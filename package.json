@@ -1,0 +1,15 @@
+{
+  "name": "runes-de-chene",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runes de Chêne - Monorepo",
+  "scripts": {
+    "dev": "pnpm --filter explore-web dev",
+    "dev:web": "pnpm --filter explore-web dev",
+    "build": "pnpm --filter explore-web build",
+    "build:web": "pnpm --filter explore-web build"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
