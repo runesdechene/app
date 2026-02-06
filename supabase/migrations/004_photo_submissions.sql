@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS hub_photo_submissions (
   submitter_name TEXT NOT NULL,
   submitter_email TEXT NOT NULL,
   submitter_instagram TEXT,
+  submitter_role TEXT DEFAULT 'client' CHECK (submitter_role IN ('client', 'ambassadeur', 'partenaire')),
   message TEXT CHECK (char_length(message) <= 500),
   
   -- Consentements
@@ -162,7 +163,8 @@ CREATE OR REPLACE FUNCTION public.create_photo_submission(
   p_submitter_instagram TEXT,
   p_message TEXT,
   p_consent_brand BOOLEAN,
-  p_consent_account BOOLEAN
+  p_consent_account BOOLEAN,
+  p_submitter_role TEXT DEFAULT 'client'
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -174,10 +176,10 @@ DECLARE
 BEGIN
   INSERT INTO hub_photo_submissions (
     user_id, submitter_name, submitter_email, submitter_instagram,
-    message, consent_brand_usage, consent_account_creation, status
+    message, consent_brand_usage, consent_account_creation, status, submitter_role
   ) VALUES (
     p_user_id, p_submitter_name, p_submitter_email, p_submitter_instagram,
-    p_message, p_consent_brand, p_consent_account, 'pending'
+    p_message, p_consent_brand, p_consent_account, 'pending', p_submitter_role
   )
   RETURNING id INTO v_id;
   RETURN v_id;

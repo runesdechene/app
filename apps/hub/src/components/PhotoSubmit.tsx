@@ -3,13 +3,29 @@ import { supabase } from '../lib/supabase'
 
 const MAX_MESSAGE_LENGTH = 500
 const MAX_FILES = 5
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB
+const ACCEPTED_TYPES = 'image/*,video/*'
+
+const isVideo = (file: File) => file.type.startsWith('video/')
+const isImage = (file: File) => file.type.startsWith('image/')
+const isMediaFile = (file: File) => isImage(file) || isVideo(file)
+const maxSizeFor = (file: File) => isVideo(file) ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
+
+type SubmitterRole = 'client' | 'ambassadeur' | 'partenaire'
+
+const ROLE_LABELS: Record<SubmitterRole, string> = {
+  client: 'Client',
+  ambassadeur: 'Ambassadeur',
+  partenaire: 'Partenaire'
+}
 
 interface FormData {
   name: string
   email: string
   instagram: string
   message: string
+  submitterRole: SubmitterRole
   consentBrand: boolean
   consentAccount: boolean
 }
@@ -22,6 +38,7 @@ export function PhotoSubmit() {
     email: '',
     instagram: '',
     message: '',
+    submitterRole: 'client' as SubmitterRole,
     consentBrand: false,
     consentAccount: false
   })
@@ -40,8 +57,8 @@ export function PhotoSubmit() {
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || [])
     const valid = selected.filter(f => {
-      if (!f.type.startsWith('image/')) return false
-      if (f.size > MAX_FILE_SIZE) return false
+      if (!isMediaFile(f)) return false
+      if (f.size > maxSizeFor(f)) return false
       return true
     })
 
@@ -124,13 +141,14 @@ export function PhotoSubmit() {
         p_submitter_instagram: form.instagram.trim() || null,
         p_message: form.message.trim() || null,
         p_consent_brand: form.consentBrand,
-        p_consent_account: form.consentAccount
+        p_consent_account: form.consentAccount,
+        p_submitter_role: form.submitterRole
       })
 
       if (subError) throw new Error(`Erreur soumission: ${subError.message}`)
 
       for (let i = 0; i < files.length; i++) {
-        setProgress(`Upload photo ${i + 1}/${files.length}...`)
+        setProgress(`Upload fichier ${i + 1}/${files.length}...`)
         const file = files[i]
         const ext = file.name.split('.').pop() || 'jpg'
         const storagePath = `submissions/${submissionId}/${crypto.randomUUID()}.${ext}`
@@ -142,7 +160,7 @@ export function PhotoSubmit() {
             upsert: false
           })
 
-        if (uploadError) throw new Error(`Erreur upload photo ${i + 1}: ${uploadError.message}`)
+        if (uploadError) throw new Error(`Erreur upload fichier ${i + 1}: ${uploadError.message}`)
 
         const { data: urlData } = supabase.storage
           .from('community-photos')
@@ -155,7 +173,7 @@ export function PhotoSubmit() {
           p_sort_order: i
         })
 
-        if (imgError) throw new Error(`Erreur enregistrement image: ${imgError.message}`)
+        if (imgError) throw new Error(`Erreur enregistrement fichier: ${imgError.message}`)
       }
 
       setStep('success')
@@ -167,7 +185,7 @@ export function PhotoSubmit() {
 
   const resetForm = () => {
     previews.forEach(p => URL.revokeObjectURL(p))
-    setForm({ name: '', email: '', instagram: '', message: '', consentBrand: false, consentAccount: false })
+    setForm({ name: '', email: '', instagram: '', message: '', submitterRole: 'client', consentBrand: false, consentAccount: false })
     setFiles([])
     setPreviews([])
     setStep('form')
@@ -181,15 +199,13 @@ export function PhotoSubmit() {
         <div className="submit-card success-card">
           <div className="success-icon">✓</div>
           <h2>Merci pour votre contribution !</h2>
-          <p>Vos photos ont ete envoyees avec succes.</p>
-          <p>Elles seront examinees par notre equipe avant publication.</p>
-          <p className="success-note">
+          <p>Vos photos ont ete envoyees avec succes. Elles seront examinees par notre equipe avant publication.</p>
+          <div className="account-info-box">
             {isNewAccount
-              ? <>Un compte Runes de Chene a ete cree pour <strong>{form.email}</strong>.&nbsp;</>
-              : <>Votre compte Runes de Chene (<strong>{form.email}</strong>) a ete associe.&nbsp;</>
+              ? <p>Felicitations, votre adresse email <strong>{form.email}</strong> a permis la creation d'un compte <strong>Runes de Chene</strong>. Vous pouvez l'utiliser sur l'application <strong>Carte</strong> pour connecter avec la communaute.</p>
+              : <p>Votre adresse email <strong>{form.email}</strong> est deja associee a un compte <strong>Runes de Chene</strong>. Vos photos ont ete rattachees a votre compte. Retrouvez la communaute sur l'application <strong>Carte</strong>.</p>
             }
-            Vous recevrez un lien de connexion par email pour acceder a vos photos et a l'application Carte.
-          </p>
+          </div>
           <button onClick={resetForm} className="btn-primary">
             Envoyer d'autres photos
           </button>
@@ -268,20 +284,33 @@ export function PhotoSubmit() {
         </div>
 
         <div className="form-group">
-          <label>Photos * <span className="optional">(max {MAX_FILES}, 10 Mo chacune)</span></label>
+          <label htmlFor="submitterRole">Vous etes *</label>
+          <select
+            id="submitterRole"
+            value={form.submitterRole}
+            onChange={(e) => updateField('submitterRole', e.target.value)}
+          >
+            {(Object.keys(ROLE_LABELS) as SubmitterRole[]).map(role => (
+              <option key={role} value={role}>{ROLE_LABELS[role]}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Photos / Videos * <span className="optional">(max {MAX_FILES} — photos 10 Mo, videos 50 Mo)</span></label>
           
           <div className="photo-upload-area" onClick={() => fileInputRef.current?.click()}>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={ACCEPTED_TYPES}
               multiple
               onChange={handleFiles}
               style={{ display: 'none' }}
             />
             <div className="upload-placeholder">
               <span className="upload-icon">📷</span>
-              <span>Cliquez pour ajouter des photos</span>
+              <span>Cliquez pour ajouter des photos ou videos</span>
             </div>
           </div>
 
@@ -289,7 +318,12 @@ export function PhotoSubmit() {
             <div className="photo-previews">
               {previews.map((src, i) => (
                 <div key={i} className="preview-item">
-                  <img src={src} alt={`Photo ${i + 1}`} />
+                  {isVideo(files[i]) ? (
+                    <video src={src} muted playsInline />
+                  ) : (
+                    <img src={src} alt={`Photo ${i + 1}`} />
+                  )}
+                  {isVideo(files[i]) && <span className="preview-video-badge">VIDEO</span>}
                   <button
                     type="button"
                     className="remove-photo"
