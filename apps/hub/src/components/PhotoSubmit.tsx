@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import './PublicForm.css'
 
 const MAX_MESSAGE_LENGTH = 500
 const MAX_FILES = 5
@@ -24,6 +25,8 @@ interface FormData {
   name: string
   email: string
   instagram: string
+  locationName: string
+  locationZip: string
   message: string
   submitterRole: SubmitterRole
   consentBrand: boolean
@@ -37,6 +40,8 @@ export function PhotoSubmit() {
     name: '',
     email: '',
     instagram: '',
+    locationName: '',
+    locationZip: '',
     message: '',
     submitterRole: 'client' as SubmitterRole,
     consentBrand: false,
@@ -111,10 +116,14 @@ export function PhotoSubmit() {
 
       if (existingUsers && existingUsers.length > 0) {
         userId = existingUsers[0].id
-        if (form.instagram.trim()) {
+        const updates: Record<string, string> = {}
+        if (form.instagram.trim()) updates.instagram = form.instagram.trim()
+        if (form.locationName.trim()) updates.location_name = form.locationName.trim()
+        if (form.locationZip.trim()) updates.location_zip = form.locationZip.trim()
+        if (Object.keys(updates).length > 0) {
           await supabase
             .from('users')
-            .update({ instagram: form.instagram.trim() })
+            .update(updates)
             .eq('id', userId)
         }
       } else {
@@ -126,7 +135,9 @@ export function PhotoSubmit() {
           p_email: form.email.toLowerCase().trim(),
           p_first_name: form.name.trim().split(' ')[0] || form.name.trim(),
           p_last_name: form.name.trim().split(' ').slice(1).join(' ') || '',
-          p_instagram: form.instagram.trim() || null
+          p_instagram: form.instagram.trim() || null,
+          p_location_name: form.locationName.trim() || null,
+          p_location_zip: form.locationZip.trim() || null
         })
 
         if (insertError) throw new Error(`Erreur creation compte: ${insertError.message}`)
@@ -139,6 +150,8 @@ export function PhotoSubmit() {
         p_submitter_name: form.name.trim(),
         p_submitter_email: form.email.toLowerCase().trim(),
         p_submitter_instagram: form.instagram.trim() || null,
+        p_location_name: form.locationName.trim() || null,
+        p_location_zip: form.locationZip.trim() || null,
         p_message: form.message.trim() || null,
         p_consent_brand: form.consentBrand,
         p_consent_account: form.consentAccount,
@@ -185,7 +198,7 @@ export function PhotoSubmit() {
 
   const resetForm = () => {
     previews.forEach(p => URL.revokeObjectURL(p))
-    setForm({ name: '', email: '', instagram: '', message: '', submitterRole: 'client', consentBrand: false, consentAccount: false })
+    setForm({ name: '', email: '', instagram: '', locationName: '', locationZip: '', message: '', submitterRole: 'client', consentBrand: false, consentAccount: false })
     setFiles([])
     setPreviews([])
     setStep('form')
@@ -280,6 +293,28 @@ export function PhotoSubmit() {
             value={form.instagram}
             onChange={(e) => updateField('instagram', e.target.value)}
             placeholder="@votre_compte"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="locationName">Ville <span className="optional">(optionnel)</span></label>
+          <input
+            id="locationName"
+            type="text"
+            value={form.locationName}
+            onChange={(e) => updateField('locationName', e.target.value)}
+            placeholder="Votre ville"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="locationZip">Code postal <span className="optional">(optionnel)</span></label>
+          <input
+            id="locationZip"
+            type="text"
+            value={form.locationZip}
+            onChange={(e) => updateField('locationZip', e.target.value)}
+            placeholder="75000"
           />
         </div>
 

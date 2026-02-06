@@ -5,6 +5,8 @@ import { Dashboard } from './components/Dashboard'
 import { Users } from './components/Users'
 import { Photos } from './components/Photos'
 import { PhotoSubmit } from './components/PhotoSubmit'
+import { Reviews } from './components/Reviews'
+import { ReviewSubmit } from './components/ReviewSubmit'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
@@ -13,13 +15,14 @@ function App() {
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
-  const publicRoutes = ['/soumettre-contenu']
+  const publicRoutes = ['/soumettre-contenu', '/soumettre-avis']
   const isPublicRoute = publicRoutes.includes(location.pathname)
 
   if (isPublicRoute) {
     return (
       <Routes>
         <Route path="/soumettre-contenu" element={<PhotoSubmit />} />
+        <Route path="/soumettre-avis" element={<ReviewSubmit />} />
       </Routes>
     )
   }
@@ -45,6 +48,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/photos" element={<Photos />} />
+          <Route path="/reviews" element={<Reviews />} />
         </Routes>
       </main>
     </div>

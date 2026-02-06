@@ -4,8 +4,10 @@
 -- Remplace hub_community_photos par un modele plus riche
 -- qui stocke les infos du formulaire public d'upload.
 
--- Ajouter colonne instagram au profil utilisateur
+-- Ajouter colonnes au profil utilisateur
 ALTER TABLE users ADD COLUMN IF NOT EXISTS instagram TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_name TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_zip TEXT;
 
 -- Table des soumissions photos
 CREATE TABLE IF NOT EXISTS hub_photo_submissions (
@@ -19,6 +21,8 @@ CREATE TABLE IF NOT EXISTS hub_photo_submissions (
   submitter_email TEXT NOT NULL,
   submitter_instagram TEXT,
   submitter_role TEXT DEFAULT 'client' CHECK (submitter_role IN ('client', 'ambassadeur', 'partenaire')),
+  location_name TEXT,
+  location_zip TEXT,
   message TEXT CHECK (char_length(message) <= 500),
   
   -- Consentements
@@ -136,12 +140,15 @@ CREATE POLICY "Public can update user instagram" ON users
 -- ============================================
 
 -- Creer un compte utilisateur depuis le formulaire public
+DROP FUNCTION IF EXISTS public.create_user_from_submission(VARCHAR, TEXT, TEXT, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION public.create_user_from_submission(
   p_id VARCHAR(255),
   p_email TEXT,
   p_first_name TEXT,
   p_last_name TEXT,
-  p_instagram TEXT
+  p_instagram TEXT,
+  p_location_name TEXT DEFAULT NULL,
+  p_location_zip TEXT DEFAULT NULL
 )
 RETURNS VARCHAR(255)
 LANGUAGE plpgsql
@@ -149,21 +156,24 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO users (id, email_address, first_name, last_name, instagram, role, is_active, rank, biography)
-  VALUES (p_id, p_email, p_first_name, p_last_name, p_instagram, 'user', true, 0, '');
+  INSERT INTO users (id, email_address, first_name, last_name, instagram, location_name, location_zip, role, is_active, rank, biography)
+  VALUES (p_id, p_email, p_first_name, p_last_name, p_instagram, p_location_name, p_location_zip, 'user', true, 0, '');
   RETURN p_id;
 END;
 $$;
 
 -- Creer une soumission photo
+DROP FUNCTION IF EXISTS public.create_photo_submission(VARCHAR, TEXT, TEXT, TEXT, TEXT, BOOLEAN, BOOLEAN, TEXT);
 CREATE OR REPLACE FUNCTION public.create_photo_submission(
   p_user_id VARCHAR(255),
   p_submitter_name TEXT,
   p_submitter_email TEXT,
   p_submitter_instagram TEXT,
-  p_message TEXT,
-  p_consent_brand BOOLEAN,
-  p_consent_account BOOLEAN,
+  p_location_name TEXT DEFAULT NULL,
+  p_location_zip TEXT DEFAULT NULL,
+  p_message TEXT DEFAULT NULL,
+  p_consent_brand BOOLEAN DEFAULT FALSE,
+  p_consent_account BOOLEAN DEFAULT FALSE,
   p_submitter_role TEXT DEFAULT 'client'
 )
 RETURNS UUID
@@ -176,9 +186,11 @@ DECLARE
 BEGIN
   INSERT INTO hub_photo_submissions (
     user_id, submitter_name, submitter_email, submitter_instagram,
+    location_name, location_zip,
     message, consent_brand_usage, consent_account_creation, status, submitter_role
   ) VALUES (
     p_user_id, p_submitter_name, p_submitter_email, p_submitter_instagram,
+    p_location_name, p_location_zip,
     p_message, p_consent_brand, p_consent_account, 'pending', p_submitter_role
   )
   RETURNING id INTO v_id;

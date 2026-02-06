@@ -28,6 +28,9 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/photos" className={({ isActive }) => isActive ? 'active' : ''}>
           Photos
         </NavLink>
+        <NavLink to="/reviews" className={({ isActive }) => isActive ? 'active' : ''}>
+          Avis
+        </NavLink>
       </nav>
 
       <div className="sidebar-footer">

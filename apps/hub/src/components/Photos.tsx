@@ -20,6 +20,8 @@ interface PhotoSubmission {
   submitter_email: string
   submitter_instagram: string | null
   submitter_role: SubmitterRole | null
+  location_name: string | null
+  location_zip: string | null
   message: string | null
   consent_brand_usage: boolean
   status: PhotoStatus
@@ -103,12 +105,28 @@ export function Photos() {
     })
 
     if (!error) {
-      setSubmissions(prev => prev.map(s =>
-        s.id === subId ? { ...s, status, rejection_reason: reason || null } : s
-      ))
+      if (filter !== 'all') {
+        setSubmissions(prev => prev.filter(s => s.id !== subId))
+      } else {
+        setSubmissions(prev => prev.map(s =>
+          s.id === subId ? { ...s, status, rejection_reason: reason || null } : s
+        ))
+      }
     }
     setRejectingId(null)
     setRejectReason('')
+  }
+
+  const deleteSubmission = async (subId: string) => {
+    if (!window.confirm('Etes-vous sur de vouloir supprimer definitivement cette soumission ? Cette action est irreversible.')) return
+
+    const { error } = await supabase.rpc('delete_photo_submission', {
+      p_submission_id: subId
+    })
+
+    if (!error) {
+      setSubmissions(prev => prev.filter(s => s.id !== subId))
+    }
   }
 
   const openLightbox = (images: SubmissionImage[], index: number) => {
@@ -194,6 +212,11 @@ export function Photos() {
                 {sub.submitter_instagram && (
                   <span className="photo-instagram">{sub.submitter_instagram}</span>
                 )}
+                {(sub.location_name || sub.location_zip) && (
+                  <span className="photo-location">
+                    {[sub.location_name, sub.location_zip].filter(Boolean).join(' — ')}
+                  </span>
+                )}
                 {sub.message && <p className="photo-caption">{sub.message}</p>}
                 <div className="photo-meta">
                   <span className="photo-date">
@@ -253,6 +276,12 @@ export function Photos() {
                   >
                     Refuser
                   </button>
+                  <button
+                    className="btn-reject"
+                    onClick={() => deleteSubmission(sub.id)}
+                  >
+                    Supprimer
+                  </button>
                 </div>
               )}
 
@@ -263,6 +292,23 @@ export function Photos() {
                     onClick={() => moderate(sub.id, 'rejected', 'Retrait apres approbation')}
                   >
                     Retirer
+                  </button>
+                  <button
+                    className="btn-reject"
+                    onClick={() => deleteSubmission(sub.id)}
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              )}
+
+              {sub.status === 'rejected' && (
+                <div className="photo-actions">
+                  <button
+                    className="btn-reject"
+                    onClick={() => deleteSubmission(sub.id)}
+                  >
+                    Supprimer
                   </button>
                 </div>
               )}
