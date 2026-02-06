@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-type PhotoStatus = 'pending' | 'approved' | 'rejected'
+type PhotoStatus = 'pending' | 'approved_great' | 'approved_average' | 'rejected'
 type SubmitterRole = 'client' | 'ambassadeur' | 'partenaire'
 
 const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm', '.avi', '.mkv', '.m4v']
@@ -30,13 +30,15 @@ interface PhotoSubmission {
 
 const STATUS_LABELS: Record<PhotoStatus, string> = {
   pending: 'En attente',
-  approved: 'Approuvee',
-  rejected: 'Rejetee'
+  approved_great: 'Geniales',
+  approved_average: 'Moyennes',
+  rejected: 'Refusees'
 }
 
 const STATUS_COLORS: Record<PhotoStatus, string> = {
   pending: '#f59e0b',
-  approved: '#22c55e',
+  approved_great: '#22c55e',
+  approved_average: '#3b82f6',
   rejected: '#ef4444'
 }
 
@@ -130,7 +132,7 @@ export function Photos() {
       <div className="page-header">
         <h1>Soumissions photos</h1>
         <div className="filter-tabs">
-          {(['pending', 'approved', 'rejected', 'all'] as const).map(f => (
+          {(['pending', 'approved_great', 'approved_average', 'rejected', 'all'] as const).map(f => (
             <button
               key={f}
               className={`filter-tab ${filter === f ? 'active' : ''}`}
@@ -235,20 +237,26 @@ export function Photos() {
                 <div className="photo-actions">
                   <button
                     className="btn-approve"
-                    onClick={() => moderate(sub.id, 'approved')}
+                    onClick={() => moderate(sub.id, 'approved_great')}
                   >
-                    Approuver
+                    Geniale
+                  </button>
+                  <button
+                    className="btn-approve-avg"
+                    onClick={() => moderate(sub.id, 'approved_average')}
+                  >
+                    Moyenne
                   </button>
                   <button
                     className="btn-reject"
                     onClick={() => setRejectingId(sub.id)}
                   >
-                    Rejeter
+                    Refuser
                   </button>
                 </div>
               )}
 
-              {sub.status === 'approved' && (
+              {(sub.status === 'approved_great' || sub.status === 'approved_average') && (
                 <div className="photo-actions">
                   <button
                     className="btn-reject"

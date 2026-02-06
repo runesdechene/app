@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS hub_photo_submissions (
   consent_account_creation BOOLEAN NOT NULL DEFAULT FALSE,
   
   -- Moderation
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved_great', 'approved_average', 'rejected')),
   moderated_by VARCHAR(255) REFERENCES users(id),
   moderated_at TIMESTAMPTZ,
   rejection_reason TEXT,
