@@ -32,6 +32,7 @@
     "@tanstack/react-query": "^5.61.0",
     "date-fns": "^3.6.0",
     "expo": "^53.0.12",
+    "expo-application": "^7.0.8",
     "expo-checkbox": "~4.1.4",
     "expo-constants": "~17.1.6",
     "expo-device": "~7.1.4",

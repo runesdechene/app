@@ -249,6 +249,9 @@ importers:
       expo:
         specifier: ^53.0.12
         version: 53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
+      expo-application:
+        specifier: ^7.0.8
+        version: 7.0.8(expo@53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0))
       expo-checkbox:
         specifier: ~4.1.4
         version: 4.1.4(react-native-web@0.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -4904,6 +4907,11 @@ packages:
 
   expo-application@6.1.5:
     resolution: {integrity: sha512-ToImFmzw8luY043pWFJhh2ZMm4IwxXoHXxNoGdlhD4Ym6+CCmkAvCglg0FK8dMLzAb+/XabmOE7Rbm8KZb6NZg==}
+    peerDependencies:
+      expo: '*'
+
+  expo-application@7.0.8:
+    resolution: {integrity: sha512-qFGyxk7VJbrNOQWBbE09XUuGuvkOgFS9QfToaK2FdagM2aQ+x3CvGV2DuVgl/l4ZxPgIf3b/MNh9xHpwSwn74Q==}
     peerDependencies:
       expo: '*'
 
@@ -14905,6 +14913,10 @@ snapshots:
       jest-util: 29.7.0
 
   expo-application@6.1.5(expo@53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)):
+    dependencies:
+      expo: 53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
+
+  expo-application@7.0.8(expo@53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)):
     dependencies:
       expo: 53.0.26(@babel/core@7.29.0)(@expo/metro-runtime@5.0.5(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.4(@babel/core@7.29.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
 
