@@ -1,6 +1,8 @@
 export * from './authenticator'
+export { SupabaseAuthenticator } from './supabase-authenticator'
 export * from './image-selector'
 export * from './location-service'
 export * from './media-uploader'
+export { SupabaseMediaUploader } from './supabase-media-uploader'
 export * from './places-feed-gateway'
 export * from './placeType.service'

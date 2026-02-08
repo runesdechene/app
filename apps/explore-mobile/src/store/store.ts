@@ -5,7 +5,6 @@ import {
 } from '@reduxjs/toolkit'
 import devToolsEnhancer from 'redux-devtools-expo-dev-plugin'
 
-import { IHttpClient } from '@/shared/http/http-client.interface'
 import { IAlerter } from '@/shared/ports/alerter/alerter'
 import { IDateProvider } from '@/shared/ports/date/date-provider'
 import { IEventEmitter } from '@/shared/ports/event-emitter/event-emitter'
@@ -24,11 +23,11 @@ import {
   IUsersQueryGateway,
 } from '@ports'
 import {
-  Authenticator,
   ImageSelector,
   LocationService,
-  MediaUploader,
 } from '@services'
+import { SupabaseAuthenticator } from '@/services/supabase-authenticator'
+import { SupabaseMediaUploader } from '@/services/supabase-media-uploader'
 import { Href } from 'expo-router'
 import {
   TypedUseSelectorHook,
@@ -42,7 +41,6 @@ export type Dependencies = {
   storage: IStorage
   router: IRouter<Href>
   dateProvider: IDateProvider
-  httpClient: IHttpClient
   alerter: IAlerter
   eventEmitter: IEventEmitter
 
@@ -57,9 +55,9 @@ export type Dependencies = {
   adminGateway: IAdminQueryGateway
 
   // Services
-  authenticator: Authenticator
+  authenticator: SupabaseAuthenticator
   locationService: LocationService
-  mediaUploader: MediaUploader
+  mediaUploader: SupabaseMediaUploader
   imageSelector: ImageSelector
 
   appVersion: string

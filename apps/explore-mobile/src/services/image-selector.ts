@@ -1,7 +1,11 @@
 import { Nullable } from '@/shared/types'
-import { MediaUploader } from '@services'
 import * as ImagePicker from 'expo-image-picker'
 import { customAlphabet } from 'nanoid/non-secure'
+
+export interface IMediaUploader {
+  storeAsUrl(params: { uri: string }): Promise<{ url: string }>
+  storeAsMedia(params: { uri: string }): Promise<{ id: string; url: string }>
+}
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 10)
 
@@ -24,7 +28,7 @@ export type OnUploadedAsMediaResult = {
 }
 
 export class ImageSelector {
-  constructor(private readonly mediaUploader: MediaUploader) {}
+  constructor(private readonly mediaUploader: IMediaUploader) {}
 
   async pickMany({
     onSelected,

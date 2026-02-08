@@ -2,17 +2,14 @@ import { Href } from 'expo-router'
 import React, { createContext, useContext, useMemo, useRef } from 'react'
 import { Provider as ReduxProvider } from 'react-redux'
 
-import { HttpAccountGateway } from '@/adapters/http-account-gateway'
-import { HttpAdminQueryGateway } from '@/adapters/http-admin-query-gateway'
-import { HttpPlacesCommandGateway } from '@/adapters/http-places-command-gateway'
-import { HttpPlacesFeedGateway } from '@/adapters/http-places-feed-gateway'
-import { HttpPlacesQueryGateway } from '@/adapters/http-places-query-gateway'
-import { HttpReviewsGateway } from '@/adapters/http-reviews-gateway'
-import { HttpSessionGateway } from '@/adapters/http-session-gateway'
-import { HttpUsersQueryGateway } from '@/adapters/http-users-query-gateway'
-import { AxiosHttpClient } from '@/shared/http/clients/axios-http-client'
-import { IHttpClient } from '@/shared/http/http-client.interface'
-import { HttpRemote } from '@/shared/http/http-remote'
+import { SupabaseAccountGateway } from '@/adapters/supabase-account-gateway'
+import { SupabaseAdminQueryGateway } from '@/adapters/supabase-admin-query-gateway'
+import { SupabasePlacesCommandGateway } from '@/adapters/supabase-places-command-gateway'
+import { SupabasePlacesFeedGateway } from '@/adapters/supabase-places-feed-gateway'
+import { SupabasePlacesQueryGateway } from '@/adapters/supabase-places-query-gateway'
+import { SupabaseReviewsGateway } from '@/adapters/supabase-reviews-gateway'
+import { SupabaseSessionGateway } from '@/adapters/supabase-session-gateway'
+import { SupabaseUsersQueryGateway } from '@/adapters/supabase-users-query-gateway'
 import { IAlerter } from '@/shared/ports/alerter/alerter'
 import { ConsoleAlerter } from '@/shared/ports/alerter/console-alerter'
 import { IDateProvider } from '@/shared/ports/date/date-provider'
@@ -23,6 +20,7 @@ import { AppRouter } from '@/shared/ports/router/app-router'
 import { IRouter } from '@/shared/ports/router/router'
 import { AsyncStorage } from '@/shared/ports/storage/async-storage'
 import { IStorage } from '@/shared/ports/storage/storage'
+import { SupabaseMediaUploader } from '@/services/supabase-media-uploader'
 import { AppStore, Dependencies, createStore } from '@/store/store'
 import {
   IAccountGateway,
@@ -35,11 +33,10 @@ import {
   IUsersQueryGateway,
 } from '@ports'
 import {
-  Authenticator,
   ImageSelector,
   LocationService,
-  MediaUploader,
 } from '@services'
+import { SupabaseAuthenticator } from '@/services/supabase-authenticator'
 import * as Application from 'expo-application'
 
 const Context = createContext({} as Dependencies)
@@ -51,32 +48,27 @@ export const DependenciesProvider = ({
 }) => {
   const storage: IStorage = new AsyncStorage()
   const router: IRouter<Href> = new AppRouter()
-  const httpClient: IHttpClient = new AxiosHttpClient(
-    // @ts-ignore
-    new HttpRemote(process.env.EXPO_PUBLIC_API_URL),
-  )
   const dateProvider: IDateProvider = new SystemDateProvider()
   const alerter: IAlerter = new ConsoleAlerter()
   const eventEmitter: IEventEmitter = new DeviceEventEmitter()
 
-  const sessionGateway: ISessionGateway = new HttpSessionGateway(httpClient)
-  const accountGateway: IAccountGateway = new HttpAccountGateway(httpClient)
-  const placesFeedGateway: IPlacesFeedGateway = new HttpPlacesFeedGateway(
-    httpClient,
-  )
-  const placesQueryGateway: IPlacesQueryGateway = new HttpPlacesQueryGateway(
-    httpClient,
-  )
+  const authenticator = new SupabaseAuthenticator(storage)
+  const getUserId = () => authenticator.getUserId()
+
+  const sessionGateway: ISessionGateway = new SupabaseSessionGateway()
+  const accountGateway: IAccountGateway = new SupabaseAccountGateway(getUserId)
+  const placesFeedGateway: IPlacesFeedGateway =
+    new SupabasePlacesFeedGateway(getUserId)
+  const placesQueryGateway: IPlacesQueryGateway =
+    new SupabasePlacesQueryGateway(getUserId)
   const placesCommandGateway: IPlacesCommandGateway =
-    new HttpPlacesCommandGateway(httpClient)
+    new SupabasePlacesCommandGateway(getUserId)
+  const usersQueryGateway: IUsersQueryGateway =
+    new SupabaseUsersQueryGateway()
+  const reviewsGateway: IReviewsGateway = new SupabaseReviewsGateway(getUserId)
+  const adminGateway: IAdminQueryGateway = new SupabaseAdminQueryGateway()
 
-  const usersQueryGateway: IUsersQueryGateway = new HttpUsersQueryGateway(
-    httpClient,
-  )
-
-  const reviewsGateway: IReviewsGateway = new HttpReviewsGateway(httpClient)
-
-  const adminGateway: IAdminQueryGateway = new HttpAdminQueryGateway(httpClient)
+  const mediaUploader = new SupabaseMediaUploader(getUserId)
 
   const appVersion = `${Application.nativeApplicationVersion ?? ''} (${Application.nativeBuildVersion ?? ''})`
 
@@ -84,7 +76,6 @@ export const DependenciesProvider = ({
     () => ({
       storage,
       router,
-      httpClient,
       dateProvider,
       alerter,
       eventEmitter,
@@ -98,15 +89,10 @@ export const DependenciesProvider = ({
       reviewsGateway,
       adminGateway,
 
-      authenticator: new Authenticator(
-        sessionGateway,
-        storage,
-        httpClient,
-        dateProvider,
-      ),
+      authenticator,
       locationService: new LocationService(alerter),
-      mediaUploader: new MediaUploader(httpClient),
-      imageSelector: new ImageSelector(new MediaUploader(httpClient)),
+      mediaUploader,
+      imageSelector: new ImageSelector(mediaUploader),
       appVersion,
     }),
     [],
