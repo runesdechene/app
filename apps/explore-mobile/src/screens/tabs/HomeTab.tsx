@@ -1,13 +1,16 @@
 import { useBannerFeedQuery } from '@/queries/use-banner-feed-query'
 import { useRegularFeedQuery } from '@/queries/use-regular-feed-query'
+import { APP_VERSION } from '@/shared/version'
 import { ApiPlaceSummary } from '@model'
 import { GetRegularFeedType } from '@ports'
 import {
   Banner,
+  Colors,
   FixedScreen,
   FlatListWrapper,
   PlacePreview,
   Tabs,
+  Text,
   useLocationProvider,
 } from '@ui'
 import { useEffect } from 'react'
@@ -17,6 +20,9 @@ export const HomeTab = () => {
 
   return (
     <FixedScreen avatarHeader footer={{ sticky: true }}>
+      <Text color={Colors.label} style={{ textAlign: 'center', opacity: 0.5, fontSize: 11, marginTop: -8, marginBottom: -8 }}>
+        v{APP_VERSION}
+      </Text>
       <Banner data={bannerQuery.data?.[0]} />
       <Tabs
         tabs={[

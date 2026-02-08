@@ -16,6 +16,7 @@ import {
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
+import * as Updates from 'expo-updates'
 import { useEffect } from 'react'
 import { PaperProvider } from 'react-native-paper'
 import 'react-native-reanimated'
@@ -23,7 +24,24 @@ import 'react-native-reanimated'
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
 
+async function checkForOTAUpdate() {
+  if (__DEV__) return
+  try {
+    const update = await Updates.checkForUpdateAsync()
+    if (update.isAvailable) {
+      await Updates.fetchUpdateAsync()
+      await Updates.reloadAsync()
+    }
+  } catch (e) {
+    console.warn('OTA update check failed:', e)
+  }
+}
+
 export default function RootLayout() {
+  useEffect(() => {
+    checkForOTAUpdate()
+  }, [])
+
   const [loaded] = useFonts({
     // Inconsolata
     Inconsolata_Black: require('@/ui/assets/fonts/Inconsolata-Black.ttf'),
