@@ -22,7 +22,7 @@ export class SupabaseAuthenticator {
     }
 
     // Listen for auth state changes
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((_event: string, session: any) => {
       if (session) {
         const authData = this.sessionToAuthData(session)
         this.user.set(authData)

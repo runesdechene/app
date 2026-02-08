@@ -98,7 +98,7 @@ export const DependenciesProvider = ({
     [],
   )
 
-  const store = useRef<AppStore>()
+  const store = useRef<AppStore>(null)
   if (!store.current) {
     store.current = createStore({
       dependencies,

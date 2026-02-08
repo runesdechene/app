@@ -243,9 +243,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.61.0
         version: 5.90.20(react@19.0.0)
-      axios:
-        specifier: ^1.7.7
-        version: 1.13.4
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0

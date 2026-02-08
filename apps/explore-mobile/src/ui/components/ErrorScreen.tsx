@@ -1,11 +1,10 @@
-import { HttpException } from '@/shared/http/http-exception'
 import { useDependencies } from '@/ui/dependencies/Dependencies'
 import { Screen } from '@/ui/libs/Screen/Screen'
 import { Text } from '@/ui/libs/Text'
 import styled from 'styled-components/native'
 
 export function printError(value: any) {
-  if (value instanceof HttpException) {
+  if (value instanceof Error) {
     return value.message
   }
 

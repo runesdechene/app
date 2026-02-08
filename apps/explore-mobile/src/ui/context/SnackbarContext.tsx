@@ -1,4 +1,3 @@
-import { HttpException } from '@/shared/http/http-exception'
 import { createContext, useContext, useState } from 'react'
 import { Snackbar } from 'react-native-paper'
 
@@ -9,9 +8,7 @@ const Context = createContext({
 
 export const SnackbarProvider = ({ children }: { children: any }) => {
   function showError(error: any) {
-    if (error instanceof HttpException) {
-      setMessage(error.message)
-    } else if (error instanceof Error) {
+    if (error instanceof Error) {
       setMessage(error.message)
     } else {
       setMessage('Unknown error')
