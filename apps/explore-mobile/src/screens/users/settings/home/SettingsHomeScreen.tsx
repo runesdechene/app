@@ -44,12 +44,6 @@ export const SettingsHomeScreen = () => {
         >
           Adresse e-mail
         </TextLink>
-        <TextLink
-          onPress={createRouter('/settings/change-password')}
-          color={Colors.label}
-        >
-          Mot de passe
-        </TextLink>
         <GapSeparator separator />
         <TextLink
           onPress={createRouter('/settings/sensible-place')}

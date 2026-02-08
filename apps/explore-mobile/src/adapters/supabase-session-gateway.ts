@@ -1,27 +1,8 @@
 import { supabase } from '@/shared/supabase/client'
 import { ApiAuthenticatedUser } from '@model'
-import {
-  BeginPasswordResetRequest,
-  EndPasswordResetRequest,
-  ISessionGateway,
-  RegisterRequest,
-} from '@ports'
+import { ISessionGateway } from '@ports'
 
 export class SupabaseSessionGateway implements ISessionGateway {
-  async signIn(
-    emailAddress: string,
-    password: string,
-  ): Promise<ApiAuthenticatedUser> {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: emailAddress,
-      password,
-    })
-
-    if (error) throw error
-
-    return this.mapSession(data)
-  }
-
   async refreshAccessToken(
     _refreshToken: string,
   ): Promise<ApiAuthenticatedUser> {
@@ -35,38 +16,6 @@ export class SupabaseSessionGateway implements ISessionGateway {
 
   async signOut(_refreshToken: string): Promise<void> {
     const { error } = await supabase.auth.signOut()
-    if (error) throw error
-  }
-
-  async register(req: RegisterRequest): Promise<ApiAuthenticatedUser> {
-    const { data, error } = await supabase.auth.signUp({
-      email: req.emailAddress,
-      password: req.password,
-      options: {
-        data: {
-          last_name: req.lastName,
-          gender: req.gender,
-        },
-      },
-    })
-
-    if (error) throw error
-    if (!data.session || !data.user) throw new Error('No session after signup')
-
-    return this.mapSession(data as any)
-  }
-
-  async beginPasswordReset(body: BeginPasswordResetRequest): Promise<void> {
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      body.emailAddress,
-    )
-    if (error) throw error
-  }
-
-  async endPasswordReset(body: EndPasswordResetRequest): Promise<void> {
-    const { error } = await supabase.auth.updateUser({
-      password: body.nextPassword,
-    })
     if (error) throw error
   }
 

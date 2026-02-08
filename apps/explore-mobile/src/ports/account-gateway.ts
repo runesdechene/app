@@ -18,14 +18,9 @@ export type ChangeInformationsRequestModel = {
   websiteUrl?: string
 }
 
-export type ChangePasswordRequestModel = {
-  newPassword: string
-}
-
 export interface IAccountGateway {
   getMyUser(): Promise<ApiMyInformations>
   changeInformations(data: ChangeInformationsRequestModel): Promise<any>
-  changePassword(data: ChangePasswordRequestModel): Promise<any>
   changeEmailAddress(data: ChangeEmailAddressRequestModel): Promise<any>
   activateAccount(data: ActivateAccountRequestModel): Promise<any>
   deleteAccount(): Promise<any>

@@ -4,7 +4,8 @@ import { supabase } from '@/shared/supabase/client'
 import { Nullable } from '@/shared/types'
 import { AuthData } from '@model'
 
-export type SignInCredentials = { emailAddress: string; password: string }
+export type SendOtpParams = { email: string }
+export type VerifyOtpParams = { email: string; code: string }
 
 export class SupabaseAuthenticator {
   private user = new ObservableValue<Nullable<AuthData>>(null)
@@ -32,10 +33,19 @@ export class SupabaseAuthenticator {
     })
   }
 
-  async signIn(credentials: SignInCredentials) {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: credentials.emailAddress,
-      password: credentials.password,
+  async sendOtp(params: SendOtpParams) {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: params.email,
+    })
+
+    if (error) throw error
+  }
+
+  async verifyOtp(params: VerifyOtpParams) {
+    const { error } = await supabase.auth.verifyOtp({
+      email: params.email,
+      token: params.code,
+      type: 'email',
     })
 
     if (error) throw error
@@ -76,11 +86,6 @@ export class SupabaseAuthenticator {
       const authData = this.sessionToAuthData(data.session)
       this.user.set(authData)
     }
-  }
-
-  async onRegistered() {
-    // Supabase Auth handles this via onAuthStateChange
-    // Nothing extra needed
   }
 
   getUserId(): string | null {

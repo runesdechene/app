@@ -1,13 +1,14 @@
 import { useDependencies } from '@/ui/dependencies/Dependencies'
 import { AuthData } from '@model'
-import { SignInCredentials } from '@services'
+import { SendOtpParams, VerifyOtpParams } from '@/services/supabase-authenticator'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 type Session = {
   session: AuthData | null
   isAuthenticated: boolean
   ready: boolean
-  signIn: (credentials: SignInCredentials) => Promise<void>
+  sendOtp: (params: SendOtpParams) => Promise<void>
+  verifyOtp: (params: VerifyOtpParams) => Promise<void>
   signOut: () => Promise<void>
   refresh: () => Promise<void>
 }
@@ -16,7 +17,8 @@ const Context = createContext<Session>({
   session: null,
   isAuthenticated: false,
   ready: false,
-  signIn: async () => {},
+  sendOtp: async () => {},
+  verifyOtp: async () => {},
   signOut: async () => {},
   refresh: async () => {},
 })
@@ -34,8 +36,8 @@ export const SessionProvider = ({
     isAuthenticated: !!session,
     session: session,
     ready: ready,
-    signIn: async (credentials: SignInCredentials) =>
-      authenticator.signIn(credentials),
+    sendOtp: async (params: SendOtpParams) => authenticator.sendOtp(params),
+    verifyOtp: async (params: VerifyOtpParams) => authenticator.verifyOtp(params),
     signOut: async () => authenticator.signOut(),
     refresh: async () => authenticator.refreshUser(),
   }

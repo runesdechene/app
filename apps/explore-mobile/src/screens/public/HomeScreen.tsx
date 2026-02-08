@@ -49,10 +49,7 @@ export const HomeScreen = () => {
       <GapSeparator />
       <GapSeparator />
       <Button onPress={() => router.push('/sign-in')} color="special">
-        Connexion
-      </Button>
-      <Button onPress={() => router.push('/register')} fullWidth>
-        Créer mon compte
+        Connexion / Inscription
       </Button>
       <GapSeparator />
       <TextLink

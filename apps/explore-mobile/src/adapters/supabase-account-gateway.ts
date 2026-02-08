@@ -4,7 +4,6 @@ import {
   ActivateAccountRequestModel,
   ChangeEmailAddressRequestModel,
   ChangeInformationsRequestModel,
-  ChangePasswordRequestModel,
   IAccountGateway,
 } from '@ports'
 
@@ -43,14 +42,6 @@ export class SupabaseAccountGateway implements IAccountGateway {
       .from('users')
       .update(updates)
       .eq('id', userId)
-
-    if (error) throw error
-  }
-
-  async changePassword(req: ChangePasswordRequestModel): Promise<any> {
-    const { error } = await supabase.auth.updateUser({
-      password: req.newPassword,
-    })
 
     if (error) throw error
   }
