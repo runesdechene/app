@@ -12,6 +12,7 @@
       "distribution": "internal"
     },
     "production": {
+      "channel": "production",
       "autoIncrement": true,
       "android": {
         "image": "latest"
@@ -25,6 +26,7 @@
       }
     },
     "apk": {
+      "channel": "production",
       "autoIncrement": true,
       "android": {
         "image": "latest",

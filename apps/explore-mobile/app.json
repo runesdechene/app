@@ -45,8 +45,15 @@
       "output": "static",
       "favicon": "./src/ui/assets/images/adaptive-icon.png"
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/147a6cdc-2328-4d3e-8544-862719950ade"
+    },
     "plugins": [
       "expo-router",
+      "expo-updates",
       [
         "expo-location",
         {
