@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "tests",
+    "dist",
+    "mikro-orm.config.ts",
+    "tsconfig.build.tsbuildinfo"
+  ]
+}

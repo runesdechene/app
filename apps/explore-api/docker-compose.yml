@@ -1,0 +1,58 @@
+version: '3'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: doadmin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: defaultdb
+    ports:
+      - '6888:5432'
+  redis:
+    image: redis/redis-stack
+    restart: always
+    environment:
+      REDIS_ARGS: "--requirepass azerty123 --user gdv on >azerty123 ~* allcommands --user default off nopass nocommands"
+    ports:
+      - "6895:8001"
+      - "6889:6379"
+  mailer:
+    image: 'mailhog/mailhog'
+    ports:
+      - '6890:1025'
+      - '6891:8025'
+  dbadmin:
+    image: 'dpage/pgadmin4'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: contact@lgdv.org
+      PGADMIN_DEFAULT_PASSWORD: azerty123
+    ports:
+      - '6892:80'
+  wanderersdb:
+    image: "mariadb:10.3"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: wanderers
+      MYSQL_PASSWORD: wanderers
+      MYSQL_DATABASE: wanderers
+    ports:
+      - "6893:3306"
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
+  wanderers_pma:
+    image: "phpmyadmin/phpmyadmin"
+    environment:
+      PMA_HOST: "wanderersdb"
+      PMA_USER: wanderers
+      PMA_PASSWORD: wanderers
+      UPLOAD_LIMIT: 3000000000
+    logging:
+      driver: none
+    expose:
+      - "80"
+    ports:
+      - "6894:80"

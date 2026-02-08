@@ -1,0 +1,18 @@
+export const testConfig = () => ({
+  DATABASE_URL: `postgresql://gdv:password123@localhost:${process.env.COMPOSE_DB_PORT}/gdv`,
+  DATABASE_USE_SSL: 'no',
+  ENVIRONMENT: 'test',
+  SMTP_HOST: 'mailer',
+  SMTP_PORT: process.env.COMPOSE_MAILER_SMTP_PORT,
+  SMTP_USER: '',
+  SMTP_PASSWORD: '',
+  WANDERERS_DB_HOST: 'localhost',
+  WANDERERS_DB_PORT: 6893,
+  WANDERERS_DB_NAME: 'wanderers',
+  WANDERERS_DB_PASSWORD: 'wanderers',
+  AWS_ACCESS_KEY: 'YOUR_AWS_ACCESS_KEY',
+  AWS_SECRET_KEY: 'YOUR_AWS_SECRET_KEY',
+  AWS_S3_REGION: 'eu-west-1',
+  AWS_DEPLOYMENT_ENV: 'dev',
+  REDIS_CONNECTION_URL: `redis://default@localhost:${process.env.COMPOSE_REDIS_PORT}`,
+});
