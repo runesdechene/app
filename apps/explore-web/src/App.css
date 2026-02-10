@@ -1,8 +1,9 @@
 :root {
   --color-primary: #8b5cf6;
+  --color-button: red;
   --color-success: #22c55e;
   --color-error: #ef4444;
-  --color-muted: #6b7280;
+  --color-muted: #6b7280; 
   --radius: 12px;
   --gap: 1.5rem;
 }

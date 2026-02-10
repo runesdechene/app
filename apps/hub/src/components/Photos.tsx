@@ -23,6 +23,9 @@ interface PhotoSubmission {
   location_name: string | null
   location_zip: string | null
   message: string | null
+  product_size: string | null
+  model_height_cm: number | null
+  model_shoulder_width_cm: number | null
   consent_brand_usage: boolean
   status: PhotoStatus
   rejection_reason: string | null
@@ -149,6 +152,9 @@ export function Photos() {
     <div className="photos">
       <div className="page-header">
         <h1>Soumissions photos</h1>
+        <a href="/soumettre-contenu" target="_blank" rel="noopener noreferrer" className="form-link">
+          Ouvrir le formulaire photos ↗
+        </a>
         <div className="filter-tabs">
           {(['pending', 'approved_great', 'approved_average', 'rejected', 'all'] as const).map(f => (
             <button
@@ -216,6 +222,13 @@ export function Photos() {
                   <span className="photo-location">
                     {[sub.location_name, sub.location_zip].filter(Boolean).join(' — ')}
                   </span>
+                )}
+                {(sub.product_size || sub.model_height_cm || sub.model_shoulder_width_cm) && (
+                  <div className="photo-sizing">
+                    {sub.product_size && <span className="sizing-badge">Taille : {sub.product_size}</span>}
+                    {sub.model_height_cm && <span className="sizing-badge">Hauteur : {sub.model_height_cm} cm</span>}
+                    {sub.model_shoulder_width_cm && <span className="sizing-badge">Epaules : {sub.model_shoulder_width_cm} cm</span>}
+                  </div>
                 )}
                 {sub.message && <p className="photo-caption">{sub.message}</p>}
                 <div className="photo-meta">

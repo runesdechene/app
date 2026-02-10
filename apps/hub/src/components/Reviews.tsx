@@ -102,6 +102,9 @@ export function Reviews() {
     <div className="reviews">
       <div className="page-header">
         <h1>Soumissions avis</h1>
+        <a href="/soumettre-avis" target="_blank" rel="noopener noreferrer" className="form-link">
+          Ouvrir le formulaire avis ↗
+        </a>
         <div className="filter-tabs">
           {(['pending', 'approved', 'archived', 'all'] as const).map(f => (
             <button

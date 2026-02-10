@@ -9,7 +9,8 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.35) 100%),
+              url('/assets/background_form.webp') center / cover no-repeat fixed;
   text-align: left;
 }
 
@@ -19,36 +20,42 @@
 }
 
 .submit-header h1 {
-  font-size: 1.8rem;
+  font-size: 2.8rem;
   margin-bottom: 0.25rem;
-  color: #fff;
+  color: #584e47;
 }
 
 .submit-header p {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
+  color: #6b4c3b;
+  font-size: 1.3rem;
 }
 
+/* ---- Header Logo ---- */
+
+.header-logo {
+  height: 100px;
+  margin-block: 1rem;
+  filter: invert(29%) sepia(5%) saturate(1456%) hue-rotate(342deg) brightness(93%) contrast(83%);
+}
 /* ---- Card / Form container ---- */
 
 .submit-form {
   width: 100%;
-  max-width: 560px;
+  max-width: 760px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: rgba(255, 252, 249, 0.86);
+  border: 3px solid rgba(214, 206, 206, 0.8); 
+  border-radius: 20px;
   padding: 2rem;
-  backdrop-filter: blur(10px);
 }
 
 .submit-card {
   max-width: 480px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 252, 249, 0.86);
+  border: 3px solid rgba(214, 206, 206, 0.8);
   border-radius: 16px;
   padding: 2.5rem 2rem;
   text-align: center;
@@ -58,11 +65,11 @@
 
 .submit-card h2 {
   margin-bottom: 0.75rem;
-  color: #fff;
+  color: #3b2314;
 }
 
 .submit-card p {
-  color: rgba(255, 255, 255, 0.7);
+  color: #5a3a2a;
   margin-bottom: 0.5rem;
   line-height: 1.5;
 }
@@ -80,35 +87,36 @@
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: #3b2314;
 }
 
 .form-group .optional {
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  color: #8b6f5e;
   font-size: 0.75rem;
 }
 
 .form-group input[type="text"],
 .form-group input[type="email"],
+.form-group input[type="number"],
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(59, 35, 20, 0.2);
   border-radius: 10px;
-  color: #fff;
+  color: #3b2314;
   font-size: 0.95rem;
   font-family: inherit;
   transition: border-color 0.2s;
 }
 
 .form-group select option {
-  background: #1a1a2e;
-  color: #fff;
+  background: #fff;
+  color: #3b2314;
 }
 
 .form-group input:focus,
@@ -125,14 +133,14 @@
 
 .char-count {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: #8b6f5e;
   text-align: right;
 }
 
 /* ---- Photo upload ---- */
 
 .photo-upload-area {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(59, 35, 20, 0.25);
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
@@ -142,7 +150,7 @@
 
 .photo-upload-area:hover {
   border-color: var(--color-primary);
-  background: rgba(100, 108, 255, 0.05);
+  background: rgba(255, 100, 100, 0.05);
 }
 
 .upload-placeholder {
@@ -150,7 +158,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #6b4c3b;
 }
 
 .upload-icon {
@@ -222,7 +230,7 @@
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(59, 35, 20, 0.2);
   transition: color 0.15s, transform 0.1s;
   padding: 0;
   line-height: 1;
@@ -237,8 +245,8 @@
 }
 
 .low-rating-notice {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 10px;
   padding: 0.75rem 1rem;
   margin-top: 0.5rem;
@@ -247,7 +255,7 @@
 .low-rating-notice p {
   margin: 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #5a3a2a;
   line-height: 1.5;
 }
 
@@ -263,7 +271,7 @@
   align-items: flex-start;
   cursor: pointer;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5a3a2a;
   line-height: 1.4;
 }
 
@@ -281,7 +289,7 @@
   align-items: center;
   cursor: pointer;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5a3a2a;
   line-height: 1.4;
   padding: 0.25rem 0;
 }
@@ -296,12 +304,12 @@
 /* ---- Buttons ---- */
 
 .btn-primary {
-  padding: 0.85rem 1.5rem;
-  background: var(--color-primary);
+  padding: 1.2rem 1.5rem;
+  background: var(--color-button);
   border: none;
-  border-radius: 10px;
-  color: white;
-  font-size: 1rem;
+  border-radius: 30px;
+  color: var(--color-button--text);
+  font-size: 1.2rem; 
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s, opacity 0.2s;
@@ -313,7 +321,8 @@
 }
 
 .btn-primary:disabled {
-  opacity: 0.4;
+  opacity: 0.9;
+  background: var(--color-button--disabled);
   cursor: not-allowed;
 }
 
@@ -351,14 +360,14 @@
 
 .success-note {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b6f5e;
   margin-top: 1rem;
   margin-bottom: 1.5rem !important;
 }
 
 .account-info-box {
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(59, 35, 20, 0.08);
+  border: 1px solid rgba(59, 35, 20, 0.2);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin: 1.25rem 0 1.5rem;
@@ -368,7 +377,7 @@
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+  color: #3b2314;
 }
 
 .uploading-card {
@@ -381,7 +390,7 @@
 .uploading-card .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(59, 35, 20, 0.15);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
