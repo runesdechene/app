@@ -9,6 +9,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
+  background-color: rgb(255, 250, 242);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.35) 100%),
               url('/assets/background_form.webp') center / cover no-repeat fixed;
   text-align: left;

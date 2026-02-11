@@ -308,6 +308,14 @@ export function PhotoSubmit() {
 
   return (
     <div className="submit-page">
+      <div className="back-button-container">
+        <a href="https://runesdechene.com" className="back-button">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Retour boutique
+        </a>
+      </div>
       <div className="submit-header">
         <img src="/assets/drapeau.svg" alt="Runes de Chêne" className="header-logo" />
         <h1>Partagez vos photos</h1>
