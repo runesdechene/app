@@ -404,8 +404,8 @@ export function PhotoSubmit() {
             <option value="XL">XL</option>
             <option value="XXL">XXL</option>
             <option value="3XL">3XL</option>
-            <option value="3XL">5XL</option>
-            <option value="3XL">4XL</option>
+            <option value="4XL">4XL</option>
+            <option value="5XL">5XL</option>
           </select>
         </div>
 
