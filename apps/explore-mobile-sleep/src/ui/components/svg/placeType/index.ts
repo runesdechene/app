@@ -1,5 +1,0 @@
-export * from './CuriosityBackground'
-export * from './HistoricBackground'
-export * from './NaturalBackground'
-export * from './RestBackground'
-export * from './ShopBackground'
