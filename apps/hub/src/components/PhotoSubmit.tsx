@@ -8,6 +8,62 @@ const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 const ACCEPTED_TYPES = "image/*,video/*";
 
+const IMAGE_MAX_DIMENSION = 1920;
+const IMAGE_QUALITY = 0.82;
+
+/** Redimensionne et convertit une image en WebP avant upload */
+function compressImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      let { width, height } = img;
+
+      // Redimensionner si nécessaire
+      if (width > IMAGE_MAX_DIMENSION || height > IMAGE_MAX_DIMENSION) {
+        if (width > height) {
+          height = Math.round(height * (IMAGE_MAX_DIMENSION / width));
+          width = IMAGE_MAX_DIMENSION;
+        } else {
+          width = Math.round(width * (IMAGE_MAX_DIMENSION / height));
+          height = IMAGE_MAX_DIMENSION;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("Canvas context unavailable"));
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return reject(new Error("Compression failed"));
+          const compressed = new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), {
+            type: "image/webp",
+          });
+          resolve(compressed);
+        },
+        "image/webp",
+        IMAGE_QUALITY,
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
+  });
+}
+
 const isVideo = (file: File) => file.type.startsWith("video/");
 const isImage = (file: File) => file.type.startsWith("image/");
 const isMediaFile = (file: File) => isImage(file) || isVideo(file);
@@ -181,9 +237,22 @@ export function PhotoSubmit() {
       if (subError) throw new Error(`Erreur soumission: ${subError.message}`);
 
       for (let i = 0; i < files.length; i++) {
+        const raw = files[i];
+        let file = raw;
+
+        // Compresser les images en WebP
+        if (isImage(raw)) {
+          setProgress(`Compression image ${i + 1}/${files.length}...`);
+          try {
+            file = await compressImage(raw);
+          } catch {
+            // En cas d'échec de compression, on upload l'original
+            file = raw;
+          }
+        }
+
         setProgress(`Upload fichier ${i + 1}/${files.length}...`);
-        const file = files[i];
-        const ext = file.name.split(".").pop() || "jpg";
+        const ext = file.name.split(".").pop() || "webp";
         const storagePath = `submissions/${submissionId}/${crypto.randomUUID()}.${ext}`;
 
         const { error: uploadError } = await supabase.storage
