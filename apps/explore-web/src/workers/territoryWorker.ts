@@ -30,6 +30,7 @@ interface PlaceInput {
   coordinates: [number, number]
   faction: string
   tagColor: string
+  factionPattern: string
   score: number
 }
 
@@ -185,8 +186,8 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
   ])
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
-  //    Grouper par faction (tagColor) pour fusion visuelle
-  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number }>()
+  //    Grouper par faction (nom) pour fusion visuelle
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number, color: string, pattern: string }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
@@ -200,12 +201,11 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     const clipped = clipToConvex(circleCoords, cellCoords as unknown as Position[])
 
     if (clipped) {
-      const key = place.tagColor
-      let group = factionRings.get(key)
-      if (!group) {
-        group = { polygons: [], totalScore: 0, count: 0 }
-        factionRings.set(key, group)
+      const key = place.faction
+      if (!factionRings.has(key)) {
+        factionRings.set(key, { polygons: [], totalScore: 0, count: 0, color: place.tagColor, pattern: place.factionPattern })
       }
+      const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
       group.totalScore += place.score
       group.count++
@@ -216,7 +216,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
   const territories: Feature<Polygon | MultiPolygon>[] = []
   let id = 0
 
-  for (const [color, group] of factionRings) {
+  for (const [, group] of factionRings) {
     let geometry: Polygon | MultiPolygon
 
     if (group.polygons.length === 1) {
@@ -238,7 +238,8 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       id: id++,
       geometry: smoothGeometry(geometry),
       properties: {
-        tagColor: color,
+        tagColor: group.color,
+        pattern: group.pattern,
         score: group.totalScore,
       },
     })

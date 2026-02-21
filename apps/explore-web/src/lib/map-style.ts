@@ -8,12 +8,12 @@ export const MAP_COLORS = {
   land:           '#F5E6D3',   // Fond / terre
   landResidential:'#EDE0CE',   // Zones résidentielles
   park:           '#E2D8C4',   // Parcs, jardins
-  wood:           '#DDD4C0',   // Forêts
+  wood:           '#ecddbd',   // Forêts
   glacier:        '#F0EBE0',   // Glaciers, neige
 
   // Eau
-  water:          '#C4B8A0',   // Océans, lacs
-  waterway:       '#B8A890',   // Rivières, canaux
+  water:          '#cec4b8',   // Océans, lacs
+  waterway:       'transparent',   // Rivières, canaux
   waterLabel:     '#7D6B5A',   // Labels cours d'eau
 
   // Bâtiments
@@ -91,6 +91,32 @@ export async function loadParchmentStyle(): Promise<StyleSpecification> {
     '#f8f4f0':                  c.labelHalo,
   }
 
+  // --- Carte de jeu : supprimer les layers inutiles ---
+  // On ne garde que le terrain, l'eau, les grandes villes et les frontières
+  const hiddenPatterns = [
+    /housenumber/i,           // numéros de maison
+    /poi/i,                   // points d'intérêt
+    /aeroway/i,               // aéroports
+    /road/i,                  // toutes les routes (autoroutes, D, M, etc.)
+    /transportation/i,        // tout le transport
+    /motorway/i,              // autoroutes
+    /trunk/i,                 // nationales
+    /primary/i,               // primaires
+    /railway/i,               // voies ferrées
+    /building/i,              // bâtiments
+    /ferry/i,                 // ferries
+    /tunnel/i,                // tunnels
+    /bridge/i,                // ponts
+    /shield/i,                // étiquettes de routes (A8, M6007…)
+    /highway/i,               // labels autoroutes
+  ]
+
+  style.layers = (style.layers as LayerSpecification[]).filter(layer => {
+    const id = layer.id.toLowerCase()
+    return !hiddenPatterns.some(p => p.test(id))
+  })
+
+  // --- Recolorer les layers restants ---
   for (const layer of style.layers as LayerSpecification[]) {
     const paint = (layer as Record<string, unknown>).paint as Record<string, unknown> | undefined
     if (!paint) continue
@@ -118,6 +144,12 @@ export async function loadParchmentStyle(): Promise<StyleSpecification> {
     if (typeof paint['text-halo-color'] === 'string' && haloMap[paint['text-halo-color'] as string]) {
       paint['text-halo-color'] = haloMap[paint['text-halo-color'] as string]
     }
+
+    // Labels de villes discrets
+    if (layer.type === 'symbol' && paint['text-color']) {
+      paint['text-opacity'] = 0.5
+    }
+
   }
 
   return style

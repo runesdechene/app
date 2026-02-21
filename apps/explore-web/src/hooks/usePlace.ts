@@ -37,6 +37,13 @@ export interface PlaceDetail {
     explored: number
     note: number | null
   }
+  claim: {
+    factionId: string
+    factionTitle: string
+    factionColor: string
+    claimedBy: string
+    claimedAt: string
+  } | null
   requester: {
     bookmarked: boolean
     liked: boolean

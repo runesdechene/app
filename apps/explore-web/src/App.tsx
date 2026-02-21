@@ -40,6 +40,7 @@ function App() {
       <PlacePanel
         placeId={selectedPlaceId}
         onClose={() => setSelectedPlaceId(null)}
+        userEmail={user?.email ?? null}
       />
 
       {showAuthModal && (

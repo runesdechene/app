@@ -12,8 +12,9 @@ import { useMapStore } from '../../stores/mapStore'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
-const ICON_SIZE = 100
-const BORDER = 6 // épaisseur du contour en pixels
+const ICON_SIZE = 120
+const PATTERN_TILE = 38   // taille totale de la tuile (icône + gap)
+const PATTERN_ICON = 28   // taille du motif dans la tuile (le reste = gap transparent)
 
 /** Charge un SVG text en HTMLImageElement */
 function svgToImage(svgText: string): Promise<HTMLImageElement> {
@@ -33,6 +34,17 @@ function colorizeSvg(rawSvg: string, color: string): string {
   return rawSvg.replace(/(<svg[^>]*>)/, `$1${style}`)
 }
 
+/** Ajuste une couleur hex : amount > 0 éclaircit, < 0 assombrit */
+function shiftColor(hex: string, amount: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  const shift = (c: number) => Math.max(0, Math.min(255, Math.round(
+    amount > 0 ? c + (255 - c) * amount : c * (1 + amount),
+  )))
+  return `rgb(${shift(r)},${shift(g)},${shift(b)})`
+}
+
 async function loadColoredSvgIcon(
   map: maplibregl.Map,
   url: string,
@@ -41,31 +53,83 @@ async function loadColoredSvgIcon(
   const res = await fetch(url)
   const rawSvg = await res.text()
 
-  // Deux versions : bordure (couleur parchemin) et remplissage (couleur du tag)
-  const [borderImg, fillImg] = await Promise.all([
-    svgToImage(colorizeSvg(rawSvg, MAP_COLORS.land)),
-    svgToImage(colorizeSvg(rawSvg, color)),
-  ])
+  // Icône en blanc
+  const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
 
   const canvas = document.createElement('canvas')
   canvas.width = ICON_SIZE
   canvas.height = ICON_SIZE
   const ctx = canvas.getContext('2d')!
+  const cx = ICON_SIZE / 2
+  const cy = ICON_SIZE / 2
+  const r = ICON_SIZE / 2 - 1
 
-  const drawSize = ICON_SIZE - BORDER * 2
+  // Fond : cercle avec dégradé linéaire (clair en haut, sombre en bas)
+  const grad = ctx.createLinearGradient(cx, cy - r, cx, cy + r)
+  grad.addColorStop(0, shiftColor(color, 0.35))    // haut clair
+  grad.addColorStop(0.5, color)                     // milieu couleur tag
+  grad.addColorStop(1, shiftColor(color, -0.25))   // bas assombri
 
-  // Dessiner la bordure : même forme décalée dans toutes les directions
-  for (let dx = -BORDER; dx <= BORDER; dx++) {
-    for (let dy = -BORDER; dy <= BORDER; dy++) {
-      if (dx === 0 && dy === 0) continue
-      ctx.drawImage(borderImg, BORDER + dx, BORDER + dy, drawSize, drawSize)
-    }
-  }
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = grad
+  ctx.fill()
 
-  // Dessiner le remplissage par-dessus, centré
-  ctx.drawImage(fillImg, BORDER, BORDER, drawSize, drawSize)
+  // Icône blanche centrée (60% du diamètre du cercle)
+  const iconSize = ICON_SIZE * 0.55
+  const iconOffset = (ICON_SIZE - iconSize) / 2
+  ctx.drawImage(whiteIcon, iconOffset, iconOffset, iconSize, iconSize)
 
   const imageData = ctx.getImageData(0, 0, ICON_SIZE, ICON_SIZE)
+  if (!map.hasImage(url)) {
+    map.addImage(url, imageData, { sdf: false })
+  }
+}
+
+/** Charge un SVG pattern et l'enregistre comme image tileable dans MapLibre */
+async function loadPatternImage(
+  map: maplibregl.Map,
+  url: string,
+): Promise<void> {
+  const res = await fetch(url)
+  if (!res.ok) return
+
+  const rawSvg = await res.text()
+
+  // Retirer width/height existants pour éviter les doublons, puis forcer nos dimensions
+  let cleanSvg = rawSvg
+    .replace(/(<svg[^>]*?)\s+width\s*=\s*"[^"]*"/g, '$1')
+    .replace(/(<svg[^>]*?)\s+height\s*=\s*"[^"]*"/g, '$1')
+
+  // Ajouter nos dimensions + un viewBox si manquant (pour que le SVG scale)
+  cleanSvg = cleanSvg.replace(
+    /(<svg[^>]*?)(\s*\/?>)/,
+    (_, before, after) => {
+      const hasViewBox = /viewBox\s*=/.test(before)
+      const viewBox = hasViewBox ? '' : ` viewBox="0 0 ${PATTERN_ICON} ${PATTERN_ICON}"`
+      return `${before} width="${PATTERN_ICON}" height="${PATTERN_ICON}"${viewBox}${after}`
+    },
+  )
+
+  // Data URL (plus fiable que Blob URL cross-browser)
+  const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`
+
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image(PATTERN_ICON, PATTERN_ICON)
+    el.onload = () => resolve(el)
+    el.onerror = reject
+    el.src = dataUrl
+  })
+
+  // Canvas = taille totale de la tuile, icône centrée (le reste = gap transparent)
+  const canvas = document.createElement('canvas')
+  canvas.width = PATTERN_TILE
+  canvas.height = PATTERN_TILE
+  const ctx = canvas.getContext('2d')!
+  const offset = (PATTERN_TILE - PATTERN_ICON) / 2
+  ctx.drawImage(img, offset, offset, PATTERN_ICON, PATTERN_ICON)
+
+  const imageData = ctx.getImageData(0, 0, PATTERN_TILE, PATTERN_TILE)
   if (!map.hasImage(url)) {
     map.addImage(url, imageData, { sdf: false })
   }
@@ -98,14 +162,14 @@ const territoryBorderLayer: LayerSpecification = {
     'line-width': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      2,       // hover → bordure visible
-      0,       // caché → pas de séparation entre même faction
+      3,
+      2,
     ],
     'line-opacity': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
       0.6,
-      0,
+      0.3,
     ],
   },
 }
@@ -200,16 +264,23 @@ export function ExploreMap() {
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
+    // Seuls les lieux revendiqués (claimed) ont une zone d'influence
     workerRef.current.postMessage({
-      features: geojson.features.map(f => {
-        const ov = placeOverrides.get(f.properties.id)
-        return {
-          coordinates: f.geometry.coordinates as [number, number],
-          faction: ov?.tagTitle || f.properties.tagTitle || 'inconnu',
-          tagColor: ov?.tagColor || f.properties.tagColor,
-          score: ov?.score ?? f.properties.score,
-        }
-      }),
+      features: geojson.features
+        .filter(f => {
+          const ov = placeOverrides.get(f.properties.id)
+          return f.properties.claimed || ov?.claimed
+        })
+        .map(f => {
+          const ov = placeOverrides.get(f.properties.id)
+          return {
+            coordinates: f.geometry.coordinates as [number, number],
+            faction: ov?.factionId || f.properties.factionId,
+            tagColor: ov?.tagColor || f.properties.tagColor,
+            factionPattern: ov?.factionPattern || f.properties.factionPattern,
+            score: ov?.score ?? f.properties.score,
+          }
+        }),
     })
   }, [geojson, placeOverrides])
 
@@ -236,6 +307,83 @@ export function ExploreMap() {
       })
     }
   }, [geojson])
+
+  // Charger les patterns de faction et ajouter UN LAYER PAR PATTERN
+  // (évite le fill-pattern data-driven qui est instable dans MapLibre)
+  const loadedPatternsRef = useRef(new Set<string>())
+  const patternLayerIdsRef = useRef<string[]>([])
+
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+    if (!map || !territories) return
+
+    // Collecter les URLs de pattern uniques
+    const patternUrls = new Set<string>()
+    for (const f of territories.features) {
+      const p = (f.properties as Record<string, unknown>)?.pattern
+      if (typeof p === 'string' && p) patternUrls.add(p)
+    }
+
+    if (patternUrls.size === 0) return
+
+    // Charger toutes les images, puis créer un layer par pattern
+    const toLoad: Promise<void>[] = []
+
+    for (const url of patternUrls) {
+      if (loadedPatternsRef.current.has(url)) continue
+      loadedPatternsRef.current.add(url)
+
+      toLoad.push(
+        loadPatternImage(map, url).catch(() => {
+          loadedPatternsRef.current.delete(url)
+        }),
+      )
+    }
+
+    Promise.all(toLoad).then(() => {
+      if (!map.getLayer('territories-fill')) return
+
+      // Nettoyer les anciens layers pattern
+      for (const id of patternLayerIdsRef.current) {
+        if (map.getLayer(id)) map.removeLayer(id)
+      }
+      patternLayerIdsRef.current = []
+
+      // Créer un layer par pattern URL (chaque faction a son propre layer)
+      let idx = 0
+      for (const url of patternUrls) {
+        if (!map.hasImage(url)) continue // image pas chargée
+
+        const layerId = `territories-pattern-${idx++}`
+        try {
+          map.addLayer(
+            {
+              id: layerId,
+              type: 'fill',
+              source: 'territories',
+              filter: ['==', ['get', 'pattern'], url],
+              paint: {
+                'fill-pattern': url,
+                'fill-opacity': 0.18,
+              },
+            },
+            'territories-border',
+          )
+          patternLayerIdsRef.current.push(layerId)
+        } catch {
+          // Pattern layer creation failed — territory affiche la couleur seule
+        }
+      }
+    })
+
+    return () => {
+      // Cleanup tous les layers pattern
+      for (const id of patternLayerIdsRef.current) {
+        if (map.getLayer(id)) map.removeLayer(id)
+      }
+      patternLayerIdsRef.current = []
+    }
+  }, [territories])
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0]
@@ -294,7 +442,7 @@ export function ExploreMap() {
 
   const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
     const map = mapRef.current?.getMap()
-    if (!map) return
+    if (!map || !map.getLayer('territories-fill')) return
 
     const features = map.queryRenderedFeatures(e.point, { layers: ['territories-fill'] })
 

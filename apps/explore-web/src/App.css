@@ -583,6 +583,148 @@
 }
 
 /* ==========================================
+   FACTION SELECTOR (ProfileMenu)
+   ========================================== */
+
+.faction-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.faction-selector-title {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-ink-light);
+  margin: 0 0 6px;
+}
+
+.faction-selector-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.faction-selector-option:hover {
+  background: var(--color-parchment-dark);
+}
+
+.faction-selector-active {
+  font-weight: 600;
+}
+
+.faction-selector-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.faction-selector-leave {
+  color: var(--color-ink-light);
+  font-size: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--color-parchment-dark);
+  padding-top: 8px;
+  border-radius: 0;
+}
+
+.faction-selector-cancel {
+  color: var(--color-ink-light);
+  font-size: 12px;
+}
+
+.faction-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==========================================
+   CLAIM BUTTON & BADGE (PlacePanel)
+   ========================================== */
+
+.place-claim-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-ink-light);
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin: 8px 0;
+}
+
+.place-claim-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.claim-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 16px;
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 600;
+  background: none;
+  border: 2px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.claim-btn:hover {
+  opacity: 0.8;
+}
+
+.claim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.claim-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+}
+
+.claim-owned {
+  font-style: italic;
+}
+
+.claim-success {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* ==========================================
    MOBILE — Bottom Sheet
    ========================================== */
 

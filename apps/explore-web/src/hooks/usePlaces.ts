@@ -15,6 +15,12 @@ interface MapPlace {
     color: string
     background: string
   } | null
+  faction: {
+    id: string
+    title: string
+    color: string
+    pattern: string | null
+  } | null
   location: {
     latitude: number
     longitude: number
@@ -30,6 +36,9 @@ export interface PlaceProperties {
   tagColor: string
   tagBackground: string
   tagIcon: string
+  factionId: string
+  factionPattern: string
+  claimed: boolean
   likes: number
   score: number
 }
@@ -81,10 +90,13 @@ export function usePlaces() {
             properties: {
               id: place.id,
               title: place.title,
-              tagTitle: place.primaryTag?.title ?? '',
-              tagColor: place.primaryTag?.color ?? '#C19A6B',
+              tagTitle: place.faction?.title ?? place.primaryTag?.title ?? '',
+              tagColor: place.faction?.color ?? place.primaryTag?.color ?? '#C19A6B',
               tagBackground: place.primaryTag?.background ?? '#F5E6D3',
               tagIcon: (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? '',
+              factionId: place.faction?.id ?? '',
+              factionPattern: place.faction?.pattern ?? '',
+              claimed: !!place.faction,
               likes: place.likes ?? 0,
               score: place.score ?? 0,
             },

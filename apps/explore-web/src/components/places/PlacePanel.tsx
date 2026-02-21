@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
-import { useMapStore } from '../../stores/mapStore'
 import { supabase } from '../../lib/supabase'
+import { useMapStore } from '../../stores/mapStore'
 
 interface PlacePanelProps {
   placeId: string | null
   onClose: () => void
+  userEmail: string | null
 }
 
-interface TagOption {
-  id: string
-  title: string
-  color: string
-  background: string
+interface UserFaction {
+  userId: string
+  factionId: string
+  factionTitle: string
+  factionColor: string
+  factionPattern: string
 }
 
-export function PlacePanel({ placeId, onClose }: PlacePanelProps) {
+export function PlacePanel({ placeId, onClose, userEmail }: PlacePanelProps) {
   const { place, loading, error } = usePlace(placeId)
   const isOpen = placeId !== null
 
@@ -38,14 +40,14 @@ export function PlacePanel({ placeId, onClose }: PlacePanelProps) {
         )}
 
         {place && !loading && (
-          <PlaceContent key={place.id} place={place} onClose={onClose} />
+          <PlaceContent key={place.id} place={place} onClose={onClose} userEmail={userEmail} />
         )}
       </div>
     </>
   )
 }
 
-function PlaceContent({ place, onClose }: { place: PlaceDetail; onClose: () => void }) {
+function PlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
   const images = place.images || []
@@ -95,6 +97,20 @@ function PlaceContent({ place, onClose }: { place: PlaceDetail; onClose: () => v
           <p className="place-panel-author">
             Par {place.author.lastName}
           </p>
+        )}
+
+        {/* Claim badge */}
+        {place.claim && (
+          <div
+            className="place-claim-badge"
+            style={{ borderColor: place.claim.factionColor }}
+          >
+            <span
+              className="place-claim-dot"
+              style={{ backgroundColor: place.claim.factionColor }}
+            />
+            Revendiqué par {place.claim.factionTitle}
+          </div>
         )}
 
         {/* Stats */}
@@ -158,122 +174,154 @@ function PlaceContent({ place, onClose }: { place: PlaceDetail; onClose: () => v
           <p className="place-panel-address">{place.address}</p>
         )}
 
-        {/* Test controls */}
-        <TestControls
-          placeId={place.id}
-          currentScore={
-            place.metrics.likes
-            + Math.round(place.metrics.views * 0.1)
-            + place.metrics.explored * 2
-          }
-        />
+        {/* Test : slider score / influence */}
+        <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
+
+        {/* Claim button */}
+        {userEmail && (
+          <ClaimButton placeId={place.id} userEmail={userEmail} currentClaim={place.claim} />
+        )}
       </div>
     </>
   )
 }
 
-// --- Contrôles de test pour les territoires ---
+// --- Bouton Revendiquer ---
 
-function TestControls({ placeId, currentScore }: { placeId: string; currentScore: number }) {
+function ClaimButton({
+  placeId,
+  userEmail,
+  currentClaim,
+}: {
+  placeId: string
+  userEmail: string
+  currentClaim: PlaceDetail['claim']
+}) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
-  const override = useMapStore(s => s.placeOverrides.get(placeId))
-  const [tags, setTags] = useState<TagOption[]>([])
-
-  const score = override?.score ?? currentScore
+  const [userFaction, setUserFaction] = useState<UserFaction | null>(null)
+  const [claiming, setClaiming] = useState(false)
+  const [claimed, setClaimed] = useState(false)
+  const [loadingFaction, setLoadingFaction] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('tags')
-      .select('id, title, color, background')
-      .order('title')
-      .then(({ data }) => {
-        if (data) setTags(data as TagOption[])
+    async function fetchUserFaction() {
+      setLoadingFaction(true)
+
+      const { data: user } = await supabase
+        .from('users')
+        .select('id, faction_id')
+        .eq('email_address', userEmail)
+        .single()
+
+      if (!user?.faction_id) {
+        setLoadingFaction(false)
+        return
+      }
+
+      const { data: faction } = await supabase
+        .from('factions')
+        .select('id, title, color, pattern')
+        .eq('id', user.faction_id)
+        .single()
+
+      if (faction) {
+        setUserFaction({
+          userId: user.id,
+          factionId: faction.id,
+          factionTitle: faction.title,
+          factionColor: faction.color,
+          factionPattern: faction.pattern ?? '',
+        })
+      }
+
+      setLoadingFaction(false)
+    }
+
+    fetchUserFaction()
+  }, [userEmail])
+
+  if (loadingFaction || !userFaction) return null
+
+  // Déjà revendiqué par la même faction
+  if (currentClaim?.factionId === userFaction.factionId && !claimed) {
+    return (
+      <div className="claim-section claim-owned">
+        <span
+          className="place-claim-dot"
+          style={{ backgroundColor: userFaction.factionColor }}
+        />
+        Votre territoire
+      </div>
+    )
+  }
+
+  if (claimed) {
+    return (
+      <div className="claim-section claim-success">
+        Revendiqué pour {userFaction.factionTitle} !
+      </div>
+    )
+  }
+
+  async function handleClaim() {
+    if (!userFaction) return
+    setClaiming(true)
+
+    const { data } = await supabase.rpc('claim_place', {
+      p_user_id: userFaction.userId,
+      p_place_id: placeId,
+    })
+
+    if (data?.success) {
+      setClaimed(true)
+      setPlaceOverride(placeId, {
+        claimed: true,
+        factionId: userFaction.factionId,
+        tagColor: userFaction.factionColor,
+        factionPattern: userFaction.factionPattern,
       })
-  }, [])
+    }
+
+    setClaiming(false)
+  }
 
   return (
-    <div style={{
-      marginTop: 16,
-      padding: 12,
-      borderRadius: 8,
-      border: '1px dashed var(--color-ink, #4A3728)',
-      opacity: 0.8,
-    }}>
-      <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>
-        Test territoires
-      </p>
-
-      {/* Tag selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: 12, minWidth: 50 }}>Faction</span>
-        <select
-          style={{
-            flex: 1,
-            padding: '4px 6px',
-            fontSize: 12,
-            borderRadius: 4,
-            border: '1px solid var(--color-ink, #4A3728)',
-            background: 'var(--color-parchment, #F5E6D3)',
-            color: 'var(--color-ink, #4A3728)',
-          }}
-          value={override?.tagTitle ?? ''}
-          onChange={(e) => {
-            if (!e.target.value) return
-            const tag = tags.find(t => t.title === e.target.value)
-            if (tag) {
-              setPlaceOverride(placeId, { tagTitle: tag.title, tagColor: tag.color })
-            }
-          }}
-        >
-          <option value="">Original</option>
-          {tags.map(t => (
-            <option key={t.id} value={t.title}>{t.title}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Score control */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 12, minWidth: 50 }}>Score</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button
-            style={btnStyle}
-            onClick={() => setPlaceOverride(placeId, { score: Math.max(0, score - 1) })}
-          >
-            -
-          </button>
-          <span style={{ fontSize: 13, fontWeight: 600, minWidth: 30, textAlign: 'center' }}>
-            {score}
-          </span>
-          <button
-            style={btnStyle}
-            onClick={() => setPlaceOverride(placeId, { score: score + 1 })}
-          >
-            +
-          </button>
-          <button
-            style={{ ...btnStyle, width: 'auto', padding: '2px 8px' }}
-            onClick={() => setPlaceOverride(placeId, { score: score + 10 })}
-          >
-            +10
-          </button>
-        </div>
-      </div>
-    </div>
+    <button
+      className="claim-btn"
+      style={{
+        borderColor: userFaction.factionColor,
+        color: userFaction.factionColor,
+      }}
+      onClick={handleClaim}
+      disabled={claiming}
+    >
+      {claiming
+        ? 'Revendication...'
+        : `Revendiquer pour ${userFaction.factionTitle}`}
+    </button>
   )
 }
 
-const btnStyle: React.CSSProperties = {
-  width: 28,
-  height: 28,
-  borderRadius: 4,
-  border: '1px solid var(--color-ink, #4A3728)',
-  background: 'var(--color-parchment, #F5E6D3)',
-  color: 'var(--color-ink, #4A3728)',
-  fontSize: 14,
-  fontWeight: 700,
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+// --- Test : slider score ---
+
+function ScoreSlider({ placeId, baseScore }: { placeId: string; baseScore: number }) {
+  const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
+  const override = useMapStore(s => s.placeOverrides.get(placeId))
+  const score = override?.score ?? baseScore
+
+  return (
+    <div style={{ margin: '12px 0', padding: '8px 0', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, opacity: 0.7 }}>
+        Score (influence) : <strong>{score}</strong>
+        <input
+          type="range"
+          min={0}
+          max={200}
+          value={score}
+          onChange={e => setPlaceOverride(placeId, { score: Number(e.target.value) })}
+          style={{ flex: 1 }}
+        />
+      </label>
+    </div>
+  )
 }

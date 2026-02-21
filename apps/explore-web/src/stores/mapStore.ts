@@ -4,6 +4,9 @@ interface PlaceOverride {
   tagTitle?: string
   tagColor?: string
   score?: number
+  claimed?: boolean
+  factionId?: string
+  factionPattern?: string
 }
 
 interface MapState {
