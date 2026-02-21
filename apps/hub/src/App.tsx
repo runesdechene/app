@@ -7,6 +7,7 @@ import { Photos } from './components/Photos'
 import { PhotoSubmit } from './components/PhotoSubmit'
 import { Reviews } from './components/Reviews'
 import { ReviewSubmit } from './components/ReviewSubmit'
+import { TagsManager } from './components/TagsManager'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
@@ -49,6 +50,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/reviews" element={<Reviews />} />
+          <Route path="/carte/tags" element={<TagsManager />} />
         </Routes>
       </main>
     </div>

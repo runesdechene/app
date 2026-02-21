@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import JSZip from 'jszip'
 import { supabase } from '../lib/supabase'
 
 type PhotoStatus = 'pending' | 'approved' | 'archived'
@@ -85,6 +86,11 @@ export function Photos() {
   // Product worn editing state
   const [editingProductId, setEditingProductId] = useState<string | null>(null)
   const [editingProductText, setEditingProductText] = useState('')
+
+  // Download state
+  const [downloadSince, setDownloadSince] = useState('')
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState('')
 
   // Fetch tags
   useEffect(() => {
@@ -255,6 +261,140 @@ export function Photos() {
     setLightbox({ images: [...images].sort((a, b) => a.sort_order - b.sort_order), index })
   }
 
+  // Download helpers
+  const sanitizeFilename = (str: string) =>
+    str.replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim()
+
+  const buildDownloadName = (sub: PhotoSubmission, index: number, url: string) => {
+    const ext = url.split('.').pop()?.split('?')[0] || 'webp'
+    const parts = [sanitizeFilename(sub.submitter_name)]
+    if (sub.submitter_instagram) parts.push(sanitizeFilename(sub.submitter_instagram))
+    if (sub.product_worn) parts.push(sanitizeFilename(sub.product_worn))
+    parts.push(String(index + 1))
+    return parts.join(' - ') + '.' + ext
+  }
+
+  const downloadableSubmissions = downloadSince
+    ? filteredSubmissions.filter(s => new Date(s.created_at) >= new Date(downloadSince))
+    : []
+
+  const downloadableImageCount = downloadableSubmissions.reduce(
+    (sum, s) => sum + (s.hub_submission_images?.length || 0), 0
+  )
+
+  const handleDownloadZip = async () => {
+    if (downloadableSubmissions.length === 0) return
+    setIsDownloading(true)
+    setDownloadProgress('Preparation...')
+
+    try {
+      const zip = new JSZip()
+      let fileIndex = 0
+      const totalFiles = downloadableImageCount
+
+      for (const sub of downloadableSubmissions) {
+        const images = (sub.hub_submission_images || []).sort((a, b) => a.sort_order - b.sort_order)
+
+        for (let i = 0; i < images.length; i++) {
+          fileIndex++
+          setDownloadProgress(`Telechargement ${fileIndex}/${totalFiles}...`)
+
+          const img = images[i]
+          const filename = buildDownloadName(sub, i, img.image_url)
+
+          try {
+            const response = await fetch(img.image_url)
+            if (!response.ok) continue
+            const blob = await response.blob()
+            zip.file(filename, blob)
+          } catch {
+            // Skip les fichiers en erreur
+          }
+        }
+      }
+
+      setDownloadProgress('Creation de l\'archive...')
+      const content = await zip.generateAsync({ type: 'blob' })
+
+      // Déclencher le téléchargement
+      const url = URL.createObjectURL(content)
+      const a = document.createElement('a')
+      a.href = url
+      const dateStr = downloadSince.replace(/-/g, '')
+      a.download = `photos-communaute-depuis-${dateStr}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      setDownloadProgress('')
+    } catch (err) {
+      console.error('Erreur download:', err)
+      setDownloadProgress('Erreur lors du telechargement')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  const downloadSingleSubmission = async (sub: PhotoSubmission) => {
+    const images = (sub.hub_submission_images || []).sort((a, b) => a.sort_order - b.sort_order)
+    if (images.length === 0) return
+
+    if (images.length === 1) {
+      // Téléchargement direct
+      try {
+        const response = await fetch(images[0].image_url)
+        if (!response.ok) return
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = buildDownloadName(sub, 0, images[0].image_url)
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } catch { /* skip */ }
+    } else {
+      // Mini ZIP pour plusieurs images
+      const zip = new JSZip()
+      for (let i = 0; i < images.length; i++) {
+        try {
+          const response = await fetch(images[i].image_url)
+          if (!response.ok) continue
+          const blob = await response.blob()
+          zip.file(buildDownloadName(sub, i, images[i].image_url), blob)
+        } catch { /* skip */ }
+      }
+      const content = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(content)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${sanitizeFilename(sub.submitter_name)}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
+  }
+
+  const downloadSingleImage = async (sub: PhotoSubmission, url: string, index: number) => {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) return
+      const blob = await response.blob()
+      const filename = buildDownloadName(sub, index, url)
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = blobUrl
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(blobUrl)
+    } catch { /* skip */ }
+  }
+
   const closeLightbox = () => setLightbox(null)
 
   const lightboxPrev = () => {
@@ -321,6 +461,34 @@ export function Photos() {
         >
           {showTagManager ? 'Fermer' : 'Gerer les tags'}
         </button>
+
+        {/* Download section */}
+        <div className="download-section">
+          <label className="download-label">Telecharger depuis le :</label>
+          <input
+            type="date"
+            className="download-date-input"
+            value={downloadSince}
+            onChange={(e) => setDownloadSince(e.target.value)}
+          />
+          {downloadSince && (
+            <span className="download-count">
+              {downloadableSubmissions.length} soumission(s), {downloadableImageCount} fichier(s)
+            </span>
+          )}
+          <button
+            className="btn-download"
+            onClick={handleDownloadZip}
+            disabled={isDownloading || downloadableImageCount === 0}
+          >
+            {isDownloading ? downloadProgress : 'Telecharger (.zip)'}
+          </button>
+          {downloadSince && (
+            <button className="btn-download-clear" onClick={() => setDownloadSince('')}>
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tag Manager */}
@@ -354,20 +522,29 @@ export function Photos() {
         <div className="empty">Aucune soumission {filter !== 'all' ? STATUS_LABELS[filter].toLowerCase() : ''}{roleFilter !== 'all' ? ` (${ROLE_LABELS[roleFilter]})` : ''}</div>
       ) : (
         <div className="photos-grid">
-          {filteredSubmissions.map(sub => (
-            <div key={sub.id} className={`photo-card ${sub.status}`}>
+          {filteredSubmissions.map(sub => {
+            const isInDownload = downloadSince && new Date(sub.created_at) >= new Date(downloadSince)
+            return (
+            <div key={sub.id} className={`photo-card ${sub.status}${isInDownload ? ' download-selected' : ''}`}>
               {/* First image as cover */}
               {sub.hub_submission_images?.length > 0 && (
-                <div className="photo-image" onClick={() => openLightbox(sub.hub_submission_images, 0)} style={{ cursor: 'pointer' }}>
-                  {(() => {
-                    const first = sub.hub_submission_images.sort((a, b) => a.sort_order - b.sort_order)[0]
-                    return isVideoUrl(first.image_url)
-                      ? <video src={first.image_url} muted playsInline />
-                      : <img src={first.image_url} alt={sub.message || 'Photo communautaire'} />
-                  })()}
+                <div className="photo-image" style={{ position: 'relative' }}>
+                  <div onClick={() => openLightbox(sub.hub_submission_images, 0)} style={{ cursor: 'pointer' }}>
+                    {(() => {
+                      const first = sub.hub_submission_images.sort((a, b) => a.sort_order - b.sort_order)[0]
+                      return isVideoUrl(first.image_url)
+                        ? <video src={first.image_url} muted playsInline />
+                        : <img src={first.image_url} alt={sub.message || 'Photo communautaire'} />
+                    })()}
+                  </div>
                   {sub.hub_submission_images.length > 1 && (
                     <span className="photo-count">{sub.hub_submission_images.length} fichiers</span>
                   )}
+                  <button
+                    className="btn-download-img"
+                    onClick={(e) => { e.stopPropagation(); downloadSingleImage(sub, sub.hub_submission_images.sort((a, b) => a.sort_order - b.sort_order)[0].image_url, 0) }}
+                    title="Telecharger cette photo"
+                  >↓</button>
                 </div>
               )}
 
@@ -490,6 +667,13 @@ export function Photos() {
                   {sub.consent_brand_usage && (
                     <span className="consent-badge">Diffusion OK</span>
                   )}
+                  <button
+                    className="btn-download-single"
+                    onClick={() => downloadSingleSubmission(sub)}
+                    title="Telecharger les photos"
+                  >
+                    ↓
+                  </button>
                 </div>
               </div>
 
@@ -499,9 +683,17 @@ export function Photos() {
                   {sub.hub_submission_images
                     .sort((a, b) => a.sort_order - b.sort_order)
                     .map((img, idx) => (
-                      isVideoUrl(img.image_url)
-                        ? <video key={img.id} src={img.image_url} muted playsInline onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
-                        : <img key={img.id} src={img.image_url} alt="" onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
+                      <div key={img.id} className="expanded-img-wrap">
+                        {isVideoUrl(img.image_url)
+                          ? <video src={img.image_url} muted playsInline onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
+                          : <img src={img.image_url} alt="" onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
+                        }
+                        <button
+                          className="btn-download-img"
+                          onClick={() => downloadSingleImage(sub, img.image_url, idx)}
+                          title="Telecharger cette photo"
+                        >↓</button>
+                      </div>
                     ))}
                 </div>
               )}
@@ -552,7 +744,7 @@ export function Photos() {
                 </div>
               )}
             </div>
-          ))}
+          )})}
         </div>
       )}
       {lightbox && (

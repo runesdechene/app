@@ -1,0 +1,244 @@
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+interface Tag {
+  id: string
+  title: string
+  color: string
+  background: string
+  icon: string | null
+  order: number
+}
+
+export function TagsManager() {
+  const [tags, setTags] = useState<Tag[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState<string | null>(null)
+  const [saving, setSaving] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadTagIdRef = useRef<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    fetchTags()
+  }, [])
+
+  async function fetchTags() {
+    const { data, error } = await supabase
+      .from('tags')
+      .select('id, title, color, background, icon, order')
+      .order('order')
+
+    if (!error && data) {
+      setTags(data as Tag[])
+    }
+    setLoading(false)
+  }
+
+  // --- Couleurs ---
+
+  function handleColorChange(tagId: string, field: 'color' | 'background', value: string) {
+    // Mise à jour locale immédiate
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, [field]: value } : t))
+
+    // Debounce la sauvegarde en base (éviter de spammer pendant qu'on glisse le picker)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      saveColor(tagId, field, value)
+    }, 400)
+  }
+
+  async function saveColor(tagId: string, field: 'color' | 'background', value: string) {
+    setSaving(tagId)
+    await supabase
+      .from('tags')
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq('id', tagId)
+    setSaving(null)
+  }
+
+  // --- Icône SVG ---
+
+  function triggerUpload(tagId: string) {
+    uploadTagIdRef.current = tagId
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const tagId = uploadTagIdRef.current
+    if (!file || !tagId) return
+
+    // Reset input pour pouvoir re-sélectionner le même fichier
+    e.target.value = ''
+
+    setUploading(tagId)
+
+    const path = `${tagId}.svg`
+
+    // Nettoyer les anciens fichiers (png/webp legacy)
+    await supabase.storage.from('tag-icons').remove([`${tagId}.png`, `${tagId}.webp`])
+
+    // Upload (upsert) dans le bucket tag-icons
+    const { error: uploadError } = await supabase.storage
+      .from('tag-icons')
+      .upload(path, file, { upsert: true, contentType: 'image/svg+xml' })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      setUploading(null)
+      return
+    }
+
+    // Récupérer l'URL publique
+    const { data: urlData } = supabase.storage
+      .from('tag-icons')
+      .getPublicUrl(path)
+
+    const iconUrl = urlData.publicUrl
+
+    // Sauvegarder l'URL dans la table tags
+    const { error: updateError } = await supabase
+      .from('tags')
+      .update({ icon: iconUrl, updated_at: new Date().toISOString() })
+      .eq('id', tagId)
+
+    if (!updateError) {
+      setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: iconUrl } : t))
+    }
+
+    setUploading(null)
+  }
+
+  async function removeIcon(tagId: string) {
+    setUploading(tagId)
+
+    // Supprimer le fichier du storage (svg + legacy png/webp)
+    await supabase.storage.from('tag-icons').remove([`${tagId}.svg`, `${tagId}.png`, `${tagId}.webp`])
+
+    // Mettre icon à null
+    const { error } = await supabase
+      .from('tags')
+      .update({ icon: null, updated_at: new Date().toISOString() })
+      .eq('id', tagId)
+
+    if (!error) {
+      setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: null } : t))
+    }
+
+    setUploading(null)
+  }
+
+  if (loading) {
+    return <div className="loading">Chargement...</div>
+  }
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1>Tags</h1>
+        <span className="tags-count">{tags.length} tags</span>
+      </div>
+
+      {/* Input fichier caché, partagé */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/svg+xml"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
+      <div className="tags-grid">
+        {tags.map(tag => (
+          <div key={tag.id} className="tag-card">
+            {/* Badge preview */}
+            <div className="tag-card-preview">
+              <span
+                className="tag-card-badge"
+                style={{ backgroundColor: tag.background, color: tag.color }}
+              >
+                {tag.icon && (
+                  <span
+                    className="tag-card-icon-img"
+                    style={{
+                      WebkitMaskImage: `url(${tag.icon})`,
+                      maskImage: `url(${tag.icon})`,
+                      backgroundColor: tag.color,
+                    }}
+                  />
+                )}
+                {tag.title}
+              </span>
+              {saving === tag.id && (
+                <span className="tag-saving-indicator">...</span>
+              )}
+            </div>
+
+            {/* ID + couleurs */}
+            <div className="tag-card-info">
+              <span className="tag-card-id">{tag.id}</span>
+            </div>
+
+            {/* Color pickers */}
+            <div className="tag-card-colors-section">
+              <label className="tag-color-field">
+                <span className="tag-color-label">Texte</span>
+                <input
+                  type="color"
+                  value={tag.color}
+                  onChange={e => handleColorChange(tag.id, 'color', e.target.value)}
+                  className="tag-color-input"
+                />
+                <span className="tag-color-value">{tag.color}</span>
+              </label>
+              <label className="tag-color-field">
+                <span className="tag-color-label">Fond</span>
+                <input
+                  type="color"
+                  value={tag.background}
+                  onChange={e => handleColorChange(tag.id, 'background', e.target.value)}
+                  className="tag-color-input"
+                />
+                <span className="tag-color-value">{tag.background}</span>
+              </label>
+            </div>
+
+            {/* Icône SVG */}
+            <div className="tag-card-icon-section">
+              {tag.icon ? (
+                <div className="tag-icon-preview">
+                  <img src={tag.icon} alt="" className="tag-icon-img" />
+                  <div className="tag-icon-actions">
+                    <button
+                      className="tag-icon-replace"
+                      onClick={() => triggerUpload(tag.id)}
+                      disabled={uploading === tag.id}
+                    >
+                      Changer
+                    </button>
+                    <button
+                      className="icon-picker-clear"
+                      onClick={() => removeIcon(tag.id)}
+                      disabled={uploading === tag.id}
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="tag-icon-btn"
+                  onClick={() => triggerUpload(tag.id)}
+                  disabled={uploading === tag.id}
+                >
+                  {uploading === tag.id ? 'Upload...' : '+ icône SVG'}
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

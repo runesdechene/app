@@ -19,7 +19,7 @@ export function Sidebar({ user }: SidebarProps) {
       </div>
 
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>
+        <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''} end>
           Dashboard
         </NavLink>
         <NavLink to="/users" className={({ isActive }) => isActive ? 'active' : ''}>
@@ -30,6 +30,11 @@ export function Sidebar({ user }: SidebarProps) {
         </NavLink>
         <NavLink to="/reviews" className={({ isActive }) => isActive ? 'active' : ''}>
           Avis
+        </NavLink>
+
+        <div className="sidebar-section-label">La Carte</div>
+        <NavLink to="/carte/tags" className={({ isActive }) => isActive ? 'active' : ''}>
+          Tags
         </NavLink>
       </nav>
 

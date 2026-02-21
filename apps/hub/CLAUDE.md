@@ -112,6 +112,17 @@ src/
 - Nomination de **modérateurs**
 - **Statistiques** et analytics avancés
 
+## Commandes
+
+```bash
+# Depuis la racine du monorepo :
+pnpm --filter hub dev       # Lance le Hub (port 3001)
+pnpm --filter hub build     # Build production
+
+pnpm dev                    # Lance explore-web / La Carte (port 3000)
+pnpm build                  # Build explore-web
+```
+
 ## Conventions
 
 - TypeScript strict — pas de `any`
