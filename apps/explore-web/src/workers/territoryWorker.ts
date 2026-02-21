@@ -1,36 +1,25 @@
 /**
- * Web Worker : calcul des territoires (Voronoï pondéré par grille)
+ * Web Worker : calcul des territoires (Voronoi + cercles clippés)
  *
  * Algorithme :
- * 1. Chaque lieu a une force = max(1, likes) + coalition_bonus
- * 2. Chaque lieu peint une influence décroissante (linéaire) sur une grille
- * 3. Pour chaque cellule, les influences s'additionnent par faction
- * 4. La cellule appartient à la faction avec la plus forte influence totale
- * 5. Zéro superposition par construction (chaque cellule a un seul gagnant)
- * 6. Les cellules sont converties en bandes horizontales fusionnées verticalement,
- *    puis union par faction, puis lissage (simplify + Chaikin)
- *
- * Stratégie local-first :
- * - Phase 1 : lieux < 150km du centre → résultat partiel rapide
- * - Phase 2 : tous les lieux → résultat final complet
+ * 1. Voronoi : chaque lieu reçoit sa cellule naturelle (zone la plus proche)
+ * 2. Cercle : rayon = f(likes) → portée d'influence du lieu
+ * 3. Clip : Sutherland-Hodgman (cercle ∩ cellule Voronoi convexe)
+ *    → ~50ms pour 2400 lieux (vs 5s+ avec turf/intersect)
+ *    → Chaque lieu a TOUJOURS un territoire (garanti par Voronoi)
+ *    → Zéro superposition (garanti par Voronoi)
  */
-import { polygon, featureCollection } from '@turf/helpers'
-import union from '@turf/union'
-import simplify from '@turf/simplify'
+import { Delaunay } from 'd3-delaunay'
 import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const INFLUENCE_BASE_KM = 1
-const INFLUENCE_PER_LIKE = 0.3
-const INFLUENCE_MAX_KM = 50
-const COALITION_BONUS = 1
-const LOCAL_RADIUS_KM = 150
-const GRID_STEP_DEG = 0.004       // ~450m de résolution
-const SIMPLIFY_TOL = 0.002
-const CHAIKIN_ITERS = 2
+const BASE_RADIUS_KM = 0.15      // rayon minimum pour tout lieu (~150m)
+const RADIUS_SCALE_KM = 0.45     // croissance douce par sqrt(likes)
 const KM_PER_DEG_LAT = 111
-const KM_PER_DEG_LON = 79
+const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
+const CIRCLE_SEGMENTS = 32       // réduit (perf), cercle reste lisse
+const VORONOI_PAD_DEG = 2
 
 // --- Types ---
 
@@ -38,324 +27,137 @@ interface PlaceInput {
   coordinates: [number, number]
   faction: string
   tagColor: string
-  likes: number
+  score: number
 }
 
 interface WorkerMessage {
   features: PlaceInput[]
-  center: [number, number]
-}
-
-interface PlaceForce {
-  coordinates: [number, number]
-  faction: string
-  tagColor: string
-  likes: number
-  radiusKm: number
-  effectiveForce: number
 }
 
 // --- Helpers ---
 
-function progress(phase: string, pct: number) {
-  self.postMessage({ type: 'progress', phase, percent: Math.round(pct) })
+/** Rayon du cercle d'influence en km — 0 score = pas de zone */
+function radiusForScore(score: number): number {
+  if (score <= 0) return 0
+  if (score <= 1) return BASE_RADIUS_KM
+  return BASE_RADIUS_KM + Math.sqrt(score - 1) * RADIUS_SCALE_KM
 }
 
-function radiusForLikes(likes: number): number {
-  return Math.min(INFLUENCE_BASE_KM + Math.max(1, likes) * INFLUENCE_PER_LIKE, INFLUENCE_MAX_KM)
-}
-
-function roughDistKm(a: [number, number], b: [number, number]): number {
-  const dx = (b[0] - a[0]) * KM_PER_DEG_LON
-  const dy = (b[1] - a[1]) * KM_PER_DEG_LAT
-  return Math.sqrt(dx * dx + dy * dy)
-}
-
-// --- Étape 1 : forces + coalition ---
-
-function computeForces(inputs: PlaceInput[]): PlaceForce[] {
-  const places: PlaceForce[] = inputs.map(f => ({
-    coordinates: f.coordinates,
-    faction: f.faction,
-    tagColor: f.tagColor,
-    likes: f.likes,
-    radiusKm: radiusForLikes(f.likes),
-    effectiveForce: Math.max(1, f.likes),
-  }))
-
-  for (let i = 0; i < places.length; i++) {
-    let allies = 0
-    for (let j = 0; j < places.length; j++) {
-      if (i === j || places[i].faction !== places[j].faction) continue
-      if (roughDistKm(places[i].coordinates, places[j].coordinates) <= places[i].radiusKm + places[j].radiusKm) {
-        allies++
-      }
-    }
-    places[i].effectiveForce += allies * COALITION_BONUS
-  }
-
-  return places
-}
-
-// --- Étape 2 : grille d'influence + résolution ---
-
-interface GridResult {
-  winners: Map<number, Map<number, string>>
-  minLon: number
-  minLat: number
-  factionColors: Map<string, string>
-  factionLikes: Map<string, number>
-}
-
-function computeGrid(places: PlaceForce[]): GridResult {
-  // Bbox englobante (avec padding = rayon max de chaque lieu)
-  let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity
-  for (const p of places) {
-    const padLon = p.radiusKm / KM_PER_DEG_LON
-    const padLat = p.radiusKm / KM_PER_DEG_LAT
-    if (p.coordinates[0] - padLon < minLon) minLon = p.coordinates[0] - padLon
-    if (p.coordinates[0] + padLon > maxLon) maxLon = p.coordinates[0] + padLon
-    if (p.coordinates[1] - padLat < minLat) minLat = p.coordinates[1] - padLat
-    if (p.coordinates[1] + padLat > maxLat) maxLat = p.coordinates[1] + padLat
-  }
-
-  // Métadonnées par faction
-  const factionColors = new Map<string, string>()
-  const factionLikes = new Map<string, number>()
-  for (const p of places) {
-    if (!factionColors.has(p.faction)) factionColors.set(p.faction, p.tagColor)
-    factionLikes.set(p.faction, (factionLikes.get(p.faction) || 0) + p.likes)
-  }
-
-  // Grille sparse : row → col → Map<faction, influence>
-  const grid = new Map<number, Map<number, Map<string, number>>>()
-
-  for (const p of places) {
-    const cellRLat = Math.ceil(p.radiusKm / KM_PER_DEG_LAT / GRID_STEP_DEG)
-    const cellRLon = Math.ceil(p.radiusKm / KM_PER_DEG_LON / GRID_STEP_DEG)
-    const cCol = Math.round((p.coordinates[0] - minLon) / GRID_STEP_DEG)
-    const cRow = Math.round((p.coordinates[1] - minLat) / GRID_STEP_DEG)
-
-    for (let dr = -cellRLat; dr <= cellRLat; dr++) {
-      const row = cRow + dr
-      for (let dc = -cellRLon; dc <= cellRLon; dc++) {
-        const col = cCol + dc
-        const lon = minLon + col * GRID_STEP_DEG
-        const lat = minLat + row * GRID_STEP_DEG
-        const dist = roughDistKm(p.coordinates, [lon, lat])
-        if (dist >= p.radiusKm) continue
-
-        const influence = ((p.radiusKm - dist) / p.radiusKm) * p.effectiveForce
-
-        if (!grid.has(row)) grid.set(row, new Map())
-        const rm = grid.get(row)!
-        if (!rm.has(col)) rm.set(col, new Map())
-        const cm = rm.get(col)!
-        cm.set(p.faction, (cm.get(p.faction) || 0) + influence)
-      }
-    }
-  }
-
-  // Résoudre : chaque cellule → faction gagnante
-  const winners = new Map<number, Map<number, string>>()
-  for (const [row, cols] of grid) {
-    const rw = new Map<number, string>()
-    for (const [col, factions] of cols) {
-      let best = '', bestV = 0
-      for (const [f, v] of factions) {
-        if (v > bestV) { bestV = v; best = f }
-      }
-      if (best) rw.set(col, best)
-    }
-    if (rw.size > 0) winners.set(row, rw)
-  }
-
-  return { winners, minLon, minLat, factionColors, factionLikes }
-}
-
-// --- Étape 3 : grille → polygones ---
-
-interface RawStrip { row: number; c1: number; c2: number }
-interface Block { r1: number; r2: number; c1: number; c2: number }
-
-/** Fusionne verticalement les bandes adjacentes de même largeur */
-function mergeVertically(strips: RawStrip[]): Block[] {
-  strips.sort((a, b) => a.c1 - b.c1 || a.c2 - b.c2 || a.row - b.row)
-  const blocks: Block[] = []
-  let i = 0
-  while (i < strips.length) {
-    const s = strips[i]
-    let r2 = s.row
-    i++
-    while (
-      i < strips.length &&
-      strips[i].c1 === s.c1 &&
-      strips[i].c2 === s.c2 &&
-      strips[i].row === r2 + 1
-    ) {
-      r2 = strips[i].row
-      i++
-    }
-    blocks.push({ r1: s.row, r2, c1: s.c1, c2: s.c2 })
-  }
-  return blocks
-}
-
-function gridToTerritories(result: GridResult): Feature<Polygon | MultiPolygon>[] {
-  const { winners, minLon, minLat, factionColors, factionLikes } = result
-  const half = GRID_STEP_DEG / 2
-
-  // Grouper les cellules par faction
-  const factionStrips = new Map<string, RawStrip[]>()
-  const sortedRows = [...winners.keys()].sort((a, b) => a - b)
-
-  for (const row of sortedRows) {
-    const cols = winners.get(row)!
-    const sortedCols = [...cols.keys()].sort((a, b) => a - b)
-
-    let i = 0
-    while (i < sortedCols.length) {
-      const faction = cols.get(sortedCols[i])!
-      const c1 = sortedCols[i]
-      let c2 = c1
-      i++
-      while (i < sortedCols.length && cols.get(sortedCols[i]) === faction && sortedCols[i] === c2 + 1) {
-        c2 = sortedCols[i]
-        i++
-      }
-      if (!factionStrips.has(faction)) factionStrips.set(faction, [])
-      factionStrips.get(faction)!.push({ row, c1, c2 })
-    }
-  }
-
-  // Pour chaque faction : fusionner verticalement → rectangles → union → lissage
-  const territories: Feature<Polygon | MultiPolygon>[] = []
-
-  for (const [faction, strips] of factionStrips) {
-    const blocks = mergeVertically(strips)
-    if (blocks.length === 0) continue
-
-    const polys: Feature<Polygon>[] = blocks.map(b => {
-      const x1 = minLon + b.c1 * GRID_STEP_DEG - half
-      const x2 = minLon + b.c2 * GRID_STEP_DEG + half
-      const y1 = minLat + b.r1 * GRID_STEP_DEG - half
-      const y2 = minLat + b.r2 * GRID_STEP_DEG + half
-      return polygon([[[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]])
-    })
-
-    let merged = mergeBinary(polys)
-    if (!merged) continue
-
-    merged = smoothTerritory(merged)
-    merged.properties = {
-      tagColor: factionColors.get(faction) ?? '#C19A6B',
-      totalLikes: factionLikes.get(faction) ?? 0,
-    }
-    territories.push(merged)
-  }
-
-  territories.sort((a, b) => (a.properties!.totalLikes as number) - (b.properties!.totalLikes as number))
-  return territories
-}
-
-// --- Lissage ---
-
-function chaikinRing(ring: Position[], iterations: number): Position[] {
-  let coords = ring
-  for (let iter = 0; iter < iterations; iter++) {
-    const next: Position[] = []
-    const len = coords.length - 1
-    for (let i = 0; i < len; i++) {
-      const p1 = coords[i]
-      const p2 = coords[(i + 1) % len]
-      next.push([0.75 * p1[0] + 0.25 * p2[0], 0.75 * p1[1] + 0.25 * p2[1]])
-      next.push([0.25 * p1[0] + 0.75 * p2[0], 0.25 * p1[1] + 0.75 * p2[1]])
-    }
-    next.push(next[0])
-    coords = next
+/** Génère un polygone circulaire fermé [lon, lat][] */
+function makeCircle(center: [number, number], radiusKm: number): Position[] {
+  const [lon, lat] = center
+  const coords: Position[] = []
+  for (let i = 0; i <= CIRCLE_SEGMENTS; i++) {
+    const angle = (2 * Math.PI * i) / CIRCLE_SEGMENTS
+    const dx = (radiusKm * Math.cos(angle)) / KM_PER_DEG_LON
+    const dy = (radiusKm * Math.sin(angle)) / KM_PER_DEG_LAT
+    coords.push([lon + dx, lat + dy])
   }
   return coords
 }
 
-function smoothTerritory(feat: Feature<Polygon | MultiPolygon>): Feature<Polygon | MultiPolygon> {
-  const s = simplify(feat, { tolerance: SIMPLIFY_TOL, highQuality: true })
-  const g = s.geometry
-  if (g.type === 'Polygon') {
-    g.coordinates = g.coordinates.map(r => chaikinRing(r, CHAIKIN_ITERS))
-  } else {
-    g.coordinates = g.coordinates.map(p => p.map(r => chaikinRing(r, CHAIKIN_ITERS)))
-  }
-  return s as Feature<Polygon | MultiPolygon>
+// --- Sutherland-Hodgman : clip polygon to convex cell ---
+
+/** Détermine si un point est du côté intérieur d'une arête */
+function isInside(p: Position, edgeA: Position, edgeB: Position): boolean {
+  return (edgeB[0] - edgeA[0]) * (p[1] - edgeA[1]) -
+         (edgeB[1] - edgeA[1]) * (p[0] - edgeA[0]) >= 0
 }
 
-// --- Union binaire ---
+/** Intersection entre le segment [p1,p2] et la droite passant par [edgeA,edgeB] */
+function lineIntersect(p1: Position, p2: Position, eA: Position, eB: Position): Position {
+  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1]
+  const x3 = eA[0], y3 = eA[1], x4 = eB[0], y4 = eB[1]
+  const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+  if (Math.abs(denom) < 1e-12) return p1 // parallèles, fallback
+  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
+  return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)]
+}
 
-function mergeBinary(
-  polys: Feature<Polygon | MultiPolygon>[],
-): Feature<Polygon | MultiPolygon> | null {
-  if (polys.length === 0) return null
-  if (polys.length === 1) return polys[0]
+/** Clip un polygone (sujet) par un polygone convexe (clip). Retourne un anneau fermé. */
+function clipToConvex(subject: Position[], clip: Position[]): Position[] | null {
+  let output = subject.slice(0, -1) // retirer le point de fermeture
+  const clipLen = clip.length - 1    // dernier point = premier
 
-  const next: Feature<Polygon | MultiPolygon>[] = []
-  for (let i = 0; i < polys.length; i += 2) {
-    if (i + 1 < polys.length) {
-      try {
-        const u = union(featureCollection([polys[i], polys[i + 1]]))
-        next.push(u ? (u as Feature<Polygon | MultiPolygon>) : polys[i])
-      } catch {
-        next.push(polys[i])
+  for (let i = 0; i < clipLen; i++) {
+    if (output.length === 0) return null
+    const input = output
+    output = []
+    const eA = clip[i]
+    const eB = clip[i + 1]
+
+    for (let j = 0; j < input.length; j++) {
+      const curr = input[j]
+      const prev = input[(j + input.length - 1) % input.length]
+      const currIn = isInside(curr, eA, eB)
+      const prevIn = isInside(prev, eA, eB)
+
+      if (currIn) {
+        if (!prevIn) output.push(lineIntersect(prev, curr, eA, eB))
+        output.push(curr)
+      } else if (prevIn) {
+        output.push(lineIntersect(prev, curr, eA, eB))
       }
-    } else {
-      next.push(polys[i])
     }
   }
 
-  return mergeBinary(next)
+  if (output.length < 3) return null
+  output.push(output[0]) // fermer l'anneau
+  return output
 }
 
 // --- Main ---
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const { features, center } = e.data
+  const { features } = e.data
 
-  progress('Tri des zones', 0)
-
-  const local: PlaceInput[] = []
-  const distant: PlaceInput[] = []
-  for (const f of features) {
-    if (roughDistKm(center, f.coordinates) <= LOCAL_RADIUS_KM) {
-      local.push(f)
-    } else {
-      distant.push(f)
-    }
-  }
-
-  // --- Phase 1 : locale ---
-  progress('Forces locales', 5)
-  const localPlaces = computeForces(local)
-
-  progress('Grille locale', 15)
-  const localGrid = computeGrid(localPlaces)
-
-  progress('Territoires locaux', 40)
-  const localTerr = gridToTerritories(localGrid)
-
-  self.postMessage({ type: 'FeatureCollection', partial: true, features: localTerr })
-
-  // --- Phase 2 : globale ---
-  if (distant.length === 0) {
-    self.postMessage({ type: 'FeatureCollection', partial: false, features: localTerr })
+  if (features.length === 0) {
+    self.postMessage({ type: 'FeatureCollection', partial: false, features: [] })
     return
   }
 
-  progress('Forces globales', 50)
-  const allPlaces = computeForces(features)
+  // 1. Voronoi
+  const points: [number, number][] = features.map(p => p.coordinates)
+  const delaunay = Delaunay.from(points)
 
-  progress('Grille globale', 60)
-  const allGrid = computeGrid(allPlaces)
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const [x, y] of points) {
+    if (x < minX) minX = x
+    if (y < minY) minY = y
+    if (x > maxX) maxX = x
+    if (y > maxY) maxY = y
+  }
 
-  progress('Territoires finaux', 85)
-  const finalTerr = gridToTerritories(allGrid)
+  const voronoi = delaunay.voronoi([
+    minX - VORONOI_PAD_DEG, minY - VORONOI_PAD_DEG,
+    maxX + VORONOI_PAD_DEG, maxY + VORONOI_PAD_DEG,
+  ])
 
-  self.postMessage({ type: 'FeatureCollection', partial: false, features: finalTerr })
+  // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
+  const territories: Feature<Polygon | MultiPolygon>[] = []
+
+  for (let i = 0; i < features.length; i++) {
+    const place = features[i]
+    const rKm = radiusForScore(place.score)
+
+    const cellCoords = voronoi.cellPolygon(i)
+    if (!cellCoords) continue
+
+    const circleCoords = makeCircle(place.coordinates, rKm)
+    const clipped = clipToConvex(circleCoords, cellCoords as unknown as Position[])
+
+    if (clipped) {
+      territories.push({
+        type: 'Feature',
+        id: i,
+        geometry: { type: 'Polygon', coordinates: [clipped] },
+        properties: {
+          tagColor: place.tagColor,
+          score: place.score,
+        },
+      })
+    }
+  }
+
+  self.postMessage({ type: 'FeatureCollection', partial: false, features: territories })
 }

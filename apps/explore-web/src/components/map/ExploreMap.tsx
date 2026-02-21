@@ -79,7 +79,20 @@ const territoryFillLayer: LayerSpecification = {
   source: 'territories',
   paint: {
     'fill-color': ['get', 'tagColor'],
-    'fill-opacity': 0.12,
+    'fill-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      0.30,    // hover → boost opacité
+      // normal
+      ['interpolate', ['linear'], ['get', 'score'],
+        0, 0.04,
+        1, 0.06,
+        5, 0.10,
+        20, 0.14,
+        50, 0.18,
+        100, 0.20,
+      ],
+    ],
   },
 }
 
@@ -89,9 +102,30 @@ const territoryBorderLayer: LayerSpecification = {
   source: 'territories',
   paint: {
     'line-color': ['get', 'tagColor'],
-    'line-width': 1.5,
-    'line-opacity': 0.25,
-    'line-dasharray': [4, 3],
+    'line-width': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      2.5,     // hover → bordure épaisse
+      // normal
+      ['interpolate', ['linear'], ['get', 'score'],
+        0, 0.3,
+        5, 0.6,
+        20, 1,
+        50, 1.5,
+      ],
+    ],
+    'line-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      0.7,     // hover → bordure bien visible
+      // normal
+      ['interpolate', ['linear'], ['get', 'score'],
+        0, 0.1,
+        5, 0.25,
+        20, 0.4,
+        50, 0.5,
+      ],
+    ],
   },
 }
 
@@ -155,6 +189,7 @@ export function ExploreMap() {
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null)
   const [mapStyle, setMapStyle] = useState<StyleSpecification | null>(null)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
+  const placeOverrides = useMapStore(state => state.placeOverrides)
 
   // Charger le style parchemin
   useEffect(() => {
@@ -173,8 +208,7 @@ export function ExploreMap() {
         return
       }
       setTerritories(e.data as FeatureCollection<Polygon | MultiPolygon>)
-      // Masquer la barre seulement quand le résultat final arrive
-      if (!e.data.partial) setWorkerProgress(null)
+      setWorkerProgress(null)
     }
     workerRef.current = worker
     return () => worker.terminate()
@@ -186,15 +220,17 @@ export function ExploreMap() {
   useEffect(() => {
     if (!geojson || !workerRef.current) return
     workerRef.current.postMessage({
-      features: geojson.features.map(f => ({
-        coordinates: f.geometry.coordinates as [number, number],
-        faction: f.properties.tagTitle || 'inconnu',
-        tagColor: f.properties.tagColor,
-        likes: f.properties.likes,
-      })),
-      center: userCenter,
+      features: geojson.features.map(f => {
+        const ov = placeOverrides.get(f.properties.id)
+        return {
+          coordinates: f.geometry.coordinates as [number, number],
+          faction: ov?.tagTitle || f.properties.tagTitle || 'inconnu',
+          tagColor: ov?.tagColor || f.properties.tagColor,
+          score: ov?.score ?? f.properties.score,
+        }
+      }),
     })
-  }, [geojson])
+  }, [geojson, placeOverrides])
 
   // Charger les icônes SVG colorées dans la map
   const loadedIconsRef = useRef(new Set<string>())
@@ -223,13 +259,14 @@ export function ExploreMap() {
   const onClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0]
     if (!feature) {
-      // Clic dans le vide → fermer le panel
       setSelectedPlaceId(null)
       return
     }
 
-    const props = feature.properties as PlaceProperties
+    // Ignorer les clics sur les territoires (pas de place id)
+    if (feature.layer?.id?.startsWith('territories')) return
 
+    const props = feature.properties as PlaceProperties
     setSelectedPlaceId(props.id)
     setPopupInfo(null)
   }, [])
@@ -242,7 +279,44 @@ export function ExploreMap() {
 
   const onMouseLeave = useCallback(() => {
     const map = mapRef.current?.getMap()
-    if (map) map.getCanvas().style.cursor = ''
+    if (!map) return
+    map.getCanvas().style.cursor = ''
+    // Clear territory hover
+    if (hoveredTerritoryRef.current !== null) {
+      map.setFeatureState(
+        { source: 'territories', id: hoveredTerritoryRef.current },
+        { hover: false },
+      )
+      hoveredTerritoryRef.current = null
+    }
+  }, [])
+
+  // Hover sur les territoires — feature-state
+  const hoveredTerritoryRef = useRef<number | null>(null)
+
+  const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+
+    const features = map.queryRenderedFeatures(e.point, { layers: ['territories-fill'] })
+
+    // Clear previous hover
+    if (hoveredTerritoryRef.current !== null) {
+      map.setFeatureState(
+        { source: 'territories', id: hoveredTerritoryRef.current },
+        { hover: false },
+      )
+      hoveredTerritoryRef.current = null
+    }
+
+    if (features.length > 0 && features[0].id != null) {
+      const id = features[0].id as number
+      hoveredTerritoryRef.current = id
+      map.setFeatureState(
+        { source: 'territories', id },
+        { hover: true },
+      )
+    }
   }, [])
 
   if (!mapStyle) {
@@ -265,22 +339,16 @@ export function ExploreMap() {
       }}
       style={{ width: '100%', height: '100%' }}
       mapStyle={mapStyle}
-      interactiveLayerIds={['places-point', 'places-icon']}
+      interactiveLayerIds={['places-point', 'places-icon', 'territories-fill']}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onMouseMove={onMouseMove}
       fadeDuration={0}
       attributionControl={false}
     >
       <NavigationControl position="top-right" showCompass={false} />
       <GeolocateControl position="top-right" />
-
-      {territories && (
-        <Source id="territories" type="geojson" data={territories}>
-          <Layer {...territoryFillLayer} />
-          <Layer {...territoryBorderLayer} />
-        </Source>
-      )}
 
       {geojson && (
         <Source
@@ -290,6 +358,13 @@ export function ExploreMap() {
         >
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
+        </Source>
+      )}
+
+      {territories && (
+        <Source id="territories" type="geojson" data={territories}>
+          <Layer {...territoryFillLayer} beforeId="places-point" />
+          <Layer {...territoryBorderLayer} beforeId="places-point" />
         </Source>
       )}
 
