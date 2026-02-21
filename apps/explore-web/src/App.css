@@ -725,6 +725,138 @@
 }
 
 /* ==========================================
+   ENERGY INDICATOR (Fog of War)
+   ========================================== */
+
+.energy-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 10px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-sepia);
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
+}
+
+.energy-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.energy-dot-full {
+  background: var(--color-sepia);
+  box-shadow: 0 0 4px rgba(193, 154, 107, 0.5);
+}
+
+.energy-dot-empty {
+  background: var(--color-parchment-dark);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   FOG OF WAR — Place Panel
+   ========================================== */
+
+.fogged-gallery {
+  filter: blur(8px) saturate(0.3);
+  opacity: 0.5;
+}
+
+.fog-mystery-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-ink-light);
+  font-style: italic;
+  margin: 8px 0 20px;
+  line-height: 1.5;
+}
+
+.fog-discover-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discover-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-parchment);
+  background: var(--color-ink);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.discover-btn:hover {
+  background: var(--color-ink-light);
+}
+
+.discover-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fog-energy-info {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  text-align: center;
+}
+
+.fog-energy-count {
+  font-weight: 600;
+  color: var(--color-sepia-dark);
+}
+
+.fog-energy-empty {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #991b1b;
+  font-style: italic;
+}
+
+.fog-cta-section {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.fog-cta-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-ink-light);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.fog-cta-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  font-family: var(--font-title);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-parchment);
+  background: var(--color-ink);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fog-cta-btn:hover {
+  background: var(--color-ink-light);
+}
+
+/* ==========================================
    MOBILE — Bottom Sheet
    ========================================== */
 

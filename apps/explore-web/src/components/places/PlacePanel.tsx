@@ -3,11 +3,15 @@ import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
+import { useFogStore } from '../../stores/fogStore'
+import { useFog } from '../../hooks/useFog'
+import { useAuth } from '../../hooks/useAuth'
 
 interface PlacePanelProps {
   placeId: string | null
   onClose: () => void
   userEmail: string | null
+  onAuthPrompt?: () => void
 }
 
 interface UserFaction {
@@ -18,7 +22,7 @@ interface UserFaction {
   factionPattern: string
 }
 
-export function PlacePanel({ placeId, onClose, userEmail }: PlacePanelProps) {
+export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
   const { place, loading, error } = usePlace(placeId)
   const isOpen = placeId !== null
 
@@ -40,14 +44,154 @@ export function PlacePanel({ placeId, onClose, userEmail }: PlacePanelProps) {
         )}
 
         {place && !loading && (
-          <PlaceContent key={place.id} place={place} onClose={onClose} userEmail={userEmail} />
+          <PlaceContent key={place.id} place={place} onClose={onClose} userEmail={userEmail} onAuthPrompt={onAuthPrompt} />
         )}
       </div>
     </>
   )
 }
 
-function PlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
+function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void }) {
+  const { isAuthenticated } = useAuth()
+  const { discover } = useFog()
+  const discoveredIds = useFogStore(s => s.discoveredIds)
+  const userFactionId = useFogStore(s => s.userFactionId)
+
+  // Déterminer si le lieu est découvert
+  const isDiscovered = isAuthenticated && (
+    discoveredIds.has(place.id) ||
+    (userFactionId !== null && place.claim?.factionId === userFactionId)
+  )
+
+  // Lieu non découvert → vue brouillard
+  if (!isDiscovered) {
+    return (
+      <FoggedPlaceView
+        place={place}
+        onClose={onClose}
+        isAuthenticated={isAuthenticated}
+        onDiscover={async () => {
+          await discover(place.id, place.location.latitude, place.location.longitude)
+        }}
+        onAuthPrompt={onAuthPrompt}
+      />
+    )
+  }
+
+  return <DiscoveredPlaceContent place={place} onClose={onClose} userEmail={userEmail} />
+}
+
+// --- Vue brouillard (lieu non découvert) ---
+
+function FoggedPlaceView({
+  place,
+  onClose,
+  isAuthenticated,
+  onDiscover,
+  onAuthPrompt,
+}: {
+  place: PlaceDetail
+  onClose: () => void
+  isAuthenticated: boolean
+  onDiscover: () => Promise<void>
+  onAuthPrompt?: () => void
+}) {
+  const energy = useFogStore(s => s.energy)
+  const userPosition = useFogStore(s => s.userPosition)
+  const [discovering, setDiscovering] = useState(false)
+
+  // Calcul distance GPS
+  let isNearby = false
+  if (userPosition) {
+    const dist = haversineM(
+      userPosition.lat, userPosition.lng,
+      place.location.latitude, place.location.longitude,
+    )
+    isNearby = dist <= 500
+  }
+
+  const cost = isNearby ? 0 : 1
+  const canAfford = cost === 0 || energy >= cost
+
+  const images = place.images || []
+
+  return (
+    <>
+      {/* Header */}
+      <div className="place-panel-header">
+        <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
+          &#10005;
+        </button>
+      </div>
+
+      {/* Gallery floue */}
+      {images.length > 0 && (
+        <div className="place-panel-gallery fogged-gallery">
+          <img
+            src={images[0].url}
+            alt="Lieu mystérieux"
+            className="place-panel-image"
+          />
+        </div>
+      )}
+
+      {/* Body */}
+      <div className="place-panel-body">
+        <h1 className="place-panel-title">{place.title}</h1>
+
+        <p className="fog-mystery-text">
+          Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.
+        </p>
+
+        {isAuthenticated ? (
+          <div className="fog-discover-section">
+            <button
+              className="discover-btn"
+              onClick={async () => {
+                setDiscovering(true)
+                await onDiscover()
+                setDiscovering(false)
+              }}
+              disabled={discovering || !canAfford}
+            >
+              {discovering
+                ? 'Exploration...'
+                : isNearby
+                  ? 'Explorer (gratuit — vous êtes à proximité)'
+                  : `Explorer (1 point d'énergie)`
+              }
+            </button>
+
+            <div className="fog-energy-info">
+              <span className="fog-energy-count">{energy}/5</span> points d'énergie
+              {!canAfford && (
+                <p className="fog-energy-empty">
+                  Plus assez d'énergie. Revenez demain ou déplacez-vous à proximité du lieu.
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="fog-cta-section">
+            <p className="fog-cta-text">
+              Rejoignez l'Aventure pour explorer ce lieu et découvrir la carte.
+            </p>
+            <button
+              className="fog-cta-btn"
+              onClick={onAuthPrompt}
+            >
+              Créer un compte
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
+// --- Vue découverte (lieu accessible) ---
+
+function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
   const images = place.images || []
@@ -184,6 +328,22 @@ function PlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClo
       </div>
     </>
   )
+}
+
+// --- Haversine ---
+
+function haversineM(
+  lat1: number, lng1: number,
+  lat2: number, lng2: number,
+): number {
+  const R = 6371000
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
 // --- Bouton Revendiquer ---

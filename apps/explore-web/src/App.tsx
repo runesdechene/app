@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { ExploreMap } from './components/map/ExploreMap'
+import { EnergyIndicator } from './components/map/EnergyIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { useMapStore } from './stores/mapStore'
 import { useAuth } from './hooks/useAuth'
+import { useFog } from './hooks/useFog'
 import './App.css'
 
 function App() {
@@ -13,12 +15,19 @@ function App() {
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
 
+  // Initialiser le fog state (découvertes + énergie) dès l'auth
+  useFog()
+
   return (
     <div className="app">
       <ExploreMap />
 
       {/* Toolbar flottante */}
       <div className="app-toolbar">
+        {!authLoading && isAuthenticated && (
+          <EnergyIndicator />
+        )}
+
         {!authLoading && (
           isAuthenticated && user?.email ? (
             <ProfileMenu email={user.email} onSignOut={signOut} />
@@ -41,6 +50,7 @@ function App() {
         placeId={selectedPlaceId}
         onClose={() => setSelectedPlaceId(null)}
         userEmail={user?.email ?? null}
+        onAuthPrompt={() => setShowAuthModal(true)}
       />
 
       {showAuthModal && (

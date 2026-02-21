@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import type { FeatureCollection, Point } from 'geojson'
 import { supabase } from '../lib/supabase'
+import { useFogStore } from '../stores/fogStore'
+import { useAuth } from './useAuth'
 
 interface MapPlace {
   id: string
@@ -41,14 +43,20 @@ export interface PlaceProperties {
   claimed: boolean
   likes: number
   score: number
+  discovered: boolean
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
 
 export function usePlaces() {
-  const [geojson, setGeojson] = useState<PlacesGeoJSON | null>(null)
+  const [rawGeojson, setRawGeojson] = useState<PlacesGeoJSON | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const discoveredIds = useFogStore(s => s.discoveredIds)
+  const userFactionId = useFogStore(s => s.userFactionId)
+  const fogLoading = useFogStore(s => s.loading)
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     async function fetchPlaces() {
@@ -99,16 +107,36 @@ export function usePlaces() {
               claimed: !!place.faction,
               likes: place.likes ?? 0,
               score: place.score ?? 0,
+              discovered: false, // sera enrichi par le useMemo
             },
           })),
       }
 
-      setGeojson(fc)
+      setRawGeojson(fc)
       setLoading(false)
     }
 
     fetchPlaces()
   }, [])
 
-  return { geojson, loading, error }
+  // Enrichir le GeoJSON avec l'état discovered (re-calcule quand fog change)
+  const geojson = useMemo(() => {
+    if (!rawGeojson) return null
+
+    return {
+      ...rawGeojson,
+      features: rawGeojson.features.map(f => ({
+        ...f,
+        properties: {
+          ...f.properties,
+          discovered: isAuthenticated
+            ? discoveredIds.has(f.properties.id) ||
+              (userFactionId !== null && f.properties.factionId === userFactionId)
+            : false,
+        },
+      })),
+    }
+  }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated])
+
+  return { geojson, loading: loading || fogLoading, error }
 }

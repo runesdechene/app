@@ -9,6 +9,7 @@ import { usePlaces } from '../../hooks/usePlaces'
 import type { PlaceProperties } from '../../hooks/usePlaces'
 import { loadParchmentStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
+import { useFogStore } from '../../stores/fogStore'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
@@ -183,7 +184,12 @@ const pointLayer: LayerSpecification = {
   source: 'places',
   filter: ['==', ['get', 'tagIcon'], ''],
   paint: {
-    'circle-color': ['get', 'tagColor'],
+    'circle-color': [
+      'case',
+      ['boolean', ['get', 'discovered'], false],
+      ['get', 'tagColor'],    // découvert : couleur normale
+      '#8A7B6A',              // brouillard : gris sépia
+    ],
     'circle-radius': [
       'interpolate', ['linear'], ['zoom'],
       4, 3,
@@ -192,6 +198,12 @@ const pointLayer: LayerSpecification = {
     ],
     'circle-stroke-width': 1.5,
     'circle-stroke-color': MAP_COLORS.land,
+    'circle-opacity': [
+      'case',
+      ['boolean', ['get', 'discovered'], false],
+      1,      // découvert : pleine opacité
+      0.4,    // brouillard : atténué
+    ],
   },
 }
 
@@ -211,6 +223,14 @@ const iconLayer: LayerSpecification = {
     ],
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
+  },
+  paint: {
+    'icon-opacity': [
+      'case',
+      ['boolean', ['get', 'discovered'], false],
+      1,      // découvert : pleine opacité
+      0.3,    // brouillard : très atténué
+    ],
   },
 }
 
@@ -235,6 +255,7 @@ export function ExploreMap() {
   const [mapStyle, setMapStyle] = useState<StyleSpecification | null>(null)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
   const placeOverrides = useMapStore(state => state.placeOverrides)
+  const setUserPosition = useFogStore(s => s.setUserPosition)
 
   // Charger le style parchemin
   useEffect(() => {
@@ -264,12 +285,13 @@ export function ExploreMap() {
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
-    // Seuls les lieux revendiqués (claimed) ont une zone d'influence
+    // Seuls les lieux revendiqués (claimed) ET découverts ont une zone d'influence
     workerRef.current.postMessage({
       features: geojson.features
         .filter(f => {
           const ov = placeOverrides.get(f.properties.id)
-          return f.properties.claimed || ov?.claimed
+          const isClaimed = f.properties.claimed || ov?.claimed
+          return isClaimed && f.properties.discovered
         })
         .map(f => {
           const ov = placeOverrides.get(f.properties.id)
@@ -437,6 +459,11 @@ export function ExploreMap() {
     }
   }, [])
 
+  // GPS tracking → fogStore
+  const onGeolocate = useCallback((e: { coords: { longitude: number; latitude: number } }) => {
+    setUserPosition({ lng: e.coords.longitude, lat: e.coords.latitude })
+  }, [setUserPosition])
+
   // Hover sur les territoires — feature-state
   const hoveredTerritoryRef = useRef<number | null>(null)
 
@@ -494,7 +521,7 @@ export function ExploreMap() {
       attributionControl={false}
     >
       <NavigationControl position="top-right" showCompass={false} />
-      <GeolocateControl position="top-right" />
+      <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />
 
       {geojson && (
         <Source
