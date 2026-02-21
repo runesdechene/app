@@ -10,6 +10,8 @@
  *    → Zéro superposition (garanti par Voronoi)
  */
 import { Delaunay } from 'd3-delaunay'
+import { union } from '@turf/union'
+import { polygon as turfPolygon, featureCollection } from '@turf/helpers'
 import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
@@ -20,6 +22,7 @@ const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
 const CIRCLE_SEGMENTS = 32       // réduit (perf), cercle reste lisse
 const VORONOI_PAD_DEG = 2
+const UNION_EPSILON = 0.00003  // ~3m — comble les micro-gaps floating-point pour l'union
 
 // --- Types ---
 
@@ -54,6 +57,54 @@ function makeCircle(center: [number, number], radiusKm: number): Position[] {
     coords.push([lon + dx, lat + dy])
   }
   return coords
+}
+
+/** Dilate légèrement un anneau convexe depuis son centroïde (comble les micro-gaps pour union) */
+function expandRing(ring: Position[]): Position[] {
+  const n = ring.length - 1 // exclure le point de fermeture
+  let cx = 0, cy = 0
+  for (let i = 0; i < n; i++) { cx += ring[i][0]; cy += ring[i][1] }
+  cx /= n; cy /= n
+
+  return ring.map(([x, y]) => {
+    const dx = x - cx, dy = y - cy
+    const d = Math.sqrt(dx * dx + dy * dy)
+    if (d < 1e-12) return [x, y]
+    return [x + (dx / d) * UNION_EPSILON, y + (dy / d) * UNION_EPSILON]
+  })
+}
+
+/** Lissage Chaikin : arrondit les angles vifs en 2 itérations → forme organique */
+function chaikinSmooth(ring: Position[], iterations = 2): Position[] {
+  let pts = ring.slice(0, -1) // retirer le point de fermeture
+  for (let iter = 0; iter < iterations; iter++) {
+    const next: Position[] = []
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i]
+      const b = pts[(i + 1) % pts.length]
+      next.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25])
+      next.push([a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75])
+    }
+    pts = next
+  }
+  pts.push(pts[0]) // fermer l'anneau
+  return pts
+}
+
+/** Applique le lissage Chaikin sur toutes les rings d'une géométrie */
+function smoothGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon {
+  if (geom.type === 'Polygon') {
+    return {
+      type: 'Polygon',
+      coordinates: geom.coordinates.map(ring => chaikinSmooth(ring)),
+    }
+  }
+  return {
+    type: 'MultiPolygon',
+    coordinates: geom.coordinates.map(poly =>
+      poly.map(ring => chaikinSmooth(ring)),
+    ),
+  }
 }
 
 // --- Sutherland-Hodgman : clip polygon to convex cell ---
@@ -134,11 +185,13 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
   ])
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
-  const territories: Feature<Polygon | MultiPolygon>[] = []
+  //    Grouper par faction (tagColor) pour fusion visuelle
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
     const rKm = radiusForScore(place.score)
+    if (rKm <= 0) continue
 
     const cellCoords = voronoi.cellPolygon(i)
     if (!cellCoords) continue
@@ -147,16 +200,48 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     const clipped = clipToConvex(circleCoords, cellCoords as unknown as Position[])
 
     if (clipped) {
-      territories.push({
-        type: 'Feature',
-        id: i,
-        geometry: { type: 'Polygon', coordinates: [clipped] },
-        properties: {
-          tagColor: place.tagColor,
-          score: place.score,
-        },
-      })
+      const key = place.tagColor
+      let group = factionRings.get(key)
+      if (!group) {
+        group = { polygons: [], totalScore: 0, count: 0 }
+        factionRings.set(key, group)
+      }
+      group.polygons.push([clipped])  // chaque polygon = [ring]
+      group.totalScore += place.score
+      group.count++
     }
+  }
+
+  // 3. Union géométrique par faction → contour extérieur uniquement
+  const territories: Feature<Polygon | MultiPolygon>[] = []
+  let id = 0
+
+  for (const [color, group] of factionRings) {
+    let geometry: Polygon | MultiPolygon
+
+    if (group.polygons.length === 1) {
+      geometry = { type: 'Polygon', coordinates: group.polygons[0] }
+    } else {
+      try {
+        const polys = group.polygons.map(coords => turfPolygon([expandRing(coords[0])]))
+        const merged = union(featureCollection(polys))
+        if (!merged) continue
+        geometry = merged.geometry
+      } catch {
+        // Fallback : MultiPolygon brut si union échoue
+        geometry = { type: 'MultiPolygon', coordinates: group.polygons }
+      }
+    }
+
+    territories.push({
+      type: 'Feature',
+      id: id++,
+      geometry: smoothGeometry(geometry),
+      properties: {
+        tagColor: color,
+        score: group.totalScore,
+      },
+    })
   }
 
   self.postMessage({ type: 'FeatureCollection', partial: false, features: territories })

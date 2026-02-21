@@ -82,17 +82,10 @@ const territoryFillLayer: LayerSpecification = {
     'fill-opacity': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      0.30,    // hover → boost opacité
-      // normal
-      ['interpolate', ['linear'], ['get', 'score'],
-        0, 0.04,
-        1, 0.06,
-        5, 0.10,
-        20, 0.14,
-        50, 0.18,
-        100, 0.20,
-      ],
+      0.22,    // hover → boost léger
+      0.12,    // fixe
     ],
+    'fill-antialias': false,  // supprime les coutures entre polygones
   },
 }
 
@@ -105,26 +98,14 @@ const territoryBorderLayer: LayerSpecification = {
     'line-width': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      2.5,     // hover → bordure épaisse
-      // normal
-      ['interpolate', ['linear'], ['get', 'score'],
-        0, 0.3,
-        5, 0.6,
-        20, 1,
-        50, 1.5,
-      ],
+      2,       // hover → bordure visible
+      0,       // caché → pas de séparation entre même faction
     ],
     'line-opacity': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      0.7,     // hover → bordure bien visible
-      // normal
-      ['interpolate', ['linear'], ['get', 'score'],
-        0, 0.1,
-        5, 0.25,
-        20, 0.4,
-        50, 0.5,
-      ],
+      0.6,
+      0,
     ],
   },
 }
@@ -263,13 +244,30 @@ export function ExploreMap() {
       return
     }
 
-    // Ignorer les clics sur les territoires (pas de place id)
-    if (feature.layer?.id?.startsWith('territories')) return
+    // Clic sur un territoire → ouvrir le lieu le plus proche (= générateur Voronoi)
+    if (feature.layer?.id?.startsWith('territories')) {
+      if (!geojson) return
+      const { lng, lat } = event.lngLat
+      let nearestId: string | null = null
+      let minDist = Infinity
+      for (const f of geojson.features) {
+        const [pLng, pLat] = f.geometry.coordinates
+        const dx = pLng - lng
+        const dy = pLat - lat
+        const dist = dx * dx + dy * dy
+        if (dist < minDist) {
+          minDist = dist
+          nearestId = f.properties.id
+        }
+      }
+      if (nearestId) setSelectedPlaceId(nearestId)
+      return
+    }
 
     const props = feature.properties as PlaceProperties
     setSelectedPlaceId(props.id)
     setPopupInfo(null)
-  }, [])
+  }, [geojson])
 
   // Curseur pointer sur les layers interactifs
   const onMouseEnter = useCallback(() => {
