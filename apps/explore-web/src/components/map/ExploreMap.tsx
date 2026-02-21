@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Map as MapGL, Source, Layer, Popup, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
+import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { usePlaces } from '../../hooks/usePlaces'
@@ -11,7 +12,7 @@ import { useMapStore } from '../../stores/mapStore'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
-const ICON_SIZE = 120
+const ICON_SIZE = 100
 const BORDER = 6 // épaisseur du contour en pixels
 
 /** Charge un SVG text en HTMLImageElement */
@@ -70,7 +71,31 @@ async function loadColoredSvgIcon(
   }
 }
 
-// --- Layer style ---
+// --- Layer style : Territoires ---
+
+const territoryFillLayer: LayerSpecification = {
+  id: 'territories-fill',
+  type: 'fill',
+  source: 'territories',
+  paint: {
+    'fill-color': ['get', 'tagColor'],
+    'fill-opacity': 0.12,
+  },
+}
+
+const territoryBorderLayer: LayerSpecification = {
+  id: 'territories-border',
+  type: 'line',
+  source: 'territories',
+  paint: {
+    'line-color': ['get', 'tagColor'],
+    'line-width': 1.5,
+    'line-opacity': 0.25,
+    'line-dasharray': [4, 3],
+  },
+}
+
+// --- Layer style : Markers ---
 
 // Cercles colorés — uniquement pour les lieux SANS icône
 const pointLayer: LayerSpecification = {
@@ -124,6 +149,9 @@ interface PopupInfo {
 export function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
   const { geojson, loading, error } = usePlaces()
+  const [territories, setTerritories] = useState<FeatureCollection<Polygon | MultiPolygon> | null>(null)
+  const workerRef = useRef<Worker | null>(null)
+  const [workerProgress, setWorkerProgress] = useState<{ phase: string; percent: number } | null>(null)
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null)
   const [mapStyle, setMapStyle] = useState<StyleSpecification | null>(null)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
@@ -132,6 +160,41 @@ export function ExploreMap() {
   useEffect(() => {
     loadParchmentStyle().then(setMapStyle)
   }, [])
+
+  // Web Worker : calcul des territoires en arrière-plan
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('../../workers/territoryWorker.ts', import.meta.url),
+      { type: 'module' },
+    )
+    worker.onmessage = (e) => {
+      if (e.data.type === 'progress') {
+        setWorkerProgress({ phase: e.data.phase, percent: e.data.percent })
+        return
+      }
+      setTerritories(e.data as FeatureCollection<Polygon | MultiPolygon>)
+      // Masquer la barre seulement quand le résultat final arrive
+      if (!e.data.partial) setWorkerProgress(null)
+    }
+    workerRef.current = worker
+    return () => worker.terminate()
+  }, [])
+
+  // Nice par défaut — sera remplacé par la géoloc utilisateur plus tard
+  const userCenter: [number, number] = [7.26, 43.7]
+
+  useEffect(() => {
+    if (!geojson || !workerRef.current) return
+    workerRef.current.postMessage({
+      features: geojson.features.map(f => ({
+        coordinates: f.geometry.coordinates as [number, number],
+        faction: f.properties.tagTitle || 'inconnu',
+        tagColor: f.properties.tagColor,
+        likes: f.properties.likes,
+      })),
+      center: userCenter,
+    })
+  }, [geojson])
 
   // Charger les icônes SVG colorées dans la map
   const loadedIconsRef = useRef(new Set<string>())
@@ -196,9 +259,9 @@ export function ExploreMap() {
     <MapGL
       ref={mapRef}
       initialViewState={{
-        longitude: 2.35,
-        latitude: 46.6,
-        zoom: 5.5,
+        longitude: userCenter[0],
+        latitude: userCenter[1],
+        zoom: 9,
       }}
       style={{ width: '100%', height: '100%' }}
       mapStyle={mapStyle}
@@ -211,6 +274,13 @@ export function ExploreMap() {
     >
       <NavigationControl position="top-right" showCompass={false} />
       <GeolocateControl position="top-right" />
+
+      {territories && (
+        <Source id="territories" type="geojson" data={territories}>
+          <Layer {...territoryFillLayer} />
+          <Layer {...territoryBorderLayer} />
+        </Source>
+      )}
 
       {geojson && (
         <Source
@@ -265,6 +335,19 @@ export function ExploreMap() {
       {error && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-100 text-red-800 px-4 py-2 rounded shadow-md text-sm z-10">
           {error}
+        </div>
+      )}
+
+      {workerProgress && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[var(--color-parchment)] text-[var(--color-ink)] px-4 py-2 rounded shadow-md text-xs font-[var(--font-body)] z-10 flex items-center gap-3 min-w-[220px]">
+          <span>{workerProgress.phase}</span>
+          <div className="flex-1 h-1.5 bg-[var(--color-ink)]/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[var(--color-ink)] rounded-full transition-[width] duration-300"
+              style={{ width: `${workerProgress.percent}%` }}
+            />
+          </div>
+          <span className="tabular-nums">{workerProgress.percent}%</span>
         </div>
       )}
     </MapGL>

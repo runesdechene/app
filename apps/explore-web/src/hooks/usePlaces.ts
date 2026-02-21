@@ -19,6 +19,7 @@ interface MapPlace {
     latitude: number
     longitude: number
   }
+  likes: number
 }
 
 export interface PlaceProperties {
@@ -28,6 +29,7 @@ export interface PlaceProperties {
   tagColor: string
   tagBackground: string
   tagIcon: string
+  likes: number
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -81,6 +83,7 @@ export function usePlaces() {
               tagColor: place.primaryTag?.color ?? '#C19A6B',
               tagBackground: place.primaryTag?.background ?? '#F5E6D3',
               tagIcon: (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? '',
+              likes: place.likes ?? 0,
             },
           })),
       }
