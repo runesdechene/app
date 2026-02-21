@@ -29,6 +29,7 @@ export function useFog() {
   const setUserId = useFogStore(s => s.setUserId)
   const setEnergy = useFogStore(s => s.setEnergy)
   const setLoading = useFogStore(s => s.setLoading)
+  const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
 
   // Init : charger les découvertes + énergie + faction à l'authentification
   useEffect(() => {
@@ -37,6 +38,7 @@ export function useFog() {
       setEnergy(0)
       setUserFactionId(null)
       setUserId(null)
+      setUserAvatarUrl(null)
       setLoading(false)
       return
     }
@@ -61,10 +63,11 @@ export function useFog() {
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
 
-      // Fetch découvertes + énergie en parallèle
-      const [discRes, energyRes] = await Promise.all([
+      // Fetch découvertes + énergie + profil en parallèle
+      const [discRes, energyRes, profileRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
+        supabase.rpc('get_my_informations', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -74,6 +77,10 @@ export function useFog() {
       }
       if (energyRes.data) {
         setEnergy((energyRes.data as { energy: number }).energy)
+      }
+      if (profileRes.data) {
+        const profile = profileRes.data as { profileImage?: { url: string } | null }
+        setUserAvatarUrl(profile.profileImage?.url ?? null)
       }
 
       setLoading(false)

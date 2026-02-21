@@ -23,6 +23,10 @@ interface FogState {
   userPosition: { lng: number; lat: number } | null
   setUserPosition: (pos: { lng: number; lat: number } | null) => void
 
+  /** URL de l'avatar du joueur (Supabase storage) */
+  userAvatarUrl: string | null
+  setUserAvatarUrl: (url: string | null) => void
+
   /** Chargement initial */
   loading: boolean
   setLoading: (loading: boolean) => void
@@ -50,6 +54,9 @@ export const useFogStore = create<FogState>((set) => ({
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),
+
+  userAvatarUrl: null,
+  setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
 
   loading: true,
   setLoading: (loading) => set({ loading }),

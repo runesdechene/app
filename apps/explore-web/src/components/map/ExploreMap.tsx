@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Map as MapGL, Source, Layer, Popup, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Map as MapGL, Source, Layer, Popup, Marker, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
 import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
@@ -136,6 +136,72 @@ async function loadPatternImage(
   }
 }
 
+// --- Fog of War : Canvas overlay ---
+//
+// Un canvas HTML positionné par-dessus la carte.
+// On dessine un rectangle opaque puis on "gomme" des cercles
+// aux lieux découverts et à la position GPS.
+// Zéro triangulation WebGL, zéro artefact.
+
+const FOG_COLOR = 'rgba(30, 25, 20, 0.55)'
+const FOG_GPS_RADIUS_KM = 50
+const FOG_MIN_RADIUS_KM = 0.5
+const FOG_BASE_RADIUS_KM = 0.15
+const FOG_RADIUS_SCALE_KM = 0.45
+
+function fogRadiusForScore(score: number): number {
+  const influence = score <= 1
+    ? FOG_BASE_RADIUS_KM
+    : FOG_BASE_RADIUS_KM + Math.sqrt(score - 1) * FOG_RADIUS_SCALE_KM
+  return Math.max(influence, FOG_MIN_RADIUS_KM)
+}
+
+/** Dessine le fog sur un canvas : fond opaque + trous radial-gradient aux découvertes */
+function drawFog(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  map: maplibregl.Map,
+  holes: { lng: number; lat: number; radiusKm: number }[],
+) {
+  // Fond opaque
+  ctx.clearRect(0, 0, w, h)
+  ctx.fillStyle = FOG_COLOR
+  ctx.fillRect(0, 0, w, h)
+
+  // Gomme circulaire pour chaque trou
+  ctx.globalCompositeOperation = 'destination-out'
+
+  for (const hole of holes) {
+    const center = map.project([hole.lng, hole.lat])
+
+    // Convertir le rayon km en pixels à ce zoom/latitude
+    const edgePoint = map.project([
+      hole.lng + (hole.radiusKm / 79), // ~79 km/deg lon à 45°
+      hole.lat,
+    ])
+    const radiusPx = Math.abs(edgePoint.x - center.x)
+
+    if (radiusPx < 1) continue
+
+    // Dégradé radial : plein au centre, fondu vers le bord
+    const grad = ctx.createRadialGradient(
+      center.x, center.y, 0,
+      center.x, center.y, radiusPx,
+    )
+    grad.addColorStop(0, 'rgba(0,0,0,1)')
+    grad.addColorStop(0.6, 'rgba(0,0,0,1)')
+    grad.addColorStop(1, 'rgba(0,0,0,0)')
+
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.arc(center.x, center.y, radiusPx, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.globalCompositeOperation = 'source-over'
+}
+
 // --- Layer style : Territoires ---
 
 const territoryFillLayer: LayerSpecification = {
@@ -256,6 +322,55 @@ export function ExploreMap() {
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
   const placeOverrides = useMapStore(state => state.placeOverrides)
   const setUserPosition = useFogStore(s => s.setUserPosition)
+  const discoveredIds = useFogStore(s => s.discoveredIds)
+  const userPosition = useFogStore(s => s.userPosition)
+  const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
+
+  // Fog canvas overlay
+  const fogCanvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  // Collecter les trous de fog (découvertes + GPS)
+  const fogHoles = useMemo(() => {
+    if (!geojson) return []
+
+    const holes: { lng: number; lat: number; radiusKm: number }[] = []
+    for (const f of geojson.features) {
+      if (f.properties.discovered) {
+        const ov = placeOverrides.get(f.properties.id)
+        const score = ov?.score ?? f.properties.score
+        const [lng, lat] = f.geometry.coordinates as [number, number]
+        holes.push({ lng, lat, radiusKm: fogRadiusForScore(score) })
+      }
+    }
+
+    if (userPosition) {
+      holes.push({ lng: userPosition.lng, lat: userPosition.lat, radiusKm: FOG_GPS_RADIUS_KM })
+    }
+
+    return holes
+  }, [geojson, discoveredIds, userPosition, placeOverrides])
+
+  // Redessiner le fog canvas à chaque mouvement de carte
+  const redrawFog = useCallback(() => {
+    const canvas = fogCanvasRef.current
+    const map = mapRef.current?.getMap()
+    if (!canvas || !map) return
+
+    const dpr = window.devicePixelRatio || 1
+    const w = map.getCanvas().width / dpr
+    const h = map.getCanvas().height / dpr
+
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    canvas.style.width = `${w}px`
+    canvas.style.height = `${h}px`
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+    drawFog(ctx, w, h, map, fogHoles)
+  }, [fogHoles])
 
   // Charger le style parchemin
   useEffect(() => {
@@ -280,8 +395,69 @@ export function ExploreMap() {
     return () => worker.terminate()
   }, [])
 
-  // Nice par défaut — sera remplacé par la géoloc utilisateur plus tard
-  const userCenter: [number, number] = [7.26, 43.7]
+  // Géolocalisation navigateur : centrer la carte + alimenter fogStore
+  // On stocke la position dans une ref pour l'utiliser dans onMapLoad
+  const geoResultRef = useRef<{ lng: number; lat: number } | null>(null)
+
+  useEffect(() => {
+    let resolved = false
+    const applyPosition = (coords: { lng: number; lat: number }, source: string) => {
+      if (resolved) return
+      resolved = true
+      console.log(`[GEO] Position via ${source}:`, coords)
+      setUserPosition(coords)
+      geoResultRef.current = coords
+      mapRef.current?.flyTo({ center: [coords.lng, coords.lat], zoom: 11, duration: 1500 })
+    }
+
+    // Lancer IP fallback immédiatement en parallèle (rapide, ~200ms)
+    fetch('https://get.geojs.io/v1/ip/geo.json')
+      .then(r => r.json())
+      .then(data => {
+        if (data.latitude && data.longitude) {
+          applyPosition({ lng: parseFloat(data.longitude), lat: parseFloat(data.latitude) }, 'IP')
+        }
+      })
+      .catch(() => {})
+
+    // GPS en parallèle — s'il répond, il écrase l'IP (plus précis)
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          // GPS gagne toujours, même si IP a déjà répondu
+          resolved = false // force override
+          applyPosition({ lng: pos.coords.longitude, lat: pos.coords.latitude }, 'GPS')
+        },
+        () => {},
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
+      )
+      return () => navigator.geolocation.clearWatch(watchId)
+    }
+  }, [])
+
+  // Quand la map se charge : flyTo géoloc + brancher le redraw fog
+  const onMapLoad = useCallback(() => {
+    const coords = geoResultRef.current
+    if (coords) {
+      mapRef.current?.flyTo({ center: [coords.lng, coords.lat], zoom: 11, duration: 1500 })
+    }
+    redrawFog()
+  }, [redrawFog])
+
+  // Redessiner le fog à chaque mouvement/zoom de la carte
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+    if (!map) return
+
+    map.on('move', redrawFog)
+    map.on('resize', redrawFog)
+    redrawFog() // dessin initial
+
+    return () => {
+      map.off('move', redrawFog)
+      map.off('resize', redrawFog)
+    }
+  }, [redrawFog])
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
@@ -503,11 +679,12 @@ export function ExploreMap() {
   }
 
   return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
     <MapGL
       ref={mapRef}
       initialViewState={{
-        longitude: userCenter[0],
-        latitude: userCenter[1],
+        longitude: 7.26,
+        latitude: 43.7,
         zoom: 9,
       }}
       style={{ width: '100%', height: '100%' }}
@@ -519,9 +696,24 @@ export function ExploreMap() {
       onMouseMove={onMouseMove}
       fadeDuration={0}
       attributionControl={false}
+      onLoad={onMapLoad}
     >
       <NavigationControl position="top-right" showCompass={false} />
       <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />
+
+      {/* Marqueur position utilisateur */}
+      {userPosition && (
+        <Marker longitude={userPosition.lng} latitude={userPosition.lat} anchor="center">
+          <div className="user-position-marker">
+            <div className="user-position-pulse" />
+            {userAvatarUrl ? (
+              <img src={userAvatarUrl} alt="" className="user-position-avatar" />
+            ) : (
+              <div className="user-position-dot" />
+            )}
+          </div>
+        </Marker>
+      )}
 
       {geojson && (
         <Source
@@ -599,5 +791,18 @@ export function ExploreMap() {
         </div>
       )}
     </MapGL>
+    {/* Fog of War — canvas overlay par-dessus la carte */}
+    <canvas
+      ref={fogCanvasRef}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+      }}
+    />
+    </div>
   )
 }
