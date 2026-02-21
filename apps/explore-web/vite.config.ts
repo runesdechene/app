@@ -1,19 +1,21 @@
+import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  envDir: path.resolve(__dirname, '../..'),
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Rune2Chain Explorer',
-        short_name: 'Rune2Chain',
-        description: 'Rune2Chain Blockchain Explorer',
-        theme_color: '#1a1a1a',
-        background_color: '#ffffff',
+        name: 'La Carte — Runes de Chene',
+        short_name: 'La Carte',
+        description: 'Explorez 2400 lieux de patrimoine historique et naturel',
+        theme_color: '#F5E6D3',
+        background_color: '#F5E6D3',
         display: 'standalone',
         icons: [
           {
@@ -38,10 +40,12 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
   },
-  envPrefix: ['VITE_', 'TAURI_'],
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'es2022',
+    },
+  },
   build: {
-    target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
-    minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
-    sourcemap: !!process.env.TAURI_DEBUG,
+    target: 'es2022',
   }
 })
