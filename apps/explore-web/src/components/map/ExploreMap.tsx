@@ -137,43 +137,50 @@ async function loadPatternImage(
   }
 }
 
-// --- Layer style : Territoires ---
+// --- Layer style : Territoires (construits dynamiquement selon la faction du joueur) ---
 
-const territoryFillLayer: LayerSpecification = {
-  id: 'territories-fill',
-  type: 'fill',
-  source: 'territories',
-  paint: {
-    'fill-color': ['get', 'tagColor'],
-    'fill-opacity': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      0.22,    // hover → boost léger
-      0.12,    // fixe
-    ],
-    'fill-antialias': false,  // supprime les coutures entre polygones
-  },
+function buildTerritoryFillLayer(userFactionId: string | null): LayerSpecification {
+  const myFaction = userFactionId ?? ''
+  return {
+    id: 'territories-fill',
+    type: 'fill',
+    source: 'territories',
+    paint: {
+      'fill-color': ['get', 'tagColor'],
+      'fill-opacity': [
+        'case',
+        ['==', ['get', 'faction'], myFaction],
+        0.28,    // Ma faction : bien visible
+        ['boolean', ['feature-state', 'hover'], false],
+        0.30,    // Hover autre faction
+        0.18,    // Autre faction : standard
+      ],
+      'fill-antialias': false,
+    },
+  }
 }
 
-const territoryBorderLayer: LayerSpecification = {
-  id: 'territories-border',
-  type: 'line',
-  source: 'territories',
-  paint: {
-    'line-color': ['get', 'tagColor'],
-    'line-width': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      3,
-      2,
-    ],
-    'line-opacity': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      0.6,
-      0.3,
-    ],
-  },
+function buildTerritoryBorderLayer(): LayerSpecification {
+  return {
+    id: 'territories-border',
+    type: 'line',
+    source: 'territories',
+    paint: {
+      'line-color': ['get', 'tagColor'],
+      'line-width': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        3.5,
+        2.5,
+      ],
+      'line-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        0.8,
+        0.45,
+      ],
+    },
+  }
 }
 
 // --- Layer style : Markers ---
@@ -299,9 +306,51 @@ export const ExploreMap = memo(function ExploreMap() {
   const setUserPosition = useFogStore(s => s.setUserPosition)
   const userPosition = useFogStore(s => s.userPosition)
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
+  const userFactionId = useFogStore(s => s.userFactionId)
+  const userFactionColor = useFogStore(s => s.userFactionColor)
 
   // Icône custom pour les lieux non découverts (chargée depuis app_settings)
   const [unknownIconLoaded, setUnknownIconLoaded] = useState(false)
+
+  // Layers territoires mémorisés (dépendent de la faction du joueur)
+  const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(userFactionId), [userFactionId])
+  const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(), [])
+
+  // Labels joueurs sur les territoires — un label par sous-polygone
+  const territoryLabels = useMemo(() => {
+    if (!territories) return null
+
+    const labels: { lon: number; lat: number; territoryId: number; factionTitle: string; players: string; tagColor: string }[] = []
+
+    for (const f of territories.features) {
+      const props = f.properties as Record<string, unknown>
+      if (typeof props.players !== 'string' || props.players === '') continue
+
+      const territoryId = f.id as number
+      const factionTitle = (props.factionTitle as string) || ''
+      const tagColor = (props.tagColor as string) || '#C19A6B'
+
+      // Extraire les anneaux extérieurs (un par sous-polygone)
+      const rings: number[][][] =
+        f.geometry.type === 'Polygon'
+          ? [f.geometry.coordinates[0]]
+          : f.geometry.coordinates.map(poly => poly[0])
+
+      for (const ring of rings) {
+        // Point le plus au nord (latitude max) de la zone
+        let topLon = ring[0][0], topLat = ring[0][1]
+        for (let i = 1; i < ring.length - 1; i++) {
+          if (ring[i][1] > topLat) {
+            topLon = ring[i][0]
+            topLat = ring[i][1]
+          }
+        }
+        labels.push({ lon: topLon, lat: topLat, territoryId, factionTitle, players: props.players as string, tagColor })
+      }
+    }
+
+    return labels
+  }, [territories])
 
   // Layers mémorisés pour éviter les flashs à chaque re-render
   const undiscoveredCircleFinal = useMemo(() => ({
@@ -429,9 +478,11 @@ export const ExploreMap = memo(function ExploreMap() {
           return {
             coordinates: f.geometry.coordinates as [number, number],
             faction: ov?.factionId || f.properties.factionId,
+            factionTitle: f.properties.tagTitle,
             tagColor: ov?.tagColor || f.properties.tagColor,
             factionPattern: ov?.factionPattern || f.properties.factionPattern,
             score: ov?.score ?? f.properties.score,
+            claimedByName: f.properties.claimedByName,
           }
         }),
     })
@@ -517,7 +568,7 @@ export const ExploreMap = memo(function ExploreMap() {
               filter: ['==', ['get', 'pattern'], url],
               paint: {
                 'fill-pattern': url,
-                'fill-opacity': 0.18,
+                'fill-opacity': 0.28,
               },
             },
             'territories-border',
@@ -588,6 +639,7 @@ export const ExploreMap = memo(function ExploreMap() {
       )
       hoveredTerritoryRef.current = null
     }
+    setHoveredTerritoryId(null)
   }, [])
 
   // GPS tracking → fogStore
@@ -595,8 +647,9 @@ export const ExploreMap = memo(function ExploreMap() {
     setUserPosition({ lng: e.coords.longitude, lat: e.coords.latitude })
   }, [setUserPosition])
 
-  // Hover sur les territoires — feature-state
+  // Hover sur les territoires — feature-state + faction hovered pour labels
   const hoveredTerritoryRef = useRef<number | null>(null)
+  const [hoveredTerritoryId, setHoveredTerritoryId] = useState<number | null>(null)
 
   const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
     const map = mapRef.current?.getMap()
@@ -620,6 +673,9 @@ export const ExploreMap = memo(function ExploreMap() {
         { source: 'territories', id },
         { hover: true },
       )
+      setHoveredTerritoryId(id)
+    } else {
+      setHoveredTerritoryId(null)
     }
   }, [])
 
@@ -655,7 +711,13 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueur position utilisateur */}
       {userPosition && (
         <Marker longitude={userPosition.lng} latitude={userPosition.lat} anchor="center">
-          <div className="user-position-marker">
+          <div
+            className="user-position-marker"
+            style={{
+              '--faction-color': userFactionColor ?? '#4A90D9',
+              '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
+            } as React.CSSProperties}
+          >
             <div className="user-position-pulse" />
             {userAvatarUrl ? (
               <img src={userAvatarUrl} alt="" className="user-position-avatar" />
@@ -685,6 +747,23 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...territoryBorderLayer} beforeId="places-undiscovered-circle" />
         </Source>
       )}
+
+      {territoryLabels && territoryLabels.map((label, i) => (
+        <Marker
+          key={`label-${i}`}
+          longitude={label.lon}
+          latitude={label.lat}
+          anchor="bottom"
+        >
+          <div
+            className={`territory-label${hoveredTerritoryId === label.territoryId ? ' visible' : ''}`}
+            style={{ '--label-color': label.tagColor } as React.CSSProperties}
+          >
+            <div className="territory-label-faction">{label.factionTitle}</div>
+            <div className="territory-label-players">{label.players}</div>
+          </div>
+        </Marker>
+      ))}
 
       {popupInfo && (
         <Popup
@@ -744,6 +823,21 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       )}
     </MapGL>
+
+    {/* Indicateur de conquête */}
+    {geojson && (() => {
+      const total = geojson.features.length
+      const discovered = geojson.features.filter(f => f.properties.discovered).length
+      return total > 0 ? (
+        <div className="conquest-indicator">
+          <span className="conquest-count">{discovered}</span>
+          <span className="conquest-separator">/</span>
+          <span className="conquest-total">{total}</span>
+          <span className="conquest-label">lieux découverts</span>
+        </div>
+      ) : null
+    })()}
+
     </div>
   )
 })

@@ -870,13 +870,14 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   transform: translate(-50%, -50%);
-  background: #4A90D9;
-  border: 2px solid #fff;
+  background: var(--faction-color, #4A90D9);
+  border: 2.5px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(74, 144, 217, 0.6);
+  box-shadow: 0 0 10px var(--faction-glow, rgba(74, 144, 217, 0.6)),
+              0 0 20px var(--faction-glow, rgba(74, 144, 217, 0.6));
   z-index: 1;
 }
 
@@ -884,12 +885,13 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 2.5px solid #fff;
-  box-shadow: 0 0 8px rgba(74, 144, 217, 0.6), 0 2px 4px rgba(0,0,0,0.3);
+  border: 3px solid var(--faction-color, #4A90D9);
+  box-shadow: 0 0 12px var(--faction-glow, rgba(74, 144, 217, 0.6)),
+              0 2px 4px rgba(0,0,0,0.3);
   object-fit: cover;
   z-index: 1;
 }
@@ -901,7 +903,7 @@
   width: 36px;
   height: 36px;
   transform: translate(-50%, -50%);
-  background: rgba(74, 144, 217, 0.25);
+  background: var(--faction-glow, rgba(74, 144, 217, 0.25));
   border-radius: 50%;
   animation: user-pulse 2s ease-out infinite;
 }
@@ -915,6 +917,85 @@
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
+}
+
+/* Indicateur de conquête */
+.conquest-indicator {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: var(--color-parchment, #F5E6D3);
+  border: 1px solid var(--color-ink-light, #C19A6B);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink, #4A3728);
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+.conquest-count {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.conquest-separator {
+  opacity: 0.4;
+  margin: 0 1px;
+}
+
+.conquest-total {
+  opacity: 0.5;
+}
+
+.conquest-label {
+  margin-left: 6px;
+  opacity: 0.6;
+  font-size: 11px;
+}
+
+/* Label faction + joueurs sur les territoires */
+.territory-label {
+  background: var(--color-parchment, #F5E6D3);
+  border: 1px solid var(--color-ink-light, #C19A6B);
+  border-top: 4px solid var(--label-color, #C19A6B);
+  border-radius: 6px;
+  padding: 5px 10px;
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-width: 160px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.territory-label.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.territory-label-faction {
+  font-family: var(--font-title, serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--label-color, #4A3728);
+  line-height: 1.2;
+}
+
+.territory-label-players {
+  font-family: var(--font-body, sans-serif);
+  font-size: 10px;
+  color: var(--color-ink-light, #7D6B5A);
+  margin-top: 2px;
+  line-height: 1.3;
 }
 
 /* ==========================================

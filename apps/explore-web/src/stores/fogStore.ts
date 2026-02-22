@@ -10,6 +10,10 @@ interface FogState {
   userFactionId: string | null
   setUserFactionId: (id: string | null) => void
 
+  /** Couleur de la faction du joueur */
+  userFactionColor: string | null
+  setUserFactionColor: (color: string | null) => void
+
   /** ID interne de l'utilisateur (table users) */
   userId: string | null
   setUserId: (id: string | null) => void
@@ -44,6 +48,9 @@ export const useFogStore = create<FogState>((set) => ({
 
   userFactionId: null,
   setUserFactionId: (id) => set({ userFactionId: id }),
+
+  userFactionColor: null,
+  setUserFactionColor: (color) => set({ userFactionColor: color }),
 
   userId: null,
   setUserId: (id) => set({ userId: id }),

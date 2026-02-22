@@ -33,12 +33,14 @@ export function useFog() {
   const setEnergy = useFogStore(s => s.setEnergy)
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
+  const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
       setDiscoveredIds([])
       setEnergy(0)
       setUserFactionId(null)
+      setUserFactionColor(null)
       setUserId(null)
       setUserAvatarUrl(null)
       setLoading(false)
@@ -63,6 +65,20 @@ export function useFog() {
 
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
+
+      // Récupérer la couleur de la faction
+      if (userData.faction_id) {
+        supabase
+          .from('factions')
+          .select('color')
+          .eq('id', userData.faction_id)
+          .single()
+          .then(({ data: factionData }) => {
+            if (!cancelled && factionData?.color) {
+              setUserFactionColor(factionData.color)
+            }
+          })
+      }
 
       const [discRes, energyRes, profileRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),

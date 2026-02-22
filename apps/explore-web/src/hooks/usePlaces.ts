@@ -23,6 +23,7 @@ interface MapPlace {
     color: string
     pattern: string | null
   } | null
+  claimedByName: string | null
   location: {
     latitude: number
     longitude: number
@@ -40,6 +41,7 @@ export interface PlaceProperties {
   tagIcon: string
   factionId: string
   factionPattern: string
+  claimedByName: string
   claimed: boolean
   likes: number
   score: number
@@ -104,6 +106,7 @@ export function usePlaces() {
               tagIcon: (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? '',
               factionId: place.faction?.id ?? '',
               factionPattern: place.faction?.pattern ?? '',
+              claimedByName: place.claimedByName ?? '',
               claimed: !!place.faction,
               likes: place.likes ?? 0,
               score: place.score ?? 0,
