@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -113,6 +113,7 @@ function FoggedPlaceView({
   const canAfford = cost === 0 || energy >= cost
 
   const images = place.images || []
+  const cacheBust = useMemo(() => Date.now(), [place.id])
 
   return (
     <>
@@ -127,7 +128,7 @@ function FoggedPlaceView({
       {images.length > 0 && (
         <div className="place-panel-gallery fogged-gallery">
           <img
-            src={images[0].url}
+            src={`${images[0].url}?v=${cacheBust}`}
             alt="Lieu mystérieux"
             className="place-panel-image"
           />
@@ -194,6 +195,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
   const images = place.images || []
+  const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
 
   const prevImage = () => setImageIndex(i => (i - 1 + images.length) % images.length)
@@ -212,7 +214,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
       {images.length > 0 && (
         <div className="place-panel-gallery">
           <img
-            src={images[imageIndex].url}
+            src={`${images[imageIndex].url}?v=${cacheBust}`}
             alt={place.title}
             className="place-panel-image"
           />
@@ -282,8 +284,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
                   <span
                     className="place-tag-icon"
                     style={{
-                      WebkitMaskImage: `url(${tag.icon})`,
-                      maskImage: `url(${tag.icon})`,
+                      WebkitMaskImage: `url(${tag.icon}?v=${cacheBust})`,
+                      maskImage: `url(${tag.icon}?v=${cacheBust})`,
                     }}
                   />
                 )}

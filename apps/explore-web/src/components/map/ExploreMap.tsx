@@ -15,8 +15,6 @@ import { supabase } from '../../lib/supabase'
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
 const ICON_SIZE = 120
-const PATTERN_TILE = 38   // taille totale de la tuile (icône + gap)
-const PATTERN_ICON = 28   // taille du motif dans la tuile (le reste = gap transparent)
 
 /** Charge un SVG text en HTMLImageElement */
 function svgToImage(svgText: string): Promise<HTMLImageElement> {
@@ -52,7 +50,7 @@ async function loadColoredSvgIcon(
   url: string,
   color: string,
 ): Promise<void> {
-  const res = await fetch(url)
+  const res = await fetch(`${url}?v=${Date.now()}`)
   const rawSvg = await res.text()
 
   // Icône en blanc
@@ -83,55 +81,6 @@ async function loadColoredSvgIcon(
   ctx.drawImage(whiteIcon, iconOffset, iconOffset, iconSize, iconSize)
 
   const imageData = ctx.getImageData(0, 0, ICON_SIZE, ICON_SIZE)
-  if (!map.hasImage(url)) {
-    map.addImage(url, imageData, { sdf: false })
-  }
-}
-
-/** Charge un SVG pattern et l'enregistre comme image tileable dans MapLibre */
-async function loadPatternImage(
-  map: maplibregl.Map,
-  url: string,
-): Promise<void> {
-  const res = await fetch(url)
-  if (!res.ok) return
-
-  const rawSvg = await res.text()
-
-  // Retirer width/height existants pour éviter les doublons, puis forcer nos dimensions
-  let cleanSvg = rawSvg
-    .replace(/(<svg[^>]*?)\s+width\s*=\s*"[^"]*"/g, '$1')
-    .replace(/(<svg[^>]*?)\s+height\s*=\s*"[^"]*"/g, '$1')
-
-  // Ajouter nos dimensions + un viewBox si manquant (pour que le SVG scale)
-  cleanSvg = cleanSvg.replace(
-    /(<svg[^>]*?)(\s*\/?>)/,
-    (_, before, after) => {
-      const hasViewBox = /viewBox\s*=/.test(before)
-      const viewBox = hasViewBox ? '' : ` viewBox="0 0 ${PATTERN_ICON} ${PATTERN_ICON}"`
-      return `${before} width="${PATTERN_ICON}" height="${PATTERN_ICON}"${viewBox}${after}`
-    },
-  )
-
-  // Data URL (plus fiable que Blob URL cross-browser)
-  const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`
-
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const el = new Image(PATTERN_ICON, PATTERN_ICON)
-    el.onload = () => resolve(el)
-    el.onerror = reject
-    el.src = dataUrl
-  })
-
-  // Canvas = taille totale de la tuile, icône centrée (le reste = gap transparent)
-  const canvas = document.createElement('canvas')
-  canvas.width = PATTERN_TILE
-  canvas.height = PATTERN_TILE
-  const ctx = canvas.getContext('2d')!
-  const offset = (PATTERN_TILE - PATTERN_ICON) / 2
-  ctx.drawImage(img, offset, offset, PATTERN_ICON, PATTERN_ICON)
-
-  const imageData = ctx.getImageData(0, 0, PATTERN_TILE, PATTERN_TILE)
   if (!map.hasImage(url)) {
     map.addImage(url, imageData, { sdf: false })
   }
@@ -316,28 +265,35 @@ export const ExploreMap = memo(function ExploreMap() {
   const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(userFactionId), [userFactionId])
   const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(), [])
 
-  // Labels joueurs sur les territoires — un label par sous-polygone
+  // Labels joueurs + blason par territoire
   const territoryLabels = useMemo(() => {
     if (!territories) return null
 
-    const labels: { lon: number; lat: number; territoryId: number; factionTitle: string; players: string; tagColor: string }[] = []
+    const labels: {
+      lon: number; lat: number
+      emblemLon: number; emblemLat: number
+      territoryId: number
+      factionTitle: string; players: string; placesCount: number
+      tagColor: string; pattern: string
+    }[] = []
 
     for (const f of territories.features) {
       const props = f.properties as Record<string, unknown>
-      if (typeof props.players !== 'string' || props.players === '') continue
-
       const territoryId = f.id as number
       const factionTitle = (props.factionTitle as string) || ''
       const tagColor = (props.tagColor as string) || '#C19A6B'
+      const pattern = (props.pattern as string) || ''
+      const players = (typeof props.players === 'string' ? props.players : '')
+      const placesCount = (typeof props.placesCount === 'number' ? props.placesCount : 0)
 
-      // Extraire les anneaux extérieurs (un par sous-polygone)
+      // Extraire les anneaux extérieurs
       const rings: number[][][] =
         f.geometry.type === 'Polygon'
           ? [f.geometry.coordinates[0]]
           : f.geometry.coordinates.map(poly => poly[0])
 
       for (const ring of rings) {
-        // Point le plus au nord (latitude max) de la zone
+        // Point le plus au nord (pour le label texte)
         let topLon = ring[0][0], topLat = ring[0][1]
         for (let i = 1; i < ring.length - 1; i++) {
           if (ring[i][1] > topLat) {
@@ -345,7 +301,22 @@ export const ExploreMap = memo(function ExploreMap() {
             topLat = ring[i][1]
           }
         }
-        labels.push({ lon: topLon, lat: topLat, territoryId, factionTitle, players: props.players as string, tagColor })
+
+        // Bounding box pour positionner le blason en haut-droite
+        let maxLon = -Infinity, maxLat = -Infinity
+        for (let i = 0; i < ring.length - 1; i++) {
+          if (ring[i][0] > maxLon) maxLon = ring[i][0]
+          if (ring[i][1] > maxLat) maxLat = ring[i][1]
+        }
+        // Vers l'intérieur — décalé à gauche du coin nord-est
+        const emblemLon = maxLon - (maxLon - topLon) * 0.55
+        const emblemLat = maxLat - (maxLat - topLat) * 0.65
+
+        labels.push({
+          lon: topLon, lat: topLat,
+          emblemLon, emblemLat,
+          territoryId, factionTitle, players, placesCount, tagColor, pattern,
+        })
       }
     }
 
@@ -459,7 +430,7 @@ export const ExploreMap = memo(function ExploreMap() {
           map.addImage(UNKNOWN_ICON_ID, img)
           setUnknownIconLoaded(true)
         }
-        img.src = url
+        img.src = `${url}?v=${Date.now()}`
       })
   }, [])
 
@@ -512,82 +483,7 @@ export const ExploreMap = memo(function ExploreMap() {
     }
   }, [geojson])
 
-  // Charger les patterns de faction et ajouter UN LAYER PAR PATTERN
-  // (évite le fill-pattern data-driven qui est instable dans MapLibre)
-  const loadedPatternsRef = useRef(new Set<string>())
-  const patternLayerIdsRef = useRef<string[]>([])
-
-  useEffect(() => {
-    const map = mapRef.current?.getMap()
-    if (!map || !territories) return
-
-    // Collecter les URLs de pattern uniques
-    const patternUrls = new Set<string>()
-    for (const f of territories.features) {
-      const p = (f.properties as Record<string, unknown>)?.pattern
-      if (typeof p === 'string' && p) patternUrls.add(p)
-    }
-
-    if (patternUrls.size === 0) return
-
-    // Charger toutes les images, puis créer un layer par pattern
-    const toLoad: Promise<void>[] = []
-
-    for (const url of patternUrls) {
-      if (loadedPatternsRef.current.has(url)) continue
-      loadedPatternsRef.current.add(url)
-
-      toLoad.push(
-        loadPatternImage(map, url).catch(() => {
-          loadedPatternsRef.current.delete(url)
-        }),
-      )
-    }
-
-    Promise.all(toLoad).then(() => {
-      if (!map.getLayer('territories-fill')) return
-
-      // Nettoyer les anciens layers pattern
-      for (const id of patternLayerIdsRef.current) {
-        if (map.getLayer(id)) map.removeLayer(id)
-      }
-      patternLayerIdsRef.current = []
-
-      // Créer un layer par pattern URL (chaque faction a son propre layer)
-      let idx = 0
-      for (const url of patternUrls) {
-        if (!map.hasImage(url)) continue // image pas chargée
-
-        const layerId = `territories-pattern-${idx++}`
-        try {
-          map.addLayer(
-            {
-              id: layerId,
-              type: 'fill',
-              source: 'territories',
-              filter: ['==', ['get', 'pattern'], url],
-              paint: {
-                'fill-pattern': url,
-                'fill-opacity': 0.28,
-              },
-            },
-            'territories-border',
-          )
-          patternLayerIdsRef.current.push(layerId)
-        } catch {
-          // Pattern layer creation failed — territory affiche la couleur seule
-        }
-      }
-    })
-
-    return () => {
-      // Cleanup tous les layers pattern
-      for (const id of patternLayerIdsRef.current) {
-        if (map.getLayer(id)) map.removeLayer(id)
-      }
-      patternLayerIdsRef.current = []
-    }
-  }, [territories])
+  // Note: fill-pattern supprimé — les blasons flottants (Markers HTML) remplacent le pattern
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0]
@@ -748,21 +644,44 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
+      {/* Blasons flottants au centroïde de chaque territoire */}
       {territoryLabels && territoryLabels.map((label, i) => (
-        <Marker
-          key={`label-${i}`}
-          longitude={label.lon}
-          latitude={label.lat}
-          anchor="bottom"
-        >
-          <div
-            className={`territory-label${hoveredTerritoryId === label.territoryId ? ' visible' : ''}`}
-            style={{ '--label-color': label.tagColor } as React.CSSProperties}
+        label.pattern ? (
+          <Marker
+            key={`emblem-${i}`}
+            longitude={label.emblemLon}
+            latitude={label.emblemLat}
+            anchor="center"
           >
-            <div className="territory-label-faction">{label.factionTitle}</div>
-            <div className="territory-label-players">{label.players}</div>
-          </div>
-        </Marker>
+            <div
+              className="territory-emblem"
+              style={{ '--emblem-color': label.tagColor } as React.CSSProperties}
+            >
+              <img src={label.pattern} alt="" className="territory-emblem-img" />
+            </div>
+          </Marker>
+        ) : null
+      ))}
+
+      {/* Labels texte au survol (point le plus au nord) */}
+      {territoryLabels && territoryLabels.map((label, i) => (
+        label.players ? (
+          <Marker
+            key={`label-${i}`}
+            longitude={label.lon}
+            latitude={label.lat}
+            anchor="bottom"
+          >
+            <div
+              className={`territory-label${hoveredTerritoryId === label.territoryId ? ' visible' : ''}`}
+              style={{ '--label-color': label.tagColor } as React.CSSProperties}
+            >
+              <div className="territory-label-faction">{label.factionTitle}</div>
+              <div className="territory-label-players">{label.players}</div>
+              <div className="territory-label-count">{label.placesCount} lieu{label.placesCount > 1 ? 'x' : ''} contrôlé{label.placesCount > 1 ? 's' : ''}</div>
+            </div>
+          </Marker>
+        ) : null
       ))}
 
       {popupInfo && (

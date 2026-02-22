@@ -16,11 +16,11 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const BASE_RADIUS_KM = 0.15      // rayon minimum pour tout lieu (~150m)
-const RADIUS_SCALE_KM = 0.45     // croissance douce par sqrt(likes)
+const BASE_RADIUS_KM = 0.25      // rayon minimum pour tout lieu (~150m)
+const RADIUS_SCALE_KM = 0.65     // croissance douce par sqrt(likes)
 const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
-const CIRCLE_SEGMENTS = 32       // réduit (perf), cercle reste lisse
+const CIRCLE_SEGMENTS = 12        // octogone
 const VORONOI_PAD_DEG = 2
 const UNION_EPSILON = 0.00003  // ~3m — comble les micro-gaps floating-point pour l'union
 
@@ -77,38 +77,6 @@ function expandRing(ring: Position[]): Position[] {
   })
 }
 
-/** Lissage Chaikin : arrondit les angles vifs en 2 itérations → forme organique */
-function chaikinSmooth(ring: Position[], iterations = 2): Position[] {
-  let pts = ring.slice(0, -1) // retirer le point de fermeture
-  for (let iter = 0; iter < iterations; iter++) {
-    const next: Position[] = []
-    for (let i = 0; i < pts.length; i++) {
-      const a = pts[i]
-      const b = pts[(i + 1) % pts.length]
-      next.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25])
-      next.push([a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75])
-    }
-    pts = next
-  }
-  pts.push(pts[0]) // fermer l'anneau
-  return pts
-}
-
-/** Applique le lissage Chaikin sur toutes les rings d'une géométrie */
-function smoothGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon {
-  if (geom.type === 'Polygon') {
-    return {
-      type: 'Polygon',
-      coordinates: geom.coordinates.map(ring => chaikinSmooth(ring)),
-    }
-  }
-  return {
-    type: 'MultiPolygon',
-    coordinates: geom.coordinates.map(poly =>
-      poly.map(ring => chaikinSmooth(ring)),
-    ),
-  }
-}
 
 // --- Sutherland-Hodgman : clip polygon to convex cell ---
 
@@ -160,6 +128,19 @@ function clipToConvex(subject: Position[], clip: Position[]): Position[] | null 
   return output
 }
 
+/** Point-in-polygon (ray casting) — teste si [x,y] est à l'intérieur d'un anneau fermé */
+function pointInRing(x: number, y: number, ring: Position[]): boolean {
+  let inside = false
+  for (let i = 0, j = ring.length - 2; i < ring.length - 1; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1]
+    const xj = ring[j][0], yj = ring[j][1]
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
 // --- Main ---
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
@@ -189,7 +170,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
   //    Grouper par faction (nom) pour fusion visuelle
-  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number] }>()
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][] }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
@@ -205,13 +186,14 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     if (clipped) {
       const key = place.faction
       if (!factionRings.has(key)) {
-        factionRings.set(key, { polygons: [], totalScore: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0] })
+        factionRings.set(key, { polygons: [], totalScore: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [] })
       }
       const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
       group.totalScore += place.score
       group.count++
       if (place.claimedByName) group.players.add(place.claimedByName)
+      group.placeCoords.push(place.coordinates)
       group.centroidSum[0] += place.coordinates[0]
       group.centroidSum[1] += place.coordinates[1]
     }
@@ -238,7 +220,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       }
     }
 
-    const sharedProps = {
+    const baseProps = {
       tagColor: group.color,
       pattern: group.pattern,
       score: group.totalScore,
@@ -247,16 +229,22 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       players: Array.from(group.players).join(', '),
     }
 
-    const smoothed = smoothGeometry(geometry)
+    const smoothed = geometry  // pas de lissage → contours angulaires
 
     // Éclater les MultiPolygon en features séparées (chaque blob = son propre ID)
+    // et compter les lieux dans chaque blob via point-in-polygon
     if (smoothed.type === 'MultiPolygon') {
       for (const polyCoords of smoothed.coordinates) {
+        const outerRing = polyCoords[0]
+        let blobCount = 0
+        for (const [px, py] of group.placeCoords) {
+          if (pointInRing(px, py, outerRing)) blobCount++
+        }
         territories.push({
           type: 'Feature',
           id: id++,
           geometry: { type: 'Polygon', coordinates: polyCoords },
-          properties: sharedProps,
+          properties: { ...baseProps, placesCount: blobCount },
         })
       }
     } else {
@@ -264,7 +252,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
         type: 'Feature',
         id: id++,
         geometry: smoothed,
-        properties: sharedProps,
+        properties: { ...baseProps, placesCount: group.count },
       })
     }
   }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
@@ -18,18 +18,22 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
 
+  const userId = useFogStore(s => s.userId)
   const userFactionId = useFogStore(s => s.userFactionId)
-  const fogLoading = useFogStore(s => s.loading)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   useFog()
 
-  // Auto-open faction modal si connecté sans faction
+  // Auto-open faction modal si connecté sans faction (une seule fois par session)
+  // userId !== null garantit que le fog a VRAIMENT chargé les données du user
+  const factionPromptDone = useRef(false)
   useEffect(() => {
-    if (isAuthenticated && !fogLoading && userFactionId === null) {
+    if (!userId) return
+    if (userFactionId === null && !factionPromptDone.current) {
+      factionPromptDone.current = true
       setShowFactionModal(true)
     }
-  }, [isAuthenticated, fogLoading, userFactionId])
+  }, [userId, userFactionId])
 
   return (
     <div className="app">
