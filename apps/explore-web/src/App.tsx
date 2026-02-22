@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
+import { FactionModal } from './components/auth/FactionModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { useMapStore } from './stores/mapStore'
+import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
 import { useFog } from './hooks/useFog'
 import './App.css'
@@ -14,9 +16,20 @@ function App() {
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showFactionModal, setShowFactionModal] = useState(false)
+
+  const userFactionId = useFogStore(s => s.userFactionId)
+  const fogLoading = useFogStore(s => s.loading)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   useFog()
+
+  // Auto-open faction modal si connecté sans faction
+  useEffect(() => {
+    if (isAuthenticated && !fogLoading && userFactionId === null) {
+      setShowFactionModal(true)
+    }
+  }, [isAuthenticated, fogLoading, userFactionId])
 
   return (
     <div className="app">
@@ -30,7 +43,7 @@ function App() {
 
         {!authLoading && (
           isAuthenticated && user?.email ? (
-            <ProfileMenu email={user.email} onSignOut={signOut} />
+            <ProfileMenu email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
           ) : (
             <button
               className="toolbar-btn auth-btn"
@@ -55,6 +68,13 @@ function App() {
 
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+
+      {showFactionModal && (
+        <FactionModal
+          onClose={() => setShowFactionModal(false)}
+          currentFactionId={userFactionId}
+        />
       )}
 
       {/* Overlay texture parchemin */}
