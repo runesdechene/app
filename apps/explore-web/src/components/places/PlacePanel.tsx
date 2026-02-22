@@ -4,6 +4,7 @@ import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
+import { useToastStore } from '../../stores/toastStore'
 import { discoverPlace } from '../../hooks/useFog'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -417,7 +418,10 @@ function ClaimButton({
 
   if (claimed) {
     return (
-      <div className="claim-section claim-success">
+      <div
+        className="claim-section claim-success claim-animate"
+        style={{ '--claim-color-rgb': hexToRgb(userFaction.factionColor) } as React.CSSProperties}
+      >
         Revendiqué pour {userFaction.factionTitle} !
       </div>
     )
@@ -440,6 +444,12 @@ function ClaimButton({
         tagColor: userFaction.factionColor,
         factionPattern: userFaction.factionPattern,
       })
+      useToastStore.getState().addToast({
+        type: 'claim',
+        message: `Lieu revendiqué pour ${userFaction.factionTitle} !`,
+        color: userFaction.factionColor,
+        timestamp: Date.now(),
+      })
     }
 
     setClaiming(false)
@@ -460,6 +470,15 @@ function ClaimButton({
         : `Revendiquer pour ${userFaction.factionTitle}`}
     </button>
   )
+}
+
+// --- Utilitaire : hex → r, g, b ---
+
+function hexToRgb(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `${r}, ${g}, ${b}`
 }
 
 // --- Test : slider score ---

@@ -743,16 +743,20 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
     </MapGL>
 
-    {/* Indicateur de conquête */}
+    {/* Barre de progression découvertes (style XP) */}
     {geojson && (() => {
       const total = geojson.features.length
       const discovered = geojson.features.filter(f => f.properties.discovered).length
+      const pct = total > 0 ? (discovered / total) * 100 : 0
       return total > 0 ? (
         <div className="conquest-indicator">
-          <span className="conquest-count">{discovered}</span>
-          <span className="conquest-separator">/</span>
-          <span className="conquest-total">{total}</span>
-          <span className="conquest-label">lieux découverts</span>
+          <div className="conquest-text">
+            <span className="conquest-count">{discovered}/{total} lieux découverts</span>
+            <span className="conquest-pct">{Math.round(pct)}%</span>
+          </div>
+          <div className="conquest-bar">
+            <div className="conquest-bar-fill" style={{ width: `${pct}%` }} />
+          </div>
         </div>
       ) : null
     })()}

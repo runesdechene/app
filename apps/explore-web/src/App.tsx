@@ -6,10 +6,12 @@ import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
+import { GameToast } from './components/map/GameToast'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
 import { useFog } from './hooks/useFog'
+import { usePresence } from './hooks/usePresence'
 import './App.css'
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   useFog()
+  // Présence temps réel sur la carte
+  usePresence()
 
   // Auto-open faction modal si connecté sans faction (une seule fois par session)
   // userId !== null garantit que le fog a VRAIMENT chargé les données du user
@@ -41,6 +45,7 @@ function App() {
       <ExploreMap />
 
       <FactionBar />
+      <GameToast />
 
       {/* Toolbar flottante */}
       <div className="app-toolbar">

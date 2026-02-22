@@ -1,0 +1,40 @@
+import { create } from 'zustand'
+
+export interface GameToast {
+  id: string
+  type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like'
+  message: string
+  color?: string
+  /** Texte à mettre en avant (coloré + bold) dans le message */
+  highlight?: string
+  /** URL d'icone faction (remplace l'emoji par défaut) */
+  iconUrl?: string
+  timestamp: number
+}
+
+interface ToastState {
+  toasts: GameToast[]
+  addToast: (toast: Omit<GameToast, 'id'>) => void
+  removeToast: (id: string) => void
+  clearAll: () => void
+}
+
+export const useToastStore = create<ToastState>((set) => ({
+  toasts: [],
+
+  addToast: (toast) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    set((state) => {
+      const next = [...state.toasts, { ...toast, id }]
+      next.sort((a, b) => a.timestamp - b.timestamp)
+      return { toasts: next }
+    })
+  },
+
+  removeToast: (id) =>
+    set((state) => ({
+      toasts: state.toasts.filter((t) => t.id !== id),
+    })),
+
+  clearAll: () => set({ toasts: [] }),
+}))

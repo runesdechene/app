@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useFogStore } from '../stores/fogStore'
+import { useToastStore } from '../stores/toastStore'
 import { useAuth } from './useAuth'
 
 const GPS_PROXIMITY_M = 500
@@ -112,11 +113,62 @@ export function useFog() {
       }
 
       setLoading(false)
+
+      // Charger l'activite recente et afficher en toasts
+      loadRecentActivity(userData.id)
     }
 
     init()
     return () => { cancelled = true }
   }, [isAuthenticated, user?.email])
+}
+
+/** Charge les events recents et les affiche en toasts (7 jours max) */
+async function loadRecentActivity(currentUserId: string) {
+  const { data } = await supabase.rpc('get_recent_activity', { p_limit: 50 })
+  if (!data || !Array.isArray(data)) return
+
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const addToast = useToastStore.getState().addToast
+
+  const recent = (data as Array<{
+    type: string
+    actor_id: string
+    faction_id: string | null
+    data: { placeTitle?: string; factionTitle?: string; actorName?: string }
+    created_at: string
+  }>)
+    .filter(e => new Date(e.created_at).getTime() > cutoff)
+
+  for (const e of recent) {
+    const isSelf = e.actor_id === currentUserId
+    const name = isSelf ? 'Vous' : (e.data?.actorName ?? 'Quelqu\'un')
+    const place = e.data?.placeTitle ?? 'un lieu'
+
+    let message = ''
+    let type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like' = 'discover'
+
+    if (e.type === 'claim') {
+      const faction = e.data?.factionTitle ?? 'une faction'
+      message = isSelf
+        ? `Vous avez revendiqué ${place} pour ${faction}`
+        : `${name} a revendiqué ${place} pour ${faction}`
+      type = 'claim'
+    } else if (e.type === 'discover') {
+      message = isSelf
+        ? `Vous avez découvert ${place}`
+        : `${name} a découvert ${place}`
+      type = 'discover'
+    } else if (e.type === 'new_user') {
+      if (isSelf) continue
+      message = `${name} a rejoint la carte`
+      type = 'new_user'
+    } else {
+      continue
+    }
+
+    addToast({ type, message, timestamp: new Date(e.created_at).getTime() })
+  }
 }
 
 /**
@@ -162,6 +214,12 @@ export async function discoverPlace(
       nextPointIn: data.nextPointIn ?? 0,
     })
   }
+
+  useToastStore.getState().addToast({
+    type: 'discover',
+    message: 'Nouveau lieu découvert !',
+    timestamp: Date.now(),
+  })
 
   return { success: true }
 }

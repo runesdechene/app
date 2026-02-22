@@ -7,6 +7,7 @@ interface FactionStat {
   color: string
   pattern: string
   claimedCount: number
+  percent: number
 }
 
 export function FactionBar() {
@@ -14,7 +15,6 @@ export function FactionBar() {
 
   useEffect(() => {
     async function fetchStats() {
-      // 1. Compter les lieux par faction
       const { data: places } = await supabase
         .from('places')
         .select('faction_id')
@@ -23,12 +23,15 @@ export function FactionBar() {
       if (!places) return
 
       const counts = new Map<string, number>()
+      let claimedTotal = 0
       for (const row of places) {
         const fid = (row as { faction_id: string }).faction_id
         counts.set(fid, (counts.get(fid) ?? 0) + 1)
+        claimedTotal++
       }
 
-      // 2. Récupérer les factions (titre, couleur, blason)
+      if (claimedTotal === 0) return
+
       const { data: factions } = await supabase
         .from('factions')
         .select('id, title, color, pattern')
@@ -36,40 +39,53 @@ export function FactionBar() {
 
       if (!factions) return
 
-      const result: FactionStat[] = factions.map(f => ({
-        factionId: f.id,
-        title: f.title,
-        color: f.color,
-        pattern: f.pattern ?? '',
-        claimedCount: counts.get(f.id) ?? 0,
-      }))
+      const result: FactionStat[] = factions
+        .map(f => {
+          const claimed = counts.get(f.id) ?? 0
+          return {
+            factionId: f.id,
+            title: f.title,
+            color: f.color,
+            pattern: f.pattern ?? '',
+            claimedCount: claimed,
+            percent: claimedTotal > 0 ? (claimed / claimedTotal) * 100 : 0,
+          }
+        })
+        .filter(f => f.claimedCount > 0)
+        .sort((a, b) => b.claimedCount - a.claimedCount)
 
-      // Trier par nombre de lieux décroissant
-      result.sort((a, b) => b.claimedCount - a.claimedCount)
       setStats(result)
     }
 
     fetchStats()
   }, [])
 
-  // Ne rien afficher si aucune faction n'a de lieux
-  if (stats.length === 0 || stats.every(s => s.claimedCount === 0)) return null
+  if (stats.length === 0) return null
 
-  const maxCount = stats[0].claimedCount
+  const leaderId = stats[0].factionId
 
   return (
-    <div className="faction-bar">
-      {stats.map((faction, i) => {
-        const isLeader = i === 0 && faction.claimedCount > 0 && faction.claimedCount === maxCount
+    <div className="faction-scoreboard">
+      {stats.map(faction => {
+        const isLeader = faction.factionId === leaderId
+        const pct = Math.round(faction.percent)
         return (
-          <div key={faction.factionId} className="faction-bar-item">
-            {isLeader && <span className="faction-bar-crown">👑</span>}
-            <span
-              className="faction-bar-dot"
-              style={{ backgroundColor: faction.color }}
-            />
-            <span className="faction-bar-count">{faction.claimedCount}</span>
-            <span className="faction-bar-title">{faction.title}</span>
+          <div
+            key={faction.factionId}
+            className={`faction-scoreboard-row${isLeader ? ' faction-scoreboard-leader' : ''}`}
+            style={{ '--faction-color': faction.color } as React.CSSProperties}
+          >
+            <span className="faction-scoreboard-bar" style={{ width: `${faction.percent}%` }} />
+            <div className="faction-scoreboard-content">
+              <span className="faction-scoreboard-dot">
+                {faction.pattern && (
+                  <img src={faction.pattern} alt="" className="faction-scoreboard-icon" />
+                )}
+              </span>
+              <span className="faction-scoreboard-name">{faction.title}</span>
+              {isLeader && <span className="faction-scoreboard-crown">👑</span>}
+              <span className="faction-scoreboard-pct">{pct}%</span>
+            </div>
           </div>
         )
       })}
