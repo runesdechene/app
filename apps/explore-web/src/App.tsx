@@ -5,6 +5,7 @@ import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
+import { FactionBar } from './components/map/FactionBar'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
@@ -38,6 +39,8 @@ function App() {
   return (
     <div className="app">
       <ExploreMap />
+
+      <FactionBar />
 
       {/* Toolbar flottante */}
       <div className="app-toolbar">

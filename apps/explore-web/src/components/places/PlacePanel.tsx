@@ -113,7 +113,6 @@ function FoggedPlaceView({
   const canAfford = cost === 0 || energy >= cost
 
   const images = place.images || []
-  const cacheBust = useMemo(() => Date.now(), [place.id])
 
   return (
     <>
@@ -128,7 +127,7 @@ function FoggedPlaceView({
       {images.length > 0 && (
         <div className="place-panel-gallery fogged-gallery">
           <img
-            src={`${images[0].url}?v=${cacheBust}`}
+            src={images[0].url}
             alt="Lieu mystérieux"
             className="place-panel-image"
           />
@@ -214,7 +213,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
       {images.length > 0 && (
         <div className="place-panel-gallery">
           <img
-            src={`${images[imageIndex].url}?v=${cacheBust}`}
+            src={images[imageIndex].url}
             alt={place.title}
             className="place-panel-image"
           />

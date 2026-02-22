@@ -31,6 +31,7 @@ export function useFog() {
   const setUserFactionId = useFogStore(s => s.setUserFactionId)
   const setUserId = useFogStore(s => s.setUserId)
   const setEnergy = useFogStore(s => s.setEnergy)
+  const setRegenInfo = useFogStore(s => s.setRegenInfo)
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
@@ -92,7 +93,18 @@ export function useFog() {
         setDiscoveredIds(discRes.data as string[])
       }
       if (energyRes.data) {
-        setEnergy((energyRes.data as { energy: number }).energy)
+        const ed = energyRes.data as {
+          energy: number
+          regenRate: number
+          claimedCount: number
+          nextPointIn: number
+        }
+        setEnergy(ed.energy)
+        setRegenInfo({
+          regenRate: ed.regenRate ?? 1,
+          claimedCount: ed.claimedCount ?? 0,
+          nextPointIn: ed.nextPointIn ?? 0,
+        })
       }
       if (profileRes.data) {
         const profile = profileRes.data as { profileImage?: { url: string } | null }
@@ -116,7 +128,7 @@ export async function discoverPlace(
   placeLat: number,
   placeLng: number,
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId, userPosition, addDiscoveredId, setEnergy } = useFogStore.getState()
+  const { userId, userPosition, addDiscoveredId, setEnergy, setRegenInfo } = useFogStore.getState()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Déterminer la méthode (GPS ou remote) basé sur la distance
@@ -142,6 +154,13 @@ export async function discoverPlace(
   addDiscoveredId(placeId)
   if (data?.energy !== undefined) {
     setEnergy(data.energy)
+  }
+  if (data?.regenRate !== undefined) {
+    setRegenInfo({
+      regenRate: data.regenRate,
+      claimedCount: data.claimedCount ?? 0,
+      nextPointIn: data.nextPointIn ?? 0,
+    })
   }
 
   return { success: true }

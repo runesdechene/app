@@ -68,6 +68,72 @@
 }
 
 /* ==========================================
+   FACTION BAR (leaderboard en haut au centre)
+   ========================================== */
+
+.faction-bar {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  gap: 12px;
+  background: rgba(245, 230, 211, 0.92);
+  border: 1px solid var(--color-sepia);
+  border-radius: 20px;
+  padding: 4px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.faction-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  font-size: 12px;
+  color: var(--color-ink);
+}
+
+.faction-bar-crown {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.faction-bar-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.faction-bar-count {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.faction-bar-title {
+  font-size: 11px;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .faction-bar-title {
+    display: none;
+  }
+  .faction-bar {
+    gap: 8px;
+    padding: 4px 10px;
+  }
+}
+
+/* ==========================================
    TOOLBAR (boutons flottants)
    ========================================== */
 
@@ -81,8 +147,8 @@
 }
 
 .toolbar-btn {
-  width: 36px;
-  height: 36px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   border: 1px solid var(--color-sepia);
   background: var(--color-parchment);
@@ -858,38 +924,77 @@
 
 .energy-indicator {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 3px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   background: var(--color-parchment);
   border: 1px solid var(--color-sepia);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
+  min-width: 120px;
 }
 
-.energy-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  transition: background 0.3s;
+.energy-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.energy-dot-full {
-  background: var(--color-sepia);
-  box-shadow: 0 0 4px rgba(193, 154, 107, 0.5);
+.energy-icon {
+  font-size: 14px;
+  line-height: 1;
 }
 
-.energy-dot-empty {
+.energy-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.energy-bar {
+  flex: 1;
+  height: 6px;
   background: var(--color-parchment-dark);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 40px;
+}
+
+.energy-bar-fill {
+  height: 100%;
+  background: var(--color-sepia);
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+.energy-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 20px;
+}
+
+.energy-rate {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-sepia);
+  white-space: nowrap;
+}
+
+.energy-claimed {
+  font-size: 11px;
+  opacity: 0.5;
+  white-space: nowrap;
 }
 
 .energy-reset-btn {
-  margin-left: 4px;
+  margin-left: 2px;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   padding: 0 2px;
   line-height: 1;
   opacity: 0.7;

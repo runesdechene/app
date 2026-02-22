@@ -18,10 +18,15 @@ interface FogState {
   userId: string | null
   setUserId: (id: string | null) => void
 
-  /** Énergie quotidienne */
+  /** Énergie et régénération */
   energy: number
   maxEnergy: number
   setEnergy: (energy: number) => void
+  regenRate: number
+  claimedCount: number
+  nextPointIn: number
+  setRegenInfo: (info: { regenRate: number; claimedCount: number; nextPointIn: number }) => void
+  setNextPointIn: (seconds: number) => void
 
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
@@ -58,6 +63,12 @@ export const useFogStore = create<FogState>((set) => ({
   energy: 5,
   maxEnergy: 5,
   setEnergy: (energy) => set({ energy }),
+  regenRate: 1,
+  claimedCount: 0,
+  nextPointIn: 0,
+  setRegenInfo: ({ regenRate, claimedCount, nextPointIn }) =>
+    set({ regenRate, claimedCount, nextPointIn }),
+  setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),
