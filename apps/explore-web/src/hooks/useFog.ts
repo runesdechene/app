@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useFogStore } from '../stores/fogStore'
 import { useAuth } from './useAuth'
@@ -20,18 +20,20 @@ function haversineM(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+/**
+ * Hook d'initialisation du fog — à appeler UNE SEULE FOIS au niveau App.
+ * Charge les découvertes, énergie, faction et avatar à l'authentification.
+ */
 export function useFog() {
   const { user, isAuthenticated } = useAuth()
 
   const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
-  const addDiscoveredId = useFogStore(s => s.addDiscoveredId)
   const setUserFactionId = useFogStore(s => s.setUserFactionId)
   const setUserId = useFogStore(s => s.setUserId)
   const setEnergy = useFogStore(s => s.setEnergy)
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
 
-  // Init : charger les découvertes + énergie + faction à l'authentification
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
       setDiscoveredIds([])
@@ -48,7 +50,6 @@ export function useFog() {
     async function init() {
       setLoading(true)
 
-      // Récupérer l'ID interne de l'utilisateur
       const { data: userData } = await supabase
         .from('users')
         .select('id, faction_id')
@@ -63,7 +64,6 @@ export function useFog() {
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
 
-      // Fetch découvertes + énergie + profil en parallèle
       const [discRes, energyRes, profileRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
@@ -89,44 +89,44 @@ export function useFog() {
     init()
     return () => { cancelled = true }
   }, [isAuthenticated, user?.email])
+}
 
-  // Découvrir un lieu
-  const discover = useCallback(async (
-    placeId: string,
-    placeLat: number,
-    placeLng: number,
-  ): Promise<{ success: boolean; error?: string }> => {
-    const userId = useFogStore.getState().userId
-    if (!userId) return { success: false, error: 'Not authenticated' }
+/**
+ * Découvrir un lieu — fonction standalone, pas besoin de hook.
+ * Lit le store directement via getState().
+ */
+export async function discoverPlace(
+  placeId: string,
+  placeLat: number,
+  placeLng: number,
+): Promise<{ success: boolean; error?: string }> {
+  const { userId, userPosition, addDiscoveredId, setEnergy } = useFogStore.getState()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
-    // Déterminer la méthode (GPS ou remote) basé sur la distance
-    let method = 'remote'
-    const pos = useFogStore.getState().userPosition
-    if (pos) {
-      const dist = haversineM(pos.lat, pos.lng, placeLat, placeLng)
-      if (dist <= GPS_PROXIMITY_M) {
-        method = 'gps'
-      }
+  // Déterminer la méthode (GPS ou remote) basé sur la distance
+  let method = 'remote'
+  if (userPosition) {
+    const dist = haversineM(userPosition.lat, userPosition.lng, placeLat, placeLng)
+    if (dist <= GPS_PROXIMITY_M) {
+      method = 'gps'
     }
+  }
 
-    const { data } = await supabase.rpc('discover_place', {
-      p_user_id: userId,
-      p_place_id: placeId,
-      p_method: method,
-    })
+  const { data } = await supabase.rpc('discover_place', {
+    p_user_id: userId,
+    p_place_id: placeId,
+    p_method: method,
+  })
 
-    if (data?.error) {
-      return { success: false, error: data.error }
-    }
+  if (data?.error) {
+    return { success: false, error: data.error }
+  }
 
-    // Update optimiste
-    addDiscoveredId(placeId)
-    if (data?.energy !== undefined) {
-      setEnergy(data.energy)
-    }
+  // Update optimiste
+  addDiscoveredId(placeId)
+  if (data?.energy !== undefined) {
+    setEnergy(data.energy)
+  }
 
-    return { success: true }
-  }, [])
-
-  return { discover }
+  return { success: true }
 }

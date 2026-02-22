@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Map as MapGL, Source, Layer, Popup, Marker, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
@@ -10,6 +10,7 @@ import type { PlaceProperties } from '../../hooks/usePlaces'
 import { loadParchmentStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
+import { supabase } from '../../lib/supabase'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
@@ -136,72 +137,6 @@ async function loadPatternImage(
   }
 }
 
-// --- Fog of War : Canvas overlay ---
-//
-// Un canvas HTML positionné par-dessus la carte.
-// On dessine un rectangle opaque puis on "gomme" des cercles
-// aux lieux découverts et à la position GPS.
-// Zéro triangulation WebGL, zéro artefact.
-
-const FOG_COLOR = 'rgba(30, 25, 20, 0.55)'
-const FOG_GPS_RADIUS_KM = 50
-const FOG_MIN_RADIUS_KM = 0.5
-const FOG_BASE_RADIUS_KM = 0.15
-const FOG_RADIUS_SCALE_KM = 0.45
-
-function fogRadiusForScore(score: number): number {
-  const influence = score <= 1
-    ? FOG_BASE_RADIUS_KM
-    : FOG_BASE_RADIUS_KM + Math.sqrt(score - 1) * FOG_RADIUS_SCALE_KM
-  return Math.max(influence, FOG_MIN_RADIUS_KM)
-}
-
-/** Dessine le fog sur un canvas : fond opaque + trous radial-gradient aux découvertes */
-function drawFog(
-  ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
-  map: maplibregl.Map,
-  holes: { lng: number; lat: number; radiusKm: number }[],
-) {
-  // Fond opaque
-  ctx.clearRect(0, 0, w, h)
-  ctx.fillStyle = FOG_COLOR
-  ctx.fillRect(0, 0, w, h)
-
-  // Gomme circulaire pour chaque trou
-  ctx.globalCompositeOperation = 'destination-out'
-
-  for (const hole of holes) {
-    const center = map.project([hole.lng, hole.lat])
-
-    // Convertir le rayon km en pixels à ce zoom/latitude
-    const edgePoint = map.project([
-      hole.lng + (hole.radiusKm / 79), // ~79 km/deg lon à 45°
-      hole.lat,
-    ])
-    const radiusPx = Math.abs(edgePoint.x - center.x)
-
-    if (radiusPx < 1) continue
-
-    // Dégradé radial : plein au centre, fondu vers le bord
-    const grad = ctx.createRadialGradient(
-      center.x, center.y, 0,
-      center.x, center.y, radiusPx,
-    )
-    grad.addColorStop(0, 'rgba(0,0,0,1)')
-    grad.addColorStop(0.6, 'rgba(0,0,0,1)')
-    grad.addColorStop(1, 'rgba(0,0,0,0)')
-
-    ctx.fillStyle = grad
-    ctx.beginPath()
-    ctx.arc(center.x, center.y, radiusPx, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  ctx.globalCompositeOperation = 'source-over'
-}
-
 // --- Layer style : Territoires ---
 
 const territoryFillLayer: LayerSpecification = {
@@ -243,19 +178,61 @@ const territoryBorderLayer: LayerSpecification = {
 
 // --- Layer style : Markers ---
 
-// Cercles colorés — uniquement pour les lieux SANS icône
+const UNKNOWN_ICON_ID = '__unknown-place'
+
+// Fallback cercles flous si pas d'icône unknown configurée (caché quand icône dispo)
+const undiscoveredCircleLayer: LayerSpecification = {
+  id: 'places-undiscovered-circle',
+  type: 'circle',
+  source: 'places',
+  filter: ['==', ['get', 'discovered'], false],
+  paint: {
+    'circle-color': '#8A7B6A',
+    'circle-radius': [
+      'interpolate', ['linear'], ['zoom'],
+      4, 4,
+      8, 6,
+      12, 9,
+    ],
+    'circle-stroke-width': 0,
+    'circle-opacity': 0.6,
+    'circle-blur': 1,
+  },
+}
+
+// Icône custom pour les lieux non découverts (visible quand icône chargée)
+const undiscoveredIconLayer: LayerSpecification = {
+  id: 'places-undiscovered-icon',
+  type: 'symbol',
+  source: 'places',
+  filter: ['==', ['get', 'discovered'], false],
+  layout: {
+    'icon-image': UNKNOWN_ICON_ID,
+    'icon-size': [
+      'interpolate', ['linear'], ['zoom'],
+      4, 0.25,
+      8, 0.35,
+      12, 0.5,
+    ],
+    'icon-allow-overlap': true,
+    'icon-ignore-placement': true,
+  },
+  paint: {
+    'icon-opacity': 0.8,
+  },
+}
+
+// Cercles colorés nets — lieux découverts SANS icône
 const pointLayer: LayerSpecification = {
   id: 'places-point',
   type: 'circle',
   source: 'places',
-  filter: ['==', ['get', 'tagIcon'], ''],
+  filter: ['all',
+    ['==', ['get', 'tagIcon'], ''],
+    ['==', ['get', 'discovered'], true],
+  ],
   paint: {
-    'circle-color': [
-      'case',
-      ['boolean', ['get', 'discovered'], false],
-      ['get', 'tagColor'],    // découvert : couleur normale
-      '#8A7B6A',              // brouillard : gris sépia
-    ],
+    'circle-color': ['get', 'tagColor'],
     'circle-radius': [
       'interpolate', ['linear'], ['zoom'],
       4, 3,
@@ -264,21 +241,20 @@ const pointLayer: LayerSpecification = {
     ],
     'circle-stroke-width': 1.5,
     'circle-stroke-color': MAP_COLORS.land,
-    'circle-opacity': [
-      'case',
-      ['boolean', ['get', 'discovered'], false],
-      1,      // découvert : pleine opacité
-      0.4,    // brouillard : atténué
-    ],
+    'circle-opacity': 1,
+    'circle-blur': 0,
   },
 }
 
-// Icônes SVG colorées — remplace le cercle pour les lieux qui ont une icône
+// Icônes SVG colorées — lieux découverts avec icône
 const iconLayer: LayerSpecification = {
   id: 'places-icon',
   type: 'symbol',
   source: 'places',
-  filter: ['!=', ['get', 'tagIcon'], ''],
+  filter: ['all',
+    ['!=', ['get', 'tagIcon'], ''],
+    ['==', ['get', 'discovered'], true],
+  ],
   layout: {
     'icon-image': ['get', 'tagIcon'],
     'icon-size': [
@@ -291,12 +267,7 @@ const iconLayer: LayerSpecification = {
     'icon-ignore-placement': true,
   },
   paint: {
-    'icon-opacity': [
-      'case',
-      ['boolean', ['get', 'discovered'], false],
-      1,      // découvert : pleine opacité
-      0.3,    // brouillard : très atténué
-    ],
+    'icon-opacity': 1,
   },
 }
 
@@ -311,7 +282,11 @@ interface PopupInfo {
   tagColor: string
 }
 
-export function ExploreMap() {
+const MAP_STYLE_PROP = { width: '100%', height: '100%' } as const
+const MAP_CONTAINER_STYLE = { position: 'relative' as const, width: '100%', height: '100%' }
+const INITIAL_VIEW = { longitude: 7.26, latitude: 43.7, zoom: 9 }
+
+export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
   const { geojson, loading, error } = usePlaces()
   const [territories, setTerritories] = useState<FeatureCollection<Polygon | MultiPolygon> | null>(null)
@@ -322,55 +297,28 @@ export function ExploreMap() {
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
   const placeOverrides = useMapStore(state => state.placeOverrides)
   const setUserPosition = useFogStore(s => s.setUserPosition)
-  const discoveredIds = useFogStore(s => s.discoveredIds)
   const userPosition = useFogStore(s => s.userPosition)
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
 
-  // Fog canvas overlay
-  const fogCanvasRef = useRef<HTMLCanvasElement | null>(null)
+  // Icône custom pour les lieux non découverts (chargée depuis app_settings)
+  const [unknownIconLoaded, setUnknownIconLoaded] = useState(false)
 
-  // Collecter les trous de fog (découvertes + GPS)
-  const fogHoles = useMemo(() => {
-    if (!geojson) return []
+  // Layers mémorisés pour éviter les flashs à chaque re-render
+  const undiscoveredCircleFinal = useMemo(() => ({
+    ...undiscoveredCircleLayer,
+    layout: { visibility: unknownIconLoaded ? 'none' as const : 'visible' as const },
+  }), [unknownIconLoaded])
 
-    const holes: { lng: number; lat: number; radiusKm: number }[] = []
-    for (const f of geojson.features) {
-      if (f.properties.discovered) {
-        const ov = placeOverrides.get(f.properties.id)
-        const score = ov?.score ?? f.properties.score
-        const [lng, lat] = f.geometry.coordinates as [number, number]
-        holes.push({ lng, lat, radiusKm: fogRadiusForScore(score) })
-      }
-    }
+  const undiscoveredIconFinal = useMemo(() => ({
+    ...undiscoveredIconLayer,
+    layout: { ...undiscoveredIconLayer.layout, visibility: unknownIconLoaded ? 'visible' as const : 'none' as const },
+  }), [unknownIconLoaded])
 
-    if (userPosition) {
-      holes.push({ lng: userPosition.lng, lat: userPosition.lat, radiusKm: FOG_GPS_RADIUS_KM })
-    }
-
-    return holes
-  }, [geojson, discoveredIds, userPosition, placeOverrides])
-
-  // Redessiner le fog canvas à chaque mouvement de carte
-  const redrawFog = useCallback(() => {
-    const canvas = fogCanvasRef.current
-    const map = mapRef.current?.getMap()
-    if (!canvas || !map) return
-
-    const dpr = window.devicePixelRatio || 1
-    const w = map.getCanvas().width / dpr
-    const h = map.getCanvas().height / dpr
-
-    canvas.width = w * dpr
-    canvas.height = h * dpr
-    canvas.style.width = `${w}px`
-    canvas.style.height = `${h}px`
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-
-    drawFog(ctx, w, h, map, fogHoles)
-  }, [fogHoles])
+  // IDs des layers interactifs (mémorisé pour éviter les re-renders MapGL)
+  const interactiveLayerIds = useMemo(() => [
+    'places-undiscovered-circle', 'places-undiscovered-icon',
+    'places-point', 'places-icon', 'territories-fill',
+  ], [])
 
   // Charger le style parchemin
   useEffect(() => {
@@ -435,29 +383,36 @@ export function ExploreMap() {
     }
   }, [])
 
-  // Quand la map se charge : flyTo géoloc + brancher le redraw fog
+  // Quand la map se charge : flyTo géoloc + charger l'icône unknown
   const onMapLoad = useCallback(() => {
     const coords = geoResultRef.current
     if (coords) {
       mapRef.current?.flyTo({ center: [coords.lng, coords.lat], zoom: 11, duration: 1500 })
     }
-    redrawFog()
-  }, [redrawFog])
 
-  // Redessiner le fog à chaque mouvement/zoom de la carte
-  useEffect(() => {
+    // Charger l'icône unknown depuis app_settings
     const map = mapRef.current?.getMap()
     if (!map) return
 
-    map.on('move', redrawFog)
-    map.on('resize', redrawFog)
-    redrawFog() // dessin initial
+    supabase
+      .from('app_settings')
+      .select('value')
+      .eq('key', 'unknown_place_icon')
+      .single()
+      .then(({ data }) => {
+        const url = data?.value
+        if (!url) return
 
-    return () => {
-      map.off('move', redrawFog)
-      map.off('resize', redrawFog)
-    }
-  }, [redrawFog])
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        img.onload = () => {
+          if (map.hasImage(UNKNOWN_ICON_ID)) return
+          map.addImage(UNKNOWN_ICON_ID, img)
+          setUnknownIconLoaded(true)
+        }
+        img.src = url
+      })
+  }, [])
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
@@ -679,17 +634,13 @@ export function ExploreMap() {
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={MAP_CONTAINER_STYLE}>
     <MapGL
       ref={mapRef}
-      initialViewState={{
-        longitude: 7.26,
-        latitude: 43.7,
-        zoom: 9,
-      }}
-      style={{ width: '100%', height: '100%' }}
+      initialViewState={INITIAL_VIEW}
+      style={MAP_STYLE_PROP}
       mapStyle={mapStyle}
-      interactiveLayerIds={['places-point', 'places-icon', 'territories-fill']}
+      interactiveLayerIds={interactiveLayerIds}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -721,6 +672,8 @@ export function ExploreMap() {
           type="geojson"
           data={geojson}
         >
+          <Layer {...undiscoveredCircleFinal} />
+          <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
         </Source>
@@ -728,8 +681,8 @@ export function ExploreMap() {
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>
-          <Layer {...territoryFillLayer} beforeId="places-point" />
-          <Layer {...territoryBorderLayer} beforeId="places-point" />
+          <Layer {...territoryFillLayer} beforeId="places-undiscovered-circle" />
+          <Layer {...territoryBorderLayer} beforeId="places-undiscovered-circle" />
         </Source>
       )}
 
@@ -791,18 +744,6 @@ export function ExploreMap() {
         </div>
       )}
     </MapGL>
-    {/* Fog of War — canvas overlay par-dessus la carte */}
-    <canvas
-      ref={fogCanvasRef}
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-      }}
-    />
     </div>
   )
-}
+})

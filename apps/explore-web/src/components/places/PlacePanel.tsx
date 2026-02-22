@@ -4,7 +4,7 @@ import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
-import { useFog } from '../../hooks/useFog'
+import { discoverPlace } from '../../hooks/useFog'
 import { useAuth } from '../../hooks/useAuth'
 
 interface PlacePanelProps {
@@ -53,7 +53,6 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlaceP
 
 function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void }) {
   const { isAuthenticated } = useAuth()
-  const { discover } = useFog()
   const discoveredIds = useFogStore(s => s.discoveredIds)
   const userFactionId = useFogStore(s => s.userFactionId)
 
@@ -71,7 +70,7 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: Plac
         onClose={onClose}
         isAuthenticated={isAuthenticated}
         onDiscover={async () => {
-          await discover(place.id, place.location.latitude, place.location.longitude)
+          await discoverPlace(place.id, place.location.latitude, place.location.longitude)
         }}
         onAuthPrompt={onAuthPrompt}
       />
