@@ -11,6 +11,7 @@ import { loadParchmentStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
+import { Minimap } from './Minimap'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
@@ -257,6 +258,9 @@ export const ExploreMap = memo(function ExploreMap() {
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
   const userFactionId = useFogStore(s => s.userFactionId)
   const userFactionColor = useFogStore(s => s.userFactionColor)
+
+  // Viewport bounds pour la minimap
+  const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
 
   // Icône custom pour les lieux non découverts (chargée depuis app_settings)
   const [unknownIconLoaded, setUnknownIconLoaded] = useState(false)
@@ -517,6 +521,16 @@ export const ExploreMap = memo(function ExploreMap() {
     setPopupInfo(null)
   }, [geojson])
 
+  // Minimap : mettre à jour le viewport bounds
+  const onMoveEnd = useCallback(() => {
+    const b = mapRef.current?.getMap().getBounds()
+    if (b) setViewBounds({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() })
+  }, [])
+
+  const handleMinimapNavigate = useCallback((lng: number, lat: number) => {
+    mapRef.current?.flyTo({ center: [lng, lat], duration: 800 })
+  }, [])
+
   // Curseur pointer sur les layers interactifs
   const onMouseEnter = useCallback(() => {
     const map = mapRef.current?.getMap()
@@ -600,6 +614,7 @@ export const ExploreMap = memo(function ExploreMap() {
       fadeDuration={0}
       attributionControl={false}
       onLoad={onMapLoad}
+      onMoveEnd={onMoveEnd}
     >
       <NavigationControl position="top-right" showCompass={false} />
       <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />
@@ -742,6 +757,11 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       )}
     </MapGL>
+
+    {/* Minimap style AoE */}
+    {geojson && viewBounds && (
+      <Minimap geojson={geojson} bounds={viewBounds} onNavigate={handleMinimapNavigate} />
+    )}
 
     {/* Barre de progression découvertes (style XP) */}
     {geojson && (() => {

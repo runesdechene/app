@@ -137,7 +137,7 @@ function FoggedPlaceView({
 
       {/* Body */}
       <div className="place-panel-body">
-        <h1 className="place-panel-title">{place.title}</h1>
+        <h1 className="place-panel-title place-panel-title-blur">{place.title}</h1>
 
         <p className="fog-mystery-text">
           Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.

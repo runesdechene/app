@@ -716,6 +716,11 @@
   letter-spacing: 0.02em;
 }
 
+.place-panel-title-blur {
+  filter: blur(6px);
+  user-select: none;
+}
+
 .place-panel-author {
   font-family: var(--font-body);
   font-size: 13px;
@@ -1225,6 +1230,34 @@
 }
 
 /* Indicateur de conquête (barre XP) */
+/* ==========================================
+   MINIMAP (bas droite, style AoE)
+   ========================================== */
+
+.minimap {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  width: 300px;
+  height: 260px;
+  border: 2px solid var(--color-sepia, #C19A6B);
+  border-radius: 30px;
+  overflow: hidden;
+  z-index: 11;
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.3);
+  cursor: pointer;
+}
+
+.minimap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================
+   CONQUEST INDICATOR (barre XP)
+   ========================================== */
+
 .conquest-indicator {
   position: absolute;
   bottom: 16px;
@@ -1478,5 +1511,12 @@
 
   .place-panel-title {
     font-size: 20px;
+  }
+
+  .minimap {
+    width: 200px;
+    height: 150px;
+    bottom: 8px;
+    right: 8px;
   }
 }
