@@ -1519,4 +1519,186 @@ table select {
   cursor: not-allowed;
 }
 
+/* ============================================
+   FACTIONS
+   ============================================ */
+
+.faction-create {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.faction-create-input {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.faction-create-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.faction-create-btn {
+  padding: 0.6rem 1rem;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.faction-create-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.faction-preview {
+  height: 48px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.faction-preview-pattern {
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0.2;
+  -webkit-mask-size: 28px;
+  mask-size: 28px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+
+.faction-title-row {
+  display: flex;
+  align-items: center;
+}
+
+.faction-title-input {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.faction-title-input:hover {
+  border-color: var(--color-border);
+}
+
+.faction-title-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.faction-delete-btn {
+  width: 100%;
+  padding: 0.4rem;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  color: rgba(239, 68, 68, 0.6);
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.faction-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================
+   DIVERS
+   ============================================ */
+
+.section h1 {
+  margin-bottom: 1.5rem;
+}
+
+.divers-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.divers-card h3 {
+  font-size: 1rem;
+  margin: 0 0 0.35rem;
+}
+
+.divers-description {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin: 0 0 1rem;
+}
+
+.divers-preview {
+  margin-bottom: 1rem;
+}
+
+.divers-preview img {
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--color-bg);
+  padding: 8px;
+}
+
+.divers-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  padding: 0.5rem 1rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
 /* Les styles des formulaires publics sont dans PublicForm.css */

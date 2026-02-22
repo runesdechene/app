@@ -8,6 +8,8 @@ import { PhotoSubmit } from './components/PhotoSubmit'
 import { Reviews } from './components/Reviews'
 import { ReviewSubmit } from './components/ReviewSubmit'
 import { TagsManager } from './components/TagsManager'
+import { Factions } from './components/Factions'
+import { Divers } from './components/Divers'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
@@ -51,6 +53,8 @@ function App() {
           <Route path="/photos" element={<Photos />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/carte/tags" element={<TagsManager />} />
+          <Route path="/carte/factions" element={<Factions />} />
+          <Route path="/carte/divers" element={<Divers />} />
         </Routes>
       </main>
     </div>

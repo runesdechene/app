@@ -1,0 +1,320 @@
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+interface Faction {
+  id: string
+  title: string
+  color: string
+  pattern: string | null
+  order: number
+}
+
+export function Factions() {
+  const [factions, setFactions] = useState<Faction[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState<string | null>(null)
+  const [saving, setSaving] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadFactionIdRef = useRef<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    fetchFactions()
+  }, [])
+
+  async function fetchFactions() {
+    const { data, error } = await supabase
+      .from('factions')
+      .select('id, title, color, pattern, order')
+      .order('order')
+
+    if (!error && data) {
+      setFactions(data as Faction[])
+    }
+    setLoading(false)
+  }
+
+  // --- Creer ---
+
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+  }
+
+  async function handleCreate() {
+    const title = newTitle.trim()
+    if (!title) return
+
+    const id = slugify(title)
+    if (factions.some(f => f.id === id)) return
+
+    setCreating(true)
+    const newFaction: Faction = {
+      id,
+      title,
+      color: '#C19A6B',
+      pattern: null,
+      order: factions.length,
+    }
+
+    const { error } = await supabase.from('factions').insert(newFaction)
+
+    if (!error) {
+      setFactions(prev => [...prev, newFaction])
+      setNewTitle('')
+    }
+    setCreating(false)
+  }
+
+  // --- Supprimer ---
+
+  async function handleDelete(factionId: string) {
+    if (!window.confirm('Supprimer cette faction ?')) return
+
+    // Supprimer le pattern du storage si present
+    const faction = factions.find(f => f.id === factionId)
+    if (faction?.pattern) {
+      await supabase.storage.from('faction-patterns').remove([`${factionId}.svg`])
+    }
+
+    const { error } = await supabase.from('factions').delete().eq('id', factionId)
+
+    if (!error) {
+      setFactions(prev => prev.filter(f => f.id !== factionId))
+    }
+  }
+
+  // --- Editer titre ---
+
+  function handleTitleChange(factionId: string, value: string) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, title: value } : f))
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      saveField(factionId, 'title', value)
+    }, 400)
+  }
+
+  // --- Couleur ---
+
+  function handleColorChange(factionId: string, value: string) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, color: value } : f))
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      saveField(factionId, 'color', value)
+    }, 400)
+  }
+
+  async function saveField(factionId: string, field: string, value: string) {
+    setSaving(factionId)
+    await supabase
+      .from('factions')
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+    setSaving(null)
+  }
+
+  // --- Pattern SVG ---
+
+  function triggerUpload(factionId: string) {
+    uploadFactionIdRef.current = factionId
+    fileInputRef.current?.click()
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const factionId = uploadFactionIdRef.current
+    if (!file || !factionId) return
+
+    e.target.value = ''
+    setUploading(factionId)
+
+    const path = `${factionId}.svg`
+
+    const { error: uploadError } = await supabase.storage
+      .from('faction-patterns')
+      .upload(path, file, { upsert: true, contentType: 'image/svg+xml' })
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      setUploading(null)
+      return
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('faction-patterns')
+      .getPublicUrl(path)
+
+    const patternUrl = urlData.publicUrl
+
+    const { error: updateError } = await supabase
+      .from('factions')
+      .update({ pattern: patternUrl, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+
+    if (!updateError) {
+      setFactions(prev => prev.map(f => f.id === factionId ? { ...f, pattern: patternUrl } : f))
+    }
+
+    setUploading(null)
+  }
+
+  async function removePattern(factionId: string) {
+    setUploading(factionId)
+
+    await supabase.storage.from('faction-patterns').remove([`${factionId}.svg`])
+
+    const { error } = await supabase
+      .from('factions')
+      .update({ pattern: null, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+
+    if (!error) {
+      setFactions(prev => prev.map(f => f.id === factionId ? { ...f, pattern: null } : f))
+    }
+
+    setUploading(null)
+  }
+
+  if (loading) {
+    return <div className="loading">Chargement...</div>
+  }
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1>Factions</h1>
+        <span className="tags-count">{factions.length} factions</span>
+      </div>
+
+      {/* Formulaire de creation */}
+      <div className="faction-create">
+        <input
+          type="text"
+          placeholder="Nom de la nouvelle faction..."
+          value={newTitle}
+          onChange={e => setNewTitle(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleCreate()}
+          className="faction-create-input"
+          disabled={creating}
+        />
+        <button
+          className="faction-create-btn"
+          onClick={handleCreate}
+          disabled={creating || !newTitle.trim()}
+        >
+          {creating ? '...' : '+ Creer'}
+        </button>
+      </div>
+
+      {/* Input fichier cache */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/svg+xml"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+
+      <div className="tags-grid">
+        {factions.map(faction => (
+          <div key={faction.id} className="tag-card">
+            {/* Preview territoire */}
+            <div
+              className="faction-preview"
+              style={{ backgroundColor: faction.color }}
+            >
+              {faction.pattern && (
+                <div
+                  className="faction-preview-pattern"
+                  style={{
+                    WebkitMaskImage: `url(${faction.pattern})`,
+                    maskImage: `url(${faction.pattern})`,
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Titre editable */}
+            <div className="faction-title-row">
+              <input
+                type="text"
+                value={faction.title}
+                onChange={e => handleTitleChange(faction.id, e.target.value)}
+                className="faction-title-input"
+              />
+              {saving === faction.id && (
+                <span className="tag-saving-indicator">...</span>
+              )}
+            </div>
+
+            {/* ID */}
+            <div className="tag-card-info">
+              <span className="tag-card-id">{faction.id}</span>
+            </div>
+
+            {/* Couleur */}
+            <label className="tag-color-field">
+              <span className="tag-color-label">Couleur</span>
+              <input
+                type="color"
+                value={faction.color}
+                onChange={e => handleColorChange(faction.id, e.target.value)}
+                className="tag-color-input"
+              />
+              <span className="tag-color-value">{faction.color}</span>
+            </label>
+
+            {/* Pattern SVG */}
+            <div className="tag-card-icon-section">
+              {faction.pattern ? (
+                <div className="tag-icon-preview">
+                  <img src={faction.pattern} alt="" className="tag-icon-img" />
+                  <div className="tag-icon-actions">
+                    <button
+                      className="tag-icon-replace"
+                      onClick={() => triggerUpload(faction.id)}
+                      disabled={uploading === faction.id}
+                    >
+                      Changer
+                    </button>
+                    <button
+                      className="icon-picker-clear"
+                      onClick={() => removePattern(faction.id)}
+                      disabled={uploading === faction.id}
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="tag-icon-btn"
+                  onClick={() => triggerUpload(faction.id)}
+                  disabled={uploading === faction.id}
+                >
+                  {uploading === faction.id ? 'Upload...' : '+ pattern SVG'}
+                </button>
+              )}
+            </div>
+
+            {/* Supprimer */}
+            <button
+              className="faction-delete-btn"
+              onClick={() => handleDelete(faction.id)}
+            >
+              Supprimer
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
