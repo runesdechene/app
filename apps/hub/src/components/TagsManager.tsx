@@ -74,15 +74,20 @@ export function TagsManager() {
 
     setUploading(tagId)
 
-    const path = `${tagId}.svg`
+    // Supprimer tous les anciens fichiers de ce tag (legacy + précédents uploads)
+    const { data: existing } = await supabase.storage.from('tag-icons').list('', {
+      search: tagId,
+    })
+    if (existing && existing.length > 0) {
+      await supabase.storage.from('tag-icons').remove(existing.map(f => f.name))
+    }
 
-    // Nettoyer les anciens fichiers (png/webp legacy)
-    await supabase.storage.from('tag-icons').remove([`${tagId}.png`, `${tagId}.webp`])
+    // Upload avec timestamp pour casser le cache CDN
+    const path = `${tagId}-${Date.now()}.svg`
 
-    // Upload (upsert) dans le bucket tag-icons
     const { error: uploadError } = await supabase.storage
       .from('tag-icons')
-      .upload(path, file, { upsert: true, contentType: 'image/svg+xml' })
+      .upload(path, file, { contentType: 'image/svg+xml' })
 
     if (uploadError) {
       console.error('Upload error:', uploadError)
@@ -113,8 +118,13 @@ export function TagsManager() {
   async function removeIcon(tagId: string) {
     setUploading(tagId)
 
-    // Supprimer le fichier du storage (svg + legacy png/webp)
-    await supabase.storage.from('tag-icons').remove([`${tagId}.svg`, `${tagId}.png`, `${tagId}.webp`])
+    // Supprimer tous les fichiers de ce tag
+    const { data: existing } = await supabase.storage.from('tag-icons').list('', {
+      search: tagId,
+    })
+    if (existing && existing.length > 0) {
+      await supabase.storage.from('tag-icons').remove(existing.map(f => f.name))
+    }
 
     // Mettre icon à null
     const { error } = await supabase
@@ -162,8 +172,8 @@ export function TagsManager() {
                   <span
                     className="tag-card-icon-img"
                     style={{
-                      WebkitMaskImage: `url(${tag.icon})`,
-                      maskImage: `url(${tag.icon})`,
+                      WebkitMaskImage: `url(${tag.icon}?v=1)`,
+                      maskImage: `url(${tag.icon}?v=1)`,
                       backgroundColor: tag.color,
                     }}
                   />
@@ -208,7 +218,7 @@ export function TagsManager() {
             <div className="tag-card-icon-section">
               {tag.icon ? (
                 <div className="tag-icon-preview">
-                  <img src={tag.icon} alt="" className="tag-icon-img" />
+                  <img src={`${tag.icon}?v=1`} alt="" className="tag-icon-img" />
                   <div className="tag-icon-actions">
                     <button
                       className="tag-icon-replace"
