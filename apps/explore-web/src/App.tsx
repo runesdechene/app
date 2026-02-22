@@ -12,6 +12,8 @@ import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
 import { useFog } from './hooks/useFog'
 import { usePresence } from './hooks/usePresence'
+import { useChat } from './hooks/useChat'
+import { ChatPanel } from './components/chat/ChatPanel'
 import './App.css'
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
   useFog()
   // Présence temps réel sur la carte
   usePresence()
+  // Chat en jeu
+  useChat()
 
   // Auto-open faction modal si connecté sans faction (une seule fois par session)
   // userId !== null garantit que le fog a VRAIMENT chargé les données du user
@@ -46,6 +50,7 @@ function App() {
 
       <FactionBar />
       <GameToast />
+      <ChatPanel />
 
       {/* Toolbar flottante */}
       <div className="app-toolbar">

@@ -36,6 +36,8 @@ export function useFog() {
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
+  const setUserFactionPattern = useFogStore(s => s.setUserFactionPattern)
+  const setUserName = useFogStore(s => s.setUserName)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
@@ -43,7 +45,9 @@ export function useFog() {
       setEnergy(0)
       setUserFactionId(null)
       setUserFactionColor(null)
+      setUserFactionPattern(null)
       setUserId(null)
+      setUserName(null)
       setUserAvatarUrl(null)
       setLoading(false)
       return
@@ -56,7 +60,7 @@ export function useFog() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('id, faction_id')
+        .select('id, faction_id, first_name, email_address')
         .eq('email_address', user!.email)
         .single()
 
@@ -67,17 +71,19 @@ export function useFog() {
 
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
+      setUserName(userData.first_name || userData.email_address || 'Anonyme')
 
       // Récupérer la couleur de la faction
       if (userData.faction_id) {
         supabase
           .from('factions')
-          .select('color')
+          .select('color, pattern')
           .eq('id', userData.faction_id)
           .single()
           .then(({ data: factionData }) => {
-            if (!cancelled && factionData?.color) {
-              setUserFactionColor(factionData.color)
+            if (!cancelled && factionData) {
+              if (factionData.color) setUserFactionColor(factionData.color)
+              if (factionData.pattern) setUserFactionPattern(factionData.pattern)
             }
           })
       }

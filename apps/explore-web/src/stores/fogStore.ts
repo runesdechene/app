@@ -14,6 +14,10 @@ interface FogState {
   userFactionColor: string | null
   setUserFactionColor: (color: string | null) => void
 
+  /** URL du pattern/icône de la faction du joueur */
+  userFactionPattern: string | null
+  setUserFactionPattern: (url: string | null) => void
+
   /** ID interne de l'utilisateur (table users) */
   userId: string | null
   setUserId: (id: string | null) => void
@@ -31,6 +35,10 @@ interface FogState {
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
   setUserPosition: (pos: { lng: number; lat: number } | null) => void
+
+  /** Prénom du joueur (pour le chat, toasts, etc.) */
+  userName: string | null
+  setUserName: (name: string | null) => void
 
   /** URL de l'avatar du joueur (Supabase storage) */
   userAvatarUrl: string | null
@@ -57,6 +65,9 @@ export const useFogStore = create<FogState>((set) => ({
   userFactionColor: null,
   setUserFactionColor: (color) => set({ userFactionColor: color }),
 
+  userFactionPattern: null,
+  setUserFactionPattern: (url) => set({ userFactionPattern: url }),
+
   userId: null,
   setUserId: (id) => set({ userId: id }),
 
@@ -72,6 +83,9 @@ export const useFogStore = create<FogState>((set) => ({
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),
+
+  userName: null,
+  setUserName: (name) => set({ userName: name }),
 
   userAvatarUrl: null,
   setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
