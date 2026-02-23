@@ -21,7 +21,7 @@ function NotorietyBadge() {
   const notoriety = useFogStore(s => s.notorietyPoints)
   return (
     <div className="notoriety-badge">
-      <span className="notoriety-icon">{'\u2B50'}</span>
+      <span className="notoriety-icon">{'\uD83C\uDF96\uFE0F'}</span>
       <span className="notoriety-value">{notoriety}</span>
     </div>
   )
