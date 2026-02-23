@@ -26,11 +26,22 @@ interface FogState {
   energy: number
   maxEnergy: number
   setEnergy: (energy: number) => void
-  regenRate: number
-  claimedCount: number
   nextPointIn: number
-  setRegenInfo: (info: { regenRate: number; claimedCount: number; nextPointIn: number }) => void
   setNextPointIn: (seconds: number) => void
+
+  /** Points de Conquête + régénération */
+  conquestPoints: number
+  maxConquest: number
+  conquestNextPointIn: number
+  setConquestPoints: (pts: number) => void
+  setConquestNextPointIn: (seconds: number) => void
+
+  /** Points de Construction + régénération */
+  constructionPoints: number
+  maxConstruction: number
+  constructionNextPointIn: number
+  setConstructionPoints: (pts: number) => void
+  setConstructionNextPointIn: (seconds: number) => void
 
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
@@ -78,12 +89,20 @@ export const useFogStore = create<FogState>((set) => ({
   energy: 5,
   maxEnergy: 5,
   setEnergy: (energy) => set({ energy }),
-  regenRate: 1,
-  claimedCount: 0,
   nextPointIn: 0,
-  setRegenInfo: ({ regenRate, claimedCount, nextPointIn }) =>
-    set({ regenRate, claimedCount, nextPointIn }),
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
+
+  conquestPoints: 5,
+  maxConquest: 5,
+  conquestNextPointIn: 0,
+  setConquestPoints: (pts) => set({ conquestPoints: pts }),
+  setConquestNextPointIn: (seconds) => set({ conquestNextPointIn: seconds }),
+
+  constructionPoints: 5,
+  maxConstruction: 5,
+  constructionNextPointIn: 0,
+  setConstructionPoints: (pts) => set({ constructionPoints: pts }),
+  setConstructionNextPointIn: (seconds) => set({ constructionNextPointIn: seconds }),
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),

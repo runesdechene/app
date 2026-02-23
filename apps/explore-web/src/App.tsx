@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
+import { ResourceIndicator } from './components/map/ResourceIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
@@ -65,7 +66,11 @@ function App() {
       {/* Toolbar flottante */}
       <div className="app-toolbar">
         {!authLoading && isAuthenticated && (
-          <EnergyIndicator />
+          <>
+            <ResourceIndicator type="conquest" />
+            <ResourceIndicator type="construction" />
+            <EnergyIndicator />
+          </>
         )}
 
         {!authLoading && (

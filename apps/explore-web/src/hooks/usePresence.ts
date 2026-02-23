@@ -114,11 +114,9 @@ export function usePresence() {
         })
         .on('presence', { event: 'sync' }, () => {
           const state = channel.presenceState()
-          console.log('[Presence] sync — state:', JSON.stringify(state))
           for (const [key, presences] of Object.entries(state)) {
             if (key === userId) continue
             const raw = presences[0] as Record<string, unknown>
-            console.log('[Presence] player raw:', key, raw)
             const lat = raw.lat as number | null
             const lng = raw.lng as number | null
             if (lat == null || lng == null) continue

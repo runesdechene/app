@@ -4,6 +4,7 @@ import { useFogStore } from '../stores/fogStore'
 import { useToastStore } from '../stores/toastStore'
 import type { GameToast } from '../stores/toastStore'
 import { useAuth } from './useAuth'
+import { useMapStore } from '../stores/mapStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const GPS_PROXIMITY_M = 500
@@ -35,18 +36,26 @@ export function useFog() {
   const setUserFactionId = useFogStore(s => s.setUserFactionId)
   const setUserId = useFogStore(s => s.setUserId)
   const setEnergy = useFogStore(s => s.setEnergy)
-  const setRegenInfo = useFogStore(s => s.setRegenInfo)
+  const setNextPointIn = useFogStore(s => s.setNextPointIn)
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
   const setUserFactionPattern = useFogStore(s => s.setUserFactionPattern)
   const setUserName = useFogStore(s => s.setUserName)
   const setIsAdmin = useFogStore(s => s.setIsAdmin)
+  const setConquestPoints = useFogStore(s => s.setConquestPoints)
+  const setConquestNextPointIn = useFogStore(s => s.setConquestNextPointIn)
+  const setConstructionPoints = useFogStore(s => s.setConstructionPoints)
+  const setConstructionNextPointIn = useFogStore(s => s.setConstructionNextPointIn)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
       setDiscoveredIds([])
       setEnergy(0)
+      setConquestPoints(0)
+      setConquestNextPointIn(0)
+      setConstructionPoints(0)
+      setConstructionNextPointIn(0)
       setUserFactionId(null)
       setUserFactionColor(null)
       setUserFactionPattern(null)
@@ -107,16 +116,18 @@ export function useFog() {
       if (energyRes.data) {
         const ed = energyRes.data as {
           energy: number
-          regenRate: number
-          claimedCount: number
           nextPointIn: number
+          conquestPoints: number
+          conquestNextPointIn: number
+          constructionPoints: number
+          constructionNextPointIn: number
         }
         setEnergy(ed.energy)
-        setRegenInfo({
-          regenRate: ed.regenRate ?? 1,
-          claimedCount: ed.claimedCount ?? 0,
-          nextPointIn: ed.nextPointIn ?? 0,
-        })
+        setNextPointIn(ed.nextPointIn ?? 0)
+        setConquestPoints(ed.conquestPoints ?? 0)
+        setConquestNextPointIn(ed.conquestNextPointIn ?? 0)
+        setConstructionPoints(ed.constructionPoints ?? 0)
+        setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
       }
       if (profileRes.data) {
         const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
@@ -147,11 +158,14 @@ export function useFog() {
             type: string
             actor_id: string
             place_id: string | null
+            faction_id: string | null
             data: {
               placeTitle?: string
               placeLatitude?: number
               placeLongitude?: number
               factionTitle?: string
+              factionColor?: string
+              factionPattern?: string
               actorName?: string
             }
           }
@@ -171,6 +185,15 @@ export function useFog() {
             message = `${name} a revendiqué ${place} pour ${faction}`
             highlights.push(place)
             type = 'claim'
+            // Mettre à jour la carte en temps réel
+            if (e.place_id && e.faction_id) {
+              useMapStore.getState().setPlaceOverride(e.place_id, {
+                claimed: true,
+                factionId: e.faction_id,
+                tagColor: e.data?.factionColor ?? undefined,
+                factionPattern: e.data?.factionPattern ?? undefined,
+              })
+            }
           } else if (e.type === 'discover') {
             message = `${name} a découvert ${place}`
             highlights.push(place)
@@ -200,9 +223,7 @@ export function useFog() {
         },
       )
 
-      ch.subscribe((status) => {
-        console.log('[Activity] realtime status:', status)
-      })
+      ch.subscribe()
       activityChannelRef.current = ch
     }
 
@@ -301,7 +322,7 @@ export async function discoverPlace(
   placeLat: number,
   placeLng: number,
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId, userPosition, addDiscoveredId, setEnergy, setRegenInfo } = useFogStore.getState()
+  const { userId, userPosition, addDiscoveredId, setEnergy, setNextPointIn, setConquestPoints, setConquestNextPointIn, setConstructionPoints, setConstructionNextPointIn } = useFogStore.getState()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Déterminer la méthode (GPS ou remote) basé sur la distance
@@ -328,17 +349,34 @@ export async function discoverPlace(
   if (data?.energy !== undefined) {
     setEnergy(data.energy)
   }
-  if (data?.regenRate !== undefined) {
-    setRegenInfo({
-      regenRate: data.regenRate,
-      claimedCount: data.claimedCount ?? 0,
-      nextPointIn: data.nextPointIn ?? 0,
-    })
+  if (data?.nextPointIn !== undefined) {
+    setNextPointIn(data.nextPointIn)
   }
+  if (data?.conquestPoints !== undefined) {
+    setConquestPoints(data.conquestPoints)
+    if (data?.conquestNextPointIn !== undefined) {
+      setConquestNextPointIn(data.conquestNextPointIn)
+    }
+  }
+  if (data?.constructionPoints !== undefined) {
+    setConstructionPoints(data.constructionPoints)
+    if (data?.constructionNextPointIn !== undefined) {
+      setConstructionNextPointIn(data.constructionNextPointIn)
+    }
+  }
+
+  // Toast avec récompenses
+  const rewards = data?.rewards as { energy?: number; conquest?: number; construction?: number } | undefined
+  const parts: string[] = []
+  if (rewards?.conquest) parts.push(`+${rewards.conquest} ⚔️`)
+  if (rewards?.construction) parts.push(`+${rewards.construction} 🔨`)
+  if (rewards?.energy) parts.push(`+${rewards.energy} ⚡`)
 
   useToastStore.getState().addToast({
     type: 'discover',
-    message: 'Nouveau lieu découvert !',
+    message: parts.length > 0
+      ? `Nouveau lieu découvert ! ${parts.join(' ')}`
+      : 'Nouveau lieu découvert !',
     timestamp: Date.now(),
   })
 

@@ -13,6 +13,7 @@ import { useFogStore } from '../../stores/fogStore'
 import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
+import { PlayerProfileModal } from './PlayerProfileModal'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
@@ -263,7 +264,9 @@ export const ExploreMap = memo(function ExploreMap() {
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
   const userFactionId = useFogStore(s => s.userFactionId)
   const userFactionColor = useFogStore(s => s.userFactionColor)
+  const currentUserId = useFogStore(s => s.userId)
   const onlinePlayers = usePlayersStore(s => s.players)
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
 
   // Viewport bounds pour la minimap
   const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
@@ -456,13 +459,12 @@ export const ExploreMap = memo(function ExploreMap() {
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
-    // Lieux revendiqués ET (découverts OU faction alliée) → zone d'influence
+    // Tous les lieux revendiqués → zone d'influence (visible même non découverts)
     workerRef.current.postMessage({
       features: geojson.features
         .filter(f => {
           const ov = placeOverrides.get(f.properties.id)
-          const isClaimed = f.properties.claimed || ov?.claimed
-          return isClaimed && (f.properties.discovered || f.properties.ownFaction)
+          return f.properties.claimed || ov?.claimed
         })
         .map(f => {
           const ov = placeOverrides.get(f.properties.id)
@@ -472,7 +474,7 @@ export const ExploreMap = memo(function ExploreMap() {
             factionTitle: f.properties.tagTitle,
             tagColor: ov?.tagColor || f.properties.tagColor,
             factionPattern: ov?.factionPattern || f.properties.factionPattern,
-            score: ov?.score ?? f.properties.score,
+            score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
             claimedByName: f.properties.claimedByName,
           }
         }),
@@ -643,7 +645,9 @@ export const ExploreMap = memo(function ExploreMap() {
             style={{
               '--faction-color': userFactionColor ?? '#4A90D9',
               '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
+              cursor: 'pointer',
             } as React.CSSProperties}
+            onClick={() => currentUserId && setSelectedPlayerId(currentUserId)}
           >
             <div className="user-position-pulse" />
             {userAvatarUrl ? (
@@ -663,6 +667,7 @@ export const ExploreMap = memo(function ExploreMap() {
             style={{
               '--faction-color': player.factionColor ?? '#888',
             } as React.CSSProperties}
+            onClick={() => setSelectedPlayerId(player.userId)}
           >
             {player.avatarUrl ? (
               <img src={player.avatarUrl} alt="" className="other-player-avatar" />
@@ -815,6 +820,13 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       ) : null
     })()}
+
+    {selectedPlayerId && (
+      <PlayerProfileModal
+        playerId={selectedPlayerId}
+        onClose={() => setSelectedPlayerId(null)}
+      />
+    )}
 
     </div>
   )

@@ -43,6 +43,7 @@ export interface PlaceDetail {
     factionColor: string
     claimedBy: string
     claimedAt: string
+    fortificationLevel: number
   } | null
   requester: {
     bookmarked: boolean

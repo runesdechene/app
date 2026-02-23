@@ -2,34 +2,28 @@ import { useEffect, useRef, useState } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
 
-const CYCLE_SECONDS = 14400 // 4 heures
+const CYCLE_SECONDS = 7200 // 2h → +0.5/h (12 pts/jour)
 
 export function EnergyIndicator() {
   const energy = useFogStore(s => s.energy)
   const maxEnergy = useFogStore(s => s.maxEnergy)
   const userId = useFogStore(s => s.userId)
   const setEnergy = useFogStore(s => s.setEnergy)
-  const regenRate = useFogStore(s => s.regenRate)
-  const claimedCount = useFogStore(s => s.claimedCount)
   const nextPointIn = useFogStore(s => s.nextPointIn)
-  const setRegenInfo = useFogStore(s => s.setRegenInfo)
   const setNextPointIn = useFogStore(s => s.setNextPointIn)
   const isAdmin = useFogStore(s => s.isAdmin)
   const [resetting, setResetting] = useState(false)
 
   const isFull = energy >= maxEnergy
 
-  // Energie fractionnaire en temps reel
+  // Energie fractionnaire en temps reel (taux fixe 1)
   const elapsedInTick = CYCLE_SECONDS - nextPointIn
   const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
   const fractionalEnergy = isFull
     ? maxEnergy
-    : Math.min(energy + fractionOfTick * regenRate, maxEnergy)
+    : Math.min(energy + fractionOfTick, maxEnergy)
 
-  // Taux par heure (cycle = 4h)
-  const ratePerHour = regenRate / 4
-
-  // Countdown timer — decremente chaque seconde
+  // Countdown timer
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -56,18 +50,13 @@ export function EnergyIndicator() {
     if (!userId) return
     const { data } = await supabase.rpc('get_user_energy', { p_user_id: userId })
     if (data) {
-      const d = data as {
-        energy: number
-        regenRate: number
-        claimedCount: number
-        nextPointIn: number
-      }
-      setEnergy(d.energy)
-      setRegenInfo({
-        regenRate: d.regenRate ?? 1,
-        claimedCount: d.claimedCount ?? 0,
-        nextPointIn: d.nextPointIn ?? 0,
-      })
+      const d = data as Record<string, number>
+      setEnergy(d.energy ?? 0)
+      setNextPointIn(d.nextPointIn ?? 0)
+      useFogStore.getState().setConquestPoints(d.conquestPoints ?? 0)
+      useFogStore.getState().setConquestNextPointIn(d.conquestNextPointIn ?? 0)
+      useFogStore.getState().setConstructionPoints(d.constructionPoints ?? 0)
+      useFogStore.getState().setConstructionNextPointIn(d.constructionNextPointIn ?? 0)
     }
   }
 
@@ -85,25 +74,16 @@ export function EnergyIndicator() {
     setResetting(false)
   }
 
-  // Formater le nombre : 3 → "3", 3.5 → "3.5", 3.72 → "3.7"
   function formatEnergy(n: number): string {
     if (n >= maxEnergy) return String(maxEnergy)
     const rounded = Math.floor(n * 10) / 10
     return rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1)
   }
 
-  // Formater le taux : 0.25 → "0.25", 0.5 → "0.5", 1 → "1"
-  function formatRate(n: number): string {
-    if (n % 1 === 0) return String(n)
-    const s = n.toFixed(2)
-    return s.replace(/0+$/, '')
-  }
-
   const fillPercent = (fractionalEnergy / maxEnergy) * 100
 
   return (
     <div className="energy-indicator">
-      {/* Ligne principale : compteur + jauge + reset */}
       <div className="energy-main">
         <span className="energy-icon">&#9889;</span>
         <span className="energy-count">{formatEnergy(fractionalEnergy)}/{maxEnergy}</span>
@@ -122,13 +102,10 @@ export function EnergyIndicator() {
         )}
       </div>
 
-      {/* Ligne secondaire : taux + lieux */}
       <div className="energy-sub">
-        <span className="energy-rate">+{formatRate(ratePerHour)}/h</span>
-        {claimedCount > 0 && (
-          <span className="energy-claimed">{claimedCount} lieu{claimedCount > 1 ? 'x' : ''}</span>
-        )}
+        <span className="energy-rate">+0.5/h</span>
       </div>
+
     </div>
   )
 }

@@ -23,6 +23,20 @@ interface UserFaction {
   factionPattern: string
 }
 
+const FORTIFICATION_NAMES: Record<number, string> = {
+  1: 'Tour de guet',
+  2: 'Tour de défense',
+  3: 'Bastion',
+  4: 'Béfroi',
+}
+
+const FORTIFICATION_COSTS: Record<number, number> = {
+  0: 1, // level 0 → 1 to reach level 1
+  1: 2, // level 1 → 2 to reach level 2
+  2: 3, // level 2 → 3 to reach level 3
+  3: 5, // level 3 → 5 to reach level 4
+}
+
 export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
   const { place, loading, error } = usePlace(placeId)
   const isOpen = placeId !== null
@@ -104,19 +118,18 @@ function FoggedPlaceView({
 }) {
   const energy = useFogStore(s => s.energy)
   const maxEnergy = useFogStore(s => s.maxEnergy)
-  const regenRate = useFogStore(s => s.regenRate)
   const nextPointIn = useFogStore(s => s.nextPointIn)
   const userPosition = useFogStore(s => s.userPosition)
   const [discovering, setDiscovering] = useState(false)
 
-  // Énergie fractionnaire (même calcul que EnergyIndicator)
-  const CYCLE_SECONDS = 14400
+  // Énergie fractionnaire (taux fixe 1, cycle 7200s = +0.5/h)
+  const CYCLE_SECONDS = 7200
   const isFull = energy >= maxEnergy
   const elapsedInTick = CYCLE_SECONDS - nextPointIn
   const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
   const fractionalEnergy = isFull
     ? maxEnergy
-    : Math.min(energy + fractionOfTick * regenRate, maxEnergy)
+    : Math.min(energy + fractionOfTick, maxEnergy)
 
   // Calcul distance GPS
   let isNearby = false
@@ -312,6 +325,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
               style={{ backgroundColor: place.claim.factionColor }}
             />
             Revendiqué par {place.claim.factionTitle}
+            {place.claim.fortificationLevel > 0 && (
+              <span className="place-fortification-badge">
+                {FORTIFICATION_NAMES[place.claim.fortificationLevel] ?? `Niveau ${place.claim.fortificationLevel}`}
+              </span>
+            )}
           </div>
         )}
 
@@ -391,6 +409,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
         {userEmail && (
           <ClaimButton placeId={place.id} userEmail={userEmail} currentClaim={place.claim} />
         )}
+
+        {/* Fortify button */}
+        {userEmail && place.claim && (
+          <FortifyButton placeId={place.id} currentClaim={place.claim} />
+        )}
       </div>
     </>
   )
@@ -424,10 +447,14 @@ function ClaimButton({
   currentClaim: PlaceDetail['claim']
 }) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
+  const conquestPoints = useFogStore(s => s.conquestPoints)
   const [userFaction, setUserFaction] = useState<UserFaction | null>(null)
   const [claiming, setClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
   const [loadingFaction, setLoadingFaction] = useState(true)
+  const fortLevel = currentClaim?.fortificationLevel ?? 0
+  const claimCost = 1 + fortLevel
 
   useEffect(() => {
     async function fetchUserFaction() {
@@ -492,14 +519,26 @@ function ClaimButton({
     )
   }
 
+  const canAffordClaim = conquestPoints >= claimCost
+
   async function handleClaim() {
-    if (!userFaction) return
+    if (!userFaction || !canAffordClaim) return
     setClaiming(true)
+    setClaimError(null)
 
     const { data } = await supabase.rpc('claim_place', {
       p_user_id: userFaction.userId,
       p_place_id: placeId,
     })
+
+    if (data?.error) {
+      setClaimError(data.error)
+      if (data.conquestPoints !== undefined) {
+        useFogStore.getState().setConquestPoints(data.conquestPoints)
+      }
+      setClaiming(false)
+      return
+    }
 
     if (data?.success) {
       setClaimed(true)
@@ -509,10 +548,20 @@ function ClaimButton({
         tagColor: userFaction.factionColor,
         factionPattern: userFaction.factionPattern,
       })
+      // Mettre à jour les 3 ressources
+      if (data.energy !== undefined) useFogStore.getState().setEnergy(data.energy)
+      if (data.conquestPoints !== undefined) useFogStore.getState().setConquestPoints(data.conquestPoints)
+      if (data.constructionPoints !== undefined) useFogStore.getState().setConstructionPoints(data.constructionPoints)
+
+      const rewards = data.rewards as { energy?: number; conquest?: number; construction?: number } | undefined
+      const parts: string[] = []
+      if (rewards?.conquest) parts.push(`+${rewards.conquest} \u2694`)
+      if (rewards?.construction) parts.push(`+${rewards.construction} \u2692`)
+      if (rewards?.energy) parts.push(`+${rewards.energy} \u26A1`)
+
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Lieu revendiqué pour ${userFaction.factionTitle} !`,
-        color: userFaction.factionColor,
+        message: `Lieu revendiqué pour ${userFaction.factionTitle} !${parts.length ? ' ' + parts.join(' ') : ''}`,
         timestamp: Date.now(),
       })
     }
@@ -521,19 +570,128 @@ function ClaimButton({
   }
 
   return (
-    <button
-      className="claim-btn"
-      style={{
-        borderColor: userFaction.factionColor,
-        color: userFaction.factionColor,
-      }}
-      onClick={handleClaim}
-      disabled={claiming}
-    >
-      {claiming
-        ? 'Revendication...'
-        : `Revendiquer pour ${userFaction.factionTitle}`}
-    </button>
+    <div className="claim-section">
+      <button
+        className="claim-btn"
+        style={{
+          borderColor: userFaction.factionColor,
+          color: userFaction.factionColor,
+        }}
+        onClick={handleClaim}
+        disabled={claiming || !canAffordClaim}
+      >
+        {claiming
+          ? 'Revendication...'
+          : canAffordClaim
+            ? `Revendiquer pour ${userFaction.factionTitle} (${claimCost} \u2694)`
+            : `Pas assez de points de conquête (${Math.floor(conquestPoints)}/${claimCost})`}
+      </button>
+      {claimError && (
+        <p className="claim-error">{claimError}</p>
+      )}
+    </div>
+  )
+}
+
+// --- Bouton Fortifier ---
+
+function FortifyButton({
+  placeId,
+  currentClaim,
+}: {
+  placeId: string
+  currentClaim: NonNullable<PlaceDetail['claim']>
+}) {
+  const constructionPoints = useFogStore(s => s.constructionPoints)
+  const userFactionId = useFogStore(s => s.userFactionId)
+  const userId = useFogStore(s => s.userId)
+  const [fortifying, setFortifying] = useState(false)
+  const [fortified, setFortified] = useState(false)
+  const [localLevel, setLocalLevel] = useState(currentClaim.fortificationLevel)
+  const [error, setError] = useState<string | null>(null)
+
+  // Pas la meme faction → pas de bouton
+  if (currentClaim.factionId !== userFactionId) return null
+
+  // Niveau max atteint
+  if (localLevel >= 4) {
+    return (
+      <div className="fortify-section fortify-max">
+        <span className="fortify-icon">{'\uD83C\uDFF0'}</span>
+        {FORTIFICATION_NAMES[4]} — Fortification maximale
+      </div>
+    )
+  }
+
+  const cost = FORTIFICATION_COSTS[localLevel] ?? 0
+  const nextName = FORTIFICATION_NAMES[localLevel + 1] ?? ''
+  const canAfford = constructionPoints >= cost
+
+  async function handleFortify() {
+    if (!userId || !canAfford) return
+    setFortifying(true)
+    setError(null)
+
+    const { data } = await supabase.rpc('fortify_place', {
+      p_user_id: userId,
+      p_place_id: placeId,
+    })
+
+    if (data?.error) {
+      setError(data.error)
+      if (data.constructionPoints !== undefined) {
+        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+      }
+      setFortifying(false)
+      return
+    }
+
+    if (data?.success) {
+      setLocalLevel(data.fortificationLevel)
+      if (data.constructionPoints !== undefined) {
+        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+      }
+      if (data.constructionNextPointIn !== undefined) {
+        useFogStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
+      }
+
+      useToastStore.getState().addToast({
+        type: 'claim',
+        message: `Lieu fortifié : ${data.fortificationName} !`,
+        timestamp: Date.now(),
+      })
+
+      setFortified(true)
+      setTimeout(() => setFortified(false), 2000)
+    }
+
+    setFortifying(false)
+  }
+
+  if (fortified && localLevel >= 4) {
+    return (
+      <div className="fortify-section fortify-max">
+        <span className="fortify-icon">{'\uD83C\uDFF0'}</span>
+        {FORTIFICATION_NAMES[4]} — Fortification maximale
+      </div>
+    )
+  }
+
+  return (
+    <div className="fortify-section">
+      <button
+        className="fortify-btn"
+        onClick={handleFortify}
+        disabled={fortifying || !canAfford}
+      >
+        {fortifying
+          ? 'Fortification...'
+          : canAfford
+            ? `\uD83D\uDD28 Fortifier \u2192 ${nextName} (${cost} \uD83D\uDD28)`
+            : `Pas assez de construction (${Math.floor(constructionPoints)}/${cost})`}
+      </button>
+      {error && <p className="fortify-error">{error}</p>}
+    </div>
   )
 }
 
