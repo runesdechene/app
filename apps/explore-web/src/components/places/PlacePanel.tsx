@@ -241,6 +241,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
   const [liked, setLiked] = useState(place.requester?.liked ?? false)
   const [likesCount, setLikesCount] = useState(place.metrics.likes)
   const [likeLoading, setLikeLoading] = useState(false)
+  const [showLikers, setShowLikers] = useState(false)
+  const [likers, setLikers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
+  const [likersLoading, setLikersLoading] = useState(false)
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
@@ -261,6 +264,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
       else { setLiked(true); setLikesCount(c => c + 1) }
     }
     setLikeLoading(false)
+  }
+
+  async function fetchLikers() {
+    if (showLikers) { setShowLikers(false); return }
+    setLikersLoading(true)
+    setShowLikers(true)
+    const { data } = await supabase.rpc('get_place_likers', { p_place_id: place.id })
+    if (data && Array.isArray(data)) {
+      setLikers(data as typeof likers)
+    }
+    setLikersLoading(false)
   }
 
   return (
@@ -328,13 +342,43 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
         {/* Stats + Like */}
         <div className="place-panel-stats">
           <span>{place.metrics.views} vues</span>
-          <button
-            className={`place-like-btn${liked ? ' place-like-btn-active' : ''}`}
-            onClick={toggleLike}
-            disabled={!userId || likeLoading}
-          >
-            {liked ? '\u2764\uFE0F' : '\uD83E\uDD0D'} {likesCount}
-          </button>
+          <div className="place-like-wrapper">
+            <button
+              className={`place-like-btn${liked ? ' place-like-btn-active' : ''}`}
+              onClick={toggleLike}
+              disabled={!userId || likeLoading}
+            >
+              {liked ? '\u2764\uFE0F' : '\uD83E\uDD0D'}
+            </button>
+            <button className="place-like-count" onClick={fetchLikers}>
+              {likesCount}
+            </button>
+            {showLikers && (
+              <div className="place-likers-dropdown">
+                {likersLoading ? (
+                  <span className="place-likers-loading">Chargement...</span>
+                ) : likers.length === 0 ? (
+                  <span className="place-likers-empty">Aucun like</span>
+                ) : (
+                  likers.map(liker => (
+                    <div key={liker.userId} className="place-liker-row">
+                      {liker.profileImage ? (
+                        <img src={liker.profileImage} alt="" className="place-liker-avatar" />
+                      ) : (
+                        <span className="place-liker-avatar place-liker-avatar-default"
+                          style={{ borderColor: liker.factionColor ?? undefined }}
+                        />
+                      )}
+                      <span className="place-liker-name">{liker.name}</span>
+                      {liker.factionColor && (
+                        <span className="place-liker-faction-dot" style={{ backgroundColor: liker.factionColor }} />
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
           <span>{place.metrics.explored} explorations</span>
           {place.metrics.note !== null && (
             <span>{place.metrics.note.toFixed(1)}/5</span>

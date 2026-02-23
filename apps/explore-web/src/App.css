@@ -818,11 +818,17 @@
   color: var(--color-ink-light);
 }
 
+.place-like-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
 .place-like-btn {
   background: none;
   border: 1px solid var(--color-parchment-dark);
-  border-radius: 14px;
-  padding: 2px 10px;
+  border-radius: 14px 0 0 14px;
+  padding: 2px 6px 2px 10px;
   font-family: var(--font-accent);
   font-size: 13px;
   color: var(--color-ink-light);
@@ -840,6 +846,80 @@
 .place-like-btn:disabled {
   opacity: 0.5;
   cursor: default;
+}
+.place-like-count {
+  background: none;
+  border: 1px solid var(--color-parchment-dark);
+  border-left: none;
+  border-radius: 0 14px 14px 0;
+  padding: 2px 10px 2px 4px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.place-like-count:hover {
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
+}
+
+/* Likers dropdown */
+.place-likers-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 8px;
+  padding: 6px 0;
+  min-width: 180px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.place-likers-loading,
+.place-likers-empty {
+  display: block;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-ink-light);
+  font-family: var(--font-accent);
+}
+.place-liker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+}
+.place-liker-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.place-liker-avatar-default {
+  display: inline-block;
+  background: var(--color-parchment-dark);
+  border: 2px solid var(--color-sepia);
+}
+.place-liker-name {
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: var(--color-ink);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.place-liker-faction-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .place-panel-tags {

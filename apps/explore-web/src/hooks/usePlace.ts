@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useFogStore } from '../stores/fogStore'
 
 export interface PlaceDetail {
   id: string
@@ -77,8 +78,9 @@ export function usePlace(placeId: string | null) {
       setError(null)
 
       // Fetch lieu et tag icons en parallèle
+      const userId = useFogStore.getState().userId
       const [placeRes, tagsRes] = await Promise.all([
-        supabase.rpc('get_place_by_id', { p_id: placeId }),
+        supabase.rpc('get_place_by_id', { p_id: placeId, p_user_id: userId }),
         supabase.from('tags').select('id, icon').not('icon', 'is', null),
       ])
 
