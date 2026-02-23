@@ -95,6 +95,7 @@ function MessageList({
 }
 
 function ChatInput({ hasFaction }: { hasFaction: boolean }) {
+  const inputRef = useRef<HTMLInputElement>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const sendChannel = useChatStore((s) => s.sendChannel)
@@ -125,6 +126,8 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       console.error('[Chat] sendChatMessage error:', result.error)
     }
     setSending(false)
+    // Focus après que React re-rende avec disabled=false
+    setTimeout(() => inputRef.current?.focus(), 0)
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -158,6 +161,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       {/* Input */}
       <div className="chat-input">
         <input
+          ref={inputRef}
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}

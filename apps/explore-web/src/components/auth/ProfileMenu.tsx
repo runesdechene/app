@@ -6,6 +6,7 @@ interface ProfileData {
   lastName: string
   biography: string
   rank: string
+  role: string
   profileImage: { id: string; url: string } | null
   faction: { id: string; title: string; color: string; pattern: string | null } | null
 }
@@ -84,6 +85,9 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             <span className="profile-dropdown-name">
               {profile?.lastName || email}
             </span>
+            {profile?.role === 'admin' && (
+              <span className="profile-dropdown-admin">Admin</span>
+            )}
             {profile?.rank && profile.rank !== 'guest' && (
               <span className="profile-dropdown-rank">{profile.rank}</span>
             )}

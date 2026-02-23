@@ -44,6 +44,10 @@ interface FogState {
   userAvatarUrl: string | null
   setUserAvatarUrl: (url: string | null) => void
 
+  /** Admin */
+  isAdmin: boolean
+  setIsAdmin: (v: boolean) => void
+
   /** Chargement initial */
   loading: boolean
   setLoading: (loading: boolean) => void
@@ -89,6 +93,9 @@ export const useFogStore = create<FogState>((set) => ({
 
   userAvatarUrl: null,
   setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
+
+  isAdmin: false,
+  setIsAdmin: (v) => set({ isAdmin: v }),
 
   loading: true,
   setLoading: (loading) => set({ loading }),

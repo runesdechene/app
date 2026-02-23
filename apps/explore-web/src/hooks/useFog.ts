@@ -41,6 +41,7 @@ export function useFog() {
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
   const setUserFactionPattern = useFogStore(s => s.setUserFactionPattern)
   const setUserName = useFogStore(s => s.setUserName)
+  const setIsAdmin = useFogStore(s => s.setIsAdmin)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
@@ -52,6 +53,7 @@ export function useFog() {
       setUserId(null)
       setUserName(null)
       setUserAvatarUrl(null)
+      setIsAdmin(false)
       setLoading(false)
       return
     }
@@ -117,8 +119,9 @@ export function useFog() {
         })
       }
       if (profileRes.data) {
-        const profile = profileRes.data as { profileImage?: { url: string } | null }
+        const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
+        setIsAdmin(profile.role === 'admin')
       }
 
       setLoading(false)

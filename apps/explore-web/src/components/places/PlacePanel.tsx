@@ -103,8 +103,20 @@ function FoggedPlaceView({
   onAuthPrompt?: () => void
 }) {
   const energy = useFogStore(s => s.energy)
+  const maxEnergy = useFogStore(s => s.maxEnergy)
+  const regenRate = useFogStore(s => s.regenRate)
+  const nextPointIn = useFogStore(s => s.nextPointIn)
   const userPosition = useFogStore(s => s.userPosition)
   const [discovering, setDiscovering] = useState(false)
+
+  // Énergie fractionnaire (même calcul que EnergyIndicator)
+  const CYCLE_SECONDS = 14400
+  const isFull = energy >= maxEnergy
+  const elapsedInTick = CYCLE_SECONDS - nextPointIn
+  const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
+  const fractionalEnergy = isFull
+    ? maxEnergy
+    : Math.min(energy + fractionOfTick * regenRate, maxEnergy)
 
   // Calcul distance GPS
   let isNearby = false
@@ -117,7 +129,7 @@ function FoggedPlaceView({
   }
 
   const cost = isNearby ? 0 : (isOwnFaction ? 0.5 : 1)
-  const canAfford = cost === 0 || energy >= cost
+  const canAfford = cost === 0 || fractionalEnergy >= cost
 
   const images = place.images || []
 
@@ -188,7 +200,7 @@ function FoggedPlaceView({
             </button>
 
             <div className="fog-energy-info">
-              <span className="fog-energy-count">{energy}/5</span> points d'énergie
+              <span className="fog-energy-count">{Number.isInteger(fractionalEnergy) ? fractionalEnergy : fractionalEnergy.toFixed(1)}/{maxEnergy}</span> points d'énergie
               {!canAfford && (
                 <p className="fog-energy-empty">
                   Plus assez d'énergie. Revenez demain ou déplacez-vous à proximité du lieu.
@@ -217,6 +229,7 @@ function FoggedPlaceView({
 // --- Vue découverte (lieu accessible) ---
 
 function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
+  const isAdmin = useFogStore(s => s.isAdmin)
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
   const images = place.images || []
@@ -344,8 +357,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
           <p className="place-panel-address">{place.address}</p>
         )}
 
-        {/* Test : slider score / influence */}
-        <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
+        {/* Admin : slider score / influence */}
+        {isAdmin && (
+          <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
+        )}
 
         {/* Claim button */}
         {userEmail && (

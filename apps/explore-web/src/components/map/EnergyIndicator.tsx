@@ -14,6 +14,7 @@ export function EnergyIndicator() {
   const nextPointIn = useFogStore(s => s.nextPointIn)
   const setRegenInfo = useFogStore(s => s.setRegenInfo)
   const setNextPointIn = useFogStore(s => s.setNextPointIn)
+  const isAdmin = useFogStore(s => s.isAdmin)
   const [resetting, setResetting] = useState(false)
 
   const isFull = energy >= maxEnergy
@@ -109,12 +110,12 @@ export function EnergyIndicator() {
         <div className="energy-bar">
           <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
         </div>
-        {!isFull && (
+        {!isFull && isAdmin && (
           <button
             className="energy-reset-btn"
             onClick={handleReset}
             disabled={resetting}
-            title="Recharger l'énergie"
+            title="Recharger l'énergie (admin)"
           >
             {resetting ? '...' : '⚡'}
           </button>
