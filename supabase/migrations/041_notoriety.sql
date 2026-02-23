@@ -33,6 +33,7 @@ BEGIN
       f.title,
       f.color,
       f.pattern,
+      COUNT(p.id)::INT AS "placesCount",
       COALESCE(SUM(
         FLOOR(EXTRACT(EPOCH FROM (NOW() - p.claimed_at)) / 3600)
         * (1 + p.fortification_level * 0.5)
@@ -71,6 +72,7 @@ DECLARE
   v_energy NUMERIC(4,1);
   v_notoriety INT;
   v_max_conquest NUMERIC(6,1) := 5.0;
+  v_max_construction NUMERIC(6,1) := 5.0;
   -- Conquest regen
   v_conquest_reset_at TIMESTAMPTZ;
   v_conquest_cycle INT := 14400;
@@ -149,7 +151,7 @@ BEGIN
   -- Construction next point
   v_construction_elapsed := EXTRACT(EPOCH FROM (NOW() - v_construction_reset_at));
   v_construction_ticks := GREATEST(0, floor(v_construction_elapsed / v_construction_cycle)::int);
-  IF v_construction >= v_max_conquest THEN
+  IF v_construction >= v_max_construction THEN
     v_construction_next_in := 0;
   ELSE
     v_construction_next_in := GREATEST(0, (v_construction_cycle - (v_construction_elapsed - v_construction_ticks * v_construction_cycle))::int);

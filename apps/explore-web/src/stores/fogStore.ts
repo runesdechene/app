@@ -14,6 +14,10 @@ interface FogState {
   userFactionColor: string | null
   setUserFactionColor: (color: string | null) => void
 
+  /** Titre de la faction du joueur */
+  userFactionTitle: string | null
+  setUserFactionTitle: (title: string | null) => void
+
   /** URL du pattern/icône de la faction du joueur */
   userFactionPattern: string | null
   setUserFactionPattern: (url: string | null) => void
@@ -83,6 +87,9 @@ export const useFogStore = create<FogState>((set) => ({
 
   userFactionColor: null,
   setUserFactionColor: (color) => set({ userFactionColor: color }),
+
+  userFactionTitle: null,
+  setUserFactionTitle: (title) => set({ userFactionTitle: title }),
 
   userFactionPattern: null,
   setUserFactionPattern: (url) => set({ userFactionPattern: url }),

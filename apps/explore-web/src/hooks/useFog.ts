@@ -40,6 +40,7 @@ export function useFog() {
   const setLoading = useFogStore(s => s.setLoading)
   const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
+  const setUserFactionTitle = useFogStore(s => s.setUserFactionTitle)
   const setUserFactionPattern = useFogStore(s => s.setUserFactionPattern)
   const setUserName = useFogStore(s => s.setUserName)
   const setIsAdmin = useFogStore(s => s.setIsAdmin)
@@ -60,6 +61,7 @@ export function useFog() {
       setNotorietyPoints(0)
       setUserFactionId(null)
       setUserFactionColor(null)
+      setUserFactionTitle(null)
       setUserFactionPattern(null)
       setUserId(null)
       setUserName(null)
@@ -93,11 +95,12 @@ export function useFog() {
       if (userData.faction_id) {
         supabase
           .from('factions')
-          .select('color, pattern')
+          .select('title, color, pattern')
           .eq('id', userData.faction_id)
           .single()
           .then(({ data: factionData }) => {
             if (!cancelled && factionData) {
+              if (factionData.title) setUserFactionTitle(factionData.title)
               if (factionData.color) setUserFactionColor(factionData.color)
               if (factionData.pattern) setUserFactionPattern(factionData.pattern)
             }

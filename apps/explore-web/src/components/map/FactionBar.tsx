@@ -8,6 +8,7 @@ interface FactionNotoriety {
   color: string
   pattern: string
   notoriety: number
+  placesCount: number
   percent: number
 }
 
@@ -29,6 +30,7 @@ export function FactionBar() {
         color: string
         pattern: string
         notoriety: number
+        placesCount: number
       }>)
         .map(f => ({
           factionId: f.factionId,
@@ -36,9 +38,10 @@ export function FactionBar() {
           color: f.color,
           pattern: f.pattern ?? '',
           notoriety: f.notoriety,
+          placesCount: f.placesCount ?? 0,
           percent: totalNotoriety > 0 ? (f.notoriety / totalNotoriety) * 100 : 0,
         }))
-        .filter(f => f.notoriety > 0)
+        .filter(f => f.notoriety > 0 || f.placesCount > 0)
         .sort((a, b) => b.notoriety - a.notoriety)
 
       setStats(result)
@@ -70,6 +73,7 @@ export function FactionBar() {
               </span>
               <span className="faction-scoreboard-name">{faction.title}</span>
               {isLeader && <span className="faction-scoreboard-crown">{'\uD83D\uDC51'}</span>}
+              <span className="faction-scoreboard-places">{faction.placesCount}</span>
               <span className="faction-scoreboard-pct">{faction.notoriety}</span>
             </div>
           </div>

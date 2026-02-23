@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -13,14 +13,6 @@ interface PlacePanelProps {
   onClose: () => void
   userEmail: string | null
   onAuthPrompt?: () => void
-}
-
-interface UserFaction {
-  userId: string
-  factionId: string
-  factionTitle: string
-  factionColor: string
-  factionPattern: string
 }
 
 const FORTIFICATION_NAMES: Record<number, string> = {
@@ -407,7 +399,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {/* Claim button */}
         {userEmail && (
-          <ClaimButton placeId={place.id} userEmail={userEmail} currentClaim={place.claim} />
+          <ClaimButton placeId={place.id} currentClaim={place.claim} />
         )}
 
         {/* Fortify button */}
@@ -439,69 +431,33 @@ function haversineM(
 
 function ClaimButton({
   placeId,
-  userEmail,
   currentClaim,
 }: {
   placeId: string
-  userEmail: string
   currentClaim: PlaceDetail['claim']
 }) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
   const conquestPoints = useFogStore(s => s.conquestPoints)
-  const [userFaction, setUserFaction] = useState<UserFaction | null>(null)
+  const userId = useFogStore(s => s.userId)
+  const factionId = useFogStore(s => s.userFactionId)
+  const factionTitle = useFogStore(s => s.userFactionTitle)
+  const factionColor = useFogStore(s => s.userFactionColor)
+  const factionPattern = useFogStore(s => s.userFactionPattern)
   const [claiming, setClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
   const [claimError, setClaimError] = useState<string | null>(null)
-  const [loadingFaction, setLoadingFaction] = useState(true)
   const fortLevel = currentClaim?.fortificationLevel ?? 0
   const claimCost = 1 + fortLevel
 
-  useEffect(() => {
-    async function fetchUserFaction() {
-      setLoadingFaction(true)
-
-      const { data: user } = await supabase
-        .from('users')
-        .select('id, faction_id')
-        .eq('email_address', userEmail)
-        .single()
-
-      if (!user?.faction_id) {
-        setLoadingFaction(false)
-        return
-      }
-
-      const { data: faction } = await supabase
-        .from('factions')
-        .select('id, title, color, pattern')
-        .eq('id', user.faction_id)
-        .single()
-
-      if (faction) {
-        setUserFaction({
-          userId: user.id,
-          factionId: faction.id,
-          factionTitle: faction.title,
-          factionColor: faction.color,
-          factionPattern: faction.pattern ?? '',
-        })
-      }
-
-      setLoadingFaction(false)
-    }
-
-    fetchUserFaction()
-  }, [userEmail])
-
-  if (loadingFaction || !userFaction) return null
+  if (!userId || !factionId || !factionTitle || !factionColor) return null
 
   // Déjà revendiqué par la même faction
-  if (currentClaim?.factionId === userFaction.factionId && !claimed) {
+  if (currentClaim?.factionId === factionId && !claimed) {
     return (
       <div className="claim-section claim-owned">
         <span
           className="place-claim-dot"
-          style={{ backgroundColor: userFaction.factionColor }}
+          style={{ backgroundColor: factionColor }}
         />
         Votre territoire
       </div>
@@ -512,9 +468,9 @@ function ClaimButton({
     return (
       <div
         className="claim-section claim-success claim-animate"
-        style={{ '--claim-color-rgb': hexToRgb(userFaction.factionColor) } as React.CSSProperties}
+        style={{ '--claim-color-rgb': hexToRgb(factionColor) } as React.CSSProperties}
       >
-        Revendiqué pour {userFaction.factionTitle} !
+        Revendiqué pour {factionTitle} !
       </div>
     )
   }
@@ -522,12 +478,12 @@ function ClaimButton({
   const canAffordClaim = conquestPoints >= claimCost
 
   async function handleClaim() {
-    if (!userFaction || !canAffordClaim) return
+    if (!canAffordClaim) return
     setClaiming(true)
     setClaimError(null)
 
     const { data } = await supabase.rpc('claim_place', {
-      p_user_id: userFaction.userId,
+      p_user_id: userId,
       p_place_id: placeId,
     })
 
@@ -544,23 +500,21 @@ function ClaimButton({
       setClaimed(true)
       setPlaceOverride(placeId, {
         claimed: true,
-        factionId: userFaction.factionId,
-        tagColor: userFaction.factionColor,
-        factionPattern: userFaction.factionPattern,
+        factionId: factionId ?? undefined,
+        tagColor: factionColor ?? undefined,
+        factionPattern: factionPattern ?? undefined,
       })
-      // Mettre à jour les 3 ressources
       if (data.energy !== undefined) useFogStore.getState().setEnergy(data.energy)
       if (data.conquestPoints !== undefined) useFogStore.getState().setConquestPoints(data.conquestPoints)
       if (data.constructionPoints !== undefined) useFogStore.getState().setConstructionPoints(data.constructionPoints)
 
-      // Notoriete
       if (data.notorietyPoints !== undefined) {
         useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
       }
 
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Lieu revendiqué pour ${userFaction.factionTitle} ! +10 Notoriété`,
+        message: `Lieu revendiqué pour ${factionTitle} ! +10 Notoriété`,
         timestamp: Date.now(),
       })
     }
@@ -573,8 +527,8 @@ function ClaimButton({
       <button
         className="claim-btn"
         style={{
-          borderColor: userFaction.factionColor,
-          color: userFaction.factionColor,
+          borderColor: factionColor,
+          color: factionColor,
         }}
         onClick={handleClaim}
         disabled={claiming || !canAffordClaim}
@@ -582,7 +536,7 @@ function ClaimButton({
         {claiming
           ? 'Revendication...'
           : canAffordClaim
-            ? `Revendiquer pour ${userFaction.factionTitle} (${claimCost} \u2694)`
+            ? `Revendiquer pour ${factionTitle} (${claimCost} \u2694)`
             : `Pas assez de points de conquête (${Math.floor(conquestPoints)}/${claimCost})`}
       </button>
       {claimError && (

@@ -17,6 +17,16 @@ import { useChat } from './hooks/useChat'
 import { ChatPanel } from './components/chat/ChatPanel'
 import './App.css'
 
+function NotorietyBadge() {
+  const notoriety = useFogStore(s => s.notorietyPoints)
+  return (
+    <div className="notoriety-badge">
+      <span className="notoriety-icon">{'\u2B50'}</span>
+      <span className="notoriety-value">{notoriety}</span>
+    </div>
+  )
+}
+
 function App() {
   const selectedPlaceId = useMapStore(state => state.selectedPlaceId)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
@@ -67,6 +77,7 @@ function App() {
       <div className="app-toolbar">
         {!authLoading && isAuthenticated && (
           <>
+            <NotorietyBadge />
             <ResourceIndicator type="conquest" />
             <ResourceIndicator type="construction" />
             <EnergyIndicator />
