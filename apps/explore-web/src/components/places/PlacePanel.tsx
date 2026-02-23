@@ -353,7 +353,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {place.author && (
           <p className="place-panel-author">
-            Lieu ajout&eacute; par {place.author.lastName}
+            {place.author.profileImageUrl && (
+              <img src={place.author.profileImageUrl} alt="" className="place-panel-author-avatar" />
+            )}
+            Lieu ajout&eacute; par <strong>{place.author.lastName}</strong>
           </p>
         )}
 
