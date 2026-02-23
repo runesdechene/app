@@ -13,6 +13,10 @@ interface MapState {
   selectedPlaceId: string | null
   setSelectedPlaceId: (id: string | null) => void
 
+  /** ID du joueur dont le profil est ouvert (global) */
+  selectedPlayerId: string | null
+  setSelectedPlayerId: (id: string | null) => void
+
   /** Demande de fly-to depuis l'extérieur (toasts, etc.) */
   pendingFlyTo: { lng: number; lat: number; placeId?: string } | null
   requestFlyTo: (target: { lng: number; lat: number; placeId?: string }) => void
@@ -26,6 +30,9 @@ interface MapState {
 export const useMapStore = create<MapState>((set) => ({
   selectedPlaceId: null,
   setSelectedPlaceId: (id) => set({ selectedPlaceId: id }),
+
+  selectedPlayerId: null,
+  setSelectedPlayerId: (id) => set({ selectedPlayerId: id }),
 
   pendingFlyTo: null,
   requestFlyTo: (target) => set({ pendingFlyTo: target }),

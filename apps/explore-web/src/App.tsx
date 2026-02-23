@@ -8,6 +8,7 @@ import { FactionModal } from './components/auth/FactionModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
 import { GameToast } from './components/map/GameToast'
+import { PlayerProfileModal } from './components/map/PlayerProfileModal'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
@@ -30,6 +31,8 @@ function NotorietyBadge() {
 function App() {
   const selectedPlaceId = useMapStore(state => state.selectedPlaceId)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
+  const selectedPlayerId = useMapStore(state => state.selectedPlayerId)
+  const setSelectedPlayerId = useMapStore(state => state.setSelectedPlayerId)
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
@@ -113,6 +116,13 @@ function App() {
         <FactionModal
           onClose={() => setShowFactionModal(false)}
           currentFactionId={userFactionId}
+        />
+      )}
+
+      {selectedPlayerId && (
+        <PlayerProfileModal
+          playerId={selectedPlayerId}
+          onClose={() => setSelectedPlayerId(null)}
         />
       )}
 

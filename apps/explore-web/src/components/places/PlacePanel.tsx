@@ -353,32 +353,47 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             <button className="place-like-count" onClick={fetchLikers}>
               {likesCount}
             </button>
-            {showLikers && (
-              <div className="place-likers-dropdown">
-                {likersLoading ? (
-                  <span className="place-likers-loading">Chargement...</span>
-                ) : likers.length === 0 ? (
-                  <span className="place-likers-empty">Aucun like</span>
-                ) : (
-                  likers.map(liker => (
-                    <div key={liker.userId} className="place-liker-row">
-                      {liker.profileImage ? (
-                        <img src={liker.profileImage} alt="" className="place-liker-avatar" />
-                      ) : (
-                        <span className="place-liker-avatar place-liker-avatar-default"
-                          style={{ borderColor: liker.factionColor ?? undefined }}
-                        />
-                      )}
-                      <span className="place-liker-name">{liker.name}</span>
-                      {liker.factionColor && (
-                        <span className="place-liker-faction-dot" style={{ backgroundColor: liker.factionColor }} />
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
           </div>
+          {showLikers && (
+            <div className="likers-modal-overlay" onClick={() => setShowLikers(false)}>
+              <div className="likers-modal" onClick={e => e.stopPropagation()}>
+                <div className="likers-modal-header">
+                  <h3>Likes</h3>
+                  <button className="likers-modal-close" onClick={() => setShowLikers(false)}>&#10005;</button>
+                </div>
+                <div className="likers-modal-list">
+                  {likersLoading ? (
+                    <span className="likers-modal-empty">Chargement...</span>
+                  ) : likers.length === 0 ? (
+                    <span className="likers-modal-empty">Aucun like</span>
+                  ) : (
+                    likers.map(liker => (
+                      <button
+                        key={liker.userId}
+                        className="place-liker-row"
+                        onClick={() => {
+                          setShowLikers(false)
+                          useMapStore.getState().setSelectedPlayerId(liker.userId)
+                        }}
+                      >
+                        {liker.profileImage ? (
+                          <img src={liker.profileImage} alt="" className="place-liker-avatar" />
+                        ) : (
+                          <span className="place-liker-avatar place-liker-avatar-default"
+                            style={{ borderColor: liker.factionColor ?? undefined }}
+                          />
+                        )}
+                        <span className="place-liker-name">{liker.name}</span>
+                        {liker.factionColor && (
+                          <span className="place-liker-faction-dot" style={{ backgroundColor: liker.factionColor }} />
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           <span>{place.metrics.explored} explorations</span>
           {place.metrics.note !== null && (
             <span>{place.metrics.note.toFixed(1)}/5</span>

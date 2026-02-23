@@ -13,7 +13,6 @@ import { useFogStore } from '../../stores/fogStore'
 import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
-import { PlayerProfileModal } from './PlayerProfileModal'
 
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
@@ -266,7 +265,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const userFactionColor = useFogStore(s => s.userFactionColor)
   const currentUserId = useFogStore(s => s.userId)
   const onlinePlayers = usePlayersStore(s => s.players)
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
 
   // Viewport bounds pour la minimap
   const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
@@ -820,13 +819,6 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       ) : null
     })()}
-
-    {selectedPlayerId && (
-      <PlayerProfileModal
-        playerId={selectedPlayerId}
-        onClose={() => setSelectedPlayerId(null)}
-      />
-    )}
 
     </div>
   )
