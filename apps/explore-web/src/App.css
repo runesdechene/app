@@ -799,10 +799,35 @@
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 14px;
   font-family: var(--font-accent);
   font-size: 13px;
   color: var(--color-ink-light);
+}
+
+.place-like-btn {
+  background: none;
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 14px;
+  padding: 2px 10px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.place-like-btn:hover:not(:disabled) {
+  border-color: var(--color-sepia);
+  color: var(--color-ink);
+}
+.place-like-btn-active {
+  border-color: #e25555;
+  color: #e25555;
+}
+.place-like-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .place-panel-tags {
@@ -1238,19 +1263,19 @@
 
 .user-position-marker {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
 }
 
 .user-position-dot {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   transform: translate(-50%, -50%);
   background: var(--faction-color, #4A90D9);
-  border: 2.5px solid #fff;
+  border: 3px solid #fff;
   border-radius: 50%;
   box-shadow: 0 0 10px var(--faction-glow, rgba(74, 144, 217, 0.6)),
               0 0 20px var(--faction-glow, rgba(74, 144, 217, 0.6));
@@ -1261,13 +1286,13 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 3px solid var(--faction-color, #4A90D9);
-  box-shadow: 0 0 12px var(--faction-glow, rgba(74, 144, 217, 0.6)),
-              0 2px 4px rgba(0,0,0,0.3);
+  border: 3.5px solid var(--faction-color, #4A90D9);
+  box-shadow: 0 0 14px var(--faction-glow, rgba(74, 144, 217, 0.6)),
+              0 2px 6px rgba(0,0,0,0.3);
   object-fit: cover;
   z-index: 1;
 }
@@ -1276,8 +1301,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
   transform: translate(-50%, -50%);
   background: var(--faction-glow, rgba(74, 144, 217, 0.25));
   border-radius: 50%;
@@ -1293,6 +1318,47 @@
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
+}
+
+/* Autres joueurs connectés sur la carte */
+.other-player-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.other-player-dot {
+  width: 18px;
+  height: 18px;
+  background: var(--faction-color, #888);
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+.other-player-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--faction-color, #888);
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  object-fit: cover;
+}
+
+.other-player-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #2c1810;
+  background: rgba(255, 248, 230, 0.85);
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 /* ==========================================
@@ -1730,6 +1796,13 @@
 
 .game-toast-close:hover {
   opacity: 1;
+}
+
+.game-toast-clickable {
+  cursor: pointer;
+}
+.game-toast-clickable:hover {
+  background: rgba(245, 230, 211, 1);
 }
 
 @keyframes toast-slide-in {

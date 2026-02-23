@@ -230,14 +230,33 @@ function FoggedPlaceView({
 
 function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
   const isAdmin = useFogStore(s => s.isAdmin)
+  const userId = useFogStore(s => s.userId)
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
+  const [liked, setLiked] = useState(place.requester?.liked ?? false)
+  const [likesCount, setLikesCount] = useState(place.metrics.likes)
+  const [likeLoading, setLikeLoading] = useState(false)
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
 
   const prevImage = () => setImageIndex(i => (i - 1 + images.length) % images.length)
   const nextImage = () => setImageIndex(i => (i + 1) % images.length)
+
+  async function toggleLike() {
+    if (!userId || likeLoading) return
+    setLikeLoading(true)
+    if (liked) {
+      const { error } = await supabase.rpc('unlike_place', { p_user_id: userId, p_place_id: place.id })
+      if (error) console.error('unlike_place error:', error)
+      else { setLiked(false); setLikesCount(c => c - 1) }
+    } else {
+      const { error } = await supabase.rpc('like_place', { p_user_id: userId, p_place_id: place.id })
+      if (error) console.error('like_place error:', error)
+      else { setLiked(true); setLikesCount(c => c + 1) }
+    }
+    setLikeLoading(false)
+  }
 
   return (
     <>
@@ -296,10 +315,16 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats + Like */}
         <div className="place-panel-stats">
           <span>{place.metrics.views} vues</span>
-          <span>{place.metrics.likes} likes</span>
+          <button
+            className={`place-like-btn${liked ? ' place-like-btn-active' : ''}`}
+            onClick={toggleLike}
+            disabled={!userId || likeLoading}
+          >
+            {liked ? '\u2764\uFE0F' : '\uD83E\uDD0D'} {likesCount}
+          </button>
           <span>{place.metrics.explored} explorations</span>
           {place.metrics.note !== null && (
             <span>{place.metrics.note.toFixed(1)}/5</span>

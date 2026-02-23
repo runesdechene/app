@@ -10,6 +10,7 @@ import type { PlaceProperties } from '../../hooks/usePlaces'
 import { loadParchmentStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
+import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 
@@ -255,11 +256,14 @@ export const ExploreMap = memo(function ExploreMap() {
   const [mapStyle, setMapStyle] = useState<StyleSpecification | null>(null)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
   const placeOverrides = useMapStore(state => state.placeOverrides)
+  const pendingFlyTo = useMapStore(state => state.pendingFlyTo)
+  const clearPendingFlyTo = useMapStore(state => state.clearPendingFlyTo)
   const setUserPosition = useFogStore(s => s.setUserPosition)
   const userPosition = useFogStore(s => s.userPosition)
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
   const userFactionId = useFogStore(s => s.userFactionId)
   const userFactionColor = useFogStore(s => s.userFactionColor)
+  const onlinePlayers = usePlayersStore(s => s.players)
 
   // Viewport bounds pour la minimap
   const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
@@ -408,6 +412,16 @@ export const ExploreMap = memo(function ExploreMap() {
       return () => navigator.geolocation.clearWatch(watchId)
     }
   }, [])
+
+  // Fly-to demandé depuis l'extérieur (toast cliqué, etc.)
+  useEffect(() => {
+    if (!pendingFlyTo) return
+    mapRef.current?.flyTo({ center: [pendingFlyTo.lng, pendingFlyTo.lat], zoom: 14, duration: 1200 })
+    if (pendingFlyTo.placeId) {
+      setSelectedPlaceId(pendingFlyTo.placeId)
+    }
+    clearPendingFlyTo()
+  }, [pendingFlyTo])
 
   // Quand la map se charge : flyTo géoloc + charger l'icône unknown
   const onMapLoad = useCallback(() => {
@@ -640,6 +654,25 @@ export const ExploreMap = memo(function ExploreMap() {
           </div>
         </Marker>
       )}
+
+      {/* Marqueurs des autres joueurs connectés */}
+      {Array.from(onlinePlayers.values()).map(player => (
+        <Marker key={player.userId} longitude={player.position.lng} latitude={player.position.lat} anchor="center">
+          <div
+            className="other-player-marker"
+            style={{
+              '--faction-color': player.factionColor ?? '#888',
+            } as React.CSSProperties}
+          >
+            {player.avatarUrl ? (
+              <img src={player.avatarUrl} alt="" className="other-player-avatar" />
+            ) : (
+              <div className="other-player-dot" />
+            )}
+            <span className="other-player-name">{player.name}</span>
+          </div>
+        </Marker>
+      ))}
 
       {geojson && (
         <Source

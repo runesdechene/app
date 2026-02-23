@@ -146,24 +146,39 @@ export function useFog() {
           const e = payload.new as {
             type: string
             actor_id: string
-            data: { placeTitle?: string; factionTitle?: string; actorName?: string }
+            place_id: string | null
+            data: {
+              placeTitle?: string
+              placeLatitude?: number
+              placeLongitude?: number
+              factionTitle?: string
+              actorName?: string
+            }
           }
 
-          // Ignorer ses propres actions (déjà notifié localement)
-          if (e.actor_id === currentUserId) return
+          // Ignorer ses propres actions (sauf likes)
+          const isSelf = e.actor_id === currentUserId
+          if (isSelf && e.type !== 'like') return
 
-          const name = e.data?.actorName ?? 'Quelqu\'un'
+          const name = isSelf ? 'Vous' : (e.data?.actorName ?? 'Quelqu\'un')
           const place = e.data?.placeTitle ?? 'un lieu'
           let message = ''
           let type: GameToast['type'] = 'discover'
+          const highlights: string[] = [name]
 
           if (e.type === 'claim') {
             const faction = e.data?.factionTitle ?? 'une faction'
             message = `${name} a revendiqué ${place} pour ${faction}`
+            highlights.push(place)
             type = 'claim'
           } else if (e.type === 'discover') {
             message = `${name} a découvert ${place}`
+            highlights.push(place)
             type = 'discover'
+          } else if (e.type === 'like') {
+            message = isSelf ? `Vous avez aimé ${place}` : `${name} a aimé ${place}`
+            highlights.push(place)
+            type = 'like'
           } else if (e.type === 'new_user') {
             message = `${name} a rejoint la carte`
             type = 'new_user'
@@ -171,7 +186,17 @@ export function useFog() {
             return
           }
 
-          addToast({ type, message, timestamp: Date.now() })
+          const hasLocation = e.data?.placeLatitude != null && e.data?.placeLongitude != null
+          addToast({
+            type,
+            message,
+            highlights,
+            placeId: e.place_id ?? undefined,
+            placeLocation: hasLocation
+              ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
+              : undefined,
+            timestamp: Date.now(),
+          })
         },
       )
 
@@ -203,8 +228,15 @@ async function loadRecentActivity(currentUserId: string) {
   const recent = (data as Array<{
     type: string
     actor_id: string
+    place_id: string | null
     faction_id: string | null
-    data: { placeTitle?: string; factionTitle?: string; actorName?: string }
+    data: {
+      placeTitle?: string
+      placeLatitude?: number
+      placeLongitude?: number
+      factionTitle?: string
+      actorName?: string
+    }
     created_at: string
   }>)
     .filter(e => new Date(e.created_at).getTime() > cutoff)
@@ -216,27 +248,47 @@ async function loadRecentActivity(currentUserId: string) {
 
     let message = ''
     let type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like' = 'discover'
+    const highlights: string[] = []
 
     if (e.type === 'claim') {
       const faction = e.data?.factionTitle ?? 'une faction'
       message = isSelf
         ? `Vous avez revendiqué ${place} pour ${faction}`
         : `${name} a revendiqué ${place} pour ${faction}`
+      highlights.push(name, place)
       type = 'claim'
     } else if (e.type === 'discover') {
       message = isSelf
         ? `Vous avez découvert ${place}`
         : `${name} a découvert ${place}`
+      highlights.push(name, place)
       type = 'discover'
+    } else if (e.type === 'like') {
+      message = isSelf
+        ? `Vous avez aimé ${place}`
+        : `${name} a aimé ${place}`
+      highlights.push(name, place)
+      type = 'like'
     } else if (e.type === 'new_user') {
       if (isSelf) continue
       message = `${name} a rejoint la carte`
+      highlights.push(name)
       type = 'new_user'
     } else {
       continue
     }
 
-    addToast({ type, message, timestamp: new Date(e.created_at).getTime() })
+    const hasLocation = e.data?.placeLatitude != null && e.data?.placeLongitude != null
+    addToast({
+      type,
+      message,
+      highlights,
+      placeId: e.place_id ?? undefined,
+      placeLocation: hasLocation
+        ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
+        : undefined,
+      timestamp: new Date(e.created_at).getTime(),
+    })
   }
 }
 

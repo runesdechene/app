@@ -5,10 +5,16 @@ export interface GameToast {
   type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like'
   message: string
   color?: string
-  /** Texte à mettre en avant (coloré + bold) dans le message */
+  /** Texte(s) à mettre en avant (bold) dans le message */
+  highlights?: string[]
+  /** @deprecated — utiliser highlights[] */
   highlight?: string
   /** URL d'icone faction (remplace l'emoji par défaut) */
   iconUrl?: string
+  /** ID du lieu (pour clic → fly to + ouvrir panel) */
+  placeId?: string
+  /** Coordonnées du lieu */
+  placeLocation?: { latitude: number; longitude: number }
   timestamp: number
 }
 
