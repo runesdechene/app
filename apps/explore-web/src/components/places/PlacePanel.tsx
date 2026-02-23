@@ -244,6 +244,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
   const [showLikers, setShowLikers] = useState(false)
   const [likers, setLikers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
   const [likersLoading, setLikersLoading] = useState(false)
+  const [explored, setExplored] = useState(place.requester?.explored ?? false)
+  const [exploredCount, setExploredCount] = useState(place.metrics.explored)
+  const [exploreLoading, setExploreLoading] = useState(false)
+  const [showExploreConfirm, setShowExploreConfirm] = useState(false)
+  const [showExplorers, setShowExplorers] = useState(false)
+  const [explorers, setExplorers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
+  const [explorersLoading, setExplorersLoading] = useState(false)
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
@@ -275,6 +282,36 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
       setLikers(data as typeof likers)
     }
     setLikersLoading(false)
+  }
+
+  async function fetchExplorers() {
+    if (showExplorers) { setShowExplorers(false); return }
+    setExplorersLoading(true)
+    setShowExplorers(true)
+    const { data } = await supabase.rpc('get_place_explorers', { p_place_id: place.id })
+    if (data && Array.isArray(data)) {
+      setExplorers(data as typeof explorers)
+    }
+    setExplorersLoading(false)
+  }
+
+  async function confirmExplore() {
+    if (!userId || exploreLoading) return
+    setExploreLoading(true)
+    const { data, error } = await supabase.rpc('explore_place', { p_user_id: userId, p_place_id: place.id })
+    if (error) {
+      console.error('explore_place error:', error)
+    } else if (data?.success) {
+      setExplored(true)
+      setExploredCount(c => c + 1)
+      useToastStore.getState().addToast({
+        type: 'discover',
+        message: 'Lieu exploré !',
+        timestamp: Date.now(),
+      })
+    }
+    setExploreLoading(false)
+    setShowExploreConfirm(false)
   }
 
   return (
@@ -394,11 +431,72 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
               </div>
             </div>
           )}
-          <span>{place.metrics.explored} explorations</span>
+          <button className="place-explore-count" onClick={fetchExplorers}>
+            {exploredCount} explorations
+          </button>
           {place.metrics.note !== null && (
             <span>{place.metrics.note.toFixed(1)}/5</span>
           )}
         </div>
+
+        {/* Explorers modal */}
+        {showExplorers && (
+          <div className="likers-modal-overlay" onClick={() => setShowExplorers(false)}>
+            <div className="likers-modal" onClick={e => e.stopPropagation()}>
+              <div className="likers-modal-header">
+                <h3>Explorations</h3>
+                <button className="likers-modal-close" onClick={() => setShowExplorers(false)}>&#10005;</button>
+              </div>
+              <div className="likers-modal-list">
+                {explorersLoading ? (
+                  <span className="likers-modal-empty">Chargement...</span>
+                ) : explorers.length === 0 ? (
+                  <span className="likers-modal-empty">Aucune exploration</span>
+                ) : (
+                  explorers.map(exp => (
+                    <button
+                      key={exp.userId}
+                      className="place-liker-row"
+                      onClick={() => {
+                        setShowExplorers(false)
+                        useMapStore.getState().setSelectedPlayerId(exp.userId)
+                      }}
+                    >
+                      {exp.profileImage ? (
+                        <img src={exp.profileImage} alt="" className="place-liker-avatar" />
+                      ) : (
+                        <span className="place-liker-avatar place-liker-avatar-default"
+                          style={{ borderColor: exp.factionColor ?? undefined }}
+                        />
+                      )}
+                      <span className="place-liker-name">{exp.name}</span>
+                      {exp.factionColor && (
+                        <span className="place-liker-faction-dot" style={{ backgroundColor: exp.factionColor }} />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Explore confirm modal */}
+        {showExploreConfirm && (
+          <div className="likers-modal-overlay" onClick={() => setShowExploreConfirm(false)}>
+            <div className="explore-confirm-modal" onClick={e => e.stopPropagation()}>
+              <p className="explore-confirm-text">Avez-vous r&eacute;ellement visit&eacute; ce lieu ?</p>
+              <div className="explore-confirm-buttons">
+                <button className="explore-confirm-yes" onClick={confirmExplore} disabled={exploreLoading}>
+                  Oui, j&apos;y suis all&eacute;
+                </button>
+                <button className="explore-confirm-no" onClick={() => setShowExploreConfirm(false)}>
+                  Non
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tags */}
         {place.tags.length > 0 && (
@@ -449,6 +547,22 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
         {/* Address */}
         {place.address && (
           <p className="place-panel-address">{place.address}</p>
+        )}
+
+        {/* Explore button */}
+        {userId && !explored && (
+          <button
+            className="place-explore-btn"
+            onClick={() => setShowExploreConfirm(true)}
+            disabled={exploreLoading}
+          >
+            {'\uD83E\uDDED'} J&apos;ai explor&eacute; ce lieu
+          </button>
+        )}
+        {userId && explored && (
+          <div className="place-explored-badge">
+            {'\u2705'} Lieu explor&eacute;
+          </div>
         )}
 
         {/* Admin : slider score / influence */}

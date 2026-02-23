@@ -961,6 +961,108 @@
   flex-shrink: 0;
 }
 
+/* Explore count clickable */
+.place-explore-count {
+  background: none;
+  border: none;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.place-explore-count:hover {
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
+}
+
+/* Explore button */
+.place-explore-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+  background: linear-gradient(180deg, #e8dfc8 0%, #d9ceb4 100%);
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.place-explore-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #d9ceb4 0%, #c9bd9e 100%);
+}
+.place-explore-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.place-explored-badge {
+  padding: 8px 16px;
+  margin-bottom: 10px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: #4a8f4e;
+  text-align: center;
+}
+
+/* Explore confirm modal */
+.explore-confirm-modal {
+  background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+  border: 2px solid #b8a47a;
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin: auto;
+  max-width: 300px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.explore-confirm-text {
+  font-family: var(--font-accent);
+  font-size: 16px;
+  color: var(--color-ink);
+  margin: 0 0 20px;
+}
+.explore-confirm-buttons {
+  display: flex;
+  gap: 12px;
+}
+.explore-confirm-yes {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(180deg, #5a8f5e 0%, #4a7a4e 100%);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.explore-confirm-yes:hover:not(:disabled) { opacity: 0.85; }
+.explore-confirm-yes:disabled { opacity: 0.5; cursor: default; }
+.explore-confirm-no {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.explore-confirm-no:hover {
+  background: var(--color-parchment-dark);
+}
+
 .place-panel-tags {
   display: flex;
   flex-wrap: wrap;
