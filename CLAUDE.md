@@ -1,6 +1,6 @@
 # Runes de Chêne — Monorepo
 
-> Dernière mise à jour : 13 février 2026
+> Dernière mise à jour : 23 février 2026
 
 ## Rôle de Claude
 
@@ -19,14 +19,12 @@ Les décisions produit et les priorités sont dans **La Citadelle** (Obsidian va
 `\\EGIDE\Runes de Chêne\👑 LA CITADELLE\`
 
 Documents clés, par ordre de priorité :
-1. `🍁 INDEX - Runes de Chêne.md` — Identité, mission, parcours client, équipe (constitution permanente)
-2. `⚔️ PLAN DE BATAILLE — Objectif 22 Mars.md` — Roadmap, deadlines, tâches semaine par semaine
-3. `📋 ECT — La Carte.md` — Specs de La Carte (MVP)
+1. `🍁 INDEX - Runes de Chêne.md` — Identité, mission, parcours client, équipe
+2. `⚔️ PLAN DE BATAILLE — Objectif 22 Mars.md` — Roadmap, deadlines, tâches
+3. `📋 ECT — La Carte.md` — Specs de La Carte
 4. `📋 ECT — Hérauts.md` — Specs du système de recrutement ambassadeurs
 5. `📋 ECT — Communication.md` — Stratégie Instagram
 6. `🏛️ INFRASTRUCTURE.md` — État de tous les outils
-
-**Avant chaque session de travail, consulter le Plan de Bataille pour les priorités actuelles.**
 
 ## Ce qu'on vend
 
@@ -40,13 +38,13 @@ Chaque décision technique doit servir ça.
 ```
 .
 ├── apps/
-│   ├── explore-web/          # La Carte — MVP carte interactive (PRIORITE 1)
+│   ├── explore-web/          # La Carte — jeu de carte interactive (PRIORITE 1)
 │   └── hub/                  # Back-office admin (fonctionnel)
 ├── packages/
 │   └── supabase-client/      # Client Supabase partagé + types générés
 ├── supabase/
 │   ├── config.toml           # Config Supabase CLI
-│   └── migrations/           # Migrations SQL (006-011)
+│   └── migrations/           # Migrations SQL (006-041)
 ├── package.json              # Root monorepo
 ├── pnpm-workspace.yaml       # Workspaces : apps/* + packages/*
 └── pnpm-lock.yaml
@@ -54,28 +52,14 @@ Chaque décision technique doit servir ça.
 
 ### Apps actives
 
-| App | Rôle | Port | Domaine | CLAUDE.md |
-|-----|------|------|---------|-----------|
-| **explore-web** | La Carte — carte interactive patrimoine | 3000 | `carte.runesdechene.com` | `apps/explore-web/CLAUDE.md` |
-| **hub** | Back-office admin (users, photos, avis, hérauts) | 3001 | `hub.runesdechene.com` | `apps/hub/CLAUDE.md` |
-
-### Package partagé
-
-| Package | Rôle | Consommé par |
-|---------|------|-------------|
-| `@runes/supabase-client` | Client Supabase + types TS générés | explore-web, hub |
+| App | Rôle | Port | Domaine |
+|-----|------|------|---------|
+| **explore-web** | La Carte — jeu de carte interactive patrimoine | 3000 | `carte.runesdechene.com` |
+| **hub** | Back-office admin (users, photos, avis, hérauts, tags) | 3001 | `hub.runesdechene.com` |
 
 ---
 
-## Priorités actuelles (fév-mars 2026)
-
-1. **La Carte MVP** — explore-web, objectif déployée le 22 mars, testable le 7 mars
-2. **Hérauts** — Page `/rejoindre` sur le Hub + section admin candidatures
-3. **Hub maintenance** — Corrections et ajouts selon besoins
-
----
-
-## Stack technique commune
+## Stack technique
 
 - **Runtime :** Node.js
 - **Package manager :** pnpm (workspaces)
@@ -83,6 +67,8 @@ Chaque décision technique doit servir ça.
 - **Framework :** React 18
 - **Build :** Vite 5
 - **Backend :** Supabase (PostgreSQL, Auth OTP, Storage, RPC functions, RLS)
+- **Carte :** MapLibre GL JS + OpenFreeMap (tuiles gratuites)
+- **State :** Zustand (fogStore, mapStore, toastStore)
 - **Déploiement :** Netlify (les deux apps)
 - **Branche principale :** `main`
 
@@ -93,6 +79,8 @@ Chaque décision technique doit servir ça.
 - **Conventional Commits** — `feat:`, `fix:`, `chore:`, `docs:`
 - **Pas de code mort** — si c'est unused, on supprime
 - **Pas d'over-engineering** — simple, direct, fonctionnel
+- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/`
+- **RPCs** — logique métier côté serveur via `SECURITY DEFINER` functions
 
 ## Commandes
 
@@ -119,9 +107,122 @@ VITE_SUPABASE_URL=https://xxx.supabase.co
 VITE_SUPABASE_ANON_KEY=xxx
 ```
 
-## Ecosystem Runes de Chêne
+---
 
-Ce monorepo fait partie d'un écosystème plus large :
+## Gameplay — La Carte (explore-web)
+
+### Factions
+
+Les joueurs rejoignent une faction. Chaque faction a un titre, une couleur, et un blason (pattern SVG). Les territoires sont visualisés sur la carte via des zones Voronoi colorées par faction.
+
+### 3 ressources — régénération temporelle
+
+| Ressource | Icône | Regen | Max | Usage |
+|-----------|-------|-------|-----|-------|
+| Énergie | ⚡ | +0.5/h (cycle 7200s) | 5 | Découvrir des lieux |
+| Conquête | ⚔️ | +0.25/h (cycle 14400s) | 5 | Revendiquer des lieux |
+| Construction | 🔨 | +0.25/h (cycle 14400s) | 5 | Fortifier des lieux |
+
+Chaque ressource régénère via un système de ticks (cycle fixe, taux 1 pt/tick). Les RPCs calculent les ticks écoulés et mettent à jour à chaque appel.
+
+### Fog of War
+
+Lieux non découverts = masqués. Coût pour découvrir :
+- **Remote :** 1.0 énergie (0.5 si même faction)
+- **GPS (< 500m) :** gratuit
+
+### Découverte
+
+`discover_place` — débloque le lieu, donne des récompenses basées sur le tag primaire (énergie, conquête, construction).
+
+### Revendication (Claim)
+
+`claim_place` — coûte `1 + fortification_level` conquête. Donne **+10 notoriété personnelle**. Pas de récompense ressource. Reset fortification à 0.
+
+### Fortification (4 niveaux)
+
+`fortify_place` — renforce un lieu de sa faction. **+5 notoriété**.
+
+| Niveau | Nom | Coût construction | Coût conquête ennemi |
+|--------|-----|-------------------|-----------------------|
+| 0 | — | — | 1 |
+| 1 | Tour de guet | 1 | 2 |
+| 2 | Tour de défense | 2 | 3 |
+| 3 | Bastion | 3 | 4 |
+| 4 | Béfroi | 5 | 5 |
+
+### Notoriété
+
+- **Personnelle :** `users.notoriety_points` (+10 claim, +5 fortify). Visible dans le profil.
+- **Faction :** calculée en temps réel par `get_faction_notoriety()`. Formule : `floor(heures_tenues) * (1 + fortification_level * 0.5)`. Lvl 0 = x1, lvl 4 = x3. Remplace l'ancien % dans le FactionBar.
+
+### Activité temps réel
+
+Canal Supabase Realtime sur `activity_log` — claims, découvertes, likes, nouveaux joueurs apparaissent en toasts.
+
+---
+
+## Tables Supabase principales
+
+| Table | Rôle |
+|-------|------|
+| `users` | Joueurs (faction_id, 3 ressources + reset_at, notoriety_points) |
+| `places` | 2400+ lieux (lat/lng, faction_id, claimed_by/at, fortification_level) |
+| `factions` | Factions (title, color, pattern SVG) |
+| `tags` | Tags avec couleurs, icônes, reward_energy/conquest/construction |
+| `place_tags` | Liaison lieu-tag (is_primary) |
+| `places_discovered` | Fog of war |
+| `place_claims` | Historique revendications |
+| `activity_log` | Feed temps réel |
+
+## RPCs principales
+
+| Fonction | Usage |
+|----------|-------|
+| `get_map_places` | Markers pour la carte |
+| `get_place_by_id` | Détail lieu (claim + fortification) |
+| `get_user_energy` | 3 ressources + regen timers + notoriété |
+| `discover_place` | Découvrir (coût énergie, récompenses tag) |
+| `claim_place` | Revendiquer (coût conquête, +10 notoriété) |
+| `fortify_place` | Fortifier (coût construction, +5 notoriété) |
+| `get_faction_notoriety` | Score temporel par faction |
+| `get_player_profile` | Profil public (stats + notoriété) |
+
+---
+
+## Architecture explore-web
+
+```
+apps/explore-web/src/
+├── components/
+│   ├── map/
+│   │   ├── ExploreMap.tsx        # Carte MapLibre + territoires Voronoi
+│   │   ├── EnergyIndicator.tsx   # Jauge énergie
+│   │   ├── ResourceIndicator.tsx # Jauges conquête/construction
+│   │   ├── FactionBar.tsx        # Scoreboard factions (notoriété)
+│   │   └── PlayerProfileModal.tsx
+│   ├── places/
+│   │   └── PlacePanel.tsx        # Fiche lieu (découverte, claim, fortify)
+│   ├── auth/
+│   │   ├── AuthForm.tsx          # Login email OTP
+│   │   └── FactionModal.tsx      # Choix de faction
+│   └── ...
+├── hooks/
+│   ├── useAuth.ts                # Auth Supabase
+│   ├── useFog.ts                 # Init fog + activité Realtime
+│   └── usePlace.ts               # Fetch détail lieu
+├── stores/
+│   ├── fogStore.ts               # State joueur (resources, faction, notoriété)
+│   ├── mapStore.ts               # State carte (placeOverrides)
+│   └── toastStore.ts             # Toasts in-game
+├── lib/supabase.ts
+├── App.tsx
+└── App.css                       # Styles parchemin/médiéval
+```
+
+---
+
+## Ecosystem Runes de Chêne
 
 | Projet | Lieu | Rôle |
 |--------|------|------|

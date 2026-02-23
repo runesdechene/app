@@ -1,37 +1,20 @@
 # La Carte — Runes de Chêne
 
-> MVP Salon — Carte interactive du patrimoine
-> Dernière mise à jour : 13 février 2026
+> Jeu de carte interactive du patrimoine français
+> Dernière mise à jour : 23 février 2026
 
 ## Source de vérité
 
 Ce fichier traduit techniquement les décisions stratégiques prises dans **La Citadelle** (Obsidian).
-En cas de conflit, **La Citadelle fait autorité** :
-
-- `⚔️ PLAN DE BATAILLE — Objectif 22 Mars.md` (roadmap, deadlines, priorités)
-- `📋 ECT — La Carte.md` (exigences, conception, tâches)
-
-Avant toute session de travail, vérifier si ces documents ont évolué.
+En cas de conflit, **La Citadelle fait autorité**.
 
 ---
 
-## Vision (V1 — MVP Salon)
+## Vision
 
-Une carte interactive du patrimoine français, **belle et fonctionnelle sur mobile**, qui :
-1. Impressionne visuellement (style parchemin/Skyrim)
-2. Affiche 2400+ lieux du patrimoine sans lag
-3. Capture les emails des utilisateurs (auth OTP obligatoire)
-4. Est montrable en salon (QR code → téléphone)
-5. S'embed dans la boutique Shopify (iframe)
+Une carte interactive du patrimoine français transformée en **jeu de factions**. Les joueurs découvrent des lieux, revendiquent des territoires pour leur faction, fortifient leurs positions, et accumulent de la notoriété.
 
-### Ce que V1 n'est PAS
-
-Pas de gameplay. Pas de factions. Pas de conquête. Pas de brouillard de guerre. Pas de territoires. Pas de guildes. Pas de chat. Pas de musique par zone. Pas de duels.
-
-> "La Carte as MMO — des studios de 20 devs mettent des années."
-> — Analyse stratégique, février 2026
-
-Le gameplay viendra en V2, **uniquement si V1 prouve l'engagement**.
+**Style visuel :** Parchemin, Skyrim, médiéval fantaisie. Couleurs sépia, typographie médiévale.
 
 ---
 
@@ -41,217 +24,153 @@ Le gameplay viendra en V2, **uniquement si V1 prouve l'engagement**.
 |-------|------|
 | React 18 + TypeScript | Framework UI |
 | Vite 5 | Build tool |
-| TailwindCSS + shadcn/ui | Styling + composants UI |
 | MapLibre GL JS | Rendu cartographique |
-| OpenFreeMap | Tuiles (gratuit, pas de clé API, basé OpenStreetMap) |
-| Supabase | Auth OTP, RPC functions, storage |
-| Zustand | State management (léger) |
-| React Query | Cache serveur + data fetching |
+| OpenFreeMap | Tuiles (gratuit, basé OpenStreetMap) |
+| Supabase | Auth OTP, RPC functions, Storage, Realtime |
+| Zustand | State management (fogStore, mapStore, toastStore) |
 | vite-plugin-pwa | PWA installable |
 | Netlify | Déploiement → `carte.runesdechene.com` |
 
-**Package manager :** pnpm
-**Port dev :** 3000
-**Package partagé :** `@runes/supabase-client` (client + types générés)
+**Port dev :** 3000 | **Build :** `pnpm build`
 
 ---
 
-## État actuel du code
-
-Le projet est un **squelette d'authentification**. La carte n'existe pas encore.
+## Architecture
 
 ```
 src/
 ├── components/
-│   ├── AuthCallback.tsx    # Callback OTP
-│   ├── AuthForm.tsx        # Formulaire email magic link
-│   ├── ConnectionStatus.tsx # Indicateur connexion Supabase
-│   ├── TablesList.tsx      # Debug (à supprimer)
-│   └── UserProfile.tsx     # Profil utilisateur basique
+│   ├── map/
+│   │   ├── ExploreMap.tsx        # Carte MapLibre + territoires Voronoi (web worker)
+│   │   ├── EnergyIndicator.tsx   # Jauge ⚡ X.X/5 +0.5/h (cycle 7200s)
+│   │   ├── ResourceIndicator.tsx # Jauges ⚔️/🔨 X.X/5 +0.25/h (cycle 14400s)
+│   │   ├── FactionBar.tsx        # Scoreboard factions (notoriété temporelle)
+│   │   ├── PlayerProfileModal.tsx # Profil joueur public
+│   │   ├── ActivityToast.tsx     # Toasts activité temps réel
+│   │   └── ...
+│   ├── places/
+│   │   └── PlacePanel.tsx        # Fiche lieu complète :
+│   │                               # - Vue fog (lieu non découvert, coût énergie)
+│   │                               # - Vue découverte (stats, claim, fortify)
+│   │                               # - ClaimButton (coût dynamique conquête)
+│   │                               # - FortifyButton (coût progressif construction)
+│   ├── auth/
+│   │   ├── AuthForm.tsx          # Login email magic link OTP
+│   │   ├── AuthCallback.tsx      # Callback OTP
+│   │   └── FactionModal.tsx      # Rejoindre/quitter une faction
+│   └── UserProfile.tsx           # Profil self (nom, rang, avatar, lieux explorés)
 ├── hooks/
-│   ├── useAuth.ts          # Hook auth Supabase
-│   └── useSupabaseConnection.ts
+│   ├── useAuth.ts                # Hook auth Supabase (user, isAuthenticated)
+│   ├── useFog.ts                 # Init fog of war + énergie + Realtime activity
+│   │                               # discoverPlace() — fonction standalone
+│   └── usePlace.ts               # Fetch détail lieu → PlaceDetail type
+├── stores/
+│   ├── fogStore.ts               # State central joueur :
+│   │                               # userId, userFactionId/Color/Pattern
+│   │                               # energy/maxEnergy/nextPointIn
+│   │                               # conquestPoints/maxConquest/conquestNextPointIn
+│   │                               # constructionPoints/maxConstruction/constructionNextPointIn
+│   │                               # notorietyPoints
+│   │                               # discoveredIds (Set<string>)
+│   │                               # userName, userAvatarUrl, isAdmin
+│   ├── mapStore.ts               # placeOverrides (Map<string, PlaceOverride>)
+│   │                               # Pour updates temps réel post-claim
+│   └── toastStore.ts             # File de toasts in-game
 ├── lib/
-│   └── supabase.ts         # Client Supabase local
-├── types/
-│   └── database.types.ts   # Types Supabase générés
-├── App.tsx                 # Point d'entrée (auth + profil)
-├── App.css
-├── main.tsx
-└── index.css
-```
-
-**A nettoyer :**
-- Le PWA manifest dit "Rune2Chain Blockchain Explorer" (ancien nom)
-- `index.html` dit "Rune2Chain" aussi
-- `TablesList.tsx` est un composant de debug
-- Tauri est configuré dans package.json mais pas prioritaire (Phase 2+)
-
----
-
-## Architecture cible
-
-```
-src/
-├── components/
-│   ├── map/           # MapLibre, markers, clusters, popups
-│   ├── places/        # Fiche lieu, panneau latéral
-│   ├── auth/          # Login OTP, gate d'accès
-│   ├── search/        # Barre de recherche
-│   ├── filters/       # Filtres type/époque
-│   └── ui/            # shadcn/ui
-├── hooks/
-│   ├── useMap.ts
-│   ├── useAuth.ts
-│   └── usePlaces.ts
-├── lib/
-│   ├── supabase.ts
-│   └── map.ts         # Config MapLibre + style parchemin
-├── types/
-│   └── database.types.ts
-├── stores/            # Zustand (auth state, map state)
-├── pages/             # SEO /lieu/:slug (P2)
-└── styles/            # Tailwind globals, thème parchemin
+│   └── supabase.ts               # Client Supabase singleton
+├── App.tsx                       # Toolbar (3 jauges) + ExploreMap + PlacePanel
+└── App.css                       # Tous les styles (parchemin, medieval, jauges, etc.)
 ```
 
 ---
 
-## Fonctionnalités MVP
+## Systèmes de jeu
 
-### P0 — Indispensable
+### Fog of War
 
-| Fonctionnalité | Détail |
-|----------------|--------|
-| **Style parchemin** | Couleurs sépia, typographie médiévale, texture |
-| **2400 markers + clusters** | Affichage performant, clusters au dézoom |
-| **Popup au clic** | Aperçu rapide : nom, type, photo |
-| **Fiche détaillée** | Panneau latéral gauche : description, photos, avis |
-| **Auth OTP** | Email obligatoire pour explorer au-delà de la zone proche |
-| **Responsive mobile first** | Les gens scannent un QR code sur leur téléphone |
-| **PWA installable** | Manifest, service worker, mode standalone |
+- `fogStore.discoveredIds` = Set de place IDs déjà découverts
+- Lieux non découverts → floutés sur la carte
+- `discoverPlace(placeId, lat, lng)` dans useFog.ts (standalone, pas un hook)
+- Coût : 1.0 énergie remote (0.5 même faction), 0 si GPS < 500m
+- `discover_place` RPC donne des récompenses tag (énergie, conquête, construction)
 
-### P1 — Important
+### 3 Ressources
 
-| Fonctionnalité | Détail |
-|----------------|--------|
-| **Géolocalisation** | Centrage sur la position de l'utilisateur |
-| **Recherche globale** | Lieux + adresses (Nominatim/OpenStreetMap) |
-| **Filtres** | Par type de lieu, par époque historique |
+Régénération par ticks côté serveur (`get_user_energy` RPC) :
+- **Énergie ⚡** : cycle 7200s (+0.5/h), max 5, pour découvrir
+- **Conquête ⚔️** : cycle 14400s (+0.25/h), max 5, pour revendiquer
+- **Construction 🔨** : cycle 14400s (+0.25/h), max 5, pour fortifier
 
-### P2 — Si le temps le permet
+Frontend : `EnergyIndicator` et `ResourceIndicator` affichent un countdown + fractional smooth avec `setInterval` 1s. Refetch auto quand le timer atteint 0.
 
-| Fonctionnalité | Détail |
-|----------------|--------|
-| **Pages SEO** | `/lieu/:slug` (indexable, Open Graph) |
-| **Mode embed** | `?embed=true` pour iframe Shopify |
-| **Optimisation performance** | Lazy loading, code splitting |
+### Claim (Revendication)
 
----
+- PlacePanel > ClaimButton
+- Coût : `1 + fortification_level` conquête
+- `claim_place` RPC : met à jour places.faction_id, reset fortification à 0, +10 notoriété
+- Update temps réel via `mapStore.setPlaceOverride` + Realtime `activity_log`
+- Toast : "Lieu revendiqué pour {faction} ! +10 Notoriété"
 
-## Données Supabase
+### Fortification
 
-### Tables principales (migration 006)
+- PlacePanel > FortifyButton (visible si lieu de sa faction + level < 4)
+- `fortify_place` RPC : coûts progressifs [1, 2, 3, 5], +5 notoriété
+- 4 niveaux : Tour de guet, Tour de défense, Bastion, Béfroi
+- Chaque niveau ajoute +1 au coût de claim ennemi
 
-- `places` — 2400+ lieux (titre, texte, lat/lng, type, images, auteur)
-- `place_types` — Types de lieux (château, église, mégalithe...) avec couleurs
-- `reviews` — Avis sur les lieux (score, message, images)
-- `users` — Utilisateurs (rank, profil, avatar)
-- `places_viewed` / `places_liked` / `places_explored` / `places_bookmarked` — Actions utilisateur
-- `image_media` — Médias avec variantes
-- `member_codes` — Système guest/member
+### Notoriété
 
-### RPC disponibles
+- **Personnelle** : `users.notoriety_points` (+10 claim, +5 fortify)
+- **Faction** : `get_faction_notoriety()` — `floor(heures) * (1 + fort_level * 0.5)`
+- FactionBar affiche le score faction (remplace l'ancien %)
+- PlayerProfileModal affiche la notoriété personnelle
 
-| Fonction | Usage |
-|----------|-------|
-| `get_map_places` | Tous les lieux pour la carte (markers) |
-| `get_place_by_id` | Détail complet d'un lieu |
-| `get_place_reviews` | Avis d'un lieu |
-| `get_user_profile` | Profil public d'un utilisateur |
-| `get_my_informations` | Profil de l'utilisateur connecté |
-| `get_map_banners` | Lieux mis en avant |
-| `get_regular_feed` / `get_banner_feed` | Feeds de lieux |
-| `get_user_places` | Lieux créés par un utilisateur |
-| `get_review_by_id` | Détail d'un avis |
+### Territoires Voronoi
 
-### Auth
+- ExploreMap calcule des zones Voronoi via un web worker (`territoryWorker`)
+- Chaque lieu revendiqué crée une zone colorée par la faction
+- Opacité : 28% pour sa faction, 18% pour les autres, 30% au hover
+- Blasons (patterns SVG) affichés aux centroïdes des territoires
 
-- **Méthode** : Magic Link OTP (email)
-- **Flow** : email → lien magique → `/auth/callback` → session
-- **Auto-création** : migration 007 crée automatiquement un profil `users` au signup
+### Activité Realtime
+
+- Canal Supabase `activity-realtime` sur `activity_log` (INSERT)
+- Types : claim, discover, like, new_user
+- `loadRecentActivity()` charge les 50 derniers events (7 jours)
+- Toasts in-game avec highlights et liens vers les lieux
 
 ---
 
-## Timeline (du Plan de Bataille V3)
+## Types clés
 
-| Semaine | Dates | Objectif La Carte |
-|---------|-------|-------------------|
-| **S2** | 17-23 fév | TailwindCSS + shadcn/ui + MapLibre parchemin + 2400 markers + clusters + popup |
-| **S3** | 24 fév - 2 mar | Fiche détaillée + recherche + géoloc + auth OTP + responsive mobile |
-| **S4** | 3-9 mar | Filtres + PWA + tests + corrections. **Version testable avant Yggdrasil (7-8 mar)** |
-| **S5** | 10-16 mar | Déploiement Netlify + SEO pages + embed + corrections ambassadeurs |
-| **S6** | 17-22 mar | Ajustements finaux + monitoring post-lancement |
+### PlaceDetail (usePlace.ts)
 
-**Date critique :** 7-8 mars = Festival Yggdrasil, Lyon. La Carte doit être montrable.
-**Deadline finale :** 22 mars = tout déployé, fonctionnel, en production.
-
----
-
-## Utilisateurs cibles
-
-1. **Visiteurs de salon** — Scannent le QR code dans leur sac → téléphone → inscription email → exploration
-2. **Visiteurs boutique en ligne** — Voient La Carte en iframe sur runesdechene.com
-3. **Ambassadeurs/Hérauts** — Testeurs avant-première (semaine 5)
-
----
-
-## Design & UX
-
-### Style visuel
-
-- **Ambiance :** Parchemin, Skyrim, médiéval fantaisie
-- **Couleurs :** Sépia, bruns, ors, rouges foncés (#833434)
-- **Typographie :** Médiévale pour les titres, lisible pour le corps
-- **Texture :** Effet parchemin sur le fond de carte
-- **Markers :** Iconographie par type de lieu, couleurs de `place_types`
-
-### Interface
-
-- **Plein écran :** La carte occupe 100% du viewport
-- **Panneau latéral gauche :** Fiche lieu (s'ouvre au clic sur un marker)
-- **Barre de recherche :** En haut, flottante
-- **Filtres :** Panneau déroulant ou drawer
-- **Auth gate :** L'utilisateur peut voir la carte et sa zone proche. Pour explorer plus loin → inscription email
-
-### Mobile first
-
-- Panneau latéral = panneau bas (bottom sheet) sur mobile
-- Recherche = barre fixe en haut
-- Filtres = icône + drawer
-- Carte = plein écran, gestes tactiles natifs (pinch zoom, pan)
+```typescript
+{
+  id, title, text, address, accessibility, sensible, geocaching,
+  images: Array<{ id, url }>,
+  author: { id, lastName, profileImageUrl },
+  type: { id, title },
+  primaryTag: { id, title, color, background } | null,
+  tags: Array<{ id, title, color, background, icon, isPrimary }>,
+  location: { latitude, longitude },
+  metrics: { views, likes, explored, note },
+  claim: {
+    factionId, factionTitle, factionColor,
+    claimedBy, claimedAt, fortificationLevel
+  } | null,
+  requester: { bookmarked, liked, explored } | null,
+  lastExplorers: Array<{ id, lastName, profileImageUrl }>,
+  beginAt, endAt
+}
+```
 
 ---
 
-## Conventions de code
+## Conventions
 
-- **TypeScript strict** — pas de `any`, types explicites
-- **TailwindCSS** — pas de CSS custom sauf nécessité absolue
-- **Composants fonctionnels** — hooks, pas de classes
-- **Imports** — `@/` alias pour `src/`
-- **State serveur** — React Query (pas de state local pour les données distantes)
-- **State client** — Zustand (auth, UI, map viewport)
-- **Commits** — Conventional Commits (`feat:`, `fix:`, `chore:`)
-- **Package manager** — pnpm uniquement
-- **Nommage fichiers** — kebab-case pour les fichiers, PascalCase pour les composants
-- **A11y** — labels, contraste, navigation clavier
-- **Pas d'over-engineering** — code simple, direct, pas d'abstraction prématurée
-
----
-
-## Déploiement
-
-- **Hébergement :** Netlify
-- **Domaine :** `carte.runesdechene.com`
-- **Build :** `pnpm build` (tsc + vite build)
-- **Previews :** Netlify deploy previews sur chaque PR
-- **Variables d'environnement :** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- **CSS** — tout dans App.css (pas de Tailwind, pas de CSS modules)
+- **State serveur** — appels Supabase directs (pas de React Query)
+- **State client** — Zustand avec `getState()` pour les fonctions standalone
+- **Composants** — fonctionnels, hooks, pas de classes
+- **Nommage** — PascalCase composants, camelCase hooks/stores
