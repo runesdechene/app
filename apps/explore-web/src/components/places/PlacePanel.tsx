@@ -353,7 +353,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {place.author && (
           <p className="place-panel-author">
-            Par {place.author.lastName}
+            Lieu ajout&eacute; par {place.author.lastName}
           </p>
         )}
 
