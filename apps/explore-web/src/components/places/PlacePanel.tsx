@@ -351,20 +351,30 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
       <div className="place-panel-body">
         <h1 className="place-panel-title">{place.title}</h1>
 
-        {place.author && (
-          <p className="place-panel-author">
-            {place.author.profileImageUrl ? (
-              <img src={place.author.profileImageUrl} alt="" className="place-panel-author-avatar" />
-            ) : (
-              <span className="place-panel-author-avatar place-panel-author-avatar-fallback">
-                {place.author.lastName?.charAt(0)?.toUpperCase() || '?'}
-              </span>
-            )}
-            <strong>{place.author.lastName}</strong> a ajout&eacute; ce lieu{place.createdAt && (
-              <> le {new Date(place.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</>
-            )}
-          </p>
-        )}
+        {place.author && (() => {
+          const name = place.author.lastName || 'Inconnu'
+          const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
+          return (
+            <p className="place-panel-author">
+              <button
+                className="place-panel-author-link"
+                onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
+              >
+                {place.author.profileImageUrl ? (
+                  <img src={place.author.profileImageUrl} alt="" className="place-panel-author-avatar" />
+                ) : (
+                  <span className="place-panel-author-avatar place-panel-author-avatar-fallback">
+                    {capitalizedName.charAt(0)}
+                  </span>
+                )}
+                <strong>{capitalizedName}</strong>
+              </button>
+              {' '}a ajout&eacute; ce lieu{place.createdAt && (
+                <> le {new Date(place.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</>
+              )}
+            </p>
+          )
+        })()}
 
         {/* Claim badge */}
         {place.claim && (
