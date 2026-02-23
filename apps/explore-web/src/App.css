@@ -370,6 +370,13 @@
   color: var(--color-water);
 }
 
+.auth-modal-code {
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 8px;
+  font-weight: 700;
+}
+
 .auth-modal-submit {
   width: 100%;
   padding: 10px 16px;
@@ -428,6 +435,26 @@
 .auth-modal-retry:hover {
   color: var(--color-ink);
   border-color: var(--color-ink-light);
+}
+
+.auth-modal-link {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 8px;
+}
+
+.auth-modal-link:hover {
+  color: var(--color-ink);
+}
+
+.auth-modal-link:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* ==========================================

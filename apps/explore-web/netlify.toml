@@ -1,0 +1,12 @@
+[build]
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors https://runesdechene.com https://*.runesdechene.com https://*.myshopify.com"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
