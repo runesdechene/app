@@ -553,15 +553,14 @@ function ClaimButton({
       if (data.conquestPoints !== undefined) useFogStore.getState().setConquestPoints(data.conquestPoints)
       if (data.constructionPoints !== undefined) useFogStore.getState().setConstructionPoints(data.constructionPoints)
 
-      const rewards = data.rewards as { energy?: number; conquest?: number; construction?: number } | undefined
-      const parts: string[] = []
-      if (rewards?.conquest) parts.push(`+${rewards.conquest} \u2694`)
-      if (rewards?.construction) parts.push(`+${rewards.construction} \u2692`)
-      if (rewards?.energy) parts.push(`+${rewards.energy} \u26A1`)
+      // Notoriete
+      if (data.notorietyPoints !== undefined) {
+        useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
+      }
 
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Lieu revendiqué pour ${userFaction.factionTitle} !${parts.length ? ' ' + parts.join(' ') : ''}`,
+        message: `Lieu revendiqué pour ${userFaction.factionTitle} ! +10 Notoriété`,
         timestamp: Date.now(),
       })
     }
@@ -654,10 +653,13 @@ function FortifyButton({
       if (data.constructionNextPointIn !== undefined) {
         useFogStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
       }
+      if (data.notorietyPoints !== undefined) {
+        useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
+      }
 
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Lieu fortifié : ${data.fortificationName} !`,
+        message: `Lieu fortifié : ${data.fortificationName} ! +5 Notoriété`,
         timestamp: Date.now(),
       })
 

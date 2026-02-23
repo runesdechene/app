@@ -9,6 +9,7 @@ interface PlayerProfile {
   factionColor: string | null
   factionPattern: string | null
   profileImage: string | null
+  notorietyPoints: number
   discoveredCount: number
   claimedCount: number
   likesCount: number
@@ -91,6 +92,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
             {/* Stats */}
             <div className="player-modal-stats">
+              <div className="player-modal-stat">
+                <span className="player-modal-stat-value">{profile.notorietyPoints}</span>
+                <span className="player-modal-stat-label">Notoriété</span>
+              </div>
               <div className="player-modal-stat">
                 <span className="player-modal-stat-value">{profile.discoveredCount}</span>
                 <span className="player-modal-stat-label">Lieux découverts</span>

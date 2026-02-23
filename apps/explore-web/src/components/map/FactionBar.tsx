@@ -2,64 +2,49 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 
-interface FactionStat {
+interface FactionNotoriety {
   factionId: string
   title: string
   color: string
   pattern: string
-  claimedCount: number
+  notoriety: number
   percent: number
 }
 
 export function FactionBar() {
-  const [stats, setStats] = useState<FactionStat[]>([])
+  const [stats, setStats] = useState<FactionNotoriety[]>([])
   const placeOverrides = useMapStore(s => s.placeOverrides)
 
   useEffect(() => {
-    async function fetchStats() {
-      const { data: places } = await supabase
-        .from('places')
-        .select('faction_id')
-        .not('faction_id', 'is', null)
+    async function fetchNotoriety() {
+      const { data } = await supabase.rpc('get_faction_notoriety')
+      if (!data || !Array.isArray(data)) return
 
-      if (!places) return
+      const totalNotoriety = (data as Array<{ notoriety: number }>)
+        .reduce((sum, f) => sum + f.notoriety, 0)
 
-      const counts = new Map<string, number>()
-      let claimedTotal = 0
-      for (const row of places) {
-        const fid = (row as { faction_id: string }).faction_id
-        counts.set(fid, (counts.get(fid) ?? 0) + 1)
-        claimedTotal++
-      }
-
-      if (claimedTotal === 0) return
-
-      const { data: factions } = await supabase
-        .from('factions')
-        .select('id, title, color, pattern')
-        .order('order')
-
-      if (!factions) return
-
-      const result: FactionStat[] = factions
-        .map(f => {
-          const claimed = counts.get(f.id) ?? 0
-          return {
-            factionId: f.id,
-            title: f.title,
-            color: f.color,
-            pattern: f.pattern ?? '',
-            claimedCount: claimed,
-            percent: claimedTotal > 0 ? (claimed / claimedTotal) * 100 : 0,
-          }
-        })
-        .filter(f => f.claimedCount > 0)
-        .sort((a, b) => b.claimedCount - a.claimedCount)
+      const result: FactionNotoriety[] = (data as Array<{
+        factionId: string
+        title: string
+        color: string
+        pattern: string
+        notoriety: number
+      }>)
+        .map(f => ({
+          factionId: f.factionId,
+          title: f.title,
+          color: f.color,
+          pattern: f.pattern ?? '',
+          notoriety: f.notoriety,
+          percent: totalNotoriety > 0 ? (f.notoriety / totalNotoriety) * 100 : 0,
+        }))
+        .filter(f => f.notoriety > 0)
+        .sort((a, b) => b.notoriety - a.notoriety)
 
       setStats(result)
     }
 
-    fetchStats()
+    fetchNotoriety()
   }, [placeOverrides])
 
   if (stats.length === 0) return null
@@ -70,7 +55,6 @@ export function FactionBar() {
     <div className="faction-scoreboard">
       {stats.map(faction => {
         const isLeader = faction.factionId === leaderId
-        const pct = Math.round(faction.percent)
         return (
           <div
             key={faction.factionId}
@@ -85,8 +69,8 @@ export function FactionBar() {
                 )}
               </span>
               <span className="faction-scoreboard-name">{faction.title}</span>
-              {isLeader && <span className="faction-scoreboard-crown">👑</span>}
-              <span className="faction-scoreboard-pct">{pct}%</span>
+              {isLeader && <span className="faction-scoreboard-crown">{'\uD83D\uDC51'}</span>}
+              <span className="faction-scoreboard-pct">{faction.notoriety}</span>
             </div>
           </div>
         )

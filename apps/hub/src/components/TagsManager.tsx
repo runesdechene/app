@@ -8,6 +8,9 @@ interface Tag {
   background: string
   icon: string | null
   order: number
+  reward_energy: number
+  reward_conquest: number
+  reward_construction: number
 }
 
 export function TagsManager() {
@@ -26,7 +29,7 @@ export function TagsManager() {
   async function fetchTags() {
     const { data, error } = await supabase
       .from('tags')
-      .select('id, title, color, background, icon, order')
+      .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction')
       .order('order')
 
     if (!error && data) {
@@ -49,6 +52,28 @@ export function TagsManager() {
   }
 
   async function saveColor(tagId: string, field: 'color' | 'background', value: string) {
+    setSaving(tagId)
+    await supabase
+      .from('tags')
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq('id', tagId)
+    setSaving(null)
+  }
+
+  // --- Récompenses ---
+
+  const rewardDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleRewardChange(tagId: string, field: 'reward_energy' | 'reward_conquest' | 'reward_construction', value: number) {
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, [field]: value } : t))
+
+    if (rewardDebounceRef.current) clearTimeout(rewardDebounceRef.current)
+    rewardDebounceRef.current = setTimeout(() => {
+      saveReward(tagId, field, value)
+    }, 400)
+  }
+
+  async function saveReward(tagId: string, field: string, value: number) {
     setSaving(tagId)
     await supabase
       .from('tags')
@@ -245,6 +270,46 @@ export function TagsManager() {
                   {uploading === tag.id ? 'Upload...' : '+ icône SVG'}
                 </button>
               )}
+            </div>
+
+            {/* Récompenses découverte */}
+            <div className="tag-card-rewards-section">
+              <span className="tag-rewards-title">Récompenses</span>
+              <div className="tag-rewards-row">
+                <label className="tag-reward-field">
+                  <span className="tag-reward-icon">{'\u26A1'}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={tag.reward_energy}
+                    onChange={e => handleRewardChange(tag.id, 'reward_energy', Number(e.target.value))}
+                    className="tag-reward-input"
+                  />
+                </label>
+                <label className="tag-reward-field">
+                  <span className="tag-reward-icon">{'\u2694'}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={tag.reward_conquest}
+                    onChange={e => handleRewardChange(tag.id, 'reward_conquest', Number(e.target.value))}
+                    className="tag-reward-input"
+                  />
+                </label>
+                <label className="tag-reward-field">
+                  <span className="tag-reward-icon">{'\u2692'}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={tag.reward_construction}
+                    onChange={e => handleRewardChange(tag.id, 'reward_construction', Number(e.target.value))}
+                    className="tag-reward-input"
+                  />
+                </label>
+              </div>
             </div>
           </div>
         ))}

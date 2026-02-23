@@ -47,6 +47,7 @@ export function useFog() {
   const setConquestNextPointIn = useFogStore(s => s.setConquestNextPointIn)
   const setConstructionPoints = useFogStore(s => s.setConstructionPoints)
   const setConstructionNextPointIn = useFogStore(s => s.setConstructionNextPointIn)
+  const setNotorietyPoints = useFogStore(s => s.setNotorietyPoints)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
@@ -56,6 +57,7 @@ export function useFog() {
       setConquestNextPointIn(0)
       setConstructionPoints(0)
       setConstructionNextPointIn(0)
+      setNotorietyPoints(0)
       setUserFactionId(null)
       setUserFactionColor(null)
       setUserFactionPattern(null)
@@ -121,6 +123,7 @@ export function useFog() {
           conquestNextPointIn: number
           constructionPoints: number
           constructionNextPointIn: number
+          notorietyPoints: number
         }
         setEnergy(ed.energy)
         setNextPointIn(ed.nextPointIn ?? 0)
@@ -128,6 +131,7 @@ export function useFog() {
         setConquestNextPointIn(ed.conquestNextPointIn ?? 0)
         setConstructionPoints(ed.constructionPoints ?? 0)
         setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
+        setNotorietyPoints(ed.notorietyPoints ?? 0)
       }
       if (profileRes.data) {
         const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }

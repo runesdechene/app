@@ -43,6 +43,10 @@ interface FogState {
   setConstructionPoints: (pts: number) => void
   setConstructionNextPointIn: (seconds: number) => void
 
+  /** Notoriété personnelle */
+  notorietyPoints: number
+  setNotorietyPoints: (pts: number) => void
+
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
   setUserPosition: (pos: { lng: number; lat: number } | null) => void
@@ -103,6 +107,9 @@ export const useFogStore = create<FogState>((set) => ({
   constructionNextPointIn: 0,
   setConstructionPoints: (pts) => set({ constructionPoints: pts }),
   setConstructionNextPointIn: (seconds) => set({ constructionNextPointIn: seconds }),
+
+  notorietyPoints: 0,
+  setNotorietyPoints: (pts) => set({ notorietyPoints: pts }),
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),

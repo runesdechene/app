@@ -1519,6 +1519,54 @@ table select {
   cursor: not-allowed;
 }
 
+/* Tag Rewards */
+.tag-card-rewards-section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+}
+
+.tag-rewards-title {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tag-rewards-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tag-reward-field {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tag-reward-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.tag-reward-input {
+  width: 48px;
+  padding: 0.3rem 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-family: monospace;
+  text-align: center;
+}
+
+.tag-reward-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
 /* ============================================
    FACTIONS
    ============================================ */
