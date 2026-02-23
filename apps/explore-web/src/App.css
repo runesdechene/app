@@ -816,6 +816,17 @@
   object-fit: cover;
   flex-shrink: 0;
 }
+.place-panel-author-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-parchment-dark);
+  color: var(--color-ink-light);
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
 
 .place-panel-stats {
   display: flex;
