@@ -108,6 +108,14 @@ export function LoginPage() {
             {loading ? 'Envoi...' : 'Recevoir un code'}
           </button>
         </form>
+
+        <button
+          onClick={() => { if (email) { setStep('code'); setError(null) } }}
+          disabled={!email}
+          style={{ marginTop: '0.5rem', background: 'transparent', color: 'var(--color-muted)', textDecoration: 'underline', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}
+        >
+          J'ai déjà un code
+        </button>
       </div>
     </div>
   )
