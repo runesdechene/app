@@ -360,7 +360,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
                 {place.author.lastName?.charAt(0)?.toUpperCase() || '?'}
               </span>
             )}
-            Lieu ajout&eacute; par <strong>{place.author.lastName}</strong>
+            <strong>{place.author.lastName}</strong> a ajout&eacute; ce lieu{place.createdAt && (
+              <> le {new Date(place.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</>
+            )}
           </p>
         )}
 

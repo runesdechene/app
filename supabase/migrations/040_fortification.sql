@@ -434,7 +434,8 @@ BEGIN
     'requester', v_requester,
     'lastExplorers', COALESCE(v_last_explorers, '[]'::json),
     'beginAt', v_place.begin_at,
-    'endAt', v_place.end_at
+    'endAt', v_place.end_at,
+    'createdAt', v_place.created_at
   );
 END;
 $$;

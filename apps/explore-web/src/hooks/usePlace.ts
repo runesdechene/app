@@ -58,6 +58,7 @@ export interface PlaceDetail {
   }>
   beginAt: string | null
   endAt: string | null
+  createdAt: string | null
 }
 
 export function usePlace(placeId: string | null) {
