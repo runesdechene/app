@@ -57,11 +57,14 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: Plac
   const discoveredIds = useFogStore(s => s.discoveredIds)
   const userFactionId = useFogStore(s => s.userFactionId)
 
-  // Déterminer si le lieu est découvert
-  const isDiscovered = isAuthenticated && (
-    discoveredIds.has(place.id) ||
-    (userFactionId !== null && place.claim?.factionId === userFactionId)
-  )
+  // Déterminer si le lieu est découvert personnellement
+  const isDiscovered = isAuthenticated && discoveredIds.has(place.id)
+
+  // Lieu de sa propre faction (visible mais pas encore découvert)
+  const isOwnFaction = isAuthenticated
+    && userFactionId !== null
+    && place.claim?.factionId === userFactionId
+    && !isDiscovered
 
   // Lieu non découvert → vue brouillard
   if (!isDiscovered) {
@@ -70,6 +73,7 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: Plac
         place={place}
         onClose={onClose}
         isAuthenticated={isAuthenticated}
+        isOwnFaction={isOwnFaction}
         onDiscover={async () => {
           await discoverPlace(place.id, place.location.latitude, place.location.longitude)
         }}
@@ -87,12 +91,14 @@ function FoggedPlaceView({
   place,
   onClose,
   isAuthenticated,
+  isOwnFaction,
   onDiscover,
   onAuthPrompt,
 }: {
   place: PlaceDetail
   onClose: () => void
   isAuthenticated: boolean
+  isOwnFaction: boolean
   onDiscover: () => Promise<void>
   onAuthPrompt?: () => void
 }) {
@@ -110,7 +116,7 @@ function FoggedPlaceView({
     isNearby = dist <= 500
   }
 
-  const cost = isNearby ? 0 : 1
+  const cost = isNearby ? 0 : (isOwnFaction ? 0.5 : 1)
   const canAfford = cost === 0 || energy >= cost
 
   const images = place.images || []
@@ -139,8 +145,25 @@ function FoggedPlaceView({
       <div className="place-panel-body">
         <h1 className="place-panel-title place-panel-title-blur">{place.title}</h1>
 
+        {/* Badge faction alliée */}
+        {isOwnFaction && place.claim && (
+          <div
+            className="place-claim-badge"
+            style={{ borderColor: place.claim.factionColor }}
+          >
+            <span
+              className="place-claim-dot"
+              style={{ backgroundColor: place.claim.factionColor }}
+            />
+            Territoire allié — {place.claim.factionTitle}
+          </div>
+        )}
+
         <p className="fog-mystery-text">
-          Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.
+          {isOwnFaction
+            ? 'Ce lieu appartient à votre faction. Découvrez-le à moindre coût.'
+            : 'Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.'
+          }
         </p>
 
         {isAuthenticated ? (
@@ -158,7 +181,9 @@ function FoggedPlaceView({
                 ? 'Exploration...'
                 : isNearby
                   ? 'Explorer (gratuit — vous êtes à proximité)'
-                  : `Explorer (1 point d'énergie)`
+                  : isOwnFaction
+                    ? 'Explorer (0.5 point d\'énergie — territoire allié)'
+                    : `Explorer (1 point d'énergie)`
               }
             </button>
 

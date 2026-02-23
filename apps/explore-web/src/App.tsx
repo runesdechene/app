@@ -33,6 +33,16 @@ function App() {
   // Chat en jeu
   useChat()
 
+  // Auto-open auth modal si non connecté (une seule fois par session)
+  const authPromptDone = useRef(false)
+  useEffect(() => {
+    if (authLoading) return
+    if (!isAuthenticated && !authPromptDone.current) {
+      authPromptDone.current = true
+      setShowAuthModal(true)
+    }
+  }, [authLoading, isAuthenticated])
+
   // Auto-open faction modal si connecté sans faction (une seule fois par session)
   // userId !== null garantit que le fog a VRAIMENT chargé les données du user
   const factionPromptDone = useRef(false)
@@ -65,12 +75,8 @@ function App() {
             <button
               className="toolbar-btn auth-btn"
               onClick={() => setShowAuthModal(true)}
-              aria-label="Se connecter"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+              ⚔️ Se connecter
             </button>
           )
         )}

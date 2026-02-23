@@ -98,6 +98,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
             >
               J'ai déjà un code
             </button>
+
+            <button
+              className="auth-modal-skip"
+              onClick={onClose}
+              type="button"
+            >
+              Voir la carte sans me connecter
+            </button>
           </>
         ) : (
           <div className="auth-modal-sent">

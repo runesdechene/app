@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useMapStore } from '../../stores/mapStore'
 
 interface FactionStat {
   factionId: string
@@ -12,6 +13,7 @@ interface FactionStat {
 
 export function FactionBar() {
   const [stats, setStats] = useState<FactionStat[]>([])
+  const placeOverrides = useMapStore(s => s.placeOverrides)
 
   useEffect(() => {
     async function fetchStats() {
@@ -58,7 +60,7 @@ export function FactionBar() {
     }
 
     fetchStats()
-  }, [])
+  }, [placeOverrides])
 
   if (stats.length === 0) return null
 

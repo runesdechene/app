@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useFogStore } from '../stores/fogStore'
 import { useToastStore } from '../stores/toastStore'
+import type { GameToast } from '../stores/toastStore'
 import { useAuth } from './useAuth'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const GPS_PROXIMITY_M = 500
 
@@ -27,6 +29,7 @@ function haversineM(
  */
 export function useFog() {
   const { user, isAuthenticated } = useAuth()
+  const activityChannelRef = useRef<RealtimeChannel | null>(null)
 
   const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
   const setUserFactionId = useFogStore(s => s.setUserFactionId)
@@ -122,10 +125,67 @@ export function useFog() {
 
       // Charger l'activite recente et afficher en toasts
       loadRecentActivity(userData.id)
+
+      // Souscrire aux events temps réel (découvertes, claims, nouveaux joueurs)
+      if (!cancelled) {
+        subscribeToActivity(userData.id)
+      }
+    }
+
+    function subscribeToActivity(currentUserId: string) {
+      const addToast = useToastStore.getState().addToast
+      const ch = supabase.channel('activity-realtime')
+
+      ch.on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'activity_log' },
+        (payload) => {
+          const e = payload.new as {
+            type: string
+            actor_id: string
+            data: { placeTitle?: string; factionTitle?: string; actorName?: string }
+          }
+
+          // Ignorer ses propres actions (déjà notifié localement)
+          if (e.actor_id === currentUserId) return
+
+          const name = e.data?.actorName ?? 'Quelqu\'un'
+          const place = e.data?.placeTitle ?? 'un lieu'
+          let message = ''
+          let type: GameToast['type'] = 'discover'
+
+          if (e.type === 'claim') {
+            const faction = e.data?.factionTitle ?? 'une faction'
+            message = `${name} a revendiqué ${place} pour ${faction}`
+            type = 'claim'
+          } else if (e.type === 'discover') {
+            message = `${name} a découvert ${place}`
+            type = 'discover'
+          } else if (e.type === 'new_user') {
+            message = `${name} a rejoint la carte`
+            type = 'new_user'
+          } else {
+            return
+          }
+
+          addToast({ type, message, timestamp: Date.now() })
+        },
+      )
+
+      ch.subscribe((status) => {
+        console.log('[Activity] realtime status:', status)
+      })
+      activityChannelRef.current = ch
     }
 
     init()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      if (activityChannelRef.current) {
+        supabase.removeChannel(activityChannelRef.current)
+        activityChannelRef.current = null
+      }
+    }
   }, [isAuthenticated, user?.email])
 }
 

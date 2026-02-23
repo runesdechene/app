@@ -138,6 +138,7 @@ function buildTerritoryBorderLayer(): LayerSpecification {
 const UNKNOWN_ICON_ID = '__unknown-place'
 
 // Fallback cercles flous si pas d'icône unknown configurée (caché quand icône dispo)
+// S'applique à TOUS les lieux non découverts (y compris faction alliée)
 const undiscoveredCircleLayer: LayerSpecification = {
   id: 'places-undiscovered-circle',
   type: 'circle',
@@ -158,6 +159,7 @@ const undiscoveredCircleLayer: LayerSpecification = {
 }
 
 // Icône custom pour les lieux non découverts (visible quand icône chargée)
+// S'applique à TOUS les lieux non découverts (y compris faction alliée)
 const undiscoveredIconLayer: LayerSpecification = {
   id: 'places-undiscovered-icon',
   type: 'symbol',
@@ -440,13 +442,13 @@ export const ExploreMap = memo(function ExploreMap() {
 
   useEffect(() => {
     if (!geojson || !workerRef.current) return
-    // Seuls les lieux revendiqués (claimed) ET découverts ont une zone d'influence
+    // Lieux revendiqués ET (découverts OU faction alliée) → zone d'influence
     workerRef.current.postMessage({
       features: geojson.features
         .filter(f => {
           const ov = placeOverrides.get(f.properties.id)
           const isClaimed = f.properties.claimed || ov?.claimed
-          return isClaimed && f.properties.discovered
+          return isClaimed && (f.properties.discovered || f.properties.ownFaction)
         })
         .map(f => {
           const ov = placeOverrides.get(f.properties.id)

@@ -46,6 +46,7 @@ export interface PlaceProperties {
   likes: number
   score: number
   discovered: boolean
+  ownFaction: boolean
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -111,6 +112,7 @@ export function usePlaces() {
               likes: place.likes ?? 0,
               score: place.score ?? 0,
               discovered: false, // sera enrichi par le useMemo
+              ownFaction: false, // sera enrichi par le useMemo
             },
           })),
       }
@@ -122,22 +124,28 @@ export function usePlaces() {
     fetchPlaces()
   }, [])
 
-  // Enrichir le GeoJSON avec l'état discovered (re-calcule quand fog change)
+  // Enrichir le GeoJSON avec l'état discovered + ownFaction (re-calcule quand fog change)
   const geojson = useMemo(() => {
     if (!rawGeojson) return null
 
     return {
       ...rawGeojson,
-      features: rawGeojson.features.map(f => ({
-        ...f,
-        properties: {
-          ...f.properties,
-          discovered: isAuthenticated
-            ? discoveredIds.has(f.properties.id) ||
-              (userFactionId !== null && f.properties.factionId === userFactionId)
-            : false,
-        },
-      })),
+      features: rawGeojson.features.map(f => {
+        const personallyDiscovered = isAuthenticated && discoveredIds.has(f.properties.id)
+        const isOwnFaction = isAuthenticated
+          && userFactionId !== null
+          && f.properties.factionId === userFactionId
+          && !personallyDiscovered
+
+        return {
+          ...f,
+          properties: {
+            ...f.properties,
+            discovered: personallyDiscovered,
+            ownFaction: isOwnFaction,
+          },
+        }
+      }),
     }
   }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated])
 
