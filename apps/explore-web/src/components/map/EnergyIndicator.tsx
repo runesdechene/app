@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
 
@@ -11,8 +11,6 @@ export function EnergyIndicator() {
   const setEnergy = useFogStore(s => s.setEnergy)
   const nextPointIn = useFogStore(s => s.nextPointIn)
   const setNextPointIn = useFogStore(s => s.setNextPointIn)
-  const isAdmin = useFogStore(s => s.isAdmin)
-  const [resetting, setResetting] = useState(false)
 
   const isFull = energy >= maxEnergy
 
@@ -60,20 +58,6 @@ export function EnergyIndicator() {
     }
   }
 
-  async function handleReset() {
-    if (!userId || resetting || isFull) return
-    setResetting(true)
-
-    const { data } = await supabase.rpc('reset_user_energy', { p_user_id: userId })
-
-    if (data?.energy !== undefined) {
-      setEnergy(data.energy)
-    } else {
-      setEnergy(maxEnergy)
-    }
-    setResetting(false)
-  }
-
   function formatEnergy(n: number): string {
     if (n >= maxEnergy) return String(maxEnergy)
     const rounded = Math.floor(n * 10) / 10
@@ -90,16 +74,6 @@ export function EnergyIndicator() {
         <div className="energy-bar">
           <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
         </div>
-        {!isFull && isAdmin && (
-          <button
-            className="energy-reset-btn"
-            onClick={handleReset}
-            disabled={resetting}
-            title="Recharger l'énergie (admin)"
-          >
-            {resetting ? '...' : '⚡'}
-          </button>
-        )}
       </div>
 
       <div className="energy-sub">

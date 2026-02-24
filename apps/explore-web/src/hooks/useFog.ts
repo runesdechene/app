@@ -67,6 +67,7 @@ export function useFog() {
       setUserName(null)
       setUserAvatarUrl(null)
       setIsAdmin(false)
+      useFogStore.setState({ maxEnergy: 5, maxConquest: 5, maxConstruction: 5 })
       setLoading(false)
       return
     }
@@ -139,7 +140,11 @@ export function useFog() {
       if (profileRes.data) {
         const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
-        setIsAdmin(profile.role === 'admin')
+        const admin = profile.role === 'admin'
+        setIsAdmin(admin)
+        if (admin) {
+          useFogStore.setState({ maxEnergy: 10, maxConquest: 10, maxConstruction: 10 })
+        }
       }
 
       setLoading(false)
