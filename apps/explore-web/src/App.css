@@ -680,11 +680,21 @@
   margin: 0;
 }
 
+.faction-card-desc a {
+  font-weight: 700;
+  color: var(--faction-color);
+  text-decoration: underline;
+  filter: grayscale(50%);
+}
+
+
 .faction-card-members {
-  font-size: 11px;
+  font-size: 16px;
   color: var(--color-ink-light);
   opacity: 0.7;
-  margin-top: 4px;
+  margin-bottom: 4px;
+  font-family: var(--font-title);
+  text-align: center;
 }
 
 .faction-card-badge {
