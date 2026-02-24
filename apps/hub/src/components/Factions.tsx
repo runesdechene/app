@@ -222,6 +222,7 @@ export function Factions() {
 
     if (uploadError) {
       console.error('Image upload error:', uploadError)
+      alert(`Erreur upload: ${uploadError.message}`)
       setUploading(null)
       return
     }
@@ -237,7 +238,10 @@ export function Factions() {
       .update({ image_url: imageUrl, updated_at: new Date().toISOString() })
       .eq('id', factionId)
 
-    if (!updateError) {
+    if (updateError) {
+      console.error('DB update error:', updateError)
+      alert(`Erreur DB: ${updateError.message}`)
+    } else {
       setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: imageUrl } : f))
     }
 
