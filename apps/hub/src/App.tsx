@@ -14,18 +14,21 @@ import { Settings } from './components/Settings'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
-function AccessDenied({ onSignOut }: { onSignOut: () => void }) {
+function AccessDenied({ onSignOut, email, role }: { onSignOut: () => void; email?: string; role?: string | null }) {
   return (
     <div className="access-denied">
       <h1>Accès refusé</h1>
       <p>Cette zone est réservée aux administrateurs de Runes de Chêne.</p>
+      <p style={{ fontSize: '12px', opacity: 0.5, marginTop: '16px' }}>
+        Email : {email ?? '?'} — Rôle : {role ?? 'null'}
+      </p>
       <button onClick={onSignOut}>Se déconnecter</button>
     </div>
   )
 }
 
 function App() {
-  const { user, loading, isAuthenticated, isAdmin, signOut } = useAuth()
+  const { user, role, loading, isAuthenticated, isAdmin, signOut } = useAuth()
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
@@ -55,7 +58,7 @@ function App() {
   }
 
   if (!isAdmin) {
-    return <AccessDenied onSignOut={signOut} />
+    return <AccessDenied onSignOut={signOut} email={user?.email} role={role} />
   }
 
   return (
