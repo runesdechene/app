@@ -354,6 +354,18 @@ export const ExploreMap = memo(function ExploreMap() {
     'places-point', 'places-icon', 'territories-fill',
   ], [])
 
+  // Lieux fortifiés → Markers ⭐ par-dessus l'icône du lieu
+  const fortifiedPlaces = useMemo(() => {
+    if (!geojson) return []
+    return geojson.features
+      .filter(f => (f.properties.fortificationLevel ?? 0) > 0)
+      .map(f => ({
+        id: f.properties.id as string,
+        lon: (f.geometry.coordinates as [number, number])[0],
+        lat: (f.geometry.coordinates as [number, number])[1],
+      }))
+  }, [geojson])
+
   // Charger le style parchemin
   useEffect(() => {
     loadParchmentStyle().then(setMapStyle)
@@ -725,6 +737,13 @@ export const ExploreMap = memo(function ExploreMap() {
             </div>
           </Marker>
         ) : null
+      ))}
+
+      {/* ⭐ sur les lieux fortifiés */}
+      {fortifiedPlaces.map(p => (
+        <Marker key={`fort-${p.id}`} longitude={p.lon} latitude={p.lat} anchor="center">
+          <span className="place-fortified-star">{'🛡️'}</span>
+        </Marker>
       ))}
 
       {/* Labels texte au survol (point le plus au nord) */}
