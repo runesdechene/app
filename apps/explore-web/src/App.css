@@ -549,8 +549,8 @@
 
 .faction-modal {
   position: relative;
-  width: 700px;
-  max-width: 95vw;
+  width: 95vw;
+  max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
   background: var(--color-parchment);
@@ -584,14 +584,33 @@
 }
 
 .faction-modal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
   gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 0 4px;
+  padding-bottom: 8px;
+}
+
+/* Masquer scrollbar tout en gardant le scroll */
+.faction-modal-grid::-webkit-scrollbar {
+  height: 4px;
+}
+.faction-modal-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+.faction-modal-grid::-webkit-scrollbar-thumb {
+  background: var(--color-parchment-dark, #E0D0BA);
+  border-radius: 2px;
 }
 
 .faction-card {
   display: flex;
   flex-direction: column;
+  flex: 0 0 calc(25% - 9px);
+  min-width: 0;
+  scroll-snap-align: start;
   background: transparent;
   border: 2px solid var(--color-parchment-dark, #E0D0BA);
   border-radius: 10px;
@@ -696,9 +715,12 @@
   cursor: wait;
 }
 
-@media (max-width: 400px) {
-  .faction-modal-grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 600px) {
+  .faction-modal {
+    padding: 24px 16px;
+  }
+  .faction-card {
+    flex: 0 0 85%;
   }
 }
 
