@@ -7,6 +7,8 @@ interface FactionData {
   title: string
   color: string
   pattern: string | null
+  description: string | null
+  image_url: string | null
 }
 
 interface FactionModalProps {
@@ -27,7 +29,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   useEffect(() => {
     supabase
       .from('factions')
-      .select('id, title, color, pattern')
+      .select('id, title, color, pattern, description, image_url')
       .order('order')
       .then(({ data }) => {
         if (data) setFactions(data as FactionData[])
@@ -92,25 +94,34 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         {loading ? (
           <p className="faction-modal-loading">Chargement...</p>
         ) : (
-          <div className="faction-modal-list">
-            {factions.map(f => (
-              <button
-                key={f.id}
-                className={`faction-modal-card ${currentFactionId === f.id ? 'active' : ''}`}
-                style={{ '--faction-color': f.color } as React.CSSProperties}
-                onClick={() => selectFaction(f.id)}
-                disabled={selecting}
-              >
-                <span
-                  className="faction-modal-dot"
-                  style={{ backgroundColor: f.color }}
-                />
-                <span className="faction-modal-card-title">{f.title}</span>
-                {currentFactionId === f.id && (
-                  <span className="faction-modal-card-badge">Actuelle</span>
-                )}
-              </button>
-            ))}
+          <div className="faction-modal-grid">
+            {factions.map(f => {
+              const isActive = currentFactionId === f.id
+              return (
+                <button
+                  key={f.id}
+                  className={`faction-card${isActive ? ' active' : ''}`}
+                  style={{ '--faction-color': f.color } as React.CSSProperties}
+                  onClick={() => selectFaction(f.id)}
+                  disabled={selecting}
+                >
+                  {f.image_url ? (
+                    <img src={f.image_url} alt={f.title} className="faction-card-img" />
+                  ) : (
+                    <div className="faction-card-placeholder" style={{ backgroundColor: f.color }} />
+                  )}
+                  <div className="faction-card-body">
+                    <span className="faction-card-name">{f.title}</span>
+                    {f.description && (
+                      <p className="faction-card-desc">{f.description}</p>
+                    )}
+                    {isActive && (
+                      <span className="faction-card-badge">Actuelle</span>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         )}
 

@@ -6,6 +6,8 @@ interface Faction {
   title: string
   color: string
   pattern: string | null
+  description: string | null
+  image_url: string | null
   order: number
 }
 
@@ -17,7 +19,9 @@ export function Factions() {
   const [creating, setCreating] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
   const uploadFactionIdRef = useRef<string | null>(null)
+  const imageUploadFactionIdRef = useRef<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -27,7 +31,7 @@ export function Factions() {
   async function fetchFactions() {
     const { data, error } = await supabase
       .from('factions')
-      .select('id, title, color, pattern, order')
+      .select('id, title, color, pattern, description, image_url, order')
       .order('order')
 
     if (!error && data) {
@@ -60,6 +64,8 @@ export function Factions() {
       title,
       color: '#C19A6B',
       pattern: null,
+      description: null,
+      image_url: null,
       order: factions.length,
     }
 
@@ -110,6 +116,15 @@ export function Factions() {
     debounceRef.current = setTimeout(() => {
       saveField(factionId, 'color', value)
     }, 400)
+  }
+
+  function handleDescriptionChange(factionId: string, value: string) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, description: value } : f))
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      saveField(factionId, 'description', value)
+    }, 600)
   }
 
   async function saveField(factionId: string, field: string, value: string) {
@@ -183,6 +198,75 @@ export function Factions() {
     setUploading(null)
   }
 
+  // --- Image faction ---
+
+  function triggerImageUpload(factionId: string) {
+    imageUploadFactionIdRef.current = factionId
+    imageInputRef.current?.click()
+  }
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const factionId = imageUploadFactionIdRef.current
+    if (!file || !factionId) return
+
+    e.target.value = ''
+    setUploading(factionId)
+
+    const ext = file.name.split('.').pop() || 'webp'
+    const path = `${factionId}-image.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('faction-patterns')
+      .upload(path, file, { upsert: true, contentType: file.type })
+
+    if (uploadError) {
+      console.error('Image upload error:', uploadError)
+      setUploading(null)
+      return
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('faction-patterns')
+      .getPublicUrl(path)
+
+    const imageUrl = urlData.publicUrl
+
+    const { error: updateError } = await supabase
+      .from('factions')
+      .update({ image_url: imageUrl, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+
+    if (!updateError) {
+      setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: imageUrl } : f))
+    }
+
+    setUploading(null)
+  }
+
+  async function removeImage(factionId: string) {
+    const faction = factions.find(f => f.id === factionId)
+    if (!faction?.image_url) return
+
+    setUploading(factionId)
+
+    // Extraire le nom de fichier depuis l'URL
+    const urlParts = faction.image_url.split('/')
+    const fileName = urlParts[urlParts.length - 1]
+    await supabase.storage.from('faction-patterns').remove([fileName])
+
+    const { error } = await supabase
+      .from('factions')
+      .update({ image_url: null, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+
+    if (!error) {
+      setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: null } : f))
+    }
+
+    setUploading(null)
+  }
+
   if (loading) {
     return <div className="loading">Chargement...</div>
   }
@@ -214,13 +298,20 @@ export function Factions() {
         </button>
       </div>
 
-      {/* Input fichier cache */}
+      {/* Inputs fichiers caches */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/svg+xml"
         style={{ display: 'none' }}
         onChange={handleFileChange}
+      />
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/webp,image/png,image/jpeg"
+        style={{ display: 'none' }}
+        onChange={handleImageChange}
       />
 
       <div className="tags-grid">
@@ -301,6 +392,52 @@ export function Factions() {
                   disabled={uploading === faction.id}
                 >
                   {uploading === faction.id ? 'Upload...' : '+ pattern SVG'}
+                </button>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="faction-field">
+              <label className="faction-field-label">Description</label>
+              <textarea
+                value={faction.description ?? ''}
+                onChange={e => handleDescriptionChange(faction.id, e.target.value)}
+                placeholder="Description de la faction..."
+                className="faction-description-input"
+                rows={3}
+              />
+            </div>
+
+            {/* Image faction */}
+            <div className="tag-card-icon-section">
+              <label className="faction-field-label">Image</label>
+              {faction.image_url ? (
+                <div className="tag-icon-preview">
+                  <img src={faction.image_url} alt="" className="faction-image-preview" />
+                  <div className="tag-icon-actions">
+                    <button
+                      className="tag-icon-replace"
+                      onClick={() => triggerImageUpload(faction.id)}
+                      disabled={uploading === faction.id}
+                    >
+                      Changer
+                    </button>
+                    <button
+                      className="icon-picker-clear"
+                      onClick={() => removeImage(faction.id)}
+                      disabled={uploading === faction.id}
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="tag-icon-btn"
+                  onClick={() => triggerImageUpload(faction.id)}
+                  disabled={uploading === faction.id}
+                >
+                  {uploading === faction.id ? 'Upload...' : '+ image'}
                 </button>
               )}
             </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import logoImg from '../../assets/logo_couleur.webp'
 
 interface AuthModalProps {
   onClose: () => void
@@ -63,9 +64,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         {step === 'form' ? (
           <>
-            <h2 className="auth-modal-title">Rejoignez l'Aventure</h2>
+            <img src={logoImg} alt="Runes de Chêne" className="auth-modal-logo" />
             <p className="auth-modal-subtitle">
-              Entrez votre email pour explorer la carte du patrimoine
+            Explorez, découvrez, revendiquez + de 2200 lieux magiques ou atypiques de votre région. Rejoignez une Faction inspirée par <a href="https://runesdechene.com/">Nos Collections</a>, et
+            progressez aux côtés de <b>milliers de clients Runes de Chêne</b> qui cartographient leur patrimoine en s'amusant.
+            </p>
+
+             <p className="auth-modal-disclaimer">
+Cette application est en ALPHA. Des bugs peuvent survenir.
             </p>
 
             <form onSubmit={handleSubmit} className="auth-modal-form">
@@ -106,6 +112,8 @@ export function AuthModal({ onClose }: AuthModalProps) {
             >
               Voir la carte sans me connecter
             </button>
+
+            <p className="auth-modal-newsletter">Toute inscription vous abonne de facto à la newsletter de la marque Runes de Chêne.</p>
           </>
         ) : (
           <div className="auth-modal-sent">

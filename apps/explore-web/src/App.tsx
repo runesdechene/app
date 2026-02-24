@@ -96,7 +96,7 @@ function App() {
               className="toolbar-btn auth-btn"
               onClick={() => setShowAuthModal(true)}
             >
-              ⚔️ Se connecter
+              ⚔️ Commencer à jouer
             </button>
           )
         )}

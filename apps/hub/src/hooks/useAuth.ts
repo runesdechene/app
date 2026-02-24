@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
@@ -18,41 +18,45 @@ export function useAuth() {
     role: null,
     loading: true
   })
-
-  async function fetchRole(userId: string): Promise<UserRole | null> {
-    const { data } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', userId)
-      .single()
-    return (data?.role as UserRole) ?? null
-  }
+  const initialised = useRef(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      let role: UserRole | null = null
+    async function fetchRole(userId: string): Promise<UserRole | null> {
       try {
-        role = session?.user ? await fetchRole(session.user.id) : null
-      } catch { /* ignore */ }
-      setState({
-        user: session?.user ?? null,
-        session,
-        role,
-        loading: false
-      })
-    }).catch(() => {
-      setState(prev => ({ ...prev, loading: false }))
-    })
+        const { data, error } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', userId)
+          .single()
+        if (error) {
+          console.error('[useAuth] fetchRole error:', error.message)
+          return null
+        }
+        return (data?.role as UserRole) ?? null
+      } catch (e) {
+        console.error('[useAuth] fetchRole exception:', e)
+        return null
+      }
+    }
+
+    async function init() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const role = session?.user ? await fetchRole(session.user.id) : null
+        setState({ user: session?.user ?? null, session, role, loading: false })
+      } catch {
+        setState(prev => ({ ...prev, loading: false }))
+      }
+      initialised.current = true
+    }
+
+    init()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!initialised.current) return
         const role = session?.user ? await fetchRole(session.user.id) : null
-        setState({
-          user: session?.user ?? null,
-          session,
-          role,
-          loading: false
-        })
+        setState({ user: session?.user ?? null, session, role, loading: false })
       }
     )
 
