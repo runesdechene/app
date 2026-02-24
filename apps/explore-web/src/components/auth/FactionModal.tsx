@@ -18,6 +18,7 @@ interface FactionModalProps {
 
 export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const [factions, setFactions] = useState<FactionData[]>([])
+  const [memberCounts, setMemberCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [selecting, setSelecting] = useState(false)
 
@@ -27,14 +28,27 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
 
   useEffect(() => {
-    supabase
-      .from('factions')
-      .select('id, title, color, pattern, description, image_url')
-      .order('order')
-      .then(({ data }) => {
-        if (data) setFactions(data as FactionData[])
-        setLoading(false)
-      })
+    Promise.all([
+      supabase
+        .from('factions')
+        .select('id, title, color, pattern, description, image_url')
+        .order('order'),
+      supabase
+        .from('users')
+        .select('faction_id')
+        .not('faction_id', 'is', null),
+    ]).then(([factionsRes, usersRes]) => {
+      if (factionsRes.data) setFactions(factionsRes.data as FactionData[])
+      if (usersRes.data) {
+        const counts: Record<string, number> = {}
+        for (const u of usersRes.data) {
+          const fid = u.faction_id as string
+          counts[fid] = (counts[fid] ?? 0) + 1
+        }
+        setMemberCounts(counts)
+      }
+      setLoading(false)
+    })
   }, [])
 
   /** Recharger les discoveredIds après changement de faction (la RPC solidifie côté DB) */
@@ -115,6 +129,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                     {f.description && (
                       <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
                     )}
+                    <span className="faction-card-members">
+                      {memberCounts[f.id] ?? 0} membre{(memberCounts[f.id] ?? 0) !== 1 ? 's' : ''}
+                    </span>
                     {isActive && (
                       <span className="faction-card-badge">Actuelle</span>
                     )}

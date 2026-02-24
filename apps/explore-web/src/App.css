@@ -550,7 +550,7 @@
 .faction-modal {
   position: relative;
   width: 95vw;
-  max-width: 900px;
+  max-width: 1300px;
   max-height: 90vh;
   overflow-y: auto;
   background: var(--color-parchment);
@@ -563,14 +563,13 @@
 
 .faction-modal-title {
   font-family: var(--font-title);
-  font-size: 26px;
+  font-size: 32px;
   color: var(--color-ink);
-  margin: 0 0 8px;
 }
 
 .faction-modal-subtitle {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 18px;
   color: var(--color-ink-light);
   margin: 0 0 24px;
   line-height: 1.4;
@@ -578,7 +577,7 @@
 
 .faction-modal-loading {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--color-ink-light);
   padding: 24px 0;
 }
@@ -591,6 +590,7 @@
   -webkit-overflow-scrolling: touch;
   scroll-padding: 0 4px;
   padding-bottom: 8px;
+  padding-top: 8px;
 }
 
 /* Masquer scrollbar tout en gardant le scroll */
@@ -657,7 +657,7 @@
 }
 
 .faction-card-body {
-  padding: 10px 12px 14px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -665,30 +665,42 @@
 
 .faction-card-name {
   font-family: var(--font-title);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-ink);
+  font-size: 23px;
+  font-weight: 500;
+  color: var(--faction-color);
+  filter: grayscale(50%);
+  text-align: center;
 }
 
 .faction-card-desc {
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 15px;
+  text-align: justify;
+  line-height: 1.2;
   color: var(--color-ink-light);
   margin: 0;
+}
+
+.faction-card-members {
+  font-size: 11px;
+  color: var(--color-ink-light);
+  opacity: 0.7;
+  margin-top: 4px;
 }
 
 .faction-card-badge {
   display: inline-block;
   align-self: flex-start;
-  margin-top: 4px;
-  font-size: 10px;
+  margin: auto;
+  margin-top: 15px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-family: var(--font-accent, "Cabin Condensed", serif);
   color: var(--faction-color, var(--color-sepia));
   background: rgba(193, 154, 107, 0.15);
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 15px;
+  border-radius: 20px;
 }
 
 .faction-modal-leave {
