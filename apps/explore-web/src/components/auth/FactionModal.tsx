@@ -88,7 +88,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
         <h2 className="faction-modal-title">Choisissez votre Faction</h2>
         <p className="faction-modal-subtitle">
-          Rejoignez une faction pour revendiquer des lieux et marquer le territoire.
+          Rejoignez une faction pour revendiquer des lieux et étendre votre influence.
         </p>
 
         {loading ? (
@@ -113,7 +113,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                   <div className="faction-card-body">
                     <span className="faction-card-name">{f.title}</span>
                     {f.description && (
-                      <p className="faction-card-desc">{f.description}</p>
+                      <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description }} />
                     )}
                     {isActive && (
                       <span className="faction-card-badge">Actuelle</span>
