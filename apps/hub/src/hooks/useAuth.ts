@@ -21,12 +21,12 @@ export function useAuth() {
   const initialised = useRef(false)
 
   useEffect(() => {
-    async function fetchRole(userId: string): Promise<UserRole | null> {
+    async function fetchRole(email: string): Promise<UserRole | null> {
       try {
         const { data, error } = await supabase
           .from('users')
           .select('role')
-          .eq('id', userId)
+          .eq('email_address', email)
           .single()
         if (error) {
           console.error('[useAuth] fetchRole error:', error.message)
@@ -42,7 +42,7 @@ export function useAuth() {
     async function init() {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        const role = session?.user ? await fetchRole(session.user.id) : null
+        const role = session?.user?.email ? await fetchRole(session.user.email) : null
         setState({ user: session?.user ?? null, session, role, loading: false })
       } catch {
         setState(prev => ({ ...prev, loading: false }))
@@ -55,7 +55,7 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!initialised.current) return
-        const role = session?.user ? await fetchRole(session.user.id) : null
+        const role = session?.user?.email ? await fetchRole(session.user.email) : null
         setState({ user: session?.user ?? null, session, role, loading: false })
       }
     )
