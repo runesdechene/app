@@ -1705,6 +1705,37 @@ table select {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
+.faction-bonus-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.faction-bonus-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.faction-bonus-input input {
+  width: 100%;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.faction-bonus-input input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .faction-image-preview {
   width: 100%;
   max-height: 120px;

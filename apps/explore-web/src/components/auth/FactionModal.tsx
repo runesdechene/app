@@ -9,6 +9,9 @@ interface FactionData {
   pattern: string | null
   description: string | null
   image_url: string | null
+  bonus_energy: number
+  bonus_conquest: number
+  bonus_construction: number
 }
 
 interface FactionModalProps {
@@ -31,7 +34,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     Promise.all([
       supabase
         .from('factions')
-        .select('id, title, color, pattern, description, image_url')
+        .select('id, title, color, pattern, description, image_url, bonus_energy, bonus_conquest, bonus_construction')
         .order('order'),
       supabase
         .from('users')
@@ -131,6 +134,13 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                     </span>
                     {f.description && (
                       <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
+                    )}
+                    {(f.bonus_energy > 0 || f.bonus_conquest > 0 || f.bonus_construction > 0) && (
+                      <div className="faction-card-bonuses">
+                        {f.bonus_energy > 0 && <span className="faction-bonus-tag">+{f.bonus_energy} Energie</span>}
+                        {f.bonus_conquest > 0 && <span className="faction-bonus-tag">+{f.bonus_conquest} Conquete</span>}
+                        {f.bonus_construction > 0 && <span className="faction-bonus-tag">+{f.bonus_construction} Construction</span>}
+                      </div>
                     )}
                     {isActive && (
                       <span className="faction-card-badge">Actuelle</span>

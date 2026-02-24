@@ -9,6 +9,9 @@ interface Faction {
   description: string | null
   image_url: string | null
   order: number
+  bonus_energy: number
+  bonus_conquest: number
+  bonus_construction: number
 }
 
 export function Factions() {
@@ -31,7 +34,7 @@ export function Factions() {
   async function fetchFactions() {
     const { data, error } = await supabase
       .from('factions')
-      .select('id, title, color, pattern, description, image_url, order')
+      .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction')
       .order('order')
 
     if (!error && data) {
@@ -67,6 +70,9 @@ export function Factions() {
       description: null,
       image_url: null,
       order: factions.length,
+      bonus_energy: 0,
+      bonus_conquest: 0,
+      bonus_construction: 0,
     }
 
     const { error } = await supabase.from('factions').insert(newFaction)
@@ -125,6 +131,24 @@ export function Factions() {
     debounceRef.current = setTimeout(() => {
       saveField(factionId, 'description', value)
     }, 600)
+  }
+
+  function handleBonusChange(factionId: string, field: 'bonus_energy' | 'bonus_conquest' | 'bonus_construction', value: number) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, [field]: value } : f))
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      saveBonusField(factionId, field, value)
+    }, 400)
+  }
+
+  async function saveBonusField(factionId: string, field: string, value: number) {
+    setSaving(factionId)
+    await supabase
+      .from('factions')
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq('id', factionId)
+    setSaving(null)
   }
 
   async function saveField(factionId: string, field: string, value: string) {
@@ -410,6 +434,46 @@ export function Factions() {
                 className="faction-description-input"
                 rows={3}
               />
+            </div>
+
+            {/* Bonus jauges */}
+            <div className="faction-field">
+              <label className="faction-field-label">Bonus Jauges</label>
+              <div className="faction-bonus-row">
+                <label className="faction-bonus-input">
+                  <span>Energie</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    value={faction.bonus_energy}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_energy', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+                <label className="faction-bonus-input">
+                  <span>Conquete</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    value={faction.bonus_conquest}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_conquest', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+                <label className="faction-bonus-input">
+                  <span>Construction</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    value={faction.bonus_construction}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_construction', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+              </div>
             </div>
 
             {/* Image faction */}
