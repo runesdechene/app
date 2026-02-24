@@ -9,6 +9,7 @@ import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
 import { GameToast } from './components/map/GameToast'
 import { PlayerProfileModal } from './components/map/PlayerProfileModal'
+import { VersionBadge } from './components/map/VersionBadge'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
 import { useAuth } from './hooks/useAuth'
@@ -125,6 +126,8 @@ function App() {
           onClose={() => setSelectedPlayerId(null)}
         />
       )}
+
+      <VersionBadge />
 
       {/* Overlay texture parchemin */}
       <div className="parchment-overlay" />
