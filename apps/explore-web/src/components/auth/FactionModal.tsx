@@ -113,7 +113,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                   <div className="faction-card-body">
                     <span className="faction-card-name">{f.title}</span>
                     {f.description && (
-                      <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description }} />
+                      <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
                     )}
                     {isActive && (
                       <span className="faction-card-badge">Actuelle</span>
