@@ -652,14 +652,10 @@
 }
 
 .faction-card-desc {
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
   color: var(--color-ink-light);
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .faction-card-badge {
