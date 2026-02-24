@@ -13,8 +13,18 @@ import { Divers } from './components/Divers'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
+function AccessDenied({ onSignOut }: { onSignOut: () => void }) {
+  return (
+    <div className="access-denied">
+      <h1>Accès refusé</h1>
+      <p>Cette zone est réservée aux administrateurs de Runes de Chêne.</p>
+      <button onClick={onSignOut}>Se déconnecter</button>
+    </div>
+  )
+}
+
 function App() {
-  const { user, loading, isAuthenticated } = useAuth()
+  const { user, loading, isAuthenticated, isAdmin, signOut } = useAuth()
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
@@ -41,6 +51,10 @@ function App() {
 
   if (!isAuthenticated) {
     return <LoginPage />
+  }
+
+  if (!isAdmin) {
+    return <AccessDenied onSignOut={signOut} />
   }
 
   return (

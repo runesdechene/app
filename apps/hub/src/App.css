@@ -1749,4 +1749,47 @@ table select {
   background: rgba(239, 68, 68, 0.25);
 }
 
+/* ============================================
+   ACCESS DENIED
+   ============================================ */
+
+.access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--color-bg);
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.access-denied h1 {
+  font-size: 1.75rem;
+  color: #ef4444;
+  margin: 0;
+}
+
+.access-denied p {
+  color: var(--color-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.access-denied button {
+  padding: 0.6rem 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.access-denied button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 /* Les styles des formulaires publics sont dans PublicForm.css */
