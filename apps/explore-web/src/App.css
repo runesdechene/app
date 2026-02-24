@@ -79,7 +79,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  width: 240px;
+  width: auto;
 }
 
 .faction-scoreboard-row {
@@ -142,14 +142,11 @@
 }
 
 .faction-scoreboard-name {
-  flex: 1;
   font-family: var(--font-accent);
   font-size: 16px;
   font-weight: 600;
   color: var(--color-ink);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .faction-scoreboard-places {
@@ -642,11 +639,11 @@
 
 .place-panel {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  bottom: 20px;
+  top: 15px;
+  left: 15px;
+  bottom: 15px;
   width: 500px;
-  border-radius: 20px;
+  border-radius: 10px;
   background-color: var(--color-parchment);
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 4px 0 40px 20px rgba(74, 55, 40, 0.15);
@@ -694,10 +691,16 @@
 .place-panel-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid var(--color-parchment-dark);
   flex-shrink: 0;
+  gap: 8px;
+}
+
+.place-panel-header .place-claim-badge {
+  margin: 0;
+  padding: 7px 20px;
 }
 
 .place-panel-close {
@@ -709,6 +712,7 @@
   font-size: 14px;
   padding: 4px 8px;
   border-radius: 4px;
+  margin-left: auto;
   transition: color 0.2s;
 }
 
@@ -728,7 +732,7 @@
 .place-panel-gallery {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 14 / 18;
   overflow: hidden;
   flex-shrink: 0;
   background: var(--color-parchment-dark);
@@ -1251,16 +1255,26 @@
    ========================================== */
 
 .place-claim-badge {
+  position: absolute;
+  left: -5px;
+  top: 15px;
   display: flex;
   align-items: center;
   gap: 6px;
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--color-ink-light);
-  border: 1px solid;
-  border-radius: 6px;
-  padding: 4px 10px;
-  margin: 8px 0;
+  color: #fff;
+  border: none;
+  margin: 0;
+}
+
+
+.place-claim-faction-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: invert(1);
 }
 
 .place-claim-dot {
@@ -1279,8 +1293,7 @@
   margin-top: 16px;
   padding: 10px 16px;
   font-family: var(--font-title);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
   background: none;
   border: 2px solid;
   border-radius: 8px;
@@ -1345,7 +1358,8 @@
   padding: 1px 6px;
   font-size: 10px;
   font-weight: 600;
-  background: rgba(74, 55, 40, 0.12);
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
   border-radius: 4px;
   white-space: nowrap;
 }

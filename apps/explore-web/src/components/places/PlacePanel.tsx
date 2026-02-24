@@ -166,7 +166,7 @@ function FoggedPlaceView({
         {isOwnFaction && place.claim && (
           <div
             className="place-claim-badge"
-            style={{ borderColor: place.claim.factionColor }}
+            style={{ backgroundColor: place.claim.factionColor }}
           >
             <span
               className="place-claim-dot"
@@ -318,6 +318,27 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     <>
       {/* Header */}
       <div className="place-panel-header">
+        {place.claim && (
+          <div
+            className="place-claim-badge"
+            style={{ backgroundColor: place.claim.factionColor }}
+          >
+            {place.claim.factionPattern ? (
+              <img src={place.claim.factionPattern} alt="" className="place-claim-faction-logo" />
+            ) : (
+              <span
+                className="place-claim-dot"
+                style={{ backgroundColor: place.claim.factionColor }}
+              />
+            )}
+            Revendiqué par {place.claim.factionTitle}
+            {place.claim.fortificationLevel > 0 && (
+              <span className="place-fortification-badge">
+                {FORTIFICATION_NAMES[place.claim.fortificationLevel] ?? `Niveau ${place.claim.fortificationLevel}`}
+              </span>
+            )}
+          </div>
+        )}
         <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
           &#10005;
         </button>
@@ -375,25 +396,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             </p>
           )
         })()}
-
-        {/* Claim badge */}
-        {place.claim && (
-          <div
-            className="place-claim-badge"
-            style={{ borderColor: place.claim.factionColor }}
-          >
-            <span
-              className="place-claim-dot"
-              style={{ backgroundColor: place.claim.factionColor }}
-            />
-            Revendiqué par {place.claim.factionTitle}
-            {place.claim.fortificationLevel > 0 && (
-              <span className="place-fortification-badge">
-                {FORTIFICATION_NAMES[place.claim.fortificationLevel] ?? `Niveau ${place.claim.fortificationLevel}`}
-              </span>
-            )}
-          </div>
-        )}
 
         {/* Stats + Like */}
         <div className="place-panel-stats">

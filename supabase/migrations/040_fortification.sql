@@ -297,23 +297,16 @@ BEGIN
   SELECT * INTO v_place_type FROM place_types WHERE id = v_place.place_type_id;
   SELECT * INTO v_author FROM users WHERE id = v_place.author_id;
 
-  -- Photo de profil de l'auteur
-  IF v_author IS NOT NULL AND v_author.profile_image_id IS NOT NULL THEN
-    SELECT
-      CASE
-        WHEN im.variants IS NOT NULL AND jsonb_array_length(im.variants) > 0 THEN
-          COALESCE(
-            (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'png_small' LIMIT 1),
-            (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'webp_small' LIMIT 1),
-            (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'original' LIMIT 1)
-          )
-        ELSE NULL
-      END INTO v_author_profile_url
-    FROM image_media im
-    WHERE im.id = v_author.profile_image_id;
-  ELSE
-    v_author_profile_url := NULL;
-  END IF;
+  -- Photo de profil de l'auteur (même logique que get_player_profile)
+  SELECT COALESCE(
+    (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'png_small' LIMIT 1),
+    (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'webp_small' LIMIT 1),
+    (SELECT v->>'url' FROM jsonb_array_elements(im.variants) v WHERE v->>'name' = 'original' LIMIT 1)
+  )
+  INTO v_author_profile_url
+  FROM users u2
+  JOIN image_media im ON im.id = u2.profile_image_id
+  WHERE u2.id = v_place.author_id;
 
   -- Metrics
   SELECT COUNT(*) INTO v_views_count FROM places_viewed WHERE place_id = p_id;
@@ -390,6 +383,7 @@ BEGIN
       'factionId', f.id,
       'factionTitle', f.title,
       'factionColor', f.color,
+      'factionPattern', f.pattern,
       'claimedBy', v_place.claimed_by,
       'claimedAt', v_place.claimed_at,
       'fortificationLevel', v_place.fortification_level
@@ -411,7 +405,7 @@ BEGIN
     'images', v_place.images,
     'author', json_build_object(
       'id', COALESCE(v_author.id, v_place.author_id),
-      'lastName', COALESCE(v_author.last_name, 'Utilisateur inconnu'),
+      'lastName', COALESCE(v_author.first_name, v_author.last_name, 'Utilisateur inconnu'),
       'profileImageUrl', v_author_profile_url
     ),
     'type', json_build_object(

@@ -17,10 +17,14 @@ BEGIN
     RETURN json_build_object('error', 'Place not found');
   END IF;
 
-  -- Insérer (ignore si déjà exploré)
+  -- Vérifier si déjà exploré
+  IF EXISTS(SELECT 1 FROM places_explored WHERE user_id = p_user_id AND place_id = p_place_id) THEN
+    RETURN json_build_object('success', true);
+  END IF;
+
+  -- Insérer
   INSERT INTO places_explored (id, user_id, place_id, created_at, updated_at)
-  VALUES (p_user_id || '_' || p_place_id, p_user_id, p_place_id, NOW(), NOW())
-  ON CONFLICT (user_id, place_id) DO NOTHING;
+  VALUES (p_user_id || '_' || p_place_id, p_user_id, p_place_id, NOW(), NOW());
 
   RETURN json_build_object('success', true);
 END;
