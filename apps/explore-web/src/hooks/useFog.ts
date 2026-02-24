@@ -275,7 +275,7 @@ async function loadRecentActivity(currentUserId: string) {
     const place = e.data?.placeTitle ?? 'un lieu'
 
     let message = ''
-    let type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like' = 'discover'
+    let type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like' | 'explore' = 'discover'
     const highlights: string[] = []
 
     if (e.type === 'claim') {
@@ -291,6 +291,12 @@ async function loadRecentActivity(currentUserId: string) {
         : `${name} a découvert ${place}`
       highlights.push(name, place)
       type = 'discover'
+    } else if (e.type === 'explore') {
+      message = isSelf
+        ? `Vous avez exploré ${place}`
+        : `${name} a exploré ${place}`
+      highlights.push(name, place)
+      type = 'explore'
     } else if (e.type === 'like') {
       message = isSelf
         ? `Vous avez aimé ${place}`

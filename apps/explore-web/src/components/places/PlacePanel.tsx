@@ -335,6 +335,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             {place.claim.fortificationLevel > 0 && (
               <span className="place-fortification-badge">
                 {FORTIFICATION_NAMES[place.claim.fortificationLevel] ?? `Niveau ${place.claim.fortificationLevel}`}
+                {' '}{'\uD83D\uDEE1\uFE0F'} +{place.claim.fortificationLevel}
               </span>
             )}
           </div>

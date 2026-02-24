@@ -6,6 +6,7 @@ import type { GameToast as GameToastType } from '../../stores/toastStore'
 const ICONS: Record<GameToastType['type'], string> = {
   claim: '\u2694\uFE0F',     // epee
   discover: '\uD83E\uDDED',  // boussole
+  explore: '\uD83E\uDDB6',   // randonnée
   new_place: '\u2B50',       // etoile
   new_user: '\uD83D\uDC64',  // silhouette
   like: '\u2764\uFE0F',      // coeur
