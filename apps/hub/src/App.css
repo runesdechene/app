@@ -1792,4 +1792,72 @@ table select {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* ============================================
+   SETTINGS (Reglages jauges)
+   ============================================ */
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+.settings-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 500;
+}
+
+.settings-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+.settings-input {
+  width: 70px;
+  padding: 0.35rem 0.5rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.settings-role-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.settings-role-badge {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.settings-user-name {
+  font-size: 0.85rem;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-users-table {
+  margin-top: 0.5rem;
+}
+
+.divers-card + .divers-card {
+  margin-top: 1.25rem;
+}
+
 /* Les styles des formulaires publics sont dans PublicForm.css */

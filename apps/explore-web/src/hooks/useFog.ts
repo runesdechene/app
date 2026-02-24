@@ -67,7 +67,6 @@ export function useFog() {
       setUserName(null)
       setUserAvatarUrl(null)
       setIsAdmin(false)
-      useFogStore.setState({ maxEnergy: 5, maxConquest: 5, maxConstruction: 5 })
       setLoading(false)
       return
     }
@@ -122,10 +121,13 @@ export function useFog() {
       if (energyRes.data) {
         const ed = energyRes.data as {
           energy: number
+          maxEnergy: number
           nextPointIn: number
           conquestPoints: number
+          maxConquest: number
           conquestNextPointIn: number
           constructionPoints: number
+          maxConstruction: number
           constructionNextPointIn: number
           notorietyPoints: number
         }
@@ -136,15 +138,16 @@ export function useFog() {
         setConstructionPoints(ed.constructionPoints ?? 0)
         setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
         setNotorietyPoints(ed.notorietyPoints ?? 0)
+        useFogStore.setState({
+          maxEnergy: ed.maxEnergy ?? 5,
+          maxConquest: ed.maxConquest ?? 5,
+          maxConstruction: ed.maxConstruction ?? 5,
+        })
       }
       if (profileRes.data) {
         const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
-        const admin = profile.role === 'admin'
-        setIsAdmin(admin)
-        if (admin) {
-          useFogStore.setState({ maxEnergy: 10, maxConquest: 10, maxConstruction: 10 })
-        }
+        setIsAdmin(profile.role === 'admin')
       }
 
       setLoading(false)
