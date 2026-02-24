@@ -29,23 +29,37 @@ interface FogState {
   /** Énergie et régénération */
   energy: number
   maxEnergy: number
+  energyCycle: number
   setEnergy: (energy: number) => void
   nextPointIn: number
   setNextPointIn: (seconds: number) => void
+  setEnergyCycle: (seconds: number) => void
 
   /** Points de Conquête + régénération */
   conquestPoints: number
   maxConquest: number
+  conquestCycle: number
   conquestNextPointIn: number
   setConquestPoints: (pts: number) => void
   setConquestNextPointIn: (seconds: number) => void
+  setConquestCycle: (seconds: number) => void
 
   /** Points de Construction + régénération */
   constructionPoints: number
   maxConstruction: number
+  constructionCycle: number
   constructionNextPointIn: number
   setConstructionPoints: (pts: number) => void
   setConstructionNextPointIn: (seconds: number) => void
+  setConstructionCycle: (seconds: number) => void
+
+  /** Bonus de faction sur les max */
+  bonusEnergy: number
+  bonusConquest: number
+  bonusConstruction: number
+  setBonusEnergy: (v: number) => void
+  setBonusConquest: (v: number) => void
+  setBonusConstruction: (v: number) => void
 
   /** Notoriété personnelle */
   notorietyPoints: number
@@ -99,21 +113,34 @@ export const useFogStore = create<FogState>((set) => ({
 
   energy: 5,
   maxEnergy: 5,
+  energyCycle: 7200,
   setEnergy: (energy) => set({ energy }),
   nextPointIn: 0,
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
+  setEnergyCycle: (seconds) => set({ energyCycle: seconds }),
 
   conquestPoints: 5,
   maxConquest: 5,
+  conquestCycle: 14400,
   conquestNextPointIn: 0,
   setConquestPoints: (pts) => set({ conquestPoints: pts }),
   setConquestNextPointIn: (seconds) => set({ conquestNextPointIn: seconds }),
+  setConquestCycle: (seconds) => set({ conquestCycle: seconds }),
 
   constructionPoints: 5,
   maxConstruction: 5,
+  constructionCycle: 14400,
   constructionNextPointIn: 0,
   setConstructionPoints: (pts) => set({ constructionPoints: pts }),
   setConstructionNextPointIn: (seconds) => set({ constructionNextPointIn: seconds }),
+  setConstructionCycle: (seconds) => set({ constructionCycle: seconds }),
+
+  bonusEnergy: 0,
+  bonusConquest: 0,
+  bonusConstruction: 0,
+  setBonusEnergy: (v) => set({ bonusEnergy: v }),
+  setBonusConquest: (v) => set({ bonusConquest: v }),
+  setBonusConstruction: (v) => set({ bonusConstruction: v }),
 
   notorietyPoints: 0,
   setNotorietyPoints: (pts) => set({ notorietyPoints: pts }),

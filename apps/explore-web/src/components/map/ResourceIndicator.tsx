@@ -2,9 +2,6 @@ import { useEffect, useRef } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
 
-const CYCLE_SECONDS = 14400 // 4h → +0.25/h (6 pts/jour)
-const REGEN_RATE = 1 // fixe
-
 const CONFIG = {
   conquest: {
     icon: '\u2694\uFE0F', // ⚔️
@@ -13,6 +10,8 @@ const CONFIG = {
     maxKey: 'maxConquest' as const,
     nextKey: 'conquestNextPointIn' as const,
     setNextKey: 'setConquestNextPointIn' as const,
+    cycleKey: 'conquestCycle' as const,
+    bonusKey: 'bonusConquest' as const,
   },
   construction: {
     icon: '\u{1F528}', // 🔨
@@ -21,6 +20,8 @@ const CONFIG = {
     maxKey: 'maxConstruction' as const,
     nextKey: 'constructionNextPointIn' as const,
     setNextKey: 'setConstructionNextPointIn' as const,
+    cycleKey: 'constructionCycle' as const,
+    bonusKey: 'bonusConstruction' as const,
   },
 } as const
 
@@ -33,20 +34,22 @@ export function ResourceIndicator({ type }: Props) {
 
   const points = useFogStore(s => s[cfg.pointsKey])
   const maxPoints = useFogStore(s => s[cfg.maxKey])
+  const cycleSeconds = useFogStore(s => s[cfg.cycleKey])
   const nextPointIn = useFogStore(s => s[cfg.nextKey])
   const setNext = useFogStore(s => s[cfg.setNextKey])
   const userId = useFogStore(s => s.userId)
+  const bonus = useFogStore(s => s[cfg.bonusKey])
 
   const isFull = points >= maxPoints
 
   // Fractional resource (smooth progression)
-  const elapsedInTick = CYCLE_SECONDS - nextPointIn
-  const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
+  const elapsedInTick = cycleSeconds - nextPointIn
+  const fractionOfTick = cycleSeconds > 0 ? elapsedInTick / cycleSeconds : 0
   const fractional = isFull
     ? maxPoints
-    : Math.min(points + fractionOfTick * REGEN_RATE, maxPoints)
+    : Math.min(points + fractionOfTick, maxPoints)
 
-  const ratePerHour = 0.25
+  const ratePerHour = 3600 / cycleSeconds
 
   // Countdown timer
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -79,10 +82,16 @@ export function ResourceIndicator({ type }: Props) {
 
     useFogStore.getState().setEnergy(d.energy ?? 0)
     useFogStore.getState().setNextPointIn(d.nextPointIn ?? 0)
+    useFogStore.getState().setEnergyCycle(d.energyCycle ?? 7200)
     useFogStore.getState().setConquestPoints(d.conquestPoints ?? 0)
     useFogStore.getState().setConquestNextPointIn(d.conquestNextPointIn ?? 0)
+    useFogStore.getState().setConquestCycle(d.conquestCycle ?? 14400)
     useFogStore.getState().setConstructionPoints(d.constructionPoints ?? 0)
     useFogStore.getState().setConstructionNextPointIn(d.constructionNextPointIn ?? 0)
+    useFogStore.getState().setConstructionCycle(d.constructionCycle ?? 14400)
+    useFogStore.getState().setBonusEnergy(d.bonusEnergy ?? 0)
+    useFogStore.getState().setBonusConquest(d.bonusConquest ?? 0)
+    useFogStore.getState().setBonusConstruction(d.bonusConstruction ?? 0)
   }
 
   function formatVal(n: number): string {
@@ -92,18 +101,22 @@ export function ResourceIndicator({ type }: Props) {
   }
 
   const fillPercent = (fractional / maxPoints) * 100
+  const defaultCycle = 14400
+  const regenBonus = cycleSeconds < defaultCycle ? 'bonus' : cycleSeconds > defaultCycle ? 'malus' : ''
 
   return (
-    <div className="energy-indicator">
+    <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`}>
       <div className="energy-main">
         <span className="energy-icon">{cfg.icon}</span>
-        <span className="energy-count">{formatVal(fractional)}/{maxPoints}</span>
+        <span className="energy-count">
+          {formatVal(fractional)}/<span className={bonus > 0 ? 'max-bonus' : bonus < 0 ? 'max-malus' : ''}>{maxPoints}</span>
+        </span>
         <div className="energy-bar">
           <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
         </div>
       </div>
       <div className="energy-sub">
-        <span className="energy-rate">+{ratePerHour}/h</span>
+        <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
       </div>
     </div>
   )

@@ -2,21 +2,21 @@ import { useEffect, useRef } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
 
-const CYCLE_SECONDS = 7200 // 2h → +0.5/h (12 pts/jour)
-
 export function EnergyIndicator() {
   const energy = useFogStore(s => s.energy)
   const maxEnergy = useFogStore(s => s.maxEnergy)
+  const cycleSeconds = useFogStore(s => s.energyCycle)
   const userId = useFogStore(s => s.userId)
   const setEnergy = useFogStore(s => s.setEnergy)
   const nextPointIn = useFogStore(s => s.nextPointIn)
   const setNextPointIn = useFogStore(s => s.setNextPointIn)
+  const bonusEnergy = useFogStore(s => s.bonusEnergy)
 
   const isFull = energy >= maxEnergy
 
   // Energie fractionnaire en temps reel (taux fixe 1)
-  const elapsedInTick = CYCLE_SECONDS - nextPointIn
-  const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
+  const elapsedInTick = cycleSeconds - nextPointIn
+  const fractionOfTick = cycleSeconds > 0 ? elapsedInTick / cycleSeconds : 0
   const fractionalEnergy = isFull
     ? maxEnergy
     : Math.min(energy + fractionOfTick, maxEnergy)
@@ -51,10 +51,16 @@ export function EnergyIndicator() {
       const d = data as Record<string, number>
       setEnergy(d.energy ?? 0)
       setNextPointIn(d.nextPointIn ?? 0)
+      useFogStore.getState().setEnergyCycle(d.energyCycle ?? 7200)
       useFogStore.getState().setConquestPoints(d.conquestPoints ?? 0)
       useFogStore.getState().setConquestNextPointIn(d.conquestNextPointIn ?? 0)
+      useFogStore.getState().setConquestCycle(d.conquestCycle ?? 14400)
       useFogStore.getState().setConstructionPoints(d.constructionPoints ?? 0)
       useFogStore.getState().setConstructionNextPointIn(d.constructionNextPointIn ?? 0)
+      useFogStore.getState().setConstructionCycle(d.constructionCycle ?? 14400)
+      useFogStore.getState().setBonusEnergy(d.bonusEnergy ?? 0)
+      useFogStore.getState().setBonusConquest(d.bonusConquest ?? 0)
+      useFogStore.getState().setBonusConstruction(d.bonusConstruction ?? 0)
     }
   }
 
@@ -65,19 +71,22 @@ export function EnergyIndicator() {
   }
 
   const fillPercent = (fractionalEnergy / maxEnergy) * 100
+  const regenBonus = cycleSeconds < 7200 ? 'bonus' : cycleSeconds > 7200 ? 'malus' : ''
 
   return (
-    <div className="energy-indicator">
+    <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`}>
       <div className="energy-main">
         <span className="energy-icon">&#9889;</span>
-        <span className="energy-count">{formatEnergy(fractionalEnergy)}/{maxEnergy}</span>
+        <span className="energy-count">
+          {formatEnergy(fractionalEnergy)}/<span className={bonusEnergy > 0 ? 'max-bonus' : bonusEnergy < 0 ? 'max-malus' : ''}>{maxEnergy}</span>
+        </span>
         <div className="energy-bar">
           <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
         </div>
       </div>
 
       <div className="energy-sub">
-        <span className="energy-rate">+0.5/h</span>
+        <span className="energy-rate">+{(3600 / cycleSeconds).toFixed(2)}/h</span>
       </div>
 
     </div>

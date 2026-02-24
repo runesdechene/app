@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
+import { useFogStore } from '../../stores/fogStore'
 
 interface FactionNotoriety {
   factionId: string
@@ -16,6 +17,7 @@ interface FactionNotoriety {
 export function FactionBar() {
   const [stats, setStats] = useState<FactionNotoriety[]>([])
   const placeOverrides = useMapStore(s => s.placeOverrides)
+  const userFactionId = useFogStore(s => s.userFactionId)
 
   useEffect(() => {
     async function fetchNotoriety() {
@@ -61,10 +63,11 @@ export function FactionBar() {
     <div className="faction-scoreboard">
       {stats.map(faction => {
         const isLeader = faction.factionId === leaderId
+        const isMine = faction.factionId === userFactionId
         return (
           <div
             key={faction.factionId}
-            className={`faction-scoreboard-row${isLeader ? ' faction-scoreboard-leader' : ''}`}
+            className={`faction-scoreboard-row${isMine ? ' faction-scoreboard-mine' : ''}`}
             style={{ '--faction-color': faction.color } as React.CSSProperties}
           >
             <span className="faction-scoreboard-bar" style={{ width: `${faction.percent}%` }} />

@@ -9,6 +9,9 @@
 ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_energy NUMERIC(4,1) NOT NULL DEFAULT 0;
 ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_conquest NUMERIC(6,1) NOT NULL DEFAULT 0;
 ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_construction NUMERIC(6,1) NOT NULL DEFAULT 0;
+ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_regen_energy NUMERIC(4,1) NOT NULL DEFAULT 0;
+ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_regen_conquest NUMERIC(4,1) NOT NULL DEFAULT 0;
+ALTER TABLE factions ADD COLUMN IF NOT EXISTS bonus_regen_construction NUMERIC(4,1) NOT NULL DEFAULT 0;
 
 -- ============================================
 -- 2. get_user_energy — LEFT JOIN factions
@@ -47,18 +50,29 @@ DECLARE
   v_construction_add NUMERIC(6,1);
   v_construction_next_in INT;
   v_notoriety INT;
+  v_bonus_energy NUMERIC(4,1);
+  v_bonus_conquest NUMERIC(6,1);
+  v_bonus_construction NUMERIC(6,1);
 BEGIN
   SELECT u.energy_points, u.energy_reset_at,
-         u.max_energy + COALESCE(f.bonus_energy, 0),
+         GREATEST(1, u.max_energy + COALESCE(f.bonus_energy, 0)),
          u.conquest_points, u.conquest_reset_at,
-         u.max_conquest + COALESCE(f.bonus_conquest, 0),
+         GREATEST(1, u.max_conquest + COALESCE(f.bonus_conquest, 0)),
          u.construction_points, u.construction_reset_at,
-         u.max_construction + COALESCE(f.bonus_construction, 0),
-         u.notoriety_points
+         GREATEST(1, u.max_construction + COALESCE(f.bonus_construction, 0)),
+         u.notoriety_points,
+         GREATEST(600, (7200 * (100 - COALESCE(f.bonus_regen_energy, 0)) / 100)::INT),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_conquest, 0)) / 100)::INT),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_construction, 0)) / 100)::INT),
+         COALESCE(f.bonus_energy, 0),
+         COALESCE(f.bonus_conquest, 0),
+         COALESCE(f.bonus_construction, 0)
   INTO v_energy, v_energy_reset_at, v_max_energy,
        v_conquest, v_conquest_reset_at, v_max_conquest,
        v_construction, v_construction_reset_at, v_max_construction,
-       v_notoriety
+       v_notoriety,
+       v_energy_cycle, v_conquest_cycle, v_construction_cycle,
+       v_bonus_energy, v_bonus_conquest, v_bonus_construction
   FROM users u
   LEFT JOIN factions f ON f.id = u.faction_id
   WHERE u.id = p_user_id;
@@ -124,13 +138,19 @@ BEGIN
     'energy', v_energy,
     'maxEnergy', v_max_energy,
     'nextPointIn', v_energy_next_in,
+    'energyCycle', v_energy_cycle,
     'conquestPoints', COALESCE(v_conquest, 0),
     'maxConquest', v_max_conquest,
     'conquestNextPointIn', v_conquest_next_in,
+    'conquestCycle', v_conquest_cycle,
     'constructionPoints', COALESCE(v_construction, 0),
     'maxConstruction', v_max_construction,
     'constructionNextPointIn', v_construction_next_in,
-    'notorietyPoints', COALESCE(v_notoriety, 0)
+    'constructionCycle', v_construction_cycle,
+    'notorietyPoints', COALESCE(v_notoriety, 0),
+    'bonusEnergy', v_bonus_energy,
+    'bonusConquest', v_bonus_conquest,
+    'bonusConstruction', v_bonus_construction
   );
 END;
 $$;
@@ -183,11 +203,15 @@ BEGIN
     RETURN json_build_object('error', 'Place not found');
   END IF;
 
-  -- Lire les max du user + bonus faction
-  SELECT u.max_energy + COALESCE(f.bonus_energy, 0),
-         u.max_conquest + COALESCE(f.bonus_conquest, 0),
-         u.max_construction + COALESCE(f.bonus_construction, 0)
-  INTO v_max_energy, v_max_conquest, v_max_construction
+  -- Lire les max du user + bonus faction + cycles regen
+  SELECT GREATEST(1, u.max_energy + COALESCE(f.bonus_energy, 0)),
+         GREATEST(1, u.max_conquest + COALESCE(f.bonus_conquest, 0)),
+         GREATEST(1, u.max_construction + COALESCE(f.bonus_construction, 0)),
+         GREATEST(600, (7200 * (100 - COALESCE(f.bonus_regen_energy, 0)) / 100)::INT),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_conquest, 0)) / 100)::INT),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_construction, 0)) / 100)::INT)
+  INTO v_max_energy, v_max_conquest, v_max_construction,
+       v_energy_cycle, v_conquest_cycle, v_construction_cycle
   FROM users u
   LEFT JOIN factions f ON f.id = u.faction_id
   WHERE u.id = p_user_id;
@@ -349,11 +373,14 @@ DECLARE
   v_construction_ticks INT;
   v_construction_next_in INT;
 BEGIN
-  -- Recuperer faction + max du user + bonus faction
+  -- Recuperer faction + max du user + bonus faction + cycles regen
   SELECT u.faction_id,
-         u.max_conquest + COALESCE(f.bonus_conquest, 0),
-         u.max_construction + COALESCE(f.bonus_construction, 0)
-  INTO v_faction_id, v_max_conquest, v_max_construction
+         GREATEST(1, u.max_conquest + COALESCE(f.bonus_conquest, 0)),
+         GREATEST(1, u.max_construction + COALESCE(f.bonus_construction, 0)),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_conquest, 0)) / 100)::INT),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_construction, 0)) / 100)::INT)
+  INTO v_faction_id, v_max_conquest, v_max_construction,
+       v_conquest_cycle, v_construction_cycle
   FROM users u
   LEFT JOIN factions f ON f.id = u.faction_id
   WHERE u.id = p_user_id;
@@ -462,10 +489,11 @@ DECLARE
   v_construction_ticks INT;
   v_construction_next_in INT;
 BEGIN
-  -- Verifier faction + lire max du user + bonus faction
+  -- Verifier faction + lire max du user + bonus faction + cycle regen
   SELECT u.faction_id,
-         u.max_construction + COALESCE(f.bonus_construction, 0)
-  INTO v_user_faction, v_max_construction
+         GREATEST(1, u.max_construction + COALESCE(f.bonus_construction, 0)),
+         GREATEST(600, (14400 * (100 - COALESCE(f.bonus_regen_construction, 0)) / 100)::INT)
+  INTO v_user_faction, v_max_construction, v_construction_cycle
   FROM users u
   LEFT JOIN factions f ON f.id = u.faction_id
   WHERE u.id = p_user_id;

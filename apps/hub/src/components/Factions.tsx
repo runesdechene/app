@@ -12,6 +12,9 @@ interface Faction {
   bonus_energy: number
   bonus_conquest: number
   bonus_construction: number
+  bonus_regen_energy: number
+  bonus_regen_conquest: number
+  bonus_regen_construction: number
 }
 
 export function Factions() {
@@ -34,7 +37,7 @@ export function Factions() {
   async function fetchFactions() {
     const { data, error } = await supabase
       .from('factions')
-      .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction')
+      .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
       .order('order')
 
     if (!error && data) {
@@ -73,6 +76,9 @@ export function Factions() {
       bonus_energy: 0,
       bonus_conquest: 0,
       bonus_construction: 0,
+      bonus_regen_energy: 0,
+      bonus_regen_conquest: 0,
+      bonus_regen_construction: 0,
     }
 
     const { error } = await supabase.from('factions').insert(newFaction)
@@ -133,7 +139,7 @@ export function Factions() {
     }, 600)
   }
 
-  function handleBonusChange(factionId: string, field: 'bonus_energy' | 'bonus_conquest' | 'bonus_construction', value: number) {
+  function handleBonusChange(factionId: string, field: 'bonus_energy' | 'bonus_conquest' | 'bonus_construction' | 'bonus_regen_energy' | 'bonus_regen_conquest' | 'bonus_regen_construction', value: number) {
     setFactions(prev => prev.map(f => f.id === factionId ? { ...f, [field]: value } : f))
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -444,7 +450,7 @@ export function Factions() {
                   <span>Energie</span>
                   <input
                     type="number"
-                    min={0}
+                    min={-10}
                     max={10}
                     step={0.5}
                     value={faction.bonus_energy}
@@ -455,7 +461,7 @@ export function Factions() {
                   <span>Conquete</span>
                   <input
                     type="number"
-                    min={0}
+                    min={-10}
                     max={10}
                     step={0.5}
                     value={faction.bonus_conquest}
@@ -466,11 +472,47 @@ export function Factions() {
                   <span>Construction</span>
                   <input
                     type="number"
-                    min={0}
+                    min={-10}
                     max={10}
                     step={0.5}
                     value={faction.bonus_construction}
                     onChange={e => handleBonusChange(faction.id, 'bonus_construction', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+              </div>
+              <label className="faction-field-label" style={{ marginTop: 8 }}>Regen % (par ressource)</label>
+              <div className="faction-bonus-row">
+                <label className="faction-bonus-input">
+                  <span>Energie</span>
+                  <input
+                    type="number"
+                    min={-50}
+                    max={50}
+                    step={5}
+                    value={faction.bonus_regen_energy}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_regen_energy', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+                <label className="faction-bonus-input">
+                  <span>Conquete</span>
+                  <input
+                    type="number"
+                    min={-50}
+                    max={50}
+                    step={5}
+                    value={faction.bonus_regen_conquest}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_regen_conquest', parseFloat(e.target.value) || 0)}
+                  />
+                </label>
+                <label className="faction-bonus-input">
+                  <span>Construction</span>
+                  <input
+                    type="number"
+                    min={-50}
+                    max={50}
+                    step={5}
+                    value={faction.bonus_regen_construction}
+                    onChange={e => handleBonusChange(faction.id, 'bonus_regen_construction', parseFloat(e.target.value) || 0)}
                   />
                 </label>
               </div>

@@ -12,6 +12,9 @@ interface FactionData {
   bonus_energy: number
   bonus_conquest: number
   bonus_construction: number
+  bonus_regen_energy: number
+  bonus_regen_conquest: number
+  bonus_regen_construction: number
 }
 
 interface FactionModalProps {
@@ -34,7 +37,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     Promise.all([
       supabase
         .from('factions')
-        .select('id, title, color, pattern, description, image_url, bonus_energy, bonus_conquest, bonus_construction')
+        .select('id, title, color, pattern, description, image_url, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
         .order('order'),
       supabase
         .from('users')
@@ -54,11 +57,34 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     })
   }, [])
 
-  /** Recharger les discoveredIds après changement de faction (la RPC solidifie côté DB) */
-  async function reloadDiscoveries() {
+  /** Recharger discoveries + jauges après changement de faction */
+  async function reloadAfterFactionChange() {
     if (!userId) return
-    const { data } = await supabase.rpc('get_user_discoveries', { p_user_id: userId })
-    if (data) setDiscoveredIds(data as string[])
+    const [discRes, energyRes] = await Promise.all([
+      supabase.rpc('get_user_discoveries', { p_user_id: userId }),
+      supabase.rpc('get_user_energy', { p_user_id: userId }),
+    ])
+    if (discRes.data) setDiscoveredIds(discRes.data as string[])
+    if (energyRes.data) {
+      const d = energyRes.data as Record<string, number>
+      useFogStore.setState({
+        energy: d.energy ?? 0,
+        maxEnergy: d.maxEnergy ?? 5,
+        nextPointIn: d.nextPointIn ?? 0,
+        energyCycle: d.energyCycle ?? 7200,
+        conquestPoints: d.conquestPoints ?? 0,
+        maxConquest: d.maxConquest ?? 5,
+        conquestNextPointIn: d.conquestNextPointIn ?? 0,
+        conquestCycle: d.conquestCycle ?? 14400,
+        constructionPoints: d.constructionPoints ?? 0,
+        maxConstruction: d.maxConstruction ?? 5,
+        constructionNextPointIn: d.constructionNextPointIn ?? 0,
+        constructionCycle: d.constructionCycle ?? 14400,
+        bonusEnergy: d.bonusEnergy ?? 0,
+        bonusConquest: d.bonusConquest ?? 0,
+        bonusConstruction: d.bonusConstruction ?? 0,
+      })
+    }
   }
 
   async function selectFaction(factionId: string) {
@@ -73,7 +99,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     const faction = factions.find(f => f.id === factionId)
     setUserFactionId(factionId)
     setUserFactionColor(faction?.color ?? null)
-    await reloadDiscoveries()
+    await reloadAfterFactionChange()
 
     setSelecting(false)
     onClose()
@@ -90,7 +116,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
     setUserFactionId(null)
     setUserFactionColor(null)
-    await reloadDiscoveries()
+    await reloadAfterFactionChange()
 
     setSelecting(false)
     onClose()
@@ -135,11 +161,38 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                     {f.description && (
                       <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
                     )}
-                    {(f.bonus_energy > 0 || f.bonus_conquest > 0 || f.bonus_construction > 0) && (
+                    {(f.bonus_energy !== 0 || f.bonus_conquest !== 0 || f.bonus_construction !== 0 || f.bonus_regen_energy !== 0 || f.bonus_regen_conquest !== 0 || f.bonus_regen_construction !== 0) && (
                       <div className="faction-card-bonuses">
-                        {f.bonus_energy > 0 && <span className="faction-bonus-tag">+{f.bonus_energy} Energie</span>}
-                        {f.bonus_conquest > 0 && <span className="faction-bonus-tag">+{f.bonus_conquest} Conquete</span>}
-                        {f.bonus_construction > 0 && <span className="faction-bonus-tag">+{f.bonus_construction} Construction</span>}
+                        {f.bonus_energy !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_energy < 0 ? ' malus' : ''}`}>
+                            {f.bonus_energy > 0 ? '+' : ''}{f.bonus_energy} Energie
+                          </span>
+                        )}
+                        {f.bonus_conquest !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_conquest < 0 ? ' malus' : ''}`}>
+                            {f.bonus_conquest > 0 ? '+' : ''}{f.bonus_conquest} Conquete
+                          </span>
+                        )}
+                        {f.bonus_construction !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_construction < 0 ? ' malus' : ''}`}>
+                            {f.bonus_construction > 0 ? '+' : ''}{f.bonus_construction} Construction
+                          </span>
+                        )}
+                        {f.bonus_regen_energy !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_regen_energy < 0 ? ' malus' : ''}`}>
+                            {f.bonus_regen_energy > 0 ? '+' : ''}{f.bonus_regen_energy}% Regen Energie
+                          </span>
+                        )}
+                        {f.bonus_regen_conquest !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_regen_conquest < 0 ? ' malus' : ''}`}>
+                            {f.bonus_regen_conquest > 0 ? '+' : ''}{f.bonus_regen_conquest}% Regen Conquete
+                          </span>
+                        )}
+                        {f.bonus_regen_construction !== 0 && (
+                          <span className={`faction-bonus-tag${f.bonus_regen_construction < 0 ? ' malus' : ''}`}>
+                            {f.bonus_regen_construction > 0 ? '+' : ''}{f.bonus_regen_construction}% Regen Construction
+                          </span>
+                        )}
                       </div>
                     )}
                     {isActive && (
@@ -152,13 +205,19 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           </div>
         )}
 
+        <div className="faction-legend">
+          <span className="faction-legend-item">⚡ Energie — Permet de découvrir des lieux</span>
+          <span className="faction-legend-item">⚔️ Conquete — Aide à revendiquer un lieu</span>
+          <span className="faction-legend-item">🪚 Construction — Vous pouvez fortifier vos lieux</span>
+        </div>
+
         {currentFactionId && (
           <button
             className="faction-modal-leave"
             onClick={leaveFaction}
             disabled={selecting}
           >
-            Quitter ma faction
+            Devenir un sans-bannière
           </button>
         )}
       </div>

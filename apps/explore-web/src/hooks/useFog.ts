@@ -123,13 +123,19 @@ export function useFog() {
           energy: number
           maxEnergy: number
           nextPointIn: number
+          energyCycle: number
           conquestPoints: number
           maxConquest: number
           conquestNextPointIn: number
+          conquestCycle: number
           constructionPoints: number
           maxConstruction: number
           constructionNextPointIn: number
+          constructionCycle: number
           notorietyPoints: number
+          bonusEnergy: number
+          bonusConquest: number
+          bonusConstruction: number
         }
         setEnergy(ed.energy)
         setNextPointIn(ed.nextPointIn ?? 0)
@@ -142,6 +148,12 @@ export function useFog() {
           maxEnergy: ed.maxEnergy ?? 5,
           maxConquest: ed.maxConquest ?? 5,
           maxConstruction: ed.maxConstruction ?? 5,
+          energyCycle: ed.energyCycle ?? 7200,
+          conquestCycle: ed.conquestCycle ?? 14400,
+          constructionCycle: ed.constructionCycle ?? 14400,
+          bonusEnergy: ed.bonusEnergy ?? 0,
+          bonusConquest: ed.bonusConquest ?? 0,
+          bonusConstruction: ed.bonusConstruction ?? 0,
         })
       }
       if (profileRes.data) {
