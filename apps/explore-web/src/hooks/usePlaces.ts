@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import type { FeatureCollection, Point } from 'geojson'
 import { supabase } from '../lib/supabase'
 import { useFogStore } from '../stores/fogStore'
+import { useMapStore } from '../stores/mapStore'
 import { useAuth } from './useAuth'
 
 interface MapPlace {
@@ -61,6 +62,7 @@ export function usePlaces() {
   const discoveredIds = useFogStore(s => s.discoveredIds)
   const userFactionId = useFogStore(s => s.userFactionId)
   const fogLoading = useFogStore(s => s.loading)
+  const deletedPlaceIds = useMapStore(s => s.deletedPlaceIds)
   const { isAuthenticated } = useAuth()
 
   useEffect(() => {
@@ -133,24 +135,26 @@ export function usePlaces() {
 
     return {
       ...rawGeojson,
-      features: rawGeojson.features.map(f => {
-        const personallyDiscovered = isAuthenticated && discoveredIds.has(f.properties.id)
-        const isOwnFaction = isAuthenticated
-          && userFactionId !== null
-          && f.properties.factionId === userFactionId
-          && !personallyDiscovered
+      features: rawGeojson.features
+        .filter(f => !deletedPlaceIds.has(f.properties.id))
+        .map(f => {
+          const personallyDiscovered = isAuthenticated && discoveredIds.has(f.properties.id)
+          const isOwnFaction = isAuthenticated
+            && userFactionId !== null
+            && f.properties.factionId === userFactionId
+            && !personallyDiscovered
 
-        return {
-          ...f,
-          properties: {
-            ...f.properties,
-            discovered: personallyDiscovered,
-            ownFaction: isOwnFaction,
-          },
-        }
-      }),
+          return {
+            ...f,
+            properties: {
+              ...f.properties,
+              discovered: personallyDiscovered,
+              ownFaction: isOwnFaction,
+            },
+          }
+        }),
     }
-  }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated])
+  }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated, deletedPlaceIds])
 
   return { geojson, loading: loading || fogLoading, error }
 }

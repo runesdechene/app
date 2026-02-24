@@ -25,6 +25,10 @@ interface MapState {
   /** Overrides locaux pour tester les territoires (tag, likes) */
   placeOverrides: Map<string, PlaceOverride>
   setPlaceOverride: (placeId: string, override: PlaceOverride) => void
+
+  /** IDs de lieux supprimes localement (pour retirer les marqueurs sans recharger) */
+  deletedPlaceIds: Set<string>
+  markPlaceDeleted: (placeId: string) => void
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -44,5 +48,13 @@ export const useMapStore = create<MapState>((set) => ({
       const next = new Map(state.placeOverrides)
       next.set(placeId, { ...next.get(placeId), ...override })
       return { placeOverrides: next }
+    }),
+
+  deletedPlaceIds: new Set(),
+  markPlaceDeleted: (placeId) =>
+    set((state) => {
+      const next = new Set(state.deletedPlaceIds)
+      next.add(placeId)
+      return { deletedPlaceIds: next }
     }),
 }))

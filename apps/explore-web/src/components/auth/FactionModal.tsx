@@ -27,10 +27,13 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const [memberCounts, setMemberCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [selecting, setSelecting] = useState(false)
+  const [confirmFaction, setConfirmFaction] = useState<string | null>(null)
 
   const userId = useFogStore(s => s.userId)
+  const notorietyPoints = useFogStore(s => s.notorietyPoints)
   const setUserFactionId = useFogStore(s => s.setUserFactionId)
   const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
+  const setNotorietyPoints = useFogStore(s => s.setNotorietyPoints)
   const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
 
   useEffect(() => {
@@ -87,9 +90,20 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     }
   }
 
+  function handleFactionClick(factionId: string) {
+    // Si changement de faction (avait une, passe a une autre) → confirmation
+    if (currentFactionId && currentFactionId !== factionId) {
+      setConfirmFaction(factionId)
+    } else {
+      selectFaction(factionId)
+    }
+  }
+
   async function selectFaction(factionId: string) {
     if (!userId || selecting) return
     setSelecting(true)
+
+    const isChanging = currentFactionId != null && currentFactionId !== factionId
 
     await supabase.rpc('set_user_faction', {
       p_user_id: userId,
@@ -99,9 +113,16 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     const faction = factions.find(f => f.id === factionId)
     setUserFactionId(factionId)
     setUserFactionColor(faction?.color ?? null)
+
+    // Reset notoriete dans le store si changement
+    if (isChanging) {
+      setNotorietyPoints(0)
+    }
+
     await reloadAfterFactionChange()
 
     setSelecting(false)
+    setConfirmFaction(null)
     onClose()
   }
 
@@ -145,7 +166,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                   key={f.id}
                   className={`faction-card${isActive ? ' active' : ''}`}
                   style={{ '--faction-color': f.color } as React.CSSProperties}
-                  onClick={() => selectFaction(f.id)}
+                  onClick={() => handleFactionClick(f.id)}
                   disabled={selecting}
                 >
                   {f.image_url ? (
@@ -219,6 +240,27 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           >
             Devenir un sans-bannière
           </button>
+        )}
+
+        {/* Confirmation changement de faction */}
+        {confirmFaction && (
+          <div className="faction-confirm-overlay">
+            <div className="faction-confirm-dialog">
+              <p>
+                Changer de faction vous coutera <strong>toute votre Notoriete</strong>
+                {notorietyPoints > 0 ? ` (${notorietyPoints} points)` : ''}.
+              </p>
+              <p>Cette action est irreversible.</p>
+              <div className="faction-confirm-actions">
+                <button onClick={() => setConfirmFaction(null)} disabled={selecting}>
+                  Annuler
+                </button>
+                <button onClick={() => selectFaction(confirmFaction)} disabled={selecting}>
+                  {selecting ? '...' : 'Confirmer'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

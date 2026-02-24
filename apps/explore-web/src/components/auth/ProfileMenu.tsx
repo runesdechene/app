@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useFogStore } from '../../stores/fogStore'
+import { useMapStore } from '../../stores/mapStore'
 
 interface ProfileData {
   id: string
   lastName: string
-  biography: string
-  rank: string
   role: string
   profileImage: { id: string; url: string } | null
   faction: { id: string; title: string; color: string; pattern: string | null } | null
@@ -21,10 +21,10 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const userId = useFogStore(s => s.userId)
 
   useEffect(() => {
     async function fetchProfile() {
-      // Trouver le user ID par email
       const { data: user } = await supabase
         .from('users')
         .select('id')
@@ -45,7 +45,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
     fetchProfile()
   }, [email])
 
-  // Fermer le menu si clic à l'extérieur
+  // Fermer le menu si clic a l'exterieur
   useEffect(() => {
     if (!open) return
 
@@ -60,6 +60,12 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   }, [open])
 
   const initial = profile?.lastName?.[0]?.toUpperCase() || email[0].toUpperCase()
+
+  function handleViewProfile() {
+    if (!userId) return
+    setOpen(false)
+    useMapStore.getState().setSelectedPlayerId(userId)
+  }
 
   return (
     <div className="profile-menu-container" ref={menuRef}>
@@ -88,17 +94,13 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             {profile?.role === 'admin' && (
               <span className="profile-dropdown-admin">Admin</span>
             )}
-            {profile?.rank && profile.rank !== 'guest' && (
-              <span className="profile-dropdown-rank">{profile.rank}</span>
-            )}
           </div>
 
-          {profile?.biography && (
-            <p className="profile-dropdown-bio">{profile.biography}</p>
-          )}
-
-          {/* Faction */}
           <div className="profile-dropdown-divider" />
+
+          <button className="profile-dropdown-action" onClick={handleViewProfile}>
+            Voir mon profil
+          </button>
 
           <button
             className="profile-dropdown-action"
@@ -120,7 +122,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
           <div className="profile-dropdown-divider" />
 
           <button className="profile-dropdown-action" onClick={onSignOut}>
-            Se déconnecter
+            Se deconnecter
           </button>
         </div>
       )}

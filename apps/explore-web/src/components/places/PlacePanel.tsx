@@ -251,6 +251,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
   const [showExplorers, setShowExplorers] = useState(false)
   const [explorers, setExplorers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
   const [explorersLoading, setExplorersLoading] = useState(false)
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  const canManage = (userId === place.author.id) || isAdmin
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
@@ -314,6 +319,27 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     setShowExploreConfirm(false)
   }
 
+  async function handleDeletePlace() {
+    if (!userId || deleting) return
+    setDeleting(true)
+    const { data, error: rpcError } = await supabase.rpc('delete_place', { p_user_id: userId, p_place_id: place.id })
+    if (rpcError) {
+      console.error('delete_place rpc error:', rpcError)
+      setDeleting(false)
+      return
+    }
+    if (data?.error) {
+      console.error('delete_place error:', data.error)
+      setDeleting(false)
+      return
+    }
+    useMapStore.getState().markPlaceDeleted(place.id)
+    useToastStore.getState().addToast({ type: 'discover', message: 'Lieu supprimé', timestamp: Date.now() })
+    setDeleting(false)
+    setShowDeleteConfirm(false)
+    onClose()
+  }
+
   return (
     <>
       {/* Header */}
@@ -340,10 +366,62 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             )}
           </div>
         )}
-        <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
-          &#10005;
-        </button>
+        <div className="place-panel-header-actions">
+          {canManage && (
+            <div className="place-options-wrap">
+              <button
+                className="place-options-btn"
+                onClick={() => setShowOptionsMenu(v => !v)}
+                aria-label="Options"
+              >
+                {'\u2699\uFE0F'}
+              </button>
+              {showOptionsMenu && (
+                <>
+                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
+                  <div className="place-options-menu">
+                    <button
+                      className="place-options-item danger"
+                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
+                    >
+                      Supprimer ce lieu
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
+            &#10005;
+          </button>
+        </div>
       </div>
+
+      {/* Dialog confirmation suppression */}
+      {showDeleteConfirm && (
+        <div className="place-delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="place-delete-confirm" onClick={e => e.stopPropagation()}>
+            <p>Supprimer &laquo;&nbsp;{place.title}&nbsp;&raquo; ?</p>
+            <p className="place-delete-confirm-warning">Cette action est irréversible.</p>
+            <div className="place-delete-confirm-actions">
+              <button
+                className="place-delete-cancel-btn"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+              >
+                Annuler
+              </button>
+              <button
+                className="place-delete-btn"
+                onClick={handleDeletePlace}
+                disabled={deleting}
+              >
+                {deleting ? 'Suppression...' : 'Supprimer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Gallery */}
       {images.length > 0 && (

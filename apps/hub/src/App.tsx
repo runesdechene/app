@@ -9,6 +9,7 @@ import { Reviews } from './components/Reviews'
 import { ReviewSubmit } from './components/ReviewSubmit'
 import { TagsManager } from './components/TagsManager'
 import { Factions } from './components/Factions'
+import { TitlesManager } from './components/TitlesManager'
 import { Divers } from './components/Divers'
 import { Settings } from './components/Settings'
 import { Sidebar } from './components/Sidebar'
@@ -72,6 +73,7 @@ function App() {
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
+          <Route path="/carte/titres" element={<TitlesManager />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
         </Routes>

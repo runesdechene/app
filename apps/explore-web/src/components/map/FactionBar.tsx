@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
+import { FactionMembersModal } from './FactionMembersModal'
 
 interface FactionNotoriety {
   factionId: string
@@ -16,6 +17,7 @@ interface FactionNotoriety {
 
 export function FactionBar() {
   const [stats, setStats] = useState<FactionNotoriety[]>([])
+  const [selectedFaction, setSelectedFaction] = useState<FactionNotoriety | null>(null)
   const placeOverrides = useMapStore(s => s.placeOverrides)
   const userFactionId = useFogStore(s => s.userFactionId)
 
@@ -69,6 +71,7 @@ export function FactionBar() {
             key={faction.factionId}
             className={`faction-scoreboard-row${isMine ? ' faction-scoreboard-mine' : ''}`}
             style={{ '--faction-color': faction.color } as React.CSSProperties}
+            onClick={() => setSelectedFaction(faction)}
           >
             <span className="faction-scoreboard-bar" style={{ width: `${faction.percent}%` }} />
             <div className="faction-scoreboard-content">
@@ -88,6 +91,15 @@ export function FactionBar() {
           </div>
         )
       })}
+
+      {selectedFaction && (
+        <FactionMembersModal
+          factionId={selectedFaction.factionId}
+          factionTitle={selectedFaction.title}
+          factionColor={selectedFaction.color}
+          onClose={() => setSelectedFaction(null)}
+        />
+      )}
     </div>
   )
 }

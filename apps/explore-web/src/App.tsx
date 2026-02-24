@@ -9,6 +9,7 @@ import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
 import { GameToast } from './components/map/GameToast'
 import { PlayerProfileModal } from './components/map/PlayerProfileModal'
+import { LeaderboardModal } from './components/map/LeaderboardModal'
 import { VersionBadge } from './components/map/VersionBadge'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
@@ -19,10 +20,10 @@ import { useChat } from './hooks/useChat'
 import { ChatPanel } from './components/chat/ChatPanel'
 import './App.css'
 
-function NotorietyBadge() {
+function NotorietyBadge({ onClick }: { onClick: () => void }) {
   const notoriety = useFogStore(s => s.notorietyPoints)
   return (
-    <div className="notoriety-badge">
+    <div className="notoriety-badge" onClick={onClick}>
       <span className="notoriety-icon">{'\uD83C\uDF96\uFE0F'}</span>
       <span className="notoriety-value">{notoriety}</span>
     </div>
@@ -37,6 +38,7 @@ function App() {
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   const userId = useFogStore(s => s.userId)
   const userFactionId = useFogStore(s => s.userFactionId)
@@ -81,7 +83,7 @@ function App() {
       <div className="app-toolbar">
         {!authLoading && isAuthenticated && (
           <>
-            <NotorietyBadge />
+            <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
             <ResourceIndicator type="conquest" />
             <ResourceIndicator type="construction" />
             <EnergyIndicator />
@@ -118,6 +120,10 @@ function App() {
           onClose={() => setShowFactionModal(false)}
           currentFactionId={userFactionId}
         />
+      )}
+
+      {showLeaderboard && (
+        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
       )}
 
       {selectedPlayerId && (

@@ -107,10 +107,11 @@ export function useFog() {
           })
       }
 
-      const [discRes, energyRes, profileRes] = await Promise.all([
+      const [discRes, energyRes, profileRes, titlesRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
         supabase.rpc('get_my_informations', { p_user_id: userData.id }),
+        supabase.rpc('get_user_titles', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -160,6 +161,18 @@ export function useFog() {
         const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
+      }
+      if (titlesRes.data) {
+        const td = titlesRes.data as {
+          unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
+          factionTitle: { id: number; name: string; icon: string; unlocks: string[] } | null
+          displayedGeneralTitleIds: number[]
+        }
+        useFogStore.setState({
+          unlockedGeneralTitles: td.unlockedGeneralTitles ?? [],
+          displayedGeneralTitleIds: td.displayedGeneralTitleIds ?? [],
+          factionTitle2: td.factionTitle ?? null,
+        })
       }
 
       setLoading(false)
@@ -344,6 +357,26 @@ async function loadRecentActivity(currentUserId: string) {
       timestamp: new Date(e.created_at).getTime(),
     })
   }
+}
+
+/**
+ * Sauvegarder la selection de titres generaux affiches (max 2).
+ */
+export async function setDisplayedTitles(
+  titleIds: number[],
+): Promise<{ success: boolean; error?: string }> {
+  const { userId } = useFogStore.getState()
+  if (!userId) return { success: false, error: 'Not authenticated' }
+
+  const { data } = await supabase.rpc('set_displayed_titles', {
+    p_user_id: userId,
+    p_title_ids: titleIds,
+  })
+
+  if (data?.error) return { success: false, error: data.error }
+
+  useFogStore.setState({ displayedGeneralTitleIds: titleIds })
+  return { success: true }
 }
 
 /**

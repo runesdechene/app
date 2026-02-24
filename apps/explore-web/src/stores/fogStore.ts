@@ -77,6 +77,14 @@ interface FogState {
   userAvatarUrl: string | null
   setUserAvatarUrl: (url: string | null) => void
 
+  /** Titres du joueur */
+  unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
+  displayedGeneralTitleIds: number[]
+  factionTitle2: { id: number; name: string; icon: string; unlocks: string[] } | null
+  setUnlockedGeneralTitles: (titles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>) => void
+  setDisplayedGeneralTitleIds: (ids: number[]) => void
+  setFactionTitle2: (t: { id: number; name: string; icon: string; unlocks: string[] } | null) => void
+
   /** Admin */
   isAdmin: boolean
   setIsAdmin: (v: boolean) => void
@@ -153,6 +161,13 @@ export const useFogStore = create<FogState>((set) => ({
 
   userAvatarUrl: null,
   setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
+
+  unlockedGeneralTitles: [],
+  displayedGeneralTitleIds: [],
+  factionTitle2: null,
+  setUnlockedGeneralTitles: (titles) => set({ unlockedGeneralTitles: titles }),
+  setDisplayedGeneralTitleIds: (ids) => set({ displayedGeneralTitleIds: ids }),
+  setFactionTitle2: (t) => set({ factionTitle2: t }),
 
   isAdmin: false,
   setIsAdmin: (v) => set({ isAdmin: v }),
