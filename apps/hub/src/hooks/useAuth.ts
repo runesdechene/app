@@ -30,13 +30,18 @@ export function useAuth() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const role = session?.user ? await fetchRole(session.user.id) : null
+      let role: UserRole | null = null
+      try {
+        role = session?.user ? await fetchRole(session.user.id) : null
+      } catch { /* ignore */ }
       setState({
         user: session?.user ?? null,
         session,
         role,
         loading: false
       })
+    }).catch(() => {
+      setState(prev => ({ ...prev, loading: false }))
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
