@@ -286,6 +286,7 @@ export const ExploreMap = memo(function ExploreMap() {
       emblemLon: number; emblemLat: number
       territoryId: number
       factionTitle: string; players: string; placesCount: number
+      hourlyRate: number
       tagColor: string; pattern: string
     }[] = []
 
@@ -297,6 +298,7 @@ export const ExploreMap = memo(function ExploreMap() {
       const pattern = (props.pattern as string) || ''
       const players = (typeof props.players === 'string' ? props.players : '')
       const placesCount = (typeof props.placesCount === 'number' ? props.placesCount : 0)
+      const hourlyRate = (typeof props.hourlyRate === 'number' ? props.hourlyRate : 0)
 
       // Extraire les anneaux extérieurs
       const rings: number[][][] =
@@ -327,7 +329,7 @@ export const ExploreMap = memo(function ExploreMap() {
         labels.push({
           lon: topLon, lat: topLat,
           emblemLon, emblemLat,
-          territoryId, factionTitle, players, placesCount, tagColor, pattern,
+          territoryId, factionTitle, players, placesCount, hourlyRate, tagColor, pattern,
         })
       }
     }
@@ -474,6 +476,7 @@ export const ExploreMap = memo(function ExploreMap() {
             tagColor: ov?.tagColor || f.properties.tagColor,
             factionPattern: ov?.factionPattern || f.properties.factionPattern,
             score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
+            fortificationLevel: f.properties.fortificationLevel ?? 0,
             claimedByName: f.properties.claimedByName,
           }
         }),
@@ -707,11 +710,18 @@ export const ExploreMap = memo(function ExploreMap() {
             latitude={label.emblemLat}
             anchor="center"
           >
-            <div
-              className="territory-emblem"
-              style={{ '--emblem-color': label.tagColor } as React.CSSProperties}
-            >
-              <img src={label.pattern} alt="" className="territory-emblem-img" />
+            <div className="territory-emblem-wrap">
+              <div
+                className="territory-emblem"
+                style={{ '--emblem-color': label.tagColor } as React.CSSProperties}
+              >
+                <img src={label.pattern} alt="" className="territory-emblem-img" />
+              </div>
+              {label.hourlyRate > 0 && (
+                <span className="territory-emblem-rate" style={{ color: label.tagColor }}>
+                  +{label.hourlyRate % 1 === 0 ? label.hourlyRate : label.hourlyRate.toFixed(1)}/h
+                </span>
+              )}
             </div>
           </Marker>
         ) : null

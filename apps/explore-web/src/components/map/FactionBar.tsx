@@ -8,6 +8,7 @@ interface FactionNotoriety {
   color: string
   pattern: string
   notoriety: number
+  hourlyRate: number
   placesCount: number
   percent: number
 }
@@ -30,6 +31,7 @@ export function FactionBar() {
         color: string
         pattern: string
         notoriety: number
+        hourlyRate: number
         placesCount: number
       }>)
         .map(f => ({
@@ -38,6 +40,7 @@ export function FactionBar() {
           color: f.color,
           pattern: f.pattern ?? '',
           notoriety: f.notoriety,
+          hourlyRate: f.hourlyRate ?? 0,
           placesCount: f.placesCount ?? 0,
           percent: totalNotoriety > 0 ? (f.notoriety / totalNotoriety) * 100 : 0,
         }))
@@ -75,6 +78,9 @@ export function FactionBar() {
               {isLeader && <span className="faction-scoreboard-crown">{'\uD83D\uDC51'}</span>}
               <span className="faction-scoreboard-places">{faction.placesCount}</span>
               <span className="faction-scoreboard-pct">{faction.notoriety}</span>
+              {faction.hourlyRate > 0 && (
+                <span className="faction-scoreboard-rate">+{faction.hourlyRate % 1 === 0 ? faction.hourlyRate : faction.hourlyRate.toFixed(1)}/h</span>
+              )}
             </div>
           </div>
         )

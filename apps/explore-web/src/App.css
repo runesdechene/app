@@ -169,6 +169,15 @@
   text-align: right;
 }
 
+.faction-scoreboard-rate {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faction-color);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
 /* ==========================================
    TOOLBAR (boutons flottants)
    ========================================== */
@@ -2187,6 +2196,30 @@
   height: 18px;
   object-fit: contain;
   filter: brightness(0) invert(1);
+}
+
+.territory-emblem-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.territory-emblem-rate {
+  position: absolute;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-parchment-dark); 
+  padding: 1px 5px;
+  border-radius: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  white-space: nowrap;
+  top: -21px;
 }
 
 /* Label faction + joueurs sur les territoires */

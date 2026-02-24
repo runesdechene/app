@@ -33,6 +33,7 @@ interface PlaceInput {
   tagColor: string
   factionPattern: string
   score: number
+  fortificationLevel: number
   claimedByName: string
 }
 
@@ -170,7 +171,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
   //    Grouper par faction (nom) pour fusion visuelle
-  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string> }>()
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number> }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
@@ -186,15 +187,18 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     if (clipped) {
       const key = place.faction
       if (!factionRings.has(key)) {
-        factionRings.set(key, { polygons: [], totalScore: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map() })
+        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map() })
       }
       const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
+      const placeRate = 1 + (place.fortificationLevel ?? 0) * 0.5
       group.totalScore += place.score
+      group.totalHourlyRate += placeRate
       group.count++
       if (place.claimedByName) group.players.add(place.claimedByName)
       group.placeCoords.push(place.coordinates)
       if (place.claimedByName) group.placeNames.set(`${place.coordinates[0]},${place.coordinates[1]}`, place.claimedByName)
+      group.placeHourlyRates.set(`${place.coordinates[0]},${place.coordinates[1]}`, placeRate)
       group.centroidSum[0] += place.coordinates[0]
       group.centroidSum[1] += place.coordinates[1]
     }
@@ -237,10 +241,12 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       for (const polyCoords of smoothed.coordinates) {
         const outerRing = polyCoords[0]
         let blobCount = 0
+        let blobHourlyRate = 0
         const blobPlayers = new Set<string>()
         for (const [px, py] of group.placeCoords) {
           if (pointInRing(px, py, outerRing)) {
             blobCount++
+            blobHourlyRate += group.placeHourlyRates.get(`${px},${py}`) ?? 1
             const name = group.placeNames.get(`${px},${py}`)
             if (name) blobPlayers.add(name)
           }
@@ -249,7 +255,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
           type: 'Feature',
           id: id++,
           geometry: { type: 'Polygon', coordinates: polyCoords },
-          properties: { ...baseProps, placesCount: blobCount, players: Array.from(blobPlayers).join(', ') },
+          properties: { ...baseProps, placesCount: blobCount, hourlyRate: blobHourlyRate, players: Array.from(blobPlayers).join(', ') },
         })
       }
     } else {
@@ -257,7 +263,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
         type: 'Feature',
         id: id++,
         geometry: smoothed,
-        properties: { ...baseProps, placesCount: group.count, players: Array.from(group.players).join(', ') },
+        properties: { ...baseProps, placesCount: group.count, hourlyRate: group.totalHourlyRate, players: Array.from(group.players).join(', ') },
       })
     }
   }
