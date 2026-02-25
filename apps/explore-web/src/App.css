@@ -3576,9 +3576,9 @@
 
 .version-badge {
   position: fixed;
-  bottom: 12px;
-  left: 60px;
-  z-index: 15;
+  top: 12px;
+  left: 12px;
+  z-index: 10001;
   background: rgba(44, 24, 16, 0.55);
   color: rgba(255, 248, 230, 0.7);
   border: none;
