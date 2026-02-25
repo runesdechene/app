@@ -1,5 +1,5 @@
 [build]
-  publish = "apps/explore-web/dist"
+  publish = "dist"
 
 [[headers]]
   for = "/*"
