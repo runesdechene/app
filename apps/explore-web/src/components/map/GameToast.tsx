@@ -10,6 +10,7 @@ const ICONS: Record<GameToastType['type'], string> = {
   new_place: '\u2B50',       // etoile
   new_user: '\uD83D\uDC64',  // silhouette
   like: '\u2764\uFE0F',      // coeur
+  fortify: '\uD83D\uDEE1\uFE0F', // bouclier
 }
 
 function formatTimeAgo(ts: number): string {

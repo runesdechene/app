@@ -224,21 +224,31 @@ export function useFog() {
           let message = ''
           let type: GameToast['type'] = 'discover'
           const highlights: string[] = [name]
+          let color: string | undefined
+          let iconUrl: string | undefined
 
           if (e.type === 'claim') {
             const faction = e.data?.factionTitle ?? 'une faction'
             message = `${name} a revendiqué ${place} pour ${faction}`
             highlights.push(place)
             type = 'claim'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
             // Mettre à jour la carte en temps réel
             if (e.place_id && e.faction_id) {
               useMapStore.getState().setPlaceOverride(e.place_id, {
                 claimed: true,
                 factionId: e.faction_id,
-                tagColor: e.data?.factionColor ?? undefined,
-                factionPattern: e.data?.factionPattern ?? undefined,
+                tagColor: color,
+                factionPattern: iconUrl,
               })
             }
+          } else if (e.type === 'fortify') {
+            message = isSelf ? `Vous avez fortifié ${place}` : `${name} a fortifié ${place}`
+            highlights.push(place)
+            type = 'fortify'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'discover') {
             message = `${name} a découvert ${place}`
             highlights.push(place)
@@ -263,6 +273,8 @@ export function useFog() {
             type,
             message,
             highlights,
+            color,
+            iconUrl,
             placeId: e.place_id ?? undefined,
             placeLocation: hasLocation
               ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
@@ -305,6 +317,8 @@ async function loadRecentActivity(currentUserId: string) {
       placeLatitude?: number
       placeLongitude?: number
       factionTitle?: string
+      factionColor?: string
+      factionPattern?: string
       actorName?: string
     }
     created_at: string
@@ -317,8 +331,10 @@ async function loadRecentActivity(currentUserId: string) {
     const place = e.data?.placeTitle ?? 'un lieu'
 
     let message = ''
-    let type: 'claim' | 'discover' | 'new_place' | 'new_user' | 'like' | 'explore' = 'discover'
+    let type: GameToast['type'] = 'discover'
     const highlights: string[] = []
+    let color: string | undefined
+    let iconUrl: string | undefined
 
     if (e.type === 'claim') {
       const faction = e.data?.factionTitle ?? 'une faction'
@@ -327,6 +343,16 @@ async function loadRecentActivity(currentUserId: string) {
         : `${name} a revendiqué ${place} pour ${faction}`
       highlights.push(name, place)
       type = 'claim'
+      color = e.data?.factionColor ?? undefined
+      iconUrl = e.data?.factionPattern ?? undefined
+    } else if (e.type === 'fortify') {
+      message = isSelf
+        ? `Vous avez fortifié ${place}`
+        : `${name} a fortifié ${place}`
+      highlights.push(name, place)
+      type = 'fortify'
+      color = e.data?.factionColor ?? undefined
+      iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'discover') {
       message = isSelf
         ? `Vous avez découvert ${place}`
@@ -365,6 +391,8 @@ async function loadRecentActivity(currentUserId: string) {
       type,
       message,
       highlights,
+      color,
+      iconUrl,
       placeId: e.place_id ?? undefined,
       placeLocation: hasLocation
         ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
