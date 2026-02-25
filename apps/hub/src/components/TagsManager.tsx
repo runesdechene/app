@@ -18,6 +18,9 @@ export function TagsManager() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState<string | null>(null)
   const [saving, setSaving] = useState<string | null>(null)
+  const [newId, setNewId] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [creating, setCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadTagIdRef = useRef<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -36,6 +39,46 @@ export function TagsManager() {
       setTags(data as Tag[])
     }
     setLoading(false)
+  }
+
+  // --- Créer un tag ---
+
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
+
+  async function handleCreate() {
+    const id = newId.trim() || slugify(newTitle)
+    const title = newTitle.trim()
+    if (!id || !title) return
+    if (tags.some(t => t.id === id)) return
+
+    setCreating(true)
+
+    const maxOrder = tags.reduce((max, t) => Math.max(max, t.order), -1)
+
+    const { data, error } = await supabase.from('tags').insert({
+      id,
+      title,
+      color: '#C19A6B',
+      background: '#F5E6D3',
+      order: maxOrder + 1,
+      reward_energy: 0,
+      reward_conquest: 0,
+      reward_construction: 0,
+    }).select().single()
+
+    if (!error && data) {
+      setTags(prev => [...prev, data as Tag])
+      setNewId('')
+      setNewTitle('')
+    }
+
+    setCreating(false)
   }
 
   // --- Couleurs ---
@@ -173,6 +216,35 @@ export function TagsManager() {
       <div className="page-header">
         <h1>Tags</h1>
         <span className="tags-count">{tags.length} tags</span>
+      </div>
+
+      {/* Formulaire d'ajout */}
+      <div className="tag-create-row">
+        <input
+          type="text"
+          placeholder="Nom du tag..."
+          value={newTitle}
+          onChange={e => { setNewTitle(e.target.value); if (!newId) setNewId('') }}
+          onKeyDown={e => e.key === 'Enter' && handleCreate()}
+          className="tag-create-input"
+          disabled={creating}
+        />
+        <input
+          type="text"
+          placeholder={newTitle ? slugify(newTitle) || 'id' : 'ID (auto)'}
+          value={newId}
+          onChange={e => setNewId(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleCreate()}
+          className="tag-create-input tag-create-id"
+          disabled={creating}
+        />
+        <button
+          className="faction-create-btn"
+          onClick={handleCreate}
+          disabled={creating || !newTitle.trim()}
+        >
+          {creating ? '...' : '+ Ajouter'}
+        </button>
       </div>
 
       {/* Input fichier caché, partagé */}

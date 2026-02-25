@@ -59,11 +59,13 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   const currentUserId = useFogStore(s => s.userId)
   const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
   const [editInstagram, setEditInstagram] = useState('')
   const [editTitleIds, setEditTitleIds] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
   const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
+  const [visibleCount, setVisibleCount] = useState(12)
 
   const isSelf = profile?.userId === currentUserId
 
@@ -86,6 +88,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   function handleStartEdit() {
     if (!profile) return
+    setEditName(profile.name ?? '')
     setEditBio(profile.biography ?? '')
     setEditInstagram(profile.instagram ?? '')
     if (profile.displayedGeneralTitles && profile.displayedGeneralTitles.length > 0) {
@@ -111,6 +114,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     await Promise.all([
       supabase.rpc('update_my_profile', {
         p_user_id: currentUserId,
+        p_first_name: editName,
         p_bio: editBio,
         p_instagram: editInstagram,
       }),
@@ -120,6 +124,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     const { data } = await supabase.rpc('get_player_profile', { p_user_id: currentUserId })
     if (data) setProfile(data as unknown as PlayerProfile)
 
+    useFogStore.getState().setUserName(editName)
     setIsEditing(false)
     setSaving(false)
   }
@@ -253,6 +258,15 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             {/* Mode edition */}
             {isEditing && isSelf && (
               <div className="player-modal-edit-form">
+                <label className="player-modal-edit-label">Nom</label>
+                <input
+                  className="player-modal-edit-input"
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  placeholder="Votre nom d'explorateur"
+                  maxLength={50}
+                />
+
                 <label className="player-modal-edit-label">Biographie</label>
                 <div className="player-modal-edit-textarea-wrap">
                   <textarea
@@ -322,19 +336,19 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               <div className="player-modal-tabs">
                 <button
                   className={`player-modal-tab${placesTab === 'authored' ? ' active' : ''}`}
-                  onClick={() => setPlacesTab('authored')}
+                  onClick={() => { setPlacesTab('authored'); setVisibleCount(12) }}
                 >
                   Ajoutés <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
                 </button>
                 <button
                   className={`player-modal-tab${placesTab === 'discovered' ? ' active' : ''}`}
-                  onClick={() => setPlacesTab('discovered')}
+                  onClick={() => { setPlacesTab('discovered'); setVisibleCount(12) }}
                 >
                   Explorés  <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
                 </button>
                 <button
                   className={`player-modal-tab${placesTab === 'claimed' ? ' active' : ''}`}
-                  onClick={() => setPlacesTab('claimed')}
+                  onClick={() => { setPlacesTab('claimed'); setVisibleCount(12) }}
                 >
                   Conquis  <span className="player-modal-tabs-number">{profile.claimedPlaces?.length ?? 0}</span>
                 </button>
@@ -350,24 +364,37 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   <div className="player-modal-places-empty">Aucun lieu</div>
                 )
 
+                const visible = places.slice(0, visibleCount)
+                const hasMore = places.length > visibleCount
+
                 return (
-                  <div className="player-modal-places-grid">
-                    {places.map(place => (
-                      <div
-                        key={place.id}
-                        className="player-modal-place-card"
-                        onClick={() => handlePlaceClick(place.id)}
+                  <>
+                    <div className="player-modal-places-grid">
+                      {visible.map(place => (
+                        <div
+                          key={place.id}
+                          className="player-modal-place-card"
+                          onClick={() => handlePlaceClick(place.id)}
+                        >
+                          {place.imageUrl ? (
+                            <img src={place.imageUrl} alt={place.title} className="player-modal-place-img" loading="lazy" />
+                          ) : (
+                            <div className="player-modal-place-img-fallback">
+                              {'\uD83C\uDFDB\uFE0F'}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {hasMore && (
+                      <button
+                        className="player-modal-show-more"
+                        onClick={() => setVisibleCount(c => c + 12)}
                       >
-                        {place.imageUrl ? (
-                          <img src={place.imageUrl} alt={place.title} className="player-modal-place-img" />
-                        ) : (
-                          <div className="player-modal-place-img-fallback">
-                            {'\uD83C\uDFDB\uFE0F'}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                        Voir plus ({places.length - visibleCount} restants)
+                      </button>
+                    )}
+                  </>
                 )
               })()}
             </div>

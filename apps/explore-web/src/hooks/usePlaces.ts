@@ -63,6 +63,7 @@ export function usePlaces() {
   const userFactionId = useFogStore(s => s.userFactionId)
   const fogLoading = useFogStore(s => s.loading)
   const deletedPlaceIds = useMapStore(s => s.deletedPlaceIds)
+  const placesRefreshKey = useMapStore(s => s.placesRefreshKey)
   const { isAuthenticated } = useAuth()
 
   useEffect(() => {
@@ -127,7 +128,7 @@ export function usePlaces() {
     }
 
     fetchPlaces()
-  }, [])
+  }, [placesRefreshKey])
 
   // Enrichir le GeoJSON avec l'état discovered + ownFaction (re-calcule quand fog change)
   const geojson = useMemo(() => {

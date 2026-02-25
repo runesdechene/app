@@ -113,6 +113,19 @@ export function usePlace(placeId: string | null) {
 
       setPlace(placeData)
       setLoading(false)
+
+      // Enregistrer la vue
+      if (userId) {
+        supabase.from('places_viewed').insert({
+          id: crypto.randomUUID(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          user_id: userId,
+          place_id: placeId,
+        }).then(({ error: viewErr }) => {
+          if (viewErr) console.error('places_viewed insert error:', viewErr)
+        })
+      }
     }
 
     fetchPlace()

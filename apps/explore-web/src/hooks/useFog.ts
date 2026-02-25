@@ -242,6 +242,10 @@ export function useFog() {
             message = isSelf ? `Vous avez aimé ${place}` : `${name} a aimé ${place}`
             highlights.push(place)
             type = 'like'
+          } else if (e.type === 'new_place') {
+            message = isSelf ? `Vous avez ajouté ${place}` : `${name} a ajouté ${place}`
+            highlights.push(name, place)
+            type = 'new_place'
           } else if (e.type === 'new_user') {
             message = `${name} a rejoint la carte`
             type = 'new_user'
@@ -336,6 +340,12 @@ async function loadRecentActivity(currentUserId: string) {
         : `${name} a aimé ${place}`
       highlights.push(name, place)
       type = 'like'
+    } else if (e.type === 'new_place') {
+      message = isSelf
+        ? `Vous avez ajouté ${place}`
+        : `${name} a ajouté ${place}`
+      highlights.push(name, place)
+      type = 'new_place'
     } else if (e.type === 'new_user') {
       if (isSelf) continue
       message = `${name} a rejoint la carte`

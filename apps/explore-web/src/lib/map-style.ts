@@ -43,16 +43,29 @@ export const MAP_COLORS = {
 
 // ============================================================
 
-/**
- * Charge le style Positron d'OpenFreeMap et remplace les couleurs
- * par la palette parchemin ci-dessus.
- */
-export async function loadParchmentStyle(): Promise<StyleSpecification> {
-  const res = await fetch('https://tiles.openfreemap.org/styles/positron')
-  const style: StyleSpecification = await res.json()
+// Layers cachés en mode jeu (carte épurée)
+const GAME_HIDDEN_PATTERNS = [
+  /housenumber/i,
+  /poi/i,
+  /aeroway/i,
+  /road/i,
+  /transportation/i,
+  /motorway/i,
+  /trunk/i,
+  /primary/i,
+  /railway/i,
+  /building/i,
+  /ferry/i,
+  /tunnel/i,
+  /bridge/i,
+  /shield/i,
+  /highway/i,
+]
+
+/** Recolore un style Positron avec la palette parchemin */
+function applyParchmentColors(style: StyleSpecification, dimLabels: boolean): void {
   const c = MAP_COLORS
 
-  // Mapping : couleur originale Positron → couleur parchemin
   const colorMap: Record<string, string> = {
     'rgb(242,243,240)':       c.land,
     'rgb(194, 200, 202)':     c.water,
@@ -91,32 +104,6 @@ export async function loadParchmentStyle(): Promise<StyleSpecification> {
     '#f8f4f0':                  c.labelHalo,
   }
 
-  // --- Carte de jeu : supprimer les layers inutiles ---
-  // On ne garde que le terrain, l'eau, les grandes villes et les frontières
-  const hiddenPatterns = [
-    /housenumber/i,           // numéros de maison
-    /poi/i,                   // points d'intérêt
-    /aeroway/i,               // aéroports
-    /road/i,                  // toutes les routes (autoroutes, D, M, etc.)
-    /transportation/i,        // tout le transport
-    /motorway/i,              // autoroutes
-    /trunk/i,                 // nationales
-    /primary/i,               // primaires
-    /railway/i,               // voies ferrées
-    /building/i,              // bâtiments
-    /ferry/i,                 // ferries
-    /tunnel/i,                // tunnels
-    /bridge/i,                // ponts
-    /shield/i,                // étiquettes de routes (A8, M6007…)
-    /highway/i,               // labels autoroutes
-  ]
-
-  style.layers = (style.layers as LayerSpecification[]).filter(layer => {
-    const id = layer.id.toLowerCase()
-    return !hiddenPatterns.some(p => p.test(id))
-  })
-
-  // --- Recolorer les layers restants ---
   for (const layer of style.layers as LayerSpecification[]) {
     const paint = (layer as Record<string, unknown>).paint as Record<string, unknown> | undefined
     if (!paint) continue
@@ -128,7 +115,6 @@ export async function loadParchmentStyle(): Promise<StyleSpecification> {
         paint[key] = colorMap[value]
       }
 
-      // Blanc pur → teinte parchemin
       if (value === '#fff' && (key === 'line-color' || key === 'fill-color')) {
         paint[key] = c.roadMajor
       }
@@ -145,12 +131,86 @@ export async function loadParchmentStyle(): Promise<StyleSpecification> {
       paint['text-halo-color'] = haloMap[paint['text-halo-color'] as string]
     }
 
-    // Labels de villes discrets
-    if (layer.type === 'symbol' && paint['text-color']) {
+    if (dimLabels && layer.type === 'symbol' && paint['text-color']) {
       paint['text-opacity'] = 0.5
     }
+  }
+}
 
+/**
+ * Style parchemin de JEU — épuré (pas de routes, bâtiments, POIs).
+ */
+export async function loadParchmentStyle(): Promise<StyleSpecification> {
+  const res = await fetch('https://tiles.openfreemap.org/styles/positron')
+  const style: StyleSpecification = await res.json()
+
+  // Supprimer les layers de détail pour la carte de jeu
+  style.layers = (style.layers as LayerSpecification[]).filter(layer => {
+    const id = layer.id.toLowerCase()
+    return !GAME_HIDDEN_PATTERNS.some(p => p.test(id))
+  })
+
+  applyParchmentColors(style, true)
+  return style
+}
+
+/**
+ * Style parchemin DÉTAILLÉ — routes, bâtiments, POIs visibles (pour placement précis).
+ */
+export async function loadParchmentDetailedStyle(): Promise<StyleSpecification> {
+  const res = await fetch('https://tiles.openfreemap.org/styles/positron')
+  const style: StyleSpecification = await res.json()
+
+  // On garde TOUS les layers — pas de filtre
+  applyParchmentColors(style, false)
+  return style
+}
+
+/**
+ * Style satellite avec tuiles Esri World Imagery (gratuites, pas de clé API).
+ * Labels de villes superposés via OpenFreeMap Positron (layer symbol uniquement).
+ */
+export async function loadSatelliteStyle(): Promise<StyleSpecification> {
+  const res = await fetch('https://tiles.openfreemap.org/styles/positron')
+  const positron: StyleSpecification = await res.json()
+
+  const labelLayers = (positron.layers as LayerSpecification[]).filter(
+    l => l.type === 'symbol',
+  )
+
+  for (const layer of labelLayers) {
+    const paint = (layer as Record<string, unknown>).paint as Record<string, unknown> | undefined
+    if (!paint) continue
+    paint['text-color'] = '#ffffff'
+    paint['text-halo-color'] = 'rgba(0,0,0,0.7)'
+    paint['text-halo-width'] = 1.5
+    paint['text-opacity'] = 1
   }
 
-  return style
+  return {
+    version: 8,
+    name: 'satellite',
+    sources: {
+      ...positron.sources,
+      'esri-satellite': {
+        type: 'raster',
+        tiles: [
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        ],
+        tileSize: 256,
+        maxzoom: 19,
+        attribution: 'Esri, Maxar, Earthstar Geographics',
+      },
+    },
+    layers: [
+      {
+        id: 'satellite-tiles',
+        type: 'raster',
+        source: 'esri-satellite',
+        minzoom: 0,
+        maxzoom: 19,
+      } as LayerSpecification,
+      ...labelLayers,
+    ],
+  }
 }

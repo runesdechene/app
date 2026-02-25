@@ -18,6 +18,7 @@ import { useFog } from './hooks/useFog'
 import { usePresence } from './hooks/usePresence'
 import { useChat } from './hooks/useChat'
 import { ChatPanel } from './components/chat/ChatPanel'
+import { AddPlaceFlow } from './components/places/AddPlaceFlow'
 import './App.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
@@ -42,6 +43,14 @@ function App() {
 
   const userId = useFogStore(s => s.userId)
   const userFactionId = useFogStore(s => s.userFactionId)
+  const addPlaceMode = useMapStore(s => s.addPlaceMode)
+  const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
+
+  // Le FAB "+" n'est visible que si un titre débloqué contient 'add_place'
+  const unlockedTitles = useFogStore(s => s.unlockedGeneralTitles)
+  const factionTitle = useFogStore(s => s.factionTitle2)
+  const canAddPlace = unlockedTitles.some(t => t.unlocks?.includes('add_place'))
+    || (factionTitle?.unlocks?.includes('add_place') ?? false)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   useFog()
@@ -75,41 +84,59 @@ function App() {
     <div className="app">
       <ExploreMap />
 
-      <FactionBar />
-      <GameToast />
-      <ChatPanel />
+      {!addPlaceMode && <FactionBar />}
+      {!addPlaceMode && <GameToast />}
+      {!addPlaceMode && <ChatPanel />}
 
-      {/* Toolbar flottante */}
-      <div className="app-toolbar">
-        {!authLoading && isAuthenticated && (
-          <>
-            <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
-            <ResourceIndicator type="conquest" />
-            <ResourceIndicator type="construction" />
-            <EnergyIndicator />
-          </>
-        )}
+      {/* Toolbar flottante (masquée en mode ajout) */}
+      {!addPlaceMode && (
+        <div className="app-toolbar">
+          {!authLoading && isAuthenticated && (
+            <>
+              <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
+              <ResourceIndicator type="conquest" />
+              <ResourceIndicator type="construction" />
+              <EnergyIndicator />
+            </>
+          )}
 
-        {!authLoading && (
-          isAuthenticated && user?.email ? (
-            <ProfileMenu email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
-          ) : (
-            <button
-              className="toolbar-btn auth-btn"
-              onClick={() => setShowAuthModal(true)}
-            >
-              ⚔️ Commencer à jouer
-            </button>
-          )
-        )}
-      </div>
+          {!authLoading && (
+            isAuthenticated && user?.email ? (
+              <ProfileMenu email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
+            ) : (
+              <button
+                className="toolbar-btn auth-btn"
+                onClick={() => setShowAuthModal(true)}
+              >
+                ⚔️ Commencer à jouer
+              </button>
+            )
+          )}
+        </div>
+      )}
 
-      <PlacePanel
-        placeId={selectedPlaceId}
-        onClose={() => setSelectedPlaceId(null)}
-        userEmail={user?.email ?? null}
-        onAuthPrompt={() => setShowAuthModal(true)}
-      />
+      {/* FAB Ajouter un lieu (gate derrière titre avec unlock 'add_place') */}
+      {!authLoading && isAuthenticated && userId && canAddPlace && !addPlaceMode && (
+        <button
+          className="add-place-fab"
+          onClick={() => setAddPlaceMode(true)}
+          aria-label="Ajouter un lieu"
+        >
+          +
+        </button>
+      )}
+
+      {/* Flow ajout de lieu (immersif) */}
+      {addPlaceMode && <AddPlaceFlow />}
+
+      {!addPlaceMode && (
+        <PlacePanel
+          placeId={selectedPlaceId}
+          onClose={() => setSelectedPlaceId(null)}
+          userEmail={user?.email ?? null}
+          onAuthPrompt={() => setShowAuthModal(true)}
+        />
+      )}
 
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
@@ -133,10 +160,10 @@ function App() {
         />
       )}
 
-      <VersionBadge />
+      {!addPlaceMode && <VersionBadge />}
 
       {/* Overlay texture parchemin */}
-      <div className="parchment-overlay" />
+      {!addPlaceMode && <div className="parchment-overlay" />}
     </div>
   )
 }

@@ -7,7 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { usePlaces } from '../../hooks/usePlaces'
 import type { PlaceProperties } from '../../hooks/usePlaces'
-import { loadParchmentStyle, MAP_COLORS } from '../../lib/map-style'
+import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
 import { useFogStore } from '../../stores/fogStore'
 import { usePlayersStore } from '../../stores/playersStore'
@@ -242,6 +242,74 @@ interface PopupInfo {
   tagColor: string
 }
 
+// --- Map Style Select (dropdown vers le haut, style Google Maps) ---
+
+type MapStyleMode = 'game' | 'detailed' | 'satellite'
+
+const STYLE_OPTIONS: { mode: MapStyleMode; label: string; icon: string }[] = [
+  { mode: 'game',      label: 'Jeu',       icon: '\uD83D\uDCDC' },  // 📜
+  { mode: 'detailed',  label: 'Détaillé',  icon: '\uD83C\uDFD8\uFE0F' },  // 🏘️
+  { mode: 'satellite', label: 'Satellite', icon: '\uD83D\uDEF0\uFE0F' },  // 🛰️
+]
+
+function MapStyleSelect({ mode, onChange, addPlaceMode }: {
+  mode: MapStyleMode
+  onChange: (m: MapStyleMode) => void
+  addPlaceMode: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Fermer au clic extérieur
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const current = STYLE_OPTIONS.find(o => o.mode === mode)!
+
+  return (
+    <div
+      ref={ref}
+      className="map-style-select"
+      style={addPlaceMode ? { bottom: 70 } : undefined}
+    >
+      {/* Dropdown (s'ouvre vers le haut) */}
+      {open && (
+        <div className="map-style-dropdown">
+          {STYLE_OPTIONS.map(opt => (
+            <button
+              key={opt.mode}
+              className={`map-style-option${opt.mode === mode ? ' active' : ''}`}
+              onClick={() => { onChange(opt.mode); setOpen(false) }}
+            >
+              <span className="map-style-option-icon">{opt.icon}</span>
+              <span className="map-style-option-label">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Bouton principal (icône layers) */}
+      <button
+        className="map-style-trigger"
+        onClick={() => setOpen(!open)}
+        title={`Style : ${current.label}`}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2" />
+          <polyline points="2 17 12 22 22 17" />
+          <polyline points="2 12 12 17 22 12" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 const MAP_STYLE_PROP = { width: '100%', height: '100%' } as const
 const MAP_CONTAINER_STYLE = { position: 'relative' as const, width: '100%', height: '100%' }
 const INITIAL_VIEW = { longitude: 7.26, latitude: 43.7, zoom: 9 }
@@ -266,6 +334,10 @@ export const ExploreMap = memo(function ExploreMap() {
   const currentUserId = useFogStore(s => s.userId)
   const onlinePlayers = usePlayersStore(s => s.players)
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
+  const addPlaceMode = useMapStore(s => s.addPlaceMode)
+  const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
+  const mapStyleMode = useMapStore(s => s.mapStyleMode)
+  const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
 
   // Viewport bounds pour la minimap
   const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
@@ -366,10 +438,35 @@ export const ExploreMap = memo(function ExploreMap() {
       }))
   }, [geojson])
 
-  // Charger le style parchemin
+  // Charger les 3 styles (jeu épuré, parchemin détaillé, satellite)
+  const gameStyleRef = useRef<StyleSpecification | null>(null)
+  const parchmentDetailedStyleRef = useRef<StyleSpecification | null>(null)
+  const satelliteStyleRef = useRef<StyleSpecification | null>(null)
+
   useEffect(() => {
-    loadParchmentStyle().then(setMapStyle)
+    loadParchmentStyle().then(s => {
+      gameStyleRef.current = s
+      // Style initial (mode par défaut = 'game')
+      if (!mapStyle) setMapStyle(s)
+    })
+    loadParchmentDetailedStyle().then(s => {
+      parchmentDetailedStyleRef.current = s
+    })
+    loadSatelliteStyle().then(s => {
+      satelliteStyleRef.current = s
+    })
   }, [])
+
+  // Switcher le style selon le mode sélectionné
+  useEffect(() => {
+    if (mapStyleMode === 'satellite' && satelliteStyleRef.current) {
+      setMapStyle(satelliteStyleRef.current)
+    } else if (mapStyleMode === 'detailed' && parchmentDetailedStyleRef.current) {
+      setMapStyle(parchmentDetailedStyleRef.current)
+    } else if (mapStyleMode === 'game' && gameStyleRef.current) {
+      setMapStyle(gameStyleRef.current)
+    }
+  }, [mapStyleMode])
 
   // Web Worker : calcul des territoires en arrière-plan
   useEffect(() => {
@@ -428,6 +525,14 @@ export const ExploreMap = memo(function ExploreMap() {
       return () => navigator.geolocation.clearWatch(watchId)
     }
   }, [])
+
+  // Initialiser les coords du centre quand on entre en mode add-place
+  useEffect(() => {
+    if (addPlaceMode) {
+      const center = mapRef.current?.getMap().getCenter()
+      if (center) setPendingNewPlaceCoords({ lng: center.lng, lat: center.lat })
+    }
+  }, [addPlaceMode, setPendingNewPlaceCoords])
 
   // Fly-to demandé depuis l'extérieur (toast cliqué, etc.)
   useEffect(() => {
@@ -522,6 +627,8 @@ export const ExploreMap = memo(function ExploreMap() {
   // Note: fill-pattern supprimé — les blasons flottants (Markers HTML) remplacent le pattern
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
+    if (addPlaceMode) return // Don't select places while placing
+
     const feature = event.features?.[0]
     if (!feature) {
       setSelectedPlaceId(null)
@@ -551,13 +658,19 @@ export const ExploreMap = memo(function ExploreMap() {
     const props = feature.properties as PlaceProperties
     setSelectedPlaceId(props.id)
     setPopupInfo(null)
-  }, [geojson])
+  }, [geojson, addPlaceMode])
 
-  // Minimap : mettre à jour le viewport bounds
+  // Minimap : mettre à jour le viewport bounds + coords pour add-place
   const onMoveEnd = useCallback(() => {
-    const b = mapRef.current?.getMap().getBounds()
+    const map = mapRef.current?.getMap()
+    if (!map) return
+    const b = map.getBounds()
     if (b) setViewBounds({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() })
-  }, [])
+    if (addPlaceMode) {
+      const center = map.getCenter()
+      setPendingNewPlaceCoords({ lng: center.lng, lat: center.lat })
+    }
+  }, [addPlaceMode, setPendingNewPlaceCoords])
 
   const handleMinimapNavigate = useCallback((lng: number, lat: number) => {
     mapRef.current?.flyTo({ center: [lng, lat], duration: 800 })
@@ -565,9 +678,10 @@ export const ExploreMap = memo(function ExploreMap() {
 
   // Curseur pointer sur les layers interactifs
   const onMouseEnter = useCallback(() => {
+    if (addPlaceMode) return
     const map = mapRef.current?.getMap()
     if (map) map.getCanvas().style.cursor = 'pointer'
-  }, [])
+  }, [addPlaceMode])
 
   const onMouseLeave = useCallback(() => {
     const map = mapRef.current?.getMap()
@@ -632,7 +746,7 @@ export const ExploreMap = memo(function ExploreMap() {
   }
 
   return (
-    <div style={MAP_CONTAINER_STYLE}>
+    <div style={MAP_CONTAINER_STYLE} data-map-style={mapStyleMode}>
     <MapGL
       ref={mapRef}
       initialViewState={INITIAL_VIEW}
@@ -648,28 +762,42 @@ export const ExploreMap = memo(function ExploreMap() {
       onLoad={onMapLoad}
       onMoveEnd={onMoveEnd}
     >
-      <NavigationControl position="top-right" showCompass={false} />
-      <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />
+      {!addPlaceMode && <NavigationControl position="top-right" showCompass={false} />}
+      {!addPlaceMode && <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />}
 
       {/* Marqueur position utilisateur */}
       {userPosition && (
         <Marker longitude={userPosition.lng} latitude={userPosition.lat} anchor="center">
-          <div
-            className="user-position-marker"
-            style={{
-              '--faction-color': userFactionColor ?? '#4A90D9',
-              '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
-              cursor: 'pointer',
-            } as React.CSSProperties}
-            onClick={() => currentUserId && setSelectedPlayerId(currentUserId)}
-          >
-            <div className="user-position-pulse" />
-            {userAvatarUrl ? (
-              <img src={userAvatarUrl} alt="" className="user-position-avatar" />
-            ) : (
+          {addPlaceMode ? (
+            /* En mode ajout : simple point pulsant (pas d'avatar pour ne pas gêner le viseur) */
+            <div
+              className="user-position-marker"
+              style={{
+                '--faction-color': userFactionColor ?? '#4A90D9',
+                '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
+              } as React.CSSProperties}
+            >
+              <div className="user-position-pulse" />
               <div className="user-position-dot" />
-            )}
-          </div>
+            </div>
+          ) : (
+            <div
+              className="user-position-marker"
+              style={{
+                '--faction-color': userFactionColor ?? '#4A90D9',
+                '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
+                cursor: 'pointer',
+              } as React.CSSProperties}
+              onClick={() => currentUserId && setSelectedPlayerId(currentUserId)}
+            >
+              <div className="user-position-pulse" />
+              {userAvatarUrl ? (
+                <img src={userAvatarUrl} alt="" className="user-position-avatar" />
+              ) : (
+                <div className="user-position-dot" />
+              )}
+            </div>
+          )}
         </Marker>
       )}
 
@@ -826,13 +954,13 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
     </MapGL>
 
-    {/* Minimap style AoE */}
-    {geojson && viewBounds && (
+    {/* Minimap style AoE (masquée en mode add-place) */}
+    {!addPlaceMode && geojson && viewBounds && (
       <Minimap geojson={geojson} bounds={viewBounds} onNavigate={handleMinimapNavigate} />
     )}
 
-    {/* Barre de progression découvertes (style XP) */}
-    {geojson && (() => {
+    {/* Barre de progression découvertes (masquée en mode add-place) */}
+    {!addPlaceMode && geojson && (() => {
       const total = geojson.features.length
       const discovered = geojson.features.filter(f => f.properties.discovered).length
       const pct = total > 0 ? (discovered / total) * 100 : 0
@@ -848,6 +976,13 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       ) : null
     })()}
+
+    {/* Sélecteur de style de carte (toujours visible) */}
+    <MapStyleSelect
+      mode={mapStyleMode}
+      onChange={setMapStyleMode}
+      addPlaceMode={addPlaceMode}
+    />
 
     </div>
   )
