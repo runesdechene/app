@@ -121,9 +121,8 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
     await reloadAfterFactionChange()
 
-    setSelecting(false)
-    setConfirmFaction(null)
-    onClose()
+    // Recharger la page pour synchroniser tout l'état
+    window.location.reload()
   }
 
   async function leaveFaction() {

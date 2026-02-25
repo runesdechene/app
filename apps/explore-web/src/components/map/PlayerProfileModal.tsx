@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
+import { compressImage } from '../../lib/imageUtils'
 import { useFogStore } from '../../stores/fogStore'
 import { useMapStore } from '../../stores/mapStore'
 import { setDisplayedTitles } from '../../hooks/useFog'
@@ -64,6 +65,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [editInstagram, setEditInstagram] = useState('')
   const [editTitleIds, setEditTitleIds] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
   const [visibleCount, setVisibleCount] = useState(12)
 
@@ -96,7 +100,16 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     } else {
       setEditTitleIds([])
     }
+    setAvatarFile(null)
+    setAvatarPreview(null)
     setIsEditing(true)
+  }
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarFile(file)
+    setAvatarPreview(URL.createObjectURL(file))
   }
 
   function handleToggleTitle(titleId: number) {
@@ -111,12 +124,29 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     if (!currentUserId || !profile) return
     setSaving(true)
 
+    let avatarUrl: string | undefined
+
+    // Upload avatar si changé
+    if (avatarFile) {
+      const compressed = await compressImage(avatarFile, 400)
+      const path = `avatars/${currentUserId}.webp`
+      const { error: uploadErr } = await supabase.storage
+        .from('place-images')
+        .upload(path, compressed, { contentType: 'image/webp', upsert: true })
+
+      if (!uploadErr) {
+        const { data: urlData } = supabase.storage.from('place-images').getPublicUrl(path)
+        avatarUrl = urlData.publicUrl
+      }
+    }
+
     await Promise.all([
       supabase.rpc('update_my_profile', {
         p_user_id: currentUserId,
         p_first_name: editName,
         p_bio: editBio,
         p_instagram: editInstagram,
+        p_avatar_url: avatarUrl ?? null,
       }),
       setDisplayedTitles(editTitleIds),
     ])
@@ -125,6 +155,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     if (data) setProfile(data as unknown as PlayerProfile)
 
     useFogStore.getState().setUserName(editName)
+    if (avatarUrl) {
+      useFogStore.getState().setUserAvatarUrl(avatarUrl)
+    }
+    setAvatarFile(null)
+    setAvatarPreview(null)
     setIsEditing(false)
     setSaving(false)
   }
@@ -151,10 +186,13 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
             {/* Top row : avatar left, info right */}
             <div className="player-modal-top">
-              <div className="player-modal-avatar-wrap">
-                {profile.profileImage ? (
+              <div
+                className={`player-modal-avatar-wrap${isEditing && isSelf ? ' editable' : ''}`}
+                onClick={() => { if (isEditing && isSelf) avatarInputRef.current?.click() }}
+              >
+                {(avatarPreview || profile.profileImage) ? (
                   <img
-                    src={profile.profileImage}
+                    src={avatarPreview ?? profile.profileImage!}
                     alt={profile.name}
                     className="player-modal-avatar"
                     style={{ borderColor: profile.factionColor ?? '#8A7B6A' }}
@@ -167,13 +205,23 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     {profile.name.charAt(0).toUpperCase()}
                   </div>
                 )}
-                {profile.factionPattern && (
+                {isEditing && isSelf && (
+                  <span className="player-modal-avatar-edit-label">Modifier</span>
+                )}
+                {profile.factionPattern && !isEditing && (
                   <img
                     src={profile.factionPattern}
                     alt=""
                     className="player-modal-faction-badge"
                   />
                 )}
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  hidden
+                />
               </div>
 
               <div className="player-modal-info">

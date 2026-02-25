@@ -1395,6 +1395,26 @@ table select {
   font-family: monospace;
 }
 
+.faction-handle-input {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  font-family: monospace;
+  padding: 2px 4px;
+  border-radius: 4px;
+  width: 100%;
+}
+.faction-handle-input:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+.faction-handle-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+
 .tag-card-colors-section {
   display: flex;
   gap: 1rem;
@@ -1754,7 +1774,7 @@ table select {
   font-family: inherit;
   font-size: 0.8rem;
   resize: vertical;
-  min-height: 60px;
+  min-height: 240px;
 }
 
 .faction-description-input:focus {

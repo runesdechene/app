@@ -119,6 +119,24 @@ export function Factions() {
     }, 400)
   }
 
+  // --- Renommer handle ---
+
+  async function handleRename(oldId: string, newId: string) {
+    const trimmed = newId.trim()
+    if (!trimmed || trimmed === oldId) return
+
+    setSaving(oldId)
+    const { data } = await supabase.rpc('rename_faction', { p_old_id: oldId, p_new_id: trimmed })
+    setSaving(null)
+
+    if (data && typeof data === 'object' && 'error' in data) {
+      alert((data as { error: string }).error)
+      return
+    }
+
+    setFactions(prev => prev.map(f => f.id === oldId ? { ...f, id: trimmed } : f))
+  }
+
   // --- Couleur ---
 
   function handleColorChange(factionId: string, value: string) {
@@ -380,9 +398,15 @@ export function Factions() {
               )}
             </div>
 
-            {/* ID */}
+            {/* ID (handle editable) */}
             <div className="tag-card-info">
-              <span className="tag-card-id">{faction.id}</span>
+              <input
+                type="text"
+                defaultValue={faction.id}
+                className="tag-card-id faction-handle-input"
+                onBlur={e => handleRename(faction.id, e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+              />
             </div>
 
             {/* Couleur */}

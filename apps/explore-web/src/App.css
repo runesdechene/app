@@ -332,11 +332,12 @@
 .auth-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(187, 176, 146, 0.596);
   z-index: 30;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(2px);
 }
 
 .auth-modal {
@@ -1054,6 +1055,7 @@
   aspect-ratio: 14 / 18;
   overflow: hidden;
   flex-shrink: 0;
+  max-height: 40vh;
   background: var(--color-parchment-dark);
 }
 
@@ -2137,7 +2139,7 @@
 .player-modal-header {
   display: flex;
   flex-direction: column;
-  padding: 20px 20px 12px;
+  padding: 20px 30px 12px;
   width: 100%;
   box-sizing: border-box;
   gap: 8px;
@@ -2173,6 +2175,14 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  padding-bottom: 10px;
+}
+
+.player-modal-titles {
+  display: flex;
+  gap: 6px;
+  justify-content: left;
+  margin: 4px 0 8px;
 }
 
 .player-modal-avatar-wrap {
@@ -2181,8 +2191,8 @@
 }
 
 .player-modal-avatar {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   border: 3px solid #b8a47a;
   object-fit: cover;
@@ -2220,6 +2230,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 20px;
 }
 
 .player-modal-info-top {
@@ -2541,25 +2552,83 @@
   border: 2px solid #b8a47a;
   border-radius: 16px;
   padding: 28px 24px;
-  width: 340px;
+  width: 720px;
   max-width: 90vw;
-  max-height: 70vh;
-  display: flex;
-  flex-direction: column;
+  max-height: 85vh;
+  overflow: hidden;
   box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5);
   animation: player-modal-slide-in 0.25s ease;
 }
 
+/* Layout 2 colonnes desktop */
+.faction-members-layout {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+  max-height: calc(85vh - 80px);
+  overflow: hidden;
+}
+
+/* Colonne gauche : banniere sticky */
+.faction-members-sidebar {
+  flex: 0 0 240px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  text-align: center;
+  overflow-y: auto;
+  max-height: calc(85vh - 80px);
+  scrollbar-width: thin;
+}
+
 .faction-members-title {
-  font-size: 18px;
+  font-family: var(--font-title, serif);
+  font-size: 24px;
   font-weight: 700;
-  margin: 0 0 14px;
   text-align: center;
 }
 
-.faction-members-list {
-  overflow-y: auto;
+.faction-members-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.faction-members-desc {
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  font-size: 15px;
+  color: #6B5B4A;
+  line-height: 1.5;
+  margin: 0 0 20px;
+  text-align: justify;
+}
+
+
+.faction-members-bonuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: left;
+}
+
+/* Colonne droite : classement */
+.faction-members-main {
   flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  max-height: calc(85vh - 80px);
+  scrollbar-width: thin;
+}
+
+.faction-members-list-title {
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: #8A7B6A;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 8px;
 }
 
 .faction-member-row {
@@ -2855,13 +2924,6 @@
   gap: 6px;
   flex-wrap: wrap;
   padding: 4px 12px 2px;
-}
-
-.player-modal-titles {
-  display: flex;
-  gap: 6px;
-  justify-content: left;
-  margin: 4px 0 8px;
 }
 
 .title-badge {
@@ -3472,6 +3534,39 @@
     font-size: 13px;
     color: var(--color-ink, #4A3728);
     cursor: pointer;
+  }
+
+  /* Faction members modal : 1 colonne mobile */
+  .faction-members-modal {
+    width: 95vw;
+    max-height: 90vh;
+    padding: 20px 16px;
+    overflow-y: auto;
+  }
+
+  .faction-members-layout {
+    flex-direction: column;
+    gap: 16px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .faction-members-sidebar {
+    flex: none;
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .faction-members-img {
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .faction-members-main {
+    max-height: none;
+    overflow: visible;
   }
 }
 
@@ -4289,4 +4384,224 @@
     height: 48px;
     font-size: 24px;
   }
+}
+
+/* ==========================================
+   ONBOARDING MODAL — Créer son aventurier
+   ========================================== */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 12, 5, 0.6);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: version-fade-in 0.2s ease;
+}
+
+.onboarding-modal {
+  background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+  border: 2px solid #b8a47a;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90vw;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: version-slide-in 0.25s ease;
+  text-align: center;
+}
+
+.onboarding-title {
+  margin: 0 0 4px;
+  font-family: var(--font-title, serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c1810;
+}
+
+.onboarding-subtitle {
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  font-size: 14px;
+  color: #8A7B6A;
+  margin: 0 0 20px;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+/* Avatar circle */
+.onboarding-avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.onboarding-avatar-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px dashed #b8a47a;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.onboarding-avatar-btn:hover {
+  border-color: #8A7B6A;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.onboarding-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.onboarding-avatar-initial {
+  font-family: var(--font-title, serif);
+  font-size: 36px;
+  color: #b8a47a;
+  line-height: 1;
+}
+
+.onboarding-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(44, 24, 16, 0.7);
+  color: #F5E6D3;
+  font-size: 10px;
+  text-align: center;
+  padding: 3px 0;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+}
+
+/* Labels + inputs */
+.onboarding-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #4A3728;
+}
+
+.onboarding-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #b8a47a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  color: #2c1810;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.onboarding-input:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+}
+
+.onboarding-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #b8a47a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  color: #2c1810;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.onboarding-textarea:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+}
+
+.onboarding-error {
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  color: #c0392b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.onboarding-submit {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #2c1810;
+  color: #F5E6D3;
+  font-size: 15px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+}
+
+.onboarding-submit:hover {
+  opacity: 0.9;
+}
+
+.onboarding-submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ==========================================
+   PLAYER PROFILE — Avatar edit overlay
+   ========================================== */
+
+.player-modal-avatar-wrap.editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.player-modal-avatar-wrap.editable:hover .player-modal-avatar {
+  opacity: 0.7;
+}
+
+.player-modal-avatar-wrap.editable:hover .player-modal-avatar-fallback {
+  opacity: 0.7;
+}
+
+.player-modal-avatar-edit-label {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(44, 24, 16, 0.75);
+  color: #F5E6D3;
+  font-size: 11px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
 }

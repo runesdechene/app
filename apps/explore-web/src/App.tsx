@@ -5,6 +5,7 @@ import { ResourceIndicator } from './components/map/ResourceIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
+import { OnboardingModal } from './components/auth/OnboardingModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
 import { GameToast } from './components/map/GameToast'
@@ -38,11 +39,13 @@ function App() {
   const setSelectedPlayerId = useMapStore(state => state.setSelectedPlayerId)
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   const userId = useFogStore(s => s.userId)
   const userFactionId = useFogStore(s => s.userFactionId)
+  const userName = useFogStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
 
@@ -69,16 +72,25 @@ function App() {
     }
   }, [authLoading, isAuthenticated])
 
-  // Auto-open faction modal si connecté sans faction (une seule fois par session)
-  // userId !== null garantit que le fog a VRAIMENT chargé les données du user
+  // Auto-open onboarding OU faction modal selon l'etat du joueur
+  // Nouveau joueur (first_name vide + pas de faction) → onboarding d'abord
+  // Joueur existant sans faction → faction directement
+  const onboardingDone = useRef(false)
   const factionPromptDone = useRef(false)
   useEffect(() => {
     if (!userId) return
-    if (userFactionId === null && !factionPromptDone.current) {
+    // Nouveau joueur : nom vide + pas de faction → onboarding
+    if (userName === '' && userFactionId === null && !onboardingDone.current) {
+      onboardingDone.current = true
+      setShowOnboarding(true)
+      return
+    }
+    // Joueur existant sans faction → faction modal
+    if (userFactionId === null && !factionPromptDone.current && !showOnboarding) {
       factionPromptDone.current = true
       setShowFactionModal(true)
     }
-  }, [userId, userFactionId])
+  }, [userId, userName, userFactionId, showOnboarding])
 
   return (
     <div className="app">
@@ -140,6 +152,13 @@ function App() {
 
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
+
+      {showOnboarding && (
+        <OnboardingModal onComplete={() => {
+          setShowOnboarding(false)
+          setShowFactionModal(true)
+        }} />
       )}
 
       {showFactionModal && (

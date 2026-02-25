@@ -78,7 +78,7 @@ export function useFog() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('id, faction_id, first_name, email_address')
+        .select('id, faction_id, first_name, email_address, avatar_url')
         .eq('email_address', user!.email)
         .single()
 
@@ -89,7 +89,12 @@ export function useFog() {
 
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
-      setUserName(userData.first_name || userData.email_address || 'Anonyme')
+      // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
+      setUserName(userData.first_name ?? '')
+      // Avatar direct si disponible
+      if (userData.avatar_url) {
+        setUserAvatarUrl(userData.avatar_url)
+      }
 
       // Récupérer la couleur de la faction
       if (userData.faction_id) {
