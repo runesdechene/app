@@ -28,9 +28,11 @@ ON CONFLICT (level) DO NOTHING;
 -- RLS : lecture publique, ecriture admin
 ALTER TABLE construction_types ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "construction_types_read" ON construction_types;
 CREATE POLICY "construction_types_read" ON construction_types
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "construction_types_admin" ON construction_types;
 CREATE POLICY "construction_types_admin" ON construction_types
   FOR ALL USING (
     EXISTS (SELECT 1 FROM users WHERE id = auth.uid()::text AND role = 'admin')
