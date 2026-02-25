@@ -69,7 +69,7 @@ Chaque décision technique doit servir ça.
 - **Backend :** Supabase (PostgreSQL, Auth OTP, Storage, RPC functions, RLS)
 - **Carte :** MapLibre GL JS + OpenFreeMap (tuiles gratuites)
 - **State :** Zustand (fogStore, mapStore, toastStore)
-- **Déploiement :** Netlify (les deux apps)
+- **Déploiement :** Netlify CLI manuel (pas d'auto-deploy Git)
 - **Branche principale :** `main`
 
 ## Conventions
@@ -92,6 +92,13 @@ pnpm --filter hub dev # Lance le hub (port 3001)
 # Build
 pnpm build            # Build explore-web
 pnpm --filter hub build
+
+# Déploiement (TOUJOURS manuel via CLI, jamais d'auto-deploy Git)
+# IMPORTANT : --dir doit être un chemin ABSOLU (Netlify résout depuis la racine repo sinon)
+# explore-web :
+cd apps/explore-web && netlify deploy --prod --dir "%CD%\dist" --no-build
+# hub :
+cd apps/hub && netlify deploy --prod --dir "%CD%\dist" --no-build
 
 # Supabase
 npx supabase start    # Supabase local

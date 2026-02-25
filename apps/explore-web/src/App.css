@@ -345,7 +345,7 @@
   max-width: 580px;
   background: var(--color-parchment);
   border: 2px solid var(--color-sepia);
-  border-radius: 12px;
+  border-radius: 40px;
   box-shadow: 0 8px 32px rgba(74, 55, 40, 0.3);
   padding: 32px;
   text-align: center;
@@ -353,9 +353,11 @@
 
 .auth-modal a 
 {
-  color: #4a8f4e;
+  color: #431bd6;
+  font-weight: bold;
   text-decoration: underline;
 }
+
 
 .auth-modal-close {
   position: absolute;
@@ -376,7 +378,7 @@
 }
 
 .auth-modal-logo {
-  height: 248px;
+  height: 298px;
   margin: auto;
 }
 
@@ -386,6 +388,11 @@
   color: var(--color-ink-light);
   margin: 0 0 24px;
   line-height: 1.5;
+}
+
+.auth-modal-places 
+{
+  font-size: 20px;
 }
 
 .auth-modal-disclaimer
@@ -418,13 +425,13 @@
 
 .auth-modal-input {
   width: 100%;
-  padding: 10px 14px;
+  padding: 14px 14px;
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-ink);
   background: white;
   border: 1px solid var(--color-sepia);
-  border-radius: 6px;
+  border-radius: 12px;
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
@@ -447,15 +454,15 @@
 
 .auth-modal-submit {
   width: 100%;
-  padding: 10px 16px;
+  padding: 14px 16px;
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.03em;
   color: var(--color-parchment);
   background: var(--color-ink);
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
 }

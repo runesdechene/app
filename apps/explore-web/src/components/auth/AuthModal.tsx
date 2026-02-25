@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import logoImg from '../../assets/logo_couleur.webp'
 
@@ -14,6 +14,13 @@ export function AuthModal({ onClose }: AuthModalProps) {
   const [step, setStep] = useState<Step>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [placesCount, setPlacesCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    supabase.from('places').select('*', { count: 'exact', head: true }).then(({ count }) => {
+      if (count) setPlacesCount(count)
+    })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,7 +73,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
           <>
             <img src={logoImg} alt="Runes de Chêne" className="auth-modal-logo" />
             <p className="auth-modal-subtitle">
-            Explorez, découvrez, revendiquez + de 2200 lieux magiques ou atypiques de votre région. Rejoignez une Faction inspirée par <a href="https://runesdechene.com/">Nos Collections</a>, et
+            Découvrez & explorez plus de <b className="auth-modal-places">{placesCount ? `${placesCount}` : '+ de 2000'}</b> lieux Historiques, magiques ou atypiques de votre région. Rejoignez une Faction inspirée par <a href="https://runesdechene.com/">Nos Collections</a>, et
             progressez aux côtés de <b>milliers de clients Runes de Chêne</b> qui cartographient leur patrimoine en s'amusant.
             </p>
 
