@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import logoImg from '../../assets/logo_couleur.webp'
+import changelogRaw from '../../../CHANGELOG.md?raw'
+
+const appVersion = changelogRaw.split('\n').find(l => l.startsWith('# '))?.slice(2).trim() ?? ''
 
 interface AuthModalProps {
   onClose: () => void
@@ -65,6 +68,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
   return (
     <div className="auth-overlay" onClick={onClose}>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
+        {appVersion && <span className="auth-modal-version">{appVersion}</span>}
         <button className="auth-modal-close" onClick={onClose} aria-label="Fermer">
           &#10005;
         </button>
