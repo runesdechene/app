@@ -114,9 +114,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     setUserFactionId(factionId)
     setUserFactionColor(faction?.color ?? null)
 
-    // Reset notoriete dans le store si changement
+    // Diviser notoriete par 2 si changement
     if (isChanging) {
-      setNotorietyPoints(0)
+      setNotorietyPoints(Math.floor(notorietyPoints / 2))
     }
 
     await reloadAfterFactionChange()
@@ -246,8 +246,8 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Changer de faction vous coutera <strong>toute votre Notoriete</strong>
-                {notorietyPoints > 0 ? ` (${notorietyPoints} points)` : ''}.
+                Etes-vous sur ? Changer de faction <strong>divisera votre Notoriete par 2</strong>
+                {notorietyPoints > 0 ? ` (${notorietyPoints} → ${Math.floor(notorietyPoints / 2)} points)` : ''}.
               </p>
               <p>Cette action est irreversible.</p>
               <div className="faction-confirm-actions">
