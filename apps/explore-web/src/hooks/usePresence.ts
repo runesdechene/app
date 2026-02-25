@@ -61,7 +61,8 @@ export function usePresence() {
       addToast({
         type: 'new_user',
         message: `${name} vient de se connecter`,
-        highlight: name,
+        highlights: [name],
+        actorId: userId!,
         color: factionColor ?? undefined,
         iconUrl: factionPattern ?? undefined,
         timestamp: Date.now(),
@@ -94,7 +95,8 @@ export function usePresence() {
             addToast({
               type: 'new_user',
               message: `${payload.name} vient de se connecter`,
-              highlight: payload.name,
+              highlights: [payload.name],
+              actorId: payload.userId,
               color: payload.factionColor ?? undefined,
               iconUrl: payload.factionPattern ?? undefined,
               timestamp: Date.now(),

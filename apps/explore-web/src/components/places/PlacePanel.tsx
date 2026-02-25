@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -15,18 +15,37 @@ interface PlacePanelProps {
   onAuthPrompt?: () => void
 }
 
-const FORTIFICATION_NAMES: Record<number, string> = {
-  1: 'Tour de guet',
-  2: 'Tour de défense',
-  3: 'Bastion',
-  4: 'Béfroi',
+// --- Types de construction (chargés depuis la DB) ---
+
+interface ConstructionTypeInfo {
+  level: number
+  name: string
+  description: string
+  image_url: string | null
+  cost: number
+  conquest_bonus: number
 }
 
-const FORTIFICATION_COSTS: Record<number, number> = {
-  0: 1, // level 0 → 1 to reach level 1
-  1: 2, // level 1 → 2 to reach level 2
-  2: 3, // level 2 → 3 to reach level 3
-  3: 5, // level 3 → 5 to reach level 4
+let _ctCache: ConstructionTypeInfo[] | null = null
+
+function useConstructionTypes(): ConstructionTypeInfo[] {
+  const [types, setTypes] = useState<ConstructionTypeInfo[]>(_ctCache ?? [])
+
+  useEffect(() => {
+    if (_ctCache) return
+    supabase.rpc('get_construction_types').then(({ data }) => {
+      if (data && Array.isArray(data)) {
+        _ctCache = data as ConstructionTypeInfo[]
+        setTypes(data as ConstructionTypeInfo[])
+      }
+    })
+  }, [])
+
+  return types
+}
+
+function ctByLevel(types: ConstructionTypeInfo[], level: number): ConstructionTypeInfo | undefined {
+  return types.find(t => t.level === level)
 }
 
 export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
@@ -255,6 +274,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  const constructionTypes = useConstructionTypes()
   const canManage = (userId === place.author.id) || isAdmin
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
@@ -358,12 +378,15 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
               />
             )}
             Revendiqué par {place.claim.factionTitle}
-            {place.claim.fortificationLevel > 0 && (
-              <span className="place-fortification-badge">
-                {FORTIFICATION_NAMES[place.claim.fortificationLevel] ?? `Niveau ${place.claim.fortificationLevel}`}
-                {' '}{'\uD83D\uDEE1\uFE0F'} +{place.claim.fortificationLevel}
-              </span>
-            )}
+            {place.claim.fortificationLevel > 0 && (() => {
+              const ct = ctByLevel(constructionTypes, place.claim!.fortificationLevel)
+              return (
+                <span className="place-fortification-badge">
+                  {ct?.name ?? `Niveau ${place.claim.fortificationLevel}`}
+                  {' '}{'\uD83D\uDEE1\uFE0F'} +{place.claim.fortificationLevel}
+                </span>
+              )
+            })()}
           </div>
         )}
         <div className="place-panel-header-actions">
@@ -646,7 +669,20 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {/* Address */}
         {place.address && (
-          <p className="place-panel-address">{place.address}</p>
+          <div className="place-panel-address-row">
+            <p className="place-panel-address">{place.address}</p>
+            <button
+              className="place-goto-btn"
+              onClick={() => useMapStore.getState().requestFlyTo({
+                lng: place.location.longitude,
+                lat: place.location.latitude,
+                placeId: place.id,
+              })}
+              title="Aller sur ce lieu"
+            >
+              {'\uD83D\uDDFA\uFE0F'}
+            </button>
+          </div>
         )}
 
         {/* Explore button */}
@@ -677,7 +713,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {/* Fortify button */}
         {userEmail && place.claim && (
-          <FortifyButton placeId={place.id} currentClaim={place.claim} />
+          <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} />
         )}
       </div>
     </>
@@ -824,9 +860,11 @@ function ClaimButton({
 function FortifyButton({
   placeId,
   currentClaim,
+  constructionTypes,
 }: {
   placeId: string
   currentClaim: NonNullable<PlaceDetail['claim']>
+  constructionTypes: ConstructionTypeInfo[]
 }) {
   const constructionPoints = useFogStore(s => s.constructionPoints)
   const userFactionId = useFogStore(s => s.userFactionId)
@@ -836,21 +874,29 @@ function FortifyButton({
   const [localLevel, setLocalLevel] = useState(currentClaim.fortificationLevel)
   const [error, setError] = useState<string | null>(null)
 
+  const maxLevel = constructionTypes.length > 0 ? Math.max(...constructionTypes.map(t => t.level)) : 4
+  const currentCt = ctByLevel(constructionTypes, localLevel)
+  const nextCt = ctByLevel(constructionTypes, localLevel + 1)
+  const maxCt = ctByLevel(constructionTypes, maxLevel)
+
   // Pas la meme faction → pas de bouton
   if (currentClaim.factionId !== userFactionId) return null
 
   // Niveau max atteint
-  if (localLevel >= 4) {
+  if (localLevel >= maxLevel) {
     return (
       <div className="fortify-section fortify-max">
-        <span className="fortify-icon">{'\uD83C\uDFF0'}</span>
-        {FORTIFICATION_NAMES[4]} — Fortification maximale
+        {maxCt?.image_url && <img src={maxCt.image_url} alt={maxCt.name} className="fortify-illustration" />}
+        <div className="fortify-current-info">
+          <span className="fortify-current-name">{maxCt?.name ?? 'Max'} — Fortification maximale</span>
+          <span className="fortify-current-desc">{maxCt?.description ?? ''}</span>
+        </div>
       </div>
     )
   }
 
-  const cost = FORTIFICATION_COSTS[localLevel] ?? 0
-  const nextName = FORTIFICATION_NAMES[localLevel + 1] ?? ''
+  const cost = nextCt?.cost ?? 0
+  const nextName = nextCt?.name ?? ''
   const canAfford = constructionPoints >= cost
 
   async function handleFortify() {
@@ -897,26 +943,40 @@ function FortifyButton({
     setFortifying(false)
   }
 
-  if (fortified && localLevel >= 4) {
+  if (fortified && localLevel >= maxLevel) {
+    const fMaxCt = ctByLevel(constructionTypes, maxLevel)
     return (
       <div className="fortify-section fortify-max">
-        <span className="fortify-icon">{'\uD83C\uDFF0'}</span>
-        {FORTIFICATION_NAMES[4]} — Fortification maximale
+        {fMaxCt?.image_url && <img src={fMaxCt.image_url} alt={fMaxCt.name} className="fortify-illustration" />}
+        <div className="fortify-current-info">
+          <span className="fortify-current-name">{fMaxCt?.name ?? 'Max'} — Fortification maximale</span>
+          <span className="fortify-current-desc">{fMaxCt?.description ?? ''}</span>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="fortify-section">
+      {localLevel > 0 && currentCt && (
+        <div className="fortify-current">
+          {currentCt.image_url && <img src={currentCt.image_url} alt={currentCt.name} className="fortify-illustration" />}
+          <div className="fortify-current-info">
+            <span className="fortify-current-name">{currentCt.name}</span>
+            <span className="fortify-current-desc">{currentCt.description}</span>
+          </div>
+        </div>
+      )}
       <button
         className="fortify-btn"
         onClick={handleFortify}
         disabled={fortifying || !canAfford}
       >
+        {nextCt?.image_url && <img src={nextCt.image_url} alt={nextCt.name} className="fortify-btn-illustration" />}
         {fortifying
           ? 'Fortification...'
           : canAfford
-            ? `\uD83D\uDD28 Fortifier \u2192 ${nextName} (${cost} \uD83D\uDD28)`
+            ? `Fortifier \u2192 ${nextName} (${cost} \uD83D\uDD28)`
             : `Pas assez de construction (${Math.floor(constructionPoints)}/${cost})`}
       </button>
       {error && <p className="fortify-error">{error}</p>}

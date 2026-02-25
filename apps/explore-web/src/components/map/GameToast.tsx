@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useToastStore } from '../../stores/toastStore'
 import { useMapStore } from '../../stores/mapStore'
 import type { GameToast as GameToastType } from '../../stores/toastStore'
@@ -24,11 +24,17 @@ function formatTimeAgo(ts: number): string {
   return `il y a ${days}j`
 }
 
-/** Met en gras tous les segments qui matchent un des highlights */
-function renderWithHighlights(message: string, highlights: string[]) {
+/**
+ * Segmente le message en parties texte/bold, et rend les parties
+ * bold cliquables si elles ont une action associée.
+ */
+function renderMessage(
+  message: string,
+  highlights: string[],
+  actions: Map<string, () => void>,
+) {
   if (highlights.length === 0) return message
 
-  // Construire les segments : trouver chaque highlight dans le message
   const parts: { text: string; bold: boolean }[] = []
   let remaining = message
 
@@ -55,9 +61,22 @@ function renderWithHighlights(message: string, highlights: string[]) {
 
   return (
     <>
-      {parts.map((p, i) =>
-        p.bold ? <strong key={i}>{p.text}</strong> : p.text
-      )}
+      {parts.map((p, i) => {
+        if (!p.bold) return p.text
+        const action = actions.get(p.text)
+        if (action) {
+          return (
+            <strong
+              key={i}
+              className="game-toast-link"
+              onClick={(e) => { e.stopPropagation(); action() }}
+            >
+              {p.text}
+            </strong>
+          )
+        }
+        return <strong key={i}>{p.text}</strong>
+      })}
     </>
   )
 }
@@ -65,8 +84,7 @@ function renderWithHighlights(message: string, highlights: string[]) {
 function ToastItem({ toast }: { toast: GameToastType }) {
   const removeToast = useToastStore(s => s.removeToast)
   const requestFlyTo = useMapStore(s => s.requestFlyTo)
-
-  const isClickable = !!toast.placeId && !!toast.placeLocation
+  const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
 
   // Collecter tous les highlights
   const highlights = [
@@ -74,20 +92,31 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     ...(toast.highlight ? [toast.highlight] : []),
   ]
 
-  function handleClick() {
-    if (!toast.placeLocation || !toast.placeId) return
-    requestFlyTo({
-      lng: toast.placeLocation.longitude,
-      lat: toast.placeLocation.latitude,
-      placeId: toast.placeId,
+  // Construire les actions cliquables pour chaque highlight
+  const actions = new Map<string, () => void>()
+
+  // Nom du joueur → ouvrir profil
+  if (toast.actorId && highlights.length > 0) {
+    const actorName = highlights[0]
+    actions.set(actorName, () => setSelectedPlayerId(toast.actorId!))
+  }
+
+  // Nom du lieu → fly to + ouvrir panel
+  if (toast.placeId && toast.placeLocation && highlights.length > 1) {
+    const placeHL = highlights[1]
+    actions.set(placeHL, () => {
+      requestFlyTo({
+        lng: toast.placeLocation!.longitude,
+        lat: toast.placeLocation!.latitude,
+        placeId: toast.placeId,
+      })
     })
   }
 
   return (
     <div
-      className={`game-toast${isClickable ? ' game-toast-clickable' : ''}`}
+      className="game-toast"
       style={{ borderLeftColor: toast.color || 'var(--color-sepia)' }}
-      onClick={isClickable ? handleClick : undefined}
     >
       {toast.iconUrl ? (
         <span
@@ -100,7 +129,7 @@ function ToastItem({ toast }: { toast: GameToastType }) {
         <span className="game-toast-icon">{ICONS[toast.type]}</span>
       )}
       <span className="game-toast-message">
-        {highlights.length > 0 ? renderWithHighlights(toast.message, highlights) : toast.message}
+        {highlights.length > 0 ? renderMessage(toast.message, highlights, actions) : toast.message}
       </span>
       <span className="game-toast-time">{formatTimeAgo(toast.timestamp)}</span>
       <button
@@ -117,6 +146,7 @@ function ToastItem({ toast }: { toast: GameToastType }) {
 export function GameToast() {
   const toasts = useToastStore(s => s.toasts)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [minimized, setMinimized] = useState(false)
 
   // Auto-scroll vers le bas quand un nouveau toast arrive
   useEffect(() => {
@@ -128,10 +158,21 @@ export function GameToast() {
   if (toasts.length === 0) return null
 
   return (
-    <div className="game-toast-container" ref={containerRef}>
-      {toasts.map(toast => (
-        <ToastItem key={toast.id} toast={toast} />
-      ))}
+    <div className={`game-toast-container${minimized ? ' game-toast-minimized' : ''}`}>
+      <button
+        className="game-toast-minimize"
+        onClick={() => setMinimized(!minimized)}
+        aria-label={minimized ? 'Agrandir' : 'Réduire'}
+      >
+        {minimized ? `\u25BC ${toasts.length}` : '\u2013'}
+      </button>
+      {!minimized && (
+        <div className="game-toast-list" ref={containerRef}>
+          {toasts.map(toast => (
+            <ToastItem key={toast.id} toast={toast} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

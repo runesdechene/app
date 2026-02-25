@@ -275,6 +275,7 @@ export function useFog() {
             highlights,
             color,
             iconUrl,
+            actorId: e.actor_id ?? undefined,
             placeId: e.place_id ?? undefined,
             placeLocation: hasLocation
               ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
@@ -393,6 +394,7 @@ async function loadRecentActivity(currentUserId: string) {
       highlights,
       color,
       iconUrl,
+      actorId: e.actor_id ?? undefined,
       placeId: e.place_id ?? undefined,
       placeLocation: hasLocation
         ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }

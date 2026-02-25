@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useFogStore } from '../../stores/fogStore'
 import { useMapStore } from '../../stores/mapStore'
 import { setDisplayedTitles } from '../../hooks/useFog'
+import { FactionMembersModal } from './FactionMembersModal'
 
 interface PlaceCard {
   id: string
@@ -70,6 +71,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const avatarInputRef = useRef<HTMLInputElement>(null)
   const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
   const [visibleCount, setVisibleCount] = useState(12)
+  const [showFactionMembers, setShowFactionMembers] = useState(false)
 
   const isSelf = profile?.userId === currentUserId
 
@@ -274,8 +276,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </span>
                 ))}
                 {profile.factionTitle2 && (
-                  <span className="title-badge title-badge-faction">
-                    {profile.factionTitle2.icon} {profile.factionTitle2.name}
+                  <span
+                    className="title-badge title-badge-faction title-badge-clickable"
+                    onClick={() => setShowFactionMembers(true)}
+                  >
+                    {profile.factionTitle2.icon} {profile.factionTitle2.name} <span className="title-badge-origin">(faction)</span>
                   </span>
                 )}
               </div>
@@ -449,6 +454,15 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
           </>
         )}
       </div>
+
+      {showFactionMembers && profile?.factionId && (
+        <FactionMembersModal
+          factionId={profile.factionId}
+          factionTitle={profile.factionTitle ?? ''}
+          factionColor={profile.factionColor ?? '#8A7B6A'}
+          onClose={() => setShowFactionMembers(false)}
+        />
+      )}
     </div>
   )
 }

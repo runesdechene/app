@@ -11,6 +11,8 @@ export interface GameToast {
   highlight?: string
   /** URL d'icone faction (remplace l'emoji par défaut) */
   iconUrl?: string
+  /** ID du joueur (pour clic → ouvrir profil) */
+  actorId?: string
   /** ID du lieu (pour clic → fly to + ouvrir panel) */
   placeId?: string
   /** Coordonnées du lieu */

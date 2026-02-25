@@ -1502,13 +1502,34 @@
   color: var(--color-ink);
 }
 
+.place-panel-address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 14px;
+}
 .place-panel-address {
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--color-ink-light);
   margin: 0;
-  padding-top: 14px;
+  flex: 1;
   border-top: 1px solid var(--color-parchment-dark);
+}
+.place-goto-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--color-sepia);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.place-goto-btn:hover {
+  opacity: 1;
 }
 
 /* ==========================================
@@ -1708,10 +1729,9 @@
   justify-content: center;
   gap: 6px;
   width: 100%;
-  padding: 8px 14px;
+  padding: 6px 14px;
   font-family: var(--font-title);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 18px;
   background: none;
   border: 2px solid var(--color-sepia);
   border-radius: 8px;
@@ -1740,8 +1760,41 @@
   color: var(--color-ink-light);
 }
 
-.fortify-icon {
-  font-size: 14px;
+.fortify-illustration {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.fortify-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  background: rgba(193, 154, 107, 0.08);
+  border-radius: 8px;
+}
+.fortify-current-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fortify-current-name {
+  font-family: var(--font-title);
+  font-size: 22px;
+  color: var(--color-ink);
+}
+.fortify-current-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-ink-light);
+  font-style: italic;
+}
+.fortify-btn-illustration {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
 }
 
 .fortify-error {
@@ -2328,6 +2381,7 @@
   font-size: 16px;
   color: #6158dd;
   text-decoration: none;
+  width: auto;
 }
 .player-modal-instagram:hover {
   color: #5a4a3a;
@@ -2951,8 +3005,19 @@
 }
 
 .title-badge-faction {
-  border: 1px solid var(--faction-color, rgba(193, 154, 107, 0.3));
+  border: 2px solid var(--faction-color, rgba(193, 154, 107, 0.3));
   color: var(--faction-color, var(--color-ink));
+  font-weight: bold;
+}
+.title-badge-clickable {
+  cursor: pointer;
+}
+.title-badge-clickable:hover {
+  opacity: 0.8;
+}
+.title-badge-origin {
+  font-weight: normal;
+  opacity: 0.8;
 }
 
 /* Title picker (ProfileMenu dropdown) */
@@ -3010,10 +3075,32 @@
 .chat-panel-closed {
   height: auto;
   width: auto;
+  background: rgba(250, 231, 212, 0.8);
+  border-radius: 50%;
 }
 
 .chat-toggle-btn {
-  display: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--color-sepia, #C19A6B);
+  opacity: 0.6;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.chat-toggle-btn:hover {
+  opacity: 1;
+}
+.chat-panel-closed .chat-toggle-btn {
+  position: static;
+  font-size: 20px;
+  padding: 8px 12px;
+  opacity: 0.8;
 }
 
 /* ---- Channel filters (top bar, checkboxes) ---- */
@@ -3190,6 +3277,15 @@
 .chat-send-btn:disabled {
   opacity: 0.3;
   cursor: default;
+}
+
+.chat-send-error {
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: 4px;
+  text-align: center;
 }
 
 /* ==========================================
@@ -3379,14 +3475,40 @@
 
 .game-toast-container {
   position: fixed;
-  top: 22px;
-  left: 16px;
+  top: 20px;
+  left: 20px;
   z-index: 18;
   display: flex;
   flex-direction: column;
+  max-width: 360px;
+  background: rgba(252, 241, 214, 0.9);
+  backdrop-filter: blur(2px);
+  padding: 10px;
+  border-radius: 10px;
+}
+.game-toast-minimize {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-sepia, #C19A6B);
+  padding: 0 4px;
+  line-height: 1;
+  opacity: 0.6;
+}
+.game-toast-minimize:hover {
+  opacity: 1;
+}
+.game-toast-minimized {
+  max-width: none;
+  padding: 6px 10px;
+}
+.game-toast-list {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  max-width: 400px;
-  max-height: 300px;
+  max-height: 240px;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -3395,18 +3517,16 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(245, 230, 211, 0.9);
   border-left: 3px solid var(--color-sepia);
-  border-radius: 4px;
   padding: 5px 8px;
-  font-family: var(--font-body);
-  font-size: 14px;
+  font-family: var(--font-);
+  font-size: 13px;
   color: var(--color-ink);
   animation: toast-slide-in 0.3s ease-out;
 }
 
 .game-toast-icon {
-  font-size: 13px;
+  font-size: 10px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -3414,8 +3534,8 @@
 }
 
 .game-toast-faction-dot {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   flex-shrink: 0;
   display: flex;
@@ -3424,8 +3544,8 @@
 }
 
 .game-toast-faction-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
@@ -3436,7 +3556,7 @@
 }
 
 .game-toast-time {
-  font-size: 13px;
+  font-size: 10px;
   color: var(--color-ink-light);
   opacity: 0.6;
   white-space: nowrap;
@@ -3459,11 +3579,15 @@
   opacity: 1;
 }
 
-.game-toast-clickable {
+.game-toast-link {
   cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
 }
-.game-toast-clickable:hover {
-  background: rgba(245, 230, 211, 1);
+.game-toast-link:hover {
+  text-decoration-style: solid;
+  opacity: 0.8;
 }
 
 @keyframes toast-slide-in {
@@ -3536,15 +3660,8 @@
   }
 
   .chat-toggle-btn {
-    display: block;
     padding: 6px 14px;
-    background: var(--color-parchment, #F5E6D3);
-    border: 1px solid var(--color-sepia, #C19A6B);
-    border-radius: 8px;
-    font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
     font-size: 13px;
-    color: var(--color-ink, #4A3728);
-    cursor: pointer;
   }
 
   /* Faction members modal : 1 colonne mobile */

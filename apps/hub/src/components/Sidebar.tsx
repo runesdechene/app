@@ -39,6 +39,9 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/carte/factions" className={({ isActive }) => isActive ? 'active' : ''}>
           Factions
         </NavLink>
+        <NavLink to="/carte/constructions" className={({ isActive }) => isActive ? 'active' : ''}>
+          Constructions
+        </NavLink>
         <NavLink to="/carte/titres" className={({ isActive }) => isActive ? 'active' : ''}>
           Titres
         </NavLink>

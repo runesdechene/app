@@ -142,35 +142,34 @@ export async function sendChatMessage(
     return { success: false, error: 'Aucune faction' }
   }
 
-  console.log('[Chat] sending:', { channel, userId, userName, content: trimmed })
-  const { error } = await supabase.from('chat_messages').insert({
-    channel,
-    user_id: userId,
-    user_name: userName || 'Anonyme',
-    faction_id: userFactionId,
-    faction_color: userFactionColor,
-    faction_pattern: userFactionPattern,
-    content: trimmed,
-  })
+  const displayName = userName || 'Anonyme'
+
+  const { data: inserted, error } = await supabase
+    .from('chat_messages')
+    .insert({
+      channel,
+      user_id: userId,
+      user_name: displayName,
+      faction_id: userFactionId,
+      faction_color: userFactionColor,
+      faction_pattern: userFactionPattern,
+      content: trimmed,
+    })
+    .select()
+    .single()
 
   if (error) {
     console.error('[Chat] insert error:', error)
     return { success: false, error: error.message }
   }
 
-  // Refetch le canal pour affichage immédiat (Realtime peut avoir du lag)
-  const { data } = await supabase
-    .from('chat_messages')
-    .select('*')
-    .eq('channel', channel)
-    .order('created_at', { ascending: true })
-    .limit(MAX_INITIAL)
-
-  if (data) {
+  // Ajout optimiste immédiat — le Realtime dédupliquera via l'id
+  if (inserted) {
+    const msg = rowToMessage(inserted as Record<string, unknown>)
     if (channel === 'general') {
-      useChatStore.getState().setGeneralMessages(data.map(rowToMessage))
+      useChatStore.getState().addGeneralMessage(msg)
     } else {
-      useChatStore.getState().setFactionMessages(data.map(rowToMessage))
+      useChatStore.getState().addFactionMessage(msg)
     }
   }
 

@@ -11,6 +11,7 @@ import { TagsManager } from './components/TagsManager'
 import { Factions } from './components/Factions'
 import { TitlesManager } from './components/TitlesManager'
 import { Divers } from './components/Divers'
+import { Constructions } from './components/Constructions'
 import { Settings } from './components/Settings'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
@@ -73,6 +74,7 @@ function App() {
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
+          <Route path="/carte/constructions" element={<Constructions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />

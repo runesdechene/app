@@ -98,6 +98,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
   const sendChannel = useChatStore((s) => s.sendChannel)
   const setSendChannel = useChatStore((s) => s.setSendChannel)
   const userFactionColor = useFogStore((s) => s.userFactionColor)
@@ -119,11 +120,13 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
 
     if (!content) return
     setSending(true)
+    setSendError(null)
     const result = await sendChatMessage(content, channel)
     if (result.success) {
       setText('')
     } else {
-      console.error('[Chat] sendChatMessage error:', result.error)
+      setSendError(result.error ?? 'Erreur inconnue')
+      setTimeout(() => setSendError(null), 4000)
     }
     setSending(false)
     // Focus après que React re-rende avec disabled=false
@@ -157,6 +160,11 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
           </button>
         )}
       </div>
+
+      {/* Erreur d'envoi */}
+      {sendError && (
+        <div className="chat-send-error">{sendError}</div>
+      )}
 
       {/* Input */}
       <div className="chat-input">
@@ -213,9 +221,8 @@ export function ChatPanel() {
 
   return (
     <div className={`chat-panel${isOpen ? '' : ' chat-panel-closed'}`}>
-      {/* Toggle mobile */}
       <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? '\u00D7' : 'Discussion'}
+        {isOpen ? '\u2013' : '\uD83D\uDCAC'}
       </button>
 
       {isOpen && (
