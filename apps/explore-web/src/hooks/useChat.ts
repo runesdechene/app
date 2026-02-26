@@ -46,11 +46,11 @@ export function useChat() {
         .from('chat_messages')
         .select('*')
         .eq('channel', 'general')
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .limit(MAX_INITIAL)
 
       if (!cancelled && generalData) {
-        setGeneralMessages(generalData.map(rowToMessage))
+        setGeneralMessages(generalData.map(rowToMessage).reverse())
       }
 
       // 2. Charger les messages faction si l'user en a une
@@ -59,11 +59,11 @@ export function useChat() {
           .from('chat_messages')
           .select('*')
           .eq('channel', userFactionId)
-          .order('created_at', { ascending: true })
+          .order('created_at', { ascending: false })
           .limit(MAX_INITIAL)
 
         if (!cancelled && factionData) {
-          setFactionMessages(factionData.map(rowToMessage))
+          setFactionMessages(factionData.map(rowToMessage).reverse())
         }
       }
 

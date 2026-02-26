@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { useFogStore } from '../../stores/fogStore'
@@ -171,7 +172,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     useMapStore.getState().setSelectedPlaceId(placeId)
   }
 
-  return (
+  const isMobile = window.innerWidth <= 768
+
+  const modal = (
     <div className="player-modal-overlay" onClick={onClose}>
       <div className="player-modal" onClick={e => e.stopPropagation()}>
         <button className="player-modal-close" onClick={onClose} aria-label="Fermer">
@@ -465,4 +468,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       )}
     </div>
   )
+
+  return isMobile ? createPortal(modal, document.body) : modal
 }

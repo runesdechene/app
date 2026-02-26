@@ -212,6 +212,10 @@ export function useFog() {
               factionColor?: string
               factionPattern?: string
               actorName?: string
+              previousClaimedBy?: string
+              previousFactionId?: string
+              previousFactionTitle?: string
+              previousClaimerName?: string
             }
           }
 
@@ -226,14 +230,28 @@ export function useFog() {
           const highlights: string[] = [name]
           let color: string | undefined
           let iconUrl: string | undefined
+          let contested = false
 
           if (e.type === 'claim') {
             const faction = e.data?.factionTitle ?? 'une faction'
-            message = `${name} a revendiqué ${place} pour ${faction}`
-            highlights.push(place)
             type = 'claim'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
+            // Notification spéciale si l'ancien contrôleur c'est nous
+            const prevName = e.data?.previousClaimerName
+            if (e.data?.previousClaimedBy === currentUserId) {
+              message = `${name} a brisé vos défenses et conquis ${place}`
+              contested = true
+            } else if (prevName) {
+              message = `${name} a conquis ${place}, repoussant ${prevName}`
+              contested = true
+            } else {
+              message = `${name} a revendiqué ${place} pour ${faction}`
+            }
+            highlights.push(place)
+            if (prevName && e.data?.previousClaimedBy !== currentUserId) {
+              highlights.push(prevName)
+            }
             // Mettre à jour la carte en temps réel
             if (e.place_id && e.faction_id) {
               useMapStore.getState().setPlaceOverride(e.place_id, {
@@ -275,7 +293,9 @@ export function useFog() {
             highlights,
             color,
             iconUrl,
+            contested,
             actorId: e.actor_id ?? undefined,
+            previousActorId: e.data?.previousClaimedBy ?? undefined,
             placeId: e.place_id ?? undefined,
             placeLocation: hasLocation
               ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
@@ -321,6 +341,10 @@ async function loadRecentActivity(currentUserId: string) {
       factionColor?: string
       factionPattern?: string
       actorName?: string
+      previousClaimedBy?: string
+      previousFactionId?: string
+      previousFactionTitle?: string
+      previousClaimerName?: string
     }
     created_at: string
   }>)
@@ -336,16 +360,32 @@ async function loadRecentActivity(currentUserId: string) {
     const highlights: string[] = []
     let color: string | undefined
     let iconUrl: string | undefined
+    let contested = false
 
     if (e.type === 'claim') {
       const faction = e.data?.factionTitle ?? 'une faction'
-      message = isSelf
-        ? `Vous avez revendiqué ${place} pour ${faction}`
-        : `${name} a revendiqué ${place} pour ${faction}`
-      highlights.push(name, place)
       type = 'claim'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
+      // Notification spéciale si l'ancien contrôleur c'est nous
+      const prevName = e.data?.previousClaimerName
+      if (e.data?.previousClaimedBy === currentUserId) {
+        message = `${name} a brisé vos défenses et conquis ${place}`
+        contested = true
+      } else if (prevName) {
+        message = isSelf
+          ? `Vous avez conquis ${place}, repoussant ${prevName}`
+          : `${name} a conquis ${place}, repoussant ${prevName}`
+        contested = true
+      } else if (isSelf) {
+        message = `Vous avez revendiqué ${place} pour ${faction}`
+      } else {
+        message = `${name} a revendiqué ${place} pour ${faction}`
+      }
+      highlights.push(name, place)
+      if (prevName && e.data?.previousClaimedBy !== currentUserId) {
+        highlights.push(prevName)
+      }
     } else if (e.type === 'fortify') {
       message = isSelf
         ? `Vous avez fortifié ${place}`
@@ -394,7 +434,9 @@ async function loadRecentActivity(currentUserId: string) {
       highlights,
       color,
       iconUrl,
+      contested,
       actorId: e.actor_id ?? undefined,
+      previousActorId: e.data?.previousClaimedBy ?? undefined,
       placeId: e.place_id ?? undefined,
       placeLocation: hasLocation
         ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }

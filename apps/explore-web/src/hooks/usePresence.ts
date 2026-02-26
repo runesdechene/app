@@ -57,17 +57,6 @@ export function usePresence() {
       const addToast = useToastStore.getState().addToast
       const { setPlayer, removePlayer } = usePlayersStore.getState()
 
-      // Toast local pour soi
-      addToast({
-        type: 'new_user',
-        message: `${name} vient de se connecter`,
-        highlights: [name],
-        actorId: userId!,
-        color: factionColor ?? undefined,
-        iconUrl: factionPattern ?? undefined,
-        timestamp: Date.now(),
-      })
-
       function buildPayload(): PresencePayload {
         const pos = useFogStore.getState().userPosition
         const avatar = useFogStore.getState().userAvatarUrl

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useFogStore } from '../../stores/fogStore'
 import { useMapStore } from '../../stores/mapStore'
+import { EmailChangeModal } from './EmailChangeModal'
 
 interface ProfileData {
   id: string
@@ -20,6 +21,7 @@ interface ProfileMenuProps {
 export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuProps) {
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [open, setOpen] = useState(false)
+  const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const userId = useFogStore(s => s.userId)
 
@@ -119,12 +121,26 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             )}
           </button>
 
+          <button
+            className="profile-dropdown-action"
+            onClick={() => { setOpen(false); setShowEmailChange(true) }}
+          >
+            Changer mon email
+          </button>
+
           <div className="profile-dropdown-divider" />
 
           <button className="profile-dropdown-action" onClick={onSignOut}>
             Se deconnecter
           </button>
         </div>
+      )}
+
+      {showEmailChange && (
+        <EmailChangeModal
+          currentEmail={email}
+          onClose={() => setShowEmailChange(false)}
+        />
       )}
     </div>
   )

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChatStore } from '../../stores/chatStore'
 import { useFogStore } from '../../stores/fogStore'
-import { useMapStore } from '../../stores/mapStore'
+import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { sendChatMessage } from '../../hooks/useChat'
+import { supabase } from '../../lib/supabase'
 import type { ChatMessage } from '../../stores/chatStore'
 
 // ---- Helpers ----
@@ -45,12 +46,13 @@ function MessageList({
   userFactionColor: string | null
 }) {
   const listRef = useRef<HTMLDivElement>(null)
+  const mobilePanel = useMobileNavStore(s => s.activePanel)
 
   useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight
     }
-  }, [messages.length])
+  }, [messages.length, mobilePanel])
 
   if (messages.length === 0) {
     return (
@@ -107,6 +109,46 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
     const raw = text.trim()
     if (!raw || sending) return
 
+    // Cheat code: recharge toutes les ressources au max (admin only, en base)
+    if (raw === '1453') {
+      setText('')
+      const fog = useFogStore.getState()
+      if (!fog.userId) return
+      const { data } = await supabase.rpc('cheat_refill', { p_user_id: fog.userId })
+      if (data && data.success) {
+        fog.setEnergy(data.energy)
+        fog.setNextPointIn(0)
+        fog.setConquestPoints(data.conquestPoints)
+        fog.setConquestNextPointIn(0)
+        fog.setConstructionPoints(data.constructionPoints)
+        fog.setConstructionNextPointIn(0)
+      }
+      return
+    }
+
+    // Cheat code ciblé: 1453>NomJoueur — refill un autre joueur + message système
+    if (raw.startsWith('1453>') && raw.length > 5) {
+      setText('')
+      const targetName = raw.slice(5).trim()
+      if (!targetName) return
+      const fog = useFogStore.getState()
+      if (!fog.userId) return
+      const { data } = await supabase.rpc('cheat_refill_target', {
+        p_caller_id: fog.userId,
+        p_target_name: targetName,
+      })
+      if (data && data.success) {
+        // Message système anonyme dans le chat général
+        await supabase.from('chat_messages').insert({
+          channel: 'general',
+          user_id: fog.userId,
+          user_name: '',
+          content: `${data.targetName} a re\u00E7u un don des Dieux \u26A1 Ses ressources ont \u00E9t\u00E9 recharg\u00E9es`,
+        })
+      }
+      return
+    }
+
     // Raccourcis : ! = général, @ = faction
     let channel = sendChannel
     let content = raw
@@ -129,8 +171,10 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       setTimeout(() => setSendError(null), 4000)
     }
     setSending(false)
-    // Focus après que React re-rende avec disabled=false
-    setTimeout(() => inputRef.current?.focus(), 0)
+    // Focus après envoi — uniquement sur desktop (évite le clavier mobile qui clignote)
+    if (window.innerWidth > 768) {
+      setTimeout(() => inputRef.current?.focus(), 0)
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -198,7 +242,6 @@ export function ChatPanel() {
   const userId = useFogStore((s) => s.userId)
   const userFactionId = useFogStore((s) => s.userFactionId)
   const userFactionColor = useFogStore((s) => s.userFactionColor)
-  const selectedPlaceId = useMapStore((s) => s.selectedPlaceId)
 
   const showGeneral = useChatStore((s) => s.showGeneral)
   const showFaction = useChatStore((s) => s.showFaction)
@@ -206,6 +249,12 @@ export function ChatPanel() {
   const factionMessages = useChatStore((s) => s.factionMessages)
 
   const [isOpen, setIsOpen] = useState(true)
+  const mobilePanel = useMobileNavStore(s => s.activePanel)
+
+  // Ouvrir/fermer automatiquement quand la navbar mobile toggle le chat
+  useEffect(() => {
+    if (mobilePanel === 'chat') setIsOpen(true)
+  }, [mobilePanel])
 
   // Fusionner et trier les messages visibles
   const mergedMessages = useMemo(() => {
@@ -215,7 +264,7 @@ export function ChatPanel() {
     return all.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
   }, [generalMessages, factionMessages, showGeneral, showFaction])
 
-  if (!userId || selectedPlaceId) return null
+  if (!userId) return null
 
   const hasFaction = !!userFactionId
 

@@ -2002,6 +2002,26 @@ table select {
   margin-top: 0.5rem;
 }
 
+.settings-global-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.settings-global-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.settings-global-field .settings-input {
+  width: 90px;
+}
+
 .divers-card + .divers-card {
   margin-top: 1.25rem;
 }

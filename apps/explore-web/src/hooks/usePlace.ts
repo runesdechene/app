@@ -46,6 +46,7 @@ export interface PlaceDetail {
     claimedBy: string
     claimedAt: string
     fortificationLevel: number
+    zoneFortification: number
   } | null
   requester: {
     bookmarked: boolean

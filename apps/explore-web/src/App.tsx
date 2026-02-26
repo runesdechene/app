@@ -20,6 +20,11 @@ import { usePresence } from './hooks/usePresence'
 import { useChat } from './hooks/useChat'
 import { ChatPanel } from './components/chat/ChatPanel'
 import { AddPlaceFlow } from './components/places/AddPlaceFlow'
+import { InstallPrompt } from './components/pwa/InstallPrompt'
+import { OfflineIndicator } from './components/pwa/OfflineIndicator'
+import { MobileNavbar } from './components/map/MobileNavbar'
+import { MobileHeader } from './components/map/MobileHeader'
+import { useMobileNavStore } from './stores/mobileNavStore'
 import './App.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
@@ -92,13 +97,22 @@ function App() {
     }
   }, [userId, userName, userFactionId, showOnboarding])
 
-  return (
-    <div className="app">
-      <ExploreMap />
+  const mobilePanel = useMobileNavStore(s => s.activePanel)
 
-      {!addPlaceMode && <FactionBar />}
-      {!addPlaceMode && <GameToast />}
-      {!addPlaceMode && <ChatPanel />}
+  return (
+    <div className="app" data-mobile-panel={mobilePanel || ''}>
+      <ExploreMap />
+      <InstallPrompt />
+      <OfflineIndicator />
+
+      {!addPlaceMode && !authLoading && isAuthenticated && <FactionBar />}
+      {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
+      {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
+
+      {/* Header mobile (logo + hamburger, masqué sur desktop) */}
+      {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
+        <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
+      )}
 
       {/* Toolbar flottante (masquée en mode ajout) */}
       {!addPlaceMode && (
@@ -179,7 +193,10 @@ function App() {
         />
       )}
 
-      {!addPlaceMode && <VersionBadge />}
+      {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
+
+      {/* Navbar mobile (masquée sur desktop via CSS) */}
+      {!addPlaceMode && !authLoading && isAuthenticated && <MobileNavbar />}
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}

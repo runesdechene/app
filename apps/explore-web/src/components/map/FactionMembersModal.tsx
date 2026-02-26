@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 
@@ -64,9 +65,23 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
     factionInfo.bonus_regen_energy !== 0 || factionInfo.bonus_regen_conquest !== 0 || factionInfo.bonus_regen_construction !== 0
   )
 
-  return (
-    <div className="player-modal-overlay" onClick={onClose}>
-      <div className="faction-members-modal" onClick={e => e.stopPropagation()}>
+  const isMobile = window.innerWidth <= 768
+
+  const modal = (
+    <div className="player-modal-overlay" onClick={onClose} style={isMobile ? { zIndex: 99999, alignItems: 'stretch' } : undefined}>
+      <div
+        className="faction-members-modal"
+        onClick={e => e.stopPropagation()}
+        style={isMobile ? {
+          width: '100%',
+          maxWidth: 'none',
+          maxHeight: 'none',
+          height: '100%',
+          borderRadius: 0,
+          border: 'none',
+          boxSizing: 'border-box' as const,
+        } : undefined}
+      >
         <button className="player-modal-close" onClick={onClose} aria-label="Fermer">
           &#10005;
         </button>
@@ -173,4 +188,6 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
       </div>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }

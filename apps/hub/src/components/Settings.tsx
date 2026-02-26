@@ -19,6 +19,10 @@ interface UserGauge {
 const ROLES = ['user', 'admin'] as const
 
 export function Settings() {
+  const [globalDefaults, setGlobalDefaults] = useState<RoleGauges>({
+    maxEnergy: 5, maxConquest: 5, maxConstruction: 5,
+  })
+  const [savingGlobal, setSavingGlobal] = useState(false)
   const [roleDefaults, setRoleDefaults] = useState<Record<string, RoleGauges>>({
     user: { maxEnergy: 5, maxConquest: 5, maxConstruction: 5 },
     admin: { maxEnergy: 10, maxConquest: 10, maxConstruction: 10 },
@@ -94,6 +98,42 @@ export function Settings() {
       )
     )
     setSaving(null)
+  }
+
+  function handleGlobalChange(field: keyof RoleGauges, value: string) {
+    const num = parseFloat(value)
+    if (isNaN(num) || num < 0) return
+    setGlobalDefaults(prev => ({ ...prev, [field]: num }))
+  }
+
+  async function applyGlobalToAll() {
+    setSavingGlobal(true)
+    await supabase
+      .from('users')
+      .update({
+        max_energy: globalDefaults.maxEnergy,
+        max_conquest: globalDefaults.maxConquest,
+        max_construction: globalDefaults.maxConstruction,
+      })
+      .gte('id', '')  // match all rows
+
+    setUsers(prev =>
+      prev.map(u => ({
+        ...u,
+        maxEnergy: globalDefaults.maxEnergy,
+        maxConquest: globalDefaults.maxConquest,
+        maxConstruction: globalDefaults.maxConstruction,
+      }))
+    )
+    // Sync role defaults display
+    setRoleDefaults(prev => {
+      const updated = { ...prev }
+      for (const role of ROLES) {
+        updated[role] = { ...globalDefaults }
+      }
+      return updated
+    })
+    setSavingGlobal(false)
   }
 
   function handleRoleChange(role: string, field: keyof RoleGauges, value: string) {
@@ -195,6 +235,56 @@ export function Settings() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="divers-card">
+        <h3>Jauges par defaut (tous les joueurs)</h3>
+        <p className="divers-description">
+          Definir les limites max d'energie, conquete et construction pour TOUS les joueurs d'un coup.
+        </p>
+
+        <div className="settings-global-row">
+          <label className="settings-global-field">
+            <span>Max Energie</span>
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              value={globalDefaults.maxEnergy}
+              onChange={e => handleGlobalChange('maxEnergy', e.target.value)}
+              className="settings-input"
+            />
+          </label>
+          <label className="settings-global-field">
+            <span>Max Conquete</span>
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              value={globalDefaults.maxConquest}
+              onChange={e => handleGlobalChange('maxConquest', e.target.value)}
+              className="settings-input"
+            />
+          </label>
+          <label className="settings-global-field">
+            <span>Max Construction</span>
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              value={globalDefaults.maxConstruction}
+              onChange={e => handleGlobalChange('maxConstruction', e.target.value)}
+              className="settings-input"
+            />
+          </label>
+          <button
+            className="btn-primary"
+            onClick={applyGlobalToAll}
+            disabled={savingGlobal}
+          >
+            {savingGlobal ? '...' : 'Appliquer a tous'}
+          </button>
+        </div>
       </div>
 
       <div className="divers-card">

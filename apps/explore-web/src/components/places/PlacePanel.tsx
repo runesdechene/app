@@ -289,11 +289,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     if (liked) {
       const { error } = await supabase.rpc('unlike_place', { p_user_id: userId, p_place_id: place.id })
       if (error) console.error('unlike_place error:', error)
-      else { setLiked(false); setLikesCount(c => c - 1) }
+      else { setLiked(false); setLikesCount(c => c - 1); useMapStore.getState().incrementPlacesRefreshKey() }
     } else {
       const { error } = await supabase.rpc('like_place', { p_user_id: userId, p_place_id: place.id })
       if (error) console.error('like_place error:', error)
-      else { setLiked(true); setLikesCount(c => c + 1) }
+      else { setLiked(true); setLikesCount(c => c + 1); useMapStore.getState().incrementPlacesRefreshKey() }
     }
     setLikeLoading(false)
   }
@@ -329,6 +329,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     } else if (data?.success) {
       setExplored(true)
       setExploredCount(c => c + 1)
+      useMapStore.getState().incrementPlacesRefreshKey()
       useToastStore.getState().addToast({
         type: 'discover',
         message: 'Lieu exploré !',
@@ -378,15 +379,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
               />
             )}
             Revendiqué par {place.claim.factionTitle}
-            {place.claim.fortificationLevel > 0 && (() => {
-              const ct = ctByLevel(constructionTypes, place.claim!.fortificationLevel)
-              return (
-                <span className="place-fortification-badge">
-                  {ct?.name ?? `Niveau ${place.claim.fortificationLevel}`}
-                  {' '}{'\uD83D\uDEE1\uFE0F'} +{place.claim.fortificationLevel}
-                </span>
-              )
-            })()}
           </div>
         )}
         <div className="place-panel-header-actions">
@@ -518,7 +510,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             <div className="likers-modal-overlay" onClick={() => setShowLikers(false)}>
               <div className="likers-modal" onClick={e => e.stopPropagation()}>
                 <div className="likers-modal-header">
-                  <h3>Likes</h3>
+                  <h3>Voyageurs qui ont aimés</h3>
                   <button className="likers-modal-close" onClick={() => setShowLikers(false)}>&#10005;</button>
                 </div>
                 <div className="likers-modal-list">
@@ -673,11 +665,21 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             <p className="place-panel-address">{place.address}</p>
             <button
               className="place-goto-btn"
-              onClick={() => useMapStore.getState().requestFlyTo({
-                lng: place.location.longitude,
-                lat: place.location.latitude,
-                placeId: place.id,
-              })}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  useMapStore.getState().setSelectedPlaceId(null)
+                  useMapStore.getState().requestFlyTo({
+                    lng: place.location.longitude,
+                    lat: place.location.latitude,
+                  })
+                } else {
+                  useMapStore.getState().requestFlyTo({
+                    lng: place.location.longitude,
+                    lat: place.location.latitude,
+                    placeId: place.id,
+                  })
+                }
+              }}
               title="Aller sur ce lieu"
             >
               {'\uD83D\uDDFA\uFE0F'}
@@ -756,7 +758,9 @@ function ClaimButton({
   const [claimed, setClaimed] = useState(false)
   const [claimError, setClaimError] = useState<string | null>(null)
   const fortLevel = currentClaim?.fortificationLevel ?? 0
-  const claimCost = 1 + fortLevel
+  const zoneFort = currentClaim?.zoneFortification ?? 0
+  const zoneBonus = Math.floor(zoneFort * 0.5)
+  const claimCost = 1 + fortLevel + zoneBonus
 
   if (!userId || !factionId || !factionTitle || !factionColor) return null
 
@@ -845,9 +849,19 @@ function ClaimButton({
         {claiming
           ? 'Revendication...'
           : canAffordClaim
-            ? `Revendiquer pour ${factionTitle} (${claimCost} \u2694)`
+            ? `Revendiquer pour ${factionTitle} (${claimCost} \u2694${zoneBonus > 0 ? ` dont ${zoneBonus} zone` : ''})`
             : `Pas assez de points de conquête (${Math.floor(conquestPoints)}/${claimCost})`}
       </button>
+      {(fortLevel > 0 || zoneBonus > 0) && (
+        <div className="claim-cost-detail">
+          {fortLevel > 0 && (
+            <span>{'\uD83D\uDEE1\uFE0F'} Fortification : +{fortLevel}</span>
+          )}
+          {zoneBonus > 0 && (
+            <span>{'\uD83D\uDEE1\uFE0F'} Voisins fortifiés : +{zoneBonus}</span>
+          )}
+        </div>
+      )}
       {claimError && (
         <p className="claim-error">{claimError}</p>
       )}

@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useToastStore } from '../../stores/toastStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useMobileNavStore } from '../../stores/mobileNavStore'
 import type { GameToast as GameToastType } from '../../stores/toastStore'
+
+const isMobile = window.innerWidth <= 768
 
 const ICONS: Record<GameToastType['type'], string> = {
   claim: '\u2694\uFE0F',     // epee
@@ -101,10 +104,11 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     actions.set(actorName, () => setSelectedPlayerId(toast.actorId!))
   }
 
-  // Nom du lieu → fly to + ouvrir panel
+  // Nom du lieu → fly to + ouvrir panel + fermer panel mobile
   if (toast.placeId && toast.placeLocation && highlights.length > 1) {
     const placeHL = highlights[1]
     actions.set(placeHL, () => {
+      useMobileNavStore.getState().closePanel()
       requestFlyTo({
         lng: toast.placeLocation!.longitude,
         lat: toast.placeLocation!.latitude,
@@ -113,12 +117,22 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     })
   }
 
+  // Ancien controleur → ouvrir profil
+  if (toast.previousActorId && highlights.length > 2) {
+    const prevName = highlights[2]
+    actions.set(prevName, () => setSelectedPlayerId(toast.previousActorId!))
+  }
+
   return (
     <div
       className="game-toast"
       style={{ borderLeftColor: toast.color || 'var(--color-sepia)' }}
     >
-      {toast.iconUrl ? (
+      {toast.contested ? (
+        <span className="game-toast-faction-dot game-toast-contested">
+          {'\uD83D\uDD25'}
+        </span>
+      ) : toast.iconUrl ? (
         <span
           className="game-toast-faction-dot"
           style={{ background: toast.color || 'var(--color-sepia)' }}
@@ -147,13 +161,21 @@ export function GameToast() {
   const toasts = useToastStore(s => s.toasts)
   const containerRef = useRef<HTMLDivElement>(null)
   const [minimized, setMinimized] = useState(false)
+  const mobilePanel = useMobileNavStore(s => s.activePanel)
 
-  // Auto-scroll vers le bas quand un nouveau toast arrive
+  // Sur desktop : auto-scroll vers le bas quand un nouveau toast arrive
+  // Sur mobile : pas besoin, l'ordre est inversé (récent en haut)
   useEffect(() => {
-    if (containerRef.current) {
+    if (!isMobile && containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight
     }
-  }, [toasts.length])
+  }, [toasts.length, mobilePanel])
+
+  // Sur mobile, afficher les plus récents en haut
+  const sortedToasts = useMemo(() => {
+    if (!isMobile) return toasts
+    return [...toasts].reverse()
+  }, [toasts])
 
   if (toasts.length === 0) return null
 
@@ -168,7 +190,7 @@ export function GameToast() {
       </button>
       {!minimized && (
         <div className="game-toast-list" ref={containerRef}>
-          {toasts.map(toast => (
+          {sortedToasts.map(toast => (
             <ToastItem key={toast.id} toast={toast} />
           ))}
         </div>

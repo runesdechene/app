@@ -117,18 +117,21 @@ function buildTerritoryBorderLayer(): LayerSpecification {
     type: 'line',
     source: 'territories',
     paint: {
+      'line-dasharray': [4, 2],
       'line-color': ['get', 'tagColor'],
+      // 2.5 base + 0.25 par niveau de fort (cap 12 → max 5.5), hover 4.5
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        3.5,
-        2.5,
+        4.5,
+        ['+', 2.5, ['*', ['min', ['get', 'totalFortification'], 12], 0.25]],
       ],
+      // 0.45 base + 0.025 par niveau de fort (cap 0.75), hover 0.8
       'line-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         0.8,
-        0.45,
+        ['min', ['+', 0.45, ['*', ['min', ['get', 'totalFortification'], 12], 0.025]], 0.75],
       ],
     },
   }
@@ -337,6 +340,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
+  const showFactions = useMapStore(s => s.showFactions)
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
 
   // Viewport bounds pour la minimap
@@ -358,7 +362,7 @@ export const ExploreMap = memo(function ExploreMap() {
       emblemLon: number; emblemLat: number
       territoryId: number
       factionTitle: string; players: string; placesCount: number
-      hourlyRate: number
+      hourlyRate: number; totalFortification: number
       tagColor: string; pattern: string
     }[] = []
 
@@ -371,6 +375,7 @@ export const ExploreMap = memo(function ExploreMap() {
       const players = (typeof props.players === 'string' ? props.players : '')
       const placesCount = (typeof props.placesCount === 'number' ? props.placesCount : 0)
       const hourlyRate = (typeof props.hourlyRate === 'number' ? props.hourlyRate : 0)
+      const totalFortification = (typeof props.totalFortification === 'number' ? props.totalFortification : 0)
 
       // Extraire les anneaux extérieurs
       const rings: number[][][] =
@@ -401,7 +406,7 @@ export const ExploreMap = memo(function ExploreMap() {
         labels.push({
           lon: topLon, lat: topLat,
           emblemLon, emblemLat,
-          territoryId, factionTitle, players, placesCount, hourlyRate, tagColor, pattern,
+          territoryId, factionTitle, players, placesCount, hourlyRate, totalFortification, tagColor, pattern,
         })
       }
     }
@@ -421,12 +426,16 @@ export const ExploreMap = memo(function ExploreMap() {
   }), [unknownIconLoaded])
 
   // IDs des layers interactifs (mémorisé pour éviter les re-renders MapGL)
-  const interactiveLayerIds = useMemo(() => [
-    'places-undiscovered-circle', 'places-undiscovered-icon',
-    'places-point', 'places-icon', 'territories-fill',
-  ], [])
+  const interactiveLayerIds = useMemo(() => {
+    const ids = [
+      'places-undiscovered-circle', 'places-undiscovered-icon',
+      'places-point', 'places-icon',
+    ]
+    if (showFactions) ids.push('territories-fill')
+    return ids
+  }, [showFactions])
 
-  // Lieux fortifiés → Markers ⭐ par-dessus l'icône du lieu
+  // Lieux fortifiés → Markers 🛡️ par-dessus l'icône du lieu
   const fortifiedPlaces = useMemo(() => {
     if (!geojson) return []
     return geojson.features
@@ -688,7 +697,7 @@ export const ExploreMap = memo(function ExploreMap() {
     if (!map) return
     map.getCanvas().style.cursor = ''
     // Clear territory hover
-    if (hoveredTerritoryRef.current !== null) {
+    if (hoveredTerritoryRef.current !== null && map.getSource('territories')) {
       map.setFeatureState(
         { source: 'territories', id: hoveredTerritoryRef.current },
         { hover: false },
@@ -709,16 +718,18 @@ export const ExploreMap = memo(function ExploreMap() {
 
   const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
     const map = mapRef.current?.getMap()
-    if (!map || !map.getLayer('territories-fill')) return
+    if (!map || !map.getLayer('territories-fill') || !map.getSource('territories')) return
 
     const features = map.queryRenderedFeatures(e.point, { layers: ['territories-fill'] })
 
     // Clear previous hover
     if (hoveredTerritoryRef.current !== null) {
-      map.setFeatureState(
-        { source: 'territories', id: hoveredTerritoryRef.current },
-        { hover: false },
-      )
+      if (map.getSource('territories')) {
+        map.setFeatureState(
+          { source: 'territories', id: hoveredTerritoryRef.current },
+          { hover: false },
+        )
+      }
       hoveredTerritoryRef.current = null
     }
 
@@ -834,7 +845,7 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {territories && (
+      {showFactions && territories && (
         <Source id="territories" type="geojson" data={territories}>
           <Layer {...territoryFillLayer} beforeId="places-undiscovered-circle" />
           <Layer {...territoryBorderLayer} beforeId="places-undiscovered-circle" />
@@ -842,7 +853,7 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
 
       {/* Blasons flottants au centroïde de chaque territoire */}
-      {territoryLabels && territoryLabels.map((label, i) => (
+      {showFactions && territoryLabels && territoryLabels.map((label, i) => (
         label.pattern ? (
           <Marker
             key={`emblem-${i}`}
@@ -867,15 +878,15 @@ export const ExploreMap = memo(function ExploreMap() {
         ) : null
       ))}
 
-      {/* ⭐ sur les lieux fortifiés */}
-      {fortifiedPlaces.map(p => (
+      {/* 🛡️ sur les lieux fortifiés */}
+      {showFactions && fortifiedPlaces.map(p => (
         <Marker key={`fort-${p.id}`} longitude={p.lon} latitude={p.lat} anchor="center">
-          <span className="place-fortified-star">{'🛡️'}</span>
+          <span className="place-fortified-star">{'\uD83D\uDEE1\uFE0F'}</span>
         </Marker>
       ))}
 
       {/* Labels texte au survol (point le plus au nord) */}
-      {territoryLabels && territoryLabels.map((label, i) => (
+      {showFactions && territoryLabels && territoryLabels.map((label, i) => (
         label.players ? (
           <Marker
             key={`label-${i}`}
@@ -959,8 +970,8 @@ export const ExploreMap = memo(function ExploreMap() {
       <Minimap geojson={geojson} bounds={viewBounds} onNavigate={handleMinimapNavigate} />
     )}
 
-    {/* Barre de progression découvertes (masquée en mode add-place) */}
-    {!addPlaceMode && geojson && (() => {
+    {/* Barre de progression découvertes (masquée en mode add-place et si non connecté) */}
+    {!addPlaceMode && currentUserId && geojson && (() => {
       const total = geojson.features.length
       const discovered = geojson.features.filter(f => f.properties.discovered).length
       const pct = total > 0 ? (discovered / total) * 100 : 0

@@ -11,8 +11,12 @@ export interface GameToast {
   highlight?: string
   /** URL d'icone faction (remplace l'emoji par défaut) */
   iconUrl?: string
+  /** Conquete contestee (lieu pris a un autre joueur) */
+  contested?: boolean
   /** ID du joueur (pour clic → ouvrir profil) */
   actorId?: string
+  /** ID de l'ancien controleur (conquete contestee) */
+  previousActorId?: string
   /** ID du lieu (pour clic → fly to + ouvrir panel) */
   placeId?: string
   /** Coordonnées du lieu */
@@ -33,7 +37,14 @@ export const useToastStore = create<ToastState>((set) => ({
   addToast: (toast) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     set((state) => {
-      const next = [...state.toasts, { ...toast, id }]
+      // Deduplicate: pour new_user, garder un seul toast par acteur
+      const dominated = toast.type === 'new_user' && toast.actorId
+        ? state.toasts.filter(t => t.type === 'new_user' && t.actorId === toast.actorId)
+        : []
+      const base = dominated.length > 0
+        ? state.toasts.filter(t => !dominated.some(d => d.id === t.id))
+        : state.toasts
+      const next = [...base, { ...toast, id }]
       next.sort((a, b) => a.timestamp - b.timestamp)
       return { toasts: next }
     })

@@ -11,12 +11,15 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'La Carte — Runes de Chene',
-        short_name: 'La Carte',
+        name: 'Runes de Chêne CONQUÊTE',
+        short_name: 'CONQUÊTE',
         description: 'Explorez 2400 lieux de patrimoine historique et naturel',
         theme_color: '#F5E6D3',
         background_color: '#F5E6D3',
         display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -27,6 +30,12 @@ export default defineConfig({
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
       },

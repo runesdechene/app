@@ -20,6 +20,8 @@ export function FactionBar() {
   const [selectedFaction, setSelectedFaction] = useState<FactionNotoriety | null>(null)
   const placeOverrides = useMapStore(s => s.placeOverrides)
   const userFactionId = useFogStore(s => s.userFactionId)
+  const showFactions = useMapStore(s => s.showFactions)
+  const setShowFactions = useMapStore(s => s.setShowFactions)
 
   useEffect(() => {
     async function fetchNotoriety() {
@@ -63,6 +65,14 @@ export function FactionBar() {
 
   return (
     <div className="faction-scoreboard">
+      <label className="faction-toggle">
+        <input
+          type="checkbox"
+          checked={showFactions}
+          onChange={(e) => setShowFactions(e.target.checked)}
+        />
+        <span className="faction-toggle-label">Territoires</span>
+      </label>
       {stats.map(faction => {
         const isLeader = faction.factionId === leaderId
         const isMine = faction.factionId === userFactionId

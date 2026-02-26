@@ -25,12 +25,23 @@ export function useAuth() {
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setState({
           user: session?.user ?? null,
           session,
           loading: false
         })
+
+        // Synchroniser email_address dans la table users apres un changement d'email
+        // + deconnecter toutes les autres sessions (anti-piratage)
+        if (event === 'USER_UPDATED' && session?.user?.email) {
+          supabase
+            .from('users')
+            .update({ email_address: session.user.email })
+            .eq('id', session.user.id)
+            .then(() => {})
+          supabase.auth.signOut({ scope: 'others' }).then(() => {})
+        }
       }
     )
 

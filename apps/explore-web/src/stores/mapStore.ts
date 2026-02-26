@@ -45,6 +45,10 @@ interface MapState {
   /** Mode de style de la carte : jeu (épuré), détaillé (parchemin+routes), satellite */
   mapStyleMode: 'game' | 'detailed' | 'satellite'
   setMapStyleMode: (mode: 'game' | 'detailed' | 'satellite') => void
+
+  /** Afficher/masquer les territoires et bannières de faction sur la carte */
+  showFactions: boolean
+  setShowFactions: (show: boolean) => void
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -85,4 +89,7 @@ export const useMapStore = create<MapState>((set) => ({
 
   mapStyleMode: 'game',
   setMapStyleMode: (mode) => set({ mapStyleMode: mode }),
+
+  showFactions: localStorage.getItem('showFactions') === 'true',
+  setShowFactions: (show) => { localStorage.setItem('showFactions', String(show)); set({ showFactions: show }) },
 }))
