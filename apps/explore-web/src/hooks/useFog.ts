@@ -164,9 +164,11 @@ export function useFog() {
         })
       }
       if (profileRes.data) {
-        const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null }
+        const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null; gameMode?: string }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
+        const gm = profile.gameMode === 'conquest' ? 'conquest' : 'exploration'
+        useFogStore.setState({ gameMode: gm })
       }
       if (titlesRes.data) {
         const td = titlesRes.data as {

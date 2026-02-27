@@ -8,12 +8,16 @@ import { FactionModal } from './components/auth/FactionModal'
 import { OnboardingModal } from './components/auth/OnboardingModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
+import { GameModeModal } from './components/auth/GameModeModal'
+import { ConquestToggle } from './components/map/ConquestToggle'
+import { InfoModal } from './components/map/InfoModal'
 import { GameToast } from './components/map/GameToast'
 import { PlayerProfileModal } from './components/map/PlayerProfileModal'
 import { LeaderboardModal } from './components/map/LeaderboardModal'
 import { VersionBadge } from './components/map/VersionBadge'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
+import { useToastStore } from './stores/toastStore'
 import { useAuth } from './hooks/useAuth'
 import { useFog } from './hooks/useFog'
 import { usePresence } from './hooks/usePresence'
@@ -29,11 +33,38 @@ import './App.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   const notoriety = useFogStore(s => s.notorietyPoints)
+  const [showInfo, setShowInfo] = useState(false)
+
   return (
-    <div className="notoriety-badge" onClick={onClick}>
-      <span className="notoriety-icon">{'\uD83C\uDF96\uFE0F'}</span>
-      <span className="notoriety-value">{notoriety}</span>
-    </div>
+    <>
+      <div
+        className="notoriety-badge"
+        onClick={(e) => {
+          e.stopPropagation()
+          setShowInfo(true)
+        }}
+        onContextMenu={(e) => { e.preventDefault(); onClick() }}
+      >
+        <span className="notoriety-icon">{'\uD83C\uDF96\uFE0F'}</span>
+        <span className="notoriety-value">{notoriety}</span>
+      </div>
+
+      {showInfo && (
+        <InfoModal
+          icon={'\uD83C\uDF96\uFE0F'}
+          title="Notoriete"
+          description="La notoriete represente votre prestige personnel dans votre faction. Vous gagnez des points en revendiquant et fortifiant des lieux."
+          rows={[
+            { label: 'Points actuels', value: String(notoriety), highlight: true },
+            { label: 'Revendiquer un lieu', value: '+10 pts' },
+            { label: 'Fortifier un lieu', value: '+5 pts' },
+            { label: 'Changer de faction', value: 'Notoriete / 2' },
+          ]}
+          onClose={() => setShowInfo(false)}
+          action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
+        />
+      )}
+    </>
   )
 }
 
@@ -45,6 +76,7 @@ function App() {
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showGameModeModal, setShowGameModeModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
@@ -53,6 +85,10 @@ function App() {
   const userName = useFogStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
+
+  // Mode de jeu (exploration masque toute l'UI faction)
+  const gameMode = useFogStore(s => s.gameMode)
+  const isConquestMode = gameMode === 'conquest'
 
   // Le FAB "+" n'est visible que si un titre débloqué contient 'add_place'
   const unlockedTitles = useFogStore(s => s.unlockedGeneralTitles)
@@ -77,25 +113,16 @@ function App() {
     }
   }, [authLoading, isAuthenticated])
 
-  // Auto-open onboarding OU faction modal selon l'etat du joueur
-  // Nouveau joueur (first_name vide + pas de faction) → onboarding d'abord
-  // Joueur existant sans faction → faction directement
+  // Auto-open onboarding selon l'etat du joueur
+  // Nouveau joueur (first_name vide) → onboarding → GameModeModal → (conquest → FactionModal)
   const onboardingDone = useRef(false)
-  const factionPromptDone = useRef(false)
   useEffect(() => {
     if (!userId) return
-    // Nouveau joueur : nom vide + pas de faction → onboarding
-    if (userName === '' && userFactionId === null && !onboardingDone.current) {
+    if (userName === '' && !onboardingDone.current) {
       onboardingDone.current = true
       setShowOnboarding(true)
-      return
     }
-    // Joueur existant sans faction → faction modal
-    if (userFactionId === null && !factionPromptDone.current && !showOnboarding) {
-      factionPromptDone.current = true
-      setShowFactionModal(true)
-    }
-  }, [userId, userName, userFactionId, showOnboarding])
+  }, [userId, userName])
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
 
@@ -105,9 +132,12 @@ function App() {
       <InstallPrompt />
       <OfflineIndicator />
 
-      {!addPlaceMode && !authLoading && isAuthenticated && <FactionBar />}
+      {!addPlaceMode && !authLoading && isAuthenticated && isConquestMode && <FactionBar />}
       {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
       {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
+
+      {/* Toggle Conquete (mini-bandeau permanent sur la carte) */}
+      {!addPlaceMode && !authLoading && isAuthenticated && <ConquestToggle />}
 
       {/* Header mobile (logo + hamburger, masqué sur desktop) */}
       {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
@@ -119,9 +149,9 @@ function App() {
         <div className="app-toolbar">
           {!authLoading && isAuthenticated && (
             <>
-              <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
-              <ResourceIndicator type="conquest" />
-              <ResourceIndicator type="construction" />
+              {isConquestMode && <NotorietyBadge onClick={() => setShowLeaderboard(true)} />}
+              {isConquestMode && <ResourceIndicator type="conquest" />}
+              {isConquestMode && <ResourceIndicator type="construction" />}
               <EnergyIndicator />
             </>
           )}
@@ -141,11 +171,21 @@ function App() {
         </div>
       )}
 
-      {/* FAB Ajouter un lieu (gate derrière titre avec unlock 'add_place') */}
-      {!authLoading && isAuthenticated && userId && canAddPlace && !addPlaceMode && (
+      {/* FAB Ajouter un lieu — toujours visible, verrouille si pas le titre */}
+      {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
-          className="add-place-fab"
-          onClick={() => setAddPlaceMode(true)}
+          className={`add-place-fab ${!canAddPlace ? 'locked' : ''}`}
+          onClick={() => {
+            if (canAddPlace) {
+              setAddPlaceMode(true)
+            } else {
+              useToastStore.getState().addToast({
+                type: 'discover',
+                message: 'Vous devez etre Explorateur Novice — decouvrez au moins 5 lieux !',
+                timestamp: Date.now(),
+              })
+            }
+          }}
           aria-label="Ajouter un lieu"
         >
           +
@@ -171,13 +211,28 @@ function App() {
       {showOnboarding && (
         <OnboardingModal onComplete={() => {
           setShowOnboarding(false)
-          setShowFactionModal(true)
+          setShowGameModeModal(true)
+        }} />
+      )}
+
+      {showGameModeModal && (
+        <GameModeModal onComplete={(mode) => {
+          setShowGameModeModal(false)
+          if (mode === 'conquest') {
+            setShowFactionModal(true)
+          }
         }} />
       )}
 
       {showFactionModal && (
         <FactionModal
-          onClose={() => setShowFactionModal(false)}
+          onClose={(joined) => {
+            setShowFactionModal(false)
+            if (!joined && gameMode === 'conquest' && !userFactionId) {
+              // Pas de faction choisie en mode conquete → repasser en exploration
+              useFogStore.getState().setGameMode('exploration')
+            }
+          }}
           currentFactionId={userFactionId}
         />
       )}

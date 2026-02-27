@@ -338,7 +338,9 @@ export const ExploreMap = memo(function ExploreMap() {
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
-  const showFactions = useMapStore(s => s.showFactions)
+  const rawShowFactions = useMapStore(s => s.showFactions)
+  const gameMode = useFogStore(s => s.gameMode)
+  const showFactions = rawShowFactions && gameMode === 'conquest'
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
 
   // Viewport bounds pour la minimap

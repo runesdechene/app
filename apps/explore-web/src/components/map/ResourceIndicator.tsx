@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
+import { InfoModal } from './InfoModal'
 
 const CONFIG = {
   conquest: {
@@ -103,21 +104,48 @@ export function ResourceIndicator({ type }: Props) {
   const fillPercent = (fractional / maxPoints) * 100
   const defaultCycle = 14400
   const regenBonus = cycleSeconds < defaultCycle ? 'bonus' : cycleSeconds > defaultCycle ? 'malus' : ''
+  const [showInfo, setShowInfo] = useState(false)
+
+  const baseMax = maxPoints - bonus
+
+  const INFO_TEXT: Record<string, string> = {
+    conquest: "Les points de conquete permettent de revendiquer des lieux pour votre faction. Chaque revendication coute des points selon le niveau de fortification du lieu.",
+    construction: "Les points de construction permettent de fortifier vos lieux revendiques. Chaque niveau de fortification rend le lieu plus difficile a conquérir par les factions adverses.",
+  }
 
   return (
-    <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`}>
-      <div className="energy-main">
-        <span className="energy-icon">{cfg.icon}</span>
-        <span className="energy-count">
-          {formatVal(fractional)}/<span className={bonus > 0 ? 'max-bonus' : bonus < 0 ? 'max-malus' : ''}>{maxPoints}</span>
-        </span>
-        <div className="energy-bar">
-          <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
+    <>
+      <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`} onClick={() => setShowInfo(true)} style={{ cursor: 'pointer' }}>
+        <div className="energy-main">
+          <span className="energy-icon">{cfg.icon}</span>
+          <span className="energy-count">
+            {formatVal(fractional)}/<span className={bonus > 0 ? 'max-bonus' : bonus < 0 ? 'max-malus' : ''}>{maxPoints}</span>
+          </span>
+          <div className="energy-bar">
+            <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
+          </div>
+        </div>
+        <div className="energy-sub">
+          <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
         </div>
       </div>
-      <div className="energy-sub">
-        <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
-      </div>
-    </div>
+
+      {showInfo && (
+        <InfoModal
+          icon={cfg.icon}
+          title={cfg.label}
+          description={INFO_TEXT[type] ?? ''}
+          rows={[
+            { label: 'Points actuels', value: `${formatVal(fractional)} / ${maxPoints}` },
+            { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
+            ...(bonus !== 0 ? [
+              { label: 'Base', value: String(baseMax), highlight: false },
+              { label: 'Bonus faction', value: `${bonus > 0 ? '+' : ''}${bonus}`, highlight: true },
+            ] : []),
+          ]}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
+    </>
   )
 }

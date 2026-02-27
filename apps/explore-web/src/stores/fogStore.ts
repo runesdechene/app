@@ -85,6 +85,10 @@ interface FogState {
   setDisplayedGeneralTitleIds: (ids: number[]) => void
   setFactionTitle2: (t: { id: number; name: string; icon: string; unlocks: string[] } | null) => void
 
+  /** Mode de jeu (exploration = pas de faction UI, conquest = tout) */
+  gameMode: 'exploration' | 'conquest'
+  setGameMode: (mode: 'exploration' | 'conquest') => void
+
   /** Admin */
   isAdmin: boolean
   setIsAdmin: (v: boolean) => void
@@ -168,6 +172,9 @@ export const useFogStore = create<FogState>((set) => ({
   setUnlockedGeneralTitles: (titles) => set({ unlockedGeneralTitles: titles }),
   setDisplayedGeneralTitleIds: (ids) => set({ displayedGeneralTitleIds: ids }),
   setFactionTitle2: (t) => set({ factionTitle2: t }),
+
+  gameMode: 'exploration',
+  setGameMode: (mode) => set({ gameMode: mode }),
 
   isAdmin: false,
   setIsAdmin: (v) => set({ isAdmin: v }),

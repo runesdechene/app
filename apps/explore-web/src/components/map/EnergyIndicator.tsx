@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useFogStore } from '../../stores/fogStore'
 import { supabase } from '../../lib/supabase'
+import { InfoModal } from './InfoModal'
 
 export function EnergyIndicator() {
   const energy = useFogStore(s => s.energy)
@@ -72,23 +73,45 @@ export function EnergyIndicator() {
 
   const fillPercent = (fractionalEnergy / maxEnergy) * 100
   const regenBonus = cycleSeconds < 7200 ? 'bonus' : cycleSeconds > 7200 ? 'malus' : ''
+  const ratePerHour = 3600 / cycleSeconds
+  const [showInfo, setShowInfo] = useState(false)
+
+  const baseMax = maxEnergy - bonusEnergy
 
   return (
-    <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`}>
-      <div className="energy-main">
-        <span className="energy-icon">&#9889;</span>
-        <span className="energy-count">
-          {formatEnergy(fractionalEnergy)}/<span className={bonusEnergy > 0 ? 'max-bonus' : bonusEnergy < 0 ? 'max-malus' : ''}>{maxEnergy}</span>
-        </span>
-        <div className="energy-bar">
-          <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
+    <>
+      <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`} onClick={() => setShowInfo(true)} style={{ cursor: 'pointer' }}>
+        <div className="energy-main">
+          <span className="energy-icon">&#9889;</span>
+          <span className="energy-count">
+            {formatEnergy(fractionalEnergy)}/<span className={bonusEnergy > 0 ? 'max-bonus' : bonusEnergy < 0 ? 'max-malus' : ''}>{maxEnergy}</span>
+          </span>
+          <div className="energy-bar">
+            <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
+          </div>
+        </div>
+
+        <div className="energy-sub">
+          <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
         </div>
       </div>
 
-      <div className="energy-sub">
-        <span className="energy-rate">+{(3600 / cycleSeconds).toFixed(2)}/h</span>
-      </div>
-
-    </div>
+      {showInfo && (
+        <InfoModal
+          icon={'\u26A1'}
+          title="Energie"
+          description="L'energie permet de decouvrir de nouveaux lieux. Chaque decouverte coute 1 point (gratuit si vous etes a proximite GPS). Elle se regenere automatiquement."
+          rows={[
+            { label: 'Points actuels', value: `${formatEnergy(fractionalEnergy)} / ${maxEnergy}` },
+            { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
+            ...(bonusEnergy !== 0 ? [
+              { label: 'Base', value: String(baseMax), highlight: false },
+              { label: 'Bonus faction', value: `${bonusEnergy > 0 ? '+' : ''}${bonusEnergy}`, highlight: true },
+            ] : []),
+          ]}
+          onClose={() => setShowInfo(false)}
+        />
+      )}
+    </>
   )
 }

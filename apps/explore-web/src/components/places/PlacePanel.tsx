@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -7,45 +7,14 @@ import { useFogStore } from '../../stores/fogStore'
 import { useToastStore } from '../../stores/toastStore'
 import { discoverPlace } from '../../hooks/useFog'
 import { useAuth } from '../../hooks/useAuth'
+import { useConstructionTypes, ctByLevel } from '../../hooks/useConstructionTypes'
+import type { ConstructionTypeInfo } from '../../hooks/useConstructionTypes'
 
 interface PlacePanelProps {
   placeId: string | null
   onClose: () => void
   userEmail: string | null
   onAuthPrompt?: () => void
-}
-
-// --- Types de construction (chargés depuis la DB) ---
-
-interface ConstructionTypeInfo {
-  level: number
-  name: string
-  description: string
-  image_url: string | null
-  cost: number
-  conquest_bonus: number
-}
-
-let _ctCache: ConstructionTypeInfo[] | null = null
-
-function useConstructionTypes(): ConstructionTypeInfo[] {
-  const [types, setTypes] = useState<ConstructionTypeInfo[]>(_ctCache ?? [])
-
-  useEffect(() => {
-    if (_ctCache) return
-    supabase.rpc('get_construction_types').then(({ data }) => {
-      if (data && Array.isArray(data)) {
-        _ctCache = data as ConstructionTypeInfo[]
-        setTypes(data as ConstructionTypeInfo[])
-      }
-    })
-  }, [])
-
-  return types
-}
-
-function ctByLevel(types: ConstructionTypeInfo[], level: number): ConstructionTypeInfo | undefined {
-  return types.find(t => t.level === level)
 }
 
 export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
@@ -181,8 +150,8 @@ function FoggedPlaceView({
       <div className="place-panel-body">
         <h1 className="place-panel-title place-panel-title-blur">{place.title}</h1>
 
-        {/* Badge faction alliée */}
-        {isOwnFaction && place.claim && (
+        {/* Badge faction alliée (masqué en mode exploration) */}
+        {useFogStore.getState().gameMode === 'conquest' && isOwnFaction && place.claim && (
           <div
             className="place-claim-badge"
             style={{ backgroundColor: place.claim.factionColor }}
@@ -365,7 +334,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     <>
       {/* Header */}
       <div className="place-panel-header">
-        {place.claim && (
+        {useFogStore.getState().gameMode === 'conquest' && place.claim && (
           <div
             className="place-claim-badge"
             style={{ backgroundColor: place.claim.factionColor }}
@@ -378,7 +347,14 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
                 style={{ backgroundColor: place.claim.factionColor }}
               />
             )}
-            Revendiqué par {place.claim.factionTitle}
+            <div className="place-claim-text">
+              <div className="place-claim-author">
+                Revendiqué par <a className="place-claim-link" onClick={() => useMapStore.getState().setSelectedPlayerId(place.claim!.claimedBy)}>{place.claim.claimedByName || 'Inconnu'}</a>
+              </div>
+              <div className="place-claim-faction-name">
+                {place.claim.factionTitle}
+              </div>
+            </div>
           </div>
         )}
         <div className="place-panel-header-actions">
@@ -708,13 +684,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
           <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
         )}
 
-        {/* Claim button */}
-        {userEmail && (
+        {/* Claim button (masque en mode exploration) */}
+        {userEmail && useFogStore.getState().gameMode === 'conquest' && (
           <ClaimButton placeId={place.id} currentClaim={place.claim} />
         )}
 
-        {/* Fortify button */}
-        {userEmail && place.claim && (
+        {/* Fortify button (masque en mode exploration) */}
+        {userEmail && useFogStore.getState().gameMode === 'conquest' && place.claim && (
           <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} />
         )}
       </div>

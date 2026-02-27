@@ -18,7 +18,7 @@ interface FactionData {
 }
 
 interface FactionModalProps {
-  onClose: () => void
+  onClose: (joined?: boolean) => void
   currentFactionId: string | null
 }
 
@@ -139,13 +139,13 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     await reloadAfterFactionChange()
 
     setSelecting(false)
-    onClose()
+    onClose(false)
   }
 
   const isMobile = window.innerWidth <= 768
 
   return (
-    <div className="auth-overlay" onClick={onClose} style={isMobile ? { zIndex: 10001 } : undefined}>
+    <div className="auth-overlay" onClick={() => onClose(false)} style={isMobile ? { zIndex: 10001 } : undefined}>
       <div
         className="faction-modal"
         onClick={e => e.stopPropagation()}
@@ -160,7 +160,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           boxSizing: 'border-box' as const,
         } : undefined}
       >
-        <button className="auth-modal-close" onClick={onClose} aria-label="Fermer">
+        <button className="auth-modal-close" onClick={() => onClose(false)} aria-label="Fermer">
           &#10005;
         </button>
 

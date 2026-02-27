@@ -1645,6 +1645,7 @@
   top: 15px;
   display: flex;
   align-items: center;
+  flex-direction: row;
   gap: 6px;
   font-family: var(--font-body);
   font-size: 14px;
@@ -1653,6 +1654,32 @@
   margin: 0;
 }
 
+
+.place-claim-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.place-claim-link {
+  border: none;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  border-bottom: 1px dashed white;
+}
+
+.place-claim-author 
+{
+}
+
+.place-claim-faction-name {
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 400;
+}
 
 .place-claim-faction-logo {
   width: 28px;
@@ -3104,7 +3131,7 @@
   bottom: 25px;
   width: 540px;
   height: 260px;
-  z-index: 16;
+  z-index: 15;
   display: flex;
   flex-direction: column;
   background: rgba(250, 231, 212, 0.62);
@@ -3208,6 +3235,26 @@
   font-weight: 700;
   font-size: 14px;
   margin-right: 3px;
+}
+
+.chat-channel-tag-bugs {
+  color: #9ea03f;
+}
+
+.chat-filter-bugs {
+  color: #9ea03f;
+}
+
+.chat-filter-bugs input {
+  accent-color: #9ea03f;
+}
+
+.chat-send-channel-bugs {
+  color: #9ea03f;
+}
+
+.chat-send-channel-bugs.chat-send-channel-active {
+  border-color: #9ea03f;
 }
 
 .chat-message-name {
@@ -3437,15 +3484,26 @@
   user-select: none;
 }
 
-.place-fortified-star {
-  position: absolute;
-  right: -25px;
-  top: 10px;
-  font-size: 24px;
-  line-height: 1;
+.place-fort-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  padding: 4px;
+  padding-bottom: 6px;
+  min-width: 24px;
+  background: #3c3d3d;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  border-radius: 0 0 50% 50%;
   pointer-events: none;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-  transform: translate(8px, -8px);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  transform: translate(18px, 16px);
+  line-height: 1;
+
 }
 
 .territory-emblem-rate {
@@ -3533,7 +3591,7 @@
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index: 18;
+  z-index: 15;
   display: flex;
   flex-direction: column;
   max-width: 360px;
@@ -3839,6 +3897,15 @@
 
 .add-place-fab:active {
   transform: scale(0.95);
+}
+
+.add-place-fab.locked {
+  opacity: 0.45;
+  filter: grayscale(0.5);
+  cursor: not-allowed;
+}
+.add-place-fab.locked:hover {
+  transform: none;
 }
 
 /* --- Top bar (step location) --- */
@@ -4701,7 +4768,7 @@
   bottom: calc(var(--safe-bottom, 0px) + 16px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 25;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5522,4 +5589,258 @@
     right: 13px;
     left: auto;
   }
+}
+
+/* ==========================================
+   ConquestToggle — mini-bandeau permanent
+   ========================================== */
+
+.conquest-toggle {
+  position: fixed;
+  top: 90px;
+  right: 62px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(30, 25, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d4c5a0;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+.conquest-toggle:hover {
+  background: rgba(40, 34, 28, 0.95);
+}
+.conquest-toggle-icon {
+  font-size: 14px;
+}
+.conquest-toggle-label {
+  font-weight: 500;
+}
+.conquest-toggle-switch {
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  transition: background 0.2s;
+  margin-left: 4px;
+}
+.conquest-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #888;
+  transition: transform 0.2s, background 0.2s;
+}
+.conquest-toggle-switch.on {
+  background: rgba(201, 168, 76, 0.4);
+}
+.conquest-toggle-switch.on::after {
+  transform: translateX(12px);
+  background: #c9a84c;
+}
+
+/* ==========================================
+   GameModeModal — choix apres onboarding
+   ========================================== */
+
+.gamemode-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(20, 16, 12, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.gamemode-modal {
+  background: #2a2318;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  color: #d4c5a0;
+}
+.gamemode-title {
+  font-size: 20px;
+  margin: 0 0 6px;
+  color: #c9a84c;
+}
+.gamemode-subtitle {
+  font-size: 13px;
+  margin: 0 0 24px;
+  opacity: 0.7;
+}
+.gamemode-options {
+  display: flex;
+  gap: 16px;
+}
+.gamemode-option {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px 16px;
+  cursor: pointer;
+  color: #d4c5a0;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.gamemode-option:hover:not(:disabled) {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.08);
+  transform: translateY(-2px);
+}
+.gamemode-option.selected {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.15);
+}
+.gamemode-option:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.gamemode-option-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 12px;
+}
+.gamemode-option-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #c9a84c;
+}
+.gamemode-option-desc {
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Mobile : stack vertical */
+@media (max-width: 520px) {
+  .gamemode-options {
+    flex-direction: column;
+  }
+  .gamemode-modal {
+    padding: 24px 16px;
+  }
+}
+
+/* ==========================================
+   InfoModal — modal explicative reutilisable
+   ========================================== */
+
+.info-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(20, 16, 12, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.info-modal {
+  background: #2a2318;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 14px;
+  padding: 24px 22px;
+  max-width: 360px;
+  width: 100%;
+  color: #d4c5a0;
+  position: relative;
+}
+.info-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #d4c5a0;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.info-modal-close:hover {
+  opacity: 1;
+}
+.info-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.info-modal-icon {
+  font-size: 28px;
+}
+.info-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #c9a84c;
+}
+.info-modal-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 16px;
+  opacity: 0.85;
+}
+.info-modal-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.info-modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+.info-modal-row:last-child {
+  border-bottom: none;
+}
+.info-modal-row-label {
+  opacity: 0.7;
+}
+.info-modal-row-value {
+  font-weight: 600;
+  color: #e8dcc4;
+}
+.info-modal-row.highlight .info-modal-row-value {
+  color: #c9a84c;
+}
+.info-modal-action {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  background: rgba(201, 168, 76, 0.1);
+  color: #c9a84c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.info-modal-action:hover {
+  background: rgba(201, 168, 76, 0.2);
 }
