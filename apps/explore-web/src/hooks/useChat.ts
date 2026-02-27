@@ -39,6 +39,8 @@ export function useChat() {
     const addGeneralMessage = useChatStore.getState().addGeneralMessage
     const setFactionMessages = useChatStore.getState().setFactionMessages
     const addFactionMessage = useChatStore.getState().addFactionMessage
+    const setBugsMessages = useChatStore.getState().setBugsMessages
+    const addBugsMessage = useChatStore.getState().addBugsMessage
 
     async function init() {
       // 1. Charger les messages recents du canal general
@@ -67,7 +69,19 @@ export function useChat() {
         }
       }
 
-      // 3. Nettoyage lazy des vieux messages (fire-and-forget)
+      // 3. Charger les messages bugs
+      const { data: bugsData } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('channel', 'bugs')
+        .order('created_at', { ascending: false })
+        .limit(MAX_INITIAL)
+
+      if (!cancelled && bugsData) {
+        setBugsMessages(bugsData.map(rowToMessage).reverse())
+      }
+
+      // 4. Nettoyage lazy des vieux messages (fire-and-forget)
       supabase.rpc('cleanup_old_chat_messages').then(() => {})
 
       if (cancelled) return
@@ -103,6 +117,19 @@ export function useChat() {
         )
       }
 
+      ch.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: 'channel=eq.bugs',
+        },
+        (payload) => {
+          addBugsMessage(rowToMessage(payload.new as Record<string, unknown>))
+        },
+      )
+
       ch.subscribe((status) => {
         console.log('[Chat] realtime status:', status)
       })
@@ -127,7 +154,7 @@ export function useChat() {
  */
 export async function sendChatMessage(
   content: string,
-  channelType: 'general' | 'faction',
+  channelType: 'general' | 'faction' | 'bugs',
 ): Promise<{ success: boolean; error?: string }> {
   const { userId, userName, userFactionId, userFactionColor, userFactionPattern } = useFogStore.getState()
   if (!userId) return { success: false, error: 'Non connecté' }
@@ -137,7 +164,7 @@ export async function sendChatMessage(
     return { success: false, error: 'Message invalide' }
   }
 
-  const channel = channelType === 'general' ? 'general' : userFactionId
+  const channel = channelType === 'bugs' ? 'bugs' : channelType === 'general' ? 'general' : userFactionId
   if (!channel) {
     return { success: false, error: 'Aucune faction' }
   }
@@ -168,6 +195,8 @@ export async function sendChatMessage(
     const msg = rowToMessage(inserted as Record<string, unknown>)
     if (channel === 'general') {
       useChatStore.getState().addGeneralMessage(msg)
+    } else if (channel === 'bugs') {
+      useChatStore.getState().addBugsMessage(msg)
     } else {
       useChatStore.getState().addFactionMessage(msg)
     }

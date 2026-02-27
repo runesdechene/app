@@ -18,8 +18,10 @@ function formatTime(iso: string): string {
 function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
   const showGeneral = useChatStore((s) => s.showGeneral)
   const showFaction = useChatStore((s) => s.showFaction)
+  const showBugs = useChatStore((s) => s.showBugs)
   const toggleGeneral = useChatStore((s) => s.toggleShowGeneral)
   const toggleFaction = useChatStore((s) => s.toggleShowFaction)
+  const toggleBugs = useChatStore((s) => s.toggleShowBugs)
   const userFactionColor = useFogStore((s) => s.userFactionColor)
 
   return (
@@ -34,6 +36,10 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
           Faction
         </label>
       )}
+      <label className="chat-filter chat-filter-bugs">
+        <input type="checkbox" checked={showBugs} onChange={toggleBugs} />
+        Bugs
+      </label>
     </div>
   )
 }
@@ -65,16 +71,22 @@ function MessageList({
   return (
     <div className="chat-messages" ref={listRef}>
       {messages.map((msg) => {
-        const isFaction = msg.channel !== 'general'
-        // Faction messages: texte en couleur faction. General: texte neutre.
-        const textColor = isFaction
-          ? (msg.factionColor || userFactionColor || 'var(--color-sepia)')
-          : undefined
+        const isFaction = msg.channel !== 'general' && msg.channel !== 'bugs'
+        const isBugs = msg.channel === 'bugs'
+        // Faction messages: texte en couleur faction. Bugs: rose. General: texte neutre.
+        const textColor = isBugs
+          ? '#9ea03f'
+          : isFaction
+            ? (msg.factionColor || userFactionColor || 'var(--color-sepia)')
+            : undefined
 
         return (
           <div key={msg.id} className="chat-message">
             {isFaction && (
               <span className="chat-channel-tag" style={{ color: msg.factionColor || undefined }}>[F]</span>
+            )}
+            {isBugs && (
+              <span className="chat-channel-tag chat-channel-tag-bugs">[B]</span>
             )}
             <span
               className="chat-message-name"
@@ -138,18 +150,21 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
         p_target_name: targetName,
       })
       if (data && data.success) {
-        // Message système anonyme dans le chat général
-        await supabase.from('chat_messages').insert({
+        // Message système dans le chat général
+        const { error: insertErr } = await supabase.from('chat_messages').insert({
           channel: 'general',
           user_id: fog.userId,
-          user_name: '',
+          user_name: 'Les Dieux',
           content: `${data.targetName} a re\u00E7u un don des Dieux \u26A1 Ses ressources ont \u00E9t\u00E9 recharg\u00E9es`,
         })
+        if (insertErr) console.error('[Cheat] insert chat error:', insertErr)
+      } else {
+        console.error('[Cheat] refill_target failed:', data)
       }
       return
     }
 
-    // Raccourcis : ! = général, @ = faction
+    // Raccourcis : ! = général, @ = faction, # = bugs
     let channel = sendChannel
     let content = raw
     if (raw.startsWith('!') && raw.length > 1) {
@@ -157,6 +172,9 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       content = raw.slice(1).trimStart()
     } else if (raw.startsWith('@') && hasFaction && raw.length > 1) {
       channel = 'faction'
+      content = raw.slice(1).trimStart()
+    } else if (raw.startsWith('#') && raw.length > 1) {
+      channel = 'bugs'
       content = raw.slice(1).trimStart()
     }
 
@@ -203,6 +221,12 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
             @ Faction
           </button>
         )}
+        <button
+          className={`chat-send-channel chat-send-channel-bugs${sendChannel === 'bugs' ? ' chat-send-channel-active' : ''}`}
+          onClick={() => setSendChannel('bugs')}
+        >
+          # Bugs
+        </button>
       </div>
 
       {/* Erreur d'envoi */}
@@ -245,8 +269,10 @@ export function ChatPanel() {
 
   const showGeneral = useChatStore((s) => s.showGeneral)
   const showFaction = useChatStore((s) => s.showFaction)
+  const showBugs = useChatStore((s) => s.showBugs)
   const generalMessages = useChatStore((s) => s.generalMessages)
   const factionMessages = useChatStore((s) => s.factionMessages)
+  const bugsMessages = useChatStore((s) => s.bugsMessages)
 
   const [isOpen, setIsOpen] = useState(true)
   const mobilePanel = useMobileNavStore(s => s.activePanel)
@@ -261,8 +287,9 @@ export function ChatPanel() {
     const all: ChatMessage[] = []
     if (showGeneral) all.push(...generalMessages)
     if (showFaction) all.push(...factionMessages)
+    if (showBugs) all.push(...bugsMessages)
     return all.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-  }, [generalMessages, factionMessages, showGeneral, showFaction])
+  }, [generalMessages, factionMessages, bugsMessages, showGeneral, showFaction, showBugs])
 
   if (!userId) return null
 

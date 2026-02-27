@@ -33,24 +33,27 @@ export function Constructions() {
   }, [])
 
   async function fetchData() {
-    const [typesRes, tagsRes] = await Promise.all([
-      supabase
-        .from('construction_types')
-        .select('level, name, description, image_url, cost, conquest_bonus, tag_ids')
-        .order('level'),
-      supabase
-        .from('tags')
-        .select('id, title')
-        .order('order'),
-    ])
+    try {
+      const [typesRes, tagsRes] = await Promise.all([
+        supabase
+          .from('construction_types')
+          .select('level, name, description, image_url, cost, conquest_bonus, tag_ids')
+          .order('level'),
+        supabase
+          .from('tags')
+          .select('id, title')
+          .order('order'),
+      ])
 
-    if (!typesRes.error && typesRes.data) {
-      setTypes(typesRes.data as ConstructionType[])
+      if (!typesRes.error && typesRes.data) {
+        setTypes(typesRes.data as ConstructionType[])
+      }
+      if (!tagsRes.error && tagsRes.data) {
+        setTags(tagsRes.data as Tag[])
+      }
+    } finally {
+      setLoading(false)
     }
-    if (!tagsRes.error && tagsRes.data) {
-      setTags(tagsRes.data as Tag[])
-    }
-    setLoading(false)
   }
 
   // --- Creer ---

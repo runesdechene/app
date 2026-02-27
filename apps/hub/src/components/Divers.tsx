@@ -12,17 +12,20 @@ export function Divers() {
   }, [])
 
   async function fetchSettings() {
-    const { data } = await supabase
-      .from('app_settings')
-      .select('key, value')
-      .in('key', ['unknown_place_icon'])
+    try {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['unknown_place_icon'])
 
-    if (data) {
-      for (const row of data) {
-        if (row.key === 'unknown_place_icon') setUnknownIcon(row.value)
+      if (data) {
+        for (const row of data) {
+          if (row.key === 'unknown_place_icon') setUnknownIcon(row.value)
+        }
       }
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {

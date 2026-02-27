@@ -108,8 +108,7 @@ export function ReviewSubmit() {
         const { error: insertError } = await supabase.rpc('create_user_from_submission', {
           p_id: newId,
           p_email: form.email.toLowerCase().trim(),
-          p_first_name: form.name.trim().split(' ')[0] || form.name.trim(),
-          p_last_name: form.name.trim().split(' ').slice(1).join(' ') || '',
+          p_first_name: form.name.trim(),
           p_instagram: null
         })
 

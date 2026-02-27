@@ -77,17 +77,20 @@ export function TitlesManager() {
   }, [])
 
   async function fetchData() {
-    const [titlesRes, factionsRes] = await Promise.all([
-      supabase.from('titles').select('*').order('type').order('order'),
-      supabase.from('factions').select('id, title, color').order('order'),
-    ])
+    try {
+      const [titlesRes, factionsRes] = await Promise.all([
+        supabase.from('titles').select('*').order('type').order('order'),
+        supabase.from('factions').select('id, title, color').order('order'),
+      ])
 
-    if (titlesRes.data) {
-      setTitles(titlesRes.data as Title[])
-      setSavedTitles(titlesRes.data as Title[])
+      if (titlesRes.data) {
+        setTitles(titlesRes.data as Title[])
+        setSavedTitles(titlesRes.data as Title[])
+      }
+      if (factionsRes.data) setFactions(factionsRes.data as Faction[])
+    } finally {
+      setLoading(false)
     }
-    if (factionsRes.data) setFactions(factionsRes.data as Faction[])
-    setLoading(false)
   }
 
   // --- Modifier localement ---

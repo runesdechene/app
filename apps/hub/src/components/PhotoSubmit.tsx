@@ -197,8 +197,7 @@ export function PhotoSubmit() {
           {
             p_id: newId,
             p_email: form.email.toLowerCase().trim(),
-            p_first_name: form.name.trim().split(" ")[0] || form.name.trim(),
-            p_last_name: form.name.trim().split(" ").slice(1).join(" ") || "",
+            p_first_name: form.name.trim(),
             p_instagram: form.instagram.trim() || null,
             p_location_name: form.locationName.trim() || null,
             p_location_zip: form.locationZip.trim() || null,

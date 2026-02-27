@@ -35,15 +35,18 @@ export function Factions() {
   }, [])
 
   async function fetchFactions() {
-    const { data, error } = await supabase
-      .from('factions')
-      .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
-      .order('order')
+    try {
+      const { data, error } = await supabase
+        .from('factions')
+        .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
+        .order('order')
 
-    if (!error && data) {
-      setFactions(data as Faction[])
+      if (!error && data) {
+        setFactions(data as Faction[])
+      }
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   // --- Creer ---

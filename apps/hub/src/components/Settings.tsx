@@ -38,41 +38,42 @@ export function Settings() {
 
   async function fetchData() {
     setLoading(true)
+    try {
+      // Charger les valeurs moyennes par role (pour pre-remplir les inputs)
+      const { data: usersData } = await supabase
+        .from('users')
+        .select('id, first_name, email_address, role, max_energy, max_conquest, max_construction')
+        .order('role')
+        .order('first_name')
 
-    // Charger les valeurs moyennes par role (pour pre-remplir les inputs)
-    const { data: usersData } = await supabase
-      .from('users')
-      .select('id, first_name, email_address, role, max_energy, max_conquest, max_construction')
-      .order('role')
-      .order('first_name')
+      if (usersData) {
+        const mapped: UserGauge[] = usersData.map((u: Record<string, unknown>) => ({
+          id: u.id as string,
+          name: (u.first_name as string) || (u.email_address as string) || 'Anonyme',
+          role: (u.role as string) || 'user',
+          maxEnergy: Number(u.max_energy) || 5,
+          maxConquest: Number(u.max_conquest) || 5,
+          maxConstruction: Number(u.max_construction) || 5,
+        }))
+        setUsers(mapped)
 
-    if (usersData) {
-      const mapped: UserGauge[] = usersData.map((u: Record<string, unknown>) => ({
-        id: u.id as string,
-        name: (u.first_name as string) || (u.email_address as string) || 'Anonyme',
-        role: (u.role as string) || 'user',
-        maxEnergy: Number(u.max_energy) || 5,
-        maxConquest: Number(u.max_conquest) || 5,
-        maxConstruction: Number(u.max_construction) || 5,
-      }))
-      setUsers(mapped)
-
-      // Calculer les valeurs par role (prendre le premier trouvé)
-      const byRole: Record<string, RoleGauges> = {}
-      for (const role of ROLES) {
-        const first = mapped.find(u => u.role === role)
-        if (first) {
-          byRole[role] = {
-            maxEnergy: first.maxEnergy,
-            maxConquest: first.maxConquest,
-            maxConstruction: first.maxConstruction,
+        // Calculer les valeurs par role (prendre le premier trouvé)
+        const byRole: Record<string, RoleGauges> = {}
+        for (const role of ROLES) {
+          const first = mapped.find(u => u.role === role)
+          if (first) {
+            byRole[role] = {
+              maxEnergy: first.maxEnergy,
+              maxConquest: first.maxConquest,
+              maxConstruction: first.maxConstruction,
+            }
           }
         }
+        setRoleDefaults(prev => ({ ...prev, ...byRole }))
       }
-      setRoleDefaults(prev => ({ ...prev, ...byRole }))
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   async function applyToRole(role: string) {

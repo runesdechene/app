@@ -48,11 +48,14 @@ export function Reviews() {
   useEffect(() => {
     async function fetchReviews() {
       setLoading(true)
-      const { data } = await supabase.rpc('get_review_submissions', {
-        p_status: filter === 'all' ? null : filter
-      })
-      setReviews(data || [])
-      setLoading(false)
+      try {
+        const { data } = await supabase.rpc('get_review_submissions', {
+          p_status: filter === 'all' ? null : filter
+        })
+        setReviews(data || [])
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchReviews()

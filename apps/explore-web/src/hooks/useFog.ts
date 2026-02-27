@@ -68,6 +68,7 @@ export function useFog() {
       setUserAvatarUrl(null)
       setIsAdmin(false)
       setLoading(false)
+      useToastStore.getState().clearAll()
       return
     }
 
@@ -223,8 +224,8 @@ export function useFog() {
           const isSelf = e.actor_id === currentUserId
           if (isSelf && e.type !== 'like') return
 
-          const name = isSelf ? 'Vous' : (e.data?.actorName ?? 'Quelqu\'un')
-          const place = e.data?.placeTitle ?? 'un lieu'
+          const name = isSelf ? 'Vous' : (e.data?.actorName || 'Quelqu\'un')
+          const place = e.data?.placeTitle || 'un lieu'
           let message = ''
           let type: GameToast['type'] = 'discover'
           const highlights: string[] = [name]
@@ -351,9 +352,13 @@ async function loadRecentActivity(currentUserId: string) {
     .filter(e => new Date(e.created_at).getTime() > cutoff)
 
   for (const e of recent) {
-    const isSelf = e.actor_id === currentUserId
-    const name = isSelf ? 'Vous' : (e.data?.actorName ?? 'Quelqu\'un')
-    const place = e.data?.placeTitle ?? 'un lieu'
+    // Ne montrer que les actions des AUTRES joueurs au chargement.
+    // Les actions "self" sont déjà affichées en temps réel pendant le jeu.
+    // Evite aussi l'inondation de toasts quand un ancien compte est migré.
+    if (e.actor_id === currentUserId) continue
+
+    const name = e.data?.actorName || 'Quelqu\'un'
+    const place = e.data?.placeTitle || 'un lieu'
 
     let message = ''
     let type: GameToast['type'] = 'discover'
@@ -373,12 +378,8 @@ async function loadRecentActivity(currentUserId: string) {
         message = `${name} a brisé vos défenses et conquis ${place}`
         contested = true
       } else if (prevName) {
-        message = isSelf
-          ? `Vous avez conquis ${place}, repoussant ${prevName}`
-          : `${name} a conquis ${place}, repoussant ${prevName}`
+        message = `${name} a conquis ${place}, repoussant ${prevName}`
         contested = true
-      } else if (isSelf) {
-        message = `Vous avez revendiqué ${place} pour ${faction}`
       } else {
         message = `${name} a revendiqué ${place} pour ${faction}`
       }
@@ -387,39 +388,28 @@ async function loadRecentActivity(currentUserId: string) {
         highlights.push(prevName)
       }
     } else if (e.type === 'fortify') {
-      message = isSelf
-        ? `Vous avez fortifié ${place}`
-        : `${name} a fortifié ${place}`
+      message = `${name} a fortifié ${place}`
       highlights.push(name, place)
       type = 'fortify'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'discover') {
-      message = isSelf
-        ? `Vous avez découvert ${place}`
-        : `${name} a découvert ${place}`
+      message = `${name} a découvert ${place}`
       highlights.push(name, place)
       type = 'discover'
     } else if (e.type === 'explore') {
-      message = isSelf
-        ? `Vous avez exploré ${place}`
-        : `${name} a exploré ${place}`
+      message = `${name} a exploré ${place}`
       highlights.push(name, place)
       type = 'explore'
     } else if (e.type === 'like') {
-      message = isSelf
-        ? `Vous avez aimé ${place}`
-        : `${name} a aimé ${place}`
+      message = `${name} a aimé ${place}`
       highlights.push(name, place)
       type = 'like'
     } else if (e.type === 'new_place') {
-      message = isSelf
-        ? `Vous avez ajouté ${place}`
-        : `${name} a ajouté ${place}`
+      message = `${name} a ajouté ${place}`
       highlights.push(name, place)
       type = 'new_place'
     } else if (e.type === 'new_user') {
-      if (isSelf) continue
       message = `${name} a rejoint la carte`
       highlights.push(name)
       type = 'new_user'

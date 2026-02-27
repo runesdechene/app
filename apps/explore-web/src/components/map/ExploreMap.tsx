@@ -13,7 +13,6 @@ import { useFogStore } from '../../stores/fogStore'
 import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
-
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
 const ICON_SIZE = 120
@@ -119,19 +118,18 @@ function buildTerritoryBorderLayer(): LayerSpecification {
     paint: {
       'line-dasharray': [4, 2],
       'line-color': ['get', 'tagColor'],
-      // 2.5 base + 0.25 par niveau de fort (cap 12 → max 5.5), hover 4.5
+      // 2 base + 0.3 par lieu (cap 10 lieux → max 5), hover 4.5
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         4.5,
-        ['+', 2.5, ['*', ['min', ['get', 'totalFortification'], 12], 0.25]],
+        ['+', 2, ['*', ['min', ['get', 'placesCount'], 10], 0.3]],
       ],
-      // 0.45 base + 0.025 par niveau de fort (cap 0.75), hover 0.8
       'line-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         0.8,
-        ['min', ['+', 0.45, ['*', ['min', ['get', 'totalFortification'], 12], 0.025]], 0.75],
+        ['min', ['+', 0.4, ['*', ['min', ['get', 'placesCount'], 10], 0.03]], 0.7],
       ],
     },
   }
@@ -195,7 +193,7 @@ const pointLayer: LayerSpecification = {
     ['==', ['get', 'discovered'], true],
   ],
   paint: {
-    'circle-color': ['get', 'tagColor'],
+    'circle-color': ['get', 'iconColor'],
     'circle-radius': [
       'interpolate', ['linear'], ['zoom'],
       4, 3,
@@ -435,7 +433,7 @@ export const ExploreMap = memo(function ExploreMap() {
     return ids
   }, [showFactions])
 
-  // Lieux fortifiés → Markers 🛡️ par-dessus l'icône du lieu
+  // Lieux fortifiés → Badge niveau par-dessus l'icône du lieu
   const fortifiedPlaces = useMemo(() => {
     if (!geojson) return []
     return geojson.features
@@ -444,6 +442,7 @@ export const ExploreMap = memo(function ExploreMap() {
         id: f.properties.id as string,
         lon: (f.geometry.coordinates as [number, number])[0],
         lat: (f.geometry.coordinates as [number, number])[1],
+        level: f.properties.fortificationLevel as number,
       }))
   }, [geojson])
 
@@ -619,7 +618,7 @@ export const ExploreMap = memo(function ExploreMap() {
     const iconColors = new Map<string, string>()
     for (const f of geojson.features) {
       if (f.properties.tagIcon) {
-        iconColors.set(f.properties.tagIcon, f.properties.tagColor)
+        iconColors.set(f.properties.tagIcon, f.properties.iconColor)
       }
     }
 
@@ -878,10 +877,10 @@ export const ExploreMap = memo(function ExploreMap() {
         ) : null
       ))}
 
-      {/* 🛡️ sur les lieux fortifiés */}
+      {/* Badge fortification sur les lieux fortifiés */}
       {showFactions && fortifiedPlaces.map(p => (
         <Marker key={`fort-${p.id}`} longitude={p.lon} latitude={p.lat} anchor="center">
-          <span className="place-fortified-star">{'\uD83D\uDEE1\uFE0F'}</span>
+          <div className="place-fort-badge">{p.level}</div>
         </Marker>
       ))}
 

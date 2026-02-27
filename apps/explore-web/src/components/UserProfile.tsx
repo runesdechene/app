@@ -5,7 +5,7 @@ interface UserProfileData {
   id: string
   email_address: string
   first_name: string | null
-  last_name: string
+  display_name: string | null
   profile_image_id: string | null
   biography: string
   rank: string
@@ -73,11 +73,11 @@ export function UserProfile({ authEmail }: { authEmail: string }) {
           <img src={avatarUrl} alt="Avatar" className="avatar" />
         ) : (
           <div className="avatar placeholder">
-            {profile.first_name?.[0] || profile.last_name[0]}
+            {(profile.display_name || profile.first_name || '?')[0]}
           </div>
         )}
         <div className="profile-info">
-          <h2>{profile.first_name} {profile.last_name}</h2>
+          <h2>{profile.display_name || profile.first_name || 'Aventurier'}</h2>
           <span className="rank">{profile.rank}</span>
         </div>
       </div>

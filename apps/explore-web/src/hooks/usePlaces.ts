@@ -39,6 +39,8 @@ export interface PlaceProperties {
   title: string
   tagTitle: string
   tagColor: string
+  /** Couleur du tag primaire (jamais ecrasee par la faction) — pour les icones */
+  iconColor: string
   tagBackground: string
   tagIcon: string
   factionId: string
@@ -108,6 +110,7 @@ export function usePlaces() {
               title: place.title,
               tagTitle: place.faction?.title ?? place.primaryTag?.title ?? '',
               tagColor: place.faction?.color ?? place.primaryTag?.color ?? '#C19A6B',
+              iconColor: place.primaryTag?.color ?? '#C19A6B',
               tagBackground: place.primaryTag?.background ?? '#F5E6D3',
               tagIcon: (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? '',
               factionId: place.faction?.id ?? '',

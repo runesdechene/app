@@ -36,7 +36,9 @@ function renderMessage(
   highlights: string[],
   actions: Map<string, () => void>,
 ) {
-  if (highlights.length === 0) return message
+  // Filtrer les highlights vides pour éviter une boucle infinie
+  const safeHL = highlights.filter(h => h.length > 0)
+  if (safeHL.length === 0) return message
 
   const parts: { text: string; bold: boolean }[] = []
   let remaining = message
@@ -44,7 +46,7 @@ function renderMessage(
   while (remaining.length > 0) {
     let earliest = -1
     let earliestHL = ''
-    for (const hl of highlights) {
+    for (const hl of safeHL) {
       const idx = remaining.indexOf(hl)
       if (idx !== -1 && (earliest === -1 || idx < earliest)) {
         earliest = idx

@@ -105,30 +105,33 @@ export function Photos() {
   useEffect(() => {
     async function fetchSubmissions() {
       setLoading(true)
-      const { data: subs } = await supabase.rpc('get_photo_submissions', {
-        p_status: filter === 'all' ? null : filter
-      })
+      try {
+        const { data: subs } = await supabase.rpc('get_photo_submissions', {
+          p_status: filter === 'all' ? null : filter
+        })
 
-      if (subs && subs.length > 0) {
-        const subIds = subs.map((s: PhotoSubmission) => s.id)
+        if (subs && subs.length > 0) {
+          const subIds = subs.map((s: PhotoSubmission) => s.id)
 
-        const [{ data: images }, { data: tagLinks }] = await Promise.all([
-          supabase.rpc('get_submission_images_batch', { p_submission_ids: subIds }),
-          supabase.rpc('get_submission_tags_batch', { p_submission_ids: subIds })
-        ])
+          const [{ data: images }, { data: tagLinks }] = await Promise.all([
+            supabase.rpc('get_submission_images_batch', { p_submission_ids: subIds }),
+            supabase.rpc('get_submission_tags_batch', { p_submission_ids: subIds })
+          ])
 
-        const enriched = subs.map((s: PhotoSubmission) => ({
-          ...s,
-          hub_submission_images: (images || []).filter((img: SubmissionImage & { submission_id: string }) => img.submission_id === s.id),
-          tags: (tagLinks || [])
-            .filter((t: { submission_id: string }) => t.submission_id === s.id)
-            .map((t: { tag_id: string; tag_name: string }) => ({ id: t.tag_id, name: t.tag_name }))
-        }))
-        setSubmissions(enriched)
-      } else {
-        setSubmissions([])
+          const enriched = subs.map((s: PhotoSubmission) => ({
+            ...s,
+            hub_submission_images: (images || []).filter((img: SubmissionImage & { submission_id: string }) => img.submission_id === s.id),
+            tags: (tagLinks || [])
+              .filter((t: { submission_id: string }) => t.submission_id === s.id)
+              .map((t: { tag_id: string; tag_name: string }) => ({ id: t.tag_id, name: t.tag_name }))
+          }))
+          setSubmissions(enriched)
+        } else {
+          setSubmissions([])
+        }
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     fetchSubmissions()

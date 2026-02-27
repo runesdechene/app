@@ -12,7 +12,7 @@ export interface ChatMessage {
   createdAt: string
 }
 
-export type ChatChannel = 'general' | 'faction'
+export type ChatChannel = 'general' | 'faction' | 'bugs'
 
 const MAX_MESSAGES = 100
 
@@ -20,8 +20,10 @@ interface ChatState {
   /** Filtres d'affichage (quels canaux on voit) */
   showGeneral: boolean
   showFaction: boolean
+  showBugs: boolean
   toggleShowGeneral: () => void
   toggleShowFaction: () => void
+  toggleShowBugs: () => void
 
   /** Canal d'envoi (où on écrit) */
   sendChannel: ChatChannel
@@ -34,13 +36,19 @@ interface ChatState {
   factionMessages: ChatMessage[]
   addFactionMessage: (msg: ChatMessage) => void
   setFactionMessages: (msgs: ChatMessage[]) => void
+
+  bugsMessages: ChatMessage[]
+  addBugsMessage: (msg: ChatMessage) => void
+  setBugsMessages: (msgs: ChatMessage[]) => void
 }
 
 export const useChatStore = create<ChatState>((set) => ({
   showGeneral: true,
   showFaction: true,
+  showBugs: true,
   toggleShowGeneral: () => set((s) => ({ showGeneral: !s.showGeneral })),
   toggleShowFaction: () => set((s) => ({ showFaction: !s.showFaction })),
+  toggleShowBugs: () => set((s) => ({ showBugs: !s.showBugs })),
 
   sendChannel: 'general',
   setSendChannel: (ch) => set({ sendChannel: ch }),
@@ -60,4 +68,12 @@ export const useChatStore = create<ChatState>((set) => ({
       return { factionMessages: [...state.factionMessages, msg].slice(-MAX_MESSAGES) }
     }),
   setFactionMessages: (msgs) => set({ factionMessages: msgs.slice(-MAX_MESSAGES) }),
+
+  bugsMessages: [],
+  addBugsMessage: (msg) =>
+    set((state) => {
+      if (state.bugsMessages.some((m) => m.id === msg.id)) return state
+      return { bugsMessages: [...state.bugsMessages, msg].slice(-MAX_MESSAGES) }
+    }),
+  setBugsMessages: (msgs) => set({ bugsMessages: msgs.slice(-MAX_MESSAGES) }),
 }))

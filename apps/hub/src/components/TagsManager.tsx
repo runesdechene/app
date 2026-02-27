@@ -30,15 +30,18 @@ export function TagsManager() {
   }, [])
 
   async function fetchTags() {
-    const { data, error } = await supabase
-      .from('tags')
-      .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction')
-      .order('order')
+    try {
+      const { data, error } = await supabase
+        .from('tags')
+        .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction')
+        .order('order')
 
-    if (!error && data) {
-      setTags(data as Tag[])
+      if (!error && data) {
+        setTags(data as Tag[])
+      }
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   // --- Créer un tag ---

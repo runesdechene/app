@@ -19,20 +19,23 @@ export function Dashboard() {
 
   useEffect(() => {
     async function fetchStats() {
-      const [usersRes, ambassadorsRes, pendingRes, approvedRes] = await Promise.all([
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-        supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'ambassador'),
-        supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-      ])
+      try {
+        const [usersRes, ambassadorsRes, pendingRes, approvedRes] = await Promise.all([
+          supabase.from('users').select('*', { count: 'exact', head: true }),
+          supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'ambassador'),
+          supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+        ])
 
-      setStats({
-        totalUsers: usersRes.count || 0,
-        ambassadors: ambassadorsRes.count || 0,
-        photosPending: pendingRes.count || 0,
-        photosApproved: approvedRes.count || 0
-      })
-      setLoading(false)
+        setStats({
+          totalUsers: usersRes.count || 0,
+          ambassadors: ambassadorsRes.count || 0,
+          photosPending: pendingRes.count || 0,
+          photosApproved: approvedRes.count || 0
+        })
+      } finally {
+        setLoading(false)
+      }
     }
 
     fetchStats()
