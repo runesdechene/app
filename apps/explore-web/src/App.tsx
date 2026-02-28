@@ -15,6 +15,7 @@ import { GameToast } from './components/map/GameToast'
 import { PlayerProfileModal } from './components/map/PlayerProfileModal'
 import { LeaderboardModal } from './components/map/LeaderboardModal'
 import { VersionBadge } from './components/map/VersionBadge'
+import { TerritoryPanel } from './components/map/TerritoryPanel'
 import { useMapStore } from './stores/mapStore'
 import { useFogStore } from './stores/fogStore'
 import { useToastStore } from './stores/toastStore'
@@ -85,6 +86,8 @@ function App() {
   const userName = useFogStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
+  const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
+  const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
   // Mode de jeu (exploration masque toute l'UI faction)
   const gameMode = useFogStore(s => s.gameMode)
@@ -201,6 +204,21 @@ function App() {
           onClose={() => setSelectedPlaceId(null)}
           userEmail={user?.email ?? null}
           onAuthPrompt={() => setShowAuthModal(true)}
+        />
+      )}
+
+      {!addPlaceMode && selectedTerritoryData && (
+        <TerritoryPanel
+          data={selectedTerritoryData}
+          onClose={() => setSelectedTerritoryData(null)}
+          onNameSaved={(anchorPlaceId, customName: string | null) => {
+            setSelectedTerritoryData({
+              ...selectedTerritoryData,
+              customName,
+              anchorPlaceId,
+            })
+          }}
+          onFactionModal={() => setShowFactionModal(true)}
         />
       )}
 

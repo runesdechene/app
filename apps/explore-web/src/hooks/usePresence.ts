@@ -33,11 +33,11 @@ export function usePresence() {
     async function init() {
       const { data } = await supabase
         .from('users')
-        .select('first_name, email_address, faction_id')
+        .select('first_name, faction_id')
         .eq('id', userId!)
         .single()
 
-      const name = data?.first_name || data?.email_address || 'Quelqu\'un'
+      const name = data?.first_name || 'Quelqu\'un'
 
       let factionColor: string | null = null
       let factionPattern: string | null = null

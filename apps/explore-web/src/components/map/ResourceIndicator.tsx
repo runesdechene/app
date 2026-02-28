@@ -107,10 +107,13 @@ export function ResourceIndicator({ type }: Props) {
   const [showInfo, setShowInfo] = useState(false)
 
   const baseMax = maxPoints - bonus
+  const baseCycle = 14400
+  const baseRate = 3600 / baseCycle
+  const hasRegenBonus = cycleSeconds !== baseCycle
 
   const INFO_TEXT: Record<string, string> = {
     conquest: "Les points de conquete permettent de revendiquer des lieux pour votre faction. Chaque revendication coute des points selon le niveau de fortification du lieu.",
-    construction: "Les points de construction permettent de fortifier vos lieux revendiques. Chaque niveau de fortification rend le lieu plus difficile a conquérir par les factions adverses.",
+    construction: "Les points de construction permettent de fortifier vos lieux revendiques. Chaque niveau de fortification rend le lieu plus difficile a conquerir par les factions adverses.",
   }
 
   return (
@@ -138,9 +141,13 @@ export function ResourceIndicator({ type }: Props) {
           rows={[
             { label: 'Points actuels', value: `${formatVal(fractional)} / ${maxPoints}` },
             { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
+            ...(hasRegenBonus ? [
+              { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
+              { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
+            ] : []),
             ...(bonus !== 0 ? [
-              { label: 'Base', value: String(baseMax), highlight: false },
-              { label: 'Bonus faction', value: `${bonus > 0 ? '+' : ''}${bonus}`, highlight: true },
+              { label: 'Capacite de base', value: String(baseMax) },
+              { label: 'Bonus capacite faction', value: `${bonus > 0 ? '+' : ''}${bonus}`, highlight: true },
             ] : []),
           ]}
           onClose={() => setShowInfo(false)}

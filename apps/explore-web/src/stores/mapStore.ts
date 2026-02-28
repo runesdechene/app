@@ -9,6 +9,21 @@ interface PlaceOverride {
   factionPattern?: string
 }
 
+export interface TerritorySelection {
+  territoryTitle: string
+  customName: string | null
+  anchorPlaceId: string
+  placeIds: string[]
+  topContributorId: string
+  topContributorName: string
+  factionTitle: string
+  tagColor: string
+  placesCount: number
+  hourlyRate: number
+  totalFortification: number
+  players: string
+}
+
 interface MapState {
   selectedPlaceId: string | null
   setSelectedPlaceId: (id: string | null) => void
@@ -49,6 +64,15 @@ interface MapState {
   /** Afficher/masquer les territoires et bannières de faction sur la carte */
   showFactions: boolean
   setShowFactions: (show: boolean) => void
+
+  /** Territoire sélectionné (clic sur un blob) */
+  selectedTerritoryData: TerritorySelection | null
+  setSelectedTerritoryData: (data: TerritorySelection | null) => void
+
+  /** Noms custom des territoires (anchor_place_id → {customName, namedBy}) */
+  territoryNames: Map<string, { customName: string | null; namedBy: string }>
+  setTerritoryNames: (names: Map<string, { customName: string | null; namedBy: string }>) => void
+  setTerritoryName: (anchorPlaceId: string, customName: string | null, namedBy: string) => void
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -92,4 +116,16 @@ export const useMapStore = create<MapState>((set) => ({
 
   showFactions: localStorage.getItem('showFactions') === 'true',
   setShowFactions: (show) => { localStorage.setItem('showFactions', String(show)); set({ showFactions: show }) },
+
+  selectedTerritoryData: null,
+  setSelectedTerritoryData: (data) => set({ selectedTerritoryData: data }),
+
+  territoryNames: new Map(),
+  setTerritoryNames: (names) => set({ territoryNames: names }),
+  setTerritoryName: (anchorPlaceId, customName, namedBy) =>
+    set((state) => {
+      const next = new Map(state.territoryNames)
+      next.set(anchorPlaceId, { customName, namedBy })
+      return { territoryNames: next }
+    }),
 }))

@@ -28,6 +28,7 @@ const UNION_EPSILON = 0.00003  // ~3m — comble les micro-gaps floating-point p
 
 interface PlaceInput {
   coordinates: [number, number]
+  placeId: string
   faction: string
   factionTitle: string
   tagColor: string
@@ -35,10 +36,25 @@ interface PlaceInput {
   score: number
   fortificationLevel: number
   claimedByName: string
+  claimedById: string
+}
+
+interface TierDef {
+  minPlaces: number
+  title: string
 }
 
 interface WorkerMessage {
   features: PlaceInput[]
+  tiers: TierDef[]
+}
+
+/** Titre progressif selon le nombre de lieux (tiers trié desc) */
+function getTerritoryTitle(count: number, tiers: TierDef[]): string {
+  for (const tier of tiers) {
+    if (count >= tier.minPlaces) return tier.title
+  }
+  return ''
 }
 
 // --- Helpers ---
@@ -145,7 +161,7 @@ function pointInRing(x: number, y: number, ring: Position[]): boolean {
 // --- Main ---
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const { features } = e.data
+  const { features, tiers } = e.data
 
   if (features.length === 0) {
     self.postMessage({ type: 'FeatureCollection', partial: false, features: [] })
@@ -171,7 +187,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
   //    Grouper par faction (nom) pour fusion visuelle
-  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, totalFortification: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number>, placeFortLevels: Map<string, number> }>()
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, totalFortification: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number>, placeFortLevels: Map<string, number>, placeIds: Map<string, string>, placeClaimedByIds: Map<string, string>, placeScores: Map<string, number> }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
@@ -187,7 +203,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     if (clipped) {
       const key = place.faction
       if (!factionRings.has(key)) {
-        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map() })
+        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map(), placeIds: new Map(), placeClaimedByIds: new Map(), placeScores: new Map() })
       }
       const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
@@ -199,9 +215,13 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       group.count++
       if (place.claimedByName) group.players.add(place.claimedByName)
       group.placeCoords.push(place.coordinates)
-      if (place.claimedByName) group.placeNames.set(`${place.coordinates[0]},${place.coordinates[1]}`, place.claimedByName)
-      group.placeHourlyRates.set(`${place.coordinates[0]},${place.coordinates[1]}`, placeRate)
-      group.placeFortLevels.set(`${place.coordinates[0]},${place.coordinates[1]}`, fortLevel)
+      const coordKey = `${place.coordinates[0]},${place.coordinates[1]}`
+      if (place.claimedByName) group.placeNames.set(coordKey, place.claimedByName)
+      group.placeHourlyRates.set(coordKey, placeRate)
+      group.placeFortLevels.set(coordKey, fortLevel)
+      group.placeIds.set(coordKey, place.placeId)
+      if (place.claimedById) group.placeClaimedByIds.set(coordKey, place.claimedById)
+      group.placeScores.set(coordKey, place.score)
       group.centroidSum[0] += place.coordinates[0]
       group.centroidSum[1] += place.coordinates[1]
     }
@@ -238,37 +258,76 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
     const smoothed = geometry  // pas de lissage → contours angulaires
 
+    // Helper : collecter les stats d'un blob via point-in-polygon
+    function collectBlobStats(outerRing: Position[]) {
+      let blobCount = 0, blobHourlyRate = 0, blobFort = 0
+      const blobPlayers = new Set<string>()
+      const blobPlaceIds: string[] = []
+      const claimCounts = new Map<string, number>()
+      const claimNames = new Map<string, string>()
+      let bestScore = -1, anchorPlaceId = ''
+
+      for (const [px, py] of group.placeCoords) {
+        if (!pointInRing(px, py, outerRing)) continue
+        const ck = `${px},${py}`
+        blobCount++
+        blobHourlyRate += group.placeHourlyRates.get(ck) ?? 1
+        blobFort += group.placeFortLevels.get(ck) ?? 0
+        const name = group.placeNames.get(ck)
+        if (name) blobPlayers.add(name)
+
+        const pid = group.placeIds.get(ck)
+        if (pid) blobPlaceIds.push(pid)
+
+        const uid = group.placeClaimedByIds.get(ck)
+        if (uid) {
+          claimCounts.set(uid, (claimCounts.get(uid) ?? 0) + 1)
+          if (name) claimNames.set(uid, name)
+        }
+
+        const sc = group.placeScores.get(ck) ?? 0
+        if (sc > bestScore && pid) { bestScore = sc; anchorPlaceId = pid }
+      }
+
+      // Top contributeur
+      let topId = '', topName = '', topCount = 0
+      for (const [uid, cnt] of claimCounts) {
+        if (cnt > topCount) { topCount = cnt; topId = uid; topName = claimNames.get(uid) ?? '' }
+      }
+
+      return {
+        placesCount: blobCount,
+        hourlyRate: blobHourlyRate,
+        totalFortification: blobFort,
+        players: Array.from(blobPlayers).join(', '),
+        placeIds: JSON.stringify(blobPlaceIds),
+        anchorPlaceId,
+        topContributorId: topId,
+        topContributorName: topName,
+        territoryTitle: getTerritoryTitle(blobCount, tiers),
+      }
+    }
+
     // Éclater les MultiPolygon en features séparées (chaque blob = son propre ID)
     // et compter les lieux + joueurs dans chaque blob via point-in-polygon
     if (smoothed.type === 'MultiPolygon') {
       for (const polyCoords of smoothed.coordinates) {
-        const outerRing = polyCoords[0]
-        let blobCount = 0
-        let blobHourlyRate = 0
-        let blobFort = 0
-        const blobPlayers = new Set<string>()
-        for (const [px, py] of group.placeCoords) {
-          if (pointInRing(px, py, outerRing)) {
-            blobCount++
-            blobHourlyRate += group.placeHourlyRates.get(`${px},${py}`) ?? 1
-            blobFort += group.placeFortLevels.get(`${px},${py}`) ?? 0
-            const name = group.placeNames.get(`${px},${py}`)
-            if (name) blobPlayers.add(name)
-          }
-        }
+        const stats = collectBlobStats(polyCoords[0])
         territories.push({
           type: 'Feature',
           id: id++,
           geometry: { type: 'Polygon', coordinates: polyCoords },
-          properties: { ...baseProps, placesCount: blobCount, hourlyRate: blobHourlyRate, totalFortification: blobFort, players: Array.from(blobPlayers).join(', ') },
+          properties: { ...baseProps, ...stats },
         })
       }
     } else {
+      const outerRing = smoothed.coordinates[0]
+      const stats = collectBlobStats(outerRing)
       territories.push({
         type: 'Feature',
         id: id++,
         geometry: smoothed,
-        properties: { ...baseProps, placesCount: group.count, hourlyRate: group.totalHourlyRate, totalFortification: group.totalFortification, players: Array.from(group.players).join(', ') },
+        properties: { ...baseProps, ...stats },
       })
     }
   }

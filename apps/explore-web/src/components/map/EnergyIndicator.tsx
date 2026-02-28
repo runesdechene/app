@@ -77,6 +77,9 @@ export function EnergyIndicator() {
   const [showInfo, setShowInfo] = useState(false)
 
   const baseMax = maxEnergy - bonusEnergy
+  const baseCycle = 7200
+  const baseRate = 3600 / baseCycle
+  const hasRegenBonus = cycleSeconds !== baseCycle
 
   return (
     <>
@@ -104,9 +107,13 @@ export function EnergyIndicator() {
           rows={[
             { label: 'Points actuels', value: `${formatEnergy(fractionalEnergy)} / ${maxEnergy}` },
             { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
+            ...(hasRegenBonus ? [
+              { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
+              { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
+            ] : []),
             ...(bonusEnergy !== 0 ? [
-              { label: 'Base', value: String(baseMax), highlight: false },
-              { label: 'Bonus faction', value: `${bonusEnergy > 0 ? '+' : ''}${bonusEnergy}`, highlight: true },
+              { label: 'Capacite de base', value: String(baseMax) },
+              { label: 'Bonus capacite faction', value: `${bonusEnergy > 0 ? '+' : ''}${bonusEnergy}`, highlight: true },
             ] : []),
           ]}
           onClose={() => setShowInfo(false)}

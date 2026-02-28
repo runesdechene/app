@@ -44,6 +44,7 @@ export interface PlaceDetail {
     factionColor: string
     factionPattern: string | null
     claimedBy: string
+    claimedByName: string
     claimedAt: string
     fortificationLevel: number
     zoneFortification: number

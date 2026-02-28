@@ -11,6 +11,7 @@ interface HubUser {
   role: Role
   is_active: boolean
   created_at: string
+  last_login_at: string | null
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -48,7 +49,7 @@ export function Users() {
         while (true) {
           let query = supabase
             .from('users')
-            .select('id, email_address, first_name, display_name, role, is_active, created_at')
+            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
 
@@ -175,11 +176,13 @@ export function Users() {
             <tbody>
               {pagedUsers.map(user => {
                 const isNew = (now - new Date(user.created_at).getTime()) < SEVEN_DAYS_MS
+                const isReactivated = !isNew && user.last_login_at && (now - new Date(user.last_login_at).getTime()) < SEVEN_DAYS_MS
                 return (
                   <tr key={user.id} className={!user.is_active ? 'inactive' : ''}>
                     <td>
                       {user.display_name || user.first_name || '-'}
                       {isNew && <span className="users-new-badge">Nouveau !</span>}
+                      {isReactivated && <span className="users-reactivated-badge">Reactive !</span>}
                     </td>
                     <td>{user.email_address}</td>
                     <td>

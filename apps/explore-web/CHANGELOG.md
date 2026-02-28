@@ -1,3 +1,10 @@
+# ALPHA V0.3.0
+## La Conquête s'affirme
+- Les territoires fusionnés se fortifient entre eux
+- Les notifications sont plus claires
+- La versin mobile fonctionne et peut être installée sur un téléphone en PWA dynamique
+- Optimisation globale de la map
+
 # ALPHA V0.2.0
 ## Les Explorateurs contribuent
 - Ajout de lieux depuis la carte (titre, photo, tag)

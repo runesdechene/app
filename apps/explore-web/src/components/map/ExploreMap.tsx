@@ -342,6 +342,30 @@ export const ExploreMap = memo(function ExploreMap() {
   const gameMode = useFogStore(s => s.gameMode)
   const showFactions = rawShowFactions && gameMode === 'conquest'
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
+  const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
+
+  // Territory tiers (configurés dans le Hub)
+  const [territoryTiers, setTerritoryTiers] = useState<{ minPlaces: number; title: string }[]>([])
+  // Territory names (noms custom par les joueurs) — dans le store pour mise à jour depuis TerritoryPanel
+  const territoryNames = useMapStore(s => s.territoryNames)
+  const setTerritoryNamesStore = useMapStore(s => s.setTerritoryNames)
+
+  useEffect(() => {
+    supabase.from('territory_tiers').select('min_places, title').order('min_places', { ascending: false })
+      .then(({ data }) => {
+        if (data) setTerritoryTiers(data.map(r => ({ minPlaces: r.min_places, title: r.title })))
+      })
+    supabase.rpc('get_winning_territory_names')
+      .then(({ data }) => {
+        if (data) {
+          const m = new Map<string, { customName: string | null; namedBy: string }>()
+          for (const r of data as Array<{ anchor_place_id: string; winning_name: string | null }>) {
+            m.set(r.anchor_place_id, { customName: r.winning_name, namedBy: '' })
+          }
+          setTerritoryNamesStore(m)
+        }
+      })
+  }, [])
 
   // Viewport bounds pour la minimap
   const [viewBounds, setViewBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null)
@@ -364,6 +388,9 @@ export const ExploreMap = memo(function ExploreMap() {
       factionTitle: string; players: string; placesCount: number
       hourlyRate: number; totalFortification: number
       tagColor: string; pattern: string
+      territoryTitle: string; customName: string | null
+      anchorPlaceId: string; placeIds: string[]
+      topContributorId: string; topContributorName: string
     }[] = []
 
     for (const f of territories.features) {
@@ -376,6 +403,27 @@ export const ExploreMap = memo(function ExploreMap() {
       const placesCount = (typeof props.placesCount === 'number' ? props.placesCount : 0)
       const hourlyRate = (typeof props.hourlyRate === 'number' ? props.hourlyRate : 0)
       const totalFortification = (typeof props.totalFortification === 'number' ? props.totalFortification : 0)
+      const territoryTitle = (props.territoryTitle as string) || ''
+      const anchorPlaceId = (props.anchorPlaceId as string) || ''
+      const topContributorId = (props.topContributorId as string) || ''
+      const topContributorName = (props.topContributorName as string) || ''
+      let placeIds: string[] = []
+      try { placeIds = JSON.parse((props.placeIds as string) || '[]') } catch { /* ignore */ }
+
+      // Résoudre le nom custom via territoryNames
+      let customName: string | null = null
+      if (anchorPlaceId && territoryNames.has(anchorPlaceId)) {
+        customName = territoryNames.get(anchorPlaceId)!.customName
+      }
+      // Si plusieurs anchors dans le blob (fusion), prendre celui qui existe
+      if (!customName) {
+        for (const pid of placeIds) {
+          if (territoryNames.has(pid)) {
+            customName = territoryNames.get(pid)!.customName
+            break
+          }
+        }
+      }
 
       // Extraire les anneaux extérieurs
       const rings: number[][][] =
@@ -407,12 +455,13 @@ export const ExploreMap = memo(function ExploreMap() {
           lon: topLon, lat: topLat,
           emblemLon, emblemLat,
           territoryId, factionTitle, players, placesCount, hourlyRate, totalFortification, tagColor, pattern,
+          territoryTitle, customName, anchorPlaceId, placeIds, topContributorId, topContributorName,
         })
       }
     }
 
     return labels
-  }, [territories])
+  }, [territories, territoryNames])
 
   // Layers mémorisés pour éviter les flashs à chaque re-render
   const undiscoveredCircleFinal = useMemo(() => ({
@@ -598,6 +647,7 @@ export const ExploreMap = memo(function ExploreMap() {
           const ov = placeOverrides.get(f.properties.id)
           return {
             coordinates: f.geometry.coordinates as [number, number],
+            placeId: f.properties.id,
             faction: ov?.factionId || f.properties.factionId,
             factionTitle: f.properties.tagTitle,
             tagColor: ov?.tagColor || f.properties.tagColor,
@@ -605,10 +655,12 @@ export const ExploreMap = memo(function ExploreMap() {
             score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
             fortificationLevel: f.properties.fortificationLevel ?? 0,
             claimedByName: f.properties.claimedByName,
+            claimedById: f.properties.claimedById,
           }
         }),
+      tiers: territoryTiers,
     })
-  }, [geojson, placeOverrides])
+  }, [geojson, placeOverrides, territoryTiers])
 
   // Charger les icônes SVG colorées dans la map
   const loadedIconsRef = useRef(new Set<string>())
@@ -642,33 +694,40 @@ export const ExploreMap = memo(function ExploreMap() {
     const feature = event.features?.[0]
     if (!feature) {
       setSelectedPlaceId(null)
+      setSelectedTerritoryData(null)
       return
     }
 
-    // Clic sur un territoire → ouvrir le lieu le plus proche (= générateur Voronoi)
+    // Clic sur un territoire → ouvrir le TerritoryPanel avec les infos du blob
     if (feature.layer?.id?.startsWith('territories')) {
-      if (!geojson) return
-      const { lng, lat } = event.lngLat
-      let nearestId: string | null = null
-      let minDist = Infinity
-      for (const f of geojson.features) {
-        const [pLng, pLat] = f.geometry.coordinates
-        const dx = pLng - lng
-        const dy = pLat - lat
-        const dist = dx * dx + dy * dy
-        if (dist < minDist) {
-          minDist = dist
-          nearestId = f.properties.id
-        }
+      if (!territoryLabels) return
+      const territoryId = feature.id as number
+      const label = territoryLabels.find(l => l.territoryId === territoryId)
+      if (label && label.placesCount >= 3) {
+        setSelectedPlaceId(null)
+        setSelectedTerritoryData({
+          territoryTitle: label.territoryTitle,
+          customName: label.customName,
+          anchorPlaceId: label.anchorPlaceId,
+          placeIds: label.placeIds,
+          topContributorId: label.topContributorId,
+          topContributorName: label.topContributorName,
+          factionTitle: label.factionTitle,
+          tagColor: label.tagColor,
+          placesCount: label.placesCount,
+          hourlyRate: label.hourlyRate,
+          totalFortification: label.totalFortification,
+          players: label.players,
+        })
       }
-      if (nearestId) setSelectedPlaceId(nearestId)
       return
     }
 
     const props = feature.properties as PlaceProperties
     setSelectedPlaceId(props.id)
+    setSelectedTerritoryData(null)
     setPopupInfo(null)
-  }, [geojson, addPlaceMode])
+  }, [geojson, addPlaceMode, territoryLabels])
 
   // Minimap : mettre à jour le viewport bounds + coords pour add-place
   const onMoveEnd = useCallback(() => {
@@ -874,6 +933,11 @@ export const ExploreMap = memo(function ExploreMap() {
                   +{label.hourlyRate % 1 === 0 ? label.hourlyRate : label.hourlyRate.toFixed(1)}/h
                 </span>
               )}
+              {label.customName && (
+                <span className="territory-emblem-title" style={{ color: label.tagColor }}>
+                  {label.customName}
+                </span>
+              )}
             </div>
           </Marker>
         ) : null
@@ -899,9 +963,10 @@ export const ExploreMap = memo(function ExploreMap() {
               className={`territory-label${hoveredTerritoryId === label.territoryId ? ' visible' : ''}`}
               style={{ '--label-color': label.tagColor } as React.CSSProperties}
             >
-              <div className="territory-label-faction">{label.factionTitle}</div>
-              <div className="territory-label-players">{label.players}</div>
-              <div className="territory-label-count">{label.placesCount} lieu{label.placesCount > 1 ? 'x' : ''} contrôlé{label.placesCount > 1 ? 's' : ''}</div>
+              <div className="territory-label-title">
+                {label.customName || label.factionTitle}
+              </div>
+              <div className="territory-label-count">{label.placesCount} lieu{label.placesCount > 1 ? 'x' : ''} controle{label.placesCount > 1 ? 's' : ''}</div>
             </div>
           </Marker>
         ) : null

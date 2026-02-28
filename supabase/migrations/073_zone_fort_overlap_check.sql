@@ -1,12 +1,41 @@
 -- ============================================
--- MIGRATION 070 : Fortification mutualisee des blobs
+-- MIGRATION 073 : Zone fortification — verifier l'overlap des territoires
 -- ============================================
--- Quand des lieux de la meme faction sont proches (~5km),
--- leurs fortifications s'additionnent pour augmenter le cout
--- de conquete : cost = 1 + fort_lieu + floor(fort_voisins * 0.5)
+-- Le bonus de zone ne s'applique QUE si les cercles de territoire
+-- se touchent (territoires fusionnes visuellement).
+-- Formule rayon : 0.25 + sqrt(score - 1) * 0.65 km
+-- Formule score : likes + vues*0.1 + explorations*2
+-- Condition : distance(A,B) <= rayon(A) + rayon(B)
 -- ============================================
 
--- 1. Modifier claim_place pour inclure le bonus de zone
+-- 1. Helper : score d'influence d'un lieu
+CREATE OR REPLACE FUNCTION public.place_influence_score(p_place_id TEXT)
+RETURNS INT
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+AS $$
+  SELECT GREATEST(0, ROUND(
+    COALESCE((SELECT COUNT(*) FROM places_liked WHERE place_id = p_place_id), 0)
+    + COALESCE((SELECT COUNT(*) FROM places_viewed WHERE place_id = p_place_id), 0) * 0.1
+    + COALESCE((SELECT COUNT(*) FROM places_explored WHERE place_id = p_place_id), 0) * 2
+  ))::int;
+$$;
+
+-- 2. Helper : rayon de territoire en km (meme formule que territoryWorker.ts)
+CREATE OR REPLACE FUNCTION public.territory_radius_km(p_score INT)
+RETURNS DOUBLE PRECISION
+LANGUAGE sql
+IMMUTABLE
+AS $$
+  SELECT CASE
+    WHEN p_score <= 0 THEN 0.0
+    WHEN p_score <= 1 THEN 0.25
+    ELSE 0.25 + sqrt(p_score - 1) * 0.65
+  END;
+$$;
+
+-- 3. Mettre a jour claim_place — bonus zone seulement si territoires fusionnes
 CREATE OR REPLACE FUNCTION public.claim_place(
   p_user_id TEXT,
   p_place_id TEXT
@@ -36,13 +65,13 @@ DECLARE
   v_construction_elapsed FLOAT;
   v_construction_ticks INT;
   v_construction_next_in INT;
-  -- Ancien proprietaire
   v_prev_faction_id TEXT;
   v_prev_claimed_by TEXT;
-  -- Coordonnees du lieu cible
   v_lat REAL;
   v_lon REAL;
   v_current_faction TEXT;
+  v_target_score INT;
+  v_target_radius DOUBLE PRECISION;
 BEGIN
   -- Recuperer faction + max du user + bonus faction + cycles regen
   SELECT u.faction_id,
@@ -69,7 +98,11 @@ BEGIN
     RETURN json_build_object('error', 'Place not found');
   END IF;
 
-  -- Calculer la fortification des voisins de meme faction (~10km)
+  -- Score et rayon du lieu cible
+  v_target_score := place_influence_score(p_place_id);
+  v_target_radius := territory_radius_km(v_target_score);
+
+  -- Fortification des voisins dont le territoire est fusionne (cercles qui se touchent)
   v_neighbor_fort := 0;
   IF v_current_faction IS NOT NULL THEN
     SELECT COALESCE(SUM(p2.fortification_level), 0)
@@ -79,7 +112,13 @@ BEGIN
       AND p2.id != p_place_id
       AND p2.fortification_level > 0
       AND ABS(p2.latitude - v_lat) < 0.09
-      AND ABS(p2.longitude - v_lon) < 0.127;
+      AND ABS(p2.longitude - v_lon) < 0.127
+      -- Verifier que les cercles de territoire se touchent
+      AND (v_target_radius + territory_radius_km(place_influence_score(p2.id)))
+          >= sqrt(
+            pow((p2.latitude - v_lat) * 111, 2)
+            + pow((p2.longitude - v_lon) * 79, 2)
+          );
   END IF;
 
   -- Cout dynamique : 1 + fort du lieu + bonus zone (x0.5)
@@ -161,7 +200,7 @@ BEGIN
 END;
 $$;
 
--- 2. Modifier get_place_by_id pour retourner zoneFortification
+-- 4. Mettre a jour get_place_by_id — zone fort seulement si territoires fusionnes
 CREATE OR REPLACE FUNCTION public.get_place_by_id(
   p_id TEXT,
   p_user_id TEXT DEFAULT NULL
@@ -186,6 +225,9 @@ DECLARE
   v_all_tags JSON;
   v_claim JSON;
   v_zone_fort INT;
+  v_target_score INT;
+  v_target_radius DOUBLE PRECISION;
+  v_claimer_name TEXT;
 BEGIN
   SELECT * INTO v_place FROM places WHERE id = p_id;
   IF v_place IS NULL THEN
@@ -275,9 +317,12 @@ BEGIN
     v_requester := NULL;
   END IF;
 
-  -- Fortification de zone : somme des fort des voisins same-faction (~10km)
+  -- Fortification de zone : seulement les voisins dont le territoire est fusionne
   v_zone_fort := 0;
   IF v_place.faction_id IS NOT NULL THEN
+    v_target_score := place_influence_score(p_id);
+    v_target_radius := territory_radius_km(v_target_score);
+
     SELECT COALESCE(SUM(p2.fortification_level), 0)
     INTO v_zone_fort
     FROM places p2
@@ -285,10 +330,23 @@ BEGIN
       AND p2.id != p_id
       AND p2.fortification_level > 0
       AND ABS(p2.latitude - v_place.latitude) < 0.09
-      AND ABS(p2.longitude - v_place.longitude) < 0.127;
+      AND ABS(p2.longitude - v_place.longitude) < 0.127
+      -- Verifier que les cercles de territoire se touchent
+      AND (v_target_radius + territory_radius_km(place_influence_score(p2.id)))
+          >= sqrt(
+            pow((p2.latitude - v_place.latitude) * 111, 2)
+            + pow((p2.longitude - v_place.longitude) * 79, 2)
+          );
   END IF;
 
-  -- Claim info (avec fortification + zone)
+  -- Nom du joueur qui a revendique
+  IF v_place.claimed_by IS NOT NULL THEN
+    SELECT COALESCE(first_name, last_name, 'Inconnu')
+    INTO v_claimer_name
+    FROM users WHERE id = v_place.claimed_by;
+  END IF;
+
+  -- Claim info (avec fortification + zone + nom du joueur)
   IF v_place.faction_id IS NOT NULL THEN
     SELECT json_build_object(
       'factionId', f.id,
@@ -296,6 +354,7 @@ BEGIN
       'factionColor', f.color,
       'factionPattern', f.pattern,
       'claimedBy', v_place.claimed_by,
+      'claimedByName', COALESCE(v_claimer_name, 'Inconnu'),
       'claimedAt', v_place.claimed_at,
       'fortificationLevel', v_place.fortification_level,
       'zoneFortification', v_zone_fort

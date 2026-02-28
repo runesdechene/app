@@ -16,6 +16,12 @@ interface UserGauge {
   maxConstruction: number
 }
 
+interface TerritoryTier {
+  id: number
+  minPlaces: number
+  title: string
+}
+
 const ROLES = ['user', 'admin'] as const
 
 export function Settings() {
@@ -31,6 +37,10 @@ export function Settings() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Territory tiers
+  const [tiers, setTiers] = useState<TerritoryTier[]>([])
+  const [savingTiers, setSavingTiers] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -70,6 +80,19 @@ export function Settings() {
           }
         }
         setRoleDefaults(prev => ({ ...prev, ...byRole }))
+      }
+      // Charger les tiers de territoire
+      const { data: tiersData } = await supabase
+        .from('territory_tiers')
+        .select('id, min_places, title')
+        .order('min_places')
+
+      if (tiersData) {
+        setTiers(tiersData.map((t: Record<string, unknown>) => ({
+          id: Number(t.id),
+          minPlaces: Number(t.min_places),
+          title: String(t.title),
+        })))
       }
     } finally {
       setLoading(false)
@@ -160,6 +183,36 @@ export function Settings() {
         .update({ [dbField]: num })
         .eq('id', userId)
     }, 600)
+  }
+
+  function handleTierChange(idx: number, field: 'minPlaces' | 'title', value: string) {
+    setTiers(prev => prev.map((t, i) => {
+      if (i !== idx) return t
+      if (field === 'minPlaces') return { ...t, minPlaces: parseInt(value) || 0 }
+      return { ...t, title: value }
+    }))
+  }
+
+  function addTier() {
+    const maxMin = tiers.length > 0 ? Math.max(...tiers.map(t => t.minPlaces)) : 0
+    setTiers(prev => [...prev, { id: 0, minPlaces: maxMin + 5, title: '' }])
+  }
+
+  function removeTier(idx: number) {
+    setTiers(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  async function saveTiers() {
+    setSavingTiers(true)
+    // Supprimer tous les tiers existants et re-insérer
+    await supabase.from('territory_tiers').delete().gte('id', 0)
+    const rows = tiers
+      .filter(t => t.title.trim() && t.minPlaces > 0)
+      .map(t => ({ min_places: t.minPlaces, title: t.title.trim() }))
+    if (rows.length > 0) {
+      await supabase.from('territory_tiers').insert(rows)
+    }
+    setSavingTiers(false)
   }
 
   if (loading) {
@@ -344,6 +397,71 @@ export function Settings() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="divers-card">
+        <h3>Titres de territoires</h3>
+        <p className="divers-description">
+          Definir les titres progressifs des territoires selon le nombre de lieux fusionnes.
+          Ex: 3 lieux = "Campement", 30 lieux = "Duche".
+        </p>
+
+        <table className="settings-table">
+          <thead>
+            <tr>
+              <th>Lieux minimum</th>
+              <th>Titre</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tiers.map((tier, idx) => (
+              <tr key={idx}>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={tier.minPlaces}
+                    onChange={e => handleTierChange(idx, 'minPlaces', e.target.value)}
+                    className="settings-input"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={tier.title}
+                    onChange={e => handleTierChange(idx, 'title', e.target.value)}
+                    className="settings-input"
+                    placeholder="Ex: Campement"
+                  />
+                </td>
+                <td>
+                  <button
+                    className="btn-danger"
+                    onClick={() => removeTier(idx)}
+                    title="Supprimer"
+                  >
+                    &times;
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+          <button className="btn-secondary" onClick={addTier}>
+            + Ajouter un tier
+          </button>
+          <button
+            className="btn-primary"
+            onClick={saveTiers}
+            disabled={savingTiers}
+          >
+            {savingTiers ? '...' : 'Sauvegarder'}
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -92,6 +92,8 @@ export function useFog() {
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')
+      // Mettre a jour last_login_at pour le Hub (badge "Reactive")
+      supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(() => {})
       // Avatar direct si disponible
       if (userData.avatar_url) {
         setUserAvatarUrl(userData.avatar_url)

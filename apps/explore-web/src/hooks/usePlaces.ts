@@ -25,6 +25,7 @@ interface MapPlace {
     pattern: string | null
   } | null
   claimedByName: string | null
+  claimedById: string | null
   fortificationLevel: number
   location: {
     latitude: number
@@ -46,6 +47,7 @@ export interface PlaceProperties {
   factionId: string
   factionPattern: string
   claimedByName: string
+  claimedById: string
   claimed: boolean
   fortificationLevel: number
   likes: number
@@ -116,6 +118,7 @@ export function usePlaces() {
               factionId: place.faction?.id ?? '',
               factionPattern: place.faction?.pattern ?? '',
               claimedByName: place.claimedByName ?? '',
+              claimedById: place.claimedById ?? '',
               claimed: !!place.faction,
               fortificationLevel: place.fortificationLevel ?? 0,
               likes: place.likes ?? 0,
