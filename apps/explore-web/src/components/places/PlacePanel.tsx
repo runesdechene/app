@@ -142,6 +142,8 @@ function FoggedPlaceView({
             src={images[0].url}
             alt="Lieu mystérieux"
             className="place-panel-image"
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
         </div>
       )}
@@ -421,6 +423,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
             src={images[imageIndex].url}
             alt={place.title}
             className="place-panel-image"
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
           {images.length > 1 && (
             <>
