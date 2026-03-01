@@ -37,6 +37,11 @@ interface MapState {
   requestFlyTo: (target: { lng: number; lat: number; placeId?: string }) => void
   clearPendingFlyTo: () => void
 
+  /** Demande de zoom depuis l'extérieur (add-place, etc.) */
+  pendingZoom: 'in' | 'out' | null
+  requestZoom: (dir: 'in' | 'out') => void
+  clearPendingZoom: () => void
+
   /** Overrides locaux pour tester les territoires (tag, likes) */
   placeOverrides: Map<string, PlaceOverride>
   setPlaceOverride: (placeId: string, override: PlaceOverride) => void
@@ -85,6 +90,10 @@ export const useMapStore = create<MapState>((set) => ({
   pendingFlyTo: null,
   requestFlyTo: (target) => set({ pendingFlyTo: target }),
   clearPendingFlyTo: () => set({ pendingFlyTo: null }),
+
+  pendingZoom: null,
+  requestZoom: (dir) => set({ pendingZoom: dir }),
+  clearPendingZoom: () => set({ pendingZoom: null }),
 
   placeOverrides: new Map(),
   setPlaceOverride: (placeId, override) =>

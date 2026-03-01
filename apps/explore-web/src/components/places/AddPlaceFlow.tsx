@@ -33,6 +33,7 @@ export function AddPlaceFlow() {
   const [coordsFocused, setCoordsFocused] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [confirmedCoords, setConfirmedCoords] = useState<{ lng: number; lat: number } | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -81,12 +82,13 @@ export function AddPlaceFlow() {
 
   function handleConfirmLocation() {
     if (!coords) return
+    setConfirmedCoords({ lng: coords.lng, lat: coords.lat })
     setStep('form')
-    // Reverse geocoding pour pré-remplir l'adresse
+    // Reverse geocoding — toujours mettre à jour l'adresse
     fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&accept-language=fr`)
       .then(r => r.json())
       .then(data => {
-        if (data?.display_name && !address) {
+        if (data?.display_name) {
           setAddress(data.display_name)
         }
       })
@@ -163,12 +165,13 @@ export function AddPlaceFlow() {
   }
 
   function handleBackToLocation() {
+    setConfirmedCoords(null)
     setStep('location')
     setError(null)
   }
 
   async function handleSubmit() {
-    if (!userId || !coords || photoFiles.length === 0 || selectedTagIds.length === 0 || !title.trim()) return
+    if (!userId || !confirmedCoords || photoFiles.length === 0 || selectedTagIds.length === 0 || !title.trim()) return
     setStep('submitting')
     setError(null)
 
@@ -208,8 +211,8 @@ export function AddPlaceFlow() {
       const { data, error: rpcError } = await supabase.rpc('create_place', {
         p_user_id: userId,
         p_title: title.trim(),
-        p_latitude: coords.lat,
-        p_longitude: coords.lng,
+        p_latitude: confirmedCoords.lat,
+        p_longitude: confirmedCoords.lng,
         p_tag_id: selectedTagIds[0],
         p_image_url: imageEntries[0].url,
         p_thumb_url: imageEntries[0].thumb,
@@ -260,7 +263,7 @@ export function AddPlaceFlow() {
         message: `Lieu "${title.trim()}" ajouté !`,
         timestamp: Date.now(),
         placeId,
-        placeLocation: { latitude: coords.lat, longitude: coords.lng },
+        placeLocation: { latitude: confirmedCoords.lat, longitude: confirmedCoords.lng },
       })
 
       setStep('success')
@@ -271,8 +274,8 @@ export function AddPlaceFlow() {
   }
 
   function handleViewPlace() {
-    if (!newPlaceId || !coords) return
-    useMapStore.getState().requestFlyTo({ lng: coords.lng, lat: coords.lat, placeId: newPlaceId })
+    if (!newPlaceId || !confirmedCoords) return
+    useMapStore.getState().requestFlyTo({ lng: confirmedCoords.lng, lat: confirmedCoords.lat, placeId: newPlaceId })
     handleClose()
   }
 
@@ -285,6 +288,7 @@ export function AddPlaceFlow() {
     setDescription('')
     setError(null)
     setNewPlaceId(null)
+    setConfirmedCoords(null)
     setStep('location')
   }
 
@@ -327,6 +331,12 @@ export function AddPlaceFlow() {
             <line x1="0" y1="24" x2="16" y2="24" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
             <line x1="32" y1="24" x2="48" y2="24" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
           </svg>
+        </div>
+
+        {/* Zoom buttons */}
+        <div className="add-place-zoom-btns">
+          <button className="add-place-zoom-btn" onClick={() => useMapStore.getState().requestZoom('in')}>+</button>
+          <button className="add-place-zoom-btn" onClick={() => useMapStore.getState().requestZoom('out')}>&minus;</button>
         </div>
 
         {/* Bottom bar */}
@@ -480,6 +490,13 @@ export function AddPlaceFlow() {
               )
             })}
           </div>
+
+          {/* Coordonnées confirmées */}
+          {confirmedCoords && (
+            <div className="add-place-coords-display">
+              {confirmedCoords.lat.toFixed(5)}, {confirmedCoords.lng.toFixed(5)}
+            </div>
+          )}
 
           {/* Adresse (optionnel) */}
           <label className="add-place-label">Adresse <span className="add-place-optional">(optionnel)</span></label>

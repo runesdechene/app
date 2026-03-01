@@ -24,6 +24,10 @@ export function Constructions() {
   const [uploading, setUploading] = useState<number | null>(null)
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
+  const [zoneMult, setZoneMult] = useState('0.5')
+  const [sizeMult, setSizeMult] = useState('0')
+  const [radiusKm, setRadiusKm] = useState('10')
+  const [savingSettings, setSavingSettings] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadLevelRef = useRef<number | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -51,9 +55,33 @@ export function Constructions() {
       if (!tagsRes.error && tagsRes.data) {
         setTags(tagsRes.data as Tag[])
       }
+
+      // Settings de zone
+      const { data: settingsData } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['zone_fort_multiplier', 'territory_size_defense_mult', 'zone_detection_radius_km'])
+      if (settingsData) {
+        for (const r of settingsData) {
+          if (r.key === 'zone_fort_multiplier') setZoneMult(r.value)
+          if (r.key === 'territory_size_defense_mult') setSizeMult(r.value)
+          if (r.key === 'zone_detection_radius_km') setRadiusKm(r.value)
+        }
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  async function saveSettings() {
+    setSavingSettings(true)
+    const now = new Date().toISOString()
+    await Promise.all([
+      supabase.from('app_settings').update({ value: zoneMult, updated_at: now }).eq('key', 'zone_fort_multiplier'),
+      supabase.from('app_settings').update({ value: sizeMult, updated_at: now }).eq('key', 'territory_size_defense_mult'),
+      supabase.from('app_settings').update({ value: radiusKm, updated_at: now }).eq('key', 'zone_detection_radius_km'),
+    ])
+    setSavingSettings(false)
   }
 
   // --- Creer ---
@@ -227,6 +255,63 @@ export function Constructions() {
         Les joueurs depensent des points de Construction pour fortifier les lieux de leur faction.
         Chaque niveau augmente le cout de conquete pour les ennemis.
       </p>
+
+      {/* Parametres de zone */}
+      <div className="construction-settings-block">
+        <div className="construction-settings-row">
+          <label className="construction-settings-label">
+            Bonus fort. voisins
+            <span className="construction-settings-hint">floor(fort voisins x mult)</span>
+          </label>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={zoneMult.replace('.', ',')}
+            onChange={e => setZoneMult(e.target.value.replace(',', '.'))}
+            className="construction-settings-input"
+          />
+        </div>
+        <div className="construction-settings-row">
+          <label className="construction-settings-label">
+            Bonus taille territoire
+            <span className="construction-settings-hint">floor(nb voisins x mult)</span>
+          </label>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={sizeMult.replace('.', ',')}
+            onChange={e => setSizeMult(e.target.value.replace(',', '.'))}
+            className="construction-settings-input"
+          />
+        </div>
+        <div className="construction-settings-row">
+          <label className="construction-settings-label">
+            Rayon detection (km)
+            <span className="construction-settings-hint">Distance max pour detecter les voisins</span>
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+            value={radiusKm}
+            onChange={e => setRadiusKm(e.target.value)}
+            className="construction-settings-input"
+          />
+        </div>
+        <div className="construction-settings-footer">
+          <span className="construction-settings-formula">
+            Cout = 1 + fort + floor(fort voisins x {zoneMult.replace('.', ',')}) + floor(nb voisins x {sizeMult.replace('.', ',')})
+          </span>
+          <button
+            className="faction-create-btn"
+            onClick={saveSettings}
+            disabled={savingSettings}
+          >
+            {savingSettings ? '...' : 'Sauver'}
+          </button>
+        </div>
+      </div>
 
       {/* Formulaire de creation */}
       <div className="faction-create">

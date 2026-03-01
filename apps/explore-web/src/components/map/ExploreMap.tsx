@@ -327,6 +327,8 @@ export const ExploreMap = memo(function ExploreMap() {
   const placeOverrides = useMapStore(state => state.placeOverrides)
   const pendingFlyTo = useMapStore(state => state.pendingFlyTo)
   const clearPendingFlyTo = useMapStore(state => state.clearPendingFlyTo)
+  const pendingZoom = useMapStore(state => state.pendingZoom)
+  const clearPendingZoom = useMapStore(state => state.clearPendingZoom)
   const setUserPosition = useFogStore(s => s.setUserPosition)
   const userPosition = useFogStore(s => s.userPosition)
   const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
@@ -571,12 +573,18 @@ export const ExploreMap = memo(function ExploreMap() {
       .catch(() => {})
 
     // GPS en parallèle — s'il répond, il écrase l'IP (plus précis)
+    let gpsFired = false
     if (navigator.geolocation) {
       const watchId = navigator.geolocation.watchPosition(
         (pos) => {
-          // GPS gagne toujours, même si IP a déjà répondu
-          resolved = false // force override
-          applyPosition({ lng: pos.coords.longitude, lat: pos.coords.latitude }, 'GPS')
+          const coords = { lng: pos.coords.longitude, lat: pos.coords.latitude }
+          setUserPosition(coords)
+          // flyTo uniquement la 1ère fois (GPS écrase IP)
+          if (!gpsFired) {
+            gpsFired = true
+            resolved = false
+            applyPosition(coords, 'GPS')
+          }
         },
         () => {},
         { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
@@ -592,6 +600,17 @@ export const ExploreMap = memo(function ExploreMap() {
       if (center) setPendingNewPlaceCoords({ lng: center.lng, lat: center.lat })
     }
   }, [addPlaceMode, setPendingNewPlaceCoords])
+
+  // Zoom demandé depuis l'extérieur (add-place, etc.)
+  useEffect(() => {
+    if (!pendingZoom) return
+    const map = mapRef.current?.getMap()
+    if (map) {
+      if (pendingZoom === 'in') map.zoomIn()
+      else map.zoomOut()
+    }
+    clearPendingZoom()
+  }, [pendingZoom, clearPendingZoom])
 
   // Fly-to demandé depuis l'extérieur (toast cliqué, etc.)
   useEffect(() => {

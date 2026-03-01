@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -733,10 +733,24 @@ function ClaimButton({
   const [claiming, setClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
   const [claimError, setClaimError] = useState<string | null>(null)
+  const [zoneMult, setZoneMult] = useState(0.5)
+  const [sizeMult, setSizeMult] = useState(0)
   const fortLevel = currentClaim?.fortificationLevel ?? 0
   const zoneFort = currentClaim?.zoneFortification ?? 0
-  const zoneBonus = Math.floor(zoneFort * 0.5)
-  const claimCost = 1 + fortLevel + zoneBonus
+  const zoneCount = currentClaim?.zoneNeighborCount ?? 0
+  const zoneBonus = Math.floor(zoneFort * zoneMult)
+  const sizeBonus = Math.floor(zoneCount * sizeMult)
+  const claimCost = 1 + fortLevel + zoneBonus + sizeBonus
+
+  useEffect(() => {
+    supabase.from('app_settings').select('key, value').in('key', ['zone_fort_multiplier', 'territory_size_defense_mult'])
+      .then(({ data }) => {
+        if (data) for (const r of data) {
+          if (r.key === 'zone_fort_multiplier') setZoneMult(parseFloat(r.value) || 0.5)
+          if (r.key === 'territory_size_defense_mult') setSizeMult(parseFloat(r.value) || 0)
+        }
+      })
+  }, [])
 
   if (!userId || !factionId || !factionTitle || !factionColor) return null
 
@@ -771,10 +785,17 @@ function ClaimButton({
     setClaiming(true)
     setClaimError(null)
 
-    const { data } = await supabase.rpc('claim_place', {
+    const { data, error: rpcError } = await supabase.rpc('claim_place', {
       p_user_id: userId,
       p_place_id: placeId,
     })
+
+    if (rpcError) {
+      console.error('claim_place RPC error:', rpcError)
+      setClaimError(rpcError.message || 'Erreur serveur')
+      setClaiming(false)
+      return
+    }
 
     if (data?.error) {
       setClaimError(data.error)
@@ -785,7 +806,7 @@ function ClaimButton({
       return
     }
 
-    if (data?.success) {
+    if (data?.ok) {
       setClaimed(true)
       setPlaceOverride(placeId, {
         claimed: true,
@@ -793,13 +814,8 @@ function ClaimButton({
         tagColor: factionColor ?? undefined,
         factionPattern: factionPattern ?? undefined,
       })
-      if (data.energy !== undefined) useFogStore.getState().setEnergy(data.energy)
       if (data.conquestPoints !== undefined) useFogStore.getState().setConquestPoints(data.conquestPoints)
-      if (data.constructionPoints !== undefined) useFogStore.getState().setConstructionPoints(data.constructionPoints)
-
-      if (data.notorietyPoints !== undefined) {
-        useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
-      }
+      if (data.notorietyPoints !== undefined) useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
 
       useToastStore.getState().addToast({
         type: 'claim',
@@ -825,16 +841,19 @@ function ClaimButton({
         {claiming
           ? 'Revendication...'
           : canAffordClaim
-            ? `Revendiquer pour ${factionTitle} (${claimCost} \u2694${zoneBonus > 0 ? ` dont ${zoneBonus} zone` : ''})`
+            ? `Revendiquer pour ${factionTitle} (${claimCost} \u2694${(zoneBonus + sizeBonus) > 0 ? ` dont ${zoneBonus + sizeBonus} zone` : ''})`
             : `Pas assez de points de conquête (${Math.floor(conquestPoints)}/${claimCost})`}
       </button>
-      {(fortLevel > 0 || zoneBonus > 0) && (
+      {(fortLevel > 0 || zoneBonus > 0 || sizeBonus > 0) && (
         <div className="claim-cost-detail">
           {fortLevel > 0 && (
             <span>{'\uD83D\uDEE1\uFE0F'} Fortification : +{fortLevel}</span>
           )}
           {zoneBonus > 0 && (
-            <span>{'\uD83D\uDEE1\uFE0F'} Voisins fortifiés : +{zoneBonus}</span>
+            <span>{'\uD83D\uDEE1\uFE0F'} Voisins fortifies : +{zoneBonus}</span>
+          )}
+          {sizeBonus > 0 && (
+            <span>{'\uD83C\uDFF0'} Taille du territoire : +{sizeBonus}</span>
           )}
         </div>
       )}

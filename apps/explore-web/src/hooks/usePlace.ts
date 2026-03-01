@@ -48,6 +48,7 @@ export interface PlaceDetail {
     claimedAt: string
     fortificationLevel: number
     zoneFortification: number
+    zoneNeighborCount: number
   } | null
   requester: {
     bookmarked: boolean
