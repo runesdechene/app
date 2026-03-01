@@ -130,9 +130,7 @@ export function useChat() {
         },
       )
 
-      ch.subscribe((status) => {
-        console.log('[Chat] realtime status:', status)
-      })
+      ch.subscribe()
       channelRef.current = ch
     }
 
