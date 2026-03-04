@@ -67,6 +67,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
   return (
     <div className="auth-overlay" onClick={onClose}>
+      <a
+        href="https://runesdechene.com"
+        className="auth-back-button"
+        onClick={e => e.stopPropagation()}
+      >
+        <span className="auth-back-arrow">&#8592;</span>
+        Retour à la boutique
+      </a>
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         {appVersion && <span className="auth-modal-version">{appVersion}</span>}
         <button className="auth-modal-close" onClick={onClose} aria-label="Fermer">

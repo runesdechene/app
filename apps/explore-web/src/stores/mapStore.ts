@@ -66,10 +66,6 @@ interface MapState {
   mapStyleMode: 'game' | 'detailed' | 'satellite'
   setMapStyleMode: (mode: 'game' | 'detailed' | 'satellite') => void
 
-  /** Afficher/masquer les territoires et bannières de faction sur la carte */
-  showFactions: boolean
-  setShowFactions: (show: boolean) => void
-
   /** Territoire sélectionné (clic sur un blob) */
   selectedTerritoryData: TerritorySelection | null
   setSelectedTerritoryData: (data: TerritorySelection | null) => void
@@ -122,9 +118,6 @@ export const useMapStore = create<MapState>((set) => ({
 
   mapStyleMode: 'game',
   setMapStyleMode: (mode) => set({ mapStyleMode: mode }),
-
-  showFactions: localStorage.getItem('showFactions') === 'true',
-  setShowFactions: (show) => { localStorage.setItem('showFactions', String(show)); set({ showFactions: show }) },
 
   selectedTerritoryData: null,
   setSelectedTerritoryData: (data) => set({ selectedTerritoryData: data }),

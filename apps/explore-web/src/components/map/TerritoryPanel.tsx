@@ -22,12 +22,18 @@ interface TerritoryPlace {
   longitude: number
 }
 
+interface Voter {
+  name: string
+  value: number
+}
+
 interface Proposal {
   id: string
   name: string
   proposedBy: string
   netScore: number
   myVote: number | null
+  voters: Voter[]
 }
 
 interface Props {
@@ -177,7 +183,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
       const errMap: Record<string, string> = {
         invalid_length: 'Le nom doit faire entre 3 et 50 caracteres.',
         inappropriate: 'Ce nom contient des termes inappropries.',
-        not_eligible: 'Revendiquez au moins 1 lieu dans ce territoire.',
+        not_eligible: 'Vous devez appartenir a cette faction pour proposer.',
         max_proposals: 'Maximum 3 propositions atteint.',
       }
       setVoteError(errMap[r.error as string] ?? 'Erreur inconnue.')
@@ -188,21 +194,23 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
     }
   }
 
-  async function handleVote(proposalId: string, value: number) {
+  const remaining = votePower - usedVotes
+
+  async function handleVote(proposalId: string, direction: 1 | -1) {
     if (!userId) return
     setVoteError(null)
 
-    // Determiner le nouveau vote (toggle si meme valeur)
     const proposal = proposals.find(p => p.id === proposalId)
     const oldVote = proposal?.myVote ?? 0
-    const newValue = oldVote === value ? 0 : value
+    const newValue = oldVote + direction
 
     // Mise a jour optimiste
+    setUsedVotes(prev => prev - Math.abs(oldVote) + Math.abs(newValue))
     setProposals(prev => prev.map(p => {
       if (p.id !== proposalId) return p
       return {
         ...p,
-        netScore: p.netScore - oldVote + newValue,
+        netScore: p.netScore + direction,
         myVote: newValue === 0 ? null : newValue,
       }
     }))
@@ -294,38 +302,60 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
               <p className="territory-panel-hint">Chargement...</p>
             ) : votePower < 1 ? (
               <p className="territory-panel-hint">
-                Revendiquez un lieu dans ce territoire pour proposer un nom et voter.
+                Rejoignez la faction {data.factionTitle} pour voter et proposer des noms.
               </p>
             ) : (
               <>
                 <div className="territory-vote-power">
-                  {usedVotes} / {votePower} vote{votePower > 1 ? 's' : ''} utilise{usedVotes > 1 ? 's' : ''}
+                  {remaining} vote{remaining > 1 ? 's' : ''} restant{remaining > 1 ? 's' : ''} sur {votePower}
+                  <span className="territory-vote-breakdown">
+                    1 base{votePower > 1 ? ` + ${votePower - 1} lieu${votePower - 1 > 1 ? 'x' : ''} revendique${votePower - 1 > 1 ? 's' : ''}` : ''}
+                  </span>
                 </div>
 
                 {proposals.length > 0 && (
                   <div className="territory-vote-list">
-                    {proposals.map(p => (
-                      <div key={p.id} className="territory-vote-row">
-                        <button
-                          className={`territory-vote-btn territory-vote-up${p.myVote === 1 ? ' active' : ''}`}
-                          onClick={() => handleVote(p.id, 1)}
-                          disabled={votePower < 1}
-                        >
-                          {'\u25B2'}
-                        </button>
-                        <span className={`territory-vote-score${p.netScore > 0 ? ' positive' : p.netScore < 0 ? ' negative' : ''}`}>
-                          {p.netScore > 0 ? '+' : ''}{p.netScore}
-                        </span>
-                        <button
-                          className={`territory-vote-btn territory-vote-down${p.myVote === -1 ? ' active' : ''}`}
-                          onClick={() => handleVote(p.id, -1)}
-                          disabled={votePower < 1}
-                        >
-                          {'\u25BC'}
-                        </button>
-                        <span className="territory-vote-name">{p.name}</span>
-                      </div>
-                    ))}
+                    {proposals.map(p => {
+                      const mv = p.myVote ?? 0
+                      const upDisabled = remaining <= 0 && mv >= 0
+                      const downDisabled = remaining <= 0 && mv <= 0
+                      return (
+                        <div key={p.id} className="territory-vote-item">
+                          <div className="territory-vote-row">
+                            <button
+                              className={`territory-vote-btn territory-vote-up${mv > 0 ? ' active' : ''}`}
+                              onClick={() => handleVote(p.id, 1)}
+                              disabled={upDisabled}
+                            >
+                              {'\u25B2'}
+                            </button>
+                            <span className={`territory-vote-score${p.netScore > 0 ? ' positive' : p.netScore < 0 ? ' negative' : ''}`}>
+                              {p.netScore > 0 ? '+' : ''}{p.netScore}
+                            </span>
+                            <button
+                              className={`territory-vote-btn territory-vote-down${mv < 0 ? ' active' : ''}`}
+                              onClick={() => handleVote(p.id, -1)}
+                              disabled={downDisabled}
+                            >
+                              {'\u25BC'}
+                            </button>
+                            <span className="territory-vote-name">{p.name}</span>
+                            {mv !== 0 && (
+                              <span className="territory-vote-my">{mv > 0 ? '+' : ''}{mv}</span>
+                            )}
+                          </div>
+                          {p.voters && p.voters.length > 0 && (
+                            <div className="territory-vote-voters">
+                              {p.voters.map((v, vi) => (
+                                <span key={vi} className={`territory-vote-voter${v.value > 0 ? ' up' : ' down'}`}>
+                                  {v.name} {v.value > 0 ? '+' : ''}{v.value}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
 

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { useFogStore } from '../../stores/fogStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { setDisplayedTitles } from '../../hooks/useFog'
 import { FactionMembersModal } from './FactionMembersModal'
 
@@ -169,6 +170,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   function handlePlaceClick(placeId: string) {
     onClose()
+    useMobileNavStore.getState().closePanel()
     useMapStore.getState().setSelectedPlaceId(placeId)
   }
 

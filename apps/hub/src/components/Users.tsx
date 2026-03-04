@@ -40,6 +40,8 @@ export function Users() {
   const [page, setPage] = useState(1)
 
   useEffect(() => {
+    let ignore = false
+
     async function fetchUsers() {
       try {
         const PAGE_SIZE = 1000
@@ -58,6 +60,7 @@ export function Users() {
           }
 
           const { data } = await query
+          if (ignore) return
           if (data && data.length > 0) {
             allUsers = allUsers.concat(data as HubUser[])
             if (data.length < PAGE_SIZE) break
@@ -67,20 +70,30 @@ export function Users() {
           }
         }
 
-        setUsers(allUsers)
+        if (!ignore) setUsers(allUsers)
       } finally {
-        setLoading(false)
+        if (!ignore) setLoading(false)
       }
     }
 
     setPage(1)
     const debounce = setTimeout(fetchUsers, 300)
-    return () => clearTimeout(debounce)
+    return () => { ignore = true; clearTimeout(debounce) }
   }, [search])
 
   const sortedUsers = useMemo(() => {
+    const cutoff = Date.now() - SEVEN_DAYS_MS
+    function priority(u: HubUser) {
+      const createdAt = new Date(u.created_at).getTime()
+      if (createdAt > cutoff) return 0 // Nouveau
+      if (u.last_login_at && new Date(u.last_login_at).getTime() > cutoff) return 1 // Réactivé
+      return 2 // Reste
+    }
     const sorted = [...users]
     sorted.sort((a, b) => {
+      const pa = priority(a)
+      const pb = priority(b)
+      if (pa !== pb) return pa - pb
       const ta = new Date(a.created_at).getTime()
       const tb = new Date(b.created_at).getTime()
       return sortAsc ? ta - tb : tb - ta
@@ -146,7 +159,7 @@ export function Users() {
             <strong>{totalCount}</strong> utilisateur{totalCount > 1 ? 's' : ''}
           </span>
           <span className="users-stat users-stat-new">
-            <strong>{recentCount}</strong> nouveau{recentCount > 1 ? 'x' : ''} cette semaine
+            <strong>{recentCount}</strong> nouveau{recentCount > 1 ? 'x' : ''} ces 7 derniers jours
           </span>
         </div>
       )}

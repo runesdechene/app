@@ -30,6 +30,7 @@ import { OfflineIndicator } from './components/pwa/OfflineIndicator'
 import { MobileNavbar } from './components/map/MobileNavbar'
 import { MobileHeader } from './components/map/MobileHeader'
 import { useMobileNavStore } from './stores/mobileNavStore'
+import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
@@ -135,16 +136,31 @@ function App() {
       <InstallPrompt />
       <OfflineIndicator />
 
-      {!addPlaceMode && !authLoading && isAuthenticated && isConquestMode && <FactionBar />}
+      {!addPlaceMode && !authLoading && isAuthenticated && (
+        <div className="conquest-area">
+          <ConquestToggle />
+          {isConquestMode && <FactionBar />}
+        </div>
+      )}
       {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
       {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
-
-      {/* Toggle Conquete (mini-bandeau permanent sur la carte) */}
-      {!addPlaceMode && !authLoading && isAuthenticated && <ConquestToggle />}
 
       {/* Header mobile (logo + hamburger, masqué sur desktop) */}
       {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
         <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
+      )}
+
+      {/* Bouton Boutique permanent desktop (masqué sur mobile + quand auth modal ouverte) */}
+      {!addPlaceMode && !showAuthModal && (
+        <a
+          href="https://runesdechene.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="desktop-shop-button"
+        >
+          <img src={shopIcon} alt="" className="desktop-shop-icon" />
+          <span>Revenir à la Boutique</span>
+        </a>
       )}
 
       {/* Toolbar flottante (masquée en mode ajout) */}

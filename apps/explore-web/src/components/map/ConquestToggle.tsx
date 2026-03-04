@@ -37,8 +37,8 @@ export function ConquestToggle() {
   return (
     <>
       <button className="conquest-toggle" onClick={handleToggle}>
-        <span className="conquest-toggle-icon">{'\u2694\uFE0F'}</span>
-        <span className="conquest-toggle-label">Conquete</span>
+        <span className="conquest-toggle-icon">{gameMode === 'conquest' ? '\u2694\uFE0F' : '\uD83E\uDDD9\u200D\u2642\uFE0F'}</span>
+        <span className="conquest-toggle-label">{gameMode === 'conquest' ? 'Conquête' : 'Exploration'}</span>
         <span className={`conquest-toggle-switch ${gameMode === 'conquest' ? 'on' : ''}`} />
       </button>
 

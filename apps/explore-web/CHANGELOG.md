@@ -1,3 +1,10 @@
+# ALPHA V0.3.1
+## Nommage de zone démocratie + corrections de bug
+- Tout une faction peut voter pour nommer un territoire de + de 3 lieux.
+- Corrections de bug mineurs sur mobile.
+- Correction de regen sur les ressources
+
+
 # ALPHA V0.3.0
 ## La Conquête s'affirme
 - Les territoires fusionnés se fortifient entre eux

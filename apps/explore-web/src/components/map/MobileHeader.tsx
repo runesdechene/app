@@ -69,7 +69,7 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
       />
 
       <div className="mobile-header-right">
-        <a href="https://www.runesdechene.com" target="_blank" rel="noopener noreferrer" className="mobile-header-shop">
+        <a href="https://runesdechene.com" target="_blank" rel="noopener noreferrer" className="mobile-header-shop">
           <img src={shopIcon} alt="Boutique" className="mobile-header-shop-icon" />
         </a>
 

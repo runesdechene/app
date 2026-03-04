@@ -28,9 +28,19 @@ function parseChangelog(raw: string): VersionBlock[] {
 
 const versions = parseChangelog(changelogRaw)
 const current = versions[0]
+const SEEN_KEY = 'changelog_seen_version'
 
 export function VersionBadge() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(() => {
+    if (!current) return false
+    const seen = localStorage.getItem(SEEN_KEY)
+    return seen !== current.version
+  })
+
+  function handleClose() {
+    if (current) localStorage.setItem(SEEN_KEY, current.version)
+    setOpen(false)
+  }
 
   if (!current) return null
 
@@ -41,11 +51,11 @@ export function VersionBadge() {
       </button>
 
       {open && (
-        <div className="version-modal-overlay" onClick={() => setOpen(false)}>
+        <div className="version-modal-overlay" onClick={() => handleClose()}>
           <div className="version-modal" onClick={e => e.stopPropagation()}>
             <div className="version-modal-header">
               <h2>{current.version}</h2>
-              <button className="version-modal-close" onClick={() => setOpen(false)}>
+              <button className="version-modal-close" onClick={() => handleClose()}>
                 &#10005;
               </button>
             </div>

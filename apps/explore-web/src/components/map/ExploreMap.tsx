@@ -340,9 +340,8 @@ export const ExploreMap = memo(function ExploreMap() {
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
-  const rawShowFactions = useMapStore(s => s.showFactions)
   const gameMode = useFogStore(s => s.gameMode)
-  const showFactions = rawShowFactions && gameMode === 'conquest'
+  const showFactions = gameMode === 'conquest'
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 

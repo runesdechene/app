@@ -810,7 +810,7 @@ function ClaimButton({
       return
     }
 
-    if (data?.ok) {
+    if (data?.success) {
       setClaimed(true)
       setPlaceOverride(placeId, {
         claimed: true,
@@ -818,7 +818,18 @@ function ClaimButton({
         tagColor: factionColor ?? undefined,
         factionPattern: factionPattern ?? undefined,
       })
-      if (data.conquestPoints !== undefined) useFogStore.getState().setConquestPoints(data.conquestPoints)
+      if (data.conquestPoints !== undefined) {
+        useFogStore.getState().setConquestPoints(data.conquestPoints)
+      }
+      if (data.conquestNextPointIn !== undefined) {
+        useFogStore.getState().setConquestNextPointIn(data.conquestNextPointIn)
+      }
+      if (data.constructionPoints !== undefined) {
+        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+      }
+      if (data.constructionNextPointIn !== undefined) {
+        useFogStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
+      }
       if (data.notorietyPoints !== undefined) useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
 
       useToastStore.getState().addToast({
