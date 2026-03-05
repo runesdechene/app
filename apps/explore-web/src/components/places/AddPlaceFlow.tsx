@@ -60,8 +60,8 @@ export function AddPlaceFlow() {
   // Sync inputs GPS depuis le centre de la carte (sauf si l'utilisateur édite)
   useEffect(() => {
     if (coords && !coordsFocused) {
-      setLatInput(coords.lat.toFixed(5))
-      setLngInput(coords.lng.toFixed(5))
+      setLatInput(coords.lat.toFixed(7))
+      setLngInput(coords.lng.toFixed(7))
     }
   }, [coords, coordsFocused])
 
@@ -494,7 +494,7 @@ export function AddPlaceFlow() {
           {/* Coordonnées confirmées */}
           {confirmedCoords && (
             <div className="add-place-coords-display">
-              {confirmedCoords.lat.toFixed(5)}, {confirmedCoords.lng.toFixed(5)}
+              {confirmedCoords.lat.toFixed(7)}, {confirmedCoords.lng.toFixed(7)}
             </div>
           )}
 

@@ -611,12 +611,17 @@ export const ExploreMap = memo(function ExploreMap() {
     clearPendingZoom()
   }, [pendingZoom, clearPendingZoom])
 
-  // Fly-to demandé depuis l'extérieur (toast cliqué, etc.)
+  // Fly-to demandé depuis l'extérieur (toast cliqué, bouton GPS, saisie coords, etc.)
   useEffect(() => {
     if (!pendingFlyTo) return
     mapRef.current?.flyTo({ center: [pendingFlyTo.lng, pendingFlyTo.lat], zoom: 14, duration: 1200 })
     if (pendingFlyTo.placeId) {
       setSelectedPlaceId(pendingFlyTo.placeId)
+    }
+    // En mode add-place, onMoveEnd ignore les mouvements programmatiques,
+    // donc on met à jour les coords directement ici (flyTo demandé par l'utilisateur)
+    if (addPlaceMode) {
+      setPendingNewPlaceCoords({ lng: pendingFlyTo.lng, lat: pendingFlyTo.lat })
     }
     clearPendingFlyTo()
   }, [pendingFlyTo])
@@ -748,12 +753,15 @@ export const ExploreMap = memo(function ExploreMap() {
   }, [geojson, addPlaceMode, territoryLabels])
 
   // Minimap : mettre à jour le viewport bounds + coords pour add-place
-  const onMoveEnd = useCallback(() => {
+  const onMoveEnd = useCallback((evt: { originalEvent?: unknown }) => {
     const map = mapRef.current?.getMap()
     if (!map) return
     const b = map.getBounds()
     if (b) setViewBounds({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() })
     if (addPlaceMode) {
+      // Ignorer les recentrages programmatiques (GPS tracking du GeolocateControl)
+      // Seuls les gestes utilisateur (drag, zoom molette) ont un originalEvent
+      if (!evt.originalEvent) return
       const center = map.getCenter()
       setPendingNewPlaceCoords({ lng: center.lng, lat: center.lat })
     }
