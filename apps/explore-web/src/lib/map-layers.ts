@@ -32,21 +32,128 @@ export function buildTerritoryBorderLayer(): LayerSpecification {
     paint: {
       'line-dasharray': [4, 2],
       'line-color': ['get', 'tagColor'],
-      // 2 base + 0.3 par lieu (cap 10 lieux → max 5), hover 4.5
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        4.5,
-        ['+', 2, ['*', ['min', ['get', 'placesCount'], 10], 0.3]],
+        3.5,
+        2.5,
       ],
       'line-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         0.8,
-        ['min', ['+', 0.4, ['*', ['min', ['get', 'placesCount'], 10], 0.03]], 0.7],
+        0.55,
       ],
     },
   }
+}
+
+// --- Layer style : Territory labels (symbol layers GPU-side, pas de DOM markers) ---
+
+/** Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré) */
+export const fortBadgeLayer: LayerSpecification = {
+  id: 'places-fort-badge',
+  type: 'symbol',
+  source: 'places',
+  filter: ['>', ['get', 'fortificationLevel'], 0],
+  layout: {
+    'icon-image': ['concat', 'shield::', ['to-string', ['get', 'fortificationLevel']]],
+    'icon-size': [
+      'interpolate', ['linear'], ['zoom'],
+      6, 0.25,
+      9, 0.35,
+      12, 0.45,
+    ],
+    'icon-offset': [38, 38],
+    'icon-allow-overlap': true,
+    'icon-ignore-placement': true,
+  },
+  paint: {
+    'icon-opacity': 0.95,
+  },
+}
+
+/** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image) */
+export const territoryEmblemLayer: LayerSpecification = {
+  id: 'territory-emblems',
+  type: 'symbol',
+  source: 'territory-labels',
+  filter: ['has', 'pattern'],
+  layout: {
+    'icon-image': ['get', 'pattern'],
+    'icon-size': [
+      'interpolate', ['linear'], ['zoom'],
+      3, 0.15,
+      6, 0.25,    // zoom 6 → petite
+      9, 0.30,    // zoom 9 → moyenne
+      12, 0.40,   // zoom 12 → grande
+    ],
+    'icon-allow-overlap': true,
+    'icon-ignore-placement': true,
+  },
+  paint: {
+    'icon-opacity': 0.9,
+  },
+}
+
+/** Rate horaire sous la bannière (+X/h) — symbol layer GPU */
+export const territoryRateLayer: LayerSpecification = {
+  id: 'territory-rates',
+  type: 'symbol',
+  source: 'territory-labels',
+  filter: ['>', ['get', 'hourlyRate'], 0],
+  layout: {
+    'text-field': ['concat', '+', ['to-string', ['get', 'hourlyRate']], '/h'],
+    'text-font': ['Open Sans Bold'],
+    'text-size': 11,
+    'text-offset': [0, -3.5],
+    'text-allow-overlap': true,
+    'text-ignore-placement': true,
+  },
+  paint: {
+    'text-color': ['get', 'tagColor'],
+    'text-opacity': [
+      'interpolate', ['linear'], ['zoom'],
+      8, 0,
+      9, 0.8,
+    ],
+    'text-halo-color': MAP_COLORS.land,
+    'text-halo-width': 1.5,
+  },
+}
+
+/** Label territoire au hover (point nord du blob) */
+export const territoryHoverLabelLayer: LayerSpecification = {
+  id: 'territory-hover-labels',
+  type: 'symbol',
+  source: 'territory-labels',
+  layout: {
+    'text-field': [
+      'concat',
+      ['get', 'factionTitle'],
+      '\n',
+      ['to-string', ['get', 'placesCount']],
+      ['case', ['>', ['get', 'placesCount'], 1], ' lieux', ' lieu'],
+    ],
+    'text-font': ['Open Sans Bold'],
+    'text-size': 11,
+    'text-anchor': 'bottom',
+    'text-offset': [0, -0.5],
+    'text-allow-overlap': true,
+    'text-ignore-placement': true,
+  },
+  paint: {
+    'text-color': ['get', 'tagColor'],
+    'text-halo-color': 'rgba(255,255,255,0.9)',
+    'text-halo-width': 1.5,
+    // Invisible par défaut, visible quand hover = true
+    'text-opacity': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      1,
+      0,
+    ],
+  },
 }
 
 // --- Layer style : Markers ---

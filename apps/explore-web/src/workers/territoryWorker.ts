@@ -59,6 +59,48 @@ function getTerritoryTitle(count: number, tiers: TierDef[]): string {
 
 // --- Helpers ---
 
+/** Douglas-Peucker simplification — réduit les vertices d'un ring */
+const SIMPLIFY_TOLERANCE = 0.0001 // ~11m — imperceptible visuellement
+function simplifyRing(ring: Position[], tolerance: number = SIMPLIFY_TOLERANCE): Position[] {
+  if (ring.length <= 4) return ring // triangle minimum
+
+  let maxDist = 0, maxIdx = 0
+  const first = ring[0], last = ring[ring.length - 2] // -2 car dernier = premier (fermé)
+
+  for (let i = 1; i < ring.length - 1; i++) {
+    const d = perpendicularDist(ring[i], first, last)
+    if (d > maxDist) { maxDist = d; maxIdx = i }
+  }
+
+  if (maxDist <= tolerance) {
+    return [first, ring[ring.length - 1]] // trop simple → juste start/end
+  }
+
+  const left = simplifyRing(ring.slice(0, maxIdx + 1), tolerance)
+  const right = simplifyRing(ring.slice(maxIdx), tolerance)
+  return [...left.slice(0, -1), ...right]
+}
+
+function perpendicularDist(p: Position, a: Position, b: Position): number {
+  const dx = b[0] - a[0], dy = b[1] - a[1]
+  const lenSq = dx * dx + dy * dy
+  if (lenSq === 0) return Math.sqrt((p[0] - a[0]) ** 2 + (p[1] - a[1]) ** 2)
+  const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / lenSq))
+  const projX = a[0] + t * dx, projY = a[1] + t * dy
+  return Math.sqrt((p[0] - projX) ** 2 + (p[1] - projY) ** 2)
+}
+
+/** Simplifie toutes les rings d'une geometry Polygon/MultiPolygon */
+function simplifyGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon {
+  if (geom.type === 'Polygon') {
+    return { type: 'Polygon', coordinates: geom.coordinates.map(ring => simplifyRing(ring)) }
+  }
+  return {
+    type: 'MultiPolygon',
+    coordinates: geom.coordinates.map(poly => poly.map(ring => simplifyRing(ring))),
+  }
+}
+
 /** Rayon du cercle d'influence en km — 0 score = pas de zone */
 function radiusForScore(score: number): number {
   if (score <= 0) return 0
@@ -310,25 +352,45 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
     // Éclater les MultiPolygon en features séparées (chaque blob = son propre ID)
     // et compter les lieux + joueurs dans chaque blob via point-in-polygon
-    if (smoothed.type === 'MultiPolygon') {
-      for (const polyCoords of smoothed.coordinates) {
-        const stats = collectBlobStats(polyCoords[0])
-        territories.push({
-          type: 'Feature',
-          id: id++,
-          geometry: { type: 'Polygon', coordinates: polyCoords },
-          properties: { ...baseProps, ...stats },
-        })
-      }
-    } else {
-      const outerRing = smoothed.coordinates[0]
+    // + pré-calculer les positions label/emblem (évite O(n×m) côté render thread)
+    function addTerritory(polyCoords: Position[][], outerRing: Position[]) {
       const stats = collectBlobStats(outerRing)
+
+      // Point le plus au nord (pour le label texte au hover)
+      let topLon = outerRing[0][0], topLat = outerRing[0][1]
+      for (let i = 1; i < outerRing.length - 1; i++) {
+        if (outerRing[i][1] > topLat) { topLon = outerRing[i][0]; topLat = outerRing[i][1] }
+      }
+      // Bounding box NE pour positionner l'emblème
+      let maxLon = -Infinity, maxLat = -Infinity
+      for (let i = 0; i < outerRing.length - 1; i++) {
+        if (outerRing[i][0] > maxLon) maxLon = outerRing[i][0]
+        if (outerRing[i][1] > maxLat) maxLat = outerRing[i][1]
+      }
+      const emblemLon = maxLon - (maxLon - topLon) * 0.55
+      const emblemLat = maxLat - (maxLat - topLat) * 0.65
+
+      // Simplifier les vertices (Douglas-Peucker) avant envoi à MapLibre
+      const simplified = simplifyGeometry({ type: 'Polygon', coordinates: polyCoords })
+
       territories.push({
         type: 'Feature',
         id: id++,
-        geometry: smoothed,
-        properties: { ...baseProps, ...stats },
+        geometry: simplified,
+        properties: {
+          ...baseProps, ...stats,
+          labelLon: topLon, labelLat: topLat,
+          emblemLon, emblemLat,
+        },
       })
+    }
+
+    if (smoothed.type === 'MultiPolygon') {
+      for (const polyCoords of smoothed.coordinates) {
+        addTerritory(polyCoords, polyCoords[0])
+      }
+    } else {
+      addTerritory(smoothed.coordinates, smoothed.coordinates[0])
     }
   }
 

@@ -78,6 +78,97 @@ export async function buildIconImageData(url: string, color: string): Promise<Im
   return imageData
 }
 
+/** Génère l'ImageData pour un emblème faction en forme de bouclier (pentagone pointu en bas) */
+export async function buildBannerImageData(url: string, color: string): Promise<ImageData> {
+  const cacheKey = `banner::${url}::${color}`
+  const cached = svgImageDataCache.get(cacheKey)
+  if (cached) return cached
+
+  let rawSvg = svgTextCache.get(url)
+  if (!rawSvg) {
+    const res = await fetch(url)
+    rawSvg = await res.text()
+    svgTextCache.set(url, rawSvg)
+  }
+
+  const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
+
+  const SIZE = 150
+  const canvas = document.createElement('canvas')
+  canvas.width = SIZE
+  canvas.height = SIZE
+  const ctx = canvas.getContext('2d')!
+  const cx = SIZE / 2
+
+  // Forme étendard : rectangle haut + pointe courte en bas
+  const w = 120              // largeur
+  const rectH = 96          // hauteur partie rectangulaire
+  const tipH = 40           // hauteur de la pointe
+  const x = cx - w / 2
+  const y = 4
+
+  ctx.beginPath()
+  ctx.moveTo(x, y)
+  ctx.lineTo(x + w, y)
+  ctx.lineTo(x + w, y + rectH)
+  ctx.lineTo(cx, y + rectH + tipH)
+  ctx.lineTo(x, y + rectH)
+  ctx.closePath()
+  ctx.fillStyle = color
+  ctx.fill()
+
+  // Icône centrée dans la forme complète (rect + pointe)
+  const iconSize = 90
+  const iconX = cx - iconSize / 2
+  const iconY = y + (rectH + tipH - iconSize) / 2 - 10
+  ctx.drawImage(whiteIcon, iconX, iconY, iconSize, iconSize)
+
+  const imageData = ctx.getImageData(0, 0, SIZE, SIZE)
+  svgImageDataCache.set(cacheKey, imageData)
+  return imageData
+}
+
+/** Génère l'ImageData pour un badge fortification en forme de bannière (rectangle + demi-cercle) */
+export function buildShieldImageData(level: number, color: string): ImageData {
+  const cacheKey = `shield::${level}::${color}`
+  const cached = svgImageDataCache.get(cacheKey)
+  if (cached) return cached
+
+  const SIZE = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = SIZE
+  canvas.height = SIZE
+  const ctx = canvas.getContext('2d')!
+
+  // Forme bannière : rectangle + demi-cercle en bas
+  const bW = 44
+  const bRectH = 28
+  const bR = bW / 2
+  const bX = (SIZE - bW) / 2
+  const bY = 4
+
+  ctx.beginPath()
+  ctx.moveTo(bX, bY)
+  ctx.lineTo(bX + bW, bY)
+  ctx.lineTo(bX + bW, bY + bRectH)
+  ctx.arc(bX + bR, bY + bRectH, bR, 0, Math.PI)
+  ctx.closePath()
+  ctx.fillStyle = '#5C4033'
+  ctx.fill()
+
+  // Chiffre centré dans la forme complète (rect + demi-cercle)
+  const totalH = bRectH + bR
+  ctx.fillStyle = '#ffffff'
+  ctx.font = 'bold 24px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(String(level), SIZE / 2, bY + totalH / 2)
+
+  const imageData = ctx.getImageData(0, 0, SIZE, SIZE)
+  svgImageDataCache.set(cacheKey, imageData)
+  return imageData
+}
+
 /** Charge une icône SVG colorée dans la map MapLibre (utilise le cache) */
 export async function loadColoredSvgIcon(
   map: maplibregl.Map,
@@ -88,4 +179,30 @@ export async function loadColoredSvgIcon(
   if (!map.hasImage(url)) {
     map.addImage(url, imageData, { sdf: false })
   }
+}
+
+/** Charge un emblème en forme de bannière dans la map MapLibre.
+ *  `bannerKey` inclut le rate pour unicité (ex: "banner::https://...::10").
+ *  La vraie URL SVG est extraite en retirant le préfixe et suffixe. */
+export async function loadBannerIcon(
+  map: maplibregl.Map,
+  bannerKey: string,
+  color: string,
+): Promise<void> {
+  if (map.hasImage(bannerKey)) return
+  const svgUrl = bannerKey.replace(/^banner::/, '')
+  const imageData = await buildBannerImageData(svgUrl, color)
+  map.addImage(bannerKey, imageData, { sdf: false })
+}
+
+/** Charge un badge bouclier de fortification dans la map MapLibre */
+export function loadShieldIcon(
+  map: maplibregl.Map,
+  level: number,
+  color: string = '#5C4033',
+): void {
+  const key = `shield::${level}`
+  if (map.hasImage(key)) return
+  const imageData = buildShieldImageData(level, color)
+  map.addImage(key, imageData, { sdf: false })
 }

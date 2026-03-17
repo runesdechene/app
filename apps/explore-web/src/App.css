@@ -3537,6 +3537,45 @@
   user-select: none;
 }
 
+.territory-name-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.territory-name-label.visible {
+  opacity: 1;
+}
+
+.territory-name-text {
+  font-family:  'Bebas Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--t-color);
+  padding: 2px;
+  text-shadow: 0 0 10px white;
+}
+
+.territory-name-rate {
+  font-family: 'Cabin', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t-color);
+  opacity: 0.8;
+  text-shadow:
+    -1px -1px 0 #F5E6D3,
+     1px -1px 0 #F5E6D3,
+    -1px  1px 0 #F5E6D3,
+     1px  1px 0 #F5E6D3;
+}
+
 .place-fort-badge {
   display: flex;
   align-items: center;
