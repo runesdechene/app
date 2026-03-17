@@ -6,7 +6,7 @@ interface UserProfileData {
   email_address: string
   first_name: string | null
   display_name: string | null
-  profile_image_id: string | null
+  avatar_url: string | null
   biography: string
   rank: string
   placesCount: number
@@ -62,9 +62,7 @@ export function UserProfile({ authEmail }: { authEmail: string }) {
     )
   }
 
-  const avatarUrl = profile.profile_image_id 
-    ? `https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/avatars/${profile.profile_image_id}`
-    : null
+  const avatarUrl = profile.avatar_url || null
 
   return (
     <div className="user-profile">

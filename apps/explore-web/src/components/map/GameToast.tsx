@@ -35,6 +35,7 @@ function renderMessage(
   message: string,
   highlights: string[],
   actions: Map<string, () => void>,
+  highlightColors: Map<string, string>,
 ) {
   // Filtrer les highlights vides pour éviter une boucle infinie
   const safeHL = highlights.filter(h => h.length > 0)
@@ -69,18 +70,20 @@ function renderMessage(
       {parts.map((p, i) => {
         if (!p.bold) return p.text
         const action = actions.get(p.text)
+        const color = highlightColors.get(p.text)
         if (action) {
           return (
             <strong
               key={i}
               className="game-toast-link"
+              style={color ? { color } : undefined}
               onClick={(e) => { e.stopPropagation(); action() }}
             >
               {p.text}
             </strong>
           )
         }
-        return <strong key={i}>{p.text}</strong>
+        return <strong key={i} style={color ? { color } : undefined}>{p.text}</strong>
       })}
     </>
   )
@@ -100,10 +103,14 @@ function ToastItem({ toast }: { toast: GameToastType }) {
   // Construire les actions cliquables pour chaque highlight
   const actions = new Map<string, () => void>()
 
-  // Nom du joueur → ouvrir profil
+  // Couleurs des noms d'utilisateurs (faction color)
+  const highlightColors = new Map<string, string>()
+
+  // Nom du joueur → ouvrir profil + couleur faction
   if (toast.actorId && highlights.length > 0) {
     const actorName = highlights[0]
     actions.set(actorName, () => setSelectedPlayerId(toast.actorId!))
+    if (toast.color) highlightColors.set(actorName, toast.color)
   }
 
   // Nom du lieu → fly to + ouvrir panel + fermer panel mobile
@@ -119,10 +126,11 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     })
   }
 
-  // Ancien controleur → ouvrir profil
+  // Ancien controleur → ouvrir profil + couleur faction
   if (toast.previousActorId && highlights.length > 2) {
     const prevName = highlights[2]
     actions.set(prevName, () => setSelectedPlayerId(toast.previousActorId!))
+    if (toast.previousActorColor) highlightColors.set(prevName, toast.previousActorColor)
   }
 
   return (
@@ -145,7 +153,7 @@ function ToastItem({ toast }: { toast: GameToastType }) {
         <span className="game-toast-icon">{ICONS[toast.type]}</span>
       )}
       <span className="game-toast-message">
-        {highlights.length > 0 ? renderMessage(toast.message, highlights, actions) : toast.message}
+        {highlights.length > 0 ? renderMessage(toast.message, highlights, actions, highlightColors) : toast.message}
       </span>
       <span className="game-toast-time">{formatTimeAgo(toast.timestamp)}</span>
       <button

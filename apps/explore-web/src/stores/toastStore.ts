@@ -17,6 +17,8 @@ export interface GameToast {
   actorId?: string
   /** ID de l'ancien controleur (conquete contestee) */
   previousActorId?: string
+  /** Couleur faction de l'ancien controleur */
+  previousActorColor?: string
   /** ID du lieu (pour clic → fly to + ouvrir panel) */
   placeId?: string
   /** Coordonnées du lieu */
