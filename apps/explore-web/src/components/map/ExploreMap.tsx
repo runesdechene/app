@@ -1,13 +1,18 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Map as MapGL, Source, Layer, Popup, Marker, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
-import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
+import type { StyleSpecification } from 'maplibre-gl'
 import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { usePlaces } from '../../hooks/usePlaces'
 import type { PlaceProperties } from '../../hooks/usePlaces'
-import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle, MAP_COLORS } from '../../lib/map-style'
+import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle } from '../../lib/map-style'
+import { loadColoredSvgIcon } from '../../lib/map-icons'
+import {
+  buildTerritoryFillLayer, buildTerritoryBorderLayer, UNKNOWN_ICON_ID,
+  undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
+} from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { usePlayersStore } from '../../stores/playersStore'
@@ -15,242 +20,7 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { TerritoryMarkers } from './TerritoryMarkers'
-// --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
-
-const ICON_SIZE = 120
-
-// Cache module-level : survit aux re-renders et changements de style
-const svgImageDataCache = new Map<string, ImageData>()
-const svgTextCache = new Map<string, string>()
-
-/** Charge un SVG text en HTMLImageElement */
-function svgToImage(svgText: string): Promise<HTMLImageElement> {
-  const blob = new Blob([svgText], { type: 'image/svg+xml' })
-  const blobUrl = URL.createObjectURL(blob)
-  return new Promise((resolve, reject) => {
-    const img = document.createElement('img')
-    img.onload = () => { URL.revokeObjectURL(blobUrl); resolve(img) }
-    img.onerror = () => { URL.revokeObjectURL(blobUrl); reject() }
-    img.src = blobUrl
-  })
-}
-
-/** Force une couleur de fill sur tout le SVG via <style> !important */
-function colorizeSvg(rawSvg: string, color: string): string {
-  const style = `<style>path,circle,rect,polygon,polyline,ellipse,line{fill:${color}!important}[fill="none"]{fill:none!important}</style>`
-  return rawSvg.replace(/(<svg[^>]*>)/, `$1${style}`)
-}
-
-/** Ajuste une couleur hex : amount > 0 éclaircit, < 0 assombrit */
-function shiftColor(hex: string, amount: number): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
-  const shift = (c: number) => Math.max(0, Math.min(255, Math.round(
-    amount > 0 ? c + (255 - c) * amount : c * (1 + amount),
-  )))
-  return `rgb(${shift(r)},${shift(g)},${shift(b)})`
-}
-
-/** Génère l'ImageData pour un SVG coloré (avec cache) */
-async function buildIconImageData(url: string, color: string): Promise<ImageData> {
-  const cacheKey = `${url}::${color}`
-  const cached = svgImageDataCache.get(cacheKey)
-  if (cached) return cached
-
-  // Fetch le SVG brut (avec cache texte)
-  let rawSvg = svgTextCache.get(url)
-  if (!rawSvg) {
-    const res = await fetch(url)
-    rawSvg = await res.text()
-    svgTextCache.set(url, rawSvg)
-  }
-
-  const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
-
-  const canvas = document.createElement('canvas')
-  canvas.width = ICON_SIZE
-  canvas.height = ICON_SIZE
-  const ctx = canvas.getContext('2d')!
-  const cx = ICON_SIZE / 2
-  const cy = ICON_SIZE / 2
-  const r = ICON_SIZE / 2 - 1
-
-  const grad = ctx.createLinearGradient(cx, cy - r, cx, cy + r)
-  grad.addColorStop(0, shiftColor(color, 0.35))
-  grad.addColorStop(0.5, color)
-  grad.addColorStop(1, shiftColor(color, -0.25))
-
-  ctx.beginPath()
-  ctx.arc(cx, cy, r, 0, Math.PI * 2)
-  ctx.fillStyle = grad
-  ctx.fill()
-
-  const iconSize = ICON_SIZE * 0.55
-  const iconOffset = (ICON_SIZE - iconSize) / 2
-  ctx.drawImage(whiteIcon, iconOffset, iconOffset, iconSize, iconSize)
-
-  const imageData = ctx.getImageData(0, 0, ICON_SIZE, ICON_SIZE)
-  svgImageDataCache.set(cacheKey, imageData)
-  return imageData
-}
-
-/** Charge une icône SVG colorée dans la map MapLibre (utilise le cache) */
-async function loadColoredSvgIcon(
-  map: maplibregl.Map,
-  url: string,
-  color: string,
-): Promise<void> {
-  const imageData = await buildIconImageData(url, color)
-  if (!map.hasImage(url)) {
-    map.addImage(url, imageData, { sdf: false })
-  }
-}
-
-// --- Layer style : Territoires (construits dynamiquement selon la faction du joueur) ---
-
-function buildTerritoryFillLayer(userFactionId: string | null): LayerSpecification {
-  const myFaction = userFactionId ?? ''
-  return {
-    id: 'territories-fill',
-    type: 'fill',
-    source: 'territories',
-    paint: {
-      'fill-color': ['get', 'tagColor'],
-      'fill-opacity': [
-        'case',
-        ['==', ['get', 'faction'], myFaction],
-        0.28,    // Ma faction : bien visible
-        ['boolean', ['feature-state', 'hover'], false],
-        0.30,    // Hover autre faction
-        0.18,    // Autre faction : standard
-      ],
-      'fill-antialias': false,
-    },
-  }
-}
-
-function buildTerritoryBorderLayer(): LayerSpecification {
-  return {
-    id: 'territories-border',
-    type: 'line',
-    source: 'territories',
-    paint: {
-      'line-dasharray': [4, 2],
-      'line-color': ['get', 'tagColor'],
-      // 2 base + 0.3 par lieu (cap 10 lieux → max 5), hover 4.5
-      'line-width': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        4.5,
-        ['+', 2, ['*', ['min', ['get', 'placesCount'], 10], 0.3]],
-      ],
-      'line-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'hover'], false],
-        0.8,
-        ['min', ['+', 0.4, ['*', ['min', ['get', 'placesCount'], 10], 0.03]], 0.7],
-      ],
-    },
-  }
-}
-
-// --- Layer style : Markers ---
-
-const UNKNOWN_ICON_ID = '__unknown-place'
-
-// Fallback cercles flous si pas d'icône unknown configurée (caché quand icône dispo)
-// S'applique à TOUS les lieux non découverts (y compris faction alliée)
-const undiscoveredCircleLayer: LayerSpecification = {
-  id: 'places-undiscovered-circle',
-  type: 'circle',
-  source: 'places',
-  filter: ['==', ['get', 'discovered'], false],
-  paint: {
-    'circle-color': '#8A7B6A',
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 4,
-      8, 6,
-      12, 9,
-    ],
-    'circle-stroke-width': 0,
-    'circle-opacity': 0.6,
-    'circle-blur': 1,
-  },
-}
-
-// Icône custom pour les lieux non découverts (visible quand icône chargée)
-// S'applique à TOUS les lieux non découverts (y compris faction alliée)
-const undiscoveredIconLayer: LayerSpecification = {
-  id: 'places-undiscovered-icon',
-  type: 'symbol',
-  source: 'places',
-  filter: ['==', ['get', 'discovered'], false],
-  layout: {
-    'icon-image': UNKNOWN_ICON_ID,
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 0.25,
-      8, 0.35,
-      12, 0.5,
-    ],
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 0.8,
-  },
-}
-
-// Cercles colorés nets — lieux découverts SANS icône
-const pointLayer: LayerSpecification = {
-  id: 'places-point',
-  type: 'circle',
-  source: 'places',
-  filter: ['all',
-    ['==', ['get', 'tagIcon'], ''],
-    ['==', ['get', 'discovered'], true],
-  ],
-  paint: {
-    'circle-color': ['get', 'iconColor'],
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 3,
-      8, 5,
-      12, 7,
-    ],
-    'circle-stroke-width': 1.5,
-    'circle-stroke-color': MAP_COLORS.land,
-    'circle-opacity': 1,
-    'circle-blur': 0,
-  },
-}
-
-// Icônes SVG colorées — lieux découverts avec icône
-const iconLayer: LayerSpecification = {
-  id: 'places-icon',
-  type: 'symbol',
-  source: 'places',
-  filter: ['all',
-    ['!=', ['get', 'tagIcon'], ''],
-    ['==', ['get', 'discovered'], true],
-  ],
-  layout: {
-    'icon-image': ['get', 'tagIcon'],
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 0.15,
-      8, 0.25,
-      12, 0.4,
-    ],
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 1,
-  },
-}
+import { MapStyleSelect } from './MapStyleSelect'
 
 // --- Component ---
 
@@ -261,74 +31,6 @@ interface PopupInfo {
   title: string
   tagTitle: string
   tagColor: string
-}
-
-// --- Map Style Select (dropdown vers le haut, style Google Maps) ---
-
-type MapStyleMode = 'game' | 'detailed' | 'satellite'
-
-const STYLE_OPTIONS: { mode: MapStyleMode; label: string; icon: string }[] = [
-  { mode: 'game',      label: 'Jeu',       icon: '\uD83D\uDCDC' },  // 📜
-  { mode: 'detailed',  label: 'Détaillé',  icon: '\uD83C\uDFD8\uFE0F' },  // 🏘️
-  { mode: 'satellite', label: 'Satellite', icon: '\uD83D\uDEF0\uFE0F' },  // 🛰️
-]
-
-function MapStyleSelect({ mode, onChange, addPlaceMode }: {
-  mode: MapStyleMode
-  onChange: (m: MapStyleMode) => void
-  addPlaceMode: boolean
-}) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Fermer au clic extérieur
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
-
-  const current = STYLE_OPTIONS.find(o => o.mode === mode)!
-
-  return (
-    <div
-      ref={ref}
-      className="map-style-select"
-      style={addPlaceMode ? { bottom: 70 } : undefined}
-    >
-      {/* Dropdown (s'ouvre vers le haut) */}
-      {open && (
-        <div className="map-style-dropdown">
-          {STYLE_OPTIONS.map(opt => (
-            <button
-              key={opt.mode}
-              className={`map-style-option${opt.mode === mode ? ' active' : ''}`}
-              onClick={() => { onChange(opt.mode); setOpen(false) }}
-            >
-              <span className="map-style-option-icon">{opt.icon}</span>
-              <span className="map-style-option-label">{opt.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Bouton principal (icône layers) */}
-      <button
-        className="map-style-trigger"
-        onClick={() => setOpen(!open)}
-        title={`Style : ${current.label}`}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 2 7 12 12 22 7 12 2" />
-          <polyline points="2 17 12 22 22 17" />
-          <polyline points="2 12 12 17 22 12" />
-        </svg>
-      </button>
-    </div>
-  )
 }
 
 const MAP_STYLE_PROP = { width: '100%', height: '100%' } as const
