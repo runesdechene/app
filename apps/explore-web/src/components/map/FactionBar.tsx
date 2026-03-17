@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { FactionMembersModal } from './FactionMembersModal'
 
 interface FactionNotoriety {
@@ -19,7 +19,7 @@ export function FactionBar() {
   const [stats, setStats] = useState<FactionNotoriety[]>([])
   const [selectedFaction, setSelectedFaction] = useState<FactionNotoriety | null>(null)
   const placeOverrides = useMapStore(s => s.placeOverrides)
-  const userFactionId = useFogStore(s => s.userFactionId)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
 
   useEffect(() => {
     async function fetchNotoriety() {

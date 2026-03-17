@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
-import { setDisplayedTitles } from '../../hooks/useFog'
+import { setDisplayedTitles } from '../../hooks/usePlayer'
 import { FactionMembersModal } from './FactionMembersModal'
 
 interface PlaceCard {
@@ -61,7 +61,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [profile, setProfile] = useState<PlayerProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const currentUserId = useFogStore(s => s.userId)
+  const currentUserId = usePlayerStore(s => s.userId)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -158,9 +158,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     const { data } = await supabase.rpc('get_player_profile', { p_user_id: currentUserId })
     if (data) setProfile(data as unknown as PlayerProfile)
 
-    useFogStore.getState().setUserName(editName)
+    usePlayerStore.getState().setUserName(editName)
     if (avatarUrl) {
-      useFogStore.getState().setUserAvatarUrl(avatarUrl)
+      usePlayerStore.getState().setUserAvatarUrl(avatarUrl)
     }
     setAvatarFile(null)
     setAvatarPreview(null)

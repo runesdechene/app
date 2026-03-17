@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChatStore } from '../../stores/chatStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { sendChatMessage } from '../../hooks/useChat'
 import { supabase } from '../../lib/supabase'
@@ -22,7 +22,7 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
   const toggleGeneral = useChatStore((s) => s.toggleShowGeneral)
   const toggleFaction = useChatStore((s) => s.toggleShowFaction)
   const toggleBugs = useChatStore((s) => s.toggleShowBugs)
-  const userFactionColor = useFogStore((s) => s.userFactionColor)
+  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
 
   return (
     <div className="chat-filters">
@@ -115,7 +115,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
   const [sendError, setSendError] = useState<string | null>(null)
   const sendChannel = useChatStore((s) => s.sendChannel)
   const setSendChannel = useChatStore((s) => s.setSendChannel)
-  const userFactionColor = useFogStore((s) => s.userFactionColor)
+  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
 
   async function handleSend() {
     const raw = text.trim()
@@ -124,7 +124,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
     // Cheat code: recharge toutes les ressources au max (admin only, en base)
     if (raw === '1453') {
       setText('')
-      const fog = useFogStore.getState()
+      const fog = usePlayerStore.getState()
       if (!fog.userId) return
       const { data } = await supabase.rpc('cheat_refill', { p_user_id: fog.userId })
       if (data && data.success) {
@@ -143,7 +143,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       setText('')
       const targetName = raw.slice(5).trim()
       if (!targetName) return
-      const fog = useFogStore.getState()
+      const fog = usePlayerStore.getState()
       if (!fog.userId) return
       const { data } = await supabase.rpc('cheat_refill_target', {
         p_caller_id: fog.userId,
@@ -263,9 +263,9 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
 // ---- Main Component ----
 
 export function ChatPanel() {
-  const userId = useFogStore((s) => s.userId)
-  const userFactionId = useFogStore((s) => s.userFactionId)
-  const userFactionColor = useFogStore((s) => s.userFactionColor)
+  const userId = usePlayerStore((s) => s.userId)
+  const userFactionId = usePlayerStore((s) => s.userFactionId)
+  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
 
   const showGeneral = useChatStore((s) => s.showGeneral)
   const showFaction = useChatStore((s) => s.showFaction)

@@ -1,16 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { EmailChangeModal } from './EmailChangeModal'
-
-interface ProfileData {
-  id: string
-  lastName: string
-  role: string
-  profileImage: { id: string; url: string } | null
-  faction: { id: string; title: string; color: string; pattern: string | null } | null
-}
 
 interface ProfileMenuProps {
   email: string
@@ -19,33 +10,18 @@ interface ProfileMenuProps {
 }
 
 export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuProps) {
-  const [profile, setProfile] = useState<ProfileData | null>(null)
   const [open, setOpen] = useState(false)
   const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  const userId = useFogStore(s => s.userId)
 
-  useEffect(() => {
-    async function fetchProfile() {
-      const { data: user } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email_address', email)
-        .single()
-
-      if (!user) return
-
-      const { data } = await supabase.rpc('get_my_informations', {
-        p_user_id: user.id,
-      })
-
-      if (data && !data.error) {
-        setProfile(data as ProfileData)
-      }
-    }
-
-    fetchProfile()
-  }, [email])
+  // Lire directement depuis playerStore au lieu de refaire un appel RPC
+  const userId = usePlayerStore(s => s.userId)
+  const userName = usePlayerStore(s => s.userName)
+  const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
+  const isAdmin = usePlayerStore(s => s.isAdmin)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userFactionColor = usePlayerStore(s => s.userFactionColor)
+  const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
 
   // Fermer le menu si clic a l'exterieur
   useEffect(() => {
@@ -61,7 +37,8 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
-  const initial = profile?.lastName?.[0]?.toUpperCase() || email[0].toUpperCase()
+  const displayName = userName || email
+  const initial = displayName[0].toUpperCase()
 
   function handleViewProfile() {
     if (!userId) return
@@ -76,9 +53,9 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
         onClick={() => setOpen(o => !o)}
         aria-label="Mon profil"
       >
-        {profile?.profileImage ? (
+        {userAvatarUrl ? (
           <img
-            src={profile.profileImage.url}
+            src={userAvatarUrl}
             alt=""
             className="profile-btn-avatar"
           />
@@ -91,9 +68,9 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
         <div className="profile-dropdown">
           <div className="profile-dropdown-header">
             <span className="profile-dropdown-name">
-              {profile?.lastName || email}
+              {displayName}
             </span>
-            {profile?.role === 'admin' && (
+            {isAdmin && (
               <span className="profile-dropdown-admin">Admin</span>
             )}
           </div>
@@ -108,13 +85,13 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             className="profile-dropdown-action"
             onClick={() => { setOpen(false); onFactionModal() }}
           >
-            {profile?.faction ? (
+            {userFactionId ? (
               <span className="faction-current">
                 <span
                   className="faction-selector-dot"
-                  style={{ backgroundColor: profile.faction.color }}
+                  style={{ backgroundColor: userFactionColor ?? undefined }}
                 />
-                {profile.faction.title}
+                {userFactionTitle}
               </span>
             ) : (
               'Rejoindre une faction'

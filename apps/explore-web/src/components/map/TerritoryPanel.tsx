@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { TerritorySelection } from '../../stores/mapStore'
 import { useMapStore } from '../../stores/mapStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { supabase } from '../../lib/supabase'
 
 interface PlaceTag {
@@ -61,8 +61,8 @@ function formatDistance(km: number): string {
 }
 
 export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: Props) {
-  const userId = useFogStore(s => s.userId)
-  const userPosition = useFogStore(s => s.userPosition)
+  const userId = usePlayerStore(s => s.userId)
+  const userPosition = usePlayerStore(s => s.userPosition)
   const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 

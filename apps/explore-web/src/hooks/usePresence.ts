@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
-import { useFogStore } from '../stores/fogStore'
+import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
 import { usePlayersStore } from '../stores/playersStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
@@ -23,7 +23,7 @@ const TRACK_INTERVAL_MS = 10_000 // Re-track position toutes les 10s
  * quand des joueurs arrivent, et synchronise les positions.
  */
 export function usePresence() {
-  const userId = useFogStore(s => s.userId)
+  const userId = usePlayerStore(s => s.userId)
   const channelRef = useRef<RealtimeChannel | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -58,8 +58,8 @@ export function usePresence() {
       const { setPlayer, removePlayer } = usePlayersStore.getState()
 
       function buildPayload(): PresencePayload {
-        const pos = useFogStore.getState().userPosition
-        const avatar = useFogStore.getState().userAvatarUrl
+        const pos = usePlayerStore.getState().userPosition
+        const avatar = usePlayerStore.getState().userAvatarUrl
         return {
           userId: userId!,
           name,

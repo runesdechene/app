@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { supabase } from '../../lib/supabase'
 import { FactionModal } from '../auth/FactionModal'
 
 export function ConquestToggle() {
-  const gameMode = useFogStore(s => s.gameMode)
-  const userId = useFogStore(s => s.userId)
-  const userFactionId = useFogStore(s => s.userFactionId)
-  const setGameMode = useFogStore(s => s.setGameMode)
+  const gameMode = usePlayerStore(s => s.gameMode)
+  const userId = usePlayerStore(s => s.userId)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const setGameMode = usePlayerStore(s => s.setGameMode)
   const [showFactionModal, setShowFactionModal] = useState(false)
 
   async function handleToggle() {

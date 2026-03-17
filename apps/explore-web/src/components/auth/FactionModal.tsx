@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 
 interface FactionData {
   id: string
@@ -29,12 +30,15 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const [selecting, setSelecting] = useState(false)
   const [confirmFaction, setConfirmFaction] = useState<string | null>(null)
 
-  const userId = useFogStore(s => s.userId)
-  const notorietyPoints = useFogStore(s => s.notorietyPoints)
-  const setUserFactionId = useFogStore(s => s.setUserFactionId)
-  const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
-  const setNotorietyPoints = useFogStore(s => s.setNotorietyPoints)
-  const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
+  const userId = usePlayerStore(s => s.userId)
+  const notorietyPoints = usePlayerStore(s => s.notorietyPoints)
+  const setUserFactionId = usePlayerStore(s => s.setUserFactionId)
+  const setUserFactionColor = usePlayerStore(s => s.setUserFactionColor)
+  const setUserFactionTitle = usePlayerStore(s => s.setUserFactionTitle)
+  const setUserFactionPattern = usePlayerStore(s => s.setUserFactionPattern)
+  const setNotorietyPoints = usePlayerStore(s => s.setNotorietyPoints)
+  const setDiscoveredIds = usePlayerStore(s => s.setDiscoveredIds)
+  const incrementPlacesRefreshKey = useMapStore(s => s.incrementPlacesRefreshKey)
 
   useEffect(() => {
     Promise.all([
@@ -70,7 +74,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     if (discRes.data) setDiscoveredIds(discRes.data as string[])
     if (energyRes.data) {
       const d = energyRes.data as Record<string, number>
-      useFogStore.setState({
+      usePlayerStore.setState({
         energy: d.energy ?? 0,
         maxEnergy: d.maxEnergy ?? 5,
         nextPointIn: d.nextPointIn ?? 0,
@@ -113,6 +117,8 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     const faction = factions.find(f => f.id === factionId)
     setUserFactionId(factionId)
     setUserFactionColor(faction?.color ?? null)
+    setUserFactionTitle(faction?.title ?? null)
+    setUserFactionPattern(faction?.pattern ?? null)
 
     // Diviser notoriete par 2 si changement
     if (isChanging) {
@@ -121,8 +127,10 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
     await reloadAfterFactionChange()
 
-    // Recharger la page pour synchroniser tout l'état
-    window.location.reload()
+    // Re-fetch les places (couleurs de faction changent) + fermer la modal
+    incrementPlacesRefreshKey()
+    setSelecting(false)
+    onClose(true)
   }
 
   async function leaveFaction() {

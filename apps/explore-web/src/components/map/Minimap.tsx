@@ -184,18 +184,31 @@ export function Minimap({ geojson, bounds, onNavigate }: MinimapProps) {
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
     }
 
-    // Dessiner chaque point
+    // Batch par couleur+alpha pour réduire les draw calls (5000 → ~10)
+    const batches = new Map<string, Path2D>()
+
     for (const f of geojson.features) {
       const [lng, lat] = f.geometry.coordinates
       const [x, y] = toPixel(lng, lat)
       const props = f.properties
+      const alpha = props.discovered ? 1 : FOG_ALPHA
+      const color = props.claimed ? props.tagColor : UNCLAIMED_COLOR
+      const key = `${color}::${alpha}`
 
-      ctx.globalAlpha = props.discovered ? 1 : FOG_ALPHA
-      ctx.fillStyle = props.claimed ? props.tagColor : UNCLAIMED_COLOR
+      let path = batches.get(key)
+      if (!path) {
+        path = new Path2D()
+        batches.set(key, path)
+      }
+      path.moveTo(x + POINT_RADIUS, y)
+      path.arc(x, y, POINT_RADIUS, 0, Math.PI * 2)
+    }
 
-      ctx.beginPath()
-      ctx.arc(x, y, POINT_RADIUS, 0, Math.PI * 2)
-      ctx.fill()
+    for (const [key, path] of batches) {
+      const [color, alpha] = key.split('::')
+      ctx.globalAlpha = Number(alpha)
+      ctx.fillStyle = color
+      ctx.fill(path)
     }
 
     ctx.globalAlpha = 1

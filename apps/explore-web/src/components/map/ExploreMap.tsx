@@ -9,13 +9,19 @@ import { usePlaces } from '../../hooks/usePlaces'
 import type { PlaceProperties } from '../../hooks/usePlaces'
 import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle, MAP_COLORS } from '../../lib/map-style'
 import { useMapStore } from '../../stores/mapStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
+import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
+import { TerritoryMarkers } from './TerritoryMarkers'
 // --- Utilitaire : SVG coloré avec bordure → ImageData pour MapLibre ---
 
 const ICON_SIZE = 120
+
+// Cache module-level : survit aux re-renders et changements de style
+const svgImageDataCache = new Map<string, ImageData>()
+const svgTextCache = new Map<string, string>()
 
 /** Charge un SVG text en HTMLImageElement */
 function svgToImage(svgText: string): Promise<HTMLImageElement> {
@@ -46,15 +52,20 @@ function shiftColor(hex: string, amount: number): string {
   return `rgb(${shift(r)},${shift(g)},${shift(b)})`
 }
 
-async function loadColoredSvgIcon(
-  map: maplibregl.Map,
-  url: string,
-  color: string,
-): Promise<void> {
-  const res = await fetch(`${url}?v=${Date.now()}`)
-  const rawSvg = await res.text()
+/** Génère l'ImageData pour un SVG coloré (avec cache) */
+async function buildIconImageData(url: string, color: string): Promise<ImageData> {
+  const cacheKey = `${url}::${color}`
+  const cached = svgImageDataCache.get(cacheKey)
+  if (cached) return cached
 
-  // Icône en blanc
+  // Fetch le SVG brut (avec cache texte)
+  let rawSvg = svgTextCache.get(url)
+  if (!rawSvg) {
+    const res = await fetch(url)
+    rawSvg = await res.text()
+    svgTextCache.set(url, rawSvg)
+  }
+
   const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
 
   const canvas = document.createElement('canvas')
@@ -65,23 +76,32 @@ async function loadColoredSvgIcon(
   const cy = ICON_SIZE / 2
   const r = ICON_SIZE / 2 - 1
 
-  // Fond : cercle avec dégradé linéaire (clair en haut, sombre en bas)
   const grad = ctx.createLinearGradient(cx, cy - r, cx, cy + r)
-  grad.addColorStop(0, shiftColor(color, 0.35))    // haut clair
-  grad.addColorStop(0.5, color)                     // milieu couleur tag
-  grad.addColorStop(1, shiftColor(color, -0.25))   // bas assombri
+  grad.addColorStop(0, shiftColor(color, 0.35))
+  grad.addColorStop(0.5, color)
+  grad.addColorStop(1, shiftColor(color, -0.25))
 
   ctx.beginPath()
   ctx.arc(cx, cy, r, 0, Math.PI * 2)
   ctx.fillStyle = grad
   ctx.fill()
 
-  // Icône blanche centrée (60% du diamètre du cercle)
   const iconSize = ICON_SIZE * 0.55
   const iconOffset = (ICON_SIZE - iconSize) / 2
   ctx.drawImage(whiteIcon, iconOffset, iconOffset, iconSize, iconSize)
 
   const imageData = ctx.getImageData(0, 0, ICON_SIZE, ICON_SIZE)
+  svgImageDataCache.set(cacheKey, imageData)
+  return imageData
+}
+
+/** Charge une icône SVG colorée dans la map MapLibre (utilise le cache) */
+async function loadColoredSvgIcon(
+  map: maplibregl.Map,
+  url: string,
+  color: string,
+): Promise<void> {
+  const imageData = await buildIconImageData(url, color)
   if (!map.hasImage(url)) {
     map.addImage(url, imageData, { sdf: false })
   }
@@ -317,7 +337,7 @@ const INITIAL_VIEW = { longitude: 7.26, latitude: 43.7, zoom: 9 }
 
 export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
-  const { geojson, loading, error } = usePlaces()
+  const { geojson, rawGeojson, loading, error } = usePlaces()
   const [territories, setTerritories] = useState<FeatureCollection<Polygon | MultiPolygon> | null>(null)
   const workerRef = useRef<Worker | null>(null)
   const [workerProgress, setWorkerProgress] = useState<{ phase: string; percent: number } | null>(null)
@@ -329,18 +349,18 @@ export const ExploreMap = memo(function ExploreMap() {
   const clearPendingFlyTo = useMapStore(state => state.clearPendingFlyTo)
   const pendingZoom = useMapStore(state => state.pendingZoom)
   const clearPendingZoom = useMapStore(state => state.clearPendingZoom)
-  const setUserPosition = useFogStore(s => s.setUserPosition)
-  const userPosition = useFogStore(s => s.userPosition)
-  const userAvatarUrl = useFogStore(s => s.userAvatarUrl)
-  const userFactionId = useFogStore(s => s.userFactionId)
-  const userFactionColor = useFogStore(s => s.userFactionColor)
-  const currentUserId = useFogStore(s => s.userId)
+  const setUserPosition = usePlayerStore(s => s.setUserPosition)
+  const userPosition = usePlayerStore(s => s.userPosition)
+  const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userFactionColor = usePlayerStore(s => s.userFactionColor)
+  const currentUserId = usePlayerStore(s => s.userId)
   const onlinePlayers = usePlayersStore(s => s.players)
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
-  const gameMode = useFogStore(s => s.gameMode)
+  const gameMode = usePlayerStore(s => s.gameMode)
   const showFactions = gameMode === 'conquest'
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
@@ -526,6 +546,8 @@ export const ExploreMap = memo(function ExploreMap() {
     } else if (mapStyleMode === 'game' && gameStyleRef.current) {
       setMapStyle(gameStyleRef.current)
     }
+    // Après changement de style, MapLibre perd les images custom → re-injecter depuis le cache
+    loadedIconsRef.current.clear()
   }, [mapStyleMode])
 
   // Web Worker : calcul des territoires en arrière-plan
@@ -546,7 +568,7 @@ export const ExploreMap = memo(function ExploreMap() {
     return () => worker.terminate()
   }, [])
 
-  // Géolocalisation navigateur : centrer la carte + alimenter fogStore
+  // Géolocalisation navigateur : centrer la carte + alimenter playerStore
   // On stocke la position dans une ref pour l'utiliser dans onMapLoad
   const geoResultRef = useRef<{ lng: number; lat: number } | null>(null)
 
@@ -653,47 +675,53 @@ export const ExploreMap = memo(function ExploreMap() {
           map.addImage(UNKNOWN_ICON_ID, img)
           setUnknownIconLoaded(true)
         }
-        img.src = `${url}?v=${Date.now()}`
+        img.src = url
       })
   }, [])
 
+  const workerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
-    if (!geojson || !workerRef.current) return
-    // Tous les lieux revendiqués → zone d'influence (visible même non découverts)
-    workerRef.current.postMessage({
-      features: geojson.features
-        .filter(f => {
-          const ov = placeOverrides.get(f.properties.id)
-          return f.properties.claimed || ov?.claimed
-        })
-        .map(f => {
-          const ov = placeOverrides.get(f.properties.id)
-          return {
-            coordinates: f.geometry.coordinates as [number, number],
-            placeId: f.properties.id,
-            faction: ov?.factionId || f.properties.factionId,
-            factionTitle: f.properties.tagTitle,
-            tagColor: ov?.tagColor || f.properties.tagColor,
-            factionPattern: ov?.factionPattern || f.properties.factionPattern,
-            score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
-            fortificationLevel: f.properties.fortificationLevel ?? 0,
-            claimedByName: f.properties.claimedByName,
-            claimedById: f.properties.claimedById,
-          }
-        }),
-      tiers: territoryTiers,
-    })
-  }, [geojson, placeOverrides, territoryTiers])
+    if (!rawGeojson || !workerRef.current) return
+    // Debounce 500ms : évite de recalculer les territoires à chaque micro-changement
+    if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current)
+    workerDebounceRef.current = setTimeout(() => {
+      if (!workerRef.current) return
+      workerRef.current.postMessage({
+        features: rawGeojson.features
+          .filter(f => {
+            const ov = placeOverrides.get(f.properties.id)
+            return f.properties.claimed || ov?.claimed
+          })
+          .map(f => {
+            const ov = placeOverrides.get(f.properties.id)
+            return {
+              coordinates: f.geometry.coordinates as [number, number],
+              placeId: f.properties.id,
+              faction: ov?.factionId || f.properties.factionId,
+              factionTitle: f.properties.tagTitle,
+              tagColor: ov?.tagColor || f.properties.tagColor,
+              factionPattern: ov?.factionPattern || f.properties.factionPattern,
+              score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
+              fortificationLevel: f.properties.fortificationLevel ?? 0,
+              claimedByName: f.properties.claimedByName,
+              claimedById: f.properties.claimedById,
+            }
+          }),
+        tiers: territoryTiers,
+      })
+    }, 500)
+    return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
+  }, [rawGeojson, placeOverrides, territoryTiers])
 
   // Charger les icônes SVG colorées dans la map
+  // Utilise rawGeojson (stable) — les icônes ne dépendent pas du statut discovered
   const loadedIconsRef = useRef(new Set<string>())
   useEffect(() => {
     const map = mapRef.current?.getMap()
-    if (!map || !geojson) return
+    if (!map || !rawGeojson) return
 
-    // Collecter les paires (url, color) uniques
     const iconColors = new Map<string, string>()
-    for (const f of geojson.features) {
+    for (const f of rawGeojson.features) {
       if (f.properties.tagIcon) {
         iconColors.set(f.properties.tagIcon, f.properties.iconColor)
       }
@@ -707,7 +735,7 @@ export const ExploreMap = memo(function ExploreMap() {
         loadedIconsRef.current.delete(url)
       })
     }
-  }, [geojson])
+  }, [rawGeojson])
 
   // Note: fill-pattern supprimé — les blasons flottants (Markers HTML) remplacent le pattern
 
@@ -793,7 +821,7 @@ export const ExploreMap = memo(function ExploreMap() {
     setHoveredTerritoryId(null)
   }, [])
 
-  // GPS tracking → fogStore
+  // GPS tracking → playerStore
   const onGeolocate = useCallback((e: { coords: { longitude: number; latitude: number } }) => {
     setUserPosition({ lng: e.coords.longitude, lat: e.coords.latitude })
   }, [setUserPosition])
@@ -899,24 +927,7 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
 
       {/* Marqueurs des autres joueurs connectés */}
-      {Array.from(onlinePlayers.values()).map(player => (
-        <Marker key={player.userId} longitude={player.position.lng} latitude={player.position.lat} anchor="center">
-          <div
-            className="other-player-marker"
-            style={{
-              '--faction-color': player.factionColor ?? '#888',
-            } as React.CSSProperties}
-            onClick={() => setSelectedPlayerId(player.userId)}
-          >
-            {player.avatarUrl ? (
-              <img src={player.avatarUrl} alt="" className="other-player-avatar" />
-            ) : (
-              <div className="other-player-dot" />
-            )}
-            <span className="other-player-name">{player.name}</span>
-          </div>
-        </Marker>
-      ))}
+      <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
       {geojson && (
         <Source
@@ -938,65 +949,14 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {/* Blasons flottants au centroïde de chaque territoire */}
-      {showFactions && territoryLabels && territoryLabels.map((label, i) => (
-        label.pattern ? (
-          <Marker
-            key={`emblem-${i}`}
-            longitude={label.emblemLon}
-            latitude={label.emblemLat}
-            anchor="center"
-          >
-            <div className="territory-emblem-wrap">
-              <div
-                className="territory-emblem"
-                style={{ '--emblem-color': label.tagColor } as React.CSSProperties}
-              >
-                <img src={label.pattern} alt="" className="territory-emblem-img" />
-              </div>
-              {label.hourlyRate > 0 && (
-                <span className="territory-emblem-rate" style={{ color: label.tagColor }}>
-                  +{label.hourlyRate % 1 === 0 ? label.hourlyRate : label.hourlyRate.toFixed(1)}/h
-                </span>
-              )}
-              {label.customName && (
-                <span className="territory-emblem-title" style={{ color: label.tagColor }}>
-                  {label.customName}
-                </span>
-              )}
-            </div>
-          </Marker>
-        ) : null
-      ))}
-
-      {/* Badge fortification sur les lieux fortifiés */}
-      {showFactions && fortifiedPlaces.map(p => (
-        <Marker key={`fort-${p.id}`} longitude={p.lon} latitude={p.lat} anchor="center">
-          <div className="place-fort-badge">{p.level}</div>
-        </Marker>
-      ))}
-
-      {/* Labels texte au survol (point le plus au nord) */}
-      {showFactions && territoryLabels && territoryLabels.map((label, i) => (
-        label.players ? (
-          <Marker
-            key={`label-${i}`}
-            longitude={label.lon}
-            latitude={label.lat}
-            anchor="bottom"
-          >
-            <div
-              className={`territory-label${hoveredTerritoryId === label.territoryId ? ' visible' : ''}`}
-              style={{ '--label-color': label.tagColor } as React.CSSProperties}
-            >
-              <div className="territory-label-title">
-                {label.customName || label.factionTitle}
-              </div>
-              <div className="territory-label-count">{label.placesCount} lieu{label.placesCount > 1 ? 'x' : ''} controle{label.placesCount > 1 ? 's' : ''}</div>
-            </div>
-          </Marker>
-        ) : null
-      ))}
+      {/* Territoires : blasons, fortifications, labels */}
+      {showFactions && territoryLabels && (
+        <TerritoryMarkers
+          labels={territoryLabels}
+          fortifiedPlaces={fortifiedPlaces}
+          hoveredTerritoryId={hoveredTerritoryId}
+        />
+      )}
 
       {popupInfo && (
         <Popup

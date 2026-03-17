@@ -1,69 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import { useFogStore } from '../../stores/fogStore'
-import { supabase } from '../../lib/supabase'
+import { useState } from 'react'
+import { usePlayerStore } from '../../stores/playerStore'
 import { InfoModal } from './InfoModal'
 
 export function EnergyIndicator() {
-  const energy = useFogStore(s => s.energy)
-  const maxEnergy = useFogStore(s => s.maxEnergy)
-  const cycleSeconds = useFogStore(s => s.energyCycle)
-  const userId = useFogStore(s => s.userId)
-  const setEnergy = useFogStore(s => s.setEnergy)
-  const nextPointIn = useFogStore(s => s.nextPointIn)
-  const setNextPointIn = useFogStore(s => s.setNextPointIn)
-  const bonusEnergy = useFogStore(s => s.bonusEnergy)
+  const energy = usePlayerStore(s => s.energy)
+  const maxEnergy = usePlayerStore(s => s.maxEnergy)
+  const cycleSeconds = usePlayerStore(s => s.energyCycle)
+  const nextPointIn = usePlayerStore(s => s.nextPointIn)
+  const bonusEnergy = usePlayerStore(s => s.bonusEnergy)
 
   const isFull = energy >= maxEnergy
 
-  // Energie fractionnaire en temps reel (taux fixe 1)
+  // Energie fractionnaire en temps reel
   const elapsedInTick = cycleSeconds - nextPointIn
   const fractionOfTick = cycleSeconds > 0 ? elapsedInTick / cycleSeconds : 0
   const fractionalEnergy = isFull
     ? maxEnergy
     : Math.min(energy + fractionOfTick, maxEnergy)
-
-  // Countdown timer
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    if (timerRef.current) clearInterval(timerRef.current)
-
-    if (isFull || nextPointIn <= 0) return
-
-    timerRef.current = setInterval(() => {
-      const current = useFogStore.getState().nextPointIn
-      if (current <= 1) {
-        if (timerRef.current) clearInterval(timerRef.current)
-        refetchEnergy()
-      } else {
-        setNextPointIn(current - 1)
-      }
-    }, 1000)
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [isFull, nextPointIn > 0])
-
-  async function refetchEnergy() {
-    if (!userId) return
-    const { data } = await supabase.rpc('get_user_energy', { p_user_id: userId })
-    if (data) {
-      const d = data as Record<string, number>
-      setEnergy(d.energy ?? 0)
-      setNextPointIn(d.nextPointIn ?? 0)
-      useFogStore.getState().setEnergyCycle(d.energyCycle ?? 7200)
-      useFogStore.getState().setConquestPoints(d.conquestPoints ?? 0)
-      useFogStore.getState().setConquestNextPointIn(d.conquestNextPointIn ?? 0)
-      useFogStore.getState().setConquestCycle(d.conquestCycle ?? 14400)
-      useFogStore.getState().setConstructionPoints(d.constructionPoints ?? 0)
-      useFogStore.getState().setConstructionNextPointIn(d.constructionNextPointIn ?? 0)
-      useFogStore.getState().setConstructionCycle(d.constructionCycle ?? 14400)
-      useFogStore.getState().setBonusEnergy(d.bonusEnergy ?? 0)
-      useFogStore.getState().setBonusConquest(d.bonusConquest ?? 0)
-      useFogStore.getState().setBonusConstruction(d.bonusConstruction ?? 0)
-    }
-  }
 
   function formatEnergy(n: number): string {
     if (n >= maxEnergy) return String(maxEnergy)

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface FogState {
+interface PlayerState {
   /** IDs des lieux découverts par l'utilisateur (lookup O(1)) */
   discoveredIds: Set<string>
   setDiscoveredIds: (ids: string[]) => void
@@ -98,7 +98,7 @@ interface FogState {
   setLoading: (loading: boolean) => void
 }
 
-export const useFogStore = create<FogState>((set) => ({
+export const usePlayerStore = create<PlayerState>((set) => ({
   discoveredIds: new Set(),
   setDiscoveredIds: (ids) => set({ discoveredIds: new Set(ids) }),
   addDiscoveredId: (id) =>

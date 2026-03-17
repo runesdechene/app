@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
-import { useFogStore } from '../stores/fogStore'
+import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
 import type { GameToast } from '../stores/toastStore'
 import { useAuth } from './useAuth'
@@ -28,27 +28,27 @@ function haversineM(
  * Hook d'initialisation du fog — à appeler UNE SEULE FOIS au niveau App.
  * Charge les découvertes, énergie, faction et avatar à l'authentification.
  */
-export function useFog() {
+export function usePlayer() {
   const { user, isAuthenticated } = useAuth()
   const activityChannelRef = useRef<RealtimeChannel | null>(null)
 
-  const setDiscoveredIds = useFogStore(s => s.setDiscoveredIds)
-  const setUserFactionId = useFogStore(s => s.setUserFactionId)
-  const setUserId = useFogStore(s => s.setUserId)
-  const setEnergy = useFogStore(s => s.setEnergy)
-  const setNextPointIn = useFogStore(s => s.setNextPointIn)
-  const setLoading = useFogStore(s => s.setLoading)
-  const setUserAvatarUrl = useFogStore(s => s.setUserAvatarUrl)
-  const setUserFactionColor = useFogStore(s => s.setUserFactionColor)
-  const setUserFactionTitle = useFogStore(s => s.setUserFactionTitle)
-  const setUserFactionPattern = useFogStore(s => s.setUserFactionPattern)
-  const setUserName = useFogStore(s => s.setUserName)
-  const setIsAdmin = useFogStore(s => s.setIsAdmin)
-  const setConquestPoints = useFogStore(s => s.setConquestPoints)
-  const setConquestNextPointIn = useFogStore(s => s.setConquestNextPointIn)
-  const setConstructionPoints = useFogStore(s => s.setConstructionPoints)
-  const setConstructionNextPointIn = useFogStore(s => s.setConstructionNextPointIn)
-  const setNotorietyPoints = useFogStore(s => s.setNotorietyPoints)
+  const setDiscoveredIds = usePlayerStore(s => s.setDiscoveredIds)
+  const setUserFactionId = usePlayerStore(s => s.setUserFactionId)
+  const setUserId = usePlayerStore(s => s.setUserId)
+  const setEnergy = usePlayerStore(s => s.setEnergy)
+  const setNextPointIn = usePlayerStore(s => s.setNextPointIn)
+  const setLoading = usePlayerStore(s => s.setLoading)
+  const setUserAvatarUrl = usePlayerStore(s => s.setUserAvatarUrl)
+  const setUserFactionColor = usePlayerStore(s => s.setUserFactionColor)
+  const setUserFactionTitle = usePlayerStore(s => s.setUserFactionTitle)
+  const setUserFactionPattern = usePlayerStore(s => s.setUserFactionPattern)
+  const setUserName = usePlayerStore(s => s.setUserName)
+  const setIsAdmin = usePlayerStore(s => s.setIsAdmin)
+  const setConquestPoints = usePlayerStore(s => s.setConquestPoints)
+  const setConquestNextPointIn = usePlayerStore(s => s.setConquestNextPointIn)
+  const setConstructionPoints = usePlayerStore(s => s.setConstructionPoints)
+  const setConstructionNextPointIn = usePlayerStore(s => s.setConstructionNextPointIn)
+  const setNotorietyPoints = usePlayerStore(s => s.setNotorietyPoints)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
@@ -153,7 +153,7 @@ export function useFog() {
         setConstructionPoints(ed.constructionPoints ?? 0)
         setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
         setNotorietyPoints(ed.notorietyPoints ?? 0)
-        useFogStore.setState({
+        usePlayerStore.setState({
           maxEnergy: ed.maxEnergy ?? 5,
           maxConquest: ed.maxConquest ?? 5,
           maxConstruction: ed.maxConstruction ?? 5,
@@ -170,7 +170,7 @@ export function useFog() {
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
         const gm = profile.gameMode === 'conquest' ? 'conquest' : 'exploration'
-        useFogStore.setState({ gameMode: gm })
+        usePlayerStore.setState({ gameMode: gm })
       }
       if (titlesRes.data) {
         const td = titlesRes.data as {
@@ -178,7 +178,7 @@ export function useFog() {
           factionTitle: { id: number; name: string; icon: string; unlocks: string[] } | null
           displayedGeneralTitleIds: number[]
         }
-        useFogStore.setState({
+        usePlayerStore.setState({
           unlockedGeneralTitles: td.unlockedGeneralTitles ?? [],
           displayedGeneralTitleIds: td.displayedGeneralTitleIds ?? [],
           factionTitle2: td.factionTitle ?? null,
@@ -446,7 +446,7 @@ async function loadRecentActivity(currentUserId: string) {
 export async function setDisplayedTitles(
   titleIds: number[],
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId } = useFogStore.getState()
+  const { userId } = usePlayerStore.getState()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   const { data } = await supabase.rpc('set_displayed_titles', {
@@ -456,7 +456,7 @@ export async function setDisplayedTitles(
 
   if (data?.error) return { success: false, error: data.error }
 
-  useFogStore.setState({ displayedGeneralTitleIds: titleIds })
+  usePlayerStore.setState({ displayedGeneralTitleIds: titleIds })
   return { success: true }
 }
 
@@ -469,7 +469,7 @@ export async function discoverPlace(
   placeLat: number,
   placeLng: number,
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId, userPosition, addDiscoveredId, setEnergy, setNextPointIn, setConquestPoints, setConquestNextPointIn, setConstructionPoints, setConstructionNextPointIn } = useFogStore.getState()
+  const { userId, userPosition, addDiscoveredId, setEnergy, setNextPointIn, setConquestPoints, setConquestNextPointIn, setConstructionPoints, setConstructionNextPointIn } = usePlayerStore.getState()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Déterminer la méthode (GPS ou remote) basé sur la distance

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
 
 type Step = 'location' | 'form' | 'submitting' | 'success'
@@ -39,8 +39,8 @@ export function AddPlaceFlow() {
 
   const coords = useMapStore(s => s.pendingNewPlaceCoords)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
-  const userId = useFogStore(s => s.userId)
-  const userPosition = useFogStore(s => s.userPosition)
+  const userId = usePlayerStore(s => s.userId)
+  const userPosition = usePlayerStore(s => s.userPosition)
 
   // Fetch tags au montage
   useEffect(() => {
@@ -254,7 +254,7 @@ export function AddPlaceFlow() {
 
       // 5. Optimistic updates
       setNewPlaceId(placeId)
-      useFogStore.getState().addDiscoveredId(placeId)
+      usePlayerStore.getState().addDiscoveredId(placeId)
       useMapStore.getState().incrementPlacesRefreshKey()
 
       // 6. Toast

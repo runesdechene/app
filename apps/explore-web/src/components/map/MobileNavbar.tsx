@@ -1,7 +1,7 @@
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { useToastStore } from '../../stores/toastStore'
 import { useChatStore } from '../../stores/chatStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 
 export function MobileNavbar() {
@@ -10,14 +10,14 @@ export function MobileNavbar() {
   const closePanel = useMobileNavStore(s => s.closePanel)
   const seenAt = useMobileNavStore(s => s.notificationsSeenAt)
   const chatSeenAt = useMobileNavStore(s => s.chatSeenAt)
-  const userId = useFogStore(s => s.userId)
+  const userId = usePlayerStore(s => s.userId)
   const unseenCount = useToastStore(s => s.toasts.filter(t => t.timestamp > seenAt && t.actorId !== userId).length)
   const unseenChat = useChatStore(s => {
     const all = [...s.generalMessages, ...s.factionMessages]
     return all.filter(m => new Date(m.createdAt).getTime() > chatSeenAt && m.userId !== userId).length
   })
-  const avatarUrl = useFogStore(s => s.userAvatarUrl)
-  const userName = useFogStore(s => s.userName)
+  const avatarUrl = usePlayerStore(s => s.userAvatarUrl)
+  const userName = usePlayerStore(s => s.userName)
 
   const initial = userName ? userName.charAt(0).toUpperCase() : '?'
 

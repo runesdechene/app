@@ -3,9 +3,9 @@ import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
-import { discoverPlace } from '../../hooks/useFog'
+import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
 import { useConstructionTypes, ctByLevel } from '../../hooks/useConstructionTypes'
 import type { ConstructionTypeInfo } from '../../hooks/useConstructionTypes'
@@ -48,8 +48,8 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlaceP
 
 function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void }) {
   const { isAuthenticated } = useAuth()
-  const discoveredIds = useFogStore(s => s.discoveredIds)
-  const userFactionId = useFogStore(s => s.userFactionId)
+  const discoveredIds = usePlayerStore(s => s.discoveredIds)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
 
   // Déterminer si le lieu est découvert personnellement
   const isDiscovered = isAuthenticated && discoveredIds.has(place.id)
@@ -96,10 +96,10 @@ function FoggedPlaceView({
   onDiscover: () => Promise<void>
   onAuthPrompt?: () => void
 }) {
-  const energy = useFogStore(s => s.energy)
-  const maxEnergy = useFogStore(s => s.maxEnergy)
-  const nextPointIn = useFogStore(s => s.nextPointIn)
-  const userPosition = useFogStore(s => s.userPosition)
+  const energy = usePlayerStore(s => s.energy)
+  const maxEnergy = usePlayerStore(s => s.maxEnergy)
+  const nextPointIn = usePlayerStore(s => s.nextPointIn)
+  const userPosition = usePlayerStore(s => s.userPosition)
   const [discovering, setDiscovering] = useState(false)
 
   // Énergie fractionnaire (taux fixe 1, cycle 7200s = +0.5/h)
@@ -153,7 +153,7 @@ function FoggedPlaceView({
         <h1 className="place-panel-title place-panel-title-blur">{place.title}</h1>
 
         {/* Badge faction alliée (masqué en mode exploration) */}
-        {useFogStore.getState().gameMode === 'conquest' && isOwnFaction && place.claim && (
+        {usePlayerStore.getState().gameMode === 'conquest' && isOwnFaction && place.claim && (
           <div
             className="place-claim-badge"
             style={{ backgroundColor: place.claim.factionColor }}
@@ -224,8 +224,8 @@ function FoggedPlaceView({
 // --- Vue découverte (lieu accessible) ---
 
 function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
-  const isAdmin = useFogStore(s => s.isAdmin)
-  const userId = useFogStore(s => s.userId)
+  const isAdmin = usePlayerStore(s => s.isAdmin)
+  const userId = usePlayerStore(s => s.userId)
   const [imageIndex, setImageIndex] = useState(0)
   const [textExpanded, setTextExpanded] = useState(false)
   const [liked, setLiked] = useState(place.requester?.liked ?? false)
@@ -336,7 +336,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
     <>
       {/* Header */}
       <div className="place-panel-header">
-        {useFogStore.getState().gameMode === 'conquest' && place.claim && (
+        {usePlayerStore.getState().gameMode === 'conquest' && place.claim && (
           <div
             className="place-claim-badge"
             style={{ backgroundColor: place.claim.factionColor }}
@@ -689,12 +689,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
         )}
 
         {/* Claim button (masque en mode exploration) */}
-        {userEmail && useFogStore.getState().gameMode === 'conquest' && (
+        {userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
           <ClaimButton placeId={place.id} currentClaim={place.claim} />
         )}
 
         {/* Fortify button (masque en mode exploration) */}
-        {userEmail && useFogStore.getState().gameMode === 'conquest' && place.claim && (
+        {userEmail && usePlayerStore.getState().gameMode === 'conquest' && place.claim && (
           <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} />
         )}
       </div>
@@ -728,12 +728,12 @@ function ClaimButton({
   currentClaim: PlaceDetail['claim']
 }) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
-  const conquestPoints = useFogStore(s => s.conquestPoints)
-  const userId = useFogStore(s => s.userId)
-  const factionId = useFogStore(s => s.userFactionId)
-  const factionTitle = useFogStore(s => s.userFactionTitle)
-  const factionColor = useFogStore(s => s.userFactionColor)
-  const factionPattern = useFogStore(s => s.userFactionPattern)
+  const conquestPoints = usePlayerStore(s => s.conquestPoints)
+  const userId = usePlayerStore(s => s.userId)
+  const factionId = usePlayerStore(s => s.userFactionId)
+  const factionTitle = usePlayerStore(s => s.userFactionTitle)
+  const factionColor = usePlayerStore(s => s.userFactionColor)
+  const factionPattern = usePlayerStore(s => s.userFactionPattern)
   const [claiming, setClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
   const [claimError, setClaimError] = useState<string | null>(null)
@@ -804,7 +804,7 @@ function ClaimButton({
     if (data?.error) {
       setClaimError(data.error)
       if (data.conquestPoints !== undefined) {
-        useFogStore.getState().setConquestPoints(data.conquestPoints)
+        usePlayerStore.getState().setConquestPoints(data.conquestPoints)
       }
       setClaiming(false)
       return
@@ -819,18 +819,18 @@ function ClaimButton({
         factionPattern: factionPattern ?? undefined,
       })
       if (data.conquestPoints !== undefined) {
-        useFogStore.getState().setConquestPoints(data.conquestPoints)
+        usePlayerStore.getState().setConquestPoints(data.conquestPoints)
       }
       if (data.conquestNextPointIn !== undefined) {
-        useFogStore.getState().setConquestNextPointIn(data.conquestNextPointIn)
+        usePlayerStore.getState().setConquestNextPointIn(data.conquestNextPointIn)
       }
       if (data.constructionPoints !== undefined) {
-        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+        usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
       }
       if (data.constructionNextPointIn !== undefined) {
-        useFogStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
+        usePlayerStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
       }
-      if (data.notorietyPoints !== undefined) useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
+      if (data.notorietyPoints !== undefined) usePlayerStore.getState().setNotorietyPoints(data.notorietyPoints)
 
       useToastStore.getState().addToast({
         type: 'claim',
@@ -890,9 +890,9 @@ function FortifyButton({
   currentClaim: NonNullable<PlaceDetail['claim']>
   constructionTypes: ConstructionTypeInfo[]
 }) {
-  const constructionPoints = useFogStore(s => s.constructionPoints)
-  const userFactionId = useFogStore(s => s.userFactionId)
-  const userId = useFogStore(s => s.userId)
+  const constructionPoints = usePlayerStore(s => s.constructionPoints)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userId = usePlayerStore(s => s.userId)
   const [fortifying, setFortifying] = useState(false)
   const [fortified, setFortified] = useState(false)
   const [localLevel, setLocalLevel] = useState(currentClaim.fortificationLevel)
@@ -936,7 +936,7 @@ function FortifyButton({
     if (data?.error) {
       setError(data.error)
       if (data.constructionPoints !== undefined) {
-        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+        usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
       }
       setFortifying(false)
       return
@@ -945,13 +945,13 @@ function FortifyButton({
     if (data?.success) {
       setLocalLevel(data.fortificationLevel)
       if (data.constructionPoints !== undefined) {
-        useFogStore.getState().setConstructionPoints(data.constructionPoints)
+        usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
       }
       if (data.constructionNextPointIn !== undefined) {
-        useFogStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
+        usePlayerStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
       }
       if (data.notorietyPoints !== undefined) {
-        useFogStore.getState().setNotorietyPoints(data.notorietyPoints)
+        usePlayerStore.getState().setNotorietyPoints(data.notorietyPoints)
       }
 
       useToastStore.getState().addToast({

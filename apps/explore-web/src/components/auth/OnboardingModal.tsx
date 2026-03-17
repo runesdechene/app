@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 
 interface OnboardingModalProps {
   onComplete: () => void
@@ -17,7 +17,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const userId = useFogStore(s => s.userId)
+  const userId = usePlayerStore(s => s.userId)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -69,9 +69,9 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     }
 
     // Mettre a jour le store
-    useFogStore.getState().setUserName(name.trim())
+    usePlayerStore.getState().setUserName(name.trim())
     if (avatarUrl) {
-      useFogStore.getState().setUserAvatarUrl(avatarUrl)
+      usePlayerStore.getState().setUserAvatarUrl(avatarUrl)
     }
 
     setLoading(false)

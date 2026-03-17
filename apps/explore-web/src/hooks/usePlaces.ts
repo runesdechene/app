@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import type { FeatureCollection, Point } from 'geojson'
 import { supabase } from '../lib/supabase'
-import { useFogStore } from '../stores/fogStore'
+import { usePlayerStore } from '../stores/playerStore'
 import { useMapStore } from '../stores/mapStore'
 import { useAuth } from './useAuth'
 
@@ -63,9 +63,9 @@ export function usePlaces() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const discoveredIds = useFogStore(s => s.discoveredIds)
-  const userFactionId = useFogStore(s => s.userFactionId)
-  const fogLoading = useFogStore(s => s.loading)
+  const discoveredIds = usePlayerStore(s => s.discoveredIds)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const fogLoading = usePlayerStore(s => s.loading)
   const deletedPlaceIds = useMapStore(s => s.deletedPlaceIds)
   const placesRefreshKey = useMapStore(s => s.placesRefreshKey)
   const { isAuthenticated } = useAuth()
@@ -163,5 +163,5 @@ export function usePlaces() {
     }
   }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated, deletedPlaceIds])
 
-  return { geojson, loading: loading || fogLoading, error }
+  return { geojson, rawGeojson, loading: loading || fogLoading, error }
 }

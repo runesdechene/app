@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
-import { useFogStore } from '../stores/fogStore'
+import { usePlayerStore } from '../stores/playerStore'
 import { useChatStore } from '../stores/chatStore'
 import type { ChatMessage } from '../stores/chatStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
@@ -26,8 +26,8 @@ function rowToMessage(row: Record<string, unknown>): ChatMessage {
  * Charge les messages recents et souscrit aux nouveaux en temps reel.
  */
 export function useChat() {
-  const userId = useFogStore(s => s.userId)
-  const userFactionId = useFogStore(s => s.userFactionId)
+  const userId = usePlayerStore(s => s.userId)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
   const channelRef = useRef<RealtimeChannel | null>(null)
 
   useEffect(() => {
@@ -154,7 +154,7 @@ export async function sendChatMessage(
   content: string,
   channelType: 'general' | 'faction' | 'bugs',
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId, userName, userFactionId, userFactionColor, userFactionPattern } = useFogStore.getState()
+  const { userId, userName, userFactionId, userFactionColor, userFactionPattern } = usePlayerStore.getState()
   if (!userId) return { success: false, error: 'Non connecté' }
 
   const trimmed = content.trim()

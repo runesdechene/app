@@ -1,17 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import logoImg from '../../assets/logo_couleur_mobile.webp'
 import shopIcon from '../../assets/shop_icon.webp'
-
-interface ProfileData {
-  id: string
-  lastName: string
-  role: string
-  faction: { id: string; title: string; color: string } | null
-}
 
 interface MobileHeaderProps {
   email: string
@@ -21,23 +13,15 @@ interface MobileHeaderProps {
 
 export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [profile, setProfile] = useState<ProfileData | null>(null)
   const ref = useRef<HTMLDivElement>(null)
-  const userId = useFogStore(s => s.userId)
 
-  useEffect(() => {
-    async function fetchProfile() {
-      const { data: user } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email_address', email)
-        .single()
-      if (!user) return
-      const { data } = await supabase.rpc('get_my_informations', { p_user_id: user.id })
-      if (data && !data.error) setProfile(data as ProfileData)
-    }
-    fetchProfile()
-  }, [email])
+  // Lire directement depuis playerStore au lieu de refaire un appel RPC
+  const userId = usePlayerStore(s => s.userId)
+  const userName = usePlayerStore(s => s.userName)
+  const isAdmin = usePlayerStore(s => s.isAdmin)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userFactionColor = usePlayerStore(s => s.userFactionColor)
+  const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
 
   // Fermer si clic exterieur
   useEffect(() => {
@@ -53,6 +37,8 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
     setMenuOpen(false)
     if (userId) useMapStore.getState().setSelectedPlayerId(userId)
   }
+
+  const displayName = userName || email
 
   return (
     <div className="mobile-header" ref={ref}>
@@ -88,9 +74,9 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
         <div className="profile-dropdown mobile-header-menu">
           <div className="profile-dropdown-header">
             <span className="profile-dropdown-name">
-              {profile?.lastName || email}
+              {displayName}
             </span>
-            {profile?.role === 'admin' && (
+            {isAdmin && (
               <span className="profile-dropdown-admin">Admin</span>
             )}
           </div>
@@ -105,13 +91,13 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
             className="profile-dropdown-action"
             onClick={() => { setMenuOpen(false); onFactionModal() }}
           >
-            {profile?.faction ? (
+            {userFactionId ? (
               <span className="faction-current">
                 <span
                   className="faction-selector-dot"
-                  style={{ backgroundColor: profile.faction.color }}
+                  style={{ backgroundColor: userFactionColor ?? undefined }}
                 />
-                {profile.faction.title}
+                {userFactionTitle}
               </span>
             ) : (
               'Rejoindre une faction'

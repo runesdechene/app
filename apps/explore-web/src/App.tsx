@@ -17,12 +17,13 @@ import { LeaderboardModal } from './components/map/LeaderboardModal'
 import { VersionBadge } from './components/map/VersionBadge'
 import { TerritoryPanel } from './components/map/TerritoryPanel'
 import { useMapStore } from './stores/mapStore'
-import { useFogStore } from './stores/fogStore'
+import { usePlayerStore } from './stores/playerStore'
 import { useToastStore } from './stores/toastStore'
 import { useAuth } from './hooks/useAuth'
-import { useFog } from './hooks/useFog'
+import { usePlayer } from './hooks/usePlayer'
 import { usePresence } from './hooks/usePresence'
 import { useChat } from './hooks/useChat'
+import { useResourceTimers } from './hooks/useResourceTimers'
 import { ChatPanel } from './components/chat/ChatPanel'
 import { AddPlaceFlow } from './components/places/AddPlaceFlow'
 import { InstallPrompt } from './components/pwa/InstallPrompt'
@@ -34,7 +35,7 @@ import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
-  const notoriety = useFogStore(s => s.notorietyPoints)
+  const notoriety = usePlayerStore(s => s.notorietyPoints)
   const [showInfo, setShowInfo] = useState(false)
 
   return (
@@ -82,30 +83,31 @@ function App() {
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
 
-  const userId = useFogStore(s => s.userId)
-  const userFactionId = useFogStore(s => s.userFactionId)
-  const userName = useFogStore(s => s.userName)
+  const userId = usePlayerStore(s => s.userId)
+  const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userName = usePlayerStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
   // Mode de jeu (exploration masque toute l'UI faction)
-  const gameMode = useFogStore(s => s.gameMode)
+  const gameMode = usePlayerStore(s => s.gameMode)
   const isConquestMode = gameMode === 'conquest'
 
   // Le FAB "+" n'est visible que si un titre débloqué contient 'add_place'
-  const unlockedTitles = useFogStore(s => s.unlockedGeneralTitles)
-  const factionTitle = useFogStore(s => s.factionTitle2)
+  const unlockedTitles = usePlayerStore(s => s.unlockedGeneralTitles)
+  const factionTitle = usePlayerStore(s => s.factionTitle2)
   const canAddPlace = unlockedTitles.some(t => t.unlocks?.includes('add_place'))
     || (factionTitle?.unlocks?.includes('add_place') ?? false)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
-  useFog()
+  usePlayer()
   // Présence temps réel sur la carte
   usePresence()
   // Chat en jeu
   useChat()
+  useResourceTimers()
 
   // Auto-open auth modal si non connecté (une seule fois par session)
   const authPromptDone = useRef(false)
@@ -264,7 +266,7 @@ function App() {
             setShowFactionModal(false)
             if (!joined && gameMode === 'conquest' && !userFactionId) {
               // Pas de faction choisie en mode conquete → repasser en exploration
-              useFogStore.getState().setGameMode('exploration')
+              usePlayerStore.getState().setGameMode('exploration')
             }
           }}
           currentFactionId={userFactionId}

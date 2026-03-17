@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 
 type LeaderboardTab = 'notoriety' | 'authored' | 'explored'
@@ -35,7 +35,7 @@ export function LeaderboardModal({ onClose }: Props) {
   const [loading, setLoading] = useState(true)
   const cache = useRef<Partial<Record<LeaderboardTab, LeaderboardEntry[]>>>({})
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
-  const currentUserId = useFogStore(s => s.userId)
+  const currentUserId = usePlayerStore(s => s.userId)
 
   useEffect(() => {
     async function load() {

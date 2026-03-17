@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useFogStore } from '../../stores/fogStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { supabase } from '../../lib/supabase'
 
 interface GameModeModalProps {
@@ -8,8 +8,8 @@ interface GameModeModalProps {
 
 export function GameModeModal({ onComplete }: GameModeModalProps) {
   const [selected, setSelected] = useState<'exploration' | 'conquest' | null>(null)
-  const userId = useFogStore(s => s.userId)
-  const setGameMode = useFogStore(s => s.setGameMode)
+  const userId = usePlayerStore(s => s.userId)
+  const setGameMode = usePlayerStore(s => s.setGameMode)
 
   async function choose(mode: 'exploration' | 'conquest') {
     setSelected(mode)
