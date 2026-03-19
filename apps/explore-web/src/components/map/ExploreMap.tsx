@@ -372,7 +372,7 @@ export const ExploreMap = memo(function ExploreMap() {
               factionPattern: ov?.factionPattern || f.properties.factionPattern,
               score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
               likes: f.properties.likes ?? 0,
-              fortificationLevel: f.properties.fortificationLevel ?? 0,
+              fortificationLevel: ov?.fortificationLevel ?? f.properties.fortificationLevel ?? 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
             }
@@ -569,6 +569,29 @@ export const ExploreMap = memo(function ExploreMap() {
     })
   }, [setTerritoryHover])
 
+  // Apply placeOverrides to geojson for icon/badge rendering (fortification, faction, etc.)
+  const enrichedGeojson = useMemo(() => {
+    if (!geojson || placeOverrides.size === 0) return geojson
+    return {
+      ...geojson,
+      features: geojson.features.map(f => {
+        const ov = placeOverrides.get(f.properties.id)
+        if (!ov) return f
+        return {
+          ...f,
+          properties: {
+            ...f.properties,
+            ...(ov.fortificationLevel !== undefined && { fortificationLevel: ov.fortificationLevel }),
+            ...(ov.factionId !== undefined && { factionId: ov.factionId }),
+            ...(ov.tagColor !== undefined && { tagColor: ov.tagColor }),
+            ...(ov.factionPattern !== undefined && { factionPattern: ov.factionPattern }),
+            ...(ov.score !== undefined && { score: ov.score }),
+          },
+        }
+      }),
+    }
+  }, [geojson, placeOverrides])
+
   if (!mapStyle) {
     return (
       <div className="flex items-center justify-center h-full bg-[var(--color-parchment)]">
@@ -639,11 +662,11 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {geojson && (
+      {enrichedGeojson && (
         <Source
           id="places"
           type="geojson"
-          data={geojson}
+          data={enrichedGeojson}
         >
           <Layer {...undiscoveredCircleFinal} />
           <Layer {...undiscoveredIconFinal} />

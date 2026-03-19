@@ -15,9 +15,10 @@ function hexToRgb(hex: string): string {
 interface Props {
   placeId: string
   currentClaim: PlaceDetail['claim']
+  onClaimed?: () => void
 }
 
-export function ClaimButton({ placeId, currentClaim }: Props) {
+export function ClaimButton({ placeId, currentClaim, onClaimed }: Props) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
   const conquestPoints = usePlayerStore(s => s.conquestPoints)
   const userId = usePlayerStore(s => s.userId)
@@ -108,6 +109,7 @@ export function ClaimButton({ placeId, currentClaim }: Props) {
         factionId: factionId ?? undefined,
         tagColor: factionColor ?? undefined,
         factionPattern: factionPattern ?? undefined,
+        fortificationLevel: 0, // Conquête reset la fortification
       })
       if (data.conquestPoints !== undefined) {
         usePlayerStore.getState().setConquestPoints(data.conquestPoints)
@@ -128,6 +130,9 @@ export function ClaimButton({ placeId, currentClaim }: Props) {
         message: `Lieu revendiqué pour ${factionTitle} ! +10 Notoriété`,
         timestamp: Date.now(),
       })
+
+      // Refetch place data to update UI (fortify button, etc.)
+      onClaimed?.()
     }
 
     setClaiming(false)

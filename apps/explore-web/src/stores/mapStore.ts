@@ -7,6 +7,7 @@ interface PlaceOverride {
   claimed?: boolean
   factionId?: string
   factionPattern?: string
+  fortificationLevel?: number
 }
 
 export interface TerritorySelection {

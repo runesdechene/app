@@ -3963,6 +3963,20 @@
   white-space: nowrap;
 }
 
+.territory-vote-delete {
+  background: none;
+  border: none;
+  color: #c0392b;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.5;
+  line-height: 1;
+}
+.territory-vote-delete:hover {
+  opacity: 1;
+}
+
 .territory-vote-my {
   font-family: var(--font-body, sans-serif);
   font-size: 11px;

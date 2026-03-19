@@ -1,6 +1,10 @@
 # ALPHA V0.3.3
 ## Fortifiez, ça rend heureux ! 
 - Les fortifications augmentent désormais la zone d'expansion du lieu. ⚒️
+- Les noms de territoires (zone de + 3 lieux connectés) sont limités à 2 par joueurs, et peuvent être supprimées.
+- Correctif : les Territoires n'ont plus "Nom incertain" lorsqu'un nom a été voté par les joueurs.
+- Correctif : La prise d'un lieu est effectif en temps réel sur la carte et la zone d'influence recalculée
+- Correctif : les profils affichent désormais tous les lieux, pas juste 50.
 
 # ALPHA V0.3.2
 ## Avatars, performances carte, auto-claim

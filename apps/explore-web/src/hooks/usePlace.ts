@@ -69,6 +69,9 @@ export function usePlace(placeId: string | null) {
   const [place, setPlace] = useState<PlaceDetail | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const refetch = () => setRefreshKey(k => k + 1)
 
   useEffect(() => {
     if (!placeId) {
@@ -133,7 +136,7 @@ export function usePlace(placeId: string | null) {
 
     fetchPlace()
     return () => { cancelled = true }
-  }, [placeId])
+  }, [placeId, refreshKey])
 
-  return { place, loading, error }
+  return { place, loading, error, refetch }
 }

@@ -184,7 +184,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
         invalid_length: 'Le nom doit faire entre 3 et 50 caracteres.',
         inappropriate: 'Ce nom contient des termes inappropries.',
         not_eligible: 'Vous devez appartenir a cette faction pour proposer.',
-        max_proposals: 'Maximum 3 propositions atteint.',
+        max_proposals: 'Maximum 2 propositions atteint.',
       }
       setVoteError(errMap[r.error as string] ?? 'Erreur inconnue.')
     } else {
@@ -230,6 +230,18 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
       const winningName = (r.winningName as string | null) ?? null
       useMapStore.getState().setTerritoryName(data.anchorPlaceId, winningName, '')
       onNameSaved(data.anchorPlaceId, winningName)
+    }
+  }
+
+  async function handleDeleteProposal(proposalId: string) {
+    const { error } = await supabase
+      .from('territory_name_proposals')
+      .delete()
+      .eq('id', proposalId)
+      .eq('proposed_by', userId)
+
+    if (!error) {
+      await loadVotes()
     }
   }
 
@@ -310,6 +322,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
                   {remaining} vote{remaining > 1 ? 's' : ''} restant{remaining > 1 ? 's' : ''} sur {votePower}
                   <span className="territory-vote-breakdown">
                     1 base{votePower > 1 ? ` + ${votePower - 1} lieu${votePower - 1 > 1 ? 'x' : ''} revendique${votePower - 1 > 1 ? 's' : ''}` : ''}
+                    {' · '}{proposalsCount}/2 proposition{proposalsCount > 1 ? 's' : ''}
                   </span>
                 </div>
 
@@ -340,6 +353,15 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
                               {'\u25BC'}
                             </button>
                             <span className="territory-vote-name">{p.name}</span>
+                            {p.proposedBy === userId && (
+                              <button
+                                className="territory-vote-delete"
+                                onClick={() => handleDeleteProposal(p.id)}
+                                title="Supprimer ma proposition"
+                              >
+                                ×
+                              </button>
+                            )}
                             {mv !== 0 && (
                               <span className="territory-vote-my">{mv > 0 ? '+' : ''}{mv}</span>
                             )}
@@ -388,7 +410,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
                       Annuler
                     </button>
                   </div>
-                ) : proposalsCount < 3 && (
+                ) : proposalsCount < 2 && (
                   <button
                     className="territory-propose-btn"
                     onClick={() => setShowProposeInput(true)}

@@ -1,6 +1,6 @@
 # La Carte — Runes de Chêne
 
-> Dernière mise à jour : 17 mars 2026
+> Dernière mise à jour : 20 mars 2026
 
 ## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
@@ -188,13 +188,13 @@ Lieux non découverts = masqués. Coût : 1.0 énergie remote (0.5 même faction
 
 ### Fortification (5 niveaux : 0→4)
 
-| Niveau | Nom | Coût construction | Coût conquête ennemi |
-|--------|-----|-------------------|----------------------|
-| 0 | — | — | 1 |
-| 1 | Tour de guet | 1 | 2 |
-| 2 | Tour de défense | 2 | 3 |
-| 3 | Bastion | 3 | 4 |
-| 4 | Béfroi | 5 | 5 |
+| Niveau | Nom | Coût construction | Coût conquête ennemi | Bonus influence |
+|--------|-----|-------------------|----------------------|-----------------|
+| 0 | — | — | 1 | +0 |
+| 1 | Tour de guet | 1 | 2 | +10 |
+| 2 | Tour de défense | 2 | 3 | +20 |
+| 3 | Bastion | 3 | 4 | +30 |
+| 4 | Forteresse | 5 | 5 | +60 |
 
 ### Notoriété
 
@@ -205,10 +205,43 @@ Lieux non découverts = masqués. Coût : 1.0 énergie remote (0.5 même faction
 
 - Voronoi via d3-delaunay + Turf.js dans un Web Worker
 - Chaque faction : union de cercles autour des lieux contrôlés
-- Taille cercle = tier basé sur nombre de lieux dans `territory_tiers`
+- Taille cercle = basée sur le **score d'influence** (voir ci-dessous)
 - Labels = nom voté par les joueurs (`territory_votes`)
+- Noms de territoire : max **2 propositions** par joueur, suppression possible de ses propres propositions
+
+### Score d'influence (rayon territoire)
+
+Le rayon d'un lieu sur la carte dépend de son score d'influence :
+
+**Formule rayon :** `0.25 + √(score - 1) × 0.65` km
+
+**Score = likes×1 + vues×0.1 + explorations×3 + bonus fortification**
+
+| Fortification | Bonus score |
+|---|---|
+| Tour de guet (niv.1) | +10 |
+| Tour de défense (niv.2) | +20 |
+| Bastion (niv.3) | +30 |
+| Forteresse (niv.4) | +60 |
+
+Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
+
+**Important :** côté serveur (`territory_radius_km`), le rayon est multiplié par **0.6** pour compenser le clipping Voronoi. Les territoires visuels sont clippés par les cellules Voronoi, donc le rayon réel est plus petit que le cercle théorique. Sans cette compensation, le blob serveur incluait des lieux visuellement non-connectés.
+
+**Debug admin :** un bloc "DEBUG TERRITOIRE" apparaît dans le PlacePanel pour les admins, montrant le détail du calcul (likes, vues, explo, fortif, score effectif, rayon, ID du lieu).
 - Emblèmes faction (étendards) aux centroïdes, badges fort sur lieux fortifiés
 - Rendu 100% GPU via symbol layers MapLibre (plus de DOM markers)
+- `enrichedGeojson` dans ExploreMap applique les `placeOverrides` (fortif, faction, score) aux features pour mise à jour temps réel des icônes
+
+### Migrations récentes (session 19-20 mars 2026)
+
+| Migration | Description |
+|---|---|
+| 099 | Bonus territoire par fortification (10/20/30/60) |
+| 100 | Profil joueur : LIMIT 50 → 500 sur les lieux |
+| 101 | Rebalance influence : likes×1, vues×0.1, explo×3 |
+| 102 | Propositions territoire : max 2, suppression possible |
+| 103 | Compensation Voronoi : rayon serveur ×0.6 |
 
 ---
 
@@ -406,7 +439,16 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 
 ---
 
-## Bugs connus (audit 17 mars 2026)
+## Bugs corrigés (session 19-20 mars 2026)
+
+- **Nom territoire "Nom incertain"** : le `customName` n'était pas résolu au clic sur un territoire polygon (seulement sur les emblèmes). Corrigé dans ExploreMap.tsx — résolution depuis le store `territoryNames` au moment du clic.
+- **Fortification pas mise à jour en temps réel sur la carte** : `PlaceOverride` ne supportait pas `fortificationLevel`. Ajouté dans mapStore + ClaimButton (reset à 0) + FortifyButton (nouveau niveau). Le `enrichedGeojson` dans ExploreMap applique les overrides aux features pour le rendu des icônes/badges.
+- **Bouton Fortifier absent après conquête** : le PlacePanel ne se rafraîchissait pas après un claim. Ajouté `refetch` dans usePlace, passé via `onClaimed` callback de ClaimButton → PlaceContent → DiscoveredPlaceContent.
+- **Blob serveur incluait des lieux visuellement non-connectés** : `territory_radius_km` utilisait le rayon théorique complet, mais le frontend clippe les cercles par Voronoi. Ajouté facteur ×0.6 dans la RPC (migration 103).
+- **Profil joueur limité à 50 lieux** : `get_player_profile` avait `LIMIT 50` sur les 3 requêtes de lieux. Monté à 500 (migration 100).
+- **Propositions territoire limitées à 3** : réduit à **2 max** par joueur par territoire. Ajouté bouton de suppression de ses propres propositions (migration 102).
+
+## Bugs connus
 
 ### CRITIQUES
 
@@ -422,8 +464,8 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 
 ### Performance
 
-4. **ExploreMap.tsx (1093 lignes)** : composant monolithique, impossible à optimiser par parties
-5. **PlacePanel.tsx (1043 lignes)** : idem, 5 sous-composants inline qui re-render ensemble
+4. **ExploreMap.tsx (~1100 lignes)** : composant monolithique, impossible à optimiser par parties
+5. **PlacePanel.tsx (~1050 lignes)** : idem, sous-composants inline qui re-render ensemble
 6. **App.tsx est un God component** : ~15 states boolean, chaque changement re-évalue tout
 7. **usePlaces charge les 5000 lieux d'un coup** : pas de viewport-based loading
 8. **Territory Worker recalcule tout** à chaque changement (pas d'update incrémental)

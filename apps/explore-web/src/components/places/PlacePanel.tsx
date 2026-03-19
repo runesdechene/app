@@ -21,7 +21,7 @@ interface PlacePanelProps {
 }
 
 export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
-  const { place, loading, error } = usePlace(placeId)
+  const { place, loading, error, refetch } = usePlace(placeId)
   const isOpen = placeId !== null
 
   return (
@@ -42,14 +42,14 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlaceP
         )}
 
         {place && !loading && (
-          <PlaceContent key={place.id} place={place} onClose={onClose} userEmail={userEmail} onAuthPrompt={onAuthPrompt} />
+          <PlaceContent key={place.id} place={place} onClose={onClose} userEmail={userEmail} onAuthPrompt={onAuthPrompt} onRefetch={refetch} />
         )}
       </div>
     </>
   )
 }
 
-function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void }) {
+function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void; onRefetch: () => void }) {
   const { isAuthenticated } = useAuth()
   const discoveredIds = usePlayerStore(s => s.discoveredIds)
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -75,12 +75,12 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt }: { place: Plac
     )
   }
 
-  return <DiscoveredPlaceContent place={place} onClose={onClose} userEmail={userEmail} />
+  return <DiscoveredPlaceContent place={place} onClose={onClose} userEmail={userEmail} onRefetch={onRefetch} />
 }
 
 // --- Vue découverte (lieu accessible) ---
 
-function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDetail; onClose: () => void; userEmail: string | null }) {
+function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
   const [imageIndex, setImageIndex] = useState(0)
@@ -547,17 +547,18 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {/* Admin : debug territoire */}
         {isAdmin && (() => {
-          const baseScore = (place.metrics?.likes ?? 0) * 5 + (place.metrics?.views ?? 0) * 0.1 + (place.metrics?.explored ?? 0) * 10
+          const baseScore = (place.metrics?.likes ?? 0) * 1 + (place.metrics?.views ?? 0) * 0.1 + (place.metrics?.explored ?? 0) * 3
           const fortLevel = place.claim?.fortificationLevel ?? 0
-          const fortBonus = fortLevel === 1 ? 10 : fortLevel === 2 ? 20 : fortLevel === 3 ? 50 : fortLevel === 4 ? 100 : 0
+          const fortBonus = fortLevel === 1 ? 10 : fortLevel === 2 ? 20 : fortLevel === 3 ? 30 : fortLevel === 4 ? 60 : 0
           const effectiveScore = Math.round(baseScore) + fortBonus
           const radius = effectiveScore <= 0 ? 0 : effectiveScore <= 1 ? 0.25 : 0.25 + Math.sqrt(effectiveScore - 1) * 0.65
           return (
             <div style={{ background: '#1a1a2e', color: '#0f0', fontSize: '11px', fontFamily: 'monospace', padding: '8px 12px', borderRadius: '8px', marginTop: '8px' }}>
               <div style={{ fontWeight: 700, marginBottom: 4 }}>DEBUG TERRITOIRE</div>
-              <div>Likes: {place.metrics?.likes ?? 0} × 5 = {(place.metrics?.likes ?? 0) * 5}</div>
+              <div style={{ opacity: 0.6, fontSize: 10 }}>ID: {place.id}</div>
+              <div>Likes: {place.metrics?.likes ?? 0} × 1 = {(place.metrics?.likes ?? 0) * 1}</div>
               <div>Vues: {place.metrics?.views ?? 0} × 0.1 = {((place.metrics?.views ?? 0) * 0.1).toFixed(1)}</div>
-              <div>Explo: {place.metrics?.explored ?? 0} × 10 = {(place.metrics?.explored ?? 0) * 10}</div>
+              <div>Explo: {place.metrics?.explored ?? 0} × 3 = {(place.metrics?.explored ?? 0) * 3}</div>
               <div>Score base: {Math.round(baseScore)}</div>
               <div>Fortif: niv.{fortLevel} → +{fortBonus}</div>
               <div style={{ fontWeight: 700, color: '#0ff' }}>Score effectif: {effectiveScore}</div>
@@ -569,7 +570,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
 
         {/* Claim button (masque en mode exploration) */}
         {userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
-          <ClaimButton placeId={place.id} currentClaim={place.claim} />
+          <ClaimButton placeId={place.id} currentClaim={place.claim} onClaimed={onRefetch} />
         )}
 
         {/* Fortify button (masque en mode exploration) */}

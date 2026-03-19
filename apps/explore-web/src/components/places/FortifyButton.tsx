@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
+import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
 import { ctByLevel } from '../../hooks/useConstructionTypes'
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function FortifyButton({ placeId, currentClaim, constructionTypes }: Props) {
+  const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
   const constructionPoints = usePlayerStore(s => s.constructionPoints)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userId = usePlayerStore(s => s.userId)
@@ -67,6 +69,7 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
 
     if (data?.success) {
       setLocalLevel(data.fortificationLevel)
+      setPlaceOverride(placeId, { fortificationLevel: data.fortificationLevel })
       if (data.constructionPoints !== undefined) {
         usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
       }
