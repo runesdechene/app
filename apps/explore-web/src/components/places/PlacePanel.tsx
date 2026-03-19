@@ -545,6 +545,28 @@ function DiscoveredPlaceContent({ place, onClose, userEmail }: { place: PlaceDet
           <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
         )}
 
+        {/* Admin : debug territoire */}
+        {isAdmin && (() => {
+          const baseScore = (place.metrics?.likes ?? 0) * 5 + (place.metrics?.views ?? 0) * 0.1 + (place.metrics?.explored ?? 0) * 10
+          const fortLevel = place.claim?.fortificationLevel ?? 0
+          const fortBonus = fortLevel === 1 ? 10 : fortLevel === 2 ? 20 : fortLevel === 3 ? 50 : fortLevel === 4 ? 100 : 0
+          const effectiveScore = Math.round(baseScore) + fortBonus
+          const radius = effectiveScore <= 0 ? 0 : effectiveScore <= 1 ? 0.25 : 0.25 + Math.sqrt(effectiveScore - 1) * 0.65
+          return (
+            <div style={{ background: '#1a1a2e', color: '#0f0', fontSize: '11px', fontFamily: 'monospace', padding: '8px 12px', borderRadius: '8px', marginTop: '8px' }}>
+              <div style={{ fontWeight: 700, marginBottom: 4 }}>DEBUG TERRITOIRE</div>
+              <div>Likes: {place.metrics?.likes ?? 0} × 5 = {(place.metrics?.likes ?? 0) * 5}</div>
+              <div>Vues: {place.metrics?.views ?? 0} × 0.1 = {((place.metrics?.views ?? 0) * 0.1).toFixed(1)}</div>
+              <div>Explo: {place.metrics?.explored ?? 0} × 10 = {(place.metrics?.explored ?? 0) * 10}</div>
+              <div>Score base: {Math.round(baseScore)}</div>
+              <div>Fortif: niv.{fortLevel} → +{fortBonus}</div>
+              <div style={{ fontWeight: 700, color: '#0ff' }}>Score effectif: {effectiveScore}</div>
+              <div style={{ fontWeight: 700, color: '#ff0' }}>Rayon: {radius.toFixed(2)} km</div>
+              <div>Formule: 0.25 + √({effectiveScore}-1) × 0.65</div>
+            </div>
+          )
+        })()}
+
         {/* Claim button (masque en mode exploration) */}
         {userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
           <ClaimButton placeId={place.id} currentClaim={place.claim} />

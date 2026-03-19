@@ -1,37 +1,95 @@
 # La Carte — Runes de Chêne
 
-> Jeu de carte interactive du patrimoine français
 > Dernière mise à jour : 17 mars 2026
 
-## Source de vérité
+## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
-Ce fichier traduit techniquement les décisions stratégiques prises dans **La Citadelle** (Obsidian).
-En cas de conflit, **La Citadelle fait autorité**.
+**Ce CLAUDE.md est un document vivant.** À chaque session, le XO DOIT le mettre à jour quand :
+- Une **migration SQL** est créée → mettre à jour Tables, RPCs, Triggers, Indexes
+- Un **composant** est créé, renommé ou supprimé → mettre à jour l'arborescence
+- Un **store** change de shape → mettre à jour la section Stores
+- Un **hook** est ajouté/modifié → mettre à jour la section Hooks
+- Une **RPC** est ajoutée ou modifiée → mettre à jour RPCs + mapping RPC↔Frontend
+- Un **bug connu** est corrigé → le retirer de la liste. Un nouveau est trouvé → l'ajouter
+- Du **code mort** est nettoyé → le retirer de la liste
+
+**Quand mettre à jour :** immédiatement après chaque changement stable (pas en plein WIP).
+**Comment :** utiliser l'outil Edit pour modifier la section concernée, puis mettre à jour la date en haut.
+**Ne jamais :** refaire un audit complet. Tenir le fichier à jour incrémentalement.
 
 ---
 
-## Vision
+## Boussole — Relire à chaque session
 
-Une carte interactive du patrimoine français transformée en **jeu de factions**. Les joueurs découvrent des lieux, revendiquent des territoires pour leur faction, fortifient leurs positions, et accumulent de la notoriété.
+**On vend : de l'Appartenance et de la Découverte**
 
-**Style visuel :** Parchemin, Skyrim, médiéval fantaisie. Couleurs sépia, typographie médiévale.
+Pense à relire : 
 
----
+**Le gameplay / la vision à terme** 
+`\\EGIDE\Runes de Chêne\👑 LA CITADELLE\📱 L'application (Conquête)\🎮 Bible Game Design.md`
+ou si EGIDE non dispo, demander la position de l'OBSIDIAN CITADELLE
+
+**La vision globale de l'application (Conquête)** 
+`\\EGIDE\Runes de Chêne\👑 LA CITADELLE\📋VUE - L'application (Conquête)` 
+ou si EGIDE non dispo, demander la position de l'OBSIDIAN CITADELLE
+
+### Règles
+
+1. **Moindre friction** — Si ça bloque ou prend du temps, c'est inutile ou mal abordé
+2. **Pareto** — 20% d'effort pour 80% de résultat
+
 
 ## Stack technique
 
-| Outil | Rôle |
-|-------|------|
-| React 18 + TypeScript | Framework UI |
-| Vite 5 | Build tool |
-| MapLibre GL JS | Rendu cartographique |
-| OpenFreeMap | Tuiles (gratuit, basé OpenStreetMap) |
-| Supabase | Auth OTP, RPC functions, Storage, Realtime |
-| Zustand | State management (playerStore, mapStore, toastStore) |
-| vite-plugin-pwa | PWA installable |
-| Netlify | Déploiement → `carte.runesdechene.com` |
+| Couche | Techno |
+|--------|--------|
+| Runtime | Node.js |
+| Package manager | pnpm (workspaces) |
+| Language | TypeScript strict |
+| Framework | React 18 (types) — React 19 installé via pnpm overrides |
+| Build | Vite 5, target es2022, PWA via vite-plugin-pwa |
+| Backend | Supabase (PostgreSQL 17, Auth OTP, Storage, RPC, RLS, Realtime) |
+| Carte | MapLibre GL JS + OpenFreeMap (tuiles gratuites) |
+| Géo | Turf.js (union, buffer, intersect, simplify, difference, distance) |
+| Territoires | d3-delaunay (Voronoi) + Web Worker |
+| State | Zustand (6 stores) |
+| Styles | Tailwind CSS 4 + App.css monolithique |
+| Déploiement | Netlify CLI manuel (pas d'auto-deploy Git) |
 
-**Port dev :** 3000 | **Build :** `pnpm build`
+## Conventions
+
+- **pnpm** — jamais npm ni yarn
+- **TypeScript strict** — pas de `any`
+- **Conventional Commits** — `feat:`, `fix:`, `chore:`, `docs:`
+- **Pas de code mort** — si c'est unused, on supprime
+- **Pas d'over-engineering** — simple, direct, fonctionnel
+- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/` (002→097)
+- **RPCs** — logique métier côté serveur via `SECURITY DEFINER` functions
+
+## Commandes
+
+```bash
+# Dev
+pnpm dev                # Lance explore-web (port 3000)
+
+# Build
+pnpm build              # tsc && vite build
+
+# Déploiement (TOUJOURS manuel, chemin ABSOLU obligatoire)
+cd apps/explore-web && netlify deploy --prod --dir "%CD%\dist" --no-build
+
+# Supabase
+npx supabase start      # Supabase local
+npx supabase db push    # Appliquer les migrations
+```
+
+## Variables d'environnement
+
+Fichier `.env` à la racine du monorepo :
+```
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=xxx
+```
 
 ---
 
@@ -39,184 +97,349 @@ Une carte interactive du patrimoine français transformée en **jeu de factions*
 
 ```
 src/
+├── App.tsx              # Orchestrateur principal (~15 modals/panels)
+├── App.css              # Styles médiévaux (monolithique, ~2000 lignes)
 ├── components/
 │   ├── map/
-│   │   ├── ExploreMap.tsx          # Carte MapLibre + territoires Voronoi (~750 lignes)
-│   │   ├── MapStyleSelect.tsx      # Dropdown style carte (game/detailed/satellite)
-│   │   ├── TerritoryMarkers.tsx    # Emblèmes, labels, badges fort (React.memo)
-│   │   ├── OnlinePlayerMarkers.tsx # Marqueurs joueurs en ligne (React.memo)
-│   │   ├── EnergyIndicator.tsx     # Jauge ⚡ X.X/5 (rendu pur, pas de timer)
-│   │   ├── ResourceIndicator.tsx   # Jauges ⚔️/🔨 X.X/5 (rendu pur, pas de timer)
-│   │   ├── Minimap.tsx             # Minimap Canvas2D (Path2D batching par couleur)
-│   │   ├── FactionBar.tsx          # Scoreboard factions (notoriété temporelle)
-│   │   ├── ConquestToggle.tsx      # Toggle mode conquête/exploration
-│   │   ├── MobileHeader.tsx        # Header mobile (profil, énergie)
-│   │   ├── MobileNavbar.tsx        # Navbar mobile bottom
-│   │   ├── PlayerProfileModal.tsx  # Profil joueur public
-│   │   ├── FactionMembersModal.tsx # Membres d'une faction
-│   │   ├── LeaderboardModal.tsx    # Classement joueurs
-│   │   ├── TerritoryPanel.tsx      # Panel détail territoire
-│   │   ├── InfoModal.tsx           # Modal info/aide
-│   │   ├── GameToast.tsx           # Toasts activité temps réel
-│   │   └── VersionBadge.tsx        # Badge version app
+│   │   ├── ExploreMap.tsx        # Carte MapLibre + territoires (~1093 lignes)
+│   │   ├── EnergyIndicator.tsx   # Jauge énergie + regen timer
+│   │   ├── ResourceIndicator.tsx # Jauge conquête OU construction
+│   │   ├── FactionBar.tsx        # Scoreboard factions (notoriété)
+│   │   ├── FactionMembersModal.tsx
+│   │   ├── ConquestToggle.tsx    # Switch exploration/conquête
+│   │   ├── GameToast.tsx         # Toasts in-game temps réel
+│   │   ├── InfoModal.tsx         # Modal info ressources
+│   │   ├── PlayerProfileModal.tsx # Profil joueur + édition
+│   │   ├── LeaderboardModal.tsx  # Classements (cache 30s)
+│   │   ├── TerritoryPanel.tsx    # Détail territoire + vote nom
+│   │   ├── Minimap.tsx           # Canvas minimap
+│   │   ├── MobileHeader.tsx      # Header mobile
+│   │   ├── MobileNavbar.tsx      # Nav mobile (Carte/Activité/Chat/Profil)
+│   │   └── VersionBadge.tsx      # Changelog modal
 │   ├── places/
-│   │   ├── PlacePanel.tsx          # Fiche lieu (~590 lignes, orchestrateur)
-│   │   ├── FoggedPlaceView.tsx     # Vue lieu non découvert (coût énergie, GPS)
-│   │   ├── ClaimButton.tsx         # Bouton revendication (coût dynamique)
-│   │   ├── FortifyButton.tsx       # Bouton fortification (coût progressif)
-│   │   ├── ScoreSlider.tsx         # Slider score/influence (admin only)
-│   │   └── AddPlaceFlow.tsx        # Ajout de lieu par l'utilisateur
+│   │   ├── PlacePanel.tsx        # Fiche lieu (~1043 lignes)
+│   │   └── AddPlaceFlow.tsx      # Création de lieu + upload photos
 │   ├── auth/
-│   │   ├── AuthModal.tsx           # Modal auth (login/signup)
-│   │   ├── FactionModal.tsx        # Rejoindre/quitter une faction
-│   │   ├── OnboardingModal.tsx     # Onboarding nouveau joueur
-│   │   ├── GameModeModal.tsx       # Choix mode de jeu
-│   │   ├── ProfileMenu.tsx         # Menu profil dropdown
-│   │   └── EmailChangeModal.tsx    # Changement d'email
+│   │   ├── AuthModal.tsx         # Login OTP email
+│   │   ├── FactionModal.tsx      # Choix/changement faction
+│   │   ├── OnboardingModal.tsx   # Setup profil initial
+│   │   ├── ProfileMenu.tsx       # Menu profil desktop
+│   │   ├── GameModeModal.tsx     # Choix mode de jeu
+│   │   └── EmailChangeModal.tsx  # Changement email
 │   ├── chat/
-│   │   └── ChatPanel.tsx           # Chat temps réel
-│   ├── pwa/
-│   │   ├── InstallPrompt.tsx       # Prompt installation PWA
-│   │   └── OfflineIndicator.tsx    # Indicateur hors-ligne
-│   ├── AuthForm.tsx                # Login email magic link OTP (legacy)
-│   ├── AuthCallback.tsx            # Callback OTP (legacy)
-│   └── UserProfile.tsx             # Profil self (nom, rang, avatar, lieux explorés)
+│   │   └── ChatPanel.tsx         # Chat 3 canaux + cheat codes admin
+│   └── pwa/
+│       ├── InstallPrompt.tsx     # PWA install banner
+│       └── OfflineIndicator.tsx  # Indicateur hors-ligne
 ├── hooks/
-│   ├── useAuth.ts                  # Hook auth Supabase (user, isAuthenticated)
-│   ├── usePlayer.ts                # Init joueur + énergie + Realtime activity
-│   │                                 # discoverPlace() — fonction standalone
-│   ├── usePlace.ts                 # Fetch détail lieu → PlaceDetail type
-│   ├── usePlaces.ts                # Fetch liste lieux → GeoJSON FeatureCollection
-│   ├── useResourceTimers.ts        # Timer unique partagé (1 setInterval pour 3 ressources)
-│   ├── useConstructionTypes.ts     # Types de construction (niveaux fortification)
-│   ├── useChat.ts                  # Hook chat temps réel
-│   ├── usePresence.ts              # Présence joueurs en ligne
-│   └── useSupabaseConnection.ts    # Gestion connexion Supabase
+│   ├── useAuth.ts               # Auth Supabase + session
+│   ├── usePlayer.ts             # Boot sequence (4 RPCs // + realtime)
+│   ├── usePlace.ts              # Fetch détail lieu
+│   ├── usePlaces.ts             # Fetch TOUS les lieux (get_map_places)
+│   ├── usePresence.ts           # Presence joueurs en ligne
+│   ├── useChat.ts               # Chat 3 canaux + realtime
+│   └── useConstructionTypes.ts  # Types fortification (cache module)
 ├── stores/
-│   ├── playerStore.ts              # State central joueur (ex-fogStore) :
-│   │                                 # userId, userFactionId/Color/Pattern
-│   │                                 # energy/maxEnergy/nextPointIn
-│   │                                 # conquestPoints/maxConquest/conquestNextPointIn
-│   │                                 # constructionPoints/maxConstruction/constructionNextPointIn
-│   │                                 # notorietyPoints, gameMode
-│   │                                 # discoveredIds (Set<string>)
-│   │                                 # userName, userAvatarUrl, isAdmin
-│   ├── mapStore.ts                 # placeOverrides (Map<string, PlaceOverride>)
-│   ├── playersStore.ts             # Joueurs en ligne (positions, factions)
-│   ├── chatStore.ts                # Messages chat
-│   ├── mobileNavStore.ts           # Navigation mobile state
-│   └── toastStore.ts               # File de toasts in-game
-├── lib/
-│   ├── supabase.ts                 # Client Supabase singleton
-│   ├── map-icons.ts                # Pipeline SVG : cache, colorize, shift, ImageData
-│   ├── map-layers.ts               # Définitions layers MapLibre (territoires, icônes, points)
-│   ├── map-style.ts                # Styles de carte (game/detailed/satellite)
-│   └── imageUtils.ts               # Utilitaires images
+│   ├── playerStore.ts           # Joueur : resources, faction, notoriété, admin
+│   ├── mapStore.ts              # Carte : selection, flyTo, overrides, mode
+│   ├── toastStore.ts            # File de toasts in-game
+│   ├── chatStore.ts             # Messages 3 canaux
+│   ├── mobileNavStore.ts        # Panel mobile actif
+│   └── playersStore.ts          # Joueurs en ligne (Map<id, player>)
 ├── workers/
-│   └── territoryWorker.ts          # Web worker Voronoi (calcul territoires)
-├── types/
-│   └── database.types.ts           # Types Supabase auto-générés
-├── App.tsx                         # Orchestrateur : toolbar + carte + panels + modals
-├── App.css                         # Tous les styles (parchemin, medieval, jauges, etc.)
-├── main.tsx                        # Point d'entrée React
-└── vite-env.d.ts                   # Types Vite
+│   └── territoryWorker.ts       # Voronoi + clip + union (Web Worker)
+├── lib/
+│   ├── supabase.ts              # Client Supabase (NON typé)
+│   ├── map-icons.ts             # Pipeline SVG : cache, colorize, shift, ImageData
+│   ├── map-layers.ts            # Définitions layers MapLibre
+│   └── map-style.ts             # Styles de carte (game/detailed/satellite)
+└── types/
+    └── database.types.ts        # Types générés (STALE, jamais importé)
 ```
 
 ---
 
-## Systèmes de jeu
+## Gameplay — La Carte
+
+### Factions
+
+Joueurs → faction. Chaque faction : titre, couleur, pattern SVG. Territoires = zones Voronoi colorées par faction sur la carte.
+
+### 3 ressources (régénération par ticks)
+
+| Ressource | Regen | Max | Usage |
+|-----------|-------|-----|-------|
+| Énergie ⚡ | +1/7200s | 5 + bonus | Découvrir des lieux |
+| Conquête ⚔️ | +1/14400s | 5 + bonus | Revendiquer des lieux |
+| Construction 🔨 | +1/14400s | 5 + bonus | Fortifier des lieux |
 
 ### Fog of War
 
-- `playerStore.discoveredIds` = Set de place IDs déjà découverts
-- Lieux non découverts → floutés sur la carte
-- `discoverPlace(placeId, lat, lng)` dans usePlayer.ts (standalone, pas un hook)
-- Coût : 1.0 énergie remote (0.5 même faction), 0 si GPS < 500m
-- `discover_place` RPC donne des récompenses tag (énergie, conquête, construction)
+Lieux non découverts = masqués. Coût : 1.0 énergie remote (0.5 même faction), gratuit GPS < 500m.
 
-### 3 Ressources
+### Actions joueur
 
-Régénération par ticks côté serveur (`get_user_energy` RPC) :
-- **Énergie ⚡** : cycle 7200s (+0.5/h), max 5, pour découvrir
-- **Conquête ⚔️** : cycle 14400s (+0.25/h), max 5, pour revendiquer
-- **Construction 🔨** : cycle 14400s (+0.25/h), max 5, pour fortifier
+| Action | RPC | Coût | Gain notoriété | Effet |
+|--------|-----|------|----------------|-------|
+| Découvrir | `discover_place` | Énergie | — | Débloque lieu + récompenses tag |
+| Revendiquer | `claim_place` | 1 + fortif. level conquête | +10 | Change faction du lieu, reset fortif. |
+| Fortifier | `fortify_place` | Selon niveau (1→5) construction | +5 | Monte le niveau de défense (0→4) |
+| Créer un lieu | `create_place` | Gratuit | — | Auto-claim si faction |
 
-Frontend : `useResourceTimers` gère un unique `setInterval` 1s pour les 3 compteurs. Refetch auto quand un timer atteint 0. `EnergyIndicator` et `ResourceIndicator` sont des composants de rendu pur (pas de timer interne).
+### Fortification (5 niveaux : 0→4)
 
-### Claim (Revendication)
-
-- PlacePanel > ClaimButton (composant séparé)
-- Coût : `1 + fortification_level + zone_bonus + size_bonus` conquête
-- `claim_place` RPC : met à jour places.faction_id, reset fortification à 0, +10 notoriété
-- Update temps réel via `mapStore.setPlaceOverride` + Realtime `activity_log`
-- Toast : "Lieu revendiqué pour {faction} ! +10 Notoriété"
-
-### Fortification
-
-- PlacePanel > FortifyButton (composant séparé, visible si lieu de sa faction + level < max)
-- `fortify_place` RPC : coûts progressifs définis par `construction_types`, +5 notoriété
-- Niveaux définis dynamiquement via `useConstructionTypes`
-- Chaque niveau ajoute +1 au coût de claim ennemi
+| Niveau | Nom | Coût construction | Coût conquête ennemi |
+|--------|-----|-------------------|----------------------|
+| 0 | — | — | 1 |
+| 1 | Tour de guet | 1 | 2 |
+| 2 | Tour de défense | 2 | 3 |
+| 3 | Bastion | 3 | 4 |
+| 4 | Béfroi | 5 | 5 |
 
 ### Notoriété
 
 - **Personnelle** : `users.notoriety_points` (+10 claim, +5 fortify)
-- **Faction** : `get_faction_notoriety()` — `floor(heures) * (1 + fort_level * 0.5)`
-- FactionBar affiche le score faction (remplace l'ancien %)
-- PlayerProfileModal affiche la notoriété personnelle
+- **Faction** : `get_faction_notoriety()` — `floor(heures_tenues) * (1 + fortif * 0.5)`
 
-### Territoires Voronoi
+### Territoires
 
-- ExploreMap calcule des zones Voronoi via un web worker (`territoryWorker`)
-- Chaque lieu revendiqué crée une zone colorée par la faction
-- Opacité : 28% pour sa faction, 18% pour les autres, 30% au hover
-- Blasons (patterns SVG) affichés aux centroïdes des territoires
-- `TerritoryMarkers` (React.memo) gère le rendu des emblèmes, labels et badges fort
-
-### Activité Realtime
-
-- Canal Supabase `activity-realtime` sur `activity_log` (INSERT)
-- Types : claim, discover, like, new_user
-- `loadRecentActivity()` charge les 50 derniers events (7 jours)
-- Toasts in-game avec highlights et liens vers les lieux
+- Voronoi via d3-delaunay + Turf.js dans un Web Worker
+- Chaque faction : union de cercles autour des lieux contrôlés
+- Taille cercle = tier basé sur nombre de lieux dans `territory_tiers`
+- Labels = nom voté par les joueurs (`territory_votes`)
+- Emblèmes faction (étendards) aux centroïdes, badges fort sur lieux fortifiés
+- Rendu 100% GPU via symbol layers MapLibre (plus de DOM markers)
 
 ---
 
-## Types clés
+## Base de données — État final (post-migration 097)
 
-### PlaceDetail (usePlace.ts)
+### Tables principales
 
-```typescript
-{
-  id, title, text, address, accessibility, sensible, geocaching,
-  images: Array<{ id, url }>,
-  author: { id, lastName, profileImageUrl },
-  type: { id, title },
-  primaryTag: { id, title, color, background } | null,
-  tags: Array<{ id, title, color, background, icon, isPrimary }>,
-  location: { latitude, longitude },
-  metrics: { views, likes, explored, note },
-  claim: {
-    factionId, factionTitle, factionColor,
-    claimedBy, claimedAt, fortificationLevel,
-    zoneFortification, zoneNeighborCount
-  } | null,
-  requester: { bookmarked, liked, explored } | null,
-  lastExplorers: Array<{ id, lastName, profileImageUrl }>,
-  beginAt, endAt
-}
+| Table | Colonnes clés | Rôle |
+|-------|---------------|------|
+| `users` | id, email, avatar_url, faction_id, energy/conquest/construction + reset_at + cycle + max + bonus, notoriety_points, game_mode, is_admin, bio, instagram | Joueurs |
+| `places` | id, name, description, lat/lng, address, images[], author_id, faction_id, claimed_by, claimed_at, fortification_level, score, total_votes | Lieux (2400+) |
+| `factions` | id, title, color, pattern, icon, description, created_by | Factions jouables |
+| `tags` | id, name, color, icon, reward_energy/conquest/construction | Tags de lieux |
+| `place_tags` | place_id, tag_id, is_primary | Liaison lieu↔tag |
+| `places_discovered` | user_id, place_id, discovered_at | Fog of war |
+| `place_claims` | id, place_id, user_id, faction_id, claimed_at | Historique conquêtes |
+| `activity_log` | id, type, actor_id, place_id, faction_id, data, created_at | Feed temps réel (Realtime) |
+| `chat_messages` | id, user_id, user_name, avatar_url, faction_id, channel, content, created_at | Chat (general/faction/bugs) |
+| `territory_votes` | id, faction_id, anchor_place_id, proposed_name, user_id, created_at | Vote noms territoires |
+| `territory_tiers` | id, minPlaces, radiusKm, label | Paliers taille territoires |
+| `construction_types` | id, level, name, cost, defense_bonus, description | Définitions fortification |
+| `app_settings` | key, value | Config jeu (zone_fort_multiplier, etc.) |
+| `place_photos` | id, place_id, user_id, url, created_at | Photos communautaires |
+| `reviews` | id, user_id, place_id, rating, comment | Avis (hub) |
+| `places_liked` | user_id, place_id | Likes |
+| `places_viewed` | user_id, place_id, viewed_at | Vues |
+| `places_explored` | user_id, place_id, explored_at | Explorations |
+| `places_bookmarked` | user_id, place_id | Favoris |
+
+### RPCs — Liste complète
+
+#### Game Core
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `discover_place` | target_place_id, is_gps | json | Coût énergie, insert places_discovered, récompenses tag, +activity_log |
+| `claim_place` | target_place_id | json | Coût conquête (1+fortif), change faction/claimed_by, reset fortif, +10 notoriété |
+| `fortify_place` | target_place_id, ct_id | json | Coût construction, monte level, +5 notoriété, +activity_log |
+| `get_user_energy` | — | json | 3 ressources + regen ticks + bonus + notoriété |
+| `get_user_discoveries` | — | setof uuid | IDs lieux découverts par le joueur |
+
+#### Map & Feed
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `get_map_places` | lim | json[] | Tous les lieux avec coords, faction, tags, scores |
+| `get_faction_notoriety` | — | json[] | Score temporel par faction (heures × fortif) |
+| `get_recent_activity` | — | json[] | Dernières entrées activity_log |
+| `get_winning_territory_names` | — | json[] | Noms gagnants par territoire |
+
+#### Place Detail
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `get_place_by_id` | target_place_id | json | Détail complet (auteur, tags, images, claim, fortif, scores) |
+| `like_place` | p_place_id | void | Insert places_liked + activity_log |
+| `unlike_place` | p_place_id | void | Delete places_liked |
+| `get_place_likers` | p_place_id | json[] | Liste des likers (avatar_url) |
+| `get_place_explorers` | p_place_id | json[] | Liste des explorateurs (avatar_url) |
+| `explore_place` | p_place_id | void | Insert places_explored + activity_log |
+| `create_place` | name, desc, lat, lng, ... | json | Crée lieu + tag primaire + auto-claim si faction + activity_log |
+| `delete_place` | p_place_id | void | Supprime lieu (admin) |
+
+#### Profile & Users
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `get_my_informations` | — | json | Profil complet du joueur connecté |
+| `get_player_profile` | p_user_id | json | Profil public (avatar_url, stats, notoriété, lieux) |
+| `update_my_profile` | name, bio, instagram, avatar_url, game_mode | void | Mise à jour profil |
+| `get_user_titles` | — | json | Titres débloqués + affichés |
+| `set_displayed_titles` | titles | void | Choix des titres affichés (max 2) |
+| `set_user_faction` | p_faction_id | void | Rejoint/change de faction |
+| `get_leaderboard` | tab | json[] | Classement (avatar_url, notoriété/authored/explored) |
+| `get_faction_members` | p_faction_id | json[] | Membres d'une faction (avatar_url, stats) |
+| `get_construction_types` | — | json[] | Liste des types de fortification |
+
+#### Territory Naming
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `get_territory_votes` | p_faction_id, p_anchor_place_id | json[] | Propositions + votes pour un territoire |
+| `propose_territory_name` | p_faction_id, p_anchor_place_id, p_name | json | Nouvelle proposition (1 par joueur par territoire) |
+| `vote_territory_name` | p_vote_id | json | Vote (1 par joueur par territoire) |
+
+#### Chat & Admin
+| RPC | Params | Retour | Logique |
+|-----|--------|--------|---------|
+| `cleanup_old_chat_messages` | — | void | Supprime messages > 7 jours |
+| `cheat_refill` | — | void | Admin : recharge ses propres ressources |
+| `cheat_refill_target` | target_name | void | Admin : recharge ressources d'un joueur |
+
+### Triggers actifs
+
+| Trigger | Table | Event | Action |
+|---------|-------|-------|--------|
+| `trg_log_claim` | `place_claims` | AFTER INSERT | Insère dans activity_log (type 'claim') |
+| `trg_check_titles` | `users` | AFTER UPDATE of notoriety_points | Débloque titres selon seuils |
+
+### Channels Realtime (frontend)
+
+| Channel | Type | Source | Usage |
+|---------|------|--------|-------|
+| `activity-feed` | Postgres Changes INSERT | `activity_log` | Toasts in-game (claims, discovers, likes, etc.) |
+| `chat-general` | Postgres Changes INSERT | `chat_messages` (channel=general) | Chat général |
+| `chat-faction` | Postgres Changes INSERT | `chat_messages` (channel=faction) | Chat faction |
+| `chat-bugs` | Postgres Changes INSERT | `chat_messages` (channel=bugs) | Chat bugs |
+| `map-presence` | Presence | — | Joueurs en ligne sur la carte |
+
+### Storage Buckets
+
+> **⚠️ Un seul bucket `place-images` pour tout** (mal nommé historiquement).
+> Il n'existe PAS de bucket `avatars`. Ne jamais faire `.from('avatars')`.
+
+| Bucket | Contenu | Chemin | Policy DELETE |
+|--------|---------|--------|---------------|
+| `place-images` | Avatars joueurs | `{userId}/avatar.webp` | `foldername[1] = auth.uid()` ✅ |
+| `place-images` | Photos de lieux | `{placeId}/{filename}` | `foldername[1] = auth.uid()` |
+| `community-photos` | Soumissions hub | — | — |
+| `app-assets` | Icônes globales | — | — |
+| `tag-icons` | Icônes de tags | — | — |
+| `faction-patterns` | Patterns factions | — | — |
+
+> **Pas de `upsert: true`** pour les avatars — la policy DELETE exige que le premier dossier du chemin = userId.
+> Toujours faire `remove([path])` puis `upload()` séparément.
+
+---
+
+## Stores Zustand (6)
+
+### playerStore — État joueur
+```
+discoveredIds, userId, userName, userAvatarUrl,
+userFactionId/Color/Title/Pattern, factionTitle2,
+energy/maxEnergy/energyCycle, conquestPoints/maxConquest/conquestCycle,
+constructionPoints/maxConstruction/constructionCycle,
+bonusEnergy/bonusConquest/bonusConstruction,
+notorietyPoints, unlockedTitles, displayedTitles,
+gameMode ('exploration'|'conquest'), isAdmin, loading, userPosition
+```
+
+### mapStore — État carte
+```
+selectedPlaceId, selectedPlayerId, pendingFlyTo, pendingZoom,
+placeOverrides (Map), deletedPlaceIds (Set), addPlaceMode,
+pendingNewPlaceCoords, placesRefreshKey, mapStyleMode ('game'|'detailed'|'satellite'),
+selectedTerritoryData, territoryNames (Map)
+```
+
+### chatStore — Chat
+```
+showGeneral/showFaction/showBugs (filtres), sendChannel,
+generalMessages/factionMessages/bugsMessages (ChatMessage[], max 100/canal)
+```
+
+### toastStore — Toasts in-game
+```
+toasts (GameToast[]) — types: claim/discover/explore/new_place/new_user/like/fortify
+Chaque toast: message, highlights, color (faction), highlightColors, actorId, previousActorId
+```
+
+### playersStore — Joueurs en ligne
+```
+players (Map<string, OnlinePlayer>) — id, name, avatar, faction, lat/lng, last_seen
+```
+
+### mobileNavStore — Navigation mobile
+```
+activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSeenAt
 ```
 
 ---
 
-## Conventions
+## RPC ↔ Frontend — Qui appelle quoi
 
-- **CSS** — tout dans App.css (pas de Tailwind, pas de CSS modules)
-- **State serveur** — appels Supabase directs (pas de React Query)
-- **State client** — Zustand avec `getState()` pour les fonctions standalone
-- **Composants** — fonctionnels, hooks, pas de classes
-- **Nommage** — PascalCase composants, camelCase hooks/stores
-- **Extraction** — composants > 200 lignes → extraire en sous-composants (React.memo si props stables)
-- **Timers** — centralisés dans `useResourceTimers`, jamais de timer dans un composant de rendu
-- **Layers MapLibre** — définitions dans `lib/map-layers.ts`, pas inline dans ExploreMap
-- **Icônes SVG** — pipeline dans `lib/map-icons.ts` avec cache module-level
+| Fichier | RPCs appelées |
+|---------|---------------|
+| `usePlayer.ts` | get_user_discoveries, get_user_energy, get_my_informations, get_user_titles, get_recent_activity, discover_place, set_displayed_titles |
+| `usePlaces.ts` | get_map_places |
+| `usePlace.ts` | get_place_by_id |
+| `useChat.ts` | cleanup_old_chat_messages |
+| `useConstructionTypes.ts` | get_construction_types |
+| `ExploreMap.tsx` | get_winning_territory_names + direct SELECT territory_tiers, app_settings |
+| `EnergyIndicator.tsx` | get_user_energy |
+| `ResourceIndicator.tsx` | get_user_energy |
+| `FactionBar.tsx` | get_faction_notoriety |
+| `FactionMembersModal.tsx` | get_faction_members + direct SELECT factions |
+| `PlayerProfileModal.tsx` | get_player_profile, update_my_profile |
+| `LeaderboardModal.tsx` | get_leaderboard |
+| `TerritoryPanel.tsx` | get_territory_votes, propose_territory_name, vote_territory_name + direct SELECT places, places_liked, place_tags |
+| `PlacePanel.tsx` | like/unlike_place, get_place_likers/explorers, explore_place, delete_place, claim_place, fortify_place + direct SELECT app_settings |
+| `AddPlaceFlow.tsx` | create_place + direct INSERT/UPDATE places, place_tags + SELECT tags |
+| `ConquestToggle.tsx` | update_my_profile |
+| `FactionModal.tsx` | set_user_faction + direct SELECT factions, users |
+| `OnboardingModal.tsx` | update_my_profile |
+| `GameModeModal.tsx` | update_my_profile |
+| `ProfileMenu.tsx` | get_my_informations |
+| `MobileHeader.tsx` | get_my_informations |
+| `ChatPanel.tsx` | cheat_refill, cheat_refill_target + direct INSERT chat_messages |
+
+---
+
+## Bugs connus (audit 17 mars 2026)
+
+### CRITIQUES
+
+1. **`claim_place` (migration 091) a perdu des fonctionnalités** :
+   - N'insère plus dans `place_claims` → historique conquêtes cassé, trigger `trg_log_claim` mort
+   - N'auto-discover plus le lieu dans `places_discovered`
+   - Ne renvoie plus les timers de regen (conquestNextPointIn, constructionNextPointIn)
+
+### MAJEURS
+
+2. **RLS trop permissive** : `app_settings` et `factions` modifiables par tout utilisateur authentifié (devrait être admin-only)
+3. **`get_my_informations` appelé 3 fois** : usePlayer + ProfileMenu + MobileHeader font 3 requêtes identiques au lieu de lire le store
+
+### Performance
+
+4. **ExploreMap.tsx (1093 lignes)** : composant monolithique, impossible à optimiser par parties
+5. **PlacePanel.tsx (1043 lignes)** : idem, 5 sous-composants inline qui re-render ensemble
+6. **App.tsx est un God component** : ~15 states boolean, chaque changement re-évalue tout
+7. **usePlaces charge les 5000 lieux d'un coup** : pas de viewport-based loading
+8. **Territory Worker recalcule tout** à chaque changement (pas d'update incrémental)
+
+---
+
+## Code mort à nettoyer
+
+| Fichier/Export | Statut |
+|----------------|--------|
+| `components/AuthCallback.tsx` | Jamais importé |
+| `components/AuthForm.tsx` | Remplacé par AuthModal.tsx |
+| `components/UserProfile.tsx` | Remplacé par PlayerProfileModal.tsx |
+| `hooks/useSupabaseConnection.ts` | Jamais importé |
+| `lib/supabase.ts` → `testConnection()`, `fetchTables()` | Utilisés uniquement par le hook mort |
+| `types/database.types.ts` | Stale, jamais importé (13 tables vs 22 réelles) |
+| `packages/supabase-client/` | Package partagé typé, jamais importé par les apps |
+| RPCs orphelines | `log_fortify_activity`, `get_user_profile`, `reset_user_energy` |
+| `haversineM()` dupliqué | PlacePanel.tsx + TerritoryPanel.tsx (identique) |

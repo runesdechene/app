@@ -38,10 +38,11 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
     // Upload avatar si choisi
     if (avatarFile) {
       const compressed = await compressImage(avatarFile, 400)
-      const path = `avatars/${userId}.webp`
+      const path = `${userId}/avatar.webp`
+      await supabase.storage.from('place-images').remove([path])
       const { error: uploadErr } = await supabase.storage
         .from('place-images')
-        .upload(path, compressed, { contentType: 'image/webp', upsert: true })
+        .upload(path, compressed, { contentType: 'image/webp' })
 
       if (uploadErr) {
         setError('Erreur lors de l\'upload de l\'avatar')

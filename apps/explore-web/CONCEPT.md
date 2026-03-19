@@ -1,12 +1,12 @@
 # Explore Web — Runes de Chêne
 
-> Bible du projet — Dernière mise à jour : 8 février 2026
+> Bible du projet — Dernière mise à jour : 19/03/2026
 
 ## Vision
 
-**Un jeu géostratégique communautaire autour du patrimoine**, connecté à la boutique e-commerce Runes de Chêne (marque de vêtements, 7 ans d'existence, +10 000 clients, +2 400 lieux, +2 970 utilisateurs).
+**Un jeu géostratégique communautaire autour du patrimoine**, connecté à la boutique e-commerce Runes de Chêne 
 
-L'application est centrée sur une **carte interactive style parchemin/Skyrim** où les joueurs explorent, conquièrent et enrichissent des lieux patrimoniaux. La carte est embeddable dans la boutique Shopify via iframe, créant un lien direct entre le jeu et la boutique.
+L'application est centrée sur une **carte interactive style parchemin/Skyrim** où les joueurs explorent, conquièrent et enrichissent des lieux patrimoniaux. 
 
 **Plateformes cibles :**
 

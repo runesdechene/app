@@ -34,6 +34,7 @@ interface PlaceInput {
   tagColor: string
   factionPattern: string
   score: number
+  likes: number
   fortificationLevel: number
   claimedByName: string
   claimedById: string
@@ -106,6 +107,17 @@ function radiusForScore(score: number): number {
   if (score <= 0) return 0
   if (score <= 1) return BASE_RADIUS_KM
   return BASE_RADIUS_KM + Math.sqrt(score - 1) * RADIUS_SCALE_KM
+}
+
+/** Bonus de score selon le niveau de fortification */
+function fortificationBonus(level: number): number {
+  switch (level) {
+    case 1: return 10
+    case 2: return 20
+    case 3: return 50
+    case 4: return 100
+    default: return 0
+  }
 }
 
 /** Génère un polygone circulaire fermé [lon, lat][] */
@@ -233,7 +245,16 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
-    const rKm = radiusForScore(place.score)
+    // Territory score: boost likes (×5 instead of ×1) and keep the rest of the score as-is
+    // Original score = likes×1 + views×0.1 + explored×2
+    // We want likes to count ×5 and explored ×10, so:
+    // new = score + likes×4 + (explored portion)×extra
+    // Since we can't separate explored from views, we boost: likes×4 extra + remaining×3 extra
+    const likes = place.likes ?? 0
+    const nonLikeScore = Math.max(0, place.score - likes) // views*0.1 + explored*2
+    const territoryScore = likes * 5 + nonLikeScore * 4 // boost everything
+    const effectiveScore = Math.max(Math.round(territoryScore), 1) + fortificationBonus(place.fortificationLevel ?? 0)
+    const rKm = radiusForScore(effectiveScore)
     if (rKm <= 0) continue
 
     const cellCoords = voronoi.cellPolygon(i)

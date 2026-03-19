@@ -35,7 +35,7 @@ interface PopupInfo {
 
 const MAP_STYLE_PROP = { width: '100%', height: '100%' } as const
 const MAP_CONTAINER_STYLE = { position: 'relative' as const, width: '100%', height: '100%' }
-const INITIAL_VIEW = { longitude: 7.26, latitude: 43.7, zoom: 9 }
+const INITIAL_VIEW = { longitude: 2.45, latitude: 46.6, zoom: 6 }
 
 export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
@@ -371,6 +371,7 @@ export const ExploreMap = memo(function ExploreMap() {
               tagColor: ov?.tagColor || f.properties.tagColor,
               factionPattern: ov?.factionPattern || f.properties.factionPattern,
               score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
+              likes: f.properties.likes ?? 0,
               fortificationLevel: f.properties.fortificationLevel ?? 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
@@ -452,11 +453,24 @@ export const ExploreMap = memo(function ExploreMap() {
       if (placesCount >= 3) {
         let placeIds: string[] = []
         try { placeIds = JSON.parse((tp.placeIds as string) || '[]') } catch { /* ignore */ }
+
+        // Resolve customName from territory names store
+        const anchorId = (tp.anchorPlaceId as string) || ''
+        let resolvedName: string | null = null
+        if (anchorId && territoryNames.has(anchorId)) {
+          resolvedName = territoryNames.get(anchorId)!.customName
+        }
+        if (!resolvedName) {
+          for (const pid of placeIds) {
+            if (territoryNames.has(pid)) { resolvedName = territoryNames.get(pid)!.customName; break }
+          }
+        }
+
         setSelectedPlaceId(null)
         setSelectedTerritoryData({
           territoryTitle: (tp.territoryTitle as string) || '',
-          customName: (tp.customName as string) || null,
-          anchorPlaceId: (tp.anchorPlaceId as string) || '',
+          customName: resolvedName,
+          anchorPlaceId: anchorId,
           placeIds,
           topContributorId: (tp.topContributorId as string) || '',
           topContributorName: (tp.topContributorName as string) || '',
@@ -657,12 +671,13 @@ export const ExploreMap = memo(function ExploreMap() {
       {showFactions && zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
         const { customName, tagColor } = f.properties as Record<string, unknown>
         if (!customName) return null
-        const [lon, lat] = (f.geometry as { coordinates: [number, number] }).coordinates
+        const [lon, lat] = (f.geometry as unknown as { coordinates: [number, number] }).coordinates
+        const style = { '--t-color': tagColor } as React.CSSProperties;
         return (
-          <Marker key={`tname-${f.id}`} longitude={lon} latitude={lat} anchor="top" offset={[0, 28]}>
+          <Marker key={`tname-${f.id}`} longitude={lon} latitude={lat} anchor="top" offset={[0, Math.round(150 * (0.20 + (Math.min(Math.max(zoomLevel, 6), 12) - 6) * (0.60 - 0.20) / 6) / 2)]}>
             <div
               className={`territory-name-label${zoomLevel >= 7 ? ' visible' : ''}`}
-              style={{ '--t-color': tagColor } as React.CSSProperties}
+              style={style}
             >
               <span className="territory-name-text">{(customName as string).toUpperCase()}</span>
             </div>

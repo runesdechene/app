@@ -55,6 +55,7 @@ export const fortBadgeLayer: LayerSpecification = {
   id: 'places-fort-badge',
   type: 'symbol',
   source: 'places',
+  minzoom: 8,
   filter: ['>', ['get', 'fortificationLevel'], 0],
   layout: {
     'icon-image': ['concat', 'shield::', ['to-string', ['get', 'fortificationLevel']]],
@@ -84,9 +85,9 @@ export const territoryEmblemLayer: LayerSpecification = {
     'icon-size': [
       'interpolate', ['linear'], ['zoom'],
       3, 0.15,
-      6, 0.25,    // zoom 6 → petite
-      9, 0.30,    // zoom 9 → moyenne
-      12, 0.40,   // zoom 12 → grande
+      6, 0.20,    // zoom 6 → petite
+      9, 0.40,    // zoom 9 → moyenne
+      12, 0.6,   // zoom 12 → grande
     ],
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
@@ -106,7 +107,13 @@ export const territoryRateLayer: LayerSpecification = {
     'text-field': ['concat', '+', ['to-string', ['get', 'hourlyRate']], '/h'],
     'text-font': ['Open Sans Bold'],
     'text-size': 11,
-    'text-offset': [0, -3.5],
+    'text-offset': [
+      'interpolate', ['linear'], ['zoom'],
+      3, ['literal', [0, -1.5]],
+      6, ['literal', [0, -2.0]],
+      9, ['literal', [0, -3.8]],
+      12, ['literal', [0, -5.5]],
+    ],
     'text-allow-overlap': true,
     'text-ignore-placement': true,
   },

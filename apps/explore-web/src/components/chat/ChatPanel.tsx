@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useChatStore } from '../../stores/chatStore'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { sendChatMessage } from '../../hooks/useChat'
 import { supabase } from '../../lib/supabase'
@@ -90,7 +91,8 @@ function MessageList({
             )}
             <span
               className="chat-message-name"
-              style={isFaction ? { color: msg.factionColor || undefined } : undefined}
+              style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px', ...(isFaction ? { color: msg.factionColor || undefined } : undefined) }}
+              onClick={() => useMapStore.getState().setSelectedPlayerId(msg.userId)}
             >
               {msg.userName}
             </span>

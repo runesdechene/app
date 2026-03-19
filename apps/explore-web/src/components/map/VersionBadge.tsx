@@ -68,7 +68,7 @@ export function VersionBadge() {
 
             {versions.length > 1 && (
               <div className="version-modal-history">
-                {versions.slice(1).map((v, i) => (
+                {versions.slice(1, 4).map((v, i) => (
                   <details key={i}>
                     <summary>{v.version}{v.title ? ` — ${v.title}` : ''}</summary>
                     <ul>

@@ -94,36 +94,50 @@ export async function buildBannerImageData(url: string, color: string): Promise<
   const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
 
   const SIZE = 150
-  const canvas = document.createElement('canvas')
-  canvas.width = SIZE
-  canvas.height = SIZE
-  const ctx = canvas.getContext('2d')!
+  const SCALE = 2  // dessiner à 2x pour anti-aliasing
+  const hiRes = SIZE * SCALE
+
+  // Canvas haute résolution
+  const big = document.createElement('canvas')
+  big.width = hiRes
+  big.height = hiRes
+  const bctx = big.getContext('2d')!
+  bctx.scale(SCALE, SCALE)
   const cx = SIZE / 2
 
   // Forme étendard : rectangle haut + pointe courte en bas
-  const w = 120              // largeur
-  const rectH = 96          // hauteur partie rectangulaire
-  const tipH = 40           // hauteur de la pointe
+  const w = 110
+  const rectH = 96
+  const tipH = 40
   const x = cx - w / 2
   const y = 4
 
-  ctx.beginPath()
-  ctx.moveTo(x, y)
-  ctx.lineTo(x + w, y)
-  ctx.lineTo(x + w, y + rectH)
-  ctx.lineTo(cx, y + rectH + tipH)
-  ctx.lineTo(x, y + rectH)
-  ctx.closePath()
-  ctx.fillStyle = color
-  ctx.fill()
+  bctx.beginPath()
+  bctx.moveTo(x, y)
+  bctx.lineTo(x + w, y)
+  bctx.lineTo(x + w, y + rectH)
+  bctx.lineTo(cx, y + rectH + tipH)
+  bctx.lineTo(x, y + rectH)
+  bctx.closePath()
+  bctx.fillStyle = color
+  bctx.fill()
 
   // Icône centrée dans la forme complète (rect + pointe)
-  const iconSize = 90
+  const iconSize = 80
   const iconX = cx - iconSize / 2
   const iconY = y + (rectH + tipH - iconSize) / 2 - 10
-  ctx.drawImage(whiteIcon, iconX, iconY, iconSize, iconSize)
+  bctx.drawImage(whiteIcon, iconX, iconY, iconSize, iconSize)
 
-  const imageData = ctx.getImageData(0, 0, SIZE, SIZE)
+  // Downscale sur un canvas à taille finale → anti-aliasing naturel
+  const small = document.createElement('canvas')
+  small.width = SIZE
+  small.height = SIZE
+  const sctx = small.getContext('2d')!
+  sctx.imageSmoothingEnabled = true
+  sctx.imageSmoothingQuality = 'high'
+  sctx.drawImage(big, 0, 0, SIZE, SIZE)
+
+  const imageData = sctx.getImageData(0, 0, SIZE, SIZE)
   svgImageDataCache.set(cacheKey, imageData)
   return imageData
 }

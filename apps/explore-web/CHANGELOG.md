@@ -1,3 +1,17 @@
+# ALPHA V0.3.3
+## Fortifiez, ça rend heureux ! 
+- Les fortifications augmentent désormais la zone d'expansion du lieu. ⚒️
+
+# ALPHA V0.3.2
+## Avatars, performances carte, auto-claim
+- Performances carte en mode conquête : plus de lag au scroll/zoom
+- Nouveaux visuels : étendards faction, badges fortification bannière, noms de territoire en Bebas Neue avec fade au zoom
+- Taux horaire (+X/h) affiché au-dessus des emblèmes de faction
+- Correction avatars : tous les profils affichent maintenant leur photo (harmonisation avatar_url)
+- Correction de bug des avatars.
+- Noms des joueurs colorés par faction dans les notifications toast
+- Auto-claim : un lieu créé est automatiquement revendiqué pour la faction du joueur (gratuit)
+
 # ALPHA V0.3.1
 ## Nommage de zone démocratie + corrections de bug
 - Tout une faction peut voter pour nommer un territoire de + de 3 lieux.

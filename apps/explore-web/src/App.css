@@ -3271,14 +3271,14 @@
   align-items: center;
   justify-content: center;
   color: var(--color-ink-light, #8d745e);
-  font-size: 16px;
+  font-size: 14px;
   font-style: italic;
 }
 
 /* ---- Message ---- */
 .chat-message {
   font-family: var(--font-body, 'Cabin', sans-serif);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.35;
   color: rgb(99, 88, 88);
   padding: 1px 0;
@@ -3312,7 +3312,7 @@
 
 .chat-message-name {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   margin-right: 6px;
 }
 

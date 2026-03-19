@@ -133,14 +133,16 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     // Upload avatar si changé
     if (avatarFile) {
       const compressed = await compressImage(avatarFile, 400)
-      const path = `avatars/${currentUserId}.webp`
+      const path = `${currentUserId}/avatar.webp`
+      // Supprimer l'ancien avatar (policy DELETE exige que le dossier = userId)
+      await supabase.storage.from('place-images').remove([path])
       const { error: uploadErr } = await supabase.storage
         .from('place-images')
-        .upload(path, compressed, { contentType: 'image/webp', upsert: true })
+        .upload(path, compressed, { contentType: 'image/webp' })
 
       if (!uploadErr) {
         const { data: urlData } = supabase.storage.from('place-images').getPublicUrl(path)
-        avatarUrl = urlData.publicUrl
+        avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`
       }
     }
 
