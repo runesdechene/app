@@ -3,10 +3,13 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
+import runeImg from '../../assets/rune_de_chene.png'
+import shopIcon from '../../assets/shop_icon.webp'
+import tshirtIcon from '../../assets/t-shirt_icon.png'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
-import { setDisplayedTitles } from '../../hooks/usePlayer'
 import { FactionMembersModal } from './FactionMembersModal'
+import { TitleComposer } from './TitleComposer'
 
 interface PlaceCard {
   id: string
@@ -66,7 +69,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
   const [editInstagram, setEditInstagram] = useState('')
-  const [editTitleIds, setEditTitleIds] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
@@ -74,20 +76,37 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
   const [visibleCount, setVisibleCount] = useState(12)
   const [showFactionMembers, setShowFactionMembers] = useState(false)
+  const [showComposer, setShowComposer] = useState(false)
+  const [showFragmentStore, setShowFragmentStore] = useState(false)
+  const [composedPhrase, setComposedPhrase] = useState<string | null>(null)
+  const [composedWordIds, setComposedWordIds] = useState<number[]>([])
+  const [savingTitle, setSavingTitle] = useState(false)
+  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>>([])
 
   const isSelf = profile?.userId === currentUserId
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.rpc('get_player_profile', { p_user_id: playerId })
-      if (data) {
-        const p = data as unknown as PlayerProfile
+      const [profileRes, composedRes, fragmentsRes] = await Promise.all([
+        supabase.rpc('get_player_profile', { p_user_id: playerId }),
+        supabase.rpc('get_user_composed_title', { p_user_id: playerId }),
+        supabase.rpc('get_user_fragments', { p_user_id: playerId }),
+      ])
+      if (profileRes.data) {
+        const p = profileRes.data as unknown as PlayerProfile
         setProfile(p)
         setEditBio(p.biography ?? '')
         setEditInstagram(p.instagram ?? '')
-        if (p.displayedGeneralTitles && p.displayedGeneralTitles.length > 0) {
-          setEditTitleIds(p.displayedGeneralTitles.map(t => t.id))
+      }
+      if (composedRes.data) {
+        const cd = composedRes.data as { phrase: string | null; wordIds: number[] | null }
+        if (cd.phrase) {
+          setComposedPhrase(cd.phrase)
+          setComposedWordIds(cd.wordIds ?? [])
         }
+      }
+      if (fragmentsRes.data && Array.isArray(fragmentsRes.data)) {
+        setPlayerFragments(fragmentsRes.data as Array<{ id: number; name: string; icon: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>)
       }
       setLoading(false)
     }
@@ -99,11 +118,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     setEditName(profile.name ?? '')
     setEditBio(profile.biography ?? '')
     setEditInstagram(profile.instagram ?? '')
-    if (profile.displayedGeneralTitles && profile.displayedGeneralTitles.length > 0) {
-      setEditTitleIds(profile.displayedGeneralTitles.map(t => t.id))
-    } else {
-      setEditTitleIds([])
-    }
     setAvatarFile(null)
     setAvatarPreview(null)
     setIsEditing(true)
@@ -116,13 +130,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     setAvatarPreview(URL.createObjectURL(file))
   }
 
-  function handleToggleTitle(titleId: number) {
-    setEditTitleIds(prev => {
-      if (prev.includes(titleId)) return prev.filter(id => id !== titleId)
-      if (prev.length >= 2) return prev
-      return [...prev, titleId]
-    })
-  }
 
   async function handleSave() {
     if (!currentUserId || !profile) return
@@ -154,7 +161,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         p_instagram: editInstagram,
         p_avatar_url: avatarUrl ?? null,
       }),
-      setDisplayedTitles(editTitleIds),
     ])
 
     const { data } = await supabase.rpc('get_player_profile', { p_user_id: currentUserId })
@@ -221,7 +227,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   <img
                     src={profile.factionPattern}
                     alt=""
-                    className="player-modal-faction-badge"
+                    className="player-modal-faction-badge clickable"
+                    onClick={(e) => { e.stopPropagation(); setShowFactionMembers(true) }}
+                    title={profile.factionTitle ?? 'Faction'}
                   />
                 )}
                 <input
@@ -243,6 +251,21 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )}
                 </div>
 
+                {composedPhrase ? (
+                  <div className="player-modal-composed-title" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
+                    <span className="player-modal-composed-phrase">{composedPhrase}</span>
+                    {isSelf && !isEditing && (
+                      <button className="player-modal-compose-btn" onClick={() => setShowComposer(true)} title="Modifier">
+                        {'\u270F\uFE0F'}
+                      </button>
+                    )}
+                  </div>
+                ) : isSelf && !isEditing ? (
+                  <button className="player-modal-compose-link" onClick={() => setShowComposer(true)}>
+                    Composer mon titre
+                  </button>
+                ) : null}
+
                 <div className="player-modal-counts">
                   <div className="player-modal-count">
                     <span className="player-modal-count-value">{profile.authoredPlaces?.length ?? 0}</span>
@@ -259,14 +282,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 </div>
 
                 <div className="player-modal-faction-row">
-                  {profile.factionTitle && (
-                    <span
-                      className="player-modal-faction"
-                      style={{ color: profile.factionColor ?? '#8A7B6A' }}
-                    >
-                      {profile.factionTitle}
-                    </span>
-                  )}
                   <span className="player-modal-notoriety">
                     {'\uD83C\uDFC5'} {profile.notorietyPoints}
                   </span>
@@ -274,8 +289,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Titres */}
-            {((profile.displayedGeneralTitles && profile.displayedGeneralTitles.length > 0) || profile.factionTitle2) && (
+            {/* Titres classiques (fallback si pas de phrase composee) */}
+            {!composedPhrase && ((profile.displayedGeneralTitles && profile.displayedGeneralTitles.length > 0) || profile.factionTitle2) && (
               <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
                 {profile.displayedGeneralTitles?.map(t => (
                   <span key={t.id} className="title-badge title-badge-general">
@@ -306,7 +321,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     rel="noopener noreferrer"
                     className="player-modal-instagram"
                   >
-                    @{profile.instagram.replace(/^@/, '')}
+                    <svg className="player-modal-instagram-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    {profile.instagram.replace(/^@/, '')}
                   </a>
                 )}
                 <p className="player-modal-joined">
@@ -349,28 +365,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   placeholder="@votre_compte"
                 />
 
-                {profile.unlockedGeneralTitles && profile.unlockedGeneralTitles.length > 0 && (
-                  <>
-                    <label className="player-modal-edit-label">Titres affiches (max 2)</label>
-                    <div className="player-modal-title-picker">
-                      {profile.unlockedGeneralTitles.map(t => {
-                        const isSelected = editTitleIds.includes(t.id)
-                        return (
-                          <label key={t.id} className="title-picker-option">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleToggleTitle(t.id)}
-                              disabled={!isSelected && editTitleIds.length >= 2}
-                            />
-                            <span>{t.icon} {t.name}</span>
-                          </label>
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
-
                 <div className="player-modal-edit-actions">
                   <button
                     className="player-modal-cancel-btn"
@@ -390,6 +384,41 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               </div>
             )}
             </div>
+
+            {/* Fragments possedes */}
+            {playerFragments.length > 0 && (
+              <div className="player-modal-fragments">
+                <span className="player-modal-fragments-label">Fragments possédés</span>
+                <div className="player-modal-fragments-scroll">
+                  {playerFragments.map(f => (
+                    <div
+                      key={f.id}
+                      className={`player-modal-fragment-chip${f.link_url ? ' clickable' : ''}`}
+                      onClick={() => f.link_url && window.open(f.link_url, '_blank', 'noopener,noreferrer')}
+                    >
+                        {f.image_url ? (
+                          <img src={f.image_url} alt="" className="player-modal-fragment-img" />
+                        ) : f.icon ? (
+                          <span className="player-modal-fragment-icon">{f.icon}</span>
+                        ) : null}
+                        <span className="player-modal-fragment-name">{f.name}</span>
+                        {f.bonus_type && f.bonus_value !== 0 && (
+                          <span className="player-modal-fragment-bonus">
+                            {f.bonus_value > 0 ? '+' : ''}{f.bonus_value} {f.bonus_type.replace('max_', 'Max ').replace('regen_', '% Regen ').replace('energy', 'Energie').replace('conquest', 'Conquete').replace('construction', 'Construction')}
+                          </span>
+                        )}
+                    </div>
+                  ))}
+                  <button
+                    className="player-modal-fragment-chip player-modal-fragment-add"
+                    onClick={() => setShowFragmentStore(true)}
+                  >
+                    <span className="player-modal-fragment-add-icon">+</span>
+                    <span className="player-modal-fragment-name">Obtenir</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Places tabs */}
             <div className="player-modal-places">
@@ -461,6 +490,83 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
           </>
         )}
       </div>
+
+      {showFragmentStore && (
+        <div className="player-modal-overlay" onClick={() => setShowFragmentStore(false)} style={{ zIndex: 10002 }}>
+          <div className="fragment-store-modal" onClick={e => e.stopPropagation()}>
+            <button className="player-modal-close" onClick={() => setShowFragmentStore(false)}>&#10005;</button>
+            <img src={runeImg} alt="" className="fragment-store-logo" />
+            <h2 className="fragment-store-title">Obtenir des fragments</h2>
+            <p className="fragment-store-subtitle">
+              Obtenez des bonus et des titres selon vos articles de la boutique Runes de Chene.
+            </p>
+            <div className="fragment-store-cards">
+              <a
+                href="https://runesdechene.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fragment-store-card"
+              >
+                <img src={shopIcon} alt="" className="fragment-store-card-img" />
+                <h3 className="fragment-store-card-title">Explorer la boutique</h3>
+                <p className="fragment-store-card-desc">
+                  Découvrez notre catalogue de vêtements biologiques, imprimés en Bretagne et sans IA.
+                </p>
+              </a>
+              <a
+                href="https://hub.runesdechene.com/soumettre-contenu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fragment-store-card"
+              >
+                <img src={tshirtIcon} alt="" className="fragment-store-card-img" />
+                <h3 className="fragment-store-card-title">J'ai deja des fragments !</h3>
+                <p className="fragment-store-card-desc">
+                  Envoyez nous une photo de vous, avec ou sans visage, pour reclamer vos fragments dans l'application.
+                </p>
+              </a>
+            </div>
+            <div className="fragment-store-footer">
+              <p className="fragment-store-footer-subtitle">
+                Vous avez déjà acheté par le passé ? Certains motifs sont éligibles !
+              </p>
+              <p className="fragment-store-footer-motifs">
+                Varegue, Avalon, Valkyrie, Druide, Morrigan, Esprit du Loup, Esprit du Hibou
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showComposer && (
+        <div className="player-modal-overlay" onClick={() => setShowComposer(false)} style={{ zIndex: 10002 }}>
+          <div className="player-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, maxHeight: '80vh', overflow: 'auto', padding: '24px' }}>
+            <button className="player-modal-close" onClick={() => setShowComposer(false)}>&#10005;</button>
+            <TitleComposer
+              currentWordIds={composedWordIds}
+              saving={savingTitle}
+              onCancel={() => setShowComposer(false)}
+              onSave={async (wordIds, phrase) => {
+                if (!currentUserId) return
+                setSavingTitle(true)
+                const { data } = await supabase.rpc('set_composed_title', {
+                  p_user_id: currentUserId,
+                  p_word_ids: wordIds,
+                  p_phrase: phrase,
+                })
+                if (data?.error) {
+                  alert(data.error)
+                } else {
+                  setComposedWordIds(wordIds)
+                  setComposedPhrase(phrase)
+                  setShowComposer(false)
+                }
+                setSavingTitle(false)
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {showFactionMembers && profile?.factionId && (
         <FactionMembersModal

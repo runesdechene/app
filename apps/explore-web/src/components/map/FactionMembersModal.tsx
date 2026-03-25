@@ -35,20 +35,31 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
   const [factionInfo, setFactionInfo] = useState<FactionInfo | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const [isUnderdog, setIsUnderdog] = useState(false)
+  const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
+
   useEffect(() => {
     async function load() {
-      const [membersRes, factionRes] = await Promise.all([
+      const [membersRes, factionRes, underdogRes, multRes] = await Promise.all([
         supabase.rpc('get_faction_members', { p_faction_id: factionId }),
         supabase.from('factions')
           .select('image_url, description, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
           .eq('id', factionId)
           .single(),
+        supabase.rpc('get_underdog_faction_id'),
+        supabase.from('app_settings').select('value').eq('key', 'underdog_multiplier').single(),
       ])
       if (membersRes.data && Array.isArray(membersRes.data)) {
         setMembers(membersRes.data as FactionMember[])
       }
       if (factionRes.data) {
         setFactionInfo(factionRes.data as FactionInfo)
+      }
+      if (underdogRes.data) {
+        setIsUnderdog((underdogRes.data as string) === factionId)
+      }
+      if (multRes.data) {
+        setUnderdogMultiplier(parseFloat(multRes.data.value) || 2)
       }
       setLoading(false)
     }
@@ -60,9 +71,13 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
     useMapStore.getState().setSelectedPlayerId(playerId)
   }
 
+  const regenE = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_energy) / underdogMultiplier) : factionInfo.bonus_regen_energy) : 0
+  const regenC = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_conquest) / underdogMultiplier) : factionInfo.bonus_regen_conquest) : 0
+  const regenB = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_construction) / underdogMultiplier) : factionInfo.bonus_regen_construction) : 0
+
   const hasBonuses = factionInfo && (
     factionInfo.bonus_energy !== 0 || factionInfo.bonus_conquest !== 0 || factionInfo.bonus_construction !== 0 ||
-    factionInfo.bonus_regen_energy !== 0 || factionInfo.bonus_regen_conquest !== 0 || factionInfo.bonus_regen_construction !== 0
+    regenE !== 0 || regenC !== 0 || regenB !== 0
   )
 
   const isMobile = window.innerWidth <= 768
@@ -118,19 +133,19 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
                         {factionInfo.bonus_construction > 0 ? '+' : ''}{factionInfo.bonus_construction} Construction
                       </span>
                     )}
-                    {factionInfo.bonus_regen_energy !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_regen_energy < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_regen_energy > 0 ? '+' : ''}{factionInfo.bonus_regen_energy}% Regen Energie
+                    {regenE !== 0 && (
+                      <span className={`faction-bonus-tag${regenE < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                        {isUnderdog && '\uD83D\uDC80 '}{regenE > 0 ? '+' : ''}{regenE}% Regen Energie
                       </span>
                     )}
-                    {factionInfo.bonus_regen_conquest !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_regen_conquest < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_regen_conquest > 0 ? '+' : ''}{factionInfo.bonus_regen_conquest}% Regen Conquete
+                    {regenC !== 0 && (
+                      <span className={`faction-bonus-tag${regenC < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                        {isUnderdog && '\uD83D\uDC80 '}{regenC > 0 ? '+' : ''}{regenC}% Regen Conquete
                       </span>
                     )}
-                    {factionInfo.bonus_regen_construction !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_regen_construction < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_regen_construction > 0 ? '+' : ''}{factionInfo.bonus_regen_construction}% Regen Construction
+                    {regenB !== 0 && (
+                      <span className={`faction-bonus-tag${regenB < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                        {isUnderdog && '\uD83D\uDC80 '}{regenB > 0 ? '+' : ''}{regenB}% Regen Construction
                       </span>
                     )}
                   </div>
@@ -141,6 +156,12 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
 
           {/* Colonne droite : classement des membres */}
           <div className="faction-members-main">
+            {isUnderdog && (
+              <div className="faction-card-underdog" style={{ position: 'relative', marginTop: 8, marginBottom: 12, border: '1px solid rgba(255, 180, 50, 0.3)', borderRadius: 8 }}>
+                <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
+                <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
+              </div>
+            )}
             <h3 className="faction-members-list-title">Classement</h3>
 
             {loading && <div className="player-modal-loading">Chargement...</div>}

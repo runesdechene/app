@@ -1,6 +1,6 @@
 # La Carte — Runes de Chêne
 
-> Dernière mise à jour : 20 mars 2026
+> Dernière mise à jour : 24 mars 2026
 
 ## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
@@ -109,7 +109,8 @@ src/
 │   │   ├── ConquestToggle.tsx    # Switch exploration/conquête
 │   │   ├── GameToast.tsx         # Toasts in-game temps réel
 │   │   ├── InfoModal.tsx         # Modal info ressources
-│   │   ├── PlayerProfileModal.tsx # Profil joueur + édition
+│   │   ├── PlayerProfileModal.tsx # Profil joueur + édition + composeur titre
+│   │   ├── TitleComposer.tsx      # Composeur de phrase-titre (fragments)
 │   │   ├── LeaderboardModal.tsx  # Classements (cache 30s)
 │   │   ├── TerritoryPanel.tsx    # Détail territoire + vote nom
 │   │   ├── Minimap.tsx           # Canvas minimap
@@ -201,6 +202,25 @@ Lieux non découverts = masqués. Coût : 1.0 énergie remote (0.5 même faction
 - **Personnelle** : `users.notoriety_points` (+10 claim, +5 fortify)
 - **Faction** : `get_faction_notoriety()` — `floor(heures_tenues) * (1 + fortif * 0.5)`
 
+### Baroud d'Honneur (Bonus Underdog)
+
+La faction avec le score de notoriété le plus bas reçoit un bonus de régénération sur **toutes** ses ressources (énergie, conquête, construction). Les cycles de regen sont divisés par le multiplicateur.
+
+- **Configurable via le Hub** (page Factions) : toggle ON/OFF + multiplicateur (défaut ×2)
+- **Stocké dans** `app_settings` : clés `underdog_enabled` et `underdog_multiplier`
+- **RPC** : `get_underdog_faction_id()` retourne l'ID (ou null si < 2 factions actives ou désactivé)
+- **Appliqué dans** `get_user_energy` : divise les cycles par le multiplicateur
+- **Affiché dans** FactionBar (icône épée pulsante) + FactionModal (badge "BAROUD D'HONNEUR")
+- **Le nombre de membres n'est plus affiché** dans la FactionModal
+
+### Joueurs en ligne — Titres sur la carte
+
+Les markers des joueurs en ligne affichent sous l'avatar : le **nom** + les **titres affichés** (max 2 généraux + 1 faction).
+
+- Les titres sont transmis via **Supabase Presence** dans le payload (`displayedTitles`)
+- Le store `playersStore` contient `displayedTitles: PlayerTitle[]` par joueur
+- Rendu dans `OnlinePlayerMarkers.tsx` sous le nom
+
 ### Territoires
 
 - Voronoi via d3-delaunay + Turf.js dans un Web Worker
@@ -233,7 +253,7 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 - Rendu 100% GPU via symbol layers MapLibre (plus de DOM markers)
 - `enrichedGeojson` dans ExploreMap applique les `placeOverrides` (fortif, faction, score) aux features pour mise à jour temps réel des icônes
 
-### Migrations récentes (session 19-20 mars 2026)
+### Migrations récentes
 
 | Migration | Description |
 |---|---|
@@ -242,6 +262,12 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 | 101 | Rebalance influence : likes×1, vues×0.1, explo×3 |
 | 102 | Propositions territoire : max 2, suppression possible |
 | 103 | Compensation Voronoi : rayon serveur ×0.6 |
+| 104 | Bonus Underdog (Baroud d'Honneur) : get_underdog_faction_id, x2 regen via get_user_energy, flag isUnderdog dans get_faction_notoriety |
+| 105 | Systeme de Fragments : title_fragments, fragment_words, user_fragments, shopify_unlocks, purchase_log, composed_title_words, RPCs get/set_composed_title + get_user_fragments |
+| 106 | composed_title_text : sauvegarde phrase en texte brut (articles + connecteurs libres inclus) |
+| 107 | image_url sur title_fragments + mise à jour get_user_fragments pour retourner image_url |
+| 108 | link_url sur title_fragments + mise à jour get_user_fragments pour retourner link_url |
+| 109 | Bonus fragments appliqués dans get_user_energy : pile base → faction → fragments → underdog |
 
 ---
 
@@ -263,7 +289,7 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 | `territory_votes` | id, faction_id, anchor_place_id, proposed_name, user_id, created_at | Vote noms territoires |
 | `territory_tiers` | id, minPlaces, radiusKm, label | Paliers taille territoires |
 | `construction_types` | id, level, name, cost, defense_bonus, description | Définitions fortification |
-| `app_settings` | key, value | Config jeu (zone_fort_multiplier, etc.) |
+| `app_settings` | key, value | Config jeu (zone_fort_multiplier, underdog_enabled, underdog_multiplier, etc.) |
 | `place_photos` | id, place_id, user_id, url, created_at | Photos communautaires |
 | `reviews` | id, user_id, place_id, rating, comment | Avis (hub) |
 | `places_liked` | user_id, place_id | Likes |
@@ -279,14 +305,15 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 | `discover_place` | target_place_id, is_gps | json | Coût énergie, insert places_discovered, récompenses tag, +activity_log |
 | `claim_place` | target_place_id | json | Coût conquête (1+fortif), change faction/claimed_by, reset fortif, +10 notoriété |
 | `fortify_place` | target_place_id, ct_id | json | Coût construction, monte level, +5 notoriété, +activity_log |
-| `get_user_energy` | — | json | 3 ressources + regen ticks + bonus + notoriété |
+| `get_user_energy` | — | json | 3 ressources + regen ticks + bonus + notoriété + isUnderdog + underdogMultiplier |
 | `get_user_discoveries` | — | setof uuid | IDs lieux découverts par le joueur |
+| `get_underdog_faction_id` | — | text | ID faction underdog (la plus basse en notoriété, ≥2 factions actives) ou null |
 
 #### Map & Feed
 | RPC | Params | Retour | Logique |
 |-----|--------|--------|---------|
 | `get_map_places` | lim | json[] | Tous les lieux avec coords, faction, tags, scores |
-| `get_faction_notoriety` | — | json[] | Score temporel par faction (heures × fortif) |
+| `get_faction_notoriety` | — | json[] | Score temporel par faction (heures × fortif) + isUnderdog par faction |
 | `get_recent_activity` | — | json[] | Dernières entrées activity_log |
 | `get_winning_territory_names` | — | json[] | Noms gagnants par territoire |
 
@@ -375,6 +402,7 @@ energy/maxEnergy/energyCycle, conquestPoints/maxConquest/conquestCycle,
 constructionPoints/maxConstruction/constructionCycle,
 bonusEnergy/bonusConquest/bonusConstruction,
 notorietyPoints, unlockedTitles, displayedTitles,
+composedPhrase,
 gameMode ('exploration'|'conquest'), isAdmin, loading, userPosition
 ```
 
@@ -400,7 +428,7 @@ Chaque toast: message, highlights, color (faction), highlightColors, actorId, pr
 
 ### playersStore — Joueurs en ligne
 ```
-players (Map<string, OnlinePlayer>) — id, name, avatar, faction, lat/lng, last_seen
+players (Map<string, OnlinePlayer>) — id, name, avatar, faction, lat/lng, displayedTitles, last_seen
 ```
 
 ### mobileNavStore — Navigation mobile
@@ -422,15 +450,16 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 | `ExploreMap.tsx` | get_winning_territory_names + direct SELECT territory_tiers, app_settings |
 | `EnergyIndicator.tsx` | get_user_energy |
 | `ResourceIndicator.tsx` | get_user_energy |
-| `FactionBar.tsx` | get_faction_notoriety |
+| `FactionBar.tsx` | get_faction_notoriety (retourne isUnderdog par faction) |
 | `FactionMembersModal.tsx` | get_faction_members + direct SELECT factions |
-| `PlayerProfileModal.tsx` | get_player_profile, update_my_profile |
+| `PlayerProfileModal.tsx` | get_player_profile, update_my_profile, get_user_composed_title |
+| `TitleComposer.tsx` | get_user_fragments, get_user_titles, set_composed_title |
 | `LeaderboardModal.tsx` | get_leaderboard |
 | `TerritoryPanel.tsx` | get_territory_votes, propose_territory_name, vote_territory_name + direct SELECT places, places_liked, place_tags |
 | `PlacePanel.tsx` | like/unlike_place, get_place_likers/explorers, explore_place, delete_place, claim_place, fortify_place + direct SELECT app_settings |
 | `AddPlaceFlow.tsx` | create_place + direct INSERT/UPDATE places, place_tags + SELECT tags |
 | `ConquestToggle.tsx` | update_my_profile |
-| `FactionModal.tsx` | set_user_faction + direct SELECT factions, users |
+| `FactionModal.tsx` | set_user_faction, get_underdog_faction_id + direct SELECT factions |
 | `OnboardingModal.tsx` | update_my_profile |
 | `GameModeModal.tsx` | update_my_profile |
 | `ProfileMenu.tsx` | get_my_informations |
@@ -469,6 +498,134 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 6. **App.tsx est un God component** : ~15 states boolean, chaque changement re-évalue tout
 7. **usePlaces charge les 5000 lieux d'un coup** : pas de viewport-based loading
 8. **Territory Worker recalcule tout** à chaque changement (pas d'update incrémental)
+
+---
+
+## Prochaine session — TODO
+
+- **Refactorer la pile de bonus en une fonction unique `get_player_bonuses(p_user_id)`** — Aujourd'hui les bonus sont calculés en dur dans `get_user_energy` (faction + fragments + underdog empilés avec des IF). Quand on ajoutera la 4ème source (set bonus, saisons, items, guildes...), refactorer en une seule fonction qui retourne tous les bonus cumulés par source. `get_user_energy` n'aura plus qu'à appeler `get_player_bonuses` et appliquer le résultat. Un seul endroit à maintenir.
+- **Composeur in-game sur mobile** — tester et ajuster le composeur de titre sur mobile (responsive)
+- **Connecter Shopify** — webhook order/paid → Edge Function → déblocage automatique des fragments via `shopify_unlocks`
+
+---
+
+## Système de Fragments & Titres Composés
+
+> Architecture complète — à relire à chaque session touchant les titres ou la boutique.
+
+### Concept
+
+Chaque achat boutique (ou exploit in-game) débloque un **fragment**. Un fragment donne :
+1. **Des mots** pour composer une phrase-titre affichée sur la carte et le profil
+2. **Un bonus gameplay** optionnel (max ressource, regen, stats...)
+
+Le joueur compose sa phrase en choisissant des mots dans ses fragments débloqués.
+
+### Structure d'une phrase composée
+
+```
+[Article] [Nom] [Connecteur] [Épithète]
+```
+
+- **Article** : Le, La, L' — gratuit, s'adapte au genre
+- **Nom** : mot principal (ex: "Varègue", "Centurion", "Druide") — vient d'un fragment ou d'un titre existant
+- **Connecteur** : au, de, du, à l', aux — gratuit, choix libre
+- **Épithète** : qualificatif (ex: "Hibou", "Nocturne", "de Fer", "aux Yeux d'Or") — vient d'un fragment
+
+Exemples : "Le Varègue au Hibou", "La Druidesse de Fer", "L'Explorateur aux Loups"
+
+### Sources de mots
+
+| Source | Ce que ça donne | Slot |
+|--------|----------------|------|
+| **Titres existants** (table `titles`) | Noms gratuits par exploit/faction | nom |
+| **Fragments achetés** (table `title_fragments`) | Noms rares + Épithètes + Connecteurs spéciaux | nom, epithete, connecteur |
+| **Faction** (gratuit) | Un nom de base sobre ("Soldat", "Initié") | nom |
+
+### Tables
+
+```
+title_fragments                    -- Un fragment = un "pack" (achat/cadeau)
+  id SERIAL PK
+  name VARCHAR(255)                -- "Esprit du Hibou", "Collection Varègue"
+  description TEXT
+  icon VARCHAR(50)
+  collection VARCHAR(50)           -- "celtique", "nordique", etc. (pour set bonus futur)
+  bonus_type VARCHAR(50)           -- "max_energy", "regen_conquest", null
+  bonus_value NUMERIC              -- 0.5, 5, 1, etc.
+  created_at TIMESTAMPTZ
+
+fragment_words                     -- Les mots offerts par ce fragment
+  id SERIAL PK
+  fragment_id FK → title_fragments
+  word VARCHAR(100)                -- "Hibou", "Nocturne", "aux Yeux d'Or"
+  slot VARCHAR(30)                 -- 'nom', 'epithete', 'connecteur'
+  gender VARCHAR(10)               -- 'm', 'f', 'n'
+
+user_fragments                     -- Collection du joueur
+  user_id FK → users
+  fragment_id FK → title_fragments
+  unlocked_at TIMESTAMPTZ
+  source VARCHAR(30)               -- 'manual', 'shopify', 'achievement'
+  UNIQUE(user_id, fragment_id)
+
+shopify_unlocks                    -- Mapping central tag Shopify → unlock jeu
+  id SERIAL PK
+  shopify_tag VARCHAR(100) UNIQUE  -- "col-varegue"
+  unlock_type VARCHAR(30)          -- 'fragment' (+ 'item', 'boost' un jour)
+  unlock_ref_id INT                -- FK vers title_fragments.id (ou autre selon type)
+
+purchase_log                       -- Audit trail complet
+  id SERIAL PK
+  email VARCHAR(255)
+  shopify_order_id VARCHAR(255)
+  shopify_tag VARCHAR(100)
+  unlock_type VARCHAR(30)
+  unlock_ref_id INT
+  user_id VARCHAR(255)             -- nullable si pending (pas encore de compte jeu)
+  status VARCHAR(30)               -- 'unlocked', 'pending', 'manual'
+  created_at TIMESTAMPTZ
+
+users (ajout)
+  composed_title_words INT[]       -- IDs des fragment_words choisis pour la phrase
+```
+
+### Flux Shopify (futur, rails posés maintenant)
+
+```
+Achat Shopify → Webhook order/paid → Edge Function Supabase
+  1. Match email client → user_id
+  2. Lire tags produit
+  3. Pour chaque tag : chercher shopify_unlocks.shopify_tag
+  4. INSERT user_fragments + purchase_log
+  5. Si pas de compte jeu → status 'pending', déblocage auto à l'inscription
+```
+
+- T-shirt et sweat même collection = même tag = même fragment
+- Le Hub gère tout le mapping (page Shopify Unlocks)
+- Un tag peut débloquer plusieurs fragments
+- Un fragment peut être débloqué par plusieurs tags (via plusieurs lignes shopify_unlocks)
+
+### Bonus gameplay
+
+Chaque fragment peut avoir un `bonus_type` + `bonus_value`. Le serveur cumule les bonus de tous les fragments du joueur et les applique dans `get_user_energy` (même logique que les bonus de faction).
+
+Types de bonus prévus : `max_energy`, `max_conquest`, `max_construction`, `regen_energy`, `regen_conquest`, `regen_construction`. Extensible.
+
+### Set bonus (futur, pas V1)
+
+Le champ `collection` sur chaque fragment permet un jour d'ajouter des bonus de set (3 fragments celtes = bonus spécial). Table future `collection_bonuses(collection, min_fragments, bonus_type, bonus_value)`. À activer quand il y a 3-4 fragments par collection en boutique.
+
+### Hub — Pages de gestion
+
+- **Titres** (existant) : titres par exploit/faction, inchangé
+- **Fragments** (nouveau) : CRUD fragments + mots par fragment + bonus
+- **Shopify Unlocks** (nouveau) : mapping tag → fragment
+- **Joueurs** (existant) : voir fragments débloqués, attribution manuelle
+
+### Ce qui reste du système de titres existant
+
+La table `titles` et le TitlesManager **restent inchangés**. Les titres existants (Novice, Explorateur, Conquérant, etc.) deviennent des mots de slot "nom" disponibles dans le composeur. Le mécanisme de déblocage par seuil/classement reste le même.
 
 ---
 

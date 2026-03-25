@@ -13,6 +13,7 @@ interface FactionNotoriety {
   hourlyRate: number
   placesCount: number
   percent: number
+  isUnderdog: boolean
 }
 
 export function FactionBar() {
@@ -37,6 +38,7 @@ export function FactionBar() {
         notoriety: number
         hourlyRate: number
         placesCount: number
+        isUnderdog: boolean
       }>)
         .map(f => ({
           factionId: f.factionId,
@@ -47,6 +49,7 @@ export function FactionBar() {
           hourlyRate: f.hourlyRate ?? 0,
           placesCount: f.placesCount ?? 0,
           percent: totalNotoriety > 0 ? (f.notoriety / totalNotoriety) * 100 : 0,
+          isUnderdog: f.isUnderdog ?? false,
         }))
         .filter(f => f.notoriety > 0 || f.placesCount > 0)
         .sort((a, b) => b.notoriety - a.notoriety)
@@ -82,6 +85,7 @@ export function FactionBar() {
               </span>
               <span className="faction-scoreboard-name">{faction.title}</span>
               {isLeader && <span className="faction-scoreboard-crown">{'\uD83D\uDC51'}</span>}
+              {faction.isUnderdog && <span className="faction-scoreboard-underdog" title="Baroud d'Honneur — x2 regen">{'\uD83D\uDC80'}</span>}
               <span className="faction-scoreboard-places">{faction.placesCount}</span>
               <span className="faction-scoreboard-pct">{faction.notoriety}</span>
               {faction.hourlyRate > 0 && (

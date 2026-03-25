@@ -115,11 +115,12 @@ export function usePlayer() {
           })
       }
 
-      const [discRes, energyRes, profileRes, titlesRes] = await Promise.all([
+      const [discRes, energyRes, profileRes, titlesRes, composedRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
         supabase.rpc('get_my_informations', { p_user_id: userData.id }),
         supabase.rpc('get_user_titles', { p_user_id: userData.id }),
+        supabase.rpc('get_user_composed_title', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -183,6 +184,12 @@ export function usePlayer() {
           displayedGeneralTitleIds: td.displayedGeneralTitleIds ?? [],
           factionTitle2: td.factionTitle ?? null,
         })
+      }
+      if (composedRes.data) {
+        const cd = composedRes.data as { phrase: string | null }
+        if (cd.phrase) {
+          usePlayerStore.setState({ composedPhrase: cd.phrase })
+        }
       }
 
       setLoading(false)

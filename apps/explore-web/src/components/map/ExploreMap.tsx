@@ -55,6 +55,8 @@ export const ExploreMap = memo(function ExploreMap() {
   const setUserPosition = usePlayerStore(s => s.setUserPosition)
   const userPosition = usePlayerStore(s => s.userPosition)
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
+  const userName = usePlayerStore(s => s.userName)
+  const userComposedPhrase = usePlayerStore(s => s.composedPhrase)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const currentUserId = usePlayerStore(s => s.userId)
@@ -640,19 +642,28 @@ export const ExploreMap = memo(function ExploreMap() {
             </div>
           ) : (
             <div
-              className="user-position-marker"
-              style={{
-                '--faction-color': userFactionColor ?? '#4A90D9',
-                '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
-                cursor: 'pointer',
-              } as React.CSSProperties}
+              className="user-marker-wrapper"
+              style={{ '--faction-color': userFactionColor ?? '#4A90D9' } as React.CSSProperties}
               onClick={() => currentUserId && setSelectedPlayerId(currentUserId)}
             >
-              <div className="user-position-pulse" />
-              {userAvatarUrl ? (
-                <img src={userAvatarUrl} alt="" className="user-position-avatar" />
-              ) : (
-                <div className="user-position-dot" />
+              <div
+                className="user-position-marker"
+                style={{
+                  '--faction-color': userFactionColor ?? '#4A90D9',
+                  '--faction-glow': `${userFactionColor ?? '#4A90D9'}60`,
+                  cursor: 'pointer',
+                } as React.CSSProperties}
+              >
+                <div className="user-position-pulse" />
+                {userAvatarUrl ? (
+                  <img src={userAvatarUrl} alt="" className="user-position-avatar" />
+                ) : (
+                  <div className="user-position-dot" />
+                )}
+              </div>
+              {userName && <span className="other-player-name">{userName}</span>}
+              {userComposedPhrase && (
+                <span className="other-player-composed">{userComposedPhrase}</span>
               )}
             </div>
           )}

@@ -5,12 +5,19 @@ import { useToastStore } from '../stores/toastStore'
 import { usePlayersStore } from '../stores/playersStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
+interface PresenceTitle {
+  icon: string
+  name: string
+}
+
 interface PresencePayload {
   userId: string
   name: string
   factionColor: string | null
   factionPattern: string | null
   avatarUrl: string | null
+  displayedTitles: PresenceTitle[]
+  composedPhrase: string | null
   lat: number | null
   lng: number | null
 }
@@ -58,14 +65,25 @@ export function usePresence() {
       const { setPlayer, removePlayer } = usePlayersStore.getState()
 
       function buildPayload(): PresencePayload {
-        const pos = usePlayerStore.getState().userPosition
-        const avatar = usePlayerStore.getState().userAvatarUrl
+        const state = usePlayerStore.getState()
+        const pos = state.userPosition
+        const avatar = state.userAvatarUrl
+        // Construire les titres affiches
+        const titles: PresenceTitle[] = []
+        const { unlockedGeneralTitles, displayedGeneralTitleIds, factionTitle2, composedPhrase } = state
+        for (const id of displayedGeneralTitleIds) {
+          const t = unlockedGeneralTitles.find(tt => tt.id === id)
+          if (t) titles.push({ icon: t.icon, name: t.name })
+        }
+        if (factionTitle2) titles.push({ icon: factionTitle2.icon, name: factionTitle2.name })
         return {
           userId: userId!,
           name,
           factionColor,
           factionPattern,
           avatarUrl: avatar,
+          displayedTitles: titles,
+          composedPhrase,
           lat: pos?.lat ?? null,
           lng: pos?.lng ?? null,
         }
@@ -98,6 +116,8 @@ export function usePresence() {
                 factionColor: payload.factionColor,
                 factionPattern: payload.factionPattern,
                 avatarUrl: payload.avatarUrl,
+                displayedTitles: (payload.displayedTitles as PresenceTitle[]) ?? [],
+                composedPhrase: (payload.composedPhrase as string) ?? null,
                 lastSeen: Date.now(),
               })
             }
@@ -118,6 +138,8 @@ export function usePresence() {
               factionColor: (raw.factionColor as string) ?? null,
               factionPattern: (raw.factionPattern as string) ?? null,
               avatarUrl: (raw.avatarUrl as string) ?? null,
+              displayedTitles: (raw.displayedTitles as PresenceTitle[]) ?? [],
+              composedPhrase: (raw.composedPhrase as string) ?? null,
               lastSeen: Date.now(),
             })
           }

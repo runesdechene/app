@@ -1,3 +1,14 @@
+# ALPHA V0.3.5
+## Des titres & des Fragments ! 
+- Les Fragments d'Histoire achetés sur la boutique (Stand ou en ligne) débloquent désormais des titres et des bonus.
+- Vous pouvez composer des titres UNIQUES avec les mots débloqués.
+- Les Fragments offrent des avantages dans le jeu.
+
+# ALPHA V0.3.4
+## Survivez & frimez !
+- BAROUD D'HONNEUR : la Faction la plus faible se battra avec les dieux à ses côtés. Regen X2 pour eux.
+- Affichage des titres sur la cartes. Activez les depuis votre profil.
+
 # ALPHA V0.3.3
 ## Fortifiez, ça rend heureux ! 
 - Les fortifications augmentent désormais la zone d'expansion du lieu. ⚒️

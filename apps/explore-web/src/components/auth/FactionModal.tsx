@@ -25,7 +25,6 @@ interface FactionModalProps {
 
 export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const [factions, setFactions] = useState<FactionData[]>([])
-  const [memberCounts, setMemberCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [selecting, setSelecting] = useState(false)
   const [confirmFaction, setConfirmFaction] = useState<string | null>(null)
@@ -40,26 +39,21 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const setDiscoveredIds = usePlayerStore(s => s.setDiscoveredIds)
   const incrementPlacesRefreshKey = useMapStore(s => s.incrementPlacesRefreshKey)
 
+  const [underdogFactionId, setUnderdogFactionId] = useState<string | null>(null)
+  const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
+
   useEffect(() => {
     Promise.all([
       supabase
         .from('factions')
         .select('id, title, color, pattern, description, image_url, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
         .order('order'),
-      supabase
-        .from('users')
-        .select('faction_id')
-        .not('faction_id', 'is', null),
-    ]).then(([factionsRes, usersRes]) => {
+      supabase.rpc('get_underdog_faction_id'),
+      supabase.from('app_settings').select('value').eq('key', 'underdog_multiplier').single(),
+    ]).then(([factionsRes, underdogRes, multRes]) => {
       if (factionsRes.data) setFactions(factionsRes.data as FactionData[])
-      if (usersRes.data) {
-        const counts: Record<string, number> = {}
-        for (const u of usersRes.data) {
-          const fid = u.faction_id as string
-          counts[fid] = (counts[fid] ?? 0) + 1
-        }
-        setMemberCounts(counts)
-      }
+      if (underdogRes.data) setUnderdogFactionId(underdogRes.data as string)
+      if (multRes.data) setUnderdogMultiplier(parseFloat(multRes.data.value) || 2)
       setLoading(false)
     })
   }, [])
@@ -183,10 +177,11 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-modal-grid">
             {factions.map(f => {
               const isActive = currentFactionId === f.id
+              const isUnderdog = underdogFactionId === f.id
               return (
                 <button
                   key={f.id}
-                  className={`faction-card${isActive ? ' active' : ''}`}
+                  className={`faction-card${isActive ? ' active' : ''}${isUnderdog ? ' underdog' : ''}`}
                   style={{ '--faction-color': f.color } as React.CSSProperties}
                   onClick={() => handleFactionClick(f.id)}
                   disabled={selecting}
@@ -198,44 +193,61 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                   )}
                   <div className="faction-card-body">
                     <span className="faction-card-name">{f.title}</span>
-                    <span className="faction-card-members">
-                      {memberCounts[f.id] ?? 0} membre{(memberCounts[f.id] ?? 0) !== 1 ? 's' : ''}
-                    </span>
                     {f.description && (
                       <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
                     )}
-                    {(f.bonus_energy !== 0 || f.bonus_conquest !== 0 || f.bonus_construction !== 0 || f.bonus_regen_energy !== 0 || f.bonus_regen_conquest !== 0 || f.bonus_regen_construction !== 0) && (
-                      <div className="faction-card-bonuses">
-                        {f.bonus_energy !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_energy < 0 ? ' malus' : ''}`}>
-                            {f.bonus_energy > 0 ? '+' : ''}{f.bonus_energy} Energie
-                          </span>
-                        )}
-                        {f.bonus_conquest !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_conquest < 0 ? ' malus' : ''}`}>
-                            {f.bonus_conquest > 0 ? '+' : ''}{f.bonus_conquest} Conquete
-                          </span>
-                        )}
-                        {f.bonus_construction !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_construction < 0 ? ' malus' : ''}`}>
-                            {f.bonus_construction > 0 ? '+' : ''}{f.bonus_construction} Construction
-                          </span>
-                        )}
-                        {f.bonus_regen_energy !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_regen_energy < 0 ? ' malus' : ''}`}>
-                            {f.bonus_regen_energy > 0 ? '+' : ''}{f.bonus_regen_energy}% Regen Energie
-                          </span>
-                        )}
-                        {f.bonus_regen_conquest !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_regen_conquest < 0 ? ' malus' : ''}`}>
-                            {f.bonus_regen_conquest > 0 ? '+' : ''}{f.bonus_regen_conquest}% Regen Conquete
-                          </span>
-                        )}
-                        {f.bonus_regen_construction !== 0 && (
-                          <span className={`faction-bonus-tag${f.bonus_regen_construction < 0 ? ' malus' : ''}`}>
-                            {f.bonus_regen_construction > 0 ? '+' : ''}{f.bonus_regen_construction}% Regen Construction
-                          </span>
-                        )}
+                    {(() => {
+                      // Calcul des regen effectifs : underdog divise le cycle, equivalent a un bonus regen combine
+                      const regenE = isUnderdog
+                        ? Math.round(100 - (100 - f.bonus_regen_energy) / underdogMultiplier)
+                        : f.bonus_regen_energy
+                      const regenC = isUnderdog
+                        ? Math.round(100 - (100 - f.bonus_regen_conquest) / underdogMultiplier)
+                        : f.bonus_regen_conquest
+                      const regenB = isUnderdog
+                        ? Math.round(100 - (100 - f.bonus_regen_construction) / underdogMultiplier)
+                        : f.bonus_regen_construction
+                      const hasAny = f.bonus_energy !== 0 || f.bonus_conquest !== 0 || f.bonus_construction !== 0 || regenE !== 0 || regenC !== 0 || regenB !== 0
+                      if (!hasAny) return null
+                      return (
+                        <div className="faction-card-bonuses">
+                          {f.bonus_energy !== 0 && (
+                            <span className={`faction-bonus-tag${f.bonus_energy < 0 ? ' malus' : ''}`}>
+                              {f.bonus_energy > 0 ? '+' : ''}{f.bonus_energy} Energie
+                            </span>
+                          )}
+                          {f.bonus_conquest !== 0 && (
+                            <span className={`faction-bonus-tag${f.bonus_conquest < 0 ? ' malus' : ''}`}>
+                              {f.bonus_conquest > 0 ? '+' : ''}{f.bonus_conquest} Conquete
+                            </span>
+                          )}
+                          {f.bonus_construction !== 0 && (
+                            <span className={`faction-bonus-tag${f.bonus_construction < 0 ? ' malus' : ''}`}>
+                              {f.bonus_construction > 0 ? '+' : ''}{f.bonus_construction} Construction
+                            </span>
+                          )}
+                          {regenE !== 0 && (
+                            <span className={`faction-bonus-tag${regenE < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                              {isUnderdog && '\uD83D\uDC80 '}{regenE > 0 ? '+' : ''}{regenE}% Regen Energie
+                            </span>
+                          )}
+                          {regenC !== 0 && (
+                            <span className={`faction-bonus-tag${regenC < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                              {isUnderdog && '\uD83D\uDC80 '}{regenC > 0 ? '+' : ''}{regenC}% Regen Conquete
+                            </span>
+                          )}
+                          {regenB !== 0 && (
+                            <span className={`faction-bonus-tag${regenB < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
+                              {isUnderdog && '\uD83D\uDC80 '}{regenB > 0 ? '+' : ''}{regenB}% Regen Construction
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })()}
+                    {isUnderdog && (
+                      <div className="faction-card-underdog">
+                        <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
+                        <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie avec une rage de vaincre ! Les ressources sont multipliées.</p>
                       </div>
                     )}
                     {isActive && (
@@ -247,7 +259,6 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
             })}
           </div>
         )}
-
         <div className="faction-legend">
           <span className="faction-legend-item">⚡ Energie — Permet de découvrir des lieux</span>
           <span className="faction-legend-item">⚔️ Conquete — Aide à revendiquer un lieu</span>
