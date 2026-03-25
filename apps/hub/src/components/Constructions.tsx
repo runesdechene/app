@@ -101,7 +101,7 @@ export function Constructions() {
         conquest_bonus: t.conquest_bonus,
         tag_ids: t.tag_ids,
         updated_at: new Date().toISOString(),
-      }).eq('level', t.level)
+      }).eq('level', t.level).then(r => r)
     }).filter(Boolean)
 
     const results = await Promise.all(promises)
@@ -110,13 +110,13 @@ export function Constructions() {
     if (errors.length > 0) {
       setSaveError(`Erreur sur ${errors.length} niveau(x)`)
     } else {
-      setSavedTypes([...types])
+      setSavedTypes(JSON.parse(JSON.stringify(types)))
     }
     setSaving(false)
   }
 
   function handleCancel() {
-    setTypes([...savedTypes])
+    setTypes(JSON.parse(JSON.stringify(savedTypes)))
     setSaveError(null)
   }
 

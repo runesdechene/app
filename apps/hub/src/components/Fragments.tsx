@@ -14,11 +14,13 @@ interface Fragment {
   name: string
   description: string | null
   icon: string | null
+  icon_url: string | null
   image_url: string | null
   collection: string | null
   bonus_type: string | null
   bonus_value: number
   link_url: string | null
+  visible: boolean
   words: FragmentWord[]
 }
 
@@ -55,6 +57,9 @@ export function Fragments() {
   const imageInputRef = useRef<HTMLInputElement>(null)
   const imageUploadFragIdRef = useRef<number | null>(null)
   const [uploadingImage, setUploadingImage] = useState<number | null>(null)
+  const iconInputRef = useRef<HTMLInputElement>(null)
+  const iconUploadFragIdRef = useRef<number | null>(null)
+  const [uploadingIcon, setUploadingIcon] = useState<number | null>(null)
 
   // Owners par fragment
   const [owners, setOwners] = useState<Record<number, Array<{ userId: string; name: string }>>>({})
@@ -98,8 +103,8 @@ export function Fragments() {
 
       const result: Fragment[] = (frags as Array<{
         id: number; name: string; description: string | null;
-        icon: string | null; image_url: string | null; collection: string | null;
-        bonus_type: string | null; bonus_value: number; link_url: string | null
+        icon: string | null; icon_url: string | null; image_url: string | null; collection: string | null;
+        bonus_type: string | null; bonus_value: number; link_url: string | null; visible: boolean
       }>).map(f => ({
         ...f,
         words: ((words ?? []) as Array<{
@@ -154,7 +159,7 @@ export function Fragments() {
 
   // --- Modifier localement ---
 
-  function updateFragment(id: number, field: string, value: string | number | null) {
+  function updateFragment(id: number, field: string, value: string | number | boolean | null) {
     setFragments(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f))
   }
 
@@ -180,7 +185,8 @@ export function Fragments() {
         collection: f.collection || null,
         bonus_type: f.bonus_type || null,
         bonus_value: f.bonus_value,
-      }).eq('id', f.id)
+        visible: f.visible,
+      }).eq('id', f.id).then(r => r)
     }).filter(Boolean)
 
     const results = await Promise.all(promises)
@@ -291,6 +297,49 @@ export function Fragments() {
     setUploadingImage(null)
   }
 
+  // --- Icone fragment ---
+
+  function triggerIconUpload(fragId: number) {
+    iconUploadFragIdRef.current = fragId
+    iconInputRef.current?.click()
+  }
+
+  async function handleIconUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const fragId = iconUploadFragIdRef.current
+    if (!file || !fragId) return
+    e.target.value = ''
+    setUploadingIcon(fragId)
+
+    const ext = file.name.split('.').pop() || 'webp'
+    const path = `icon-${fragId}.${ext}`
+    const { error: uploadErr } = await supabase.storage
+      .from('app-fragments')
+      .upload(path, file, { upsert: true, contentType: file.type })
+
+    if (uploadErr) {
+      alert(`Erreur upload: ${uploadErr.message}`)
+      setUploadingIcon(null)
+      return
+    }
+
+    const { data: urlData } = supabase.storage.from('app-fragments').getPublicUrl(path)
+    const iconUrl = `${urlData.publicUrl}?t=${Date.now()}`
+
+    await supabase.from('title_fragments').update({ icon_url: iconUrl }).eq('id', fragId)
+    setFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: iconUrl } : f))
+    setSavedFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: iconUrl } : f))
+    setUploadingIcon(null)
+  }
+
+  async function removeIcon(fragId: number) {
+    setUploadingIcon(fragId)
+    await supabase.from('title_fragments').update({ icon_url: null }).eq('id', fragId)
+    setFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: null } : f))
+    setSavedFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: null } : f))
+    setUploadingIcon(null)
+  }
+
   // --- Attribution manuelle ---
 
   async function searchPlayers(query: string) {
@@ -367,14 +416,9 @@ export function Fragments() {
         </button>
       </div>
 
-      {/* Input file cache pour images */}
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/webp,image/png,image/jpeg"
-        style={{ display: 'none' }}
-        onChange={handleImageUpload}
-      />
+      {/* Inputs fichiers caches */}
+      <input ref={imageInputRef} type="file" accept="image/webp,image/png,image/jpeg" style={{ display: 'none' }} onChange={handleImageUpload} />
+      <input ref={iconInputRef} type="file" accept="image/webp,image/png,image/jpeg,image/svg+xml" style={{ display: 'none' }} onChange={handleIconUpload} />
 
       {/* Liste des fragments */}
       <div className="tags-grid fragments-grid">
@@ -411,9 +455,27 @@ export function Fragments() {
               />
             </div>
 
+            {/* Icone */}
+            <div className="tag-card-icon-section">
+              <label className="faction-field-label">Icone (badge)</label>
+              {frag.icon_url ? (
+                <div className="tag-icon-preview">
+                  <img src={frag.icon_url} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                  <div className="tag-icon-actions">
+                    <button className="tag-icon-replace" onClick={() => triggerIconUpload(frag.id)} disabled={uploadingIcon === frag.id}>Changer</button>
+                    <button className="icon-picker-clear" onClick={() => removeIcon(frag.id)} disabled={uploadingIcon === frag.id}>Retirer</button>
+                  </div>
+                </div>
+              ) : (
+                <button className="tag-icon-btn" onClick={() => triggerIconUpload(frag.id)} disabled={uploadingIcon === frag.id}>
+                  {uploadingIcon === frag.id ? 'Upload...' : '+ icone'}
+                </button>
+              )}
+            </div>
+
             {/* Image */}
             <div className="tag-card-icon-section">
-              <label className="faction-field-label">Image</label>
+              <label className="faction-field-label">Image (grande)</label>
               {frag.image_url ? (
                 <div className="tag-icon-preview">
                   <img src={frag.image_url} alt="" className="faction-image-preview" />
@@ -551,6 +613,10 @@ export function Fragments() {
               >
                 Attribuer a un joueur
               </button>
+              <label className="fragment-visible-toggle">
+                <input type="checkbox" checked={frag.visible} onChange={() => updateFragment(frag.id, 'visible', !frag.visible)} />
+                <span>Visible en jeu</span>
+              </label>
               <button className="faction-delete-btn" onClick={() => handleDelete(frag.id)}>
                 Supprimer
               </button>

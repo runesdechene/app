@@ -31,6 +31,7 @@ import { OfflineIndicator } from './components/pwa/OfflineIndicator'
 import { MobileNavbar } from './components/map/MobileNavbar'
 import { MobileHeader } from './components/map/MobileHeader'
 import { useMobileNavStore } from './stores/mobileNavStore'
+import { AdScreen } from './components/map/AdScreen'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 
@@ -82,6 +83,7 @@ function App() {
   const [showGameModeModal, setShowGameModeModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showAdScreen, setShowAdScreen] = useState(true)
 
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -134,6 +136,9 @@ function App() {
 
   return (
     <div className="app" data-mobile-panel={mobilePanel || ''}>
+      {showAdScreen && isAuthenticated && !authLoading && (
+        <AdScreen onDone={() => setShowAdScreen(false)} />
+      )}
       <ExploreMap />
       <InstallPrompt />
       <OfflineIndicator />

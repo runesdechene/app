@@ -85,9 +85,9 @@ interface PlayerState {
   setDisplayedGeneralTitleIds: (ids: number[]) => void
   setFactionTitle2: (t: { id: number; name: string; icon: string; unlocks: string[] } | null) => void
 
-  /** Phrase composee (titres fragments) */
-  composedPhrase: string | null
-  setComposedPhrase: (phrase: string | null) => void
+  /** Titre prioritaire (affiché sur la carte) */
+  primaryTitle: string | null
+  setPrimaryTitle: (title: string | null) => void
 
   /** Mode de jeu (exploration = pas de faction UI, conquest = tout) */
   gameMode: 'exploration' | 'conquest'
@@ -177,8 +177,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setDisplayedGeneralTitleIds: (ids) => set({ displayedGeneralTitleIds: ids }),
   setFactionTitle2: (t) => set({ factionTitle2: t }),
 
-  composedPhrase: null,
-  setComposedPhrase: (phrase) => set({ composedPhrase: phrase }),
+  primaryTitle: null,
+  setPrimaryTitle: (title) => set({ primaryTitle: title }),
 
   gameMode: 'exploration',
   setGameMode: (mode) => set({ gameMode: mode }),

@@ -1,18 +1,12 @@
 import { memo } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 
-interface PlayerTitle {
-  icon: string
-  name: string
-}
-
 interface OnlinePlayer {
   userId: string
   name: string
   avatarUrl: string | null
   factionColor: string | null
-  displayedTitles: PlayerTitle[]
-  composedPhrase: string | null
+  primaryTitle: string | null
   position: { lng: number; lat: number }
 }
 
@@ -39,8 +33,8 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
               <div className="other-player-dot" />
             )}
             <span className="other-player-name">{player.name}</span>
-            {player.composedPhrase && (
-              <span className="other-player-composed">{player.composedPhrase}</span>
+            {player.primaryTitle && (
+              <span className="other-player-title">{player.primaryTitle}</span>
             )}
           </div>
         </Marker>

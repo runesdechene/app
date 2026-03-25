@@ -3,13 +3,9 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
-import runeImg from '../../assets/rune_de_chene.png'
-import shopIcon from '../../assets/shop_icon.webp'
-import tshirtIcon from '../../assets/t-shirt_icon.png'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { FactionMembersModal } from './FactionMembersModal'
-import { TitleComposer } from './TitleComposer'
 
 interface PlaceCard {
   id: string
@@ -76,20 +72,25 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
   const [visibleCount, setVisibleCount] = useState(12)
   const [showFactionMembers, setShowFactionMembers] = useState(false)
-  const [showComposer, setShowComposer] = useState(false)
   const [showFragmentStore, setShowFragmentStore] = useState(false)
-  const [composedPhrase, setComposedPhrase] = useState<string | null>(null)
-  const [composedWordIds, setComposedWordIds] = useState<number[]>([])
-  const [savingTitle, setSavingTitle] = useState(false)
-  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>>([])
+  const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; bonus_type: string | null; bonus_value: number; owned: boolean }>>([])
+  const [loadingFragments, setLoadingFragments] = useState(false)
+  const [showTitlePicker, setShowTitlePicker] = useState(false)
+  const [titleCategories, setTitleCategories] = useState<{
+    gameTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean }>
+    factionTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean }>
+    fragmentTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean; source_label: string }>
+  }>({ gameTitles: [], factionTitles: [], fragmentTitles: [] })
+  const [selectedTitleIds, setSelectedTitleIds] = useState<number[]>([])
+  const [savingTitles, setSavingTitles] = useState(false)
+  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>>([])
 
   const isSelf = profile?.userId === currentUserId
 
   useEffect(() => {
     async function load() {
-      const [profileRes, composedRes, fragmentsRes] = await Promise.all([
+      const [profileRes, fragmentsRes] = await Promise.all([
         supabase.rpc('get_player_profile', { p_user_id: playerId }),
-        supabase.rpc('get_user_composed_title', { p_user_id: playerId }),
         supabase.rpc('get_user_fragments', { p_user_id: playerId }),
       ])
       if (profileRes.data) {
@@ -98,15 +99,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         setEditBio(p.biography ?? '')
         setEditInstagram(p.instagram ?? '')
       }
-      if (composedRes.data) {
-        const cd = composedRes.data as { phrase: string | null; wordIds: number[] | null }
-        if (cd.phrase) {
-          setComposedPhrase(cd.phrase)
-          setComposedWordIds(cd.wordIds ?? [])
-        }
-      }
       if (fragmentsRes.data && Array.isArray(fragmentsRes.data)) {
-        setPlayerFragments(fragmentsRes.data as Array<{ id: number; name: string; icon: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>)
+        setPlayerFragments(fragmentsRes.data as Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number }>)
       }
       setLoading(false)
     }
@@ -130,6 +124,76 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     setAvatarPreview(URL.createObjectURL(file))
   }
 
+
+  async function openFragmentCollection() {
+    setShowFragmentStore(true)
+    setLoadingFragments(true)
+    const uid = currentUserId || playerId
+    const { data } = await supabase.rpc('get_all_fragments', { p_user_id: uid })
+    if (data && Array.isArray(data)) {
+      setAllFragments(data as typeof allFragments)
+    }
+    setLoadingFragments(false)
+  }
+
+  async function openTitlePicker() {
+    if (!currentUserId) return
+    setShowTitlePicker(true)
+
+    const { data } = await supabase.rpc('get_all_player_titles', { p_user_id: currentUserId })
+    if (data) {
+      const d = data as {
+        gameTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean }> | null
+        factionTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean }> | null
+        fragmentTitles: Array<{ id: number; name: string; icon: string | null; description: string | null; icon_url: string | null; image_url: string | null; unlocked: boolean; source_label: string }> | null
+        displayedIds: number[]
+      }
+      setTitleCategories({
+        gameTitles: d.gameTitles ?? [],
+        factionTitles: d.factionTitles ?? [],
+        fragmentTitles: d.fragmentTitles ?? [],
+      })
+      setSelectedTitleIds(d.displayedIds ?? [])
+    }
+  }
+
+  function toggleTitle(titleId: number) {
+    setSelectedTitleIds(prev => {
+      if (prev.includes(titleId)) return prev.filter(id => id !== titleId)
+      if (prev.length >= 3) return prev
+      return [...prev, titleId]
+    })
+  }
+
+  async function saveTitles() {
+    if (!currentUserId) return
+    setSavingTitles(true)
+    await supabase.rpc('set_displayed_titles_v3', {
+      p_user_id: currentUserId,
+      p_title_ids: selectedTitleIds,
+    })
+
+    // Mettre à jour le primaryTitle dans le store (premier titre = carte)
+    const allTitlesFlat = [...titleCategories.factionTitles, ...titleCategories.gameTitles, ...titleCategories.fragmentTitles]
+    const selectedTitles = selectedTitleIds
+      .map(id => allTitlesFlat.find(t => t.id === id))
+      .filter(Boolean) as Array<{ id: number; name: string; icon: string | null }>
+
+    if (selectedTitles.length > 0) {
+      usePlayerStore.getState().setPrimaryTitle(`${selectedTitles[0].icon ?? ''} ${selectedTitles[0].name}`.trim())
+    }
+
+    // Mettre à jour le profil local avec les titres sélectionnés
+    if (profile) {
+      setProfile({
+        ...profile,
+        displayedGeneralTitles: selectedTitles.map(t => ({ id: t.id, name: t.name, icon: t.icon ?? '' })),
+      })
+    }
+
+    setSavingTitles(false)
+    setShowTitlePicker(false)
+  }
 
   async function handleSave() {
     if (!currentUserId || !profile) return
@@ -251,21 +315,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )}
                 </div>
 
-                {composedPhrase ? (
-                  <div className="player-modal-composed-title" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
-                    <span className="player-modal-composed-phrase">{composedPhrase}</span>
-                    {isSelf && !isEditing && (
-                      <button className="player-modal-compose-btn" onClick={() => setShowComposer(true)} title="Modifier">
-                        {'\u270F\uFE0F'}
-                      </button>
-                    )}
-                  </div>
-                ) : isSelf && !isEditing ? (
-                  <button className="player-modal-compose-link" onClick={() => setShowComposer(true)}>
-                    Composer mon titre
-                  </button>
-                ) : null}
-
                 <div className="player-modal-counts">
                   <div className="player-modal-count">
                     <span className="player-modal-count-value">{profile.authoredPlaces?.length ?? 0}</span>
@@ -289,24 +338,24 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               </div>
             </div>
 
-            {/* Titres classiques (fallback si pas de phrase composee) */}
-            {!composedPhrase && ((profile.displayedGeneralTitles && profile.displayedGeneralTitles.length > 0) || profile.factionTitle2) && (
-              <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
-                {profile.displayedGeneralTitles?.map(t => (
-                  <span key={t.id} className="title-badge title-badge-general">
-                    {t.icon} {t.name}
-                  </span>
-                ))}
-                {profile.factionTitle2 && (
-                  <span
-                    className="title-badge title-badge-faction title-badge-clickable"
-                    onClick={() => setShowFactionMembers(true)}
-                  >
-                    {profile.factionTitle2.icon} {profile.factionTitle2.name} <span className="title-badge-origin">(faction)</span>
-                  </span>
-                )}
-              </div>
-            )}
+            {/* Titres */}
+            <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
+              {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
+                <span key={t.id} className="title-badge title-badge-general">
+                  {t.icon_url ? (
+                    <img src={t.icon_url} alt="" className="title-badge-img" />
+                  ) : t.icon ? (
+                    <span>{t.icon}</span>
+                  ) : null}
+                  {t.name}
+                </span>
+              ))}
+              {isSelf && !isEditing && (
+                <button className="title-badge title-badge-edit" onClick={openTitlePicker}>
+                  {'\u270F\uFE0F'}
+                </button>
+              )}
+            </div>
 
             {/* Bio + Instagram (mode lecture) */}
             {!isEditing && (
@@ -385,40 +434,33 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             )}
             </div>
 
-            {/* Fragments possedes */}
-            {playerFragments.length > 0 && (
-              <div className="player-modal-fragments">
-                <span className="player-modal-fragments-label">Fragments possédés</span>
-                <div className="player-modal-fragments-scroll">
-                  {playerFragments.map(f => (
-                    <div
-                      key={f.id}
-                      className={`player-modal-fragment-chip${f.link_url ? ' clickable' : ''}`}
-                      onClick={() => f.link_url && window.open(f.link_url, '_blank', 'noopener,noreferrer')}
-                    >
-                        {f.image_url ? (
-                          <img src={f.image_url} alt="" className="player-modal-fragment-img" />
-                        ) : f.icon ? (
-                          <span className="player-modal-fragment-icon">{f.icon}</span>
-                        ) : null}
-                        <span className="player-modal-fragment-name">{f.name}</span>
-                        {f.bonus_type && f.bonus_value !== 0 && (
-                          <span className="player-modal-fragment-bonus">
-                            {f.bonus_value > 0 ? '+' : ''}{f.bonus_value} {f.bonus_type.replace('max_', 'Max ').replace('regen_', '% Regen ').replace('energy', 'Energie').replace('conquest', 'Conquete').replace('construction', 'Construction')}
-                          </span>
-                        )}
-                    </div>
-                  ))}
-                  <button
-                    className="player-modal-fragment-chip player-modal-fragment-add"
-                    onClick={() => setShowFragmentStore(true)}
+            {/* Fragments possedes — badges ronds compacts */}
+            <div className="player-modal-fragments">
+              <div className="player-modal-fragments-row">
+                {playerFragments.map(f => (
+                  <div
+                    key={f.id}
+                    className="player-modal-fragment-badge"
+                    onClick={openFragmentCollection}
+                    title={`${f.name}${f.bonus_type && f.bonus_value ? ` — ${f.bonus_value > 0 ? '+' : ''}${f.bonus_value} ${f.bonus_type.replace('max_', 'Max ').replace('regen_', '% Regen ').replace('energy', 'Energie').replace('conquest', 'Conquete').replace('construction', 'Construction')}` : ''}`}
                   >
-                    <span className="player-modal-fragment-add-icon">+</span>
-                    <span className="player-modal-fragment-name">Obtenir</span>
+                    {f.image_url ? (
+                      <img src={f.image_url} alt={f.name} className="player-modal-fragment-badge-img" />
+                    ) : (
+                      <span className="player-modal-fragment-badge-icon">{f.icon ?? '?'}</span>
+                    )}
+                  </div>
+                ))}
+                {isSelf && (
+                  <button
+                    className="player-modal-fragment-badge player-modal-fragment-badge-add"
+                    onClick={openFragmentCollection}
+                  >
+                    +
                   </button>
-                </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Places tabs */}
             <div className="player-modal-places">
@@ -493,77 +535,136 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
       {showFragmentStore && (
         <div className="player-modal-overlay" onClick={() => setShowFragmentStore(false)} style={{ zIndex: 10002 }}>
-          <div className="fragment-store-modal" onClick={e => e.stopPropagation()}>
+          <div className="player-modal" onClick={e => e.stopPropagation()} style={{ width: '85vw', maxWidth: 1100, maxHeight: '85vh', overflow: 'auto', padding: '24px', alignItems: 'stretch' }}>
             <button className="player-modal-close" onClick={() => setShowFragmentStore(false)}>&#10005;</button>
-            <img src={runeImg} alt="" className="fragment-store-logo" />
-            <h2 className="fragment-store-title">Obtenir des fragments</h2>
-            <p className="fragment-store-subtitle">
-              Obtenez des bonus et des titres selon vos articles de la boutique Runes de Chene.
+            <h3 className="fragment-collection-title">Vos médailles d'achats</h3>
+            <p className="fragment-collection-subtitle">
+              Chez Runes de Chêne, nos illustrations originales sont appelées <b>Fragments</b>. Achetée sur la <u><a href="https://runesdechene.com"><b>Boutique officielle</b></a></u>, elles augmentent vos compétences.
             </p>
-            <div className="fragment-store-cards">
-              <a
-                href="https://runesdechene.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="fragment-store-card"
-              >
-                <img src={shopIcon} alt="" className="fragment-store-card-img" />
-                <h3 className="fragment-store-card-title">Explorer la boutique</h3>
-                <p className="fragment-store-card-desc">
-                  Découvrez notre catalogue de vêtements biologiques, imprimés en Bretagne et sans IA.
-                </p>
+
+            {loadingFragments ? (
+              <p style={{ textAlign: 'center', color: '#8A7B6A', fontStyle: 'italic', padding: '2rem 0' }}>Chargement...</p>
+            ) : (
+              <div className="frag-grid">
+                {allFragments.map(f => (
+                  <div key={f.id} className={`frag-grid-card${f.owned ? ' owned' : ''}`}>
+                    <div className="frag-grid-img-wrap">
+                      {f.image_url ? (
+                        <img src={f.image_url} alt="" className="frag-grid-img" />
+                      ) : (
+                        <span className="frag-grid-emoji">{f.icon ?? '?'}</span>
+                      )}
+                      {f.owned && <span className="frag-grid-badge-owned">Possédé</span>}
+                    </div>
+                    <div className="frag-grid-info">
+                      <h3 className="frag-grid-name">{f.name}</h3>
+                      {f.description && <p className="frag-grid-desc">{f.description}</p>}
+                      {f.bonus_type && f.bonus_value !== 0 && (
+                        <span className="frag-grid-bonus">
+                          {f.bonus_value > 0 ? '+' : ''}{f.bonus_value} {f.bonus_type.replace('max_', 'Max ').replace('regen_', '% Regen ').replace('energy', 'Energie').replace('conquest', 'Conquete').replace('construction', 'Construction')}
+                        </span>
+                      )}
+                      {f.link_url && (
+                        <button className="frag-grid-shop-btn" onClick={() => window.open(f.link_url!, '_blank', 'noopener,noreferrer')}>
+                          Voir sur la boutique
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ padding: '12px 0 0', textAlign: 'center' }}>
+              <a href="https://hub.runesdechene.com/soumettre-contenu" target="_blank" rel="noopener noreferrer" style={{ color: '#8A7B6A', fontSize: 11, textDecoration: 'none' }}>
+                J'ai deja achete — Reclamer mes fragments
               </a>
-              <a
-                href="https://hub.runesdechene.com/soumettre-contenu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="fragment-store-card"
-              >
-                <img src={tshirtIcon} alt="" className="fragment-store-card-img" />
-                <h3 className="fragment-store-card-title">J'ai deja des fragments !</h3>
-                <p className="fragment-store-card-desc">
-                  Envoyez nous une photo de vous, avec ou sans visage, pour reclamer vos fragments dans l'application.
-                </p>
-              </a>
-            </div>
-            <div className="fragment-store-footer">
-              <p className="fragment-store-footer-subtitle">
-                Vous avez déjà acheté par le passé ? Certains motifs sont éligibles !
-              </p>
-              <p className="fragment-store-footer-motifs">
-                Varegue, Avalon, Valkyrie, Druide, Morrigan, Esprit du Loup, Esprit du Hibou
-              </p>
             </div>
           </div>
         </div>
       )}
 
-      {showComposer && (
-        <div className="player-modal-overlay" onClick={() => setShowComposer(false)} style={{ zIndex: 10002 }}>
-          <div className="player-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, maxHeight: '80vh', overflow: 'auto', padding: '24px' }}>
-            <button className="player-modal-close" onClick={() => setShowComposer(false)}>&#10005;</button>
-            <TitleComposer
-              currentWordIds={composedWordIds}
-              saving={savingTitle}
-              onCancel={() => setShowComposer(false)}
-              onSave={async (wordIds, phrase) => {
-                if (!currentUserId) return
-                setSavingTitle(true)
-                const { data } = await supabase.rpc('set_composed_title', {
-                  p_user_id: currentUserId,
-                  p_word_ids: wordIds,
-                  p_phrase: phrase,
-                })
-                if (data?.error) {
-                  alert(data.error)
-                } else {
-                  setComposedWordIds(wordIds)
-                  setComposedPhrase(phrase)
-                  setShowComposer(false)
-                }
-                setSavingTitle(false)
-              }}
-            />
+      {showTitlePicker && (
+        <div className="player-modal-overlay" onClick={() => setShowTitlePicker(false)} style={{ zIndex: 10002 }}>
+          <div className="player-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 900, maxHeight: '85vh', overflow: 'auto', padding: '24px', alignItems: 'stretch' }}>
+            <button className="player-modal-close" onClick={() => setShowTitlePicker(false)}>&#10005;</button>
+            <h3 style={{ margin: '0 0 4px', fontFamily: 'var(--font-accent)', textAlign: 'left' }}>Choisissez vos titres</h3>
+            <p style={{ fontSize: 12, color: '#8A7B6A', margin: '0 0 16px', textAlign: 'left' }}>
+              Max 3 titres. Le premier sera affiché sur la carte.
+            </p>
+
+            {titleCategories.gameTitles.length === 0 && titleCategories.factionTitles.length === 0 && titleCategories.fragmentTitles.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#8A7B6A', fontStyle: 'italic', padding: '1rem 0' }}>Chargement...</p>
+            ) : (
+              <>
+                {(titleCategories.gameTitles.length > 0 || titleCategories.factionTitles.length > 0) && (
+                  <div className="title-picker-category">
+                    <span className="title-picker-category-label">Titres de jeu</span>
+                    <div className="title-picker-grid">
+                      {[...titleCategories.factionTitles.filter(t => t.unlocked), ...titleCategories.gameTitles].map(t => {
+                        const isSelected = selectedTitleIds.includes(t.id)
+                        const rank = isSelected ? selectedTitleIds.indexOf(t.id) + 1 : null
+                        return (
+                          <button
+                            key={`game-${t.id}`}
+                            className={`title-picker-item${isSelected ? ' selected' : ''}${!t.unlocked ? ' locked' : ''}`}
+                            onClick={() => t.unlocked && toggleTitle(t.id)}
+                            disabled={!t.unlocked || (!isSelected && selectedTitleIds.length >= 3)}
+                          >
+                            {rank && <span className="title-picker-rank">{rank}</span>}
+                            {t.icon_url ? (
+                              <img src={t.icon_url} alt="" className="title-picker-img" />
+                            ) : (
+                              <span className="title-picker-icon">{t.icon ?? ''}</span>
+                            )}
+                            <span className="title-picker-name">{t.name}</span>
+                            {t.description && <span className="title-picker-desc">{t.description}</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {titleCategories.fragmentTitles.length > 0 && (
+                  <div className="title-picker-category">
+                    <span className="title-picker-category-label">Titres de fragment</span>
+                    <div className="title-picker-grid">
+                      {titleCategories.fragmentTitles.map(t => {
+                        const isSelected = selectedTitleIds.includes(t.id)
+                        const rank = isSelected ? selectedTitleIds.indexOf(t.id) + 1 : null
+                        return (
+                          <button
+                            key={`frag-${t.id}`}
+                            className={`title-picker-item${isSelected ? ' selected' : ''}${!t.unlocked ? ' locked' : ''}`}
+                            onClick={() => t.unlocked && toggleTitle(t.id)}
+                            disabled={!t.unlocked || (!isSelected && selectedTitleIds.length >= 3)}
+                          >
+                            {rank && <span className="title-picker-rank">{rank}</span>}
+                            {t.icon_url ? (
+                              <img src={t.icon_url} alt="" className="title-picker-img" />
+                            ) : (
+                              <span className="title-picker-icon">{t.icon ?? ''}</span>
+                            )}
+                            <span className="title-picker-name">{t.name}</span>
+                            {t.description && <span className="title-picker-desc">{t.description}</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="title-picker-actions">
+              <button className="player-modal-cancel-btn" onClick={() => setShowTitlePicker(false)} disabled={savingTitles}>
+                Annuler
+              </button>
+              <button className="player-modal-save-btn" onClick={saveTitles} disabled={savingTitles}>
+                {savingTitles ? 'Sauvegarde...' : 'Valider'}
+              </button>
+            </div>
           </div>
         </div>
       )}

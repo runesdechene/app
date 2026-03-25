@@ -15,6 +15,7 @@ import { Constructions } from './components/Constructions'
 import { Fragments } from './components/Fragments'
 import { AssignFragments } from './components/AssignFragments'
 import { ShopifyUnlocks } from './components/ShopifyUnlocks'
+import { Ads } from './components/Ads'
 import { Settings } from './components/Settings'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
@@ -82,6 +83,7 @@ function App() {
           <Route path="/carte/fragments" element={<Fragments />} />
           <Route path="/carte/associer" element={<AssignFragments />} />
           <Route path="/carte/shopify" element={<ShopifyUnlocks />} />
+          <Route path="/carte/publicites" element={<Ads />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
         </Routes>

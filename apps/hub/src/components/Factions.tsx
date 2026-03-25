@@ -118,7 +118,7 @@ export function Factions() {
         bonus_regen_conquest: f.bonus_regen_conquest,
         bonus_regen_construction: f.bonus_regen_construction,
         updated_at: new Date().toISOString(),
-      }).eq('id', f.id)
+      }).eq('id', f.id).then(r => r)
     }).filter(Boolean)
 
     const results = await Promise.all(promises)
@@ -127,13 +127,13 @@ export function Factions() {
     if (errors.length > 0) {
       setSaveError(`Erreur sur ${errors.length} faction(s)`)
     } else {
-      setSavedFactions([...factions])
+      setSavedFactions(JSON.parse(JSON.stringify(factions)))
     }
     setSaving(false)
   }
 
   function handleCancel() {
-    setFactions([...savedFactions])
+    setFactions(JSON.parse(JSON.stringify(savedFactions)))
     setSaveError(null)
   }
 

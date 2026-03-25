@@ -72,7 +72,7 @@ export function TagsManager() {
         reward_conquest: t.reward_conquest,
         reward_construction: t.reward_construction,
         updated_at: new Date().toISOString(),
-      }).eq('id', t.id)
+      }).eq('id', t.id).then(r => r)
     }).filter(Boolean)
 
     const results = await Promise.all(promises)
@@ -81,13 +81,13 @@ export function TagsManager() {
     if (errors.length > 0) {
       setSaveError(`Erreur sur ${errors.length} tag(s)`)
     } else {
-      setSavedTags([...tags])
+      setSavedTags(JSON.parse(JSON.stringify(tags)))
     }
     setSaving(false)
   }
 
   function handleCancel() {
-    setTags([...savedTags])
+    setTags(JSON.parse(JSON.stringify(savedTags)))
     setSaveError(null)
   }
 

@@ -89,9 +89,6 @@ export function AuthModal({ onClose }: AuthModalProps) {
             progressez aux côtés de <b>milliers de clients Runes de Chêne</b> qui cartographient leur patrimoine en s'amusant.
             </p>
 
-             <p className="auth-modal-disclaimer">
-Cette application est en ALPHA. Des bugs peuvent survenir.
-            </p>
 
             <form onSubmit={handleSubmit} className="auth-modal-form">
               <input

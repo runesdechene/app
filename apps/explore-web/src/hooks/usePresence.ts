@@ -5,29 +5,21 @@ import { useToastStore } from '../stores/toastStore'
 import { usePlayersStore } from '../stores/playersStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
-interface PresenceTitle {
-  icon: string
-  name: string
-}
-
 interface PresencePayload {
   userId: string
   name: string
   factionColor: string | null
   factionPattern: string | null
   avatarUrl: string | null
-  displayedTitles: PresenceTitle[]
-  composedPhrase: string | null
+  primaryTitle: string | null
   lat: number | null
   lng: number | null
 }
 
-const TRACK_INTERVAL_MS = 10_000 // Re-track position toutes les 10s
+const TRACK_INTERVAL_MS = 10_000
 
 /**
  * Hook de présence — à appeler UNE SEULE FOIS au niveau App.
- * Rejoint un channel Supabase Presence, affiche des toasts
- * quand des joueurs arrivent, et synchronise les positions.
  */
 export function usePresence() {
   const userId = usePlayerStore(s => s.userId)
@@ -68,28 +60,18 @@ export function usePresence() {
         const state = usePlayerStore.getState()
         const pos = state.userPosition
         const avatar = state.userAvatarUrl
-        // Construire les titres affiches
-        const titles: PresenceTitle[] = []
-        const { unlockedGeneralTitles, displayedGeneralTitleIds, factionTitle2, composedPhrase } = state
-        for (const id of displayedGeneralTitleIds) {
-          const t = unlockedGeneralTitles.find(tt => tt.id === id)
-          if (t) titles.push({ icon: t.icon, name: t.name })
-        }
-        if (factionTitle2) titles.push({ icon: factionTitle2.icon, name: factionTitle2.name })
         return {
           userId: userId!,
           name,
           factionColor,
           factionPattern,
           avatarUrl: avatar,
-          displayedTitles: titles,
-          composedPhrase,
+          primaryTitle: state.primaryTitle,
           lat: pos?.lat ?? null,
           lng: pos?.lng ?? null,
         }
       }
 
-      // Rejoindre le channel presence
       const channel = supabase.channel('map-presence', {
         config: { presence: { key: userId! } },
       })
@@ -116,8 +98,7 @@ export function usePresence() {
                 factionColor: payload.factionColor,
                 factionPattern: payload.factionPattern,
                 avatarUrl: payload.avatarUrl,
-                displayedTitles: (payload.displayedTitles as PresenceTitle[]) ?? [],
-                composedPhrase: (payload.composedPhrase as string) ?? null,
+                primaryTitle: (payload.primaryTitle as string) ?? null,
                 lastSeen: Date.now(),
               })
             }
@@ -138,8 +119,7 @@ export function usePresence() {
               factionColor: (raw.factionColor as string) ?? null,
               factionPattern: (raw.factionPattern as string) ?? null,
               avatarUrl: (raw.avatarUrl as string) ?? null,
-              displayedTitles: (raw.displayedTitles as PresenceTitle[]) ?? [],
-              composedPhrase: (raw.composedPhrase as string) ?? null,
+              primaryTitle: (raw.primaryTitle as string) ?? null,
               lastSeen: Date.now(),
             })
           }
@@ -157,7 +137,6 @@ export function usePresence() {
           }
         })
 
-      // Re-track position périodiquement
       intervalRef.current = setInterval(async () => {
         if (channel.state === 'joined') {
           await channel.track(buildPayload())

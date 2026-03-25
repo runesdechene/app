@@ -17,6 +17,7 @@ interface Title {
   condition: TitleCondition
   order: number
   icon: string | null
+  description: string | null
   unlocks: string[]
 }
 
@@ -126,14 +127,15 @@ export function TitlesManager() {
       return supabase.from('titles').update({
         name: t.name,
         icon: t.icon,
+        description: t.description,
         order: t.order,
         condition: t.condition,
         unlocks: t.unlocks,
-      }).eq('id', t.id)
+      }).eq('id', t.id).then(r => r)
     }).filter(Boolean)
 
     await Promise.all(promises)
-    setSavedTitles([...titles])
+    setSavedTitles(JSON.parse(JSON.stringify(titles)))
     setSaving(false)
   }
 
@@ -150,21 +152,28 @@ export function TitlesManager() {
       .filter(t => t.type === newType)
       .reduce((max, t) => Math.max(max, t.order), -1)
 
-    const { data, error } = await supabase.from('titles').insert({
-      name,
-      type: newType,
-      faction_id: newType === 'faction' ? newFactionId : null,
-      condition: { stat: 'discoveries', min: 0 },
-      order: maxOrder + 1,
-      icon: null,
-      unlocks: [],
-    }).select().single()
+    try {
+      const { data, error } = await supabase.from('titles').insert({
+        name,
+        type: newType,
+        faction_id: newType === 'faction' ? newFactionId : null,
+        condition: { stat: 'discoveries', min: 0 },
+        order: maxOrder + 1,
+        icon: null,
+        unlocks: [],
+      }).select().single()
 
-    if (!error && data) {
-      const t = data as Title
-      setTitles(prev => [...prev, t])
-      setSavedTitles(prev => [...prev, t])
-      setNewName('')
+      if (error) {
+        console.error('Create title error:', error)
+        alert(`Erreur: ${error.message}`)
+      } else if (data) {
+        const t = data as Title
+        setTitles(prev => [...prev, t])
+        setSavedTitles(prev => [...prev, t])
+        setNewName('')
+      }
+    } catch (err) {
+      console.error('Create title exception:', err)
     }
     setCreating(false)
   }
@@ -361,6 +370,15 @@ function TitleRow({
           />
         </label>
       </div>
+
+      {/* Description */}
+      <input
+        type="text"
+        value={t.description ?? ''}
+        onChange={e => onFieldChange(t.id, 'description', e.target.value)}
+        className="title-description-input"
+        placeholder="Comment obtenir ce titre..."
+      />
 
       {/* Condition Builder */}
       <ConditionBuilder

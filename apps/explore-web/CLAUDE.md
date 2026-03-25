@@ -1,6 +1,6 @@
 # La Carte — Runes de Chêne
 
-> Dernière mise à jour : 24 mars 2026
+> Dernière mise à jour : 25 mars 2026
 
 ## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
@@ -174,6 +174,18 @@ Joueurs → faction. Chaque faction : titre, couleur, pattern SVG. Territoires =
 | Conquête ⚔️ | +1/14400s | 5 + bonus | Revendiquer des lieux |
 | Construction 🔨 | +1/14400s | 5 + bonus | Fortifier des lieux |
 
+### Loading Screen (Interstitiel publicitaire) ✅
+
+Ecran de chargement immersif affiché au lancement de l'app, avant l'entrée sur la carte.
+
+- **Desktop** : carte portrait centrée. **Mobile** : plein écran.
+- **Ken Burns effect** : zoom lent cinématique sur l'image.
+- **Astuce "Le Saviez-vous ?"** : tirée aléatoirement depuis la table `ad_tips` (gérée via le Hub).
+- **Bouton "Découvrir"** : affiche le titre du produit associé et redirige vers la boutique.
+- **Bouton "Entrer sur la carte"** : ferme l'interstitiel et lance le jeu.
+- Classes CSS renommées de `ad-*` en `loading-*` pour éviter les ad blockers.
+- Images et tips gérés depuis le Hub (page Publicités) avec SaveBar intégrée.
+
 ### Fog of War
 
 Lieux non découverts = masqués. Coût : 1.0 énergie remote (0.5 même faction), gratuit GPS < 500m.
@@ -268,6 +280,10 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 | 107 | image_url sur title_fragments + mise à jour get_user_fragments pour retourner image_url |
 | 108 | link_url sur title_fragments + mise à jour get_user_fragments pour retourner link_url |
 | 109 | Bonus fragments appliqués dans get_user_energy : pile base → faction → fragments → underdog |
+| 110 | Pending fragments : auto-déblocage des fragments en attente à l'inscription (email match) |
+| 111 | Ad screens & tips : tables pour les écrans de chargement (images + astuces "Le Saviez-vous ?") |
+| 112 | Ad RLS fix : correction des policies RLS sur les tables ad screens |
+| 113 | Ad screen title : ajout du champ titre sur les écrans publicitaires |
 
 ---
 
@@ -506,6 +522,7 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 - **Refactorer la pile de bonus en une fonction unique `get_player_bonuses(p_user_id)`** — Aujourd'hui les bonus sont calculés en dur dans `get_user_energy` (faction + fragments + underdog empilés avec des IF). Quand on ajoutera la 4ème source (set bonus, saisons, items, guildes...), refactorer en une seule fonction qui retourne tous les bonus cumulés par source. `get_user_energy` n'aura plus qu'à appeler `get_player_bonuses` et appliquer le résultat. Un seul endroit à maintenir.
 - **Composeur in-game sur mobile** — tester et ajuster le composeur de titre sur mobile (responsive)
 - **Connecter Shopify** — webhook order/paid → Edge Function → déblocage automatique des fragments via `shopify_unlocks`
+- **Push notifications** — exploiter la base emails capturée pour pousser du contenu et ramener les joueurs
 
 ---
 

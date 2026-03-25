@@ -117,12 +117,11 @@ export function usePlayer() {
           })
       }
 
-      const [discRes, energyRes, profileRes, titlesRes, composedRes] = await Promise.all([
+      const [discRes, energyRes, profileRes, titlesRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
         supabase.rpc('get_my_informations', { p_user_id: userData.id }),
         supabase.rpc('get_user_titles', { p_user_id: userData.id }),
-        supabase.rpc('get_user_composed_title', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -187,10 +186,13 @@ export function usePlayer() {
           factionTitle2: td.factionTitle ?? null,
         })
       }
-      if (composedRes.data) {
-        const cd = composedRes.data as { phrase: string | null }
-        if (cd.phrase) {
-          usePlayerStore.setState({ composedPhrase: cd.phrase })
+      // PrimaryTitle = premier titre affiché (v3)
+      const { data: playerProfile } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
+      if (playerProfile) {
+        const pp = playerProfile as { displayedGeneralTitles?: Array<{ icon: string; name: string }> }
+        const firstTitle = pp.displayedGeneralTitles?.[0]
+        if (firstTitle) {
+          usePlayerStore.setState({ primaryTitle: `${firstTitle.icon ?? ''} ${firstTitle.name}`.trim() })
         }
       }
 

@@ -1,10 +1,5 @@
 import { create } from 'zustand'
 
-export interface PlayerTitle {
-  icon: string
-  name: string
-}
-
 export interface OnlinePlayer {
   userId: string
   name: string
@@ -12,8 +7,7 @@ export interface OnlinePlayer {
   factionColor: string | null
   factionPattern: string | null
   avatarUrl: string | null
-  displayedTitles: PlayerTitle[]
-  composedPhrase: string | null
+  primaryTitle: string | null
   lastSeen: number
 }
 

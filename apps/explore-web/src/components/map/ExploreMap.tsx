@@ -56,7 +56,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const userPosition = usePlayerStore(s => s.userPosition)
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
   const userName = usePlayerStore(s => s.userName)
-  const userComposedPhrase = usePlayerStore(s => s.composedPhrase)
+  const userPrimaryTitle = usePlayerStore(s => s.primaryTitle)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const currentUserId = usePlayerStore(s => s.userId)
@@ -662,8 +662,8 @@ export const ExploreMap = memo(function ExploreMap() {
                 )}
               </div>
               {userName && <span className="other-player-name">{userName}</span>}
-              {userComposedPhrase && (
-                <span className="other-player-composed">{userComposedPhrase}</span>
+              {userPrimaryTitle && (
+                <span className="other-player-title">{userPrimaryTitle}</span>
               )}
             </div>
           )}
@@ -759,7 +759,7 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
 
       {loading && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-[var(--color-parchment)] text-[var(--color-ink)] px-4 py-2 rounded shadow-md text-sm font-[var(--font-body)] z-10">
+        <div style={{ top: 'calc(var(--safe-top, 0px) + 56px)' }} className="absolute left-1/2 -translate-x-1/2 bg-[var(--color-parchment)] text-[var(--color-ink)] px-4 py-2 rounded shadow-md text-sm font-[var(--font-body)] z-10">
           Chargement des lieux...
         </div>
       )}
