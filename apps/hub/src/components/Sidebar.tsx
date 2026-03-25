@@ -45,6 +45,12 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/carte/titres" className={({ isActive }) => isActive ? 'active' : ''}>
           Titres
         </NavLink>
+        <NavLink to="/carte/fragments" className={({ isActive }) => isActive ? 'active' : ''}>
+          Fragments
+        </NavLink>
+        <NavLink to="/carte/shopify" className={({ isActive }) => isActive ? 'active' : ''}>
+          Shopify Unlocks
+        </NavLink>
         <NavLink to="/carte/reglages" className={({ isActive }) => isActive ? 'active' : ''}>
           Reglages
         </NavLink>

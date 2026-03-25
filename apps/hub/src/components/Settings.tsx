@@ -36,7 +36,7 @@ export function Settings() {
   const [users, setUsers] = useState<UserGauge[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debounceMapRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   // Territory tiers
   const [tiers, setTiers] = useState<TerritoryTier[]>([])
@@ -175,14 +175,17 @@ export function Settings() {
 
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, [field]: num } : u))
 
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(async () => {
+    const key = `${userId}:${field}`
+    const existing = debounceMapRef.current.get(key)
+    if (existing) clearTimeout(existing)
+    debounceMapRef.current.set(key, setTimeout(async () => {
+      debounceMapRef.current.delete(key)
       const dbField = field === 'maxEnergy' ? 'max_energy' : field === 'maxConquest' ? 'max_conquest' : 'max_construction'
       await supabase
         .from('users')
         .update({ [dbField]: num })
         .eq('id', userId)
-    }, 600)
+    }, 600))
   }
 
   function handleTierChange(idx: number, field: 'minPlaces' | 'title', value: string) {

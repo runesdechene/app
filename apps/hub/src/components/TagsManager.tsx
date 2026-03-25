@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { SaveBar } from './SaveBar'
 
 interface Tag {
   id: string
@@ -15,15 +16,18 @@ interface Tag {
 
 export function TagsManager() {
   const [tags, setTags] = useState<Tag[]>([])
+  const [savedTags, setSavedTags] = useState<Tag[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState<string | null>(null)
-  const [saving, setSaving] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [newId, setNewId] = useState('')
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadTagIdRef = useRef<string | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const hasChanges = JSON.stringify(tags) !== JSON.stringify(savedTags)
 
   useEffect(() => {
     fetchTags()
@@ -38,13 +42,56 @@ export function TagsManager() {
 
       if (!error && data) {
         setTags(data as Tag[])
+        setSavedTags(data as Tag[])
       }
     } finally {
       setLoading(false)
     }
   }
 
-  // --- Créer un tag ---
+  // --- Modifier localement ---
+
+  function updateField(tagId: string, field: string, value: string | number) {
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, [field]: value } : t))
+  }
+
+  // --- Sauvegarder tout ---
+
+  async function handleSave() {
+    setSaving(true)
+    setSaveError(null)
+
+    const promises = tags.map(t => {
+      const saved = savedTags.find(s => s.id === t.id)
+      if (JSON.stringify(t) === JSON.stringify(saved)) return null
+      return supabase.from('tags').update({
+        title: t.title,
+        color: t.color,
+        background: t.background,
+        reward_energy: t.reward_energy,
+        reward_conquest: t.reward_conquest,
+        reward_construction: t.reward_construction,
+        updated_at: new Date().toISOString(),
+      }).eq('id', t.id)
+    }).filter(Boolean)
+
+    const results = await Promise.all(promises)
+    const errors = results.filter(r => r?.error)
+
+    if (errors.length > 0) {
+      setSaveError(`Erreur sur ${errors.length} tag(s)`)
+    } else {
+      setSavedTags([...tags])
+    }
+    setSaving(false)
+  }
+
+  function handleCancel() {
+    setTags([...savedTags])
+    setSaveError(null)
+  }
+
+  // --- Créer ---
 
   function slugify(text: string): string {
     return text
@@ -61,74 +108,23 @@ export function TagsManager() {
     if (tags.some(t => t.id === id)) return
 
     setCreating(true)
-
     const maxOrder = tags.reduce((max, t) => Math.max(max, t.order), -1)
 
     const { data, error } = await supabase.from('tags').insert({
-      id,
-      title,
-      color: '#C19A6B',
-      background: '#F5E6D3',
-      order: maxOrder + 1,
-      reward_energy: 0,
-      reward_conquest: 0,
-      reward_construction: 0,
+      id, title, color: '#C19A6B', background: '#F5E6D3',
+      order: maxOrder + 1, reward_energy: 0, reward_conquest: 0, reward_construction: 0,
     }).select().single()
 
     if (!error && data) {
       setTags(prev => [...prev, data as Tag])
+      setSavedTags(prev => [...prev, data as Tag])
       setNewId('')
       setNewTitle('')
     }
-
     setCreating(false)
   }
 
-  // --- Couleurs ---
-
-  function handleColorChange(tagId: string, field: 'color' | 'background', value: string) {
-    // Mise à jour locale immédiate
-    setTags(prev => prev.map(t => t.id === tagId ? { ...t, [field]: value } : t))
-
-    // Debounce la sauvegarde en base (éviter de spammer pendant qu'on glisse le picker)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      saveColor(tagId, field, value)
-    }, 400)
-  }
-
-  async function saveColor(tagId: string, field: 'color' | 'background', value: string) {
-    setSaving(tagId)
-    await supabase
-      .from('tags')
-      .update({ [field]: value, updated_at: new Date().toISOString() })
-      .eq('id', tagId)
-    setSaving(null)
-  }
-
-  // --- Récompenses ---
-
-  const rewardDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  function handleRewardChange(tagId: string, field: 'reward_energy' | 'reward_conquest' | 'reward_construction', value: number) {
-    setTags(prev => prev.map(t => t.id === tagId ? { ...t, [field]: value } : t))
-
-    if (rewardDebounceRef.current) clearTimeout(rewardDebounceRef.current)
-    rewardDebounceRef.current = setTimeout(() => {
-      saveReward(tagId, field, value)
-    }, 400)
-  }
-
-  async function saveReward(tagId: string, field: string, value: number) {
-    setSaving(tagId)
-    await supabase
-      .from('tags')
-      .update({ [field]: value, updated_at: new Date().toISOString() })
-      .eq('id', tagId)
-    setSaving(null)
-  }
-
-  // --- Icône SVG ---
+  // --- Icône SVG (save immédiat car fichier) ---
 
   function triggerUpload(tagId: string) {
     uploadTagIdRef.current = tagId
@@ -139,83 +135,57 @@ export function TagsManager() {
     const file = e.target.files?.[0]
     const tagId = uploadTagIdRef.current
     if (!file || !tagId) return
-
-    // Reset input pour pouvoir re-sélectionner le même fichier
     e.target.value = ''
-
     setUploading(tagId)
 
-    // Supprimer tous les anciens fichiers de ce tag (legacy + précédents uploads)
-    const { data: existing } = await supabase.storage.from('tag-icons').list('', {
-      search: tagId,
-    })
+    const { data: existing } = await supabase.storage.from('tag-icons').list('', { search: tagId })
     if (existing && existing.length > 0) {
       await supabase.storage.from('tag-icons').remove(existing.map(f => f.name))
     }
 
-    // Upload avec timestamp pour casser le cache CDN
     const path = `${tagId}-${Date.now()}.svg`
-
     const { error: uploadError } = await supabase.storage
       .from('tag-icons')
       .upload(path, file, { contentType: 'image/svg+xml' })
 
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
-      setUploading(null)
-      return
-    }
+    if (uploadError) { setUploading(null); return }
 
-    // Récupérer l'URL publique
-    const { data: urlData } = supabase.storage
-      .from('tag-icons')
-      .getPublicUrl(path)
-
+    const { data: urlData } = supabase.storage.from('tag-icons').getPublicUrl(path)
     const iconUrl = urlData.publicUrl
 
-    // Sauvegarder l'URL dans la table tags
-    const { error: updateError } = await supabase
-      .from('tags')
+    const { error: updateError } = await supabase.from('tags')
       .update({ icon: iconUrl, updated_at: new Date().toISOString() })
       .eq('id', tagId)
 
     if (!updateError) {
-      setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: iconUrl } : t))
+      const update = (prev: Tag[]) => prev.map(t => t.id === tagId ? { ...t, icon: iconUrl } : t)
+      setTags(update)
+      setSavedTags(update)
     }
-
     setUploading(null)
   }
 
   async function removeIcon(tagId: string) {
     setUploading(tagId)
-
-    // Supprimer tous les fichiers de ce tag
-    const { data: existing } = await supabase.storage.from('tag-icons').list('', {
-      search: tagId,
-    })
+    const { data: existing } = await supabase.storage.from('tag-icons').list('', { search: tagId })
     if (existing && existing.length > 0) {
       await supabase.storage.from('tag-icons').remove(existing.map(f => f.name))
     }
-
-    // Mettre icon à null
-    const { error } = await supabase
-      .from('tags')
+    const { error } = await supabase.from('tags')
       .update({ icon: null, updated_at: new Date().toISOString() })
       .eq('id', tagId)
-
     if (!error) {
-      setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: null } : t))
+      const update = (prev: Tag[]) => prev.map(t => t.id === tagId ? { ...t, icon: null } : t)
+      setTags(update)
+      setSavedTags(update)
     }
-
     setUploading(null)
   }
 
-  if (loading) {
-    return <div className="loading">Chargement...</div>
-  }
+  if (loading) return <div className="loading">Chargement...</div>
 
   return (
-    <div>
+    <div style={{ paddingBottom: hasChanges ? 70 : 0 }}>
       <div className="page-header">
         <h1>Tags</h1>
         <span className="tags-count">{tags.length} tags</span>
@@ -250,42 +220,25 @@ export function TagsManager() {
         </button>
       </div>
 
-      {/* Input fichier caché, partagé */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/svg+xml"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
+      <input ref={fileInputRef} type="file" accept="image/svg+xml" style={{ display: 'none' }} onChange={handleFileChange} />
 
       <div className="tags-grid">
         {tags.map(tag => (
           <div key={tag.id} className="tag-card">
             {/* Badge preview */}
             <div className="tag-card-preview">
-              <span
-                className="tag-card-badge"
-                style={{ backgroundColor: tag.background, color: tag.color }}
-              >
+              <span className="tag-card-badge" style={{ backgroundColor: tag.background, color: tag.color }}>
                 {tag.icon && (
-                  <span
-                    className="tag-card-icon-img"
-                    style={{
-                      WebkitMaskImage: `url(${tag.icon}?v=1)`,
-                      maskImage: `url(${tag.icon}?v=1)`,
-                      backgroundColor: tag.color,
-                    }}
-                  />
+                  <span className="tag-card-icon-img" style={{
+                    WebkitMaskImage: `url(${tag.icon}?v=1)`,
+                    maskImage: `url(${tag.icon}?v=1)`,
+                    backgroundColor: tag.color,
+                  }} />
                 )}
                 {tag.title}
               </span>
-              {saving === tag.id && (
-                <span className="tag-saving-indicator">...</span>
-              )}
             </div>
 
-            {/* ID + couleurs */}
             <div className="tag-card-info">
               <span className="tag-card-id">{tag.id}</span>
             </div>
@@ -294,22 +247,12 @@ export function TagsManager() {
             <div className="tag-card-colors-section">
               <label className="tag-color-field">
                 <span className="tag-color-label">Texte</span>
-                <input
-                  type="color"
-                  value={tag.color}
-                  onChange={e => handleColorChange(tag.id, 'color', e.target.value)}
-                  className="tag-color-input"
-                />
+                <input type="color" value={tag.color} onChange={e => updateField(tag.id, 'color', e.target.value)} className="tag-color-input" />
                 <span className="tag-color-value">{tag.color}</span>
               </label>
               <label className="tag-color-field">
                 <span className="tag-color-label">Fond</span>
-                <input
-                  type="color"
-                  value={tag.background}
-                  onChange={e => handleColorChange(tag.id, 'background', e.target.value)}
-                  className="tag-color-input"
-                />
+                <input type="color" value={tag.background} onChange={e => updateField(tag.id, 'background', e.target.value)} className="tag-color-input" />
                 <span className="tag-color-value">{tag.background}</span>
               </label>
             </div>
@@ -320,28 +263,12 @@ export function TagsManager() {
                 <div className="tag-icon-preview">
                   <img src={`${tag.icon}?v=1`} alt="" className="tag-icon-img" />
                   <div className="tag-icon-actions">
-                    <button
-                      className="tag-icon-replace"
-                      onClick={() => triggerUpload(tag.id)}
-                      disabled={uploading === tag.id}
-                    >
-                      Changer
-                    </button>
-                    <button
-                      className="icon-picker-clear"
-                      onClick={() => removeIcon(tag.id)}
-                      disabled={uploading === tag.id}
-                    >
-                      Retirer
-                    </button>
+                    <button className="tag-icon-replace" onClick={() => triggerUpload(tag.id)} disabled={uploading === tag.id}>Changer</button>
+                    <button className="icon-picker-clear" onClick={() => removeIcon(tag.id)} disabled={uploading === tag.id}>Retirer</button>
                   </div>
                 </div>
               ) : (
-                <button
-                  className="tag-icon-btn"
-                  onClick={() => triggerUpload(tag.id)}
-                  disabled={uploading === tag.id}
-                >
+                <button className="tag-icon-btn" onClick={() => triggerUpload(tag.id)} disabled={uploading === tag.id}>
                   {uploading === tag.id ? 'Upload...' : '+ icône SVG'}
                 </button>
               )}
@@ -349,46 +276,30 @@ export function TagsManager() {
 
             {/* Récompenses découverte */}
             <div className="tag-card-rewards-section">
-              <span className="tag-rewards-title">Récompenses</span>
+              <span className="tag-rewards-title">Recompenses</span>
               <div className="tag-rewards-row">
                 <label className="tag-reward-field">
                   <span className="tag-reward-icon">{'\u26A1'}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={tag.reward_energy}
-                    onChange={e => handleRewardChange(tag.id, 'reward_energy', Number(e.target.value))}
-                    className="tag-reward-input"
-                  />
+                  <input type="number" min={0} step={1} value={tag.reward_energy}
+                    onChange={e => updateField(tag.id, 'reward_energy', Number(e.target.value))} className="tag-reward-input" />
                 </label>
                 <label className="tag-reward-field">
                   <span className="tag-reward-icon">{'\u2694'}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={tag.reward_conquest}
-                    onChange={e => handleRewardChange(tag.id, 'reward_conquest', Number(e.target.value))}
-                    className="tag-reward-input"
-                  />
+                  <input type="number" min={0} step={1} value={tag.reward_conquest}
+                    onChange={e => updateField(tag.id, 'reward_conquest', Number(e.target.value))} className="tag-reward-input" />
                 </label>
                 <label className="tag-reward-field">
                   <span className="tag-reward-icon">{'\u2692'}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={tag.reward_construction}
-                    onChange={e => handleRewardChange(tag.id, 'reward_construction', Number(e.target.value))}
-                    className="tag-reward-input"
-                  />
+                  <input type="number" min={0} step={1} value={tag.reward_construction}
+                    onChange={e => updateField(tag.id, 'reward_construction', Number(e.target.value))} className="tag-reward-input" />
                 </label>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      <SaveBar hasChanges={hasChanges} saving={saving} error={saveError} onSave={handleSave} onCancel={handleCancel} />
     </div>
   )
 }
