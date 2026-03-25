@@ -94,6 +94,8 @@ export function usePlayer() {
       setUserName(userData.first_name ?? '')
       // Mettre a jour last_login_at pour le Hub (badge "Reactive")
       supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(() => {})
+      // Debloquer les fragments pending (achats avant inscription)
+      supabase.rpc('unlock_pending_fragments', { p_user_id: userData.id, p_email: user!.email }).then(() => {})
       // Avatar direct si disponible
       if (userData.avatar_url) {
         setUserAvatarUrl(userData.avatar_url)

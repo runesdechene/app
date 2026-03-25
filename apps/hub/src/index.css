@@ -5,23 +5,33 @@
 }
 
 :root {
-  --color-bg: #0f0f0f;
-  --color-surface: #1a1a1a;
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-text: #ffffff;
-  --color-muted: #888888;
+  /* Palette parchemin — alignée sur explore-web */
+  --color-bg: #f5edd8;
+  --color-surface: #faf3e0;
+  --color-surface-hover: #f0e6cc;
+  --color-border: rgba(160, 130, 90, 0.2);
+  --color-border-strong: rgba(160, 130, 90, 0.4);
+  --color-text: #3a2e1e;
+  --color-text-secondary: #6b5a47;
+  --color-muted: #8A7B6A;
   --color-primary: #801c1c;
+  --color-primary-light: rgba(128, 28, 28, 0.08);
   --color-button: #f4d694;
-  --color-button--text: #202219;
-  --color-button--disabled: #e0dbd1;
-  --color-success: #22c55e;
-  --color-shopify: #96bf48;
-  --color-ivy: #8b5cf6;
+  --color-button--text: #3a2e1e;
+  --color-button--disabled: #d0c8b8;
+  --color-success: #2a7a30;
+  --color-danger: #b43c3c;
+  --color-shopify: #6b8f2e;
+  --color-ivy: #6b4fa0;
   --radius: 8px;
 
   --font-heading-family: 'Bebas Neue', cursive;
   --font-body-family: 'Cabin', sans-serif;
   --font-accent-family: 'Cabin Condensed', sans-serif;
+  --font-title-family: 'Cinzel', serif;
+
+  --shadow-sm: 0 1px 3px rgba(100, 80, 50, 0.08);
+  --shadow-md: 0 2px 8px rgba(100, 80, 50, 0.1);
 }
 
 body {
@@ -35,6 +45,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading-family);
   letter-spacing: 0.04em;
   line-height: 1.1;
+  color: var(--color-text);
 }
 
 label, .filter-tab, .status-badge, .role-badge,
@@ -45,4 +56,50 @@ label, .filter-tab, .status-badge, .role-badge,
 
 #root {
   min-height: 100vh;
+}
+
+/* Scrollbar parcheminée */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(193, 154, 107, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(193, 154, 107, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(193, 154, 107, 0.5);
+}
+
+/* Inputs et selects globaux */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: var(--font-body-family);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 2px rgba(160, 130, 90, 0.1);
+}
+
+select option {
+  background: var(--color-surface);
+  color: var(--color-text);
 }

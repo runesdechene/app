@@ -12,6 +12,7 @@ interface HubUser {
   is_active: boolean
   created_at: string
   last_login_at: string | null
+  isPending?: boolean
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -68,6 +69,34 @@ export function Users() {
           } else {
             break
           }
+        }
+
+        // Charger les emails pending (pas encore de compte)
+        const { data: pendingData } = await supabase
+          .from('purchase_log')
+          .select('email, created_at')
+          .eq('status', 'pending')
+
+        if (!ignore && pendingData) {
+          const existingEmails = new Set(allUsers.map(u => u.email_address.toLowerCase()))
+          const pendingEmails = new Map<string, string>()
+          for (const p of pendingData as Array<{ email: string; created_at: string }>) {
+            if (p.email && !existingEmails.has(p.email.toLowerCase()) && !pendingEmails.has(p.email.toLowerCase())) {
+              pendingEmails.set(p.email.toLowerCase(), p.created_at)
+            }
+          }
+          const pendingUsers: HubUser[] = Array.from(pendingEmails.entries()).map(([email, created]) => ({
+            id: `pending-${email}`,
+            email_address: email,
+            first_name: null,
+            display_name: null,
+            role: 'user' as Role,
+            is_active: false,
+            created_at: created,
+            last_login_at: null,
+            isPending: true,
+          }))
+          allUsers = [...allUsers, ...pendingUsers]
         }
 
         if (!ignore) setUsers(allUsers)
@@ -140,17 +169,65 @@ export function Users() {
   }
 
   const now = Date.now()
+  const [showExport, setShowExport] = useState(false)
+
+  function exportEmails(filter: 'all' | 'active' | 'inactive' | 'pending' | 'validated') {
+    let filtered: HubUser[]
+    let label: string
+    switch (filter) {
+      case 'active':
+        filtered = users.filter(u => !u.isPending && u.is_active)
+        label = 'actifs'
+        break
+      case 'inactive':
+        filtered = users.filter(u => !u.isPending && !u.is_active)
+        label = 'inactifs'
+        break
+      case 'pending':
+        filtered = users.filter(u => u.isPending)
+        label = 'en attente'
+        break
+      case 'validated':
+        filtered = users.filter(u => !u.isPending)
+        label = 'valides'
+        break
+      default:
+        filtered = users
+        label = 'tous'
+    }
+    const emails = filtered.map(u => u.email_address)
+    if (emails.length === 0) { alert('Aucun email'); return }
+    navigator.clipboard.writeText(emails.join('\n'))
+    alert(`${emails.length} email(s) ${label} copie(s)`)
+    setShowExport(false)
+  }
 
   return (
     <div className="users">
       <div className="page-header">
         <h1>Utilisateurs</h1>
-        <input
-          type="search"
-          placeholder="Rechercher par nom ou email..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="page-header-actions">
+          <div className="users-export-wrap">
+            <button className="users-export-btn" onClick={() => setShowExport(!showExport)}>
+              Exporter &#9662;
+            </button>
+            {showExport && (
+              <div className="users-export-dropdown">
+                <button onClick={() => exportEmails('validated')}>Comptes valides ({users.filter(u => !u.isPending).length})</button>
+                <button onClick={() => exportEmails('active')}>Comptes actifs ({users.filter(u => !u.isPending && u.is_active).length})</button>
+                <button onClick={() => exportEmails('inactive')}>Comptes inactifs ({users.filter(u => !u.isPending && !u.is_active).length})</button>
+                <button onClick={() => exportEmails('pending')}>Comptes en attente ({users.filter(u => u.isPending).length})</button>
+                <button onClick={() => exportEmails('all')}>Tous les comptes ({users.length})</button>
+              </div>
+            )}
+          </div>
+          <input
+            type="search"
+            placeholder="Rechercher par nom ou email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       {!loading && (
@@ -194,12 +271,15 @@ export function Users() {
                   <tr key={user.id} className={!user.is_active ? 'inactive' : ''}>
                     <td>
                       {user.display_name || user.first_name || '-'}
-                      {isNew && <span className="users-new-badge">Nouveau !</span>}
+                      {user.isPending && <span className="users-pending-badge">En attente</span>}
+                      {isNew && !user.isPending && <span className="users-new-badge">Nouveau !</span>}
                       {isReactivated && <span className="users-reactivated-badge">Reactive !</span>}
                     </td>
                     <td>{user.email_address}</td>
                     <td>
-                      {editingRole === user.id ? (
+                      {user.isPending ? (
+                        <span className="role-badge" style={{ backgroundColor: '#a08060', cursor: 'default' }}>En attente</span>
+                      ) : editingRole === user.id ? (
                         <select
                           value={user.role}
                           onChange={(e) => updateRole(user.id, e.target.value as Role)}

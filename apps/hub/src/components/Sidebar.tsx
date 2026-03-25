@@ -48,6 +48,9 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/carte/fragments" className={({ isActive }) => isActive ? 'active' : ''}>
           Fragments
         </NavLink>
+        <NavLink to="/carte/associer" className={({ isActive }) => isActive ? 'active' : ''}>
+          Associer Fragments
+        </NavLink>
         <NavLink to="/carte/shopify" className={({ isActive }) => isActive ? 'active' : ''}>
           Shopify Unlocks
         </NavLink>

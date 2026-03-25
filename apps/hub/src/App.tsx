@@ -13,6 +13,7 @@ import { TitlesManager } from './components/TitlesManager'
 import { Divers } from './components/Divers'
 import { Constructions } from './components/Constructions'
 import { Fragments } from './components/Fragments'
+import { AssignFragments } from './components/AssignFragments'
 import { ShopifyUnlocks } from './components/ShopifyUnlocks'
 import { Settings } from './components/Settings'
 import { Sidebar } from './components/Sidebar'
@@ -79,6 +80,7 @@ function App() {
           <Route path="/carte/constructions" element={<Constructions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />
           <Route path="/carte/fragments" element={<Fragments />} />
+          <Route path="/carte/associer" element={<AssignFragments />} />
           <Route path="/carte/shopify" element={<ShopifyUnlocks />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
