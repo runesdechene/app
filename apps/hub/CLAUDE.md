@@ -1,131 +1,122 @@
-# Hub — Runes de Chêne
+# Hub — Runes de Chêne (Back-office admin)
 
-> Back-office d'administration — Dernière mise à jour : 10 février 2026
+> Dernière mise à jour : 29 mars 2026
 
-## Vision
+## Rôle
 
-Le Hub est le **panneau d'administration** de l'écosystème Runes de Chêne. Il gère les utilisateurs, modère le contenu communautaire (photos, avis), et à terme administrera l'application Carte (types de lieux, tags, factions, titres, événements, produits géolocalisés).
+Le Hub est le back-office admin de Runes de Chêne. Il gère les paramètres du jeu, le contenu, les joueurs et la boutique. Accessible uniquement aux admins (`users.role = 'admin'`).
 
-## Stack technique
+## Stack
 
-- **Framework** : React 18 + TypeScript + Vite
-- **Routing** : react-router-dom v6
-- **Backend** : Supabase (auth, RPC functions, storage)
-- **Port dev** : 3001
-- **Déploiement** : Netlify — domaine `hub.runesdechene.com`
-- **Package manager** : pnpm
-
-## Architecture actuelle
-
-```
-src/
-├── components/
-│   ├── Dashboard.tsx       # Stats globales (comptes, photos pending/approved)
-│   ├── LoginPage.tsx       # Auth admin (Supabase Auth)
-│   ├── Sidebar.tsx         # Navigation latérale
-│   ├── Users.tsx           # Gestion utilisateurs (rôles, actif/inactif)
-│   ├── Photos.tsx          # Modération photos communautaires (admin)
-│   ├── PhotoSubmit.tsx     # Formulaire public /soumettre-contenu
-│   ├── Reviews.tsx         # Modération avis (admin)
-│   ├── ReviewSubmit.tsx    # Formulaire public /soumettre-avis
-│   └── PublicForm.css      # Styles formulaires publics
-├── hooks/
-│   └── useAuth.ts          # Hook auth Supabase
-├── lib/
-│   └── supabase.ts         # Client Supabase
-├── App.tsx                 # Router principal
-├── App.css                 # Styles globaux
-├── main.tsx                # Point d'entrée
-└── index.css               # Reset CSS
-```
-
-## Routes
-
-### Routes admin (auth requise)
-- `/` — Dashboard (stats)
-- `/users` — Gestion des utilisateurs
-- `/photos` — Modération des soumissions photos
-- `/reviews` — Modération des soumissions avis
-
-### Routes publiques
-- `/soumettre-contenu` — Formulaire de soumission de photos (clients, ambassadeurs, partenaires)
-- `/soumettre-avis` — Formulaire de soumission d'avis
-
-## Fonctionnalités existantes
-
-### Dashboard
-- Nombre total de comptes
-- Nombre d'ambassadeurs
-- Photos en attente de modération
-- Photos approuvées
-
-### Utilisateurs
-- Liste avec recherche par email
-- Modification des rôles : user, ambassador, moderator, admin
-- Activation/désactivation de compte
-
-### Photos (modération)
-- Filtres par statut : En attente, Géniales, Moyennes, Refusées
-- Filtres par rôle : Client, Ambassadeur, Partenaire
-- Actions : Approuver (géniale/moyenne), Refuser (avec raison), Supprimer
-- Lightbox pour visualiser les photos/vidéos
-- Affichage des métadonnées (nom, email, instagram, localisation, message)
-
-### Soumission photos (public)
-- Champs : Nom, Email, Instagram, Ville, Code postal, Rôle, Message
-- Upload multi-fichiers (max 5, photos 10Mo, vidéos 50Mo)
-- Consentements : diffusion marque + création compte
-- Création automatique de compte si email inconnu
-
-### Avis (modération)
-- Filtres par statut : En attente, Validés, Archivés
-- Actions : Valider, Archiver, Supprimer
-- Affichage note (étoiles), texte, photo, statut d'achat
-
-### Soumission avis (public)
-- Champs : Nom, Email, Lieu, Code postal, Note (1-5 étoiles), Texte, Photo, Statut d'achat
-- Consentements : création compte + republication
-- Création automatique de compte si email inconnu
-
-## RPC Supabase utilisées
-
-- `create_user_from_submission` — Création de compte depuis formulaire public
-- `create_photo_submission` — Enregistrement soumission photo
-- `add_submission_image` — Ajout image à une soumission
-- `get_photo_submissions` — Liste des soumissions (filtrable par statut)
-- `get_submission_images_batch` — Images par lot
-- `moderate_submission` — Modération photo
-- `delete_photo_submission` — Suppression photo
-- `create_review_submission` — Enregistrement soumission avis
-- `get_review_submissions` — Liste des avis (filtrable par statut)
-- `moderate_review` — Modération avis
-- `delete_review_submission` — Suppression avis
-
-## Extensions prévues (pour l'app Carte)
-
-- Gestion des **types de lieux**
-- Gestion des **tags** (tri, fusion, suppression)
-- Placement des **produits** sur la carte
-- Gestion des **titres** et conditions de déblocage
-- Gestion des **factions** et événements de saison
-- Configuration des **musiques** par zone géographique
-- Nomination de **modérateurs**
-- **Statistiques** et analytics avancés
+| Couche | Techno |
+|--------|--------|
+| Framework | React 18 + TypeScript |
+| Routing | React Router DOM |
+| Build | Vite 5 |
+| Backend | Supabase (même instance que explore-web) |
+| Styles | CSS global (`index.css` + `App.css`) — thème parchemin |
+| Déploiement | Netlify CLI manuel |
 
 ## Commandes
 
 ```bash
-# Depuis la racine du monorepo :
-pnpm --filter hub dev       # Lance le Hub (port 3001)
-pnpm --filter hub build     # Build production
-
-pnpm dev                    # Lance explore-web / La Carte (port 3000)
-pnpm build                  # Build explore-web
+pnpm --filter hub dev     # Lance le Hub (port 3001)
+pnpm --filter hub build   # Build
+cd apps/hub && netlify deploy --prod --dir "%CD%\dist" --no-build
 ```
 
 ## Conventions
 
-- TypeScript strict — pas de `any`
-- Code propre, DRY, modulaire
-- pnpm comme package manager
-- Variables d'environnement : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- **Pattern SaveBar** : toutes les pages utilisent `<SaveBar>` pour sauvegarder. Pas d'auto-save (sauf AssignFragments).
+- **Après chaque save** : refetch les données du serveur pour garantir la synchronisation.
+- **Deep copy** : `JSON.parse(JSON.stringify(data))` pour comparer l'état sauvé vs courant.
+- **try/finally** : wrapper les fetch pour éviter les "Chargement..." infinis.
+- **Classes CSS** : Publicités = `pub-*` (pas `ads-*`) pour éviter les ad blockers.
+
+## Architecture
+
+```
+src/
+├── App.tsx              # Router principal + auth guard
+├── App.css              # Layout global
+├── index.css            # Thème parchemin (palette, inputs, scrollbar)
+├── hooks/
+│   └── useAuth.ts       # Auth Supabase + vérification rôle admin
+├── lib/
+│   └── supabase.ts      # Client Supabase
+└── components/
+    ├── Sidebar.tsx            # Navigation latérale
+    ├── SaveBar.tsx            # Barre save/annuler réutilisable
+    ├── LoginPage.tsx          # Login OTP admin
+    ├── Dashboard.tsx          # Vue d'ensemble
+    │
+    │── CONTENU
+    ├── Users.tsx              # Gestion joueurs
+    ├── Photos.tsx             # Photos communauté
+    ├── PhotoSubmit.tsx        # Page publique soumission photos
+    ├── Reviews.tsx            # Avis soumis
+    ├── ReviewSubmit.tsx       # Page publique soumission avis
+    ├── PublicForm.css         # Styles pages publiques
+    │
+    │── LA CARTE
+    ├── TagsManager.tsx        # Tags de lieux (nom, icône, couleur, base_cost)
+    ├── Factions.tsx           # Héritages (description, bannière, bonus énergie, réductions par tag)
+    ├── Constructions.tsx      # Types de fortification
+    ├── TitlesManager.tsx      # Titres du jeu
+    ├── Fragments.tsx          # Fragments boutique (bonus passifs + compétences actives)
+    ├── AssignFragments.tsx    # Attribution fragments → joueurs (mode stand)
+    ├── ShopifyUnlocks.tsx     # Liens Shopify → fragments
+    ├── Ads.tsx                # Loading screen (images + tips)
+    ├── Settings.tsx           # Réglages (énergie, regen, distance, noms territoires)
+    └── Divers.tsx             # Outils divers
+```
+
+## Pages et ce qu'elles gèrent
+
+### Tags (`/carte/tags`)
+- CRUD des tags de lieux
+- `base_cost` : coût en énergie pour découvrir/veiller un lieu de ce type
+- Nombre de lieux par tag affiché
+- Suppression uniquement si aucun lieu n'utilise le tag
+
+### Héritages / Factions (`/carte/factions`)
+- Description, image (bannière), couleurs
+- **Bonus énergie** : max + regen %
+- **Réductions de coût par tag** : chaque héritage a un % de réduction par type de lieu
+- Baroud d'Honneur : toggle ON/OFF + multiplicateur
+
+### Constructions (`/carte/constructions`)
+- 4 niveaux de fortification (Tour de guet → Forteresse)
+- Nom, coût, bonus défense, description
+
+### Titres (`/carte/titres`)
+- Titres généraux (stats) + titres de faction
+- Nom, icône (emoji), icon_url (image), description, condition (JSONB), ordre
+
+### Fragments (`/carte/fragments`)
+- Nom, description, images (icône ronde + grande image)
+- **Bonus passif** : type (max_energy, regen_energy, etc.) + valeur
+- **Compétence active** : type + cooldown (heures) + valeur (% pour discount)
+- Types de compétence : free_discover, free_claim, double_glory, distance_ignore, discount_discover, discount_claim
+- Mots de titre associés
+- Toggle visible/invisible, lien boutique
+
+### Associer Fragments (`/carte/associer`)
+- Recherche joueur par nom, attribution instantanée
+- Mode pending pour les emails sans compte (purchase_log)
+
+### Publicités (`/carte/publicites`)
+- Images du loading screen + tips "Le Saviez-vous ?"
+
+### Réglages (`/carte/reglages`)
+- **Titres de territoire** : termes par taille (Village/Ville/Capitale)
+- **Cycles de régénération** : heures par point d'énergie
+- **Énergie par défaut** : max pour tous les joueurs
+- **Seuils de distance** : km pour les multiplicateurs
+
+## Routes publiques (sans auth)
+
+| Route | Composant |
+|-------|-----------|
+| `/soumettre-contenu` | PhotoSubmit |
+| `/soumettre-avis` | ReviewSubmit |

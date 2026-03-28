@@ -6,8 +6,8 @@
 
 | Si tu bosses sur... | Lis ce fichier |
 |---------------------|----------------|
-| **L'application (Conquête)** (explore-web) | `apps/explore-web/CLAUDE.md` |
-| **Le Hub (Gestion de la communauté, plateforme de liaison entre boutique et Conquête)** (back-office admin) | `apps/hub/CLAUDE.md` |
+| **L'application (L'Érudition Conquérante)** (explore-web) | `apps/explore-web/CLAUDE.md` |
+| **Le Hub (Gestion de la communauté, back-office admin)** | `apps/hub/CLAUDE.md` |
 
 ## Commandes rapides
 
