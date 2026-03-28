@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
+import './OnboardingModal.css'
 
 interface OnboardingModalProps {
   onComplete: () => void

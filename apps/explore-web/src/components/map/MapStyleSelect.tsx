@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import './MapStyleSelect.css'
 
 export type MapStyleMode = 'game' | 'detailed' | 'satellite'
 

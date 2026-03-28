@@ -1,0 +1,323 @@
+/* ==========================================
+   AUTH MODAL
+   ========================================== */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(187, 176, 146, 0.596);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+/* Bouton "Retour à la boutique" sur l'overlay login */
+.auth-back-button {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(0, 0, 0, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background: var(--color-parchment);
+  padding: 15px 25px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-family: var(--font-accent);
+  font-size: 1.25rem;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 31;
+}
+
+.auth-back-button:hover {
+  opacity: 1;
+  transform: translateX(-3px);
+}
+
+.auth-back-arrow {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+/* Bouton Boutique permanent desktop */
+.desktop-shop-button {
+  position: fixed;
+  top: 16px;
+  left: 20px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 10px;
+  background: rgba(252, 241, 214, 0.9);
+  border: 1px solid var(--color-sepia);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--color-ink);
+  font-family: var(--font-accent);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.desktop-shop-button:hover {
+  background: rgba(252, 241, 214, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.2);
+}
+
+.desktop-shop-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-shop-button {
+    display: none;
+  }
+  .auth-back-button {
+    top: 0;
+    left: 0;
+    font-size: 0.85rem;
+    border-radius: 0;
+    border-bottom-right-radius: 20px;
+    border: 0;
+    background: var(--color-parchment);
+    opacity: 1;
+    border-bottom: 2px solid var(--color-parchment-dark);
+    border-right: 2px solid var(--color-parchment-dark);
+  }
+}
+
+.auth-modal {
+  position: relative;
+  width: auto;
+  max-width: 580px;
+  background: var(--color-parchment);
+  border: 2px solid var(--color-sepia);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.3);
+  padding: 32px;
+  text-align: center;
+}
+
+.auth-modal a
+{
+  color: #431bd6;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+
+.auth-modal-version {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 11px;
+  color: var(--color-ink-light);
+  opacity: 0.5;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  letter-spacing: 0.05em;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.auth-modal-close:hover {
+  color: var(--color-ink);
+}
+
+.auth-modal-logo {
+  max-height: 298px;
+  height: auto;
+  margin: auto;
+}
+
+.auth-modal-subtitle {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-ink-light);
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+@media screen and (max-width: 798px)
+{
+  .auth-modal-subtitle
+  {
+    font-size: 14px;
+  }
+}
+
+.auth-modal-places
+{
+  font-size: 20px;
+}
+
+
+
+.auth-modal-newsletter
+{
+  font-size: 12px;
+  font-family: var(--font-accent, "Cabin Condensed", serif);
+  color: var(--color-sepia-dark);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+
+.auth-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-modal-input {
+  width: 100%;
+  padding: 14px 14px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-ink);
+  background: white;
+  border: 1px solid var(--color-sepia);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-modal-input:focus {
+  border-color: var(--color-sepia-dark);
+}
+
+.auth-modal-input::placeholder {
+  color: var(--color-water);
+}
+
+.auth-modal-code {
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 8px;
+  font-weight: 700;
+}
+
+.auth-modal-submit {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--font-accent);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-parchment);
+  background: var(--color-ink);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-modal-submit:hover {
+  background: var(--color-ink-light);
+}
+
+.auth-modal-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-modal-error {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #991b1b;
+  margin: 0;
+}
+
+.auth-modal-sent {
+  padding: 8px 0;
+}
+
+.auth-modal-hint {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  margin: 8px 0 20px;
+  font-style: italic;
+}
+
+.auth-modal-retry {
+  background: none;
+  border: 1px solid var(--color-sepia);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: color 0.2s, border-color 0.2s;
+  margin-top: 10px;
+}
+
+.auth-modal-retry:hover {
+  color: var(--color-ink);
+  border-color: var(--color-ink-light);
+}
+
+.auth-modal-link {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 8px;
+  margin-right: 5px;
+}
+
+.auth-modal-link:hover {
+  color: var(--color-ink);
+}
+
+.auth-modal-link:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.auth-modal-skip {
+  background: none;
+  border: none;
+  color: var(--color-ink-light);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 12px;
+  text-decoration: underline;
+  opacity: 0.7;
+  margin-left: 5px;
+}
+
+.auth-modal-skip:hover {
+  opacity: 1;
+}

@@ -1,6 +1,6 @@
 # La Carte — Runes de Chêne
 
-> Dernière mise à jour : 25 mars 2026
+> Dernière mise à jour : 26 mars 2026
 
 ## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
@@ -53,7 +53,7 @@ ou si EGIDE non dispo, demander la position de l'OBSIDIAN CITADELLE
 | Géo | Turf.js (union, buffer, intersect, simplify, difference, distance) |
 | Territoires | d3-delaunay (Voronoi) + Web Worker |
 | State | Zustand (6 stores) |
-| Styles | Tailwind CSS 4 + App.css monolithique |
+| Styles | Tailwind CSS 4 + CSS par composant (22 fichiers, ex-monolithique App.css) |
 | Déploiement | Netlify CLI manuel (pas d'auto-deploy Git) |
 
 ## Conventions
@@ -63,7 +63,11 @@ ou si EGIDE non dispo, demander la position de l'OBSIDIAN CITADELLE
 - **Conventional Commits** — `feat:`, `fix:`, `chore:`, `docs:`
 - **Pas de code mort** — si c'est unused, on supprime
 - **Pas d'over-engineering** — simple, direct, fonctionnel
-- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/` (002→097)
+- **CSS par composant** — chaque composant importe son propre `.css` (ex: `import './FactionBar.css'`). App.css ne contient que le global (layout, MapLibre). Media queries dans `styles/mobile.css`
+- **Pas de console.log en prod** — nettoyés régulièrement
+- **Hub SaveBar** — toutes les pages du Hub utilisent le pattern SaveBar (try/finally, deep copy, pas d'auto-save sauf AssignFragments)
+- **Presence** — les données du marker (nom, faction, avatar) sont lues depuis le store playerStore à chaque tick (10s), pas capturées à l'init
+- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/` (002→129)
 - **RPCs** — logique métier côté serveur via `SECURITY DEFINER` functions
 
 ## Commandes
@@ -98,7 +102,9 @@ VITE_SUPABASE_ANON_KEY=xxx
 ```
 src/
 ├── App.tsx              # Orchestrateur principal (~15 modals/panels)
-├── App.css              # Styles médiévaux (monolithique, ~2000 lignes)
+├── App.css              # Styles globaux + toolbar (224 lignes)
+├── styles/
+│   └── mobile.css       # Media queries responsive (825 lignes)
 ├── components/
 │   ├── map/
 │   │   ├── ExploreMap.tsx        # Carte MapLibre + territoires (~1093 lignes)
@@ -109,8 +115,9 @@ src/
 │   │   ├── ConquestToggle.tsx    # Switch exploration/conquête
 │   │   ├── GameToast.tsx         # Toasts in-game temps réel
 │   │   ├── InfoModal.tsx         # Modal info ressources
-│   │   ├── PlayerProfileModal.tsx # Profil joueur + édition + composeur titre
-│   │   ├── TitleComposer.tsx      # Composeur de phrase-titre (fragments)
+│   │   ├── PlayerProfileModal.tsx # Profil joueur + édition + titres v3 + collection fragments
+│   │   ├── AdScreen.tsx          # Loading screen interstitiel (Ken Burns)
+│   │   ├── OnlinePlayerMarkers.tsx # Markers joueurs en ligne (nom + titre)
 │   │   ├── LeaderboardModal.tsx  # Classements (cache 30s)
 │   │   ├── TerritoryPanel.tsx    # Détail territoire + vote nom
 │   │   ├── Minimap.tsx           # Canvas minimap
@@ -225,12 +232,34 @@ La faction avec le score de notoriété le plus bas reçoit un bonus de régén�
 - **Affiché dans** FactionBar (icône épée pulsante) + FactionModal (badge "BAROUD D'HONNEUR")
 - **Le nombre de membres n'est plus affiché** dans la FactionModal
 
-### Joueurs en ligne — Titres sur la carte
+### Titres v3 (badges)
 
-Les markers des joueurs en ligne affichent sous l'avatar : le **nom** + les **titres affichés** (max 2 généraux + 1 faction).
+Système de titres = badges sélectionnables (max 3 affichés). Chaque titre a un `id`, `name`, `icon`, `icon_url` optionnel.
 
-- Les titres sont transmis via **Supabase Presence** dans le payload (`displayedTitles`)
-- Le store `playersStore` contient `displayedTitles: PlayerTitle[]` par joueur
+- **Titres généraux** : débloqués par les stats (découvertes, claims, likes...) — table `titles`
+- **Titre faction** : lié à la faction du joueur — table `titles` avec `type = 'faction'`
+- **Mots de fragments** : chaque fragment donne des mots utilisables comme titres — table `fragment_words` (id négatif = `fw.id * -1`)
+- **Affichage** : `displayed_title_ids_v3` INT[] sur `users` (mix d'IDs positifs pour titres et négatifs pour mots de fragments)
+- **Sur la carte** : 1 `primaryTitle` transmis via Presence, affiché sous le nom du joueur
+- **RPCs** : `get_all_player_titles(user_id)` retourne les 3 catégories + `displayedIds`, `set_displayed_titles_v3(user_id, ids)` sauvegarde
+
+### Fragments
+
+Chaque achat boutique peut débloquer un **fragment** qui donne :
+- Des **mots de titre** utilisables dans le système de titres v3
+- Un **bonus gameplay** (max_energy, regen_energy, etc.)
+
+- **Tables** : `title_fragments`, `fragment_words`, `user_fragments`, `shopify_unlocks`, `purchase_log`
+- **RPCs** : `get_user_fragments(user_id)`, `get_all_fragments(user_id)` (avec flag `owned`)
+- **Bonuses appliqués dans** : `get_user_energy()` — pile base → faction → fragments → underdog
+- **Gestion Hub** : page Fragments (édition, mots, icônes, images) + page Associer Fragments (attribution manuelle)
+
+### Joueurs en ligne — Titre sur la carte
+
+Les markers des joueurs en ligne affichent sous l'avatar : le **nom** + un **titre prioritaire**.
+
+- Le `primaryTitle` est transmis via **Supabase Presence** dans le payload
+- Le store `playersStore` contient `primaryTitle: string | null` par joueur
 - Rendu dans `OnlinePlayerMarkers.tsx` sous le nom
 
 ### Territoires
@@ -240,6 +269,7 @@ Les markers des joueurs en ligne affichent sous l'avatar : le **nom** + les **ti
 - Taille cercle = basée sur le **score d'influence** (voir ci-dessous)
 - Labels = nom voté par les joueurs (`territory_votes`)
 - Noms de territoire : max **2 propositions** par joueur, suppression possible de ses propres propositions
+- **Votes filtrés par faction** : seuls les votes/propositions de joueurs de la faction du territoire comptent. Les votes orphelins (joueurs ayant changé de faction) sont supprimés automatiquement. Faction du territoire = faction la plus représentée dans le blob (pas juste un lieu au hasard).
 
 ### Score d'influence (rayon territoire)
 
@@ -275,19 +305,30 @@ Le bonus de fortification est **perdu** quand le lieu est conquis (reset à 0).
 | 102 | Propositions territoire : max 2, suppression possible |
 | 103 | Compensation Voronoi : rayon serveur ×0.6 |
 | 104 | Bonus Underdog (Baroud d'Honneur) : get_underdog_faction_id, x2 regen via get_user_energy, flag isUnderdog dans get_faction_notoriety |
-| 105 | Systeme de Fragments : title_fragments, fragment_words, user_fragments, shopify_unlocks, purchase_log, composed_title_words, RPCs get/set_composed_title + get_user_fragments |
-| 106 | composed_title_text : sauvegarde phrase en texte brut (articles + connecteurs libres inclus) |
-| 107 | image_url sur title_fragments + mise à jour get_user_fragments pour retourner image_url |
-| 108 | link_url sur title_fragments + mise à jour get_user_fragments pour retourner link_url |
-| 109 | Bonus fragments appliqués dans get_user_energy : pile base → faction → fragments → underdog |
-| 110 | Pending fragments : auto-déblocage des fragments en attente à l'inscription (email match) |
-| 111 | Ad screens & tips : tables pour les écrans de chargement (images + astuces "Le Saviez-vous ?") |
-| 112 | Ad RLS fix : correction des policies RLS sur les tables ad screens |
-| 113 | Ad screen title : ajout du champ titre sur les écrans publicitaires |
+| 105 | Systeme de Fragments : title_fragments, fragment_words, user_fragments, shopify_unlocks, purchase_log |
+| 106 | composed_title_text (SUPPRIME en 128) |
+| 107 | image_url sur title_fragments |
+| 108 | link_url sur title_fragments |
+| 109 | Bonus fragments dans get_user_energy : pile base → faction → fragments → underdog |
+| 110 | Pending fragments : auto-déblocage à l'inscription |
+| 111 | Ad screens & tips tables |
+| 112 | Ad RLS fix |
+| 113 | Ad screen title |
+| 114 | Titres v3 : displayed_title_ids_v3, set_displayed_titles_v3, get_all_player_titles |
+| 115 | Fix get_all_player_titles (3 catégories + unlocked flag) |
+| 116-117 | Fix get_player_profile avec titres v3 + fallback v2 |
+| 118-120 | Description sur titles et fragments |
+| 121 | get_all_fragments RPC (tous les fragments avec flag owned) |
+| 122-123 | Champ visible sur title_fragments + filtrage |
+| 124-127 | icon_url et image_url dans les RPCs titres/fragments/profil |
+| 128 | CLEANUP : DROP composed_title_words, composed_title_text, get_user_composed_title, set_composed_title |
+| 129 | INDEX performance : claimed_by, user_fragments, activity_log, fragment_words, territory_votes |
+| 130 | Progression titres : condition + stats dans get_all_player_titles, admins voient fragments non-visibles |
+| 131-134 | Votes territoire : filtrage par faction active, suppression votes/propositions orphelins, fix u.name → first_name |
 
 ---
 
-## Base de données — État final (post-migration 097)
+## Base de données — État final (post-migration 129)
 
 ### Tables principales
 

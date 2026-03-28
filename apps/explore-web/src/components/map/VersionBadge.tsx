@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import changelogRaw from '../../../CHANGELOG.md?raw'
+import './VersionBadge.css'
 
 interface VersionBlock {
   version: string

@@ -3,6 +3,7 @@ import { useToastStore } from '../../stores/toastStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import type { GameToast as GameToastType } from '../../stores/toastStore'
+import './GameToast.css'
 
 const isMobile = window.innerWidth <= 768
 
@@ -95,10 +96,7 @@ function ToastItem({ toast }: { toast: GameToastType }) {
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
 
   // Collecter tous les highlights
-  const highlights = [
-    ...(toast.highlights || []),
-    ...(toast.highlight ? [toast.highlight] : []),
-  ]
+  const highlights = toast.highlights || []
 
   // Construire les actions cliquables pour chaque highlight
   const actions = new Map<string, () => void>()

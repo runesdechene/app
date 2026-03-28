@@ -1,0 +1,825 @@
+/* ==========================================
+   OFFLINE INDICATOR
+   ========================================== */
+
+/* ==========================================
+   MOBILE NAVBAR (masquee sur desktop)
+   ========================================== */
+
+.mobile-navbar {
+  display: none;
+}
+
+.mobile-header {
+  display: none;
+}
+
+.offline-indicator {
+  position: fixed;
+  top: calc(var(--safe-top, 0px) + 52px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(153, 27, 27, 0.9);
+  color: #fff;
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  animation: toast-slide-in 0.3s ease-out;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   ConquestToggle — mini-bandeau permanent
+   ========================================== */
+
+.conquest-area {
+  position: fixed;
+  bottom: 352px;
+  right: 25px;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.conquest-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(30, 25, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d4c5a0;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+.conquest-toggle:hover {
+  background: rgba(40, 34, 28, 0.95);
+}
+.conquest-toggle-icon {
+  font-size: 14px;
+}
+.conquest-toggle-label {
+  font-weight: 500;
+}
+.conquest-toggle-switch {
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  transition: background 0.2s;
+  margin-left: 4px;
+}
+.conquest-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #888;
+  transition: transform 0.2s, background 0.2s;
+}
+.conquest-toggle-switch.on {
+  background: rgba(201, 168, 76, 0.4);
+}
+.conquest-toggle-switch.on::after {
+  transform: translateX(12px);
+  background: #c9a84c;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE (max-width: 768px)
+   ========================================== */
+
+@media (max-width: 768px) {
+
+  /* --- Safe area pour les boutons close des modals --- */
+  .player-modal-close,
+  .auth-modal-close {
+    top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+  }
+
+  .place-panel-close {
+    margin-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* --- Toolbar compact --- */
+  .app-toolbar {
+    top: 0;
+    left: 0;
+    right: 56px;
+    padding: calc(var(--safe-top, 0px) + 6px) 8px 6px;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    background: rgba(245, 230, 211, 0.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(193, 154, 107, 0.2);
+  }
+
+  .energy-indicator {
+    min-width: auto;
+    padding: 4px 8px;
+    gap: 2px;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 8px;
+  }
+
+  .energy-main {
+    gap: 4px;
+  }
+
+  .energy-bar {
+    display: none;
+  }
+
+  .energy-sub {
+    display: none;
+  }
+
+  .energy-icon {
+    font-size: 12px;
+  }
+
+  .energy-count {
+    font-size: 12px;
+  }
+
+  .notoriety-badge {
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+
+  .notoriety-icon {
+    font-size: 12px;
+  }
+
+  .notoriety-value {
+    font-size: 12px;
+  }
+
+  .toolbar-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .auth-btn {
+    padding: 0 10px;
+    font-size: 11px;
+    height: 34px;
+    border-radius: 17px;
+  }
+
+  .profile-btn-initial {
+    font-size: 13px;
+  }
+
+  /* Profile menu dropdown */
+  .profile-menu {
+    right: 0;
+    min-width: 160px;
+  }
+
+  /* --- Faction Scoreboard compact --- */
+
+  .faction-scoreboard-row {
+    height: 28px;
+    min-height: 36px;
+    border-radius: 8px;
+  }
+
+  .faction-scoreboard-content {
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  .faction-scoreboard-dot {
+    width: 18px;
+    height: 18px;
+  }
+
+  .faction-scoreboard-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .faction-scoreboard-name {
+    font-size: 12px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .faction-scoreboard-places {
+    display: none;
+  }
+
+  .faction-scoreboard-places::after {
+    content: none;
+  }
+
+  .faction-scoreboard-pct {
+    font-size: 12px;
+    min-width: 20px;
+  }
+
+  .faction-scoreboard-rate {
+    display: none;
+  }
+
+  .faction-scoreboard-crown {
+    font-size: 12px;
+  }
+
+  /* --- Game Toast --- */
+  .game-toast-container {
+    top: calc(var(--safe-top, 0px) + 48px);
+    left: 8px;
+    max-width: calc(100vw - 140px);
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .game-toast {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .game-toast-message {
+    font-size: 12px;
+  }
+
+  .game-toast-close {
+    padding: 8px;
+    font-size: 14px;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* --- Chat Panel polish --- */
+  .chat-panel {
+    left: calc(var(--safe-left, 0px) + 8px);
+    right: calc(var(--safe-right, 0px) + 8px);
+    bottom: calc(var(--safe-bottom, 0px) + 50px);
+    width: auto;
+    height: 220px;
+  }
+
+  .chat-panel-closed {
+    height: auto;
+  }
+
+  .chat-toggle-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .chat-panel-closed .chat-toggle-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  /* --- Place Panel (bottom sheet) --- */
+  .place-panel {
+    width: 100%;
+    height: 100dvh;
+    height: 100vh; /* fallback */
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-right: none;
+    border-top: none;
+    border-radius: 0;
+    transform: translateY(100%);
+    box-shadow: none;
+    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
+    overflow-y: scroll;
+  }
+
+  @supports (height: 100dvh) {
+    .place-panel {
+      height: 100dvh;
+    }
+  }
+
+ .place-panel-header {
+  margin-top: 62px;
+ }
+
+  .territory-panel-header {
+    margin-top: 62px;
+  }
+
+  .territory-panel .place-panel-close {
+    top: 70px;
+  }
+
+  .place-panel-header .place-claim-badge {
+    position: relative;
+    margin-left: -15px;
+    max-width: 80vw;
+    z-index: 999;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    font-size: 13px;
+    margin-top: -30px;
+  }
+
+  .place-panel-body {
+    margin-bottom: 10px;
+    overflow: visible;
+    flex: none;
+  }
+
+  .place-panel-open {
+    transform: translateY(0);
+  }
+
+  .place-panel-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 19;
+    pointer-events: none;
+  }
+
+  .place-panel-gallery {
+    aspect-ratio: 16 / 9;
+  }
+
+  .place-panel-title {
+    font-size: 28px;
+  }
+
+  .place-panel-gallery {
+    min-height: 50vh;
+  }
+
+  .likers-modal
+  {
+    padding-top: 58px;
+  }
+
+  /* --- Minimap : cachee sur mobile --- */
+  .minimap {
+    display: none;
+  }
+
+  /* --- Add Place FAB --- */
+  .add-place-fab {
+    width: 56px;
+    height: 56px;
+  }
+
+  /* --- Version Badge --- */
+  .version-badge {
+    bottom: calc(var(--safe-bottom, 0px) + 8px);
+    left: calc(var(--safe-left, 0px) + 8px);
+    font-size: 10px;
+    padding: 2px 6px;
+    opacity: 0.5;
+  }
+
+  /* --- MapLibre Controls --- */
+  .maplibregl-ctrl-top-right {
+    top: calc(var(--safe-top, 0px) + 108px) !important;
+    right: calc(var(--safe-right, 0px) + 4px) !important;
+  }
+
+  .maplibregl-ctrl-group button {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* --- Modals mobile --- */
+  .auth-modal {
+    max-width: 95vw;
+    padding: 24px 20px;
+    margin: 40px 16px;
+  }
+
+  .leaderboard-modal {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+
+  .version-modal {
+    width: 95vw;
+    max-height: 85vh;
+  }
+
+  .onboarding-modal {
+    max-width: 95vw;
+    padding: 28px 20px;
+  }
+
+  /* Faction members modal : 1 colonne mobile */
+  .faction-members-modal {
+    width: 95vw;
+    max-height: 90vh;
+    padding: 20px 16px;
+    overflow-y: auto;
+  }
+
+  .faction-members-layout {
+    flex-direction: column;
+    gap: 16px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .faction-members-sidebar {
+    flex: none;
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .faction-members-img {
+    height: auto;
+    width: 50vw;
+    margin: auto;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .faction-members-main {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* --- Offline Indicator --- */
+  .offline-indicator {
+    top: calc(var(--safe-top, 0px) + 44px);
+    font-size: 12px;
+    max-width: calc(100vw - 32px);
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* ==========================================
+     MOBILE NAVBAR
+     ========================================== */
+
+  .mobile-navbar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    background: rgba(245, 230, 211, 0.92);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(193, 154, 107, 0.3);
+    padding: 4px 0 calc(var(--safe-bottom, 0px) + 4px);
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 16px;
+    position: relative;
+    color: var(--color-ink-light);
+    transition: color 0.15s;
+    min-width: 64px;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--color-sepia-dark);
+  }
+
+  .mobile-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: var(--color-sepia);
+    border-radius: 2px;
+  }
+
+  .mobile-nav-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .mobile-nav-initial {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-sepia);
+    color: var(--color-parchment);
+    font-family: var(--font-title);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-nav-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--color-sepia);
+  }
+
+  .mobile-nav-label {
+    font-family: var(--font-accent);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .mobile-nav-badge {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    background: #c0392b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  /* --- Masquer les controles desktop remplaces par la navbar --- */
+  .app-toolbar .auth-btn {
+    display: none;
+  }
+
+  .chat-toggle-btn {
+    display: none;
+  }
+
+  /* Masquer le profil de la toolbar (remplace par hamburger) */
+  .app-toolbar .profile-menu-container {
+    display: none;
+  }
+
+  /* --- Mobile Header (logo + hamburger) --- */
+  .mobile-header {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9998;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(var(--safe-top, 0px) + 6px) 12px 6px;
+    background: #3d2406;
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+  }
+
+  .mobile-header-logo {
+    height: 44px;
+    width: auto;
+  }
+
+  .mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mobile-header-shop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .mobile-header-shop-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: invert(1);
+    opacity: 0.8;
+  }
+
+  .mobile-header-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: white;
+    opacity: 0.7;
+    border-radius: 1px;
+  }
+
+  .mobile-header-menu {
+    position: absolute;
+    top: 100%;
+    right: 8px;
+    z-index: 9999;
+  }
+
+  /* Toolbar descend sous le header */
+  .app-toolbar {
+    top: calc(var(--safe-top, 0px) + 60px);
+    padding-top: 6px;
+    justify-content: left;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+  }
+
+  /* --- Panneaux masques par defaut sur mobile --- */
+  .game-toast-container {
+    display: none !important;
+  }
+
+  .chat-panel {
+    display: none !important;
+  }
+
+  /* Masquer la fiche lieu quand un panel navbar est actif */
+  [data-mobile-panel="notifications"] .place-panel,
+  [data-mobile-panel="chat"] .place-panel {
+    display: none !important;
+  }
+
+
+  /* LAYERS MOBILE */
+
+  .map-style-dropdown {
+  position: absolute;
+  bottom: auto;
+  top: 50px;
+  left: auto;
+  right: 0;
+}
+
+
+  /* --- Panneaux PLEINE PAGE quand actifs via data-mobile-panel --- */
+
+  [data-mobile-panel="notifications"] .game-toast-container {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: none;
+    max-height: none;
+    overflow-y: auto;
+    z-index: 9000;
+    border-radius: 0;
+    padding-top: calc(var(--safe-top, 0px) + 12px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 60px);
+    background: rgba(252, 241, 214, 0.97);
+    backdrop-filter: blur(10px);
+    padding-top: 70px;
+  }
+
+[data-mobile-panel="notifications"] .game-toast
+  {
+    padding-block: 0;
+  }
+
+  .player-modal {
+    max-height: 100vh;
+    min-width: unset;
+    width: 100vw;
+    border-radius: 0;
+    padding-bottom: 50px;
+  }
+
+  .conquest-area
+  {
+    bottom: calc(var(--safe-bottom, 0px) + 65px);
+    top: auto;
+    right: 8px;
+  }
+
+  /* Modale profil plein ecran, sous la navbar */
+  .player-modal-overlay {
+    align-items: stretch;
+    z-index: 9999 !important;
+  }
+
+  [data-mobile-panel="notifications"] .game-toast-list
+  {
+    max-height: none;
+  }
+
+  [data-mobile-panel="notifications"] .game-toast-minimize
+  {
+    display: none;
+  }
+
+  .chat-input {
+    padding-bottom: 10px;
+  }
+
+  .conquest-indicator
+  {
+    top: calc(var(--safe-top, 0px) + 100px);
+    bottom: auto;
+    left: 7px;
+    right: auto;
+  }
+
+  [data-mobile-panel="chat"] .chat-panel {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    bottom: calc(var(--safe-bottom, 0px) + 52px);
+    left: 0;
+    right: 0;
+    height: auto;
+    width: auto;
+    border-radius: 0;
+    z-index: 9000;
+    padding-top: calc(var(--safe-top, 0px) + 8px);
+    background: rgba(250, 231, 212, 0.97);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Forcer le chat ouvert quand affiche via navbar */
+  [data-mobile-panel="chat"] .chat-panel-closed {
+    height: auto;
+    width: auto;
+    border-radius: 0;
+    background: rgba(250, 231, 212, 0.97);
+  }
+
+  /* --- Ajuster positions avec la navbar en bas --- */
+  .add-place-fab {
+    bottom: calc(var(--safe-bottom, 0px) + 76px);
+    left: 50%;
+    font-weight: 300;
+    transform: translateX(-50%);
+  }
+
+  .version-badge {
+    bottom: calc(var(--safe-bottom, 0px) + 65px);
+  }
+
+  .install-prompt {
+    bottom: calc(var(--safe-bottom, 0px) + 68px);
+  }
+
+  /* Bouton style carte au-dessus de la navbar */
+  .map-style-select {
+    top: calc(var(--safe-bottom, 0px) + 68px);
+    bottom: auto;
+    right: 13px;
+    left: auto;
+  }
+}

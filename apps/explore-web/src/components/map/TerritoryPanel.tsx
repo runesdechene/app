@@ -3,6 +3,7 @@ import type { TerritorySelection } from '../../stores/mapStore'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { supabase } from '../../lib/supabase'
+import './TerritoryPanel.css'
 
 interface PlaceTag {
   id: string
@@ -284,7 +285,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
           </div>
           <div className="territory-panel-stat">
             <span className="territory-panel-stat-value">+{data.hourlyRate % 1 === 0 ? data.hourlyRate : data.hourlyRate.toFixed(1)}/h</span>
-            <span className="territory-panel-stat-label">Notoriete</span>
+            <span className="territory-panel-stat-label">Gloire</span>
           </div>
           <div className="territory-panel-stat">
             <span className="territory-panel-stat-value">{data.totalFortification}</span>
@@ -314,14 +315,14 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
               <p className="territory-panel-hint">Chargement...</p>
             ) : votePower < 1 ? (
               <p className="territory-panel-hint">
-                Rejoignez la faction {data.factionTitle} pour voter et proposer des noms.
+                Rejoignez l'héritage {data.factionTitle} pour voter et proposer des noms.
               </p>
             ) : (
               <>
                 <div className="territory-vote-power">
                   {remaining} vote{remaining > 1 ? 's' : ''} restant{remaining > 1 ? 's' : ''} sur {votePower}
                   <span className="territory-vote-breakdown">
-                    1 base{votePower > 1 ? ` + ${votePower - 1} lieu${votePower - 1 > 1 ? 'x' : ''} revendique${votePower - 1 > 1 ? 's' : ''}` : ''}
+                    1 base{votePower > 1 ? ` + ${votePower - 1} lieu${votePower - 1 > 1 ? 'x' : ''} protégé${votePower - 1 > 1 ? 's' : ''}` : ''}
                     {' · '}{proposalsCount}/2 proposition{proposalsCount > 1 ? 's' : ''}
                   </span>
                 </div>

@@ -13,9 +13,11 @@ interface Faction {
   bonus_energy: number
   bonus_conquest: number
   bonus_construction: number
+  bonus_vitalite: number
   bonus_regen_energy: number
   bonus_regen_conquest: number
   bonus_regen_construction: number
+  bonus_regen_vitalite: number
 }
 
 export function Factions() {
@@ -32,13 +34,18 @@ export function Factions() {
   const uploadFactionIdRef = useRef<string | null>(null)
   const imageUploadFactionIdRef = useRef<string | null>(null)
 
+  // Tag bonuses per faction
+  const [allTags, setAllTags] = useState<Array<{ id: string; title: string }>>([])
+  const [tagBonuses, setTagBonuses] = useState<Record<string, Record<string, number>>>({}) // faction_id -> tag_id -> reduction
+  const [savedTagBonuses, setSavedTagBonuses] = useState<Record<string, Record<string, number>>>({})
+
   // Underdog settings
   const [underdogEnabled, setUnderdogEnabled] = useState(false)
   const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
   const [underdogFactionId, setUnderdogFactionId] = useState<string | null>(null)
   const [savingUnderdog, setSavingUnderdog] = useState(false)
 
-  const hasChanges = JSON.stringify(factions) !== JSON.stringify(savedFactions)
+  const hasChanges = JSON.stringify(factions) !== JSON.stringify(savedFactions) || JSON.stringify(tagBonuses) !== JSON.stringify(savedTagBonuses)
 
   useEffect(() => {
     fetchFactions()
@@ -80,12 +87,28 @@ export function Factions() {
     try {
       const { data, error } = await supabase
         .from('factions')
-        .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
+        .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_vitalite, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction, bonus_regen_vitalite')
         .order('order')
 
       if (!error && data) {
         setFactions(data as Faction[])
         setSavedFactions(data as Faction[])
+      }
+
+      // Fetch all tags
+      const { data: tagsData } = await supabase.from('tags').select('id, title').order('order')
+      if (tagsData) setAllTags(tagsData as Array<{ id: string; title: string }>)
+
+      // Fetch tag bonuses
+      const { data: bonusData } = await supabase.from('faction_tag_bonuses').select('faction_id, tag_id, cost_reduction')
+      if (bonusData) {
+        const map: Record<string, Record<string, number>> = {}
+        for (const row of bonusData as Array<{ faction_id: string; tag_id: string; cost_reduction: number }>) {
+          if (!map[row.faction_id]) map[row.faction_id] = {}
+          map[row.faction_id][row.tag_id] = row.cost_reduction
+        }
+        setTagBonuses(map)
+        setSavedTagBonuses(JSON.parse(JSON.stringify(map)))
       }
     } finally {
       setLoading(false)
@@ -104,32 +127,59 @@ export function Factions() {
     setSaving(true)
     setSaveError(null)
 
-    const promises = factions.map(f => {
-      const saved = savedFactions.find(s => s.id === f.id)
-      if (JSON.stringify(f) === JSON.stringify(saved)) return null
-      return supabase.from('factions').update({
-        title: f.title,
-        color: f.color,
-        description: f.description,
-        bonus_energy: f.bonus_energy,
-        bonus_conquest: f.bonus_conquest,
-        bonus_construction: f.bonus_construction,
-        bonus_regen_energy: f.bonus_regen_energy,
-        bonus_regen_conquest: f.bonus_regen_conquest,
-        bonus_regen_construction: f.bonus_regen_construction,
-        updated_at: new Date().toISOString(),
-      }).eq('id', f.id).then(r => r)
-    }).filter(Boolean)
+    try {
+      const promises = factions.map(f => {
+        const saved = savedFactions.find(s => s.id === f.id)
+        if (JSON.stringify(f) === JSON.stringify(saved)) return null
+        return supabase.from('factions').update({
+          title: f.title,
+          color: f.color,
+          pattern: f.pattern,
+          description: f.description,
+          image_url: f.image_url,
+          bonus_energy: f.bonus_energy,
+          bonus_conquest: f.bonus_conquest,
+          bonus_construction: f.bonus_construction,
+          bonus_vitalite: f.bonus_vitalite,
+          bonus_regen_energy: f.bonus_regen_energy,
+          bonus_regen_conquest: f.bonus_regen_conquest,
+          bonus_regen_construction: f.bonus_regen_construction,
+          bonus_regen_vitalite: f.bonus_regen_vitalite,
+          updated_at: new Date().toISOString(),
+        }).eq('id', f.id).then(r => r)
+      }).filter(Boolean)
 
-    const results = await Promise.all(promises)
-    const errors = results.filter(r => r?.error)
+      const results = await Promise.all(promises)
+      const errors = results.filter(r => r?.error)
 
-    if (errors.length > 0) {
-      setSaveError(`Erreur sur ${errors.length} faction(s)`)
-    } else {
-      setSavedFactions(JSON.parse(JSON.stringify(factions)))
+      if (errors.length > 0) {
+        setSaveError(`Erreur sur ${errors.length} héritage(s)`)
+      }
+
+      await saveTagBonuses()
+      await fetchFactions()
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
+  }
+
+  async function saveTagBonuses() {
+    // Delete all existing and re-insert
+    for (const factionId of Object.keys(tagBonuses)) {
+      const entries = Object.entries(tagBonuses[factionId] || {}).filter(([, v]) => v > 0)
+      // Delete existing for this faction
+      await supabase.from('faction_tag_bonuses').delete().eq('faction_id', factionId)
+      // Insert new
+      if (entries.length > 0) {
+        await supabase.from('faction_tag_bonuses').insert(
+          entries.map(([tagId, reduction]) => ({
+            faction_id: factionId,
+            tag_id: tagId,
+            cost_reduction: reduction,
+          }))
+        )
+      }
+    }
   }
 
   function handleCancel() {
@@ -159,8 +209,8 @@ export function Factions() {
     const newFaction: Faction = {
       id, title, color: '#C19A6B', pattern: null, description: null, image_url: null,
       order: factions.length,
-      bonus_energy: 0, bonus_conquest: 0, bonus_construction: 0,
-      bonus_regen_energy: 0, bonus_regen_conquest: 0, bonus_regen_construction: 0,
+      bonus_energy: 0, bonus_conquest: 0, bonus_construction: 0, bonus_vitalite: 0,
+      bonus_regen_energy: 0, bonus_regen_conquest: 0, bonus_regen_construction: 0, bonus_regen_vitalite: 0,
     }
 
     const { error } = await supabase.from('factions').insert(newFaction)
@@ -175,7 +225,7 @@ export function Factions() {
   // --- Supprimer ---
 
   async function handleDelete(factionId: string) {
-    if (!window.confirm('Supprimer cette faction ?')) return
+    if (!window.confirm('Supprimer cet héritage ?')) return
     const faction = factions.find(f => f.id === factionId)
     if (faction?.pattern) {
       await supabase.storage.from('faction-patterns').remove([`${factionId}.svg`])
@@ -225,31 +275,12 @@ export function Factions() {
     const { data: urlData } = supabase.storage.from('faction-patterns').getPublicUrl(path)
     const patternUrl = urlData.publicUrl
 
-    const { error: updateError } = await supabase
-      .from('factions')
-      .update({ pattern: patternUrl, updated_at: new Date().toISOString() })
-      .eq('id', factionId)
-
-    if (!updateError) {
-      const update = (prev: Faction[]) => prev.map(f => f.id === factionId ? { ...f, pattern: patternUrl } : f)
-      setFactions(update)
-      setSavedFactions(update)
-    }
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, pattern: patternUrl } : f))
     setUploading(null)
   }
 
-  async function removePattern(factionId: string) {
-    setUploading(factionId)
-    await supabase.storage.from('faction-patterns').remove([`${factionId}.svg`])
-    const { error } = await supabase.from('factions')
-      .update({ pattern: null, updated_at: new Date().toISOString() })
-      .eq('id', factionId)
-    if (!error) {
-      const update = (prev: Faction[]) => prev.map(f => f.id === factionId ? { ...f, pattern: null } : f)
-      setFactions(update)
-      setSavedFactions(update)
-    }
-    setUploading(null)
+  function removePattern(factionId: string) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, pattern: null } : f))
   }
 
   // --- Image faction (save immediat car fichier) ---
@@ -281,37 +312,12 @@ export function Factions() {
     const { data: urlData } = supabase.storage.from('faction-patterns').getPublicUrl(path)
     const imageUrl = urlData.publicUrl
 
-    const { error: updateError } = await supabase.from('factions')
-      .update({ image_url: imageUrl, updated_at: new Date().toISOString() })
-      .eq('id', factionId)
-
-    if (!updateError) {
-      const update = (prev: Faction[]) => prev.map(f => f.id === factionId ? { ...f, image_url: imageUrl } : f)
-      setFactions(update)
-      setSavedFactions(update)
-    }
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: imageUrl } : f))
     setUploading(null)
   }
 
-  async function removeImage(factionId: string) {
-    const faction = factions.find(f => f.id === factionId)
-    if (!faction?.image_url) return
-    setUploading(factionId)
-
-    const urlParts = faction.image_url.split('/')
-    const fileName = urlParts[urlParts.length - 1]
-    await supabase.storage.from('faction-patterns').remove([fileName])
-
-    const { error } = await supabase.from('factions')
-      .update({ image_url: null, updated_at: new Date().toISOString() })
-      .eq('id', factionId)
-
-    if (!error) {
-      const update = (prev: Faction[]) => prev.map(f => f.id === factionId ? { ...f, image_url: null } : f)
-      setFactions(update)
-      setSavedFactions(update)
-    }
-    setUploading(null)
+  function removeImage(factionId: string) {
+    setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: null } : f))
   }
 
   if (loading) return <div className="loading">Chargement...</div>
@@ -319,8 +325,8 @@ export function Factions() {
   return (
     <div style={{ paddingBottom: hasChanges ? 70 : 0 }}>
       <div className="page-header">
-        <h1>Factions</h1>
-        <span className="tags-count">{factions.length} factions</span>
+        <h1>Héritages</h1>
+        <span className="tags-count">{factions.length} héritages</span>
       </div>
 
       {/* Baroud d'Honneur — reglage underdog */}
@@ -361,7 +367,7 @@ export function Factions() {
             </label>
             {underdogFactionId && (
               <div className="underdog-current">
-                Faction actuelle : <strong>{factions.find(f => f.id === underdogFactionId)?.title ?? underdogFactionId}</strong>
+                Héritage actuel : <strong>{factions.find(f => f.id === underdogFactionId)?.title ?? underdogFactionId}</strong>
               </div>
             )}
           </div>
@@ -372,7 +378,7 @@ export function Factions() {
       <div className="faction-create">
         <input
           type="text"
-          placeholder="Nom de la nouvelle faction..."
+          placeholder="Nom du nouvel héritage..."
           value={newTitle}
           onChange={e => setNewTitle(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleCreate()}
@@ -467,44 +473,51 @@ export function Factions() {
               />
             </div>
 
-            {/* Bonus jauges */}
+            {/* Bonus énergie */}
             <div className="faction-field">
-              <label className="faction-field-label">Bonus Jauges</label>
+              <label className="faction-field-label">Bonus Énergie</label>
               <div className="faction-bonus-row">
                 <label className="faction-bonus-input">
-                  <span>Energie</span>
+                  <span>⚡ Max</span>
                   <input type="number" min={-10} max={10} step={0.5} value={faction.bonus_energy}
                     onChange={e => updateField(faction.id, 'bonus_energy', parseFloat(e.target.value) || 0)} />
                 </label>
                 <label className="faction-bonus-input">
-                  <span>Conquete</span>
-                  <input type="number" min={-10} max={10} step={0.5} value={faction.bonus_conquest}
-                    onChange={e => updateField(faction.id, 'bonus_conquest', parseFloat(e.target.value) || 0)} />
-                </label>
-                <label className="faction-bonus-input">
-                  <span>Construction</span>
-                  <input type="number" min={-10} max={10} step={0.5} value={faction.bonus_construction}
-                    onChange={e => updateField(faction.id, 'bonus_construction', parseFloat(e.target.value) || 0)} />
-                </label>
-              </div>
-              <label className="faction-field-label" style={{ marginTop: 8 }}>Regen % (par ressource)</label>
-              <div className="faction-bonus-row">
-                <label className="faction-bonus-input">
-                  <span>Energie</span>
+                  <span>⚡ Regen %</span>
                   <input type="number" min={-50} max={50} step={5} value={faction.bonus_regen_energy}
                     onChange={e => updateField(faction.id, 'bonus_regen_energy', parseFloat(e.target.value) || 0)} />
                 </label>
-                <label className="faction-bonus-input">
-                  <span>Conquete</span>
-                  <input type="number" min={-50} max={50} step={5} value={faction.bonus_regen_conquest}
-                    onChange={e => updateField(faction.id, 'bonus_regen_conquest', parseFloat(e.target.value) || 0)} />
-                </label>
-                <label className="faction-bonus-input">
-                  <span>Construction</span>
-                  <input type="number" min={-50} max={50} step={5} value={faction.bonus_regen_construction}
-                    onChange={e => updateField(faction.id, 'bonus_regen_construction', parseFloat(e.target.value) || 0)} />
-                </label>
               </div>
+            </div>
+
+            {/* Bonus par type de lieu */}
+            <div className="faction-field">
+              <label className="faction-field-label">Réduction de coût par type de lieu (%)</label>
+              {allTags.map(tag => {
+                const val = tagBonuses[faction.id]?.[tag.id] ?? 0
+                return (
+                  <div key={tag.id} className="faction-bonus-row" style={{ marginBottom: 4 }}>
+                    <span style={{ flex: 1, fontSize: 13 }}>{tag.title}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={80}
+                      step={5}
+                      value={val}
+                      onChange={e => {
+                        const num = parseFloat(e.target.value) || 0
+                        setTagBonuses(prev => ({
+                          ...prev,
+                          [faction.id]: { ...(prev[faction.id] || {}), [tag.id]: num }
+                        }))
+                      }}
+                      className="tag-reward-input"
+                      style={{ width: 60 }}
+                    />
+                    <span style={{ fontSize: 11, color: '#8A7B6A', marginLeft: 4 }}>%</span>
+                  </div>
+                )
+              })}
             </div>
 
             {/* Image faction */}

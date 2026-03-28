@@ -11,11 +11,19 @@ interface Props {
   placeId: string
   currentClaim: NonNullable<PlaceDetail['claim']>
   constructionTypes: ConstructionTypeInfo[]
+  placeLocation: { latitude: number; longitude: number }
 }
 
-export function FortifyButton({ placeId, currentClaim, constructionTypes }: Props) {
+export function FortifyButton({ placeId, currentClaim, constructionTypes, placeLocation }: Props) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
-  const constructionPoints = usePlayerStore(s => s.constructionPoints)
+  const energyRaw = usePlayerStore(s => s.energy)
+  const maxEnergy = usePlayerStore(s => s.maxEnergy)
+  const nextPointIn = usePlayerStore(s => s.nextPointIn)
+  const energyCycle = usePlayerStore(s => s.energyCycle)
+  const isFull = energyRaw >= maxEnergy
+  const elapsedInTick = energyCycle - nextPointIn
+  const fractionOfTick = energyCycle > 0 ? elapsedInTick / energyCycle : 0
+  const energy = isFull ? maxEnergy : Math.min(energyRaw + fractionOfTick, maxEnergy)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userId = usePlayerStore(s => s.userId)
   const [fortifying, setFortifying] = useState(false)
@@ -44,24 +52,46 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
     )
   }
 
-  const cost = nextCt?.cost ?? 0
+  // Calcul distance
+  const userPosition = usePlayerStore(s => s.userPosition)
+  let distanceKm = 999
+  if (userPosition) {
+    const R = 6371
+    const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
+    const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
+    const a = Math.sin(dLat/2)**2 + Math.cos(userPosition.lat*Math.PI/180)*Math.cos(placeLocation.latitude*Math.PI/180)*Math.sin(dLng/2)**2
+    distanceKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  }
+  const distMult = distanceKm < 0.5 ? 0.5 : distanceKm < 10 ? 1 : distanceKm < 50 ? 2 : 3
+  const baseCost = nextCt?.cost ?? 0
+  const cost = Math.max(1, Math.round(baseCost * distMult * 2) / 2)
   const nextName = nextCt?.name ?? ''
-  const canAfford = constructionPoints >= cost
+  // Use raw (server-side) energy for afford check, not interpolated display value
+  const canAfford = energyRaw >= cost
 
   async function handleFortify() {
     if (!userId || !canAfford) return
     setFortifying(true)
     setError(null)
 
+    const userPos = usePlayerStore.getState().userPosition
     const { data } = await supabase.rpc('fortify_place', {
       p_user_id: userId,
       p_place_id: placeId,
+      p_user_lat: userPos?.lat ?? null,
+      p_user_lng: userPos?.lng ?? null,
     })
 
     if (data?.error) {
-      setError(data.error)
-      if (data.constructionPoints !== undefined) {
-        usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
+      const errorMessages: Record<string, string> = {
+        not_enough_energy: `Pas assez d'énergie (${Math.floor(data.energy ?? 0)}/${data.cost ?? '?'} ⚡)`,
+        not_your_faction: 'Ce lieu ne fait pas partie de votre héritage',
+        no_faction: 'Vous devez rejoindre un héritage',
+        max_level: 'Niveau de fortification maximum atteint',
+      }
+      setError(errorMessages[data.error] ?? data.error)
+      if (data.energy !== undefined) {
+        usePlayerStore.getState().setEnergy(data.energy)
       }
       setFortifying(false)
       return
@@ -70,11 +100,8 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
     if (data?.success) {
       setLocalLevel(data.fortificationLevel)
       setPlaceOverride(placeId, { fortificationLevel: data.fortificationLevel })
-      if (data.constructionPoints !== undefined) {
-        usePlayerStore.getState().setConstructionPoints(data.constructionPoints)
-      }
-      if (data.constructionNextPointIn !== undefined) {
-        usePlayerStore.getState().setConstructionNextPointIn(data.constructionNextPointIn)
+      if (data.energy !== undefined) {
+        usePlayerStore.getState().setEnergy(data.energy)
       }
       if (data.notorietyPoints !== undefined) {
         usePlayerStore.getState().setNotorietyPoints(data.notorietyPoints)
@@ -82,7 +109,7 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
 
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Lieu fortifié : ${data.fortificationName} ! +5 Notoriété`,
+        message: `Fortification renforcée : ${data.fortificationName} ! +5 Gloire`,
         timestamp: Date.now(),
       })
 
@@ -126,8 +153,8 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
         {fortifying
           ? 'Fortification...'
           : canAfford
-            ? `Fortifier \u2192 ${nextName} (${cost} \uD83D\uDD28)`
-            : `Pas assez de construction (${Math.floor(constructionPoints)}/${cost})`}
+            ? `Fortifier \u2192 ${nextName} (${cost} \u26A1)`
+            : `Pas assez d'énergie (${Math.floor(energy)}/${cost})`}
       </button>
       {error && <p className="fortify-error">{error}</p>}
     </div>

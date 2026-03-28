@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import './InstallPrompt.css'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>

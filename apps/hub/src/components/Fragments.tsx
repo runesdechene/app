@@ -19,6 +19,9 @@ interface Fragment {
   collection: string | null
   bonus_type: string | null
   bonus_value: number
+  ability_type: string | null
+  ability_cooldown_hours: number
+  ability_value: number
   link_url: string | null
   visible: boolean
   words: FragmentWord[]
@@ -104,7 +107,7 @@ export function Fragments() {
       const result: Fragment[] = (frags as Array<{
         id: number; name: string; description: string | null;
         icon: string | null; icon_url: string | null; image_url: string | null; collection: string | null;
-        bonus_type: string | null; bonus_value: number; link_url: string | null; visible: boolean
+        bonus_type: string | null; bonus_value: number; ability_type: string | null; ability_cooldown_hours: number; ability_value: number; link_url: string | null; visible: boolean
       }>).map(f => ({
         ...f,
         words: ((words ?? []) as Array<{
@@ -115,7 +118,7 @@ export function Fragments() {
       }))
 
       setFragments(result)
-      setSavedFragments(result.map(f => ({ ...f })))
+      setSavedFragments(JSON.parse(JSON.stringify(result)))
     } finally {
       setLoading(false)
     }
@@ -169,39 +172,46 @@ export function Fragments() {
     setSaving(true)
     setSaveError(null)
 
-    const promises = fragments.map(f => {
-      const saved = savedFragments.find(s => s.id === f.id)
-      if (!saved) return null
-      // Comparer sans words
-      const { words: _w1, ...fData } = f
-      const { words: _w2, ...sData } = saved
-      if (JSON.stringify(fData) === JSON.stringify(sData)) return null
-      return supabase.from('title_fragments').update({
-        name: f.name,
-        description: f.description || null,
-        icon: f.icon || null,
-        image_url: f.image_url,
-        link_url: f.link_url || null,
-        collection: f.collection || null,
-        bonus_type: f.bonus_type || null,
-        bonus_value: f.bonus_value,
-        visible: f.visible,
-      }).eq('id', f.id).then(r => r)
-    }).filter(Boolean)
+    try {
+      const promises = fragments.map(f => {
+        const saved = savedFragments.find(s => s.id === f.id)
+        if (!saved) return null
+        // Comparer sans words
+        const { words: _w1, ...fData } = f
+        const { words: _w2, ...sData } = saved
+        if (JSON.stringify(fData) === JSON.stringify(sData)) return null
+        return supabase.from('title_fragments').update({
+          name: f.name,
+          description: f.description || null,
+          icon: f.icon || null,
+          icon_url: f.icon_url || null,
+          image_url: f.image_url,
+          link_url: f.link_url || null,
+          collection: f.collection || null,
+          bonus_type: f.bonus_type || null,
+          bonus_value: f.bonus_value,
+          ability_type: f.ability_type || null,
+          ability_cooldown_hours: f.ability_cooldown_hours,
+          ability_value: f.ability_value ?? 0,
+          visible: f.visible,
+        }).eq('id', f.id).then(r => r)
+      }).filter(Boolean)
 
-    const results = await Promise.all(promises)
-    const errors = results.filter(r => r?.error)
+      const results = await Promise.all(promises)
+      const errors = results.filter(r => r?.error)
 
-    if (errors.length > 0) {
-      setSaveError(`Erreur sur ${errors.length} fragment(s)`)
-    } else {
-      setSavedFragments(fragments.map(f => ({ ...f })))
+      if (errors.length > 0) {
+        setSaveError(`Erreur sur ${errors.length} fragment(s)`)
+      } else {
+        await fetchFragments()
+      }
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   function handleCancel() {
-    setFragments(savedFragments.map(f => ({ ...f })))
+    setFragments(JSON.parse(JSON.stringify(savedFragments)))
     setSaveError(null)
   }
 
@@ -278,23 +288,12 @@ export function Fragments() {
     const { data: urlData } = supabase.storage.from('app-fragments').getPublicUrl(path)
     const imageUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
-    await supabase.from('title_fragments').update({ image_url: imageUrl }).eq('id', fragId)
     setFragments(prev => prev.map(f => f.id === fragId ? { ...f, image_url: imageUrl } : f))
     setUploadingImage(null)
   }
 
-  async function removeImage(fragId: number) {
-    const frag = fragments.find(f => f.id === fragId)
-    if (!frag?.image_url) return
-    setUploadingImage(fragId)
-
-    const urlParts = frag.image_url.split('?')[0].split('/')
-    const fileName = urlParts[urlParts.length - 1]
-    await supabase.storage.from('app-fragments').remove([fileName])
-
-    await supabase.from('title_fragments').update({ image_url: null }).eq('id', fragId)
+  function removeImage(fragId: number) {
     setFragments(prev => prev.map(f => f.id === fragId ? { ...f, image_url: null } : f))
-    setUploadingImage(null)
   }
 
   // --- Icone fragment ---
@@ -326,18 +325,12 @@ export function Fragments() {
     const { data: urlData } = supabase.storage.from('app-fragments').getPublicUrl(path)
     const iconUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
-    await supabase.from('title_fragments').update({ icon_url: iconUrl }).eq('id', fragId)
     setFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: iconUrl } : f))
-    setSavedFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: iconUrl } : f))
     setUploadingIcon(null)
   }
 
-  async function removeIcon(fragId: number) {
-    setUploadingIcon(fragId)
-    await supabase.from('title_fragments').update({ icon_url: null }).eq('id', fragId)
+  function removeIcon(fragId: number) {
     setFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: null } : f))
-    setSavedFragments(prev => prev.map(f => f.id === fragId ? { ...f, icon_url: null } : f))
-    setUploadingIcon(null)
   }
 
   // --- Attribution manuelle ---
@@ -545,6 +538,35 @@ export function Fragments() {
                     onChange={e => updateFragment(frag.id, 'bonus_value', parseFloat(e.target.value) || 0)}
                   />
                 </label>
+              )}
+            </div>
+
+            <div className="frag-field" style={{ marginTop: 8 }}>
+              <label className="frag-field-label">Compétence active</label>
+              <select value={frag.ability_type ?? ''} onChange={e => updateFragment(frag.id, 'ability_type', e.target.value || null)}>
+                <option value="">Aucune</option>
+                <option value="free_discover">Découverte gratuite</option>
+                <option value="free_claim">Protection gratuite</option>
+                <option value="discount_discover">Réduction découverte (en ⚡)</option>
+                <option value="discount_claim">Réduction protection (en ⚡)</option>
+                <option value="double_glory">Double Gloire</option>
+                <option value="distance_ignore">Ignorer la distance</option>
+              </select>
+              {frag.ability_type && (
+                <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <div>
+                    <label style={{ fontSize: 12, color: '#6b5a47' }}>Cooldown (heures)</label>
+                    <input type="number" min={1} max={168} step={1} value={frag.ability_cooldown_hours}
+                      onChange={e => updateFragment(frag.id, 'ability_cooldown_hours', parseInt(e.target.value) || 24)} className="tag-reward-input" />
+                  </div>
+                  {(frag.ability_type === 'discount_discover' || frag.ability_type === 'discount_claim') && (
+                    <div>
+                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Réduction (⚡)</label>
+                      <input type="number" min={0.5} max={10} step={0.5} value={frag.ability_value ?? 0}
+                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 0)} className="tag-reward-input" />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 

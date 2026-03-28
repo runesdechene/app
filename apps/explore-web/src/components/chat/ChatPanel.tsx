@@ -6,6 +6,7 @@ import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { sendChatMessage } from '../../hooks/useChat'
 import { supabase } from '../../lib/supabase'
 import type { ChatMessage } from '../../stores/chatStore'
+import './ChatPanel.css'
 
 // ---- Helpers ----
 
@@ -34,7 +35,7 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
       {hasFaction && (
         <label className="chat-filter chat-filter-faction" style={{ color: userFactionColor || undefined }}>
           <input type="checkbox" checked={showFaction} onChange={toggleFaction} style={{ accentColor: userFactionColor || undefined }} />
-          Faction
+          Dortoir
         </label>
       )}
       <label className="chat-filter chat-filter-bugs">
@@ -153,15 +154,12 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       })
       if (data && data.success) {
         // Message système dans le chat général
-        const { error: insertErr } = await supabase.from('chat_messages').insert({
+        await supabase.from('chat_messages').insert({
           channel: 'general',
           user_id: fog.userId,
           user_name: 'Les Dieux',
           content: `${data.targetName} a re\u00E7u un don des Dieux \u26A1 Ses ressources ont \u00E9t\u00E9 recharg\u00E9es`,
         })
-        if (insertErr) console.error('[Cheat] insert chat error:', insertErr)
-      } else {
-        console.error('[Cheat] refill_target failed:', data)
       }
       return
     }
@@ -220,7 +218,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
             onClick={() => setSendChannel('faction')}
             style={{ color: userFactionColor || undefined, borderColor: sendChannel === 'faction' ? userFactionColor || undefined : undefined }}
           >
-            @ Faction
+            @ Dortoir
           </button>
         )}
         <button

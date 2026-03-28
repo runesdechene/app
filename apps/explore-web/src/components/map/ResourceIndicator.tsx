@@ -4,8 +4,8 @@ import { InfoModal } from './InfoModal'
 
 const CONFIG = {
   conquest: {
-    icon: '\u2694\uFE0F', // ⚔️
-    label: 'Conquete',
+    icon: '\uD83D\uDC51', // 👑
+    label: 'Noblesse',
     pointsKey: 'conquestPoints' as const,
     maxKey: 'maxConquest' as const,
     nextKey: 'conquestNextPointIn' as const,
@@ -13,18 +13,27 @@ const CONFIG = {
     bonusKey: 'bonusConquest' as const,
   },
   construction: {
-    icon: '\u{1F528}', // 🔨
-    label: 'Construction',
+    icon: '\uD83D\uDD2E', // 🔮
+    label: 'Sagesse',
     pointsKey: 'constructionPoints' as const,
     maxKey: 'maxConstruction' as const,
     nextKey: 'constructionNextPointIn' as const,
     cycleKey: 'constructionCycle' as const,
     bonusKey: 'bonusConstruction' as const,
   },
+  vitalite: {
+    icon: '\u{1F33F}', // 🌿
+    label: 'Vitalité',
+    pointsKey: 'vitalitePoints' as const,
+    maxKey: 'maxVitalite' as const,
+    nextKey: 'vitaliteNextPointIn' as const,
+    cycleKey: 'vitaliteCycle' as const,
+    bonusKey: 'bonusVitalite' as const,
+  },
 } as const
 
 interface Props {
-  type: 'conquest' | 'construction'
+  type: 'conquest' | 'construction' | 'vitalite'
 }
 
 export function ResourceIndicator({ type }: Props) {
@@ -64,8 +73,9 @@ export function ResourceIndicator({ type }: Props) {
   const hasRegenBonus = cycleSeconds !== baseCycle
 
   const INFO_TEXT: Record<string, string> = {
-    conquest: "Les points de conquete permettent de revendiquer des lieux pour votre faction. Chaque revendication coute des points selon le niveau de fortification du lieu.",
-    construction: "Les points de construction permettent de fortifier vos lieux revendiques. Chaque niveau de fortification rend le lieu plus difficile a conquerir par les factions adverses.",
+    conquest: "La Noblesse permet de decouvrir et proteger les monuments, capitales et sites de pouvoir. Elle se regenere automatiquement.",
+    construction: "La Sagesse permet de decouvrir et proteger les temples, abbayes et lieux sacres. Elle se regenere automatiquement.",
+    vitalite: "La Vitalite permet de decouvrir et proteger les forets, dolmens et sites naturels. Elle se regenere automatiquement.",
   }
 
   return (

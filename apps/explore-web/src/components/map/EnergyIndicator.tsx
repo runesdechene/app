@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { InfoModal } from './InfoModal'
+import './EnergyIndicator.css'
 
 export function EnergyIndicator() {
   const energy = usePlayerStore(s => s.energy)
@@ -38,7 +39,7 @@ export function EnergyIndicator() {
     <>
       <div className={`energy-indicator${regenBonus ? ` regen-${regenBonus}` : ''}`} onClick={() => setShowInfo(true)} style={{ cursor: 'pointer' }}>
         <div className="energy-main">
-          <span className="energy-icon">&#9889;</span>
+          <span className="energy-icon">{'\u26A1'}</span>
           <span className="energy-count">
             {formatEnergy(fractionalEnergy)}/<span className={bonusEnergy > 0 ? 'max-bonus' : bonusEnergy < 0 ? 'max-malus' : ''}>{maxEnergy}</span>
           </span>
@@ -56,7 +57,7 @@ export function EnergyIndicator() {
         <InfoModal
           icon={'\u26A1'}
           title="Energie"
-          description="L'energie permet de decouvrir de nouveaux lieux. Chaque decouverte coute 1 point (gratuit si vous etes a proximite GPS). Elle se regenere automatiquement."
+          description="L'energie permet de decouvrir et proteger des lieux. Le cout varie selon le type de lieu. Elle se regenere automatiquement."
           rows={[
             { label: 'Points actuels', value: `${formatEnergy(fractionalEnergy)} / ${maxEnergy}` },
             { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },

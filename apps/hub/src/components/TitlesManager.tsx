@@ -121,22 +121,25 @@ export function TitlesManager() {
   async function handleSave() {
     setSaving(true)
 
-    const promises = titles.map(t => {
-      const saved = savedTitles.find(s => s.id === t.id)
-      if (JSON.stringify(t) === JSON.stringify(saved)) return null
-      return supabase.from('titles').update({
-        name: t.name,
-        icon: t.icon,
-        description: t.description,
-        order: t.order,
-        condition: t.condition,
-        unlocks: t.unlocks,
-      }).eq('id', t.id).then(r => r)
-    }).filter(Boolean)
+    try {
+      const promises = titles.map(t => {
+        const saved = savedTitles.find(s => s.id === t.id)
+        if (JSON.stringify(t) === JSON.stringify(saved)) return null
+        return supabase.from('titles').update({
+          name: t.name,
+          icon: t.icon,
+          description: t.description,
+          order: t.order,
+          condition: t.condition,
+          unlocks: t.unlocks,
+        }).eq('id', t.id).then(r => r)
+      }).filter(Boolean)
 
-    await Promise.all(promises)
-    setSavedTitles(JSON.parse(JSON.stringify(titles)))
-    setSaving(false)
+      await Promise.all(promises)
+      await fetchData()
+    } finally {
+      setSaving(false)
+    }
   }
 
   // --- Creer ---
@@ -164,7 +167,6 @@ export function TitlesManager() {
       }).select().single()
 
       if (error) {
-        console.error('Create title error:', error)
         alert(`Erreur: ${error.message}`)
       } else if (data) {
         const t = data as Title
@@ -172,8 +174,7 @@ export function TitlesManager() {
         setSavedTitles(prev => [...prev, t])
         setNewName('')
       }
-    } catch (err) {
-      console.error('Create title exception:', err)
+    } catch {
     }
     setCreating(false)
   }

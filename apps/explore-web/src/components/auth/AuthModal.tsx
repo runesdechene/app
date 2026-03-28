@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import logoImg from '../../assets/logo_couleur.webp'
 import changelogRaw from '../../../CHANGELOG.md?raw'
+import './AuthModal.css'
 
 const appVersion = changelogRaw.split('\n').find(l => l.startsWith('# '))?.slice(2).trim() ?? ''
 

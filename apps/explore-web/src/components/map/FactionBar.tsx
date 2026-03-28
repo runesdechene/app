@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { FactionMembersModal } from './FactionMembersModal'
+import './FactionBar.css'
 
 interface FactionNotoriety {
   factionId: string
@@ -23,41 +24,61 @@ export function FactionBar() {
   const userFactionId = usePlayerStore(s => s.userFactionId)
 
   useEffect(() => {
-    async function fetchNotoriety() {
-      const { data } = await supabase.rpc('get_faction_notoriety')
-      if (!data || !Array.isArray(data)) return
+    async function fetchGlory() {
+      // Récupérer la Gloire totale par Héritage (somme de notoriety_points des membres)
+      const [notorietyRes, factionsRes] = await Promise.all([
+        supabase.rpc('get_faction_notoriety'),
+        supabase.from('factions').select('id, title, color, pattern'),
+      ])
 
-      const totalNotoriety = (data as Array<{ notoriety: number }>)
-        .reduce((sum, f) => sum + f.notoriety, 0)
+      if (!notorietyRes.data || !factionsRes.data) return
 
-      const result: FactionNotoriety[] = (data as Array<{
-        factionId: string
-        title: string
-        color: string
-        pattern: string
-        notoriety: number
-        hourlyRate: number
-        placesCount: number
-        isUnderdog: boolean
-      }>)
-        .map(f => ({
-          factionId: f.factionId,
-          title: f.title,
-          color: f.color,
-          pattern: f.pattern ?? '',
-          notoriety: f.notoriety,
-          hourlyRate: f.hourlyRate ?? 0,
-          placesCount: f.placesCount ?? 0,
-          percent: totalNotoriety > 0 ? (f.notoriety / totalNotoriety) * 100 : 0,
-          isUnderdog: f.isUnderdog ?? false,
-        }))
+      // Calculer la Gloire totale par faction depuis les users
+      const { data: gloryData } = await supabase
+        .from('users')
+        .select('faction_id, notoriety_points')
+        .not('faction_id', 'is', null)
+
+      const gloryByFaction: Record<string, number> = {}
+      const countByFaction: Record<string, number> = {}
+      if (gloryData) {
+        for (const u of gloryData as Array<{ faction_id: string; notoriety_points: number }>) {
+          gloryByFaction[u.faction_id] = (gloryByFaction[u.faction_id] || 0) + (u.notoriety_points || 0)
+          countByFaction[u.faction_id] = (countByFaction[u.faction_id] || 0) + 1
+        }
+      }
+
+      // Données de notoriété pour les lieux et hourlyRate
+      const notoMap = new Map<string, { placesCount: number; hourlyRate: number; isUnderdog: boolean }>()
+      for (const f of notorietyRes.data as Array<{ factionId: string; placesCount: number; hourlyRate: number; isUnderdog: boolean }>) {
+        notoMap.set(f.factionId, { placesCount: f.placesCount ?? 0, hourlyRate: f.hourlyRate ?? 0, isUnderdog: f.isUnderdog ?? false })
+      }
+
+      const totalGlory = Object.values(gloryByFaction).reduce((sum, v) => sum + v, 0)
+
+      const result: FactionNotoriety[] = (factionsRes.data as Array<{ id: string; title: string; color: string; pattern: string | null }>)
+        .map(f => {
+          const glory = gloryByFaction[f.id] || 0
+          const noto = notoMap.get(f.id)
+          return {
+            factionId: f.id,
+            title: f.title,
+            color: f.color,
+            pattern: f.pattern ?? '',
+            notoriety: glory,
+            hourlyRate: noto?.hourlyRate ?? 0,
+            placesCount: noto?.placesCount ?? 0,
+            percent: totalGlory > 0 ? (glory / totalGlory) * 100 : 0,
+            isUnderdog: noto?.isUnderdog ?? false,
+          }
+        })
         .filter(f => f.notoriety > 0 || f.placesCount > 0)
         .sort((a, b) => b.notoriety - a.notoriety)
 
       setStats(result)
     }
 
-    fetchNotoriety()
+    fetchGlory()
   }, [placeOverrides])
 
   if (stats.length === 0) return null
@@ -83,14 +104,12 @@ export function FactionBar() {
                   <img src={faction.pattern} alt="" className="faction-scoreboard-icon" />
                 )}
               </span>
-              <span className="faction-scoreboard-name">{faction.title}</span>
-              {isLeader && <span className="faction-scoreboard-crown">{'\uD83D\uDC51'}</span>}
-              {faction.isUnderdog && <span className="faction-scoreboard-underdog" title="Baroud d'Honneur — x2 regen">{'\uD83D\uDC80'}</span>}
-              <span className="faction-scoreboard-places">{faction.placesCount}</span>
-              <span className="faction-scoreboard-pct">{faction.notoriety}</span>
-              {faction.hourlyRate > 0 && (
-                <span className="faction-scoreboard-rate">+{faction.hourlyRate % 1 === 0 ? faction.hourlyRate : faction.hourlyRate.toFixed(1)}/h</span>
-              )}
+              <span className="faction-scoreboard-name" style={{ flex: 1 }}>
+                {faction.title}
+                {isLeader && <span className="faction-scoreboard-crown"> {'\uD83D\uDC51'}</span>}
+                {faction.isUnderdog && <span className="faction-scoreboard-underdog" title="Baroud d'Honneur — x2 regen"> {'\uD83D\uDC80'}</span>}
+              </span>
+              <span className="faction-scoreboard-pct">{faction.notoriety} {'\uD83C\uDF96\uFE0F'}</span>
             </div>
           </div>
         )

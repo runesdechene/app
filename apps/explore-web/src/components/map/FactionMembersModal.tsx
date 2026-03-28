@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
+import { TagBonusList } from './TagBonusList'
 
 interface FactionMember {
   userId: string
@@ -37,10 +38,15 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
 
   const [isUnderdog, setIsUnderdog] = useState(false)
   const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
+  const [tagBonusesPrimary, setTagBonusesPrimary] = useState<Array<{ title: string; icon: string | null; color: string; bg: string }>>([])
+  const [tagBonusesSecondary, setTagBonusesSecondary] = useState<Array<{ title: string; icon: string | null; color: string; bg: string }>>([])
+  const [primaryReduction, setPrimaryReduction] = useState<number | undefined>()
+  const [secondaryReduction, setSecondaryReduction] = useState<number | undefined>()
+
 
   useEffect(() => {
     async function load() {
-      const [membersRes, factionRes, underdogRes, multRes] = await Promise.all([
+      const [membersRes, factionRes, underdogRes, multRes, bonusRes, tagsRes] = await Promise.all([
         supabase.rpc('get_faction_members', { p_faction_id: factionId }),
         supabase.from('factions')
           .select('image_url, description, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
@@ -48,6 +54,8 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
           .single(),
         supabase.rpc('get_underdog_faction_id'),
         supabase.from('app_settings').select('value').eq('key', 'underdog_multiplier').single(),
+        supabase.from('faction_tag_bonuses').select('tag_id, cost_reduction').eq('faction_id', factionId),
+        supabase.from('tags').select('id, title, icon, color, background'),
       ])
       if (membersRes.data && Array.isArray(membersRes.data)) {
         setMembers(membersRes.data as FactionMember[])
@@ -61,6 +69,24 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
       if (multRes.data) {
         setUnderdogMultiplier(parseFloat(multRes.data.value) || 2)
       }
+      if (bonusRes.data && tagsRes.data) {
+        const tagMap = new Map((tagsRes.data as Array<{ id: string; title: string; icon: string | null; color: string; background: string }>).map(t => [t.id, t]))
+        const primary: Array<{ title: string; icon: string | null; color: string; bg: string }> = []
+        const secondary: Array<{ title: string; icon: string | null; color: string; bg: string }> = []
+        for (const row of bonusRes.data as Array<{ tag_id: string; cost_reduction: number }>) {
+          if (row.cost_reduction <= 0) continue
+          const tag = tagMap.get(row.tag_id)
+          const entry = { title: tag?.title ?? row.tag_id, icon: tag?.icon ?? null, color: tag?.color ?? '#C19A6B', bg: tag?.background ?? '#F5E6D3' }
+          if (row.cost_reduction >= 50) primary.push(entry)
+          else secondary.push(entry)
+        }
+        setTagBonusesPrimary(primary)
+        setTagBonusesSecondary(secondary)
+        const pRow = (bonusRes.data as Array<{ tag_id: string; cost_reduction: number }>).find(r => r.cost_reduction >= 50)
+        const sRow = (bonusRes.data as Array<{ tag_id: string; cost_reduction: number }>).find(r => r.cost_reduction > 0 && r.cost_reduction < 50)
+        if (pRow) setPrimaryReduction(pRow.cost_reduction)
+        if (sRow) setSecondaryReduction(sRow.cost_reduction)
+      }
       setLoading(false)
     }
     load()
@@ -71,14 +97,6 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
     useMapStore.getState().setSelectedPlayerId(playerId)
   }
 
-  const regenE = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_energy) / underdogMultiplier) : factionInfo.bonus_regen_energy) : 0
-  const regenC = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_conquest) / underdogMultiplier) : factionInfo.bonus_regen_conquest) : 0
-  const regenB = factionInfo ? (isUnderdog ? Math.round(100 - (100 - factionInfo.bonus_regen_construction) / underdogMultiplier) : factionInfo.bonus_regen_construction) : 0
-
-  const hasBonuses = factionInfo && (
-    factionInfo.bonus_energy !== 0 || factionInfo.bonus_conquest !== 0 || factionInfo.bonus_construction !== 0 ||
-    regenE !== 0 || regenC !== 0 || regenB !== 0
-  )
 
   const isMobile = window.innerWidth <= 768
 
@@ -116,40 +134,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
                 {factionInfo.description && (
                   <p className="faction-members-desc" dangerouslySetInnerHTML={{ __html: factionInfo.description.replace(/\n/g, '<br>') }} />
                 )}
-                {hasBonuses && (
-                  <div className="faction-members-bonuses">
-                    {factionInfo.bonus_energy !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_energy < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_energy > 0 ? '+' : ''}{factionInfo.bonus_energy} Energie
-                      </span>
-                    )}
-                    {factionInfo.bonus_conquest !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_conquest < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_conquest > 0 ? '+' : ''}{factionInfo.bonus_conquest} Conquete
-                      </span>
-                    )}
-                    {factionInfo.bonus_construction !== 0 && (
-                      <span className={`faction-bonus-tag${factionInfo.bonus_construction < 0 ? ' malus' : ''}`}>
-                        {factionInfo.bonus_construction > 0 ? '+' : ''}{factionInfo.bonus_construction} Construction
-                      </span>
-                    )}
-                    {regenE !== 0 && (
-                      <span className={`faction-bonus-tag${regenE < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
-                        {isUnderdog && '\uD83D\uDC80 '}{regenE > 0 ? '+' : ''}{regenE}% Regen Energie
-                      </span>
-                    )}
-                    {regenC !== 0 && (
-                      <span className={`faction-bonus-tag${regenC < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
-                        {isUnderdog && '\uD83D\uDC80 '}{regenC > 0 ? '+' : ''}{regenC}% Regen Conquete
-                      </span>
-                    )}
-                    {regenB !== 0 && (
-                      <span className={`faction-bonus-tag${regenB < 0 ? ' malus' : ''}${isUnderdog ? ' boosted' : ''}`}>
-                        {isUnderdog && '\uD83D\uDC80 '}{regenB > 0 ? '+' : ''}{regenB}% Regen Construction
-                      </span>
-                    )}
-                  </div>
-                )}
+                <TagBonusList primary={tagBonusesPrimary} secondary={tagBonusesSecondary} primaryReduction={primaryReduction} secondaryReduction={secondaryReduction} />
               </>
             )}
           </div>
@@ -159,7 +144,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
             {isUnderdog && (
               <div className="faction-card-underdog" style={{ position: 'relative', marginTop: 8, marginBottom: 12, border: '1px solid rgba(255, 180, 50, 0.3)', borderRadius: 8 }}>
                 <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
+                <p className="faction-card-underdog-desc">Cet héritage lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
               </div>
             )}
             <h3 className="faction-members-list-title">Classement</h3>

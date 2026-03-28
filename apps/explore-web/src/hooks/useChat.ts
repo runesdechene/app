@@ -184,7 +184,6 @@ export async function sendChatMessage(
     .single()
 
   if (error) {
-    console.error('[Chat] insert error:', error)
     return { success: false, error: error.message }
   }
 

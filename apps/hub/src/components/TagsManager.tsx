@@ -12,7 +12,10 @@ interface Tag {
   reward_energy: number
   reward_conquest: number
   reward_construction: number
+  gauge: string
+  base_cost: number
 }
+
 
 export function TagsManager() {
   const [tags, setTags] = useState<Tag[]>([])
@@ -21,6 +24,7 @@ export function TagsManager() {
   const [uploading, setUploading] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [placeCounts, setPlaceCounts] = useState<Record<string, number>>({})
   const [newId, setNewId] = useState('')
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
@@ -37,12 +41,24 @@ export function TagsManager() {
     try {
       const { data, error } = await supabase
         .from('tags')
-        .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction')
+        .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction, gauge, base_cost')
         .order('order')
 
       if (!error && data) {
         setTags(data as Tag[])
         setSavedTags(data as Tag[])
+      }
+
+      // Compter les lieux par tag
+      const { data: counts } = await supabase
+        .from('place_tags')
+        .select('tag_id')
+      if (counts) {
+        const map: Record<string, number> = {}
+        for (const row of counts as Array<{ tag_id: string }>) {
+          map[row.tag_id] = (map[row.tag_id] || 0) + 1
+        }
+        setPlaceCounts(map)
       }
     } finally {
       setLoading(false)
@@ -61,29 +77,35 @@ export function TagsManager() {
     setSaving(true)
     setSaveError(null)
 
-    const promises = tags.map(t => {
-      const saved = savedTags.find(s => s.id === t.id)
-      if (JSON.stringify(t) === JSON.stringify(saved)) return null
-      return supabase.from('tags').update({
-        title: t.title,
-        color: t.color,
-        background: t.background,
-        reward_energy: t.reward_energy,
-        reward_conquest: t.reward_conquest,
-        reward_construction: t.reward_construction,
-        updated_at: new Date().toISOString(),
-      }).eq('id', t.id).then(r => r)
-    }).filter(Boolean)
+    try {
+      const promises = tags.map(t => {
+        const saved = savedTags.find(s => s.id === t.id)
+        if (JSON.stringify(t) === JSON.stringify(saved)) return null
+        return supabase.from('tags').update({
+          title: t.title,
+          icon: t.icon,
+          color: t.color,
+          background: t.background,
+          reward_energy: t.reward_energy,
+          reward_conquest: t.reward_conquest,
+          reward_construction: t.reward_construction,
+          gauge: t.gauge,
+          base_cost: t.base_cost,
+          updated_at: new Date().toISOString(),
+        }).eq('id', t.id).then(r => r)
+      }).filter(Boolean)
 
-    const results = await Promise.all(promises)
-    const errors = results.filter(r => r?.error)
+      const results = await Promise.all(promises)
+      const errors = results.filter(r => r?.error)
 
-    if (errors.length > 0) {
-      setSaveError(`Erreur sur ${errors.length} tag(s)`)
-    } else {
-      setSavedTags(JSON.parse(JSON.stringify(tags)))
+      if (errors.length > 0) {
+        setSaveError(`Erreur sur ${errors.length} tag(s)`)
+      } else {
+        await fetchTags()
+      }
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   function handleCancel() {
@@ -112,7 +134,7 @@ export function TagsManager() {
 
     const { data, error } = await supabase.from('tags').insert({
       id, title, color: '#C19A6B', background: '#F5E6D3',
-      order: maxOrder + 1, reward_energy: 0, reward_conquest: 0, reward_construction: 0,
+      order: maxOrder + 1, reward_energy: 0, reward_conquest: 0, reward_construction: 0, gauge: 'energy', base_cost: 1,
     }).select().single()
 
     if (!error && data) {
@@ -153,33 +175,12 @@ export function TagsManager() {
     const { data: urlData } = supabase.storage.from('tag-icons').getPublicUrl(path)
     const iconUrl = urlData.publicUrl
 
-    const { error: updateError } = await supabase.from('tags')
-      .update({ icon: iconUrl, updated_at: new Date().toISOString() })
-      .eq('id', tagId)
-
-    if (!updateError) {
-      const update = (prev: Tag[]) => prev.map(t => t.id === tagId ? { ...t, icon: iconUrl } : t)
-      setTags(update)
-      setSavedTags(update)
-    }
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: iconUrl } : t))
     setUploading(null)
   }
 
-  async function removeIcon(tagId: string) {
-    setUploading(tagId)
-    const { data: existing } = await supabase.storage.from('tag-icons').list('', { search: tagId })
-    if (existing && existing.length > 0) {
-      await supabase.storage.from('tag-icons').remove(existing.map(f => f.name))
-    }
-    const { error } = await supabase.from('tags')
-      .update({ icon: null, updated_at: new Date().toISOString() })
-      .eq('id', tagId)
-    if (!error) {
-      const update = (prev: Tag[]) => prev.map(t => t.id === tagId ? { ...t, icon: null } : t)
-      setTags(update)
-      setSavedTags(update)
-    }
-    setUploading(null)
+  function removeIcon(tagId: string) {
+    setTags(prev => prev.map(t => t.id === tagId ? { ...t, icon: null } : t))
   }
 
   if (loading) return <div className="loading">Chargement...</div>
@@ -235,12 +236,18 @@ export function TagsManager() {
                     backgroundColor: tag.color,
                   }} />
                 )}
-                {tag.title}
+                <input
+                  type="text"
+                  value={tag.title}
+                  onChange={e => updateField(tag.id, 'title', e.target.value)}
+                  className="tag-title-input"
+                />
               </span>
             </div>
 
             <div className="tag-card-info">
               <span className="tag-card-id">{tag.id}</span>
+              <span className="tag-card-count">{placeCounts[tag.id] || 0} lieu{(placeCounts[tag.id] || 0) > 1 ? 'x' : ''}</span>
             </div>
 
             {/* Color pickers */}
@@ -272,6 +279,14 @@ export function TagsManager() {
                   {uploading === tag.id ? 'Upload...' : '+ icône SVG'}
                 </button>
               )}
+            </div>
+
+            {/* Coût en énergie */}
+            <div className="tag-card-rewards-section">
+              <span className="tag-rewards-title">Cout energie</span>
+              <input type="number" min={0.5} max={10} step={0.5} value={tag.base_cost}
+                onChange={e => updateField(tag.id, 'base_cost', parseFloat(e.target.value) || 1)}
+                className="tag-reward-input" />
             </div>
 
             {/* Récompenses découverte */}

@@ -54,8 +54,6 @@ export function Ads() {
         supabase.from('ad_tips').select('*').order('created_at', { ascending: false }),
         supabase.from('app_settings').select('value').eq('key', 'ad_screen_duration').single(),
       ])
-      console.log('[Ads] screens:', screensRes.data?.length, 'error:', screensRes.error?.message)
-      console.log('[Ads] tips:', tipsRes.data?.length, 'error:', tipsRes.error?.message)
       if (screensRes.data) {
         setScreens(screensRes.data as AdScreen[])
         setSavedScreens(screensRes.data as AdScreen[])
@@ -66,7 +64,6 @@ export function Ads() {
       }
       if (durationRes.data) setDuration(durationRes.data.value)
     } catch (err) {
-      console.error('[Ads] fetchAll exception:', err)
     } finally {
       setLoading(false)
     }
@@ -78,34 +75,36 @@ export function Ads() {
     setSaving(true)
     setSaveError(null)
 
-    const promises = []
+    try {
+      const promises = []
 
-    // Screens modifies
-    for (const s of screens) {
-      const saved = savedScreens.find(ss => ss.id === s.id)
-      if (!saved || JSON.stringify(s) === JSON.stringify(saved)) continue
-      promises.push(supabase.from('ad_screens').update({
-        title: s.title,
-        product_url: s.product_url,
-        active: s.active,
-      }).eq('id', s.id).then(() => {}))
+      // Screens modifies
+      for (const s of screens) {
+        const saved = savedScreens.find(ss => ss.id === s.id)
+        if (!saved || JSON.stringify(s) === JSON.stringify(saved)) continue
+        promises.push(supabase.from('ad_screens').update({
+          title: s.title,
+          product_url: s.product_url,
+          active: s.active,
+        }).eq('id', s.id).then(() => {}))
+      }
+
+      // Tips modifies
+      for (const t of tips) {
+        const saved = savedTips.find(st => st.id === t.id)
+        if (!saved || JSON.stringify(t) === JSON.stringify(saved)) continue
+        promises.push(supabase.from('ad_tips').update({
+          title: t.title,
+          subtitle: t.subtitle,
+          active: t.active,
+        }).eq('id', t.id).then(() => {}))
+      }
+
+      await Promise.all(promises)
+      await fetchAll()
+    } finally {
+      setSaving(false)
     }
-
-    // Tips modifies
-    for (const t of tips) {
-      const saved = savedTips.find(st => st.id === t.id)
-      if (!saved || JSON.stringify(t) === JSON.stringify(saved)) continue
-      promises.push(supabase.from('ad_tips').update({
-        title: t.title,
-        subtitle: t.subtitle,
-        active: t.active,
-      }).eq('id', t.id).then(() => {}))
-    }
-
-    await Promise.all(promises)
-    setSavedScreens(JSON.parse(JSON.stringify(screens)))
-    setSavedTips(JSON.parse(JSON.stringify(tips)))
-    setSaving(false)
   }
 
   function handleCancel() {
@@ -198,8 +197,7 @@ export function Ads() {
         setNewTitle('')
         setNewSubtitle('')
       }
-    } catch (err) {
-      console.error('Create tip exception:', err)
+    } catch {
     }
     setCreatingTip(false)
   }

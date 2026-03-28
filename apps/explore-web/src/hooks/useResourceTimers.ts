@@ -37,6 +37,12 @@ export function useResourceTimers() {
         else s.setConstructionNextPointIn(s.constructionNextPointIn - 1)
       }
 
+      // Vitalite countdown
+      if (s.vitalitePoints < s.maxVitalite && s.vitaliteNextPointIn > 0) {
+        if (s.vitaliteNextPointIn <= 1) needsRefetch = true
+        else s.setVitaliteNextPointIn(s.vitaliteNextPointIn - 1)
+      }
+
       if (needsRefetch) refetchResources(userId)
     }, 1000)
 
@@ -63,5 +69,10 @@ async function refetchResources(userId: string) {
     bonusEnergy: d.bonusEnergy ?? 0,
     bonusConquest: d.bonusConquest ?? 0,
     bonusConstruction: d.bonusConstruction ?? 0,
+    vitalitePoints: d.vitalitePoints ?? 0,
+    maxVitalite: d.maxVitalite ?? 5,
+    vitaliteNextPointIn: d.vitaliteNextPointIn ?? 0,
+    vitaliteCycle: d.vitaliteCycle ?? 14400,
+    bonusVitalite: d.bonusVitalite ?? 0,
   })
 }

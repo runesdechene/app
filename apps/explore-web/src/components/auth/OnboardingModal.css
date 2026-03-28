@@ -1,0 +1,187 @@
+/* ==========================================
+   ONBOARDING MODAL — Créer son aventurier
+   ========================================== */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 12, 5, 0.6);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: version-fade-in 0.2s ease;
+}
+
+.onboarding-modal {
+  background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+  border: 2px solid #b8a47a;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90vw;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: version-slide-in 0.25s ease;
+  text-align: center;
+}
+
+.onboarding-title {
+  margin: 0 0 4px;
+  font-family: var(--font-title, serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c1810;
+}
+
+.onboarding-subtitle {
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  font-size: 14px;
+  color: #8A7B6A;
+  margin: 0 0 20px;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+/* Avatar circle */
+.onboarding-avatar-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.onboarding-avatar-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px dashed #b8a47a;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.onboarding-avatar-btn:hover {
+  border-color: #8A7B6A;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.onboarding-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.onboarding-avatar-initial {
+  font-family: var(--font-title, serif);
+  font-size: 36px;
+  color: #b8a47a;
+  line-height: 1;
+}
+
+.onboarding-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(44, 24, 16, 0.7);
+  color: #F5E6D3;
+  font-size: 10px;
+  text-align: center;
+  padding: 3px 0;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+}
+
+/* Labels + inputs */
+.onboarding-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #4A3728;
+}
+
+.onboarding-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #b8a47a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  color: #2c1810;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.onboarding-input:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+}
+
+.onboarding-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #b8a47a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  color: #2c1810;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.onboarding-textarea:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+}
+
+.onboarding-error {
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  color: #c0392b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.onboarding-submit {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #2c1810;
+  color: #F5E6D3;
+  font-size: 15px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+}
+
+.onboarding-submit:hover {
+  opacity: 0.9;
+}
+
+.onboarding-submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

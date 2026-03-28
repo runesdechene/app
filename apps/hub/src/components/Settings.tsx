@@ -3,8 +3,6 @@ import { supabase } from '../lib/supabase'
 
 interface RoleGauges {
   maxEnergy: number
-  maxConquest: number
-  maxConstruction: number
 }
 
 interface UserGauge {
@@ -12,8 +10,6 @@ interface UserGauge {
   name: string
   role: string
   maxEnergy: number
-  maxConquest: number
-  maxConstruction: number
 }
 
 interface TerritoryTier {
@@ -26,12 +22,12 @@ const ROLES = ['user', 'admin'] as const
 
 export function Settings() {
   const [globalDefaults, setGlobalDefaults] = useState<RoleGauges>({
-    maxEnergy: 5, maxConquest: 5, maxConstruction: 5,
+    maxEnergy: 5,
   })
   const [savingGlobal, setSavingGlobal] = useState(false)
   const [roleDefaults, setRoleDefaults] = useState<Record<string, RoleGauges>>({
-    user: { maxEnergy: 5, maxConquest: 5, maxConstruction: 5 },
-    admin: { maxEnergy: 10, maxConquest: 10, maxConstruction: 10 },
+    user: { maxEnergy: 5 },
+    admin: { maxEnergy: 10 },
   })
   const [users, setUsers] = useState<UserGauge[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,6 +37,23 @@ export function Settings() {
   // Territory tiers
   const [tiers, setTiers] = useState<TerritoryTier[]>([])
   const [savingTiers, setSavingTiers] = useState(false)
+
+  // Regen cycles (in seconds)
+  const [regenCycles, setRegenCycles] = useState({
+    energy_base_cycle: 7200,
+  })
+  const [savingRegen, setSavingRegen] = useState(false)
+
+  const [distSettings, setDistSettings] = useState({
+    distance_gps_km: 0.5,
+    distance_close_km: 10,
+    distance_mid_km: 50,
+    distance_mult_gps: 0.5,
+    distance_mult_close: 1,
+    distance_mult_mid: 2,
+    distance_mult_far: 3,
+  })
+  const [savingDist, setSavingDist] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -52,7 +65,7 @@ export function Settings() {
       // Charger les valeurs moyennes par role (pour pre-remplir les inputs)
       const { data: usersData } = await supabase
         .from('users')
-        .select('id, first_name, email_address, role, max_energy, max_conquest, max_construction')
+        .select('id, first_name, email_address, role, max_energy')
         .order('role')
         .order('first_name')
 
@@ -62,8 +75,6 @@ export function Settings() {
           name: (u.first_name as string) || (u.email_address as string) || 'Anonyme',
           role: (u.role as string) || 'user',
           maxEnergy: Number(u.max_energy) || 5,
-          maxConquest: Number(u.max_conquest) || 5,
-          maxConstruction: Number(u.max_construction) || 5,
         }))
         setUsers(mapped)
 
@@ -74,8 +85,6 @@ export function Settings() {
           if (first) {
             byRole[role] = {
               maxEnergy: first.maxEnergy,
-              maxConquest: first.maxConquest,
-              maxConstruction: first.maxConstruction,
             }
           }
         }
@@ -94,6 +103,38 @@ export function Settings() {
           title: String(t.title),
         })))
       }
+
+      // Charger les cycles de regen
+      const { data: settingsData } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['energy_base_cycle'])
+
+      if (settingsData) {
+        const cycles = { ...regenCycles }
+        for (const row of settingsData as { key: string; value: string }[]) {
+          if (row.key in cycles) {
+            (cycles as Record<string, number>)[row.key] = Number(row.value) || (cycles as Record<string, number>)[row.key]
+          }
+        }
+        setRegenCycles(cycles)
+      }
+
+      // Charger les settings de distance
+      const { data: distData } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['distance_gps_km', 'distance_close_km', 'distance_mid_km', 'distance_mult_gps', 'distance_mult_close', 'distance_mult_mid', 'distance_mult_far'])
+
+      if (distData) {
+        const dist = { ...distSettings }
+        for (const row of distData as { key: string; value: string }[]) {
+          if (row.key in dist) {
+            (dist as Record<string, number>)[row.key] = Number(row.value) || (dist as Record<string, number>)[row.key]
+          }
+        }
+        setDistSettings(dist)
+      }
     } finally {
       setLoading(false)
     }
@@ -108,8 +149,6 @@ export function Settings() {
       .from('users')
       .update({
         max_energy: gauges.maxEnergy,
-        max_conquest: gauges.maxConquest,
-        max_construction: gauges.maxConstruction,
       })
       .eq('role', role)
 
@@ -117,7 +156,7 @@ export function Settings() {
     setUsers(prev =>
       prev.map(u =>
         u.role === role
-          ? { ...u, maxEnergy: gauges.maxEnergy, maxConquest: gauges.maxConquest, maxConstruction: gauges.maxConstruction }
+          ? { ...u, maxEnergy: gauges.maxEnergy }
           : u
       )
     )
@@ -136,8 +175,6 @@ export function Settings() {
       .from('users')
       .update({
         max_energy: globalDefaults.maxEnergy,
-        max_conquest: globalDefaults.maxConquest,
-        max_construction: globalDefaults.maxConstruction,
       })
       .gte('id', '')  // match all rows
 
@@ -145,8 +182,6 @@ export function Settings() {
       prev.map(u => ({
         ...u,
         maxEnergy: globalDefaults.maxEnergy,
-        maxConquest: globalDefaults.maxConquest,
-        maxConstruction: globalDefaults.maxConstruction,
       }))
     )
     // Sync role defaults display
@@ -169,7 +204,7 @@ export function Settings() {
     }))
   }
 
-  async function handleUserChange(userId: string, field: 'maxEnergy' | 'maxConquest' | 'maxConstruction', value: string) {
+  async function handleUserChange(userId: string, field: 'maxEnergy', value: string) {
     const num = parseFloat(value)
     if (isNaN(num) || num < 0) return
 
@@ -180,10 +215,9 @@ export function Settings() {
     if (existing) clearTimeout(existing)
     debounceMapRef.current.set(key, setTimeout(async () => {
       debounceMapRef.current.delete(key)
-      const dbField = field === 'maxEnergy' ? 'max_energy' : field === 'maxConquest' ? 'max_conquest' : 'max_construction'
       await supabase
         .from('users')
-        .update({ [dbField]: num })
+        .update({ max_energy: num })
         .eq('id', userId)
     }, 600))
   }
@@ -218,6 +252,30 @@ export function Settings() {
     setSavingTiers(false)
   }
 
+  async function saveRegenCycles() {
+    setSavingRegen(true)
+    const keys = ['energy_base_cycle'] as const
+    for (const key of keys) {
+      await supabase.from('app_settings').upsert(
+        { key, value: String(regenCycles[key]) },
+        { onConflict: 'key' }
+      )
+    }
+    setSavingRegen(false)
+  }
+
+  async function saveDistSettings() {
+    setSavingDist(true)
+    const keys = Object.keys(distSettings) as (keyof typeof distSettings)[]
+    for (const key of keys) {
+      await supabase.from('app_settings').upsert(
+        { key, value: String(distSettings[key]) },
+        { onConflict: 'key' }
+      )
+    }
+    setSavingDist(false)
+  }
+
   if (loading) {
     return <div className="section"><p>Chargement...</p></div>
   }
@@ -227,179 +285,106 @@ export function Settings() {
       <h1>Reglages</h1>
 
       <div className="divers-card">
-        <h3>Jauges par role</h3>
+        <h3>Cycles de regeneration</h3>
         <p className="divers-description">
-          Definir les limites max d'energie, conquete et construction par role.
-          Cliquer "Appliquer" met a jour tous les utilisateurs de ce role.
-        </p>
-
-        <table className="settings-table">
-          <thead>
-            <tr>
-              <th>Role</th>
-              <th>Max Energie</th>
-              <th>Max Conquete</th>
-              <th>Max Construction</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {ROLES.map(role => (
-              <tr key={role}>
-                <td className="settings-role-label">
-                  {role === 'admin' ? 'Admin' : 'Joueur'}
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={roleDefaults[role]?.maxEnergy ?? 5}
-                    onChange={e => handleRoleChange(role, 'maxEnergy', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={roleDefaults[role]?.maxConquest ?? 5}
-                    onChange={e => handleRoleChange(role, 'maxConquest', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={roleDefaults[role]?.maxConstruction ?? 5}
-                    onChange={e => handleRoleChange(role, 'maxConstruction', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-                <td>
-                  <button
-                    className="btn-primary"
-                    onClick={() => applyToRole(role)}
-                    disabled={saving === role}
-                  >
-                    {saving === role ? '...' : 'Appliquer'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="divers-card">
-        <h3>Jauges par defaut (tous les joueurs)</h3>
-        <p className="divers-description">
-          Definir les limites max d'energie, conquete et construction pour TOUS les joueurs d'un coup.
+          Duree de base (en heures) pour regenerer 1 point de chaque jauge.
         </p>
 
         <div className="settings-global-row">
           <label className="settings-global-field">
-            <span>Max Energie</span>
+            <span>⚡ Energie</span>
             <input
               type="number"
-              min="1"
+              min="0.5"
               step="0.5"
-              value={globalDefaults.maxEnergy}
-              onChange={e => handleGlobalChange('maxEnergy', e.target.value)}
+              value={regenCycles.energy_base_cycle / 3600}
+              onChange={e => {
+                const h = parseFloat(e.target.value)
+                if (!isNaN(h) && h > 0) setRegenCycles(prev => ({ ...prev, energy_base_cycle: Math.round(h * 3600) }))
+              }}
               className="settings-input"
             />
-          </label>
-          <label className="settings-global-field">
-            <span>Max Conquete</span>
-            <input
-              type="number"
-              min="1"
-              step="0.5"
-              value={globalDefaults.maxConquest}
-              onChange={e => handleGlobalChange('maxConquest', e.target.value)}
-              className="settings-input"
-            />
-          </label>
-          <label className="settings-global-field">
-            <span>Max Construction</span>
-            <input
-              type="number"
-              min="1"
-              step="0.5"
-              value={globalDefaults.maxConstruction}
-              onChange={e => handleGlobalChange('maxConstruction', e.target.value)}
-              className="settings-input"
-            />
+            <span style={{ fontSize: '0.8em', opacity: 0.6 }}>heures</span>
           </label>
           <button
             className="btn-primary"
-            onClick={applyGlobalToAll}
-            disabled={savingGlobal}
+            onClick={saveRegenCycles}
+            disabled={savingRegen}
           >
-            {savingGlobal ? '...' : 'Appliquer a tous'}
+            {savingRegen ? '...' : 'Sauvegarder'}
           </button>
         </div>
       </div>
 
       <div className="divers-card">
-        <h3>Par joueur</h3>
+        <h3>Cout par distance</h3>
         <p className="divers-description">
-          Ajuster individuellement les limites d'un joueur.
-          Les modifications sont sauvegardees automatiquement.
+          Seuils de distance (km) et multiplicateurs de cout en energie.
         </p>
 
-        <table className="settings-table settings-users-table">
+        <table className="settings-table">
           <thead>
             <tr>
-              <th>Joueur</th>
-              <th>Role</th>
-              <th>Energie</th>
-              <th>Conquete</th>
-              <th>Construction</th>
+              <th>Zone</th>
+              <th>Distance max (km)</th>
+              <th>Multiplicateur</th>
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td className="settings-user-name">{user.name}</td>
-                <td className="settings-role-badge">{user.role}</td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={user.maxEnergy}
-                    onChange={e => handleUserChange(user.id, 'maxEnergy', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={user.maxConquest}
-                    onChange={e => handleUserChange(user.id, 'maxConquest', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.5"
-                    value={user.maxConstruction}
-                    onChange={e => handleUserChange(user.id, 'maxConstruction', e.target.value)}
-                    className="settings-input"
-                  />
-                </td>
-              </tr>
-            ))}
+            <tr>
+              <td>GPS (sur place)</td>
+              <td>
+                <input type="number" min="0.1" step="0.1" value={distSettings.distance_gps_km}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_gps_km: parseFloat(e.target.value) || 0.5 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="0.1" value={distSettings.distance_mult_gps}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_mult_gps: parseFloat(e.target.value) || 0.5 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+            <tr>
+              <td>Proche</td>
+              <td>
+                <input type="number" min="1" step="1" value={distSettings.distance_close_km}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_close_km: parseFloat(e.target.value) || 10 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="0.1" value={distSettings.distance_mult_close}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_mult_close: parseFloat(e.target.value) || 1 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+            <tr>
+              <td>Moyen</td>
+              <td>
+                <input type="number" min="1" step="5" value={distSettings.distance_mid_km}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_mid_km: parseFloat(e.target.value) || 50 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="0.1" value={distSettings.distance_mult_mid}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_mult_mid: parseFloat(e.target.value) || 2 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+            <tr>
+              <td>Loin (au-dela)</td>
+              <td>—</td>
+              <td>
+                <input type="number" min="0" step="0.1" value={distSettings.distance_mult_far}
+                  onChange={e => setDistSettings(prev => ({ ...prev, distance_mult_far: parseFloat(e.target.value) || 3 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
           </tbody>
         </table>
+
+        <button className="btn-primary" onClick={saveDistSettings} disabled={savingDist} style={{ marginTop: 10 }}>
+          {savingDist ? '...' : 'Sauvegarder'}
+        </button>
       </div>
 
       <div className="divers-card">
@@ -466,6 +451,117 @@ export function Settings() {
           </button>
         </div>
       </div>
+
+      <div className="divers-card">
+        <h3>Energie par role</h3>
+        <p className="divers-description">
+          Definir la limite max d'energie par role.
+          Cliquer "Appliquer" met a jour tous les utilisateurs de ce role.
+        </p>
+
+        <table className="settings-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>⚡ Energie max</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {ROLES.map(role => (
+              <tr key={role}>
+                <td className="settings-role-label">
+                  {role === 'admin' ? 'Admin' : 'Joueur'}
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.5"
+                    value={roleDefaults[role]?.maxEnergy ?? 5}
+                    onChange={e => handleRoleChange(role, 'maxEnergy', e.target.value)}
+                    className="settings-input"
+                  />
+                </td>
+                <td>
+                  <button
+                    className="btn-primary"
+                    onClick={() => applyToRole(role)}
+                    disabled={saving === role}
+                  >
+                    {saving === role ? '...' : 'Appliquer'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="divers-card">
+        <h3>Energie par defaut (tous les joueurs)</h3>
+        <p className="divers-description">
+          Definir la limite d'energie pour TOUS les joueurs d'un coup.
+        </p>
+
+        <div className="settings-global-row">
+          <label className="settings-global-field">
+            <span>⚡ Energie max</span>
+            <input
+              type="number"
+              min="1"
+              step="0.5"
+              value={globalDefaults.maxEnergy}
+              onChange={e => handleGlobalChange('maxEnergy', e.target.value)}
+              className="settings-input"
+            />
+          </label>
+          <button
+            className="btn-primary"
+            onClick={applyGlobalToAll}
+            disabled={savingGlobal}
+          >
+            {savingGlobal ? '...' : 'Appliquer a tous'}
+          </button>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Par joueur</h3>
+        <p className="divers-description">
+          Ajuster individuellement les limites d'un joueur.
+          Les modifications sont sauvegardees automatiquement.
+        </p>
+
+        <table className="settings-table settings-users-table">
+          <thead>
+            <tr>
+              <th>Joueur</th>
+              <th>Role</th>
+              <th>⚡ Energie max</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id}>
+                <td className="settings-user-name">{user.name}</td>
+                <td className="settings-role-badge">{user.role}</td>
+                <td>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.5"
+                    value={user.maxEnergy}
+                    onChange={e => handleUserChange(user.id, 'maxEnergy', e.target.value)}
+                    className="settings-input"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   )
 }

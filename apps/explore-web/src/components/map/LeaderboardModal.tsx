@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
+import './LeaderboardModal.css'
 
 type LeaderboardTab = 'notoriety' | 'authored' | 'explored'
 
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const TAB_LABELS: Record<LeaderboardTab, string> = {
-  notoriety: 'Notoriété',
+  notoriety: 'Gloire',
   authored: 'Lieux ajoutés',
   explored: 'Lieux explorés',
 }

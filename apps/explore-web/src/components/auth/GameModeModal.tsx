@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { supabase } from '../../lib/supabase'
+import './GameModeModal.css'
 
 interface GameModeModalProps {
   onComplete: (mode: 'exploration' | 'conquest') => void
@@ -53,7 +54,7 @@ export function GameModeModal({ onComplete }: GameModeModalProps) {
             <span className="gamemode-option-icon">{'\u2694\uFE0F'}</span>
             <h3 className="gamemode-option-title">Conquete</h3>
             <p className="gamemode-option-desc">
-              Tout du monde <b>Exploration</b>, mais vous rejoignez aussi une faction, revendiquez vos lieux favoris pour votre banniere, creez un micro-empire et fortifiez vos territoires.
+              Tout du monde <b>Exploration</b>, mais vous rejoignez aussi un héritage, protégez vos lieux favoris pour votre banniere, creez un micro-empire et fortifiez vos territoires.
             </p>
           </button>
         </div>

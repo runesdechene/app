@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { usePlayerStore } from '../../stores/playerStore'
+import { supabase } from '../../lib/supabase'
+import './FoggedPlaceView.css'
 
 /** Haversine distance en mètres */
 function haversineM(
@@ -32,30 +34,54 @@ export function FoggedPlaceView({
   const energy = usePlayerStore(s => s.energy)
   const maxEnergy = usePlayerStore(s => s.maxEnergy)
   const nextPointIn = usePlayerStore(s => s.nextPointIn)
+  const energyCycle = usePlayerStore(s => s.energyCycle)
   const userPosition = usePlayerStore(s => s.userPosition)
+  const userId = usePlayerStore(s => s.userId)
   const [discovering, setDiscovering] = useState(false)
+  const [tagReduction, setTagReduction] = useState(0)
 
-  // Énergie fractionnaire (taux fixe 1, cycle 7200s = +0.5/h)
-  const CYCLE_SECONDS = 7200
+  useEffect(() => {
+    if (userId) {
+      supabase.rpc('get_faction_tag_reduction', { p_user_id: userId, p_place_id: place.id })
+        .then(({ data }) => { if (data != null) setTagReduction(Number(data) || 0) })
+    }
+  }, [userId, place.id])
+
   const isFull = energy >= maxEnergy
-  const elapsedInTick = CYCLE_SECONDS - nextPointIn
-  const fractionOfTick = CYCLE_SECONDS > 0 ? elapsedInTick / CYCLE_SECONDS : 0
+  const elapsedInTick = energyCycle - nextPointIn
+  const fractionOfTick = energyCycle > 0 ? elapsedInTick / energyCycle : 0
   const fractionalEnergy = isFull
     ? maxEnergy
     : Math.min(energy + fractionOfTick, maxEnergy)
 
   // Calcul distance GPS
   let isNearby = false
+  let distanceKm = 999
   if (userPosition) {
-    const dist = haversineM(
+    const distM = haversineM(
       userPosition.lat, userPosition.lng,
       place.location.latitude, place.location.longitude,
     )
-    isNearby = dist <= 500
+    distanceKm = distM / 1000
+    isNearby = distM <= 500
   }
 
-  const cost = isNearby ? 0 : (isOwnFaction ? 0.5 : 1)
-  const canAfford = cost === 0 || fractionalEnergy >= cost
+  const activeBuff = usePlayerStore(s => s.activeBuff)
+
+  // Multiplicateur de distance
+  const distMult = distanceKm < 0.5 ? 0.5 : distanceKm < 10 ? 1 : distanceKm < 50 ? 2 : 3
+  // Coût de base depuis le tag (TODO: lire base_cost du tag, pour l'instant 1)
+  const baseCost = 1
+  const discoverFree = activeBuff === 'free_discover'
+  const discoverDiscount = activeBuff === 'discount_discover' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '0') : 0
+  let cost = discoverFree ? 0 : (isNearby ? 0 : baseCost * distMult * (1 - tagReduction / 100))
+  if (!isNearby && isOwnFaction) cost = cost * 0.5
+  if (discoverDiscount > 0) cost = Math.max(0, cost - discoverDiscount)
+  // Arrondir au 0.5
+  cost = Math.round(cost * 2) / 2
+  if (!isNearby && !discoverFree && cost > 0) cost = Math.max(0.5, cost)
+  // Use raw (server-side) energy for afford check, not interpolated display value
+  const canAfford = cost === 0 || energy >= cost
 
   const images = place.images || []
 
@@ -101,7 +127,7 @@ export function FoggedPlaceView({
 
         <p className="fog-mystery-text">
           {isOwnFaction
-            ? 'Ce lieu appartient à votre faction. Découvrez-le à moindre coût.'
+            ? 'Ce lieu appartient à votre héritage. Découvrez-le à moindre coût.'
             : 'Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.'
           }
         </p>
@@ -118,17 +144,34 @@ export function FoggedPlaceView({
               disabled={discovering || !canAfford}
             >
               {discovering
-                ? 'Exploration...'
-                : isNearby
-                  ? 'Explorer (gratuit — vous êtes à proximité)'
-                  : isOwnFaction
-                    ? 'Explorer (0.5 point d\'énergie — territoire allié)'
-                    : `Explorer (1 point d'énergie)`
+                ? 'Découverte...'
+                : discoverFree
+                  ? 'Découvrir (gratuit ✨ compétence active)'
+                  : discoverDiscount > 0
+                    ? `Découvrir (${cost} ⚡ — compétence -${discoverDiscount})`
+                    : isNearby
+                      ? 'Découvrir (gratuit — vous êtes à proximité)'
+                      : `Découvrir (${cost} ⚡)`
               }
             </button>
 
+            {!isNearby && distMult > 1 && (
+              <div className="fog-distance-info" style={{ fontSize: 11, color: '#8A7B6A', marginTop: 4 }}>
+                {'\uD83D\uDCCD'} Distance ({Math.round(distanceKm)} km) : cout x{distMult}
+              </div>
+            )}
+            {!isNearby && isOwnFaction && (
+              <div className="fog-distance-info" style={{ fontSize: 11, color: '#2a7a30', marginTop: 2 }}>
+                Territoire allié : cout /2
+              </div>
+            )}
+            {tagReduction > 0 && (
+              <div className="fog-distance-info" style={{ fontSize: 11, color: '#2a7a30', marginTop: 2 }}>
+                {'\uD83C\uDF96\uFE0F'} Bonus héritage : -{tagReduction}%
+              </div>
+            )}
             <div className="fog-energy-info">
-              <span className="fog-energy-count">{Number.isInteger(fractionalEnergy) ? fractionalEnergy : fractionalEnergy.toFixed(1)}/{maxEnergy}</span> points d'énergie
+              <span className="fog-energy-count">{Number.isInteger(fractionalEnergy) ? fractionalEnergy : fractionalEnergy.toFixed(1)}/{maxEnergy}</span> énergie
               {!canAfford && (
                 <p className="fog-energy-empty">
                   Plus assez d'énergie. Revenez demain ou déplacez-vous à proximité du lieu.

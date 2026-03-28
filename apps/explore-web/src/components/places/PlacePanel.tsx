@@ -12,6 +12,7 @@ import { FoggedPlaceView } from './FoggedPlaceView'
 import { ClaimButton } from './ClaimButton'
 import { FortifyButton } from './FortifyButton'
 import { ScoreSlider } from './ScoreSlider'
+import './PlacePanel.css'
 
 interface PlacePanelProps {
   placeId: string | null
@@ -103,7 +104,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
   const [deleting, setDeleting] = useState(false)
 
   const constructionTypes = useConstructionTypes()
-  const canManage = (userId === place.author.id) || isAdmin
   const images = place.images || []
   const cacheBust = useMemo(() => Date.now(), [place.id])
   const TEXT_LIMIT = 300
@@ -116,12 +116,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
     setLikeLoading(true)
     if (liked) {
       const { error } = await supabase.rpc('unlike_place', { p_user_id: userId, p_place_id: place.id })
-      if (error) console.error('unlike_place error:', error)
-      else { setLiked(false); setLikesCount(c => c - 1); useMapStore.getState().incrementPlacesRefreshKey() }
+      if (!error) { setLiked(false); setLikesCount(c => c - 1); useMapStore.getState().incrementPlacesRefreshKey() }
     } else {
       const { error } = await supabase.rpc('like_place', { p_user_id: userId, p_place_id: place.id })
-      if (error) console.error('like_place error:', error)
-      else { setLiked(true); setLikesCount(c => c + 1); useMapStore.getState().incrementPlacesRefreshKey() }
+      if (!error) { setLiked(true); setLikesCount(c => c + 1); useMapStore.getState().incrementPlacesRefreshKey() }
     }
     setLikeLoading(false)
   }
@@ -152,9 +150,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
     if (!userId || exploreLoading) return
     setExploreLoading(true)
     const { data, error } = await supabase.rpc('explore_place', { p_user_id: userId, p_place_id: place.id })
-    if (error) {
-      console.error('explore_place error:', error)
-    } else if (data?.success) {
+    if (!error && data?.success) {
       setExplored(true)
       setExploredCount(c => c + 1)
       useMapStore.getState().incrementPlacesRefreshKey()
@@ -173,12 +169,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
     setDeleting(true)
     const { data, error: rpcError } = await supabase.rpc('delete_place', { p_user_id: userId, p_place_id: place.id })
     if (rpcError) {
-      console.error('delete_place rpc error:', rpcError)
       setDeleting(false)
       return
     }
     if (data?.error) {
-      console.error('delete_place error:', data.error)
       setDeleting(false)
       return
     }
@@ -198,8 +192,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
             className="place-claim-badge"
             style={{ backgroundColor: place.claim.factionColor }}
           >
-            {place.claim.factionPattern ? (
-              <img src={place.claim.factionPattern} alt="" className="place-claim-faction-logo" />
+            {place.claim.claimedByAvatar ? (
+              <img src={place.claim.claimedByAvatar} alt="" className="place-claim-avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${place.claim.factionColor}` }} />
             ) : (
               <span
                 className="place-claim-dot"
@@ -208,7 +202,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
             )}
             <div className="place-claim-text">
               <div className="place-claim-author">
-                Revendiqué par <a className="place-claim-link" onClick={() => useMapStore.getState().setSelectedPlayerId(place.claim!.claimedBy)}>{place.claim.claimedByName || 'Inconnu'}</a>
+                Veillé par <a className="place-claim-link" onClick={() => useMapStore.getState().setSelectedPlayerId(place.claim!.claimedBy)}>{place.claim.claimedByName || 'Inconnu'}</a>
               </div>
               <div className="place-claim-faction-name">
                 {place.claim.factionTitle}
@@ -217,7 +211,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           </div>
         )}
         <div className="place-panel-header-actions">
-          {canManage && (
+          {isAdmin && (
             <div className="place-options-wrap">
               <button
                 className="place-options-btn"
@@ -570,12 +564,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
 
         {/* Claim button (masque en mode exploration) */}
         {userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
-          <ClaimButton placeId={place.id} currentClaim={place.claim} onClaimed={onRefetch} />
+          <ClaimButton placeId={place.id} currentClaim={place.claim} placeLocation={place.location} onClaimed={onRefetch} />
         )}
 
         {/* Fortify button (masque en mode exploration) */}
         {userEmail && usePlayerStore.getState().gameMode === 'conquest' && place.claim && (
-          <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} />
+          <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} placeLocation={place.location} />
         )}
       </div>
     </>

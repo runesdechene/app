@@ -7,8 +7,6 @@ export interface GameToast {
   color?: string
   /** Texte(s) à mettre en avant (bold) dans le message */
   highlights?: string[]
-  /** @deprecated — utiliser highlights[] */
-  highlight?: string
   /** URL d'icone faction (remplace l'emoji par défaut) */
   iconUrl?: string
   /** Conquete contestee (lieu pris a un autre joueur) */

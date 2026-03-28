@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
-import { ResourceIndicator } from './components/map/ResourceIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
 import { OnboardingModal } from './components/auth/OnboardingModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
+import { AbilityBar } from './components/map/AbilityBar'
 import { GameModeModal } from './components/auth/GameModeModal'
 import { ConquestToggle } from './components/map/ConquestToggle'
 import { InfoModal } from './components/map/InfoModal'
@@ -18,7 +18,6 @@ import { VersionBadge } from './components/map/VersionBadge'
 import { TerritoryPanel } from './components/map/TerritoryPanel'
 import { useMapStore } from './stores/mapStore'
 import { usePlayerStore } from './stores/playerStore'
-import { useToastStore } from './stores/toastStore'
 import { useAuth } from './hooks/useAuth'
 import { usePlayer } from './hooks/usePlayer'
 import { usePresence } from './hooks/usePresence'
@@ -34,6 +33,7 @@ import { useMobileNavStore } from './stores/mobileNavStore'
 import { AdScreen } from './components/map/AdScreen'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
+import './styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   const notoriety = usePlayerStore(s => s.notorietyPoints)
@@ -56,13 +56,13 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
       {showInfo && (
         <InfoModal
           icon={'\uD83C\uDF96\uFE0F'}
-          title="Notoriete"
-          description="La notoriete represente votre prestige personnel dans votre faction. Vous gagnez des points en revendiquant et fortifiant des lieux."
+          title="Gloire"
+          description="La Gloire represente votre prestige personnel dans votre héritage. Vous gagnez des points en protégeant et fortifiant des lieux."
           rows={[
             { label: 'Points actuels', value: String(notoriety), highlight: true },
-            { label: 'Revendiquer un lieu', value: '+10 pts' },
+            { label: 'Protéger un lieu', value: '+10 pts' },
             { label: 'Fortifier un lieu', value: '+5 pts' },
-            { label: 'Changer de faction', value: 'Notoriete / 2' },
+            { label: 'Changer d\'Héritage', value: 'Gloire / 2' },
           ]}
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
@@ -83,6 +83,7 @@ function App() {
   const [showGameModeModal, setShowGameModeModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
 
   const userId = usePlayerStore(s => s.userId)
@@ -172,12 +173,10 @@ function App() {
 
       {/* Toolbar flottante (masquée en mode ajout) */}
       {!addPlaceMode && (
-        <div className="app-toolbar">
+        <div className="app-toolbar" style={showAdScreen ? { visibility: 'hidden' } : undefined}>
           {!authLoading && isAuthenticated && (
             <>
               {isConquestMode && <NotorietyBadge onClick={() => setShowLeaderboard(true)} />}
-              {isConquestMode && <ResourceIndicator type="conquest" />}
-              {isConquestMode && <ResourceIndicator type="construction" />}
               <EnergyIndicator />
             </>
           )}
@@ -197,6 +196,9 @@ function App() {
         </div>
       )}
 
+      {/* Barre de compétences */}
+      {!authLoading && isAuthenticated && userId && !addPlaceMode && <AbilityBar />}
+
       {/* FAB Ajouter un lieu — toujours visible, verrouille si pas le titre */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
@@ -205,17 +207,27 @@ function App() {
             if (canAddPlace) {
               setAddPlaceMode(true)
             } else {
-              useToastStore.getState().addToast({
-                type: 'discover',
-                message: 'Vous devez etre Explorateur Novice — decouvrez au moins 5 lieux !',
-                timestamp: Date.now(),
-              })
+              setShowAddPlaceInfo(true)
             }
           }}
           aria-label="Ajouter un lieu"
         >
           +
         </button>
+      )}
+
+      {/* Info modal ajout de lieu */}
+      {showAddPlaceInfo && (
+        <InfoModal
+          icon="🏛️"
+          title="Ajouter un lieu"
+          description="Pour pouvoir ajouter un lieu sur la carte, vous devez d'abord découvrir au moins 5 lieux et obtenir le titre d'Explorateur."
+          rows={[
+            { label: 'Condition', value: 'Découvrir 5 lieux' },
+            { label: 'Titre requis', value: 'Explorateur' },
+          ]}
+          onClose={() => setShowAddPlaceInfo(false)}
+        />
       )}
 
       {/* Flow ajout de lieu (immersif) */}

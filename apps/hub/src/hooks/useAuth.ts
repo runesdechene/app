@@ -29,12 +29,10 @@ export function useAuth() {
           .eq('email_address', email)
           .single()
         if (error) {
-          console.error('[useAuth] fetchRole error:', error.message)
           return null
         }
         return (data?.role as UserRole) ?? null
       } catch (e) {
-        console.error('[useAuth] fetchRole exception:', e)
         return null
       }
     }

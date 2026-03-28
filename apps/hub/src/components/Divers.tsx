@@ -51,7 +51,6 @@ export function Divers() {
       .upload(path, file)
 
     if (uploadError) {
-      console.error('Upload error:', uploadError)
       setUploading(false)
       return
     }

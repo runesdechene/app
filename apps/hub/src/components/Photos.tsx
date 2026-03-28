@@ -332,7 +332,6 @@ export function Photos() {
 
       setDownloadProgress('')
     } catch (err) {
-      console.error('Erreur download:', err)
       setDownloadProgress('Erreur lors du telechargement')
     } finally {
       setIsDownloading(false)
@@ -357,7 +356,7 @@ export function Photos() {
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-      } catch { /* skip */ }
+      } catch { alert('Erreur lors du téléchargement') }
     } else {
       // Mini ZIP pour plusieurs images
       const zip = new JSZip()
@@ -367,7 +366,7 @@ export function Photos() {
           if (!response.ok) continue
           const blob = await response.blob()
           zip.file(buildDownloadName(sub, i, images[i].image_url), blob)
-        } catch { /* skip */ }
+        } catch { alert('Erreur lors du téléchargement') }
       }
       const content = await zip.generateAsync({ type: 'blob' })
       const url = URL.createObjectURL(content)
@@ -395,7 +394,7 @@ export function Photos() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(blobUrl)
-    } catch { /* skip */ }
+    } catch { alert('Erreur lors du téléchargement') }
   }
 
   const closeLightbox = () => setLightbox(null)

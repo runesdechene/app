@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import './AddPlaceFlow.css'
 
 type Step = 'location' | 'form' | 'submitting' | 'success'
 
@@ -34,6 +35,7 @@ export function AddPlaceFlow() {
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [confirmedCoords, setConfirmedCoords] = useState<{ lng: number; lat: number } | null>(null)
+  const [charterChecks, setCharterChecks] = useState([false, false, false])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -289,10 +291,12 @@ export function AddPlaceFlow() {
     setError(null)
     setNewPlaceId(null)
     setConfirmedCoords(null)
+    setCharterChecks([false, false, false])
     setStep('location')
   }
 
-  const canSubmit = title.trim().length > 0 && photoFiles.length > 0 && selectedTagIds.length > 0
+  const allCharterChecked = charterChecks.every(Boolean)
+  const canSubmit = title.trim().length > 0 && photoFiles.length > 0 && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked
 
   // ===== STEP 1 : Location =====
   if (step === 'location') {
@@ -508,8 +512,8 @@ export function AddPlaceFlow() {
             placeholder="Ex: 12 rue du Chateau, 06000 Nice"
           />
 
-          {/* Description (optionnel) */}
-          <label className="add-place-label">Description <span className="add-place-optional">(optionnel)</span></label>
+          {/* Description */}
+          <label className="add-place-label">Description <span className="add-place-required">*</span></label>
           <textarea
             className="add-place-textarea"
             value={description}
@@ -517,6 +521,33 @@ export function AddPlaceFlow() {
             placeholder="Racontez l'histoire de ce lieu..."
             rows={3}
           />
+          {/* Charte du lieu */}
+          <div className="add-place-charter">
+            <div className="add-place-charter-header">
+              <span className="add-place-charter-icon">&#x1F3F0;</span>
+              <p className="add-place-charter-title">Charte de l'explorateur érudit</p>
+            </div>
+            <p className="add-place-charter-intro">
+              Runes de Chêne s'oppose à l'Oubli. Chaque lieu ajouté sur la Carte doit favoriser le réenchantement de notre époque. <b>L'objectif</b> est 
+              de créer la plus grande carte de lieux atypiques, anciens, naturels pour s'opposer à la froideur
+              du monde moderne.
+            </p>
+            <div className="add-place-charter-divider" />
+            {[
+              'Ce lieu a une valeur historique, naturelle, patrimoniale ou atypique.',
+              'Ma description raconte l\'histoire ou l\'intérêt de ce lieu, laissant un avis fiable pour vos compagnons de route',
+              'Mes photos montrent le lieu tel qu\'il est — pas de selfies, pas de filtres, pas de photos trouvées en ligne',
+            ].map((text, i) => (
+              <label key={i} className="add-place-charter-check">
+                <input
+                  type="checkbox"
+                  checked={charterChecks[i]}
+                  onChange={() => setCharterChecks(prev => prev.map((v, j) => j === i ? !v : v))}
+                />
+                <span>{text}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="add-place-form-footer">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import './AdScreen.css'
 
 interface AdData {
   screen: {
@@ -32,7 +33,7 @@ export function AdScreen({ onDone }: Props) {
       onDone()
       setDismissed(true)
     }
-  }, [userName])
+  }, [userName, onDone])
 
   useEffect(() => {
     if (dismissed) return

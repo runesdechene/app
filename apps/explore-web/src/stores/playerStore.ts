@@ -53,15 +53,30 @@ interface PlayerState {
   setConstructionNextPointIn: (seconds: number) => void
   setConstructionCycle: (seconds: number) => void
 
+  /** Vitalité + régénération */
+  vitalitePoints: number
+  maxVitalite: number
+  vitaliteCycle: number
+  vitaliteNextPointIn: number
+  setVitalitePoints: (pts: number) => void
+  setVitaliteNextPointIn: (seconds: number) => void
+  setVitaliteCycle: (seconds: number) => void
+
   /** Bonus de faction sur les max */
   bonusEnergy: number
   bonusConquest: number
   bonusConstruction: number
+  bonusVitalite: number
   setBonusEnergy: (v: number) => void
   setBonusConquest: (v: number) => void
   setBonusConstruction: (v: number) => void
+  setBonusVitalite: (v: number) => void
 
-  /** Notoriété personnelle */
+  /** Buff actif (compétence de fragment) */
+  activeBuff: string | null  // 'free_discover' | 'free_claim' | 'double_glory' | 'distance_ignore' | null
+  setActiveBuff: (buff: string | null) => void
+
+  /** Gloire personnelle */
   notorietyPoints: number
   setNotorietyPoints: (pts: number) => void
 
@@ -81,10 +96,6 @@ interface PlayerState {
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
   displayedGeneralTitleIds: number[]
   factionTitle2: { id: number; name: string; icon: string; unlocks: string[] } | null
-  setUnlockedGeneralTitles: (titles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>) => void
-  setDisplayedGeneralTitleIds: (ids: number[]) => void
-  setFactionTitle2: (t: { id: number; name: string; icon: string; unlocks: string[] } | null) => void
-
   /** Titre prioritaire (affiché sur la carte) */
   primaryTitle: string | null
   setPrimaryTitle: (title: string | null) => void
@@ -127,36 +138,53 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   userId: null,
   setUserId: (id) => set({ userId: id }),
 
-  energy: 5,
-  maxEnergy: 5,
+  energy: 3,
+  maxEnergy: 3,
   energyCycle: 7200,
   setEnergy: (energy) => set({ energy }),
   nextPointIn: 0,
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
   setEnergyCycle: (seconds) => set({ energyCycle: seconds }),
 
-  conquestPoints: 5,
-  maxConquest: 5,
+  conquestPoints: 3,
+  maxConquest: 3,
   conquestCycle: 14400,
   conquestNextPointIn: 0,
   setConquestPoints: (pts) => set({ conquestPoints: pts }),
   setConquestNextPointIn: (seconds) => set({ conquestNextPointIn: seconds }),
   setConquestCycle: (seconds) => set({ conquestCycle: seconds }),
 
-  constructionPoints: 5,
-  maxConstruction: 5,
+  constructionPoints: 3,
+  maxConstruction: 3,
   constructionCycle: 14400,
   constructionNextPointIn: 0,
   setConstructionPoints: (pts) => set({ constructionPoints: pts }),
   setConstructionNextPointIn: (seconds) => set({ constructionNextPointIn: seconds }),
   setConstructionCycle: (seconds) => set({ constructionCycle: seconds }),
 
+  vitalitePoints: 3,
+  maxVitalite: 3,
+  vitaliteCycle: 14400,
+  vitaliteNextPointIn: 0,
+  setVitalitePoints: (pts) => set({ vitalitePoints: pts }),
+  setVitaliteNextPointIn: (seconds) => set({ vitaliteNextPointIn: seconds }),
+  setVitaliteCycle: (seconds) => set({ vitaliteCycle: seconds }),
+
   bonusEnergy: 0,
   bonusConquest: 0,
   bonusConstruction: 0,
+  bonusVitalite: 0,
   setBonusEnergy: (v) => set({ bonusEnergy: v }),
   setBonusConquest: (v) => set({ bonusConquest: v }),
   setBonusConstruction: (v) => set({ bonusConstruction: v }),
+  setBonusVitalite: (v) => set({ bonusVitalite: v }),
+
+  activeBuff: localStorage.getItem('activeBuff') || null,
+  setActiveBuff: (buff) => {
+    if (buff) localStorage.setItem('activeBuff', buff)
+    else localStorage.removeItem('activeBuff')
+    set({ activeBuff: buff })
+  },
 
   notorietyPoints: 0,
   setNotorietyPoints: (pts) => set({ notorietyPoints: pts }),
@@ -173,10 +201,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   unlockedGeneralTitles: [],
   displayedGeneralTitleIds: [],
   factionTitle2: null,
-  setUnlockedGeneralTitles: (titles) => set({ unlockedGeneralTitles: titles }),
-  setDisplayedGeneralTitleIds: (ids) => set({ displayedGeneralTitleIds: ids }),
-  setFactionTitle2: (t) => set({ factionTitle2: t }),
-
   primaryTitle: null,
   setPrimaryTitle: (title) => set({ primaryTitle: title }),
 

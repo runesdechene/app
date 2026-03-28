@@ -22,6 +22,7 @@ export interface PlaceDetail {
     title: string
     color: string
     background: string
+    gauge: 'energy' | 'conquest' | 'construction' | 'vitalite'
   } | null
   tags: Array<{
     id: string
@@ -45,6 +46,7 @@ export interface PlaceDetail {
     factionPattern: string | null
     claimedBy: string
     claimedByName: string
+    claimedByAvatar: string | null
     claimedAt: string
     fortificationLevel: number
     zoneFortification: number
@@ -108,6 +110,12 @@ export function usePlace(placeId: string | null) {
 
       const placeData = placeRes.data as PlaceDetail
 
+      // Enrichir le primaryTag avec la gauge
+      if (placeData.primaryTag) {
+        const { data: gaugeData } = await supabase.rpc('get_place_gauge', { p_place_id: placeId })
+        placeData.primaryTag.gauge = (gaugeData as string ?? 'energy') as 'energy' | 'conquest' | 'construction' | 'vitalite'
+      }
+
       // Enrichir les tags avec leurs icônes
       if (tagsRes.data && placeData.tags) {
         const iconMap = new Map(tagsRes.data.map(t => [t.id, t.icon]))
@@ -115,6 +123,12 @@ export function usePlace(placeId: string | null) {
           ...tag,
           icon: iconMap.get(tag.id) ?? null,
         }))
+      }
+
+      // Enrichir le claim avec l'avatar du protecteur
+      if (placeData.claim?.claimedBy) {
+        const { data: avatarData } = await supabase.rpc('get_user_avatar', { p_user_id: placeData.claim.claimedBy })
+        placeData.claim.claimedByAvatar = (avatarData as string) ?? null
       }
 
       setPlace(placeData)
@@ -128,9 +142,7 @@ export function usePlace(placeId: string | null) {
           updated_at: new Date().toISOString(),
           user_id: userId,
           place_id: placeId,
-        }).then(({ error: viewErr }) => {
-          if (viewErr) console.error('places_viewed insert error:', viewErr)
-        })
+        }).then(() => {})
       }
     }
 

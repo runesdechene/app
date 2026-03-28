@@ -1,0 +1,117 @@
+/* ==========================================
+   PLAYER PROFILE — Avatar edit overlay
+   ========================================== */
+
+.player-modal-avatar-wrap.editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.player-modal-avatar-wrap.editable:hover .player-modal-avatar {
+  opacity: 0.7;
+}
+
+.player-modal-avatar-wrap.editable:hover .player-modal-avatar-fallback {
+  opacity: 0.7;
+}
+
+.player-modal-avatar-edit-label {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(44, 24, 16, 0.75);
+  color: #F5E6D3;
+  font-size: 11px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ==========================================
+   PWA INSTALL PROMPT
+   ========================================== */
+
+.install-prompt {
+  position: fixed;
+  bottom: calc(var(--safe-bottom, 0px) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(44, 24, 16, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  border: 1px solid rgba(193, 154, 107, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: calc(100vw - 32px);
+  width: 390px;
+  animation: toast-slide-in 0.3s ease-out;
+}
+
+.install-prompt-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.install-prompt-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.install-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.install-prompt-text strong {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: #F5E6D3;
+}
+
+.install-prompt-text span {
+  font-size: 12px;
+  color: rgba(245, 230, 211, 0.7);
+  line-height: 1.3;
+}
+
+.install-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.install-prompt-btn {
+  background: var(--color-sepia);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.install-prompt-dismiss {
+  background: none;
+  border: none;
+  color: rgba(245, 230, 211, 0.5);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+}

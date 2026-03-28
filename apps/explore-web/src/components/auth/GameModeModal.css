@@ -1,0 +1,89 @@
+/* ==========================================
+   GameModeModal — choix apres onboarding
+   ========================================== */
+
+.gamemode-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(20, 16, 12, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.gamemode-modal {
+  background: #2a2318;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  color: #d4c5a0;
+}
+.gamemode-title {
+  font-size: 20px;
+  margin: 0 0 6px;
+  color: #c9a84c;
+}
+.gamemode-subtitle {
+  font-size: 13px;
+  margin: 0 0 24px;
+  opacity: 0.7;
+}
+.gamemode-options {
+  display: flex;
+  gap: 16px;
+}
+.gamemode-option {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px 16px;
+  cursor: pointer;
+  color: #d4c5a0;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.gamemode-option:hover:not(:disabled) {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.08);
+  transform: translateY(-2px);
+}
+.gamemode-option.selected {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.15);
+}
+.gamemode-option:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.gamemode-option-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 12px;
+}
+.gamemode-option-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #c9a84c;
+}
+.gamemode-option-desc {
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.8;
+}
+
+/* Mobile : stack vertical */
+@media (max-width: 520px) {
+  .gamemode-options {
+    flex-direction: column;
+  }
+  .gamemode-modal {
+    padding: 24px 16px;
+  }
+}

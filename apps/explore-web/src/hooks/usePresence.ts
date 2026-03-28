@@ -30,42 +30,18 @@ export function usePresence() {
     if (!userId) return
 
     async function init() {
-      const { data } = await supabase
-        .from('users')
-        .select('first_name, faction_id')
-        .eq('id', userId!)
-        .single()
-
-      const name = data?.first_name || 'Quelqu\'un'
-
-      let factionColor: string | null = null
-      let factionPattern: string | null = null
-
-      if (data?.faction_id) {
-        const { data: faction } = await supabase
-          .from('factions')
-          .select('color, pattern')
-          .eq('id', data.faction_id)
-          .single()
-        if (faction) {
-          factionColor = faction.color
-          factionPattern = faction.pattern ?? null
-        }
-      }
-
       const addToast = useToastStore.getState().addToast
       const { setPlayer, removePlayer } = usePlayersStore.getState()
 
       function buildPayload(): PresencePayload {
         const state = usePlayerStore.getState()
         const pos = state.userPosition
-        const avatar = state.userAvatarUrl
         return {
           userId: userId!,
-          name,
-          factionColor,
-          factionPattern,
-          avatarUrl: avatar,
+          name: state.userName || 'Quelqu\'un',
+          factionColor: state.userFactionColor,
+          factionPattern: state.userFactionPattern,
+          avatarUrl: state.userAvatarUrl,
           primaryTitle: state.primaryTitle,
           lat: pos?.lat ?? null,
           lng: pos?.lng ?? null,

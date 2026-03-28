@@ -1,3 +1,5 @@
+import './InfoModal.css'
+
 interface InfoRow {
   label: string
   value: string

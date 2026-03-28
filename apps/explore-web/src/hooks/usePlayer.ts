@@ -143,10 +143,15 @@ export function usePlayer() {
           maxConstruction: number
           constructionNextPointIn: number
           constructionCycle: number
+          vitalitePoints: number
+          maxVitalite: number
+          vitaliteNextPointIn: number
+          vitaliteCycle: number
           notorietyPoints: number
           bonusEnergy: number
           bonusConquest: number
           bonusConstruction: number
+          bonusVitalite: number
         }
         setEnergy(ed.energy)
         setNextPointIn(ed.nextPointIn ?? 0)
@@ -165,6 +170,11 @@ export function usePlayer() {
           bonusEnergy: ed.bonusEnergy ?? 0,
           bonusConquest: ed.bonusConquest ?? 0,
           bonusConstruction: ed.bonusConstruction ?? 0,
+          vitalitePoints: ed.vitalitePoints ?? 0,
+          maxVitalite: ed.maxVitalite ?? 5,
+          vitaliteNextPointIn: ed.vitaliteNextPointIn ?? 0,
+          vitaliteCycle: ed.vitaliteCycle ?? 14400,
+          bonusVitalite: ed.bonusVitalite ?? 0,
         })
       }
       if (profileRes.data) {
@@ -249,20 +259,19 @@ export function usePlayer() {
           let contested = false
 
           if (e.type === 'claim') {
-            const faction = e.data?.factionTitle ?? 'une faction'
             type = 'claim'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
             // Notification spéciale si l'ancien contrôleur c'est nous
             const prevName = e.data?.previousClaimerName
             if (e.data?.previousClaimedBy === currentUserId) {
-              message = `${name} a brisé vos défenses et conquis ${place}`
+              message = `${name} a pris le flambeau sur ${place}, et veille à présent sur lui`
               contested = true
             } else if (prevName) {
-              message = `${name} a conquis ${place}, repoussant ${prevName}`
+              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
               contested = true
             } else {
-              message = `${name} a revendiqué ${place} pour ${faction}`
+              message = `${name} veille à présent sur ${place}`
             }
             highlights.push(place)
             if (prevName && e.data?.previousClaimedBy !== currentUserId) {
@@ -383,20 +392,19 @@ async function loadRecentActivity(currentUserId: string) {
     let contested = false
 
     if (e.type === 'claim') {
-      const faction = e.data?.factionTitle ?? 'une faction'
       type = 'claim'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
       // Notification spéciale si l'ancien contrôleur c'est nous
       const prevName = e.data?.previousClaimerName
       if (e.data?.previousClaimedBy === currentUserId) {
-        message = `${name} a brisé vos défenses et conquis ${place}`
+        message = `${name} a pris le flambeau sur ${place}, et veille à présent sur lui`
         contested = true
       } else if (prevName) {
-        message = `${name} a conquis ${place}, repoussant ${prevName}`
+        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
         contested = true
       } else {
-        message = `${name} a revendiqué ${place} pour ${faction}`
+        message = `${name} veille à présent sur ${place}`
       }
       highlights.push(name, place)
       if (prevName && e.data?.previousClaimedBy !== currentUserId) {
@@ -480,7 +488,7 @@ export async function discoverPlace(
   placeLat: number,
   placeLng: number,
 ): Promise<{ success: boolean; error?: string }> {
-  const { userId, userPosition, addDiscoveredId, setEnergy, setNextPointIn, setConquestPoints, setConquestNextPointIn, setConstructionPoints, setConstructionNextPointIn } = usePlayerStore.getState()
+  const { userId, userPosition, addDiscoveredId } = usePlayerStore.getState()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Déterminer la méthode (GPS ou remote) basé sur la distance
@@ -492,35 +500,37 @@ export async function discoverPlace(
     }
   }
 
+  const userPos = usePlayerStore.getState().userPosition
   const { data } = await supabase.rpc('discover_place', {
     p_user_id: userId,
     p_place_id: placeId,
     p_method: method,
+    p_user_lat: userPos?.lat ?? null,
+    p_user_lng: userPos?.lng ?? null,
+    p_free: usePlayerStore.getState().activeBuff === 'free_discover',
   })
 
   if (data?.error) {
     return { success: false, error: data.error }
   }
 
-  // Update optimiste
+  // Consommer le buff si actif
+  const buff = usePlayerStore.getState().activeBuff
+  if (buff === 'free_discover' || buff === 'discount_discover') {
+    usePlayerStore.getState().setActiveBuff(null)
+    localStorage.removeItem('activeBuffValue')
+  }
+
+  // Rafraîchir l'énergie depuis le serveur (plus fiable que le calcul local)
   addDiscoveredId(placeId)
-  if (data?.energy !== undefined) {
-    setEnergy(data.energy)
-  }
-  if (data?.nextPointIn !== undefined) {
-    setNextPointIn(data.nextPointIn)
-  }
-  if (data?.conquestPoints !== undefined) {
-    setConquestPoints(data.conquestPoints)
-    if (data?.conquestNextPointIn !== undefined) {
-      setConquestNextPointIn(data.conquestNextPointIn)
-    }
-  }
-  if (data?.constructionPoints !== undefined) {
-    setConstructionPoints(data.constructionPoints)
-    if (data?.constructionNextPointIn !== undefined) {
-      setConstructionNextPointIn(data.constructionNextPointIn)
-    }
+  const { data: refreshed } = await supabase.rpc('get_user_energy', { p_user_id: userId })
+  if (refreshed) {
+    usePlayerStore.setState({
+      energy: refreshed.energy,
+      maxEnergy: refreshed.maxEnergy,
+      nextPointIn: refreshed.nextPointIn,
+      energyCycle: refreshed.energyCycle,
+    })
   }
 
   // Toast avec récompenses

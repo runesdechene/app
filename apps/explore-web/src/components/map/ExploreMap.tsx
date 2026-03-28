@@ -245,10 +245,9 @@ export const ExploreMap = memo(function ExploreMap() {
 
   useEffect(() => {
     let resolved = false
-    const applyPosition = (coords: { lng: number; lat: number }, source: string) => {
+    const applyPosition = (coords: { lng: number; lat: number }, _source: string) => {
       if (resolved) return
       resolved = true
-      console.log(`[GEO] Position via ${source}:`, coords)
       setUserPosition(coords)
       geoResultRef.current = coords
       mapRef.current?.flyTo({ center: [coords.lng, coords.lat], zoom: 11, duration: 1500 })

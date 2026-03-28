@@ -91,28 +91,32 @@ export function Constructions() {
     setSaving(true)
     setSaveError(null)
 
-    const promises = types.map(t => {
-      const saved = savedTypes.find(s => s.level === t.level)
-      if (JSON.stringify(t) === JSON.stringify(saved)) return null
-      return supabase.from('construction_types').update({
-        name: t.name,
-        description: t.description,
-        cost: t.cost,
-        conquest_bonus: t.conquest_bonus,
-        tag_ids: t.tag_ids,
-        updated_at: new Date().toISOString(),
-      }).eq('level', t.level).then(r => r)
-    }).filter(Boolean)
+    try {
+      const promises = types.map(t => {
+        const saved = savedTypes.find(s => s.level === t.level)
+        if (JSON.stringify(t) === JSON.stringify(saved)) return null
+        return supabase.from('construction_types').update({
+          name: t.name,
+          description: t.description,
+          image_url: t.image_url,
+          cost: t.cost,
+          conquest_bonus: t.conquest_bonus,
+          tag_ids: t.tag_ids,
+          updated_at: new Date().toISOString(),
+        }).eq('level', t.level).then(r => r)
+      }).filter(Boolean)
 
-    const results = await Promise.all(promises)
-    const errors = results.filter(r => r?.error)
+      const results = await Promise.all(promises)
+      const errors = results.filter(r => r?.error)
 
-    if (errors.length > 0) {
-      setSaveError(`Erreur sur ${errors.length} niveau(x)`)
-    } else {
-      setSavedTypes(JSON.parse(JSON.stringify(types)))
+      if (errors.length > 0) {
+        setSaveError(`Erreur sur ${errors.length} niveau(x)`)
+      } else {
+        await fetchData()
+      }
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
   }
 
   function handleCancel() {
@@ -187,31 +191,12 @@ export function Constructions() {
     const { data: urlData } = supabase.storage.from('place-images').getPublicUrl(path)
     const imageUrl = urlData.publicUrl
 
-    const { error: updateError } = await supabase.from('construction_types')
-      .update({ image_url: imageUrl, updated_at: new Date().toISOString() })
-      .eq('level', level)
-
-    if (!updateError) {
-      const update = (prev: ConstructionType[]) => prev.map(t => t.level === level ? { ...t, image_url: imageUrl } : t)
-      setTypes(update)
-      setSavedTypes(update)
-    }
+    setTypes(prev => prev.map(t => t.level === level ? { ...t, image_url: imageUrl } : t))
     setUploading(null)
   }
 
-  async function removeImage(level: number) {
-    const ct = types.find(t => t.level === level)
-    if (!ct?.image_url) return
-    setUploading(level)
-    const { error } = await supabase.from('construction_types')
-      .update({ image_url: null, updated_at: new Date().toISOString() })
-      .eq('level', level)
-    if (!error) {
-      const update = (prev: ConstructionType[]) => prev.map(t => t.level === level ? { ...t, image_url: null } : t)
-      setTypes(update)
-      setSavedTypes(update)
-    }
-    setUploading(null)
+  function removeImage(level: number) {
+    setTypes(prev => prev.map(t => t.level === level ? { ...t, image_url: null } : t))
   }
 
   if (loading) return <div className="loading">Chargement...</div>

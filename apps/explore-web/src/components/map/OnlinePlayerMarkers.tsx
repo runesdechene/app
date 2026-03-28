@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
+import './OnlinePlayerMarkers.css'
 
 interface OnlinePlayer {
   userId: string

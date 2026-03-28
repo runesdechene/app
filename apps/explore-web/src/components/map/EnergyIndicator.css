@@ -1,0 +1,121 @@
+/* ==========================================
+   ENERGY INDICATOR (Fog of War)
+   ========================================== */
+
+.energy-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-sepia);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
+  min-width: 120px;
+}
+
+.energy-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.energy-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.energy-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.energy-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-parchment-dark);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 40px;
+}
+
+.energy-bar-fill {
+  height: 100%;
+  background: var(--color-sepia);
+  border-radius: 3px;
+  transition: width 1s linear;
+}
+
+.energy-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 20px;
+}
+
+.energy-rate {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-sepia);
+  white-space: nowrap;
+}
+
+.energy-indicator.regen-bonus {
+  border-color: rgba(60, 140, 60, 0.4);
+  box-shadow: 0 1px 4px rgba(60, 140, 60, 0.15);
+}
+
+.energy-indicator.regen-bonus .energy-rate {
+  color: #3c8c3c;
+}
+
+.energy-indicator.regen-malus {
+  border-color: rgba(180, 60, 60, 0.3);
+  box-shadow: 0 1px 4px rgba(180, 60, 60, 0.12);
+}
+
+.energy-indicator.regen-malus .energy-rate {
+  color: #b43c3c;
+}
+
+.max-bonus {
+  color: #3c8c3c;
+  font-weight: 800;
+}
+
+.max-malus {
+  color: #b43c3c;
+  font-weight: 800;
+}
+
+.energy-claimed {
+  font-size: 11px;
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+.energy-reset-btn {
+  margin-left: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.energy-reset-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.energy-reset-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  transform: none;
+}

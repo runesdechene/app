@@ -1,0 +1,119 @@
+/* ==========================================
+   FACTION SCOREBOARD (style AoE, bas gauche)
+   ========================================== */
+
+.faction-scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: auto;
+}
+
+
+.faction-scoreboard-row {
+  position: relative;
+  height: 34px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(245, 230, 211, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.faction-scoreboard-mine {
+  border: 2px solid var(--faction-color);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Barre de remplissage en fond */
+.faction-scoreboard-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--faction-color);
+  opacity: 0.25;
+  transition: width 0.6s ease;
+  border-radius: 3px;
+}
+
+/* Contenu texte par-dessus */
+.faction-scoreboard-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.faction-scoreboard-crown {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.faction-scoreboard-underdog {
+  font-size: 14px;
+  line-height: 1;
+  animation: underdog-pulse 2s ease-in-out infinite;
+}
+
+@keyframes underdog-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+.faction-scoreboard-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--faction-color);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faction-scoreboard-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.faction-scoreboard-name {
+  font-family: var(--font-accent);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.faction-scoreboard-places {
+  font-size: 11px;
+  color: rgba(74, 55, 40, 0.5);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.faction-scoreboard-places::after {
+  content: ' lieux';
+}
+
+.faction-scoreboard-pct {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--faction-color);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+.faction-scoreboard-rate {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faction-color);
+  opacity: 0.7;
+  white-space: nowrap;
+}
