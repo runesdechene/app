@@ -284,10 +284,6 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
             <span className="territory-panel-stat-label">Lieu{data.placesCount > 1 ? 'x' : ''}</span>
           </div>
           <div className="territory-panel-stat">
-            <span className="territory-panel-stat-value">+{data.hourlyRate % 1 === 0 ? data.hourlyRate : data.hourlyRate.toFixed(1)}/h</span>
-            <span className="territory-panel-stat-label">Gloire</span>
-          </div>
-          <div className="territory-panel-stat">
             <span className="territory-panel-stat-value">{data.totalFortification}</span>
             <span className="territory-panel-stat-label">Fortification</span>
           </div>

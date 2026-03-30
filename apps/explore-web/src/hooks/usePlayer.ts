@@ -242,6 +242,9 @@ export function usePlayer() {
               previousFactionId?: string
               previousFactionTitle?: string
               previousClaimerName?: string
+              previousActorId?: string
+              previousActorName?: string
+              gloryGain?: number
             }
           }
 
@@ -262,16 +265,17 @@ export function usePlayer() {
             type = 'claim'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
+            const glory = e.data?.gloryGain ? ` 🎖️ +${e.data.gloryGain}` : ''
             // Notification spéciale si l'ancien contrôleur c'est nous
-            const prevName = e.data?.previousClaimerName
-            if (e.data?.previousClaimedBy === currentUserId) {
-              message = `${name} a pris le flambeau sur ${place}, et veille à présent sur lui`
+            const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
+            if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
+              message = `${name} a pris le flambeau sur ${place}${glory}`
               contested = true
             } else if (prevName) {
-              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
+              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}${glory}`
               contested = true
             } else {
-              message = `${name} veille à présent sur ${place}`
+              message = `${name} veille à présent sur ${place}${glory}`
             }
             highlights.push(place)
             if (prevName && e.data?.previousClaimedBy !== currentUserId) {
@@ -370,6 +374,9 @@ async function loadRecentActivity(currentUserId: string) {
       previousFactionId?: string
       previousFactionTitle?: string
       previousClaimerName?: string
+      previousActorId?: string
+      previousActorName?: string
+      gloryGain?: number
     }
     created_at: string
   }>)
@@ -395,19 +402,19 @@ async function loadRecentActivity(currentUserId: string) {
       type = 'claim'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
-      // Notification spéciale si l'ancien contrôleur c'est nous
-      const prevName = e.data?.previousClaimerName
-      if (e.data?.previousClaimedBy === currentUserId) {
-        message = `${name} a pris le flambeau sur ${place}, et veille à présent sur lui`
+      const glory = e.data?.gloryGain ? ` 🎖️ +${e.data.gloryGain}` : ''
+      const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
+      if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
+        message = `${name} a pris le flambeau sur ${place}${glory}`
         contested = true
       } else if (prevName) {
-        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
+        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}${glory}`
         contested = true
       } else {
-        message = `${name} veille à présent sur ${place}`
+        message = `${name} veille à présent sur ${place}${glory}`
       }
       highlights.push(name, place)
-      if (prevName && e.data?.previousClaimedBy !== currentUserId) {
+      if (prevName && e.data?.previousClaimedBy !== currentUserId && e.data?.previousActorId !== currentUserId) {
         highlights.push(prevName)
       }
     } else if (e.type === 'fortify') {
@@ -508,6 +515,7 @@ export async function discoverPlace(
     p_user_lat: userPos?.lat ?? null,
     p_user_lng: userPos?.lng ?? null,
     p_free: usePlayerStore.getState().activeBuff === 'free_discover',
+    p_glory_mult: usePlayerStore.getState().activeBuff === 'double_glory' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '2') : 1,
   })
 
   if (data?.error) {
@@ -516,7 +524,7 @@ export async function discoverPlace(
 
   // Consommer le buff si actif
   const buff = usePlayerStore.getState().activeBuff
-  if (buff === 'free_discover' || buff === 'discount_discover') {
+  if (buff === 'free_discover' || buff === 'discount_discover' || buff === 'double_glory') {
     usePlayerStore.getState().setActiveBuff(null)
     localStorage.removeItem('activeBuffValue')
   }
@@ -533,18 +541,12 @@ export async function discoverPlace(
     })
   }
 
-  // Toast avec récompenses
-  const rewards = data?.rewards as { energy?: number; conquest?: number; construction?: number } | undefined
-  const parts: string[] = []
-  if (rewards?.conquest) parts.push(`+${rewards.conquest} ⚔️`)
-  if (rewards?.construction) parts.push(`+${rewards.construction} 🔨`)
-  if (rewards?.energy) parts.push(`+${rewards.energy} ⚡`)
+  // Toast avec Gloire gagnée
+  const gloryGain = data?.gloryGain ?? 2
 
   useToastStore.getState().addToast({
     type: 'discover',
-    message: parts.length > 0
-      ? `Nouveau lieu découvert ! ${parts.join(' ')}`
-      : 'Nouveau lieu découvert !',
+    message: `Nouveau lieu découvert ! 🎖️ +${gloryGain} Gloire`,
     timestamp: Date.now(),
   })
 

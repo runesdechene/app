@@ -12,14 +12,31 @@ function hexToRgb(hex: string): string {
   return `${r}, ${g}, ${b}`
 }
 
+interface CostPreview {
+  cost: number
+  energy: number
+  canAfford: boolean
+  gloryPreview: number
+  detail: {
+    baseCost: number
+    distanceKm: number
+    distanceMult: number
+    tagReduction: number
+    sameFaction: boolean
+    fortifCost: number
+    zoneCost: number
+    sizeCost: number
+  }
+}
+
 interface Props {
   placeId: string
   currentClaim: PlaceDetail['claim']
-  placeLocation: { latitude: number; longitude: number }
+  placeLocation?: { latitude: number; longitude: number }
   onClaimed?: () => void
 }
 
-export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }: Props) {
+export function ClaimButton({ placeId, currentClaim, onClaimed }: Props) {
   const setPlaceOverride = useMapStore(s => s.setPlaceOverride)
   const energyRaw = usePlayerStore(s => s.energy)
   const maxEnergy = usePlayerStore(s => s.maxEnergy)
@@ -34,61 +51,42 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
   const factionTitle = usePlayerStore(s => s.userFactionTitle)
   const factionColor = usePlayerStore(s => s.userFactionColor)
   const factionPattern = usePlayerStore(s => s.userFactionPattern)
+  const activeBuff = usePlayerStore(s => s.activeBuff)
   const [claiming, setClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
   const [claimError, setClaimError] = useState<string | null>(null)
-  const [zoneMult, setZoneMult] = useState(0.5)
-  const [sizeMult, setSizeMult] = useState(0)
-  const [tagReduction, setTagReduction] = useState(0)
-  const userPosition = usePlayerStore(s => s.userPosition)
-  const fortLevel = currentClaim?.fortificationLevel ?? 0
-  const zoneFort = currentClaim?.zoneFortification ?? 0
-  const zoneCount = currentClaim?.zoneNeighborCount ?? 0
-  const zoneBonus = Math.floor(zoneFort * zoneMult)
-  const sizeBonus = Math.floor(zoneCount * sizeMult)
+  const [preview, setPreview] = useState<CostPreview | null>(null)
+  const [previewLoading, setPreviewLoading] = useState(true)
 
-  // Distance et multiplicateur
-  let distanceKm = 999
-  if (userPosition) {
-    const R = 6371
-    const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
-    const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
-    const a = Math.sin(dLat/2)**2 + Math.cos(userPosition.lat*Math.PI/180)*Math.cos(placeLocation.latitude*Math.PI/180)*Math.sin(dLng/2)**2
-    distanceKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-  }
-  const activeBuff = usePlayerStore(s => s.activeBuff)
-  const claimFree = activeBuff === 'free_claim'
-  const claimDiscount = activeBuff === 'discount_claim' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '0') : 0
-  const distMult = distanceKm < 0.5 ? 0.5 : distanceKm < 10 ? 1 : distanceKm < 50 ? 2 : 3
-  let baseCostWithDist = claimFree ? 0 : 1 * distMult * (1 - tagReduction / 100)
-  if (claimDiscount > 0) baseCostWithDist = Math.max(0, baseCostWithDist - claimDiscount)
-  const claimCost = claimFree ? 0 : Math.max(0.5, Math.round((baseCostWithDist + fortLevel + zoneBonus + sizeBonus) * 2) / 2)
-
+  // Fetch le vrai coût depuis le serveur — SEULEMENT si on peut veiller (pas notre faction)
+  const isOwnFaction = currentClaim?.factionId === factionId
   useEffect(() => {
-    supabase.from('app_settings').select('key, value').in('key', ['zone_fort_multiplier', 'territory_size_defense_mult'])
-      .then(({ data }) => {
-        if (data) for (const r of data) {
-          if (r.key === 'zone_fort_multiplier') setZoneMult(parseFloat(r.value) || 0.5)
-          if (r.key === 'territory_size_defense_mult') setSizeMult(parseFloat(r.value) || 0)
-        }
-      })
-    // Fetch tag reduction for this place
-    if (userId) {
-      supabase.rpc('get_faction_tag_reduction', { p_user_id: userId, p_place_id: placeId })
-        .then(({ data }) => { if (data != null) setTagReduction(Number(data) || 0) })
+    if (!userId || isOwnFaction) {
+      setPreviewLoading(false)
+      return
     }
-  }, [userId, placeId])
+    setPreviewLoading(true)
+    const userPos = usePlayerStore.getState().userPosition
+    supabase.rpc('preview_action_cost', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_action: 'claim',
+      p_user_lat: userPos?.lat ?? null,
+      p_user_lng: userPos?.lng ?? null,
+    }).then(({ data, error }) => {
+      console.log('[COST PREVIEW claim]', { data, error })
+      if (data) setPreview(data as CostPreview)
+      setPreviewLoading(false)
+    })
+  }, [userId, placeId, isOwnFaction])
 
   if (!userId || !factionId || !factionTitle || !factionColor) return null
 
-  // Déjà revendiqué par la même faction
+  // Déjà veillé par la même faction
   if (currentClaim?.factionId === factionId && !claimed) {
     return (
       <div className="claim-section claim-owned">
-        <span
-          className="place-claim-dot"
-          style={{ backgroundColor: factionColor }}
-        />
+        <span className="place-claim-dot" style={{ backgroundColor: factionColor }} />
         Votre territoire
       </div>
     )
@@ -105,8 +103,16 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
     )
   }
 
-  // Use raw (server-side) energy for afford check, not interpolated display value
-  const canAffordClaim = energyRaw >= claimCost
+  const claimFree = activeBuff === 'free_claim'
+  const claimDiscount = activeBuff === 'discount_claim' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '0') : 0
+
+  // Coût final (serveur comme source de vérité)
+  let claimCost = preview?.cost ?? 1
+  if (claimFree) claimCost = 0
+  else if (claimDiscount > 0) claimCost = Math.max(0.5, Math.round((claimCost * (1 - claimDiscount / 100)) * 2) / 2)
+
+  const canAffordClaim = claimCost === 0 || energyRaw >= claimCost
+  const d = preview?.detail
 
   async function handleClaim() {
     if (!canAffordClaim) return
@@ -120,6 +126,7 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
       p_user_lat: userPos?.lat ?? null,
       p_user_lng: userPos?.lng ?? null,
       p_free: usePlayerStore.getState().activeBuff === 'free_claim',
+      p_glory_mult: usePlayerStore.getState().activeBuff === 'double_glory' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '2') : 1,
     })
 
     if (rpcError) {
@@ -130,7 +137,7 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
 
     if (data?.error) {
       const errorMessages: Record<string, string> = {
-        not_enough_energy: `Pas assez d'énergie (${Math.floor(data.energy ?? 0)}/${data.claimCost ?? '?'} ⚡)`,
+        not_enough_energy: `Pas assez d'énergie (${(data.energy ?? 0).toFixed(1)}/${(data.claimCost ?? 0).toFixed(1)} ⚡)`,
         no_faction: 'Vous devez rejoindre un héritage',
         already_claimed: 'Ce lieu est déjà sous votre protection',
       }
@@ -143,8 +150,8 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
     }
 
     if (data?.success) {
-      const claimBuff = usePlayerStore.getState().activeBuff
-      if (claimBuff === 'free_claim' || claimBuff === 'discount_claim') {
+      const buff = usePlayerStore.getState().activeBuff
+      if (buff === 'free_claim' || buff === 'discount_claim' || buff === 'double_glory') {
         usePlayerStore.getState().setActiveBuff(null)
         localStorage.removeItem('activeBuffValue')
       }
@@ -156,18 +163,14 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
         factionPattern: factionPattern ?? undefined,
         fortificationLevel: 0,
       })
-      if (data.energy !== undefined) {
-        usePlayerStore.getState().setEnergy(data.energy)
-      }
+      if (data.energy !== undefined) usePlayerStore.getState().setEnergy(data.energy)
       if (data.notorietyPoints !== undefined) usePlayerStore.getState().setNotorietyPoints(data.notorietyPoints)
 
       useToastStore.getState().addToast({
         type: 'claim',
-        message: `Vous veillez à présent sur ce lieu ! +5 Gloire`,
+        message: `Vous veillez à présent sur ce lieu ! 🎖️ +${data.gloryGain ?? 5} Gloire`,
         timestamp: Date.now(),
       })
-
-      // Refetch place data to update UI (fortify button, etc.)
       onClaimed?.()
     }
 
@@ -178,39 +181,40 @@ export function ClaimButton({ placeId, currentClaim, placeLocation, onClaimed }:
     <div className="claim-section">
       <button
         className="claim-btn"
-        style={{
-          borderColor: factionColor,
-          color: factionColor,
-        }}
+        style={{ borderColor: factionColor, color: factionColor }}
         onClick={handleClaim}
-        disabled={claiming || !canAffordClaim}
+        disabled={claiming || !canAffordClaim || previewLoading}
       >
         {claiming
           ? 'En cours...'
-          : canAffordClaim
-            ? `Veiller sur ce lieu (${claimCost} \u26A1${(zoneBonus + sizeBonus) > 0 ? ` dont ${zoneBonus + sizeBonus} zone` : ''})`
-            : `Pas assez d'énergie (${Math.floor(energy)}/${claimCost})`}
+          : previewLoading
+            ? 'Calcul du coût...'
+            : claimFree
+              ? 'Veiller sur ce lieu (gratuit ✨)'
+              : canAffordClaim
+                ? `Veiller sur ce lieu (${claimCost} \u26A1)`
+                : `Pas assez d'énergie (${energy.toFixed(1)}/${claimCost} ⚡)`}
       </button>
-      <div className="claim-cost-detail">
-        {distMult > 1 && (
-          <span>{'\uD83D\uDCCD'} Distance ({Math.round(distanceKm)} km) : x{distMult}</span>
-        )}
-        {distMult < 1 && (
-          <span>{'\uD83D\uDCCD'} Sur place : x{distMult}</span>
-        )}
-        {fortLevel > 0 && (
-          <span>{'\uD83D\uDEE1\uFE0F'} Fortification : +{fortLevel}</span>
-        )}
-        {zoneBonus > 0 && (
-          <span>{'\uD83D\uDEE1\uFE0F'} Voisins fortifies : +{zoneBonus}</span>
-        )}
-        {sizeBonus > 0 && (
-          <span>{'\uD83C\uDFF0'} Taille du territoire : +{sizeBonus}</span>
-        )}
-        {tagReduction > 0 && (
-          <span style={{ color: '#2a7a30' }}>{'\uD83C\uDF96\uFE0F'} Bonus héritage : -{tagReduction}%</span>
-        )}
-      </div>
+      {d && !claimFree && (
+        <div className="claim-cost-detail">
+          <span>{'\uD83D\uDCCD'}({d.distanceKm} km) : {d.distanceMult === 1 ? 'x1' : d.distanceMult < 1 ? `x${d.distanceMult} (sur place)` : `x${d.distanceMult}`}</span>
+          {d.fortifCost > 0 && (
+            <span>{'\uD83D\uDEE1\uFE0F'} Fortification : +{d.fortifCost}</span>
+          )}
+          {d.zoneCost > 0 && (
+            <span>{'\uD83D\uDEE1\uFE0F'} Voisins fortifiés : +{d.zoneCost}</span>
+          )}
+          {d.sizeCost > 0 && (
+            <span>{'\uD83C\uDFF0'} Territoire : +{d.sizeCost}</span>
+          )}
+          {d.tagReduction > 0 && (
+            <span style={{ color: '#2a7a30' }}>{'\uD83C\uDF96\uFE0F'} Héritage: -{d.tagReduction}%</span>
+          )}
+          {preview?.gloryPreview && (
+            <span style={{ color: '#b8860b' }}>{'\uD83C\uDF96\uFE0F'} +{preview.gloryPreview}</span>
+          )}
+        </div>
+      )}
       {claimError && (
         <p className="claim-error">{claimError}</p>
       )}

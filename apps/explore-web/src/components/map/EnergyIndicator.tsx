@@ -20,9 +20,9 @@ export function EnergyIndicator() {
     : Math.min(energy + fractionOfTick, maxEnergy)
 
   function formatEnergy(n: number): string {
-    if (n >= maxEnergy) return String(maxEnergy)
+    if (n >= maxEnergy) return maxEnergy.toFixed(1)
     const rounded = Math.floor(n * 10) / 10
-    return rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1)
+    return rounded.toFixed(1)
   }
 
   const fillPercent = (fractionalEnergy / maxEnergy) * 100

@@ -549,7 +549,7 @@ export function Fragments() {
                 <option value="free_claim">Protection gratuite</option>
                 <option value="discount_discover">Réduction découverte (en ⚡)</option>
                 <option value="discount_claim">Réduction protection (en ⚡)</option>
-                <option value="double_glory">Double Gloire</option>
+                <option value="double_glory">Gloire multipliée (xN)</option>
                 <option value="distance_ignore">Ignorer la distance</option>
               </select>
               {frag.ability_type && (
@@ -561,9 +561,16 @@ export function Fragments() {
                   </div>
                   {(frag.ability_type === 'discount_discover' || frag.ability_type === 'discount_claim') && (
                     <div>
-                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Réduction (⚡)</label>
-                      <input type="number" min={0.5} max={10} step={0.5} value={frag.ability_value ?? 0}
-                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 0)} className="tag-reward-input" />
+                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Réduction (%)</label>
+                      <input type="number" min={5} max={100} step={5} value={frag.ability_value ?? 50}
+                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 50)} className="tag-reward-input" />
+                    </div>
+                  )}
+                  {frag.ability_type === 'double_glory' && (
+                    <div>
+                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Multiplicateur (x)</label>
+                      <input type="number" min={1.5} max={10} step={0.5} value={frag.ability_value ?? 2}
+                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 2)} className="tag-reward-input" />
                     </div>
                   )}
                 </div>

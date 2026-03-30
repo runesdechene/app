@@ -2,6 +2,11 @@ import { useState } from 'react'
 import changelogRaw from '../../../CHANGELOG.md?raw'
 import './VersionBadge.css'
 
+function renderMarkdown(text: string) {
+  const html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  return <span dangerouslySetInnerHTML={{ __html: html }} />
+}
+
 interface VersionBlock {
   version: string
   title: string
@@ -63,7 +68,7 @@ export function VersionBadge() {
             {current.title && <h3 className="version-modal-title">{current.title}</h3>}
             <ul className="version-modal-list">
               {current.lines.map((line, i) => (
-                <li key={i}>{line}</li>
+                <li key={i}>{renderMarkdown(line)}</li>
               ))}
             </ul>
 
@@ -74,7 +79,7 @@ export function VersionBadge() {
                     <summary>{v.version}{v.title ? ` — ${v.title}` : ''}</summary>
                     <ul>
                       {v.lines.map((line, j) => (
-                        <li key={j}>{line}</li>
+                        <li key={j}>{renderMarkdown(line)}</li>
                       ))}
                     </ul>
                   </details>

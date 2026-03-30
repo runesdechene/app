@@ -9,9 +9,6 @@ interface Tag {
   background: string
   icon: string | null
   order: number
-  reward_energy: number
-  reward_conquest: number
-  reward_construction: number
   gauge: string
   base_cost: number
 }
@@ -41,7 +38,7 @@ export function TagsManager() {
     try {
       const { data, error } = await supabase
         .from('tags')
-        .select('id, title, color, background, icon, order, reward_energy, reward_conquest, reward_construction, gauge, base_cost')
+        .select('id, title, color, background, icon, order, gauge, base_cost')
         .order('order')
 
       if (!error && data) {
@@ -86,9 +83,6 @@ export function TagsManager() {
           icon: t.icon,
           color: t.color,
           background: t.background,
-          reward_energy: t.reward_energy,
-          reward_conquest: t.reward_conquest,
-          reward_construction: t.reward_construction,
           gauge: t.gauge,
           base_cost: t.base_cost,
           updated_at: new Date().toISOString(),
@@ -134,10 +128,13 @@ export function TagsManager() {
 
     const { data, error } = await supabase.from('tags').insert({
       id, title, color: '#C19A6B', background: '#F5E6D3',
-      order: maxOrder + 1, reward_energy: 0, reward_conquest: 0, reward_construction: 0, gauge: 'energy', base_cost: 1,
+      order: maxOrder + 1, gauge: 'energy', base_cost: 1,
     }).select().single()
 
-    if (!error && data) {
+    if (error) {
+      console.error('[TAG CREATE ERROR]', error)
+      alert(`Erreur création tag : ${error.message}`)
+    } else if (data) {
       setTags(prev => [...prev, data as Tag])
       setSavedTags(prev => [...prev, data as Tag])
       setNewId('')
@@ -289,27 +286,6 @@ export function TagsManager() {
                 className="tag-reward-input" />
             </div>
 
-            {/* Récompenses découverte */}
-            <div className="tag-card-rewards-section">
-              <span className="tag-rewards-title">Recompenses</span>
-              <div className="tag-rewards-row">
-                <label className="tag-reward-field">
-                  <span className="tag-reward-icon">{'\u26A1'}</span>
-                  <input type="number" min={0} step={1} value={tag.reward_energy}
-                    onChange={e => updateField(tag.id, 'reward_energy', Number(e.target.value))} className="tag-reward-input" />
-                </label>
-                <label className="tag-reward-field">
-                  <span className="tag-reward-icon">{'\u2694'}</span>
-                  <input type="number" min={0} step={1} value={tag.reward_conquest}
-                    onChange={e => updateField(tag.id, 'reward_conquest', Number(e.target.value))} className="tag-reward-input" />
-                </label>
-                <label className="tag-reward-field">
-                  <span className="tag-reward-icon">{'\u2692'}</span>
-                  <input type="number" min={0} step={1} value={tag.reward_construction}
-                    onChange={e => updateField(tag.id, 'reward_construction', Number(e.target.value))} className="tag-reward-input" />
-                </label>
-              </div>
-            </div>
           </div>
         ))}
       </div>

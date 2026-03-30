@@ -171,7 +171,12 @@ export function Users() {
   const now = Date.now()
   const [showExport, setShowExport] = useState(false)
 
-  function exportEmails(filter: 'all' | 'active' | 'inactive' | 'pending' | 'validated') {
+  const cutoffMs = Date.now() - SEVEN_DAYS_MS
+  const newUsers = users.filter(u => !u.isPending && new Date(u.created_at).getTime() > cutoffMs)
+  const reactivatedUsers = users.filter(u => !u.isPending && new Date(u.created_at).getTime() <= cutoffMs && u.last_login_at && new Date(u.last_login_at).getTime() > cutoffMs)
+  const dormantUsers = users.filter(u => !u.isPending && new Date(u.created_at).getTime() <= cutoffMs && (!u.last_login_at || new Date(u.last_login_at).getTime() <= cutoffMs))
+
+  function exportEmails(filter: 'all' | 'active' | 'inactive' | 'pending' | 'validated' | 'new' | 'reactivated' | 'dormant') {
     let filtered: HubUser[]
     let label: string
     switch (filter) {
@@ -190,6 +195,18 @@ export function Users() {
       case 'validated':
         filtered = users.filter(u => !u.isPending)
         label = 'valides'
+        break
+      case 'new':
+        filtered = newUsers
+        label = 'nouveaux (< 7j)'
+        break
+      case 'reactivated':
+        filtered = reactivatedUsers
+        label = 'reactives (login < 7j)'
+        break
+      case 'dormant':
+        filtered = dormantUsers
+        label = 'anciens non reactives'
         break
       default:
         filtered = users
@@ -213,6 +230,10 @@ export function Users() {
             </button>
             {showExport && (
               <div className="users-export-dropdown">
+                <button onClick={() => exportEmails('new')}>Nouveaux &lt; 7j ({newUsers.length})</button>
+                <button onClick={() => exportEmails('reactivated')}>Reactives &lt; 7j ({reactivatedUsers.length})</button>
+                <button onClick={() => exportEmails('dormant')}>Anciens non reactives ({dormantUsers.length})</button>
+                <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid rgba(193,154,107,0.3)' }} />
                 <button onClick={() => exportEmails('validated')}>Comptes valides ({users.filter(u => !u.isPending).length})</button>
                 <button onClick={() => exportEmails('active')}>Comptes actifs ({users.filter(u => !u.isPending && u.is_active).length})</button>
                 <button onClick={() => exportEmails('inactive')}>Comptes inactifs ({users.filter(u => !u.isPending && !u.is_active).length})</button>

@@ -355,11 +355,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </div>
                   <div className="player-modal-count">
                     <span className="player-modal-count-value">{profile.claimedPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">tenus</span>
-                  </div>
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.claimedCount ?? 0}</span>
-                    <span className="player-modal-count-label">protections menées</span>
+                    <span className="player-modal-count-label">Veillés</span> 
                   </div>
                 </div>
 
@@ -551,7 +547,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   className={`player-modal-tab${placesTab === 'claimed' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('claimed'); setVisibleCount(12) }}
                 >
-                  Tenus  <span className="player-modal-tabs-number">{profile.claimedPlaces?.length ?? 0}</span>
+                  Veillés  <span className="player-modal-tabs-number">{profile.claimedPlaces?.length ?? 0}</span>
                 </button>
               </div>
 

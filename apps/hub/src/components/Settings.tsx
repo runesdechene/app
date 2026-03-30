@@ -44,6 +44,15 @@ export function Settings() {
   })
   const [savingRegen, setSavingRegen] = useState(false)
 
+  // Glory rates
+  const [gloryRates, setGloryRates] = useState({
+    glory_discover: 2,
+    glory_claim: 5,
+    glory_fortify: 5,
+    glory_cost_bonus_pct: 10,
+  })
+  const [savingGlory, setSavingGlory] = useState(false)
+
   const [distSettings, setDistSettings] = useState({
     distance_gps_km: 0.5,
     distance_close_km: 10,
@@ -118,6 +127,22 @@ export function Settings() {
           }
         }
         setRegenCycles(cycles)
+      }
+
+      // Charger les taux de Gloire
+      const { data: gloryData } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['glory_discover', 'glory_claim', 'glory_fortify', 'glory_cost_bonus_pct'])
+
+      if (gloryData) {
+        const g = { ...gloryRates }
+        for (const row of gloryData as { key: string; value: string }[]) {
+          if (row.key in g) {
+            (g as Record<string, number>)[row.key] = Number(row.value) || (g as Record<string, number>)[row.key]
+          }
+        }
+        setGloryRates(g)
       }
 
       // Charger les settings de distance
@@ -264,6 +289,18 @@ export function Settings() {
     setSavingRegen(false)
   }
 
+  async function saveGloryRates() {
+    setSavingGlory(true)
+    const keys = Object.keys(gloryRates) as (keyof typeof gloryRates)[]
+    for (const key of keys) {
+      await supabase.from('app_settings').upsert(
+        { key, value: String(gloryRates[key]) },
+        { onConflict: 'key' }
+      )
+    }
+    setSavingGlory(false)
+  }
+
   async function saveDistSettings() {
     setSavingDist(true)
     const keys = Object.keys(distSettings) as (keyof typeof distSettings)[]
@@ -312,6 +349,55 @@ export function Settings() {
             disabled={savingRegen}
           >
             {savingRegen ? '...' : 'Sauvegarder'}
+          </button>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Taux de Gloire</h3>
+        <p className="divers-description">
+          Points de Gloire gagnes par action. Les Fragments avec "Gloire multipliee" appliquent un multiplicateur sur ces valeurs.
+        </p>
+
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Decouverte</span>
+            <input
+              type="number" min="0" step="1"
+              value={gloryRates.glory_discover}
+              onChange={e => setGloryRates(prev => ({ ...prev, glory_discover: parseInt(e.target.value) || 0 }))}
+              className="settings-input"
+            />
+          </label>
+          <label className="settings-global-field">
+            <span>Protection</span>
+            <input
+              type="number" min="0" step="1"
+              value={gloryRates.glory_claim}
+              onChange={e => setGloryRates(prev => ({ ...prev, glory_claim: parseInt(e.target.value) || 0 }))}
+              className="settings-input"
+            />
+          </label>
+          <label className="settings-global-field">
+            <span>Fortification</span>
+            <input
+              type="number" min="0" step="1"
+              value={gloryRates.glory_fortify}
+              onChange={e => setGloryRates(prev => ({ ...prev, glory_fortify: parseInt(e.target.value) || 0 }))}
+              className="settings-input"
+            />
+          </label>
+          <label className="settings-global-field">
+            <span>Bonus cout (%)</span>
+            <input
+              type="number" min="0" step="5"
+              value={gloryRates.glory_cost_bonus_pct}
+              onChange={e => setGloryRates(prev => ({ ...prev, glory_cost_bonus_pct: parseInt(e.target.value) || 0 }))}
+              className="settings-input"
+            />
+          </label>
+          <button className="btn-primary" onClick={saveGloryRates} disabled={savingGlory}>
+            {savingGlory ? '...' : 'Sauvegarder'}
           </button>
         </div>
       </div>

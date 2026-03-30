@@ -21,7 +21,7 @@ const ABILITY_LABELS: Record<string, string> = {
   free_claim: 'Protection gratuite',
   discount_discover: 'Réduction découverte',
   discount_claim: 'Réduction protection',
-  double_glory: 'Double Gloire',
+  double_glory: 'Gloire multipliée',
   distance_ignore: 'Ignorer la distance',
 }
 
@@ -87,7 +87,7 @@ export function AbilityBar() {
     free_claim: '🛡️ Protection gratuite prête !',
     discount_discover: `🔍 Prochaine découverte -${buffValue} ⚡`,
     discount_claim: `🛡️ Prochaine protection -${buffValue} ⚡`,
-    double_glory: '🏅 Double Gloire activée !',
+    double_glory: `🏅 Gloire x${buffValue || 2} sur la prochaine action !`,
     distance_ignore: '📍 Distance ignorée !',
   }
 

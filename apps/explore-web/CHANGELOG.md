@@ -1,3 +1,32 @@
+# ALPHA V0.4.5
+## Gloire dynamique & Compétences
+- **La Gloire récompense le courage.** Plus une action coûte d'énergie, plus elle rapporte de Gloire. Prendre un lieu lointain et fortifié rapporte bien plus qu'un lieu facile.
+- **Projection de Gloire.** Avant de veiller sur un lieu, vous voyez combien de Gloire vous allez gagner.
+- **Profil simplifié.** "Protections menées" retiré (donnée peu fiable). Terminologie harmonisée : "Veillés" partout.
+
+# ALPHA V0.4.4
+## Calcul de coût unifié & Performance
+- **Un seul calcul de coût.** Le serveur est maintenant l'unique source de vérité — le coût affiché correspond toujours exactement à ce qui est déduit.
+- **Performance.** Les lieux dans les grands territoires s'ouvrent instantanément (suppression du calcul de blob O(n³)).
+- **Énergie décimale.** L'indicateur affiche toujours la virgule (4.0/9.0 au lieu de 4/9).
+- **RLS Tags.** Les admins peuvent créer/modifier/supprimer des tags depuis le Hub.
+- **Récompenses par tag retirées** du Hub (jamais utilisées, anciennes jauges).
+
+# ALPHA V0.4.3.1
+## Fix des lieux qui chargeaient longtemps avant de s'ouvrir
+
+# ALPHA V0.4.3
+## Fix des énergies.
+
+
+# ALPHA V0.4.2
+## Renforcement de l'ajout de lieu
+- La Charte des Explorateurs recentre le thème de l'application
+- La description devient obligatoire
+- Un embryon de modération est mis en place pour supprimer les lieux hors-sujets
+- Les défenses lointaines des voisins sont baissées, pour égaliser le nouveau système d'énergie.
+
+
 # ALPHA V0.4.1
 ## L'Érudition Conquérante — fix énergie lointaines
 Fix d'affichage. La 0.4 reste la grosse nouveauté (lire en dessous si besoin)
