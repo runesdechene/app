@@ -8,11 +8,11 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { usePlaces } from '../../hooks/usePlaces'
 import type { PlaceProperties } from '../../hooks/usePlaces'
 import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle } from '../../lib/map-style'
-import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon } from '../../lib/map-icons'
+import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } from '../../lib/map-icons'
 import {
-  buildTerritoryFillLayer, buildTerritoryBorderLayer, UNKNOWN_ICON_ID,
+  buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, territoryRateLayer, territoryHoverLabelLayer,
+  fortBadgeLayer, territoryEmblemLayer, territoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -408,13 +408,15 @@ export const ExploreMap = memo(function ExploreMap() {
     }
   }, [rawGeojson])
 
-  // Charger les bannières faction + boucliers fort dans MapLibre
+  // Charger les bannières faction + tuiles pattern dans MapLibre
   const loadedPatternsRef = useRef(new Set<string>())
+  const loadedTilesRef = useRef(new Set<string>())
   const loadedShieldsRef = useRef(new Set<number>())
   useEffect(() => {
     const map = mapRef.current?.getMap()
-    if (!map || !territoryLabelsGeojson) return
+    if (!map || !territoryLabelsGeojson || !territories) return
 
+    // Charger les bannières
     for (const f of territoryLabelsGeojson.features) {
       const { pattern, tagColor } = f.properties
       if (!pattern || loadedPatternsRef.current.has(pattern)) continue
@@ -423,7 +425,34 @@ export const ExploreMap = memo(function ExploreMap() {
         loadedPatternsRef.current.delete(pattern)
       })
     }
-  }, [territoryLabelsGeojson])
+
+    // Charger les tuiles pattern par faction (pour fill-pattern)
+    // Extraire les factions uniques depuis les territories
+    const factionMap = new Map<string, { pattern: string; color: string }>()
+    for (const f of territories.features) {
+      const factionId = f.properties?.faction as string
+      const patternUrl = f.properties?.pattern as string
+      const tagColor = f.properties?.tagColor as string
+      if (factionId && patternUrl && !factionMap.has(factionId)) {
+        factionMap.set(factionId, { pattern: patternUrl, color: tagColor })
+      }
+    }
+
+    for (const [factionId, { pattern, color }] of factionMap) {
+      if (loadedTilesRef.current.has(factionId)) continue
+      loadedTilesRef.current.add(factionId)
+      loadFactionTile(map, factionId, pattern, color).then(() => {
+        // Ajouter le layer de pattern une fois la tuile chargée
+        const layerId = `territories-pattern-${factionId}`
+        if (!map.getLayer(layerId) && map.getSource('territories')) {
+          const layer = buildTerritoryPatternLayer(factionId)
+          map.addLayer(layer as any, 'territories-fill')
+        }
+      }).catch(() => {
+        loadedTilesRef.current.delete(factionId)
+      })
+    }
+  }, [territoryLabelsGeojson, territories])
 
   // Charger les boucliers de fortification (niveaux 1-6)
   useEffect(() => {
@@ -697,7 +726,6 @@ export const ExploreMap = memo(function ExploreMap() {
       {showFactions && territoryLabelsGeojson && (
         <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
           <Layer {...territoryEmblemLayer} />
-          <Layer {...territoryRateLayer} />
         </Source>
       )}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}

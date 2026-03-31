@@ -209,6 +209,45 @@ export async function loadBannerIcon(
   map.addImage(bannerKey, imageData, { sdf: false })
 }
 
+/** Charge un pattern SVG faction en tuile 128x128 pour fill-pattern MapLibre */
+export async function loadFactionTile(
+  map: maplibregl.Map,
+  factionId: string,
+  patternUrl: string,
+  color: string,
+): Promise<void> {
+  const key = `tile::${factionId}`
+  if (map.hasImage(key)) return
+
+  const MOTIF_SIZE = 128
+  const GAP = 50
+  const TILE_SIZE = MOTIF_SIZE + GAP
+
+  let svgText = svgTextCache.get(patternUrl)
+  if (!svgText) {
+    const resp = await fetch(patternUrl)
+    svgText = await resp.text()
+    svgTextCache.set(patternUrl, svgText)
+  }
+
+  // Coloriser avec la vraie couleur de la faction
+  const colorized = colorizeSvg(svgText, color)
+  const img = await svgToImage(colorized)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = TILE_SIZE
+  canvas.height = TILE_SIZE
+  const ctx = canvas.getContext('2d')!
+  // Fond transparent (le gap)
+  ctx.clearRect(0, 0, TILE_SIZE, TILE_SIZE)
+  // Dessiner le motif centré (le gap est autour)
+  ctx.globalAlpha = 1
+  ctx.drawImage(img, 0, 0, MOTIF_SIZE, MOTIF_SIZE)
+
+  const imageData = ctx.getImageData(0, 0, TILE_SIZE, TILE_SIZE)
+  map.addImage(key, imageData, { sdf: false })
+}
+
 /** Charge un badge bouclier de fortification dans la map MapLibre */
 export function loadShieldIcon(
   map: maplibregl.Map,

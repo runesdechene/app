@@ -29,8 +29,8 @@ interface Faction {
 
 const STAT_OPTIONS = [
   { value: 'discoveries', label: 'Decouvertes' },
-  { value: 'claims', label: 'Claims' },
-  { value: 'notoriety', label: 'Notoriete' },
+  { value: 'claims', label: 'Lieux veillés' },
+  { value: 'notoriety', label: 'Gloire' },
   { value: 'likes', label: 'Likes' },
   { value: 'fortifications', label: 'Fortifications' },
 ]

@@ -102,6 +102,9 @@ export function FortifyButton({ placeId, currentClaim, constructionTypes }: Prop
     setFortifying(true)
     setError(null)
 
+    // Forcer la regen côté serveur avant l'action
+    await supabase.rpc('get_user_energy', { p_user_id: userId })
+
     const userPos = usePlayerStore.getState().userPosition
     const { data } = await supabase.rpc('fortify_place', {
       p_user_id: userId,

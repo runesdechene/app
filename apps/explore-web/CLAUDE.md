@@ -67,7 +67,7 @@ Pense à relire :
 - **Pas de console.log en prod** — nettoyés régulièrement
 - **Hub SaveBar** — toutes les pages du Hub utilisent le pattern SaveBar (try/finally, refetch serveur après save)
 - **Presence** — les données du marker sont lues depuis le store playerStore à chaque tick (10s)
-- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/` (002→165)
+- **Migrations SQL** — fichiers numérotés dans `supabase/migrations/` (002→182)
 - **RPCs** — logique métier côté serveur via `SECURITY DEFINER` functions
 
 ## Vocabulaire du jeu (V0.4)
@@ -332,33 +332,144 @@ L'héritage le plus faible reçoit un bonus de régénération. Configurable via
 
 ---
 
-## Base de données — État V0.4 (post-migration 165)
+## Base de données — Schéma réel (post-migration 182)
 
-### Tables principales
+> Source : `information_schema.columns` du 29 mars 2026. C'est la VÉRITÉ — toujours s'y référer avant de modifier une RPC.
 
-| Table | Colonnes clés | Rôle |
-|-------|---------------|------|
-| `users` | id, email, avatar_url, faction_id, energy_points/max_energy/energy_reset_at, vitalite_points (unused), notoriety_points (=Gloire), game_mode, is_admin, bio, instagram, displayed_title_ids_v3 | Joueurs |
-| `places` | id, name, description, lat/lng, images[], author_id, faction_id, claimed_by, claimed_at, claimed_avatar_url, fortification_level, score | Lieux (2400+) |
-| `factions` | id, title, color, pattern, icon, description, image_url, bonus_energy, bonus_regen_energy, bonus_vitalite, bonus_regen_vitalite | Héritages |
-| `tags` | id, name, color, background, icon, base_cost, gauge (legacy) | Tags de lieux |
-| `place_tags` | place_id, tag_id, is_primary | Liaison lieu↔tag |
-| `faction_tag_bonuses` | faction_id, tag_id, cost_reduction | Réductions de coût par héritage×tag |
-| `title_fragments` | id, name, description, icon, image_url, icon_url, link_url, visible, bonus_type, bonus_value, ability_type, ability_cooldown_hours, ability_value | Fragments boutique |
-| `fragment_words` | id, fragment_id, word | Mots de titre par fragment |
-| `user_fragments` | user_id, fragment_id | Fragments possédés |
-| `fragment_ability_uses` | user_id, fragment_id, used_at | Tracking cooldown compétences |
-| `titles` | id, name, type, icon, icon_url, image_url, description, condition, order, faction_id | Titres |
-| `places_discovered` | user_id, place_id | Fog of war |
-| `place_claims` | id, place_id, user_id, faction_id, claimed_at | Historique protections |
-| `activity_log` | id, type, actor_id, place_id, faction_id, data, created_at | Feed temps réel |
-| `chat_messages` | id, user_id, user_name, avatar_url, faction_id, channel, content, created_at | Chat (general/faction/bugs) |
-| `territory_name_proposals` | id, anchor_place_id, proposed_by, name | Propositions noms |
-| `territory_name_votes` | id, proposal_id, voter_id, value | Votes |
-| `territory_tiers` | id, minPlaces, radiusKm, label | Paliers taille territoires |
-| `construction_types` | id, level, name, cost, defense_bonus, description | Fortifications |
-| `app_settings` | key, value | Config (underdog, distance_thresholds, regen_cycles, etc.) |
-| `ad_screens` / `ad_tips` | ... | Loading screen |
+### users
+```
+id VARCHAR PK, created_at, updated_at, email_address VARCHAR, first_name VARCHAR,
+role VARCHAR, display_name TEXT, bio TEXT, biography VARCHAR (legacy), avatar_url TEXT,
+instagram TEXT, is_active BOOLEAN, last_login_at TIMESTAMPTZ,
+faction_id VARCHAR FK→factions, game_mode VARCHAR DEFAULT 'exploration',
+energy_points NUMERIC DEFAULT 5, max_energy NUMERIC DEFAULT 3, energy_reset_at TIMESTAMPTZ,
+conquest_points NUMERIC (legacy), max_conquest NUMERIC (legacy), conquest_reset_at (legacy),
+construction_points NUMERIC (legacy), max_construction NUMERIC (legacy), construction_reset_at (legacy),
+vitalite_points NUMERIC (legacy), max_vitalite NUMERIC (legacy), vitalite_reset_at (legacy),
+notoriety_points INT DEFAULT 0 (= Gloire),
+displayed_general_title_ids INT[] (legacy v2), displayed_title_ids_v3 INT[]
+```
+⚠️ La colonne s'appelle `first_name` PAS `name`. `bio` ET `biography` existent (legacy). `text` n'existe PAS sur users.
+
+### places
+```
+id VARCHAR PK, created_at, updated_at, author_id VARCHAR FK→users,
+place_type_id VARCHAR FK→place_types, title VARCHAR, text TEXT (= description du lieu),
+address VARCHAR, latitude REAL, longitude REAL, images JSONB,
+accessibility VARCHAR, sensible BOOLEAN, begin_at TIMESTAMPTZ, end_at TIMESTAMPTZ,
+faction_id VARCHAR FK→factions, claimed_by VARCHAR FK→users, claimed_at TIMESTAMPTZ,
+claimed_avatar_url TEXT, fortification_level INT DEFAULT 0
+```
+⚠️ La description s'appelle `text` PAS `description`. `images` est JSONB pas un array. Pas de colonne `score` (calculé dynamiquement).
+
+### factions
+```
+id VARCHAR PK, title VARCHAR, color VARCHAR, pattern VARCHAR (SVG URL),
+order INT, description TEXT, image_url TEXT,
+bonus_energy NUMERIC, bonus_regen_energy NUMERIC,
+bonus_conquest NUMERIC (legacy), bonus_construction NUMERIC (legacy),
+bonus_regen_conquest NUMERIC (legacy), bonus_regen_construction NUMERIC (legacy),
+bonus_vitalite NUMERIC (legacy), bonus_regen_vitalite NUMERIC (legacy)
+```
+
+### tags
+```
+id VARCHAR PK, title VARCHAR, color VARCHAR, background VARCHAR, icon VARCHAR (SVG URL),
+order INT, base_cost NUMERIC DEFAULT 1.0, gauge VARCHAR (legacy),
+reward_energy INT (legacy), reward_conquest INT (legacy), reward_construction INT (legacy)
+```
+
+### titles
+```
+id SERIAL PK, name VARCHAR, type VARCHAR ('general'|'faction'), faction_id VARCHAR,
+order INT, icon VARCHAR, description TEXT, condition JSONB, unlocks TEXT[], created_at
+```
+
+### title_fragments
+```
+id SERIAL PK, name VARCHAR, description TEXT, icon VARCHAR, icon_url TEXT, image_url TEXT,
+link_url TEXT, collection VARCHAR, visible BOOLEAN, bonus_type VARCHAR, bonus_value NUMERIC,
+ability_type VARCHAR, ability_cooldown_hours INT DEFAULT 24, ability_value NUMERIC DEFAULT 0
+```
+
+### fragment_words
+```
+id SERIAL PK, fragment_id INT FK→title_fragments, word VARCHAR, slot VARCHAR, gender VARCHAR
+```
+
+### user_fragments
+```
+user_id VARCHAR FK→users, fragment_id INT FK→title_fragments, unlocked_at, source VARCHAR
+```
+
+### fragment_ability_uses
+```
+user_id VARCHAR PK, fragment_id INT PK, used_at TIMESTAMPTZ
+```
+
+### faction_tag_bonuses
+```
+faction_id VARCHAR PK FK→factions, tag_id VARCHAR PK FK→tags, cost_reduction NUMERIC(5,2)
+```
+
+### place_tags
+```
+place_id VARCHAR PK, tag_id VARCHAR PK, is_primary BOOLEAN, created_at
+```
+
+### places_discovered
+```
+user_id VARCHAR, place_id VARCHAR, method VARCHAR, discovered_at TIMESTAMPTZ
+```
+
+### place_claims
+```
+id SERIAL, place_id VARCHAR, user_id VARCHAR, faction_id VARCHAR, claimed_at,
+previous_faction_id VARCHAR, previous_claimed_by VARCHAR
+```
+
+### activity_log
+```
+id SERIAL, type VARCHAR, actor_id VARCHAR, place_id VARCHAR, faction_id VARCHAR,
+data JSONB, created_at TIMESTAMPTZ
+```
+
+### chat_messages
+```
+id BIGSERIAL, channel VARCHAR, user_id VARCHAR, user_name VARCHAR,
+faction_id VARCHAR, faction_color VARCHAR, faction_pattern TEXT, content TEXT, created_at
+```
+
+### construction_types
+```
+level INT, name TEXT, description TEXT, image_url TEXT, cost INT, conquest_bonus INT, tag_ids TEXT[]
+```
+
+### territory_name_proposals / territory_name_votes
+```
+proposals: id UUID PK, anchor_place_id VARCHAR, proposed_by VARCHAR, name VARCHAR
+votes: id UUID PK, proposal_id UUID FK, voter_id VARCHAR, value SMALLINT (+1/-1)
+```
+
+### territory_tiers
+```
+id SERIAL, min_places INT, title VARCHAR
+```
+
+### app_settings
+```
+key TEXT PK, value TEXT, updated_at TIMESTAMPTZ
+```
+Clés utilisées : underdog_enabled, underdog_multiplier, zone_fort_multiplier, zone_detection_radius_km, distance_gps_km, distance_close_km, distance_mid_km, distance_mult_gps/close/mid/far, energy_base_cycle, glory_discover, glory_claim, glory_fortify, glory_cost_bonus_pct
+
+### ad_screens / ad_tips
+```
+screens: id SERIAL, image_url TEXT, product_url TEXT, title TEXT, active BOOLEAN
+tips: id SERIAL, title TEXT, subtitle TEXT, tag VARCHAR, active BOOLEAN
+```
+
+### Tables legacy (ne pas toucher)
+`image_media`, `member_codes`, `password_resets`, `refresh_tokens`, `mikro_orm_migrations`, `reviews`, `reviews_images`, `tag_gauge_mapping`
 
 ### RPCs — Liste complète
 

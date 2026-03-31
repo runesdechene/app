@@ -75,7 +75,7 @@ export function FoggedPlaceView({
   if (discoverFree) cost = 0
   else if (discoverDiscount > 0) cost = Math.max(0.5, Math.round((cost * (1 - discoverDiscount / 100)) * 2) / 2)
 
-  const canAfford = cost === 0 || energy >= cost
+  const canAfford = cost === 0 || fractionalEnergy >= cost
   const d = preview?.detail
   const images = place.images || []
 

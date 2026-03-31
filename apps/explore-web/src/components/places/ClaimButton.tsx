@@ -119,6 +119,9 @@ export function ClaimButton({ placeId, currentClaim, onClaimed }: Props) {
     setClaiming(true)
     setClaimError(null)
 
+    // Forcer la regen côté serveur avant l'action
+    await supabase.rpc('get_user_energy', { p_user_id: userId })
+
     const userPos = usePlayerStore.getState().userPosition
     const { data, error: rpcError } = await supabase.rpc('claim_place', {
       p_user_id: userId,

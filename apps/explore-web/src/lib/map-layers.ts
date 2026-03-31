@@ -14,10 +14,10 @@ export function buildTerritoryFillLayer(userFactionId: string | null): LayerSpec
       'fill-opacity': [
         'case',
         ['==', ['get', 'faction'], myFaction],
-        0.28,    // Ma faction : bien visible
+        0.25,    // Ma faction
         ['boolean', ['feature-state', 'hover'], false],
         0.30,    // Hover autre faction
-        0.18,    // Autre faction : standard
+        0.18,    // Autre faction
       ],
       'fill-antialias': false,
     },
@@ -35,17 +35,63 @@ export function buildTerritoryBorderLayer(): LayerSpecification {
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        3.5,
-        2.5,
+        3,
+        2,
       ],
       'line-opacity': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
-        0.8,
-        0.55,
+        0.7,
+        0.45,
       ],
     },
   }
+}
+
+// --- Layer : Pattern de faction en fond de territoire (papier peint) ---
+
+export function buildTerritoryPatternLayer(factionId: string): LayerSpecification {
+  return {
+    id: `territories-pattern-${factionId}`,
+    type: 'fill',
+    source: 'territories',
+    filter: ['==', ['get', 'faction'], factionId],
+    paint: {
+      'fill-pattern': `tile::${factionId}`,
+      'fill-opacity': 0,  // Désactivé — gardé au cas où
+    },
+  }
+}
+
+// --- Layer : Halos d'influence (cercles flous par lieu, effet aura) ---
+
+export const territoryHaloLayer: LayerSpecification = {
+  id: 'territory-halo',
+  type: 'circle',
+  source: 'places',
+  filter: ['all',
+    ['==', ['get', 'discovered'], true],
+    ['!=', ['get', 'tagColor'], ''],
+    ['!=', ['get', 'tagColor'], '#C19A6B'],
+  ],
+  paint: {
+    'circle-color': ['get', 'tagColor'],
+    'circle-radius': [
+      'interpolate', ['linear'], ['zoom'],
+      4, 6,
+      7, 15,
+      10, 35,
+      13, 70,
+    ],
+    'circle-opacity': [
+      'interpolate', ['linear'], ['zoom'],
+      4, 0.15,
+      8, 0.20,
+      12, 0.25,
+    ],
+    'circle-blur': 1,
+    'circle-stroke-width': 0,
+  },
 }
 
 // --- Layer style : Territory labels (symbol layers GPU-side, pas de DOM markers) ---
@@ -84,16 +130,16 @@ export const territoryEmblemLayer: LayerSpecification = {
     'icon-image': ['get', 'pattern'],
     'icon-size': [
       'interpolate', ['linear'], ['zoom'],
-      3, 0.15,
-      6, 0.20,    // zoom 6 → petite
-      9, 0.40,    // zoom 9 → moyenne
-      12, 0.6,   // zoom 12 → grande
+      3, 0.08,
+      6, 0.12,
+      9, 0.20,
+      12, 0.30,
     ],
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
   },
   paint: {
-    'icon-opacity': 0.9,
+    'icon-opacity': 0.7,
   },
 }
 

@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Runes de Chêne CONQUÊTE',
-        short_name: 'CONQUÊTE',
+        name: 'Runes de Chêne',
+        short_name: 'Runes de Chêne',
         description: 'Explorez 2400 lieux de patrimoine historique et naturel',
         theme_color: '#f8f3e7',
         background_color: '#f8f3e7',
