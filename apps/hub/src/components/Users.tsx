@@ -32,6 +32,7 @@ const ROLE_COLORS: Record<Role, string> = {
 }
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 const PER_PAGE = 50
 
 export function Users() {
@@ -152,9 +153,35 @@ export function Users() {
     both: users.filter(u => u.account_source === 'both').length,
   }), [users])
 
-  const recentCount = useMemo(() => {
+  const recentCounts = useMemo(() => {
     const cutoff = Date.now() - SEVEN_DAYS_MS
-    return users.filter(u => new Date(u.created_at).getTime() > cutoff).length
+    const recent = users.filter(u => new Date(u.created_at).getTime() > cutoff)
+    return {
+      app: recent.filter(u => (u.account_source || 'app') !== 'shopify').length,
+      shopify: recent.filter(u => u.account_source === 'shopify').length,
+    }
+  }, [users])
+
+  const stats = useMemo(() => {
+    const appUsers = users.filter(u => u.account_source !== 'shopify' && !u.isPending)
+    const withLogin = appUsers.filter(u => u.last_login_at)
+    const active30d = withLogin.filter(u => u.last_login_at && (Date.now() - new Date(u.last_login_at).getTime()) < THIRTY_DAYS_MS)
+    const active7d = withLogin.filter(u => u.last_login_at && (Date.now() - new Date(u.last_login_at).getTime()) < SEVEN_DAYS_MS)
+    const shopifyOnly = users.filter(u => u.account_source === 'shopify')
+    const both = users.filter(u => u.account_source === 'both')
+    const conversionRate = shopifyOnly.length + both.length > 0
+      ? Math.round((both.length / (shopifyOnly.length + both.length)) * 100)
+      : 0
+
+    return {
+      totalApp: appUsers.length,
+      active30d: active30d.length,
+      active7d: active7d.length,
+      retention30d: appUsers.length > 0 ? Math.round((active30d.length / appUsers.length) * 100) : 0,
+      retention7d: appUsers.length > 0 ? Math.round((active7d.length / appUsers.length) * 100) : 0,
+      shopifyConversion: conversionRate,
+      neverConnected: appUsers.filter(u => !u.last_login_at).length,
+    }
   }, [users])
 
   // Reset page quand on change le tri
@@ -268,13 +295,35 @@ export function Users() {
 
       {!loading && (
         <>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+            <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'rgba(193,154,107,0.08)', borderRadius: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 700 }}>{stats.totalApp}</div>
+              <div style={{ fontSize: 11, color: '#6b5a47' }}>Joueurs app</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'rgba(42,122,48,0.08)', borderRadius: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#2a7a30' }}>{stats.active7d}</div>
+              <div style={{ fontSize: 11, color: '#6b5a47' }}>Actifs 7j ({stats.retention7d}%)</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'rgba(42,122,48,0.05)', borderRadius: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#2a7a30' }}>{stats.active30d}</div>
+              <div style={{ fontSize: 11, color: '#6b5a47' }}>Actifs 30j ({stats.retention30d}%)</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'rgba(184,134,11,0.08)', borderRadius: 8 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#b8860b' }}>{stats.shopifyConversion}%</div>
+              <div style={{ fontSize: 11, color: '#6b5a47' }}>Clients Shopify → App</div>
+            </div>
+          </div>
           <div className="users-stats">
-            <span className="users-stat">
-              <strong>{totalCount}</strong> utilisateur{totalCount > 1 ? 's' : ''}
-            </span>
-            <span className="users-stat users-stat-new">
-              <strong>{recentCount}</strong> nouveau{recentCount > 1 ? 'x' : ''} ces 7 derniers jours
-            </span>
+            {recentCounts.app > 0 && (
+              <span className="users-stat users-stat-new">
+                🗺️ <strong>{recentCounts.app}</strong> nouveau{recentCounts.app > 1 ? 'x' : ''} compte{recentCounts.app > 1 ? 's' : ''} app (7j)
+              </span>
+            )}
+            {recentCounts.shopify > 0 && (
+              <span className="users-stat" style={{ color: '#b8860b' }}>
+                🛒 <strong>{recentCounts.shopify}</strong> nouveau{recentCounts.shopify > 1 ? 'x' : ''} client{recentCounts.shopify > 1 ? 's' : ''} Shopify (7j)
+              </span>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
             <button className={sourceFilter === 'all' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('all'); setPage(1) }}>
@@ -306,7 +355,7 @@ export function Users() {
                 <th>Email</th>
                 <th>Source</th>
                 <th>Role</th>
-                <th>Actif</th>
+                <th>Statut</th>
                 <th
                   className="users-th-sortable"
                   onClick={() => setSortAsc(!sortAsc)}
@@ -360,13 +409,21 @@ export function Users() {
                         </span>
                       )}
                     </td>
-                    <td>
-                      <button
-                        className={`toggle-btn ${user.is_active ? 'active' : 'inactive'}`}
-                        onClick={() => toggleActive(user.id, user.is_active)}
-                      >
-                        {user.is_active ? 'Actif' : 'Inactif'}
-                      </button>
+                    <td style={{ fontSize: 11 }}>
+                      {user.account_source === 'shopify' ? (
+                        <span style={{ color: '#b8860b', fontWeight: 600 }}>⏳ En attente</span>
+                      ) : user.last_login_at && (now - new Date(user.last_login_at).getTime()) < THIRTY_DAYS_MS ? (
+                        <span style={{ color: '#2a7a30', fontWeight: 600 }}>🟢 Actif</span>
+                      ) : user.last_login_at ? (
+                        <span style={{ color: '#8A7B6A', fontWeight: 600 }}>💤 Inactif</span>
+                      ) : (
+                        <span style={{ color: '#6b5a47', fontWeight: 600 }}>❓ Jamais connecté</span>
+                      )}
+                      {user.last_login_at && (
+                        <div style={{ color: '#8A7B6A', fontSize: 10 }}>
+                          {new Date(user.last_login_at).toLocaleDateString('fr-FR')}
+                        </div>
+                      )}
                     </td>
                     <td>{new Date(user.created_at).toLocaleDateString('fr-FR')}</td>
                   </tr>

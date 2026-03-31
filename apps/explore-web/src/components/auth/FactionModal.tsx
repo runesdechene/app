@@ -136,6 +136,16 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
     await reloadAfterFactionChange()
 
+    // Mettre à jour les tags Shopify (fire-and-forget)
+    const userEmail = await supabase.auth.getUser().then(({ data }) => data.user?.email)
+    if (userEmail) {
+      fetch('https://hub.runesdechene.com/.netlify/functions/shopify-create-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, firstName: usePlayerStore.getState().userName, factionTitle: faction?.title }),
+      }).catch(() => {})
+    }
+
     // Re-fetch les places (couleurs de faction changent) + fermer la modal
     incrementPlacesRefreshKey()
     setSelecting(false)

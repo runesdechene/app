@@ -96,6 +96,18 @@ export function usePlayer() {
       supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(() => {})
       // Debloquer les fragments pending (achats avant inscription)
       supabase.rpc('unlock_pending_fragments', { p_user_id: userData.id, p_email: user!.email }).then(() => {})
+      // Créer/lier le client Shopify (fire-and-forget, pas bloquant)
+      if (user?.email) {
+        fetch('https://hub.runesdechene.com/.netlify/functions/shopify-create-customer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            firstName: userData.first_name || null,
+            factionTitle: null, // sera mis à jour au choix de faction
+          }),
+        }).catch(() => {})
+      }
       // Avatar direct si disponible
       if (userData.avatar_url) {
         setUserAvatarUrl(userData.avatar_url)
