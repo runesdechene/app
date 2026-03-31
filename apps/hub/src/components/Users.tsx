@@ -13,6 +13,8 @@ interface HubUser {
   created_at: string
   last_login_at: string | null
   isPending?: boolean
+  account_source?: string | null
+  shopify_customer_id?: number | null
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -39,6 +41,7 @@ export function Users() {
   const [editingRole, setEditingRole] = useState<string | null>(null)
   const [sortAsc, setSortAsc] = useState(false)
   const [page, setPage] = useState(1)
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'app' | 'shopify' | 'both'>('all')
 
   useEffect(() => {
     let ignore = false
@@ -52,7 +55,7 @@ export function Users() {
         while (true) {
           let query = supabase
             .from('users')
-            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at')
+            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
 
@@ -130,12 +133,24 @@ export function Users() {
     return sorted
   }, [users, sortAsc])
 
-  const totalCount = users.length
+  const filteredUsers = useMemo(() => {
+    if (sourceFilter === 'all') return sortedUsers
+    return sortedUsers.filter(u => (u.account_source || 'app') === sourceFilter)
+  }, [sortedUsers, sourceFilter])
+
+  const totalCount = filteredUsers.length
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE))
   const pagedUsers = useMemo(() => {
     const start = (page - 1) * PER_PAGE
-    return sortedUsers.slice(start, start + PER_PAGE)
-  }, [sortedUsers, page])
+    return filteredUsers.slice(start, start + PER_PAGE)
+  }, [filteredUsers, page])
+
+  const sourceCounts = useMemo(() => ({
+    all: users.length,
+    app: users.filter(u => (u.account_source || 'app') === 'app').length,
+    shopify: users.filter(u => u.account_source === 'shopify').length,
+    both: users.filter(u => u.account_source === 'both').length,
+  }), [users])
 
   const recentCount = useMemo(() => {
     const cutoff = Date.now() - SEVEN_DAYS_MS
@@ -252,14 +267,30 @@ export function Users() {
       </div>
 
       {!loading && (
-        <div className="users-stats">
-          <span className="users-stat">
-            <strong>{totalCount}</strong> utilisateur{totalCount > 1 ? 's' : ''}
-          </span>
-          <span className="users-stat users-stat-new">
-            <strong>{recentCount}</strong> nouveau{recentCount > 1 ? 'x' : ''} ces 7 derniers jours
-          </span>
-        </div>
+        <>
+          <div className="users-stats">
+            <span className="users-stat">
+              <strong>{totalCount}</strong> utilisateur{totalCount > 1 ? 's' : ''}
+            </span>
+            <span className="users-stat users-stat-new">
+              <strong>{recentCount}</strong> nouveau{recentCount > 1 ? 'x' : ''} ces 7 derniers jours
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+            <button className={sourceFilter === 'all' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('all'); setPage(1) }}>
+              Tous ({sourceCounts.all})
+            </button>
+            <button className={sourceFilter === 'both' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('both'); setPage(1) }} style={sourceFilter === 'both' ? { background: '#2a7a30' } : { color: '#2a7a30', borderColor: '#2a7a30' }}>
+              ✅ App + Shopify ({sourceCounts.both})
+            </button>
+            <button className={sourceFilter === 'app' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('app'); setPage(1) }} style={sourceFilter === 'app' ? { background: '#6b46c1' } : { color: '#6b46c1', borderColor: '#6b46c1' }}>
+              🗺️ App uniquement ({sourceCounts.app})
+            </button>
+            <button className={sourceFilter === 'shopify' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('shopify'); setPage(1) }} style={sourceFilter === 'shopify' ? { background: '#b8860b' } : { color: '#b8860b', borderColor: '#b8860b' }}>
+              🛒 Shopify uniquement ({sourceCounts.shopify})
+            </button>
+          </div>
+        </>
       )}
 
       {loading ? (
@@ -273,6 +304,7 @@ export function Users() {
               <tr>
                 <th>Nom</th>
                 <th>Email</th>
+                <th>Source</th>
                 <th>Role</th>
                 <th>Actif</th>
                 <th
@@ -297,6 +329,11 @@ export function Users() {
                       {isReactivated && <span className="users-reactivated-badge">Reactive !</span>}
                     </td>
                     <td>{user.email_address}</td>
+                    <td style={{ fontSize: 11 }}>
+                      {(user.account_source || 'app') === 'both' && <span style={{ color: '#2a7a30' }}>✅ Les deux</span>}
+                      {(user.account_source || 'app') === 'app' && <span style={{ color: '#6b46c1' }}>🗺️ App</span>}
+                      {user.account_source === 'shopify' && <span style={{ color: '#b8860b' }}>🛒 Shopify</span>}
+                    </td>
                     <td>
                       {user.isPending ? (
                         <span className="role-badge" style={{ backgroundColor: '#a08060', cursor: 'default' }}>En attente</span>

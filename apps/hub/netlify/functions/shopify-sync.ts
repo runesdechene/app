@@ -130,8 +130,9 @@ export default async function handler(request: Request) {
       const existing = emailToUser.get(email)
 
       if (existing) {
-        if (!existing.shopify_customer_id || existing.account_source !== 'both') {
-          toUpdate.push({ id: existing.id, shopify_customer_id: customer.id })
+        if (!existing.shopify_customer_id) {
+          const newSource = existing.id.startsWith('shopify-') ? 'shopify' : 'both'
+          toUpdate.push({ id: existing.id, shopify_customer_id: customer.id, source: newSource })
         } else {
           skipped++
         }
@@ -163,7 +164,7 @@ export default async function handler(request: Request) {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id, account_source: 'both' }),
+          body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id, account_source: u.source }),
         })
       )
       await Promise.all(promises)
