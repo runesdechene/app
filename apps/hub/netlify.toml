@@ -1,5 +1,19 @@
 [build]
   publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js"]
+
+[functions."shopify-sync"]
+  timeout = 60
+
+[functions."shopify-callback"]
+  timeout = 15
+
+[functions."shopify-proxy"]
+  timeout = 15
 
 [[redirects]]
   from = "/*"

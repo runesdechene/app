@@ -17,6 +17,8 @@ import { AssignFragments } from './components/AssignFragments'
 import { ShopifyUnlocks } from './components/ShopifyUnlocks'
 import { Ads } from './components/Ads'
 import { Settings } from './components/Settings'
+import { ShopifyConnect, ShopifyCallback } from './components/ShopifyConnect'
+import { ShopifySync } from './components/ShopifySync'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
@@ -86,6 +88,9 @@ function App() {
           <Route path="/carte/publicites" element={<Ads />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
+          <Route path="/shopify/connect" element={<ShopifyConnect />} />
+          <Route path="/shopify/sync" element={<ShopifySync />} />
+          <Route path="/shopify/callback" element={<ShopifyCallback />} />
         </Routes>
       </main>
     </div>
