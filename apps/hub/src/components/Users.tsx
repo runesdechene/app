@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { syncUserTagsToShopify } from '../lib/shopifyTags'
 
 type Role = 'user' | 'ambassador' | 'moderator' | 'admin'
 
@@ -15,6 +17,7 @@ interface HubUser {
   isPending?: boolean
   account_source?: string | null
   shopify_customer_id?: number | null
+  faction_title?: string | null
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -36,6 +39,7 @@ const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 const PER_PAGE = 50
 
 export function Users() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<HubUser[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -56,7 +60,7 @@ export function Users() {
         while (true) {
           let query = supabase
             .from('users')
-            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id')
+            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, factions(title)')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
 
@@ -67,7 +71,14 @@ export function Users() {
           const { data } = await query
           if (ignore) return
           if (data && data.length > 0) {
-            allUsers = allUsers.concat(data as HubUser[])
+            const mapped = data.map((u: Record<string, unknown>) => {
+              const { factions, ...rest } = u
+              return {
+                ...rest,
+                faction_title: (factions as { title: string } | null)?.title ?? null,
+              }
+            }) as unknown as HubUser[]
+            allUsers = allUsers.concat(mapped)
             if (data.length < PAGE_SIZE) break
             from += PAGE_SIZE
           } else {
@@ -195,6 +206,11 @@ export function Users() {
 
     if (!error) {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+      // Sync tags vers Shopify (fire-and-forget)
+      const user = users.find(u => u.id === userId)
+      if (user?.shopify_customer_id) {
+        syncUserTagsToShopify(user).catch(() => {})
+      }
     }
     setEditingRole(null)
   }
@@ -207,6 +223,11 @@ export function Users() {
 
     if (!error) {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_active: !currentActive } : u))
+      // Sync tags vers Shopify (fire-and-forget)
+      const user = users.find(u => u.id === userId)
+      if (user?.shopify_customer_id) {
+        syncUserTagsToShopify(user).catch(() => {})
+      }
     }
   }
 
@@ -370,7 +391,12 @@ export function Users() {
                 const isNew = (now - new Date(user.created_at).getTime()) < SEVEN_DAYS_MS
                 const isReactivated = !isNew && user.last_login_at && (now - new Date(user.last_login_at).getTime()) < SEVEN_DAYS_MS
                 return (
-                  <tr key={user.id} className={!user.is_active ? 'inactive' : ''}>
+                  <tr
+                    key={user.id}
+                    className={`users-row-clickable${!user.is_active ? ' inactive' : ''}`}
+                    onClick={() => !user.isPending && navigate(`/users/${encodeURIComponent(user.id)}`)}
+                    style={user.isPending ? undefined : { cursor: 'pointer' }}
+                  >
                     <td>
                       {user.display_name || user.first_name || '-'}
                       {user.isPending && <span className="users-pending-badge">En attente</span>}

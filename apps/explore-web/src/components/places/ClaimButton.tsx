@@ -166,8 +166,20 @@ export function ClaimButton({ placeId, currentClaim, onClaimed }: Props) {
         factionPattern: factionPattern ?? undefined,
         fortificationLevel: 0,
       })
-      if (data.energy !== undefined) usePlayerStore.getState().setEnergy(data.energy)
       if (data.notorietyPoints !== undefined) usePlayerStore.getState().setNotorietyPoints(data.notorietyPoints)
+
+      // Refresh complet de l'énergie depuis le serveur (énergie + nextPointIn + cycle)
+      const { data: refreshed } = await supabase.rpc('get_user_energy', { p_user_id: userId })
+      if (refreshed) {
+        usePlayerStore.setState({
+          energy: refreshed.energy,
+          maxEnergy: refreshed.maxEnergy,
+          nextPointIn: refreshed.nextPointIn,
+          energyCycle: refreshed.energyCycle,
+        })
+      } else if (data.energy !== undefined) {
+        usePlayerStore.getState().setEnergy(data.energy)
+      }
 
       useToastStore.getState().addToast({
         type: 'claim',

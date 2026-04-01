@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth'
 import { LoginPage } from './components/LoginPage'
 import { Dashboard } from './components/Dashboard'
 import { Users } from './components/Users'
+import { UserDetail } from './components/UserDetail'
 import { Photos } from './components/Photos'
 import { PhotoSubmit } from './components/PhotoSubmit'
 import { Reviews } from './components/Reviews'
@@ -76,6 +77,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/:userId" element={<UserDetail />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/carte/tags" element={<TagsManager />} />

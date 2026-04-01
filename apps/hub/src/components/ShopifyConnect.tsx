@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 const SHOPIFY_SHOP = 'runes-de-chene.myshopify.com'
 const SHOPIFY_CLIENT_ID = import.meta.env.VITE_SHOPIFY_CLIENT_ID || ''
-const SHOPIFY_SCOPES = 'read_customers,write_customers,read_orders'
+const SHOPIFY_SCOPES = 'read_customers,write_customers,read_orders,read_products'
 // Le callback passe par une Netlify Function (pas directement le navigateur → CORS)
 const REDIRECT_URI = `${window.location.origin}/.netlify/functions/shopify-callback`
 

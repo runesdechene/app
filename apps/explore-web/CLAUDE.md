@@ -1,6 +1,6 @@
 # La Carte — Runes de Chêne (V0.4 — L'Érudition Conquérante)
 
-> Dernière mise à jour : 29 mars 2026
+> Dernière mise à jour : 1er avril 2026 (migration 187)
 
 ## RÈGLE N°0 — Ce fichier est la mémoire du projet
 
@@ -613,3 +613,47 @@ activePanel ('notifications'|'chat'|'profile'|null), notificationsSeenAt, chatSe
 | 162-163 | Nettoyage titres orphelins (changement faction) |
 | 164 | ability_value (paramètre % pour discount) |
 | 165 | Nettoyage titres locked encore affichés |
+| 167 | `preview_action_cost` — RPC unique pour calculer le coût de toute action (source de vérité) |
+| 168-170 | Coût unifié : discover/claim/fortify appellent preview_action_cost en interne |
+| 171-172 | Performance : suppression blob loop O(n³) dans get_place_by_id |
+| 173-176 | Gloire : multiplicateur configurable + bonus coût % + preview dans get_user_energy |
+| 177 | Gloire dans activity_log (pour les toasts des autres joueurs) |
+| 178 | Fix claims count (places.claimed_by au lieu de place_claims) |
+| 179-182 | Fix get_player_profile (signatures multiples PostgreSQL) |
+| 183 | shopify_customer_id + account_source sur users |
+| 184-185 | Fix account_source : critère UUID vs shopify-* ID |
+| 186 | Fix get_user_titles : champ `unlocks` manquant (bouton ajouter lieu cassé) |
+| 187 | Fix regen fantôme : `energy_reset_at` avance même au max (corrige le bug de déduction incorrecte) |
+
+> **Fix frontend associé (1er avril 2026)** : `ClaimButton.tsx` et `FortifyButton.tsx` font maintenant un refresh complet `get_user_energy` après l'action (comme `discoverPlace`), au lieu de juste `setEnergy`. Corrige l'affichage fractionnaire incorrect dû à `nextPointIn` périmé.
+
+---
+
+## Prochaines étapes
+
+### À faire immédiatement
+1. **Redéployer le Hub** avec le fix `shopify-create-customer` (opt_in_level + account_source)
+2. **Tester** : inscription app → vérifier que le client Shopify est créé avec tag `app-player`
+3. **Tester** : changement d'héritage → vérifier tag `heritage-{faction}` mis à jour sur Shopify
+4. **Fix cosmétique** : les clients Shopify créés par l'API arrivent en anglais (langue par défaut)
+
+### Shopify (Phase 5+ — à poursuivre)
+5. **Shopify Unlocks** : mapper les produits Shopify → fragments pour attribution automatique à l'achat (via webhook orders/paid déjà en place)
+6. **Consent marketing** : tracking dans le Hub (qui est opt-in/out)
+7. **Sync périodique** : la sync initiale est faite (4343 clients importés), mais pas de cron récurrent
+
+### Game Design — Vision future (Bible Game Design)
+8. **Co-protection** : système d'enchères d'énergie (plusieurs joueurs protègent un lieu ensemble, personne ne perd son investissement)
+9. **Énigmes du Sphinx** : tests de connaissance pour protéger les lieux (coût proportionnel à l'investissement)
+10. **Âmes d'Ancêtres** : esprits collectibles GPS-only (feature future)
+11. **L'Oubli** : événements PvE coopératifs (feature future)
+12. **Expéditions** : quêtes collaboratives entre joueurs
+13. **Voies de Prestige** : arbres de spécialisation long-terme
+
+### Système de Diplomatie (plan détaillé existant)
+> Plan complet : `C:\Users\uriel\.claude\plans\sleepy-painting-lamport.md`
+
+- **Phase 0** : Créer 2-4 nouveaux héritages (data only, 0 code)
+- **Phase 1** : Tables alliances + RPCs + modal + chat alliance + directives
+- **Phase 2** : Mercenariat (claim pour un allié)
+- **Phase 3** : Découverte alliée (coût réduit en territoire allié)

@@ -68,7 +68,7 @@ export default async function handler(request: Request) {
         // Le client existe déjà — mettre à jour ses tags
         const customerId = searchData.customers[0].id
         const existingTags = searchData.customers[0].tags || ''
-        const newTags = addTags(existingTags, ['app-player', factionTitle ? `heritage-${slugify(factionTitle)}` : null].filter(Boolean) as string[])
+        const newTags = updateTags(existingTags, ['app-player', 'source:app', factionTitle ? `heritage-${slugify(factionTitle)}` : null].filter(Boolean) as string[])
 
         await fetch(`https://${shop}/admin/api/2026-01/customers/${customerId}.json`, {
           method: 'PUT',
@@ -89,7 +89,7 @@ export default async function handler(request: Request) {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ shopify_customer_id: customerId, account_source: 'both' }),
+          body: JSON.stringify({ shopify_customer_id: customerId }),
         })
 
         return json({ success: true, action: 'updated', customerId })
@@ -107,9 +107,10 @@ export default async function handler(request: Request) {
         customer: {
           email,
           first_name: firstName || '',
-          tags: ['app-player', factionTitle ? `heritage-${slugify(factionTitle)}` : null].filter(Boolean).join(', '),
+          tags: ['app-player', 'source:app', factionTitle ? `heritage-${slugify(factionTitle)}` : null].filter(Boolean).join(', '),
           email_marketing_consent: {
             state: 'subscribed',
+            opt_in_level: 'single_opt_in',
             consent_updated_at: new Date().toISOString(),
           },
         },
@@ -124,7 +125,7 @@ export default async function handler(request: Request) {
     const createData = await createResp.json()
     const newCustomerId = createData.customer?.id
 
-    // Mettre à jour Supabase
+    // Mettre à jour Supabase (juste le shopify_customer_id, pas la source — elle reste 'app')
     if (newCustomerId) {
       await fetch(`${SUPABASE_URL}/rest/v1/users?email_address=eq.${encodeURIComponent(email.toLowerCase())}`, {
         method: 'PATCH',
@@ -133,7 +134,7 @@ export default async function handler(request: Request) {
           'Authorization': `Bearer ${SUPABASE_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ shopify_customer_id: newCustomerId, account_source: 'both' }),
+        body: JSON.stringify({ shopify_customer_id: newCustomerId }),
       })
     }
 
@@ -148,10 +149,14 @@ function slugify(text: string): string {
   return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 }
 
-function addTags(existing: string, newTags: string[]): string {
-  const tags = new Set(existing.split(',').map(t => t.trim()).filter(Boolean))
-  for (const t of newTags) tags.add(t)
-  return Array.from(tags).join(', ')
+function updateTags(existing: string, newTags: string[]): string {
+  const tags = existing.split(',').map(t => t.trim()).filter(Boolean)
+  // Retirer les anciens tags heritage- et source: (on en garde qu'un seul de chaque)
+  const filtered = tags.filter(t => !t.startsWith('heritage-') && !t.startsWith('source:'))
+  // Ajouter les nouveaux
+  const tagSet = new Set(filtered)
+  for (const t of newTags) tagSet.add(t)
+  return Array.from(tagSet).join(', ')
 }
 
 export const config = {

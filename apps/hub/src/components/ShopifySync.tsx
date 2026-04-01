@@ -190,6 +190,178 @@ export function ShopifySync() {
     }
   }
 
+  // --- Batch rétroactif : synchroniser les tags source vers Shopify ---
+  const [tagging, setTagging] = useState(false)
+  const [tagProgress, setTagProgress] = useState({ done: 0, total: 0, errors: 0, skipped: 0 })
+  const [tagErrors, setTagErrors] = useState<string[]>([])
+  const [tagDone, setTagDone] = useState(false)
+
+  async function runSourceTagging() {
+    if (!token) return
+    setTagging(true)
+    setTagDone(false)
+    setTagProgress({ done: 0, total: 0, errors: 0, skipped: 0 })
+    setTagErrors([])
+
+    try {
+      // 1. Fetch tous les users Supabase avec un shopify_customer_id (paginé)
+      const PAGE_SIZE = 1000
+      let allAppUsers: Array<{ email_address: string; shopify_customer_id: number; account_source: string | null; created_at: string; faction_id: string | null }> = []
+      let from = 0
+
+      while (true) {
+        const { data } = await supabase
+          .from('users')
+          .select('email_address, shopify_customer_id, account_source, created_at, faction_id')
+          .not('shopify_customer_id', 'is', null)
+          .range(from, from + PAGE_SIZE - 1)
+
+        if (data && data.length > 0) {
+          allAppUsers = allAppUsers.concat(data as typeof allAppUsers)
+          if (data.length < PAGE_SIZE) break
+          from += PAGE_SIZE
+        } else {
+          break
+        }
+      }
+
+      if (allAppUsers.length === 0) {
+        setTagProgress({ done: 0, total: 0, errors: 0, skipped: 0 })
+        setTagDone(true)
+        return
+      }
+
+      // 2. Fetch les noms de faction
+      const { data: factionData } = await supabase.from('factions').select('id, title')
+      const factionMap = new Map((factionData ?? []).map(f => [f.id, f.title]))
+
+      // 3. Fetch tous les clients Shopify (pour comparer created_at des "both")
+      const shopifyCustomers = await fetchAllShopifyCustomers()
+      const shopifyMap = new Map<number, { created_at: string; tags: string }>()
+      for (const c of shopifyCustomers) {
+        shopifyMap.set(c.id, { created_at: c.created_at, tags: c.tags })
+      }
+
+      // 4. Calculer les tags finaux pour chaque user (ignorer ceux qui ont déjà source:)
+      // On merge côté frontend car on a déjà les tags Shopify existants
+      function mergeTags(existing: string, newTags: string[], removePrefixes: string[]): string {
+        const tags = existing.split(',').map(t => t.trim()).filter(Boolean)
+        const filtered = tags.filter(t => !removePrefixes.some(p => t.startsWith(p)))
+        const tagSet = new Set(filtered)
+        for (const t of newTags) tagSet.add(t)
+        return Array.from(tagSet).join(', ')
+      }
+
+      type BatchItem = { customerId: number; email: string; tags: string }
+      const items: BatchItem[] = []
+      let skipped = 0
+
+      for (const u of allAppUsers) {
+        const shopifyCustomer = shopifyMap.get(u.shopify_customer_id)
+
+        // Ignorer si le client Shopify a déjà un tag source:
+        if (shopifyCustomer) {
+          const existingTags = shopifyCustomer.tags.split(',').map(t => t.trim())
+          if (existingTags.some(t => t.startsWith('source:'))) {
+            skipped++
+            continue
+          }
+        }
+
+        // Pas de client Shopify trouvé → skip (on ne peut pas PUT sans ID)
+        if (!shopifyCustomer) {
+          skipped++
+          continue
+        }
+
+        let sourceTag: string
+        const accountSource = u.account_source || 'app'
+
+        if (accountSource === 'both') {
+          const appDate = new Date(u.created_at).getTime()
+          const shopifyDate = new Date(shopifyCustomer.created_at).getTime()
+          sourceTag = appDate <= shopifyDate ? 'source:app' : 'source:shopify'
+        } else if (accountSource === 'shopify') {
+          sourceTag = 'source:shopify'
+        } else {
+          sourceTag = 'source:app'
+        }
+
+        const newTags = [sourceTag]
+        const removePrefixes = ['source:']
+
+        if (u.faction_id) {
+          const factionTitle = factionMap.get(u.faction_id)
+          if (factionTitle) {
+            const slug = factionTitle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+            newTags.push(`heritage-${slug}`)
+            removePrefixes.push('heritage-')
+          }
+        }
+
+        if (accountSource !== 'shopify') {
+          newTags.push('app-player')
+        }
+
+        // Merger avec les tags existants côté frontend (pas de GET nécessaire côté serveur)
+        const finalTags = mergeTags(shopifyCustomer.tags, newTags, removePrefixes)
+
+        items.push({
+          customerId: u.shopify_customer_id,
+          email: u.email_address,
+          tags: finalTags,
+        })
+      }
+
+      setTagProgress({ done: 0, total: items.length, errors: 0, skipped })
+
+      // 5. Envoyer par batches de 25 via GraphQL (25 updates en 1 seule requête Shopify)
+      let errors = 0
+      const errorLogs: string[] = []
+      const BATCH_SIZE = 25
+
+      for (let i = 0; i < items.length; i += BATCH_SIZE) {
+        const batch = items.slice(i, i + BATCH_SIZE)
+
+        try {
+          const resp = await fetch('/.netlify/functions/shopify-batch-tags', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: batch }),
+          })
+          const data = await resp.json()
+
+          if (data.results) {
+            for (const r of data.results as Array<{ email: string; success: boolean; reason?: string }>) {
+              if (!r.success) {
+                errors++
+                errorLogs.push(`❌ ${r.email} — ${r.reason || 'Erreur inconnue'}`)
+              }
+            }
+          }
+        } catch (err) {
+          errors += batch.length
+          errorLogs.push(`❌ Batch ${i / BATCH_SIZE + 1} — Erreur réseau : ${err}`)
+        }
+
+        setTagProgress({ done: Math.min(i + BATCH_SIZE, items.length), total: items.length, errors, skipped })
+        setTagErrors([...errorLogs])
+
+        // Pause 1s entre batches pour laisser le bucket GraphQL se remplir
+        if (i + BATCH_SIZE < items.length) {
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+      }
+
+      setTagProgress({ done: items.length, total: items.length, errors, skipped })
+      setTagErrors([...errorLogs])
+      setTagDone(true)
+
+    } finally {
+      setTagging(false)
+    }
+  }
+
   if (loading) return <div className="section"><p>Chargement...</p></div>
 
   if (!token) {
@@ -226,6 +398,44 @@ export function ShopifySync() {
           </div>
         )}
         {importError && <p style={{ color: '#cb2020' }}>❌ {importError}</p>}
+      </div>
+
+      <div className="divers-card" style={{ marginBottom: 16 }}>
+        <h3>Synchroniser les tags source → Shopify</h3>
+        <p className="divers-description">
+          Applique les tags <code>source:app</code> / <code>source:shopify</code> + <code>heritage-*</code> sur tous les clients Shopify liés.
+          Pour les clients qui ont les deux comptes, la date de création la plus ancienne détermine la source.
+        </p>
+        <button className="btn-primary" onClick={runSourceTagging} disabled={tagging} style={{ marginBottom: 8 }}>
+          {tagging ? `Synchronisation... ${tagProgress.done} / ${tagProgress.total}` : 'Lancer la synchronisation des tags'}
+        </button>
+        {tagging && tagProgress.total > 0 && (
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ background: 'rgba(193,154,107,0.2)', borderRadius: 8, height: 8, overflow: 'hidden' }}>
+              <div style={{ background: '#2a7a30', height: '100%', width: `${(tagProgress.done / tagProgress.total) * 100}%`, transition: 'width 0.3s' }} />
+            </div>
+            <div style={{ fontSize: 11, color: '#6b5a47', marginTop: 4 }}>
+              {tagProgress.done} / {tagProgress.total} clients traités
+              {tagProgress.errors > 0 && <span style={{ color: '#cb2020' }}> — {tagProgress.errors} erreur(s)</span>}
+            </div>
+          </div>
+        )}
+        {tagDone && (
+          <p style={{ color: '#2a7a30', fontWeight: 600 }}>
+            ✅ {tagProgress.total} clients traités — {tagProgress.total - tagProgress.errors} mis à jour, {tagProgress.errors} erreur(s)
+            {tagProgress.skipped > 0 && <span style={{ color: '#6b5a47', fontWeight: 400 }}> — {tagProgress.skipped} ignoré(s) (déjà taggés)</span>}
+          </p>
+        )}
+        {tagErrors.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: '#cb2020', marginBottom: 4 }}>Détail des erreurs ({tagErrors.length}) :</p>
+            <div style={{ background: '#1a1a1a', color: '#ff6b6b', padding: 12, borderRadius: 8, fontFamily: 'monospace', fontSize: 11, maxHeight: 200, overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+              {tagErrors.map((log, i) => (
+                <div key={i}>{log}</div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="divers-card">
