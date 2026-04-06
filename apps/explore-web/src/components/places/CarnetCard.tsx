@@ -63,19 +63,17 @@ export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influenceP
     setVoting(true)
 
     if (liked) {
-      // Unlike: remove vote
-      await supabase
-        .from('contribution_votes')
-        .delete()
-        .eq('contribution_id', carnet.id)
-        .eq('user_id', userId)
-      await supabase
-        .from('place_contributions')
-        .update({ votes_up: Math.max(0, localVotesUp - 1) })
-        .eq('id', carnet.id)
-      setLiked(false)
-      setLocalVotesUp(v => Math.max(0, v - 1))
-      onVoted()
+      // Unlike via RPC (SECURITY DEFINER)
+      const { data, error } = await supabase.rpc('unlike_contribution', {
+        p_user_id: userId,
+        p_contribution_id: carnet.id,
+      })
+      const result = data as { success?: boolean } | null
+      if (!error && result?.success) {
+        setLiked(false)
+        setLocalVotesUp(v => Math.max(0, v - 1))
+        onVoted()
+      }
     } else {
       // Like
       const { data, error } = await supabase.rpc('vote_contribution', {
