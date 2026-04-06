@@ -64,7 +64,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
   const handleClick = useCallback(async (factionId: string) => {
     if (!userId || !userFactionId || loading) return
-    if (factionId !== userFactionId) return // can only boost your own
     if (influenceStock <= 0) {
       setError('Plus d\u2019influence disponible.')
       return
@@ -78,6 +77,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       p_user_id: userId,
       p_place_id: placeId,
       p_points: 1,
+      p_target_faction_id: factionId,
     }
     if (userPosition) {
       params.p_user_lat = userPosition.lat
@@ -113,7 +113,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
     useToastStore.getState().addToast({
       type: 'claim',
-      message: `+1 influence pour ton H\u00e9ritage !`,
+      message: `+1 influence ${factionId === userFactionId ? 'pour ton H\u00e9ritage' : ''} !`.replace('  ', ' '),
       timestamp: Date.now(),
     })
 
@@ -146,12 +146,14 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
               key={b.factionId}
               className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}`}
               onClick={() => handleClick(b.factionId)}
-              disabled={!canClick || !isOwn || loading}
-              title={isOwn ? `Cliquer pour +1 influence ${b.name}` : b.name}
+              disabled={!canClick || loading}
+              title={`Cliquer pour +1 influence ${b.name}`}
             >
-              <div className="influence-banner-flag" style={{ backgroundColor: b.color }}>
-                {b.pattern && (
+              <div className="influence-banner-flag">
+                {b.pattern ? (
                   <img src={b.pattern} alt="" className="influence-banner-pattern" />
+                ) : (
+                  <div className="influence-banner-color" style={{ backgroundColor: b.color }} />
                 )}
                 {isDominant && <span className="influence-banner-crown">\u2B50</span>}
               </div>
