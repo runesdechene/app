@@ -534,20 +534,23 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 {tag.title}
               </span>
             ))}
-            {v05?.dominantFaction && factionNames.get(v05.dominantFaction) && (
-              <span
-                className="place-tag place-tag-faction"
-                style={{
-                  backgroundColor: factionColors.get(v05.dominantFaction) ?? '#8A7B6A',
-                  color: '#fff',
-                }}
-              >
-                {factionSvgs.get(v05.dominantFaction) && (
-                  <img src={factionSvgs.get(v05.dominantFaction)!} alt="" className="place-tag-faction-svg" />
-                )}
-                Sous l'influence {factionNames.get(v05.dominantFaction)}
-              </span>
-            )}
+            {v05?.dominantFaction && factionNames.get(v05.dominantFaction) && (() => {
+              const fc = factionColors.get(v05.dominantFaction) ?? '#8A7B6A'
+              return (
+                <span
+                  className="place-tag place-tag-faction"
+                  style={{
+                    backgroundColor: `${fc}20`,
+                    color: fc,
+                  }}
+                >
+                  {factionSvgs.get(v05.dominantFaction) && (
+                    <img src={factionSvgs.get(v05.dominantFaction)!} alt="" className="place-tag-faction-svg" style={{ filter: 'none' }} />
+                  )}
+                  Sous l'influence {factionNames.get(v05.dominantFaction)}
+                </span>
+              )
+            })()}
           </div>
 
           {/* Address */}

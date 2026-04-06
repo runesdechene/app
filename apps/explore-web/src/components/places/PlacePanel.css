@@ -205,17 +205,12 @@
 .place-hero-prev { left: 8px; }
 .place-hero-next { right: 8px; }
 
-/* Faction influence pill in tags row */
-.place-tag-faction {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
+/* Faction influence pill in tags row — pastel style */
 .place-tag-faction-svg {
   width: 18px;
   height: 18px;
   object-fit: contain;
   flex-shrink: 0;
-  filter: brightness(0) invert(1);
 }
 
 /* Title actions (bookmark + gear, right of title) */
