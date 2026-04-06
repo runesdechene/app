@@ -324,67 +324,101 @@
   opacity: 1;
 }
 
-/* Roles */
-.place-roles {
-  display: flex;
-  gap: 16px;
+/* Unified explorer row (replaces roles + explorers) */
+.place-explorers-unified {
   padding-bottom: 12px;
   border-bottom: 1px dashed var(--color-parchment-dark);
 }
 
-.place-role-link {
+.place-explorers-avatars {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.place-exp-avatar-wrap {
+  position: relative;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--color-ink-light);
-  transition: color 0.15s;
+  margin-right: -4px;
 }
 
-.place-role-link:hover {
-  color: var(--color-ink);
-}
-
-.place-role-avatar {
-  width: 24px;
-  height: 24px;
+.place-exp-avatar {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
+  border: 2px solid var(--color-parchment);
+  transition: transform 0.15s;
 }
 
-.place-role-avatar-fallback {
-  display: inline-flex;
+.place-exp-avatar:hover {
+  transform: scale(1.12);
+  z-index: 1;
+}
+
+.place-exp-avatar-fallback {
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-parchment-dark);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.place-exp-badge {
+  position: absolute;
+  font-size: 10px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.place-exp-badge-author {
+  bottom: -2px;
+  right: -2px;
+}
+
+.place-exp-badge-guardian {
+  bottom: -2px;
+  left: -2px;
+}
+
+.place-exp-badge-guardian.place-exp-badge-offset {
+  left: auto;
+  right: -2px;
+  bottom: 10px;
+}
+
+.place-exp-visit-btn {
+  margin-left: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.place-exp-visit-btn:hover {
+  background: #1b5e20;
+}
+
+.place-exp-visit-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.place-exp-empty {
+  font-size: 12px;
   color: var(--color-ink-light);
-  font-family: var(--font-accent);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.place-role-label {
-  font-weight: 600;
-  color: var(--color-sepia);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.place-role-name {
-  font-weight: 600;
-  color: var(--color-ink);
-}
-
-.place-role-sep {
-  color: var(--color-ink-light);
-  font-size: 11px;
+  font-style: italic;
+  margin: 0;
 }
 
 /* ==========================================

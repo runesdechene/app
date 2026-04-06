@@ -16,7 +16,6 @@ import { InfluenceFrame } from './InfluenceFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { AddCarnetModal } from './AddCarnetModal'
-import { PlaceExplorers } from './PlaceExplorers'
 import { InfluenceButton } from './InfluenceButton'
 import './PlacePanel.css'
 
@@ -131,6 +130,102 @@ function QuickInfoChip({ icon, value, placeholder, onClick }: {
       {icon}
       <span className="place-quick-info-text">{value ?? placeholder}</span>
     </button>
+  )
+}
+
+/** Unified explorer row — discoverer (⭐) and guardian (🛡) get badges on their avatars */
+function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeLocation, isExplorer, onVisited }: {
+  explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
+  authorId: string | null
+  guardianId: string | null
+  factionColors: Map<string, string>
+  placeId: string
+  placeLocation: { latitude: number; longitude: number }
+  isExplorer: boolean
+  onVisited: () => void
+}) {
+  const userId = usePlayerStore(s => s.userId)
+  const userPosition = usePlayerStore(s => s.userPosition)
+  const [loading, setLoading] = useState(false)
+
+  const isOnSite = useMemo(() => {
+    if (!userPosition) return false
+    const R = 6371
+    const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
+    const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
+  }, [userPosition, placeLocation])
+
+  const canVisit = userId && !isExplorer && isOnSite
+
+  async function handleVisit() {
+    if (!userId || !userPosition || loading) return
+    setLoading(true)
+    const { data, error } = await supabase.rpc('visit_place_gps', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_user_lat: userPosition.lat,
+      p_user_lng: userPosition.lng,
+    })
+    if (!error && data && !data.error) {
+      const result = data as { newInfluenceStock?: number; newExploration?: number; influenceGain?: number; explorationGain?: number }
+      if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
+      if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
+      useToastStore.getState().addToast({ type: 'explore', message: `Visite validée ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`, timestamp: Date.now() })
+      onVisited()
+    }
+    setLoading(false)
+  }
+
+  // Sort: author first, then guardian, then rest by visit date
+  const sorted = useMemo(() => {
+    const copy = [...explorers]
+    copy.sort((a, b) => {
+      const aScore = (a.userId === authorId ? 0 : a.userId === guardianId ? 1 : 2)
+      const bScore = (b.userId === authorId ? 0 : b.userId === guardianId ? 1 : 2)
+      if (aScore !== bScore) return aScore - bScore
+      return new Date(a.visitedAt).getTime() - new Date(b.visitedAt).getTime()
+    })
+    return copy
+  }, [explorers, authorId, guardianId])
+
+  return (
+    <div className="place-explorers-unified">
+      <div className="place-explorers-avatars">
+        {sorted.map(exp => {
+          const isAuthor = exp.userId === authorId
+          const isGuardian = exp.userId === guardianId
+          const color = factionColors.get(exp.factionId) ?? '#8A7B6A'
+          return (
+            <button
+              key={exp.userId}
+              className="place-exp-avatar-wrap"
+              onClick={() => useMapStore.getState().setSelectedPlayerId(exp.userId)}
+              title={`${exp.userName}${isAuthor ? ' — Découvreur' : ''}${isGuardian ? ' — Gardien' : ''}`}
+            >
+              {exp.userAvatar ? (
+                <img src={exp.userAvatar} alt={exp.userName} className="place-exp-avatar" style={{ borderColor: color }} />
+              ) : (
+                <div className="place-exp-avatar place-exp-avatar-fallback" style={{ backgroundColor: color }}>
+                  {(exp.userName || '?').charAt(0).toUpperCase()}
+                </div>
+              )}
+              {isAuthor && <span className="place-exp-badge place-exp-badge-author">⭐</span>}
+              {isGuardian && <span className={`place-exp-badge place-exp-badge-guardian${isAuthor ? ' place-exp-badge-offset' : ''}`}>🛡️</span>}
+            </button>
+          )
+        })}
+        {canVisit && (
+          <button className="place-exp-visit-btn" onClick={handleVisit} disabled={loading}>
+            {loading ? '...' : '📍 J\'y suis allé'}
+          </button>
+        )}
+      </div>
+      {sorted.length === 0 && !canVisit && (
+        <p className="place-exp-empty">Aucun explorateur pour l'instant.</p>
+      )}
+    </div>
   )
 }
 
@@ -510,70 +605,19 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
             />
           </div>
 
-          {/* Roles — merged if same person */}
-          <div className="place-roles">
-            {(() => {
-              const isSamePerson = place.author && v05?.guardian && place.author.id === v05.guardian.userId
-              if (isSamePerson) {
-                const avatar = place.author.profileImageUrl || v05.guardian!.avatar
-                const name = place.author.lastName || v05.guardian!.name || 'Inconnu'
-                return (
-                  <button
-                    className="place-role-link"
-                    onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
-                  >
-                    {avatar ? (
-                      <img src={avatar} alt="" className="place-role-avatar" />
-                    ) : (
-                      <span className="place-role-avatar place-role-avatar-fallback">
-                        {(name).charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                    <span className="place-role-name">{name}</span>
-                    <span className="place-role-label">Découvreur</span>
-                    <span className="place-role-sep">·</span>
-                    <span className="place-role-label">Gardien</span>
-                  </button>
-                )
-              }
-              return (
-                <>
-                  {place.author && (
-                    <button
-                      className="place-role-link"
-                      onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
-                    >
-                      {place.author.profileImageUrl ? (
-                        <img src={place.author.profileImageUrl} alt="" className="place-role-avatar" />
-                      ) : (
-                        <span className="place-role-avatar place-role-avatar-fallback">
-                          {(place.author.lastName || '?').charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <span className="place-role-name">{place.author.lastName || 'Inconnu'}</span>
-                      <span className="place-role-label">Découvreur</span>
-                    </button>
-                  )}
-                  {v05?.guardian && (
-                    <button
-                      className="place-role-link"
-                      onClick={() => useMapStore.getState().setSelectedPlayerId(v05.guardian!.userId)}
-                    >
-                      {v05.guardian.avatar ? (
-                        <img src={v05.guardian.avatar} alt="" className="place-role-avatar" />
-                      ) : (
-                        <span className="place-role-avatar place-role-avatar-fallback">
-                          {(v05.guardian.name || '?').charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <span className="place-role-name">{v05.guardian.name}</span>
-                      <span className="place-role-label">Gardien</span>
-                    </button>
-                  )}
-                </>
-              )
-            })()}
-          </div>
+          {/* Explorers row with role badges */}
+          {v05 && (
+            <ExplorerRow
+              explorers={v05.explorers ?? []}
+              authorId={place.author?.id ?? null}
+              guardianId={v05.guardian?.userId ?? null}
+              factionColors={factionColors}
+              placeId={place.id}
+              placeLocation={place.location}
+              isExplorer={v05.isExplorer}
+              onVisited={() => { refreshV05(); onRefetch() }}
+            />
+          )}
         </div>
 
         {/* Zone 3A — Influence Frame */}
@@ -596,17 +640,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           />
         )}
 
-        {/* Zone 3B — Explorers */}
-        {v05 && (
-          <PlaceExplorers
-            placeId={place.id}
-            explorers={v05.explorers ?? []}
-            placeLocation={place.location}
-            isExplorer={v05.isExplorer}
-            factionColors={factionColors}
-            onVisited={() => { refreshV05(); onRefetch() }}
-          />
-        )}
+        {/* (Explorers now in identity section above) */}
 
         {/* Place Enigma (GPS only) */}
         <PlaceEnigma
