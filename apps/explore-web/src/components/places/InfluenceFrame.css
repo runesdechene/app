@@ -143,6 +143,32 @@
   100% { transform: scale(1); }
 }
 
+/* Particle burst on click */
+.influence-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 10;
+  animation: particle-burst 0.6s ease-out forwards;
+}
+
+@keyframes particle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(0, 0) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+
 /* Error & hint */
 .influence-frame-error {
   font-size: 11px;

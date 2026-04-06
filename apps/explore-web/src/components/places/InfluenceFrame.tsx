@@ -1,7 +1,6 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
-import { useToastStore } from '../../stores/toastStore'
 import './InfluenceFrame.css'
 
 interface InfluenceEntry {
@@ -21,16 +20,53 @@ interface InfluenceFrameProps {
   onInfluencePlaced: () => void
 }
 
-export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation, onInfluencePlaced }: InfluenceFrameProps) {
+/** Short satisfying "pop" sound via Web Audio API */
+function playPopSound() {
+  try {
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.setValueAtTime(600, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05)
+    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.15)
+    gain.gain.setValueAtTime(0.15, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.2)
+    setTimeout(() => ctx.close(), 300)
+  } catch { /* silent fallback */ }
+}
+
+/** Spawn particle burst around click position */
+function spawnParticles(container: HTMLElement) {
+  const emojis = ['✨', '⭐', '🌟', '💫']
+  for (let i = 0; i < 6; i++) {
+    const el = document.createElement('span')
+    el.className = 'influence-particle'
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)]
+    const angle = (Math.PI * 2 * i) / 6 + (Math.random() - 0.5) * 0.5
+    const dist = 30 + Math.random() * 25
+    el.style.setProperty('--tx', `${Math.cos(angle) * dist}px`)
+    el.style.setProperty('--ty', `${Math.sin(angle) * dist}px`)
+    container.appendChild(el)
+    el.addEventListener('animationend', () => el.remove())
+  }
+}
+
+export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation, onInfluencePlaced: _onInfluencePlaced }: InfluenceFrameProps) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const influenceStock = usePlayerStore(s => s.influenceStock)
   const userPosition = usePlayerStore(s => s.userPosition)
   const gameMode = usePlayerStore(s => s.gameMode)
 
-  const [loading, setLoading] = useState(false)
+  // Optimistic local score deltas (faction -> bonus points added locally)
+  const [localBonus, setLocalBonus] = useState<Map<string, number>>(new Map())
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const pendingRef = useRef(false)
 
   if (gameMode !== 'conquest') return null
 
@@ -43,36 +79,52 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
   }, [userPosition, placeLocation])
 
-  // Build banners: all factions, sorted by total influence DESC, user's faction highlighted
+  // Build banners with local bonus applied
   const banners = useMemo(() => {
     const influenceMap = new Map(influence.map(i => [i.factionId, i]))
     const allIds = Array.from(factionColors.keys())
     return allIds
-      .map(id => ({
-        factionId: id,
-        total: influenceMap.get(id)?.total ?? 0,
-        placed: influenceMap.get(id)?.placed ?? 0,
-        content: influenceMap.get(id)?.content ?? 0,
-        color: factionColors.get(id) ?? '#8A7B6A',
-        pattern: factionPatterns.get(id) ?? null,
-        name: factionNames.get(id) ?? id,
-      }))
+      .map(id => {
+        const bonus = localBonus.get(id) ?? 0
+        const base = influenceMap.get(id)
+        return {
+          factionId: id,
+          total: (base?.total ?? 0) + bonus,
+          placed: (base?.placed ?? 0) + bonus,
+          content: base?.content ?? 0,
+          color: factionColors.get(id) ?? '#8A7B6A',
+          pattern: factionPatterns.get(id) ?? null,
+          name: factionNames.get(id) ?? id,
+        }
+      })
       .sort((a, b) => b.total - a.total)
-  }, [influence, factionColors, factionPatterns, factionNames])
+  }, [influence, factionColors, factionPatterns, factionNames, localBonus])
 
   const dominant = banners[0]?.factionId
 
-  const handleClick = useCallback(async (factionId: string) => {
-    if (!userId || !userFactionId || loading) return
+  const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
+    if (!userId || !userFactionId || pendingRef.current) return
     if (influenceStock <= 0) {
       setError('Plus d\u2019influence disponible.')
       return
     }
 
-    setLoading(true)
+    // Optimistic update — instant feedback
+    pendingRef.current = true
     setError(null)
     setPulseFaction(factionId)
+    playPopSound()
+    spawnParticles(buttonEl)
 
+    // Update local score + stock immediately
+    setLocalBonus(prev => {
+      const next = new Map(prev)
+      next.set(factionId, (prev.get(factionId) ?? 0) + 1)
+      return next
+    })
+    usePlayerStore.getState().setInfluenceStock(influenceStock - 1)
+
+    // Fire RPC in background
     const params: Record<string, unknown> = {
       p_user_id: userId,
       p_place_id: placeId,
@@ -86,41 +138,39 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
     const { data, error: rpcError } = await supabase.rpc('place_influence_action', params)
 
-    if (rpcError) {
-      setError(rpcError.message)
-      setLoading(false)
-      setTimeout(() => setPulseFaction(null), 300)
-      return
-    }
+    if (rpcError || (data as { error?: string })?.error) {
+      // Rollback optimistic update
+      setLocalBonus(prev => {
+        const next = new Map(prev)
+        const cur = prev.get(factionId) ?? 1
+        if (cur <= 1) next.delete(factionId)
+        else next.set(factionId, cur - 1)
+        return next
+      })
+      usePlayerStore.getState().setInfluenceStock(influenceStock) // restore
 
-    const result = data as { success?: boolean; error?: string; remainingStock?: number; pointsPlaced?: number }
-
-    if (result.error) {
-      const messages: Record<string, string> = {
-        no_faction: 'Rejoignez un H\u00e9ritage d\u2019abord.',
-        not_enough_influence: 'Stock \u00e9puis\u00e9.',
-        daily_remote_limit: 'Limite \u00e0 distance atteinte (5/jour).',
+      const result = data as { error?: string } | null
+      if (result?.error) {
+        const messages: Record<string, string> = {
+          no_faction: 'Rejoignez un H\u00e9ritage d\u2019abord.',
+          not_enough_influence: 'Stock \u00e9puis\u00e9.',
+          daily_remote_limit: 'Limite \u00e0 distance atteinte (5/jour).',
+        }
+        setError(messages[result.error] ?? result.error)
+      } else {
+        setError('Erreur r\u00e9seau, r\u00e9essayez.')
       }
-      setError(messages[result.error] ?? result.error)
-      setLoading(false)
-      setTimeout(() => setPulseFaction(null), 300)
-      return
+    } else {
+      // Sync real remaining stock from server
+      const result = data as { remainingStock?: number }
+      if (result.remainingStock != null) {
+        usePlayerStore.getState().setInfluenceStock(result.remainingStock)
+      }
     }
 
-    if (result.remainingStock != null) {
-      usePlayerStore.getState().setInfluenceStock(result.remainingStock)
-    }
-
-    useToastStore.getState().addToast({
-      type: 'claim',
-      message: `+1 influence ${factionId === userFactionId ? 'pour ton H\u00e9ritage' : ''} !`.replace('  ', ' '),
-      timestamp: Date.now(),
-    })
-
-    setLoading(false)
+    pendingRef.current = false
     setTimeout(() => setPulseFaction(null), 300)
-    onInfluencePlaced()
-  }, [userId, userFactionId, influenceStock, loading, placeId, userPosition, onInfluencePlaced])
+  }, [userId, userFactionId, influenceStock, placeId, userPosition])
 
   const canClick = userId && userFactionId && influenceStock > 0
 
@@ -131,7 +181,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         {userId && (
           <span className="influence-frame-stock">
             {influenceStock} pt{influenceStock !== 1 ? 's' : ''}
-            {isGps ? ' \u00b7 sur place' : ` \u00b7 \u00e0 distance`}
+            {isGps ? ' \u00b7 sur place' : ' \u00b7 \u00e0 distance'}
           </span>
         )}
       </div>
@@ -145,9 +195,9 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
             <button
               key={b.factionId}
               className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}`}
-              onClick={() => handleClick(b.factionId)}
-              disabled={!canClick || loading}
-              title={`Cliquer pour +1 influence ${b.name}`}
+              onClick={(e) => handleClick(b.factionId, e.currentTarget)}
+              disabled={!canClick}
+              title={`+1 influence ${b.name}`}
             >
               <div className="influence-banner-flag">
                 {b.pattern ? (
@@ -155,7 +205,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
                 ) : (
                   <div className="influence-banner-color" style={{ backgroundColor: b.color }} />
                 )}
-                {isDominant && <span className="influence-banner-crown">\u2B50</span>}
+                {isDominant && <span className="influence-banner-crown">{'\u2B50'}</span>}
               </div>
               <span className="influence-banner-score">{b.total}</span>
             </button>
