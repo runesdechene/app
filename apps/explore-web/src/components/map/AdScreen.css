@@ -162,6 +162,13 @@
   transition: all 0.15s;
 }
 
+.loading-screen-enter-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .loading-screen-enter:hover {
   background: transparent;
   border: 2px solid rgba(255, 241, 211, 0.8);
