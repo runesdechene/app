@@ -58,10 +58,12 @@ BEGIN
     SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'influence_max_remote_per_day'), 5)
     INTO v_max_remote;
 
+    -- Count remote placements today FOR THIS PLACE (not global)
     SELECT COALESCE(SUM((data->>'points')::INT), 0) INTO v_today_remote
     FROM activity_log
     WHERE actor_id = p_user_id
       AND type = 'place_influence'
+      AND place_id = p_place_id
       AND (data->>'remote')::BOOLEAN = TRUE
       AND created_at::DATE = CURRENT_DATE;
 

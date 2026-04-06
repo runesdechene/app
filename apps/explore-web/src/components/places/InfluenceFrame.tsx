@@ -97,10 +97,11 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
           name: factionNames.get(id) ?? id,
         }
       })
-      .sort((a, b) => b.total - a.total)
+      // Stable order: keep faction DB order (from factionColors Map insertion order)
+      // No re-sorting by score to prevent banners from swapping on click
   }, [influence, factionColors, factionPatterns, factionNames, localBonus])
 
-  const dominant = banners[0]?.factionId
+  const dominant = banners.reduce((best, b) => b.total > (best?.total ?? 0) ? b : best, banners[0])?.factionId
 
   const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
     if (!userId || !userFactionId || pendingRef.current) return
