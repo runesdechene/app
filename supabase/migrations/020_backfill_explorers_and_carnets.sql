@@ -5,12 +5,8 @@
 -- 0. Allow NULL faction_id (players without heritage still get carnets)
 ALTER TABLE place_contributions ALTER COLUMN faction_id DROP NOT NULL;
 
--- 1. Backfill place_explorers: every place author becomes an explorer
-INSERT INTO place_explorers (place_id, user_id, visited_at)
-SELECT p.id, p.author_id, p.created_at
-FROM places p
-WHERE p.author_id IS NOT NULL
-ON CONFLICT (place_id, user_id) DO NOTHING;
+-- 1. (REMOVED) — Discoverers are NOT auto-explorers. Only GPS visits count.
+-- place_explorers backfill removed in migration 023.
 
 -- 2. Backfill place_contributions: discoverer's carnet from places.text + images
 --    Only insert where no carnet already exists for that author+place

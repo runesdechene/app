@@ -156,8 +156,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
   }, [userPosition, placeLocation])
 
-  const canVisit = userId && !isExplorer && isOnSite
-
   async function handleVisit() {
     if (!userId || !userPosition || loading) return
     setLoading(true)
@@ -216,14 +214,19 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
             </button>
           )
         })}
-        {canVisit && (
-          <button className="place-exp-visit-btn" onClick={handleVisit} disabled={loading}>
-            {loading ? '...' : '📍 J\'y suis allé'}
+        {userId && !isExplorer && (
+          <button
+            className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
+            onClick={handleVisit}
+            disabled={!isOnSite || loading}
+            title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
+          >
+            {loading ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
           </button>
         )}
       </div>
-      {sorted.length === 0 && !canVisit && (
-        <p className="place-exp-empty">Aucun explorateur pour l'instant.</p>
+      {sorted.length === 0 && (
+        <p className="place-exp-empty">Personne n'a encore exploré ce lieu en personne.</p>
       )}
     </div>
   )

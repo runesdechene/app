@@ -423,6 +423,14 @@
   cursor: default;
 }
 
+.place-exp-visit-btn-disabled {
+  background: var(--color-parchment-dark);
+  color: var(--color-ink-light);
+  font-weight: 500;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
 .place-exp-empty {
   font-size: 12px;
   color: var(--color-ink-light);
