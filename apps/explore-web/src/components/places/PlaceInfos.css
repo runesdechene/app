@@ -1,0 +1,96 @@
+.place-infos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 8px;
+  padding: 12px;
+  background: #faf6ec;
+}
+.info-row-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.info-icon { font-size: 14px; }
+.info-label {
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.info-edit-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-family: var(--font-accent);
+  font-size: 11px;
+  color: var(--color-sepia-dark);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.info-content p {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  margin: 0;
+  line-height: 1.5;
+}
+.info-meta {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  color: var(--color-ink-light);
+  display: block;
+  margin-top: 4px;
+}
+.info-empty {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-ink-light);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Edit mode */
+.info-edit { margin-top: 4px; }
+.info-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  background: var(--color-parchment);
+  resize: vertical;
+}
+.info-edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.info-save-btn {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #5a4a3a, #3a2a1a);
+  color: var(--color-parchment);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  cursor: pointer;
+}
+.info-save-btn:disabled { opacity: 0.5; cursor: default; }
+.info-cancel-btn {
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 6px;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+}
