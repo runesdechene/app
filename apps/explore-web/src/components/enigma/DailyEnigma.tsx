@@ -116,11 +116,12 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <div className="enigma-header">
           <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
+          <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
           <h2 className="enigma-title">
             {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
           </h2>
           {enigma?.isBonus && (
-            <span className="enigma-cost">Co\u00fbt : {enigma.energyCost} \u26a1</span>
+            <span className="enigma-cost">{enigma.energyCost} \u26a1</span>
           )}
         </div>
 

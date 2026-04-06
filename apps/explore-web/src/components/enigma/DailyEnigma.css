@@ -39,27 +39,39 @@
   text-align: center;
   margin-bottom: 16px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.enigma-icon {
-  font-size: 36px;
-  display: block;
+.enigma-header-chest {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
   margin-bottom: 8px;
 }
 
 .enigma-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--color-ink);
   margin: 0 0 4px;
 }
 
-.enigma-difficulty {
-  font-size: 12px;
+.enigma-cost {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: #d4af37;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 6px;
+}
+
+.enigma-difficulty {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 8px;
   display: inline-block;
+  margin: 8px auto;
 }
 
 .enigma-difficulty.easy {
