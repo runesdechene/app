@@ -33,6 +33,8 @@ interface MapPlace {
   }
   likes: number
   score: number
+  totalInfluence: number
+  influenceByFaction: Record<string, number>
 }
 
 export interface PlaceProperties {
@@ -54,6 +56,8 @@ export interface PlaceProperties {
   score: number
   discovered: boolean
   ownFaction: boolean
+  totalInfluence: number
+  influenceByFaction: Record<string, number>
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -119,10 +123,12 @@ export function usePlaces() {
               factionPattern: place.faction?.pattern ?? '',
               claimedByName: place.claimedByName ?? '',
               claimedById: place.claimedById ?? '',
-              claimed: !!place.faction,
+              claimed: !!place.faction || (place.totalInfluence ?? 0) > 0,
               fortificationLevel: place.fortificationLevel ?? 0,
               likes: place.likes ?? 0,
               score: place.score ?? 0,
+              totalInfluence: place.totalInfluence ?? 0,
+              influenceByFaction: place.influenceByFaction ?? {},
               discovered: false, // sera enrichi par le useMemo
               ownFaction: false, // sera enrichi par le useMemo
             },

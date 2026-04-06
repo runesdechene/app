@@ -360,7 +360,7 @@ export const ExploreMap = memo(function ExploreMap() {
         features: rawGeojson.features
           .filter(f => {
             const ov = placeOverrides.get(f.properties.id)
-            return f.properties.claimed || ov?.claimed
+            return f.properties.claimed || (f.properties.totalInfluence ?? 0) > 0 || ov?.claimed
           })
           .map(f => {
             const ov = placeOverrides.get(f.properties.id)
@@ -376,6 +376,8 @@ export const ExploreMap = memo(function ExploreMap() {
               fortificationLevel: ov?.fortificationLevel ?? f.properties.fortificationLevel ?? 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
+              totalInfluence: f.properties.totalInfluence ?? 0,
+              influenceByFaction: f.properties.influenceByFaction ?? {},
             }
           }),
         tiers: territoryTiers,
