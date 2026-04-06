@@ -545,7 +545,14 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   }}
                 >
                   {factionSvgs.get(v05.dominantFaction) && (
-                    <img src={factionSvgs.get(v05.dominantFaction)!} alt="" className="place-tag-faction-svg" style={{ filter: 'none' }} />
+                    <span
+                      className="place-tag-faction-svg"
+                      style={{
+                        WebkitMaskImage: `url(${factionSvgs.get(v05.dominantFaction)!})`,
+                        maskImage: `url(${factionSvgs.get(v05.dominantFaction)!})`,
+                        backgroundColor: fc,
+                      }}
+                    />
                   )}
                   Sous l'influence {factionNames.get(v05.dominantFaction)}
                 </span>

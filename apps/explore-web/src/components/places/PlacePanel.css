@@ -207,10 +207,16 @@
 
 /* Faction influence pill in tags row — pastel style */
 .place-tag-faction-svg {
+  display: inline-block;
   width: 18px;
   height: 18px;
-  object-fit: contain;
   flex-shrink: 0;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
 }
 
 /* Title actions (bookmark + gear, right of title) */
