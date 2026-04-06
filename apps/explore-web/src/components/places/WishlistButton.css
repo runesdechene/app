@@ -3,21 +3,30 @@
    ========================================== */
 
 .wishlist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   background: none;
-  border: none;
+  border: 1px solid var(--color-parchment-dark);
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 20px;
-  padding: 4px;
-  line-height: 1;
-  transition: transform 0.15s;
+  color: var(--color-ink-light);
+  transition: background 0.15s, color 0.15s;
 }
 
 .wishlist-btn:hover {
-  transform: scale(1.2);
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
+}
+
+.wishlist-btn.wishlisted {
+  color: var(--color-sepia);
+  border-color: var(--color-sepia);
 }
 
 .wishlist-btn:disabled {
   opacity: 0.4;
   cursor: default;
-  transform: none;
 }

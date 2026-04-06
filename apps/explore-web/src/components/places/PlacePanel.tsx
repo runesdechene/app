@@ -408,7 +408,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
                     onClick={() => setShowOptionsMenu(v => !v)}
                     aria-label="Options"
                   >
-                    {'\u2699\uFE0F'}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                   </button>
                   {showOptionsMenu && (
                     <>
@@ -510,40 +510,69 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
             />
           </div>
 
-          {/* Roles */}
+          {/* Roles — merged if same person */}
           <div className="place-roles">
-            {place.author && (
-              <button
-                className="place-role-link"
-                onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
-              >
-                {place.author.profileImageUrl ? (
-                  <img src={place.author.profileImageUrl} alt="" className="place-role-avatar" />
-                ) : (
-                  <span className="place-role-avatar place-role-avatar-fallback">
-                    {(place.author.lastName || '?').charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <span className="place-role-label">Découvreur</span>
-                <span className="place-role-name">{place.author.lastName || 'Inconnu'}</span>
-              </button>
-            )}
-            {v05?.guardian && (
-              <button
-                className="place-role-link"
-                onClick={() => useMapStore.getState().setSelectedPlayerId(v05.guardian!.userId)}
-              >
-                {v05.guardian.avatar ? (
-                  <img src={v05.guardian.avatar} alt="" className="place-role-avatar" />
-                ) : (
-                  <span className="place-role-avatar place-role-avatar-fallback">
-                    {(v05.guardian.name || '?').charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <span className="place-role-label">Gardien</span>
-                <span className="place-role-name">{v05.guardian.name}</span>
-              </button>
-            )}
+            {(() => {
+              const isSamePerson = place.author && v05?.guardian && place.author.id === v05.guardian.userId
+              if (isSamePerson) {
+                const avatar = place.author.profileImageUrl || v05.guardian!.avatar
+                const name = place.author.lastName || v05.guardian!.name || 'Inconnu'
+                return (
+                  <button
+                    className="place-role-link"
+                    onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
+                  >
+                    {avatar ? (
+                      <img src={avatar} alt="" className="place-role-avatar" />
+                    ) : (
+                      <span className="place-role-avatar place-role-avatar-fallback">
+                        {(name).charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                    <span className="place-role-name">{name}</span>
+                    <span className="place-role-label">Découvreur</span>
+                    <span className="place-role-sep">·</span>
+                    <span className="place-role-label">Gardien</span>
+                  </button>
+                )
+              }
+              return (
+                <>
+                  {place.author && (
+                    <button
+                      className="place-role-link"
+                      onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
+                    >
+                      {place.author.profileImageUrl ? (
+                        <img src={place.author.profileImageUrl} alt="" className="place-role-avatar" />
+                      ) : (
+                        <span className="place-role-avatar place-role-avatar-fallback">
+                          {(place.author.lastName || '?').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="place-role-name">{place.author.lastName || 'Inconnu'}</span>
+                      <span className="place-role-label">Découvreur</span>
+                    </button>
+                  )}
+                  {v05?.guardian && (
+                    <button
+                      className="place-role-link"
+                      onClick={() => useMapStore.getState().setSelectedPlayerId(v05.guardian!.userId)}
+                    >
+                      {v05.guardian.avatar ? (
+                        <img src={v05.guardian.avatar} alt="" className="place-role-avatar" />
+                      ) : (
+                        <span className="place-role-avatar place-role-avatar-fallback">
+                          {(v05.guardian.name || '?').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="place-role-name">{v05.guardian.name}</span>
+                      <span className="place-role-label">Gardien</span>
+                    </button>
+                  )}
+                </>
+              )
+            })()}
           </div>
         </div>
 

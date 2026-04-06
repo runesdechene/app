@@ -33,12 +33,12 @@ export function WishlistButton({ placeId, isWishlisted }: WishlistButtonProps) {
 
   return (
     <button
-      className="wishlist-btn"
+      className={`wishlist-btn${wishlisted ? ' wishlisted' : ''}`}
       onClick={handleToggle}
       disabled={loading}
       title={wishlisted ? 'Retirer de la wishlist' : 'Je veux y aller'}
     >
-      {wishlisted ? '\uD83D\uDCD6' : '\uD83D\uDD16'}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill={wishlisted ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
     </button>
   )
 }
