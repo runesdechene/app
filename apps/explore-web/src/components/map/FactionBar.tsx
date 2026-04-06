@@ -97,7 +97,7 @@ export function FactionBar() {
                 {isLeader && <span className="faction-scoreboard-crown"> {'\uD83D\uDC51'}</span>}
                 {faction.isUnderdog && <span className="faction-scoreboard-underdog" title="Baroud d'Honneur — x2 regen"> {'\uD83D\uDC80'}</span>}
               </span>
-              <span className="faction-scoreboard-pct">{faction.notoriety} {'\uD83C\uDFF3\uFE0F'}</span>
+              <span className="faction-scoreboard-pct">{faction.notoriety} {'\uD83C\uDFF4'}</span>
             </div>
           </div>
         )
