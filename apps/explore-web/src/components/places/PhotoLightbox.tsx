@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './PhotoLightbox.css'
 
 interface PhotoLightboxProps {
@@ -25,7 +26,7 @@ export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLight
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose, prev, next])
 
-  return (
+  return createPortal(
     <div className="lightbox-overlay" onClick={onClose}>
       <div className="lightbox-content" onClick={e => e.stopPropagation()}>
         <img src={photos[safeIndex]} alt="" className="lightbox-img" />
@@ -40,6 +41,7 @@ export function PhotoLightbox({ photos, index, onClose, onNavigate }: PhotoLight
 
         <button className="lightbox-close" onClick={onClose}>&#10005;</button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
