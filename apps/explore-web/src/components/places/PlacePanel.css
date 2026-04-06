@@ -330,6 +330,15 @@
   border-bottom: 1px dashed var(--color-parchment-dark);
 }
 
+.place-exp-title {
+  margin: 0 0 6px;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink-light);
+  letter-spacing: 0.02em;
+}
+
 .place-explorers-avatars {
   display: flex;
   align-items: center;
