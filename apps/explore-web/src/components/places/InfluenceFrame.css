@@ -145,6 +145,7 @@
 .influence-banner:disabled {
   opacity: 0.5;
   cursor: default;
+  pointer-events: none;
 }
 
 /* Zero-score banners: slightly faded, visible enough to click on mobile */

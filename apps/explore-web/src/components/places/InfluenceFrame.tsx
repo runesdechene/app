@@ -178,11 +178,12 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       <div className="influence-frame-header">
         <span className="influence-frame-title">Influence des H\u00e9ritages</span>
         {userId && (
-          <span className={`influence-frame-stock${remoteExhausted ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
-            {influenceStock} pt{influenceStock !== 1 ? 's' : ''}
-            {isGps
-              ? ' \u00b7 sur place'
-              : ` \u00b7 ${MAX_REMOTE_PER_PLACE - remoteUsed}/${MAX_REMOTE_PER_PLACE} restants`
+          <span className={`influence-frame-stock${!canClick ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
+            {influenceStock > 0
+              ? isGps
+                ? `${influenceStock} pts \u00b7 sur place`
+                : `${influenceStock} pts \u00b7 ${MAX_REMOTE_PER_PLACE - remoteUsed}/${MAX_REMOTE_PER_PLACE} ici`
+              : 'Stock \u00e9puis\u00e9'
             }
           </span>
         )}
@@ -197,7 +198,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
             <button
               key={b.factionId}
               className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}${b.total === 0 ? ' influence-banner-zero' : ''}`}
-              onClick={(e) => handleClick(b.factionId, e.currentTarget)}
+              onClick={(e) => { if (canClick) handleClick(b.factionId, e.currentTarget) }}
               disabled={!canClick}
               title={`+1 influence ${b.name}`}
             >
