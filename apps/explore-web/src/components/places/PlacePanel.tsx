@@ -249,6 +249,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   // Faction visual data cache (colors + patterns for all factions)
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
   const [factionPatterns, setFactionPatterns] = useState<Map<string, string>>(new Map())
+  const [factionSvgs, setFactionSvgs] = useState<Map<string, string>>(new Map())
   const [factionNames, setFactionNames] = useState<Map<string, string>>(new Map())
 
   // Fetch V0.5 detail + all faction visuals
@@ -257,21 +258,24 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     async function loadV05() {
       const [{ data, error }, { data: allFactions }] = await Promise.all([
         supabase.rpc('get_place_detail_v05', { p_place_id: place.id, p_user_id: userId ?? null }),
-        supabase.from('factions').select('id, color, image_url, title').order('order'),
+        supabase.from('factions').select('id, color, image_url, pattern, title').order('order'),
       ])
       if (cancelled || error) return
       // Cache all factions
       if (allFactions) {
         const colors = new Map<string, string>()
         const patterns = new Map<string, string>()
+        const svgs = new Map<string, string>()
         const names = new Map<string, string>()
-        for (const f of allFactions as Array<{ id: string; color: string; image_url: string; title: string }>) {
+        for (const f of allFactions as Array<{ id: string; color: string; image_url: string; pattern: string; title: string }>) {
           colors.set(f.id, f.color)
           if (f.image_url) patterns.set(f.id, f.image_url)
+          if (f.pattern) svgs.set(f.id, f.pattern)
           names.set(f.id, f.title)
         }
         setFactionColors(colors)
         setFactionPatterns(patterns)
+        setFactionSvgs(svgs)
         setFactionNames(names)
       }
       const d = data as V05Detail | null
@@ -475,17 +479,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         {/* Identity */}
         <div className="place-identity">
           <div className="place-title-row">
-            <h2 className="place-title">
-              {place.title}
-              {v05?.dominantFaction && factionPatterns.get(v05.dominantFaction) && (
-                <img
-                  src={factionPatterns.get(v05.dominantFaction)!}
-                  alt={factionNames.get(v05.dominantFaction) ?? ''}
-                  title={factionNames.get(v05.dominantFaction) ?? ''}
-                  className="place-title-faction"
-                />
-              )}
-            </h2>
+            <h2 className="place-title">{place.title}</h2>
             <div className="place-title-actions">
               {v05 && (
                 <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
@@ -517,32 +511,44 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             </div>
           </div>
 
-          {/* Tags */}
-          {place.tags.length > 0 && (
-            <div className="place-tags">
-              {place.tags.map(tag => (
-                <span
-                  key={tag.id}
-                  className="place-tag"
-                  style={{
-                    backgroundColor: tag.background,
-                    color: tag.color,
-                  }}
-                >
-                  {tag.icon && (
-                    <span
-                      className="place-tag-icon"
-                      style={{
-                        WebkitMaskImage: `url(${tag.icon}?v=${cacheBust})`,
-                        maskImage: `url(${tag.icon}?v=${cacheBust})`,
-                      }}
-                    />
-                  )}
-                  {tag.title}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* Tags + faction influence pill */}
+          <div className="place-tags">
+            {place.tags.map(tag => (
+              <span
+                key={tag.id}
+                className="place-tag"
+                style={{
+                  backgroundColor: tag.background,
+                  color: tag.color,
+                }}
+              >
+                {tag.icon && (
+                  <span
+                    className="place-tag-icon"
+                    style={{
+                      WebkitMaskImage: `url(${tag.icon}?v=${cacheBust})`,
+                      maskImage: `url(${tag.icon}?v=${cacheBust})`,
+                    }}
+                  />
+                )}
+                {tag.title}
+              </span>
+            ))}
+            {v05?.dominantFaction && factionNames.get(v05.dominantFaction) && (
+              <span
+                className="place-tag place-tag-faction"
+                style={{
+                  backgroundColor: factionColors.get(v05.dominantFaction) ?? '#8A7B6A',
+                  color: '#fff',
+                }}
+              >
+                {factionSvgs.get(v05.dominantFaction) && (
+                  <img src={factionSvgs.get(v05.dominantFaction)!} alt="" className="place-tag-faction-svg" />
+                )}
+                Sous l'influence {factionNames.get(v05.dominantFaction)}
+              </span>
+            )}
+          </div>
 
           {/* Address */}
           {place.address && (

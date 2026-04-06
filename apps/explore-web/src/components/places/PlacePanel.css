@@ -205,17 +205,17 @@
 .place-hero-prev { left: 8px; }
 .place-hero-next { right: 8px; }
 
-/* Dominant faction badge next to title */
-.place-title-faction {
-  display: inline-block;
-  width: 30px;
-  height: 38px;
-  object-fit: cover;
-  vertical-align: middle;
-  margin-left: 10px;
-  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
-  border-radius: 3px 3px 0 0;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+/* Faction influence pill in tags row */
+.place-tag-faction {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.place-tag-faction-svg {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
 }
 
 /* Title actions (bookmark + gear, right of title) */
