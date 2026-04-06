@@ -182,10 +182,8 @@ export default async function handler(request: Request) {
 
       // Mettre à jour le lien Shopify si nécessaire
       if (!existingUser.shopify_customer_id && customerId) {
-        const newSource = existingUser.id.startsWith('shopify-') ? 'shopify' : 'both'
         await supabasePatch(`users?id=eq.${existingUser.id}`, {
           shopify_customer_id: customerId,
-          account_source: newSource,
         })
       }
     } else {

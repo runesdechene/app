@@ -1,3 +1,10 @@
+
+# ALPHA V0.4.7
+Fix des inscriptions et tchat
+
+# ALPHA V0.4.6
+Fix des inscriptions et tchat
+
 # ALPHA V0.4.5
 ## Gloire dynamique & Compétences
 - **La Gloire récompense le courage.** Plus une action coûte d'énergie, plus elle rapporte de Gloire. Prendre un lieu lointain et fortifié rapporte bien plus qu'un lieu facile.

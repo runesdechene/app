@@ -18,6 +18,7 @@ interface HubUser {
   account_source?: string | null
   shopify_customer_id?: number | null
   faction_title?: string | null
+  isClient?: boolean
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -46,7 +47,7 @@ export function Users() {
   const [editingRole, setEditingRole] = useState<string | null>(null)
   const [sortAsc, setSortAsc] = useState(false)
   const [page, setPage] = useState(1)
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'app' | 'shopify' | 'both'>('all')
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'app' | 'shopify'>('all')
 
   useEffect(() => {
     let ignore = false
@@ -114,6 +115,23 @@ export function Users() {
           allUsers = [...allUsers, ...pendingUsers]
         }
 
+        // Charger les emails clients (ont au moins un achat confirmé)
+        const { data: clientData } = await supabase
+          .from('purchase_log')
+          .select('email')
+          .eq('status', 'unlocked')
+        if (!ignore && clientData) {
+          const clientEmails = new Set(
+            (clientData as Array<{ email: string }>)
+              .map(c => c.email?.toLowerCase())
+              .filter(Boolean)
+          )
+          allUsers = allUsers.map(u => ({
+            ...u,
+            isClient: clientEmails.has(u.email_address.toLowerCase()),
+          }))
+        }
+
         if (!ignore) setUsers(allUsers)
       } finally {
         if (!ignore) setLoading(false)
@@ -161,7 +179,6 @@ export function Users() {
     all: users.length,
     app: users.filter(u => (u.account_source || 'app') === 'app').length,
     shopify: users.filter(u => u.account_source === 'shopify').length,
-    both: users.filter(u => u.account_source === 'both').length,
   }), [users])
 
   const recentCounts = useMemo(() => {
@@ -179,9 +196,9 @@ export function Users() {
     const active30d = withLogin.filter(u => u.last_login_at && (Date.now() - new Date(u.last_login_at).getTime()) < THIRTY_DAYS_MS)
     const active7d = withLogin.filter(u => u.last_login_at && (Date.now() - new Date(u.last_login_at).getTime()) < SEVEN_DAYS_MS)
     const shopifyOnly = users.filter(u => u.account_source === 'shopify')
-    const both = users.filter(u => u.account_source === 'both')
-    const conversionRate = shopifyOnly.length + both.length > 0
-      ? Math.round((both.length / (shopifyOnly.length + both.length)) * 100)
+    const shopifyWithLogin = shopifyOnly.filter(u => u.last_login_at)
+    const conversionRate = shopifyOnly.length > 0
+      ? Math.round((shopifyWithLogin.length / shopifyOnly.length) * 100)
       : 0
 
     return {
@@ -350,14 +367,11 @@ export function Users() {
             <button className={sourceFilter === 'all' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('all'); setPage(1) }}>
               Tous ({sourceCounts.all})
             </button>
-            <button className={sourceFilter === 'both' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('both'); setPage(1) }} style={sourceFilter === 'both' ? { background: '#2a7a30' } : { color: '#2a7a30', borderColor: '#2a7a30' }}>
-              ✅ App + Shopify ({sourceCounts.both})
-            </button>
             <button className={sourceFilter === 'app' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('app'); setPage(1) }} style={sourceFilter === 'app' ? { background: '#6b46c1' } : { color: '#6b46c1', borderColor: '#6b46c1' }}>
-              🗺️ App uniquement ({sourceCounts.app})
+              🗺️ App ({sourceCounts.app})
             </button>
             <button className={sourceFilter === 'shopify' ? 'btn-primary' : 'btn-secondary'} onClick={() => { setSourceFilter('shopify'); setPage(1) }} style={sourceFilter === 'shopify' ? { background: '#b8860b' } : { color: '#b8860b', borderColor: '#b8860b' }}>
-              🛒 Shopify uniquement ({sourceCounts.shopify})
+              🛒 Shopify ({sourceCounts.shopify})
             </button>
           </div>
         </>
@@ -375,6 +389,7 @@ export function Users() {
                 <th>Nom</th>
                 <th>Email</th>
                 <th>Source</th>
+                <th>Client</th>
                 <th>Role</th>
                 <th>Statut</th>
                 <th
@@ -405,9 +420,14 @@ export function Users() {
                     </td>
                     <td>{user.email_address}</td>
                     <td style={{ fontSize: 11 }}>
-                      {(user.account_source || 'app') === 'both' && <span style={{ color: '#2a7a30' }}>✅ Les deux</span>}
                       {(user.account_source || 'app') === 'app' && <span style={{ color: '#6b46c1' }}>🗺️ App</span>}
                       {user.account_source === 'shopify' && <span style={{ color: '#b8860b' }}>🛒 Shopify</span>}
+                    </td>
+                    <td style={{ fontSize: 11, textAlign: 'center' }}>
+                      {user.isClient
+                        ? <span style={{ color: '#2a7a30', fontWeight: 600 }}>Oui</span>
+                        : <span style={{ color: '#8A7B6A' }}>Non</span>
+                      }
                     </td>
                     <td>
                       {user.isPending ? (

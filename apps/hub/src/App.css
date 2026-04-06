@@ -314,6 +314,27 @@
   font-weight: bold;
 }
 
+.stat-value-sm {
+  font-size: 1.4rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.dashboard h2 {
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
 /* Page Header */
 .page-header {
   display: flex;

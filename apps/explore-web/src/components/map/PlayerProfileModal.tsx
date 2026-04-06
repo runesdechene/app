@@ -169,6 +169,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     notoriety: 'gloire',
     likes: 'likes',
     fortifications: 'fortifications',
+    places_added: 'lieux ajoutés',
   }
 
   function formatProgress(condition?: { stat: string; min?: number; rank?: number }): string | null {

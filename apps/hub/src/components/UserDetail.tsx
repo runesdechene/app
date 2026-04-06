@@ -155,11 +155,9 @@ export function UserDetail() {
     </div>
   )
 
-  const sourceLabel = (user.account_source || 'app') === 'both'
-    ? '✅ App + Shopify'
-    : user.account_source === 'shopify'
-      ? '🛒 Shopify uniquement'
-      : '🗺️ App uniquement'
+  const sourceLabel = user.account_source === 'shopify'
+    ? '🛒 Shopify'
+    : '🗺️ App'
 
   return (
     <div className="ud">

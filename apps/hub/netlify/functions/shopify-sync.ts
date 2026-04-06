@@ -131,8 +131,7 @@ export default async function handler(request: Request) {
 
       if (existing) {
         if (!existing.shopify_customer_id) {
-          const newSource = existing.id.startsWith('shopify-') ? 'shopify' : 'both'
-          toUpdate.push({ id: existing.id, shopify_customer_id: customer.id, source: newSource })
+          toUpdate.push({ id: existing.id, shopify_customer_id: customer.id })
         } else {
           skipped++
         }
@@ -164,7 +163,7 @@ export default async function handler(request: Request) {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id, account_source: u.source }),
+          body: JSON.stringify({ shopify_customer_id: u.shopify_customer_id }),
         })
       )
       await Promise.all(promises)

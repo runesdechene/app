@@ -1,0 +1,295 @@
+/* ==========================================
+   FACTION MODAL
+   ========================================== */
+
+.faction-modal {
+  position: relative;
+  width: 95vw;
+  max-width: 1300px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-parchment);
+  border: 2px solid var(--color-sepia);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.3);
+  padding: 32px;
+  text-align: center;
+}
+
+.faction-modal-title {
+  font-family: var(--font-title);
+  font-size: 32px;
+  color: var(--color-ink);
+}
+
+.faction-modal-subtitle {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--color-ink-light);
+  margin: 0 0 24px;
+  line-height: 1.4;
+}
+
+.faction-modal-loading {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-ink-light);
+  padding: 24px 0;
+}
+
+.faction-modal-grid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 0 4px;
+  padding-bottom: 8px;
+  padding-top: 8px;
+}
+
+/* Masquer scrollbar tout en gardant le scroll */
+.faction-modal-grid::-webkit-scrollbar {
+  height: 4px;
+}
+.faction-modal-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+.faction-modal-grid::-webkit-scrollbar-thumb {
+  background: var(--color-parchment-dark, #E0D0BA);
+  border-radius: 2px;
+}
+
+.faction-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 calc(25% - 9px);
+  min-width: 0;
+  scroll-snap-align: start;
+  background: transparent;
+  border: 2px solid var(--color-parchment-dark, #E0D0BA);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  padding: 0;
+}
+
+.faction-card:hover {
+  border-color: var(--faction-color, var(--color-sepia));
+  background: rgba(193, 154, 107, 0.06);
+  transform: translateY(-2px);
+}
+
+.faction-card:active {
+  transform: scale(0.97);
+}
+
+.faction-card.active {
+  border-color: var(--faction-color, var(--color-sepia));
+  border-width: 3px;
+  background: rgba(193, 154, 107, 0.1);
+}
+
+.faction-card:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.faction-card-img {
+  aspect-ratio: 1;
+  object-fit: contain;
+  width: 80%;
+  height: 300px;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.faction-card-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  opacity: 0.3;
+}
+
+.faction-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.faction-card-name {
+  font-family: var(--font-title);
+  font-size: 23px;
+  font-weight: 500;
+  color: var(--faction-color);
+  filter: grayscale(50%);
+  text-align: center;
+}
+
+.faction-card-desc {
+  font-size: 15px;
+  text-align: justify;
+  line-height: 1.2;
+  color: var(--color-ink-light);
+  margin: 0;
+}
+
+.faction-card-desc a {
+  font-weight: 700;
+  color: var(--faction-color);
+  text-decoration: underline;
+  filter: grayscale(50%);
+}
+
+
+.faction-card-members {
+  font-size: 16px;
+  color: var(--color-ink-light);
+  opacity: 0.7;
+  margin-bottom: 4px;
+  font-family: var(--font-title);
+  text-align: center;
+}
+
+.faction-card-bonuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.faction-bonus-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(193, 154, 107, 0.12);
+  border: 1px solid rgba(193, 154, 107, 0.25);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.faction-bonus-tag.malus {
+  background: rgba(180, 60, 60, 0.12);
+  border-color: rgba(180, 60, 60, 0.3);
+  color: #b43c3c;
+}
+
+.faction-bonus-tag.boosted {
+  background: rgba(50, 160, 60, 0.12);
+  border-color: rgba(50, 160, 60, 0.35);
+  color: #2a7a30;
+}
+
+.faction-bonus-tag.boosted.malus {
+  background: rgba(180, 60, 60, 0.12);
+  border-color: rgba(180, 60, 60, 0.3);
+  color: #b43c3c;
+}
+
+.faction-card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-accent, "Cabin Condensed", serif);
+  color: var(--faction-color, var(--color-sepia));
+  background: rgba(193, 154, 107, 0.15);
+  padding: 4px 15px;
+  border-radius: 20px;
+}
+
+.faction-card.underdog {
+  border-color: rgba(255, 180, 50, 0.5);
+  box-shadow: 0 0 12px rgba(255, 180, 50, 0.15);
+}
+
+.faction-card-underdog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 240, 200, 0.95);
+  border-bottom: 2px solid rgba(255, 180, 50, 0.3);
+  padding: 8px 12px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+.faction-card-underdog-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c48a15;
+  font-family: var(--font-accent, "Cabin Condensed", serif);
+}
+
+.faction-card-underdog-desc {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(150, 110, 50, 0.85);
+  line-height: 1.3;
+}
+
+.faction-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.faction-legend-item {
+  font-size: 14px;
+  color: rgba(74, 61, 47, 0.9);
+  padding: 5px 16px;
+  background: rgba(193, 154, 107, 0.3);
+  border-radius: 20px;
+}
+
+.faction-modal-leave {
+  display: inline-block;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.faction-modal-leave:hover {
+  color: #9B4D4D;
+  background: rgba(155, 77, 77, 0.08);
+}
+
+.faction-modal-leave:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+@media (max-width: 600px) {
+  .faction-modal {
+    padding: 24px 16px;
+  }
+  .faction-card {
+    flex: 0 0 85%;
+  }
+}

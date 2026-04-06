@@ -33,6 +33,7 @@ const STAT_OPTIONS = [
   { value: 'notoriety', label: 'Gloire' },
   { value: 'likes', label: 'Likes' },
   { value: 'fortifications', label: 'Fortifications' },
+  { value: 'places_added', label: 'Lieux ajoutés' },
 ]
 
 const MODE_OPTIONS = [

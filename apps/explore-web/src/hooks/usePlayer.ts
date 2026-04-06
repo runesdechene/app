@@ -88,6 +88,24 @@ export function usePlayer() {
         return
       }
 
+      // Auto-migration : si l'ID en base (Firebase) ne matche pas auth.uid() (Supabase),
+      // migrer l'ancien compte vers le nouvel UUID pour que la RLS fonctionne
+      const authId = user!.id
+      if (userData.id !== authId) {
+        console.warn(`[usePlayer] ID mismatch detected: db=${userData.id}, auth=${authId}. Migrating...`)
+        const { data: migResult } = await supabase.rpc('migrate_user_to_auth_id', {
+          p_old_id: userData.id,
+          p_new_id: authId,
+        })
+        if (migResult?.error) {
+          console.error('[usePlayer] Migration failed:', migResult.error)
+        } else {
+          console.log('[usePlayer] Migration successful:', migResult)
+          // Utiliser le nouvel ID
+          userData.id = authId
+        }
+      }
+
       setUserId(userData.id)
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
