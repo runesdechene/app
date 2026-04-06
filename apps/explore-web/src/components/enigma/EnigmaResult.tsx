@@ -12,9 +12,12 @@ interface EnigmaResultProps {
 export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose }: EnigmaResultProps) {
   return (
     <div className="enigma-result">
-      <span className="enigma-result-icon">
-        {correct ? '\u2705' : '\u274C'}
-      </span>
+      <div className="enigma-result-icon">
+        {correct
+          ? <img src="/res/coffre_ouvert.webp" alt="" className="enigma-result-chest" />
+          : <span className="enigma-result-wrong-icon">{'\u274C'}</span>
+        }
+      </div>
 
       <div className={`enigma-result-label ${correct ? 'correct' : 'wrong'}`}>
         {correct ? 'Bonne r\u00e9ponse !' : 'Mauvaise r\u00e9ponse'}

@@ -8,10 +8,19 @@
 }
 
 .enigma-result-icon {
-  font-size: 48px;
   display: block;
   margin-bottom: 12px;
   animation: enigma-pop 0.4s ease-out;
+}
+
+.enigma-result-chest {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.enigma-result-wrong-icon {
+  font-size: 48px;
 }
 
 @keyframes enigma-pop {

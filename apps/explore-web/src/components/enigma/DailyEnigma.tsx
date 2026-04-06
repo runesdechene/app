@@ -219,7 +219,7 @@ export function EnigmaChestButton({ onClick, hasAnsweredToday }: ChestButtonProp
       onClick={onClick}
       title="\u00c9nigme du jour"
     >
-      {'\uD83D\uDCE6'}
+      <img src="/res/coffre.webp" alt="" className="enigma-chest-img" />
       {!hasAnsweredToday && <span className="enigma-chest-dot" />}
     </button>
   )
