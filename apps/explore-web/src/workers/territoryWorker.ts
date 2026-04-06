@@ -16,8 +16,8 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const BASE_RADIUS_KM = 0.25      // rayon minimum pour tout lieu (~150m)
-const RADIUS_SCALE_KM = 0.65     // croissance douce par sqrt(likes)
+const BASE_RADIUS_KM = 0.20      // ~120m minimum
+const RADIUS_SCALE_KM = 0.12     // gentle growth — influence grows faster
 const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
 const CIRCLE_SEGMENTS = 12        // octogone
@@ -113,17 +113,6 @@ function radiusForScore(score: number): number {
   return BASE_RADIUS_KM + Math.sqrt(score - 1) * RADIUS_SCALE_KM
 }
 
-/** Bonus de score selon le niveau de fortification (legacy V0.4) */
-function fortificationBonus(level: number): number {
-  switch (level) {
-    case 1: return 10
-    case 2: return 20
-    case 3: return 30
-    case 4: return 60
-    default: return 0
-  }
-}
-
 /** V0.5 : retourne la faction dominante par influence (fallback sur faction du lieu) */
 function getDominantFaction(place: PlaceInput): string {
   if (place.influenceByFaction) {
@@ -137,15 +126,12 @@ function getDominantFaction(place: PlaceInput): string {
   return place.faction
 }
 
-/** V0.5 : score basé sur l'influence totale (fallback V0.4 si pas d'influence) */
+/** V0.5 : score basé sur l'influence totale */
 function getPlaceScore(place: PlaceInput): number {
   if (place.totalInfluence != null && place.totalInfluence > 0) {
     return place.totalInfluence
   }
-  // Fallback V0.4
-  const likes = place.likes ?? 0
-  const nonLikeScore = Math.max(0, place.score - likes)
-  return Math.max(Math.round(likes + nonLikeScore * 1.5), 1) + fortificationBonus(place.fortificationLevel ?? 0)
+  return 1
 }
 
 /** Génère un polygone circulaire fermé [lon, lat][] */
