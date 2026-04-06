@@ -8,6 +8,7 @@ interface AdScreen {
   product_url: string | null
   title: string | null
   active: boolean
+  linked_tip_id: number | null
 }
 
 interface AdTip {
@@ -86,6 +87,7 @@ export function Ads() {
           title: s.title,
           product_url: s.product_url,
           active: s.active,
+          linked_tip_id: s.linked_tip_id,
         }).eq('id', s.id).then(() => {}))
       }
 
@@ -156,7 +158,7 @@ export function Ads() {
     setUploadingScreen(false)
   }
 
-  function updateScreen(id: number, field: string, value: string | boolean | null) {
+  function updateScreen(id: number, field: string, value: string | boolean | number | null) {
     setScreens(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s))
   }
 
@@ -281,6 +283,18 @@ export function Ads() {
                   onChange={e => updateScreen(s.id, 'product_url', e.target.value || null)}
                   className="pub-screen-field-input"
                 />
+                <select
+                  value={s.linked_tip_id ?? ''}
+                  onChange={e => updateScreen(s.id, 'linked_tip_id', e.target.value ? Number(e.target.value) : null)}
+                  className="pub-screen-field-input"
+                >
+                  <option value="">Texte aleatoire</option>
+                  {tips.map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.title.length > 50 ? t.title.slice(0, 50) + '...' : t.title}
+                    </option>
+                  ))}
+                </select>
                 <div className="pub-screen-actions">
                   <button
                     className={`pub-toggle-btn${s.active ? ' active' : ''}`}
