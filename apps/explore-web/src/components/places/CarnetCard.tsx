@@ -29,9 +29,10 @@ interface CarnetCardProps {
   influencePerPhoto: number
   influencePerVote: number
   onVoted: () => void
+  onPhotoOpen?: (photos: string[], index: number) => void
 }
 
-export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted }: CarnetCardProps) {
+export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted, onPhotoOpen }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
 
@@ -90,7 +91,15 @@ export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, in
       {carnet.images.length > 0 && (
         <div className="carnet-photos">
           {carnet.images.map((url, i) => (
-            <img key={i} src={url} alt="" className="carnet-photo" loading="lazy" />
+            <img
+              key={i}
+              src={url}
+              alt=""
+              className="carnet-photo"
+              loading="lazy"
+              onClick={() => onPhotoOpen?.(carnet.images, i)}
+              style={{ cursor: onPhotoOpen ? 'pointer' : undefined }}
+            />
           ))}
         </div>
       )}

@@ -16,6 +16,7 @@ import { InfluenceFrame } from './InfluenceFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { AddCarnetModal } from './AddCarnetModal'
+import { PhotoLightbox } from './PhotoLightbox'
 import './PlacePanel.css'
 
 interface PlacePanelProps {
@@ -241,6 +242,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [deleting, setDeleting] = useState(false)
   const [activeTab, setActiveTab] = useState<ActiveTab>('carnets')
   const [showAddCarnet, setShowAddCarnet] = useState(false)
+  const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
 
   // V0.5 detail data
   const [v05, setV05] = useState<V05Detail | null>(null)
@@ -698,6 +700,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   influencePerPhoto={influencePerPhoto}
                   influencePerVote={influencePerVote}
                   onVoted={refreshV05}
+                  onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
                 />
               ))
             )}
@@ -714,7 +717,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
         {activeTab === 'galerie' && (
           <div className="place-tab-content">
-            <PlaceGallery photos={galleryPhotos} onPhotoClick={scrollToCarnet} />
+            <PlaceGallery
+              photos={galleryPhotos}
+              onPhotoClick={scrollToCarnet}
+              onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
+            />
           </div>
         )}
 
@@ -760,6 +767,15 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           canRate={v05?.isExplorer === true || isAuthor}
           onClose={() => setShowAddCarnet(false)}
           onSaved={refreshV05}
+        />
+      )}
+
+      {lightbox && (
+        <PhotoLightbox
+          photos={lightbox.photos}
+          index={lightbox.index}
+          onClose={() => setLightbox(null)}
+          onNavigate={(idx) => setLightbox(prev => prev ? { ...prev, index: idx } : null)}
         />
       )}
     </>

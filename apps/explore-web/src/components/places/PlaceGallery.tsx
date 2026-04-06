@@ -8,9 +8,10 @@ interface GalleryPhoto {
 interface PlaceGalleryProps {
   photos: GalleryPhoto[]
   onPhotoClick: (carnetId: number) => void
+  onPhotoOpen?: (photos: string[], index: number) => void
 }
 
-export function PlaceGallery({ photos, onPhotoClick }: PlaceGalleryProps) {
+export function PlaceGallery({ photos, onPhotoClick: _onPhotoClick, onPhotoOpen }: PlaceGalleryProps) {
   if (photos.length === 0) {
     return (
       <div className="gallery-empty">
@@ -19,13 +20,15 @@ export function PlaceGallery({ photos, onPhotoClick }: PlaceGalleryProps) {
     )
   }
 
+  const allUrls = photos.map(p => p.url)
+
   return (
     <div className="gallery-grid">
       {photos.map((photo, i) => (
         <button
           key={`${photo.carnetId}-${i}`}
           className="gallery-item"
-          onClick={() => onPhotoClick(photo.carnetId)}
+          onClick={() => onPhotoOpen?.(allUrls, i)}
         >
           <img src={photo.url} alt="" loading="lazy" />
         </button>
