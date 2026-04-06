@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
@@ -36,22 +36,61 @@ interface CarnetCardProps {
 export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted, onPhotoOpen }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
+  const [liked, setLiked] = useState(false)
+  const [localVotesUp, setLocalVotesUp] = useState(carnet.votesUp)
+
+  // Check if user already liked this carnet
+  useEffect(() => {
+    if (!userId || carnet.userId === userId) return
+    supabase
+      .from('contribution_votes')
+      .select('vote')
+      .eq('contribution_id', carnet.id)
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.vote === 1) setLiked(true)
+      })
+  }, [userId, carnet.id, carnet.userId])
 
   const textInfluence = influencePerCarnet
   const photosInfluence = carnet.images.length > 0 ? influencePerPhoto : 0
   const votesInfluence = carnet.votesUp * influencePerVote
   const totalInfluence = textInfluence + photosInfluence + votesInfluence
 
-  async function vote(direction: 1 | -1) {
+  async function toggleLike() {
     if (!userId || voting) return
     setVoting(true)
-    const { data, error } = await supabase.rpc('vote_contribution', {
-      p_user_id: userId,
-      p_contribution_id: carnet.id,
-      p_vote: direction,
-    })
-    const result = data as { success?: boolean; error?: string } | null
-    if (!error && result?.success) onVoted()
+
+    if (liked) {
+      // Unlike: remove vote
+      await supabase
+        .from('contribution_votes')
+        .delete()
+        .eq('contribution_id', carnet.id)
+        .eq('user_id', userId)
+      await supabase
+        .from('place_contributions')
+        .update({ votes_up: Math.max(0, localVotesUp - 1) })
+        .eq('id', carnet.id)
+      setLiked(false)
+      setLocalVotesUp(v => Math.max(0, v - 1))
+      onVoted()
+    } else {
+      // Like
+      const { data, error } = await supabase.rpc('vote_contribution', {
+        p_user_id: userId,
+        p_contribution_id: carnet.id,
+        p_vote: 1,
+      })
+      const result = data as { success?: boolean } | null
+      if (!error && result?.success) {
+        setLiked(true)
+        setLocalVotesUp(v => v + 1)
+        onVoted()
+      }
+    }
+
     setVoting(false)
   }
 
@@ -122,11 +161,15 @@ export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influenceP
       {/* Footer: like + date */}
       <div className="carnet-footer">
         {carnet.userId !== userId ? (
-          <button className="carnet-like-btn" onClick={() => vote(1)} disabled={voting || !userId}>
-            ❤️ J'aime{carnet.votesUp > 0 ? ` (${carnet.votesUp})` : ''}
+          <button
+            className={`carnet-like-btn${liked ? ' carnet-liked' : ''}`}
+            onClick={toggleLike}
+            disabled={voting || !userId}
+          >
+            {liked ? '❤️' : '🤍'} {liked ? 'Aimé' : 'J\'aime'}{localVotesUp > 0 ? ` (${localVotesUp})` : ''}
           </button>
         ) : (
-          carnet.votesUp > 0 && <span className="carnet-like-count">❤️ {carnet.votesUp}</span>
+          localVotesUp > 0 && <span className="carnet-like-count">❤️ {localVotesUp}</span>
         )}
         <span className="carnet-date">{timeAgo}</span>
       </div>

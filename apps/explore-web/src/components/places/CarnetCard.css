@@ -63,8 +63,8 @@
 
 .carnet-faction-icon {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
@@ -89,12 +89,13 @@
 /* Text */
 .carnet-text {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--color-ink);
   font-style: italic;
   margin-bottom: 8px;
   white-space: pre-wrap;
+  opacity: 0.9;
 }
 
 /* Photos */
@@ -105,7 +106,7 @@
   overflow-x: auto;
 }
 .carnet-photo {
-  height: 80px;
+  height: 100px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
@@ -140,6 +141,11 @@
 }
 .carnet-like-btn:disabled { opacity: 0.5; cursor: default; }
 
+.carnet-liked {
+  background: rgba(220, 80, 100, 0.22);
+  border-color: rgba(220, 80, 100, 0.45);
+}
+
 .carnet-like-count {
   font-size: 13px;
   color: #c0506a;
@@ -148,8 +154,9 @@
 }
 .carnet-date {
   margin-left: auto;
-  font-size: 11px;
+  font-size: 13px;
   font-family: var(--font-body);
+  color: var(--color-muted);
 }
 
 /* Influence line */
