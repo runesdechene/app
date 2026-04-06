@@ -44,12 +44,13 @@ export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, in
   async function vote(direction: 1 | -1) {
     if (!userId || voting) return
     setVoting(true)
-    const { error } = await supabase.rpc('vote_contribution', {
+    const { data, error } = await supabase.rpc('vote_contribution', {
       p_user_id: userId,
       p_contribution_id: carnet.id,
       p_vote: direction,
     })
-    if (!error) onVoted()
+    const result = data as { success?: boolean; error?: string } | null
+    if (!error && result?.success) onVoted()
     setVoting(false)
   }
 
