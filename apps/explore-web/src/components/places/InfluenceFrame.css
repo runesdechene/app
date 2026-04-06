@@ -46,6 +46,18 @@
   color: #c0392b;
 }
 
+.influence-frame-stock-shake {
+  animation: stock-shake 0.4s ease;
+}
+
+@keyframes stock-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+
 /* Banner row */
 .influence-banners {
   display: flex;
@@ -135,20 +147,20 @@
   cursor: default;
 }
 
-/* Zero-score banners: greyed out, low opacity, reveal on hover */
+/* Zero-score banners: slightly faded, visible enough to click on mobile */
 .influence-banner-zero .influence-banner-flag {
-  filter: grayscale(1);
-  opacity: 0.35;
+  filter: grayscale(0.6);
+  opacity: 0.5;
   transition: filter 0.2s, opacity 0.2s;
 }
 
 .influence-banner-zero:hover .influence-banner-flag {
   filter: grayscale(0);
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .influence-banner-zero .influence-banner-score {
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 /* Pulse animation on click */
@@ -189,20 +201,3 @@
   }
 }
 
-/* Error & hint */
-.influence-frame-error {
-  font-size: 11px;
-  color: #c0392b;
-  text-align: center;
-  margin: 8px 0 0;
-  font-family: var(--font-body);
-}
-
-.influence-frame-hint {
-  font-size: 10px;
-  color: var(--color-ink-light);
-  text-align: center;
-  margin: 8px 0 0;
-  font-family: var(--font-accent);
-  opacity: 0.7;
-}

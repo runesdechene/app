@@ -65,8 +65,8 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   // Optimistic local score deltas (faction -> bonus points added locally)
   const [localBonus, setLocalBonus] = useState<Map<string, number>>(new Map())
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const [remoteUsed, setRemoteUsed] = useState(0) // clicks spent remotely on this place today
+  const [shakeStock, setShakeStock] = useState(false)
   const pendingRef = useRef(false)
   const MAX_REMOTE_PER_PLACE = 5
 
@@ -107,18 +107,15 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
   const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
     if (!userId || !userFactionId || pendingRef.current) return
-    if (influenceStock <= 0) {
-      setError('Plus d\u2019influence disponible.')
-      return
-    }
-    if (!isGps && remoteUsed >= MAX_REMOTE_PER_PLACE) {
-      setError('Limite atteinte sur ce lieu (5/jour \u00e0 distance).')
+    if (influenceStock <= 0 || (!isGps && remoteUsed >= MAX_REMOTE_PER_PLACE)) {
+      // Shake the stock indicator to signal "can't click"
+      setShakeStock(true)
+      setTimeout(() => setShakeStock(false), 500)
       return
     }
 
     // Optimistic update — instant feedback
     pendingRef.current = true
-    setError(null)
     setPulseFaction(factionId)
     playPopSound()
     spawnParticles(buttonEl)
@@ -160,17 +157,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       })
       usePlayerStore.getState().setInfluenceStock(influenceStock) // restore
 
-      const result = data as { error?: string } | null
-      if (result?.error) {
-        const messages: Record<string, string> = {
-          no_faction: 'Rejoignez un H\u00e9ritage d\u2019abord.',
-          not_enough_influence: 'Stock \u00e9puis\u00e9.',
-          daily_remote_limit: 'Limite \u00e0 distance atteinte (5/jour).',
-        }
-        setError(messages[result.error] ?? result.error)
-      } else {
-        setError('Erreur r\u00e9seau, r\u00e9essayez.')
-      }
+      // Silent rollback — header already shows the state
     } else {
       // Sync real remaining stock from server
       const result = data as { remainingStock?: number }
@@ -191,7 +178,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       <div className="influence-frame-header">
         <span className="influence-frame-title">Influence des H\u00e9ritages</span>
         {userId && (
-          <span className={`influence-frame-stock${remoteExhausted ? ' influence-frame-stock-exhausted' : ''}`}>
+          <span className={`influence-frame-stock${remoteExhausted ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
             {influenceStock} pt{influenceStock !== 1 ? 's' : ''}
             {isGps
               ? ' \u00b7 sur place'
@@ -228,7 +215,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         })}
       </div>
 
-      {error && <p className="influence-frame-error">{error}</p>}
     </div>
   )
 }
