@@ -178,12 +178,12 @@ export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influenceP
           className="carnet-influence-badge"
           style={{ backgroundColor: factionColor ?? '#8a7a6a' }}
         >
-          🏰 +{totalInfluence}
+          🏴 +{totalInfluence}
         </span>
         <span className="carnet-influence-breakdown">
-          📖 texte +{textInfluence}
-          {photosInfluence > 0 && <> · 📷 photos +{photosInfluence}</>}
-          {votesInfluence > 0 && <> · 👍 votes +{votesInfluence}</>}
+          +{textInfluence} 📖 texte<span className="carnet-influence-spacer"></span> 
+          {photosInfluence > 0 && <>  +{photosInfluence} 📷 photos </>}<span className="carnet-influence-spacer"></span> 
+          {votesInfluence > 0 && <>  ❤️ +{votesInfluence} j'aime  </>}
         </span>
       </div>
     </div>

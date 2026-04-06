@@ -1,7 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-06T11:59:18.344Z
-> Files: 434 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-06T23:17:48.653Z
+> Files: 509 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../../.claude/projects/C--Users-uriel-desktop-DEVS-app--Runes-de-Ch-ne-/memory/
+
+- `feedback_enigma_tone.md` (~330 tok)
+- `MEMORY.md` — Memory — Runes de Chêne (~1086 tok)
 
 ## ./
 
@@ -29,6 +34,15 @@
 ## .claude/rules/
 
 - `openwolf.md` (~313 tok)
+
+## .superpowers/brainstorm/8345-1775484898/content/
+
+- `fiche-lieu-v4.html` — Fiche de lieu — V4 (~3673 tok)
+- `fiche-lieu-v5.html` — Fiche de lieu — V5 (~2773 tok)
+- `hero-photo-v3.html` — Option C — Variantes photo (~5358 tok)
+- `hierarchy-v2.html` — Fiche de lieu — Maquettes (~5151 tok)
+- `hierarchy.html` (~2249 tok)
+- `waiting.html` (~41 tok)
 
 ## .wolf/
 
@@ -65,7 +79,7 @@
 ## apps/explore-web/src/
 
 - `App.css` — Styles: 30 rules (~1372 tok)
-- `App.tsx` — NotorietyBadge — uses useState, useRef, useEffect (~3455 tok)
+- `App.tsx` — NotorietyBadge (~3690 tok)
 - `index.css` — Styles: 3 rules, 15 vars (~340 tok)
 - `main.tsx` (~70 tok)
 - `vite-env.d.ts` — / <reference types="vite/client" /> (~61 tok)
@@ -169,26 +183,41 @@
 - `ChatPanel.css` — Styles: 34 rules (~1380 tok)
 - `ChatPanel.tsx` — ---- Helpers ---- (~3154 tok)
 
+## apps/explore-web/src/components/enigma/
+
+- `DailyEnigma.css` — Styles: 30 rules (~1150 tok)
+- `DailyEnigma.css` — Styles: enigma overlay, modal, choices, chest icon with pulse (~1150 tok)
+- `DailyEnigma.tsx` — Chest button to display on the map — pulses when enigma is available (~1809 tok)
+- `DailyEnigma.tsx` — DailyEnigma modal + EnigmaChestButton, calls get_daily_enigma + answer_enigma (~1809 tok)
+- `EnigmaResult.css` — Styles: 14 rules (~490 tok)
+- `EnigmaResult.css` — Styles: result display with pop animation (~490 tok)
+- `EnigmaResult.tsx` — EnigmaResult (~378 tok)
+- `EnigmaResult.tsx` — EnigmaResult — correct/wrong display with gains (~378 tok)
+- `PlaceEnigma.css` — Styles: 5 rules (~233 tok)
+- `PlaceEnigma.css` — Styles: place enigma trigger button (~233 tok)
+- `PlaceEnigma.tsx` — Haversine in km (~1737 tok)
+- `PlaceEnigma.tsx` — PlaceEnigma — GPS-only enigma on place detail (~1714 tok)
+
 ## apps/explore-web/src/components/map/
 
 - `AbilityBar.css` — Styles: 12 rules, 1 media queries, 1 animations (~584 tok)
 - `AbilityBar.tsx` — ABILITY_LABELS — uses useState, useEffect (~1348 tok)
-- `AdScreen.css` — Styles: 39 rules, 1 media queries, 2 animations (~2015 tok)
-- `AdScreen.tsx` — AdScreen — uses useState, useEffect (~922 tok)
+- `AdScreen.css` — Styles: 40 rules (~2047 tok)
+- `AdScreen.tsx` — AdScreen (~1169 tok)
 - `ConquestToggle.css` — Styles: 25 rules (~1619 tok)
 - `ConquestToggle.tsx` — ConquestToggle — uses useState (~503 tok)
 - `EnergyIndicator.css` — Styles: 18 rules (~593 tok)
-- `EnergyIndicator.tsx` — EnergyIndicator — uses useState (~928 tok)
-- `ExploreMap.tsx` — MAP_STYLE_PROP — renders map — uses useState, useEffect, useMemo (~10102 tok)
+- `EnergyIndicator.tsx` — EnergyIndicator (~1006 tok)
+- `ExploreMap.tsx` — MAP_STYLE_PROP (~10153 tok)
 - `FactionBar.css` — Styles: 15 rules, 1 animations (~664 tok)
-- `FactionBar.tsx` — FactionBar — uses useEffect (~1469 tok)
+- `FactionBar.tsx` — FactionBar (~1261 tok)
 - `FactionMembersModal.tsx` — FactionMembersModal — uses useState, useEffect (~2529 tok)
 - `GameToast.css` — Styles: 17 rules, 1 animations (~729 tok)
 - `GameToast.tsx` — Segmente le message en parties texte/bold, et rend les parties (~1997 tok)
 - `InfoModal.css` — Styles: 16 rules (~574 tok)
 - `InfoModal.tsx` — InfoModal (~432 tok)
 - `LeaderboardModal.css` — Styles: 57 rules (~2326 tok)
-- `LeaderboardModal.tsx` — TAB_LABELS — uses useState, useEffect (~1153 tok)
+- `LeaderboardModal.tsx` — TAB_LABELS (~1210 tok)
 - `MapStyleSelect.css` — Styles: 53 rules, 2 animations (~2782 tok)
 - `MapStyleSelect.tsx` — STYLE_OPTIONS — uses useState, useEffect (~676 tok)
 - `Minimap.tsx` — CANVAS_W — renders chart — uses useMemo, useCallback, useEffect (~2549 tok)
@@ -196,7 +225,7 @@
 - `MobileNavbar.tsx` — MobileNavbar (~1053 tok)
 - `OnlinePlayerMarkers.css` — Styles: 86 rules, 1 media queries, 3 animations (~4671 tok)
 - `OnlinePlayerMarkers.tsx` — OnlinePlayerMarkers (~402 tok)
-- `PlayerProfileModal.tsx` — formatDate — uses useState, useEffect (~10531 tok)
+- `PlayerProfileModal.tsx` — V0.5 fields (~10797 tok)
 - `ResourceIndicator.tsx` — CONFIG — uses useState (~1326 tok)
 - `TagBonusList.tsx` — TagBonusList (~774 tok)
 - `TerritoryMarkers.tsx` — TerritoryMarkers (~915 tok)
@@ -207,15 +236,43 @@
 
 ## apps/explore-web/src/components/places/
 
+- `AddCarnetModal.css` — Styles: 26 rules (~1002 tok)
+- `AddCarnetModal.tsx` — AddCarnetModal (~1591 tok)
+- `AddContributionModal.css` — Styles: 14 rules (~656 tok)
+- `AddContributionModal.tsx` — TYPE_OPTIONS (~1403 tok)
 - `AddPlaceFlow.css` — Styles: 32 rules (~1632 tok)
 - `AddPlaceFlow.tsx` — MAX_FILE_SIZE — renders chart — uses useState, useEffect (~6391 tok)
+- `CarnetCard.css` — Styles: 28 rules (~1074 tok)
+- `CarnetCard.tsx` — CarnetCard (~1908 tok)
 - `ClaimButton.tsx` — hexToRgb — uses useState, useEffect (~2461 tok)
+- `ContributionCard.css` — Styles: 15 rules (~657 tok)
+- `ContributionCard.tsx` — TYPE_LABELS (~1022 tok)
 - `FoggedPlaceView.css` — Styles: 13 rules (~517 tok)
 - `FoggedPlaceView.tsx` — FoggedPlaceView — uses useState, useEffect (~1868 tok)
 - `FortifyButton.tsx` — FortifyButton — uses useState, useEffect (~2510 tok)
-- `PlacePanel.css` — Styles: 81 rules (~5824 tok)
-- `PlacePanel.tsx` — PlacePanel — uses useState, useMemo (~6882 tok)
+- `InfluenceButton.css` — Styles: 21 rules (~691 tok)
+- `InfluenceButton.tsx` — Haversine distance in km (~1492 tok)
+- `InfluenceFlags.css` — Styles: 6 rules (~230 tok)
+- `InfluenceFlags.tsx` — InfluenceFlags (~402 tok)
+- `InfluenceFrame.css` — Styles: 27 rules (~1212 tok)
+- `InfluenceFrame.tsx` — Short satisfying "pop" sound via Web Audio API (~2741 tok)
+- `PhotoLightbox.css` — Styles: 12 rules (~542 tok)
+- `PhotoLightbox.tsx` — PhotoLightbox (~470 tok)
+- `PlaceContributions.css` — Styles: 11 rules (~431 tok)
+- `PlaceContributions.tsx` — TAB_OPTIONS (~816 tok)
+- `PlaceExplorers.css` — Styles: 13 rules (~463 tok)
+- `PlaceExplorers.tsx` — Haversine distance in km (~1273 tok)
+- `PlaceGallery.css` — Styles: 5 rules (~158 tok)
+- `PlaceGallery.tsx` — PlaceGallery (~260 tok)
+- `PlaceInfos.css` — Styles: 15 rules (~566 tok)
+- `PlaceInfos.tsx` — INFO_CONFIG (~1224 tok)
+- `PlacePanel.css` — Styles: 78 rules (~4068 tok)
+- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9136 tok)
+- `PlaceRating.css` — Styles: 8 rules (~214 tok)
+- `PlaceRating.tsx` — PlaceRating (~607 tok)
 - `ScoreSlider.tsx` — ScoreSlider (~250 tok)
+- `WishlistButton.css` — Styles: 4 rules (~196 tok)
+- `WishlistButton.tsx` — WishlistButton (~381 tok)
 
 ## apps/explore-web/src/components/pwa/
 
@@ -229,8 +286,8 @@
 - `useChat.ts` — Hook de chat — a appeler UNE SEULE FOIS au niveau App. (~1785 tok)
 - `useConstructionTypes.ts` — Exports ConstructionTypeInfo, useConstructionTypes, ctByLevel (~265 tok)
 - `usePlace.ts` — Exports PlaceDetail, usePlace (~1213 tok)
-- `usePlaces.ts` — Couleur du tag primaire (jamais ecrasee par la faction) — pour les icones (~1517 tok)
-- `usePlayer.ts` — Distance haversine en mètres (~6404 tok)
+- `usePlaces.ts` — Couleur du tag primaire (jamais ecrasee par la faction) — pour les icones (~1604 tok)
+- `usePlayer.ts` — Distance haversine en mètres (~6582 tok)
 - `usePresence.ts` — Hook de présence — à appeler UNE SEULE FOIS au niveau App. (~1350 tok)
 - `useResourceTimers.ts` — Single shared interval that ticks all 3 resource countdowns (energy, conquest, construction). (~808 tok)
 - `useSupabaseConnection.ts` — Exports useSupabaseConnection (~330 tok)
@@ -239,7 +296,7 @@
 
 - `imageUtils.ts` — Redimensionne et convertit une image en WebP avant upload (~428 tok)
 - `map-icons.ts` — Charge un SVG text en HTMLImageElement (~2382 tok)
-- `map-layers.ts` — Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré) (~2235 tok)
+- `map-layers.ts` — Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré) (~2271 tok)
 - `map-style.ts` — Recolore un style Positron avec la palette parchemin (~2065 tok)
 - `supabase.ts` — Exports supabase, testConnection, fetchTables (~351 tok)
 
@@ -249,12 +306,12 @@
 - `mapStore.ts` — ID du joueur dont le profil est ouvert (global) (~1341 tok)
 - `mobileNavStore.ts` — Timestamp de la dernière ouverture du panneau notifications (~287 tok)
 - `playersStore.ts` — Exports OnlinePlayer, usePlayersStore (~262 tok)
-- `playerStore.ts` — IDs des lieux découverts par l'utilisateur (lookup O(1)) (~2022 tok)
+- `playerStore.ts` — IDs des lieux découverts par l'utilisateur (lookup O(1)) (~2287 tok)
 - `toastStore.ts` — Texte(s) à mettre en avant (bold) dans le message (~554 tok)
 
 ## apps/explore-web/src/styles/
 
-- `mobile.css` — Styles: 13 rules, 1 media queries (~4484 tok)
+- `mobile.css` — Styles: 13 rules (~4393 tok)
 
 ## apps/explore-web/src/types/
 
@@ -262,7 +319,7 @@
 
 ## apps/explore-web/src/workers/
 
-- `territoryWorker.ts` — Web Worker : calcul des territoires (Voronoi + cercles clippés) (~4611 tok)
+- `territoryWorker.ts` — Web Worker : calcul des territoires (Voronoi + cercles clippés). V0.5 : scoring influence-only, radius tuné (BASE 0.20, SCALE 0.12), fortificationBonus supprimé (~4200 tok)
 
 ## apps/hub/
 
@@ -296,18 +353,19 @@
 ## apps/hub/src/
 
 - `App.css` — Styles: 93 rules, 2 animations (~20084 tok)
-- `App.tsx` — AccessDenied (~1151 tok)
+- `App.tsx` — AccessDenied (~1184 tok)
 - `index.css` — Styles: 3 rules, 24 vars (~666 tok)
 - `main.tsx` (~97 tok)
 - `vite-env.d.ts` — / <reference types="vite/client" /> (~55 tok)
 
 ## apps/hub/src/components/
 
-- `Ads.tsx` — Ads — uses useState, useEffect (~3731 tok)
+- `Ads.tsx` — Ads (~3918 tok)
 - `AssignFragments.tsx` — AssignFragments — uses useState, useEffect (~3137 tok)
-- `Constructions.tsx` — Constructions — uses useState, useEffect (~3838 tok)
-- `Dashboard.tsx` — isoDate — uses useState, useEffect (~1878 tok)
+- `Constructions.tsx` — Constructions (archive V0.4, desactivee avec bandeau) (~4200 tok)
+- `Dashboard.tsx` — Dashboard avec stats V0.5 (enigmes, influence, top contributeurs) (~3800 tok)
 - `Divers.tsx` — Divers — uses useState, useEffect (~1048 tok)
+- `Enigmas.tsx` — Page gestion enigmes V0.5 : liste paginee, filtres, CRUD, toggle actif, stats (~7500 tok)
 - `Factions.tsx` — Factions — uses useState, useEffect (~6096 tok)
 - `Fragments.tsx` — BONUS_TYPES — uses useState, useEffect (~7614 tok)
 - `LoginPage.tsx` — LoginPage — renders form — uses useState (~993 tok)
@@ -317,15 +375,15 @@
 - `Reviews.tsx` — PURCHASE_LABELS — uses useState, useEffect (~2126 tok)
 - `ReviewSubmit.tsx` — MAX_REVIEW_LENGTH — renders form — uses useState (~4025 tok)
 - `SaveBar.tsx` — SaveBar (~295 tok)
-- `Settings.tsx` — ROLES (~6463 tok)
+- `Settings.tsx` — ROLES (~10262 tok)
 - `ShopifyConnect.tsx` — Callback OAuth — reçoit le token depuis la Netlify Function (~1623 tok)
 - `ShopifySync.tsx` — ShopifySync — uses useState, useEffect (~5972 tok)
 - `ShopifyUnlocks.tsx` — ShopifyUnlocks — uses useState, useEffect (~1384 tok)
-- `Sidebar.tsx` — Sidebar (~873 tok)
+- `Sidebar.tsx` — Sidebar (~911 tok)
 - `TagsManager.tsx` — TagsManager — uses useState, useEffect (~2894 tok)
 - `TitlesManager.tsx` — STAT_OPTIONS — uses useState, useEffect (~4318 tok)
-- `UserDetail.tsx` — UserDetail — renders table — uses useNavigate, useState, useEffect (~3256 tok)
-- `Users.tsx` — ROLE_LABELS — uses useNavigate, useState, useEffect, useMemo (~6290 tok)
+- `UserDetail.tsx` — UserDetail — renders table (~3462 tok)
+- `Users.tsx` — ROLE_LABELS (~6440 tok)
 
 ## apps/hub/src/hooks/
 
@@ -339,6 +397,16 @@
 ## docs/
 
 - `ARCHITECTURE_HUB.md` — Architecture HUB - Runes de Chene (~1057 tok)
+
+## docs/superpowers/plans/
+
+- `2026-04-06-phase6-influence-migration.md` — Phase 6 — Influence Migration (Kill Old Claims) (~4162 tok)
+- `2026-04-06-place-panel-modal-fix.md` — PlacePanel — Modal UX Fix + Data Backfill (~4505 tok)
+- `2026-04-06-place-panel-redesign.md` — PlacePanel Redesign — Implementation Plan (~11515 tok)
+
+## docs/superpowers/specs/
+
+- `2026-04-06-place-panel-redesign.md` — Spec — Refonte Fiche de Lieu (PlacePanel) (~1624 tok)
 
 ## packages/supabase-client/
 
@@ -379,6 +447,7 @@
 
 - `002_hub_tables.sql` — HUB : Gestion des comptes Runes de Chene (~837 tok)
 - `002_new_user_energy_from_settings.sql` — MIGRATION 002 : handle_new_user lit max_energy depuis app_settings (~2002 tok)
+- `003_ad_screen_linked_tip.sql` — MIGRATION 003 : Liaison image ↔ texte sur les pubs (~631 tok)
 - `003_cleanup_old_tables.sql` — NETTOYAGE : Suppression des anciennes tables Shopify/IVY (~553 tok)
 - `004_photo_submissions.sql` — TABLE SOUMISSIONS PHOTOS COMMUNAUTAIRES (~2821 tok)
 - `005_review_submissions.sql` — 005 : Soumissions d'avis texte (~1688 tok)
@@ -387,19 +456,34 @@
 - `008_photo_submission_sizing.sql` — AJOUT CHAMPS TAILLE PRODUIT / MODELE (~581 tok)
 - `009_photo_tags_and_status_update.sql` — MIGRATION : NOUVEAU SYSTEME STATUTS + TAGS (~2746 tok)
 - `010_update_submission_message.sql` — FONCTION : Modifier le message d'une soumission photo (~154 tok)
+- `010_v05_rpc_place_influence.sql` — 010_v05_rpc_place_influence.sql (~920 tok)
 - `011_product_worn_and_api_location.sql` — 1. Ajouter colonne product_worn (produit porte - reference interne) (~659 tok)
+- `011_v05_rpc_visit_place.sql` — 011_v05_rpc_visit_place.sql (~810 tok)
 - `012_tags_system.sql` — MIGRATION 012 : Système de Tags (~10483 tok)
+- `012_v05_rpc_daily_enigma.sql` — 012_v05_rpc_daily_enigma.sql (~1234 tok)
 - `013_tags_update_policy.sql` — MIGRATION 013 : Tags — UPDATE policy + Storage bucket (~432 tok)
+- `013_v05_rpc_contributions.sql` — 013_v05_rpc_contributions.sql (~1404 tok)
 - `014_map_influence_zones.sql` — MIGRATION 014 : Zones d'influence — likes count dans get_map_places (~1644 tok)
+- `014_v05_rpc_place_detail.sql` — 014_v05_rpc_place_detail.sql (~1049 tok)
 - `015_map_score_composite.sql` — MIGRATION 015 : Score composite pour zones d'influence (~2106 tok)
+- `015_v05_rpc_decay_rating_wishlist.sql` — 015_v05_rpc_decay_rating_wishlist.sql (~727 tok)
 - `016_factions.sql` — MIGRATION 016 : Systeme de factions (~486 tok)
+- `016_v05_update_discover_place.sql` — 016_v05_update_discover_place.sql (~1114 tok)
 - `017_factions_gameplay.sql` — MIGRATION 017 : Factions gameplay (~5660 tok)
+- `017_v05_update_profile_rpcs.sql` — 017_v05_update_profile_rpcs.sql (~2355 tok)
 - `018_fix_map_places_pattern.sql` — Fix : ajouter faction.pattern dans get_map_places (~2313 tok)
+- `018_v05_seed_enigmas.sql` — 018_v05_seed_enigmas.sql (~10267 tok)
 - `019_fog_of_war.sql` — MIGRATION 019 : Brouillard de guerre V1 (~1397 tok)
+- `019_v05_contributions_images.sql` — 019_v05_contributions_images.sql (~110 tok)
 - `020_app_settings.sql` — 020 : Table app_settings + bucket app-assets (~454 tok)
+- `020_backfill_explorers_and_carnets.sql` — 020_backfill_explorers_and_carnets.sql (~1534 tok)
+- `021_influence_any_faction.sql` — 021_influence_any_faction.sql (~1092 tok)
 - `021_map_places_claimer_name.sql` — Migration 020 : ajouter le nom du conquérant à get_map_places (~2390 tok)
+- `022_phase6_influence_map.sql` — 022_phase6_influence_map.sql (~2509 tok)
 - `022_reset_user_energy.sql` — Migration 022 : RPC pour recharger l'énergie d'un joueur (~125 tok)
 - `023_faction_change_discoveries.sql` — Migration 023 : Fix découvertes lors du changement de faction (~796 tok)
+- `023_fix_discover_not_explorer.sql` — 023_fix_discover_not_explorer.sql (~1121 tok)
+- `024_create_place_v05_rewards.sql` — 024_create_place_v05_rewards.sql (~2012 tok)
 - `024_energy_regen.sql` — MIGRATION 024 : Regen d'energie progressive (~1795 tok)
 - `025_energy_regen_faction_filter.sql` — MIGRATION 025 : Correctif regen energie (~1427 tok)
 - `026_activity_log.sql` — MIGRATION 026 : Activity Log (notifications) (~909 tok)
@@ -571,3 +655,9 @@
 - `192_fix_account_source_no_both.sql` — MIGRATION 192 : Supprimer account_source = 'both' (~286 tok)
 - `193_fix_get_user_titles_unlocks_again.sql` — MIGRATION 193 : Restaurer le champ "unlocks" dans get_user_titles (bis) (~1106 tok)
 - `194_add_places_added_title_condition.sql` — MIGRATION 194 : Ajouter condition "places_added" pour les titres (~1132 tok)
+- `195_v05_users_new_columns.sql` — 195_v05_users_new_columns.sql (~246 tok)
+- `196_v05_place_influence.sql` — 196_v05_place_influence.sql (~282 tok)
+- `197_v05_place_contributions.sql` — 197_v05_place_contributions.sql (~618 tok)
+- `198_v05_place_explorers_ratings_wishlist.sql` — 198_v05_place_explorers_ratings_wishlist.sql (~611 tok)
+- `199_v05_enigmas.sql` — 199_v05_enigmas.sql (~672 tok)
+- `200_v05_app_settings.sql` — 200_v05_app_settings.sql (~414 tok)

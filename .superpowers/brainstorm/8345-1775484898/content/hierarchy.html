@@ -1,0 +1,121 @@
+<h2>Hiérarchie de la fiche de lieu</h2>
+<p class="subtitle">Qu'est-ce que le joueur voit en premier ? Qu'est-ce qui l'accroche ?</p>
+
+<div class="cards">
+
+  <!-- Option A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);">
+      <div style="font-family: Georgia, serif; font-size: 13px; color: #5a4a3a; line-height: 1.6;">
+        <div style="background: #3a2a1a; color: #f5efe0; padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 11px; display: flex; justify-content: space-between;">
+          <span>📷 Photo hero plein cadre</span>
+          <span>❤️ ⭐ 🔖</span>
+        </div>
+        <div style="font-size: 18px; font-weight: bold; margin-bottom: 2px;">Titre du lieu</div>
+        <div style="font-size: 11px; color: #8a7a6a; margin-bottom: 6px;">🏷️ Tags &nbsp; | &nbsp; 📍 Adresse</div>
+        <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+          <span style="background: #69a72a; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">🟢 142</span>
+          <span style="background: #2665c9; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">🔵 89</span>
+          <span style="background: #9c3088; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">🟣 203 ⭐</span>
+          <span style="background: #cb2020; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">🔴 45</span>
+        </div>
+        <div style="border: 1px dashed #c9b99a; padding: 6px; border-radius: 6px; margin-bottom: 8px;">
+          <div style="font-size: 10px; font-weight: bold;">📖 Page de carnet la + votée</div>
+          <div style="font-size: 10px; color: #7a6a5a;">« Un lieu hors du temps... »</div>
+        </div>
+        <div style="font-size: 10px; color: #8a7a6a;">👤 Découvreur &nbsp; 👑 Gardien &nbsp; 🧭 12 Explorateurs</div>
+        <div style="margin-top: 8px; background: #5a4a3a; color: #f5efe0; padding: 6px; border-radius: 4px; text-align: center; font-size: 11px;">
+          🏰 Placer de l'influence
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Photo d'abord, contenu ensuite</h3>
+      <p>Hero image immersive → titre + drapeaux → meilleure contribution → explorateurs → action. <strong>Le visuel accroche, la communauté suit.</strong></p>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);">
+      <div style="font-family: Georgia, serif; font-size: 13px; color: #5a4a3a; line-height: 1.6;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div>
+            <div style="font-size: 18px; font-weight: bold;">Titre du lieu</div>
+            <div style="font-size: 10px; color: #8a7a6a;">🧭 Découvert par <u>Uriel</u> · 👑 Gardien: <u>Lya</u></div>
+          </div>
+          <div style="text-align: right; font-size: 10px;">
+            <div>⭐ 4.2 <span style="color:#8a7a6a">(8)</span></div>
+            <div>🔖</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+          <span style="background: #69a72a; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">142</span>
+          <span style="background: #9c3088; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">203 ⭐</span>
+          <span style="background: #2665c9; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">89</span>
+          <span style="background: #cb2020; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">45</span>
+        </div>
+        <div style="background: #3a2a1a; color: #f5efe0; padding: 6px 10px; border-radius: 4px; margin-bottom: 8px; font-size: 11px; text-align: center;">
+          📷 Photo (plus petite, 16:9)
+        </div>
+        <div style="font-size: 10px; color: #5a4a3a; margin-bottom: 8px;">
+          🏷️ Château · Mégalithe &nbsp; | &nbsp; 📍 Carnac, Morbihan
+        </div>
+        <div style="display: flex; gap: 4px; margin-bottom: 6px; font-size: 10px;">
+          <span style="padding: 3px 8px; border: 1px solid #c9b99a; border-radius: 12px; background: rgba(0,0,0,0.03);">📖 Carnets (3)</span>
+          <span style="padding: 3px 8px; border: 1px solid #c9b99a; border-radius: 12px; background: rgba(0,0,0,0.03);">📷 Photos (5)</span>
+          <span style="padding: 3px 8px; border: 1px solid #c9b99a; border-radius: 12px; background: rgba(0,0,0,0.03);">ℹ️ Infos (2)</span>
+        </div>
+        <div style="margin-top: 6px; background: #5a4a3a; color: #f5efe0; padding: 6px; border-radius: 4px; text-align: center; font-size: 11px;">
+          🏰 Placer de l'influence
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Identité d'abord, photo secondaire</h3>
+      <p>Titre + rôles + drapeaux EN PREMIER → photo réduite (16:9) → tags + adresse → onglets contenu → action. <strong>Le lieu a une identité avant d'avoir une image.</strong></p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);">
+      <div style="font-family: Georgia, serif; font-size: 13px; color: #5a4a3a; line-height: 1.6;">
+        <div style="position: relative; background: #3a2a1a; color: #f5efe0; padding: 10px; border-radius: 4px; margin-bottom: 8px;">
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 2px;">Titre du lieu</div>
+          <div style="font-size: 10px; opacity: 0.7;">📷 Photo en fond (overlay sombre)</div>
+          <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px;">
+            <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 8px; font-size: 9px;">⭐ 4.2</span>
+            <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 8px; font-size: 9px;">🔖</span>
+          </div>
+          <div style="display: flex; gap: 3px; margin-top: 6px;">
+            <span style="background: rgba(105,167,42,0.8); padding: 1px 6px; border-radius: 8px; font-size: 9px;">142</span>
+            <span style="background: rgba(156,48,136,0.8); padding: 1px 6px; border-radius: 8px; font-size: 9px;">203⭐</span>
+            <span style="background: rgba(38,101,201,0.8); padding: 1px 6px; border-radius: 8px; font-size: 9px;">89</span>
+            <span style="background: rgba(203,32,32,0.8); padding: 1px 6px; border-radius: 8px; font-size: 9px;">45</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+          <div style="width: 28px; height: 28px; background: #c9b99a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">🧭</div>
+          <div style="font-size: 10px;">Découvert par <u>Uriel</u></div>
+          <div style="width: 28px; height: 28px; background: #c9b99a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">👑</div>
+          <div style="font-size: 10px;">Gardien: <u>Lya</u></div>
+        </div>
+        <div style="font-size: 10px; color: #5a4a3a; margin-bottom: 8px;">
+          🏷️ Tags &nbsp; 📍 Adresse
+        </div>
+        <div style="display: flex; gap: 4px; font-size: 10px; border-top: 1px solid #d9c9a9; padding-top: 6px;">
+          <span style="flex: 1; text-align: center; padding: 4px; border-bottom: 2px solid #5a4a3a; font-weight: bold;">Carnet</span>
+          <span style="flex: 1; text-align: center; padding: 4px; color: #8a7a6a;">Photos</span>
+          <span style="flex: 1; text-align: center; padding: 4px; color: #8a7a6a;">Infos</span>
+          <span style="flex: 1; text-align: center; padding: 4px; color: #8a7a6a;">🏰</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Hero compact avec overlay</h3>
+      <p>Photo + titre + drapeaux fusionnés en un header dense → rôles → onglets pour tout le reste. <strong>Maximum d'info en minimum d'espace. Le contenu est dans les onglets.</strong></p>
+    </div>
+  </div>
+
+</div>

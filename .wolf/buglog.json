@@ -79,6 +79,1286 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-06T11:59:18.358Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-04-06T12:13:48.026Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/hub/src/components/Ads.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T12:13:48.026Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-04-06T12:14:01.789Z",
+      "error_message": "Wrong reference: null should be number",
+      "file": "apps/hub/src/components/Ads.tsx",
+      "root_cause": "Used \"null\" instead of \"number\"",
+      "fix": "Changed null → number",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T12:14:01.789Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-04-06T12:24:57.932Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/map/AdScreen.tsx",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 13→18 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T12:24:57.932Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-04-06T12:25:08.789Z",
+      "error_message": "CSS fix: display",
+      "file": "apps/explore-web/src/components/map/AdScreen.css",
+      "root_cause": "display: block → flex",
+      "fix": "Changed display: block → flex",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T12:25:08.789Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-04-06T13:35:21.158Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/hub/src/App.tsx",
+      "root_cause": "Had './components/Settings'",
+      "fix": "Changed to './components/Enigmas'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T13:35:26.006Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-04-06T13:35:24.267Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/hooks/usePlayer.ts",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:35:24.267Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-04-06T13:35:57.252Z",
+      "error_message": "Missing await",
+      "file": "apps/hub/src/components/Settings.tsx",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: async function saveV05Settings() {; setSavingV05(true)",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T13:36:04.061Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-04-06T13:36:55.835Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/hub/src/components/UserDetail.tsx",
+      "root_cause": "Had 'id, email_address, first_name, display_name, role",
+      "fix": "Changed to 'id, email_address, first_name, display_name, role",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:36:55.835Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-04-06T13:37:21.440Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/hub/src/components/Users.tsx",
+      "root_cause": "Had 'id, email_address, first_name, display_name, role",
+      "fix": "Changed to 'id, email_address, first_name, display_name, role",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:37:21.440Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-04-06T13:37:35.298Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/hub/src/components/Users.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:37:35.298Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-04-06T13:38:05.640Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/hub/src/components/Dashboard.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:38:05.640Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-04-06T13:38:34.775Z",
+      "error_message": "CSS fix: paddingBottom",
+      "file": "apps/hub/src/components/Constructions.tsx",
+      "root_cause": "paddingBottom: hasChanges ? 70 : 0 → hasChanges ? 70 : 0, opacity: 0.6, pointerEvents: 'none', position: 'relative'",
+      "fix": "Changed paddingBottom: hasChanges ? 70 : 0 → hasChanges ? 70 : 0, opacity: 0.6, pointerEvents: 'none', position: 'relative'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:38:34.775Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-04-06T13:41:53.610Z",
+      "error_message": "Missing guard clause",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "No early return/throw for edge case: cancelled || error",
+      "fix": "Added guard clause: if (cancelled || error)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:41:53.610Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-04-06T13:42:07.892Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:42:07.892Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-04-06T13:42:28.116Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/workers/territoryWorker.ts",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:42:28.116Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-04-06T13:42:36.760Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/workers/territoryWorker.ts",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 11→5 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:42:36.760Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-04-06T13:42:58.937Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/map/EnergyIndicator.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:42:58.937Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-04-06T13:43:19.058Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/map/PlayerProfileModal.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:43:19.058Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-04-06T13:43:32.065Z",
+      "error_message": "CSS fix: notoriety, explored",
+      "file": "apps/explore-web/src/components/map/LeaderboardModal.tsx",
+      "root_cause": "notoriety: '\\uD83C\\uDFC5', → '\\uD83C\\uDF96\\uFE0F',; explored: '\\uD83E\\uDDED', → '\\uD83D\\uDCCD',",
+      "fix": "Changed notoriety: '\\uD83C\\uDFC5', → '\\uD83C\\uDF96\\uFE0F',; explored: '\\uD83E\\uDDED', → '\\uD83D\\uDCCD',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:43:32.065Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-04-06T13:43:36.830Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/map/LeaderboardModal.tsx",
+      "root_cause": "Had 'authored'",
+      "fix": "Changed to 'exploration'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:43:36.830Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-04-06T13:44:28.390Z",
+      "error_message": "CSS fix: label",
+      "file": "apps/explore-web/src/App.tsx",
+      "root_cause": "label: 'Changer d\\'Héritage', value: 'Gloire / 2' → 'Changer d\\'H\\u00e9ritage', value: 'Gloire / 2'",
+      "fix": "Changed label: 'Changer d\\'Héritage', value: 'Gloire / 2' → 'Changer d\\'H\\u00e9ritage', value: 'Gloire / 2'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:44:28.390Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-04-06T13:44:35.028Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/lib/map-layers.ts",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:44:35.028Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-04-06T13:44:58.484Z",
+      "error_message": "Wrong reference: PlaceEnigmaProps should be _",
+      "file": "apps/explore-web/src/components/enigma/PlaceEnigma.tsx",
+      "root_cause": "Used \"PlaceEnigmaProps\" instead of \"_\"",
+      "fix": "Changed PlaceEnigmaProps → _",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T13:44:58.484Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-04-06T15:40:15.124Z",
+      "error_message": "Wrong reference: panel should be hero",
+      "file": "apps/explore-web/src/styles/mobile.css",
+      "root_cause": "Used \"panel\" instead of \"hero\"",
+      "fix": "Changed panel → hero",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:40:15.124Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-04-06T15:40:18.926Z",
+      "error_message": "CSS fix: margin-top",
+      "file": "apps/explore-web/src/styles/mobile.css",
+      "root_cause": "margin-top: 62px → 0",
+      "fix": "Changed margin-top: 62px → 0",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T15:40:27.807Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-04-06T15:40:23.496Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/styles/mobile.css",
+      "root_cause": "10 lines replaced/restructured",
+      "fix": "Rewrote 16→5 lines (10 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:40:23.496Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-04-06T15:40:49.827Z",
+      "error_message": "Wrong reference: InfluenceFrameProps should be _onInfluencePlaced",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Used \"InfluenceFrameProps\" instead of \"_onInfluencePlaced\"",
+      "fix": "Changed InfluenceFrameProps → _onInfluencePlaced",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:40:49.827Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-04-06T15:42:52.641Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PlaceExplorers.tsx",
+      "root_cause": "Had '\\uD83D\\uDCCD J\\u2019y suis !'",
+      "fix": "Changed to '📍 J\\'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:42:52.641Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-04-06T15:46:35.506Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:46:35.506Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-04-06T15:49:33.517Z",
+      "error_message": "CSS fix: Top-left, Top-right",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Top-left: close + admin gear */ → rating pill */; Top-right: rating pill + wishlist */ → close + admin gear */",
+      "fix": "Changed Top-left: close + admin gear */ → rating pill */; Top-right: rating pill + wishlist */ → close + admin gear */",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:49:33.517Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-04-06T15:49:39.724Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:49:39.724Z"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-04-06T15:53:28.844Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: function QuickInfoChip({ icon, value, placeholder, onClick }; icon: React.ReactNode",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T15:53:46.681Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-04-06T15:53:59.754Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "10 lines replaced/restructured",
+      "fix": "Rewrote 32→64 lines (10 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:53:59.754Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-04-06T15:54:15.116Z",
+      "error_message": "CSS fix: border, padding",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "border: 1px solid var(--color-sepia) → none; padding: 2px 6px → 2px",
+      "fix": "Changed border: 1px solid var(--color-sepia) → none; padding: 2px 6px → 2px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T15:54:15.116Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-04-06T20:13:57.250Z",
+      "error_message": "CSS fix: transform, top, box-shadow",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "transform: translateX(100%) → translate(-50%, -50%) scale(1); top: 35px → 50%; box-shadow: 4px 0 40px 20px rgba(74, 55, 40, 0.15) → 0 20px 60px rgba(74, 55, 40, 0.3)",
+      "fix": "Changed transform: translateX(100%) → translate(-50%, -50%) scale(1); top: 35px → 50%; box-shadow: 4px 0 40px 20px rgba(74, 55, 40, 0.15) → 0 20px 60px rgba(74, 55, 40, 0.3)",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:13:57.250Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-04-06T20:15:27.810Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:15:27.810Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-04-06T20:15:31.676Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 6→3 lines (3 removed) | Also: {/* Hidden InfluenceButton for the action modal */; {showInfluenceAction && userEmail && usePlayerStor",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T20:15:37.511Z"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-04-06T20:30:18.474Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/WishlistButton.tsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 10→10 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:30:18.474Z"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-04-06T20:30:58.374Z",
+      "error_message": "CSS fix: font-weight, color, font-size",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "font-weight: 400 → 600; color: var(--color-ink) → var(--color-ink-light); font-size: 12px → 11px",
+      "fix": "Changed font-weight: 400 → 600; color: var(--color-ink) → var(--color-ink-light); font-size: 12px → 11px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:30:58.374Z"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-04-06T20:32:56.104Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: /** Unified explorer row — discoverer (⭐) and guardian (🛡) ; function ExplorerRow({ explorers, authorId, guardianId, fact",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T20:33:39.183Z"
+    },
+    {
+      "id": "bug-046",
+      "timestamp": "2026-04-06T20:33:10.707Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Had './PlaceExplorers'",
+      "fix": "Changed to './InfluenceButton'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T20:35:09.763Z"
+    },
+    {
+      "id": "bug-047",
+      "timestamp": "2026-04-06T20:33:56.439Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "30 lines replaced/restructured",
+      "fix": "Rewrote 62→96 lines (30 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:33:56.439Z"
+    },
+    {
+      "id": "bug-048",
+      "timestamp": "2026-04-06T20:37:56.283Z",
+      "error_message": "CSS fix: data, p_place_id",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "data: factionData → allFactions; p_place_id: place.id, → place.id, p_user_id: userId ?? null",
+      "fix": "Changed data: factionData → allFactions; p_place_id: place.id, → place.id, p_user_id: userId ?? null",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:37:56.283Z"
+    },
+    {
+      "id": "bug-049",
+      "timestamp": "2026-04-06T20:38:07.753Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 19→12 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:38:07.753Z"
+    },
+    {
+      "id": "bug-050",
+      "timestamp": "2026-04-06T20:40:19.603Z",
+      "error_message": "CSS fix: border-radius, box-shadow",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.css",
+      "root_cause": "border-radius: 4px 4px 0 0 → 6px 6px 0 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) → 0 2px 8px rgba(0, 0, 0, 0.25)",
+      "fix": "Changed border-radius: 4px 4px 0 0 → 6px 6px 0 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) → 0 2px 8px rgba(0, 0, 0, 0.25)",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:40:19.603Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-04-06T20:41:58.766Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→6 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:41:58.766Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-04-06T20:42:49.180Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Had `+1 influence pour ton H\\u00e9ritage !`",
+      "fix": "Changed to `+1 influence ${factionId === userFactionId ? '",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T20:42:49.180Z"
+    },
+    {
+      "id": "bug-053",
+      "timestamp": "2026-04-06T21:04:12.641Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/workers/territoryWorker.ts",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 10→7 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "ts"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:04:12.641Z"
+    },
+    {
+      "id": "bug-054",
+      "timestamp": "2026-04-06T21:10:56.498Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 9→14 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:10:56.498Z"
+    },
+    {
+      "id": "bug-055",
+      "timestamp": "2026-04-06T21:11:04.378Z",
+      "error_message": "CSS fix: opacity",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "opacity: 0.4 → 0.7",
+      "fix": "Changed opacity: 0.4 → 0.7",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:11:04.378Z"
+    },
+    {
+      "id": "bug-056",
+      "timestamp": "2026-04-06T21:20:45.151Z",
+      "error_message": "Significant refactor of ",
+      "file": "supabase/migrations/023_fix_discover_not_explorer.sql",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→14 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sql"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:20:45.151Z"
+    },
+    {
+      "id": "bug-057",
+      "timestamp": "2026-04-06T21:21:15.866Z",
+      "error_message": "Wrong reference: influencePerPhoto should be 0",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Used \"influencePerPhoto\" instead of \"0\"",
+      "fix": "Changed influencePerPhoto → 0",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:21:15.866Z"
+    },
+    {
+      "id": "bug-058",
+      "timestamp": "2026-04-06T21:50:49.047Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/map/FactionBar.tsx",
+      "root_cause": "Had '\\uD83C\\uDF96\\uFE0F'",
+      "fix": "Changed to '\\uD83C\\uDFF0'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-06T21:52:13.715Z"
+    },
+    {
+      "id": "bug-059",
+      "timestamp": "2026-04-06T21:55:07.881Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:55:07.881Z"
+    },
+    {
+      "id": "bug-060",
+      "timestamp": "2026-04-06T21:55:19.593Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:55:19.593Z"
+    },
+    {
+      "id": "bug-061",
+      "timestamp": "2026-04-06T21:59:37.206Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 6→9 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T21:59:37.206Z"
+    },
+    {
+      "id": "bug-062",
+      "timestamp": "2026-04-06T22:00:09.116Z",
+      "error_message": "CSS fix: opacity",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.css",
+      "root_cause": "opacity: 0.5 → 0.4",
+      "fix": "Changed opacity: 0.5 → 0.4",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-06T22:04:16.079Z"
+    },
+    {
+      "id": "bug-063",
+      "timestamp": "2026-04-06T22:09:48.959Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:09:48.959Z"
+    },
+    {
+      "id": "bug-064",
+      "timestamp": "2026-04-06T22:10:19.185Z",
+      "error_message": "Missing guard clause",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "No early return/throw for edge case: !data",
+      "fix": "Added guard clause: if (!data)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:10:19.185Z"
+    },
+    {
+      "id": "bug-065",
+      "timestamp": "2026-04-06T22:13:42.510Z",
+      "error_message": "CSS fix: font-size",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.css",
+      "root_cause": "font-size: 11px → 13px",
+      "fix": "Changed font-size: 11px → 13px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T22:13:51.343Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-04-06T22:15:08.419Z",
+      "error_message": "Wrong reference: Influence should be Coupe",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Used \"Influence\" instead of \"Coupe\"",
+      "fix": "Changed Influence → Coupe",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:15:08.419Z"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-04-06T22:15:31.630Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:15:31.630Z"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-04-06T22:15:53.972Z",
+      "error_message": "CSS fix: right",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "right: 8px → 12px",
+      "fix": "Changed right: 8px → 12px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:15:53.972Z"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-04-06T22:30:14.148Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: {/* Tags + faction influence pill */}; {v05?.dominantFaction && factionNames.get(v05.dominantFactio",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T22:32:43.813Z"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-04-06T22:30:23.694Z",
+      "error_message": "CSS fix: width, height, border-radius",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "width: 100% → 30px; height: 100% → 38px; border-radius: 4px 4px 0 0 → 3px 3px 0 0",
+      "fix": "Changed width: 100% → 30px; height: 100% → 38px; border-radius: 4px 4px 0 0 → 3px 3px 0 0",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:30:23.694Z"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-04-06T22:32:13.789Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Had 'id, color, image_url, title'",
+      "fix": "Changed to 'id, color, image_url, pattern, title'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:32:13.789Z"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-04-06T22:35:23.383Z",
+      "error_message": "CSS fix: backgroundColor, color",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "backgroundColor: factionColors.get(v05.dominantFaction) ?? '#8A7B6A', → `${fc; color: '#fff', → fc,",
+      "fix": "Changed backgroundColor: factionColors.get(v05.dominantFaction) ?? '#8A7B6A', → `${fc; color: '#fff', → fc,",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:35:23.383Z"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-04-06T22:35:31.486Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.css",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 12→7 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:35:31.486Z"
+    },
+    {
+      "id": "bug-074",
+      "timestamp": "2026-04-06T22:39:43.009Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Had './PlacePanel.css'",
+      "fix": "Changed to './PhotoLightbox'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:39:43.009Z"
+    },
+    {
+      "id": "bug-075",
+      "timestamp": "2026-04-06T22:39:56.158Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation | Also: <PlaceGallery; photos={galleryPhotos}",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T22:41:11.450Z"
+    },
+    {
+      "id": "bug-076",
+      "timestamp": "2026-04-06T22:40:42.671Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:40:42.671Z"
+    },
+    {
+      "id": "bug-077",
+      "timestamp": "2026-04-06T22:40:55.245Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlaceGallery.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:40:55.245Z"
+    },
+    {
+      "id": "bug-078",
+      "timestamp": "2026-04-06T22:42:49.108Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PhotoLightbox.tsx",
+      "root_cause": "Had './PhotoLightbox.css'",
+      "fix": "Changed to 'react-dom'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:42:49.108Z"
+    },
+    {
+      "id": "bug-079",
+      "timestamp": "2026-04-06T22:46:57.342Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:46:57.342Z"
+    },
+    {
+      "id": "bug-080",
+      "timestamp": "2026-04-06T22:53:59.487Z",
+      "error_message": "CSS fix: Footer",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Footer: votes + date */ → upvote + date */",
+      "fix": "Changed Footer: votes + date */ → upvote + date */",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T22:53:59.487Z"
+    },
+    {
+      "id": "bug-081",
+      "timestamp": "2026-04-06T23:00:34.424Z",
+      "error_message": "CSS fix: Footer",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Footer: upvote + date */ → like + date */",
+      "fix": "Changed Footer: upvote + date */ → like + date */",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T23:00:34.424Z"
+    },
+    {
+      "id": "bug-082",
+      "timestamp": "2026-04-06T23:00:52.736Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/CarnetCard.css",
+      "root_cause": "9 lines replaced/restructured",
+      "fix": "Rewrote 11→24 lines (9 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T23:00:52.736Z"
+    },
+    {
+      "id": "bug-083",
+      "timestamp": "2026-04-06T23:10:20.560Z",
+      "error_message": "CSS fix: width, height",
+      "file": "apps/explore-web/src/components/places/CarnetCard.css",
+      "root_cause": "width: 8px → 10px; height: 8px → 10px",
+      "fix": "Changed width: 8px → 10px; height: 8px → 10px",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T23:10:20.560Z"
+    },
+    {
+      "id": "bug-084",
+      "timestamp": "2026-04-06T23:15:26.526Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: // Unlike via RPC (SECURITY DEFINER); const { data, error } = await supabase.rpc('unlike_contribut",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-06T23:17:48.669Z"
+    },
+    {
+      "id": "bug-085",
+      "timestamp": "2026-04-06T23:15:37.566Z",
+      "error_message": "CSS fix: p_vote",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "p_vote: direction, → 1,",
+      "fix": "Changed p_vote: direction, → 1,",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06T23:15:37.566Z"
     }
   ]
 }

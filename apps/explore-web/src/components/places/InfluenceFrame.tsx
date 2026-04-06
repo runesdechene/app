@@ -197,7 +197,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   return (
     <div className="influence-frame">
       <div className="influence-frame-header">
-        <span className="influence-frame-title">Coupe des H\u00e9ritages</span>
+        <span className="influence-frame-title">🏆 Coupe des Héritages</span>
         {userId && (
           <span className={`influence-frame-stock${!canClick ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
             {influenceStock <= 0

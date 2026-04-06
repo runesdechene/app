@@ -28,10 +28,9 @@
 }
 
 .influence-frame-title {
-  font-family: var(--font-accent);
-  font-size: 14px;
+  font-family: var(--font-title);
+  font-size: 18px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
   color: var(--color-ink-light);
 }
 
@@ -43,7 +42,10 @@
 }
 
 .influence-frame-stock-exhausted {
-  color: #c0392b;
+  color: #cc5a4d;
+  padding: 4px 12px;
+  background: rgba(206, 186, 186, 0.3);
+  border-radius: 50px;
 }
 
 .influence-frame-stock-shake {

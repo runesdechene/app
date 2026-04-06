@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de lieu — Maquettes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; font-family: Georgia, 'Times New Roman', serif; color: #3a2a1a; }
+
+  .page-title { text-align: center; color: #f5efe0; padding: 30px 20px 10px; font-size: 24px; }
+  .page-sub { text-align: center; color: #a09080; padding: 0 20px 30px; font-size: 14px; }
+
+  .mockups { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; padding: 0 20px 40px; }
+
+  .phone {
+    width: 375px;
+    height: 780px;
+    background: #f5efe0;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .phone:hover { border-color: #c9a96e; }
+  .phone.selected { border-color: #c9a96e; }
+  .phone-label {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #f5efe0;
+    font-size: 16px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  /* Shared */
+  .hero-img {
+    width: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .parchment { background: #f5efe0; }
+  .body-scroll { flex: 1; overflow-y: auto; }
+  .body-scroll::-webkit-scrollbar { display: none; }
+
+  .influence-bar { display: flex; gap: 5px; flex-wrap: wrap; }
+  .inf-badge { color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 3px; }
+
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 14px; font-size: 12px; font-weight: bold; }
+
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #8a7a6a; margin: 16px 0 8px; font-family: system-ui, sans-serif; }
+
+  .avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #d9c9a9; }
+  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #d9c9a9; }
+
+  .role-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; color: #5a4a3a; }
+  .role-icon { font-size: 14px; }
+
+  .cta-btn { display: block; width: 100%; padding: 12px; background: linear-gradient(135deg, #5a4a3a, #3a2a1a); color: #f5efe0; border: none; border-radius: 8px; font-family: Georgia, serif; font-size: 15px; text-align: center; cursor: pointer; margin-top: 12px; }
+
+  .tab-bar { display: flex; border-bottom: 1px solid #d9c9a9; }
+  .tab { flex: 1; text-align: center; padding: 10px 4px; font-size: 12px; color: #8a7a6a; cursor: pointer; font-family: system-ui, sans-serif; position: relative; }
+  .tab.active { color: #3a2a1a; font-weight: bold; }
+  .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%; height: 2px; background: #5a4a3a; border-radius: 1px; }
+
+  .carnet-card { background: #faf6ec; border: 1px solid #e8dcc8; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+  .carnet-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .carnet-name { font-size: 13px; font-weight: bold; color: #3a2a1a; }
+  .carnet-faction-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .carnet-text { font-size: 13px; line-height: 1.6; color: #5a4a3a; font-style: italic; }
+  .carnet-votes { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: #8a7a6a; }
+
+  .explorers-row { display: flex; gap: -4px; align-items: center; }
+  .explorers-row .avatar-sm { margin-left: -6px; }
+  .explorers-row .avatar-sm:first-child { margin-left: 0; }
+
+  .star { color: #c9a96e; }
+  .wishlist-btn { background: none; border: 1px solid #d9c9a9; border-radius: 8px; padding: 6px 10px; font-size: 16px; cursor: pointer; }
+
+  /* Overlay style for C */
+  .overlay-header { position: relative; }
+  .overlay-header img { width: 100%; height: 220px; object-fit: cover; }
+  .overlay-gradient { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(transparent, rgba(30,20,10,0.85)); }
+  .overlay-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 16px; color: #f5efe0; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Fiche de lieu — 3 approches</h1>
+<p class="page-sub">Cliquez sur le mockup qui vous parle. Scrollez dans chaque phone.</p>
+
+<div class="mockups">
+
+<!-- ========== OPTION A : Photo hero d'abord ========== -->
+<div style="position: relative; margin-top: 40px;">
+  <div class="phone-label">A — Photo hero immersive</div>
+  <div class="phone" data-choice="a" onclick="document.querySelectorAll('.phone').forEach(p=>p.classList.remove('selected'));this.classList.add('selected')">
+
+    <!-- Hero photo -->
+    <img class="hero-img" src="https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=750&h=500&fit=crop" alt="Carnac" style="height: 260px;">
+
+    <div class="body-scroll" style="padding: 16px;">
+      <!-- Titre -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 style="font-size: 22px; margin-bottom: 4px;">Alignements de Carnac</h2>
+          <p style="font-size: 12px; color: #8a7a6a; font-style: italic;">
+            🧭 Découvert par <u style="color: #5a4a3a;">Uriel</u> · 👑 Gardien : <u style="color: #5a4a3a;">Lya</u>
+          </p>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span style="font-size: 14px;" class="star">★</span>
+          <span style="font-size: 14px; font-weight: bold;">4.2</span>
+          <button class="wishlist-btn">🔖</button>
+        </div>
+      </div>
+
+      <!-- Influence flags -->
+      <div style="margin: 12px 0;" class="influence-bar">
+        <span class="inf-badge" style="background: #9c3088;">203 ⭐</span>
+        <span class="inf-badge" style="background: #69a72a;">142</span>
+        <span class="inf-badge" style="background: #2665c9;">89</span>
+        <span class="inf-badge" style="background: #cb2020;">45</span>
+      </div>
+
+      <!-- Tags -->
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;">
+        <span class="tag" style="background: #e8dcc8; color: #5a4a3a;">🗿 Mégalithe</span>
+        <span class="tag" style="background: #dde8d0; color: #3a5a2a;">🌿 Site naturel</span>
+      </div>
+
+      <!-- Description -->
+      <p style="font-size: 14px; line-height: 1.7; color: #5a4a3a; margin-bottom: 14px;">
+        Plus de 3 000 menhirs dressés il y a 7 000 ans. Personne ne sait vraiment pourquoi. Les théories vont du calendrier astronomique au marquage territorial d'un peuple oublié...
+      </p>
+
+      <p style="font-size: 12px; color: #8a7a6a; margin-bottom: 16px;">📍 Carnac, Morbihan, Bretagne</p>
+
+      <!-- Meilleure contribution -->
+      <div class="section-title">📖 Meilleur carnet</div>
+      <div class="carnet-card">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+          <span class="carnet-name">Elowen</span>
+          <span class="carnet-faction-dot" style="background: #69a72a;"></span>
+        </div>
+        <p class="carnet-text">« On arrive au lever du soleil. La brume colle aux pierres. On dirait qu'elles respirent. J'ai touché un menhir — il était tiède. Sept mille ans et il garde la chaleur. »</p>
+        <div class="carnet-votes">
+          <span>👍 24</span>
+          <span>👎 1</span>
+        </div>
+      </div>
+
+      <!-- Explorateurs -->
+      <div class="section-title">🧭 Explorateurs (12)</div>
+      <div class="explorers-row" style="margin-bottom: 16px;">
+        <img class="avatar-sm" src="https://i.pravatar.cc/56?img=1" alt="">
+        <img class="avatar-sm" src="https://i.pravatar.cc/56?img=5" alt="">
+        <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+        <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+        <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+        <span style="font-size: 12px; color: #8a7a6a; margin-left: 8px;">+7</span>
+      </div>
+
+      <!-- CTA -->
+      <button class="cta-btn">🏰 Placer de l'influence</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== OPTION B : Identité d'abord ========== -->
+<div style="position: relative; margin-top: 40px;">
+  <div class="phone-label">B — Identité d'abord</div>
+  <div class="phone" data-choice="b" onclick="document.querySelectorAll('.phone').forEach(p=>p.classList.remove('selected'));this.classList.add('selected')">
+
+    <div class="body-scroll">
+      <!-- Header sans photo -->
+      <div style="padding: 20px 16px 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h2 style="font-size: 22px; line-height: 1.1; flex: 1;">Alignements de Carnac</h2>
+          <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+            <span class="star" style="font-size: 16px;">★</span>
+            <span style="font-size: 15px; font-weight: bold;">4.2</span>
+            <button class="wishlist-btn">🔖</button>
+          </div>
+        </div>
+
+        <!-- Rôles -->
+        <div style="margin: 8px 0 12px;">
+          <div class="role-row">
+            <img class="avatar-sm" src="https://i.pravatar.cc/56?img=1" alt="">
+            <span><span class="role-icon">🧭</span> Découvert par <strong>Uriel</strong></span>
+          </div>
+          <div class="role-row">
+            <img class="avatar-sm" src="https://i.pravatar.cc/56?img=5" alt="">
+            <span><span class="role-icon">👑</span> Gardien : <strong>Lya</strong></span>
+          </div>
+        </div>
+
+        <!-- Influence -->
+        <div class="influence-bar">
+          <span class="inf-badge" style="background: #9c3088;">203 ⭐</span>
+          <span class="inf-badge" style="background: #69a72a;">142</span>
+          <span class="inf-badge" style="background: #2665c9;">89</span>
+          <span class="inf-badge" style="background: #cb2020;">45</span>
+        </div>
+      </div>
+
+      <!-- Photo réduite 16:9 -->
+      <img class="hero-img" src="https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=750&h=420&fit=crop" alt="Carnac" style="height: 180px;">
+
+      <div style="padding: 12px 16px;">
+        <!-- Tags + adresse -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+          <span class="tag" style="background: #e8dcc8; color: #5a4a3a;">🗿 Mégalithe</span>
+          <span class="tag" style="background: #dde8d0; color: #3a5a2a;">🌿 Site naturel</span>
+        </div>
+        <p style="font-size: 12px; color: #8a7a6a; margin-bottom: 14px;">📍 Carnac, Morbihan, Bretagne</p>
+
+        <!-- Description courte -->
+        <p style="font-size: 14px; line-height: 1.7; color: #5a4a3a; margin-bottom: 14px;">
+          Plus de 3 000 menhirs dressés il y a 7 000 ans. Personne ne sait vraiment pourquoi...
+          <button style="background: none; border: none; color: #8a6a4a; font-size: 13px; cursor: pointer; font-style: italic;">Lire la suite</button>
+        </p>
+
+        <!-- Onglets contenu -->
+        <div class="tab-bar">
+          <div class="tab active">📖 Carnets (3)</div>
+          <div class="tab">📷 Photos (5)</div>
+          <div class="tab">ℹ️ Infos (2)</div>
+        </div>
+
+        <!-- Contenu onglet -->
+        <div style="margin-top: 12px;">
+          <div class="carnet-card">
+            <div class="carnet-header">
+              <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+              <span class="carnet-name">Elowen</span>
+              <span class="carnet-faction-dot" style="background: #69a72a;"></span>
+            </div>
+            <p class="carnet-text">« On arrive au lever du soleil. La brume colle aux pierres. On dirait qu'elles respirent. »</p>
+            <div class="carnet-votes">
+              <span>👍 24</span>
+              <span>👎 1</span>
+            </div>
+          </div>
+          <div class="carnet-card">
+            <div class="carnet-header">
+              <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+              <span class="carnet-name">Thibault</span>
+              <span class="carnet-faction-dot" style="background: #2665c9;"></span>
+            </div>
+            <p class="carnet-text">« Les locaux disent que certaines nuits, on entend les pierres vibrer... »</p>
+            <div class="carnet-votes">
+              <span>👍 11</span>
+              <span>👎 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explorateurs -->
+        <div class="section-title">🧭 Explorateurs (12)</div>
+        <div class="explorers-row" style="margin-bottom: 16px;">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=1" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=5" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+          <span style="font-size: 12px; color: #8a7a6a; margin-left: 8px;">+7</span>
+        </div>
+
+        <button class="cta-btn">🏰 Placer de l'influence</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== OPTION C : Overlay compact ========== -->
+<div style="position: relative; margin-top: 40px;">
+  <div class="phone-label">C — Hero compact overlay</div>
+  <div class="phone" data-choice="c" onclick="document.querySelectorAll('.phone').forEach(p=>p.classList.remove('selected'));this.classList.add('selected')">
+
+    <div class="body-scroll">
+      <!-- Overlay header -->
+      <div class="overlay-header">
+        <img src="https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=750&h=500&fit=crop" alt="Carnac" style="width: 100%; height: 220px; object-fit: cover;">
+        <div class="overlay-gradient"></div>
+        <div class="overlay-content">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <h2 style="font-size: 22px; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.5);">Alignements de Carnac</h2>
+              <div class="influence-bar" style="margin-top: 6px;">
+                <span class="inf-badge" style="background: rgba(156,48,136,0.85);">203 ⭐</span>
+                <span class="inf-badge" style="background: rgba(105,167,42,0.85);">142</span>
+                <span class="inf-badge" style="background: rgba(38,101,201,0.85);">89</span>
+                <span class="inf-badge" style="background: rgba(203,32,32,0.85);">45</span>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+              <button class="wishlist-btn" style="border-color: rgba(255,255,255,0.3); color: #f5efe0;">🔖</button>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="star">★</span>
+                <span style="font-weight: bold;">4.2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 14px 16px;">
+        <!-- Rôles -->
+        <div style="display: flex; gap: 16px; margin-bottom: 12px;">
+          <div class="role-row" style="margin-bottom: 0;">
+            <img class="avatar-sm" src="https://i.pravatar.cc/56?img=1" alt="">
+            <span style="font-size: 12px;"><span class="role-icon">🧭</span> <strong>Uriel</strong></span>
+          </div>
+          <div class="role-row" style="margin-bottom: 0;">
+            <img class="avatar-sm" src="https://i.pravatar.cc/56?img=5" alt="">
+            <span style="font-size: 12px;"><span class="role-icon">👑</span> <strong>Lya</strong></span>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
+          <span class="tag" style="background: #e8dcc8; color: #5a4a3a;">🗿 Mégalithe</span>
+          <span class="tag" style="background: #dde8d0; color: #3a5a2a;">🌿 Site naturel</span>
+        </div>
+        <p style="font-size: 12px; color: #8a7a6a; margin-bottom: 12px;">📍 Carnac, Morbihan, Bretagne</p>
+
+        <!-- Onglets -->
+        <div class="tab-bar">
+          <div class="tab active">📖 Carnet</div>
+          <div class="tab">📷 Photos</div>
+          <div class="tab">ℹ️ Infos</div>
+          <div class="tab">🏰 Influence</div>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <!-- Description comme premier "carnet" -->
+          <div class="carnet-card" style="border-left: 3px solid #c9a96e;">
+            <div class="carnet-header">
+              <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+              <span class="carnet-name">Elowen</span>
+              <span class="carnet-faction-dot" style="background: #69a72a;"></span>
+              <span style="font-size: 11px; color: #8a7a6a; margin-left: auto;">👍 24</span>
+            </div>
+            <p class="carnet-text">« On arrive au lever du soleil. La brume colle aux pierres. On dirait qu'elles respirent. J'ai touché un menhir — il était tiède. Sept mille ans et il garde la chaleur. »</p>
+          </div>
+
+          <div class="carnet-card">
+            <div class="carnet-header">
+              <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+              <span class="carnet-name">Thibault</span>
+              <span class="carnet-faction-dot" style="background: #2665c9;"></span>
+              <span style="font-size: 11px; color: #8a7a6a; margin-left: auto;">👍 11</span>
+            </div>
+            <p class="carnet-text">« Les locaux disent que certaines nuits, on entend les pierres vibrer... »</p>
+          </div>
+
+          <div class="carnet-card">
+            <div class="carnet-header">
+              <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+              <span class="carnet-name">Maël</span>
+              <span class="carnet-faction-dot" style="background: #cb2020;"></span>
+              <span style="font-size: 11px; color: #8a7a6a; margin-left: auto;">👍 7</span>
+            </div>
+            <p class="carnet-text">« Pensez à y aller hors saison. En août c'est bondé et l'accès est restreint. »</p>
+          </div>
+        </div>
+
+        <!-- Explorateurs -->
+        <div class="section-title">🧭 Explorateurs (12)</div>
+        <div class="explorers-row" style="margin-bottom: 16px;">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=1" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=5" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+          <span style="font-size: 12px; color: #8a7a6a; margin-left: 8px;">+7</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</body>
+</html>

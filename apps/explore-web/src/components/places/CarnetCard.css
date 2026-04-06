@@ -163,7 +163,7 @@
 .carnet-influence-line {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px dashed var(--color-parchment-dark);
@@ -174,14 +174,18 @@
   gap: 4px;
   padding: 3px 10px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   font-family: var(--font-accent);
   color: white;
   flex-shrink: 0;
 }
 .carnet-influence-breakdown {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--color-ink-light);
   font-family: var(--font-accent);
+}
+
+.carnet-influence-spacer {
+padding-left: 10px;
 }

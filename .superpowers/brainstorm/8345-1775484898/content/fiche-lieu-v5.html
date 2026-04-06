@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de lieu — V5</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; font-family: Georgia, 'Times New Roman', serif; color: #3a2a1a; display: flex; justify-content: center; padding: 40px 20px; gap: 30px; flex-wrap: wrap; }
+
+  .label { text-align: center; color: #f5efe0; font-size: 14px; margin-bottom: 12px; font-family: system-ui, sans-serif; }
+
+  .phone {
+    width: 390px;
+    height: 700px;
+    background: #f5efe0;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scroll { flex: 1; overflow-y: auto; padding: 16px; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  .section-label { font-family: system-ui, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #8a7a6a; margin-bottom: 10px; }
+
+  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #d9c9a9; }
+
+  /* Carnet cards */
+  .carnet-card {
+    background: #faf6ec;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .carnet-card.top { border-left: 3px solid #c9a96e; }
+  .carnet-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .carnet-name { font-size: 13px; font-weight: bold; color: #3a2a1a; }
+  .carnet-faction-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .carnet-stars { margin-left: auto; font-size: 12px; color: #c9a96e; letter-spacing: 1px; }
+  .carnet-text { font-size: 13px; line-height: 1.6; color: #5a4a3a; font-style: italic; margin-bottom: 8px; }
+
+  .carnet-photos { display: flex; gap: 6px; margin-bottom: 8px; }
+  .carnet-photos img { height: 80px; object-fit: cover; border-radius: 4px; flex: 1; min-width: 0; }
+
+  .carnet-footer { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #8a7a6a; }
+  .vote-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: #8a7a6a; padding: 2px 4px; }
+
+  /* Influence contribution badge */
+  .influence-contrib {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: system-ui, sans-serif;
+    color: white;
+  }
+  .influence-contrib .value { opacity: 0.9; }
+  .influence-breakdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #8a7a6a;
+    font-family: system-ui, sans-serif;
+    margin-top: 2px;
+  }
+  .influence-breakdown span { opacity: 0.8; }
+
+  .star { color: #c9a96e; }
+</style>
+</head>
+<body>
+
+<!-- ===== OPTION A : Badge compact dans le footer ===== -->
+<div>
+  <div class="label">A — Badge compact dans le footer</div>
+  <div class="phone">
+    <div class="scroll">
+      <div class="section-label">📖 Carnets (3)</div>
+
+      <div class="carnet-card top">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+          <span class="carnet-name">Elowen</span>
+          <span class="carnet-faction-dot" style="background: #69a72a;"></span>
+          <span class="carnet-stars">★★★★★</span>
+        </div>
+        <p class="carnet-text">« On arrive au lever du soleil. La brume colle aux pierres. On dirait qu'elles respirent. J'ai touché un menhir — il était tiède. Sept mille ans et il garde la chaleur. »</p>
+        <div class="carnet-photos">
+          <img src="https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=300&h=200&fit=crop&crop=left" alt="">
+          <img src="https://images.unsplash.com/photo-1560930950-2b5e0e1ff3d0?w=300&h=200&fit=crop" alt="">
+          <img src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 24</button>
+          <button class="vote-btn">👎 1</button>
+          <span class="influence-contrib" style="background: #69a72a; margin-left: auto;">
+            🏰 +35
+          </span>
+        </div>
+      </div>
+
+      <div class="carnet-card">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+          <span class="carnet-name">Thibault</span>
+          <span class="carnet-faction-dot" style="background: #2665c9;"></span>
+          <span class="carnet-stars">★★★★<span style="opacity: 0.25;">★</span></span>
+        </div>
+        <p class="carnet-text">« Les locaux disent que certaines nuits, on entend les pierres vibrer. Mythe ou réalité ? »</p>
+        <div class="carnet-photos">
+          <img src="https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 11</button>
+          <button class="vote-btn">👎 0</button>
+          <span class="influence-contrib" style="background: #2665c9; margin-left: auto;">
+            🏰 +22
+          </span>
+        </div>
+      </div>
+
+      <div class="carnet-card">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+          <span class="carnet-name">Maël</span>
+          <span class="carnet-faction-dot" style="background: #cb2020;"></span>
+          <span class="carnet-stars">★★★<span style="opacity: 0.25;">★★</span></span>
+        </div>
+        <p class="carnet-text">« Pensez à y aller hors saison. En août c'est bondé. »</p>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 7</button>
+          <button class="vote-btn">👎 2</button>
+          <span class="influence-contrib" style="background: #cb2020; margin-left: auto;">
+            🏰 +15
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OPTION B : Détail sous le footer ===== -->
+<div>
+  <div class="label">B — Détail décomposé sous les votes</div>
+  <div class="phone">
+    <div class="scroll">
+      <div class="section-label">📖 Carnets (3)</div>
+
+      <div class="carnet-card top">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=12" alt="">
+          <span class="carnet-name">Elowen</span>
+          <span class="carnet-faction-dot" style="background: #69a72a;"></span>
+          <span class="carnet-stars">★★★★★</span>
+        </div>
+        <p class="carnet-text">« On arrive au lever du soleil. La brume colle aux pierres. On dirait qu'elles respirent. J'ai touché un menhir — il était tiède. Sept mille ans et il garde la chaleur. »</p>
+        <div class="carnet-photos">
+          <img src="https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=300&h=200&fit=crop&crop=left" alt="">
+          <img src="https://images.unsplash.com/photo-1560930950-2b5e0e1ff3d0?w=300&h=200&fit=crop" alt="">
+          <img src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 24</button>
+          <button class="vote-btn">👎 1</button>
+          <span style="margin-left: auto; font-size: 11px;">il y a 3 jours</span>
+        </div>
+        <!-- Influence breakdown -->
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8dcc8; display: flex; align-items: center; gap: 8px;">
+          <span class="influence-contrib" style="background: #69a72a;">🏰 +35</span>
+          <div class="influence-breakdown">
+            <span>📖 texte +10</span>
+            <span>·</span>
+            <span>📷 photos +15</span>
+            <span>·</span>
+            <span>❤️ +10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="carnet-card">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=22" alt="">
+          <span class="carnet-name">Thibault</span>
+          <span class="carnet-faction-dot" style="background: #2665c9;"></span>
+          <span class="carnet-stars">★★★★<span style="opacity: 0.25;">★</span></span>
+        </div>
+        <p class="carnet-text">« Les locaux disent que certaines nuits, on entend les pierres vibrer. »</p>
+        <div class="carnet-photos">
+          <img src="https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=300&h=200&fit=crop" alt="">
+        </div>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 11</button>
+          <button class="vote-btn">👎 0</button>
+          <span style="margin-left: auto; font-size: 11px;">il y a 1 semaine</span>
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8dcc8; display: flex; align-items: center; gap: 8px;">
+          <span class="influence-contrib" style="background: #2665c9;">🏰 +22</span>
+          <div class="influence-breakdown">
+            <span>📖 +10</span>
+            <span>·</span>
+            <span>📷 +5</span>
+            <span>·</span>
+            <span>👍 +7</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="carnet-card">
+        <div class="carnet-header">
+          <img class="avatar-sm" src="https://i.pravatar.cc/56?img=33" alt="">
+          <span class="carnet-name">Maël</span>
+          <span class="carnet-faction-dot" style="background: #cb2020;"></span>
+          <span class="carnet-stars">★★★<span style="opacity: 0.25;">★★</span></span>
+        </div>
+        <p class="carnet-text">« Pensez à y aller hors saison. En août c'est bondé. »</p>
+        <div class="carnet-footer">
+          <button class="vote-btn">👍 7</button>
+          <button class="vote-btn">👎 2</button>
+          <span style="margin-left: auto; font-size: 11px;">il y a 2 semaines</span>
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e8dcc8; display: flex; align-items: center; gap: 8px;">
+          <span class="influence-contrib" style="background: #cb2020;">🏰 +15</span>
+          <div class="influence-breakdown">
+            <span>📖 +10</span>
+            <span>·</span>
+            <span>👍 +5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

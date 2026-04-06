@@ -346,11 +346,17 @@
 
 .place-exp-title {
   margin: 0 0 6px;
-  font-family: var(--font-accent);
-  font-size: 12px;
+  font-family: var(--font-title);
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-ink-light);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
+}
+
+.place-exp-title-lenght 
+{
+  color: rgb(173, 149, 149);
+  padding-left: 5px;
 }
 
 .place-explorers-avatars {
@@ -469,7 +475,7 @@
   border: none;
   border-bottom: 2px solid transparent;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 16px;
   color: var(--color-ink-light);
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
@@ -484,6 +490,13 @@
   color: var(--color-ink);
   border-bottom-color: var(--color-sepia);
   font-weight: 600;
+}
+
+.place-tab-lenght 
+{
+  color: rgb(173, 149, 149);
+  padding-left: 10px;
+  font-family: var(--font-body);
 }
 
 /* Tab content area */

@@ -37,3 +37,6 @@
 - [2026-04] **Coût par distance** : multiplicateur GPS/proche/moyen/loin, seuils configurables Hub.
 - [2026-04] **Gloire** = score pur, jamais dépensé. Classement Héritages = somme Gloire membres.
 - [2026-04] **Context cleanup** : CLAUDE.md disséqués vers .wolf/ (schema, rpcs, gameplay, stores, shopify) pour réduire le coût token par session de ~30k à ~4k.
+- [2026-04] **V0.5 — Influence remplace Claim/Fortify** : système multi-Héritage par lieu, influence placée (decay) + influence de contenu (permanent). Fiches de lieu collaboratives = carnets (texte + photos + note). Énigme quotidienne. Migrations numérotées 004-019 dans supabase/migrations/.
+- [2026-04] **PlacePanel redesign** : layout C (hero photo plein cadre, pas d'overlay) + cadre parchemin pour influence + onglets (Carnets/Galerie/Infos/Admin). Photos liées aux carnets, pas de vote individuel par photo. Infos = champs wiki éditables par tous.
+- [2026-04] **Énigmes** : sources historiques fiables uniquement (Venner, Dumézil, sources antiques). Ton enraciné/patriote, mystère du réel. Jamais de witchy/wicca/new-age.

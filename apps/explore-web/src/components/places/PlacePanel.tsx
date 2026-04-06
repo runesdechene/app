@@ -190,7 +190,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 
   return (
     <div className="place-explorers-unified">
-      <p className="place-exp-title">Ils ont foulé ces terres ({sorted.length})</p>
+      <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
       <div className="place-explorers-avatars">
         {sorted.map(exp => {
           const isAuthor = exp.userId === authorId
