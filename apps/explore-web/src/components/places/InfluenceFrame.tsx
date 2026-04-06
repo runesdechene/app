@@ -200,11 +200,13 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         <span className="influence-frame-title">Influence des H\u00e9ritages</span>
         {userId && (
           <span className={`influence-frame-stock${!canClick ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
-            {influenceStock > 0
-              ? isGps
-                ? `${influenceStock} pts \u00b7 sur place`
-                : `${influenceStock} pts \u00b7 ${MAX_REMOTE_PER_PLACE - remoteUsed}/${MAX_REMOTE_PER_PLACE} ici`
-              : 'Stock \u00e9puis\u00e9'
+            {influenceStock <= 0
+              ? 'Plus de points disponibles'
+              : isGps
+                ? `${influenceStock} points \u2014 illimit\u00e9 sur place`
+                : remoteExhausted
+                  ? 'Limite du jour atteinte sur ce lieu'
+                  : `${influenceStock} points \u2014 encore ${MAX_REMOTE_PER_PLACE - remoteUsed} clics sur ce lieu`
             }
           </span>
         )}
