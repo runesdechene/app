@@ -214,6 +214,32 @@
   50% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); }
 }
 
+/* Bonus enigma button */
+.enigma-next-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.enigma-next-btn:hover { opacity: 0.85; }
+
+/* Energy cost badge */
+.enigma-cost {
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: #d4af37;
+  font-weight: 600;
+}
+
 .enigma-chest-dot {
   position: absolute;
   top: 4px;

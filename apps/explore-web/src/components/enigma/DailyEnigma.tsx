@@ -12,6 +12,9 @@ interface Enigma {
   format: 'qcm' | 'free'
   choices: string[] | null
   heritageId: string | null
+  energyCost: number
+  isBonus: boolean
+  answeredToday: number
 }
 
 interface AnswerResult {
@@ -20,8 +23,10 @@ interface AnswerResult {
   explanation: string
   influenceGain: number
   eruditionGain: number
+  energyCost: number
   newInfluenceStock: number
   newErudition: number
+  newEnergy: number
   newGlory: number
 }
 
@@ -38,62 +43,58 @@ const DIFFICULTY_LABELS: Record<string, string> = {
 export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const userId = usePlayerStore(s => s.userId)
   const [enigma, setEnigma] = useState<Enigma | null>(null)
-  const [alreadyAnswered, setAlreadyAnswered] = useState(false)
+  const [noEnergy, setNoEnergy] = useState(false)
+  const [noEnigma, setNoEnigma] = useState(false)
   const [loading, setLoading] = useState(true)
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
 
-  useEffect(() => {
+  function loadEnigma() {
     if (!userId) return
-    let cancelled = false
+    setLoading(true)
+    setEnigma(null)
+    setResult(null)
+    setSelectedChoice(null)
+    setFreeAnswer('')
+    setNoEnergy(false)
+    setNoEnigma(false)
 
-    async function load() {
-      setLoading(true)
-      const { data, error } = await supabase.rpc('get_daily_enigma', { p_user_id: userId })
+    supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data, error }) => {
+      if (error) { setLoading(false); return }
+      const d = data as Record<string, unknown>
 
-      if (cancelled) return
-
-      if (error) {
-        setLoading(false)
-        return
-      }
-
-      const d = data as { already_answered?: boolean; error?: string } & Enigma
-
-      if (d.already_answered) {
-        setAlreadyAnswered(true)
-      } else if (d.error) {
-        // No enigma available
-        setAlreadyAnswered(true)
+      if (d.error === 'not_enough_energy') {
+        setNoEnergy(true)
+      } else if (d.error === 'no_enigma_available') {
+        setNoEnigma(true)
       } else if (d.id) {
         setEnigma({
-          id: d.id,
-          difficulty: d.difficulty,
-          loreText: d.loreText,
-          question: d.question,
-          format: d.format,
-          choices: d.choices,
-          heritageId: d.heritageId,
+          id: d.id as number,
+          difficulty: d.difficulty as 'easy' | 'medium' | 'hard',
+          loreText: d.loreText as string,
+          question: d.question as string,
+          format: d.format as 'qcm' | 'free',
+          choices: d.choices as string[] | null,
+          heritageId: d.heritageId as string | null,
+          energyCost: (d.energyCost as number) ?? 0,
+          isBonus: (d.isBonus as boolean) ?? false,
+          answeredToday: (d.answeredToday as number) ?? 0,
         })
       }
-
       setLoading(false)
-    }
+    })
+  }
 
-    load()
-    return () => { cancelled = true }
-  }, [userId])
+  useEffect(() => { loadEnigma() }, [userId])
 
   async function handleSubmit() {
     if (!userId || !enigma || submitting) return
-
     const answer = enigma.format === 'qcm' ? selectedChoice : freeAnswer.trim()
     if (!answer) return
 
     setSubmitting(true)
-
     const { data, error } = await supabase.rpc('answer_enigma', {
       p_user_id: userId,
       p_enigma_id: enigma.id,
@@ -103,16 +104,10 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
     if (!error && data && !data.error) {
       const r = data as AnswerResult
       setResult(r)
-
-      // Update store
-      if (r.newInfluenceStock != null) {
-        usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
-      }
-      if (r.newErudition != null) {
-        usePlayerStore.getState().setEruditionPoints(r.newErudition)
-      }
+      if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
+      if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
+      if (r.newEnergy != null) usePlayerStore.getState().setEnergy(r.newEnergy)
     }
-
     setSubmitting(false)
   }
 
@@ -121,31 +116,39 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <div className="enigma-header">
           <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
-          <span className="enigma-icon">{'\uD83D\uDCE6'}</span>
-          <h2 className="enigma-title">&Eacute;nigme du jour</h2>
+          <h2 className="enigma-title">
+            {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
+          </h2>
+          {enigma?.isBonus && (
+            <span className="enigma-cost">Co\u00fbt : {enigma.energyCost} \u26a1</span>
+          )}
         </div>
 
-        {loading && (
-          <div className="enigma-loading">Chargement...</div>
-        )}
+        {loading && <div className="enigma-loading">Chargement...</div>}
 
-        {!loading && alreadyAnswered && !result && (
+        {!loading && noEnergy && (
           <div className="enigma-already-done">
-            <span className="enigma-already-done-icon">{'\u2705'}</span>
             <p className="enigma-already-done-text">
-              Vous avez d&eacute;j&agrave; r&eacute;pondu aujourd&apos;hui. Revenez demain !
+              Pas assez d'\u00e9nergie pour une \u00e9nigme bonus (5 \u26a1 requis).
             </p>
           </div>
         )}
 
-        {!loading && enigma && !result && !alreadyAnswered && (
+        {!loading && noEnigma && (
+          <div className="enigma-already-done">
+            <p className="enigma-already-done-text">
+              Plus d'\u00e9nigmes disponibles pour le moment.
+            </p>
+          </div>
+        )}
+
+        {!loading && enigma && !result && (
           <>
             <span className={`enigma-difficulty ${enigma.difficulty}`}>
               {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
             </span>
 
             <p className="enigma-lore">{enigma.loreText}</p>
-
             <p className="enigma-question">{enigma.question}</p>
 
             {enigma.format === 'qcm' && enigma.choices && (
@@ -184,21 +187,26 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         )}
 
         {result && (
-          <EnigmaResult
-            correct={result.correct}
-            answer={result.answer}
-            explanation={result.explanation}
-            influenceGain={result.influenceGain}
-            eruditionGain={result.eruditionGain}
-            onClose={onClose}
-          />
+          <>
+            <EnigmaResult
+              correct={result.correct}
+              answer={result.answer}
+              explanation={result.explanation}
+              influenceGain={result.influenceGain}
+              eruditionGain={result.eruditionGain}
+              onClose={onClose}
+            />
+            <button className="enigma-next-btn" onClick={loadEnigma}>
+              Encore une \u00e9nigme (5 \u26a1)
+            </button>
+          </>
         )}
       </div>
     </div>
   )
 }
 
-/** Chest button to display on the map — pulses when enigma is available */
+/** Chest button to display on the map */
 interface ChestButtonProps {
   onClick: () => void
   hasAnsweredToday: boolean
