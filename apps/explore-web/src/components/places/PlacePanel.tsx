@@ -8,7 +8,6 @@ import { useToastStore } from '../../stores/toastStore'
 import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
-import { ScoreSlider } from './ScoreSlider'
 import { WishlistButton } from './WishlistButton'
 import { PlaceEnigma } from '../enigma/PlaceEnigma'
 import { CarnetCard } from './CarnetCard'
@@ -119,7 +118,21 @@ interface V05Contribution {
   userAvatar: string | null
 }
 
-type ActiveTab = 'carnets' | 'galerie' | 'infos'
+type ActiveTab = 'carnets' | 'galerie' | 'infos' | 'admin'
+
+function QuickInfoChip({ icon, value, placeholder, onClick }: {
+  icon: React.ReactNode
+  value: string | null
+  placeholder: string
+  onClick: () => void
+}) {
+  return (
+    <button className={`place-quick-info place-quick-info-btn${value ? ' has-value' : ''}`} onClick={onClick} title={value ?? `Ajouter : ${placeholder}`}>
+      {icon}
+      <span className="place-quick-info-text">{value ?? placeholder}</span>
+    </button>
+  )
+}
 
 function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
@@ -340,11 +353,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           <div className="place-hero-placeholder" />
         )}
 
-        {/* Top-left: close + admin gear */}
+        {/* Top-left: rating pill */}
         <div className="place-hero-top-left">
-          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
-            &#10005;
-          </button>
+          {avgRating !== null && (
+            <span className="place-hero-pill place-hero-rating">
+              ★ {avgRating.toFixed(1)}
+            </span>
+          )}
+        </div>
+
+        {/* Top-right: close + admin gear */}
+        <div className="place-hero-top-right">
           {isAdmin && (
             <div className="place-options-wrap">
               <button
@@ -369,20 +388,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
               )}
             </div>
           )}
-        </div>
-
-        {/* Top-right: rating pill + wishlist */}
-        <div className="place-hero-top-right">
-          {avgRating !== null && (
-            <span className="place-hero-pill place-hero-rating">
-              ★ {avgRating.toFixed(1)}
-            </span>
-          )}
-          {v05 && (
-            <span className="place-hero-pill">
-              <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
-            </span>
-          )}
+          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+            &#10005;
+          </button>
         </div>
 
         {/* Gallery dots */}
@@ -411,7 +419,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
       <div className="place-body">
         {/* Identity */}
         <div className="place-identity">
-          <h2 className="place-title">{place.title}</h2>
+          <div className="place-title-row">
+            <h2 className="place-title">{place.title}</h2>
+            {v05 && (
+              <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
+            )}
+          </div>
 
           {/* Tags */}
           {place.tags.length > 0 && (
@@ -443,8 +456,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           {/* Address */}
           {place.address && (
             <p className="place-address">
-              <span className="place-address-icon">{'\uD83D\uDCCD'}</span>
-              {place.address}
+              <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span className="place-address-text">{place.address}</span>
               <button
                 className="place-goto-btn"
                 onClick={() => {
@@ -462,12 +475,38 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
                     })
                   }
                 }}
-                title="Aller sur ce lieu"
+                title="Voir sur la carte"
               >
-                {'\uD83D\uDDFA\uFE0F'}
+                <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
               </button>
             </p>
           )}
+
+          {/* Quick info row: views + accessibility + season + warning */}
+          <div className="place-quick-infos">
+            <span className="place-quick-info">
+              <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              {place.metrics.views}
+            </span>
+            <QuickInfoChip
+              icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>}
+              value={infoFields.find(i => i.type === 'accessibility')?.content ?? null}
+              placeholder="Accessibilité"
+              onClick={() => setActiveTab('infos')}
+            />
+            <QuickInfoChip
+              icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L12 14"/><path d="M2 12h4"/><path d="M20 12h2"/><path d="M7.8 5.2l2.8 2.8"/><path d="M16.2 5.2l-2.8 2.8"/><path d="M12 2v4"/></svg>}
+              value={infoFields.find(i => i.type === 'season')?.content ?? null}
+              placeholder="Saison"
+              onClick={() => setActiveTab('infos')}
+            />
+            <QuickInfoChip
+              icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+              value={infoFields.find(i => i.type === 'warning')?.content ?? null}
+              placeholder="Info"
+              onClick={() => setActiveTab('infos')}
+            />
+          </div>
 
           {/* Roles */}
           <div className="place-roles">
@@ -567,6 +606,14 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           >
             Infos ({infoFields.length})
           </button>
+          {isAdmin && (
+            <button
+              className={`place-tab place-tab-admin${activeTab === 'admin' ? ' active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+            >
+              Admin
+            </button>
+          )}
         </div>
 
         {/* Tab content */}
@@ -611,9 +658,32 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           </div>
         )}
 
-        {/* Admin: ScoreSlider */}
-        {isAdmin && (
-          <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
+        {activeTab === 'admin' && isAdmin && (
+          <div className="place-tab-content">
+            <div className="place-admin-debug">
+              <div className="place-admin-debug-title">Données du lieu</div>
+              <div>ID: <span className="mono">{place.id}</span></div>
+              <div>Auteur: {place.author?.lastName ?? '—'} ({place.author?.id})</div>
+              <div>Vues: {place.metrics.views} · Likes: {place.metrics.likes} · Explo: {place.metrics.explored}</div>
+              <div>Note ancienne: {place.metrics.note?.toFixed(1) ?? '—'}</div>
+              <div>Claim: {place.claim?.factionId ?? 'aucun'} {place.claim ? `(fort niv.${place.claim.fortificationLevel})` : ''}</div>
+              {v05 && (
+                <>
+                  <div style={{ marginTop: 6, fontWeight: 700 }}>V0.5 Influence</div>
+                  {v05.influence.map(i => (
+                    <div key={i.factionId}>
+                      {i.factionId}: placé={i.placed} contenu={i.content} total={i.total}
+                    </div>
+                  ))}
+                  <div>Dominant: {v05.dominantFaction ?? '—'}</div>
+                  <div>Gardien: {v05.guardian?.name ?? '—'}</div>
+                  <div>Explorateurs: {v05.explorers?.length ?? 0}</div>
+                  <div>Contributions: {v05.contributions?.length ?? 0}</div>
+                  <div>Note moy: {avgRating?.toFixed(1) ?? '—'} ({carnets.filter(c => c.rating !== null).length} notes)</div>
+                </>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

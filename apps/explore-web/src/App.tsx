@@ -31,12 +31,17 @@ import { MobileNavbar } from './components/map/MobileNavbar'
 import { MobileHeader } from './components/map/MobileHeader'
 import { useMobileNavStore } from './stores/mobileNavStore'
 import { AdScreen } from './components/map/AdScreen'
+import { DailyEnigma, EnigmaChestButton } from './components/enigma/DailyEnigma'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 import './styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
+  const glory = usePlayerStore(s => s.glory)
+  const explorationPoints = usePlayerStore(s => s.explorationPoints)
+  const eruditionPoints = usePlayerStore(s => s.eruditionPoints)
   const notoriety = usePlayerStore(s => s.notorietyPoints)
+  const displayGlory = glory > 0 ? glory : notoriety
   const [showInfo, setShowInfo] = useState(false)
 
   return (
@@ -50,19 +55,19 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
         onContextMenu={(e) => { e.preventDefault(); onClick() }}
       >
         <span className="notoriety-icon">{'\uD83C\uDF96\uFE0F'}</span>
-        <span className="notoriety-value">{notoriety}</span>
+        <span className="notoriety-value">{displayGlory}</span>
       </div>
 
       {showInfo && (
         <InfoModal
           icon={'\uD83C\uDF96\uFE0F'}
           title="Gloire"
-          description="La Gloire represente votre prestige personnel dans votre héritage. Vous gagnez des points en protégeant et fortifiant des lieux."
+          description="La Gloire represente votre prestige. Elle est la somme de vos points d'Exploration (terrain) et d'Erudition (enigmes)."
           rows={[
-            { label: 'Points actuels', value: String(notoriety), highlight: true },
-            { label: 'Protéger un lieu', value: '+10 pts' },
-            { label: 'Fortifier un lieu', value: '+5 pts' },
-            { label: 'Changer d\'Héritage', value: 'Gloire / 2' },
+            { label: 'Gloire totale', value: String(displayGlory), highlight: true },
+            { label: 'Exploration', value: `${explorationPoints} pts` },
+            { label: '\u00c9rudition', value: `${eruditionPoints} pts` },
+            { label: 'Changer d\'H\u00e9ritage', value: 'Gloire / 2' },
           ]}
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
@@ -85,6 +90,8 @@ function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
+  const [showDailyEnigma, setShowDailyEnigma] = useState(false)
+  const [enigmaAnsweredToday, setEnigmaAnsweredToday] = useState(false)
 
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -177,6 +184,10 @@ function App() {
           {!authLoading && isAuthenticated && (
             <>
               {isConquestMode && <NotorietyBadge onClick={() => setShowLeaderboard(true)} />}
+              <EnigmaChestButton
+                onClick={() => setShowDailyEnigma(true)}
+                hasAnsweredToday={enigmaAnsweredToday}
+              />
               <EnergyIndicator />
             </>
           )}
@@ -228,6 +239,11 @@ function App() {
           ]}
           onClose={() => setShowAddPlaceInfo(false)}
         />
+      )}
+
+      {/* Daily Enigma modal */}
+      {showDailyEnigma && (
+        <DailyEnigma onClose={() => { setShowDailyEnigma(false); setEnigmaAnsweredToday(true) }} />
       )}
 
       {/* Flow ajout de lieu (immersif) */}

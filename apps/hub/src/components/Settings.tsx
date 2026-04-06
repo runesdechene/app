@@ -64,6 +64,40 @@ export function Settings() {
   })
   const [savingDist, setSavingDist] = useState(false)
 
+  // V0.5 Settings
+  const [v05Influence, setV05Influence] = useState({
+    influence_max_remote_per_day: 5,
+    influence_decay_per_week: 1,
+    influence_visit_gps: 3,
+    influence_add_place: 5,
+    influence_add_photo: 2,
+    influence_add_carnet: 3,
+    influence_per_vote: 1,
+  })
+  const [v05Exploration, setV05Exploration] = useState({
+    exploration_visit_gps: 3,
+    exploration_add_place: 10,
+    exploration_add_photo: 5,
+    exploration_add_carnet: 5,
+  })
+  const [v05Erudition, setV05Erudition] = useState({
+    erudition_add_carnet: 3,
+    erudition_enigma_wrong: -1,
+  })
+  const [v05Enigma, setV05Enigma] = useState({
+    enigma_influence_easy: 2,
+    enigma_influence_medium: 4,
+    enigma_influence_hard: 6,
+    enigma_erudition_easy: 3,
+    enigma_erudition_medium: 6,
+    enigma_erudition_hard: 10,
+    enigma_place_influence_base: 1,
+    enigma_place_influence_per_diff: 1,
+    enigma_place_erudition_base: 2,
+    enigma_place_erudition_per_diff: 2,
+  })
+  const [savingV05, setSavingV05] = useState(false)
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -170,6 +204,37 @@ export function Settings() {
           }
         }
         setDistSettings(dist)
+      }
+
+      // V0.5 settings
+      const v05Keys = [
+        ...Object.keys(v05Influence),
+        ...Object.keys(v05Exploration),
+        ...Object.keys(v05Erudition),
+        ...Object.keys(v05Enigma),
+      ]
+      const { data: v05Data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', v05Keys)
+
+      if (v05Data) {
+        const infl = { ...v05Influence }
+        const expl = { ...v05Exploration }
+        const erud = { ...v05Erudition }
+        const enig = { ...v05Enigma }
+        for (const row of v05Data as { key: string; value: string }[]) {
+          const val = Number(row.value)
+          if (isNaN(val)) continue
+          if (row.key in infl) (infl as Record<string, number>)[row.key] = val
+          else if (row.key in expl) (expl as Record<string, number>)[row.key] = val
+          else if (row.key in erud) (erud as Record<string, number>)[row.key] = val
+          else if (row.key in enig) (enig as Record<string, number>)[row.key] = val
+        }
+        setV05Influence(infl)
+        setV05Exploration(expl)
+        setV05Erudition(erud)
+        setV05Enigma(enig)
       }
     } finally {
       setLoading(false)
@@ -328,6 +393,23 @@ export function Settings() {
       )
     }
     setSavingDist(false)
+  }
+
+  async function saveV05Settings() {
+    setSavingV05(true)
+    const allSettings: Record<string, number> = {
+      ...v05Influence,
+      ...v05Exploration,
+      ...v05Erudition,
+      ...v05Enigma,
+    }
+    for (const [key, value] of Object.entries(allSettings)) {
+      await supabase.from('app_settings').upsert(
+        { key, value: String(value) },
+        { onConflict: 'key' }
+      )
+    }
+    setSavingV05(false)
   }
 
   if (loading) {
@@ -663,6 +745,211 @@ export function Settings() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* ====== V0.5 — Influence & Enigmes ====== */}
+      <h2 style={{ marginTop: '2rem', marginBottom: '0.5rem', borderTop: '2px solid rgba(193,154,107,0.3)', paddingTop: '1.5rem' }}>
+        V0.5 — Influence &amp; Enigmes
+      </h2>
+
+      <div className="divers-card">
+        <h3>Influence</h3>
+        <p className="divers-description">
+          Parametres du systeme d'influence : gains, limites et decroissance.
+        </p>
+
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Max remote / jour</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_max_remote_per_day}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_max_remote_per_day: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Decay / semaine</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_decay_per_week}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_decay_per_week: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Visite GPS</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_visit_gps}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_visit_gps: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout lieu</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_add_place}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_add_place: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout photo</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_add_photo}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_add_photo: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout carnet</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_add_carnet}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_add_carnet: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Par vote</span>
+            <input type="number" min="0" step="1" value={v05Influence.influence_per_vote}
+              onChange={e => setV05Influence(prev => ({ ...prev, influence_per_vote: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Exploration</h3>
+        <p className="divers-description">
+          Points d'Exploration gagnes par action terrain.
+        </p>
+
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Visite GPS</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_visit_gps}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_visit_gps: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout lieu</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_add_place}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_add_place: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout photo</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_add_photo}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_add_photo: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Ajout carnet</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_add_carnet}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_add_carnet: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Erudition</h3>
+        <p className="divers-description">
+          Points d'Erudition gagnes par action savoir.
+        </p>
+
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Ajout carnet</span>
+            <input type="number" min="0" step="1" value={v05Erudition.erudition_add_carnet}
+              onChange={e => setV05Erudition(prev => ({ ...prev, erudition_add_carnet: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Enigme fausse</span>
+            <input type="number" step="1" value={v05Erudition.erudition_enigma_wrong}
+              onChange={e => setV05Erudition(prev => ({ ...prev, erudition_enigma_wrong: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Enigmes — Recompenses</h3>
+        <p className="divers-description">
+          Influence et Erudition gagnes selon la difficulte de l'enigme.
+        </p>
+
+        <table className="settings-table">
+          <thead>
+            <tr>
+              <th>Difficulte</th>
+              <th>Influence</th>
+              <th>Erudition</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Facile</td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_influence_easy}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_influence_easy: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_erudition_easy}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_erudition_easy: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+            <tr>
+              <td>Moyen</td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_influence_medium}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_influence_medium: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_erudition_medium}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_erudition_medium: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+            <tr>
+              <td>Difficile</td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_influence_hard}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_influence_hard: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+              <td>
+                <input type="number" min="0" step="1" value={v05Enigma.enigma_erudition_hard}
+                  onChange={e => setV05Enigma(prev => ({ ...prev, enigma_erudition_hard: parseInt(e.target.value) || 0 }))}
+                  className="settings-input" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style={{ marginTop: 16, marginBottom: 8, fontSize: 14 }}>Enigmes de lieu</h4>
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Influence base</span>
+            <input type="number" min="0" step="1" value={v05Enigma.enigma_place_influence_base}
+              onChange={e => setV05Enigma(prev => ({ ...prev, enigma_place_influence_base: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Influence / diff</span>
+            <input type="number" min="0" step="1" value={v05Enigma.enigma_place_influence_per_diff}
+              onChange={e => setV05Enigma(prev => ({ ...prev, enigma_place_influence_per_diff: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Erudition base</span>
+            <input type="number" min="0" step="1" value={v05Enigma.enigma_place_erudition_base}
+              onChange={e => setV05Enigma(prev => ({ ...prev, enigma_place_erudition_base: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Erudition / diff</span>
+            <input type="number" min="0" step="1" value={v05Enigma.enigma_place_erudition_per_diff}
+              onChange={e => setV05Enigma(prev => ({ ...prev, enigma_place_erudition_per_diff: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 12, marginBottom: 24 }}>
+        <button className="btn-primary" onClick={saveV05Settings} disabled={savingV05}>
+          {savingV05 ? '...' : 'Sauvegarder V0.5'}
+        </button>
       </div>
 
     </div>

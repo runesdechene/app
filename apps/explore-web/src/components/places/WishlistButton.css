@@ -1,0 +1,23 @@
+/* ==========================================
+   WISHLIST BUTTON (V0.5)
+   ========================================== */
+
+.wishlist-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+  line-height: 1;
+  transition: transform 0.15s;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.2);
+}
+
+.wishlist-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}

@@ -113,7 +113,7 @@
     top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
   }
 
-  .place-panel-close {
+  .place-hero-close {
     margin-top: env(safe-area-inset-top, 0px);
   }
 
@@ -321,8 +321,8 @@
     }
   }
 
- .place-panel-header {
-  margin-top: 62px;
+ .place-hero {
+  margin-top: 0;
  }
 
   .territory-panel-header {
@@ -333,18 +333,7 @@
     top: 70px;
   }
 
-  .place-panel-header .place-claim-badge {
-    position: relative;
-    margin-left: -15px;
-    max-width: 80vw;
-    z-index: 999;
-    border-bottom-right-radius: 20px;
-    border-top-right-radius: 20px;
-    font-size: 13px;
-    margin-top: -30px;
-  }
-
-  .place-panel-body {
+  .place-body {
     margin-bottom: 10px;
     overflow: visible;
     flex: none;
@@ -363,16 +352,13 @@
     pointer-events: none;
   }
 
-  .place-panel-gallery {
-    aspect-ratio: 16 / 9;
+  .place-hero {
+    height: 280px;
+    min-height: unset;
   }
 
-  .place-panel-title {
-    font-size: 28px;
-  }
-
-  .place-panel-gallery {
-    min-height: 50vh;
+  .place-title {
+    font-size: 22px;
   }
 
   .likers-modal

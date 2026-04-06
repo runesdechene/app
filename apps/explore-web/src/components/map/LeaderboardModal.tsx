@@ -4,7 +4,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import './LeaderboardModal.css'
 
-type LeaderboardTab = 'notoriety' | 'authored' | 'explored'
+type LeaderboardTab = 'notoriety' | 'authored' | 'explored' | 'exploration' | 'erudition'
 
 interface LeaderboardEntry {
   rank: number
@@ -21,14 +21,18 @@ interface Props {
 
 const TAB_LABELS: Record<LeaderboardTab, string> = {
   notoriety: 'Gloire',
-  authored: 'Lieux ajoutés',
-  explored: 'Lieux explorés',
+  exploration: 'Exploration',
+  erudition: '\u00c9rudition',
+  authored: 'Lieux ajout\u00e9s',
+  explored: 'Lieux explor\u00e9s',
 }
 
 const TAB_ICONS: Record<LeaderboardTab, string> = {
-  notoriety: '\uD83C\uDFC5',
+  notoriety: '\uD83C\uDF96\uFE0F',
+  exploration: '\uD83E\uDDED',
+  erudition: '\uD83D\uDCD6',
   authored: '\uD83D\uDCCD',
-  explored: '\uD83E\uDDED',
+  explored: '\uD83D\uDCCD',
 }
 
 export function LeaderboardModal({ onClose }: Props) {
@@ -70,7 +74,7 @@ export function LeaderboardModal({ onClose }: Props) {
         <h2 className="leaderboard-title">Classement</h2>
 
         <div className="leaderboard-tabs">
-          {(['notoriety', 'authored', 'explored'] as LeaderboardTab[]).map(t => (
+          {(['notoriety', 'exploration', 'erudition', 'authored', 'explored'] as LeaderboardTab[]).map(t => (
             <button
               key={t}
               className={`leaderboard-tab${tab === t ? ' active' : ''}`}

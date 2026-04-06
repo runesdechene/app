@@ -37,6 +37,11 @@ interface PlayerProfile {
   factionPattern: string | null
   profileImage: string | null
   notorietyPoints: number
+  /** V0.5 fields */
+  explorationPoints?: number
+  eruditionPoints?: number
+  influenceStock?: number
+  glory?: number
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -362,9 +367,22 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
                 <div className="player-modal-faction-row">
                   <span className="player-modal-notoriety">
-                    {'\uD83C\uDFC5'} {profile.notorietyPoints}
+                    {'\uD83C\uDF96\uFE0F'} {profile.glory ?? profile.notorietyPoints} Gloire
                   </span>
                 </div>
+                {(profile.explorationPoints != null || profile.eruditionPoints != null) && (
+                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 12, opacity: 0.8 }}>
+                    {profile.explorationPoints != null && (
+                      <span>{'\uD83E\uDDED'} {profile.explorationPoints} Exploration</span>
+                    )}
+                    {profile.eruditionPoints != null && (
+                      <span>{'\uD83D\uDCD6'} {profile.eruditionPoints} \u00c9rudition</span>
+                    )}
+                    {profile.influenceStock != null && (
+                      <span>{'\uD83C\uDFF4'} {profile.influenceStock} Influence</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

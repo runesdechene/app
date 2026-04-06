@@ -38,6 +38,10 @@ interface PlaceInput {
   fortificationLevel: number
   claimedByName: string
   claimedById: string
+  /** V0.5 : influence totale (toutes factions) sur le lieu */
+  totalInfluence?: number
+  /** V0.5 : influence par faction { factionId: score } */
+  influenceByFaction?: Record<string, number>
 }
 
 interface TierDef {
@@ -109,7 +113,7 @@ function radiusForScore(score: number): number {
   return BASE_RADIUS_KM + Math.sqrt(score - 1) * RADIUS_SCALE_KM
 }
 
-/** Bonus de score selon le niveau de fortification */
+/** Bonus de score selon le niveau de fortification (legacy V0.4) */
 function fortificationBonus(level: number): number {
   switch (level) {
     case 1: return 10
@@ -118,6 +122,30 @@ function fortificationBonus(level: number): number {
     case 4: return 60
     default: return 0
   }
+}
+
+/** V0.5 : retourne la faction dominante par influence (fallback sur faction du lieu) */
+function getDominantFaction(place: PlaceInput): string {
+  if (place.influenceByFaction) {
+    let max = 0
+    let dominant = place.faction
+    for (const [factionId, score] of Object.entries(place.influenceByFaction)) {
+      if (score > max) { max = score; dominant = factionId }
+    }
+    return dominant
+  }
+  return place.faction
+}
+
+/** V0.5 : score basé sur l'influence totale (fallback V0.4 si pas d'influence) */
+function getPlaceScore(place: PlaceInput): number {
+  if (place.totalInfluence != null && place.totalInfluence > 0) {
+    return place.totalInfluence
+  }
+  // Fallback V0.4
+  const likes = place.likes ?? 0
+  const nonLikeScore = Math.max(0, place.score - likes)
+  return Math.max(Math.round(likes + nonLikeScore * 1.5), 1) + fortificationBonus(place.fortificationLevel ?? 0)
 }
 
 /** Génère un polygone circulaire fermé [lon, lat][] */
@@ -245,14 +273,8 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
-    // Territory score with adjusted weights
-    // DB score = likes×1 + views×0.1 + explored×2
-    // Target: likes×1, views×0.4, explored×3
-    // Approx: likes + (score - likes) × 1.5
-    const likes = place.likes ?? 0
-    const nonLikeScore = Math.max(0, place.score - likes) // views*0.1 + explored*2
-    const territoryScore = likes + nonLikeScore * 1.5
-    const effectiveScore = Math.max(Math.round(territoryScore), 1) + fortificationBonus(place.fortificationLevel ?? 0)
+    // V0.5 : use influence-based score, fallback to V0.4
+    const effectiveScore = getPlaceScore(place)
     const rKm = radiusForScore(effectiveScore)
     if (rKm <= 0) continue
 
@@ -263,7 +285,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     const clipped = clipToConvex(circleCoords, cellCoords as unknown as Position[])
 
     if (clipped) {
-      const key = place.faction
+      const key = getDominantFaction(place)
       if (!factionRings.has(key)) {
         factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map(), placeIds: new Map(), placeClaimedByIds: new Map(), placeScores: new Map() })
       }

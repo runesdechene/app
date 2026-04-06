@@ -17,6 +17,13 @@ interface GrowthStats {
   reactivated30d: number
 }
 
+interface V05Stats {
+  enigmasToday: number
+  influenceThisWeek: number
+  topContributors: Array<{ name: string; points: number }>
+  topDocumentedPlaces: Array<{ title: string; contributions: number }>
+}
+
 function isoDate(daysAgo: number): string {
   const d = new Date()
   d.setDate(d.getDate() - daysAgo)
@@ -34,6 +41,12 @@ export function Dashboard() {
     newToday: 0, reactivatedToday: 0,
     new7d: 0, reactivated7d: 0,
     new30d: 0, reactivated30d: 0,
+  })
+  const [v05Stats, setV05Stats] = useState<V05Stats>({
+    enigmasToday: 0,
+    influenceThisWeek: 0,
+    topContributors: [],
+    topDocumentedPlaces: [],
   })
   const [loading, setLoading] = useState(true)
 
@@ -95,6 +108,73 @@ export function Dashboard() {
           new30d: newMonthRes.count || 0,
           reactivated30d: reactMonthRes.count || 0,
         })
+
+        // V0.5 Stats
+        const v05: V05Stats = {
+          enigmasToday: 0,
+          influenceThisWeek: 0,
+          topContributors: [],
+          topDocumentedPlaces: [],
+        }
+
+        // Enigmas answered today
+        const { count: enigmaCount } = await supabase
+          .from('enigma_answers')
+          .select('*', { count: 'exact', head: true })
+          .gte('answered_at', startOfToday)
+        v05.enigmasToday = enigmaCount || 0
+
+        // Total influence placed this week
+        const { data: influenceData } = await supabase
+          .from('place_influence')
+          .select('placed_points')
+          .gte('updated_at', ago7d)
+        if (influenceData) {
+          v05.influenceThisWeek = (influenceData as Array<{ placed_points: number }>)
+            .reduce((sum, r) => sum + (r.placed_points || 0), 0)
+        }
+
+        // Top contributors by exploration_points
+        const { data: topContribData } = await supabase
+          .from('users')
+          .select('first_name, display_name, exploration_points, erudition_points')
+          .order('exploration_points', { ascending: false })
+          .limit(5)
+        if (topContribData) {
+          v05.topContributors = (topContribData as Array<{
+            first_name: string | null
+            display_name: string | null
+            exploration_points: number
+            erudition_points: number
+          }>).map(u => ({
+            name: u.display_name || u.first_name || 'Anonyme',
+            points: (u.exploration_points || 0) + (u.erudition_points || 0),
+          }))
+        }
+
+        // Top documented places (by number of contributions)
+        const { data: topPlacesData } = await supabase
+          .from('place_contributions')
+          .select('place_id, places(title)')
+          .limit(500)
+        if (topPlacesData) {
+          const placeCounts = new Map<string, { title: string; count: number }>()
+          for (const row of topPlacesData as Array<{ place_id: string; places: { title: string } | null }>) {
+            const key = row.place_id
+            const existing = placeCounts.get(key)
+            if (existing) {
+              existing.count++
+            } else {
+              placeCounts.set(key, { title: row.places?.title ?? key, count: 1 })
+            }
+          }
+          v05.topDocumentedPlaces = Array.from(placeCounts.values())
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5)
+            .map(p => ({ title: p.title, contributions: p.count }))
+        }
+
+        setV05Stats(v05)
       } finally {
         setLoading(false)
       }
@@ -169,6 +249,67 @@ export function Dashboard() {
           </div>
         </div>
       </div>
+
+      <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>V0.5 — Influence &amp; Enigmes</h2>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h3>Enigmes aujourd'hui</h3>
+          <span className="stat-value" style={{ color: '#6b46c1' }}>{v05Stats.enigmasToday}</span>
+        </div>
+        <div className="stat-card">
+          <h3>Influence placee (7j)</h3>
+          <span className="stat-value" style={{ color: '#3b82f6' }}>{v05Stats.influenceThisWeek}</span>
+        </div>
+      </div>
+
+      {v05Stats.topContributors.length > 0 && (
+        <div style={{ marginTop: '1rem' }}>
+          <h3 style={{ marginBottom: '0.5rem', fontSize: 14 }}>Top contributeurs (Gloire)</h3>
+          <table className="users-table" style={{ fontSize: 13 }}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Joueur</th>
+                <th>Gloire</th>
+              </tr>
+            </thead>
+            <tbody>
+              {v05Stats.topContributors.map((c, i) => (
+                <tr key={i}>
+                  <td>{i + 1}</td>
+                  <td>{c.name}</td>
+                  <td style={{ fontWeight: 600 }}>{c.points}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {v05Stats.topDocumentedPlaces.length > 0 && (
+        <div style={{ marginTop: '1rem' }}>
+          <h3 style={{ marginBottom: '0.5rem', fontSize: 14 }}>Lieux les plus documentes</h3>
+          <table className="users-table" style={{ fontSize: 13 }}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Lieu</th>
+                <th>Contributions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {v05Stats.topDocumentedPlaces.map((p, i) => (
+                <tr key={i}>
+                  <td>{i + 1}</td>
+                  <td>{p.title}</td>
+                  <td style={{ fontWeight: 600 }}>{p.contributions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

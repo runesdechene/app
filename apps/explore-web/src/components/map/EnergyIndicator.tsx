@@ -9,6 +9,7 @@ export function EnergyIndicator() {
   const cycleSeconds = usePlayerStore(s => s.energyCycle)
   const nextPointIn = usePlayerStore(s => s.nextPointIn)
   const bonusEnergy = usePlayerStore(s => s.bonusEnergy)
+  const influenceStock = usePlayerStore(s => s.influenceStock)
 
   const isFull = energy >= maxEnergy
 
@@ -50,6 +51,11 @@ export function EnergyIndicator() {
 
         <div className="energy-sub">
           <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
+          {influenceStock > 0 && (
+            <span className="energy-rate" style={{ marginLeft: 6, color: '#8a6b30' }}>
+              {'\uD83C\uDFF4'} {influenceStock}
+            </span>
+          )}
         </div>
       </div>
 

@@ -76,9 +76,24 @@ interface PlayerState {
   activeBuff: string | null  // 'free_discover' | 'free_claim' | 'double_glory' | 'distance_ignore' | null
   setActiveBuff: (buff: string | null) => void
 
-  /** Gloire personnelle */
+  /** Gloire personnelle (legacy — alias de glory) */
   notorietyPoints: number
   setNotorietyPoints: (pts: number) => void
+
+  /** V0.5 — Points d'exploration (terrain, GPS, ajout lieu, photos) */
+  explorationPoints: number
+  setExplorationPoints: (pts: number) => void
+
+  /** V0.5 — Points d'érudition (énigmes quotidiennes, énigmes de lieu) */
+  eruditionPoints: number
+  setEruditionPoints: (pts: number) => void
+
+  /** V0.5 — Stock d'influence dépensable sur les lieux */
+  influenceStock: number
+  setInfluenceStock: (stock: number) => void
+
+  /** V0.5 — Gloire = explorationPoints + eruditionPoints */
+  glory: number
 
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
@@ -188,6 +203,17 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   notorietyPoints: 0,
   setNotorietyPoints: (pts) => set({ notorietyPoints: pts }),
+
+  explorationPoints: 0,
+  setExplorationPoints: (pts) => set((state) => ({ explorationPoints: pts, glory: pts + state.eruditionPoints })),
+
+  eruditionPoints: 0,
+  setEruditionPoints: (pts) => set((state) => ({ eruditionPoints: pts, glory: state.explorationPoints + pts })),
+
+  influenceStock: 0,
+  setInfluenceStock: (stock) => set({ influenceStock: stock }),
+
+  glory: 0,
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),

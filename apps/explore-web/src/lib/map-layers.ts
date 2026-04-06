@@ -96,7 +96,10 @@ export const territoryHaloLayer: LayerSpecification = {
 
 // --- Layer style : Territory labels (symbol layers GPU-side, pas de DOM markers) ---
 
-/** Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré) */
+/** Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré)
+ *  NOTE V0.5: gardé pour rétrocompatibilité pendant la transition vers le système d'influence.
+ *  Sera supprimé en Phase 6.
+ */
 export const fortBadgeLayer: LayerSpecification = {
   id: 'places-fort-badge',
   type: 'symbol',

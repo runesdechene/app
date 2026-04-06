@@ -208,11 +208,29 @@ export function usePlayer() {
         })
       }
       if (profileRes.data) {
-        const profile = profileRes.data as { role?: string; profileImage?: { url: string } | null; gameMode?: string }
+        const profile = profileRes.data as {
+          role?: string
+          profileImage?: { url: string } | null
+          gameMode?: string
+          explorationPoints?: number
+          eruditionPoints?: number
+          influenceStock?: number
+          glory?: number
+        }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
         const gm = profile.gameMode === 'conquest' ? 'conquest' : 'exploration'
         usePlayerStore.setState({ gameMode: gm })
+        // V0.5 fields
+        if (profile.explorationPoints != null) {
+          usePlayerStore.getState().setExplorationPoints(profile.explorationPoints)
+        }
+        if (profile.eruditionPoints != null) {
+          usePlayerStore.getState().setEruditionPoints(profile.eruditionPoints)
+        }
+        if (profile.influenceStock != null) {
+          usePlayerStore.getState().setInfluenceStock(profile.influenceStock)
+        }
       }
       if (titlesRes.data) {
         const td = titlesRes.data as {

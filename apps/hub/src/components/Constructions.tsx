@@ -202,9 +202,27 @@ export function Constructions() {
   if (loading) return <div className="loading">Chargement...</div>
 
   return (
-    <div style={{ paddingBottom: hasChanges ? 70 : 0 }}>
+    <div style={{ paddingBottom: hasChanges ? 70 : 0, opacity: 0.6, pointerEvents: 'none', position: 'relative' }}>
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        background: 'linear-gradient(135deg, #b8860b 0%, #8b6914 100%)',
+        color: '#fff',
+        padding: '14px 20px',
+        borderRadius: 8,
+        marginBottom: 16,
+        fontSize: 14,
+        fontWeight: 600,
+        textAlign: 'center',
+        pointerEvents: 'auto',
+        opacity: 1,
+      }}>
+        Systeme de fortification remplace par l'Influence en V0.5 — Cette page est desactivee.
+        Les donnees sont conservees a titre d'archive.
+      </div>
       <div className="page-header">
-        <h1>Constructions</h1>
+        <h1>Constructions <span style={{ fontSize: 12, fontWeight: 400, opacity: 0.7 }}>(archive V0.4)</span></h1>
         <span className="tags-count">{types.length} niveaux</span>
       </div>
 
