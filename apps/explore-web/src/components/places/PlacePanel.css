@@ -2,36 +2,56 @@
    PLACE PANEL — Shell
    ========================================== */
 
+.place-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: rgba(20, 12, 5, 0.45);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: place-panel-fade-in 0.2s ease;
+}
+
+@keyframes place-panel-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes place-panel-appear {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 .place-panel {
   position: fixed;
-  top: 15px;
-  left: 15px;
-  bottom: 15px;
-  width: 500px;
-  border-radius: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.96);
+  width: 700px;
+  max-height: calc(100vh - 70px);
+  border-radius: 20px;
   background-color: var(--color-parchment);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 4px 0 40px 20px rgba(74, 55, 40, 0.15);
+  box-shadow: 0 20px 60px rgba(74, 55, 40, 0.3);
   z-index: 20;
-  transform: translateX(-120%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  pointer-events: none;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .place-panel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
 }
 
 .place-panel-open {
-  transform: translateX(0);
-}
-
-.place-panel-backdrop {
-  display: none;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+  animation: place-panel-appear 0.25s ease;
 }
 
 /* Loading & Error */
@@ -59,7 +79,7 @@
 .place-hero {
   position: relative;
   width: 100%;
-  height: 320px;
+  height: 420px;
   overflow: hidden;
   flex-shrink: 0;
   background: var(--color-parchment-dark);
@@ -101,8 +121,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
-  background: rgba(74, 55, 40, 0.55);
+  padding: 10px 10px;
+  background: rgba(88, 81, 75, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: none;
@@ -122,7 +142,6 @@
 
 .place-hero-close {
   font-size: 14px;
-  padding: 6px 10px;
 }
 
 .place-hero-rating {
@@ -204,7 +223,7 @@
 
 .place-title {
   font-family: var(--font-title);
-  font-size: 24px;
+  font-size: 34px;
   color: var(--color-ink);
   line-height: 1.1;
   margin: 0 0 8px;
@@ -250,7 +269,7 @@
   align-items: center;
   gap: 6px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--color-ink-light);
   margin: 0 0 12px;
 }
@@ -566,7 +585,7 @@
 .place-quick-infos {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   flex-wrap: wrap;
   margin: 8px 0 12px;
 }
@@ -575,7 +594,7 @@
   align-items: center;
   gap: 4px;
   font-family: var(--font-accent);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--color-ink-light);
 }
 .place-quick-info-btn {

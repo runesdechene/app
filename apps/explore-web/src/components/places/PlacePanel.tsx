@@ -33,7 +33,7 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlaceP
 
   return (
     <>
-      {isOpen && <div className="place-panel-backdrop" />}
+      {isOpen && <div className="place-panel-backdrop" onClick={onClose} />}
 
       <div className={`place-panel ${isOpen ? 'place-panel-open' : ''}`}>
         {loading && (
