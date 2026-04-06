@@ -362,6 +362,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           )}
         </div>
 
+        {/* Top-right: close button */}
+        <div className="place-hero-top-right">
+          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+            &#10005;
+          </button>
+        </div>
+
         {/* Gallery dots */}
         {currentHeroPhotos.length > 1 && (
           <div className="place-hero-dots">
@@ -384,50 +391,41 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
         )}
       </div>
 
-      {/* Toolbar row: bookmark left — gear + close right */}
-      <div className="place-toolbar">
-        <div className="place-toolbar-left">
-          {v05 && (
-            <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
-          )}
-        </div>
-        <div className="place-toolbar-right">
-          {isAdmin && (
-            <div className="place-options-wrap">
-              <button
-                className="place-toolbar-btn"
-                onClick={() => setShowOptionsMenu(v => !v)}
-                aria-label="Options"
-              >
-                {'\u2699\uFE0F'}
-              </button>
-              {showOptionsMenu && (
-                <>
-                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
-                  <div className="place-options-menu">
-                    <button
-                      className="place-options-item danger"
-                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
-                    >
-                      Supprimer ce lieu
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          <button onClick={onClose} className="place-toolbar-btn" aria-label="Fermer">
-            &#10005;
-          </button>
-        </div>
-      </div>
-
       {/* Zone 2 — Body */}
       <div className="place-body">
         {/* Identity */}
         <div className="place-identity">
           <div className="place-title-row">
             <h2 className="place-title">{place.title}</h2>
+            <div className="place-title-actions">
+              {v05 && (
+                <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
+              )}
+              {isAdmin && (
+                <div className="place-options-wrap">
+                  <button
+                    className="place-toolbar-btn"
+                    onClick={() => setShowOptionsMenu(v => !v)}
+                    aria-label="Options"
+                  >
+                    {'\u2699\uFE0F'}
+                  </button>
+                  {showOptionsMenu && (
+                    <>
+                      <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
+                      <div className="place-options-menu">
+                        <button
+                          className="place-options-item danger"
+                          onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
+                        >
+                          Supprimer ce lieu
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tags */}

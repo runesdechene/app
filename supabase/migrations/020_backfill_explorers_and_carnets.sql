@@ -35,6 +35,15 @@ WHERE p.author_id IS NOT NULL
   )
 ON CONFLICT (place_id, user_id, type) DO NOTHING;
 
+-- 2b. Backfill place_influence: content_points from carnets (10pts/carnet + 5pts/photo)
+--     Only for authors with a faction (no faction = no heritage to credit)
+INSERT INTO place_influence (place_id, faction_id, placed_points, content_points)
+SELECT pc.place_id, pc.faction_id, 0, 10 + (COALESCE(jsonb_array_length(pc.images), 0) * 5)
+FROM place_contributions pc
+WHERE pc.type = 'carnet' AND pc.faction_id IS NOT NULL
+ON CONFLICT (place_id, faction_id)
+DO UPDATE SET content_points = place_influence.content_points + EXCLUDED.content_points;
+
 -- 3. Update get_place_detail_v05: add images to contributions JSON
 CREATE OR REPLACE FUNCTION public.get_place_detail_v05(
   p_place_id TEXT,
