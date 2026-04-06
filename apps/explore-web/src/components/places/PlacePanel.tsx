@@ -362,37 +362,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           )}
         </div>
 
-        {/* Top-right: close + admin gear */}
-        <div className="place-hero-top-right">
-          {isAdmin && (
-            <div className="place-options-wrap">
-              <button
-                className="place-hero-pill place-options-btn"
-                onClick={() => setShowOptionsMenu(v => !v)}
-                aria-label="Options"
-              >
-                {'\u2699\uFE0F'}
-              </button>
-              {showOptionsMenu && (
-                <>
-                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
-                  <div className="place-options-menu">
-                    <button
-                      className="place-options-item danger"
-                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
-                    >
-                      Supprimer ce lieu
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
-            &#10005;
-          </button>
-        </div>
-
         {/* Gallery dots */}
         {currentHeroPhotos.length > 1 && (
           <div className="place-hero-dots">
@@ -415,15 +384,50 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
         )}
       </div>
 
+      {/* Toolbar row: bookmark left — gear + close right */}
+      <div className="place-toolbar">
+        <div className="place-toolbar-left">
+          {v05 && (
+            <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
+          )}
+        </div>
+        <div className="place-toolbar-right">
+          {isAdmin && (
+            <div className="place-options-wrap">
+              <button
+                className="place-toolbar-btn"
+                onClick={() => setShowOptionsMenu(v => !v)}
+                aria-label="Options"
+              >
+                {'\u2699\uFE0F'}
+              </button>
+              {showOptionsMenu && (
+                <>
+                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
+                  <div className="place-options-menu">
+                    <button
+                      className="place-options-item danger"
+                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
+                    >
+                      Supprimer ce lieu
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          <button onClick={onClose} className="place-toolbar-btn" aria-label="Fermer">
+            &#10005;
+          </button>
+        </div>
+      </div>
+
       {/* Zone 2 — Body */}
       <div className="place-body">
         {/* Identity */}
         <div className="place-identity">
           <div className="place-title-row">
             <h2 className="place-title">{place.title}</h2>
-            {v05 && (
-              <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
-            )}
           </div>
 
           {/* Tags */}
@@ -556,15 +560,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           />
         )}
 
-        {/* Hidden InfluenceButton for the action modal */}
-        {showInfluenceAction && userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
-          <div style={{ display: 'none' }}>
-            <InfluenceButton
-              placeId={place.id}
-              placeLocation={place.location}
-              onInfluencePlaced={() => { refreshV05(); onRefetch(); setShowInfluenceAction(false) }}
-            />
-          </div>
+        {/* InfluenceButton action panel */}
+        {showInfluenceAction && userEmail && (
+          <InfluenceButton
+            placeId={place.id}
+            placeLocation={place.location}
+            onInfluencePlaced={() => { refreshV05(); onRefetch(); setShowInfluenceAction(false) }}
+          />
         )}
 
         {/* Zone 3B — Explorers */}
