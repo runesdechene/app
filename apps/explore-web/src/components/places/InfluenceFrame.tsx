@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import './InfluenceFrame.css'
@@ -67,6 +67,27 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
   const [remoteUsed, setRemoteUsed] = useState(0) // clicks spent remotely on this place today
   const [shakeStock, setShakeStock] = useState(false)
+
+  // Load today's remote usage for this place from activity_log
+  useEffect(() => {
+    if (!userId) return
+    const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+    supabase
+      .from('activity_log')
+      .select('data')
+      .eq('actor_id', userId)
+      .eq('place_id', placeId)
+      .eq('type', 'place_influence')
+      .gte('created_at', today)
+      .then(({ data }) => {
+        if (!data) return
+        const remoteTotal = data.reduce((sum, row) => {
+          const d = row.data as { remote?: boolean; points?: number }
+          return d?.remote ? sum + (d.points ?? 1) : sum
+        }, 0)
+        setRemoteUsed(remoteTotal)
+      })
+  }, [userId, placeId])
   const pendingRef = useRef(false)
   const MAX_REMOTE_PER_PLACE = 5
 
