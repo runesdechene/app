@@ -660,19 +660,22 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             className={`place-tab${activeTab === 'carnets' ? ' active' : ''}`}
             onClick={() => setActiveTab('carnets')}
           >
-            Carnets ({carnets.length})
+            Carnets 
+            <span className="place-tab-lenght">{carnets.length}</span>
           </button>
           <button
             className={`place-tab${activeTab === 'galerie' ? ' active' : ''}`}
             onClick={() => setActiveTab('galerie')}
           >
-            Galerie ({galleryPhotos.length})
+            Galerie
+            <span className="place-tab-lenght">{galleryPhotos.length}</span>
           </button>
           <button
             className={`place-tab${activeTab === 'infos' ? ' active' : ''}`}
             onClick={() => setActiveTab('infos')}
           >
-            Infos ({infoFields.length})
+            Infos
+            <span className="place-tab-lenght">{infoFields.length}</span>
           </button>
           {isAdmin && (
             <button
@@ -696,6 +699,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   carnet={c}
                   isTop={i === 0}
                   factionColor={factionColors.get(c.factionId) ?? null}
+                  factionSvg={factionSvgs.get(c.factionId) ?? null}
                   influencePerCarnet={influencePerCarnet}
                   influencePerPhoto={influencePerPhoto}
                   influencePerVote={influencePerVote}

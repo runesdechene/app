@@ -25,6 +25,7 @@ interface CarnetCardProps {
   carnet: Carnet
   isTop: boolean
   factionColor: string | null
+  factionSvg: string | null
   influencePerCarnet: number   // from app_settings
   influencePerPhoto: number
   influencePerVote: number
@@ -32,7 +33,7 @@ interface CarnetCardProps {
   onPhotoOpen?: (photos: string[], index: number) => void
 }
 
-export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted, onPhotoOpen }: CarnetCardProps) {
+export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted, onPhotoOpen }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
 
@@ -74,7 +75,20 @@ export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, in
           <span className="carnet-name">{carnet.userName}</span>
         </button>
         {factionColor && (
-          <span className="carnet-faction-dot" style={{ backgroundColor: factionColor }} />
+          <span className="carnet-faction-badge" style={{ backgroundColor: `${factionColor}20` }}>
+            {factionSvg ? (
+              <span
+                className="carnet-faction-icon"
+                style={{
+                  WebkitMaskImage: `url(${factionSvg})`,
+                  maskImage: `url(${factionSvg})`,
+                  backgroundColor: factionColor,
+                }}
+              />
+            ) : (
+              <span className="carnet-faction-dot-inner" style={{ backgroundColor: factionColor }} />
+            )}
+          </span>
         )}
         {carnet.rating !== null && (
           <span className="carnet-stars">
