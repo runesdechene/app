@@ -352,7 +352,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
   // Influence config defaults (TODO: fetch from app_settings)
   const influencePerCarnet = 10
-  const influencePerPhoto = 5
+  const influencePerPhoto = 10
   const influencePerVote = 1
 
   const isAuthor = place.author?.id === userId

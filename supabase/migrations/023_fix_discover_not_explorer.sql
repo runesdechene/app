@@ -67,9 +67,15 @@ BEGIN
   v_glory_gain := GREATEST(1, ROUND((v_glory_base + v_cost * v_glory_cost_pct / 100) * COALESCE(p_glory_mult, 1)));
   UPDATE users SET notoriety_points = notoriety_points + v_glory_gain WHERE id = p_user_id;
 
-  -- V0.5 : exploration_points + influence_stock
+  -- V0.5 : exploration_points always, influence_stock only for the place CREATOR
   SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'exploration_add_place'), 5) INTO v_exploration_gain;
-  SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'influence_add_place'), 25) INTO v_influence_gain;
+
+  -- Only the place author (creator) gets influence stock reward
+  IF EXISTS (SELECT 1 FROM places WHERE id = p_place_id AND author_id = p_user_id) THEN
+    SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'influence_add_place'), 50) INTO v_influence_gain;
+  ELSE
+    v_influence_gain := 0;
+  END IF;
 
   UPDATE users SET
     exploration_points = exploration_points + v_exploration_gain,

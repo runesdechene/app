@@ -36,7 +36,7 @@ export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, in
   const [voting, setVoting] = useState(false)
 
   const textInfluence = influencePerCarnet
-  const photosInfluence = carnet.images.length * influencePerPhoto
+  const photosInfluence = carnet.images.length > 0 ? influencePerPhoto : 0
   const votesInfluence = carnet.votesUp * influencePerVote
   const totalInfluence = textInfluence + photosInfluence + votesInfluence
 
