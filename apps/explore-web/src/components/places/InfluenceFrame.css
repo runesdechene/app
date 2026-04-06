@@ -1,3 +1,7 @@
+/* ==========================================
+   INFLUENCE FRAME — Banner Clicker
+   ========================================== */
+
 .influence-frame {
   background: linear-gradient(135deg, #faf3e0 0%, #f0e6cc 100%);
   border: 2px solid #c9a96e;
@@ -6,6 +10,7 @@
   margin-bottom: 16px;
   position: relative;
 }
+
 .influence-frame::before {
   content: '';
   position: absolute;
@@ -15,60 +20,141 @@
   pointer-events: none;
 }
 
+.influence-frame-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 .influence-frame-title {
   font-family: var(--font-accent);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--color-ink-light);
-  margin-bottom: 10px;
-  text-align: center;
 }
 
-.influence-flags {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-.influence-flag {
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: bold;
+.influence-frame-stock {
   font-family: var(--font-accent);
-}
-
-.influence-empty {
-  text-align: center;
-  font-size: 12px;
-  color: var(--color-ink-light);
-  font-style: italic;
-  margin-bottom: 12px;
-}
-
-.influence-cta {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background: linear-gradient(135deg, #5a4a3a, #3a2a1a);
-  color: var(--color-parchment);
-  border: none;
-  border-radius: 6px;
-  font-family: var(--font-title);
-  font-size: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.influence-cta:hover { opacity: 0.85; }
-
-.influence-stock-label {
-  text-align: center;
   font-size: 11px;
-  color: var(--color-ink-light);
-  margin-top: 6px;
+  color: var(--color-sepia);
+  font-weight: 600;
+}
+
+/* Banner row */
+.influence-banners {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.influence-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  transition: transform 0.1s;
+  position: relative;
+}
+
+.influence-banner-own {
+  cursor: pointer;
+}
+
+.influence-banner-own:not(:disabled):hover {
+  transform: scale(1.08);
+}
+
+.influence-banner-own:not(:disabled):active {
+  transform: scale(0.92);
+}
+
+/* The banner flag — WebP image */
+.influence-banner-flag {
+  width: 80px;
+  height: 100px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  /* Pennant bottom cut */
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+}
+
+.influence-banner-pattern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.influence-banner-crown {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* Score below banner */
+.influence-banner-score {
   font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dominant banner glow */
+.influence-banner-dominant .influence-banner-flag {
+  box-shadow: 0 2px 12px rgba(255, 215, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Own faction highlight ring */
+.influence-banner-own .influence-banner-flag {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+.influence-banner-own:disabled {
+  opacity: 0.5;
+}
+
+/* Pulse animation on click */
+.influence-banner-pulse .influence-banner-flag {
+  animation: banner-pulse 0.3s ease;
+}
+
+@keyframes banner-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* Error & hint */
+.influence-frame-error {
+  font-size: 11px;
+  color: #c0392b;
+  text-align: center;
+  margin: 8px 0 0;
+  font-family: var(--font-body);
+}
+
+.influence-frame-hint {
+  font-size: 10px;
+  color: var(--color-ink-light);
+  text-align: center;
+  margin: 8px 0 0;
+  font-family: var(--font-accent);
+  opacity: 0.7;
 }

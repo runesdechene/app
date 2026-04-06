@@ -16,7 +16,6 @@ import { InfluenceFrame } from './InfluenceFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { AddCarnetModal } from './AddCarnetModal'
-import { InfluenceButton } from './InfluenceButton'
 import './PlacePanel.css'
 
 interface PlacePanelProps {
@@ -230,7 +229,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   )
 }
 
-function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
+function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
   const [imageIndex, setImageIndex] = useState(0)
@@ -244,62 +243,42 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
   const [v05, setV05] = useState<V05Detail | null>(null)
   const [v05Key, setV05Key] = useState(0)
 
-  // Faction colors cache
+  // Faction visual data cache (colors + patterns for all factions)
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
+  const [factionPatterns, setFactionPatterns] = useState<Map<string, string>>(new Map())
+  const [factionNames, setFactionNames] = useState<Map<string, string>>(new Map())
 
-  // Fetch V0.5 detail
+  // Fetch V0.5 detail + all faction visuals
   useEffect(() => {
     let cancelled = false
     async function loadV05() {
-      const { data, error } = await supabase.rpc('get_place_detail_v05', {
-        p_place_id: place.id,
-        p_user_id: userId ?? null,
-      })
+      const [{ data, error }, { data: allFactions }] = await Promise.all([
+        supabase.rpc('get_place_detail_v05', { p_place_id: place.id, p_user_id: userId ?? null }),
+        supabase.from('factions').select('id, color, image_url, title').order('order'),
+      ])
       if (cancelled || error) return
-      const d = data as V05Detail | null
-      if (d) {
-        setV05(d)
-        if (d.influence && Array.isArray(d.influence)) {
-          const factionIds = d.influence.map(i => i.factionId)
-          if (factionIds.length > 0) {
-            const { data: factionData } = await supabase
-              .from('factions')
-              .select('id, color')
-              .in('id', factionIds)
-            if (!cancelled && factionData) {
-              const map = new Map<string, string>()
-              for (const f of factionData as Array<{ id: string; color: string }>) {
-                map.set(f.id, f.color)
-              }
-              setFactionColors(map)
-              setV05(prev => {
-                if (!prev) return prev
-                return {
-                  ...prev,
-                  influence: prev.influence.map(i => ({
-                    ...i,
-                    factionColor: map.get(i.factionId),
-                  })),
-                }
-              })
-            }
-          }
+      // Cache all factions
+      if (allFactions) {
+        const colors = new Map<string, string>()
+        const patterns = new Map<string, string>()
+        const names = new Map<string, string>()
+        for (const f of allFactions as Array<{ id: string; color: string; image_url: string; title: string }>) {
+          colors.set(f.id, f.color)
+          if (f.image_url) patterns.set(f.id, f.image_url)
+          names.set(f.id, f.title)
         }
+        setFactionColors(colors)
+        setFactionPatterns(patterns)
+        setFactionNames(names)
       }
+      const d = data as V05Detail | null
+      if (d) setV05(d)
     }
     loadV05()
     return () => { cancelled = true }
   }, [place.id, userId, v05Key])
 
   const refreshV05 = () => setV05Key(k => k + 1)
-
-  // Listen for influence-action custom event from InfluenceFrame
-  const [showInfluenceAction, setShowInfluenceAction] = useState(false)
-  useEffect(() => {
-    function onOpen() { setShowInfluenceAction(true) }
-    window.addEventListener('open-influence-action', onOpen)
-    return () => window.removeEventListener('open-influence-action', onOpen)
-  }, [])
 
   // --- Data transformations ---
 
@@ -621,23 +600,16 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
           )}
         </div>
 
-        {/* Zone 3A — Influence Frame */}
+        {/* Zone 3A — Influence Banners */}
         {v05 && (
           <InfluenceFrame
             placeId={place.id}
             influence={v05.influence ?? []}
             factionColors={factionColors}
+            factionPatterns={factionPatterns}
+            factionNames={factionNames}
             placeLocation={place.location}
             onInfluencePlaced={() => { refreshV05(); onRefetch() }}
-          />
-        )}
-
-        {/* InfluenceButton action panel */}
-        {showInfluenceAction && userEmail && (
-          <InfluenceButton
-            placeId={place.id}
-            placeLocation={place.location}
-            onInfluencePlaced={() => { refreshV05(); onRefetch(); setShowInfluenceAction(false) }}
           />
         )}
 
