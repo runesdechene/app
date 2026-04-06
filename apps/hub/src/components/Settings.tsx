@@ -113,6 +113,17 @@ export function Settings() {
         })))
       }
 
+      // Charger default_max_energy depuis app_settings
+      const { data: defaultEnergyData } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'default_max_energy')
+        .single()
+
+      if (defaultEnergyData?.value) {
+        setGlobalDefaults(prev => ({ ...prev, maxEnergy: Number(defaultEnergyData.value) || prev.maxEnergy }))
+      }
+
       // Charger les cycles de regen
       const { data: settingsData } = await supabase
         .from('app_settings')
@@ -202,6 +213,12 @@ export function Settings() {
         max_energy: globalDefaults.maxEnergy,
       })
       .gte('id', '')  // match all rows
+
+    // Persister dans app_settings pour que handle_new_user lise la bonne valeur
+    await supabase.from('app_settings').upsert(
+      { key: 'default_max_energy', value: String(globalDefaults.maxEnergy) },
+      { onConflict: 'key' }
+    )
 
     setUsers(prev =>
       prev.map(u => ({

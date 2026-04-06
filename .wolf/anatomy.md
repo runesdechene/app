@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-06T11:22:38.657Z
-> Files: 433 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-06T11:59:18.344Z
+> Files: 434 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -317,7 +317,7 @@
 - `Reviews.tsx` — PURCHASE_LABELS — uses useState, useEffect (~2126 tok)
 - `ReviewSubmit.tsx` — MAX_REVIEW_LENGTH — renders form — uses useState (~4025 tok)
 - `SaveBar.tsx` — SaveBar (~295 tok)
-- `Settings.tsx` — ROLES — renders map — uses useState, useEffect (~6279 tok)
+- `Settings.tsx` — ROLES (~6463 tok)
 - `ShopifyConnect.tsx` — Callback OAuth — reçoit le token depuis la Netlify Function (~1623 tok)
 - `ShopifySync.tsx` — ShopifySync — uses useState, useEffect (~5972 tok)
 - `ShopifyUnlocks.tsx` — ShopifyUnlocks — uses useState, useEffect (~1384 tok)
@@ -378,6 +378,7 @@
 ## supabase/migrations/
 
 - `002_hub_tables.sql` — HUB : Gestion des comptes Runes de Chene (~837 tok)
+- `002_new_user_energy_from_settings.sql` — MIGRATION 002 : handle_new_user lit max_energy depuis app_settings (~2002 tok)
 - `003_cleanup_old_tables.sql` — NETTOYAGE : Suppression des anciennes tables Shopify/IVY (~553 tok)
 - `004_photo_submissions.sql` — TABLE SOUMISSIONS PHOTOS COMMUNAUTAIRES (~2821 tok)
 - `005_review_submissions.sql` — 005 : Soumissions d'avis texte (~1688 tok)
