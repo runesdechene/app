@@ -16,7 +16,7 @@ interface InfluenceFrameProps {
   onInfluencePlaced: () => void
 }
 
-export function InfluenceFrame({ placeId, influence, factionColors, placeLocation, onInfluencePlaced }: InfluenceFrameProps) {
+export function InfluenceFrame({ placeId, influence, factionColors, placeLocation, onInfluencePlaced: _onInfluencePlaced }: InfluenceFrameProps) {
   const influenceStock = usePlayerStore(s => s.influenceStock)
   const userId = usePlayerStore(s => s.userId)
   const gameMode = usePlayerStore(s => s.gameMode)

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -7,11 +7,18 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
 import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
-import { useConstructionTypes } from '../../hooks/useConstructionTypes'
 import { FoggedPlaceView } from './FoggedPlaceView'
-import { ClaimButton } from './ClaimButton'
-import { FortifyButton } from './FortifyButton'
 import { ScoreSlider } from './ScoreSlider'
+import { WishlistButton } from './WishlistButton'
+import { PlaceEnigma } from '../enigma/PlaceEnigma'
+import { CarnetCard } from './CarnetCard'
+import type { Carnet } from './CarnetCard'
+import { InfluenceFrame } from './InfluenceFrame'
+import { PlaceGallery } from './PlaceGallery'
+import { PlaceInfos } from './PlaceInfos'
+import { AddCarnetModal } from './AddCarnetModal'
+import { PlaceExplorers } from './PlaceExplorers'
+import { InfluenceButton } from './InfluenceButton'
 import './PlacePanel.css'
 
 interface PlacePanelProps {
@@ -81,87 +88,195 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
 
 // --- Vue découverte (lieu accessible) ---
 
+/** V0.5 detail data from get_place_detail_v05 */
+interface V05Detail {
+  influence: Array<{ factionId: string; placed: number; content: number; total: number }>
+  dominantFaction: string | null
+  contributions: V05Contribution[]
+  explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
+  avgRating: number | null
+  ratingCount: number
+  userRating: number | null
+  isWishlisted: boolean
+  isExplorer: boolean
+  guardian: { userId: string; name: string; avatar: string | null; factionId: string } | null
+}
+
+/** Raw contribution from the RPC */
+interface V05Contribution {
+  id: number
+  userId: string
+  factionId: string
+  type: string
+  content: string | null
+  imageUrl: string | null
+  images?: string[]
+  rating?: number | null
+  votesUp: number
+  votesDown: number
+  createdAt: string
+  userName: string
+  userAvatar: string | null
+}
+
+type ActiveTab = 'carnets' | 'galerie' | 'infos'
+
 function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
   const [imageIndex, setImageIndex] = useState(0)
-  const [textExpanded, setTextExpanded] = useState(false)
-  const [liked, setLiked] = useState(place.requester?.liked ?? false)
-  const [likesCount, setLikesCount] = useState(place.metrics.likes)
-  const [likeLoading, setLikeLoading] = useState(false)
-  const [showLikers, setShowLikers] = useState(false)
-  const [likers, setLikers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
-  const [likersLoading, setLikersLoading] = useState(false)
-  const [explored, setExplored] = useState(place.requester?.explored ?? false)
-  const [exploredCount, setExploredCount] = useState(place.metrics.explored)
-  const [exploreLoading, setExploreLoading] = useState(false)
-  const [showExploreConfirm, setShowExploreConfirm] = useState(false)
-  const [showExplorers, setShowExplorers] = useState(false)
-  const [explorers, setExplorers] = useState<Array<{ userId: string; name: string; factionColor: string | null; profileImage: string | null }>>([])
-  const [explorersLoading, setExplorersLoading] = useState(false)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [activeTab, setActiveTab] = useState<ActiveTab>('carnets')
+  const [showAddCarnet, setShowAddCarnet] = useState(false)
 
-  const constructionTypes = useConstructionTypes()
-  const images = place.images || []
-  const cacheBust = useMemo(() => Date.now(), [place.id])
-  const TEXT_LIMIT = 300
+  // V0.5 detail data
+  const [v05, setV05] = useState<V05Detail | null>(null)
+  const [v05Key, setV05Key] = useState(0)
 
-  const prevImage = () => setImageIndex(i => (i - 1 + images.length) % images.length)
-  const nextImage = () => setImageIndex(i => (i + 1) % images.length)
+  // Faction colors cache
+  const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
 
-  async function toggleLike() {
-    if (!userId || likeLoading) return
-    setLikeLoading(true)
-    if (liked) {
-      const { error } = await supabase.rpc('unlike_place', { p_user_id: userId, p_place_id: place.id })
-      if (!error) { setLiked(false); setLikesCount(c => c - 1); useMapStore.getState().incrementPlacesRefreshKey() }
-    } else {
-      const { error } = await supabase.rpc('like_place', { p_user_id: userId, p_place_id: place.id })
-      if (!error) { setLiked(true); setLikesCount(c => c + 1); useMapStore.getState().incrementPlacesRefreshKey() }
-    }
-    setLikeLoading(false)
-  }
-
-  async function fetchLikers() {
-    if (showLikers) { setShowLikers(false); return }
-    setLikersLoading(true)
-    setShowLikers(true)
-    const { data } = await supabase.rpc('get_place_likers', { p_place_id: place.id })
-    if (data && Array.isArray(data)) {
-      setLikers(data as typeof likers)
-    }
-    setLikersLoading(false)
-  }
-
-  async function fetchExplorers() {
-    if (showExplorers) { setShowExplorers(false); return }
-    setExplorersLoading(true)
-    setShowExplorers(true)
-    const { data } = await supabase.rpc('get_place_explorers', { p_place_id: place.id })
-    if (data && Array.isArray(data)) {
-      setExplorers(data as typeof explorers)
-    }
-    setExplorersLoading(false)
-  }
-
-  async function confirmExplore() {
-    if (!userId || exploreLoading) return
-    setExploreLoading(true)
-    const { data, error } = await supabase.rpc('explore_place', { p_user_id: userId, p_place_id: place.id })
-    if (!error && data?.success) {
-      setExplored(true)
-      setExploredCount(c => c + 1)
-      useMapStore.getState().incrementPlacesRefreshKey()
-      useToastStore.getState().addToast({
-        type: 'discover',
-        message: 'Lieu exploré !',
-        timestamp: Date.now(),
+  // Fetch V0.5 detail
+  useEffect(() => {
+    let cancelled = false
+    async function loadV05() {
+      const { data, error } = await supabase.rpc('get_place_detail_v05', {
+        p_place_id: place.id,
+        p_user_id: userId ?? null,
       })
+      if (cancelled || error) return
+      const d = data as V05Detail | null
+      if (d) {
+        setV05(d)
+        if (d.influence && Array.isArray(d.influence)) {
+          const factionIds = d.influence.map(i => i.factionId)
+          if (factionIds.length > 0) {
+            const { data: factionData } = await supabase
+              .from('factions')
+              .select('id, color')
+              .in('id', factionIds)
+            if (!cancelled && factionData) {
+              const map = new Map<string, string>()
+              for (const f of factionData as Array<{ id: string; color: string }>) {
+                map.set(f.id, f.color)
+              }
+              setFactionColors(map)
+              setV05(prev => {
+                if (!prev) return prev
+                return {
+                  ...prev,
+                  influence: prev.influence.map(i => ({
+                    ...i,
+                    factionColor: map.get(i.factionId),
+                  })),
+                }
+              })
+            }
+          }
+        }
+      }
     }
-    setExploreLoading(false)
-    setShowExploreConfirm(false)
+    loadV05()
+    return () => { cancelled = true }
+  }, [place.id, userId, v05Key])
+
+  const refreshV05 = () => setV05Key(k => k + 1)
+
+  // Listen for influence-action custom event from InfluenceFrame
+  const [showInfluenceAction, setShowInfluenceAction] = useState(false)
+  useEffect(() => {
+    function onOpen() { setShowInfluenceAction(true) }
+    window.addEventListener('open-influence-action', onOpen)
+    return () => window.removeEventListener('open-influence-action', onOpen)
+  }, [])
+
+  // --- Data transformations ---
+
+  // Carnets: filter contributions with type 'carnet', sorted by votesUp DESC
+  const carnets: Carnet[] = useMemo(() => {
+    if (!v05?.contributions) return []
+    return v05.contributions
+      .filter(c => c.type === 'carnet')
+      .sort((a, b) => b.votesUp - a.votesUp)
+      .map(c => ({
+        id: c.id,
+        userId: c.userId,
+        factionId: c.factionId,
+        content: c.content ?? '',
+        images: c.images ?? (c.imageUrl ? [c.imageUrl] : []),
+        rating: c.rating ?? null,
+        votesUp: c.votesUp,
+        votesDown: c.votesDown,
+        createdAt: c.createdAt,
+        userName: c.userName,
+        userAvatar: c.userAvatar,
+      }))
+  }, [v05?.contributions])
+
+  // Hero photo: random from top-3 voted carnets' images, fallback to place.images
+  const heroPhotos = useMemo(() => {
+    const top3 = carnets.slice(0, 3)
+    const carnetPhotos = top3.flatMap(c => c.images)
+    if (carnetPhotos.length > 0) return carnetPhotos
+    return (place.images || []).map(img => img.url)
+  }, [carnets, place.images])
+
+  const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
+  const heroPhotoUrl = currentHeroPhotos.length > 0
+    ? currentHeroPhotos[imageIndex % currentHeroPhotos.length]
+    : null
+
+  // Average rating from carnets
+  const avgRating = useMemo(() => {
+    // Use V05 avgRating if available (from place_ratings table)
+    if (v05?.avgRating != null) return v05.avgRating
+    // Fallback: compute from carnets
+    const rated = carnets.filter(c => c.rating !== null)
+    if (rated.length === 0) return null
+    return rated.reduce((sum, c) => sum + c.rating!, 0) / rated.length
+  }, [v05?.avgRating, carnets])
+
+  // Gallery photos: flatten all carnet images
+  const galleryPhotos = useMemo(() => {
+    return carnets.flatMap(c =>
+      c.images.map(url => ({ url, carnetId: c.id }))
+    )
+  }, [carnets])
+
+  // Info fields: filter contributions of type accessibility, season, warning
+  const infoFields = useMemo(() => {
+    if (!v05?.contributions) return []
+    const infoTypes = ['accessibility', 'season', 'warning']
+    return v05.contributions
+      .filter(c => infoTypes.includes(c.type))
+      .map(c => ({
+        type: c.type as 'accessibility' | 'season' | 'warning',
+        content: c.content,
+        userName: c.userName,
+        updatedAt: c.createdAt,
+      }))
+  }, [v05?.contributions])
+
+  // Influence config defaults (TODO: fetch from app_settings)
+  const influencePerCarnet = 10
+  const influencePerPhoto = 5
+  const influencePerVote = 1
+
+  const isAuthor = place.author?.id === userId
+
+  const cacheBust = useMemo(() => Date.now(), [place.id])
+
+  // Hero gallery navigation
+  const prevHero = () => setImageIndex(i => (i - 1 + currentHeroPhotos.length) % currentHeroPhotos.length)
+  const nextHero = () => setImageIndex(i => (i + 1) % currentHeroPhotos.length)
+
+  function scrollToCarnet(carnetId: number) {
+    setActiveTab('carnets')
+    setTimeout(() => {
+      document.getElementById(`carnet-${carnetId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
   }
 
   async function handleDeletePlace() {
@@ -185,62 +300,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
 
   return (
     <>
-      {/* Header */}
-      <div className="place-panel-header">
-        {usePlayerStore.getState().gameMode === 'conquest' && place.claim && (
-          <div
-            className="place-claim-badge"
-            style={{ backgroundColor: place.claim.factionColor }}
-          >
-            {place.claim.claimedByAvatar ? (
-              <img src={place.claim.claimedByAvatar} alt="" className="place-claim-avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${place.claim.factionColor}` }} />
-            ) : (
-              <span
-                className="place-claim-dot"
-                style={{ backgroundColor: place.claim.factionColor }}
-              />
-            )}
-            <div className="place-claim-text">
-              <div className="place-claim-author">
-                Veillé par <a className="place-claim-link" onClick={() => useMapStore.getState().setSelectedPlayerId(place.claim!.claimedBy)}>{place.claim.claimedByName || 'Inconnu'}</a>
-              </div>
-              <div className="place-claim-faction-name">
-                {place.claim.factionTitle}
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="place-panel-header-actions">
-          {isAdmin && (
-            <div className="place-options-wrap">
-              <button
-                className="place-options-btn"
-                onClick={() => setShowOptionsMenu(v => !v)}
-                aria-label="Options"
-              >
-                {'\u2699\uFE0F'}
-              </button>
-              {showOptionsMenu && (
-                <>
-                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
-                  <div className="place-options-menu">
-                    <button
-                      className="place-options-item danger"
-                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
-                    >
-                      Supprimer ce lieu
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
-            &#10005;
-          </button>
-        </div>
-      </div>
-
       {/* Dialog confirmation suppression */}
       {showDeleteConfirm && (
         <div className="place-delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
@@ -267,311 +326,306 @@ function DiscoveredPlaceContent({ place, onClose, userEmail, onRefetch }: { plac
         </div>
       )}
 
-      {/* Gallery */}
-      {images.length > 0 && (
-        <div className="place-panel-gallery">
+      {/* Zone 1 — Hero Photo */}
+      <div className="place-hero">
+        {heroPhotoUrl ? (
           <img
-            src={images[imageIndex].url}
+            src={heroPhotoUrl}
             alt={place.title}
-            className="place-panel-image"
+            className="place-hero-img"
             loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
-          {images.length > 1 && (
-            <>
-              <button className="gallery-nav gallery-prev" onClick={prevImage}>
-                &#8249;
-              </button>
-              <button className="gallery-nav gallery-next" onClick={nextImage}>
-                &#8250;
-              </button>
-              <span className="gallery-counter">
-                {imageIndex + 1} / {images.length}
-              </span>
-            </>
-          )}
-        </div>
-      )}
+        ) : (
+          <div className="place-hero-placeholder" />
+        )}
 
-      {/* Body */}
-      <div className="place-panel-body">
-        <h1 className="place-panel-title">{place.title}</h1>
-
-        {place.author && (() => {
-          const name = place.author.lastName || 'Inconnu'
-          const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
-          return (
-            <p className="place-panel-author">
-              <button
-                className="place-panel-author-link"
-                onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
-              >
-                {place.author.profileImageUrl ? (
-                  <img src={place.author.profileImageUrl} alt="" className="place-panel-author-avatar" />
-                ) : (
-                  <span className="place-panel-author-avatar place-panel-author-avatar-fallback">
-                    {capitalizedName.charAt(0)}
-                  </span>
-                )}
-                <strong>{capitalizedName}</strong>
-              </button>
-              {' '}a ajout&eacute; ce lieu{place.createdAt && (
-                <> le {new Date(place.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</>
-              )}
-            </p>
-          )
-        })()}
-
-        {/* Stats + Like */}
-        <div className="place-panel-stats">
-          <span>{place.metrics.views} vues</span>
-          <div className="place-like-wrapper">
-            <button
-              className={`place-like-btn${liked ? ' place-like-btn-active' : ''}`}
-              onClick={toggleLike}
-              disabled={!userId || likeLoading}
-            >
-              {liked ? '\u2764\uFE0F' : '\uD83E\uDD0D'}
-            </button>
-            <button className="place-like-count" onClick={fetchLikers}>
-              {likesCount}
-            </button>
-          </div>
-          {showLikers && (
-            <div className="likers-modal-overlay" onClick={() => setShowLikers(false)}>
-              <div className="likers-modal" onClick={e => e.stopPropagation()}>
-                <div className="likers-modal-header">
-                  <h3>Voyageurs qui ont aimés</h3>
-                  <button className="likers-modal-close" onClick={() => setShowLikers(false)}>&#10005;</button>
-                </div>
-                <div className="likers-modal-list">
-                  {likersLoading ? (
-                    <span className="likers-modal-empty">Chargement...</span>
-                  ) : likers.length === 0 ? (
-                    <span className="likers-modal-empty">Aucun like</span>
-                  ) : (
-                    likers.map(liker => (
-                      <button
-                        key={liker.userId}
-                        className="place-liker-row"
-                        onClick={() => {
-                          setShowLikers(false)
-                          useMapStore.getState().setSelectedPlayerId(liker.userId)
-                        }}
-                      >
-                        {liker.profileImage ? (
-                          <img src={liker.profileImage} alt="" className="place-liker-avatar" />
-                        ) : (
-                          <span className="place-liker-avatar place-liker-avatar-default"
-                            style={{ borderColor: liker.factionColor ?? undefined }}
-                          />
-                        )}
-                        <span className="place-liker-name">{liker.name}</span>
-                        {liker.factionColor && (
-                          <span className="place-liker-faction-dot" style={{ backgroundColor: liker.factionColor }} />
-                        )}
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          <button className="place-explore-count" onClick={fetchExplorers}>
-            {exploredCount} explorations
+        {/* Top-left: close + admin gear */}
+        <div className="place-hero-top-left">
+          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+            &#10005;
           </button>
-          {place.metrics.note !== null && (
-            <span>{place.metrics.note.toFixed(1)}/5</span>
+          {isAdmin && (
+            <div className="place-options-wrap">
+              <button
+                className="place-hero-pill place-options-btn"
+                onClick={() => setShowOptionsMenu(v => !v)}
+                aria-label="Options"
+              >
+                {'\u2699\uFE0F'}
+              </button>
+              {showOptionsMenu && (
+                <>
+                  <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
+                  <div className="place-options-menu">
+                    <button
+                      className="place-options-item danger"
+                      onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
+                    >
+                      Supprimer ce lieu
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Explorers modal */}
-        {showExplorers && (
-          <div className="likers-modal-overlay" onClick={() => setShowExplorers(false)}>
-            <div className="likers-modal" onClick={e => e.stopPropagation()}>
-              <div className="likers-modal-header">
-                <h3>Explorations</h3>
-                <button className="likers-modal-close" onClick={() => setShowExplorers(false)}>&#10005;</button>
-              </div>
-              <div className="likers-modal-list">
-                {explorersLoading ? (
-                  <span className="likers-modal-empty">Chargement...</span>
-                ) : explorers.length === 0 ? (
-                  <span className="likers-modal-empty">Aucune exploration</span>
-                ) : (
-                  explorers.map(exp => (
-                    <button
-                      key={exp.userId}
-                      className="place-liker-row"
-                      onClick={() => {
-                        setShowExplorers(false)
-                        useMapStore.getState().setSelectedPlayerId(exp.userId)
-                      }}
-                    >
-                      {exp.profileImage ? (
-                        <img src={exp.profileImage} alt="" className="place-liker-avatar" />
-                      ) : (
-                        <span className="place-liker-avatar place-liker-avatar-default"
-                          style={{ borderColor: exp.factionColor ?? undefined }}
-                        />
-                      )}
-                      <span className="place-liker-name">{exp.name}</span>
-                      {exp.factionColor && (
-                        <span className="place-liker-faction-dot" style={{ backgroundColor: exp.factionColor }} />
-                      )}
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Top-right: rating pill + wishlist */}
+        <div className="place-hero-top-right">
+          {avgRating !== null && (
+            <span className="place-hero-pill place-hero-rating">
+              ★ {avgRating.toFixed(1)}
+            </span>
+          )}
+          {v05 && (
+            <span className="place-hero-pill">
+              <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
+            </span>
+          )}
+        </div>
 
-        {/* Explore confirm modal */}
-        {showExploreConfirm && (
-          <div className="likers-modal-overlay" onClick={() => setShowExploreConfirm(false)}>
-            <div className="explore-confirm-modal" onClick={e => e.stopPropagation()}>
-              <p className="explore-confirm-text">Avez-vous r&eacute;ellement visit&eacute; ce lieu ?</p>
-              <div className="explore-confirm-buttons">
-                <button className="explore-confirm-yes" onClick={confirmExplore} disabled={exploreLoading}>
-                  Oui, j&apos;y suis all&eacute;
-                </button>
-                <button className="explore-confirm-no" onClick={() => setShowExploreConfirm(false)}>
-                  Non
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tags */}
-        {place.tags.length > 0 && (
-          <div className="place-panel-tags">
-            {place.tags.map(tag => (
-              <span
-                key={tag.id}
-                className="place-tag"
-                style={{
-                  backgroundColor: tag.background,
-                  color: tag.color,
-                }}
-              >
-                {tag.icon && (
-                  <span
-                    className="place-tag-icon"
-                    style={{
-                      WebkitMaskImage: `url(${tag.icon}?v=${cacheBust})`,
-                      maskImage: `url(${tag.icon}?v=${cacheBust})`,
-                    }}
-                  />
-                )}
-                {tag.title}
-              </span>
+        {/* Gallery dots */}
+        {currentHeroPhotos.length > 1 && (
+          <div className="place-hero-dots">
+            {currentHeroPhotos.map((_, i) => (
+              <button
+                key={i}
+                className={`place-hero-dot${i === (imageIndex % currentHeroPhotos.length) ? ' active' : ''}`}
+                onClick={() => setImageIndex(i)}
+              />
             ))}
           </div>
         )}
 
-        {/* Description */}
-        {place.text && (
-          <div className="place-panel-description">
-            <p>
-              {!textExpanded && place.text.length > TEXT_LIMIT
-                ? place.text.slice(0, TEXT_LIMIT) + '...'
-                : place.text}
-            </p>
-            {place.text.length > TEXT_LIMIT && (
+        {/* Gallery nav arrows */}
+        {currentHeroPhotos.length > 1 && (
+          <>
+            <button className="place-hero-nav place-hero-prev" onClick={prevHero}>&#8249;</button>
+            <button className="place-hero-nav place-hero-next" onClick={nextHero}>&#8250;</button>
+          </>
+        )}
+      </div>
+
+      {/* Zone 2 — Body */}
+      <div className="place-body">
+        {/* Identity */}
+        <div className="place-identity">
+          <h2 className="place-title">{place.title}</h2>
+
+          {/* Tags */}
+          {place.tags.length > 0 && (
+            <div className="place-tags">
+              {place.tags.map(tag => (
+                <span
+                  key={tag.id}
+                  className="place-tag"
+                  style={{
+                    backgroundColor: tag.background,
+                    color: tag.color,
+                  }}
+                >
+                  {tag.icon && (
+                    <span
+                      className="place-tag-icon"
+                      style={{
+                        WebkitMaskImage: `url(${tag.icon}?v=${cacheBust})`,
+                        maskImage: `url(${tag.icon}?v=${cacheBust})`,
+                      }}
+                    />
+                  )}
+                  {tag.title}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Address */}
+          {place.address && (
+            <p className="place-address">
+              <span className="place-address-icon">{'\uD83D\uDCCD'}</span>
+              {place.address}
               <button
-                className="place-panel-readmore"
-                onClick={() => setTextExpanded(e => !e)}
+                className="place-goto-btn"
+                onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    useMapStore.getState().setSelectedPlaceId(null)
+                    useMapStore.getState().requestFlyTo({
+                      lng: place.location.longitude,
+                      lat: place.location.latitude,
+                    })
+                  } else {
+                    useMapStore.getState().requestFlyTo({
+                      lng: place.location.longitude,
+                      lat: place.location.latitude,
+                      placeId: place.id,
+                    })
+                  }
+                }}
+                title="Aller sur ce lieu"
               >
-                {textExpanded ? 'Réduire' : 'Lire la suite'}
+                {'\uD83D\uDDFA\uFE0F'}
+              </button>
+            </p>
+          )}
+
+          {/* Roles */}
+          <div className="place-roles">
+            {place.author && (
+              <button
+                className="place-role-link"
+                onClick={() => useMapStore.getState().setSelectedPlayerId(place.author.id)}
+              >
+                {place.author.profileImageUrl ? (
+                  <img src={place.author.profileImageUrl} alt="" className="place-role-avatar" />
+                ) : (
+                  <span className="place-role-avatar place-role-avatar-fallback">
+                    {(place.author.lastName || '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="place-role-label">Découvreur</span>
+                <span className="place-role-name">{place.author.lastName || 'Inconnu'}</span>
+              </button>
+            )}
+            {v05?.guardian && (
+              <button
+                className="place-role-link"
+                onClick={() => useMapStore.getState().setSelectedPlayerId(v05.guardian!.userId)}
+              >
+                {v05.guardian.avatar ? (
+                  <img src={v05.guardian.avatar} alt="" className="place-role-avatar" />
+                ) : (
+                  <span className="place-role-avatar place-role-avatar-fallback">
+                    {(v05.guardian.name || '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="place-role-label">Gardien</span>
+                <span className="place-role-name">{v05.guardian.name}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Zone 3A — Influence Frame */}
+        {v05 && (
+          <InfluenceFrame
+            placeId={place.id}
+            influence={v05.influence ?? []}
+            factionColors={factionColors}
+            placeLocation={place.location}
+            onInfluencePlaced={() => { refreshV05(); onRefetch() }}
+          />
+        )}
+
+        {/* Hidden InfluenceButton for the action modal */}
+        {showInfluenceAction && userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
+          <div style={{ display: 'none' }}>
+            <InfluenceButton
+              placeId={place.id}
+              placeLocation={place.location}
+              onInfluencePlaced={() => { refreshV05(); onRefetch(); setShowInfluenceAction(false) }}
+            />
+          </div>
+        )}
+
+        {/* Zone 3B — Explorers */}
+        {v05 && (
+          <PlaceExplorers
+            placeId={place.id}
+            explorers={v05.explorers ?? []}
+            placeLocation={place.location}
+            isExplorer={v05.isExplorer}
+            factionColors={factionColors}
+            onVisited={() => { refreshV05(); onRefetch() }}
+          />
+        )}
+
+        {/* Place Enigma (GPS only) */}
+        <PlaceEnigma
+          placeId={place.id}
+          placeLocation={place.location}
+          placeTags={place.tags.map(t => t.title)}
+        />
+
+        {/* Zone 4 — Tabs */}
+        <div className="place-tabs">
+          <button
+            className={`place-tab${activeTab === 'carnets' ? ' active' : ''}`}
+            onClick={() => setActiveTab('carnets')}
+          >
+            Carnets ({carnets.length})
+          </button>
+          <button
+            className={`place-tab${activeTab === 'galerie' ? ' active' : ''}`}
+            onClick={() => setActiveTab('galerie')}
+          >
+            Galerie ({galleryPhotos.length})
+          </button>
+          <button
+            className={`place-tab${activeTab === 'infos' ? ' active' : ''}`}
+            onClick={() => setActiveTab('infos')}
+          >
+            Infos ({infoFields.length})
+          </button>
+        </div>
+
+        {/* Tab content */}
+        {activeTab === 'carnets' && (
+          <div className="place-tab-content">
+            {carnets.length === 0 ? (
+              <p className="place-tab-empty">Aucun carnet pour l'instant. Soyez le premier à écrire !</p>
+            ) : (
+              carnets.map((c, i) => (
+                <CarnetCard
+                  key={c.id}
+                  carnet={c}
+                  isTop={i === 0}
+                  factionColor={factionColors.get(c.factionId) ?? null}
+                  influencePerCarnet={influencePerCarnet}
+                  influencePerPhoto={influencePerPhoto}
+                  influencePerVote={influencePerVote}
+                  onVoted={refreshV05}
+                />
+              ))
+            )}
+            {userId && (
+              <button
+                className="place-add-carnet-btn"
+                onClick={() => setShowAddCarnet(true)}
+              >
+                Ajouter ma page de carnet
               </button>
             )}
           </div>
         )}
 
-        {/* Address */}
-        {place.address && (
-          <div className="place-panel-address-row">
-            <p className="place-panel-address">{place.address}</p>
-            <button
-              className="place-goto-btn"
-              onClick={() => {
-                if (window.innerWidth <= 768) {
-                  useMapStore.getState().setSelectedPlaceId(null)
-                  useMapStore.getState().requestFlyTo({
-                    lng: place.location.longitude,
-                    lat: place.location.latitude,
-                  })
-                } else {
-                  useMapStore.getState().requestFlyTo({
-                    lng: place.location.longitude,
-                    lat: place.location.latitude,
-                    placeId: place.id,
-                  })
-                }
-              }}
-              title="Aller sur ce lieu"
-            >
-              {'\uD83D\uDDFA\uFE0F'}
-            </button>
+        {activeTab === 'galerie' && (
+          <div className="place-tab-content">
+            <PlaceGallery photos={galleryPhotos} onPhotoClick={scrollToCarnet} />
           </div>
         )}
 
-        {/* Explore button */}
-        {userId && !explored && (
-          <button
-            className="place-explore-btn"
-            onClick={() => setShowExploreConfirm(true)}
-            disabled={exploreLoading}
-          >
-            {'\uD83E\uDDED'} J&apos;ai explor&eacute; ce lieu
-          </button>
-        )}
-        {userId && explored && (
-          <div className="place-explored-badge">
-            {'\u2705'} Lieu explor&eacute;
+        {activeTab === 'infos' && (
+          <div className="place-tab-content">
+            <PlaceInfos placeId={place.id} infos={infoFields} onRefresh={refreshV05} />
           </div>
         )}
 
-        {/* Admin : slider score / influence */}
+        {/* Admin: ScoreSlider */}
         {isAdmin && (
           <ScoreSlider placeId={place.id} baseScore={place.metrics.likes + place.metrics.explored * 2} />
         )}
-
-        {/* Admin : debug territoire */}
-        {isAdmin && (() => {
-          const baseScore = (place.metrics?.likes ?? 0) * 1 + (place.metrics?.views ?? 0) * 0.1 + (place.metrics?.explored ?? 0) * 3
-          const fortLevel = place.claim?.fortificationLevel ?? 0
-          const fortBonus = fortLevel === 1 ? 10 : fortLevel === 2 ? 20 : fortLevel === 3 ? 30 : fortLevel === 4 ? 60 : 0
-          const effectiveScore = Math.round(baseScore) + fortBonus
-          const radius = effectiveScore <= 0 ? 0 : effectiveScore <= 1 ? 0.25 : 0.25 + Math.sqrt(effectiveScore - 1) * 0.65
-          return (
-            <div style={{ background: '#1a1a2e', color: '#0f0', fontSize: '11px', fontFamily: 'monospace', padding: '8px 12px', borderRadius: '8px', marginTop: '8px' }}>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>DEBUG TERRITOIRE</div>
-              <div style={{ opacity: 0.6, fontSize: 10 }}>ID: {place.id}</div>
-              <div>Likes: {place.metrics?.likes ?? 0} × 1 = {(place.metrics?.likes ?? 0) * 1}</div>
-              <div>Vues: {place.metrics?.views ?? 0} × 0.1 = {((place.metrics?.views ?? 0) * 0.1).toFixed(1)}</div>
-              <div>Explo: {place.metrics?.explored ?? 0} × 3 = {(place.metrics?.explored ?? 0) * 3}</div>
-              <div>Score base: {Math.round(baseScore)}</div>
-              <div>Fortif: niv.{fortLevel} → +{fortBonus}</div>
-              <div style={{ fontWeight: 700, color: '#0ff' }}>Score effectif: {effectiveScore}</div>
-              <div style={{ fontWeight: 700, color: '#ff0' }}>Rayon: {radius.toFixed(2)} km</div>
-              <div>Formule: 0.25 + √({effectiveScore}-1) × 0.65</div>
-            </div>
-          )
-        })()}
-
-        {/* Claim button (masque en mode exploration) */}
-        {userEmail && usePlayerStore.getState().gameMode === 'conquest' && (
-          <ClaimButton placeId={place.id} currentClaim={place.claim} placeLocation={place.location} onClaimed={onRefetch} />
-        )}
-
-        {/* Fortify button (masque en mode exploration) */}
-        {userEmail && usePlayerStore.getState().gameMode === 'conquest' && place.claim && (
-          <FortifyButton placeId={place.id} currentClaim={place.claim} constructionTypes={constructionTypes} placeLocation={place.location} />
-        )}
       </div>
+
+      {/* Add carnet modal */}
+      {showAddCarnet && (
+        <AddCarnetModal
+          placeId={place.id}
+          canRate={v05?.isExplorer === true || isAuthor}
+          onClose={() => setShowAddCarnet(false)}
+          onSaved={refreshV05}
+        />
+      )}
     </>
   )
 }

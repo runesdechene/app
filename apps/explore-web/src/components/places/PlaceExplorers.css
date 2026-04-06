@@ -1,0 +1,87 @@
+/* ==========================================
+   PLACE EXPLORERS (V0.5 — Hall of Fame)
+   ========================================== */
+
+.place-explorers {
+  margin-top: 12px;
+}
+
+.place-explorers-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 8px;
+}
+
+.place-explorers-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.place-explorers-row .place-explorer-avatar,
+.place-explorers-row .place-explorer-avatar-fallback {
+  margin-right: -6px;
+}
+
+.place-explorer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-sepia);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.place-explorer-avatar:hover {
+  transform: scale(1.15);
+}
+
+.place-explorer-avatar-fallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.place-explorer-avatar-fallback:hover {
+  transform: scale(1.15);
+}
+
+.place-explorers-visit-btn {
+  margin-left: 12px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: none;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.place-explorers-visit-btn:hover {
+  background: #1b5e20;
+  transform: scale(1.04);
+}
+
+.place-explorers-visit-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.place-explorers-empty {
+  font-size: 12px;
+  color: var(--color-sepia);
+  opacity: 0.6;
+  font-style: italic;
+}
