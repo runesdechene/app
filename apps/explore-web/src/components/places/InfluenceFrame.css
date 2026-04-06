@@ -42,6 +42,10 @@
   font-weight: 600;
 }
 
+.influence-frame-stock-exhausted {
+  color: #c0392b;
+}
+
 /* Banner row */
 .influence-banners {
   display: flex;
@@ -129,6 +133,22 @@
 .influence-banner:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+/* Zero-score banners: greyed out, low opacity, reveal on hover */
+.influence-banner-zero .influence-banner-flag {
+  filter: grayscale(1);
+  opacity: 0.35;
+  transition: filter 0.2s, opacity 0.2s;
+}
+
+.influence-banner-zero:hover .influence-banner-flag {
+  filter: grayscale(0);
+  opacity: 0.85;
+}
+
+.influence-banner-zero .influence-banner-score {
+  opacity: 0.4;
 }
 
 /* Pulse animation on click */

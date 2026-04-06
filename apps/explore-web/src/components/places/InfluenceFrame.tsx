@@ -66,7 +66,9 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   const [localBonus, setLocalBonus] = useState<Map<string, number>>(new Map())
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [remoteUsed, setRemoteUsed] = useState(0) // clicks spent remotely on this place today
   const pendingRef = useRef(false)
+  const MAX_REMOTE_PER_PLACE = 5
 
   if (gameMode !== 'conquest') return null
 
@@ -109,6 +111,10 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       setError('Plus d\u2019influence disponible.')
       return
     }
+    if (!isGps && remoteUsed >= MAX_REMOTE_PER_PLACE) {
+      setError('Limite atteinte sur ce lieu (5/jour \u00e0 distance).')
+      return
+    }
 
     // Optimistic update — instant feedback
     pendingRef.current = true
@@ -116,6 +122,9 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     setPulseFaction(factionId)
     playPopSound()
     spawnParticles(buttonEl)
+
+    // Track remote usage
+    if (!isGps) setRemoteUsed(r => r + 1)
 
     // Update local score + stock immediately
     setLocalBonus(prev => {
@@ -141,6 +150,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
     if (rpcError || (data as { error?: string })?.error) {
       // Rollback optimistic update
+      if (!isGps) setRemoteUsed(r => Math.max(0, r - 1))
       setLocalBonus(prev => {
         const next = new Map(prev)
         const cur = prev.get(factionId) ?? 1
@@ -173,16 +183,20 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     setTimeout(() => setPulseFaction(null), 300)
   }, [userId, userFactionId, influenceStock, placeId, userPosition])
 
-  const canClick = userId && userFactionId && influenceStock > 0
+  const remoteExhausted = !isGps && remoteUsed >= MAX_REMOTE_PER_PLACE
+  const canClick = userId && userFactionId && influenceStock > 0 && !remoteExhausted
 
   return (
     <div className="influence-frame">
       <div className="influence-frame-header">
         <span className="influence-frame-title">Influence des H\u00e9ritages</span>
         {userId && (
-          <span className="influence-frame-stock">
+          <span className={`influence-frame-stock${remoteExhausted ? ' influence-frame-stock-exhausted' : ''}`}>
             {influenceStock} pt{influenceStock !== 1 ? 's' : ''}
-            {isGps ? ' \u00b7 sur place' : ' \u00b7 \u00e0 distance'}
+            {isGps
+              ? ' \u00b7 sur place'
+              : ` \u00b7 ${MAX_REMOTE_PER_PLACE - remoteUsed}/${MAX_REMOTE_PER_PLACE} restants`
+            }
           </span>
         )}
       </div>
@@ -195,7 +209,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
           return (
             <button
               key={b.factionId}
-              className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}`}
+              className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}${b.total === 0 ? ' influence-banner-zero' : ''}`}
               onClick={(e) => handleClick(b.factionId, e.currentTarget)}
               disabled={!canClick}
               title={`+1 influence ${b.name}`}
@@ -215,9 +229,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       </div>
 
       {error && <p className="influence-frame-error">{error}</p>}
-      {!isGps && userId && userFactionId && (
-        <p className="influence-frame-hint">5 clics/jour max \u00e0 distance</p>
-      )}
     </div>
   )
 }
