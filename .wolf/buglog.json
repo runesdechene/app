@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-04-02",
+      "error_message": "RLS trop permissive sur app_settings et factions",
+      "file": "supabase/migrations/",
+      "root_cause": "Pas de policy admin-only sur ces tables — tout utilisateur authentifié peut modifier",
+      "fix": "NON RÉSOLU — à fixer",
+      "tags": ["security", "rls", "supabase"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-04-02",
+      "error_message": "get_my_informations appelé 3 fois au boot",
+      "file": "apps/explore-web/src/hooks/usePlayer.ts",
+      "root_cause": "usePlayer + ProfileMenu + MobileHeader font 3 requêtes identiques",
+      "fix": "NON RÉSOLU — mutualiser l'appel",
+      "tags": ["performance", "duplicate-fetch"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-06"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-04-02",
+      "error_message": "Bouton ajouter lieu cassé — unlocks manquant",
+      "file": "supabase/migrations/",
+      "root_cause": "get_user_titles oubliait 'unlocks' dans json_build_object",
+      "fix": "Ajouté unlocks dans généraux ET faction (mig 186, 191, 193)",
+      "tags": ["rpc", "titles", "recurring"],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-02"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-04-01",
+      "error_message": "Énergie affichée en fractionnaire après claim/fortify",
+      "file": "apps/explore-web/src/components/places/ClaimButton.tsx",
+      "root_cause": "Seul setEnergy était appelé, nextPointIn périmé",
+      "fix": "Refresh complet get_user_energy après chaque action (comme discoverPlace)",
+      "tags": ["ui", "energy", "refresh"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-01"
+    }
+  ]
+}

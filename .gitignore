@@ -34,3 +34,10 @@ pnpm-debug.log*
 
 # Local Netlify folder
 .netlify
+
+# Claude Code (local only)
+.claude/settings.local.json
+
+# OpenWolf (ephemeral)
+.wolf/memory.md
+.wolf/designqc-captures/
