@@ -105,14 +105,15 @@ export function CarnetCard({ carnet, isTop, factionColor, influencePerCarnet, in
         </div>
       )}
 
-      {/* Footer: votes + date */}
+      {/* Footer: upvote + date */}
       <div className="carnet-footer">
-        <button className="carnet-vote-btn" onClick={() => vote(1)} disabled={voting || !userId}>
-          👍 {carnet.votesUp}
-        </button>
-        <button className="carnet-vote-btn" onClick={() => vote(-1)} disabled={voting || !userId}>
-          👎 {carnet.votesDown}
-        </button>
+        {carnet.userId !== userId ? (
+          <button className="carnet-vote-btn" onClick={() => vote(1)} disabled={voting || !userId}>
+            👍 {carnet.votesUp || ''}
+          </button>
+        ) : (
+          carnet.votesUp > 0 && <span className="carnet-vote-count">👍 {carnet.votesUp}</span>
+        )}
         <span className="carnet-date">{timeAgo}</span>
       </div>
 
