@@ -447,16 +447,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           </button>
         </div>
 
-        {/* Bottom-right: dominant faction banner */}
-        {v05?.dominantFaction && factionPatterns.get(v05.dominantFaction) && (
-          <div className="place-hero-faction" title={factionNames.get(v05.dominantFaction) ?? ''}>
-            <img
-              src={factionPatterns.get(v05.dominantFaction)!}
-              alt={factionNames.get(v05.dominantFaction) ?? ''}
-              className="place-hero-faction-img"
-            />
-          </div>
-        )}
 
         {/* Gallery dots */}
         {currentHeroPhotos.length > 1 && (
@@ -485,7 +475,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         {/* Identity */}
         <div className="place-identity">
           <div className="place-title-row">
-            <h2 className="place-title">{place.title}</h2>
+            <h2 className="place-title">
+              {place.title}
+              {v05?.dominantFaction && factionPatterns.get(v05.dominantFaction) && (
+                <img
+                  src={factionPatterns.get(v05.dominantFaction)!}
+                  alt={factionNames.get(v05.dominantFaction) ?? ''}
+                  title={factionNames.get(v05.dominantFaction) ?? ''}
+                  className="place-title-faction"
+                />
+              )}
+            </h2>
             <div className="place-title-actions">
               {v05 && (
                 <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
