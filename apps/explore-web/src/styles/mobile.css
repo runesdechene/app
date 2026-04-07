@@ -149,7 +149,8 @@
   }
 
   .energy-sub {
-    display: none;
+    display: flex;
+    padding-left: 20px;
   }
 
   .energy-icon {
@@ -301,7 +302,7 @@
   /* --- Place Panel (fullscreen under navbar on mobile) --- */
   .place-panel {
     width: 100%;
-    top: 48px;
+    top: 60px;
     left: 0;
     max-height: none;
     height: calc(100vh - 48px);
@@ -316,7 +317,7 @@
 
   @supports (height: 100dvh) {
     .place-panel {
-      height: calc(100dvh - 48px);
+      height: calc(100dvh - 60px);
     }
   }
 
@@ -350,8 +351,10 @@
   }
 
   .place-hero {
-    height: 280px;
+    height: 480px;
     min-height: unset;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
   }
 
   .place-title {
