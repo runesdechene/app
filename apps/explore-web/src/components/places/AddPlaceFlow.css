@@ -287,3 +287,44 @@
   accent-color: #4A3728;
   cursor: pointer;
 }
+
+/* Rewards preview block */
+.add-place-rewards {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(60, 140, 60, 0.06);
+  border: 1px solid rgba(60, 140, 60, 0.2);
+  border-radius: 10px;
+}
+
+.add-place-rewards-title {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 8px;
+}
+
+.add-place-rewards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.add-place-reward {
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: #2a7a30;
+  font-weight: 600;
+}
+
+.add-place-reward-bonus {
+  font-size: 14px;
+  color: #b8860b;
+}
+
+.add-place-reward-hint {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-ink-light);
+}

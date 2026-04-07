@@ -550,6 +550,32 @@ export function AddPlaceFlow() {
               </label>
             ))}
           </div>
+
+          {/* Rewards preview */}
+          {confirmedCoords && (() => {
+            const isOnSite = userPosition
+              ? (() => {
+                  const R = 6371
+                  const dLat = (confirmedCoords.lat - userPosition.lat) * Math.PI / 180
+                  const dLng = (confirmedCoords.lng - userPosition.lng) * Math.PI / 180
+                  const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(confirmedCoords.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2
+                  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.5
+                })()
+              : false
+            const hasPhoto = photoFiles.length > 0
+            const hasText = description.trim().length > 0
+            return (
+              <div className="add-place-rewards">
+                <p className="add-place-rewards-title">{isOnSite ? '\uD83C\uDFAF Vous \u00eates sur place !' : '\uD83D\uDCCD Ajout \u00e0 distance'}</p>
+                <div className="add-place-rewards-list">
+                  {isOnSite && <span className="add-place-reward add-place-reward-bonus">\u26a1 +80 points d'influence (bonus sur place)</span>}
+                  {hasText && <span className="add-place-reward">{'\uD83D\uDCD6'} +10 influence carnet (texte)</span>}
+                  {hasPhoto && <span className="add-place-reward">{'\uD83D\uDCF7'} +10 influence carnet (photos)</span>}
+                  {!isOnSite && <span className="add-place-reward add-place-reward-hint">Rendez-vous sur place pour gagner 80 points bonus !</span>}
+                </div>
+              </div>
+            )
+          })()}
         </div>
 
         <div className="add-place-form-footer">
