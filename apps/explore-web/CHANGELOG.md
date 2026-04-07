@@ -1,4 +1,29 @@
 
+# ALPHA V0.5.0
+## L'Ère de l'Influence
+Fini les conquêtes. Désormais, chaque lieu est un terrain d'influence où les Héritages s'affrontent.
+
+### Nouveau système d'influence
+- **Cliquez sur les bannières.** Un clic = un point d'influence pour l'Héritage de votre choix. Son, étoiles, satisfaction.
+- **Soutenez qui vous voulez.** Alliances, trahisons, stratégie : à vous de jouer.
+- **5 clics/jour par lieu à distance**, illimité sur place.
+- **Coupe des Héritages.** Le classement reflète l'influence totale de chaque faction.
+
+### Fiches de lieu repensées
+- Modal centrée avec overlay et bannière de l'Héritage dominant.
+- **Carnets collaboratifs** : écrivez, ajoutez des photos, likez ❤️ les récits.
+- **Galerie photo** avec lightbox plein écran et navigation.
+- Avatars des explorateurs avec badges ⭐ Découvreur et 🛡 Gardien.
+
+### Énigmes bonus
+- L'énigme du jour reste **gratuite**.
+- Enchaînez les énigmes pour **5⚡** chacune.
+- Coffre au trésor animé, héritage affiché sur chaque question.
+
+### Exploration GPS
+- Rendez-vous sur un lieu pour devenir **Explorateur** et gagner 50 points d'influence.
+- Créer un lieu rapporte **80 points**.
+
 # ALPHA V0.4.7
 Fix des inscriptions et tchat
 
