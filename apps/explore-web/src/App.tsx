@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from './lib/supabase'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
 import { PlacePanel } from './components/places/PlacePanel'
@@ -94,6 +95,15 @@ function App() {
   const [enigmaAnsweredToday, setEnigmaAnsweredToday] = useState(false)
 
   const userId = usePlayerStore(s => s.userId)
+
+  // Check if daily enigma already answered (on load + after userId available)
+  useEffect(() => {
+    if (!userId) return
+    supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
+      const d = data as { isBonus?: boolean } | null
+      if (d?.isBonus) setEnigmaAnsweredToday(true)
+    })
+  }, [userId])
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userName = usePlayerStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
