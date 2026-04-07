@@ -65,7 +65,7 @@ export function InstallPrompt() {
       <div className="install-prompt-content">
         <img src="/pwa-192x192.png" alt="" className="install-prompt-icon" />
         <div className="install-prompt-text">
-          <strong>Installer Runes de Chêne CONQUÊTE</strong>
+          <strong>Installer l'application</strong>
           <span>
             {isIOS
               ? "Appuyez sur Partager puis \"Sur l'ecran d'accueil\""

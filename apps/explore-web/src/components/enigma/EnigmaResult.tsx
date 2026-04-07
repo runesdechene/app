@@ -9,7 +9,7 @@ interface EnigmaResultProps {
   onClose: () => void
 }
 
-export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose }: EnigmaResultProps) {
+export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose: _onClose }: EnigmaResultProps) {
   return (
     <div className="enigma-result">
       <div className="enigma-result-icon">
