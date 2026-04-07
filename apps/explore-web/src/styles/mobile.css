@@ -133,11 +133,11 @@
 
   .energy-indicator {
     min-width: auto;
-    padding: 4px 8px;
+    padding: 9px 12px;
     gap: 2px;
     flex-direction: row;
     align-items: center;
-    border-radius: 8px;
+    border-radius: 12px;
   }
 
   .energy-main {
@@ -153,24 +153,24 @@
   }
 
   .energy-icon {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .energy-count {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .notoriety-badge {
-    padding: 4px 8px;
-    border-radius: 8px;
+    padding: 9px 12px;
+    border-radius: 12px;
   }
 
   .notoriety-icon {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .notoriety-value {
-    font-size: 12px;
+    font-size: 16px;
   }
 
   .toolbar-btn {
@@ -298,39 +298,41 @@
     padding: 12px;
   }
 
-  /* --- Place Panel (bottom sheet) --- */
+  /* --- Place Panel (fullscreen under navbar on mobile) --- */
   .place-panel {
     width: 100%;
-    height: 100dvh;
-    height: 100vh; /* fallback */
-    top: 0;
-    bottom: 0;
+    top: 48px;
     left: 0;
-    border-right: none;
-    border-top: none;
+    max-height: none;
+    height: calc(100vh - 48px);
     border-radius: 0;
-    transform: translateY(100%);
     box-shadow: none;
+    transform: none;
     padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
     overflow-y: scroll;
+    opacity: 0;
+    pointer-events: none;
   }
 
   @supports (height: 100dvh) {
     .place-panel {
-      height: 100dvh;
+      height: calc(100dvh - 48px);
     }
   }
 
- .place-hero {
-  margin-top: 0;
- }
+  .place-panel-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    animation: none;
+  }
 
   .territory-panel-header {
-    margin-top: 62px;
+    margin-top: 0;
   }
 
   .territory-panel .place-panel-close {
-    top: 70px;
+    top: 8px;
   }
 
   .place-body {
@@ -339,17 +341,12 @@
     flex: none;
   }
 
-  .place-panel-open {
-    transform: translateY(0);
-  }
-
   .place-panel-backdrop {
     display: block;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.3);
     z-index: 19;
-    pointer-events: none;
   }
 
   .place-hero {
@@ -755,7 +752,7 @@
 
   .conquest-indicator
   {
-    top: calc(var(--safe-top, 0px) + 100px);
+    top: calc(var(--safe-top, 0px) + 120px);
     bottom: auto;
     left: 7px;
     right: auto;
