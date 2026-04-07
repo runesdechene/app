@@ -9,6 +9,7 @@ interface Faction {
   pattern: string | null
   description: string | null
   image_url: string | null
+  adjective: string
   order: number
   bonus_energy: number
   bonus_conquest: number
@@ -87,7 +88,7 @@ export function Factions() {
     try {
       const { data, error } = await supabase
         .from('factions')
-        .select('id, title, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_vitalite, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction, bonus_regen_vitalite')
+        .select('id, title, adjective, color, pattern, description, image_url, order, bonus_energy, bonus_conquest, bonus_construction, bonus_vitalite, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction, bonus_regen_vitalite')
         .order('order')
 
       if (!error && data) {
@@ -133,6 +134,7 @@ export function Factions() {
         if (JSON.stringify(f) === JSON.stringify(saved)) return null
         return supabase.from('factions').update({
           title: f.title,
+          adjective: f.adjective,
           color: f.color,
           pattern: f.pattern,
           description: f.description,
@@ -418,6 +420,18 @@ export function Factions() {
                 value={faction.title}
                 onChange={e => updateField(faction.id, 'title', e.target.value)}
                 className="faction-title-input"
+              />
+            </div>
+
+            {/* Adjectif (ex: Nordique, Celtique) */}
+            <div className="faction-title-row" style={{ marginTop: 4 }}>
+              <input
+                type="text"
+                value={faction.adjective || ''}
+                onChange={e => updateField(faction.id, 'adjective', e.target.value)}
+                className="faction-title-input"
+                placeholder="Adjectif (ex: Nordique)"
+                style={{ fontSize: 13, opacity: 0.8 }}
               />
             </div>
 

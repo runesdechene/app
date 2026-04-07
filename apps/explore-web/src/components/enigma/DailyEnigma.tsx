@@ -50,15 +50,15 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
-  const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string }>>(new Map())
+  const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string; adjective: string }>>(new Map())
 
   // Load faction visuals once
   useEffect(() => {
-    supabase.from('factions').select('id, color, pattern, title').order('order').then(({ data }) => {
+    supabase.from('factions').select('id, color, pattern, title, adjective').order('order').then(({ data }) => {
       if (!data) return
-      const map = new Map<string, { color: string; pattern: string; title: string }>()
-      for (const f of data as Array<{ id: string; color: string; pattern: string; title: string }>) {
-        map.set(f.id, { color: f.color, pattern: f.pattern, title: f.title })
+      const map = new Map<string, { color: string; pattern: string; title: string; adjective: string }>()
+      for (const f of data as Array<{ id: string; color: string; pattern: string; title: string; adjective: string }>) {
+        map.set(f.id, { color: f.color, pattern: f.pattern, title: f.title, adjective: f.adjective || f.title })
       }
       setFactions(map)
     })
@@ -178,7 +178,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
                         }}
                       />
                     )}
-                    {f.title}
+                    H\u00e9ritage {f.adjective}
                   </div>
                 )
               })()}
