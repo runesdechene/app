@@ -114,6 +114,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   return (
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
+        <button className="enigma-close-x" onClick={onClose}>&#10005;</button>
         {!result && (
           <div className="enigma-header">
             <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
@@ -198,9 +199,23 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
               eruditionGain={result.eruditionGain}
               onClose={onClose}
             />
-            <button className="enigma-next-btn" onClick={loadEnigma}>
-              Encore une énime (5⚡)
-            </button>
+            {(() => {
+              const energy = usePlayerStore.getState().energy
+              const cost = 5
+              const canAfford = energy >= cost
+              return (
+                <button
+                  className={`enigma-next-btn${!canAfford ? ' enigma-next-btn-disabled' : ''}`}
+                  onClick={canAfford ? loadEnigma : undefined}
+                  disabled={!canAfford}
+                >
+                  {canAfford
+                    ? `Encore une \u00e9nigme (${cost}\u26a1)`
+                    : `Pas assez d'\u00e9nergie (${cost}\u26a1 requis)`
+                  }
+                </button>
+              )
+            })()}
           </>
         )}
       </div>

@@ -25,14 +25,31 @@
 }
 
 .enigma-close {
+  display: none;
+}
+
+.enigma-close-x {
   position: absolute;
   top: 12px;
   right: 12px;
-  background: none;
-  border: none;
-  font-size: 18px;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-parchment-dark);
+  background: var(--color-parchment);
+  color: var(--color-ink-light);
+  font-size: 14px;
   cursor: pointer;
-  color: var(--color-sepia);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.enigma-close-x:hover {
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
 }
 
 .enigma-header {
@@ -245,7 +262,13 @@
   cursor: pointer;
   transition: opacity 0.15s;
 }
-.enigma-next-btn:hover { opacity: 0.85; }
+.enigma-next-btn:hover:not(:disabled) { opacity: 0.85; }
+
+.enigma-next-btn-disabled {
+  background: var(--color-parchment-dark);
+  opacity: 0.6;
+  cursor: default;
+}
 
 /* Energy cost badge */
 .enigma-cost {
