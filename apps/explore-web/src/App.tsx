@@ -67,8 +67,8 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
           rows={[
             { label: 'Gloire totale', value: String(displayGlory), highlight: true },
             { label: 'Exploration', value: `${explorationPoints} pts` },
-            { label: '\u00c9rudition', value: `${eruditionPoints} pts` },
-            { label: 'Changer d\'H\u00e9ritage', value: 'Gloire / 2' },
+            { label: 'érudition', value: `${eruditionPoints} pts` },
+            { label: 'Changer d\'Héritage', value: 'Gloire / 2' },
           ]}
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
@@ -100,8 +100,8 @@ function App() {
   useEffect(() => {
     if (!userId) return
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
-      const d = data as { isBonus?: boolean } | null
-      if (d?.isBonus) setEnigmaAnsweredToday(true)
+      const d = data as { isBonus?: boolean; error?: string } | null
+      if (d?.isBonus || d?.error === 'not_enough_energy') setEnigmaAnsweredToday(true)
     })
   }, [userId])
   const userFactionId = usePlayerStore(s => s.userFactionId)
