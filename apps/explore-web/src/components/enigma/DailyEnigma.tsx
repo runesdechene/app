@@ -114,7 +114,6 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   return (
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
-        <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
         {!result && (
           <div className="enigma-header">
             <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
@@ -200,7 +199,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
               onClose={onClose}
             />
             <button className="enigma-next-btn" onClick={loadEnigma}>
-              Encore une \u00e9nigme (5 \u26a1)
+              Encore une énime (5⚡)
             </button>
           </>
         )}

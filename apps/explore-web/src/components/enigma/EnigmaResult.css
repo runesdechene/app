@@ -3,6 +3,7 @@
    ========================================== */
 
 .enigma-result {
+  position: relative;
   text-align: center;
   padding: 8px 0;
 }
@@ -37,7 +38,7 @@
 }
 
 .enigma-result-label.correct {
-  color: #3c8c3c;
+  color: #2ea875;
 }
 
 .enigma-result-label.wrong {
@@ -52,8 +53,8 @@
 }
 
 .enigma-result-explanation {
-  font-size: 13px;
-  color: var(--color-sepia);
+  font-size: 16px;
+  color: var(--color-muted);
   line-height: 1.6;
   margin-bottom: 16px;
   padding: 10px 14px;
@@ -89,17 +90,25 @@
   color: #6a3cb4;
 }
 
-.enigma-result-close {
-  padding: 10px 24px;
-  border-radius: 10px;
-  border: none;
-  background: var(--color-sepia);
-  color: var(--color-parchment);
+.enigma-result-close-x {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-parchment-dark);
+  background: var(--color-parchment);
+  color: var(--color-ink-light);
   font-size: 14px;
-  font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
 
-.enigma-result-close:hover {
-  background: var(--color-ink);
+.enigma-result-close-x:hover {
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
 }

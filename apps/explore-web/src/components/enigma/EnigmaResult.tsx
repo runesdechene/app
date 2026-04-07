@@ -12,6 +12,7 @@ interface EnigmaResultProps {
 export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose }: EnigmaResultProps) {
   return (
     <div className="enigma-result">
+      <button className="enigma-result-close-x" onClick={onClose}>&#10005;</button>
       <div className="enigma-result-icon">
         {correct
           ? <img src="/res/coffre_ouvert.webp" alt="" className="enigma-result-chest" />
@@ -36,19 +37,16 @@ export function EnigmaResult({ correct, answer, explanation, influenceGain, erud
       <div className="enigma-result-gains">
         {influenceGain > 0 && (
           <div className="enigma-result-gain influence">
-            +{influenceGain} influence
+            +{influenceGain} point influence
           </div>
         )}
         {eruditionGain > 0 && (
           <div className="enigma-result-gain erudition">
-            +{eruditionGain} \u00e9rudition
+            +{eruditionGain} point d'érudition
           </div>
         )}
       </div>
 
-      <button className="enigma-result-close" onClick={onClose}>
-        Fermer
-      </button>
     </div>
   )
 }
