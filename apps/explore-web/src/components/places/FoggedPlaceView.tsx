@@ -91,11 +91,13 @@ export function FoggedPlaceView({
           <div className="place-hero-placeholder" />
         )}
 
-        <div className="place-hero-top-right">
-          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
-            &#10005;
-          </button>
-        </div>
+      </div>
+
+      {/* Close button — outside hero so not affected by blur */}
+      <div className="fogged-close">
+        <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+          &#10005;
+        </button>
       </div>
 
       {/* Body */}
@@ -110,8 +112,8 @@ export function FoggedPlaceView({
 
         <p className="fog-mystery-text">
           {isOwnFaction
-            ? 'Ce lieu appartient \u00e0 votre h\u00e9ritage. D\u00e9couvrez-le \u00e0 moindre co\u00fbt.'
-            : 'Ce lieu est encore dans le brouillard. D\u00e9pensez de l\u2019\u00e9nergie pour le r\u00e9v\u00e9ler.'
+            ? 'Ce lieu est sous influence de votre héritage. Découvrez-le à moindre coût.'
+            : 'Ce lieu est encore dans le brouillard. Dépensez votre énergie pour le réler.'
           }
         </p>
 
@@ -154,10 +156,10 @@ export function FoggedPlaceView({
             )}
 
             <div className="fog-energy-info">
-              <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> \u00e9nergie
+              <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> énergie
               {!canAfford && (
                 <p className="fog-energy-empty">
-                  Pas assez d'\u00e9nergie. Revenez plus tard ou d\u00e9placez-vous \u00e0 proximit\u00e9.
+                  Pas assez d'énergie. Revenez plus tard ou d\u00e9placez-vous \u00e0 proximit\u00e9.
                 </p>
               )}
             </div>

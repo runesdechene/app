@@ -7,8 +7,11 @@
   opacity: 0.6;
 }
 
-.fogged-hero .place-hero-top-right {
-  filter: none;
+.fogged-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
 }
 
 .fogged-title {
