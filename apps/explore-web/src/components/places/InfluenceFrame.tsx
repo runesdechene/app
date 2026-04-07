@@ -20,22 +20,46 @@ interface InfluenceFrameProps {
   onInfluencePlaced: () => void
 }
 
-/** Short satisfying "pop" sound via Web Audio API */
+/** War drum hit via Web Audio API — deep impact + noise burst */
 function playPopSound() {
   try {
     const ctx = new AudioContext()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.frequency.setValueAtTime(600, ctx.currentTime)
-    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05)
-    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.15)
-    gain.gain.setValueAtTime(0.15, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.2)
-    setTimeout(() => ctx.close(), 300)
+    const t = ctx.currentTime
+
+    // Deep drum body — low sine with fast pitch drop
+    const drum = ctx.createOscillator()
+    const drumGain = ctx.createGain()
+    drum.type = 'sine'
+    drum.frequency.setValueAtTime(120, t)
+    drum.frequency.exponentialRampToValueAtTime(45, t + 0.15)
+    drumGain.gain.setValueAtTime(0.6, t)
+    drumGain.gain.exponentialRampToValueAtTime(0.01, t + 0.25)
+    drum.connect(drumGain)
+    drumGain.connect(ctx.destination)
+    drum.start(t)
+    drum.stop(t + 0.25)
+
+    // Attack transient — short noise burst for the "hit" feel
+    const bufferSize = ctx.sampleRate * 0.06
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+    const output = noiseBuffer.getChannelData(0)
+    for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.4
+    const noise = ctx.createBufferSource()
+    noise.buffer = noiseBuffer
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0.3, t)
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.06)
+    // Low-pass filter for warmth
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(400, t)
+    noise.connect(filter)
+    filter.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
+    noise.start(t)
+    noise.stop(t + 0.06)
+
+    setTimeout(() => ctx.close(), 400)
   } catch { /* silent fallback */ }
 }
 
