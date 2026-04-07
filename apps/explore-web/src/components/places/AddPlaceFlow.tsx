@@ -220,6 +220,8 @@ export function AddPlaceFlow() {
         p_thumb_url: imageEntries[0].thumb,
         p_address: address.trim(),
         p_text: description.trim(),
+        p_user_lat: userPosition?.lat ?? null,
+        p_user_lng: userPosition?.lng ?? null,
       })
 
       if (rpcError) {
