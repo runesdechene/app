@@ -70,8 +70,10 @@
   font-weight: 600;
   padding: 3px 12px;
   border-radius: 8px;
-  display: inline-block;
+  display: block;
+  width: fit-content;
   margin: 8px auto;
+  text-align: center;
 }
 
 .enigma-difficulty.easy {
@@ -90,8 +92,8 @@
 }
 
 .enigma-lore {
-  font-size: 13px;
-  color: var(--color-sepia);
+  font-size: 18px;
+  color: var(--color-muted);
   font-style: italic;
   line-height: 1.6;
   margin-bottom: 16px;
