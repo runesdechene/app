@@ -165,3 +165,21 @@
 }
 .add-carnet-submit:hover:not(:disabled) { opacity: 0.85; }
 .add-carnet-submit:disabled { opacity: 0.5; cursor: default; }
+
+/* Mobile: modal starts below navbar, footer above bottom nav */
+@media (max-width: 768px) {
+  .add-carnet-overlay {
+    top: 48px;
+    align-items: stretch;
+  }
+
+  .add-carnet-modal {
+    max-height: none;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .add-carnet-footer {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
+  }
+}
