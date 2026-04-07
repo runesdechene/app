@@ -114,16 +114,18 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   return (
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
-        <div className="enigma-header">
-          <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
-          <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
-          <h2 className="enigma-title">
-            {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
-          </h2>
-          {enigma?.isBonus && (
-            <span className="enigma-cost">{enigma.energyCost} \u26a1</span>
-          )}
-        </div>
+        <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
+        {!result && (
+          <div className="enigma-header">
+            <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
+            <h2 className="enigma-title">
+              {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
+            </h2>
+            {enigma?.isBonus && (
+              <span className="enigma-cost">{enigma.energyCost} \u26a1</span>
+            )}
+          </div>
+        )}
 
         {loading && <div className="enigma-loading">Chargement...</div>}
 
@@ -145,9 +147,9 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
 
         {!loading && enigma && !result && (
           <>
-            <span className={`enigma-difficulty ${enigma.difficulty}`}>
+            <div className={`enigma-difficulty ${enigma.difficulty}`}>
               {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
-            </span>
+            </div>
 
             <p className="enigma-lore">{enigma.loreText}</p>
             <p className="enigma-question">{enigma.question}</p>
@@ -218,10 +220,12 @@ export function EnigmaChestButton({ onClick, hasAnsweredToday }: ChestButtonProp
     <button
       className={`enigma-chest-btn${!hasAnsweredToday ? ' pulse' : ''}`}
       onClick={onClick}
-      title="\u00c9nigme du jour"
+      title={hasAnsweredToday ? '\u00c9nigme bonus (5 \u26a1)' : '\u00c9nigme du jour (gratuite)'}
     >
       <img src="/res/coffre.webp" alt="" className="enigma-chest-img" />
-      {!hasAnsweredToday && <span className="enigma-chest-dot" />}
+      <span className="enigma-chest-label">
+        {hasAnsweredToday ? '5\u26a1' : '\u2B50'}
+      </span>
     </button>
   )
 }

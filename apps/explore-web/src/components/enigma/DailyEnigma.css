@@ -203,13 +203,14 @@
 
 /* Chest icon on map */
 .enigma-chest-btn {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: var(--color-parchment);
   border: 1px solid var(--color-sepia);
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 6px 10px;
   cursor: pointer;
-  font-size: 20px;
   line-height: 1;
   box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
   transition: transform 0.15s;
@@ -260,12 +261,10 @@
   object-fit: contain;
 }
 
-.enigma-chest-dot {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #d4af37;
+.enigma-chest-label {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-sepia);
+  line-height: 1;
 }
