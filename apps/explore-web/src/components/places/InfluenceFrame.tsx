@@ -20,46 +20,50 @@ interface InfluenceFrameProps {
   onInfluencePlaced: () => void
 }
 
-/** War drum hit via Web Audio API — deep impact + noise burst */
+/** War horn / fog horn — brassy resonant blast */
 function playPopSound() {
   try {
     const ctx = new AudioContext()
     const t = ctx.currentTime
 
-    // Deep drum body — low sine with fast pitch drop
-    const drum = ctx.createOscillator()
-    const drumGain = ctx.createGain()
-    drum.type = 'sine'
-    drum.frequency.setValueAtTime(120, t)
-    drum.frequency.exponentialRampToValueAtTime(45, t + 0.15)
-    drumGain.gain.setValueAtTime(0.6, t)
-    drumGain.gain.exponentialRampToValueAtTime(0.01, t + 0.25)
-    drum.connect(drumGain)
-    drumGain.connect(ctx.destination)
-    drum.start(t)
-    drum.stop(t + 0.25)
+    // Fundamental — sawtooth for brassy texture
+    const fund = ctx.createOscillator()
+    fund.type = 'sawtooth'
+    fund.frequency.setValueAtTime(90, t)
+    fund.frequency.linearRampToValueAtTime(110, t + 0.05)
+    fund.frequency.linearRampToValueAtTime(105, t + 0.3)
 
-    // Attack transient — short noise burst for the "hit" feel
-    const bufferSize = ctx.sampleRate * 0.06
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-    const output = noiseBuffer.getChannelData(0)
-    for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.4
-    const noise = ctx.createBufferSource()
-    noise.buffer = noiseBuffer
-    const noiseGain = ctx.createGain()
-    noiseGain.gain.setValueAtTime(0.3, t)
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.06)
-    // Low-pass filter for warmth
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'lowpass'
-    filter.frequency.setValueAtTime(400, t)
-    noise.connect(filter)
-    filter.connect(noiseGain)
-    noiseGain.connect(ctx.destination)
-    noise.start(t)
-    noise.stop(t + 0.06)
+    // Second harmonic — adds body
+    const harm = ctx.createOscillator()
+    harm.type = 'sawtooth'
+    harm.frequency.setValueAtTime(180, t)
+    harm.frequency.linearRampToValueAtTime(220, t + 0.05)
+    harm.frequency.linearRampToValueAtTime(210, t + 0.3)
 
-    setTimeout(() => ctx.close(), 400)
+    // Bandpass filter — nasal horn resonance
+    const bp = ctx.createBiquadFilter()
+    bp.type = 'bandpass'
+    bp.frequency.setValueAtTime(350, t)
+    bp.Q.setValueAtTime(3, t)
+
+    // Envelope — slow attack, sustain, fade
+    const env = ctx.createGain()
+    env.gain.setValueAtTime(0, t)
+    env.gain.linearRampToValueAtTime(0.25, t + 0.04)
+    env.gain.setValueAtTime(0.25, t + 0.15)
+    env.gain.exponentialRampToValueAtTime(0.01, t + 0.35)
+
+    fund.connect(bp)
+    harm.connect(bp)
+    bp.connect(env)
+    env.connect(ctx.destination)
+
+    fund.start(t)
+    harm.start(t)
+    fund.stop(t + 0.35)
+    harm.stop(t + 0.35)
+
+    setTimeout(() => ctx.close(), 500)
   } catch { /* silent fallback */ }
 }
 
