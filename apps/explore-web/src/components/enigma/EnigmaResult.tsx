@@ -12,7 +12,6 @@ interface EnigmaResultProps {
 export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose }: EnigmaResultProps) {
   return (
     <div className="enigma-result">
-      <button className="enigma-result-close-x" onClick={onClose}>&#10005;</button>
       <div className="enigma-result-icon">
         {correct
           ? <img src="/res/coffre_ouvert.webp" alt="" className="enigma-result-chest" />
@@ -21,12 +20,12 @@ export function EnigmaResult({ correct, answer, explanation, influenceGain, erud
       </div>
 
       <div className={`enigma-result-label ${correct ? 'correct' : 'wrong'}`}>
-        {correct ? 'Bonne r\u00e9ponse !' : 'Mauvaise r\u00e9ponse'}
+        {correct ? 'Bonne réponse !' : 'Mauvaise réponse'}
       </div>
 
       {!correct && (
         <div className="enigma-result-answer">
-          R\u00e9ponse : {answer}
+          Réponse : {answer}
         </div>
       )}
 
