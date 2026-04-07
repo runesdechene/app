@@ -10,7 +10,6 @@ const CONFIG = {
     maxKey: 'maxConquest' as const,
     nextKey: 'conquestNextPointIn' as const,
     cycleKey: 'conquestCycle' as const,
-    bonusKey: 'bonusConquest' as const,
   },
   construction: {
     icon: '\uD83D\uDD2E', // 🔮
@@ -19,7 +18,6 @@ const CONFIG = {
     maxKey: 'maxConstruction' as const,
     nextKey: 'constructionNextPointIn' as const,
     cycleKey: 'constructionCycle' as const,
-    bonusKey: 'bonusConstruction' as const,
   },
   vitalite: {
     icon: '\u{1F33F}', // 🌿
@@ -28,7 +26,6 @@ const CONFIG = {
     maxKey: 'maxVitalite' as const,
     nextKey: 'vitaliteNextPointIn' as const,
     cycleKey: 'vitaliteCycle' as const,
-    bonusKey: 'bonusVitalite' as const,
   },
 } as const
 
@@ -43,7 +40,6 @@ export function ResourceIndicator({ type }: Props) {
   const maxPoints = usePlayerStore(s => s[cfg.maxKey])
   const cycleSeconds = usePlayerStore(s => s[cfg.cycleKey])
   const nextPointIn = usePlayerStore(s => s[cfg.nextKey])
-  const bonus = usePlayerStore(s => s[cfg.bonusKey])
 
   const isFull = points >= maxPoints
 
@@ -67,7 +63,6 @@ export function ResourceIndicator({ type }: Props) {
   const regenBonus = cycleSeconds < defaultCycle ? 'bonus' : cycleSeconds > defaultCycle ? 'malus' : ''
   const [showInfo, setShowInfo] = useState(false)
 
-  const baseMax = maxPoints - bonus
   const baseCycle = 14400
   const baseRate = 3600 / baseCycle
   const hasRegenBonus = cycleSeconds !== baseCycle
@@ -84,7 +79,7 @@ export function ResourceIndicator({ type }: Props) {
         <div className="energy-main">
           <span className="energy-icon">{cfg.icon}</span>
           <span className="energy-count">
-            {formatVal(fractional)}/<span className={bonus > 0 ? 'max-bonus' : bonus < 0 ? 'max-malus' : ''}>{maxPoints}</span>
+            {formatVal(fractional)}/{maxPoints}
           </span>
           <div className="energy-bar">
             <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
@@ -106,10 +101,6 @@ export function ResourceIndicator({ type }: Props) {
             ...(hasRegenBonus ? [
               { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
               { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
-            ] : []),
-            ...(bonus !== 0 ? [
-              { label: 'Capacite de base', value: String(baseMax) },
-              { label: 'Bonus capacite faction', value: `${bonus > 0 ? '+' : ''}${bonus}`, highlight: true },
             ] : []),
           ]}
           onClose={() => setShowInfo(false)}

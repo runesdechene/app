@@ -1,3 +1,77 @@
+# ALPHA V0.5.5 
+## NOM DE CODE : PYTHEAS
+
+*Quelque chose a changé dans le vent. La carte a écouté.*
+
+Fidèle à sa réputation, Runes de Chêne s'oriente grâce à vous sur l'explorateur & l'érudition, transformant la conquête aggressive en un lieu d'aventure, d'influence, de stratégie et de découverte. Enigmes, Influences partagées, traitrises ou soutiens, jamais la Carte ne fut si proche de sa vision qui stimule l'âme, l'esprit et le corps. 
+
+### Chaque action resonne
+Le fil d'activite prend vie. Recits deposes, enigmes percees, bannieres levees — tout est visible, en temps reel, aux couleurs de votre Heritage. Cliquez un nom : decouvrez l'explorateur. Cliquez un lieu : envolez-vous vers lui. 
+
+### Les Fragments changent de nature
+Fini le stock gratuit. Desormais, chaque Fragment que vous possedez **etend votre portee d'influence** sur les lieux qui partagent ses affinites. Un Fragment lie a la Foret ? Votre voix porte plus loin sur chaque Foret de la carte. 
+
+### Le terrain recompense les braves
+Creer un lieu depuis chez vous ? Toujours possible. Mais les recompenses d'influence sont desormais **reservees a ceux qui s'y tiennent, en vrai, les pieds dans l'herbe**. 
+
+### Un jeu plus pur
+Les mecaniques obsoletes ont ete balayees. Fortifications, revendications, energies multiples — tout ca appartient au passe. 
+
+# ALPHA V0.5.2
+## Influence, Carnets et Equilibre
+
+### Influence perenne par les likes
+- Les points perennes sur un lieu dependent du **classement des carnets par likes** : 1er = 20pts, 2e = 10pts, 3e = 5pts, 4e+ = 2pts.
+- Plus de "+X texte, +X photo" — c'est la communaute qui decide quel recit merite de l'influence.
+- Badge "Recit le plus aime" sur le carnet en tete.
+- Recalcul automatique apres chaque vote.
+
+### Visite GPS
+- Explorer un lieu sur place rapporte **20 pts d'exploration** (au lieu de 2).
+- Plus de content_points perennes a la visite — reserves aux carnets/photos.
+
+### Coffre a enigmes
+- Le coffre affiche clairement son etat : gratuit (etoile), bonus (cout en energie), ou grise avec X/Y energie si insuffisant.
+
+### Fiche de lieu
+- Cliquer sur un indicateur (accessibilite, saison, info) scrolle automatiquement vers l'onglet Infos.
+- Confirmation amicale avant de soutenir un Heritage rival ("Un agent double, c'est interessant").
+
+### Profil joueur
+- Gloire detaillee : "15 Gloire (10 exploration + 5 erudition)".
+- Influence a placer + influence placee visibles.
+- Badge d'influence dans la barre de ressources.
+
+### Titres
+- Les titres utilisent la nouvelle Gloire (exploration + erudition), plus l'ancienne notoriete.
+- Gloire a 0 = aucun titre debloque.
+- Les titres de faction sont classes par Gloire.
+
+### Hub
+- Nouveaux reglages : bonus GPS exploration, cooldown Heritage.
+
+# ALPHA V0.5.1
+## Gloire, Equilibre et Coupe des Heritages
+
+### Coupe des Heritages
+- Nouveau switch **Coupe des Heritages** : colorez les lieux selon l'Heritage dominant.
+- Mode OFF : lieux en couleur normale, territoires visibles.
+- Mode ON : les billes prennent la couleur de la faction qui influence le plus. Lieux neutres en gris.
+- Le scoreboard faction ne compte que l'**influence active** (placement, pas contenu permanent).
+
+### Gloire V0.5
+- **Gloire = Exploration + Erudition.** Les classements et profils utilisent ce calcul.
+- L'ancienne notoriete ne s'accumule plus.
+- Exploration proportionnelle : vous gagnez autant de points que le cout en energie de la decouverte.
+- Bonus GPS : +10 pts d'exploration quand vous etes sur place.
+- Mauvaise reponse a une enigme = 0 erudition. Seules les bonnes reponses comptent.
+
+### Heritage
+- Changer d'Heritage ne coute plus de Gloire. Cooldown de **30 jours** a la place.
+- Toutes les infos d'Heritage sont toujours visibles (plus de mode exploration qui masque).
+
+### Hub
+- Nouveaux reglages : bonus GPS exploration, cooldown Heritage.
 
 # ALPHA V0.5.0
 ## L'Ère de l'Influence

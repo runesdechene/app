@@ -62,23 +62,6 @@ interface PlayerState {
   setVitaliteNextPointIn: (seconds: number) => void
   setVitaliteCycle: (seconds: number) => void
 
-  /** Bonus de faction sur les max */
-  bonusEnergy: number
-  bonusConquest: number
-  bonusConstruction: number
-  bonusVitalite: number
-  setBonusEnergy: (v: number) => void
-  setBonusConquest: (v: number) => void
-  setBonusConstruction: (v: number) => void
-  setBonusVitalite: (v: number) => void
-
-  /** Buff actif (compétence de fragment) */
-  activeBuff: string | null  // 'free_discover' | 'free_claim' | 'double_glory' | 'distance_ignore' | null
-  setActiveBuff: (buff: string | null) => void
-
-  /** Gloire personnelle (legacy — alias de glory) */
-  notorietyPoints: number
-  setNotorietyPoints: (pts: number) => void
 
   /** V0.5 — Points d'exploration (terrain, GPS, ajout lieu, photos) */
   explorationPoints: number
@@ -115,9 +98,10 @@ interface PlayerState {
   primaryTitle: string | null
   setPrimaryTitle: (title: string | null) => void
 
-  /** Mode de jeu (exploration = pas de faction UI, conquest = tout) */
-  gameMode: 'exploration' | 'conquest'
-  setGameMode: (mode: 'exploration' | 'conquest') => void
+
+  /** Mode coloration carte : true = billes colorées par faction */
+  factionColorMode: boolean
+  setFactionColorMode: (on: boolean) => void
 
   /** Admin */
   isAdmin: boolean
@@ -185,24 +169,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setVitaliteNextPointIn: (seconds) => set({ vitaliteNextPointIn: seconds }),
   setVitaliteCycle: (seconds) => set({ vitaliteCycle: seconds }),
 
-  bonusEnergy: 0,
-  bonusConquest: 0,
-  bonusConstruction: 0,
-  bonusVitalite: 0,
-  setBonusEnergy: (v) => set({ bonusEnergy: v }),
-  setBonusConquest: (v) => set({ bonusConquest: v }),
-  setBonusConstruction: (v) => set({ bonusConstruction: v }),
-  setBonusVitalite: (v) => set({ bonusVitalite: v }),
-
-  activeBuff: localStorage.getItem('activeBuff') || null,
-  setActiveBuff: (buff) => {
-    if (buff) localStorage.setItem('activeBuff', buff)
-    else localStorage.removeItem('activeBuff')
-    set({ activeBuff: buff })
-  },
-
-  notorietyPoints: 0,
-  setNotorietyPoints: (pts) => set({ notorietyPoints: pts }),
 
   explorationPoints: 0,
   setExplorationPoints: (pts) => set((state) => ({ explorationPoints: pts, glory: pts + state.eruditionPoints })),
@@ -230,8 +196,12 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   primaryTitle: null,
   setPrimaryTitle: (title) => set({ primaryTitle: title }),
 
-  gameMode: 'exploration',
-  setGameMode: (mode) => set({ gameMode: mode }),
+
+  factionColorMode: localStorage.getItem('factionColorMode') === 'true',
+  setFactionColorMode: (on) => {
+    localStorage.setItem('factionColorMode', String(on))
+    set({ factionColorMode: on })
+  },
 
   isAdmin: false,
   setIsAdmin: (v) => set({ isAdmin: v }),

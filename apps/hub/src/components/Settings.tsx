@@ -44,14 +44,6 @@ export function Settings() {
   })
   const [savingRegen, setSavingRegen] = useState(false)
 
-  // Glory rates
-  const [gloryRates, setGloryRates] = useState({
-    glory_discover: 2,
-    glory_claim: 5,
-    glory_fortify: 5,
-    glory_cost_bonus_pct: 10,
-  })
-  const [savingGlory, setSavingGlory] = useState(false)
 
   const [distSettings, setDistSettings] = useState({
     distance_gps_km: 0.5,
@@ -76,15 +68,19 @@ export function Settings() {
   })
   const [v05Exploration, setV05Exploration] = useState({
     exploration_visit_gps: 3,
-    exploration_add_place: 10,
+    exploration_gps_bonus: 10,
     exploration_add_photo: 5,
     exploration_add_carnet: 5,
   })
   const [v05Erudition, setV05Erudition] = useState({
     erudition_add_carnet: 3,
-    erudition_enigma_wrong: -1,
+  })
+  const [v05Faction, setV05Faction] = useState({
+    faction_change_cooldown_days: 30,
   })
   const [v05Enigma, setV05Enigma] = useState({
+    fragment_enigma_influence: 5,
+    fragment_enigma_erudition: 2,
     enigma_influence_easy: 2,
     enigma_influence_medium: 4,
     enigma_influence_hard: 6,
@@ -174,22 +170,6 @@ export function Settings() {
         setRegenCycles(cycles)
       }
 
-      // Charger les taux de Gloire
-      const { data: gloryData } = await supabase
-        .from('app_settings')
-        .select('key, value')
-        .in('key', ['glory_discover', 'glory_claim', 'glory_fortify', 'glory_cost_bonus_pct'])
-
-      if (gloryData) {
-        const g = { ...gloryRates }
-        for (const row of gloryData as { key: string; value: string }[]) {
-          if (row.key in g) {
-            (g as Record<string, number>)[row.key] = Number(row.value) || (g as Record<string, number>)[row.key]
-          }
-        }
-        setGloryRates(g)
-      }
-
       // Charger les settings de distance
       const { data: distData } = await supabase
         .from('app_settings')
@@ -211,6 +191,7 @@ export function Settings() {
         ...Object.keys(v05Influence),
         ...Object.keys(v05Exploration),
         ...Object.keys(v05Erudition),
+        ...Object.keys(v05Faction),
         ...Object.keys(v05Enigma),
       ]
       const { data: v05Data } = await supabase
@@ -222,6 +203,7 @@ export function Settings() {
         const infl = { ...v05Influence }
         const expl = { ...v05Exploration }
         const erud = { ...v05Erudition }
+        const fact = { ...v05Faction }
         const enig = { ...v05Enigma }
         for (const row of v05Data as { key: string; value: string }[]) {
           const val = Number(row.value)
@@ -229,11 +211,13 @@ export function Settings() {
           if (row.key in infl) (infl as Record<string, number>)[row.key] = val
           else if (row.key in expl) (expl as Record<string, number>)[row.key] = val
           else if (row.key in erud) (erud as Record<string, number>)[row.key] = val
+          else if (row.key in fact) (fact as Record<string, number>)[row.key] = val
           else if (row.key in enig) (enig as Record<string, number>)[row.key] = val
         }
         setV05Influence(infl)
         setV05Exploration(expl)
         setV05Erudition(erud)
+        setV05Faction(fact)
         setV05Enigma(enig)
       }
     } finally {
@@ -371,17 +355,6 @@ export function Settings() {
     setSavingRegen(false)
   }
 
-  async function saveGloryRates() {
-    setSavingGlory(true)
-    const keys = Object.keys(gloryRates) as (keyof typeof gloryRates)[]
-    for (const key of keys) {
-      await supabase.from('app_settings').upsert(
-        { key, value: String(gloryRates[key]) },
-        { onConflict: 'key' }
-      )
-    }
-    setSavingGlory(false)
-  }
 
   async function saveDistSettings() {
     setSavingDist(true)
@@ -401,6 +374,7 @@ export function Settings() {
       ...v05Influence,
       ...v05Exploration,
       ...v05Erudition,
+      ...v05Faction,
       ...v05Enigma,
     }
     for (const [key, value] of Object.entries(allSettings)) {
@@ -452,54 +426,6 @@ export function Settings() {
         </div>
       </div>
 
-      <div className="divers-card">
-        <h3>Taux de Gloire</h3>
-        <p className="divers-description">
-          Points de Gloire gagnes par action. Les Fragments avec "Gloire multipliee" appliquent un multiplicateur sur ces valeurs.
-        </p>
-
-        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
-          <label className="settings-global-field">
-            <span>Decouverte</span>
-            <input
-              type="number" min="0" step="1"
-              value={gloryRates.glory_discover}
-              onChange={e => setGloryRates(prev => ({ ...prev, glory_discover: parseInt(e.target.value) || 0 }))}
-              className="settings-input"
-            />
-          </label>
-          <label className="settings-global-field">
-            <span>Protection</span>
-            <input
-              type="number" min="0" step="1"
-              value={gloryRates.glory_claim}
-              onChange={e => setGloryRates(prev => ({ ...prev, glory_claim: parseInt(e.target.value) || 0 }))}
-              className="settings-input"
-            />
-          </label>
-          <label className="settings-global-field">
-            <span>Fortification</span>
-            <input
-              type="number" min="0" step="1"
-              value={gloryRates.glory_fortify}
-              onChange={e => setGloryRates(prev => ({ ...prev, glory_fortify: parseInt(e.target.value) || 0 }))}
-              className="settings-input"
-            />
-          </label>
-          <label className="settings-global-field">
-            <span>Bonus cout (%)</span>
-            <input
-              type="number" min="0" step="5"
-              value={gloryRates.glory_cost_bonus_pct}
-              onChange={e => setGloryRates(prev => ({ ...prev, glory_cost_bonus_pct: parseInt(e.target.value) || 0 }))}
-              className="settings-input"
-            />
-          </label>
-          <button className="btn-primary" onClick={saveGloryRates} disabled={savingGlory}>
-            {savingGlory ? '...' : 'Sauvegarder'}
-          </button>
-        </div>
-      </div>
 
       <div className="divers-card">
         <h3>Cout par distance</h3>
@@ -807,20 +733,20 @@ export function Settings() {
       <div className="divers-card">
         <h3>Exploration</h3>
         <p className="divers-description">
-          Points d'Exploration gagnes par action terrain.
+          Points d'Exploration gagnes par action terrain. La decouverte donne autant de pts que le cout en energie (proportionnel a la distance). Le bonus GPS s'applique en plus quand on est sur place.
         </p>
 
         <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
           <label className="settings-global-field">
-            <span>Visite GPS</span>
-            <input type="number" min="0" step="1" value={v05Exploration.exploration_visit_gps}
-              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_visit_gps: parseInt(e.target.value) || 0 }))}
+            <span>Bonus GPS (sur place)</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_gps_bonus}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_gps_bonus: parseInt(e.target.value) || 0 }))}
               className="settings-input" />
           </label>
           <label className="settings-global-field">
-            <span>Ajout lieu</span>
-            <input type="number" min="0" step="1" value={v05Exploration.exploration_add_place}
-              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_add_place: parseInt(e.target.value) || 0 }))}
+            <span>Visite GPS</span>
+            <input type="number" min="0" step="1" value={v05Exploration.exploration_visit_gps}
+              onChange={e => setV05Exploration(prev => ({ ...prev, exploration_visit_gps: parseInt(e.target.value) || 0 }))}
               className="settings-input" />
           </label>
           <label className="settings-global-field">
@@ -851,10 +777,20 @@ export function Settings() {
               onChange={e => setV05Erudition(prev => ({ ...prev, erudition_add_carnet: parseInt(e.target.value) || 0 }))}
               className="settings-input" />
           </label>
+        </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>Heritage (Faction)</h3>
+        <p className="divers-description">
+          Regles de changement d'Heritage.
+        </p>
+
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
           <label className="settings-global-field">
-            <span>Enigme fausse</span>
-            <input type="number" step="1" value={v05Erudition.erudition_enigma_wrong}
-              onChange={e => setV05Erudition(prev => ({ ...prev, erudition_enigma_wrong: parseInt(e.target.value) || 0 }))}
+            <span>Cooldown changement (jours)</span>
+            <input type="number" min="1" step="1" value={v05Faction.faction_change_cooldown_days}
+              onChange={e => setV05Faction(prev => ({ ...prev, faction_change_cooldown_days: parseInt(e.target.value) || 30 }))}
               className="settings-input" />
           </label>
         </div>
@@ -916,6 +852,22 @@ export function Settings() {
             </tr>
           </tbody>
         </table>
+
+        <h4 style={{ marginTop: 16, marginBottom: 8, fontSize: 14 }}>Enigmes de fragments</h4>
+        <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <label className="settings-global-field">
+            <span>Influence</span>
+            <input type="number" min="0" step="1" value={v05Enigma.fragment_enigma_influence}
+              onChange={e => setV05Enigma(prev => ({ ...prev, fragment_enigma_influence: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+          <label className="settings-global-field">
+            <span>Erudition</span>
+            <input type="number" min="0" step="1" value={v05Enigma.fragment_enigma_erudition}
+              onChange={e => setV05Enigma(prev => ({ ...prev, fragment_enigma_erudition: parseInt(e.target.value) || 0 }))}
+              className="settings-input" />
+          </label>
+        </div>
 
         <h4 style={{ marginTop: 16, marginBottom: 8, fontSize: 14 }}>Enigmes de lieu</h4>
         <div className="settings-global-row" style={{ flexWrap: 'wrap', gap: 12 }}>

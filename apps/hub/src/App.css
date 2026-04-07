@@ -2250,7 +2250,7 @@ table select {
   background: rgba(160, 130, 90, 0.08);
   border: 1px solid rgba(160, 130, 90, 0.2);
   border-radius: 6px;
-  color: #fff;
+  color: var(--color-text, #3D2B1F);
   font-size: 0.85rem;
 }
 

@@ -162,9 +162,9 @@ export function PlaceEnigma(props: PlaceEnigmaProps) {
 
   return (
     <div className="place-enigma">
-      <span className={`enigma-difficulty ${enigma.difficulty}`}>
+      <div className={`enigma-difficulty ${enigma.difficulty}`}>
         {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
-      </span>
+      </div>
 
       <p className="enigma-lore" style={{ marginTop: 8 }}>{enigma.loreText}</p>
       <p className="enigma-question">{enigma.question}</p>
@@ -187,7 +187,7 @@ export function PlaceEnigma(props: PlaceEnigmaProps) {
         <input
           type="text"
           className="enigma-free-input"
-          placeholder="Votre r\u00e9ponse..."
+          placeholder="Votre réponse..."
           value={freeAnswer}
           onChange={e => setFreeAnswer(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}

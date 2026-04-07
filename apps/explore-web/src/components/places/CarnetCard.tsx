@@ -24,16 +24,16 @@ export interface Carnet {
 interface CarnetCardProps {
   carnet: Carnet
   isTop: boolean
+  rank: number
   factionColor: string | null
   factionSvg: string | null
-  influencePerCarnet: number   // from app_settings
-  influencePerPhoto: number
-  influencePerVote: number
   onVoted: () => void
   onPhotoOpen?: (photos: string[], index: number) => void
 }
 
-export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influencePerCarnet, influencePerPhoto, influencePerVote, onVoted, onPhotoOpen }: CarnetCardProps) {
+const RANK_POINTS = [20, 10, 5]
+
+export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, onVoted, onPhotoOpen }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
   const [liked, setLiked] = useState(false)
@@ -53,10 +53,7 @@ export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influenceP
       })
   }, [userId, carnet.id, carnet.userId])
 
-  const textInfluence = influencePerCarnet
-  const photosInfluence = carnet.images.length > 0 ? influencePerPhoto : 0
-  const votesInfluence = carnet.votesUp * influencePerVote
-  const totalInfluence = textInfluence + photosInfluence + votesInfluence
+  const rankPoints = RANK_POINTS[rank - 1] ?? 2
 
   async function toggleLike() {
     if (!userId || voting) return
@@ -172,19 +169,19 @@ export function CarnetCard({ carnet, isTop, factionColor, factionSvg, influenceP
         <span className="carnet-date">{timeAgo}</span>
       </div>
 
-      {/* Influence line */}
+      {/* Influence badge — basé sur le classement par likes */}
       <div className="carnet-influence-line">
         <span
           className="carnet-influence-badge"
           style={{ backgroundColor: factionColor ?? '#8a7a6a' }}
         >
-          🏴 +{totalInfluence}
+          {'\uD83C\uDF1F'} +{rankPoints} influence
         </span>
-        <span className="carnet-influence-breakdown">
-          +{textInfluence} 📖 texte<span className="carnet-influence-spacer"></span> 
-          {photosInfluence > 0 && <>  +{photosInfluence} 📷 photos </>}<span className="carnet-influence-spacer"></span> 
-          {votesInfluence > 0 && <>  ❤️ +{votesInfluence} j'aime  </>}
-        </span>
+        {isTop && (
+          <span className="carnet-influence-breakdown" style={{ fontWeight: 600 }}>
+            Recit le plus aime
+          </span>
+        )}
       </div>
     </div>
   )

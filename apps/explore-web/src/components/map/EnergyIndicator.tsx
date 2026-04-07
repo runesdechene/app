@@ -8,9 +8,6 @@ export function EnergyIndicator() {
   const maxEnergy = usePlayerStore(s => s.maxEnergy)
   const cycleSeconds = usePlayerStore(s => s.energyCycle)
   const nextPointIn = usePlayerStore(s => s.nextPointIn)
-  const bonusEnergy = usePlayerStore(s => s.bonusEnergy)
-  const influenceStock = usePlayerStore(s => s.influenceStock)
-
   const isFull = energy >= maxEnergy
 
   // Energie fractionnaire en temps reel
@@ -31,7 +28,6 @@ export function EnergyIndicator() {
   const ratePerHour = 3600 / cycleSeconds
   const [showInfo, setShowInfo] = useState(false)
 
-  const baseMax = maxEnergy - bonusEnergy
   const baseCycle = 7200
   const baseRate = 3600 / baseCycle
   const hasRegenBonus = cycleSeconds !== baseCycle
@@ -42,7 +38,7 @@ export function EnergyIndicator() {
         <div className="energy-main">
           <span className="energy-icon">{'\u26A1'}</span>
           <span className="energy-count">
-            {formatEnergy(fractionalEnergy)}/<span className={bonusEnergy > 0 ? 'max-bonus' : bonusEnergy < 0 ? 'max-malus' : ''}>{maxEnergy}</span>
+            {formatEnergy(fractionalEnergy)}/{maxEnergy}
           </span>
           <div className="energy-bar">
             <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
@@ -51,11 +47,6 @@ export function EnergyIndicator() {
 
         <div className="energy-sub">
           <span className="energy-rate">+{ratePerHour.toFixed(2)}/h</span>
-          {influenceStock > 0 && (
-            <span className="energy-rate" style={{ marginLeft: 6, color: '#8a6b30' }}>
-              {'\uD83C\uDFF4'} {influenceStock}
-            </span>
-          )}
         </div>
       </div>
 
@@ -70,10 +61,6 @@ export function EnergyIndicator() {
             ...(hasRegenBonus ? [
               { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
               { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
-            ] : []),
-            ...(bonusEnergy !== 0 ? [
-              { label: 'Capacite de base', value: String(baseMax) },
-              { label: 'Bonus capacite faction', value: `${bonusEnergy > 0 ? '+' : ''}${bonusEnergy}`, highlight: true },
             ] : []),
           ]}
           onClose={() => setShowInfo(false)}

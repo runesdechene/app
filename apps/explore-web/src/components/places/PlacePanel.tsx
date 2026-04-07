@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePlace } from '../../hooks/usePlace'
 import type { PlaceDetail } from '../../hooks/usePlace'
 import { supabase } from '../../lib/supabase'
@@ -134,12 +134,13 @@ function QuickInfoChip({ icon, value, placeholder, onClick }: {
 }
 
 /** Unified explorer row — discoverer (⭐) and guardian (🛡) get badges on their avatars */
-function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeLocation, isExplorer, onVisited }: {
+function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited }: {
   explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
   authorId: string | null
   guardianId: string | null
   factionColors: Map<string, string>
   placeId: string
+  placeTitle: string
   placeLocation: { latitude: number; longitude: number }
   isExplorer: boolean
   onVisited: () => void
@@ -147,6 +148,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
   const [loading, setLoading] = useState(false)
+  const [revisited, setRevisited] = useState(false)
 
   const isOnSite = useMemo(() => {
     if (!userPosition) return false
@@ -154,8 +156,35 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
     const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.2
   }, [userPosition, placeLocation])
+
+  async function handleRevisit() {
+    if (!userId || !userPosition || loading || revisited) return
+    setLoading(true)
+    const { data, error } = await supabase.rpc('revisit_place_gps', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_user_lat: userPosition.lat,
+      p_user_lng: userPosition.lng,
+    })
+    if (!error && data && !data.error) {
+      const result = data as { influenceGain?: number; recentRevisits?: number }
+      const gain = result.influenceGain ?? 0
+      useToastStore.getState().addToast({
+        type: 'revisit',
+        message: `De retour sur ${placeTitle} ! +${gain} influence`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
+        timestamp: Date.now(),
+      })
+      setRevisited(true)
+    } else if (data?.error === 'already_revisited_today') {
+      setRevisited(true)
+    }
+    setLoading(false)
+  }
 
   async function handleVisit() {
     if (!userId || !userPosition || loading) return
@@ -170,7 +199,14 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       const result = data as { newInfluenceStock?: number; newExploration?: number; influenceGain?: number; explorationGain?: number }
       if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
       if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
-      useToastStore.getState().addToast({ type: 'explore', message: `Visite validée ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`, timestamp: Date.now() })
+      useToastStore.getState().addToast({
+        type: 'explore',
+        message: `Visite de ${placeTitle} validée ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
+        timestamp: Date.now(),
+      })
       onVisited()
     }
     setLoading(false)
@@ -218,12 +254,25 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
         {userId && !isExplorer && (
           <button
             className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
-            onClick={handleVisit}
+            onClick={isOnSite ? handleVisit : undefined}
             disabled={!isOnSite || loading}
             title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
           >
-            {loading ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
+            {loading && !isExplorer ? '...' : isOnSite ? '\uD83D\uDCCD J\'y suis alle' : '\uD83D\uDCCD Sur place uniquement'}
           </button>
+        )}
+        {userId && isExplorer && !revisited && (
+          <button
+            className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
+            onClick={isOnSite ? handleRevisit : undefined}
+            disabled={!isOnSite || loading}
+            title={isOnSite ? 'Revisiter ce lieu pour gagner de l\'influence' : 'Rendez-vous sur place pour revisiter'}
+          >
+            {loading && isExplorer ? '...' : isOnSite ? '\uD83D\uDCCD De retour !' : '\uD83D\uDCCD Revisiter (sur place)'}
+          </button>
+        )}
+        {userId && isExplorer && revisited && (
+          <span style={{ fontSize: 11, opacity: 0.5, padding: '4px 8px' }}>Revisite du jour validee</span>
         )}
       </div>
       {sorted.length === 0 && (
@@ -241,6 +290,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [activeTab, setActiveTab] = useState<ActiveTab>('carnets')
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const scrollToTab = useCallback((tab: ActiveTab) => {
+    setActiveTab(tab)
+    setTimeout(() => tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+  }, [])
   const [showAddCarnet, setShowAddCarnet] = useState(false)
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
 
@@ -355,11 +409,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         updatedAt: c.createdAt,
       }))
   }, [v05?.contributions])
-
-  // Influence config defaults (TODO: fetch from app_settings)
-  const influencePerCarnet = 10
-  const influencePerPhoto = 10
-  const influencePerVote = 1
 
   const isAuthor = place.author?.id === userId
 
@@ -601,19 +650,19 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>}
               value={infoFields.find(i => i.type === 'accessibility')?.content ?? null}
               placeholder="Accessibilité"
-              onClick={() => setActiveTab('infos')}
+              onClick={() => scrollToTab('infos')}
             />
             <QuickInfoChip
               icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L12 14"/><path d="M2 12h4"/><path d="M20 12h2"/><path d="M7.8 5.2l2.8 2.8"/><path d="M16.2 5.2l-2.8 2.8"/><path d="M12 2v4"/></svg>}
               value={infoFields.find(i => i.type === 'season')?.content ?? null}
               placeholder="Saison"
-              onClick={() => setActiveTab('infos')}
+              onClick={() => scrollToTab('infos')}
             />
             <QuickInfoChip
               icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
               value={infoFields.find(i => i.type === 'warning')?.content ?? null}
               placeholder="Info"
-              onClick={() => setActiveTab('infos')}
+              onClick={() => scrollToTab('infos')}
             />
           </div>
 
@@ -625,6 +674,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               guardianId={v05.guardian?.userId ?? null}
               factionColors={factionColors}
               placeId={place.id}
+              placeTitle={place.title}
               placeLocation={place.location}
               isExplorer={v05.isExplorer}
               onVisited={() => { refreshV05(); onRefetch() }}
@@ -655,7 +705,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         />
 
         {/* Zone 4 — Tabs */}
-        <div className="place-tabs">
+        <div className="place-tabs" ref={tabsRef}>
           <button
             className={`place-tab${activeTab === 'carnets' ? ' active' : ''}`}
             onClick={() => setActiveTab('carnets')}
@@ -672,7 +722,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           </button>
           <button
             className={`place-tab${activeTab === 'infos' ? ' active' : ''}`}
-            onClick={() => setActiveTab('infos')}
+            onClick={() => scrollToTab('infos')}
           >
             Infos
             <span className="place-tab-lenght">{infoFields.length}</span>
@@ -698,11 +748,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   key={c.id}
                   carnet={c}
                   isTop={i === 0}
+                  rank={i + 1}
                   factionColor={factionColors.get(c.factionId) ?? null}
                   factionSvg={factionSvgs.get(c.factionId) ?? null}
-                  influencePerCarnet={influencePerCarnet}
-                  influencePerPhoto={influencePerPhoto}
-                  influencePerVote={influencePerVote}
                   onVoted={refreshV05}
                   onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
                 />
@@ -713,7 +761,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 className="place-add-carnet-btn"
                 onClick={() => setShowAddCarnet(true)}
               >
-                Ajouter ma page de carnet
+                Ajouter mon propre récit
               </button>
             )}
           </div>

@@ -1,0 +1,59 @@
+.fragment-bar {
+  display: flex;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.fragment-bar-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 2px solid #c9a96e;
+  background: var(--color-parchment);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
+}
+
+.fragment-bar-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+.fragment-bar-btn.done {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+  cursor: default;
+}
+
+.fragment-bar-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.fragment-bar-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.fragment-bar-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d4af37;
+  border: 1.5px solid var(--color-parchment);
+  animation: fragment-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes fragment-dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+  50% { box-shadow: 0 0 6px 2px rgba(212, 175, 55, 0.3); }
+}

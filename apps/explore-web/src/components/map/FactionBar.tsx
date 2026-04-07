@@ -25,21 +25,21 @@ export function FactionBar() {
 
   useEffect(() => {
     async function fetchInfluence() {
-      // V0.5: Score = somme de l'influence totale (placed + content) de tous les lieux par faction
+      // Score = placed_points uniquement (influence active, decay naturel)
       const [influenceRes, factionsRes] = await Promise.all([
         supabase
           .from('place_influence')
-          .select('faction_id, placed_points, content_points'),
+          .select('faction_id, placed_points'),
         supabase.from('factions').select('id, title, color, pattern').order('order'),
       ])
 
       if (!factionsRes.data) return
 
-      // Aggregate influence per faction
+      // Aggregate placed influence per faction
       const influenceByFaction: Record<string, number> = {}
       if (influenceRes.data) {
-        for (const row of influenceRes.data as Array<{ faction_id: string; placed_points: number; content_points: number }>) {
-          influenceByFaction[row.faction_id] = (influenceByFaction[row.faction_id] || 0) + row.placed_points + row.content_points
+        for (const row of influenceRes.data as Array<{ faction_id: string; placed_points: number }>) {
+          influenceByFaction[row.faction_id] = (influenceByFaction[row.faction_id] || 0) + row.placed_points
         }
       }
 
@@ -97,11 +97,16 @@ export function FactionBar() {
                 {isLeader && <span className="faction-scoreboard-crown"> {'\uD83D\uDC51'}</span>}
                 {faction.isUnderdog && <span className="faction-scoreboard-underdog" title="Baroud d'Honneur — x2 regen"> {'\uD83D\uDC80'}</span>}
               </span>
-              <span className="faction-scoreboard-pct">{faction.notoriety} {'\uD83C\uDFF4'}</span>
+              <span className="faction-scoreboard-pct">{faction.notoriety} {'\uD83C\uDF1F'}</span>
             </div>
           </div>
         )
       })}
+
+      <div className="faction-scoreboard-live">
+        <span className="faction-scoreboard-live-dot" />
+        Influence active
+      </div>
 
       {selectedFaction && (
         <FactionMembersModal

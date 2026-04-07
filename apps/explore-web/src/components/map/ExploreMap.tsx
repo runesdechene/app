@@ -65,8 +65,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
-  const gameMode = usePlayerStore(s => s.gameMode)
-  const showFactions = gameMode === 'conquest'
+  const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
@@ -178,10 +177,10 @@ export const ExploreMap = memo(function ExploreMap() {
     const ids = [
       'places-undiscovered-circle', 'places-undiscovered-icon',
       'places-point', 'places-icon',
+      'territories-fill',
     ]
-    if (showFactions) ids.push('territories-fill')
     return ids
-  }, [showFactions])
+  }, [])
 
   // Lieux fortifiés → Badge niveau par-dessus l'icône du lieu
   // Fort badges sont maintenant un symbol layer sur la source places (fortBadgeLayer)
@@ -386,29 +385,57 @@ export const ExploreMap = memo(function ExploreMap() {
     return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
   }, [rawGeojson, placeOverrides, territoryTiers])
 
-  // Charger les icônes SVG colorées dans la map
-  // Utilise rawGeojson (stable) — les icônes ne dépendent pas du statut discovered
+  // Charger les icônes SVG colorées dans la map (tag colors + faction colors pour le mode bannières)
   const loadedIconsRef = useRef(new Set<string>())
   useEffect(() => {
     const map = mapRef.current?.getMap()
-    if (!map || !rawGeojson) return
+    if (!rawGeojson) return
+    // Attendre que la map soit chargée
+    if (!map) return
 
-    const iconColors = new Map<string, string>()
     for (const f of rawGeojson.features) {
-      if (f.properties.tagIcon) {
-        iconColors.set(f.properties.tagIcon, f.properties.iconColor)
+      const { tagIcon, iconColor, bannerIcon } = f.properties
+
+      // Icône normale (couleur tag)
+      if (tagIcon && !loadedIconsRef.current.has(tagIcon)) {
+        loadedIconsRef.current.add(tagIcon)
+        loadColoredSvgIcon(map, tagIcon, iconColor).catch(() => {
+          loadedIconsRef.current.delete(tagIcon)
+        })
+      }
+
+      // Icône faction (pour le mode bannières) — clé = "faction::{url}::{color}"
+      if (bannerIcon && !loadedIconsRef.current.has(bannerIcon)) {
+        loadedIconsRef.current.add(bannerIcon)
+        const parts = bannerIcon.split('::')
+        const svgUrl = parts[1]
+        const fColor = parts[2]
+        if (svgUrl && fColor) {
+          loadColoredSvgIcon(map, svgUrl, fColor, bannerIcon, svgUrl).catch(() => {
+            loadedIconsRef.current.delete(bannerIcon)
+          })
+        }
       }
     }
+  }, [rawGeojson])
 
-    for (const [url, color] of iconColors) {
-      if (loadedIconsRef.current.has(url)) continue
-      loadedIconsRef.current.add(url)
+  // Charger dynamiquement les icônes bannières pour les overrides (changement de faction)
+  useEffect(() => {
+    const map = mapRef.current?.getMap()
+    if (!map || !factionColorMode || placeOverrides.size === 0 || !rawGeojson) return
 
-      loadColoredSvgIcon(map, url, color).catch(() => {
-        loadedIconsRef.current.delete(url)
+    for (const [placeId, ov] of placeOverrides) {
+      if (!ov.tagColor) continue
+      const feature = rawGeojson.features.find(f => f.properties.id === placeId)
+      if (!feature?.properties.tagIcon) continue
+      const bannerKey = `faction::${feature.properties.tagIcon}::${ov.tagColor}`
+      if (loadedIconsRef.current.has(bannerKey)) continue
+      loadedIconsRef.current.add(bannerKey)
+      loadColoredSvgIcon(map, feature.properties.tagIcon, ov.tagColor, bannerKey, feature.properties.tagIcon).catch(() => {
+        loadedIconsRef.current.delete(bannerKey)
       })
     }
-  }, [rawGeojson])
+  }, [placeOverrides, factionColorMode, rawGeojson])
 
   // Charger les bannières faction + tuiles pattern dans MapLibre
   const loadedPatternsRef = useRef(new Set<string>())
@@ -601,28 +628,44 @@ export const ExploreMap = memo(function ExploreMap() {
     })
   }, [setTerritoryHover])
 
-  // Apply placeOverrides to geojson for icon/badge rendering (fortification, faction, etc.)
+  // Apply placeOverrides + factionColorMode to geojson
   const enrichedGeojson = useMemo(() => {
-    if (!geojson || placeOverrides.size === 0) return geojson
+    if (!geojson) return geojson
+    const needsEnrich = placeOverrides.size > 0 || factionColorMode
+    if (!needsEnrich) return geojson
     return {
       ...geojson,
       features: geojson.features.map(f => {
         const ov = placeOverrides.get(f.properties.id)
-        if (!ov) return f
-        return {
-          ...f,
-          properties: {
-            ...f.properties,
-            ...(ov.fortificationLevel !== undefined && { fortificationLevel: ov.fortificationLevel }),
-            ...(ov.factionId !== undefined && { factionId: ov.factionId }),
-            ...(ov.tagColor !== undefined && { tagColor: ov.tagColor }),
-            ...(ov.factionPattern !== undefined && { factionPattern: ov.factionPattern }),
-            ...(ov.score !== undefined && { score: ov.score }),
-          },
+        const props = { ...f.properties }
+        if (ov) {
+          if (ov.fortificationLevel !== undefined) props.fortificationLevel = ov.fortificationLevel
+          if (ov.factionId !== undefined) props.factionId = ov.factionId
+          if (ov.tagColor !== undefined) {
+            props.tagColor = ov.tagColor
+            props.dominantFactionColor = ov.tagColor
+          }
+          if (ov.factionPattern !== undefined) props.factionPattern = ov.factionPattern
+          if (ov.score !== undefined) props.score = ov.score
         }
+        // Mode bannières : icônes et cercles colorés par la faction dominante
+        if (factionColorMode) {
+          props.iconColor = props.dominantFactionColor || '#8A8A8A'
+          // Recalculer bannerIcon si la faction a changé via override
+          if (props.dominantFactionColor && props.tagIcon) {
+            const originalTagIcon = f.properties.tagIcon
+            if (originalTagIcon) {
+              const newBannerKey = `faction::${originalTagIcon}::${props.dominantFactionColor}`
+              props.tagIcon = newBannerKey
+            }
+          } else if (props.bannerIcon) {
+            props.tagIcon = props.bannerIcon
+          }
+        }
+        return { ...f, properties: props }
       }),
     }
-  }, [geojson, placeOverrides])
+  }, [geojson, placeOverrides, factionColorMode])
 
   if (!mapStyle) {
     return (
@@ -713,25 +756,25 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
-          {showFactions && <Layer {...fortBadgeLayer} />}
+          <Layer {...fortBadgeLayer} />
         </Source>
       )}
 
-      {showFactions && territories && (
+      {territories && (
         <Source id="territories" type="geojson" data={territories}>
           <Layer {...territoryFillLayer} beforeId="places-undiscovered-circle" />
           <Layer {...territoryBorderLayer} beforeId="places-undiscovered-circle" />
         </Source>
       )}
 
-      {/* Emblèmes, noms custom, labels hover — symbol layers GPU (0 DOM nodes) */}
-      {showFactions && territoryLabelsGeojson && (
+      {/* Emblèmes — visibles uniquement en mode bannières */}
+      {factionColorMode && territoryLabelsGeojson && (
         <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
           <Layer {...territoryEmblemLayer} />
         </Source>
       )}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}
-      {showFactions && zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
+      {zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
         const { customName, tagColor } = f.properties as Record<string, unknown>
         if (!customName) return null
         const [lon, lat] = (f.geometry as unknown as { coordinates: [number, number] }).coordinates
@@ -748,7 +791,7 @@ export const ExploreMap = memo(function ExploreMap() {
         )
       })}
 
-      {showFactions && territoryHoverGeojson && (
+      {territoryHoverGeojson && (
         <Source id="territory-hover-labels" type="geojson" data={territoryHoverGeojson}>
           <Layer {...territoryHoverLabelLayer} />
         </Source>

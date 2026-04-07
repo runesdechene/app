@@ -145,7 +145,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         {!loading && noEnergy && (
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
-              Pas assez d'\u00e9nergie pour une \u00e9nigme bonus (5 ⚡ requis).
+              Pas assez d'énergie pour une énigme bonus (5 ⚡ requis).
             </p>
           </div>
         )}
@@ -153,7 +153,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         {!loading && noEnigma && (
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
-              Plus d'\u00e9nigmes disponibles pour le moment.
+              Plus d'énigmes disponibles pour le moment.
             </p>
           </div>
         )}
@@ -178,7 +178,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
                         }}
                       />
                     )}
-                    H\u00e9ritage {f.adjective}
+                    Héritage {f.adjective}
                   </div>
                 )
               })()}
@@ -205,7 +205,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
               <input
                 type="text"
                 className="enigma-free-input"
-                placeholder="Votre r\u00e9ponse..."
+                placeholder="Votre réponse..."
                 value={freeAnswer}
                 onChange={e => setFreeAnswer(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}
@@ -223,33 +223,14 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         )}
 
         {result && (
-          <>
-            <EnigmaResult
-              correct={result.correct}
-              answer={result.answer}
-              explanation={result.explanation}
-              influenceGain={result.influenceGain}
-              eruditionGain={result.eruditionGain}
-              onClose={onClose}
-            />
-            {(() => {
-              const energy = usePlayerStore.getState().energy
-              const cost = 5
-              const canAfford = energy >= cost
-              return (
-                <button
-                  className={`enigma-next-btn${!canAfford ? ' enigma-next-btn-disabled' : ''}`}
-                  onClick={canAfford ? loadEnigma : undefined}
-                  disabled={!canAfford}
-                >
-                  {canAfford
-                    ? `Encore une \u00e9nigme (${cost}\u26a1)`
-                    : `Pas assez d'\u00e9nergie (${cost}\u26a1 requis)`
-                  }
-                </button>
-              )
-            })()}
-          </>
+          <EnigmaResult
+            correct={result.correct}
+            answer={result.answer}
+            explanation={result.explanation}
+            influenceGain={result.influenceGain}
+            eruditionGain={result.eruditionGain}
+            onClose={onClose}
+          />
         )}
       </div>
     </div>

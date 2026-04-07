@@ -31,7 +31,6 @@
   max-height: calc(100vh - 70px);
   border-radius: 20px;
   background-color: var(--color-parchment);
-  border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 20px 60px rgba(74, 55, 40, 0.3);
   z-index: 20;
   opacity: 0;
@@ -527,7 +526,8 @@
   border: 2px dashed var(--color-parchment-dark);
   border-radius: 8px;
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
   color: var(--color-ink-light);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;

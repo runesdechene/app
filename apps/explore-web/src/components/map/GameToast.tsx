@@ -15,6 +15,10 @@ const ICONS: Record<GameToastType['type'], string> = {
   new_user: '\uD83D\uDC64',  // silhouette
   like: '\u2764\uFE0F',      // coeur
   fortify: '\uD83D\uDEE1\uFE0F', // bouclier
+  contribute: '\uD83D\uDCD5', // livre fermé rouge (récit/photo)
+  revisit: '\uD83D\uDD04',   // flèches rotation (re-exploration)
+  enigma: '\uD83D\uDD2E',  // boule de cristal (érudition)
+  influence: '\uD83C\uDFF4',  // drapeau noir (influence)
 }
 
 function formatTimeAgo(ts: number): string {
@@ -105,23 +109,28 @@ function ToastItem({ toast }: { toast: GameToastType }) {
   const highlightColors = new Map<string, string>()
 
   // Nom du joueur → ouvrir profil + couleur faction
+  // Convention: quand actorId est set, highlights[0] = nom du joueur
   if (toast.actorId && highlights.length > 0) {
     const actorName = highlights[0]
     actions.set(actorName, () => setSelectedPlayerId(toast.actorId!))
     if (toast.color) highlightColors.set(actorName, toast.color)
   }
 
-  // Nom du lieu → fly to + ouvrir panel + fermer panel mobile
-  if (toast.placeId && toast.placeLocation && highlights.length > 1) {
-    const placeHL = highlights[1]
-    actions.set(placeHL, () => {
-      useMobileNavStore.getState().closePanel()
-      requestFlyTo({
-        lng: toast.placeLocation!.longitude,
-        lat: toast.placeLocation!.latitude,
-        placeId: toast.placeId,
+  // Nom du lieu → fly to + ouvrir panel
+  // Le lieu est highlights[1] quand il y a un acteur, ou highlights[0] quand c'est un toast self sans actorId
+  if (toast.placeId && toast.placeLocation) {
+    const placeIdx = toast.actorId ? 1 : 0
+    if (highlights.length > placeIdx) {
+      const placeHL = highlights[placeIdx]
+      actions.set(placeHL, () => {
+        useMobileNavStore.getState().closePanel()
+        requestFlyTo({
+          lng: toast.placeLocation!.longitude,
+          lat: toast.placeLocation!.latitude,
+          placeId: toast.placeId,
+        })
       })
-    })
+    }
   }
 
   // Ancien controleur → ouvrir profil + couleur faction
@@ -133,22 +142,27 @@ function ToastItem({ toast }: { toast: GameToastType }) {
 
   return (
     <div
-      className="game-toast"
-      style={{ borderLeftColor: toast.color || 'var(--color-sepia)' }}
+      className={`game-toast${toast.type === 'contribute' || toast.type === 'new_place' ? ' game-toast-content' : ''}`}
+      style={toast.type === 'contribute' || toast.type === 'new_place' ? { borderLeftColor: toast.color || 'var(--color-sepia)' } : undefined}
     >
       {toast.contested ? (
-        <span className="game-toast-faction-dot game-toast-contested">
+        <span className="game-toast-icon-bubble">
           {'\uD83D\uDD25'}
         </span>
-      ) : toast.iconUrl ? (
-        <span
-          className="game-toast-faction-dot"
-          style={{ background: toast.color || 'var(--color-sepia)' }}
-        >
-          <img src={toast.iconUrl} alt="" className="game-toast-faction-icon" />
-        </span>
+      ) : toast.type === 'new_user' ? (
+        toast.actorAvatarUrl ? (
+          <img
+            src={toast.actorAvatarUrl}
+            alt=""
+            className="game-toast-avatar"
+                      />
+        ) : (
+          <span className="game-toast-avatar-fallback" style={{ borderColor: toast.color || 'var(--color-sepia)' }}>
+            {'\uD83D\uDC64'}
+          </span>
+        )
       ) : (
-        <span className="game-toast-icon">{ICONS[toast.type]}</span>
+        <span className="game-toast-icon-bubble">{ICONS[toast.type]}</span>
       )}
       <span className="game-toast-message">
         {highlights.length > 0 ? renderMessage(toast.message, highlights, actions, highlightColors) : toast.message}
@@ -165,11 +179,29 @@ function ToastItem({ toast }: { toast: GameToastType }) {
   )
 }
 
+const AUTO_DISMISS_MS = 60 * 60 * 1000 // 1h
+
 export function GameToast() {
   const toasts = useToastStore(s => s.toasts)
+  const removeToast = useToastStore(s => s.removeToast)
   const containerRef = useRef<HTMLDivElement>(null)
   const [minimized, setMinimized] = useState(false)
+  const [, setTick] = useState(0)
   const mobilePanel = useMobileNavStore(s => s.activePanel)
+
+  // Rafraîchir les timestamps toutes les 30s
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 30_000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Auto-dismiss des toasts de plus d'1h
+  useEffect(() => {
+    const now = Date.now()
+    for (const t of toasts) {
+      if (now - t.timestamp > AUTO_DISMISS_MS) removeToast(t.id)
+    }
+  }, [toasts, removeToast])
 
   // Sur desktop : auto-scroll vers le bas quand un nouveau toast arrive
   // Sur mobile : pas besoin, l'ordre est inversé (récent en haut)

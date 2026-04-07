@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from './lib/supabase'
 import { ExploreMap } from './components/map/ExploreMap'
 import { EnergyIndicator } from './components/map/EnergyIndicator'
+import { InfluenceBadge } from './components/map/InfluenceBadge'
 import { PlacePanel } from './components/places/PlacePanel'
 import { AuthModal } from './components/auth/AuthModal'
 import { FactionModal } from './components/auth/FactionModal'
 import { OnboardingModal } from './components/auth/OnboardingModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
-import { AbilityBar } from './components/map/AbilityBar'
-import { GameModeModal } from './components/auth/GameModeModal'
 import { ConquestToggle } from './components/map/ConquestToggle'
 import { InfoModal } from './components/map/InfoModal'
 import { GameToast } from './components/map/GameToast'
@@ -32,7 +30,9 @@ import { MobileNavbar } from './components/map/MobileNavbar'
 import { MobileHeader } from './components/map/MobileHeader'
 import { useMobileNavStore } from './stores/mobileNavStore'
 import { AdScreen } from './components/map/AdScreen'
-import { DailyEnigma, EnigmaChestButton } from './components/enigma/DailyEnigma'
+import { DailyEnigma } from './components/enigma/DailyEnigma'
+import { EnigmaChestButton } from './components/enigma/EnigmaChestButton'
+import { FragmentEnigma } from './components/enigma/FragmentEnigma'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 import './styles/mobile.css'
@@ -41,8 +41,7 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
   const glory = usePlayerStore(s => s.glory)
   const explorationPoints = usePlayerStore(s => s.explorationPoints)
   const eruditionPoints = usePlayerStore(s => s.eruditionPoints)
-  const notoriety = usePlayerStore(s => s.notorietyPoints)
-  const displayGlory = glory > 0 ? glory : notoriety
+  const displayGlory = glory
   const [showInfo, setShowInfo] = useState(false)
 
   return (
@@ -68,7 +67,7 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
             { label: 'Gloire totale', value: String(displayGlory), highlight: true },
             { label: 'Exploration', value: `${explorationPoints} pts` },
             { label: 'érudition', value: `${eruditionPoints} pts` },
-            { label: 'Changer d\'Héritage', value: 'Gloire / 2' },
+            { label: 'Changer d\'Héritage', value: '1 fois / 30 jours' },
           ]}
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
@@ -86,34 +85,20 @@ function App() {
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [showGameModeModal, setShowGameModeModal] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
-  const [enigmaAnsweredToday, setEnigmaAnsweredToday] = useState(false)
+  const [fragmentEnigma, setFragmentEnigma] = useState<{ fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null>(null)
 
   const userId = usePlayerStore(s => s.userId)
-
-  // Check if daily enigma already answered (on load + after userId available)
-  useEffect(() => {
-    if (!userId) return
-    supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
-      const d = data as { isBonus?: boolean; error?: string } | null
-      if (d?.isBonus || d?.error === 'not_enough_energy') setEnigmaAnsweredToday(true)
-    })
-  }, [userId])
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userName = usePlayerStore(s => s.userName)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
-
-  // Mode de jeu (exploration masque toute l'UI faction)
-  const gameMode = usePlayerStore(s => s.gameMode)
-  const isConquestMode = gameMode === 'conquest'
 
   // Le FAB "+" n'est visible que si un titre débloqué contient 'add_place'
   const unlockedTitles = usePlayerStore(s => s.unlockedGeneralTitles)
@@ -164,7 +149,7 @@ function App() {
       {!addPlaceMode && !authLoading && isAuthenticated && (
         <div className="conquest-area">
           <ConquestToggle />
-          {isConquestMode && <FactionBar />}
+          <FactionBar />
         </div>
       )}
       {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
@@ -184,7 +169,7 @@ function App() {
           className="desktop-shop-button"
         >
           <img src={shopIcon} alt="" className="desktop-shop-icon" />
-          <span>Revenir à la Boutique</span>
+          <span>Visiter la Boutique officielle</span>
         </a>
       )}
 
@@ -193,10 +178,11 @@ function App() {
         <div className="app-toolbar" style={showAdScreen ? { visibility: 'hidden' } : undefined}>
           {!authLoading && isAuthenticated && (
             <>
-              {isConquestMode && <NotorietyBadge onClick={() => setShowLeaderboard(true)} />}
+              <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
+              <InfluenceBadge />
               <EnigmaChestButton
-                onClick={() => setShowDailyEnigma(true)}
-                hasAnsweredToday={enigmaAnsweredToday}
+                onOpenDaily={() => setShowDailyEnigma(true)}
+                onOpenFragment={(f) => setFragmentEnigma(f)}
               />
               <EnergyIndicator />
             </>
@@ -216,9 +202,6 @@ function App() {
           )}
         </div>
       )}
-
-      {/* Barre de compétences */}
-      {!authLoading && isAuthenticated && userId && !addPlaceMode && <AbilityBar />}
 
       {/* FAB Ajouter un lieu — toujours visible, verrouille si pas le titre */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
@@ -253,7 +236,11 @@ function App() {
 
       {/* Daily Enigma modal */}
       {showDailyEnigma && (
-        <DailyEnigma onClose={() => { setShowDailyEnigma(false); setEnigmaAnsweredToday(true) }} />
+        <DailyEnigma onClose={() => setShowDailyEnigma(false)} />
+      )}
+
+      {fragmentEnigma && (
+        <FragmentEnigma fragment={fragmentEnigma} onClose={() => setFragmentEnigma(null)} />
       )}
 
       {/* Flow ajout de lieu (immersif) */}
@@ -290,28 +277,13 @@ function App() {
       {showOnboarding && (
         <OnboardingModal onComplete={() => {
           setShowOnboarding(false)
-          setShowGameModeModal(true)
-        }} />
-      )}
-
-      {showGameModeModal && (
-        <GameModeModal onComplete={(mode) => {
-          setShowGameModeModal(false)
-          if (mode === 'conquest') {
-            setShowFactionModal(true)
-          }
+          setShowFactionModal(true)
         }} />
       )}
 
       {showFactionModal && (
         <FactionModal
-          onClose={(joined) => {
-            setShowFactionModal(false)
-            if (!joined && gameMode === 'conquest' && !userFactionId) {
-              // Pas de faction choisie en mode conquete → repasser en exploration
-              usePlayerStore.getState().setGameMode('exploration')
-            }
-          }}
+          onClose={() => setShowFactionModal(false)}
           currentFactionId={userFactionId}
         />
       )}

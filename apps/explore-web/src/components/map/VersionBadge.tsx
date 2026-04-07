@@ -2,15 +2,35 @@ import { useState } from 'react'
 import changelogRaw from '../../../CHANGELOG.md?raw'
 import './VersionBadge.css'
 
+/**
+ * Render bold/italic from our own CHANGELOG.md (trusted source, not user input).
+ * Uses React elements instead of dangerouslySetInnerHTML.
+ */
 function renderMarkdown(text: string) {
-  const html = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  return <span dangerouslySetInnerHTML={{ __html: html }} />
+  const parts: (string | JSX.Element)[] = []
+  const re = /\*\*(.+?)\*\*|\*(.+?)\*/g
+  let lastIndex = 0
+  let key = 0
+  let match: RegExpExecArray | null
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
+    if (match[1]) parts.push(<strong key={key++}>{match[1]}</strong>)
+    else if (match[2]) parts.push(<em key={key++}>{match[2]}</em>)
+    lastIndex = re.lastIndex
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return <>{parts}</>
 }
+
+type LineEntry =
+  | { type: 'bullet'; text: string }
+  | { type: 'paragraph'; text: string }
+  | { type: 'heading'; text: string }
 
 interface VersionBlock {
   version: string
   title: string
-  lines: string[]
+  lines: LineEntry[]
 }
 
 function parseChangelog(raw: string): VersionBlock[] {
@@ -24,8 +44,12 @@ function parseChangelog(raw: string): VersionBlock[] {
       blocks.push(current)
     } else if (trimmed.startsWith('## ') && current) {
       current.title = trimmed.slice(3).trim()
+    } else if (trimmed.startsWith('### ') && current) {
+      current.lines.push({ type: 'heading', text: trimmed.slice(4).trim() })
     } else if (trimmed.startsWith('- ') && current) {
-      current.lines.push(trimmed.slice(2).trim())
+      current.lines.push({ type: 'bullet', text: trimmed.slice(2).trim() })
+    } else if (trimmed.length > 0 && current) {
+      current.lines.push({ type: 'paragraph', text: trimmed })
     }
   }
 
@@ -66,22 +90,26 @@ export function VersionBadge() {
               </button>
             </div>
             {current.title && <h3 className="version-modal-title">{current.title}</h3>}
-            <ul className="version-modal-list">
-              {current.lines.map((line, i) => (
-                <li key={i}>{renderMarkdown(line)}</li>
-              ))}
-            </ul>
+            <div className="version-modal-content">
+              {current.lines.map((entry, i) => {
+                if (entry.type === 'heading') return <h4 key={i} className="version-modal-section">{entry.text}</h4>
+                if (entry.type === 'paragraph') return <p key={i} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
+                return <p key={i} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
+              })}
+            </div>
 
             {versions.length > 1 && (
               <div className="version-modal-history">
                 {versions.slice(1, 4).map((v, i) => (
                   <details key={i}>
                     <summary>{v.version}{v.title ? ` — ${v.title}` : ''}</summary>
-                    <ul>
-                      {v.lines.map((line, j) => (
-                        <li key={j}>{renderMarkdown(line)}</li>
-                      ))}
-                    </ul>
+                    <div className="version-modal-content">
+                      {v.lines.map((entry, j) => {
+                        if (entry.type === 'heading') return <h4 key={j} className="version-modal-section">{entry.text}</h4>
+                        if (entry.type === 'paragraph') return <p key={j} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
+                        return <p key={j} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
+                      })}
+                    </div>
                   </details>
                 ))}
               </div>

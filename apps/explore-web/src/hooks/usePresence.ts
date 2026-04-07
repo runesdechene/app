@@ -62,6 +62,7 @@ export function usePresence() {
               message: `${payload.name} vient de se connecter`,
               highlights: [payload.name],
               actorId: payload.userId,
+              actorAvatarUrl: payload.avatarUrl ?? undefined,
               color: payload.factionColor ?? undefined,
               iconUrl: payload.factionPattern ?? undefined,
               timestamp: Date.now(),

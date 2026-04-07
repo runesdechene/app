@@ -204,3 +204,83 @@
   }
 }
 
+/* Betrayal confirmation popup */
+.influence-betrayal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.influence-betrayal-dialog {
+  background: var(--color-parchment);
+  border: 2px solid #c9a96e;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 280px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.influence-betrayal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.influence-betrayal-actions button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #c9a96e;
+  background: var(--color-parchment);
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-ink);
+}
+
+.influence-betrayal-actions button:last-child {
+  background: #8b0000;
+  color: #fff;
+  border-color: #8b0000;
+}
+
+/* Hint box — comment gagner de l'influence */
+.influence-frame-hint {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px dashed #c9a96e;
+  border-radius: 6px;
+}
+
+.influence-frame-hint-title {
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.influence-frame-hint-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--color-ink);
+  opacity: 0.8;
+}
+

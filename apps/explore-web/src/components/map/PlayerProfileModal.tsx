@@ -41,6 +41,7 @@ interface PlayerProfile {
   explorationPoints?: number
   eruditionPoints?: number
   influenceStock?: number
+  influencePlaced?: number
   glory?: number
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
@@ -81,7 +82,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [visibleCount, setVisibleCount] = useState(12)
   const [showFactionMembers, setShowFactionMembers] = useState(false)
   const [showFragmentStore, setShowFragmentStore] = useState(false)
-  const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; bonus_type: string | null; bonus_value: number; ability_type: string | null; owned: boolean }>>([])
+  const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null; owned: boolean }>>([])
   const [loadingFragments, setLoadingFragments] = useState(false)
   const [showTitlePicker, setShowTitlePicker] = useState(false)
   const [titleCategories, setTitleCategories] = useState<{
@@ -92,7 +93,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [playerStats, setPlayerStats] = useState<Record<string, number>>({})
   const [selectedTitleIds, setSelectedTitleIds] = useState<number[]>([])
   const [savingTitles, setSavingTitles] = useState(false)
-  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number; ability_type: string | null }>>([])
+  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null }>>([])
 
   const isSelf = profile?.userId === currentUserId
 
@@ -109,7 +110,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         setEditInstagram(p.instagram ?? '')
       }
       if (fragmentsRes.data && Array.isArray(fragmentsRes.data)) {
-        setPlayerFragments(fragmentsRes.data as Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; bonus_type: string | null; bonus_value: number; ability_type: string | null }>)
+        setPlayerFragments(fragmentsRes.data as typeof playerFragments)
       }
       setLoading(false)
     }
@@ -367,19 +368,21 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
                 <div className="player-modal-faction-row">
                   <span className="player-modal-notoriety">
-                    {'\uD83C\uDF96\uFE0F'} {profile.glory ?? profile.notorietyPoints} Gloire
+                    {'\uD83C\uDF96\uFE0F'} {profile.glory ?? 0} Gloire
+                    {(profile.explorationPoints != null || profile.eruditionPoints != null) && (
+                      <span style={{ fontSize: '0.75em', opacity: 0.7, marginLeft: 6 }}>
+                        ({'\uD83E\uDDED'} {profile.explorationPoints ?? 0} exploration + {'\uD83D\uDCD6'} {profile.eruditionPoints ?? 0} erudition)
+                      </span>
+                    )}
                   </span>
                 </div>
-                {(profile.explorationPoints != null || profile.eruditionPoints != null) && (
+                {(profile.influenceStock != null || (profile.influencePlaced != null && profile.influencePlaced > 0)) && (
                   <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 12, opacity: 0.8 }}>
-                    {profile.explorationPoints != null && (
-                      <span>{'\uD83E\uDDED'} {profile.explorationPoints} Exploration</span>
-                    )}
-                    {profile.eruditionPoints != null && (
-                      <span>{'\uD83D\uDCD6'} {profile.eruditionPoints} \u00c9rudition</span>
-                    )}
                     {profile.influenceStock != null && (
-                      <span>{'\uD83C\uDFF4'} {profile.influenceStock} Influence</span>
+                      <span>{'\uD83C\uDFF4'} {profile.influenceStock} influence a placer</span>
+                    )}
+                    {profile.influencePlaced != null && profile.influencePlaced > 0 && (
+                      <span>{'\uD83C\uDF1F'} {profile.influencePlaced} influence placee</span>
                     )}
                   </div>
                 )}
@@ -482,8 +485,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             )}
             </div>
 
-            {/* Fragments possedes — badges ronds compacts */}
+            {/* Fragments possedes */}
+            {(playerFragments.length > 0 || isSelf) && (
             <div className="player-modal-fragments">
+              <p className="player-modal-fragments-title">Fragments collectés</p>
               <div className="player-modal-fragments-wrapper">
                 {playerFragments.length > 4 && (
                   <button
@@ -495,43 +500,48 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   >&#8249;</button>
                 )}
               <div className="player-modal-fragments-row">
-                {playerFragments.map(f => {
-                  const ABILITY_LABELS: Record<string, string> = {
-                    free_discover: '🔍 1x/j',
-                    free_claim: '🛡️ 1x/j',
-                    double_glory: '🏅 x2/j',
-                    distance_ignore: '📍 0/j',
-                  }
-                  const bonusLabel = f.bonus_type && f.bonus_value
-                    ? `${f.bonus_value > 0 ? '+' : ''}${f.bonus_value} ${f.bonus_type.replace('max_energy', '⚡ max').replace('regen_energy', '% regen ⚡').replace('max_conquest', '⚡ max').replace('max_construction', '⚡ max').replace('regen_conquest', '% regen ⚡').replace('regen_construction', '% regen ⚡').replace('max_vitalite', '⚡ max').replace('regen_vitalite', '% regen ⚡')}`
-                    : null
-                  const abilityLabel = f.ability_type ? ABILITY_LABELS[f.ability_type] ?? null : null
-                  return (
+                {playerFragments.map(f => (
                     <div
                       key={f.id}
                       className="player-modal-fragment-badge"
                       onClick={openFragmentCollection}
-                      style={{ position: 'relative' }}
                     >
                       {f.image_url ? (
                         <img src={f.image_url} alt={f.name} className="player-modal-fragment-badge-img" />
                       ) : (
                         <span className="player-modal-fragment-badge-icon">{f.icon ?? '?'}</span>
                       )}
-                      {(bonusLabel || abilityLabel) && (
-                        <span className="player-modal-fragment-bonus">
-                          {bonusLabel}{bonusLabel && abilityLabel ? ' · ' : ''}{abilityLabel}
-                        </span>
+                      <span className="player-modal-fragment-name">{f.name}</span>
+                      {f.affinities && f.affinities.length > 0 && (
+                        <div className="player-modal-fragment-tags">
+                          {f.affinities.map(a => (
+                            <span
+                              key={a.tagId}
+                              className="player-modal-fragment-tag-dot"
+                              style={{ background: a.tagColor }}
+                              title={`+${a.bonusPoints}/j 🏴 ${a.tagTitle}`}
+                            >
+                              {a.tagIcon && <img src={a.tagIcon} alt="" />}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
-                  )
-                })}
-                {isSelf && (
+                ))}
+                {isSelf && playerFragments.length > 0 && (
                   <button
                     className="player-modal-fragment-badge player-modal-fragment-badge-add"
                     onClick={openFragmentCollection}
                   >
                     +
+                  </button>
+                )}
+                {isSelf && playerFragments.length === 0 && (
+                  <button
+                    className="player-modal-fragment-cta"
+                    onClick={openFragmentCollection}
+                  >
+                    + S'équiper de mon premier fragment
                   </button>
                 )}
               </div>
@@ -546,6 +556,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 )}
               </div>
             </div>
+            )}
 
             {/* Places tabs */}
             <div className="player-modal-places">
@@ -622,9 +633,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         <div className="player-modal-overlay" onClick={() => setShowFragmentStore(false)} style={{ zIndex: 10002 }}>
           <div className="player-modal fragment-collection-modal" onClick={e => e.stopPropagation()}>
             <button className="player-modal-close" onClick={() => setShowFragmentStore(false)}>&#10005;</button>
-            <h3 className="fragment-collection-title">Vos fragments</h3>
+            <h3 className="fragment-collection-title">Fragments disponibles</h3>
             <p className="fragment-collection-subtitle">
-              Chez Runes de Chêne, nos illustrations originales sont appelées <b>Fragments</b>. Achetée sur la <u><a href="https://runesdechene.com"><b>Boutique officielle</b></a></u>, elles augmentent vos compétences.
+              Chez Runes de Chêne, nos illustrations originales sont appelées <b>Fragments</b>. Achetées sur la <u><a href="https://runesdechene.com"><b>Boutique officielle</b></a></u>, elles augmentent votre limite d'influence a distance sur les lieux associes <b>ET</b> vous offrent des 🔮 énigmes thématiques supplémentaires toutes les 48h.
             </p>
 
             {loadingFragments ? (
@@ -644,22 +655,24 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     <div className="frag-grid-info">
                       <h3 className="frag-grid-name">{f.name}</h3>
                       {f.description && <p className="frag-grid-desc">{f.description}</p>}
-                      {f.bonus_type && f.bonus_value !== 0 && (
-                        <span className="frag-grid-bonus">
-                          {f.bonus_value > 0 ? '+' : ''}{f.bonus_value} {f.bonus_type.replace('max_energy', '⚡ max').replace('regen_energy', '% regen ⚡').replace('max_conquest', '⚡ max').replace('max_construction', '⚡ max').replace('regen_conquest', '% regen ⚡').replace('regen_construction', '% regen ⚡').replace('max_vitalite', '⚡ max').replace('regen_vitalite', '% regen ⚡')}
-                        </span>
-                      )}
-                      {f.ability_type && (
-                        <span className="frag-grid-bonus">
-                          {f.ability_type === 'free_discover' && '🔍 Découverte gratuite 1x/jour'}
-                          {f.ability_type === 'free_claim' && '🛡️ Protection gratuite 1x/jour'}
-                          {f.ability_type === 'double_glory' && '🏅 Double Gloire 1x/jour'}
-                          {f.ability_type === 'distance_ignore' && '📍 Ignorer la distance 1x/jour'}
-                        </span>
+                      {f.affinities && f.affinities.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+                          {f.affinities.map(a => (
+                            <span key={a.tagId} className="frag-grid-bonus" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                width: 18, height: 18, borderRadius: '50%', background: a.tagColor, flexShrink: 0,
+                              }}>
+                                {a.tagIcon && <img src={a.tagIcon} alt="" style={{ width: 11, height: 11, filter: 'brightness(0) invert(1)' }} />}
+                              </span>
+                              <span>+{a.bonusPoints}/j 🏴 {a.tagTitle}</span>
+                            </span>
+                          ))}
+                        </div>
                       )}
                       {f.link_url && (
                         <button className="frag-grid-shop-btn" onClick={() => window.open(f.link_url!, '_blank', 'noopener,noreferrer')}>
-                          <img src={shopIcon} alt="" style={{ width: 14, height: 14, verticalAlign: 'middle', marginRight: 4, display: 'inline' }} />Acheter
+                          <img src={shopIcon} alt="" style={{ width: 14, height: 14, verticalAlign: 'middle', marginRight: 4, display: 'inline' }} />Découvrir la collection
                         </button>
                       )}
                     </div>
@@ -669,7 +682,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             )}
 
             <div style={{ padding: '12px 0 0', textAlign: 'center' }}>
-              <a href="https://hub.runesdechene.com/soumettre-contenu" target="_blank" rel="noopener noreferrer" style={{ color: '#8A7B6A', fontSize: 11, textDecoration: 'none' }}>
+              <a href="https://hub.runesdechene.com/soumettre-contenu" target="_blank" rel="noopener noreferrer" style={{ color: '#8A7B6A', fontSize: 16, textDecoration: 'none' }}>
                 J'ai deja achete — Reclamer mes fragments
               </a>
             </div>

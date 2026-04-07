@@ -48,7 +48,6 @@ export function usePlayer() {
   const setConquestNextPointIn = usePlayerStore(s => s.setConquestNextPointIn)
   const setConstructionPoints = usePlayerStore(s => s.setConstructionPoints)
   const setConstructionNextPointIn = usePlayerStore(s => s.setConstructionNextPointIn)
-  const setNotorietyPoints = usePlayerStore(s => s.setNotorietyPoints)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
@@ -58,7 +57,6 @@ export function usePlayer() {
       setConquestNextPointIn(0)
       setConstructionPoints(0)
       setConstructionNextPointIn(0)
-      setNotorietyPoints(0)
       setUserFactionId(null)
       setUserFactionColor(null)
       setUserFactionTitle(null)
@@ -177,11 +175,6 @@ export function usePlayer() {
           maxVitalite: number
           vitaliteNextPointIn: number
           vitaliteCycle: number
-          notorietyPoints: number
-          bonusEnergy: number
-          bonusConquest: number
-          bonusConstruction: number
-          bonusVitalite: number
         }
         setEnergy(ed.energy)
         setNextPointIn(ed.nextPointIn ?? 0)
@@ -189,7 +182,6 @@ export function usePlayer() {
         setConquestNextPointIn(ed.conquestNextPointIn ?? 0)
         setConstructionPoints(ed.constructionPoints ?? 0)
         setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
-        setNotorietyPoints(ed.notorietyPoints ?? 0)
         usePlayerStore.setState({
           maxEnergy: ed.maxEnergy ?? 5,
           maxConquest: ed.maxConquest ?? 5,
@@ -197,21 +189,16 @@ export function usePlayer() {
           energyCycle: ed.energyCycle ?? 7200,
           conquestCycle: ed.conquestCycle ?? 14400,
           constructionCycle: ed.constructionCycle ?? 14400,
-          bonusEnergy: ed.bonusEnergy ?? 0,
-          bonusConquest: ed.bonusConquest ?? 0,
-          bonusConstruction: ed.bonusConstruction ?? 0,
           vitalitePoints: ed.vitalitePoints ?? 0,
           maxVitalite: ed.maxVitalite ?? 5,
           vitaliteNextPointIn: ed.vitaliteNextPointIn ?? 0,
           vitaliteCycle: ed.vitaliteCycle ?? 14400,
-          bonusVitalite: ed.bonusVitalite ?? 0,
         })
       }
       if (profileRes.data) {
         const profile = profileRes.data as {
           role?: string
           profileImage?: { url: string } | null
-          gameMode?: string
           explorationPoints?: number
           eruditionPoints?: number
           influenceStock?: number
@@ -219,8 +206,6 @@ export function usePlayer() {
         }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
-        const gm = profile.gameMode === 'conquest' ? 'conquest' : 'exploration'
-        usePlayerStore.setState({ gameMode: gm })
         // V0.5 fields
         if (profile.explorationPoints != null) {
           usePlayerStore.getState().setExplorationPoints(profile.explorationPoints)
@@ -293,19 +278,29 @@ export function usePlayer() {
               previousActorId?: string
               previousActorName?: string
               gloryGain?: number
+              contributionType?: string
+              points?: number
+              influenceGain?: number
+              eruditionGain?: number
+              enigmaType?: string
+              difficulty?: string
+              actorAvatarUrl?: string
             }
           }
 
-          // Ignorer ses propres actions (sauf likes)
+          // Ignorer ses propres actions (sauf likes et enigma_success)
           const isSelf = e.actor_id === currentUserId
-          if (isSelf && e.type !== 'like') return
+          if (isSelf && e.type !== 'like' && e.type !== 'enigma_success') return
+          // Ignorer le tracking interne fragment_enigma (pas un toast)
+          if (e.type === 'fragment_enigma') return
 
           const name = isSelf ? 'Vous' : (e.data?.actorName || 'Quelqu\'un')
           const place = e.data?.placeTitle || 'un lieu'
+          const actorAvatarUrl = e.data?.actorAvatarUrl ?? undefined
           let message = ''
           let type: GameToast['type'] = 'discover'
           const highlights: string[] = [name]
-          let color: string | undefined
+          let color: string | undefined = e.data?.factionColor ?? undefined
           let iconUrl: string | undefined
           let contested = false
 
@@ -313,23 +308,20 @@ export function usePlayer() {
             type = 'claim'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
-            const glory = e.data?.gloryGain ? ` 🎖️ +${e.data.gloryGain}` : ''
-            // Notification spéciale si l'ancien contrôleur c'est nous
             const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
             if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
-              message = `${name} a pris le flambeau sur ${place}${glory}`
+              message = `${name} a pris le flambeau sur ${place}`
               contested = true
             } else if (prevName) {
-              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}${glory}`
+              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
               contested = true
             } else {
-              message = `${name} veille à présent sur ${place}${glory}`
+              message = `${name} veille à présent sur ${place}`
             }
             highlights.push(place)
             if (prevName && e.data?.previousClaimedBy !== currentUserId) {
               highlights.push(prevName)
             }
-            // Mettre à jour la carte en temps réel
             if (e.place_id && e.faction_id) {
               useMapStore.getState().setPlaceOverride(e.place_id, {
                 claimed: true,
@@ -359,6 +351,36 @@ export function usePlayer() {
           } else if (e.type === 'new_user') {
             message = `${name} a rejoint la carte`
             type = 'new_user'
+          } else if (e.type === 'contribute') {
+            const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
+            message = `${name} a ajouté ${contribType} sur ${place}`
+            highlights.push(place)
+            type = 'contribute'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
+          } else if (e.type === 'revisit_gps') {
+            const gain = e.data?.influenceGain ?? 0
+            message = `${name} est de retour sur ${place} (+${gain} influence)`
+            highlights.push(place)
+            type = 'revisit'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
+          } else if (e.type === 'enigma_success') {
+            const erudGain = e.data?.eruditionGain ?? 0
+            const infGain = e.data?.influenceGain ?? 0
+            if (isSelf) {
+              message = `Enigme réussie ! +${erudGain} érudition, +${infGain} influence`
+            } else {
+              message = `${name} a résolu une énigme (+${erudGain} érudition)`
+            }
+            type = 'enigma'
+          } else if (e.type === 'place_influence') {
+            const pts = e.data?.points ?? 1
+            message = `${name} a placé ${pts} influence sur ${place}`
+            highlights.push(place)
+            type = 'influence'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
           } else {
             return
           }
@@ -372,6 +394,7 @@ export function usePlayer() {
             iconUrl,
             contested,
             actorId: e.actor_id ?? undefined,
+            actorAvatarUrl,
             previousActorId: e.data?.previousClaimedBy ?? undefined,
             placeId: e.place_id ?? undefined,
             placeLocation: hasLocation
@@ -425,6 +448,13 @@ async function loadRecentActivity(currentUserId: string) {
       previousActorId?: string
       previousActorName?: string
       gloryGain?: number
+      contributionType?: string
+      points?: number
+      influenceGain?: number
+      eruditionGain?: number
+      enigmaType?: string
+      difficulty?: string
+      actorAvatarUrl?: string
     }
     created_at: string
   }>)
@@ -432,34 +462,33 @@ async function loadRecentActivity(currentUserId: string) {
 
   for (const e of recent) {
     // Ne montrer que les actions des AUTRES joueurs au chargement.
-    // Les actions "self" sont déjà affichées en temps réel pendant le jeu.
-    // Evite aussi l'inondation de toasts quand un ancien compte est migré.
     if (e.actor_id === currentUserId) continue
+    // Ignorer le tracking interne fragment_enigma
+    if (e.type === 'fragment_enigma') continue
 
     const name = e.data?.actorName || 'Quelqu\'un'
     const place = e.data?.placeTitle || 'un lieu'
+    const actorAvatarUrl = e.data?.actorAvatarUrl ?? undefined
 
     let message = ''
     let type: GameToast['type'] = 'discover'
     const highlights: string[] = []
-    let color: string | undefined
+    let color: string | undefined = e.data?.factionColor ?? undefined
     let iconUrl: string | undefined
     let contested = false
 
     if (e.type === 'claim') {
       type = 'claim'
-      color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
-      const glory = e.data?.gloryGain ? ` 🎖️ +${e.data.gloryGain}` : ''
       const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
       if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
-        message = `${name} a pris le flambeau sur ${place}${glory}`
+        message = `${name} a pris le flambeau sur ${place}`
         contested = true
       } else if (prevName) {
-        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}${glory}`
+        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
         contested = true
       } else {
-        message = `${name} veille à présent sur ${place}${glory}`
+        message = `${name} veille à présent sur ${place}`
       }
       highlights.push(name, place)
       if (prevName && e.data?.previousClaimedBy !== currentUserId && e.data?.previousActorId !== currentUserId) {
@@ -491,6 +520,32 @@ async function loadRecentActivity(currentUserId: string) {
       message = `${name} a rejoint la carte`
       highlights.push(name)
       type = 'new_user'
+    } else if (e.type === 'contribute') {
+      const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
+      message = `${name} a ajouté ${contribType} sur ${place}`
+      highlights.push(name, place)
+      type = 'contribute'
+      color = e.data?.factionColor ?? undefined
+      iconUrl = e.data?.factionPattern ?? undefined
+    } else if (e.type === 'revisit_gps') {
+      const gain = e.data?.influenceGain ?? 0
+      message = `${name} est de retour sur ${place} (+${gain} influence)`
+      highlights.push(name, place)
+      type = 'revisit'
+      color = e.data?.factionColor ?? undefined
+      iconUrl = e.data?.factionPattern ?? undefined
+    } else if (e.type === 'enigma_success') {
+      const erudGain = e.data?.eruditionGain ?? 0
+      message = `${name} a résolu une énigme (+${erudGain} érudition)`
+      highlights.push(name)
+      type = 'enigma'
+    } else if (e.type === 'place_influence') {
+      const pts = e.data?.points ?? 1
+      message = `${name} a placé ${pts} influence sur ${place}`
+      highlights.push(name, place)
+      type = 'influence'
+      color = e.data?.factionColor ?? undefined
+      iconUrl = e.data?.factionPattern ?? undefined
     } else {
       continue
     }
@@ -504,6 +559,7 @@ async function loadRecentActivity(currentUserId: string) {
       iconUrl,
       contested,
       actorId: e.actor_id ?? undefined,
+      actorAvatarUrl,
       previousActorId: e.data?.previousClaimedBy ?? undefined,
       placeId: e.place_id ?? undefined,
       placeLocation: hasLocation
@@ -565,19 +621,12 @@ export async function discoverPlace(
     p_method: method,
     p_user_lat: userPos?.lat ?? null,
     p_user_lng: userPos?.lng ?? null,
-    p_free: usePlayerStore.getState().activeBuff === 'free_discover',
-    p_glory_mult: usePlayerStore.getState().activeBuff === 'double_glory' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '2') : 1,
+    p_free: false,
+    p_glory_mult: 1,
   })
 
   if (data?.error) {
     return { success: false, error: data.error }
-  }
-
-  // Consommer le buff si actif
-  const buff = usePlayerStore.getState().activeBuff
-  if (buff === 'free_discover' || buff === 'discount_discover' || buff === 'double_glory') {
-    usePlayerStore.getState().setActiveBuff(null)
-    localStorage.removeItem('activeBuffValue')
   }
 
   // Rafraîchir l'énergie depuis le serveur (plus fiable que le calcul local)
@@ -592,12 +641,13 @@ export async function discoverPlace(
     })
   }
 
-  // Toast avec Gloire gagnée
-  const gloryGain = data?.gloryGain ?? 2
+  const explorationGain = data?.explorationGain ?? 5
+  const currentExploration = usePlayerStore.getState().explorationPoints
+  usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
 
   useToastStore.getState().addToast({
     type: 'discover',
-    message: `Nouveau lieu découvert ! 🎖️ +${gloryGain} Gloire`,
+    message: `Nouveau lieu découvert ! 🧭 +${explorationGain} Exploration`,
     timestamp: Date.now(),
   })
 

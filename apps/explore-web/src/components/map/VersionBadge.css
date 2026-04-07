@@ -96,17 +96,29 @@
   font-style: italic;
 }
 
-.version-modal-list {
+.version-modal-content {
   margin: 0 0 16px;
-  padding-left: 20px;
   font-family: var(--font-body, 'Cabin', sans-serif);
   font-size: 14px;
   color: #4A3728;
   line-height: 1.6;
 }
 
-.version-modal-list li {
-  margin-bottom: 4px;
+.version-modal-section {
+  margin: 14px 0 4px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c1810;
+}
+
+.version-modal-paragraph {
+  margin: 6px 0;
+}
+
+.version-modal-bullet {
+  margin: 3px 0;
+  padding-left: 8px;
 }
 
 .version-modal-history {

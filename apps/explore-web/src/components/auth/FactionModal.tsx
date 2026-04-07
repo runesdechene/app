@@ -32,14 +32,13 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const [confirmFaction, setConfirmFaction] = useState<string | null>(null)
 
   const userId = usePlayerStore(s => s.userId)
-  const notorietyPoints = usePlayerStore(s => s.notorietyPoints)
   const setUserFactionId = usePlayerStore(s => s.setUserFactionId)
   const setUserFactionColor = usePlayerStore(s => s.setUserFactionColor)
   const setUserFactionTitle = usePlayerStore(s => s.setUserFactionTitle)
   const setUserFactionPattern = usePlayerStore(s => s.setUserFactionPattern)
-  const setNotorietyPoints = usePlayerStore(s => s.setNotorietyPoints)
   const setDiscoveredIds = usePlayerStore(s => s.setDiscoveredIds)
   const incrementPlacesRefreshKey = useMapStore(s => s.incrementPlacesRefreshKey)
+  const [cooldownError, setCooldownError] = useState<string | null>(null)
 
   const [underdogFactionId, setUnderdogFactionId] = useState<string | null>(null)
   const [tagBonuses, setTagBonuses] = useState<Record<string, Array<{ tagTitle: string; tagIcon: string | null; tagColor: string; tagBg: string; reduction: number }>>>({})
@@ -96,9 +95,6 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         maxConstruction: d.maxConstruction ?? 5,
         constructionNextPointIn: d.constructionNextPointIn ?? 0,
         constructionCycle: d.constructionCycle ?? 14400,
-        bonusEnergy: d.bonusEnergy ?? 0,
-        bonusConquest: d.bonusConquest ?? 0,
-        bonusConstruction: d.bonusConstruction ?? 0,
       })
     }
   }
@@ -116,23 +112,32 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     if (!userId || selecting) return
     setSelecting(true)
 
-    const isChanging = currentFactionId != null && currentFactionId !== factionId
+    setCooldownError(null)
 
-    await supabase.rpc('set_user_faction', {
+    const { data } = await supabase.rpc('set_user_faction', {
       p_user_id: userId,
       p_faction_id: factionId,
     })
+
+    if (data?.error === 'cooldown') {
+      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer d'Héritage.`)
+      setConfirmFaction(null)
+      setSelecting(false)
+      return
+    }
+
+    if (data?.error) {
+      setCooldownError(data.error)
+      setConfirmFaction(null)
+      setSelecting(false)
+      return
+    }
 
     const faction = factions.find(f => f.id === factionId)
     setUserFactionId(factionId)
     setUserFactionColor(faction?.color ?? null)
     setUserFactionTitle(faction?.title ?? null)
     setUserFactionPattern(faction?.pattern ?? null)
-
-    // Diviser notoriete par 2 si changement
-    if (isChanging) {
-      setNotorietyPoints(Math.floor(notorietyPoints / 2))
-    }
 
     await reloadAfterFactionChange()
 
@@ -246,6 +251,12 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         )}
         <div className="faction-legend">
           <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
+          <span className="faction-legend-item">🧭 Exploration — Gagnée en découvrant des lieux</span>
+          <span className="faction-legend-item">📖 Érudition — Gagnée en réussissant des énigmes</span>
+          <span className="faction-legend-item">🎖️ Gloire — Exploration + Érudition, votre prestige total</span>
+          {currentFactionId && (
+            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer d'Héritage n'est possible qu'une fois tous les 30 jours</span>
+          )}
         </div>
 
         {currentFactionId && (
@@ -258,15 +269,25 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           </button>
         )}
 
+        {/* Erreur cooldown */}
+        {cooldownError && (
+          <div className="faction-confirm-overlay">
+            <div className="faction-confirm-dialog">
+              <p>{cooldownError}</p>
+              <div className="faction-confirm-actions">
+                <button onClick={() => setCooldownError(null)}>Compris</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Confirmation changement de faction */}
-        {confirmFaction && (
+        {confirmFaction && !cooldownError && (
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Etes-vous sur ? Changer d'Héritage <strong>divisera votre Gloire par 2</strong>
-                {notorietyPoints > 0 ? ` (${notorietyPoints} → ${Math.floor(notorietyPoints / 2)} points)` : ''}.
+                Êtes-vous sûr ? Changer d'Héritage n'est possible <strong>qu'une fois tous les 30 jours</strong>.
               </p>
-              <p>Cette action est irreversible.</p>
               <div className="faction-confirm-actions">
                 <button onClick={() => setConfirmFaction(null)} disabled={selecting}>
                   Annuler

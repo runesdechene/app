@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 import './InfluenceFrame.css'
 
 interface InfluenceEntry {
@@ -50,13 +51,16 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const influenceStock = usePlayerStore(s => s.influenceStock)
   const userPosition = usePlayerStore(s => s.userPosition)
-  const gameMode = usePlayerStore(s => s.gameMode)
-
   // Optimistic local score deltas (faction -> bonus points added locally)
   const [localBonus, setLocalBonus] = useState<Map<string, number>>(new Map())
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
   const [remoteUsed, setRemoteUsed] = useState(0) // clicks spent remotely on this place today
   const [shakeStock, setShakeStock] = useState(false)
+  const [betrayalConfirmed, setBetrayalConfirmed] = useState(false)
+  const [betrayalTarget, setBetrayalTarget] = useState<{ factionId: string; buttonEl: HTMLElement } | null>(null)
+
+  // Reset confirmation quand on change de lieu
+  useEffect(() => { setBetrayalConfirmed(false) }, [placeId])
 
   // Load today's remote usage for this place from activity_log
   useEffect(() => {
@@ -78,10 +82,8 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         setRemoteUsed(remoteTotal)
       })
   }, [userId, placeId])
+  const [maxRemote, setMaxRemote] = useState(5)
   const pendingRef = useRef(false)
-  const MAX_REMOTE_PER_PLACE = 5
-
-  if (gameMode !== 'conquest') return null
 
   const isGps = useMemo(() => {
     if (!userPosition) return false
@@ -89,7 +91,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
     const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.2
   }, [userPosition, placeLocation])
 
   // Build banners with local bonus applied
@@ -118,7 +120,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
   const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
     if (!userId || !userFactionId || pendingRef.current) return
-    if (influenceStock <= 0 || (!isGps && remoteUsed >= MAX_REMOTE_PER_PLACE)) {
+    if (influenceStock <= 0 || (!isGps && remoteUsed >= maxRemote)) {
       // Shake the stock indicator to signal "can't click"
       setShakeStock(true)
       setTimeout(() => setShakeStock(false), 500)
@@ -171,9 +173,27 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       // Silent rollback — header already shows the state
     } else {
       // Sync real remaining stock from server
-      const result = data as { remainingStock?: number }
+      const result = data as { remainingStock?: number; maxRemote?: number; placeInfluence?: Array<{ factionId: string; placed: number; content: number; total: number }> }
       if (result.remainingStock != null) {
         usePlayerStore.getState().setInfluenceStock(result.remainingStock)
+      }
+      if (result.maxRemote != null) {
+        setMaxRemote(result.maxRemote)
+      }
+      // Mettre à jour la carte : faction dominante
+      if (result.placeInfluence) {
+        const dominant = result.placeInfluence.reduce((best, pi) =>
+          pi.total > (best?.total ?? 0) ? pi : best, result.placeInfluence[0])
+        if (dominant) {
+          const { setPlaceOverride } = useMapStore.getState()
+          setPlaceOverride(placeId, {
+            factionId: dominant.factionId,
+            tagColor: factionColors.get(dominant.factionId) ?? undefined,
+            factionPattern: factionPatterns.get(dominant.factionId) ?? undefined,
+            claimed: true,
+            score: dominant.total,
+          })
+        }
       }
     }
 
@@ -181,7 +201,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     setTimeout(() => setPulseFaction(null), 300)
   }, [userId, userFactionId, influenceStock, placeId, userPosition])
 
-  const remoteExhausted = !isGps && remoteUsed >= MAX_REMOTE_PER_PLACE
+  const remoteExhausted = !isGps && remoteUsed >= maxRemote
   const canClick = userId && userFactionId && influenceStock > 0 && !remoteExhausted
 
   return (
@@ -196,7 +216,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
                 ? `${influenceStock} points \u2014 illimit\u00e9 sur place`
                 : remoteExhausted
                   ? 'Limite du jour atteinte sur ce lieu'
-                  : `${influenceStock} points \u2014 encore ${MAX_REMOTE_PER_PLACE - remoteUsed} clics sur ce lieu`
+                  : `${influenceStock} points \u2014 encore ${maxRemote - remoteUsed} clics sur ce lieu`
             }
           </span>
         )}
@@ -211,7 +231,14 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
             <button
               key={b.factionId}
               className={`influence-banner${isOwn ? ' influence-banner-own' : ''}${isDominant ? ' influence-banner-dominant' : ''}${isPulsing ? ' influence-banner-pulse' : ''}${b.total === 0 ? ' influence-banner-zero' : ''}`}
-              onClick={(e) => { if (canClick) handleClick(b.factionId, e.currentTarget) }}
+              onClick={(e) => {
+                if (!canClick) return
+                if (b.factionId !== userFactionId && !betrayalConfirmed) {
+                  setBetrayalTarget({ factionId: b.factionId, buttonEl: e.currentTarget })
+                  return
+                }
+                handleClick(b.factionId, e.currentTarget)
+              }}
               disabled={!canClick}
               title={`+1 influence ${b.name}`}
             >
@@ -228,6 +255,35 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
           )
         })}
       </div>
+
+      {/* Confirmation trahison */}
+      {betrayalTarget && (
+        <div className="influence-betrayal-overlay">
+          <div className="influence-betrayal-dialog">
+            <p>Tiens, vous soutenez un autre Heritage ? Un agent double, c'est intéressant 👀</p>
+            <p style={{ fontSize: '0.85em', opacity: 0.7 }}>Confirmer ?</p>
+            <div className="influence-betrayal-actions">
+              <button onClick={() => setBetrayalTarget(null)}>Non, erreur</button>
+              <button onClick={() => {
+                setBetrayalConfirmed(true)
+                setBetrayalTarget(null)
+                handleClick(betrayalTarget.factionId, betrayalTarget.buttonEl)
+              }}>Influencer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {influenceStock <= 0 && (
+        <div className="influence-frame-hint">
+          <span className="influence-frame-hint-title">Comment gagner de l'influence ?</span>
+          <ul className="influence-frame-hint-list">
+            <li>{'\u2B50'} Repondre aux enigmes</li>
+            <li>{'\uD83D\uDCCD'} Explorer un lieu sur place (GPS)</li>
+            <li>{'\uD83D\uDCDD'} Ameliorer une fiche de lieu</li>
+          </ul>
+        </div>
+      )}
 
     </div>
   )

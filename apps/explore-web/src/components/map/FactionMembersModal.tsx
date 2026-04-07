@@ -8,8 +8,11 @@ interface FactionMember {
   userId: string
   name: string
   profileImage: string | null
-  notorietyPoints: number
+  glory: number
+  influencePlaced: number
+  influenceContent: number
   displayedGeneralTitles: Array<{ id: number; name: string; icon: string }> | null
+
   factionTitle2: { id: number; name: string; icon: string } | null
 }
 
@@ -184,7 +187,14 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
                         </div>
                       )}
                     </div>
-                    <span className="faction-member-notoriety">{m.notorietyPoints}</span>
+                    <span className="faction-member-notoriety">
+                      {'\uD83C\uDF96\uFE0F'} {m.glory}
+                      {m.influencePlaced > 0 && (
+                        <span style={{ marginLeft: 6, opacity: 0.6, fontSize: '0.85em' }}>
+                          {'\uD83C\uDF1F'} {m.influencePlaced}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -22,9 +22,9 @@ interface Props {
 const TAB_LABELS: Record<LeaderboardTab, string> = {
   notoriety: 'Gloire',
   exploration: 'Exploration',
-  erudition: '\u00c9rudition',
-  authored: 'Lieux ajout\u00e9s',
-  explored: 'Lieux explor\u00e9s',
+  erudition: 'érudition',
+  authored: 'Lieux ajoutés',
+  explored: 'Lieux explorés',
 }
 
 const TAB_ICONS: Record<LeaderboardTab, string> = {

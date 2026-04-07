@@ -8,7 +8,7 @@ interface CostPreview {
   cost: number
   energy: number
   canAfford: boolean
-  gloryPreview: number
+  gloryPreview?: number
   detail: {
     baseCost: number
     distanceKm: number
@@ -38,7 +38,6 @@ export function FoggedPlaceView({
   const nextPointIn = usePlayerStore(s => s.nextPointIn)
   const energyCycle = usePlayerStore(s => s.energyCycle)
   const userId = usePlayerStore(s => s.userId)
-  const activeBuff = usePlayerStore(s => s.activeBuff)
   const [discovering, setDiscovering] = useState(false)
   const [preview, setPreview] = useState<CostPreview | null>(null)
   const [previewLoading, setPreviewLoading] = useState(true)
@@ -64,13 +63,7 @@ export function FoggedPlaceView({
     })
   }, [userId, place.id])
 
-  const discoverFree = activeBuff === 'free_discover'
-  const discoverDiscount = activeBuff === 'discount_discover' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '0') : 0
-
-  let cost = preview?.cost ?? 1
-  if (discoverFree) cost = 0
-  else if (discoverDiscount > 0) cost = Math.max(0.5, Math.round((cost * (1 - discoverDiscount / 100)) * 2) / 2)
-
+  const cost = preview?.cost ?? 1
   const canAfford = cost === 0 || fractionalEnergy >= cost
   const d = preview?.detail
   const images = place.images || []
@@ -129,28 +122,23 @@ export function FoggedPlaceView({
               disabled={discovering || !canAfford || previewLoading}
             >
               {discovering
-                ? 'D\u00e9couverte...'
+                ? 'Découverte...'
                 : previewLoading
-                  ? 'Calcul du co\u00fbt...'
-                  : discoverFree
-                    ? 'D\u00e9couvrir (gratuit \u2728)'
-                    : cost === 0
-                      ? 'D\u00e9couvrir (gratuit \u2014 proximit\u00e9)'
-                      : `D\u00e9couvrir (${cost} \u26a1)`
+                  ? 'Calcul du coûtt...'
+                  : cost === 0
+                    ? 'Découvrir (gratuit \u2014 proximit\u00e9)'
+                    : `Découvrir (${cost} \u26a1)`
               }
             </button>
 
-            {d && !discoverFree && (
+            {d && (
               <div className="fog-cost-detail">
                 <span>{'\uD83D\uDCCD'} {d.distanceKm} km \u2014 {d.distanceMult === 1 ? 'x1' : d.distanceMult < 1 ? `x${d.distanceMult} (sur place)` : `x${d.distanceMult}`}</span>
                 {d.sameFaction && (
                   <span className="fog-cost-bonus">Territoire alli\u00e9 : co\u00fbt /2</span>
                 )}
                 {d.tagReduction > 0 && (
-                  <span className="fog-cost-bonus">H\u00e9ritage : -{d.tagReduction}%</span>
-                )}
-                {preview?.gloryPreview != null && preview.gloryPreview > 0 && (
-                  <span className="fog-cost-glory">{'\uD83C\uDF96\uFE0F'} +{preview.gloryPreview} gloire</span>
+                  <span className="fog-cost-bonus">Héritagee : -{d.tagReduction}%</span>
                 )}
               </div>
             )}
@@ -159,7 +147,7 @@ export function FoggedPlaceView({
               <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> énergie
               {!canAfford && (
                 <p className="fog-energy-empty">
-                  Pas assez d'énergie. Revenez plus tard ou d\u00e9placez-vous \u00e0 proximit\u00e9.
+                  Pas assez d'énergie. Revenez plus tard ou déplacez-vous à proximité.
                 </p>
               )}
             </div>
@@ -167,7 +155,7 @@ export function FoggedPlaceView({
         ) : (
           <div className="fog-cta-section">
             <p className="fog-cta-text">
-              Rejoignez l'aventure pour d\u00e9couvrir ce lieu.
+              Rejoignez l'aventure pour découvrir ce lieu.
             </p>
             <button className="fog-cta-btn" onClick={onAuthPrompt}>
               Cr\u00e9er un compte

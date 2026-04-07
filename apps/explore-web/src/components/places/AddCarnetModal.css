@@ -169,7 +169,7 @@
 /* Mobile: modal starts below navbar, footer above bottom nav */
 @media (max-width: 768px) {
   .add-carnet-overlay {
-    top: 48px;
+    top: 60px;
     align-items: stretch;
   }
 

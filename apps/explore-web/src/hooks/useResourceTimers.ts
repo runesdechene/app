@@ -66,13 +66,9 @@ async function refetchResources(userId: string) {
     constructionPoints: d.constructionPoints ?? 0,
     constructionNextPointIn: d.constructionNextPointIn ?? 0,
     constructionCycle: d.constructionCycle ?? 14400,
-    bonusEnergy: d.bonusEnergy ?? 0,
-    bonusConquest: d.bonusConquest ?? 0,
-    bonusConstruction: d.bonusConstruction ?? 0,
     vitalitePoints: d.vitalitePoints ?? 0,
     maxVitalite: d.maxVitalite ?? 5,
     vitaliteNextPointIn: d.vitaliteNextPointIn ?? 0,
     vitaliteCycle: d.vitaliteCycle ?? 14400,
-    bonusVitalite: d.bonusVitalite ?? 0,
   })
 }

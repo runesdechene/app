@@ -1,57 +1,15 @@
-import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
-import { supabase } from '../../lib/supabase'
-import { FactionModal } from '../auth/FactionModal'
 import './ConquestToggle.css'
 
 export function ConquestToggle() {
-  const gameMode = usePlayerStore(s => s.gameMode)
-  const userId = usePlayerStore(s => s.userId)
-  const userFactionId = usePlayerStore(s => s.userFactionId)
-  const setGameMode = usePlayerStore(s => s.setGameMode)
-  const [showFactionModal, setShowFactionModal] = useState(false)
-
-  async function handleToggle() {
-    if (gameMode === 'exploration') {
-      // Activer conquete — si pas de faction, ouvrir FactionModal d'abord
-      if (!userFactionId) {
-        setShowFactionModal(true)
-      } else {
-        persist('conquest')
-      }
-    } else {
-      // Repasser en exploration
-      persist('exploration')
-    }
-  }
-
-  async function persist(mode: 'exploration' | 'conquest') {
-    setGameMode(mode)
-    if (userId) {
-      await supabase.rpc('update_my_profile', {
-        p_user_id: userId,
-        p_game_mode: mode,
-      })
-    }
-  }
+  const factionColorMode = usePlayerStore(s => s.factionColorMode)
+  const setFactionColorMode = usePlayerStore(s => s.setFactionColorMode)
 
   return (
-    <>
-      <button className="conquest-toggle" onClick={handleToggle}>
-        <span className="conquest-toggle-icon">{'\uD83D\uDDFA\uFE0F'}</span>
-        <span className="conquest-toggle-label">Territoires</span>
-        <span className={`conquest-toggle-switch ${gameMode === 'conquest' ? 'on' : ''}`} />
-      </button>
-
-      {showFactionModal && (
-        <FactionModal
-          onClose={(joined) => {
-            setShowFactionModal(false)
-            if (joined) persist('conquest')
-          }}
-          currentFactionId={userFactionId}
-        />
-      )}
-    </>
+    <button className="conquest-toggle" onClick={() => setFactionColorMode(!factionColorMode)}>
+      <span className="conquest-toggle-icon">{'\u2694\uFE0F'}</span>
+      <span className="conquest-toggle-label">Coupe des Héritages</span>
+      <span className={`conquest-toggle-switch ${factionColorMode ? 'on' : ''}`} />
+    </button>
   )
 }

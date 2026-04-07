@@ -47,6 +47,10 @@ export interface PlaceProperties {
   tagBackground: string
   tagIcon: string
   factionId: string
+  factionColor: string
+  dominantFactionColor: string
+  /** Clé d'icône en mode bannières = faction:{tagIcon}::{factionColor} */
+  bannerIcon: string
   factionPattern: string
   claimedByName: string
   claimedById: string
@@ -79,10 +83,11 @@ export function usePlaces() {
       setLoading(true)
       setError(null)
 
-      // Fetch places et tag icons en parallèle
-      const [placesRes, tagsRes] = await Promise.all([
+      // Fetch places, tag icons et couleurs factions en parallèle
+      const [placesRes, tagsRes, factionsRes] = await Promise.all([
         supabase.rpc('get_map_places', { p_type: 'all', p_limit: 5000 }),
         supabase.from('tags').select('id, icon').not('icon', 'is', null),
+        supabase.from('factions').select('id, color'),
       ])
 
       if (placesRes.error) {
@@ -98,6 +103,14 @@ export function usePlaces() {
       if (tagsRes.data) {
         for (const t of tagsRes.data) {
           if (t.icon) tagIcons.set(t.id, t.icon)
+        }
+      }
+
+      // Map faction id → color
+      const factionColorMap = new Map<string, string>()
+      if (factionsRes.data) {
+        for (const f of factionsRes.data) {
+          factionColorMap.set(f.id, f.color)
         }
       }
 
@@ -120,6 +133,38 @@ export function usePlaces() {
               tagBackground: place.primaryTag?.background ?? '#F5E6D3',
               tagIcon: (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? '',
               factionId: place.faction?.id ?? '',
+              factionColor: place.faction?.color ?? '',
+              dominantFactionColor: (() => {
+                const inf = place.influenceByFaction ?? {}
+                let maxId = ''
+                let maxPts = 0
+                for (const [fid, pts] of Object.entries(inf)) {
+                  if (pts > maxPts) { maxPts = pts; maxId = fid }
+                }
+                // Gris si aucun point ou si égalité parfaite entre toutes les factions
+                if (maxPts === 0) return ''
+                const vals = Object.values(inf)
+                if (vals.length > 1 && vals.every(v => v === maxPts)) return ''
+                return factionColorMap.get(maxId) ?? ''
+              })(),
+              bannerIcon: (() => {
+                const icon = (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? ''
+                if (!icon) return ''
+                const inf = place.influenceByFaction ?? {}
+                let maxId = ''
+                let maxPts = 0
+                for (const [fid, pts] of Object.entries(inf)) {
+                  if (pts > maxPts) { maxPts = pts; maxId = fid }
+                }
+                let fc = ''
+                if (maxPts > 0) {
+                  const vals = Object.values(inf)
+                  if (!(vals.length > 1 && vals.every(v => v === maxPts))) {
+                    fc = factionColorMap.get(maxId) ?? ''
+                  }
+                }
+                return `faction::${icon}::${fc || '#8A8A8A'}`
+              })(),
               factionPattern: place.faction?.pattern ?? '',
               claimedByName: place.claimedByName ?? '',
               claimedById: place.claimedById ?? '',

@@ -17,11 +17,6 @@ interface Fragment {
   icon_url: string | null
   image_url: string | null
   collection: string | null
-  bonus_type: string | null
-  bonus_value: number
-  ability_type: string | null
-  ability_cooldown_hours: number
-  ability_value: number
   link_url: string | null
   visible: boolean
   words: FragmentWord[]
@@ -33,15 +28,16 @@ interface PlayerResult {
   email_address: string
 }
 
-const BONUS_TYPES = [
-  { value: '', label: 'Aucun bonus' },
-  { value: 'max_energy', label: 'Max Energie' },
-  { value: 'max_conquest', label: 'Max Conquete' },
-  { value: 'max_construction', label: 'Max Construction' },
-  { value: 'regen_energy', label: '% Regen Energie' },
-  { value: 'regen_conquest', label: '% Regen Conquete' },
-  { value: 'regen_construction', label: '% Regen Construction' },
-]
+interface TagOption {
+  id: string
+  title: string
+}
+
+interface Affinity {
+  fragment_id: number
+  tag_id: string
+  bonus_points: number
+}
 
 interface FactionOption {
   id: string
@@ -64,6 +60,11 @@ export function Fragments() {
   const iconUploadFragIdRef = useRef<number | null>(null)
   const [uploadingIcon, setUploadingIcon] = useState<number | null>(null)
 
+  // Tags & affinités
+  const [tags, setTags] = useState<TagOption[]>([])
+  const [affinities, setAffinities] = useState<Affinity[]>([])
+  const [savedAffinities, setSavedAffinities] = useState<Affinity[]>([])
+
   // Owners par fragment
   const [owners, setOwners] = useState<Record<number, Array<{ userId: string; name: string }>>>({})
 
@@ -79,16 +80,22 @@ export function Fragments() {
 
   async function fetchFragments() {
     try {
-      const [fragsRes, wordsRes, factionsRes, ownersRes] = await Promise.all([
+      const [fragsRes, wordsRes, factionsRes, ownersRes, tagsRes, affRes] = await Promise.all([
         supabase.from('title_fragments').select('*').order('created_at', { ascending: false }),
         supabase.from('fragment_words').select('*').order('id'),
         supabase.from('factions').select('id, title').order('order'),
         supabase.from('user_fragments').select('user_id, fragment_id, users!inner(first_name, email_address)'),
+        supabase.from('tags').select('id, title').order('title'),
+        supabase.from('fragment_tag_affinities').select('*'),
       ])
 
       const frags = fragsRes.data
       if (!frags) return
       if (factionsRes.data) setFactions(factionsRes.data as FactionOption[])
+      if (tagsRes.data) setTags(tagsRes.data as TagOption[])
+      const aff = (affRes.data ?? []) as Affinity[]
+      setAffinities(aff)
+      setSavedAffinities(JSON.parse(JSON.stringify(aff)))
 
       // Regrouper les owners par fragment
       const ownerMap: Record<number, Array<{ userId: string; name: string }>> = {}
@@ -107,7 +114,7 @@ export function Fragments() {
       const result: Fragment[] = (frags as Array<{
         id: number; name: string; description: string | null;
         icon: string | null; icon_url: string | null; image_url: string | null; collection: string | null;
-        bonus_type: string | null; bonus_value: number; ability_type: string | null; ability_cooldown_hours: number; ability_value: number; link_url: string | null; visible: boolean
+        link_url: string | null; visible: boolean
       }>).map(f => ({
         ...f,
         words: ((words ?? []) as Array<{
@@ -158,12 +165,31 @@ export function Fragments() {
   }
 
   // Comparaison sans les words (les words sont saved immédiatement)
-  const hasChanges = JSON.stringify(fragments.map(f => ({ ...f, words: [] }))) !== JSON.stringify(savedFragments.map(f => ({ ...f, words: [] })))
+  const hasFragChanges = JSON.stringify(fragments.map(f => ({ ...f, words: [] }))) !== JSON.stringify(savedFragments.map(f => ({ ...f, words: [] })))
+  const hasAffChanges = JSON.stringify(affinities) !== JSON.stringify(savedAffinities)
+  const hasChanges = hasFragChanges || hasAffChanges
 
   // --- Modifier localement ---
 
   function updateFragment(id: number, field: string, value: string | number | boolean | null) {
     setFragments(prev => prev.map(f => f.id === id ? { ...f, [field]: value } : f))
+  }
+
+  // --- Affinités ---
+
+  function addAffinity(fragId: number, tagId: string) {
+    if (!tagId || affinities.find(a => a.fragment_id === fragId && a.tag_id === tagId)) return
+    setAffinities(prev => [...prev, { fragment_id: fragId, tag_id: tagId, bonus_points: 3 }])
+  }
+
+  function removeAffinity(fragId: number, tagId: string) {
+    setAffinities(prev => prev.filter(a => !(a.fragment_id === fragId && a.tag_id === tagId)))
+  }
+
+  function updateAffinityBonus(fragId: number, tagId: string, bonus: number) {
+    setAffinities(prev => prev.map(a =>
+      a.fragment_id === fragId && a.tag_id === tagId ? { ...a, bonus_points: bonus } : a
+    ))
   }
 
   // --- Sauvegarder tout ---
@@ -188,17 +214,29 @@ export function Fragments() {
           image_url: f.image_url,
           link_url: f.link_url || null,
           collection: f.collection || null,
-          bonus_type: f.bonus_type || null,
-          bonus_value: f.bonus_value,
-          ability_type: f.ability_type || null,
-          ability_cooldown_hours: f.ability_cooldown_hours,
-          ability_value: f.ability_value ?? 0,
           visible: f.visible,
         }).eq('id', f.id).then(r => r)
       }).filter(Boolean)
 
       const results = await Promise.all(promises)
       const errors = results.filter(r => r?.error)
+
+      // Sauvegarder les affinités
+      if (hasAffChanges) {
+        // Supprimer les affinités retirées
+        for (const s of savedAffinities) {
+          if (!affinities.find(a => a.fragment_id === s.fragment_id && a.tag_id === s.tag_id)) {
+            await supabase.from('fragment_tag_affinities')
+              .delete().eq('fragment_id', s.fragment_id).eq('tag_id', s.tag_id)
+          }
+        }
+        // Upsert les affinités courantes
+        for (const a of affinities) {
+          await supabase.from('fragment_tag_affinities')
+            .upsert({ fragment_id: a.fragment_id, tag_id: a.tag_id, bonus_points: a.bonus_points },
+              { onConflict: 'fragment_id,tag_id' })
+        }
+      }
 
       if (errors.length > 0) {
         setSaveError(`Erreur sur ${errors.length} fragment(s)`)
@@ -212,6 +250,7 @@ export function Fragments() {
 
   function handleCancel() {
     setFragments(JSON.parse(JSON.stringify(savedFragments)))
+    setAffinities(JSON.parse(JSON.stringify(savedAffinities)))
     setSaveError(null)
   }
 
@@ -501,7 +540,7 @@ export function Fragments() {
               />
             </div>
 
-            {/* Collection + Bonus */}
+            {/* Collection (héritage) */}
             <div className="faction-bonus-row">
               <label className="faction-bonus-input">
                 <span>Collection</span>
@@ -516,65 +555,40 @@ export function Fragments() {
                   ))}
                 </select>
               </label>
-              <label className="faction-bonus-input">
-                <span>Bonus</span>
-                <select
-                  value={frag.bonus_type ?? ''}
-                  onChange={e => updateFragment(frag.id, 'bonus_type', e.target.value || null)}
-                  className="fragment-select"
-                >
-                  {BONUS_TYPES.map(b => (
-                    <option key={b.value} value={b.value}>{b.label}</option>
-                  ))}
-                </select>
-              </label>
-              {frag.bonus_type && (
-                <label className="faction-bonus-input">
-                  <span>Valeur</span>
-                  <input
-                    type="number"
-                    step={0.5}
-                    value={frag.bonus_value}
-                    onChange={e => updateFragment(frag.id, 'bonus_value', parseFloat(e.target.value) || 0)}
-                  />
-                </label>
-              )}
             </div>
 
-            <div className="frag-field" style={{ marginTop: 8 }}>
-              <label className="frag-field-label">Compétence active</label>
-              <select value={frag.ability_type ?? ''} onChange={e => updateFragment(frag.id, 'ability_type', e.target.value || null)}>
-                <option value="">Aucune</option>
-                <option value="free_discover">Découverte gratuite</option>
-                <option value="free_claim">Protection gratuite</option>
-                <option value="discount_discover">Réduction découverte (en ⚡)</option>
-                <option value="discount_claim">Réduction protection (en ⚡)</option>
-                <option value="double_glory">Gloire multipliée (xN)</option>
-                <option value="distance_ignore">Ignorer la distance</option>
-              </select>
-              {frag.ability_type && (
-                <div style={{ marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <div>
-                    <label style={{ fontSize: 12, color: '#6b5a47' }}>Cooldown (heures)</label>
-                    <input type="number" min={1} max={168} step={1} value={frag.ability_cooldown_hours}
-                      onChange={e => updateFragment(frag.id, 'ability_cooldown_hours', parseInt(e.target.value) || 24)} className="tag-reward-input" />
-                  </div>
-                  {(frag.ability_type === 'discount_discover' || frag.ability_type === 'discount_claim') && (
-                    <div>
-                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Réduction (%)</label>
-                      <input type="number" min={5} max={100} step={5} value={frag.ability_value ?? 50}
-                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 50)} className="tag-reward-input" />
-                    </div>
-                  )}
-                  {frag.ability_type === 'double_glory' && (
-                    <div>
-                      <label style={{ fontSize: 12, color: '#6b5a47' }}>Multiplicateur (x)</label>
-                      <input type="number" min={1.5} max={10} step={0.5} value={frag.ability_value ?? 2}
-                        onChange={e => updateFragment(frag.id, 'ability_value', parseFloat(e.target.value) || 2)} className="tag-reward-input" />
-                    </div>
-                  )}
+            {/* Affinités — types de lieu associés */}
+            <div className="faction-field" style={{ marginTop: 8 }}>
+              <label className="faction-field-label">Affinites (+ limite influence a distance)</label>
+              {affinities.filter(a => a.fragment_id === frag.id).map(a => (
+                <div key={a.tag_id} className="fragment-word-row" style={{ alignItems: 'center' }}>
+                  <span style={{ flex: 1, fontSize: 13 }}>{tags.find(t => t.id === a.tag_id)?.title ?? a.tag_id}</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={a.bonus_points}
+                    onChange={e => updateAffinityBonus(frag.id, a.tag_id, parseInt(e.target.value) || 1)}
+                    style={{ width: 50, textAlign: 'center' }}
+                    className="tag-reward-input"
+                  />
+                  <button className="fragment-word-delete" onClick={() => removeAffinity(frag.id, a.tag_id)}>&#10005;</button>
                 </div>
+              ))}
+              {affinities.filter(a => a.fragment_id === frag.id).length === 0 && (
+                <p style={{ fontSize: '0.75rem', opacity: 0.4, margin: '4px 0' }}>Aucune affinite</p>
               )}
+              <select
+                value=""
+                onChange={e => { if (e.target.value) addAffinity(frag.id, e.target.value) }}
+                className="fragment-select"
+                style={{ marginTop: 4, fontSize: 12 }}
+              >
+                <option value="">+ Ajouter un type de lieu...</option>
+                {tags
+                  .filter(t => !affinities.find(a => a.fragment_id === frag.id && a.tag_id === t.id))
+                  .map(t => <option key={t.id} value={t.id}>{t.title}</option>)
+                }
+              </select>
             </div>
 
             {/* Termes */}

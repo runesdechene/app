@@ -1383,7 +1383,7 @@ Structure JSX (du haut vers le bas) :
       <>
         {carnets.map((c, i) => <CarnetCard key={c.id} carnet={c} isTop={i === 0} ... />)}
         <button className="place-add-carnet-btn" onClick={() => setShowAddCarnet(true)}>
-          ✏️ Ajouter ma page de carnet
+          ✏️ Ajouter ma propre page de carnet
         </button>
       </>
     )}

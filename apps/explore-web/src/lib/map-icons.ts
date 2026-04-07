@@ -183,15 +183,20 @@ export function buildShieldImageData(level: number, color: string): ImageData {
   return imageData
 }
 
-/** Charge une icône SVG colorée dans la map MapLibre (utilise le cache) */
+/** Charge une icône SVG colorée dans la map MapLibre (utilise le cache).
+ *  `key` optionnel : clé MapLibre si différente de l'URL (ex: mode bannières).
+ *  `fetchUrl` optionnel : URL réelle du SVG si différente de la clé. */
 export async function loadColoredSvgIcon(
   map: maplibregl.Map,
   url: string,
   color: string,
+  key?: string,
+  fetchUrl?: string,
 ): Promise<void> {
-  const imageData = await buildIconImageData(url, color)
-  if (!map.hasImage(url)) {
-    map.addImage(url, imageData, { sdf: false })
+  const mapKey = key ?? url
+  const imageData = await buildIconImageData(fetchUrl ?? url, color)
+  if (!map.hasImage(mapKey)) {
+    map.addImage(mapKey, imageData, { sdf: false })
   }
 }
 

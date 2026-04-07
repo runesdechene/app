@@ -15,6 +15,7 @@ interface Explorer {
 
 interface PlaceExplorersProps {
   placeId: string
+  placeTitle: string
   explorers: Explorer[]
   placeLocation: { latitude: number; longitude: number }
   isExplorer: boolean
@@ -37,17 +38,17 @@ function haversineKm(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-export function PlaceExplorers({ placeId, explorers, placeLocation, isExplorer, factionColors, onVisited }: PlaceExplorersProps) {
+export function PlaceExplorers({ placeId, placeTitle, explorers, placeLocation, isExplorer, factionColors, onVisited }: PlaceExplorersProps) {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
   const [loading, setLoading] = useState(false)
 
   const isOnSite = useMemo(() => {
     if (!userPosition) return false
-    return haversineKm(userPosition.lat, userPosition.lng, placeLocation.latitude, placeLocation.longitude) < 0.1
+    return haversineKm(userPosition.lat, userPosition.lng, placeLocation.latitude, placeLocation.longitude) < 0.2
   }, [userPosition, placeLocation])
 
-  const canVisit = userId && !isExplorer && isOnSite
+  const [revisited, setRevisited] = useState(false)
 
   async function handleVisit() {
     if (!userId || !userPosition || loading) return
@@ -77,10 +78,43 @@ export function PlaceExplorers({ placeId, explorers, placeLocation, isExplorer, 
 
       useToastStore.getState().addToast({
         type: 'explore',
-        message: `Visite valid\u00e9e ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`,
+        message: `Visite de ${placeTitle} validée ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
         timestamp: Date.now(),
       })
       onVisited()
+    }
+
+    setLoading(false)
+  }
+
+  async function handleRevisit() {
+    if (!userId || !userPosition || loading || revisited) return
+    setLoading(true)
+
+    const { data, error } = await supabase.rpc('revisit_place_gps', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_user_lat: userPosition.lat,
+      p_user_lng: userPosition.lng,
+    })
+
+    if (!error && data && !data.error) {
+      const result = data as { influenceGain?: number; recentRevisits?: number }
+      const gain = result.influenceGain ?? 0
+      useToastStore.getState().addToast({
+        type: 'revisit',
+        message: `De retour sur ${placeTitle} ! +${gain} influence`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
+        timestamp: Date.now(),
+      })
+      setRevisited(true)
+    } else if (data?.error === 'already_revisited_today') {
+      setRevisited(true)
     }
 
     setLoading(false)
@@ -90,7 +124,7 @@ export function PlaceExplorers({ placeId, explorers, placeLocation, isExplorer, 
     <div className="place-explorers">
       <h3 className="place-explorers-title">🧭 Explorateurs ({explorers.length})</h3>
 
-      {explorers.length === 0 && !canVisit ? (
+      {explorers.length === 0 && !userId ? (
         <p className="place-explorers-empty">Personne n&apos;a encore visit&eacute; ce lieu en personne.</p>
       ) : (
         <div className="place-explorers-row">
@@ -119,14 +153,28 @@ export function PlaceExplorers({ placeId, explorers, placeLocation, isExplorer, 
             )
           })}
 
-          {canVisit && (
+          {userId && !isExplorer && (
             <button
-              className="place-explorers-visit-btn"
-              onClick={handleVisit}
-              disabled={loading}
+              className={`place-explorers-visit-btn${!isOnSite ? ' place-explorers-visit-btn-disabled' : ''}`}
+              onClick={isOnSite ? handleVisit : undefined}
+              disabled={loading || !isOnSite}
+              title={!isOnSite ? 'Rendez-vous sur place pour explorer ce lieu' : undefined}
             >
-              {loading ? 'Validation...' : '📍 J\'y suis allé'}
+              {loading ? 'Validation...' : '\uD83D\uDCCD J\'y suis alle'}
             </button>
+          )}
+          {userId && isExplorer && !revisited && (
+            <button
+              className={`place-explorers-visit-btn${!isOnSite ? ' place-explorers-visit-btn-disabled' : ''}`}
+              onClick={isOnSite ? handleRevisit : undefined}
+              disabled={loading || !isOnSite}
+              title={!isOnSite ? 'Rendez-vous sur place pour revisiter ce lieu' : undefined}
+            >
+              {loading ? 'Validation...' : '\uD83D\uDCCD De retour !'}
+            </button>
+          )}
+          {userId && isExplorer && revisited && (
+            <span style={{ fontSize: 11, opacity: 0.5 }}>Revisite du jour validee</span>
           )}
         </div>
       )}
