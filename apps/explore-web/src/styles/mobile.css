@@ -308,7 +308,7 @@
     border-radius: 0;
     box-shadow: none;
     transform: none;
-    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 120px);
     overflow-y: scroll;
     opacity: 0;
     pointer-events: none;
