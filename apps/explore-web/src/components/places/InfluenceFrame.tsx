@@ -20,50 +20,12 @@ interface InfluenceFrameProps {
   onInfluencePlaced: () => void
 }
 
-/** War horn / fog horn — brassy resonant blast */
+/** Influence click sound */
 function playPopSound() {
   try {
-    const ctx = new AudioContext()
-    const t = ctx.currentTime
-
-    // Fundamental — sawtooth for brassy texture
-    const fund = ctx.createOscillator()
-    fund.type = 'sawtooth'
-    fund.frequency.setValueAtTime(90, t)
-    fund.frequency.linearRampToValueAtTime(110, t + 0.05)
-    fund.frequency.linearRampToValueAtTime(105, t + 0.3)
-
-    // Second harmonic — adds body
-    const harm = ctx.createOscillator()
-    harm.type = 'sawtooth'
-    harm.frequency.setValueAtTime(180, t)
-    harm.frequency.linearRampToValueAtTime(220, t + 0.05)
-    harm.frequency.linearRampToValueAtTime(210, t + 0.3)
-
-    // Bandpass filter — nasal horn resonance
-    const bp = ctx.createBiquadFilter()
-    bp.type = 'bandpass'
-    bp.frequency.setValueAtTime(350, t)
-    bp.Q.setValueAtTime(3, t)
-
-    // Envelope — slow attack, sustain, fade
-    const env = ctx.createGain()
-    env.gain.setValueAtTime(0, t)
-    env.gain.linearRampToValueAtTime(0.25, t + 0.04)
-    env.gain.setValueAtTime(0.25, t + 0.15)
-    env.gain.exponentialRampToValueAtTime(0.01, t + 0.35)
-
-    fund.connect(bp)
-    harm.connect(bp)
-    bp.connect(env)
-    env.connect(ctx.destination)
-
-    fund.start(t)
-    harm.start(t)
-    fund.stop(t + 0.35)
-    harm.stop(t + 0.35)
-
-    setTimeout(() => ctx.close(), 500)
+    const s = new Audio('/res/influence_click.mp3')
+    s.volume = 0.5
+    s.play()
   } catch { /* silent fallback */ }
 }
 
