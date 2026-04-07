@@ -1,15 +1,24 @@
 /* ==========================================
-   FOG OF WAR — Place Panel
+   FOG OF WAR — Place Panel (V0.5)
    ========================================== */
 
-.fogged-gallery {
-  filter: blur(8px) saturate(0.3);
-  opacity: 0.5;
+.fogged-hero {
+  filter: blur(6px) saturate(0.3);
+  opacity: 0.6;
+}
+
+.fogged-hero .place-hero-top-right {
+  filter: none;
+}
+
+.fogged-title {
+  filter: blur(3px);
+  user-select: none;
 }
 
 .fog-mystery-text {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-ink-light);
   font-style: italic;
   margin: 8px 0 20px;
@@ -27,14 +36,14 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   font-family: var(--font-title);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-parchment);
   background: var(--color-ink);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s, opacity 0.2s;
 }
@@ -48,21 +57,38 @@
   cursor: not-allowed;
 }
 
+.fog-cost-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: var(--color-ink-light);
+}
+
+.fog-cost-bonus {
+  color: #2a7a30;
+}
+
+.fog-cost-glory {
+  color: #b8860b;
+}
+
 .fog-energy-info {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-ink-light);
   text-align: center;
 }
 
 .fog-energy-count {
   font-weight: 600;
-  color: var(--color-sepia-dark);
+  color: var(--color-ink);
 }
 
 .fog-energy-empty {
   margin: 8px 0 0;
-  font-size: 12px;
+  font-size: 13px;
   color: #991b1b;
   font-style: italic;
 }
@@ -74,7 +100,7 @@
 
 .fog-cta-text {
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-ink-light);
   margin: 0 0 16px;
   line-height: 1.5;
@@ -82,18 +108,31 @@
 
 .fog-cta-btn {
   display: inline-block;
-  padding: 10px 24px;
+  padding: 12px 28px;
   font-family: var(--font-title);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--color-parchment);
   background: var(--color-ink);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .fog-cta-btn:hover {
   background: var(--color-ink-light);
+}
+
+.place-claim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
 }

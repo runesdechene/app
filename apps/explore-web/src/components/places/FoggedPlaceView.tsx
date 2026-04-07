@@ -43,13 +43,11 @@ export function FoggedPlaceView({
   const [preview, setPreview] = useState<CostPreview | null>(null)
   const [previewLoading, setPreviewLoading] = useState(true)
 
-  // Energie fractionnaire pour affichage
   const isFull = energy >= maxEnergy
   const elapsedInTick = energyCycle - nextPointIn
   const fractionOfTick = energyCycle > 0 ? elapsedInTick / energyCycle : 0
   const fractionalEnergy = isFull ? maxEnergy : Math.min(energy + fractionOfTick, maxEnergy)
 
-  // Fetch le vrai coût depuis le serveur
   useEffect(() => {
     if (!userId) return
     setPreviewLoading(true)
@@ -60,8 +58,7 @@ export function FoggedPlaceView({
       p_action: 'discover',
       p_user_lat: userPos?.lat ?? null,
       p_user_lng: userPos?.lng ?? null,
-    }).then(({ data, error }) => {
-      console.log('[COST PREVIEW discover]', { data, error })
+    }).then(({ data }) => {
       if (data) setPreview(data as CostPreview)
       setPreviewLoading(false)
     })
@@ -70,7 +67,6 @@ export function FoggedPlaceView({
   const discoverFree = activeBuff === 'free_discover'
   const discoverDiscount = activeBuff === 'discount_discover' ? parseFloat(localStorage.getItem('activeBuffValue') ?? '0') : 0
 
-  // Coût final (serveur comme source de vérité, 0 si buff gratuit)
   let cost = preview?.cost ?? 1
   if (discoverFree) cost = 0
   else if (discoverDiscount > 0) cost = Math.max(0.5, Math.round((cost * (1 - discoverDiscount / 100)) * 2) / 2)
@@ -81,41 +77,41 @@ export function FoggedPlaceView({
 
   return (
     <>
-      {/* Header */}
-      <div className="place-panel-header">
-        <button onClick={onClose} className="place-panel-close" aria-label="Fermer">
-          &#10005;
-        </button>
-      </div>
-
-      {/* Gallery floue */}
-      {images.length > 0 && (
-        <div className="place-panel-gallery fogged-gallery">
+      {/* Hero — blurred */}
+      <div className="place-hero fogged-hero">
+        {images.length > 0 ? (
           <img
             src={images[0].url}
-            alt="Lieu mystérieux"
-            className="place-panel-image"
+            alt=""
+            className="place-hero-img"
             loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
+        ) : (
+          <div className="place-hero-placeholder" />
+        )}
+
+        <div className="place-hero-top-right">
+          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+            &#10005;
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Body */}
-      <div className="place-panel-body">
-        <h1 className="place-panel-title place-panel-title-blur">{place.title}</h1>
+      <div className="place-body">
+        <h2 className="place-title fogged-title">{place.title}</h2>
 
-        {usePlayerStore.getState().gameMode === 'conquest' && isOwnFaction && place.claim && (
+        {isOwnFaction && place.claim && (
           <div className="place-claim-badge" style={{ backgroundColor: place.claim.factionColor }}>
-            <span className="place-claim-dot" style={{ backgroundColor: place.claim.factionColor }} />
-            Territoire allié — {place.claim.factionTitle}
+            Territoire alli\u00e9 \u2014 {place.claim.factionTitle}
           </div>
         )}
 
         <p className="fog-mystery-text">
           {isOwnFaction
-            ? 'Ce lieu appartient à votre héritage. Découvrez-le à moindre coût.'
-            : 'Ce lieu est encore dans le brouillard. Explorez-le pour en découvrir les secrets.'
+            ? 'Ce lieu appartient \u00e0 votre h\u00e9ritage. D\u00e9couvrez-le \u00e0 moindre co\u00fbt.'
+            : 'Ce lieu est encore dans le brouillard. D\u00e9pensez de l\u2019\u00e9nergie pour le r\u00e9v\u00e9ler.'
           }
         </p>
 
@@ -131,37 +127,37 @@ export function FoggedPlaceView({
               disabled={discovering || !canAfford || previewLoading}
             >
               {discovering
-                ? 'Découverte...'
+                ? 'D\u00e9couverte...'
                 : previewLoading
-                  ? 'Calcul du coût...'
+                  ? 'Calcul du co\u00fbt...'
                   : discoverFree
-                    ? 'Découvrir (gratuit ✨ compétence active)'
+                    ? 'D\u00e9couvrir (gratuit \u2728)'
                     : cost === 0
-                      ? 'Découvrir (gratuit — vous êtes à proximité)'
-                      : `Découvrir (${cost} ⚡)`
+                      ? 'D\u00e9couvrir (gratuit \u2014 proximit\u00e9)'
+                      : `D\u00e9couvrir (${cost} \u26a1)`
               }
             </button>
 
             {d && !discoverFree && (
-              <div className="claim-cost-detail">
-                <span>{'\uD83D\uDCCD'}({d.distanceKm} km) : {d.distanceMult === 1 ? 'x1' : d.distanceMult < 1 ? `x${d.distanceMult} (sur place)` : `x${d.distanceMult}`}</span>
+              <div className="fog-cost-detail">
+                <span>{'\uD83D\uDCCD'} {d.distanceKm} km \u2014 {d.distanceMult === 1 ? 'x1' : d.distanceMult < 1 ? `x${d.distanceMult} (sur place)` : `x${d.distanceMult}`}</span>
                 {d.sameFaction && (
-                  <span style={{ color: '#2a7a30' }}>Territoire : coût /2</span>
+                  <span className="fog-cost-bonus">Territoire alli\u00e9 : co\u00fbt /2</span>
                 )}
                 {d.tagReduction > 0 && (
-                  <span style={{ color: '#2a7a30' }}>{'\uD83C\uDF96\uFE0F'} Héritage : -{d.tagReduction}%</span>
+                  <span className="fog-cost-bonus">H\u00e9ritage : -{d.tagReduction}%</span>
                 )}
-                {preview?.gloryPreview && (
-                  <span style={{ color: '#b8860b' }}>{'\uD83C\uDF96\uFE0F'} +{preview.gloryPreview}</span>
+                {preview?.gloryPreview != null && preview.gloryPreview > 0 && (
+                  <span className="fog-cost-glory">{'\uD83C\uDF96\uFE0F'} +{preview.gloryPreview} gloire</span>
                 )}
               </div>
             )}
 
             <div className="fog-energy-info">
-              <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> énergie
+              <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> \u00e9nergie
               {!canAfford && (
                 <p className="fog-energy-empty">
-                  Plus assez d'énergie. Revenez demain ou déplacez-vous à proximité du lieu.
+                  Pas assez d'\u00e9nergie. Revenez plus tard ou d\u00e9placez-vous \u00e0 proximit\u00e9.
                 </p>
               )}
             </div>
@@ -169,10 +165,10 @@ export function FoggedPlaceView({
         ) : (
           <div className="fog-cta-section">
             <p className="fog-cta-text">
-              Rejoignez l'Aventure pour explorer ce lieu et découvrir la carte.
+              Rejoignez l'aventure pour d\u00e9couvrir ce lieu.
             </p>
             <button className="fog-cta-btn" onClick={onAuthPrompt}>
-              Créer un compte
+              Cr\u00e9er un compte
             </button>
           </div>
         )}
