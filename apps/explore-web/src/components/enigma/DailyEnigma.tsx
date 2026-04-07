@@ -50,6 +50,19 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
+  const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string }>>(new Map())
+
+  // Load faction visuals once
+  useEffect(() => {
+    supabase.from('factions').select('id, color, pattern, title').order('order').then(({ data }) => {
+      if (!data) return
+      const map = new Map<string, { color: string; pattern: string; title: string }>()
+      for (const f of data as Array<{ id: string; color: string; pattern: string; title: string }>) {
+        map.set(f.id, { color: f.color, pattern: f.pattern, title: f.title })
+      }
+      setFactions(map)
+    })
+  }, [])
 
   function loadEnigma() {
     if (!userId) return
@@ -122,7 +135,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
               {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
             </h2>
             {enigma?.isBonus && (
-              <span className="enigma-cost">{enigma.energyCost} \u26a1</span>
+              <span className="enigma-cost">{enigma.energyCost}⚡ </span>
             )}
           </div>
         )}
@@ -132,7 +145,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         {!loading && noEnergy && (
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
-              Pas assez d'\u00e9nergie pour une \u00e9nigme bonus (5 \u26a1 requis).
+              Pas assez d'\u00e9nergie pour une \u00e9nigme bonus (5 ⚡ requis).
             </p>
           </div>
         )}
@@ -147,8 +160,28 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
 
         {!loading && enigma && !result && (
           <>
-            <div className={`enigma-difficulty ${enigma.difficulty}`}>
-              {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
+            <div className="enigma-meta">
+              <div className={`enigma-difficulty ${enigma.difficulty}`}>
+                {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
+              </div>
+              {enigma.heritageId && factions.get(enigma.heritageId) && (() => {
+                const f = factions.get(enigma.heritageId!)!
+                return (
+                  <div className="enigma-heritage-pill" style={{ backgroundColor: `${f.color}20`, color: f.color }}>
+                    {f.pattern && (
+                      <span
+                        className="enigma-heritage-icon"
+                        style={{
+                          WebkitMaskImage: `url(${f.pattern})`,
+                          maskImage: `url(${f.pattern})`,
+                          backgroundColor: f.color,
+                        }}
+                      />
+                    )}
+                    {f.title}
+                  </div>
+                )
+              })()}
             </div>
 
             <p className="enigma-lore">{enigma.loreText}</p>
@@ -234,7 +267,7 @@ export function EnigmaChestButton({ onClick, hasAnsweredToday }: ChestButtonProp
     <button
       className={`enigma-chest-btn${!hasAnsweredToday ? ' pulse' : ''}`}
       onClick={onClick}
-      title={hasAnsweredToday ? '\u00c9nigme bonus (5 \u26a1)' : '\u00c9nigme du jour (gratuite)'}
+      title={hasAnsweredToday ? '\u00c9nigme bonus (5 ⚡ )' : '\u00c9nigme du jour (gratuite)'}
     >
       <img src="/res/coffre.webp" alt="" className="enigma-chest-img" />
       <span className="enigma-chest-label">
