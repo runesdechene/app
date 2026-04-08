@@ -88,15 +88,13 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
 
-        <div className="enigma-header">
-          <div className="enigma-header-content">
-            {(fragment.iconUrl || fragment.icon) && (
-              fragment.iconUrl
-                ? <img src={fragment.iconUrl} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
-                : <span style={{ fontSize: 24 }}>{fragment.icon}</span>
-            )}
-            <h2 className="enigma-title">Enigme — {fragment.name}</h2>
-          </div>
+        <div className="enigma-header" style={{ flexDirection: 'column', alignItems: 'center' }}>
+          {(fragment.iconUrl || fragment.icon) && (
+            fragment.iconUrl
+              ? <img src={fragment.iconUrl} alt="" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: '50%' }} />
+              : <span style={{ fontSize: 32 }}>{fragment.icon}</span>
+          )}
+          <h2 className="enigma-title">Énigme — {fragment.name}</h2>
         </div>
 
         {loading && <p style={{ textAlign: 'center', padding: 20 }}>Chargement...</p>}

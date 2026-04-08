@@ -88,7 +88,7 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
 
 /** V0.5 detail data from get_place_detail_v05 */
 interface V05Detail {
-  influence: Array<{ factionId: string; placed: number; content: number; total: number }>
+  influence: Array<{ factionId: string; placed: number; permanent: number; content: number; total: number }>
   dominantFaction: string | null
   contributions: V05Contribution[]
   explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>

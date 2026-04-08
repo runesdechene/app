@@ -117,7 +117,7 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment }: Props) {
             >
               <img src="/res/coffre.webp" alt="" className="enigma-menu-item-img" />
               <div className="enigma-menu-item-info">
-                <span className="enigma-menu-item-name">Enigme du jour</span>
+                <span className="enigma-menu-item-name">Enigmes du jour</span>
                 <span className="enigma-menu-item-sub">
                   {dailyDone ? `Revient dans ${countdown}` : 'Gratuite'}
                 </span>

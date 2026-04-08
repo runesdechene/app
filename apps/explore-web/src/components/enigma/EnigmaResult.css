@@ -112,3 +112,22 @@
   background: var(--color-parchment-dark);
   color: var(--color-ink);
 }
+
+.enigma-result-next {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-sepia, #C19A6B);
+  color: #fff;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.enigma-result-next:hover {
+  background: #a8844f;
+}

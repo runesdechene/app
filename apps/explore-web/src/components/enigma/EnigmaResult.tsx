@@ -7,9 +7,10 @@ interface EnigmaResultProps {
   influenceGain: number
   eruditionGain: number
   onClose: () => void
+  closeLabel?: string
 }
 
-export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose: _onClose }: EnigmaResultProps) {
+export function EnigmaResult({ correct, answer, explanation, influenceGain, eruditionGain, onClose, closeLabel }: EnigmaResultProps) {
   return (
     <div className="enigma-result">
       <div className="enigma-result-icon">
@@ -46,6 +47,9 @@ export function EnigmaResult({ correct, answer, explanation, influenceGain, erud
         )}
       </div>
 
+      <button className="enigma-result-next" onClick={onClose}>
+        {closeLabel ?? 'Fermer'}
+      </button>
     </div>
   )
 }

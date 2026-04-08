@@ -3505,6 +3505,294 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-07T20:36:31.507Z"
+    },
+    {
+      "id": "bug-220",
+      "timestamp": "2026-04-07T20:52:01.646Z",
+      "error_message": "Significant refactor of ",
+      "file": "//EGIDE/Runes de Chêne/👑 LA CITADELLE/📱 L'application (La Carte)/🎮 Bible Game Design.md",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 7→9 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T20:52:01.646Z"
+    },
+    {
+      "id": "bug-221",
+      "timestamp": "2026-04-07T20:52:50.898Z",
+      "error_message": "Incorrect value in code",
+      "file": "//EGIDE/Runes de Chêne/👑 LA CITADELLE/📱 L'application (La Carte)/🎮 Bible Game Design.md",
+      "root_cause": "Had 'Explorateur érudit (live)\n- **V0.5** — L'",
+      "fix": "Changed to 'Explorateur érudit\n- **V0.5** — L'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T20:52:50.898Z"
+    },
+    {
+      "id": "bug-222",
+      "timestamp": "2026-04-07T23:43:32.126Z",
+      "error_message": "Wrong condition in logic",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "Condition was: if (influenceStock <= 0 || (!isGps && remoteUsed >= ma)",
+      "fix": "Changed to: if (influenceStock <= 0)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T23:43:32.126Z"
+    },
+    {
+      "id": "bug-223",
+      "timestamp": "2026-04-07T23:44:06.363Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 8→4 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T23:44:06.363Z"
+    },
+    {
+      "id": "bug-224",
+      "timestamp": "2026-04-07T23:45:27.456Z",
+      "error_message": "Significant refactor of ",
+      "file": "supabase/migrations/051_influence_no_limit_permanent_gps.sql",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 11→127 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sql"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T23:45:27.456Z"
+    },
+    {
+      "id": "bug-225",
+      "timestamp": "2026-04-08T00:03:19.917Z",
+      "error_message": "CSS fix: onClose",
+      "file": "apps/explore-web/src/components/enigma/EnigmaResult.tsx",
+      "root_cause": "onClose: _onClose → () => void",
+      "fix": "Changed onClose: _onClose → () => void",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:03:19.917Z"
+    },
+    {
+      "id": "bug-226",
+      "timestamp": "2026-04-08T00:03:25.569Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/enigma/EnigmaResult.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:03:25.569Z"
+    },
+    {
+      "id": "bug-227",
+      "timestamp": "2026-04-08T00:03:37.010Z",
+      "error_message": "CSS fix: background, color",
+      "file": "apps/explore-web/src/components/enigma/EnigmaResult.css",
+      "root_cause": "background: var(--color-parchment-dark) → #a8844f; color: var(--color-ink) → #fff",
+      "fix": "Changed background: var(--color-parchment-dark) → #a8844f; color: var(--color-ink) → #fff",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:03:37.010Z"
+    },
+    {
+      "id": "bug-228",
+      "timestamp": "2026-04-08T00:03:57.366Z",
+      "error_message": "CSS fix: font-size, color",
+      "file": "apps/explore-web/src/components/enigma/DailyEnigma.css",
+      "root_cause": "font-size: 14px → 13px; color: #d4af37 → var(--color-sepia, #C19A6B)",
+      "fix": "Changed font-size: 14px → 13px; color: #d4af37 → var(--color-sepia, #C19A6B)",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:03:57.366Z"
+    },
+    {
+      "id": "bug-229",
+      "timestamp": "2026-04-08T00:13:05.865Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/enigma/DailyEnigma.tsx",
+      "root_cause": "Had 'easy'",
+      "fix": "Changed to 'very_easy'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T00:13:17.873Z"
+    },
+    {
+      "id": "bug-230",
+      "timestamp": "2026-04-08T00:13:12.554Z",
+      "error_message": "CSS fix: DIFFICULTY_ORDER",
+      "file": "apps/explore-web/src/components/enigma/DailyEnigma.tsx",
+      "root_cause": "DIFFICULTY_ORDER: Array<'easy' | 'medium' | 'hard'> = ['easy', 'medium', 'hard'] → Array<'very_easy' | 'easy' | 'medium' | 'hard'> = ['very_easy', 'easy', 'medium', 'hard']",
+      "fix": "Changed DIFFICULTY_ORDER: Array<'easy' | 'medium' | 'hard'> = ['easy', 'medium', 'hard'] → Array<'very_easy' | 'easy' | 'medium' | 'hard'> = ['very_easy', 'easy', 'medium', 'hard']",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:13:12.554Z"
+    },
+    {
+      "id": "bug-231",
+      "timestamp": "2026-04-08T00:19:39.952Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/hub/src/components/Enigmas.tsx",
+      "root_cause": "Had 'easy'",
+      "fix": "Changed to 'very_easy'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:19:39.952Z"
+    },
+    {
+      "id": "bug-232",
+      "timestamp": "2026-04-08T00:19:59.411Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/hub/src/components/Enigmas.tsx",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 8→6 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:19:59.411Z"
+    },
+    {
+      "id": "bug-233",
+      "timestamp": "2026-04-08T00:20:05.945Z",
+      "error_message": "CSS fix: EMPTY_ENIGMA",
+      "file": "apps/hub/src/components/Enigmas.tsx",
+      "root_cause": "EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at' | 'total_answers' | 'correct_pct'> = { → Omit<Enigma, 'id' | 'created_at'> = {",
+      "fix": "Changed EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at' | 'total_answers' | 'correct_pct'> = { → Omit<Enigma, 'id' | 'created_at'> = {",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T00:21:06.348Z"
+    },
+    {
+      "id": "bug-234",
+      "timestamp": "2026-04-08T00:20:31.507Z",
+      "error_message": "Wrong reference: is_active should be active",
+      "file": "apps/hub/src/components/Enigmas.tsx",
+      "root_cause": "Used \"is_active\" instead of \"active\"",
+      "fix": "Changed is_active → active",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 11,
+      "last_seen": "2026-04-08T00:23:13.877Z"
+    },
+    {
+      "id": "bug-235",
+      "timestamp": "2026-04-08T00:53:47.201Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/enigma/DailyEnigma.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:53:47.201Z"
+    },
+    {
+      "id": "bug-236",
+      "timestamp": "2026-04-08T01:04:31.235Z",
+      "error_message": "CSS fix: width, fontSize",
+      "file": "apps/explore-web/src/components/enigma/FragmentEnigma.tsx",
+      "root_cause": "width: 32, height: 32, objectFit: 'contain' → 48, height: 48, objectFit: 'contain', borderRadius: '50%'; fontSize: 24 → 32",
+      "fix": "Changed width: 32, height: 32, objectFit: 'contain' → 48, height: 48, objectFit: 'contain', borderRadius: '50%'; fontSize: 24 → 32",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T01:04:31.235Z"
+    },
+    {
+      "id": "bug-237",
+      "timestamp": "2026-04-08T01:14:33.330Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/map/GameToast.tsx",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 23→12 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T01:14:33.330Z"
     }
   ]
 }

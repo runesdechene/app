@@ -46,7 +46,7 @@ function spawnParticles(container: HTMLElement) {
   }
 }
 
-export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation, onInfluencePlaced: _onInfluencePlaced }: InfluenceFrameProps) {
+export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation: _placeLocation, onInfluencePlaced: _onInfluencePlaced }: InfluenceFrameProps) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const influenceStock = usePlayerStore(s => s.influenceStock)
@@ -54,7 +54,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   // Optimistic local score deltas (faction -> bonus points added locally)
   const [localBonus, setLocalBonus] = useState<Map<string, number>>(new Map())
   const [pulseFaction, setPulseFaction] = useState<string | null>(null)
-  const [remoteUsed, setRemoteUsed] = useState(0) // clicks spent remotely on this place today
   const [shakeStock, setShakeStock] = useState(false)
   const [betrayalConfirmed, setBetrayalConfirmed] = useState(false)
   const [betrayalTarget, setBetrayalTarget] = useState<{ factionId: string; buttonEl: HTMLElement } | null>(null)
@@ -62,37 +61,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   // Reset confirmation quand on change de lieu
   useEffect(() => { setBetrayalConfirmed(false) }, [placeId])
 
-  // Load today's remote usage for this place from activity_log
-  useEffect(() => {
-    if (!userId) return
-    const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
-    supabase
-      .from('activity_log')
-      .select('data')
-      .eq('actor_id', userId)
-      .eq('place_id', placeId)
-      .eq('type', 'place_influence')
-      .gte('created_at', today)
-      .then(({ data }) => {
-        if (!data) return
-        const remoteTotal = data.reduce((sum, row) => {
-          const d = row.data as { remote?: boolean; points?: number }
-          return d?.remote ? sum + (d.points ?? 1) : sum
-        }, 0)
-        setRemoteUsed(remoteTotal)
-      })
-  }, [userId, placeId])
-  const [maxRemote, setMaxRemote] = useState(5)
   const pendingRef = useRef(false)
-
-  const isGps = useMemo(() => {
-    if (!userPosition) return false
-    const R = 6371
-    const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
-    const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.2
-  }, [userPosition, placeLocation])
 
   // Build banners with local bonus applied
   const banners = useMemo(() => {
@@ -120,7 +89,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
   const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
     if (!userId || !userFactionId || pendingRef.current) return
-    if (influenceStock <= 0 || (!isGps && remoteUsed >= maxRemote)) {
+    if (influenceStock <= 0) {
       // Shake the stock indicator to signal "can't click"
       setShakeStock(true)
       setTimeout(() => setShakeStock(false), 500)
@@ -132,9 +101,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     setPulseFaction(factionId)
     playPopSound()
     spawnParticles(buttonEl)
-
-    // Track remote usage
-    if (!isGps) setRemoteUsed(r => r + 1)
 
     // Update local score + stock immediately
     setLocalBonus(prev => {
@@ -160,7 +126,6 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
     if (rpcError || (data as { error?: string })?.error) {
       // Rollback optimistic update
-      if (!isGps) setRemoteUsed(r => Math.max(0, r - 1))
       setLocalBonus(prev => {
         const next = new Map(prev)
         const cur = prev.get(factionId) ?? 1
@@ -173,12 +138,9 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
       // Silent rollback — header already shows the state
     } else {
       // Sync real remaining stock from server
-      const result = data as { remainingStock?: number; maxRemote?: number; placeInfluence?: Array<{ factionId: string; placed: number; content: number; total: number }> }
+      const result = data as { remainingStock?: number; placeInfluence?: Array<{ factionId: string; placed: number; permanent: number; content: number; total: number }> }
       if (result.remainingStock != null) {
         usePlayerStore.getState().setInfluenceStock(result.remainingStock)
-      }
-      if (result.maxRemote != null) {
-        setMaxRemote(result.maxRemote)
       }
       // Mettre à jour la carte : faction dominante
       if (result.placeInfluence) {
@@ -201,8 +163,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
     setTimeout(() => setPulseFaction(null), 300)
   }, [userId, userFactionId, influenceStock, placeId, userPosition])
 
-  const remoteExhausted = !isGps && remoteUsed >= maxRemote
-  const canClick = userId && userFactionId && influenceStock > 0 && !remoteExhausted
+  const canClick = userId && userFactionId && influenceStock > 0
 
   return (
     <div className="influence-frame">
@@ -212,11 +173,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
           <span className={`influence-frame-stock${!canClick ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
             {influenceStock <= 0
               ? 'Plus de points disponibles'
-              : isGps
-                ? `${influenceStock} points \u2014 illimit\u00e9 sur place`
-                : remoteExhausted
-                  ? 'Limite du jour atteinte sur ce lieu'
-                  : `${influenceStock} points \u2014 encore ${maxRemote - remoteUsed} clics sur ce lieu`
+              : `${influenceStock} points à placer`
             }
           </span>
         )}

@@ -179,11 +179,8 @@ function ToastItem({ toast }: { toast: GameToastType }) {
   )
 }
 
-const AUTO_DISMISS_MS = 60 * 60 * 1000 // 1h
-
 export function GameToast() {
   const toasts = useToastStore(s => s.toasts)
-  const removeToast = useToastStore(s => s.removeToast)
   const containerRef = useRef<HTMLDivElement>(null)
   const [minimized, setMinimized] = useState(false)
   const [, setTick] = useState(0)
@@ -194,14 +191,6 @@ export function GameToast() {
     const id = setInterval(() => setTick(t => t + 1), 30_000)
     return () => clearInterval(id)
   }, [])
-
-  // Auto-dismiss des toasts de plus d'1h
-  useEffect(() => {
-    const now = Date.now()
-    for (const t of toasts) {
-      if (now - t.timestamp > AUTO_DISMISS_MS) removeToast(t.id)
-    }
-  }, [toasts, removeToast])
 
   // Sur desktop : auto-scroll vers le bas quand un nouveau toast arrive
   // Sur mobile : pas besoin, l'ordre est inversé (récent en haut)

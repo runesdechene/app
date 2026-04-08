@@ -1,12 +1,13 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-07T20:36:31.485Z
-> Files: 545 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T01:14:33.275Z
+> Files: 556 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../.claude/projects/C--Users-uriel-desktop-DEVS-app--Runes-de-Ch-ne-/memory/
 
+- `feedback_editorial_direction.md` (~641 tok)
 - `feedback_enigma_tone.md` (~330 tok)
-- `MEMORY.md` — Memory — Runes de Chêne (~1086 tok)
+- `MEMORY.md` — Memory — Runes de Chêne (~1120 tok)
 
 ## ./
 
@@ -57,6 +58,10 @@
 - `schema.md` — Schéma BDD complet post-migration 194 (~3000 tok)
 - `shopify.md` — Intégration Shopify : OAuth, webhooks, functions, tags (~1000 tok)
 - `stores.md` — Les 6 stores Zustand avec leur shape (~600 tok)
+
+## //EGIDE/Runes de Chêne/👑 LA CITADELLE/📱 L'application (La Carte)/
+
+- `🎮 Bible Game Design.md` — 🎮 Bible Game Design — Runes de Chêne, l'application (~6441 tok)
 
 ## apps/explore-web/
 
@@ -186,14 +191,14 @@
 
 ## apps/explore-web/src/components/enigma/
 
-- `DailyEnigma.css` — Styles: 55 rules (~2210 tok)
+- `DailyEnigma.css` — Styles: 60 rules (~2358 tok)
 - `DailyEnigma.css` — Styles: enigma overlay, modal, choices, chest icon with pulse (~1150 tok)
-- `DailyEnigma.tsx` — Chest button to display on the map (~2502 tok)
+- `DailyEnigma.tsx` — Chest button to display on the map (~2892 tok)
 - `DailyEnigma.tsx` — DailyEnigma modal + EnigmaChestButton, calls get_daily_enigma + answer_enigma (~1809 tok)
 - `EnigmaChestButton.tsx` — getCountdown (~1751 tok)
-- `EnigmaResult.css` — Styles: 16 rules (~600 tok)
+- `EnigmaResult.css` — Styles: 18 rules (~703 tok)
 - `EnigmaResult.css` — Styles: result display with pop animation (~490 tok)
-- `EnigmaResult.tsx` — EnigmaResult (~394 tok)
+- `EnigmaResult.tsx` — EnigmaResult (~433 tok)
 - `EnigmaResult.tsx` — EnigmaResult — correct/wrong display with gains (~378 tok)
 - `FragmentEnigma.tsx` — FragmentEnigma (~1404 tok)
 - `PlaceEnigma.css` — Styles: 5 rules (~233 tok)
@@ -218,7 +223,7 @@
 - `FragmentBar.css` — Styles: 8 rules (~333 tok)
 - `FragmentBar.tsx` — FragmentBar (~758 tok)
 - `GameToast.css` — Styles: 17 rules (~742 tok)
-- `GameToast.tsx` — Segmente le message en parties texte/bold, et rend les parties (~2380 tok)
+- `GameToast.tsx` — Segmente le message en parties texte/bold, et rend les parties (~2285 tok)
 - `InfluenceBadge.tsx` — InfluenceBadge (~300 tok)
 - `InfoModal.css` — Styles: 16 rules (~574 tok)
 - `InfoModal.tsx` — InfoModal (~432 tok)
@@ -261,7 +266,7 @@
 - `InfluenceFlags.css` — Styles: 6 rules (~230 tok)
 - `InfluenceFlags.tsx` — InfluenceFlags (~402 tok)
 - `InfluenceFrame.css` — Styles: 35 rules (~1690 tok)
-- `InfluenceFrame.tsx` — Influence click sound (~3323 tok)
+- `InfluenceFrame.tsx` — Influence click sound (~2781 tok)
 - `PhotoLightbox.css` — Styles: 12 rules (~542 tok)
 - `PhotoLightbox.tsx` — PhotoLightbox (~470 tok)
 - `PlaceContributions.css` — Styles: 11 rules (~431 tok)
@@ -273,7 +278,7 @@
 - `PlaceInfos.css` — Styles: 15 rules (~566 tok)
 - `PlaceInfos.tsx` — INFO_CONFIG (~1224 tok)
 - `PlacePanel.css` — Styles: 78 rules (~4068 tok)
-- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9684 tok)
+- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9690 tok)
 - `PlaceRating.css` — Styles: 8 rules (~214 tok)
 - `PlaceRating.tsx` — PlaceRating (~607 tok)
 - `ScoreSlider.tsx` — ScoreSlider (~250 tok)
@@ -371,7 +376,7 @@
 - `Constructions.tsx` — Constructions (archive V0.4, desactivee avec bandeau) (~4200 tok)
 - `Dashboard.tsx` — Dashboard avec stats V0.5 (enigmes, influence, top contributeurs) (~3800 tok)
 - `Divers.tsx` — Divers — uses useState, useEffect (~1048 tok)
-- `Enigmas.tsx` — Page gestion enigmes V0.5 : liste paginee, filtres, CRUD, toggle actif, stats (~7500 tok)
+- `Enigmas.tsx` — DIFFICULTY_LABELS (~6676 tok)
 - `Factions.tsx` — Factions (~6258 tok)
 - `FragmentAffinities.tsx` — FragmentAffinities — renders table (~1632 tok)
 - `Fragments.tsx` — Fragments (~7569 tok)
@@ -411,7 +416,7 @@
 - `2026-04-06-phase6-influence-migration.md` — Phase 6 — Influence Migration (Kill Old Claims) (~4162 tok)
 - `2026-04-06-place-panel-modal-fix.md` — PlacePanel — Modal UX Fix + Data Backfill (~4505 tok)
 - `2026-04-06-place-panel-redesign.md` — PlacePanel Redesign — Implementation Plan (~11515 tok)
-- `2026-04-07-campements.md` — Campements — Plan d'implementation (~7493 tok)
+- `2026-04-07-campements.md` — Campements — Plan d'implementation (~7515 tok)
 - `2026-04-07-fragment-limit-and-hub-rules.md` — Fragment Limit Bonus + Hub Game Rules Page (~3595 tok)
 
 ## docs/superpowers/specs/
@@ -439,6 +444,7 @@
 ## supabase/
 
 - `config.toml` (~184 tok)
+- `enigmas_easy_batch.sql` — Énigmes quotidiennes — difficulté "easy" — ~55 entrées réparties sur 4 factions (~9267 tok)
 - `recovery_denis.sql` — RESTAURATION DES DONNEES DE DENIS POUCHAIN (~12665 tok)
 - `schema_dump.sql` (~128 tok)
 
@@ -547,12 +553,20 @@
 - `049_fix_legende_title_rank.sql` — 049_fix_legende_title_rank.sql (~1314 tok)
 - `050_create_place_no_remote_influence.sql` — 050_create_place_no_remote_influence.sql (~1443 tok)
 - `050_titles.sql` — MIGRATION 050 : Systeme de Titres (~2654 tok)
+- `051_influence_no_limit_permanent_gps.sql` — 051_influence_no_limit_permanent_gps.sql (~4088 tok)
 - `051_titles_v2.sql` — MIGRATION 051 : Titres v2 — Conditions flexibles + Selection joueur (~4088 tok)
+- `052_create_place_permanent_and_likes_minimum.sql` — 052_create_place_permanent_and_likes_minimum.sql (~2046 tok)
 - `052_profile_features.sql` — MIGRATION 052 : Profil unifie + Faction payante + Membres (~4113 tok)
 - `053_add_place.sql` — 053 : Ajout de lieu depuis la carte (~816 tok)
+- `053_daily_enigma_trio.sql` — 053_daily_enigma_trio.sql (~698 tok)
 - `054_places_viewed_insert_policy.sql` — 054 : Policy INSERT sur places_viewed (~94 tok)
+- `054_very_easy_enigmas_and_fixed_daily.sql` — 054_very_easy_enigmas_and_fixed_daily.sql (~3051 tok)
+- `055_medium_enigmas.sql` — 055_medium_enigmas.sql (~11064 tok)
 - `055_profile_no_limit.sql` — 055 : Retirer le LIMIT 50 + servir les thumbnails (~1495 tok)
+- `055_very_easy_enigmas_batch2.sql` — 055_very_easy_enigmas_batch2.sql (~10441 tok)
+- `056_hard_enigmas_batch2.sql` — 056_hard_enigmas_batch2.sql (~16954 tok)
 - `056_profile_edit_name.sql` — 056 : Ajouter p_first_name a update_my_profile (~178 tok)
+- `057_enigma_erudition_wrong_and_rewards.sql` — 057_enigma_erudition_wrong_and_rewards.sql (~2345 tok)
 - `057_onboarding_avatar.sql` — 057 : Onboarding — avatar_url + update RPCs (~2266 tok)
 - `058_rename_faction.sql` — MIGRATION 058 : RPC rename_faction (~584 tok)
 - `059_backfill_author_discoveries.sql` — MIGRATION 059 : Backfill author discoveries (~262 tok)

@@ -6,15 +6,14 @@ import './DailyEnigma.css'
 
 interface Enigma {
   id: number
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: 'very_easy' | 'easy' | 'medium' | 'hard'
   loreText: string
   question: string
   format: 'qcm' | 'free'
   choices: string[] | null
   heritageId: string | null
-  energyCost: number
-  isBonus: boolean
-  answeredToday: number
+  rewardInfluence: number
+  rewardErudition: number
 }
 
 interface AnswerResult {
@@ -23,10 +22,8 @@ interface AnswerResult {
   explanation: string
   influenceGain: number
   eruditionGain: number
-  energyCost: number
   newInfluenceStock: number
   newErudition: number
-  newEnergy: number
   newGlory: number
 }
 
@@ -35,21 +32,26 @@ interface DailyEnigmaProps {
 }
 
 const DIFFICULTY_LABELS: Record<string, string> = {
-  easy: 'Facile',
-  medium: 'Moyen',
-  hard: 'Difficile',
+  very_easy: 'Facile',
+  easy: 'Intermédiaire',
+  medium: 'Avancé',
+  hard: 'Expert',
 }
+
+const DIFFICULTY_ORDER: Array<'very_easy' | 'easy' | 'medium' | 'hard'> = ['very_easy', 'easy', 'medium', 'hard']
 
 export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const userId = usePlayerStore(s => s.userId)
-  const [enigma, setEnigma] = useState<Enigma | null>(null)
-  const [noEnergy, setNoEnergy] = useState(false)
+  const [enigmas, setEnigmas] = useState<Enigma[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [allDone, setAllDone] = useState(false)
   const [noEnigma, setNoEnigma] = useState(false)
   const [loading, setLoading] = useState(true)
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
+  const [, setTotalGains] = useState({ influence: 0, erudition: 0 })
   const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string; adjective: string }>>(new Map())
 
   // Load faction visuals once
@@ -64,43 +66,47 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
     })
   }, [])
 
-  function loadEnigma() {
+  function loadEnigmas() {
     if (!userId) return
     setLoading(true)
-    setEnigma(null)
+    setEnigmas([])
+    setCurrentIndex(0)
     setResult(null)
-    setSelectedChoice(null)
-    setFreeAnswer('')
-    setNoEnergy(false)
+    setAllDone(false)
     setNoEnigma(false)
+    setTotalGains({ influence: 0, erudition: 0 })
 
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data, error }) => {
       if (error) { setLoading(false); return }
       const d = data as Record<string, unknown>
 
-      if (d.error === 'not_enough_energy') {
-        setNoEnergy(true)
+      if (d.all_answered) {
+        setAllDone(true)
       } else if (d.error === 'no_enigma_available') {
         setNoEnigma(true)
-      } else if (d.id) {
-        setEnigma({
-          id: d.id as number,
-          difficulty: d.difficulty as 'easy' | 'medium' | 'hard',
-          loreText: d.loreText as string,
-          question: d.question as string,
-          format: d.format as 'qcm' | 'free',
-          choices: d.choices as string[] | null,
-          heritageId: d.heritageId as string | null,
-          energyCost: (d.energyCost as number) ?? 0,
-          isBonus: (d.isBonus as boolean) ?? false,
-          answeredToday: (d.answeredToday as number) ?? 0,
-        })
+      } else if (d.enigmas && Array.isArray(d.enigmas)) {
+        const list = (d.enigmas as Array<Record<string, unknown>>).map(e => ({
+          id: e.id as number,
+          difficulty: e.difficulty as Enigma['difficulty'],
+          loreText: e.loreText as string,
+          question: e.question as string,
+          format: e.format as 'qcm' | 'free',
+          choices: e.choices as string[] | null,
+          heritageId: e.heritageId as string | null,
+          rewardInfluence: (e.rewardInfluence as number) ?? 0,
+          rewardErudition: (e.rewardErudition as number) ?? 0,
+        }))
+        // Sort easy → medium → hard
+        list.sort((a, b) => DIFFICULTY_ORDER.indexOf(a.difficulty) - DIFFICULTY_ORDER.indexOf(b.difficulty))
+        setEnigmas(list)
       }
       setLoading(false)
     })
   }
 
-  useEffect(() => { loadEnigma() }, [userId])
+  useEffect(() => { loadEnigmas() }, [userId])
+
+  const enigma = enigmas[currentIndex] ?? null
 
   async function handleSubmit() {
     if (!userId || !enigma || submitting) return
@@ -119,33 +125,47 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
       setResult(r)
       if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
       if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
-      if (r.newEnergy != null) usePlayerStore.getState().setEnergy(r.newEnergy)
+      setTotalGains(prev => ({
+        influence: prev.influence + (r.influenceGain ?? 0),
+        erudition: prev.erudition + (r.eruditionGain ?? 0),
+      }))
     }
     setSubmitting(false)
   }
+
+  function handleNext() {
+    if (currentIndex < enigmas.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+      setResult(null)
+      setSelectedChoice(null)
+      setFreeAnswer('')
+    } else {
+      onClose()
+    }
+  }
+
+  const isLast = currentIndex >= enigmas.length - 1
+  const progress = enigmas.length > 0 ? `${currentIndex + 1} / ${enigmas.length}` : ''
 
   return (
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <button className="enigma-close-x" onClick={onClose}>&#10005;</button>
+
         {!result && (
           <div className="enigma-header">
             <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
-            <h2 className="enigma-title">
-              {enigma?.isBonus ? '\u00c9nigme bonus' : '\u00c9nigme du jour'}
-            </h2>
-            {enigma?.isBonus && (
-              <span className="enigma-cost">{enigma.energyCost}⚡ </span>
-            )}
+            <h2 className="enigma-title">{'\u00c9'}nigmes du jour</h2>
+            {enigmas.length > 0 && <span className="enigma-progress">{progress}</span>}
           </div>
         )}
 
         {loading && <div className="enigma-loading">Chargement...</div>}
 
-        {!loading && noEnergy && (
+        {!loading && allDone && (
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
-              Pas assez d'énergie pour une énigme bonus (5 ⚡ requis).
+              Vous avez répondu aux 3 énigmes du jour. Revenez demain !
             </p>
           </div>
         )}
@@ -183,6 +203,13 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
                 )
               })()}
             </div>
+
+            {(enigma.rewardInfluence > 0 || enigma.rewardErudition > 0) && (
+              <div className="enigma-rewards-preview">
+                {enigma.rewardInfluence > 0 && <span className="enigma-reward influence">🏴 +{enigma.rewardInfluence} influence</span>}
+                {enigma.rewardErudition > 0 && <span className="enigma-reward erudition">📜 +{enigma.rewardErudition} érudition</span>}
+              </div>
+            )}
 
             <p className="enigma-lore">{enigma.loreText}</p>
             <p className="enigma-question">{enigma.question}</p>
@@ -229,7 +256,8 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
             explanation={result.explanation}
             influenceGain={result.influenceGain}
             eruditionGain={result.eruditionGain}
-            onClose={onClose}
+            onClose={isLast ? onClose : handleNext}
+            closeLabel={isLast ? 'Fermer' : '\u00c9nigme suivante \u2192'}
           />
         )}
       </div>
@@ -248,11 +276,11 @@ export function EnigmaChestButton({ onClick, hasAnsweredToday }: ChestButtonProp
     <button
       className={`enigma-chest-btn${!hasAnsweredToday ? ' pulse' : ''}`}
       onClick={onClick}
-      title={hasAnsweredToday ? '\u00c9nigme bonus (5 ⚡ )' : '\u00c9nigme du jour (gratuite)'}
+      title={hasAnsweredToday ? 'Énigmes du jour' : 'Énigmes du jour (nouvelles !)'}
     >
       <img src="/res/coffre.webp" alt="" className="enigma-chest-img" />
       <span className="enigma-chest-label">
-        {hasAnsweredToday ? '5\u26a1' : '\u2B50'}
+        {hasAnsweredToday ? '📚' : '\u2B50'}
       </span>
     </button>
   )

@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { SaveBar } from './SaveBar'
 
 type EnigmaType = 'daily' | 'place'
-type Difficulty = 'easy' | 'medium' | 'hard'
+type Difficulty = 'very_easy' | 'easy' | 'medium' | 'hard'
 type AnswerFormat = 'qcm' | 'free'
 
 interface Enigma {
@@ -14,14 +14,12 @@ interface Enigma {
   place_tag: string | null
   lore_text: string
   question: string
-  answer_format: AnswerFormat
+  format: AnswerFormat
   choices: string[] | null
   answer: string
   explanation: string
-  is_active: boolean
+  active: boolean
   created_at: string
-  total_answers: number
-  correct_pct: number
 }
 
 interface Faction {
@@ -35,12 +33,14 @@ interface Tag {
 }
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: 'Facile',
-  medium: 'Moyen',
-  hard: 'Difficile',
+  very_easy: 'Facile',
+  easy: 'Intermédiaire',
+  medium: 'Avancé',
+  hard: 'Expert',
 }
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  very_easy: '#2a9d8f',
   easy: '#22c55e',
   medium: '#f59e0b',
   hard: '#ef4444',
@@ -53,18 +53,18 @@ const TYPE_LABELS: Record<EnigmaType, string> = {
 
 const PER_PAGE = 20
 
-const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at' | 'total_answers' | 'correct_pct'> = {
+const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at'> = {
   type: 'daily',
   difficulty: 'easy',
   heritage_id: null,
   place_tag: null,
   lore_text: '',
   question: '',
-  answer_format: 'qcm',
+  format: 'qcm',
   choices: ['', '', '', ''],
   answer: '',
   explanation: '',
-  is_active: true,
+  active: true,
 }
 
 export function Enigmas() {
@@ -109,14 +109,12 @@ export function Enigmas() {
           place_tag: (e.place_tag as string | null) ?? null,
           lore_text: String(e.lore_text ?? ''),
           question: String(e.question ?? ''),
-          answer_format: (e.answer_format as AnswerFormat) || 'qcm',
+          format: (e.format as AnswerFormat) || 'qcm',
           choices: (e.choices as string[] | null) ?? null,
           answer: String(e.answer ?? ''),
           explanation: String(e.explanation ?? ''),
-          is_active: Boolean(e.is_active),
+          active: Boolean(e.active),
           created_at: String(e.created_at ?? ''),
-          total_answers: Number(e.total_answers ?? 0),
-          correct_pct: Number(e.correct_pct ?? 0),
         }))
         setEnigmas(mapped)
         setSavedEnigmas(JSON.parse(JSON.stringify(mapped)))
@@ -134,8 +132,8 @@ export function Enigmas() {
       if (filterType !== 'all' && e.type !== filterType) return false
       if (filterDifficulty !== 'all' && e.difficulty !== filterDifficulty) return false
       if (filterHeritage !== 'all' && e.heritage_id !== filterHeritage) return false
-      if (filterActive === 'active' && !e.is_active) return false
-      if (filterActive === 'inactive' && e.is_active) return false
+      if (filterActive === 'active' && !e.active) return false
+      if (filterActive === 'inactive' && e.active) return false
       return true
     })
   }, [enigmas, filterType, filterDifficulty, filterHeritage, filterActive])
@@ -149,7 +147,7 @@ export function Enigmas() {
   // Stats
   const stats = useMemo(() => ({
     total: enigmas.length,
-    active: enigmas.filter(e => e.is_active).length,
+    active: enigmas.filter(e => e.active).length,
     daily: enigmas.filter(e => e.type === 'daily').length,
     place: enigmas.filter(e => e.type === 'place').length,
   }), [enigmas])
@@ -158,14 +156,14 @@ export function Enigmas() {
   async function toggleActive(id: number) {
     const enigma = enigmas.find(e => e.id === id)
     if (!enigma) return
-    const newActive = !enigma.is_active
+    const newActive = !enigma.active
     const { error } = await supabase
       .from('enigmas')
-      .update({ is_active: newActive })
+      .update({ active: newActive })
       .eq('id', id)
     if (!error) {
-      setEnigmas(prev => prev.map(e => e.id === id ? { ...e, is_active: newActive } : e))
-      setSavedEnigmas(prev => prev.map(e => e.id === id ? { ...e, is_active: newActive } : e))
+      setEnigmas(prev => prev.map(e => e.id === id ? { ...e, active: newActive } : e))
+      setSavedEnigmas(prev => prev.map(e => e.id === id ? { ...e, active: newActive } : e))
     }
   }
 
@@ -179,11 +177,11 @@ export function Enigmas() {
       place_tag: enigma.place_tag,
       lore_text: enigma.lore_text,
       question: enigma.question,
-      answer_format: enigma.answer_format,
+      format: enigma.format,
       choices: enigma.choices ? [...enigma.choices] : ['', '', '', ''],
       answer: enigma.answer,
       explanation: enigma.explanation,
-      is_active: enigma.is_active,
+      active: enigma.active,
     })
   }
 
@@ -230,13 +228,13 @@ export function Enigmas() {
       place_tag: editForm.place_tag || null,
       lore_text: editForm.lore_text,
       question: editForm.question,
-      answer_format: editForm.answer_format,
-      choices: editForm.answer_format === 'qcm'
+      format: editForm.format,
+      choices: editForm.format === 'qcm'
         ? (editForm.choices || []).filter(c => c.trim())
         : null,
       answer: editForm.answer,
       explanation: editForm.explanation,
-      is_active: editForm.is_active,
+      active: editForm.active,
     }
 
     if (editingId === 'new') {
@@ -292,11 +290,11 @@ export function Enigmas() {
               place_tag: e.place_tag,
               lore_text: e.lore_text,
               question: e.question,
-              answer_format: e.answer_format,
+              format: e.format,
               choices: e.choices,
               answer: e.answer,
               explanation: e.explanation,
-              is_active: e.is_active,
+              active: e.active,
             })
             .eq('id', e.id)
           if (error) {
@@ -353,6 +351,7 @@ export function Enigmas() {
                 onChange={e => setEditForm(prev => ({ ...prev, difficulty: e.target.value as Difficulty }))}
                 className="settings-input"
               >
+                <option value="very_easy">Très facile</option>
                 <option value="easy">Facile</option>
                 <option value="medium">Moyen</option>
                 <option value="hard">Difficile</option>
@@ -412,8 +411,8 @@ export function Enigmas() {
             <label className="settings-global-field">
               <span>Format de reponse</span>
               <select
-                value={editForm.answer_format}
-                onChange={e => setEditForm(prev => ({ ...prev, answer_format: e.target.value as AnswerFormat }))}
+                value={editForm.format}
+                onChange={e => setEditForm(prev => ({ ...prev, format: e.target.value as AnswerFormat }))}
                 className="settings-input"
               >
                 <option value="qcm">QCM</option>
@@ -422,7 +421,7 @@ export function Enigmas() {
             </label>
           </div>
 
-          {editForm.answer_format === 'qcm' && (
+          {editForm.format === 'qcm' && (
             <div className="faction-field" style={{ marginBottom: 12 }}>
               <label className="faction-field-label">Choix</label>
               {(editForm.choices || []).map((choice, idx) => (
@@ -472,8 +471,8 @@ export function Enigmas() {
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input
               type="checkbox"
-              checked={editForm.is_active}
-              onChange={e => setEditForm(prev => ({ ...prev, is_active: e.target.checked }))}
+              checked={editForm.active}
+              onChange={e => setEditForm(prev => ({ ...prev, active: e.target.checked }))}
             />
             <span>Active</span>
           </label>
@@ -540,6 +539,7 @@ export function Enigmas() {
           className="settings-input"
         >
           <option value="all">Toutes difficultes</option>
+          <option value="very_easy">Très facile</option>
           <option value="easy">Facile</option>
           <option value="medium">Moyen</option>
           <option value="hard">Difficile</option>
@@ -578,8 +578,6 @@ export function Enigmas() {
                 <th>Difficulte</th>
                 <th>Question</th>
                 <th>Heritage</th>
-                <th>Reponses</th>
-                <th>% Correct</th>
                 <th>Active</th>
                 <th>Actions</th>
               </tr>
@@ -604,17 +602,13 @@ export function Enigmas() {
                       {e.question || <span style={{ opacity: 0.4 }}>Pas de question</span>}
                     </td>
                     <td style={{ fontSize: 11 }}>{factionName}</td>
-                    <td style={{ textAlign: 'center' }}>{e.total_answers}</td>
-                    <td style={{ textAlign: 'center' }}>
-                      {e.total_answers > 0 ? `${e.correct_pct}%` : '-'}
-                    </td>
                     <td style={{ textAlign: 'center' }}>
                       <button
                         onClick={() => toggleActive(e.id)}
-                        className={e.is_active ? 'btn-primary' : 'btn-secondary'}
+                        className={e.active ? 'btn-primary' : 'btn-secondary'}
                         style={{ fontSize: 11, padding: '2px 8px', minWidth: 50 }}
                       >
-                        {e.is_active ? 'Oui' : 'Non'}
+                        {e.active ? 'Oui' : 'Non'}
                       </button>
                     </td>
                     <td>

@@ -46,16 +46,16 @@
 | message | TEXT | |
 | created_at | TIMESTAMPTZ | |
 
-### Nouvelle table: `fragment_tag_affinities`
+### Table existante: `fragment_tag_affinities` (migration 040, déjà en prod)
 
 | Colonne | Type | Notes |
 |---------|------|-------|
 | fragment_id | INT FK title_fragments(id) | |
 | tag_id | VARCHAR(255) FK tags(id) | |
-| bonus_points | INT | Pts perennes ajoutes (defaut 10) |
+| bonus_points | INT | Pts perennes ajoutes (defaut 3) |
 | PK | (fragment_id, tag_id) | |
 
-Configurable depuis le Hub : quel fragment boost quel tag.
+Déjà configurable depuis le Hub > Fragments > Affinités. Utilisée par `place_influence_action` pour le bonus remote.
 
 ---
 
