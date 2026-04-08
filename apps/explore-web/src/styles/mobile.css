@@ -809,3 +809,17 @@
     left: auto;
   }
 }
+
+/* Notification panel — mobile */
+@media (max-width: 768px) {
+  .notification-panel {
+    position: fixed;
+    top: auto;
+    bottom: 64px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-height: 60vh;
+    border-radius: 16px 16px 0 0;
+  }
+}

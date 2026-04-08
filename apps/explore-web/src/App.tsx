@@ -33,6 +33,8 @@ import { AdScreen } from './components/map/AdScreen'
 import { DailyEnigma } from './components/enigma/DailyEnigma'
 import { EnigmaChestButton } from './components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from './components/enigma/FragmentEnigma'
+import { NotificationBell } from './components/notifications/NotificationBell'
+import { useNotifications } from './hooks/useNotifications'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 import './styles/mobile.css'
@@ -113,6 +115,7 @@ function App() {
   usePresence()
   // Chat en jeu
   useChat()
+  useNotifications()
   useResourceTimers()
 
   // Auto-open auth modal si non connecté (une seule fois par session)
@@ -186,6 +189,7 @@ function App() {
                 onOpenFragment={(f) => setFragmentEnigma(f)}
                 refreshKey={enigmaRefreshKey}
               />
+              <NotificationBell />
               <EnergyIndicator />
             </>
           )}
