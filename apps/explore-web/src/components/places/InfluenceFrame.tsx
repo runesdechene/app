@@ -235,9 +235,9 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         <div className="influence-frame-hint">
           <span className="influence-frame-hint-title">Comment gagner de l'influence ?</span>
           <ul className="influence-frame-hint-list">
-            <li>{'\u2B50'} Repondre aux enigmes</li>
-            <li>{'\uD83D\uDCCD'} Explorer un lieu sur place (GPS)</li>
-            <li>{'\uD83D\uDCDD'} Ameliorer une fiche de lieu</li>
+            <li>🔮 Résoudre les énigmes du jour → stock à placer</li>
+            <li>🧭 Visiter un lieu en GPS → stock à placer</li>
+            <li>📜 Écrire un récit → influence permanente</li>
           </ul>
         </div>
       )}

@@ -126,13 +126,6 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, perm
             )}
           </span>
         )}
-        {carnet.rating !== null && (
-          <span className="carnet-stars">
-            {Array.from({ length: 5 }, (_, i) => (
-              <span key={i} className={i < carnet.rating! ? 'star-filled' : 'star-empty'}>★</span>
-            ))}
-          </span>
-        )}
       </div>
 
       {/* Title + Text */}

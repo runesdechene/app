@@ -10,10 +10,10 @@ interface AddCarnetModalProps {
   onSaved: () => void
 }
 
-export function AddCarnetModal({ placeId, canRate, onClose, onSaved }: AddCarnetModalProps) {
+export function AddCarnetModal({ placeId, canRate: _canRate, onClose, onSaved }: AddCarnetModalProps) {
   const userId = usePlayerStore(s => s.userId)
+  const [carnetTitle, setCarnetTitle] = useState('')
   const [text, setText] = useState('')
-  const [rating, setRating] = useState<number | null>(null)
   const [photos, setPhotos] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
@@ -66,9 +66,9 @@ export function AddCarnetModal({ placeId, canRate, onClose, onSaved }: AddCarnet
         user_id: userId,
         faction_id: usePlayerStore.getState().userFactionId,
         type: 'carnet',
+        title: carnetTitle.trim() || null,
         content: text.trim(),
         images: imageUrls,
-        rating: rating,
       }, { onConflict: 'place_id,user_id,type' })
 
     if (insertErr) {
@@ -99,6 +99,16 @@ export function AddCarnetModal({ placeId, canRate, onClose, onSaved }: AddCarnet
         </div>
 
         <div className="add-carnet-body">
+          {/* Titre (optionnel) */}
+          <input
+            className="add-carnet-title-input"
+            type="text"
+            value={carnetTitle}
+            onChange={e => setCarnetTitle(e.target.value)}
+            placeholder="Titre de votre note (optionnel)"
+            maxLength={120}
+          />
+
           {/* Text */}
           <textarea
             className="add-carnet-textarea"
@@ -135,22 +145,6 @@ export function AddCarnetModal({ placeId, canRate, onClose, onSaved }: AddCarnet
               onChange={e => addPhotos(e.target.files)}
             />
           </div>
-
-          {/* Rating */}
-          {canRate && (
-            <div className="add-carnet-rating">
-              <span className="add-carnet-rating-label">Note :</span>
-              {[1, 2, 3, 4, 5].map(n => (
-                <button
-                  key={n}
-                  className={`add-carnet-star ${rating !== null && n <= rating ? 'active' : ''}`}
-                  onClick={() => setRating(prev => prev === n ? null : n)}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
-          )}
 
           {error && <p className="add-carnet-error">{error}</p>}
         </div>

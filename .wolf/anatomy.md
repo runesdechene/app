@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T11:39:28.192Z
-> Files: 557 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T13:51:36.333Z
+> Files: 559 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../.claude/projects/C--Users-uriel-desktop-DEVS-app--Runes-de-Ch-ne-/memory/
 
@@ -65,7 +65,7 @@
 
 ## apps/explore-web/
 
-- `CHANGELOG.md` — ALPHA V0.5.3 (~2978 tok)
+- `CHANGELOG.md` — ALPHA V0.5.7 (~3562 tok)
 - `CLAUDE.md` — La Carte — Runes de Chêne (V0.4 — L'Érudition Conquérante) (~288 tok)
 - `index.html` — Runes de Chêne CONQUÊTE (~239 tok)
 - `netlify.toml` (~78 tok)
@@ -73,7 +73,7 @@
 - `postcss.config.mjs` (~26 tok)
 - `tsconfig.json` — TypeScript configuration (~167 tok)
 - `tsconfig.node.json` (~64 tok)
-- `vite.config.ts` — Vite build configuration (~426 tok)
+- `vite.config.ts` (~449 tok)
 
 ## apps/explore-web/public/fortifications/
 
@@ -247,14 +247,14 @@
 
 ## apps/explore-web/src/components/places/
 
-- `AddCarnetModal.css` — Styles: 27 rules (~1099 tok)
-- `AddCarnetModal.tsx` — AddCarnetModal (~1591 tok)
+- `AddCarnetModal.css` — Styles: 29 rules (~1211 tok)
+- `AddCarnetModal.tsx` — AddCarnetModal (~1531 tok)
 - `AddContributionModal.css` — Styles: 14 rules (~656 tok)
 - `AddContributionModal.tsx` — TYPE_OPTIONS (~1403 tok)
 - `AddPlaceFlow.css` — Styles: 53 rules (~2466 tok)
 - `AddPlaceFlow.tsx` — MAX_FILE_SIZE (~7640 tok)
 - `CarnetCard.css` — Styles: 31 rules (~1211 tok)
-- `CarnetCard.tsx` — RANK_POINTS (~1910 tok)
+- `CarnetCard.tsx` — RANK_POINTS (~1832 tok)
 - `ClaimButton.tsx` — hexToRgb (~2374 tok)
 - `ContributionCard.css` — Styles: 15 rules (~657 tok)
 - `ContributionCard.tsx` — TYPE_LABELS (~1022 tok)
@@ -266,7 +266,7 @@
 - `InfluenceFlags.css` — Styles: 6 rules (~230 tok)
 - `InfluenceFlags.tsx` — InfluenceFlags (~402 tok)
 - `InfluenceFrame.css` — Styles: 35 rules (~1690 tok)
-- `InfluenceFrame.tsx` — Influence click sound (~2781 tok)
+- `InfluenceFrame.tsx` — Influence click sound (~2783 tok)
 - `PhotoLightbox.css` — Styles: 12 rules (~542 tok)
 - `PhotoLightbox.tsx` — PhotoLightbox (~470 tok)
 - `PlaceContributions.css` — Styles: 11 rules (~431 tok)
@@ -277,8 +277,8 @@
 - `PlaceGallery.tsx` — PlaceGallery (~260 tok)
 - `PlaceInfos.css` — Styles: 15 rules (~566 tok)
 - `PlaceInfos.tsx` — INFO_CONFIG (~1224 tok)
-- `PlacePanel.css` — Styles: 78 rules (~4068 tok)
-- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9920 tok)
+- `PlacePanel.css` — Styles: 82 rules (~4686 tok)
+- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~10597 tok)
 - `PlaceRating.css` — Styles: 8 rules (~214 tok)
 - `PlaceRating.tsx` — PlaceRating (~607 tok)
 - `ScoreSlider.tsx` — ScoreSlider (~250 tok)
@@ -380,7 +380,7 @@
 - `Factions.tsx` — Factions (~6258 tok)
 - `FragmentAffinities.tsx` — FragmentAffinities — renders table (~1632 tok)
 - `Fragments.tsx` — Fragments (~7569 tok)
-- `GameRules.tsx` — Clés obsolètes — anciens systèmes supprimés (conquête, construction, vitalité, fortification, claim) (~2438 tok)
+- `GameRules.tsx` — Clés obsolètes — anciens systèmes supprimés (conquête, construction, vitalité, fortification, claim) (~2528 tok)
 - `LoginPage.tsx` — LoginPage — renders form — uses useState (~993 tok)
 - `Photos.tsx` — VIDEO_EXTENSIONS — uses useState, useEffect (~8703 tok)
 - `PhotoSubmit.tsx` — Redimensionne et convertit une image en WebP avant upload (~5938 tok)
@@ -571,7 +571,9 @@
 - `058_fix_daily_enigma_max3.sql` — 058_fix_daily_enigma_max3.sql (~764 tok)
 - `058_rename_faction.sql` — MIGRATION 058 : RPC rename_faction (~584 tok)
 - `059_backfill_author_discoveries.sql` — MIGRATION 059 : Backfill author discoveries (~262 tok)
+- `059_visit_gps_stock_bonus.sql` — 059_visit_gps_stock_bonus.sql (~1661 tok)
 - `060_fortify_faction_color.sql` — MIGRATION 060 : Ajouter couleur faction au trigger fortify (~368 tok)
+- `060_visit_gps_stock_only.sql` — 060_visit_gps_stock_only.sql (~1448 tok)
 - `061_construction_types.sql` — MIGRATION 061 : Types de construction dynamiques (~1609 tok)
 - `062_faction_change_half_notoriety.sql` — MIGRATION 062 : Changement de faction = /2 notoriete (~636 tok)
 - `063_cheat_refill.sql` — MIGRATION 063 : Cheat code — refill ressources (~596 tok)

@@ -83,17 +83,17 @@
       "first_read": "2026-04-07T19:41:35.458Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/hub/src/components/GameRules.tsx": {
-      "count": 4,
-      "tokens": 2410,
+      "count": 6,
+      "tokens": 2473,
       "first_read": "2026-04-07T19:41:45.617Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddPlaceFlow.tsx": {
-      "count": 11,
-      "tokens": 7095,
+      "count": 12,
+      "tokens": 7640,
       "first_read": "2026-04-07T19:59:18.006Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/CHANGELOG.md": {
-      "count": 2,
+      "count": 4,
       "tokens": 514,
       "first_read": "2026-04-07T20:10:51.213Z"
     },
@@ -153,13 +153,13 @@
       "first_read": "2026-04-07T23:41:42.940Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/InfluenceFrame.tsx": {
-      "count": 7,
+      "count": 8,
       "tokens": 2781,
       "first_read": "2026-04-07T23:42:54.404Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx": {
-      "count": 9,
-      "tokens": 9887,
+      "count": 22,
+      "tokens": 10323,
       "first_read": "2026-04-07T23:44:23.221Z"
     },
     "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/supabase/migrations/020_backfill_explorers_and_carnets.sql": {
@@ -261,6 +261,46 @@
       "count": 3,
       "tokens": 1172,
       "first_read": "2026-04-08T11:00:15.376Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.css": {
+      "count": 1,
+      "tokens": 4068,
+      "first_read": "2026-04-08T11:47:03.681Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx": {
+      "count": 5,
+      "tokens": 1441,
+      "first_read": "2026-04-08T11:52:06.178Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/hooks/usePlace.ts": {
+      "count": 1,
+      "tokens": 1213,
+      "first_read": "2026-04-08T11:53:29.111Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.css": {
+      "count": 1,
+      "tokens": 1099,
+      "first_read": "2026-04-08T12:02:14.078Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/enigma/PlaceEnigma.tsx": {
+      "count": 2,
+      "tokens": 1737,
+      "first_read": "2026-04-08T12:02:33.443Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/public/manifest.webmanifest": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-08T12:37:42.223Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/dist/manifest.webmanifest": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-08T12:37:53.839Z"
+    },
+    "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/vite.config.ts": {
+      "count": 1,
+      "tokens": 426,
+      "first_read": "2026-04-08T12:38:45.347Z"
     }
   },
   "files_written": [
@@ -1577,6 +1617,240 @@
       "action": "edit",
       "tokens": 73,
       "at": "2026-04-08T11:39:28.206Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/CarnetCard.tsx",
+      "action": "edit",
+      "tokens": 0,
+      "at": "2026-04-08T11:44:21.389Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 102,
+      "at": "2026-04-08T11:44:35.721Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 113,
+      "at": "2026-04-08T11:44:44.536Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 41,
+      "at": "2026-04-08T11:44:58.983Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 93,
+      "at": "2026-04-08T11:45:09.334Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 325,
+      "at": "2026-04-08T11:45:30.666Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 25,
+      "at": "2026-04-08T11:45:59.546Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 63,
+      "at": "2026-04-08T11:46:06.374Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 27,
+      "at": "2026-04-08T11:46:29.340Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.css",
+      "action": "edit",
+      "tokens": 423,
+      "at": "2026-04-08T11:47:17.584Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 19,
+      "at": "2026-04-08T11:52:20.391Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 54,
+      "at": "2026-04-08T11:55:07.055Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 16,
+      "at": "2026-04-08T11:55:13.176Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "action": "edit",
+      "tokens": 134,
+      "at": "2026-04-08T11:58:11.382Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/supabase/migrations/059_visit_gps_stock_bonus.sql",
+      "action": "create",
+      "tokens": 1780,
+      "at": "2026-04-08T12:01:05.068Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 40,
+      "at": "2026-04-08T12:01:27.674Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 36,
+      "at": "2026-04-08T12:01:35.359Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.tsx",
+      "action": "edit",
+      "tokens": 127,
+      "at": "2026-04-08T12:01:59.191Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/AddCarnetModal.css",
+      "action": "edit",
+      "tokens": 119,
+      "at": "2026-04-08T12:02:21.865Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 24,
+      "at": "2026-04-08T12:05:28.909Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 82,
+      "at": "2026-04-08T12:05:44.714Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 194,
+      "at": "2026-04-08T12:05:55.176Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 120,
+      "at": "2026-04-08T12:06:10.590Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 216,
+      "at": "2026-04-08T12:06:19.197Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.css",
+      "action": "edit",
+      "tokens": 124,
+      "at": "2026-04-08T12:06:29.070Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 19,
+      "at": "2026-04-08T12:06:50.004Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/CHANGELOG.md",
+      "action": "edit",
+      "tokens": 539,
+      "at": "2026-04-08T12:09:39.908Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/CHANGELOG.md",
+      "action": "edit",
+      "tokens": 436,
+      "at": "2026-04-08T12:10:26.515Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/supabase/migrations/060_visit_gps_stock_only.sql",
+      "action": "create",
+      "tokens": 1551,
+      "at": "2026-04-08T12:13:02.016Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 43,
+      "at": "2026-04-08T12:13:27.448Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 147,
+      "at": "2026-04-08T12:13:36.329Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 85,
+      "at": "2026-04-08T12:13:43.734Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.tsx",
+      "action": "edit",
+      "tokens": 220,
+      "at": "2026-04-08T12:13:54.747Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/PlacePanel.css",
+      "action": "edit",
+      "tokens": 45,
+      "at": "2026-04-08T12:14:02.295Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/src/components/places/InfluenceFrame.tsx",
+      "action": "edit",
+      "tokens": 56,
+      "at": "2026-04-08T12:14:11.355Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/vite.config.ts",
+      "action": "edit",
+      "tokens": 244,
+      "at": "2026-04-08T12:39:03.441Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/explore-web/CHANGELOG.md",
+      "action": "edit",
+      "tokens": 117,
+      "at": "2026-04-08T12:40:35.006Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/hub/src/components/GameRules.tsx",
+      "action": "edit",
+      "tokens": 43,
+      "at": "2026-04-08T13:51:22.821Z"
+    },
+    {
+      "file": "C:/Users/uriel/desktop/DEVS/app (Runes de Chêne)/apps/hub/src/components/GameRules.tsx",
+      "action": "edit",
+      "tokens": 74,
+      "at": "2026-04-08T13:51:36.348Z"
     }
   ],
   "edit_counts": {
@@ -1590,16 +1864,16 @@
     "supabase/migrations/048_fragment_affinities_rls_write.sql": 1,
     "apps/explore-web/src/components/map/OnlinePlayerMarkers.css": 6,
     "supabase/migrations/049_fix_legende_title_rank.sql": 1,
-    "apps/hub/src/components/GameRules.tsx": 10,
+    "apps/hub/src/components/GameRules.tsx": 12,
     "supabase/migrations/050_create_place_no_remote_influence.sql": 1,
-    "apps/explore-web/CHANGELOG.md": 2,
+    "apps/explore-web/CHANGELOG.md": 5,
     "apps/explore-web/src/components/map/VersionBadge.tsx": 3,
     "apps/explore-web/src/components/map/VersionBadge.css": 1,
     "//EGIDE/Runes de Chêne/👑 LA CITADELLE/📱 L'application (La Carte)/🎮 Bible Game Design.md": 4,
     "docs/superpowers/plans/2026-04-07-campements.md": 1,
     "supabase/migrations/051_influence_no_limit_permanent_gps.sql": 4,
-    "apps/explore-web/src/components/places/InfluenceFrame.tsx": 10,
-    "apps/explore-web/src/components/places/PlacePanel.tsx": 9,
+    "apps/explore-web/src/components/places/InfluenceFrame.tsx": 12,
+    "apps/explore-web/src/components/places/PlacePanel.tsx": 27,
     "supabase/migrations/052_create_place_permanent_and_likes_minimum.sql": 7,
     "supabase/migrations/053_daily_enigma_trio.sql": 1,
     "apps/explore-web/src/components/enigma/DailyEnigma.tsx": 9,
@@ -1619,14 +1893,20 @@
     "supabase/migrations/058_fix_daily_enigma_max3.sql": 1,
     "apps/explore-web/src/components/enigma/EnigmaChestButton.tsx": 6,
     "apps/explore-web/src/App.tsx": 4,
-    "apps/explore-web/src/components/places/CarnetCard.tsx": 7,
+    "apps/explore-web/src/components/places/CarnetCard.tsx": 8,
     "apps/explore-web/src/components/places/AddPlaceFlow.tsx": 18,
     "apps/explore-web/src/components/places/AddPlaceFlow.css": 3,
-    "apps/explore-web/src/components/places/CarnetCard.css": 3
+    "apps/explore-web/src/components/places/CarnetCard.css": 3,
+    "apps/explore-web/src/components/places/PlacePanel.css": 3,
+    "apps/explore-web/src/components/places/AddCarnetModal.tsx": 6,
+    "supabase/migrations/059_visit_gps_stock_bonus.sql": 1,
+    "apps/explore-web/src/components/places/AddCarnetModal.css": 1,
+    "supabase/migrations/060_visit_gps_stock_only.sql": 1,
+    "apps/explore-web/vite.config.ts": 1
   },
-  "anatomy_hits": 48,
-  "anatomy_misses": 4,
-  "repeated_reads_warned": 90,
+  "anatomy_hits": 54,
+  "anatomy_misses": 6,
+  "repeated_reads_warned": 114,
   "cerebrum_warnings": 0,
-  "stop_count": 110
+  "stop_count": 127
 }

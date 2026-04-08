@@ -1,21 +1,63 @@
-# ALPHA V0.5.5 
+# ALPHA V0.5.7
+
+- Visiter un lieu GPS donne du **stock à placer** (plus d'influence permanente sur les visites)
+- Re-visites avec rendements décroissants : 10, 5, 3, puis 2 minimum
+- Notation par étoiles après chaque visite GPS
+- Titre optionnel sur les pages de carnet
+- Fix installation PWA sur Samsung Internet
+- Énigmes de lieu masquées (en cours de développement)
+
+# ALPHA V0.5.6
+## Le Terrain Récompense
+
+### 3 énigmes par jour
+Chaque jour, trois défis vous attendent : **Facile**, **Intermédiaire** et **Avancé**. Résolvez-les pour gagner des points d'influence à placer sur les bannières. Plus de 300 questions sur les quatre Héritages — on apprend en jouant.
+
+### Le terrain, c'est tout
+Visiter un lieu en GPS donne de **l'influence permanente** — elle ne disparaît jamais. Créer un lieu sur place, c'est encore mieux. Les bannières cliquées à distance, elles, s'érodent avec le temps. **Le vrai pouvoir appartient à ceux qui marchent.**
+
+### Votre carnet d'explorateur
+Quand vous ajoutez un lieu, vous écrivez votre **première note d'explorateur** — titre, texte, photos — dans un cadre dédié. Chaque récit donne de l'influence permanente au lieu. Les récits les plus aimés rapportent encore plus.
+
+### Notez les lieux que vous visitez
+Après chaque visite GPS, donnez votre avis en **5 étoiles**. Rapide, simple, et la note moyenne apparaît en haut de chaque fiche.
+
+### Fragments — portée d'influence
+Vos Fragments augmentent votre **limite d'influence à distance** sur les lieux correspondants. Visible sur votre profil avec les icônes des types de lieu associés.
+
+### Plus clair, plus propre
+- Les récompenses s'affichent après chaque action (création, visite, énigme)
+- Les notifications montrent qui fait quoi, en couleurs
+- Le bouton "De retour" n'apparaît qu'après 24h
+- Les anciens systèmes ont été retirés. Il ne reste que l'essentiel.
+
+# ALPHA V0.5.5
 ## NOM DE CODE : PYTHEAS
 
 *Quelque chose a changé dans le vent. La carte a écouté.*
 
-Fidèle à sa réputation, Runes de Chêne s'oriente grâce à vous sur l'explorateur & l'érudition, transformant la conquête aggressive en un lieu d'aventure, d'influence, de stratégie et de découverte. Enigmes, Influences partagées, traitrises ou soutiens, jamais la Carte ne fut si proche de sa vision qui stimule l'âme, l'esprit et le corps. 
+Fidèle à sa réputation, Runes de Chêne s'oriente grâce à vous sur l'explorateur & l'érudition, transformant la conquête aggressive en un lieu d'aventure, d'influence, de stratégie et de découverte. Enigmes, Influences partagées, traitrises ou soutiens, jamais la Carte ne fut si proche de sa vision qui stimule l'âme, l'esprit et le corps.
 
-### Chaque action resonne
-Le fil d'activite prend vie. Recits deposes, enigmes percees, bannieres levees — tout est visible, en temps reel, aux couleurs de votre Heritage. Cliquez un nom : decouvrez l'explorateur. Cliquez un lieu : envolez-vous vers lui. 
+### 3 énigmes par jour
+Chaque jour, trois défis vous attendent : **Facile**, **Intermédiaire** et **Avancé**. Résolvez-les pour gagner des points d'influence à placer sur les bannières. Plus de 300 questions sur les quatre Héritages — on apprend en jouant.
 
-### Les Fragments changent de nature
-Fini le stock gratuit. Desormais, chaque Fragment que vous possedez **etend votre portee d'influence** sur les lieux qui partagent ses affinites. Un Fragment lie a la Foret ? Votre voix porte plus loin sur chaque Foret de la carte. 
+### Le terrain, c'est tout
+Visiter un lieu en GPS donne de **l'influence permanente** — elle ne disparaît jamais. Créer un lieu sur place, c'est encore mieux. Les bannières cliquées à distance, elles, s'érodent avec le temps. **Le vrai pouvoir appartient à ceux qui marchent.**
 
-### Le terrain recompense les braves
-Creer un lieu depuis chez vous ? Toujours possible. Mais les recompenses d'influence sont desormais **reservees a ceux qui s'y tiennent, en vrai, les pieds dans l'herbe**. 
+### Votre carnet d'explorateur
+Quand vous ajoutez un lieu, vous écrivez votre **première note d'explorateur** — titre, texte, photos — dans un cadre dédié. Chaque récit donne de l'influence permanente au lieu. Les récits les plus aimés rapportent encore plus.
 
-### Un jeu plus pur
-Les mecaniques obsoletes ont ete balayees. Fortifications, revendications, energies multiples — tout ca appartient au passe. 
+### Notez les lieux que vous visitez
+Après chaque visite GPS, donnez votre avis en **5 étoiles**. Rapide, simple, et la note moyenne apparaît en haut de chaque fiche.
+
+### Fragments — portée d'influence
+Vos Fragments augmentent votre **limite d'influence à distance** sur les lieux correspondants. Visible sur votre profil avec les icônes des types de lieu associés.
+
+### Plus clair, plus propre
+- Les récompenses s'affichent après chaque action (création, visite, énigme)
+- Les notifications montrent qui fait quoi, en couleurs
+- Le bouton "De retour" n'apparaît qu'après 24h
+- Les anciens systèmes ont été retirés. Il ne reste que l'essentiel.
 
 # ALPHA V0.5.2
 ## Influence, Carnets et Equilibre

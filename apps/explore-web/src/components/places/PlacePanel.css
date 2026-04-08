@@ -450,6 +450,117 @@
   opacity: 0.7;
 }
 
+/* Rating prompt after GPS visit */
+.place-rating-prompt {
+  margin: 10px 0;
+  padding: 12px 16px;
+  background: rgba(245, 230, 211, 0.6);
+  border: 1px solid rgba(193, 154, 107, 0.25);
+  border-radius: 10px;
+  text-align: center;
+  animation: rating-fade-in 0.3s ease;
+}
+
+@keyframes rating-fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.place-visit-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.2);
+}
+
+.place-visit-rewards-title {
+  margin: 0 0 4px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c1810;
+}
+
+.place-visit-reward {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4A3728;
+}
+
+.place-visit-reward-hint {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8A7B6A;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.place-rating-prompt-text {
+  margin: 0 0 8px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c1810;
+}
+
+.place-rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.place-rating-star {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: rgba(193, 154, 107, 0.3);
+  cursor: pointer;
+  transition: color 0.15s, transform 0.15s;
+  padding: 0 2px;
+}
+
+.place-rating-star:hover {
+  transform: scale(1.2);
+}
+
+.place-rating-star.filled {
+  color: #d4af37;
+}
+
+.place-rating-submit {
+  display: inline-block;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-sepia, #C19A6B);
+  color: #fff;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.place-rating-submit:hover {
+  background: #a8844f;
+}
+
+.place-rating-skip {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #8A7B6A;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.place-rating-skip:hover {
+  opacity: 1;
+}
+
 .place-exp-empty {
   font-size: 12px;
   color: var(--color-ink-light);

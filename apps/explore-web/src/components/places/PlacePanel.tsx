@@ -9,7 +9,7 @@ import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from './WishlistButton'
-import { PlaceEnigma } from '../enigma/PlaceEnigma'
+// PlaceEnigma masqué pour l'instant (pas d'énigmes de lieu en DB)
 import { CarnetCard } from './CarnetCard'
 import type { Carnet } from './CarnetCard'
 import { InfluenceFrame } from './InfluenceFrame'
@@ -151,6 +151,10 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   const [loading, setLoading] = useState(false)
   const [revisited, setRevisited] = useState(false)
   const [recentlyVisited, setRecentlyVisited] = useState(true) // hide by default until check
+  const [showRating, setShowRating] = useState(false)
+  const [ratingValue, setRatingValue] = useState(0)
+  const [ratingSaved, setRatingSaved] = useState(false)
+  const [visitRewards, setVisitRewards] = useState<{ stock: number; exploration: number; visitNumber: number; nextVisitGain?: number } | null>(null)
 
   // Vérifier si le joueur a visité/créé/revisité ce lieu dans les 24h
   useEffect(() => {
@@ -188,17 +192,18 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       p_user_lng: userPosition.lng,
     })
     if (!error && data && !data.error) {
-      const result = data as { influenceGain?: number; recentRevisits?: number }
-      const gain = result.influenceGain ?? 0
+      const result = data as { stockGain?: number; explorationGain?: number; visitNumber?: number; nextVisitGain?: number }
+      setVisitRewards({ stock: result.stockGain ?? 0, exploration: result.explorationGain ?? 0, visitNumber: result.visitNumber ?? 1, nextVisitGain: result.nextVisitGain })
       useToastStore.getState().addToast({
         type: 'revisit',
-        message: `De retour sur ${placeTitle} ! +${gain} influence`,
+        message: `De retour sur ${placeTitle} !`,
         highlights: [placeTitle],
         placeId,
         placeLocation,
         timestamp: Date.now(),
       })
       setRevisited(true)
+      setShowRating(true)
     } else if (data?.error === 'already_revisited_today') {
       setRevisited(true)
     }
@@ -215,20 +220,29 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       p_user_lng: userPosition.lng,
     })
     if (!error && data && !data.error) {
-      const result = data as { newInfluenceStock?: number; newExploration?: number; influenceGain?: number; explorationGain?: number }
+      const result = data as { newInfluenceStock?: number; newExploration?: number; stockGain?: number; explorationGain?: number; visitNumber?: number }
       if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
       if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
+      setVisitRewards({ stock: result.stockGain ?? 0, exploration: result.explorationGain ?? 0, visitNumber: result.visitNumber ?? 1 })
       useToastStore.getState().addToast({
         type: 'explore',
-        message: `Visite de ${placeTitle} validée ! +${result.influenceGain ?? 0} influence, +${result.explorationGain ?? 0} exploration`,
+        message: `Visite de ${placeTitle} validée !`,
         highlights: [placeTitle],
         placeId,
         placeLocation,
         timestamp: Date.now(),
       })
       onVisited()
+      setShowRating(true)
     }
     setLoading(false)
+  }
+
+  async function submitRating() {
+    if (!userId || ratingValue === 0) return
+    await supabase.rpc('rate_place', { p_user_id: userId, p_place_id: placeId, p_rating: ratingValue })
+    setRatingSaved(true)
+    setTimeout(() => setShowRating(false), 1500)
   }
 
   // Sort: author first, then guardian, then rest by visit date
@@ -294,6 +308,50 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
           <span style={{ fontSize: 11, opacity: 0.5, padding: '4px 8px' }}>Revisite du jour validee</span>
         )}
       </div>
+
+      {/* Prompt notation après visite GPS */}
+      {showRating && !ratingSaved && (
+        <div className="place-rating-prompt">
+          {visitRewards && (
+            <div className="place-visit-rewards">
+              <p className="place-visit-rewards-title">🎉 Récompenses</p>
+              {visitRewards.stock > 0 && <span className="place-visit-reward">🏴 +{visitRewards.stock} influence à placer</span>}
+              {visitRewards.exploration > 0 && <span className="place-visit-reward">🧭 +{visitRewards.exploration} exploration</span>}
+              {visitRewards.visitNumber > 1 && visitRewards.nextVisitGain != null && (
+                <span className="place-visit-reward place-visit-reward-hint">
+                  📉 Visite n°{visitRewards.visitNumber} — prochaine visite : +{visitRewards.nextVisitGain} pts
+                </span>
+              )}
+            </div>
+          )}
+          <p className="place-rating-prompt-text">Qu'avez-vous pensé de ce lieu ?</p>
+          <div className="place-rating-stars">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button
+                key={star}
+                className={`place-rating-star${star <= ratingValue ? ' filled' : ''}`}
+                onClick={() => setRatingValue(star)}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          {ratingValue > 0 && (
+            <button className="place-rating-submit" onClick={submitRating}>
+              Valider
+            </button>
+          )}
+          <button className="place-rating-skip" onClick={() => setShowRating(false)}>
+            Passer
+          </button>
+        </div>
+      )}
+      {showRating && ratingSaved && (
+        <div className="place-rating-prompt">
+          <p className="place-rating-prompt-text">Merci pour votre avis ! ⭐</p>
+        </div>
+      )}
+
       {sorted.length === 0 && (
         <p className="place-exp-empty">Personne n'a encore exploré ce lieu en personne.</p>
       )}
@@ -400,14 +458,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     : null
 
   // Average rating from carnets
-  const avgRating = useMemo(() => {
-    // Use V05 avgRating if available (from place_ratings table)
-    if (v05?.avgRating != null) return v05.avgRating
-    // Fallback: compute from carnets
-    const rated = carnets.filter(c => c.rating !== null)
-    if (rated.length === 0) return null
-    return rated.reduce((sum, c) => sum + c.rating!, 0) / rated.length
-  }, [v05?.avgRating, carnets])
+  const avgRating = v05?.avgRating ?? null
+  const ratingCount = v05?.ratingCount ?? 0
 
   // Gallery photos: flatten all carnet images
   const galleryPhotos = useMemo(() => {
@@ -510,7 +562,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         <div className="place-hero-top-left">
           {avgRating !== null && (
             <span className="place-hero-pill place-hero-rating">
-              ★ {avgRating.toFixed(1)}
+              ★ {avgRating.toFixed(1)} {ratingCount > 0 && <span style={{ opacity: 0.7, fontSize: '0.85em' }}>({ratingCount})</span>}
             </span>
           )}
         </div>
@@ -717,12 +769,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
         {/* (Explorers now in identity section above) */}
 
-        {/* Place Enigma (GPS only) */}
-        <PlaceEnigma
-          placeId={place.id}
-          placeLocation={place.location}
-          placeTags={place.tags.map(t => t.title)}
-        />
+        {/* Place Enigma — masqué pour l'instant (pas d'énigmes de lieu en DB) */}
 
         {/* Zone 4 — Tabs */}
         <div className="place-tabs" ref={tabsRef}>
@@ -825,7 +872,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   <div>Gardien: {v05.guardian?.name ?? '—'}</div>
                   <div>Explorateurs: {v05.explorers?.length ?? 0}</div>
                   <div>Contributions: {v05.contributions?.length ?? 0}</div>
-                  <div>Note moy: {avgRating?.toFixed(1) ?? '—'} ({carnets.filter(c => c.rating !== null).length} notes)</div>
+                  <div>Note moy: {avgRating?.toFixed(1) ?? '—'} ({ratingCount} avis GPS)</div>
                 </>
               )}
             </div>

@@ -45,6 +45,10 @@ const DEAD_KEYS = new Set([
   'shopify_shop',
   'unknown_place_icon',
   'ad_screen_duration',
+  'influence_max_remote_per_day',
+  'influence_visit_gps',
+  'influence_revisit_gps',
+  'fragment_affinity_bonus_default',
 ])
 
 const DESCRIPTIONS: Record<string, string> = {
@@ -90,6 +94,8 @@ const DESCRIPTIONS: Record<string, string> = {
   enigma_bonus_energy_cost: "Coût en énergie pour lancer un bonus d'énigme",
   erudition_enigma_wrong: "Érudition perdue sur mauvaise réponse d'énigme",
   influence_per_vote: "Influence placée par clic de bannière",
+  influence_visit_gps_stock: "Stock d'influence gagné pour une visite GPS (1re fois)",
+  influence_revisit_gps_stock: "Stock d'influence gagné pour une re-visite GPS (base avant diminishing)",
 }
 
 export function GameRules() {
