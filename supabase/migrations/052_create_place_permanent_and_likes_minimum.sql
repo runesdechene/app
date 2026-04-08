@@ -16,7 +16,8 @@ CREATE OR REPLACE FUNCTION public.create_place(
   p_address    TEXT DEFAULT '',
   p_text       TEXT DEFAULT '',
   p_user_lat   REAL DEFAULT NULL,
-  p_user_lng   REAL DEFAULT NULL
+  p_user_lng   REAL DEFAULT NULL,
+  p_carnet_title TEXT DEFAULT NULL
 )
 RETURNS JSON
 LANGUAGE plpgsql
@@ -115,6 +116,11 @@ BEGIN
     ON CONFLICT (place_id, faction_id)
     DO UPDATE SET permanent_points = place_influence.permanent_points + v_influence_gain,
                  updated_at = NOW();
+
+    -- Auto-visite : le créateur sur place est aussi explorateur
+    INSERT INTO place_explorers (place_id, user_id)
+    VALUES (v_new_id, p_user_id)
+    ON CONFLICT DO NOTHING;
   END IF;
 
   -- Auto-create carnet contribution
@@ -123,9 +129,10 @@ BEGIN
     v_content_pts := v_content_pts + 10;
   END IF;
 
-  INSERT INTO place_contributions (place_id, user_id, faction_id, type, content, images, created_at)
+  INSERT INTO place_contributions (place_id, user_id, faction_id, type, title, content, images, created_at)
   VALUES (
     v_new_id, p_user_id, v_faction_id, 'carnet',
+    NULLIF(TRIM(COALESCE(p_carnet_title, '')), ''),
     COALESCE(NULLIF(TRIM(p_text), ''), 'Lieu découvert.'),
     COALESCE(
       (SELECT jsonb_agg(img->>'url') FROM jsonb_array_elements(v_images) AS img WHERE img->>'url' IS NOT NULL),
@@ -135,13 +142,8 @@ BEGIN
   )
   ON CONFLICT (place_id, user_id, type) DO NOTHING;
 
-  -- Content influence for creator's faction (sera recalculé par les likes)
-  IF v_faction_id IS NOT NULL AND NOT v_is_gps THEN
-    -- Remote : pas de permanent, mais content_points via carnet si liké
-    INSERT INTO place_influence (place_id, faction_id, content_points)
-    VALUES (v_new_id, v_faction_id, 0)
-    ON CONFLICT (place_id, faction_id) DO NOTHING;
-  END IF;
+  -- Recalculer les content_points (le nouveau carnet entre dans le classement)
+  PERFORM recalc_place_content_points(v_new_id);
 
   -- Activity log
   SELECT COALESCE(first_name, email_address) INTO v_actor_name
@@ -163,15 +165,18 @@ BEGIN
   RETURN json_build_object(
     'success', true,
     'placeId', v_new_id,
-    'influenceGain', v_influence_gain,
-    'contentPoints', v_content_pts,
     'isGps', v_is_gps,
-    'permanent', v_is_gps
+    'rewards', json_build_object(
+      'permanentInfluence', v_influence_gain,
+      'explorationGain', CASE WHEN v_is_gps THEN 15 ELSE 5 END,
+      'contentPoints', v_content_pts,
+      'isExplorer', v_is_gps
+    )
   );
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.create_place(TEXT, TEXT, REAL, REAL, TEXT, TEXT, TEXT, TEXT, TEXT, REAL, REAL) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_place(TEXT, TEXT, REAL, REAL, TEXT, TEXT, TEXT, TEXT, TEXT, REAL, REAL, TEXT) TO authenticated;
 
 -- ============================================================
 -- 2. recalc_place_content_points — carnets sans likes = 0 pts

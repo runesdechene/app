@@ -333,6 +333,7 @@ BEGIN
       'userId', pc.user_id,
       'factionId', pc.faction_id,
       'type', pc.type,
+      'title', pc.title,
       'content', pc.content,
       'imageUrl', pc.image_url,
       'images', COALESCE(pc.images, '[]'::jsonb),

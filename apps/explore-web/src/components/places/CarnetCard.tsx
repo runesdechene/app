@@ -8,6 +8,7 @@ export interface Carnet {
   id: number
   userId: string
   factionId: string
+  title: string | null
   content: string
   images: string[]        // URLs des photos liées
   rating: number | null   // 1-5 étoiles (null si pas noté)
@@ -22,6 +23,7 @@ export interface Carnet {
 }
 
 interface CarnetCardProps {
+  permanentInfluence?: number
   carnet: Carnet
   isTop: boolean
   rank: number
@@ -33,7 +35,7 @@ interface CarnetCardProps {
 
 const RANK_POINTS = [20, 10, 5]
 
-export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, onVoted, onPhotoOpen }: CarnetCardProps) {
+export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, permanentInfluence, onVoted, onPhotoOpen }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
   const [liked, setLiked] = useState(false)
@@ -133,7 +135,8 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, onVo
         )}
       </div>
 
-      {/* Text */}
+      {/* Title + Text */}
+      {carnet.title && <h4 className="carnet-title">{carnet.title}</h4>}
       <p className="carnet-text">{carnet.content}</p>
 
       {/* Photos */}
@@ -171,15 +174,17 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, onVo
 
       {/* Influence badge — basé sur le classement par likes */}
       <div className="carnet-influence-line">
-        <span
-          className="carnet-influence-badge"
-          style={{ backgroundColor: factionColor ?? '#8a7a6a' }}
-        >
-          {'\uD83C\uDF1F'} +{rankPoints} influence
+        <span className="carnet-influence-badge">
+          📜 +{rankPoints} influence permanente
         </span>
+        {permanentInfluence != null && permanentInfluence > 0 && isTop && (
+          <span className="carnet-influence-badge carnet-influence-badge-gps">
+            🧭 +{permanentInfluence} explorateur GPS
+          </span>
+        )}
         {isTop && (
           <span className="carnet-influence-breakdown" style={{ fontWeight: 600 }}>
-            Recit le plus aime
+            {localVotesUp > 0 ? 'Récit le plus aimé' : 'Récit plébiscité'}
           </span>
         )}
       </div>

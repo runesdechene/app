@@ -90,6 +90,7 @@ function App() {
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
+  const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{ fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null>(null)
 
   const userId = usePlayerStore(s => s.userId)
@@ -183,6 +184,7 @@ function App() {
               <EnigmaChestButton
                 onOpenDaily={() => setShowDailyEnigma(true)}
                 onOpenFragment={(f) => setFragmentEnigma(f)}
+                refreshKey={enigmaRefreshKey}
               />
               <EnergyIndicator />
             </>
@@ -236,11 +238,11 @@ function App() {
 
       {/* Daily Enigma modal */}
       {showDailyEnigma && (
-        <DailyEnigma onClose={() => setShowDailyEnigma(false)} />
+        <DailyEnigma onClose={() => { setShowDailyEnigma(false); setEnigmaRefreshKey(k => k + 1) }} />
       )}
 
       {fragmentEnigma && (
-        <FragmentEnigma fragment={fragmentEnigma} onClose={() => setFragmentEnigma(null)} />
+        <FragmentEnigma fragment={fragmentEnigma} onClose={() => { setFragmentEnigma(null); setEnigmaRefreshKey(k => k + 1) }} />
       )}
 
       {/* Flow ajout de lieu (immersif) */}

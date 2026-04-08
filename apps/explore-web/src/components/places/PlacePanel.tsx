@@ -106,6 +106,7 @@ interface V05Contribution {
   userId: string
   factionId: string
   type: string
+  title: string | null
   content: string | null
   imageUrl: string | null
   images?: string[]
@@ -149,6 +150,24 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   const userPosition = usePlayerStore(s => s.userPosition)
   const [loading, setLoading] = useState(false)
   const [revisited, setRevisited] = useState(false)
+  const [recentlyVisited, setRecentlyVisited] = useState(true) // hide by default until check
+
+  // Vérifier si le joueur a visité/créé/revisité ce lieu dans les 24h
+  useEffect(() => {
+    if (!userId || !isExplorer) return
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    supabase
+      .from('activity_log')
+      .select('id')
+      .eq('actor_id', userId)
+      .eq('place_id', placeId)
+      .in('type', ['visit_gps', 'revisit_gps', 'new_place'])
+      .gte('created_at', since)
+      .limit(1)
+      .then(({ data }) => {
+        setRecentlyVisited((data?.length ?? 0) > 0)
+      })
+  }, [userId, placeId, isExplorer])
 
   const isOnSite = useMemo(() => {
     if (!userPosition) return false
@@ -258,17 +277,17 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
             disabled={!isOnSite || loading}
             title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
           >
-            {loading && !isExplorer ? '...' : isOnSite ? '\uD83D\uDCCD J\'y suis alle' : '\uD83D\uDCCD Sur place uniquement'}
+            {loading && !isExplorer ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
           </button>
         )}
-        {userId && isExplorer && !revisited && (
+        {userId && isExplorer && !revisited && !recentlyVisited && (
           <button
             className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
             onClick={isOnSite ? handleRevisit : undefined}
             disabled={!isOnSite || loading}
             title={isOnSite ? 'Revisiter ce lieu pour gagner de l\'influence' : 'Rendez-vous sur place pour revisiter'}
           >
-            {loading && isExplorer ? '...' : isOnSite ? '\uD83D\uDCCD De retour !' : '\uD83D\uDCCD Revisiter (sur place)'}
+            {loading && isExplorer ? '...' : isOnSite ? '📍 De retour !' : '📍 Revisiter (sur place)'}
           </button>
         )}
         {userId && isExplorer && revisited && (
@@ -355,6 +374,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         id: c.id,
         userId: c.userId,
         factionId: c.factionId,
+        title: c.title ?? null,
         content: c.content ?? '',
         images: c.images ?? (c.imageUrl ? [c.imageUrl] : []),
         rating: c.rating ?? null,
@@ -751,6 +771,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   rank={i + 1}
                   factionColor={factionColors.get(c.factionId) ?? null}
                   factionSvg={factionSvgs.get(c.factionId) ?? null}
+                  permanentInfluence={v05?.influence?.find(inf => inf.factionId === c.factionId)?.permanent ?? 0}
                   onVoted={refreshV05}
                   onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
                 />

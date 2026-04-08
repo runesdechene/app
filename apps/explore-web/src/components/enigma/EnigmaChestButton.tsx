@@ -17,6 +17,7 @@ interface FragmentStatus {
 interface Props {
   onOpenDaily: () => void
   onOpenFragment: (fragment: { fragmentId: number; name: string; icon: string | null; iconUrl: string | null }) => void
+  refreshKey?: number
 }
 
 function getCountdown(): string {
@@ -38,23 +39,25 @@ function getTimeUntil(isoDate: string | null): string {
   return `${h}h${m.toString().padStart(2, '0')}`
 }
 
-export function EnigmaChestButton({ onOpenDaily, onOpenFragment }: Props) {
+export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const [dailyDone, setDailyDone] = useState(false)
   const [fragments, setFragments] = useState<FragmentStatus[]>([])
   const [showMenu, setShowMenu] = useState(false)
   const [countdown, setCountdown] = useState(getCountdown())
 
-  useEffect(() => {
+  function refreshStatus() {
     if (!userId) return
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
-      const d = data as { already_answered?: boolean } | null
-      if (d?.already_answered) setDailyDone(true)
+      const d = data as { all_answered?: boolean } | null
+      setDailyDone(!!d?.all_answered)
     })
     supabase.rpc('get_my_fragment_status', { p_user_id: userId }).then(({ data }) => {
       if (data && Array.isArray(data)) setFragments(data as FragmentStatus[])
     })
-  }, [userId])
+  }
+
+  useEffect(() => { refreshStatus() }, [userId, refreshKey])
 
   // Countdown ticker
   useEffect(() => {

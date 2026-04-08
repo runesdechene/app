@@ -3793,6 +3793,294 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-08T01:14:33.330Z"
+    },
+    {
+      "id": "bug-238",
+      "timestamp": "2026-04-08T10:18:32.355Z",
+      "error_message": "CSS fix: background, color",
+      "file": "apps/explore-web/src/components/enigma/DailyEnigma.css",
+      "root_cause": "background: rgba(180, 60, 60, 0.15) → rgba(239, 68, 68, 0.15); color: #b43c3c → #dc2626",
+      "fix": "Changed background: rgba(180, 60, 60, 0.15) → rgba(239, 68, 68, 0.15); color: #b43c3c → #dc2626",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T10:18:32.355Z"
+    },
+    {
+      "id": "bug-239",
+      "timestamp": "2026-04-08T10:24:33.628Z",
+      "error_message": "Wrong reference: Props should be refreshKey",
+      "file": "apps/explore-web/src/components/enigma/EnigmaChestButton.tsx",
+      "root_cause": "Used \"Props\" instead of \"refreshKey\"",
+      "fix": "Changed Props → refreshKey",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T10:24:33.628Z"
+    },
+    {
+      "id": "bug-240",
+      "timestamp": "2026-04-08T10:24:45.201Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/enigma/EnigmaChestButton.tsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 6→4 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T10:24:45.201Z"
+    },
+    {
+      "id": "bug-241",
+      "timestamp": "2026-04-08T10:51:43.507Z",
+      "error_message": "Wrong reference: u2728 should be div",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.tsx",
+      "root_cause": "Used \"u2728\" instead of \"div\"",
+      "fix": "Changed u2728 → div",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T10:51:50.533Z"
+    },
+    {
+      "id": "bug-242",
+      "timestamp": "2026-04-08T10:57:09.478Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T10:57:09.478Z"
+    },
+    {
+      "id": "bug-243",
+      "timestamp": "2026-04-08T10:59:27.534Z",
+      "error_message": "Incorrect value in code",
+      "file": "supabase/migrations/051_influence_no_limit_permanent_gps.sql",
+      "root_cause": "Had 'content'",
+      "fix": "Changed to 'title'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "sql"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T10:59:27.534Z"
+    },
+    {
+      "id": "bug-244",
+      "timestamp": "2026-04-08T11:00:02.666Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Had \"carnet-text\"",
+      "fix": "Changed to \"carnet-title\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:00:02.666Z"
+    },
+    {
+      "id": "bug-245",
+      "timestamp": "2026-04-08T11:06:50.013Z",
+      "error_message": "Significant refactor of ",
+      "file": "supabase/migrations/052_create_place_permanent_and_likes_minimum.sql",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→11 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sql"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:06:50.013Z"
+    },
+    {
+      "id": "bug-246",
+      "timestamp": "2026-04-08T11:07:28.893Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:07:28.893Z"
+    },
+    {
+      "id": "bug-247",
+      "timestamp": "2026-04-08T11:08:25.167Z",
+      "error_message": "CSS fix: font-weight, color",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.css",
+      "root_cause": "font-weight: 500 → 600; color: var(--color-ink-light) → #4A3728",
+      "fix": "Changed font-weight: 500 → 600; color: var(--color-ink-light) → #4A3728",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:08:25.167Z"
+    },
+    {
+      "id": "bug-248",
+      "timestamp": "2026-04-08T11:21:17.132Z",
+      "error_message": "Significant refactor of ",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.tsx",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 27→32 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:21:17.132Z"
+    },
+    {
+      "id": "bug-249",
+      "timestamp": "2026-04-08T11:21:34.852Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/AddPlaceFlow.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:21:34.852Z"
+    },
+    {
+      "id": "bug-250",
+      "timestamp": "2026-04-08T11:22:37.219Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:22:37.219Z"
+    },
+    {
+      "id": "bug-251",
+      "timestamp": "2026-04-08T11:22:50.772Z",
+      "error_message": "Incorrect value in code",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Had '\\uD83D\\uDCCD J\\'",
+      "fix": "Changed to '📍 J\\'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T11:22:56.465Z"
+    },
+    {
+      "id": "bug-252",
+      "timestamp": "2026-04-08T11:35:03.041Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/PlacePanel.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:35:03.041Z"
+    },
+    {
+      "id": "bug-253",
+      "timestamp": "2026-04-08T11:35:08.211Z",
+      "error_message": "Type error",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Missing or incorrect type annotation",
+      "fix": "Added type assertion/annotation",
+      "tags": [
+        "auto-detected",
+        "type-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:35:08.211Z"
+    },
+    {
+      "id": "bug-254",
+      "timestamp": "2026-04-08T11:35:29.469Z",
+      "error_message": "Null/undefined access in ",
+      "file": "apps/explore-web/src/components/places/CarnetCard.tsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T11:35:29.469Z"
+    },
+    {
+      "id": "bug-255",
+      "timestamp": "2026-04-08T11:38:13.085Z",
+      "error_message": "CSS fix: font-size, color",
+      "file": "apps/explore-web/src/components/places/CarnetCard.css",
+      "root_cause": "font-size: 13px → 12px; color: white → #16a34a !important",
+      "fix": "Changed font-size: 13px → 12px; color: white → #16a34a !important",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T11:39:28.212Z"
     }
   ]
 }

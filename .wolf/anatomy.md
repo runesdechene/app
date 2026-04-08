@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T01:14:33.275Z
-> Files: 556 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T11:39:28.192Z
+> Files: 557 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../.claude/projects/C--Users-uriel-desktop-DEVS-app--Runes-de-Ch-ne-/memory/
 
@@ -85,7 +85,7 @@
 ## apps/explore-web/src/
 
 - `App.css` — Styles: 34 rules (~1576 tok)
-- `App.tsx` — NotorietyBadge (~3490 tok)
+- `App.tsx` — NotorietyBadge (~3545 tok)
 - `index.css` — Styles: 3 rules, 15 vars (~340 tok)
 - `main.tsx` (~70 tok)
 - `vite-env.d.ts` — / <reference types="vite/client" /> (~61 tok)
@@ -195,7 +195,7 @@
 - `DailyEnigma.css` — Styles: enigma overlay, modal, choices, chest icon with pulse (~1150 tok)
 - `DailyEnigma.tsx` — Chest button to display on the map (~2892 tok)
 - `DailyEnigma.tsx` — DailyEnigma modal + EnigmaChestButton, calls get_daily_enigma + answer_enigma (~1809 tok)
-- `EnigmaChestButton.tsx` — getCountdown (~1751 tok)
+- `EnigmaChestButton.tsx` — getCountdown (~1774 tok)
 - `EnigmaResult.css` — Styles: 18 rules (~703 tok)
 - `EnigmaResult.css` — Styles: result display with pop animation (~490 tok)
 - `EnigmaResult.tsx` — EnigmaResult (~433 tok)
@@ -251,10 +251,10 @@
 - `AddCarnetModal.tsx` — AddCarnetModal (~1591 tok)
 - `AddContributionModal.css` — Styles: 14 rules (~656 tok)
 - `AddContributionModal.tsx` — TYPE_OPTIONS (~1403 tok)
-- `AddPlaceFlow.css` — Styles: 38 rules (~1837 tok)
-- `AddPlaceFlow.tsx` — MAX_FILE_SIZE (~6895 tok)
-- `CarnetCard.css` — Styles: 28 rules (~1074 tok)
-- `CarnetCard.tsx` — RANK_POINTS (~1811 tok)
+- `AddPlaceFlow.css` — Styles: 53 rules (~2466 tok)
+- `AddPlaceFlow.tsx` — MAX_FILE_SIZE (~7640 tok)
+- `CarnetCard.css` — Styles: 31 rules (~1211 tok)
+- `CarnetCard.tsx` — RANK_POINTS (~1910 tok)
 - `ClaimButton.tsx` — hexToRgb (~2374 tok)
 - `ContributionCard.css` — Styles: 15 rules (~657 tok)
 - `ContributionCard.tsx` — TYPE_LABELS (~1022 tok)
@@ -278,7 +278,7 @@
 - `PlaceInfos.css` — Styles: 15 rules (~566 tok)
 - `PlaceInfos.tsx` — INFO_CONFIG (~1224 tok)
 - `PlacePanel.css` — Styles: 78 rules (~4068 tok)
-- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9690 tok)
+- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~9920 tok)
 - `PlaceRating.css` — Styles: 8 rules (~214 tok)
 - `PlaceRating.tsx` — PlaceRating (~607 tok)
 - `ScoreSlider.tsx` — ScoreSlider (~250 tok)
@@ -553,9 +553,9 @@
 - `049_fix_legende_title_rank.sql` — 049_fix_legende_title_rank.sql (~1314 tok)
 - `050_create_place_no_remote_influence.sql` — 050_create_place_no_remote_influence.sql (~1443 tok)
 - `050_titles.sql` — MIGRATION 050 : Systeme de Titres (~2654 tok)
-- `051_influence_no_limit_permanent_gps.sql` — 051_influence_no_limit_permanent_gps.sql (~4088 tok)
+- `051_influence_no_limit_permanent_gps.sql` — 051_influence_no_limit_permanent_gps.sql (~4095 tok)
 - `051_titles_v2.sql` — MIGRATION 051 : Titres v2 — Conditions flexibles + Selection joueur (~4088 tok)
-- `052_create_place_permanent_and_likes_minimum.sql` — 052_create_place_permanent_and_likes_minimum.sql (~2046 tok)
+- `052_create_place_permanent_and_likes_minimum.sql` — 052_create_place_permanent_and_likes_minimum.sql (~2086 tok)
 - `052_profile_features.sql` — MIGRATION 052 : Profil unifie + Faction payante + Membres (~4113 tok)
 - `053_add_place.sql` — 053 : Ajout de lieu depuis la carte (~816 tok)
 - `053_daily_enigma_trio.sql` — 053_daily_enigma_trio.sql (~698 tok)
@@ -568,6 +568,7 @@
 - `056_profile_edit_name.sql` — 056 : Ajouter p_first_name a update_my_profile (~178 tok)
 - `057_enigma_erudition_wrong_and_rewards.sql` — 057_enigma_erudition_wrong_and_rewards.sql (~2345 tok)
 - `057_onboarding_avatar.sql` — 057 : Onboarding — avatar_url + update RPCs (~2266 tok)
+- `058_fix_daily_enigma_max3.sql` — 058_fix_daily_enigma_max3.sql (~764 tok)
 - `058_rename_faction.sql` — MIGRATION 058 : RPC rename_faction (~584 tok)
 - `059_backfill_author_discoveries.sql` — MIGRATION 059 : Backfill author discoveries (~262 tok)
 - `060_fortify_faction_color.sql` — MIGRATION 060 : Ajouter couleur faction au trigger fortify (~368 tok)

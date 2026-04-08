@@ -26,6 +26,8 @@ export function AddPlaceFlow() {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [address, setAddress] = useState('')
   const [description, setDescription] = useState('')
+  const [carnetTitle, setCarnetTitle] = useState('')
+  const [rewards, setRewards] = useState<{ permanentInfluence: number; explorationGain: number; contentPoints: number; isExplorer: boolean; isGps: boolean } | null>(null)
   const [tags, setTags] = useState<Tag[]>([])
   const [error, setError] = useState<string | null>(null)
   const [newPlaceId, setNewPlaceId] = useState<string | null>(null)
@@ -220,6 +222,7 @@ export function AddPlaceFlow() {
         p_thumb_url: imageEntries[0].thumb,
         p_address: address.trim(),
         p_text: description.trim(),
+        p_carnet_title: carnetTitle.trim() || null,
         p_user_lat: userPosition?.lat ?? null,
         p_user_lng: userPosition?.lng ?? null,
       })
@@ -237,6 +240,7 @@ export function AddPlaceFlow() {
       }
 
       const placeId = data.placeId as string
+      if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 
       // 3. Si plusieurs photos, mettre à jour le JSONB images
       if (imageEntries.length > 1) {
@@ -348,7 +352,7 @@ export function AddPlaceFlow() {
         {/* Bottom bar */}
         <div className="add-place-bottom-bar">
           <button className="add-place-gps-btn" onClick={handleGPS} disabled={!userPosition}>
-            {'\uD83D\uDCCD'} Ma position
+            📍 Ma position
           </button>
           <div className="add-place-coords-inputs">
             <label className="add-place-coord-label">Lat</label>
@@ -410,56 +414,6 @@ export function AddPlaceFlow() {
             autoFocus
           />
 
-          {/* Photos */}
-          <label className="add-place-label">
-            Photos <span className="add-place-required">*</span>
-            {photoPreviews.length > 0 && (
-              <span className="add-place-optional"> ({photoPreviews.length})</span>
-            )}
-          </label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handlePhotoChange}
-            style={{ display: 'none' }}
-          />
-          {photoPreviews.length > 0 ? (
-            <div className="add-place-photos-grid">
-              {photoPreviews.map((url, i) => (
-                <div
-                  key={url}
-                  className={`add-place-photo-thumb${dragIndex === i ? ' dragging' : ''}${dragOverIndex === i ? ' drag-over' : ''}`}
-                  draggable
-                  onDragStart={() => handleDragStart(i)}
-                  onDragOver={e => handleDragOver(e, i)}
-                  onDrop={() => handleDrop(i)}
-                  onDragEnd={handleDragEnd}
-                >
-                  <img src={url} alt={`Photo ${i + 1}`} draggable={false} />
-                  {i === 0 && <span className="add-place-photo-main">Principale</span>}
-                  <button
-                    className="add-place-photo-remove"
-                    onClick={() => handleRemovePhoto(i)}
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
-              <button
-                className="add-place-photo-add-more"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <button className="add-place-photo-btn" onClick={() => fileInputRef.current?.click()}>
-              {'\uD83D\uDCF7'} Ajouter des photos
-            </button>
-          )}
-
           {/* Tags (multi-sélection ordonnée) */}
           <label className="add-place-label">
             Type de lieu <span className="add-place-required">*</span>
@@ -514,19 +468,83 @@ export function AddPlaceFlow() {
             placeholder="Ex: 12 rue du Chateau, 06000 Nice"
           />
 
-          {/* Description */}
-          <label className="add-place-label">Description <span className="add-place-required">*</span></label>
-          <textarea
-            className="add-place-textarea"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder="Racontez l'histoire de ce lieu..."
-            rows={3}
-          />
+          {/* Carnet d'explorateur */}
+          <div className="add-place-carnet-frame">
+            <div className="add-place-carnet-header">
+              <span className="add-place-carnet-icon">📜</span>
+              <div>
+                <p className="add-place-carnet-title">Votre première note d'explorateur</p>
+                <p className="add-place-carnet-subtitle">Vous êtes le premier à fouler ce lieu. Immortalisez-le.</p>
+              </div>
+            </div>
+
+            {/* Photos */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handlePhotoChange}
+              style={{ display: 'none' }}
+            />
+            {photoPreviews.length > 0 ? (
+              <div className="add-place-photos-grid">
+                {photoPreviews.map((url, i) => (
+                  <div
+                    key={url}
+                    className={`add-place-photo-thumb${dragIndex === i ? ' dragging' : ''}${dragOverIndex === i ? ' drag-over' : ''}`}
+                    draggable
+                    onDragStart={() => handleDragStart(i)}
+                    onDragOver={e => handleDragOver(e, i)}
+                    onDrop={() => handleDrop(i)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <img src={url} alt={`Photo ${i + 1}`} draggable={false} />
+                    {i === 0 && <span className="add-place-photo-main">Principale</span>}
+                    <button
+                      className="add-place-photo-remove"
+                      onClick={() => handleRemovePhoto(i)}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                <button
+                  className="add-place-photo-add-more"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <button className="add-place-photo-btn" onClick={() => fileInputRef.current?.click()}>
+                📷 Ajouter des photos
+              </button>
+            )}
+
+            {/* Titre du carnet (optionnel) */}
+            <input
+              className="add-place-input add-place-carnet-title-input"
+              type="text"
+              value={carnetTitle}
+              onChange={e => setCarnetTitle(e.target.value)}
+              placeholder="Titre de votre note (optionnel)"
+              maxLength={120}
+            />
+
+            {/* Texte du carnet */}
+            <textarea
+              className="add-place-textarea"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Qu'avez-vous découvert ici ? Racontez ce lieu, son histoire, votre ressenti..."
+              rows={4}
+            />
+          </div>
           {/* Charte du lieu */}
           <div className="add-place-charter">
             <div className="add-place-charter-header">
-              <span className="add-place-charter-icon">&#x1F3F0;</span>
+              <span className="add-place-charter-icon">🏰</span>
               <p className="add-place-charter-title">Charte de l'explorateur érudit</p>
             </div>
             <p className="add-place-charter-intro">
@@ -562,16 +580,16 @@ export function AddPlaceFlow() {
                   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.5
                 })()
               : false
-            const hasPhoto = photoFiles.length > 0
             const hasText = description.trim().length > 0
             return (
               <div className="add-place-rewards">
-                <p className="add-place-rewards-title">{isOnSite ? '\uD83C\uDFAF Vous \u00eates sur place !' : '\uD83D\uDCCD Ajout \u00e0 distance'}</p>
+                <p className="add-place-rewards-title">{isOnSite ? '🎯 Vous êtes sur place !' : '📍 Ajout à distance'}</p>
                 <div className="add-place-rewards-list">
-                  {isOnSite && <span className="add-place-reward add-place-reward-bonus">\u26a1 +80 points d'influence (bonus sur place)</span>}
-                  {hasText && <span className="add-place-reward">{'\uD83D\uDCD6'} +10 influence carnet (texte)</span>}
-                  {hasPhoto && <span className="add-place-reward">{'\uD83D\uDCF7'} +10 influence carnet (photos)</span>}
-                  {!isOnSite && <span className="add-place-reward add-place-reward-hint">Rendez-vous sur place pour gagner 80 points bonus !</span>}
+                  {isOnSite && <span className="add-place-reward add-place-reward-bonus">🏴 +30 influence permanente (bonus sur place)</span>}
+                  {isOnSite && <span className="add-place-reward">🧭 +15 exploration (5 base + 10 GPS)</span>}
+                  {!isOnSite && <span className="add-place-reward">🧭 +5 exploration</span>}
+                  {hasText && <span className="add-place-reward">📖 +20 influence permanente (récit)</span>}
+                  {!isOnSite && <span className="add-place-reward add-place-reward-hint">💡 Rendez-vous sur place pour 30 pts d'influence permanente !</span>}
                 </div>
               </div>
             )
@@ -610,11 +628,45 @@ export function AddPlaceFlow() {
   return (
     <div className="add-place-form">
       <div className="add-place-success">
-        <div className="add-place-success-icon">{'\u2728'}</div>
+        <div className="add-place-success-icon">✨</div>
         <h2 className="add-place-success-title">Lieu ajouté !</h2>
         <p className="add-place-success-text">
           Votre lieu apparaît maintenant sur la carte.
         </p>
+
+        {rewards && (
+          <div className="add-place-rewards-summary">
+            <p className="add-place-rewards-summary-title">Vos récompenses</p>
+            {rewards.permanentInfluence > 0 && (
+              <div className="add-place-reward-line">
+                <span>🏴</span>
+                <span>+{rewards.permanentInfluence} influence permanente <span className="add-place-reward-tag gps">GPS</span></span>
+              </div>
+            )}
+            {rewards.contentPoints > 0 && (
+              <div className="add-place-reward-line">
+                <span>📜</span>
+                <span>+{rewards.contentPoints} influence permanente <span className="add-place-reward-tag">récit</span></span>
+              </div>
+            )}
+            <div className="add-place-reward-line">
+              <span>🧭</span>
+              <span>+{rewards.explorationGain} exploration {rewards.isGps && <span className="add-place-reward-tag gps">GPS</span>}</span>
+            </div>
+            {rewards.isExplorer && (
+              <div className="add-place-reward-line">
+                <span>🥾</span>
+                <span>Explorateur du lieu <span className="add-place-reward-tag gps">GPS</span></span>
+              </div>
+            )}
+            {(rewards.permanentInfluence > 0 && rewards.contentPoints > 0) && (
+              <div className="add-place-reward-total">
+                Total influence sur ce lieu : {rewards.permanentInfluence + rewards.contentPoints} pts
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="add-place-success-actions">
           <button className="add-place-submit-btn" onClick={handleViewPlace}>
             Voir le lieu

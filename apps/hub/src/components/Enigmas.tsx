@@ -40,10 +40,10 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 }
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  very_easy: '#2a9d8f',
-  easy: '#22c55e',
-  medium: '#f59e0b',
-  hard: '#ef4444',
+  very_easy: '#2563eb',
+  easy: '#16a34a',
+  medium: '#d97706',
+  hard: '#dc2626',
 }
 
 const TYPE_LABELS: Record<EnigmaType, string> = {
