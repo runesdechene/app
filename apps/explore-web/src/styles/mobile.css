@@ -736,11 +736,9 @@
 
   .conquest-area
   {
-    top: calc(var(--safe-top, 0px) + 155px);
-    bottom: auto;
-    left: 7px;
-    right: auto;
-    align-items: flex-start;
+    bottom: calc(var(--safe-bottom, 0px) + 65px);
+    top: auto;
+    right: 8px;
   }
 
   /* Modale profil plein ecran, sous la navbar */
