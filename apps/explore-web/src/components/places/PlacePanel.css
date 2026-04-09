@@ -811,9 +811,15 @@
 .place-quick-infos {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   margin: 8px 0 12px;
+  padding-bottom: 2px;
+}
+.place-quick-infos::-webkit-scrollbar {
+  display: none;
 }
 .place-quick-info {
   display: inline-flex;
@@ -830,8 +836,9 @@
   padding: 3px 10px;
   cursor: pointer;
   transition: all 0.15s;
-  max-width: 120px;
+  max-width: 140px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .place-quick-info-btn .place-quick-info-text {
   overflow: hidden;
