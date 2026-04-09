@@ -584,16 +584,6 @@
     line-height: 1;
   }
 
-  /* --- Coffre : cacher le countdown sur mobile --- */
-  .enigma-chest-countdown {
-    display: none;
-  }
-
-  .enigma-chest-img {
-    min-width: 28px;
-    min-height: 28px;
-  }
-
   /* --- Masquer les controles desktop remplaces par la navbar --- */
   .app-toolbar .auth-btn {
     display: none;
@@ -850,12 +840,12 @@
 @media (max-width: 768px) {
   .notification-panel {
     position: fixed;
-    top: auto;
-    bottom: 64px;
-    right: 8px;
-    left: 8px;
+    top: 60px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    min-height: 100vh;
     width: auto;
-    max-height: 60vh;
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
   }
 }

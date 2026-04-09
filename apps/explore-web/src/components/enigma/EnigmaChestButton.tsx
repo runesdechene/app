@@ -99,13 +99,11 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
           alt=""
           className={`enigma-chest-img${availableCount === 0 ? ' enigma-chest-img-done' : ''}`}
         />
-        <span className="enigma-chest-label">
-          {availableCount > 0 ? (
+        {availableCount > 0 && (
+          <span className="enigma-chest-label">
             <span style={{ color: '#d4af37', fontWeight: 700 }}>{availableCount}</span>
-          ) : (
-            <span className="enigma-chest-countdown" style={{ color: '#4A3728', fontWeight: 600, fontSize: 10 }}>{countdown}</span>
-          )}
-        </span>
+          </span>
+        )}
       </button>
 
       {showMenu && (
