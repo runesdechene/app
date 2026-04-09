@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNotificationStore } from '../../stores/notificationStore'
 import { NotificationPanel } from './NotificationPanel'
 
@@ -20,7 +21,10 @@ export function NotificationBell() {
           </span>
         )}
       </button>
-      {open && <NotificationPanel onClose={() => setOpen(false)} />}
+      {open && createPortal(
+        <NotificationPanel onClose={() => setOpen(false)} />,
+        document.body
+      )}
     </div>
   )
 }
