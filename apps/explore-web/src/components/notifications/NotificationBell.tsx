@@ -6,12 +6,20 @@ import { NotificationPanel } from './NotificationPanel'
 export function NotificationBell() {
   const [open, setOpen] = useState(false)
   const unreadCount = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length)
+  const markAllRead = useNotificationStore((s) => s.markAllRead)
+
+  function handleToggle() {
+    if (!open && unreadCount > 0) {
+      markAllRead()
+    }
+    setOpen(!open)
+  }
 
   return (
     <div className="notification-bell-wrapper">
       <button
         className="notification-bell"
-        onClick={() => setOpen(!open)}
+        onClick={handleToggle}
         aria-label="Notifications"
       >
         <span className="notification-bell-icon">{'\uD83D\uDD14'}</span>
