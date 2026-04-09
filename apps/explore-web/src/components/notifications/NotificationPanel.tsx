@@ -1,7 +1,4 @@
-import { useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
 import { useNotificationStore, Notification } from '../../stores/notificationStore'
-import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import './NotificationPanel.css'
 
@@ -60,18 +57,6 @@ interface NotificationPanelProps {
 
 export function NotificationPanel({ onClose }: NotificationPanelProps) {
   const notifications = useNotificationStore((s) => s.notifications)
-  const markAllRead = useNotificationStore((s) => s.markAllRead)
-  const userId = usePlayerStore((s) => s.userId)
-
-  // Mark all as read on open
-  useEffect(() => {
-    if (!userId) return
-    const hasUnread = notifications.some((n) => !n.read)
-    if (hasUnread) {
-      markAllRead()
-      supabase.rpc('mark_notifications_read', { p_user_id: userId })
-    }
-  }, [userId, notifications, markAllRead])
 
   function handleClick(notif: Notification) {
     if (notif.data.placeId) {

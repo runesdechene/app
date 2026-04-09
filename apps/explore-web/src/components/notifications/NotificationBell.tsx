@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { supabase } from '../../lib/supabase'
 import { useNotificationStore } from '../../stores/notificationStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import { NotificationPanel } from './NotificationPanel'
 
 export function NotificationBell() {
@@ -11,6 +13,8 @@ export function NotificationBell() {
   function handleToggle() {
     if (!open && unreadCount > 0) {
       markAllRead()
+      const userId = usePlayerStore.getState().userId
+      if (userId) supabase.rpc('mark_notifications_read', { p_user_id: userId })
     }
     setOpen(!open)
   }
