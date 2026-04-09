@@ -3926,3 +3926,165 @@ table select {
 }
 
 /* Les styles des formulaires publics sont dans PublicForm.css */
+
+/* ============================================
+   TUTORIAL MANAGER
+   ============================================ */
+
+.tutorial-phase-section {
+  margin-bottom: 32px;
+}
+
+.tutorial-phase-section h3 {
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tutorial-slide-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.tutorial-slide-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tutorial-slide-pos {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  min-width: 28px;
+}
+
+.tutorial-slide-header button {
+  padding: 4px 8px;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.tutorial-slide-header button:hover {
+  background: var(--color-border);
+}
+
+.tutorial-slide-delete {
+  margin-left: auto !important;
+  color: var(--color-danger) !important;
+  border-color: var(--color-danger) !important;
+  background: rgba(192, 57, 43, 0.08) !important;
+}
+
+.tutorial-slide-delete:hover {
+  background: rgba(192, 57, 43, 0.18) !important;
+}
+
+.tutorial-slide-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.tutorial-slide-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.tutorial-slide-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--color-bg);
+  color: var(--color-text);
+  resize: vertical;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.tutorial-slide-image-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tutorial-slide-preview {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.tutorial-slide-image-row button {
+  padding: 6px 14px;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.tutorial-slide-image-row button:hover {
+  background: var(--color-border);
+}
+
+.tutorial-add-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px dashed var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.tutorial-add-btn:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.tutorial-reset-btn {
+  padding: 10px 20px;
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid var(--color-danger);
+  border-radius: 8px;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tutorial-reset-btn:hover {
+  background: rgba(192, 57, 43, 0.2);
+}

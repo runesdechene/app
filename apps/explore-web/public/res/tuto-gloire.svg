@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" fill="none">
+  <rect width="400" height="260" rx="16" fill="#1a1a28"/>
+  <!-- Lueur dorée -->
+  <radialGradient id="goldglow" cx="50%" cy="40%">
+    <stop offset="0" stop-color="#d4a017" stop-opacity=".1"/>
+    <stop offset="1" stop-color="#1a1a28" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="400" height="260" rx="16" fill="url(#goldglow)"/>
+  <!-- Médaille / Trophée -->
+  <g transform="translate(155,30)">
+    <!-- Ruban -->
+    <path d="M30 60 L10 110 L30 95 L45 110 L45 60Z" fill="#c0392b" opacity=".7"/>
+    <path d="M60 60 L80 110 L60 95 L45 110 L45 60Z" fill="#a02020" opacity=".7"/>
+    <!-- Médaille -->
+    <circle cx="45" cy="45" r="38" fill="#2a2520" stroke="#d4a017" stroke-width="3"/>
+    <circle cx="45" cy="45" r="30" fill="none" stroke="#d4a017" stroke-width="1" opacity=".4"/>
+    <!-- Étoile au centre -->
+    <polygon points="45,18 51,33 67,33 54,43 59,58 45,48 31,58 36,43 23,33 39,33" fill="#d4a017" opacity=".8"/>
+  </g>
+  <!-- Barres de classement -->
+  <g transform="translate(80,155)">
+    <!-- 3ème -->
+    <rect x="0" y="50" width="60" height="50" rx="4" fill="#cd7f32" opacity=".3" stroke="#cd7f32" stroke-width="1"/>
+    <text x="30" y="80" text-anchor="middle" font-size="16" fill="#cd7f32" font-family="serif" font-weight="700">3</text>
+    <!-- 1er -->
+    <rect x="80" y="10" width="60" height="90" rx="4" fill="#d4a017" opacity=".3" stroke="#d4a017" stroke-width="1"/>
+    <text x="110" y="50" text-anchor="middle" font-size="20" fill="#d4a017" font-family="serif" font-weight="700">1</text>
+    <!-- 2ème -->
+    <rect x="160" y="30" width="60" height="70" rx="4" fill="#aaa" opacity=".25" stroke="#aaa" stroke-width="1"/>
+    <text x="190" y="65" text-anchor="middle" font-size="18" fill="#aaa" font-family="serif" font-weight="700">2</text>
+  </g>
+  <!-- Formule -->
+  <g transform="translate(80,245)">
+    <text x="120" y="0" text-anchor="middle" font-size="10" fill="#8a8070" font-family="serif" letter-spacing="1" opacity=".6">EXPLORATION + ERUDITION = GLOIRE</text>
+  </g>
+</svg>

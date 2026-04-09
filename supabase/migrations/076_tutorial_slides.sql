@@ -30,5 +30,15 @@ ALTER TABLE tutorial_slides ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "tutorial_slides_select" ON tutorial_slides
   FOR SELECT USING (true);
 
--- Insert/Update/Delete réservés à service_role (Hub admin)
--- Pas de policy pour authenticated en écriture = refusé par défaut
+-- Écriture réservée aux admins
+CREATE POLICY "tutorial_slides_insert" ON tutorial_slides
+  FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid()::TEXT AND role = 'admin'));
+
+CREATE POLICY "tutorial_slides_update" ON tutorial_slides
+  FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid()::TEXT AND role = 'admin'));
+
+CREATE POLICY "tutorial_slides_delete" ON tutorial_slides
+  FOR DELETE TO authenticated
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid()::TEXT AND role = 'admin'));
