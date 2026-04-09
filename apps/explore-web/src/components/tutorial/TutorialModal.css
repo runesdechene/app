@@ -1,0 +1,107 @@
+/* ==========================================
+   TUTORIAL MODAL — Slides tutoriel
+   ========================================== */
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 12, 5, 0.6);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: version-fade-in 0.2s ease;
+}
+
+.tutorial-modal {
+  background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+  border: 2px solid #b8a47a;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90vw;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: version-slide-in 0.25s ease;
+  text-align: center;
+  position: relative;
+}
+
+.tutorial-skip {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #8A7B6A;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+}
+
+.tutorial-skip:hover {
+  color: #4A3728;
+}
+
+.tutorial-image {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.tutorial-title {
+  margin: 0 0 12px;
+  font-family: var(--font-title, serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: #2c1810;
+}
+
+.tutorial-body {
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4A3728;
+  margin: 0 0 24px;
+  white-space: pre-line;
+}
+
+.tutorial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c4b394;
+  transition: background 0.2s;
+}
+
+.tutorial-dot.active {
+  background: #8B6914;
+}
+
+.tutorial-next {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #8B6914, #a37e1f);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.tutorial-next:hover {
+  opacity: 0.9;
+}
