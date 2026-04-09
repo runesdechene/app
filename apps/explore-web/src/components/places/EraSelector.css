@@ -4,39 +4,48 @@
 
 .era-label {
   display: block;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
   font-weight: 600;
+  font-size: 13px;
   margin-bottom: 0.5rem;
-  color: var(--color-text);
+  color: #4A3728;
 }
 
 .era-required {
-  color: var(--color-accent);
+  color: #c0392b;
 }
 
 .era-optional {
-  color: var(--color-text-muted);
+  color: #8A7B6A;
   font-weight: 400;
-  font-size: 0.85rem;
+  font-size: 12px;
 }
 
 .era-dropdown {
   width: 100%;
-  padding: 0.75rem;
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-input);
-  color: var(--color-text);
-  font-size: 0.95rem;
-  appearance: none;
+  border: 1px solid #b8a47a;
+  background: rgba(255, 255, 255, 0.5);
+  color: #2c1810;
+  font-size: 14px;
+  font-family: var(--font-body, 'Cabin', sans-serif);
   cursor: pointer;
+  box-sizing: border-box;
+}
+
+.era-dropdown:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+  outline: none;
 }
 
 .era-date-section {
   margin-top: 1rem;
   padding: 1rem;
   border-radius: 8px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid #b8a47a;
 }
 
 .era-date-row {
@@ -48,34 +57,43 @@
 
 .era-year-input {
   flex: 1;
-  padding: 0.75rem;
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-input);
-  color: var(--color-text);
+  border: 1px solid #b8a47a;
+  background: rgba(255, 255, 255, 0.5);
+  color: #2c1810;
   font-size: 1.1rem;
   font-weight: 600;
+  font-family: var(--font-body, 'Cabin', sans-serif);
+  box-sizing: border-box;
+}
+
+.era-year-input:focus {
+  border-color: #8A7B6A;
+  box-shadow: 0 0 0 2px rgba(138, 123, 106, 0.15);
+  outline: none;
 }
 
 .era-bce-toggle {
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 1px solid #b8a47a;
 }
 
 .era-bce-btn {
   padding: 0.6rem 0.8rem;
-  background: var(--color-bg-input);
-  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.5);
+  color: #8A7B6A;
   border: none;
   cursor: pointer;
   font-size: 0.8rem;
+  font-family: var(--font-body, 'Cabin', sans-serif);
 }
 
 .era-bce-btn.active {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: #4A3728;
+  color: #fff;
   font-weight: 600;
 }
 
@@ -88,24 +106,25 @@
 
 .era-ref-label {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: #8A7B6A;
   margin-right: 0.5rem;
 }
 
 .era-ref-btn {
   padding: 0.35rem 0.6rem;
   border-radius: 6px;
-  background: var(--color-bg-card);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.3);
+  color: #8A7B6A;
+  border: 1px solid #b8a47a;
   cursor: pointer;
   font-size: 0.72rem;
+  font-family: var(--font-body, 'Cabin', sans-serif);
 }
 
 .era-ref-btn.active {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-color: var(--color-accent);
+  background: #4A3728;
+  color: #fff;
+  border-color: #4A3728;
   font-weight: 600;
 }
 
@@ -119,14 +138,14 @@
   margin-top: 0.75rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid #b8a47a;
 }
 
 .era-equiv-title {
   display: block;
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: #8A7B6A;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
@@ -139,9 +158,10 @@
 }
 
 .era-equiv-primary {
-  color: var(--color-accent);
+  color: #4A3728;
+  font-weight: 600;
 }
 
 .era-equiv-secondary {
-  color: var(--color-text-muted);
+  color: #8A7B6A;
 }

@@ -23,9 +23,9 @@ interface PlaceInfosProps {
 }
 
 const INFO_CONFIG = {
-  accessibility: { icon: '♿', label: 'Accessibilité', placeholder: 'Facile / Modéré / Difficile + détails...' },
-  season: { icon: '🌿', label: 'Saison idéale', placeholder: 'Printemps, été, toute l\'année...' },
-  warning: { icon: '⚠️', label: 'Information importante', placeholder: 'Danger, propriété privée, horaires...' },
+  accessibility: { icon: '♿', label: 'Accessibilité', placeholder: 'Facile / Modéré / Difficile + détails...', emptyAction: 'Ajouter une accessibilité' },
+  season: { icon: '🌿', label: 'Saison idéale', placeholder: 'Printemps, été, toute l\'année...', emptyAction: 'Ajouter une saison' },
+  warning: { icon: '⚠️', label: 'Information importante', placeholder: 'Danger, propriété privée, horaires...', emptyAction: 'Ajouter une info' },
 } as const
 
 export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefresh }: PlaceInfosProps) {
@@ -57,11 +57,6 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
         <div className="info-row-header">
           <span className="info-icon">🏛️</span>
           <span className="info-label">Époque</span>
-          {!eraId && userId && !editingEra && (
-            <button className="info-edit-btn" onClick={() => setEditingEra(true)}>
-              Ajouter
-            </button>
-          )}
         </div>
 
         {editingEra ? (
@@ -89,6 +84,10 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
               )}
             </p>
           </div>
+        ) : userId ? (
+          <button className="info-empty-action" onClick={() => setEditingEra(true)}>
+            Ajouter une époque
+          </button>
         ) : (
           <p className="info-empty">Aucune époque renseignée</p>
         )}
@@ -106,6 +105,7 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
             icon={config.icon}
             label={config.label}
             placeholder={config.placeholder}
+            emptyAction={config.emptyAction}
             content={existing?.content ?? null}
             userName={existing?.userName ?? null}
             updatedAt={existing?.updatedAt ?? null}
@@ -118,12 +118,13 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
   )
 }
 
-function InfoRow({ placeId, type, icon, label, placeholder, content, userName, updatedAt, canEdit, onSaved }: {
+function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content, userName, updatedAt, canEdit, onSaved }: {
   placeId: string
   type: string
   icon: string
   label: string
   placeholder: string
+  emptyAction: string
   content: string | null
   userName: string | null
   updatedAt: string | null
@@ -188,6 +189,10 @@ function InfoRow({ placeId, type, icon, label, placeholder, content, userName, u
             <span className="info-meta">Modifié par {userName} · {getTimeAgo(updatedAt)}</span>
           )}
         </div>
+      ) : canEdit ? (
+        <button className="info-empty-action" onClick={() => setEditing(true)}>
+          {emptyAction}
+        </button>
       ) : (
         <p className="info-empty">Aucune information renseignée</p>
       )}
