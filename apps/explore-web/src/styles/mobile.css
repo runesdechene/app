@@ -683,7 +683,7 @@
   }
 
   /* Date référentiel sous la toolbar */
-  .calendar-date {
+  .calendar-date-wrapper {
     position: fixed;
     top: calc(var(--safe-top, 0px) + 60px + 110px);
     left: 8px;
