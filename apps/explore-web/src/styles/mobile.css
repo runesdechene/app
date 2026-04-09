@@ -394,6 +394,12 @@
     left: 8px !important;
   }
 
+  /* Masquer les boutons zoom sur mobile (pinch-to-zoom suffit) */
+  .maplibregl-ctrl-zoom-in,
+  .maplibregl-ctrl-zoom-out {
+    display: none !important;
+  }
+
   .maplibregl-ctrl-group button {
     width: 36px !important;
     height: 36px !important;
