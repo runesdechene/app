@@ -1,3 +1,30 @@
+# ALPHA V0.5.9
+## Le Livre d'Or
+
+### Le rating mène au carnet
+Après avoir noté un lieu en étoiles, une invitation vous propose de laisser une page de carnet. Les étoiles que vous avez données s'affichent sur votre carte de récit — un contexte émotionnel pour ceux qui vous lisent.
+
+### Éditez vos récits et renommez les lieux
+Modifiez votre page de carnet à tout moment — texte, titre, photos. Supprimez-la si vous changez d'avis. Et si vous avez écrit un récit sur un lieu, vous pouvez aussi en changer le nom.
+
+### Corrections
+- Le panneau de notifications passe désormais au-dessus de tous les contrôles de la carte
+- Le badge de notifications non-lues disparaît immédiatement à l'ouverture
+- Le countdown du coffre d'énigmes est masqué sur mobile (visible dans la modal)
+- La modal de carnet prend tout l'espace du panneau de lieu
+
+# ALPHA V0.5.8
+## Calendriers du monde ancien
+
+### 6 référentiels calendaires
+Choisissez comment le temps s'affiche dans votre application. En plus du Grégorien, de la Fondation de Rome (AUC) et de la Chute de Constantinople, trois nouveaux référentiels :
+- **Calendrier impérial** — dates en mois républicains (Vendémiaire, Brumaire, Germinal...) avec le suffixe impérial
+- **Calendrier de Coligny** — le calendrier luni-solaire gaulois reconstitué, avec les 12 mois celtiques (Samonios, Dumannios, Giamonios...) calculés sur de vraies lunaisons
+- **Ère olympique** — comptez les années depuis les premiers Jeux de 776 av. J.-C.
+
+### La date vit sur la carte
+La date du jour dans votre référentiel choisi s'affiche en permanence sur la carte — sous l'avatar en desktop, sous la barre d'énergie sur mobile. Changez de calendrier dans le menu profil, l'affichage se met à jour instantanément.
+
 # ALPHA V0.5.7
 
 - Visiter un lieu GPS donne du **stock à placer** (plus d'influence permanente sur les visites)
