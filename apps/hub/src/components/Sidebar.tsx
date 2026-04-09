@@ -70,6 +70,9 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/carte/regles" className={({ isActive }) => isActive ? 'active' : ''}>
           Règles
         </NavLink>
+        <NavLink to="/carte/tutoriel" className={({ isActive }) => isActive ? 'active' : ''}>
+          Tutoriel
+        </NavLink>
 
         <div className="sidebar-section-label">Shopify</div>
         <NavLink to="/shopify/connect" className={({ isActive }) => isActive ? 'active' : ''}>

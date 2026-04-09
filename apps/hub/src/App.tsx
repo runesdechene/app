@@ -20,6 +20,7 @@ import { Ads } from './components/Ads'
 import { Enigmas } from './components/Enigmas'
 import { Settings } from './components/Settings'
 import { GameRules } from './components/GameRules'
+import { TutorialManager } from './components/TutorialManager'
 import { ShopifyConnect, ShopifyCallback } from './components/ShopifyConnect'
 import { ShopifySync } from './components/ShopifySync'
 import { Sidebar } from './components/Sidebar'
@@ -94,6 +95,7 @@ function App() {
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
           <Route path="/carte/regles" element={<GameRules />} />
+          <Route path="/carte/tutoriel" element={<TutorialManager />} />
           <Route path="/shopify/connect" element={<ShopifyConnect />} />
           <Route path="/shopify/sync" element={<ShopifySync />} />
           <Route path="/shopify/callback" element={<ShopifyCallback />} />
