@@ -107,6 +107,10 @@ interface PlayerState {
   isAdmin: boolean
   setIsAdmin: (v: boolean) => void
 
+  /** Tutorial complété */
+  tutorialCompletedAt: string | null
+  setTutorialCompletedAt: (v: string | null) => void
+
   /** Chargement initial */
   loading: boolean
   setLoading: (loading: boolean) => void
@@ -205,6 +209,9 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   isAdmin: false,
   setIsAdmin: (v) => set({ isAdmin: v }),
+
+  tutorialCompletedAt: null,
+  setTutorialCompletedAt: (v) => set({ tutorialCompletedAt: v }),
 
   loading: true,
   setLoading: (loading) => set({ loading }),

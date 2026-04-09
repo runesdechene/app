@@ -65,6 +65,7 @@ export function usePlayer() {
       setUserName(null)
       setUserAvatarUrl(null)
       setIsAdmin(false)
+      usePlayerStore.getState().setTutorialCompletedAt(null)
       setLoading(false)
       useToastStore.getState().clearAll()
       return
@@ -77,7 +78,7 @@ export function usePlayer() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('id, faction_id, first_name, email_address, avatar_url')
+        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at')
         .eq('email_address', user!.email)
         .single()
 
@@ -105,6 +106,7 @@ export function usePlayer() {
       }
 
       setUserId(userData.id)
+      usePlayerStore.getState().setTutorialCompletedAt(userData.tutorial_completed_at)
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')
@@ -285,6 +287,9 @@ export function usePlayer() {
               enigmaType?: string
               difficulty?: string
               actorAvatarUrl?: string
+              authorName?: string
+              authorId?: string
+              contributionId?: number
             }
           }
 
@@ -344,6 +349,15 @@ export function usePlayer() {
             message = isSelf ? `Vous avez aimé ${place}` : `${name} a aimé ${place}`
             highlights.push(place)
             type = 'like'
+          } else if (e.type === 'like_carnet') {
+            const author = e.data?.authorName || 'un explorateur'
+            message = isSelf
+              ? `Vous avez aimé le récit de ${author} sur ${place}`
+              : `${name} a aimé un récit sur ${place}`
+            highlights.push(name, place)
+            type = 'like'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'new_place') {
             message = isSelf ? `Vous avez ajouté ${place}` : `${name} a ajouté ${place}`
             highlights.push(name, place)

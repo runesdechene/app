@@ -34,7 +34,10 @@ import { DailyEnigma } from './components/enigma/DailyEnigma'
 import { EnigmaChestButton } from './components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from './components/enigma/FragmentEnigma'
 import { NotificationBell } from './components/notifications/NotificationBell'
+import { TutorialModal } from './components/tutorial/TutorialModal'
+import type { TutorialSlide } from './components/tutorial/TutorialModal'
 import { useNotifications } from './hooks/useNotifications'
+import { supabase } from './lib/supabase'
 import shopIcon from './assets/shop_icon.webp'
 import './App.css'
 import './styles/mobile.css'
@@ -94,6 +97,9 @@ function App() {
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{ fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null>(null)
+  const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
+  const [tutorialSlides, setTutorialSlides] = useState<TutorialSlide[]>([])
+  const tutorialCompletedAt = usePlayerStore(s => s.tutorialCompletedAt)
 
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -133,11 +139,64 @@ function App() {
   const onboardingDone = useRef(false)
   useEffect(() => {
     if (!userId) return
-    if (userName === '' && !onboardingDone.current) {
+    if (userName === '' && !onboardingDone.current && tutorialPhase === null) {
       onboardingDone.current = true
       setShowOnboarding(true)
     }
-  }, [userId, userName])
+  }, [userId, userName, tutorialPhase])
+
+  // Tutorial : fetch slides si pas encore complété
+  const tutorialFetched = useRef(false)
+  useEffect(() => {
+    if (!userId || tutorialCompletedAt !== null || tutorialFetched.current) return
+    tutorialFetched.current = true
+
+    supabase
+      .from('tutorial_slides')
+      .select('id, phase, position, title, body, image_url')
+      .eq('active', true)
+      .order('phase')
+      .order('position')
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setTutorialSlides(data as TutorialSlide[])
+          setTutorialPhase('before')
+        }
+      })
+  }, [userId, tutorialCompletedAt])
+
+  function handleTutorialBeforeComplete() {
+    setTutorialPhase(null)
+    // Nouveau joueur → onboarding, existant → passer à phase "after"
+    if (userName === '') {
+      onboardingDone.current = true
+      setShowOnboarding(true)
+    } else {
+      // Joueur existant : enchaîner directement sur phase "after"
+      const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
+      if (afterSlides.length > 0) {
+        setTutorialPhase('after')
+      } else {
+        markTutorialComplete()
+      }
+    }
+  }
+
+  function handleTutorialAfterComplete() {
+    setTutorialPhase(null)
+    markTutorialComplete()
+  }
+
+  function markTutorialComplete() {
+    if (!userId) return
+    supabase
+      .from('users')
+      .update({ tutorial_completed_at: new Date().toISOString() })
+      .eq('id', userId)
+      .then(() => {
+        usePlayerStore.getState().setTutorialCompletedAt(new Date().toISOString())
+      })
+  }
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
 
@@ -276,6 +335,22 @@ function App() {
         />
       )}
 
+      {tutorialPhase === 'before' && (
+        <TutorialModal
+          slides={tutorialSlides.filter(s => s.phase === 'before')}
+          onComplete={handleTutorialBeforeComplete}
+          lastSlideLabel="Commencer"
+        />
+      )}
+
+      {tutorialPhase === 'after' && (
+        <TutorialModal
+          slides={tutorialSlides.filter(s => s.phase === 'after')}
+          onComplete={handleTutorialAfterComplete}
+          lastSlideLabel="C'est parti !"
+        />
+      )}
+
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
@@ -289,7 +364,14 @@ function App() {
 
       {showFactionModal && (
         <FactionModal
-          onClose={() => setShowFactionModal(false)}
+          onClose={() => {
+            setShowFactionModal(false)
+            // Après choix d'héritage, enchaîner sur tuto phase "after" si slides disponibles
+            const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
+            if (afterSlides.length > 0 && !usePlayerStore.getState().tutorialCompletedAt) {
+              setTutorialPhase('after')
+            }
+          }}
           currentFactionId={userFactionId}
         />
       )}
