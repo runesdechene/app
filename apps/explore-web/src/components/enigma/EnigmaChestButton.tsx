@@ -8,6 +8,7 @@ interface FragmentStatus {
   name: string
   icon: string | null
   iconUrl: string | null
+  imageUrl: string | null
   collection: string | null
   hasEnigma: boolean
   enigmaCooldown: boolean
@@ -136,8 +137,8 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
                   onClick={done ? undefined : () => handleSelectFragment(f)}
                   disabled={done}
                 >
-                  {f.iconUrl ? (
-                    <img src={f.iconUrl} alt="" className="enigma-menu-item-img" />
+                  {f.imageUrl ? (
+                    <img src={f.imageUrl} alt="" className="enigma-menu-item-img" />
                   ) : f.icon ? (
                     <span className="enigma-menu-item-img" style={{ fontSize: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{f.icon}</span>
                   ) : (
