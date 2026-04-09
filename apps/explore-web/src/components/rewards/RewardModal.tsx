@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import './RewardModal.css'
 
 interface RewardGain {
@@ -13,7 +14,7 @@ interface RewardModalProps {
 }
 
 export function RewardModal({ title, gains, onClose }: RewardModalProps) {
-  return (
+  return createPortal(
     <div
       className="reward-modal-overlay"
       onClick={onClose}
@@ -44,6 +45,7 @@ export function RewardModal({ title, gains, onClose }: RewardModalProps) {
           Fermer
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
