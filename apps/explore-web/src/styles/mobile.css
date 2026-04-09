@@ -801,12 +801,12 @@
     bottom: calc(var(--safe-bottom, 0px) + 68px);
   }
 
-  /* Bouton style carte au-dessus de la navbar */
+  /* Bouton style carte — bas gauche, au-dessus du badge version */
   .map-style-select {
-    top: calc(var(--safe-bottom, 0px) + 68px);
-    bottom: auto;
-    right: 13px;
-    left: auto;
+    top: auto;
+    bottom: calc(var(--safe-bottom, 0px) + 85px);
+    left: 8px;
+    right: auto;
   }
 }
 
