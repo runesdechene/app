@@ -71,7 +71,7 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
 
   function handleClick() {
     if (!hasFragments) {
-      if (!dailyDone) onOpenDaily()
+      onOpenDaily()
       return
     }
     setShowMenu(true)
@@ -103,7 +103,7 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
           {availableCount > 0 ? (
             <span style={{ color: '#d4af37', fontWeight: 700 }}>{availableCount}</span>
           ) : (
-            <span style={{ color: '#4A3728', fontWeight: 600, fontSize: 10 }}>{countdown}</span>
+            <span className="enigma-chest-countdown" style={{ color: '#4A3728', fontWeight: 600, fontSize: 10 }}>{countdown}</span>
           )}
         </span>
       </button>

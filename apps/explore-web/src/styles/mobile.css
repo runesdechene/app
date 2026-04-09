@@ -150,7 +150,7 @@
 
   .energy-sub {
     display: flex;
-    padding-left: 20px;
+    padding-left: 2px;
   }
 
   .energy-icon {
@@ -171,6 +171,15 @@
   }
 
   .notoriety-value {
+    font-size: 16px;
+  }
+
+  .notification-bell {
+    width: auto;
+    padding: 9px 12px;
+  }
+
+  .notification-bell-icon {
     font-size: 16px;
   }
 
@@ -575,6 +584,11 @@
     line-height: 1;
   }
 
+  /* --- Coffre : cacher le countdown sur mobile --- */
+  .enigma-chest-countdown {
+    display: none;
+  }
+
   /* --- Masquer les controles desktop remplaces par la navbar --- */
   .app-toolbar .auth-btn {
     display: none;
@@ -673,6 +687,15 @@
     backdrop-filter: none;
   }
 
+  /* Date référentiel sous la toolbar */
+  .calendar-date {
+    position: fixed;
+    top: calc(var(--safe-top, 0px) + 60px + 110px);
+    left: 8px;
+    right: auto;
+    z-index: 14;
+  }
+
   /* --- Panneaux masques par defaut sur mobile --- */
   .game-toast-container {
     display: none !important;
@@ -693,10 +716,10 @@
 
   .map-style-dropdown {
   position: absolute;
-  bottom: auto;
-  top: 50px;
-  left: auto;
-  right: 0;
+  bottom: 50px;
+  top: auto;
+  left: 0;
+  right: auto;
 }
 
 

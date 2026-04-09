@@ -31,6 +31,16 @@ interface DailyEnigmaProps {
   onClose: () => void
 }
 
+function getCountdown(): string {
+  const now = new Date()
+  const midnight = new Date(now)
+  midnight.setHours(24, 0, 0, 0)
+  const diff = midnight.getTime() - now.getTime()
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  return `${h}h${m.toString().padStart(2, '0')}`
+}
+
 const DIFFICULTY_LABELS: Record<string, string> = {
   very_easy: 'Facile',
   easy: 'Intermédiaire',
@@ -165,7 +175,10 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         {!loading && allDone && (
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
-              Vous avez répondu aux 3 énigmes du jour. Revenez demain !
+              Vous avez répondu aux 3 énigmes du jour.
+            </p>
+            <p className="enigma-already-done-text" style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>
+              Prochaines énigmes dans {getCountdown()}
             </p>
           </div>
         )}
