@@ -65,6 +65,9 @@ export interface PlaceDetail {
   beginAt: string | null
   endAt: string | null
   createdAt: string | null
+  eraId: string | null
+  eraName: string | null
+  yearExact: number | null
 }
 
 export function usePlace(placeId: string | null) {

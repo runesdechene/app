@@ -847,7 +847,14 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
         {activeTab === 'infos' && (
           <div className="place-tab-content">
-            <PlaceInfos placeId={place.id} infos={infoFields} onRefresh={refreshV05} />
+            <PlaceInfos
+              placeId={place.id}
+              infos={infoFields}
+              eraId={place.eraId ?? null}
+              eraName={place.eraName ?? null}
+              yearExact={place.yearExact ?? null}
+              onRefresh={refreshV05}
+            />
           </div>
         )}
 

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCalendarRef } from '../../hooks/useCalendarRef'
+import { formatYear } from '../../lib/calendarUtils'
+import { EraSelector } from './EraSelector'
 import './PlaceInfos.css'
 
 interface InfoField {
@@ -13,6 +16,9 @@ interface InfoField {
 interface PlaceInfosProps {
   placeId: string
   infos: InfoField[]
+  eraId: string | null
+  eraName: string | null
+  yearExact: number | null
   onRefresh: () => void
 }
 
@@ -22,11 +28,73 @@ const INFO_CONFIG = {
   warning: { icon: '⚠️', label: 'Information importante', placeholder: 'Danger, propriété privée, horaires...' },
 } as const
 
-export function PlaceInfos({ placeId, infos, onRefresh }: PlaceInfosProps) {
+export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefresh }: PlaceInfosProps) {
   const userId = usePlayerStore(s => s.userId)
+  const { calendarRef } = useCalendarRef()
+  const [editingEra, setEditingEra] = useState(false)
+  const [newEraId, setNewEraId] = useState<string | null>(null)
+  const [newYearExact, setNewYearExact] = useState<number | null>(null)
+  const [savingEra, setSavingEra] = useState(false)
+
+  async function saveEra() {
+    if (!newEraId || savingEra) return
+    setSavingEra(true)
+    const { error } = await supabase
+      .from('places')
+      .update({ era_id: newEraId, year_exact: newYearExact })
+      .eq('id', placeId)
+    if (!error) {
+      setEditingEra(false)
+      onRefresh()
+    }
+    setSavingEra(false)
+  }
 
   return (
     <div className="place-infos">
+      {/* Ligne Époque */}
+      <div className="info-row">
+        <div className="info-row-header">
+          <span className="info-icon">🏛️</span>
+          <span className="info-label">Époque</span>
+          {!eraId && userId && !editingEra && (
+            <button className="info-edit-btn" onClick={() => setEditingEra(true)}>
+              Ajouter
+            </button>
+          )}
+        </div>
+
+        {editingEra ? (
+          <div className="info-edit">
+            <EraSelector
+              eraId={newEraId}
+              yearExact={newYearExact}
+              onChange={(era, year) => { setNewEraId(era); setNewYearExact(year) }}
+            />
+            <div className="info-edit-actions">
+              <button className="info-save-btn" onClick={saveEra} disabled={savingEra || !newEraId}>
+                {savingEra ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+              <button className="info-cancel-btn" onClick={() => setEditingEra(false)}>
+                Annuler
+              </button>
+            </div>
+          </div>
+        ) : eraId && eraName ? (
+          <div className="info-content">
+            <p>
+              {eraName}
+              {yearExact !== null && (
+                <span className="era-date-display"> — {formatYear(yearExact, calendarRef)}</span>
+              )}
+            </p>
+          </div>
+        ) : (
+          <p className="info-empty">Aucune époque renseignée</p>
+        )}
+      </div>
+
+      {/* InfoRows existants */}
       {(['accessibility', 'season', 'warning'] as const).map(type => {
         const config = INFO_CONFIG[type]
         const existing = infos.find(i => i.type === type)
