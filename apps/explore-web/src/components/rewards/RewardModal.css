@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   animation: reward-overlay-in 0.25s ease-out;
 }
 

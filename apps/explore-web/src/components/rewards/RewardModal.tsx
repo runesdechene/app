@@ -32,8 +32,8 @@ export function RewardModal({ title, gains, onClose }: RewardModalProps) {
 
         {gains.length > 0 && (
           <div className="reward-modal-gains">
-            {gains.map((gain, i) => (
-              <div key={i} className={`reward-modal-gain ${gain.type}`}>
+            {gains.map((gain) => (
+              <div key={gain.type} className={`reward-modal-gain ${gain.type}`}>
                 +{gain.value} {gain.label}
               </div>
             ))}
