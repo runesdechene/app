@@ -389,7 +389,7 @@
   /* --- MapLibre Controls — bas gauche, au-dessus du bouton layers --- */
   .maplibregl-ctrl-top-right {
     top: auto !important;
-    bottom: calc(var(--safe-bottom, 0px) + 135px) !important;
+    bottom: calc(var(--safe-bottom, 0px) + 150px) !important;
     right: auto !important;
     left: 8px !important;
   }
@@ -812,7 +812,7 @@
   /* Bouton style carte — bas gauche, au-dessus du badge version */
   .map-style-select {
     top: auto;
-    bottom: calc(var(--safe-bottom, 0px) + 85px);
+    bottom: calc(var(--safe-bottom, 0px) + 100px);
     left: 8px;
     right: auto;
   }
