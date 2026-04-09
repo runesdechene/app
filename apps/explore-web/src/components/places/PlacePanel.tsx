@@ -390,6 +390,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setActiveTab(tab)
     setTimeout(() => tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }, [])
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleDraft, setTitleDraft] = useState(place.title)
+  const [titleSaving, setTitleSaving] = useState(false)
   const [showAddCarnet, setShowAddCarnet] = useState(false)
   const [editingCarnet, setEditingCarnet] = useState<Carnet | null>(null)
   const [deleteConfirmPlaceId, setDeleteConfirmPlaceId] = useState<string | null>(null)
@@ -551,6 +554,29 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setDeleteConfirmPlaceId(null)
   }
 
+  async function handleRenamePlace() {
+    if (!userId || !titleDraft.trim() || titleDraft.trim() === place.title) {
+      setEditingTitle(false)
+      setTitleDraft(place.title)
+      return
+    }
+    setTitleSaving(true)
+    const { data, error } = await supabase.rpc('rename_place', {
+      p_user_id: userId,
+      p_place_id: place.id,
+      p_title: titleDraft.trim(),
+    })
+    const result = data as { success?: boolean; title?: string; error?: string } | null
+    if (!error && result?.success) {
+      refreshV05()
+      onRefetch()
+    } else {
+      setTitleDraft(place.title)
+    }
+    setTitleSaving(false)
+    setEditingTitle(false)
+  }
+
   return (
     <>
       {/* Dialog confirmation suppression */}
@@ -637,7 +663,34 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         {/* Identity */}
         <div className="place-identity">
           <div className="place-title-row">
-            <h2 className="place-title">{place.title}</h2>
+            {editingTitle ? (
+              <div className="place-title-edit">
+                <input
+                  className="place-title-input"
+                  type="text"
+                  value={titleDraft}
+                  onChange={e => setTitleDraft(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleRenamePlace()
+                    if (e.key === 'Escape') { setEditingTitle(false); setTitleDraft(place.title) }
+                  }}
+                  maxLength={255}
+                  autoFocus
+                  disabled={titleSaving}
+                />
+                <button className="place-title-edit-btn place-title-edit-ok" onClick={handleRenamePlace} disabled={titleSaving}>✓</button>
+                <button className="place-title-edit-btn place-title-edit-cancel" onClick={() => { setEditingTitle(false); setTitleDraft(place.title) }}>✕</button>
+              </div>
+            ) : (
+              <h2 className="place-title">
+                {place.title}
+                {userHasCarnet && (
+                  <button className="place-title-edit-pencil" onClick={() => setEditingTitle(true)} title="Renommer ce lieu">
+                    ✏️
+                  </button>
+                )}
+              </h2>
+            )}
             <div className="place-title-actions">
               {v05 && (
                 <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />

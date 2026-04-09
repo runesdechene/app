@@ -272,6 +272,63 @@
   letter-spacing: 0.02em;
 }
 
+.place-title-edit-pencil {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.4;
+  margin-left: 8px;
+  padding: 0;
+  vertical-align: middle;
+  transition: opacity 0.15s;
+}
+
+.place-title-edit-pencil:hover {
+  opacity: 0.8;
+}
+
+.place-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.place-title-input {
+  flex: 1;
+  font-family: var(--font-title);
+  font-size: 28px;
+  color: var(--color-ink);
+  border: 1px solid rgba(44, 24, 16, 0.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.8);
+  outline: none;
+}
+
+.place-title-input:focus {
+  border-color: #c9a96e;
+}
+
+.place-title-edit-btn {
+  background: none;
+  border: 1px solid rgba(44, 24, 16, 0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.place-title-edit-ok:hover {
+  background: rgba(100, 180, 100, 0.15);
+}
+
+.place-title-edit-cancel:hover {
+  background: rgba(200, 50, 50, 0.1);
+}
+
 /* Tags */
 .place-tags {
   display: flex;
