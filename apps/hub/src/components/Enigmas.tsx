@@ -81,6 +81,7 @@ export function Enigmas() {
   const [filterDifficulty, setFilterDifficulty] = useState<Difficulty | 'all'>('all')
   const [filterHeritage, setFilterHeritage] = useState<string>('all')
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
 
   // Editing
@@ -128,15 +129,17 @@ export function Enigmas() {
 
   // Filtered & paginated list
   const filtered = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim()
     return enigmas.filter(e => {
       if (filterType !== 'all' && e.type !== filterType) return false
       if (filterDifficulty !== 'all' && e.difficulty !== filterDifficulty) return false
       if (filterHeritage !== 'all' && e.heritage_id !== filterHeritage) return false
       if (filterActive === 'active' && !e.active) return false
       if (filterActive === 'inactive' && e.active) return false
+      if (q && !e.question.toLowerCase().includes(q) && !e.lore_text.toLowerCase().includes(q) && !e.answer.toLowerCase().includes(q)) return false
       return true
     })
-  }, [enigmas, filterType, filterDifficulty, filterHeritage, filterActive])
+  }, [enigmas, filterType, filterDifficulty, filterHeritage, filterActive, searchQuery])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const paged = useMemo(() => {
@@ -522,7 +525,17 @@ export function Enigmas() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Search + Filters */}
+      <div style={{ marginBottom: 12 }}>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); setPage(1) }}
+          placeholder="Rechercher dans les questions, lore, réponses..."
+          className="settings-input"
+          style={{ width: '100%', padding: '8px 12px', fontSize: 14 }}
+        />
+      </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
         <select
           value={filterType}
