@@ -577,6 +577,23 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setEditingTitle(false)
   }
 
+  // --- Carnet modal: takes over entire panel ---
+  if (showAddCarnet || editingCarnet) {
+    return (
+      <AddCarnetModal
+        placeId={place.id}
+        canRate={v05?.isExplorer === true || isAuthor}
+        onClose={() => { setShowAddCarnet(false); setEditingCarnet(null) }}
+        onSaved={() => { refreshV05(); setEditingCarnet(null); setShowAddCarnet(false) }}
+        existingCarnet={editingCarnet ? {
+          title: editingCarnet.title,
+          content: editingCarnet.content,
+          images: editingCarnet.images,
+        } : undefined}
+      />
+    )
+  }
+
   return (
     <>
       {/* Dialog confirmation suppression */}
@@ -984,21 +1001,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           </div>
         )}
       </div>
-
-      {/* Add/Edit carnet modal */}
-      {(showAddCarnet || editingCarnet) && (
-        <AddCarnetModal
-          placeId={place.id}
-          canRate={v05?.isExplorer === true || isAuthor}
-          onClose={() => { setShowAddCarnet(false); setEditingCarnet(null) }}
-          onSaved={() => { refreshV05(); setEditingCarnet(null); setShowAddCarnet(false) }}
-          existingCarnet={editingCarnet ? {
-            title: editingCarnet.title,
-            content: editingCarnet.content,
-            images: editingCarnet.images,
-          } : undefined}
-        />
-      )}
 
       {/* Delete carnet confirmation */}
       {deleteConfirmPlaceId && (

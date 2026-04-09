@@ -1,13 +1,9 @@
 .add-carnet-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--color-parchment);
   display: flex;
   flex-direction: column;
-  z-index: 5;
+  flex: 1;
+  min-height: 0;
   animation: add-carnet-fade 0.2s ease;
-  border-radius: inherit;
-  overflow: hidden;
 }
 @keyframes add-carnet-fade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -16,7 +12,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-height: 0;
 }
 
 .add-carnet-header {
