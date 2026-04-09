@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useCalendarRef } from '../../hooks/useCalendarRef'
 import { formatYear } from '../../lib/calendarUtils'
 import { EraSelector } from './EraSelector'
+import { RewardModal } from '../rewards/RewardModal'
 import './PlaceInfos.css'
 
 interface InfoField {
@@ -35,16 +36,26 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
   const [newEraId, setNewEraId] = useState<string | null>(null)
   const [newYearExact, setNewYearExact] = useState<number | null>(null)
   const [savingEra, setSavingEra] = useState(false)
+  const [reward, setReward] = useState<{ erudition: number } | null>(null)
 
   async function saveEra() {
-    if (!newEraId || savingEra) return
+    if (!newEraId || savingEra || !userId) return
+    if (!window.confirm('Cette information est importante pour le patrimoine et les futurs visiteurs. Confirmez-vous qu\'elle est fiable ?')) return
     setSavingEra(true)
-    const { error } = await supabase
-      .from('places')
-      .update({ era_id: newEraId, year_exact: newYearExact })
-      .eq('id', placeId)
-    if (!error) {
+    const { data, error } = await supabase.rpc('contribute_to_place', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_type: 'epoch',
+      p_content: null,
+      p_image_url: null,
+      p_era_id: newEraId,
+      p_year_exact: newYearExact,
+    })
+    if (!error && data?.success) {
       setEditingEra(false)
+      if (data.isFirstContribution && data.eruditionGain > 0) {
+        setReward({ erudition: data.eruditionGain })
+      }
       onRefresh()
     }
     setSavingEra(false)
@@ -114,6 +125,14 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
           />
         )
       })}
+
+      {reward && (
+        <RewardModal
+          title="Contribution enregistrée !"
+          gains={[{ label: "points d'érudition", value: reward.erudition, type: 'erudition' }]}
+          onClose={() => setReward(null)}
+        />
+      )}
     </div>
   )
 }
@@ -135,17 +154,22 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(content ?? '')
   const [saving, setSaving] = useState(false)
+  const [reward, setReward] = useState<{ erudition: number } | null>(null)
 
   async function save() {
     if (!userId || !value.trim() || saving) return
+    if (!window.confirm("Cette information est importante pour le patrimoine et les futurs visiteurs. Confirmez-vous qu'elle est fiable ?")) return
     setSaving(true)
-    const { error } = await supabase.rpc('contribute_to_place', {
+    const { data, error } = await supabase.rpc('contribute_to_place', {
       p_user_id: userId,
       p_place_id: placeId,
       p_type: type,
       p_content: value.trim(),
     })
-    if (!error) {
+    if (!error && data?.success) {
+      if (data.isFirstContribution && data.eruditionGain > 0) {
+        setReward({ erudition: data.eruditionGain })
+      }
       setEditing(false)
       onSaved()
     }
@@ -195,6 +219,15 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
         </button>
       ) : (
         <p className="info-empty">Aucune information renseignée</p>
+      )}
+      {reward && (
+        <RewardModal
+          title="Contribution recompensee !"
+          gains={[
+            { label: "erudition", value: reward.erudition, type: 'erudition' as const },
+          ]}
+          onClose={() => setReward(null)}
+        />
       )}
     </div>
   )
