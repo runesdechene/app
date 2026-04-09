@@ -31,11 +31,13 @@ interface CarnetCardProps {
   factionSvg: string | null
   onVoted: () => void
   onPhotoOpen?: (photos: string[], index: number) => void
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
 const RANK_POINTS = [20, 10, 5]
 
-export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, permanentInfluence, onVoted, onPhotoOpen }: CarnetCardProps) {
+export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, permanentInfluence, onVoted, onPhotoOpen, onEdit, onDelete }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
   const [liked, setLiked] = useState(false)
@@ -167,7 +169,19 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, perm
             {liked ? '❤️' : '🤍'} {liked ? 'Aimé' : 'J\'aime'}{localVotesUp > 0 ? ` (${localVotesUp})` : ''}
           </button>
         ) : (
-          localVotesUp > 0 && <span className="carnet-like-count">❤️ {localVotesUp}</span>
+          <div className="carnet-owner-actions">
+            {localVotesUp > 0 && <span className="carnet-like-count">❤️ {localVotesUp}</span>}
+            {onEdit && (
+              <button className="carnet-action-btn" onClick={onEdit} title="Modifier">
+                ✏️
+              </button>
+            )}
+            {onDelete && (
+              <button className="carnet-action-btn carnet-action-btn-danger" onClick={onDelete} title="Supprimer">
+                🗑️
+              </button>
+            )}
+          </div>
         )}
         <span className="carnet-date">{timeAgo}</span>
       </div>

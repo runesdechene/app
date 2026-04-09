@@ -391,6 +391,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setTimeout(() => tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }, [])
   const [showAddCarnet, setShowAddCarnet] = useState(false)
+  const [editingCarnet, setEditingCarnet] = useState<Carnet | null>(null)
+  const [deleteConfirmPlaceId, setDeleteConfirmPlaceId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
 
   // V0.5 detail data
@@ -534,6 +536,19 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setDeleting(false)
     setShowDeleteConfirm(false)
     onClose()
+  }
+
+  async function handleDeleteCarnet() {
+    if (!userId) return
+    const { data, error } = await supabase.rpc('delete_carnet', {
+      p_user_id: userId,
+      p_place_id: place.id,
+    })
+    const result = data as { success?: boolean; error?: string } | null
+    if (!error && result?.success) {
+      refreshV05()
+    }
+    setDeleteConfirmPlaceId(null)
   }
 
   return (
@@ -849,6 +864,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   permanentInfluence={v05?.influence?.find(inf => inf.factionId === c.factionId)?.permanent ?? 0}
                   onVoted={refreshV05}
                   onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
+                  onEdit={c.userId === userId ? () => setEditingCarnet(c) : undefined}
+                  onDelete={c.userId === userId ? () => setDeleteConfirmPlaceId(c.userId) : undefined}
                 />
               ))
             )}
@@ -915,14 +932,37 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         )}
       </div>
 
-      {/* Add carnet modal */}
-      {showAddCarnet && (
+      {/* Add/Edit carnet modal */}
+      {(showAddCarnet || editingCarnet) && (
         <AddCarnetModal
           placeId={place.id}
           canRate={v05?.isExplorer === true || isAuthor}
-          onClose={() => setShowAddCarnet(false)}
-          onSaved={refreshV05}
+          onClose={() => { setShowAddCarnet(false); setEditingCarnet(null) }}
+          onSaved={() => { refreshV05(); setEditingCarnet(null); setShowAddCarnet(false) }}
+          existingCarnet={editingCarnet ? {
+            title: editingCarnet.title,
+            content: editingCarnet.content,
+            images: editingCarnet.images,
+          } : undefined}
         />
+      )}
+
+      {/* Delete carnet confirmation */}
+      {deleteConfirmPlaceId && (
+        <div className="place-delete-confirm-overlay" onClick={() => setDeleteConfirmPlaceId(null)}>
+          <div className="place-delete-confirm" onClick={e => e.stopPropagation()}>
+            <p>Supprimer votre page de carnet ?</p>
+            <p className="place-delete-confirm-warning">Cette action est irréversible.</p>
+            <div className="place-delete-confirm-actions">
+              <button className="place-delete-btn" onClick={handleDeleteCarnet}>
+                Supprimer
+              </button>
+              <button className="place-delete-cancel-btn" onClick={() => setDeleteConfirmPlaceId(null)}>
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {lightbox && (

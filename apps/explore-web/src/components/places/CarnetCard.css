@@ -167,6 +167,30 @@
   color: var(--color-muted);
 }
 
+.carnet-owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carnet-action-btn {
+  background: none;
+  border: 1px solid rgba(44, 24, 16, 0.15);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.carnet-action-btn:hover {
+  background: rgba(44, 24, 16, 0.06);
+}
+
+.carnet-action-btn-danger:hover {
+  background: rgba(200, 50, 50, 0.1);
+}
+
 /* Influence line */
 .carnet-influence-line {
   display: flex;
