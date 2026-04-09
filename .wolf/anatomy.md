@@ -1,19 +1,19 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-08T13:51:36.333Z
-> Files: 559 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-09T13:02:29.082Z
+> Files: 602 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../.claude/projects/C--Users-uriel-desktop-DEVS-app--Runes-de-Ch-ne-/memory/
 
 - `feedback_editorial_direction.md` (~641 tok)
 - `feedback_enigma_tone.md` (~330 tok)
-- `MEMORY.md` — Memory — Runes de Chêne (~1120 tok)
+- `MEMORY.md` — Memory — Runes de Chêne (~1166 tok)
 
 ## ./
 
 - `.gitignore` — Git ignore rules (~135 tok)
 - `CHANGELOG.md` — Changelog (~514 tok)
-- `CLAUDE.md` — OpenWolf (~462 tok)
+- `CLAUDE.md` — OpenWolf (~475 tok)
 - `package.json` — Node.js package manifest (~162 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~58592 tok)
 - `pnpm-workspace.yaml` (~13 tok)
@@ -36,6 +36,19 @@
 ## .claude/rules/
 
 - `openwolf.md` (~313 tok)
+
+## .superpowers/brainstorm/24723-1775667219/content/
+
+- `epoch-form-mockup.html` (~1135 tok)
+
+## .superpowers/brainstorm/24957-1775691916/content/
+
+- `epoch-form-mockup-v2.html` (~892 tok)
+- `epoch-form-mockup-v3.html` (~886 tok)
+- `epoch-form-mockup-v4.html` (~883 tok)
+- `epoch-form-mockup-v5.html` (~885 tok)
+- `epoch-form-mockup.html` (~1135 tok)
+- `waiting.html` (~39 tok)
 
 ## .superpowers/brainstorm/8345-1775484898/content/
 
@@ -84,8 +97,8 @@
 
 ## apps/explore-web/src/
 
-- `App.css` — Styles: 34 rules (~1576 tok)
-- `App.tsx` — NotorietyBadge (~3545 tok)
+- `App.css` — Styles: 39 rules (~1708 tok)
+- `App.tsx` — NotorietyBadge (~4488 tok)
 - `index.css` — Styles: 3 rules, 15 vars (~340 tok)
 - `main.tsx` (~70 tok)
 - `vite-env.d.ts` — / <reference types="vite/client" /> (~61 tok)
@@ -182,7 +195,7 @@
 - `GameModeModal.tsx` — GameModeModal (~694 tok)
 - `OnboardingModal.css` — Styles: 20 rules (~1094 tok)
 - `OnboardingModal.tsx` — OnboardingModal — renders form — uses useState (~1573 tok)
-- `ProfileMenu.tsx` — ProfileMenu — uses useState, useEffect (~1115 tok)
+- `ProfileMenu.tsx` — ProfileMenu (~1372 tok)
 
 ## apps/explore-web/src/components/chat/
 
@@ -212,6 +225,8 @@
 - `AbilityBar.tsx` — ABILITY_LABELS — uses useState, useEffect (~1348 tok)
 - `AdScreen.css` — Styles: 40 rules (~2047 tok)
 - `AdScreen.tsx` — AdScreen (~1169 tok)
+- `CalendarDate.css` — Styles: 1 rules (~106 tok)
+- `CalendarDate.tsx` — CalendarDate (~123 tok)
 - `ConquestToggle.css` — Styles: 25 rules (~1619 tok)
 - `ConquestToggle.tsx` — ConquestToggle (~177 tok)
 - `EnergyIndicator.css` — Styles: 18 rules (~593 tok)
@@ -245,6 +260,15 @@
 - `VersionBadge.css` — Styles: 20 rules (~891 tok)
 - `VersionBadge.tsx` — Render bold/italic from our own CHANGELOG.md (trusted source, not user input). (~1305 tok)
 
+## apps/explore-web/src/components/notifications/
+
+- `NotificationBell.tsx` — Bell icon + unread badge, toggles NotificationPanel (~200 tok)
+- `NotificationBell.tsx` — NotificationBell (~248 tok)
+- `NotificationPanel.css` — Styles: 19 rules (~780 tok)
+- `NotificationPanel.css` — Styles: 19 rules (~760 tok)
+- `NotificationPanel.tsx` — Dropdown panel: notification list, type icons, formatted messages, time ago, click → navigate to place, marks all read on open (~350 tok)
+- `NotificationPanel.tsx` — TYPE_ICONS (~1130 tok)
+
 ## apps/explore-web/src/components/places/
 
 - `AddCarnetModal.css` — Styles: 29 rules (~1211 tok)
@@ -252,12 +276,16 @@
 - `AddContributionModal.css` — Styles: 14 rules (~656 tok)
 - `AddContributionModal.tsx` — TYPE_OPTIONS (~1403 tok)
 - `AddPlaceFlow.css` — Styles: 53 rules (~2466 tok)
-- `AddPlaceFlow.tsx` — MAX_FILE_SIZE (~7640 tok)
+- `AddPlaceFlow.tsx` — MAX_FILE_SIZE (~7782 tok)
 - `CarnetCard.css` — Styles: 31 rules (~1211 tok)
 - `CarnetCard.tsx` — RANK_POINTS (~1832 tok)
 - `ClaimButton.tsx` — hexToRgb (~2374 tok)
 - `ContributionCard.css` — Styles: 15 rules (~657 tok)
 - `ContributionCard.tsx` — TYPE_LABELS (~1022 tok)
+- `EraSelector.css` — Styles: 23 rules (~838 tok)
+- `EraSelector.css` — Styles for EraSelector component — dropdown époque, date section, BCE toggle, ref buttons, equivalences (~350 tok)
+- `EraSelector.tsx` — EraSelector (~1678 tok)
+- `EraSelector.tsx` — EraSelector component — dropdown époque, date précise, référentiels calendrier (grégorien/AUC/Constantinople), validation fourchette (~450 tok)
 - `FoggedPlaceView.css` — Styles: 19 rules (~695 tok)
 - `FoggedPlaceView.tsx` — FoggedPlaceView (~1599 tok)
 - `FortifyButton.tsx` — FortifyButton (~2401 tok)
@@ -275,15 +303,20 @@
 - `PlaceExplorers.tsx` — Haversine distance in km (~1806 tok)
 - `PlaceGallery.css` — Styles: 5 rules (~158 tok)
 - `PlaceGallery.tsx` — PlaceGallery (~260 tok)
-- `PlaceInfos.css` — Styles: 15 rules (~566 tok)
-- `PlaceInfos.tsx` — INFO_CONFIG (~1224 tok)
-- `PlacePanel.css` — Styles: 82 rules (~4686 tok)
-- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~10597 tok)
+- `PlaceInfos.css` — Styles: 17 rules (~675 tok)
+- `PlaceInfos.tsx` — INFO_CONFIG (~1995 tok)
+- `PlacePanel.css` — Styles: 82 rules (~4732 tok)
+- `PlacePanel.tsx` — V0.5 detail data from get_place_detail_v05 (~10847 tok)
 - `PlaceRating.css` — Styles: 8 rules (~214 tok)
 - `PlaceRating.tsx` — PlaceRating (~607 tok)
 - `ScoreSlider.tsx` — ScoreSlider (~250 tok)
 - `WishlistButton.css` — Styles: 4 rules (~196 tok)
 - `WishlistButton.tsx` — WishlistButton (~381 tok)
+
+## apps/explore-web/src/components/rewards/
+
+- `RewardModal.tsx` — Reusable compact reward popup (coffre + gains), used after first info contribution (~350 tok)
+- `RewardModal.css` — Styles: reward overlay, card, gains badges, pop animation (~500 tok)
 
 ## apps/explore-web/src/components/pwa/
 
@@ -294,17 +327,20 @@
 ## apps/explore-web/src/hooks/
 
 - `useAuth.ts` — Exports useAuth (~438 tok)
+- `useCalendarRef.ts` — Exports useCalendarRef (~254 tok)
 - `useChat.ts` — Hook de chat — a appeler UNE SEULE FOIS au niveau App. (~1785 tok)
 - `useConstructionTypes.ts` — Exports ConstructionTypeInfo, useConstructionTypes, ctByLevel (~265 tok)
-- `usePlace.ts` — Exports PlaceDetail, usePlace (~1213 tok)
+- `useNotifications.ts` — Exports useNotifications (~844 tok)
+- `usePlace.ts` — Exports PlaceDetail, usePlace (~1236 tok)
 - `usePlaces.ts` — Couleur du tag primaire (jamais ecrasee par la faction) — pour les icones (~2183 tok)
-- `usePlayer.ts` — Distance haversine en mètres (~7223 tok)
+- `usePlayer.ts` — Distance haversine en mètres (~7384 tok)
 - `usePresence.ts` — Hook de présence — à appeler UNE SEULE FOIS au niveau App. (~1368 tok)
 - `useResourceTimers.ts` — Single shared interval that ticks all 3 resource countdowns (energy, conquest, construction). (~760 tok)
 - `useSupabaseConnection.ts` — Exports useSupabaseConnection (~330 tok)
 
 ## apps/explore-web/src/lib/
 
+- `calendarUtils.ts` — Convertit une année Grégorienne vers le référentiel cible (~663 tok)
 - `imageUtils.ts` — Redimensionne et convertit une image en WebP avant upload (~428 tok)
 - `map-icons.ts` — Charge un SVG text en HTMLImageElement (~2448 tok)
 - `map-layers.ts` — Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré) (~2646 tok)
@@ -316,13 +352,14 @@
 - `chatStore.ts` — Filtres d'affichage (quels canaux on voit) (~728 tok)
 - `mapStore.ts` — ID du joueur dont le profil est ouvert (global) (~1341 tok)
 - `mobileNavStore.ts` — Timestamp de la dernière ouverture du panneau notifications (~287 tok)
+- `notificationStore.ts` — Exports Notification, useNotificationStore (~415 tok)
 - `playersStore.ts` — Exports OnlinePlayer, usePlayersStore (~262 tok)
 - `playerStore.ts` — IDs des lieux découverts par l'utilisateur (lookup O(1)) (~1954 tok)
 - `toastStore.ts` — Texte(s) à mettre en avant (bold) dans le message (~916 tok)
 
 ## apps/explore-web/src/styles/
 
-- `mobile.css` — Styles: 13 rules (~4420 tok)
+- `mobile.css` — Styles: 13 rules (~4651 tok)
 
 ## apps/explore-web/src/types/
 
@@ -350,6 +387,7 @@
 - `shopify-create-customer.ts` — Netlify Function : créer un client Shopify quand un joueur s'inscrit sur l'app (~1654 tok)
 - `shopify-order-webhook.ts` — Netlify Function : webhook Shopify orders/paid (~2994 tok)
 - `shopify-proxy.ts` — Netlify Function : proxy les appels API Shopify pour éviter le CORS (~536 tok)
+- `shopify-replay-orders.ts` — Netlify Function : rattrapage des commandes Shopify non traitées (~2899 tok)
 - `shopify-sync-tags.ts` — Netlify Function : met à jour les tags d'un client Shopify existant (~1398 tok)
 - `shopify-sync.ts` — Netlify Function : synchro initiale Shopify → Supabase (~2109 tok)
 
@@ -390,7 +428,7 @@
 - `SaveBar.tsx` — SaveBar (~295 tok)
 - `Settings.tsx` — ROLES (~9822 tok)
 - `ShopifyConnect.tsx` — Callback OAuth — reçoit le token depuis la Netlify Function (~1623 tok)
-- `ShopifySync.tsx` — ShopifySync — uses useState, useEffect (~5972 tok)
+- `ShopifySync.tsx` — ShopifySync (~6808 tok)
 - `ShopifyUnlocks.tsx` — ShopifyUnlocks — uses useState, useEffect (~1384 tok)
 - `Sidebar.tsx` — Sidebar (~948 tok)
 - `TagsManager.tsx` — TagsManager — uses useState, useEffect (~2894 tok)
@@ -418,10 +456,14 @@
 - `2026-04-06-place-panel-redesign.md` — PlacePanel Redesign — Implementation Plan (~11515 tok)
 - `2026-04-07-campements.md` — Campements — Plan d'implementation (~7515 tok)
 - `2026-04-07-fragment-limit-and-hub-rules.md` — Fragment Limit Bonus + Hub Game Rules Page (~3595 tok)
+- `2026-04-08-notifications-persistantes.md` — Notifications Persistantes — Implementation Plan (~12082 tok)
+- `2026-04-09-epoque-lieu.md` — Champ Époque sur les Lieux — Plan d'implémentation (~7757 tok)
 
 ## docs/superpowers/specs/
 
 - `2026-04-06-place-panel-redesign.md` — Spec — Refonte Fiche de Lieu (PlacePanel) (~1624 tok)
+- `2026-04-08-notifications-persistantes.md` — Notifications Persistantes — Spec (~1510 tok)
+- `2026-04-09-epoque-lieu-design.md` — Spec — Champ Époque sur les Lieux (~1135 tok)
 
 ## packages/supabase-client/
 
@@ -575,23 +617,38 @@
 - `060_fortify_faction_color.sql` — MIGRATION 060 : Ajouter couleur faction au trigger fortify (~368 tok)
 - `060_visit_gps_stock_only.sql` — 060_visit_gps_stock_only.sql (~1448 tok)
 - `061_construction_types.sql` — MIGRATION 061 : Types de construction dynamiques (~1609 tok)
+- `061_fix_titles_zero_glory_guard.sql` — 061_fix_titles_zero_glory_guard.sql (~1367 tok)
 - `062_faction_change_half_notoriety.sql` — MIGRATION 062 : Changement de faction = /2 notoriete (~636 tok)
+- `062_fix_nion_batch_discoveries_and_rls.sql` — 062_fix_nion_batch_discoveries_and_rls.sql (~577 tok)
 - `063_cheat_refill.sql` — MIGRATION 063 : Cheat code — refill ressources (~596 tok)
+- `063_like_carnet_toast.sql` — 063_like_carnet_toast.sql (~953 tok)
 - `064_claim_previous_owner.sql` — MIGRATION 064 : Notification "territoire perdu" (~1115 tok)
+- `064_notifications_table.sql` — 064_notifications_table.sql (~774 tok)
 - `065_cheat_refill_target.sql` — MIGRATION 065 : Cheat code — refill un joueur cible par nom (~631 tok)
+- `065_notif_like_carnet.sql` — 065_notif_like_carnet.sql (~1133 tok)
 - `066_fix_claim_place_regression.sql` — MIGRATION 066 : Corriger la regression de claim_place (~1478 tok)
+- `066_notif_new_carnet.sql` — 066_notif_new_carnet.sql (~982 tok)
 - `067_fix_handle_new_user_fk.sql` — MIGRATION 067 : Fix handle_new_user — cascade FK (~1076 tok)
+- `067_notif_exploration.sql` — 067_notif_exploration.sql (~2005 tok)
 - `068_fix_handle_new_user_safe.sql` — MIGRATION 068 : handle_new_user — version defensive (~1412 tok)
+- `068_notif_milestone_vues.sql` — 068_notif_milestone_vues.sql (~454 tok)
 - `069_fix_handle_new_user_order.sql` — MIGRATION 069 : handle_new_user — bon ordre d'operations (~1434 tok)
+- `069_notif_claim_lost.sql` — 069_notif_claim_lost.sql (~620 tok)
 - `070_blob_fortification.sql` — MIGRATION 070 : Fortification mutualisee des blobs (~3471 tok)
+- `070_notif_mark_read_rpc.sql` — 070_notif_mark_read_rpc.sql (~144 tok)
 - `071_cheat_accent_fix.sql` — MIGRATION 071 : Fix cheat_refill_target pour accents (~738 tok)
 - `072_fix_fortify_actor.sql` — MIGRATION 072 : Fix acteur dans les toasts de fortification (~1493 tok)
+- `073_eras_table_and_place_columns.sql` — MIGRATION 073 : Table eras (11 périodes), colonnes era_id/year_exact sur places, mise à jour create_place RPC (~204 tok)
+- `073_eras_table_and_place_columns.sql` — Migration 073 : table eras + colonnes era_id/year_exact sur places + mise à jour create_place RPC (~1837 tok)
 - `073_zone_fort_overlap_check.sql` — MIGRATION 073 : Zone fortification — verifier l'overlap des territoires (~4110 tok)
 - `074_handle_new_user_safe_v2.sql` — MIGRATION 074 : handle_new_user — safe v2 (~1870 tok)
 - `075_chat_bugs_channel_rls.sql` — MIGRATION 075 : RLS pour le canal chat 'bugs' (~447 tok)
-- `076_drop_last_name.sql` — MIGRATION 076 : Supprimer last_name (~4538 tok)
+- `075_get_place_by_id_era_fields.sql` — Migration 075: Add era fields to get_place_by_id return + RLS for era updates (~1728 tok)
+- `076_tutorial_slides.sql` — MIGRATION 076 : Table tutorial_slides + colonne tutorial_completed_at sur users (~350 tok)
+- `077_fix_actorname_display_name.sql` — 077: Fix actorName in activity_log — use display_name instead of first_name only (~275 tok)
 - `077_game_mode.sql` — MIGRATION 077 : game_mode (exploration / conquest) (~1000 tok)
 - `078_new_user_energy_from_role.sql` — MIGRATION 078 : Nouveaux users heritent les max jauges du role (~1954 tok)
+- `078_reward_info_contributions.sql` — 078: Extend contribute_to_place — info types (accessibility/season/warning/epoch) + first-contribution erudition reward + p_era_id/p_year_exact params + isFirstContribution in response (~575 tok)
 - `079_territory_names.sql` — MIGRATION 079 : Identite des Territoires (~3642 tok)
 - `080_territory_votes.sql` — MIGRATION 080 : Vote de Noms de Territoires (~2907 tok)
 - `081_zone_fort_multiplier_setting.sql` — MIGRATION 081 : Multiplicateur de zone fortification configurable (~1453 tok)
