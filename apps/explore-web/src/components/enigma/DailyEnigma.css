@@ -285,7 +285,6 @@
 .enigma-chest-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   background: var(--color-parchment);
   border: 1px solid var(--color-sepia);
   border-radius: 12px;
@@ -364,6 +363,7 @@
   font-weight: 700;
   color: var(--color-muted);
   line-height: 1;
+  padding-left: 5px;
 }
 
 /* Menu de sélection d'énigme */
@@ -421,8 +421,8 @@
 }
 
 .enigma-menu-item-img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 48px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -435,14 +435,14 @@
 .enigma-menu-item-name {
   display: block;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--color-ink);
 }
 
 .enigma-menu-item-sub {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-ink);
   opacity: 0.6;
 }
