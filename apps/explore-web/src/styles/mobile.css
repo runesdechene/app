@@ -589,6 +589,11 @@
     display: none;
   }
 
+  .enigma-chest-img {
+    min-width: 28px;
+    min-height: 28px;
+  }
+
   /* --- Masquer les controles desktop remplaces par la navbar --- */
   .app-toolbar .auth-btn {
     display: none;
