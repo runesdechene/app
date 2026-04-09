@@ -5,7 +5,7 @@ export const CALENDAR_LABELS: Record<CalendarRef, string> = {
   auc: 'Fondation de Rome (AUC)',
   constantinople: 'Chute de Constantinople',
   imperial: 'Calendrier impérial',
-  coligny: 'Calendrier de Coligny',
+  coligny: 'Calendrier lunaire gaulois',
 }
 
 /** Convertit une année Grégorienne vers le référentiel cible */
