@@ -223,6 +223,32 @@
   color: var(--color-ink);
 }
 
+.profile-dropdown-calendar {
+  padding: 0;
+}
+
+.profile-dropdown-calendar-label {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #8a8278);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-ref-option {
+  position: relative;
+  font-size: 0.85rem !important;
+}
+
+.calendar-ref-option.active {
+  color: var(--color-accent, #c97a3a) !important;
+}
+
+.calendar-ref-check {
+  margin-right: 0.5rem;
+}
+
 /* ==========================================
    NOTORIETY / GLORY BADGE
    ========================================== */

@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { EmailChangeModal } from './EmailChangeModal'
+import { useCalendarRef } from '../../hooks/useCalendarRef'
+import { CALENDAR_LABELS } from '../../lib/calendarUtils'
 
 interface ProfileMenuProps {
   email: string
@@ -13,6 +15,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const [open, setOpen] = useState(false)
   const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { calendarRef, setCalendarRef } = useCalendarRef()
 
   // Lire directement depuis playerStore au lieu de refaire un appel RPC
   const userId = usePlayerStore(s => s.userId)
@@ -104,6 +107,22 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
           >
             Changer mon email
           </button>
+
+          <div className="profile-dropdown-divider" />
+
+          <div className="profile-dropdown-calendar">
+            <span className="profile-dropdown-calendar-label">Référentiel calendaire</span>
+            {(['gregorian', 'auc', 'constantinople'] as const).map(ref => (
+              <button
+                key={ref}
+                className={`profile-dropdown-action calendar-ref-option ${calendarRef === ref ? 'active' : ''}`}
+                onClick={() => setCalendarRef(ref)}
+              >
+                {calendarRef === ref && <span className="calendar-ref-check">✓</span>}
+                {CALENDAR_LABELS[ref]}
+              </button>
+            ))}
+          </div>
 
           <div className="profile-dropdown-divider" />
 
