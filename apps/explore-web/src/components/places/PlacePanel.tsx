@@ -15,6 +15,8 @@ import type { Carnet } from './CarnetCard'
 import { InfluenceFrame } from './InfluenceFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
+import { useCalendarRef } from '../../hooks/useCalendarRef'
+import { formatYear } from '../../lib/calendarUtils'
 import { AddCarnetModal } from './AddCarnetModal'
 import { PhotoLightbox } from './PhotoLightbox'
 import './PlacePanel.css'
@@ -362,6 +364,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
+  const { calendarRef } = useCalendarRef()
   const [imageIndex, setImageIndex] = useState(0)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -734,6 +737,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
               value={infoFields.find(i => i.type === 'warning')?.content ?? null}
               placeholder="Info"
+              onClick={() => scrollToTab('infos')}
+            />
+            <QuickInfoChip
+              icon={<svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>}
+              value={place.eraName ? (place.yearExact !== null ? `${place.eraName} — ${formatYear(place.yearExact, calendarRef)}` : place.eraName) : null}
+              placeholder="Époque"
               onClick={() => scrollToTab('infos')}
             />
           </div>
