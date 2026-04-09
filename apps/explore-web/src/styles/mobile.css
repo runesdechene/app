@@ -386,10 +386,12 @@
     opacity: 0.5;
   }
 
-  /* --- MapLibre Controls --- */
+  /* --- MapLibre Controls — bas gauche, au-dessus du bouton layers --- */
   .maplibregl-ctrl-top-right {
-    top: calc(var(--safe-top, 0px) + 108px) !important;
-    right: calc(var(--safe-right, 0px) + 4px) !important;
+    top: auto !important;
+    bottom: calc(var(--safe-bottom, 0px) + 135px) !important;
+    right: auto !important;
+    left: 8px !important;
   }
 
   .maplibregl-ctrl-group button {
