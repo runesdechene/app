@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import { EraSelector } from './EraSelector'
 import './AddPlaceFlow.css'
 
 type Step = 'location' | 'form' | 'submitting' | 'success'
@@ -38,6 +39,8 @@ export function AddPlaceFlow() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [confirmedCoords, setConfirmedCoords] = useState<{ lng: number; lat: number } | null>(null)
   const [charterChecks, setCharterChecks] = useState([false, false, false])
+  const [eraId, setEraId] = useState<string | null>(null)
+  const [yearExact, setYearExact] = useState<number | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -225,6 +228,8 @@ export function AddPlaceFlow() {
         p_carnet_title: carnetTitle.trim() || null,
         p_user_lat: userPosition?.lat ?? null,
         p_user_lng: userPosition?.lng ?? null,
+        p_era_id: eraId,
+        p_year_exact: yearExact,
       })
 
       if (rpcError) {
@@ -298,11 +303,13 @@ export function AddPlaceFlow() {
     setNewPlaceId(null)
     setConfirmedCoords(null)
     setCharterChecks([false, false, false])
+    setEraId(null)
+    setYearExact(null)
     setStep('location')
   }
 
   const allCharterChecked = charterChecks.every(Boolean)
-  const canSubmit = title.trim().length > 0 && photoFiles.length > 0 && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked
+  const canSubmit = title.trim().length > 0 && photoFiles.length > 0 && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked && eraId !== null
 
   // ===== STEP 1 : Location =====
   if (step === 'location') {
@@ -450,6 +457,13 @@ export function AddPlaceFlow() {
               )
             })}
           </div>
+
+          <EraSelector
+            eraId={eraId}
+            yearExact={yearExact}
+            onChange={(era, year) => { setEraId(era); setYearExact(year) }}
+            required
+          />
 
           {/* Coordonnées confirmées */}
           {confirmedCoords && (
