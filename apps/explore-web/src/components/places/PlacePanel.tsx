@@ -137,7 +137,7 @@ function QuickInfoChip({ icon, value, placeholder, onClick }: {
 }
 
 /** Unified explorer row — discoverer (⭐) and guardian (🛡) get badges on their avatars */
-function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited }: {
+function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited, userHasCarnet, onWriteCarnet }: {
   explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
   authorId: string | null
   guardianId: string | null
@@ -147,6 +147,8 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   placeLocation: { latitude: number; longitude: number }
   isExplorer: boolean
   onVisited: () => void
+  userHasCarnet: boolean
+  onWriteCarnet: () => void
 }) {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
@@ -351,6 +353,19 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       {showRating && ratingSaved && (
         <div className="place-rating-prompt">
           <p className="place-rating-prompt-text">Merci pour votre avis ! ⭐</p>
+          {!userHasCarnet && (
+            <div className="place-rating-cta">
+              <p className="place-rating-cta-text">Envie de laisser une page de carnet ?<br /><span className="place-rating-cta-hint">Même un mot, ça compte.</span></p>
+              <div className="place-rating-cta-actions">
+                <button className="place-rating-cta-write" onClick={() => { setShowRating(false); onWriteCarnet() }}>
+                  Écrire une page
+                </button>
+                <button className="place-rating-skip" onClick={() => setShowRating(false)}>
+                  Passer
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -446,6 +461,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         userAvatar: c.userAvatar,
       }))
   }, [v05?.contributions])
+
+  const userHasCarnet = useMemo(() => carnets.some(c => c.userId === userId), [carnets, userId])
 
   // Hero photo: random from top-3 voted carnets' images, fallback to place.images
   const heroPhotos = useMemo(() => {
@@ -759,6 +776,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               placeLocation={place.location}
               isExplorer={v05.isExplorer}
               onVisited={() => { refreshV05(); onRefetch() }}
+              userHasCarnet={userHasCarnet}
+              onWriteCarnet={() => setShowAddCarnet(true)}
             />
           )}
         </div>
