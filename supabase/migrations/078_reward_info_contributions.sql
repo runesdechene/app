@@ -4,6 +4,11 @@
 -- For epoch type: also updates places.era_id and places.year_exact.
 -- Returns isFirstContribution boolean in JSON response.
 
+-- Add 'epoch' to the CHECK constraint on place_contributions.type
+ALTER TABLE place_contributions DROP CONSTRAINT IF EXISTS place_contributions_type_check;
+ALTER TABLE place_contributions ADD CONSTRAINT place_contributions_type_check
+  CHECK (type IN ('carnet', 'photo', 'accessibility', 'season', 'warning', 'epoch'));
+
 -- Drop old signature before replacing
 DROP FUNCTION IF EXISTS public.contribute_to_place(TEXT, TEXT, TEXT, TEXT, TEXT);
 
@@ -82,13 +87,15 @@ BEGIN
       INTO v_erudition_gain;
   END IF;
 
-  UPDATE users SET
-    exploration_points = exploration_points + v_exploration_gain,
-    erudition_points   = erudition_points   + v_erudition_gain
-  WHERE id = p_user_id;
+  IF v_exploration_gain > 0 OR v_erudition_gain > 0 THEN
+    UPDATE users SET
+      exploration_points = exploration_points + v_exploration_gain,
+      erudition_points   = erudition_points   + v_erudition_gain
+    WHERE id = p_user_id;
+  END IF;
 
   -- For epoch contributions: persist era and year on the place
-  IF p_type = 'epoch' THEN
+  IF p_type = 'epoch' AND p_era_id IS NOT NULL THEN
     UPDATE places
     SET era_id     = p_era_id,
         year_exact = p_year_exact
@@ -136,3 +143,8 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.contribute_to_place(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, INT) TO authenticated;
+
+-- Seed default value for info contribution rewards
+INSERT INTO public.app_settings (key, value)
+VALUES ('erudition_add_info', '1')
+ON CONFLICT (key) DO NOTHING;
