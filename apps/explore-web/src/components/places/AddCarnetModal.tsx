@@ -106,8 +106,8 @@ export function AddCarnetModal({ placeId, canRate: _canRate, onClose, onSaved, e
   }
 
   return (
-    <div className="add-carnet-overlay" onClick={onClose}>
-      <div className="add-carnet-modal" onClick={e => e.stopPropagation()}>
+    <div className="add-carnet-overlay">
+      <div className="add-carnet-modal">
         <div className="add-carnet-header">
           <h3>{existingCarnet ? 'Modifier ma page' : 'Ma page de carnet'}</h3>
           <button className="add-carnet-close" onClick={onClose}>✕</button>
