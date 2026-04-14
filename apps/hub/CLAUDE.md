@@ -1,34 +1,41 @@
-# Hub — Runes de Chêne (Back-office admin)
+# hub — Back-office admin
 
-## Rôle
+> Port dev 3001. Prod : hub.runesdechene.com (Netlify).
+> Accès admin uniquement (`users.role = 'admin'`).
 
-Back-office admin : paramètres du jeu, contenu, joueurs, boutique. Accès admin uniquement (`users.role = 'admin'`).
+## Mémoire projet
 
-## Stack
+Pour conventions, gotchas, décisions, préférences, architecture :
 
-React 18 + TypeScript · Vite 5 · Supabase · React Router DOM · CSS global (thème parchemin) · Netlify CLI manuel
+**`~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`**
+
+Pour la structure du code : Graphify (`graphify-out/graph.json` racine monorepo).
+Pour docs externes : Context7 MCP.
+
+## Spécificités cette app
+
+- React 18 + Vite 5 + TypeScript strict
+- React Router DOM
+- CSS global (thème parchemin)
+- **Netlify Functions** pour Shopify (sync, webhooks, proxy) dans `netlify/functions/`
 
 ## Commandes
 
 ```bash
 pnpm --filter hub dev     # port 3001
 pnpm --filter hub build
-cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --no-build
+# Deploy — ⚠️ inclure --functions :
+cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify/functions" --no-build
 ```
 
-## Conventions
+## Règles Hub spécifiques
 
-- **Pattern SaveBar** : toutes les pages utilisent `<SaveBar>`. Pas d'auto-save (sauf AssignFragments).
+- **Pattern SaveBar** — toutes les pages utilisent `<SaveBar>`. Pas d'auto-save (sauf `AssignFragments`).
 - **Après chaque save** : refetch serveur pour garantir la synchro.
-- **Deep copy** : `JSON.parse(JSON.stringify(data))` pour comparer sauvé vs courant.
-- **try/finally** : wrapper les fetch pour éviter "Chargement..." infinis.
-- **Classes CSS** : Publicités = `pub-*` (pas `ads-*`) pour éviter les ad blockers.
+- **Deep copy** pour comparaison : `JSON.parse(JSON.stringify(data))`.
+- **try/finally** autour des fetch — éviter les "Chargement…" infinis.
+- **Classes CSS pubs** : préfixe `pub-*` (PAS `ads-*`, bloqué par ad blockers).
 
-## Référence détaillée (.wolf/)
+## Auth Hub — fetchRole
 
-| Besoin | Fichier |
-|--------|---------|
-| Intégration Shopify | `.wolf/shopify.md` |
-| Schéma BDD | `.wolf/schema.md` |
-| Composants & fichiers | `.wolf/anatomy.md` |
-| Bugs connus | `.wolf/buglog.json` |
+Toujours requêter par **email** (pas par id), voir Citadelle `DEV/Architecture/Auth et utilisateurs.md`.
