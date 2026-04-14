@@ -42,3 +42,4 @@ pnpm-debug.log*
 .wolf/memory.md
 .wolf/designqc-captures/
 graphify-out/
+.wolf-archive/
