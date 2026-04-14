@@ -41,3 +41,4 @@ pnpm-debug.log*
 # OpenWolf (ephemeral)
 .wolf/memory.md
 .wolf/designqc-captures/
+graphify-out/
