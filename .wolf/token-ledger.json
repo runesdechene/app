@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-04-06T10:06:40.584Z",
   "lifetime": {
-    "total_tokens_estimated": 52302782,
-    "total_reads": 14990,
-    "total_writes": 45308,
-    "total_sessions": 6,
+    "total_tokens_estimated": 52414741,
+    "total_reads": 15145,
+    "total_writes": 45367,
+    "total_sessions": 7,
     "anatomy_hits": 13831,
-    "anatomy_misses": 1121,
-    "repeated_reads_blocked": 26353,
-    "estimated_savings_vs_bare_cli": 125642838
+    "anatomy_misses": 1276,
+    "repeated_reads_blocked": 26454,
+    "estimated_savings_vs_bare_cli": 126655878
   },
   "sessions": [
     {
@@ -323363,6 +323363,1449 @@
         "writes_count": 256,
         "repeated_reads_blocked": 112,
         "anatomy_lookups": 54
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T20:36:32.152Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 7,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T20:42:08.877Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 8,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T20:45:21.070Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 8,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T20:49:21.183Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 28,
+        "reads_count": 9,
+        "writes_count": 1,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T20:55:30.720Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 28,
+        "reads_count": 13,
+        "writes_count": 1,
+        "repeated_reads_blocked": 5,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:01:42.663Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1230,
+        "reads_count": 13,
+        "writes_count": 6,
+        "repeated_reads_blocked": 11,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:02:33.727Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1230,
+        "reads_count": 13,
+        "writes_count": 6,
+        "repeated_reads_blocked": 11,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:03:48.119Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1271,
+        "reads_count": 13,
+        "writes_count": 7,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:05:38.548Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1271,
+        "reads_count": 13,
+        "writes_count": 7,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:06:58.069Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1271,
+        "reads_count": 13,
+        "writes_count": 7,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:15:03.138Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/map/VersionBadge.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 171,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1442,
+        "reads_count": 15,
+        "writes_count": 8,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:16:17.295Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/map/VersionBadge.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 171,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1442,
+        "reads_count": 15,
+        "writes_count": 8,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-04-10-2233",
+      "started": "2026-04-10T20:33:52.505Z",
+      "ended": "2026-04-10T21:19:00.434Z",
+      "reads": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/stores/notificationStore.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/useNotifications.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/064_notifications_table.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/070_notif_mark_read_rpc.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationPanel.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/065_notif_like_carnet.sql",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/rewards/RewardModal.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 12663,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlaceInfos.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/hooks/usePlace.ts",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/map/VersionBadge.tsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/notifications/NotificationBell.tsx",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 352,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 388,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 106,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 254,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/src/components/places/PlacePanel.tsx",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/supabase/migrations/067_notif_exploration.sql",
+          "tokens_estimated": 41,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/uriel/Desktop/DEVS/app/apps/explore-web/CHANGELOG.md",
+          "tokens_estimated": 171,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12663,
+        "output_tokens_estimated": 1442,
+        "reads_count": 15,
+        "writes_count": 8,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 0
       }
     }
   ],

@@ -50,8 +50,8 @@ BEGIN
     RETURN json_build_object('error', 'already_visited');
   END IF;
 
-  v_stock_gain := 20;
-  SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'exploration_visit_gps'), 20) INTO v_exploration_gain;
+  v_stock_gain := 15;
+  SELECT COALESCE((SELECT value::INT FROM app_settings WHERE key = 'exploration_visit_gps'), 10) INTO v_exploration_gain;
 
   INSERT INTO place_explorers (place_id, user_id) VALUES (p_place_id, p_user_id);
 

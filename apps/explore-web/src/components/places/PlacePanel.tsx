@@ -197,6 +197,10 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     })
     if (!error && data && !data.error) {
       const result = data as { stockGain?: number; explorationGain?: number; visitNumber?: number; nextVisitGain?: number }
+      // Mettre à jour le store avec les gains
+      const store = usePlayerStore.getState()
+      if (result.stockGain) store.setInfluenceStock(store.influenceStock + result.stockGain)
+      if (result.explorationGain) store.setExplorationPoints(store.explorationPoints + result.explorationGain)
       setVisitRewards({ stock: result.stockGain ?? 0, exploration: result.explorationGain ?? 0, visitNumber: result.visitNumber ?? 1, nextVisitGain: result.nextVisitGain })
       useToastStore.getState().addToast({
         type: 'revisit',
@@ -213,6 +217,8 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     }
     setLoading(false)
   }
+
+  const needsRefreshRef = useRef(false)
 
   async function handleVisit() {
     if (!userId || !userPosition || loading) return
@@ -236,17 +242,28 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
         placeLocation,
         timestamp: Date.now(),
       })
-      onVisited()
+      needsRefreshRef.current = true
       setShowRating(true)
     }
     setLoading(false)
+  }
+
+  function finishRatingFlow() {
+    setShowRating(false)
+    if (needsRefreshRef.current) {
+      needsRefreshRef.current = false
+      onVisited()
+    }
   }
 
   async function submitRating() {
     if (!userId || ratingValue === 0) return
     await supabase.rpc('rate_place', { p_user_id: userId, p_place_id: placeId, p_rating: ratingValue })
     setRatingSaved(true)
-    setTimeout(() => setShowRating(false), 1500)
+    // Si le joueur a déjà un carnet, pas de CTA → auto-fermer après 1.5s
+    if (userHasCarnet) {
+      setTimeout(finishRatingFlow, 1500)
+    }
   }
 
   // Sort: author first, then guardian, then rest by visit date
@@ -345,7 +362,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
               Valider
             </button>
           )}
-          <button className="place-rating-skip" onClick={() => setShowRating(false)}>
+          <button className="place-rating-skip" onClick={finishRatingFlow}>
             Passer
           </button>
         </div>
@@ -357,10 +374,10 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
             <div className="place-rating-cta">
               <p className="place-rating-cta-text">Envie de laisser une page de carnet ?<br /><span className="place-rating-cta-hint">Même un mot, ça compte.</span></p>
               <div className="place-rating-cta-actions">
-                <button className="place-rating-cta-write" onClick={() => { setShowRating(false); onWriteCarnet() }}>
+                <button className="place-rating-cta-write" onClick={() => { finishRatingFlow(); onWriteCarnet() }}>
                   Écrire une page
                 </button>
-                <button className="place-rating-skip" onClick={() => setShowRating(false)}>
+                <button className="place-rating-skip" onClick={finishRatingFlow}>
                   Passer
                 </button>
               </div>

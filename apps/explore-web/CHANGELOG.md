@@ -1,3 +1,14 @@
+# ALPHA V0.5.10
+## Corrections & Équilibrage
+
+### Récompenses de visite GPS
+- Le flow de récompenses (gains, notation, proposition de récit) s'affiche correctement après une exploration ou ré-exploration GPS
+- Les gains d'influence et d'exploration sont mis à jour en temps réel dans l'interface après une revisit
+- Équilibrage : première exploration GPS donne **+15 stock d'influence** et **+10 exploration** (au lieu de +20/+20)
+
+### Notifications
+- Les notifications se marquent comme lues de manière persistante (le badge rouge ne revient plus au rechargement)
+
 # ALPHA V0.5.9
 ## Le Livre d'Or
 

@@ -14,7 +14,7 @@ export function NotificationBell() {
     if (!open && unreadCount > 0) {
       markAllRead()
       const userId = usePlayerStore.getState().userId
-      if (userId) supabase.rpc('mark_notifications_read', { p_user_id: userId })
+      if (userId) supabase.rpc('mark_notifications_read', { p_user_id: userId }).then(() => {})
     }
     setOpen(!open)
   }
