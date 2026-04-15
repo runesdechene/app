@@ -136,7 +136,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, firstName: usePlayerStore.getState().userName, factionTitle: faction?.title }),
-      }).catch(() => {})
+      })
+        .then(res => { if (!res.ok) console.warn('[FactionModal] shopify sync HTTP', res.status) })
+        .catch(err => console.warn('[FactionModal] shopify sync failed', err))
     }
 
     // Re-fetch les places (couleurs de faction changent) + fermer la modal
