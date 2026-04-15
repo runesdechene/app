@@ -35,10 +35,10 @@
 }
 
 /* ==========================================
-   ConquestToggle — mini-bandeau permanent
+   InfluenceToggle — mini-bandeau permanent
    ========================================== */
 
-.conquest-area {
+.influence-area {
   position: fixed;
   bottom: 352px;
   right: 25px;
@@ -49,7 +49,7 @@
   gap: 6px;
 }
 
-.conquest-toggle {
+.influence-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -64,16 +64,16 @@
   -webkit-backdrop-filter: blur(8px);
   transition: background 0.2s;
 }
-.conquest-toggle:hover {
+.influence-toggle:hover {
   background: rgba(40, 34, 28, 0.95);
 }
-.conquest-toggle-icon {
+.influence-toggle-icon {
   font-size: 14px;
 }
-.conquest-toggle-label {
+.influence-toggle-label {
   font-weight: 500;
 }
-.conquest-toggle-switch {
+.influence-toggle-switch {
   width: 28px;
   height: 16px;
   border-radius: 8px;
@@ -82,7 +82,7 @@
   transition: background 0.2s;
   margin-left: 4px;
 }
-.conquest-toggle-switch::after {
+.influence-toggle-switch::after {
   content: '';
   position: absolute;
   top: 2px;
@@ -93,10 +93,10 @@
   background: #888;
   transition: transform 0.2s, background 0.2s;
 }
-.conquest-toggle-switch.on {
+.influence-toggle-switch.on {
   background: rgba(201, 168, 76, 0.4);
 }
-.conquest-toggle-switch.on::after {
+.influence-toggle-switch.on::after {
   transform: translateX(12px);
   background: #c9a84c;
 }
@@ -752,7 +752,7 @@
     padding-bottom: 50px;
   }
 
-  .conquest-area
+  .influence-area
   {
     bottom: calc(var(--safe-bottom, 0px) + 65px);
     top: auto;
