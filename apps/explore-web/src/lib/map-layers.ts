@@ -223,28 +223,6 @@ export const pointLayer: LayerSpecification = {
   },
 }
 
-// Mode bannières : TOUS les lieux découverts en cercles de fond (couleur = faction dominante)
-// Les icônes SVG se superposent par-dessus
-export const bannerPointLayer: LayerSpecification = {
-  id: 'places-banner-point',
-  type: 'circle',
-  source: 'places',
-  filter: ['==', ['get', 'discovered'], true],
-  paint: {
-    'circle-color': ['get', 'iconColor'],
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 5,
-      8, 10,
-      12, 16,
-    ],
-    'circle-stroke-width': 2.5,
-    'circle-stroke-color': MAP_COLORS.land,
-    'circle-opacity': 1,
-    'circle-blur': 0,
-  },
-}
-
 // Icônes SVG colorées — lieux découverts avec icône
 export const iconLayer: LayerSpecification = {
   id: 'places-icon',
@@ -261,32 +239,6 @@ export const iconLayer: LayerSpecification = {
       4, 0.15,
       8, 0.25,
       12, 0.4,
-    ],
-    'icon-anchor': 'center',
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 1,
-  },
-}
-
-// Mode bannières : icônes SVG plus grandes pour couvrir le cercle faction
-export const bannerIconLayer: LayerSpecification = {
-  id: 'places-banner-icon',
-  type: 'symbol',
-  source: 'places',
-  filter: ['all',
-    ['!=', ['get', 'tagIcon'], ''],
-    ['==', ['get', 'discovered'], true],
-  ],
-  layout: {
-    'icon-image': ['get', 'tagIcon'],
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 0.22,
-      8, 0.38,
-      12, 0.6,
     ],
     'icon-anchor': 'center',
     'icon-allow-overlap': true,
