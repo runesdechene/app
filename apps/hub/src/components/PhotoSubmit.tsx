@@ -244,8 +244,8 @@ export function PhotoSubmit() {
           setProgress(`Compression image ${i + 1}/${files.length}...`);
           try {
             file = await compressImage(raw);
-          } catch {
-            // En cas d'échec de compression, on upload l'original
+          } catch (err) {
+            console.warn('[PhotoSubmit] compression failed, uploading original', err);
             file = raw;
           }
         }
@@ -283,6 +283,7 @@ export function PhotoSubmit() {
 
       setStep("success");
     } catch (err) {
+      console.error('[PhotoSubmit] submission failed', err);
       setErrorMsg(
         err instanceof Error ? err.message : "Une erreur est survenue",
       );

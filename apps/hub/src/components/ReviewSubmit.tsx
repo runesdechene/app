@@ -161,6 +161,7 @@ export function ReviewSubmit() {
 
       setStep('success')
     } catch (err) {
+      console.error('[ReviewSubmit] submission failed', err)
       setErrorMsg(err instanceof Error ? err.message : 'Une erreur est survenue')
       setStep('error')
     }
