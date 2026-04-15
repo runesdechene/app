@@ -44,19 +44,11 @@ export function usePlayer() {
   const setUserFactionPattern = usePlayerStore(s => s.setUserFactionPattern)
   const setUserName = usePlayerStore(s => s.setUserName)
   const setIsAdmin = usePlayerStore(s => s.setIsAdmin)
-  const setConquestPoints = usePlayerStore(s => s.setConquestPoints)
-  const setConquestNextPointIn = usePlayerStore(s => s.setConquestNextPointIn)
-  const setConstructionPoints = usePlayerStore(s => s.setConstructionPoints)
-  const setConstructionNextPointIn = usePlayerStore(s => s.setConstructionNextPointIn)
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
       setDiscoveredIds([])
       setEnergy(0)
-      setConquestPoints(0)
-      setConquestNextPointIn(0)
-      setConstructionPoints(0)
-      setConstructionNextPointIn(0)
       setUserFactionId(null)
       setUserFactionColor(null)
       setUserFactionTitle(null)
@@ -165,36 +157,12 @@ export function usePlayer() {
           maxEnergy: number
           nextPointIn: number
           energyCycle: number
-          conquestPoints: number
-          maxConquest: number
-          conquestNextPointIn: number
-          conquestCycle: number
-          constructionPoints: number
-          maxConstruction: number
-          constructionNextPointIn: number
-          constructionCycle: number
-          vitalitePoints: number
-          maxVitalite: number
-          vitaliteNextPointIn: number
-          vitaliteCycle: number
         }
         setEnergy(ed.energy)
         setNextPointIn(ed.nextPointIn ?? 0)
-        setConquestPoints(ed.conquestPoints ?? 0)
-        setConquestNextPointIn(ed.conquestNextPointIn ?? 0)
-        setConstructionPoints(ed.constructionPoints ?? 0)
-        setConstructionNextPointIn(ed.constructionNextPointIn ?? 0)
         usePlayerStore.setState({
           maxEnergy: ed.maxEnergy ?? 5,
-          maxConquest: ed.maxConquest ?? 5,
-          maxConstruction: ed.maxConstruction ?? 5,
           energyCycle: ed.energyCycle ?? 7200,
-          conquestCycle: ed.conquestCycle ?? 14400,
-          constructionCycle: ed.constructionCycle ?? 14400,
-          vitalitePoints: ed.vitalitePoints ?? 0,
-          maxVitalite: ed.maxVitalite ?? 5,
-          vitaliteNextPointIn: ed.vitaliteNextPointIn ?? 0,
-          vitaliteCycle: ed.vitaliteCycle ?? 14400,
         })
       }
       if (profileRes.data) {
@@ -582,26 +550,6 @@ async function loadRecentActivity(currentUserId: string) {
       timestamp: new Date(e.created_at).getTime(),
     })
   }
-}
-
-/**
- * Sauvegarder la selection de titres generaux affiches (max 2).
- */
-export async function setDisplayedTitles(
-  titleIds: number[],
-): Promise<{ success: boolean; error?: string }> {
-  const { userId } = usePlayerStore.getState()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-
-  const { data } = await supabase.rpc('set_displayed_titles', {
-    p_user_id: userId,
-    p_title_ids: titleIds,
-  })
-
-  if (data?.error) return { success: false, error: data.error }
-
-  usePlayerStore.setState({ displayedGeneralTitleIds: titleIds })
-  return { success: true }
 }
 
 /**

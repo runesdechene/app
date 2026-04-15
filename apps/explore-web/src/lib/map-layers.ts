@@ -63,37 +63,6 @@ export function buildTerritoryPatternLayer(factionId: string): LayerSpecificatio
   }
 }
 
-// --- Layer : Halos d'influence (cercles flous par lieu, effet aura) ---
-
-export const territoryHaloLayer: LayerSpecification = {
-  id: 'territory-halo',
-  type: 'circle',
-  source: 'places',
-  filter: ['all',
-    ['==', ['get', 'discovered'], true],
-    ['!=', ['get', 'tagColor'], ''],
-    ['!=', ['get', 'tagColor'], '#C19A6B'],
-  ],
-  paint: {
-    'circle-color': ['get', 'tagColor'],
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 6,
-      7, 15,
-      10, 35,
-      13, 70,
-    ],
-    'circle-opacity': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 0.15,
-      8, 0.20,
-      12, 0.25,
-    ],
-    'circle-blur': 1,
-    'circle-stroke-width': 0,
-  },
-}
-
 // --- Layer style : Territory labels (symbol layers GPU-side, pas de DOM markers) ---
 
 /** Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré)
@@ -145,38 +114,6 @@ export const territoryEmblemLayer: LayerSpecification = {
   },
   paint: {
     'icon-opacity': 0.7,
-  },
-}
-
-/** Rate horaire sous la bannière (+X/h) — symbol layer GPU */
-export const territoryRateLayer: LayerSpecification = {
-  id: 'territory-rates',
-  type: 'symbol',
-  source: 'territory-labels',
-  filter: ['>', ['get', 'hourlyRate'], 0],
-  layout: {
-    'text-field': ['concat', '+', ['to-string', ['get', 'hourlyRate']], '/h'],
-    'text-font': ['Open Sans Bold'],
-    'text-size': 11,
-    'text-offset': [
-      'interpolate', ['linear'], ['zoom'],
-      3, ['literal', [0, -1.5]],
-      6, ['literal', [0, -2.0]],
-      9, ['literal', [0, -3.8]],
-      12, ['literal', [0, -5.5]],
-    ],
-    'text-allow-overlap': true,
-    'text-ignore-placement': true,
-  },
-  paint: {
-    'text-color': ['get', 'tagColor'],
-    'text-opacity': [
-      'interpolate', ['linear'], ['zoom'],
-      8, 0,
-      9, 0.8,
-    ],
-    'text-halo-color': MAP_COLORS.land,
-    'text-halo-width': 1.5,
   },
 }
 
@@ -286,28 +223,6 @@ export const pointLayer: LayerSpecification = {
   },
 }
 
-// Mode bannières : TOUS les lieux découverts en cercles de fond (couleur = faction dominante)
-// Les icônes SVG se superposent par-dessus
-export const bannerPointLayer: LayerSpecification = {
-  id: 'places-banner-point',
-  type: 'circle',
-  source: 'places',
-  filter: ['==', ['get', 'discovered'], true],
-  paint: {
-    'circle-color': ['get', 'iconColor'],
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 5,
-      8, 10,
-      12, 16,
-    ],
-    'circle-stroke-width': 2.5,
-    'circle-stroke-color': MAP_COLORS.land,
-    'circle-opacity': 1,
-    'circle-blur': 0,
-  },
-}
-
 // Icônes SVG colorées — lieux découverts avec icône
 export const iconLayer: LayerSpecification = {
   id: 'places-icon',
@@ -324,32 +239,6 @@ export const iconLayer: LayerSpecification = {
       4, 0.15,
       8, 0.25,
       12, 0.4,
-    ],
-    'icon-anchor': 'center',
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 1,
-  },
-}
-
-// Mode bannières : icônes SVG plus grandes pour couvrir le cercle faction
-export const bannerIconLayer: LayerSpecification = {
-  id: 'places-banner-icon',
-  type: 'symbol',
-  source: 'places',
-  filter: ['all',
-    ['!=', ['get', 'tagIcon'], ''],
-    ['==', ['get', 'discovered'], true],
-  ],
-  layout: {
-    'icon-image': ['get', 'tagIcon'],
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      4, 0.22,
-      8, 0.38,
-      12, 0.6,
     ],
     'icon-anchor': 'center',
     'icon-allow-overlap': true,

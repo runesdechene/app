@@ -22,7 +22,6 @@ export interface PlaceDetail {
     title: string
     color: string
     background: string
-    gauge: 'energy' | 'conquest' | 'construction' | 'vitalite'
   } | null
   tags: Array<{
     id: string
@@ -112,12 +111,6 @@ export function usePlace(placeId: string | null) {
       }
 
       const placeData = placeRes.data as PlaceDetail
-
-      // Enrichir le primaryTag avec la gauge
-      if (placeData.primaryTag) {
-        const { data: gaugeData } = await supabase.rpc('get_place_gauge', { p_place_id: placeId })
-        placeData.primaryTag.gauge = (gaugeData as string ?? 'energy') as 'energy' | 'conquest' | 'construction' | 'vitalite'
-      }
 
       // Enrichir les tags avec leurs icônes
       if (tagsRes.data && placeData.tags) {

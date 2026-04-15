@@ -8,7 +8,7 @@ import { FactionModal } from './components/auth/FactionModal'
 import { OnboardingModal } from './components/auth/OnboardingModal'
 import { ProfileMenu } from './components/auth/ProfileMenu'
 import { FactionBar } from './components/map/FactionBar'
-import { ConquestToggle } from './components/map/ConquestToggle'
+import { InfluenceToggle } from './components/map/InfluenceToggle'
 import { InfoModal } from './components/map/InfoModal'
 import { GameToast } from './components/map/GameToast'
 import { PlayerProfileModal } from './components/map/PlayerProfileModal'
@@ -210,8 +210,8 @@ function App() {
       <OfflineIndicator />
 
       {!addPlaceMode && !authLoading && isAuthenticated && (
-        <div className="conquest-area">
-          <ConquestToggle />
+        <div className="influence-area">
+          <InfluenceToggle />
           <FactionBar />
         </div>
       )}

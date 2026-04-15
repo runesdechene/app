@@ -13,11 +13,7 @@ interface FactionData {
   description: string | null
   image_url: string | null
   bonus_energy: number
-  bonus_conquest: number
-  bonus_construction: number
   bonus_regen_energy: number
-  bonus_regen_conquest: number
-  bonus_regen_construction: number
 }
 
 interface FactionModalProps {
@@ -87,14 +83,6 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         maxEnergy: d.maxEnergy ?? 5,
         nextPointIn: d.nextPointIn ?? 0,
         energyCycle: d.energyCycle ?? 7200,
-        conquestPoints: d.conquestPoints ?? 0,
-        maxConquest: d.maxConquest ?? 5,
-        conquestNextPointIn: d.conquestNextPointIn ?? 0,
-        conquestCycle: d.conquestCycle ?? 14400,
-        constructionPoints: d.constructionPoints ?? 0,
-        maxConstruction: d.maxConstruction ?? 5,
-        constructionNextPointIn: d.constructionNextPointIn ?? 0,
-        constructionCycle: d.constructionCycle ?? 14400,
       })
     }
   }

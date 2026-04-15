@@ -20,11 +20,7 @@ interface FactionInfo {
   image_url: string | null
   description: string | null
   bonus_energy: number
-  bonus_conquest: number
-  bonus_construction: number
   bonus_regen_energy: number
-  bonus_regen_conquest: number
-  bonus_regen_construction: number
 }
 
 interface Props {
@@ -52,7 +48,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
       const [membersRes, factionRes, underdogRes, multRes, bonusRes, tagsRes] = await Promise.all([
         supabase.rpc('get_faction_members', { p_faction_id: factionId }),
         supabase.from('factions')
-          .select('image_url, description, bonus_energy, bonus_conquest, bonus_construction, bonus_regen_energy, bonus_regen_conquest, bonus_regen_construction')
+          .select('image_url, description, bonus_energy, bonus_regen_energy')
           .eq('id', factionId)
           .single(),
         supabase.rpc('get_underdog_faction_id'),
