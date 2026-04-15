@@ -35,34 +35,6 @@ interface PlayerState {
   setNextPointIn: (seconds: number) => void
   setEnergyCycle: (seconds: number) => void
 
-  /** Points de Conquête + régénération */
-  conquestPoints: number
-  maxConquest: number
-  conquestCycle: number
-  conquestNextPointIn: number
-  setConquestPoints: (pts: number) => void
-  setConquestNextPointIn: (seconds: number) => void
-  setConquestCycle: (seconds: number) => void
-
-  /** Points de Construction + régénération */
-  constructionPoints: number
-  maxConstruction: number
-  constructionCycle: number
-  constructionNextPointIn: number
-  setConstructionPoints: (pts: number) => void
-  setConstructionNextPointIn: (seconds: number) => void
-  setConstructionCycle: (seconds: number) => void
-
-  /** Vitalité + régénération */
-  vitalitePoints: number
-  maxVitalite: number
-  vitaliteCycle: number
-  vitaliteNextPointIn: number
-  setVitalitePoints: (pts: number) => void
-  setVitaliteNextPointIn: (seconds: number) => void
-  setVitaliteCycle: (seconds: number) => void
-
-
   /** V0.5 — Points d'exploration (terrain, GPS, ajout lieu, photos) */
   explorationPoints: number
   setExplorationPoints: (pts: number) => void
@@ -148,31 +120,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   nextPointIn: 0,
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
   setEnergyCycle: (seconds) => set({ energyCycle: seconds }),
-
-  conquestPoints: 3,
-  maxConquest: 3,
-  conquestCycle: 14400,
-  conquestNextPointIn: 0,
-  setConquestPoints: (pts) => set({ conquestPoints: pts }),
-  setConquestNextPointIn: (seconds) => set({ conquestNextPointIn: seconds }),
-  setConquestCycle: (seconds) => set({ conquestCycle: seconds }),
-
-  constructionPoints: 3,
-  maxConstruction: 3,
-  constructionCycle: 14400,
-  constructionNextPointIn: 0,
-  setConstructionPoints: (pts) => set({ constructionPoints: pts }),
-  setConstructionNextPointIn: (seconds) => set({ constructionNextPointIn: seconds }),
-  setConstructionCycle: (seconds) => set({ constructionCycle: seconds }),
-
-  vitalitePoints: 3,
-  maxVitalite: 3,
-  vitaliteCycle: 14400,
-  vitaliteNextPointIn: 0,
-  setVitalitePoints: (pts) => set({ vitalitePoints: pts }),
-  setVitaliteNextPointIn: (seconds) => set({ vitaliteNextPointIn: seconds }),
-  setVitaliteCycle: (seconds) => set({ vitaliteCycle: seconds }),
-
 
   explorationPoints: 0,
   setExplorationPoints: (pts) => set((state) => ({ explorationPoints: pts, glory: pts + state.eruditionPoints })),

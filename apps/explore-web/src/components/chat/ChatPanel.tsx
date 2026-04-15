@@ -133,10 +133,6 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       if (data && data.success) {
         fog.setEnergy(data.energy)
         fog.setNextPointIn(0)
-        fog.setConquestPoints(data.conquestPoints)
-        fog.setConquestNextPointIn(0)
-        fog.setConstructionPoints(data.constructionPoints)
-        fog.setConstructionNextPointIn(0)
       }
       return
     }
