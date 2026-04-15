@@ -103,9 +103,13 @@ export function usePlayer() {
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')
       // Mettre a jour last_login_at pour le Hub (badge "Reactive")
-      supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(() => {})
+      supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(({ error }) => {
+        if (error) console.warn('[usePlayer] update last_login_at failed', error)
+      })
       // Debloquer les fragments pending (achats avant inscription)
-      supabase.rpc('unlock_pending_fragments', { p_user_id: userData.id, p_email: user!.email }).then(() => {})
+      supabase.rpc('unlock_pending_fragments', { p_user_id: userData.id, p_email: user!.email }).then(({ error }) => {
+        if (error) console.warn('[usePlayer] unlock_pending_fragments failed', error)
+      })
       // Créer/lier le client Shopify (fire-and-forget, pas bloquant)
       if (user?.email) {
         fetch('https://hub.runesdechene.com/.netlify/functions/shopify-create-customer', {
@@ -116,7 +120,9 @@ export function usePlayer() {
             firstName: userData.first_name || null,
             factionTitle: null, // sera mis à jour au choix de faction
           }),
-        }).catch(() => {})
+        })
+          .then(res => { if (!res.ok) console.warn('[usePlayer] shopify-create-customer HTTP', res.status) })
+          .catch(err => console.warn('[usePlayer] shopify-create-customer failed', err))
       }
       // Avatar direct si disponible
       if (userData.avatar_url) {
@@ -130,8 +136,13 @@ export function usePlayer() {
           .select('title, color, pattern')
           .eq('id', userData.faction_id)
           .single()
-          .then(({ data: factionData }) => {
-            if (!cancelled && factionData) {
+          .then(({ data: factionData, error: factionErr }) => {
+            if (cancelled) return
+            if (factionErr) {
+              console.warn('[usePlayer] load faction failed', factionErr)
+              return
+            }
+            if (factionData) {
               if (factionData.title) setUserFactionTitle(factionData.title)
               if (factionData.color) setUserFactionColor(factionData.color)
               if (factionData.pattern) setUserFactionPattern(factionData.pattern)
@@ -200,7 +211,8 @@ export function usePlayer() {
         })
       }
       // PrimaryTitle = premier titre affiché (v3)
-      const { data: playerProfile } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
+      const { data: playerProfile, error: profileErr } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
+      if (profileErr) console.warn('[usePlayer] get_player_profile failed', profileErr)
       if (playerProfile) {
         const pp = playerProfile as { displayedGeneralTitles?: Array<{ icon: string; name: string }> }
         const firstTitle = pp.displayedGeneralTitles?.[0]
