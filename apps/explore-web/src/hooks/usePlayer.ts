@@ -585,26 +585,6 @@ async function loadRecentActivity(currentUserId: string) {
 }
 
 /**
- * Sauvegarder la selection de titres generaux affiches (max 2).
- */
-export async function setDisplayedTitles(
-  titleIds: number[],
-): Promise<{ success: boolean; error?: string }> {
-  const { userId } = usePlayerStore.getState()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-
-  const { data } = await supabase.rpc('set_displayed_titles', {
-    p_user_id: userId,
-    p_title_ids: titleIds,
-  })
-
-  if (data?.error) return { success: false, error: data.error }
-
-  usePlayerStore.setState({ displayedGeneralTitleIds: titleIds })
-  return { success: true }
-}
-
-/**
  * Découvrir un lieu — fonction standalone, pas besoin de hook.
  * Lit le store directement via getState().
  */
