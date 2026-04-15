@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { EnigmaResult } from './EnigmaResult'
@@ -45,10 +45,19 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
   const [error, setError] = useState<string | null>(null)
 
   // Charger l'énigme au montage
-  useState(() => {
+  useEffect(() => {
     if (!userId) return
-    supabase.rpc('get_fragment_enigma', { p_user_id: userId, p_fragment_id: fragment.fragmentId })
-      .then(({ data }) => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data, error: rpcError } = await supabase.rpc('get_fragment_enigma', { p_user_id: userId, p_fragment_id: fragment.fragmentId })
+        if (cancelled) return
+        if (rpcError) {
+          console.error('[FragmentEnigma] get_fragment_enigma error', rpcError)
+          setError('Erreur de chargement de l\'énigme. Réessayez plus tard.')
+          setLoading(false)
+          return
+        }
         const d = data as Enigma & { error?: string; already_answered?: boolean } | null
         if (d?.already_answered) {
           setError('Vous avez deja repondu a cette enigme aujourd\'hui.')
@@ -60,25 +69,40 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
           setEnigma(d)
         }
         setLoading(false)
-      })
-  })
+      } catch (err) {
+        if (cancelled) return
+        console.error('[FragmentEnigma] get_fragment_enigma threw', err)
+        setError('Erreur réseau. Vérifiez votre connexion.')
+        setLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [userId, fragment.fragmentId])
 
   async function handleSubmit() {
     if (!userId || !enigma || !answer.trim() || submitting) return
     setSubmitting(true)
 
-    const { data } = await supabase.rpc('answer_fragment_enigma', {
-      p_user_id: userId,
-      p_enigma_id: enigma.id,
-      p_answer: answer.trim(),
-      p_fragment_id: fragment.fragmentId,
-    })
+    try {
+      const { data, error: rpcError } = await supabase.rpc('answer_fragment_enigma', {
+        p_user_id: userId,
+        p_enigma_id: enigma.id,
+        p_answer: answer.trim(),
+        p_fragment_id: fragment.fragmentId,
+      })
 
-    if (data && !data.error) {
-      const r = data as AnswerResult
-      setResult(r)
-      if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
-      if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
+      if (rpcError) {
+        console.error('[FragmentEnigma] answer_fragment_enigma error', rpcError)
+        setError('Erreur lors de la soumission. Réessayez.')
+      } else if (data && !data.error) {
+        const r = data as AnswerResult
+        setResult(r)
+        if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
+        if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
+      }
+    } catch (err) {
+      console.error('[FragmentEnigma] answer_fragment_enigma threw', err)
+      setError('Erreur réseau lors de la soumission.')
     }
     setSubmitting(false)
   }

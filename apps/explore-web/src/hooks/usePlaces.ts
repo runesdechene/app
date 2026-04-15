@@ -83,14 +83,23 @@ export function usePlaces() {
       setLoading(true)
       setError(null)
 
-      // Fetch places, tag icons et couleurs factions en parallèle
-      const [placesRes, tagsRes, factionsRes] = await Promise.all([
-        supabase.rpc('get_map_places', { p_type: 'all', p_limit: 5000 }),
-        supabase.from('tags').select('id, icon').not('icon', 'is', null),
-        supabase.from('factions').select('id, color'),
-      ])
+      let placesRes, tagsRes, factionsRes
+      try {
+        // Fetch places, tag icons et couleurs factions en parallèle
+        ;[placesRes, tagsRes, factionsRes] = await Promise.all([
+          supabase.rpc('get_map_places', { p_type: 'all', p_limit: 5000 }),
+          supabase.from('tags').select('id, icon').not('icon', 'is', null),
+          supabase.from('factions').select('id, color'),
+        ])
+      } catch (err) {
+        console.error('[usePlaces] fetch threw', err)
+        setError(err instanceof Error ? err.message : 'Erreur réseau lors du chargement de la carte')
+        setLoading(false)
+        return
+      }
 
       if (placesRes.error) {
+        console.error('[usePlaces] get_map_places error', placesRes.error)
         setError(placesRes.error.message)
         setLoading(false)
         return

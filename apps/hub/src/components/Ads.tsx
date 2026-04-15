@@ -65,6 +65,7 @@ export function Ads() {
       }
       if (durationRes.data) setDuration(durationRes.data.value)
     } catch (err) {
+      console.error('[Ads] fetchAll failed', err)
     } finally {
       setLoading(false)
     }
@@ -199,7 +200,8 @@ export function Ads() {
         setNewTitle('')
         setNewSubtitle('')
       }
-    } catch {
+    } catch (err) {
+      console.error('[Ads] createTip failed', err)
     }
     setCreatingTip(false)
   }

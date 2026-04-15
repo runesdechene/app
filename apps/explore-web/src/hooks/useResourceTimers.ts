@@ -31,12 +31,20 @@ export function useResourceTimers() {
 }
 
 async function refetchResources(userId: string) {
-  const { data } = await supabase.rpc('get_user_energy', { p_user_id: userId })
-  if (!data) return
-  const d = data as Record<string, number>
-  usePlayerStore.setState({
-    energy: d.energy ?? 0,
-    nextPointIn: d.nextPointIn ?? 0,
-    energyCycle: d.energyCycle ?? 7200,
-  })
+  try {
+    const { data, error } = await supabase.rpc('get_user_energy', { p_user_id: userId })
+    if (error) {
+      console.warn('[useResourceTimers] get_user_energy failed', error)
+      return
+    }
+    if (!data) return
+    const d = data as Record<string, number>
+    usePlayerStore.setState({
+      energy: d.energy ?? 0,
+      nextPointIn: d.nextPointIn ?? 0,
+      energyCycle: d.energyCycle ?? 7200,
+    })
+  } catch (err) {
+    console.warn('[useResourceTimers] get_user_energy threw', err)
+  }
 }

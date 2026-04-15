@@ -55,7 +55,11 @@ export function AddPlaceFlow() {
       .from('tags')
       .select('id, title, color, background, icon')
       .order('order')
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[AddPlaceFlow] load tags failed', error)
+          return
+        }
         if (data) setTags(data as Tag[])
       })
   }, [])
@@ -93,13 +97,13 @@ export function AddPlaceFlow() {
     setStep('form')
     // Reverse geocoding — toujours mettre à jour l'adresse
     fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&accept-language=fr`)
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(data => {
         if (data?.display_name) {
           setAddress(data.display_name)
         }
       })
-      .catch(() => {})
+      .catch(err => console.warn('[AddPlaceFlow] reverse-geocoding failed', err))
   }
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -249,10 +253,11 @@ export function AddPlaceFlow() {
 
       // 3. Si plusieurs photos, mettre à jour le JSONB images
       if (imageEntries.length > 1) {
-        await supabase
+        const { error: imgErr } = await supabase
           .from('places')
           .update({ images: imageEntries })
           .eq('id', placeId)
+        if (imgErr) console.error('[AddPlaceFlow] update images failed', imgErr)
       }
 
       // 4. Si plusieurs tags, insérer les tags secondaires
@@ -262,7 +267,8 @@ export function AddPlaceFlow() {
           tag_id: tagId,
           is_primary: false,
         }))
-        await supabase.from('place_tags').insert(secondaryTags)
+        const { error: tagErr } = await supabase.from('place_tags').insert(secondaryTags)
+        if (tagErr) console.error('[AddPlaceFlow] insert secondary tags failed', tagErr)
       }
 
       // 5. Optimistic updates

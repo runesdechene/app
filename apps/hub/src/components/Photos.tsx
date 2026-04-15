@@ -310,8 +310,8 @@ export function Photos() {
             if (!response.ok) continue
             const blob = await response.blob()
             zip.file(filename, blob)
-          } catch {
-            // Skip les fichiers en erreur
+          } catch (err) {
+            console.warn('[Photos] zip fetch skipped file', filename, err)
           }
         }
       }
@@ -332,6 +332,7 @@ export function Photos() {
 
       setDownloadProgress('')
     } catch (err) {
+      console.error('[Photos] downloadArchive failed', err)
       setDownloadProgress('Erreur lors du telechargement')
     } finally {
       setIsDownloading(false)
@@ -356,7 +357,7 @@ export function Photos() {
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-      } catch { alert('Erreur lors du téléchargement') }
+      } catch (err) { console.error('[Photos] single download failed', err); alert('Erreur lors du téléchargement') }
     } else {
       // Mini ZIP pour plusieurs images
       const zip = new JSZip()
@@ -366,7 +367,7 @@ export function Photos() {
           if (!response.ok) continue
           const blob = await response.blob()
           zip.file(buildDownloadName(sub, i, images[i].image_url), blob)
-        } catch { alert('Erreur lors du téléchargement') }
+        } catch (err) { console.error('[Photos] submission zip fetch failed', err); alert('Erreur lors du téléchargement') }
       }
       const content = await zip.generateAsync({ type: 'blob' })
       const url = URL.createObjectURL(content)
@@ -394,7 +395,7 @@ export function Photos() {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(blobUrl)
-    } catch { alert('Erreur lors du téléchargement') }
+    } catch (err) { console.error('[Photos] downloadSingleImage failed', err); alert('Erreur lors du téléchargement') }
   }
 
   const closeLightbox = () => setLightbox(null)
