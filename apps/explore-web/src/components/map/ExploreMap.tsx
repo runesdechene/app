@@ -77,11 +77,13 @@ export const ExploreMap = memo(function ExploreMap() {
 
   useEffect(() => {
     supabase.from('territory_tiers').select('min_places, title').order('min_places', { ascending: false })
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) { console.warn('[ExploreMap] load territory_tiers failed', error); return }
         if (data) setTerritoryTiers(data.map(r => ({ minPlaces: r.min_places, title: r.title })))
       })
     supabase.rpc('get_winning_territory_names')
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) { console.warn('[ExploreMap] get_winning_territory_names failed', error); return }
         if (data) {
           const m = new Map<string, { customName: string | null; namedBy: string }>()
           for (const r of data as Array<{ anchor_place_id: string; winning_name: string | null }>) {
@@ -111,7 +113,7 @@ export const ExploreMap = memo(function ExploreMap() {
       const props = f.properties as Record<string, unknown>
       const anchorPlaceId = (props.anchorPlaceId as string) || ''
       let placeIds: string[] = []
-      try { placeIds = JSON.parse((props.placeIds as string) || '[]') } catch { /* ignore */ }
+      try { placeIds = JSON.parse((props.placeIds as string) || '[]') } catch (e) { console.warn('[ExploreMap] placeIds parse failed', e) }
 
       // Résoudre le nom custom via territoryNames
       let customName = ''
@@ -333,7 +335,8 @@ export const ExploreMap = memo(function ExploreMap() {
       .select('value')
       .eq('key', 'unknown_place_icon')
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) { console.warn('[ExploreMap] load unknown_place_icon failed', error); return }
         const url = data?.value
         if (!url) return
 
@@ -344,6 +347,7 @@ export const ExploreMap = memo(function ExploreMap() {
           map.addImage(UNKNOWN_ICON_ID, img)
           setUnknownIconLoaded(true)
         }
+        img.onerror = () => console.warn('[ExploreMap] unknown_place_icon image load failed', url)
         img.src = url
       })
   }, [])
@@ -511,7 +515,7 @@ export const ExploreMap = memo(function ExploreMap() {
       const placesCount = (typeof tp.placesCount === 'number' ? tp.placesCount : 0)
       if (placesCount >= 3) {
         let placeIds: string[] = []
-        try { placeIds = JSON.parse((tp.placeIds as string) || '[]') } catch { /* ignore */ }
+        try { placeIds = JSON.parse((tp.placeIds as string) || '[]') } catch (e) { console.warn('[ExploreMap] placeIds parse failed (click)', e) }
 
         // Resolve customName from territory names store
         const anchorId = (tp.anchorPlaceId as string) || ''
