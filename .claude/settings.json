@@ -12,6 +12,17 @@
         ]
       }
     ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && UNPUSHED=$(git log @{u}..HEAD --oneline 2>/dev/null | wc -l); if [ \"$UNPUSHED\" -gt 0 ]; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"Stop\",\"additionalContext\":\"⚠️ ATTENTION : '\"$UNPUSHED\"' commit(s) non pushé(s) sur cette branche. Rappelle Uriel de git push AVANT de fermer la session. Règle critique.\"}}'; else echo ''; fi"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Glob|Grep",
