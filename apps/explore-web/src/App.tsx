@@ -134,16 +134,26 @@ function App() {
     }
   }, [authLoading, isAuthenticated])
 
-  // Auto-open onboarding selon l'etat du joueur
-  // Nouveau joueur (first_name vide) → onboarding → GameModeModal → (conquest → FactionModal)
+  // Flux nouveau joueur : slides "before" → onboarding → slides "after" → FactionModal
+  // Edge case (existant sans nom) : useEffect auto-déclenche onboarding après fetch tutorial
   const onboardingDone = useRef(false)
+  const [tutorialFetchDone, setTutorialFetchDone] = useState(false)
   useEffect(() => {
     if (!userId) return
-    if (userName === '' && !onboardingDone.current && tutorialPhase === null) {
+    // Cas normal : le handler du tutorial déclenche l'onboarding au bon moment.
+    // Ce useEffect ne sert QUE pour l'edge case : user sans nom et pas de slides / tutorial déjà fini.
+    const tutorialUnavailableOrDone =
+      tutorialCompletedAt !== null || (tutorialFetchDone && tutorialSlides.length === 0)
+    if (
+      userName === '' &&
+      !onboardingDone.current &&
+      tutorialPhase === null &&
+      tutorialUnavailableOrDone
+    ) {
       onboardingDone.current = true
       setShowOnboarding(true)
     }
-  }, [userId, userName, tutorialPhase])
+  }, [userId, userName, tutorialPhase, tutorialCompletedAt, tutorialFetchDone, tutorialSlides.length])
 
   // Tutorial : fetch slides si pas encore complété
   const tutorialFetched = useRef(false)
@@ -162,17 +172,18 @@ function App() {
           setTutorialSlides(data as TutorialSlide[])
           setTutorialPhase('before')
         }
+        setTutorialFetchDone(true)
       })
   }, [userId, tutorialCompletedAt])
 
   function handleTutorialBeforeComplete() {
     setTutorialPhase(null)
-    // Nouveau joueur → onboarding, existant → passer à phase "after"
+    // Nouveau joueur → onboarding (puis slides "after" → faction au onComplete de l'onboarding)
+    // Existant → passer à "after" si disponibles, sinon marquer terminé
     if (userName === '') {
       onboardingDone.current = true
       setShowOnboarding(true)
     } else {
-      // Joueur existant : enchaîner directement sur phase "after"
       const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
       if (afterSlides.length > 0) {
         setTutorialPhase('after')
@@ -184,7 +195,13 @@ function App() {
 
   function handleTutorialAfterComplete() {
     setTutorialPhase(null)
-    markTutorialComplete()
+    // Si nouveau joueur sans faction → ouvrir FactionModal AVANT de marquer le tuto terminé
+    // (la fermeture de FactionModal marquera le tuto terminé)
+    if (!usePlayerStore.getState().userFactionId) {
+      setShowFactionModal(true)
+    } else {
+      markTutorialComplete()
+    }
   }
 
   function markTutorialComplete() {
@@ -358,7 +375,14 @@ function App() {
       {showOnboarding && (
         <OnboardingModal onComplete={() => {
           setShowOnboarding(false)
-          setShowFactionModal(true)
+          // Flux nouveau joueur : onboarding → slides "after" → FactionModal
+          const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
+          if (afterSlides.length > 0 && !usePlayerStore.getState().tutorialCompletedAt) {
+            setTutorialPhase('after')
+          } else if (!usePlayerStore.getState().userFactionId) {
+            // Pas de slides after → aller directement à la FactionModal
+            setShowFactionModal(true)
+          }
         }} />
       )}
 
@@ -366,10 +390,9 @@ function App() {
         <FactionModal
           onClose={() => {
             setShowFactionModal(false)
-            // Après choix d'héritage, enchaîner sur tuto phase "after" si slides disponibles
-            const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
-            if (afterSlides.length > 0 && !usePlayerStore.getState().tutorialCompletedAt) {
-              setTutorialPhase('after')
+            // Si le tutorial n'est pas encore marqué terminé (flux nouveau joueur), le faire maintenant
+            if (!usePlayerStore.getState().tutorialCompletedAt) {
+              markTutorialComplete()
             }
           }}
           currentFactionId={userFactionId}
