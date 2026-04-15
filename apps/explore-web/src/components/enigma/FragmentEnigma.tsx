@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { EnigmaResult } from './EnigmaResult'
@@ -45,10 +45,12 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
   const [error, setError] = useState<string | null>(null)
 
   // Charger l'énigme au montage
-  useState(() => {
+  useEffect(() => {
     if (!userId) return
+    let cancelled = false
     supabase.rpc('get_fragment_enigma', { p_user_id: userId, p_fragment_id: fragment.fragmentId })
       .then(({ data }) => {
+        if (cancelled) return
         const d = data as Enigma & { error?: string; already_answered?: boolean } | null
         if (d?.already_answered) {
           setError('Vous avez deja repondu a cette enigme aujourd\'hui.')
@@ -61,7 +63,8 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
         }
         setLoading(false)
       })
-  })
+    return () => { cancelled = true }
+  }, [userId, fragment.fragmentId])
 
   async function handleSubmit() {
     if (!userId || !enigma || !answer.trim() || submitting) return
