@@ -3,14 +3,47 @@
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > Mémoire unifiée : **La Citadelle** (Obsidian) + **Graphify** + **Context7**
 
-## Démarrage — Règle N°1
+## Protocole de démarrage — OBLIGATOIRE
 
-Lire `~/citadelle/CLAUDE.md` (symlink vers le vault Citadelle). Ce fichier contient :
-- Le protocole ingest (scanner `_Inbox/`)
-- Le routing par intent
-- La 4-Layer Query Rule
+### Déclencheurs (cas où ce protocole s'exécute)
 
-Si `~/citadelle` inaccessible : vérifier qu'Obsidian est ouvert et que le vault est synchronisé. Fallback NAS : `\\EGIDE\Runes de Chêne\👑 LA CITADELLE\`. Mode dégradé en dernier recours.
+- Le premier message de chaque session qui mentionne un domaine de travail
+- Formulations reconnues : *"Sujet : X"*, *"Sujet X"*, *"On bosse sur X"*, *"On parle de X"*
+- Ou toute question dont le domaine est identifiable (boutique, app, marque, festivals, com, etc.)
+
+### Actions requises (dans cet ordre, AVANT toute réponse)
+
+**Étape 1** — Exécuter immédiatement :
+```
+Read("~/citadelle/CLAUDE.md")
+```
+Ne pas commenter, ne pas résumer — juste l'avoir en contexte.
+
+**Étape 2** — Consulter la section "## 2. Routing par intent" de ce fichier Citadelle et identifier la ligne correspondant au sujet annoncé.
+
+**Étape 3** — Exécuter les Read des fichiers listés "Charger en priorité" pour cette ligne (souvent : 1 VUE + 1 note DEV + 1 Backlog + 1 INDEX). Utiliser Obsidian MCP si disponible, sinon Read direct via symlink.
+
+**Étape 4** — Maintenant seulement, répondre à la demande de l'utilisateur avec le contexte chargé.
+
+### Exemple concret
+
+> Utilisateur : *"Sujet : boutique en ligne"*
+
+Actions :
+1. `Read("~/citadelle/CLAUDE.md")`
+2. Trouver ligne "Boutique en ligne / Shopify" dans routing table
+3. `Read("~/citadelle/📋 VUE - Boutique en ligne.md")` + `Read("~/citadelle/⛩️ La Marque/🌐 La boutique en ligne/DEV - Notes techniques.md")` + `Read("~/citadelle/Backlogs/Backlog - Boutique en ligne.md")`
+4. Répondre : *"OK, contexte chargé : thème Crépuscule (fork Heritage v3.2.1), jamais MAJ Heritage, mix CA 30%/70%, 4 chantiers en backlog. Sur quoi on attaque ?"*
+
+### Ne JAMAIS
+
+- ❌ Demander à l'utilisateur "qu'est-ce que tu veux faire ?" sans avoir lu Citadelle d'abord
+- ❌ Répondre depuis la mémoire ou le CLAUDE.md repo seul (il ne contient que les conventions code)
+- ❌ Supposer le sens du sujet sans consulter la VUE + notes associées
+
+### Fallback
+
+Si `~/citadelle` inaccessible : vérifier qu'Obsidian est ouvert. Fallback NAS : `\\EGIDE\Runes de Chêne\👑 LA CITADELLE\`. Signaler explicitement le mode dégradé.
 
 ## 4-Layer Query Rule
 

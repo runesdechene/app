@@ -1,6 +1,17 @@
 {
   "autoMemoryEnabled": false,
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"PROTOCOLE XO: Avant toute réponse au premier message utilisateur, exécute Read(\\\"~/citadelle/CLAUDE.md\\\") puis applique la règle N°1 (ingest _Inbox/ + lint + routing selon le sujet annoncé). NE JAMAIS demander ce que l utilisateur veut faire avant d avoir lu Citadelle CLAUDE.md.\"}}'"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Glob|Grep",
