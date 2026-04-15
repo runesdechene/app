@@ -36,15 +36,53 @@ interface ShopifyCustomer {
   created_at: string
 }
 
+async function requireAdmin(request: Request): Promise<{ userId: string } | { error: string; status: number }> {
+  const authHeader = request.headers.get('Authorization') || ''
+  const bearer = authHeader.replace(/^Bearer\s+/i, '')
+  if (!bearer) return { error: 'Missing Authorization header', status: 401 }
+
+  // Valider le JWT avec Supabase Auth
+  const userResp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${bearer}`,
+    },
+  })
+  if (!userResp.ok) return { error: 'Invalid session', status: 401 }
+  const user = await userResp.json() as { id?: string }
+  if (!user?.id) return { error: 'Invalid session', status: 401 }
+
+  // Vérifier le rôle admin côté DB
+  const roleResp = await fetch(`${SUPABASE_URL}/rest/v1/users?select=role&id=eq.${user.id}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    },
+  })
+  if (!roleResp.ok) return { error: 'Failed to verify role', status: 500 }
+  const rows = await roleResp.json() as Array<{ role?: string }>
+  if (!rows[0] || rows[0].role !== 'admin') return { error: 'Forbidden — admin only', status: 403 }
+
+  return { userId: user.id }
+}
+
 export default async function handler(request: Request) {
   // CORS preflight
   if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type' } })
+    return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } })
   }
 
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405)
   }
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    return json({ error: 'Missing Supabase env vars' }, 500)
+  }
+
+  // GARDE SÉCURITÉ : session Supabase valide + role admin
+  const auth = await requireAdmin(request)
+  if ('error' in auth) return json({ error: auth.error }, auth.status)
 
   let token: string, shop: string
   try {
@@ -57,10 +95,6 @@ export default async function handler(request: Request) {
 
   if (!token || !shop) {
     return json({ error: 'Missing token or shop' }, 400)
-  }
-
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    return json({ error: 'Missing Supabase env vars' }, 500)
   }
 
   try {

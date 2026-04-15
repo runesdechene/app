@@ -171,9 +171,19 @@ export function ShopifySync() {
     setImportResult(null)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const accessToken = session?.access_token
+      if (!accessToken) {
+        setImportError('Session expirée, reconnecte-toi')
+        setImporting(false)
+        return
+      }
       const resp = await fetch('/.netlify/functions/shopify-sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({ token, shop: 'runes-de-chene.myshopify.com' }),
       })
 
