@@ -48,8 +48,9 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
   useEffect(() => {
     if (!userId) return
     let cancelled = false
-    supabase.rpc('get_fragment_enigma', { p_user_id: userId, p_fragment_id: fragment.fragmentId })
-      .then(({ data, error: rpcError }) => {
+    ;(async () => {
+      try {
+        const { data, error: rpcError } = await supabase.rpc('get_fragment_enigma', { p_user_id: userId, p_fragment_id: fragment.fragmentId })
         if (cancelled) return
         if (rpcError) {
           console.error('[FragmentEnigma] get_fragment_enigma error', rpcError)
@@ -68,13 +69,13 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
           setEnigma(d)
         }
         setLoading(false)
-      })
-      .catch(err => {
+      } catch (err) {
         if (cancelled) return
         console.error('[FragmentEnigma] get_fragment_enigma threw', err)
         setError('Erreur réseau. Vérifiez votre connexion.')
         setLoading(false)
-      })
+      }
+    })()
     return () => { cancelled = true }
   }, [userId, fragment.fragmentId])
 
