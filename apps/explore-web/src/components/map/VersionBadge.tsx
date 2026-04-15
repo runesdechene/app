@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import changelogRaw from '../../../CHANGELOG.md?raw'
+import { safeStorage } from '../../lib/safeStorage'
 import './VersionBadge.css'
 
 /**
@@ -63,12 +64,12 @@ const SEEN_KEY = 'changelog_seen_version'
 export function VersionBadge() {
   const [open, setOpen] = useState(() => {
     if (!current) return false
-    const seen = localStorage.getItem(SEEN_KEY)
+    const seen = safeStorage.get(SEEN_KEY)
     return seen !== current.version
   })
 
   function handleClose() {
-    if (current) localStorage.setItem(SEEN_KEY, current.version)
+    if (current) safeStorage.set(SEEN_KEY, current.version)
     setOpen(false)
   }
 

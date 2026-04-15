@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { safeStorage } from '../lib/safeStorage'
 
 interface PlayerState {
   /** IDs des lieux découverts par l'utilisateur (lookup O(1)) */
@@ -148,9 +149,9 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setPrimaryTitle: (title) => set({ primaryTitle: title }),
 
 
-  factionColorMode: localStorage.getItem('factionColorMode') === 'true',
+  factionColorMode: safeStorage.get('factionColorMode') === 'true',
   setFactionColorMode: (on) => {
-    localStorage.setItem('factionColorMode', String(on))
+    safeStorage.set('factionColorMode', String(on))
     set({ factionColorMode: on })
   },
 
