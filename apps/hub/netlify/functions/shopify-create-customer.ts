@@ -77,7 +77,11 @@ export default async function handler(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            customer: { id: customerId, tags: newTags },
+            customer: {
+              id: customerId,
+              tags: newTags,
+              ...(firstName ? { first_name: firstName } : {}),
+            },
           }),
         })
 
