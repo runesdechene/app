@@ -88,7 +88,7 @@ const breadcrumbSchema = {
   <Breadcrumb placeType={place.place_type.title} placeName={place.title} />
   <div class="page-tint">
     <main class="main-split">
-      <Gallery images={place.images} title={place.title} />
+      <Gallery images={place.images} title={place.title} placeName={place.title} />
       <article class="content-col">
         <span class="place-type-label">{place.place_type.title}</span>
         <h1 class="place-title">{place.title}</h1>

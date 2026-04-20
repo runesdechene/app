@@ -2,9 +2,10 @@
 interface Props {
   images: Array<{ id: string; url: string; thumb?: string }>;
   title: string;
+  placeName: string;
 }
 
-const { images, title } = Astro.props;
+const { images, title, placeName } = Astro.props;
 const displayImages = images.slice(0, 5);
 const mainImage = displayImages[0] ?? null;
 ---
@@ -38,6 +39,13 @@ const mainImage = displayImages[0] ?? null;
       ))}
     </div>
   )}
+  <a href="https://carte.runesdechene.com" class="gallery-cta">
+    <span class="gallery-cta-icon">&#x1F5FA;</span>
+    <span>
+      Explorer {placeName} sur La Carte
+      <span class="gallery-cta-sub">Gratuit &middot; Sans pub &middot; 2500+ lieux</span>
+    </span>
+  </a>
   <script define:vars={{ urls: displayImages.map(img => img.url) }}>
     const gallery = document.querySelector('[data-gallery]');
     if (gallery && urls.length > 1) {
