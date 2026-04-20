@@ -8,41 +8,45 @@ interface Props {
 }
 
 const { seoDescription, originalText, contributions } = Astro.props;
-const description = seoDescription || originalText;
+const description = seoDescription;
 ---
 
-<section class="container" style="padding-top: 3rem;">
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 2.5rem;">
   {description && (
-    <div style="margin-bottom: 3rem;">
-      <h2>A propos de ce lieu</h2>
-      <p style="font-size: 1.05rem; line-height: 1.8;">{description}</p>
+    <div style="margin-bottom: 2.5rem;">
+      <h2 style="font-family: var(--font-accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1rem;">À propos de ce lieu</h2>
+      <p style="font-size: 1.05rem; line-height: 1.85; color: var(--text);">{description}</p>
     </div>
   )}
 
   {contributions.length > 0 && (
     <div>
-      <h2>Récits des explorateurs ({contributions.length})</h2>
-      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <h2 style="font-family: var(--font-accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1.5rem;">
+        Récits des explorateurs ({contributions.length})
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
         {contributions.map((c) => (
-          <article style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-              <span style="font-weight: 600; color: var(--color-accent);">
+          <article style="background: var(--bg-warm); border-left: 3px solid var(--accent); padding: 1.2rem 1.5rem; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+              <span style="font-family: var(--font-accent); font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text);">
                 {c.user_name}
               </span>
-              <span style="color: var(--color-muted); font-size: 0.85rem;">
+              <span style="font-family: var(--font-accent); font-size: 0.75rem; font-weight: 600; color: var(--accent);">
                 +{c.votes_up}
               </span>
             </div>
-            {c.title && <p style="font-weight: 600; margin-bottom: 0.5rem;">{c.title}</p>}
-            <p style="line-height: 1.7;">{c.content}</p>
+            {c.title && <p style="font-weight: 600; margin-bottom: 0.4rem;">{c.title}</p>}
+            <p style="font-size: 0.95rem; line-height: 1.8; color: var(--text-light); font-style: italic;">
+              &laquo; {c.content} &raquo;
+            </p>
             {c.images?.length > 0 && (
-              <div style="display: flex; gap: 0.5rem; margin-top: 1rem; overflow-x: auto;">
-                {c.images.map((img) => (
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem; overflow-x: auto;">
+                {c.images.map((url) => (
                   <img
-                    src={img.thumb || img.url}
+                    src={url}
                     alt="Photo du lieu"
                     loading="lazy"
-                    style="width: 120px; height: 90px; object-fit: cover; border-radius: 4px;"
+                    style="width: 120px; height: 90px; object-fit: cover; border-radius: 6px;"
                   />
                 ))}
               </div>
@@ -52,4 +56,4 @@ const description = seoDescription || originalText;
       </div>
     </div>
   )}
-</section>
+</div>

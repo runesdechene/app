@@ -35,7 +35,7 @@ export interface Contribution {
   title: string;
   content: string;
   image_url: string | null;
-  images: PlaceImage[];
+  images: string[];
   votes_up: number;
   votes_down: number;
   created_at: string;
@@ -49,8 +49,7 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
     .select(`
       id, title, text, slug, address, latitude, longitude,
       images, accessibility, sensible, seo_description,
-      place_types!inner ( id, title, color, images ),
-      users!places_author_id_fkey ( first_name )
+      place_types!inner ( id, title, color, images )
     `)
     .not('slug', 'is', null)
     .eq('private', false)
@@ -71,7 +70,7 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
     sensible: row.sensible,
     seo_description: row.seo_description,
     place_type: row.place_types,
-    author_name: row.users?.first_name ?? 'Explorateur',
+    author_name: '',
   }));
 }
 

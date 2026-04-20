@@ -1,11 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 :root {
-  --color-bg: #0a0a0a;
-  --color-text: #e8e0d4;
-  --color-accent: #c8a96e;
-  --color-muted: #8a7e6b;
-  --color-surface: #1a1a1a;
-  --color-border: #2a2a2a;
-  --font-body: 'Georgia', 'Times New Roman', serif;
+  --bg: #ffffff;
+  --bg-warm: #f9f6f0;
+  --text: #594848;
+  --text-light: #7d6b6b;
+  --text-muted: #8a7e6b;
+  --accent: #833434;
+  --accent-hover: #6b2828;
+  --sepia: #C19A6B;
+  --border: #eeeeee;
+  --border-warm: #d4c8b4;
+  --font-accent: 'Cabin Condensed', sans-serif;
+  --font-body: 'Cabin', sans-serif;
   --max-width: 900px;
 }
 
@@ -13,31 +20,15 @@
 
 body {
   font-family: var(--font-body);
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--color-accent); text-decoration: none; }
+a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 img { max-width: 100%; height: auto; display: block; }
 
-.container { max-width: var(--max-width); margin: 0 auto; padding: 0 1.5rem; }
-
-h1 { font-size: 2.2rem; line-height: 1.2; font-weight: 700; color: var(--color-text); }
-h2 { font-size: 1.5rem; color: var(--color-accent); margin-bottom: 1rem; font-weight: 600; }
-
-.btn-primary {
-  display: inline-block;
-  background: var(--color-accent);
-  color: var(--color-bg);
-  padding: 0.8rem 2rem;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 1rem;
-  text-align: center;
-  transition: opacity 0.2s;
-}
-.btn-primary:hover { opacity: 0.9; text-decoration: none; }
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 2rem; }

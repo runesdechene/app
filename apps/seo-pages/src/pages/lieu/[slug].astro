@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Hero from '../../components/Hero.astro';
+import ValuesBar from '../../components/ValuesBar.astro';
 import PlaceContent from '../../components/PlaceContent.astro';
 import PlaceInfo from '../../components/PlaceInfo.astro';
 import CtaDownload from '../../components/CtaDownload.astro';
@@ -65,6 +66,7 @@ const schemaOrg = {
     address={place.address}
     imageUrl={firstImageUrl}
   />
+  <ValuesBar />
   <PlaceContent
     seoDescription={place.seo_description}
     originalText={place.text}

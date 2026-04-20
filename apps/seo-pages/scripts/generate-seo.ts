@@ -19,7 +19,7 @@ async function getStalePlaces() {
       place_types ( title )
     `)
     .not('slug', 'is', null)
-    .or('seo_description.is.null,seo_generated_at.lt.updated_at')
+    .is('seo_description', null)
     .eq('private', false)
     .eq('masked', false)
     .limit(50);
@@ -48,7 +48,7 @@ async function generateDescription(
   contributions: { content: string; votes_up: number; type: string }[]
 ): Promise<string> {
   const contribTexts = contributions
-    .filter((c) => c.content.trim().length > 10)
+    .filter((c) => c.content && c.content.trim().length > 10)
     .map((c, i) => `Récit ${i + 1} (${c.votes_up} votes, type: ${c.type}) : ${c.content}`)
     .join('\n\n');
 
