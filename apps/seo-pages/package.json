@@ -1,20 +1,17 @@
 {
   "name": "@runes/seo-pages",
   "type": "module",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
+    "build": "tsx src/build.ts",
+    "build:place": "tsx scripts/process-place.ts",
     "generate:slugs": "tsx scripts/generate-slugs.ts",
     "generate:seo": "tsx scripts/generate-seo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@astrojs/sitemap": "^3.3.0",
-    "@supabase/supabase-js": "^2.39.3",
-    "astro": "^5.7.0"
+    "@supabase/supabase-js": "^2.39.3"
   },
   "devDependencies": {
     "dotenv": "^16.4.0",

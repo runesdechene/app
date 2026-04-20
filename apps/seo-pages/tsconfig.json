@@ -1,11 +1,18 @@
 {
-  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist-ts",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@lib/*": ["src/lib/*"],
-      "@components/*": ["src/components/*"],
-      "@layouts/*": ["src/layouts/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@templates/*": ["./src/templates/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "scripts/**/*.ts"]
 }
