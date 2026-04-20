@@ -199,8 +199,9 @@ img { max-width: 100%; height: auto; display: block; }
 .thumbs::-webkit-scrollbar { display: none; }
 
 .thumb {
-  flex: 0 0 calc(100% / 8);
+  flex: 1 0 calc(100% / 8);
   min-width: 80px;
+  max-width: calc(100% / 4);
   aspect-ratio: 16 / 10;
   overflow: hidden;
   cursor: pointer;
