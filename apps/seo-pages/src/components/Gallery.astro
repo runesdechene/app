@@ -3,9 +3,10 @@ interface Props {
   images: Array<{ id: string; url: string; thumb?: string }>;
   title: string;
   placeName: string;
+  authorName: string;
 }
 
-const { images, title, placeName } = Astro.props;
+const { images, title, placeName, authorName } = Astro.props;
 const mainImage = images[0] ?? null;
 ---
 <aside class="gallery" data-gallery>
@@ -15,6 +16,11 @@ const mainImage = images[0] ?? null;
     ) : (
       <div class="gallery-placeholder">
         <span>Aucune photo</span>
+      </div>
+    )}
+    {authorName && mainImage && (
+      <div class="gallery-credit" data-gallery-credit>
+        Photo par {authorName}
       </div>
     )}
     {images.length > 1 && (

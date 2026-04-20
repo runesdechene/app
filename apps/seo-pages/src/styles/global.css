@@ -151,6 +151,22 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 16px;
 }
 
+.gallery-credit {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(74, 55, 40, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--parchment);
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+}
+
 .gallery-dots {
   position: absolute;
   bottom: 12px;

@@ -66,7 +66,7 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
       .from('places')
       .select(`
         id, title, text, slug, address, latitude, longitude,
-        images, accessibility, sensible, seo_description,
+        images, accessibility, sensible, seo_description, author_id,
         place_types!inner ( id, title, color, images )
       `)
       .not('slug', 'is', null)
@@ -112,6 +112,19 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
     }
   }
 
+  const authorIds = [...new Set(allPlaces.map((p: any) => p.author_id).filter(Boolean))];
+  const authorMap = new Map<string, string>();
+  for (let i = 0; i < authorIds.length; i += TAG_BATCH_SIZE) {
+    const batch = authorIds.slice(i, i + TAG_BATCH_SIZE);
+    const { data: authors } = await supabase
+      .from('users')
+      .select('id, first_name')
+      .in('id', batch);
+    for (const a of authors ?? []) {
+      authorMap.set(a.id, a.first_name ?? '');
+    }
+  }
+
   return allPlaces.map((row: any) => {
     const tags = tagsMap.get(row.id) ?? [];
     const primary = tags.find(t => t.isPrimary) ?? tags[0] ?? null;
@@ -128,7 +141,7 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
       sensible: row.sensible,
       seo_description: row.seo_description,
       place_type: row.place_types,
-      author_name: '',
+      author_name: authorMap.get(row.author_id) ?? '',
       tags,
       primaryTag: primary,
     };
