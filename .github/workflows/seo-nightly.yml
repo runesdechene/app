@@ -5,7 +5,7 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  generate-and-build:
+  generate-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,15 +16,29 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+
       - run: pnpm install --filter @runes/seo-pages
-      - run: pnpm --filter @runes/seo-pages generate:slugs
+
+      - name: Generate slugs
+        run: pnpm --filter @runes/seo-pages generate:slugs
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-      - run: pnpm --filter @runes/seo-pages generate:seo
+
+      - name: Generate SEO descriptions
+        run: pnpm --filter @runes/seo-pages generate:seo
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      - name: Trigger Netlify build
-        run: curl -X POST -d '{}' "${{ secrets.NETLIFY_SEO_BUILD_HOOK }}"
+
+      - name: Build static pages
+        run: pnpm --filter @runes/seo-pages build
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+      - name: Deploy to Netlify
+        run: npx netlify-cli deploy --prod --no-build --dir=apps/seo-pages/dist --site=5a5b9cb9-d330-41d7-a037-6bd65ac67eb9
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
