@@ -12,10 +12,13 @@ const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', {
   month: 'long',
   year: 'numeric',
 });
+const truncateLength = 180;
+const isLong = c.content.length > truncateLength;
+const preview = isLong ? c.content.slice(0, truncateLength).trimEnd() + '…' : c.content;
 ---
 <div class="contribution-card">
-  <div class="contribution-header">
-    <div class="contribution-author">
+  <div class="contribution-layout">
+    <div class="contribution-avatar-col">
       <div class="contribution-avatar">
         {c.user_avatar ? (
           <img src={c.user_avatar} alt={c.user_name} loading="lazy" />
@@ -23,22 +26,30 @@ const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', {
           initial
         )}
       </div>
-      <div>
-        <div class="contribution-name">{c.user_name}</div>
-        <div class="contribution-date">{dateStr}</div>
+    </div>
+    <div class="contribution-body">
+      <div class="contribution-header">
+        <div>
+          <div class="contribution-name">{c.user_name}</div>
+          <div class="contribution-date">{dateStr}</div>
+        </div>
+        {c.votes_up > 0 && (
+          <div class="contribution-votes">+{c.votes_up}</div>
+        )}
       </div>
+      {c.title && <p class="contribution-title">{c.title}</p>}
+      <p class="contribution-text contribution-preview">&laquo; {preview} &raquo;</p>
+      {isLong && (
+        <>
+          <p class="contribution-text contribution-full">&laquo; {c.content} &raquo;</p>
+          <button
+            class="contribution-read-more"
+            onclick="const card=this.closest('.contribution-card'); card.querySelector('.contribution-preview').style.display='none'; card.querySelector('.contribution-full').style.display='block'; this.style.display='none';"
+          >
+            Lire la suite
+          </button>
+        </>
+      )}
     </div>
-    {c.votes_up > 0 && (
-      <div class="contribution-votes">+{c.votes_up}</div>
-    )}
   </div>
-  {c.title && <p class="contribution-title">{c.title}</p>}
-  <p class="contribution-text">&laquo; {c.content} &raquo;</p>
-  {c.images.length > 0 && (
-    <div class="contribution-images">
-      {c.images.map((url) => (
-        <img src={url} alt="Photo du lieu" loading="lazy" />
-      ))}
-    </div>
-  )}
 </div>
