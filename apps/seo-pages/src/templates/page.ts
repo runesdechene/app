@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Place, Contribution, NearbyPlace } from '../lib/places';
 import { deriveTheme } from '../lib/color';
 import { renderHeader } from './header';
@@ -5,6 +8,9 @@ import { renderGallery } from './gallery';
 import { renderPlaceContent } from './place-content';
 import { renderNearbyPlaces } from './nearby-places';
 import { renderFooter } from './footer';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const globalCss = readFileSync(join(__dirname, '..', 'styles', 'global.css'), 'utf-8');
 
 function escapeHtml(str: string): string {
   return str
@@ -84,6 +90,9 @@ export function renderPage(input: RenderPageInput): string {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f7ede1" />
   <meta name="author" content="Runes de Chêne" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
   <link rel="preconnect" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
   <link rel="dns-prefetch" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
   <link rel="icon" type="image/png" href="/app-icon.png" />
@@ -107,8 +116,8 @@ export function renderPage(input: RenderPageInput): string {
   <script type="application/ld+json">${JSON.stringify(schemaOrg)}</script>
   <script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>
 
-  <link rel="stylesheet" href="/assets/global.css" />
   <style>
+${globalCss}
     :root {
       --tag-color: ${color};
       --tag-bg: ${bg};

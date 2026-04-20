@@ -24,7 +24,7 @@ export function renderGallery(props: GalleryProps): string {
   const mainImage = images[0] ?? null;
 
   const heroImg = mainImage
-    ? `<img src="${escapeHtml(mainImage.url)}" alt="${escapeHtml(title)}" loading="eager" fetchpriority="high" class="hero-img" data-gallery-main />`
+    ? `<img src="${escapeHtml(mainImage.url)}" alt="${escapeHtml(title)}" loading="eager" fetchpriority="high" class="hero-img" data-gallery-main style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s ease;" onload="this.style.opacity='1'" />`
     : `<div class="hero-placeholder"><span>Aucune photo</span></div>`;
 
   const fullscreenBtn = mainImage
@@ -46,7 +46,7 @@ export function renderGallery(props: GalleryProps): string {
   const thumbsHtml = images.length > 1
     ? `<div class="thumbs" data-gallery-thumbs>
 ${images.map((img, i) => `  <div class="thumb${i === 0 ? ' active' : ''}" data-gallery-thumb="${i}">
-    <img src="${escapeHtml(img.thumb || img.url)}" alt="${escapeHtml(title)} — photo ${i + 1}" loading="lazy" />
+    <img src="${escapeHtml(img.thumb || img.url)}" alt="${escapeHtml(title)} — photo ${i + 1}" loading="lazy" style="opacity:0;transition:opacity .3s ease;" onload="this.style.opacity='1'" />
   </div>`).join('\n')}
 </div>`
     : '';
@@ -54,7 +54,7 @@ ${images.map((img, i) => `  <div class="thumb${i === 0 ? ' active' : ''}" data-g
   const urls = JSON.stringify(images.map(img => img.url));
 
   return `<!-- HERO -->
-<section class="hero" data-gallery>
+<section class="hero" data-gallery style="position:relative;width:100%;height:88vh;min-height:550px;overflow:hidden;background:#f7ede1;">
   ${heroImg}
   <div class="hero-overlay"></div>
   ${fullscreenBtn}

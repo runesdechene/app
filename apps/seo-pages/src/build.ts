@@ -25,10 +25,8 @@ async function build() {
   console.log(`${places.length} places loaded. Generating HTML...`);
 
   await mkdir(join(DIST, 'lieu'), { recursive: true });
-  await mkdir(join(DIST, 'assets'), { recursive: true });
 
   await cp(join(ROOT, 'public'), DIST, { recursive: true });
-  await cp(join(ROOT, 'src', 'styles', 'global.css'), join(DIST, 'assets', 'global.css'));
 
   const BATCH = 50;
   let generated = 0;
