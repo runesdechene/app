@@ -1,0 +1,23 @@
+# Runes de Chêne — Application de découverte du patrimoine
+
+## Qu'est-ce que Runes de Chêne ?
+Runes de Chêne est un mouvement français né de l'amour pour l'Histoire, le patrimoine et la Nature. L'application gratuite permet à une communauté d'explorateurs de découvrir, documenter et partager plus de 2600 lieux remarquables en France et ailleurs : châteaux, abbayes, mégalithes, forêts anciennes, vestiges romains, sentiers oubliés.
+
+## Ce site
+Les pages sous /lieu/ sont des fiches descriptives de chaque lieu référencé dans l'application. Chaque page contient :
+- Le nom, l'adresse et les coordonnées GPS du lieu
+- Des photos prises par les explorateurs de la communauté
+- Une description SEO générée à partir des récits des visiteurs
+- Les récits (contributions) des explorateurs qui ont visité le lieu
+- Les lieux à proximité pour encourager l'exploration
+
+## Données structurées
+Chaque page utilise Schema.org avec les types TouristAttraction et BreadcrumbList.
+
+## Contact
+Site : https://runesdechene.com
+Application : https://carte.runesdechene.com
+Instagram : https://www.instagram.com/runesdechene
+
+## Politique
+Tout le contenu est généré par la communauté d'explorateurs. Les descriptions SEO sont synthétisées par IA à partir des récits des visiteurs, en ne citant que des faits historiques vérifiables.

@@ -34,6 +34,15 @@ const metaDescription = (place.seo_description || place.text || '').slice(0, 155
 const canonicalUrl = `https://carte.runesdechene.com/lieu/${place.slug}`;
 const tagLabel = place.primaryTag?.title ?? 'Lieu';
 
+const reviews = contributions
+  .filter(c => c.content && c.content.length > 20)
+  .map(c => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: c.user_name },
+    datePublished: c.created_at.slice(0, 10),
+    reviewBody: c.content.slice(0, 300),
+  }));
+
 const schemaOrg = {
   '@context': 'https://schema.org',
   '@type': 'TouristAttraction',
@@ -45,10 +54,12 @@ const schemaOrg = {
     latitude: place.latitude,
     longitude: place.longitude,
   },
-  image: firstImageUrl || undefined,
+  image: place.images?.map((img: any) => img.url).filter(Boolean) || undefined,
   url: canonicalUrl,
   isAccessibleForFree: true,
   touristType: 'Nature & Heritage',
+  ...(reviews.length > 0 && { review: reviews }),
+  ...(place.author_name && { creator: { '@type': 'Person', name: place.author_name } }),
 };
 
 const breadcrumbSchema = {

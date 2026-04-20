@@ -18,7 +18,7 @@ const mainImage = images[0] ?? null;
 <!-- HERO -->
 <section class="hero" data-gallery>
   {mainImage ? (
-    <img src={mainImage.url} alt={title} loading="eager" class="hero-img" data-gallery-main />
+    <img src={mainImage.url} alt={title} loading="eager" fetchpriority="high" class="hero-img" data-gallery-main />
   ) : (
     <div class="hero-placeholder">
       <span>Aucune photo</span>
