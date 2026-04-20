@@ -7,10 +7,15 @@ interface Props {
   image?: string;
   canonicalUrl: string;
   schemaOrg?: Record<string, any>;
+  breadcrumbSchema?: Record<string, any>;
+  tagDominantColor?: string;
 }
 
-const { title, description, image, canonicalUrl, schemaOrg } = Astro.props;
+const { title, description, image, canonicalUrl, schemaOrg, breadcrumbSchema, tagDominantColor } = Astro.props;
 const ogImage = image || '/og-default.png';
+
+const dominantColor = tagDominantColor || '#C19A6B';
+const dominantBg = `${dominantColor}12`;
 ---
 
 <!DOCTYPE html>
@@ -38,6 +43,16 @@ const ogImage = image || '/og-default.png';
   {schemaOrg && (
     <script type="application/ld+json" set:html={JSON.stringify(schemaOrg)} />
   )}
+  {breadcrumbSchema && (
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  )}
+
+  <style define:vars={{ dominantColor, dominantBg }}>
+    :root {
+      --tag-dominant: var(--dominantColor);
+      --tag-dominant-bg: var(--dominantBg);
+    }
+  </style>
 </head>
 <body>
   <slot />

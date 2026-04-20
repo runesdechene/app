@@ -3,7 +3,7 @@ interface NearbyPlace {
   title: string;
   slug: string;
   images: { id: string; url: string; thumb?: string }[];
-  place_type: { title: string };
+  place_type: { title: string; color?: string };
 }
 
 interface Props {
@@ -12,31 +12,28 @@ interface Props {
 
 const { places } = Astro.props;
 ---
-
 {places.length > 0 && (
-  <div class="container" style="padding: 2.5rem 2rem;">
-    <h2 style="font-family: var(--font-accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 1.5rem;">Lieux à proximité</h2>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+  <section class="nearby-section">
+    <div class="section-label">Lieux à proximité</div>
+    <div class="nearby-grid">
       {places.map((place) => (
-        <a href={`/lieu/${place.slug}`} style="text-decoration: none; color: inherit; border-radius: 8px; overflow: hidden; background: var(--bg-warm); transition: transform 0.2s, box-shadow 0.2s;">
+        <a href={`/lieu/${place.slug}`} class="nearby-card">
           {place.images?.[0]?.url ? (
             <img
               src={place.images[0].thumb || place.images[0].url}
               alt={place.title}
               loading="lazy"
-              style="width: 100%; height: 120px; object-fit: cover;"
+              class="nearby-card-img"
             />
           ) : (
-            <div style="width: 100%; height: 120px; background: var(--border);"></div>
+            <div class="nearby-card-img" />
           )}
-          <div style="padding: 0.8rem;">
-            <p style="font-family: var(--font-accent); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.2rem;">
-              {place.place_type.title}
-            </p>
-            <p style="font-family: var(--font-accent); font-size: 0.9rem; font-weight: 600; color: var(--text);">{place.title}</p>
+          <div class="nearby-card-body">
+            <div class="nearby-card-type">{place.place_type.title}</div>
+            <div class="nearby-card-name">{place.title}</div>
           </div>
         </a>
       ))}
     </div>
-  </div>
+  </section>
 )}

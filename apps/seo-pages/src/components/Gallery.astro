@@ -1,0 +1,40 @@
+---
+interface Props {
+  images: Array<{ id: string; url: string; thumb?: string }>;
+  title: string;
+}
+
+const { images, title } = Astro.props;
+const mainImage = images[0] ?? null;
+const thumbImages = images.slice(0, 5);
+---
+<aside class="gallery">
+  <div class="gallery-main">
+    {mainImage ? (
+      <img src={mainImage.url} alt={title} loading="eager" />
+    ) : (
+      <div class="gallery-placeholder">
+        <span>Aucune photo</span>
+      </div>
+    )}
+    {images.length > 1 && (
+      <div class="gallery-dots">
+        {images.slice(0, 5).map((_, i) => (
+          <button
+            class={`gallery-dot${i === 0 ? ' active' : ''}`}
+            aria-label={`Photo ${i + 1}`}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+  {thumbImages.length > 1 && (
+    <div class="gallery-thumbs">
+      {thumbImages.map((img, i) => (
+        <div class={`gallery-thumb${i === 0 ? ' active' : ''}`}>
+          <img src={img.thumb || img.url} alt={`${title} — photo ${i + 1}`} loading="lazy" />
+        </div>
+      ))}
+    </div>
+  )}
+</aside>

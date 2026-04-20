@@ -1,0 +1,44 @@
+---
+import type { Contribution } from '../lib/places';
+
+interface Props {
+  contribution: Contribution;
+}
+
+const { contribution: c } = Astro.props;
+const initial = c.user_name.charAt(0).toUpperCase();
+const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+---
+<div class="contribution-card">
+  <div class="contribution-header">
+    <div class="contribution-author">
+      <div class="contribution-avatar">
+        {c.user_avatar ? (
+          <img src={c.user_avatar} alt={c.user_name} loading="lazy" />
+        ) : (
+          initial
+        )}
+      </div>
+      <div>
+        <div class="contribution-name">{c.user_name}</div>
+        <div class="contribution-date">{dateStr}</div>
+      </div>
+    </div>
+    {c.votes_up > 0 && (
+      <div class="contribution-votes">+{c.votes_up}</div>
+    )}
+  </div>
+  {c.title && <p class="contribution-title">{c.title}</p>}
+  <p class="contribution-text">&laquo; {c.content} &raquo;</p>
+  {c.images.length > 0 && (
+    <div class="contribution-images">
+      {c.images.slice(0, 4).map((url) => (
+        <img src={url} alt="Photo du lieu" loading="lazy" />
+      ))}
+    </div>
+  )}
+</div>

@@ -1,0 +1,15 @@
+---
+interface Props {
+  placeType: string;
+  placeName: string;
+}
+
+const { placeType, placeName } = Astro.props;
+---
+<nav class="breadcrumb">
+  <a href="https://carte.runesdechene.com">La Carte</a>
+  <span class="sep">›</span>
+  <a href={`https://carte.runesdechene.com/lieu?type=${encodeURIComponent(placeType.toLowerCase())}`}>{placeType}</a>
+  <span class="sep">›</span>
+  <span class="current">{placeName}</span>
+</nav>
