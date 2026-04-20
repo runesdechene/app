@@ -243,6 +243,7 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 19px;
   line-height: 1.85;
   color: rgba(255,255,255,0.6);
+  text-align: justify;
   margin-bottom: 56px;
 }
 
@@ -452,11 +453,16 @@ img { max-width: 100%; height: auto; display: block; }
   color: #fff;
 }
 
+.content-cta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
 .content-cta-sub {
   font-family: var(--font-accent);
   font-size: 14px;
   color: rgba(255,255,255,0.45);
-  margin-top: 2px;
 }
 
 /* ===== GALLERY CTA (under thumbs) ===== */
@@ -464,7 +470,7 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
   align-items: center;
   gap: 14px;
-  max-width: 760px;
+  max-width: calc(760px - 64px);
   margin: 16px auto 0;
   padding: 16px 24px;
   background: var(--tag-glow);
