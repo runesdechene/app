@@ -1,10 +1,5 @@
 ---
-interface NearbyPlace {
-  title: string;
-  slug: string;
-  images: { id: string; url: string; thumb?: string }[];
-  place_type: { title: string; color?: string };
-}
+import type { NearbyPlace } from '../lib/places';
 
 interface Props {
   places: NearbyPlace[];
@@ -18,19 +13,34 @@ const { places } = Astro.props;
     <div class="nearby-grid">
       {places.map((place) => (
         <a href={`/lieu/${place.slug}`} class="nearby-card">
-          {place.images?.[0]?.url ? (
-            <img
-              src={place.images[0].thumb || place.images[0].url}
-              alt={place.title}
-              loading="lazy"
-              class="nearby-card-img"
-            />
-          ) : (
-            <div class="nearby-card-img" />
-          )}
-          <div class="nearby-card-body">
-            <div class="nearby-card-type">{place.place_type.title}</div>
-            <div class="nearby-card-name">{place.title}</div>
+          <div class="nearby-card-visual">
+            {place.images?.[0]?.url ? (
+              <img
+                src={place.images[0].thumb || place.images[0].url}
+                alt={place.title}
+                loading="lazy"
+                class="nearby-card-img"
+              />
+            ) : (
+              <div class="nearby-card-img nearby-card-placeholder" />
+            )}
+            <div class="nearby-card-overlay">
+              {place.primaryTag && (
+                <span
+                  class="nearby-card-tag"
+                  style={`color: ${place.primaryTag.color};`}
+                >
+                  {place.primaryTag.icon && (
+                    <span
+                      class="nearby-card-tag-icon"
+                      style={`background-color: ${place.primaryTag.color}; -webkit-mask-image: url(${place.primaryTag.icon}); mask-image: url(${place.primaryTag.icon});`}
+                    />
+                  )}
+                  {place.primaryTag.title}
+                </span>
+              )}
+              <span class="nearby-card-name">{place.title}</span>
+            </div>
           </div>
         </a>
       ))}

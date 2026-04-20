@@ -1,15 +1,18 @@
 ---
+import type { PlaceTag } from '../lib/places';
+
 interface Props {
-  placeType: string;
+  primaryTag: PlaceTag | null;
   placeName: string;
 }
 
-const { placeType, placeName } = Astro.props;
+const { primaryTag, placeName } = Astro.props;
+const tagLabel = primaryTag?.title ?? 'Lieu';
 ---
 <nav class="breadcrumb">
-  <a href="https://carte.runesdechene.com">La Carte</a>
+  <a href="https://carte.runesdechene.com">Runes de Chêne</a>
   <span class="sep">›</span>
-  <a href={`https://carte.runesdechene.com/lieu?type=${encodeURIComponent(placeType.toLowerCase())}`}>{placeType}</a>
+  <a href={`https://carte.runesdechene.com/lieu?tag=${encodeURIComponent(tagLabel.toLowerCase())}`}>{tagLabel}</a>
   <span class="sep">›</span>
   <span class="current">{placeName}</span>
 </nav>

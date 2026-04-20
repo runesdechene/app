@@ -177,17 +177,23 @@ export async function getPlaceContributions(placeId: string): Promise<Contributi
   }));
 }
 
+export interface NearbyPlace {
+  title: string;
+  slug: string;
+  images: PlaceImage[];
+  primaryTag: PlaceTag | null;
+}
+
 export async function getNearbyPlaces(
   latitude: number,
   longitude: number,
   excludeId: string,
   limit = 4
-): Promise<Pick<Place, 'title' | 'slug' | 'images' | 'place_type'>[]> {
+): Promise<NearbyPlace[]> {
   const { data, error } = await supabase
     .from('places')
     .select(`
-      id, title, slug, images, latitude, longitude,
-      place_types!inner ( id, title, color, images )
+      id, title, slug, images, latitude, longitude
     `)
     .not('slug', 'is', null)
     .neq('id', excludeId)
@@ -201,14 +207,46 @@ export async function getNearbyPlaces(
 
   if (error) throw error;
 
-  const places = (data ?? []).map((row: any) => ({
-    ...row,
-    place_type: row.place_types,
-    distance: haversine(latitude, longitude, row.latitude, row.longitude),
-  }));
+  const sorted = (data ?? [])
+    .map((row: any) => ({
+      ...row,
+      distance: haversine(latitude, longitude, row.latitude, row.longitude),
+    }))
+    .sort((a: any, b: any) => a.distance - b.distance)
+    .slice(0, limit);
 
-  places.sort((a: any, b: any) => a.distance - b.distance);
-  return places.slice(0, limit);
+  const nearbyIds = sorted.map((p: any) => p.id);
+  const tagMap = new Map<string, PlaceTag>();
+  if (nearbyIds.length > 0) {
+    const { data: tagRows } = await supabase
+      .from('place_tags')
+      .select('place_id, is_primary, tags(id, title, color, background, icon)')
+      .in('place_id', nearbyIds)
+      .eq('is_primary', true);
+
+    for (const r of (tagRows ?? []) as unknown as Array<{
+      place_id: string;
+      is_primary: boolean;
+      tags: { id: string; title: string; color: string; background: string; icon: string | null } | null;
+    }>) {
+      if (!r.tags) continue;
+      tagMap.set(r.place_id, {
+        id: r.tags.id,
+        title: r.tags.title,
+        color: r.tags.color,
+        background: r.tags.background,
+        icon: r.tags.icon,
+        isPrimary: true,
+      });
+    }
+  }
+
+  return sorted.map((row: any) => ({
+    title: row.title,
+    slug: row.slug,
+    images: row.images ?? [],
+    primaryTag: tagMap.get(row.id) ?? null,
+  }));
 }
 
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
