@@ -13,6 +13,15 @@ export interface PlaceType {
   images: Record<string, string>;
 }
 
+export interface PlaceTag {
+  id: string;
+  title: string;
+  color: string;
+  background: string;
+  icon: string | null;
+  isPrimary: boolean;
+}
+
 export interface Place {
   id: string;
   title: string;
@@ -27,6 +36,8 @@ export interface Place {
   seo_description: string | null;
   place_type: PlaceType;
   author_name: string;
+  tags: PlaceTag[];
+  primaryTag: PlaceTag | null;
 }
 
 export interface Contribution {
@@ -43,35 +54,84 @@ export interface Contribution {
   user_avatar: string | null;
 }
 
+const PAGE_SIZE = 1000;
+
 export async function getAllPlacesWithSlugs(): Promise<Place[]> {
-  const { data, error } = await supabase
-    .from('places')
-    .select(`
-      id, title, text, slug, address, latitude, longitude,
-      images, accessibility, sensible, seo_description,
-      place_types!inner ( id, title, color, images )
-    `)
-    .not('slug', 'is', null)
-    .eq('private', false)
-    .eq('masked', false);
+  let allPlaces: any[] = [];
+  let from = 0;
 
-  if (error) throw error;
+  while (true) {
+    const { data, error } = await supabase
+      .from('places')
+      .select(`
+        id, title, text, slug, address, latitude, longitude,
+        images, accessibility, sensible, seo_description,
+        place_types!inner ( id, title, color, images )
+      `)
+      .not('slug', 'is', null)
+      .eq('private', false)
+      .eq('masked', false)
+      .range(from, from + PAGE_SIZE - 1);
 
-  return (data ?? []).map((row: any) => ({
-    id: row.id,
-    title: row.title,
-    text: row.text,
-    slug: row.slug,
-    address: row.address,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    images: row.images ?? [],
-    accessibility: row.accessibility,
-    sensible: row.sensible,
-    seo_description: row.seo_description,
-    place_type: row.place_types,
-    author_name: '',
-  }));
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    allPlaces = allPlaces.concat(data);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  const placeIds = allPlaces.map((p: any) => p.id);
+
+  const tagsMap = new Map<string, PlaceTag[]>();
+  for (let i = 0; i < placeIds.length; i += PAGE_SIZE) {
+    const batch = placeIds.slice(i, i + PAGE_SIZE);
+    const { data: tagRows, error: tagErr } = await supabase
+      .from('place_tags')
+      .select('place_id, is_primary, tags(id, title, color, background, icon)')
+      .in('place_id', batch);
+
+    if (tagErr) throw tagErr;
+
+    for (const r of (tagRows ?? []) as unknown as Array<{
+      place_id: string;
+      is_primary: boolean;
+      tags: { id: string; title: string; color: string; background: string; icon: string | null } | null;
+    }>) {
+      if (!r.tags) continue;
+      const arr = tagsMap.get(r.place_id) ?? [];
+      arr.push({
+        id: r.tags.id,
+        title: r.tags.title,
+        color: r.tags.color,
+        background: r.tags.background,
+        icon: r.tags.icon,
+        isPrimary: r.is_primary,
+      });
+      tagsMap.set(r.place_id, arr);
+    }
+  }
+
+  return allPlaces.map((row: any) => {
+    const tags = tagsMap.get(row.id) ?? [];
+    const primary = tags.find(t => t.isPrimary) ?? tags[0] ?? null;
+    return {
+      id: row.id,
+      title: row.title,
+      text: row.text,
+      slug: row.slug,
+      address: row.address,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      images: row.images ?? [],
+      accessibility: row.accessibility,
+      sensible: row.sensible,
+      seo_description: row.seo_description,
+      place_type: row.place_types,
+      author_name: '',
+      tags,
+      primaryTag: primary,
+    };
+  });
 }
 
 export async function getPlaceContributions(placeId: string): Promise<Contribution[]> {
