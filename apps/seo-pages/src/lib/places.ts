@@ -55,6 +55,7 @@ export interface Contribution {
 }
 
 const PAGE_SIZE = 1000;
+const TAG_BATCH_SIZE = 300;
 
 export async function getAllPlacesWithSlugs(): Promise<Place[]> {
   let allPlaces: any[] = [];
@@ -83,8 +84,8 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
   const placeIds = allPlaces.map((p: any) => p.id);
 
   const tagsMap = new Map<string, PlaceTag[]>();
-  for (let i = 0; i < placeIds.length; i += PAGE_SIZE) {
-    const batch = placeIds.slice(i, i + PAGE_SIZE);
+  for (let i = 0; i < placeIds.length; i += TAG_BATCH_SIZE) {
+    const batch = placeIds.slice(i, i + TAG_BATCH_SIZE);
     const { data: tagRows, error: tagErr } = await supabase
       .from('place_tags')
       .select('place_id, is_primary, tags(id, title, color, background, icon)')
