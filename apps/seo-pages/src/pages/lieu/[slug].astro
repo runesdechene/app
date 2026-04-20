@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import Gallery from '../../components/Gallery.astro';
-import TagPills from '../../components/TagPills.astro';
+
 import PlaceContent from '../../components/PlaceContent.astro';
 
 import NearbyPlaces from '../../components/NearbyPlaces.astro';
@@ -91,11 +91,24 @@ const breadcrumbSchema = {
     <main class="main-split">
       <Gallery images={place.images} title={place.title} placeName={place.title} authorName={place.author_name} />
       <article class="content-col">
-        <span class="place-type-label">{place.place_type.title}</span>
+        {place.primaryTag && (
+          <span
+            class="place-primary-tag"
+            style={`background: ${place.primaryTag.background}; color: ${place.primaryTag.color};`}
+          >
+            {place.primaryTag.icon && (
+              <span
+                class="place-primary-tag-icon"
+                style={`background-color: ${place.primaryTag.color}; -webkit-mask-image: url(${place.primaryTag.icon}); mask-image: url(${place.primaryTag.icon});`}
+              />
+            )}
+            {place.primaryTag.title}
+          </span>
+        )}
         <h1 class="place-title">{place.title}</h1>
         {place.address && <p class="place-address">{place.address}</p>}
-        <TagPills tags={place.tags} />
         <hr class="content-divider" />
+        <h2 class="place-about-heading">À propos de {place.title}</h2>
         <PlaceContent
           description={place.seo_description || place.text}
           accessibility={place.accessibility}

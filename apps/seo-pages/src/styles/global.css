@@ -271,14 +271,29 @@ img { max-width: 100%; height: auto; display: block; }
   flex-direction: column;
 }
 
-.place-type-label {
+.place-primary-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 24px;
   font-family: var(--font-accent);
-  font-size: 16px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--accent);
-  margin-bottom: 8px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+
+.place-primary-tag-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
 }
 
 .place-title {
@@ -291,52 +306,10 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-address {
-  font-size: 18px;
+  font-size: 16px;
+  font-style: italic;
   color: var(--ink-light);
   margin-bottom: 18px;
-}
-
-.place-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 28px;
-  align-items: center;
-}
-
-.place-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 24px;
-  font-family: var(--font-accent);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.03em;
-}
-
-.place-tag.primary {
-  padding: 9px 22px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.place-tag-icon {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-}
-
-.place-tag.primary .place-tag-icon {
-  width: 18px;
-  height: 18px;
 }
 
 .content-divider {
@@ -345,6 +318,16 @@ img { max-width: 100%; height: auto; display: block; }
   background: var(--parchment-dark);
   margin: 4px 0 28px 0;
   border: none;
+}
+
+.place-about-heading {
+  font-family: var(--font-accent);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  margin-bottom: 16px;
 }
 
 .place-description {
