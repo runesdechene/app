@@ -14,9 +14,9 @@ const { places } = Astro.props;
       {places.map((place) => (
         <a href={`/lieu/${place.slug}`} class="nearby-card">
           <div class="nearby-card-visual">
-            {place.images?.[0]?.url ? (
+            {(place.images ?? [])[0]?.url ? (
               <img
-                src={place.images[0].thumb || place.images[0].url}
+                src={(place.images ?? [])[0]?.thumb || (place.images ?? [])[0]?.url}
                 alt={place.title}
                 loading="lazy"
                 class="nearby-card-img"

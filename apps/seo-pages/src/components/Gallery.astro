@@ -6,7 +6,8 @@ interface Props {
   authorName: string;
 }
 
-const { images, title, placeName, authorName } = Astro.props;
+const { images: rawImages, title, placeName, authorName } = Astro.props;
+const images = rawImages ?? [];
 const mainImage = images[0] ?? null;
 ---
 <aside class="gallery" data-gallery>
