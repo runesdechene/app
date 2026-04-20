@@ -26,14 +26,11 @@ const { places } = Astro.props;
             )}
             <div class="nearby-card-overlay">
               {place.primaryTag && (
-                <span
-                  class="nearby-card-tag"
-                  style={`color: ${place.primaryTag.color}; background: ${place.primaryTag.background};`}
-                >
+                <span class="nearby-card-tag">
                   {place.primaryTag.icon && (
                     <span
                       class="nearby-card-tag-icon"
-                      style={`background-color: ${place.primaryTag.color}; -webkit-mask-image: url(${place.primaryTag.icon}); mask-image: url(${place.primaryTag.icon});`}
+                      style={`background-color: rgba(255,255,255,0.9); -webkit-mask-image: url(${place.primaryTag.icon}); mask-image: url(${place.primaryTag.icon});`}
                     />
                   )}
                   {place.primaryTag.title}

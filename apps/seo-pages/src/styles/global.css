@@ -593,14 +593,12 @@ img { max-width: 100%; height: auto; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  align-self: flex-start;
-  padding: 5px 12px;
-  border-radius: 16px;
   font-family: var(--font-accent);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .nearby-card-tag-icon {
