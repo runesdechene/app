@@ -7,6 +7,24 @@
     Content-Security-Policy = "frame-ancestors https://runesdechene.com https://*.runesdechene.com https://*.myshopify.com"
 
 [[redirects]]
+  from = "/lieu/*"
+  to = "https://rdc-seo-pages.netlify.app/lieu/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-index.xml"
+  to = "https://rdc-seo-pages.netlify.app/sitemap-index.xml"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sitemap-0.xml"
+  to = "https://rdc-seo-pages.netlify.app/sitemap-0.xml"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
