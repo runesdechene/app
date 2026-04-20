@@ -416,53 +416,28 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
 }
 
-/* ===== CONTENT CTA ===== */
-.content-cta {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-top: 48px;
-  padding: 22px 28px;
-  background: var(--tag-glow);
-  border: 1px solid var(--tag-border);
-  border-radius: 14px;
+/* ===== CONTRIBUTE BUTTON ===== */
+.contribute-btn {
+  display: block;
+  margin-top: 40px;
+  padding: 14px 0;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  font-family: var(--font-accent);
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.45);
   text-decoration: none;
-  color: #fff;
   transition: all 0.2s;
 }
 
-.content-cta:hover {
+.contribute-btn:hover {
   border-color: var(--tag-color);
-  background: var(--tag-glow);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  color: var(--tag-accent);
   text-decoration: none;
-}
-
-.content-cta-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  flex-shrink: 0;
-}
-
-.content-cta-main {
-  font-family: var(--font-accent);
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.content-cta-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.content-cta-sub {
-  font-family: var(--font-accent);
-  font-size: 14px;
-  color: rgba(255,255,255,0.45);
 }
 
 /* ===== GALLERY CTA (under thumbs) ===== */
