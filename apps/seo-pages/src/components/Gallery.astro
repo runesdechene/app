@@ -6,8 +6,7 @@ interface Props {
 }
 
 const { images, title, placeName } = Astro.props;
-const displayImages = images.slice(0, 5);
-const mainImage = displayImages[0] ?? null;
+const mainImage = images[0] ?? null;
 ---
 <aside class="gallery" data-gallery>
   <div class="gallery-main">
@@ -18,9 +17,9 @@ const mainImage = displayImages[0] ?? null;
         <span>Aucune photo</span>
       </div>
     )}
-    {displayImages.length > 1 && (
+    {images.length > 1 && (
       <div class="gallery-dots">
-        {displayImages.map((_, i) => (
+        {images.map((_, i) => (
           <button
             class={`gallery-dot${i === 0 ? ' active' : ''}`}
             aria-label={`Photo ${i + 1}`}
@@ -30,9 +29,9 @@ const mainImage = displayImages[0] ?? null;
       </div>
     )}
   </div>
-  {displayImages.length > 1 && (
+  {images.length > 1 && (
     <div class="gallery-thumbs">
-      {displayImages.map((img, i) => (
+      {images.map((img, i) => (
         <div class={`gallery-thumb${i === 0 ? ' active' : ''}`} data-gallery-thumb={i}>
           <img src={img.thumb || img.url} alt={`${title} — photo ${i + 1}`} loading="lazy" />
         </div>
@@ -51,7 +50,7 @@ const mainImage = displayImages[0] ?? null;
       <span class="gallery-cta-sub">Éco-tourisme d'aventure &middot; 2500+ lieux à explorer &middot; Gratuit</span>
     </span>
   </a>
-  <script define:vars={{ urls: displayImages.map(img => img.url) }}>
+  <script define:vars={{ urls: images.map(img => img.url) }}>
     const gallery = document.querySelector('[data-gallery]');
     if (gallery && urls.length > 1) {
       const mainImg = gallery.querySelector('[data-gallery-main]');

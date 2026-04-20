@@ -36,7 +36,7 @@ const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', {
   <p class="contribution-text">&laquo; {c.content} &raquo;</p>
   {c.images.length > 0 && (
     <div class="contribution-images">
-      {c.images.slice(0, 4).map((url) => (
+      {c.images.map((url) => (
         <img src={url} alt="Photo du lieu" loading="lazy" />
       ))}
     </div>
