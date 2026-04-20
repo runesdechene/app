@@ -592,17 +592,20 @@ img { max-width: 100%; height: auto; display: block; }
 .nearby-card-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: 16px;
   font-family: var(--font-accent);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .nearby-card-tag-icon {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   display: inline-block;
   mask-size: contain;
   mask-repeat: no-repeat;
@@ -614,10 +617,10 @@ img { max-width: 100%; height: auto; display: block; }
 
 .nearby-card-name {
   font-family: var(--font-accent);
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 /* === 9. Footer === */

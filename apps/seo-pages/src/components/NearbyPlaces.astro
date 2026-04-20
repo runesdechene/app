@@ -28,7 +28,7 @@ const { places } = Astro.props;
               {place.primaryTag && (
                 <span
                   class="nearby-card-tag"
-                  style={`color: ${place.primaryTag.color};`}
+                  style={`color: ${place.primaryTag.color}; background: ${place.primaryTag.background};`}
                 >
                   {place.primaryTag.icon && (
                     <span
