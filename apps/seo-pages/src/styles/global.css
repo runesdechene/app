@@ -237,9 +237,11 @@ img { max-width: 100%; height: auto; display: block; }
   box-shadow: 0 4px 16px rgba(74, 55, 40, 0.3);
 }
 
-.gallery-cta-icon {
-  font-size: 16px;
-  line-height: 1;
+.gallery-cta-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .gallery-cta-sub {
@@ -260,7 +262,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .place-type-label {
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -278,7 +280,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-address {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--ink-light);
   margin-bottom: 16px;
 }
@@ -295,17 +297,17 @@ img { max-width: 100%; height: auto; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 14px;
+  padding: 6px 16px;
   border-radius: 20px;
   font-family: var(--font-accent);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.03em;
 }
 
 .place-tag.primary {
-  padding: 7px 18px;
-  font-size: 14px;
+  padding: 8px 20px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -335,7 +337,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-description {
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.9;
   color: var(--ink);
   margin-bottom: 32px;
@@ -372,7 +374,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* === 7. Contributions === */
 .section-label {
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -444,12 +446,12 @@ img { max-width: 100%; height: auto; display: block; }
 
 .contribution-title {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 17px;
   margin-bottom: 8px;
 }
 
 .contribution-text {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.8;
   color: var(--ink-light);
   font-style: italic;
@@ -475,9 +477,9 @@ img { max-width: 100%; height: auto; display: block; }
   background: none;
   border: 1px solid var(--parchment-dark);
   border-radius: 8px;
-  padding: 12px 24px;
+  padding: 14px 24px;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -502,59 +504,7 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
 }
 
-/* === 8. CTA Contextuel === */
-.cta-contextual {
-  background: linear-gradient(135deg, var(--ink) 0%, #2a1f17 100%);
-  border-radius: 12px;
-  padding: 36px;
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 32px;
-}
-
-.cta-logo {
-  height: 24px;
-  width: auto;
-  margin: 0 auto 16px;
-  opacity: 0.6;
-}
-
-.cta-contextual h3 {
-  font-family: var(--font-title);
-  font-size: 32px;
-  color: var(--parchment);
-  margin-bottom: 8px;
-  letter-spacing: 0.02em;
-}
-
-.cta-contextual p {
-  font-size: 15px;
-  color: var(--sepia);
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
-
-.cta-button {
-  display: inline-block;
-  background: var(--accent);
-  color: #fff;
-  padding: 12px 32px;
-  border-radius: 8px;
-  font-family: var(--font-accent);
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.cta-button:hover {
-  background: var(--accent-hover);
-  text-decoration: none;
-}
-
-/* === 9. Nearby Grid === */
+/* === 8. Nearby Grid === */
 .nearby-section {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -596,7 +546,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .nearby-card-type {
   font-family: var(--font-accent);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -606,7 +556,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .nearby-card-name {
   font-family: var(--font-accent);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
 }
@@ -625,7 +575,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .footer-text {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--ink-light);
   max-width: 480px;
   margin: 0 auto 24px;

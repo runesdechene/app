@@ -40,10 +40,15 @@ const mainImage = displayImages[0] ?? null;
     </div>
   )}
   <a href="https://carte.runesdechene.com" class="gallery-cta">
-    <span class="gallery-cta-icon">&#x1F5FA;</span>
+    <img
+      src="/app-icon.png"
+      alt="Runes de Chêne"
+      class="gallery-cta-logo"
+      loading="lazy"
+    />
     <span>
-      Explorer {placeName} sur La Carte
-      <span class="gallery-cta-sub">Gratuit &middot; Sans pub &middot; 2500+ lieux</span>
+      Découvrir ce lieu sur La Carte
+      <span class="gallery-cta-sub">Éco-tourisme d'aventure &middot; 2500+ lieux à explorer &middot; Gratuit</span>
     </span>
   </a>
   <script define:vars={{ urls: displayImages.map(img => img.url) }}>

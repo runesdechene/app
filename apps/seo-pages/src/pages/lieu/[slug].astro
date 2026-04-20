@@ -5,7 +5,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import Gallery from '../../components/Gallery.astro';
 import TagPills from '../../components/TagPills.astro';
 import PlaceContent from '../../components/PlaceContent.astro';
-import CtaDownload from '../../components/CtaDownload.astro';
+
 import NearbyPlaces from '../../components/NearbyPlaces.astro';
 import Footer from '../../components/Footer.astro';
 import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces } from '../../lib/places';
@@ -100,7 +100,7 @@ const breadcrumbSchema = {
           accessibility={place.accessibility}
           contributions={contributions}
         />
-        <CtaDownload placeName={place.title} />
+
       </article>
     </main>
   </div>
