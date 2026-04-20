@@ -108,9 +108,9 @@ const breadcrumbSchema = {
         <h1 class="place-title">{place.title}</h1>
         {place.address && <p class="place-address">{place.address}</p>}
         <hr class="content-divider" />
-        <h2 class="place-about-heading">À propos de {place.title}</h2>
+        {place.seo_description && <h2 class="place-about-heading">À propos de {place.title}</h2>}
         <PlaceContent
-          description={place.seo_description || place.text}
+          description={place.seo_description}
           accessibility={place.accessibility}
           contributions={contributions}
         />
