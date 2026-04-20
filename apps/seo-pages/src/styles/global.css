@@ -186,8 +186,9 @@ img { max-width: 100%; height: auto; display: block; }
 /* ===== THUMBS STRIP ===== */
 .thumbs {
   display: grid;
-  gap: 3px;
-  padding: 3px;
+  gap: 0;
+  padding: 0;
+  padding-bottom: 20px;
   background: var(--parchment-dark);
 }
 
