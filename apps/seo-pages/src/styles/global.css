@@ -273,6 +273,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .place-primary-tag {
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 8px;
   padding: 8px 18px;
@@ -514,6 +515,53 @@ img { max-width: 100%; height: auto; display: block; }
 
 .contributions-hidden.open {
   display: flex;
+}
+
+/* Content CTA (after contributions) */
+.content-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--parchment-dark);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.content-cta:hover {
+  text-decoration: none;
+  border-color: var(--sepia);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 55, 40, 0.1);
+}
+
+.content-cta-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.content-cta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.content-cta-main {
+  font-family: var(--font-accent);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.content-cta-sub {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  color: var(--ink-light);
 }
 
 /* === 8. Nearby Grid === */
