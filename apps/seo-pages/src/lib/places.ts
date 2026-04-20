@@ -157,6 +157,7 @@ export async function getPlaceContributions(placeId: string): Promise<Contributi
       users ( first_name, avatar_url )
     `)
     .eq('place_id', placeId)
+    .eq('type', 'carnet')
     .order('votes_up', { ascending: false })
     .order('created_at', { ascending: false });
 
