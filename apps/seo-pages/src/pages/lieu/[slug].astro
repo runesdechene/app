@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Hero from '../../components/Hero.astro';
+import PlaceContent from '../../components/PlaceContent.astro';
+import PlaceInfo from '../../components/PlaceInfo.astro';
+import CtaDownload from '../../components/CtaDownload.astro';
+import NearbyPlaces from '../../components/NearbyPlaces.astro';
+import BrandBlock from '../../components/BrandBlock.astro';
+import Footer from '../../components/Footer.astro';
+import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces } from '../../lib/places';
+import type { Place, Contribution } from '../../lib/places';
+
+export async function getStaticPaths() {
+  const places = await getAllPlacesWithSlugs();
+
+  return places.map((place) => ({
+    params: { slug: place.slug },
+    props: { place },
+  }));
+}
+
+interface Props {
+  place: Place;
+}
+
+const { place } = Astro.props;
+
+const contributions: Contribution[] = await getPlaceContributions(place.id);
+const nearby = await getNearbyPlaces(place.latitude, place.longitude, place.id);
+
+const firstImageUrl = place.images?.[0]?.url ?? null;
+const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
+const canonicalUrl = `https://carte.runesdechene.com/lieu/${place.slug}`;
+
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@type': 'TouristAttraction',
+  name: place.title,
+  description: metaDescription,
+  address: place.address || undefined,
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: place.latitude,
+    longitude: place.longitude,
+  },
+  image: firstImageUrl || undefined,
+  url: canonicalUrl,
+  isAccessibleForFree: true,
+  touristType: 'Nature & Heritage',
+};
+---
+
+<Base
+  title={`${place.title} — Runes de Chêne`}
+  description={metaDescription}
+  image={firstImageUrl ?? undefined}
+  canonicalUrl={canonicalUrl}
+  schemaOrg={schemaOrg}
+>
+  <Header />
+  <Hero
+    title={place.title}
+    placeType={place.place_type.title}
+    address={place.address}
+    imageUrl={firstImageUrl}
+  />
+  <PlaceContent
+    seoDescription={place.seo_description}
+    originalText={place.text}
+    contributions={contributions}
+  />
+  <PlaceInfo accessibility={place.accessibility} />
+  <CtaDownload placeName={place.title} />
+  <NearbyPlaces places={nearby} />
+  <BrandBlock />
+  <Footer />
+</Base>

@@ -45,6 +45,19 @@ Actions :
 
 Si `~/citadelle` inaccessible : vérifier qu'Obsidian est ouvert. Fallback NAS : `\\EGIDE\Runes de Chêne\👑 LA CITADELLE\`. Signaler explicitement le mode dégradé.
 
+## HARD GATE — Avant toute action code
+
+**STOP. Tu ne crées, modifies ou supprimes AUCUN fichier tant que ces checks ne sont pas passés.**
+
+1. **Graphify présent ?** → `ls graphify-out/graph.json` — si absent, STOP et demander à Uriel
+2. **Schema DB lu ?** → Suivre `_Index DEV → Gotchas → [[Schema DB — noms de colonnes]]` — ne JAMAIS deviner un nom de colonne
+3. **Routing Obsidian suivi ?** → Citadelle CLAUDE.md → table routing → lire les notes liées dans l'ordre. PAS de search_vault en freestyle
+4. **Bon repo confirmé ?** → `hostname` → `_system/machines.md` → vérifier qu'on est au bon chemin
+
+**Si un check échoue → STOP et demander. Ne pas contourner. Ne pas "aller plus vite".**
+
+---
+
 ## 4-Layer Query Rule
 
 Avant de lire un fichier brut, interroger dans cet ordre :

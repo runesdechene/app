@@ -1,0 +1,19 @@
+---
+interface Props {
+  accessibility: string | null;
+}
+
+const { accessibility } = Astro.props;
+---
+
+{accessibility && (
+  <section class="container" style="padding-top: 2rem;">
+    <h2>Infos pratiques</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+      <div style="background: var(--color-surface); padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+        <span style="color: var(--color-muted); font-size: 0.8rem; display: block;">Accessibilité</span>
+        <span style="font-weight: 600;">{accessibility}</span>
+      </div>
+    </div>
+  </section>
+)}

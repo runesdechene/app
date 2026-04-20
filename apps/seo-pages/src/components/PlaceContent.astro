@@ -1,0 +1,55 @@
+---
+import type { Contribution } from '../lib/places';
+
+interface Props {
+  seoDescription: string | null;
+  originalText: string;
+  contributions: Contribution[];
+}
+
+const { seoDescription, originalText, contributions } = Astro.props;
+const description = seoDescription || originalText;
+---
+
+<section class="container" style="padding-top: 3rem;">
+  {description && (
+    <div style="margin-bottom: 3rem;">
+      <h2>A propos de ce lieu</h2>
+      <p style="font-size: 1.05rem; line-height: 1.8;">{description}</p>
+    </div>
+  )}
+
+  {contributions.length > 0 && (
+    <div>
+      <h2>Récits des explorateurs ({contributions.length})</h2>
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {contributions.map((c) => (
+          <article style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+              <span style="font-weight: 600; color: var(--color-accent);">
+                {c.user_name}
+              </span>
+              <span style="color: var(--color-muted); font-size: 0.85rem;">
+                +{c.votes_up}
+              </span>
+            </div>
+            {c.title && <p style="font-weight: 600; margin-bottom: 0.5rem;">{c.title}</p>}
+            <p style="line-height: 1.7;">{c.content}</p>
+            {c.images?.length > 0 && (
+              <div style="display: flex; gap: 0.5rem; margin-top: 1rem; overflow-x: auto;">
+                {c.images.map((img) => (
+                  <img
+                    src={img.thumb || img.url}
+                    alt="Photo du lieu"
+                    loading="lazy"
+                    style="width: 120px; height: 90px; object-fit: cover; border-radius: 4px;"
+                  />
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
