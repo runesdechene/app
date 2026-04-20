@@ -1,11 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
 import Gallery from '../../components/Gallery.astro';
-
 import PlaceContent from '../../components/PlaceContent.astro';
-
 import NearbyPlaces from '../../components/NearbyPlaces.astro';
 import Footer from '../../components/Footer.astro';
 import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from '../../lib/places';
@@ -36,6 +33,8 @@ const firstImageUrl = place.images?.[0]?.url ?? null;
 const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
 const canonicalUrl = `https://carte.runesdechene.com/lieu/${place.slug}`;
 
+const tagLabel = place.primaryTag?.title ?? 'Lieu';
+
 const schemaOrg = {
   '@context': 'https://schema.org',
   '@type': 'TouristAttraction',
@@ -53,7 +52,6 @@ const schemaOrg = {
   touristType: 'Nature & Heritage',
 };
 
-const tagLabel = place.primaryTag?.title ?? 'Lieu';
 const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -86,41 +84,31 @@ const breadcrumbSchema = {
   canonicalUrl={canonicalUrl}
   schemaOrg={schemaOrg}
   breadcrumbSchema={breadcrumbSchema}
-  tagDominantColor={place.primaryTag?.color}
+  tagColor={place.primaryTag?.color}
+  tagBg={place.primaryTag?.background}
 >
   <Header />
-  <Breadcrumb primaryTag={place.primaryTag} placeName={place.title} />
-  <div class="page-tint">
-    <main class="main-split">
-      <Gallery images={place.images} title={place.title} placeName={place.title} authorName={place.author_name} placeCount={placeCount} />
-      <article class="content-col">
-        {place.primaryTag && (
-          <span
-            class="place-primary-tag"
-            style={`background: ${place.primaryTag.background}; color: ${place.primaryTag.color};`}
-          >
-            {place.primaryTag.icon && (
-              <span
-                class="place-primary-tag-icon"
-                style={`background-color: ${place.primaryTag.color}; -webkit-mask-image: url(${place.primaryTag.icon}); mask-image: url(${place.primaryTag.icon});`}
-              />
-            )}
-            {place.primaryTag.title}
-          </span>
-        )}
-        <h1 class="place-title">{place.title}</h1>
-        {place.address && <p class="place-address">{place.address}</p>}
-        <hr class="content-divider" />
-        {place.seo_description && <h2 class="place-about-heading">À propos de {place.title}</h2>}
-        <PlaceContent
-          description={place.seo_description}
-          accessibility={place.accessibility}
-          contributions={contributions}
-        />
+  <Gallery
+    images={place.images}
+    title={place.title}
+    address={place.address}
+    authorName={place.author_name}
+    primaryTag={place.primaryTag}
+    placeCount={placeCount}
+    breadcrumbTag={tagLabel}
+  />
 
-      </article>
-    </main>
+  <div class="body-tint">
+    <div class="content">
+      {place.seo_description && <div class="section-label">À propos de {place.title}</div>}
+      <PlaceContent
+        description={place.seo_description}
+        accessibility={place.accessibility}
+        contributions={contributions}
+      />
+    </div>
   </div>
+
   <NearbyPlaces places={nearby} />
   <Footer />
 </Base>

@@ -1,78 +1,92 @@
 ---
+import type { PlaceTag } from '../lib/places';
+
 interface Props {
   images: Array<{ id: string; url: string; thumb?: string }>;
   title: string;
-  placeName: string;
+  address: string;
   authorName: string;
+  primaryTag: PlaceTag | null;
   placeCount: number;
+  breadcrumbTag: string;
 }
 
-const { images: rawImages, title, placeName, authorName, placeCount } = Astro.props;
+const { images: rawImages, title, address, authorName, primaryTag, placeCount, breadcrumbTag } = Astro.props;
 const images = rawImages ?? [];
 const mainImage = images[0] ?? null;
 ---
-<aside class="gallery" data-gallery>
-  <div class="gallery-main">
-    {mainImage ? (
-      <img src={mainImage.url} alt={title} loading="eager" data-gallery-main />
-    ) : (
-      <div class="gallery-placeholder">
-        <span>Aucune photo</span>
-      </div>
-    )}
-    {authorName && mainImage && (
-      <div class="gallery-credit" data-gallery-credit>
-        Photo par {authorName}
-      </div>
-    )}
-    {images.length > 1 && (
-      <div class="gallery-dots">
-        {images.map((_, i) => (
-          <button
-            class={`gallery-dot${i === 0 ? ' active' : ''}`}
-            aria-label={`Photo ${i + 1}`}
-            data-gallery-dot={i}
-          />
-        ))}
-      </div>
-    )}
-  </div>
-  {images.length > 1 && (
-    <div class="gallery-thumbs">
-      {images.map((img, i) => (
-        <div class={`gallery-thumb${i === 0 ? ' active' : ''}`} data-gallery-thumb={i}>
-          <img src={img.thumb || img.url} alt={`${title} — photo ${i + 1}`} loading="lazy" />
-        </div>
-      ))}
+<!-- HERO -->
+<section class="hero">
+  {mainImage ? (
+    <img src={mainImage.url} alt={title} loading="eager" class="hero-img" data-gallery-main />
+  ) : (
+    <div class="hero-placeholder">
+      <span>Aucune photo</span>
     </div>
   )}
-  <a href="https://carte.runesdechene.com" class="gallery-cta">
-    <img
-      src="/app-icon.png"
-      alt="Runes de Chêne"
-      class="gallery-cta-logo"
-      loading="lazy"
-    />
-    <span>
-      Découvrir ce lieu sur l'application
-      <span class="gallery-cta-sub">Éco-tourisme d'aventure &middot; {placeCount}+ lieux à explorer &middot; Gratuit</span>
-    </span>
-  </a>
-  <script define:vars={{ urls: images.map(img => img.url) }}>
-    const gallery = document.querySelector('[data-gallery]');
-    if (gallery && urls.length > 1) {
-      const mainImg = gallery.querySelector('[data-gallery-main]');
-      const dots = gallery.querySelectorAll('[data-gallery-dot]');
-      const thumbs = gallery.querySelectorAll('[data-gallery-thumb]');
+  <div class="hero-overlay"></div>
 
-      function goTo(index) {
-        mainImg.src = urls[index];
-        dots.forEach((d, i) => d.classList.toggle('active', i === index));
-        thumbs.forEach((t, i) => t.classList.toggle('active', i === index));
-      }
+  <div class="hero-content">
+    <div class="hero-breadcrumb">
+      <a href="https://runesdechene.com">Runes de Chêne</a>
+      <span class="sep">›</span>
+      <a href={`https://carte.runesdechene.com/lieu?tag=${encodeURIComponent(breadcrumbTag.toLowerCase())}`}>{breadcrumbTag}</a>
+      <span class="sep">›</span>
+      {title}
+    </div>
+    {primaryTag && (
+      <div
+        class="hero-tag"
+        style={`background: ${primaryTag.background}; color: ${primaryTag.color};`}
+      >
+        {primaryTag.icon && (
+          <span
+            class="hero-tag-icon"
+            style={`background-color: ${primaryTag.color}; -webkit-mask-image: url(${primaryTag.icon}); mask-image: url(${primaryTag.icon});`}
+          />
+        )}
+        {primaryTag.title}
+      </div>
+    )}
+    <h1 class="hero-title">{title}</h1>
+    {address && <p class="hero-address">{address}</p>}
+    {authorName && <p class="hero-credit">Photo par {authorName}</p>}
+  </div>
+</section>
 
-      dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
-      thumbs.forEach((thumb, i) => thumb.addEventListener('click', () => goTo(i)));
+<!-- THUMBS STRIP -->
+{images.length > 1 && (
+  <div class="thumbs" style={`grid-template-columns: repeat(${Math.min(images.length, 7)}, 1fr);`} data-gallery-thumbs>
+    {images.map((img, i) => (
+      <div class={`thumb${i === 0 ? ' active' : ''}`} data-gallery-thumb={i}>
+        <img src={img.thumb || img.url} alt={`${title} — photo ${i + 1}`} loading="lazy" />
+      </div>
+    ))}
+  </div>
+)}
+
+<!-- GALLERY CTA -->
+<a href="https://carte.runesdechene.com" class="gallery-cta">
+  <img src="/app-icon.png" alt="Runes de Chêne" class="gallery-cta-logo" loading="lazy" />
+  <span>
+    Découvrir ce lieu sur l'application
+    <span class="gallery-cta-sub">Éco-tourisme d'aventure · {placeCount}+ lieux à explorer · Gratuit</span>
+  </span>
+</a>
+
+<!-- SLIDESHOW SCRIPT -->
+<script define:vars={{ urls: images.map(img => img.url) }}>
+  const hero = document.querySelector('.hero');
+  const thumbsContainer = document.querySelector('[data-gallery-thumbs]');
+  if (hero && thumbsContainer && urls.length > 1) {
+    const mainImg = hero.querySelector('[data-gallery-main]');
+    const thumbs = thumbsContainer.querySelectorAll('[data-gallery-thumb]');
+
+    function goTo(index) {
+      mainImg.src = urls[index];
+      thumbs.forEach((t, i) => t.classList.toggle('active', i === index));
     }
-  </script>
-</aside>
+
+    thumbs.forEach((thumb, i) => thumb.addEventListener('click', () => goTo(i)));
+  }
+</script>
