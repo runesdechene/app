@@ -56,6 +56,74 @@ export interface Contribution {
 
 const PAGE_SIZE = 1000;
 
+export async function getPlaceBySlug(slug: string): Promise<Place | null> {
+  const { data, error } = await supabase
+    .from('places')
+    .select(`
+      id, title, text, slug, address, latitude, longitude,
+      images, accessibility, sensible, seo_description, author_id,
+      place_types!inner ( id, title, color, images )
+    `)
+    .eq('slug', slug)
+    .eq('private', false)
+    .eq('masked', false)
+    .single();
+
+  if (error || !data) return null;
+
+  const { data: tagRows } = await supabase
+    .from('place_tags')
+    .select('place_id, is_primary, tags(id, title, color, background, icon)')
+    .eq('place_id', data.id);
+
+  const tags: PlaceTag[] = [];
+  for (const r of (tagRows ?? []) as unknown as Array<{
+    place_id: string;
+    is_primary: boolean;
+    tags: { id: string; title: string; color: string; background: string; icon: string | null } | null;
+  }>) {
+    if (!r.tags) continue;
+    tags.push({
+      id: r.tags.id,
+      title: r.tags.title,
+      color: r.tags.color,
+      background: r.tags.background,
+      icon: r.tags.icon,
+      isPrimary: r.is_primary,
+    });
+  }
+
+  const primary = tags.find(t => t.isPrimary) ?? tags[0] ?? null;
+
+  let authorName = '';
+  if (data.author_id) {
+    const { data: author } = await supabase
+      .from('users')
+      .select('first_name')
+      .eq('id', data.author_id)
+      .single();
+    authorName = author?.first_name ?? '';
+  }
+
+  return {
+    id: data.id,
+    title: data.title,
+    text: data.text,
+    slug: data.slug,
+    address: data.address,
+    latitude: data.latitude,
+    longitude: data.longitude,
+    images: data.images ?? [],
+    accessibility: data.accessibility,
+    sensible: data.sensible,
+    seo_description: data.seo_description,
+    place_type: (data as any).place_types,
+    author_name: authorName,
+    tags,
+    primaryTag: primary,
+  };
+}
+
 export async function getTotalPlaceCount(): Promise<number> {
   const { count, error } = await supabase
     .from('places')

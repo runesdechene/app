@@ -32,7 +32,6 @@ const nearby = await getNearbyPlaces(place.latitude, place.longitude, place.id);
 const firstImageUrl = place.images?.[0]?.url ?? null;
 const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
 const canonicalUrl = `https://carte.runesdechene.com/lieu/${place.slug}`;
-
 const tagLabel = place.primaryTag?.title ?? 'Lieu';
 
 const schemaOrg = {
