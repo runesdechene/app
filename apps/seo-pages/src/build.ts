@@ -1,4 +1,4 @@
-import { mkdir, writeFile, cp } from 'node:fs/promises';
+import { mkdir, writeFile, cp, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from './lib/places';
@@ -11,6 +11,9 @@ const DIST = join(ROOT, 'dist');
 
 async function build() {
   const start = Date.now();
+
+  await rm(DIST, { recursive: true, force: true });
+
   console.log('Fetching places...');
 
   const [places, totalCount] = await Promise.all([
