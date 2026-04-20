@@ -624,8 +624,8 @@ img { max-width: 100%; height: auto; display: block; }
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .hero {
-    height: 85vh;
-    min-height: 480px;
+    height: 92vh;
+    min-height: 520px;
   }
 
   .hero-title {
