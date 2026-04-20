@@ -26,6 +26,7 @@ body {
   font-family: var(--font-body);
   background: var(--parchment);
   color: var(--ink);
+  font-size: 18px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
@@ -46,7 +47,7 @@ img { max-width: 100%; height: auto; display: block; }
 .header-inner {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 12px 32px;
+  padding: 14px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -63,11 +64,11 @@ img { max-width: 100%; height: auto; display: block; }
   gap: 8px;
   background: var(--accent);
   color: #fff;
-  padding: 10px 22px;
+  padding: 12px 26px;
   border-radius: 8px;
   font-family: var(--font-accent);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   text-decoration: none;
@@ -82,17 +83,12 @@ img { max-width: 100%; height: auto; display: block; }
   transform: translateY(-1px);
 }
 
-.header-cta-icon {
-  font-size: 15px;
-  line-height: 1;
-}
-
 .breadcrumb {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 10px 32px;
+  padding: 12px 32px;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--ink-light);
   border-bottom: 1px solid var(--parchment-dark);
 }
@@ -152,7 +148,7 @@ img { max-width: 100%; height: auto; display: block; }
   justify-content: center;
   color: rgba(255, 255, 255, 0.5);
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .gallery-dots {
@@ -161,12 +157,12 @@ img { max-width: 100%; height: auto; display: block; }
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .gallery-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
   border: none;
@@ -214,19 +210,18 @@ img { max-width: 100%; height: auto; display: block; }
 .gallery-cta {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 14px;
   margin-top: 16px;
-  padding: 14px 24px;
+  padding: 16px 24px;
   background: linear-gradient(135deg, var(--ink) 0%, #2a1f17 100%);
   border-radius: 10px;
   text-decoration: none;
   color: var(--parchment);
   font-family: var(--font-accent);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(74, 55, 40, 0.2);
 }
@@ -238,20 +233,20 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .gallery-cta-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   flex-shrink: 0;
 }
 
 .gallery-cta-sub {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.04em;
   color: var(--sepia);
   text-transform: none;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 /* === 6. Content === */
@@ -262,7 +257,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .place-type-label {
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -272,23 +267,23 @@ img { max-width: 100%; height: auto; display: block; }
 
 .place-title {
   font-family: var(--font-title);
-  font-size: 52px;
+  font-size: 56px;
   line-height: 1.05;
   color: var(--ink);
   letter-spacing: 0.01em;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .place-address {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--ink-light);
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .place-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 28px;
   align-items: center;
 }
@@ -296,24 +291,24 @@ img { max-width: 100%; height: auto; display: block; }
 .place-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 16px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 24px;
   font-family: var(--font-accent);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.03em;
 }
 
 .place-tag.primary {
-  padding: 8px 20px;
-  font-size: 15px;
+  padding: 9px 22px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 .place-tag-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   display: inline-block;
   mask-size: contain;
   mask-repeat: no-repeat;
@@ -324,8 +319,8 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-tag.primary .place-tag-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 .content-divider {
@@ -337,14 +332,14 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-description {
-  font-size: 18px;
-  line-height: 1.9;
+  font-size: 19px;
+  line-height: 1.85;
   color: var(--ink);
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .place-description p {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .place-description p:last-child {
@@ -352,11 +347,11 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .place-accessibility {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--ink-light);
   margin-top: -16px;
   margin-bottom: 32px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   background: var(--parchment-dark);
   border-radius: 8px;
 }
@@ -364,7 +359,7 @@ img { max-width: 100%; height: auto; display: block; }
 .place-accessibility strong {
   font-family: var(--font-accent);
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   display: block;
   margin-bottom: 4px;
@@ -374,7 +369,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* === 7. Contributions === */
 .section-label {
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -385,7 +380,7 @@ img { max-width: 100%; height: auto; display: block; }
 .contribution-card {
   background: var(--parchment-dark);
   border-radius: 12px;
-  padding: 24px;
+  padding: 28px;
   border-left: 4px solid var(--accent);
 }
 
@@ -393,18 +388,18 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .contribution-author {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .contribution-avatar {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--sepia);
   display: flex;
@@ -412,7 +407,7 @@ img { max-width: 100%; height: auto; display: block; }
   justify-content: center;
   color: #fff;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   overflow: hidden;
 }
@@ -426,32 +421,32 @@ img { max-width: 100%; height: auto; display: block; }
 .contribution-name {
   font-family: var(--font-accent);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--ink);
 }
 
 .contribution-date {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--ink-light);
 }
 
 .contribution-votes {
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--accent);
 }
 
 .contribution-title {
   font-weight: 600;
-  font-size: 17px;
+  font-size: 19px;
   margin-bottom: 8px;
 }
 
 .contribution-text {
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.8;
   color: var(--ink-light);
   font-style: italic;
@@ -460,12 +455,12 @@ img { max-width: 100%; height: auto; display: block; }
 .contribution-images {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .contribution-images img {
-  width: 100px;
-  height: 75px;
+  width: 110px;
+  height: 82px;
   object-fit: cover;
   border-radius: 6px;
 }
@@ -473,13 +468,13 @@ img { max-width: 100%; height: auto; display: block; }
 .contributions-toggle {
   display: block;
   width: 100%;
-  margin-top: 12px;
+  margin-top: 14px;
   background: none;
   border: 1px solid var(--parchment-dark);
   border-radius: 8px;
-  padding: 14px 24px;
+  padding: 16px 24px;
   font-family: var(--font-accent);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -546,7 +541,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .nearby-card-type {
   font-family: var(--font-accent);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -556,12 +551,12 @@ img { max-width: 100%; height: auto; display: block; }
 
 .nearby-card-name {
   font-family: var(--font-accent);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--ink);
 }
 
-/* === 10. Footer === */
+/* === 9. Footer === */
 .site-footer {
   border-top: 1px solid var(--parchment-dark);
   padding: 40px 32px;
@@ -569,15 +564,15 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .footer-logo img {
-  height: 28px;
+  height: 32px;
   width: auto;
   margin: 0 auto 16px;
 }
 
 .footer-text {
-  font-size: 16px;
+  font-size: 17px;
   color: var(--ink-light);
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto 24px;
   line-height: 1.7;
 }
@@ -588,7 +583,7 @@ img { max-width: 100%; height: auto; display: block; }
   justify-content: center;
   flex-wrap: wrap;
   font-family: var(--font-accent);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -603,12 +598,12 @@ img { max-width: 100%; height: auto; display: block; }
 
 .footer-copy {
   margin-top: 20px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--ink-light);
   opacity: 0.6;
 }
 
-/* === 11. Mobile === */
+/* === 10. Mobile === */
 @media (max-width: 768px) {
   .main-split {
     grid-template-columns: 1fr;
@@ -625,7 +620,11 @@ img { max-width: 100%; height: auto; display: block; }
   }
 
   .place-title {
-    font-size: 38px;
+    font-size: 40px;
+  }
+
+  .place-description {
+    font-size: 17px;
   }
 
   .nearby-grid {
@@ -638,7 +637,7 @@ img { max-width: 100%; height: auto; display: block; }
 
   .breadcrumb {
     padding: 8px 20px;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .nearby-section {
@@ -647,13 +646,5 @@ img { max-width: 100%; height: auto; display: block; }
 
   .site-footer {
     padding: 32px 20px;
-  }
-
-  .cta-contextual {
-    padding: 28px 20px;
-  }
-
-  .cta-contextual h3 {
-    font-size: 26px;
   }
 }
