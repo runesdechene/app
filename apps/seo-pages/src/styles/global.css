@@ -176,13 +176,13 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .gallery-thumbs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-top: 12px;
 }
 
 .gallery-thumb {
-  flex: 1;
   aspect-ratio: 1;
   border-radius: 8px;
   overflow: hidden;
