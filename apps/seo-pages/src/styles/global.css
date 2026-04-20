@@ -624,7 +624,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .hero {
-    height: 92vh;
+    height: 100vh;
     min-height: 520px;
   }
 
