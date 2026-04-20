@@ -95,7 +95,7 @@ export function renderPage(input: RenderPageInput): string {
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
   <link rel="preconnect" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
   <link rel="dns-prefetch" href="https://ukpapqssgsxirsgmcvof.supabase.co" />
-  <link rel="icon" type="image/png" href="/app-icon.png" />
+  <link rel="icon" type="image/png" href="https://rdc-seo-pages.netlify.app/app-icon.png" />
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(metaDescription)}" />
   <link rel="canonical" href="${canonicalUrl}" />

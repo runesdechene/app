@@ -77,7 +77,7 @@ ${thumbsHtml}
 
 <!-- GALLERY CTA -->
 <a href="https://carte.runesdechene.com" class="gallery-cta">
-  <img src="/app-icon.png" alt="Runes de Ch\u00EAne" class="gallery-cta-logo" loading="lazy" />
+  <img src="https://rdc-seo-pages.netlify.app/app-icon.png" alt="Runes de Ch\u00EAne" class="gallery-cta-logo" loading="lazy" />
   <span>
     D\u00E9couvrir ce lieu sur l'application
     <span class="gallery-cta-sub">\u00C9co-tourisme d'aventure \u00B7 ${placeCount}+ lieux \u00E0 explorer \u00B7 Gratuit</span>

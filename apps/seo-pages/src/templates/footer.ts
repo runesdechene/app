@@ -9,7 +9,7 @@ export function renderFooter(): string {
     />
   </div>
   <p class="footer-text">
-    Un mouvement né de l'amour pour l'Histoire, le patrimoine et la Nature.
+    Une marque née de l'amour pour l'Histoire, le patrimoine et la Nature.
     Des milliers d'explorateurs qui refusent l'oubli et documentent les lieux remarquables de France et d'ailleurs.
     Rejoignez-nous.
   </p>
