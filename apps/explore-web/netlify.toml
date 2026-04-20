@@ -13,6 +13,12 @@
   force = true
 
 [[redirects]]
+  from = "/_astro/*"
+  to = "https://rdc-seo-pages.netlify.app/_astro/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/sitemap-index.xml"
   to = "https://rdc-seo-pages.netlify.app/sitemap-index.xml"
   status = 200
