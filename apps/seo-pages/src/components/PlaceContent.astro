@@ -14,7 +14,7 @@ const remaining = contributions.slice(1);
 ---
 <div>
   {description && (
-    <div class="place-description">
+    <div class="description">
       <Fragment set:html={description.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')} />
     </div>
   )}

@@ -219,7 +219,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ===== BODY TINT ===== */
 .body-tint {
-  background: linear-gradient(180deg, var(--tag-dark) 0%, var(--tag-deep) 500px);
+  background: linear-gradient(180deg, var(--tag-dark) 0%, var(--tag-deep) 800px);
 }
 
 /* ===== CONTENT ===== */
