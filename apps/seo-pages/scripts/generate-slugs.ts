@@ -18,7 +18,7 @@ function slugify(text: string): string {
 async function generateSlugs() {
   const { data: places, error } = await supabase
     .from('places')
-    .select('id, title, slug')
+    .select('id, title, slug, address')
     .is('slug', null);
 
   if (error) throw error;
@@ -29,18 +29,31 @@ async function generateSlugs() {
 
   console.log(`Generating slugs for ${places.length} places...`);
 
-  const { data: existingSlugs } = await supabase
-    .from('places')
-    .select('slug')
-    .not('slug', 'is', null);
-
-  const usedSlugs = new Set((existingSlugs ?? []).map((p: any) => p.slug));
+  const usedSlugs = new Set<string>();
+  let from = 0;
+  const PAGE = 1000;
+  while (true) {
+    const { data: batch } = await supabase
+      .from('places')
+      .select('slug')
+      .not('slug', 'is', null)
+      .range(from, from + PAGE - 1);
+    if (!batch || batch.length === 0) break;
+    for (const p of batch) usedSlugs.add(p.slug);
+    if (batch.length < PAGE) break;
+    from += PAGE;
+  }
 
   for (const place of places) {
     let slug = slugify(place.title);
     let candidate = slug;
-    let counter = 1;
 
+    if (usedSlugs.has(candidate) && place.address) {
+      const city = place.address.split(',').slice(-2, -1)[0]?.trim();
+      if (city) candidate = `${slug}-${slugify(city)}`;
+    }
+
+    let counter = 1;
     while (usedSlugs.has(candidate)) {
       candidate = `${slug}-${counter}`;
       counter++;
