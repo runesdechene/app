@@ -11,6 +11,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
+const BATCH_SIZE = 50;
+
 async function getStalePlaces() {
   const { data, error } = await supabase
     .from('places')
@@ -22,7 +24,7 @@ async function getStalePlaces() {
     .is('seo_description', null)
     .eq('private', false)
     .eq('masked', false)
-    .limit(50);
+    .limit(BATCH_SIZE);
 
   if (error) throw error;
   return data ?? [];
@@ -33,6 +35,7 @@ async function getContributionsForPlace(placeId: string) {
     .from('place_contributions')
     .select('content, votes_up, votes_down, type')
     .eq('place_id', placeId)
+    .eq('type', 'carnet')
     .order('votes_up', { ascending: false })
     .order('created_at', { ascending: false });
 
@@ -82,47 +85,69 @@ ${contribTexts || 'Aucun récit disponible.'}
 }
 
 async function run() {
-  const places = await getStalePlaces();
+  let totalProcessed = 0;
+  let batchNumber = 0;
 
-  if (places.length === 0) {
-    console.log('All SEO descriptions are up to date.');
-    return;
-  }
+  while (true) {
+    batchNumber++;
+    const places = await getStalePlaces();
 
-  console.log(`Processing ${places.length} places...`);
-  let processed = 0;
+    if (places.length === 0) {
+      console.log(`\nTerminé — ${totalProcessed} descriptions générées au total.`);
+      break;
+    }
 
-  for (const place of places) {
-    const contributions = await getContributionsForPlace(place.id);
-    const placeType = (place as any).place_types?.title ?? 'Lieu';
+    console.log(`\n--- Batch ${batchNumber} (${places.length} lieux) ---`);
+    let batchProcessed = 0;
 
-    console.log(`  ${place.title} (${contributions.length} contributions)...`);
+    for (const place of places) {
+      const contributions = await getContributionsForPlace(place.id);
+      const placeType = (place as any).place_types?.title ?? 'Lieu';
 
-    const description = await generateDescription(
-      place.title,
-      placeType,
-      place.text,
-      place.address,
-      contributions
-    );
+      console.log(`  [${totalProcessed + batchProcessed + 1}] ${place.title} (${contributions.length} récits)...`);
 
-    const { error } = await supabase
-      .from('places')
-      .update({
-        seo_description: description,
-        seo_generated_at: new Date().toISOString(),
-      })
-      .eq('id', place.id);
+      try {
+        const description = await generateDescription(
+          place.title,
+          placeType,
+          place.text,
+          place.address,
+          contributions
+        );
 
-    if (error) {
-      console.error(`    Failed: ${error.message}`);
-    } else {
-      console.log(`    Done (${description.length} chars)`);
-      processed++;
+        const { error } = await supabase
+          .from('places')
+          .update({
+            seo_description: description,
+            seo_generated_at: new Date().toISOString(),
+          })
+          .eq('id', place.id);
+
+        if (error) {
+          console.error(`    ✗ DB: ${error.message}`);
+        } else {
+          console.log(`    ✓ ${description.length} chars`);
+          batchProcessed++;
+        }
+      } catch (err: any) {
+        if (err?.status === 429) {
+          console.log('    ⏳ Rate limit — pause 60s...');
+          await new Promise((r) => setTimeout(r, 60_000));
+          continue;
+        }
+        console.error(`    ✗ API: ${err.message}`);
+      }
+    }
+
+    totalProcessed += batchProcessed;
+    console.log(`  Batch ${batchNumber}: ${batchProcessed}/${places.length} — Total: ${totalProcessed}`);
+
+    // Petite pause entre les batches pour pas stresser l'API
+    if (places.length === BATCH_SIZE) {
+      console.log('  Pause 5s avant le prochain batch...');
+      await new Promise((r) => setTimeout(r, 5_000));
     }
   }
-
-  console.log(`\nProcessed ${processed}/${places.length} places.`);
 }
 
 run().catch(console.error);
