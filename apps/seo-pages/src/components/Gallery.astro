@@ -4,9 +4,10 @@ interface Props {
   title: string;
   placeName: string;
   authorName: string;
+  placeCount: number;
 }
 
-const { images: rawImages, title, placeName, authorName } = Astro.props;
+const { images: rawImages, title, placeName, authorName, placeCount } = Astro.props;
 const images = rawImages ?? [];
 const mainImage = images[0] ?? null;
 ---
@@ -54,7 +55,7 @@ const mainImage = images[0] ?? null;
     />
     <span>
       Découvrir ce lieu sur l'application
-      <span class="gallery-cta-sub">Éco-tourisme d'aventure &middot; 2500+ lieux à explorer &middot; Gratuit</span>
+      <span class="gallery-cta-sub">Éco-tourisme d'aventure &middot; {placeCount}+ lieux à explorer &middot; Gratuit</span>
     </span>
   </a>
   <script define:vars={{ urls: images.map(img => img.url) }}>

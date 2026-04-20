@@ -13,18 +13,20 @@ import type { Place, Contribution } from '../../lib/places';
 
 export async function getStaticPaths() {
   const places = await getAllPlacesWithSlugs();
+  const placeCount = Math.floor(places.length / 100) * 100;
 
   return places.map((place) => ({
     params: { slug: place.slug },
-    props: { place },
+    props: { place, placeCount },
   }));
 }
 
 interface Props {
   place: Place;
+  placeCount: number;
 }
 
-const { place } = Astro.props;
+const { place, placeCount } = Astro.props;
 
 const contributions: Contribution[] = await getPlaceContributions(place.id);
 const nearby = await getNearbyPlaces(place.latitude, place.longitude, place.id);
@@ -89,7 +91,7 @@ const breadcrumbSchema = {
   <Breadcrumb primaryTag={place.primaryTag} placeName={place.title} />
   <div class="page-tint">
     <main class="main-split">
-      <Gallery images={place.images} title={place.title} placeName={place.title} authorName={place.author_name} />
+      <Gallery images={place.images} title={place.title} placeName={place.title} authorName={place.author_name} placeCount={placeCount} />
       <article class="content-col">
         {place.primaryTag && (
           <span
