@@ -8,12 +8,13 @@ import PlaceContent from '../../components/PlaceContent.astro';
 
 import NearbyPlaces from '../../components/NearbyPlaces.astro';
 import Footer from '../../components/Footer.astro';
-import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces } from '../../lib/places';
+import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from '../../lib/places';
 import type { Place, Contribution } from '../../lib/places';
 
 export async function getStaticPaths() {
   const places = await getAllPlacesWithSlugs();
-  const placeCount = Math.floor(places.length / 100) * 100;
+  const totalCount = await getTotalPlaceCount();
+  const placeCount = Math.floor(totalCount / 100) * 100;
 
   return places.map((place) => ({
     params: { slug: place.slug },

@@ -55,6 +55,17 @@ export interface Contribution {
 }
 
 const PAGE_SIZE = 1000;
+
+export async function getTotalPlaceCount(): Promise<number> {
+  const { count, error } = await supabase
+    .from('places')
+    .select('*', { count: 'exact', head: true })
+    .eq('private', false)
+    .eq('masked', false);
+
+  if (error) throw error;
+  return count ?? 0;
+}
 const TAG_BATCH_SIZE = 300;
 
 export async function getAllPlacesWithSlugs(): Promise<Place[]> {
