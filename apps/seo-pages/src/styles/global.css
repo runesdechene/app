@@ -624,23 +624,43 @@ img { max-width: 100%; height: auto; display: block; }
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .hero {
-    height: 75vh;
-    min-height: 420px;
+    height: 85vh;
+    min-height: 480px;
   }
 
   .hero-title {
-    font-size: 44px;
+    font-size: 38px;
   }
 
   .hero-content {
-    bottom: 32px;
+    bottom: 28px;
     left: 20px;
     right: 20px;
   }
 
-  .hero-address { font-size: 15px; }
+  .hero-address { font-size: 14px; }
+  .hero-credit { font-size: 11px; }
+  .hero-breadcrumb { font-size: 12px; margin-bottom: 10px; }
 
-  .nav { padding: 16px 20px; }
+  .hero-tag {
+    padding: 5px 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .hero-tag-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .nav { padding: 14px 16px; }
+
+  .nav-cta {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+
+  .nav-logo img { height: 28px; }
 
   .thumbs {
     grid-template-columns: repeat(4, 1fr) !important;
@@ -648,16 +668,26 @@ img { max-width: 100%; height: auto; display: block; }
 
   .content { padding: 36px 20px; }
 
+  .description {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .section-label { font-size: 14px; }
+
   .contribution-layout {
     flex-direction: column;
     gap: 12px;
   }
+
+  .contribution-text { font-size: 16px; }
 
   .nearby-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .nearby-section { padding: 32px 20px 48px; }
-  .gallery-cta { margin: 12px 20px 0; }
+  .gallery-cta { margin: 12px 20px 0; font-size: 13px; }
+  .gallery-cta-logo { width: 36px; height: 36px; }
   .site-footer { padding: 32px 20px; }
 }
