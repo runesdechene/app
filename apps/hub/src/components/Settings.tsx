@@ -94,6 +94,10 @@ export function Settings() {
   })
   const [savingV05, setSavingV05] = useState(false)
 
+  // Share template
+  const [shareTemplate, setShareTemplate] = useState<string>('')
+  const [savingShareTemplate, setSavingShareTemplate] = useState(false)
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -220,6 +224,13 @@ export function Settings() {
         setV05Faction(fact)
         setV05Enigma(enig)
       }
+      // Charger le template de partage social
+      const { data: shareData } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'share_text_template')
+        .single()
+      if (shareData) setShareTemplate(shareData.value)
     } finally {
       setLoading(false)
     }
@@ -384,6 +395,16 @@ export function Settings() {
       )
     }
     setSavingV05(false)
+  }
+
+  async function saveShareTemplate() {
+    setSavingShareTemplate(true)
+    const { error } = await supabase
+      .from('app_settings')
+      .update({ value: shareTemplate, updated_at: new Date().toISOString() })
+      .eq('key', 'share_text_template')
+    setSavingShareTemplate(false)
+    if (error) alert('Erreur : ' + error.message)
   }
 
   if (loading) {
@@ -902,6 +923,39 @@ export function Settings() {
         <button className="btn-primary" onClick={saveV05Settings} disabled={savingV05}>
           {savingV05 ? '...' : 'Sauvegarder V0.5'}
         </button>
+      </div>
+
+      <div style={{ marginTop: 24, borderTop: '1px solid #eee', paddingTop: 24 }}>
+        <h3>Partage social</h3>
+        <p className="divers-description">
+          Texte pré-rempli quand un utilisateur partage un lieu depuis l'app ou la SEO Page.
+          Utilise <code>{'{name}'}</code> pour insérer le nom du lieu. Le changement est instantané sur l'app ;
+          la SEO Page se met à jour au prochain rebuild nightly (~24h max).
+        </p>
+
+        <label className="settings-global-field" style={{ width: '100%', maxWidth: 600 }}>
+          <span>Template de partage</span>
+          <textarea
+            value={shareTemplate}
+            onChange={e => setShareTemplate(e.target.value)}
+            rows={3}
+            className="settings-input"
+            style={{ width: '100%', fontFamily: 'inherit' }}
+          />
+        </label>
+
+        <div style={{ marginTop: 8, padding: 12, background: '#f7ede1', borderRadius: 6 }}>
+          <strong style={{ display: 'block', marginBottom: 4, fontSize: 13 }}>Aperçu :</strong>
+          <em style={{ fontSize: 14 }}>
+            {shareTemplate.replace('{name}', 'Abbaye de Fontenay') || '(template vide)'}
+          </em>
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <button className="btn-primary" onClick={saveShareTemplate} disabled={savingShareTemplate}>
+            {savingShareTemplate ? '...' : 'Sauvegarder'}
+          </button>
+        </div>
       </div>
 
     </div>
