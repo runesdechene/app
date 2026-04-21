@@ -18,7 +18,7 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
   </a>
   <div class="nav-actions">
     <button
-      class="nav-share"
+      class="nav-share share-btn-js"
       type="button"
       data-share-title="${escapeAttr(placeName)}"
       data-share-text="${escapeAttr(shareText)}"
@@ -42,9 +42,9 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
 
 <script>
 (function() {
-  var btn = document.querySelector('.nav-share');
+  var buttons = document.querySelectorAll('.share-btn-js');
   var toast = document.getElementById('share-toast');
-  if (!btn || !toast) return;
+  if (!buttons.length || !toast) return;
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -52,25 +52,27 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
     setTimeout(function() { toast.classList.remove('visible'); }, 2200);
   }
 
-  btn.addEventListener('click', async function() {
-    var title = btn.getAttribute('data-share-title') || '';
-    var text = btn.getAttribute('data-share-text') || '';
-    var url = btn.getAttribute('data-share-url') || '';
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var title = btn.getAttribute('data-share-title') || '';
+      var text = btn.getAttribute('data-share-text') || '';
+      var url = btn.getAttribute('data-share-url') || '';
 
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: title, text: text, url: url });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        showToast('Lien copié ✓');
-      } else {
-        showToast(url);
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: title, text: text, url: url });
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(url);
+          showToast('Lien copié ✓');
+        } else {
+          showToast(url);
+        }
+      } catch (err) {
+        if (err && err.name !== 'AbortError') {
+          showToast('Échec du partage');
+        }
       }
-    } catch (err) {
-      if (err && err.name !== 'AbortError') {
-        showToast('Échec du partage');
-      }
-    }
+    });
   });
 })();
 </script>`

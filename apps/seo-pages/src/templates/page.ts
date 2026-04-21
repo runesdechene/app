@@ -149,6 +149,9 @@ ${globalCss}
         description: place.seo_description,
         accessibility: place.accessibility,
         contributions,
+        placeName: place.title,
+        placeSlug: place.slug,
+        shareTextTemplate,
       })}
     </div>
 
