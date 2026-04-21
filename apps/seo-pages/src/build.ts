@@ -2,6 +2,7 @@ import { mkdir, writeFile, cp, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from './lib/places';
+import { getShareTextTemplate } from './lib/appSettings';
 import { renderPage } from './templates/page';
 import { renderSitemap } from './templates/sitemap';
 
@@ -16,9 +17,10 @@ async function build() {
 
   console.log('Fetching places...');
 
-  const [places, totalCount] = await Promise.all([
+  const [places, totalCount, shareTextTemplate] = await Promise.all([
     getAllPlacesWithSlugs(),
     getTotalPlaceCount(),
+    getShareTextTemplate(),
   ]);
   const placeCount = Math.floor(totalCount / 100) * 100;
 
@@ -39,7 +41,7 @@ async function build() {
         getNearbyPlaces(place.latitude, place.longitude, place.id),
       ]);
 
-      const html = renderPage({ place, contributions, nearby, placeCount });
+      const html = renderPage({ place, contributions, nearby, placeCount, shareTextTemplate });
       const dir = join(DIST, 'lieu', place.slug);
       await mkdir(dir, { recursive: true });
       await writeFile(join(dir, 'index.html'), html, 'utf-8');

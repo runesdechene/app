@@ -759,3 +759,58 @@ img { max-width: 100%; height: auto; display: block; }
   .gallery-cta-logo { width: 36px; height: 36px; }
   .site-footer { padding: 32px 20px; }
 }
+
+/* Share button dans la nav transparente */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  color: #4A3728;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.nav-share:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.nav-share:active {
+  transform: scale(0.95);
+}
+
+/* Toast de confirmation partage */
+.share-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 12px 20px;
+  background: #4A3728;
+  color: #f7ede1;
+  border-radius: 999px;
+  font-size: 15px;
+  font-family: 'Cabin', sans-serif;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+  max-width: calc(100vw - 48px);
+  text-align: center;
+}
+
+.share-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

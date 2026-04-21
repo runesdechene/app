@@ -25,10 +25,11 @@ interface RenderPageInput {
   contributions: Contribution[];
   nearby: NearbyPlace[];
   placeCount: number;
+  shareTextTemplate: string;
 }
 
 export function renderPage(input: RenderPageInput): string {
-  const { place, contributions, nearby, placeCount } = input;
+  const { place, contributions, nearby, placeCount, shareTextTemplate } = input;
 
   const firstImageUrl = place.images?.[0]?.url ?? null;
   const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
@@ -130,7 +131,7 @@ ${globalCss}
   </style>
 </head>
 <body>
-  ${renderHeader()}
+  ${renderHeader({ placeName: place.title, placeSlug: place.slug, shareTextTemplate })}
   ${renderGallery({
     images: place.images,
     title: place.title,
