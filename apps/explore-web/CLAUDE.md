@@ -13,7 +13,7 @@ Conventions, gotchas, décisions, préférences, architecture :
 
 - React 18 + Vite 5 + TypeScript strict
 - MapLibre GL JS (carte)
-- Zustand (6 stores)
+- Zustand (7 stores, dont `appConfigStore` pour les configs app-wide en DB)
 - CSS par composant, media queries dans `styles/mobile.css`
 - Supabase client : `src/lib/supabaseClient.ts`
 
