@@ -62,8 +62,8 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
         if (navigator.share) {
           await navigator.share({ title: title, text: text, url: url });
         } else if (navigator.clipboard) {
-          await navigator.clipboard.writeText(url);
-          showToast('Lien copié ✓');
+          await navigator.clipboard.writeText(text + '\n' + url);
+          showToast('Message copié ✓');
         } else {
           showToast(url);
         }

@@ -23,10 +23,10 @@ export function ShareButton({ placeName, placeSlug }: ShareButtonProps) {
       if (navigator.share) {
         await navigator.share(payload)
       } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(`${text}\n${url}`)
         addToast({
           type: 'info',
-          message: 'Lien copié ✓',
+          message: 'Message copié ✓',
           timestamp: Date.now(),
         })
       } else {
