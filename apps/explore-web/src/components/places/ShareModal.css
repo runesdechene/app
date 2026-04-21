@@ -1,0 +1,86 @@
+.share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.share-modal {
+  background: #f7ede1;
+  border: 1px solid #4A372833;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  font-family: 'Cabin', sans-serif;
+}
+
+.share-modal h3 {
+  margin: 0 0 16px 0;
+  color: #4A3728;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+}
+
+.share-modal-textarea {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #4A372833;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #4A3728;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.share-modal-textarea:focus {
+  border-color: #7D5A3C;
+}
+
+.share-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.share-modal-cancel,
+.share-modal-copy {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.share-modal-cancel {
+  background: transparent;
+  border: 1px solid #4A372833;
+  color: #4A3728;
+}
+
+.share-modal-cancel:hover {
+  background: #E8D5BE;
+}
+
+.share-modal-copy {
+  background: #4A3728;
+  border: 1px solid #4A3728;
+  color: #f7ede1;
+}
+
+.share-modal-copy:hover {
+  background: #7D5A3C;
+  border-color: #7D5A3C;
+}

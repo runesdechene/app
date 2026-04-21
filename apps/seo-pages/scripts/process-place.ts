@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
 
 import { getPlaceBySlug, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from '../src/lib/places';
+import { getShareTextTemplate } from '../src/lib/appSettings';
 import { slugify } from '../src/lib/slugify';
 import { renderPage } from '../src/templates/page';
 
@@ -129,14 +130,15 @@ export async function processPlace(placeId: string): Promise<string> {
   const place = await getPlaceBySlug(slug);
   if (!place) throw new Error(`Place with slug ${slug} not found after processing`);
 
-  const [contributions, nearby, totalCount] = await Promise.all([
+  const [contributions, nearby, totalCount, shareTextTemplate] = await Promise.all([
     getPlaceContributions(place.id),
     getNearbyPlaces(place.latitude, place.longitude, place.id),
     getTotalPlaceCount(),
+    getShareTextTemplate(),
   ]);
 
   const placeCount = Math.floor(totalCount / 100) * 100;
-  const html = renderPage({ place, contributions, nearby, placeCount });
+  const html = renderPage({ place, contributions, nearby, placeCount, shareTextTemplate });
 
   const dir = join(DIST, 'lieu', slug);
   await mkdir(dir, { recursive: true });

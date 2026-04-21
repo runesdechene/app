@@ -38,40 +38,86 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
   </div>
 </nav>
 
-<div id="share-toast" class="share-toast" aria-live="polite"></div>
+<div id="share-modal" class="share-modal-backdrop" role="dialog" aria-modal="true" hidden>
+  <div class="share-modal" onclick="event.stopPropagation()">
+    <h3>Partager ce lieu</h3>
+    <textarea id="share-modal-text" readonly rows="4" class="share-modal-textarea"></textarea>
+    <div class="share-modal-actions">
+      <button id="share-modal-cancel" class="share-modal-cancel" type="button">Fermer</button>
+      <button id="share-modal-copy" class="share-modal-copy" type="button">Copier dans le presse-papier</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function() {
   var buttons = document.querySelectorAll('.share-btn-js');
-  var toast = document.getElementById('share-toast');
-  if (!buttons.length || !toast) return;
+  if (!buttons.length) return;
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('visible');
-    setTimeout(function() { toast.classList.remove('visible'); }, 2200);
-  }
+  var modal = document.getElementById('share-modal');
+  var modalTextarea = document.getElementById('share-modal-text');
+  var modalCopy = document.getElementById('share-modal-copy');
+  var modalCancel = document.getElementById('share-modal-cancel');
 
   var isMobile = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+
+  function openModal(fullText) {
+    if (!modal || !modalTextarea) return;
+    modalTextarea.value = fullText;
+    modal.removeAttribute('hidden');
+    setTimeout(function() { modalTextarea.select(); }, 50);
+  }
+
+  function closeModal() {
+    if (!modal || !modalCopy) return;
+    modal.setAttribute('hidden', '');
+    modalCopy.textContent = 'Copier dans le presse-papier';
+  }
+
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  if (modalCancel) {
+    modalCancel.addEventListener('click', closeModal);
+  }
+
+  if (modalCopy) {
+    modalCopy.addEventListener('click', async function() {
+      if (!modalTextarea) return;
+      var text = modalTextarea.value;
+      try {
+        await navigator.clipboard.writeText(text);
+        modalCopy.textContent = '✓ Copié';
+        setTimeout(closeModal, 1500);
+      } catch (err) {
+        // clipboard non disponible — textarea déjà sélectionnée, user peut Ctrl+C
+      }
+    });
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal && !modal.hasAttribute('hidden')) closeModal();
+  });
 
   buttons.forEach(function(btn) {
     btn.addEventListener('click', async function() {
       var title = btn.getAttribute('data-share-title') || '';
       var text = btn.getAttribute('data-share-text') || '';
       var url = btn.getAttribute('data-share-url') || '';
+      var fullText = text + '\n' + url;
 
       try {
         if (navigator.share && isMobile) {
           await navigator.share({ title: title, text: text, url: url });
-        } else if (navigator.clipboard) {
-          await navigator.clipboard.writeText(text + '\n' + url);
-          showToast('Message copié ✓');
         } else {
-          showToast(url);
+          openModal(fullText);
         }
       } catch (err) {
         if (err && err.name !== 'AbortError') {
-          showToast('Échec du partage');
+          openModal(fullText);
         }
       }
     });

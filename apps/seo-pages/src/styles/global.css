@@ -790,29 +790,96 @@ img { max-width: 100%; height: auto; display: block; }
   transform: scale(0.95);
 }
 
-/* Toast de confirmation partage */
-.share-toast {
+/* Modale de partage */
+.share-modal-backdrop {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  padding: 12px 20px;
-  background: #4A3728;
-  color: #f7ede1;
-  border-radius: 999px;
-  font-size: 15px;
-  font-family: 'Cabin', sans-serif;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 1000;
-  max-width: calc(100vw - 48px);
-  text-align: center;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
 }
 
-.share-toast.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+.share-modal-backdrop[hidden] {
+  display: none;
+}
+
+.share-modal {
+  background: var(--parchment);
+  border: 1px solid rgba(74, 55, 40, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-body);
+}
+
+.share-modal h3 {
+  margin: 0 0 16px 0;
+  color: var(--ink);
+  font-family: var(--font-title);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+}
+
+.share-modal-textarea {
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(74, 55, 40, 0.2);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.share-modal-textarea:focus {
+  border-color: var(--ink-light);
+}
+
+.share-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.share-modal-cancel,
+.share-modal-copy {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.share-modal-cancel {
+  background: transparent;
+  border: 1px solid rgba(74, 55, 40, 0.2);
+  color: var(--ink);
+}
+
+.share-modal-cancel:hover {
+  background: var(--parchment-dark);
+}
+
+.share-modal-copy {
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--parchment);
+}
+
+.share-modal-copy:hover {
+  background: var(--ink-light);
+  border-color: var(--ink-light);
 }
 
 .share-cta {
