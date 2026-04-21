@@ -19,6 +19,8 @@ const ICONS: Record<GameToastType['type'], string> = {
   revisit: '\uD83D\uDD04',   // flèches rotation (re-exploration)
   enigma: '\uD83D\uDD2E',  // boule de cristal (érudition)
   influence: '\uD83C\uDFF4',  // drapeau noir (influence)
+  info: '\uD83D\uDCCB',      // presse-papiers (copie, info)
+  error: '\u26A0\uFE0F',     // avertissement (erreur)
 }
 
 function formatTimeAgo(ts: number): string {
