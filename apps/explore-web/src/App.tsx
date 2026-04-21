@@ -29,6 +29,7 @@ import { OfflineIndicator } from './components/pwa/OfflineIndicator'
 import { MobileNavbar } from './components/map/MobileNavbar'
 import { MobileHeader } from './components/map/MobileHeader'
 import { useMobileNavStore } from './stores/mobileNavStore'
+import { useAppConfigStore } from './stores/appConfigStore'
 import { AdScreen } from './components/map/AdScreen'
 import { DailyEnigma } from './components/enigma/DailyEnigma'
 import { EnigmaChestButton } from './components/enigma/EnigmaChestButton'
@@ -133,6 +134,11 @@ function App() {
       setShowAuthModal(true)
     }
   }, [authLoading, isAuthenticated])
+
+  // Fetch app-wide config (share_text_template, etc.) une seule fois au mount
+  useEffect(() => {
+    useAppConfigStore.getState().fetchConfig()
+  }, [])
 
   // Flux nouveau joueur : slides "before" → onboarding → slides "after" → FactionModal
   // Edge case (existant sans nom) : useEffect auto-déclenche onboarding après fetch tutorial
