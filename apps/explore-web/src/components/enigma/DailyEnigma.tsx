@@ -61,6 +61,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
+  const [rpcError, setRpcError] = useState<string | null>(null)
   const [, setTotalGains] = useState({ influence: 0, erudition: 0 })
   const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string; adjective: string }>>(new Map())
 
@@ -84,10 +85,15 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
     setResult(null)
     setAllDone(false)
     setNoEnigma(false)
+    setRpcError(null)
     setTotalGains({ influence: 0, erudition: 0 })
 
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data, error }) => {
-      if (error) { setLoading(false); return }
+      if (error) {
+        setRpcError(`Erreur de chargement : ${error.message ?? 'RPC indisponible'}`)
+        setLoading(false)
+        return
+      }
       const d = data as Record<string, unknown>
 
       if (d.all_answered) {
@@ -109,6 +115,8 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         // Sort easy → medium → hard
         list.sort((a, b) => DIFFICULTY_ORDER.indexOf(a.difficulty) - DIFFICULTY_ORDER.indexOf(b.difficulty))
         setEnigmas(list)
+      } else {
+        setRpcError(`Format de réponse inattendu : ${JSON.stringify(d).slice(0, 200)}`)
       }
       setLoading(false)
     })
@@ -187,6 +195,14 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
           <div className="enigma-already-done">
             <p className="enigma-already-done-text">
               Plus d'énigmes disponibles pour le moment.
+            </p>
+          </div>
+        )}
+
+        {!loading && rpcError && (
+          <div className="enigma-already-done">
+            <p className="enigma-already-done-text" style={{ color: '#c94545' }}>
+              {rpcError}
             </p>
           </div>
         )}
