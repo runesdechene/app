@@ -52,6 +52,8 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
     setTimeout(function() { toast.classList.remove('visible'); }, 2200);
   }
 
+  var isMobile = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+
   buttons.forEach(function(btn) {
     btn.addEventListener('click', async function() {
       var title = btn.getAttribute('data-share-title') || '';
@@ -59,7 +61,7 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
       var url = btn.getAttribute('data-share-url') || '';
 
       try {
-        if (navigator.share) {
+        if (navigator.share && isMobile) {
           await navigator.share({ title: title, text: text, url: url });
         } else if (navigator.clipboard) {
           await navigator.clipboard.writeText(text + '\n' + url);

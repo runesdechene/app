@@ -19,8 +19,12 @@ export function ShareButton({ placeName, placeSlug }: ShareButtonProps) {
     const url = `https://carte.runesdechene.com/lieu/${placeSlug}`
     const payload = { title: placeName, text, url }
 
+    // Touch-first = mobile/tablette → share sheet natif (iOS/Android OK).
+    // Desktop → bypass navigator.share (le share sheet Windows ignore le texte au "Copier le lien").
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
     try {
-      if (navigator.share) {
+      if (navigator.share && isMobile) {
         await navigator.share(payload)
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(`${text}\n${url}`)
