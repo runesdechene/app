@@ -15,6 +15,7 @@ import type { Carnet } from './CarnetCard'
 import { InfluenceFrame } from './InfluenceFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
+import { ShareButton } from './ShareButton'
 import { useCalendarRef } from '../../hooks/useCalendarRef'
 import { formatYear } from '../../lib/calendarUtils'
 import { AddCarnetModal } from './AddCarnetModal'
@@ -662,8 +663,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           )}
         </div>
 
-        {/* Top-right: close button */}
+        {/* Top-right: share + close buttons */}
         <div className="place-hero-top-right">
+          <ShareButton placeName={place.title} placeSlug={place.slug} />
           <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
             &#10005;
           </button>

@@ -61,6 +61,7 @@ export interface PlaceDetail {
     lastName: string
     profileImageUrl: string | null
   }>
+  slug: string | null
   beginAt: string | null
   endAt: string | null
   createdAt: string | null
