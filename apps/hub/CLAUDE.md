@@ -5,12 +5,10 @@
 
 ## Mémoire projet
 
-Pour conventions, gotchas, décisions, préférences, architecture :
-
+Conventions, gotchas, décisions, préférences, architecture :
 **`~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`**
 
-Pour la structure du code : Graphify (`graphify-out/graph.json` racine monorepo).
-Pour docs externes : Context7 MCP.
+4-Layer Query Rule et règles Graphify : voir `CLAUDE.md` racine monorepo.
 
 ## Spécificités cette app
 

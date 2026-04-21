@@ -4,13 +4,10 @@
 
 ## Mémoire projet
 
-Pour tout ce qui concerne **conventions, gotchas, décisions, préférences, architecture** :
-
+Conventions, gotchas, décisions, préférences, architecture :
 **`~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`**
 
-Pour la **structure du code** : interroger Graphify (`graphify-out/graph.json` à la racine du monorepo).
-
-Pour les **docs externes** (React, Supabase, MapLibre…) : Context7 MCP.
+4-Layer Query Rule et règles Graphify : voir `CLAUDE.md` racine monorepo.
 
 ## Spécificités cette app
 
