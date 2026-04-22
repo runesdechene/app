@@ -1,0 +1,697 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.activity_log (
+  id integer NOT NULL DEFAULT nextval('activity_log_id_seq'::regclass),
+  type character varying NOT NULL,
+  actor_id character varying,
+  place_id character varying,
+  faction_id character varying,
+  data jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT activity_log_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_log_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.users(id),
+  CONSTRAINT activity_log_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT activity_log_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.ad_screens (
+  id integer NOT NULL DEFAULT nextval('ad_screens_id_seq'::regclass),
+  image_url text NOT NULL,
+  product_url text,
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  title text,
+  linked_tip_id integer,
+  CONSTRAINT ad_screens_pkey PRIMARY KEY (id),
+  CONSTRAINT ad_screens_linked_tip_id_fkey FOREIGN KEY (linked_tip_id) REFERENCES public.ad_tips(id)
+);
+CREATE TABLE public.ad_tips (
+  id integer NOT NULL DEFAULT nextval('ad_tips_id_seq'::regclass),
+  title text NOT NULL,
+  subtitle text,
+  tag character varying NOT NULL DEFAULT 'astuce'::character varying CHECK (tag::text = ANY (ARRAY['astuce'::character varying, 'anecdote'::character varying]::text[])),
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT ad_tips_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.app_settings (
+  key text NOT NULL,
+  value text NOT NULL,
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT app_settings_pkey PRIMARY KEY (key)
+);
+CREATE TABLE public.chat_messages (
+  id bigint NOT NULL DEFAULT nextval('chat_messages_id_seq'::regclass),
+  channel character varying NOT NULL,
+  user_id character varying NOT NULL,
+  user_name character varying NOT NULL,
+  faction_id character varying,
+  faction_color character varying,
+  content text NOT NULL CHECK (char_length(content) >= 1 AND char_length(content) <= 500),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  faction_pattern text,
+  CONSTRAINT chat_messages_pkey PRIMARY KEY (id),
+  CONSTRAINT chat_messages_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT chat_messages_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.construction_types (
+  level integer NOT NULL,
+  name text NOT NULL,
+  description text NOT NULL DEFAULT ''::text,
+  image_url text,
+  cost integer NOT NULL DEFAULT 1,
+  conquest_bonus integer NOT NULL DEFAULT 1,
+  tag_ids ARRAY,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT construction_types_pkey PRIMARY KEY (level)
+);
+CREATE TABLE public.contribution_votes (
+  id integer NOT NULL DEFAULT nextval('contribution_votes_id_seq'::regclass),
+  contribution_id integer NOT NULL,
+  user_id character varying NOT NULL,
+  vote smallint NOT NULL CHECK (vote = ANY (ARRAY['-1'::integer, 1])),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT contribution_votes_pkey PRIMARY KEY (id),
+  CONSTRAINT contribution_votes_contribution_id_fkey FOREIGN KEY (contribution_id) REFERENCES public.place_contributions(id),
+  CONSTRAINT contribution_votes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.enigma_responses (
+  id integer NOT NULL DEFAULT nextval('enigma_responses_id_seq'::regclass),
+  enigma_id integer NOT NULL,
+  user_id character varying NOT NULL,
+  answer_given text NOT NULL,
+  correct boolean NOT NULL,
+  influence_gained integer NOT NULL DEFAULT 0,
+  erudition_gained integer NOT NULL DEFAULT 0,
+  responded_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT enigma_responses_pkey PRIMARY KEY (id),
+  CONSTRAINT enigma_responses_enigma_id_fkey FOREIGN KEY (enigma_id) REFERENCES public.enigmas(id),
+  CONSTRAINT enigma_responses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.enigmas (
+  id integer NOT NULL DEFAULT nextval('enigmas_id_seq'::regclass),
+  type text NOT NULL CHECK (type = ANY (ARRAY['daily'::text, 'place'::text, 'fragment'::text])),
+  difficulty text NOT NULL CHECK (difficulty = ANY (ARRAY['very_easy'::text, 'easy'::text, 'medium'::text, 'hard'::text])),
+  heritage_id character varying,
+  place_tag text,
+  lore_text text NOT NULL,
+  question text NOT NULL,
+  format text NOT NULL CHECK (format = ANY (ARRAY['qcm'::text, 'free'::text])),
+  choices jsonb,
+  answer text NOT NULL,
+  explanation text NOT NULL,
+  active boolean NOT NULL DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  fragment_id integer,
+  CONSTRAINT enigmas_pkey PRIMARY KEY (id),
+  CONSTRAINT enigmas_heritage_id_fkey FOREIGN KEY (heritage_id) REFERENCES public.factions(id),
+  CONSTRAINT enigmas_fragment_id_fkey FOREIGN KEY (fragment_id) REFERENCES public.title_fragments(id)
+);
+CREATE TABLE public.eras (
+  id character varying NOT NULL,
+  name character varying NOT NULL,
+  year_start integer,
+  year_end integer,
+  sort_order smallint NOT NULL,
+  CONSTRAINT eras_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.faction_tag_bonuses (
+  faction_id character varying NOT NULL,
+  tag_id character varying NOT NULL,
+  cost_reduction numeric NOT NULL DEFAULT 0,
+  CONSTRAINT faction_tag_bonuses_pkey PRIMARY KEY (faction_id, tag_id),
+  CONSTRAINT faction_tag_bonuses_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id),
+  CONSTRAINT faction_tag_bonuses_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id)
+);
+CREATE TABLE public.factions (
+  id character varying NOT NULL,
+  title character varying NOT NULL,
+  color character varying NOT NULL DEFAULT '#C19A6B'::character varying,
+  pattern character varying,
+  order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  description text,
+  image_url text,
+  bonus_energy numeric NOT NULL DEFAULT 0,
+  bonus_conquest numeric NOT NULL DEFAULT 0,
+  bonus_construction numeric NOT NULL DEFAULT 0,
+  bonus_regen numeric NOT NULL DEFAULT 0,
+  bonus_regen_energy numeric NOT NULL DEFAULT 0,
+  bonus_regen_conquest numeric NOT NULL DEFAULT 0,
+  bonus_regen_construction numeric NOT NULL DEFAULT 0,
+  bonus_vitalite numeric DEFAULT 0,
+  bonus_regen_vitalite numeric DEFAULT 0,
+  adjective character varying DEFAULT ''::character varying,
+  CONSTRAINT factions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.fragment_ability_uses (
+  user_id character varying NOT NULL,
+  fragment_id integer NOT NULL,
+  used_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT fragment_ability_uses_pkey PRIMARY KEY (user_id, fragment_id),
+  CONSTRAINT fragment_ability_uses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT fragment_ability_uses_fragment_id_fkey FOREIGN KEY (fragment_id) REFERENCES public.title_fragments(id)
+);
+CREATE TABLE public.fragment_tag_affinities (
+  fragment_id integer NOT NULL,
+  tag_id character varying NOT NULL,
+  bonus_points integer NOT NULL DEFAULT 3,
+  CONSTRAINT fragment_tag_affinities_pkey PRIMARY KEY (fragment_id, tag_id),
+  CONSTRAINT fragment_tag_affinities_fragment_id_fkey FOREIGN KEY (fragment_id) REFERENCES public.title_fragments(id),
+  CONSTRAINT fragment_tag_affinities_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id)
+);
+CREATE TABLE public.fragment_words (
+  id integer NOT NULL DEFAULT nextval('fragment_words_id_seq'::regclass),
+  fragment_id integer NOT NULL,
+  word character varying NOT NULL,
+  slot character varying NOT NULL CHECK (slot::text = ANY (ARRAY['nom'::character varying, 'epithete'::character varying, 'connecteur'::character varying]::text[])),
+  gender character varying DEFAULT 'n'::character varying CHECK (gender::text = ANY (ARRAY['m'::character varying, 'f'::character varying, 'n'::character varying]::text[])),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT fragment_words_pkey PRIMARY KEY (id),
+  CONSTRAINT fragment_words_fragment_id_fkey FOREIGN KEY (fragment_id) REFERENCES public.title_fragments(id)
+);
+CREATE TABLE public.hub_community_photos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id character varying,
+  user_email text,
+  image_url text NOT NULL,
+  caption text,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text])),
+  moderated_by character varying,
+  moderated_at timestamp with time zone,
+  rejection_reason text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hub_community_photos_pkey PRIMARY KEY (id),
+  CONSTRAINT hub_community_photos_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT hub_community_photos_moderated_by_fkey FOREIGN KEY (moderated_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.hub_photo_submission_tags (
+  submission_id uuid NOT NULL,
+  tag_id uuid NOT NULL,
+  CONSTRAINT hub_photo_submission_tags_pkey PRIMARY KEY (submission_id, tag_id),
+  CONSTRAINT hub_photo_submission_tags_submission_id_fkey FOREIGN KEY (submission_id) REFERENCES public.hub_photo_submissions(id),
+  CONSTRAINT hub_photo_submission_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.hub_photo_tags(id)
+);
+CREATE TABLE public.hub_photo_submissions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id character varying,
+  submitter_name text NOT NULL,
+  submitter_email text NOT NULL,
+  submitter_instagram text,
+  message text CHECK (char_length(message) <= 500),
+  consent_brand_usage boolean NOT NULL DEFAULT false,
+  consent_account_creation boolean NOT NULL DEFAULT false,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'archived'::text])),
+  moderated_by character varying,
+  moderated_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  submitter_role text DEFAULT 'client'::text CHECK (submitter_role = ANY (ARRAY['client'::text, 'ambassadeur'::text, 'partenaire'::text])),
+  location_name text,
+  location_zip text,
+  product_size text,
+  model_height_cm numeric,
+  model_shoulder_width_cm numeric,
+  product_worn text,
+  CONSTRAINT hub_photo_submissions_pkey PRIMARY KEY (id),
+  CONSTRAINT hub_photo_submissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT hub_photo_submissions_moderated_by_fkey FOREIGN KEY (moderated_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.hub_photo_tags (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hub_photo_tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.hub_review_submissions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id character varying,
+  submitter_name text NOT NULL,
+  submitter_email text NOT NULL,
+  location_name text NOT NULL,
+  location_zip text NOT NULL,
+  review_text text NOT NULL CHECK (char_length(review_text) <= 2000),
+  rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'archived'::text])),
+  moderated_by character varying,
+  moderated_at timestamp with time zone,
+  rejection_reason text,
+  created_at timestamp with time zone DEFAULT now(),
+  purchase_status text DEFAULT 'owner'::text CHECK (purchase_status = ANY (ARRAY['owner'::text, 'planning'::text, 'no'::text])),
+  consent_account boolean NOT NULL DEFAULT false,
+  consent_republish boolean NOT NULL DEFAULT false,
+  image_url text,
+  storage_path text,
+  CONSTRAINT hub_review_submissions_pkey PRIMARY KEY (id),
+  CONSTRAINT hub_review_submissions_moderated_by_fkey FOREIGN KEY (moderated_by) REFERENCES public.users(id),
+  CONSTRAINT hub_review_submissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.hub_submission_images (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  submission_id uuid NOT NULL,
+  storage_path text NOT NULL,
+  image_url text NOT NULL,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hub_submission_images_pkey PRIMARY KEY (id),
+  CONSTRAINT hub_submission_images_submission_id_fkey FOREIGN KEY (submission_id) REFERENCES public.hub_photo_submissions(id)
+);
+CREATE TABLE public.image_media (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  variants jsonb NOT NULL,
+  CONSTRAINT image_media_pkey PRIMARY KEY (id),
+  CONSTRAINT image_media_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.member_codes (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying UNIQUE,
+  code character varying NOT NULL UNIQUE,
+  is_consumed boolean NOT NULL,
+  CONSTRAINT member_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT member_codes_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.mikro_orm_migrations (
+  id integer NOT NULL DEFAULT nextval('mikro_orm_migrations_id_seq'::regclass),
+  name character varying,
+  executed_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT mikro_orm_migrations_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.notifications (
+  id integer NOT NULL DEFAULT nextval('notifications_id_seq'::regclass),
+  recipient_id text NOT NULL,
+  type text NOT NULL,
+  data jsonb NOT NULL DEFAULT '{}'::jsonb,
+  read boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT notifications_pkey PRIMARY KEY (id),
+  CONSTRAINT notifications_recipient_id_fkey FOREIGN KEY (recipient_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.password_resets (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  code character varying NOT NULL,
+  expires_at timestamp with time zone NOT NULL,
+  is_consumed boolean NOT NULL,
+  CONSTRAINT password_resets_pkey PRIMARY KEY (id),
+  CONSTRAINT password_resets_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.place_claims (
+  id integer NOT NULL DEFAULT nextval('place_claims_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  user_id character varying NOT NULL,
+  faction_id character varying NOT NULL,
+  claimed_at timestamp with time zone NOT NULL DEFAULT now(),
+  previous_faction_id character varying,
+  previous_claimed_by character varying,
+  CONSTRAINT place_claims_pkey PRIMARY KEY (id),
+  CONSTRAINT place_claims_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_claims_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT place_claims_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.place_contributions (
+  id integer NOT NULL DEFAULT nextval('place_contributions_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  user_id character varying NOT NULL,
+  faction_id character varying,
+  type text NOT NULL CHECK (type = ANY (ARRAY['carnet'::text, 'photo'::text, 'accessibility'::text, 'season'::text, 'warning'::text, 'epoch'::text])),
+  content text,
+  image_url text,
+  rating smallint CHECK (rating >= 1 AND rating <= 5),
+  votes_up integer NOT NULL DEFAULT 0,
+  votes_down integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  images jsonb DEFAULT '[]'::jsonb,
+  title text,
+  CONSTRAINT place_contributions_pkey PRIMARY KEY (id),
+  CONSTRAINT place_contributions_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_contributions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT place_contributions_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.place_explorers (
+  id integer NOT NULL DEFAULT nextval('place_explorers_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  user_id character varying NOT NULL,
+  visited_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT place_explorers_pkey PRIMARY KEY (id),
+  CONSTRAINT place_explorers_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_explorers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.place_influence (
+  id integer NOT NULL DEFAULT nextval('place_influence_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  faction_id character varying NOT NULL,
+  placed_points integer NOT NULL DEFAULT 0,
+  content_points integer NOT NULL DEFAULT 0,
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  permanent_points integer NOT NULL DEFAULT 0,
+  CONSTRAINT place_influence_pkey PRIMARY KEY (id),
+  CONSTRAINT place_influence_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_influence_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.place_ratings (
+  id integer NOT NULL DEFAULT nextval('place_ratings_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  user_id character varying NOT NULL,
+  rating smallint NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT place_ratings_pkey PRIMARY KEY (id),
+  CONSTRAINT place_ratings_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.place_tags (
+  place_id character varying NOT NULL,
+  tag_id character varying NOT NULL,
+  is_primary boolean NOT NULL DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT place_tags_pkey PRIMARY KEY (place_id, tag_id),
+  CONSTRAINT place_tags_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT place_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id)
+);
+CREATE TABLE public.place_types (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  parent_id character varying,
+  title character varying NOT NULL,
+  form_description character varying NOT NULL,
+  long_description character varying NOT NULL,
+  images jsonb NOT NULL,
+  color character varying NOT NULL,
+  order integer NOT NULL,
+  background character varying,
+  border character varying,
+  faded_color character varying,
+  hidden boolean DEFAULT false,
+  CONSTRAINT place_types_pkey PRIMARY KEY (id),
+  CONSTRAINT place_types_parent_id_foreign FOREIGN KEY (parent_id) REFERENCES public.place_types(id)
+);
+CREATE TABLE public.place_wishlist (
+  id integer NOT NULL DEFAULT nextval('place_wishlist_id_seq'::regclass),
+  place_id character varying NOT NULL,
+  user_id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT place_wishlist_pkey PRIMARY KEY (id),
+  CONSTRAINT place_wishlist_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT place_wishlist_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id)
+);
+CREATE TABLE public.places (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  author_id character varying NOT NULL,
+  place_type_id character varying NOT NULL,
+  title character varying NOT NULL,
+  text text NOT NULL,
+  address character varying NOT NULL,
+  latitude real NOT NULL,
+  longitude real NOT NULL,
+  private boolean NOT NULL,
+  masked boolean NOT NULL,
+  images jsonb NOT NULL,
+  accessibility character varying,
+  best_season character varying,
+  geocaching text,
+  bivouac text,
+  sensible boolean DEFAULT false,
+  begin_at timestamp with time zone,
+  end_at timestamp with time zone,
+  faction_id character varying,
+  claimed_by character varying,
+  claimed_at timestamp with time zone,
+  fortification_level integer NOT NULL DEFAULT 0,
+  claimed_avatar_url text,
+  era_id character varying,
+  year_exact integer,
+  slug text UNIQUE,
+  seo_description text,
+  seo_generated_at timestamp with time zone,
+  CONSTRAINT places_pkey PRIMARY KEY (id),
+  CONSTRAINT places_author_id_foreign FOREIGN KEY (author_id) REFERENCES public.users(id),
+  CONSTRAINT places_place_type_id_foreign FOREIGN KEY (place_type_id) REFERENCES public.place_types(id),
+  CONSTRAINT places_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id),
+  CONSTRAINT places_claimed_by_fkey FOREIGN KEY (claimed_by) REFERENCES public.users(id),
+  CONSTRAINT places_era_id_fkey FOREIGN KEY (era_id) REFERENCES public.eras(id)
+);
+CREATE TABLE public.places_bookmarked (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  CONSTRAINT places_bookmarked_pkey PRIMARY KEY (id),
+  CONSTRAINT places_bookmarked_place_id_foreign FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT places_bookmarked_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.places_discovered (
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  method character varying NOT NULL DEFAULT 'remote'::character varying,
+  discovered_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT places_discovered_pkey PRIMARY KEY (user_id, place_id),
+  CONSTRAINT places_discovered_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT places_discovered_place_id_fkey FOREIGN KEY (place_id) REFERENCES public.places(id)
+);
+CREATE TABLE public.places_explored (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  CONSTRAINT places_explored_pkey PRIMARY KEY (id),
+  CONSTRAINT places_explored_place_id_foreign FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT places_explored_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.places_liked (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  CONSTRAINT places_liked_pkey PRIMARY KEY (id),
+  CONSTRAINT places_liked_place_id_foreign FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT places_liked_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.places_viewed (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  CONSTRAINT places_viewed_pkey PRIMARY KEY (id),
+  CONSTRAINT places_viewed_place_id_foreign FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT places_viewed_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.purchase_log (
+  id integer NOT NULL DEFAULT nextval('purchase_log_id_seq'::regclass),
+  email character varying,
+  shopify_order_id character varying,
+  shopify_tag character varying,
+  unlock_type character varying,
+  unlock_ref_id integer,
+  user_id character varying,
+  status character varying NOT NULL DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['unlocked'::character varying, 'pending'::character varying, 'manual'::character varying, 'skipped'::character varying, 'no_match'::character varying, 'no_tags'::character varying]::text[])),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT purchase_log_pkey PRIMARY KEY (id),
+  CONSTRAINT purchase_log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.refresh_tokens (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  value character varying NOT NULL UNIQUE,
+  expires_at timestamp with time zone NOT NULL,
+  disabled boolean NOT NULL,
+  CONSTRAINT refresh_tokens_pkey PRIMARY KEY (id),
+  CONSTRAINT refresh_tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.reviews (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL,
+  updated_at timestamp with time zone NOT NULL,
+  user_id character varying NOT NULL,
+  place_id character varying NOT NULL,
+  score integer NOT NULL,
+  message text NOT NULL,
+  geocache boolean DEFAULT false,
+  CONSTRAINT reviews_pkey PRIMARY KEY (id),
+  CONSTRAINT reviews_place_id_foreign FOREIGN KEY (place_id) REFERENCES public.places(id),
+  CONSTRAINT reviews_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.reviews_images (
+  review_id character varying NOT NULL,
+  image_media_id character varying NOT NULL,
+  CONSTRAINT reviews_images_pkey PRIMARY KEY (review_id, image_media_id),
+  CONSTRAINT reviews_images_image_media_id_foreign FOREIGN KEY (image_media_id) REFERENCES public.image_media(id),
+  CONSTRAINT reviews_images_review_id_foreign FOREIGN KEY (review_id) REFERENCES public.reviews(id)
+);
+CREATE TABLE public.shopify_unlocks (
+  id integer NOT NULL DEFAULT nextval('shopify_unlocks_id_seq'::regclass),
+  shopify_tag character varying NOT NULL,
+  unlock_type character varying NOT NULL DEFAULT 'fragment'::character varying CHECK (unlock_type::text = ANY (ARRAY['fragment'::character varying, 'item'::character varying, 'boost'::character varying]::text[])),
+  unlock_ref_id integer NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT shopify_unlocks_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.tag_gauge_mapping (
+  tag_id character varying NOT NULL,
+  gauge character varying NOT NULL DEFAULT 'energy'::character varying CHECK (gauge::text = ANY (ARRAY['energy'::character varying, 'conquest'::character varying, 'construction'::character varying, 'vitalite'::character varying]::text[])),
+  CONSTRAINT tag_gauge_mapping_pkey PRIMARY KEY (tag_id),
+  CONSTRAINT tag_gauge_mapping_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tags(id)
+);
+CREATE TABLE public.tags (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  title character varying NOT NULL,
+  color character varying NOT NULL DEFAULT '#C19A6B'::character varying,
+  background character varying NOT NULL DEFAULT '#F5E6D3'::character varying,
+  icon character varying,
+  order integer NOT NULL DEFAULT 0,
+  reward_energy integer NOT NULL DEFAULT 0,
+  reward_conquest integer NOT NULL DEFAULT 0,
+  reward_construction integer NOT NULL DEFAULT 0,
+  gauge character varying NOT NULL DEFAULT 'energy'::character varying CHECK (gauge::text = ANY (ARRAY['energy'::character varying, 'conquest'::character varying, 'construction'::character varying, 'vitalite'::character varying]::text[])),
+  base_cost numeric NOT NULL DEFAULT 1.0,
+  CONSTRAINT tags_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.territory_name_proposals (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  anchor_place_id character varying NOT NULL,
+  proposed_by character varying NOT NULL,
+  name character varying NOT NULL CHECK (length(TRIM(BOTH FROM name)) >= 3),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT territory_name_proposals_pkey PRIMARY KEY (id),
+  CONSTRAINT territory_name_proposals_proposed_by_fkey FOREIGN KEY (proposed_by) REFERENCES public.users(id)
+);
+CREATE TABLE public.territory_name_votes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  proposal_id uuid NOT NULL,
+  voter_id character varying NOT NULL,
+  value smallint NOT NULL CHECK (value <> 0),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT territory_name_votes_pkey PRIMARY KEY (id),
+  CONSTRAINT territory_name_votes_proposal_id_fkey FOREIGN KEY (proposal_id) REFERENCES public.territory_name_proposals(id),
+  CONSTRAINT territory_name_votes_voter_id_fkey FOREIGN KEY (voter_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.territory_tiers (
+  id integer NOT NULL DEFAULT nextval('territory_tiers_id_seq'::regclass),
+  min_places integer NOT NULL UNIQUE,
+  title character varying NOT NULL,
+  CONSTRAINT territory_tiers_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.title_fragments (
+  id integer NOT NULL DEFAULT nextval('title_fragments_id_seq'::regclass),
+  name character varying NOT NULL,
+  description text,
+  icon character varying,
+  collection character varying,
+  bonus_type character varying,
+  bonus_value numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  image_url text,
+  link_url text,
+  visible boolean NOT NULL DEFAULT true,
+  icon_url text,
+  ability_type character varying DEFAULT NULL::character varying,
+  ability_cooldown_hours integer DEFAULT 24,
+  ability_value numeric DEFAULT 0,
+  CONSTRAINT title_fragments_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.titles (
+  id integer NOT NULL DEFAULT nextval('titles_id_seq'::regclass),
+  name character varying NOT NULL,
+  type character varying NOT NULL CHECK (type::text = ANY (ARRAY['general'::character varying, 'faction'::character varying]::text[])),
+  faction_id character varying,
+  order integer NOT NULL DEFAULT 0,
+  icon character varying,
+  unlocks ARRAY DEFAULT '{}'::text[],
+  created_at timestamp with time zone DEFAULT now(),
+  condition jsonb NOT NULL DEFAULT '{"min": 0, "stat": "discoveries"}'::jsonb,
+  description text,
+  CONSTRAINT titles_pkey PRIMARY KEY (id),
+  CONSTRAINT titles_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
+CREATE TABLE public.tutorial_slides (
+  id integer NOT NULL DEFAULT nextval('tutorial_slides_id_seq'::regclass),
+  phase text NOT NULL CHECK (phase = ANY (ARRAY['before'::text, 'after'::text])),
+  position integer NOT NULL,
+  title text NOT NULL,
+  body text NOT NULL,
+  image_url text,
+  active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT tutorial_slides_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_fragments (
+  user_id character varying NOT NULL,
+  fragment_id integer NOT NULL,
+  unlocked_at timestamp with time zone DEFAULT now(),
+  source character varying NOT NULL DEFAULT 'manual'::character varying CHECK (source::text = ANY (ARRAY['manual'::character varying, 'shopify'::character varying, 'achievement'::character varying]::text[])),
+  CONSTRAINT user_fragments_pkey PRIMARY KEY (user_id, fragment_id),
+  CONSTRAINT user_fragments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT user_fragments_fragment_id_fkey FOREIGN KEY (fragment_id) REFERENCES public.title_fragments(id)
+);
+CREATE TABLE public.users (
+  id character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  email_address character varying NOT NULL UNIQUE,
+  password character varying,
+  first_name character varying,
+  role character varying NOT NULL,
+  gender character varying,
+  rank character varying NOT NULL DEFAULT 'guest'::character varying,
+  biography character varying NOT NULL DEFAULT ''::character varying,
+  instagram_id character varying,
+  website_url character varying,
+  last_access timestamp with time zone,
+  last_device_os character varying,
+  last_device_version character varying,
+  display_name text,
+  bio text,
+  avatar_url text,
+  is_active boolean DEFAULT true,
+  last_login_at timestamp with time zone,
+  instagram text,
+  location_name text,
+  location_zip text,
+  faction_id character varying,
+  energy_points numeric NOT NULL DEFAULT 5,
+  energy_reset_at timestamp with time zone NOT NULL DEFAULT now(),
+  conquest_points numeric NOT NULL DEFAULT 0,
+  construction_points numeric NOT NULL DEFAULT 0,
+  conquest_reset_at timestamp with time zone DEFAULT now(),
+  construction_reset_at timestamp with time zone DEFAULT now(),
+  notoriety_points integer NOT NULL DEFAULT 0,
+  max_energy numeric NOT NULL DEFAULT 3.0,
+  max_conquest numeric NOT NULL DEFAULT 3.0,
+  max_construction numeric NOT NULL DEFAULT 3.0,
+  displayed_general_title_ids ARRAY DEFAULT '{}'::integer[],
+  game_mode character varying DEFAULT 'exploration'::character varying,
+  displayed_title_ids_v3 ARRAY DEFAULT '{}'::integer[],
+  vitalite_points numeric DEFAULT 5.0,
+  max_vitalite numeric DEFAULT 3.0,
+  vitalite_reset_at timestamp with time zone DEFAULT now(),
+  shopify_customer_id bigint,
+  account_source character varying DEFAULT 'app'::character varying CHECK (account_source::text = ANY (ARRAY['app'::character varying, 'shopify'::character varying]::text[])),
+  exploration_points integer NOT NULL DEFAULT 0,
+  erudition_points integer NOT NULL DEFAULT 0,
+  influence_stock integer NOT NULL DEFAULT 0,
+  faction_changed_at timestamp with time zone,
+  tutorial_completed_at timestamp with time zone,
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_faction_id_fkey FOREIGN KEY (faction_id) REFERENCES public.factions(id)
+);
