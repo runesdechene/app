@@ -75,9 +75,6 @@ export function Sidebar({ user }: SidebarProps) {
         </NavLink>
 
         <div className="sidebar-section-label">Shopify</div>
-        <NavLink to="/shopify/connect" className={({ isActive }) => isActive ? 'active' : ''}>
-          Connexion Shopify
-        </NavLink>
         <NavLink to="/shopify/sync" className={({ isActive }) => isActive ? 'active' : ''}>
           Synchro Emails
         </NavLink>

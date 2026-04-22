@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 interface ShopifyCustomer {
@@ -26,27 +26,23 @@ interface CrossResult {
 type FilterMode = 'all' | 'both' | 'shopify_only' | 'app_only'
 
 export function ShopifySync() {
-  const [token, setToken] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [results, setResults] = useState<CrossResult[]>([])
   const [filter, setFilter] = useState<FilterMode>('all')
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    supabase.from('app_settings').select('value').eq('key', 'shopify_access_token').single()
-      .then(({ data }) => {
-        if (data?.value) setToken(data.value)
-        setLoading(false)
-      })
-  }, [])
-
   async function fetchAllShopifyCustomers(): Promise<ShopifyCustomer[]> {
+    const { data: { session } } = await supabase.auth.getSession()
+    const jwt = session?.access_token
+    if (!jwt) throw new Error('Session expirée')
+
     const all: ShopifyCustomer[] = []
     let nextUrl: string | null = 'customers.json?limit=250&fields=id,email,first_name,last_name,orders_count,tags,created_at'
 
     while (nextUrl) {
-      const resp = await fetch(`/.netlify/functions/shopify-proxy?endpoint=${encodeURIComponent(nextUrl)}&token=${encodeURIComponent(token!)}&shop=runes-de-chene.myshopify.com`)
+      const resp: Response = await fetch(`/.netlify/functions/shopify-proxy?endpoint=${encodeURIComponent(nextUrl)}&shop=runes-de-chene.myshopify.com`, {
+        headers: { 'Authorization': `Bearer ${jwt}` },
+      })
 
       if (!resp.ok) break
 
@@ -76,7 +72,6 @@ export function ShopifySync() {
   }
 
   async function runSync() {
-    if (!token) return
     setSyncing(true)
 
     try {
@@ -165,7 +160,6 @@ export function ShopifySync() {
   const [importError, setImportError] = useState<string | null>(null)
 
   async function runImport() {
-    if (!token) return
     setImporting(true)
     setImportError(null)
     setImportResult(null)
@@ -184,7 +178,7 @@ export function ShopifySync() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ token, shop: 'runes-de-chene.myshopify.com' }),
+        body: JSON.stringify({ shop: 'runes-de-chene.myshopify.com' }),
       })
 
       const data = await resp.json()
@@ -207,7 +201,6 @@ export function ShopifySync() {
   const [tagDone, setTagDone] = useState(false)
 
   async function runSourceTagging() {
-    if (!token) return
     setTagging(true)
     setTagDone(false)
     setTagProgress({ done: 0, total: 0, errors: 0, skipped: 0 })
@@ -370,17 +363,6 @@ export function ShopifySync() {
     } finally {
       setTagging(false)
     }
-  }
-
-  if (loading) return <div className="section"><p>Chargement...</p></div>
-
-  if (!token) {
-    return (
-      <div className="section">
-        <h1>Synchronisation Shopify</h1>
-        <p>Connectez d'abord Shopify depuis la page <a href="/shopify/connect">Connexion Shopify</a>.</p>
-      </div>
-    )
   }
 
   return (

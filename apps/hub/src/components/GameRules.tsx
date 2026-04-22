@@ -41,7 +41,6 @@ const DEAD_KEYS = new Set([
   'fragment_collection_2',
   'fragment_collection_3',
   'fragment_collection_4',
-  'shopify_access_token',
   'shopify_shop',
   'unknown_place_icon',
   'ad_screen_duration',

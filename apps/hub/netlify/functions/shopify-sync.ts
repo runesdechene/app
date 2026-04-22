@@ -84,17 +84,26 @@ export default async function handler(request: Request) {
   const auth = await requireAdmin(request)
   if ('error' in auth) return json({ error: auth.error }, auth.status)
 
-  let token: string, shop: string
-  try {
-    const body = await request.json()
-    token = body.token
-    shop = body.shop
-  } catch {
-    return json({ error: 'Invalid JSON body' }, 400)
+  // Token depuis env Netlify (fallback app_settings pendant transition)
+  let token: string | null = process.env.SHOPIFY_ACCESS_TOKEN || null
+  if (!token) {
+    const settingsResp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    })
+    const settings = await settingsResp.json()
+    token = Array.isArray(settings) && settings.length > 0 ? settings[0].value : null
   }
 
-  if (!token || !shop) {
-    return json({ error: 'Missing token or shop' }, 400)
+  let shop: string
+  try {
+    const body = await request.json()
+    shop = body.shop || 'runes-de-chene.myshopify.com'
+  } catch {
+    shop = 'runes-de-chene.myshopify.com'
+  }
+
+  if (!token) {
+    return json({ error: 'SHOPIFY_ACCESS_TOKEN not configured' }, 500)
   }
 
   try {

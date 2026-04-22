@@ -52,6 +52,9 @@ async function supabasePatch(path: string, body: unknown) {
 const SHOP = 'runes-de-chene.myshopify.com'
 
 async function getShopifyToken(): Promise<string | null> {
+  const fromEnv = process.env.SHOPIFY_ACCESS_TOKEN
+  if (fromEnv) return fromEnv
+  // Fallback temporaire app_settings pendant la transition
   const resp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
   })

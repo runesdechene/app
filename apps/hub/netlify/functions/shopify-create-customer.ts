@@ -40,15 +40,15 @@ export default async function handler(request: Request) {
 
   if (!email) return json({ error: 'Missing email' }, 400)
 
-  // Récupérer le token Shopify depuis app_settings
-  const settingsResp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-    },
-  })
-  const settings = await settingsResp.json()
-  const shopifyToken = Array.isArray(settings) && settings.length > 0 ? settings[0].value : null
+  // Token depuis env Netlify (fallback app_settings pendant transition)
+  let shopifyToken: string | null = process.env.SHOPIFY_ACCESS_TOKEN || null
+  if (!shopifyToken) {
+    const settingsResp = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?key=eq.shopify_access_token&select=value&limit=1`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    })
+    const settings = await settingsResp.json()
+    shopifyToken = Array.isArray(settings) && settings.length > 0 ? settings[0].value : null
+  }
 
   if (!shopifyToken) {
     return json({ error: 'Shopify not connected' }, 500)
