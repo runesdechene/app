@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'Runes de Chêne',
         short_name: 'Runes de Chêne',
-        description: 'Explorez 2400 lieux de patrimoine historique et naturel',
+        description: "App d'Aventure locale. 2 600+ lieux d'Histoire et de Nature à redécouvrir avec la Confrérie.",
         theme_color: '#f8f3e7',
         background_color: '#f8f3e7',
         display: 'standalone',

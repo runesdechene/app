@@ -182,3 +182,11 @@
     font-size: clamp(1.6rem, 7vw, 2.4rem);
   }
 }
+
+@media screen and (max-width: 749px) { 
+  .landing-content__cta {
+    min-height: 34px;
+    padding: 1rem 1rem;
+    font-size: 0.9rem;
+  }
+}

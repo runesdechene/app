@@ -117,6 +117,13 @@
   pointer-events: none;
 }
 
+@media screen and (max-width: 749px)
+{
+  .landing__footer {
+    font-size: 0.5rem;
+  }
+}
+
 /* Lien Boutique — haut-droite sur l'image Friedrich, équilibre la toast en bas-droite */
 .landing__shop-link {
   position: absolute;
