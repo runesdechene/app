@@ -1,0 +1,55 @@
+.landing-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.landing-image--placeholder {
+  background-color: #d4cab8;
+}
+
+.landing-image__picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-image__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  animation: landingImageKenBurns 20s ease-in-out infinite alternate;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+@keyframes landingImageKenBurns {
+  from { transform: scale(1.00); }
+  to   { transform: scale(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-image__img {
+    animation: none;
+  }
+}
+
+.landing-image__frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.landing-image__frame-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}

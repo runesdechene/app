@@ -1,0 +1,103 @@
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: min(560px, 100%);
+  color: #46352e;
+  text-align: left;
+}
+
+.landing-content__overline {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #46352e;
+  font-weight: 600;
+}
+
+.landing-content__title {
+  margin: 0;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: 0.005em;
+  font-weight: 700;
+  color: #963e3e;
+  text-wrap: balance;
+}
+
+.landing-content__subtitle {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.55;
+  color: #46352e;
+  opacity: 0.92;
+  font-weight: 400;
+}
+
+.landing-content__pitch {
+  margin: 0;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: #46352e;
+  font-weight: 600;
+}
+
+.landing-content__perks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  align-items: flex-start;
+}
+
+.landing-content__perk {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--perk-color);
+  background-color: rgba(var(--perk-rgb), 0.14);
+  border: 1.5px solid rgba(var(--perk-rgb), 0.4);
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.landing-content__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  min-height: 52px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1.5px solid #2a2418;
+  background-color: #2a2418;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 320px;
+  font-family: inherit;
+}
+
+.landing-content__cta:hover {
+  background-color: rgba(42, 36, 24, 0.85);
+  border-color: rgba(42, 36, 24, 0.85);
+  transform: translateY(-2px);
+}
+
+@media screen and (max-width: 749px) {
+  .landing-content__perk {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.7rem;
+  }
+  .landing-content__title {
+    font-size: clamp(1.6rem, 7vw, 2.4rem);
+  }
+}
