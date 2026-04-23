@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useAuthForm } from '../../hooks/useAuthForm'
 import logoImg from '../../assets/logo_couleur.webp'
 import changelogRaw from '../../../CHANGELOG.md?raw'
 import './AuthModal.css'
@@ -10,14 +11,15 @@ interface AuthModalProps {
   onClose: () => void
 }
 
-type Step = 'form' | 'sent'
-
 export function AuthModal({ onClose }: AuthModalProps) {
-  const [email, setEmail] = useState('')
-  const [code, setCode] = useState('')
-  const [step, setStep] = useState<Step>('form')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    email, setEmail,
+    code, setCode,
+    step, setStep,
+    loading, error,
+    requestCode, verifyCode,
+  } = useAuthForm({ onSuccess: onClose })
+
   const [placesCount, setPlacesCount] = useState<number | null>(null)
 
   useEffect(() => {
@@ -26,44 +28,14 @@ export function AuthModal({ onClose }: AuthModalProps) {
     })
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
-    })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      setStep('sent')
-      setError(null)
-    }
-    setLoading(false)
+    void requestCode()
   }
 
-  const handleVerifyCode = async (e: React.FormEvent) => {
+  function handleVerifyCode(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: code,
-      type: 'email',
-    })
-
-    if (error) {
-      setError('Code invalide ou expiré')
-    } else {
-      onClose()
-    }
-    setLoading(false)
+    void verifyCode()
   }
 
   return (
@@ -120,7 +92,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
             <button
               className="auth-modal-link"
-              onClick={() => { if (email) { setStep('sent'); setError(null) } }}
+              onClick={() => { if (email) setStep('sent') }}
               disabled={!email}
             >
               J'ai déjà un code
@@ -170,7 +142,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
             <button
               className="auth-modal-retry"
-              onClick={() => { setStep('form'); setCode(''); setError(null) }}
+              onClick={() => { setStep('form'); setCode('') }}
             >
               Changer d'email
             </button>

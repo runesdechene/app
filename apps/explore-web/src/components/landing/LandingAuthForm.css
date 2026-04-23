@@ -1,0 +1,143 @@
+.landing-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: min(420px, 100%);
+  color: #46352e;
+}
+
+.landing-auth__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: #46352e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  width: fit-content;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+  font-family: inherit;
+}
+
+.landing-auth__back:hover {
+  opacity: 1;
+}
+
+.landing-auth__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #963e3e;
+  font-weight: 700;
+}
+
+.landing-auth__hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #46352e;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.landing-auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.landing-auth__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.landing-auth__field input {
+  padding: 0.625rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1.5px solid rgba(70, 53, 46, 0.3);
+  border-radius: 8px;
+  background: #fff;
+  color: #46352e;
+  transition: border-color 0.2s ease;
+}
+
+.landing-auth__field input:focus {
+  outline: none;
+  border-color: #46352e;
+}
+
+.landing-auth__field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.landing-auth__code {
+  text-align: center;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.4em;
+  font-weight: 700;
+}
+
+.landing-auth__error {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.85rem;
+  color: #a13030;
+  background: rgba(161, 48, 48, 0.08);
+  border-radius: 8px;
+}
+
+.landing-auth__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1.5px solid #2a2418;
+  background-color: #2a2418;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.landing-auth__submit:hover:not(:disabled) {
+  background-color: rgba(42, 36, 24, 0.85);
+}
+
+.landing-auth__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.landing-auth__toggle {
+  background: none;
+  border: none;
+  color: #46352e;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-align: center;
+  opacity: 0.75;
+  font-family: inherit;
+}
+
+.landing-auth__toggle:hover {
+  opacity: 1;
+}
+
+.landing-auth__toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
