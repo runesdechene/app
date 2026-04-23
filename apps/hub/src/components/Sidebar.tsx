@@ -67,6 +67,9 @@ export function Sidebar({ user }: SidebarProps) {
         <NavLink to="/carte/divers" className={({ isActive }) => isActive ? 'active' : ''}>
           Divers
         </NavLink>
+        <NavLink to="/carte/landing" className={({ isActive }) => isActive ? 'active' : ''}>
+          Page d'accueil
+        </NavLink>
         <NavLink to="/carte/regles" className={({ isActive }) => isActive ? 'active' : ''}>
           Règles
         </NavLink>

@@ -12,6 +12,7 @@ import { TagsManager } from './components/TagsManager'
 import { Factions } from './components/Factions'
 import { TitlesManager } from './components/TitlesManager'
 import { Divers } from './components/Divers'
+import { LandingConfig } from './components/LandingConfig'
 import { Constructions } from './components/Constructions'
 import { Fragments } from './components/Fragments'
 import { AssignFragments } from './components/AssignFragments'
@@ -93,6 +94,7 @@ function App() {
           <Route path="/carte/enigmes" element={<Enigmas />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
+          <Route path="/carte/landing" element={<LandingConfig />} />
           <Route path="/carte/regles" element={<GameRules />} />
           <Route path="/carte/tutoriel" element={<TutorialManager />} />
           <Route path="/shopify/sync" element={<ShopifySync />} />

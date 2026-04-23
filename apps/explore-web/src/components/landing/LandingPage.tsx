@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useAppConfigStore } from '../../stores/appConfigStore'
 import LandingContent from './LandingContent'
 import LandingAuthForm from './LandingAuthForm'
 import LandingImage from './LandingImage'
@@ -12,6 +13,16 @@ export default function LandingPage() {
   const [mode, setMode] = useState<Mode>('default')
   const navigate = useNavigate()
   const { user } = useAuth()
+  const landingImageDesktopUrl = useAppConfigStore(s => s.landingImageDesktopUrl)
+  const landingImageMobileUrl = useAppConfigStore(s => s.landingImageMobileUrl)
+  const landingFrameUrl = useAppConfigStore(s => s.landingFrameUrl)
+  const configLoaded = useAppConfigStore(s => s.loaded)
+
+  useEffect(() => {
+    if (!configLoaded) {
+      useAppConfigStore.getState().fetchConfig()
+    }
+  }, [configLoaded])
 
   function handleCtaClick() {
     if (user) {
@@ -31,19 +42,20 @@ export default function LandingPage() {
 
   return (
     <div className="landing">
-      <div className={`landing__parchment${mode === 'auth' ? ' is-auth-mode' : ''}`}>
-        <div className="landing__view landing__view--default">
-          <LandingContent onCtaClick={handleCtaClick} />
-        </div>
-        <div className="landing__view landing__view--auth">
-          <LandingAuthForm onSuccess={handleAuthSuccess} onBack={handleBack} />
+      <div className="landing__parchment">
+        <div className="landing__view">
+          {mode === 'default' ? (
+            <LandingContent onCtaClick={handleCtaClick} />
+          ) : (
+            <LandingAuthForm onSuccess={handleAuthSuccess} onBack={handleBack} />
+          )}
         </div>
       </div>
       <div className="landing__image">
         <LandingImage
-          imageDesktopUrl={undefined}
-          imageMobileUrl={undefined}
-          framePngUrl={undefined}
+          imageDesktopUrl={landingImageDesktopUrl || undefined}
+          imageMobileUrl={landingImageMobileUrl || undefined}
+          framePngUrl={landingFrameUrl || undefined}
         />
       </div>
     </div>
