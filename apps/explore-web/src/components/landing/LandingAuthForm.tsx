@@ -39,7 +39,7 @@ export default function LandingAuthForm({ onSuccess, onBack }: LandingAuthFormPr
         <>
           <h2 className="landing-auth__title">Salvé, voyageur !</h2>
           <p className="landing-auth__hint"><b>Entre ton email</b>. Que tu sois nouveau ici, 
-            ou que tu sois déjà un porteur de la Rune de Chêne, tu recevras un code secrêt à 6 chiffres.</p>
+            ou que tu sois déjà un porteur de la Rune de Chêne, tu recevras un code secret à 6 chiffres.</p>
 
           <form className="landing-auth__form" onSubmit={handleEmailSubmit}>
             <label className="landing-auth__field">
