@@ -19,7 +19,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         lang: 'fr',
-        start_url: '/',
+        start_url: '/carte',
         scope: '/',
         icons: [
           {
