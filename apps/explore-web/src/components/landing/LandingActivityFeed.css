@@ -1,0 +1,89 @@
+.landing-activity {
+  position: absolute;
+  z-index: 2;
+  bottom: clamp(1.5rem, 3vh, 2.5rem);
+  right: clamp(1.5rem, 3vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  pointer-events: none;
+  max-width: min(420px, 90vw);
+}
+
+.landing-activity__stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+  font-weight: 500;
+}
+
+.landing-activity__stat strong {
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+}
+
+.landing-activity__stat-sep {
+  opacity: 0.5;
+}
+
+.landing-activity__toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(42, 36, 24, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.4;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  animation: landingToastIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-activity__toast:hover {
+  background-color: rgba(42, 36, 24, 0.75);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.landing-activity__toast-pin {
+  font-size: 1.1rem;
+}
+
+.landing-activity__toast-text strong {
+  font-weight: 700;
+}
+
+.landing-activity__toast-meta {
+  opacity: 0.75;
+  font-size: 0.875rem;
+}
+
+@keyframes landingToastIn {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-activity__toast { animation: none; }
+}
+
+/* Mobile : on cache le bloc — le parchemin couvre le bas, pas la place */
+@media screen and (max-width: 749px) {
+  .landing-activity {
+    display: none;
+  }
+}

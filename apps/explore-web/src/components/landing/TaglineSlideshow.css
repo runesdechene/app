@@ -17,11 +17,17 @@
   width: 100%;
   margin: 0;
   font-style: italic;
-  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-size: 1.1rem;
   color: #46352e;
   opacity: 0;
   transition: opacity 0.6s ease;
   pointer-events: none;
+}
+
+@media screen and (max-width: 749px) {
+  .tagline-slideshow {
+    display: none;
+  }
 }
 
 .tagline-slideshow__slide.is-active {
@@ -34,7 +40,7 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.625rem;
-  align-items: center;
+  justify-content: center;
 }
 
 .tagline-slideshow__dot {

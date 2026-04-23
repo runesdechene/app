@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-type LandingKey = 'landing_image_desktop_url' | 'landing_image_mobile_url' | 'landing_frame_url'
+type LandingKey = 'landing_image_desktop_url' | 'landing_image_mobile_url' | 'landing_frame_url' | 'landing_logo_url'
 
 interface ImageSlot {
   key: LandingKey
@@ -11,6 +11,12 @@ interface ImageSlot {
 }
 
 const SLOTS: ImageSlot[] = [
+  {
+    key: 'landing_logo_url',
+    storagePrefix: 'landing-logo',
+    title: 'Logo (au-dessus du titre)',
+    description: 'Logo affiché en haut du contenu textuel, au-dessus de « BIENVENUE DANS ». Format PNG transparent recommandé.',
+  },
   {
     key: 'landing_image_desktop_url',
     storagePrefix: 'landing-image-desktop',
@@ -36,6 +42,7 @@ export function LandingConfig() {
     landing_image_desktop_url: '',
     landing_image_mobile_url: '',
     landing_frame_url: '',
+    landing_logo_url: '',
   })
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState<LandingKey | null>(null)
@@ -43,6 +50,7 @@ export function LandingConfig() {
     landing_image_desktop_url: null,
     landing_image_mobile_url: null,
     landing_frame_url: null,
+    landing_logo_url: null,
   })
 
   useEffect(() => {
@@ -61,6 +69,7 @@ export function LandingConfig() {
           landing_image_desktop_url: '',
           landing_image_mobile_url: '',
           landing_frame_url: '',
+          landing_logo_url: '',
         }
         for (const row of data) {
           if (row.key in next) {

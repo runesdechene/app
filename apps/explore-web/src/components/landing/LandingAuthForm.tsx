@@ -37,8 +37,9 @@ export default function LandingAuthForm({ onSuccess, onBack }: LandingAuthFormPr
 
       {step === 'form' ? (
         <>
-          <h2 className="landing-auth__title">Se connecter</h2>
-          <p className="landing-auth__hint">Entrez votre email — vous recevrez un code à 6 chiffres pour vous connecter.</p>
+          <h2 className="landing-auth__title">Salvé, voyageur !</h2>
+          <p className="landing-auth__hint"><b>Entre ton email</b>. Que tu sois nouveau ici, 
+            ou que tu sois déjà un porteur de la Rune de Chêne, tu recevras un code secrêt à 6 chiffres.</p>
 
           <form className="landing-auth__form" onSubmit={handleEmailSubmit}>
             <label className="landing-auth__field">
@@ -47,7 +48,7 @@ export default function LandingAuthForm({ onSuccess, onBack }: LandingAuthFormPr
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="votre@email.com"
+                placeholder="ton@email.com"
                 required
                 autoComplete="email"
                 disabled={loading}

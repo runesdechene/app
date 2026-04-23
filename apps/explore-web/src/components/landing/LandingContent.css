@@ -4,7 +4,17 @@
   gap: 1.25rem;
   max-width: min(560px, 100%);
   color: #46352e;
-  text-align: left;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.landing-content__logo {
+  display: block;
+  width: auto;
+  max-width: clamp(120px, 18vw, 420px);
+  height: auto;
+  margin: 0 0 0.5rem 0;
 }
 
 .landing-content__overline {
@@ -18,10 +28,12 @@
 
 .landing-content__title {
   margin: 0;
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
-  line-height: 1.1;
-  letter-spacing: 0.005em;
-  font-weight: 700;
+  margin-top: -15px;
+  font-family: var(--font-title, 'Bebas Neue', sans-serif);
+  font-size: clamp(2.5rem, 5.5vw, 2rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  font-weight: 600;
   color: #963e3e;
   text-wrap: balance;
 }
@@ -35,6 +47,11 @@
   font-weight: 400;
 }
 
+.landing-content__subtitle-callout {
+  color: #963e3e;
+  font-weight: 700;
+}
+
 .landing-content__pitch {
   margin: 0;
   font-size: clamp(1rem, 1.3vw, 1.2rem);
@@ -42,60 +59,119 @@
   font-weight: 600;
 }
 
+/* Médailles rondes : icône grande dans un cercle + label dessous */
 .landing-content__perks {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-top: 0.25rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
   align-items: flex-start;
 }
 
 .landing-content__perk {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  width: 90px;
+  text-align: center;
+}
+
+.landing-content__perk-medal {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--perk-color);
+  background-color: rgba(var(--perk-rgb), 0.18);
+  border: 2.5px solid var(--perk-color);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.85), inset 0 1px 4px rgba(255, 255, 255, 0.4);
+}
+
+.landing-content__perk-label {
+  font-size: 0.78rem;
+  font-weight: 700;
   line-height: 1.2;
   color: var(--perk-color);
-  background-color: rgba(var(--perk-rgb), 0.14);
-  border: 1.5px solid rgba(var(--perk-rgb), 0.4);
-  border-radius: 9999px;
-  white-space: nowrap;
 }
 
 .landing-content__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  min-height: 52px;
-  padding: 0.875rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
+  gap: 0.75rem;
+  min-height: 64px;
+  padding: 1.125rem 2.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   border: 1.5px solid #2a2418;
   background-color: #2a2418;
   color: #fff;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-  margin-top: 0.5rem;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  margin-top: 0.75rem;
   width: 100%;
-  max-width: 320px;
+  max-width: 420px;
   font-family: inherit;
+  box-shadow: 0 6px 18px rgba(42, 36, 24, 0.25);
 }
 
 .landing-content__cta:hover {
-  background-color: rgba(42, 36, 24, 0.85);
-  border-color: rgba(42, 36, 24, 0.85);
+  background-color: rgba(42, 36, 24, 0.9);
+  border-color: rgba(42, 36, 24, 0.9);
   transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(42, 36, 24, 0.35);
+}
+
+/* Lien Boutique mobile-only — discret, sous le CTA principal */
+.landing-content__shop-link {
+  display: none;
+  color: #46352e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  transition: opacity 0.2s ease;
+}
+
+.landing-content__shop-link:hover {
+  opacity: 1;
 }
 
 @media screen and (max-width: 749px) {
+  .landing-content__shop-link {
+    display: inline-block;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .landing-content__logo {
+    max-width: 220px;
+  }
+  .landing-content__perks {
+    gap: 0.75rem;
+  }
   .landing-content__perk {
-    font-size: 0.78rem;
-    padding: 0.35rem 0.7rem;
+    width: 72px;
+    gap: 0.35rem;
+  }
+  .landing-content__perk-medal {
+    width: 50px;
+    height: 50px;
+  }
+  .landing-content__perk-medal svg {
+    width: 22px;
+    height: 22px;
+  }
+  .landing-content__perk-label {
+    font-size: 0.7rem;
   }
   .landing-content__title {
     font-size: clamp(1.6rem, 7vw, 2.4rem);
