@@ -1,3 +1,16 @@
+# ALPHA V0.5.11
+## Vos réponses comptent
+
+### Énigmes — validation indulgente
+Les énigmes à réponse libre acceptent désormais les variantes raisonnables :
+- Accents oubliés (*pompei* pour *Pompéi*)
+- Pluriels (*louves* pour *Louve*)
+- Articles ajoutés ou retirés (*le Bosphore* pour *Bosphore*)
+- Apostrophes, tirets, underscores
+- Petites typos sur les mots longs (*hippocrte* pour *Hippocrate*)
+
+Plus besoin d'écrire au caractère près. Si vous savez la réponse, l'app la reconnaît.
+
 # ALPHA V0.5.10
 ## Corrections & Équilibrage
 
