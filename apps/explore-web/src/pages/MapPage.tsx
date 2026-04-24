@@ -212,13 +212,17 @@ export default function MapPage() {
 
   function markTutorialComplete() {
     if (!userId) return
-    supabase
-      .from('users')
-      .update({ tutorial_completed_at: new Date().toISOString() })
-      .eq('id', userId)
-      .then(() => {
-        usePlayerStore.getState().setTutorialCompletedAt(new Date().toISOString())
-      })
+    supabase.rpc('mark_tutorial_complete', { p_user_id: userId }).then(({ data, error }) => {
+      if (error) {
+        console.warn('[MapPage] mark_tutorial_complete failed', error)
+        return
+      }
+      if ((data as { error?: string })?.error) {
+        console.warn('[MapPage] mark_tutorial_complete error', (data as { error: string }).error)
+        return
+      }
+      usePlayerStore.getState().setTutorialCompletedAt(new Date().toISOString())
+    })
   }
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)

@@ -102,9 +102,10 @@ export function usePlayer() {
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')
-      // Mettre a jour last_login_at pour le Hub (badge "Reactive")
-      supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', userData.id).then(({ error }) => {
-        if (error) console.warn('[usePlayer] update last_login_at failed', error)
+      // Mettre a jour last_login_at pour le Hub (badge "Reactive") — via RPC
+      // car RLS de public.users n'a pas de policy UPDATE (silent deny sinon).
+      supabase.rpc('touch_last_login', { p_user_id: userData.id }).then(({ error }) => {
+        if (error) console.warn('[usePlayer] touch_last_login failed', error)
       })
       // Debloquer les fragments pending (achats avant inscription)
       supabase.rpc('unlock_pending_fragments', { p_user_id: userData.id, p_email: user!.email }).then(({ error }) => {
