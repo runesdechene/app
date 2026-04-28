@@ -42,7 +42,7 @@ const PERKS: Perk[] = [
     ),
   },
   {
-    text: 'Titres & Faut-faits',
+    text: 'Titres & Hauts-Faits',
     color: '#99794e',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
