@@ -7,6 +7,22 @@
 3. **En-tête commenté obligatoire** (rationale "WHY : ...") — Graphify-SQL parse ces commentaires comme description du nœud, donc c'est ce que Claude lira en priorité plus tard.
 4. **Avant de réécrire une RPC** : lire la version la plus récente intégralement (voir `gotchas.md` → "Lire avant de réécrire").
 
+## Preview obligatoire avant apply (RPCs)
+
+Si la migration touche à un `CREATE OR REPLACE FUNCTION`, lancer le preview avant d'apply :
+
+```bash
+node scripts/migration-preview.mjs supabase/migrations/XXX_nom.sql
+```
+
+Le script affiche pour chaque fonction modifiée :
+- Diff côté git (rouge/vert) vs la version actuellement définie dans une migration antérieure
+- Liste explicite des valeurs hardcodées, conditions de garde et formes de retour qui ont **changé** (limites, gains, distances, error strings, RETURN shape)
+
+**Si une régression sémantique est repérée** → corriger la migration AVANT `db query`. C'est le garde-fou contre la classe de bug du 9 avril 2026 (migration 081 qui a silencieusement réécrit `revisit_place_gps` en perdant la spec V0.5.7 — perdu jusqu'au 28 avril).
+
+Pour les migrations purement DDL/data (pas de RPC), le script affiche "rien à vérifier" et exit 0.
+
 ## Application
 
 Toujours via CLI, jamais manuellement :
