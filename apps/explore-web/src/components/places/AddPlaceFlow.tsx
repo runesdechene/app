@@ -218,15 +218,14 @@ export function AddPlaceFlow() {
         imageEntries.push({ id: imageId, url: fullUrl.publicUrl, thumb: thumbUrl })
       }
 
-      // 2. Create place via RPC (première photo + premier tag)
+      // 2. Create place via RPC (toutes les photos + premier tag, atomique)
       const { data, error: rpcError } = await supabase.rpc('create_place', {
         p_user_id: userId,
         p_title: title.trim(),
         p_latitude: confirmedCoords.lat,
         p_longitude: confirmedCoords.lng,
         p_tag_id: selectedTagIds[0],
-        p_image_url: imageEntries[0].url,
-        p_thumb_url: imageEntries[0].thumb,
+        p_images: imageEntries,
         p_address: address.trim(),
         p_text: description.trim(),
         p_carnet_title: carnetTitle.trim() || null,
@@ -251,16 +250,7 @@ export function AddPlaceFlow() {
       const placeId = data.placeId as string
       if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 
-      // 3. Si plusieurs photos, mettre à jour le JSONB images
-      if (imageEntries.length > 1) {
-        const { error: imgErr } = await supabase
-          .from('places')
-          .update({ images: imageEntries })
-          .eq('id', placeId)
-        if (imgErr) console.error('[AddPlaceFlow] update images failed', imgErr)
-      }
-
-      // 4. Si plusieurs tags, insérer les tags secondaires
+      // 3. Si plusieurs tags, insérer les tags secondaires
       if (selectedTagIds.length > 1) {
         const secondaryTags = selectedTagIds.slice(1).map(tagId => ({
           place_id: placeId,
@@ -271,12 +261,12 @@ export function AddPlaceFlow() {
         if (tagErr) console.error('[AddPlaceFlow] insert secondary tags failed', tagErr)
       }
 
-      // 5. Optimistic updates
+      // 4. Optimistic updates
       setNewPlaceId(placeId)
       usePlayerStore.getState().addDiscoveredId(placeId)
       useMapStore.getState().incrementPlacesRefreshKey()
 
-      // 6. Toast
+      // 5. Toast
       useToastStore.getState().addToast({
         type: 'new_place',
         message: `Lieu "${title.trim()}" ajouté !`,
