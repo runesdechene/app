@@ -18,10 +18,16 @@ Avant de lire un fichier brut, interroger dans cet ordre :
 
 - Avant toute question architecture/codebase : **lire `graphify-out/GRAPH_REPORT.md`** (god nodes, communautés)
 - Si `graphify-out/wiki/index.md` existe : naviguer via le wiki plutôt que les fichiers bruts
-- Après modifs **code TS/TSX** : `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` (rebuild AST, sans LLM)
-- Après modifs **SQL** (migrations / RPCs) : `python3 scripts/graphify-sql.py` (parse `supabase/migrations/*.sql` → nodes RPC/table/view + edges defines/uses/follows, idempotent)
 
-Les deux commandes sont indépendantes et peuvent être lancées dans n'importe quel ordre — les nodes SQL (`category: "sql"`) survivent au rebuild AST.
+**Auto via post-commit hook** (`.git/hooks/post-commit`) :
+- Rebuild AST sur tout commit (zone `graphify-hook-start/end`)
+- Lance `scripts/graphify-sql.py` si le commit touche `supabase/migrations/` (zone `graphify-sql-hook-start/end`)
+
+**Rebuilds manuels (rares)** :
+- Code TS/TSX : `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"`
+- SQL : `python3 scripts/graphify-sql.py` (idempotent)
+
+Les deux pipelines sont indépendantes — les nodes SQL (`category: "sql"`) survivent au rebuild AST.
 
 ## Ecosystem
 

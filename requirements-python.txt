@@ -1,0 +1,10 @@
+# Python tooling pour ce repo (le repo lui-même est Node/TS, mais Graphify
+# tourne en Python). À pinner pour éviter qu'un upgrade upstream casse :
+# - les API utilisées par scripts/graphify-sql.py (graphify.watch._rebuild_code,
+#   graphify.detect.detect, structure de graph.json en networkx node_link)
+# - le bloc post-commit hook (`graphify-sql-hook-start/end` dans .git/hooks/post-commit)
+#
+# Si tu veux upgrade : bump ici, lance `python3 scripts/test_graphify_sql.py`,
+# vérifie que le rebuild AST + SQL fonctionnent encore, puis commit le bump.
+
+graphifyy==0.4.13
