@@ -18,7 +18,10 @@ Avant de lire un fichier brut, interroger dans cet ordre :
 
 - Avant toute question architecture/codebase : **lire `graphify-out/GRAPH_REPORT.md`** (god nodes, communautés)
 - Si `graphify-out/wiki/index.md` existe : naviguer via le wiki plutôt que les fichiers bruts
-- Après modifs code : `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` pour garder le graph à jour
+- Après modifs **code TS/TSX** : `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` (rebuild AST, sans LLM)
+- Après modifs **SQL** (migrations / RPCs) : `python3 scripts/graphify-sql.py` (parse `supabase/migrations/*.sql` → nodes RPC/table/view + edges defines/uses/follows, idempotent)
+
+Les deux commandes sont indépendantes et peuvent être lancées dans n'importe quel ordre — les nodes SQL (`category: "sql"`) survivent au rebuild AST.
 
 ## Ecosystem
 
