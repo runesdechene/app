@@ -184,7 +184,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
     const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.2
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
   }, [userPosition, placeLocation])
 
   async function handleRevisit() {
@@ -196,13 +196,43 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       p_user_lat: userPosition.lat,
       p_user_lng: userPosition.lng,
     })
-    if (!error && data && !data.error) {
-      const result = data as { stockGain?: number; explorationGain?: number; visitNumber?: number; nextVisitGain?: number }
-      // Mettre à jour le store avec les gains
-      const store = usePlayerStore.getState()
-      if (result.stockGain) store.setInfluenceStock(store.influenceStock + result.stockGain)
-      if (result.explorationGain) store.setExplorationPoints(store.explorationPoints + result.explorationGain)
-      setVisitRewards({ stock: result.stockGain ?? 0, exploration: result.explorationGain ?? 0, visitNumber: result.visitNumber ?? 1, nextVisitGain: result.nextVisitGain })
+    const result = data as {
+      success?: boolean
+      stockGain?: number
+      explorationGain?: number
+      newInfluenceStock?: number
+      newExploration?: number
+      visitNumber?: number
+      nextVisitGain?: number
+      error?: string
+      distanceKm?: number
+    } | null
+
+    if (error) {
+      useToastStore.getState().addToast({
+        type: 'error',
+        message: 'Erreur réseau, réessayez',
+        timestamp: Date.now(),
+      })
+    } else if (result?.error === 'already_revisited_today') {
+      setRevisited(true)
+    } else if (result?.error) {
+      const msg =
+        result.error === 'too_far' ? `Trop loin du lieu (${result.distanceKm} km)` :
+        result.error === 'not_visited_yet' ? 'Vous devez d\'abord visiter ce lieu' :
+        result.error === 'no_faction' ? 'Choisissez une faction d\'abord' :
+        result.error === 'unauthorized' ? 'Session expirée, reconnectez-vous' :
+        `Erreur: ${result.error}`
+      useToastStore.getState().addToast({ type: 'error', message: msg, timestamp: Date.now() })
+    } else if (result?.success) {
+      if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
+      if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
+      setVisitRewards({
+        stock: result.stockGain ?? 0,
+        exploration: result.explorationGain ?? 0,
+        visitNumber: result.visitNumber ?? 1,
+        nextVisitGain: result.nextVisitGain,
+      })
       useToastStore.getState().addToast({
         type: 'revisit',
         message: `De retour sur ${placeTitle} !`,
@@ -213,8 +243,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       })
       setRevisited(true)
       setShowRating(true)
-    } else if (data?.error === 'already_revisited_today') {
-      setRevisited(true)
     }
     setLoading(false)
   }
@@ -326,8 +354,14 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
             {loading && isExplorer ? '...' : isOnSite ? '📍 De retour !' : '📍 Revisiter (sur place)'}
           </button>
         )}
-        {userId && isExplorer && revisited && (
-          <span style={{ fontSize: 11, opacity: 0.5, padding: '4px 8px' }}>Revisite du jour validee</span>
+        {userId && isExplorer && (revisited || recentlyVisited) && (
+          <button
+            className="place-exp-visit-btn place-exp-visit-btn-disabled"
+            disabled
+            title="Vous avez déjà revisité ce lieu aujourd'hui"
+          >
+            ✓ Déjà revisité aujourd'hui
+          </button>
         )}
       </div>
 
