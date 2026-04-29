@@ -11,8 +11,8 @@ C'est la première fois que des énigmes ne sont rattachées à **aucune faction
 ### Plus de répétitions sur les énigmes journalières
 Si vous avez déjà répondu à une énigme dans le passé, vous ne la reverrez plus tant qu'il reste du contenu neuf à découvrir dans la difficulté correspondante. Quand vous aurez tout vu, le pool recyclera proprement. Les anciens beta-testeurs qui rebouclaient sur les mêmes questions vont enfin redécouvrir des énigmes oubliées.
 
-### Corrections du fond historique
-Une cinquantaine de corrections sur les énigmes existantes : faits factuels (Hannibal redevient carthaginois et non romain ; le cratère de Vix retrouve sa contenance de 1 100 litres ; les Nerviens regagnent le Hainaut au lieu de la Champagne), formulations ambiguës, et une vingtaine de fautes d'orthographe — dont une famille curieuse d'« Empereuromain » (mots collés sans espace, séquelle d'un ancien script de génération).
+### Énigmes existantes — fond et orthographe
+Passe complète sur les énigmes du jeu : quelques erreurs factuelles corrigées, formulations ambiguës resserrées, et une vingtaine de fautes d'orthographe nettoyées.
 
 # ALPHA V0.5.11
 ## Vos réponses comptent
