@@ -22,6 +22,12 @@ import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
 
+// Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
+// La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
+const HERITAGE_CUP_DOT_COLOR = '#ecdfc0'  // Parchemin clair, fond très lumineux
+const HERITAGE_CUP_INK_COLOR = '#2D1F0F'  // Encre brune foncée pour les icônes
+const HERITAGE_CUP_INK_PREFIX = 'ink::'
+
 // --- Component ---
 
 interface PopupInfo {
@@ -398,7 +404,7 @@ export const ExploreMap = memo(function ExploreMap() {
     if (!map) return
 
     for (const f of rawGeojson.features) {
-      const { tagIcon, iconColor, bannerIcon } = f.properties
+      const { tagIcon, iconColor, dominantFactionColor } = f.properties
 
       // Icône normale (couleur tag)
       if (tagIcon && !loadedIconsRef.current.has(tagIcon)) {
@@ -408,22 +414,23 @@ export const ExploreMap = memo(function ExploreMap() {
         })
       }
 
-      // Icône faction (pour le mode bannières) — clé = "faction::{url}::{color}"
-      if (bannerIcon && !loadedIconsRef.current.has(bannerIcon)) {
-        loadedIconsRef.current.add(bannerIcon)
-        const parts = bannerIcon.split('::')
-        const svgUrl = parts[1]
-        const fColor = parts[2]
-        if (svgUrl && fColor) {
-          loadColoredSvgIcon(map, svgUrl, fColor, bannerIcon, svgUrl).catch(() => {
-            loadedIconsRef.current.delete(bannerIcon)
+      // Icône mode Coupe des Héritages — fond sépia, icône encre brune, anneau couleur faction dominante
+      if (tagIcon) {
+        const border = dominantFactionColor || ''
+        const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::${border}`
+        if (!loadedIconsRef.current.has(inkKey)) {
+          loadedIconsRef.current.add(inkKey)
+          loadColoredSvgIcon(
+            map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR, border || undefined,
+          ).catch(() => {
+            loadedIconsRef.current.delete(inkKey)
           })
         }
       }
     }
   }, [rawGeojson])
 
-  // Charger dynamiquement les icônes bannières pour les overrides (changement de faction)
+  // Recharger les variantes encre quand les overrides modifient la faction dominante (clics influence)
   useEffect(() => {
     const map = mapRef.current?.getMap()
     if (!map || !factionColorMode || placeOverrides.size === 0 || !rawGeojson) return
@@ -432,11 +439,13 @@ export const ExploreMap = memo(function ExploreMap() {
       if (!ov.tagColor) continue
       const feature = rawGeojson.features.find(f => f.properties.id === placeId)
       if (!feature?.properties.tagIcon) continue
-      const bannerKey = `faction::${feature.properties.tagIcon}::${ov.tagColor}`
-      if (loadedIconsRef.current.has(bannerKey)) continue
-      loadedIconsRef.current.add(bannerKey)
-      loadColoredSvgIcon(map, feature.properties.tagIcon, ov.tagColor, bannerKey, feature.properties.tagIcon).catch(() => {
-        loadedIconsRef.current.delete(bannerKey)
+      const inkKey = `${HERITAGE_CUP_INK_PREFIX}${feature.properties.tagIcon}::${ov.tagColor}`
+      if (loadedIconsRef.current.has(inkKey)) continue
+      loadedIconsRef.current.add(inkKey)
+      loadColoredSvgIcon(
+        map, feature.properties.tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, feature.properties.tagIcon, HERITAGE_CUP_INK_COLOR, ov.tagColor,
+      ).catch(() => {
+        loadedIconsRef.current.delete(inkKey)
       })
     }
   }, [placeOverrides, factionColorMode, rawGeojson])
@@ -652,18 +661,13 @@ export const ExploreMap = memo(function ExploreMap() {
           if (ov.factionPattern !== undefined) props.factionPattern = ov.factionPattern
           if (ov.score !== undefined) props.score = ov.score
         }
-        // Mode bannières : icônes et cercles colorés par la faction dominante
+        // Mode "Coupe des Héritages" : carte sépia + icônes encre brune + anneau couleur faction dominante.
+        // L'emblème territoire reste l'indicateur principal de faction.
         if (factionColorMode) {
-          props.iconColor = props.dominantFactionColor || '#8A8A8A'
-          // Recalculer bannerIcon si la faction a changé via override
-          if (props.dominantFactionColor && props.tagIcon) {
-            const originalTagIcon = f.properties.tagIcon
-            if (originalTagIcon) {
-              const newBannerKey = `faction::${originalTagIcon}::${props.dominantFactionColor}`
-              props.tagIcon = newBannerKey
-            }
-          } else if (props.bannerIcon) {
-            props.tagIcon = props.bannerIcon
+          props.iconColor = HERITAGE_CUP_DOT_COLOR
+          if (props.tagIcon) {
+            const border = props.dominantFactionColor || ''
+            props.tagIcon = `${HERITAGE_CUP_INK_PREFIX}${props.tagIcon}::${border}`
           }
         }
         return { ...f, properties: props }

@@ -93,14 +93,12 @@ export const fortBadgeLayer: LayerSpecification = {
 }
 
 /** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image) */
-// NOTE: display:none — gardé pour réactivation future
 export const territoryEmblemLayer: LayerSpecification = {
   id: 'territory-emblems',
   type: 'symbol',
   source: 'territory-labels',
   filter: ['has', 'pattern'],
   layout: {
-    'visibility': 'none',
     'icon-image': ['get', 'pattern'],
     'icon-size': [
       'interpolate', ['linear'], ['zoom'],
@@ -113,7 +111,7 @@ export const territoryEmblemLayer: LayerSpecification = {
     'icon-ignore-placement': true,
   },
   paint: {
-    'icon-opacity': 0.7,
+    'icon-opacity': 1,
   },
 }
 

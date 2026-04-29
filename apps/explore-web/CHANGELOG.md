@@ -1,3 +1,15 @@
+# ALPHA V0.5.13
+## Le retour des sceaux
+
+### Coupe des Héritages — la carte des stratèges
+Quand vous activez le mode **Coupe des Héritages**, la carte vire au parchemin, les lieux passent à l'encre brune, et les **sceaux des Héritages** réapparaissent au centre de chaque territoire — un par faction dominante. Chaque lieu reçoit aussi une fine bordure aux couleurs de l'Héritage qui le contrôle : un coup d'œil suffit pour lire l'allégeance.
+
+### Territoires — la sève monte plus vite
+Le rayon d'influence d'un lieu grandit désormais beaucoup plus généreusement avec ses points. Quelques points d'influence suffisent à voir un territoire prendre forme, là où il fallait une longue patience auparavant. Les empires se bâtissent à la vitesse qu'ils méritent.
+
+### Corrections
+- L'icône Boutique disparaissait par intermittence selon les builds — cache PWA recalibré.
+
 # ALPHA V0.5.12
 ## Le souffle de la Grèce
 

@@ -35,9 +35,16 @@ function shiftColor(hex: string, amount: number): string {
   return `rgb(${shift(r)},${shift(g)},${shift(b)})`
 }
 
-/** Génère l'ImageData pour un SVG coloré (avec cache) */
-export async function buildIconImageData(url: string, color: string): Promise<ImageData> {
-  const cacheKey = `${url}::${color}`
+/** Génère l'ImageData pour un SVG coloré (avec cache).
+ *  `color` = fond du disque (avec dégradé). `iconFill` = couleur de l'icône (défaut blanc).
+ *  `borderColor` = anneau de bordure optionnel (utilisé pour la faction dominante en mode Coupe des Héritages). */
+export async function buildIconImageData(
+  url: string,
+  color: string,
+  iconFill: string = '#ffffff',
+  borderColor?: string,
+): Promise<ImageData> {
+  const cacheKey = `${url}::${color}::${iconFill}::${borderColor ?? ''}`
   const cached = svgImageDataCache.get(cacheKey)
   if (cached) return cached
 
@@ -49,7 +56,7 @@ export async function buildIconImageData(url: string, color: string): Promise<Im
     svgTextCache.set(url, rawSvg)
   }
 
-  const whiteIcon = await svgToImage(colorizeSvg(rawSvg, '#ffffff'))
+  const innerIcon = await svgToImage(colorizeSvg(rawSvg, iconFill))
 
   const canvas = document.createElement('canvas')
   canvas.width = ICON_SIZE
@@ -69,16 +76,26 @@ export async function buildIconImageData(url: string, color: string): Promise<Im
   ctx.fillStyle = grad
   ctx.fill()
 
+  // Anneau de bordure (couleur faction dominante en mode Coupe des Héritages)
+  if (borderColor) {
+    const borderWidth = ICON_SIZE * 0.04
+    ctx.beginPath()
+    ctx.arc(cx, cy, r - borderWidth / 2, 0, Math.PI * 2)
+    ctx.lineWidth = borderWidth
+    ctx.strokeStyle = borderColor
+    ctx.stroke()
+  }
+
   const iconSize = ICON_SIZE * 0.55
   const iconOffset = (ICON_SIZE - iconSize) / 2
-  ctx.drawImage(whiteIcon, iconOffset, iconOffset, iconSize, iconSize)
+  ctx.drawImage(innerIcon, iconOffset, iconOffset, iconSize, iconSize)
 
   const imageData = ctx.getImageData(0, 0, ICON_SIZE, ICON_SIZE)
   svgImageDataCache.set(cacheKey, imageData)
   return imageData
 }
 
-/** Génère l'ImageData pour un emblème faction en forme de bouclier (pentagone pointu en bas) */
+/** Génère l'ImageData pour un emblème faction en forme de sceau circulaire */
 export async function buildBannerImageData(url: string, color: string): Promise<ImageData> {
   const cacheKey = `banner::${url}::${color}`
   const cached = svgImageDataCache.get(cacheKey)
@@ -104,28 +121,20 @@ export async function buildBannerImageData(url: string, color: string): Promise<
   const bctx = big.getContext('2d')!
   bctx.scale(SCALE, SCALE)
   const cx = SIZE / 2
+  const cy = SIZE / 2
 
-  // Forme étendard : rectangle haut + pointe courte en bas
-  const w = 110
-  const rectH = 96
-  const tipH = 40
-  const x = cx - w / 2
-  const y = 4
+  // Forme sceau : disque plein
+  const radius = 64
 
   bctx.beginPath()
-  bctx.moveTo(x, y)
-  bctx.lineTo(x + w, y)
-  bctx.lineTo(x + w, y + rectH)
-  bctx.lineTo(cx, y + rectH + tipH)
-  bctx.lineTo(x, y + rectH)
-  bctx.closePath()
+  bctx.arc(cx, cy, radius, 0, Math.PI * 2)
   bctx.fillStyle = color
   bctx.fill()
 
-  // Icône centrée dans la forme complète (rect + pointe)
+  // Icône centrée dans le sceau
   const iconSize = 80
   const iconX = cx - iconSize / 2
-  const iconY = y + (rectH + tipH - iconSize) / 2 - 10
+  const iconY = cy - iconSize / 2
   bctx.drawImage(whiteIcon, iconX, iconY, iconSize, iconSize)
 
   // Downscale sur un canvas à taille finale → anti-aliasing naturel
@@ -192,9 +201,11 @@ export async function loadColoredSvgIcon(
   color: string,
   key?: string,
   fetchUrl?: string,
+  iconFill?: string,
+  borderColor?: string,
 ): Promise<void> {
   const mapKey = key ?? url
-  const imageData = await buildIconImageData(fetchUrl ?? url, color)
+  const imageData = await buildIconImageData(fetchUrl ?? url, color, iconFill, borderColor)
   if (!map.hasImage(mapKey)) {
     map.addImage(mapKey, imageData, { sdf: false })
   }

@@ -49,8 +49,6 @@ export interface PlaceProperties {
   factionId: string
   factionColor: string
   dominantFactionColor: string
-  /** Clé d'icône en mode bannières = faction:{tagIcon}::{factionColor} */
-  bannerIcon: string
   factionPattern: string
   claimedByName: string
   claimedById: string
@@ -155,24 +153,6 @@ export function usePlaces() {
                 const vals = Object.values(inf)
                 if (vals.length > 1 && vals.every(v => v === maxPts)) return ''
                 return factionColorMap.get(maxId) ?? ''
-              })(),
-              bannerIcon: (() => {
-                const icon = (place.primaryTag?.id ? tagIcons.get(place.primaryTag.id) : undefined) ?? ''
-                if (!icon) return ''
-                const inf = place.influenceByFaction ?? {}
-                let maxId = ''
-                let maxPts = 0
-                for (const [fid, pts] of Object.entries(inf)) {
-                  if (pts > maxPts) { maxPts = pts; maxId = fid }
-                }
-                let fc = ''
-                if (maxPts > 0) {
-                  const vals = Object.values(inf)
-                  if (!(vals.length > 1 && vals.every(v => v === maxPts))) {
-                    fc = factionColorMap.get(maxId) ?? ''
-                  }
-                }
-                return `faction::${icon}::${fc || '#8A8A8A'}`
               })(),
               factionPattern: place.faction?.pattern ?? '',
               claimedByName: place.claimedByName ?? '',

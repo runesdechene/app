@@ -16,8 +16,8 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const BASE_RADIUS_KM = 0.20      // ~120m minimum
-const RADIUS_SCALE_KM = 0.12     // gentle growth — influence grows faster
+const BASE_RADIUS_KM = 0.30      // 300m de base
+const RADIUS_SCALE_KM = 0.30     // croissance modérée — sensation d'empire sans débordement
 const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
 const CIRCLE_SEGMENTS = 12        // octogone
