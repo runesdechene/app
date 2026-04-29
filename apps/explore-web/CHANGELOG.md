@@ -1,3 +1,19 @@
+# ALPHA V0.5.12
+## Le souffle de la Grèce
+
+### 32 nouvelles énigmes — la Grèce antique
+Hoplites en phalange, philosophes condamnés, oracles murmurés sous le Parnasse, tablettes de malédiction enterrées dans le plomb, cuirasses de lin et trières en bronze : trente-deux questions sur la Grèce antique entrent dans le cycle des énigmes journalières. Approche **historique et occulte**, peu mythologique — Sparte et Athènes, Marathon et Leuctres, Hécate et les Mystères d'Éleusis, Héraclite et Pline l'Ancien.
+
+C'est la première fois que des énigmes ne sont rattachées à **aucune faction** — elles tombent pour tous les joueurs, peu importe l'héritage choisi.
+
+*Si certains noms vous parlent particulièrement — l'Hoplite, Hécate — vous comprendrez pourquoi le 12 mai, à Écho & Merveilles.*
+
+### Plus de répétitions sur les énigmes journalières
+Si vous avez déjà répondu à une énigme dans le passé, vous ne la reverrez plus tant qu'il reste du contenu neuf à découvrir dans la difficulté correspondante. Quand vous aurez tout vu, le pool recyclera proprement. Les anciens beta-testeurs qui rebouclaient sur les mêmes questions vont enfin redécouvrir des énigmes oubliées.
+
+### Corrections du fond historique
+Une cinquantaine de corrections sur les énigmes existantes : faits factuels (Hannibal redevient carthaginois et non romain ; le cratère de Vix retrouve sa contenance de 1 100 litres ; les Nerviens regagnent le Hainaut au lieu de la Champagne), formulations ambiguës, et une vingtaine de fautes d'orthographe — dont une famille curieuse d'« Empereuromain » (mots collés sans espace, séquelle d'un ancien script de génération).
+
 # ALPHA V0.5.11
 ## Vos réponses comptent
 
