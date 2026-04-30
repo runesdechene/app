@@ -75,7 +75,9 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
                     <div className="veille-markers-avatar veille-markers-avatar-fallback" />
                   )}
                   {m.factionPattern && (
-                    <img src={m.factionPattern} alt="" className="veille-markers-emblem" />
+                    <span className="veille-markers-emblem-wrap">
+                      <img src={m.factionPattern} alt="" className="veille-markers-emblem" />
+                    </span>
                   )}
                 </div>
               ))}

@@ -13,14 +13,16 @@ let factionsLoaded = false
 
 async function ensureFactionsCache(): Promise<void> {
   if (factionsLoaded) return
-  const { data, error } = await supabase.from('factions').select('id, color, image_url')
+  // V0.7 : on prend f.pattern (SVG icône) pas f.image_url (bannière .webp)
+  // pour cohérence avec les markers carte (rendu icône blanche sur disc couleur faction).
+  const { data, error } = await supabase.from('factions').select('id, color, pattern')
   if (error) {
     console.error('[veilles] factions fetch error:', error.message)
     return
   }
-  for (const f of (data ?? []) as Array<{ id: string; color: string | null; image_url: string | null }>) {
+  for (const f of (data ?? []) as Array<{ id: string; color: string | null; pattern: string | null }>) {
     if (f.color) factionColors.set(f.id, f.color)
-    if (f.image_url) factionPatterns.set(f.id, f.image_url)
+    if (f.pattern) factionPatterns.set(f.id, f.pattern)
   }
   factionsLoaded = true
 }

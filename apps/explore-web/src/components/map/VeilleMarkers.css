@@ -33,18 +33,28 @@
   background: #5a4a3a;
 }
 
-.veille-markers-emblem {
+/* Badge faction : disc couleur faction avec SVG icône blanche au centre */
+.veille-markers-emblem-wrap {
   position: absolute;
   top: -6px;
   right: -6px;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #faf3e0;
-  border: 1.5px solid var(--frame-color, #8a6f4a);
-  object-fit: contain;
-  padding: 1.5px;
+  background: var(--frame-color, #8a6f4a);
+  border: 2px solid #faf3e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.veille-markers-emblem {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  /* SVG noir → blanc */
+  filter: brightness(0) invert(1);
 }
 
 .veille-markers-more {
