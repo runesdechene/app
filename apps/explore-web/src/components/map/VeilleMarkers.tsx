@@ -1,8 +1,10 @@
 import { memo, useMemo } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
+import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import { useVeillesStore } from '../../stores/veillesStore'
 import { useMapStore } from '../../stores/mapStore'
 import type { PlacesGeoJSON } from '../../hooks/usePlaces'
+import type { MapVeilleMember } from '../../types/veille'
 import './VeilleMarkers.css'
 
 /** Seuil de zoom : en dessous, le sceau emblème (territoryEmblemLayer) prend le relais. */
@@ -16,8 +18,11 @@ interface Bounds {
 }
 
 interface Props {
-  /** GeoJSON des lieux : on lit lng/lat depuis chaque feature, pas le centroïde du territoire
-   *  (le centroïde merged-blob plante l'avatar dans un trou quand des lieux sont voisins). */
+  /** Territoires (output du worker) : on itère pour grouper les veilles par territoire,
+   *  on dédupe par userId — évite de répéter le même avatar si une personne veille
+   *  plusieurs lieux du même blob. */
+  territories: FeatureCollection<Polygon | MultiPolygon> | null
+  /** GeoJSON des lieux : on en extrait les coordonnées (placeId → [lng, lat]). */
   geojson: PlacesGeoJSON | null
   zoom: number
   bounds: Bounds | null
@@ -28,55 +33,94 @@ interface Props {
  * Chaque avatar a un cadre de la couleur de sa faction et l'emblème de la faction
  * en badge superposé. Pour les expéditions, plusieurs têtes en pile diagonale.
  */
-export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds }: Props) {
+export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson, zoom, bounds }: Props) {
   const veilles = useVeillesStore(s => s.veilles)
   const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
 
-  /** Option B : 1 avatar par lieu veillé, ancré sur les coordonnées GPS du lieu.
-   *  Visible à partir de zoom 9 (sinon le sceau emblème de territoryEmblemLayer suffit).
-   *  Si > 1 membre dans l'expedition, badge "+N" dans le coin. */
+  /** 1 avatar par territoire, ancré sur la position GPS du lieu le plus récemment veillé
+   *  (= pas de drift centroïde, et pas de répétition même-personne sur N lieux mergés).
+   *  Le lead avatar est le 1er membre du dernier plantage. Badge +N affiche le nombre de
+   *  veilleurs uniques dans le territoire (toutes places + tous membres, dédupliqués). */
   const markers = useMemo(() => {
-    if (!geojson || !bounds || zoom < MIN_ZOOM_FOR_AVATARS) return []
+    if (!territories || !geojson || !bounds || zoom < MIN_ZOOM_FOR_AVATARS) return []
+
+    // Lookup placeId → [lng, lat]
+    const placeCoords = new Map<string, [number, number]>()
+    for (const f of geojson.features) {
+      placeCoords.set(f.properties.id, [f.geometry.coordinates[0], f.geometry.coordinates[1]])
+    }
+
     const out: Array<{
+      key: string
       placeId: string
       longitude: number
       latitude: number
-      veille: NonNullable<ReturnType<typeof veilles.get>>
+      lead: MapVeilleMember
+      uniqueCount: number
     }> = []
 
-    for (const f of geojson.features) {
-      const v = veilles.get(f.properties.id)
-      if (!v) continue
-      const [lng, lat] = f.geometry.coordinates
+    for (const t of territories.features) {
+      const props = t.properties as Record<string, unknown>
+      let placeIds: string[] = []
+      try { placeIds = JSON.parse((props.placeIds as string) || '[]') } catch { /* ignore */ }
+      if (placeIds.length === 0) continue
+
+      // Trouver le lieu le plus récemment veillé dans ce territoire + accumuler les membres uniques
+      let mostRecentPlaceId = ''
+      let mostRecentTs = -Infinity
+      const uniqueUserIds = new Set<string>()
+      let leadCandidate: MapVeilleMember | null = null
+
+      for (const pid of placeIds) {
+        const v = veilles.get(pid)
+        if (!v) continue
+        for (const m of v.members) uniqueUserIds.add(m.userId)
+        const ts = new Date(v.plantedAt).getTime()
+        if (ts > mostRecentTs) {
+          mostRecentTs = ts
+          mostRecentPlaceId = pid
+          leadCandidate = v.members[0] ?? null
+        }
+      }
+      if (!leadCandidate || !mostRecentPlaceId) continue
+
+      const coords = placeCoords.get(mostRecentPlaceId)
+      if (!coords) continue
+      const [lng, lat] = coords
       // Viewport filter
       if (lng < bounds.minLng || lng > bounds.maxLng || lat < bounds.minLat || lat > bounds.maxLat) continue
-      out.push({ placeId: f.properties.id, longitude: lng, latitude: lat, veille: v })
+
+      out.push({
+        key: String(t.id ?? mostRecentPlaceId),
+        placeId: mostRecentPlaceId,
+        longitude: lng,
+        latitude: lat,
+        lead: leadCandidate,
+        uniqueCount: uniqueUserIds.size,
+      })
     }
     return out
-  }, [geojson, veilles, bounds, zoom])
+  }, [territories, geojson, veilles, bounds, zoom])
 
   return (
     <>
-      {markers.map(({ placeId, longitude, latitude, veille }) => {
-        const members = veille.members
-        const lead = members[0]
-        const extraCount = members.length - 1
-        const allNames = members.map(m => m.displayName.trim()).join(', ')
+      {markers.map(({ key, placeId, longitude, latitude, lead, uniqueCount }) => {
+        const extraCount = uniqueCount - 1
+        const title = extraCount > 0 ? `${lead.displayName.trim()} (+${extraCount} autre${extraCount > 1 ? 's' : ''})` : lead.displayName.trim()
         // Taille proportionnelle au zoom (cohérent avec icon-size du place iconLayer :
         // ~30px à zoom 9, ~44px à zoom 12). Ne dépasse jamais la taille des icônes lieux.
         const sizePx = Math.round(Math.max(22, Math.min(44, 22 + (zoom - 9) * 7)))
         return (
           <Marker
-            key={placeId}
+            key={key}
             longitude={longitude}
             latitude={latitude}
-            anchor="bottom"
-            offset={[0, -Math.round(sizePx * 0.6)]}
+            anchor="top-left"
           >
             <div
               className="veille-marker"
               onClick={() => setSelectedPlaceId(placeId)}
-              title={allNames}
+              title={title}
               style={{
                 '--frame-color': lead.factionColor ?? '#8a6f4a',
                 '--avatar-size': `${sizePx}px`,
