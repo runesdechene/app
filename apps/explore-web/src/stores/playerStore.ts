@@ -128,8 +128,13 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   eruditionPoints: 0,
   setEruditionPoints: (pts) => set((state) => ({ eruditionPoints: pts, glory: state.explorationPoints + pts })),
 
-  influenceStock: 0,
-  setInfluenceStock: (stock) => set({ influenceStock: stock }),
+  // Persisté en safeStorage pour éviter le flash "0" au démarrage le temps que get_my_informations charge.
+  // La valeur est resync avec la BD dès que le profil arrive — le cache n'autorité pas, il évite juste le flash.
+  influenceStock: Number(safeStorage.get('influenceStock')) || 0,
+  setInfluenceStock: (stock) => {
+    safeStorage.set('influenceStock', String(stock))
+    set({ influenceStock: stock })
+  },
 
   glory: 0,
 
