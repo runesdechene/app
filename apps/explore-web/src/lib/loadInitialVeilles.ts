@@ -61,7 +61,9 @@ export function pushVeilleOverride(placeId: string, factionId: string | null, is
 
   useMapStore.getState().setPlaceOverride(placeId, {
     claimed: true,
-    factionId: isNeutral ? undefined : (factionId ?? undefined),
+    // V0.7 : factionId='__neutral__' pour les expéditions multi-faction (clé de groupe distincte
+    // dans le territoryWorker, évite le merge avec les territoires colorés).
+    factionId: isNeutral ? '__neutral__' : (factionId ?? undefined),
     tagColor,
     factionPattern,
   })

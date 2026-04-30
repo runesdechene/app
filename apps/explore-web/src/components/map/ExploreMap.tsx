@@ -374,27 +374,27 @@ export const ExploreMap = memo(function ExploreMap() {
       if (!workerRef.current) return
       workerRef.current.postMessage({
         features: rawGeojson.features
-          .filter(f => {
-            const ov = placeOverrides.get(f.properties.id)
-            return f.properties.claimed || (f.properties.totalInfluence ?? 0) > 0 || ov?.claimed
-          })
+          // V0.7 : seulement les lieux veillés (override claimed posé par loadInitialVeilles / pushVeilleOverride)
+          .filter(f => placeOverrides.get(f.properties.id)?.claimed)
           .map(f => {
-            const ov = placeOverrides.get(f.properties.id)
+            const ov = placeOverrides.get(f.properties.id)!
             return {
               coordinates: f.geometry.coordinates as [number, number],
               placeId: f.properties.id,
-              faction: ov?.factionId || f.properties.factionId,
+              // V0.7 : faction = celle de la veille (ou '__neutral__' si expédition multi-faction)
+              faction: ov.factionId ?? '__neutral__',
               factionTitle: f.properties.tagTitle,
-              tagColor: ov?.tagColor || f.properties.tagColor,
-              factionPattern: ov?.factionPattern || f.properties.factionPattern,
-              score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
+              tagColor: ov.tagColor ?? f.properties.tagColor,
+              factionPattern: ov.factionPattern ?? '',
+              score: 1,
               likes: f.properties.likes ?? 0,
-              fortificationLevel: ov?.fortificationLevel ?? f.properties.fortificationLevel ?? 0,
+              fortificationLevel: 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
               discovered: discoveredIds.has(f.properties.id),
-              totalInfluence: f.properties.totalInfluence ?? 0,
-              influenceByFaction: f.properties.influenceByFaction ?? {},
+              // V0.7 : influence cumulative ignorée — les territoires sont uniformes
+              totalInfluence: 0,
+              influenceByFaction: {},
             }
           }),
         tiers: territoryTiers,
