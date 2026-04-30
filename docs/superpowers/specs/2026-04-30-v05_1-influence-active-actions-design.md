@@ -1,5 +1,7 @@
 # V0.5.1 — Influence par actions actives
 
+> ⚠️ **OBSOLÈTE** — remplacé le 30 avril 2026 par le pivot V0.7 (système de Veille / Plantage d'étendard). Voir `2026-04-30-v07-veille-plantage.md`. Spec conservée pour traçabilité du raisonnement.
+>
 > Brainstormé le 30 avril 2026 (Uriel + XO).
 > Migration cible : `015_v05_1_active_actions.sql`.
 
