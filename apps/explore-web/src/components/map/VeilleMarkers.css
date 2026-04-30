@@ -1,0 +1,66 @@
+/* Pile d'avatars veille en haut-droite du lieu */
+.veille-markers-stack {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  /* Décale légèrement vers le haut-droite du point (bottom-left anchor) */
+  margin-left: 18px;
+  margin-bottom: 18px;
+  pointer-events: auto;
+}
+
+.veille-markers-avatar-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.veille-markers-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--frame-color, #8a6f4a);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  object-fit: cover;
+  background: #1f1812;
+  display: block;
+}
+
+.veille-markers-avatar-fallback {
+  background: #5a4a3a;
+}
+
+.veille-markers-emblem {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #faf3e0;
+  border: 1.5px solid var(--frame-color, #8a6f4a);
+  object-fit: contain;
+  padding: 1.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.veille-markers-more {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(48, 38, 28, 0.92);
+  color: #f5e9d0;
+  border: 2px solid #8a6f4a;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}

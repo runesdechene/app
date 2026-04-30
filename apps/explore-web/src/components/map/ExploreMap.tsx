@@ -21,6 +21,7 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
+import { VeilleMarkers } from './VeilleMarkers'
 import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
@@ -761,6 +762,9 @@ export const ExploreMap = memo(function ExploreMap() {
 
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
+
+      {/* V0.7 — pile d'avatars du/des veilleur(s) en haut-droite de chaque lieu veillé */}
+      <VeilleMarkers geojson={enrichedGeojson} />
 
       {enrichedGeojson && (
         <Source
