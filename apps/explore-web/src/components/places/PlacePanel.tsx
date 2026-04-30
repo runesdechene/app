@@ -13,6 +13,7 @@ import { WishlistButton } from './WishlistButton'
 import { CarnetCard } from './CarnetCard'
 import type { Carnet } from './CarnetCard'
 import { InfluenceFrame } from './InfluenceFrame'
+import { VeilleFrame } from './VeilleFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { ShareButton } from './ShareButton'
@@ -920,7 +921,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           )}
         </div>
 
-        {/* Zone 3A — Influence Banners */}
+        {/* V0.7 — Veille (Plantage de l'étendard) */}
+        <VeilleFrame
+          placeId={place.id}
+          placeLocation={{ latitude: place.location.latitude, longitude: place.location.longitude }}
+        />
+
+        {/* Zone 3A — Influence Banners (V0.5, figée — système remplacé par la Veille) */}
         {v05 && (
           <InfluenceFrame
             placeId={place.id}
@@ -930,6 +937,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             factionNames={factionNames}
             placeLocation={place.location}
             onInfluencePlaced={() => { refreshV05(); onRefetch() }}
+            readOnly
           />
         )}
 
