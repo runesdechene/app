@@ -35,7 +35,7 @@ interface Props {
  */
 export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson, zoom, bounds }: Props) {
   const veilles = useVeillesStore(s => s.veilles)
-  const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
+  const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
 
   /** 1 avatar par veilleur unique d'un territoire, ancré sur LE lieu où ce veilleur a planté
    *  le plus récemment. Évite la double-représentation (même personne sur N lieux du blob)
@@ -109,7 +109,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
 
   return (
     <>
-      {markers.map(({ key, placeId, longitude, latitude, lead, extraCount }) => {
+      {markers.map(({ key, longitude, latitude, lead, extraCount }) => {
         const title = extraCount > 0 ? `${lead.displayName.trim()} (+${extraCount} autre${extraCount > 1 ? 's' : ''})` : lead.displayName.trim()
         // Taille proportionnelle au zoom, réduite à 70% de la taille des icônes lieux
         // (~15px à zoom 9, ~31px à zoom 12) pour rester discret à côté de l'icône lieu.
@@ -124,7 +124,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
           >
             <div
               className="veille-marker"
-              onClick={() => setSelectedPlaceId(placeId)}
+              onClick={() => setSelectedPlayerId(lead.userId)}
               title={title}
               style={{
                 '--frame-color': lead.factionColor ?? '#8a6f4a',
