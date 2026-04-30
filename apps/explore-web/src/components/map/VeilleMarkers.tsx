@@ -6,9 +6,6 @@ import { useMapStore } from '../../stores/mapStore'
 import type { MapVeilleMember } from '../../types/veille'
 import './VeilleMarkers.css'
 
-/** Seuil de zoom : en dessous, on ne rend pas les avatars (trop nombreux à la fois). */
-const MIN_ZOOM_FOR_MARKERS = 9
-
 interface Bounds {
   minLng: number
   maxLng: number
@@ -18,7 +15,6 @@ interface Bounds {
 
 interface Props {
   territories: FeatureCollection<Polygon | MultiPolygon> | null
-  zoom: number
   bounds: Bounds | null
 }
 
@@ -27,14 +23,16 @@ interface Props {
  * Chaque avatar a un cadre de la couleur de sa faction et l'emblème de la faction
  * en badge superposé. Pour les expéditions, plusieurs têtes en pile diagonale.
  */
-export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bounds }: Props) {
+export const VeilleMarkers = memo(function VeilleMarkers({ territories, bounds }: Props) {
   const veilles = useVeillesStore(s => s.veilles)
   const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
 
   /** Pour chaque territoire visible : agrège les membres de toutes les veilles qu'il contient,
-   *  et place le marker à la position de l'emblème (= centroïde du territoire). */
+   *  et place le marker à la position de l'emblème (= centroïde du territoire).
+   *  Pas de zoom-gate — l'avatar+emblème composite remplace l'ancienne couche emblem
+   *  (taille constante via React Markers, pas de scaling MapLibre). */
   const markers = useMemo(() => {
-    if (!territories || zoom < MIN_ZOOM_FOR_MARKERS || !bounds) return []
+    if (!territories || !bounds) return []
     const out: Array<{
       key: string
       placeId: string  // pour le clic — le 1er placeId du territoire
@@ -83,7 +81,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bo
       })
     }
     return out
-  }, [territories, veilles, zoom, bounds])
+  }, [territories, veilles, bounds])
 
   return (
     <>
@@ -113,6 +111,13 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bo
                   <img src={m.avatarUrl} alt="" className="veille-markers-avatar" />
                 ) : (
                   <div className="veille-markers-avatar veille-markers-avatar-fallback" />
+                )}
+                {/* V0.7 : emblème faction collé sur l'avatar — disque couleur faction
+                    + SVG blanc centré. La personne porte la bannière de sa faction. */}
+                {m.factionPattern && (
+                  <span className="veille-markers-emblem-wrap">
+                    <img src={m.factionPattern} alt="" className="veille-markers-emblem" />
+                  </span>
                 )}
               </div>
             ))}

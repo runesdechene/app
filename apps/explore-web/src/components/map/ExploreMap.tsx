@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -763,11 +763,12 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {/* V0.7 — pile d'avatars du/des veilleur(s) ancrée sur l'emblème du territoire (centroïde),
-          décalée bas-droite. Viewport-filtré + zoom-gated (zoom >= 9) pour la perf. */}
+      {/* V0.7 — composite avatar + emblème faction par territoire, ancré au centroïde.
+          La personne porte la bannière de sa faction et possède le territoire.
+          Taille constante à tous zooms (React Markers, pas de scaling MapLibre).
+          Viewport-filtré pour la perf. */}
       <VeilleMarkers
         territories={territories}
-        zoom={zoomLevel}
         bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
       />
 
@@ -792,14 +793,10 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {/* V0.7 — Emblèmes faction toujours visibles au centroïde du territoire (tous zooms).
-          Disque couleur faction + SVG blanc centré (buildBannerImageData → forme sceau).
-          Source : territoryWorker → group.pattern (URL SVG depuis ov.factionPattern). */}
-      {territoryLabelsGeojson && (
-        <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
-          <Layer {...territoryEmblemLayer} />
-        </Source>
-      )}
+      {/* V0.7 — l'emblème faction est désormais rendu en composite avec l'avatar
+          dans VeilleMarkers (le veilleur porte la bannière de sa faction). La couche
+          territoryEmblemLayer scalait avec le zoom, on la retire au profit des React
+          Markers dont la taille reste constante. */}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}
       {zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
         const { customName, tagColor } = f.properties as Record<string, unknown>
