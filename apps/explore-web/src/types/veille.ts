@@ -44,8 +44,19 @@ export interface PlantFlagError {
 
 export type PlantFlagResult = PlantFlagSuccess | PlantFlagError
 
+export interface MapVeilleMember {
+  userId: string
+  displayName: string
+  avatarUrl: string | null
+  factionId: string
+  factionColor: string | null
+  factionPattern: string | null
+}
+
 export interface MapVeille {
   placeId: string
   factionId: string | null
   isNeutral: boolean
+  plantedAt: string
+  members: MapVeilleMember[]
 }
