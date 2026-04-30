@@ -763,11 +763,11 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {/* V0.7 — Option B : 1 avatar par territoire à zoom >= 9 (cadre couleur faction
-          + badge +N si expedition). En dessous c'est territoryEmblemLayer (sceau) qui prend.
-          Taille constante (React Marker), viewport-filtré pour la perf. */}
+      {/* V0.7 — Option B : 1 avatar par lieu veillé (ancré sur la position GPS du lieu,
+          pas le centroïde du territoire qui peut foirer en zone dense). Visible à zoom >= 9.
+          Cadre couleur faction + badge +N si expedition. Viewport-filtré pour la perf. */}
       <VeilleMarkers
-        territories={territories}
+        geojson={enrichedGeojson}
         zoom={zoomLevel}
         bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
       />
