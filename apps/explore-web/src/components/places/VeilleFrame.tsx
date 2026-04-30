@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useVeille } from '../../hooks/useVeille'
+import { ExpeditionOptInModal } from './ExpeditionOptInModal'
+import type { NearbyPlanter } from '../../types/veille'
 import './VeilleFrame.css'
 
 interface Props {
@@ -22,9 +24,10 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userPosition = usePlayerStore(s => s.userPosition)
-  const { veille, refresh, plant } = useVeille(placeId)
+  const { veille, refresh, plant, fetchNearby } = useVeille(placeId)
   const [planting, setPlanting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [optInCandidates, setOptInCandidates] = useState<NearbyPlanter[] | null>(null)
 
   useEffect(() => { refresh() }, [refresh])
 
@@ -35,12 +38,13 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   const onSpot = distanceKm !== null && distanceKm <= 0.1
   const canPlant = !!(userId && userFactionId && onSpot && !planting)
 
-  const handlePlant = useCallback(async () => {
+  const doPlant = useCallback(async (partners: string[]) => {
     if (!userId || !userPosition) return
     setErrorMsg(null)
     setPlanting(true)
-    const result = await plant(userId, userPosition.lat, userPosition.lng, [])
+    const result = await plant(userId, userPosition.lat, userPosition.lng, partners)
     setPlanting(false)
+    setOptInCandidates(null)
     if ('error' in result) {
       const msg = result.error === 'too_far'
         ? `Trop loin (${result.distanceKm} km). Approche-toi à moins de 100m.`
@@ -54,6 +58,17 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
     }
     await refresh()
   }, [userId, userPosition, plant, refresh])
+
+  const handlePlant = useCallback(async () => {
+    if (!userId || !userPosition) return
+    setErrorMsg(null)
+    const candidates = await fetchNearby(userId)
+    if (candidates.length === 0) {
+      await doPlant([])
+      return
+    }
+    setOptInCandidates(candidates)
+  }, [userId, userPosition, fetchNearby, doPlant])
 
   const renderState = () => {
     if (!veille) return null
@@ -101,6 +116,14 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
         >
           {planting ? '...' : '🚩 Planter l’étendard'}
         </button>
+      )}
+
+      {optInCandidates && (
+        <ExpeditionOptInModal
+          candidates={optInCandidates}
+          onCancel={() => setOptInCandidates(null)}
+          onConfirm={(ids) => doPlant(ids)}
+        />
       )}
     </div>
   )
