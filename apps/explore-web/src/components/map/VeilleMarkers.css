@@ -19,10 +19,9 @@
 .veille-marker-avatar {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  /* Cadre couleur faction (largeur scale aussi avec --border-w) — sans liseré blanc parasite */
-  border: var(--border-w, 3px) solid var(--frame-color, #8a6f4a);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  /* Carré aux coins très arrondis — pas de cadre couleur faction. */
+  border-radius: 40%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   object-fit: cover;
   background: #1f1812;
   display: block;
@@ -32,18 +31,18 @@
   background: #5a4a3a;
 }
 
-/* Badge +N pour les expéditions multi-veilleurs */
+/* Badge +N pour les expéditions multi-veilleurs — proportionné à l'avatar */
 .veille-marker-badge {
   position: absolute;
-  top: -4px;
-  right: -8px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
+  top: -3px;
+  right: -6px;
+  min-width: calc(var(--avatar-size, 22px) * 0.55);
+  height: calc(var(--avatar-size, 22px) * 0.55);
+  padding: 0 4px;
+  border-radius: 999px;
   background: var(--frame-color, #8a6f4a);
   color: #fff;
-  font-size: 11px;
+  font-size: calc(var(--avatar-size, 22px) * 0.4);
   font-weight: 700;
   display: flex;
   align-items: center;
