@@ -792,8 +792,10 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {/* Emblèmes — visibles uniquement en mode bannières */}
-      {factionColorMode && territoryLabelsGeojson && (
+      {/* V0.7 — Emblèmes faction toujours visibles au centroïde du territoire (tous zooms).
+          Disque couleur faction + SVG blanc centré (buildBannerImageData → forme sceau).
+          Source : territoryWorker → group.pattern (URL SVG depuis ov.factionPattern). */}
+      {territoryLabelsGeojson && (
         <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
           <Layer {...territoryEmblemLayer} />
         </Source>

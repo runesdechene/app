@@ -74,11 +74,8 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
                   ) : (
                     <div className="veille-markers-avatar veille-markers-avatar-fallback" />
                   )}
-                  {m.factionPattern && (
-                    <span className="veille-markers-emblem-wrap">
-                      <img src={m.factionPattern} alt="" className="veille-markers-emblem" />
-                    </span>
-                  )}
+                  {/* V0.7 : pas d'emblème faction sur l'avatar — l'emblème est rendu
+                      au centroïde du territoire par territoryEmblemLayer (toujours visible). */}
                 </div>
               ))}
               {veille.members.length > 4 && (
