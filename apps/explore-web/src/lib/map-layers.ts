@@ -13,7 +13,10 @@ export function buildTerritoryFillLayer(userFactionId: string | null, factionCol
     type: 'fill',
     source: 'territories',
     paint: {
-      'fill-color': factionColorMode ? ['get', 'tagColor'] : TERRITORY_MUTED_COLOR,
+      // Si CdH désactivée OU territoire entièrement fogged : neutre. Sinon : couleur faction.
+      'fill-color': factionColorMode
+        ? ['case', ['get', 'revealed'], ['get', 'tagColor'], TERRITORY_MUTED_COLOR]
+        : TERRITORY_MUTED_COLOR,
       'fill-opacity': [
         'case',
         ['==', ['get', 'faction'], myFaction],
@@ -34,7 +37,9 @@ export function buildTerritoryBorderLayer(factionColorMode: boolean): LayerSpeci
     source: 'territories',
     paint: {
       'line-dasharray': [4, 2],
-      'line-color': factionColorMode ? ['get', 'tagColor'] : TERRITORY_MUTED_COLOR,
+      'line-color': factionColorMode
+        ? ['case', ['get', 'revealed'], ['get', 'tagColor'], TERRITORY_MUTED_COLOR]
+        : TERRITORY_MUTED_COLOR,
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
@@ -95,12 +100,13 @@ export const fortBadgeLayer: LayerSpecification = {
   },
 }
 
-/** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image) */
+/** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image)
+ *  Caché sur les territoires entièrement fogged pour ne pas leak la faction qui contrôle. */
 export const territoryEmblemLayer: LayerSpecification = {
   id: 'territory-emblems',
   type: 'symbol',
   source: 'territory-labels',
-  filter: ['has', 'pattern'],
+  filter: ['all', ['has', 'pattern'], ['get', 'revealed']],
   layout: {
     'icon-image': ['get', 'pattern'],
     'icon-size': [
@@ -118,12 +124,13 @@ export const territoryEmblemLayer: LayerSpecification = {
   },
 }
 
-/** Label territoire au hover (point nord du blob) */
+/** Label territoire au hover (point nord du blob) — caché si territoire entièrement fogged */
 export function buildTerritoryHoverLabelLayer(factionColorMode: boolean): LayerSpecification {
   return {
     id: 'territory-hover-labels',
     type: 'symbol',
     source: 'territory-labels',
+    filter: ['get', 'revealed'],
     layout: {
       'text-field': [
         'concat',

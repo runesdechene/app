@@ -38,6 +38,8 @@ interface PlaceInput {
   fortificationLevel: number
   claimedByName: string
   claimedById: string
+  /** Lieu personnellement découvert par le user — sert à neutraliser les blobs entièrement fogged */
+  discovered: boolean
   /** V0.5 : influence totale (toutes factions) sur le lieu */
   totalInfluence?: number
   /** V0.5 : influence par faction { factionId: score } */
@@ -255,7 +257,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
   // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
   //    Grouper par faction (nom) pour fusion visuelle
-  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, totalFortification: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number>, placeFortLevels: Map<string, number>, placeIds: Map<string, string>, placeClaimedByIds: Map<string, string>, placeScores: Map<string, number> }>()
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, totalFortification: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number>, placeFortLevels: Map<string, number>, placeIds: Map<string, string>, placeClaimedByIds: Map<string, string>, placeScores: Map<string, number>, placeDiscovered: Map<string, boolean> }>()
 
   for (let i = 0; i < features.length; i++) {
     const place = features[i]
@@ -273,7 +275,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     if (clipped) {
       const key = getDominantFaction(place)
       if (!factionRings.has(key)) {
-        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map(), placeIds: new Map(), placeClaimedByIds: new Map(), placeScores: new Map() })
+        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map(), placeIds: new Map(), placeClaimedByIds: new Map(), placeScores: new Map(), placeDiscovered: new Map() })
       }
       const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
@@ -292,6 +294,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       group.placeIds.set(coordKey, place.placeId)
       if (place.claimedById) group.placeClaimedByIds.set(coordKey, place.claimedById)
       group.placeScores.set(coordKey, place.score)
+      group.placeDiscovered.set(coordKey, place.discovered)
       group.centroidSum[0] += place.coordinates[0]
       group.centroidSum[1] += place.coordinates[1]
     }
@@ -336,6 +339,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       const claimCounts = new Map<string, number>()
       const claimNames = new Map<string, string>()
       let bestScore = -1, anchorPlaceId = ''
+      let revealed = false
 
       for (const [px, py] of group.placeCoords) {
         if (!pointInRing(px, py, outerRing)) continue
@@ -357,6 +361,8 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
 
         const sc = group.placeScores.get(ck) ?? 0
         if (sc > bestScore && pid) { bestScore = sc; anchorPlaceId = pid }
+
+        if (group.placeDiscovered.get(ck)) revealed = true
       }
 
       // Top contributeur
@@ -375,6 +381,7 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
         topContributorId: topId,
         topContributorName: topName,
         territoryTitle: getTerritoryTitle(blobCount, tiers),
+        revealed,
       }
     }
 

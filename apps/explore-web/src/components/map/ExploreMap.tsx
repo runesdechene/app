@@ -63,6 +63,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
   const userName = usePlayerStore(s => s.userName)
   const userDisplayedTitles = usePlayerStore(s => s.displayedTitles)
+  const discoveredIds = usePlayerStore(s => s.discoveredIds)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const currentUserId = usePlayerStore(s => s.userId)
@@ -151,6 +152,7 @@ export const ExploreMap = memo(function ExploreMap() {
           customName,
           labelLon: props.labelLon as number,
           labelLat: props.labelLat as number,
+          revealed: !!props.revealed,
         },
       }
     })
@@ -386,6 +388,7 @@ export const ExploreMap = memo(function ExploreMap() {
               fortificationLevel: ov?.fortificationLevel ?? f.properties.fortificationLevel ?? 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
+              discovered: discoveredIds.has(f.properties.id),
               totalInfluence: f.properties.totalInfluence ?? 0,
               influenceByFaction: f.properties.influenceByFaction ?? {},
             }
@@ -394,7 +397,7 @@ export const ExploreMap = memo(function ExploreMap() {
       })
     }, 500)
     return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
-  }, [rawGeojson, placeOverrides, territoryTiers])
+  }, [rawGeojson, placeOverrides, territoryTiers, discoveredIds])
 
   // Charger les icônes SVG colorées dans la map (tag colors + faction colors pour le mode bannières)
   const loadedIconsRef = useRef(new Set<string>())
