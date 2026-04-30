@@ -19,8 +19,8 @@
 .veille-marker-avatar {
   width: 100%;
   height: 100%;
-  /* Carré aux coins très arrondis — pas de cadre couleur faction. */
-  border-radius: 40%;
+  /* Rond — pas de cadre couleur faction. */
+  border-radius: 50%;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   object-fit: cover;
   background: #1f1812;
