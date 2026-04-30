@@ -92,6 +92,9 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bo
         const lead = members[0]
         const extraCount = members.length - 1
         const allNames = members.map(m => m.displayName.trim()).join(', ')
+        // Taille proportionnelle au zoom (cohérent avec icon-size du place iconLayer :
+        // ~30px à zoom 9, ~44px à zoom 12). Ne dépasse jamais la taille des icônes lieux.
+        const sizePx = Math.round(Math.max(22, Math.min(44, 22 + (zoom - 9) * 7)))
         return (
           <Marker
             key={key}
@@ -103,7 +106,11 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bo
               className="veille-marker"
               onClick={() => setSelectedPlaceId(placeId)}
               title={allNames}
-              style={{ '--frame-color': lead.factionColor ?? '#8a6f4a' } as React.CSSProperties}
+              style={{
+                '--frame-color': lead.factionColor ?? '#8a6f4a',
+                '--avatar-size': `${sizePx}px`,
+                '--border-w': `${Math.max(2, Math.round(sizePx / 14))}px`,
+              } as React.CSSProperties}
             >
               {lead.avatarUrl ? (
                 <img src={lead.avatarUrl} alt="" className="veille-marker-avatar" />

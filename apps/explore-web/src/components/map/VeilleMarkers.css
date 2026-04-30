@@ -1,11 +1,12 @@
-/* Option B : 1 avatar par territoire avec cadre épais couleur faction.
+/* Option B : 1 avatar par territoire avec cadre couleur faction.
    Anchor center du Marker = au centre du territoire (= où était le sceau emblème).
-   Taille constante à tous zooms (≥ 9). */
+   Taille proportionnelle au zoom (--avatar-size, --border-w injectés par le composant)
+   pour ne jamais dépasser la taille des icônes des lieux. */
 
 .veille-marker {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: var(--avatar-size, 32px);
+  height: var(--avatar-size, 32px);
   cursor: pointer;
   pointer-events: auto;
   transition: transform 0.15s ease;
@@ -16,12 +17,12 @@
 }
 
 .veille-marker-avatar {
-  width: 44px;
-  height: 44px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  /* Cadre épais = info faction (remplace le sceau emblème dès qu'on a un veilleur visible) */
-  border: 4px solid var(--frame-color, #8a6f4a);
-  box-shadow: 0 0 0 2px #faf3e0, 0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Cadre couleur faction (largeur scale aussi avec --border-w) — sans liseré blanc parasite */
+  border: var(--border-w, 3px) solid var(--frame-color, #8a6f4a);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   object-fit: cover;
   background: #1f1812;
   display: block;
@@ -36,14 +37,13 @@
   position: absolute;
   top: -4px;
   right: -8px;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 11px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
   background: var(--frame-color, #8a6f4a);
   color: #fff;
-  border: 2px solid #faf3e0;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   display: flex;
   align-items: center;
