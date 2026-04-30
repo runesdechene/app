@@ -16,7 +16,7 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const BASE_RADIUS_KM = 0.30      // V0.7 : rayon fixe 300m pour tout lieu veillé
+const BASE_RADIUS_KM = 1.0       // V0.7 : rayon fixe 1km pour tout lieu veillé
 const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
 const CIRCLE_SEGMENTS = 12        // octogone
