@@ -207,4 +207,6 @@ Ces objets sont **figés** à partir de la migration 015 (plus alimentés, plus 
 
 **Pourquoi pas DROP maintenant** : l'ancienne UI (`InfluenceFrame.tsx`) lit encore `place_influence` via `get_player_profile` / `get_map_places` en mode lecture seule. Le DROP casserait la lecture des lieux non-encore-veillés. On retire l'UI legacy à un chantier ultérieur.
 
+**Cas particulier `TerritoryPanel.tsx`** (décision Uriel, 1er mai 2026) : le panel de proposition/vote de noms de territoires (`propose_territory_name`, `vote_territory_name` — mig 013) reste **actif** pendant la passation douce, par cohérence avec l'expérience user actuelle. Les RPCs ne sont pas neutralisées comme `place_influence_action`. Elles continueront à écrire dans `territory_proposals` / `territory_votes` jusqu'au chantier **Campement** (V0.7 phase 2+) qui remplacera le nommage par blob via une entité géolocalisée par user. À ce moment-là : neutraliser les RPCs, retirer le UI, supprimer les données.
+
 Le commentaire d'en-tête de `015_v07_veille.sql` listera ces DEPRECATES sous une section `-- DEPRECATES (cleanup ultérieur via Graphify)` pour que `scripts/graphify-sql.py` les indexe et qu'un script futur puisse les énumérer en parsant le graphe.
