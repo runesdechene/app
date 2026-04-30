@@ -763,10 +763,10 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {/* V0.7 — pile d'avatars du/des veilleur(s) en haut-droite de chaque lieu veillé.
-          Viewport-filtré + zoom-gated (zoom >= 9) pour rester perfo sur 1300+ veilles. */}
+      {/* V0.7 — pile d'avatars du/des veilleur(s) ancrée sur l'emblème du territoire (centroïde),
+          décalée bas-droite. Viewport-filtré + zoom-gated (zoom >= 9) pour la perf. */}
       <VeilleMarkers
-        geojson={enrichedGeojson}
+        territories={territories}
         zoom={zoomLevel}
         bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
       />
