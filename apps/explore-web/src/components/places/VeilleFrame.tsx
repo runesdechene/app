@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useVeille } from '../../hooks/useVeille'
 import { ExpeditionOptInModal } from './ExpeditionOptInModal'
+import { pushVeilleOverride } from '../../lib/loadInitialVeilles'
 import type { NearbyPlanter } from '../../types/veille'
 import './VeilleFrame.css'
 
@@ -56,8 +57,9 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       setErrorMsg(msg)
       return
     }
+    pushVeilleOverride(placeId, result.factionId, result.isNeutral)
     await refresh()
-  }, [userId, userPosition, plant, refresh])
+  }, [userId, userPosition, plant, refresh, placeId])
 
   const handlePlant = useCallback(async () => {
     if (!userId || !userPosition) return

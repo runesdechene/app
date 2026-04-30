@@ -21,6 +21,7 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
+import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
 // La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
@@ -83,6 +84,9 @@ export const ExploreMap = memo(function ExploreMap() {
   const setTerritoryNamesStore = useMapStore(s => s.setTerritoryNames)
 
   useEffect(() => {
+    // V0.7 — coloriage initial par veille
+    loadInitialVeilles()
+
     supabase.from('territory_tiers').select('min_places, title').order('min_places', { ascending: false })
       .then(({ data, error }) => {
         if (error) { console.warn('[ExploreMap] load territory_tiers failed', error); return }
