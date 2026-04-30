@@ -37,10 +37,11 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
   const veilles = useVeillesStore(s => s.veilles)
   const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
 
-  /** 1 avatar par territoire, ancré sur la position GPS du lieu le plus récemment veillé
-   *  (= pas de drift centroïde, et pas de répétition même-personne sur N lieux mergés).
-   *  Le lead avatar est le 1er membre du dernier plantage. Badge +N affiche le nombre de
-   *  veilleurs uniques dans le territoire (toutes places + tous membres, dédupliqués). */
+  /** 1 avatar par veilleur unique d'un territoire, ancré sur LE lieu où ce veilleur a planté
+   *  le plus récemment. Évite la double-représentation (même personne sur N lieux du blob)
+   *  tout en montrant tous les acteurs du territoire. Pour les expéditions co-localisées
+   *  (X+Y plantent ensemble place A et A est leur lieu de référence), 1 marker au lieu A
+   *  avec lead = 1er membre + badge "+N-1" pour les co-veilleurs. */
   const markers = useMemo(() => {
     if (!territories || !geojson || !bounds || zoom < MIN_ZOOM_FOR_AVATARS) return []
 
@@ -56,7 +57,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
       longitude: number
       latitude: number
       lead: MapVeilleMember
-      uniqueCount: number
+      extraCount: number
     }> = []
 
     for (const t of territories.features) {
@@ -65,47 +66,50 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
       try { placeIds = JSON.parse((props.placeIds as string) || '[]') } catch { /* ignore */ }
       if (placeIds.length === 0) continue
 
-      // Trouver le lieu le plus récemment veillé dans ce territoire + accumuler les membres uniques
-      let mostRecentPlaceId = ''
-      let mostRecentTs = -Infinity
-      const uniqueUserIds = new Set<string>()
-      let leadCandidate: MapVeilleMember | null = null
-
+      // Pour chaque user, trouver son lieu de référence (le plus récent où il apparaît) dans ce territoire
+      const userBest = new Map<string, { member: MapVeilleMember; placeId: string; plantedAt: number }>()
       for (const pid of placeIds) {
         const v = veilles.get(pid)
         if (!v) continue
-        for (const m of v.members) uniqueUserIds.add(m.userId)
         const ts = new Date(v.plantedAt).getTime()
-        if (ts > mostRecentTs) {
-          mostRecentTs = ts
-          mostRecentPlaceId = pid
-          leadCandidate = v.members[0] ?? null
+        for (const m of v.members) {
+          const existing = userBest.get(m.userId)
+          if (!existing || ts > existing.plantedAt) {
+            userBest.set(m.userId, { member: m, placeId: pid, plantedAt: ts })
+          }
         }
       }
-      if (!leadCandidate || !mostRecentPlaceId) continue
 
-      const coords = placeCoords.get(mostRecentPlaceId)
-      if (!coords) continue
-      const [lng, lat] = coords
-      // Viewport filter
-      if (lng < bounds.minLng || lng > bounds.maxLng || lat < bounds.minLat || lat > bounds.maxLat) continue
+      // Grouper les users par leur lieu de référence — co-veilleurs co-localisés mergent en 1 marker
+      const usersPerPlace = new Map<string, MapVeilleMember[]>()
+      for (const state of userBest.values()) {
+        const arr = usersPerPlace.get(state.placeId) ?? []
+        arr.push(state.member)
+        usersPerPlace.set(state.placeId, arr)
+      }
 
-      out.push({
-        key: String(t.id ?? mostRecentPlaceId),
-        placeId: mostRecentPlaceId,
-        longitude: lng,
-        latitude: lat,
-        lead: leadCandidate,
-        uniqueCount: uniqueUserIds.size,
-      })
+      for (const [pid, members] of usersPerPlace) {
+        const coords = placeCoords.get(pid)
+        if (!coords) continue
+        const [lng, lat] = coords
+        if (lng < bounds.minLng || lng > bounds.maxLng || lat < bounds.minLat || lat > bounds.maxLat) continue
+
+        out.push({
+          key: `${t.id ?? 'tx'}::${pid}`,
+          placeId: pid,
+          longitude: lng,
+          latitude: lat,
+          lead: members[0],
+          extraCount: members.length - 1,
+        })
+      }
     }
     return out
   }, [territories, geojson, veilles, bounds, zoom])
 
   return (
     <>
-      {markers.map(({ key, placeId, longitude, latitude, lead, uniqueCount }) => {
-        const extraCount = uniqueCount - 1
+      {markers.map(({ key, placeId, longitude, latitude, lead, extraCount }) => {
         const title = extraCount > 0 ? `${lead.displayName.trim()} (+${extraCount} autre${extraCount > 1 ? 's' : ''})` : lead.displayName.trim()
         // Taille proportionnelle au zoom, réduite à 70% de la taille des icônes lieux
         // (~15px à zoom 9, ~31px à zoom 12) pour rester discret à côté de l'icône lieu.
