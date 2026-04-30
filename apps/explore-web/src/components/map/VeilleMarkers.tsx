@@ -6,6 +6,9 @@ import { useMapStore } from '../../stores/mapStore'
 import type { MapVeilleMember } from '../../types/veille'
 import './VeilleMarkers.css'
 
+/** Seuil de zoom : en dessous, le sceau emblème (territoryEmblemLayer) prend le relais. */
+const MIN_ZOOM_FOR_AVATARS = 9
+
 interface Bounds {
   minLng: number
   maxLng: number
@@ -15,6 +18,7 @@ interface Bounds {
 
 interface Props {
   territories: FeatureCollection<Polygon | MultiPolygon> | null
+  zoom: number
   bounds: Bounds | null
 }
 
@@ -23,16 +27,15 @@ interface Props {
  * Chaque avatar a un cadre de la couleur de sa faction et l'emblème de la faction
  * en badge superposé. Pour les expéditions, plusieurs têtes en pile diagonale.
  */
-export const VeilleMarkers = memo(function VeilleMarkers({ territories, bounds }: Props) {
+export const VeilleMarkers = memo(function VeilleMarkers({ territories, zoom, bounds }: Props) {
   const veilles = useVeillesStore(s => s.veilles)
   const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
 
-  /** Pour chaque territoire visible : agrège les membres de toutes les veilles qu'il contient,
-   *  et place le marker à la position de l'emblème (= centroïde du territoire).
-   *  Pas de zoom-gate — l'avatar+emblème composite remplace l'ancienne couche emblem
-   *  (taille constante via React Markers, pas de scaling MapLibre). */
+  /** Option B : 1 avatar (le 1er membre) avec cadre couleur faction par territoire.
+   *  Visible à partir de zoom 9 (sinon le sceau emblème de territoryEmblemLayer suffit).
+   *  Si > 1 membre dans l'expedition, badge "+N" dans le coin. */
   const markers = useMemo(() => {
-    if (!territories || !bounds) return []
+    if (!territories || !bounds || zoom < MIN_ZOOM_FOR_AVATARS) return []
     const out: Array<{
       key: string
       placeId: string  // pour le clic — le 1er placeId du territoire
@@ -81,54 +84,39 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, bounds }
       })
     }
     return out
-  }, [territories, veilles, bounds])
+  }, [territories, veilles, bounds, zoom])
 
   return (
     <>
-      {markers.map(({ key, placeId, longitude, latitude, members }) => (
-        <Marker
-          key={key}
-          longitude={longitude}
-          latitude={latitude}
-          anchor="top-left"
-        >
-          <div
-            className="veille-markers-stack"
-            onClick={() => setSelectedPlaceId(placeId)}
-            title={members.map(m => m.displayName.trim()).join(', ')}
+      {markers.map(({ key, placeId, longitude, latitude, members }) => {
+        const lead = members[0]
+        const extraCount = members.length - 1
+        const allNames = members.map(m => m.displayName.trim()).join(', ')
+        return (
+          <Marker
+            key={key}
+            longitude={longitude}
+            latitude={latitude}
+            anchor="center"
           >
-            {members.slice(0, 4).map((m, i) => (
-              <div
-                key={m.userId}
-                className="veille-markers-avatar-wrap"
-                style={{
-                  '--frame-color': m.factionColor ?? '#8a6f4a',
-                  transform: `translate(${i * 12}px, ${i * 12}px)`,
-                  zIndex: 10 - i,
-                } as React.CSSProperties}
-              >
-                {m.avatarUrl ? (
-                  <img src={m.avatarUrl} alt="" className="veille-markers-avatar" />
-                ) : (
-                  <div className="veille-markers-avatar veille-markers-avatar-fallback" />
-                )}
-                {/* V0.7 : emblème faction collé sur l'avatar — disque couleur faction
-                    + SVG blanc centré. La personne porte la bannière de sa faction. */}
-                {m.factionPattern && (
-                  <span className="veille-markers-emblem-wrap">
-                    <img src={m.factionPattern} alt="" className="veille-markers-emblem" />
-                  </span>
-                )}
-              </div>
-            ))}
-            {members.length > 4 && (
-              <div className="veille-markers-more" style={{ transform: 'translate(48px, 48px)' }}>
-                +{members.length - 4}
-              </div>
-            )}
-          </div>
-        </Marker>
-      ))}
+            <div
+              className="veille-marker"
+              onClick={() => setSelectedPlaceId(placeId)}
+              title={allNames}
+              style={{ '--frame-color': lead.factionColor ?? '#8a6f4a' } as React.CSSProperties}
+            >
+              {lead.avatarUrl ? (
+                <img src={lead.avatarUrl} alt="" className="veille-marker-avatar" />
+              ) : (
+                <div className="veille-marker-avatar veille-marker-avatar-fallback" />
+              )}
+              {extraCount > 0 && (
+                <span className="veille-marker-badge">+{extraCount}</span>
+              )}
+            </div>
+          </Marker>
+        )
+      })}
     </>
   )
 })

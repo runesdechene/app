@@ -1,76 +1,53 @@
-/* Pile d'avatars veille — anchor top-left du point GPS du lieu (≈ centre du territoire / emblème).
-   Décalage bas-droite via marges pour positionner les avatars juste sous l'emblème. */
-.veille-markers-stack {
+/* Option B : 1 avatar par territoire avec cadre épais couleur faction.
+   Anchor center du Marker = au centre du territoire (= où était le sceau emblème).
+   Taille constante à tous zooms (≥ 9). */
+
+.veille-marker {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
-  margin-left: 12px;
-  margin-top: 12px;
   pointer-events: auto;
+  transition: transform 0.15s ease;
 }
 
-.veille-markers-avatar-wrap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 36px;
-  height: 36px;
+.veille-marker:hover {
+  transform: scale(1.1);
 }
 
-.veille-markers-avatar {
-  width: 36px;
-  height: 36px;
+.veille-marker-avatar {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 3px solid var(--frame-color, #8a6f4a);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  /* Cadre épais = info faction (remplace le sceau emblème dès qu'on a un veilleur visible) */
+  border: 4px solid var(--frame-color, #8a6f4a);
+  box-shadow: 0 0 0 2px #faf3e0, 0 2px 8px rgba(0, 0, 0, 0.4);
   object-fit: cover;
   background: #1f1812;
   display: block;
 }
 
-.veille-markers-avatar-fallback {
+.veille-marker-avatar-fallback {
   background: #5a4a3a;
 }
 
-/* Badge faction : disc couleur faction avec SVG icône blanche au centre */
-.veille-markers-emblem-wrap {
+/* Badge +N pour les expéditions multi-veilleurs */
+.veille-marker-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
+  top: -4px;
+  right: -8px;
+  min-width: 22px;
   height: 22px;
-  border-radius: 50%;
+  padding: 0 6px;
+  border-radius: 11px;
   background: var(--frame-color, #8a6f4a);
+  color: #fff;
   border: 2px solid #faf3e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-.veille-markers-emblem {
-  width: 12px;
-  height: 12px;
-  object-fit: contain;
-  /* SVG noir → blanc */
-  filter: brightness(0) invert(1);
-}
-
-.veille-markers-more {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: rgba(48, 38, 28, 0.92);
-  color: #f5e9d0;
-  border: 2px solid #8a6f4a;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
