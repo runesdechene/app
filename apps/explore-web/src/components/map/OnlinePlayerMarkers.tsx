@@ -7,7 +7,7 @@ interface OnlinePlayer {
   name: string
   avatarUrl: string | null
   factionColor: string | null
-  primaryTitle: string | null
+  displayedTitles: string[]
   position: { lng: number; lat: number }
 }
 
@@ -34,9 +34,9 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
               <div className="other-player-dot" />
             )}
             <span className="other-player-name">{player.name}</span>
-            {player.primaryTitle && (
-              <span className="other-player-title">{player.primaryTitle}</span>
-            )}
+            {player.displayedTitles.map((title, i) => (
+              <span key={i} className="other-player-title">{title}</span>
+            ))}
           </div>
         </Marker>
       ))}

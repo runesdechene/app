@@ -19,7 +19,17 @@ interface AuthoredPlace extends PlaceCard {
   createdAt: string
 }
 
-type PlacesTab = 'authored' | 'discovered' | 'claimed'
+interface VisitedPlace extends PlaceCard {
+  visitsCount: number
+  lastVisitedAt: string
+}
+
+interface FavoritePlace extends PlaceCard {
+  totalPoints: number
+  lastActionAt: string
+}
+
+type PlacesTab = 'authored' | 'discovered' | 'favorites'
 
 interface TitleInfo {
   id: number
@@ -49,9 +59,8 @@ interface PlayerProfile {
   biography: string
   instagram: string | null
   authoredPlaces: AuthoredPlace[]
-  discoveredPlaces: PlaceCard[]
-  claimedPlaces: PlaceCard[]
-  claimedCount: number
+  discoveredPlaces: VisitedPlace[]
+  favoritePlaces: FavoritePlace[]
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }> | null
 }
 
@@ -63,6 +72,20 @@ interface Props {
 function formatDate(iso: string): string {
   const d = new Date(iso)
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function formatRelativeDate(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime()
+  const days = Math.floor(diffMs / 86400000)
+  if (days < 1) return "aujourd'hui"
+  if (days === 1) return 'hier'
+  if (days < 7) return `il y a ${days} j`
+  const weeks = Math.floor(days / 7)
+  if (weeks < 5) return `il y a ${weeks} sem`
+  const months = Math.floor(days / 30)
+  if (months < 12) return `il y a ${months} mois`
+  const years = Math.floor(days / 365)
+  return `il y a ${years} an${years > 1 ? 's' : ''}`
 }
 
 export function PlayerProfileModal({ playerId, onClose }: Props) {
@@ -207,17 +230,17 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       p_title_ids: selectedTitleIds,
     })
 
-    // Mettre à jour le primaryTitle dans le store (premier titre = carte)
+    // Mettre à jour displayedTitles dans le store (tous les titres affichés sur la carte)
     const allTitlesFlat = [...titleCategories.factionTitles, ...titleCategories.gameTitles, ...titleCategories.fragmentTitles]
     const selectedTitles = selectedTitleIds
       .map(id => allTitlesFlat.find(t => t.id === id))
       .filter(Boolean) as Array<{ id: number; name: string; icon: string | null; icon_url: string | null }>
 
-    if (selectedTitles.length > 0) {
-      const first = selectedTitles[0]
-      const prefix = first.icon_url ? '' : (first.icon ?? '')
-      usePlayerStore.getState().setPrimaryTitle(`${prefix} ${first.name}`.trim())
-    }
+    const titlesForMap = selectedTitles.map(t => {
+      const prefix = t.icon_url ? '' : (t.icon ?? '')
+      return `${prefix} ${t.name}`.trim()
+    })
+    usePlayerStore.getState().setDisplayedTitles(titlesForMap)
 
     // Mettre à jour le profil local avec les titres sélectionnés
     if (profile) {
@@ -361,8 +384,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     <span className="player-modal-count-label">visités</span>
                   </div>
                   <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.claimedPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">Veillés</span> 
+                    <span className="player-modal-count-value">{profile.favoritePlaces?.length ?? 0}</span>
+                    <span className="player-modal-count-label">Influencés</span>
                   </div>
                 </div>
 
@@ -461,8 +484,13 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 <input
                   className="player-modal-edit-input"
                   value={editInstagram}
-                  onChange={e => setEditInstagram(e.target.value)}
+                  onChange={e => setEditInstagram(e.target.value.replace(/[^a-zA-Z0-9._@]/g, ''))}
                   placeholder="@votre_compte"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck={false}
+                  inputMode="text"
                 />
 
                 <div className="player-modal-edit-actions">
@@ -574,10 +602,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   Visités  <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
                 </button>
                 <button
-                  className={`player-modal-tab${placesTab === 'claimed' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('claimed'); setVisibleCount(12) }}
+                  className={`player-modal-tab${placesTab === 'favorites' ? ' active' : ''}`}
+                  onClick={() => { setPlacesTab('favorites'); setVisibleCount(12) }}
                 >
-                  Veillés  <span className="player-modal-tabs-number">{profile.claimedPlaces?.length ?? 0}</span>
+                  Influencés  <span className="player-modal-tabs-number">{profile.favoritePlaces?.length ?? 0}</span>
                 </button>
               </div>
 
@@ -585,7 +613,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 const places: PlaceCard[] =
                   placesTab === 'authored' ? (profile.authoredPlaces ?? []) :
                   placesTab === 'discovered' ? (profile.discoveredPlaces ?? []) :
-                  (profile.claimedPlaces ?? [])
+                  (profile.favoritePlaces ?? [])
 
                 if (places.length === 0) return (
                   <div className="player-modal-places-empty">Aucun lieu</div>
@@ -593,34 +621,74 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
                 const visible = places.slice(0, visibleCount)
                 const hasMore = places.length > visibleCount
+                const showMoreBtn = hasMore && (
+                  <button
+                    className="player-modal-show-more"
+                    onClick={() => setVisibleCount(c => c + 12)}
+                  >
+                    Voir plus ({places.length - visibleCount} restants)
+                  </button>
+                )
 
+                // Tab Ajout\u00E9s \u2014 grille de photos (existant)
+                if (placesTab === 'authored') {
+                  return (
+                    <>
+                      <div className="player-modal-places-grid">
+                        {visible.map(place => (
+                          <div
+                            key={place.id}
+                            className="player-modal-place-card"
+                            onClick={() => handlePlaceClick(place.id)}
+                          >
+                            {place.imageUrl ? (
+                              <img src={place.imageUrl} alt={place.title} className="player-modal-place-img" loading="lazy" />
+                            ) : (
+                              <div className="player-modal-place-img-fallback">
+                                {'\uD83C\uDFDB\uFE0F'}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {showMoreBtn}
+                    </>
+                  )
+                }
+
+                // Tabs Visit\u00E9s + Influenc\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
                 return (
                   <>
-                    <div className="player-modal-places-grid">
-                      {visible.map(place => (
-                        <div
-                          key={place.id}
-                          className="player-modal-place-card"
-                          onClick={() => handlePlaceClick(place.id)}
-                        >
-                          {place.imageUrl ? (
-                            <img src={place.imageUrl} alt={place.title} className="player-modal-place-img" loading="lazy" />
-                          ) : (
-                            <div className="player-modal-place-img-fallback">
-                              {'\uD83C\uDFDB\uFE0F'}
+                    <div className="player-modal-places-list">
+                      {visible.map(place => {
+                        const meta = placesTab === 'discovered'
+                          ? { num: (place as VisitedPlace).visitsCount, unit: (place as VisitedPlace).visitsCount > 1 ? 'visites' : 'visite', date: (place as VisitedPlace).lastVisitedAt }
+                          : { num: (place as FavoritePlace).totalPoints, unit: (place as FavoritePlace).totalPoints > 1 ? 'points' : 'point', date: (place as FavoritePlace).lastActionAt }
+                        return (
+                          <div
+                            key={place.id}
+                            className="player-modal-place-row"
+                            onClick={() => handlePlaceClick(place.id)}
+                          >
+                            {place.imageUrl ? (
+                              <img src={place.imageUrl} alt={place.title} className="place-row-img" loading="lazy" />
+                            ) : (
+                              <div className="place-row-img place-row-img-fallback">{'\uD83C\uDFDB\uFE0F'}</div>
+                            )}
+                            <div className="place-row-body">
+                              <div className="place-row-name">{place.title}</div>
+                              {place.type && <div className="place-row-tag">{place.type}</div>}
                             </div>
-                          )}
-                        </div>
-                      ))}
+                            <div className="place-row-meta">
+                              <span className="place-row-num">{meta.num}</span>
+                              <span className="place-row-num-unit">{meta.unit}</span>
+                              <div className="place-row-date">{formatRelativeDate(meta.date)}</div>
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                    {hasMore && (
-                      <button
-                        className="player-modal-show-more"
-                        onClick={() => setVisibleCount(c => c + 12)}
-                      >
-                        Voir plus ({places.length - visibleCount} restants)
-                      </button>
-                    )}
+                    {showMoreBtn}
                   </>
                 )
               })()}

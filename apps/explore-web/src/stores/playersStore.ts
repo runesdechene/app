@@ -7,7 +7,7 @@ export interface OnlinePlayer {
   factionColor: string | null
   factionPattern: string | null
   avatarUrl: string | null
-  primaryTitle: string | null
+  displayedTitles: string[]
   lastSeen: number
 }
 

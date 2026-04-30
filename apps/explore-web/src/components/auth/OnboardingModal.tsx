@@ -148,9 +148,14 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
             <input
               type="text"
               value={instagram}
-              onChange={e => setInstagram(e.target.value)}
+              onChange={e => setInstagram(e.target.value.replace(/[^a-zA-Z0-9._@]/g, ''))}
               placeholder="@votre_compte (optionnel)"
               className="onboarding-input"
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
+              inputMode="text"
             />
           </label>
 

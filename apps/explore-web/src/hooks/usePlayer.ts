@@ -211,15 +211,16 @@ export function usePlayer() {
           factionTitle2: td.factionTitle ?? null,
         })
       }
-      // PrimaryTitle = premier titre affiché (v3)
+      // displayedTitles = tous les titres affichés (max 3) formatés pour la carte
       const { data: playerProfile, error: profileErr } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
       if (profileErr) console.warn('[usePlayer] get_player_profile failed', profileErr)
       if (playerProfile) {
-        const pp = playerProfile as { displayedGeneralTitles?: Array<{ icon: string; name: string }> }
-        const firstTitle = pp.displayedGeneralTitles?.[0]
-        if (firstTitle) {
-          usePlayerStore.setState({ primaryTitle: `${firstTitle.icon ?? ''} ${firstTitle.name}`.trim() })
-        }
+        const pp = playerProfile as { displayedGeneralTitles?: Array<{ icon: string; name: string; icon_url?: string | null }> }
+        const titles = (pp.displayedGeneralTitles ?? []).map(t => {
+          const prefix = t.icon_url ? '' : (t.icon ?? '')
+          return `${prefix} ${t.name}`.trim()
+        })
+        usePlayerStore.setState({ displayedTitles: titles })
       }
 
       setLoading(false)

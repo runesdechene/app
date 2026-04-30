@@ -67,9 +67,9 @@ interface PlayerState {
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
   displayedGeneralTitleIds: number[]
   factionTitle2: { id: number; name: string; icon: string; unlocks: string[] } | null
-  /** Titre prioritaire (affiché sur la carte) */
-  primaryTitle: string | null
-  setPrimaryTitle: (title: string | null) => void
+  /** Titres affichés sur la carte (max 3, ordonnés) */
+  displayedTitles: string[]
+  setDisplayedTitles: (titles: string[]) => void
 
 
   /** Mode coloration carte : true = billes colorées par faction */
@@ -145,8 +145,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   unlockedGeneralTitles: [],
   displayedGeneralTitleIds: [],
   factionTitle2: null,
-  primaryTitle: null,
-  setPrimaryTitle: (title) => set({ primaryTitle: title }),
+  displayedTitles: [],
+  setDisplayedTitles: (titles) => set({ displayedTitles: titles }),
 
 
   factionColorMode: safeStorage.get('factionColorMode') === 'true',

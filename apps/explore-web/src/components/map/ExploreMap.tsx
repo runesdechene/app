@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, territoryHoverLabelLayer,
+  fortBadgeLayer, territoryEmblemLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -62,7 +62,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const userPosition = usePlayerStore(s => s.userPosition)
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
   const userName = usePlayerStore(s => s.userName)
-  const userPrimaryTitle = usePlayerStore(s => s.primaryTitle)
+  const userDisplayedTitles = usePlayerStore(s => s.displayedTitles)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const currentUserId = usePlayerStore(s => s.userId)
@@ -107,8 +107,9 @@ export const ExploreMap = memo(function ExploreMap() {
   const [unknownIconLoaded, setUnknownIconLoaded] = useState(false)
 
   // Layers territoires mémorisés (dépendent de la faction du joueur)
-  const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(userFactionId), [userFactionId])
-  const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(), [])
+  const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(userFactionId, factionColorMode), [userFactionId, factionColorMode])
+  const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(factionColorMode), [factionColorMode])
+  const territoryHoverLabelLayer = useMemo(() => buildTerritoryHoverLabelLayer(factionColorMode), [factionColorMode])
 
   // Source GeoJSON Points pour les symbol layers territoire (emblèmes, labels, noms)
   // Les positions labelLon/labelLat et emblemLon/emblemLat sont pré-calculées dans le worker
@@ -743,9 +744,9 @@ export const ExploreMap = memo(function ExploreMap() {
                 )}
               </div>
               {userName && <span className="other-player-name">{userName}</span>}
-              {userPrimaryTitle && (
-                <span className="other-player-title">{userPrimaryTitle}</span>
-              )}
+              {userDisplayedTitles.map((title, i) => (
+                <span key={i} className="other-player-title">{title}</span>
+              ))}
             </div>
           )}
         </Marker>

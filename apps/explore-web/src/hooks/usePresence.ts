@@ -11,7 +11,7 @@ interface PresencePayload {
   factionColor: string | null
   factionPattern: string | null
   avatarUrl: string | null
-  primaryTitle: string | null
+  displayedTitles: string[]
   lat: number | null
   lng: number | null
 }
@@ -42,7 +42,7 @@ export function usePresence() {
           factionColor: state.userFactionColor,
           factionPattern: state.userFactionPattern,
           avatarUrl: state.userAvatarUrl,
-          primaryTitle: state.primaryTitle,
+          displayedTitles: state.displayedTitles,
           lat: pos?.lat ?? null,
           lng: pos?.lng ?? null,
         }
@@ -75,7 +75,7 @@ export function usePresence() {
                 factionColor: payload.factionColor,
                 factionPattern: payload.factionPattern,
                 avatarUrl: payload.avatarUrl,
-                primaryTitle: (payload.primaryTitle as string) ?? null,
+                displayedTitles: Array.isArray(payload.displayedTitles) ? payload.displayedTitles : [],
                 lastSeen: Date.now(),
               })
             }
@@ -96,7 +96,7 @@ export function usePresence() {
               factionColor: (raw.factionColor as string) ?? null,
               factionPattern: (raw.factionPattern as string) ?? null,
               avatarUrl: (raw.avatarUrl as string) ?? null,
-              primaryTitle: (raw.primaryTitle as string) ?? null,
+              displayedTitles: Array.isArray(raw.displayedTitles) ? (raw.displayedTitles as string[]) : [],
               lastSeen: Date.now(),
             })
           }

@@ -1,16 +1,19 @@
 import type { LayerSpecification } from 'maplibre-gl'
 import { MAP_COLORS } from './map-style'
 
+// Teinte neutre parchemin appliquée aux territoires quand la Coupe des Héritages est désactivée
+const TERRITORY_MUTED_COLOR = '#9E9282'
+
 // --- Layer style : Territoires (construits dynamiquement selon la faction du joueur) ---
 
-export function buildTerritoryFillLayer(userFactionId: string | null): LayerSpecification {
+export function buildTerritoryFillLayer(userFactionId: string | null, factionColorMode: boolean): LayerSpecification {
   const myFaction = userFactionId ?? ''
   return {
     id: 'territories-fill',
     type: 'fill',
     source: 'territories',
     paint: {
-      'fill-color': ['get', 'tagColor'],
+      'fill-color': factionColorMode ? ['get', 'tagColor'] : TERRITORY_MUTED_COLOR,
       'fill-opacity': [
         'case',
         ['==', ['get', 'faction'], myFaction],
@@ -24,14 +27,14 @@ export function buildTerritoryFillLayer(userFactionId: string | null): LayerSpec
   }
 }
 
-export function buildTerritoryBorderLayer(): LayerSpecification {
+export function buildTerritoryBorderLayer(factionColorMode: boolean): LayerSpecification {
   return {
     id: 'territories-border',
     type: 'line',
     source: 'territories',
     paint: {
       'line-dasharray': [4, 2],
-      'line-color': ['get', 'tagColor'],
+      'line-color': factionColorMode ? ['get', 'tagColor'] : TERRITORY_MUTED_COLOR,
       'line-width': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
@@ -116,37 +119,39 @@ export const territoryEmblemLayer: LayerSpecification = {
 }
 
 /** Label territoire au hover (point nord du blob) */
-export const territoryHoverLabelLayer: LayerSpecification = {
-  id: 'territory-hover-labels',
-  type: 'symbol',
-  source: 'territory-labels',
-  layout: {
-    'text-field': [
-      'concat',
-      ['get', 'factionTitle'],
-      '\n',
-      ['to-string', ['get', 'placesCount']],
-      ['case', ['>', ['get', 'placesCount'], 1], ' lieux', ' lieu'],
-    ],
-    'text-font': ['Open Sans Bold'],
-    'text-size': 11,
-    'text-anchor': 'bottom',
-    'text-offset': [0, -0.5],
-    'text-allow-overlap': true,
-    'text-ignore-placement': true,
-  },
-  paint: {
-    'text-color': ['get', 'tagColor'],
-    'text-halo-color': 'rgba(255,255,255,0.9)',
-    'text-halo-width': 1.5,
-    // Invisible par défaut, visible quand hover = true
-    'text-opacity': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      1,
-      0,
-    ],
-  },
+export function buildTerritoryHoverLabelLayer(factionColorMode: boolean): LayerSpecification {
+  return {
+    id: 'territory-hover-labels',
+    type: 'symbol',
+    source: 'territory-labels',
+    layout: {
+      'text-field': [
+        'concat',
+        ['get', 'factionTitle'],
+        '\n',
+        ['to-string', ['get', 'placesCount']],
+        ['case', ['>', ['get', 'placesCount'], 1], ' lieux', ' lieu'],
+      ],
+      'text-font': ['Open Sans Bold'],
+      'text-size': 11,
+      'text-anchor': 'bottom',
+      'text-offset': [0, -0.5],
+      'text-allow-overlap': true,
+      'text-ignore-placement': true,
+    },
+    paint: {
+      'text-color': factionColorMode ? ['get', 'tagColor'] : TERRITORY_MUTED_COLOR,
+      'text-halo-color': 'rgba(255,255,255,0.9)',
+      'text-halo-width': 1.5,
+      // Invisible par défaut, visible quand hover = true
+      'text-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'hover'], false],
+        1,
+        0,
+      ],
+    },
+  }
 }
 
 // --- Layer style : Markers ---

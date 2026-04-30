@@ -1,3 +1,18 @@
+# ALPHA V0.5.14
+## Le profil s'épaissit
+
+### Trois titres au lieu d'un
+Sur votre profil **et sur la carte**, vous pouvez désormais afficher jusqu'à **trois titres** au lieu d'un seul. Empilez-les sous votre nom pour raconter qui vous êtes — votre rang dans l'Héritage, votre titre de bâtisseur, le titre lié à votre fragment.
+
+### Lieux Influencés — la trace de votre attachement
+L'onglet **Veillés** disparaît. À sa place : **Influencés**, qui rassemble les lieux où vous avez le plus dépensé d'influence, ordonnés par engagement. Une ligne par lieu, la photo à gauche, le total de points en chiffres clairs à droite, et la date du dernier geste. Vos sanctuaires, vos forteresses préférées, vos forêts d'élection se rangent désormais d'eux-mêmes.
+
+### Visités — chaque lieu a son histoire
+L'onglet **Visités** prend le même format. Pour chaque lieu : photo, nombre de fois où vous y êtes passé, date de la dernière exploration. Les pèlerinages se voient.
+
+### Corrections
+- Les pseudos Instagram avec un *underscore* ne s'écrivent plus en travers — l'autocorrect mobile ne déforme plus la saisie.
+
 # ALPHA V0.5.13
 ## Le retour des sceaux
 
