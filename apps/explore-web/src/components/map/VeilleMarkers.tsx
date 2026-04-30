@@ -70,7 +70,8 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
             key={placeId}
             longitude={longitude}
             latitude={latitude}
-            anchor="center"
+            anchor="bottom"
+            offset={[0, -Math.round(sizePx * 0.6)]}
           >
             <div
               className="veille-marker"
