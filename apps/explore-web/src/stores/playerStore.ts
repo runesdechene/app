@@ -122,11 +122,19 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
   setEnergyCycle: (seconds) => set({ energyCycle: seconds }),
 
-  explorationPoints: 0,
-  setExplorationPoints: (pts) => set((state) => ({ explorationPoints: pts, glory: pts + state.eruditionPoints })),
+  // Cachés en safeStorage — même raison qu'influenceStock : éviter le flash "0 Gloire" au démarrage
+  // le temps que get_my_informations charge. La valeur est resync depuis la BD à l'init.
+  explorationPoints: Number(safeStorage.get('explorationPoints')) || 0,
+  setExplorationPoints: (pts) => set((state) => {
+    safeStorage.set('explorationPoints', String(pts))
+    return { explorationPoints: pts, glory: pts + state.eruditionPoints }
+  }),
 
-  eruditionPoints: 0,
-  setEruditionPoints: (pts) => set((state) => ({ eruditionPoints: pts, glory: state.explorationPoints + pts })),
+  eruditionPoints: Number(safeStorage.get('eruditionPoints')) || 0,
+  setEruditionPoints: (pts) => set((state) => {
+    safeStorage.set('eruditionPoints', String(pts))
+    return { eruditionPoints: pts, glory: state.explorationPoints + pts }
+  }),
 
   // Persisté en safeStorage pour éviter le flash "0" au démarrage le temps que get_my_informations charge.
   // La valeur est resync avec la BD dès que le profil arrive — le cache n'autorité pas, il évite juste le flash.
@@ -136,7 +144,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     set({ influenceStock: stock })
   },
 
-  glory: 0,
+  // Dérivé d'explorationPoints + eruditionPoints, mais initialisé depuis le cache pour le rendu instantané du badge
+  glory: (Number(safeStorage.get('explorationPoints')) || 0) + (Number(safeStorage.get('eruditionPoints')) || 0),
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),
