@@ -1,12 +1,12 @@
-/* Pile d'avatars veille en haut-droite du lieu */
+/* Pile d'avatars veille — anchor top-left du point GPS du lieu (≈ centre du territoire / emblème).
+   Décalage bas-droite via marges pour positionner les avatars juste sous l'emblème. */
 .veille-markers-stack {
   position: relative;
   width: 36px;
   height: 36px;
   cursor: pointer;
-  /* Décale légèrement vers le haut-droite du point (bottom-left anchor) */
-  margin-left: 18px;
-  margin-bottom: 18px;
+  margin-left: 12px;
+  margin-top: 12px;
   pointer-events: auto;
 }
 

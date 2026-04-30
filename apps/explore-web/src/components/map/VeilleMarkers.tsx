@@ -52,7 +52,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
             key={id}
             longitude={longitude}
             latitude={latitude}
-            anchor="bottom-left"
+            anchor="top-left"
           >
             <div
               className="veille-markers-stack"
@@ -65,7 +65,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
                   className="veille-markers-avatar-wrap"
                   style={{
                     '--frame-color': m.factionColor ?? '#8a6f4a',
-                    transform: `translate(${i * 12}px, ${i * -12}px)`,
+                    transform: `translate(${i * 12}px, ${i * 12}px)`,
                     zIndex: 10 - i,
                   } as React.CSSProperties}
                 >
@@ -79,7 +79,7 @@ export const VeilleMarkers = memo(function VeilleMarkers({ geojson, zoom, bounds
                 </div>
               ))}
               {veille.members.length > 4 && (
-                <div className="veille-markers-more" style={{ transform: 'translate(48px, -48px)' }}>
+                <div className="veille-markers-more" style={{ transform: 'translate(48px, 48px)' }}>
                   +{veille.members.length - 4}
                 </div>
               )}
