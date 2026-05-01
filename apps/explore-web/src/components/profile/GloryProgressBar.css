@@ -2,12 +2,12 @@
 
 .glory-bar__track {
   position: relative;
-  background: rgba(58, 40, 24, 0.55);
-  border: 1px solid rgba(212, 165, 116, 0.35);
+  background: transparent;
+  border: 1px solid rgba(92, 90, 87, 0.35);
   border-radius: 10px;
-  height: 22px;
+  height: 18px;
   overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  margin-bottom: 10px;
 }
 
 .glory-bar__fill {
@@ -26,13 +26,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Alegreya', serif;
+  font-family: var(--font-body);
   font-size: 12px;
-  color: #f4e9d4;
+  color: #97928b;
   letter-spacing: 0.3px;
-  text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.7),
-    0 0 4px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -40,5 +37,5 @@
 .glory-bar__text strong {
   font-weight: 700;
   margin-right: 4px;
-  color: #fff8e0;
+  color: #3d342b;
 }

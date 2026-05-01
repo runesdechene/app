@@ -1,8 +1,9 @@
 .level-text {
-  font-family: 'Alegreya', serif;
-  color: #d4a574;
+  font-family: var(--font-title), serif;
+  color: #3d342b;
   opacity: 0.55;
-  font-size: 0.8em;
-  margin-left: 12px;
+  font-size: 1.2em;
+  margin-left: 0;
+  margin-top: 3px;
   font-weight: 400;
 }
