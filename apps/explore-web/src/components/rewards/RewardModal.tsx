@@ -4,7 +4,10 @@ import './RewardModal.css'
 interface RewardGain {
   label: string
   value: number
-  type: 'erudition' | 'influence'
+  /** V0.6 — 'glory' / 'coupe' = nouveaux types V0.7 ; 'erudition' / 'influence'
+      gardés pour compat (V0.5 figé). Les classes CSS `.reward-modal-gain.X`
+      définissent les couleurs par type. */
+  type: 'glory' | 'coupe' | 'erudition' | 'influence'
 }
 
 interface RewardModalProps {

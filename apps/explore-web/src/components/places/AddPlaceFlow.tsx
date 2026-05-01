@@ -647,31 +647,29 @@ export function AddPlaceFlow() {
         {rewards && (
           <div className="add-place-rewards-summary">
             <p className="add-place-rewards-summary-title">Vos récompenses</p>
-            {rewards.permanentInfluence > 0 && (
-              <div className="add-place-reward-line">
-                <span>🏴</span>
-                <span>+{rewards.permanentInfluence} influence permanente <span className="add-place-reward-tag gps">GPS</span></span>
-              </div>
-            )}
+            {/* V0.6 — Affichage Gloire + Coupe au lieu des anciens points
+                d'exploration / influence permanente. Lieu ajouté = +7 sur
+                chacune (formule unifiée V0.7 phase 3.5). Si carnet présent,
+                +3 supplémentaires. La visite GPS implicite ajoute +1 (en
+                pratique, ajouter un lieu = être sur place = visite GPS). */}
+            <div className="add-place-reward-line">
+              <span>🏛️</span>
+              <span>+7 Gloire / +7 Coupe <span className="add-place-reward-tag">lieu ajouté</span></span>
+            </div>
+            <div className="add-place-reward-line">
+              <span>🎖️</span>
+              <span>+1 Gloire / +1 Coupe <span className="add-place-reward-tag gps">visite GPS</span></span>
+            </div>
             {rewards.contentPoints > 0 && (
               <div className="add-place-reward-line">
                 <span>📜</span>
-                <span>+{rewards.contentPoints} influence permanente <span className="add-place-reward-tag">récit</span></span>
+                <span>+3 Gloire / +3 Coupe <span className="add-place-reward-tag">carnet</span></span>
               </div>
             )}
-            <div className="add-place-reward-line">
-              <span>🧭</span>
-              <span>+{rewards.explorationGain} exploration {rewards.isGps && <span className="add-place-reward-tag gps">GPS</span>}</span>
-            </div>
             {rewards.isExplorer && (
               <div className="add-place-reward-line">
                 <span>🥾</span>
                 <span>Explorateur du lieu <span className="add-place-reward-tag gps">GPS</span></span>
-              </div>
-            )}
-            {(rewards.permanentInfluence > 0 && rewards.contentPoints > 0) && (
-              <div className="add-place-reward-total">
-                Total influence sur ce lieu : {rewards.permanentInfluence + rewards.contentPoints} pts
               </div>
             )}
           </div>

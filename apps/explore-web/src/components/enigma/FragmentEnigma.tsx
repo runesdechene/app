@@ -169,6 +169,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
             explanation={result.explanation}
             influenceGain={result.influenceGain}
             eruditionGain={result.eruditionGain}
+            difficulty={enigma?.difficulty as 'very_easy' | 'easy' | 'medium' | 'hard' | undefined}
             onClose={onClose}
           />
         )}

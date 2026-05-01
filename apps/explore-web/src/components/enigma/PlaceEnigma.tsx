@@ -133,6 +133,7 @@ export function PlaceEnigma(props: PlaceEnigmaProps) {
           explanation={result.explanation}
           influenceGain={result.influenceGain}
           eruditionGain={result.eruditionGain}
+          difficulty={enigma?.difficulty}
           onClose={() => setShowEnigma(false)}
         />
       </div>

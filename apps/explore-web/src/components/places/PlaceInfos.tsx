@@ -36,7 +36,9 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
   const [newEraId, setNewEraId] = useState<string | null>(null)
   const [newYearExact, setNewYearExact] = useState<number | null>(null)
   const [savingEra, setSavingEra] = useState(false)
-  const [reward, setReward] = useState<{ erudition: number } | null>(null)
+  // V0.6 — RewardModal n'affiche plus l'érudition (V0.5 figée), mais les
+  // gains réels Gloire/Coupe pour un carnet : +3 sur chacune (formule unifiée).
+  const [reward, setReward] = useState<{ glory: number; coupe: number } | null>(null)
 
   async function saveEra() {
     if (!newEraId || savingEra || !userId) return
@@ -53,8 +55,9 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
     })
     if (!error && data?.success) {
       setEditingEra(false)
-      if (data.isFirstContribution && data.eruditionGain > 0) {
-        setReward({ erudition: data.eruditionGain })
+      if (data.isFirstContribution) {
+        // V0.6 — gain réel pour un carnet : +3 Gloire et +3 Coupe (formule unifiée)
+        setReward({ glory: 3, coupe: 3 })
       }
       onRefresh()
     }
@@ -129,7 +132,10 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
       {reward && (
         <RewardModal
           title="Contribution enregistrée !"
-          gains={[{ label: "points d'érudition", value: reward.erudition, type: 'erudition' }]}
+          gains={[
+            { label: 'Gloire', value: reward.glory, type: 'glory' },
+            { label: 'Coupe',  value: reward.coupe, type: 'coupe' },
+          ]}
           onClose={() => setReward(null)}
         />
       )}
@@ -154,7 +160,9 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(content ?? '')
   const [saving, setSaving] = useState(false)
-  const [reward, setReward] = useState<{ erudition: number } | null>(null)
+  // V0.6 — RewardModal n'affiche plus l'érudition (V0.5 figée), mais les
+  // gains réels Gloire/Coupe pour un carnet : +3 sur chacune (formule unifiée).
+  const [reward, setReward] = useState<{ glory: number; coupe: number } | null>(null)
 
   async function save() {
     if (!userId || !value.trim() || saving) return
@@ -167,8 +175,9 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
       p_content: value.trim(),
     })
     if (!error && data?.success) {
-      if (data.isFirstContribution && data.eruditionGain > 0) {
-        setReward({ erudition: data.eruditionGain })
+      if (data.isFirstContribution) {
+        // V0.6 — gain réel pour un carnet : +3 Gloire et +3 Coupe (formule unifiée)
+        setReward({ glory: 3, coupe: 3 })
       }
       setEditing(false)
       onSaved()
@@ -224,7 +233,8 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
         <RewardModal
           title="Contribution recompensee !"
           gains={[
-            { label: "erudition", value: reward.erudition, type: 'erudition' as const },
+            { label: 'Gloire', value: reward.glory, type: 'glory' as const },
+            { label: 'Coupe',  value: reward.coupe, type: 'coupe' as const },
           ]}
           onClose={() => setReward(null)}
         />

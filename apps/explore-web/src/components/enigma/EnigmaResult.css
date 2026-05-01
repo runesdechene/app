@@ -90,6 +90,23 @@
   color: #6a3cb4;
 }
 
+/* V0.6 — Couleurs Gloire (médaille dorée) et Coupe (trophée doré profond) */
+.enigma-result-gain.glory {
+  background: rgba(184, 134, 11, 0.14);
+  color: #8a5a0b;
+}
+
+.enigma-result-gain.coupe {
+  background: rgba(212, 175, 55, 0.16);
+  color: #b8860b;
+}
+
+/* V0.6 — Couleur Énigme validée (encre érudite, profil intellectuel) */
+.enigma-result-gain.enigma {
+  background: rgba(80, 50, 130, 0.12);
+  color: #5a347a;
+}
+
 .enigma-result-close-x {
   position: absolute;
   top: 12px;

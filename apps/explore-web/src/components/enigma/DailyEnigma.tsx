@@ -285,6 +285,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
             explanation={result.explanation}
             influenceGain={result.influenceGain}
             eruditionGain={result.eruditionGain}
+            difficulty={enigma.difficulty}
             onClose={isLast ? onClose : handleNext}
             closeLabel={isLast ? 'Fermer' : '\u00c9nigme suivante \u2192'}
           />

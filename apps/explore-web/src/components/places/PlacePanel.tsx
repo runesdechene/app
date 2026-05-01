@@ -374,11 +374,19 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
           {visitRewards && (
             <div className="place-visit-rewards">
               <p className="place-visit-rewards-title">🎉 Récompenses</p>
-              {visitRewards.stock > 0 && <span className="place-visit-reward">🏴 +{visitRewards.stock} influence à placer</span>}
-              {visitRewards.exploration > 0 && <span className="place-visit-reward">🧭 +{visitRewards.exploration} exploration</span>}
-              {visitRewards.visitNumber > 1 && visitRewards.nextVisitGain != null && (
+              {/* V0.6 — Affichage Gloire + Coupe au lieu des anciens points
+                  d'exploration / influence stock. Une 1ère visite GPS d'un
+                  nouveau lieu = +1 Gloire et +1 Coupe (formule unifiée
+                  V0.7 phase 3.5). Une revisite ne donne rien (DISTINCT
+                  place_id côté SQL). */}
+              {visitRewards.visitNumber === 1 ? (
+                <>
+                  <span className="place-visit-reward">🎖️ +1 Gloire</span>
+                  <span className="place-visit-reward">🏆 +1 Coupe</span>
+                </>
+              ) : (
                 <span className="place-visit-reward place-visit-reward-hint">
-                  📉 Visite n°{visitRewards.visitNumber} — prochaine visite : +{visitRewards.nextVisitGain} pts
+                  Visite n°{visitRewards.visitNumber} — vous connaissez déjà ce lieu, pas de gain supplémentaire
                 </span>
               )}
             </div>

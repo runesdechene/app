@@ -90,6 +90,17 @@
   color: #6a3cb4;
 }
 
+/* V0.6 — couleurs Gloire (médaille dorée) et Coupe (trophée doré profond) */
+.reward-modal-gain.glory {
+  background: rgba(184, 134, 11, 0.14);
+  color: #8a5a0b;
+}
+
+.reward-modal-gain.coupe {
+  background: rgba(212, 175, 55, 0.16);
+  color: #b8860b;
+}
+
 .reward-modal-close {
   display: block;
   margin: 0 auto;

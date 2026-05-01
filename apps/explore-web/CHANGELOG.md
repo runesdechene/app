@@ -1,3 +1,18 @@
+# ALPHA V0.6.1
+## Récompenses lisibles — chaque action montre son gain réel
+
+### Énigmes — la difficulté paye enfin
+Les énigmes valident désormais une **récompense pondérée** selon leur difficulté : +1 pour les facile et très facile, +2 pour les moyennes, +3 pour les difficiles. Sur la Gloire **et** sur la Coupe. Quand vous résolvez une énigme dure, vous gagnez trois fois plus qu'une facile — votre effort cesse d'être invisible. *Le compteur d'énigmes validées sur votre profil reste, lui, à une par énigme : il raconte le volume, pas l'effort.*
+
+### Récompenses — fini l'érudition et l'influence fantômes
+Partout où l'application annonçait des gains — visite d'un lieu, ajout d'un récit, énigme résolue, lieu ajouté — elle parlait encore en *points d'érudition* et *points d'exploration*, hérités de l'ancien système. Désormais chaque récompense affiche **+X Gloire** et **+X Coupe** très exactement, en cohérence avec les compteurs visibles dans la barre du haut et sur le profil.
+
+### Visite GPS d'un lieu nouveau
+Quand vous validez une visite GPS sur un lieu où vous n'étiez encore jamais venu : **+1 Gloire, +1 Coupe**. Quand vous y revenez, plus de gain — la marche première compte, les retours sont des retrouvailles.
+
+### Carnet écrit, lieu ajouté
+Un récit écrit pour la première fois sur un lieu : **+3 Gloire, +3 Coupe**. Un lieu ajouté à la carte : **+7 Gloire, +7 Coupe** (et la visite GPS implicite vient s'y ajouter, et le carnet si vous l'écrivez dans la foulée). Le geste complet du créateur sur place reste la plus grande mise commune que vous puissiez faire pour votre Héritage.
+
 # ALPHA V0.6.0
 ## Le grand basculement — Veille, Couronnes, Coupe des Héritages
 

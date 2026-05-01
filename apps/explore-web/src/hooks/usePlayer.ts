@@ -617,13 +617,17 @@ export async function discoverPlace(
     })
   }
 
+  // V0.6 — la "découverte" d'un nouveau lieu correspond à une visite GPS,
+  // qui rapporte +1 Gloire et +1 Coupe (formule unifiée V0.7 phase 3.5).
+  // Les anciens "exploration_points" sont encore stockés en DB pour rétrocompat
+  // mais plus affichés. Le toast mentionne désormais Gloire / Coupe.
   const explorationGain = data?.explorationGain ?? 5
   const currentExploration = usePlayerStore.getState().explorationPoints
   usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
 
   useToastStore.getState().addToast({
     type: 'discover',
-    message: `Nouveau lieu découvert ! 🧭 +${explorationGain} Exploration`,
+    message: 'Nouveau lieu découvert ! 🎖️ +1 Gloire 🏆 +1 Coupe',
     timestamp: Date.now(),
   })
 
