@@ -100,6 +100,36 @@ export const fortBadgeLayer: LayerSpecification = {
   },
 }
 
+/** V0.7 — Emblème faction posé sur CHAQUE lieu veillé (vision d'ensemble lieu-par-lieu).
+ *  Petit symbole décalé en haut-droite du point GPS. Filter : factionPattern non vide
+ *  (= lieu veillé V0.7), discovered (pas sur les lieux fogged). maxzoom=9 → au-delà, c'est
+ *  VeilleMarkers React qui prend (avec l'avatar). */
+export const placeVeilleEmblemLayer: LayerSpecification = {
+  id: 'place-veille-emblem',
+  type: 'symbol',
+  source: 'places',
+  maxzoom: 9,
+  filter: ['all',
+    ['!=', ['get', 'factionPattern'], ''],
+    ['==', ['get', 'discovered'], true],
+  ],
+  layout: {
+    'icon-image': ['concat', 'banner::', ['get', 'factionPattern']],
+    'icon-size': [
+      'interpolate', ['linear'], ['zoom'],
+      3, 0.05,
+      6, 0.08,
+      9, 0.14,
+    ],
+    'icon-offset': [40, -40],   // haut-droite de l'icône lieu
+    'icon-allow-overlap': true,
+    'icon-ignore-placement': true,
+  },
+  paint: {
+    'icon-opacity': 0.95,
+  },
+}
+
 /** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image)
  *  Caché sur les territoires entièrement fogged pour ne pas leak la faction qui contrôle.
  *  V0.7 : maxzoom=9 — au-delà, le composite avatar+emblème (VeilleMarkers React) prend le

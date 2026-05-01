@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, territoryEmblemLayer, placeVeilleEmblemLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -784,6 +784,8 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
+          {/* V0.7 — emblème faction sur chaque lieu veillé, vision d'ensemble à bas zoom */}
+          <Layer {...placeVeilleEmblemLayer} />
           <Layer {...fortBadgeLayer} />
         </Source>
       )}
