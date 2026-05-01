@@ -73,6 +73,10 @@ interface PlayerProfile {
   xpToNextLevel?: number
   xpForNextLevel?: number
   veteranFirstEra?: boolean
+  /** V0.7 — Couronnes & Coupe exposés pour tous les profils (mig 051) */
+  crownsBalance?: number
+  coupeScoreCurrentSeason?: number
+  coupeSeasonName?: string | null
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -424,29 +428,52 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   xpToNextLevel={isSelf ? xpToNextLevel : (profile.xpToNextLevel ?? 5)}
                   xpForNextLevel={isSelf ? xpForNextLevel : (profile.xpForNextLevel ?? 5)}
                 />
-                {isSelf && (
-                  <>
-                    {coupeState?.myBreakdown && (
-                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                        <span>
-                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
-                          {coupeState.season?.name && (
-                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                              ({coupeState.season.name})
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    )}
+                {/* Coupe \u2014 visible pour soi (score live) et pour les autres (depuis le profil) */}
+                {isSelf ? (
+                  coupeState?.myBreakdown && (
                     <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
                       <span>
-                        {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
-                        <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                          / 500
-                        </span>
+                        {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
+                        {coupeState.season?.name && (
+                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                            ({coupeState.season.name})
+                          </span>
+                        )}
                       </span>
                     </div>
-                  </>
+                  )
+                ) : (
+                  (profile.coupeScoreCurrentSeason ?? 0) > 0 && (
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83C\uDFC6'} {profile.coupeScoreCurrentSeason} pts {'\u00E0 la Coupe'}
+                        {profile.coupeSeasonName && (
+                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                            ({profile.coupeSeasonName})
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )
+                )}
+                {/* Couronnes \u2014 visible pour soi (store live) et pour les autres (depuis le profil) */}
+                {isSelf ? (
+                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                    <span>
+                      {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                      <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                        / 500
+                      </span>
+                    </span>
+                  </div>
+                ) : (
+                  (profile.crownsBalance ?? 0) > 0 && (
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83E\uDE99'} {profile.crownsBalance} {'Couronne'}{(profile.crownsBalance ?? 0) > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                      </span>
+                    </div>
+                  )
                 )}
 
                 {/* V0.7 phase 3.5 \u2014 Sous les Couronnes, on garde uniquement
