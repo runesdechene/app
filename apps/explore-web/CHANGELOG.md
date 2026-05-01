@@ -1,3 +1,35 @@
+# ALPHA V0.6.0
+## Le grand basculement — Veille, Couronnes, Coupe des Héritages
+
+### Plantez votre étendard sur les lieux que vous foulez
+Sur chaque lieu où vous vous tenez physiquement, un nouveau geste : **planter votre étendard**. Vous devenez le **veilleur** de ce lieu — votre nom s'inscrit dessus pour tous, en signature manuscrite sur la carte. Pour le supplanter, un autre veilleur devra fouler le même sol. Un seul lieu, un seul veilleur (ou une expédition de plusieurs, si vous avez planté ensemble). Le veilleur n'est plus une faction abstraite : c'est une personne, vous.
+
+### Couronnes de Chêne — la moisson quotidienne des veilleurs
+Tant que vous veillez un lieu, il vous récompense. Toutes les vingt-quatre heures, un **coffre** apparaît sur votre lieu veillé — cliquez, une **Couronne** s'élève, votre stock grossit. Une Couronne pour le veilleur solitaire, deux pour ceux qui ont planté en expédition. Stock plafonné à cinq cents — au-delà, on vous demandera bientôt de les dépenser.
+
+### La Coupe des Héritages — saison ouverte
+Les Héritages s'affrontent désormais dans une **compétition saine et saisonnière**. Chaque action personnelle — visite GPS, énigme résolue, photo, carnet, plantage, lieu ajouté — ajoute des points à votre score. Ces points cumulés par tous les membres d'un Héritage déterminent qui remportera la **Coupe**. À chaque saison, tout repart à zéro. La domination se gagne, elle ne se garde pas.
+
+### Le titre de votre Héritage se mérite chaque saison
+Désormais, le titre que vous portez au sein de votre Héritage — Basileus, Prélat, Citoyen, et leurs équivalents — n'est plus une distinction figée. Il est attribué à chaque instant en fonction de votre **rang dans la Coupe en cours**. Le plus actif de la saison porte le plus haut titre. La saison suivante, à chacun de prouver à nouveau son ardeur.
+
+### La Gloire repensée — claire, juste, vivante
+Vos points d'exploration et d'érudition disparaissent — ils étaient opaques. À leur place : **votre Gloire à vie**, calculée à partir de toutes vos actions de jeu. Chaque visite, chaque énigme résolue, chaque carnet, chaque plantage, chaque lieu ajouté pèse — et le détail s'affiche quand vous cliquez sur votre médaille. Vous voyez exactement d'où vient votre prestige.
+
+### Influence — le système entre en sommeil
+Le système d'influence — placer ses points sur les bannières d'un lieu — est mis en sommeil. Il ne servait plus la promesse du jeu : *celui qui foule la terre en est le veilleur*. Vos points placés ne disparaissent pas, ils attendent. Une refonte pour les **lieux lointains** que vous ne pourrez jamais atteindre physiquement (Mongolie, Pétra, montagnes du Caucase) viendra sous la forme d'un nouveau levier — investir vos Couronnes pour faire tomber un lieu inaccessible entre les mains de votre Héritage.
+
+### Sur la carte
+Le **scoreboard des Héritages** passe en jauges verticales schématiques, lecture immédiate des forces en présence. Les noms des veilleurs sur les lieux retrouvent une **typographie de signature**, plus calme, plus parchemin. Les modales (Coupe, classement, faction) se réorganisent autour des nouveaux compteurs.
+
+### Sur le profil
+Sous votre nom, **lieux explorés** et **énigmes résolues** au lieu des chiffres ambigus d'autrefois. Un nouvel onglet **Veillés** liste vos lieux veillés en temps réel (et remplace l'onglet Influencés, devenu sans usage). Les **Fragments possédés** se montrent plus sobrement, sans les billes d'affinité.
+
+### Corrections
+- Le compteur de photos ne sous-comptait plus que les contributions explicites — désormais il inclut les photos initiales d'un lieu créé.
+- Plus jamais deux personnes ne se partagent un titre faction : un seul rang, un seul titre.
+- Les visites GPS et les lieux explorés sont maintenant alignés sur la même source — fini le décalage de comptage.
+
 # ALPHA V0.5.14
 ## Le profil s'épaissit
 

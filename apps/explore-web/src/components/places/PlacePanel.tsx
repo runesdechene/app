@@ -12,7 +12,9 @@ import { WishlistButton } from './WishlistButton'
 // PlaceEnigma masqué pour l'instant (pas d'énigmes de lieu en DB)
 import { CarnetCard } from './CarnetCard'
 import type { Carnet } from './CarnetCard'
-import { InfluenceFrame } from './InfluenceFrame'
+// V0.6 — InfluenceFrame masqué dans le panel lieu (mig 022 défrise la RPC en
+// transition mais le UI ne l'expose plus). Réactivable en décommentant + import.
+// import { InfluenceFrame } from './InfluenceFrame'
 import { VeilleFrame } from './VeilleFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
@@ -456,8 +458,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [v05Key, setV05Key] = useState(0)
 
   // Faction visual data cache (colors + patterns for all factions)
+  // V0.6 — factionPatterns plus utilisé suite au masquage de InfluenceFrame.
+  // setFactionPatterns reste pour ne pas casser le useEffect de chargement plus bas
+  // (coût marginal, et ça nous évite de devoir aussi le retirer si on réactive InfluenceFrame).
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
-  const [factionPatterns, setFactionPatterns] = useState<Map<string, string>>(new Map())
+  const [, setFactionPatterns] = useState<Map<string, string>>(new Map())
   const [factionSvgs, setFactionSvgs] = useState<Map<string, string>>(new Map())
   const [factionNames, setFactionNames] = useState<Map<string, string>>(new Map())
 
@@ -927,10 +932,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           placeLocation={{ latitude: place.location.latitude, longitude: place.location.longitude }}
         />
 
-        {/* Zone 3A — Influence Banners (V0.5)
-            Transition douce V0.5 → V0.7 : reste actif tant que la phase 5 V0.7
-            (refonte "investir Couronnes à distance" avec défense par veilleur)
-            n'est pas livrée. Sinon les users perdent un usage attendu. */}
+        {/* Zone 3A — Influence Banners (V0.5) — MASQUÉ V0.6
+            Le système d'influence V0.5 est mis en sommeil avec l'arrivée des
+            Couronnes et de la Coupe (V0.6). Sera repensé en phase 5 V0.7 sous
+            la forme "investir Couronnes à distance" pour les lieux lointains
+            (cf project_v07_phase5_influence_distance.md).
+            Code conservé en commentaire pour réactivation rapide si besoin :
+
         {v05 && (
           <InfluenceFrame
             placeId={place.id}
@@ -941,7 +949,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             placeLocation={place.location}
             onInfluencePlaced={() => { refreshV05(); onRefetch() }}
           />
-        )}
+        )} */}
 
         {/* (Explorers now in identity section above) */}
 
