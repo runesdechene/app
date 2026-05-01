@@ -193,7 +193,7 @@ Pour qu'un joueur **voie qui est connecté** sans dépendre du zoom de la carte 
 S'ouvre au tap sur un médaillon de Campement (sien ou autre).
 
 **Layout** :
-- **Desktop** (≥ 768px) : 1 colonne principale (~64-95%) + **drawer Mur** repliable à droite (52px fermé / ~36% ouvert). Drawer ouvert par défaut, repliable si l'utilisateur veut plus d'espace.
+- **Desktop** (≥ 768px) : 1 colonne principale + **drawer Mur** repliable à droite. Layout asymétrique **~68/32** (drawer ouvert) ou **~95/5** (drawer fermé). Pas de double colonne 50/50. Drawer ouvert par défaut, repliable si l'utilisateur veut plus d'espace.
 - **Mobile** (< 768px) : bottom sheet draggable (peek 30% / half 70% / full 95%). Pas de drawer latéral (pas la place). Le Mur est accessible via une vue plein écran dédiée (slide-in droite) au tap d'un bouton "📜 Mur (5)".
 
 **Sections (colonne principale, ordre)** :
@@ -208,6 +208,36 @@ S'ouvre au tap sur un médaillon de Campement (sien ou autre).
 8. **Visités récemment** (7 derniers jours) — scroll horizontal, fond crème pâle, timestamp ("il y a 2h", "hier")
 
 **Pas de barre d'actions en bas** (Uriel : *« le bouton "Voir son Campement sur la carte" est inutile, on a forcément ouvert la modale par là »*).
+
+### 5.7.bis Direction visuelle — "sobre + chaude"
+
+Direction validée Uriel le 2026-05-01 après itérations visuelles. Critère central : **logiciel sobre, pas RPG**. La modale doit donner le **ressenti** de Campement sans tomber dans le carton-pâte façon Skyrim/Hearthstone.
+
+**À faire (touches signifiantes, peu coûteuses)** :
+- **Atmosphère discrète** : voile chaud très léger en bas de modale (subtil, pas un effet de feu de camp animé). Texture parchemin chaud uniforme en fond.
+- **Titres narratifs** au lieu d'administratifs :
+  - "Mon parcours" plutôt que "Stats"
+  - "Mes titres" plutôt que "Titres & Hauts faits"
+  - "Fragments possédés" (naming canonique, déjà existant)
+  - "Lieux ajoutés" / "Lieux veillés" / "Visités récemment" (existants ou nouveaux mais sobres)
+  - "Mur · les mots des passants" pour le drawer
+- **Note épinglée par une punaise rouge** discrète (seul élément "physique" assumé — la note est posée sur la modale, pas une bulle plate)
+- **Drawer Mur** : fond très légèrement décalé (~8% d'opacité chaude) pour le distinguer, sans texture "bois clouté"
+- **Style actuel de l'application préservé** : cards parchemin existantes, pills sépia, polices serif italiques pour les titres narratifs et noms
+
+**À ne pas faire (rejeté Uriel — "trop RPG")** :
+- ❌ Blason scellé pour les stats
+- ❌ Médaillon ornemental pour les titres
+- ❌ Besace cuir ouverte pour les fragments
+- ❌ Carte parchemin déroulée avec rouleaux pour les lieux
+- ❌ Panneau de bois clouté avec planches verticales pour le mur
+- ❌ Lueur de feu de camp animée
+- ❌ Étoiles éparses en arrière-plan
+- ❌ Header en cuir clouté avec coutures dorées
+
+**Justification** : ces éléments font *« RPG, pas logiciel »* et seraient *« galère »* à coder/maintenir cross-device. Les 2 ajouts (titres narratifs + punaise sur note) suffisent à passer de *« page de profil »* à *« espace personnel du voyageur »* sans ralentir le dev ni complexifier les assets.
+
+Maquette de référence : `.superpowers/brainstorm/<session>/content/campement-vision-A-sobre.html`
 
 **Drawer Mur** (à droite, repliable) :
 - État fermé (52px) : icône 📜, compteur (5), pulse rouge si non-lu, label vertical "Mur · 1 non lu"
@@ -360,7 +390,7 @@ Cette méta-spec est le **cadre d'articulation**. Chacun des 3 sous-systèmes au
 | **Surcharge des notifications** | Dans le sous-spec Campement : permissions claires, paramètres user pour désactiver certaines notifs. |
 | **Économie Couronnes déséquilibrée** | Calibrer dans chaque sous-spec à partir des hypothèses §4. Probablement ajustements post-livraison. |
 | **Régression du `TerritoryPanel`** existant | Migrer en no-op les 3 RPCs (`propose_territory_name`, `vote_territory_name`, `get_territory_votes`) au moment du dev Campement. Cf. mémoire `project_v07_territory_panel_todo.md`. |
-| **La modale ne "respire" pas assez le Campement** (risque exprimé par Uriel à la review) | La structure actuelle reste celle d'un profil joueur enrichi (sections empilées). Le sous-spec Campement doit chercher des **signaux narratifs forts** pour que l'utilisateur ressente *« c'est chez moi »* dès l'ouverture : éléments décoratifs, tonalité de voix dans les wordings, micro-animations, peut-être un fond de modale qui évoque le bivouac (texture parchemin, lueur de feu de camp en arrière-plan), titres de sections plus narratifs (« Mon parcours » plutôt que « Stats »). Vision long-terme §5.3 (bannière, musique, déco) renforce ce ressenti. À itérer post-livraison initiale. |
+| **La modale ne "respire" pas assez le Campement** (risque exprimé Uriel le 2026-05-01) | **Mitigation tranchée le 2026-05-01** (cf. §5.7.bis) : direction "sobre + chaude" — atmosphère discrète + titres narratifs ("Mon parcours", "Mes titres", "Mes routes") + punaise rouge sur la note. **Ne pas** glisser vers du RPG (blason, besace, bois clouté, lueur de feu) — Uriel a explicitement rejeté ces options. Vision long-terme §5.3 (bannière, musique, déco) renforce le ressenti progressivement post-V0.7. |
 
 ### 10.2 Dépendances et contraintes
 
