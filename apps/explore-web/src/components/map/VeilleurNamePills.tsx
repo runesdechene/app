@@ -25,18 +25,20 @@ interface Props {
  * Remplace l'emblème faction par lieu — la signature humaine prend la place du symbole tribal.
  */
 export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom, bounds }: Props) {
-  const setSelectedPlaceId = useMapStore(s => s.setSelectedPlaceId)
+  const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
 
   const pills = useMemo(() => {
     if (!geojson || !bounds || zoom < MIN_ZOOM) return []
-    const out: Array<{ id: string; longitude: number; latitude: number; name: string; avatarUrl: string }> = []
+    const out: Array<{ placeId: string; userId: string; longitude: number; latitude: number; name: string; avatarUrl: string }> = []
     for (const f of geojson.features) {
       const name = f.properties.veilleurName
-      if (!name || !f.properties.discovered) continue
+      const userId = f.properties.veilleurUserId
+      if (!name || !userId || !f.properties.discovered) continue
       const [lng, lat] = f.geometry.coordinates
       if (lng < bounds.minLng || lng > bounds.maxLng || lat < bounds.minLat || lat > bounds.maxLat) continue
       out.push({
-        id: f.properties.id,
+        placeId: f.properties.id,
+        userId,
         longitude: lng,
         latitude: lat,
         name,
@@ -48,9 +50,9 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
 
   return (
     <>
-      {pills.map(({ id, longitude, latitude, name, avatarUrl }) => (
+      {pills.map(({ placeId, userId, longitude, latitude, name, avatarUrl }) => (
         <Marker
-          key={id}
+          key={placeId}
           longitude={longitude}
           latitude={latitude}
           anchor="top"
@@ -61,7 +63,7 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
             onClick={e => {
               e.stopPropagation()
               e.nativeEvent.stopPropagation()
-              setSelectedPlaceId(id)
+              setSelectedPlayerId(userId)
             }}
           >
             {avatarUrl && (

@@ -669,6 +669,7 @@ export const ExploreMap = memo(function ExploreMap() {
           }
           if (ov.factionPattern !== undefined) props.factionPattern = ov.factionPattern
           if (ov.score !== undefined) props.score = ov.score
+          if (ov.veilleurUserId !== undefined) props.veilleurUserId = ov.veilleurUserId
           if (ov.veilleurName !== undefined) props.veilleurName = ov.veilleurName
           if (ov.veilleurAvatarUrl !== undefined) props.veilleurAvatarUrl = ov.veilleurAvatarUrl
         }

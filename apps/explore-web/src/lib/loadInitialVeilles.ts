@@ -46,6 +46,7 @@ export async function loadInitialVeilles(): Promise<void> {
       v.placeId,
       v.factionId,
       v.isNeutral,
+      lead?.userId || undefined,
       lead?.displayName?.trim() || undefined,
       lead?.avatarUrl || undefined,
     )
@@ -53,13 +54,14 @@ export async function loadInitialVeilles(): Promise<void> {
 }
 
 /**
- * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu + nom + avatar veilleur).
+ * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu + userId + nom + avatar veilleur).
  * À appeler après chaque plant_flag réussi pour rafraîchir la carte instantanément.
  */
 export function pushVeilleOverride(
   placeId: string,
   factionId: string | null,
   isNeutral: boolean,
+  veilleurUserId?: string,
   veilleurName?: string,
   veilleurAvatarUrl?: string,
 ): void {
@@ -81,6 +83,7 @@ export function pushVeilleOverride(
     factionId: isNeutral ? '__neutral__' : (factionId ?? undefined),
     tagColor,
     factionPattern,
+    veilleurUserId,
     veilleurName,
     veilleurAvatarUrl,
   })

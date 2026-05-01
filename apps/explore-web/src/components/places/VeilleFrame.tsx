@@ -62,6 +62,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       placeId,
       result.factionId,
       result.isNeutral,
+      lead?.userId || undefined,
       lead?.displayName?.trim() || undefined,
       lead?.avatarUrl || undefined,
     )

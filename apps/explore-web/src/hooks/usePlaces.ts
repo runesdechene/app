@@ -60,6 +60,8 @@ export interface PlaceProperties {
   ownFaction: boolean
   totalInfluence: number
   influenceByFaction: Record<string, number>
+  /** V0.7 — userId du veilleur principal (vide si pas veillé) — pour ouvrir profil au click pilule */
+  veilleurUserId: string
   /** V0.7 — nom du veilleur principal du lieu (vide si pas veillé) */
   veilleurName: string
   /** V0.7 — avatar URL du veilleur principal (vide si pas veillé) */
@@ -169,7 +171,8 @@ export function usePlaces() {
               influenceByFaction: place.influenceByFaction ?? {},
               discovered: false, // sera enrichi par le useMemo
               ownFaction: false, // sera enrichi par le useMemo
-              veilleurName: '',          // sera enrichi par les placeOverrides (loadInitialVeilles)
+              veilleurUserId: '',        // sera enrichi par les placeOverrides (loadInitialVeilles)
+              veilleurName: '',          // idem
               veilleurAvatarUrl: '',     // idem
             },
           })),

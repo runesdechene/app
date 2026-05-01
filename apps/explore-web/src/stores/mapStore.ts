@@ -8,6 +8,8 @@ interface PlaceOverride {
   factionId?: string
   factionPattern?: string
   fortificationLevel?: number
+  /** V0.7 — userId du veilleur principal (pour ouvrir son profil au click pilule carte) */
+  veilleurUserId?: string
   /** V0.7 — nom du veilleur principal (lead member) du lieu, pour le rendu carte */
   veilleurName?: string
   /** V0.7 — avatar URL du veilleur principal, pour la pilule signée carte */
