@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useMapStore } from '../../stores/mapStore'
 import { useCoupe } from '../../hooks/useCoupe'
 import { CoupeRulesModal } from './CoupeRulesModal'
+import { supabase } from '../../lib/supabase'
 import './LeaderboardModal.css'
 import './CoupeModal.css'
+
+interface FactionMeta {
+  color: string
+  pattern: string | null
+}
 
 type CoupeTab = 'classement' | 'top' | 'moi'
 
@@ -31,6 +37,20 @@ export function CoupeModal({ onClose }: Props) {
   const [tab, setTab] = useState<CoupeTab>('classement')
   const [showRules, setShowRules] = useState(false)
   const { state, loading, error } = useCoupe(true)
+  const [factionMeta, setFactionMeta] = useState<Map<string, FactionMeta>>(new Map())
+
+  // Fetch les couleurs / patterns de faction une seule fois pour enrichir le
+  // tab "Top contributeurs" avec un petit emblème à côté de chaque user.
+  useEffect(() => {
+    supabase.from('factions').select('id, color, pattern').then(({ data }) => {
+      if (!data) return
+      const m = new Map<string, FactionMeta>()
+      for (const f of data as Array<{ id: string; color: string; pattern: string | null }>) {
+        m.set(f.id, { color: f.color, pattern: f.pattern })
+      }
+      setFactionMeta(m)
+    })
+  }, [])
 
   function handlePlayerClick(playerId: string) {
     onClose()
@@ -103,24 +123,39 @@ export function CoupeModal({ onClose }: Props) {
                   {state.topUsers.length === 0 ? (
                     <p className="coupe-empty">Aucun contributeur pour le moment.</p>
                   ) : (
-                    state.topUsers.map(u => (
-                      <button
-                        key={u.userId}
-                        className="coupe-user-row"
-                        onClick={() => handlePlayerClick(u.userId)}
-                      >
-                        <span className="coupe-rank">#{u.rank}</span>
-                        {u.avatarUrl ? (
-                          <img src={u.avatarUrl} alt="" className="coupe-user-avatar" />
-                        ) : (
-                          <span className="coupe-user-avatar coupe-user-avatar-fallback">
-                            {u.displayName.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                        <span className="coupe-user-name">{u.displayName}</span>
-                        <span className="coupe-score">{u.score} pts</span>
-                      </button>
-                    ))
+                    state.topUsers.map(u => {
+                      const meta = factionMeta.get(u.factionId)
+                      return (
+                        <button
+                          key={u.userId}
+                          className="coupe-user-row"
+                          onClick={() => handlePlayerClick(u.userId)}
+                        >
+                          <span className="coupe-rank">#{u.rank}</span>
+                          {u.avatarUrl ? (
+                            <img src={u.avatarUrl} alt="" className="coupe-user-avatar" />
+                          ) : (
+                            <span className="coupe-user-avatar coupe-user-avatar-fallback">
+                              {u.displayName.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                          <span className="coupe-user-name">{u.displayName}</span>
+                          {meta && (
+                            <span
+                              className="coupe-user-faction-emblem"
+                              style={{ background: meta.color }}
+                              title="Héritage du joueur"
+                              aria-hidden
+                            >
+                              {meta.pattern && (
+                                <img src={meta.pattern} alt="" className="coupe-user-faction-emblem-img" />
+                              )}
+                            </span>
+                          )}
+                          <span className="coupe-score">{u.score} pts</span>
+                        </button>
+                      )
+                    })
                   )}
                 </div>
               )}
