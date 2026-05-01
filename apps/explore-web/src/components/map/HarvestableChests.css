@@ -85,7 +85,7 @@
 }
 
 /* ============================================================
-   Burst d'animation au click — halo + sparks + +N volant
+   Burst d'animation au click — flash "gling" + pièce 🪙+N qui s'élève
    ============================================================ */
 
 .harvestable-chest-burst {
@@ -98,102 +98,75 @@
   z-index: 5;
 }
 
-/* Halo doré qui s'expand depuis le centre puis fade out */
-.harvestable-chest-halo {
+/* Flash "gling" — éclat blanc-doré bref qui scintille au spawn de la pièce */
+.harvestable-chest-gling {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 48px;
-  height: 48px;
-  margin-left: -24px;
-  margin-top: -24px;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 224, 130, 0.55) 0%,
-    rgba(212, 175, 55, 0.35) 40%,
-    rgba(212, 175, 55, 0) 70%
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 224, 130, 0.6) 35%,
+    rgba(255, 224, 130, 0) 70%
   );
-  animation: chest-halo 700ms ease-out forwards;
+  animation: chest-gling 380ms ease-out forwards;
 }
 
-@keyframes chest-halo {
-  0%   { transform: scale(0.6); opacity: 0.95; }
-  60%  { transform: scale(2.2); opacity: 0.5; }
-  100% { transform: scale(3.2); opacity: 0; }
+@keyframes chest-gling {
+  0%   { transform: scale(0.4); opacity: 0; }
+  25%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
 }
 
-/* Sparks (étoiles) qui partent en éventail */
-.harvestable-chest-spark {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font-size: 16px;
-  color: #ffe082;
-  text-shadow: 0 0 6px rgba(255, 224, 130, 0.9);
-  transform: translate(-50%, -50%);
-  opacity: 0;
-}
-
-.harvestable-chest-spark--1 {
-  animation: chest-spark-1 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-}
-.harvestable-chest-spark--2 {
-  animation: chest-spark-2 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-}
-.harvestable-chest-spark--3 {
-  animation: chest-spark-3 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-}
-
-@keyframes chest-spark-1 {
-  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
-  20%  { opacity: 1; }
-  100% { transform: translate(calc(-50% - 32px), calc(-50% - 28px)) scale(1.1); opacity: 0; }
-}
-@keyframes chest-spark-2 {
-  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
-  20%  { opacity: 1; }
-  100% { transform: translate(calc(-50% + 30px), calc(-50% - 30px)) scale(1.1); opacity: 0; }
-}
-@keyframes chest-spark-3 {
-  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
-  20%  { opacity: 1; }
-  100% { transform: translate(-50%, calc(-50% - 44px)) scale(1.2); opacity: 0; }
-}
-
-/* +N volant — gros, doré, monte haut, dure 2s */
-.harvestable-chest-float {
+/* Pièce d'or 🪙 +N qui s'élève depuis l'icône en disparaissant */
+.harvestable-chest-coin {
   position: absolute;
   left: 50%;
   top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   transform: translate(-50%, 0);
+  animation: chest-coin-rise 1600ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  pointer-events: none;
+  white-space: nowrap;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.harvestable-chest-coin-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.harvestable-chest-coin-plus {
   font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 34px;
+  font-size: 24px;
   font-weight: 800;
   color: #ffe082;
   text-shadow:
-    0 0 8px rgba(255, 184, 0, 0.95),
-    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 6px rgba(255, 184, 0, 0.95),
+    0 2px 3px rgba(0, 0, 0, 0.7),
     0 0 1px rgba(0, 0, 0, 0.9);
   letter-spacing: 0.02em;
-  animation: chest-float 2000ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-  pointer-events: none;
+  line-height: 1;
 }
 
-@keyframes chest-float {
+@keyframes chest-coin-rise {
   0% {
     opacity: 0;
-    transform: translate(-50%, 8px) scale(0.6);
+    transform: translate(-50%, 8px) scale(0.7);
   }
   15% {
     opacity: 1;
-    transform: translate(-50%, -8px) scale(1.4);
-  }
-  30% {
-    transform: translate(-50%, -22px) scale(1.15);
+    transform: translate(-50%, -2px) scale(1.15);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -100px) scale(1);
+    transform: translate(-50%, -80px) scale(1);
   }
 }

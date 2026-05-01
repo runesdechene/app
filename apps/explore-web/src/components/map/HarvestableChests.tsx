@@ -51,16 +51,18 @@ export function HarvestableChests({ geojson }: Props) {
     const burstId = Date.now()
     setBursts(prev => [...prev, { id: burstId, placeId, value: expectedGain }])
 
-    // Hook audio placeholder — Uriel fournira le fichier plus tard.
-    // Une fois le fichier dispo dans /res/crown_harvest.mp3 :
-    //   const audio = new Audio('/res/crown_harvest.mp3')
-    //   audio.volume = 0.4
-    //   audio.play().catch(() => {})
+    // Bruit "gling" — on reprend le son d'influence V0.5 (déjà dans /res/),
+    // cohérent en termes d'identité sonore RdC. Volume 0.5 comme InfluenceFrame.
+    try {
+      const s = new Audio('/res/influence_click.mp3')
+      s.volume = 0.5
+      s.play().catch(() => {})
+    } catch { /* silent fallback */ }
 
-    // Cleanup de l'anim après sa durée totale (la plus longue : float +N = 2s)
+    // Cleanup de l'anim après sa durée totale (float +N = 1.6s)
     setTimeout(() => {
       setBursts(prev => prev.filter(n => n.id !== burstId))
-    }, 2100)
+    }, 1700)
 
     const result = await harvest(userId, placeId)
 
@@ -117,11 +119,13 @@ export function HarvestableChests({ geojson }: Props) {
 
               {myBursts.map(b => (
                 <span key={b.id} className="harvestable-chest-burst" aria-hidden>
-                  <span className="harvestable-chest-halo" />
-                  <span className="harvestable-chest-spark harvestable-chest-spark--1">{'✦'}</span>
-                  <span className="harvestable-chest-spark harvestable-chest-spark--2">{'✦'}</span>
-                  <span className="harvestable-chest-spark harvestable-chest-spark--3">{'✦'}</span>
-                  <span className="harvestable-chest-float">+{b.value}</span>
+                  {/* Flash "gling" — éclat blanc bref qui scintille au spawn */}
+                  <span className="harvestable-chest-gling" />
+                  {/* Pièce d'or 🪙 +N qui s'élève en disparaissant */}
+                  <span className="harvestable-chest-coin">
+                    <span className="harvestable-chest-coin-icon">{'🪙'}</span>
+                    <span className="harvestable-chest-coin-plus">+{b.value}</span>
+                  </span>
                 </span>
               ))}
             </div>
