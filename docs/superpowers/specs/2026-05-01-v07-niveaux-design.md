@@ -18,6 +18,20 @@ Contrainte forte : ne pas catapulter les vétérans actuels (top à ~7000 pts) d
 
 ---
 
+## 1.bis Glossaire & vocabulaire métier
+
+Trois actions distinctes qui étaient ambiguës dans le code et l'UI actuels (cf. bug toast §6.4) :
+
+| Concept (interne) | Verbe joueur (UI) | Description | Trigger DB |
+|---|---|---|---|
+| **Découvrir** | *« Le brouillard se lève sur [lieu] »* | Sortir un lieu du brouillard (à distance OU par proximité, sans présence physique) | INSERT `places_discovered` |
+| **Fouler** | *« Tu as foulé [lieu] »* | Aller physiquement sur place (GPS confirmé) | INSERT `place_explorers` (DISTINCT place_id) |
+| **Cartographier** | *« Tu as cartographié [lieu] »* | Inscrire un nouveau lieu dans la base commune | INSERT `places` (auteur) |
+
+Le code, les noms de tables et les RPCs gardent leurs noms historiques (`discover_place`, `places_discovered`, `place_explorers`). Seule l'UI joueur utilise le nouveau lexique pour lever toute confusion.
+
+---
+
 ## 2. Décisions stratégiques (résumé exécutif)
 
 | Décision | Choix retenu | Raison principale |
@@ -146,19 +160,19 @@ Paliers de référence :
 
 ## 5. Coefficients d'action
 
-| Action | Gloire | Coupe | Notes |
-|---|---|---|---|
-| Découverte du brouillard (`places_discovered` INSERT) | **+1** | **0** | Récompense la marche exploratoire. Exclu Coupe pour éviter le farm de zone large en saison. |
-| Visite GPS d'un nouveau lieu (`place_explorers` INSERT, DISTINCT place_id) | **+3** | **+3** | Effort physique, valeur de référence. |
-| Énigme `very_easy` correcte | +1 | +1 | Inchangé (mig 038). |
-| Énigme `easy` correcte | +1 | +1 | Inchangé. |
-| Énigme `medium` correcte | +2 | +2 | Inchangé. |
-| Énigme `hard` correcte | +3 | +3 | Inchangé. |
-| Photo ajoutée (par photo dans `images[]`) | +1 | +1 | Inchangé (mig 038 logique de comptage). |
-| Carnet écrit | +5 | +5 | ↑ depuis +3 (effort rédactionnel). |
-| Plantage de bannière (`veille_history`) | +10 | +10 | ↑ depuis +5 (événement marquant). |
-| Lieu ajouté (`places.author_id`) | +20 | +20 | ↑ depuis +7 (création patrimoniale). |
-| Revisite GPS (`revisit_place_gps`, log `activity_log`) | 0 | 0 | Inchangé. Anti-farm garanti par DISTINCT et par mig 006 (1 revisite/jour, influence dégressive 15/10/5/3). |
+| Action interne | Verbe joueur | Gloire | Coupe | Notes |
+|---|---|---|---|---|
+| **Découvrir** (`places_discovered` INSERT) | *« Le brouillard se lève »* | **+1** | **0** | Récompense la marche exploratoire. Exclu Coupe pour éviter le farm de zone large en saison. |
+| **Fouler** (`place_explorers` INSERT, DISTINCT place_id) | *« Tu as foulé »* | **+3** | **+3** | Effort physique, valeur de référence. |
+| Énigme `very_easy` correcte | *« Énigme résolue »* | +1 | +1 | Inchangé (mig 038). |
+| Énigme `easy` correcte | *« Énigme résolue »* | +1 | +1 | Inchangé. |
+| Énigme `medium` correcte | *« Énigme résolue »* | +2 | +2 | Inchangé. |
+| Énigme `hard` correcte | *« Énigme résolue »* | +3 | +3 | Inchangé. |
+| Photo ajoutée (par photo dans `images[]`) | *« Tu as ajouté une photo »* | +1 | +1 | Inchangé (mig 038 logique de comptage). |
+| Carnet écrit | *« Tu as écrit un récit »* | +5 | +5 | ↑ depuis +3 (effort rédactionnel). |
+| Plantage de bannière (`veille_history`) | *« Tu as planté ta bannière »* | +10 | +10 | ↑ depuis +5 (événement marquant). |
+| **Cartographier** (`places.author_id`) | *« Tu as cartographié »* | +20 | +20 | ↑ depuis +7 (création patrimoniale). Gating : niveau 3 minimum. |
+| Revisite GPS (`revisit_place_gps`, log `activity_log`) | (toast existant inchangé) | 0 | 0 | Inchangé. Anti-farm garanti par DISTINCT et par mig 006 (1 revisite/jour, influence dégressive 15/10/5/3). |
 
 **Cohérence Coupe vs Gloire** : la formule reste identique aux deux jauges sauf pour la découverte de brouillard. Les helpers SQL existants (`_enigma_score_weighted`) restent utilisés tels quels pour les énigmes.
 
@@ -193,7 +207,16 @@ Une fois confirmation que rien ne dépend plus de la Gloire :
 **Changelog public** (date du déploiement) :
 > *« Le système d'expérience évolue. Tous les Veilleurs reprennent depuis le Niveau 1, mais ceux qui étaient là avant gardent à vie le badge Vétéran de la Première Époque. Vos accomplissements antérieurs sont reconnus — par votre badge, et par notre mémoire. À partir d'aujourd'hui, chaque pas compte. »*
 
-**Email aux vétérans** : version étendue du même message, avec rappel des paliers narratifs (niveau 3 = ajout de lieu débloqué, niveau 30 = palier reconnu, niveau 50 = légende).
+**Email aux vétérans** : version étendue du même message, avec rappel des paliers narratifs (niveau 3 = cartographier débloqué, niveau 30 = palier reconnu, niveau 50 = légende).
+
+### 6.4 Bug toast actuel résolu naturellement par la refonte
+
+**Constat** (découvert en session, 2026-05-01) : le code actuel (`apps/explore-web/src/hooks/usePlayer.ts` ligne 605-609) affiche après chaque appel à `discover_place` un toast *« Nouveau lieu découvert ! +1 Gloire +1 Coupe »*, peu importe le `method` ('gps' OU 'remote'). Or côté serveur, la formule Gloire/Coupe (mig 024+038) ne compte que `place_explorers` (DISTINCT place_id), pas `places_discovered`. **Conséquence** : une découverte à distance affiche un gain mensonger — le compteur réel ne bouge pas.
+
+**Résolution** : la refonte rend le toast honnête par construction.
+- Trigger DB sur `places_discovered` INSERT incrémente réellement `xp_total` de +1.
+- Toast post-refonte (cf. §7.2) sépare : *« Le brouillard se lève sur [lieu] +1 Gloire »* (sans Coupe, exclu) vs *« Tu as foulé [lieu] +3 Gloire / +3 Coupe »*.
+- Décision : pas de patch d'urgence avant la sortie de la feature niveaux. Le throwaway code n'aurait pas de durée de vie.
 
 ---
 
@@ -208,11 +231,19 @@ Une fois confirmation que rien ne dépend plus de la Gloire :
 
 ### 7.2 Toasts d'action
 
-Format unifié, lyrique, narratif :
-- *« +5 Gloire — tu as planté ta bannière »*
-- *« +20 Gloire — tu as ajouté un nouveau lieu »*
-- *« +1 Gloire — un lieu sort du brouillard »*
-- *« +3 Gloire — tu as visité ce lieu »*
+Format unifié, narratif, séparant explicitement Gloire / Coupe quand les deux divergent :
+
+| Action | Wording du toast (UI joueur) |
+|---|---|
+| Découvrir | 🔍  *« Le brouillard se lève sur [lieu] »*  +1 Gloire |
+| Fouler | 🥾  *« Tu as foulé [lieu] »*  +3 Gloire / +3 Coupe |
+| Cartographier | 📜  *« Tu as cartographié [lieu] »*  +20 Gloire / +20 Coupe |
+| Carnet | ✍️  *« Tu as écrit un récit sur [lieu] »*  +5 Gloire / +5 Coupe |
+| Photo | 📷  *« Tu as ajouté une photo de [lieu] »*  +1 Gloire / +1 Coupe |
+| Plantage | 🏴  *« Tu as planté ta bannière à [lieu] »*  +10 Gloire / +10 Coupe |
+| Énigme résolue | 🦉  *« Énigme résolue sur [lieu] »*  +N Gloire / +N Coupe |
+
+Cas combiné : si un joueur foule un lieu jamais découvert préalablement (passe direct dessus), les triggers DB cumulent +1 (découverte) + +3 (foulée) côté Gloire et +3 côté Coupe. Le front compose un toast unifié : 🥾 *« Tu as découvert et foulé [lieu] »* +4 Gloire / +3 Coupe.
 
 Comportement identique aux toasts Couronnes existants (stack, fenêtre 5min de fusion, pattern V0.6.2).
 
@@ -250,37 +281,99 @@ Visualise le badge en gros au centre, bouton *« Reprendre »*.
 
 ---
 
-## 8. Migration des titres généraux
+## 8. Refonte complète des titres généraux
 
-Les titres existants de type `'general'` (table `titles`) sont migrés via UPDATE dans la même mig que le switch.
+Décision philosophique : **plus aucun titre rank lifetime** (qui frustre les joueurs en se faisant doubler). Tous les titres généraux passent en **threshold acquis à vie** sur 7 axes thématiques. Les titres faction (basés sur le rang Coupe, mig 034+) restent inchangés.
 
-### 8.1 Pattern stat-based (`condition->>'stat' = 'glory'` avec `min`)
+Total : **33 titres généraux** (vs 18 actuels après suppression des Bâtisseur).
 
-Avant :
-```json
-{"stat": "glory", "min": 200}
-```
+### 8.1 Axe 1 — Niveau (parcours global, 6 paliers)
 
-Après (mapping basé sur les paliers de la nouvelle courbe) :
-- `glory min: 50` → `level min: 4`
-- `glory min: 100` → `level min: 5`
-- `glory min: 200` → `level min: 8`
-- `glory min: 500` → `level min: 13`
-- `glory min: 1000` → `level min: 20`
-- `glory min: 2000` → `level min: 27`
-- `glory min: 5000` → `level min: 40`
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Compagnon** | ⚜️ | `level >= 5` |
+| 2 | **Veilleur** | ⚔️ | `level >= 15` |
+| 3 | **Héros local** | 🛡️ | `level >= 25` |
+| 4 | **Héros régional** | 🏛️ | `level >= 35` |
+| 5 | **Héros** | 🦅 | `level >= 42` |
+| 6 | **Légende** | 👑 | `level >= 50` (cap) |
 
-Calibration validée à l'implémentation en regardant les seuils existants un par un.
+### 8.2 Axe 2 — Découvertes du brouillard (5 paliers, basé sur `places_discovered` count)
 
-### 8.2 Pattern rank-based (`condition->>'stat' = 'glory'` avec `rank`)
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Novice** | 🌱 | Inscription (`discoveries >= 0`) |
+| 2 | **Curieux** | 🔍 | `discoveries >= 10` |
+| 3 | **Explorateur** | 🧭 | `discoveries >= 50` |
+| 4 | **Arpenteur** | 🗺️ | `discoveries >= 200` |
+| 5 | **Grand Voyageur** | 🌐 | `discoveries >= 1000` |
 
-Avant : `{"stat": "glory", "rank": 10}` (top 10 du leaderboard "notoriety")
+### 8.3 Axe 3 — Marche physique (4 paliers, basé sur `place_explorers` DISTINCT count)
 
-Après : `{"stat": "level", "rank": 10}` — utilise le nouveau leaderboard tri par niveau (tie-break xp_total).
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Pèlerin** | 🥾 | `places_visited >= 10` |
+| 2 | **Cheminant** | 🚶 | `places_visited >= 50` |
+| 3 | **Errant** | ⚔️ | `places_visited >= 150` |
+| 4 | **Marcheur des Mondes** | 🌍 | `places_visited >= 500` |
 
-### 8.3 Refactor `get_user_titles`
+### 8.4 Axe 4 — Érudition (4 paliers, basé sur `_enigma_score_weighted`)
 
-La fonction existante (mig 038) calcule `v_glory_rank` via RANK OVER ORDER BY (exploration_points + erudition_points). À remplacer par RANK OVER ORDER BY xp_total. Les CASE qui matchent `condition->>'stat' IN ('notoriety', 'glory')` deviennent `IN ('notoriety', 'glory', 'level')` (tolérance pour ne pas casser si certaines lignes restent).
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Apprenti Sage** | 📜 | `enigma_score >= 15` |
+| 2 | **Érudit** | 📚 | `enigma_score >= 50` |
+| 3 | **Philosophe** | 🦉 | `enigma_score >= 150` |
+| 4 | **Grand Sage** | 📖 | `enigma_score >= 400` |
+
+### 8.5 Axe 5 — Bannière (5 paliers, basé sur `veille_history` count)
+
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Recrue** | 🌑 | `plantages >= 3` |
+| 2 | **Hérault** | 🏴 | `plantages >= 10` |
+| 3 | **Banneret** | ⚜️ | `plantages >= 30` |
+| 4 | **Capitaine** | 🛡️ | `plantages >= 80` |
+| 5 | **Maréchal** | 👑 | `plantages >= 200` |
+
+### 8.6 Axe 6 — Cartographie (5 paliers, basé sur `places.author_id` count)
+
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Pionnier** | 🌟 | `places_added >= 1` |
+| 2 | **Cartographe Initié** | 🧭 | `places_added >= 5` |
+| 3 | **Cartographe** | 📐 | `places_added >= 25` |
+| 4 | **Grand Chroniqueur** | 📜 | `places_added >= 100` |
+| 5 | **Maître-Cartographe** | 🏗️ | `places_added >= 500` |
+
+### 8.7 Axe 7 — Carnets (NOUVEAU axe, 4 paliers, basé sur `place_contributions` type='carnet' count)
+
+| Palier | Nom | Icône | Condition |
+|---|---|---|---|
+| 1 | **Page** | 📝 | `carnets >= 1` |
+| 2 | **Conteur** | 🪶 | `carnets >= 10` |
+| 3 | **Chroniqueur** | 📜 | `carnets >= 50` |
+| 4 | **Maître Conteur** | 📖 | `carnets >= 200` |
+
+### 8.8 Suppressions
+
+- ID 18 **Bâtisseur** (min 100 fortifications) — concept disparu, pas de remplacement.
+- ID 19 **Bâtisseur de cathédrales** (min 500 fortifications) — idem.
+
+### 8.9 Stratégie de migration SQL
+
+La mig 040 (switch principal) :
+1. **DELETE** des 2 titres Bâtisseur (IDs 18, 19).
+2. **UPDATE** des 18 titres existants pour aligner leurs conditions sur les nouveaux schémas (`level`, `discoveries`, `places_visited`, `enigma_score`, `plantages`, `places_added`, `carnets`).
+3. **INSERT** des nouveaux titres manquants pour atteindre les 33 finaux (notamment tout l'axe Carnets, plusieurs paliers intermédiaires, le palier "Pionnier", etc.).
+4. **Refonte de `get_user_titles`** pour évaluer les conditions sur les nouveaux compteurs (extension du CASE existant : ajout des stats `level`, `places_visited`, `enigma_score`, `plantages`, `carnets`).
+
+### 8.10 Effet sur les vétérans à la connexion post-switch
+
+Tout le monde repart à xp_total = 0. Les compteurs de contenu (`places_discovered`, `place_explorers`, `places.author_id`, `place_contributions`, `veille_history`) eux **restent intacts** (pas reset). Donc :
+- Les axes Découvertes / Marche / Érudition / Bannière / Cartographie / Carnets **conservent les acquis** historiques. Un vétéran qui avait 80 lieux découverts garde son titre Arpenteur.
+- L'axe Niveau **redémarre à zéro** (puisque xp_total = 0). Les titres Compagnon / Veilleur / Héros... se reméritent.
+- Le badge "Vétéran de la Première Époque" compense visuellement la perte du palier Niveau.
 
 ---
 
