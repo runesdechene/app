@@ -16,7 +16,7 @@ export function readCachedGlory(): number {
   return Number(safeStorage.get(STORAGE_KEY_GLORY)) || 0
 }
 
-export function useGlory(autoLoad = false) {
+export function useGlory(autoLoad = false, pollMs = 0) {
   const userId = usePlayerStore(s => s.userId)
   const [state, setState] = useState<GloryState | null>(null)
   const [loading, setLoading] = useState(false)
@@ -51,6 +51,12 @@ export function useGlory(autoLoad = false) {
   useEffect(() => {
     if (autoLoad && userId) refresh()
   }, [autoLoad, userId, refresh])
+
+  useEffect(() => {
+    if (!pollMs || pollMs <= 0 || !userId) return
+    const id = window.setInterval(() => { refresh() }, pollMs)
+    return () => window.clearInterval(id)
+  }, [pollMs, userId, refresh])
 
   return { state, loading, error, refresh }
 }

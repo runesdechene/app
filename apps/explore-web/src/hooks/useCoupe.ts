@@ -6,11 +6,11 @@ import type { CoupeState } from '../types/coupe'
 /**
  * V0.7 phase 3 — Lecture de l'état Coupe des Héritages.
  *
- * Pas de polling : refresh manuel (à l'ouverture du modal) + au mount initial.
- * La RPC `get_coupe_state` calcule à la volée depuis les sources, donc on a
- * toujours des données fraîches au moment où on lit.
+ * Refresh manuel + autoLoad au mount + polling optionnel (pollMs > 0) pour
+ * voir le score progresser quasi-temps réel sans avoir à fermer/rouvrir.
+ * 30s suffit largement pour ressentir la "vie" sans surcharger la DB.
  */
-export function useCoupe(autoLoad = false) {
+export function useCoupe(autoLoad = false, pollMs = 0) {
   const userId = usePlayerStore(s => s.userId)
   const [state, setState] = useState<CoupeState | null>(null)
   const [loading, setLoading] = useState(false)
@@ -44,6 +44,12 @@ export function useCoupe(autoLoad = false) {
   useEffect(() => {
     if (autoLoad && userId) refresh()
   }, [autoLoad, userId, refresh])
+
+  useEffect(() => {
+    if (!pollMs || pollMs <= 0 || !userId) return
+    const id = window.setInterval(() => { refresh() }, pollMs)
+    return () => window.clearInterval(id)
+  }, [pollMs, userId, refresh])
 
   return { state, loading, error, refresh }
 }

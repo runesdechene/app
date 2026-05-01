@@ -92,7 +92,10 @@ export function FactionBar() {
     }
 
     load()
-    return () => { cancelled = true }
+    // Polling 30s — on ressent la progression quasi-temps réel quand un user
+    // ajoute une action (carnet, plantage, énigme) sans avoir à reload la page.
+    const id = window.setInterval(load, 30000)
+    return () => { cancelled = true; window.clearInterval(id) }
   }, [userId])
 
   if (stats.length === 0) return null

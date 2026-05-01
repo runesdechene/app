@@ -48,7 +48,7 @@ import '../styles/mobile.css'
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   // V0.7 phase 3.5 — Gloire calculée à la volée via get_my_glory.
   // readCachedGlory évite le flash 0 au boot le temps de l'appel RPC.
-  const { state: glory } = useGlory(true)
+  const { state: glory } = useGlory(true, 30000)
   const displayGlory = glory?.glory ?? readCachedGlory()
   const [showInfo, setShowInfo] = useState(false)
 
