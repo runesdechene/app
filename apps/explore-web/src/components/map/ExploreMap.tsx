@@ -423,14 +423,14 @@ export const ExploreMap = memo(function ExploreMap() {
         })
       }
 
-      // Icône mode Coupe des Héritages — fond sépia, icône encre brune (plus d'anneau coloré)
+      // Icône mode Coupe des Héritages — fond sépia, icône encre brune, anneau couleur faction
       if (tagIcon) {
         const border = dominantFactionColor || ''
         const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::${border}`
         if (!loadedIconsRef.current.has(inkKey)) {
           loadedIconsRef.current.add(inkKey)
           loadColoredSvgIcon(
-            map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR,
+            map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR, border || undefined,
           ).catch(() => {
             loadedIconsRef.current.delete(inkKey)
           })
@@ -452,7 +452,7 @@ export const ExploreMap = memo(function ExploreMap() {
       if (loadedIconsRef.current.has(inkKey)) continue
       loadedIconsRef.current.add(inkKey)
       loadColoredSvgIcon(
-        map, feature.properties.tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, feature.properties.tagIcon, HERITAGE_CUP_INK_COLOR,
+        map, feature.properties.tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, feature.properties.tagIcon, HERITAGE_CUP_INK_COLOR, ov.tagColor,
       ).catch(() => {
         loadedIconsRef.current.delete(inkKey)
       })
