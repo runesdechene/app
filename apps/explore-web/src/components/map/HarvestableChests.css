@@ -40,8 +40,15 @@
 
 .harvestable-chest-btn.busy {
   pointer-events: none;
-  opacity: 0.7;
-  animation: none;
+  animation: chest-fade-out 1500ms ease-out forwards;
+}
+
+/* Fade out doux du coffre pendant que la pièce s'élève — évite l'illusion
+   d'un second coffre cliquable au même endroit. */
+@keyframes chest-fade-out {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.85; }
+  100% { opacity: 0; }
 }
 
 /* Cercle balloon sépia qui imite la taille du marker lieu d'origine
