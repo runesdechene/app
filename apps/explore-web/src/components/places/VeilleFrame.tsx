@@ -11,6 +11,26 @@ interface Props {
   placeLocation: { latitude: number; longitude: number }
 }
 
+/** Format relatif de la date de plantage, plafonné à 3 mois pour ne pas effrayer les nouveaux.
+ *  Hier ou avant-hier → "depuis quelques jours"
+ *  < 7 jours → "depuis X jours"
+ *  < 4 semaines → "depuis X semaines"
+ *  < 3 mois → "depuis X mois"
+ *  ≥ 3 mois → "depuis plus de 3 mois" */
+function formatVeilleSince(plantedAtIso: string): string {
+  const planted = new Date(plantedAtIso).getTime()
+  const now = Date.now()
+  const diffMs = Math.max(0, now - planted)
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  if (days < 1) return 'depuis aujourd’hui'
+  if (days < 7) return `depuis ${days} jour${days > 1 ? 's' : ''}`
+  const weeks = Math.floor(days / 7)
+  if (weeks < 4) return `depuis ${weeks} semaine${weeks > 1 ? 's' : ''}`
+  const months = Math.floor(days / 30)
+  if (months < 3) return `depuis ${months} mois`
+  return 'depuis plus de 3 mois'
+}
+
 function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const R = 6371
   const dLat = (b.lat - a.lat) * Math.PI / 180
@@ -57,15 +77,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       setErrorMsg(msg)
       return
     }
-    const lead = result.members[0]
-    pushVeilleOverride(
-      placeId,
-      result.factionId,
-      result.isNeutral,
-      lead?.userId || undefined,
-      lead?.displayName?.trim() || undefined,
-      lead?.avatarUrl || undefined,
-    )
+    pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
     await refresh()
   }, [userId, userPosition, plant, refresh, placeId])
 
@@ -87,7 +99,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
     }
     const isSolo = veille.members.length === 1
     const names = veille.members.map(m => m.displayName.trim())
-    const dateStr = new Date(veille.plantedAt).toLocaleDateString()
+    const sinceStr = formatVeilleSince(veille.plantedAt)
     const label = isSolo
       ? <><strong>{names[0]}</strong> veille ce lieu</>
       : (veille.isNeutral
@@ -104,7 +116,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
                  className="veille-frame-avatar" />
           ))}
         </div>
-        <span>{label} — depuis le {dateStr}</span>
+        <span>{label} {sinceStr}</span>
       </div>
     )
   }
