@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ExploreMap } from '../components/map/ExploreMap'
 import { EnergyIndicator } from '../components/map/EnergyIndicator'
 import { CrownsBadge } from '../components/map/CrownsBadge'
+import { CoupeBadge } from '../components/map/CoupeBadge'
 import { PlacePanel } from '../components/places/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -269,6 +270,7 @@ export default function MapPage() {
           {!authLoading && isAuthenticated && (
             <>
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
+              <CoupeBadge />
               <CrownsBadge />
               <EnigmaChestButton
                 onOpenDaily={() => setShowDailyEnigma(true)}

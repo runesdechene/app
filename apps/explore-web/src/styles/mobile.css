@@ -101,6 +101,35 @@
   background: #c9a84c;
 }
 
+/* V0.7 phase 3 — Wrapper qui aligne le toggle Coupe + bouton ⓘ règles */
+.influence-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.influence-toggle-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(30, 25, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d4c5a0;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+.influence-toggle-info:hover {
+  background: rgba(40, 34, 28, 0.95);
+}
+
 /* ==========================================
    MOBILE RESPONSIVE (max-width: 768px)
    ========================================== */
