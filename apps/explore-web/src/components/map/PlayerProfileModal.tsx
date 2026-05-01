@@ -56,6 +56,9 @@ interface PlayerProfile {
   influenceStock?: number
   influencePlaced?: number
   glory?: number
+  /** V0.7 phase 3.5 — nouveaux compteurs (mig 030) */
+  lieuxExplores?: number
+  enigmasSolved?: number
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -380,18 +383,18 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )}
                 </div>
 
+                {/* V0.7 phase 3.5 — Compteurs cohérents avec la nouvelle Gloire :
+                    "lieux explorés" (DISTINCT visit_gps) + "énigmes résolues".
+                    Remplace l'ancien trio (lieux ajoutés / visités / influencés)
+                    qui mélangeait V0.5 et faisait doublon. */}
                 <div className="player-modal-counts">
                   <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.authoredPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">lieux</span>
+                    <span className="player-modal-count-value">{profile.lieuxExplores ?? 0}</span>
+                    <span className="player-modal-count-label">{'lieux explorés'}</span>
                   </div>
                   <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.discoveredPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">visités</span>
-                  </div>
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.favoritePlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">Influencés</span>
+                    <span className="player-modal-count-value">{profile.enigmasSolved ?? 0}</span>
+                    <span className="player-modal-count-label">{'énigmes résolues'}</span>
                   </div>
                 </div>
 
