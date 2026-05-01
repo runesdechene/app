@@ -183,10 +183,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
                       )}
                     </div>
                     <span className="faction-member-notoriety">
-                      {'\uD83C\uDF96\uFE0F'} {m.glory}
-                      <span style={{ marginLeft: 8, opacity: 0.7, fontSize: '0.9em' }}>
-                        {'\uD83C\uDFC6'} {m.coupeScore}
-                      </span>
+                      {'\uD83C\uDFC6'} {m.coupeScore}
                     </span>
                   </div>
                 ))}
