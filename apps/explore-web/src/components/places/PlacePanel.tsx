@@ -927,7 +927,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           placeLocation={{ latitude: place.location.latitude, longitude: place.location.longitude }}
         />
 
-        {/* Zone 3A — Influence Banners (V0.5, figée — système remplacé par la Veille) */}
+        {/* Zone 3A — Influence Banners (V0.5)
+            Transition douce V0.5 → V0.7 : reste actif tant que la phase 5 V0.7
+            (refonte "investir Couronnes à distance" avec défense par veilleur)
+            n'est pas livrée. Sinon les users perdent un usage attendu. */}
         {v05 && (
           <InfluenceFrame
             placeId={place.id}
@@ -937,7 +940,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             factionNames={factionNames}
             placeLocation={place.location}
             onInfluencePlaced={() => { refreshV05(); onRefetch() }}
-            readOnly
           />
         )}
 
