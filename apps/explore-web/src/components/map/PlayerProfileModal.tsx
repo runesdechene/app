@@ -56,8 +56,9 @@ interface PlayerProfile {
   influenceStock?: number
   influencePlaced?: number
   glory?: number
-  /** V0.7 phase 3.5 — nouveaux compteurs (mig 030) */
+  /** V0.7 phase 3.5 — nouveaux compteurs (mig 030 + 031) */
   lieuxExplores?: number
+  lieuxVeilles?: number
   enigmasSolved?: number
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
@@ -383,19 +384,27 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )}
                 </div>
 
-                {/* V0.7 phase 3.5 — Compteurs cohérents avec la nouvelle Gloire :
-                    "lieux explorés" (DISTINCT visit_gps) + "énigmes résolues".
-                    Remplace l'ancien trio (lieux ajoutés / visités / influencés)
-                    qui mélangeait V0.5 et faisait doublon. */}
-                <div className="player-modal-counts">
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.lieuxExplores ?? 0}</span>
-                    <span className="player-modal-count-label">{'lieux explorés'}</span>
-                  </div>
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.enigmasSolved ?? 0}</span>
-                    <span className="player-modal-count-label">{'énigmes résolues'}</span>
-                  </div>
+                {/* V0.7 phase 3.5 — Titres déplacés sous le nom (depuis le
+                    bas du header) pour densifier l'identité visuelle.
+                    Les compteurs (lieux explorés / énigmes / lieux veillés)
+                    sont déplacés plus bas, sous les Couronnes, en lignes
+                    cohérentes avec Gloire/Coupe/Couronnes. */}
+                <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
+                  {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
+                    <span key={t.id} className="title-badge title-badge-general">
+                      {t.icon_url ? (
+                        <img src={t.icon_url} alt="" className="title-badge-img" />
+                      ) : t.icon ? (
+                        <span>{t.icon}</span>
+                      ) : null}
+                      {t.name}
+                    </span>
+                  ))}
+                  {isSelf && !isEditing && (
+                    <button className="title-badge title-badge-edit" onClick={openTitlePicker}>
+                      {'✏️'}
+                    </button>
+                  )}
                 </div>
 
                 {/* V0.7 phase 3.5 \u2014 Refonte Gloire + Coupe + Couronnes
@@ -433,31 +442,22 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         </span>
                       </span>
                     </div>
-                    {/* Note : les compteurs bruts d\u00E9taill\u00E9s sont maintenant dans
-                        l'InfoModal de la Gloire (cliquer sur le \uD83C\uDF96\uFE0F depuis la carte
-                        pour voir le calcul ligne par ligne). */}
                   </>
                 )}
-              </div>
-            </div>
 
-            {/* Titres */}
-            <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
-              {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
-                <span key={t.id} className="title-badge title-badge-general">
-                  {t.icon_url ? (
-                    <img src={t.icon_url} alt="" className="title-badge-img" />
-                  ) : t.icon ? (
-                    <span>{t.icon}</span>
-                  ) : null}
-                  {t.name}
-                </span>
-              ))}
-              {isSelf && !isEditing && (
-                <button className="title-badge title-badge-edit" onClick={openTitlePicker}>
-                  {'\u270F\uFE0F'}
-                </button>
-              )}
+                {/* V0.7 phase 3.5 \u2014 Compteurs sous Couronnes, m\u00EAme style que
+                    Gloire/Coupe/Couronnes. Visibles pour TOUS les profils
+                    (pas seulement isSelf \u2014 donn\u00E9es dans get_player_profile). */}
+                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
+                  <span>{'\uD83E\uDDED'} {profile.lieuxExplores ?? 0} {'lieux explor\u00E9s'}</span>
+                </div>
+                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
+                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
+                </div>
+                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
+                  <span>{'\uD83D\uDEA9'} {profile.lieuxVeilles ?? 0} {'lieux veill\u00E9s'}</span>
+                </div>
+              </div>
             </div>
 
             {/* Bio + Instagram (mode lecture) */}
