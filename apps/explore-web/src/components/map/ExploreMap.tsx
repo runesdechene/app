@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -21,6 +21,10 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
+import { VeilleurNamePills } from './VeilleurNamePills'
+import { HarvestableChests } from './HarvestableChests'
+import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
+import { useCrownsStore } from '../../stores/crownsStore'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
 // La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
@@ -82,7 +86,19 @@ export const ExploreMap = memo(function ExploreMap() {
   const territoryNames = useMapStore(s => s.territoryNames)
   const setTerritoryNamesStore = useMapStore(s => s.setTerritoryNames)
 
+  // V0.7 phase 2 — Couronnes de Chêne : Set des lieux où le user peut récolter un coffre
+  const harvestableSet = useCrownsStore(s => s.harvestableSet)
+  const refreshCrowns = useCrownsStore(s => s.refresh)
+
+  // Refresh balance + harvestable dès qu'on connaît le userId
   useEffect(() => {
+    if (currentUserId) refreshCrowns(currentUserId)
+  }, [currentUserId, refreshCrowns])
+
+  useEffect(() => {
+    // V0.7 — coloriage initial par veille
+    loadInitialVeilles()
+
     supabase.from('territory_tiers').select('min_places, title').order('min_places', { ascending: false })
       .then(({ data, error }) => {
         if (error) { console.warn('[ExploreMap] load territory_tiers failed', error); return }
@@ -370,27 +386,27 @@ export const ExploreMap = memo(function ExploreMap() {
       if (!workerRef.current) return
       workerRef.current.postMessage({
         features: rawGeojson.features
-          .filter(f => {
-            const ov = placeOverrides.get(f.properties.id)
-            return f.properties.claimed || (f.properties.totalInfluence ?? 0) > 0 || ov?.claimed
-          })
+          // V0.7 : seulement les lieux veillés (override claimed posé par loadInitialVeilles / pushVeilleOverride)
+          .filter(f => placeOverrides.get(f.properties.id)?.claimed)
           .map(f => {
-            const ov = placeOverrides.get(f.properties.id)
+            const ov = placeOverrides.get(f.properties.id)!
             return {
               coordinates: f.geometry.coordinates as [number, number],
               placeId: f.properties.id,
-              faction: ov?.factionId || f.properties.factionId,
+              // V0.7 : faction = celle de la veille (ou '__neutral__' si expédition multi-faction)
+              faction: ov.factionId ?? '__neutral__',
               factionTitle: f.properties.tagTitle,
-              tagColor: ov?.tagColor || f.properties.tagColor,
-              factionPattern: ov?.factionPattern || f.properties.factionPattern,
-              score: Math.max(ov?.score ?? f.properties.score, (ov?.claimed || f.properties.claimed) ? 1 : 0),
+              tagColor: ov.tagColor ?? f.properties.tagColor,
+              factionPattern: ov.factionPattern ?? '',
+              score: 1,
               likes: f.properties.likes ?? 0,
-              fortificationLevel: ov?.fortificationLevel ?? f.properties.fortificationLevel ?? 0,
+              fortificationLevel: 0,
               claimedByName: f.properties.claimedByName,
               claimedById: f.properties.claimedById,
               discovered: discoveredIds.has(f.properties.id),
-              totalInfluence: f.properties.totalInfluence ?? 0,
-              influenceByFaction: f.properties.influenceByFaction ?? {},
+              // V0.7 : influence cumulative ignorée — les territoires sont uniformes
+              totalInfluence: 0,
+              influenceByFaction: {},
             }
           }),
         tiers: territoryTiers,
@@ -418,7 +434,7 @@ export const ExploreMap = memo(function ExploreMap() {
         })
       }
 
-      // Icône mode Coupe des Héritages — fond sépia, icône encre brune, anneau couleur faction dominante
+      // Icône mode Coupe des Héritages — fond sépia, icône encre brune, anneau couleur faction
       if (tagIcon) {
         const border = dominantFactionColor || ''
         const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::${border}`
@@ -645,16 +661,20 @@ export const ExploreMap = memo(function ExploreMap() {
     })
   }, [setTerritoryHover])
 
-  // Apply placeOverrides + factionColorMode to geojson
+  // Apply placeOverrides + factionColorMode + harvestable to geojson
   const enrichedGeojson = useMemo(() => {
     if (!geojson) return geojson
-    const needsEnrich = placeOverrides.size > 0 || factionColorMode
+    const needsEnrich = placeOverrides.size > 0 || factionColorMode || harvestableSet.size > 0
     if (!needsEnrich) return geojson
     return {
       ...geojson,
       features: geojson.features.map(f => {
         const ov = placeOverrides.get(f.properties.id)
         const props = { ...f.properties }
+        // V0.7 phase 2 — flag de coffre Couronnes : masque l'icône lieu via filter map-layers
+        if (harvestableSet.has(f.properties.id)) {
+          (props as Record<string, unknown>).harvestable = true
+        }
         if (ov) {
           if (ov.fortificationLevel !== undefined) props.fortificationLevel = ov.fortificationLevel
           if (ov.factionId !== undefined) props.factionId = ov.factionId
@@ -664,6 +684,10 @@ export const ExploreMap = memo(function ExploreMap() {
           }
           if (ov.factionPattern !== undefined) props.factionPattern = ov.factionPattern
           if (ov.score !== undefined) props.score = ov.score
+          if (ov.veilleurUserId !== undefined) props.veilleurUserId = ov.veilleurUserId
+          if (ov.veilleurName !== undefined) props.veilleurName = ov.veilleurName
+          if (ov.veilleurAvatarUrl !== undefined) props.veilleurAvatarUrl = ov.veilleurAvatarUrl
+          if (ov.veilleurExtraCount !== undefined) props.veilleurExtraCount = ov.veilleurExtraCount
         }
         // Mode "Coupe des Héritages" : carte sépia + icônes encre brune + anneau couleur faction dominante.
         // L'emblème territoire reste l'indicateur principal de faction.
@@ -677,7 +701,7 @@ export const ExploreMap = memo(function ExploreMap() {
         return { ...f, properties: props }
       }),
     }
-  }, [geojson, placeOverrides, factionColorMode])
+  }, [geojson, placeOverrides, factionColorMode, harvestableSet])
 
   if (!mapStyle) {
     return (
@@ -758,6 +782,18 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
+      {/* V0.7 — Mode Coupe des Héritages ON : pilule sépia signée du nom du veilleur,
+          centrée sous l'icône du lieu. Remplace l'emblème faction (humanisation). React
+          Markers pour le rendu capsule (DOM CSS, MapLibre symbol layer ne le gère pas).
+          Viewport-filtré + zoom-gated >= 9 pour la perf. */}
+      {factionColorMode && (
+        <VeilleurNamePills
+          geojson={enrichedGeojson}
+          zoom={zoomLevel}
+          bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
+        />
+      )}
+
       {enrichedGeojson && (
         <Source
           id="places"
@@ -768,9 +804,17 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
+          {/* V0.7 — Mode Coupe ON : pilules sépia avec nom du veilleur (montées en
+              React Markers plus bas dans le JSX, hors du symbol layer pour avoir un vrai
+              fond capsule). Mode Coupe OFF : carte épurée, juste les lieux. */}
           <Layer {...fortBadgeLayer} />
         </Source>
       )}
+
+      {/* V0.7 phase 2 — Couronnes de Chêne : coffres récoltables (1+/jour selon expé).
+          Rendu en React Markers DOM pour gérer animation +N + click sans toucher MapLibre.
+          Visible uniquement sur les lieux où le user actuel peut récolter (filtré par crownsStore). */}
+      <HarvestableChests geojson={enrichedGeojson} />
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>
@@ -779,12 +823,9 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {/* Emblèmes — visibles uniquement en mode bannières */}
-      {factionColorMode && territoryLabelsGeojson && (
-        <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
-          <Layer {...territoryEmblemLayer} />
-        </Source>
-      )}
+      {/* V0.7 — territoryEmblemLayer (sceau au centroïde du blob mergé) retiré :
+          redondant avec placeVeilleEmblemLayer qui pose un emblème par lieu. Plus simple,
+          plus juste (chaque lieu veillé montre sa faction, pas une approximation de blob). */}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}
       {zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
         const { customName, tagColor } = f.properties as Record<string, unknown>

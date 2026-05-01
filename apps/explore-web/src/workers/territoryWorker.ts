@@ -16,8 +16,7 @@ import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
 
 // --- Constantes ---
 
-const BASE_RADIUS_KM = 0.30      // 300m de base
-const RADIUS_SCALE_KM = 0.30     // croissance modérée — sensation d'empire sans débordement
+const BASE_RADIUS_KM = 1.0       // V0.7 : rayon fixe 1km pour tout lieu veillé
 const KM_PER_DEG_LAT = 111
 const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
 const CIRCLE_SEGMENTS = 12        // octogone
@@ -108,32 +107,21 @@ function simplifyGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon 
   }
 }
 
-/** Rayon du cercle d'influence en km — 0 score = pas de zone */
+/** V0.7 : rayon fixe 300m pour tout lieu veillé. score <= 0 = pas de zone (filtré en amont). */
 function radiusForScore(score: number): number {
   if (score <= 0) return 0
-  if (score <= 1) return BASE_RADIUS_KM
-  return BASE_RADIUS_KM + Math.sqrt(score - 1) * RADIUS_SCALE_KM
+  return BASE_RADIUS_KM
 }
 
-/** V0.5 : retourne la faction dominante par influence (fallback sur faction du lieu) */
+/** V0.7 : faction = celle de la veille (déjà résolue dans la dispatch ExploreMap depuis ov.factionId).
+ *  Pour les expéditions multi-faction (neutres), `place.faction` vaut '__neutral__' — utilisé comme clé de groupe. */
 function getDominantFaction(place: PlaceInput): string {
-  if (place.influenceByFaction) {
-    let max = 0
-    let dominant = place.faction
-    for (const [factionId, score] of Object.entries(place.influenceByFaction)) {
-      if (score > max) { max = score; dominant = factionId }
-    }
-    return dominant
-  }
   return place.faction
 }
 
-/** V0.5 : score basé sur l'influence totale */
+/** V0.7 : score binaire — 1 si veillé (radiusForScore renverra le rayon fixe), 0 sinon. */
 function getPlaceScore(place: PlaceInput): number {
-  if (place.totalInfluence != null && place.totalInfluence > 0) {
-    return place.totalInfluence
-  }
-  return 1
+  return place.score > 0 ? 1 : 0
 }
 
 /** Génère un polygone circulaire fermé [lon, lat][] */

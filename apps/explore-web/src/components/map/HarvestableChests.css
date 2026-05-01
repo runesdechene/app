@@ -1,0 +1,179 @@
+/* V0.7 — Couronnes de Chêne : marker coffre récoltable.
+   Le coffre vit DANS un cercle sépia (constant, jamais coloré faction —
+   on ne crie pas la faction sur la carte, on signale juste un coffre à
+   ramasser). Reproduit la taille du balloon-marker des lieux d'origine. */
+
+.harvestable-chest-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.harvestable-chest-btn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease-out;
+  animation: chest-bob 2.6s ease-in-out infinite;
+}
+
+.harvestable-chest-btn:hover {
+  transform: scale(1.12);
+}
+
+.harvestable-chest-btn:active .harvestable-chest-circle {
+  animation: chest-pop 380ms cubic-bezier(0.2, 0.7, 0.3, 1.4);
+}
+
+.harvestable-chest-btn.busy {
+  pointer-events: none;
+  animation: chest-fade-out 1500ms ease-out forwards;
+}
+
+/* Fade out doux du coffre pendant que la pièce s'élève — évite l'illusion
+   d'un second coffre cliquable au même endroit. */
+@keyframes chest-fade-out {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+/* Cercle balloon sépia qui imite la taille du marker lieu d'origine
+   (≈ 48px à zoom 12, l'icône lieu a `icon-size: 0.4` sur image ~120px). */
+.harvestable-chest-circle {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ecdfc0;  /* HERITAGE_CUP_DOT_COLOR — même sépia clair que les icônes lieu en mode Coupe des Héritages */
+  border-radius: 50%;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 2px rgba(212, 175, 55, 0.85);  /* anneau or */
+  transition: transform 120ms ease-out;
+}
+
+.harvestable-chest-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Bobbing très léger pour signaler "vivant / cliquable" */
+@keyframes chest-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+
+/* Pop au click : le cercle gonfle puis revient (ressort) */
+@keyframes chest-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.45); }
+  70%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   Burst d'animation au click — flash "gling" + pièce 🪙+N qui s'élève
+   ============================================================ */
+
+.harvestable-chest-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Flash "gling" — éclat blanc-doré bref qui scintille au spawn de la pièce */
+.harvestable-chest-gling {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  margin-top: -28px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 224, 130, 0.6) 35%,
+    rgba(255, 224, 130, 0) 70%
+  );
+  animation: chest-gling 380ms ease-out forwards;
+}
+
+@keyframes chest-gling {
+  0%   { transform: scale(0.4); opacity: 0; }
+  25%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* Pièce d'or 🪙 +N qui s'élève depuis l'icône en disparaissant */
+.harvestable-chest-coin {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, 0);
+  animation: chest-coin-rise 1600ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  pointer-events: none;
+  white-space: nowrap;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.harvestable-chest-coin-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.harvestable-chest-coin-plus {
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffe082;
+  text-shadow:
+    0 0 6px rgba(255, 184, 0, 0.95),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 0 1px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+@keyframes chest-coin-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -2px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80px) scale(1);
+  }
+}

@@ -282,3 +282,22 @@
   color: var(--color-ink);
   font-variant-numeric: tabular-nums;
 }
+
+/* V0.7 — Couronnes de Chêne : pop d'incrément à chaque récolte
+   (déclenché par key change sur .crowns-value dans CrownsBadge.tsx) */
+.crowns-value {
+  display: inline-block;
+  animation: crowns-pop 480ms cubic-bezier(0.2, 0.7, 0.3, 1.4);
+  color: #b8860b;
+}
+
+.crowns-badge.capped .crowns-value {
+  color: #6b5b3e;
+}
+
+@keyframes crowns-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.5); color: #ffd54f; }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}

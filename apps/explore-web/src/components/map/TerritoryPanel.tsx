@@ -1,3 +1,8 @@
+// V0.7 — TODO À VIRER au chantier Campement (V0.7 phase 2 ou +).
+// Ce panel utilise encore propose_territory_name / vote_territory_name (mig 013),
+// marquées DEPRECATES dans la mig 015 mais laissées actives pour la passation douce.
+// Le nommage des territoires reviendra via le Campement (entité géolocalisée
+// par user qui donnera son nom à la zone si entourée de lieux à sa couleur).
 import { useEffect, useState, useCallback } from 'react'
 import type { TerritorySelection } from '../../stores/mapStore'
 import { useMapStore } from '../../stores/mapStore'

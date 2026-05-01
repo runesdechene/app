@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCrownsStore } from '../../stores/crownsStore'
+import { useCoupe } from '../../hooks/useCoupe'
+import { useGlory } from '../../hooks/useGlory'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
@@ -29,7 +32,12 @@ interface FavoritePlace extends PlaceCard {
   lastActionAt: string
 }
 
-type PlacesTab = 'authored' | 'discovered' | 'favorites'
+interface VeilledPlace extends PlaceCard {
+  plantedAt: string
+  memberCount: number
+}
+
+type PlacesTab = 'authored' | 'discovered' | 'veilled'
 
 interface TitleInfo {
   id: number
@@ -53,6 +61,10 @@ interface PlayerProfile {
   influenceStock?: number
   influencePlaced?: number
   glory?: number
+  /** V0.7 phase 3.5 — nouveaux compteurs (mig 030 + 031) */
+  lieuxExplores?: number
+  lieuxVeilles?: number
+  enigmasSolved?: number
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -60,7 +72,10 @@ interface PlayerProfile {
   instagram: string | null
   authoredPlaces: AuthoredPlace[]
   discoveredPlaces: VisitedPlace[]
+  /** V0.5 legacy — gardé pour rétrocompat mais l'onglet est remplacé par veilled */
   favoritePlaces: FavoritePlace[]
+  /** V0.7 phase 3.5 — lieux actuellement veillés (mig 032) */
+  veilledPlaces: VeilledPlace[]
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }> | null
 }
 
@@ -93,6 +108,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   const currentUserId = usePlayerStore(s => s.userId)
+  const crownsBalance = useCrownsStore(s => s.balance)
+  const { state: coupeState } = useCoupe(true)
+  const { state: gloryState } = useGlory(true)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -374,45 +392,63 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )}
                 </div>
 
-                <div className="player-modal-counts">
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.authoredPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">lieux</span>
-                  </div>
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.discoveredPlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">visités</span>
-                  </div>
-                  <div className="player-modal-count">
-                    <span className="player-modal-count-value">{profile.favoritePlaces?.length ?? 0}</span>
-                    <span className="player-modal-count-label">Influencés</span>
-                  </div>
-                </div>
-
+                {/* V0.7 phase 3.5 — Titres déplacés sous le nom (depuis le
+                    bas du header) pour densifier l'identité visuelle.
+                    Les compteurs (lieux explorés / énigmes / lieux veillés)
+                    sont déplacés plus bas, sous les Couronnes, en lignes
+                    cohérentes avec Gloire/Coupe/Couronnes. */}
+                {/* V0.7 phase 3.5 \u2014 Refonte Gloire + Coupe + Couronnes
+                    Pour soi : on utilise get_my_glory (formule \u00E0 la vol\u00E9e, lifetime).
+                    Pour les autres : on garde l'ancienne formule profile.glory
+                    (exploration_points + erudition_points) jusqu'\u00E0 ce que
+                    get_player_profile soit align\u00E9. */}
                 <div className="player-modal-faction-row">
                   <span className="player-modal-notoriety">
-                    {'\uD83C\uDF96\uFE0F'} {profile.glory ?? 0} Gloire
-                    {(profile.explorationPoints != null || profile.eruditionPoints != null) && (
-                      <span style={{ fontSize: '0.75em', opacity: 0.7, marginLeft: 6 }}>
-                        ({'\uD83E\uDDED'} {profile.explorationPoints ?? 0} exploration + {'\uD83D\uDCD6'} {profile.eruditionPoints ?? 0} erudition)
-                      </span>
-                    )}
+                    {'\uD83C\uDF96\uFE0F'} {(isSelf && gloryState ? gloryState.glory : (profile.glory ?? 0))} Gloire
+                    <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
+                      {'(\u00E0 vie)'}
+                    </span>
                   </span>
                 </div>
-                {(profile.influenceStock != null || (profile.influencePlaced != null && profile.influencePlaced > 0)) && (
-                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 12, opacity: 0.8 }}>
-                    {profile.influenceStock != null && (
-                      <span>{'\uD83C\uDFF4'} {profile.influenceStock} influence a placer</span>
+                {isSelf && (
+                  <>
+                    {coupeState?.myBreakdown && (
+                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                        <span>
+                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
+                          {coupeState.season?.name && (
+                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                              ({coupeState.season.name})
+                            </span>
+                          )}
+                        </span>
+                      </div>
                     )}
-                    {profile.influencePlaced != null && profile.influencePlaced > 0 && (
-                      <span>{'\uD83C\uDF1F'} {profile.influencePlaced} influence placee</span>
-                    )}
-                  </div>
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                        <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                          / 500
+                        </span>
+                      </span>
+                    </div>
+                  </>
                 )}
+
+                {/* V0.7 phase 3.5 \u2014 Sous les Couronnes, on garde uniquement
+                    le compteur d'\u00E9nigmes r\u00E9solues. Les lieux explor\u00E9s et
+                    veill\u00E9s sont d\u00E9j\u00E0 visibles dans les onglets en bas
+                    (Explor\u00E9s / Veill\u00E9s) \u2014 pas besoin de les dupliquer ici. */}
+                <div
+                  className="player-modal-faction-row"
+                  style={{ gap: 14, fontSize: 13, opacity: 0.85 }}
+                >
+                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
+                </div>
               </div>
             </div>
 
-            {/* Titres */}
+            {/* Titres \u2014 au-dessus de la bio (position d'origine) */}
             <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
               {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
                 <span key={t.id} className="title-badge title-badge-general">
@@ -516,7 +552,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             {/* Fragments possedes */}
             {(playerFragments.length > 0 || isSelf) && (
             <div className="player-modal-fragments">
-              <p className="player-modal-fragments-title">Fragments collectés</p>
+              <p className="player-modal-fragments-title">{'Fragments possédés'}</p>
               <div className="player-modal-fragments-wrapper">
                 {playerFragments.length > 4 && (
                   <button
@@ -540,20 +576,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         <span className="player-modal-fragment-badge-icon">{f.icon ?? '?'}</span>
                       )}
                       <span className="player-modal-fragment-name">{f.name}</span>
-                      {f.affinities && f.affinities.length > 0 && (
-                        <div className="player-modal-fragment-tags">
-                          {f.affinities.map(a => (
-                            <span
-                              key={a.tagId}
-                              className="player-modal-fragment-tag-dot"
-                              style={{ background: a.tagColor }}
-                              title={`+${a.bonusPoints}/j 🏴 ${a.tagTitle}`}
-                            >
-                              {a.tagIcon && <img src={a.tagIcon} alt="" />}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      {/* V0.7 phase 3.5 — Billes de couleur (affinités tags V0.5)
+                          retirées. Le bonus d'affinité ne donne plus d'influence
+                          depuis le freeze V0.5. À reconsidérer si on rebranche
+                          quelque chose dessus à la phase 5+. */}
                     </div>
                 ))}
                 {isSelf && playerFragments.length > 0 && (
@@ -588,24 +614,27 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
             {/* Places tabs */}
             <div className="player-modal-places">
+              {/* V0.7 phase 3.5 — Onglets : Ajoutés / Explorés / Veillés.
+                  "Veillés" remplace "Influencés" (V0.5 figé). Petites icônes
+                  cohérentes avec les compteurs du header. */}
               <div className="player-modal-tabs">
                 <button
                   className={`player-modal-tab${placesTab === 'authored' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('authored'); setVisibleCount(12) }}
                 >
-                  Ajoutés <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
+                  {'🏛️'} {'Ajoutés'} <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
                 </button>
                 <button
                   className={`player-modal-tab${placesTab === 'discovered' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('discovered'); setVisibleCount(12) }}
                 >
-                  Visités  <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
+                  {'🧭'} {'Explorés'} <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
                 </button>
                 <button
-                  className={`player-modal-tab${placesTab === 'favorites' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('favorites'); setVisibleCount(12) }}
+                  className={`player-modal-tab${placesTab === 'veilled' ? ' active' : ''}`}
+                  onClick={() => { setPlacesTab('veilled'); setVisibleCount(12) }}
                 >
-                  Influencés  <span className="player-modal-tabs-number">{profile.favoritePlaces?.length ?? 0}</span>
+                  {'🚩'} {'Veillés'} <span className="player-modal-tabs-number">{profile.veilledPlaces?.length ?? 0}</span>
                 </button>
               </div>
 
@@ -613,7 +642,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 const places: PlaceCard[] =
                   placesTab === 'authored' ? (profile.authoredPlaces ?? []) :
                   placesTab === 'discovered' ? (profile.discoveredPlaces ?? []) :
-                  (profile.favoritePlaces ?? [])
+                  (profile.veilledPlaces ?? [])
 
                 if (places.length === 0) return (
                   <div className="player-modal-places-empty">Aucun lieu</div>
@@ -656,14 +685,21 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )
                 }
 
-                // Tabs Visit\u00E9s + Influenc\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
+                // Tabs Explor\u00E9s + Veill\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
                 return (
                   <>
                     <div className="player-modal-places-list">
                       {visible.map(place => {
                         const meta = placesTab === 'discovered'
                           ? { num: (place as VisitedPlace).visitsCount, unit: (place as VisitedPlace).visitsCount > 1 ? 'visites' : 'visite', date: (place as VisitedPlace).lastVisitedAt }
-                          : { num: (place as FavoritePlace).totalPoints, unit: (place as FavoritePlace).totalPoints > 1 ? 'points' : 'point', date: (place as FavoritePlace).lastActionAt }
+                          : (() => {
+                              const v = place as VeilledPlace
+                              return {
+                                num: v.memberCount,
+                                unit: v.memberCount > 1 ? 'veilleurs' : 'veilleur',
+                                date: v.plantedAt,
+                              }
+                            })()
                         return (
                           <div
                             key={place.id}

@@ -13,6 +13,7 @@ import { WishlistButton } from './WishlistButton'
 import { CarnetCard } from './CarnetCard'
 import type { Carnet } from './CarnetCard'
 import { InfluenceFrame } from './InfluenceFrame'
+import { VeilleFrame } from './VeilleFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { ShareButton } from './ShareButton'
@@ -920,7 +921,16 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           )}
         </div>
 
-        {/* Zone 3A — Influence Banners */}
+        {/* V0.7 — Veille (Plantage de l'étendard) */}
+        <VeilleFrame
+          placeId={place.id}
+          placeLocation={{ latitude: place.location.latitude, longitude: place.location.longitude }}
+        />
+
+        {/* Zone 3A — Influence Banners (V0.5)
+            Transition douce V0.5 → V0.7 : reste actif tant que la phase 5 V0.7
+            (refonte "investir Couronnes à distance" avec défense par veilleur)
+            n'est pas livrée. Sinon les users perdent un usage attendu. */}
         {v05 && (
           <InfluenceFrame
             placeId={place.id}

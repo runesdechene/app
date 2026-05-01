@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { ExploreMap } from '../components/map/ExploreMap'
 import { EnergyIndicator } from '../components/map/EnergyIndicator'
-import { InfluenceBadge } from '../components/map/InfluenceBadge'
+import { CrownsBadge } from '../components/map/CrownsBadge'
+import { CoupeBadge } from '../components/map/CoupeBadge'
+import { useGlory, readCachedGlory } from '../hooks/useGlory'
 import { PlacePanel } from '../components/places/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -44,10 +46,10 @@ import '../App.css'
 import '../styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
-  const glory = usePlayerStore(s => s.glory)
-  const explorationPoints = usePlayerStore(s => s.explorationPoints)
-  const eruditionPoints = usePlayerStore(s => s.eruditionPoints)
-  const displayGlory = glory
+  // V0.7 phase 3.5 — Gloire calculée à la volée via get_my_glory.
+  // readCachedGlory évite le flash 0 au boot le temps de l'appel RPC.
+  const { state: glory } = useGlory(true, 30000)
+  const displayGlory = glory?.glory ?? readCachedGlory()
   const [showInfo, setShowInfo] = useState(false)
 
   return (
@@ -67,14 +69,24 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
       {showInfo && (
         <InfoModal
           icon={'🎖️'}
-          title="Gloire"
-          description="La Gloire represente votre prestige. Elle est la somme de vos points d'Exploration (terrain) et d'Erudition (enigmes)."
-          rows={[
-            { label: 'Gloire totale', value: String(displayGlory), highlight: true },
-            { label: 'Exploration', value: `${explorationPoints} pts` },
-            { label: 'érudition', value: `${eruditionPoints} pts` },
-            { label: 'Changer d\'Héritage', value: '1 fois / 30 jours' },
-          ]}
+          title={'Gloire'}
+          description={'La Gloire récompense vos actions de jeu, cumulée depuis le début. Voici le détail de votre score, action par action.'}
+          rows={
+            glory ? [
+              { label: 'Lieux explorés',    value: `${glory.lieuxExplores} × 1 = ${glory.lieuxExplores} pts` },
+              {
+                label: `Énigmes résolues${glory.enigmes.total > 0 ? ` (${glory.enigmes.hard}h • ${glory.enigmes.medium}m • ${glory.enigmes.easy + glory.enigmes.veryEasy}e)` : ''}`,
+                value: `${glory.enigmes.total} × 1 = ${glory.enigmes.total} pts`,
+              },
+              { label: 'Photos ajoutées',   value: `${glory.photos} × 1 = ${glory.photos} pts` },
+              { label: 'Carnets écrits',    value: `${glory.carnets} × 3 = ${glory.carnets * 3} pts` },
+              { label: 'Plantages',         value: `${glory.plantages} × 5 = ${glory.plantages * 5} pts` },
+              { label: 'Lieux ajoutés',     value: `${glory.lieuxAjoutes} × 7 = ${glory.lieuxAjoutes * 7} pts` },
+              { label: 'Gloire totale',     value: `${glory.glory} pts`, highlight: true },
+            ] : [
+              { label: 'Gloire totale', value: `${displayGlory} pts`, highlight: true },
+            ]
+          }
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
         />
@@ -269,7 +281,8 @@ export default function MapPage() {
           {!authLoading && isAuthenticated && (
             <>
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
-              <InfluenceBadge />
+              <CoupeBadge />
+              <CrownsBadge />
               <EnigmaChestButton
                 onOpenDaily={() => setShowDailyEnigma(true)}
                 onOpenFragment={(f) => setFragmentEnigma(f)}

@@ -101,11 +101,14 @@ export const fortBadgeLayer: LayerSpecification = {
 }
 
 /** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image)
- *  Caché sur les territoires entièrement fogged pour ne pas leak la faction qui contrôle. */
+ *  Caché sur les territoires entièrement fogged pour ne pas leak la faction qui contrôle.
+ *  V0.7 : maxzoom=9 — au-delà, le composite avatar+emblème (VeilleMarkers React) prend le
+ *  relais avec une taille constante. */
 export const territoryEmblemLayer: LayerSpecification = {
   id: 'territory-emblems',
   type: 'symbol',
   source: 'territory-labels',
+  maxzoom: 9,
   filter: ['all', ['has', 'pattern'], ['get', 'revealed']],
   layout: {
     'icon-image': ['get', 'pattern'],
@@ -114,7 +117,6 @@ export const territoryEmblemLayer: LayerSpecification = {
       3, 0.08,
       6, 0.12,
       9, 0.20,
-      12, 0.30,
     ],
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
@@ -210,6 +212,7 @@ export const undiscoveredIconLayer: LayerSpecification = {
 }
 
 // Cercles colorés nets — lieux découverts SANS icône
+// V0.7 — masqué quand `harvestable: true` (le coffre Couronnes prend la place visuellement)
 export const pointLayer: LayerSpecification = {
   id: 'places-point',
   type: 'circle',
@@ -217,6 +220,7 @@ export const pointLayer: LayerSpecification = {
   filter: ['all',
     ['==', ['get', 'tagIcon'], ''],
     ['==', ['get', 'discovered'], true],
+    ['!=', ['get', 'harvestable'], true],
   ],
   paint: {
     'circle-color': ['get', 'iconColor'],
@@ -234,6 +238,7 @@ export const pointLayer: LayerSpecification = {
 }
 
 // Icônes SVG colorées — lieux découverts avec icône
+// V0.7 — masqué quand `harvestable: true` (le coffre Couronnes prend la place visuellement)
 export const iconLayer: LayerSpecification = {
   id: 'places-icon',
   type: 'symbol',
@@ -241,6 +246,7 @@ export const iconLayer: LayerSpecification = {
   filter: ['all',
     ['!=', ['get', 'tagIcon'], ''],
     ['==', ['get', 'discovered'], true],
+    ['!=', ['get', 'harvestable'], true],
   ],
   layout: {
     'icon-image': ['get', 'tagIcon'],

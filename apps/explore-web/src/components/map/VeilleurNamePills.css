@@ -1,0 +1,52 @@
+/* V0.7 — Pilule signée avatar + nom du veilleur, sous l'icône du lieu.
+   Mode Coupe des Héritages uniquement. Style parchemin doux, brun, élégant. */
+
+.veilleur-name-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #f3e3c5;            /* parchemin clair */
+  color: #5a2718;                  /* bordeaux/brun encre */
+  /* V0.7 — Alegreya (serif humaniste) pour la signature sur la carte.
+     Cohérent ligne éditoriale "chevalier errant" : on lit "X veille ce lieu"
+     comme une dédicace gravée, pas comme une étiquette UI. */
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 0px solid #b8895a;
+  box-shadow: 0 2px 5px rgba(60, 30, 10, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.veilleur-name-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(60, 30, 10, 0.35);
+}
+
+.veilleur-name-pill-text {
+  line-height: 1;
+  padding-top: 1px;              /* compensation visuelle du baseline */
+}
+
+/* Badge "+N" pour les expéditions de plus de 3 membres */
+.veilleur-name-pill-extra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #b8895a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+}

@@ -19,6 +19,8 @@ interface InfluenceFrameProps {
   factionNames: Map<string, string>
   placeLocation: { latitude: number; longitude: number }
   onInfluencePlaced: () => void
+  /** V0.7 : système figé, rendre les bannières non-cliquables. RPC place_influence_action est aussi neutralisée côté serveur. */
+  readOnly?: boolean
 }
 
 /** Influence click sound */
@@ -46,7 +48,7 @@ function spawnParticles(container: HTMLElement) {
   }
 }
 
-export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation: _placeLocation, onInfluencePlaced: _onInfluencePlaced }: InfluenceFrameProps) {
+export function InfluenceFrame({ placeId, influence, factionColors, factionPatterns, factionNames, placeLocation: _placeLocation, onInfluencePlaced: _onInfluencePlaced, readOnly = false }: InfluenceFrameProps) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const influenceStock = usePlayerStore(s => s.influenceStock)
@@ -88,6 +90,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
   const dominant = banners.reduce((best, b) => b.total > (best?.total ?? 0) ? b : best, banners[0])?.factionId
 
   const handleClick = useCallback(async (factionId: string, buttonEl: HTMLElement) => {
+    if (readOnly) return
     if (!userId || !userFactionId || pendingRef.current) return
     if (influenceStock <= 0) {
       // Shake the stock indicator to signal "can't click"
@@ -161,15 +164,15 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
 
     pendingRef.current = false
     setTimeout(() => setPulseFaction(null), 300)
-  }, [userId, userFactionId, influenceStock, placeId, userPosition])
+  }, [userId, userFactionId, influenceStock, placeId, userPosition, readOnly])
 
-  const canClick = userId && userFactionId && influenceStock > 0
+  const canClick = !readOnly && userId && userFactionId && influenceStock > 0
 
   return (
     <div className="influence-frame">
       <div className="influence-frame-header">
-        <span className="influence-frame-title">🏆 Coupe des Héritages</span>
-        {userId && (
+        <span className="influence-frame-title">🏆 Coupe des Héritages{readOnly ? ' — figée (V0.7)' : ''}</span>
+        {userId && !readOnly && (
           <span className={`influence-frame-stock${!canClick ? ' influence-frame-stock-exhausted' : ''}${shakeStock ? ' influence-frame-stock-shake' : ''}`}>
             {influenceStock <= 0
               ? 'Plus de points disponibles'
@@ -231,7 +234,7 @@ export function InfluenceFrame({ placeId, influence, factionColors, factionPatte
         </div>
       )}
 
-      {influenceStock <= 0 && (
+      {influenceStock <= 0 && !readOnly && (
         <div className="influence-frame-hint">
           <span className="influence-frame-hint-title">Comment gagner de l'influence ?</span>
           <ul className="influence-frame-hint-list">

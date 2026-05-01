@@ -60,6 +60,14 @@ export interface PlaceProperties {
   ownFaction: boolean
   totalInfluence: number
   influenceByFaction: Record<string, number>
+  /** V0.7 — userId du veilleur principal (vide si pas veillé) — pour ouvrir profil au click pilule */
+  veilleurUserId: string
+  /** V0.7 — nom du veilleur principal du lieu (vide si pas veillé) */
+  veilleurName: string
+  /** V0.7 — avatar URL du veilleur principal (vide si pas veillé) */
+  veilleurAvatarUrl: string
+  /** V0.7 — nombre de co-veilleurs en plus du lead (badge "+N" sur la pilule carte) */
+  veilleurExtraCount: number
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -165,6 +173,10 @@ export function usePlaces() {
               influenceByFaction: place.influenceByFaction ?? {},
               discovered: false, // sera enrichi par le useMemo
               ownFaction: false, // sera enrichi par le useMemo
+              veilleurUserId: '',         // sera enrichi par les placeOverrides (loadInitialVeilles)
+              veilleurName: '',           // idem
+              veilleurAvatarUrl: '',      // idem
+              veilleurExtraCount: 0,      // idem
             },
           })),
       }
