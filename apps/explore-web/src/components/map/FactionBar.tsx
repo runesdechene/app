@@ -21,6 +21,14 @@ interface FactionRowEnriched extends CoupeFactionEntry {
   pattern: string
 }
 
+interface FactionMeta {
+  id: string
+  title: string
+  color: string
+  pattern: string | null
+  order: number
+}
+
 const COUPE_LABEL = 'Coupe des Héritages'
 
 export function FactionBar() {
@@ -37,7 +45,7 @@ export function FactionBar() {
     async function load() {
       const [coupeRes, factionsRes] = await Promise.all([
         supabase.rpc('get_coupe_state', { p_user_id: userId, p_season_id: null }),
-        supabase.from('factions').select('id, pattern'),
+        supabase.from('factions').select('id, title, color, pattern, order').order('order'),
       ])
       if (cancelled) return
 
@@ -51,15 +59,33 @@ export function FactionBar() {
         return
       }
 
-      const patternByFaction = new Map<string, string>()
-      for (const f of (factionsRes.data ?? []) as Array<{ id: string; pattern: string | null }>) {
-        if (f.pattern) patternByFaction.set(f.id, f.pattern)
-      }
+      const allFactions = (factionsRes.data ?? []) as FactionMeta[]
+      const scoreById = new Map<string, CoupeFactionEntry>()
+      for (const f of state.factions) scoreById.set(f.factionId, f)
 
-      const enriched: FactionRowEnriched[] = state.factions.map(f => ({
-        ...f,
-        pattern: patternByFaction.get(f.factionId) ?? '',
-      }))
+      // On affiche TOUTES les factions, même celles à 0 pt. Donne un sentiment
+      // de compétition complète (page à conquérir au démarrage, domination
+      // visible mid-saison). Tri : score desc, puis order DB pour les ex aequo.
+      const enriched: FactionRowEnriched[] = allFactions
+        .map<FactionRowEnriched>(f => {
+          const s = scoreById.get(f.id)
+          return {
+            factionId:    f.id,
+            factionTitle: f.title,
+            factionColor: f.color,
+            score:        s?.score ?? 0,
+            memberCount:  s?.memberCount ?? 0,
+            rank:         s?.rank ?? 0,           // 0 = sans rang officiel (à 0 pt)
+            pattern:      f.pattern ?? '',
+          }
+        })
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score
+          // ex aequo (notamment à 0 pt) → ordre DB (champs `order` perdu après le map mais on a allFactions trié)
+          const ai = allFactions.findIndex(f => f.id === a.factionId)
+          const bi = allFactions.findIndex(f => f.id === b.factionId)
+          return ai - bi
+        })
 
       setStats(enriched)
       setSeasonName(state.season?.name ?? null)
@@ -71,8 +97,9 @@ export function FactionBar() {
 
   if (stats.length === 0) return null
 
-  const maxScore = stats[0]?.score ?? 1   // factions sont triées par rank croissant côté RPC
-  const leaderId = stats[0].factionId
+  const maxScore = stats[0]?.score ?? 0
+  // Pas de couronne quand tout le monde est à 0 (début de saison, pas de leader)
+  const leaderId = maxScore > 0 ? stats[0].factionId : null
 
   return (
     <>
@@ -81,9 +108,14 @@ export function FactionBar() {
           {stats.map(faction => {
             const isLeader = faction.factionId === leaderId
             const isMine = faction.factionId === userFactionId
-            const heightPct = maxScore > 0
-              ? Math.max(8, Math.round((faction.score / maxScore) * 100))
-              : 0
+            // Hauteur proportionnelle au max courant. Une faction à 0 pt → 0%
+            // (track gris vide visible, pas de fill). On garde un min de 4%
+            // sur les factions qui ONT contribué (pour qu'on voie la barre
+            // même à 1 pt face à un leader à 100).
+            const heightPct =
+              maxScore <= 0          ? 0 :
+              faction.score <= 0     ? 0 :
+              Math.max(4, Math.round((faction.score / maxScore) * 100))
             return (
               <div
                 key={faction.factionId}
