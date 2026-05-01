@@ -3,7 +3,7 @@ import { ExploreMap } from '../components/map/ExploreMap'
 import { EnergyIndicator } from '../components/map/EnergyIndicator'
 import { CrownsBadge } from '../components/map/CrownsBadge'
 import { CoupeBadge } from '../components/map/CoupeBadge'
-import { useGlory, readCachedGlory } from '../hooks/useGlory'
+import { useGlory } from '../hooks/useGlory'
 import { PlacePanel } from '../components/places/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -51,11 +51,18 @@ import '../App.css'
 import '../styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
-  // V0.7 phase 3.5 — Gloire calculée à la volée via get_my_glory.
-  // readCachedGlory évite le flash 0 au boot le temps de l'appel RPC.
+  // V0.7 — affiche le NIVEAU dans le badge (au lieu de la Gloire brute).
+  // Au clic : modale narrative avec le détail des compteurs par axe d'action.
   const { state: glory } = useGlory(true, 30000)
-  const displayGlory = glory?.glory ?? readCachedGlory()
+  const level = usePlayerStore(s => s.level)
+  const xpTotal = usePlayerStore(s => s.xpTotal)
+  const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
   const [showInfo, setShowInfo] = useState(false)
+
+  const isCap = level >= 50
+  const description = isCap
+    ? `Tu as atteint le sommet — ${xpTotal} Gloire cumulée. Tu es Légende.`
+    : `Ton parcours de Veilleur — ${xpTotal} Gloire récoltée au fil de tes pas. Encore ${xpToNextLevel} avant le niveau ${level + 1}.`
 
   return (
     <>
@@ -68,29 +75,28 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
         onContextMenu={(e) => { e.preventDefault(); onClick() }}
       >
         <span className="notoriety-icon">{'🎖️'}</span>
-        <span className="notoriety-value">{displayGlory}</span>
+        <span className="notoriety-value">{level}</span>
       </div>
 
       {showInfo && (
         <InfoModal
           icon={'🎖️'}
-          title={'Gloire'}
-          description={'La Gloire récompense vos actions de jeu, cumulée depuis le début. Voici le détail de votre score, action par action.'}
+          title={`Niveau ${level}`}
+          description={description}
           rows={
             glory ? [
-              { label: 'Lieux explorés',    value: `${glory.lieuxExplores} × 1 = ${glory.lieuxExplores} pts` },
+              { label: '🥾 Lieux foulés (GPS)',           value: `${glory.lieuxExplores}` },
+              { label: '📜 Lieux cartographiés',          value: `${glory.lieuxAjoutes}` },
+              { label: '🏴 Plantages de bannière',        value: `${glory.plantages}` },
+              { label: '✍️ Récits écrits',                value: `${glory.carnets}` },
+              { label: '📷 Photos ajoutées',              value: `${glory.photos}` },
               {
-                label: `Énigmes résolues${glory.enigmes.total > 0 ? ` (${glory.enigmes.hard}h • ${glory.enigmes.medium}m • ${glory.enigmes.easy + glory.enigmes.veryEasy}e)` : ''}`,
-                value: `${glory.enigmes.total} × 1 = ${glory.enigmes.total} pts`,
+                label: glory.enigmes.total > 0
+                  ? `🦉 Énigmes résolues (${glory.enigmes.hard}h • ${glory.enigmes.medium}m • ${glory.enigmes.easy + glory.enigmes.veryEasy}e)`
+                  : '🦉 Énigmes résolues',
+                value: `${glory.enigmes.total}`,
               },
-              { label: 'Photos ajoutées',   value: `${glory.photos} × 1 = ${glory.photos} pts` },
-              { label: 'Carnets écrits',    value: `${glory.carnets} × 3 = ${glory.carnets * 3} pts` },
-              { label: 'Plantages',         value: `${glory.plantages} × 5 = ${glory.plantages * 5} pts` },
-              { label: 'Lieux ajoutés',     value: `${glory.lieuxAjoutes} × 7 = ${glory.lieuxAjoutes * 7} pts` },
-              { label: 'Gloire totale',     value: `${glory.glory} pts`, highlight: true },
-            ] : [
-              { label: 'Gloire totale', value: `${displayGlory} pts`, highlight: true },
-            ]
+            ] : []
           }
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
