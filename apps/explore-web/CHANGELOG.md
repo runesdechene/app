@@ -1,3 +1,19 @@
+# ALPHA V0.6.2
+## Le fil d'actualité fait peau neuve
+
+### Toasts épurés, lisibles, à jour
+Les notifications qui défilent sur la carte parlent désormais le langage du nouveau jeu. Les anciennes mentions d'érudition, d'influence, de fortification — vestiges du système gelé — disparaissent. Vous voyez désormais en temps réel :
+- **🚩 Étendard planté** : *"X a planté son étendard sur Y"*. Quand c'est vous : *"+5 Gloire +5 Coupe"* en clair.
+- **📖 Énigme résolue** : *"X a résolu une énigme"*. Pour vous : *"+1 à +3 Gloire +1 à +3 Coupe +1 énigme validée"* selon la difficulté.
+- **🧭 Lieu découvert** : *"X a découvert Y"*. Pour vous : *"+1 Gloire +1 Coupe"*.
+- **🪙 Couronne récoltée** : *"Vous avez récolté X Couronne(s) sur Y"* — visible uniquement pour vous, votre moisson n'est pas un événement public.
+- **🏛️ Lieu ajouté** : *"X a ajouté Y"*. Pour vous : *"+7 Gloire +7 Coupe"*.
+- **📜 Récit / photo** : *"X a ajouté un récit sur Y"*. Pour vous : *"+3 Gloire +3 Coupe"* (ou *"+1 +1"* pour une photo).
+- **🔄 Retour sur un lieu** : *"X est de retour sur Y"* — sobre, sans gain affiché (la marche première a déjà été récompensée).
+- **❤️ Like, 👤 nouveau joueur** : inchangés.
+
+Plus de **claim**, de **fortify**, de **place_influence** dans le fil. Si vous y veniez chercher un repère du nombre de points dépensés sur un lieu, c'est désormais la **Coupe des Héritages** qui raconte cette histoire — saisonnière, claire, comparable.
+
 # ALPHA V0.6.1
 ## Récompenses lisibles — chaque action montre son gain réel
 

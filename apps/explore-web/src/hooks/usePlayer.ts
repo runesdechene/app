@@ -291,24 +291,19 @@ export function usePlayer() {
           let iconUrl: string | undefined
           let contested = false
 
-          if (e.type === 'claim') {
-            type = 'claim'
+          // V0.6 — toasts épurés. Skip V0.5 (claim, fortify, place_influence)
+          // qui ne servent plus rien. Ajout V0.7 (plant_flag, harvest_crown).
+          // Reformulation gains en Gloire/Coupe (formule unifiée).
+          if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
+            return
+          } else if (e.type === 'plant_flag') {
+            message = isSelf
+              ? `Vous avez planté votre étendard sur ${place} 🚩 +5 Gloire +5 Coupe`
+              : `${name} a planté son étendard sur ${place} 🚩 +5 Gloire`
+            highlights.push(place)
+            type = 'plant_flag'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
-            const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
-            if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
-              message = `${name} a pris le flambeau sur ${place}`
-              contested = true
-            } else if (prevName) {
-              message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
-              contested = true
-            } else {
-              message = `${name} veille à présent sur ${place}`
-            }
-            highlights.push(place)
-            if (prevName && e.data?.previousClaimedBy !== currentUserId) {
-              highlights.push(prevName)
-            }
             if (e.place_id && e.faction_id) {
               useMapStore.getState().setPlaceOverride(e.place_id, {
                 claimed: true,
@@ -317,14 +312,20 @@ export function usePlayer() {
                 factionPattern: iconUrl,
               })
             }
-          } else if (e.type === 'fortify') {
-            message = isSelf ? `Vous avez fortifié ${place}` : `${name} a fortifié ${place}`
-            highlights.push(place)
-            type = 'fortify'
-            color = e.data?.factionColor ?? undefined
-            iconUrl = e.data?.factionPattern ?? undefined
+          } else if (e.type === 'harvest_crown') {
+            // mig 021 stocke 'gain' (pas 'points') : 1 solo, 2 expé
+            const gain = (e.data as { gain?: number })?.gain ?? 1
+            if (isSelf) {
+              message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
+              highlights.push(place)
+            } else {
+              return  // récoltes des autres = bruit, on n'affiche pas
+            }
+            type = 'harvest_crown'
           } else if (e.type === 'discover') {
-            message = `${name} a découvert ${place}`
+            message = isSelf
+              ? `Vous avez découvert ${place} 🧭 +1 Gloire +1 Coupe`
+              : `${name} a découvert ${place} 🧭`
             highlights.push(place)
             type = 'discover'
           } else if (e.type === 'like') {
@@ -341,42 +342,44 @@ export function usePlayer() {
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'new_place') {
-            message = isSelf ? `Vous avez ajouté ${place}` : `${name} a ajouté ${place}`
+            message = isSelf
+              ? `Vous avez ajouté ${place} 🏛️ +7 Gloire +7 Coupe`
+              : `${name} a ajouté ${place} 🏛️`
             highlights.push(name, place)
             type = 'new_place'
           } else if (e.type === 'new_user') {
             message = `${name} a rejoint la carte`
             type = 'new_user'
           } else if (e.type === 'contribute') {
-            const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
-            message = `${name} a ajouté ${contribType} sur ${place}`
+            const isPhoto = e.data?.contributionType === 'photo'
+            const contribType = isPhoto ? 'une photo' : 'un récit'
+            const points = isPhoto ? 1 : 3
+            message = isSelf
+              ? `Vous avez ajouté ${contribType} sur ${place} 📜 +${points} Gloire +${points} Coupe`
+              : `${name} a ajouté ${contribType} sur ${place} 📜`
             highlights.push(place)
             type = 'contribute'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'revisit_gps') {
-            const gain = e.data?.influenceGain ?? 0
-            message = `${name} est de retour sur ${place} (+${gain} influence)`
+            // V0.6 — pas de gain pour la revisite (formule V0.7 = DISTINCT place_id)
+            message = isSelf
+              ? `De retour sur ${place}`
+              : `${name} est de retour sur ${place}`
             highlights.push(place)
             type = 'revisit'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'enigma_success') {
-            const erudGain = e.data?.eruditionGain ?? 0
-            const infGain = e.data?.influenceGain ?? 0
+            // Pondération 1/1/2/3 selon difficulté (mig 038)
+            const diff = e.data?.difficulty ?? 'easy'
+            const gain = diff === 'hard' ? 3 : diff === 'medium' ? 2 : 1
             if (isSelf) {
-              message = `Enigme réussie ! +${erudGain} érudition, +${infGain} influence`
+              message = `Énigme résolue ! 📖 +${gain} Gloire +${gain} Coupe +1 énigme validée`
             } else {
-              message = `${name} a résolu une énigme (+${erudGain} érudition)`
+              message = `${name} a résolu une énigme 📖`
             }
             type = 'enigma'
-          } else if (e.type === 'place_influence') {
-            const pts = e.data?.points ?? 1
-            message = `${name} a placé ${pts} influence sur ${place}`
-            highlights.push(place)
-            type = 'influence'
-            color = e.data?.factionColor ?? undefined
-            iconUrl = e.data?.factionPattern ?? undefined
           } else {
             return
           }
@@ -473,43 +476,26 @@ async function loadRecentActivity(currentUserId: string) {
     let iconUrl: string | undefined
     let contested = false
 
-    if (e.type === 'claim') {
-      type = 'claim'
-      iconUrl = e.data?.factionPattern ?? undefined
-      const prevName = e.data?.previousClaimerName ?? e.data?.previousActorName
-      if (e.data?.previousClaimedBy === currentUserId || e.data?.previousActorId === currentUserId) {
-        message = `${name} a pris le flambeau sur ${place}`
-        contested = true
-      } else if (prevName) {
-        message = `${name} a pris le flambeau sur ${place}, succédant à ${prevName}`
-        contested = true
-      } else {
-        message = `${name} veille à présent sur ${place}`
-      }
+    // V0.6 — toasts d'historique (7 derniers jours) épurés.
+    // Skip V0.5 (claim, fortify, place_influence, harvest_crown autres users).
+    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence' || e.type === 'harvest_crown') {
+      continue
+    } else if (e.type === 'plant_flag') {
+      message = `${name} a planté son étendard sur ${place} 🚩`
       highlights.push(name, place)
-      if (prevName && e.data?.previousClaimedBy !== currentUserId && e.data?.previousActorId !== currentUserId) {
-        highlights.push(prevName)
-      }
-    } else if (e.type === 'fortify') {
-      message = `${name} a fortifié ${place}`
-      highlights.push(name, place)
-      type = 'fortify'
+      type = 'plant_flag'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
-    } else if (e.type === 'discover') {
-      message = `${name} a découvert ${place}`
+    } else if (e.type === 'discover' || e.type === 'explore') {
+      message = `${name} a découvert ${place} 🧭`
       highlights.push(name, place)
       type = 'discover'
-    } else if (e.type === 'explore') {
-      message = `${name} a exploré ${place}`
-      highlights.push(name, place)
-      type = 'explore'
     } else if (e.type === 'like') {
       message = `${name} a aimé ${place}`
       highlights.push(name, place)
       type = 'like'
     } else if (e.type === 'new_place') {
-      message = `${name} a ajouté ${place}`
+      message = `${name} a ajouté ${place} 🏛️`
       highlights.push(name, place)
       type = 'new_place'
     } else if (e.type === 'new_user') {
@@ -518,30 +504,21 @@ async function loadRecentActivity(currentUserId: string) {
       type = 'new_user'
     } else if (e.type === 'contribute') {
       const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
-      message = `${name} a ajouté ${contribType} sur ${place}`
+      message = `${name} a ajouté ${contribType} sur ${place} 📜`
       highlights.push(name, place)
       type = 'contribute'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'revisit_gps') {
-      const gain = e.data?.influenceGain ?? 0
-      message = `${name} est de retour sur ${place} (+${gain} influence)`
+      message = `${name} est de retour sur ${place}`
       highlights.push(name, place)
       type = 'revisit'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'enigma_success') {
-      const erudGain = e.data?.eruditionGain ?? 0
-      message = `${name} a résolu une énigme (+${erudGain} érudition)`
+      message = `${name} a résolu une énigme 📖`
       highlights.push(name)
       type = 'enigma'
-    } else if (e.type === 'place_influence') {
-      const pts = e.data?.points ?? 1
-      message = `${name} a placé ${pts} influence sur ${place}`
-      highlights.push(name, place)
-      type = 'influence'
-      color = e.data?.factionColor ?? undefined
-      iconUrl = e.data?.factionPattern ?? undefined
     } else {
       continue
     }

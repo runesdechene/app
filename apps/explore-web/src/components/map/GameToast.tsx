@@ -18,9 +18,12 @@ const ICONS: Record<GameToastType['type'], string> = {
   contribute: '\uD83D\uDCD5', // livre fermé rouge (récit/photo)
   revisit: '\uD83D\uDD04',   // flèches rotation (re-exploration)
   enigma: '\uD83D\uDD2E',  // boule de cristal (érudition)
-  influence: '\uD83C\uDFF4',  // drapeau noir (influence)
+  influence: '\uD83C\uDFF4',  // drapeau noir (V0.5 fig\u00E9)
   info: '\uD83D\uDCCB',      // presse-papiers (copie, info)
   error: '\u26A0\uFE0F',     // avertissement (erreur)
+  // V0.7 ajouts
+  plant_flag: '\uD83D\uDEA9',     // drapeau rouge (\u00E9tendard plant\u00E9)
+  harvest_crown: '\uD83E\uDE99',  // pi\u00E8ce (Couronne r\u00E9colt\u00E9e)
 }
 
 function formatTimeAgo(ts: number): string {
