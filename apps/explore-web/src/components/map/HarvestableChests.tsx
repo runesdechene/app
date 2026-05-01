@@ -6,26 +6,28 @@ import { useCrownsStore } from '../../stores/crownsStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import './HarvestableChests.css'
 
-interface FloatingNumber {
+interface ClickBurst {
   id: number
   placeId: string
   value: number
 }
 
 interface Props {
-  /** GeoJSON enrichi des places — on lit géométrie + id depuis là */
+  /** GeoJSON enrichi des places — on lit géométrie + id + tagColor depuis là */
   geojson: FeatureCollection<Point, PlaceProperties> | null
 }
 
 /**
- * V0.7 phase 2 — Marqueurs coffre Couronnes de Chêne sur les lieux récoltables.
+ * V0.7 phase 2 — Marqueurs coffre Couronnes de Chêne.
  *
  * Visible uniquement pour les lieux où le user actuel est dans l'expé active
- * et où le timer 24h s'est écoulé (driven par crownsStore.harvestableSet,
- * peuplé via get_my_crowns_state au boot et après chaque récolte).
+ * et où le timer 24h s'est écoulé (driven par crownsStore.harvestableSet).
  *
- * Click coffre → animation +1 + RPC harvest_crown + retrait du marker.
- * Le coffre couvre visuellement l'icône lieu (60×60 vs 32×32) — pas de modif map-layers.
+ * Visuel : reproduit le balloon-marker des lieux (cercle de couleur faction)
+ * mais avec un mini coffre à la place de l'icône SVG type-de-lieu. L'icône
+ * d'origine est cachée par le filter `harvestable !== true` sur iconLayer.
+ *
+ * Click → burst d'animation (pop coffre + halo + +N volant) + RPC harvest_crown.
  */
 export function HarvestableChests({ geojson }: Props) {
   const harvestableSet = useCrownsStore(s => s.harvestableSet)
@@ -33,7 +35,7 @@ export function HarvestableChests({ geojson }: Props) {
   const harvest = useCrownsStore(s => s.harvest)
   const userId = usePlayerStore(s => s.userId)
 
-  const [floatingNumbers, setFloatingNumbers] = useState<FloatingNumber[]>([])
+  const [bursts, setBursts] = useState<ClickBurst[]>([])
   const [busyPlaceIds, setBusyPlaceIds] = useState<Set<string>>(new Set())
 
   const handleClick = useCallback(async (e: React.MouseEvent, placeId: string) => {
@@ -45,9 +47,9 @@ export function HarvestableChests({ geojson }: Props) {
 
     setBusyPlaceIds(prev => new Set(prev).add(placeId))
 
-    // Animation optimiste : on lance le +N tout de suite
-    const tempId = Date.now()
-    setFloatingNumbers(prev => [...prev, { id: tempId, placeId, value: expectedGain }])
+    // Animation optimiste : burst de feedback immédiat
+    const burstId = Date.now()
+    setBursts(prev => [...prev, { id: burstId, placeId, value: expectedGain }])
 
     // Hook audio placeholder — Uriel fournira le fichier plus tard.
     // Une fois le fichier dispo dans /res/crown_harvest.mp3 :
@@ -55,10 +57,10 @@ export function HarvestableChests({ geojson }: Props) {
     //   audio.volume = 0.4
     //   audio.play().catch(() => {})
 
-    // Cleanup de l'anim après 1.6s
+    // Cleanup de l'anim après sa durée totale (la plus longue : float +N = 2s)
     setTimeout(() => {
-      setFloatingNumbers(prev => prev.filter(n => n.id !== tempId))
-    }, 1600)
+      setBursts(prev => prev.filter(n => n.id !== burstId))
+    }, 2100)
 
     const result = await harvest(userId, placeId)
 
@@ -85,7 +87,7 @@ export function HarvestableChests({ geojson }: Props) {
         const [lng, lat] = f.geometry.coordinates as [number, number]
         const placeId = f.properties.id
         const isBusy = busyPlaceIds.has(placeId)
-        const floats = floatingNumbers.filter(n => n.placeId === placeId)
+        const myBursts = bursts.filter(n => n.placeId === placeId)
 
         return (
           <Marker
@@ -101,12 +103,26 @@ export function HarvestableChests({ geojson }: Props) {
                 onClick={(e) => handleClick(e, placeId)}
                 disabled={isBusy}
                 aria-label="Récolter une Couronne de Chêne"
-                title="Récolter"
+                title="Récolter une Couronne de Chêne"
               >
-                <img src="/res/coffre.webp" alt="" className="harvestable-chest-img" draggable={false} />
+                <span className="harvestable-chest-circle">
+                  <img
+                    src="/res/coffre.webp"
+                    alt=""
+                    className="harvestable-chest-img"
+                    draggable={false}
+                  />
+                </span>
               </button>
-              {floats.map(n => (
-                <span key={n.id} className="harvestable-chest-float">+{n.value}</span>
+
+              {myBursts.map(b => (
+                <span key={b.id} className="harvestable-chest-burst" aria-hidden>
+                  <span className="harvestable-chest-halo" />
+                  <span className="harvestable-chest-spark harvestable-chest-spark--1">{'✦'}</span>
+                  <span className="harvestable-chest-spark harvestable-chest-spark--2">{'✦'}</span>
+                  <span className="harvestable-chest-spark harvestable-chest-spark--3">{'✦'}</span>
+                  <span className="harvestable-chest-float">+{b.value}</span>
+                </span>
               ))}
             </div>
           </Marker>

@@ -642,40 +642,6 @@
     opacity: 0.8;
   }
 
-  /* V0.7 — Couronnes de Chêne : compteur compact dans la barre top */
-  .mobile-header-crowns {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    background: rgba(244, 232, 200, 0.85);
-    border: 1px solid rgba(90, 39, 24, 0.25);
-    border-radius: 999px;
-    color: #5a2718;
-    font-family: var(--font-accent, 'Cinzel', serif);
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 120ms ease-out, transform 120ms ease-out;
-  }
-  .mobile-header-crowns:hover {
-    background: rgba(244, 232, 200, 1);
-    transform: translateY(-1px);
-  }
-  .mobile-header-crowns:active {
-    transform: translateY(0) scale(0.97);
-  }
-  .mobile-header-crowns-icon {
-    font-size: 16px;
-    line-height: 1;
-  }
-  .mobile-header-crowns-count {
-    font-variant-numeric: tabular-nums;
-    min-width: 14px;
-    text-align: center;
-  }
-
   .mobile-header-hamburger {
     display: flex;
     flex-direction: column;

@@ -1,9 +1,12 @@
-/* V0.7 — Couronnes de Chêne : marker coffre récoltable */
+/* V0.7 — Couronnes de Chêne : marker coffre récoltable.
+   Le coffre vit DANS un cercle sépia (constant, jamais coloré faction —
+   on ne crie pas la faction sur la carte, on signale juste un coffre à
+   ramasser). Reproduit la taille du balloon-marker des lieux d'origine. */
 
 .harvestable-chest-wrap {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,67 +27,173 @@
   align-items: center;
   justify-content: center;
   transition: transform 120ms ease-out;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
   animation: chest-bob 2.6s ease-in-out infinite;
 }
 
 .harvestable-chest-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
-.harvestable-chest-btn:active {
-  transform: scale(0.92);
+.harvestable-chest-btn:active .harvestable-chest-circle {
+  animation: chest-pop 380ms cubic-bezier(0.2, 0.7, 0.3, 1.4);
 }
 
 .harvestable-chest-btn.busy {
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.7;
   animation: none;
 }
 
+/* Cercle balloon sépia qui imite la taille du marker lieu d'origine
+   (≈ 48px à zoom 12, l'icône lieu a `icon-size: 0.4` sur image ~120px). */
+.harvestable-chest-circle {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ecdfc0;  /* HERITAGE_CUP_DOT_COLOR — même sépia clair que les icônes lieu en mode Coupe des Héritages */
+  border-radius: 50%;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 2px rgba(212, 175, 55, 0.85);  /* anneau or */
+  transition: transform 120ms ease-out;
+}
+
 .harvestable-chest-img {
-  width: 52px;
-  height: 52px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* Petit bobbing pour signaler que c'est cliquable */
+/* Bobbing très léger pour signaler "vivant / cliquable" */
 @keyframes chest-bob {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-3px); }
+  50%      { transform: translateY(-2px); }
 }
 
-/* +N volant qui monte et fade out */
+/* Pop au click : le cercle gonfle puis revient (ressort) */
+@keyframes chest-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.45); }
+  70%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+/* ============================================================
+   Burst d'animation au click — halo + sparks + +N volant
+   ============================================================ */
+
+.harvestable-chest-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Halo doré qui s'expand depuis le centre puis fade out */
+.harvestable-chest-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 130, 0.55) 0%,
+    rgba(212, 175, 55, 0.35) 40%,
+    rgba(212, 175, 55, 0) 70%
+  );
+  animation: chest-halo 700ms ease-out forwards;
+}
+
+@keyframes chest-halo {
+  0%   { transform: scale(0.6); opacity: 0.95; }
+  60%  { transform: scale(2.2); opacity: 0.5; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* Sparks (étoiles) qui partent en éventail */
+.harvestable-chest-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: 16px;
+  color: #ffe082;
+  text-shadow: 0 0 6px rgba(255, 224, 130, 0.9);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.harvestable-chest-spark--1 {
+  animation: chest-spark-1 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.harvestable-chest-spark--2 {
+  animation: chest-spark-2 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.harvestable-chest-spark--3 {
+  animation: chest-spark-3 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes chest-spark-1 {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(calc(-50% - 32px), calc(-50% - 28px)) scale(1.1); opacity: 0; }
+}
+@keyframes chest-spark-2 {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(calc(-50% + 30px), calc(-50% - 30px)) scale(1.1); opacity: 0; }
+}
+@keyframes chest-spark-3 {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(-50%, calc(-50% - 44px)) scale(1.2); opacity: 0; }
+}
+
+/* +N volant — gros, doré, monte haut, dure 2s */
 .harvestable-chest-float {
   position: absolute;
   left: 50%;
-  top: 8px;
-  transform: translateX(-50%);
+  top: 0;
+  transform: translate(-50%, 0);
   font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 22px;
-  font-weight: 700;
-  color: #d4af37;
+  font-size: 34px;
+  font-weight: 800;
+  color: #ffe082;
   text-shadow:
-    0 0 4px rgba(0, 0, 0, 0.8),
-    0 1px 2px rgba(0, 0, 0, 0.6);
+    0 0 8px rgba(255, 184, 0, 0.95),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 1px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.02em;
+  animation: chest-float 2000ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
   pointer-events: none;
-  animation: chest-float 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-  z-index: 5;
 }
 
 @keyframes chest-float {
   0% {
     opacity: 0;
-    transform: translate(-50%, 4px) scale(0.85);
+    transform: translate(-50%, 8px) scale(0.6);
   }
-  18% {
+  15% {
     opacity: 1;
-    transform: translate(-50%, -4px) scale(1.15);
+    transform: translate(-50%, -8px) scale(1.4);
+  }
+  30% {
+    transform: translate(-50%, -22px) scale(1.15);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -56px) scale(1);
+    transform: translate(-50%, -100px) scale(1);
   }
 }
