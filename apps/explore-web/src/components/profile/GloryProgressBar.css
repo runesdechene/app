@@ -1,0 +1,17 @@
+.glory-bar { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.glory-bar__track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.glory-bar__fill {
+  background: linear-gradient(90deg, #b8865a, #d4a574);
+  height: 100%;
+  transition: width 0.4s ease-out;
+}
+.glory-bar__text {
+  font-size: 12px;
+  opacity: 0.75;
+  font-family: 'Alegreya', serif;
+}
