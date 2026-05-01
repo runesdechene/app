@@ -44,3 +44,10 @@ pnpm-debug.log*
 graphify-out/
 .wolf-archive/
 *.openwolf-era
+
+# Superpowers / mockups / Python / Supabase temp
+.superpowers/
+mockups/
+__pycache__/
+*.pyc
+supabase/.temp/
