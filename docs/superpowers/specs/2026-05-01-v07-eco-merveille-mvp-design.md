@@ -27,7 +27,7 @@ ECO Merveille est un festival où Runes de Chêne sera présent dans ~10 jours. 
 | Imprécision GPS | **Toggle on/off binaire** (pas de 3 paliers) | Simplicité maximum, suffisant pour rassurer |
 | Rayon de brouillage | **50 km** autour de la position réelle | Suffisamment large pour anonymiser, suffisamment local pour rester crédible |
 | Brouillage dans l'eau | **Interdit** — retry jusqu'à terre ferme | Pas de joueur affiché au milieu de l'océan |
-| Position offline | **Persistante** (dernière position de déconnexion), avatar **gris** | Évite que la carte se vide en soirée. Pas de cap 24h. |
+| Position offline | **Persistante** (dernière position de déconnexion), avatar **gris**, **TTL 24h** après inactivité | Évite que la carte se vide en soirée + évite la pollution de comptes longuement inactifs |
 | Refonte modale profil | **NON** pour ECO Merveille | Le `PlayerProfileModal` reste tel quel, juste augmenté de la note partagée |
 | Bandeau de présence | **NON** pour ECO Merveille | Reporté avec le sous-spec Campement complet |
 
@@ -45,10 +45,12 @@ ECO Merveille est un festival où Runes de Chêne sera présent dans ~10 jours. 
 
 ### 3.2 Logique
 
-- **Si activé** : à chaque envoi de position au serveur, on génère une position aléatoire **dans un disque de 50 km** autour de la position GPS réelle. Cette position est *recalculée à chaque mise à jour* (l'avatar floue donc en marchant).
-- **Si désactivé** : position GPS réelle, comme aujourd'hui.
-- **Si l'utilisateur active/désactive en cours de session** : effet immédiat à la prochaine mise à jour de position (~30 sec). Pas de redémarrage app nécessaire.
-- **Si l'utilisateur n'a pas autorisé le GPS** : pas de position publique du tout — il n'apparaît pas sur la carte, n'apparaît pas dans la liste des connectés. La modale de son profil reste accessible mais sans indication de position. Important pour ECO Merveille où beaucoup s'inscrivent au stand sans avoir encore activé la géoloc.
+- **Si activé** : la position aléatoire est calculée **une seule fois au lancement de l'app** (login ou ouverture d'une session active). Elle reste **fixée pendant toute la session** — pas de recalcul à chaque update GPS. L'avatar reste donc à un endroit stable de 50 km autour du joueur, plus crédible et moins désagréable visuellement.
+- **Si désactivé** : position GPS réelle, mise à jour normalement comme aujourd'hui.
+- **Si l'utilisateur active/désactive en cours de session** : effet immédiat — un nouveau tirage aléatoire est fait au moment du toggle. Cette nouvelle position floutée est ensuite stable jusqu'à la prochaine relance.
+- **Si l'utilisateur n'a pas autorisé le GPS** : pas de position publique du tout — il n'apparaît pas sur la carte. La modale de son profil reste accessible mais sans indication de position. Important pour ECO Merveille où beaucoup s'inscrivent au stand sans avoir encore activé la géoloc.
+
+**Justification "fixée au lancement"** : Uriel le 2026-05-02. Si la position floutée saute toutes les 30 sec, ça donne un effet "fantôme qui clignote" peu crédible. En la figeant à l'ouverture de session, le joueur apparaît comme étant *« dans cette zone »* de manière stable. Acceptable même s'il se déplace réellement de 5-10 km dans la session — au pire la position floutée n'est plus dans le bon cercle de 50 km, mais c'est peu visible.
 
 ### 3.3 Contrainte technique : pas dans l'eau
 
@@ -117,13 +119,13 @@ ALTER TABLE users ADD COLUMN profile_note_updated_at timestamptz;
 - **Pas de pastille verte** "en ligne" pour les offline (était présente quand connecté).
 - **Au tap** : la modale du profil s'ouvre normalement, sans pastille en ligne, et avec l'indication *« Vu il y a X jours »* placée sous le nom du joueur (à côté de l'héritage / faction).
 
-### 5.2 Pas de cap temporel
+### 5.2 TTL 24h après inactivité
 
-L'avatar gris reste **indéfiniment** à sa dernière position de déconnexion (jusqu'à la prochaine connexion). Pas de TTL automatique.
+L'avatar gris reste à sa dernière position **pendant 24h max** après la déconnexion. Au-delà, il **disparaît complètement** de la carte jusqu'à la prochaine connexion du joueur.
 
-**Justification** : la carte ne se vide jamais le soir / le week-end. Le sentiment de communauté reste continu.
+**Justification** (Uriel le 2026-05-02) : on évite que la carte se peuple de comptes inactifs depuis des semaines. 24h c'est large — un joueur qui se reconnecte le lendemain matin retrouvera sa présence. Au-delà, c'est un compte qui s'est éloigné, on libère la carte.
 
-**Risque** : à terme avec des comptes inactifs, la carte peut s'encombrer. Quand le nombre d'inactifs dépasse les actifs (probablement dans plusieurs mois), on ajoutera un TTL (genre 30 ou 60 jours d'inactivité). Pas pour ce MVP.
+**Logique technique** : côté requête de la carte, on filtre `last_seen_at >= NOW() - INTERVAL '24 hours'`. C'est une condition WHERE simple, pas de cron de cleanup.
 
 ### 5.3 Logique technique
 
@@ -186,7 +188,7 @@ ALTER TABLE users ADD COLUMN last_seen_lng double precision;
 | **Dataset Natural Earth lourd à importer** | C'est ~3 MB. PostGIS gère sans problème. Une fois importé, c'est statique. |
 | **Performance randomisation côté serveur** | RPC simple, ~1× par 30 sec par user actif. Largement OK. |
 | **Note inappropriée publiée** | Limite 200 char + bouton signaler + reset admin. Pas de filtre IA (sur-engineering 10 jours). |
-| **Carte qui devient illisible avec les offline persistants** | Tant qu'on est en alpha (~quelques centaines de joueurs), ce n'est pas un problème. À surveiller post-V0.7. |
+| **Carte qui devient illisible avec les offline persistants** | Mitigé par le TTL 24h après inactivité (cf. §5.2) : seuls les joueurs vus dans les dernières 24h apparaissent en gris. Au-delà, ils disparaissent de la carte. |
 | **Conflit avec le sous-spec Campement complet futur** | Aucun : les 3 features ici sont des prérequis ou des compléments du Campement complet. La note partagée deviendra le mécanisme du "Mur" plus tard, le toggle "Brouiller" sera potentiellement remplacé par les 3 paliers + mode nomade, etc. |
 | **Délai 10 jours trop tendu** | Si on ne peut pas tout livrer, ordre de priorité : (1) note partagée (cœur social), (2) toggle brouiller (privacy), (3) offline persistant (bonus). On peut sacrifier (3) en derniers recours. |
 
