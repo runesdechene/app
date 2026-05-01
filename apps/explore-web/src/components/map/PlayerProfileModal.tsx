@@ -32,7 +32,12 @@ interface FavoritePlace extends PlaceCard {
   lastActionAt: string
 }
 
-type PlacesTab = 'authored' | 'discovered' | 'favorites'
+interface VeilledPlace extends PlaceCard {
+  plantedAt: string
+  memberCount: number
+}
+
+type PlacesTab = 'authored' | 'discovered' | 'veilled'
 
 interface TitleInfo {
   id: number
@@ -67,7 +72,10 @@ interface PlayerProfile {
   instagram: string | null
   authoredPlaces: AuthoredPlace[]
   discoveredPlaces: VisitedPlace[]
+  /** V0.5 legacy — gardé pour rétrocompat mais l'onglet est remplacé par veilled */
   favoritePlaces: FavoritePlace[]
+  /** V0.7 phase 3.5 — lieux actuellement veillés (mig 032) */
+  veilledPlaces: VeilledPlace[]
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }> | null
 }
 
@@ -445,17 +453,15 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </>
                 )}
 
-                {/* V0.7 phase 3.5 \u2014 Compteurs sous Couronnes, m\u00EAme style que
-                    Gloire/Coupe/Couronnes. Visibles pour TOUS les profils
-                    (pas seulement isSelf \u2014 donn\u00E9es dans get_player_profile). */}
-                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
-                  <span>{'\uD83E\uDDED'} {profile.lieuxExplores ?? 0} {'lieux explor\u00E9s'}</span>
-                </div>
-                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
-                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
-                </div>
-                <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.85 }}>
-                  <span>{'\uD83D\uDEA9'} {profile.lieuxVeilles ?? 0} {'lieux veill\u00E9s'}</span>
+                {/* V0.7 phase 3.5 \u2014 Compteurs sous Couronnes, sur UNE ligne
+                    pour gagner de la verticalit\u00E9. Visibles pour tous les profils. */}
+                <div
+                  className="player-modal-faction-row"
+                  style={{ gap: 14, fontSize: 13, opacity: 0.85, flexWrap: 'wrap' }}
+                >
+                  <span>{'\uD83E\uDDED'} {profile.lieuxExplores ?? 0}</span>
+                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0}</span>
+                  <span>{'\uD83D\uDEA9'} {profile.lieuxVeilles ?? 0}</span>
                 </div>
               </div>
             </div>
@@ -617,24 +623,27 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
             {/* Places tabs */}
             <div className="player-modal-places">
+              {/* V0.7 phase 3.5 — Onglets : Ajoutés / Explorés / Veillés.
+                  "Veillés" remplace "Influencés" (V0.5 figé). Petites icônes
+                  cohérentes avec les compteurs du header. */}
               <div className="player-modal-tabs">
                 <button
                   className={`player-modal-tab${placesTab === 'authored' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('authored'); setVisibleCount(12) }}
                 >
-                  Ajoutés <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
+                  {'🏛️'} {'Ajoutés'} <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
                 </button>
                 <button
                   className={`player-modal-tab${placesTab === 'discovered' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('discovered'); setVisibleCount(12) }}
                 >
-                  Visités  <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
+                  {'🧭'} {'Explorés'} <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
                 </button>
                 <button
-                  className={`player-modal-tab${placesTab === 'favorites' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('favorites'); setVisibleCount(12) }}
+                  className={`player-modal-tab${placesTab === 'veilled' ? ' active' : ''}`}
+                  onClick={() => { setPlacesTab('veilled'); setVisibleCount(12) }}
                 >
-                  Influencés  <span className="player-modal-tabs-number">{profile.favoritePlaces?.length ?? 0}</span>
+                  {'🚩'} {'Veillés'} <span className="player-modal-tabs-number">{profile.veilledPlaces?.length ?? 0}</span>
                 </button>
               </div>
 
@@ -642,7 +651,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 const places: PlaceCard[] =
                   placesTab === 'authored' ? (profile.authoredPlaces ?? []) :
                   placesTab === 'discovered' ? (profile.discoveredPlaces ?? []) :
-                  (profile.favoritePlaces ?? [])
+                  (profile.veilledPlaces ?? [])
 
                 if (places.length === 0) return (
                   <div className="player-modal-places-empty">Aucun lieu</div>
@@ -685,14 +694,21 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   )
                 }
 
-                // Tabs Visit\u00E9s + Influenc\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
+                // Tabs Explor\u00E9s + Veill\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
                 return (
                   <>
                     <div className="player-modal-places-list">
                       {visible.map(place => {
                         const meta = placesTab === 'discovered'
                           ? { num: (place as VisitedPlace).visitsCount, unit: (place as VisitedPlace).visitsCount > 1 ? 'visites' : 'visite', date: (place as VisitedPlace).lastVisitedAt }
-                          : { num: (place as FavoritePlace).totalPoints, unit: (place as FavoritePlace).totalPoints > 1 ? 'points' : 'point', date: (place as FavoritePlace).lastActionAt }
+                          : (() => {
+                              const v = place as VeilledPlace
+                              return {
+                                num: v.memberCount,
+                                unit: v.memberCount > 1 ? 'veilleurs' : 'veilleur',
+                                date: v.plantedAt,
+                              }
+                            })()
                         return (
                           <div
                             key={place.id}
