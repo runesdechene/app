@@ -9,7 +9,6 @@ import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { FactionMembersModal } from './FactionMembersModal'
-import { LevelMedallion } from '../profile/LevelMedallion'
 import { VeteranBadge } from '../profile/VeteranBadge'
 import { GloryProgressBar } from '../profile/GloryProgressBar'
 
@@ -388,15 +387,23 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 />
               </div>
 
-              {isSelf && (
-                <div className="player-modal-medallion-wrap">
-                  <LevelMedallion level={level} size="md" />
-                </div>
-              )}
-
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
                   <h2 className="player-modal-name">{profile.name}</h2>
+                  {isSelf && (
+                    <span
+                      style={{
+                        fontFamily: "'Alegreya', serif",
+                        color: '#d4a574',
+                        opacity: 0.55,
+                        fontSize: '0.8em',
+                        marginLeft: '12px',
+                        fontWeight: 400,
+                      }}
+                    >
+                      Niveau {level}
+                    </span>
+                  )}
                   {isSelf && veteranFirstEra && (
                     <VeteranBadge size="sm" />
                   )}
