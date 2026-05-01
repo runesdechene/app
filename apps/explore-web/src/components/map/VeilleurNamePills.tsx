@@ -73,7 +73,7 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
               setSelectedPlayerId(userId)
             }}
           >
-            <span className="veilleur-name-pill-text">{name.toUpperCase()}</span>
+            <span className="veilleur-name-pill-text">{name}</span>
             {extraCount > 0 && (
               <span className="veilleur-name-pill-extra">+{extraCount}</span>
             )}
