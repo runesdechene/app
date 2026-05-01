@@ -8,7 +8,7 @@ import './LeaderboardModal.css'
 // (anciens compteurs abstraits, plus utilisés depuis la refonte Gloire) +
 // 'explored' (qui buggait sur une table inexistante).
 // Ajouté : 'planted' (étendards plantés via veille_history).
-type LeaderboardTab = 'notoriety' | 'planted' | 'authored'
+type LeaderboardTab = 'notoriety' | 'veilled' | 'authored'
 
 interface LeaderboardEntry {
   rank: number
@@ -25,13 +25,13 @@ interface Props {
 
 const TAB_LABELS: Record<LeaderboardTab, string> = {
   notoriety: 'Gloire',
-  planted:   'Étendards plantés',
+  veilled:   'Lieux veillés',
   authored:  'Lieux ajoutés',
 }
 
 const TAB_ICONS: Record<LeaderboardTab, string> = {
   notoriety: '🎖️',
-  planted:   '🚩',
+  veilled:   '🚩',
   authored:  '🏛️',
 }
 
@@ -50,7 +50,9 @@ export function LeaderboardModal({ onClose }: Props) {
         return
       }
       setLoading(true)
-      const { data } = await supabase.rpc('get_leaderboard', { p_type: tab, p_limit: 20 })
+      // p_limit élevé : on remonte tous les joueurs avec ≥ 1 point.
+      // 500 couvre largement l'alpha, on bascule en pagination si on dépasse un jour.
+      const { data } = await supabase.rpc('get_leaderboard', { p_type: tab, p_limit: 500 })
       const rows = (data && Array.isArray(data) ? data : []) as LeaderboardEntry[]
       cache.current[tab] = rows
       setEntries(rows)
@@ -74,7 +76,7 @@ export function LeaderboardModal({ onClose }: Props) {
         <h2 className="leaderboard-title">{'Classement'}</h2>
 
         <div className="leaderboard-tabs">
-          {(['notoriety', 'planted', 'authored'] as LeaderboardTab[]).map(t => (
+          {(['notoriety', 'veilled', 'authored'] as LeaderboardTab[]).map(t => (
             <button
               key={t}
               className={`leaderboard-tab${tab === t ? ' active' : ''}`}
