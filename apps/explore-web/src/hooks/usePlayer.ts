@@ -328,12 +328,12 @@ export function usePlayer() {
               // method stocké dans data si disponible (mig 042+) — sinon message conservateur (remote)
               const method = (e.data as { method?: string })?.method
               if (method === 'gps') {
-                message = `Tu as découvert et foulé ${place} 🥾 +4 Gloire / +3 Coupe`
+                message = `Le brouillard se lève sur ${place} et tu as foulé son sol 🥾 +4 Gloire / +3 Coupe`
               } else {
                 message = `Le brouillard se lève sur ${place} 🔍 +1 Gloire`
               }
             } else {
-              message = `${name} a découvert ${place} 🧭`
+              message = `Le brouillard se lève sur ${place} pour ${name} 🔍`
             }
             highlights.push(place)
             type = 'discover'
@@ -496,7 +496,7 @@ async function loadRecentActivity(currentUserId: string) {
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'discover' || e.type === 'explore') {
-      message = `${name} a découvert ${place} 🧭`
+      message = `Le brouillard se lève sur ${place} pour ${name} 🔍`
       highlights.push(name, place)
       type = 'discover'
     } else if (e.type === 'like') {
@@ -612,7 +612,7 @@ export async function discoverPlace(
   // - remote : trigger _trg_xp_discovered_insert → +1 Gloire (pas de Coupe — places_discovered exclu de Coupe)
   // - gps    : cascade places_discovered + place_explorers → +4 Gloire / +3 Coupe
   const toastMessage = method === 'gps'
-    ? 'Tu as découvert et foulé ce lieu 🥾 +4 Gloire / +3 Coupe'
+    ? 'Le brouillard se lève sur ce lieu et tu as foulé son sol 🥾 +4 Gloire / +3 Coupe'
     : 'Le brouillard se lève sur ce lieu 🔍 +1 Gloire'
 
   useToastStore.getState().addToast({
