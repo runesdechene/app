@@ -74,7 +74,7 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
         }}
         onContextMenu={(e) => { e.preventDefault(); onClick() }}
       >
-        <span className="notoriety-icon">{'🎖️'}</span>
+        <span className="notoriety-icon">Niv</span>
         <span className="notoriety-value">{level}</span>
       </div>
 
@@ -90,12 +90,20 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
               { label: '🏴 Plantages de bannière',        value: `${glory.plantages}` },
               { label: '✍️ Récits écrits',                value: `${glory.carnets}` },
               { label: '📷 Photos ajoutées',              value: `${glory.photos}` },
-              {
-                label: glory.enigmes.total > 0
-                  ? `🦉 Énigmes résolues (${glory.enigmes.hard}h • ${glory.enigmes.medium}m • ${glory.enigmes.easy + glory.enigmes.veryEasy}e)`
-                  : '🦉 Énigmes résolues',
-                value: `${glory.enigmes.total}`,
-              },
+              (() => {
+                const easyTotal = glory.enigmes.easy + glory.enigmes.veryEasy
+                const parts = [
+                  glory.enigmes.hard   ? `${glory.enigmes.hard} difficile${glory.enigmes.hard > 1 ? 's' : ''}`     : null,
+                  glory.enigmes.medium ? `${glory.enigmes.medium} moyenne${glory.enigmes.medium > 1 ? 's' : ''}`   : null,
+                  easyTotal            ? `${easyTotal} facile${easyTotal > 1 ? 's' : ''} ou très facile${easyTotal > 1 ? 's' : ''}` : null,
+                ].filter(Boolean).join(', ')
+                return {
+                  label: glory.enigmes.total > 0
+                    ? `🦉 Énigmes résolues (${parts})`
+                    : '🦉 Énigmes résolues',
+                  value: `${glory.enigmes.total}`,
+                }
+              })(),
             ] : []
           }
           onClose={() => setShowInfo(false)}
