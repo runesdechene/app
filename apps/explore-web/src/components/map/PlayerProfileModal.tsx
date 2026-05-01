@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
+import { useCoupe } from '../../hooks/useCoupe'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
@@ -95,6 +96,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   const currentUserId = usePlayerStore(s => s.userId)
   const crownsBalance = useCrownsStore(s => s.balance)
+  const { state: coupeState } = useCoupe(true)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -411,16 +413,33 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     )}
                   </div>
                 )}
-                {/* V0.7 \u2014 Couronnes de Ch\u00EAne (visible uniquement sur son propre profil) */}
+                {/* V0.7 \u2014 Couronnes de Ch\u00EAne + Coupe des H\u00E9ritages
+                    (visible uniquement sur son propre profil).
+                    Note : on utilise les escapes Unicode pour les caract\u00E8res
+                    accentu\u00E9s, plusieurs probl\u00E8mes d'encodage observ\u00E9s par le pass\u00E9. */}
                 {isSelf && (
-                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                    <span>
-                      {'\uD83E\uDE99'} {crownsBalance} Couronne{crownsBalance > 1 ? 's' : ''} de Ch\u00EAne
-                      <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                        / 500
+                  <>
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                        <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                          / 500
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    </div>
+                    {coupeState?.myBreakdown && (
+                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                        <span>
+                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe des H\u00E9ritages'}
+                          {coupeState.season?.name && (
+                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                              ({coupeState.season.name})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

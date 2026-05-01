@@ -5,7 +5,11 @@
 .info-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  /* z-index très élevé : doit passer au-dessus de TOUS les autres modals
+     (player-modal-overlay = 9999, leaderboard-overlay = 1100, FactionMembers
+     mobile = 99999). Sinon les règles Coupe ouvertes depuis CoupeModal ou
+     FactionBar sont masquées. */
+  z-index: 100000;
   background: rgba(20, 16, 12, 0.7);
   display: flex;
   align-items: center;

@@ -1,135 +1,138 @@
 /* ==========================================
-   FACTION SCOREBOARD (style AoE, bas gauche)
+   FACTION SCOREBOARD — V0.7 phase 3, jauges verticales
+   Identification par emblème + couleur de faction (pas de nom texte
+   pour rester schématique). Click sur une jauge → modal members.
+   Click sur le label bas → modal Coupe complète.
    ========================================== */
 
 .faction-scoreboard {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: flex-end;
+  gap: 6px;
   width: auto;
 }
 
-
-.faction-scoreboard-row {
-  position: relative;
-  height: 34px;
-  border-radius: 10px;
-  overflow: hidden;
+.faction-scoreboard-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 10px 6px;
   background: rgba(245, 230, 211, 0.85);
   border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
-.faction-scoreboard-mine {
-  border: 2px solid var(--faction-color);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.12);
-}
-
-/* Barre de remplissage en fond */
-.faction-scoreboard-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: var(--faction-color);
-  opacity: 0.25;
-  transition: width 0.6s ease;
-  border-radius: 3px;
-}
-
-/* Contenu texte par-dessus */
-.faction-scoreboard-content {
-  position: relative;
-  z-index: 1;
+.faction-scoreboard-col {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  height: 100%;
-  padding: 0 8px;
+  gap: 4px;
+  min-width: 32px;
+  cursor: pointer;
+  transition: transform 120ms ease-out;
 }
 
+.faction-scoreboard-col:hover {
+  transform: translateY(-2px);
+}
+
+.faction-scoreboard-col-mine .faction-scoreboard-emblem {
+  border: 2px solid var(--faction-color);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.18);
+}
+
+/* Couronne 👑 du leader, posée au-dessus de l'emblème */
 .faction-scoreboard-crown {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.faction-scoreboard-underdog {
   font-size: 14px;
   line-height: 1;
-  animation: underdog-pulse 2s ease-in-out infinite;
-}
-
-@keyframes underdog-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.4); }
-}
-
-.faction-scoreboard-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--faction-color);
-  flex-shrink: 0;
-  display: flex;
+  height: 16px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.faction-scoreboard-icon {
+.faction-scoreboard-crown-spacer {
+  height: 16px;  /* préserve l'alignement vertical des jauges */
+}
+
+/* Emblème faction = cercle de couleur faction + pattern blanc à l'intérieur */
+.faction-scoreboard-emblem {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--faction-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.faction-scoreboard-emblem-img {
   width: 18px;
   height: 18px;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
 
-.faction-scoreboard-name {
-  font-family: var(--font-accent);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-ink);
-  white-space: nowrap;
+/* Track (fond) + fill (proportionnel) de la jauge verticale.
+   Hauteur fixe pour rester schématique, le fill grandit du bas. */
+.faction-scoreboard-track {
+  position: relative;
+  width: 12px;
+  height: 64px;
+  border-radius: 6px;
+  background: rgba(74, 55, 40, 0.15);
+  overflow: hidden;
 }
 
-.faction-scoreboard-places {
-  font-size: 11px;
-  color: rgba(74, 55, 40, 0.5);
-  margin-left: auto;
-  white-space: nowrap;
-}
-.faction-scoreboard-places::after {
-  content: ' lieux';
+.faction-scoreboard-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--faction-color);
+  border-radius: 6px;
+  transition: height 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-.faction-scoreboard-pct {
-  font-family: var(--font-accent);
-  font-size: 14px;
+.faction-scoreboard-score {
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 12px;
   font-weight: 700;
   color: var(--faction-color);
   font-variant-numeric: tabular-nums;
-  min-width: 28px;
-  text-align: right;
+  line-height: 1;
 }
 
-.faction-scoreboard-rate {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--faction-color);
-  opacity: 0.7;
-  white-space: nowrap;
-}
-
+/* Label bas — cliquable, ouvre la modal Coupe complète */
 .faction-scoreboard-live {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: right;
   gap: 5px;
-  font-family: var(--font-accent);
+  background: rgba(245, 230, 211, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-accent, 'Cinzel', serif);
   font-size: 10px;
   font-weight: 600;
-  color: rgba(74, 55, 40, 0.45);
+  color: rgba(74, 55, 40, 0.65);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 2px 4px 0;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.faction-scoreboard-live:hover {
+  background: rgba(245, 230, 211, 1);
+  color: rgba(74, 55, 40, 0.9);
 }
 
 .faction-scoreboard-live-dot {
@@ -138,6 +141,13 @@
   border-radius: 50%;
   background: #b8860b;
   animation: live-pulse 2s ease-in-out infinite;
+}
+
+.faction-scoreboard-live-season {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+  font-weight: 500;
 }
 
 @keyframes live-pulse {
