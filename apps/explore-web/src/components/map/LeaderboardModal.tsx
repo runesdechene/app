@@ -4,7 +4,11 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import './LeaderboardModal.css'
 
-type LeaderboardTab = 'notoriety' | 'authored' | 'explored' | 'exploration' | 'erudition'
+// V0.7 phase 3.5 — Onglets simplifiés. Retiré : 'exploration', 'erudition'
+// (anciens compteurs abstraits, plus utilisés depuis la refonte Gloire) +
+// 'explored' (qui buggait sur une table inexistante).
+// Ajouté : 'planted' (étendards plantés via veille_history).
+type LeaderboardTab = 'notoriety' | 'planted' | 'authored'
 
 interface LeaderboardEntry {
   rank: number
@@ -21,18 +25,14 @@ interface Props {
 
 const TAB_LABELS: Record<LeaderboardTab, string> = {
   notoriety: 'Gloire',
-  exploration: 'Exploration',
-  erudition: 'érudition',
-  authored: 'Lieux ajoutés',
-  explored: 'Lieux explorés',
+  planted:   'Étendards plantés',
+  authored:  'Lieux ajoutés',
 }
 
 const TAB_ICONS: Record<LeaderboardTab, string> = {
-  notoriety: '\uD83C\uDF96\uFE0F',
-  exploration: '\uD83E\uDDED',
-  erudition: '\uD83D\uDCD6',
-  authored: '\uD83D\uDCCD',
-  explored: '\uD83D\uDCCD',
+  notoriety: '🎖️',
+  planted:   '🚩',
+  authored:  '🏛️',
 }
 
 export function LeaderboardModal({ onClose }: Props) {
@@ -45,7 +45,7 @@ export function LeaderboardModal({ onClose }: Props) {
   useEffect(() => {
     async function load() {
       if (cache.current[tab]) {
-        setEntries(cache.current[tab])
+        setEntries(cache.current[tab]!)
         setLoading(false)
         return
       }
@@ -71,10 +71,10 @@ export function LeaderboardModal({ onClose }: Props) {
           &#10005;
         </button>
 
-        <h2 className="leaderboard-title">Classement</h2>
+        <h2 className="leaderboard-title">{'Classement'}</h2>
 
         <div className="leaderboard-tabs">
-          {(['notoriety', 'exploration', 'erudition', 'authored', 'explored'] as LeaderboardTab[]).map(t => (
+          {(['notoriety', 'planted', 'authored'] as LeaderboardTab[]).map(t => (
             <button
               key={t}
               className={`leaderboard-tab${tab === t ? ' active' : ''}`}
@@ -85,10 +85,10 @@ export function LeaderboardModal({ onClose }: Props) {
           ))}
         </div>
 
-        {loading && <div className="player-modal-loading">Chargement...</div>}
+        {loading && <div className="player-modal-loading">{'Chargement...'}</div>}
 
         {!loading && entries.length === 0 && (
-          <div className="player-modal-loading">Aucun joueur</div>
+          <div className="player-modal-loading">{'Aucun joueur'}</div>
         )}
 
         {!loading && entries.length > 0 && (
