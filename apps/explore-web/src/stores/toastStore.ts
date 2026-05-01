@@ -42,11 +42,14 @@ export const useToastStore = create<ToastState>((set) => ({
       // V0.6 — Fusion harvest_crown : si on récolte plusieurs coffres en rafale,
       // on incrémente le total dans le toast existant au lieu d'en créer un nouveau.
       // Évite le spam quand le user clique 5 coffres en 30s.
+      // Fenêtre de fusion : 5 minutes — au-delà, on démarre un nouveau toast
+      // (sinon une récolte 1h après agrège bizarrement avec une vieille session).
+      const HARVEST_MERGE_WINDOW_MS = 5 * 60 * 1000
       if (toast.type === 'harvest_crown' && toast.actorId) {
         const existing = state.toasts.find(
           t => t.type === 'harvest_crown' && t.actorId === toast.actorId
         )
-        if (existing) {
+        if (existing && Date.now() - existing.timestamp < HARVEST_MERGE_WINDOW_MS) {
           const prevMatch = existing.message.match(/(\d+) Couronne/)
           const prev = prevMatch ? parseInt(prevMatch[1], 10) : 1
           const addMatch = toast.message.match(/(\d+) Couronne/)
