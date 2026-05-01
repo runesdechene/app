@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCrownsStore } from '../../stores/crownsStore'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
@@ -93,6 +94,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   const currentUserId = usePlayerStore(s => s.userId)
+  const crownsBalance = useCrownsStore(s => s.balance)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -407,6 +409,17 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     {profile.influencePlaced != null && profile.influencePlaced > 0 && (
                       <span>{'\uD83C\uDF1F'} {profile.influencePlaced} influence placee</span>
                     )}
+                  </div>
+                )}
+                {/* V0.7 \u2014 Couronnes de Ch\u00EAne (visible uniquement sur son propre profil) */}
+                {isSelf && (
+                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                    <span>
+                      {'\uD83E\uDE99'} {crownsBalance} Couronne{crownsBalance > 1 ? 's' : ''} de Ch\u00EAne
+                      <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                        / 500
+                      </span>
+                    </span>
                   </div>
                 )}
               </div>

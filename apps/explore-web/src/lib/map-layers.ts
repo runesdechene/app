@@ -212,6 +212,7 @@ export const undiscoveredIconLayer: LayerSpecification = {
 }
 
 // Cercles colorés nets — lieux découverts SANS icône
+// V0.7 — masqué quand `harvestable: true` (le coffre Couronnes prend la place visuellement)
 export const pointLayer: LayerSpecification = {
   id: 'places-point',
   type: 'circle',
@@ -219,6 +220,7 @@ export const pointLayer: LayerSpecification = {
   filter: ['all',
     ['==', ['get', 'tagIcon'], ''],
     ['==', ['get', 'discovered'], true],
+    ['!=', ['get', 'harvestable'], true],
   ],
   paint: {
     'circle-color': ['get', 'iconColor'],
@@ -236,6 +238,7 @@ export const pointLayer: LayerSpecification = {
 }
 
 // Icônes SVG colorées — lieux découverts avec icône
+// V0.7 — masqué quand `harvestable: true` (le coffre Couronnes prend la place visuellement)
 export const iconLayer: LayerSpecification = {
   id: 'places-icon',
   type: 'symbol',
@@ -243,6 +246,7 @@ export const iconLayer: LayerSpecification = {
   filter: ['all',
     ['!=', ['get', 'tagIcon'], ''],
     ['==', ['get', 'discovered'], true],
+    ['!=', ['get', 'harvestable'], true],
   ],
   layout: {
     'icon-image': ['get', 'tagIcon'],

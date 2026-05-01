@@ -1,0 +1,90 @@
+/* V0.7 — Couronnes de Chêne : marker coffre récoltable */
+
+.harvestable-chest-wrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.harvestable-chest-btn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease-out;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  animation: chest-bob 2.6s ease-in-out infinite;
+}
+
+.harvestable-chest-btn:hover {
+  transform: scale(1.1);
+}
+
+.harvestable-chest-btn:active {
+  transform: scale(0.92);
+}
+
+.harvestable-chest-btn.busy {
+  pointer-events: none;
+  opacity: 0.6;
+  animation: none;
+}
+
+.harvestable-chest-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Petit bobbing pour signaler que c'est cliquable */
+@keyframes chest-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* +N volant qui monte et fade out */
+.harvestable-chest-float {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: #d4af37;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.8),
+    0 1px 2px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: chest-float 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  z-index: 5;
+}
+
+@keyframes chest-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.85);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -4px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -56px) scale(1);
+  }
+}

@@ -22,7 +22,9 @@ import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
 import { VeilleurNamePills } from './VeilleurNamePills'
+import { HarvestableChests } from './HarvestableChests'
 import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
+import { useCrownsStore } from '../../stores/crownsStore'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
 // La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
@@ -83,6 +85,15 @@ export const ExploreMap = memo(function ExploreMap() {
   // Territory names (noms custom par les joueurs) — dans le store pour mise à jour depuis TerritoryPanel
   const territoryNames = useMapStore(s => s.territoryNames)
   const setTerritoryNamesStore = useMapStore(s => s.setTerritoryNames)
+
+  // V0.7 phase 2 — Couronnes de Chêne : Set des lieux où le user peut récolter un coffre
+  const harvestableSet = useCrownsStore(s => s.harvestableSet)
+  const refreshCrowns = useCrownsStore(s => s.refresh)
+
+  // Refresh balance + harvestable dès qu'on connaît le userId
+  useEffect(() => {
+    if (currentUserId) refreshCrowns(currentUserId)
+  }, [currentUserId, refreshCrowns])
 
   useEffect(() => {
     // V0.7 — coloriage initial par veille
@@ -650,16 +661,20 @@ export const ExploreMap = memo(function ExploreMap() {
     })
   }, [setTerritoryHover])
 
-  // Apply placeOverrides + factionColorMode to geojson
+  // Apply placeOverrides + factionColorMode + harvestable to geojson
   const enrichedGeojson = useMemo(() => {
     if (!geojson) return geojson
-    const needsEnrich = placeOverrides.size > 0 || factionColorMode
+    const needsEnrich = placeOverrides.size > 0 || factionColorMode || harvestableSet.size > 0
     if (!needsEnrich) return geojson
     return {
       ...geojson,
       features: geojson.features.map(f => {
         const ov = placeOverrides.get(f.properties.id)
         const props = { ...f.properties }
+        // V0.7 phase 2 — flag de coffre Couronnes : masque l'icône lieu via filter map-layers
+        if (harvestableSet.has(f.properties.id)) {
+          (props as Record<string, unknown>).harvestable = true
+        }
         if (ov) {
           if (ov.fortificationLevel !== undefined) props.fortificationLevel = ov.fortificationLevel
           if (ov.factionId !== undefined) props.factionId = ov.factionId
@@ -686,7 +701,7 @@ export const ExploreMap = memo(function ExploreMap() {
         return { ...f, properties: props }
       }),
     }
-  }, [geojson, placeOverrides, factionColorMode])
+  }, [geojson, placeOverrides, factionColorMode, harvestableSet])
 
   if (!mapStyle) {
     return (
@@ -795,6 +810,11 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...fortBadgeLayer} />
         </Source>
       )}
+
+      {/* V0.7 phase 2 — Couronnes de Chêne : coffres récoltables (1+/jour selon expé).
+          Rendu en React Markers DOM pour gérer animation +N + click sans toucher MapLibre.
+          Visible uniquement sur les lieux où le user actuel peut récolter (filtré par crownsStore). */}
+      <HarvestableChests geojson={enrichedGeojson} />
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>
