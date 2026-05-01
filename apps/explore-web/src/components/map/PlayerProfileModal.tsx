@@ -453,15 +453,15 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </>
                 )}
 
-                {/* V0.7 phase 3.5 \u2014 Compteurs sous Couronnes, sur UNE ligne
-                    pour gagner de la verticalit\u00E9. Visibles pour tous les profils. */}
+                {/* V0.7 phase 3.5 \u2014 Sous les Couronnes, on garde uniquement
+                    le compteur d'\u00E9nigmes r\u00E9solues. Les lieux explor\u00E9s et
+                    veill\u00E9s sont d\u00E9j\u00E0 visibles dans les onglets en bas
+                    (Explor\u00E9s / Veill\u00E9s) \u2014 pas besoin de les dupliquer ici. */}
                 <div
                   className="player-modal-faction-row"
-                  style={{ gap: 14, fontSize: 13, opacity: 0.85, flexWrap: 'wrap' }}
+                  style={{ gap: 14, fontSize: 13, opacity: 0.85 }}
                 >
-                  <span>{'\uD83E\uDDED'} {profile.lieuxExplores ?? 0}</span>
-                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0}</span>
-                  <span>{'\uD83D\uDEA9'} {profile.lieuxVeilles ?? 0}</span>
+                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
                 </div>
               </div>
             </div>
