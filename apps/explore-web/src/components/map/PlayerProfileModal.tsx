@@ -404,7 +404,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   <span className="player-modal-notoriety">
                     {'\uD83C\uDF96\uFE0F'} {(isSelf && gloryState ? gloryState.glory : (profile.glory ?? 0))} Gloire
                     <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
-                      (\u00E0 vie)
+                      {'(\u00E0 vie)'}
                     </span>
                   </span>
                 </div>
