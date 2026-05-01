@@ -45,7 +45,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 4px 0 12px;
+  /* padding horizontal pour aérer les rows par rapport aux bords du modal,
+     cohérent avec leaderboard-row qui a padding: 8px 16px */
+  padding: 10px 14px 16px;
+  overflow-y: auto;
 }
 
 .coupe-empty {
@@ -179,7 +182,8 @@
 /* === Breakdown (Ma contribution) === */
 
 .coupe-breakdown {
-  padding: 4px 0 12px;
+  padding: 10px 14px 16px;
+  overflow-y: auto;
 }
 
 .coupe-my-total {
