@@ -1,0 +1,52 @@
+.veteran-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000;
+}
+.veteran-modal {
+  background: radial-gradient(ellipse at top, #3a2818, #0d0a06);
+  border: 2px solid #d4a574;
+  padding: 32px 40px;
+  border-radius: 10px;
+  color: #e8dfc8;
+  text-align: center;
+  max-width: 92vw;
+  width: 480px;
+  font-family: 'Alegreya', serif;
+}
+.veteran-modal__title {
+  font-size: 22px;
+  font-style: italic;
+  color: #d4a574;
+  margin-bottom: 18px;
+}
+.veteran-modal__badge {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 18px;
+  transform: scale(1.4);
+}
+.veteran-modal__body {
+  font-size: 15px;
+  line-height: 1.55;
+  opacity: 0.92;
+  margin: 12px 0;
+}
+.veteran-modal__body--sub {
+  font-size: 13px;
+  opacity: 0.7;
+}
+.veteran-modal__btn {
+  background: #d4a574;
+  color: #1a1612;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+.veteran-modal__btn:hover { background: #e8c890; }

@@ -6,6 +6,7 @@ import type { GameToast } from '../stores/toastStore'
 import { useAuth } from './useAuth'
 import { useMapStore } from '../stores/mapStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { refreshLevelStateGlobal } from './useLevel'
 
 const GPS_PROXIMITY_M = 500
 
@@ -298,8 +299,8 @@ export function usePlayer() {
             return
           } else if (e.type === 'plant_flag') {
             message = isSelf
-              ? `Vous avez planté votre étendard sur ${place} 🚩 +5 Gloire +5 Coupe`
-              : `${name} a planté son étendard sur ${place} 🚩 +5 Gloire`
+              ? `🏴 Tu as planté ta bannière à ${place} +10 Gloire / +10 Coupe`
+              : `${name} a planté son étendard sur ${place} 🚩`
             highlights.push(place)
             type = 'plant_flag'
             color = e.data?.factionColor ?? undefined
@@ -323,9 +324,17 @@ export function usePlayer() {
             }
             type = 'harvest_crown'
           } else if (e.type === 'discover') {
-            message = isSelf
-              ? `Vous avez découvert ${place} 🧭 +1 Gloire +1 Coupe`
-              : `${name} a découvert ${place} 🧭`
+            if (isSelf) {
+              // method stocké dans data si disponible (mig 042+) — sinon message conservateur (remote)
+              const method = (e.data as { method?: string })?.method
+              if (method === 'gps') {
+                message = `Tu as découvert et foulé ${place} 🥾 +4 Gloire / +3 Coupe`
+              } else {
+                message = `Le brouillard se lève sur ${place} 🔍 +1 Gloire`
+              }
+            } else {
+              message = `${name} a découvert ${place} 🧭`
+            }
             highlights.push(place)
             type = 'discover'
           } else if (e.type === 'like') {
@@ -343,7 +352,7 @@ export function usePlayer() {
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'new_place') {
             message = isSelf
-              ? `Vous avez ajouté ${place} 🏛️ +7 Gloire +7 Coupe`
+              ? `📜 Tu as cartographié ${place} +20 Gloire / +20 Coupe`
               : `${name} a ajouté ${place} 🏛️`
             highlights.push(name, place)
             type = 'new_place'
@@ -352,11 +361,11 @@ export function usePlayer() {
             type = 'new_user'
           } else if (e.type === 'contribute') {
             const isPhoto = e.data?.contributionType === 'photo'
-            const contribType = isPhoto ? 'une photo' : 'un récit'
-            const points = isPhoto ? 1 : 3
             message = isSelf
-              ? `Vous avez ajouté ${contribType} sur ${place} 📜 +${points} Gloire +${points} Coupe`
-              : `${name} a ajouté ${contribType} sur ${place} 📜`
+              ? isPhoto
+                ? `📷 Tu as ajouté une photo de ${place} +1 Gloire / +1 Coupe`
+                : `✍️ Tu as écrit un récit sur ${place} +5 Gloire / +5 Coupe`
+              : `${name} a ${isPhoto ? 'ajouté une photo de' : 'écrit un récit sur'} ${place} 📜`
             highlights.push(place)
             type = 'contribute'
             color = e.data?.factionColor ?? undefined
@@ -375,7 +384,7 @@ export function usePlayer() {
             const diff = e.data?.difficulty ?? 'easy'
             const gain = diff === 'hard' ? 3 : diff === 'medium' ? 2 : 1
             if (isSelf) {
-              message = `Énigme résolue ! 📖 +${gain} Gloire +${gain} Coupe +1 énigme validée`
+              message = `Énigme résolue sur ${place} 🦉 +${gain} Gloire / +${gain} Coupe`
             } else {
               message = `${name} a résolu une énigme 📖`
             }
@@ -594,19 +603,26 @@ export async function discoverPlace(
     })
   }
 
-  // V0.6 — la "découverte" d'un nouveau lieu correspond à une visite GPS,
-  // qui rapporte +1 Gloire et +1 Coupe (formule unifiée V0.7 phase 3.5).
-  // Les anciens "exploration_points" sont encore stockés en DB pour rétrocompat
-  // mais plus affichés. Le toast mentionne désormais Gloire / Coupe.
+  // V0.7 — mise à jour des exploration_points (rétrocompat, plus affiché)
   const explorationGain = data?.explorationGain ?? 5
   const currentExploration = usePlayerStore.getState().explorationPoints
   usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
 
+  // Toast honnête selon la méthode réelle :
+  // - remote : trigger _trg_xp_discovered_insert → +1 Gloire (pas de Coupe — places_discovered exclu de Coupe)
+  // - gps    : cascade places_discovered + place_explorers → +4 Gloire / +3 Coupe
+  const toastMessage = method === 'gps'
+    ? 'Tu as découvert et foulé ce lieu 🥾 +4 Gloire / +3 Coupe'
+    : 'Le brouillard se lève sur ce lieu 🔍 +1 Gloire'
+
   useToastStore.getState().addToast({
     type: 'discover',
-    message: 'Nouveau lieu découvert ! 🎖️ +1 Gloire 🏆 +1 Coupe',
+    message: toastMessage,
     timestamp: Date.now(),
   })
+
+  // Rafraîchir l'état de niveau pour que useLevelUp détecte le changement
+  await refreshLevelStateGlobal(userId)
 
   return { success: true }
 }

@@ -40,6 +40,11 @@ import { NotificationBell } from '../components/notifications/NotificationBell'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
+import { useLevel } from '../hooks/useLevel'
+import { useLevelUp } from '../hooks/useLevelUp'
+import { LevelUpModal } from '../components/levelup/LevelUpModal'
+import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
+import { xpForLevel } from '../lib/levelCalc'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -128,6 +133,12 @@ export default function MapPage() {
   const canAddPlace = unlockedTitles.some(t => t.unlocks?.includes('add_place'))
     || (factionTitle?.unlocks?.includes('add_place') ?? false)
 
+  // Gating niveau 3 pour Cartographier
+  const playerLevel = usePlayerStore(s => s.level)
+  const playerXpTotal = usePlayerStore(s => s.xpTotal)
+  const canAddPlaceByLevel = playerLevel >= 3
+  const xpNeededForLevel3 = Math.max(0, xpForLevel(3) - playerXpTotal)
+
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   usePlayer()
   // Présence temps réel sur la carte
@@ -136,6 +147,21 @@ export default function MapPage() {
   useChat()
   useNotifications()
   useResourceTimers()
+
+  // V0.7 — Système de niveaux
+  useLevel(true)
+  const { pendingLevelUp, dismiss } = useLevelUp()
+  const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
+  const [showVeteranWelcome, setShowVeteranWelcome] = useState(false)
+
+  useEffect(() => {
+    if (!userId || !veteranFirstEra) return
+    const seenKey = `veteranWelcomeSeen_${userId}`
+    if (!localStorage.getItem(seenKey)) {
+      setShowVeteranWelcome(true)
+      localStorage.setItem(seenKey, '1')
+    }
+  }, [userId, veteranFirstEra])
 
   // Auto-open auth modal si non connecté (une seule fois par session)
   const authPromptDone = useRef(false)
@@ -308,25 +334,38 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* FAB Ajouter un lieu — toujours visible, verrouille si pas le titre */}
+      {/* FAB Ajouter un lieu — toujours visible, verrouille si niveau < 3 ou pas le titre */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
-          className={`add-place-fab ${!canAddPlace ? 'locked' : ''}`}
+          className={`add-place-fab ${(!canAddPlaceByLevel || !canAddPlace) ? 'locked' : ''}`}
           onClick={() => {
-            if (canAddPlace) {
-              setAddPlaceMode(true)
-            } else {
+            if (!canAddPlaceByLevel || !canAddPlace) {
               setShowAddPlaceInfo(true)
+            } else {
+              setAddPlaceMode(true)
             }
           }}
           aria-label="Ajouter un lieu"
         >
-          +
+          {(!canAddPlaceByLevel || !canAddPlace) ? '🔒' : '+'}
         </button>
       )}
 
       {/* Info modal ajout de lieu */}
-      {showAddPlaceInfo && (
+      {showAddPlaceInfo && !canAddPlaceByLevel && (
+        <InfoModal
+          icon="🗺️"
+          title="Cartographier"
+          description={`L'ajout de lieux est réservé aux Veilleurs de niveau 3 et plus. Continue d'explorer pour le débloquer.`}
+          rows={[
+            { label: 'Niveau requis', value: 'Niveau 3' },
+            { label: 'Ton niveau actuel', value: `Niveau ${playerLevel}` },
+            { label: 'Gloire manquante', value: `${xpNeededForLevel3} avant le niveau 3` },
+          ]}
+          onClose={() => setShowAddPlaceInfo(false)}
+        />
+      )}
+      {showAddPlaceInfo && canAddPlaceByLevel && !canAddPlace && (
         <InfoModal
           icon="🏛️"
           title="Ajouter un lieu"
@@ -437,6 +476,18 @@ export default function MapPage() {
 
       {/* Navbar mobile (masquée sur desktop via CSS) */}
       {!addPlaceMode && !authLoading && isAuthenticated && <MobileNavbar />}
+
+      {/* V0.7 — Modales niveau */}
+      {pendingLevelUp && (
+        <LevelUpModal
+          levelBefore={pendingLevelUp.levelBefore}
+          levelAfter={pendingLevelUp.levelAfter}
+          onClose={dismiss}
+        />
+      )}
+      {showVeteranWelcome && (
+        <VeteranWelcomeModal onClose={() => setShowVeteranWelcome(false)} />
+      )}
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}

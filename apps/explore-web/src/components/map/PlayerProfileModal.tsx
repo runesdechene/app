@@ -5,11 +5,13 @@ import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
-import { useGlory } from '../../hooks/useGlory'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { FactionMembersModal } from './FactionMembersModal'
+import { VeteranBadge } from '../profile/VeteranBadge'
+import { GloryProgressBar } from '../profile/GloryProgressBar'
+import { LevelText } from '../profile/LevelText'
 
 interface PlaceCard {
   id: string
@@ -65,6 +67,16 @@ interface PlayerProfile {
   lieuxExplores?: number
   lieuxVeilles?: number
   enigmasSolved?: number
+  /** V0.7 Niveaux — exposés par get_player_profile (mig 045) */
+  level?: number
+  xpTotal?: number
+  xpToNextLevel?: number
+  xpForNextLevel?: number
+  veteranFirstEra?: boolean
+  /** V0.7 — Couronnes & Coupe exposés pour tous les profils (mig 051) */
+  crownsBalance?: number
+  coupeScoreCurrentSeason?: number
+  coupeSeasonName?: string | null
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -110,7 +122,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const currentUserId = usePlayerStore(s => s.userId)
   const crownsBalance = useCrownsStore(s => s.balance)
   const { state: coupeState } = useCoupe(true)
-  const { state: gloryState } = useGlory(true)
+  const level = usePlayerStore(s => s.level)
+  const xpTotal = usePlayerStore(s => s.xpTotal)
+  const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
+  const xpForNextLevel = usePlayerStore(s => s.xpForNextLevel)
+  const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -385,6 +401,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
                   <h2 className="player-modal-name">{profile.name}</h2>
+                  <LevelText level={isSelf ? level : (profile.level ?? 1)} />
+                  {(isSelf ? veteranFirstEra : (profile.veteranFirstEra ?? false)) && (
+                    <VeteranBadge size="sm" />
+                  )}
                   {isSelf && !isEditing && (
                     <button className="player-modal-edit-btn" onClick={handleStartEdit} aria-label="Modifier">
                       {'\u270F\uFE0F'}
@@ -402,37 +422,58 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     Pour les autres : on garde l'ancienne formule profile.glory
                     (exploration_points + erudition_points) jusqu'\u00E0 ce que
                     get_player_profile soit align\u00E9. */}
-                <div className="player-modal-faction-row">
-                  <span className="player-modal-notoriety">
-                    {'\uD83C\uDF96\uFE0F'} {(isSelf && gloryState ? gloryState.glory : (profile.glory ?? 0))} Gloire
-                    <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
-                      {'(\u00E0 vie)'}
-                    </span>
-                  </span>
-                </div>
-                {isSelf && (
-                  <>
-                    {coupeState?.myBreakdown && (
-                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                        <span>
-                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
-                          {coupeState.season?.name && (
-                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                              ({coupeState.season.name})
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                    )}
+                <GloryProgressBar
+                  level={isSelf ? level : (profile.level ?? 1)}
+                  xpTotal={isSelf ? xpTotal : (profile.xpTotal ?? 0)}
+                  xpToNextLevel={isSelf ? xpToNextLevel : (profile.xpToNextLevel ?? 5)}
+                  xpForNextLevel={isSelf ? xpForNextLevel : (profile.xpForNextLevel ?? 5)}
+                />
+                {/* Coupe \u2014 visible pour soi (score live) et pour les autres (depuis le profil) */}
+                {isSelf ? (
+                  coupeState?.myBreakdown && (
                     <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
                       <span>
-                        {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
-                        <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                          / 500
-                        </span>
+                        {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
+                        {coupeState.season?.name && (
+                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                            ({coupeState.season.name})
+                          </span>
+                        )}
                       </span>
                     </div>
-                  </>
+                  )
+                ) : (
+                  (profile.coupeScoreCurrentSeason ?? 0) > 0 && (
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83C\uDFC6'} {profile.coupeScoreCurrentSeason} pts {'\u00E0 la Coupe'}
+                        {profile.coupeSeasonName && (
+                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                            ({profile.coupeSeasonName})
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )
+                )}
+                {/* Couronnes \u2014 visible pour soi (store live) et pour les autres (depuis le profil) */}
+                {isSelf ? (
+                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                    <span>
+                      {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                      <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                        / 500
+                      </span>
+                    </span>
+                  </div>
+                ) : (
+                  (profile.crownsBalance ?? 0) > 0 && (
+                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                      <span>
+                        {'\uD83E\uDE99'} {profile.crownsBalance} {'Couronne'}{(profile.crownsBalance ?? 0) > 1 ? 's' : ''} {'de Ch\u00EAne'}
+                      </span>
+                    </div>
+                  )
                 )}
 
                 {/* V0.7 phase 3.5 \u2014 Sous les Couronnes, on garde uniquement

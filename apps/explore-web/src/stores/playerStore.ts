@@ -51,6 +51,15 @@ interface PlayerState {
   /** V0.5 — Gloire = explorationPoints + eruditionPoints */
   glory: number
 
+  /** V0.7 — Niveau du joueur */
+  level: number
+  xpTotal: number
+  xpToNextLevel: number
+  xpForNextLevel: number
+  veteranFirstEra: boolean
+  levelInitialized: boolean
+  setLevelState: (s: { level: number; xpTotal: number; xpToNextLevel: number; xpForNextLevel: number; veteranFirstEra: boolean }) => void
+
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
   setUserPosition: (pos: { lng: number; lat: number } | null) => void
@@ -146,6 +155,22 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   // Dérivé d'explorationPoints + eruditionPoints, mais initialisé depuis le cache pour le rendu instantané du badge
   glory: (Number(safeStorage.get('explorationPoints')) || 0) + (Number(safeStorage.get('eruditionPoints')) || 0),
+
+  // V0.7 — Niveau (synchronisé via useLevel / get_player_profile)
+  level: 1,
+  xpTotal: 0,
+  xpToNextLevel: 5,
+  xpForNextLevel: 5,
+  veteranFirstEra: false,
+  levelInitialized: false,
+  setLevelState: (s) => set({
+    level: s.level,
+    xpTotal: s.xpTotal,
+    xpToNextLevel: s.xpToNextLevel,
+    xpForNextLevel: s.xpForNextLevel,
+    veteranFirstEra: s.veteranFirstEra,
+    levelInitialized: true,
+  }),
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),

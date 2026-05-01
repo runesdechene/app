@@ -63,7 +63,7 @@ ALTER TABLE users ADD COLUMN xp_total integer NOT NULL DEFAULT 0;
 ALTER TABLE users ADD COLUMN veteran_first_era boolean NOT NULL DEFAULT false;
 
 -- Date de bascule du système (constante app, secondes epoch UTC)
-INSERT INTO app_config (key, value)
+INSERT INTO app_settings (key, value)
 VALUES ('xp_epoch', extract(epoch from now())::text);
 ```
 
@@ -185,7 +185,7 @@ Paliers de référence :
 Ordre des opérations en transaction :
 
 1. **Schéma** : ALTER TABLE users ADD COLUMNS (`xp_total`, `veteran_first_era`).
-2. **Constante** : INSERT app_config (`xp_epoch`, now()).
+2. **Constante** : INSERT app_settings (`xp_epoch`, now()).
 3. **Marquage vétéran** : UPDATE users SET veteran_first_era = true WHERE id IN (UNION DISTINCT des contributeurs historiques avant epoch).
 4. **xp_total reste à 0** pour tous (DEFAULT 0). Coupure nette confirmée.
 5. **Création de `_level_from_xp`** (function IMMUTABLE).

@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EraSelector } from './EraSelector'
 import './AddPlaceFlow.css'
 
@@ -241,12 +242,19 @@ export function AddPlaceFlow() {
         return
       }
 
+      if (data?.error === 'level_too_low') {
+        setError(`Tu dois être au moins niveau ${(data as { requiredLevel: number }).requiredLevel} pour cartographier un lieu (tu es niveau ${(data as { currentLevel: number }).currentLevel}).`)
+        setStep('form')
+        return
+      }
+
       if (data?.error) {
         setError(data.error)
         setStep('form')
         return
       }
 
+      void refreshLevelStateGlobal(userId)
       const placeId = data.placeId as string
       if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 

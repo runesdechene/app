@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { refreshLevelStateGlobal } from './useLevel'
 import type { PlaceVeille, NearbyPlanter, PlantFlagResult } from '../types/veille'
 
 export function useVeille(placeId: string) {
@@ -46,6 +47,7 @@ export function useVeille(placeId: string) {
       console.error('plant_flag error:', error.message, error.details, error.hint)
       return { error: 'unauthorized' }
     }
+    void refreshLevelStateGlobal(userId)
     return data as PlantFlagResult
   }, [placeId])
 

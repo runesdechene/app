@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
 import './DailyEnigma.css'
 
@@ -147,6 +148,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         influence: prev.influence + (r.influenceGain ?? 0),
         erudition: prev.erudition + (r.eruditionGain ?? 0),
       }))
+      if (userId) void refreshLevelStateGlobal(userId)
     }
     setSubmitting(false)
   }
