@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import './InfoModal.css'
 
 interface InfoRow {
@@ -16,7 +17,11 @@ interface InfoModalProps {
 }
 
 export function InfoModal({ icon, title, description, rows, onClose, action }: InfoModalProps) {
-  return (
+  // Portal vers document.body : sort de tout stacking context parent (chatbox,
+  // toastbox, map container, etc.) qui pourrait plafonner le z-index de la modal.
+  // Sans portal, le z-index 100000 est relatif au stacking context du parent qui
+  // peut être < à celui d'un sibling top-level. Avec portal, on est top-level.
+  const node = (
     <div className="info-modal-overlay" onClick={onClose}>
       <div className="info-modal" onClick={e => e.stopPropagation()}>
         <button className="info-modal-close" onClick={onClose} aria-label="Fermer">
@@ -45,4 +50,5 @@ export function InfoModal({ icon, title, description, rows, onClose, action }: I
       </div>
     </div>
   )
+  return createPortal(node, document.body)
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useMapStore } from '../../stores/mapStore'
 import { useCoupe } from '../../hooks/useCoupe'
 import { CoupeRulesModal } from './CoupeRulesModal'
@@ -36,7 +37,9 @@ export function CoupeModal({ onClose }: Props) {
     useMapStore.getState().setSelectedPlayerId(playerId)
   }
 
-  return (
+  // Portal vers document.body : sort de tout stacking context parent (chat,
+  // toasts, map container) qui pourrait plafonner le z-index de la modal.
+  const modalNode = (
     <>
       <div className="leaderboard-overlay" onClick={onClose}>
         <div className="leaderboard-modal coupe-modal" onClick={e => e.stopPropagation()}>
@@ -173,4 +176,6 @@ export function CoupeModal({ onClose }: Props) {
       {showRules && <CoupeRulesModal onClose={() => setShowRules(false)} />}
     </>
   )
+
+  return createPortal(modalNode, document.body)
 }
