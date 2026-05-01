@@ -422,14 +422,14 @@ export const ExploreMap = memo(function ExploreMap() {
         })
       }
 
-      // Icône mode Coupe des Héritages — fond sépia, icône encre brune, anneau couleur faction dominante
+      // Icône mode Coupe des Héritages — fond sépia, icône encre brune (plus d'anneau coloré)
       if (tagIcon) {
         const border = dominantFactionColor || ''
         const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::${border}`
         if (!loadedIconsRef.current.has(inkKey)) {
           loadedIconsRef.current.add(inkKey)
           loadColoredSvgIcon(
-            map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR, border || undefined,
+            map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR,
           ).catch(() => {
             loadedIconsRef.current.delete(inkKey)
           })
@@ -451,7 +451,7 @@ export const ExploreMap = memo(function ExploreMap() {
       if (loadedIconsRef.current.has(inkKey)) continue
       loadedIconsRef.current.add(inkKey)
       loadColoredSvgIcon(
-        map, feature.properties.tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, feature.properties.tagIcon, HERITAGE_CUP_INK_COLOR, ov.tagColor,
+        map, feature.properties.tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, feature.properties.tagIcon, HERITAGE_CUP_INK_COLOR,
       ).catch(() => {
         loadedIconsRef.current.delete(inkKey)
       })
@@ -776,8 +776,9 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
-          {/* V0.7 — emblème faction sur chaque lieu veillé, vision d'ensemble à bas zoom */}
-          <Layer {...placeVeilleEmblemLayer} />
+          {/* V0.7 — emblème faction sur chaque lieu veillé, visible UNIQUEMENT en mode
+              Coupe des Héritages (factionColorMode). Sinon : carte "neutre", focus sur les lieux. */}
+          {factionColorMode && <Layer {...placeVeilleEmblemLayer} />}
           <Layer {...fortBadgeLayer} />
         </Source>
       )}
