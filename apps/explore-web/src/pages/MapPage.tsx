@@ -44,6 +44,7 @@ import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
 import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
+import { xpForLevel } from '../lib/levelCalc'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -131,6 +132,12 @@ export default function MapPage() {
   const factionTitle = usePlayerStore(s => s.factionTitle2)
   const canAddPlace = unlockedTitles.some(t => t.unlocks?.includes('add_place'))
     || (factionTitle?.unlocks?.includes('add_place') ?? false)
+
+  // Gating niveau 3 pour Cartographier
+  const playerLevel = usePlayerStore(s => s.level)
+  const playerXpTotal = usePlayerStore(s => s.xpTotal)
+  const canAddPlaceByLevel = playerLevel >= 3
+  const xpNeededForLevel3 = Math.max(0, xpForLevel(3) - playerXpTotal)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   usePlayer()
@@ -327,25 +334,38 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* FAB Ajouter un lieu — toujours visible, verrouille si pas le titre */}
+      {/* FAB Ajouter un lieu — toujours visible, verrouille si niveau < 3 ou pas le titre */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
-          className={`add-place-fab ${!canAddPlace ? 'locked' : ''}`}
+          className={`add-place-fab ${(!canAddPlaceByLevel || !canAddPlace) ? 'locked' : ''}`}
           onClick={() => {
-            if (canAddPlace) {
-              setAddPlaceMode(true)
-            } else {
+            if (!canAddPlaceByLevel || !canAddPlace) {
               setShowAddPlaceInfo(true)
+            } else {
+              setAddPlaceMode(true)
             }
           }}
           aria-label="Ajouter un lieu"
         >
-          +
+          {(!canAddPlaceByLevel || !canAddPlace) ? '🔒' : '+'}
         </button>
       )}
 
       {/* Info modal ajout de lieu */}
-      {showAddPlaceInfo && (
+      {showAddPlaceInfo && !canAddPlaceByLevel && (
+        <InfoModal
+          icon="🗺️"
+          title="Cartographier"
+          description={`L'ajout de lieux est réservé aux Veilleurs de niveau 3 et plus. Continue d'explorer pour le débloquer.`}
+          rows={[
+            { label: 'Niveau requis', value: 'Niveau 3' },
+            { label: 'Ton niveau actuel', value: `Niveau ${playerLevel}` },
+            { label: 'Gloire manquante', value: `${xpNeededForLevel3} avant le niveau 3` },
+          ]}
+          onClose={() => setShowAddPlaceInfo(false)}
+        />
+      )}
+      {showAddPlaceInfo && canAddPlaceByLevel && !canAddPlace && (
         <InfoModal
           icon="🏛️"
           title="Ajouter un lieu"
