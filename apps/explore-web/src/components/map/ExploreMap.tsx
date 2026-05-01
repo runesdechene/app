@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, placeVeilleEmblemLayer, veilleurNameLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -21,6 +21,7 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
+import { VeilleurNamePills } from './VeilleurNamePills'
 import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
@@ -763,9 +764,17 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {/* V0.7 — Plus d'avatar carte (les expéditions multi-veilleurs créaient trop de
-          markers). On garde uniquement l'emblème faction par lieu (placeVeilleEmblemLayer
-          dans la source 'places'). Pour voir QUI veille → click le lieu pour ouvrir le panel. */}
+      {/* V0.7 — Mode Coupe des Héritages ON : pilule sépia signée du nom du veilleur,
+          centrée sous l'icône du lieu. Remplace l'emblème faction (humanisation). React
+          Markers pour le rendu capsule (DOM CSS, MapLibre symbol layer ne le gère pas).
+          Viewport-filtré + zoom-gated >= 9 pour la perf. */}
+      {factionColorMode && (
+        <VeilleurNamePills
+          geojson={enrichedGeojson}
+          zoom={zoomLevel}
+          bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
+        />
+      )}
 
       {enrichedGeojson && (
         <Source
@@ -777,11 +786,9 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
-          {/* V0.7 — Mode Coupe des Héritages ON : emblème faction par lieu (vue stratège tribale) */}
-          {factionColorMode && <Layer {...placeVeilleEmblemLayer} />}
-          {/* V0.7 — Mode default (Coupe OFF) : nom du veilleur posé en signature
-              (vue humaine — qui possède quoi sans tomber dans le tribal) */}
-          {!factionColorMode && <Layer {...veilleurNameLayer} />}
+          {/* V0.7 — Mode Coupe ON : pilules sépia avec nom du veilleur (montées en
+              React Markers plus bas dans le JSX, hors du symbol layer pour avoir un vrai
+              fond capsule). Mode Coupe OFF : carte épurée, juste les lieux. */}
           <Layer {...fortBadgeLayer} />
         </Source>
       )}
