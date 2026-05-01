@@ -40,6 +40,10 @@ import { NotificationBell } from '../components/notifications/NotificationBell'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
+import { useLevel } from '../hooks/useLevel'
+import { useLevelUp } from '../hooks/useLevelUp'
+import { LevelUpModal } from '../components/levelup/LevelUpModal'
+import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -136,6 +140,21 @@ export default function MapPage() {
   useChat()
   useNotifications()
   useResourceTimers()
+
+  // V0.7 — Système de niveaux
+  useLevel(true)
+  const { pendingLevelUp, dismiss } = useLevelUp()
+  const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
+  const [showVeteranWelcome, setShowVeteranWelcome] = useState(false)
+
+  useEffect(() => {
+    if (!userId || !veteranFirstEra) return
+    const seenKey = `veteranWelcomeSeen_${userId}`
+    if (!localStorage.getItem(seenKey)) {
+      setShowVeteranWelcome(true)
+      localStorage.setItem(seenKey, '1')
+    }
+  }, [userId, veteranFirstEra])
 
   // Auto-open auth modal si non connecté (une seule fois par session)
   const authPromptDone = useRef(false)
@@ -437,6 +456,18 @@ export default function MapPage() {
 
       {/* Navbar mobile (masquée sur desktop via CSS) */}
       {!addPlaceMode && !authLoading && isAuthenticated && <MobileNavbar />}
+
+      {/* V0.7 — Modales niveau */}
+      {pendingLevelUp && (
+        <LevelUpModal
+          levelBefore={pendingLevelUp.levelBefore}
+          levelAfter={pendingLevelUp.levelAfter}
+          onClose={dismiss}
+        />
+      )}
+      {showVeteranWelcome && (
+        <VeteranWelcomeModal onClose={() => setShowVeteranWelcome(false)} />
+      )}
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}

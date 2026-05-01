@@ -5,11 +5,13 @@ import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
-import { useGlory } from '../../hooks/useGlory'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { FactionMembersModal } from './FactionMembersModal'
+import { LevelMedallion } from '../profile/LevelMedallion'
+import { VeteranBadge } from '../profile/VeteranBadge'
+import { GloryProgressBar } from '../profile/GloryProgressBar'
 
 interface PlaceCard {
   id: string
@@ -110,7 +112,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const currentUserId = usePlayerStore(s => s.userId)
   const crownsBalance = useCrownsStore(s => s.balance)
   const { state: coupeState } = useCoupe(true)
-  const { state: gloryState } = useGlory(true)
+  const level = usePlayerStore(s => s.level)
+  const xpTotal = usePlayerStore(s => s.xpTotal)
+  const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
+  const xpForNextLevel = usePlayerStore(s => s.xpForNextLevel)
+  const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -382,9 +388,18 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 />
               </div>
 
+              {isSelf && (
+                <div className="player-modal-medallion-wrap">
+                  <LevelMedallion level={level} size="md" />
+                </div>
+              )}
+
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
                   <h2 className="player-modal-name">{profile.name}</h2>
+                  {isSelf && veteranFirstEra && (
+                    <VeteranBadge size="sm" />
+                  )}
                   {isSelf && !isEditing && (
                     <button className="player-modal-edit-btn" onClick={handleStartEdit} aria-label="Modifier">
                       {'\u270F\uFE0F'}
@@ -402,14 +417,24 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     Pour les autres : on garde l'ancienne formule profile.glory
                     (exploration_points + erudition_points) jusqu'\u00E0 ce que
                     get_player_profile soit align\u00E9. */}
-                <div className="player-modal-faction-row">
-                  <span className="player-modal-notoriety">
-                    {'\uD83C\uDF96\uFE0F'} {(isSelf && gloryState ? gloryState.glory : (profile.glory ?? 0))} Gloire
-                    <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
-                      {'(\u00E0 vie)'}
+                {isSelf && (
+                  <GloryProgressBar
+                    level={level}
+                    xpTotal={xpTotal}
+                    xpToNextLevel={xpToNextLevel}
+                    xpForNextLevel={xpForNextLevel}
+                  />
+                )}
+                {!isSelf && (
+                  <div className="player-modal-faction-row">
+                    <span className="player-modal-notoriety">
+                      {'\uD83C\uDF96\uFE0F'} {profile.glory ?? 0} Gloire
+                      <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
+                        {'(\u00E0 vie)'}
+                      </span>
                     </span>
-                  </span>
-                </div>
+                  </div>
+                )}
                 {isSelf && (
                   <>
                     {coupeState?.myBreakdown && (
