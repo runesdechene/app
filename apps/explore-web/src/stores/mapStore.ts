@@ -12,8 +12,10 @@ interface PlaceOverride {
   veilleurUserId?: string
   /** V0.7 — nom du veilleur principal (lead member) du lieu, pour le rendu carte */
   veilleurName?: string
-  /** V0.7 — avatar URL du veilleur principal, pour la pilule signée carte */
+  /** V0.7 — avatar URL du veilleur principal (lead) */
   veilleurAvatarUrl?: string
+  /** V0.7 — nombre de co-veilleurs en plus du lead (badge "+N" sur la pilule, 0 si solo) */
+  veilleurExtraCount?: number
 }
 
 export interface TerritorySelection {

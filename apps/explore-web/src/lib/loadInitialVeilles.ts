@@ -41,30 +41,27 @@ export async function loadInitialVeilles(): Promise<void> {
 
   const veilles = (veillesData as MapVeille[] | null) ?? []
   for (const v of veilles) {
-    const lead = v.members[0]
-    pushVeilleOverride(
-      v.placeId,
-      v.factionId,
-      v.isNeutral,
-      lead?.userId || undefined,
-      lead?.displayName?.trim() || undefined,
-      lead?.avatarUrl || undefined,
-    )
+    pushVeilleOverride(v.placeId, v.factionId, v.isNeutral, v.members)
   }
 }
 
 /**
- * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu + userId + nom + avatar veilleur).
- * À appeler après chaque plant_flag réussi pour rafraîchir la carte instantanément.
+ * Push une veille en override sur le mapStore — propage tous les members pour la facepile carte.
+ * Accepte n'importe quelle forme avec userId/displayName/avatarUrl (MapVeilleMember ou VeilleMember).
  */
+type PushMember = { userId: string; displayName: string; avatarUrl: string | null }
 export function pushVeilleOverride(
   placeId: string,
   factionId: string | null,
   isNeutral: boolean,
-  veilleurUserId?: string,
-  veilleurName?: string,
-  veilleurAvatarUrl?: string,
+  members: PushMember[] = [],
 ): void {
+  const lead = members[0]
+  const veilleurUserId = lead?.userId || undefined
+  const veilleurName = lead?.displayName?.trim() || undefined
+  const veilleurAvatarUrl = lead?.avatarUrl || undefined
+  // V0.7 — extraCount = nombre de co-veilleurs en plus du lead (badge "+N" sur la pilule)
+  const veilleurExtraCount = Math.max(0, members.length - 1)
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.
   if (!factionsLoaded) {
     void ensureFactionsCache()
@@ -86,5 +83,6 @@ export function pushVeilleOverride(
     veilleurUserId,
     veilleurName,
     veilleurAvatarUrl,
+    veilleurExtraCount,
   })
 }

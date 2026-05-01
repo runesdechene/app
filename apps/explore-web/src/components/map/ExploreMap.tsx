@@ -672,6 +672,7 @@ export const ExploreMap = memo(function ExploreMap() {
           if (ov.veilleurUserId !== undefined) props.veilleurUserId = ov.veilleurUserId
           if (ov.veilleurName !== undefined) props.veilleurName = ov.veilleurName
           if (ov.veilleurAvatarUrl !== undefined) props.veilleurAvatarUrl = ov.veilleurAvatarUrl
+          if (ov.veilleurExtraCount !== undefined) props.veilleurExtraCount = ov.veilleurExtraCount
         }
         // Mode "Coupe des Héritages" : carte sépia + icônes encre brune + anneau couleur faction dominante.
         // L'emblème territoire reste l'indicateur principal de faction.

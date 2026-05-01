@@ -29,7 +29,14 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
 
   const pills = useMemo(() => {
     if (!geojson || !bounds || zoom < MIN_ZOOM) return []
-    const out: Array<{ placeId: string; userId: string; longitude: number; latitude: number; name: string; avatarUrl: string }> = []
+    const out: Array<{
+      placeId: string
+      userId: string
+      longitude: number
+      latitude: number
+      name: string
+      extraCount: number
+    }> = []
     for (const f of geojson.features) {
       const name = f.properties.veilleurName
       const userId = f.properties.veilleurUserId
@@ -42,7 +49,7 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
         longitude: lng,
         latitude: lat,
         name,
-        avatarUrl: f.properties.veilleurAvatarUrl,
+        extraCount: f.properties.veilleurExtraCount ?? 0,
       })
     }
     return out
@@ -50,7 +57,7 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
 
   return (
     <>
-      {pills.map(({ placeId, userId, longitude, latitude, name, avatarUrl }) => (
+      {pills.map(({ placeId, userId, longitude, latitude, name, extraCount }) => (
         <Marker
           key={placeId}
           longitude={longitude}
@@ -66,10 +73,10 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
               setSelectedPlayerId(userId)
             }}
           >
-            {avatarUrl && (
-              <img src={avatarUrl} alt="" className="veilleur-name-pill-avatar" />
-            )}
             <span className="veilleur-name-pill-text">{name.toUpperCase()}</span>
+            {extraCount > 0 && (
+              <span className="veilleur-name-pill-extra">+{extraCount}</span>
+            )}
           </div>
         </Marker>
       ))}

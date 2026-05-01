@@ -5,7 +5,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px 3px 4px;
+  padding: 3px 11px;              /* symétrique sans avatar à gauche */
   border-radius: 999px;
   background: #f3e3c5;            /* parchemin clair */
   color: #5a2718;                  /* bordeaux/brun encre */
@@ -27,20 +27,23 @@
   box-shadow: 0 3px 8px rgba(60, 30, 10, 0.35);
 }
 
-/* Avatar à gauche, légèrement débordant */
-.veilleur-name-pill-avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1.5px solid #b8895a;
-  background: #1f1812;
-  margin-left: -2px;             /* léger débord style notification iPhone */
-  flex-shrink: 0;
-  display: block;
-}
-
 .veilleur-name-pill-text {
   line-height: 1;
   padding-top: 1px;              /* compensation visuelle du baseline */
+}
+
+/* Badge "+N" pour les expéditions de plus de 3 membres */
+.veilleur-name-pill-extra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #b8895a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
 }
