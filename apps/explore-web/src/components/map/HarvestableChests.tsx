@@ -38,49 +38,56 @@ export function HarvestableChests({ geojson }: Props) {
   const [bursts, setBursts] = useState<ClickBurst[]>([])
   const [busyPlaceIds, setBusyPlaceIds] = useState<Set<string>>(new Set())
 
-  const handleClick = useCallback(async (e: React.MouseEvent, placeId: string) => {
+  const handleClick = useCallback((e: React.MouseEvent, placeId: string) => {
     e.stopPropagation()
     if (!userId || busyPlaceIds.has(placeId)) return
 
     const meta = harvestable.get(placeId)
     const expectedGain = meta?.gain ?? 1
 
+    // Marker maintenu visible pendant l'animation (sinon le store retire placeId
+    // de harvestableSet dès que la RPC réussit ~300ms et démonte le <Marker> →
+    // l'animation disparaît avant d'avoir joué).
     setBusyPlaceIds(prev => new Set(prev).add(placeId))
 
-    // Animation optimiste : burst de feedback immédiat
+    // Burst de feedback immédiat (animation optimiste)
     const burstId = Date.now()
     setBursts(prev => [...prev, { id: burstId, placeId, value: expectedGain }])
 
-    // Bruit "gling" — on reprend le son d'influence V0.5 (déjà dans /res/),
-    // cohérent en termes d'identité sonore RdC. Volume 0.5 comme InfluenceFrame.
+    // Bruit "gling" — son d'influence V0.5 réutilisé (cohérent identité sonore RdC).
     try {
       const s = new Audio('/res/influence_click.mp3')
       s.volume = 0.5
       s.play().catch(() => {})
     } catch { /* silent fallback */ }
 
-    // Cleanup de l'anim après sa durée totale (float +N = 1.6s)
-    setTimeout(() => {
+    // RPC en arrière-plan — on n'attend pas pour démonter, sinon l'animation est tronquée.
+    const harvestPromise = harvest(userId, placeId)
+
+    // Cleanup synchronisé avec la fin de l'animation pièce qui s'élève (1.6s + marge).
+    window.setTimeout(() => {
       setBursts(prev => prev.filter(n => n.id !== burstId))
+      setBusyPlaceIds(prev => {
+        const next = new Set(prev)
+        next.delete(placeId)
+        return next
+      })
+      void harvestPromise.then(result => {
+        if ('error' in result) console.warn('[crowns] harvest failed:', result.error)
+      })
     }, 1700)
-
-    const result = await harvest(userId, placeId)
-
-    setBusyPlaceIds(prev => {
-      const next = new Set(prev)
-      next.delete(placeId)
-      return next
-    })
-
-    if ('error' in result) {
-      console.warn('[crowns] harvest failed:', result.error)
-    }
   }, [userId, harvestable, harvest, busyPlaceIds])
 
-  if (!geojson || harvestableSet.size === 0) return null
+  // Set d'affichage = harvestable courant ∪ busy (animations en cours).
+  // Garde le marker monté jusqu'à la fin du burst, même si le store a déjà
+  // retiré le placeId après une RPC réussie.
+  const displayedSet = new Set<string>(harvestableSet)
+  for (const id of busyPlaceIds) displayedSet.add(id)
+
+  if (!geojson || displayedSet.size === 0) return null
 
   const harvestableFeatures = geojson.features.filter(f =>
-    harvestableSet.has(f.properties.id),
+    displayedSet.has(f.properties.id),
   )
 
   return (
