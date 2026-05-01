@@ -1,3 +1,32 @@
+# ALPHA V0.7.0
+## Niveaux, Vétérans, et un nouveau lexique
+
+### Le système d'expérience prend forme
+Tous les Veilleurs reprennent depuis le **Niveau 1**. Mais ceux qui étaient là avant gardent à vie le badge **Vétéran de la Première Époque**, gravé sur leur profil. Vos accomplissements antérieurs sont reconnus — par votre badge, et par notre mémoire. À partir d'aujourd'hui, chaque pas compte vers votre prochain palier.
+
+### Trois actions, trois mots
+Le vocabulaire de l'app se précise. Trois gestes désormais clairement distincts :
+- **🔍 Découvrir** : un lieu sort du brouillard quand vous passez à proximité.
+- **🥾 Fouler** : vous y posez le pied physiquement, GPS en main.
+- **📜 Cartographier** : vous inscrivez un nouveau lieu dans la carte commune.
+
+Plus de confusion entre "découvrir à distance" et "y aller pour de vrai". Chaque action a son verbe, son toast, son poids.
+
+### Niveaux et titres refondus
+**33 titres généraux** sur 7 axes — Niveau, Découvertes, Marche, Érudition, Bannière, Cartographie, Carnets. Tous **acquis à vie** : plus aucun titre "perdu" en se faisant doubler. Vos paliers, vous les gardez.
+
+Quelques jalons à viser :
+- **Niveau 3** : vous débloquez la cartographie (l'ajout de lieux).
+- **Niveau 25** : vous portez le titre de Héros local.
+- **Niveau 35** : Héros régional.
+- **Niveau 50** : Légende. Le sommet est mythique — atteignable, mais peu y arriveront.
+
+### Gloire vivante, niveau acquis
+La **Gloire** que vous récoltez à chaque action est désormais l'expérience qui vous fait monter de niveau. Sur votre profil, une barre indique votre progression vers le palier suivant. Le niveau, lui, ne redescend jamais une fois acquis (sauf si un de vos contenus est supprimé — symétrie naturelle).
+
+### Boost vétéran
+Si vous aviez déjà cartographié des lieux avant le 1er mars, un **bonus rétroactif** vient s'ajouter à votre niveau de départ. Pas autant qu'un effort GPS récent, mais assez pour reconnaître votre apport au patrimoine commun.
+
 # ALPHA V0.6.2
 ## Le fil d'actualité fait peau neuve
 
