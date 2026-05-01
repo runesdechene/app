@@ -154,14 +154,26 @@ export function CoupeModal({ onClose }: Props) {
                           <span className="coupe-breakdown-pts">{state.myBreakdown.carnets * 3} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
+                          <span className="coupe-breakdown-label">Lieux explorés (GPS)</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxExplores} × 1</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxExplores} pts</span>
+                        </div>
+                        <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Photos ajoutées</span>
                           <span className="coupe-breakdown-meta">{state.myBreakdown.photos} × 1</span>
                           <span className="coupe-breakdown-pts">{state.myBreakdown.photos} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
-                          <span className="coupe-breakdown-label">Énigmes résolues</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.enigmes} × 1</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.enigmes} pts</span>
+                          <span className="coupe-breakdown-label">
+                            Énigmes résolues
+                            {state.myBreakdown.enigmes.total > 0 && (
+                              <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                                ({state.myBreakdown.enigmes.hard}h • {state.myBreakdown.enigmes.medium}m • {state.myBreakdown.enigmes.easy + state.myBreakdown.enigmes.veryEasy}e)
+                              </span>
+                            )}
+                          </span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.enigmes.total} × 1</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.enigmes.total} pts</span>
                         </div>
                       </div>
                     </>

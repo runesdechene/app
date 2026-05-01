@@ -5,6 +5,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
+import { useGlory } from '../../hooks/useGlory'
 import shopIcon from '../../assets/shop_icon.webp'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
@@ -97,6 +98,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const currentUserId = usePlayerStore(s => s.userId)
   const crownsBalance = useCrownsStore(s => s.balance)
   const { state: coupeState } = useCoupe(true)
+  const { state: gloryState } = useGlory(true)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -393,32 +395,33 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </div>
                 </div>
 
+                {/* V0.7 phase 3.5 \u2014 Refonte Gloire + Coupe + Couronnes
+                    Pour soi : on utilise get_my_glory (formule \u00E0 la vol\u00E9e, lifetime).
+                    Pour les autres : on garde l'ancienne formule profile.glory
+                    (exploration_points + erudition_points) jusqu'\u00E0 ce que
+                    get_player_profile soit align\u00E9. */}
                 <div className="player-modal-faction-row">
                   <span className="player-modal-notoriety">
-                    {'\uD83C\uDF96\uFE0F'} {profile.glory ?? 0} Gloire
-                    {(profile.explorationPoints != null || profile.eruditionPoints != null) && (
-                      <span style={{ fontSize: '0.75em', opacity: 0.7, marginLeft: 6 }}>
-                        ({'\uD83E\uDDED'} {profile.explorationPoints ?? 0} exploration + {'\uD83D\uDCD6'} {profile.eruditionPoints ?? 0} erudition)
-                      </span>
-                    )}
+                    {'\uD83C\uDF96\uFE0F'} {(isSelf && gloryState ? gloryState.glory : (profile.glory ?? 0))} Gloire
+                    <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
+                      (\u00E0 vie)
+                    </span>
                   </span>
                 </div>
-                {(profile.influenceStock != null || (profile.influencePlaced != null && profile.influencePlaced > 0)) && (
-                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 12, opacity: 0.8 }}>
-                    {profile.influenceStock != null && (
-                      <span>{'\uD83C\uDFF4'} {profile.influenceStock} influence a placer</span>
-                    )}
-                    {profile.influencePlaced != null && profile.influencePlaced > 0 && (
-                      <span>{'\uD83C\uDF1F'} {profile.influencePlaced} influence placee</span>
-                    )}
-                  </div>
-                )}
-                {/* V0.7 \u2014 Couronnes de Ch\u00EAne + Coupe des H\u00E9ritages
-                    (visible uniquement sur son propre profil).
-                    Note : on utilise les escapes Unicode pour les caract\u00E8res
-                    accentu\u00E9s, plusieurs probl\u00E8mes d'encodage observ\u00E9s par le pass\u00E9. */}
                 {isSelf && (
                   <>
+                    {coupeState?.myBreakdown && (
+                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+                        <span>
+                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
+                          {coupeState.season?.name && (
+                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
+                              ({coupeState.season.name})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    )}
                     <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
                       <span>
                         {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
@@ -427,16 +430,37 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         </span>
                       </span>
                     </div>
-                    {coupeState?.myBreakdown && (
-                      <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
+
+                    {/* Compteurs bruts d\u00E9taill\u00E9s \u2014 informatifs, pour le r\u00E9cit */}
+                    {gloryState && (
+                      <div
+                        className="player-modal-glory-breakdown"
+                        style={{
+                          marginTop: 8,
+                          padding: '8px 12px',
+                          background: 'rgba(244, 232, 200, 0.45)',
+                          border: '1px solid rgba(90, 39, 24, 0.12)',
+                          borderRadius: 8,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 4,
+                          fontSize: 12,
+                          color: '#3d2817',
+                        }}
+                      >
+                        <span>{'\uD83E\uDDED'} {gloryState.lieuxExplores} {'lieux explor\u00E9s'}</span>
                         <span>
-                          {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe des H\u00E9ritages'}
-                          {coupeState.season?.name && (
-                            <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                              ({coupeState.season.name})
+                          {'\uD83D\uDCD6'} {gloryState.enigmes.total} {'\u00E9nigmes r\u00E9solues'}
+                          {gloryState.enigmes.total > 0 && (
+                            <span style={{ fontSize: '0.9em', opacity: 0.6, marginLeft: 6 }}>
+                              ({gloryState.enigmes.hard} hard \u2022 {gloryState.enigmes.medium} medium \u2022 {gloryState.enigmes.easy + gloryState.enigmes.veryEasy} easy)
                             </span>
                           )}
                         </span>
+                        <span>{'\uD83D\uDCDD'} {gloryState.carnets} {'carnets'}</span>
+                        <span>{'\uD83D\uDCF8'} {gloryState.photos} {'photos'}</span>
+                        <span>{'\uD83D\uDEA9'} {gloryState.plantages} {'plantages'}</span>
+                        <span>{'\uD83C\uDFDB\uFE0F'} {gloryState.lieuxAjoutes} {'lieux ajout\u00E9s'}</span>
                       </div>
                     )}
                   </>

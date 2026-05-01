@@ -3,6 +3,7 @@ import { ExploreMap } from '../components/map/ExploreMap'
 import { EnergyIndicator } from '../components/map/EnergyIndicator'
 import { CrownsBadge } from '../components/map/CrownsBadge'
 import { CoupeBadge } from '../components/map/CoupeBadge'
+import { useGlory, readCachedGlory } from '../hooks/useGlory'
 import { PlacePanel } from '../components/places/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -45,10 +46,10 @@ import '../App.css'
 import '../styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
-  const glory = usePlayerStore(s => s.glory)
-  const explorationPoints = usePlayerStore(s => s.explorationPoints)
-  const eruditionPoints = usePlayerStore(s => s.eruditionPoints)
-  const displayGlory = glory
+  // V0.7 phase 3.5 — Gloire calculée à la volée via get_my_glory.
+  // readCachedGlory évite le flash 0 au boot le temps de l'appel RPC.
+  const { state: glory } = useGlory(true)
+  const displayGlory = glory?.glory ?? readCachedGlory()
   const [showInfo, setShowInfo] = useState(false)
 
   return (
@@ -68,14 +69,21 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
       {showInfo && (
         <InfoModal
           icon={'🎖️'}
-          title="Gloire"
-          description="La Gloire represente votre prestige. Elle est la somme de vos points d'Exploration (terrain) et d'Erudition (enigmes)."
-          rows={[
-            { label: 'Gloire totale', value: String(displayGlory), highlight: true },
-            { label: 'Exploration', value: `${explorationPoints} pts` },
-            { label: 'érudition', value: `${eruditionPoints} pts` },
-            { label: 'Changer d\'Héritage', value: '1 fois / 30 jours' },
-          ]}
+          title={'Gloire'}
+          description={'La Gloire représente votre prestige cumulé depuis le début. Elle est calculée à partir de toutes vos actions de jeu : lieux explorés, énigmes résolues, carnets, photos, plantages de bannière et lieux ajoutés. Même formule que la Coupe des Héritages, mais sur toute votre histoire (pas reboot à chaque saison).'}
+          rows={
+            glory ? [
+              { label: 'Gloire totale',     value: `${glory.glory} pts`,                  highlight: true },
+              { label: 'Lieux explorés',    value: `${glory.lieuxExplores}` },
+              { label: 'Énigmes résolues',  value: `${glory.enigmes.total} (${glory.enigmes.hard} hard • ${glory.enigmes.medium} medium • ${glory.enigmes.easy + glory.enigmes.veryEasy} easy)` },
+              { label: 'Carnets écrits',    value: `${glory.carnets}` },
+              { label: 'Photos ajoutées',   value: `${glory.photos}` },
+              { label: 'Plantages',         value: `${glory.plantages}` },
+              { label: 'Lieux ajoutés',     value: `${glory.lieuxAjoutes}` },
+            ] : [
+              { label: 'Gloire totale', value: `${displayGlory} pts`, highlight: true },
+            ]
+          }
           onClose={() => setShowInfo(false)}
           action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
         />
