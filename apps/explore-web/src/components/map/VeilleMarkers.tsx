@@ -124,7 +124,12 @@ export const VeilleMarkers = memo(function VeilleMarkers({ territories, geojson,
           >
             <div
               className="veille-marker"
-              onClick={() => setSelectedPlayerId(lead.userId)}
+              onClick={e => {
+                // Empêche le click de remonter au handler MapLibre du lieu sous l'avatar
+                e.stopPropagation()
+                e.nativeEvent.stopPropagation()
+                setSelectedPlayerId(lead.userId)
+              }}
               title={title}
               style={{
                 '--frame-color': lead.factionColor ?? '#8a6f4a',
