@@ -1,14 +1,19 @@
 .glory-bar { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .glory-bar__track {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  height: 8px;
+  background: rgba(58, 40, 24, 0.55);
+  border: 1px solid rgba(212, 165, 116, 0.35);
+  border-radius: 5px;
+  height: 10px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .glory-bar__fill {
   background: linear-gradient(90deg, #b8865a, #d4a574);
   height: 100%;
+  min-width: 2px;
+  border-radius: 4px;
   transition: width 0.4s ease-out;
+  box-shadow: 0 0 6px rgba(212, 165, 116, 0.4);
 }
 .glory-bar__text {
   font-size: 12px;
