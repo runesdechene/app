@@ -17,12 +17,12 @@ export function GloryProgressBar({ xpTotal: _xpTotal, xpForNextLevel, xpToNextLe
     <div className="glory-bar">
       <div className="glory-bar__track">
         <div className="glory-bar__fill" style={{ width: `${progressPct}%` }} />
-        <div className="glory-bar__text">
-          {isCap
-            ? 'Cap atteint — tu es Légende.'
-            : <><strong>{xpToNextLevel}</strong> Gloire avant le prochain niveau</>
-          }
-        </div>
+      </div>
+      <div className="glory-bar__text">
+        {isCap
+          ? 'Cap atteint — tu es Légende.'
+          : <><strong>{xpToNextLevel}</strong> Gloire avant le prochain niveau</>
+        }
       </div>
     </div>
   )
