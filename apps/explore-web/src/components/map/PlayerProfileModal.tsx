@@ -397,24 +397,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     Les compteurs (lieux explorés / énigmes / lieux veillés)
                     sont déplacés plus bas, sous les Couronnes, en lignes
                     cohérentes avec Gloire/Coupe/Couronnes. */}
-                <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
-                  {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
-                    <span key={t.id} className="title-badge title-badge-general">
-                      {t.icon_url ? (
-                        <img src={t.icon_url} alt="" className="title-badge-img" />
-                      ) : t.icon ? (
-                        <span>{t.icon}</span>
-                      ) : null}
-                      {t.name}
-                    </span>
-                  ))}
-                  {isSelf && !isEditing && (
-                    <button className="title-badge title-badge-edit" onClick={openTitlePicker}>
-                      {'✏️'}
-                    </button>
-                  )}
-                </div>
-
                 {/* V0.7 phase 3.5 \u2014 Refonte Gloire + Coupe + Couronnes
                     Pour soi : on utilise get_my_glory (formule \u00E0 la vol\u00E9e, lifetime).
                     Pour les autres : on garde l'ancienne formule profile.glory
@@ -464,6 +446,25 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Titres \u2014 au-dessus de la bio (position d'origine) */}
+            <div className="player-modal-titles" style={{ '--faction-color': profile.factionColor ?? undefined } as React.CSSProperties}>
+              {profile.displayedGeneralTitles?.map((t: { id: number; name: string; icon?: string; icon_url?: string }) => (
+                <span key={t.id} className="title-badge title-badge-general">
+                  {t.icon_url ? (
+                    <img src={t.icon_url} alt="" className="title-badge-img" />
+                  ) : t.icon ? (
+                    <span>{t.icon}</span>
+                  ) : null}
+                  {t.name}
+                </span>
+              ))}
+              {isSelf && !isEditing && (
+                <button className="title-badge title-badge-edit" onClick={openTitlePicker}>
+                  {'\u270F\uFE0F'}
+                </button>
+              )}
             </div>
 
             {/* Bio + Instagram (mode lecture) */}
