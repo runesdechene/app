@@ -552,7 +552,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             {/* Fragments possedes */}
             {(playerFragments.length > 0 || isSelf) && (
             <div className="player-modal-fragments">
-              <p className="player-modal-fragments-title">Fragments collectés</p>
+              <p className="player-modal-fragments-title">{'Fragments possédés'}</p>
               <div className="player-modal-fragments-wrapper">
                 {playerFragments.length > 4 && (
                   <button
@@ -576,20 +576,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         <span className="player-modal-fragment-badge-icon">{f.icon ?? '?'}</span>
                       )}
                       <span className="player-modal-fragment-name">{f.name}</span>
-                      {f.affinities && f.affinities.length > 0 && (
-                        <div className="player-modal-fragment-tags">
-                          {f.affinities.map(a => (
-                            <span
-                              key={a.tagId}
-                              className="player-modal-fragment-tag-dot"
-                              style={{ background: a.tagColor }}
-                              title={`+${a.bonusPoints}/j 🏴 ${a.tagTitle}`}
-                            >
-                              {a.tagIcon && <img src={a.tagIcon} alt="" />}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      {/* V0.7 phase 3.5 — Billes de couleur (affinités tags V0.5)
+                          retirées. Le bonus d'affinité ne donne plus d'influence
+                          depuis le freeze V0.5. À reconsidérer si on rebranche
+                          quelque chose dessus à la phase 5+. */}
                     </div>
                 ))}
                 {isSelf && playerFragments.length > 0 && (
