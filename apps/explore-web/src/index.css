@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Alegreya:wght@500;600;700;800&family=Amiri:wght@400;700&display=swap');
 
 @theme {
   /* Palette parchemin */
@@ -17,10 +17,12 @@
   --font-title: 'Bebas Neue', sans-serif;
   --font-accent: 'Cabin Condensed', sans-serif;
   --font-body: 'Cabin', sans-serif;
-  /* Serif ancienne pour signatures (pilules nom-veilleur sur la carte,
+  /* Serif humaniste pour signatures (pilules nom-veilleur sur la carte,
      potentiellement d'autres signatures à venir). Cohérent ligne éditoriale
-     "chevalier errant / sublime allemand". */
-  --font-signature: 'Playfair Display', 'Cabin', serif;
+     "chevalier errant / sublime allemand". Alegreya = serif littéraire
+     moderne, calme, légèrement caligraphique. Switch vers 'Amiri' si tu
+     préfères un rendu plus traditionnel/arabisant. */
+  --font-signature: 'Alegreya', 'Cabin', serif;
 }
 
 :root {
