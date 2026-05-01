@@ -57,6 +57,7 @@ interface PlayerState {
   xpToNextLevel: number
   xpForNextLevel: number
   veteranFirstEra: boolean
+  levelInitialized: boolean
   setLevelState: (s: { level: number; xpTotal: number; xpToNextLevel: number; xpForNextLevel: number; veteranFirstEra: boolean }) => void
 
   /** Position GPS du joueur */
@@ -161,12 +162,14 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   xpToNextLevel: 5,
   xpForNextLevel: 5,
   veteranFirstEra: false,
+  levelInitialized: false,
   setLevelState: (s) => set({
     level: s.level,
     xpTotal: s.xpTotal,
     xpToNextLevel: s.xpToNextLevel,
     xpForNextLevel: s.xpForNextLevel,
     veteranFirstEra: s.veteranFirstEra,
+    levelInitialized: true,
   }),
 
   userPosition: null,
