@@ -2,7 +2,7 @@
 ## Niveaux, Vétérans, et un nouveau lexique
 
 ### Le système d'expérience prend forme
-Tous les Veilleurs reprennent depuis le **Niveau 1**. Mais ceux qui étaient là avant gardent à vie le badge **Vétéran de la Première Époque**, gravé sur leur profil. Vos accomplissements antérieurs sont reconnus — par votre badge, et par notre mémoire. À partir d'aujourd'hui, chaque pas compte vers votre prochain palier.
+Tous les Veilleurs reprennent avec leurs accomplissements depuis le **1er mars**. Ceux qui étaient là avant gardent à vie le badge **Vétéran de la Première Époque**, gravé sur leur profil, et reçoivent un bonus réduit sur les lieux ajoutés avant cette date. À partir d'aujourd'hui, chaque pas compte vers votre prochain palier.
 
 ### Trois actions, trois mots
 Le vocabulaire de l'app se précise. Trois gestes désormais clairement distincts :

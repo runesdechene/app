@@ -17,9 +17,9 @@ export function VeteranWelcomeModal({ onClose }: Props) {
           Tu étais là avant. Le badge <strong>Vétéran de la Première Époque</strong> est désormais gravé sur ton profil — il restera à vie.
         </p>
         <p className="veteran-modal__body veteran-modal__body--sub">
-          Tous les Veilleurs reprennent depuis le Niveau 1. Vos accomplissements antérieurs sont reconnus — par votre badge, et par notre mémoire.
+          Tous les Veilleurs reprennent avec leurs accomplissements depuis le 1er mars. Les anciens gagnent un bonus réduit sur les lieux ajoutés avant cette date.
         </p>
-        <button className="veteran-modal__btn" onClick={onClose}>Reprendre la marche</button>
+        <button className="veteran-modal__btn" onClick={onClose}>Accepter cet honneur</button>
       </div>
     </div>
   )
