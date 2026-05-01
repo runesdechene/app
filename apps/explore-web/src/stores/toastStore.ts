@@ -39,6 +39,29 @@ export const useToastStore = create<ToastState>((set) => ({
   addToast: (toast) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     set((state) => {
+      // V0.6 — Fusion harvest_crown : si on récolte plusieurs coffres en rafale,
+      // on incrémente le total dans le toast existant au lieu d'en créer un nouveau.
+      // Évite le spam quand le user clique 5 coffres en 30s.
+      if (toast.type === 'harvest_crown' && toast.actorId) {
+        const existing = state.toasts.find(
+          t => t.type === 'harvest_crown' && t.actorId === toast.actorId
+        )
+        if (existing) {
+          const prevMatch = existing.message.match(/(\d+) Couronne/)
+          const prev = prevMatch ? parseInt(prevMatch[1], 10) : 1
+          const addMatch = toast.message.match(/(\d+) Couronne/)
+          const added = addMatch ? parseInt(addMatch[1], 10) : 1
+          const total = prev + added
+          return {
+            toasts: state.toasts.map(t =>
+              t.id === existing.id
+                ? { ...t, message: `Vous avez récolté ${total} Couronne${total > 1 ? 's' : ''} 🪙`, timestamp: toast.timestamp }
+                : t
+            ),
+          }
+        }
+      }
+
       // Fusion : influence du même acteur sur le même lieu → incrémenter le message
       if (toast.type === 'influence' && toast.actorId && toast.placeId) {
         const existing = state.toasts.find(
