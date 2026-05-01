@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
 import './DailyEnigma.css'
 
@@ -99,6 +100,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
         setResult(r)
         if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
         if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
+        if (userId) void refreshLevelStateGlobal(userId)
       }
     } catch (err) {
       console.error('[FragmentEnigma] answer_fragment_enigma threw', err)

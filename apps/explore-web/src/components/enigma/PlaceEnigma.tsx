@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
 import './PlaceEnigma.css'
 
@@ -119,6 +120,7 @@ export function PlaceEnigma(props: PlaceEnigmaProps) {
       if (r.newErudition != null) {
         usePlayerStore.getState().setEruditionPoints(r.newErudition)
       }
+      void refreshLevelStateGlobal(userId)
     }
 
     setSubmitting(false)

@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import './AddCarnetModal.css'
 
 interface AddCarnetModalProps {
@@ -98,6 +99,7 @@ export function AddCarnetModal({ placeId, canRate: _canRate, onClose, onSaved, e
         p_type: 'carnet',
         p_content: text.trim(),
       })
+      void refreshLevelStateGlobal(userId)
     }
 
     setSaving(false)

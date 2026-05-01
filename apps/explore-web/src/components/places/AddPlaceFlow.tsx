@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EraSelector } from './EraSelector'
 import './AddPlaceFlow.css'
 
@@ -247,6 +248,7 @@ export function AddPlaceFlow() {
         return
       }
 
+      void refreshLevelStateGlobal(userId)
       const placeId = data.placeId as string
       if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 
