@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lieux préférés · 4 traitements visuels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin:wght@400;500;600;700&family=Cabin+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-parchment: #f7ede1;
+    --color-parchment-dark: #E8D5BE;
+    --color-ink: #4A3728;
+    --color-ink-light: #7D5A3C;
+    --color-sepia: #C19A6B;
+    --color-sepia-dark: #A0784C;
+    --font-title: 'Bebas Neue', sans-serif;
+    --font-accent: 'Cabin Condensed', sans-serif;
+    --font-body: 'Cabin', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 36px 20px 80px;
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: #2a1a0d;
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(193, 154, 107, 0.15), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(193, 154, 107, 0.1), transparent 55%);
+    min-height: 100vh;
+  }
+
+  .head { text-align: center; max-width: 800px; margin: 0 auto 28px; color: #d8c8a8; }
+  .head .eyebrow { font-family: var(--font-accent); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-sepia); margin-bottom: 6px; }
+  .head h1 { font-family: var(--font-title); font-size: 30px; letter-spacing: 0.04em; color: #f5e6d3; margin: 0 0 8px; }
+  .head .lede { font-size: 13px; color: #b8a890; line-height: 1.6; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 24px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+    border-radius: 16px;
+    box-shadow: 0 1px 40px 20px rgba(0,0,0,0.25);
+    overflow: hidden;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .card-tag {
+    display: block;
+    background: var(--color-ink);
+    color: var(--color-parchment);
+    font-family: var(--font-accent);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid rgb(212, 204, 188);
+    padding: 0 20px;
+  }
+  .tab {
+    border: none; background: none;
+    border-bottom: 3px solid transparent;
+    padding: 8px 14px;
+    font-family: var(--font-title);
+    font-size: 16px;
+    color: #a0917a;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .tab.active { color: #442e25; border-bottom-color: #8A7B6A; }
+  .tab .count { font-family: var(--font-body); font-weight: 700; opacity: 0.5; padding-left: 8px; font-size: 14px; letter-spacing: 0; }
+
+  /* ─── Métriques communes ─── */
+  .meta { text-align: right; white-space: nowrap; flex-shrink: 0; }
+  .points {
+    font-family: var(--font-title);
+    font-size: 22px;
+    color: var(--color-sepia-dark);
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+  .points-unit {
+    display: block;
+    font-family: var(--font-accent);
+    font-size: 10px; font-weight: 600;
+    color: #a0917a;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+  .date {
+    font-family: var(--font-body); font-size: 11px;
+    color: #a0917a; font-style: italic;
+    margin-top: 4px;
+  }
+
+  .place-name {
+    font-family: var(--font-accent);
+    font-size: 16px; font-weight: 700;
+    color: #2c1810;
+    line-height: 1.2;
+    margin: 0 0 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .place-tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #8A7B6A;
+  }
+
+  /* ════════════ A.a · Image full-height collée à gauche ════════════ */
+  .list-aa .row {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    align-items: center;
+    column-gap: 16px;
+    padding: 0 20px 0 0;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+    min-height: 92px;
+  }
+  .list-aa .row:last-child { border-bottom: 0; }
+  .list-aa .row:hover { background: rgba(193, 154, 107, 0.08); }
+  .list-aa .img {
+    width: 110px;
+    height: 100%;
+    object-fit: cover;
+    align-self: stretch;
+    background: rgba(184, 164, 122, 0.18);
+    filter: saturate(0.92);
+    display: block;
+  }
+
+  /* ════════════ A.b · Carré 80×80 bordé sépia ════════════ */
+  .list-ab .row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    column-gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+  }
+  .list-ab .row:last-child { border-bottom: 0; }
+  .list-ab .row:hover { background: rgba(193, 154, 107, 0.08); }
+  .list-ab .img {
+    width: 80px; height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 2px solid var(--color-sepia);
+    box-shadow: 0 3px 8px rgba(74, 55, 40, 0.18);
+    background: rgba(184, 164, 122, 0.18);
+    filter: saturate(0.92);
+  }
+
+  /* ════════════ A.c · Image en fond + gradient parchemin ════════════ */
+  .list-ac .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 16px 22px;
+    min-height: 80px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background-position 0.4s ease;
+  }
+  .list-ac .row:last-child { border-bottom: 0; }
+  .list-ac .row::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+      rgba(250, 243, 224, 0.96) 0%,
+      rgba(250, 243, 224, 0.92) 35%,
+      rgba(250, 243, 224, 0.55) 75%,
+      rgba(250, 243, 224, 0.35) 100%);
+    pointer-events: none;
+  }
+  .list-ac .row > * { position: relative; z-index: 1; }
+  .list-ac .row:hover::before {
+    background: linear-gradient(90deg,
+      rgba(250, 243, 224, 0.92) 0%,
+      rgba(250, 243, 224, 0.85) 35%,
+      rgba(250, 243, 224, 0.4) 75%,
+      rgba(250, 243, 224, 0.2) 100%);
+  }
+  .list-ac .place-name { font-size: 17px; }
+
+  /* ════════════ A.d · Polaroid incliné ════════════ */
+  .list-ad .row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+  }
+  .list-ad .row:last-child { border-bottom: 0; }
+  .list-ad .row:hover { background: rgba(193, 154, 107, 0.08); }
+  .list-ad .row:hover .polaroid { transform: rotate(0deg) scale(1.05); }
+  .list-ad .polaroid {
+    width: 80px;
+    background: #fbf6e8;
+    padding: 4px 4px 14px;
+    border-radius: 2px;
+    box-shadow: 0 4px 10px rgba(74, 55, 40, 0.22), 0 1px 2px rgba(74, 55, 40, 0.1);
+    transform: rotate(-2.5deg);
+    transition: transform 0.3s ease;
+    transform-origin: center;
+  }
+  .list-ad .polaroid:nth-child(odd) { transform: rotate(2deg); }
+  .list-ad .row:nth-child(2n) .polaroid { transform: rotate(2deg); }
+  .list-ad .row:nth-child(3n) .polaroid { transform: rotate(-3deg); }
+  .list-ad .polaroid img {
+    width: 72px; height: 72px;
+    object-fit: cover;
+    display: block;
+    filter: saturate(0.92);
+  }
+
+  /* ════════════ A.e · Mix A.a + fond A.c flouté ════════════ */
+  .list-ae .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 12px 22px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+    cursor: pointer;
+    overflow: hidden;
+    min-height: 88px;
+  }
+  .list-ae .row:last-child { border-bottom: 0; }
+  .list-ae .row::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: var(--bg);
+    background-size: cover;
+    background-position: center;
+    filter: blur(3px) saturate(0.85);
+    transform: scale(1.1);
+    z-index: 0;
+  }
+  .list-ae .row::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+      rgba(250, 243, 224, 0.94) 0%,
+      rgba(250, 243, 224, 0.86) 40%,
+      rgba(250, 243, 224, 0.55) 80%,
+      rgba(250, 243, 224, 0.35) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .list-ae .row > * { position: relative; z-index: 2; }
+  .list-ae .img {
+    width: 96px; height: 64px;
+    border-radius: 6px;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(74, 55, 40, 0.3);
+    border: 2px solid rgba(255, 250, 240, 0.85);
+  }
+  .list-ae .row:hover::after {
+    background: linear-gradient(90deg,
+      rgba(250, 243, 224, 0.88) 0%,
+      rgba(250, 243, 224, 0.78) 40%,
+      rgba(250, 243, 224, 0.4) 80%,
+      rgba(250, 243, 224, 0.2) 100%);
+  }
+  .list-ae .place-name { font-size: 17px; }
+
+  /* ─── footnote ─── */
+  .foot {
+    max-width: 900px; margin: 40px auto 0;
+    color: #b8a890; font-size: 13px; line-height: 1.7;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(193, 154, 107, 0.2);
+    border-radius: 10px;
+    padding: 18px 24px;
+  }
+  .foot b { color: var(--color-sepia); font-family: var(--font-accent); letter-spacing: 0.05em; }
+  .foot p { margin: 6px 0; }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <div class="eyebrow">Variante A · 4 traitements de l'image</div>
+    <h1>Lieu = une ligne · plus de présence visuelle</h1>
+    <div class="lede">
+      Onglet « Influencés » actif. Mêmes 5 lieux dans chaque variante pour comparer juste l'image.
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ════════════════════ A.a — Paysage 96×64 ════════════════════ -->
+    <div>
+      <div class="card">
+        <span class="card-tag">A.a · Photo paysage 96×64</span>
+        <div class="tabs">
+          <button class="tab">Ajoutés <span class="count">12</span></button>
+          <button class="tab">Visités <span class="count">28</span></button>
+          <button class="tab active">Influencés <span class="count">9</span></button>
+        </div>
+        <div class="list-aa">
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/avalon/200/140">
+            <div>
+              <div class="place-name">Le Vieux Chêne d'Avalon</div>
+              <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+            </div>
+            <div class="meta"><span class="points">428</span><span class="points-unit">points</span><div class="date">il y a 3 j</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/brehat/200/140">
+            <div>
+              <div class="place-name">Forteresse de Bréhat</div>
+              <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+            </div>
+            <div class="meta"><span class="points">312</span><span class="points-unit">points</span><div class="date">il y a 1 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/wandrille/200/140">
+            <div>
+              <div class="place-name">Abbaye de Saint-Wandrille</div>
+              <div class="place-tag">Abbaye · Seine-Maritime</div>
+            </div>
+            <div class="meta"><span class="points">245</span><span class="points-unit">points</span><div class="date">il y a 2 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/broceliande/200/140">
+            <div>
+              <div class="place-name">Forêt de Brocéliande</div>
+              <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+            </div>
+            <div class="meta"><span class="points">187</span><span class="points-unit">points</span><div class="date">il y a 3 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/montsm/200/140">
+            <div>
+              <div class="place-name">Mont Saint-Michel</div>
+              <div class="place-tag">Sanctuaire · Manche</div>
+            </div>
+            <div class="meta"><span class="points">156</span><span class="points-unit">points</span><div class="date">il y a 1 mois</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ A.b — Carré 80×80 bordé ════════════════════ -->
+    <div>
+      <div class="card">
+        <span class="card-tag">A.b · Carré 80×80 + bordure sépia</span>
+        <div class="tabs">
+          <button class="tab">Ajoutés <span class="count">12</span></button>
+          <button class="tab">Visités <span class="count">28</span></button>
+          <button class="tab active">Influencés <span class="count">9</span></button>
+        </div>
+        <div class="list-ab">
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/avalon/160/160">
+            <div>
+              <div class="place-name">Le Vieux Chêne d'Avalon</div>
+              <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+            </div>
+            <div class="meta"><span class="points">428</span><span class="points-unit">points</span><div class="date">il y a 3 j</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/brehat/160/160">
+            <div>
+              <div class="place-name">Forteresse de Bréhat</div>
+              <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+            </div>
+            <div class="meta"><span class="points">312</span><span class="points-unit">points</span><div class="date">il y a 1 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/wandrille/160/160">
+            <div>
+              <div class="place-name">Abbaye de Saint-Wandrille</div>
+              <div class="place-tag">Abbaye · Seine-Maritime</div>
+            </div>
+            <div class="meta"><span class="points">245</span><span class="points-unit">points</span><div class="date">il y a 2 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/broceliande/160/160">
+            <div>
+              <div class="place-name">Forêt de Brocéliande</div>
+              <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+            </div>
+            <div class="meta"><span class="points">187</span><span class="points-unit">points</span><div class="date">il y a 3 sem</div></div>
+          </div>
+          <div class="row">
+            <img class="img" src="https://picsum.photos/seed/montsm/160/160">
+            <div>
+              <div class="place-name">Mont Saint-Michel</div>
+              <div class="place-tag">Sanctuaire · Manche</div>
+            </div>
+            <div class="meta"><span class="points">156</span><span class="points-unit">points</span><div class="date">il y a 1 mois</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ A.c — Fond immersif ════════════════════ -->
+    <div>
+      <div class="card">
+        <span class="card-tag">A.c · Image en fond + gradient parchemin</span>
+        <div class="tabs">
+          <button class="tab">Ajoutés <span class="count">12</span></button>
+          <button class="tab">Visités <span class="count">28</span></button>
+          <button class="tab active">Influencés <span class="count">9</span></button>
+        </div>
+        <div class="list-ac">
+          <div class="row" style="background-image: url('https://picsum.photos/seed/avalon/700/200')">
+            <div>
+              <div class="place-name">Le Vieux Chêne d'Avalon</div>
+              <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+            </div>
+            <div class="meta"><span class="points">428</span><span class="points-unit">points</span><div class="date">il y a 3 j</div></div>
+          </div>
+          <div class="row" style="background-image: url('https://picsum.photos/seed/brehat/700/200')">
+            <div>
+              <div class="place-name">Forteresse de Bréhat</div>
+              <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+            </div>
+            <div class="meta"><span class="points">312</span><span class="points-unit">points</span><div class="date">il y a 1 sem</div></div>
+          </div>
+          <div class="row" style="background-image: url('https://picsum.photos/seed/wandrille/700/200')">
+            <div>
+              <div class="place-name">Abbaye de Saint-Wandrille</div>
+              <div class="place-tag">Abbaye · Seine-Maritime</div>
+            </div>
+            <div class="meta"><span class="points">245</span><span class="points-unit">points</span><div class="date">il y a 2 sem</div></div>
+          </div>
+          <div class="row" style="background-image: url('https://picsum.photos/seed/broceliande/700/200')">
+            <div>
+              <div class="place-name">Forêt de Brocéliande</div>
+              <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+            </div>
+            <div class="meta"><span class="points">187</span><span class="points-unit">points</span><div class="date">il y a 3 sem</div></div>
+          </div>
+          <div class="row" style="background-image: url('https://picsum.photos/seed/montsm/700/200')">
+            <div>
+              <div class="place-name">Mont Saint-Michel</div>
+              <div class="place-tag">Sanctuaire · Manche</div>
+            </div>
+            <div class="meta"><span class="points">156</span><span class="points-unit">points</span><div class="date">il y a 1 mois</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ A.d — Polaroid incliné ════════════════════ -->
+    <div>
+      <div class="card">
+        <span class="card-tag">A.d · Polaroid incliné</span>
+        <div class="tabs">
+          <button class="tab">Ajoutés <span class="count">12</span></button>
+          <button class="tab">Visités <span class="count">28</span></button>
+          <button class="tab active">Influencés <span class="count">9</span></button>
+        </div>
+        <div class="list-ad">
+          <div class="row">
+            <div class="polaroid"><img src="https://picsum.photos/seed/avalon/160/160"></div>
+            <div>
+              <div class="place-name">Le Vieux Chêne d'Avalon</div>
+              <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+            </div>
+            <div class="meta"><span class="points">428</span><span class="points-unit">points</span><div class="date">il y a 3 j</div></div>
+          </div>
+          <div class="row">
+            <div class="polaroid"><img src="https://picsum.photos/seed/brehat/160/160"></div>
+            <div>
+              <div class="place-name">Forteresse de Bréhat</div>
+              <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+            </div>
+            <div class="meta"><span class="points">312</span><span class="points-unit">points</span><div class="date">il y a 1 sem</div></div>
+          </div>
+          <div class="row">
+            <div class="polaroid"><img src="https://picsum.photos/seed/wandrille/160/160"></div>
+            <div>
+              <div class="place-name">Abbaye de Saint-Wandrille</div>
+              <div class="place-tag">Abbaye · Seine-Maritime</div>
+            </div>
+            <div class="meta"><span class="points">245</span><span class="points-unit">points</span><div class="date">il y a 2 sem</div></div>
+          </div>
+          <div class="row">
+            <div class="polaroid"><img src="https://picsum.photos/seed/broceliande/160/160"></div>
+            <div>
+              <div class="place-name">Forêt de Brocéliande</div>
+              <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+            </div>
+            <div class="meta"><span class="points">187</span><span class="points-unit">points</span><div class="date">il y a 3 sem</div></div>
+          </div>
+          <div class="row">
+            <div class="polaroid"><img src="https://picsum.photos/seed/montsm/160/160"></div>
+            <div>
+              <div class="place-name">Mont Saint-Michel</div>
+              <div class="place-tag">Sanctuaire · Manche</div>
+            </div>
+            <div class="meta"><span class="points">156</span><span class="points-unit">points</span><div class="date">il y a 1 mois</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════ A.e — Mix A.a + fond A.c flouté ════════════════════ -->
+    <div>
+      <div class="card">
+        <span class="card-tag">A.e · Mix A.a + fond A.c flouté ★</span>
+        <div class="tabs">
+          <button class="tab">Ajoutés <span class="count">12</span></button>
+          <button class="tab">Visités <span class="count">28</span></button>
+          <button class="tab active">Influencés <span class="count">9</span></button>
+        </div>
+        <div class="list-ae">
+          <div class="row" style="--bg: url('https://picsum.photos/seed/avalon/700/200')">
+            <img class="img" src="https://picsum.photos/seed/avalon/200/140">
+            <div>
+              <div class="place-name">Le Vieux Chêne d'Avalon</div>
+              <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+            </div>
+            <div class="meta"><span class="points">428</span><span class="points-unit">points</span><div class="date">il y a 3 j</div></div>
+          </div>
+          <div class="row" style="--bg: url('https://picsum.photos/seed/brehat/700/200')">
+            <img class="img" src="https://picsum.photos/seed/brehat/200/140">
+            <div>
+              <div class="place-name">Forteresse de Bréhat</div>
+              <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+            </div>
+            <div class="meta"><span class="points">312</span><span class="points-unit">points</span><div class="date">il y a 1 sem</div></div>
+          </div>
+          <div class="row" style="--bg: url('https://picsum.photos/seed/wandrille/700/200')">
+            <img class="img" src="https://picsum.photos/seed/wandrille/200/140">
+            <div>
+              <div class="place-name">Abbaye de Saint-Wandrille</div>
+              <div class="place-tag">Abbaye · Seine-Maritime</div>
+            </div>
+            <div class="meta"><span class="points">245</span><span class="points-unit">points</span><div class="date">il y a 2 sem</div></div>
+          </div>
+          <div class="row" style="--bg: url('https://picsum.photos/seed/broceliande/700/200')">
+            <img class="img" src="https://picsum.photos/seed/broceliande/200/140">
+            <div>
+              <div class="place-name">Forêt de Brocéliande</div>
+              <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+            </div>
+            <div class="meta"><span class="points">187</span><span class="points-unit">points</span><div class="date">il y a 3 sem</div></div>
+          </div>
+          <div class="row" style="--bg: url('https://picsum.photos/seed/montsm/700/200')">
+            <img class="img" src="https://picsum.photos/seed/montsm/200/140">
+            <div>
+              <div class="place-name">Mont Saint-Michel</div>
+              <div class="place-tag">Sanctuaire · Manche</div>
+            </div>
+            <div class="meta"><span class="points">156</span><span class="points-unit">points</span><div class="date">il y a 1 mois</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <p><b>A.a</b> · Paysage 96×64 — sobre, fait respirer la photo.</p>
+    <p><b>A.b</b> · Carré 80×80 bordé — vignette de musée.</p>
+    <p><b>A.c</b> · Image en fond — la plus immersive.</p>
+    <p><b>A.d</b> · Polaroid incliné — éditorial photo de voyage.</p>
+    <p><b>★ A.e</b> · <b>Mix A.a + fond A.c flouté</b> — la photo nette donne le focus, le fond flouté donne l'atmosphère. Même image, deux usages : net devant, ambiance derrière.</p>
+  </div>
+
+</body>
+</html>

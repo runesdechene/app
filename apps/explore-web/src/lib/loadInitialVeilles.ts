@@ -1,6 +1,5 @@
 import { supabase } from './supabase'
 import { useMapStore } from '../stores/mapStore'
-import { useVeillesStore } from '../stores/veillesStore'
 import type { MapVeille } from '../types/veille'
 
 const NEUTRAL_COLOR = '#8a6f4a'
@@ -41,26 +40,19 @@ export async function loadInitialVeilles(): Promise<void> {
   }
 
   const veilles = (veillesData as MapVeille[] | null) ?? []
-
-  // Peuple le veillesStore (source de vérité pour VeilleMarkers — avatars + faction colors)
-  useVeillesStore.getState().setVeilles(veilles)
-
-  // Peuple les placeOverrides du mapStore (source de vérité pour territoryWorker — couleur + claimed)
   for (const v of veilles) {
     pushVeilleOverride(v.placeId, v.factionId, v.isNeutral)
   }
 }
 
 /**
- * Push une veille (résultat de plant_flag) en override sur le mapStore + veillesStore.
+ * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu).
  * À appeler après chaque plant_flag réussi pour rafraîchir la carte instantanément.
  */
 export function pushVeilleOverride(
   placeId: string,
   factionId: string | null,
   isNeutral: boolean,
-  members?: MapVeille['members'],
-  plantedAt?: string,
 ): void {
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.
   if (!factionsLoaded) {
@@ -81,22 +73,4 @@ export function pushVeilleOverride(
     tagColor,
     factionPattern,
   })
-
-  // Si on a les membres (depuis plant_flag), on peuple aussi le veillesStore pour les markers.
-  // Enrichit factionColor/factionPattern depuis le cache si manquants (cas typique : plant_flag
-  // retourne {userId, displayName, avatarUrl, factionId} sans les couleurs/patterns).
-  if (members) {
-    const enriched = members.map(m => ({
-      ...m,
-      factionColor: m.factionColor ?? factionColors.get(m.factionId) ?? null,
-      factionPattern: m.factionPattern ?? factionPatterns.get(m.factionId) ?? null,
-    }))
-    useVeillesStore.getState().upsertVeille({
-      placeId,
-      factionId,
-      isNeutral,
-      plantedAt: plantedAt ?? new Date().toISOString(),
-      members: enriched,
-    })
-  }
 }

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Directions Immersives</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin+Condensed:wght@400;500;600;700&family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Cabin', sans-serif; background: #111; color: #fff; }
+
+  .direction { margin-bottom: 80px; border-bottom: 2px solid #333; padding-bottom: 60px; }
+  .direction-label {
+    position: sticky; top: 0; z-index: 100;
+    background: #833434; color: #fff; padding: 12px 24px;
+    font-family: 'Cabin Condensed', sans-serif; font-size: 15px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  /* ===== DIRECTION A: DARK CINEMATIC ===== */
+  .a-hero {
+    position: relative; width: 100%; height: 85vh; min-height: 500px;
+    background: linear-gradient(135deg, #2a1810, #1a0f08);
+    overflow: hidden;
+  }
+  .a-hero-img {
+    width: 100%; height: 100%; object-fit: cover; opacity: 0.7;
+    background: linear-gradient(135deg, #C19A6B 0%, #8B6914 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 18px;
+  }
+  .a-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(transparent 30%, rgba(0,0,0,0.85));
+  }
+  .a-hero-nav {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 20px 32px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .a-hero-logo { font-family: 'Bebas Neue'; font-size: 24px; color: #fff; opacity: 0.9; letter-spacing: 0.02em; }
+  .a-hero-cta-btn {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+    color: #fff; padding: 10px 22px; border-radius: 8px;
+    font-family: 'Cabin Condensed'; font-weight: 700; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid rgba(255,255,255,0.2);
+  }
+  .a-hero-content {
+    position: absolute; bottom: 40px; left: 32px; right: 32px; z-index: 10;
+    max-width: 800px;
+  }
+  .a-hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(110, 72, 127, 0.3); border: 1px solid rgba(110, 72, 127, 0.5);
+    color: #c9a0e0; padding: 6px 16px; border-radius: 20px;
+    font-family: 'Cabin Condensed'; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px;
+  }
+  .a-hero-title {
+    font-family: 'Bebas Neue'; font-size: 64px; line-height: 1.0;
+    color: #fff; margin-bottom: 8px;
+  }
+  .a-hero-address {
+    font-size: 16px; color: rgba(255,255,255,0.5); font-style: italic;
+    margin-bottom: 16px;
+  }
+  .a-hero-credit {
+    font-family: 'Cabin Condensed'; font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Thumbs strip */
+  .a-thumbs {
+    display: flex; gap: 4px; padding: 4px; background: #111;
+  }
+  .a-thumb {
+    flex: 1; height: 80px; background: #2a2a2a; opacity: 0.6;
+    border-radius: 0;
+  }
+  .a-thumb.active { opacity: 1; border-bottom: 3px solid #6e487f; }
+
+  /* Content section - dark bg, centered */
+  .a-content {
+    max-width: 720px; margin: 0 auto; padding: 48px 32px;
+  }
+  .a-about {
+    font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: #c9a0e0; margin-bottom: 20px;
+  }
+  .a-desc {
+    font-size: 18px; line-height: 1.85; color: rgba(255,255,255,0.75);
+    margin-bottom: 40px;
+  }
+  .a-contrib {
+    background: rgba(255,255,255,0.05); border-left: 3px solid #6e487f;
+    border-radius: 0 12px 12px 0; padding: 24px; margin-bottom: 20px;
+  }
+  .a-contrib-name { font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+  .a-contrib-text { font-size: 16px; color: rgba(255,255,255,0.55); font-style: italic; margin-top: 8px; line-height: 1.8; }
+  .a-cta-box {
+    background: rgba(110, 72, 127, 0.1); border: 1px solid rgba(110, 72, 127, 0.3);
+    border-radius: 12px; padding: 28px; text-align: center; margin-top: 40px;
+  }
+  .a-cta-title { font-family: 'Bebas Neue'; font-size: 28px; color: #fff; margin-bottom: 6px; }
+  .a-cta-sub { font-size: 15px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+  .a-cta-btn {
+    display: inline-block; background: #6e487f; color: #fff;
+    padding: 12px 32px; border-radius: 8px;
+    font-family: 'Cabin Condensed'; font-weight: 700; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* Nearby - dark */
+  .a-nearby { max-width: 1000px; margin: 0 auto; padding: 0 32px 60px; }
+  .a-nearby-label { font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #c9a0e0; margin-bottom: 20px; }
+  .a-nearby-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .a-nearby-card { aspect-ratio: 3/4; background: #222; border-radius: 10px; position: relative; overflow: hidden; }
+  .a-nearby-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.8)); display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; }
+  .a-nearby-card-tag { font-family: 'Cabin Condensed'; font-size: 11px; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .a-nearby-card-name { font-family: 'Cabin Condensed'; font-size: 16px; font-weight: 700; color: #fff; }
+
+  /* ===== DIRECTION B: DARK + PARCHMENT CONTENT ===== */
+  .b-hero {
+    position: relative; width: 100%; height: 75vh; min-height: 450px;
+    background: #1a1a1a; overflow: hidden;
+  }
+  .b-hero-img {
+    width: 100%; height: 100%; object-fit: cover;
+    background: linear-gradient(135deg, #C19A6B 0%, #8B6914 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 18px;
+  }
+  .b-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.75));
+  }
+  .b-hero-nav {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 20px 32px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .b-hero-logo { font-family: 'Bebas Neue'; font-size: 24px; color: #fff; opacity: 0.9; }
+  .b-hero-cta-btn {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+    color: #fff; padding: 10px 22px; border-radius: 8px;
+    font-family: 'Cabin Condensed'; font-weight: 700; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid rgba(255,255,255,0.2);
+  }
+  .b-hero-content {
+    position: absolute; bottom: 40px; left: 32px; right: 32px; z-index: 10;
+    max-width: 700px;
+  }
+  .b-hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #FDEFEF; color: #6e487f;
+    padding: 6px 16px; border-radius: 20px;
+    font-family: 'Cabin Condensed'; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
+  }
+  .b-hero-title {
+    font-family: 'Bebas Neue'; font-size: 56px; line-height: 1.0;
+    color: #fff; margin-bottom: 8px;
+  }
+  .b-hero-address { font-size: 15px; color: rgba(255,255,255,0.5); font-style: italic; }
+  .b-hero-credit { font-family: 'Cabin Condensed'; font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 8px; }
+
+  /* Transition to parchment */
+  .b-transition {
+    height: 60px;
+    background: linear-gradient(#111, #f7ede1);
+  }
+  .b-thumbs {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    padding: 0 32px; max-width: 800px; margin: -30px auto 0; position: relative; z-index: 5;
+  }
+  .b-thumb {
+    aspect-ratio: 1; background: #ddd; border-radius: 8px; opacity: 0.7;
+    border: 2px solid transparent;
+  }
+  .b-thumb.active { opacity: 1; border-color: #6e487f; }
+
+  .b-content {
+    background: #f7ede1; max-width: 800px; margin: 0 auto; padding: 40px 32px 60px;
+  }
+  .b-about {
+    font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: #833434; margin-bottom: 20px;
+  }
+  .b-desc {
+    font-size: 18px; line-height: 1.85; color: #4A3728; margin-bottom: 40px;
+  }
+  .b-contrib {
+    background: #E8D5BE; border-left: 3px solid #833434;
+    border-radius: 0 12px 12px 0; padding: 24px; margin-bottom: 16px;
+  }
+  .b-contrib-name { font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700; color: #4A3728; text-transform: uppercase; }
+  .b-contrib-text { font-size: 16px; color: #7D5A3C; font-style: italic; margin-top: 8px; line-height: 1.8; }
+
+  .b-parchment-footer { background: #f7ede1; padding: 0 32px 60px; }
+  .b-nearby { max-width: 1000px; margin: 0 auto; }
+  .b-nearby-label { font-family: 'Cabin Condensed'; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #833434; margin-bottom: 20px; }
+  .b-nearby-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .b-nearby-card { aspect-ratio: 3/4; background: #d4c8b4; border-radius: 10px; position: relative; overflow: hidden; }
+  .b-nearby-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0,0,0,0.7)); display: flex; flex-direction: column; justify-content: flex-end; padding: 14px; }
+  .b-nearby-card-name { font-family: 'Cabin Condensed'; font-size: 16px; font-weight: 700; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ===== DIRECTION A: FULL DARK CINEMATIC ===== -->
+<div class="direction">
+  <div class="direction-label">A — Full Dark Cinématique · Le lieu est le héros · Tout sombre</div>
+
+  <div class="a-hero">
+    <div class="a-hero-img">Photo hero plein écran (85vh)</div>
+    <div class="a-hero-overlay"></div>
+    <div class="a-hero-nav">
+      <span class="a-hero-logo">RUNES DE CHÊNE</span>
+      <span class="a-hero-cta-btn">Ouvrir l'application</span>
+    </div>
+    <div class="a-hero-content">
+      <div class="a-hero-tag">◆ Sanctuaires</div>
+      <div class="a-hero-title">Abbaye de Montmajour</div>
+      <div class="a-hero-address">Arles, Bouches-du-Rhône, Provence</div>
+      <div class="a-hero-credit">Photo par Nolroc</div>
+    </div>
+  </div>
+
+  <div class="a-thumbs">
+    <div class="a-thumb active"></div>
+    <div class="a-thumb"></div>
+    <div class="a-thumb"></div>
+    <div class="a-thumb"></div>
+    <div class="a-thumb"></div>
+    <div class="a-thumb"></div>
+    <div class="a-thumb"></div>
+  </div>
+
+  <div class="a-content">
+    <div class="a-about">À propos de Abbaye de Montmajour</div>
+    <div class="a-desc">L'abbaye de Montmajour est un joyau patrimonial provençal situé à Arles, aux portes de la Camargue. Cette ancienne nécropole, habitée dès l'Antiquité, a accueilli au Xe siècle une communauté d'ermites...</div>
+
+    <div class="a-about" style="margin-top: 40px;">Récit d'explorateur</div>
+    <div class="a-contrib">
+      <div class="a-contrib-name">Nolroc · 15 mars 2026</div>
+      <div class="a-contrib-text">« Nécropole connue depuis l'Antiquité, le Mons Majoris abritait au Xe siècle une communauté d'ermites... »</div>
+    </div>
+
+    <div class="a-cta-box">
+      <div class="a-cta-title">Explorez ce lieu</div>
+      <div class="a-cta-sub">Ajoutez vos photos et partagez votre récit</div>
+      <span class="a-cta-btn">Accéder à l'application</span>
+    </div>
+  </div>
+
+  <div class="a-nearby">
+    <div class="a-nearby-label">Lieux à proximité</div>
+    <div class="a-nearby-grid">
+      <div class="a-nearby-card"><div class="a-nearby-card-overlay"><div class="a-nearby-card-tag">Ruines</div><div class="a-nearby-card-name">Porte de la Cavalerie</div></div></div>
+      <div class="a-nearby-card"><div class="a-nearby-card-overlay"><div class="a-nearby-card-tag">Monuments</div><div class="a-nearby-card-name">Arènes d'Arles</div></div></div>
+      <div class="a-nearby-card"><div class="a-nearby-card-overlay"><div class="a-nearby-card-tag">Ruines</div><div class="a-nearby-card-name">Thermes de Constantin</div></div></div>
+      <div class="a-nearby-card"><div class="a-nearby-card-overlay"><div class="a-nearby-card-tag">Historique</div><div class="a-nearby-card-name">Cloître Saint-Trophime</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DIRECTION B: DARK HERO → PARCHMENT CONTENT ===== -->
+<div class="direction">
+  <div class="direction-label">B — Dark Hero → Transition Parchemin · Immersif en haut, lisible en bas</div>
+
+  <div class="b-hero">
+    <div class="b-hero-img">Photo hero plein écran (75vh)</div>
+    <div class="b-hero-overlay"></div>
+    <div class="b-hero-nav">
+      <span class="b-hero-logo">RUNES DE CHÊNE</span>
+      <span class="b-hero-cta-btn">Ouvrir l'application</span>
+    </div>
+    <div class="b-hero-content">
+      <div class="b-hero-tag">◆ Sanctuaires</div>
+      <div class="b-hero-title">Abbaye de Montmajour</div>
+      <div class="b-hero-address">Arles, Bouches-du-Rhône, Provence</div>
+      <div class="b-hero-credit">Photo par Nolroc</div>
+    </div>
+  </div>
+
+  <div class="b-transition"></div>
+  <div class="b-thumbs">
+    <div class="b-thumb active"></div>
+    <div class="b-thumb"></div>
+    <div class="b-thumb"></div>
+    <div class="b-thumb"></div>
+  </div>
+
+  <div class="b-content">
+    <div class="b-about">À propos de Abbaye de Montmajour</div>
+    <div class="b-desc">L'abbaye de Montmajour est un joyau patrimonial provençal situé à Arles, aux portes de la Camargue. Cette ancienne nécropole, habitée dès l'Antiquité, a accueilli au Xe siècle une communauté d'ermites...</div>
+
+    <div class="b-about" style="margin-top: 40px;">Récit d'explorateur</div>
+    <div class="b-contrib">
+      <div class="b-contrib-name">Nolroc · 15 mars 2026</div>
+      <div class="b-contrib-text">« Nécropole connue depuis l'Antiquité, le Mons Majoris abritait au Xe siècle une communauté d'ermites... »</div>
+    </div>
+  </div>
+
+  <div class="b-parchment-footer">
+    <div class="b-nearby">
+      <div class="b-nearby-label">Lieux à proximité</div>
+      <div class="b-nearby-grid">
+        <div class="b-nearby-card"><div class="b-nearby-card-overlay"><div class="b-nearby-card-name">Porte de la Cavalerie</div></div></div>
+        <div class="b-nearby-card"><div class="b-nearby-card-overlay"><div class="b-nearby-card-name">Arènes d'Arles</div></div></div>
+        <div class="b-nearby-card"><div class="b-nearby-card-overlay"><div class="b-nearby-card-name">Thermes de Constantin</div></div></div>
+        <div class="b-nearby-card"><div class="b-nearby-card-overlay"><div class="b-nearby-card-name">Cloître Saint-Trophime</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

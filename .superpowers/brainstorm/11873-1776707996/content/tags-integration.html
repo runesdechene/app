@@ -1,0 +1,108 @@
+<h2>Integration des Tags Colores</h2>
+<p class="subtitle">Comment les tags (Nature, Moyen Age, Sacre...) donnent de la couleur a la page ?</p>
+
+<div class="cards" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:24px; margin-top:32px;">
+
+  <!-- Option A: Pills classiques -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="cursor:pointer;">
+    <div class="card-image" style="padding:24px; background:#1a1a1a;">
+      <!-- Simulated left column of the split -->
+      <div style="width:100%; background:#f7ede1; border-radius:8px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <!-- Photo placeholder -->
+        <div style="height:160px; background:linear-gradient(135deg, #C19A6B, #8B6914); border-radius:6px;"></div>
+        <!-- Tags as pills underneath -->
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <span style="background:#2D5F3A20; color:#2D5F3A; font-size:11px; padding:4px 12px; border-radius:20px; font-weight:600;">&#x1F332; Nature</span>
+          <span style="background:#83343420; color:#833434; font-size:11px; padding:4px 12px; border-radius:20px; font-weight:600;">&#x1F3F0; Moyen Age</span>
+          <span style="background:#6B4C8A20; color:#6B4C8A; font-size:11px; padding:4px 12px; border-radius:20px; font-weight:600;">&#x26EA; Sacre</span>
+        </div>
+        <!-- Mini thumbnails -->
+        <div style="display:flex; gap:4px;">
+          <div style="flex:1; height:50px; background:#E8D5BE; border-radius:4px;"></div>
+          <div style="flex:1; height:50px; background:#E8D5BE; border-radius:4px;"></div>
+          <div style="flex:1; height:50px; background:#E8D5BE; border-radius:4px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Pills sous la photo</h3>
+      <p>Tags en badges colores entre la galerie et les thumbnails. Simple, lisible, pattern connu. Les icones SVG des tags sont affichees dans les pills.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Bandeau lateral colore -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="cursor:pointer;">
+    <div class="card-image" style="padding:24px; background:#1a1a1a;">
+      <div style="width:100%; background:#f7ede1; border-radius:8px; overflow:hidden; display:flex; flex-direction:column;">
+        <!-- Color accent bar at top derived from primary tag -->
+        <div style="height:4px; background: linear-gradient(90deg, #2D5F3A 0%, #2D5F3A 50%, #833434 50%, #833434 80%, #6B4C8A 80%, #6B4C8A 100%);"></div>
+        <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+          <!-- Photo with colored border accent -->
+          <div style="height:160px; background:linear-gradient(135deg, #C19A6B, #8B6914); border-radius:6px; border-left:4px solid #2D5F3A;"></div>
+          <!-- Tags as vertical list with icons -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:24px; height:24px; border-radius:50%; background:#2D5F3A20; display:flex; align-items:center; justify-content:center; font-size:12px;">&#x1F332;</div>
+              <span style="font-size:11px; color:#2D5F3A; font-weight:600;">Nature</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:24px; height:24px; border-radius:50%; background:#83343420; display:flex; align-items:center; justify-content:center; font-size:12px;">&#x1F3F0;</div>
+              <span style="font-size:11px; color:#833434; font-weight:600;">Moyen Age</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:24px; height:24px; border-radius:50%; background:#6B4C8A20; display:flex; align-items:center; justify-content:center; font-size:12px;">&#x26EA;</div>
+              <span style="font-size:11px; color:#6B4C8A; font-weight:600;">Sacre</span>
+            </div>
+          </div>
+          <!-- Thumbnails -->
+          <div style="display:flex; gap:4px;">
+            <div style="flex:1; height:50px; background:#E8D5BE; border-radius:4px;"></div>
+            <div style="flex:1; height:50px; background:#E8D5BE; border-radius:4px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Barre chromatique + liste</h3>
+      <p>Barre de couleur en haut derivee des tags. Tags en liste verticale avec icone ronde. La couleur du tag principal teinte aussi le bord de l'image. Plus editorial.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Tag dominant qui teinte la page -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="cursor:pointer;">
+    <div class="card-image" style="padding:24px; background:#1a1a1a;">
+      <div style="width:100%; border-radius:8px; overflow:hidden; position:relative;">
+        <!-- Background tinted by primary tag -->
+        <div style="background: linear-gradient(180deg, #2D5F3A10 0%, #f7ede1 40%); padding:16px; display:flex; flex-direction:column; gap:12px;">
+          <!-- Primary tag as big label -->
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <div style="width:28px; height:28px; border-radius:6px; background:#2D5F3A; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff;">&#x1F332;</div>
+            <span style="font-size:13px; color:#2D5F3A; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Nature</span>
+          </div>
+          <!-- Photo -->
+          <div style="height:140px; background:linear-gradient(135deg, #C19A6B, #8B6914); border-radius:6px;"></div>
+          <!-- Secondary tags small -->
+          <div style="display:flex; gap:6px;">
+            <span style="background:#83343420; color:#833434; font-size:9px; padding:3px 10px; border-radius:12px; font-weight:600;">Moyen Age</span>
+            <span style="background:#6B4C8A20; color:#6B4C8A; font-size:9px; padding:3px 10px; border-radius:12px; font-weight:600;">Sacre</span>
+          </div>
+          <!-- Thumbnails -->
+          <div style="display:flex; gap:4px;">
+            <div style="flex:1; height:45px; background:#E8D5BE; border-radius:4px;"></div>
+            <div style="flex:1; height:45px; background:#E8D5BE; border-radius:4px;"></div>
+            <div style="flex:1; height:45px; background:#E8D5BE; border-radius:4px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Tag dominant</h3>
+      <p>Le tag principal teinte le haut de la colonne gauche (gradient subtil). Il est affiche en gros avec son icone. Les secondaires restent en petites pills. Chaque page a sa propre "couleur" selon le lieu.</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px; padding:16px; background:rgba(193,154,107,0.1); border-radius:8px; border-left:3px solid #C19A6B;">
+  <p style="font-size:13px; color:#666; line-height:1.6;"><strong>Rappel :</strong> Dans la DB, chaque tag a un <code>color</code>, un <code>background</code> et un <code>icon</code> (SVG). Le <code>place_type</code> (Chateau, Eglise...) a aussi une couleur. On peut exploiter tout ca.</p>
+</div>

@@ -100,28 +100,36 @@ export const fortBadgeLayer: LayerSpecification = {
   },
 }
 
-/** V0.7 — Emblème faction posé sur CHAQUE lieu veillé (vision d'ensemble lieu-par-lieu).
- *  Petit symbole décalé en haut-droite du point GPS. Filter : factionPattern non vide
- *  (= lieu veillé V0.7), discovered (pas sur les lieux fogged). maxzoom=9 → au-delà, c'est
- *  VeilleMarkers React qui prend (avec l'avatar). */
+/** V0.7 — Emblème faction posé sur CHAQUE lieu veillé, à TOUS les zooms.
+ *  Petit symbole décalé en haut-droite du point GPS du lieu. Filter : factionPattern
+ *  non vide (= lieu veillé V0.7), discovered (pas sur les lieux fogged).
+ *  Pour voir QUI veille (avatars), il faut cliquer sur le lieu — le panel l'affiche. */
 export const placeVeilleEmblemLayer: LayerSpecification = {
   id: 'place-veille-emblem',
   type: 'symbol',
   source: 'places',
-  maxzoom: 9,
   filter: ['all',
     ['!=', ['get', 'factionPattern'], ''],
     ['==', ['get', 'discovered'], true],
   ],
   layout: {
     'icon-image': ['concat', 'banner::', ['get', 'factionPattern']],
+    /* Au dézoom : sceau plus gros, centré sur le lieu (couvre l'icône, vision d'ensemble par faction).
+       Au zoom : sceau réduit, décalé en haut-droite (laisse l'icône lieu visible). */
     'icon-size': [
       'interpolate', ['linear'], ['zoom'],
-      3, 0.05,
-      6, 0.08,
-      9, 0.14,
+      3, 0.18,
+      7, 0.22,
+      9, 0.20,
+      12, 0.30,
     ],
-    'icon-offset': [40, -40],   // haut-droite de l'icône lieu
+    'icon-offset': [
+      'interpolate', ['linear'], ['zoom'],
+      3, ['literal', [0, 0]],
+      7, ['literal', [0, 0]],
+      9, ['literal', [50, -50]],
+      12, ['literal', [80, -80]],
+    ],
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
   },

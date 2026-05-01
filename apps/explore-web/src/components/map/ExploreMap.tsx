@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, territoryEmblemLayer, placeVeilleEmblemLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, placeVeilleEmblemLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -21,7 +21,6 @@ import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { MapStyleSelect } from './MapStyleSelect'
-import { VeilleMarkers } from './VeilleMarkers'
 import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
@@ -763,16 +762,9 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* Marqueurs des autres joueurs connectés */}
       <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
 
-      {/* V0.7 — Option B : 1 avatar par TERRITOIRE (déduplication par userId entre les
-          lieux mergés du même blob), ancré sur la position GPS du lieu le plus récemment
-          veillé du territoire. Visible à zoom >= 9. Cadre couleur faction + badge +N si
-          plusieurs veilleurs uniques. Viewport-filtré pour la perf. */}
-      <VeilleMarkers
-        territories={territories}
-        geojson={enrichedGeojson}
-        zoom={zoomLevel}
-        bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
-      />
+      {/* V0.7 — Plus d'avatar carte (les expéditions multi-veilleurs créaient trop de
+          markers). On garde uniquement l'emblème faction par lieu (placeVeilleEmblemLayer
+          dans la source 'places'). Pour voir QUI veille → click le lieu pour ouvrir le panel. */}
 
       {enrichedGeojson && (
         <Source
@@ -797,15 +789,9 @@ export const ExploreMap = memo(function ExploreMap() {
         </Source>
       )}
 
-      {/* V0.7 — Option B : sceau emblème faction visible à zoom < 9 (vue régionale).
-          Au-delà de zoom 9, VeilleMarkers prend le relais avec l'avatar seul (cadre
-          couleur faction + badge +N si expedition). Pas de double rendu — le layer a
-          maxzoom 9, les markers ont minZoom 9. */}
-      {territoryLabelsGeojson && (
-        <Source id="territory-labels" type="geojson" data={territoryLabelsGeojson}>
-          <Layer {...territoryEmblemLayer} />
-        </Source>
-      )}
+      {/* V0.7 — territoryEmblemLayer (sceau au centroïde du blob mergé) retiré :
+          redondant avec placeVeilleEmblemLayer qui pose un emblème par lieu. Plus simple,
+          plus juste (chaque lieu veillé montre sa faction, pas une approximation de blob). */}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}
       {zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
         const { customName, tagColor } = f.properties as Record<string, unknown>

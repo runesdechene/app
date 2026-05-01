@@ -57,18 +57,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       setErrorMsg(msg)
       return
     }
-    // Enrichir les membres avec factionColor/factionPattern (récupérés via get_place_veille
-    // à la prochaine refresh — ici on injecte les avatars sans couleur de frame, le veillesStore
-    // sera ré-écrasé par get_place_veille au refresh côté panel et par get_map_veilles au reboot)
-    const enrichedMembers = result.members.map(m => ({
-      userId: m.userId,
-      displayName: m.displayName,
-      avatarUrl: m.avatarUrl,
-      factionId: m.factionId,
-      factionColor: null,
-      factionPattern: null,
-    }))
-    pushVeilleOverride(placeId, result.factionId, result.isNeutral, enrichedMembers, result.plantedAt)
+    pushVeilleOverride(placeId, result.factionId, result.isNeutral)
     await refresh()
   }, [userId, userPosition, plant, refresh, placeId])
 

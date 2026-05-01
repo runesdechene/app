@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profil joueur — Lieux préférés (maquette dans le design app)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabin:wght@400;500;600;700&family=Cabin+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ─── Variables réelles de l'app ─── */
+  :root {
+    --color-parchment: #f7ede1;
+    --color-parchment-dark: #E8D5BE;
+    --color-ink: #4A3728;
+    --color-ink-light: #7D5A3C;
+    --color-sepia: #C19A6B;
+    --color-sepia-dark: #A0784C;
+    --color-water: #C4B8A0;
+    --color-sage: #C4CCB0;
+    --font-title: 'Bebas Neue', sans-serif;
+    --font-accent: 'Cabin Condensed', sans-serif;
+    --font-body: 'Cabin', sans-serif;
+    --faction-color: #6b8a4d;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: #2a1a0d;
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(193, 154, 107, 0.15), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(193, 154, 107, 0.1), transparent 55%);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .doc-head { text-align: center; max-width: 900px; margin: 0 auto 36px; color: #d8c8a8; }
+  .doc-eyebrow { font-family: var(--font-accent); font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-sepia); margin-bottom: 6px; }
+  .doc-title { font-family: var(--font-title); font-size: 34px; letter-spacing: 0.04em; color: #f5e6d3; margin: 0 0 10px; }
+  .doc-lede { font-family: var(--font-body); font-size: 14px; color: #b8a890; line-height: 1.6; max-width: 580px; margin: 0 auto; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 24px;
+    max-width: 1480px;
+    margin: 0 auto;
+  }
+
+  .card-label {
+    font-family: var(--font-accent);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--color-sepia);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  /* ═════════ Modal réplique exacte du PlayerProfileModal ═════════ */
+  .player-modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(180deg, #faf3e0 0%, #f0e6cc 100%);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 1px 40px 20px rgba(0,0,0,0.25);
+    overflow: hidden;
+    gap: 5px;
+    padding-bottom: 8px;
+  }
+
+  .player-modal-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; font-size: 22px;
+    color: #8A7B6A; cursor: pointer; line-height: 1;
+  }
+
+  .player-modal-header {
+    display: flex; flex-direction: column;
+    padding: 20px 30px 0;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .player-modal-top {
+    display: flex; align-items: center; gap: 20px;
+  }
+
+  .player-modal-avatar-wrap { position: relative; flex-shrink: 0; }
+
+  .player-modal-avatar {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 3px solid #b8a47a;
+    object-fit: cover;
+    background: linear-gradient(135deg, #c19a6b, #8A7B6A);
+    display: flex; align-items: center; justify-content: center;
+    color: #faf3e0; font-size: 44px; font-weight: 700;
+  }
+
+  .player-modal-faction-badge {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #faf3e0;
+    border: 2px solid #b8a47a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .player-modal-info {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 12px 0;
+    text-align: left;
+  }
+
+  .player-modal-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c1810;
+    line-height: 1.2;
+  }
+
+  .player-modal-counts {
+    display: flex; gap: 16px;
+    margin-top: 4px;
+  }
+  .player-modal-count { display: flex; gap: 4px; align-items: baseline; }
+  .player-modal-count-value { font-size: 15px; font-weight: 700; color: #2c1810; }
+  .player-modal-count-label { font-size: 13px; color: #8A7B6A; }
+
+  .player-modal-faction-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .player-modal-notoriety { font-size: 16px; font-weight: 600; color: #5a4a3a; }
+  .player-modal-faction-row.influence { gap: 12px; font-size: 12px; opacity: 0.8; }
+
+  /* ─── Titres badges ─── */
+  .player-modal-titles {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: flex-start;
+    margin: 4px 0 8px;
+  }
+
+  .title-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    background: rgba(193, 154, 107, 0.18);
+    border: 1px solid rgba(193, 154, 107, 0.4);
+    border-radius: 12px;
+    font-family: var(--font-accent);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .title-badge-edit {
+    background: transparent;
+    border: 1px dashed rgba(193, 154, 107, 0.5);
+    color: var(--color-sepia-dark);
+    cursor: pointer;
+  }
+
+  .player-modal-bio {
+    font-size: 14px; color: #5a4a3a; line-height: 1.5;
+    margin: 4px 0 0; text-align: left;
+  }
+  .player-modal-instagram {
+    display: inline-flex; align-items: center; gap: 4px;
+    align-self: flex-start;
+    font-size: 14px; color: #6158dd; text-decoration: none;
+    margin-top: 6px;
+  }
+  .player-modal-instagram svg { width: 14px; height: 14px; }
+
+  .player-modal-joined {
+    margin: 6px 0 0; font-size: 12px;
+    color: #a0917a; font-style: italic; text-align: left;
+  }
+
+  /* ─── Fragments collected (carrousel) ─── */
+  .player-modal-fragments {
+    width: 100%;
+    padding: 6px 0;
+  }
+  .player-modal-fragments-title {
+    font-size: 14px; text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8A7B6A;
+    font-weight: 600;
+    padding: 5px 0;
+    margin: 0 30px;
+    text-align: left;
+  }
+  .player-modal-fragments-row {
+    display: flex; gap: 8px;
+    padding: 8px 30px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .player-modal-fragments-row::-webkit-scrollbar { display: none; }
+  .player-modal-fragment-badge {
+    width: 96px; min-height: 130px;
+    padding: 6px;
+    background: rgba(193, 154, 107, 0.15);
+    border-radius: 16px;
+    flex-shrink: 0;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  .player-modal-fragment-badge-img {
+    width: 76px; height: 86px;
+    object-fit: cover; border-radius: 8px;
+  }
+  .player-modal-fragment-name {
+    font-family: var(--font-accent); font-size: 11px;
+    font-weight: 700; text-transform: uppercase;
+    color: #6b5a47; text-align: center;
+    line-height: 1.1;
+    overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; max-width: 84px;
+  }
+
+  /* ─── Tabs ─── */
+  .player-modal-places { width: 100%; margin-top: 14px; text-align: left; }
+  .player-modal-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgb(212, 204, 188);
+    padding-inline: 20px;
+  }
+  .player-modal-tab {
+    background: none; border: none;
+    border-bottom: 3px solid transparent;
+    padding: 6px 14px;
+    font-family: var(--font-title);
+    font-size: 16px; font-weight: 500;
+    color: #a0917a; cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+  .player-modal-tab.active { color: #442e25; border-bottom-color: #8A7B6A; }
+  .player-modal-tabs-number { font-size: 14px; opacity: 0.5; padding-left: 8px; font-family: var(--font-body); font-weight: 700; letter-spacing: 0; }
+
+  /* ════════════════════════════════════════════════════════════════
+     ❖ NOUVELLE SECTION — un lieu = une ligne
+     ════════════════════════════════════════════════════════════════ */
+
+  .places-list { padding: 4px 0 12px; }
+
+  /* ─── Variante A — Photo + métrique latérale ─── */
+  .places-list--a .place-row {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .places-list--a .place-row:last-child { border-bottom: 0; }
+  .places-list--a .place-row:hover { background: rgba(193, 154, 107, 0.08); }
+
+  .places-list--a .place-img {
+    width: 60px; height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(184, 164, 122, 0.18);
+    filter: saturate(0.9);
+  }
+
+  .places-list--a .place-name {
+    font-family: var(--font-accent);
+    font-size: 16px; font-weight: 700;
+    color: #2c1810;
+    line-height: 1.2;
+    margin: 0 0 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .places-list--a .place-tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #8A7B6A;
+    letter-spacing: 0.3px;
+  }
+
+  .places-list--a .place-meta { text-align: right; white-space: nowrap; flex-shrink: 0; }
+  .places-list--a .place-points {
+    font-family: var(--font-title);
+    font-size: 22px;
+    color: var(--color-sepia-dark);
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+  .places-list--a .place-points-unit {
+    display: block;
+    font-family: var(--font-accent);
+    font-size: 10px; font-weight: 600;
+    color: #a0917a;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+  }
+  .places-list--a .place-date {
+    font-family: var(--font-body); font-size: 11px;
+    color: #a0917a; font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* ─── Variante B — Photo + nom dominant ─── */
+  .places-list--b .place-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+  }
+  .places-list--b .place-row:last-child { border-bottom: 0; }
+  .places-list--b .place-row:hover { background: rgba(193, 154, 107, 0.08); }
+
+  .places-list--b .place-img {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #b8a47a;
+    background: rgba(184, 164, 122, 0.18);
+    filter: saturate(0.9);
+  }
+
+  .places-list--b .place-name {
+    font-family: var(--font-accent);
+    font-size: 17px; font-weight: 700;
+    color: #2c1810;
+    line-height: 1.2;
+    margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .places-list--b .place-sub {
+    font-family: var(--font-body); font-size: 12px;
+    color: #8A7B6A;
+    margin-top: 2px;
+  }
+  .places-list--b .place-sub b {
+    font-family: var(--font-title); font-weight: 500;
+    color: var(--color-sepia-dark);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+    margin-right: 3px;
+  }
+  .places-list--b .place-sub .sep { color: #c8b89a; margin: 0 6px; }
+
+  .places-list--b .place-chevron {
+    color: #c19a6b; font-size: 22px; line-height: 1; opacity: 0.5;
+  }
+
+  /* ─── Variante C — Numérique en gros à gauche, photo absente ─── */
+  .places-list--c .place-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+    cursor: pointer;
+  }
+  .places-list--c .place-row:last-child { border-bottom: 0; }
+  .places-list--c .place-row:hover { background: rgba(193, 154, 107, 0.08); }
+
+  .places-list--c .place-num {
+    text-align: right;
+    border-right: 1px solid rgba(193, 154, 107, 0.3);
+    padding-right: 14px;
+  }
+  .places-list--c .place-num-val {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 28px;
+    color: var(--color-sepia-dark);
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+  }
+  .places-list--c .place-num-unit {
+    display: block;
+    font-family: var(--font-accent);
+    font-size: 9px; font-weight: 700;
+    color: #a0917a;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-top: 3px;
+  }
+
+  .places-list--c .place-name {
+    font-family: var(--font-accent);
+    font-size: 16px; font-weight: 700;
+    color: #2c1810;
+    line-height: 1.2;
+    margin: 0 0 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .places-list--c .place-tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #8A7B6A;
+  }
+
+  .places-list--c .place-date {
+    font-family: var(--font-body); font-size: 11px;
+    color: #a0917a; font-style: italic;
+    text-align: right; white-space: nowrap;
+  }
+
+  .doc-foot {
+    max-width: 900px; margin: 50px auto 0;
+    color: #b8a890;
+    font-size: 13px; line-height: 1.7;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(193, 154, 107, 0.2);
+    border-radius: 10px;
+    padding: 18px 24px;
+  }
+  .doc-foot b { color: var(--color-sepia); font-family: var(--font-accent); letter-spacing: 0.05em; }
+  .doc-foot p { margin: 4px 0; }
+</style>
+</head>
+<body>
+
+  <div class="doc-head">
+    <div class="doc-eyebrow">Maquette dans le design réel · explore-web</div>
+    <h1 class="doc-title">Lieux Influencés <span style="color: var(--color-sepia)">·</span> 3 variantes</h1>
+    <div class="doc-lede">
+      Modal profil reproduit à l'identique (typo Bebas Neue / Cabin Condensed / Cabin, palette parchemin).
+      Seule la liste des lieux varie — un lieu = une ligne.
+      Onglet « Influencés » actif (remplace « Veillés »).
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ════════════════════════ VARIANTE A ════════════════════════ -->
+    <div>
+      <div class="card-label">Variante A · Photo carrée + chiffre encadré</div>
+      <div class="player-modal">
+        <button class="player-modal-close">✕</button>
+        <div class="player-modal-header">
+          <div class="player-modal-top">
+            <div class="player-modal-avatar-wrap">
+              <div class="player-modal-avatar">U</div>
+              <div class="player-modal-faction-badge">🌳</div>
+            </div>
+            <div class="player-modal-info">
+              <h2 class="player-modal-name">Olwen le Voyageur</h2>
+              <div class="player-modal-counts">
+                <div class="player-modal-count"><span class="player-modal-count-value">12</span><span class="player-modal-count-label">lieux</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">28</span><span class="player-modal-count-label">visités</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">9</span><span class="player-modal-count-label">influencés</span></div>
+              </div>
+              <div class="player-modal-faction-row">
+                <span class="player-modal-notoriety">🎖️ 1428 Gloire</span>
+              </div>
+              <div class="player-modal-faction-row influence">
+                <span>🏴 12 influence à placer</span>
+                <span>🌟 248 influence placée</span>
+              </div>
+            </div>
+          </div>
+          <div class="player-modal-titles">
+            <span class="title-badge">⚔️ Glorieux Errant</span>
+            <span class="title-badge">🏰 Bâtisseur d'Avalon</span>
+            <span class="title-badge">🌅 Veilleur d'Aube</span>
+            <button class="title-badge title-badge-edit">✏️</button>
+          </div>
+          <p class="player-modal-bio">Marcheur des forêts d'Ouest. Toujours un fragment d'histoire à raconter, toujours une carte à plier.</p>
+          <a href="#" class="player-modal-instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>olwen_le_voyageur</a>
+          <p class="player-modal-joined">Explorateur depuis le 14 mars 2025</p>
+        </div>
+
+        <div class="player-modal-fragments">
+          <p class="player-modal-fragments-title">Fragments collectés</p>
+          <div class="player-modal-fragments-row">
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag1/120/130">
+              <span class="player-modal-fragment-name">Chêne d'Ouest</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag2/120/130">
+              <span class="player-modal-fragment-name">Pierre Levée</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag3/120/130">
+              <span class="player-modal-fragment-name">Cendre d'Or</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-modal-places">
+          <div class="player-modal-tabs">
+            <button class="player-modal-tab">Ajoutés <span class="player-modal-tabs-number">12</span></button>
+            <button class="player-modal-tab">Visités <span class="player-modal-tabs-number">28</span></button>
+            <button class="player-modal-tab active">Influencés <span class="player-modal-tabs-number">9</span></button>
+          </div>
+          <div class="places-list places-list--a">
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/avalon/120/120">
+              <div>
+                <div class="place-name">Le Vieux Chêne d'Avalon</div>
+                <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+              </div>
+              <div class="place-meta">
+                <span class="place-points">428</span>
+                <span class="place-points-unit">points</span>
+                <div class="place-date">il y a 3 j</div>
+              </div>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/brehat/120/120">
+              <div>
+                <div class="place-name">Forteresse de Bréhat</div>
+                <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+              </div>
+              <div class="place-meta">
+                <span class="place-points">312</span>
+                <span class="place-points-unit">points</span>
+                <div class="place-date">il y a 1 sem</div>
+              </div>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/wandrille/120/120">
+              <div>
+                <div class="place-name">Abbaye de Saint-Wandrille</div>
+                <div class="place-tag">Abbaye · Seine-Maritime</div>
+              </div>
+              <div class="place-meta">
+                <span class="place-points">245</span>
+                <span class="place-points-unit">points</span>
+                <div class="place-date">il y a 2 sem</div>
+              </div>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/broceliande/120/120">
+              <div>
+                <div class="place-name">Forêt de Brocéliande</div>
+                <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+              </div>
+              <div class="place-meta">
+                <span class="place-points">187</span>
+                <span class="place-points-unit">points</span>
+                <div class="place-date">il y a 3 sem</div>
+              </div>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/montsm/120/120">
+              <div>
+                <div class="place-name">Mont Saint-Michel</div>
+                <div class="place-tag">Sanctuaire · Manche</div>
+              </div>
+              <div class="place-meta">
+                <span class="place-points">156</span>
+                <span class="place-points-unit">points</span>
+                <div class="place-date">il y a 1 mois</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ VARIANTE B ════════════════════════ -->
+    <div>
+      <div class="card-label">Variante B · Photo ronde + ligne unique compacte</div>
+      <div class="player-modal">
+        <button class="player-modal-close">✕</button>
+        <div class="player-modal-header">
+          <div class="player-modal-top">
+            <div class="player-modal-avatar-wrap">
+              <div class="player-modal-avatar">U</div>
+              <div class="player-modal-faction-badge">🌳</div>
+            </div>
+            <div class="player-modal-info">
+              <h2 class="player-modal-name">Olwen le Voyageur</h2>
+              <div class="player-modal-counts">
+                <div class="player-modal-count"><span class="player-modal-count-value">12</span><span class="player-modal-count-label">lieux</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">28</span><span class="player-modal-count-label">visités</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">9</span><span class="player-modal-count-label">influencés</span></div>
+              </div>
+              <div class="player-modal-faction-row">
+                <span class="player-modal-notoriety">🎖️ 1428 Gloire</span>
+              </div>
+              <div class="player-modal-faction-row influence">
+                <span>🏴 12 influence à placer</span>
+                <span>🌟 248 influence placée</span>
+              </div>
+            </div>
+          </div>
+          <div class="player-modal-titles">
+            <span class="title-badge">⚔️ Glorieux Errant</span>
+            <span class="title-badge">🏰 Bâtisseur d'Avalon</span>
+            <span class="title-badge">🌅 Veilleur d'Aube</span>
+            <button class="title-badge title-badge-edit">✏️</button>
+          </div>
+          <p class="player-modal-bio">Marcheur des forêts d'Ouest. Toujours un fragment d'histoire à raconter, toujours une carte à plier.</p>
+          <a href="#" class="player-modal-instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>olwen_le_voyageur</a>
+          <p class="player-modal-joined">Explorateur depuis le 14 mars 2025</p>
+        </div>
+
+        <div class="player-modal-fragments">
+          <p class="player-modal-fragments-title">Fragments collectés</p>
+          <div class="player-modal-fragments-row">
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag1/120/130">
+              <span class="player-modal-fragment-name">Chêne d'Ouest</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag2/120/130">
+              <span class="player-modal-fragment-name">Pierre Levée</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag3/120/130">
+              <span class="player-modal-fragment-name">Cendre d'Or</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-modal-places">
+          <div class="player-modal-tabs">
+            <button class="player-modal-tab">Ajoutés <span class="player-modal-tabs-number">12</span></button>
+            <button class="player-modal-tab">Visités <span class="player-modal-tabs-number">28</span></button>
+            <button class="player-modal-tab active">Influencés <span class="player-modal-tabs-number">9</span></button>
+          </div>
+          <div class="places-list places-list--b">
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/avalon/120/120">
+              <div>
+                <div class="place-name">Le Vieux Chêne d'Avalon</div>
+                <div class="place-sub"><b>428 pts</b><span class="sep">·</span>Sanctuaire<span class="sep">·</span>il y a 3 j</div>
+              </div>
+              <span class="place-chevron">›</span>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/brehat/120/120">
+              <div>
+                <div class="place-name">Forteresse de Bréhat</div>
+                <div class="place-sub"><b>312 pts</b><span class="sep">·</span>Forteresse<span class="sep">·</span>il y a 1 sem</div>
+              </div>
+              <span class="place-chevron">›</span>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/wandrille/120/120">
+              <div>
+                <div class="place-name">Abbaye de Saint-Wandrille</div>
+                <div class="place-sub"><b>245 pts</b><span class="sep">·</span>Abbaye<span class="sep">·</span>il y a 2 sem</div>
+              </div>
+              <span class="place-chevron">›</span>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/broceliande/120/120">
+              <div>
+                <div class="place-name">Forêt de Brocéliande</div>
+                <div class="place-sub"><b>187 pts</b><span class="sep">·</span>Forêt<span class="sep">·</span>il y a 3 sem</div>
+              </div>
+              <span class="place-chevron">›</span>
+            </div>
+            <div class="place-row">
+              <img class="place-img" src="https://picsum.photos/seed/montsm/120/120">
+              <div>
+                <div class="place-name">Mont Saint-Michel</div>
+                <div class="place-sub"><b>156 pts</b><span class="sep">·</span>Sanctuaire<span class="sep">·</span>il y a 1 mois</div>
+              </div>
+              <span class="place-chevron">›</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ VARIANTE C ════════════════════════ -->
+    <div>
+      <div class="card-label">Variante C · Chiffre dominant à gauche, sans photo</div>
+      <div class="player-modal">
+        <button class="player-modal-close">✕</button>
+        <div class="player-modal-header">
+          <div class="player-modal-top">
+            <div class="player-modal-avatar-wrap">
+              <div class="player-modal-avatar">U</div>
+              <div class="player-modal-faction-badge">🌳</div>
+            </div>
+            <div class="player-modal-info">
+              <h2 class="player-modal-name">Olwen le Voyageur</h2>
+              <div class="player-modal-counts">
+                <div class="player-modal-count"><span class="player-modal-count-value">12</span><span class="player-modal-count-label">lieux</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">28</span><span class="player-modal-count-label">visités</span></div>
+                <div class="player-modal-count"><span class="player-modal-count-value">9</span><span class="player-modal-count-label">influencés</span></div>
+              </div>
+              <div class="player-modal-faction-row">
+                <span class="player-modal-notoriety">🎖️ 1428 Gloire</span>
+              </div>
+              <div class="player-modal-faction-row influence">
+                <span>🏴 12 influence à placer</span>
+                <span>🌟 248 influence placée</span>
+              </div>
+            </div>
+          </div>
+          <div class="player-modal-titles">
+            <span class="title-badge">⚔️ Glorieux Errant</span>
+            <span class="title-badge">🏰 Bâtisseur d'Avalon</span>
+            <span class="title-badge">🌅 Veilleur d'Aube</span>
+            <button class="title-badge title-badge-edit">✏️</button>
+          </div>
+          <p class="player-modal-bio">Marcheur des forêts d'Ouest. Toujours un fragment d'histoire à raconter, toujours une carte à plier.</p>
+          <a href="#" class="player-modal-instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>olwen_le_voyageur</a>
+          <p class="player-modal-joined">Explorateur depuis le 14 mars 2025</p>
+        </div>
+
+        <div class="player-modal-fragments">
+          <p class="player-modal-fragments-title">Fragments collectés</p>
+          <div class="player-modal-fragments-row">
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag1/120/130">
+              <span class="player-modal-fragment-name">Chêne d'Ouest</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag2/120/130">
+              <span class="player-modal-fragment-name">Pierre Levée</span>
+            </div>
+            <div class="player-modal-fragment-badge">
+              <img class="player-modal-fragment-badge-img" src="https://picsum.photos/seed/frag3/120/130">
+              <span class="player-modal-fragment-name">Cendre d'Or</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-modal-places">
+          <div class="player-modal-tabs">
+            <button class="player-modal-tab">Ajoutés <span class="player-modal-tabs-number">12</span></button>
+            <button class="player-modal-tab">Visités <span class="player-modal-tabs-number">28</span></button>
+            <button class="player-modal-tab active">Influencés <span class="player-modal-tabs-number">9</span></button>
+          </div>
+          <div class="places-list places-list--c">
+            <div class="place-row">
+              <div class="place-num"><span class="place-num-val">428</span><span class="place-num-unit">points</span></div>
+              <div>
+                <div class="place-name">Le Vieux Chêne d'Avalon</div>
+                <div class="place-tag">Sanctuaire · Forêt d'Iroise</div>
+              </div>
+              <div class="place-date">il y a 3 j</div>
+            </div>
+            <div class="place-row">
+              <div class="place-num"><span class="place-num-val">312</span><span class="place-num-unit">points</span></div>
+              <div>
+                <div class="place-name">Forteresse de Bréhat</div>
+                <div class="place-tag">Forteresse · Côtes-d'Armor</div>
+              </div>
+              <div class="place-date">il y a 1 sem</div>
+            </div>
+            <div class="place-row">
+              <div class="place-num"><span class="place-num-val">245</span><span class="place-num-unit">points</span></div>
+              <div>
+                <div class="place-name">Abbaye de Saint-Wandrille</div>
+                <div class="place-tag">Abbaye · Seine-Maritime</div>
+              </div>
+              <div class="place-date">il y a 2 sem</div>
+            </div>
+            <div class="place-row">
+              <div class="place-num"><span class="place-num-val">187</span><span class="place-num-unit">points</span></div>
+              <div>
+                <div class="place-name">Forêt de Brocéliande</div>
+                <div class="place-tag">Forêt · Ille-et-Vilaine</div>
+              </div>
+              <div class="place-date">il y a 3 sem</div>
+            </div>
+            <div class="place-row">
+              <div class="place-num"><span class="place-num-val">156</span><span class="place-num-unit">points</span></div>
+              <div>
+                <div class="place-name">Mont Saint-Michel</div>
+                <div class="place-tag">Sanctuaire · Manche</div>
+              </div>
+              <div class="place-date">il y a 1 mois</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="doc-foot">
+    <p><b>A</b> · Photo carrée 60×60 à gauche, métrique en chiffres Bebas Neue à droite. La plus chaleureuse — l'image attire l'œil et différencie chaque ligne d'un coup.</p>
+    <p><b>B</b> · Photo ronde + métriques fusionnées sur une ligne unique avec séparateurs. La plus dense et compacte — on tient plus de lieux à l'écran sans scroll.</p>
+    <p><b>C</b> · Sans photo. Le chiffre Bebas Neue 28px à gauche devient l'ancre visuelle — c'est l'investissement qui parle, pas la photo. Plus érudit, plus tableau de bord.</p>
+  </div>
+
+</body>
+</html>
