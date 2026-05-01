@@ -1,0 +1,66 @@
+.lvlup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  animation: lvlup-fade-in 0.3s ease-out;
+}
+@keyframes lvlup-fade-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+.lvlup-modal {
+  background: radial-gradient(ellipse at top, #3a2818, #1a1612);
+  border: 2px solid #d4a574;
+  padding: 28px 36px;
+  border-radius: 10px;
+  color: #e8dfc8;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(212, 165, 116, 0.3);
+  max-width: 90vw;
+  font-family: 'Alegreya', serif;
+  animation: lvlup-scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes lvlup-scale-in {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.lvlup-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+.lvlup-num {
+  font-size: 48px;
+  font-weight: 700;
+  color: #d4a574;
+  margin: 8px 0;
+  letter-spacing: -1px;
+}
+.lvlup-num span {
+  display: inline-block;
+  min-width: 1.2ch;
+}
+.lvlup-quote {
+  font-size: 15px;
+  font-style: italic;
+  opacity: 0.85;
+  margin: 8px 0 16px;
+  max-width: 380px;
+}
+.lvlup-btn {
+  background: #d4a574;
+  color: #1a1612;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lvlup-btn:hover { background: #e8c890; }
