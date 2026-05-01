@@ -67,6 +67,12 @@ interface PlayerProfile {
   lieuxExplores?: number
   lieuxVeilles?: number
   enigmasSolved?: number
+  /** V0.7 Niveaux — exposés par get_player_profile (mig 045) */
+  level?: number
+  xpTotal?: number
+  xpToNextLevel?: number
+  xpForNextLevel?: number
+  veteranFirstEra?: boolean
   joinedAt: string
   displayedGeneralTitles: TitleInfo[] | null
   factionTitle2: TitleInfo | null
@@ -391,8 +397,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
                   <h2 className="player-modal-name">{profile.name}</h2>
-                  {isSelf && <LevelText level={level} />}
-                  {isSelf && veteranFirstEra && (
+                  <LevelText level={isSelf ? level : (profile.level ?? 1)} />
+                  {(isSelf ? veteranFirstEra : (profile.veteranFirstEra ?? false)) && (
                     <VeteranBadge size="sm" />
                   )}
                   {isSelf && !isEditing && (
@@ -412,24 +418,12 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     Pour les autres : on garde l'ancienne formule profile.glory
                     (exploration_points + erudition_points) jusqu'\u00E0 ce que
                     get_player_profile soit align\u00E9. */}
-                {isSelf && (
-                  <GloryProgressBar
-                    level={level}
-                    xpTotal={xpTotal}
-                    xpToNextLevel={xpToNextLevel}
-                    xpForNextLevel={xpForNextLevel}
-                  />
-                )}
-                {!isSelf && (
-                  <div className="player-modal-faction-row">
-                    <span className="player-modal-notoriety">
-                      {'\uD83C\uDF96\uFE0F'} {profile.glory ?? 0} Gloire
-                      <span style={{ fontSize: '0.75em', opacity: 0.6, marginLeft: 6 }}>
-                        {'(\u00E0 vie)'}
-                      </span>
-                    </span>
-                  </div>
-                )}
+                <GloryProgressBar
+                  level={isSelf ? level : (profile.level ?? 1)}
+                  xpTotal={isSelf ? xpTotal : (profile.xpTotal ?? 0)}
+                  xpToNextLevel={isSelf ? xpToNextLevel : (profile.xpToNextLevel ?? 5)}
+                  xpForNextLevel={isSelf ? xpForNextLevel : (profile.xpForNextLevel ?? 5)}
+                />
                 {isSelf && (
                   <>
                     {coupeState?.myBreakdown && (
