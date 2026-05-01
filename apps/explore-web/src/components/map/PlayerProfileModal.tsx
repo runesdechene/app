@@ -11,6 +11,7 @@ import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { FactionMembersModal } from './FactionMembersModal'
 import { VeteranBadge } from '../profile/VeteranBadge'
 import { GloryProgressBar } from '../profile/GloryProgressBar'
+import { LevelText } from '../profile/LevelText'
 
 interface PlaceCard {
   id: string
@@ -390,20 +391,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
                   <h2 className="player-modal-name">{profile.name}</h2>
-                  {isSelf && (
-                    <span
-                      style={{
-                        fontFamily: "'Alegreya', serif",
-                        color: '#d4a574',
-                        opacity: 0.55,
-                        fontSize: '0.8em',
-                        marginLeft: '12px',
-                        fontWeight: 400,
-                      }}
-                    >
-                      Niveau {level}
-                    </span>
-                  )}
+                  {isSelf && <LevelText level={level} />}
                   {isSelf && veteranFirstEra && (
                     <VeteranBadge size="sm" />
                   )}
