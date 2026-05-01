@@ -430,39 +430,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         </span>
                       </span>
                     </div>
-
-                    {/* Compteurs bruts d\u00E9taill\u00E9s \u2014 informatifs, pour le r\u00E9cit */}
-                    {gloryState && (
-                      <div
-                        className="player-modal-glory-breakdown"
-                        style={{
-                          marginTop: 8,
-                          padding: '8px 12px',
-                          background: 'rgba(244, 232, 200, 0.45)',
-                          border: '1px solid rgba(90, 39, 24, 0.12)',
-                          borderRadius: 8,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 4,
-                          fontSize: 12,
-                          color: '#3d2817',
-                        }}
-                      >
-                        <span>{'\uD83E\uDDED'} {gloryState.lieuxExplores} {'lieux explor\u00E9s'}</span>
-                        <span>
-                          {'\uD83D\uDCD6'} {gloryState.enigmes.total} {'\u00E9nigmes r\u00E9solues'}
-                          {gloryState.enigmes.total > 0 && (
-                            <span style={{ fontSize: '0.9em', opacity: 0.6, marginLeft: 6 }}>
-                              ({gloryState.enigmes.hard} hard \u2022 {gloryState.enigmes.medium} medium \u2022 {gloryState.enigmes.easy + gloryState.enigmes.veryEasy} easy)
-                            </span>
-                          )}
-                        </span>
-                        <span>{'\uD83D\uDCDD'} {gloryState.carnets} {'carnets'}</span>
-                        <span>{'\uD83D\uDCF8'} {gloryState.photos} {'photos'}</span>
-                        <span>{'\uD83D\uDEA9'} {gloryState.plantages} {'plantages'}</span>
-                        <span>{'\uD83C\uDFDB\uFE0F'} {gloryState.lieuxAjoutes} {'lieux ajout\u00E9s'}</span>
-                      </div>
-                    )}
+                    {/* Note : les compteurs bruts d\u00E9taill\u00E9s sont maintenant dans
+                        l'InfoModal de la Gloire (cliquer sur le \uD83C\uDF96\uFE0F depuis la carte
+                        pour voir le calcul ligne par ligne). */}
                   </>
                 )}
               </div>

@@ -70,16 +70,19 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
         <InfoModal
           icon={'🎖️'}
           title={'Gloire'}
-          description={'La Gloire représente votre prestige cumulé depuis le début. Elle est calculée à partir de toutes vos actions de jeu : lieux explorés, énigmes résolues, carnets, photos, plantages de bannière et lieux ajoutés. Même formule que la Coupe des Héritages, mais sur toute votre histoire (pas reboot à chaque saison).'}
+          description={'La Gloire récompense vos actions de jeu, cumulée depuis le début. Voici le détail de votre score, action par action.'}
           rows={
             glory ? [
-              { label: 'Gloire totale',     value: `${glory.glory} pts`,                  highlight: true },
-              { label: 'Lieux explorés',    value: `${glory.lieuxExplores}` },
-              { label: 'Énigmes résolues',  value: `${glory.enigmes.total} (${glory.enigmes.hard} hard • ${glory.enigmes.medium} medium • ${glory.enigmes.easy + glory.enigmes.veryEasy} easy)` },
-              { label: 'Carnets écrits',    value: `${glory.carnets}` },
-              { label: 'Photos ajoutées',   value: `${glory.photos}` },
-              { label: 'Plantages',         value: `${glory.plantages}` },
-              { label: 'Lieux ajoutés',     value: `${glory.lieuxAjoutes}` },
+              { label: 'Lieux explorés',    value: `${glory.lieuxExplores} × 1 = ${glory.lieuxExplores} pts` },
+              {
+                label: `Énigmes résolues${glory.enigmes.total > 0 ? ` (${glory.enigmes.hard}h • ${glory.enigmes.medium}m • ${glory.enigmes.easy + glory.enigmes.veryEasy}e)` : ''}`,
+                value: `${glory.enigmes.total} × 1 = ${glory.enigmes.total} pts`,
+              },
+              { label: 'Photos ajoutées',   value: `${glory.photos} × 1 = ${glory.photos} pts` },
+              { label: 'Carnets écrits',    value: `${glory.carnets} × 3 = ${glory.carnets * 3} pts` },
+              { label: 'Plantages',         value: `${glory.plantages} × 5 = ${glory.plantages * 5} pts` },
+              { label: 'Lieux ajoutés',     value: `${glory.lieuxAjoutes} × 7 = ${glory.lieuxAjoutes * 7} pts` },
+              { label: 'Gloire totale',     value: `${glory.glory} pts`, highlight: true },
             ] : [
               { label: 'Gloire totale', value: `${displayGlory} pts`, highlight: true },
             ]
