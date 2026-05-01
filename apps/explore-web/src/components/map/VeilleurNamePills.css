@@ -1,18 +1,21 @@
-/* V0.7 — Pilule sépia signature du veilleur, sous l'icône du lieu.
-   Mode Coupe des Héritages uniquement. */
+/* V0.7 — Pilule signée avatar + nom du veilleur, sous l'icône du lieu.
+   Mode Coupe des Héritages uniquement. Style parchemin doux, brun, élégant. */
+
 .veilleur-name-pill {
-  display: inline-block;
-  padding: 3px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 4px;
   border-radius: 999px;
-  background: #d8b88a;        /* sépia clair, ton parchemin chaud */
-  color: #3a2614;              /* brun encre */
-  font-size: 12px;
-  font-weight: 600;
+  background: #f3e3c5;            /* parchemin clair */
+  color: #5a2718;                  /* bordeaux/brun encre */
   font-family: var(--font-accent, 'Open Sans'), serif;
-  letter-spacing: 0.02em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   white-space: nowrap;
-  border: 1px solid #a07a45;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid #b8895a;
+  box-shadow: 0 2px 5px rgba(60, 30, 10, 0.25);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   pointer-events: auto;
@@ -21,5 +24,23 @@
 
 .veilleur-name-pill:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 8px rgba(60, 30, 10, 0.35);
+}
+
+/* Avatar à gauche, légèrement débordant */
+.veilleur-name-pill-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #b8895a;
+  background: #1f1812;
+  margin-left: -2px;             /* léger débord style notification iPhone */
+  flex-shrink: 0;
+  display: block;
+}
+
+.veilleur-name-pill-text {
+  line-height: 1;
+  padding-top: 1px;              /* compensation visuelle du baseline */
 }

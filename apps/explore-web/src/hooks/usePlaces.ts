@@ -62,6 +62,8 @@ export interface PlaceProperties {
   influenceByFaction: Record<string, number>
   /** V0.7 — nom du veilleur principal du lieu (vide si pas veillé) */
   veilleurName: string
+  /** V0.7 — avatar URL du veilleur principal (vide si pas veillé) */
+  veilleurAvatarUrl: string
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -167,7 +169,8 @@ export function usePlaces() {
               influenceByFaction: place.influenceByFaction ?? {},
               discovered: false, // sera enrichi par le useMemo
               ownFaction: false, // sera enrichi par le useMemo
-              veilleurName: '',  // sera enrichi par le useMemo via placeOverrides
+              veilleurName: '',          // sera enrichi par les placeOverrides (loadInitialVeilles)
+              veilleurAvatarUrl: '',     // idem
             },
           })),
       }

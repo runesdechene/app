@@ -10,6 +10,8 @@ interface PlaceOverride {
   fortificationLevel?: number
   /** V0.7 — nom du veilleur principal (lead member) du lieu, pour le rendu carte */
   veilleurName?: string
+  /** V0.7 — avatar URL du veilleur principal, pour la pilule signée carte */
+  veilleurAvatarUrl?: string
 }
 
 export interface TerritorySelection {

@@ -41,13 +41,19 @@ export async function loadInitialVeilles(): Promise<void> {
 
   const veilles = (veillesData as MapVeille[] | null) ?? []
   for (const v of veilles) {
-    const veilleurName = v.members[0]?.displayName?.trim() || undefined
-    pushVeilleOverride(v.placeId, v.factionId, v.isNeutral, veilleurName)
+    const lead = v.members[0]
+    pushVeilleOverride(
+      v.placeId,
+      v.factionId,
+      v.isNeutral,
+      lead?.displayName?.trim() || undefined,
+      lead?.avatarUrl || undefined,
+    )
   }
 }
 
 /**
- * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu + nom veilleur).
+ * Push une veille en override sur le mapStore (couleur territoire + emblème par lieu + nom + avatar veilleur).
  * À appeler après chaque plant_flag réussi pour rafraîchir la carte instantanément.
  */
 export function pushVeilleOverride(
@@ -55,6 +61,7 @@ export function pushVeilleOverride(
   factionId: string | null,
   isNeutral: boolean,
   veilleurName?: string,
+  veilleurAvatarUrl?: string,
 ): void {
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.
   if (!factionsLoaded) {
@@ -75,5 +82,6 @@ export function pushVeilleOverride(
     tagColor,
     factionPattern,
     veilleurName,
+    veilleurAvatarUrl,
   })
 }

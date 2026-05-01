@@ -57,8 +57,14 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       setErrorMsg(msg)
       return
     }
-    const veilleurName = result.members[0]?.displayName?.trim() || undefined
-    pushVeilleOverride(placeId, result.factionId, result.isNeutral, veilleurName)
+    const lead = result.members[0]
+    pushVeilleOverride(
+      placeId,
+      result.factionId,
+      result.isNeutral,
+      lead?.displayName?.trim() || undefined,
+      lead?.avatarUrl || undefined,
+    )
     await refresh()
   }, [userId, userPosition, plant, refresh, placeId])
 
