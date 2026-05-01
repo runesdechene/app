@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, placeVeilleEmblemLayer, buildTerritoryHoverLabelLayer,
+  fortBadgeLayer, placeVeilleEmblemLayer, veilleurNameLayer, buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -668,6 +668,7 @@ export const ExploreMap = memo(function ExploreMap() {
           }
           if (ov.factionPattern !== undefined) props.factionPattern = ov.factionPattern
           if (ov.score !== undefined) props.score = ov.score
+          if (ov.veilleurName !== undefined) props.veilleurName = ov.veilleurName
         }
         // Mode "Coupe des Héritages" : carte sépia + icônes encre brune + anneau couleur faction dominante.
         // L'emblème territoire reste l'indicateur principal de faction.
@@ -776,9 +777,11 @@ export const ExploreMap = memo(function ExploreMap() {
           <Layer {...undiscoveredIconFinal} />
           <Layer {...pointLayer} />
           <Layer {...iconLayer} />
-          {/* V0.7 — emblème faction sur chaque lieu veillé, visible UNIQUEMENT en mode
-              Coupe des Héritages (factionColorMode). Sinon : carte "neutre", focus sur les lieux. */}
+          {/* V0.7 — Mode Coupe des Héritages ON : emblème faction par lieu (vue stratège tribale) */}
           {factionColorMode && <Layer {...placeVeilleEmblemLayer} />}
+          {/* V0.7 — Mode default (Coupe OFF) : nom du veilleur posé en signature
+              (vue humaine — qui possède quoi sans tomber dans le tribal) */}
+          {!factionColorMode && <Layer {...veilleurNameLayer} />}
           <Layer {...fortBadgeLayer} />
         </Source>
       )}

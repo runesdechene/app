@@ -100,6 +100,43 @@ export const fortBadgeLayer: LayerSpecification = {
   },
 }
 
+/** V0.7 — Nom du veilleur en signature posée sur le lieu veillé.
+ *  Mode "humain" par défaut (factionColorMode OFF) : on voit QUI veille, pas QUELLE faction.
+ *  Texte en bannière sobre, halo de la couleur du veilleur (info faction passive sans crier).
+ *  Filter : veilleurName non vide + discovered. Visible à zoom >= 8 pour éviter le clutter. */
+export const veilleurNameLayer: LayerSpecification = {
+  id: 'place-veilleur-name',
+  type: 'symbol',
+  source: 'places',
+  minzoom: 8,
+  filter: ['all',
+    ['!=', ['get', 'veilleurName'], ''],
+    ['==', ['get', 'discovered'], true],
+  ],
+  layout: {
+    'text-field': ['get', 'veilleurName'],
+    'text-font': ['Open Sans Bold'],
+    'text-size': [
+      'interpolate', ['linear'], ['zoom'],
+      8, 10,
+      11, 12,
+      14, 14,
+    ],
+    'text-anchor': 'top-left',
+    'text-offset': [0.6, 0.3],
+    'text-allow-overlap': false,
+    'text-ignore-placement': false,
+    'text-letter-spacing': 0.04,
+  },
+  paint: {
+    'text-color': '#f5e9d0',
+    'text-halo-color': ['get', 'tagColor'],
+    'text-halo-width': 2.5,
+    'text-halo-blur': 0.5,
+    'text-opacity': 0.95,
+  },
+}
+
 /** V0.7 — Emblème faction posé sur CHAQUE lieu veillé, à TOUS les zooms.
  *  Petit symbole décalé en haut-droite du point GPS du lieu. Filter : factionPattern
  *  non vide (= lieu veillé V0.7), discovered (pas sur les lieux fogged).

@@ -60,6 +60,8 @@ export interface PlaceProperties {
   ownFaction: boolean
   totalInfluence: number
   influenceByFaction: Record<string, number>
+  /** V0.7 — nom du veilleur principal du lieu (vide si pas veillé) */
+  veilleurName: string
 }
 
 export type PlacesGeoJSON = FeatureCollection<Point, PlaceProperties>
@@ -165,6 +167,7 @@ export function usePlaces() {
               influenceByFaction: place.influenceByFaction ?? {},
               discovered: false, // sera enrichi par le useMemo
               ownFaction: false, // sera enrichi par le useMemo
+              veilleurName: '',  // sera enrichi par le useMemo via placeOverrides
             },
           })),
       }

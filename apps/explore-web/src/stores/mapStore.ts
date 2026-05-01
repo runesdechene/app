@@ -8,6 +8,8 @@ interface PlaceOverride {
   factionId?: string
   factionPattern?: string
   fortificationLevel?: number
+  /** V0.7 — nom du veilleur principal (lead member) du lieu, pour le rendu carte */
+  veilleurName?: string
 }
 
 export interface TerritorySelection {
