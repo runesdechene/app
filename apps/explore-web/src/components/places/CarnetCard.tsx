@@ -35,9 +35,7 @@ interface CarnetCardProps {
   onDelete?: () => void
 }
 
-const RANK_POINTS = [20, 10, 5]
-
-export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, permanentInfluence, onVoted, onPhotoOpen, onEdit, onDelete }: CarnetCardProps) {
+export function CarnetCard({ carnet, isTop, factionColor, factionSvg, onVoted, onPhotoOpen, onEdit, onDelete }: CarnetCardProps) {
   const userId = usePlayerStore(s => s.userId)
   const [voting, setVoting] = useState(false)
   const [liked, setLiked] = useState(false)
@@ -56,8 +54,6 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, perm
         if (data?.vote === 1) setLiked(true)
       })
   }, [userId, carnet.id, carnet.userId])
-
-  const rankPoints = RANK_POINTS[rank - 1] ?? 2
 
   async function toggleLike() {
     if (!userId || voting) return
@@ -186,22 +182,14 @@ export function CarnetCard({ carnet, isTop, rank, factionColor, factionSvg, perm
         <span className="carnet-date">{timeAgo}</span>
       </div>
 
-      {/* Influence badge — basé sur le classement par likes */}
-      <div className="carnet-influence-line">
-        <span className="carnet-influence-badge">
-          📜 +{rankPoints} influence permanente
-        </span>
-        {permanentInfluence != null && permanentInfluence > 0 && isTop && (
-          <span className="carnet-influence-badge carnet-influence-badge-gps">
-            🧭 +{permanentInfluence} explorateur GPS
-          </span>
-        )}
-        {isTop && (
+      {/* Statut récit (sans les badges influence legacy V0.5 retirés 2026-05-02) */}
+      {isTop && (
+        <div className="carnet-influence-line">
           <span className="carnet-influence-breakdown" style={{ fontWeight: 600 }}>
             {localVotesUp > 0 ? 'Récit le plus aimé' : 'Récit plébiscité'}
           </span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

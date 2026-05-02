@@ -259,6 +259,22 @@ export function AddPlaceFlow() {
       const placeId = data.placeId as string
       if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 
+      // Auto-veille : si on a ajouté le lieu sur place GPS, on en devient
+      // automatiquement le veilleur. Pas de PERFORM côté SQL — on appelle
+      // plant_flag depuis le client après le succès de create_place pour ne
+      // pas coupler les deux RPCs (un échec de plant_flag ne doit pas casser
+      // create_place — décision Uriel 2026-05-02).
+      if (data.isGps && userPosition) {
+        const { error: plantErr } = await supabase.rpc('plant_flag', {
+          p_user_id: userId,
+          p_place_id: placeId,
+          p_user_lat: userPosition.lat,
+          p_user_lng: userPosition.lng,
+          p_partners_user_ids: [],
+        })
+        if (plantErr) console.warn('[AddPlaceFlow] auto plant_flag failed', plantErr)
+      }
+
       // 3. Si plusieurs tags, insérer les tags secondaires
       if (selectedTagIds.length > 1) {
         const secondaryTags = selectedTagIds.slice(1).map(tagId => ({
@@ -599,16 +615,14 @@ export function AddPlaceFlow() {
                   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.5
                 })()
               : false
-            const hasText = description.trim().length > 0
             return (
               <div className="add-place-rewards">
                 <p className="add-place-rewards-title">{isOnSite ? '🎯 Vous êtes sur place !' : '📍 Ajout à distance'}</p>
                 <div className="add-place-rewards-list">
-                  {isOnSite && <span className="add-place-reward add-place-reward-bonus">🏴 +30 influence permanente (bonus sur place)</span>}
+                  {isOnSite && <span className="add-place-reward add-place-reward-bonus">🏴 Vous devenez veilleur du lieu</span>}
                   {isOnSite && <span className="add-place-reward">🧭 +15 exploration (5 base + 10 GPS)</span>}
                   {!isOnSite && <span className="add-place-reward">🧭 +5 exploration</span>}
-                  {hasText && <span className="add-place-reward">📖 +20 influence permanente (récit)</span>}
-                  {!isOnSite && <span className="add-place-reward add-place-reward-hint">💡 Rendez-vous sur place pour 30 pts d'influence permanente !</span>}
+                  {!isOnSite && <span className="add-place-reward add-place-reward-hint">💡 Rendez-vous sur place pour devenir veilleur du lieu !</span>}
                 </div>
               </div>
             )
