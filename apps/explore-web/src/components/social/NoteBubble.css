@@ -3,7 +3,7 @@
   border: 1px solid #c8a874;
   border-radius: 16px;
   padding: 8px 14px;
-  min-width: 200px;
+  width: max-content;
   max-width: 320px;
   font-family: var(--font-signature);
   font-size: 13px;
