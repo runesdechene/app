@@ -24,6 +24,8 @@ const ICONS: Record<GameToastType['type'], string> = {
   // V0.7 ajouts
   plant_flag: '\uD83D\uDEA9',     // drapeau rouge (\u00E9tendard plant\u00E9)
   harvest_crown: '\uD83E\uDE99',  // pi\u00E8ce (Couronne r\u00E9colt\u00E9e)
+  // V0.7+ mini-qu\u00EAtes journali\u00E8res
+  quest_completed: '\uD83C\uDFAF', // cible (qu\u00EAte accomplie)
 }
 
 function formatTimeAgo(ts: number): string {

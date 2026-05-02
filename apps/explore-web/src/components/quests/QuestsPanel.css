@@ -1,0 +1,79 @@
+.quests-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.55);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.quests-panel {
+  background: #fdf3d6;
+  border: 1px solid #c8a874;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  color: #3a2a1a;
+}
+
+.quests-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(120, 90, 40, 0.18);
+}
+
+.quests-panel__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quests-panel__title {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  color: #5a3a1a;
+}
+
+.quests-panel__date {
+  font-size: 13px;
+  color: #7a4a1a;
+  opacity: 0.85;
+  text-transform: capitalize;
+}
+
+.quests-panel__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #7a4a1a;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+}
+
+.quests-panel__body {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quests-panel__footer {
+  padding: 10px 18px;
+  border-top: 1px solid rgba(120, 90, 40, 0.1);
+  font-size: 12px;
+  color: #7a4a1a;
+  text-align: center;
+  opacity: 0.85;
+}

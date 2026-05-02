@@ -23,6 +23,7 @@ import { useAuth } from '../hooks/useAuth'
 import { usePlayer } from '../hooks/usePlayer'
 import { usePresence } from '../hooks/usePresence'
 import { useBrouillagePistes } from '../hooks/useBrouillagePistes'
+import { useTimezoneSync } from '../hooks/useTimezoneSync'
 import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
@@ -160,6 +161,8 @@ export default function MapPage() {
   usePresence()
   // V0.7+ Brouillage GPS — calcule la position floutée publiée aux autres
   useBrouillagePistes()
+  // V0.7+ Mini-quêtes journalières — sync timezone du device pour le reset minuit local
+  useTimezoneSync()
   // Chat en jeu
   useChat()
   useNotifications()

@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { useToastStore } from '../../stores/toastStore'
 import { useChatStore } from '../../stores/chatStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useUserQuests } from '../../hooks/useUserQuests'
+import { QuestsPanel } from '../quests/QuestsPanel'
 
 export function MobileNavbar() {
+  const [questsOpen, setQuestsOpen] = useState(false)
+  const { quests, loading: questsLoading } = useUserQuests()
+  const incompleteQuests = quests.filter(q => !q.completed).length
   const activePanel = useMobileNavStore(s => s.activePanel)
   const togglePanel = useMobileNavStore(s => s.togglePanel)
   const closePanel = useMobileNavStore(s => s.closePanel)
@@ -70,6 +76,24 @@ export function MobileNavbar() {
         <span className="mobile-nav-label">Activite</span>
       </button>
 
+      {/* V0.7+ Quêtes du jour */}
+      <button
+        className={`mobile-nav-item${questsOpen ? ' active' : ''}`}
+        onClick={() => {
+          // Ferme tout panneau ouvert avant
+          closePanel()
+          useMapStore.getState().setSelectedPlayerId(null)
+          setQuestsOpen(true)
+        }}
+        aria-label="Quêtes du jour"
+      >
+        <span className="mobile-nav-icon">📜</span>
+        {incompleteQuests > 0 && (
+          <span className="mobile-nav-badge">{incompleteQuests}</span>
+        )}
+        <span className="mobile-nav-label">Quêtes</span>
+      </button>
+
       {/* Chat */}
       <button
         className={`mobile-nav-item${activePanel === 'chat' ? ' active' : ''}`}
@@ -96,6 +120,12 @@ export function MobileNavbar() {
         )}
         <span className="mobile-nav-label">Profil</span>
       </button>
+      <QuestsPanel
+        isOpen={questsOpen}
+        onClose={() => setQuestsOpen(false)}
+        quests={quests}
+        loading={questsLoading}
+      />
     </nav>
   )
 }
