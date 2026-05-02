@@ -1074,6 +1074,7 @@ function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
       <h3 className="player-modal-section-title">
         {emoji} {titleText} <span className="player-modal-section-count">{places.length}</span>
       </h3>
+      <div className="player-modal-places-wrapper">
       <div className="player-modal-places-row">
         {visible.map(place => (
           <button
@@ -1098,6 +1099,7 @@ function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
             <span className="player-modal-place-tile-name">Voir tout</span>
           </button>
         )}
+      </div>
       </div>
     </div>
   )

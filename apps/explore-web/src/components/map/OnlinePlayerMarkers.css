@@ -1103,16 +1103,26 @@
   opacity: 0.8;
 }
 
-/* Padding horizontal 30 px = aligné sur le titre `.player-modal-section-title`
-   (qui a margin-inline 30 px). La row prend toute la largeur → scroll libre. */
+/* Wrapper en flex (copie du `.player-modal-fragments-wrapper`) → fournit le
+   contexte flex où la row peut prendre `flex: 1` et donc toute la largeur. */
+.player-modal-places-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Strict copy de `.player-modal-fragments-row` (qui marche). */
 .player-modal-places-row {
   display: flex;
+  align-items: center;
   gap: 10px;
+  flex-wrap: nowrap;
   overflow-x: auto;
-  scroll-snap-type: x proximity;
-  padding: 4px 30px 8px;
+  flex: 1;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  padding: 4px 30px 8px;
 }
 .player-modal-places-row::-webkit-scrollbar {
   height: 4px;
