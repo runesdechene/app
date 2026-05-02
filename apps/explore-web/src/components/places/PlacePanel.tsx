@@ -838,14 +838,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             ))}
             {/* V0.7 — Veillé par {nom du veilleur principal}, dans la couleur de sa faction.
                 Remplace l'ancien "Sous l'influence de la {faction}" (legacy V0.5).
+                Layout : [svg-faction] Veillé par {nom} [avatar-round].
                 Source : placeOverride (peuplé par loadInitialVeilles / pushVeilleOverride). */}
             {placeOverride?.veilleurName && placeOverride?.veilleurUserId && (() => {
               const factionId = placeOverride.factionId
               const fc = (factionId && factionColors.get(factionId)) ?? placeOverride.tagColor ?? '#8A7B6A'
               const svg = factionId ? factionSvgs.get(factionId) : undefined
+              const avatar = placeOverride.veilleurAvatarUrl
+              const initial = placeOverride.veilleurName.charAt(0).toUpperCase()
               return (
                 <span
-                  className="place-tag place-tag-faction"
+                  className="place-tag place-tag-faction place-tag-veilleur"
                   style={{ backgroundColor: `${fc}20`, color: fc, cursor: 'pointer' }}
                   onClick={() => useMapStore.getState().setSelectedPlayerId(placeOverride.veilleurUserId!)}
                   title={`Voir le profil de ${placeOverride.veilleurName}`}
@@ -860,8 +863,25 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                       }}
                     />
                   )}
-                  Veillé par {placeOverride.veilleurName}
-                  {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
+                  <span className="place-tag-veilleur-text">
+                    Veillé par {placeOverride.veilleurName}
+                    {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
+                  </span>
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt=""
+                      className="place-tag-veilleur-avatar"
+                      style={{ borderColor: fc }}
+                    />
+                  ) : (
+                    <span
+                      className="place-tag-veilleur-avatar place-tag-veilleur-avatar-fallback"
+                      style={{ background: fc, borderColor: fc }}
+                    >
+                      {initial}
+                    </span>
+                  )}
                 </span>
               )
             })()}

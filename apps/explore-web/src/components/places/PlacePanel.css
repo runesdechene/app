@@ -218,6 +218,37 @@
   mask-position: center;
 }
 
+/* Pilule "Veillé par {nom}" — V0.7+ : icône faction à gauche, nom au centre,
+   avatar du veilleur à droite dans un rond bordé de la couleur faction. */
+.place-tag-veilleur {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 10px;
+}
+.place-tag-veilleur-text {
+  display: inline-block;
+  line-height: 1.2;
+}
+.place-tag-veilleur-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid;
+  background: rgba(255, 255, 255, 0.5);
+}
+.place-tag-veilleur-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-accent, 'Cinzel', serif);
+}
+
 /* Title actions (bookmark + gear, right of title) */
 .place-title-actions {
   display: flex;
