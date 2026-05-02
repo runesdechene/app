@@ -45,8 +45,8 @@ ECO Merveille est un festival où Runes de Chêne sera présent dans ~10 jours. 
 
 ### 3.2 Logique
 
-- **Si activé** : la position aléatoire est calculée **une seule fois au lancement de l'app** (login ou ouverture d'une session active). Elle reste **fixée pendant toute la session** — pas de recalcul à chaque update GPS. L'avatar reste donc à un endroit stable de 50 km autour du joueur, plus crédible et moins désagréable visuellement.
-- **Si désactivé** : position GPS réelle, mise à jour normalement comme aujourd'hui.
+- **Si activé** : la position aléatoire **publique** (celle exposée aux autres veilleurs) est calculée **une seule fois au lancement de l'app** (login ou ouverture d'une session active). Elle reste **fixée pendant toute la session** — pas de recalcul à chaque update GPS. Pour les autres, l'avatar reste donc à un endroit stable de 50 km autour du joueur, plus crédible et moins désagréable visuellement. **Pour soi, on continue de voir sa vraie position GPS** (cf. §3.5).
+- **Si désactivé** : position GPS réelle, mise à jour normalement comme aujourd'hui (visible par tous, soi inclus).
 - **Si l'utilisateur active/désactive en cours de session** : effet immédiat — un nouveau tirage aléatoire est fait au moment du toggle. Cette nouvelle position floutée est ensuite stable jusqu'à la prochaine relance.
 - **Si l'utilisateur n'a pas autorisé le GPS** : pas de position publique du tout — il n'apparaît pas sur la carte. La modale de son profil reste accessible mais sans indication de position. Important pour ECO Merveille où beaucoup s'inscrivent au stand sans avoir encore activé la géoloc.
 
@@ -73,9 +73,22 @@ Nouvelle colonne sur `users` :
 ALTER TABLE users ADD COLUMN brouiller_pistes boolean NOT NULL DEFAULT true;
 ```
 
-La position GPS *réelle* du joueur (pour la fonctionnalité GPS de découverte de lieux) reste stockée privée et utilisée uniquement pour les vérifications GPS — non exposée aux autres joueurs.
+La position GPS *réelle* du joueur (pour la fonctionnalité GPS de découverte de lieux **et pour son propre affichage carte**, cf. §3.5) reste stockée privée et utilisée uniquement côté client — non exposée aux autres joueurs en DB publique.
 
-La **position publique** affichée (en propre ou floutée) est calculée au moment de l'envoi et stockée dans la colonne existante de position publique (à confirmer : `users.last_known_lat/lng` ou équivalent — à vérifier dans le code lors du dev).
+La **position publique** (réelle si toggle off, floutée si toggle on) est calculée au moment de l'envoi et stockée dans la colonne existante de position publique (à confirmer : `users.last_known_lat/lng` ou équivalent — à vérifier dans le code lors du dev). Cette colonne est ce que les **autres** voyageurs lisent.
+
+### 3.5 Asymétrie soi / autres (décision Uriel 2026-05-02)
+
+**Règle fondatrice** : le brouillage GPS s'applique **uniquement à ce que les autres voient**. Pour soi-même, on affiche toujours sa **position GPS réelle**, la plus précise possible.
+
+Conséquences techniques :
+
+- **Frontend — mon avatar sur ma carte** : utilise toujours la position GPS du device (Geolocation API navigateur), **jamais** la position publique du serveur. C'est ma vraie position, peu importe l'état du toggle.
+- **Frontend — avatars des autres** : utilise la position publique lue depuis le serveur (qui est floutée si leur toggle est on, réelle sinon).
+- **Backend — RPC `update_user_position`** : reçoit la vraie position du device, la stocke dans la colonne publique en l'ayant floutée si `brouiller_pistes = true`. Ne renvoie **rien** au client appelant pour son propre affichage (le client garde sa vraie position locale).
+- **Cas multi-device** : si je suis connecté sur 2 devices, chaque device affiche **sa propre** position GPS locale pour mon avatar. Pas de synchro inutile.
+
+**Justification (Uriel)** : *« Le brouillage GPS ça doit être pour les autres. Pour soi, on doit toujours avoir la position affichée la plus précise. »* — UX cohérente, le joueur voit ce qu'il sait être vrai (sa vraie position) sans subir le flou qu'il a choisi de présenter aux autres.
 
 ---
 
