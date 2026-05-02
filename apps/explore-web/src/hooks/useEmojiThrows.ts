@@ -73,41 +73,31 @@ export function useEmojiThrows() {
   }, [userId, isMuted])
 
   const throwEmoji = useCallback(async (toUserId: string, emoji: string) => {
-    if (!userId) { console.warn('[throwEmoji] aborted: no userId'); return }
-    if (!isAllowedEmoji(emoji)) { console.warn('[throwEmoji] aborted: emoji not in frontend bank', emoji); return }
+    if (!userId) return
+    if (!isAllowedEmoji(emoji)) return
     const now = Date.now()
-    if (now - lastThrowAtRef.current < CLIENT_THROTTLE_MS) {
-      console.warn('[throwEmoji] aborted: throttle', now - lastThrowAtRef.current, 'ms since last')
-      return
-    }
+    if (now - lastThrowAtRef.current < CLIENT_THROTTLE_MS) return
     lastThrowAtRef.current = now
 
     // Validation serveur (whitelist) — loud sur erreur, sinon le clic est silencieusement perdu.
     const { error } = await supabase.rpc('validate_emoji_throw', { p_emoji: emoji })
     if (error) {
-      console.error('[throwEmoji] validate_emoji_throw RPC failed', { emoji, error })
+      console.warn('[throwEmoji] validate_emoji_throw RPC failed', error)
       return
     }
 
     // Broadcast aux autres
     if (channelRef.current && channelRef.current.state === 'joined') {
-      const result = await channelRef.current.send({
+      await channelRef.current.send({
         type: 'broadcast',
         event: 'throw',
         payload: { from: userId, to: toUserId, emoji },
-      })
-      console.info('[throwEmoji] broadcast sent', { emoji, toUserId, result })
-    } else {
-      console.warn('[throwEmoji] channel not joined, broadcast skipped', {
-        hasChannel: !!channelRef.current,
-        state: channelRef.current?.state,
       })
     }
 
     // Affichage local immédiat (optimiste — broadcast self:false donc pas de doublon)
     setFlying(prev => {
       if (prev.length >= MAX_CONCURRENT) return prev
-      console.info('[throwEmoji] adding to flying', { emoji, currentLen: prev.length })
       return [...prev, {
         id: `${userId}-${toUserId}-${Date.now()}-${Math.random()}`,
         fromUserId: userId,
