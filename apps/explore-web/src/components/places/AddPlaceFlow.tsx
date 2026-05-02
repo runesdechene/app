@@ -242,8 +242,9 @@ export function AddPlaceFlow() {
         return
       }
 
-      if (data?.error === 'level_too_low') {
-        setError(`Tu dois être au moins niveau ${(data as { requiredLevel: number }).requiredLevel} pour cartographier un lieu (tu es niveau ${(data as { currentLevel: number }).currentLevel}).`)
+      if (data?.error === 'not_enough_discoveries') {
+        const d = data as { requiredDiscoveries: number; currentDiscoveries: number }
+        setError(`Tu dois avoir découvert au moins ${d.requiredDiscoveries} lieux pour cartographier (tu en as ${d.currentDiscoveries}).`)
         setStep('form')
         return
       }

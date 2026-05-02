@@ -48,7 +48,6 @@ import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
 import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
-import { xpForLevel } from '../lib/levelCalc'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -145,17 +144,13 @@ export default function MapPage() {
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
-  // Le FAB "+" n'est visible que si un titre débloqué contient 'add_place'
-  const unlockedTitles = usePlayerStore(s => s.unlockedGeneralTitles)
-  const factionTitle = usePlayerStore(s => s.factionTitle2)
-  const canAddPlace = unlockedTitles.some(t => t.unlocks?.includes('add_place'))
-    || (factionTitle?.unlocks?.includes('add_place') ?? false)
-
-  // Gating niveau 3 pour Cartographier
-  const playerLevel = usePlayerStore(s => s.level)
-  const playerXpTotal = usePlayerStore(s => s.xpTotal)
-  const canAddPlaceByLevel = playerLevel >= 3
-  const xpNeededForLevel3 = Math.max(0, xpForLevel(3) - playerXpTotal)
+  // Gating Cartographier : 3 lieux découverts (décision Uriel 2026-05-02 — règle simple,
+  // indépendante du système de niveaux/quêtes). Le titre "Explorateur" reste un titre de
+  // profil mais ne gate plus l'ajout de lieu.
+  const discoveriesCount = usePlayerStore(s => s.discoveredIds.size)
+  const MIN_DISCOVERIES_FOR_ADD_PLACE = 3
+  const canAddPlace = discoveriesCount >= MIN_DISCOVERIES_FOR_ADD_PLACE
+  const discoveriesNeeded = Math.max(0, MIN_DISCOVERIES_FOR_ADD_PLACE - discoveriesCount)
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   usePlayer()
@@ -362,12 +357,12 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* FAB Ajouter un lieu — toujours visible, verrouille si niveau < 3 ou pas le titre */}
+      {/* FAB Ajouter un lieu — verrouillé si moins de 3 lieux découverts */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
-          className={`add-place-fab ${(!canAddPlaceByLevel || !canAddPlace) ? 'locked' : ''}`}
+          className={`add-place-fab ${!canAddPlace ? 'locked' : ''}`}
           onClick={() => {
-            if (!canAddPlaceByLevel || !canAddPlace) {
+            if (!canAddPlace) {
               setShowAddPlaceInfo(true)
             } else {
               setAddPlaceMode(true)
@@ -375,32 +370,19 @@ export default function MapPage() {
           }}
           aria-label="Ajouter un lieu"
         >
-          {(!canAddPlaceByLevel || !canAddPlace) ? '🔒' : '+'}
+          {!canAddPlace ? '🔒' : '+'}
         </button>
       )}
 
-      {/* Info modal ajout de lieu */}
-      {showAddPlaceInfo && !canAddPlaceByLevel && (
+      {showAddPlaceInfo && !canAddPlace && (
         <InfoModal
           icon="🗺️"
           title="Cartographier"
-          description={`L'ajout de lieux est réservé aux Veilleurs de niveau 3 et plus. Continue d'explorer pour le débloquer.`}
+          description={`Pour ajouter un lieu sur la carte, découvre d'abord ${MIN_DISCOVERIES_FOR_ADD_PLACE} lieux. Continue d'explorer pour le débloquer.`}
           rows={[
-            { label: 'Niveau requis', value: 'Niveau 3' },
-            { label: 'Ton niveau actuel', value: `Niveau ${playerLevel}` },
-            { label: 'Gloire manquante', value: `${xpNeededForLevel3} avant le niveau 3` },
-          ]}
-          onClose={() => setShowAddPlaceInfo(false)}
-        />
-      )}
-      {showAddPlaceInfo && canAddPlaceByLevel && !canAddPlace && (
-        <InfoModal
-          icon="🏛️"
-          title="Ajouter un lieu"
-          description="Pour pouvoir ajouter un lieu sur la carte, vous devez d'abord découvrir au moins 5 lieux et obtenir le titre d'Explorateur."
-          rows={[
-            { label: 'Condition', value: 'Découvrir 5 lieux' },
-            { label: 'Titre requis', value: 'Explorateur' },
+            { label: 'Condition', value: `Découvrir ${MIN_DISCOVERIES_FOR_ADD_PLACE} lieux` },
+            { label: 'Découvertes actuelles', value: `${discoveriesCount} / ${MIN_DISCOVERIES_FOR_ADD_PLACE}` },
+            { label: 'Reste', value: discoveriesNeeded === 0 ? 'Débloqué !' : `${discoveriesNeeded} découverte${discoveriesNeeded > 1 ? 's' : ''}` },
           ]}
           onClose={() => setShowAddPlaceInfo(false)}
         />
