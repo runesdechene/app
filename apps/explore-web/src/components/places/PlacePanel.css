@@ -236,7 +236,6 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1.5px solid;
   background: rgba(255, 255, 255, 0.5);
 }
 .place-tag-veilleur-avatar-fallback {

@@ -872,12 +872,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                       src={avatar}
                       alt=""
                       className="place-tag-veilleur-avatar"
-                      style={{ borderColor: fc }}
                     />
                   ) : (
                     <span
                       className="place-tag-veilleur-avatar place-tag-veilleur-avatar-fallback"
-                      style={{ background: fc, borderColor: fc }}
+                      style={{ background: fc }}
                     >
                       {initial}
                     </span>
