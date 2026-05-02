@@ -139,8 +139,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const avatarInputRef = useRef<HTMLInputElement>(null)
-  const [placesTab, setPlacesTab] = useState<PlacesTab>('authored')
-  const [visibleCount, setVisibleCount] = useState(12)
+  // V0.7+ Refonte 2026-05-02 : plus d'onglets — 3 carrousels horizontaux empilés.
+  // Si > CAROUSEL_CAP : tile "Voir tout (N)" à la fin → overlay grid.
+  const [viewAllSection, setViewAllSection] = useState<PlacesTab | null>(null)
   const [showFactionMembers, setShowFactionMembers] = useState(false)
   const [showFragmentStore, setShowFragmentStore] = useState(false)
   const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null; owned: boolean }>>([])
@@ -817,120 +818,28 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
             {/* Places tabs */}
             <div className="player-modal-places">
-              {/* V0.7 phase 3.5 — Onglets : Ajoutés / Explorés / Veillés.
-                  "Veillés" remplace "Influencés" (V0.5 figé). Petites icônes
-                  cohérentes avec les compteurs du header. */}
-              <div className="player-modal-tabs">
-                <button
-                  className={`player-modal-tab${placesTab === 'authored' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('authored'); setVisibleCount(12) }}
-                >
-                  {'🏛️'} {'Ajoutés'} <span className="player-modal-tabs-number">{profile.authoredPlaces?.length ?? 0}</span>
-                </button>
-                <button
-                  className={`player-modal-tab${placesTab === 'discovered' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('discovered'); setVisibleCount(12) }}
-                >
-                  {'🧭'} {'Explorés'} <span className="player-modal-tabs-number">{profile.discoveredPlaces?.length ?? 0}</span>
-                </button>
-                <button
-                  className={`player-modal-tab${placesTab === 'veilled' ? ' active' : ''}`}
-                  onClick={() => { setPlacesTab('veilled'); setVisibleCount(12) }}
-                >
-                  {'🚩'} {'Revendiqués'} <span className="player-modal-tabs-number">{profile.veilledPlaces?.length ?? 0}</span>
-                </button>
-              </div>
-
-              {(() => {
-                const places: PlaceCard[] =
-                  placesTab === 'authored' ? (profile.authoredPlaces ?? []) :
-                  placesTab === 'discovered' ? (profile.discoveredPlaces ?? []) :
-                  (profile.veilledPlaces ?? [])
-
-                if (places.length === 0) return (
-                  <div className="player-modal-places-empty">Aucun lieu</div>
-                )
-
-                const visible = places.slice(0, visibleCount)
-                const hasMore = places.length > visibleCount
-                const showMoreBtn = hasMore && (
-                  <button
-                    className="player-modal-show-more"
-                    onClick={() => setVisibleCount(c => c + 12)}
-                  >
-                    Voir plus ({places.length - visibleCount} restants)
-                  </button>
-                )
-
-                // Tab Ajout\u00E9s \u2014 grille de photos (existant)
-                if (placesTab === 'authored') {
-                  return (
-                    <>
-                      <div className="player-modal-places-grid">
-                        {visible.map(place => (
-                          <div
-                            key={place.id}
-                            className="player-modal-place-card"
-                            onClick={() => handlePlaceClick(place.id)}
-                          >
-                            {place.imageUrl ? (
-                              <img src={place.imageUrl} alt={place.title} className="player-modal-place-img" loading="lazy" />
-                            ) : (
-                              <div className="player-modal-place-img-fallback">
-                                {'\uD83C\uDFDB\uFE0F'}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      {showMoreBtn}
-                    </>
-                  )
-                }
-
-                // Tabs Explor\u00E9s + Veill\u00E9s \u2014 format ligne (image full-height \u00E0 gauche)
-                return (
-                  <>
-                    <div className="player-modal-places-list">
-                      {visible.map(place => {
-                        const meta = placesTab === 'discovered'
-                          ? { num: (place as VisitedPlace).visitsCount, unit: (place as VisitedPlace).visitsCount > 1 ? 'visites' : 'visite', date: (place as VisitedPlace).lastVisitedAt }
-                          : (() => {
-                              const v = place as VeilledPlace
-                              return {
-                                num: v.memberCount,
-                                unit: v.memberCount > 1 ? 'veilleurs' : 'veilleur',
-                                date: v.plantedAt,
-                              }
-                            })()
-                        return (
-                          <div
-                            key={place.id}
-                            className="player-modal-place-row"
-                            onClick={() => handlePlaceClick(place.id)}
-                          >
-                            {place.imageUrl ? (
-                              <img src={place.imageUrl} alt={place.title} className="place-row-img" loading="lazy" />
-                            ) : (
-                              <div className="place-row-img place-row-img-fallback">{'\uD83C\uDFDB\uFE0F'}</div>
-                            )}
-                            <div className="place-row-body">
-                              <div className="place-row-name">{place.title}</div>
-                              {place.type && <div className="place-row-tag">{place.type}</div>}
-                            </div>
-                            <div className="place-row-meta">
-                              <span className="place-row-num">{meta.num}</span>
-                              <span className="place-row-num-unit">{meta.unit}</span>
-                              <div className="place-row-date">{formatRelativeDate(meta.date)}</div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                    {showMoreBtn}
-                  </>
-                )
-              })()}
+              {/* V0.7+ Refonte 2026-05-02 : 3 carrousels horizontaux empilés. */}
+              <PlacesCarousel
+                emoji={'\u{1F3DB}️'}
+                titleText="Ajoutés"
+                places={profile.authoredPlaces ?? []}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('authored')}
+              />
+              <PlacesCarousel
+                emoji={'\u{1F9ED}'}
+                titleText="Explorés"
+                places={profile.discoveredPlaces ?? []}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('discovered')}
+              />
+              <PlacesCarousel
+                emoji={'\u{1F6A9}'}
+                titleText="Revendiqués"
+                places={profile.veilledPlaces ?? []}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('veilled')}
+              />
             </div>
           </>
         )}
@@ -1100,8 +1009,96 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
           onClose={() => setShowFactionMembers(false)}
         />
       )}
+
+      {viewAllSection && profile && (() => {
+        const places: PlaceCard[] =
+          viewAllSection === 'authored' ? (profile.authoredPlaces ?? []) :
+          viewAllSection === 'discovered' ? (profile.discoveredPlaces ?? []) :
+          (profile.veilledPlaces ?? [])
+        const meta =
+          viewAllSection === 'authored' ? { emoji: '\u{1F3DB}️', text: 'Ajoutés' } :
+          viewAllSection === 'discovered' ? { emoji: '\u{1F9ED}', text: 'Explorés' } :
+          { emoji: '\u{1F6A9}', text: 'Revendiqués' }
+        return (
+          <div className="player-modal-overlay" onClick={() => setViewAllSection(null)} style={{ zIndex: 10003 }}>
+            <div className="player-modal player-modal-view-all" onClick={e => e.stopPropagation()}>
+              <button className="player-modal-close" onClick={() => setViewAllSection(null)}>&#10005;</button>
+              <h3 className="player-modal-view-all-title">
+                {meta.emoji} {meta.text} <span className="player-modal-view-all-count">{places.length}</span>
+              </h3>
+              <div className="player-modal-view-all-grid">
+                {places.map(place => (
+                  <button
+                    key={place.id}
+                    className="player-modal-place-tile"
+                    onClick={() => { handlePlaceClick(place.id); setViewAllSection(null) }}
+                  >
+                    {place.imageUrl ? (
+                      <img src={place.imageUrl} alt={place.title} className="player-modal-place-tile-img" loading="lazy" />
+                    ) : (
+                      <div className="player-modal-place-tile-img player-modal-place-tile-img-fallback">{'\u{1F3DB}️'}</div>
+                    )}
+                    <span className="player-modal-place-tile-name">{place.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 
   return isMobile ? createPortal(modal, document.body) : modal
+}
+
+/** V0.7+ Sous-composant local — carousel horizontal d'un type de lieux (Ajoutés
+ *  / Explorés / Revendiqués) avec compteur dans le titre + tile "Voir tout" si
+ *  > CAROUSEL_CAP. Section masquée si 0 lieu (pas de carousel vide affreux). */
+const CAROUSEL_CAP = 20
+
+function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
+  emoji: string
+  titleText: string
+  places: PlaceCard[]
+  onPlaceClick: (id: string) => void
+  onViewAll: () => void
+}) {
+  if (places.length === 0) return null
+
+  const visible = places.slice(0, CAROUSEL_CAP)
+  const showViewAll = places.length > CAROUSEL_CAP
+
+  return (
+    <div className="player-modal-section">
+      <h3 className="player-modal-section-title">
+        {emoji} {titleText} <span className="player-modal-section-count">{places.length}</span>
+      </h3>
+      <div className="player-modal-places-row">
+        {visible.map(place => (
+          <button
+            key={place.id}
+            className="player-modal-place-tile"
+            onClick={() => onPlaceClick(place.id)}
+          >
+            {place.imageUrl ? (
+              <img src={place.imageUrl} alt={place.title} className="player-modal-place-tile-img" loading="lazy" />
+            ) : (
+              <div className="player-modal-place-tile-img player-modal-place-tile-img-fallback">{'\u{1F3DB}️'}</div>
+            )}
+            <span className="player-modal-place-tile-name">{place.title}</span>
+          </button>
+        ))}
+        {showViewAll && (
+          <button
+            className="player-modal-place-tile player-modal-place-tile-view-all"
+            onClick={onViewAll}
+          >
+            <span className="player-modal-place-tile-img player-modal-place-tile-view-all-icon">+{places.length - CAROUSEL_CAP}</span>
+            <span className="player-modal-place-tile-name">Voir tout</span>
+          </button>
+        )}
+      </div>
+    </div>
+  )
 }
