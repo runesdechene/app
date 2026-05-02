@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import changelogRaw from '../../../CHANGELOG.md?raw'
 import { safeStorage } from '../../lib/safeStorage'
+import { usePlayerStore } from '../../stores/playerStore'
 import './VersionBadge.css'
 
 /**
@@ -62,8 +63,11 @@ const current = versions[0]
 const SEEN_KEY = 'changelog_seen_version'
 
 export function VersionBadge() {
+  // Fresh user (tutorial pas encore terminé) : pas d'auto-open du changelog,
+  // ça pollue l'arrivée dans le jeu. Le badge reste cliquable s'il veut le lire.
   const [open, setOpen] = useState(() => {
     if (!current) return false
+    if (usePlayerStore.getState().tutorialCompletedAt === null) return false
     const seen = safeStorage.get(SEEN_KEY)
     return seen !== current.version
   })
