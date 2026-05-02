@@ -1,7 +1,6 @@
 import { memo, useRef, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
-import { NoteBubble } from '../social/NoteBubble'
-import { NoteReactionsRow } from '../social/NoteReactionsRow'
+import { NoteOverlay } from '../social/NoteOverlay'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
@@ -97,30 +96,17 @@ function OtherPlayerMarker({
           ))}
         </div>
 
-        {/* V0.7+ Note éphémère au-dessus de l'avatar (cachée tant que le popover est ouvert) */}
-        {noteIsActive && !isPopoverOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 'calc(100% + 8px)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              pointerEvents: 'auto',
-              zIndex: 4,
-              display: 'flex',
-              flexDirection: 'column-reverse',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <PlayerReactionsInline noteUserId={player.userId} />
-            <NoteBubble
-              text={player.noteText!}
-              onTap={onTogglePopover}
-            />
-          </div>
-        )}
       </div>
+
+      {/* V0.7+ Note éphémère portée vers document.body (z-index 9000, au-dessus des autres markers/icônes) */}
+      {noteIsActive && !isPopoverOpen && (
+        <NoteOverlayForPlayer
+          anchorEl={avatarRef.current}
+          text={player.noteText!}
+          noteUserId={player.userId}
+          onTap={onTogglePopover}
+        />
+      )}
 
       {isPopoverOpen && (
         <AvatarActionsPopover
@@ -135,7 +121,9 @@ function OtherPlayerMarker({
   )
 }
 
-function PlayerReactionsInline({ noteUserId }: { noteUserId: string }) {
+function NoteOverlayForPlayer({
+  anchorEl, text, noteUserId, onTap,
+}: { anchorEl: HTMLElement | null; text: string; noteUserId: string; onTap: () => void }) {
   const { reactions } = useNoteReactions(noteUserId)
-  return <NoteReactionsRow reactions={reactions} />
+  return <NoteOverlay anchorEl={anchorEl} text={text} reactions={reactions} onTap={onTap} />
 }

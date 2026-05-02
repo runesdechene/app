@@ -23,8 +23,7 @@ import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
-import { NoteBubble } from '../social/NoteBubble'
-import { NoteReactionsRow } from '../social/NoteReactionsRow'
+import { NoteOverlay } from '../social/NoteOverlay'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
 import { MapStyleSelect } from './MapStyleSelect'
 import { VeilleurNamePills } from './VeilleurNamePills'
@@ -826,26 +825,12 @@ export const ExploreMap = memo(function ExploreMap() {
                 <span key={i} className="other-player-title">{title}</span>
               ))}
               {ownNoteIsActive && !showSelfPopover && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 'calc(100% + 8px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    pointerEvents: 'auto',
-                    zIndex: 4,
-                    display: 'flex',
-                    flexDirection: 'column-reverse',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  <NoteReactionsRow reactions={ownNoteReactions} />
-                  <NoteBubble
-                    text={ownNoteText!}
-                    onTap={() => setShowSelfPopover(true)}
-                  />
-                </div>
+                <NoteOverlay
+                  anchorEl={selfAvatarRef.current}
+                  text={ownNoteText!}
+                  reactions={ownNoteReactions}
+                  onTap={() => setShowSelfPopover(true)}
+                />
               )}
               {showSelfPopover && currentUserId && (
                 <AvatarActionsPopover
