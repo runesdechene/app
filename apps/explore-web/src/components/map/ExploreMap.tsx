@@ -88,7 +88,9 @@ export const ExploreMap = memo(function ExploreMap() {
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations
   const { flying } = useEmojiThrows()
   const [showSelfPopover, setShowSelfPopover] = useState(false)
-  const selfAvatarRef = useRef<HTMLDivElement>(null)
+  // Callback ref via state : un useRef ne déclenche pas de re-render quand le DOM
+  // s'attache, donc NoteOverlay / AvatarActionsPopover recevaient null forever.
+  const [selfAvatarEl, setSelfAvatarEl] = useState<HTMLDivElement | null>(null)
   // V0.7+ Note du moment — la note posée doit s'afficher sous mon propre avatar
   // sur la carte (pas seulement pour les autres). Lecture depuis playerStore qui est
   // synchronisé par useUserNote (utilisé dans le NoteEditor du popover).
@@ -805,7 +807,7 @@ export const ExploreMap = memo(function ExploreMap() {
               }}
             >
               <div
-                ref={selfAvatarRef}
+                ref={setSelfAvatarEl}
                 className="user-position-marker"
                 style={{
                   '--faction-color': userFactionColor ?? '#4A90D9',
@@ -826,7 +828,7 @@ export const ExploreMap = memo(function ExploreMap() {
               ))}
               {ownNoteIsActive && !showSelfPopover && (
                 <NoteOverlay
-                  anchorEl={selfAvatarRef.current}
+                  anchorEl={selfAvatarEl}
                   text={ownNoteText!}
                   reactions={ownNoteReactions}
                   onTap={() => setShowSelfPopover(true)}
@@ -835,7 +837,7 @@ export const ExploreMap = memo(function ExploreMap() {
               {showSelfPopover && currentUserId && (
                 <AvatarActionsPopover
                   mode="self"
-                  anchorEl={selfAvatarRef.current}
+                  anchorEl={selfAvatarEl}
                   onClose={() => setShowSelfPopover(false)}
                   onViewProfile={() => setSelectedPlayerId(currentUserId)}
                 />

@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from 'react'
+import { memo, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import { NoteOverlay } from '../social/NoteOverlay'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
@@ -62,7 +62,9 @@ function OtherPlayerMarker({
   onSelectPlayer,
   onSendEmoji,
 }: SubProps) {
-  const avatarRef = useRef<HTMLDivElement>(null)
+  // Callback ref via useState : refs natifs ne triggent pas de re-render au mount,
+  // donc NoteOverlay/AvatarActionsPopover ne recevaient jamais l'élément ancre.
+  const [avatarEl, setAvatarEl] = useState<HTMLDivElement | null>(null)
   const noteIsActive = !!(
     player.noteText &&
     player.notePostedAt &&
@@ -77,7 +79,7 @@ function OtherPlayerMarker({
     >
       <div className="other-player-marker-wrap" style={{ position: 'relative' }}>
         <div
-          ref={avatarRef}
+          ref={setAvatarEl}
           className="other-player-marker"
           style={{ '--faction-color': player.factionColor ?? '#888' } as React.CSSProperties}
           onClick={(e) => {
@@ -101,7 +103,7 @@ function OtherPlayerMarker({
       {/* V0.7+ Note éphémère portée vers document.body (z-index 9000, au-dessus des autres markers/icônes) */}
       {noteIsActive && !isPopoverOpen && (
         <NoteOverlayForPlayer
-          anchorEl={avatarRef.current}
+          anchorEl={avatarEl}
           text={player.noteText!}
           noteUserId={player.userId}
           onTap={onTogglePopover}
@@ -111,7 +113,7 @@ function OtherPlayerMarker({
       {isPopoverOpen && (
         <AvatarActionsPopover
           mode="other"
-          anchorEl={avatarRef.current}
+          anchorEl={avatarEl}
           onClose={onClosePopover}
           onViewProfile={() => onSelectPlayer(player.userId)}
           onSendEmoji={onSendEmoji}
