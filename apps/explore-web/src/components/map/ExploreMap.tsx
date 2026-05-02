@@ -22,6 +22,7 @@ import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
+import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
 import { MapStyleSelect } from './MapStyleSelect'
 import { VeilleurNamePills } from './VeilleurNamePills'
 import { HarvestableChests } from './HarvestableChests'
@@ -84,6 +85,7 @@ export const ExploreMap = memo(function ExploreMap() {
 
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations
   const { flying } = useEmojiThrows()
+  const [showSelfPopover, setShowSelfPopover] = useState(false)
   const [viewportSize, setViewportSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   useEffect(() => {
     const update = () => setViewportSize({ w: window.innerWidth, h: window.innerHeight })
@@ -782,8 +784,11 @@ export const ExploreMap = memo(function ExploreMap() {
           ) : (
             <div
               className="user-marker-wrapper"
-              style={{ '--faction-color': userFactionColor ?? '#4A90D9' } as React.CSSProperties}
-              onClick={() => currentUserId && setSelectedPlayerId(currentUserId)}
+              style={{ '--faction-color': userFactionColor ?? '#4A90D9', position: 'relative' } as React.CSSProperties}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowSelfPopover(prev => !prev)
+              }}
             >
               <div
                 className="user-position-marker"
@@ -804,6 +809,23 @@ export const ExploreMap = memo(function ExploreMap() {
               {userDisplayedTitles.map((title, i) => (
                 <span key={i} className="other-player-title">{title}</span>
               ))}
+              {showSelfPopover && currentUserId && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 'calc(100% + 12px)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 10,
+                  }}
+                >
+                  <AvatarActionsPopover
+                    mode="self"
+                    onClose={() => setShowSelfPopover(false)}
+                    onViewProfile={() => setSelectedPlayerId(currentUserId)}
+                  />
+                </div>
+              )}
             </div>
           )}
         </Marker>

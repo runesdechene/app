@@ -1,0 +1,124 @@
+.avatar-actions-popover {
+  background: #fdf3d6;
+  border: 1px solid #c8a874;
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  position: relative;
+  pointer-events: auto;
+  z-index: 100;
+  min-width: 180px;
+}
+
+.avatar-actions-popover::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid #c8a874;
+}
+
+.avatar-actions-popover__btn {
+  background: #fff;
+  border: 1px solid #d4c4a4;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  color: #3a2a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.avatar-actions-popover__btn:hover {
+  background: #fde6c4;
+  border-color: #c8a874;
+}
+
+.avatar-actions-popover__btn:active {
+  background: #f9d29a;
+}
+
+.avatar-actions-popover__btn-cancel {
+  background: transparent;
+  border: 1px dashed #c8a874;
+  color: #7a4a1a;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.avatar-actions-popover__note-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.avatar-actions-popover__note-edit label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #7a4a1a;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.avatar-actions-popover__note-edit textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 8px;
+  border: 1px solid #c8a874;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  font-style: italic;
+  background: #fff;
+  color: #3a2a1a;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.avatar-actions-popover__note-edit-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #7a4a1a;
+}
+
+.avatar-actions-popover__note-edit-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.avatar-actions-popover__note-edit-actions button {
+  background: #fff;
+  border: 1px solid #c8a874;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #3a2a1a;
+}
+
+.avatar-actions-popover__note-edit-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.avatar-actions-popover__note-edit-actions .primary {
+  background: #8A7B6A;
+  color: #fdf3d6;
+  border-color: #6a5a4a;
+}

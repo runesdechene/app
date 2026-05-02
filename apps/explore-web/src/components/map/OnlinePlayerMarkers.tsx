@@ -1,8 +1,8 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import { NoteBubble } from '../social/NoteBubble'
 import { NoteReactionsRow } from '../social/NoteReactionsRow'
-import { EmojiPicker } from '../social/EmojiPicker'
+import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
 import './OnlinePlayerMarkers.css'
@@ -27,27 +27,14 @@ const NOTE_TTL_MS = 24 * 60 * 60 * 1000
 
 export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, onSelectPlayer }: Props) {
   const { throwEmoji } = useEmojiThrows()
-  const [pickerFor, setPickerFor] = useState<string | null>(null)
-
-  // Tap dehors → fermer picker
-  useEffect(() => {
-    if (!pickerFor) return
-    function onDocClick(e: MouseEvent) {
-      const target = e.target as HTMLElement | null
-      if (!target) return
-      if (target.closest('.emoji-picker') || target.closest('.other-player-marker')) return
-      setPickerFor(null)
-    }
-    document.addEventListener('mousedown', onDocClick)
-    return () => document.removeEventListener('mousedown', onDocClick)
-  }, [pickerFor])
+  const [popoverFor, setPopoverFor] = useState<string | null>(null)
 
   return (
     <>
       {Array.from(players.values()).map(player => {
         const noteIsActive = player.noteText && player.notePostedAt &&
           new Date(player.notePostedAt).getTime() > Date.now() - NOTE_TTL_MS
-        const showPicker = pickerFor === player.userId
+        const showPopover = popoverFor === player.userId
 
         return (
           <Marker
@@ -62,7 +49,7 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
                 style={{ '--faction-color': player.factionColor ?? '#888' } as React.CSSProperties}
                 onClick={(e) => {
                   e.stopPropagation()
-                  setPickerFor(prev => prev === player.userId ? null : player.userId)
+                  setPopoverFor(prev => prev === player.userId ? null : player.userId)
                 }}
               >
                 {player.avatarUrl ? (
@@ -97,56 +84,23 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
                 </div>
               )}
 
-              {/* V0.7+ Picker emoji au tap */}
-              {showPicker && (
+              {/* V0.7+ Mini popover d'actions (Voir profil / Envoyer emoji) */}
+              {showPopover && (
                 <div
                   style={{
                     position: 'absolute',
-                    bottom: 'calc(100% + 8px)',
+                    bottom: 'calc(100% + 12px)',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 10,
                   }}
                 >
-                  <EmojiPicker
-                    onPick={(emoji) => {
-                      void throwEmoji(player.userId, emoji)
-                      // picker reste ouvert pour surclick
-                    }}
+                  <AvatarActionsPopover
+                    mode="other"
+                    onClose={() => setPopoverFor(null)}
+                    onViewProfile={() => onSelectPlayer(player.userId)}
+                    onSendEmoji={(emoji) => { void throwEmoji(player.userId, emoji) }}
                   />
-                  <div style={{
-                    display: 'flex', gap: 4, marginTop: 4, justifyContent: 'center',
-                  }}>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setPickerFor(null)
-                        onSelectPlayer(player.userId)
-                      }}
-                      style={{
-                        background: '#fff', border: '1px solid #d4a574',
-                        borderRadius: 6, padding: '3px 10px', fontSize: 12,
-                        cursor: 'pointer', color: '#3a2a1a',
-                      }}
-                    >
-                      👁️ Voir le profil
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setPickerFor(null)
-                      }}
-                      style={{
-                        background: '#fff', border: '1px solid #d4a574',
-                        borderRadius: 6, padding: '3px 10px', fontSize: 12,
-                        cursor: 'pointer', color: '#3a2a1a',
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -157,7 +111,6 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
   )
 })
 
-/** Mini composant inline qui fetch et rend les compteurs de réactions sous une note */
 function PlayerReactionsInline({ noteUserId }: { noteUserId: string }) {
   const { reactions } = useNoteReactions(noteUserId)
   return <NoteReactionsRow reactions={reactions} />
