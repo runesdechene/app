@@ -41,10 +41,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
   useEffect(() => {
     Promise.all([
-      supabase
-        .from('factions')
-        .select('id, title, color, pattern, description, image_url')
-        .order('order'),
+      // V0.7+ Mig 065 : factions triées par nombre de membres ASC (les plus
+      // faibles d'abord) pour auto-équilibrage des inscriptions.
+      supabase.rpc('get_factions_for_choice'),
       supabase.rpc('get_underdog_faction_id'),
       supabase.from('faction_tag_bonuses').select('faction_id, tag_id, cost_reduction'),
       supabase.from('tags').select('id, title, icon, color, background'),
