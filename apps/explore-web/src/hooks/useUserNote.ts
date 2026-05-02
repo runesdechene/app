@@ -58,7 +58,12 @@ export function useUserNote() {
   return { note: { text, postedAt }, loading, setNoteText, clearNote }
 }
 
-/** Pose ou modifie la note. Optimistic + rollback si RPC échoue. */
+/**
+ * Pose ou modifie la note. Pas d'optimistic update : la DB est l'unique source de vérité.
+ * On attend la confirmation RPC avant d'écrire le store. Conséquence visuelle : ~200-500ms
+ * de latence avant que la NoteBubble locale se mette à jour. Bénéfice : pas de versions
+ * divergentes entre store local, presence broadcast, et DB — tout converge sur une valeur.
+ */
 export async function setNoteText(value: string): Promise<void> {
   const trimmed = value.trim()
   if (trimmed.length === 0) {
@@ -66,32 +71,15 @@ export async function setNoteText(value: string): Promise<void> {
     return
   }
   if (trimmed.length > 200) throw new Error('note_too_long')
-  const prevText = usePlayerStore.getState().ownNoteText
-  const prevPostedAt = usePlayerStore.getState().ownNotePostedAt
-  const optimisticPostedAt = new Date().toISOString()
-  // Optimistic : le store passe à la nouvelle valeur tout de suite. Le useEffect dans
-  // usePresence détecte le changement et re-track immédiatement → autres voyageurs voient
-  // la nouvelle note sans fenêtre intermédiaire à null.
-  usePlayerStore.getState().setOwnNote(trimmed, optimisticPostedAt)
   const { data, error } = await supabase.rpc('set_note', { p_text: trimmed })
-  if (error) {
-    // Rollback
-    usePlayerStore.getState().setOwnNote(prevText, prevPostedAt)
-    throw error
-  }
-  // Sync du timestamp serveur (la note posée_at de l'optimistic peut différer de quelques ms)
-  const serverPostedAt = (data as { posted_at?: string } | null)?.posted_at ?? optimisticPostedAt
+  if (error) throw error
+  const serverPostedAt = (data as { posted_at?: string } | null)?.posted_at ?? new Date().toISOString()
   usePlayerStore.getState().setOwnNote(trimmed, serverPostedAt)
 }
 
-/** Efface la note. Optimistic + rollback si RPC échoue. */
+/** Efface la note. Pas d'optimistic — attend la confirmation DB. */
 export async function clearNote(): Promise<void> {
-  const prevText = usePlayerStore.getState().ownNoteText
-  const prevPostedAt = usePlayerStore.getState().ownNotePostedAt
-  usePlayerStore.getState().setOwnNote(null, null)
   const { error } = await supabase.rpc('clear_note')
-  if (error) {
-    usePlayerStore.getState().setOwnNote(prevText, prevPostedAt)
-    throw error
-  }
+  if (error) throw error
+  usePlayerStore.getState().setOwnNote(null, null)
 }
