@@ -461,6 +461,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [deleteConfirmPlaceId, setDeleteConfirmPlaceId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
 
+  // V0.7 — overrides (veilleur principal posé par loadInitialVeilles / pushVeilleOverride)
+  const placeOverride = useMapStore(s => s.placeOverrides.get(place.id))
+
   // V0.5 detail data
   const [v05, setV05] = useState<V05Detail | null>(null)
   const [v05Key, setV05Key] = useState(0)
@@ -472,7 +475,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
   const [, setFactionPatterns] = useState<Map<string, string>>(new Map())
   const [factionSvgs, setFactionSvgs] = useState<Map<string, string>>(new Map())
-  const [factionNames, setFactionNames] = useState<Map<string, string>>(new Map())
+  const [, setFactionNames] = useState<Map<string, string>>(new Map())
 
   // Fetch V0.5 detail + all faction visuals
   useEffect(() => {
@@ -829,27 +832,32 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 {tag.title}
               </span>
             ))}
-            {v05?.dominantFaction && factionNames.get(v05.dominantFaction) && (() => {
-              const fc = factionColors.get(v05.dominantFaction) ?? '#8A7B6A'
+            {/* V0.7 — Veillé par {nom du veilleur principal}, dans la couleur de sa faction.
+                Remplace l'ancien "Sous l'influence de la {faction}" (legacy V0.5).
+                Source : placeOverride (peuplé par loadInitialVeilles / pushVeilleOverride). */}
+            {placeOverride?.veilleurName && placeOverride?.veilleurUserId && (() => {
+              const factionId = placeOverride.factionId
+              const fc = (factionId && factionColors.get(factionId)) ?? placeOverride.tagColor ?? '#8A7B6A'
+              const svg = factionId ? factionSvgs.get(factionId) : undefined
               return (
                 <span
                   className="place-tag place-tag-faction"
-                  style={{
-                    backgroundColor: `${fc}20`,
-                    color: fc,
-                  }}
+                  style={{ backgroundColor: `${fc}20`, color: fc, cursor: 'pointer' }}
+                  onClick={() => useMapStore.getState().setSelectedPlayerId(placeOverride.veilleurUserId!)}
+                  title={`Voir le profil de ${placeOverride.veilleurName}`}
                 >
-                  {factionSvgs.get(v05.dominantFaction) && (
+                  {svg && (
                     <span
                       className="place-tag-faction-svg"
                       style={{
-                        WebkitMaskImage: `url(${factionSvgs.get(v05.dominantFaction)!})`,
-                        maskImage: `url(${factionSvgs.get(v05.dominantFaction)!})`,
+                        WebkitMaskImage: `url(${svg})`,
+                        maskImage: `url(${svg})`,
                         backgroundColor: fc,
                       }}
                     />
                   )}
-                  Sous l'influence {factionNames.get(v05.dominantFaction)}
+                  Veillé par {placeOverride.veilleurName}
+                  {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
                 </span>
               )
             })()}
