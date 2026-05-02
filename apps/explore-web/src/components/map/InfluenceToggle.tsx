@@ -13,7 +13,7 @@ export function InfluenceToggle() {
       <div className="influence-toggle-wrap">
         <button className="influence-toggle" onClick={() => setFactionColorMode(!factionColorMode)}>
           <span className="influence-toggle-icon">{'⚔️'}</span>
-          <span className="influence-toggle-label">{factionColorMode ? 'Coupe des Héritages' : 'Héritages'}</span>
+          <span className="influence-toggle-label">Héritages</span>
           <span className={`influence-toggle-switch ${factionColorMode ? 'on' : ''}`} />
         </button>
         <button

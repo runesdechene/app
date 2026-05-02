@@ -465,17 +465,92 @@
     margin: 40px 16px;
   }
 
-  /* Sur mobile, le FAB "+" (centré bas) chevauchait visuellement le bas de la modal
-     scoreboard / Coupe (1100 > 15 mais le FAB reste cliquable et bouche la lecture).
-     On pousse l'overlay vers le haut via padding-bottom et on réduit max-height pour
-     que la modale s'arrête au-dessus du FAB. */
+  /* Scoreboard / Coupe / classement : compact sur mobile (largeur ET hauteur).
+     - Largeur : 78vw au lieu de 95vw → ne touche plus les bords écran.
+     - Hauteur : 72vh + padding bottom 150px → s'arrête au-dessus du FAB "+".
+     - Paddings/avatars/fonts internes réduits pour densité. */
   .leaderboard-overlay {
+    padding: 16px;
     padding-bottom: calc(var(--safe-bottom, 0px) + 150px);
   }
 
   .leaderboard-modal {
-    max-width: 95vw;
+    max-width: 78vw;
     max-height: 72vh;
+  }
+
+  .leaderboard-title {
+    font-size: 15px;
+    padding: 12px 12px 8px;
+  }
+
+  .leaderboard-tabs {
+    padding: 0 6px;
+  }
+
+  .leaderboard-tab {
+    font-size: 11px;
+    padding: 8px 2px;
+  }
+
+  .leaderboard-row,
+  .coupe-faction-row,
+  .coupe-user-row {
+    gap: 6px;
+    padding: 6px 10px;
+  }
+
+  .leaderboard-avatar,
+  .coupe-user-avatar {
+    width: 26px;
+    height: 26px;
+  }
+
+  .leaderboard-rank,
+  .coupe-rank {
+    font-size: 12px;
+    min-width: 22px;
+  }
+
+  .coupe-faction-name,
+  .coupe-user-name,
+  .coupe-score {
+    font-size: 12px;
+  }
+
+  .coupe-list,
+  .coupe-breakdown {
+    padding: 6px 10px 12px;
+    gap: 5px;
+  }
+
+  .coupe-rules-btn {
+    font-size: 12px;
+    padding: 4px 10px;
+    margin-bottom: 10px;
+  }
+
+  .coupe-my-total {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .coupe-my-total-value {
+    font-size: 22px;
+  }
+
+  .coupe-breakdown-row {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .coupe-breakdown-label {
+    font-size: 12px;
+  }
+
+  .coupe-breakdown-pts {
+    font-size: 12px;
+    min-width: 40px;
   }
 
   .version-modal {
