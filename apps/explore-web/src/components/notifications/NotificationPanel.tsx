@@ -10,6 +10,7 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   milestone_vues: '\uD83D\uDC41\uFE0F',
   milestone_exploration: '\u26F0\uFE0F',
   claim_lost: '\u2694\uFE0F',
+  note_reaction: '\uD83D\uDCAC',
 }
 
 function formatMessage(notif: Notification): string {
@@ -34,6 +35,8 @@ function formatMessage(notif: Notification): string {
       return `L'un de vos lieux a atteint ${d.explorerCount} explorateurs`
     case 'claim_lost':
       return `Une autre Maison d'Héritage a pris l'ascendant sur l'un de vos lieux`
+    case 'note_reaction':
+      return `${d.actorName || 'Quelqu\'un'} a réagi ${d.emoji ?? ''} à votre mot`
   }
 }
 
