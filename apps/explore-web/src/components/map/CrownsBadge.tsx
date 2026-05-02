@@ -8,7 +8,7 @@ import { InfoModal } from './InfoModal'
 // d'encodage source / PWA cache observés par le passé.
 
 const TXT_TITLE       = 'Couronnes de Chêne'
-const TXT_DESCRIPTION = 'Chaque jour, des coffres de Couronnes apparaissent sur les lieux que vous revendiquez.'
+const TXT_DESCRIPTION = 'Chaque jour, des coffres de Couronnes apparaissent aléatoirement sur les lieux que vous avez revendiqué.'
 const TXT_ROW_SOLO    = 'Récolte solo'
 const TXT_ROW_SOLO_VAL = '+1 Couronne'
 const TXT_ROW_EXP     = 'Récolte en expédition'
