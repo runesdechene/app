@@ -14,6 +14,9 @@ interface PresencePayload {
   displayedTitles: string[]
   lat: number | null
   lng: number | null
+  /** V0.7+ Micro-social — note éphémère broadcastée pour qu'elle apparaisse sous l'avatar des autres */
+  noteText: string | null
+  notePostedAt: string | null
 }
 
 const TRACK_INTERVAL_MS = 10_000
@@ -50,6 +53,8 @@ export function usePresence() {
           displayedTitles: state.displayedTitles,
           lat: pos?.lat ?? null,
           lng: pos?.lng ?? null,
+          noteText: state.ownNoteText,
+          notePostedAt: state.ownNotePostedAt,
         }
       }
 
@@ -82,6 +87,8 @@ export function usePresence() {
                 avatarUrl: payload.avatarUrl,
                 displayedTitles: Array.isArray(payload.displayedTitles) ? payload.displayedTitles : [],
                 lastSeen: Date.now(),
+                noteText: payload.noteText ?? null,
+                notePostedAt: payload.notePostedAt ?? null,
               })
             }
           }
@@ -103,6 +110,8 @@ export function usePresence() {
               avatarUrl: (raw.avatarUrl as string) ?? null,
               displayedTitles: Array.isArray(raw.displayedTitles) ? (raw.displayedTitles as string[]) : [],
               lastSeen: Date.now(),
+              noteText: (raw.noteText as string | null) ?? null,
+              notePostedAt: (raw.notePostedAt as string | null) ?? null,
             })
           }
         })

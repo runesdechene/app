@@ -20,6 +20,8 @@ import { usePlayersStore } from '../../stores/playersStore'
 import { supabase } from '../../lib/supabase'
 import { Minimap } from './Minimap'
 import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
+import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
+import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { MapStyleSelect } from './MapStyleSelect'
 import { VeilleurNamePills } from './VeilleurNamePills'
 import { HarvestableChests } from './HarvestableChests'
@@ -79,6 +81,34 @@ export const ExploreMap = memo(function ExploreMap() {
   const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
+
+  // V0.7+ Micro-social — channel emoji-throws + queue d'animations
+  const { flying } = useEmojiThrows()
+  const [viewportSize, setViewportSize] = useState({ w: window.innerWidth, h: window.innerHeight })
+  useEffect(() => {
+    const update = () => setViewportSize({ w: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  const resolveAvatar = useCallback<AvatarPositionResolver>((targetUserId) => {
+    const map = mapRef.current?.getMap()
+    if (!map) return null
+    let lat: number | null = null
+    let lng: number | null = null
+    if (targetUserId === currentUserId && userPosition) {
+      lat = userPosition.lat
+      lng = userPosition.lng
+    } else {
+      const p = onlinePlayers.get(targetUserId)
+      if (!p) return null
+      lat = p.position.lat
+      lng = p.position.lng
+    }
+    if (lat == null || lng == null) return null
+    const point = map.project([lng, lat])
+    return { x: point.x, y: point.y }
+  }, [currentUserId, userPosition, onlinePlayers])
 
   // Territory tiers (configurés dans le Hub)
   const [territoryTiers, setTerritoryTiers] = useState<{ minPlaces: number; title: string }[]>([])
@@ -908,6 +938,14 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       )}
     </MapGL>
+
+    {/* V0.7+ Micro-social — couche d'animations emoji-throws au-dessus de la carte */}
+    <FlyingEmojiLayer
+      flying={flying}
+      resolveAvatar={resolveAvatar}
+      viewportWidth={viewportSize.w}
+      viewportHeight={viewportSize.h}
+    />
 
     {/* Minimap style AoE (masquée en mode add-place) */}
     {!addPlaceMode && geojson && viewBounds && (

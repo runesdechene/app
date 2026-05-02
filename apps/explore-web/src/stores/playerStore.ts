@@ -72,6 +72,11 @@ interface PlayerState {
   publicPosition: { lng: number; lat: number } | null
   setPublicPosition: (pos: { lng: number; lat: number } | null) => void
 
+  /** V0.7+ Micro-social — ma note éphémère (24h). Null si pas de note posée. Broadcastée via presence. */
+  ownNoteText: string | null
+  ownNotePostedAt: string | null
+  setOwnNote: (text: string | null, postedAt: string | null) => void
+
   /** Prénom du joueur (pour le chat, toasts, etc.) */
   userName: string | null
   setUserName: (name: string | null) => void
@@ -188,6 +193,10 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   publicPosition: null,
   setPublicPosition: (pos) => set({ publicPosition: pos }),
+
+  ownNoteText: null,
+  ownNotePostedAt: null,
+  setOwnNote: (text, postedAt) => set({ ownNoteText: text, ownNotePostedAt: postedAt }),
 
   userName: null,
   setUserName: (name) => set({ userName: name }),

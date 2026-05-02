@@ -12,6 +12,10 @@ import { FactionMembersModal } from './FactionMembersModal'
 import { VeteranBadge } from '../profile/VeteranBadge'
 import { GloryProgressBar } from '../profile/GloryProgressBar'
 import { LevelText } from '../profile/LevelText'
+import { useUserNote } from '../../hooks/useUserNote'
+import { useNoteReactions } from '../../hooks/useNoteReactions'
+import { useMutedUsers } from '../../hooks/useMutedUsers'
+import { NoteReactionsRow } from '../social/NoteReactionsRow'
 
 interface PlaceCard {
   id: string
@@ -152,13 +156,23 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [savingTitles, setSavingTitles] = useState(false)
   const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null }>>([])
 
+  // V0.7+ Micro-social
+  const [otherNoteText, setOtherNoteText] = useState<string | null>(null)
+  const [otherNotePostedAt, setOtherNotePostedAt] = useState<string | null>(null)
+  const { note: ownNote, setNoteText, clearNote } = useUserNote()
+  const { reactions, addReaction, refetch: refetchReactions } = useNoteReactions(playerId)
+  const { isMuted, muteUser, unmuteUser } = useMutedUsers()
+  const [editNote, setEditNote] = useState('')
+  const [savingNote, setSavingNote] = useState(false)
+
   const isSelf = profile?.userId === currentUserId
 
   useEffect(() => {
     async function load() {
-      const [profileRes, fragmentsRes] = await Promise.all([
+      const [profileRes, fragmentsRes, noteRes] = await Promise.all([
         supabase.rpc('get_player_profile', { p_user_id: playerId }),
         supabase.rpc('get_user_fragments', { p_user_id: playerId }),
+        supabase.from('users').select('note_text, note_posted_at').eq('id', playerId).single(),
       ])
       if (profileRes.data) {
         const p = profileRes.data as unknown as PlayerProfile
@@ -169,10 +183,66 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       if (fragmentsRes.data && Array.isArray(fragmentsRes.data)) {
         setPlayerFragments(fragmentsRes.data as typeof playerFragments)
       }
+      // V0.7+ Note de l'autre voyageur (filtrage 24h côté client par sécurité — la DB filtre aussi)
+      if (noteRes.data) {
+        const text = (noteRes.data as { note_text: string | null }).note_text
+        const postedAt = (noteRes.data as { note_posted_at: string | null }).note_posted_at
+        const expired = postedAt && new Date(postedAt).getTime() < Date.now() - 24 * 60 * 60 * 1000
+        setOtherNoteText(expired ? null : text)
+        setOtherNotePostedAt(expired ? null : postedAt)
+      }
       setLoading(false)
     }
     load()
   }, [playerId])
+
+  // Pré-remplit le champ d'édition de note avec la note posée (sur soi)
+  useEffect(() => {
+    if (isSelf) setEditNote(ownNote.text ?? '')
+  }, [isSelf, ownNote.text])
+
+  async function saveNoteOnBlur() {
+    if (!isSelf) return
+    const next = editNote.trim()
+    const current = ownNote.text ?? ''
+    if (next === current) return
+    setSavingNote(true)
+    try {
+      if (next.length === 0) await clearNote()
+      else await setNoteText(next)
+    } catch (err) {
+      console.warn('[PlayerProfileModal] save note failed', err)
+    }
+    setSavingNote(false)
+  }
+
+  async function handleReactToOther(emoji: string) {
+    try {
+      await addReaction(playerId, emoji)
+      await refetchReactions()
+    } catch (err) {
+      console.warn('[PlayerProfileModal] react_to_note failed', err)
+    }
+  }
+
+  async function handleToggleMute() {
+    try {
+      if (isMuted(playerId)) await unmuteUser(playerId)
+      else await muteUser(playerId)
+    } catch (err) {
+      console.warn('[PlayerProfileModal] mute toggle failed', err)
+    }
+  }
+
+  async function handleReportNote() {
+    if (!confirm('Signaler cette note pour modération ?')) return
+    const { error } = await supabase.rpc('report_note', { p_target_user_id: playerId })
+    if (error) {
+      alert('Le signalement a échoué : ' + (error.message ?? 'erreur inconnue'))
+      return
+    }
+    alert('Signalement envoyé. Merci.')
+  }
 
   function handleStartEdit() {
     if (!profile) return
@@ -528,6 +598,113 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 <p className="player-modal-joined">
                   Explorateur depuis le {formatDate(profile.joinedAt)}
                 </p>
+
+                {/* V0.7+ Micro-social — Note éphémère 24h */}
+                {isSelf && (
+                  <div style={{
+                    marginTop: 12,
+                    padding: 10,
+                    background: '#fdf3d6',
+                    border: '1px solid #c8a874',
+                    borderRadius: 8,
+                  }}>
+                    <label style={{
+                      display: 'block', fontSize: 11, textTransform: 'uppercase',
+                      color: '#7a4a1a', fontWeight: 600, letterSpacing: '0.04em', marginBottom: 6,
+                    }}>
+                      Mon mot du moment
+                    </label>
+                    <textarea
+                      value={editNote}
+                      onChange={e => setEditNote(e.target.value.slice(0, 200))}
+                      onBlur={saveNoteOnBlur}
+                      maxLength={200}
+                      disabled={savingNote}
+                      placeholder="Laisse un mot pour les autres voyageurs (visible 24h)…"
+                      style={{
+                        width: '100%', minHeight: 56, padding: 8,
+                        border: '1px solid #c8a874', borderRadius: 6,
+                        fontFamily: 'inherit', fontSize: 14, fontStyle: 'italic',
+                        background: '#fff', color: '#3a2a1a', resize: 'vertical',
+                      }}
+                    />
+                    <div style={{ textAlign: 'right', fontSize: 11, color: '#7a4a1a', marginTop: 4 }}>
+                      {editNote.length}/200
+                    </div>
+                  </div>
+                )}
+
+                {!isSelf && otherNoteText && (
+                  <div style={{
+                    marginTop: 12,
+                    padding: 10,
+                    background: '#fdf3d6',
+                    border: '1px solid #c8a874',
+                    borderRadius: 8,
+                  }}>
+                    <div style={{
+                      fontSize: 10, textTransform: 'uppercase', color: '#7a4a1a',
+                      fontWeight: 600, letterSpacing: '0.04em', marginBottom: 4,
+                    }}>
+                      {profile.name} {otherNotePostedAt && `· ${formatRelativeDate(otherNotePostedAt)}`}
+                    </div>
+                    <p style={{
+                      fontStyle: 'italic', color: '#3a2a1a', margin: '0 0 6px 0',
+                      fontSize: 14, lineHeight: 1.32,
+                    }}>
+                      {otherNoteText}
+                    </p>
+                    <NoteReactionsRow reactions={reactions} />
+                    {/* Mini picker contextuel : 7 emojis salutation pour réagir vite */}
+                    <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
+                      {['👋', '❤️', '🤝', '🙏', '🌳', '☕', '🪙'].map(e => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => handleReactToOther(e)}
+                          style={{
+                            background: '#fff', border: '1px solid #d4c4a4',
+                            borderRadius: 6, padding: '3px 8px', fontSize: 16,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+                      <button
+                        type="button"
+                        onClick={handleReportNote}
+                        style={{
+                          background: 'none', border: '1px dashed #b87878',
+                          color: '#8a4a4a', fontSize: 12, padding: '3px 8px',
+                          borderRadius: 4, cursor: 'pointer',
+                        }}
+                      >
+                        ⚠️ Signaler
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* V0.7+ Mute soft — bouton dispo sur tout profil non-self */}
+                {!isSelf && (
+                  <button
+                    type="button"
+                    onClick={handleToggleMute}
+                    style={{
+                      marginTop: 10, width: '100%', padding: '6px 10px',
+                      background: '#f0e0c0', border: '1px solid #c8a874',
+                      borderRadius: 6, cursor: 'pointer', fontSize: 13,
+                      color: '#3a2a1a',
+                    }}
+                  >
+                    {isMuted(playerId)
+                      ? '🔔 Recevoir à nouveau les emojis de ce voyageur'
+                      : '🔕 Ne plus recevoir d\'emojis de ce voyageur'}
+                  </button>
+                )}
               </>
             )}
 
