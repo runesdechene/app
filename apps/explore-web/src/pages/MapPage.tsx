@@ -24,6 +24,7 @@ import { usePlayer } from '../hooks/usePlayer'
 import { usePresence } from '../hooks/usePresence'
 import { useBrouillagePistes } from '../hooks/useBrouillagePistes'
 import { useTimezoneSync } from '../hooks/useTimezoneSync'
+import { useUserNote } from '../hooks/useUserNote'
 import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
@@ -163,6 +164,9 @@ export default function MapPage() {
   useBrouillagePistes()
   // V0.7+ Mini-quêtes journalières — sync timezone du device pour le reset minuit local
   useTimezoneSync()
+  // V0.7+ Note du moment — fetch initial + sync playerStore.ownNote* au mount
+  // (sinon la note "disparaît" au reload et n'est pas broadcast aux autres via presence)
+  useUserNote()
   // Chat en jeu
   useChat()
   useNotifications()
