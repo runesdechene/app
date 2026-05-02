@@ -8,9 +8,13 @@ import { InfoModal } from './InfoModal'
 // d'encodage source / PWA cache observés par le passé.
 
 const TXT_TITLE       = 'Couronnes de Chêne'
-const TXT_DESCRIPTION = 'Récoltez chaque jour les Couronnes de Chêne sur les lieux que vous veillez. Un coffre apparaît toutes les 24h sur chaque lieu — cliquez pour ramasser. En solo : 1 Couronne par jour. En expédition (2 veilleurs ou plus) : 2 Couronnes par jour. Plafond personnel : 500.'
+const TXT_DESCRIPTION = "Chaque jour, des coffres de Couronnes apparaissent sur certains des lieux que vous veillez. Si vous en veillez peu, ils en ont presque tous. Si vous en veillez beaucoup, l'algorithme tire au sort jusqu'à 15 lieux par jour — qui changent chaque matin — pour que vos meilleurs jours plafonnent autour de 15 à 30 Couronnes, mais que sur la durée tous vos lieux contribuent. Cliquez sur un coffre pour ramasser : +1 en solo, +2 en expédition. Plafond personnel : 500."
+const TXT_ROW_DAILY   = 'Coffres par jour'
+const TXT_ROW_DAILY_VAL = 'jusqu’à 15 lieux tirés au sort'
 const TXT_ROW_SOLO    = 'Récolte solo'
-const TXT_ROW_EXP     = 'Récolte en expédition'
+const TXT_ROW_SOLO_VAL = '+1 Couronne par coffre'
+const TXT_ROW_EXP     = 'Récolte en expédition (2 veilleurs ou +)'
+const TXT_ROW_EXP_VAL = '+2 Couronnes par coffre'
 const TXT_ROW_FUTURE  = 'À venir'
 const TXT_ROW_FUTURE_VAL = 'Acheter des énigmes, déplacer son Campement'
 
@@ -43,8 +47,9 @@ export function CrownsBadge() {
           description={TXT_DESCRIPTION}
           rows={[
             { label: 'Stock actuel', value: `${balance} / 500`, highlight: true },
-            { label: TXT_ROW_SOLO, value: '+1 / jour / lieu' },
-            { label: TXT_ROW_EXP, value: '+2 / jour / lieu' },
+            { label: TXT_ROW_DAILY, value: TXT_ROW_DAILY_VAL },
+            { label: TXT_ROW_SOLO, value: TXT_ROW_SOLO_VAL },
+            { label: TXT_ROW_EXP, value: TXT_ROW_EXP_VAL },
             { label: TXT_ROW_FUTURE, value: TXT_ROW_FUTURE_VAL },
           ]}
           onClose={() => setShowInfo(false)}
