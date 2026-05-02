@@ -840,6 +840,7 @@ export const ExploreMap = memo(function ExploreMap() {
                   text={ownNoteText!}
                   reactions={ownNoteReactions}
                   onTap={() => setShowSelfPopover(true)}
+                  compact={zoomLevel < 13}
                 />
               )}
               {showSelfPopover && currentUserId && (
