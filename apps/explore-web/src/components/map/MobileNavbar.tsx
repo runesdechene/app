@@ -1,16 +1,10 @@
-import { useState } from 'react'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { useToastStore } from '../../stores/toastStore'
 import { useChatStore } from '../../stores/chatStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
-import { useUserQuests } from '../../hooks/useUserQuests'
-import { QuestsPanel } from '../quests/QuestsPanel'
 
 export function MobileNavbar() {
-  const [questsOpen, setQuestsOpen] = useState(false)
-  const { quests, loading: questsLoading } = useUserQuests()
-  const incompleteQuests = quests.filter(q => !q.completed).length
   const activePanel = useMobileNavStore(s => s.activePanel)
   const togglePanel = useMobileNavStore(s => s.togglePanel)
   const closePanel = useMobileNavStore(s => s.closePanel)
@@ -28,22 +22,18 @@ export function MobileNavbar() {
   const initial = userName ? userName.charAt(0).toUpperCase() : '?'
 
   function handleProfileTap() {
-    // Fermer tout panneau ouvert
     closePanel()
-    // Ouvrir le profil joueur en grand
     if (userId) {
       useMapStore.getState().setSelectedPlayerId(userId)
     }
   }
 
   function handlePanelTap(panel: 'notifications' | 'chat') {
-    // Fermer le profil si ouvert
     useMapStore.getState().setSelectedPlayerId(null)
     togglePanel(panel)
   }
 
   function handleMapTap() {
-    // Tout fermer : panneau, profil, place panel
     closePanel()
     useMapStore.getState().setSelectedPlayerId(null)
     useMapStore.getState().setSelectedPlaceId(null)
@@ -53,7 +43,6 @@ export function MobileNavbar() {
 
   return (
     <nav className="mobile-navbar">
-      {/* Carte */}
       <button
         className={`mobile-nav-item${nothingOpen ? ' active' : ''}`}
         onClick={handleMapTap}
@@ -63,7 +52,6 @@ export function MobileNavbar() {
         <span className="mobile-nav-label">Carte</span>
       </button>
 
-      {/* Notifications */}
       <button
         className={`mobile-nav-item${activePanel === 'notifications' ? ' active' : ''}`}
         onClick={() => handlePanelTap('notifications')}
@@ -76,25 +64,10 @@ export function MobileNavbar() {
         <span className="mobile-nav-label">Activite</span>
       </button>
 
-      {/* V0.7+ Quêtes du jour */}
-      <button
-        className={`mobile-nav-item${questsOpen ? ' active' : ''}`}
-        onClick={() => {
-          // Ferme tout panneau ouvert avant
-          closePanel()
-          useMapStore.getState().setSelectedPlayerId(null)
-          setQuestsOpen(true)
-        }}
-        aria-label="Quêtes du jour"
-      >
-        <span className="mobile-nav-icon">📜</span>
-        {incompleteQuests > 0 && (
-          <span className="mobile-nav-badge">{incompleteQuests}</span>
-        )}
-        <span className="mobile-nav-label">Quêtes</span>
-      </button>
+      {/* V0.7+ Quêtes : désactivé visuellement (2026-05-02) tant que le système n'est pas
+          réintroduit proprement (3 quêtes sur 4 ne tracking plus depuis le rollback mig 058).
+          Les fichiers useUserQuests / QuestsPanel / QuestRow sont conservés pour réactivation. */}
 
-      {/* Chat */}
       <button
         className={`mobile-nav-item${activePanel === 'chat' ? ' active' : ''}`}
         onClick={() => handlePanelTap('chat')}
@@ -107,7 +80,6 @@ export function MobileNavbar() {
         <span className="mobile-nav-label">Messages</span>
       </button>
 
-      {/* Profil — ouvre le PlayerProfileModal directement */}
       <button
         className="mobile-nav-item"
         onClick={handleProfileTap}
@@ -120,12 +92,6 @@ export function MobileNavbar() {
         )}
         <span className="mobile-nav-label">Profil</span>
       </button>
-      <QuestsPanel
-        isOpen={questsOpen}
-        onClose={() => setQuestsOpen(false)}
-        quests={quests}
-        loading={questsLoading}
-      />
     </nav>
   )
 }
