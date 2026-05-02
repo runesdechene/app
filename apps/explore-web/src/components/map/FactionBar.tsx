@@ -29,11 +29,12 @@ interface FactionMeta {
   order: number
 }
 
-const COUPE_LABEL = 'Coupe des Héritages'
+const COUPE_LABEL = 'Héritages'
 
 export function FactionBar() {
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userId = usePlayerStore(s => s.userId)
+  const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
   const [selectedFaction, setSelectedFaction] = useState<FactionRowEnriched | null>(null)
@@ -91,13 +92,16 @@ export function FactionBar() {
       setSeasonName(state.season?.name ?? null)
     }
 
+    if (!factionColorMode) return  // mode Coupe désactivé : pas de fetch, pas de scoreboard
+
     load()
     // Polling 30s — on ressent la progression quasi-temps réel quand un user
     // ajoute une action (carnet, plantage, énigme) sans avoir à reload la page.
     const id = window.setInterval(load, 30000)
     return () => { cancelled = true; window.clearInterval(id) }
-  }, [userId])
+  }, [userId, factionColorMode])
 
+  if (!factionColorMode) return null
   if (stats.length === 0) return null
 
   const maxScore = stats[0]?.score ?? 0

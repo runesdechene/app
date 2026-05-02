@@ -167,6 +167,48 @@
     display: none;
   }
 
+  /* Scoreboard FactionBar (jauges verticales sur la carte) : compactage mobile.
+     L'élément est ancré bottom-right via .influence-area et débordait sous le FAB "+"
+     centré. Réduction des colonnes/gaps/emblèmes ~30 % pour qu'il tienne dans la zone
+     droite sans atteindre la zone du FAB. */
+  .faction-scoreboard-bars {
+    gap: 4px;
+    padding: 4px 6px 3px;
+  }
+  .faction-scoreboard-col {
+    min-width: 22px;
+    gap: 2px;
+  }
+  .faction-scoreboard-crown,
+  .faction-scoreboard-crown-spacer {
+    height: 12px;
+    font-size: 11px;
+  }
+  .faction-scoreboard-emblem {
+    width: 20px;
+    height: 20px;
+  }
+  .faction-scoreboard-emblem-img {
+    width: 14px;
+    height: 14px;
+  }
+  .faction-scoreboard-track {
+    width: 9px;
+    height: 48px;
+  }
+  .faction-scoreboard-score {
+    font-size: 10px;
+  }
+  .faction-scoreboard-live {
+    padding: 3px 8px;
+    font-size: 9px;
+    gap: 4px;
+  }
+  .faction-scoreboard-live-dot {
+    width: 5px;
+    height: 5px;
+  }
+
   .mobile-energy-slot {
     display: flex;
     position: absolute;
