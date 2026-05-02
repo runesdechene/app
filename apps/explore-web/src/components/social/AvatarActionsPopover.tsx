@@ -37,15 +37,6 @@ export function AvatarActionsPopover(props: Props) {
   const ownNoteText = usePlayerStore(s => s.ownNoteText)
   const hasNote = props.mode === 'self' && !!ownNoteText
 
-  // ESC ferme
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') props.onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [props])
-
   // Click outside ferme — sauf clic sur le picker (qui est nested)
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -64,7 +55,18 @@ export function AvatarActionsPopover(props: Props) {
     <div
       ref={popoverRef}
       className="avatar-actions-popover"
+      // stopPropagation pour que la carte MapLibre n'intercepte pas le clavier (flèches → pan),
+      // la souris (clic → place caret), le wheel (zoom carte) et le touch.
       onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        e.stopPropagation()
+        if (e.key === 'Escape') props.onClose()
+      }}
+      onWheel={(e) => e.stopPropagation()}
+      onContextMenu={(e) => e.stopPropagation()}
     >
       {view === 'menu' && (
         <>
