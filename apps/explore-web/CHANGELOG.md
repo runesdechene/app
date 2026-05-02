@@ -1,3 +1,31 @@
+# ALPHA V0.7.1
+## La carte vit, la route s'éveille
+
+### 🔒 Brouille tes pistes
+Une option dans le menu profil te permet désormais de **brouiller ta position** auprès des autres voyageurs : ton avatar leur apparaît dans un rayon de **50 km** autour de toi, jamais à ta vraie position. Activé par défaut, parce que la confidentialité, ça doit être le réflexe. Toi, tu vois toujours ta vraie position GPS — le brouillage n'est que pour les autres.
+
+### 📜 Le mot du moment
+Sur ton profil, **laisse un mot** (200 caractères max) que tous les voyageurs voient sous ton avatar pendant **24 heures**. Un café au pied du chêne, un appel à se croiser, une trouvaille d'aujourd'hui. Les autres peuvent **réagir avec un emoji** — les compteurs s'empilent sous ta note. Au bout de 24h, tout disparaît, place blanche, repose ce que tu veux.
+
+### 👋 Lance un emoji
+Tape sur l'avatar d'un voyageur et **lance-lui un emoji** : il vole en arc à travers la carte, visible de tous ceux qui ont les deux silhouettes à l'écran. Pas de stockage, pas de notif — juste un signe instantané, façon Zenly. La banque emoji est curée pour Runes de Chêne (33 symboles : salutations, nature, marche, patrimoine, convivial, esprit, hommage). Le surclick est libre, pour les rafales. Si quelqu'un t'envoie trop d'emojis, **mute soft** depuis son profil — silencieux, sans humiliation.
+
+### 🎯 Les Quêtes du jour
+Un nouvel onglet **📜 Quêtes** dans la barre de navigation : 4 quêtes journalières fixes qui se valident automatiquement quand tu joues normalement.
+- **🪙 Récolte la moisson d'au moins 2 lieux** — +3 XP
+- **🌫️ Lève le brouillard sur 2 lieux** — +5 XP
+- **🗝️ Tente l'énigme du jour** — +5 XP
+- **👋 Lance un emoji ou réagis à une note** — +3 XP
+
+**+16 XP par jour** si tu fais tout. Reset à minuit dans ta timezone. Pas de bouton "récolter", pas de friction — un toast 🎯 t'avertit dès qu'une quête se complète.
+
+### Sous le capot
+- Le brouillage GPS est calculé une seule fois par session pour rester crédible (pas de "fantôme qui clignote").
+- Les actions des quêtes sont trackées par triggers SQL : aucun risque d'oublier de comptabiliser une découverte ou une moisson.
+- Réseau temps réel : channel emoji-throws broadcast pur (zéro DB), notes en presence + DB pour la persistence inter-sessions, quêtes en postgres_changes pour les toasts de complétion.
+
+---
+
 # ALPHA V0.7.0
 ## Niveaux, Vétérans, et un nouveau lexique
 
@@ -6,7 +34,7 @@ Tous les Veilleurs reprennent avec leurs accomplissements depuis le **1er mars**
 
 ### Trois actions, trois mots
 Le vocabulaire de l'app se précise. Trois gestes désormais clairement distincts :
-- **🔍 Découvrir** : un lieu sort du brouillard quand vous passez à proximité.
+- **🔍 Découvrir** : un lieu sort du brouillard quand vous dépensez vos points d'énergie pour le découvrir.
 - **🥾 Fouler** : vous y posez le pied physiquement, GPS en main.
 - **📜 Cartographier** : vous inscrivez un nouveau lieu dans la carte commune.
 
