@@ -75,6 +75,11 @@ interface MapState {
   mapStyleMode: 'game' | 'detailed' | 'satellite'
   setMapStyleMode: (mode: 'game' | 'detailed' | 'satellite') => void
 
+  /** Niveau de zoom courant (0 monde, ~14 ville, ~22 rue). Mis à jour par ExploreMap.
+   *  Lu par les overlays qui veulent compacter à bas zoom (NoteOverlay → icône). */
+  mapZoom: number
+  setMapZoom: (z: number) => void
+
   /** Territoire sélectionné (clic sur un blob) */
   selectedTerritoryData: TerritorySelection | null
   setSelectedTerritoryData: (data: TerritorySelection | null) => void
@@ -118,6 +123,9 @@ export const useMapStore = create<MapState>((set) => ({
 
   addPlaceMode: false,
   setAddPlaceMode: (active) => set({ addPlaceMode: active }),
+
+  mapZoom: 6,
+  setMapZoom: (z) => set({ mapZoom: z }),
 
   pendingNewPlaceCoords: null,
   setPendingNewPlaceCoords: (coords) => set({ pendingNewPlaceCoords: coords }),

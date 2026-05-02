@@ -3,7 +3,12 @@ import { Marker } from '@vis.gl/react-maplibre'
 import { NoteOverlay } from '../social/NoteOverlay'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
+import { useMapStore } from '../../stores/mapStore'
 import './OnlinePlayerMarkers.css'
+
+// Au-dessus de ce zoom : note complète (bulle + texte). Sous ce seuil :
+// icône 📜 compacte (la carte reste lisible quand on dézoome large).
+const NOTE_FULL_ZOOM_THRESHOLD = 13
 
 interface OnlinePlayer {
   userId: string
@@ -101,7 +106,7 @@ function OtherPlayerMarker({
 
       </div>
 
-      {/* V0.7+ Note éphémère portée vers document.body (z-index 9000, au-dessus des autres markers/icônes) */}
+      {/* V0.7+ Note éphémère portée vers document.body (compact = icône si zoom large) */}
       {noteIsActive && !isPopoverOpen && (
         <NoteOverlayForPlayer
           anchorEl={avatarEl}
@@ -128,5 +133,7 @@ function NoteOverlayForPlayer({
   anchorEl, text, noteUserId, onTap,
 }: { anchorEl: HTMLElement | null; text: string; noteUserId: string; onTap: () => void }) {
   const { reactions } = useNoteReactions(noteUserId)
-  return <NoteOverlay anchorEl={anchorEl} text={text} reactions={reactions} onTap={onTap} />
+  const mapZoom = useMapStore(s => s.mapZoom)
+  const compact = mapZoom < NOTE_FULL_ZOOM_THRESHOLD
+  return <NoteOverlay anchorEl={anchorEl} text={text} reactions={reactions} onTap={onTap} compact={compact} />
 }

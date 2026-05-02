@@ -781,7 +781,11 @@ export const ExploreMap = memo(function ExploreMap() {
       attributionControl={false}
       onLoad={onMapLoad}
       onMoveEnd={onMoveEnd}
-      onZoomEnd={e => setZoomLevel(Math.floor(e.viewState.zoom))}
+      onZoomEnd={e => {
+        const z = e.viewState.zoom
+        setZoomLevel(Math.floor(z))
+        useMapStore.getState().setMapZoom(z)
+      }}
     >
       {!addPlaceMode && <NavigationControl position="top-right" showCompass={false} />}
       {!addPlaceMode && <GeolocateControl position="top-right" trackUserLocation onGeolocate={onGeolocate} />}
