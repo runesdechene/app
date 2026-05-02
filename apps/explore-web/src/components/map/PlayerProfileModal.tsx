@@ -14,6 +14,7 @@ import { GloryProgressBar } from '../profile/GloryProgressBar'
 import { LevelText } from '../profile/LevelText'
 import { useUserNote } from '../../hooks/useUserNote'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
+import { useNoteReactors } from '../../hooks/useNoteReactors'
 import { useMutedUsers } from '../../hooks/useMutedUsers'
 import { NoteReactionsRow } from '../social/NoteReactionsRow'
 
@@ -161,6 +162,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [otherNotePostedAt, setOtherNotePostedAt] = useState<string | null>(null)
   const { note: ownNote, setNoteText, clearNote } = useUserNote()
   const { reactions, addReaction, refetch: refetchReactions } = useNoteReactions(playerId)
+  const { reactors, refetch: refetchReactors } = useNoteReactors(playerId)
   const { isMuted, muteUser, unmuteUser } = useMutedUsers()
   const [editNote, setEditNote] = useState('')
   const [savingNote, setSavingNote] = useState(false)
@@ -219,7 +221,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   async function handleReactToOther(emoji: string) {
     try {
       await addReaction(playerId, emoji)
-      await refetchReactions()
+      await Promise.all([refetchReactions(), refetchReactors()])
     } catch (err) {
       console.warn('[PlayerProfileModal] react_to_note failed', err)
     }
@@ -655,6 +657,55 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                       {otherNoteText}
                     </p>
                     <NoteReactionsRow reactions={reactions} />
+
+                    {/* Liste détaillée des reactors par emoji (qui a réagi) — V0.7+ feature */}
+                    {reactors.length > 0 && (
+                      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {reactions.map(({ emoji }) => {
+                          const list = reactors.filter(r => r.emoji === emoji)
+                          if (list.length === 0) return null
+                          return (
+                            <div key={emoji} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
+                              {list.map(r => (
+                                <span
+                                  key={r.reactorUserId}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    background: 'rgba(244, 232, 200, 0.6)',
+                                    border: '1px solid rgba(90, 39, 24, 0.15)',
+                                    borderRadius: 999,
+                                    padding: '2px 8px 2px 2px',
+                                    fontSize: 12,
+                                    color: '#3a2a1a',
+                                  }}
+                                >
+                                  {r.reactorAvatarUrl ? (
+                                    <img
+                                      src={r.reactorAvatarUrl}
+                                      alt=""
+                                      style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }}
+                                    />
+                                  ) : (
+                                    <span style={{
+                                      width: 20, height: 20, borderRadius: '50%',
+                                      background: '#8a6f4a', color: '#fff', fontSize: 11, fontWeight: 700,
+                                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                      {r.reactorName.charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                  {r.reactorName}
+                                </span>
+                              ))}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+
                     {/* Mini picker contextuel : 7 emojis salutation pour réagir vite */}
                     <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
                       {['👋', '❤️', '🤝', '🙏', '🌳', '☕', '🪙'].map(e => (

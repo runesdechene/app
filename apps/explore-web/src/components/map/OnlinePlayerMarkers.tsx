@@ -8,7 +8,7 @@ import './OnlinePlayerMarkers.css'
 
 // Au-dessus de ce zoom : note complète (bulle + texte). Sous ce seuil :
 // icône 📜 compacte (la carte reste lisible quand on dézoome large).
-const NOTE_FULL_ZOOM_THRESHOLD = 13
+const NOTE_FULL_ZOOM_THRESHOLD = 9
 
 interface OnlinePlayer {
   userId: string
