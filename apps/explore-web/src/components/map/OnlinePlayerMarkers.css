@@ -507,8 +507,8 @@
 /* Places section — tabs + photo grid */
 .player-modal-places {
   width: 100%;
-  margin-top: 14px;
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .player-modal-tabs {
@@ -702,7 +702,7 @@
 /* Player fragments bar */
 
 .player-modal-fragments {
-  padding: 6px 0;
+  padding: 6px 0 0 0;
   align-self: stretch;
   position: relative;
 }
@@ -772,14 +772,15 @@
 }
 
 .player-modal-fragments-title {
-  font-size: 14px;
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #8A7B6A;
-  font-weight: 600;
+  font-weight: 500;
   padding: 5px 0;
   margin-inline: 30px;;
   text-align: left;
+  font-family: var(--font-title);
 }
 
 .player-modal-fragment-badge {
@@ -1074,7 +1075,6 @@
   padding: 6px 0;
   align-self: stretch;
   position: relative;
-  margin-top: 14px;
 }
 .player-modal-section:first-child {
   margin-top: 0;
@@ -1082,18 +1082,19 @@
 
 /* Style copié de `.player-modal-fragments-title` pour cohérence visuelle. */
 .player-modal-section-title {
-  font-size: 14px;
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #8A7B6A;
-  font-weight: 600;
-  padding: 5px 0;
+  font-weight: 500;
+  padding: 0 0 5px 0;
   margin: 0;
   margin-inline: 30px;
   text-align: left;
   display: flex;
   align-items: baseline;
   gap: 8px;
+  font-family: var(--font-title);
 }
 
 .player-modal-section-count {
@@ -1114,7 +1115,6 @@
 /* Strict copy de `.player-modal-fragments-row` (qui marche). */
 .player-modal-places-row {
   display: flex;
-  align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -1135,7 +1135,7 @@
 /* Tiles portrait — ratio 3:4 (88 × 117 px), plus naturel pour des photos de lieux. */
 .player-modal-place-tile {
   flex: 0 0 auto;
-  width: 88px;
+  width: 130px;
   background: none;
   border: none;
   padding: 0;
@@ -1148,8 +1148,8 @@
 }
 
 .player-modal-place-tile-img {
-  width: 88px;
-  height: 117px;
+  width: 130px;
+  height: 180px;
   object-fit: cover;
   border-radius: 10px;
   background: rgba(193, 154, 107, 0.15);
@@ -1164,14 +1164,15 @@
 }
 
 .player-modal-place-tile-name {
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.25;
-  color: #4A3728;
+  color: #6e5d50;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   padding: 0 2px;
+  font-family: var(--font-accent);
 }
 
 /* Tile "Voir tout" — fond pointillé + grand "+N" centré. */

@@ -820,25 +820,25 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             <div className="player-modal-places">
               {/* V0.7+ Refonte 2026-05-02 : 3 carrousels horizontaux empilés. */}
               <PlacesCarousel
-                emoji={'\u{1F3DB}️'}
-                titleText="Ajoutés"
+                emoji={''}
+                titleText="A cartographié"
                 places={profile.authoredPlaces ?? []}
                 onPlaceClick={handlePlaceClick}
                 onViewAll={() => setViewAllSection('authored')}
               />
               <PlacesCarousel
-                emoji={'\u{1F9ED}'}
-                titleText="Explorés"
-                places={profile.discoveredPlaces ?? []}
-                onPlaceClick={handlePlaceClick}
-                onViewAll={() => setViewAllSection('discovered')}
-              />
-              <PlacesCarousel
-                emoji={'\u{1F6A9}'}
-                titleText="Revendiqués"
+                emoji={''}
+                titleText="Étendard planté sur..."
                 places={profile.veilledPlaces ?? []}
                 onPlaceClick={handlePlaceClick}
                 onViewAll={() => setViewAllSection('veilled')}
+              />
+              <PlacesCarousel
+                emoji={''}
+                titleText="S'est rendu à..."
+                places={profile.discoveredPlaces ?? []}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('discovered')}
               />
             </div>
           </>
