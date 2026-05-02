@@ -153,11 +153,26 @@
     right: 56px;
     padding: calc(var(--safe-top, 0px) + 6px) 8px 6px;
     gap: 4px;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background: rgba(245, 230, 211, 0.9);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid rgba(193, 154, 107, 0.2);
+  }
+
+  /* Énergie sortie de la toolbar mobile : remontée à droite de la barre "lieux découverts"
+     (cf. .conquest-indicator + .mobile-energy-slot). Libère de la place pour les autres
+     badges (Gloire/Coupe/Couronnes/Énigme/Cloche) qui s'étalent sur toute la largeur. */
+  .app-toolbar .energy-indicator {
+    display: none;
+  }
+
+  .mobile-energy-slot {
+    display: flex;
+    position: absolute;
+    top: calc(var(--safe-top, 0px) + 120px);
+    right: 7px;
+    z-index: 10;
   }
 
   .energy-indicator {

@@ -26,6 +26,7 @@ import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
 import { NoteOverlay } from '../social/NoteOverlay'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
 import { MapStyleSelect } from './MapStyleSelect'
+import { EnergyIndicator } from './EnergyIndicator'
 import { VeilleurNamePills } from './VeilleurNamePills'
 import { HarvestableChests } from './HarvestableChests'
 import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
@@ -1010,6 +1011,13 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       ) : null
     })()}
+
+    {/* Énergie déplacée hors de la toolbar du haut sur mobile : posée à droite de la
+        barre "lieux découverts" pour libérer la 1ère ligne (Gloire/Coupe/Couronnes/etc.).
+        Cachée sur desktop par défaut (CSS App.css), visible en mobile (mobile.css). */}
+    {!addPlaceMode && currentUserId && (
+      <div className="mobile-energy-slot"><EnergyIndicator /></div>
+    )}
 
     {/* Sélecteur de style de carte (toujours visible) */}
     <MapStyleSelect
