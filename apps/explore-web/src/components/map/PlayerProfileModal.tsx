@@ -477,63 +477,52 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   xpToNextLevel={isSelf ? xpToNextLevel : (profile.xpToNextLevel ?? 5)}
                   xpForNextLevel={isSelf ? xpForNextLevel : (profile.xpForNextLevel ?? 5)}
                 />
-                {/* Coupe \u2014 visible pour soi (score live) et pour les autres (depuis le profil) */}
-                {isSelf ? (
-                  coupeState?.myBreakdown && (
-                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                      <span>
-                        {'\uD83C\uDFC6'} {coupeState.myBreakdown.score} pts {'\u00E0 la Coupe'}
-                        {coupeState.season?.name && (
-                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                            ({coupeState.season.name})
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  )
-                ) : (
-                  (profile.coupeScoreCurrentSeason ?? 0) > 0 && (
-                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                      <span>
-                        {'\uD83C\uDFC6'} {profile.coupeScoreCurrentSeason} pts {'\u00E0 la Coupe'}
-                        {profile.coupeSeasonName && (
-                          <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                            ({profile.coupeSeasonName})
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  )
-                )}
-                {/* Couronnes \u2014 visible pour soi (store live) et pour les autres (depuis le profil) */}
-                {isSelf ? (
-                  <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                    <span>
-                      {'\uD83E\uDE99'} {crownsBalance} {'Couronne'}{crownsBalance > 1 ? 's' : ''} {'de Ch\u00EAne'}
-                      <span style={{ fontSize: '0.85em', opacity: 0.6, marginLeft: 6 }}>
-                        / 500
-                      </span>
-                    </span>
-                  </div>
-                ) : (
-                  (profile.crownsBalance ?? 0) > 0 && (
-                    <div className="player-modal-faction-row" style={{ gap: 12, fontSize: 13, opacity: 0.9 }}>
-                      <span>
-                        {'\uD83E\uDE99'} {profile.crownsBalance} {'Couronne'}{(profile.crownsBalance ?? 0) > 1 ? 's' : ''} {'de Ch\u00EAne'}
-                      </span>
-                    </div>
-                  )
-                )}
+                {/* V0.7 phase 3.5 \u2014 3 stats (Coupe / Couronnes / \u00C9nigmes) wrapp\u00E9es
+                    dans un container : display: contents sur desktop (rendu inchang\u00E9,
+                    lignes empil\u00E9es), grid 3 colonnes sur mobile (blocs centr\u00E9s). */}
+                <div className="player-modal-stats">
+                  {/* Coupe \u2014 score live pour soi, depuis le profil pour les autres */}
+                  {isSelf ? (
+                    coupeState?.myBreakdown ? (
+                      <div className="player-modal-stat">
+                        <span className="player-modal-stat-icon">{'\uD83C\uDFC6'}</span>
+                        <span className="player-modal-stat-value">{coupeState.myBreakdown.score}</span>
+                        <span className="player-modal-stat-label">{'\u00E0 la Coupe'}</span>
+                      </div>
+                    ) : null
+                  ) : (
+                    (profile.coupeScoreCurrentSeason ?? 0) > 0 ? (
+                      <div className="player-modal-stat">
+                        <span className="player-modal-stat-icon">{'\uD83C\uDFC6'}</span>
+                        <span className="player-modal-stat-value">{profile.coupeScoreCurrentSeason}</span>
+                        <span className="player-modal-stat-label">{'\u00E0 la Coupe'}</span>
+                      </div>
+                    ) : null
+                  )}
 
-                {/* V0.7 phase 3.5 \u2014 Sous les Couronnes, on garde uniquement
-                    le compteur d'\u00E9nigmes r\u00E9solues. Les lieux explor\u00E9s et
-                    veill\u00E9s sont d\u00E9j\u00E0 visibles dans les onglets en bas
-                    (Explor\u00E9s / Veill\u00E9s) \u2014 pas besoin de les dupliquer ici. */}
-                <div
-                  className="player-modal-faction-row"
-                  style={{ gap: 14, fontSize: 13, opacity: 0.85 }}
-                >
-                  <span>{'\uD83D\uDCD6'} {profile.enigmasSolved ?? 0} {'\u00E9nigmes r\u00E9solues'}</span>
+                  {/* Couronnes */}
+                  {isSelf ? (
+                    <div className="player-modal-stat">
+                      <span className="player-modal-stat-icon">{'\uD83E\uDE99'}</span>
+                      <span className="player-modal-stat-value">{crownsBalance}</span>
+                      <span className="player-modal-stat-label">{'Couronne'}{crownsBalance > 1 ? 's' : ''}</span>
+                    </div>
+                  ) : (
+                    (profile.crownsBalance ?? 0) > 0 ? (
+                      <div className="player-modal-stat">
+                        <span className="player-modal-stat-icon">{'\uD83E\uDE99'}</span>
+                        <span className="player-modal-stat-value">{profile.crownsBalance}</span>
+                        <span className="player-modal-stat-label">{'Couronne'}{(profile.crownsBalance ?? 0) > 1 ? 's' : ''}</span>
+                      </div>
+                    ) : null
+                  )}
+
+                  {/* \u00C9nigmes r\u00E9solues */}
+                  <div className="player-modal-stat">
+                    <span className="player-modal-stat-icon">{'\uD83D\uDCD6'}</span>
+                    <span className="player-modal-stat-value">{profile.enigmasSolved ?? 0}</span>
+                    <span className="player-modal-stat-label">{'\u00E9nigmes'}</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1018,3 +1018,70 @@
     border-radius: 0;
   }
 }
+
+/* ==========================================
+   PlayerProfileModal — refonte mobile (2026-05-02 Uriel) :
+   layout vertical centré (avatar haut, nom, niveau, barre XP) +
+   3 stats en grille de blocs (Coupe / Couronnes / Énigmes).
+   ========================================== */
+@media (max-width: 768px) {
+  .player-modal-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .player-modal-info {
+    align-items: center;
+    padding: 0 16px 12px;
+    width: 100%;
+  }
+
+  .player-modal-info-top {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Désactive le display:contents desktop : sur mobile, c'est un vrai grid 3 colonnes. */
+  .player-modal-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .player-modal-stat {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 6px;
+    background: rgba(193, 154, 107, 0.12);
+    border: 1px solid rgba(193, 154, 107, 0.25);
+    border-radius: 10px;
+    text-align: center;
+    opacity: 1;
+  }
+
+  .player-modal-stat-icon {
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .player-modal-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4A3728;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .player-modal-stat-label {
+    font-size: 11px;
+    opacity: 0.7;
+    line-height: 1.2;
+  }
+}

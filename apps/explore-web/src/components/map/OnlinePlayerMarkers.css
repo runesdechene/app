@@ -276,12 +276,36 @@
   gap: 8px;
 }
 
+/* Desktop : container transparent (les 3 stats restent en lignes empilées
+   comme avant). Mobile : grid 3 colonnes (cf. mobile.css). */
+.player-modal-stats {
+  display: contents;
+}
+.player-modal-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+.player-modal-stat-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+.player-modal-stat-value {
+  font-weight: 600;
+  color: #4A3728;
+}
+.player-modal-stat-label {
+  opacity: 0.85;
+}
+
 .player-modal-name {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #2c1810;
-  font-family: inherit;
+  font-size: 25px;
+  font-weight: 400;
+  color: #5f483e;
+  font-family: var(--font-title);
 }
 
 .player-modal-edit-btn {
