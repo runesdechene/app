@@ -2,7 +2,6 @@ import { memo, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import { NoteOverlay } from '../social/NoteOverlay'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
-import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
 import './OnlinePlayerMarkers.css'
 
@@ -20,12 +19,14 @@ interface OnlinePlayer {
 interface Props {
   players: Map<string, OnlinePlayer>
   onSelectPlayer: (id: string) => void
+  /** Hissé en prop depuis ExploreMap pour partager l'unique instance de useEmojiThrows
+   *  (sinon le state `flying` de l'envoyeur vit dans une instance déconnectée du Layer). */
+  throwEmoji: (toUserId: string, emoji: string) => Promise<void>
 }
 
 const NOTE_TTL_MS = 24 * 60 * 60 * 1000
 
-export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, onSelectPlayer }: Props) {
-  const { throwEmoji } = useEmojiThrows()
+export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, onSelectPlayer, throwEmoji }: Props) {
   const [popoverFor, setPopoverFor] = useState<string | null>(null)
 
   return (

@@ -85,8 +85,11 @@ export const ExploreMap = memo(function ExploreMap() {
   const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
-  // V0.7+ Micro-social — channel emoji-throws + queue d'animations
-  const { flying } = useEmojiThrows()
+  // V0.7+ Micro-social — channel emoji-throws + queue d'animations.
+  // Instance unique du hook : `throwEmoji` est passé à OnlinePlayerMarkers en prop pour
+  // que l'envoi local et l'affichage `flying` partagent le même state (broadcast self:false,
+  // donc l'envoyeur ne voit son propre emoji que via l'optimistic update interne au hook).
+  const { flying, throwEmoji } = useEmojiThrows()
   const [showSelfPopover, setShowSelfPopover] = useState(false)
   // Callback ref via state : un useRef ne déclenche pas de re-render quand le DOM
   // s'attache, donc NoteOverlay / AvatarActionsPopover recevaient null forever.
@@ -848,7 +851,7 @@ export const ExploreMap = memo(function ExploreMap() {
       )}
 
       {/* Marqueurs des autres joueurs connectés */}
-      <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} />
+      <OnlinePlayerMarkers players={onlinePlayers} onSelectPlayer={setSelectedPlayerId} throwEmoji={throwEmoji} />
 
       {/* V0.7 — Mode Coupe des Héritages ON : pilule sépia signée du nom du veilleur,
           centrée sous l'icône du lieu. Remplace l'emblème faction (humanisation). React
