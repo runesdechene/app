@@ -82,6 +82,10 @@ export function usePresence() {
               timestamp: Date.now(),
             })
             if (payload.lat != null && payload.lng != null) {
+              // V0.7+ Note volontairement OMISE ici : la DB (via useNotesRealtime) est la
+              // seule source de vérité pour les notes des autres voyageurs. Presence reste
+              // utilisé pour position/avatar/titres, où il est correct.
+              const existing = usePlayersStore.getState().players.get(payload.userId)
               setPlayer({
                 userId: payload.userId,
                 name: payload.name,
@@ -91,8 +95,8 @@ export function usePresence() {
                 avatarUrl: payload.avatarUrl,
                 displayedTitles: Array.isArray(payload.displayedTitles) ? payload.displayedTitles : [],
                 lastSeen: Date.now(),
-                noteText: payload.noteText ?? null,
-                notePostedAt: payload.notePostedAt ?? null,
+                noteText: existing?.noteText ?? null,
+                notePostedAt: existing?.notePostedAt ?? null,
               })
             }
           }
@@ -105,6 +109,8 @@ export function usePresence() {
             const lat = raw.lat as number | null
             const lng = raw.lng as number | null
             if (lat == null || lng == null) continue
+            // V0.7+ Note OMISE ici (cf. join handler) : DB seule source pour les autres notes.
+            const existingSync = usePlayersStore.getState().players.get(raw.userId as string)
             setPlayer({
               userId: raw.userId as string,
               name: raw.name as string,
@@ -114,8 +120,8 @@ export function usePresence() {
               avatarUrl: (raw.avatarUrl as string) ?? null,
               displayedTitles: Array.isArray(raw.displayedTitles) ? (raw.displayedTitles as string[]) : [],
               lastSeen: Date.now(),
-              noteText: (raw.noteText as string | null) ?? null,
-              notePostedAt: (raw.notePostedAt as string | null) ?? null,
+              noteText: existingSync?.noteText ?? null,
+              notePostedAt: existingSync?.notePostedAt ?? null,
             })
           }
         })
