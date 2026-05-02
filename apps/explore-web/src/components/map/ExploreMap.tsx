@@ -23,6 +23,9 @@ import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
+import { NoteBubble } from '../social/NoteBubble'
+import { NoteReactionsRow } from '../social/NoteReactionsRow'
+import { useNoteReactions } from '../../hooks/useNoteReactions'
 import { MapStyleSelect } from './MapStyleSelect'
 import { VeilleurNamePills } from './VeilleurNamePills'
 import { HarvestableChests } from './HarvestableChests'
@@ -86,6 +89,17 @@ export const ExploreMap = memo(function ExploreMap() {
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations
   const { flying } = useEmojiThrows()
   const [showSelfPopover, setShowSelfPopover] = useState(false)
+  // V0.7+ Note du moment — la note posée doit s'afficher sous mon propre avatar
+  // sur la carte (pas seulement pour les autres). Lecture depuis playerStore qui est
+  // synchronisé par useUserNote (utilisé dans le NoteEditor du popover).
+  const ownNoteText = usePlayerStore(s => s.ownNoteText)
+  const ownNotePostedAt = usePlayerStore(s => s.ownNotePostedAt)
+  const ownNoteIsActive = !!(
+    ownNoteText &&
+    ownNotePostedAt &&
+    new Date(ownNotePostedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000
+  )
+  const { reactions: ownNoteReactions } = useNoteReactions(ownNoteIsActive ? currentUserId : null)
   const [viewportSize, setViewportSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   useEffect(() => {
     const update = () => setViewportSize({ w: window.innerWidth, h: window.innerHeight })
@@ -809,6 +823,26 @@ export const ExploreMap = memo(function ExploreMap() {
               {userDisplayedTitles.map((title, i) => (
                 <span key={i} className="other-player-title">{title}</span>
               ))}
+              {ownNoteIsActive && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    pointerEvents: 'auto',
+                    zIndex: 4,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <NoteBubble
+                    authorName={userName ?? 'Moi'}
+                    text={ownNoteText!}
+                    onTap={() => currentUserId && setSelectedPlayerId(currentUserId)}
+                  />
+                  <NoteReactionsRow reactions={ownNoteReactions} />
+                </div>
+              )}
               {showSelfPopover && currentUserId && (
                 <div
                   style={{
