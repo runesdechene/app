@@ -161,29 +161,15 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   // (décision Uriel 2026-05-02 — fini les 2 boutons quasi-identiques).
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const [loading, setLoading] = useState(false)
-  const [revisited, setRevisited] = useState(false)
-  const [recentlyVisited, setRecentlyVisited] = useState(true) // hide by default until check
   const [showRating, setShowRating] = useState(false)
   const [ratingValue, setRatingValue] = useState(0)
   const [ratingSaved, setRatingSaved] = useState(false)
   const [visitRewards, setVisitRewards] = useState<{ stock: number; exploration: number; visitNumber: number; nextVisitGain?: number } | null>(null)
 
-  // Vérifier si le joueur a visité/créé/revisité ce lieu dans les 24h
-  useEffect(() => {
-    if (!userId || !isExplorer) return
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    supabase
-      .from('activity_log')
-      .select('id')
-      .eq('actor_id', userId)
-      .eq('place_id', placeId)
-      .in('type', ['visit_gps', 'revisit_gps', 'new_place'])
-      .gte('created_at', since)
-      .limit(1)
-      .then(({ data }) => {
-        setRecentlyVisited((data?.length ?? 0) > 0)
-      })
-  }, [userId, placeId, isExplorer])
+  // Bouton "Revisiter (sur place)" retiré 2026-05-02 (Uriel) — la mécanique
+  // de revisite GPS V0.5 (gain influence par revisite) est obsolète depuis
+  // la refonte Gloire/Coupe ; le geste utile sur place est désormais "Planter
+  // mon étendard" (= visit + plant_flag en 1 tap).
 
   const isOnSite = useMemo(() => {
     if (!userPosition) return false
@@ -193,66 +179,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
   }, [userPosition, placeLocation])
-
-  async function handleRevisit() {
-    if (!userId || !userPosition || loading || revisited) return
-    setLoading(true)
-    const { data, error } = await supabase.rpc('revisit_place_gps', {
-      p_user_id: userId,
-      p_place_id: placeId,
-      p_user_lat: userPosition.lat,
-      p_user_lng: userPosition.lng,
-    })
-    const result = data as {
-      success?: boolean
-      stockGain?: number
-      explorationGain?: number
-      newInfluenceStock?: number
-      newExploration?: number
-      visitNumber?: number
-      nextVisitGain?: number
-      error?: string
-      distanceKm?: number
-    } | null
-
-    if (error) {
-      useToastStore.getState().addToast({
-        type: 'error',
-        message: 'Erreur réseau, réessayez',
-        timestamp: Date.now(),
-      })
-    } else if (result?.error === 'already_revisited_today') {
-      setRevisited(true)
-    } else if (result?.error) {
-      const msg =
-        result.error === 'too_far' ? `Trop loin du lieu (${result.distanceKm} km)` :
-        result.error === 'not_visited_yet' ? 'Vous devez d\'abord visiter ce lieu' :
-        result.error === 'no_faction' ? 'Choisissez une faction d\'abord' :
-        result.error === 'unauthorized' ? 'Session expirée, reconnectez-vous' :
-        `Erreur: ${result.error}`
-      useToastStore.getState().addToast({ type: 'error', message: msg, timestamp: Date.now() })
-    } else if (result?.success) {
-      if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
-      if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
-      setVisitRewards({
-        stock: result.stockGain ?? 0,
-        exploration: result.explorationGain ?? 0,
-        visitNumber: result.visitNumber ?? 1,
-        nextVisitGain: result.nextVisitGain,
-      })
-      useToastStore.getState().addToast({
-        type: 'revisit',
-        message: `De retour sur ${placeTitle} !`,
-        highlights: [placeTitle],
-        placeId,
-        placeLocation,
-        timestamp: Date.now(),
-      })
-      setRevisited(true)
-      setShowRating(true)
-    }
-    setLoading(false)
-  }
 
   const needsRefreshRef = useRef(false)
 
@@ -316,64 +242,45 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 
   return (
     <div className="place-explorers-unified">
-      <div className="place-exp-title-row">
-        <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
+      <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
+      <div className="place-explorers-avatars">
+        <div className="place-explorers-avatars-list">
+          {sorted.map(exp => {
+            const isAuthor = exp.userId === authorId
+            const isGuardian = exp.userId === guardianId
+            const color = factionColors.get(exp.factionId) ?? '#8A7B6A'
+            return (
+              <button
+                key={exp.userId}
+                className="place-exp-avatar-wrap"
+                onClick={() => useMapStore.getState().setSelectedPlayerId(exp.userId)}
+                title={`${exp.userName}${isAuthor ? ' — Découvreur' : ''}${isGuardian ? ' — Gardien' : ''}`}
+              >
+                {exp.userAvatar ? (
+                  <img src={exp.userAvatar} alt={exp.userName} className="place-exp-avatar" style={{ borderColor: color }} />
+                ) : (
+                  <div className="place-exp-avatar place-exp-avatar-fallback" style={{ backgroundColor: color }}>
+                    {(exp.userName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                {isAuthor && <span className="place-exp-badge place-exp-badge-author">⭐</span>}
+                {isGuardian && <span className={`place-exp-badge place-exp-badge-guardian${isAuthor ? ' place-exp-badge-offset' : ''}`}>🛡️</span>}
+              </button>
+            )
+          })}
+          {userId && !isExplorer && !userFactionId && (
+            <button
+              className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
+              onClick={isOnSite ? handleVisit : undefined}
+              disabled={!isOnSite || loading}
+              title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
+            >
+              {loading && !isExplorer ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
+            </button>
+          )}
+        </div>
         {userFactionId && (
           <VeilleFrame placeId={placeId} placeLocation={placeLocation} />
-        )}
-      </div>
-      <div className="place-explorers-avatars">
-        {sorted.map(exp => {
-          const isAuthor = exp.userId === authorId
-          const isGuardian = exp.userId === guardianId
-          const color = factionColors.get(exp.factionId) ?? '#8A7B6A'
-          return (
-            <button
-              key={exp.userId}
-              className="place-exp-avatar-wrap"
-              onClick={() => useMapStore.getState().setSelectedPlayerId(exp.userId)}
-              title={`${exp.userName}${isAuthor ? ' — Découvreur' : ''}${isGuardian ? ' — Gardien' : ''}`}
-            >
-              {exp.userAvatar ? (
-                <img src={exp.userAvatar} alt={exp.userName} className="place-exp-avatar" style={{ borderColor: color }} />
-              ) : (
-                <div className="place-exp-avatar place-exp-avatar-fallback" style={{ backgroundColor: color }}>
-                  {(exp.userName || '?').charAt(0).toUpperCase()}
-                </div>
-              )}
-              {isAuthor && <span className="place-exp-badge place-exp-badge-author">⭐</span>}
-              {isGuardian && <span className={`place-exp-badge place-exp-badge-guardian${isAuthor ? ' place-exp-badge-offset' : ''}`}>🛡️</span>}
-            </button>
-          )
-        })}
-        {userId && !isExplorer && !userFactionId && (
-          <button
-            className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
-            onClick={isOnSite ? handleVisit : undefined}
-            disabled={!isOnSite || loading}
-            title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
-          >
-            {loading && !isExplorer ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
-          </button>
-        )}
-        {userId && isExplorer && !revisited && !recentlyVisited && (
-          <button
-            className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
-            onClick={isOnSite ? handleRevisit : undefined}
-            disabled={!isOnSite || loading}
-            title={isOnSite ? 'Revisiter ce lieu pour gagner de l\'influence' : 'Rendez-vous sur place pour revisiter'}
-          >
-            {loading && isExplorer ? '...' : isOnSite ? '📍 De retour !' : '📍 Revisiter (sur place)'}
-          </button>
-        )}
-        {userId && isExplorer && (revisited || recentlyVisited) && (
-          <button
-            className="place-exp-visit-btn place-exp-visit-btn-disabled"
-            disabled
-            title="Vous avez déjà revisité ce lieu aujourd'hui"
-          >
-            ✓ Déjà revisité aujourd'hui
-          </button>
         )}
       </div>
 

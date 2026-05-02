@@ -430,20 +430,6 @@
   border-bottom: 1px dashed var(--color-parchment-dark);
 }
 
-/* Ligne wrapper : titre "Ils ont foulé ces terres" à gauche + bouton "Planter
-   mon étendard" à droite, alignés baseline. */
-.place-exp-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 0 0 6px;
-  flex-wrap: wrap;
-}
-.place-exp-title-row .place-exp-title {
-  margin: 0;
-}
-
 .place-exp-title {
   margin: 0 0 6px;
   font-family: var(--font-title);
@@ -459,11 +445,20 @@
   padding-left: 5px;
 }
 
+/* La rangée explorers tient désormais : liste avatars à gauche, et le bouton
+   "Planter mon étendard" (VeilleFrame) collé à droite, séparés par flex-1. */
 .place-explorers-avatars {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+.place-explorers-avatars-list {
+  display: flex;
+  align-items: center;
+  flex: 1;
   flex-wrap: wrap;
   gap: 2px;
+  min-width: 0;
 }
 
 .place-exp-avatar-wrap {
