@@ -177,14 +177,29 @@ export default function MapPage() {
   const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
   const [showVeteranWelcome, setShowVeteranWelcome] = useState(false)
 
+  // Veteran welcome : on lit veteran_welcomed_at en DB (mig 066) plutôt que
+  // localStorage qui est purgé par le service worker PWA à chaque update.
   useEffect(() => {
     if (!userId || !veteranFirstEra) return
-    const seenKey = `veteranWelcomeSeen_${userId}`
-    if (!localStorage.getItem(seenKey)) {
-      setShowVeteranWelcome(true)
-      localStorage.setItem(seenKey, '1')
-    }
+    let cancelled = false
+    void (async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('veteran_welcomed_at')
+        .eq('id', userId)
+        .maybeSingle()
+      if (cancelled || error) return
+      const welcomedAt = (data as { veteran_welcomed_at: string | null } | null)?.veteran_welcomed_at
+      if (!welcomedAt) setShowVeteranWelcome(true)
+    })()
+    return () => { cancelled = true }
   }, [userId, veteranFirstEra])
+
+  async function handleVeteranWelcomeClose() {
+    setShowVeteranWelcome(false)
+    const { error } = await supabase.rpc('dismiss_veteran_welcome')
+    if (error) console.warn('[MapPage] dismiss_veteran_welcome failed', error)
+  }
 
   // Auto-open auth modal si non connecté (une seule fois par session)
   const authPromptDone = useRef(false)
@@ -496,7 +511,7 @@ export default function MapPage() {
         />
       )}
       {showVeteranWelcome && (
-        <VeteranWelcomeModal onClose={() => setShowVeteranWelcome(false)} />
+        <VeteranWelcomeModal onClose={handleVeteranWelcomeClose} />
       )}
 
       {/* Overlay texture parchemin */}
