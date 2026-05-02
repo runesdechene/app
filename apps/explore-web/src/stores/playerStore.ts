@@ -64,6 +64,14 @@ interface PlayerState {
   userPosition: { lng: number; lat: number } | null
   setUserPosition: (pos: { lng: number; lat: number } | null) => void
 
+  /** V0.7+ Brouillage GPS — toggle privacy (défaut true). Pour les autres uniquement, soi voit toujours sa vraie position. */
+  brouillerPistes: boolean
+  setBrouillerPistes: (v: boolean) => void
+
+  /** V0.7+ Brouillage GPS — position publique floutée (50 km autour de userPosition), calculée 1x par session puis stable. */
+  publicPosition: { lng: number; lat: number } | null
+  setPublicPosition: (pos: { lng: number; lat: number } | null) => void
+
   /** Prénom du joueur (pour le chat, toasts, etc.) */
   userName: string | null
   setUserName: (name: string | null) => void
@@ -174,6 +182,12 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   userPosition: null,
   setUserPosition: (pos) => set({ userPosition: pos }),
+
+  brouillerPistes: true,
+  setBrouillerPistes: (v) => set({ brouillerPistes: v }),
+
+  publicPosition: null,
+  setPublicPosition: (pos) => set({ publicPosition: pos }),
 
   userName: null,
   setUserName: (name) => set({ userName: name }),

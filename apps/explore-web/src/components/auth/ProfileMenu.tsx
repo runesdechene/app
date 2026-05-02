@@ -4,6 +4,7 @@ import { useMapStore } from '../../stores/mapStore'
 import { EmailChangeModal } from './EmailChangeModal'
 import { useCalendarRef } from '../../hooks/useCalendarRef'
 import { CALENDAR_LABELS } from '../../lib/calendarUtils'
+import { supabase } from '../../lib/supabase'
 
 interface ProfileMenuProps {
   email: string
@@ -25,6 +26,24 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
+  const brouillerPistes = usePlayerStore(s => s.brouillerPistes)
+  const [savingBrouiller, setSavingBrouiller] = useState(false)
+
+  async function setBrouiller(value: boolean) {
+    if (savingBrouiller || value === brouillerPistes) return
+    setSavingBrouiller(true)
+    // Optimistic: applique localement, le serveur suit.
+    usePlayerStore.getState().setBrouillerPistes(value)
+    // Si on désactive, libérer la position floutée pour broadcaster la vraie au prochain track.
+    // Si on réactive, useBrouillagePistes recalculera (transition false→true).
+    if (!value) usePlayerStore.getState().setPublicPosition(null)
+    const { error } = await supabase.rpc('set_brouiller_pistes', { p_enabled: value })
+    if (error) {
+      console.warn('[ProfileMenu] set_brouiller_pistes failed', error)
+      usePlayerStore.getState().setBrouillerPistes(!value)
+    }
+    setSavingBrouiller(false)
+  }
 
   // Fermer le menu si clic a l'exterieur
   useEffect(() => {
@@ -122,6 +141,28 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
                 {CALENDAR_LABELS[ref]}
               </button>
             ))}
+          </div>
+
+          <div className="profile-dropdown-divider" />
+
+          <div className="profile-dropdown-calendar">
+            <span className="profile-dropdown-calendar-label">Visibilité de ma position</span>
+            <button
+              className={`profile-dropdown-action calendar-ref-option ${brouillerPistes ? 'active' : ''}`}
+              onClick={() => setBrouiller(true)}
+              disabled={savingBrouiller}
+            >
+              {brouillerPistes && <span className="calendar-ref-check">✓</span>}
+              🔒 Pistes brouillées (50 km)
+            </button>
+            <button
+              className={`profile-dropdown-action calendar-ref-option ${!brouillerPistes ? 'active' : ''}`}
+              onClick={() => setBrouiller(false)}
+              disabled={savingBrouiller}
+            >
+              {!brouillerPistes && <span className="calendar-ref-check">✓</span>}
+              👁️ Position GPS exacte
+            </button>
           </div>
 
           <div className="profile-dropdown-divider" />

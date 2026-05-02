@@ -35,7 +35,12 @@ export function usePresence() {
 
       function buildPayload(): PresencePayload {
         const state = usePlayerStore.getState()
-        const pos = state.userPosition
+        // V0.7+ Brouillage GPS — si toggle on et position floutée prête, on broadcast la floutée.
+        // Sinon on broadcast la vraie. Soi continue d'afficher sa vraie position (publicPosition
+        // n'est consommée QUE dans le payload presence — donc visible uniquement aux autres).
+        const pos = (state.brouillerPistes && state.publicPosition)
+          ? state.publicPosition
+          : state.userPosition
         return {
           userId: userId!,
           name: state.userName || 'Quelqu\'un',

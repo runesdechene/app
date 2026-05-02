@@ -71,7 +71,7 @@ export function usePlayer() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at')
+        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes')
         .eq('email_address', user!.email)
         .single()
 
@@ -100,6 +100,8 @@ export function usePlayer() {
 
       setUserId(userData.id)
       usePlayerStore.getState().setTutorialCompletedAt(userData.tutorial_completed_at)
+      // V0.7+ Brouillage GPS — privacy-by-default true (cohérent avec le DEFAULT SQL)
+      usePlayerStore.getState().setBrouillerPistes(userData.brouiller_pistes ?? true)
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')
@@ -330,10 +332,10 @@ export function usePlayer() {
               if (method === 'gps') {
                 message = `Le brouillard se lève sur ${place} et tu as foulé son sol 🥾 +4 Gloire / +3 Coupe`
               } else {
-                message = `Le brouillard se lève sur ${place} 🔍 +1 Gloire`
+                message = `Le brouillard se lève sur ${place}. +1 Gloire`
               }
             } else {
-              message = `Le brouillard se lève sur ${place} pour ${name} 🔍`
+              message = `${name} a levé le brouillard sur ${place}`
             }
             highlights.push(place)
             type = 'discover'
@@ -496,7 +498,7 @@ async function loadRecentActivity(currentUserId: string) {
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'discover' || e.type === 'explore') {
-      message = `Le brouillard se lève sur ${place} pour ${name} 🔍`
+      message = `${name} a levé le brouillard sur ${place}`
       highlights.push(name, place)
       type = 'discover'
     } else if (e.type === 'like') {
