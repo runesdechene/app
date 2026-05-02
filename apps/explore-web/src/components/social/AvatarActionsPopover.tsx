@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { EmojiPicker } from './EmojiPicker'
 import { useUserNote } from '../../hooks/useUserNote'
+import { usePlayerStore } from '../../stores/playerStore'
 import './AvatarActionsPopover.css'
 
 type Mode = 'self' | 'other'
@@ -33,6 +34,8 @@ type Props = PropsSelf | PropsOther
 export function AvatarActionsPopover(props: Props) {
   const [view, setView] = useState<SubView>('menu')
   const popoverRef = useRef<HTMLDivElement>(null)
+  const ownNoteText = usePlayerStore(s => s.ownNoteText)
+  const hasNote = props.mode === 'self' && !!ownNoteText
 
   // ESC ferme
   useEffect(() => {
@@ -82,7 +85,7 @@ export function AvatarActionsPopover(props: Props) {
               className="avatar-actions-popover__btn"
               onClick={() => setView('note')}
             >
-              📜 Laisser un mot
+              📜 {hasNote ? 'Changer ma note' : 'Laisser un mot'}
             </button>
           ) : (
             <button

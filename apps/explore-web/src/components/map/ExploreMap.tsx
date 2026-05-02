@@ -823,7 +823,7 @@ export const ExploreMap = memo(function ExploreMap() {
               {userDisplayedTitles.map((title, i) => (
                 <span key={i} className="other-player-title">{title}</span>
               ))}
-              {ownNoteIsActive && (
+              {ownNoteIsActive && !showSelfPopover && (
                 <div
                   style={{
                     position: 'absolute',
@@ -837,13 +837,11 @@ export const ExploreMap = memo(function ExploreMap() {
                     alignItems: 'center',
                     gap: 4,
                   }}
-                  onClick={(e) => e.stopPropagation()}
                 >
                   <NoteReactionsRow reactions={ownNoteReactions} />
                   <NoteBubble
-                    authorName={userName ?? 'Moi'}
                     text={ownNoteText!}
-                    onTap={() => currentUserId && setSelectedPlayerId(currentUserId)}
+                    onTap={() => setShowSelfPopover(true)}
                   />
                 </div>
               )}
