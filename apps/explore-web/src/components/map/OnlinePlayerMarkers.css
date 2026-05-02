@@ -1068,7 +1068,12 @@
    (refonte 2026-05-02 — remplace les anciens onglets cliquables)
    ========================================== */
 
+/* Strictement copié sur `.player-modal-fragments` (align-self stretch =
+   prend toute la largeur du modal qui a `align-items: center`). */
 .player-modal-section {
+  padding: 6px 0;
+  align-self: stretch;
+  position: relative;
   margin-top: 14px;
 }
 .player-modal-section:first-child {
