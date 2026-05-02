@@ -508,8 +508,6 @@
 .player-modal-places {
   width: 100%;
   margin-top: 14px;
-  padding: 0 30px;
-  box-sizing: border-box;
   text-align: left;
 }
 
@@ -1079,7 +1077,7 @@
 
 .player-modal-section-title {
   margin: 0 0 6px;
-  padding: 0 30px;
+  padding: 0 60px;
   font-family: var(--font-title, serif);
   font-size: 16px;
   font-weight: 600;
@@ -1095,13 +1093,15 @@
   font-weight: 500;
 }
 
-/* Padding horizontal 30 px = aligné avec .player-modal-fragments-row au-dessus. */
+/* Padding horizontal 60 px = même alignement effectif que les fragments
+   (qui ont 30 px de leur row + 30 px hérités du `.player-modal-header` parent).
+   La row prend toute la largeur du modal → scroll libre jusqu'aux bords. */
 .player-modal-places-row {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding: 4px 30px 8px;
+  padding: 4px 60px 8px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
