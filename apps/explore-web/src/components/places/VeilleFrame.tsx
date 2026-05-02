@@ -3,6 +3,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useVeille } from '../../hooks/useVeille'
 import { ExpeditionOptInModal } from './ExpeditionOptInModal'
 import { pushVeilleOverride } from '../../lib/loadInitialVeilles'
+import { supabase } from '../../lib/supabase'
 import etendardIcon from '../../assets/etendard.png'
 import type { NearbyPlanter } from '../../types/veille'
 import './VeilleFrame.css'
@@ -64,7 +65,20 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
     if (!userId || !userPosition) return
     setErrorMsg(null)
     setPlanting(true)
+    // 1 tap = visit + plant (décision Uriel 2026-05-02 : fini les 2 boutons
+    // quasi-identiques). On lance la visite en parallèle de plant_flag : si
+    // visit_place_gps échoue (déjà visité, etc.), peu importe — l'INSERT dans
+    // place_explorers est ON CONFLICT DO NOTHING côté SQL et le trigger XP
+    // (mig 042) ne fire que sur INSERT effectif. Plant_flag reste l'action
+    // critique : si elle plante, on remonte l'erreur.
+    const visitPromise = Promise.resolve(supabase.rpc('visit_place_gps', {
+      p_user_id: userId,
+      p_place_id: placeId,
+      p_user_lat: userPosition.lat,
+      p_user_lng: userPosition.lng,
+    })).then(() => {}, () => {/* la visite est secondaire, on ignore les erreurs */})
     const result = await plant(userId, userPosition.lat, userPosition.lng, partners)
+    await visitPromise
     setPlanting(false)
     setOptInCandidates(null)
     if ('error' in result) {

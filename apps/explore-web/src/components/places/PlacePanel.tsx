@@ -156,6 +156,10 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 }) {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
+  // Si user a une faction, le bouton "J'y suis allé" est masqué : la visite et
+  // le plantage de l'étendard se font en 1 tap via VeilleFrame plus bas
+  // (décision Uriel 2026-05-02 — fini les 2 boutons quasi-identiques).
+  const userFactionId = usePlayerStore(s => s.userFactionId)
   const [loading, setLoading] = useState(false)
   const [revisited, setRevisited] = useState(false)
   const [recentlyVisited, setRecentlyVisited] = useState(true) // hide by default until check
@@ -337,7 +341,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
             </button>
           )
         })}
-        {userId && !isExplorer && (
+        {userId && !isExplorer && !userFactionId && (
           <button
             className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
             onClick={isOnSite ? handleVisit : undefined}
@@ -929,7 +933,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             <ExplorerRow
               explorers={v05.explorers ?? []}
               authorId={place.author?.id ?? null}
-              guardianId={v05.guardian?.userId ?? null}
+              guardianId={placeOverride?.veilleurUserId ?? null}
               factionColors={factionColors}
               placeId={place.id}
               placeTitle={place.title}
