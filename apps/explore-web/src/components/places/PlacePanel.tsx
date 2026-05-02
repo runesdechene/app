@@ -765,20 +765,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                   onClick={() => useMapStore.getState().setSelectedPlayerId(placeOverride.veilleurUserId!)}
                   title={`Voir le profil de ${placeOverride.veilleurName}`}
                 >
-                  {svg && (
-                    <span
-                      className="place-tag-faction-svg"
-                      style={{
-                        WebkitMaskImage: `url(${svg})`,
-                        maskImage: `url(${svg})`,
-                        backgroundColor: fc,
-                      }}
-                    />
-                  )}
-                  <span className="place-tag-veilleur-text">
-                    Veillé par {placeOverride.veilleurName}
-                    {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
-                  </span>
                   {avatar ? (
                     <img
                       src={avatar}
@@ -792,6 +778,20 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                     >
                       {initial}
                     </span>
+                  )}
+                  <span className="place-tag-veilleur-text">
+                    Veillé par {placeOverride.veilleurName}
+                    {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
+                  </span>
+                  {svg && (
+                    <span
+                      className="place-tag-faction-svg"
+                      style={{
+                        WebkitMaskImage: `url(${svg})`,
+                        maskImage: `url(${svg})`,
+                        backgroundColor: fc,
+                      }}
+                    />
                   )}
                 </span>
               )
