@@ -13,9 +13,10 @@ interface Props {
 
 /**
  * V0.7+ NoteBubble + NoteReactionsRow rendus via createPortal vers document.body
- * pour échapper au stack context des Markers MapLibre. Z-index 9000 → au-dessus
- * des icônes de lieux, coffres, et noms d'autres voyageurs. La position suit
- * l'avatar via requestAnimationFrame (suit pan/zoom de la carte).
+ * pour échapper au stack context des Markers MapLibre. Z-index 25 → au-dessus
+ * des icônes/markers (qui sont dans le stacking context de la carte, donc 0-15
+ * au niveau body) mais SOUS les modales UI (30+). La position suit l'avatar via
+ * requestAnimationFrame (suit pan/zoom de la carte).
  */
 export function NoteOverlay({ anchorEl, text, reactions, onTap }: Props) {
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
@@ -46,7 +47,7 @@ export function NoteOverlay({ anchorEl, text, reactions, onTap }: Props) {
         left: pos.left,
         top: pos.top - 8,
         transform: 'translate(-50%, -100%)',
-        zIndex: 9000,
+        zIndex: 25,
         pointerEvents: 'auto',
         display: 'flex',
         flexDirection: 'column-reverse',
