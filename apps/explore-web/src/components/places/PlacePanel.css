@@ -224,7 +224,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 10px 3px 4px;
+  padding: 3px 10px 3px 2px;
 }
 .place-tag-veilleur-text {
   display: inline-block;
