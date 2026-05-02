@@ -430,6 +430,20 @@
   border-bottom: 1px dashed var(--color-parchment-dark);
 }
 
+/* Ligne wrapper : titre "Ils ont foulé ces terres" à gauche + bouton "Planter
+   mon étendard" à droite, alignés baseline. */
+.place-exp-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 6px;
+  flex-wrap: wrap;
+}
+.place-exp-title-row .place-exp-title {
+  margin: 0;
+}
+
 .place-exp-title {
   margin: 0 0 6px;
   font-family: var(--font-title);

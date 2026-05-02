@@ -1,102 +1,45 @@
-/* Veille frame — sobre, parchment, intégré dans PlacePanel.
-   Refonte 2026-05-02 (Uriel) : ancien design "RPG card" (fond brun foncé, gros
-   bouton plein) remplacé par un cadre parchment discret avec un bouton rond
-   à l'image de l'étendard (assets/etendard.png). Touches signifiantes, pas de
-   cuir clouté — cohérent avec le reste de l'app. */
+/* Bouton "Planter mon étendard" inline (refonte 2026-05-02 — Uriel : à droite
+   de "Ils ont foulé ces terres" dans ExplorerRow). Compact, pilule parchment
+   avec icône étendard à gauche. */
 
-.veille-frame {
-  background: rgba(245, 230, 211, 0.55);
-  color: #4A3728;
-  border: 1px solid rgba(193, 154, 107, 0.3);
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.veille-frame-header {
-  font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(74, 55, 40, 0.6);
-}
-
-.veille-frame-state {
-  display: flex;
+.veille-plant-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  line-height: 1.4;
-  color: #4A3728;
-}
-
-.veille-frame-vacant {
-  font-style: italic;
-  color: rgba(74, 55, 40, 0.75);
-}
-
-.veille-frame-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: rgba(193, 154, 107, 0.2);
-  border: 1.5px solid #f5e6d3;
-}
-
-.veille-frame-heads {
-  display: flex;
-  flex-shrink: 0;
-}
-.veille-frame-heads .veille-frame-avatar:not(:first-child) {
-  margin-left: -8px;
-}
-
-/* Bouton plein "Veiller sur ce lieu" : icône étendard à gauche + texte clair. */
-.veille-frame-plant-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 6px 12px 6px 8px;
   background: linear-gradient(180deg, rgba(255, 248, 224, 0.95), rgba(244, 232, 200, 0.9));
   color: #4A3728;
   border: 1px solid rgba(193, 154, 107, 0.7);
   border-radius: 999px;
   font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.03em;
+  white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(74, 55, 40, 0.15);
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
-.veille-frame-plant-btn:hover:not(:disabled) {
+.veille-plant-btn:hover:not(:disabled) {
   background: linear-gradient(180deg, #fff8e0, #f4e8c8);
   border-color: rgba(193, 154, 107, 1);
-  box-shadow: 0 3px 10px rgba(74, 55, 40, 0.22);
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.22);
 }
-.veille-frame-plant-btn:active:not(:disabled) {
+.veille-plant-btn:active:not(:disabled) {
   transform: translateY(1px);
-  box-shadow: 0 1px 3px rgba(74, 55, 40, 0.2);
 }
-.veille-frame-plant-btn:disabled {
+.veille-plant-btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
 }
-.veille-frame-plant-btn.planting {
+.veille-plant-btn.planting {
   animation: veille-plant-pulse 1.4s ease-in-out infinite;
 }
 
-.veille-frame-plant-icon {
-  width: 22px;
-  height: 22px;
+.veille-plant-icon {
+  width: 18px;
+  height: 18px;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
@@ -108,22 +51,8 @@
   50%      { opacity: 0.7; }
 }
 
-.veille-frame-hint {
-  font-size: 12px;
-  font-style: italic;
-  color: rgba(74, 55, 40, 0.65);
-  text-align: center;
-  line-height: 1.4;
-}
-
-.veille-frame-error {
-  font-size: 13px;
-  color: #a05548;
-  font-style: italic;
-}
-
 /* ============================================
-   Expedition opt-in modal — refonte parchment cohérente
+   Expedition opt-in modal — palette parchment cohérente
    ============================================ */
 
 .expedition-modal-overlay {

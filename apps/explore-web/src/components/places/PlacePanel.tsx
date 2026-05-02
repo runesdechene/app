@@ -316,7 +316,12 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 
   return (
     <div className="place-explorers-unified">
-      <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
+      <div className="place-exp-title-row">
+        <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
+        {userFactionId && (
+          <VeilleFrame placeId={placeId} placeLocation={placeLocation} />
+        )}
+      </div>
       <div className="place-explorers-avatars">
         {sorted.map(exp => {
           const isAuthor = exp.userId === authorId
@@ -965,11 +970,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           )}
         </div>
 
-        {/* V0.7 — Veille (Plantage de l'étendard) */}
-        <VeilleFrame
-          placeId={place.id}
-          placeLocation={{ latitude: place.location.latitude, longitude: place.location.longitude }}
-        />
+        {/* V0.7 — Plantage de l'étendard désormais à droite du titre "Ils ont foulé ces
+            terres" dans ExplorerRow (décision Uriel 2026-05-02 — bouton inline plus
+            compact, état déjà visible dans la pilule "Veillé par" sous le titre du lieu). */}
 
         {/* Zone 3A — Influence Banners (V0.5) — MASQUÉ V0.6
             Le système d'influence V0.5 est mis en sommeil avec l'arrivée des
