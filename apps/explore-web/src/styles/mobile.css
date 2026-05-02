@@ -465,9 +465,17 @@
     margin: 40px 16px;
   }
 
+  /* Sur mobile, le FAB "+" (centré bas) chevauchait visuellement le bas de la modal
+     scoreboard / Coupe (1100 > 15 mais le FAB reste cliquable et bouche la lecture).
+     On pousse l'overlay vers le haut via padding-bottom et on réduit max-height pour
+     que la modale s'arrête au-dessus du FAB. */
+  .leaderboard-overlay {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 150px);
+  }
+
   .leaderboard-modal {
     max-width: 95vw;
-    max-height: 85vh;
+    max-height: 72vh;
   }
 
   .version-modal {
