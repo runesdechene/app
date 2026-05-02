@@ -780,7 +780,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                     </span>
                   )}
                   <span className="place-tag-veilleur-text">
-                    Veillé par {placeOverride.veilleurName}
+                    Revendiqué par {placeOverride.veilleurName}
                     {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
                   </span>
                   {svg && (

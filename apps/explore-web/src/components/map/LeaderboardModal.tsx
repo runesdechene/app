@@ -25,7 +25,7 @@ interface Props {
 
 const TAB_LABELS: Record<LeaderboardTab, string> = {
   notoriety: 'Gloire',
-  veilled:   'Lieux veillés',
+  veilled:   'Lieux revendiqués',
   authored:  'Lieux ajoutés',
 }
 

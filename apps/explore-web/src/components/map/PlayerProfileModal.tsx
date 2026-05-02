@@ -848,7 +848,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   className={`player-modal-tab${placesTab === 'veilled' ? ' active' : ''}`}
                   onClick={() => { setPlacesTab('veilled'); setVisibleCount(12) }}
                 >
-                  {'🚩'} {'Veillés'} <span className="player-modal-tabs-number">{profile.veilledPlaces?.length ?? 0}</span>
+                  {'🚩'} {'Revendiqués'} <span className="player-modal-tabs-number">{profile.veilledPlaces?.length ?? 0}</span>
                 </button>
               </div>
 
