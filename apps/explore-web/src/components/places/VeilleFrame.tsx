@@ -150,10 +150,10 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
             className={`veille-frame-plant-btn${planting ? ' planting' : ''}`}
             disabled={!canPlant}
             onClick={handlePlant}
-            aria-label="Veiller sur ce lieu"
+            aria-label="Planter mon étendard"
           >
             <img src={etendardIcon} alt="" className="veille-frame-plant-icon" />
-            <span>{planting ? 'Plantage en cours…' : 'Veiller sur ce lieu'}</span>
+            <span>{planting ? 'Plantage en cours…' : 'Planter mon étendard'}</span>
           </button>
           <div className="veille-frame-hint">
             Vous devez être sur place (à moins de 100&nbsp;m) pour effectuer cette action.
