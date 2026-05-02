@@ -21,6 +21,28 @@ interface PresencePayload {
 
 const TRACK_INTERVAL_MS = 10_000
 
+function buildPayload(userId: string): PresencePayload {
+  const state = usePlayerStore.getState()
+  // V0.7+ Brouillage GPS — si toggle on et position floutée prête, on broadcast la floutée.
+  // Sinon on broadcast la vraie. Soi continue d'afficher sa vraie position (publicPosition
+  // n'est consommée QUE dans le payload presence — donc visible uniquement aux autres).
+  const pos = (state.brouillerPistes && state.publicPosition)
+    ? state.publicPosition
+    : state.userPosition
+  return {
+    userId,
+    name: state.userName || 'Quelqu\'un',
+    factionColor: state.userFactionColor,
+    factionPattern: state.userFactionPattern,
+    avatarUrl: state.userAvatarUrl,
+    displayedTitles: state.displayedTitles,
+    lat: pos?.lat ?? null,
+    lng: pos?.lng ?? null,
+    noteText: state.ownNoteText,
+    notePostedAt: state.ownNotePostedAt,
+  }
+}
+
 /**
  * Hook de présence — à appeler UNE SEULE FOIS au niveau App.
  */
@@ -28,6 +50,10 @@ export function usePresence() {
   const userId = usePlayerStore(s => s.userId)
   const channelRef = useRef<RealtimeChannel | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // V0.7+ Watch ownNote* pour re-track immédiat (sinon les autres voient la note avec
+  // jusqu'à 10s de retard via l'interval)
+  const ownNoteText = usePlayerStore(s => s.ownNoteText)
+  const ownNotePostedAt = usePlayerStore(s => s.ownNotePostedAt)
 
   useEffect(() => {
     if (!userId) return
@@ -35,28 +61,6 @@ export function usePresence() {
     async function init() {
       const addToast = useToastStore.getState().addToast
       const { setPlayer, removePlayer } = usePlayersStore.getState()
-
-      function buildPayload(): PresencePayload {
-        const state = usePlayerStore.getState()
-        // V0.7+ Brouillage GPS — si toggle on et position floutée prête, on broadcast la floutée.
-        // Sinon on broadcast la vraie. Soi continue d'afficher sa vraie position (publicPosition
-        // n'est consommée QUE dans le payload presence — donc visible uniquement aux autres).
-        const pos = (state.brouillerPistes && state.publicPosition)
-          ? state.publicPosition
-          : state.userPosition
-        return {
-          userId: userId!,
-          name: state.userName || 'Quelqu\'un',
-          factionColor: state.userFactionColor,
-          factionPattern: state.userFactionPattern,
-          avatarUrl: state.userAvatarUrl,
-          displayedTitles: state.displayedTitles,
-          lat: pos?.lat ?? null,
-          lng: pos?.lng ?? null,
-          noteText: state.ownNoteText,
-          notePostedAt: state.ownNotePostedAt,
-        }
-      }
 
       const channel = supabase.channel('map-presence', {
         config: { presence: { key: userId! } },
@@ -124,13 +128,13 @@ export function usePresence() {
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            await channel.track(buildPayload())
+            await channel.track(buildPayload(userId!))
           }
         })
 
       intervalRef.current = setInterval(async () => {
         if (channel.state === 'joined') {
-          await channel.track(buildPayload())
+          await channel.track(buildPayload(userId!))
         }
       }, TRACK_INTERVAL_MS)
 
@@ -151,4 +155,12 @@ export function usePresence() {
       usePlayersStore.getState().clearAll()
     }
   }, [userId])
+
+  // V0.7+ Re-track immédiat quand la note change pour propager aux autres voyageurs sans attendre l'interval
+  useEffect(() => {
+    if (!userId) return
+    const channel = channelRef.current
+    if (!channel || channel.state !== 'joined') return
+    void channel.track(buildPayload(userId))
+  }, [userId, ownNoteText, ownNotePostedAt])
 }
