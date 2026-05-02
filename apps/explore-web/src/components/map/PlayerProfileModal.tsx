@@ -12,7 +12,6 @@ import { FactionMembersModal } from './FactionMembersModal'
 import { VeteranBadge } from '../profile/VeteranBadge'
 import { GloryProgressBar } from '../profile/GloryProgressBar'
 import { LevelText } from '../profile/LevelText'
-import { useUserNote } from '../../hooks/useUserNote'
 import { useNoteReactions } from '../../hooks/useNoteReactions'
 import { useNoteReactors } from '../../hooks/useNoteReactors'
 import { useMutedUsers } from '../../hooks/useMutedUsers'
@@ -160,12 +159,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   // V0.7+ Micro-social
   const [otherNoteText, setOtherNoteText] = useState<string | null>(null)
   const [otherNotePostedAt, setOtherNotePostedAt] = useState<string | null>(null)
-  const { note: ownNote, setNoteText, clearNote } = useUserNote()
   const { reactions, addReaction, refetch: refetchReactions } = useNoteReactions(playerId)
   const { reactors, refetch: refetchReactors } = useNoteReactors(playerId)
   const { isMuted, muteUser, unmuteUser } = useMutedUsers()
-  const [editNote, setEditNote] = useState('')
-  const [savingNote, setSavingNote] = useState(false)
 
   const isSelf = profile?.userId === currentUserId
 
@@ -198,25 +194,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     load()
   }, [playerId])
 
-  // Pré-remplit le champ d'édition de note avec la note posée (sur soi)
-  useEffect(() => {
-    if (isSelf) setEditNote(ownNote.text ?? '')
-  }, [isSelf, ownNote.text])
-
-  async function saveNoteOnBlur() {
-    if (!isSelf) return
-    const next = editNote.trim()
-    const current = ownNote.text ?? ''
-    if (next === current) return
-    setSavingNote(true)
-    try {
-      if (next.length === 0) await clearNote()
-      else await setNoteText(next)
-    } catch (err) {
-      console.warn('[PlayerProfileModal] save note failed', err)
-    }
-    setSavingNote(false)
-  }
 
   async function handleReactToOther(emoji: string) {
     try {
@@ -601,40 +578,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   Explorateur depuis le {formatDate(profile.joinedAt)}
                 </p>
 
-                {/* V0.7+ Micro-social — Note éphémère 24h */}
-                {isSelf && (
-                  <div style={{
-                    marginTop: 12,
-                    padding: 10,
-                    background: '#fdf3d6',
-                    border: '1px solid #c8a874',
-                    borderRadius: 8,
-                  }}>
-                    <label style={{
-                      display: 'block', fontSize: 11, textTransform: 'uppercase',
-                      color: '#7a4a1a', fontWeight: 600, letterSpacing: '0.04em', marginBottom: 6,
-                    }}>
-                      Mon mot du moment
-                    </label>
-                    <textarea
-                      value={editNote}
-                      onChange={e => setEditNote(e.target.value.slice(0, 200))}
-                      onBlur={saveNoteOnBlur}
-                      maxLength={200}
-                      disabled={savingNote}
-                      placeholder="Laisse un mot pour les autres voyageurs (visible 24h)…"
-                      style={{
-                        width: '100%', minHeight: 56, padding: 8,
-                        border: '1px solid #c8a874', borderRadius: 6,
-                        fontFamily: 'inherit', fontSize: 14, fontStyle: 'italic',
-                        background: '#fff', color: '#3a2a1a', resize: 'vertical',
-                      }}
-                    />
-                    <div style={{ textAlign: 'right', fontSize: 11, color: '#7a4a1a', marginTop: 4 }}>
-                      {editNote.length}/200
-                    </div>
-                  </div>
-                )}
+                {/* "Mon mot du moment" édité uniquement depuis la carte (avatar → popover).
+                    Décision Uriel 2026-05-02 : pas d'input dans le profil, c'est moche. */}
 
                 {!isSelf && otherNoteText && (
                   <div style={{
@@ -739,22 +684,22 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </div>
                 )}
 
-                {/* V0.7+ Mute soft — bouton dispo sur tout profil non-self */}
+                {/* V0.7+ Mute soft — petit lien discret en bas, l'utilisateur ne va le
+                    chercher que s'il en a vraiment besoin. */}
                 {!isSelf && (
-                  <button
-                    type="button"
-                    onClick={handleToggleMute}
-                    style={{
-                      marginTop: 10, width: '100%', padding: '6px 10px',
-                      background: '#f0e0c0', border: '1px solid #c8a874',
-                      borderRadius: 6, cursor: 'pointer', fontSize: 13,
-                      color: '#3a2a1a',
-                    }}
-                  >
-                    {isMuted(playerId)
-                      ? '🔔 Recevoir à nouveau les emojis de ce voyageur'
-                      : '🔕 Ne plus recevoir d\'emojis de ce voyageur'}
-                  </button>
+                  <div style={{ marginTop: 10, textAlign: 'right' }}>
+                    <button
+                      type="button"
+                      onClick={handleToggleMute}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: 11, color: '#8a6f4a', opacity: 0.7,
+                        padding: '2px 4px', fontFamily: 'inherit',
+                      }}
+                    >
+                      {isMuted(playerId) ? '🔔 réactiver les emojis' : '🔕 mute les emojis'}
+                    </button>
+                  </div>
                 )}
               </>
             )}
