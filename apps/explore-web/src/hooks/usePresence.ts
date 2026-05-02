@@ -14,9 +14,6 @@ interface PresencePayload {
   displayedTitles: string[]
   lat: number | null
   lng: number | null
-  /** V0.7+ Micro-social — note éphémère broadcastée pour qu'elle apparaisse sous l'avatar des autres */
-  noteText: string | null
-  notePostedAt: string | null
 }
 
 const TRACK_INTERVAL_MS = 10_000
@@ -38,22 +35,23 @@ function buildPayload(userId: string): PresencePayload {
     displayedTitles: state.displayedTitles,
     lat: pos?.lat ?? null,
     lng: pos?.lng ?? null,
-    noteText: state.ownNoteText,
-    notePostedAt: state.ownNotePostedAt,
   }
 }
 
 /**
  * Hook de présence — à appeler UNE SEULE FOIS au niveau App.
+ *
+ * V0.7+ La note éphémère N'EST PAS dans le payload presence : elle se propage
+ * exclusivement via `useNotesRealtime` (postgres_changes UPDATE sur `users`,
+ * mig 057). Mélanger les deux sources causait deux bugs : (1) la position
+ * publique sautait à chaque édit de note (re-track presence), (2) la note
+ * disparaissait chez les autres si le sync handler arrivait avant le UPDATE
+ * realtime (le `?? null` écrasait la valeur).
  */
 export function usePresence() {
   const userId = usePlayerStore(s => s.userId)
   const channelRef = useRef<RealtimeChannel | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  // V0.7+ Watch ownNote* pour re-track immédiat (sinon les autres voient la note avec
-  // jusqu'à 10s de retard via l'interval)
-  const ownNoteText = usePlayerStore(s => s.ownNoteText)
-  const ownNotePostedAt = usePlayerStore(s => s.ownNotePostedAt)
 
   useEffect(() => {
     if (!userId) return
@@ -82,9 +80,7 @@ export function usePresence() {
               timestamp: Date.now(),
             })
             if (payload.lat != null && payload.lng != null) {
-              // V0.7+ Note volontairement OMISE ici : la DB (via useNotesRealtime) est la
-              // seule source de vérité pour les notes des autres voyageurs. Presence reste
-              // utilisé pour position/avatar/titres, où il est correct.
+              // V0.7+ Note non touchée : preserve l'existante (mise à jour par useNotesRealtime).
               const existing = usePlayersStore.getState().players.get(payload.userId)
               setPlayer({
                 userId: payload.userId,
@@ -109,7 +105,7 @@ export function usePresence() {
             const lat = raw.lat as number | null
             const lng = raw.lng as number | null
             if (lat == null || lng == null) continue
-            // V0.7+ Note OMISE ici (cf. join handler) : DB seule source pour les autres notes.
+            // V0.7+ Note non touchée : preserve l'existante (mise à jour par useNotesRealtime).
             const existingSync = usePlayersStore.getState().players.get(raw.userId as string)
             setPlayer({
               userId: raw.userId as string,
@@ -161,12 +157,4 @@ export function usePresence() {
       usePlayersStore.getState().clearAll()
     }
   }, [userId])
-
-  // V0.7+ Re-track immédiat quand la note change pour propager aux autres voyageurs sans attendre l'interval
-  useEffect(() => {
-    if (!userId) return
-    const channel = channelRef.current
-    if (!channel || channel.state !== 'joined') return
-    void channel.track(buildPayload(userId))
-  }, [userId, ownNoteText, ownNotePostedAt])
 }
