@@ -1069,12 +1069,15 @@
    ========================================== */
 
 .player-modal-section {
-  margin-top: 18px;
+  margin-top: 14px;
+}
+.player-modal-section:first-child {
+  margin-top: 0;
 }
 
 .player-modal-section-title {
-  margin: 0 0 8px;
-  padding: 0 4px;
+  margin: 0 0 6px;
+  padding: 0 30px;
   font-family: var(--font-title, serif);
   font-size: 16px;
   font-weight: 600;
@@ -1090,12 +1093,13 @@
   font-weight: 500;
 }
 
+/* Padding horizontal 30 px = aligné avec .player-modal-fragments-row au-dessus. */
 .player-modal-places-row {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding: 4px 4px 8px;
+  padding: 4px 30px 8px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
@@ -1107,9 +1111,10 @@
   border-radius: 2px;
 }
 
+/* Tiles portrait — ratio 3:4 (88 × 117 px), plus naturel pour des photos de lieux. */
 .player-modal-place-tile {
   flex: 0 0 auto;
-  width: 96px;
+  width: 88px;
   background: none;
   border: none;
   padding: 0;
@@ -1122,15 +1127,15 @@
 }
 
 .player-modal-place-tile-img {
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 117px;
   object-fit: cover;
   border-radius: 10px;
   background: rgba(193, 154, 107, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 30px;
 }
 
 .player-modal-place-tile-img-fallback {
@@ -1197,7 +1202,7 @@
 
 .player-modal-view-all-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
   gap: 12px;
   overflow-y: auto;
   padding: 4px;
@@ -1207,6 +1212,6 @@
 }
 .player-modal-view-all-grid .player-modal-place-tile-img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   height: auto;
 }
