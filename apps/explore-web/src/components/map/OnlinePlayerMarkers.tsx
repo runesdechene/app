@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { memo, useRef, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import { NoteBubble } from '../social/NoteBubble'
 import { NoteReactionsRow } from '../social/NoteReactionsRow'
@@ -31,89 +31,109 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
 
   return (
     <>
-      {Array.from(players.values()).map(player => {
-        const noteIsActive = player.noteText && player.notePostedAt &&
-          new Date(player.notePostedAt).getTime() > Date.now() - NOTE_TTL_MS
-        const showPopover = popoverFor === player.userId
-
-        return (
-          <Marker
-            key={player.userId}
-            longitude={player.position.lng}
-            latitude={player.position.lat}
-            anchor="center"
-          >
-            <div className="other-player-marker-wrap" style={{ position: 'relative' }}>
-              <div
-                className="other-player-marker"
-                style={{ '--faction-color': player.factionColor ?? '#888' } as React.CSSProperties}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setPopoverFor(prev => prev === player.userId ? null : player.userId)
-                }}
-              >
-                {player.avatarUrl ? (
-                  <img src={player.avatarUrl} alt="" className="other-player-avatar" />
-                ) : (
-                  <div className="other-player-dot" />
-                )}
-                <span className="other-player-name">{player.name}</span>
-                {player.displayedTitles.map((title, i) => (
-                  <span key={i} className="other-player-title">{title}</span>
-                ))}
-              </div>
-
-              {/* V0.7+ Note éphémère au-dessus de l'avatar (réactions sous la bulle, près de l'avatar).
-                   Cachée tant que le popover d'actions est ouvert (le popover prend la place visuelle). */}
-              {noteIsActive && !showPopover && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 'calc(100% + 8px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    pointerEvents: 'auto',
-                    zIndex: 4,
-                    display: 'flex',
-                    flexDirection: 'column-reverse',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  <PlayerReactionsInline noteUserId={player.userId} />
-                  <NoteBubble
-                    text={player.noteText!}
-                    onTap={() => setPopoverFor(player.userId)}
-                  />
-                </div>
-              )}
-
-              {/* V0.7+ Mini popover d'actions (Voir profil / Envoyer emoji) */}
-              {showPopover && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 'calc(100% + 12px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 10,
-                  }}
-                >
-                  <AvatarActionsPopover
-                    mode="other"
-                    onClose={() => setPopoverFor(null)}
-                    onViewProfile={() => onSelectPlayer(player.userId)}
-                    onSendEmoji={(emoji) => { void throwEmoji(player.userId, emoji) }}
-                  />
-                </div>
-              )}
-            </div>
-          </Marker>
-        )
-      })}
+      {Array.from(players.values()).map(player => (
+        <OtherPlayerMarker
+          key={player.userId}
+          player={player}
+          isPopoverOpen={popoverFor === player.userId}
+          onTogglePopover={() => setPopoverFor(prev => prev === player.userId ? null : player.userId)}
+          onClosePopover={() => setPopoverFor(null)}
+          onSelectPlayer={onSelectPlayer}
+          onSendEmoji={(emoji) => { void throwEmoji(player.userId, emoji) }}
+        />
+      ))}
     </>
   )
 })
+
+interface SubProps {
+  player: OnlinePlayer
+  isPopoverOpen: boolean
+  onTogglePopover: () => void
+  onClosePopover: () => void
+  onSelectPlayer: (id: string) => void
+  onSendEmoji: (emoji: string) => void
+}
+
+function OtherPlayerMarker({
+  player,
+  isPopoverOpen,
+  onTogglePopover,
+  onClosePopover,
+  onSelectPlayer,
+  onSendEmoji,
+}: SubProps) {
+  const avatarRef = useRef<HTMLDivElement>(null)
+  const noteIsActive = !!(
+    player.noteText &&
+    player.notePostedAt &&
+    new Date(player.notePostedAt).getTime() > Date.now() - NOTE_TTL_MS
+  )
+
+  return (
+    <Marker
+      longitude={player.position.lng}
+      latitude={player.position.lat}
+      anchor="center"
+    >
+      <div className="other-player-marker-wrap" style={{ position: 'relative' }}>
+        <div
+          ref={avatarRef}
+          className="other-player-marker"
+          style={{ '--faction-color': player.factionColor ?? '#888' } as React.CSSProperties}
+          onClick={(e) => {
+            e.stopPropagation()
+            onTogglePopover()
+          }}
+        >
+          {player.avatarUrl ? (
+            <img src={player.avatarUrl} alt="" className="other-player-avatar" />
+          ) : (
+            <div className="other-player-dot" />
+          )}
+          <span className="other-player-name">{player.name}</span>
+          {player.displayedTitles.map((title, i) => (
+            <span key={i} className="other-player-title">{title}</span>
+          ))}
+        </div>
+
+        {/* V0.7+ Note éphémère au-dessus de l'avatar (cachée tant que le popover est ouvert) */}
+        {noteIsActive && !isPopoverOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 8px)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              pointerEvents: 'auto',
+              zIndex: 4,
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <PlayerReactionsInline noteUserId={player.userId} />
+            <NoteBubble
+              text={player.noteText!}
+              onTap={onTogglePopover}
+            />
+          </div>
+        )}
+      </div>
+
+      {isPopoverOpen && (
+        <AvatarActionsPopover
+          mode="other"
+          anchorEl={avatarRef.current}
+          onClose={onClosePopover}
+          onViewProfile={() => onSelectPlayer(player.userId)}
+          onSendEmoji={onSendEmoji}
+        />
+      )}
+    </Marker>
+  )
+}
 
 function PlayerReactionsInline({ noteUserId }: { noteUserId: string }) {
   const { reactions } = useNoteReactions(noteUserId)

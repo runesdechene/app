@@ -89,6 +89,7 @@ export const ExploreMap = memo(function ExploreMap() {
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations
   const { flying } = useEmojiThrows()
   const [showSelfPopover, setShowSelfPopover] = useState(false)
+  const selfAvatarRef = useRef<HTMLDivElement>(null)
   // V0.7+ Note du moment — la note posée doit s'afficher sous mon propre avatar
   // sur la carte (pas seulement pour les autres). Lecture depuis playerStore qui est
   // synchronisé par useUserNote (utilisé dans le NoteEditor du popover).
@@ -805,6 +806,7 @@ export const ExploreMap = memo(function ExploreMap() {
               }}
             >
               <div
+                ref={selfAvatarRef}
                 className="user-position-marker"
                 style={{
                   '--faction-color': userFactionColor ?? '#4A90D9',
@@ -846,21 +848,12 @@ export const ExploreMap = memo(function ExploreMap() {
                 </div>
               )}
               {showSelfPopover && currentUserId && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 'calc(100% + 12px)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 10,
-                  }}
-                >
-                  <AvatarActionsPopover
-                    mode="self"
-                    onClose={() => setShowSelfPopover(false)}
-                    onViewProfile={() => setSelectedPlayerId(currentUserId)}
-                  />
-                </div>
+                <AvatarActionsPopover
+                  mode="self"
+                  anchorEl={selfAvatarRef.current}
+                  onClose={() => setShowSelfPopover(false)}
+                  onViewProfile={() => setSelectedPlayerId(currentUserId)}
+                />
               )}
             </div>
           )}
