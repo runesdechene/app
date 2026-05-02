@@ -63,24 +63,28 @@ export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, 
                 ))}
               </div>
 
-              {/* V0.7+ Note éphémère sous l'avatar */}
+              {/* V0.7+ Note éphémère au-dessus de l'avatar (réactions sous la bulle, près de l'avatar) */}
               {noteIsActive && (
                 <div
                   style={{
                     position: 'absolute',
-                    top: 'calc(100% + 6px)',
+                    bottom: 'calc(100% + 8px)',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     pointerEvents: 'auto',
                     zIndex: 4,
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    alignItems: 'center',
+                    gap: 4,
                   }}
                 >
+                  <PlayerReactionsInline noteUserId={player.userId} />
                   <NoteBubble
                     authorName={player.name}
                     text={player.noteText!}
                     onTap={() => onSelectPlayer(player.userId)}
                   />
-                  <PlayerReactionsInline noteUserId={player.userId} />
                 </div>
               )}
 

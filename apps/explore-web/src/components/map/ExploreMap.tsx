@@ -827,20 +827,24 @@ export const ExploreMap = memo(function ExploreMap() {
                 <div
                   style={{
                     position: 'absolute',
-                    top: 'calc(100% + 6px)',
+                    bottom: 'calc(100% + 8px)',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     pointerEvents: 'auto',
                     zIndex: 4,
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    alignItems: 'center',
+                    gap: 4,
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
+                  <NoteReactionsRow reactions={ownNoteReactions} />
                   <NoteBubble
                     authorName={userName ?? 'Moi'}
                     text={ownNoteText!}
                     onTap={() => currentUserId && setSelectedPlayerId(currentUserId)}
                   />
-                  <NoteReactionsRow reactions={ownNoteReactions} />
                 </div>
               )}
               {showSelfPopover && currentUserId && (
