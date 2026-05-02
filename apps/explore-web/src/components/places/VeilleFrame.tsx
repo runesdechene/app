@@ -3,6 +3,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useVeille } from '../../hooks/useVeille'
 import { ExpeditionOptInModal } from './ExpeditionOptInModal'
 import { pushVeilleOverride } from '../../lib/loadInitialVeilles'
+import etendardIcon from '../../assets/etendard.png'
 import type { NearbyPlanter } from '../../types/veille'
 import './VeilleFrame.css'
 
@@ -123,22 +124,26 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
 
   return (
     <div className="veille-frame">
-      <div className="veille-frame-header">🚩 Veille</div>
+      <div className="veille-frame-header">Veille</div>
 
-      {renderState()}
+      <div className="veille-frame-row">
+        <div className="veille-frame-state-wrap">
+          {renderState()}
+          {errorMsg && <div className="veille-frame-error">{errorMsg}</div>}
+        </div>
 
-      {errorMsg && <div className="veille-frame-error">{errorMsg}</div>}
-
-      {userId && userFactionId && (
-        <button
-          className="veille-frame-plant-btn"
-          disabled={!canPlant}
-          onClick={handlePlant}
-          title={onSpot ? 'Planter ton étendard' : 'Approche-toi à moins de 100m du lieu'}
-        >
-          {planting ? '...' : '🚩 Planter l’étendard'}
-        </button>
-      )}
+        {userId && userFactionId && (
+          <button
+            className={`veille-frame-plant-btn${planting ? ' planting' : ''}`}
+            disabled={!canPlant}
+            onClick={handlePlant}
+            title={onSpot ? 'Planter ton étendard' : 'Approche-toi à moins de 100m du lieu'}
+            aria-label="Planter l'étendard"
+          >
+            <img src={etendardIcon} alt="" className="veille-frame-plant-icon" />
+          </button>
+        )}
+      </div>
 
       {optInCandidates && (
         <ExpeditionOptInModal
