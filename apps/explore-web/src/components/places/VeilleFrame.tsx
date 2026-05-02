@@ -124,26 +124,28 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
 
   return (
     <div className="veille-frame">
-      <div className="veille-frame-header">Veille</div>
+      <div className="veille-frame-header">Veilleur du lieu</div>
 
-      <div className="veille-frame-row">
-        <div className="veille-frame-state-wrap">
-          {renderState()}
-          {errorMsg && <div className="veille-frame-error">{errorMsg}</div>}
-        </div>
+      {renderState()}
 
-        {userId && userFactionId && (
+      {errorMsg && <div className="veille-frame-error">{errorMsg}</div>}
+
+      {userId && userFactionId && (
+        <>
           <button
             className={`veille-frame-plant-btn${planting ? ' planting' : ''}`}
             disabled={!canPlant}
             onClick={handlePlant}
-            title={onSpot ? 'Planter ton étendard' : 'Approche-toi à moins de 100m du lieu'}
-            aria-label="Planter l'étendard"
+            aria-label="Veiller sur ce lieu"
           >
             <img src={etendardIcon} alt="" className="veille-frame-plant-icon" />
+            <span>{planting ? 'Plantage en cours…' : 'Veiller sur ce lieu'}</span>
           </button>
-        )}
-      </div>
+          <div className="veille-frame-hint">
+            Vous devez être sur place (à moins de 100&nbsp;m) pour effectuer cette action.
+          </div>
+        </>
+      )}
 
       {optInCandidates && (
         <ExpeditionOptInModal
