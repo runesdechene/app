@@ -1098,15 +1098,14 @@
   opacity: 0.8;
 }
 
-/* Padding horizontal 60 px = même alignement effectif que les fragments
-   (qui ont 30 px de leur row + 30 px hérités du `.player-modal-header` parent).
-   La row prend toute la largeur du modal → scroll libre jusqu'aux bords. */
+/* Padding horizontal 30 px = aligné sur le titre `.player-modal-section-title`
+   (qui a margin-inline 30 px). La row prend toute la largeur → scroll libre. */
 .player-modal-places-row {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding: 4px 60px 8px;
+  padding: 4px 30px 8px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
