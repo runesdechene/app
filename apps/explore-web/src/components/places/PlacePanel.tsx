@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
@@ -290,17 +291,18 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
           {visitRewards && (
             <div className="place-visit-rewards">
               <p className="place-visit-rewards-title">🎉 Récompenses</p>
-              {/* V0.6 — Affichage Gloire + Coupe au lieu des anciens points
-                  d'exploration / influence stock. Une 1ère visite GPS d'un
-                  nouveau lieu = +1 Gloire et +1 Coupe (formule unifiée
-                  V0.7 phase 3.5). Une revisite ne donne rien (DISTINCT
-                  place_id côté SQL). */}
-              {visitRewards.visitNumber === 1 ? (
-                <>
-                  <span className="place-visit-reward">🎖️ +1 Gloire</span>
-                  <span className="place-visit-reward">🏆 +1 Coupe</span>
-                </>
-              ) : (
+              {/* V067 — barème centralisé app_settings via gloryRulesStore. */}
+              {visitRewards.visitNumber === 1 ? (() => {
+                const r = useGloryRulesStore.getState().rules
+                const g = r['glory.visit_gps']
+                const c = r['coupe.visit_gps']
+                return (
+                  <>
+                    {g > 0 && <span className="place-visit-reward">🎖️ +{g} Gloire</span>}
+                    {c > 0 && <span className="place-visit-reward">🏆 +{c} Coupe</span>}
+                  </>
+                )
+              })() : (
                 <span className="place-visit-reward place-visit-reward-hint">
                   Visite n°{visitRewards.visitNumber} — vous connaissez déjà ce lieu, pas de gain supplémentaire
                 </span>

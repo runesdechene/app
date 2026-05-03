@@ -36,6 +36,7 @@ import { MobileNavbar } from '../components/map/MobileNavbar'
 import { MobileHeader } from '../components/map/MobileHeader'
 import { useMobileNavStore } from '../stores/mobileNavStore'
 import { useAppConfigStore } from '../stores/appConfigStore'
+import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { AdScreen } from '../components/map/AdScreen'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
@@ -214,6 +215,8 @@ export default function MapPage() {
   // Fetch app-wide config (share_text_template, etc.) une seule fois au mount
   useEffect(() => {
     useAppConfigStore.getState().fetchConfig()
+    // Barème Gloire/Coupe centralisé (mig 067) — chargé une fois, lu partout
+    useGloryRulesStore.getState().fetchRules()
   }, [])
 
   // Flux nouveau joueur : slides "before" → onboarding → slides "after" → FactionModal

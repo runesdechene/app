@@ -5,6 +5,7 @@ import { useCalendarRef } from '../../hooks/useCalendarRef'
 import { formatYear } from '../../lib/calendarUtils'
 import { EraSelector } from './EraSelector'
 import { RewardModal } from '../rewards/RewardModal'
+import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import './PlaceInfos.css'
 
 interface InfoField {
@@ -56,8 +57,13 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
     if (!error && data?.success) {
       setEditingEra(false)
       if (data.isFirstContribution) {
-        // V0.6 — gain réel pour un carnet : +3 Gloire et +3 Coupe (formule unifiée)
-        setReward({ glory: 3, coupe: 3 })
+        // V067 — barème centralisé. Les contributions epoch/info utilisent
+        // les mêmes valeurs que carnet (à valider avec Uriel : la formule
+        // SQL get_my_glory/get_coupe_state ne compte QUE type='carnet' et
+        // type='photo' — donc ces points affichés ne sont pas réellement
+        // attribués en DB. Bug existant à trancher hors de cette session.)
+        const r = useGloryRulesStore.getState().rules
+        setReward({ glory: r['glory.carnet'], coupe: r['coupe.carnet'] })
       }
       onRefresh()
     }
@@ -176,8 +182,13 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
     })
     if (!error && data?.success) {
       if (data.isFirstContribution) {
-        // V0.6 — gain réel pour un carnet : +3 Gloire et +3 Coupe (formule unifiée)
-        setReward({ glory: 3, coupe: 3 })
+        // V067 — barème centralisé. Les contributions epoch/info utilisent
+        // les mêmes valeurs que carnet (à valider avec Uriel : la formule
+        // SQL get_my_glory/get_coupe_state ne compte QUE type='carnet' et
+        // type='photo' — donc ces points affichés ne sont pas réellement
+        // attribués en DB. Bug existant à trancher hors de cette session.)
+        const r = useGloryRulesStore.getState().rules
+        setReward({ glory: r['glory.carnet'], coupe: r['coupe.carnet'] })
       }
       setEditing(false)
       onSaved()

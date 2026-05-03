@@ -4,6 +4,7 @@ import { compressImage } from '../../lib/imageUtils'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useToastStore } from '../../stores/toastStore'
+import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EraSelector } from './EraSelector'
 import './AddPlaceFlow.css'
@@ -667,36 +668,50 @@ export function AddPlaceFlow() {
           Votre lieu apparaît maintenant sur la carte.
         </p>
 
-        {rewards && (
-          <div className="add-place-rewards-summary">
-            <p className="add-place-rewards-summary-title">Vos récompenses</p>
-            {/* V0.6 — Affichage Gloire + Coupe au lieu des anciens points
-                d'exploration / influence permanente. Lieu ajouté = +7 sur
-                chacune (formule unifiée V0.7 phase 3.5). Si carnet présent,
-                +3 supplémentaires. La visite GPS implicite ajoute +1 (en
-                pratique, ajouter un lieu = être sur place = visite GPS). */}
-            <div className="add-place-reward-line">
-              <span>🏛️</span>
-              <span>+7 Gloire / +7 Coupe <span className="add-place-reward-tag">lieu ajouté</span></span>
-            </div>
-            <div className="add-place-reward-line">
-              <span>🎖️</span>
-              <span>+1 Gloire / +1 Coupe <span className="add-place-reward-tag gps">visite GPS</span></span>
-            </div>
-            {rewards.contentPoints > 0 && (
+        {rewards && (() => {
+          const r = useGloryRulesStore.getState().rules
+          const fmt = (g: number, c: number) => {
+            const parts: string[] = []
+            if (g > 0) parts.push(`+${g} Gloire`)
+            if (c > 0) parts.push(`+${c} Coupe`)
+            return parts.join(' / ')
+          }
+          return (
+            <div className="add-place-rewards-summary">
+              <p className="add-place-rewards-summary-title">Vos récompenses</p>
+              {/* V067 — toutes les valeurs lues depuis le barème centralisé
+                  (app_settings via gloryRulesStore). Modification dans le Hub
+                  → reflétée ici au prochain boot, sans déploy. */}
               <div className="add-place-reward-line">
-                <span>📜</span>
-                <span>+3 Gloire / +3 Coupe <span className="add-place-reward-tag">carnet</span></span>
+                <span>🏛️</span>
+                <span>{fmt(r['glory.add_place'], r['coupe.add_place'])} <span className="add-place-reward-tag">lieu ajouté</span></span>
               </div>
-            )}
-            {rewards.isExplorer && (
-              <div className="add-place-reward-line">
-                <span>🥾</span>
-                <span>Explorateur du lieu <span className="add-place-reward-tag gps">GPS</span></span>
-              </div>
-            )}
-          </div>
-        )}
+              {rewards.isGps && (
+                <div className="add-place-reward-line">
+                  <span>🥾</span>
+                  <span>{fmt(r['glory.visit_gps'], r['coupe.visit_gps'])} <span className="add-place-reward-tag gps">visite sur place</span></span>
+                </div>
+              )}
+              {rewards.contentPoints > 0 && (
+                <div className="add-place-reward-line">
+                  <span>📜</span>
+                  <span>{fmt(r['glory.carnet'], r['coupe.carnet'])} <span className="add-place-reward-tag">carnet</span></span>
+                </div>
+              )}
+              {rewards.isGps && (
+                <>
+                  <div className="add-place-reward-line">
+                    <span>🏴</span>
+                    <span>{fmt(r['glory.plant_flag'], r['coupe.plant_flag'])} <span className="add-place-reward-tag gps">étendard planté</span></span>
+                  </div>
+                  <p className="add-place-success-text" style={{ marginTop: 12, fontStyle: 'italic' }}>
+                    Votre étendard est planté. Vous êtes désormais protecteur de ce lieu.
+                  </p>
+                </>
+              )}
+            </div>
+          )
+        })()}
 
         <div className="add-place-success-actions">
           <button className="add-place-submit-btn" onClick={handleViewPlace}>

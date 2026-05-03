@@ -7,6 +7,7 @@ import { useAuth } from './useAuth'
 import { useMapStore } from '../stores/mapStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { refreshLevelStateGlobal } from './useLevel'
+import { useGloryRulesStore } from '../stores/gloryRulesStore'
 
 const GPS_PROXIMITY_M = 500
 
@@ -294,14 +295,21 @@ export function usePlayer() {
           let iconUrl: string | undefined
           let contested = false
 
-          // V0.6 — toasts épurés. Skip V0.5 (claim, fortify, place_influence)
-          // qui ne servent plus rien. Ajout V0.7 (plant_flag, harvest_crown).
-          // Reformulation gains en Gloire/Coupe (formule unifiée).
+          // V067 — toasts tirés du barème centralisé (app_settings).
+          // Helper local : formate "+G Gloire / +C Coupe" en omettant les 0.
+          const r = useGloryRulesStore.getState().rules
+          const fmt = (g: number, c: number) => {
+            const parts: string[] = []
+            if (g > 0) parts.push(`+${g} Gloire`)
+            if (c > 0) parts.push(`+${c} Coupe`)
+            return parts.join(' / ')
+          }
+
           if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
             return
           } else if (e.type === 'plant_flag') {
             message = isSelf
-              ? `🏴 Tu as planté ta bannière à ${place} +10 Gloire / +10 Coupe`
+              ? `🏴 Tu as planté ta bannière à ${place} ${fmt(r['glory.plant_flag'], r['coupe.plant_flag'])}`
               : `${name} a planté son étendard sur ${place} 🚩`
             highlights.push(place)
             type = 'plant_flag'
@@ -316,24 +324,19 @@ export function usePlayer() {
               })
             }
           } else if (e.type === 'harvest_crown') {
-            // mig 021 stocke 'gain' (pas 'points') : 1 solo, 2 expé
             const gain = (e.data as { gain?: number })?.gain ?? 1
             if (isSelf) {
               message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
               highlights.push(place)
             } else {
-              return  // récoltes des autres = bruit, on n'affiche pas
+              return
             }
             type = 'harvest_crown'
           } else if (e.type === 'discover') {
             if (isSelf) {
-              // method stocké dans data si disponible (mig 042+) — sinon message conservateur (remote)
-              const method = (e.data as { method?: string })?.method
-              if (method === 'gps') {
-                message = `Le brouillard se lève sur ${place} et tu as foulé son sol 🥾 +4 Gloire / +3 Coupe`
-              } else {
-                message = `Le brouillard se lève sur ${place}. +1 Gloire`
-              }
+              // V067 — découverte = mêmes points peu importe la méthode
+              // (le bouton "Poser ma marque" sur place fait la visite GPS séparée).
+              message = `Le brouillard se lève sur ${place} 🔍 ${fmt(r['glory.discover_remote'], r['coupe.discover_remote'])}`
             } else {
               message = `${name} a levé le brouillard sur ${place}`
             }
@@ -353,8 +356,11 @@ export function usePlayer() {
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'new_place') {
+            // V067 — gain réel = lieu ajouté + (auto si sur place GPS)
+            // visite + plantage. On ne connait pas isGps depuis l'event,
+            // donc on affiche juste le minimum garanti (lieu ajouté).
             message = isSelf
-              ? `📜 Tu as cartographié ${place} +20 Gloire / +20 Coupe`
+              ? `📜 Tu as cartographié ${place} ${fmt(r['glory.add_place'], r['coupe.add_place'])}`
               : `${name} a ajouté ${place} 🏛️`
             highlights.push(name, place)
             type = 'new_place'
@@ -363,10 +369,12 @@ export function usePlayer() {
             type = 'new_user'
           } else if (e.type === 'contribute') {
             const isPhoto = e.data?.contributionType === 'photo'
+            const g = isPhoto ? r['glory.photo'] : r['glory.carnet']
+            const c = isPhoto ? r['coupe.photo'] : r['coupe.carnet']
             message = isSelf
               ? isPhoto
-                ? `📷 Tu as ajouté une photo de ${place} +1 Gloire / +1 Coupe`
-                : `✍️ Tu as écrit un récit sur ${place} +5 Gloire / +5 Coupe`
+                ? `📷 Tu as ajouté une photo de ${place} ${fmt(g, c)}`
+                : `✍️ Tu as écrit un récit sur ${place} ${fmt(g, c)}`
               : `${name} a ${isPhoto ? 'ajouté une photo de' : 'écrit un récit sur'} ${place} 📜`
             highlights.push(place)
             type = 'contribute'
@@ -610,12 +618,18 @@ export async function discoverPlace(
   const currentExploration = usePlayerStore.getState().explorationPoints
   usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
 
-  // Toast honnête selon la méthode réelle :
-  // - remote : trigger _trg_xp_discovered_insert → +1 Gloire (pas de Coupe — places_discovered exclu de Coupe)
-  // - gps    : cascade places_discovered + place_explorers → +4 Gloire / +3 Coupe
-  const toastMessage = method === 'gps'
-    ? 'Le brouillard se lève sur ce lieu et tu as foulé son sol 🥾 +4 Gloire / +3 Coupe'
-    : 'Le brouillard se lève sur ce lieu 🔍 +1 Gloire'
+  // V067 — barème centralisé app_settings via gloryRulesStore.
+  // Découverte = +discover_remote G / +discover_remote C (par défaut 1G / 0C).
+  // (La visite GPS est désormais une action SÉPARÉE — elle se déclenche
+  // depuis le bouton "Poser ma marque" sur PlacePanel, plus lors de la
+  // découverte. Donc plus de différenciation gps/remote ici.)
+  const rules = useGloryRulesStore.getState().rules
+  const gloryGain = rules['glory.discover_remote'] ?? 1
+  const coupeGain = rules['coupe.discover_remote'] ?? 0
+  const gainParts: string[] = []
+  if (gloryGain > 0) gainParts.push(`+${gloryGain} Gloire`)
+  if (coupeGain > 0) gainParts.push(`+${coupeGain} Coupe`)
+  const toastMessage = `Le brouillard se lève sur ce lieu 🔍 ${gainParts.join(' / ')}`
 
   useToastStore.getState().addToast({
     type: 'discover',
