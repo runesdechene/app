@@ -276,6 +276,10 @@ export function usePlayer() {
               authorName?: string
               authorId?: string
               contributionId?: number
+              fragmentId?: number
+              fragmentName?: string
+              fragmentIcon?: string | null
+              fragmentIconUrl?: string | null
             }
           }
 
@@ -392,15 +396,18 @@ export function usePlayer() {
             // V067 — barème centralisé app_settings : Gloire pondérée
             // (1/2/3/5), Coupe fixe (+1 quelle que soit la difficulté
             // pour l'équité du classement / anti-triche).
-            // V069+ — type d'énigme distingué (daily / fragment / place)
-            // pour éviter "Énigme résolue sur un lieu" sur les fragments.
+            // V069+ — type d'énigme distingué (daily / fragment / place).
+            // V070 — pour les fragments : nom du fragment dans le message,
+            // cliquable (ouvre la modale FragmentEnigma via mapStore).
             const diff = e.data?.difficulty ?? 'easy'
             const diffLabel = diff === 'very_easy' ? 'très facile'
                             : diff === 'medium'    ? 'moyenne'
                             : diff === 'hard'      ? 'difficile'
                             : 'facile'
             const kind = e.data?.enigmaType ?? 'daily'
-            const kindLabel = kind === 'fragment' ? 'de codex'
+            const fragmentName = e.data?.fragmentName ?? null
+            const kindLabel = kind === 'fragment'
+                                ? (fragmentName ? `du fragment ${fragmentName}` : 'de codex')
                             : kind === 'place'    ? "d'un lieu"
                             : 'du jour'
             const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
@@ -417,6 +424,10 @@ export function usePlayer() {
               message = `Énigme ${kindLabel} résolue (${diffLabel}) 🦉 ${fmt(gainG, gainC)}`
             } else {
               message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${fmt(gainG, gainC)}`
+            }
+            // V070 — push le nom du fragment en highlight pour le rendre cliquable
+            if (kind === 'fragment' && fragmentName) {
+              highlights.push(fragmentName)
             }
             type = 'enigma'
           } else {
@@ -438,6 +449,10 @@ export function usePlayer() {
             placeLocation: hasLocation
               ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
               : undefined,
+            fragmentId: e.data?.fragmentId,
+            fragmentName: e.data?.fragmentName,
+            fragmentIcon: e.data?.fragmentIcon,
+            fragmentIconUrl: e.data?.fragmentIconUrl,
             timestamp: Date.now(),
           })
         },
@@ -493,14 +508,22 @@ async function loadRecentActivity(currentUserId: string) {
       enigmaType?: string
       difficulty?: string
       actorAvatarUrl?: string
+      fragmentId?: number
+      fragmentName?: string
+      fragmentIcon?: string | null
+      fragmentIconUrl?: string | null
     }
     created_at: string
   }>)
     .filter(e => new Date(e.created_at).getTime() > cutoff)
 
   for (const e of recent) {
-    // Ne montrer que les actions des AUTRES joueurs au chargement.
-    if (e.actor_id === currentUserId) continue
+    // V070 — on inclut désormais les actions de SOI-MÊME au reload (avant
+    // c'était skip systématique, mais Uriel veut que les toasts soient
+    // persistants entre les rechargements). Seule exception : new_user
+    // (c'est SA propre connexion, on ne va pas se notifier soi-même
+    // d'avoir rejoint la carte).
+    if (e.type === 'new_user' && e.actor_id === currentUserId) continue
     // Ignorer le tracking interne fragment_enigma
     if (e.type === 'fragment_enigma') continue
 
@@ -516,9 +539,17 @@ async function loadRecentActivity(currentUserId: string) {
     let contested = false
 
     // V0.6 — toasts d'historique (7 derniers jours) épurés.
-    // Skip V0.5 (claim, fortify, place_influence, harvest_crown autres users).
-    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence' || e.type === 'harvest_crown') {
+    // Skip V0.5 figés (claim, fortify, place_influence). Pour harvest_crown,
+    // on n'affiche que les siennes (récolte de couronnes — le système est
+    // perso, pas social).
+    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
       continue
+    } else if (e.type === 'harvest_crown') {
+      if (e.actor_id !== currentUserId) continue
+      const gain = (e.data as { gain?: number })?.gain ?? 1
+      message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
+      highlights.push(place)
+      type = 'harvest_crown'
     } else if (e.type === 'plant_flag') {
       message = `${name} a planté son étendard sur ${place} 🚩`
       highlights.push(name, place)
@@ -555,14 +586,16 @@ async function loadRecentActivity(currentUserId: string) {
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'enigma_success') {
-      // V069 — affiche type + difficulté + gain pour cohérence avec le live subscribe
+      // V069/070 — affiche type (avec nom du fragment si applicable) + difficulté + gain.
       const diff = e.data?.difficulty ?? 'easy'
       const diffLabel = diff === 'very_easy' ? 'très facile'
                       : diff === 'medium'    ? 'moyenne'
                       : diff === 'hard'      ? 'difficile'
                       : 'facile'
-      const kind = (e.data as { enigmaType?: string })?.enigmaType ?? 'daily'
-      const kindLabel = kind === 'fragment' ? 'de codex'
+      const kind = e.data?.enigmaType ?? 'daily'
+      const fragmentName = e.data?.fragmentName ?? null
+      const kindLabel = kind === 'fragment'
+                          ? (fragmentName ? `du fragment ${fragmentName}` : 'de codex')
                       : kind === 'place'    ? "d'un lieu"
                       : 'du jour'
       const r = useGloryRulesStore.getState().rules
@@ -581,6 +614,9 @@ async function loadRecentActivity(currentUserId: string) {
       if (gainC > 0) parts.push(`+${gainC} Coupe`)
       message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${parts.join(' / ')}`
       highlights.push(name)
+      if (kind === 'fragment' && fragmentName) {
+        highlights.push(fragmentName)
+      }
       type = 'enigma'
     } else {
       continue
@@ -601,6 +637,10 @@ async function loadRecentActivity(currentUserId: string) {
       placeLocation: hasLocation
         ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
         : undefined,
+      fragmentId: e.data?.fragmentId,
+      fragmentName: e.data?.fragmentName,
+      fragmentIcon: e.data?.fragmentIcon,
+      fragmentIconUrl: e.data?.fragmentIconUrl,
       timestamp: new Date(e.created_at).getTime(),
     })
   }

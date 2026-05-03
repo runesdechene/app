@@ -46,6 +46,11 @@ interface MapState {
   requestFlyTo: (target: { lng: number; lat: number; placeId?: string }) => void
   clearPendingFlyTo: () => void
 
+  /** Demande d'ouverture de la modale FragmentEnigma depuis l'extérieur (toasts) */
+  pendingFragmentOpen: { fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null
+  requestFragmentOpen: (fragment: { fragmentId: number; name: string; icon: string | null; iconUrl: string | null }) => void
+  clearPendingFragmentOpen: () => void
+
   /** Demande de zoom depuis l'extérieur (add-place, etc.) */
   pendingZoom: 'in' | 'out' | null
   requestZoom: (dir: 'in' | 'out') => void
@@ -100,6 +105,10 @@ export const useMapStore = create<MapState>((set) => ({
   pendingFlyTo: null,
   requestFlyTo: (target) => set({ pendingFlyTo: target }),
   clearPendingFlyTo: () => set({ pendingFlyTo: null }),
+
+  pendingFragmentOpen: null,
+  requestFragmentOpen: (fragment) => set({ pendingFragmentOpen: fragment }),
+  clearPendingFragmentOpen: () => set({ pendingFragmentOpen: null }),
 
   pendingZoom: null,
   requestZoom: (dir) => set({ pendingZoom: dir }),

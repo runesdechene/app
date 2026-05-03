@@ -147,6 +147,19 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     if (toast.previousActorColor) highlightColors.set(prevName, toast.previousActorColor)
   }
 
+  // V070 — nom du fragment cliquable (énigme de fragment) → ouvre la modale
+  // FragmentEnigma via mapStore.pendingFragmentOpen (consommé par MapPage).
+  if (toast.fragmentId && toast.fragmentName) {
+    actions.set(toast.fragmentName, () => {
+      useMapStore.getState().requestFragmentOpen({
+        fragmentId: toast.fragmentId!,
+        name: toast.fragmentName!,
+        icon: toast.fragmentIcon ?? null,
+        iconUrl: toast.fragmentIconUrl ?? null,
+      })
+    })
+  }
+
   return (
     <div
       className={`game-toast${toast.type === 'contribute' || toast.type === 'new_place' ? ' game-toast-content' : ''}`}

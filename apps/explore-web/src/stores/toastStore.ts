@@ -23,6 +23,11 @@ export interface GameToast {
   placeId?: string
   /** Coordonnées du lieu */
   placeLocation?: { latitude: number; longitude: number }
+  /** V070 — fragment associé (énigme de fragment) : nom cliquable → ouvre la modale FragmentEnigma */
+  fragmentId?: number
+  fragmentName?: string
+  fragmentIcon?: string | null
+  fragmentIconUrl?: string | null
   timestamp: number
 }
 
