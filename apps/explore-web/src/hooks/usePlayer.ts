@@ -392,11 +392,17 @@ export function usePlayer() {
             // V067 — barème centralisé app_settings : Gloire pondérée
             // (1/2/3/5), Coupe fixe (+1 quelle que soit la difficulté
             // pour l'équité du classement / anti-triche).
+            // V069+ — type d'énigme distingué (daily / fragment / place)
+            // pour éviter "Énigme résolue sur un lieu" sur les fragments.
             const diff = e.data?.difficulty ?? 'easy'
             const diffLabel = diff === 'very_easy' ? 'très facile'
                             : diff === 'medium'    ? 'moyenne'
                             : diff === 'hard'      ? 'difficile'
                             : 'facile'
+            const kind = e.data?.enigmaType ?? 'daily'
+            const kindLabel = kind === 'fragment' ? 'de codex'
+                            : kind === 'place'    ? "d'un lieu"
+                            : 'du jour'
             const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
                        : diff === 'medium'    ? 'glory.enigma_medium'
                        : diff === 'hard'      ? 'glory.enigma_hard'
@@ -408,9 +414,9 @@ export function usePlayer() {
             const gainG = r[keyG] ?? 1
             const gainC = r[keyC] ?? 1
             if (isSelf) {
-              message = `Énigme ${diffLabel} résolue 🦉 ${fmt(gainG, gainC)}`
+              message = `Énigme ${kindLabel} résolue (${diffLabel}) 🦉 ${fmt(gainG, gainC)}`
             } else {
-              message = `${name} a résolu une énigme ${diffLabel} 📖 ${fmt(gainG, gainC)}`
+              message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${fmt(gainG, gainC)}`
             }
             type = 'enigma'
           } else {
@@ -549,12 +555,16 @@ async function loadRecentActivity(currentUserId: string) {
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'enigma_success') {
-      // V069 — affiche difficulté + gain pour cohérence avec le live subscribe
+      // V069 — affiche type + difficulté + gain pour cohérence avec le live subscribe
       const diff = e.data?.difficulty ?? 'easy'
       const diffLabel = diff === 'very_easy' ? 'très facile'
                       : diff === 'medium'    ? 'moyenne'
                       : diff === 'hard'      ? 'difficile'
                       : 'facile'
+      const kind = (e.data as { enigmaType?: string })?.enigmaType ?? 'daily'
+      const kindLabel = kind === 'fragment' ? 'de codex'
+                      : kind === 'place'    ? "d'un lieu"
+                      : 'du jour'
       const r = useGloryRulesStore.getState().rules
       const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
                  : diff === 'medium'    ? 'glory.enigma_medium'
@@ -569,7 +579,7 @@ async function loadRecentActivity(currentUserId: string) {
       const parts: string[] = []
       if (gainG > 0) parts.push(`+${gainG} Gloire`)
       if (gainC > 0) parts.push(`+${gainC} Coupe`)
-      message = `${name} a résolu une énigme ${diffLabel} 📖 ${parts.join(' / ')}`
+      message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${parts.join(' / ')}`
       highlights.push(name)
       type = 'enigma'
     } else {
