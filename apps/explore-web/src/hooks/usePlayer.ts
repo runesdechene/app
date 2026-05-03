@@ -389,11 +389,22 @@ export function usePlayer() {
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'enigma_success') {
-            // Pondération 1/1/2/3 selon difficulté (mig 038)
+            // V067 — barème centralisé app_settings : Gloire pondérée
+            // (1/2/3/5), Coupe fixe (+1 quelle que soit la difficulté
+            // pour l'équité du classement / anti-triche).
             const diff = e.data?.difficulty ?? 'easy'
-            const gain = diff === 'hard' ? 3 : diff === 'medium' ? 2 : 1
+            const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
+                       : diff === 'medium'    ? 'glory.enigma_medium'
+                       : diff === 'hard'      ? 'glory.enigma_hard'
+                       : 'glory.enigma_easy'
+            const keyC = diff === 'very_easy' ? 'coupe.enigma_very_easy'
+                       : diff === 'medium'    ? 'coupe.enigma_medium'
+                       : diff === 'hard'      ? 'coupe.enigma_hard'
+                       : 'coupe.enigma_easy'
+            const gainG = r[keyG] ?? 1
+            const gainC = r[keyC] ?? 1
             if (isSelf) {
-              message = `Énigme résolue sur ${place} 🦉 +${gain} Gloire / +${gain} Coupe`
+              message = `Énigme résolue 🦉 ${fmt(gainG, gainC)}`
             } else {
               message = `${name} a résolu une énigme 📖`
             }
