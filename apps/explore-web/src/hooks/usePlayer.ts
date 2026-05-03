@@ -356,12 +356,11 @@ export function usePlayer() {
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'new_place') {
-            // V067 — gain réel = lieu ajouté + (auto si sur place GPS)
-            // visite + plantage. On ne connait pas isGps depuis l'event,
-            // donc on affiche juste le minimum garanti (lieu ajouté).
-            message = isSelf
-              ? `📜 Tu as cartographié ${place} ${fmt(r['glory.add_place'], r['coupe.add_place'])}`
-              : `${name} a ajouté ${place} 🏛️`
+            // V067 — pour soi-même, AddPlaceFlow émet déjà un toast local
+            // détaillé qui connait isGps (lieu + visite + plantage si sur
+            // place). Skip ici pour éviter doublon.
+            if (isSelf) return
+            message = `${name} a ajouté ${place} 🏛️`
             highlights.push(name, place)
             type = 'new_place'
           } else if (e.type === 'new_user') {

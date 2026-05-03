@@ -4,8 +4,6 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useCalendarRef } from '../../hooks/useCalendarRef'
 import { formatYear } from '../../lib/calendarUtils'
 import { EraSelector } from './EraSelector'
-import { RewardModal } from '../rewards/RewardModal'
-import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import './PlaceInfos.css'
 
 interface InfoField {
@@ -37,9 +35,6 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
   const [newEraId, setNewEraId] = useState<string | null>(null)
   const [newYearExact, setNewYearExact] = useState<number | null>(null)
   const [savingEra, setSavingEra] = useState(false)
-  // V0.6 — RewardModal n'affiche plus l'érudition (V0.5 figée), mais les
-  // gains réels Gloire/Coupe pour un carnet : +3 sur chacune (formule unifiée).
-  const [reward, setReward] = useState<{ glory: number; coupe: number } | null>(null)
 
   async function saveEra() {
     if (!newEraId || savingEra || !userId) return
@@ -56,15 +51,9 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
     })
     if (!error && data?.success) {
       setEditingEra(false)
-      if (data.isFirstContribution) {
-        // V067 — barème centralisé. Les contributions epoch/info utilisent
-        // les mêmes valeurs que carnet (à valider avec Uriel : la formule
-        // SQL get_my_glory/get_coupe_state ne compte QUE type='carnet' et
-        // type='photo' — donc ces points affichés ne sont pas réellement
-        // attribués en DB. Bug existant à trancher hors de cette session.)
-        const r = useGloryRulesStore.getState().rules
-        setReward({ glory: r['glory.carnet'], coupe: r['coupe.carnet'] })
-      }
+      // V067 — décision Uriel 2026-05-03 : ces contributions (epoch /
+      // accessibility / season / warning) sont des INFOS communautaires
+      // qui n'attribuent PAS de points (ni en DB ni en UI).
       onRefresh()
     }
     setSavingEra(false)
@@ -135,16 +124,6 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
         )
       })}
 
-      {reward && (
-        <RewardModal
-          title="Contribution enregistrée !"
-          gains={[
-            { label: 'Gloire', value: reward.glory, type: 'glory' },
-            { label: 'Coupe',  value: reward.coupe, type: 'coupe' },
-          ]}
-          onClose={() => setReward(null)}
-        />
-      )}
     </div>
   )
 }
@@ -166,9 +145,6 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(content ?? '')
   const [saving, setSaving] = useState(false)
-  // V0.6 — RewardModal n'affiche plus l'érudition (V0.5 figée), mais les
-  // gains réels Gloire/Coupe pour un carnet : +3 sur chacune (formule unifiée).
-  const [reward, setReward] = useState<{ glory: number; coupe: number } | null>(null)
 
   async function save() {
     if (!userId || !value.trim() || saving) return
@@ -181,15 +157,9 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
       p_content: value.trim(),
     })
     if (!error && data?.success) {
-      if (data.isFirstContribution) {
-        // V067 — barème centralisé. Les contributions epoch/info utilisent
-        // les mêmes valeurs que carnet (à valider avec Uriel : la formule
-        // SQL get_my_glory/get_coupe_state ne compte QUE type='carnet' et
-        // type='photo' — donc ces points affichés ne sont pas réellement
-        // attribués en DB. Bug existant à trancher hors de cette session.)
-        const r = useGloryRulesStore.getState().rules
-        setReward({ glory: r['glory.carnet'], coupe: r['coupe.carnet'] })
-      }
+      // V067 — décision Uriel 2026-05-03 : ces contributions (accessibility
+      // / season / warning) sont des INFOS communautaires qui n'attribuent
+      // PAS de points (ni en DB ni en UI).
       setEditing(false)
       onSaved()
     }
@@ -239,16 +209,6 @@ function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content
         </button>
       ) : (
         <p className="info-empty">Aucune information renseignée</p>
-      )}
-      {reward && (
-        <RewardModal
-          title="Contribution recompensee !"
-          gains={[
-            { label: 'Gloire', value: reward.glory, type: 'glory' as const },
-            { label: 'Coupe',  value: reward.coupe, type: 'coupe' as const },
-          ]}
-          onClose={() => setReward(null)}
-        />
       )}
     </div>
   )

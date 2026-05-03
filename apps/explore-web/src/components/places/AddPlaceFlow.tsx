@@ -292,10 +292,21 @@ export function AddPlaceFlow() {
       usePlayerStore.getState().addDiscoveredId(placeId)
       useMapStore.getState().incrementPlacesRefreshKey()
 
-      // 5. Toast
+      // 5. Toast — message complet avec gains réels (lieu + visite + plantage
+      // si sur place GPS). On a l'info isGps ici, contrairement au toast
+      // realtime qui le perd. Le handler usePlayer.ts skip new_place isSelf
+      // pour éviter doublon.
+      const ruleSet = useGloryRulesStore.getState().rules
+      const totalGlory = (ruleSet['glory.add_place'] ?? 7)
+        + (data.isGps ? (ruleSet['glory.visit_gps'] ?? 3) + (ruleSet['glory.plant_flag'] ?? 2) : 0)
+      const totalCoupe = (ruleSet['coupe.add_place'] ?? 7)
+        + (data.isGps ? (ruleSet['coupe.visit_gps'] ?? 3) + (ruleSet['coupe.plant_flag'] ?? 2) : 0)
+      const gainParts: string[] = []
+      if (totalGlory > 0) gainParts.push(`+${totalGlory} Gloire`)
+      if (totalCoupe > 0) gainParts.push(`+${totalCoupe} Coupe`)
       useToastStore.getState().addToast({
         type: 'new_place',
-        message: `Lieu "${title.trim()}" ajouté !`,
+        message: `📜 Tu as cartographié ${title.trim()} ${gainParts.join(' / ')}`,
         timestamp: Date.now(),
         placeId,
         placeLocation: { latitude: confirmedCoords.lat, longitude: confirmedCoords.lng },

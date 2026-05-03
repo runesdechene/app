@@ -13,6 +13,9 @@ interface CategoryGroup {
 }
 
 const CATEGORIES: Record<string, string> = {
+  glory: 'Gloire (lifetime)',
+  coupe: 'Coupe (saison)',
+  cooldown: 'Cooldowns',
   influence: 'Influence',
   exploration: 'Exploration',
   erudition: 'Érudition',
@@ -21,7 +24,6 @@ const CATEGORIES: Record<string, string> = {
   faction: 'Héritage',
   distance: 'Coût par distance',
   energy: 'Énergie',
-  glory: 'Gloire',
   default: 'Défauts globaux',
 }
 
@@ -95,6 +97,33 @@ const DESCRIPTIONS: Record<string, string> = {
   influence_per_vote: "Influence placée par clic de bannière",
   influence_visit_gps_stock: "Stock d'influence gagné pour une visite GPS (1re fois)",
   influence_revisit_gps_stock: "Stock d'influence gagné pour une re-visite GPS (base avant diminishing)",
+
+  // === Barème centralisé V067 (mig 067) ===
+  // Source de vérité unique pour Gloire (lifetime) et Coupe (saison).
+  // Toute modification ici se répercute sur les RPCs SQL ET sur l'app au prochain boot.
+  'glory.discover_remote':  "Gloire — Découvrir un lieu (sortir du brouillard, distance ou GPS)",
+  'glory.visit_gps':        "Gloire — Visiter GPS un lieu nouveau (fouler le sol)",
+  'glory.plant_flag':       "Gloire — Planter son étendard sur un lieu",
+  'glory.add_place':        "Gloire — Ajouter un lieu à la carte",
+  'glory.carnet':           "Gloire — Écrire un récit (carnet) sur un lieu",
+  'glory.photo':            "Gloire — Ajouter une contribution photo (1 par contribution, peu importe le nombre d'images)",
+  'glory.enigma_very_easy': "Gloire — Énigme très facile résolue",
+  'glory.enigma_easy':      "Gloire — Énigme facile résolue",
+  'glory.enigma_medium':    "Gloire — Énigme moyenne résolue",
+  'glory.enigma_hard':      "Gloire — Énigme difficile résolue",
+
+  'coupe.discover_remote':  "Coupe — Découvrir un lieu (recommandé : 0, sinon farmable à distance)",
+  'coupe.visit_gps':        "Coupe — Visiter GPS un lieu nouveau",
+  'coupe.plant_flag':       "Coupe — Planter son étendard",
+  'coupe.add_place':        "Coupe — Ajouter un lieu",
+  'coupe.carnet':           "Coupe — Écrire un récit",
+  'coupe.photo':            "Coupe — Ajouter une contribution photo",
+  'coupe.enigma_very_easy': "Coupe — Énigme très facile (recommandé : +1 fixe pour anti-triche)",
+  'coupe.enigma_easy':      "Coupe — Énigme facile (recommandé : +1 fixe)",
+  'coupe.enigma_medium':    "Coupe — Énigme moyenne (recommandé : +1 fixe)",
+  'coupe.enigma_hard':      "Coupe — Énigme difficile (recommandé : +1 fixe)",
+
+  'cooldown.replant_hours': "Heures avant qu'un même user puisse replanter sur le même lieu (anti-farm collusion)",
 }
 
 export function GameRules() {
@@ -123,7 +152,9 @@ export function GameRules() {
       const grouped: Record<string, Setting[]> = {}
       for (const row of data ?? []) {
         if (DEAD_KEYS.has(row.key)) continue
-        const prefix = row.key.split('_')[0]
+        // Split sur "." OU "_" (clés V067 utilisent "." pour grouping
+        // hiérarchique : glory.visit_gps, coupe.add_place, cooldown.replant_hours).
+        const prefix = row.key.split(/[._]/)[0]
         const catName = CATEGORIES[prefix] ? prefix : 'divers'
         if (!grouped[catName]) grouped[catName] = []
         grouped[catName].push({ key: row.key, value: row.value })
