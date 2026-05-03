@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
+import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
 interface Enigma {
@@ -174,7 +175,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
 
         {!result && (
           <div className="enigma-header">
-            <img src="/res/coffre.webp" alt="" className="enigma-header-chest" />
+            <img src={parcheminImg} alt="" className="enigma-header-chest" />
             <h2 className="enigma-title">{'\u00c9'}nigmes du jour</h2>
             {enigmas.length > 0 && <span className="enigma-progress">{progress}</span>}
           </div>

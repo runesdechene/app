@@ -1,3 +1,4 @@
+import parcheminImg from '../../assets/parchemin.png'
 import './EnigmaResult.css'
 
 // V0.6 — Refonte Gloire/Coupe : on n'affiche plus "+X point d'érudition"
@@ -36,7 +37,7 @@ export function EnigmaResult({ correct, answer, explanation, difficulty, onClose
     <div className="enigma-result">
       <div className="enigma-result-icon">
         {correct
-          ? <img src="/res/coffre_ouvert.webp" alt="" className="enigma-result-chest" />
+          ? <img src={parcheminImg} alt="" className="enigma-result-chest" />
           : <span className="enigma-result-wrong-icon">{'❌'}</span>
         }
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
 interface FragmentStatus {
@@ -96,7 +97,7 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
         title="Enigmes"
       >
         <img
-          src="/res/coffre.webp"
+          src={parcheminImg}
           alt=""
           className={`enigma-chest-img${availableCount === 0 ? ' enigma-chest-img-done' : ''}`}
         />
@@ -117,7 +118,7 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
               onClick={dailyDone ? undefined : handleSelectDaily}
               disabled={dailyDone}
             >
-              <img src="/res/coffre.webp" alt="" className="enigma-menu-item-img" />
+              <img src={parcheminImg} alt="" className="enigma-menu-item-img" />
               <div className="enigma-menu-item-info">
                 <span className="enigma-menu-item-name">Enigmes du jour</span>
                 <span className="enigma-menu-item-sub">

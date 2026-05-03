@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
+import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
 interface FragmentInfo {
@@ -115,11 +116,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
         <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
 
         <div className="enigma-header" style={{ flexDirection: 'column', alignItems: 'center' }}>
-          {(fragment.iconUrl || fragment.icon) && (
-            fragment.iconUrl
-              ? <img src={fragment.iconUrl} alt="" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: '50%' }} />
-              : <span style={{ fontSize: 32 }}>{fragment.icon}</span>
-          )}
+          <img src={parcheminImg} alt="" className="enigma-header-chest" />
           <h2 className="enigma-title">Énigme — {fragment.name}</h2>
         </div>
 
