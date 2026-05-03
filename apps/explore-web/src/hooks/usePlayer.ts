@@ -473,10 +473,27 @@ export function usePlayer() {
   }, [isAuthenticated, user?.email])
 }
 
-/** Charge les events recents et les affiche en toasts (7 jours max) */
+/** Charge les events recents et les affiche en toasts (7 jours max).
+ *  V071 : on appelle get_recent_activity (global) ET get_my_recent_activity
+ *  (mes events à moi) en parallèle, puis on dédup par id. Sans ça, mes
+ *  propres énigmes/plantages peuvent être noyés dans le flot global et
+ *  ne plus apparaître au reload. */
 async function loadRecentActivity(currentUserId: string) {
-  const { data } = await supabase.rpc('get_recent_activity', { p_limit: 50 })
-  if (!data || !Array.isArray(data)) return
+  const [globalRes, myRes] = await Promise.all([
+    supabase.rpc('get_recent_activity', { p_limit: 50 }),
+    supabase.rpc('get_my_recent_activity', { p_user_id: currentUserId, p_limit: 50 }),
+  ])
+  const globalArr = Array.isArray(globalRes.data) ? globalRes.data : []
+  const myArr = Array.isArray(myRes.data) ? myRes.data : []
+  const seen = new Set<number>()
+  const data: typeof globalArr = []
+  for (const e of [...globalArr, ...myArr]) {
+    const id = (e as { id: number }).id
+    if (seen.has(id)) continue
+    seen.add(id)
+    data.push(e)
+  }
+  if (data.length === 0) return
 
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000
   const addToast = useToastStore.getState().addToast
