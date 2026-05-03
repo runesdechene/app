@@ -393,6 +393,10 @@ export function usePlayer() {
             // (1/2/3/5), Coupe fixe (+1 quelle que soit la difficulté
             // pour l'équité du classement / anti-triche).
             const diff = e.data?.difficulty ?? 'easy'
+            const diffLabel = diff === 'very_easy' ? 'très facile'
+                            : diff === 'medium'    ? 'moyenne'
+                            : diff === 'hard'      ? 'difficile'
+                            : 'facile'
             const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
                        : diff === 'medium'    ? 'glory.enigma_medium'
                        : diff === 'hard'      ? 'glory.enigma_hard'
@@ -404,9 +408,9 @@ export function usePlayer() {
             const gainG = r[keyG] ?? 1
             const gainC = r[keyC] ?? 1
             if (isSelf) {
-              message = `Énigme résolue 🦉 ${fmt(gainG, gainC)}`
+              message = `Énigme ${diffLabel} résolue 🦉 ${fmt(gainG, gainC)}`
             } else {
-              message = `${name} a résolu une énigme 📖`
+              message = `${name} a résolu une énigme ${diffLabel} 📖 ${fmt(gainG, gainC)}`
             }
             type = 'enigma'
           } else {
@@ -545,7 +549,27 @@ async function loadRecentActivity(currentUserId: string) {
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
     } else if (e.type === 'enigma_success') {
-      message = `${name} a résolu une énigme 📖`
+      // V069 — affiche difficulté + gain pour cohérence avec le live subscribe
+      const diff = e.data?.difficulty ?? 'easy'
+      const diffLabel = diff === 'very_easy' ? 'très facile'
+                      : diff === 'medium'    ? 'moyenne'
+                      : diff === 'hard'      ? 'difficile'
+                      : 'facile'
+      const r = useGloryRulesStore.getState().rules
+      const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
+                 : diff === 'medium'    ? 'glory.enigma_medium'
+                 : diff === 'hard'      ? 'glory.enigma_hard'
+                 : 'glory.enigma_easy'
+      const keyC = diff === 'very_easy' ? 'coupe.enigma_very_easy'
+                 : diff === 'medium'    ? 'coupe.enigma_medium'
+                 : diff === 'hard'      ? 'coupe.enigma_hard'
+                 : 'coupe.enigma_easy'
+      const gainG = r[keyG] ?? 1
+      const gainC = r[keyC] ?? 1
+      const parts: string[] = []
+      if (gainG > 0) parts.push(`+${gainG} Gloire`)
+      if (gainC > 0) parts.push(`+${gainC} Coupe`)
+      message = `${name} a résolu une énigme ${diffLabel} 📖 ${parts.join(' / ')}`
       highlights.push(name)
       type = 'enigma'
     } else {
