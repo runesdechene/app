@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useMapStore } from '../../stores/mapStore'
 import { useCoupe } from '../../hooks/useCoupe'
+import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import { CoupeRulesModal } from './CoupeRulesModal'
 import { supabase } from '../../lib/supabase'
 import './LeaderboardModal.css'
@@ -38,6 +39,15 @@ export function CoupeModal({ onClose }: Props) {
   const [showRules, setShowRules] = useState(false)
   const { state, loading, error } = useCoupe(true)
   const [factionMeta, setFactionMeta] = useState<Map<string, FactionMeta>>(new Map())
+  // V068 : barème dynamique pour le tab "Ma contribution" (avant : × hardcodé,
+  // décalé par rapport au score réel calculé en SQL via _user_coupe_score)
+  const ruleGet = useGloryRulesStore(s => s.get)
+  const cAdd     = ruleGet('coupe.add_place')
+  const cPlant   = ruleGet('coupe.plant_flag')
+  const cCarnet  = ruleGet('coupe.carnet')
+  const cVisit   = ruleGet('coupe.visit_gps')
+  const cPhoto   = ruleGet('coupe.photo')
+  const cEnigma  = ruleGet('coupe.enigma_easy') // fixe quelle que soit la diff.
 
   // Fetch les couleurs / patterns de faction une seule fois pour enrichir le
   // tab "Top contributeurs" avec un petit emblème à côté de chaque user.
@@ -175,28 +185,28 @@ export function CoupeModal({ onClose }: Props) {
                       <div className="coupe-breakdown-rows">
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Lieux ajoutés</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxAjoutes} × 7</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxAjoutes * 7} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxAjoutes} × {cAdd}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxAjoutes * cAdd} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Plantages de bannière</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.plantages} × 5</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.plantages * 5} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.plantages} × {cPlant}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.plantages * cPlant} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Carnets</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.carnets} × 3</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.carnets * 3} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.carnets} × {cCarnet}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.carnets * cCarnet} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Lieux explorés (GPS)</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxExplores} × 1</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxExplores} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxExplores} × {cVisit}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxExplores * cVisit} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Photos ajoutées</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.photos} × 1</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.photos} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.photos} × {cPhoto}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.photos * cPhoto} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">
@@ -207,8 +217,8 @@ export function CoupeModal({ onClose }: Props) {
                               </span>
                             )}
                           </span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.enigmes.total} × 1</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.enigmes.total} pts</span>
+                          <span className="coupe-breakdown-meta">{state.myBreakdown.enigmes.total} × {cEnigma}</span>
+                          <span className="coupe-breakdown-pts">{state.myBreakdown.enigmes.total * cEnigma} pts</span>
                         </div>
                       </div>
                     </>

@@ -57,14 +57,6 @@ export interface CoupeState {
   myBreakdown: CoupeMyBreakdown | null
 }
 
-/** Barème — gardé en synchro avec les migrations 023 + 024. Si tu modifies ici,
- *  modifie aussi les migs. Énigmes : +1 fixe quelle que soit la difficulté
- *  (anti-triche : on n'incite pas à chercher en ligne pour les hard). */
-export const COUPE_BAREME = {
-  visite: 1,        // visite GPS d'un nouveau lieu (DISTINCT place_id)
-  enigme: 1,        // énigme résolue (toute difficulté)
-  photo: 1,
-  carnet: 3,
-  plantage: 5,
-  lieuAjoute: 7,
-} as const
+// V067 — barème déplacé dans app_settings (mig 067) + lu via useGloryRulesStore.
+// Plus de constante figée ici : consommer le store pour rester cohérent avec le
+// SQL et la page Hub admin.

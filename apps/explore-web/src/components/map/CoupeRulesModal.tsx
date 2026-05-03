@@ -1,5 +1,5 @@
 import { InfoModal } from './InfoModal'
-import { COUPE_BAREME } from '../../types/coupe'
+import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 
 interface Props {
   onClose: () => void
@@ -9,23 +9,32 @@ interface Props {
  * V0.7 phase 3 — Règles claires de la Coupe des Héritages.
  * Accessible via icône ⓘ près du toggle "Coupe des Héritages" + lien depuis CoupeModal.
  *
- * Le barème est volontairement plat sur les énigmes (+1 fixe) pour ne pas
- * inciter à tricher en cherchant les hard en ligne.
+ * Énigmes : +1 fixe quelle que soit la difficulté (anti-triche, on n'incite
+ * pas à chercher les hard en ligne). Toutes les valeurs viennent du store
+ * useGloryRulesStore (mig 067) — éditable depuis le Hub admin.
  */
 export function CoupeRulesModal({ onClose }: Props) {
+  const get = useGloryRulesStore(s => s.get)
+  const visite   = get('coupe.visit_gps')
+  const plantage = get('coupe.plant_flag')
+  const lieu     = get('coupe.add_place')
+  const carnet   = get('coupe.carnet')
+  const photo    = get('coupe.photo')
+  const enigme   = get('coupe.enigma_easy') // valeur "fixe" (toutes diff. = même)
+
   return (
     <InfoModal
       icon={'🏆'}
       title={'Coupe des Héritages'}
       description={'Chaque saison, les Héritages s\'affrontent dans une compétition saine d\'actions personnelles. Tes plantages, tes carnets, tes énigmes résolues — tout compte pour ton Héritage. La faction qui cumule le plus de points à la clôture remporte la Coupe. Même formule que la Gloire à vie, sur la fenêtre de la saison.'}
       rows={[
-        { label: 'Visite GPS d\'un nouveau lieu',  value: `+${COUPE_BAREME.visite} pt` },
-        { label: 'Énigme résolue (toute diff.)',  value: `+${COUPE_BAREME.enigme} pt` },
-        { label: 'Photo ajoutée à un lieu',        value: `+${COUPE_BAREME.photo} pt` },
-        { label: 'Carnet écrit sur un lieu',       value: `+${COUPE_BAREME.carnet} pts` },
-        { label: 'Plantage de bannière (terrain)', value: `+${COUPE_BAREME.plantage} pts`, highlight: true },
-        { label: 'Lieu ajouté',                    value: `+${COUPE_BAREME.lieuAjoute} pts`, highlight: true },
-        { label: 'Combo créateur sur place',       value: `${COUPE_BAREME.visite + COUPE_BAREME.lieuAjoute + COUPE_BAREME.plantage + COUPE_BAREME.carnet} pts` },
+        { label: 'Visite GPS d\'un nouveau lieu',  value: `+${visite} pt${visite > 1 ? 's' : ''}` },
+        { label: 'Énigme résolue (toute diff.)',   value: `+${enigme} pt${enigme > 1 ? 's' : ''}` },
+        { label: 'Photo ajoutée à un lieu',        value: `+${photo} pt${photo > 1 ? 's' : ''}` },
+        { label: 'Carnet écrit sur un lieu',       value: `+${carnet} pt${carnet > 1 ? 's' : ''}` },
+        { label: 'Plantage de bannière (terrain)', value: `+${plantage} pt${plantage > 1 ? 's' : ''}`, highlight: true },
+        { label: 'Lieu ajouté',                    value: `+${lieu} pt${lieu > 1 ? 's' : ''}`, highlight: true },
+        { label: 'Combo créateur sur place',       value: `${visite + lieu + plantage + carnet} pts` },
       ]}
       onClose={onClose}
     />
