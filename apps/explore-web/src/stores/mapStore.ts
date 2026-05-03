@@ -46,10 +46,12 @@ interface MapState {
   requestFlyTo: (target: { lng: number; lat: number; placeId?: string }) => void
   clearPendingFlyTo: () => void
 
-  /** Demande d'ouverture de la modale FragmentEnigma depuis l'extérieur (toasts) */
-  pendingFragmentOpen: { fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null
-  requestFragmentOpen: (fragment: { fragmentId: number; name: string; icon: string | null; iconUrl: string | null }) => void
-  clearPendingFragmentOpen: () => void
+  /** V070 — Demande d'ouverture de la galerie Fragments dans le PlayerProfileModal
+   *  (déclenchée depuis un toast d'énigme de fragment). Le PlayerProfileModal lit
+   *  ce flag à chaque mount et appelle openFragmentCollection() automatiquement. */
+  pendingOpenFragmentStore: boolean
+  requestOpenFragmentStore: () => void
+  clearPendingOpenFragmentStore: () => void
 
   /** Demande de zoom depuis l'extérieur (add-place, etc.) */
   pendingZoom: 'in' | 'out' | null
@@ -106,9 +108,9 @@ export const useMapStore = create<MapState>((set) => ({
   requestFlyTo: (target) => set({ pendingFlyTo: target }),
   clearPendingFlyTo: () => set({ pendingFlyTo: null }),
 
-  pendingFragmentOpen: null,
-  requestFragmentOpen: (fragment) => set({ pendingFragmentOpen: fragment }),
-  clearPendingFragmentOpen: () => set({ pendingFragmentOpen: null }),
+  pendingOpenFragmentStore: false,
+  requestOpenFragmentStore: () => set({ pendingOpenFragmentStore: true }),
+  clearPendingOpenFragmentStore: () => set({ pendingOpenFragmentStore: false }),
 
   pendingZoom: null,
   requestZoom: (dir) => set({ pendingZoom: dir }),

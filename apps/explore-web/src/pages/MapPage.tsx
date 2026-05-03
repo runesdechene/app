@@ -144,16 +144,6 @@ export default function MapPage() {
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
-  // V070 — toast énigme fragment cliquable : si un autre composant
-  // demande l'ouverture d'un fragment, on l'inject ici dans fragmentEnigma.
-  const pendingFragmentOpen = useMapStore(s => s.pendingFragmentOpen)
-  const clearPendingFragmentOpen = useMapStore(s => s.clearPendingFragmentOpen)
-  useEffect(() => {
-    if (pendingFragmentOpen) {
-      setFragmentEnigma(pendingFragmentOpen)
-      clearPendingFragmentOpen()
-    }
-  }, [pendingFragmentOpen, clearPendingFragmentOpen])
 
   // Gating Cartographier : 3 lieux découverts (décision Uriel 2026-05-02 — règle simple,
   // indépendante du système de niveaux/quêtes). Le titre "Explorateur" reste un titre de

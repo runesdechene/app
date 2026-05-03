@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useToastStore } from '../../stores/toastStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import type { GameToast as GameToastType } from '../../stores/toastStore'
 import './GameToast.css'
 
@@ -147,16 +148,15 @@ function ToastItem({ toast }: { toast: GameToastType }) {
     if (toast.previousActorColor) highlightColors.set(prevName, toast.previousActorColor)
   }
 
-  // V070 — nom du fragment cliquable (énigme de fragment) → ouvre la modale
-  // FragmentEnigma via mapStore.pendingFragmentOpen (consommé par MapPage).
+  // V070 — nom du fragment cliquable (énigme de fragment) → ouvre la galerie
+  // Fragments dans le PlayerProfileModal de SOI-MÊME (le but est de "découvrir"
+  // les fragments depuis le toast, pas de relancer l'énigme).
   if (toast.fragmentId && toast.fragmentName) {
     actions.set(toast.fragmentName, () => {
-      useMapStore.getState().requestFragmentOpen({
-        fragmentId: toast.fragmentId!,
-        name: toast.fragmentName!,
-        icon: toast.fragmentIcon ?? null,
-        iconUrl: toast.fragmentIconUrl ?? null,
-      })
+      const myId = usePlayerStore.getState().userId
+      if (!myId) return
+      useMapStore.getState().setSelectedPlayerId(myId)
+      useMapStore.getState().requestOpenFragmentStore()
     })
   }
 

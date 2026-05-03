@@ -166,6 +166,19 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   const isSelf = profile?.userId === currentUserId
 
+  // V070 — toast d'énigme de fragment cliquable : si le mapStore demande
+  // l'ouverture de la galerie Fragments, on l'ouvre ici (le profil chargé
+  // est nécessaire pour que get_all_fragments retourne les bonnes données).
+  const pendingOpenFragmentStore = useMapStore(s => s.pendingOpenFragmentStore)
+  const clearPendingOpenFragmentStore = useMapStore(s => s.clearPendingOpenFragmentStore)
+  useEffect(() => {
+    if (pendingOpenFragmentStore && profile) {
+      openFragmentCollection()
+      clearPendingOpenFragmentStore()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingOpenFragmentStore, profile])
+
   useEffect(() => {
     async function load() {
       const [profileRes, fragmentsRes, noteRes] = await Promise.all([
@@ -851,7 +864,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
             <button className="player-modal-close" onClick={() => setShowFragmentStore(false)}>&#10005;</button>
             <h3 className="fragment-collection-title">Fragments disponibles</h3>
             <p className="fragment-collection-subtitle">
-              Chez Runes de Chêne, nos illustrations originales sont appelées <b>Fragments</b>. Achetées sur la <u><a href="https://runesdechene.com"><b>Boutique officielle</b></a></u>, elles augmentent votre limite d'influence a distance sur les lieux associes <b>ET</b> vous offrent des 🔮 énigmes thématiques supplémentaires toutes les 48h.
+              Chez Runes de Chêne, nos illustrations originales sont appelées <b>Fragments</b>. Achetées sur la <u><a href="https://runesdechene.com"><b>Boutique officielle</b></a></u>, elles vous offrent des 🔮 énigmes thématiques supplémentaires toutes les 48h.
             </p>
 
             {loadingFragments ? (
