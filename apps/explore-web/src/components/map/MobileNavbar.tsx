@@ -64,10 +64,6 @@ export function MobileNavbar() {
         <span className="mobile-nav-label">Activite</span>
       </button>
 
-      {/* V0.7+ Quêtes : désactivé visuellement (2026-05-02) tant que le système n'est pas
-          réintroduit proprement (3 quêtes sur 4 ne tracking plus depuis le rollback mig 058).
-          Les fichiers useUserQuests / QuestsPanel / QuestRow sont conservés pour réactivation. */}
-
       <button
         className={`mobile-nav-item${activePanel === 'chat' ? ' active' : ''}`}
         onClick={() => handlePanelTap('chat')}
