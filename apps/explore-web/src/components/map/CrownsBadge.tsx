@@ -14,7 +14,7 @@ const TXT_ROW_SOLO_VAL = '+1 Couronne'
 const TXT_ROW_EXP     = 'Récolte en expédition'
 const TXT_ROW_EXP_VAL = '+2 Couronnes'
 const TXT_ROW_FUTURE  = 'À venir'
-const TXT_ROW_FUTURE_VAL = 'Acheter des énigmes, déplacer son Campement'
+const TXT_ROW_FUTURE_VAL = 'Acheter des énigmes, etc...'
 
 export function CrownsBadge() {
   const balance = useCrownsStore(s => s.balance)
