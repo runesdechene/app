@@ -100,32 +100,6 @@ export const fortBadgeLayer: LayerSpecification = {
   },
 }
 
-/** Emblèmes faction au centroïde des territoires (icon + rate intégrés dans l'image)
- *  Caché sur les territoires entièrement fogged pour ne pas leak la faction qui contrôle.
- *  V0.7 : maxzoom=9 — au-delà, le composite avatar+emblème (VeilleMarkers React) prend le
- *  relais avec une taille constante. */
-export const territoryEmblemLayer: LayerSpecification = {
-  id: 'territory-emblems',
-  type: 'symbol',
-  source: 'territory-labels',
-  maxzoom: 9,
-  filter: ['all', ['has', 'pattern'], ['get', 'revealed']],
-  layout: {
-    'icon-image': ['get', 'pattern'],
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      3, 0.08,
-      6, 0.12,
-      9, 0.20,
-    ],
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 1,
-  },
-}
-
 /** Label territoire au hover (point nord du blob) — caché si territoire entièrement fogged */
 export function buildTerritoryHoverLabelLayer(factionColorMode: boolean): LayerSpecification {
   return {

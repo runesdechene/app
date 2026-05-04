@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
@@ -295,26 +295,5 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         )}
       </div>
     </div>
-  )
-}
-
-/** Chest button to display on the map */
-interface ChestButtonProps {
-  onClick: () => void
-  hasAnsweredToday: boolean
-}
-
-export function EnigmaChestButton({ onClick, hasAnsweredToday }: ChestButtonProps) {
-  return (
-    <button
-      className={`enigma-chest-btn${!hasAnsweredToday ? ' pulse' : ''}`}
-      onClick={onClick}
-      title={hasAnsweredToday ? 'Énigmes du jour' : 'Énigmes du jour (nouvelles !)'}
-    >
-      <img src="/res/coffre.webp" alt="" className="enigma-chest-img" />
-      <span className="enigma-chest-label">
-        {hasAnsweredToday ? '📚' : '\u2B50'}
-      </span>
-    </button>
   )
 }
