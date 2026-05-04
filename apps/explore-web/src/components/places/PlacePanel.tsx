@@ -10,12 +10,8 @@ import { discoverPlace } from '../../hooks/usePlayer'
 import { useAuth } from '../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from './WishlistButton'
-// PlaceEnigma masqué pour l'instant (pas d'énigmes de lieu en DB)
 import { CarnetCard } from './CarnetCard'
 import type { Carnet } from './CarnetCard'
-// V0.6 — InfluenceFrame masqué dans le panel lieu (mig 022 défrise la RPC en
-// transition mais le UI ne l'expose plus). Réactivable en décommentant + import.
-// import { InfluenceFrame } from './InfluenceFrame'
 import { VeilleFrame } from './VeilleFrame'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
@@ -386,14 +382,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [v05, setV05] = useState<V05Detail | null>(null)
   const [v05Key, setV05Key] = useState(0)
 
-  // Faction visual data cache (colors + patterns for all factions)
-  // V0.6 — factionPatterns plus utilisé suite au masquage de InfluenceFrame.
-  // setFactionPatterns reste pour ne pas casser le useEffect de chargement plus bas
-  // (coût marginal, et ça nous évite de devoir aussi le retirer si on réactive InfluenceFrame).
+  // Faction visual data cache (colors + svgs only — patterns/names plus utilisés depuis le retrait d'InfluenceFrame, B2)
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
-  const [, setFactionPatterns] = useState<Map<string, string>>(new Map())
   const [factionSvgs, setFactionSvgs] = useState<Map<string, string>>(new Map())
-  const [, setFactionNames] = useState<Map<string, string>>(new Map())
 
   // Fetch V0.5 detail + all faction visuals
   useEffect(() => {
@@ -401,25 +392,18 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     async function loadV05() {
       const [{ data, error }, { data: allFactions }] = await Promise.all([
         supabase.rpc('get_place_detail_v05', { p_place_id: place.id, p_user_id: userId ?? null }),
-        supabase.from('factions').select('id, color, image_url, pattern, title').order('order'),
+        supabase.from('factions').select('id, color, pattern').order('order'),
       ])
       if (cancelled || error) return
-      // Cache all factions
       if (allFactions) {
         const colors = new Map<string, string>()
-        const patterns = new Map<string, string>()
         const svgs = new Map<string, string>()
-        const names = new Map<string, string>()
-        for (const f of allFactions as Array<{ id: string; color: string; image_url: string; pattern: string; title: string }>) {
+        for (const f of allFactions as Array<{ id: string; color: string; pattern: string }>) {
           colors.set(f.id, f.color)
-          if (f.image_url) patterns.set(f.id, f.image_url)
           if (f.pattern) svgs.set(f.id, f.pattern)
-          names.set(f.id, f.title)
         }
         setFactionColors(colors)
-        setFactionPatterns(patterns)
         setFactionSvgs(svgs)
-        setFactionNames(names)
       }
       const d = data as V05Detail | null
       if (d) setV05(d)
@@ -882,29 +866,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         {/* V0.7 — Plantage de l'étendard désormais à droite du titre "Ils ont foulé ces
             terres" dans ExplorerRow (décision Uriel 2026-05-02 — bouton inline plus
             compact, état déjà visible dans la pilule "Veillé par" sous le titre du lieu). */}
-
-        {/* Zone 3A — Influence Banners (V0.5) — MASQUÉ V0.6
-            Le système d'influence V0.5 est mis en sommeil avec l'arrivée des
-            Couronnes et de la Coupe (V0.6). Sera repensé en phase 5 V0.7 sous
-            la forme "investir Couronnes à distance" pour les lieux lointains
-            (cf project_v07_phase5_influence_distance.md).
-            Code conservé en commentaire pour réactivation rapide si besoin :
-
-        {v05 && (
-          <InfluenceFrame
-            placeId={place.id}
-            influence={v05.influence ?? []}
-            factionColors={factionColors}
-            factionPatterns={factionPatterns}
-            factionNames={factionNames}
-            placeLocation={place.location}
-            onInfluencePlaced={() => { refreshV05(); onRefetch() }}
-          />
-        )} */}
-
-        {/* (Explorers now in identity section above) */}
-
-        {/* Place Enigma — masqué pour l'instant (pas d'énigmes de lieu en DB) */}
 
         {/* Zone 4 — Tabs */}
         <div className="place-tabs" ref={tabsRef}>
