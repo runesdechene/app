@@ -259,7 +259,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           <div className="court-vacant-text">
             <span className="court-leader-label">Lieu vierge</span>
             <span className="court-vacant-title">Personne ne veille ici</span>
-            <span className="court-vacant-hint">Pose ta marque depuis loin avec tes Couronnes — 50 pour t'établir</span>
+            <span className="court-vacant-hint">1 Couronne suffit pour t'établir — ensuite c'est la course au plus offrant</span>
           </div>
         </div>
       )}
