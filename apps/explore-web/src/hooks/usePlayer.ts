@@ -93,7 +93,7 @@ export function usePlayer() {
         if (migResult?.error) {
           console.error('[usePlayer] Migration failed:', migResult.error)
         } else {
-          console.log('[usePlayer] Migration successful:', migResult)
+          console.info('[usePlayer] Migration successful:', migResult)
           // Utiliser le nouvel ID
           userData.id = authId
         }
