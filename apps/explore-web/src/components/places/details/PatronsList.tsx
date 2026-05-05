@@ -8,13 +8,7 @@ interface PatronsListProps {
 }
 
 export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
-  if (patrons.length === 0) {
-    return (
-      <div className="patrons-empty">
-        Aucun mécène ne s'est encore distingué sur ce lieu.
-      </div>
-    )
-  }
+  if (patrons.length === 0) return null
 
   const openProfile = (userId: string) => {
     useMapStore.getState().setSelectedPlayerId(userId)
