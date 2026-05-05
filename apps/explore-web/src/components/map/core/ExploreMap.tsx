@@ -29,27 +29,15 @@ import { VeilleurNamePills } from '../markers/VeilleurNamePills'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
-
-// Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
-// La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
-const HERITAGE_CUP_DOT_COLOR = '#ecdfc0'  // Parchemin clair, fond très lumineux
-const HERITAGE_CUP_INK_COLOR = '#2D1F0F'  // Encre brune foncée pour les icônes
-const HERITAGE_CUP_INK_PREFIX = 'ink::'
-
-// --- Component ---
-
-interface PopupInfo {
-  id: string
-  longitude: number
-  latitude: number
-  title: string
-  tagTitle: string
-  tagColor: string
-}
-
-const MAP_STYLE_PROP = { width: '100%', height: '100%' } as const
-const MAP_CONTAINER_STYLE = { position: 'relative' as const, width: '100%', height: '100%' }
-const INITIAL_VIEW = { longitude: 2.45, latitude: 46.6, zoom: 6 }
+import {
+  HERITAGE_CUP_DOT_COLOR,
+  HERITAGE_CUP_INK_COLOR,
+  HERITAGE_CUP_INK_PREFIX,
+  MAP_STYLE_PROP,
+  MAP_CONTAINER_STYLE,
+  INITIAL_VIEW,
+} from '../../../lib/exploreMapConstants'
+import type { PopupInfo } from '../../../lib/exploreMapConstants'
 
 export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
