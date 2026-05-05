@@ -1,0 +1,36 @@
+.court-tension {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+.court-tension-status {
+  font-size: 14px;
+  opacity: 0.85;
+}
+.court-tension-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.12);
+}
+.court-tension-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+.court-tension-fill.veilleur {
+  background: linear-gradient(90deg, #6b8e6b, #8aaf8a);
+}
+.court-tension-fill.challenger {
+  background: linear-gradient(90deg, #b86b4b, #d48060);
+}
+.court-tension-scores {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.court-score-veilleur { color: #4d6b4d; }
+.court-score-menace   { color: #a05030; font-weight: 500; }

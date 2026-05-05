@@ -10,7 +10,6 @@ import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
-import { InfluenceToggle } from '../components/map/controls/InfluenceToggle'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
@@ -309,7 +308,6 @@ export default function MapPage() {
 
       {!addPlaceMode && !authLoading && isAuthenticated && (
         <div className="influence-area">
-          <InfluenceToggle />
           <FactionBar />
         </div>
       )}
