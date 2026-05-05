@@ -310,10 +310,10 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             className="court-btn-contest"
             onClick={handleContestTap}
             disabled={balance < 1 || creatingExp}
-            aria-label="Contester ce lieu"
+            aria-label="Influencer ce lieu"
           >
             <span className="court-btn-icon">⚔</span>
-            <span className="court-btn-label">{creatingExp ? 'Préparation…' : 'Contester'}</span>
+            <span className="court-btn-label">{creatingExp ? 'Préparation…' : 'Influencer'}</span>
             <span className="court-btn-cost">−1 👑</span>
             {bursts.filter(b => b.side === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
