@@ -10,6 +10,7 @@ import { supabase } from './supabase'
 import { useToastStore } from '../stores/toastStore'
 import type { GameToast } from '../stores/toastStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
+import { COURT_TYPES, buildCourtToast, type CourtActivityRow } from './courtToastMessages'
 
 export async function loadRecentActivityToasts(currentUserId: string) {
   const [globalRes, myRes] = await Promise.all([
@@ -76,6 +77,23 @@ export async function loadRecentActivityToasts(currentUserId: string) {
     if (e.type === 'new_user' && e.actor_id === currentUserId) continue
     // Ignorer le tracking interne fragment_enigma
     if (e.type === 'fragment_enigma') continue
+
+    // V097 — types Cour : déléguer au helper centralisé pour cohérence
+    // avec useCourtNotifications (live-feed Realtime).
+    if (COURT_TYPES.has(e.type)) {
+      const built = buildCourtToast(e as CourtActivityRow, currentUserId)
+      if (built) {
+        useToastStore.getState().addToast({
+          type: 'court',
+          message: built.message,
+          highlights: built.highlights,
+          actorId: e.actor_id ?? undefined,
+          placeId: e.place_id ?? undefined,
+          timestamp: new Date(e.created_at).getTime(),
+        })
+      }
+      continue
+    }
 
     const name = e.data?.actorName || 'Quelqu\'un'
     const place = e.data?.placeTitle || 'un lieu'
