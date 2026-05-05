@@ -61,13 +61,11 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlaceP
 function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onAuthPrompt?: () => void; onRefetch: () => void }) {
   const { isAuthenticated } = useAuth()
   const discoveredIds = usePlayerStore(s => s.discoveredIds)
-  const userFactionId = usePlayerStore(s => s.userFactionId)
 
   const isDiscovered = isAuthenticated && discoveredIds.has(place.id)
-  const isOwnFaction = isAuthenticated
-    && userFactionId !== null
-    && place.claim?.factionId === userFactionId
-    && !isDiscovered
+  // V0.7 — la notion "lieu de ma faction" disparaît avec les colonnes claimed_*.
+  // À réintroduire post-festival via la Veille (faction du veilleur) si nécessaire.
+  const isOwnFaction = false
 
   if (!isDiscovered) {
     return (
@@ -964,7 +962,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               <div>Auteur: {place.author?.lastName ?? '—'} ({place.author?.id})</div>
               <div>Vues: {place.metrics.views} · Likes: {place.metrics.likes} · Explo: {place.metrics.explored}</div>
               <div>Note ancienne: {place.metrics.note?.toFixed(1) ?? '—'}</div>
-              <div>Claim: {place.claim?.factionId ?? 'aucun'} {place.claim ? `(fort niv.${place.claim.fortificationLevel})` : ''}</div>
               {v05 && (
                 <>
                   <div style={{ marginTop: 6, fontWeight: 700 }}>V0.5 Influence</div>

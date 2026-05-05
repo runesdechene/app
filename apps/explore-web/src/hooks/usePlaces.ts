@@ -24,9 +24,6 @@ interface MapPlace {
     color: string
     pattern: string | null
   } | null
-  claimedByName: string | null
-  claimedById: string | null
-  fortificationLevel: number
   location: {
     latitude: number
     longitude: number
@@ -50,10 +47,7 @@ export interface PlaceProperties {
   factionColor: string
   dominantFactionColor: string
   factionPattern: string
-  claimedByName: string
-  claimedById: string
   claimed: boolean
-  fortificationLevel: number
   likes: number
   score: number
   discovered: boolean
@@ -163,10 +157,7 @@ export function usePlaces() {
                 return factionColorMap.get(maxId) ?? ''
               })(),
               factionPattern: place.faction?.pattern ?? '',
-              claimedByName: place.claimedByName ?? '',
-              claimedById: place.claimedById ?? '',
               claimed: !!place.faction || (place.totalInfluence ?? 0) > 0,
-              fortificationLevel: place.fortificationLevel ?? 0,
               likes: place.likes ?? 0,
               score: place.score ?? 0,
               totalInfluence: place.totalInfluence ?? 0,

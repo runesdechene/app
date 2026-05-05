@@ -38,19 +38,6 @@ export interface PlaceDetail {
     explored: number
     note: number | null
   }
-  claim: {
-    factionId: string
-    factionTitle: string
-    factionColor: string
-    factionPattern: string | null
-    claimedBy: string
-    claimedByName: string
-    claimedByAvatar: string | null
-    claimedAt: string
-    fortificationLevel: number
-    zoneFortification: number
-    zoneNeighborCount: number
-  } | null
   requester: {
     bookmarked: boolean
     liked: boolean
@@ -120,12 +107,6 @@ export function usePlace(placeId: string | null) {
           ...tag,
           icon: iconMap.get(tag.id) ?? null,
         }))
-      }
-
-      // Enrichir le claim avec l'avatar du protecteur
-      if (placeData.claim?.claimedBy) {
-        const { data: avatarData } = await supabase.rpc('get_user_avatar', { p_user_id: placeData.claim.claimedBy })
-        placeData.claim.claimedByAvatar = (avatarData as string) ?? null
       }
 
       setPlace(placeData)

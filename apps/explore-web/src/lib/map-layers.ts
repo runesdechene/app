@@ -73,33 +73,6 @@ export function buildTerritoryPatternLayer(factionId: string): LayerSpecificatio
 
 // --- Layer style : Territory labels (symbol layers GPU-side, pas de DOM markers) ---
 
-/** Badge fortification sur les lieux fortifiés (icône bouclier avec chiffre intégré)
- *  NOTE V0.5: gardé pour rétrocompatibilité pendant la transition vers le système d'influence.
- *  Sera supprimé en Phase 6.
- */
-export const fortBadgeLayer: LayerSpecification = {
-  id: 'places-fort-badge',
-  type: 'symbol',
-  source: 'places',
-  minzoom: 8,
-  filter: ['>', ['get', 'fortificationLevel'], 0],
-  layout: {
-    'icon-image': ['concat', 'shield::', ['to-string', ['get', 'fortificationLevel']]],
-    'icon-size': [
-      'interpolate', ['linear'], ['zoom'],
-      6, 0.25,
-      9, 0.35,
-      12, 0.45,
-    ],
-    'icon-offset': [38, 38],
-    'icon-allow-overlap': true,
-    'icon-ignore-placement': true,
-  },
-  paint: {
-    'icon-opacity': 0.95,
-  },
-}
-
 /** Label territoire au hover (point nord du blob) — caché si territoire entièrement fogged */
 export function buildTerritoryHoverLabelLayer(factionColorMode: boolean): LayerSpecification {
   return {

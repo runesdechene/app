@@ -99,12 +99,6 @@ export function FoggedPlaceView({
       <div className="place-body">
         <h2 className="place-title fogged-title">{place.title}</h2>
 
-        {isOwnFaction && place.claim && (
-          <div className="place-claim-badge" style={{ backgroundColor: place.claim.factionColor }}>
-            Territoire alli\u00e9 \u2014 {place.claim.factionTitle}
-          </div>
-        )}
-
         <p className="fog-mystery-text">
           {isOwnFaction
             ? 'Ce lieu est sous influence de votre héritage. Découvrez-le à moindre coût.'

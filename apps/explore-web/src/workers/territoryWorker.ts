@@ -34,9 +34,6 @@ interface PlaceInput {
   factionPattern: string
   score: number
   likes: number
-  fortificationLevel: number
-  claimedByName: string
-  claimedById: string
   /** Lieu personnellement découvert par le user — sert à neutraliser les blobs entièrement fogged */
   discovered: boolean
   /** V0.5 : influence totale (toutes factions) sur le lieu */
@@ -267,20 +264,15 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       }
       const group = factionRings.get(key)!
       group.polygons.push([clipped])  // chaque polygon = [ring]
-      const placeRate = 1 + (place.fortificationLevel ?? 0) * 0.5
-      const fortLevel = place.fortificationLevel ?? 0
+      // Plus de fortification (système V0 mort en mai 2026) → rate uniforme = 1
       group.totalScore += place.score
-      group.totalHourlyRate += placeRate
-      group.totalFortification += fortLevel
+      group.totalHourlyRate += 1
       group.count++
-      if (place.claimedByName) group.players.add(place.claimedByName)
       group.placeCoords.push(place.coordinates)
       const coordKey = `${place.coordinates[0]},${place.coordinates[1]}`
-      if (place.claimedByName) group.placeNames.set(coordKey, place.claimedByName)
-      group.placeHourlyRates.set(coordKey, placeRate)
-      group.placeFortLevels.set(coordKey, fortLevel)
+      group.placeHourlyRates.set(coordKey, 1)
+      group.placeFortLevels.set(coordKey, 0)
       group.placeIds.set(coordKey, place.placeId)
-      if (place.claimedById) group.placeClaimedByIds.set(coordKey, place.claimedById)
       group.placeScores.set(coordKey, place.score)
       group.placeDiscovered.set(coordKey, place.discovered)
       group.centroidSum[0] += place.coordinates[0]

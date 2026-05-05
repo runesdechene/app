@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  fortBadgeLayer, buildTerritoryHoverLabelLayer,
+  buildTerritoryHoverLabelLayer,
 } from '../../lib/map-layers'
 import { useMapStore } from '../../stores/mapStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -439,9 +439,6 @@ export const ExploreMap = memo(function ExploreMap() {
               factionPattern: ov.factionPattern ?? '',
               score: 1,
               likes: f.properties.likes ?? 0,
-              fortificationLevel: 0,
-              claimedByName: f.properties.claimedByName,
-              claimedById: f.properties.claimedById,
               discovered: discoveredIds.has(f.properties.id),
               // V0.7 : influence cumulative ignorée — les territoires sont uniformes
               totalInfluence: 0,
@@ -715,7 +712,6 @@ export const ExploreMap = memo(function ExploreMap() {
           (props as Record<string, unknown>).harvestable = true
         }
         if (ov) {
-          if (ov.fortificationLevel !== undefined) props.fortificationLevel = ov.fortificationLevel
           if (ov.factionId !== undefined) props.factionId = ov.factionId
           if (ov.tagColor !== undefined) {
             props.tagColor = ov.tagColor
@@ -862,7 +858,6 @@ export const ExploreMap = memo(function ExploreMap() {
           {/* V0.7 — Mode Coupe ON : pilules sépia avec nom du veilleur (montées en
               React Markers plus bas dans le JSX, hors du symbol layer pour avoir un vrai
               fond capsule). Mode Coupe OFF : carte épurée, juste les lieux. */}
-          <Layer {...fortBadgeLayer} />
         </Source>
       )}
 
