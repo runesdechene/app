@@ -14,6 +14,7 @@ const COURT_TYPES = new Set([
   'place_taken_remote',
   'place_taken_remote_self',
   'place_taken_back_gps',
+  'place_reaffirmed',          // V096
   'mecene_principal_gained',
 ])
 
@@ -31,6 +32,8 @@ interface ActivityLogRow {
     oldExpeditionId?: string
     newExpeditionId?: string
     reclaimedBy?: string
+    fromVacant?: boolean
+    threatsCleared?: number
   } | null
   created_at: string
 }
@@ -68,6 +71,12 @@ function buildToast(row: ActivityLogRow, currentUserId: string): {
     case 'place_taken_remote_self':
       // Notif à la nouvelle expé : actor_id = celui qui a investi pour basculer.
       if (!isSelf) return null
+      if (row.data?.fromVacant) {
+        return {
+          message: `🏴 Vous avez posé votre marque sur ${placeTitle} — allez-y physiquement pour la confirmer`,
+          highlights: [placeTitle],
+        }
+      }
       return {
         message: `⚡ Vous tenez ${placeTitle} à distance — allez-y physiquement pour le confirmer`,
         highlights: [placeTitle],
@@ -84,6 +93,23 @@ function buildToast(row: ActivityLogRow, currentUserId: string): {
         message: `🛡️ L'ancien veilleur a repris ${placeTitle}`,
         highlights: [placeTitle],
       }
+    case 'place_reaffirmed': {
+      // Plein-veilleur qui revient IRL et efface les menaces (V096)
+      const cleared = row.data?.threatsCleared ?? 0
+      if (isSelf) {
+        return {
+          message: cleared > 0
+            ? `🛡️ Vous avez réaffirmé votre veille sur ${placeTitle} — ${cleared} menace${cleared > 1 ? 's' : ''} effacée${cleared > 1 ? 's' : ''}`
+            : `🛡️ Vous êtes repassé sur ${placeTitle}`,
+          highlights: [placeTitle],
+        }
+      }
+      // Côté challengers déchus : message public discret
+      return {
+        message: `🛡️ ${actorName} a réaffirmé sa veille sur ${placeTitle}`,
+        highlights: [actorName, placeTitle],
+      }
+    }
     case 'mecene_principal_gained':
       if (!isSelf) return null  // Toast perso uniquement
       return {
