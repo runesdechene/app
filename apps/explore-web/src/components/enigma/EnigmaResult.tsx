@@ -71,7 +71,7 @@ export function EnigmaResult({ correct, answer, explanation, difficulty, crownsG
           </div>
           {typeof crownsGain === 'number' && (
             <div className="enigma-result-gain crowns">
-              {'👑'} +{crownsGain} Couronne{crownsGain > 1 ? 's' : ''}
+              {'🪙'} +{crownsGain} Couronne{crownsGain > 1 ? 's' : ''}
               {crownsGain === 0 && <span className="enigma-result-gain-note">(stock plein)</span>}
             </div>
           )}
