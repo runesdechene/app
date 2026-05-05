@@ -1,9 +1,14 @@
 ﻿import { useState } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { CoupeRulesModal } from '../modals/CoupeRulesModal'
-import './InfluenceToggle.css'
+import './HeritagesToggle.css'
 
-export function InfluenceToggle() {
+// Anciennement InfluenceToggle (V0.5). Renommé V0.7 phase 5.
+// NB : les classes CSS .influence-toggle-* + .influence-area sont conservées
+// pour cohérence avec les autres règles CSS du projet. Le fichier
+// HeritagesToggle.css contient aussi les règles .minimap et .conquest-indicator
+// (regroupement historique — à éclater plus tard).
+export function HeritagesToggle() {
   const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const setFactionColorMode = usePlayerStore(s => s.setFactionColorMode)
   const [showRules, setShowRules] = useState(false)
