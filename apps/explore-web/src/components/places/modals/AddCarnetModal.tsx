@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
-import { refreshLevelStateGlobal } from '../../hooks/useLevel'
+﻿import { useState, useRef } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
 import './AddCarnetModal.css'
 
 interface AddCarnetModalProps {

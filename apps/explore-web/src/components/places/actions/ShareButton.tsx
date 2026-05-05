@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useAppConfigStore } from '../../stores/appConfigStore'
-import { useToastStore } from '../../stores/toastStore'
-import { ShareModal } from './ShareModal'
+﻿import { useState } from 'react'
+import { useAppConfigStore } from '../../../stores/appConfigStore'
+import { useToastStore } from '../../../stores/toastStore'
+import { ShareModal } from '../modals/ShareModal'
 import './ShareButton.css'
 
 interface ShareButtonProps {

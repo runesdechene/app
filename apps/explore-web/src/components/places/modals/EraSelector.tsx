@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+﻿import { useState, useEffect } from 'react'
+import { supabase } from '../../../lib/supabase'
 import {
   type CalendarRef,
   CALENDAR_LABELS,
@@ -7,7 +7,7 @@ import {
   toCalendar,
   formatYear,
   formatEraRange,
-} from '../../lib/calendarUtils'
+} from '../../../lib/calendarUtils'
 import './EraSelector.css'
 
 interface Era {

@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
+﻿import { useState } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
 import './WishlistButton.css'
 
 interface WishlistButtonProps {

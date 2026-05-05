@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
-import { useCalendarRef } from '../../hooks/useCalendarRef'
-import { formatYear } from '../../lib/calendarUtils'
-import { EraSelector } from './EraSelector'
+﻿import { useState } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { useCalendarRef } from '../../../hooks/useCalendarRef'
+import { formatYear } from '../../../lib/calendarUtils'
+import { EraSelector } from '../modals/EraSelector'
 import './PlaceInfos.css'
 
 interface InfoField {

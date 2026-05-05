@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
-import type { PlaceDetail } from '../../hooks/usePlace'
-import { usePlayerStore } from '../../stores/playerStore'
-import { supabase } from '../../lib/supabase'
+﻿import { useState, useEffect } from 'react'
+import type { PlaceDetail } from '../../../hooks/usePlace'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { supabase } from '../../../lib/supabase'
 import './FoggedPlaceView.css'
-import { ShareButton } from './ShareButton'
+import { ShareButton } from '../actions/ShareButton'
 
 interface CostPreview {
   cost: number

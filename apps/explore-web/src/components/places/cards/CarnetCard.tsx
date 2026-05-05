@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
-import { useMapStore } from '../../stores/mapStore'
+﻿import { useState, useEffect } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { useMapStore } from '../../../stores/mapStore'
 import './CarnetCard.css'
 
 export interface Carnet {
