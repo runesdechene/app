@@ -8,13 +8,13 @@ import { InfoModal } from '../modals/InfoModal'
 // d'encodage source / PWA cache observés par le passé.
 
 const TXT_TITLE       = 'Couronnes de Chêne'
-const TXT_DESCRIPTION = 'Chaque jour, des coffres de Couronnes apparaissent aléatoirement sur les lieux que vous avez revendiqué.'
+const TXT_DESCRIPTION = 'La monnaie du jeu. Récoltez les coffres qui apparaissent chaque jour sur vos lieux veillés, et gagnez-en en résolvant les énigmes. Investissez vos Couronnes sur la Cour de chaque lieu pour soutenir un veilleur ou poser votre marque à distance.'
 const TXT_ROW_SOLO    = 'Récolte solo'
 const TXT_ROW_SOLO_VAL = '+1 Couronne'
 const TXT_ROW_EXP     = 'Récolte en expédition'
 const TXT_ROW_EXP_VAL = '+2 Couronnes'
-const TXT_ROW_FUTURE  = 'À venir'
-const TXT_ROW_FUTURE_VAL = 'Acheter des énigmes, etc...'
+const TXT_ROW_ENIGMA  = 'Énigme correcte'
+const TXT_ROW_ENIGMA_VAL = '+1 à +3 selon la difficulté'
 
 export function CrownsBadge() {
   const balance = useCrownsStore(s => s.balance)
@@ -47,7 +47,7 @@ export function CrownsBadge() {
             { label: 'Stock actuel', value: `${balance} / 500`, highlight: true },
             { label: TXT_ROW_SOLO, value: TXT_ROW_SOLO_VAL },
             { label: TXT_ROW_EXP, value: TXT_ROW_EXP_VAL },
-            { label: TXT_ROW_FUTURE, value: TXT_ROW_FUTURE_VAL },
+            { label: TXT_ROW_ENIGMA, value: TXT_ROW_ENIGMA_VAL },
           ]}
           onClose={() => setShowInfo(false)}
         />
