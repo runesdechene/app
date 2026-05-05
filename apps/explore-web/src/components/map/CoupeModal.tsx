@@ -5,6 +5,7 @@ import { useCoupe } from '../../hooks/useCoupe'
 import { useGloryRulesStore } from '../../stores/gloryRulesStore'
 import { CoupeRulesModal } from './CoupeRulesModal'
 import { supabase } from '../../lib/supabase'
+import { formatFrenchLongDate } from '../../lib/dateFormat'
 import './LeaderboardModal.css'
 import './CoupeModal.css'
 
@@ -26,11 +27,8 @@ const TAB_LABELS: Record<CoupeTab, string> = {
 }
 
 function formatSeasonRange(startedAt: string, endedAt: string | null): string {
-  const start = new Date(startedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-  if (endedAt) {
-    const end = new Date(endedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-    return `${start} → ${end}`
-  }
+  const start = formatFrenchLongDate(startedAt)
+  if (endedAt) return `${start} → ${formatFrenchLongDate(endedAt)}`
   return `Depuis le ${start}`
 }
 

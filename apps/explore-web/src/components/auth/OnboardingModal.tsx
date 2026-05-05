@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import { compressImage } from '../../lib/imageUtils'
+import { uploadAvatar } from '../../lib/avatarUpload'
 import { usePlayerStore } from '../../stores/playerStore'
 import './OnboardingModal.css'
 
@@ -36,23 +36,14 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
 
     let avatarUrl: string | undefined
 
-    // Upload avatar si choisi
     if (avatarFile) {
-      const compressed = await compressImage(avatarFile, 400)
-      const path = `${userId}/avatar.webp`
-      await supabase.storage.from('place-images').remove([path])
-      const { error: uploadErr } = await supabase.storage
-        .from('place-images')
-        .upload(path, compressed, { contentType: 'image/webp' })
-
-      if (uploadErr) {
+      const uploaded = await uploadAvatar(userId, avatarFile)
+      if (!uploaded) {
         setError('Erreur lors de l\'upload de l\'avatar')
         setLoading(false)
         return
       }
-
-      const { data: urlData } = supabase.storage.from('place-images').getPublicUrl(path)
-      avatarUrl = urlData.publicUrl
+      avatarUrl = uploaded
     }
 
     // Sauvegarder le profil

@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
-import { compressImage } from '../../lib/imageUtils'
+import { uploadAvatar } from '../../lib/avatarUpload'
+import { formatFrenchLongDate } from '../../lib/dateFormat'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
@@ -95,11 +96,6 @@ interface PlayerProfile {
 interface Props {
   playerId: string
   onClose: () => void
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 export function PlayerProfileModal({ playerId, onClose }: Props) {
@@ -306,20 +302,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
     let avatarUrl: string | undefined
 
-    // Upload avatar si changé
     if (avatarFile) {
-      const compressed = await compressImage(avatarFile, 400)
-      const path = `${currentUserId}/avatar.webp`
-      // Supprimer l'ancien avatar (policy DELETE exige que le dossier = userId)
-      await supabase.storage.from('place-images').remove([path])
-      const { error: uploadErr } = await supabase.storage
-        .from('place-images')
-        .upload(path, compressed, { contentType: 'image/webp' })
-
-      if (!uploadErr) {
-        const { data: urlData } = supabase.storage.from('place-images').getPublicUrl(path)
-        avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`
-      }
+      const uploaded = await uploadAvatar(currentUserId, avatarFile, { cacheBust: true })
+      if (uploaded) avatarUrl = uploaded
     }
 
     await Promise.all([
@@ -527,7 +512,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </a>
                 )}
                 <p className="player-modal-joined">
-                  Explorateur depuis le {formatDate(profile.joinedAt)}
+                  Explorateur depuis le {formatFrenchLongDate(profile.joinedAt)}
                 </p>
 
 
