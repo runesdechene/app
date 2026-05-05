@@ -43,6 +43,7 @@ import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
 import { useCourtNotifications } from '../hooks/useCourtNotifications'
+import { InfluenceToggle } from '../components/map/controls/InfluenceToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
@@ -311,6 +312,7 @@ export default function MapPage() {
 
       {!addPlaceMode && !authLoading && isAuthenticated && (
         <div className="influence-area">
+          <InfluenceToggle />
           <FactionBar />
         </div>
       )}
