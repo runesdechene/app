@@ -14,84 +14,8 @@ import { VeteranBadge } from '../../profile/VeteranBadge'
 import { GloryProgressBar } from '../../profile/GloryProgressBar'
 import { LevelText } from '../../profile/LevelText'
 import { useMutedUsers } from '../../../hooks/useMutedUsers'
-
-interface PlaceCard {
-  id: string
-  title: string
-  type: string
-  imageUrl: string | null
-}
-
-interface AuthoredPlace extends PlaceCard {
-  createdAt: string
-}
-
-interface VisitedPlace extends PlaceCard {
-  visitsCount: number
-  lastVisitedAt: string
-}
-
-interface FavoritePlace extends PlaceCard {
-  totalPoints: number
-  lastActionAt: string
-}
-
-interface VeilledPlace extends PlaceCard {
-  plantedAt: string
-  memberCount: number
-}
-
-type PlacesTab = 'authored' | 'discovered' | 'veilled'
-
-interface TitleInfo {
-  id: number
-  name: string
-  icon: string
-  icon_url?: string
-}
-
-interface PlayerProfile {
-  userId: string
-  name: string
-  factionId: string | null
-  factionTitle: string | null
-  factionColor: string | null
-  factionPattern: string | null
-  profileImage: string | null
-  notorietyPoints: number
-  /** V0.5 fields */
-  explorationPoints?: number
-  eruditionPoints?: number
-  influenceStock?: number
-  influencePlaced?: number
-  glory?: number
-  /** V0.7 phase 3.5 — nouveaux compteurs (mig 030 + 031) */
-  lieuxExplores?: number
-  lieuxVeilles?: number
-  enigmasSolved?: number
-  /** V0.7 Niveaux — exposés par get_player_profile (mig 045) */
-  level?: number
-  xpTotal?: number
-  xpToNextLevel?: number
-  xpForNextLevel?: number
-  veteranFirstEra?: boolean
-  /** V0.7 — Couronnes & Coupe exposés pour tous les profils (mig 051) */
-  crownsBalance?: number
-  coupeScoreCurrentSeason?: number
-  coupeSeasonName?: string | null
-  joinedAt: string
-  displayedGeneralTitles: TitleInfo[] | null
-  factionTitle2: TitleInfo | null
-  biography: string
-  instagram: string | null
-  authoredPlaces: AuthoredPlace[]
-  discoveredPlaces: VisitedPlace[]
-  /** V0.5 legacy — gardé pour rétrocompat mais l'onglet est remplacé par veilled */
-  favoritePlaces: FavoritePlace[]
-  /** V0.7 phase 3.5 — lieux actuellement veillés (mig 032) */
-  veilledPlaces: VeilledPlace[]
-  unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }> | null
-}
+import type { PlayerProfile, PlacesTab, PlaceCard } from '../../../types/playerProfile'
+import { formatTitleProgress } from '../../../lib/titleProgress'
 
 interface Props {
   playerId: string
@@ -232,28 +156,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       setSelectedTitleIds(d.displayedIds ?? [])
       if (d.stats) setPlayerStats(d.stats)
     }
-  }
-
-  const STAT_LABELS: Record<string, string> = {
-    discoveries: 'découvertes',
-    claims: 'protections',
-    notoriety: 'gloire',
-    likes: 'likes',
-    fortifications: 'fortifications',
-    places_added: 'lieux ajoutés',
-  }
-
-  function formatProgress(condition?: { stat: string; min?: number; rank?: number }): string | null {
-    if (!condition) return null
-    const stat = condition.stat
-    const current = playerStats[stat] ?? 0
-    if (condition.min != null) {
-      return `${current} / ${condition.min} ${STAT_LABELS[stat] ?? stat}`
-    }
-    if (condition.rank != null) {
-      return `Top ${condition.rank} ${STAT_LABELS[stat] ?? stat}`
-    }
-    return null
   }
 
   function toggleTitle(titleId: number) {
@@ -768,7 +670,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                       {[...titleCategories.factionTitles.filter(t => t.unlocked), ...titleCategories.gameTitles].map(t => {
                         const isSelected = selectedTitleIds.includes(t.id)
                         const rank = isSelected ? selectedTitleIds.indexOf(t.id) + 1 : null
-                        const progress = !t.unlocked ? formatProgress(t.condition) : null
+                        const progress = !t.unlocked ? formatTitleProgress(t.condition, playerStats) : null
                         const pct = !t.unlocked && t.condition?.min ? Math.min(100, Math.round(((playerStats[t.condition.stat] ?? 0) / t.condition.min) * 100)) : null
                         return (
                           <button
