@@ -831,6 +831,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             terres" dans ExplorerRow (décision Uriel 2026-05-02 — bouton inline plus
             compact, état déjà visible dans la pilule "Veillé par" sous le titre du lieu). */}
 
+        {/* V0.7 phase 5 — La Cour : toujours visible au-dessus des onglets. */}
+        <PlaceCourtView placeId={place.id} placeTitle={place.title} />
+
         {/* Zone 4 — Tabs */}
         <div className="place-tabs" ref={tabsRef}>
           <button
@@ -917,7 +920,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               yearExact={place.yearExact ?? null}
               onRefresh={refreshV05}
             />
-            <PlaceCourtView placeId={place.id} placeTitle={place.title} />
           </div>
         )}
 
