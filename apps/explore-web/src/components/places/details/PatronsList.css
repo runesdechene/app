@@ -59,9 +59,41 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Nom cliquable (ouvre profil joueur) — esprit lien sépia, pas un gros bouton */
 .patron-name {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 500;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-ink, #4a3728);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.patron-name:hover {
+  text-decoration: underline;
+  text-decoration-color: rgba(193, 154, 107, 0.6);
+  text-underline-offset: 3px;
+}
+
+.patron-faction-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  opacity: 0.85;
 }
 
 .patron-title {
@@ -69,11 +101,10 @@
   color: #b88a4a;
   font-weight: 600;
   font-style: italic;
-  margin-left: 4px;
+  white-space: nowrap;
 }
 
 .patron-you {
-  margin-left: 4px;
   opacity: 0.6;
   font-style: italic;
   font-size: 12px;

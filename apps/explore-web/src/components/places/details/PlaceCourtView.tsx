@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
+import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import './PlaceCourtView.css'
@@ -250,20 +251,48 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
 
       {/* Ligne veilleur : avatar + texte + petit icône faction */}
       <div className="court-leader-row">
-        <div
-          className="court-leader-avatar"
-          style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
-        >
-          {veilleur.leaderAvatarUrl ? (
-            <img src={veilleur.leaderAvatarUrl} alt={veilleur.leaderName} />
-          ) : (
-            <span className="court-leader-avatar-initials">{initials || '?'}</span>
-          )}
-        </div>
+        {veilleur.leaderUserId ? (
+          <button
+            type="button"
+            className="court-leader-avatar court-leader-avatar-btn"
+            style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
+            onClick={() => useMapStore.getState().setSelectedPlayerId(veilleur.leaderUserId!)}
+            title={`Voir le profil de ${veilleur.leaderName}`}
+            aria-label={`Voir le profil de ${veilleur.leaderName}`}
+          >
+            {veilleur.leaderAvatarUrl ? (
+              <img src={veilleur.leaderAvatarUrl} alt="" />
+            ) : (
+              <span className="court-leader-avatar-initials">{initials || '?'}</span>
+            )}
+          </button>
+        ) : (
+          <div
+            className="court-leader-avatar"
+            style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
+          >
+            {veilleur.leaderAvatarUrl ? (
+              <img src={veilleur.leaderAvatarUrl} alt={veilleur.leaderName} />
+            ) : (
+              <span className="court-leader-avatar-initials">{initials || '?'}</span>
+            )}
+          </div>
+        )}
         <div className="court-leader-text">
           <span className="court-leader-label">Étendard planté par</span>
           <div className="court-leader-name-row">
-            <span className="court-leader-name">{veilleur.leaderName}</span>
+            {veilleur.leaderUserId ? (
+              <button
+                type="button"
+                className="court-leader-name court-leader-name-btn"
+                onClick={() => useMapStore.getState().setSelectedPlayerId(veilleur.leaderUserId!)}
+                title={`Voir le profil de ${veilleur.leaderName}`}
+              >
+                {veilleur.leaderName}
+              </button>
+            ) : (
+              <span className="court-leader-name">{veilleur.leaderName}</span>
+            )}
             {veilleur.factionPattern && veilleur.factionColor && (
               <span
                 className="court-leader-faction-icon"
@@ -277,7 +306,9 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               />
             )}
           </div>
-          <span className="court-faveur-acquise">Acquis par sa visite sur le lieu</span>
+          {!veilleur.byInfluence && (
+            <span className="court-faveur-acquise">Acquis par sa visite sur le lieu</span>
+          )}
           {veilleur.byInfluence && (
             <span className="court-by-influence">tient ce lieu à distance</span>
           )}

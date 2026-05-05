@@ -39,6 +39,10 @@ export interface Patron {
   /** V089 — décomposition Soutien (defense) vs Influence (attack) */
   defenseTotal: number
   attackTotal: number
+  /** V090 — faction du mécène pour afficher l'icône faction sur la ligne */
+  factionId: string | null
+  factionColor: string | null
+  factionPattern: string | null
 }
 
 export interface ChronicleEntry {

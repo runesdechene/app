@@ -1,4 +1,5 @@
 import './PatronsList.css'
+import { useMapStore } from '../../../stores/mapStore'
 import type { Patron } from '../../../types/court'
 
 interface PatronsListProps {
@@ -15,6 +16,10 @@ export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
     )
   }
 
+  const openProfile = (userId: string) => {
+    useMapStore.getState().setSelectedPlayerId(userId)
+  }
+
   return (
     <div className="patrons-list">
       {patrons.map((p, i) => {
@@ -23,11 +28,27 @@ export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
         return (
           <div key={p.userId} className={`patron-row${isFirst ? ' first' : ''}${isYou ? ' is-you' : ''}`}>
             <span className="patron-rank">#{i + 1}</span>
-            <span className="patron-name">
+            <button
+              type="button"
+              className="patron-name"
+              onClick={() => openProfile(p.userId)}
+              title={`Voir le profil de ${p.displayName}`}
+            >
               {p.displayName}
-              {isFirst && <span className="patron-title"> · Mécène Principal</span>}
-              {isYou && <span className="patron-you"> (vous)</span>}
-            </span>
+              {p.factionPattern && p.factionColor && (
+                <span
+                  className="patron-faction-icon"
+                  style={{
+                    backgroundColor: p.factionColor,
+                    WebkitMaskImage: `url(${p.factionPattern})`,
+                    maskImage: `url(${p.factionPattern})`,
+                  }}
+                  aria-hidden
+                />
+              )}
+              {isFirst && <span className="patron-title">Mécène Principal</span>}
+              {isYou && <span className="patron-you">(vous)</span>}
+            </button>
             <span className="patron-breakdown">
               {p.defenseTotal > 0 && (
                 <span className="patron-side patron-side-support" title="Soutien">🛡 {p.defenseTotal}</span>
