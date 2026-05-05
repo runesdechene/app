@@ -1,24 +1,81 @@
+/* ==========================================
+   CHRONIQUE — journal des actions diplomatiques
+   Timeline visuelle, défense vert / attaque ocre
+   ========================================== */
+
 .chronicle-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin: 12px 0;
+  gap: 2px;
+  padding-top: 4px;
 }
+
 .chronicle-title {
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.8;
-  margin-bottom: 6px;
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  margin: 4px 0 10px;
+  letter-spacing: 0.3px;
+  color: var(--color-ink, #4a3728);
+  opacity: 0.85;
 }
+
 .chronicle-row {
   font-size: 13px;
-  padding: 4px 6px;
-  border-left: 2px solid transparent;
   line-height: 1.5;
+  padding: 7px 10px 7px 14px;
+  border-left: 3px solid transparent;
+  position: relative;
+  border-radius: 0 6px 6px 0;
 }
-.chronicle-row.defense  { border-left-color: #6b8e6b; }
-.chronicle-row.attack   { border-left-color: #b86b4b; }
-.chronicle-actor   { font-weight: 500; }
-.chronicle-amount  { font-variant-numeric: tabular-nums; font-weight: 500; }
-.chronicle-time    { opacity: 0.6; font-size: 12px; }
-.chronicle-empty   { font-style: italic; opacity: 0.6; font-size: 14px; }
+
+.chronicle-row.defense {
+  border-left-color: #6b8e6b;
+  background: rgba(107, 142, 107, 0.05);
+}
+
+.chronicle-row.attack {
+  border-left-color: #b86b4b;
+  background: rgba(184, 107, 75, 0.05);
+}
+
+.chronicle-actor {
+  font-weight: 600;
+  color: var(--color-ink, #4a3728);
+}
+
+.chronicle-verb {
+  opacity: 0.85;
+}
+
+.chronicle-target {
+  font-weight: 500;
+  font-style: italic;
+}
+
+.chronicle-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(202, 160, 102, 0.18);
+  border-radius: 8px;
+  color: #8a5e26;
+  font-size: 12px;
+}
+
+.chronicle-time {
+  display: block;
+  margin-top: 2px;
+  opacity: 0.55;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.chronicle-empty {
+  text-align: center;
+  font-style: italic;
+  font-size: 13px;
+  opacity: 0.55;
+  padding: 10px;
+}
