@@ -277,18 +277,18 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               />
             )}
           </div>
+          <span className="court-faveur-acquise">+50 acquis au plantage</span>
           {veilleur.byInfluence && (
             <span className="court-by-influence">tient ce lieu à distance</span>
           )}
         </div>
       </div>
 
-      {/* Jauge faveur / menace avec trait à 50 */}
+      {/* Jauge faveur / menace avec trait à 50 (chiffres intégrés) */}
       <CourtTensionBar
         scoreVeilleur={optimisticVeilleurScore}
         menaceHaute={optimisticMenace}
       />
-      <div className="court-faveur-acquise">+50 acquis au plantage</div>
 
       {/* Boutons tap-rafale */}
       <div className="court-actions">
