@@ -36,6 +36,9 @@ export interface Patron {
   userId: string
   displayName: string
   total: number
+  /** V089 — décomposition Soutien (defense) vs Influence (attack) */
+  defenseTotal: number
+  attackTotal: number
 }
 
 export interface ChronicleEntry {

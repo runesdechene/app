@@ -28,7 +28,14 @@ export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
               {isFirst && <span className="patron-title"> · Mécène Principal</span>}
               {isYou && <span className="patron-you"> (vous)</span>}
             </span>
-            <span className="patron-total">{p.total} 👑</span>
+            <span className="patron-breakdown">
+              {p.defenseTotal > 0 && (
+                <span className="patron-side patron-side-support" title="Soutien">🛡 {p.defenseTotal}</span>
+              )}
+              {p.attackTotal > 0 && (
+                <span className="patron-side patron-side-influence" title="Influence">⚔ {p.attackTotal}</span>
+              )}
+            </span>
           </div>
         )
       })}
