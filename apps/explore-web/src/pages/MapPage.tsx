@@ -42,6 +42,7 @@ import { NotificationBell } from '../components/notifications/NotificationBell'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
+import { useCourtNotifications } from '../hooks/useCourtNotifications'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
@@ -161,6 +162,8 @@ export default function MapPage() {
   // Chat en jeu
   useChat()
   useNotifications()
+  // V0.7 phase 5 — toasts La Cour (attaque, bascule, mécène principal…)
+  useCourtNotifications()
   useResourceTimers()
 
   // V0.7 — Système de niveaux
