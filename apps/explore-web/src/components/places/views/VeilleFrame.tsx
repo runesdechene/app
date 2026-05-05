@@ -69,7 +69,11 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
           ? 'Tu n\'as pas encore choisi d\'Héritage.'
           : result.error === 'place_not_found'
             ? 'Ce lieu n\'existe plus.'
-            : 'Connecte-toi pour planter.'
+            : result.error === 'already_yours'
+              ? 'Tu veilles déjà sur ce lieu — pas besoin de replanter ton étendard.'
+              : result.error === 'cooldown'
+                ? `Tu as déjà planté ici récemment. Reviens dans ${result.remainingHours ?? '?'} h.`
+                : 'Connecte-toi pour planter.'
       alert(msg)
       return
     }
@@ -96,10 +100,10 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
         disabled={!canPlant}
         onClick={handlePlant}
         title={onSpot ? 'Planter ton étendard sur ce lieu' : 'Vous devez être à moins de 100 m du lieu'}
-        aria-label="Planter mon étendard"
+        aria-label="Planter mon étendard (GPS)"
       >
         <img src={etendardIcon} alt="" className="veille-plant-icon" />
-        <span>{planting ? '…' : 'Planter mon étendard'}</span>
+        <span>{planting ? '…' : 'Planter mon étendard (GPS)'}</span>
       </button>
 
       {optInCandidates && (

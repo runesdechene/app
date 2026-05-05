@@ -38,8 +38,12 @@ export interface PlantFlagSuccess {
 }
 
 export interface PlantFlagError {
-  error: 'unauthorized' | 'no_faction' | 'place_not_found' | 'too_far'
+  error: 'unauthorized' | 'no_faction' | 'place_not_found' | 'too_far' | 'cooldown' | 'already_yours'
   distanceKm?: number
+  remainingHours?: number
+  cooldownHours?: number
+  expeditionId?: string
+  placeTitle?: string
 }
 
 export type PlantFlagResult = PlantFlagSuccess | PlantFlagError
