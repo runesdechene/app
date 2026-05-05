@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { TagBonusList } from '../map/TagBonusList'
+import { TagBonusList } from '../map/modals/TagBonusList'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import './FactionModal.css'

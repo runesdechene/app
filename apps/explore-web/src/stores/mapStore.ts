@@ -7,7 +7,6 @@ interface PlaceOverride {
   claimed?: boolean
   factionId?: string
   factionPattern?: string
-  fortificationLevel?: number
   /** V0.7 — userId du veilleur principal (pour ouvrir son profil au click pilule carte) */
   veilleurUserId?: string
   /** V0.7 — nom du veilleur principal (lead member) du lieu, pour le rendu carte */
@@ -82,8 +81,7 @@ interface MapState {
   mapStyleMode: 'game' | 'detailed' | 'satellite'
   setMapStyleMode: (mode: 'game' | 'detailed' | 'satellite') => void
 
-  /** Niveau de zoom courant (0 monde, ~14 ville, ~22 rue). Mis à jour par ExploreMap.
-   *  Lu par les overlays qui veulent compacter à bas zoom (NoteOverlay → icône). */
+  /** Niveau de zoom courant (0 monde, ~14 ville, ~22 rue). Mis à jour par ExploreMap. */
   mapZoom: number
   setMapZoom: (z: number) => void
 

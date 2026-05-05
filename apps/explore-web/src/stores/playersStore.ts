@@ -9,9 +9,6 @@ export interface OnlinePlayer {
   avatarUrl: string | null
   displayedTitles: string[]
   lastSeen: number
-  /** V0.7+ Micro-social — note éphémère (≤200 char, 24h) */
-  noteText?: string | null
-  notePostedAt?: string | null
 }
 
 interface PlayersState {

@@ -196,38 +196,6 @@ export function getMoonPhase(date: Date): string {
   return ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'][eighth]
 }
 
-/* ===========================================
-   FORMATAGE DATE COMPLÈTE
-   =========================================== */
-
-const GREGORIAN_MONTHS = [
-  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
-]
-
-/** Formate la date complète (jour + mois + année) selon le référentiel */
-export function formatFullDate(date: Date, ref: CalendarRef): string {
-  if (ref === 'imperial') {
-    const rep = toRepublicanDate(date)
-    if (rep.month === 12) {
-      return `${rep.monthName}, an ${rep.year}`
-    }
-    return `${rep.day} ${rep.monthName}, an ${rep.year}`
-  }
-
-  if (ref === 'coligny') {
-    const col = toColignyDate(date)
-    const moonPhase = getMoonPhase(date)
-    return `${col.day} ${col.monthName} ${moonPhase}`
-  }
-
-  // AUC, Constantinople, Olympique, Grégorien : jour/mois grégorien + année convertie
-  const day = date.getDate()
-  const month = GREGORIAN_MONTHS[date.getMonth()]
-  const year = formatYear(date.getFullYear(), ref)
-  return `${day} ${month} ${year}`
-}
-
 /** Formate la fourchette d'une époque pour le dropdown */
 export function formatEraRange(yearStart: number | null, yearEnd: number | null): string {
   if (yearStart === null && yearEnd !== null) {

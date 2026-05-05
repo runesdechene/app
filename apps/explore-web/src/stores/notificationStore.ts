@@ -6,7 +6,6 @@ export interface Notification {
     | 'like_carnet' | 'new_carnet' | 'exploration'
     | 'milestone_likes' | 'milestone_vues' | 'milestone_exploration'
     | 'claim_lost'
-    | 'note_reaction'
   data: {
     actorName?: string
     actorId?: string
@@ -19,8 +18,6 @@ export interface Notification {
     explorerCount?: number
     visitorsToday?: number
     lastVisitorName?: string
-    /** Pour 'note_reaction' — emoji envoyé par le reactor */
-    emoji?: string
   }
   read: boolean
   created_at: string

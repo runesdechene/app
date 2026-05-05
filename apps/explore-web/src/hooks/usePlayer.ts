@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+﻿import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
@@ -6,25 +6,8 @@ import type { GameToast } from '../stores/toastStore'
 import { useAuth } from './useAuth'
 import { useMapStore } from '../stores/mapStore'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { refreshLevelStateGlobal } from './useLevel'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
-
-const GPS_PROXIMITY_M = 500
-
-/** Distance haversine en mètres */
-function haversineM(
-  lat1: number, lng1: number,
-  lat2: number, lng2: number,
-): number {
-  const R = 6371000
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLng = (lng2 - lng1) * Math.PI / 180
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
+import { loadRecentActivityToasts } from '../lib/loadRecentActivityToasts'
 
 /**
  * Hook d'initialisation du fog — à appeler UNE SEULE FOIS au niveau App.
@@ -93,7 +76,7 @@ export function usePlayer() {
         if (migResult?.error) {
           console.error('[usePlayer] Migration failed:', migResult.error)
         } else {
-          console.log('[usePlayer] Migration successful:', migResult)
+          console.info('[usePlayer] Migration successful:', migResult)
           // Utiliser le nouvel ID
           userData.id = authId
         }
@@ -155,11 +138,10 @@ export function usePlayer() {
           })
       }
 
-      const [discRes, energyRes, profileRes, titlesRes] = await Promise.all([
+      const [discRes, energyRes, profileRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
         supabase.rpc('get_my_informations', { p_user_id: userData.id }),
-        supabase.rpc('get_user_titles', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -185,35 +167,9 @@ export function usePlayer() {
         const profile = profileRes.data as {
           role?: string
           profileImage?: { url: string } | null
-          explorationPoints?: number
-          eruditionPoints?: number
-          influenceStock?: number
-          glory?: number
         }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
-        // V0.5 fields
-        if (profile.explorationPoints != null) {
-          usePlayerStore.getState().setExplorationPoints(profile.explorationPoints)
-        }
-        if (profile.eruditionPoints != null) {
-          usePlayerStore.getState().setEruditionPoints(profile.eruditionPoints)
-        }
-        if (profile.influenceStock != null) {
-          usePlayerStore.getState().setInfluenceStock(profile.influenceStock)
-        }
-      }
-      if (titlesRes.data) {
-        const td = titlesRes.data as {
-          unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
-          factionTitle: { id: number; name: string; icon: string; unlocks: string[] } | null
-          displayedGeneralTitleIds: number[]
-        }
-        usePlayerStore.setState({
-          unlockedGeneralTitles: td.unlockedGeneralTitles ?? [],
-          displayedGeneralTitleIds: td.displayedGeneralTitleIds ?? [],
-          factionTitle2: td.factionTitle ?? null,
-        })
       }
       // displayedTitles = tous les titres affichés (max 3) formatés pour la carte
       const { data: playerProfile, error: profileErr } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
@@ -230,7 +186,7 @@ export function usePlayer() {
       setLoading(false)
 
       // Charger l'activite recente et afficher en toasts
-      loadRecentActivity(userData.id)
+      loadRecentActivityToasts(userData.id)
 
       // Souscrire aux events temps réel (découvertes, claims, nouveaux joueurs)
       if (!cancelled) {
@@ -473,273 +429,3 @@ export function usePlayer() {
   }, [isAuthenticated, user?.email])
 }
 
-/** Charge les events recents et les affiche en toasts (7 jours max).
- *  V071 : on appelle get_recent_activity (global) ET get_my_recent_activity
- *  (mes events à moi) en parallèle, puis on dédup par id. Sans ça, mes
- *  propres énigmes/plantages peuvent être noyés dans le flot global et
- *  ne plus apparaître au reload. */
-async function loadRecentActivity(currentUserId: string) {
-  const [globalRes, myRes] = await Promise.all([
-    supabase.rpc('get_recent_activity', { p_limit: 50 }),
-    supabase.rpc('get_my_recent_activity', { p_user_id: currentUserId, p_limit: 50 }),
-  ])
-  const globalArr = Array.isArray(globalRes.data) ? globalRes.data : []
-  const myArr = Array.isArray(myRes.data) ? myRes.data : []
-  const seen = new Set<number>()
-  const data: typeof globalArr = []
-  for (const e of [...globalArr, ...myArr]) {
-    const id = (e as { id: number }).id
-    if (seen.has(id)) continue
-    seen.add(id)
-    data.push(e)
-  }
-  if (data.length === 0) return
-
-  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000
-  const addToast = useToastStore.getState().addToast
-
-  const recent = (data as Array<{
-    type: string
-    actor_id: string
-    place_id: string | null
-    faction_id: string | null
-    data: {
-      placeTitle?: string
-      placeLatitude?: number
-      placeLongitude?: number
-      factionTitle?: string
-      factionColor?: string
-      factionPattern?: string
-      actorName?: string
-      previousClaimedBy?: string
-      previousFactionId?: string
-      previousFactionTitle?: string
-      previousClaimerName?: string
-      previousActorId?: string
-      previousActorName?: string
-      gloryGain?: number
-      contributionType?: string
-      points?: number
-      influenceGain?: number
-      eruditionGain?: number
-      enigmaType?: string
-      difficulty?: string
-      actorAvatarUrl?: string
-      fragmentId?: number
-      fragmentName?: string
-      fragmentIcon?: string | null
-      fragmentIconUrl?: string | null
-    }
-    created_at: string
-  }>)
-    .filter(e => new Date(e.created_at).getTime() > cutoff)
-
-  for (const e of recent) {
-    // V070 — on inclut désormais les actions de SOI-MÊME au reload (avant
-    // c'était skip systématique, mais Uriel veut que les toasts soient
-    // persistants entre les rechargements). Seule exception : new_user
-    // (c'est SA propre connexion, on ne va pas se notifier soi-même
-    // d'avoir rejoint la carte).
-    if (e.type === 'new_user' && e.actor_id === currentUserId) continue
-    // Ignorer le tracking interne fragment_enigma
-    if (e.type === 'fragment_enigma') continue
-
-    const name = e.data?.actorName || 'Quelqu\'un'
-    const place = e.data?.placeTitle || 'un lieu'
-    const actorAvatarUrl = e.data?.actorAvatarUrl ?? undefined
-
-    let message = ''
-    let type: GameToast['type'] = 'discover'
-    const highlights: string[] = []
-    let color: string | undefined = e.data?.factionColor ?? undefined
-    let iconUrl: string | undefined
-    let contested = false
-
-    // V0.6 — toasts d'historique (7 derniers jours) épurés.
-    // Skip V0.5 figés (claim, fortify, place_influence). Pour harvest_crown,
-    // on n'affiche que les siennes (récolte de couronnes — le système est
-    // perso, pas social).
-    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
-      continue
-    } else if (e.type === 'harvest_crown') {
-      if (e.actor_id !== currentUserId) continue
-      const gain = (e.data as { gain?: number })?.gain ?? 1
-      message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
-      highlights.push(place)
-      type = 'harvest_crown'
-    } else if (e.type === 'plant_flag') {
-      message = `${name} a planté son étendard sur ${place} 🚩`
-      highlights.push(name, place)
-      type = 'plant_flag'
-      color = e.data?.factionColor ?? undefined
-      iconUrl = e.data?.factionPattern ?? undefined
-    } else if (e.type === 'discover' || e.type === 'explore') {
-      message = `${name} a levé le brouillard sur ${place}`
-      highlights.push(name, place)
-      type = 'discover'
-    } else if (e.type === 'like') {
-      message = `${name} a aimé ${place}`
-      highlights.push(name, place)
-      type = 'like'
-    } else if (e.type === 'new_place') {
-      message = `${name} a ajouté ${place} 🏛️`
-      highlights.push(name, place)
-      type = 'new_place'
-    } else if (e.type === 'new_user') {
-      message = `${name} a rejoint la carte`
-      highlights.push(name)
-      type = 'new_user'
-    } else if (e.type === 'contribute') {
-      const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
-      message = `${name} a ajouté ${contribType} sur ${place} 📜`
-      highlights.push(name, place)
-      type = 'contribute'
-      color = e.data?.factionColor ?? undefined
-      iconUrl = e.data?.factionPattern ?? undefined
-    } else if (e.type === 'revisit_gps') {
-      message = `${name} est de retour sur ${place}`
-      highlights.push(name, place)
-      type = 'revisit'
-      color = e.data?.factionColor ?? undefined
-      iconUrl = e.data?.factionPattern ?? undefined
-    } else if (e.type === 'enigma_success') {
-      // V069/070 — affiche type (avec nom du fragment si applicable) + difficulté + gain.
-      const diff = e.data?.difficulty ?? 'easy'
-      const diffLabel = diff === 'very_easy' ? 'très facile'
-                      : diff === 'medium'    ? 'moyenne'
-                      : diff === 'hard'      ? 'difficile'
-                      : 'facile'
-      const kind = e.data?.enigmaType ?? 'daily'
-      const fragmentName = e.data?.fragmentName ?? null
-      const kindLabel = kind === 'fragment'
-                          ? (fragmentName ? `du fragment ${fragmentName}` : 'de codex')
-                      : kind === 'place'    ? "d'un lieu"
-                      : 'du jour'
-      const r = useGloryRulesStore.getState().rules
-      const keyG = diff === 'very_easy' ? 'glory.enigma_very_easy'
-                 : diff === 'medium'    ? 'glory.enigma_medium'
-                 : diff === 'hard'      ? 'glory.enigma_hard'
-                 : 'glory.enigma_easy'
-      const keyC = diff === 'very_easy' ? 'coupe.enigma_very_easy'
-                 : diff === 'medium'    ? 'coupe.enigma_medium'
-                 : diff === 'hard'      ? 'coupe.enigma_hard'
-                 : 'coupe.enigma_easy'
-      const gainG = r[keyG] ?? 1
-      const gainC = r[keyC] ?? 1
-      const parts: string[] = []
-      if (gainG > 0) parts.push(`+${gainG} Gloire`)
-      if (gainC > 0) parts.push(`+${gainC} Coupe`)
-      message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${parts.join(' / ')}`
-      highlights.push(name)
-      if (kind === 'fragment' && fragmentName) {
-        highlights.push(fragmentName)
-      }
-      type = 'enigma'
-    } else {
-      continue
-    }
-
-    const hasLocation = e.data?.placeLatitude != null && e.data?.placeLongitude != null
-    addToast({
-      type,
-      message,
-      highlights,
-      color,
-      iconUrl,
-      contested,
-      actorId: e.actor_id ?? undefined,
-      actorAvatarUrl,
-      previousActorId: e.data?.previousClaimedBy ?? undefined,
-      placeId: e.place_id ?? undefined,
-      placeLocation: hasLocation
-        ? { latitude: e.data!.placeLatitude!, longitude: e.data!.placeLongitude! }
-        : undefined,
-      fragmentId: e.data?.fragmentId,
-      fragmentName: e.data?.fragmentName,
-      fragmentIcon: e.data?.fragmentIcon,
-      fragmentIconUrl: e.data?.fragmentIconUrl,
-      timestamp: new Date(e.created_at).getTime(),
-    })
-  }
-}
-
-/**
- * Découvrir un lieu — fonction standalone, pas besoin de hook.
- * Lit le store directement via getState().
- */
-export async function discoverPlace(
-  placeId: string,
-  placeLat: number,
-  placeLng: number,
-): Promise<{ success: boolean; error?: string }> {
-  const { userId, userPosition, addDiscoveredId } = usePlayerStore.getState()
-  if (!userId) return { success: false, error: 'Not authenticated' }
-
-  // Déterminer la méthode (GPS ou remote) basé sur la distance
-  let method = 'remote'
-  if (userPosition) {
-    const dist = haversineM(userPosition.lat, userPosition.lng, placeLat, placeLng)
-    if (dist <= GPS_PROXIMITY_M) {
-      method = 'gps'
-    }
-  }
-
-  // Forcer la regen côté serveur avant l'action
-  await supabase.rpc('get_user_energy', { p_user_id: userId })
-
-  const userPos = usePlayerStore.getState().userPosition
-  const { data } = await supabase.rpc('discover_place', {
-    p_user_id: userId,
-    p_place_id: placeId,
-    p_method: method,
-    p_user_lat: userPos?.lat ?? null,
-    p_user_lng: userPos?.lng ?? null,
-    p_free: false,
-    p_glory_mult: 1,
-  })
-
-  if (data?.error) {
-    return { success: false, error: data.error }
-  }
-
-  // Rafraîchir l'énergie depuis le serveur (plus fiable que le calcul local)
-  addDiscoveredId(placeId)
-  const { data: refreshed } = await supabase.rpc('get_user_energy', { p_user_id: userId })
-  if (refreshed) {
-    usePlayerStore.setState({
-      energy: refreshed.energy,
-      maxEnergy: refreshed.maxEnergy,
-      nextPointIn: refreshed.nextPointIn,
-      energyCycle: refreshed.energyCycle,
-    })
-  }
-
-  // V0.7 — mise à jour des exploration_points (rétrocompat, plus affiché)
-  const explorationGain = data?.explorationGain ?? 5
-  const currentExploration = usePlayerStore.getState().explorationPoints
-  usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
-
-  // V067 — barème centralisé app_settings via gloryRulesStore.
-  // Découverte = +discover_remote G / +discover_remote C (par défaut 1G / 0C).
-  // (La visite GPS est désormais une action SÉPARÉE — elle se déclenche
-  // depuis le bouton "Poser ma marque" sur PlacePanel, plus lors de la
-  // découverte. Donc plus de différenciation gps/remote ici.)
-  const rules = useGloryRulesStore.getState().rules
-  const gloryGain = rules['glory.discover_remote'] ?? 1
-  const coupeGain = rules['coupe.discover_remote'] ?? 0
-  const gainParts: string[] = []
-  if (gloryGain > 0) gainParts.push(`+${gloryGain} Gloire`)
-  if (coupeGain > 0) gainParts.push(`+${coupeGain} Coupe`)
-  const toastMessage = `Le brouillard se lève sur ce lieu 🔍 ${gainParts.join(' / ')}`
-
-  useToastStore.getState().addToast({
-    type: 'discover',
-    message: toastMessage,
-    timestamp: Date.now(),
-  })
-
-  // Rafraîchir l'état de niveau pour que useLevelUp détecte le changement
-  await refreshLevelStateGlobal(userId)
-
-  return { success: true }
-}
