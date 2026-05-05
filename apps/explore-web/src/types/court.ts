@@ -18,6 +18,8 @@ export interface CourtVeilleur {
   /** V086 — leader de l'expédition (user mis en avant côté UX) */
   leaderName: string
   leaderUserId: string | null
+  /** V088 — avatar du leader */
+  leaderAvatarUrl: string | null
   factionId: string | null
   factionColor: string | null
   factionPattern: string | null

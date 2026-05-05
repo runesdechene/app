@@ -1,24 +1,16 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { CourtChronicle } from './CourtChronicle'
-import { InvestCrownsModal } from '../actions/InvestCrownsModal'
 import './PlaceCourtView.css'
-import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, CourtStatus } from '../../../types/court'
+import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus } from '../../../types/court'
 
 interface PlaceCourtViewProps {
   placeId: string
   placeTitle: string
-}
-
-interface InvestTarget {
-  expeditionId: string
-  expeditionName: string
-  side: CourtSide
-  currentScore: number
 }
 
 const STATUS_LABELS: Record<CourtStatus, string> = {
@@ -28,18 +20,52 @@ const STATUS_LABELS: Record<CourtStatus, string> = {
   en_siege:       'En siège',
 }
 
-export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
+interface PendingTaps {
+  side: CourtSide
+  expId: string
+  count: number
+}
+
+interface BurstAnim {
+  id: number
+  side: CourtSide
+}
+
+const TAP_DEBOUNCE_MS = 250
+
+function playClickSound() {
+  try {
+    const s = new Audio('/res/influence_click.mp3')
+    s.volume = 0.5
+    void s.play().catch(() => {})
+  } catch { /* silent */ }
+}
+
+export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtViewProps) {
   const userId = usePlayerStore(s => s.userId)
   const balance = useCrownsStore(s => s.balance)
+  const setCrownsBalance = useCrownsStore(s => s.setBalance)
+  const refreshCrowns = useCrownsStore(s => s.refresh)
+
   const [state, setState] = useState<PlaceCourtState | null>(null)
   const [loading, setLoading] = useState(true)
-  const [investTarget, setInvestTarget] = useState<InvestTarget | null>(null)
-  const [creatingExp, setCreatingExp] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [notVeilled, setNotVeilled] = useState(false)
+  const [creatingExp, setCreatingExp] = useState(false)
+  const [bursts, setBursts] = useState<BurstAnim[]>([])
+  // Tick pour forcer rerender quand pendingTapsRef change
+  const [, forceUpdate] = useState(0)
+
+  // Pending taps (refs pour éviter les races avec setTimeout/RPC)
+  const pendingRef = useRef<PendingTaps | null>(null)
+  const sendTimerRef = useRef<number | null>(null)
+  const inFlightRef = useRef(false)
+
+  // Helper qui relit le ref via fonction (évite le narrowing TS post-affectation null)
+  const readPending = (): PendingTaps | null => pendingRef.current
 
   const fetchState = useCallback(async () => {
-    setLoading(true)
+    if (!placeId) return
     const { data, error } = await supabase.rpc('get_place_court_state', {
       p_place_id: placeId,
       p_user_id: userId,
@@ -63,9 +89,99 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
     }
     setNotVeilled(false)
     setState(d)
+    setErrorMsg(null)
   }, [placeId, userId])
 
-  useEffect(() => { void fetchState() }, [fetchState])
+  useEffect(() => {
+    setLoading(true)
+    void fetchState()
+  }, [fetchState])
+
+  // Cleanup timer au démontage
+  useEffect(() => () => {
+    if (sendTimerRef.current) {
+      window.clearTimeout(sendTimerRef.current)
+      sendTimerRef.current = null
+    }
+  }, [])
+
+  const sendPendingTaps = useCallback(async () => {
+    if (inFlightRef.current) return
+    const pending = pendingRef.current
+    if (!pending || pending.count <= 0) return
+    if (!userId) return
+
+    inFlightRef.current = true
+    pendingRef.current = null
+    forceUpdate(n => n + 1)
+
+    try {
+      const { data, error } = await supabase.rpc('invest_crowns', {
+        p_user_id: userId,
+        p_place_id: placeId,
+        p_target_expedition_id: pending.expId,
+        p_amount: pending.count,
+      })
+      if (error) {
+        console.error('[PlaceCourtView] invest_crowns error', error)
+        // Resync balance + state
+        if (userId) await refreshCrowns(userId)
+        await fetchState()
+        return
+      }
+      const r = data as InvestCrownsResult & { error?: string; balance?: number }
+      if (r.error) {
+        console.warn('[PlaceCourtView] invest_crowns refused:', r.error)
+        if (userId) await refreshCrowns(userId)
+        await fetchState()
+        return
+      }
+      // Aligne la balance avec le serveur (peut différer si pendant ce temps user a tapé X fois en plus)
+      // On ajoute la diff entre la balance optimistic affichée et la balance serveur
+      setCrownsBalance(r.balance)
+      await fetchState()
+    } finally {
+      inFlightRef.current = false
+      // S'il y a eu d'autres taps pendant que le RPC tournait → reflusher
+      const after = readPending()
+      if (after && after.count > 0) {
+        void sendPendingTaps()
+      }
+    }
+  }, [userId, placeId, fetchState, refreshCrowns, setCrownsBalance])
+
+  const queueTap = useCallback((side: CourtSide, expId: string) => {
+    const currentPending = readPending()
+    if (balance < 1 + (currentPending?.count ?? 0)) return // plus de Couronnes en stock optimistic
+
+    playClickSound()
+
+    // Optimistic balance --
+    setCrownsBalance(balance - 1)
+
+    // Burst animation
+    const id = Date.now() + Math.random()
+    setBursts(prev => [...prev, { id, side }])
+    window.setTimeout(() => {
+      setBursts(prev => prev.filter(b => b.id !== id))
+    }, 900)
+
+    // Empile le tap
+    const existing = readPending()
+    if (!existing || existing.expId !== expId) {
+      pendingRef.current = { side, expId, count: 1 }
+    } else {
+      existing.count += 1
+    }
+    forceUpdate(n => n + 1)
+
+    // Debounce envoi
+    if (sendTimerRef.current) window.clearTimeout(sendTimerRef.current)
+    sendTimerRef.current = window.setTimeout(() => {
+      sendTimerRef.current = null
+      void sendPendingTaps()
+    }, TAP_DEBOUNCE_MS)
+  }, [balance, setCrownsBalance, sendPendingTaps])
 
   if (notVeilled) return null
   if (loading || !state) {
@@ -77,29 +193,28 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
 
-  const handleSupport = () => {
-    setInvestTarget({
-      expeditionId: veilleur.expeditionId,
-      expeditionName: veilleur.leaderName,
-      side: 'defense',
-      currentScore: scoreVeilleur - 50,
-    })
+  // Score optimistic (en local + pending)
+  const pendingTaps = readPending()
+  const pendingDefense = pendingTaps && pendingTaps.expId === veilleur.expeditionId && pendingTaps.side === 'defense' ? pendingTaps.count : 0
+  const pendingAttack = pendingTaps && userChallengerExp && pendingTaps.expId === userChallengerExp && pendingTaps.side === 'attack' ? pendingTaps.count : 0
+  const optimisticVeilleurScore = scoreVeilleur + pendingDefense
+  const optimisticChallengerScore = (challengerThreat?.score ?? 0) + pendingAttack
+  const optimisticMenace = userChallengerExp ? Math.max(menaceHaute ?? 0, optimisticChallengerScore) : (menaceHaute ?? 0)
+
+  const supportExpId = veilleur.expeditionId
+  const handleSupportTap = () => {
+    if (balance < 1) return
+    queueTap('defense', supportExpId)
   }
 
-  const handleChallenge = () => {
-    if (!userChallengerExp) return
-    setInvestTarget({
-      expeditionId: userChallengerExp,
-      expeditionName: challengerThreat?.name ?? 'Mon expédition',
-      side: 'attack',
-      currentScore: challengerThreat?.score ?? 0,
-    })
-  }
-
-  const handleCreateChallenger = async () => {
-    if (!userId || creatingExp) return
+  const handleContestTap = async () => {
+    if (balance < 1 || creatingExp) return
+    if (userChallengerExp) {
+      queueTap('attack', userChallengerExp)
+      return
+    }
+    // Premier tap : il faut créer l'expé challenger d'abord
     setCreatingExp(true)
-    setErrorMsg(null)
     const { data, error } = await supabase.rpc('create_challenger_expedition', {
       p_user_id: userId,
       p_place_id: placeId,
@@ -115,16 +230,17 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
       return
     }
     await fetchState()
-    setInvestTarget({
-      expeditionId: r.expeditionId,
-      expeditionName: 'Mon expédition',
-      side: 'attack',
-      currentScore: 0,
-    })
+    queueTap('attack', r.expeditionId)
   }
 
-  const showChallengeFlow = !isMember && !userChallengerExp
-  const showInvestChallenger = !isMember && !!userChallengerExp
+  // Initiales pour fallback avatar
+  const initials = veilleur.leaderName
+    .split(/\s+/)
+    .map(w => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
   return (
     <div className={`court-view court-status-${status}`}>
@@ -133,55 +249,76 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
         {STATUS_LABELS[status]}
       </div>
 
-      {/* Lieu protégé par [Leader] + boule colorée avec icône faction */}
+      {/* Ligne veilleur : avatar + texte + petit icône faction */}
       <div className="court-leader-row">
+        <div
+          className="court-leader-avatar"
+          style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
+        >
+          {veilleur.leaderAvatarUrl ? (
+            <img src={veilleur.leaderAvatarUrl} alt={veilleur.leaderName} />
+          ) : (
+            <span className="court-leader-avatar-initials">{initials || '?'}</span>
+          )}
+        </div>
         <div className="court-leader-text">
           <span className="court-leader-label">Lieu protégé par</span>
-          <span className="court-leader-name">{veilleur.leaderName}</span>
+          <div className="court-leader-name-row">
+            <span className="court-leader-name">{veilleur.leaderName}</span>
+            {veilleur.factionPattern && veilleur.factionColor && (
+              <span
+                className="court-leader-faction-icon"
+                style={{
+                  backgroundColor: veilleur.factionColor,
+                  WebkitMaskImage: `url(${veilleur.factionPattern})`,
+                  maskImage: `url(${veilleur.factionPattern})`,
+                }}
+                title={veilleur.name}
+                aria-label={`Faction : ${veilleur.name}`}
+              />
+            )}
+          </div>
           {veilleur.byInfluence && (
             <span className="court-by-influence">tient ce lieu à distance</span>
           )}
         </div>
-        {veilleur.factionColor && (
-          <div
-            className="court-leader-orb"
-            style={{ backgroundColor: veilleur.factionColor }}
-            title={veilleur.name}
-            aria-label={`Faction : ${veilleur.name}`}
-          >
-            {veilleur.factionPattern && (
-              <span
-                className="court-leader-orb-icon"
-                style={{
-                  WebkitMaskImage: `url(${veilleur.factionPattern})`,
-                  maskImage: `url(${veilleur.factionPattern})`,
-                }}
-              />
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Jauge faveur / menace */}
+      {/* Jauge faveur / menace avec trait à 50 */}
       <CourtTensionBar
-        scoreVeilleur={scoreVeilleur}
-        menaceHaute={menaceHaute ?? 0}
-        status={status}
+        scoreVeilleur={optimisticVeilleurScore}
+        menaceHaute={optimisticMenace}
       />
+      <div className="court-faveur-acquise">+50 acquis au plantage</div>
 
-      {/* Boutons */}
+      {/* Boutons tap-rafale */}
       <div className="court-actions">
-        <button onClick={handleSupport} disabled={balance < 1}>
-          {isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
+        <button
+          className="court-btn-support"
+          onClick={handleSupportTap}
+          disabled={balance < 1}
+          aria-label={isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
+        >
+          <span className="court-btn-icon">🛡</span>
+          <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
+          <span className="court-btn-cost">−1 👑</span>
+          {bursts.filter(b => b.side === 'defense').map(b => (
+            <span key={b.id} className="court-btn-burst">+1</span>
+          ))}
         </button>
-        {showInvestChallenger && (
-          <button className="challenge" onClick={handleChallenge} disabled={balance < 1}>
-            Influencer
-          </button>
-        )}
-        {showChallengeFlow && (
-          <button className="challenge" onClick={handleCreateChallenger} disabled={balance < 1 || creatingExp}>
-            {creatingExp ? 'Préparation…' : 'Influencer'}
+        {!isMember && (
+          <button
+            className="court-btn-contest"
+            onClick={handleContestTap}
+            disabled={balance < 1 || creatingExp}
+            aria-label="Contester ce lieu"
+          >
+            <span className="court-btn-icon">⚔</span>
+            <span className="court-btn-label">{creatingExp ? 'Préparation…' : 'Contester'}</span>
+            <span className="court-btn-cost">−1 👑</span>
+            {bursts.filter(b => b.side === 'attack').map(b => (
+              <span key={b.id} className="court-btn-burst">+1</span>
+            ))}
           </button>
         )}
       </div>
@@ -196,21 +333,6 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
       <PatronsList patrons={topPatrons} currentUserId={userId ?? undefined} />
 
       <CourtChronicle entries={chronicle} />
-
-      {investTarget && (
-        <InvestCrownsModal
-          placeId={placeId}
-          placeTitle={placeTitle}
-          expeditionId={investTarget.expeditionId}
-          expeditionName={investTarget.expeditionName}
-          side={investTarget.side}
-          scoreToBeat={investTarget.side === 'attack' ? scoreVeilleur : undefined}
-          currentScore={investTarget.currentScore}
-          balance={balance}
-          onClose={() => setInvestTarget(null)}
-          onSuccess={() => { void fetchState() }}
-        />
-      )}
     </div>
   )
 }

@@ -1,37 +1,12 @@
 /* ==========================================
    COUR TENSION BAR — Faveur vs Menace
-   Jauge épaisse, statut coloré bien visible
+   Jauge épaisse + trait "+50 acquis" visible
    ========================================== */
 
 .court-tension {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.court-tension-status {
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  padding: 6px 12px;
-  border-radius: 14px;
-  align-self: center;
-}
-
-.court-tension-status:has(+ .court-tension-bar) {
-  /* fallback si :has pas supporté : pas de souci, le style de base est neutre */
-}
-
-/* Couleurs par statut (dérivées du préfixe emoji du libellé) */
-.court-tension-status {
-  background: rgba(107, 142, 107, 0.18);
-  color: #3e5e3e;
-}
-
-/* Override par contenu — fallback simple : on utilise le first-child de la pilule */
-.court-tension-status:where(:not(:empty)) {
-  /* déterminé par couleur dans le composant */
+  gap: 6px;
 }
 
 .court-tension-bar {
@@ -47,7 +22,7 @@
 
 .court-tension-fill {
   height: 100%;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .court-tension-fill.veilleur {
@@ -57,6 +32,34 @@
 
 .court-tension-fill.challenger {
   background: linear-gradient(180deg, #d48060, #b86b4b);
+}
+
+/* Trait "+50 acquis" — repère visuel discret */
+.court-tension-mark {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: rgba(74, 55, 40, 0.55);
+  pointer-events: none;
+  transform: translateX(-1px);
+  z-index: 2;
+}
+
+.court-tension-mark::after {
+  content: '50';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: rgba(74, 55, 40, 0.65);
+  background: rgba(245, 230, 211, 0.9);
+  padding: 0 3px;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 .court-tension-scores {
@@ -75,19 +78,9 @@
   gap: 4px;
 }
 
-.court-score-veilleur::before {
-  content: '🛡';
-  font-size: 14px;
-}
-
 .court-score-menace {
   color: #a05030;
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.court-score-menace::before {
-  content: '⚔';
-  font-size: 14px;
 }
