@@ -99,8 +99,6 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
       } else if (data && !data.error) {
         const r = data as AnswerResult
         setResult(r)
-        if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
-        if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
         if (userId) void refreshLevelStateGlobal(userId)
       }
     } catch (err) {

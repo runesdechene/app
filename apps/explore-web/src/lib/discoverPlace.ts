@@ -80,11 +80,6 @@ export async function discoverPlace(
     })
   }
 
-  // V0.7 — mise à jour des exploration_points (rétrocompat, plus affiché)
-  const explorationGain = data?.explorationGain ?? 5
-  const currentExploration = usePlayerStore.getState().explorationPoints
-  usePlayerStore.getState().setExplorationPoints(currentExploration + explorationGain)
-
   // V067 — barème centralisé app_settings via gloryRulesStore.
   // Découverte = +discover_remote G / +discover_remote C (par défaut 1G / 0C).
   const rules = useGloryRulesStore.getState().rules

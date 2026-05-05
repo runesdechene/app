@@ -143,8 +143,6 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
     if (!error && data && !data.error) {
       const r = data as AnswerResult
       setResult(r)
-      if (r.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(r.newInfluenceStock)
-      if (r.newErudition != null) usePlayerStore.getState().setEruditionPoints(r.newErudition)
       setTotalGains(prev => ({
         influence: prev.influence + (r.influenceGain ?? 0),
         erudition: prev.erudition + (r.eruditionGain ?? 0),

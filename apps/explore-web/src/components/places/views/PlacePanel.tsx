@@ -154,9 +154,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       p_user_lng: userPosition.lng,
     })
     if (!error && data && !data.error) {
-      const result = data as { newInfluenceStock?: number; newExploration?: number; stockGain?: number; explorationGain?: number; visitNumber?: number }
-      if (result.newInfluenceStock != null) usePlayerStore.getState().setInfluenceStock(result.newInfluenceStock)
-      if (result.newExploration != null) usePlayerStore.getState().setExplorationPoints(result.newExploration)
+      const result = data as { stockGain?: number; explorationGain?: number; visitNumber?: number }
       setVisitRewards({ stock: result.stockGain ?? 0, exploration: result.explorationGain ?? 0, visitNumber: result.visitNumber ?? 1 })
       useToastStore.getState().addToast({
         type: 'explore',

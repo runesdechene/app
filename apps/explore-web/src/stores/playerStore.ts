@@ -34,22 +34,6 @@ interface PlayerState {
   setEnergy: (energy: number) => void
   nextPointIn: number
   setNextPointIn: (seconds: number) => void
-  setEnergyCycle: (seconds: number) => void
-
-  /** V0.5 — Points d'exploration (terrain, GPS, ajout lieu, photos) */
-  explorationPoints: number
-  setExplorationPoints: (pts: number) => void
-
-  /** V0.5 — Points d'érudition (énigmes quotidiennes, énigmes de lieu) */
-  eruditionPoints: number
-  setEruditionPoints: (pts: number) => void
-
-  /** V0.5 — Stock d'influence dépensable sur les lieux */
-  influenceStock: number
-  setInfluenceStock: (stock: number) => void
-
-  /** V0.5 — Gloire = explorationPoints + eruditionPoints */
-  glory: number
 
   /** V0.7 — Niveau du joueur */
   level: number
@@ -80,14 +64,9 @@ interface PlayerState {
   userAvatarUrl: string | null
   setUserAvatarUrl: (url: string | null) => void
 
-  /** Titres du joueur */
-  unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
-  displayedGeneralTitleIds: number[]
-  factionTitle2: { id: number; name: string; icon: string; unlocks: string[] } | null
   /** Titres affichés sur la carte (max 3, ordonnés) */
   displayedTitles: string[]
   setDisplayedTitles: (titles: string[]) => void
-
 
   /** Mode coloration carte : true = billes colorées par faction */
   factionColorMode: boolean
@@ -137,32 +116,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   setEnergy: (energy) => set({ energy }),
   nextPointIn: 0,
   setNextPointIn: (seconds) => set({ nextPointIn: seconds }),
-  setEnergyCycle: (seconds) => set({ energyCycle: seconds }),
-
-  // Cachés en safeStorage — même raison qu'influenceStock : éviter le flash "0 Gloire" au démarrage
-  // le temps que get_my_informations charge. La valeur est resync depuis la BD à l'init.
-  explorationPoints: Number(safeStorage.get('explorationPoints')) || 0,
-  setExplorationPoints: (pts) => set((state) => {
-    safeStorage.set('explorationPoints', String(pts))
-    return { explorationPoints: pts, glory: pts + state.eruditionPoints }
-  }),
-
-  eruditionPoints: Number(safeStorage.get('eruditionPoints')) || 0,
-  setEruditionPoints: (pts) => set((state) => {
-    safeStorage.set('eruditionPoints', String(pts))
-    return { eruditionPoints: pts, glory: state.explorationPoints + pts }
-  }),
-
-  // Persisté en safeStorage pour éviter le flash "0" au démarrage le temps que get_my_informations charge.
-  // La valeur est resync avec la BD dès que le profil arrive — le cache n'autorité pas, il évite juste le flash.
-  influenceStock: Number(safeStorage.get('influenceStock')) || 0,
-  setInfluenceStock: (stock) => {
-    safeStorage.set('influenceStock', String(stock))
-    set({ influenceStock: stock })
-  },
-
-  // Dérivé d'explorationPoints + eruditionPoints, mais initialisé depuis le cache pour le rendu instantané du badge
-  glory: (Number(safeStorage.get('explorationPoints')) || 0) + (Number(safeStorage.get('eruditionPoints')) || 0),
 
   // V0.7 — Niveau (synchronisé via useLevel / get_player_profile)
   level: 1,
@@ -195,12 +148,8 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   userAvatarUrl: null,
   setUserAvatarUrl: (url) => set({ userAvatarUrl: url }),
 
-  unlockedGeneralTitles: [],
-  displayedGeneralTitleIds: [],
-  factionTitle2: null,
   displayedTitles: [],
   setDisplayedTitles: (titles) => set({ displayedTitles: titles }),
-
 
   factionColorMode: safeStorage.get('factionColorMode') === 'true',
   setFactionColorMode: (on) => {

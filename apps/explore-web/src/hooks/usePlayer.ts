@@ -138,11 +138,10 @@ export function usePlayer() {
           })
       }
 
-      const [discRes, energyRes, profileRes, titlesRes] = await Promise.all([
+      const [discRes, energyRes, profileRes] = await Promise.all([
         supabase.rpc('get_user_discoveries', { p_user_id: userData.id }),
         supabase.rpc('get_user_energy', { p_user_id: userData.id }),
         supabase.rpc('get_my_informations', { p_user_id: userData.id }),
-        supabase.rpc('get_user_titles', { p_user_id: userData.id }),
       ])
 
       if (cancelled) return
@@ -168,35 +167,9 @@ export function usePlayer() {
         const profile = profileRes.data as {
           role?: string
           profileImage?: { url: string } | null
-          explorationPoints?: number
-          eruditionPoints?: number
-          influenceStock?: number
-          glory?: number
         }
         setUserAvatarUrl(profile.profileImage?.url ?? null)
         setIsAdmin(profile.role === 'admin')
-        // V0.5 fields
-        if (profile.explorationPoints != null) {
-          usePlayerStore.getState().setExplorationPoints(profile.explorationPoints)
-        }
-        if (profile.eruditionPoints != null) {
-          usePlayerStore.getState().setEruditionPoints(profile.eruditionPoints)
-        }
-        if (profile.influenceStock != null) {
-          usePlayerStore.getState().setInfluenceStock(profile.influenceStock)
-        }
-      }
-      if (titlesRes.data) {
-        const td = titlesRes.data as {
-          unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }>
-          factionTitle: { id: number; name: string; icon: string; unlocks: string[] } | null
-          displayedGeneralTitleIds: number[]
-        }
-        usePlayerStore.setState({
-          unlockedGeneralTitles: td.unlockedGeneralTitles ?? [],
-          displayedGeneralTitleIds: td.displayedGeneralTitleIds ?? [],
-          factionTitle2: td.factionTitle ?? null,
-        })
       }
       // displayedTitles = tous les titres affichés (max 3) formatés pour la carte
       const { data: playerProfile, error: profileErr } = await supabase.rpc('get_player_profile', { p_user_id: userData.id })
