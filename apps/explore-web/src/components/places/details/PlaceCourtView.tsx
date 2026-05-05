@@ -18,6 +18,7 @@ const STATUS_LABELS: Record<CourtStatus, string> = {
   convoite:       'Convoité',
   sous_pression:  'Sous pression',
   en_siege:       'En siège',
+  vacant:         'Lieu vierge',
 }
 
 interface PendingTaps {
@@ -77,7 +78,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       return
     }
     const d = data as PlaceCourtState & { error?: string }
-    if (d.error === 'not_veilled') {
+    if (d.error === 'place_not_found') {
       setNotVeilled(true)
       setState(null)
       return
@@ -188,22 +189,22 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     return <div className="court-loading">{errorMsg ?? 'Chargement…'}</div>
   }
 
-  const { veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, callerContext } = state
+  const { vacant, veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, callerContext } = state
   const isMember = callerContext?.isMemberOfVeilleur ?? false
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
 
   // Score optimistic (en local + pending)
   const pendingTaps = readPending()
-  const pendingDefense = pendingTaps && pendingTaps.expId === veilleur.expeditionId && pendingTaps.side === 'defense' ? pendingTaps.count : 0
+  const pendingDefense = pendingTaps && veilleur && pendingTaps.expId === veilleur.expeditionId && pendingTaps.side === 'defense' ? pendingTaps.count : 0
   const pendingAttack = pendingTaps && userChallengerExp && pendingTaps.expId === userChallengerExp && pendingTaps.side === 'attack' ? pendingTaps.count : 0
   const optimisticVeilleurScore = scoreVeilleur + pendingDefense
   const optimisticChallengerScore = (challengerThreat?.score ?? 0) + pendingAttack
   const optimisticMenace = userChallengerExp ? Math.max(menaceHaute ?? 0, optimisticChallengerScore) : (menaceHaute ?? 0)
 
-  const supportExpId = veilleur.expeditionId
+  const supportExpId = veilleur?.expeditionId ?? null
   const handleSupportTap = () => {
-    if (balance < 1) return
+    if (!supportExpId || balance < 1) return
     queueTap('defense', supportExpId)
   }
 
@@ -233,14 +234,16 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     queueTap('attack', r.expeditionId)
   }
 
-  // Initiales pour fallback avatar
-  const initials = veilleur.leaderName
-    .split(/\s+/)
-    .map(w => w[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
+  // Initiales pour fallback avatar (vide si vacant)
+  const initials = veilleur
+    ? veilleur.leaderName
+        .split(/\s+/)
+        .map(w => w[0])
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : ''
 
   return (
     <div className={`court-view court-status-${status}`}>
@@ -249,7 +252,20 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         {STATUS_LABELS[status]}
       </div>
 
+      {/* Ligne vacant : message d'invitation à poser sa marque */}
+      {vacant && (
+        <div className="court-vacant-row">
+          <div className="court-vacant-icon">🏴</div>
+          <div className="court-vacant-text">
+            <span className="court-leader-label">Lieu vierge</span>
+            <span className="court-vacant-title">Personne ne veille ici</span>
+            <span className="court-vacant-hint">Pose ta marque depuis loin avec tes Couronnes — 50 pour t'établir</span>
+          </div>
+        </div>
+      )}
+
       {/* Ligne veilleur : avatar + texte + petit icône faction */}
+      {!vacant && veilleur && (
       <div className="court-leader-row">
         {veilleur.leaderUserId ? (
           <button
@@ -279,7 +295,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           </div>
         )}
         <div className="court-leader-text">
-          <span className="court-leader-label">Étendard planté par</span>
+          <span className="court-leader-label">Lieu veillé par</span>
           <div className="court-leader-name-row">
             {veilleur.leaderUserId ? (
               <button
@@ -314,6 +330,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           )}
         </div>
       </div>
+      )}
 
       {/* Jauge faveur / menace avec trait à 50 (chiffres intégrés) */}
       <CourtTensionBar
@@ -323,28 +340,32 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
 
       {/* Boutons tap-rafale */}
       <div className="court-actions">
-        <button
-          className="court-btn-support"
-          onClick={handleSupportTap}
-          disabled={balance < 1}
-          aria-label={isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
-        >
-          <span className="court-btn-icon">🛡</span>
-          <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
-          <span className="court-btn-cost">−1 🪙</span>
-          {bursts.filter(b => b.side === 'defense').map(b => (
-            <span key={b.id} className="court-btn-burst">+1</span>
-          ))}
-        </button>
-        {!isMember && (
+        {!vacant && (
+          <button
+            className="court-btn-support"
+            onClick={handleSupportTap}
+            disabled={balance < 1}
+            aria-label={isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
+          >
+            <span className="court-btn-icon">🛡</span>
+            <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
+            <span className="court-btn-cost">−1 🪙</span>
+            {bursts.filter(b => b.side === 'defense').map(b => (
+              <span key={b.id} className="court-btn-burst">+1</span>
+            ))}
+          </button>
+        )}
+        {(vacant || !isMember) && (
           <button
             className="court-btn-contest"
             onClick={handleContestTap}
             disabled={balance < 1 || creatingExp}
-            aria-label="Influencer ce lieu"
+            aria-label={vacant ? 'Poser ma marque sur ce lieu vierge' : 'Influencer ce lieu'}
           >
             <span className="court-btn-icon">⚔</span>
-            <span className="court-btn-label">{creatingExp ? 'Préparation…' : 'Influencer'}</span>
+            <span className="court-btn-label">
+              {creatingExp ? 'Préparation…' : (vacant ? 'Poser ma marque' : 'Influencer')}
+            </span>
             <span className="court-btn-cost">−1 🪙</span>
             {bursts.filter(b => b.side === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>

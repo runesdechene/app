@@ -1,7 +1,7 @@
 // Types client-side pour La Cour (V0.7 phase 5).
 // Voir docs/superpowers/specs/2026-05-05-v07-phase5-la-cour-design.md
 
-export type CourtStatus = 'paisible' | 'convoite' | 'sous_pression' | 'en_siege'
+export type CourtStatus = 'paisible' | 'convoite' | 'sous_pression' | 'en_siege' | 'vacant'
 
 export type CourtSide = 'defense' | 'attack'
 
@@ -61,12 +61,14 @@ export interface CourtCallerContext {
 }
 
 export interface PlaceCourtState {
-  veilleur: CourtVeilleur
+  /** V094 — true si le lieu n'a pas de veilleur (jamais planté ou abandonné) */
+  vacant: boolean
+  /** Null si vacant */
+  veilleur: CourtVeilleur | null
   scoreVeilleur: number
   threats: CourtThreat[]
-  /** Visible seulement aux membres veilleur */
   menaceHaute: number | null
-  /** Visible seulement aux non-membres */
+  /** Score à dépasser : score veilleur si veillé, 50 si vacant */
   scoreToBeat: number | null
   topPatrons: Patron[]
   chronicle: ChronicleEntry[]
