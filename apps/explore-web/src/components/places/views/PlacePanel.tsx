@@ -20,6 +20,7 @@ import { useCalendarRef } from '../../../hooks/useCalendarRef'
 import { formatYear } from '../../../lib/calendarUtils'
 import { AddCarnetModal } from '../modals/AddCarnetModal'
 import { PhotoLightbox } from '../modals/PhotoLightbox'
+import type { V05Detail, PlacePanelActiveTab } from '../../../types/placeDetail'
 import './PlacePanel.css'
 
 interface PlacePanelProps {
@@ -86,40 +87,6 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
 }
 
 // --- Vue découverte (lieu accessible) ---
-
-/** V0.5 detail data from get_place_detail_v05 */
-interface V05Detail {
-  influence: Array<{ factionId: string; placed: number; permanent: number; content: number; total: number }>
-  dominantFaction: string | null
-  contributions: V05Contribution[]
-  explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
-  avgRating: number | null
-  ratingCount: number
-  userRating: number | null
-  isWishlisted: boolean
-  isExplorer: boolean
-  guardian: { userId: string; name: string; avatar: string | null; factionId: string } | null
-}
-
-/** Raw contribution from the RPC */
-interface V05Contribution {
-  id: number
-  userId: string
-  factionId: string
-  type: string
-  title: string | null
-  content: string | null
-  imageUrl: string | null
-  images?: string[]
-  rating?: number | null
-  votesUp: number
-  votesDown: number
-  createdAt: string
-  userName: string
-  userAvatar: string | null
-}
-
-type ActiveTab = 'carnets' | 'galerie' | 'infos' | 'admin'
 
 function QuickInfoChip({ icon, value, placeholder, onClick }: {
   icon: React.ReactNode
@@ -359,9 +326,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [activeTab, setActiveTab] = useState<ActiveTab>('carnets')
+  const [activeTab, setActiveTab] = useState<PlacePanelActiveTab>('carnets')
   const tabsRef = useRef<HTMLDivElement>(null)
-  const scrollToTab = useCallback((tab: ActiveTab) => {
+  const scrollToTab = useCallback((tab: PlacePanelActiveTab) => {
     setActiveTab(tab)
     setTimeout(() => tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }, [])
