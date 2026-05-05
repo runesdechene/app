@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import changelogRaw from '../../../CHANGELOG.md?raw'
-import { safeStorage } from '../../lib/safeStorage'
-import { usePlayerStore } from '../../stores/playerStore'
+﻿import { useState } from 'react'
+import changelogRaw from '../../../../CHANGELOG.md?raw'
+import { safeStorage } from '../../../lib/safeStorage'
+import { usePlayerStore } from '../../../stores/playerStore'
 import './VersionBadge.css'
 
 /**

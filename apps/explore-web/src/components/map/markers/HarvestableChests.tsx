@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react'
+﻿import { useState, useCallback } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import type { FeatureCollection, Point } from 'geojson'
-import type { PlaceProperties } from '../../hooks/usePlaces'
-import { useCrownsStore } from '../../stores/crownsStore'
-import { usePlayerStore } from '../../stores/playerStore'
+import type { PlaceProperties } from '../../../hooks/usePlaces'
+import { useCrownsStore } from '../../../stores/crownsStore'
+import { usePlayerStore } from '../../../stores/playerStore'
 import './HarvestableChests.css'
 
 interface ClickBurst {

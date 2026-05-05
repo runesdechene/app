@@ -1,6 +1,6 @@
-import { memo, useState } from 'react'
+﻿import { memo, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
-import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
+import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
 import './OnlinePlayerMarkers.css'
 
 interface OnlinePlayer {

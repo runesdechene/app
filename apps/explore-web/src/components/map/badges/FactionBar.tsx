@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
-import { FactionMembersModal } from './FactionMembersModal'
-import { CoupeModal } from './CoupeModal'
-import type { CoupeState, CoupeFactionEntry } from '../../types/coupe'
+﻿import { useEffect, useState } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { FactionMembersModal } from '../modals/FactionMembersModal'
+import { CoupeModal } from '../modals/CoupeModal'
+import type { CoupeState, CoupeFactionEntry } from '../../../types/coupe'
 import './FactionBar.css'
 
 /**

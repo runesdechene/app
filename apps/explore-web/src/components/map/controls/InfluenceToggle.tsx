@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { usePlayerStore } from '../../stores/playerStore'
-import { CoupeRulesModal } from './CoupeRulesModal'
+﻿import { useState } from 'react'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { CoupeRulesModal } from '../modals/CoupeRulesModal'
 import './InfluenceToggle.css'
 
 export function InfluenceToggle() {

@@ -1,7 +1,7 @@
-import { memo, useMemo } from 'react'
+﻿import { memo, useMemo } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
-import { useMapStore } from '../../stores/mapStore'
-import type { PlacesGeoJSON } from '../../hooks/usePlaces'
+import { useMapStore } from '../../../stores/mapStore'
+import type { PlacesGeoJSON } from '../../../hooks/usePlaces'
 import './VeilleurNamePills.css'
 
 const MIN_ZOOM = 9

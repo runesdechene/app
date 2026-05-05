@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useCrownsStore } from '../../stores/crownsStore'
-import { InfoModal } from './InfoModal'
+﻿import { useState } from 'react'
+import { useCrownsStore } from '../../../stores/crownsStore'
+import { InfoModal } from '../modals/InfoModal'
 
 // V0.7 phase 2 — Compteur de Couronnes de Chêne dans la toolbar.
 // Toutes les chaînes UI utilisent les escapes Unicode (ê = ê, é = é,

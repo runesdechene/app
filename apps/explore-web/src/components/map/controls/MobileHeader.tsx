@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react'
-import { usePlayerStore } from '../../stores/playerStore'
-import { useMapStore } from '../../stores/mapStore'
-import { useMobileNavStore } from '../../stores/mobileNavStore'
-import { supabase } from '../../lib/supabase'
-import { EmailChangeModal } from '../auth/EmailChangeModal'
-import logoImg from '../../assets/logo_couleur_mobile.webp'
-import shopIcon from '../../assets/shop_icon.webp'
+﻿import { useState, useRef, useEffect } from 'react'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { useMapStore } from '../../../stores/mapStore'
+import { useMobileNavStore } from '../../../stores/mobileNavStore'
+import { supabase } from '../../../lib/supabase'
+import { EmailChangeModal } from '../../auth/EmailChangeModal'
+import logoImg from '../../../assets/logo_couleur_mobile.webp'
+import shopIcon from '../../../assets/shop_icon.webp'
 
 interface MobileHeaderProps {
   email: string

@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useCoupe } from '../../hooks/useCoupe'
-import { usePlayerStore } from '../../stores/playerStore'
-import { CoupeModal } from './CoupeModal'
+﻿import { useState } from 'react'
+import { useCoupe } from '../../../hooks/useCoupe'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { CoupeModal } from '../modals/CoupeModal'
 
 /**
  * V0.7 phase 3 — Bouton toolbar qui ouvre la Coupe des Héritages.

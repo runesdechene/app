@@ -1,34 +1,34 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Map as MapGL, Source, Layer, Popup, Marker, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
 import type { StyleSpecification, Map as MaplibreMap } from 'maplibre-gl'
 import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-import { usePlaces } from '../../hooks/usePlaces'
-import type { PlaceProperties } from '../../hooks/usePlaces'
-import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle } from '../../lib/map-style'
-import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } from '../../lib/map-icons'
+import { usePlaces } from '../../../hooks/usePlaces'
+import type { PlaceProperties } from '../../../hooks/usePlaces'
+import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle } from '../../../lib/map-style'
+import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } from '../../../lib/map-icons'
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
   buildTerritoryHoverLabelLayer,
-} from '../../lib/map-layers'
-import { useMapStore } from '../../stores/mapStore'
-import { usePlayerStore } from '../../stores/playerStore'
-import { usePlayersStore } from '../../stores/playersStore'
-import { supabase } from '../../lib/supabase'
+} from '../../../lib/map-layers'
+import { useMapStore } from '../../../stores/mapStore'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { usePlayersStore } from '../../../stores/playersStore'
+import { supabase } from '../../../lib/supabase'
 import { Minimap } from './Minimap'
-import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
-import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
-import { useEmojiThrows } from '../../hooks/useEmojiThrows'
-import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
-import { MapStyleSelect } from './MapStyleSelect'
-import { EnergyIndicator } from './EnergyIndicator'
-import { VeilleurNamePills } from './VeilleurNamePills'
-import { HarvestableChests } from './HarvestableChests'
-import { loadInitialVeilles } from '../../lib/loadInitialVeilles'
-import { useCrownsStore } from '../../stores/crownsStore'
+import { OnlinePlayerMarkers } from '../markers/OnlinePlayerMarkers'
+import { FlyingEmojiLayer, type AvatarPositionResolver } from '../../social/FlyingEmojiLayer'
+import { useEmojiThrows } from '../../../hooks/useEmojiThrows'
+import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
+import { MapStyleSelect } from '../controls/MapStyleSelect'
+import { EnergyIndicator } from '../badges/EnergyIndicator'
+import { VeilleurNamePills } from '../markers/VeilleurNamePills'
+import { HarvestableChests } from '../markers/HarvestableChests'
+import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
+import { useCrownsStore } from '../../../stores/crownsStore'
 
 // Couleurs du mode "Coupe des Héritages" — fond parchemin, lieux en encre brune.
 // La couleur faction n'apparaît plus sur les lieux : seule la bannière d'emblème territoire la porte.
@@ -286,7 +286,7 @@ export const ExploreMap = memo(function ExploreMap() {
   // Web Worker : calcul des territoires en arrière-plan
   useEffect(() => {
     const worker = new Worker(
-      new URL('../../workers/territoryWorker.ts', import.meta.url),
+      new URL('../../../workers/territoryWorker.ts', import.meta.url),
       { type: 'module' },
     )
     worker.onmessage = (e) => {

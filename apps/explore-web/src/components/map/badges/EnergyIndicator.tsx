@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { usePlayerStore } from '../../stores/playerStore'
-import { InfoModal } from './InfoModal'
+﻿import { useState } from 'react'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { InfoModal } from '../modals/InfoModal'
 import './EnergyIndicator.css'
 
 export function EnergyIndicator() {

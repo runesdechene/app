@@ -1,8 +1,8 @@
-import { useMobileNavStore } from '../../stores/mobileNavStore'
-import { useToastStore } from '../../stores/toastStore'
-import { useChatStore } from '../../stores/chatStore'
-import { usePlayerStore } from '../../stores/playerStore'
-import { useMapStore } from '../../stores/mapStore'
+﻿import { useMobileNavStore } from '../../../stores/mobileNavStore'
+import { useToastStore } from '../../../stores/toastStore'
+import { useChatStore } from '../../../stores/chatStore'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { useMapStore } from '../../../stores/mapStore'
 
 export function MobileNavbar() {
   const activePanel = useMobileNavStore(s => s.activePanel)

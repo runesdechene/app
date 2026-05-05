@@ -1,5 +1,5 @@
-import { InfoModal } from './InfoModal'
-import { useGloryRulesStore } from '../../stores/gloryRulesStore'
+﻿import { InfoModal } from './InfoModal'
+import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 
 interface Props {
   onClose: () => void

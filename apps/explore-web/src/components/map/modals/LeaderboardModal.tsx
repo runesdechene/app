@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react'
-import { supabase } from '../../lib/supabase'
-import { usePlayerStore } from '../../stores/playerStore'
-import { useMapStore } from '../../stores/mapStore'
+﻿import { useEffect, useState, useRef } from 'react'
+import { supabase } from '../../../lib/supabase'
+import { usePlayerStore } from '../../../stores/playerStore'
+import { useMapStore } from '../../../stores/mapStore'
 import './LeaderboardModal.css'
 
 // V0.7 phase 3.5 — Onglets simplifiés. Retiré : 'exploration', 'erudition'

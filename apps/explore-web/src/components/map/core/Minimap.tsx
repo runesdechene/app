@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FeatureCollection, Point } from 'geojson'
-import type { PlaceProperties } from '../../hooks/usePlaces'
+import type { PlaceProperties } from '../../../hooks/usePlaces'
 
 interface ViewBounds {
   north: number

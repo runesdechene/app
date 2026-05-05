@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { supabase } from '../../lib/supabase'
-import { useMapStore } from '../../stores/mapStore'
+import { supabase } from '../../../lib/supabase'
+import { useMapStore } from '../../../stores/mapStore'
 import { TagBonusList } from './TagBonusList'
 
 interface FactionMember {
