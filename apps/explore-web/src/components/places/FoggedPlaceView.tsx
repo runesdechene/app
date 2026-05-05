@@ -16,9 +16,6 @@ interface CostPreview {
     distanceMult: number
     tagReduction: number
     sameFaction: boolean
-    fortifCost: number
-    zoneCost: number
-    sizeCost: number
   }
 }
 
