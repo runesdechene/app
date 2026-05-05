@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCrownsStore } from '../../stores/crownsStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
 import parcheminImg from '../../assets/parchemin.png'
@@ -24,7 +25,8 @@ interface AnswerResult {
   explanation: string
   influenceGain: number
   eruditionGain: number
-  newInfluenceStock: number
+  crownsGain?: number
+  newCrownsBalance?: number
   newErudition: number
   newGlory: number
 }
@@ -54,6 +56,7 @@ const DIFFICULTY_ORDER: Array<'very_easy' | 'easy' | 'medium' | 'hard'> = ['very
 
 export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const userId = usePlayerStore(s => s.userId)
+  const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const [enigmas, setEnigmas] = useState<Enigma[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [allDone, setAllDone] = useState(false)
@@ -147,6 +150,9 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         influence: prev.influence + (r.influenceGain ?? 0),
         erudition: prev.erudition + (r.eruditionGain ?? 0),
       }))
+      if (typeof r.newCrownsBalance === 'number') {
+        setCrownsBalance(r.newCrownsBalance)
+      }
       if (userId) void refreshLevelStateGlobal(userId)
     }
     setSubmitting(false)
@@ -286,6 +292,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
             explanation={result.explanation}
             influenceGain={result.influenceGain}
             eruditionGain={result.eruditionGain}
+            crownsGain={result.crownsGain}
             difficulty={enigma.difficulty}
             onClose={isLast ? onClose : handleNext}
             closeLabel={isLast ? 'Fermer' : '\u00c9nigme suivante \u2192'}

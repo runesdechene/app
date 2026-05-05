@@ -20,6 +20,8 @@ interface EnigmaResultProps {
   eruditionGain: number
   /** V0.6 — difficulté de l'énigme pour calculer le gain pondéré 1/1/2/3 */
   difficulty?: 'very_easy' | 'easy' | 'medium' | 'hard'
+  /** V0.7 phase 5 — Couronnes gagnées (0 si stock plein) */
+  crownsGain?: number
   onClose: () => void
   closeLabel?: string
 }
@@ -31,7 +33,7 @@ const DIFFICULTY_GAIN: Record<string, number> = {
   hard:      3,
 }
 
-export function EnigmaResult({ correct, answer, explanation, difficulty, onClose, closeLabel }: EnigmaResultProps) {
+export function EnigmaResult({ correct, answer, explanation, difficulty, crownsGain, onClose, closeLabel }: EnigmaResultProps) {
   const gain = difficulty ? (DIFFICULTY_GAIN[difficulty] ?? 1) : 1
   return (
     <div className="enigma-result">
@@ -67,6 +69,12 @@ export function EnigmaResult({ correct, answer, explanation, difficulty, onClose
           <div className="enigma-result-gain enigma">
             {'📖'} +1 énigme validée
           </div>
+          {typeof crownsGain === 'number' && (
+            <div className="enigma-result-gain crowns">
+              {'👑'} +{crownsGain} Couronne{crownsGain > 1 ? 's' : ''}
+              {crownsGain === 0 && <span className="enigma-result-gain-note">(stock plein)</span>}
+            </div>
+          )}
         </div>
       )}
 

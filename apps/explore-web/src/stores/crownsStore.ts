@@ -17,6 +17,8 @@ interface CrownsStoreState {
   refresh: (userId: string) => Promise<void>
   /** Récolte un coffre (appelle la RPC, met à jour la balance + retire de la liste) */
   harvest: (userId: string, placeId: string) => Promise<HarvestResult>
+  /** V0.7 phase 5 — Mise à jour directe de la balance après énigme ou investissement */
+  setBalance: (newBalance: number) => void
 
   /** Reset (déconnexion) */
   reset: () => void
@@ -81,6 +83,14 @@ export const useCrownsStore = create<CrownsStoreState>((set, get) => ({
       })
     }
     return result
+  },
+
+  setBalance: (newBalance) => {
+    safeStorage.set('crownsBalance', String(newBalance))
+    set({
+      balance: newBalance,
+      capped: newBalance >= 500,
+    })
   },
 
   reset: () => {

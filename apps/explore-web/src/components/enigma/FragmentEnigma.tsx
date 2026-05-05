@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCrownsStore } from '../../stores/crownsStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { EnigmaResult } from './EnigmaResult'
 import parcheminImg from '../../assets/parchemin.png'
@@ -33,12 +34,14 @@ interface AnswerResult {
   explanation: string
   influenceGain: number
   eruditionGain: number
-  newInfluenceStock?: number
+  crownsGain?: number
+  newCrownsBalance?: number
   newErudition?: number
 }
 
 export function FragmentEnigma({ fragment, onClose }: Props) {
   const userId = usePlayerStore(s => s.userId)
+  const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const [enigma, setEnigma] = useState<Enigma | null>(null)
   const [loading, setLoading] = useState(true)
   const [answer, setAnswer] = useState('')
@@ -99,6 +102,9 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
       } else if (data && !data.error) {
         const r = data as AnswerResult
         setResult(r)
+        if (typeof r.newCrownsBalance === 'number') {
+          setCrownsBalance(r.newCrownsBalance)
+        }
         if (userId) void refreshLevelStateGlobal(userId)
       }
     } catch (err) {
@@ -166,6 +172,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
             explanation={result.explanation}
             influenceGain={result.influenceGain}
             eruditionGain={result.eruditionGain}
+            crownsGain={result.crownsGain}
             difficulty={enigma?.difficulty as 'very_easy' | 'easy' | 'medium' | 'hard' | undefined}
             onClose={onClose}
           />
