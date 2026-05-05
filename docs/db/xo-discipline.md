@@ -116,9 +116,14 @@ console.info/warn/error OK avec discernement. console.log = oubli.
 ### E3. Update CLAUDE.md de la sous-app si la structure a changé
 Si on a ajouté un nouveau sous-dossier, store, helper majeur → update `apps/<app>/CLAUDE.md` dans le même commit.
 
-### E4. Push à chaque modif importante (pas seulement fin de session)
-Uriel travaille multi-postes. Jamais laisser du WIP non pushé.
-*Origine : feedback du 6 avril.*
+### E4. Commit fréquent, push par lots cohérents
+Commit à chaque étape qui marche (build OK). Push :
+- en fin de session (**toujours**)
+- quand Uriel signale un changement de poste
+- quand un lot logique est terminé (feature livrée, sprint phase finie, fix critique testé)
+- **PAS à chaque commit intermédiaire** — coût hook Graphify + tokens output significatif sur la durée.
+
+*Origine : règle révisée le 5 mai 2026. La version "push à chaque modif" du 6 avril gaspillait tokens et temps.*
 
 ---
 
