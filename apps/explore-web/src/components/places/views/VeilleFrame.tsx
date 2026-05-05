@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from 'react'
+﻿import { useState, useCallback, useEffect } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useVeille } from '../../../hooks/useVeille'
 import { ExpeditionOptInModal } from '../modals/ExpeditionOptInModal'
@@ -36,9 +36,18 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userPosition = usePlayerStore(s => s.userPosition)
-  const { refresh, plant, fetchNearby } = useVeille(placeId)
+  const { veille, refresh, plant, fetchNearby } = useVeille(placeId)
   const [planting, setPlanting] = useState(false)
   const [optInCandidates, setOptInCandidates] = useState<NearbyPlanter[] | null>(null)
+
+  // Charge l'état de veille au mount pour décider si le bouton doit s'afficher.
+  useEffect(() => { void refresh() }, [refresh])
+
+  // Si user est déjà membre de l'expé veilleuse plein-veilleur, on cache le
+  // bouton (replant interdit côté backend depuis mig 092).
+  const userIsAlreadyVeilleur =
+    veille && !veille.vacant && !veille.byInfluence && !!userId &&
+    veille.members.some(m => m.userId === userId)
 
   const distanceKm = userPosition
     ? haversineKm({ lat: userPosition.lat, lng: userPosition.lng },
@@ -92,6 +101,9 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   }, [userId, userPosition, fetchNearby, doPlant])
 
   if (!userId || !userFactionId) return null
+  // V092 — replant interdit sur son propre lieu plein-veilleur. On masque
+  // simplement le bouton plutôt que d'afficher une erreur post-clic.
+  if (userIsAlreadyVeilleur) return null
 
   return (
     <>

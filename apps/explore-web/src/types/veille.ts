@@ -16,6 +16,8 @@ export type PlaceVeille =
       factionId: string | null     // null si neutral
       expeditionId: string
       plantedAt: string
+      /** V093 — true si l'expé veille à distance (n'a pas confirmé IRL) */
+      byInfluence: boolean
       members: VeilleMember[]      // toujours ≥ 1 entrée (solo = 1)
     }
 
