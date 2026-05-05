@@ -261,7 +261,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           )}
         </div>
         <div className="court-leader-text">
-          <span className="court-leader-label">Lieu protégé par</span>
+          <span className="court-leader-label">Étendard planté par</span>
           <div className="court-leader-name-row">
             <span className="court-leader-name">{veilleur.leaderName}</span>
             {veilleur.factionPattern && veilleur.factionColor && (
@@ -277,7 +277,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               />
             )}
           </div>
-          <span className="court-faveur-acquise">+50 acquis au plantage</span>
+          <span className="court-faveur-acquise">Acquis par sa visite sur le lieu</span>
           {veilleur.byInfluence && (
             <span className="court-by-influence">tient ce lieu à distance</span>
           )}
@@ -300,7 +300,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         >
           <span className="court-btn-icon">🛡</span>
           <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
-          <span className="court-btn-cost">−1 👑</span>
+          <span className="court-btn-cost">−1 🪙</span>
           {bursts.filter(b => b.side === 'defense').map(b => (
             <span key={b.id} className="court-btn-burst">+1</span>
           ))}
@@ -314,7 +314,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           >
             <span className="court-btn-icon">⚔</span>
             <span className="court-btn-label">{creatingExp ? 'Préparation…' : 'Influencer'}</span>
-            <span className="court-btn-cost">−1 👑</span>
+            <span className="court-btn-cost">−1 🪙</span>
             {bursts.filter(b => b.side === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}

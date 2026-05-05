@@ -698,54 +698,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 {tag.title}
               </span>
             ))}
-            {/* V0.7 — Veillé par {nom du veilleur principal}, dans la couleur de sa faction.
-                Remplace l'ancien "Sous l'influence de la {faction}" (legacy V0.5).
-                Layout : [svg-faction] Veillé par {nom} [avatar-round].
-                Source : placeOverride (peuplé par loadInitialVeilles / pushVeilleOverride). */}
-            {placeOverride?.veilleurName && placeOverride?.veilleurUserId && (() => {
-              const factionId = placeOverride.factionId
-              const fc = (factionId && factionColors.get(factionId)) ?? placeOverride.tagColor ?? '#8A7B6A'
-              const svg = factionId ? factionSvgs.get(factionId) : undefined
-              const avatar = placeOverride.veilleurAvatarUrl
-              const initial = placeOverride.veilleurName.charAt(0).toUpperCase()
-              return (
-                <span
-                  className="place-tag place-tag-faction place-tag-veilleur"
-                  style={{ backgroundColor: `${fc}20`, color: fc, cursor: 'pointer' }}
-                  onClick={() => useMapStore.getState().setSelectedPlayerId(placeOverride.veilleurUserId!)}
-                  title={`Voir le profil de ${placeOverride.veilleurName}`}
-                >
-                  {avatar ? (
-                    <img
-                      src={avatar}
-                      alt=""
-                      className="place-tag-veilleur-avatar"
-                    />
-                  ) : (
-                    <span
-                      className="place-tag-veilleur-avatar place-tag-veilleur-avatar-fallback"
-                      style={{ background: fc }}
-                    >
-                      {initial}
-                    </span>
-                  )}
-                  <span className="place-tag-veilleur-text">
-                    Revendiqué par {placeOverride.veilleurName}
-                    {placeOverride.veilleurExtraCount && placeOverride.veilleurExtraCount > 0 ? ` +${placeOverride.veilleurExtraCount}` : ''}
-                  </span>
-                  {svg && (
-                    <span
-                      className="place-tag-faction-svg"
-                      style={{
-                        WebkitMaskImage: `url(${svg})`,
-                        maskImage: `url(${svg})`,
-                        backgroundColor: fc,
-                      }}
-                    />
-                  )}
-                </span>
-              )
-            })()}
+            {/* V0.7 phase 5 (6 mai) — pilule "Revendiqué par {nom}" retirée :
+                redondante avec la section "Lieu protégé par Diane" affichée
+                par PlaceCourtView juste en-dessous du panel. */}
           </div>
 
           {/* Address */}

@@ -40,7 +40,7 @@ export function CourtChronicle({ entries }: CourtChronicleProps) {
           {' '}
           <span className="chronicle-target">{e.expeditionName}</span>
           {' — '}
-          <span className="chronicle-amount">{e.amount} 👑</span>
+          <span className="chronicle-amount">{e.amount} 🪙</span>
           {' · '}
           <span className="chronicle-time">{formatRelative(e.ts)}</span>
         </div>
