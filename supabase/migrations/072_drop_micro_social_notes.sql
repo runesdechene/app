@@ -20,7 +20,17 @@
 --    publication, c'est le moins invasif (state pré-057 restauré).
 -- ============================================================
 
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS public.users;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_publication_tables
+     WHERE pubname = 'supabase_realtime'
+       AND schemaname = 'public'
+       AND tablename = 'users'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime DROP TABLE public.users;
+  END IF;
+END $$;
 
 -- ============================================================
 -- 1. Modération des notes (signalement)
