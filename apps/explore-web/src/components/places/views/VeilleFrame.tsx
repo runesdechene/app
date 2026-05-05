@@ -40,14 +40,12 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   const [planting, setPlanting] = useState(false)
   const [optInCandidates, setOptInCandidates] = useState<NearbyPlanter[] | null>(null)
 
-  // Charge l'état de veille au mount pour décider si le bouton doit s'afficher.
+  // V096 — le bouton reste affiché même pour le veilleur plein, car
+  // replanter sur son propre lieu efface désormais les menaces challengers
+  // (cas D "réaffirmation IRL"). On garde le refresh au mount pour la
+  // donnée de veille (utilisée ailleurs si besoin).
   useEffect(() => { void refresh() }, [refresh])
-
-  // Si user est déjà membre de l'expé veilleuse plein-veilleur, on cache le
-  // bouton (replant interdit côté backend depuis mig 092).
-  const userIsAlreadyVeilleur =
-    veille && !veille.vacant && !veille.byInfluence && !!userId &&
-    veille.members.some(m => m.userId === userId)
+  void veille // évite warn unused — l'état est utilisé via refresh
 
   const distanceKm = userPosition
     ? haversineKm({ lat: userPosition.lat, lng: userPosition.lng },
@@ -101,9 +99,6 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   }, [userId, userPosition, fetchNearby, doPlant])
 
   if (!userId || !userFactionId) return null
-  // V092 — replant interdit sur son propre lieu plein-veilleur. On masque
-  // simplement le bouton plutôt que d'afficher une erreur post-clic.
-  if (userIsAlreadyVeilleur) return null
 
   return (
     <>
