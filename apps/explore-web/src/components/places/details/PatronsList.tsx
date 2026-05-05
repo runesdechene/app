@@ -17,7 +17,6 @@ export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
 
   return (
     <div className="patrons-list">
-      <div className="patrons-title">Trône des Mécènes</div>
       {patrons.map((p, i) => {
         const isFirst = i === 0
         const isYou = currentUserId === p.userId

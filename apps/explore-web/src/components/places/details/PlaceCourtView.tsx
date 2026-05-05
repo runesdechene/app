@@ -4,7 +4,6 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
-import { CourtChronicle } from './CourtChronicle'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus } from '../../../types/court'
 
@@ -188,7 +187,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     return <div className="court-loading">{errorMsg ?? 'Chargement…'}</div>
   }
 
-  const { veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, chronicle, callerContext } = state
+  const { veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, callerContext } = state
   const isMember = callerContext?.isMemberOfVeilleur ?? false
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
@@ -331,8 +330,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       {errorMsg && <p className="court-error">{errorMsg}</p>}
 
       <PatronsList patrons={topPatrons} currentUserId={userId ?? undefined} />
-
-      <CourtChronicle entries={chronicle} />
     </div>
   )
 }
