@@ -13,6 +13,7 @@ import { WishlistButton } from '../actions/WishlistButton'
 import { CarnetCard } from '../cards/CarnetCard'
 import type { Carnet } from '../cards/CarnetCard'
 import { VeilleFrame } from './VeilleFrame'
+import { PlaceCourtView } from '../details/PlaceCourtView'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { ShareButton } from '../actions/ShareButton'
@@ -916,6 +917,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               yearExact={place.yearExact ?? null}
               onRefresh={refreshV05}
             />
+            <PlaceCourtView placeId={place.id} placeTitle={place.title} />
           </div>
         )}
 

@@ -1,3 +1,29 @@
+# ALPHA V0.7.2
+## La Cour s'ouvre — l'or peut soutenir la marche
+
+### 👑 Investis tes Couronnes pour soutenir un lieu, ou en briguer un
+Sur la fiche de chaque lieu veillé, **La Cour** t'attend. Tu peux désormais investir tes Couronnes de Chêne pour :
+- **Soutenir le veilleur en place** — renforcer sa faveur diplomatique
+- **Mécèner un lieu** sans en être l'expédition — devenir Mécène Principal et porter ton nom au Trône
+- **Défier l'expédition veilleuse** depuis la distance, et faire basculer le lieu à toi
+
+Le veilleur démarre toujours avec une **faveur de 50** acquise au plantage. Pour le contester, il faut dépasser ce score (plus ce qu'il aura ajouté en défense). Et toujours, **la marche prime sur l'or** : un veilleur qui revient en personne efface tous les efforts adverses et reprend gratuitement son lieu.
+
+### 📖 Les énigmes te rapportent désormais des Couronnes
+Chaque énigme correctement résolue (du jour, d'un lieu ou d'un fragment) crédite ton trésor :
+**+1, +1, +2 ou +3 Couronnes** selon la difficulté. Un mécène sans bagages peut ainsi se constituer une bourse au fil des jours.
+
+### 🏛️ Le Trône des Mécènes
+Sur chaque lieu, les 5 plus généreux mécènes sont nommés à vie. Le premier d'entre eux porte le titre **Mécène Principal de [Lieu]**. Quatre nouveaux titres généraux récompensent ton engagement : **Bourse Légère** (50 Couronnes), **Coffre d'Or** (200), **Trésorier** (1000), **Premier Mécène** (#1 sur 3 lieux ou plus).
+
+### Sous le capot
+- Faveur 50 implicite, jamais stockée — calculée à la volée pour réduire la dette d'état.
+- Bascule atomique en transaction, journal append-only pour la chronique et le leaderboard mécènes.
+- Anciens scores d'influence V0.5 droppés. Tout le monde repart à zéro sur la nouvelle Cour.
+- Notifications temps réel : tu sauras qui s'intéresse à tes lieux, et quand tu deviens Mécène Principal d'un endroit.
+
+---
+
 # ALPHA V0.7.1
 ## La carte vit, la route s'éveille
 

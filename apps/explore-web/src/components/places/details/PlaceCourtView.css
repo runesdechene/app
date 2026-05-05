@@ -1,0 +1,55 @@
+.court-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin-top: 16px;
+}
+.court-section-title {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.court-loading {
+  padding: 24px;
+  text-align: center;
+  opacity: 0.7;
+  font-style: italic;
+}
+.court-veilleur { padding: 8px 0; }
+.court-veilleur-name { font-size: 15px; }
+.court-by-influence { opacity: 0.7; font-style: italic; font-size: 13px; }
+.court-veilleur-members { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.court-member-pill {
+  font-size: 13px;
+  padding: 3px 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 12px;
+}
+.court-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.court-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  background: #6b3f1f;
+  color: #fff;
+}
+.court-actions button.challenge { background: #a04830; }
+.court-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+.court-no-balance {
+  font-size: 13px;
+  opacity: 0.7;
+  font-style: italic;
+}
+.court-error {
+  font-size: 13px;
+  color: #c94545;
+  margin-top: 4px;
+}

@@ -37,3 +37,9 @@ cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify
 ## Auth Hub — fetchRole
 
 Toujours requêter par **email** (pas par id), voir Citadelle `DEV/Architecture/Auth et utilisateurs.md`.
+
+## Vues de monitoring V0.7 phase 5
+
+`Divers.tsx` héberge la section **Bascules récentes** (V0.7 phase 5, 5 mai 2026) :
+listing des `place_taken_remote` des 30 derniers jours pour suivre l'usage de
+**La Cour** (influence à distance) et détecter d'éventuels abus.

@@ -14,6 +14,7 @@ Conventions, gotchas, décisions, préférences, architecture :
 - React 18 + Vite 5 + TypeScript strict
 - MapLibre GL JS (carte)
 - Zustand (10 stores : `appConfigStore`, `chatStore`, `crownsStore`, `gloryRulesStore`, `mapStore`, `mobileNavStore`, `notificationStore`, `playerStore`, `playersStore`, `toastStore`)
+- V0.7 phase 5 (5 mai 2026) : système **La Cour** — influence à distance via Couronnes, sur la fiche de lieu (onglet Infos). Composants `PlaceCourtView` + `CourtTensionBar` + `PatronsList` + `CourtChronicle` + `InvestCrownsModal` dans `components/places/details/` et `components/places/actions/`. Hook `useCourtNotifications` (subscribe activity_log filtré). Énigmes (daily/fragment/place) rapportent **1/1/2/3 Couronnes** selon difficulté (cap silencieux 500). Drop V0.5 : `InfluenceFrame`/`InfluenceToggle`/`users.influence_stock`/tables `place_influence` + `user_place_influence`.
 - CSS par composant, media queries dans `styles/mobile.css`
 - Supabase client : `src/lib/supabase.ts`
 

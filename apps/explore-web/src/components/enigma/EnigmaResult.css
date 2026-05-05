@@ -107,6 +107,19 @@
   color: #5a347a;
 }
 
+/* V0.7 phase 5 — Couronnes (or chaud) */
+.enigma-result-gain.crowns {
+  background: rgba(202, 160, 102, 0.18);
+  color: #8a5e26;
+}
+
+.enigma-result-gain-note {
+  margin-left: 6px;
+  font-weight: 500;
+  opacity: 0.7;
+  font-size: 11px;
+}
+
 .enigma-result-close-x {
   position: absolute;
   top: 12px;

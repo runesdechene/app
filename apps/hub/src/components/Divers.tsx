@@ -1,15 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
+interface BasculeRow {
+  id: number
+  place_id: string | null
+  actor_id: string | null
+  data: {
+    placeTitle?: string
+    actorName?: string
+    oldExpeditionId?: string
+    newExpeditionId?: string
+  } | null
+  created_at: string
+}
+
 export function Divers() {
   const [unknownIcon, setUnknownIcon] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [bascules, setBascules] = useState<BasculeRow[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchSettings()
+    fetchBascules()
   }, [])
+
+  async function fetchBascules() {
+    const since = new Date(Date.now() - 30 * 86400000).toISOString()
+    const { data } = await supabase
+      .from('activity_log')
+      .select('id, place_id, actor_id, data, created_at')
+      .eq('type', 'place_taken_remote')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(50)
+    setBascules((data ?? []) as BasculeRow[])
+  }
 
   async function fetchSettings() {
     try {
@@ -123,6 +150,40 @@ export function Divers() {
             </button>
           )}
         </div>
+      </div>
+
+      <div className="divers-card">
+        <h3>La Cour — Bascules récentes (V0.7 phase 5)</h3>
+        <p className="divers-description">
+          Lieux qui ont basculé par influence dans les 30 derniers jours. Pour suivre l'usage
+          du système et détecter d'éventuels abus.
+        </p>
+        {bascules.length === 0 ? (
+          <p style={{ opacity: 0.7, fontStyle: 'italic' }}>Aucune bascule récente.</p>
+        ) : (
+          <table style={{ width: '100%', fontSize: 14, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.15)' }}>
+                <th style={{ textAlign: 'left', padding: '8px 4px' }}>Date</th>
+                <th style={{ textAlign: 'left', padding: '8px 4px' }}>Lieu</th>
+                <th style={{ textAlign: 'left', padding: '8px 4px' }}>Auteur</th>
+                <th style={{ textAlign: 'left', padding: '8px 4px' }}>Ancienne expé</th>
+                <th style={{ textAlign: 'left', padding: '8px 4px' }}>Nouvelle expé</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bascules.map(b => (
+                <tr key={b.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                  <td style={{ padding: '6px 4px' }}>{new Date(b.created_at).toLocaleString('fr-FR')}</td>
+                  <td style={{ padding: '6px 4px' }}>{b.data?.placeTitle ?? b.place_id ?? '—'}</td>
+                  <td style={{ padding: '6px 4px' }}>{b.data?.actorName ?? b.actor_id ?? '—'}</td>
+                  <td style={{ padding: '6px 4px', fontFamily: 'monospace', fontSize: 12 }}>{b.data?.oldExpeditionId?.slice(0, 8) ?? '—'}</td>
+                  <td style={{ padding: '6px 4px', fontFamily: 'monospace', fontSize: 12 }}>{b.data?.newExpeditionId?.slice(0, 8) ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   )

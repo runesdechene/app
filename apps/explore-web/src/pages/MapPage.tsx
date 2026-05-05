@@ -10,7 +10,6 @@ import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
-import { InfluenceToggle } from '../components/map/controls/InfluenceToggle'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
@@ -43,6 +42,7 @@ import { NotificationBell } from '../components/notifications/NotificationBell'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
+import { useCourtNotifications } from '../hooks/useCourtNotifications'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
@@ -162,6 +162,8 @@ export default function MapPage() {
   // Chat en jeu
   useChat()
   useNotifications()
+  // V0.7 phase 5 — toasts La Cour (attaque, bascule, mécène principal…)
+  useCourtNotifications()
   useResourceTimers()
 
   // V0.7 — Système de niveaux
@@ -309,7 +311,6 @@ export default function MapPage() {
 
       {!addPlaceMode && !authLoading && isAuthenticated && (
         <div className="influence-area">
-          <InfluenceToggle />
           <FactionBar />
         </div>
       )}

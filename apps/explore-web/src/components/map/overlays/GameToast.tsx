@@ -27,6 +27,8 @@ const ICONS: Record<GameToastType['type'], string> = {
   harvest_crown: '\uD83E\uDE99',  // pi\u00E8ce (Couronne r\u00E9colt\u00E9e)
   // V0.7+ mini-qu\u00EAtes journali\u00E8res
   quest_completed: '\uD83C\uDFAF', // cible (qu\u00EAte accomplie)
+  // V0.7 phase 5 \u2014 La Cour (attaque, bascule, m\u00E9c\u00E8ne principal)
+  court: '\uD83D\uDC51', // couronne
 }
 
 function formatTimeAgo(ts: number): string {
