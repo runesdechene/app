@@ -1,13 +1,13 @@
 /* ==========================================
-   LA COUR — V0.7 phase 5
-   Conteneur parcheminé, hiérarchie marquée
+   FICHE DE LIEU — Cour (V0.7 phase 5)
+   Layout centré sur le veilleur (la personne)
    ========================================== */
 
 .court-view {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin: 20px 0 12px;
+  margin: 18px 0 12px;
   padding: 18px 16px 16px;
   background: linear-gradient(180deg, rgba(245, 230, 211, 0.6), rgba(245, 230, 211, 0.25));
   border: 1px solid rgba(193, 154, 107, 0.4);
@@ -16,38 +16,8 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 3px rgba(74, 55, 40, 0.08);
 }
 
-.court-view::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 18px;
-  right: 18px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(193, 154, 107, 0.5), transparent);
-}
-
-.court-section-title {
-  font-family: var(--font-accent, 'Cormorant Garamond', serif);
-  font-size: 26px;
-  font-weight: 700;
-  margin: 0;
-  text-align: center;
-  letter-spacing: 0.5px;
-  color: var(--color-ink, #4a3728);
-  position: relative;
-}
-
-.court-section-title::before,
-.court-section-title::after {
-  content: '⚜';
-  margin: 0 12px;
-  color: rgba(193, 154, 107, 0.7);
-  font-size: 18px;
-  vertical-align: middle;
-}
-
 .court-loading {
-  padding: 28px;
+  padding: 24px;
   text-align: center;
   opacity: 0.6;
   font-style: italic;
@@ -55,29 +25,88 @@
 }
 
 /* ==========================================
-   Carte d'identité veilleur
+   Pilule statut — top right en absolute
    ========================================== */
 
-.court-veilleur {
-  background: rgba(255, 255, 255, 0.4);
-  padding: 12px 14px;
-  border-radius: 8px;
-  border-left: 3px solid var(--color-sepia, #c19a6b);
-}
-
-.court-veilleur-name {
-  font-size: 15px;
-  color: var(--color-ink, #4a3728);
-  margin-bottom: 8px;
-}
-
-.court-veilleur-name strong {
+.court-status-pill {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  z-index: 2;
+}
+
+.court-status-pill.court-status-paisible {
+  background: rgba(107, 142, 107, 0.18);
+  color: #3e5e3e;
+  border: 1px solid rgba(107, 142, 107, 0.35);
+}
+
+.court-status-pill.court-status-convoite {
+  background: rgba(212, 175, 55, 0.18);
+  color: #8a6a1a;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+.court-status-pill.court-status-sous_pression {
+  background: rgba(212, 130, 60, 0.2);
+  color: #8a4a16;
+  border: 1px solid rgba(212, 130, 60, 0.45);
+}
+
+.court-status-pill.court-status-en_siege {
+  background: rgba(180, 60, 60, 0.22);
+  color: #8a2424;
+  border: 1px solid rgba(180, 60, 60, 0.5);
+  animation: court-siege-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes court-siege-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(180, 60, 60, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(180, 60, 60, 0); }
+}
+
+/* ==========================================
+   Lieu protégé par [Leader] + boule faction
+   ========================================== */
+
+.court-leader-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 90px; /* libère la place pour la pilule statut */
+  min-height: 48px;
+}
+
+.court-leader-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.court-leader-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: rgba(74, 55, 40, 0.55);
+}
+
+.court-leader-name {
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-ink, #4a3728);
+  line-height: 1.1;
 }
 
 .court-by-influence {
-  display: inline-block;
-  margin-left: 8px;
   font-size: 11px;
   font-style: italic;
   font-weight: 500;
@@ -85,22 +114,42 @@
   border-radius: 10px;
   background: rgba(184, 107, 75, 0.15);
   color: #8a4d2f;
-  vertical-align: middle;
+  align-self: flex-start;
+  margin-top: 4px;
 }
 
-.court-veilleur-members {
+/* Boule colorée à droite — couleur faction + icône en mask-image */
+.court-leader-orb {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(74, 55, 40, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  position: relative;
 }
 
-.court-member-pill {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  background: var(--color-parchment-dark, #e0d0ba);
-  border-radius: 12px;
-  color: var(--color-ink, #4a3728);
+.court-leader-orb::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.court-leader-orb-icon {
+  width: 28px;
+  height: 28px;
+  background-color: rgba(255, 255, 255, 0.92);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 /* ==========================================
@@ -111,12 +160,11 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 4px 0 2px;
 }
 
 .court-actions button {
   flex: 1;
-  min-width: 140px;
+  min-width: 130px;
   padding: 12px 16px;
   border: none;
   border-radius: 8px;
@@ -138,7 +186,6 @@
 
 .court-actions button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(74, 55, 40, 0.3);
 }
 
 .court-actions button.challenge {
@@ -153,7 +200,7 @@
 }
 
 .court-no-balance {
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
   opacity: 0.65;
   font-style: italic;

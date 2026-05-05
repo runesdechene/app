@@ -15,6 +15,12 @@ export interface CourtVeilleur {
   name: string
   planted_at: string
   byInfluence: boolean
+  /** V086 — leader de l'expédition (user mis en avant côté UX) */
+  leaderName: string
+  leaderUserId: string | null
+  factionId: string | null
+  factionColor: string | null
+  factionPattern: string | null
   members: ExpeditionMember[]
 }
 

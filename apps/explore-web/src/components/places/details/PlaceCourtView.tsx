@@ -7,7 +7,7 @@ import { PatronsList } from './PatronsList'
 import { CourtChronicle } from './CourtChronicle'
 import { InvestCrownsModal } from '../actions/InvestCrownsModal'
 import './PlaceCourtView.css'
-import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult } from '../../../types/court'
+import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, CourtStatus } from '../../../types/court'
 
 interface PlaceCourtViewProps {
   placeId: string
@@ -21,6 +21,13 @@ interface InvestTarget {
   currentScore: number
 }
 
+const STATUS_LABELS: Record<CourtStatus, string> = {
+  paisible:       'Paisible',
+  convoite:       'Convoité',
+  sous_pression:  'Sous pression',
+  en_siege:       'En siège',
+}
+
 export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
   const userId = usePlayerStore(s => s.userId)
   const balance = useCrownsStore(s => s.balance)
@@ -29,7 +36,6 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
   const [investTarget, setInvestTarget] = useState<InvestTarget | null>(null)
   const [creatingExp, setCreatingExp] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-
   const [notVeilled, setNotVeilled] = useState(false)
 
   const fetchState = useCallback(async () => {
@@ -41,7 +47,7 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
     setLoading(false)
     if (error) {
       console.error('[PlaceCourtView] get_place_court_state error', error)
-      setErrorMsg('Impossible de charger la Cour pour le moment.')
+      setErrorMsg('Impossible de charger les informations pour le moment.')
       return
     }
     const d = data as PlaceCourtState & { error?: string }
@@ -61,11 +67,9 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
 
   useEffect(() => { void fetchState() }, [fetchState])
 
-  // Lieu pas veillé → silence (pas de section Cour)
   if (notVeilled) return null
-
   if (loading || !state) {
-    return <div className="court-loading">{errorMsg ?? 'Chargement de la Cour…'}</div>
+    return <div className="court-loading">{errorMsg ?? 'Chargement…'}</div>
   }
 
   const { veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, chronicle, callerContext } = state
@@ -76,9 +80,9 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
   const handleSupport = () => {
     setInvestTarget({
       expeditionId: veilleur.expeditionId,
-      expeditionName: veilleur.name,
+      expeditionName: veilleur.leaderName,
       side: 'defense',
-      currentScore: scoreVeilleur - 50,  // l'UI affiche "+amount à la défense" (faveur 50 reste implicite)
+      currentScore: scoreVeilleur - 50,
     })
   }
 
@@ -107,10 +111,9 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
     }
     const r = data as CreateChallengerExpeditionResult & { error?: string }
     if (r.error) {
-      setErrorMsg(r.error === 'no_faction' ? 'Vous devez choisir une faction d\'abord.' : r.error)
+      setErrorMsg(r.error === 'no_faction' ? "Vous devez choisir une faction d'abord." : r.error)
       return
     }
-    // Refetch + ouvre la modale d'investissement sur la nouvelle expé
     await fetchState()
     setInvestTarget({
       expeditionId: r.expeditionId,
@@ -121,45 +124,68 @@ export function PlaceCourtView({ placeId, placeTitle }: PlaceCourtViewProps) {
   }
 
   const showChallengeFlow = !isMember && !userChallengerExp
-  const showInvestChallenger = !isMember && userChallengerExp
+  const showInvestChallenger = !isMember && !!userChallengerExp
 
   return (
-    <div className="court-view">
-      <h3 className="court-section-title">La Cour</h3>
+    <div className={`court-view court-status-${status}`}>
+      {/* Statut en absolute top-right */}
+      <div className={`court-status-pill court-status-${status}`}>
+        {STATUS_LABELS[status]}
+      </div>
 
+      {/* Lieu protégé par [Leader] + boule colorée avec icône faction */}
+      <div className="court-leader-row">
+        <div className="court-leader-text">
+          <span className="court-leader-label">Lieu protégé par</span>
+          <span className="court-leader-name">{veilleur.leaderName}</span>
+          {veilleur.byInfluence && (
+            <span className="court-by-influence">tient ce lieu à distance</span>
+          )}
+        </div>
+        {veilleur.factionColor && (
+          <div
+            className="court-leader-orb"
+            style={{ backgroundColor: veilleur.factionColor }}
+            title={veilleur.name}
+            aria-label={`Faction : ${veilleur.name}`}
+          >
+            {veilleur.factionPattern && (
+              <span
+                className="court-leader-orb-icon"
+                style={{
+                  WebkitMaskImage: `url(${veilleur.factionPattern})`,
+                  maskImage: `url(${veilleur.factionPattern})`,
+                }}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Jauge faveur / menace */}
       <CourtTensionBar
         scoreVeilleur={scoreVeilleur}
         menaceHaute={menaceHaute ?? 0}
         status={status}
       />
 
-      <div className="court-veilleur">
-        <div className="court-veilleur-name">
-          Veilleur : <strong>{veilleur.name}</strong>
-          {veilleur.byInfluence && <span className="court-by-influence"> · tient ce lieu à distance</span>}
-        </div>
-        <div className="court-veilleur-members">
-          {veilleur.members.map(m => (
-            <span key={m.userId} className="court-member-pill">{m.displayName}</span>
-          ))}
-        </div>
-      </div>
-
+      {/* Boutons */}
       <div className="court-actions">
         <button onClick={handleSupport} disabled={balance < 1}>
           {isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
         </button>
         {showInvestChallenger && (
           <button className="challenge" onClick={handleChallenge} disabled={balance < 1}>
-            Investir pour mon expédition
+            Influencer
           </button>
         )}
         {showChallengeFlow && (
           <button className="challenge" onClick={handleCreateChallenger} disabled={balance < 1 || creatingExp}>
-            {creatingExp ? 'Création…' : 'Défier'}
+            {creatingExp ? 'Préparation…' : 'Influencer'}
           </button>
         )}
       </div>
+
       {balance < 1 && (
         <p className="court-no-balance">
           Vous n'avez plus de Couronnes. Récoltez sur vos lieux veillés ou résolvez des énigmes pour en gagner.
