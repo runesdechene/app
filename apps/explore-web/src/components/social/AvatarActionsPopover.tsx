@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { EmojiPicker } from './EmojiPicker'
-import { useUserNote } from '../../hooks/useUserNote'
-import { usePlayerStore } from '../../stores/playerStore'
 import './AvatarActionsPopover.css'
 
 type Mode = 'self' | 'other'
-type SubView = 'menu' | 'note' | 'picker'
+type SubView = 'menu' | 'picker'
 
 interface PropsBase {
   mode: Mode
@@ -33,20 +31,17 @@ type Props = PropsSelf | PropsOther
 
 /**
  * V0.7+ Mini popover qui s'ouvre au tap d'un avatar sur la carte.
- * - Mode self  : "Voir le profil" + "Laisser une note" (textarea inline)
+ * - Mode self  : "Voir le profil"
  * - Mode other : "Voir le profil" + "Envoyer un emoji" (picker inline)
  *
- * Rendu via createPortal au document.body pour que le textarea/inputs reçoivent
- * correctement les events natifs (caret au clic, navigation aux flèches, sélection)
- * sans interception par MapLibre. Suit l'avatar via requestAnimationFrame loop tant
- * qu'il est ouvert (suit le pan/zoom de la carte naturellement).
+ * Rendu via createPortal au document.body pour que les inputs du picker reçoivent
+ * correctement les events natifs sans interception par MapLibre. Suit l'avatar via
+ * requestAnimationFrame loop tant qu'il est ouvert (suit le pan/zoom de la carte).
  */
 export function AvatarActionsPopover(props: Props) {
   const [view, setView] = useState<SubView>('menu')
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
-  const ownNoteText = usePlayerStore(s => s.ownNoteText)
-  const hasNote = props.mode === 'self' && !!ownNoteText
 
   // Suit la position de l'avatar en continu (tolère pan/zoom de la carte)
   useEffect(() => {
@@ -113,15 +108,7 @@ export function AvatarActionsPopover(props: Props) {
             👁️ Voir le profil
           </button>
 
-          {props.mode === 'self' ? (
-            <button
-              type="button"
-              className="avatar-actions-popover__btn"
-              onClick={() => setView('note')}
-            >
-              📜 {hasNote ? 'Changer ma note' : 'Laisser un mot'}
-            </button>
-          ) : (
+          {props.mode === 'other' && (
             <button
               type="button"
               className="avatar-actions-popover__btn"
@@ -141,10 +128,6 @@ export function AvatarActionsPopover(props: Props) {
         </>
       )}
 
-      {view === 'note' && props.mode === 'self' && (
-        <NoteEditor onDone={props.onClose} onBack={() => setView('menu')} />
-      )}
-
       {view === 'picker' && props.mode === 'other' && (
         <EmojiPicker
           onPick={(emoji) => {
@@ -156,96 +139,4 @@ export function AvatarActionsPopover(props: Props) {
   )
 
   return createPortal(node, document.body)
-}
-
-/** Sous-composant : édition rapide de la note du moment (200 chars max, 24h). */
-function NoteEditor({ onDone, onBack }: { onDone: () => void; onBack: () => void }) {
-  const { note, setNoteText, clearNote } = useUserNote()
-  const [draft, setDraft] = useState(note.text ?? '')
-  const [saving, setSaving] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  // Synchronise quand la note arrive après mount
-  useEffect(() => {
-    setDraft(note.text ?? '')
-  }, [note.text])
-
-  // Focus + caret en fin de texte au mount (pour qu'on tape directement la suite)
-  useEffect(() => {
-    const ta = textareaRef.current
-    if (!ta) return
-    ta.focus()
-    const len = ta.value.length
-    ta.setSelectionRange(len, len)
-  }, [])
-
-  async function save() {
-    const next = draft.trim()
-    const current = note.text ?? ''
-    if (next === current) {
-      onDone()
-      return
-    }
-    setSaving(true)
-    try {
-      if (next.length === 0) await clearNote()
-      else await setNoteText(next)
-      onDone()
-    } catch (err) {
-      console.warn('[NoteEditor] save failed', err)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function clear() {
-    setSaving(true)
-    try {
-      await clearNote()
-      setDraft('')
-      onDone()
-    } catch (err) {
-      console.warn('[NoteEditor] clear failed', err)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  return (
-    <div className="avatar-actions-popover__note-edit">
-      <label>Mon mot du moment</label>
-      <textarea
-        ref={textareaRef}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value.slice(0, 200))}
-        maxLength={200}
-        disabled={saving}
-        placeholder="Un mot que les autres voyageurs verront 24h…"
-      />
-      <div className="avatar-actions-popover__note-edit-meta">
-        <span>{draft.length}/200</span>
-        {note.text && (
-          <button
-            type="button"
-            onClick={clear}
-            disabled={saving}
-            style={{
-              background: 'none', border: 'none', color: '#8a4a4a',
-              fontSize: 12, cursor: 'pointer', padding: 0,
-            }}
-          >
-            Effacer
-          </button>
-        )}
-      </div>
-      <div className="avatar-actions-popover__note-edit-actions">
-        <button type="button" onClick={onBack} disabled={saving}>
-          Retour
-        </button>
-        <button type="button" className="primary" onClick={save} disabled={saving}>
-          {saving ? '…' : 'Poser'}
-        </button>
-      </div>
-    </div>
-  )
 }

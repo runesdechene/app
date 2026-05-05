@@ -1,14 +1,7 @@
 import { memo, useState } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
-import { NoteOverlay } from '../social/NoteOverlay'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
-import { useNoteReactions } from '../../hooks/useNoteReactions'
-import { useMapStore } from '../../stores/mapStore'
 import './OnlinePlayerMarkers.css'
-
-// Au-dessus de ce zoom : note complète (bulle + texte). Sous ce seuil :
-// icône 📜 compacte (la carte reste lisible quand on dézoome large).
-const NOTE_FULL_ZOOM_THRESHOLD = 9
 
 interface OnlinePlayer {
   userId: string
@@ -17,8 +10,6 @@ interface OnlinePlayer {
   factionColor: string | null
   displayedTitles: string[]
   position: { lng: number; lat: number }
-  noteText?: string | null
-  notePostedAt?: string | null
 }
 
 interface Props {
@@ -28,8 +19,6 @@ interface Props {
    *  (sinon le state `flying` de l'envoyeur vit dans une instance déconnectée du Layer). */
   throwEmoji: (toUserId: string, emoji: string) => Promise<void>
 }
-
-const NOTE_TTL_MS = 24 * 60 * 60 * 1000
 
 export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, onSelectPlayer, throwEmoji }: Props) {
   const [popoverFor, setPopoverFor] = useState<string | null>(null)
@@ -68,14 +57,7 @@ function OtherPlayerMarker({
   onSelectPlayer,
   onSendEmoji,
 }: SubProps) {
-  // Callback ref via useState : refs natifs ne triggent pas de re-render au mount,
-  // donc NoteOverlay/AvatarActionsPopover ne recevaient jamais l'élément ancre.
   const [avatarEl, setAvatarEl] = useState<HTMLDivElement | null>(null)
-  const noteIsActive = !!(
-    player.noteText &&
-    player.notePostedAt &&
-    new Date(player.notePostedAt).getTime() > Date.now() - NOTE_TTL_MS
-  )
 
   return (
     <Marker
@@ -103,18 +85,7 @@ function OtherPlayerMarker({
             <span key={i} className="other-player-title">{title}</span>
           ))}
         </div>
-
       </div>
-
-      {/* V0.7+ Note éphémère portée vers document.body (compact = icône si zoom large) */}
-      {noteIsActive && !isPopoverOpen && (
-        <NoteOverlayForPlayer
-          anchorEl={avatarEl}
-          text={player.noteText!}
-          noteUserId={player.userId}
-          onTap={onTogglePopover}
-        />
-      )}
 
       {isPopoverOpen && (
         <AvatarActionsPopover
@@ -127,13 +98,4 @@ function OtherPlayerMarker({
       )}
     </Marker>
   )
-}
-
-function NoteOverlayForPlayer({
-  anchorEl, text, noteUserId, onTap,
-}: { anchorEl: HTMLElement | null; text: string; noteUserId: string; onTap: () => void }) {
-  const { reactions } = useNoteReactions(noteUserId)
-  const mapZoom = useMapStore(s => s.mapZoom)
-  const compact = mapZoom < NOTE_FULL_ZOOM_THRESHOLD
-  return <NoteOverlay anchorEl={anchorEl} text={text} reactions={reactions} onTap={onTap} compact={compact} />
 }

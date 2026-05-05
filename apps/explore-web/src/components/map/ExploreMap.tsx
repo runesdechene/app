@@ -23,8 +23,6 @@ import { OnlinePlayerMarkers } from './OnlinePlayerMarkers'
 import { FlyingEmojiLayer, type AvatarPositionResolver } from '../social/FlyingEmojiLayer'
 import { useEmojiThrows } from '../../hooks/useEmojiThrows'
 import { AvatarActionsPopover } from '../social/AvatarActionsPopover'
-import { NoteOverlay } from '../social/NoteOverlay'
-import { useNoteReactions } from '../../hooks/useNoteReactions'
 import { MapStyleSelect } from './MapStyleSelect'
 import { EnergyIndicator } from './EnergyIndicator'
 import { VeilleurNamePills } from './VeilleurNamePills'
@@ -93,19 +91,8 @@ export const ExploreMap = memo(function ExploreMap() {
   const { flying, throwEmoji } = useEmojiThrows()
   const [showSelfPopover, setShowSelfPopover] = useState(false)
   // Callback ref via state : un useRef ne déclenche pas de re-render quand le DOM
-  // s'attache, donc NoteOverlay / AvatarActionsPopover recevaient null forever.
+  // s'attache, donc AvatarActionsPopover recevait null forever.
   const [selfAvatarEl, setSelfAvatarEl] = useState<HTMLDivElement | null>(null)
-  // V0.7+ Note du moment — la note posée doit s'afficher sous mon propre avatar
-  // sur la carte (pas seulement pour les autres). Lecture depuis playerStore qui est
-  // synchronisé par useUserNote (utilisé dans le NoteEditor du popover).
-  const ownNoteText = usePlayerStore(s => s.ownNoteText)
-  const ownNotePostedAt = usePlayerStore(s => s.ownNotePostedAt)
-  const ownNoteIsActive = !!(
-    ownNoteText &&
-    ownNotePostedAt &&
-    new Date(ownNotePostedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000
-  )
-  const { reactions: ownNoteReactions } = useNoteReactions(ownNoteIsActive ? currentUserId : null)
   const [viewportSize, setViewportSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   useEffect(() => {
     const update = () => setViewportSize({ w: window.innerWidth, h: window.innerHeight })
@@ -834,15 +821,6 @@ export const ExploreMap = memo(function ExploreMap() {
               {userDisplayedTitles.map((title, i) => (
                 <span key={i} className="other-player-title">{title}</span>
               ))}
-              {ownNoteIsActive && !showSelfPopover && (
-                <NoteOverlay
-                  anchorEl={selfAvatarEl}
-                  text={ownNoteText!}
-                  reactions={ownNoteReactions}
-                  onTap={() => setShowSelfPopover(true)}
-                  compact={zoomLevel < 9}
-                />
-              )}
               {showSelfPopover && currentUserId && (
                 <AvatarActionsPopover
                   mode="self"

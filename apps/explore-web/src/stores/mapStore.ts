@@ -82,8 +82,7 @@ interface MapState {
   mapStyleMode: 'game' | 'detailed' | 'satellite'
   setMapStyleMode: (mode: 'game' | 'detailed' | 'satellite') => void
 
-  /** Niveau de zoom courant (0 monde, ~14 ville, ~22 rue). Mis à jour par ExploreMap.
-   *  Lu par les overlays qui veulent compacter à bas zoom (NoteOverlay → icône). */
+  /** Niveau de zoom courant (0 monde, ~14 ville, ~22 rue). Mis à jour par ExploreMap. */
   mapZoom: number
   setMapZoom: (z: number) => void
 

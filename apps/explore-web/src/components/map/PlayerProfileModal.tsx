@@ -12,10 +12,7 @@ import { FactionMembersModal } from './FactionMembersModal'
 import { VeteranBadge } from '../profile/VeteranBadge'
 import { GloryProgressBar } from '../profile/GloryProgressBar'
 import { LevelText } from '../profile/LevelText'
-import { useNoteReactions } from '../../hooks/useNoteReactions'
-import { useNoteReactors } from '../../hooks/useNoteReactors'
 import { useMutedUsers } from '../../hooks/useMutedUsers'
-import { NoteReactionsRow } from '../social/NoteReactionsRow'
 
 interface PlaceCard {
   id: string
@@ -105,20 +102,6 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function formatRelativeDate(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime()
-  const days = Math.floor(diffMs / 86400000)
-  if (days < 1) return "aujourd'hui"
-  if (days === 1) return 'hier'
-  if (days < 7) return `il y a ${days} j`
-  const weeks = Math.floor(days / 7)
-  if (weeks < 5) return `il y a ${weeks} sem`
-  const months = Math.floor(days / 30)
-  if (months < 12) return `il y a ${months} mois`
-  const years = Math.floor(days / 365)
-  return `il y a ${years} an${years > 1 ? 's' : ''}`
-}
-
 export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [profile, setProfile] = useState<PlayerProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -157,11 +140,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [savingTitles, setSavingTitles] = useState(false)
   const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null }>>([])
 
-  // V0.7+ Micro-social
-  const [otherNoteText, setOtherNoteText] = useState<string | null>(null)
-  const [otherNotePostedAt, setOtherNotePostedAt] = useState<string | null>(null)
-  const { reactions, addReaction, refetch: refetchReactions } = useNoteReactions(playerId)
-  const { reactors, refetch: refetchReactors } = useNoteReactors(playerId)
   const { isMuted, muteUser, unmuteUser } = useMutedUsers()
 
   const isSelf = profile?.userId === currentUserId
@@ -181,10 +159,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   useEffect(() => {
     async function load() {
-      const [profileRes, fragmentsRes, noteRes] = await Promise.all([
+      const [profileRes, fragmentsRes] = await Promise.all([
         supabase.rpc('get_player_profile', { p_user_id: playerId }),
         supabase.rpc('get_user_fragments', { p_user_id: playerId }),
-        supabase.from('users').select('note_text, note_posted_at').eq('id', playerId).single(),
       ])
       if (profileRes.data) {
         const p = profileRes.data as unknown as PlayerProfile
@@ -195,28 +172,10 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       if (fragmentsRes.data && Array.isArray(fragmentsRes.data)) {
         setPlayerFragments(fragmentsRes.data as typeof playerFragments)
       }
-      // V0.7+ Note de l'autre voyageur (filtrage 24h côté client par sécurité — la DB filtre aussi)
-      if (noteRes.data) {
-        const text = (noteRes.data as { note_text: string | null }).note_text
-        const postedAt = (noteRes.data as { note_posted_at: string | null }).note_posted_at
-        const expired = postedAt && new Date(postedAt).getTime() < Date.now() - 24 * 60 * 60 * 1000
-        setOtherNoteText(expired ? null : text)
-        setOtherNotePostedAt(expired ? null : postedAt)
-      }
       setLoading(false)
     }
     load()
   }, [playerId])
-
-
-  async function handleReactToOther(emoji: string) {
-    try {
-      await addReaction(playerId, emoji)
-      await Promise.all([refetchReactions(), refetchReactors()])
-    } catch (err) {
-      console.warn('[PlayerProfileModal] react_to_note failed', err)
-    }
-  }
 
   async function handleToggleMute() {
     try {
@@ -225,16 +184,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     } catch (err) {
       console.warn('[PlayerProfileModal] mute toggle failed', err)
     }
-  }
-
-  async function handleReportNote() {
-    if (!confirm('Signaler cette note pour modération ?')) return
-    const { error } = await supabase.rpc('report_note', { p_target_user_id: playerId })
-    if (error) {
-      alert('Le signalement a échoué : ' + (error.message ?? 'erreur inconnue'))
-      return
-    }
-    alert('Signalement envoyé. Merci.')
   }
 
   function handleStartEdit() {
@@ -581,111 +530,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   Explorateur depuis le {formatDate(profile.joinedAt)}
                 </p>
 
-                {/* "Mon mot du moment" édité uniquement depuis la carte (avatar → popover).
-                    Décision Uriel 2026-05-02 : pas d'input dans le profil, c'est moche. */}
-
-                {!isSelf && otherNoteText && (
-                  <div style={{
-                    marginTop: 12,
-                    padding: 10,
-                    background: '#fdf3d6',
-                    border: '1px solid #c8a874',
-                    borderRadius: 8,
-                  }}>
-                    <div style={{
-                      fontSize: 10, textTransform: 'uppercase', color: '#7a4a1a',
-                      fontWeight: 600, letterSpacing: '0.04em', marginBottom: 4,
-                    }}>
-                      {profile.name} {otherNotePostedAt && `· ${formatRelativeDate(otherNotePostedAt)}`}
-                    </div>
-                    <p style={{
-                      fontStyle: 'italic', color: '#3a2a1a', margin: '0 0 6px 0',
-                      fontSize: 14, lineHeight: 1.32,
-                    }}>
-                      {otherNoteText}
-                    </p>
-                    <NoteReactionsRow reactions={reactions} />
-
-                    {/* Liste détaillée des reactors par emoji (qui a réagi) — V0.7+ feature */}
-                    {reactors.length > 0 && (
-                      <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        {reactions.map(({ emoji }) => {
-                          const list = reactors.filter(r => r.emoji === emoji)
-                          if (list.length === 0) return null
-                          return (
-                            <div key={emoji} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: 18, lineHeight: 1 }}>{emoji}</span>
-                              {list.map(r => (
-                                <span
-                                  key={r.reactorUserId}
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 4,
-                                    background: 'rgba(244, 232, 200, 0.6)',
-                                    border: '1px solid rgba(90, 39, 24, 0.15)',
-                                    borderRadius: 999,
-                                    padding: '2px 8px 2px 2px',
-                                    fontSize: 12,
-                                    color: '#3a2a1a',
-                                  }}
-                                >
-                                  {r.reactorAvatarUrl ? (
-                                    <img
-                                      src={r.reactorAvatarUrl}
-                                      alt=""
-                                      style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }}
-                                    />
-                                  ) : (
-                                    <span style={{
-                                      width: 20, height: 20, borderRadius: '50%',
-                                      background: '#8a6f4a', color: '#fff', fontSize: 11, fontWeight: 700,
-                                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                    }}>
-                                      {r.reactorName.charAt(0).toUpperCase()}
-                                    </span>
-                                  )}
-                                  {r.reactorName}
-                                </span>
-                              ))}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-
-                    {/* Mini picker contextuel : 7 emojis salutation pour réagir vite */}
-                    <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
-                      {['👋', '❤️', '🤝', '🙏', '🌳', '☕', '🪙'].map(e => (
-                        <button
-                          key={e}
-                          type="button"
-                          onClick={() => handleReactToOther(e)}
-                          style={{
-                            background: '#fff', border: '1px solid #d4c4a4',
-                            borderRadius: 6, padding: '3px 8px', fontSize: 16,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {e}
-                        </button>
-                      ))}
-                    </div>
-                    <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                      <button
-                        type="button"
-                        onClick={handleReportNote}
-                        style={{
-                          background: 'none', border: '1px dashed #b87878',
-                          color: '#8a4a4a', fontSize: 12, padding: '3px 8px',
-                          borderRadius: 4, cursor: 'pointer',
-                        }}
-                      >
-                        ⚠️ Signaler
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* V0.7+ Mute soft — petit lien discret en bas, l'utilisateur ne va le
                     chercher que s'il en a vraiment besoin. */}
