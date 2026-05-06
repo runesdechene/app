@@ -5,7 +5,7 @@
   position: fixed;
   inset: 0;
   background: rgba(40, 30, 20, 0.4);
-  z-index: 16; /* au-dessus du FAB (z-index: 15) */
+  z-index: 9490; /* au-dessus du HUD courant, en-dessous des modales d'expé */
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;

@@ -5,7 +5,7 @@
   position: fixed;
   inset: 0;
   background: rgba(40, 30, 20, 0.5);
-  z-index: 950;
+  z-index: 9510;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -650,7 +650,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.92);
-  z-index: 1000;
+  z-index: 9520;
   display: flex;
   align-items: center;
   justify-content: center;
