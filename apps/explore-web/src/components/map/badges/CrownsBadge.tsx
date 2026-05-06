@@ -8,7 +8,7 @@ import { InfoModal } from '../modals/InfoModal'
 // d'encodage source / PWA cache observés par le passé.
 
 const TXT_TITLE       = 'Couronnes de Chêne'
-const TXT_DESCRIPTION = 'La monnaie du jeu. Récoltez les coffres qui apparaissent chaque jour sur vos lieux veillés, et gagnez-en en résolvant les énigmes. Investissez vos Couronnes sur la Cour de chaque lieu pour soutenir un veilleur ou poser votre marque à distance.'
+const TXT_DESCRIPTION = 'La monnaie du jeu. Récoltez les coffres qui apparaissent chaque jour sur vos lieux veillés, et gagnez-en en résolvant les énigmes. Investissez vos Couronnes en mécénat sur un lieu pour soutenir un veilleur ou poser votre marque à distance — plus un lieu reçoit de Couronnes, plus il rayonne sur la carte.'
 const TXT_ROW_SOLO    = 'Récolte solo'
 const TXT_ROW_SOLO_VAL = '+1 Couronne'
 const TXT_ROW_EXP     = 'Récolte en expédition'

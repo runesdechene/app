@@ -54,6 +54,9 @@ export function PatronsList({ patrons, currentUserId }: PatronsListProps) {
           </div>
         )
       })}
+      <div className="patrons-footer">
+        Plus de couronnes sont investies sur ce lieu, plus ce lieu rayonne sur la carte.
+      </div>
     </div>
   )
 }
