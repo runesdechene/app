@@ -62,12 +62,12 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     const map: Record<string, { display_name: string; avatar_url: string | null; faction_color: string | null }> = {}
     if (current.chief && current.chief.user_id) {
       map[current.chief.user_id] = {
-        display_name: chief.display_name,
-        avatar_url: chief.avatar_url,
-        faction_color: chief.faction_color,
+        display_name: current.chief.display_name,
+        avatar_url: current.chief.avatar_url,
+        faction_color: current.chief.faction_color,
       }
     }
-    const validated = validatedParticipants ?? []
+    const validated = current.validated_participants ?? []
     for (const p of validated) {
       if (!p || !p.user_id) continue
       map[p.user_id] = {
