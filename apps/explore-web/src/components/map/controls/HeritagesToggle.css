@@ -123,13 +123,23 @@
 
 .territory-name-text {
   font-family:  'Bebas Neue', sans-serif;
-  font-size: 18px;
+  /* font-size injecté en inline style depuis ExploreMap.tsx (interpole sur le zoom) */
   font-weight: 400;
   letter-spacing: 0.01em;
   white-space: nowrap;
   color: var(--t-color);
   padding: 2px;
-  text-shadow: 0 0 10px white;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.95),
+    0 0 16px rgba(255, 255, 255, 0.7);
+  transition: font-size 0.2s ease;
+}
+
+/* V0.7 — Force le marker portant le titre du territoire AU-DESSUS des autres
+   markers HTML (pilules veilleurs notamment). MapLibre attribue un z-index
+   automatique aux markers selon leur projection ; on l'écrase ici. */
+.maplibregl-marker:has(.territory-name-label) {
+  z-index: 1000 !important;
 }
 
 .territory-name-rate {
