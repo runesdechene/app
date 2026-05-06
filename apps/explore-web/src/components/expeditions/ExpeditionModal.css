@@ -96,11 +96,27 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 .expedition-modal-chat-col .expedition-chat-messages {
   flex: 1 1 auto;
   max-height: none;
   min-height: 0;
+  overflow-y: auto;
+}
+
+/* ─────────── Scrollbars discrètes (cachées sur Firefox + style mince Chrome) ─────────── */
+.expedition-modal-main,
+.expedition-modal-chat-col .expedition-chat-messages {
+  scrollbar-width: none;        /* Firefox : invisible mais scrollable */
+  -ms-overflow-style: none;     /* IE/Edge ancien */
+}
+.expedition-modal-main::-webkit-scrollbar,
+.expedition-modal-chat-col .expedition-chat-messages::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                /* Chrome/Safari : caché */
 }
 
 /* Mobile : retour en colonne unique */
