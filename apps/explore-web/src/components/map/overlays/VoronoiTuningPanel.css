@@ -4,7 +4,9 @@
   position: fixed;
   top: 120px;
   right: 16px;
-  z-index: 1500;
+  /* z-index aligné sur les éléments d'interface carte (energy/influence
+     ~15) pour qu'il passe SOUS toute modale ou panel ouvert. */
+  z-index: 15;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -24,16 +26,6 @@
   .voronoi-tuning-fab
   {
     top: 67px;
-  }
-  /* Sur mobile, quand un panneau plein-écran est actif (notifications,
-     chat, quests), le FAB de debug Voronoi se retrouvait visuellement
-     par-dessus le panneau (contexte de stacking différent). On le cache
-     pendant qu'un panel est actif pour ne pas masquer la croix de
-     fermeture du panel. */
-  [data-mobile-panel="notifications"] .voronoi-tuning-fab,
-  [data-mobile-panel="chat"] .voronoi-tuning-fab,
-  [data-mobile-panel="quests"] .voronoi-tuning-fab {
-    display: none;
   }
 }
 
