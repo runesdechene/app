@@ -431,7 +431,7 @@ export const ExploreMap = memo(function ExploreMap() {
               placeId: f.properties.id,
               // V0.7 : faction = celle de la veille (ou '__neutral__' si expédition multi-faction)
               faction: ov.factionId ?? '__neutral__',
-              factionTitle: f.properties.tagTitle,
+              factionTitle: ov.factionTitle ?? '',
               tagColor: ov.tagColor ?? f.properties.tagColor,
               factionPattern: ov.factionPattern ?? '',
               score: 1,

@@ -6,6 +6,7 @@ interface PlaceOverride {
   score?: number
   claimed?: boolean
   factionId?: string
+  factionTitle?: string
   factionPattern?: string
   /** V0.7 — userId du veilleur principal (pour ouvrir son profil au click pilule carte) */
   veilleurUserId?: string

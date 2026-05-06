@@ -8,20 +8,20 @@ const NEUTRAL_COLOR = '#8a6f4a'
 // puis réutilisé par pushVeilleOverride pour les plants suivants.
 const factionColors = new Map<string, string>()
 const factionPatterns = new Map<string, string>()
+const factionTitles = new Map<string, string>()
 let factionsLoaded = false
 
 async function ensureFactionsCache(): Promise<void> {
   if (factionsLoaded) return
-  // V0.7 : on prend f.pattern (SVG icône) pas f.image_url (bannière .webp)
-  // pour cohérence avec les markers carte (rendu icône blanche sur disc couleur faction).
-  const { data, error } = await supabase.from('factions').select('id, color, pattern')
+  const { data, error } = await supabase.from('factions').select('id, color, pattern, title')
   if (error) {
     console.error('[veilles] factions fetch error:', error.message)
     return
   }
-  for (const f of (data ?? []) as Array<{ id: string; color: string | null; pattern: string | null }>) {
+  for (const f of (data ?? []) as Array<{ id: string; color: string | null; pattern: string | null; title: string | null }>) {
     if (f.color) factionColors.set(f.id, f.color)
     if (f.pattern) factionPatterns.set(f.id, f.pattern)
+    if (f.title) factionTitles.set(f.id, f.title)
   }
   factionsLoaded = true
 }
@@ -72,6 +72,9 @@ export function pushVeilleOverride(
   const factionPattern = isNeutral || !factionId
     ? undefined
     : factionPatterns.get(factionId)
+  const factionTitle = isNeutral
+    ? 'Neutre'
+    : (factionId ? factionTitles.get(factionId) : undefined)
 
   useMapStore.getState().setPlaceOverride(placeId, {
     claimed: true,
@@ -79,6 +82,7 @@ export function pushVeilleOverride(
     // dans le territoryWorker, évite le merge avec les territoires colorés).
     factionId: isNeutral ? '__neutral__' : (factionId ?? undefined),
     tagColor,
+    factionTitle,
     factionPattern,
     veilleurUserId,
     veilleurName,
