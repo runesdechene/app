@@ -32,7 +32,7 @@
   background: #f5e9d4;
   border-radius: 14px;
   padding: 32px;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   color: #8a7050;
   text-align: center;
@@ -57,7 +57,7 @@
               inset 1px 1px 1px rgba(255, 255, 255, 0.3);
 }
 .expedition-modal-eyebrow {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.24em;
@@ -66,7 +66,7 @@
   margin-bottom: 6px;
 }
 .expedition-modal-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-weight: 500;
   font-size: 30px;
@@ -75,7 +75,7 @@
   margin: 0 0 8px;
 }
 .expedition-modal-when {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   color: #6e5435;
   font-style: italic;
@@ -97,7 +97,7 @@
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
 }
 .expedition-modal-call-label {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.24em;
@@ -118,7 +118,7 @@
 }
 .expedition-modal-call-edit:hover { color: #a14a2a; }
 .expedition-modal-call-text {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 17px;
   color: #4a3925;
@@ -130,7 +130,7 @@
   border: 1px solid rgba(184, 154, 106, 0.5);
   border-radius: 6px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 16px;
   color: #2a1f10;
@@ -150,7 +150,7 @@
   color: #6e5435;
   padding: 6px 14px;
   border-radius: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   cursor: pointer;
 }
@@ -164,7 +164,7 @@
   padding: 18px 28px;
   background: rgba(255, 248, 235, 0.5);
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 16px;
   line-height: 1.6;
@@ -189,7 +189,7 @@
 }
 .emm-info-label {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -198,7 +198,7 @@
   margin-bottom: 2px;
 }
 .emm-info-value {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   color: #2a1f10;
   line-height: 1.4;
@@ -210,7 +210,7 @@
   gap: 5px;
   padding: 1px 8px 1px 6px;
   border-radius: 9px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -227,7 +227,7 @@
   color: #faf2dd;
   align-items: center;
   justify-content: center;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
@@ -241,7 +241,7 @@
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
 }
 .expedition-modal-section h3 {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.24em;
@@ -275,13 +275,13 @@
   width: 32px; height: 32px; font-size: 13px;
 }
 .expedition-modal-pending-head strong {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   color: #2a1f10;
   font-weight: 500;
 }
 .expedition-modal-pending-msg {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 15px;
   color: #4a3925;
@@ -296,7 +296,7 @@
 }
 
 .emm-btn-mini {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -313,7 +313,7 @@
 .emm-btn-mini:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .emm-pill-chief {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -340,7 +340,7 @@
 }
 .expedition-modal-companion-info { min-width: 0; }
 .expedition-modal-companion-name {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   color: #2a1f10;
   font-weight: 500;
@@ -360,7 +360,7 @@
 }
 .expedition-modal-request label {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -375,7 +375,7 @@
   border: 1px solid rgba(184, 154, 106, 0.45);
   border-radius: 6px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   font-style: italic;
   color: #2a1f10;
@@ -386,7 +386,7 @@
 .expedition-modal-status {
   padding: 16px 28px;
   background: rgba(184, 154, 106, 0.12);
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   color: #6e5435;
   text-align: center;
@@ -401,7 +401,7 @@
   border: none;
   padding: 14px 22px;
   border-radius: 8px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -418,7 +418,7 @@
   color: #6e5435;
   padding: 8px 16px;
   border-radius: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   cursor: pointer;
 }
@@ -436,7 +436,7 @@
 .expedition-modal-flag {
   background: none;
   border: none;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 12px;
   color: #8a7050;
   cursor: pointer;
@@ -447,7 +447,7 @@
 .expedition-modal-flag:hover { color: #a14a2a; }
 
 .emm-empty {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   color: #8a7050;
   text-align: center;
@@ -477,14 +477,14 @@
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
 }
 .emm-report-author strong {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-size: 18px;
   color: #2a1f10;
 }
 .emm-report-badge {
   margin-left: auto;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -496,7 +496,7 @@
 }
 .emm-report-badge-mine { background: rgba(161, 74, 42, 0.16); color: #a14a2a; }
 .emm-report-text {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
   color: #4a3925;
@@ -519,7 +519,7 @@
   overflow-y: auto;
 }
 .expedition-chat-empty {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   color: #8a7050;
   text-align: center;
@@ -544,7 +544,7 @@
   color: #faf2dd;
   align-items: center;
   justify-content: center;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 700;
   flex-shrink: 0;
@@ -557,7 +557,7 @@
   border: 1px solid rgba(184, 154, 106, 0.4);
   padding: 8px 12px;
   border-radius: 14px;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   color: #2a1f10;
   line-height: 1.45;
@@ -569,7 +569,7 @@
 }
 .expedition-chat-author {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   color: #6b5230;
@@ -590,7 +590,7 @@
   border: 1px solid rgba(184, 154, 106, 0.4);
   border-radius: 18px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   color: #2a1f10;
 }
@@ -641,7 +641,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-weight: 600;
   color: #6e5435;
   aspect-ratio: 1;
@@ -678,7 +678,7 @@
   bottom: 24px; left: 50%;
   transform: translateX(-50%);
   color: #faf2dd;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-size: 18px;
 }
@@ -688,7 +688,7 @@
 .report-editor-section { margin-bottom: 18px; }
 .report-editor-label {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -703,7 +703,7 @@
   border: 1px solid rgba(184, 154, 106, 0.45);
   border-radius: 6px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
   color: #2a1f10;
@@ -713,7 +713,7 @@
 }
 .report-editor-counter {
   text-align: right;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   color: #8a7050;
   margin-top: 4px;
@@ -772,7 +772,7 @@
 }
 .report-editor-uploading,
 .report-editor-hint {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   color: #8a7050;
   font-size: 13px;
@@ -790,13 +790,13 @@
   cursor: pointer;
 }
 .report-editor-toggle-title {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   color: #2a1f10;
   font-weight: 500;
 }
 .report-editor-toggle-help {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   color: #8a7050;
   margin-top: 2px;
@@ -827,7 +827,7 @@
   border: 1px solid #a14a2a;
   border-radius: 6px;
   color: #a14a2a;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
 }
 .report-editor-actions {
@@ -842,7 +842,7 @@
   color: #6e5435;
   padding: 10px 16px;
   border-radius: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   cursor: pointer;
 }
@@ -853,7 +853,7 @@
   border: none;
   padding: 12px 22px;
   border-radius: 8px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -864,7 +864,7 @@
 .report-editor-xp-hint {
   text-align: center;
   margin-top: 10px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 12px;
   color: #8a7050;
   letter-spacing: 0.06em;
@@ -885,7 +885,7 @@
 }
 .emm-flag-dialog h4 {
   margin: 0 0 12px;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-size: 18px;
   color: #2a1f10;
@@ -900,7 +900,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 15px;
   color: #4a3925;
   cursor: pointer;
@@ -912,7 +912,7 @@
   border: 1px solid rgba(184, 154, 106, 0.45);
   border-radius: 6px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 14px;
   font-style: italic;
   box-sizing: border-box;
@@ -931,7 +931,7 @@
   color: #6e5435;
   padding: 8px 14px;
   border-radius: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   cursor: pointer;
 }
@@ -941,7 +941,7 @@
   border-color: #a14a2a;
 }
 .emm-flag-done {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   color: #5e7044;
   text-align: center;

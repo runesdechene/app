@@ -33,7 +33,7 @@
   background: linear-gradient(180deg, #faf2dd, #f5e9d4);
 }
 .expedition-creator-eyebrow {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.24em;
@@ -42,7 +42,7 @@
   margin-bottom: 4px;
 }
 .expedition-creator-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-weight: 500;
   font-size: 28px;
@@ -71,7 +71,7 @@
 }
 .ec-label {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -86,7 +86,7 @@
   border: 1px solid rgba(184, 154, 106, 0.45);
   border-radius: 6px;
   background: #fff8eb;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   color: #2a1f10;
   box-sizing: border-box;
@@ -96,7 +96,7 @@
 .ec-textarea:focus { outline: 2px solid #a14a2a; outline-offset: 1px; }
 .ec-counter {
   text-align: right;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   color: #8a7050;
   margin-top: 4px;
@@ -116,7 +116,7 @@
   border-radius: 6px;
   background: transparent;
   color: #6e5435;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -146,7 +146,7 @@
 }
 .ec-slot-num {
   display: block;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-size: 32px;
   color: #2a1f10;
@@ -155,7 +155,7 @@
 .ec-slot-label {
   display: block;
   margin-top: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -189,13 +189,13 @@
   cursor: pointer;
 }
 .ec-toggle-title {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-size: 16px;
   color: #2a1f10;
   font-weight: 500;
 }
 .ec-toggle-help {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   color: #8a7050;
   margin-top: 2px;
@@ -226,7 +226,7 @@
   border: 1px solid #a14a2a;
   border-radius: 6px;
   color: #a14a2a;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   margin-bottom: 12px;
 }
@@ -252,7 +252,7 @@
   border: none;
   border-radius: 8px;
   padding: 12px 22px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.08em;

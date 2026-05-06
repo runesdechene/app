@@ -10,7 +10,7 @@
 .expeditions-list-empty {
   text-align: center;
   padding: 32px 22px;
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 15px;
   color: #8a7050;
@@ -37,7 +37,7 @@
   gap: 5px;
   padding: 3px 10px 3px 8px;
   border-radius: 14px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -53,7 +53,7 @@
 .expedition-card-body { min-width: 0; }
 
 .expedition-card-when {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -64,7 +64,7 @@
 .expedition-card-when.is-muted { color: #8a7050; }
 
 .expedition-card-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-signature);
   font-style: italic;
   font-weight: 500;
   font-size: 21px;
@@ -74,7 +74,7 @@
 }
 
 .expedition-card-call {
-  font-family: 'Newsreader', serif;
+  font-family: var(--font-body);
   font-style: italic;
   font-size: 14px;
   color: #6e5435;
@@ -86,7 +86,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 13px;
   color: #8a7050;
   flex-wrap: wrap;
@@ -153,7 +153,7 @@
   flex-shrink: 0;
 }
 .expedition-card-slots-num {
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 18px;
   font-weight: 700;
   color: #2a1f10;
@@ -167,7 +167,7 @@
 }
 .expedition-card-slots-label {
   display: block;
-  font-family: 'Public Sans', sans-serif;
+  font-family: var(--font-accent);
   font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
