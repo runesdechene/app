@@ -18,6 +18,14 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   place_taken_back_gps: '\uD83D\uDEE1\uFE0F',
   place_reaffirmed: '\uD83D\uDEE1\uFE0F',
   mecene_principal_gained: '\uD83E\uDE99',
+  // V0.7+ \u2014 Exp\u00E9ditions joueur-joueur
+  expedition_join_request: '\uD83D\uDC4B',     // \uD83D\uDC4B
+  expedition_auto_joined: '\u2728',             // \u2728
+  expedition_validated: '\u2705',               // \u2705
+  expedition_rejected: '\u274C',                // \u274C
+  expedition_modified: '\u270F\uFE0F',          // \u270F\uFE0F
+  expedition_cancelled: '\uD83D\uDEAB',         // \uD83D\uDEAB
+  expedition_report_posted: '\uD83D\uDCDC',     // \uD83D\uDCDC
 }
 
 function formatMessage(notif: Notification): string {
@@ -65,6 +73,23 @@ function formatMessage(notif: Notification): string {
     }
     case 'mecene_principal_gained':
       return `Vous êtes désormais Mécène Principal de ${place}`
+    // V0.7+ — Expéditions
+    case 'expedition_join_request':
+      return `${d.requesterName || 'Quelqu\'un'} demande à rejoindre ${d.expeditionName || 'ton expédition'}`
+    case 'expedition_auto_joined':
+      return `${d.requesterName || 'Un voyageur'} a rejoint ${d.expeditionName || 'ton expédition'}`
+    case 'expedition_validated':
+      return d.autoValidated
+        ? `Tu rejoins ${d.expeditionName || 'l\'expédition'}`
+        : `Le chef a validé ta participation à ${d.expeditionName || 'l\'expédition'}`
+    case 'expedition_rejected':
+      return `Le chef n'a pas retenu ta demande pour ${d.expeditionName || 'l\'expédition'}`
+    case 'expedition_modified':
+      return `${d.expeditionName || 'Une expédition'} a été modifiée`
+    case 'expedition_cancelled':
+      return `${d.expeditionName || 'Une expédition'} a été annulée`
+    case 'expedition_report_posted':
+      return `${d.authorName || 'Un compagnon'} a laissé un compte rendu sur ${d.expeditionName || 'l\'expédition'}`
   }
 }
 

@@ -11,6 +11,11 @@ export interface Notification {
     | 'place_taken_remote' | 'place_taken_remote_self'
     | 'place_taken_back_gps' | 'place_reaffirmed'
     | 'mecene_principal_gained'
+    // V0.7+ — Expéditions joueur-joueur
+    | 'expedition_join_request' | 'expedition_auto_joined'
+    | 'expedition_validated' | 'expedition_rejected'
+    | 'expedition_modified' | 'expedition_cancelled'
+    | 'expedition_report_posted'
   data: {
     actorName?: string
     actorId?: string
@@ -33,6 +38,16 @@ export interface Notification {
     newExpeditionId?: string
     reclaimedBy?: string
     plantedByUser?: string
+    // V0.7+ — Expéditions joueur-joueur
+    expeditionName?: string
+    requesterUserId?: string
+    requesterName?: string
+    chiefName?: string
+    authorName?: string
+    isPublic?: boolean
+    autoValidated?: boolean
+    message?: string | null
+    changedFields?: string[]
   }
   read: boolean
   created_at: string
