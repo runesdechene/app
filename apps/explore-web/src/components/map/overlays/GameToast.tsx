@@ -241,20 +241,23 @@ export function GameToast() {
 
   return (
     <div className={`game-toast-container${minimized ? ' game-toast-minimized' : ''}`}>
-      <button
-        className="game-toast-minimize"
+      <header className="game-toast-header">
+        <h2 className="game-toast-title">Activité de la carte</h2>
+        <button
+        className="game-toast-collapse"
         onClick={() => setMinimized(!minimized)}
         aria-label={minimized ? 'Agrandir' : 'Réduire'}
       >
-        {minimized ? `\u25BC ${toasts.length}` : '\u2013'}
+        {minimized ? '\u25BE' : '\u25B4'}
       </button>
-      {!minimized && (
+      </header>
+      <div className={`game-toast-content${minimized ? ' is-minimized' : ''}`}>
         <div className="game-toast-list" ref={containerRef}>
           {sortedToasts.map(toast => (
             <ToastItem key={toast.id} toast={toast} />
           ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }

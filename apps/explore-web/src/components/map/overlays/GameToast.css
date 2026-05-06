@@ -25,19 +25,48 @@
     max-width: calc(100vw - 140px);
   }
 }
-.game-toast-minimize {
-  align-self: flex-end;
+/* Header aligné sur QuestsBoardPanel — titre serif italique + bouton ▴/▾ */
+.game-toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 4px 8px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+  flex-shrink: 0;
+  gap: 8px;
+}
+.game-toast-title {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-ink);
+  line-height: 1;
+  margin: 0;
+}
+.game-toast-collapse {
   background: none;
   border: none;
+  font-size: 18px;
+  color: var(--color-ink-light);
   cursor: pointer;
-  font-size: 14px;
-  color: var(--color-sepia, #C19A6B);
-  padding: 0 4px;
-  line-height: 1;
-  opacity: 0.6;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.game-toast-minimize:hover {
-  opacity: 1;
+.game-toast-collapse:hover {
+  background: rgba(193, 154, 107, 0.18);
+}
+.game-toast-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.game-toast-content.is-minimized {
+  display: none;
 }
 .game-toast-minimized {
   max-width: none;
