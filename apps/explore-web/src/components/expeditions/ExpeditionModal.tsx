@@ -193,21 +193,29 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </div>
         )}
 
-        {/* Topbar minimale — juste les actions (retour / edit / close).
-            Le contenu (titre, eyebrow, appel) est désormais DANS le main
-            scrollable, plus haut. Comme ça il scroll avec le reste et
-            la zone visible n'est pas amputée par un header sticky. */}
-        <div className="expedition-modal-topbar">
-          {editorOpen ? (
+        {/* Topbar : visible UNIQUEMENT en mode édition (titre 'Modifier
+            l'expédition' + ← retour + ×). En mode info, on n'affiche
+            rien — les actions ✎ et × flottent en absolute top-right
+            (cf. .expedition-modal-floating). */}
+        {editorOpen && (
+          <div className="expedition-modal-topbar is-editing">
             <button
               className="expedition-modal-back"
               onClick={() => setEditorOpen(false)}
               aria-label="Annuler l'édition"
               title="Annuler l'édition"
             >←</button>
-          ) : <span className="expedition-modal-topbar-spacer" />}
-          <div className="expedition-modal-topbar-actions">
-            {!editorOpen && isChief && e.status === 'published' && (
+            <h3 className="expedition-modal-topbar-title">Modifier l'expédition</h3>
+            <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+          </div>
+        )}
+
+        {/* Actions flottantes en absolute top-right — visibles en mode
+            info uniquement. Le × est caché sur mobile-avec-chat (tabs
+            l'ont déjà). */}
+        {!editorOpen && (
+          <div className="expedition-modal-floating">
+            {isChief && e.status === 'published' && (
               <button
                 className="expedition-modal-edit"
                 onClick={() => setEditorOpen(true)}
@@ -215,10 +223,13 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
                 title="Modifier l'expédition"
               >✎</button>
             )}
-            {/* Le × de la topbar — caché mobile car déjà dans les tabs. */}
-            <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+            <button
+              className="expedition-modal-close floating-close"
+              onClick={onClose}
+              aria-label="Fermer"
+            >×</button>
           </div>
-        </div>
+        )}
 
         <div className={[
           'expedition-modal-shell',

@@ -312,10 +312,8 @@
 
 .expedition-modal > * { flex-shrink: 0; }
 
-/* Topbar minimale — barre d'actions sticky en haut de la modale.
-   Le titre/eyebrow/appel ne vivent PLUS dans la topbar mais dans
-   le main scrollable (cf. .expedition-modal-intro). */
-.expedition-modal-topbar {
+/* Topbar — visible UNIQUEMENT en mode édition (← + titre + ×). */
+.expedition-modal-topbar.is-editing {
   position: relative;
   padding: 10px 16px;
   display: flex;
@@ -326,11 +324,24 @@
   background: #faf2dd;
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
 }
-.expedition-modal-topbar-spacer {
-  display: inline-block;
-  width: 1px;
+.expedition-modal-topbar-title {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-ink);
+  margin: 0;
+  flex: 1;
+  text-align: center;
 }
-.expedition-modal-topbar-actions {
+
+/* Actions flottantes en absolute top-right — visibles en mode info.
+   Pas de fond, pas de barre — juste les boutons sur l'angle. */
+.expedition-modal-floating {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  z-index: 6;
   display: flex;
   gap: 8px;
   align-items: center;
@@ -345,22 +356,32 @@
 }
 
 @media (max-width: 760px) {
-  .expedition-modal-topbar {
-    padding: 8px 12px;
-  }
-  /* Sur mobile, le × est déjà dans les tabs (s'il y a chat) — on le
-     cache dans la topbar pour éviter le doublon. Si pas de chat,
-     pas de tabs, donc le × topbar reste visible. */
-  .expedition-modal.mobile-tab-info .expedition-modal-topbar .expedition-modal-close,
-  .expedition-modal.mobile-tab-chat .expedition-modal-topbar .expedition-modal-close {
-    display: none;
-  }
-  /* Topbar masquée en mode chat — pas d'action utile (× est dans les tabs). */
-  .expedition-modal.mobile-tab-chat .expedition-modal-topbar {
-    display: none;
+  .expedition-modal-topbar.is-editing {
+    /* Topbar éditée gère le safe-top — c'est le 1er élément en mode édition. */
+    padding: calc(var(--safe-top, 0px) + 10px) 12px 10px 12px;
   }
   .expedition-modal-intro {
     padding: 18px 16px 16px 16px;
+  }
+  /* Mobile + tabs visibles : tabs ont leur propre × → on cache le × du
+     floating pour éviter le doublon. Le ✎ reste visible. */
+  .expedition-modal.mobile-tab-info .expedition-modal-floating .floating-close,
+  .expedition-modal.mobile-tab-chat .expedition-modal-floating .floating-close {
+    display: none;
+  }
+  /* Mode chat : .left est cachée, donc l'intro et son ✎ aussi → on
+     cache le floating entier (sinon il flotte au-dessus du chat sans
+     contexte). */
+  .expedition-modal.mobile-tab-chat .expedition-modal-floating {
+    display: none;
+  }
+  /* Mobile avec tabs : décaler le floating SOUS les tabs (~46px + safe-top). */
+  .expedition-modal.mobile-tab-info .expedition-modal-floating {
+    top: calc(var(--safe-top, 0px) + 56px);
+  }
+  /* Mobile sans tabs (pas de chat dispo) : respecter le safe-top du notch. */
+  .expedition-modal:not(.mobile-tab-info):not(.mobile-tab-chat) .expedition-modal-floating {
+    top: calc(var(--safe-top, 0px) + 8px);
   }
 }
 .expedition-modal-header-content {
