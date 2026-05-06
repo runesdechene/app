@@ -37,6 +37,21 @@
 }
 .expedition-creator-embedded .expedition-creator-body {
   padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  align-content: start;
+}
+.expedition-creator-embedded .ec-section {
+  margin-bottom: 0;
+}
+.expedition-creator-embedded .ec-section-full {
+  grid-column: 1 / -1;
+}
+@media (max-width: 760px) {
+  .expedition-creator-embedded .expedition-creator-body {
+    grid-template-columns: 1fr;
+  }
 }
 .expedition-creator-embedded .expedition-creator-footer {
   background: #faf2dd;

@@ -59,6 +59,11 @@
   min-height: 0;
   /* hauteur définie par flex stretch (parent .expedition-modal-shell flex row) */
 }
+
+/* Mode édition — on cache le chat pour donner toute la place au formulaire */
+.expedition-modal-shell.is-editing .expedition-modal-chat-col {
+  display: none;
+}
 .expedition-modal-chat-col-header {
   padding: 14px 18px 8px;
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);

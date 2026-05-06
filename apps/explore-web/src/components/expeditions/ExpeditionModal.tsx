@@ -151,7 +151,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
       <div className="expedition-modal" onClick={(ev) => ev.stopPropagation()}>
-        <div className="expedition-modal-shell">
+        <div className={`expedition-modal-shell${editorOpen ? ' is-editing' : ''}`}>
         <div className="expedition-modal-left">
         <header className="expedition-modal-header">
           <div className="expedition-modal-header-content">
