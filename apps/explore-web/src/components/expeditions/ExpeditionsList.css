@@ -19,11 +19,8 @@
 /* ─────────── ExpeditionCard ─────────── */
 
 .expedition-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 14px;
-  padding: 14px 22px;
-  align-items: start;
+  position: relative;
+  padding: 12px 14px 28px 14px; /* padding-bottom + 8px pour la zone slots en absolute */
   border-bottom: 1px solid rgba(184, 154, 106, 0.25);
   cursor: pointer;
   transition: background 0.18s;
@@ -32,25 +29,30 @@
 .expedition-card:hover { background: rgba(184, 154, 106, 0.08); }
 
 .expedition-card-pill {
+  position: absolute;
+  top: 10px;
+  right: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px 3px 8px;
-  border-radius: 14px;
+  gap: 4px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 12px;
   font-family: var(--font-accent);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: rgba(161, 74, 42, 0.14);
   color: #a14a2a;
-  align-self: start;
-  margin-top: 3px;
   white-space: nowrap;
+  pointer-events: none;
 }
 .expedition-card-pill-icon { font-size: 12px; line-height: 1; }
 
-.expedition-card-body { min-width: 0; }
+.expedition-card-body {
+  /* Réserve un peu de place à droite en haut (la pilule en absolute) */
+  padding-right: 88px;
+}
 
 .expedition-card-when {
   font-family: var(--font-accent);
@@ -147,14 +149,18 @@
 }
 
 .expedition-card-slots {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
   text-align: right;
-  align-self: start;
-  margin-top: 2px;
-  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  pointer-events: none;
 }
 .expedition-card-slots-num {
   font-family: var(--font-accent);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: #2a1f10;
   line-height: 1;
@@ -163,14 +169,12 @@
 .expedition-card-slots-mute {
   color: #8a7050;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 13px;
 }
 .expedition-card-slots-label {
-  display: block;
   font-family: var(--font-accent);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #8a7050;
-  margin-top: 3px;
 }
