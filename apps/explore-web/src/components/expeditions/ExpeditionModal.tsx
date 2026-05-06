@@ -332,7 +332,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               <span className="emm-rule-icon">🤝</span>
               <div>
                 <strong>L'humain avant tout</strong>
-                <small>On vient se rencontrer, pas se mesurer.</small>
+                <small>Respect, bienveillance, camaraderie.</small>
               </div>
             </div>
             <div className="emm-rule">

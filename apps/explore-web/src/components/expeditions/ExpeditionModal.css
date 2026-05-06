@@ -19,13 +19,20 @@
   border-radius: 14px;
   width: 100%;
   max-width: 960px;
-  max-height: 95vh;
+  height: 90vh;        /* hauteur fixe pour que le flex column arme correctement le scroll du main */
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32);
   overflow: hidden;
   position: relative;
   margin: auto;
+}
+@media (max-width: 760px) {
+  .expedition-modal {
+    height: auto;
+    max-height: 95vh;
+  }
 }
 
 /* ─────────── Shell 2 colonnes plein-hauteur ─────────── */
