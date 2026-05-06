@@ -3,7 +3,8 @@
  * "Aujourd'hui · 09:00" / "Demain · 14:00" / "Dans 4 jours · 10:30" /
  * "Le 22 juin · 19:00" pour > 7j ou passé > 7j → date longue.
  */
-export function formatRelativeRdv(rdvAt: string): string {
+export function formatRelativeRdv(rdvAt: string | null): string {
+  if (!rdvAt) return 'Date à définir'
   const rdv = new Date(rdvAt)
   const rdvMs = rdv.getTime()
   const now = Date.now()

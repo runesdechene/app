@@ -571,6 +571,15 @@ export const ExploreMap = memo(function ExploreMap() {
   }, [geojson])
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
+    // V0.7+ — mode "tap-on-map" pour placer le RDV d'une expédition
+    if (useMapStore.getState().expeditionPinMode) {
+      useMapStore.getState().setExpeditionPinResult({
+        lat: event.lngLat.lat,
+        lng: event.lngLat.lng,
+      })
+      useMapStore.getState().setExpeditionPinMode(false)
+      return
+    }
     if (addPlaceMode) return // Don't select places while placing
 
     const feature = event.features?.[0]

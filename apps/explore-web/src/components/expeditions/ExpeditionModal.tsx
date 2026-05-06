@@ -186,9 +186,13 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
 
         {/* Bloc info */}
         <section className="expedition-modal-info">
-          <InfoRow icon="📅" label="Date" value={new Date(e.rdv_at).toLocaleString('fr-FR', {
-            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
-          })} />
+          <InfoRow icon="📅" label="Date" value={
+            e.rdv_at
+              ? new Date(e.rdv_at).toLocaleString('fr-FR', {
+                  weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+                })
+              : 'À définir avec les compagnons'
+          } />
           <InfoRow
             icon="👤"
             label="Chef"

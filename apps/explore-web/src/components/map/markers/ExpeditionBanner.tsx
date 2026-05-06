@@ -16,15 +16,15 @@ interface Props {
 }
 
 export function ExpeditionBanner({ expedition, onClick }: Props) {
-  const rdv = new Date(expedition.rdv_at).getTime()
-  const now = Date.now()
-  const diffMs = rdv - now
+  const rdvAt = expedition.rdv_at
   const day = 24 * 60 * 60 * 1000
+  const diffMs = rdvAt ? new Date(rdvAt).getTime() - Date.now() : null
 
-  const isToday = diffMs >= -day && diffMs < day
-  const isTomorrow = diffMs >= day && diffMs < 2 * day
-  const isSoon = diffMs >= 2 * day && diffMs < 7 * day
-  const isFuture = diffMs >= 7 * day
+  const isUnset = rdvAt === null
+  const isToday = diffMs !== null && diffMs >= -day && diffMs < day
+  const isTomorrow = diffMs !== null && diffMs >= day && diffMs < 2 * day
+  const isSoon = diffMs !== null && diffMs >= 2 * day && diffMs < 7 * day
+  const isFuture = diffMs !== null && diffMs >= 7 * day
 
   const className = [
     'expedition-banner',
@@ -32,15 +32,18 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
     isTomorrow && 'is-tomorrow',
     isSoon && 'is-soon',
     isFuture && 'is-future',
+    isUnset && 'is-unset',
   ].filter(Boolean).join(' ')
 
-  const badge = isToday
-    ? "Aujourd'hui"
-    : isTomorrow
-      ? 'Demain'
-      : isSoon
-        ? 'Bientôt'
-        : null
+  const badge = isUnset
+    ? 'À définir'
+    : isToday
+      ? "Aujourd'hui"
+      : isTomorrow
+        ? 'Demain'
+        : isSoon
+          ? 'Bientôt'
+          : null
 
   return (
     <button

@@ -27,7 +27,7 @@ function userIdOrThrow(): string {
 export async function createExpedition(input: {
   name: string
   description: string | null
-  rdv_at: string
+  rdv_at: string | null
   rdv_lat: number
   rdv_lng: number
   rdv_label: string | null
@@ -55,7 +55,7 @@ export async function createExpedition(input: {
 export async function updateExpedition(expeditionId: string, patches: {
   name: string
   description: string | null
-  rdv_at: string
+  rdv_at: string | null
   rdv_lat: number
   rdv_lng: number
   rdv_label: string | null

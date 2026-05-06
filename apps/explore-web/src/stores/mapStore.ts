@@ -74,6 +74,12 @@ interface MapState {
   pendingNewPlaceCoords: { lng: number; lat: number } | null
   setPendingNewPlaceCoords: (coords: { lng: number; lat: number } | null) => void
 
+  /** V0.7+ Expéditions — mode tap-on-map pour choisir le point de RDV */
+  expeditionPinMode: boolean
+  setExpeditionPinMode: (active: boolean) => void
+  expeditionPinResult: { lat: number; lng: number } | null
+  setExpeditionPinResult: (coords: { lat: number; lng: number } | null) => void
+
   /** Compteur de rafraîchissement des lieux (incrémenté après création/suppression) */
   placesRefreshKey: number
   incrementPlacesRefreshKey: () => void
@@ -133,6 +139,11 @@ export const useMapStore = create<MapState>((set) => ({
 
   addPlaceMode: false,
   setAddPlaceMode: (active) => set({ addPlaceMode: active }),
+
+  expeditionPinMode: false,
+  setExpeditionPinMode: (active) => set({ expeditionPinMode: active }),
+  expeditionPinResult: null,
+  setExpeditionPinResult: (coords) => set({ expeditionPinResult: coords }),
 
   mapZoom: 6,
   setMapZoom: (z) => set({ mapZoom: z }),

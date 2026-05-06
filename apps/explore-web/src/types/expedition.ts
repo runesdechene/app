@@ -29,7 +29,7 @@ export interface ExpeditionValidatedParticipant extends ExpeditionPersonSummary 
 export interface ExpeditionListItem {
   id: string
   name: string
-  rdv_at: string
+  rdv_at: string | null  // null = "Date à définir" (les participants se mettent d'accord dans le chat)
   rdv_lat: number
   rdv_lng: number
   rdv_label: string | null
@@ -50,7 +50,7 @@ export interface ExpeditionDetail {
   chief_user_id: string
   name: string
   description: string | null
-  rdv_at: string
+  rdv_at: string | null  // null = "Date à définir"
   rdv_lat: number
   rdv_lng: number
   rdv_label: string | null

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { createExpedition } from '../../lib/expeditionsApi'
+import { createExpedition, updateExpeditionCall } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { listUpcomingExpeditions } from '../../lib/expeditionsApi'
+import { useMapStore } from '../../stores/mapStore'
 import './ExpeditionCreator.css'
 
 interface Props {
@@ -23,6 +24,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
   const setUpcoming = useExpeditionsStore((s) => s.setUpcoming)
 
   const [name, setName] = useState('')
+  const [callText, setCallText] = useState('')
   const [description, setDescription] = useState('')
   const [rdvAt, setRdvAt] = useState(() => {
     const d = new Date()
@@ -30,6 +32,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
     d.setHours(9, 0, 0, 0)
     return d.toISOString().slice(0, 16) // format datetime-local
   })
+  const [rdvUnset, setRdvUnset] = useState(false) // true = "Date à définir"
   const [rdvLat, setRdvLat] = useState<number | null>(initialLat ?? null)
   const [rdvLng, setRdvLng] = useState<number | null>(initialLng ?? null)
   const [rdvLabel, setRdvLabel] = useState('')
@@ -38,6 +41,30 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
   const [validationMode, setValidationMode] = useState<'manual' | 'free'>('manual')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // ─────────── Tap-on-map ───────────
+  const [pickingPin, setPickingPin] = useState(false)
+  const expeditionPinResult = useMapStore((s) => s.expeditionPinResult)
+
+  useEffect(() => {
+    if (pickingPin && expeditionPinResult) {
+      setRdvLat(expeditionPinResult.lat)
+      setRdvLng(expeditionPinResult.lng)
+      setPickingPin(false)
+      useMapStore.getState().setExpeditionPinResult(null)
+    }
+  }, [pickingPin, expeditionPinResult])
+
+  function onPickOnMap() {
+    useMapStore.getState().setExpeditionPinResult(null)
+    useMapStore.getState().setExpeditionPinMode(true)
+    setPickingPin(true)
+  }
+
+  function cancelPickPin() {
+    useMapStore.getState().setExpeditionPinMode(false)
+    setPickingPin(false)
+  }
 
   function useCurrentPosition() {
     if (!navigator.geolocation) {
@@ -57,16 +84,20 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
     setError(null)
     if (name.trim().length < 3) { setError('Le nom doit faire au moins 3 caractères'); return }
     if (rdvLat == null || rdvLng == null) { setError('Choisis un point de RDV'); return }
-    const rdvDate = new Date(rdvAt)
-    if (Number.isNaN(rdvDate.getTime()) || rdvDate.getTime() <= Date.now()) {
-      setError('La date du RDV doit être dans le futur'); return
+    let rdvAtIso: string | null = null
+    if (!rdvUnset) {
+      const rdvDate = new Date(rdvAt)
+      if (Number.isNaN(rdvDate.getTime()) || rdvDate.getTime() <= Date.now()) {
+        setError('La date du RDV doit être dans le futur'); return
+      }
+      rdvAtIso = rdvDate.toISOString()
     }
 
     setSubmitting(true)
     const result = await createExpedition({
       name: name.trim(),
       description: description.trim() || null,
-      rdv_at: rdvDate.toISOString(),
+      rdv_at: rdvAtIso,
       rdv_lat: rdvLat,
       rdv_lng: rdvLng,
       rdv_label: rdvLabel.trim() || null,
@@ -80,9 +111,28 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
       setError(translateError(result.error))
       return
     }
+    // Si l'appel a été saisi, le poser via update_voyage_call
+    if (callText.trim()) {
+      await updateExpeditionCall(result.expedition_id, callText.trim())
+    }
     // Refresh la liste pour que la nouvelle expé apparaisse au prochain ouverture du panneau
     listUpcomingExpeditions().then(setUpcoming).catch(() => {})
     onCreated(result.expedition_id)
+  }
+
+  if (pickingPin) {
+    return createPortal(
+      <div className="ec-pin-picker-banner">
+        <div className="ec-pin-picker-text">
+          <span className="ec-pin-picker-icon">👆</span>
+          Tape sur la carte pour placer le point de RDV
+        </div>
+        <button type="button" className="ec-pin-picker-cancel" onClick={cancelPickPin}>
+          Annuler
+        </button>
+      </div>,
+      document.body,
+    )
   }
 
   return createPortal(
@@ -111,6 +161,20 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
             <div className="ec-counter">{name.length} / 80</div>
           </section>
 
+          {/* L'appel — sous-titre / phrase de motivation */}
+          <section className="ec-section">
+            <label className="ec-label">L'appel <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnel · modifiable plus tard)</span></label>
+            <input
+              type="text"
+              className="ec-input"
+              placeholder="« Une nuit pour faire le silence avec ses propres pas. »"
+              value={callText}
+              maxLength={200}
+              onChange={(e) => setCallText(e.target.value)}
+            />
+            <div className="ec-counter">{callText.length} / 200</div>
+          </section>
+
           {/* Description */}
           <section className="ec-section">
             <label className="ec-label">Description (optionnelle)</label>
@@ -132,31 +196,33 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
               className="ec-input"
               value={rdvAt}
               onChange={(e) => setRdvAt(e.target.value)}
+              disabled={rdvUnset}
+              style={rdvUnset ? { opacity: 0.5 } : undefined}
             />
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, cursor: 'pointer', fontSize: 14, color: '#6e5435' }}>
+              <input
+                type="checkbox"
+                checked={rdvUnset}
+                onChange={(e) => setRdvUnset(e.target.checked)}
+              />
+              À définir plus tard avec les compagnons
+            </label>
           </section>
 
           {/* Lieu */}
           <section className="ec-section">
             <label className="ec-label">Point de ralliement</label>
-            <div className="ec-coords-row">
-              <input
-                type="number"
-                className="ec-input ec-input-coord"
-                placeholder="Latitude"
-                value={rdvLat ?? ''}
-                step="0.0001"
-                onChange={(e) => setRdvLat(e.target.value ? parseFloat(e.target.value) : null)}
-              />
-              <input
-                type="number"
-                className="ec-input ec-input-coord"
-                placeholder="Longitude"
-                value={rdvLng ?? ''}
-                step="0.0001"
-                onChange={(e) => setRdvLng(e.target.value ? parseFloat(e.target.value) : null)}
-              />
+            <div className="ec-pin-status">
+              {rdvLat != null && rdvLng != null ? (
+                <span>📍 {rdvLat.toFixed(4)}, {rdvLng.toFixed(4)}</span>
+              ) : (
+                <span style={{ color: '#a14a2a' }}>Aucun point choisi</span>
+              )}
             </div>
-            <button type="button" className="ec-secondary-btn" onClick={useCurrentPosition}>
+            <button type="button" className="ec-secondary-btn" onClick={onPickOnMap}>
+              🗺️ {rdvLat != null ? 'Changer le point sur la carte' : 'Choisir sur la carte'}
+            </button>
+            <button type="button" className="ec-secondary-btn" onClick={useCurrentPosition} style={{ marginTop: 6 }}>
               📍 Utiliser ma position actuelle
             </button>
             <input
@@ -191,16 +257,22 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
                 <span className="ec-slot-label">ouvert</span>
               </button>
             </div>
-            {slotsMode === 'fixed' && (
-              <input
-                type="range"
-                className="ec-slider"
-                min={2}
-                max={50}
-                value={slotsMax}
-                onChange={(e) => setSlotsMax(parseInt(e.target.value, 10))}
-              />
-            )}
+            {slotsMode === 'fixed' && (() => {
+              const pct = ((slotsMax - 2) / (50 - 2)) * 100
+              return (
+                <input
+                  type="range"
+                  className="ec-slider"
+                  min={2}
+                  max={50}
+                  value={slotsMax}
+                  onChange={(e) => setSlotsMax(parseInt(e.target.value, 10))}
+                  style={{
+                    background: `linear-gradient(90deg, #a14a2a 0%, #a14a2a ${pct}%, #ecdcb8 ${pct}%, #ecdcb8 100%)`,
+                  }}
+                />
+              )
+            })()}
           </section>
 
           {/* Validation */}
@@ -225,7 +297,6 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
         </div>
 
         <footer className="expedition-creator-footer">
-          <button className="ec-secondary-btn" onClick={onClose}>Annuler</button>
           <button
             className="ec-primary-btn"
             onClick={handleSubmit}
