@@ -203,8 +203,15 @@
     z-index: 10011;
     background: #faf2dd;
   }
-  .expedition-modal-main {
-    padding-bottom: calc(var(--safe-bottom, 0px) + 160px);
+  /* Spacer ::after — workaround du bug "padding-bottom ignoré dans
+     un flex container scrollable" (Safari/Chrome). On rend un vrai
+     enfant flex en bas du contenu, garanti de compter dans le
+     scrollHeight. */
+  .expedition-modal-main::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    height: calc(var(--safe-bottom, 0px) + 200px);
   }
 
   /* Chat input — fixed bottom en mode chat. */
@@ -217,8 +224,11 @@
     padding-bottom: calc(var(--safe-bottom, 0px) + 12px);
     background: #f5e9d4;
   }
-  .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages {
-    padding-bottom: calc(var(--safe-bottom, 0px) + 160px);
+  .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    height: calc(var(--safe-bottom, 0px) + 180px);
   }
 }
 
