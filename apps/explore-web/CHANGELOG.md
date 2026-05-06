@@ -1,3 +1,29 @@
+# ALPHA V0.7.3
+## Affinage de La Cour — la marche garde toujours le dessus
+
+### 🪙 Tap pour investir, plus de modale
+Sur la fiche d'un lieu, **soutenir le veilleur** ou **influencer** se fait au tap direct : un clic = 1 Couronne dépensée, score qui monte en direct, son discret, animation de pièce qui s'envole. Tu peux marteler aussi vite que ta jauge le permet.
+
+### 🏴 Lieux sans veilleur : 1 Couronne suffit pour t'établir
+Les lieux que personne n'a foulés (Mongolie, ruines isolées) sont désormais accessibles à distance. Une seule Couronne pour y poser ta marque ; ensuite c'est la course au plus offrant. **Mais souvenez-vous** : la première personne qui se déplace IRL devient plein-veilleur avec un acquis de **+50** que personne ne peut effacer à distance.
+
+### 🛡️ Réaffirmation IRL
+Si quelqu'un investit contre ton lieu, tu peux **revenir physiquement** dessus : un nouveau plantage efface toutes les menaces en cours. La marche prime toujours sur l'or.
+
+### 👑 Avatar du veilleur cliquable
+Sur chaque fiche, l'avatar et le nom du veilleur ouvrent maintenant son profil. Idem pour les mécènes du Trône — ils ont leur icône de faction à côté de leur nom.
+
+### 🔔 Notifications personnelles
+Quand quelqu'un attaque un de tes lieux, perd ou prend un lieu auprès de toi, tu reçois maintenant une **notification persistante dans la cloche** — même si tu n'étais pas en ligne au moment de l'event. Plus rien ne se perd.
+
+### Sous le capot
+- Faveur 50 réservée aux veilleurs IRL : un veilleur "par influence" n'a pas de bonus diplomatique, juste ses Couronnes.
+- Réaffirmation IRL : le bouton "Planter mon étendard" sur ton propre lieu efface les challengers en cours (mais garde ta défense).
+- Replant interdit en pure perte : le bouton ne s'affiche que quand il a un sens.
+- Refonte UX en parchemin / encres bordeaux et violet pour aligner avec l'esprit Rune de Chêne.
+
+---
+
 # ALPHA V0.7.2
 ## La Cour s'ouvre — l'or peut soutenir la marche
 
