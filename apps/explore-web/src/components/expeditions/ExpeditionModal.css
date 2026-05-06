@@ -28,16 +28,25 @@
   margin: auto;
 }
 
-/* ─────────── Body 2 colonnes ─────────── */
-.expedition-modal-body {
+/* ─────────── Shell 2 colonnes plein-hauteur ─────────── */
+.expedition-modal-shell {
   display: flex;
   flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.expedition-modal-left {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
 }
 .expedition-modal-main {
   flex: 1 1 auto;
   overflow-y: auto;
+  min-height: 0;
   min-width: 0;
 }
 .expedition-modal-chat-col {
@@ -48,6 +57,7 @@
   border-left: 1px solid rgba(184, 154, 106, 0.45);
   background: rgba(252, 241, 214, 0.4);
   min-height: 0;
+  height: 100%;
 }
 .expedition-modal-chat-col-header {
   padding: 14px 18px 8px;
@@ -79,10 +89,12 @@
 
 /* Mobile : retour en colonne unique */
 @media (max-width: 760px) {
-  .expedition-modal-body { flex-direction: column; }
+  .expedition-modal-shell { flex-direction: column; }
+  .expedition-modal-left { flex: 0 0 auto; }
   .expedition-modal-chat-col {
     flex: 0 0 auto;
     min-width: 0;
+    height: auto;
     border-left: none;
     border-top: 1px solid rgba(184, 154, 106, 0.45);
   }

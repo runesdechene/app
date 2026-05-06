@@ -140,9 +140,13 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     refresh()
   }
 
+  const chatVisible = isMember && (e.status === 'published' || e.status === 'passed')
+
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
       <div className="expedition-modal" onClick={(ev) => ev.stopPropagation()}>
+        <div className="expedition-modal-shell">
+        <div className="expedition-modal-left">
         <header className="expedition-modal-header">
           <div className="expedition-modal-pin" />
           <div>
@@ -187,9 +191,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </section>
         )}
 
-        {/* Body 2 colonnes : main (gauche, 70%) + chat (droite, 30%, si membre) */}
-        <div className="expedition-modal-body">
-          <div className="expedition-modal-main">
+        <div className="expedition-modal-main">
 
         {/* Description */}
         {e.description && (
@@ -348,21 +350,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
 
           </div>{/* /expedition-modal-main */}
 
-          {/* Colonne droite : chat (membres seulement, status published/passed) */}
-          {isMember && (e.status === 'published' || e.status === 'passed') && (
-            <aside className="expedition-modal-chat-col">
-              <div className="expedition-modal-chat-col-header">
-                <h3>Préparation · chat privé</h3>
-              </div>
-              <ExpeditionChat
-                expeditionId={expeditionId}
-                participantsById={participantsById}
-                readOnly={e.status === 'passed'}
-              />
-            </aside>
-          )}
-        </div>{/* /expedition-modal-body */}
-
         {/* Footer */}
         <footer className="expedition-modal-footer">
           <button className="expedition-modal-flag" onClick={() => setFlagOpen(true)}>
@@ -375,6 +362,22 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             <button className="emm-btn-cancel" onClick={handleCancel}>Annuler l'expédition</button>
           )}
         </footer>
+        </div>{/* /expedition-modal-left */}
+
+        {/* Colonne droite — chat plein-hauteur (membres seulement) */}
+        {chatVisible && (
+          <aside className="expedition-modal-chat-col">
+            <div className="expedition-modal-chat-col-header">
+              <h3>Préparation · chat privé</h3>
+            </div>
+            <ExpeditionChat
+              expeditionId={expeditionId}
+              participantsById={participantsById}
+              readOnly={e.status === 'passed'}
+            />
+          </aside>
+        )}
+        </div>{/* /expedition-modal-shell */}
 
         {flagOpen && (
           <FlagDialog
