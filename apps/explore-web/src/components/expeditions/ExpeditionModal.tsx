@@ -187,6 +187,10 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </section>
         )}
 
+        {/* Body 2 colonnes : main (gauche, 70%) + chat (droite, 30%, si membre) */}
+        <div className="expedition-modal-body">
+          <div className="expedition-modal-main">
+
         {/* Description */}
         {e.description && (
           <section className="expedition-modal-description">{e.description}</section>
@@ -320,18 +324,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </section>
         )}
 
-        {/* Chat (membres seulement) */}
-        {isMember && (e.status === 'published' || e.status === 'passed') && (
-          <section className="expedition-modal-section">
-            <h3>Préparation · chat privé</h3>
-            <ExpeditionChat
-              expeditionId={expeditionId}
-              participantsById={participantsById}
-              readOnly={e.status === 'passed'}
-            />
-          </section>
-        )}
-
         {/* Comptes rendus (date passée) */}
         {(e.status === 'passed' || e.status === 'archived') && (
           <section className="expedition-modal-section">
@@ -353,6 +345,23 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             )}
           </section>
         )}
+
+          </div>{/* /expedition-modal-main */}
+
+          {/* Colonne droite : chat (membres seulement, status published/passed) */}
+          {isMember && (e.status === 'published' || e.status === 'passed') && (
+            <aside className="expedition-modal-chat-col">
+              <div className="expedition-modal-chat-col-header">
+                <h3>Préparation · chat privé</h3>
+              </div>
+              <ExpeditionChat
+                expeditionId={expeditionId}
+                participantsById={participantsById}
+                readOnly={e.status === 'passed'}
+              />
+            </aside>
+          )}
+        </div>{/* /expedition-modal-body */}
 
         {/* Footer */}
         <footer className="expedition-modal-footer">

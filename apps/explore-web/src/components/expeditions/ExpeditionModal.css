@@ -18,7 +18,7 @@
   border: 1px solid #b89a6a;
   border-radius: 14px;
   width: 100%;
-  max-width: 600px;
+  max-width: 960px;
   max-height: 95vh;
   display: flex;
   flex-direction: column;
@@ -26,6 +26,67 @@
   overflow: hidden;
   position: relative;
   margin: auto;
+}
+
+/* ─────────── Body 2 colonnes ─────────── */
+.expedition-modal-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.expedition-modal-main {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-width: 0;
+}
+.expedition-modal-chat-col {
+  flex: 0 0 32%;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(184, 154, 106, 0.45);
+  background: rgba(252, 241, 214, 0.4);
+  min-height: 0;
+}
+.expedition-modal-chat-col-header {
+  padding: 14px 18px 8px;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+  flex-shrink: 0;
+}
+.expedition-modal-chat-col-header h3 {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #8a7050;
+  margin: 0;
+}
+.expedition-modal-chat-col .expedition-chat {
+  flex: 1 1 auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.expedition-modal-chat-col .expedition-chat-messages {
+  flex: 1;
+  max-height: none;
+}
+
+/* Mobile : retour en colonne unique */
+@media (max-width: 760px) {
+  .expedition-modal-body { flex-direction: column; }
+  .expedition-modal-chat-col {
+    flex: 0 0 auto;
+    min-width: 0;
+    border-left: none;
+    border-top: 1px solid rgba(184, 154, 106, 0.45);
+  }
+  .expedition-modal-chat-col .expedition-chat-messages { max-height: 280px; }
 }
 
 .expedition-modal-loading {
