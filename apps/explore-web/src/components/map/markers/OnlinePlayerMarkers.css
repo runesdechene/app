@@ -1127,8 +1127,9 @@
   -ms-overflow-style: none;
   /* Padding latéral généreux desktop pour que les flèches en absolute
      (left/right 10px, ~34px de large) ne masquent pas le 1er/dernier tile. */
-  padding: 4px 50px 8px 50px;
+  padding: 4px 30px 8px 30px;
 }
+
 .player-modal-places-row::-webkit-scrollbar {
   display: none;
 }
@@ -1176,7 +1177,7 @@
 /* Tiles portrait — ratio 3:4 (88 × 117 px), plus naturel pour des photos de lieux. */
 .player-modal-place-tile {
   flex: 0 0 auto;
-  width: 130px;
+  width: 160px;
   background: none;
   border: none;
   padding: 0;
@@ -1189,10 +1190,10 @@
 }
 
 .player-modal-place-tile-img {
-  width: 130px;
-  height: 180px;
+  width: 160px;
+  height: 220px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 0px;
   background: rgba(193, 154, 107, 0.15);
   display: flex;
   align-items: center;
@@ -1214,6 +1215,12 @@
   overflow: hidden;
   padding: 0 2px;
   font-family: var(--font-accent);
+}
+/* Petit emoji du tag primary du lieu, juste avant le titre. */
+.player-modal-place-tile-tag-icon {
+  display: inline;
+  margin-right: 4px;
+  font-size: 0.95em;
 }
 
 /* Tile "Voir tout" — fond pointillé + grand "+N" centré. */

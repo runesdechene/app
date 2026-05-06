@@ -842,7 +842,10 @@ function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
               ) : (
                 <div className="player-modal-place-tile-img player-modal-place-tile-img-fallback">{'\u{1F3DB}️'}</div>
               )}
-              <span className="player-modal-place-tile-name">{place.title}</span>
+              <span className="player-modal-place-tile-name">
+                {place.tagIcon && <span className="player-modal-place-tile-tag-icon" aria-hidden>{place.tagIcon}</span>}
+                {place.title}
+              </span>
             </button>
           ))}
           {showViewAll && (
