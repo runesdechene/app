@@ -347,6 +347,17 @@
   align-items: center;
 }
 
+/* Desktop : si la chat-col est présente (chatVisible → classe
+   mobile-tab-info|chat sur la modale), décaler les boutons à gauche
+   pour qu'ils flottent sur la colonne info, pas sur la chat-col.
+   La chat-col fait 32% de la largeur de la modale. */
+@media (min-width: 761px) {
+  .expedition-modal.mobile-tab-info .expedition-modal-floating,
+  .expedition-modal.mobile-tab-chat .expedition-modal-floating {
+    right: calc(32% + 12px);
+  }
+}
+
 /* Intro de la modale — vit dans .expedition-modal-main, scrolle avec
    le reste du contenu. Reprend les styles de l'ancien header. */
 .expedition-modal-intro {
@@ -574,6 +585,22 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+/* Quand l'image affichée est l'avatar du chef (pas de cover), on évite
+   d'étirer une petite image carrée sur 16:9 — cover-contained centré. */
+.expedition-modal-cover-img-avatar {
+  object-fit: contain !important;
+  background: linear-gradient(135deg, #ecdcb8, #d9c79d);
+}
+/* Drapeau rouge en signature 'événement', bottom-right de la cover. */
+.expedition-modal-cover-flag {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
 }
 .expedition-modal-cover-empty {
   width: 100%;

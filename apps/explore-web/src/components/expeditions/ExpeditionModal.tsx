@@ -296,10 +296,19 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           {e.rdv_label && <div className="expedition-modal-when">{e.rdv_label}</div>}
         </div>
 
-        {/* Cover image — visible si fournie. Modification via le bouton ✎ du header (chef). */}
-        {e.cover_image_url && (
+        {/* Cover image — la cover si fournie, sinon l'avatar du chef.
+            Drapeau rouge superposé en signature 'événement' (cohérent
+            avec le marker carte). Bouton ✎ du header (chef) pour modifier. */}
+        {(e.cover_image_url || chief.avatar_url) && (
           <div className="expedition-modal-cover">
-            <img src={getExpeditionCoverUrl(e.cover_image_url)} alt="" />
+            <img
+              src={e.cover_image_url
+                ? getExpeditionCoverUrl(e.cover_image_url)
+                : (chief.avatar_url as string)}
+              alt=""
+              className={e.cover_image_url ? '' : 'expedition-modal-cover-img-avatar'}
+            />
+            <span className="expedition-modal-cover-flag" aria-hidden>🚩</span>
           </div>
         )}
 
