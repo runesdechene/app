@@ -211,7 +211,7 @@ Toutes en `SECURITY DEFINER` avec contrôle d'autorisation explicite (cf. discip
 | `eject_participant(expedition_id, user_id)` | Chef éjecte un participant validé. | Chef |
 | `send_expedition_message(expedition_id, content)` | Insert dans `expedition_messages`. | Participant validé ou chef |
 | `mark_expedition_messages_read(expedition_id)` | Update `expedition_message_reads.last_read_at`. | Participant validé ou chef |
-| `upsert_expedition_report(expedition_id, text_content, is_public, cover_media_id)` | Crée/met à jour le compte rendu. Si premier post → +10 XP via `add_user_xp` + flag `xp_awarded = true`. Notifie les autres participants. Refuse si statut = `published` (pas de CR avant la date). | Participant validé ou chef |
+| `upsert_expedition_report(expedition_id, text_content, is_public, cover_media_id)` | Crée/met à jour le compte rendu. Notifie les autres participants. Refuse si statut = `published` (pas de CR avant la date). **L'attribution +10 XP est portée par un trigger SQL `_trg_xp_expedition_report_insert` qui pose le XP au premier INSERT et marque `xp_awarded = true` pour empêcher le double-comptage à l'édition** — pattern aligné avec les triggers `_trg_xp_*` existants (cf. mig 042 levels_triggers). | Participant validé ou chef |
 | `register_expedition_media(expedition_id, storage_path, kind, size_bytes, duration_seconds)` | Lie un média uploadé au compte rendu (à appeler après upload Supabase Storage). | Auteur du compte rendu |
 | `delete_expedition_media(media_id)` | Supprime média (Storage + ligne DB). | Auteur ou chef |
 | `flag_expedition(expedition_id, reason, comment?)` | Crée un signalement. | Connecté |
@@ -344,7 +344,7 @@ Toast in-app via `toastStore` existant pour les notifications déclenchées en t
 |---|---|---|
 | Créer une expédition | 0 | Acte gratuit |
 | Rejoindre une expé (validé) | 0 | Acte gratuit |
-| Poster son compte rendu | **+10 XP** (1 fois) | Via `add_user_xp` existant. Flag `xp_awarded` empêche double-attribution si le user édite |
+| Poster son compte rendu | **+10 XP** (1 fois) | Via trigger SQL `_trg_xp_expedition_report_insert` au premier INSERT. Flag `xp_awarded` empêche double-attribution si le user édite |
 | Avoir des comptes rendus publics | 0 mais valeur sociale (vitrine archives) | Pas d'XP supplémentaire pour éviter le grind |
 
 **Pas de Couronnes** dans cette feature — l'économie reste lisible (Couronnes = moisson + futures missions Hub).
@@ -461,7 +461,32 @@ Cf. session brainstorm 2026-05-06 — pitch validé Uriel :
 - ≥ 30 % des comptes rendus sont marqués `is_public`
 - 0 incident modération nécessitant une action en urgence dans les 30 premiers jours
 
-### 12.4 Références cadres
+### 12.4 Pivots post-brainstorm visuel (6 mai 2026 — soir)
+
+Suite à la maquette `.superpowers/brainstorm/2026-05-06-expeditions/content/expeditions-mockup.html` validée par Uriel, les ajustements suivants prévalent sur le corps de la spec :
+
+1. **Tableau de Quêtes → panneau HUD intégré** (pas une modale full-screen, pas d'onglets) :
+   - Le panneau s'affiche sur la carte, sous les notifications toast existantes (`ToastStack`).
+   - Liste **unifiée** qui agrégera à terme Expéditions + Missions Hub + Quêtes du jour. Chaque item porte une **pilule de type** discrète (`🚩 Expédition` rouge ; `🎯 Mission` or ; `☀️ Du jour` vert moss).
+   - En V1, seules les Expéditions s'y affichent. Le bas du panneau contient deux **ghost rows** "Bientôt" annonçant Missions et Du jour pour préparer l'arrivée.
+   - Lien discret en bas : "Voir les expéditions archivées →" qui ouvre une vue dédiée (modale ou page) — pas un onglet du panneau.
+   - Composant à créer : `apps/explore-web/src/components/quests/QuestsBoardPanel.tsx` (et non `QuestsBoard.tsx` modal).
+
+2. **Nouveau champ `call_text` — "L'appel"** :
+   - Petite phrase de motivation/intention sous le titre, visible dans le panneau, les modales et l'archive.
+   - **Modifiable par tous les participants validés ET le chef**. Le titre reste verrouillé au chef seul.
+   - 200 caractères max recommandés (à valider). Un seul appel actif à la fois (la dernière modif écrase).
+   - Pas de notification à chaque modif (bruit).
+   - Naming UI : « L'appel » (validé Uriel).
+   - Schéma : ajouter `call_text text CHECK (call_text IS NULL OR length(call_text) <= 200)` à la table `expeditions` + `call_author_id text REFERENCES users(id)` + `call_updated_at timestamptz`.
+   - Nouvelle RPC : `update_expedition_call(p_user_id, p_expedition_id, p_call_text)` — autorise chef ou participant validé.
+
+3. **Affichage des Héritages (factions)** :
+   - Chaque avatar reçoit une **bordure colorée 2px** correspondant à la couleur de l'Héritage du joueur (`faction.color`).
+   - Une **mini-pilule** avec le titre de l'Héritage (`faction.title`, ex : "Vikings", "Celtes", "Romains") et un point coloré apparaît à côté du nom dans toutes les meta-lignes (panneau, modales, compte rendu, archive).
+   - Implication RPC : `list_expeditions_upcoming`, `list_expeditions_archives`, `get_expedition`, `list_my_expeditions` doivent retourner `faction_color` (string hex) et `faction_title` (string) pour le chef, les participants validés, les pending, et les auteurs de comptes rendus. **À patcher dans les RPCs Phase 2-5 du plan d'implémentation.**
+
+### 12.5 Références cadres
 
 - Méta-spec V0.7 articulation : [`2026-05-01-v07-articulation-campement-quetes-influence-design.md`](2026-05-01-v07-articulation-campement-quetes-influence-design.md)
 - Spec mini-quêtes journalières : [`2026-05-02-v07-mini-quetes-journalieres-design.md`](2026-05-02-v07-mini-quetes-journalieres-design.md)

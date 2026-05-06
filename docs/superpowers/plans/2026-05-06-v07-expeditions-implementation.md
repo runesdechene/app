@@ -9,7 +9,14 @@
 **Tech Stack:** PostgreSQL/PL-pgSQL (Supabase), Supabase Storage, Supabase Realtime, React 18 + Vite 5 + TypeScript strict, Zustand, MapLibre GL JS, `pg_cron`. Convention monorepo : pnpm, conventional commits, migrations SQL numérotées.
 
 **Repo:** `C:/Users/uriel/Desktop/DEVS/app (Runes de Chêne)/` (machine FONDATION)
-**Branch:** `main` (Uriel a confirmé pas de branche dédiée pour cette feature — push par lots cohérents en fin de session uniquement)
+**Branch:** à confirmer en début d'exécution (main vs `v07-expeditions`).
+
+> ⚠️ **Pivots post-brainstorm visuel (6 mai 2026 — soir)** acté dans la spec §12.4 — à intégrer dans les Tasks ci-dessous :
+> 1. **Tableau de Quêtes** = panneau HUD intégré (pas modale, pas onglets). Composant `QuestsBoardPanel.tsx` (Task 10.1 à réécrire). Liste unifiée avec **pilules de type** + ghost rows pour Missions/Du jour.
+> 2. **Nouveau champ `call_text` ("L'appel")** modifiable collectivement (chef + validés). Migration 104 à étendre + nouvelle RPC `update_expedition_call`.
+> 3. **Affichage Héritages** : bordure colorée sur les avatars + mini-pilule. Listings RPC (Phase 2.4, 2.5) doivent retourner `faction_color` et `faction_title`.
+>
+> Voir la maquette `.superpowers/brainstorm/2026-05-06-expeditions/content/expeditions-mockup.html` pour la traduction visuelle.
 
 ---
 
@@ -115,6 +122,9 @@ CREATE TABLE IF NOT EXISTS public.expeditions (
   rdv_lat double precision NOT NULL,
   rdv_lng double precision NOT NULL,
   rdv_label text CHECK (rdv_label IS NULL OR length(rdv_label) <= 120),
+  call_text text CHECK (call_text IS NULL OR length(call_text) <= 200),
+  call_author_id text REFERENCES public.users(id),
+  call_updated_at timestamptz,
   slots_max integer CHECK (slots_max IS NULL OR slots_max BETWEEN 2 AND 50),
   slots_open boolean NOT NULL DEFAULT false,
   validation_mode text NOT NULL CHECK (validation_mode IN ('manual','free')),
@@ -437,6 +447,10 @@ git add supabase/migrations/105_v07_expedition_storage_rls.sql && git commit -m 
 Toutes les RPCs sont en `SECURITY DEFINER` pour appliquer la logique métier côté serveur (cf. règle inviolable `apps/explore-web/CLAUDE.md`).
 
 **Convention :** chaque RPC dans une migration séparée, numérotée. Pattern reproduit de la baseline existante. Les paramètres sont préfixés `p_`. Les retours sont `json` ou `jsonb` (idem repo).
+
+> 🎨 **Note Héritages (factions)** — toutes les RPCs de listing/lecture (`get_expedition`, `list_expeditions_upcoming`, `list_expeditions_archives`, `list_my_expeditions`) doivent inclure dans leurs JOINs sur `users` les colonnes `faction_id`, et JOIN sur `factions` pour `factions.title AS faction_title` et `factions.color AS faction_color`. À ajouter dans le `json_build_object` du chef et de chaque participant retourné. Le frontend l'utilise pour la bordure colorée + la pilule "Vikings/Celtes/Romains".
+>
+> 📞 **Note L'appel** — `get_expedition` doit aussi retourner `call_text`, `call_author_id`, `call_updated_at` dans l'objet `expedition`.
 
 ### Task 2.1: RPC `create_expedition`
 
@@ -1180,6 +1194,69 @@ BEGIN
 END;
 $$;
 GRANT EXECUTE ON FUNCTION public.eject_participant(text,uuid,text) TO authenticated;
+```
+
+- [ ] **Step 2: Appliquer + commit**
+
+---
+
+## Phase 4 — RPCs Messagerie
+
+### Task 3.4: RPC `update_expedition_call` (l'Appel collectif)
+
+**Files:**
+- Create: `supabase/migrations/113b_v07_rpc_update_expedition_call.sql`
+
+- [ ] **Step 1: Écrire la RPC**
+
+```sql
+-- 113b_v07_rpc_update_expedition_call.sql
+-- WHY : "L'appel" est une phrase de motivation modifiable par tous les
+-- participants validés et le chef. Le titre lui reste verrouillé au chef
+-- (cf. update_expedition existante). Pas de notification à chaque modif.
+
+CREATE OR REPLACE FUNCTION public.update_expedition_call(
+  p_user_id text,
+  p_expedition_id uuid,
+  p_call_text text
+) RETURNS json
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_expe public.expeditions%ROWTYPE;
+  v_authorized boolean;
+BEGIN
+  IF p_call_text IS NOT NULL AND length(p_call_text) > 200 THEN
+    RETURN json_build_object('success', false, 'error', 'call_too_long');
+  END IF;
+
+  SELECT * INTO v_expe FROM public.expeditions WHERE id = p_expedition_id;
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'error', 'expedition_not_found');
+  END IF;
+  IF v_expe.status NOT IN ('published','passed') THEN
+    RETURN json_build_object('success', false, 'error', 'expedition_not_editable');
+  END IF;
+
+  v_authorized := v_expe.chief_user_id = p_user_id OR EXISTS (
+    SELECT 1 FROM public.expedition_participants
+    WHERE expedition_id = p_expedition_id AND user_id = p_user_id AND status = 'validated'
+  );
+  IF NOT v_authorized THEN
+    RETURN json_build_object('success', false, 'error', 'not_authorized');
+  END IF;
+
+  UPDATE public.expeditions
+    SET call_text = p_call_text,
+        call_author_id = p_user_id,
+        call_updated_at = now(),
+        updated_at = now()
+    WHERE id = p_expedition_id;
+
+  RETURN json_build_object('success', true);
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.update_expedition_call(text,uuid,text) TO authenticated;
 ```
 
 - [ ] **Step 2: Appliquer + commit**
@@ -2063,11 +2140,13 @@ cd "C:/Users/uriel/Desktop/DEVS/app (Runes de Chêne)" && git add apps/explore-w
 
 ## Phase 10 — Tableau de Quêtes & marker carte
 
-### Task 10.1: `QuestsBoard` (afficheur unifié)
+### Task 10.1: `QuestsBoardPanel` (panneau HUD intégré, pas modale)
+
+> ⚠️ **Pivot 6 mai soir** : ce composant n'est PLUS une modale full-screen avec onglets. C'est un **panneau intégré au HUD carte**, qui s'affiche sous les notifications toast (`ToastStack`). Liste **unifiée** Expéditions/Missions/Du jour, chaque item porte une **pilule de type**. Au lancement, seules les Expéditions s'affichent, avec deux ghost rows "Bientôt" pour annoncer Missions et Du jour. Voir maquette Scène 1 dans `.superpowers/brainstorm/2026-05-06-expeditions/content/expeditions-mockup.html`.
 
 **Files:**
-- Create: `apps/explore-web/src/components/quests/QuestsBoard.tsx` (sous-dossier à créer)
-- Create: `apps/explore-web/src/components/quests/QuestsBoard.css`
+- Create: `apps/explore-web/src/components/quests/QuestsBoardPanel.tsx` (sous-dossier à créer)
+- Create: `apps/explore-web/src/components/quests/QuestsBoardPanel.css`
 
 - [ ] **Step 1: Créer le squelette**
 
