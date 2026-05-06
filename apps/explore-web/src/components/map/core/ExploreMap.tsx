@@ -887,8 +887,8 @@ export const ExploreMap = memo(function ExploreMap() {
         const { customName, tagColor } = f.properties as Record<string, unknown>
         if (!customName) return null
         const [lon, lat] = (f.geometry as unknown as { coordinates: [number, number] }).coordinates
-        // V0.7 — taille du titre interpolée sur le zoom : 18px (zoom 6) → 78px (zoom 16)
-        const fontSize = Math.round(18 + Math.max(0, Math.min(zoomLevel, 16) - 6) * 6)
+        // V0.7 — taille du titre interpolée sur le zoom : 18px (zoom 6) → 25px (zoom 16)
+        const fontSize = Math.round(18 + Math.max(0, Math.min(zoomLevel, 16) - 6) * 0.7)
         return (
           <Marker
             key={`tname-${f.id}`}
