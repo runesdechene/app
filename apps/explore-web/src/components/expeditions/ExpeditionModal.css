@@ -19,6 +19,7 @@
   border-radius: 14px;
   width: 100%;
   max-width: 960px;
+  height: 90vh;          /* hauteur fixe pour que le chat à droite occupe toute la hauteur */
   max-height: 95vh;
   display: flex;
   flex-direction: column;
@@ -26,6 +27,12 @@
   overflow: hidden;
   position: relative;
   margin: auto;
+}
+@media (max-width: 760px) {
+  .expedition-modal {
+    /* mobile : on revient à hauteur dynamique (le chat est empilé sous le main) */
+    height: auto;
+  }
 }
 
 /* ─────────── Shell 2 colonnes plein-hauteur ─────────── */
