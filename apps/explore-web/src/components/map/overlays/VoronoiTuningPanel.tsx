@@ -74,13 +74,13 @@ export function VoronoiTuningPanel() {
           <label>Base (km)</label>
           <input
             type="range"
-            min={0.3}
-            max={2.0}
-            step={0.05}
+            min={0.1}
+            max={10}
+            step={0.1}
             value={baseKm}
             onChange={e => setBaseKm(Number(e.target.value))}
           />
-          <span className="vtp-value">{baseKm.toFixed(2)}</span>
+          <span className="vtp-value">{baseKm.toFixed(1)}</span>
         </div>
 
         <div className="vtp-row">
@@ -88,7 +88,7 @@ export function VoronoiTuningPanel() {
           <input
             type="range"
             min={0.05}
-            max={1.0}
+            max={3.0}
             step={0.05}
             value={stepKm}
             onChange={e => setStepKm(Number(e.target.value))}
@@ -100,9 +100,9 @@ export function VoronoiTuningPanel() {
           <label>Cap max</label>
           <input
             type="range"
-            min={1.5}
-            max={5.0}
-            step={0.1}
+            min={1}
+            max={30}
+            step={0.5}
             value={capKm}
             onChange={e => setCapKm(Number(e.target.value))}
           />
