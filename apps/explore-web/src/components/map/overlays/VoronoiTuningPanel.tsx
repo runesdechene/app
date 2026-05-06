@@ -1,12 +1,6 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../../lib/supabase'
+import { useState } from 'react'
 import { useVoronoiTuningStore, radiusForCrowns } from '../../../stores/voronoiTuningStore'
 import './VoronoiTuningPanel.css'
-
-interface CourtInvestedRow {
-  placeId: string
-  crownsTotal: number
-}
 
 const REFERENCE_VALUES = [0, 1, 5, 20, 100, 500, 1000, 10000]
 
@@ -19,27 +13,11 @@ export function VoronoiTuningPanel() {
   const setBaseKm = useVoronoiTuningStore(s => s.setBaseKm)
   const setStepKm = useVoronoiTuningStore(s => s.setStepKm)
   const setCapKm = useVoronoiTuningStore(s => s.setCapKm)
-  const setCrownsByPlace = useVoronoiTuningStore(s => s.setCrownsByPlace)
+  const crownsByPlace = useVoronoiTuningStore(s => s.crownsByPlace)
   const reset = useVoronoiTuningStore(s => s.reset)
 
   const [collapsed, setCollapsed] = useState(true)
-  const [loadedCount, setLoadedCount] = useState<number | null>(null)
-
-  // Charge les Couronnes investies par lieu au mount
-  useEffect(() => {
-    void (async () => {
-      const { data, error } = await supabase.rpc('get_court_invested_per_place')
-      if (error) {
-        console.error('[VoronoiTuningPanel] error', error)
-        return
-      }
-      const rows = (data as CourtInvestedRow[]) ?? []
-      const map = new Map<string, number>()
-      for (const r of rows) map.set(r.placeId, r.crownsTotal)
-      setCrownsByPlace(map)
-      setLoadedCount(rows.length)
-    })()
-  }, [setCrownsByPlace])
+  const loadedCount = crownsByPlace.size
 
   if (collapsed) {
     return (
@@ -129,7 +107,7 @@ export function VoronoiTuningPanel() {
 
       <div className="vtp-footer">
         <span className="vtp-loaded">
-          {loadedCount === null ? 'Chargement…' : `${loadedCount} lieu${loadedCount > 1 ? 'x' : ''} avec Couronnes`}
+          {loadedCount === 0 ? 'Chargement…' : `${loadedCount} lieu${loadedCount > 1 ? 'x' : ''} avec Couronnes`}
         </span>
         <button className="vtp-reset" onClick={reset}>Réinitialiser</button>
       </div>

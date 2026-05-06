@@ -44,6 +44,7 @@ import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
 import { useCourtNotifications } from '../hooks/useCourtNotifications'
+import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
 import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
@@ -167,6 +168,8 @@ export default function MapPage() {
   useNotifications()
   // V0.7 phase 5 — toasts La Cour (attaque, bascule, mécène principal…)
   useCourtNotifications()
+  // V0.7.3 — charge les Couronnes investies par lieu pour pondérer le Voronoï
+  useCourtInvestedLoad(isAuthenticated)
   useResourceTimers()
 
   // V0.7 — Système de niveaux

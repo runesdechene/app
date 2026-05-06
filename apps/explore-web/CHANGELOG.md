@@ -21,6 +21,7 @@ Quand quelqu'un attaque un de tes lieux, perd ou prend un lieu auprès de toi, t
 - Réaffirmation IRL : le bouton "Planter mon étendard" sur ton propre lieu efface les challengers en cours (mais garde ta défense).
 - Replant interdit en pure perte : le bouton ne s'affiche que quand il a un sens.
 - Refonte UX en parchemin / encres bordeaux et violet pour aligner avec l'esprit Rune de Chêne.
+- **Voronoï pondéré activé en prod** (1.6 km de base, +0.9 km par décade de Couronnes investies, plafond 10 km) : les lieux avec beaucoup de Couronnes irradient plus loin sur la carte. Le panel admin de calibration reste accessible.
 
 ---
 

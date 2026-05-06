@@ -5,11 +5,14 @@ import { create } from 'zustand'
 //
 // Formule : rayon_km = min(capKm, baseKm + log10(1 + crowns) × stepKm)
 
+// Valeurs PROD calibrées le 6 mai 2026 par Uriel via le panel admin.
+// Le panel reste disponible (composant + RPC + store) — il suffit de remonter
+// <VoronoiTuningPanel /> dans MapPage pour ré-ouvrir le simulateur.
 export const VORONOI_TUNING_DEFAULTS = {
-  enabled: false,
-  baseKm: 1.0,
-  stepKm: 0.5,
-  capKm: 3.0,
+  enabled: true,
+  baseKm: 1.6,
+  stepKm: 0.9,
+  capKm: 10.0,
 } as const
 
 interface VoronoiTuningState {
