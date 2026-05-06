@@ -14,9 +14,25 @@ interface Props {
   /** Lookup display_name + avatar_url pour chaque user_id participant. */
   participantsById: Record<string, { display_name: string; avatar_url: string | null; faction_color: string | null }>
   readOnly?: boolean
+  /** Click sur avatar/nom — ouvre le profil et ferme la modale parente. */
+  onAuthorClick?: (userId: string) => void
 }
 
-export function ExpeditionChat({ expeditionId, participantsById, readOnly }: Props) {
+function formatChatDate(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  if (d.toDateString() === now.toDateString()) return time
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (d.toDateString() === yesterday.toDateString()) return `Hier ${time}`
+  const sameYear = d.getFullYear() === now.getFullYear()
+  return d.toLocaleDateString('fr-FR', sameYear
+    ? { day: 'numeric', month: 'short' }
+    : { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + time
+}
+
+export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAuthorClick }: Props) {
   useExpeditionChat(expeditionId)
 
   // /!\ NE PAS faire `s.messagesByExpedition[id] ?? []` directement dans le selector :
@@ -60,17 +76,47 @@ export function ExpeditionChat({ expeditionId, participantsById, readOnly }: Pro
         {messages.map((m) => {
           const isMe = m.user_id === myUserId
           const author = participantsById[m.user_id]
-          const initials = (author?.display_name || '?').slice(0, 2).toUpperCase()
+          const authorName = author?.display_name || 'Voyageur'
+          const initials = authorName.slice(0, 2).toUpperCase()
           const factionStyle = author?.faction_color
             ? { boxShadow: `0 0 0 2px #faf2dd, 0 0 0 3px ${author.faction_color}` }
             : undefined
+          // Pas de profil cliquable pour soi-même (inutile).
+          const handleAuthor = !isMe && onAuthorClick ? () => onAuthorClick(m.user_id) : undefined
+          const avatarContent = author?.avatar_url ? <img src={author.avatar_url} alt="" /> : initials
           return (
             <div key={m.id} className={`expedition-chat-msg${isMe ? ' is-me' : ''}`}>
-              <span className="expedition-chat-avatar" style={factionStyle}>
-                {author?.avatar_url ? <img src={author.avatar_url} alt="" /> : initials}
-              </span>
+              {handleAuthor ? (
+                <button
+                  type="button"
+                  className="expedition-chat-avatar is-clickable"
+                  style={factionStyle}
+                  onClick={handleAuthor}
+                  title={`Voir le profil de ${authorName}`}
+                >{avatarContent}</button>
+              ) : (
+                <span className="expedition-chat-avatar" style={factionStyle}>{avatarContent}</span>
+              )}
               <div className="expedition-chat-bubble">
-                <span className="expedition-chat-author">{isMe ? 'Toi' : (author?.display_name || 'Voyageur')}</span>
+                <div className="expedition-chat-meta">
+                  {isMe ? (
+                    <span className="expedition-chat-author">Toi</span>
+                  ) : handleAuthor ? (
+                    <button
+                      type="button"
+                      className="expedition-chat-author is-clickable"
+                      onClick={handleAuthor}
+                      title={`Voir le profil de ${authorName}`}
+                    >
+                      {authorName}
+                    </button>
+                  ) : (
+                    <span className="expedition-chat-author">{authorName}</span>
+                  )}
+                  <span className="expedition-chat-date" title={new Date(m.created_at).toLocaleString('fr-FR')}>
+                    {formatChatDate(m.created_at)}
+                  </span>
+                </div>
                 {m.content}
               </div>
             </div>

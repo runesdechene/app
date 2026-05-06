@@ -426,6 +426,36 @@
   box-sizing: content-box;
 }
 .emm-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+button.emm-avatar.emm-avatar-btn {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+button.emm-avatar.emm-avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+/* NameLink — nom cliquable inline qui ouvre le profil. */
+.emm-name-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s, text-decoration-color 0.15s;
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 82, 48, 0.25);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.emm-name-link:hover {
+  color: #6b3410;
+  text-decoration-color: rgba(107, 52, 16, 0.7);
+}
 
 .expedition-modal-section {
   padding: 18px 28px;
@@ -803,16 +833,54 @@
   color: #faf2dd;
   border-color: #2a1f10;
 }
+.expedition-chat-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
 .expedition-chat-author {
-  display: block;
   font-family: var(--font-accent);
   font-size: 11px;
   font-weight: 600;
   color: #6b5230;
-  margin-bottom: 2px;
   letter-spacing: 0.04em;
+  /* reset bouton si version cliquable */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  text-align: left;
+}
+button.expedition-chat-author.is-clickable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+button.expedition-chat-author.is-clickable:hover {
+  color: #2a1f10;
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 82, 48, 0.5);
+  text-underline-offset: 2px;
+}
+.expedition-chat-date {
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 500;
+  color: #a08868;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 .expedition-chat-msg.is-me .expedition-chat-author { color: #b89a6a; }
+button.expedition-chat-avatar.is-clickable {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+button.expedition-chat-avatar.is-clickable:hover {
+  transform: scale(1.06);
+}
 .expedition-chat-input {
   display: flex;
   gap: 8px;

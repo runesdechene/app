@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import {
   getExpedition,
@@ -13,6 +13,7 @@ import {
 } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 import { ExpeditionChat } from './ExpeditionChat'
 import { ExpeditionGallery } from './ExpeditionGallery'
 import { ReportEditor } from './ReportEditor'
@@ -58,6 +59,13 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     return () => setCurrent(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expeditionId])
+
+  // Ouvre le profil d'un voyageur — ferme la modale d'expédition au passage.
+  const openProfile = useCallback((userId: string) => {
+    if (!userId) return
+    useMapStore.getState().setSelectedPlayerId(userId)
+    onClose()
+  }, [onClose])
 
   // Lookup participants pour le chat (avatar + faction)
   const participantsById = useMemo(() => {
@@ -156,7 +164,9 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         <header className="expedition-modal-header">
           <div className="expedition-modal-header-content">
             <div className="expedition-modal-eyebrow">
-              {formatRelativeRdv(e.rdv_at)} · par {isChief ? 'toi' : chief.display_name}
+              {formatRelativeRdv(e.rdv_at)} · par {isChief
+                ? 'toi'
+                : <NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />}
             </div>
             <h2 className="expedition-modal-title">{e.name}</h2>
 
@@ -244,7 +254,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           <InfoRow
             icon="👤"
             label="Chef"
-            value={chief.display_name}
+            value={<NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />}
           />
           <InfoRow icon="👥" label="Compagnons" value={
             e.slots_open
@@ -264,9 +274,14 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               {pendingParticipants.map((p) => (
                 <li key={p.user_id} className="expedition-modal-pending-card">
                   <div className="expedition-modal-pending-head">
-                    <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
+                    <Avatar
+                      name={p.display_name}
+                      avatarUrl={p.avatar_url}
+                      factionColor={p.faction_color}
+                      onClick={() => openProfile(p.user_id)}
+                    />
                     <div>
-                      <strong>{p.display_name}</strong>
+                      <strong><NameLink name={p.display_name} onClick={() => openProfile(p.user_id)} /></strong>
                       {p.faction_title && p.faction_color && (
                         <div style={{ marginTop: 2 }}>
                           <HeritageTag title={p.faction_title} color={p.faction_color} />
@@ -302,9 +317,12 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
                 name={chief.display_name}
                 avatarUrl={chief.avatar_url}
                 factionColor={chief.faction_color}
+                onClick={() => openProfile(chief.user_id)}
               />
               <div className="expedition-modal-companion-info">
-                <div className="expedition-modal-companion-name">{chief.display_name}</div>
+                <div className="expedition-modal-companion-name">
+                  <NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />
+                </div>
                 <div className="expedition-modal-companion-meta">
                   <span className="emm-pill-chief">Chef</span>
                 </div>
@@ -312,9 +330,16 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             </li>
             {validatedParticipants.map((p) => (
               <li key={p.user_id} className="expedition-modal-companion">
-                <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
+                <Avatar
+                  name={p.display_name}
+                  avatarUrl={p.avatar_url}
+                  factionColor={p.faction_color}
+                  onClick={() => openProfile(p.user_id)}
+                />
                 <div className="expedition-modal-companion-info">
-                  <div className="expedition-modal-companion-name">{p.display_name}</div>
+                  <div className="expedition-modal-companion-name">
+                    <NameLink name={p.display_name} onClick={() => openProfile(p.user_id)} />
+                  </div>
                 </div>
                 {isChief && (
                   <button className="emm-btn-mini" onClick={() => handleEject(p.user_id)}>Éjecter</button>
@@ -401,7 +426,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           <section className="expedition-modal-section">
             <h3>Comptes rendus · galerie</h3>
             <ExpeditionGallery reports={reports} />
-            <ReportsList reports={reports} myUserId={myUserId} />
+            <ReportsList reports={reports} myUserId={myUserId} onAuthorClick={openProfile} />
             {isMember && !reportEditorOpen && (
               <button className="emm-btn-primary" onClick={() => setReportEditorOpen(true)}>
                 {myReport ? 'Modifier mon compte rendu' : 'Laisser mon compte rendu'}
@@ -446,6 +471,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               expeditionId={expeditionId}
               participantsById={participantsById}
               readOnly={e.status === 'passed'}
+              onAuthorClick={openProfile}
             />
           </aside>
         )}
@@ -490,13 +516,26 @@ function HeritageTag({ title, color }: { title: string; color: string }) {
   )
 }
 
-function Avatar({ name, avatarUrl, factionColor }: {
-  name: string; avatarUrl: string | null; factionColor: string | null
+function Avatar({ name, avatarUrl, factionColor, onClick }: {
+  name: string; avatarUrl: string | null; factionColor: string | null; onClick?: () => void
 }) {
   const initials = (name || '?').slice(0, 2).toUpperCase()
   const style = factionColor
     ? { boxShadow: `0 0 0 2px #faf2dd, 0 0 0 4px ${factionColor}` }
     : undefined
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className="emm-avatar emm-avatar-btn"
+        style={style}
+        onClick={onClick}
+        title={`Voir le profil de ${name}`}
+      >
+        {avatarUrl ? <img src={avatarUrl} alt="" /> : initials}
+      </button>
+    )
+  }
   return (
     <span className="emm-avatar" style={style}>
       {avatarUrl ? <img src={avatarUrl} alt="" /> : initials}
@@ -504,7 +543,22 @@ function Avatar({ name, avatarUrl, factionColor }: {
   )
 }
 
-function ReportsList({ reports, myUserId }: { reports: ExpeditionReport[]; myUserId: string | null }) {
+function NameLink({ name, onClick }: { name: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="emm-name-link"
+      onClick={onClick}
+      title={`Voir le profil de ${name}`}
+    >
+      {name}
+    </button>
+  )
+}
+
+function ReportsList({ reports, myUserId, onAuthorClick }: {
+  reports: ExpeditionReport[]; myUserId: string | null; onAuthorClick: (userId: string) => void
+}) {
   if (reports.length === 0) {
     return <div className="emm-empty">Pas encore de compte rendu posé.</div>
   }
@@ -513,9 +567,14 @@ function ReportsList({ reports, myUserId }: { reports: ExpeditionReport[]; myUse
       {reports.map((r) => (
         <div key={r.user_id} className="emm-report-card">
           <div className="emm-report-author">
-            <Avatar name={r.display_name} avatarUrl={r.avatar_url} factionColor={r.faction_color} />
+            <Avatar
+              name={r.display_name}
+              avatarUrl={r.avatar_url}
+              factionColor={r.faction_color}
+              onClick={() => onAuthorClick(r.user_id)}
+            />
             <div>
-              <strong>{r.display_name}</strong>
+              <strong><NameLink name={r.display_name} onClick={() => onAuthorClick(r.user_id)} /></strong>
               {r.faction_title && r.faction_color && (
                 <div style={{ marginTop: 2 }}>
                   <HeritageTag title={r.faction_title} color={r.faction_color} />
