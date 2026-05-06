@@ -10,7 +10,7 @@ import {
   updateExpeditionCall,
   flagExpedition,
   uploadExpeditionCover,
-  getExpeditionMediaUrl,
+  getExpeditionCoverUrl,
 } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -207,7 +207,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         {(e.cover_image_url || isChief) && (
           <div className="expedition-modal-cover">
             {e.cover_image_url ? (
-              <img src={getExpeditionMediaUrl(e.cover_image_url)} alt="" />
+              <img src={getExpeditionCoverUrl(e.cover_image_url)} alt="" />
             ) : (
               <div className="expedition-modal-cover-empty">
                 <span>📷</span>

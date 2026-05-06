@@ -319,10 +319,10 @@ export async function uploadExpeditionCover(
   if (file.size > 10 * 1024 * 1024) return { success: false, error: 'image_too_large' }
 
   const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = `${expeditionId}/cover/${Date.now()}.${ext}`
+  const path = `${expeditionId}/${Date.now()}.${ext}`
 
   const { error: uploadError } = await supabase.storage
-    .from('voyage-medias')
+    .from('voyage-covers')
     .upload(path, file, { contentType: file.type, upsert: true })
   if (uploadError) return { success: false, error: uploadError.message }
 
@@ -332,12 +332,21 @@ export async function uploadExpeditionCover(
     p_storage_path: path,
   })
   if (rpcError) {
-    await supabase.storage.from('voyage-medias').remove([path])
+    await supabase.storage.from('voyage-covers').remove([path])
     return { success: false, error: rpcError.message }
   }
   const d = data as { success: boolean; error?: string }
   if (!d.success) return { success: false, error: d.error }
   return { success: true, storage_path: path }
+}
+
+/**
+ * URL publique d'une cover image d'expédition.
+ * Le bucket voyage-covers est public, l'URL marche sans auth.
+ */
+export function getExpeditionCoverUrl(storagePath: string): string {
+  const { data } = supabase.storage.from('voyage-covers').getPublicUrl(storagePath)
+  return data.publicUrl
 }
 
 export type { ExpeditionMessage } // re-export pour ergonomie

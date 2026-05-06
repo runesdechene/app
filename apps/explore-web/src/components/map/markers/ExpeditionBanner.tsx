@@ -1,5 +1,5 @@
 import type { ExpeditionListItem } from '../../../types/expedition'
-import { getExpeditionMediaUrl } from '../../../lib/expeditionsApi'
+import { getExpeditionCoverUrl } from '../../../lib/expeditionsApi'
 import './ExpeditionBanner.css'
 
 /**
@@ -41,7 +41,7 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
 
   // Image source : cover > avatar chef > rien (fallback emoji)
   const coverUrl = expedition.cover_image_url
-    ? getExpeditionMediaUrl(expedition.cover_image_url)
+    ? getExpeditionCoverUrl(expedition.cover_image_url)
     : null
   const imgSrc = coverUrl ?? expedition.chief.avatar_url
   const factionRingStyle = expedition.chief.faction_color
