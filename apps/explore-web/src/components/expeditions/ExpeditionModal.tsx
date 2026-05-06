@@ -293,6 +293,37 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </section>
         )}
 
+        {/* Validés */}
+        <section className="expedition-modal-section">
+          <h3>Compagnons validés · {validatedCount}</h3>
+          <ul className="expedition-modal-companions-list">
+            <li className="expedition-modal-companion">
+              <Avatar
+                name={chief.display_name}
+                avatarUrl={chief.avatar_url}
+                factionColor={chief.faction_color}
+              />
+              <div className="expedition-modal-companion-info">
+                <div className="expedition-modal-companion-name">{chief.display_name}</div>
+                <div className="expedition-modal-companion-meta">
+                  <span className="emm-pill-chief">Chef</span>
+                </div>
+              </div>
+            </li>
+            {validatedParticipants.map((p) => (
+              <li key={p.user_id} className="expedition-modal-companion">
+                <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
+                <div className="expedition-modal-companion-info">
+                  <div className="expedition-modal-companion-name">{p.display_name}</div>
+                </div>
+                {isChief && (
+                  <button className="emm-btn-mini" onClick={() => handleEject(p.user_id)}>Éjecter</button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+
         {/* Règles de l'explorateur érudit — bulles de bienséance bienveillante */}
         <section className="expedition-modal-section expedition-modal-rules">
           <h3>Règles de l'explorateur érudit</h3>
@@ -340,37 +371,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               </div>
             </div>
           </div>
-        </section>
-
-        {/* Validés */}
-        <section className="expedition-modal-section">
-          <h3>Compagnons validés · {validatedCount}</h3>
-          <ul className="expedition-modal-companions-list">
-            <li className="expedition-modal-companion">
-              <Avatar
-                name={chief.display_name}
-                avatarUrl={chief.avatar_url}
-                factionColor={chief.faction_color}
-              />
-              <div className="expedition-modal-companion-info">
-                <div className="expedition-modal-companion-name">{chief.display_name}</div>
-                <div className="expedition-modal-companion-meta">
-                  <span className="emm-pill-chief">Chef</span>
-                </div>
-              </div>
-            </li>
-            {validatedParticipants.map((p) => (
-              <li key={p.user_id} className="expedition-modal-companion">
-                <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
-                <div className="expedition-modal-companion-info">
-                  <div className="expedition-modal-companion-name">{p.display_name}</div>
-                </div>
-                {isChief && (
-                  <button className="emm-btn-mini" onClick={() => handleEject(p.user_id)}>Éjecter</button>
-                )}
-              </li>
-            ))}
-          </ul>
         </section>
 
         {/* Demande à rejoindre (non-membre) */}
