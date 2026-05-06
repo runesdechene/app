@@ -887,16 +887,27 @@ export const ExploreMap = memo(function ExploreMap() {
         const { customName, tagColor } = f.properties as Record<string, unknown>
         if (!customName) return null
         const [lon, lat] = (f.geometry as unknown as { coordinates: [number, number] }).coordinates
-        // V0.7 — taille du titre interpolée sur le zoom : 16px (zoom 6) → 56px (zoom 16)
-        const fontSize = Math.round(16 + Math.max(0, Math.min(zoomLevel, 16) - 6) * 4)
-        const style = { '--t-color': tagColor, fontSize: `${fontSize}px` } as React.CSSProperties;
+        // V0.7 — taille du titre interpolée sur le zoom : 18px (zoom 6) → 78px (zoom 16)
+        const fontSize = Math.round(18 + Math.max(0, Math.min(zoomLevel, 16) - 6) * 6)
         return (
-          <Marker key={`tname-${f.id}`} longitude={lon} latitude={lat} anchor="top" offset={[0, Math.round(150 * (0.20 + (Math.min(Math.max(zoomLevel, 6), 12) - 6) * (0.60 - 0.20) / 6) / 2)]}>
+          <Marker
+            key={`tname-${f.id}`}
+            className="territory-name-marker"
+            longitude={lon}
+            latitude={lat}
+            anchor="top"
+            offset={[0, Math.round(150 * (0.20 + (Math.min(Math.max(zoomLevel, 6), 12) - 6) * (0.60 - 0.20) / 6) / 2)]}
+          >
             <div
               className={`territory-name-label${zoomLevel >= 7 ? ' visible' : ''}`}
-              style={style}
+              style={{ '--t-color': tagColor } as React.CSSProperties}
             >
-              <span className="territory-name-text">{(customName as string).toUpperCase()}</span>
+              <span
+                className="territory-name-text"
+                style={{ fontSize: `${fontSize}px` }}
+              >
+                {(customName as string).toUpperCase()}
+              </span>
             </div>
           </Marker>
         )

@@ -137,8 +137,9 @@
 
 /* V0.7 — Force le marker portant le titre du territoire AU-DESSUS des autres
    markers HTML (pilules veilleurs notamment). MapLibre attribue un z-index
-   automatique aux markers selon leur projection ; on l'écrase ici. */
-.maplibregl-marker:has(.territory-name-label) {
+   automatique aux markers selon leur projection ; on l'écrase ici via la
+   classe `territory-name-marker` posée sur le <Marker> dans ExploreMap.tsx. */
+.maplibregl-marker.territory-name-marker {
   z-index: 1000 !important;
 }
 
