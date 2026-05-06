@@ -211,7 +211,7 @@
     content: '';
     display: block;
     flex-shrink: 0;
-    height: calc(var(--safe-bottom, 0px) + 200px);
+    height: calc(var(--safe-bottom, 0px) + 340px);
   }
 
   /* Chat input — fixed bottom en mode chat. */
@@ -408,6 +408,36 @@
   line-height: 1;
   padding: 0 4px;
   flex-shrink: 0;
+}
+
+/* Bouton "← Retour" — visible uniquement en mode édition (header.is-editing).
+   Annule l'édition sans fermer la modale. */
+.expedition-modal-back {
+  background: rgba(193, 154, 107, 0.18);
+  border: 1px solid rgba(193, 154, 107, 0.35);
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  font-size: 18px;
+  color: var(--color-ink, #4A3728);
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+  padding: 0;
+}
+.expedition-modal-back:hover {
+  background: rgba(193, 154, 107, 0.32);
+}
+/* En mode édition, on aligne center le titre court "Modifier l'expédition" */
+.expedition-modal-header.is-editing {
+  align-items: center;
+}
+.expedition-modal-header.is-editing .expedition-modal-title {
+  font-size: 18px;
 }
 
 /* L'appel — désormais inline dans le header (cf. .expedition-modal-title-call).
