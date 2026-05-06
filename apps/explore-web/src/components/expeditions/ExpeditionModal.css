@@ -204,7 +204,7 @@
     background: #faf2dd;
   }
   .expedition-modal-main {
-    padding-bottom: calc(var(--safe-bottom, 0px) + 70px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 160px);
   }
 
   /* Chat input — fixed bottom en mode chat. */
@@ -218,7 +218,7 @@
     background: #f5e9d4;
   }
   .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages {
-    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 160px);
   }
 }
 

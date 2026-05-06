@@ -74,7 +74,7 @@
 @media (max-width: 760px) {
   .expedition-creator-embedded .expedition-creator-body {
     flex-direction: column;
-    padding: 14px 16px 90px 16px; /* place pour le footer fixed */
+    padding: 14px 16px calc(var(--safe-bottom, 0px) + 160px) 16px; /* place pour le footer fixed + marge confort */
     gap: 14px;
   }
   .expedition-creator-embedded .ec-col {
