@@ -262,45 +262,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             <div className="ec-counter">{callText.length} / 200</div>
           </section>
 
-          {/* Description */}
-          <section className="ec-section">
-            <label className="ec-label">Description <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnelle)</span></label>
-            <textarea
-              className="ec-textarea"
-              placeholder="Ce que tu prévois, ce qu'il faut prévoir, le ton qu'on veut donner…"
-              value={description}
-              maxLength={1000}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <div className="ec-counter">{description.length} / 1000</div>
-          </section>
-
-          </div>{/* /ec-col-identity */}
-
-          <div className="ec-col ec-col-rdv">
-
-          {/* Date+heure */}
-          <section className="ec-section">
-            <label className="ec-label">Date et heure du RDV</label>
-            <input
-              type="datetime-local"
-              className="ec-input"
-              value={rdvAt}
-              onChange={(e) => setRdvAt(e.target.value)}
-              disabled={rdvUnset}
-              style={rdvUnset ? { opacity: 0.5 } : undefined}
-            />
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, cursor: 'pointer', fontSize: 14, color: '#6e5435' }}>
-              <input
-                type="checkbox"
-                checked={rdvUnset}
-                onChange={(e) => setRdvUnset(e.target.checked)}
-              />
-              À définir plus tard avec les compagnons
-            </label>
-          </section>
-
-          {/* Lieu */}
+          {/* Lieu (Point de ralliement) */}
           <section className="ec-section">
             <label className="ec-label">Point de ralliement</label>
             <div className="ec-pin-status">
@@ -325,6 +287,44 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
               onChange={(e) => setRdvLabel(e.target.value)}
               style={{ marginTop: 8 }}
             />
+          </section>
+
+          </div>{/* /ec-col-identity */}
+
+          <div className="ec-col ec-col-rdv">
+
+          {/* Description (en haut de la col droite, plus de hauteur) */}
+          <section className="ec-section ec-section-grow">
+            <label className="ec-label">Description <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnelle)</span></label>
+            <textarea
+              className="ec-textarea ec-textarea-tall"
+              placeholder="Ce que tu prévois, ce qu'il faut prévoir, le ton qu'on veut donner…"
+              value={description}
+              maxLength={1000}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <div className="ec-counter">{description.length} / 1000</div>
+          </section>
+
+          {/* Date+heure */}
+          <section className="ec-section">
+            <label className="ec-label">Date et heure du RDV</label>
+            <input
+              type="datetime-local"
+              className="ec-input"
+              value={rdvAt}
+              onChange={(e) => setRdvAt(e.target.value)}
+              disabled={rdvUnset}
+              style={rdvUnset ? { opacity: 0.5 } : undefined}
+            />
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, cursor: 'pointer', fontSize: 14, color: '#6e5435' }}>
+              <input
+                type="checkbox"
+                checked={rdvUnset}
+                onChange={(e) => setRdvUnset(e.target.checked)}
+              />
+              À définir plus tard avec les compagnons
+            </label>
           </section>
 
           {/* Slots */}

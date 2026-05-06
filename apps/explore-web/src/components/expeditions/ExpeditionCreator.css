@@ -56,6 +56,13 @@
 .expedition-creator-embedded .ec-section {
   margin-bottom: 0;
 }
+.expedition-creator-embedded .ec-section-grow {
+  display: flex;
+  flex-direction: column;
+}
+.expedition-creator-embedded .ec-textarea-tall {
+  min-height: 220px;
+}
 .expedition-creator-embedded .ec-error-full {
   flex-basis: 100%;
   width: 100%;
@@ -278,7 +285,9 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 24px 16px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 16px;
   border: 1px dashed rgba(184, 154, 106, 0.6);
   border-radius: 8px;
   background: rgba(255, 248, 235, 0.5);
@@ -297,12 +306,10 @@
 .ec-cover-preview {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
-  max-width: 220px;
-  margin: 0 auto;
-  border-radius: 50%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
   overflow: hidden;
-  border: 3px solid #b89a6a;
+  border: 1px solid rgba(193, 154, 107, 0.45);
   background: #ecdcb8;
 }
 .ec-cover-preview img {
