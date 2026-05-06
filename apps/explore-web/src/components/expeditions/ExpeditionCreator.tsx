@@ -215,23 +215,11 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
       {header}
 
       <div className="expedition-creator-body">
-          {/* Nom */}
-          <section className="ec-section">
-            <label className="ec-label">Nom de l'expédition</label>
-            <input
-              type="text"
-              className="ec-input"
-              placeholder="Bivouac sur le Vercors"
-              value={name}
-              maxLength={80}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <div className="ec-counter">{name.length} / 80</div>
-          </section>
+          <div className="ec-col ec-col-identity">
 
           {/* Image de couverture (optionnelle) */}
           <section className="ec-section">
-            <label className="ec-label">Image de l'expédition <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnelle · 10 Mo max)</span></label>
+            <label className="ec-label">Image de l'expédition <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(10 Mo max)</span></label>
             {coverPreview ? (
               <div className="ec-cover-preview">
                 <img src={coverPreview} alt="" />
@@ -246,9 +234,23 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             )}
           </section>
 
-          {/* L'appel — sous-titre / phrase de motivation */}
+          {/* Nom */}
           <section className="ec-section">
-            <label className="ec-label">L'appel <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnel · modifiable plus tard)</span></label>
+            <label className="ec-label">Nom de l'expédition</label>
+            <input
+              type="text"
+              className="ec-input"
+              placeholder="Bivouac sur le Vercors"
+              value={name}
+              maxLength={80}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <div className="ec-counter">{name.length} / 80</div>
+          </section>
+
+          {/* L'appel */}
+          <section className="ec-section">
+            <label className="ec-label">L'appel <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnel)</span></label>
             <input
               type="text"
               className="ec-input"
@@ -262,7 +264,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
 
           {/* Description */}
           <section className="ec-section">
-            <label className="ec-label">Description (optionnelle)</label>
+            <label className="ec-label">Description <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnelle)</span></label>
             <textarea
               className="ec-textarea"
               placeholder="Ce que tu prévois, ce qu'il faut prévoir, le ton qu'on veut donner…"
@@ -272,6 +274,10 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             />
             <div className="ec-counter">{description.length} / 1000</div>
           </section>
+
+          </div>{/* /ec-col-identity */}
+
+          <div className="ec-col ec-col-rdv">
 
           {/* Date+heure */}
           <section className="ec-section">
@@ -360,39 +366,38 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             })()}
           </section>
 
-          {/* Validation */}
-          <section className="ec-section">
-            <label className="ec-label">Mode d'inscription</label>
-            <div className="ec-toggle-row" onClick={() => setValidationMode(validationMode === 'manual' ? 'free' : 'manual')}>
-              <div>
-                <div className="ec-toggle-title">
-                  {validationMode === 'manual' ? 'Validation manuelle' : 'Inscription libre'}
+          {/* Validation — création seulement (update_voyage ne change pas ce champ) */}
+          {!isEdit && (
+            <section className="ec-section">
+              <label className="ec-label">Mode d'inscription</label>
+              <div className="ec-toggle-row" onClick={() => setValidationMode(validationMode === 'manual' ? 'free' : 'manual')}>
+                <div>
+                  <div className="ec-toggle-title">
+                    {validationMode === 'manual' ? 'Validation manuelle' : 'Inscription libre'}
+                  </div>
+                  <div className="ec-toggle-help">
+                    {validationMode === 'manual'
+                      ? 'Tu vois chaque demande avant d\'accepter'
+                      : 'Chacun rejoint sans demander, jusqu\'à ce que ce soit complet'}
+                  </div>
                 </div>
-                <div className="ec-toggle-help">
-                  {validationMode === 'manual'
-                    ? 'Tu vois chaque demande avant d\'accepter'
-                    : 'Chacun rejoint sans demander, jusqu\'à ce que ce soit complet'}
-                </div>
+                <div className={`ec-toggle-switch${validationMode === 'free' ? ' is-off' : ''}`} />
               </div>
-              <div className={`ec-toggle-switch${validationMode === 'free' ? ' is-off' : ''}`} />
-            </div>
-          </section>
+            </section>
+          )}
 
-          {error && <div className="ec-error">{error}</div>}
+          </div>{/* /ec-col-rdv */}
+
+          {error && <div className="ec-error ec-error-full">{error}</div>}
         </div>
 
         <footer className="expedition-creator-footer">
-          {embedded && (
-            <button className="ec-secondary-btn" onClick={onClose}>
-              ← Retour
-            </button>
-          )}
           <button
             className="ec-primary-btn"
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer' : "Publier l'expédition")}
+            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'expédition")}
           </button>
         </footer>
     </>

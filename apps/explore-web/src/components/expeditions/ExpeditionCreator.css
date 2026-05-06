@@ -35,22 +35,40 @@
   box-shadow: none;
   height: 100%;
 }
+/* Layout par défaut : .ec-col est transparent (display: contents)
+   pour ne pas affecter le rendu en mode création (overlay). */
+.ec-col { display: contents; }
+
+/* Mode embedded : 2 colonnes thématiques (Identité / RDV) */
 .expedition-creator-embedded .expedition-creator-body {
-  padding: 16px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 20px;
-  align-content: start;
+  padding: 18px 22px;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+.expedition-creator-embedded .ec-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 .expedition-creator-embedded .ec-section {
   margin-bottom: 0;
 }
-.expedition-creator-embedded .ec-section-full {
-  grid-column: 1 / -1;
+.expedition-creator-embedded .ec-error-full {
+  flex-basis: 100%;
+  width: 100%;
 }
+
 @media (max-width: 760px) {
   .expedition-creator-embedded .expedition-creator-body {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    padding: 14px 16px;
+    gap: 14px;
+  }
+  .expedition-creator-embedded .ec-col {
+    width: 100%;
   }
 }
 .expedition-creator-embedded .expedition-creator-footer {

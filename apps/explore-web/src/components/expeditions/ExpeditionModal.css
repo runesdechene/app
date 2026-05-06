@@ -60,8 +60,10 @@
   /* hauteur définie par flex stretch (parent .expedition-modal-shell flex row) */
 }
 
-/* Mode édition — on cache le chat pour donner toute la place au formulaire */
-.expedition-modal-shell.is-editing .expedition-modal-chat-col {
+/* Mode édition : on cache le chat ET le footer modal (Signaler / Annuler / Se retirer)
+   — ils n'ont rien à faire pendant qu'on édite. */
+.expedition-modal-shell.is-editing .expedition-modal-chat-col,
+.expedition-modal-shell.is-editing .expedition-modal-footer {
   display: none;
 }
 .expedition-modal-chat-col-header {
