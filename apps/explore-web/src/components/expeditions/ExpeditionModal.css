@@ -312,15 +312,56 @@
 
 .expedition-modal > * { flex-shrink: 0; }
 
-.expedition-modal-header {
+/* Topbar minimale — barre d'actions sticky en haut de la modale.
+   Le titre/eyebrow/appel ne vivent PLUS dans la topbar mais dans
+   le main scrollable (cf. .expedition-modal-intro). */
+.expedition-modal-topbar {
   position: relative;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  background: #faf2dd;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+}
+.expedition-modal-topbar-spacer {
+  display: inline-block;
+  width: 1px;
+}
+.expedition-modal-topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Intro de la modale — vit dans .expedition-modal-main, scrolle avec
+   le reste du contenu. Reprend les styles de l'ancien header. */
+.expedition-modal-intro {
   padding: 22px 28px 18px 28px;
   background: linear-gradient(180deg, #faf2dd, #f5e9d4);
   border-bottom: 1px solid rgba(184, 154, 106, 0.45);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  flex-shrink: 0;
+}
+
+@media (max-width: 760px) {
+  .expedition-modal-topbar {
+    padding: 8px 12px;
+  }
+  /* Sur mobile, le × est déjà dans les tabs (s'il y a chat) — on le
+     cache dans la topbar pour éviter le doublon. Si pas de chat,
+     pas de tabs, donc le × topbar reste visible. */
+  .expedition-modal.mobile-tab-info .expedition-modal-topbar .expedition-modal-close,
+  .expedition-modal.mobile-tab-chat .expedition-modal-topbar .expedition-modal-close {
+    display: none;
+  }
+  /* Topbar masquée en mode chat — pas d'action utile (× est dans les tabs). */
+  .expedition-modal.mobile-tab-chat .expedition-modal-topbar {
+    display: none;
+  }
+  .expedition-modal-intro {
+    padding: 18px 16px 16px 16px;
+  }
 }
 .expedition-modal-header-content {
   flex: 1 1 auto;

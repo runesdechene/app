@@ -160,14 +160,15 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
       <div
-        className={`expedition-modal${chatVisible ? ` mobile-tab-${mobileTab}` : ''}`}
+        className={`expedition-modal${chatVisible && !editorOpen ? ` mobile-tab-${mobileTab}` : ''}`}
         onClick={(ev) => ev.stopPropagation()}
       >
 
         {/* Tabs mobile-only — placées TOUT EN HAUT pour qu'elles soient
             l'élément de navigation principal sur mobile. Le header (titre,
-            etc.) descend en dessous et n'apparaît que sur le tab Expédition. */}
-        {chatVisible && (
+            etc.) descend en dessous et n'apparaît que sur le tab Expédition.
+            Cachées en mode édition — pas pertinentes. */}
+        {chatVisible && !editorOpen && (
           <div className="expedition-modal-mobile-tabs" role="tablist">
             <button
               type="button"
@@ -192,79 +193,32 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </div>
         )}
 
-        <header className={`expedition-modal-header${editorOpen ? ' is-editing' : ''}`}>
+        {/* Topbar minimale — juste les actions (retour / edit / close).
+            Le contenu (titre, eyebrow, appel) est désormais DANS le main
+            scrollable, plus haut. Comme ça il scroll avec le reste et
+            la zone visible n'est pas amputée par un header sticky. */}
+        <div className="expedition-modal-topbar">
           {editorOpen ? (
-            <>
+            <button
+              className="expedition-modal-back"
+              onClick={() => setEditorOpen(false)}
+              aria-label="Annuler l'édition"
+              title="Annuler l'édition"
+            >←</button>
+          ) : <span className="expedition-modal-topbar-spacer" />}
+          <div className="expedition-modal-topbar-actions">
+            {!editorOpen && isChief && e.status === 'published' && (
               <button
-                className="expedition-modal-back"
-                onClick={() => setEditorOpen(false)}
-                aria-label="Annuler l'édition"
-                title="Annuler l'édition"
-              >←</button>
-              <div className="expedition-modal-header-content">
-                <h2 className="expedition-modal-title">Modifier l'expédition</h2>
-              </div>
-              <div className="expedition-modal-header-actions">
-                <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="expedition-modal-header-content">
-                <div className="expedition-modal-eyebrow">
-                  {formatRelativeRdv(e.rdv_at)} · par {isChief
-                    ? 'toi'
-                    : <NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />}
-                </div>
-                <h2 className="expedition-modal-title">{e.name}</h2>
-
-                {/* L'appel — intégré directement sous le titre, pas dans un bloc séparé */}
-                {(e.call_text || canEditCall) && (
-                  <div className="expedition-modal-title-call">
-                    {editingCall ? (
-                      <div className="expedition-modal-call-edit-row">
-                        <textarea
-                          value={callDraft}
-                          maxLength={200}
-                          onChange={(ev) => setCallDraft(ev.target.value)}
-                          placeholder="Une phrase qui dit pourquoi on y va…"
-                        />
-                        <div className="expedition-modal-call-actions">
-                          <button onClick={() => setEditingCall(false)}>Annuler</button>
-                          <button onClick={handleSaveCall} className="is-primary">Enregistrer</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {e.call_text && <span className="expedition-modal-call-text">« {e.call_text} »</span>}
-                        {canEditCall && (
-                          <button
-                            className="expedition-modal-call-edit"
-                            onClick={() => setEditingCall(true)}
-                            title="Modifier l'appel"
-                          >✎</button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {e.rdv_label && <div className="expedition-modal-when">{e.rdv_label}</div>}
-              </div>
-              <div className="expedition-modal-header-actions">
-                {isChief && e.status === 'published' && (
-                  <button
-                    className="expedition-modal-edit"
-                    onClick={() => setEditorOpen(true)}
-                    aria-label="Modifier l'expédition"
-                    title="Modifier l'expédition"
-                  >✎</button>
-                )}
-                <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
-              </div>
-            </>
-          )}
-        </header>
+                className="expedition-modal-edit"
+                onClick={() => setEditorOpen(true)}
+                aria-label="Modifier l'expédition"
+                title="Modifier l'expédition"
+              >✎</button>
+            )}
+            {/* Le × de la topbar — caché mobile car déjà dans les tabs. */}
+            <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+          </div>
+        </div>
 
         <div className={[
           'expedition-modal-shell',
@@ -286,6 +240,51 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           />
         ) : (
         <>
+        {/* Bloc en-tête contextuel — eyebrow, titre, appel, lieu. Vit
+            DANS le main scrollable (et plus dans un header sticky), pour
+            que l'espace vertical visible soit maximal sur mobile. */}
+        <div className="expedition-modal-intro">
+          <div className="expedition-modal-eyebrow">
+            {formatRelativeRdv(e.rdv_at)} · par {isChief
+              ? 'toi'
+              : <NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />}
+          </div>
+          <h2 className="expedition-modal-title">{e.name}</h2>
+
+          {/* L'appel — intégré directement sous le titre, pas dans un bloc séparé */}
+          {(e.call_text || canEditCall) && (
+            <div className="expedition-modal-title-call">
+              {editingCall ? (
+                <div className="expedition-modal-call-edit-row">
+                  <textarea
+                    value={callDraft}
+                    maxLength={200}
+                    onChange={(ev) => setCallDraft(ev.target.value)}
+                    placeholder="Une phrase qui dit pourquoi on y va…"
+                  />
+                  <div className="expedition-modal-call-actions">
+                    <button onClick={() => setEditingCall(false)}>Annuler</button>
+                    <button onClick={handleSaveCall} className="is-primary">Enregistrer</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {e.call_text && <span className="expedition-modal-call-text">« {e.call_text} »</span>}
+                  {canEditCall && (
+                    <button
+                      className="expedition-modal-call-edit"
+                      onClick={() => setEditingCall(true)}
+                      title="Modifier l'appel"
+                    >✎</button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {e.rdv_label && <div className="expedition-modal-when">{e.rdv_label}</div>}
+        </div>
+
         {/* Cover image — visible si fournie. Modification via le bouton ✎ du header (chef). */}
         {e.cover_image_url && (
           <div className="expedition-modal-cover">
