@@ -19,7 +19,6 @@
   border-radius: 14px;
   width: 100%;
   max-width: 960px;
-  height: 90vh;          /* hauteur fixe pour que le chat à droite occupe toute la hauteur */
   max-height: 95vh;
   display: flex;
   flex-direction: column;
@@ -27,12 +26,6 @@
   overflow: hidden;
   position: relative;
   margin: auto;
-}
-@media (max-width: 760px) {
-  .expedition-modal {
-    /* mobile : on revient à hauteur dynamique (le chat est empilé sous le main) */
-    height: auto;
-  }
 }
 
 /* ─────────── Shell 2 colonnes plein-hauteur ─────────── */
@@ -64,7 +57,7 @@
   border-left: 1px solid rgba(184, 154, 106, 0.45);
   background: rgba(252, 241, 214, 0.4);
   min-height: 0;
-  height: 100%;
+  /* hauteur définie par flex stretch (parent .expedition-modal-shell flex row) */
 }
 .expedition-modal-chat-col-header {
   padding: 14px 18px 8px;
