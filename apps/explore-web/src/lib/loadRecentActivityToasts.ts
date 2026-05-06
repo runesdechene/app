@@ -87,7 +87,8 @@ export async function loadRecentActivityToasts(currentUserId: string) {
           type: 'court',
           message: built.message,
           highlights: built.highlights,
-          actorId: e.actor_id ?? undefined,
+          // V097.1 — actorId mappé uniquement si actor en highlights[0]
+          actorId: built.hasActorInHighlights ? (e.actor_id ?? undefined) : undefined,
           placeId: e.place_id ?? undefined,
           timestamp: new Date(e.created_at).getTime(),
         })

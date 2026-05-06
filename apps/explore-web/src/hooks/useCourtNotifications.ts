@@ -33,7 +33,9 @@ export function useCourtNotifications() {
           type: 'court',
           message: t.message,
           highlights: t.highlights,
-          actorId: row.actor_id ?? undefined,
+          // V097.1 — actorId mappé seulement si l'actor est en highlights[0],
+          // sinon le clic sur le lieu serait redirigé vers le profil de l'actor.
+          actorId: t.hasActorInHighlights ? (row.actor_id ?? undefined) : undefined,
           placeId: row.place_id ?? undefined,
           timestamp: Date.now(),
         })

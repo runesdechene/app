@@ -33,6 +33,11 @@ export const COURT_TYPES = new Set<string>([
 export interface CourtToastBuilt {
   message: string
   highlights: string[]
+  /** True si highlights[0] est le nom de l'actor (auquel cas mapper actorId
+   *  au clic). False si highlights[0] est le nom du lieu ou autre — dans
+   *  ce cas il NE FAUT PAS passer actorId au toast (sinon le composant
+   *  GameToast mappe à tort le clic du lieu vers le profil de l'actor). */
+  hasActorInHighlights: boolean
 }
 
 /** Construit le message d'un toast Cour. Retourne null si l'event ne doit pas
@@ -48,17 +53,20 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
       return {
         message: `⚔ ${actorName} s'intéresse à ${placeTitle}`,
         highlights: [actorName, placeTitle],
+        hasActorInHighlights: true,
       }
     case 'place_court_high_threat':
       return {
         message: `🔥 ${placeTitle} est sous forte pression`,
         highlights: [placeTitle],
+        hasActorInHighlights: false,
       }
     case 'place_taken_remote':
       if (isSelf) return null
       return {
         message: `⚡ ${actorName} a pris ${placeTitle} à distance`,
         highlights: [actorName, placeTitle],
+        hasActorInHighlights: true,
       }
     case 'place_taken_remote_self':
       if (!isSelf) return null
@@ -66,22 +74,26 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
         return {
           message: `🏴 Vous avez posé votre marque sur ${placeTitle} — allez-y physiquement pour la confirmer`,
           highlights: [placeTitle],
+          hasActorInHighlights: false,
         }
       }
       return {
         message: `⚡ Vous tenez ${placeTitle} à distance — allez-y physiquement pour le confirmer`,
         highlights: [placeTitle],
+        hasActorInHighlights: false,
       }
     case 'place_taken_back_gps':
       if (isSelf) {
         return {
           message: `🛡️ Vous avez repris ${placeTitle} par votre marche`,
           highlights: [placeTitle],
+          hasActorInHighlights: false,
         }
       }
       return {
         message: `🛡️ L'ancien veilleur a repris ${placeTitle}`,
         highlights: [placeTitle],
+        hasActorInHighlights: false,
       }
     case 'place_reaffirmed': {
       const cleared = row.data?.threatsCleared ?? 0
@@ -91,11 +103,13 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
             ? `🛡️ Vous avez réaffirmé votre veille sur ${placeTitle} — ${cleared} menace${cleared > 1 ? 's' : ''} effacée${cleared > 1 ? 's' : ''}`
             : `🛡️ Vous êtes repassé sur ${placeTitle}`,
           highlights: [placeTitle],
+          hasActorInHighlights: false,
         }
       }
       return {
         message: `🛡️ ${actorName} a réaffirmé sa veille sur ${placeTitle}`,
         highlights: [actorName, placeTitle],
+        hasActorInHighlights: true,
       }
     }
     case 'mecene_principal_gained':
@@ -103,6 +117,7 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
       return {
         message: `🪙 Vous êtes désormais Mécène Principal de ${placeTitle}`,
         highlights: [placeTitle],
+        hasActorInHighlights: false,
       }
     default:
       return null

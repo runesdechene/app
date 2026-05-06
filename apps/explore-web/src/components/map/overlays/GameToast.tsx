@@ -128,18 +128,27 @@ function ToastItem({ toast }: { toast: GameToastType }) {
 
   // Nom du lieu → fly to + ouvrir panel
   // Le lieu est highlights[1] quand il y a un acteur, ou highlights[0] quand c'est un toast self sans actorId
-  if (toast.placeId && toast.placeLocation) {
+  if (toast.placeId) {
     const placeIdx = toast.actorId ? 1 : 0
     if (highlights.length > placeIdx) {
       const placeHL = highlights[placeIdx]
-      actions.set(placeHL, () => {
-        useMobileNavStore.getState().closePanel()
-        requestFlyTo({
-          lng: toast.placeLocation!.longitude,
-          lat: toast.placeLocation!.latitude,
-          placeId: toast.placeId,
+      if (toast.placeLocation) {
+        actions.set(placeHL, () => {
+          useMobileNavStore.getState().closePanel()
+          requestFlyTo({
+            lng: toast.placeLocation!.longitude,
+            lat: toast.placeLocation!.latitude,
+            placeId: toast.placeId,
+          })
         })
-      })
+      } else {
+        // V097.1 — fallback : pas de coords (cas toasts Cour) → ouvre la fiche
+        // sans fly-to. Mieux que pas d'action du tout.
+        actions.set(placeHL, () => {
+          useMobileNavStore.getState().closePanel()
+          useMapStore.getState().setSelectedPlaceId(toast.placeId!)
+        })
+      }
     }
   }
 
