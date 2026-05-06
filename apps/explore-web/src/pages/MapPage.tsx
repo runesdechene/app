@@ -325,7 +325,12 @@ export default function MapPage() {
           <FactionBar />
         </div>
       )}
-      {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
+      {!addPlaceMode && !authLoading && isAuthenticated && (
+        <div className="hud-left-stack">
+          <GameToast />
+          <ExpeditionsHud />
+        </div>
+      )}
       {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
       {!addPlaceMode && !authLoading && isAuthenticated && isAdmin && <VoronoiTuningPanel />}
 
@@ -517,7 +522,6 @@ export default function MapPage() {
         />
       )}
 
-      {!addPlaceMode && !authLoading && isAuthenticated && <ExpeditionsHud />}
 
       {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
 

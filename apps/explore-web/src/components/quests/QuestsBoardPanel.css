@@ -2,26 +2,24 @@
    Cf. spec §12.4 + maquette Scène 1. */
 
 .qbp {
-  position: fixed;
-  top: 144px; /* sous .game-toast-container (top: 68px + ~70px de marge) */
-  left: 20px;
-  width: 360px;
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 220px);
+  /* Position gérée par le wrapper .hud-left-stack côté desktop.
+     Sur mobile : caché par défaut, plein écran via [data-mobile-panel="quests"] (cf. mobile.css). */
+  width: 100%;
   background: #f5e9d4;
   border: 1px solid #b89a6a;
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(20, 14, 5, 0.22),
               0 4px 10px rgba(42, 31, 16, 0.14);
-  z-index: 14; /* en dessous des toasts (z-index: 15) */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   transition: max-height 0.22s ease;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .qbp.qbp-collapsed {
-  max-height: 56px;
+  flex: 0 0 auto;
 }
 
 /* Mobile : caché par défaut, plein écran si data-mobile-panel="quests"
