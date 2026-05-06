@@ -183,9 +183,42 @@
   .expedition-modal.mobile-tab-chat .expedition-modal-left {
     display: none;
   }
-  /* La zone d'écriture du chat doit respecter la home indicator iOS. */
-  .expedition-modal-chat-col .expedition-chat-input {
+
+  /* ──────────────────────────────────────────────────────────────────
+     POSITION FIXED — barres du bas ancrées au viewport
+     ──────────────────────────────────────────────────────────────────
+     Les hauteurs flex (100dvh / stretch) sont mal calculées sur
+     Safari/Chrome iOS quand la barre du navigateur est mobile. Plutôt
+     que de courir après le bon calcul, on ancre les barres du bas au
+     viewport via position: fixed. Le main / les messages compensent
+     avec un padding-bottom. */
+
+  /* Footer modale (Signaler / Annuler / Se retirer) — fixed bottom,
+     visible uniquement en mode info (le mode chat cache .left). */
+  .expedition-modal-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10011;
+    background: #faf2dd;
+  }
+  .expedition-modal-main {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 70px);
+  }
+
+  /* Chat input — fixed bottom en mode chat. */
+  .expedition-modal.mobile-tab-chat .expedition-chat-input {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10011;
     padding-bottom: calc(var(--safe-bottom, 0px) + 12px);
+    background: #f5e9d4;
+  }
+  .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
   }
 }
 
