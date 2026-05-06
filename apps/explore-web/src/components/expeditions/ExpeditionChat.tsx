@@ -3,6 +3,11 @@ import { useExpeditionChat } from '../../hooks/useExpeditionChat'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { sendExpeditionMessage } from '../../lib/expeditionsApi'
 import { usePlayerStore } from '../../stores/playerStore'
+import type { ExpeditionMessage } from '../../types/expedition'
+
+// Sentinelle stable pour éviter le piège du selector Zustand qui retourne
+// un nouveau tableau à chaque render (cause de "infinite loop" warning).
+const EMPTY_MESSAGES: ExpeditionMessage[] = []
 
 interface Props {
   expeditionId: string
@@ -14,7 +19,10 @@ interface Props {
 export function ExpeditionChat({ expeditionId, participantsById, readOnly }: Props) {
   useExpeditionChat(expeditionId)
 
-  const messages = useExpeditionsStore((s) => s.messagesByExpedition[expeditionId] ?? [])
+  // /!\ NE PAS faire `s.messagesByExpedition[id] ?? []` directement dans le selector :
+  // ça retourne un nouveau [] à chaque render et déclenche une boucle infinie Zustand.
+  const messagesMap = useExpeditionsStore((s) => s.messagesByExpedition)
+  const messages = messagesMap[expeditionId] ?? EMPTY_MESSAGES
   const myUserId = usePlayerStore((s) => s.userId)
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
