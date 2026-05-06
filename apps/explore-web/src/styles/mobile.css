@@ -995,12 +995,69 @@
     border-radius: 0;
     border: none;
     z-index: 9000;
-    padding-top: calc(var(--safe-top, 0px) + 8px);
+    /* La mobile-header (z 9998) fait safe-top + 6 + 44 + 6 = safe-top + 56px.
+       On laisse 8px de respiration sous le bord inférieur de la header. */
+    padding-top: calc(var(--safe-top, 0px) + 64px);
     background: rgba(250, 231, 212, 0.97);
     backdrop-filter: blur(10px);
   }
   [data-mobile-panel="quests"] .qbp.qbp-collapsed {
     max-height: none;
+  }
+
+  /* Cards expéditions mobile : chaque ligne devient une "tuile" sépia
+     avec padding et radius. Plus lisible qu'une simple liste avec
+     border-bottom. */
+  [data-mobile-panel="quests"] .qbp .expedition-card {
+    background: rgba(252, 241, 214, 0.7);
+    border: 1px solid rgba(193, 154, 107, 0.22);
+    border-radius: 5px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+  }
+  [data-mobile-panel="quests"] .qbp .expedition-card:last-child {
+    margin-bottom: 0;
+  }
+  /* Override le border-bottom desktop sur mobile — séparation par gap,
+     pas par ligne. */
+  [data-mobile-panel="quests"] .qbp .expedition-card,
+  [data-mobile-panel="quests"] .qbp .expedition-card:last-child {
+    border-bottom: 1px solid rgba(193, 154, 107, 0.22);
+  }
+  [data-mobile-panel="quests"] .qbp .expeditions-list {
+    padding: 8px 4px 8px;
+  }
+
+  /* FAB "+" — bouton rond flottant en bas à droite du panneau quêtes. */
+  [data-mobile-panel="quests"] .qbp .qbp-fab-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 16px;
+    bottom: calc(var(--safe-bottom, 0px) + 16px);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-ink, #2a1f10);
+    color: var(--color-parchment, #faf2dd);
+    border: none;
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(20, 14, 5, 0.35);
+    z-index: 9001;
+    padding: 0;
+  }
+  [data-mobile-panel="quests"] .qbp .qbp-fab-add:active {
+    transform: scale(0.96);
+  }
+  /* Le bouton "+ Créer" du header reste utilisable mais devient secondaire —
+     on le réduit à un bouton-icône discret pour libérer de l'espace texte
+     et éviter la double-CTA visuelle avec le FAB. */
+  [data-mobile-panel="quests"] .qbp .qbp-cta-mini {
+    display: none;
   }
 
   /* --- Ajuster positions avec la navbar en bas --- */

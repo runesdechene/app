@@ -69,6 +69,16 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
       <div className="qbp-content">
         <ExpeditionsList onOpenExpedition={onOpenExpedition} />
       </div>
+
+      {/* FAB "+" — visible uniquement en mode mobile-fullscreen (cf. mobile.css).
+          Pattern d'app natif : action principale en bas à droite, accessible au pouce. */}
+      <button
+        type="button"
+        className="qbp-fab-add"
+        onClick={onOpenCreator}
+        aria-label="Créer une expédition"
+        title="Créer une expédition"
+      >+</button>
     </aside>
   )
 }
