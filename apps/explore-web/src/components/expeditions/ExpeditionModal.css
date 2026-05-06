@@ -7,10 +7,10 @@
   background: rgba(40, 30, 20, 0.5);
   z-index: 9510;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 16px;
-  overflow-y: auto;
+  overflow: hidden; /* PAS de scroll sur l'overlay — sinon il prend le scroll au lieu du main */
 }
 
 .expedition-modal {
@@ -40,6 +40,7 @@
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
 }
 .expedition-modal-left {
