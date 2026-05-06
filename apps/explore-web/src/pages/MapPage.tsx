@@ -40,6 +40,7 @@ import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { NotificationBell } from '../components/notifications/NotificationBell'
+import { ExpeditionsHud } from '../components/expeditions/ExpeditionsHud'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
@@ -129,6 +130,7 @@ export default function MapPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showQuestsBoard, setShowQuestsBoard] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
@@ -357,6 +359,12 @@ export default function MapPage() {
                 refreshKey={enigmaRefreshKey}
               />
               <NotificationBell />
+              <button
+                className="toolbar-btn quests-btn"
+                onClick={() => setShowQuestsBoard(true)}
+                aria-label="Tableau de Quêtes"
+                title="Tableau de Quêtes"
+              >📋</button>
               <EnergyIndicator />
             </>
           )}
@@ -498,6 +506,13 @@ export default function MapPage() {
         <PlayerProfileModal
           playerId={selectedPlayerId}
           onClose={() => setSelectedPlayerId(null)}
+        />
+      )}
+
+      {!addPlaceMode && !authLoading && isAuthenticated && (
+        <ExpeditionsHud
+          open={showQuestsBoard}
+          onClose={() => setShowQuestsBoard(false)}
         />
       )}
 

@@ -13,8 +13,9 @@ Conventions, gotchas, décisions, préférences, architecture :
 
 - React 18 + Vite 5 + TypeScript strict
 - MapLibre GL JS (carte)
-- Zustand (10 stores : `appConfigStore`, `chatStore`, `crownsStore`, `gloryRulesStore`, `mapStore`, `mobileNavStore`, `notificationStore`, `playerStore`, `playersStore`, `toastStore`)
+- Zustand (11 stores : `appConfigStore`, `chatStore`, `crownsStore`, `expeditionsStore`, `gloryRulesStore`, `mapStore`, `mobileNavStore`, `notificationStore`, `playerStore`, `playersStore`, `toastStore`)
 - V0.7 phase 5 (5 mai 2026) : système **La Cour** — influence à distance via Couronnes, sur la fiche de lieu (onglet Infos). Composants `PlaceCourtView` + `CourtTensionBar` + `PatronsList` + `CourtChronicle` + `InvestCrownsModal` dans `components/places/details/` et `components/places/actions/`. Hook `useCourtNotifications` (subscribe activity_log filtré). Énigmes (daily/fragment/place) rapportent **1/1/2/3 Couronnes** selon difficulté (cap silencieux 500). Drop V0.5 : `InfluenceFrame`/`InfluenceToggle`/`users.influence_stock`/tables `place_influence` + `user_place_influence`.
+- V0.7+ (6 mai 2026) : système **Expéditions joueur-joueur**. Bannière temporaire sur la carte (point GPS libre), chef d'expédition unique, chat privé, comptes rendus opt-in (texte + photos + vidéos), galerie agrégée, archives consultables, "L'appel" modifiable collectivement, +10 XP au premier compte rendu. Sous-dossier `components/expeditions/` (Hud, Modal, Creator, Chat, Gallery, ReportEditor, Card, List). Sous-dossier `components/quests/` (QuestsBoardPanel — panneau HUD intégré sous toasts, liste unifiée Expéditions/Missions/Du jour avec pilules de type). Store Zustand `expeditionsStore`. Tables SQL préfixées `voyage_*` (mig 104-110) à cause d'une collision avec la table `expeditions` du système Plantage/Veille V0.7 (cf. docs/db/tech-debt.md D1). Bucket Supabase Storage `voyage-medias` (RLS). Renommage : ancien `ExpeditionOptInModal` (Plantage) → `VeillePartageeModal`. Notifications étendues avec 7 types `expedition_*`.
 - CSS par composant, media queries dans `styles/mobile.css`
 - Supabase client : `src/lib/supabase.ts`
 
@@ -38,6 +39,10 @@ components/
 │  └─ shared/      sous-composants partagés
 ├─ enigma/         DailyEnigma, FragmentEnigma, EnigmaResult
 ├─ profile/        avatar / settings (intégré modals/ pour les fenêtres)
+├─ expeditions/    ExpeditionsHud (orchestrateur), QuestsBoardPanel, ExpeditionsList,
+│                  ExpeditionCard, ExpeditionCreator, ExpeditionModal, ExpeditionChat,
+│                  ExpeditionGallery, ReportEditor (V0.7+, 6 mai 2026)
+├─ quests/         QuestsBoardPanel (panneau HUD agrégateur)
 ```
 
 ## Helpers extraits (sprint Purification)
@@ -48,8 +53,12 @@ components/
 - `lib/avatarUpload.ts` — `uploadAvatar(userId, file, {cacheBust})`
 - `lib/exploreMapConstants.ts` — constantes carte + `PopupInfo`
 - `lib/titleProgress.ts` — `STAT_LABELS` + `formatTitleProgress`
+- `lib/expeditionsApi.ts` — wrapper RPCs voyages (V0.7+, mappe voyage_* SQL → Expedition* TS)
+- `lib/expeditionDateFormat.ts` — `formatRelativeRdv()` pour les libellés date d'expédition
+- `hooks/useExpeditionChat.ts` — Realtime chat live d'une expédition (pattern useChat)
 - `types/playerProfile.ts` — types V0.5 PlayerProfile
 - `types/placeDetail.ts` — `V05Detail`, `V05Contribution`, `PlacePanelActiveTab`
+- `types/expedition.ts` — types V0.7+ ExpeditionListItem, Detail, FullPayload, Report
 
 ## Commandes
 
