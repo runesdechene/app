@@ -40,6 +40,8 @@ interface PlaceInput {
   totalInfluence?: number
   /** V0.5 : influence par faction { factionId: score } */
   influenceByFaction?: Record<string, number>
+  /** V098 — total Couronnes investies sur ce lieu (pour Voronoï pondéré) */
+  crownsTotal?: number
 }
 
 interface TierDef {
@@ -47,9 +49,20 @@ interface TierDef {
   title: string
 }
 
+/** V098 — params de tuning Voronoï pondéré (panel admin). Si enabled = false,
+ *  on retombe sur le rayon fixe BASE_RADIUS_KM (comportement V0.7 actuel). */
+interface RadiusTuning {
+  enabled: boolean
+  baseKm: number
+  stepKm: number
+  capKm: number
+}
+
 interface WorkerMessage {
   features: PlaceInput[]
   tiers: TierDef[]
+  /** Optionnel — défaut = rayon fixe historique */
+  radiusTuning?: RadiusTuning
 }
 
 /** Titre progressif selon le nombre de lieux (tiers trié desc) */
@@ -108,6 +121,14 @@ function simplifyGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon 
 function radiusForScore(score: number): number {
   if (score <= 0) return 0
   return BASE_RADIUS_KM
+}
+
+/** V098 — rayon pondéré par Couronnes investies. Formule log10 avec cap.
+ *  Appelée uniquement si tuning.enabled = true. */
+function radiusForCrowns(crowns: number, tuning: RadiusTuning): number {
+  const c = Math.max(0, crowns)
+  const r = tuning.baseKm + Math.log10(1 + c) * tuning.stepKm
+  return Math.min(tuning.capKm, r)
 }
 
 /** V0.7 : faction = celle de la veille (déjà résolue dans la dispatch ExploreMap depuis ov.factionId).
@@ -216,7 +237,8 @@ function pointInRing(x: number, y: number, ring: Position[]): boolean {
 // --- Main ---
 
 self.onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const { features, tiers } = e.data
+  const { features, tiers, radiusTuning } = e.data
+  const tuningOn = radiusTuning?.enabled === true
 
   if (features.length === 0) {
     self.postMessage({ type: 'FeatureCollection', partial: false, features: [] })
@@ -248,7 +270,11 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
     const place = features[i]
     // V0.5 : use influence-based score, fallback to V0.4
     const effectiveScore = getPlaceScore(place)
-    const rKm = radiusForScore(effectiveScore)
+    if (effectiveScore <= 0) continue
+    // V098 : pondération par Couronnes si admin tuning actif, sinon rayon fixe
+    const rKm = tuningOn && radiusTuning
+      ? radiusForCrowns(place.crownsTotal ?? 0, radiusTuning)
+      : radiusForScore(effectiveScore)
     if (rKm <= 0) continue
 
     const cellCoords = voronoi.cellPolygon(i)

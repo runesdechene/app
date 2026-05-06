@@ -1,0 +1,150 @@
+/* Panel admin de tuning Voronoï pondéré (V098) */
+
+.voronoi-tuning-fab {
+  position: fixed;
+  bottom: 92px;
+  right: 16px;
+  z-index: 800;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(74, 55, 40, 0.4);
+  background: rgba(245, 230, 211, 0.92);
+  color: #4a3728;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(74, 55, 40, 0.18);
+}
+
+.voronoi-tuning-fab:hover {
+  background: rgba(245, 230, 211, 1);
+}
+
+.voronoi-tuning-panel {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 280px;
+  z-index: 800;
+  background: rgba(245, 230, 211, 0.97);
+  border: 1px solid rgba(193, 154, 107, 0.6);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 12px;
+  color: var(--color-ink, #4a3728);
+  box-shadow: 0 4px 12px rgba(74, 55, 40, 0.2);
+}
+
+.vtp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.vtp-title {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.vtp-close {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--color-ink, #4a3728);
+}
+
+.vtp-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.vtp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.vtp-body.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.vtp-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 50px;
+  align-items: center;
+  gap: 6px;
+}
+
+.vtp-row label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(74, 55, 40, 0.75);
+}
+
+.vtp-row input[type=range] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.vtp-value {
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.vtp-reference {
+  width: 100%;
+  font-size: 11px;
+  margin-top: 8px;
+  border-collapse: collapse;
+}
+
+.vtp-reference th {
+  text-align: left;
+  font-weight: 600;
+  opacity: 0.7;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.3);
+  padding: 2px 4px;
+}
+
+.vtp-reference td {
+  padding: 2px 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.vtp-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(193, 154, 107, 0.3);
+}
+
+.vtp-loaded {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.vtp-reset {
+  background: rgba(193, 154, 107, 0.2);
+  border: 1px solid rgba(193, 154, 107, 0.5);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--color-ink, #4a3728);
+}
+
+.vtp-reset:hover {
+  background: rgba(193, 154, 107, 0.35);
+}

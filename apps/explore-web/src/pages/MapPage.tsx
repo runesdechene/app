@@ -12,6 +12,7 @@ import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
+import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
 import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
 import { LeaderboardModal } from '../components/map/modals/LeaderboardModal'
 import { VersionBadge } from '../components/map/badges/VersionBadge'
@@ -139,6 +140,7 @@ export default function MapPage() {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userName = usePlayerStore(s => s.userName)
+  const isAdmin = usePlayerStore(s => s.isAdmin)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
@@ -318,6 +320,7 @@ export default function MapPage() {
       )}
       {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
       {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
+      {!addPlaceMode && !authLoading && isAuthenticated && isAdmin && <VoronoiTuningPanel />}
 
       {/* Header mobile (logo + hamburger, masqué sur desktop) */}
       {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (

@@ -29,6 +29,7 @@ import { VeilleurNamePills } from '../markers/VeilleurNamePills'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
+import { useVoronoiTuningStore } from '../../../stores/voronoiTuningStore'
 import {
   HERITAGE_CUP_DOT_COLOR,
   HERITAGE_CUP_INK_COLOR,
@@ -404,6 +405,12 @@ export const ExploreMap = memo(function ExploreMap() {
       })
   }, [])
 
+  // V098 — params Voronoï pondéré (panel admin)
+  const voronoiTuning = useVoronoiTuningStore(s => ({
+    enabled: s.enabled, baseKm: s.baseKm, stepKm: s.stepKm, capKm: s.capKm,
+  }))
+  const crownsByPlace = useVoronoiTuningStore(s => s.crownsByPlace)
+
   const workerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!rawGeojson || !workerRef.current) return
@@ -431,13 +438,16 @@ export const ExploreMap = memo(function ExploreMap() {
               // V0.7 : influence cumulative ignorée — les territoires sont uniformes
               totalInfluence: 0,
               influenceByFaction: {},
+              // V098 : Couronnes investies sur ce lieu (Voronoï pondéré admin)
+              crownsTotal: crownsByPlace.get(f.properties.id) ?? 0,
             }
           }),
         tiers: territoryTiers,
+        radiusTuning: voronoiTuning,
       })
     }, 500)
     return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
-  }, [rawGeojson, placeOverrides, territoryTiers, discoveredIds])
+  }, [rawGeojson, placeOverrides, territoryTiers, discoveredIds, voronoiTuning, crownsByPlace])
 
   // Charger les icônes SVG colorées dans la map (tag colors + faction colors pour le mode bannières)
   const loadedIconsRef = useRef(new Set<string>())
