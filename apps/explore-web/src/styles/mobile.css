@@ -997,7 +997,7 @@
     z-index: 9000;
     /* La mobile-header (z 9998) fait safe-top + 6 + 44 + 6 = safe-top + 56px.
        On laisse 8px de respiration sous le bord inférieur de la header. */
-    padding-top: calc(var(--safe-top, 0px) + 64px);
+    padding-top: calc(var(--safe-top, 0px) + 70px);
     background: rgba(250, 231, 212, 0.97);
     backdrop-filter: blur(10px);
   }

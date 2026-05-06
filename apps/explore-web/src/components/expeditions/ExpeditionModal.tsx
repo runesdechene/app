@@ -135,12 +135,12 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     if (r.success) refresh()
   }
   async function handleWithdraw() {
-    if (!confirm('Te retirer de cette expédition ?')) return
+    if (!confirm('Te retirer de cet événement ?')) return
     await withdrawFromExpedition(expeditionId)
     onClose()
   }
   async function handleCancel() {
-    if (!confirm('Annuler définitivement cette expédition ?')) return
+    if (!confirm('Annuler définitivement cet événement ?')) return
     await cancelExpedition(expeditionId)
     onClose()
   }
@@ -176,7 +176,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               aria-selected={mobileTab === 'info'}
               className={`expedition-modal-mobile-tab${mobileTab === 'info' ? ' is-active' : ''}`}
               onClick={() => setMobileTab('info')}
-            >Expédition</button>
+            >Événement</button>
             <button
               type="button"
               role="tab"
@@ -205,7 +205,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               aria-label="Annuler l'édition"
               title="Annuler l'édition"
             >←</button>
-            <h3 className="expedition-modal-topbar-title">Modifier l'expédition</h3>
+            <h3 className="expedition-modal-topbar-title">Modifier l'événement</h3>
             <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
           </div>
         )}
@@ -219,8 +219,8 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               <button
                 className="expedition-modal-edit"
                 onClick={() => setEditorOpen(true)}
-                aria-label="Modifier l'expédition"
-                title="Modifier l'expédition"
+                aria-label="Modifier l'événement"
+                title="Modifier l'événement"
               >✎</button>
             )}
             <button
@@ -522,7 +522,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             <button className="emm-btn-secondary" onClick={handleWithdraw}>Se retirer</button>
           )}
           {isChief && e.status === 'published' && (
-            <button className="emm-btn-cancel" onClick={handleCancel}>Annuler l'expédition</button>
+            <button className="emm-btn-cancel" onClick={handleCancel}>Annuler l'événement</button>
           )}
         </footer>
         </div>{/* /expedition-modal-left */}
@@ -673,7 +673,7 @@ function FlagDialog({ expeditionId, onClose }: { expeditionId: string; onClose: 
 
   return (
     <div className="emm-flag-dialog" onClick={(e) => e.stopPropagation()}>
-      <h4>Signaler cette expédition</h4>
+      <h4>Signaler cet événement</h4>
       {done ? (
         <div className="emm-flag-done">Merci, signalement envoyé.</div>
       ) : (

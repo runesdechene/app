@@ -74,25 +74,25 @@ function formatMessage(notif: Notification): string {
     }
     case 'mecene_principal_gained':
       return `Vous êtes désormais Mécène Principal de ${place}`
-    // V0.7+ — Expéditions
+    // V0.7+ — Événements
     case 'expedition_join_request':
-      return `${d.requesterName || 'Quelqu\'un'} demande à rejoindre ${d.expeditionName || 'ton expédition'}`
+      return `${d.requesterName || 'Quelqu\'un'} demande à rejoindre ${d.expeditionName || 'ton événement'}`
     case 'expedition_auto_joined':
-      return `${d.requesterName || 'Un voyageur'} a rejoint ${d.expeditionName || 'ton expédition'}`
+      return `${d.requesterName || 'Un voyageur'} a rejoint ${d.expeditionName || 'ton événement'}`
     case 'expedition_validated':
       return d.autoValidated
-        ? `Tu rejoins ${d.expeditionName || 'l\'expédition'}`
-        : `Le chef a validé ta participation à ${d.expeditionName || 'l\'expédition'}`
+        ? `Tu rejoins ${d.expeditionName || 'l\'événement'}`
+        : `Le chef a validé ta participation à ${d.expeditionName || 'l\'événement'}`
     case 'expedition_rejected':
-      return `Le chef n'a pas retenu ta demande pour ${d.expeditionName || 'l\'expédition'}`
+      return `Le chef n'a pas retenu ta demande pour ${d.expeditionName || 'l\'événement'}`
     case 'expedition_modified':
-      return `${d.expeditionName || 'Une expédition'} a été modifiée`
+      return `${d.expeditionName || 'Un événement'} a été modifié`
     case 'expedition_cancelled':
-      return `${d.expeditionName || 'Une expédition'} a été annulée`
+      return `${d.expeditionName || 'Un événement'} a été annulé`
     case 'expedition_report_posted':
-      return `${d.authorName || 'Un compagnon'} a laissé un compte rendu sur ${d.expeditionName || 'l\'expédition'}`
+      return `${d.authorName || 'Un compagnon'} a laissé un compte rendu sur ${d.expeditionName || 'l\'événement'}`
     case 'expedition_message':
-      return `${d.authorName || 'Un compagnon'} t'a écrit dans ${d.expeditionName || 'l\'expédition'}${d.preview ? ' : « ' + d.preview + ' »' : ''}`
+      return `${d.authorName || 'Un compagnon'} t'a écrit dans ${d.expeditionName || 'l\'événement'}${d.preview ? ' : « ' + d.preview + ' »' : ''}`
   }
 }
 

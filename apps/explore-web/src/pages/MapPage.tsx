@@ -390,7 +390,7 @@ export default function MapPage() {
         <button
           className="add-place-fab"
           onClick={() => setShowCreateMenu(true)}
-          aria-label="Créer un lieu ou une expédition"
+          aria-label="Créer un lieu ou un événement"
         >+</button>
       )}
 

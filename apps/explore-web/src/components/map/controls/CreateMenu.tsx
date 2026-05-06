@@ -59,7 +59,7 @@ export function CreateMenu({
         >
           <span className="create-menu-icon">🚩</span>
           <div className="create-menu-text">
-            <div className="create-menu-title">Créer une expédition</div>
+            <div className="create-menu-title">Créer un événement</div>
             <div className="create-menu-help">Convoquer des compagnons pour partir ensemble</div>
           </div>
         </button>

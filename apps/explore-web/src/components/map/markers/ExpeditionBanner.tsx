@@ -53,7 +53,7 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
       type="button"
       className={className}
       onClick={onClick}
-      aria-label={`Expédition ${expedition.name}`}
+      aria-label={`Événement ${expedition.name}`}
       title={expedition.name}
     >
       <span className="expedition-banner-medallion" style={factionRingStyle}>

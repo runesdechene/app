@@ -203,8 +203,8 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
   const header = !embedded ? (
     <header className="expedition-creator-header">
       <div>
-        <div className="expedition-creator-eyebrow">Nouvelle expédition</div>
-        <h2 className="expedition-creator-title">{isEdit ? 'Modifier l\'expédition' : 'Convoque tes compagnons'}</h2>
+        <div className="expedition-creator-eyebrow">Nouvel événement</div>
+        <h2 className="expedition-creator-title">{isEdit ? 'Modifier l\'événement' : 'Convoque tes compagnons'}</h2>
       </div>
       <button className="expedition-creator-close" onClick={onClose} aria-label="Fermer">×</button>
     </header>
@@ -219,7 +219,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
 
           {/* Image de couverture (optionnelle) */}
           <section className="ec-section">
-            <label className="ec-label">Image de l'expédition <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(10 Mo max)</span></label>
+            <label className="ec-label">Image de l'événement <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(10 Mo max)</span></label>
             {coverPreview ? (
               <div className="ec-cover-preview">
                 <img src={coverPreview} alt="" />
@@ -236,7 +236,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
 
           {/* Nom */}
           <section className="ec-section">
-            <label className="ec-label">Nom de l'expédition</label>
+            <label className="ec-label">Nom de l'événement</label>
             <input
               type="text"
               className="ec-input"
@@ -397,7 +397,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'expédition")}
+            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'événement")}
           </button>
         </footer>
     </>
@@ -424,7 +424,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
 function translateError(err?: string): string {
   switch (err) {
     case 'max_active_voyages_reached':
-      return 'Tu as déjà 3 expéditions actives. Termine ou annule d\'abord.'
+      return 'Tu as déjà 3 événements actifs. Termine ou annule d\'abord.'
     case 'rdv_must_be_in_future':
       return 'La date du RDV doit être dans le futur.'
     case 'unauthenticated':

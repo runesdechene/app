@@ -20,6 +20,13 @@
   background: rgba(245, 230, 211, 1);
 }
 
+@media screen and (max-width: 749px) {
+  .voronoi-tuning-fab 
+  {
+    top: 67px;
+  }
+}
+
 .voronoi-tuning-panel {
   position: fixed;
   top: 80px;
