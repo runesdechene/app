@@ -500,7 +500,7 @@
 }
 .expedition-modal-companion {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
+  grid-template-columns: 44px 1fr auto;
   gap: 12px;
   align-items: center;
 }

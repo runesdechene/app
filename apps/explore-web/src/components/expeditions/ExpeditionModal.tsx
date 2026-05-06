@@ -156,7 +156,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         <header className="expedition-modal-header">
           <div className="expedition-modal-header-content">
             <div className="expedition-modal-eyebrow">
-              {isChief ? 'Ton expédition' : 'Expédition'} · {formatRelativeRdv(e.rdv_at)}
+              {formatRelativeRdv(e.rdv_at)} · par {isChief ? 'toi' : chief.display_name}
             </div>
             <h2 className="expedition-modal-title">{e.name}</h2>
 
@@ -244,14 +244,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           <InfoRow
             icon="👤"
             label="Chef"
-            value={
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                {chief.display_name}
-                {chief.faction_title && chief.faction_color && (
-                  <HeritageTag title={chief.faction_title} color={chief.faction_color} />
-                )}
-              </span>
-            }
+            value={chief.display_name}
           />
           <InfoRow icon="👥" label="Compagnons" value={
             e.slots_open
@@ -314,9 +307,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
                 <div className="expedition-modal-companion-name">{chief.display_name}</div>
                 <div className="expedition-modal-companion-meta">
                   <span className="emm-pill-chief">Chef</span>
-                  {chief.faction_title && chief.faction_color && (
-                    <HeritageTag title={chief.faction_title} color={chief.faction_color} />
-                  )}
                 </div>
               </div>
             </li>
@@ -325,9 +315,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
                 <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
                 <div className="expedition-modal-companion-info">
                   <div className="expedition-modal-companion-name">{p.display_name}</div>
-                  {p.faction_title && p.faction_color && (
-                    <HeritageTag title={p.faction_title} color={p.faction_color} />
-                  )}
                 </div>
                 {isChief && (
                   <button className="emm-btn-mini" onClick={() => handleEject(p.user_id)}>Éjecter</button>
