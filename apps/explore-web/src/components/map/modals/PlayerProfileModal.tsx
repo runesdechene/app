@@ -808,10 +808,15 @@ function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
   onPlaceClick: (id: string) => void
   onViewAll: () => void
 }) {
+  const rowRef = useRef<HTMLDivElement>(null)
   if (places.length === 0) return null
 
   const visible = places.slice(0, CAROUSEL_CAP)
   const showViewAll = places.length > CAROUSEL_CAP
+
+  function scrollBy(delta: number) {
+    rowRef.current?.scrollBy({ left: delta, behavior: 'smooth' })
+  }
 
   return (
     <div className="player-modal-section">
@@ -819,31 +824,43 @@ function PlacesCarousel({ emoji, titleText, places, onPlaceClick, onViewAll }: {
         {emoji} {titleText} <span className="player-modal-section-count">{places.length}</span>
       </h3>
       <div className="player-modal-places-wrapper">
-      <div className="player-modal-places-row">
-        {visible.map(place => (
-          <button
-            key={place.id}
-            className="player-modal-place-tile"
-            onClick={() => onPlaceClick(place.id)}
-          >
-            {place.imageUrl ? (
-              <img src={place.imageUrl} alt={place.title} className="player-modal-place-tile-img" loading="lazy" />
-            ) : (
-              <div className="player-modal-place-tile-img player-modal-place-tile-img-fallback">{'\u{1F3DB}️'}</div>
-            )}
-            <span className="player-modal-place-tile-name">{place.title}</span>
-          </button>
-        ))}
-        {showViewAll && (
-          <button
-            className="player-modal-place-tile player-modal-place-tile-view-all"
-            onClick={onViewAll}
-          >
-            <span className="player-modal-place-tile-img player-modal-place-tile-view-all-icon">+{places.length - CAROUSEL_CAP}</span>
-            <span className="player-modal-place-tile-name">Voir tout</span>
-          </button>
-        )}
-      </div>
+        <button
+          className="places-arrow places-arrow--left"
+          onClick={() => scrollBy(-280)}
+          aria-label="Précédent"
+          type="button"
+        >‹</button>
+        <div ref={rowRef} className="player-modal-places-row">
+          {visible.map(place => (
+            <button
+              key={place.id}
+              className="player-modal-place-tile"
+              onClick={() => onPlaceClick(place.id)}
+            >
+              {place.imageUrl ? (
+                <img src={place.imageUrl} alt={place.title} className="player-modal-place-tile-img" loading="lazy" />
+              ) : (
+                <div className="player-modal-place-tile-img player-modal-place-tile-img-fallback">{'\u{1F3DB}️'}</div>
+              )}
+              <span className="player-modal-place-tile-name">{place.title}</span>
+            </button>
+          ))}
+          {showViewAll && (
+            <button
+              className="player-modal-place-tile player-modal-place-tile-view-all"
+              onClick={onViewAll}
+            >
+              <span className="player-modal-place-tile-img player-modal-place-tile-view-all-icon">+{places.length - CAROUSEL_CAP}</span>
+              <span className="player-modal-place-tile-name">Voir tout</span>
+            </button>
+          )}
+        </div>
+        <button
+          className="places-arrow places-arrow--right"
+          onClick={() => scrollBy(280)}
+          aria-label="Suivant"
+          type="button"
+        >›</button>
       </div>
     </div>
   )

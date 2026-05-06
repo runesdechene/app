@@ -1121,15 +1121,43 @@
   flex: 1;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  padding: 4px 30px 8px;
+  /* Scrollbar masquée — la navigation se fait via les flèches .places-arrow
+     sur desktop, swipe tactile sur mobile. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 4px 8px;
 }
 .player-modal-places-row::-webkit-scrollbar {
-  height: 4px;
+  display: none;
 }
-.player-modal-places-row::-webkit-scrollbar-thumb {
-  background: rgba(193, 154, 107, 0.4);
-  border-radius: 2px;
+
+/* Flèches gauche/droite des carrousels de lieux — réplique du système
+   utilisé pour les fragments. Cachées sur mobile (swipe natural). */
+.places-arrow {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(245, 230, 211, 0.9);
+  border: 1px solid rgba(193, 154, 107, 0.3);
+  color: #6b5a47;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+.places-arrow:hover {
+  background: rgba(255, 242, 227, 1);
+  transform: scale(1.1);
+}
+@media (max-width: 760px) {
+  .places-arrow {
+    display: none;
+  }
 }
 
 /* Tiles portrait — ratio 3:4 (88 × 117 px), plus naturel pour des photos de lieux. */
