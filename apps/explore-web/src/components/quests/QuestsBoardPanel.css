@@ -1,0 +1,139 @@
+/* QuestsBoardPanel — panneau HUD intégré sous les toasts.
+   Direction : sépia parchemin chaud, sobre logiciel pas RPG.
+   Cf. maquette Scène 1 : .superpowers/brainstorm/2026-05-06-expeditions/content/expeditions-mockup.html */
+
+.qbp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.35);
+  z-index: 800;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 16px 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.qbp-overlay.qbp-mounted { opacity: 1; }
+
+.qbp-panel {
+  background: #f5e9d4;
+  border: 1px solid #b89a6a;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32),
+              0 4px 12px rgba(42, 31, 16, 0.18);
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.qbp-handle {
+  margin: 8px auto 0;
+  width: 40px;
+  height: 4px;
+  background: #d9c79d;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.qbp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 14px 22px 16px;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.45);
+  flex-shrink: 0;
+}
+.qbp-eyebrow {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a7050;
+  margin-bottom: 2px;
+}
+.qbp-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 30px;
+  color: #2a1f10;
+  line-height: 1;
+  margin: 0;
+}
+.qbp-cta-mini {
+  background: #2a1f10;
+  color: #faf2dd;
+  border: none;
+  border-radius: 18px;
+  padding: 8px 16px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(42, 31, 16, 0.18);
+}
+.qbp-cta-mini:hover { background: #000; }
+
+.qbp-future {
+  padding: 14px 22px;
+  border-top: 1px solid rgba(184, 154, 106, 0.25);
+  background: rgba(184, 154, 106, 0.06);
+  flex-shrink: 0;
+}
+.qbp-future-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #8a7050;
+}
+
+.qbp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 14px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-style: normal;
+}
+.qbp-pill-icon { font-size: 12px; line-height: 1; }
+.qbp-pill-expedition { background: rgba(161, 74, 42, 0.14); color: #a14a2a; }
+.qbp-pill-mission { background: rgba(184, 154, 106, 0.18); color: #6b5230; }
+.qbp-pill-daily { background: rgba(94, 112, 68, 0.18); color: #3d4a2c; }
+.qbp-pill-ghost {
+  background: transparent;
+  border: 1px dashed rgba(184, 154, 106, 0.45);
+  color: #8a7050;
+}
+
+.qbp-archives-link {
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  border: none;
+  border-top: 1px solid rgba(184, 154, 106, 0.25);
+  background: transparent;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #6e5435;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.qbp-archives-link:hover { color: #a14a2a; }

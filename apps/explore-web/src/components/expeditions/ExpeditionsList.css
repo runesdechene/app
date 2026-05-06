@@ -1,0 +1,176 @@
+/* ExpeditionsList — liste des cards d'expé dans le panneau HUD */
+
+.expeditions-list {
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+}
+
+.expeditions-list-loading,
+.expeditions-list-empty {
+  text-align: center;
+  padding: 32px 22px;
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: #8a7050;
+}
+
+/* ─────────── ExpeditionCard ─────────── */
+
+.expedition-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  padding: 14px 22px;
+  align-items: start;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.expedition-card:last-child { border-bottom: none; }
+.expedition-card:hover { background: rgba(184, 154, 106, 0.08); }
+
+.expedition-card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 14px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(161, 74, 42, 0.14);
+  color: #a14a2a;
+  align-self: start;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+.expedition-card-pill-icon { font-size: 12px; line-height: 1; }
+
+.expedition-card-body { min-width: 0; }
+
+.expedition-card-when {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #a14a2a;
+  margin-bottom: 2px;
+}
+.expedition-card-when.is-muted { color: #8a7050; }
+
+.expedition-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 21px;
+  color: #2a1f10;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.expedition-card-call {
+  font-family: 'Newsreader', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #6e5435;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.expedition-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  color: #8a7050;
+  flex-wrap: wrap;
+}
+
+.expedition-card-avatar {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b89a6a, #6e5435);
+  color: #faf2dd;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.expedition-card-avatar img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+
+.expedition-card-heritage-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px 1px 6px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+.expedition-card-heritage-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+
+.expedition-card-dot { color: #b89a6a; }
+.expedition-card-place {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.expedition-card-badge {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9px;
+}
+.expedition-card-badge.is-chief {
+  background: rgba(161, 74, 42, 0.18);
+  color: #a14a2a;
+}
+
+.expedition-card-slots {
+  text-align: right;
+  align-self: start;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.expedition-card-slots-num {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f10;
+  line-height: 1;
+}
+.expedition-card-slots-num.is-full { color: #8a7050; }
+.expedition-card-slots-mute {
+  color: #8a7050;
+  font-weight: 400;
+  font-size: 14px;
+}
+.expedition-card-slots-label {
+  display: block;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a7050;
+  margin-top: 3px;
+}
