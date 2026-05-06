@@ -23,6 +23,16 @@ export function ExpeditionsHud({ open, onClose }: Props) {
   const [archivesOpen, setArchivesOpen] = useState(false)
   const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
 
+  // Ecoute requestOpenExpedition (déclenché par tap bannière sur la carte)
+  const pendingOpen = useExpeditionsStore((s) => s.pendingOpenExpeditionId)
+  const requestOpen = useExpeditionsStore((s) => s.requestOpenExpedition)
+  useEffect(() => {
+    if (pendingOpen) {
+      setSelectedExpeditionId(pendingOpen)
+      requestOpen(null) // consume
+    }
+  }, [pendingOpen, requestOpen])
+
   return (
     <>
       {open && !creatorOpen && !archivesOpen && selectedExpeditionId === null && (

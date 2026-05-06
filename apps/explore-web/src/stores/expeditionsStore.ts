@@ -19,6 +19,11 @@ interface ExpeditionsState {
   archives: ExpeditionListItem[]
   current: ExpeditionFullPayload | null
   messagesByExpedition: Record<string, ExpeditionMessage[]>
+  /**
+   * ID de l'expé que ExpeditionsHud doit ouvrir au prochain tick (ex : tap
+   * sur une bannière de la carte). Le Hud reset à null après ouverture.
+   */
+  pendingOpenExpeditionId: string | null
 
   setUpcoming: (l: ExpeditionListItem[]) => void
   setArchives: (l: ExpeditionListItem[]) => void
@@ -26,6 +31,7 @@ interface ExpeditionsState {
   setMessages: (expeditionId: string, m: ExpeditionMessage[]) => void
   addMessage: (expeditionId: string, m: ExpeditionMessage) => void
   clearMessages: (expeditionId: string) => void
+  requestOpenExpedition: (id: string | null) => void
 }
 
 export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
@@ -33,8 +39,10 @@ export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
   archives: [],
   current: null,
   messagesByExpedition: {},
+  pendingOpenExpeditionId: null,
 
   setUpcoming: (l) => set({ upcoming: l }),
+  requestOpenExpedition: (id) => set({ pendingOpenExpeditionId: id }),
   setArchives: (l) => set({ archives: l }),
   setCurrent: (p) => set({ current: p }),
 

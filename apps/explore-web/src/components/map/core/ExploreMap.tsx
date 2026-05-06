@@ -26,6 +26,7 @@ import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
 import { MapStyleSelect } from '../controls/MapStyleSelect'
 import { EnergyIndicator } from '../badges/EnergyIndicator'
 import { VeilleurNamePills } from '../markers/VeilleurNamePills'
+import { ExpeditionBanners } from '../markers/ExpeditionBanners'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
@@ -850,6 +851,9 @@ export const ExploreMap = memo(function ExploreMap() {
           bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
         />
       )}
+
+      {/* V0.7+ Expéditions — bannières sur la carte (chaque expé published) */}
+      <ExpeditionBanners />
 
       {enrichedGeojson && (
         <Source
