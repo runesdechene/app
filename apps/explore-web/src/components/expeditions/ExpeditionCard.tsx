@@ -24,6 +24,8 @@ export function ExpeditionCard({ item, onClick }: Props) {
     ? `∞ · ${item.validated_count + 1}`
     : `${item.validated_count + 1}/${item.slots_max}`
 
+  const unread = item.unread_count ?? 0
+
   return (
     <li className="expedition-card" onClick={onClick}>
       <span
@@ -35,6 +37,11 @@ export function ExpeditionCard({ item, onClick }: Props) {
           <img src={item.chief.avatar_url} alt="" />
         ) : (
           initials
+        )}
+        {unread > 0 && (
+          <span className="expedition-card-unread" aria-label={`${unread} nouveau${unread > 1 ? 'x' : ''} message${unread > 1 ? 's' : ''}`}>
+            {unread > 9 ? '9+' : unread}
+          </span>
         )}
       </span>
       <span className="expedition-card-flag" aria-hidden>🚩</span>

@@ -26,6 +26,7 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   expedition_modified: '\u270F\uFE0F',          // \u270F\uFE0F
   expedition_cancelled: '\uD83D\uDEAB',         // \uD83D\uDEAB
   expedition_report_posted: '\uD83D\uDCDC',     // \uD83D\uDCDC
+  expedition_message: '\uD83D\uDCAC',           // \uD83D\uDCAC
 }
 
 function formatMessage(notif: Notification): string {
@@ -90,6 +91,8 @@ function formatMessage(notif: Notification): string {
       return `${d.expeditionName || 'Une expédition'} a été annulée`
     case 'expedition_report_posted':
       return `${d.authorName || 'Un compagnon'} a laissé un compte rendu sur ${d.expeditionName || 'l\'expédition'}`
+    case 'expedition_message':
+      return `${d.authorName || 'Un compagnon'} t'a écrit dans ${d.expeditionName || 'l\'expédition'}${d.preview ? ' : « ' + d.preview + ' »' : ''}`
   }
 }
 

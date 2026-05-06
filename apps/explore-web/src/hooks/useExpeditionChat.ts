@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
+import { markExpeditionMessagesRead, listUpcomingExpeditions } from '../lib/expeditionsApi'
 import type { ExpeditionMessage } from '../types/expedition'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -55,10 +56,21 @@ export function useExpeditionChat(expeditionId: string | null) {
         },
         (payload) => {
           addMessage(expeditionId!, rowToMessage(payload.new as Record<string, unknown>))
+          // Marque immédiatement comme lu — la modale est ouverte
+          markExpeditionMessagesRead(expeditionId!).catch(() => {})
         },
       )
       ch.subscribe()
       channelRef.current = ch
+
+      // Mark read au mount + refresh la liste pour effacer la pastille
+      try {
+        await markExpeditionMessagesRead(expeditionId!)
+        const updated = useExpeditionsStore.getState().setUpcoming
+        listUpcomingExpeditions().then((list) => updated(list)).catch(() => {})
+      } catch {
+        // ignore
+      }
     }
 
     init()

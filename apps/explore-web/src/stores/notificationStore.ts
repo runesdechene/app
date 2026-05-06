@@ -15,7 +15,7 @@ export interface Notification {
     | 'expedition_join_request' | 'expedition_auto_joined'
     | 'expedition_validated' | 'expedition_rejected'
     | 'expedition_modified' | 'expedition_cancelled'
-    | 'expedition_report_posted'
+    | 'expedition_report_posted' | 'expedition_message'
   data: {
     actorName?: string
     actorId?: string
@@ -44,10 +44,12 @@ export interface Notification {
     requesterName?: string
     chiefName?: string
     authorName?: string
+    authorUserId?: string
     isPublic?: boolean
     autoValidated?: boolean
     message?: string | null
     changedFields?: string[]
+    preview?: string
   }
   read: boolean
   created_at: string

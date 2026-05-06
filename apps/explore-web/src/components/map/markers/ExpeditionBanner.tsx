@@ -64,6 +64,11 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
         )}
       </span>
       <span className="expedition-banner-flag" aria-hidden>🚩</span>
+      {(expedition.unread_count ?? 0) > 0 && (
+        <span className="expedition-banner-unread" aria-label={`${expedition.unread_count} non lu${(expedition.unread_count ?? 0) > 1 ? 's' : ''}`}>
+          {(expedition.unread_count ?? 0) > 9 ? '9+' : expedition.unread_count}
+        </span>
+      )}
     </button>
   )
 }

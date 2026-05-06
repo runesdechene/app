@@ -41,6 +41,7 @@ export interface ExpeditionListItem {
   validation_mode: ExpeditionValidationMode
   chief: ExpeditionPersonSummary
   validated_count: number
+  unread_count?: number
   public_reports_count?: number
   i_am_chief?: boolean
   cancelled_at?: string | null

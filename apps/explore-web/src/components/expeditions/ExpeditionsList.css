@@ -55,6 +55,25 @@
   object-fit: cover;
   border-radius: 50%;
 }
+.expedition-card-avatar { position: relative; }
+.expedition-card-unread {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #d22;
+  color: #fff;
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  border: 2px solid var(--color-parchment);
+  box-sizing: content-box;
+}
 
 .expedition-card-flag {
   font-size: 14px;
