@@ -1,5 +1,5 @@
 import type { ExpeditionListItem } from '../../types/expedition'
-import { formatRelativeRdv } from '../../lib/expeditionDateFormat'
+import { formatRelativeRdvShort } from '../../lib/expeditionDateFormat'
 
 interface Props {
   item: ExpeditionListItem
@@ -46,7 +46,7 @@ export function ExpeditionCard({ item, onClick }: Props) {
       </span>
       <span className="expedition-card-flag" aria-hidden>🚩</span>
       <span className="expedition-card-title">{item.name}</span>
-      <span className="expedition-card-when">{formatRelativeRdv(item.rdv_at)}</span>
+      <span className="expedition-card-when">{formatRelativeRdvShort(item.rdv_at)}</span>
       <span className="expedition-card-slots">{slots}</span>
     </li>
   )
