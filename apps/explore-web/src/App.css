@@ -90,6 +90,30 @@
   gap: 8px;
 }
 
+/* Pile gauche du HUD : Toasts + Tableau de Quêtes empilés.
+   Chacun se replie librement et l'autre prend la place. */
+.hud-left-stack {
+  display: contents; /* mobile/default : pas de wrapper visuel, layout original */
+}
+@media (min-width: 761px) {
+  .hud-left-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: fixed;
+    top: 68px;
+    left: 20px;
+    z-index: 14;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 88px);
+    pointer-events: none;
+  }
+  .hud-left-stack > * {
+    pointer-events: auto;
+  }
+}
+
 /* Sur desktop, l'énergie reste dans la toolbar ; la slot mobile est cachée. */
 .mobile-energy-slot {
   display: none;

@@ -1,0 +1,99 @@
+/* ExpeditionsList — card minimaliste sur 1 ligne. */
+
+.expeditions-list {
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+}
+
+.expeditions-list-loading,
+.expeditions-list-empty {
+  text-align: center;
+  padding: 24px 14px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  color: #8a7050;
+}
+
+/* ─────────── ExpeditionCard 1 ligne ─────────── */
+
+.expedition-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+  cursor: pointer;
+  transition: background 0.18s;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+}
+.expedition-card:last-child { border-bottom: none; }
+.expedition-card:hover { background: rgba(193, 154, 107, 0.1); }
+
+.expedition-card-avatar {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-sepia), var(--color-sepia-dark));
+  color: var(--color-parchment);
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-sizing: content-box;
+}
+.expedition-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.expedition-card-flag {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.expedition-card-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-signature);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.expedition-card-when {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #a14a2a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.expedition-card-slots {
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: rgba(193, 154, 107, 0.18);
+  padding: 2px 8px;
+  border-radius: 10px;
+}

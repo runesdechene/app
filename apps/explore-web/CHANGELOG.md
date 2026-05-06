@@ -1,3 +1,26 @@
+# ALPHA V0.7.4
+## Les Expéditions — la carte devient un point de rendez-vous
+
+### 🚩 Convoque tes compagnons
+Crée une expédition depuis le bouton **+** de la carte : un nom, une date (ou *« à définir avec les compagnons »*), un point planté à la souris. Les autres voyageurs voient ta bannière et peuvent demander à te rejoindre — tu valides chaque demande, ou tu laisses l'inscription libre.
+
+### 📍 Ta signature sur la carte
+Choisis une image pour ton expédition, sinon ton avatar parle. Médaillon rond avec un drapeau rouge en signature. Plus la date approche, plus elle pulse — *Aujourd'hui*, elle s'illumine.
+
+### 💬 Préparation à l'écart
+Une fois validés, les compagnons accèdent à un **chat privé** pour s'organiser. Toujours sous les yeux à droite de la modale.
+
+### ✨ L'appel
+Sous le titre de l'expédition, une phrase qui dit pourquoi vous y allez. **Tous les compagnons peuvent la modifier** — l'appel s'écrit à plusieurs.
+
+### Sous le capot
+- Panneau « Expéditions » dans le HUD gauche, sous les toasts d'activité (mobile : page entière)
+- Chat Realtime, notifications pour acceptation, refus, modifs, annulation, rappel J-1
+- Bucket public dédié pour les images de couverture
+- Comptes rendus + galerie commune posés en backend, ouverts dès qu'une expédition est passée
+
+---
+
 # ALPHA V0.7.3
 ## Affinage de La Cour — la marche garde toujours le dessus
 

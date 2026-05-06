@@ -3,31 +3,70 @@
    ========================================== */
 
 .game-toast-container {
-  position: fixed;
-  top: 68px;
-  left: 20px;
+  /* Position gérée par le wrapper .hud-left-stack côté desktop (cf. App.css).
+     Mobile garde son override via mobile.css (top: 48px; left: 8px). */
   z-index: 15;
   display: flex;
   flex-direction: column;
-  max-width: 360px;
+  flex-shrink: 0;
+  width: 100%;
   background: rgba(252, 241, 214, 0.9);
   backdrop-filter: blur(2px);
   padding: 10px;
   border-radius: 10px;
 }
-.game-toast-minimize {
-  align-self: flex-end;
+@media (max-width: 760px) {
+  .game-toast-container {
+    /* Mobile : on rétablit le positionnement fixe (compat avec règles mobile.css existantes) */
+    position: fixed;
+    top: calc(var(--safe-top, 0px) + 48px);
+    left: 8px;
+    width: auto;
+    max-width: calc(100vw - 140px);
+  }
+}
+/* Header aligné sur QuestsBoardPanel — titre serif italique + bouton ▴/▾ */
+.game-toast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 4px 8px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+  flex-shrink: 0;
+  gap: 8px;
+}
+.game-toast-title {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-ink);
+  line-height: 1;
+  margin: 0;
+}
+.game-toast-collapse {
   background: none;
   border: none;
+  font-size: 18px;
+  color: var(--color-ink-light);
   cursor: pointer;
-  font-size: 14px;
-  color: var(--color-sepia, #C19A6B);
-  padding: 0 4px;
-  line-height: 1;
-  opacity: 0.6;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.game-toast-minimize:hover {
-  opacity: 1;
+.game-toast-collapse:hover {
+  background: rgba(193, 154, 107, 0.18);
+}
+.game-toast-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.game-toast-content.is-minimized {
+  display: none;
 }
 .game-toast-minimized {
   max-width: none;

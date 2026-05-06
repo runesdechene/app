@@ -1,0 +1,81 @@
+/* ExpeditionBanner — marker rond sur la carte (médaillon photo + 🚩) */
+
+.expedition-banner {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 8px rgba(20, 14, 5, 0.35));
+  transition: transform 0.18s;
+}
+.expedition-banner:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.expedition-banner-medallion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #d9c79d, #a0784c);
+  border: 3px solid #b89a6a;
+  box-sizing: border-box;
+}
+.expedition-banner-medallion img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.expedition-banner-fallback {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.expedition-banner-flag {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #faf2dd;
+  border: 2px solid #b89a6a;
+  font-size: 14px;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(20, 14, 5, 0.3);
+}
+
+/* États selon proximité de la date */
+.expedition-banner.is-today {
+  animation: expedition-banner-pulse 2s ease-in-out infinite;
+}
+@keyframes expedition-banner-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 12px rgba(212, 170, 90, 0.85))
+            drop-shadow(0 4px 8px rgba(20, 14, 5, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(212, 170, 90, 1))
+            drop-shadow(0 4px 8px rgba(20, 14, 5, 0.35));
+  }
+}
+
+.expedition-banner.is-tomorrow {
+  filter: drop-shadow(0 0 8px rgba(212, 170, 90, 0.55))
+          drop-shadow(0 4px 8px rgba(20, 14, 5, 0.35));
+}
+
+.expedition-banner.is-future,
+.expedition-banner.is-unset {
+  opacity: 0.85;
+}

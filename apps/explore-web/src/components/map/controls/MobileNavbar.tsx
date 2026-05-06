@@ -28,7 +28,7 @@ export function MobileNavbar() {
     }
   }
 
-  function handlePanelTap(panel: 'notifications' | 'chat') {
+  function handlePanelTap(panel: 'notifications' | 'chat' | 'quests') {
     useMapStore.getState().setSelectedPlayerId(null)
     togglePanel(panel)
   }
@@ -74,6 +74,15 @@ export function MobileNavbar() {
           <span className="mobile-nav-badge">{unseenChat > 9 ? '9+' : unseenChat}</span>
         )}
         <span className="mobile-nav-label">Messages</span>
+      </button>
+
+      <button
+        className={`mobile-nav-item${activePanel === 'quests' ? ' active' : ''}`}
+        onClick={() => handlePanelTap('quests')}
+        aria-label="Tableau de Quetes"
+      >
+        <span className="mobile-nav-icon">&#128203;</span>
+        <span className="mobile-nav-label">Quetes</span>
       </button>
 
       <button

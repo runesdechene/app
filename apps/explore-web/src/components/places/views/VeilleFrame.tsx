@@ -1,7 +1,7 @@
 ﻿import { useState, useCallback, useEffect } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useVeille } from '../../../hooks/useVeille'
-import { ExpeditionOptInModal } from '../modals/ExpeditionOptInModal'
+import { VeillePartageeModal } from '../modals/VeillePartageeModal'
 import { pushVeilleOverride } from '../../../lib/loadInitialVeilles'
 import { supabase } from '../../../lib/supabase'
 import etendardIcon from '../../../assets/etendard.png'
@@ -114,7 +114,7 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       </button>
 
       {optInCandidates && (
-        <ExpeditionOptInModal
+        <VeillePartageeModal
           candidates={optInCandidates}
           onCancel={() => setOptInCandidates(null)}
           onConfirm={(ids) => doPlant(ids)}

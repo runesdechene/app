@@ -52,10 +52,10 @@
 }
 
 /* ============================================
-   Expedition opt-in modal — palette parchment cohérente
+   Veille partagée — modale d'association de veilleurs lors d'un plantage collectif
    ============================================ */
 
-.expedition-modal-overlay {
+.veille-partagee-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(20, 12, 5, 0.6);
@@ -65,7 +65,7 @@
   justify-content: center;
   padding: 16px;
 }
-.expedition-modal {
+.veille-partagee-modal {
   background: var(--color-parchment, #f5e6d3);
   color: #4A3728;
   border: 1px solid var(--color-sepia, #C19A6B);
@@ -76,26 +76,26 @@
   font-size: 15px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
-.expedition-modal h3 {
+.veille-partagee-modal h3 {
   margin: 0 0 8px 0;
   font-family: var(--font-accent, 'Cinzel', serif);
   font-size: 18px;
   font-weight: 600;
 }
-.expedition-modal p {
+.veille-partagee-modal p {
   margin: 0 0 14px 0;
   opacity: 0.8;
   font-size: 14px;
   line-height: 1.4;
 }
-.expedition-modal-list {
+.veille-partagee-modal-list {
   list-style: none;
   padding: 0;
   margin: 0 0 16px 0;
   max-height: 320px;
   overflow-y: auto;
 }
-.expedition-modal-list li label {
+.veille-partagee-modal-list li label {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -103,15 +103,15 @@
   cursor: pointer;
   border-radius: 6px;
 }
-.expedition-modal-list li label:hover {
+.veille-partagee-modal-list li label:hover {
   background: rgba(193, 154, 107, 0.15);
 }
-.expedition-modal-list input[type="checkbox"] {
+.veille-partagee-modal-list input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
 }
-.expedition-modal-list img {
+.veille-partagee-modal-list img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -119,20 +119,20 @@
   background: rgba(193, 154, 107, 0.2);
   border: 1.5px solid #f5e6d3;
 }
-.expedition-modal-name {
+.veille-partagee-modal-name {
   flex: 1;
   font-size: 15px;
 }
-.expedition-modal-faction {
+.veille-partagee-modal-faction {
   font-size: 18px;
   margin-left: 6px;
 }
-.expedition-modal-actions {
+.veille-partagee-modal-actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
 }
-.expedition-modal-actions button {
+.veille-partagee-modal-actions button {
   background: #8a6f4a;
   color: #f5e9d0;
   border: none;
@@ -146,18 +146,18 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.expedition-modal-actions button:hover:not(:disabled) {
+.veille-partagee-modal-actions button:hover:not(:disabled) {
   background: #4A3728;
 }
-.expedition-modal-actions button:disabled {
+.veille-partagee-modal-actions button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.expedition-modal-secondary {
+.veille-partagee-modal-secondary {
   background: transparent !important;
   border: 1px solid #8a6f4a !important;
   color: #4A3728 !important;
 }
-.expedition-modal-secondary:hover:not(:disabled) {
+.veille-partagee-modal-secondary:hover:not(:disabled) {
   background: rgba(193, 154, 107, 0.15) !important;
 }

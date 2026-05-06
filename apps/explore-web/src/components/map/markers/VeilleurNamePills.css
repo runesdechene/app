@@ -13,7 +13,7 @@
      Cohérent ligne éditoriale "chevalier errant" : on lit "X veille ce lieu"
      comme une dédicace gravée, pas comme une étiquette UI. */
   font-family: var(--font-signature, 'Alegreya'), serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;

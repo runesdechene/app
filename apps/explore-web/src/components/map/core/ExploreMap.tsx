@@ -26,6 +26,7 @@ import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
 import { MapStyleSelect } from '../controls/MapStyleSelect'
 import { EnergyIndicator } from '../badges/EnergyIndicator'
 import { VeilleurNamePills } from '../markers/VeilleurNamePills'
+import { ExpeditionBanners } from '../markers/ExpeditionBanners'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
@@ -570,6 +571,15 @@ export const ExploreMap = memo(function ExploreMap() {
   }, [geojson])
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
+    // V0.7+ — mode "tap-on-map" pour placer le RDV d'une expédition
+    if (useMapStore.getState().expeditionPinMode) {
+      useMapStore.getState().setExpeditionPinResult({
+        lat: event.lngLat.lat,
+        lng: event.lngLat.lng,
+      })
+      useMapStore.getState().setExpeditionPinMode(false)
+      return
+    }
     if (addPlaceMode) return // Don't select places while placing
 
     const feature = event.features?.[0]
@@ -850,6 +860,9 @@ export const ExploreMap = memo(function ExploreMap() {
           bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
         />
       )}
+
+      {/* V0.7+ Expéditions — bannières sur la carte (chaque expé published) */}
+      <ExpeditionBanners />
 
       {enrichedGeojson && (
         <Source

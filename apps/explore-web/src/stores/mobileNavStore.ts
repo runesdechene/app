@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type MobilePanel = 'notifications' | 'chat' | 'profile' | null
+export type MobilePanel = 'notifications' | 'chat' | 'profile' | 'quests' | null
 
 interface MobileNavState {
   activePanel: MobilePanel
