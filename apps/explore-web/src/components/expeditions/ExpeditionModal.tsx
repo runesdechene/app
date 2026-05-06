@@ -38,6 +38,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   const [reportEditorOpen, setReportEditorOpen] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [flagOpen, setFlagOpen] = useState(false)
+  const [mobileTab, setMobileTab] = useState<'info' | 'chat'>('info')
 
   // Charge le détail à l'ouverture / refresh
   async function refresh() {
@@ -159,8 +160,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
       <div className="expedition-modal" onClick={(ev) => ev.stopPropagation()}>
-        <div className={`expedition-modal-shell${editorOpen ? ' is-editing' : ''}`}>
-        <div className="expedition-modal-left">
         <header className="expedition-modal-header">
           <div className="expedition-modal-header-content">
             <div className="expedition-modal-eyebrow">
@@ -215,6 +214,34 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
           </div>
         </header>
+
+        {/* Tabs mobile-only — Expédition / Chat. Affichées uniquement si le
+            chat est dispo (membre + status published/passed). */}
+        {chatVisible && (
+          <div className="expedition-modal-mobile-tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'info'}
+              className={`expedition-modal-mobile-tab${mobileTab === 'info' ? ' is-active' : ''}`}
+              onClick={() => setMobileTab('info')}
+            >Expédition</button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'chat'}
+              className={`expedition-modal-mobile-tab${mobileTab === 'chat' ? ' is-active' : ''}`}
+              onClick={() => setMobileTab('chat')}
+            >Chat</button>
+          </div>
+        )}
+
+        <div className={[
+          'expedition-modal-shell',
+          editorOpen && 'is-editing',
+          chatVisible && `mobile-tab-${mobileTab}`,
+        ].filter(Boolean).join(' ')}>
+        <div className="expedition-modal-left">
 
         <div className="expedition-modal-main">
 

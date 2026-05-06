@@ -141,25 +141,89 @@
 
 /* Mobile : retour en colonne unique */
 @media (max-width: 760px) {
+  /* Layout mobile à TABS : la zone active (info ou chat) prend tout
+     l'écran. Pas d'empilement. */
   .expedition-modal-shell { flex-direction: column; }
-  /* La left col DOIT prendre la place restante (1 1 auto) — pas 0 0 auto.
-     Sinon le main avec flex:1 + overflow:auto n'a aucune contrainte de
-     hauteur et le scroll ne s'arme pas → modale figée non scrollable. */
   .expedition-modal-left {
     flex: 1 1 auto;
     min-height: 0;
   }
-  /* Chat avec une hauteur fixe en bas, son propre scroll interne. */
   .expedition-modal-chat-col {
-    flex: 0 0 240px;
-    height: 240px;
-    max-height: 240px;
+    flex: 1 1 auto;
     min-width: 0;
+    height: auto;
+    max-height: none;
     border-left: none;
-    border-top: 1px solid rgba(184, 154, 106, 0.45);
+    border-top: none;
   }
   .expedition-modal-chat-col .expedition-chat-messages {
     max-height: none;
+  }
+  /* Le header propre du chat ("Préparation · chat privé") devient
+     redondant avec le tab "Chat" sélectionné. */
+  .expedition-modal-chat-col-header {
+    display: none;
+  }
+  /* Tab info actif → masquer le chat. */
+  .expedition-modal-shell.mobile-tab-info .expedition-modal-chat-col {
+    display: none;
+  }
+  /* Tab chat actif → masquer la zone info (main + footer). */
+  .expedition-modal-shell.mobile-tab-chat .expedition-modal-left {
+    display: none;
+  }
+  /* La zone d'écriture du chat doit respecter la home indicator iOS. */
+  .expedition-modal-chat-col .expedition-chat-input {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 12px);
+  }
+}
+
+/* ─────────── Tabs mobile (Expédition / Chat) ─────────── */
+.expedition-modal-mobile-tabs {
+  display: none; /* desktop : invisible — pas de tabs */
+}
+@media (max-width: 760px) {
+  .expedition-modal-mobile-tabs {
+    display: flex;
+    background: #faf2dd;
+    border-bottom: 1px solid rgba(184, 154, 106, 0.45);
+    flex-shrink: 0;
+  }
+  .expedition-modal-mobile-tab {
+    position: relative;
+    flex: 1;
+    padding: 12px 8px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font-accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #8a7050;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .expedition-modal-mobile-tab.is-active {
+    color: #2a1f10;
+    border-bottom-color: #2a1f10;
+  }
+  .expedition-modal-mobile-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: #d22;
+    color: #fff;
+    font-family: var(--font-accent);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
   }
 }
 
