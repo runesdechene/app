@@ -208,6 +208,18 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
 
         <div className="expedition-modal-main">
 
+        {editorOpen ? (
+          <ExpeditionCreator
+            embedded
+            existing={current.expedition}
+            onClose={() => setEditorOpen(false)}
+            onCreated={() => {
+              setEditorOpen(false)
+              refresh()
+            }}
+          />
+        ) : (
+        <>
         {/* Cover image — visible si fournie. Modification via le bouton ✎ du header (chef). */}
         {e.cover_image_url && (
           <div className="expedition-modal-cover">
@@ -369,6 +381,8 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             )}
           </section>
         )}
+        </>
+        )}{/* /editorOpen ternary */}
 
           </div>{/* /expedition-modal-main */}
 
@@ -408,16 +422,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           />
         )}
 
-        {editorOpen && (
-          <ExpeditionCreator
-            existing={current.expedition}
-            onClose={() => setEditorOpen(false)}
-            onCreated={() => {
-              setEditorOpen(false)
-              refresh()
-            }}
-          />
-        )}
       </div>
     </div>,
     document.body,

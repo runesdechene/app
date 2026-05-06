@@ -20,6 +20,9 @@ interface Props {
   initialLng?: number
   /** Si fourni, le composant passe en mode édition de cette expé existante. */
   existing?: ExpeditionDetail
+  /** Si true, le composant se rend inline sans overlay/portal (pour
+   *  l'édition depuis la modale ExpeditionModal). */
+  embedded?: boolean
 }
 
 /**
@@ -28,7 +31,7 @@ interface Props {
  * Le tap-on-map sera V1.5 — pour l'instant, lat/lng saisis manuellement
  * avec un bouton "ma position actuelle".
  */
-export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, existing }: Props) {
+export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, existing, embedded }: Props) {
   const isEdit = !!existing
   const setUpcoming = useExpeditionsStore((s) => s.setUpcoming)
 
@@ -197,18 +200,21 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
     )
   }
 
-  return createPortal(
-    <div className="expedition-creator-overlay" onClick={onClose}>
-      <div className="expedition-creator" onClick={(e) => e.stopPropagation()}>
-        <header className="expedition-creator-header">
-          <div>
-            <div className="expedition-creator-eyebrow">Nouvelle expédition</div>
-            <h2 className="expedition-creator-title">{isEdit ? 'Modifier l\'expédition' : 'Convoque tes compagnons'}</h2>
-          </div>
-          <button className="expedition-creator-close" onClick={onClose} aria-label="Fermer">×</button>
-        </header>
+  const header = !embedded ? (
+    <header className="expedition-creator-header">
+      <div>
+        <div className="expedition-creator-eyebrow">Nouvelle expédition</div>
+        <h2 className="expedition-creator-title">{isEdit ? 'Modifier l\'expédition' : 'Convoque tes compagnons'}</h2>
+      </div>
+      <button className="expedition-creator-close" onClick={onClose} aria-label="Fermer">×</button>
+    </header>
+  ) : null
 
-        <div className="expedition-creator-body">
+  const formContent = (
+    <>
+      {header}
+
+      <div className="expedition-creator-body">
           {/* Nom */}
           <section className="ec-section">
             <label className="ec-label">Nom de l'expédition</label>
@@ -376,6 +382,11 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
         </div>
 
         <footer className="expedition-creator-footer">
+          {embedded && (
+            <button className="ec-secondary-btn" onClick={onClose}>
+              ← Retour
+            </button>
+          )}
           <button
             className="ec-primary-btn"
             onClick={handleSubmit}
@@ -384,6 +395,21 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
             {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer' : "Publier l'expédition")}
           </button>
         </footer>
+    </>
+  )
+
+  if (embedded) {
+    return (
+      <div className="expedition-creator expedition-creator-embedded">
+        {formContent}
+      </div>
+    )
+  }
+
+  return createPortal(
+    <div className="expedition-creator-overlay" onClick={onClose}>
+      <div className="expedition-creator" onClick={(e) => e.stopPropagation()}>
+        {formContent}
       </div>
     </div>,
     document.body,

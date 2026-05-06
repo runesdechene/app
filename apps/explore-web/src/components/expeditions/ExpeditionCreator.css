@@ -24,6 +24,25 @@
   overflow: hidden;
 }
 
+/* Mode embedded — rendu inline dans la main col d'ExpeditionModal.
+   Pas d'overlay, pas de wrapper modale, prend la place dispo. */
+.expedition-creator.expedition-creator-embedded {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  max-width: none;
+  max-height: none;
+  box-shadow: none;
+  height: 100%;
+}
+.expedition-creator-embedded .expedition-creator-body {
+  padding: 16px 20px;
+}
+.expedition-creator-embedded .expedition-creator-footer {
+  background: #faf2dd;
+  border-top: 1px solid rgba(193, 154, 107, 0.4);
+}
+
 .expedition-creator-header {
   padding: 20px 24px 16px;
   display: flex;
