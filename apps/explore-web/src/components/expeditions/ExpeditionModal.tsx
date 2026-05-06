@@ -159,7 +159,39 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
 
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
-      <div className="expedition-modal" onClick={(ev) => ev.stopPropagation()}>
+      <div
+        className={`expedition-modal${chatVisible ? ` mobile-tab-${mobileTab}` : ''}`}
+        onClick={(ev) => ev.stopPropagation()}
+      >
+
+        {/* Tabs mobile-only — placées TOUT EN HAUT pour qu'elles soient
+            l'élément de navigation principal sur mobile. Le header (titre,
+            etc.) descend en dessous et n'apparaît que sur le tab Expédition. */}
+        {chatVisible && (
+          <div className="expedition-modal-mobile-tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'info'}
+              className={`expedition-modal-mobile-tab${mobileTab === 'info' ? ' is-active' : ''}`}
+              onClick={() => setMobileTab('info')}
+            >Expédition</button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mobileTab === 'chat'}
+              className={`expedition-modal-mobile-tab${mobileTab === 'chat' ? ' is-active' : ''}`}
+              onClick={() => setMobileTab('chat')}
+            >Chat</button>
+            <button
+              type="button"
+              className="expedition-modal-mobile-tab-close"
+              onClick={onClose}
+              aria-label="Fermer"
+            >×</button>
+          </div>
+        )}
+
         <header className="expedition-modal-header">
           <div className="expedition-modal-header-content">
             <div className="expedition-modal-eyebrow">
@@ -215,31 +247,9 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </div>
         </header>
 
-        {/* Tabs mobile-only — Expédition / Chat. Affichées uniquement si le
-            chat est dispo (membre + status published/passed). */}
-        {chatVisible && (
-          <div className="expedition-modal-mobile-tabs" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mobileTab === 'info'}
-              className={`expedition-modal-mobile-tab${mobileTab === 'info' ? ' is-active' : ''}`}
-              onClick={() => setMobileTab('info')}
-            >Expédition</button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mobileTab === 'chat'}
-              className={`expedition-modal-mobile-tab${mobileTab === 'chat' ? ' is-active' : ''}`}
-              onClick={() => setMobileTab('chat')}
-            >Chat</button>
-          </div>
-        )}
-
         <div className={[
           'expedition-modal-shell',
           editorOpen && 'is-editing',
-          chatVisible && `mobile-tab-${mobileTab}`,
         ].filter(Boolean).join(' ')}>
         <div className="expedition-modal-left">
 

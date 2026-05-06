@@ -25,7 +25,11 @@
 }
 
 /* Mode embedded — rendu inline dans la main col d'ExpeditionModal.
-   Pas d'overlay, pas de wrapper modale, prend la place dispo. */
+   Pas d'overlay, pas de wrapper modale, prend la place dispo.
+   PAS de height: 100% : sinon le contenu déborde sans pousser le
+   parent (.expedition-modal-main) à scroller, et le footer (bouton
+   submit) devient inaccessible sur mobile. On laisse la hauteur
+   suivre le contenu, c'est le main qui gère le scroll. */
 .expedition-creator.expedition-creator-embedded {
   background: transparent;
   border: none;
@@ -33,7 +37,6 @@
   max-width: none;
   max-height: none;
   box-shadow: none;
-  height: 100%;
 }
 /* Layout par défaut : .ec-col est transparent (display: contents)
    pour ne pas affecter le rendu en mode création (overlay). */

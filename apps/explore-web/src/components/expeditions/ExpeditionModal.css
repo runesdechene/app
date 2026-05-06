@@ -36,19 +36,30 @@
     align-items: stretch;
     z-index: 10010;
   }
+  /* IMPORTANT : 100dvh (dynamic viewport height) au lieu de 100vh.
+     Sur Safari/Chrome iOS, 100vh inclut la barre de navigation du
+     navigateur — la modale dépasse alors la zone visible et le bas
+     (chat input, bouton submit) tombe sous l'écran. 100dvh suit la
+     hauteur visible courante. */
   .expedition-modal {
-    height: 100vh;
-    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     width: 100vw;
     max-width: 100vw;
     border-radius: 0;
     border: none;
     margin: 0;
   }
+  /* En mode tab Chat : on cache TOUT ce qui n'est pas le chat — y
+     compris le header (titre, eyebrow, ✎). Les tabs en haut suffisent
+     à identifier qu'on est sur l'expédition. */
+  .expedition-modal.mobile-tab-chat .expedition-modal-header {
+    display: none;
+  }
   /* Safe areas iOS — on respecte le notch en haut et la home indicator
      en bas. Padding horizontal réduit pour gagner de la place. */
   .expedition-modal-header {
-    padding: calc(var(--safe-top, 0px) + 14px) 16px 12px 16px;
+    padding: 14px 16px 12px 16px;
   }
   .expedition-modal-footer {
     padding: 12px 16px calc(var(--safe-bottom, 0px) + 12px) 16px;
@@ -165,11 +176,11 @@
     display: none;
   }
   /* Tab info actif → masquer le chat. */
-  .expedition-modal-shell.mobile-tab-info .expedition-modal-chat-col {
+  .expedition-modal.mobile-tab-info .expedition-modal-chat-col {
     display: none;
   }
   /* Tab chat actif → masquer la zone info (main + footer). */
-  .expedition-modal-shell.mobile-tab-chat .expedition-modal-left {
+  .expedition-modal.mobile-tab-chat .expedition-modal-left {
     display: none;
   }
   /* La zone d'écriture du chat doit respecter la home indicator iOS. */
@@ -185,6 +196,10 @@
 @media (max-width: 760px) {
   .expedition-modal-mobile-tabs {
     display: flex;
+    align-items: stretch;
+    /* Les tabs sont MAINTENANT le tout-premier élément en haut → c'est
+       elles qui gèrent le safe-top (notch iOS). */
+    padding-top: var(--safe-top, 0px);
     background: #faf2dd;
     border-bottom: 1px solid rgba(184, 154, 106, 0.45);
     flex-shrink: 0;
@@ -192,7 +207,7 @@
   .expedition-modal-mobile-tab {
     position: relative;
     flex: 1;
-    padding: 12px 8px;
+    padding: 14px 8px;
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
@@ -224,6 +239,21 @@
     font-size: 10px;
     font-weight: 700;
     line-height: 1;
+  }
+  /* Bouton × intégré aux tabs — comme le header n'est plus toujours
+     visible (caché en mode chat), le close doit aussi vivre ici. */
+  .expedition-modal-mobile-tab-close {
+    flex: 0 0 auto;
+    width: 48px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    color: #6b5230;
+    cursor: pointer;
+    padding: 0;
   }
 }
 
