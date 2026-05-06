@@ -142,15 +142,25 @@
 /* Mobile : retour en colonne unique */
 @media (max-width: 760px) {
   .expedition-modal-shell { flex-direction: column; }
-  .expedition-modal-left { flex: 0 0 auto; }
+  /* La left col DOIT prendre la place restante (1 1 auto) — pas 0 0 auto.
+     Sinon le main avec flex:1 + overflow:auto n'a aucune contrainte de
+     hauteur et le scroll ne s'arme pas → modale figée non scrollable. */
+  .expedition-modal-left {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  /* Chat avec une hauteur fixe en bas, son propre scroll interne. */
   .expedition-modal-chat-col {
-    flex: 0 0 auto;
+    flex: 0 0 240px;
+    height: 240px;
+    max-height: 240px;
     min-width: 0;
-    height: auto;
     border-left: none;
     border-top: 1px solid rgba(184, 154, 106, 0.45);
   }
-  .expedition-modal-chat-col .expedition-chat-messages { max-height: 280px; }
+  .expedition-modal-chat-col .expedition-chat-messages {
+    max-height: none;
+  }
 }
 
 .expedition-modal-loading {
