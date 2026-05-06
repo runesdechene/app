@@ -83,8 +83,9 @@
   min-height: 0;
 }
 .expedition-modal-chat-col .expedition-chat-messages {
-  flex: 1;
+  flex: 1 1 auto;
   max-height: none;
+  min-height: 0;
 }
 
 /* Mobile : retour en colonne unique */
@@ -656,6 +657,7 @@
   padding: 12px 14px;
   border-top: 1px solid rgba(184, 154, 106, 0.3);
   background: #f5e9d4;
+  flex-shrink: 0; /* collé en bas — ne se rétrécit jamais */
 }
 .expedition-chat-input input {
   flex: 1;
