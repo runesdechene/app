@@ -211,7 +211,7 @@
     content: '';
     display: block;
     flex-shrink: 0;
-    height: calc(var(--safe-bottom, 0px) + 340px);
+    height: calc(var(--safe-bottom, 0px) + 20px);
   }
 
   /* Chat input — fixed bottom en mode chat. */
@@ -228,7 +228,7 @@
     content: '';
     display: block;
     flex-shrink: 0;
-    height: calc(var(--safe-bottom, 0px) + 180px);
+    height: calc(var(--safe-bottom, 0px) + 20px);
   }
 }
 
