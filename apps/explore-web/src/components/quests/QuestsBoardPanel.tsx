@@ -47,7 +47,7 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
     >
       <header className="qbp-header">
         <div className="qbp-titlewrap">
-          <h2 className="qbp-title">Expéditions sur la carte</h2>
+          <h2 className="qbp-title">Expéditions</h2>
         </div>
         <div className="qbp-actions">
           <button className="qbp-cta-mini" onClick={onOpenCreator}>+ Créer</button>
@@ -64,7 +64,11 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
         </div>
       </header>
 
-      {!collapsed && <ExpeditionsList onOpenExpedition={onOpenExpedition} />}
+      {/* On ne démonte PAS la liste au repli — sinon flash de re-fetch au déploiement.
+          On la cache en CSS via la classe parent .qbp-collapsed. */}
+      <div className="qbp-content">
+        <ExpeditionsList onOpenExpedition={onOpenExpedition} />
+      </div>
     </aside>
   )
 }

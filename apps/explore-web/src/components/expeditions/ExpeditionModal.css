@@ -192,40 +192,58 @@
    On garde uniquement les styles de l'éditeur (textarea + actions) qui sont
    réutilisés inline. */
 
+.expedition-modal-call-edit-row {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
 .expedition-modal-call-edit-row textarea {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid rgba(184, 154, 106, 0.5);
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1px solid rgba(193, 154, 107, 0.45);
+  border-radius: 8px;
   background: #fff8eb;
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 16px;
-  color: #2a1f10;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-ink);
   resize: vertical;
-  min-height: 60px;
+  min-height: 56px;
   box-sizing: border-box;
+}
+.expedition-modal-call-edit-row textarea:focus {
+  outline: 2px solid #a14a2a;
+  outline-offset: 1px;
+  border-color: transparent;
 }
 .expedition-modal-call-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 6px;
 }
 .expedition-modal-call-actions button {
   background: transparent;
-  border: 1px solid rgba(184, 154, 106, 0.4);
-  color: #6e5435;
-  padding: 6px 14px;
-  border-radius: 6px;
+  border: 1px solid rgba(193, 154, 107, 0.45);
+  color: var(--color-ink-light);
+  padding: 5px 12px;
+  border-radius: 14px;
   font-family: var(--font-accent);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
 }
+.expedition-modal-call-actions button:hover {
+  background: rgba(193, 154, 107, 0.1);
+}
 .expedition-modal-call-actions button.is-primary {
-  background: #2a1f10;
-  color: #faf2dd;
-  border-color: #2a1f10;
+  background: var(--color-ink);
+  color: var(--color-parchment);
+  border-color: var(--color-ink);
+}
+.expedition-modal-call-actions button.is-primary:hover {
+  background: #2c2018;
 }
 
 .expedition-modal-description {
