@@ -60,12 +60,16 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   const participantsById = useMemo(() => {
     if (!current) return {}
     const map: Record<string, { display_name: string; avatar_url: string | null; faction_color: string | null }> = {}
-    map[current.chief.user_id] = {
-      display_name: current.chief.display_name,
-      avatar_url: current.chief.avatar_url,
-      faction_color: current.chief.faction_color,
+    if (current.chief && current.chief.user_id) {
+      map[current.chief.user_id] = {
+        display_name: chief.display_name,
+        avatar_url: chief.avatar_url,
+        faction_color: chief.faction_color,
+      }
     }
-    for (const p of current.validated_participants) {
+    const validated = validatedParticipants ?? []
+    for (const p of validated) {
+      if (!p || !p.user_id) continue
       map[p.user_id] = {
         display_name: p.display_name,
         avatar_url: p.avatar_url,
@@ -75,7 +79,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     return map
   }, [current])
 
-  if (loading || !current) {
+  if (loading || !current || !current.expedition || !current.chief) {
     return createPortal(
       <div className="expedition-modal-overlay" onClick={onClose}>
         <div className="expedition-modal-loading">Chargement…</div>
@@ -85,15 +89,19 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   }
 
   const e = current.expedition
+  const chief = current.chief
+  const validatedParticipants = current.validated_participants ?? []
+  const pendingParticipants = current.pending_participants ?? []
+  const reports = current.reports ?? []
   const isChief = current.my_status === 'chief'
   const isValidated = current.my_status === 'validated'
   const isPending = current.my_status === 'pending'
   const isMember = isChief || isValidated
   const canEditCall = isMember && (e.status === 'published' || e.status === 'passed')
   const canRequest = !isChief && !isValidated && !isPending && e.status === 'published'
-  const validatedCount = current.validated_participants.length + 1 // chef inclus
+  const validatedCount = validatedParticipants.length + 1 // chef inclus
   const isFull = !e.slots_open && e.slots_max != null && validatedCount >= e.slots_max
-  const myReport = current.reports.find((r) => r.user_id === myUserId) ?? null
+  const myReport = reports.find((r) => r.user_id === myUserId) ?? null
 
   async function handleAccept(targetUserId: string) {
     await respondJoinRequest(expeditionId, targetUserId, 'accept')
@@ -198,9 +206,9 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
             label="Chef"
             value={
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                {current.chief.display_name}
-                {current.chief.faction_title && current.chief.faction_color && (
-                  <HeritageTag title={current.chief.faction_title} color={current.chief.faction_color} />
+                {chief.display_name}
+                {chief.faction_title && chief.faction_color && (
+                  <HeritageTag title={chief.faction_title} color={chief.faction_color} />
                 )}
               </span>
             }
@@ -216,11 +224,11 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         </section>
 
         {/* Pending (chef) */}
-        {isChief && current.pending_participants.length > 0 && (
+        {isChief && pendingParticipants.length > 0 && (
           <section className="expedition-modal-section">
-            <h3>Demandes en attente · {current.pending_participants.length}</h3>
+            <h3>Demandes en attente · {pendingParticipants.length}</h3>
             <ul className="expedition-modal-pending-list">
-              {current.pending_participants.map((p) => (
+              {pendingParticipants.map((p) => (
                 <li key={p.user_id} className="expedition-modal-pending-card">
                   <div className="expedition-modal-pending-head">
                     <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
@@ -258,21 +266,21 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           <ul className="expedition-modal-companions-list">
             <li className="expedition-modal-companion">
               <Avatar
-                name={current.chief.display_name}
-                avatarUrl={current.chief.avatar_url}
-                factionColor={current.chief.faction_color}
+                name={chief.display_name}
+                avatarUrl={chief.avatar_url}
+                factionColor={chief.faction_color}
               />
               <div className="expedition-modal-companion-info">
-                <div className="expedition-modal-companion-name">{current.chief.display_name}</div>
+                <div className="expedition-modal-companion-name">{chief.display_name}</div>
                 <div className="expedition-modal-companion-meta">
                   <span className="emm-pill-chief">Chef</span>
-                  {current.chief.faction_title && current.chief.faction_color && (
-                    <HeritageTag title={current.chief.faction_title} color={current.chief.faction_color} />
+                  {chief.faction_title && chief.faction_color && (
+                    <HeritageTag title={chief.faction_title} color={chief.faction_color} />
                   )}
                 </div>
               </div>
             </li>
-            {current.validated_participants.map((p) => (
+            {validatedParticipants.map((p) => (
               <li key={p.user_id} className="expedition-modal-companion">
                 <Avatar name={p.display_name} avatarUrl={p.avatar_url} factionColor={p.faction_color} />
                 <div className="expedition-modal-companion-info">
@@ -328,8 +336,8 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         {(e.status === 'passed' || e.status === 'archived') && (
           <section className="expedition-modal-section">
             <h3>Comptes rendus · galerie</h3>
-            <ExpeditionGallery reports={current.reports} />
-            <ReportsList reports={current.reports} myUserId={myUserId} />
+            <ExpeditionGallery reports={reports} />
+            <ReportsList reports={reports} myUserId={myUserId} />
             {isMember && !reportEditorOpen && (
               <button className="emm-btn-primary" onClick={() => setReportEditorOpen(true)}>
                 {myReport ? 'Modifier mon compte rendu' : 'Laisser mon compte rendu'}
