@@ -1,3 +1,34 @@
+# ALPHA V0.7.5
+## Affinage des Événements — plein écran mobile, navigation fluide
+
+### 🎟️ « Expédition » devient « Événement »
+Un événement, c'est un rendez-vous géolocalisé organisé par un voyageur — marche, festival, vernissage, fête de village. Le mot juste pour accueillir toutes les formes de rassemblement.
+
+### 📱 Mobile : ergonomie revue
+La modale d'événement passe en **plein écran** avec deux onglets — **Événement** et **Chat** — chacun sur la pleine page. La création d'un événement aussi : plein écran, par-dessus tout. Plus rien qui dépasse, tout est scrollable.
+
+### 👤 Tous les noms sont cliquables
+Dans une modale d'événement — chef, compagnons, demandeurs, auteurs de comptes rendus, et même les voyageurs dans le chat — chaque avatar et chaque nom ouvre maintenant son profil.
+
+### 🕐 Dates contextuelles
+Sur la card à gauche, on lit *« Dans 28 jours »* plutôt qu'une date abstraite. Plus parlant. Et dans le chat, chaque message porte son heure (« Hier 14:32 », « Aujourd'hui », etc.).
+
+### 📍 Avatar du chef en fallback
+Si tu n'as pas mis de photo à ton événement, c'est l'avatar du chef qui s'affiche dans le cadre — avec le drapeau rouge en signature.
+
+### 🗺️ Profil joueur : carrousels affinés
+Les 3 carrousels (cartographié / planté / visité) affichent désormais l'**icône du type de lieu** avant chaque nom. Sur PC, des flèches gauche/droite pour naviguer ; la scrollbar moche a disparu. Sur mobile, swipe naturel.
+
+### Sous le capot
+- Modale plein écran via `100dvh` + safe-area iOS (notch + home indicator)
+- Footer modale, chat input et footer création ancrés au viewport (position fixed) : plus rien ne se cache derrière la barre du navigateur
+- Titre / appel / lieu descendent dans la zone scrollable plutôt qu'en sticky — tout l'écran sert à lire
+- Mode édition : header allégé (« Modifier l'événement » + ← Retour), tabs masquées
+- FAB debug Voronoï ramené au niveau de l'interface carte — ne masque plus les notifications
+- Mig 118 : `get_player_profile` retourne désormais `tagIcon` (emoji du tag primary)
+
+---
+
 # ALPHA V0.7.4
 ## Les Expéditions — la carte devient un point de rendez-vous
 
