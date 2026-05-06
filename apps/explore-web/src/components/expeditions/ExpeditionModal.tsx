@@ -9,6 +9,8 @@ import {
   cancelExpedition,
   updateExpeditionCall,
   flagExpedition,
+  uploadExpeditionCover,
+  getExpeditionMediaUrl,
 } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { usePlayerStore } from '../../stores/playerStore'
@@ -140,6 +142,15 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     refresh()
   }
 
+  async function handleCoverChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0]
+    ev.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) return
+    const result = await uploadExpeditionCover(expeditionId, file)
+    if (result.success) refresh()
+  }
+
   const chatVisible = isMember && (e.status === 'published' || e.status === 'passed')
 
   return createPortal(
@@ -191,6 +202,26 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         </header>
 
         <div className="expedition-modal-main">
+
+        {/* Cover image — visible si fournie ; chef peut ajouter / modifier */}
+        {(e.cover_image_url || isChief) && (
+          <div className="expedition-modal-cover">
+            {e.cover_image_url ? (
+              <img src={getExpeditionMediaUrl(e.cover_image_url)} alt="" />
+            ) : (
+              <div className="expedition-modal-cover-empty">
+                <span>📷</span>
+                <small>Aucune image — ton avatar sera affiché sur la carte</small>
+              </div>
+            )}
+            {isChief && (
+              <label className="expedition-modal-cover-edit" title={e.cover_image_url ? 'Modifier l\'image' : 'Ajouter une image'}>
+                <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
+                {e.cover_image_url ? '✎' : '+'}
+              </label>
+            )}
+          </div>
+        )}
 
         {/* Description */}
         {e.description && (
