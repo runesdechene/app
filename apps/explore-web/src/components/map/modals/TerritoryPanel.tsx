@@ -81,6 +81,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
   const [votePower, setVotePower] = useState(0)
   const [usedVotes, setUsedVotes] = useState(0)
   const [proposalsCount, setProposalsCount] = useState(0)
+  const [myVeilledPlaceIds, setMyVeilledPlaceIds] = useState<Set<string>>(new Set())
   const [votesLoading, setVotesLoading] = useState(false)
   const [showProposeInput, setShowProposeInput] = useState(false)
   const [proposeName, setProposeName] = useState('')
@@ -102,11 +103,12 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
     })
     setVotesLoading(false)
     if (result) {
-      const r = result as { votePower: number; usedVotes: number; proposalsCount: number; proposals: Proposal[] }
+      const r = result as { votePower: number; usedVotes: number; proposalsCount: number; proposals: Proposal[]; myVeilledPlaceIds?: string[] }
       setVotePower(r.votePower)
       setUsedVotes(r.usedVotes)
       setProposalsCount(r.proposalsCount)
       setProposals(r.proposals ?? [])
+      setMyVeilledPlaceIds(new Set(r.myVeilledPlaceIds ?? []))
     }
   }, [userId, data.anchorPlaceId, data.placeIds])
 
@@ -441,7 +443,15 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
                   )}
                 </div>
                 <div className="territory-place-info">
-                  <div className="territory-place-name">{p.title}</div>
+                  <div className="territory-place-name">
+                    {p.title}
+                    {myVeilledPlaceIds.has(p.id) && (
+                      <span className="territory-place-veille-pill" title="Vous veillez ce lieu — +1 voix">
+                        <span aria-hidden>{'🏴'}</span>
+                        Vous veillez · +1 voix
+                      </span>
+                    )}
+                  </div>
                   {p.tags.length > 0 && (
                     <div className="territory-place-tags">
                       {p.tags.map(tag => (
