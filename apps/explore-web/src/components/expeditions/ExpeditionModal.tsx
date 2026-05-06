@@ -9,7 +9,6 @@ import {
   cancelExpedition,
   updateExpeditionCall,
   flagExpedition,
-  uploadExpeditionCover,
   getExpeditionCoverUrl,
 } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
@@ -17,6 +16,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { ExpeditionChat } from './ExpeditionChat'
 import { ExpeditionGallery } from './ExpeditionGallery'
 import { ReportEditor } from './ReportEditor'
+import { ExpeditionCreator } from './ExpeditionCreator'
 import { formatRelativeRdv } from '../../lib/expeditionDateFormat'
 import type { ExpeditionReport } from '../../types/expedition'
 import './ExpeditionModal.css'
@@ -35,6 +35,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   const [editingCall, setEditingCall] = useState(false)
   const [callDraft, setCallDraft] = useState('')
   const [reportEditorOpen, setReportEditorOpen] = useState(false)
+  const [editorOpen, setEditorOpen] = useState(false)
   const [flagOpen, setFlagOpen] = useState(false)
 
   // Charge le détail à l'ouverture / refresh
@@ -99,7 +100,9 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   const isValidated = current.my_status === 'validated'
   const isPending = current.my_status === 'pending'
   const isMember = isChief || isValidated
-  const canEditCall = isMember && (e.status === 'published' || e.status === 'passed')
+  // Edition inline de l'appel : réservée aux validés non-chef.
+  // Le chef passe par le bouton "✎ Modifier" du header (édition globale).
+  const canEditCall = isValidated && !isChief && (e.status === 'published' || e.status === 'passed')
   const canRequest = !isChief && !isValidated && !isPending && e.status === 'published'
   const validatedCount = validatedParticipants.length + 1 // chef inclus
   const isFull = !e.slots_open && e.slots_max != null && validatedCount >= e.slots_max
@@ -142,14 +145,6 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     refresh()
   }
 
-  async function handleCoverChange(ev: React.ChangeEvent<HTMLInputElement>) {
-    const file = ev.target.files?.[0]
-    ev.target.value = ''
-    if (!file) return
-    if (!file.type.startsWith('image/')) return
-    const result = await uploadExpeditionCover(expeditionId, file)
-    if (result.success) refresh()
-  }
 
   const chatVisible = isMember && (e.status === 'published' || e.status === 'passed')
 
@@ -198,28 +193,25 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
 
             {e.rdv_label && <div className="expedition-modal-when">{e.rdv_label}</div>}
           </div>
-          <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+          <div className="expedition-modal-header-actions">
+            {isChief && e.status === 'published' && (
+              <button
+                className="expedition-modal-edit"
+                onClick={() => setEditorOpen(true)}
+                aria-label="Modifier l'expédition"
+                title="Modifier l'expédition"
+              >✎</button>
+            )}
+            <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+          </div>
         </header>
 
         <div className="expedition-modal-main">
 
-        {/* Cover image — visible si fournie ; chef peut ajouter / modifier */}
-        {(e.cover_image_url || isChief) && (
+        {/* Cover image — visible si fournie. Modification via le bouton ✎ du header (chef). */}
+        {e.cover_image_url && (
           <div className="expedition-modal-cover">
-            {e.cover_image_url ? (
-              <img src={getExpeditionCoverUrl(e.cover_image_url)} alt="" />
-            ) : (
-              <div className="expedition-modal-cover-empty">
-                <span>📷</span>
-                <small>Aucune image — ton avatar sera affiché sur la carte</small>
-              </div>
-            )}
-            {isChief && (
-              <label className="expedition-modal-cover-edit" title={e.cover_image_url ? 'Modifier l\'image' : 'Ajouter une image'}>
-                <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
-                {e.cover_image_url ? '✎' : '+'}
-              </label>
-            )}
+            <img src={getExpeditionCoverUrl(e.cover_image_url)} alt="" />
           </div>
         )}
 
@@ -413,6 +405,17 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           <FlagDialog
             expeditionId={expeditionId}
             onClose={() => setFlagOpen(false)}
+          />
+        )}
+
+        {editorOpen && (
+          <ExpeditionCreator
+            existing={current.expedition}
+            onClose={() => setEditorOpen(false)}
+            onCreated={() => {
+              setEditorOpen(false)
+              refresh()
+            }}
           />
         )}
       </div>

@@ -177,6 +177,29 @@
   font-size: 14px;
   color: #8a7050;
 }
+.expedition-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.expedition-modal-edit {
+  background: rgba(193, 154, 107, 0.18);
+  border: 1px solid rgba(193, 154, 107, 0.35);
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--color-ink, #4A3728);
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.expedition-modal-edit:hover {
+  background: rgba(193, 154, 107, 0.28);
+}
 .expedition-modal-close {
   background: none;
   border: none;

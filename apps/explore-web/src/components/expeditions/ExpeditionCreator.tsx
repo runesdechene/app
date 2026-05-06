@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { createExpedition, updateExpeditionCall, uploadExpeditionCover } from '../../lib/expeditionsApi'
+import {
+  createExpedition,
+  updateExpedition,
+  updateExpeditionCall,
+  uploadExpeditionCover,
+} from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
-import { listUpcomingExpeditions } from '../../lib/expeditionsApi'
+import { listUpcomingExpeditions, getExpeditionCoverUrl } from '../../lib/expeditionsApi'
 import { useMapStore } from '../../stores/mapStore'
+import type { ExpeditionDetail } from '../../types/expedition'
 import './ExpeditionCreator.css'
 
 interface Props {
@@ -12,6 +18,8 @@ interface Props {
   /** Coordonnées initiales (ex : centre de la carte au moment de l'ouverture). */
   initialLat?: number
   initialLng?: number
+  /** Si fourni, le composant passe en mode édition de cette expé existante. */
+  existing?: ExpeditionDetail
 }
 
 /**
@@ -20,27 +28,34 @@ interface Props {
  * Le tap-on-map sera V1.5 — pour l'instant, lat/lng saisis manuellement
  * avec un bouton "ma position actuelle".
  */
-export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }: Props) {
+export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, existing }: Props) {
+  const isEdit = !!existing
   const setUpcoming = useExpeditionsStore((s) => s.setUpcoming)
 
-  const [name, setName] = useState('')
-  const [callText, setCallText] = useState('')
-  const [description, setDescription] = useState('')
+  const [name, setName] = useState(existing?.name ?? '')
+  const [callText, setCallText] = useState(existing?.call_text ?? '')
+  const [description, setDescription] = useState(existing?.description ?? '')
   const [coverFile, setCoverFile] = useState<File | null>(null)
-  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(
+    existing?.cover_image_url ? getExpeditionCoverUrl(existing.cover_image_url) : null,
+  )
   const [rdvAt, setRdvAt] = useState(() => {
+    if (existing?.rdv_at) {
+      // ISO → format datetime-local
+      return new Date(existing.rdv_at).toISOString().slice(0, 16)
+    }
     const d = new Date()
     d.setDate(d.getDate() + 7)
     d.setHours(9, 0, 0, 0)
-    return d.toISOString().slice(0, 16) // format datetime-local
+    return d.toISOString().slice(0, 16)
   })
-  const [rdvUnset, setRdvUnset] = useState(false) // true = "Date à définir"
-  const [rdvLat, setRdvLat] = useState<number | null>(initialLat ?? null)
-  const [rdvLng, setRdvLng] = useState<number | null>(initialLng ?? null)
-  const [rdvLabel, setRdvLabel] = useState('')
-  const [slotsMode, setSlotsMode] = useState<'fixed' | 'open'>('fixed')
-  const [slotsMax, setSlotsMax] = useState(5)
-  const [validationMode, setValidationMode] = useState<'manual' | 'free'>('manual')
+  const [rdvUnset, setRdvUnset] = useState(existing ? existing.rdv_at === null : false)
+  const [rdvLat, setRdvLat] = useState<number | null>(existing?.rdv_lat ?? initialLat ?? null)
+  const [rdvLng, setRdvLng] = useState<number | null>(existing?.rdv_lng ?? initialLng ?? null)
+  const [rdvLabel, setRdvLabel] = useState(existing?.rdv_label ?? '')
+  const [slotsMode, setSlotsMode] = useState<'fixed' | 'open'>(existing?.slots_open ? 'open' : 'fixed')
+  const [slotsMax, setSlotsMax] = useState(existing?.slots_max ?? 5)
+  const [validationMode, setValidationMode] = useState<'manual' | 'free'>(existing?.validation_mode ?? 'manual')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -113,34 +128,58 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
     }
 
     setSubmitting(true)
-    const result = await createExpedition({
-      name: name.trim(),
-      description: description.trim() || null,
-      rdv_at: rdvAtIso,
-      rdv_lat: rdvLat,
-      rdv_lng: rdvLng,
-      rdv_label: rdvLabel.trim() || null,
-      slots_max: slotsMode === 'fixed' ? slotsMax : null,
-      slots_open: slotsMode === 'open',
-      validation_mode: validationMode,
-    })
+    let expeditionId: string
+    if (isEdit && existing) {
+      // Mode édition — update_voyage (qui ne touche pas call_text ni cover)
+      const r = await updateExpedition(existing.id, {
+        name: name.trim(),
+        description: description.trim() || null,
+        rdv_at: rdvAtIso,
+        rdv_lat: rdvLat,
+        rdv_lng: rdvLng,
+        rdv_label: rdvLabel.trim() || null,
+        slots_max: slotsMode === 'fixed' ? slotsMax : null,
+        slots_open: slotsMode === 'open',
+      })
+      if (!r.success) {
+        setSubmitting(false)
+        setError(translateError(r.error))
+        return
+      }
+      expeditionId = existing.id
+    } else {
+      const r = await createExpedition({
+        name: name.trim(),
+        description: description.trim() || null,
+        rdv_at: rdvAtIso,
+        rdv_lat: rdvLat,
+        rdv_lng: rdvLng,
+        rdv_label: rdvLabel.trim() || null,
+        slots_max: slotsMode === 'fixed' ? slotsMax : null,
+        slots_open: slotsMode === 'open',
+        validation_mode: validationMode,
+      })
+      if (!r.success || !r.expedition_id) {
+        setSubmitting(false)
+        setError(translateError(r.error))
+        return
+      }
+      expeditionId = r.expedition_id
+    }
+
+    // L'appel — mise à jour si fourni (ou si modifié en édition)
+    const trimmedCall = callText.trim() || null
+    if (!isEdit ? trimmedCall : trimmedCall !== existing?.call_text) {
+      await updateExpeditionCall(expeditionId, trimmedCall)
+    }
+    // Image cover — upload si nouveau fichier choisi
+    if (coverFile) {
+      await uploadExpeditionCover(expeditionId, coverFile)
+    }
     setSubmitting(false)
 
-    if (!result.success || !result.expedition_id) {
-      setError(translateError(result.error))
-      return
-    }
-    // Si l'appel a été saisi, le poser via update_voyage_call
-    if (callText.trim()) {
-      await updateExpeditionCall(result.expedition_id, callText.trim())
-    }
-    // Si une image cover a été choisie, l'uploader
-    if (coverFile) {
-      await uploadExpeditionCover(result.expedition_id, coverFile)
-    }
-    // Refresh la liste pour que la nouvelle expé apparaisse au prochain ouverture du panneau
     listUpcomingExpeditions().then(setUpcoming).catch(() => {})
-    onCreated(result.expedition_id)
+    onCreated(expeditionId)
   }
 
   if (pickingPin) {
@@ -164,7 +203,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
         <header className="expedition-creator-header">
           <div>
             <div className="expedition-creator-eyebrow">Nouvelle expédition</div>
-            <h2 className="expedition-creator-title">Convoque tes compagnons</h2>
+            <h2 className="expedition-creator-title">{isEdit ? 'Modifier l\'expédition' : 'Convoque tes compagnons'}</h2>
           </div>
           <button className="expedition-creator-close" onClick={onClose} aria-label="Fermer">×</button>
         </header>
@@ -342,7 +381,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
             onClick={handleSubmit}
             disabled={submitting}
           >
-            {submitting ? 'Publication…' : "Publier l'expédition"}
+            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer' : "Publier l'expédition")}
           </button>
         </footer>
       </div>
