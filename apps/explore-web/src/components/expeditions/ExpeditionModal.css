@@ -116,19 +116,16 @@
 
 .expedition-modal-header {
   position: relative;
-  padding: 24px 56px 20px 56px;
+  padding: 22px 28px 18px 28px;
   background: linear-gradient(180deg, #faf2dd, #f5e9d4);
   border-bottom: 1px solid rgba(184, 154, 106, 0.45);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
-.expedition-modal-pin {
-  position: absolute;
-  top: 24px; left: 22px;
-  width: 14px; height: 14px;
-  background: radial-gradient(circle at 30% 30%, #c46640, #a14a2a 60%, #6a2a16 100%);
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4),
-              inset -1px -1px 2px rgba(0, 0, 0, 0.3),
-              inset 1px 1px 1px rgba(255, 255, 255, 0.3);
+.expedition-modal-header-content {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 .expedition-modal-eyebrow {
   font-family: var(--font-accent);
@@ -141,63 +138,60 @@
 }
 .expedition-modal-title {
   font-family: var(--font-signature);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 30px;
+  font-weight: 600;
+  font-size: 28px;
   color: #2a1f10;
-  line-height: 1.1;
-  margin: 0 0 8px;
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+.expedition-modal-title-call {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.expedition-modal-title-call .expedition-modal-call-text {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 15px;
+  color: #6e5435;
+  line-height: 1.4;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.expedition-modal-title-call .expedition-modal-call-edit {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #b89a6a;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.expedition-modal-title-call .expedition-modal-call-edit:hover {
+  color: #a14a2a;
 }
 .expedition-modal-when {
   font-family: var(--font-body);
-  font-size: 15px;
-  color: #6e5435;
-  font-style: italic;
+  font-size: 14px;
+  color: #8a7050;
 }
 .expedition-modal-close {
-  position: absolute;
-  top: 16px; right: 16px;
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 26px;
   color: #6e5435;
   cursor: pointer;
   line-height: 1;
+  padding: 0 4px;
+  flex-shrink: 0;
 }
 
-.expedition-modal-call {
-  padding: 14px 56px 16px 56px;
-  background: rgba(255, 248, 235, 0.6);
-  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
-}
-.expedition-modal-call-label {
-  font-family: var(--font-accent);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: #8a7050;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.expedition-modal-call-edit {
-  background: none;
-  border: none;
-  font-size: 11px;
-  color: #8a6f4a;
-  cursor: pointer;
-  padding: 0;
-}
-.expedition-modal-call-edit:hover { color: #a14a2a; }
-.expedition-modal-call-text {
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: 17px;
-  color: #4a3925;
-  line-height: 1.5;
-}
+/* L'appel — désormais inline dans le header (cf. .expedition-modal-title-call).
+   On garde uniquement les styles de l'éditeur (textarea + actions) qui sont
+   réutilisés inline. */
+
 .expedition-modal-call-edit-row textarea {
   width: 100%;
   padding: 8px 10px;

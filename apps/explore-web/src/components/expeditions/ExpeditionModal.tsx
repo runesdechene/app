@@ -148,48 +148,47 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
         <div className="expedition-modal-shell">
         <div className="expedition-modal-left">
         <header className="expedition-modal-header">
-          <div className="expedition-modal-pin" />
-          <div>
+          <div className="expedition-modal-header-content">
             <div className="expedition-modal-eyebrow">
               {isChief ? 'Ton expédition' : 'Expédition'} · {formatRelativeRdv(e.rdv_at)}
             </div>
             <h2 className="expedition-modal-title">{e.name}</h2>
+
+            {/* L'appel — intégré directement sous le titre, pas dans un bloc séparé */}
+            {(e.call_text || canEditCall) && (
+              <div className="expedition-modal-title-call">
+                {editingCall ? (
+                  <div className="expedition-modal-call-edit-row">
+                    <textarea
+                      value={callDraft}
+                      maxLength={200}
+                      onChange={(ev) => setCallDraft(ev.target.value)}
+                      placeholder="Une phrase qui dit pourquoi on y va…"
+                    />
+                    <div className="expedition-modal-call-actions">
+                      <button onClick={() => setEditingCall(false)}>Annuler</button>
+                      <button onClick={handleSaveCall} className="is-primary">Enregistrer</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {e.call_text && <span className="expedition-modal-call-text">« {e.call_text} »</span>}
+                    {canEditCall && (
+                      <button
+                        className="expedition-modal-call-edit"
+                        onClick={() => setEditingCall(true)}
+                        title="Modifier l'appel"
+                      >✎</button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
             {e.rdv_label && <div className="expedition-modal-when">{e.rdv_label}</div>}
           </div>
           <button className="expedition-modal-close" onClick={onClose} aria-label="Fermer">×</button>
         </header>
-
-        {/* L'appel */}
-        {(e.call_text || canEditCall) && (
-          <section className="expedition-modal-call">
-            <div className="expedition-modal-call-label">
-              L'appel
-              {canEditCall && !editingCall && (
-                <button className="expedition-modal-call-edit" onClick={() => setEditingCall(true)}>
-                  ✎ modifier
-                </button>
-              )}
-            </div>
-            {editingCall ? (
-              <div className="expedition-modal-call-edit-row">
-                <textarea
-                  value={callDraft}
-                  maxLength={200}
-                  onChange={(ev) => setCallDraft(ev.target.value)}
-                  placeholder="Une phrase qui dit pourquoi on y va…"
-                />
-                <div className="expedition-modal-call-actions">
-                  <button onClick={() => setEditingCall(false)}>Annuler</button>
-                  <button onClick={handleSaveCall} className="is-primary">Enregistrer</button>
-                </div>
-              </div>
-            ) : (
-              <div className="expedition-modal-call-text">
-                « {e.call_text} »
-              </div>
-            )}
-          </section>
-        )}
 
         <div className="expedition-modal-main">
 
