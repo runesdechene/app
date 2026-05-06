@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { createExpedition } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { listUpcomingExpeditions } from '../../lib/expeditionsApi'
@@ -84,7 +85,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
     onCreated(result.expedition_id)
   }
 
-  return (
+  return createPortal(
     <div className="expedition-creator-overlay" onClick={onClose}>
       <div className="expedition-creator" onClick={(e) => e.stopPropagation()}>
         <header className="expedition-creator-header">
@@ -234,7 +235,8 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

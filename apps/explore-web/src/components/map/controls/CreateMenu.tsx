@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import './CreateMenu.css'
 
 /**
@@ -29,7 +30,7 @@ export function CreateMenu({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  return (
+  return createPortal(
     <div className="create-menu-overlay" onClick={onClose}>
       <div className="create-menu" onClick={(e) => e.stopPropagation()}>
         <div className="create-menu-eyebrow">Que veux-tu créer ?</div>
@@ -63,6 +64,7 @@ export function CreateMenu({
           </div>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

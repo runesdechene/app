@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   getExpedition,
   requestJoinExpedition,
@@ -75,10 +76,11 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   }, [current])
 
   if (loading || !current) {
-    return (
+    return createPortal(
       <div className="expedition-modal-overlay" onClick={onClose}>
         <div className="expedition-modal-loading">Chargement…</div>
-      </div>
+      </div>,
+      document.body,
     )
   }
 
@@ -130,7 +132,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
     refresh()
   }
 
-  return (
+  return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
       <div className="expedition-modal" onClick={(ev) => ev.stopPropagation()}>
         <header className="expedition-modal-header">
@@ -360,7 +362,8 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
