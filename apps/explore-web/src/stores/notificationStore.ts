@@ -6,6 +6,11 @@ export interface Notification {
     | 'like_carnet' | 'new_carnet' | 'exploration'
     | 'milestone_likes' | 'milestone_vues' | 'milestone_exploration'
     | 'claim_lost'
+    // V097 — La Cour
+    | 'place_court_attack' | 'place_court_high_threat'
+    | 'place_taken_remote' | 'place_taken_remote_self'
+    | 'place_taken_back_gps' | 'place_reaffirmed'
+    | 'mecene_principal_gained'
   data: {
     actorName?: string
     actorId?: string
@@ -18,6 +23,16 @@ export interface Notification {
     explorerCount?: number
     visitorsToday?: number
     lastVisitorName?: string
+    // V097 — Cour
+    expeditionId?: string
+    fromVacant?: boolean
+    threatsCleared?: number
+    score?: number
+    total?: number
+    oldExpeditionId?: string
+    newExpeditionId?: string
+    reclaimedBy?: string
+    plantedByUser?: string
   }
   read: boolean
   created_at: string

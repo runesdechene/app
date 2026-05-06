@@ -10,10 +10,19 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   milestone_vues: '\uD83D\uDC41\uFE0F',
   milestone_exploration: '\u26F0\uFE0F',
   claim_lost: '\u2694\uFE0F',
+  // V097 \u2014 La Cour
+  place_court_attack: '\u2694\uFE0F',
+  place_court_high_threat: '\uD83D\uDD25',
+  place_taken_remote: '\u26A1',
+  place_taken_remote_self: '\uD83C\uDFF4',
+  place_taken_back_gps: '\uD83D\uDEE1\uFE0F',
+  place_reaffirmed: '\uD83D\uDEE1\uFE0F',
+  mecene_principal_gained: '\uD83E\uDE99',
 }
 
 function formatMessage(notif: Notification): string {
   const d = notif.data
+  const place = d.placeTitle || 'un de vos lieux'
   switch (notif.type) {
     case 'like_carnet':
       return `${d.actorName || 'Quelqu\'un'} a aimé votre récit sur ${d.placeTitle || 'un lieu'}`
@@ -34,6 +43,28 @@ function formatMessage(notif: Notification): string {
       return `L'un de vos lieux a atteint ${d.explorerCount} explorateurs`
     case 'claim_lost':
       return `Une autre Maison d'Héritage a pris l'ascendant sur l'un de vos lieux`
+    // V097 — La Cour
+    case 'place_court_attack':
+      return `${d.actorName || 'Quelqu\'un'} s'intéresse à ${place}`
+    case 'place_court_high_threat':
+      return `${place} est sous forte pression`
+    case 'place_taken_remote':
+      return `Vous avez perdu ${place} — un mécène a pris l'ascendant`
+    case 'place_taken_remote_self':
+      if (d.fromVacant) {
+        return `Vous avez posé votre marque sur ${place} — confirmez-la sur place`
+      }
+      return `Vous tenez ${place} à distance — confirmez-le sur place`
+    case 'place_taken_back_gps':
+      return `L'ancien veilleur a repris ${place} par la marche`
+    case 'place_reaffirmed': {
+      const cleared = d.threatsCleared ?? 0
+      return cleared > 0
+        ? `${place} : ${cleared} menace${cleared > 1 ? 's' : ''} effacée${cleared > 1 ? 's' : ''} par le veilleur`
+        : `Le veilleur de ${place} est repassé sur place`
+    }
+    case 'mecene_principal_gained':
+      return `Vous êtes désormais Mécène Principal de ${place}`
   }
 }
 
