@@ -27,17 +27,9 @@ export function ExpeditionsList({ onOpenExpedition }: Props) {
     return () => { cancelled = true }
   }, [setUpcoming])
 
-  if (loading) {
-    return <div className="expeditions-list-loading">Chargement…</div>
-  }
-
-  if (upcoming.length === 0) {
-    return (
-      <div className="expeditions-list-empty">
-        Aucune expédition à venir. Crée la première.
-      </div>
-    )
-  }
+  // Si pas d'expéditions à afficher (chargement ou vide), on ne rend rien.
+  // Le panel n'affiche que son header — discret quand il n'y a rien.
+  if (loading || upcoming.length === 0) return null
 
   return (
     <ul className="expeditions-list">
