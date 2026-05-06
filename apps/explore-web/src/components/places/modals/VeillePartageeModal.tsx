@@ -7,7 +7,7 @@ interface Props {
   onConfirm: (selectedIds: string[]) => void
 }
 
-export function ExpeditionOptInModal({ candidates, onCancel, onConfirm }: Props) {
+export function VeillePartageeModal({ candidates, onCancel, onConfirm }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const toggle = (id: string) => {
@@ -20,13 +20,13 @@ export function ExpeditionOptInModal({ candidates, onCancel, onConfirm }: Props)
   }
 
   return (
-    <div className="expedition-modal-overlay" onClick={onCancel}>
-      <div className="expedition-modal" onClick={e => e.stopPropagation()}>
+    <div className="veille-partagee-modal-overlay" onClick={onCancel}>
+      <div className="veille-partagee-modal" onClick={e => e.stopPropagation()}>
         <h3>Tu n'es pas seul ici</h3>
         <p>
           {candidates.length} autre{candidates.length > 1 ? 's' : ''} voyageur{candidates.length > 1 ? 's sont' : ' est'} sur place. Planter ensemble ?
         </p>
-        <ul className="expedition-modal-list">
+        <ul className="veille-partagee-modal-list">
           {candidates.map(c => (
             <li key={c.userId}>
               <label>
@@ -36,9 +36,9 @@ export function ExpeditionOptInModal({ candidates, onCancel, onConfirm }: Props)
                   onChange={() => toggle(c.userId)}
                 />
                 <img src={c.avatarUrl ?? '/res/default-avatar.png'} alt="" />
-                <span className="expedition-modal-name">{c.displayName.trim()}</span>
+                <span className="veille-partagee-modal-name">{c.displayName.trim()}</span>
                 <span
-                  className="expedition-modal-faction"
+                  className="veille-partagee-modal-faction"
                   style={{ color: c.factionColor ?? '#8a6f4a' }}
                   title={c.factionId}
                 >
@@ -48,8 +48,8 @@ export function ExpeditionOptInModal({ candidates, onCancel, onConfirm }: Props)
             </li>
           ))}
         </ul>
-        <div className="expedition-modal-actions">
-          <button onClick={() => onConfirm([])} className="expedition-modal-secondary">
+        <div className="veille-partagee-modal-actions">
+          <button onClick={() => onConfirm([])} className="veille-partagee-modal-secondary">
             Planter seul
           </button>
           <button
