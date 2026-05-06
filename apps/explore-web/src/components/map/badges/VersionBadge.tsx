@@ -77,6 +77,25 @@ export function VersionBadge() {
     setOpen(false)
   }
 
+  async function forceUpdate() {
+    try {
+      // 1. Désinstalle le Service Worker pour qu'il télécharge le nouveau au prochain load
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(regs.map((r) => r.unregister()))
+      }
+      // 2. Vide tous les caches du PWA
+      if ('caches' in window) {
+        const keys = await caches.keys()
+        await Promise.all(keys.map((k) => caches.delete(k)))
+      }
+    } catch {
+      // ignore — on recharge dans tous les cas
+    }
+    // 3. Hard reload (bypass cache navigateur)
+    window.location.reload()
+  }
+
   if (!current) return null
 
   return (
@@ -101,6 +120,13 @@ export function VersionBadge() {
                 if (entry.type === 'paragraph') return <p key={i} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
                 return <p key={i} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
               })}
+            </div>
+
+            <div className="version-modal-update">
+              <button className="version-modal-update-btn" onClick={forceUpdate}>
+                🔄 Forcer la mise à jour
+              </button>
+              <small>Si tu ne vois pas la dernière version, ce bouton recharge l'app proprement.</small>
             </div>
 
             {versions.length > 1 && (

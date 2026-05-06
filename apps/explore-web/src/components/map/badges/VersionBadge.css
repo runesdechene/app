@@ -2,6 +2,38 @@
    VERSION BADGE + CHANGELOG MODAL
    ========================================== */
 
+.version-modal-update {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(193, 154, 107, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 248, 235, 0.5);
+  text-align: center;
+}
+.version-modal-update-btn {
+  background: var(--color-ink, #4A3728);
+  color: var(--color-parchment, #f7ede1);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.version-modal-update-btn:hover {
+  background: #2c2018;
+}
+.version-modal-update small {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-body, Cabin, sans-serif);
+  font-size: 12px;
+  font-style: italic;
+  color: #8a7050;
+}
+
 .version-badge {
   position: fixed;
   bottom: 12px;
