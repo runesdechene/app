@@ -405,10 +405,12 @@ export const ExploreMap = memo(function ExploreMap() {
       })
   }, [])
 
-  // V098 — params Voronoï pondéré (panel admin)
-  const voronoiTuning = useVoronoiTuningStore(s => ({
-    enabled: s.enabled, baseKm: s.baseKm, stepKm: s.stepKm, capKm: s.capKm,
-  }))
+  // V098 — params Voronoï pondéré (panel admin) — selectors atomiques
+  // pour éviter de créer un nouvel objet à chaque render (boucle infinie Zustand)
+  const tuningEnabled = useVoronoiTuningStore(s => s.enabled)
+  const tuningBaseKm = useVoronoiTuningStore(s => s.baseKm)
+  const tuningStepKm = useVoronoiTuningStore(s => s.stepKm)
+  const tuningCapKm = useVoronoiTuningStore(s => s.capKm)
   const crownsByPlace = useVoronoiTuningStore(s => s.crownsByPlace)
 
   const workerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -443,11 +445,17 @@ export const ExploreMap = memo(function ExploreMap() {
             }
           }),
         tiers: territoryTiers,
-        radiusTuning: voronoiTuning,
+        radiusTuning: {
+          enabled: tuningEnabled,
+          baseKm: tuningBaseKm,
+          stepKm: tuningStepKm,
+          capKm: tuningCapKm,
+        },
       })
     }, 500)
     return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
-  }, [rawGeojson, placeOverrides, territoryTiers, discoveredIds, voronoiTuning, crownsByPlace])
+  }, [rawGeojson, placeOverrides, territoryTiers, discoveredIds,
+      tuningEnabled, tuningBaseKm, tuningStepKm, tuningCapKm, crownsByPlace])
 
   // Charger les icônes SVG colorées dans la map (tag colors + faction colors pour le mode bannières)
   const loadedIconsRef = useRef(new Set<string>())
