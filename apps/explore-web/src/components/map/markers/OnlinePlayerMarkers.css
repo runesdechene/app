@@ -1107,9 +1107,9 @@
 /* Wrapper en flex (copie du `.player-modal-fragments-wrapper`) → fournit le
    contexte flex où la row peut prendre `flex: 1` et donc toute la largeur. */
 .player-modal-places-wrapper {
+  position: relative; /* ancrage pour les flèches en absolute */
   display: flex;
   align-items: center;
-  gap: 4px;
 }
 
 /* Strict copy de `.player-modal-fragments-row` (qui marche). */
@@ -1125,15 +1125,22 @@
      sur desktop, swipe tactile sur mobile. */
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 4px 4px 8px;
+  /* Padding latéral généreux desktop pour que les flèches en absolute
+     (left/right 10px, ~34px de large) ne masquent pas le 1er/dernier tile. */
+  padding: 4px 50px 8px 50px;
 }
 .player-modal-places-row::-webkit-scrollbar {
   display: none;
 }
 
 /* Flèches gauche/droite des carrousels de lieux — réplique du système
-   utilisé pour les fragments. Cachées sur mobile (swipe natural). */
+   utilisé pour les fragments. En position absolute pour ne pas amputer
+   l'espace de la row. Cachées sur mobile (swipe natural). */
 .places-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
   flex-shrink: 0;
   width: 34px;
   height: 34px;
@@ -1146,17 +1153,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: background 0.2s, transform 0.2s;
   padding: 0;
   line-height: 1;
 }
 .places-arrow:hover {
   background: rgba(255, 242, 227, 1);
-  transform: scale(1.1);
+  transform: translateY(-50%) scale(1.1);
 }
+.places-arrow--left { left: 10px; }
+.places-arrow--right { right: 10px; }
 @media (max-width: 760px) {
   .places-arrow {
     display: none;
+  }
+  .player-modal-places-row {
+    /* Mobile : pas de flèches → padding réduit pour gagner de la place. */
+    padding: 4px 12px 8px 12px;
   }
 }
 
