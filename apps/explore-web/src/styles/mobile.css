@@ -980,6 +980,29 @@
     background: rgba(250, 231, 212, 0.97);
   }
 
+  /* V0.7+ Quetes — page entiere mobile via mobileNav */
+  [data-mobile-panel="quests"] .qbp {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    bottom: calc(var(--safe-bottom, 0px) + 52px);
+    left: 0;
+    right: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+    z-index: 9000;
+    padding-top: calc(var(--safe-top, 0px) + 8px);
+    background: rgba(250, 231, 212, 0.97);
+    backdrop-filter: blur(10px);
+  }
+  [data-mobile-panel="quests"] .qbp.qbp-collapsed {
+    max-height: none;
+  }
+
   /* --- Ajuster positions avec la navbar en bas --- */
   .add-place-fab {
     bottom: calc(var(--safe-bottom, 0px) + 76px);

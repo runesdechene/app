@@ -1,0 +1,92 @@
+/* CreateMenu — popup au-dessus du FAB "+"
+   Le FAB est à `bottom: 80px; left: 30px`. Le menu pop-up apparaît au-dessus. */
+
+.create-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.4);
+  z-index: 16; /* au-dessus du FAB (z-index: 15) */
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 0 160px 30px; /* aligné au-dessus du FAB */
+}
+
+.create-menu {
+  background: #f5e9d4;
+  border: 1px solid #b89a6a;
+  border-radius: 14px;
+  width: min(320px, calc(100vw - 60px));
+  box-shadow: 0 12px 32px rgba(20, 14, 5, 0.32);
+  overflow: hidden;
+  animation: create-menu-pop 0.18s ease;
+}
+
+@keyframes create-menu-pop {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+.create-menu-eyebrow {
+  padding: 14px 18px 10px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a7050;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+}
+
+.create-menu-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.18);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.create-menu-option:last-child { border-bottom: none; }
+.create-menu-option:hover { background: rgba(184, 154, 106, 0.08); }
+.create-menu-option.is-locked .create-menu-title { color: #8a7050; }
+.create-menu-option.is-locked .create-menu-help { color: #a14a2a; }
+
+.create-menu-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.create-menu-text { min-width: 0; }
+.create-menu-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2a1f10;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.create-menu-help {
+  font-family: 'Newsreader', serif;
+  font-size: 14px;
+  font-style: italic;
+  color: #6e5435;
+}
+
+@media (max-width: 760px) {
+  .create-menu-overlay {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 calc(var(--safe-bottom, 0px) + 160px) 0;
+  }
+  .create-menu {
+    width: calc(100vw - 32px);
+    max-width: 360px;
+  }
+}

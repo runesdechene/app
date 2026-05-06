@@ -8,41 +8,45 @@ import { useExpeditionsStore } from '../../stores/expeditionsStore'
 
 /**
  * Orchestrateur du sous-système Expéditions côté HUD.
- * Gère l'état des modales/panneaux : Tableau de Quêtes, création,
- * détail, archives. À monter dans MapPage. Le bouton 📋 d'ouverture
- * est rendu séparément (cf. toolbar de MapPage).
+ * Le QuestsBoardPanel est toujours monté (cf. spec §12.4 — desktop : panel
+ * sous les toasts ; mobile : page entière via mobileNav).
+ *
+ * Cet orchestrateur gère les états transitoires : ouverture de la modale
+ * détail, du créateur, et des archives. Le panel principal reste accessible
+ * en arrière-plan.
  */
-
-interface Props {
-  open: boolean
-  onClose: () => void
-}
-
-export function ExpeditionsHud({ open, onClose }: Props) {
+export function ExpeditionsHud() {
   const [creatorOpen, setCreatorOpen] = useState(false)
   const [archivesOpen, setArchivesOpen] = useState(false)
   const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
 
-  // Ecoute requestOpenExpedition (déclenché par tap bannière sur la carte)
+  // Demande d'ouverture déclenchée depuis ailleurs (ex : tap bannière sur la carte)
   const pendingOpen = useExpeditionsStore((s) => s.pendingOpenExpeditionId)
   const requestOpen = useExpeditionsStore((s) => s.requestOpenExpedition)
   useEffect(() => {
     if (pendingOpen) {
       setSelectedExpeditionId(pendingOpen)
-      requestOpen(null) // consume
+      requestOpen(null)
     }
   }, [pendingOpen, requestOpen])
 
+  // Demande d'ouverture du créateur (depuis le FAB menu)
+  const pendingCreator = useExpeditionsStore((s) => s.pendingOpenCreator)
+  const requestCreator = useExpeditionsStore((s) => s.requestOpenCreator)
+  useEffect(() => {
+    if (pendingCreator) {
+      setCreatorOpen(true)
+      requestCreator(false)
+    }
+  }, [pendingCreator, requestCreator])
+
   return (
     <>
-      {open && !creatorOpen && !archivesOpen && selectedExpeditionId === null && (
-        <QuestsBoardPanel
-          onClose={onClose}
-          onOpenExpedition={(id) => setSelectedExpeditionId(id)}
-          onOpenCreator={() => setCreatorOpen(true)}
-          onOpenArchives={() => setArchivesOpen(true)}
-        />
-      )}
+      <QuestsBoardPanel
+        onOpenExpedition={(id) => setSelectedExpeditionId(id)}
+        onOpenCreator={() => setCreatorOpen(true)}
+        onOpenArchives={() => setArchivesOpen(true)}
+      />
 
       {creatorOpen && (
         <ExpeditionCreator
@@ -95,15 +99,14 @@ function ArchivesPanel({ onClose, onOpenExpedition }: ArchivesProps) {
   }, [setArchives])
 
   return (
-    <div className="qbp-overlay qbp-mounted" onClick={onClose}>
-      <div className="qbp-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="qbp-handle" />
+    <div className="qbp-archives-overlay" onClick={onClose}>
+      <div className="qbp-archives" onClick={(e) => e.stopPropagation()}>
         <header className="qbp-header">
-          <div>
+          <div className="qbp-titlewrap">
             <div className="qbp-eyebrow">Archives</div>
             <h2 className="qbp-title">Expéditions passées</h2>
           </div>
-          <button className="qbp-cta-mini" onClick={onClose}>Fermer</button>
+          <button className="qbp-close" onClick={onClose} aria-label="Fermer">×</button>
         </header>
         {loading ? (
           <div className="expeditions-list-loading">Chargement…</div>

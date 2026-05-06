@@ -41,6 +41,8 @@ import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { NotificationBell } from '../components/notifications/NotificationBell'
 import { ExpeditionsHud } from '../components/expeditions/ExpeditionsHud'
+import { CreateMenu } from '../components/map/controls/CreateMenu'
+import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
@@ -130,7 +132,7 @@ export default function MapPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
-  const [showQuestsBoard, setShowQuestsBoard] = useState(false)
+  const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
@@ -359,12 +361,6 @@ export default function MapPage() {
                 refreshKey={enigmaRefreshKey}
               />
               <NotificationBell />
-              <button
-                className="toolbar-btn quests-btn"
-                onClick={() => setShowQuestsBoard(true)}
-                aria-label="Tableau de Quêtes"
-                title="Tableau de Quêtes"
-              >📋</button>
               <EnergyIndicator />
             </>
           )}
@@ -384,21 +380,33 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* FAB Ajouter un lieu — verrouillé si moins de 3 lieux découverts */}
+      {/* FAB Créer (lieu OU expédition) — toujours actif, le menu gère le verrou lieu */}
       {!authLoading && isAuthenticated && userId && !addPlaceMode && (
         <button
-          className={`add-place-fab ${!canAddPlace ? 'locked' : ''}`}
-          onClick={() => {
-            if (!canAddPlace) {
-              setShowAddPlaceInfo(true)
-            } else {
-              setAddPlaceMode(true)
-            }
+          className="add-place-fab"
+          onClick={() => setShowCreateMenu(true)}
+          aria-label="Créer un lieu ou une expédition"
+        >+</button>
+      )}
+
+      {showCreateMenu && (
+        <CreateMenu
+          canAddPlace={canAddPlace}
+          discoveriesNeeded={discoveriesNeeded}
+          onAddPlace={() => {
+            setShowCreateMenu(false)
+            setAddPlaceMode(true)
           }}
-          aria-label="Ajouter un lieu"
-        >
-          {!canAddPlace ? '🔒' : '+'}
-        </button>
+          onAddPlaceLocked={() => {
+            setShowCreateMenu(false)
+            setShowAddPlaceInfo(true)
+          }}
+          onCreateExpedition={() => {
+            setShowCreateMenu(false)
+            useExpeditionsStore.getState().requestOpenCreator(true)
+          }}
+          onClose={() => setShowCreateMenu(false)}
+        />
       )}
 
       {showAddPlaceInfo && !canAddPlace && (
@@ -509,12 +517,7 @@ export default function MapPage() {
         />
       )}
 
-      {!addPlaceMode && !authLoading && isAuthenticated && (
-        <ExpeditionsHud
-          open={showQuestsBoard}
-          onClose={() => setShowQuestsBoard(false)}
-        />
-      )}
+      {!addPlaceMode && !authLoading && isAuthenticated && <ExpeditionsHud />}
 
       {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
 

@@ -24,6 +24,8 @@ interface ExpeditionsState {
    * sur une bannière de la carte). Le Hud reset à null après ouverture.
    */
   pendingOpenExpeditionId: string | null
+  /** Demande d'ouverture du créateur (depuis le FAB menu). */
+  pendingOpenCreator: boolean
 
   setUpcoming: (l: ExpeditionListItem[]) => void
   setArchives: (l: ExpeditionListItem[]) => void
@@ -32,6 +34,7 @@ interface ExpeditionsState {
   addMessage: (expeditionId: string, m: ExpeditionMessage) => void
   clearMessages: (expeditionId: string) => void
   requestOpenExpedition: (id: string | null) => void
+  requestOpenCreator: (open: boolean) => void
 }
 
 export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
@@ -40,9 +43,11 @@ export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
   current: null,
   messagesByExpedition: {},
   pendingOpenExpeditionId: null,
+  pendingOpenCreator: false,
 
   setUpcoming: (l) => set({ upcoming: l }),
   requestOpenExpedition: (id) => set({ pendingOpenExpeditionId: id }),
+  requestOpenCreator: (open) => set({ pendingOpenCreator: open }),
   setArchives: (l) => set({ archives: l }),
   setCurrent: (p) => set({ current: p }),
 

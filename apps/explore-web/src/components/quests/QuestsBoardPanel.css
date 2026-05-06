@@ -1,52 +1,49 @@
-/* QuestsBoardPanel — panneau HUD intégré sous les toasts.
-   Direction : sépia parchemin chaud, sobre logiciel pas RPG.
-   Cf. maquette Scène 1 : .superpowers/brainstorm/2026-05-06-expeditions/content/expeditions-mockup.html */
+/* QuestsBoardPanel — panel attaché HUD (desktop) / page entière (mobile)
+   Cf. spec §12.4 + maquette Scène 1. */
 
-.qbp-overlay {
+.qbp {
   position: fixed;
-  inset: 0;
-  background: rgba(40, 30, 20, 0.35);
-  z-index: 800;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 80px 16px 16px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.qbp-overlay.qbp-mounted { opacity: 1; }
-
-.qbp-panel {
+  top: 144px; /* sous .game-toast-container (top: 68px + ~70px de marge) */
+  left: 20px;
+  width: 360px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 220px);
   background: #f5e9d4;
   border: 1px solid #b89a6a;
   border-radius: 14px;
-  box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32),
-              0 4px 12px rgba(42, 31, 16, 0.18);
-  width: 100%;
-  max-width: 560px;
-  max-height: 80vh;
-  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(20, 14, 5, 0.22),
+              0 4px 10px rgba(42, 31, 16, 0.14);
+  z-index: 14; /* en dessous des toasts (z-index: 15) */
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  transition: max-height 0.22s ease;
 }
 
-.qbp-handle {
-  margin: 8px auto 0;
-  width: 40px;
-  height: 4px;
-  background: #d9c79d;
-  border-radius: 2px;
-  flex-shrink: 0;
+.qbp.qbp-collapsed {
+  max-height: 56px;
+}
+
+/* Mobile : caché par défaut, plein écran si data-mobile-panel="quests"
+   (cf. règles dans mobile.css). */
+@media (max-width: 760px) {
+  .qbp {
+    /* hidden by default on mobile */
+    display: none;
+  }
 }
 
 .qbp-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 14px 22px 16px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid rgba(184, 154, 106, 0.45);
   flex-shrink: 0;
+  gap: 8px;
 }
+
+.qbp-titlewrap { min-width: 0; }
 .qbp-eyebrow {
   font-family: 'Public Sans', sans-serif;
   font-size: 11px;
@@ -60,28 +57,49 @@
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   font-weight: 500;
-  font-size: 30px;
+  font-size: 26px;
   color: #2a1f10;
   line-height: 1;
   margin: 0;
 }
+
+.qbp-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
 .qbp-cta-mini {
   background: #2a1f10;
   color: #faf2dd;
   border: none;
-  border-radius: 18px;
-  padding: 8px 16px;
+  border-radius: 16px;
+  padding: 7px 14px;
   font-family: 'Public Sans', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(42, 31, 16, 0.18);
+  box-shadow: 0 3px 8px rgba(42, 31, 16, 0.18);
 }
 .qbp-cta-mini:hover { background: #000; }
 
+.qbp-collapse,
+.qbp-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #6e5435;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.qbp-collapse:hover,
+.qbp-close:hover { background: rgba(184, 154, 106, 0.12); }
+.qbp-close { font-size: 24px; }
+
 .qbp-future {
-  padding: 14px 22px;
+  padding: 12px 16px;
   border-top: 1px solid rgba(184, 154, 106, 0.25);
   background: rgba(184, 154, 106, 0.06);
   flex-shrink: 0;
@@ -90,10 +108,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
+  padding: 4px 0;
   font-family: 'Newsreader', serif;
   font-style: italic;
-  font-size: 13px;
+  font-size: 12px;
   color: #8a7050;
 }
 
@@ -110,6 +128,7 @@
   text-transform: uppercase;
   white-space: nowrap;
   font-style: normal;
+  flex-shrink: 0;
 }
 .qbp-pill-icon { font-size: 12px; line-height: 1; }
 .qbp-pill-expedition { background: rgba(161, 74, 42, 0.14); color: #a14a2a; }
@@ -124,7 +143,7 @@
 .qbp-archives-link {
   width: 100%;
   text-align: center;
-  padding: 14px;
+  padding: 12px;
   border: none;
   border-top: 1px solid rgba(184, 154, 106, 0.25);
   background: transparent;
@@ -137,3 +156,34 @@
   flex-shrink: 0;
 }
 .qbp-archives-link:hover { color: #a14a2a; }
+
+/* La liste interne hérite des styles ExpeditionsList.css */
+.qbp .expeditions-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 80px;
+}
+
+/* ─────────── Archives Panel (modale au-dessus) ─────────── */
+.qbp-archives-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.5);
+  z-index: 920;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.qbp-archives {
+  background: #f5e9d4;
+  border: 1px solid #b89a6a;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32);
+  overflow: hidden;
+}
