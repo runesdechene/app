@@ -22,3 +22,25 @@
 **Quand traiter** : prochain sprint cleanup. Pas urgent — la cohabitation `voyage_*` (Expéditions joueur) / `expeditions` (Plantage) fonctionne sans collision tant que personne n'écrit du SQL ad-hoc qui mélange les deux concepts.
 
 **Approche recommandée** : 1 seule migration qui ALTER TABLE RENAME + CREATE OR REPLACE de toutes les RPCs vivantes touchées dans la même transaction (rollback atomique si une RPC casse).
+
+---
+
+## D2. Consolider `users.first_name` et `users.display_name`
+
+**Origine** : 6 mai 2026 — sprint Expéditions. La table `users` a deux colonnes de nom :
+- `first_name` (varchar 255) — colonne d'origine, écrite par l'app à l'inscription (cf. `usePlayer.ts`).
+- `display_name` (text) — ajoutée plus tard avec une intention "nom d'affichage différent du prénom légal", **jamais écrite par aucune migration ni par l'app**.
+
+**Conséquence** : 50+ migrations V0.7 (Coupe, Cour, plantage, leaderboards, Expéditions…) lisent `display_name` qui est NULL pour la majorité des users. Les RPCs retournent des noms vides en silence. Les composants ont parfois des fallbacks (`?? 'Voyageur'`) qui masquent le bug, mais le sous-système Expéditions a révélé le problème.
+
+**Backfill appliqué** (mig 117) : `UPDATE users SET display_name = first_name WHERE display_name IS NULL`. Résout immédiatement la lecture pour les users existants.
+
+**Dette à traiter** : décider du nom canonique et drop l'autre.
+- Option A — drop `first_name`, garder `display_name` : sémantique plus moderne (un user "affiche" un nom). Coût : refondre `apps/explore-web/src/hooks/usePlayer.ts` + tous les autres usages de `first_name` dans le code (à inventorier — l'auth en dépend).
+- Option B — drop `display_name`, garder `first_name` : moins disruptif côté code, mais touche 50 migrations + 19 fichiers TS qui lisent `display_name`. Coût plus élevé.
+
+**Coût estimé** : 1 jour de refacto + tests.
+
+**Quand traiter** : prochain sprint cleanup. Pas urgent — le backfill + la convention `COALESCE(display_name, first_name)` dans les nouvelles RPCs (cf. règle XO en mémoire) tient l'eau.
+
+**Convention temporaire** : toute nouvelle RPC qui retourne un nom user doit faire `COALESCE(u.display_name, u.first_name, 'Voyageur')`.

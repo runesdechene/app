@@ -293,6 +293,19 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
           </section>
         )}
 
+        {/* Règles de l'explorateur érudit — encart de bienséance bienveillant */}
+        <section className="expedition-modal-section expedition-modal-rules">
+          <h3>Règles de l'explorateur érudit</h3>
+          <ul className="expedition-modal-rules-list">
+            <li><strong>L'humain avant la performance.</strong> On vient pour rencontrer, pas pour se mesurer.</li>
+            <li><strong>L'engagement de présence.</strong> Confirme ta venue. Si tu ne peux plus, retire-toi assez tôt pour que les autres se réorganisent.</li>
+            <li><strong>Le rythme du plus lent.</strong> On marche ensemble, on attend ensemble.</li>
+            <li><strong>Le chef garde la responsabilité</strong> du groupe (orientation, sécurité, rythme). Mais ce n'est pas un boss — chacun reste maître de son pas.</li>
+            <li><strong>Avant de partager une photo</strong> où apparaît un compagnon, demande-lui son accord.</li>
+            <li><strong>Si une situation dérape</strong> (alcool, agressivité, propos qui salissent quelqu'un), tu peux te retirer à tout moment. Le chef peut éjecter.</li>
+          </ul>
+        </section>
+
         {/* Validés */}
         <section className="expedition-modal-section">
           <h3>Compagnons validés · {validatedCount}</h3>

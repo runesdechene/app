@@ -416,6 +416,40 @@
   margin: 0 0 14px;
 }
 
+.expedition-modal-rules {
+  background: rgba(193, 154, 107, 0.08);
+}
+.expedition-modal-rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.expedition-modal-rules-list li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4a3925;
+  padding-left: 18px;
+  position: relative;
+}
+.expedition-modal-rules-list li::before {
+  content: "·";
+  position: absolute;
+  left: 4px;
+  top: -2px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #a14a2a;
+  line-height: 1;
+}
+.expedition-modal-rules-list strong {
+  color: #2a1f10;
+  font-weight: 600;
+}
+
 .expedition-modal-pending-list {
   list-style: none;
   padding: 0;
