@@ -34,6 +34,7 @@ export interface ExpeditionListItem {
   rdv_lng: number
   rdv_label: string | null
   call_text: string | null
+  cover_image_url: string | null  // path Storage <voyage_id>/cover/...
   status: ExpeditionStatus
   slots_max: number | null
   slots_open: boolean
@@ -57,6 +58,7 @@ export interface ExpeditionDetail {
   call_text: string | null
   call_author_id: string | null
   call_updated_at: string | null
+  cover_image_url: string | null
   slots_max: number | null
   slots_open: boolean
   validation_mode: ExpeditionValidationMode

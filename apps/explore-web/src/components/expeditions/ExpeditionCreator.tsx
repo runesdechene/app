@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { createExpedition, updateExpeditionCall } from '../../lib/expeditionsApi'
+import { createExpedition, updateExpeditionCall, uploadExpeditionCover } from '../../lib/expeditionsApi'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { listUpcomingExpeditions } from '../../lib/expeditionsApi'
 import { useMapStore } from '../../stores/mapStore'
@@ -26,6 +26,8 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
   const [name, setName] = useState('')
   const [callText, setCallText] = useState('')
   const [description, setDescription] = useState('')
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [rdvAt, setRdvAt] = useState(() => {
     const d = new Date()
     d.setDate(d.getDate() + 7)
@@ -64,6 +66,23 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
   function cancelPickPin() {
     useMapStore.getState().setExpeditionPinMode(false)
     setPickingPin(false)
+  }
+
+  function handleCoverSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) { setError('Choisis une image'); return }
+    if (file.size > 10 * 1024 * 1024) { setError('Image trop lourde (10 Mo max)'); return }
+    setError(null)
+    setCoverFile(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setCoverPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+  function clearCover() {
+    setCoverFile(null)
+    setCoverPreview(null)
   }
 
   function useCurrentPosition() {
@@ -115,6 +134,10 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
     if (callText.trim()) {
       await updateExpeditionCall(result.expedition_id, callText.trim())
     }
+    // Si une image cover a été choisie, l'uploader
+    if (coverFile) {
+      await uploadExpeditionCover(result.expedition_id, coverFile)
+    }
     // Refresh la liste pour que la nouvelle expé apparaisse au prochain ouverture du panneau
     listUpcomingExpeditions().then(setUpcoming).catch(() => {})
     onCreated(result.expedition_id)
@@ -159,6 +182,23 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng }
               onChange={(e) => setName(e.target.value)}
             />
             <div className="ec-counter">{name.length} / 80</div>
+          </section>
+
+          {/* Image de couverture (optionnelle) */}
+          <section className="ec-section">
+            <label className="ec-label">Image de l'expédition <span style={{ textTransform: 'none', letterSpacing: 0, color: '#8a7050', fontWeight: 400 }}>(optionnelle · 10 Mo max)</span></label>
+            {coverPreview ? (
+              <div className="ec-cover-preview">
+                <img src={coverPreview} alt="" />
+                <button type="button" className="ec-cover-remove" onClick={clearCover} aria-label="Retirer">×</button>
+              </div>
+            ) : (
+              <label className="ec-cover-picker">
+                <input type="file" accept="image/*" onChange={handleCoverSelect} hidden />
+                <span>📷 Choisir une image</span>
+                <small>Sinon, ton avatar sera utilisé sur la carte</small>
+              </label>
+            )}
           </section>
 
           {/* L'appel — sous-titre / phrase de motivation */}

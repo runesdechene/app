@@ -1,13 +1,17 @@
 import type { ExpeditionListItem } from '../../../types/expedition'
+import { getExpeditionMediaUrl } from '../../../lib/expeditionsApi'
 import './ExpeditionBanner.css'
 
 /**
- * Bannière "plantée" pour une expédition à venir.
- * Cf. maquette Scène 2 : 3 états visuels selon proximité de rdv_at.
+ * Marker rond pour une expédition sur la carte.
+ * Cf. retours UX 6 mai : médaillon rond > bandeau horizontal.
  *
- * Rendu HTML (pas WebGL) — pour V1, on garde le marker DOM.
- * À LOD plus dezoomé (< zoom 8), on basculera plus tard vers
- * un layer natif MapLibre (cf. plan §10.3 LOD différé V1).
+ * Affichage :
+ * - Si l'expé a une cover_image_url → photo dans le médaillon
+ * - Sinon → avatar du chef
+ * - Sinon → fond sépia avec 🚩 centré
+ * Toujours : un petit 🚩 en pastille superposée bottom-right (signature
+ * "expédition") + halo doré pulsant si l'expé est "Aujourd'hui".
  */
 
 interface Props {
@@ -35,15 +39,14 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
     isUnset && 'is-unset',
   ].filter(Boolean).join(' ')
 
-  const badge = isUnset
-    ? 'À définir'
-    : isToday
-      ? "Aujourd'hui"
-      : isTomorrow
-        ? 'Demain'
-        : isSoon
-          ? 'Bientôt'
-          : null
+  // Image source : cover > avatar chef > rien (fallback emoji)
+  const coverUrl = expedition.cover_image_url
+    ? getExpeditionMediaUrl(expedition.cover_image_url)
+    : null
+  const imgSrc = coverUrl ?? expedition.chief.avatar_url
+  const factionRingStyle = expedition.chief.faction_color
+    ? { borderColor: expedition.chief.faction_color }
+    : undefined
 
   return (
     <button
@@ -51,10 +54,16 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
       className={className}
       onClick={onClick}
       aria-label={`Expédition ${expedition.name}`}
+      title={expedition.name}
     >
+      <span className="expedition-banner-medallion" style={factionRingStyle}>
+        {imgSrc ? (
+          <img src={imgSrc} alt="" />
+        ) : (
+          <span className="expedition-banner-fallback" aria-hidden>🚩</span>
+        )}
+      </span>
       <span className="expedition-banner-flag" aria-hidden>🚩</span>
-      <span className="expedition-banner-name">{expedition.name}</span>
-      {badge && <span className="expedition-banner-badge">{badge}</span>}
     </button>
   )
 }

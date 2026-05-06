@@ -305,4 +305,39 @@ export function getExpeditionMediaUrl(storagePath: string): string {
   return data.publicUrl
 }
 
+/**
+ * Upload une image de couverture pour un voyage.
+ * Path convention : `<voyage_id>/cover/<timestamp>.<ext>`
+ * Lisible par tout le monde grâce à la policy SELECT publique.
+ */
+export async function uploadExpeditionCover(
+  expeditionId: string,
+  file: File,
+): Promise<{ success: boolean; storage_path?: string; error?: string }> {
+  const userId = usePlayerStore.getState().userId
+  if (!userId) return { success: false, error: 'not_authenticated' }
+  if (file.size > 10 * 1024 * 1024) return { success: false, error: 'image_too_large' }
+
+  const ext = file.name.split('.').pop() ?? 'jpg'
+  const path = `${expeditionId}/cover/${Date.now()}.${ext}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('voyage-medias')
+    .upload(path, file, { contentType: file.type, upsert: true })
+  if (uploadError) return { success: false, error: uploadError.message }
+
+  const { data, error: rpcError } = await supabase.rpc('set_voyage_cover_image', {
+    p_user_id: userId,
+    p_voyage_id: expeditionId,
+    p_storage_path: path,
+  })
+  if (rpcError) {
+    await supabase.storage.from('voyage-medias').remove([path])
+    return { success: false, error: rpcError.message }
+  }
+  const d = data as { success: boolean; error?: string }
+  if (!d.success) return { success: false, error: d.error }
+  return { success: true, storage_path: path }
+}
+
 export type { ExpeditionMessage } // re-export pour ergonomie
