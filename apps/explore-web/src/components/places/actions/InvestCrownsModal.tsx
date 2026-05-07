@@ -78,7 +78,7 @@ export function InvestCrownsModal(props: InvestCrownsModalProps) {
             disabled={max === 0}
           />
           <div className="invest-amount">
-            {amount} <span>👑</span> sur {balance}
+            {amount} <span>🪙</span> sur {balance}
           </div>
         </div>
 

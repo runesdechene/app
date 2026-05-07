@@ -93,7 +93,7 @@ export async function discoverPlace(
   if (coupeGain > 0) gainParts.push(`+${coupeGain} Coupe`)
   if (crownsGain > 0) {
     const questSuffix = (data?.questBonus ?? 0) > 0 ? ' (Mini-quête !)' : ''
-    gainParts.push(`+${crownsGain} 👑${questSuffix}`)
+    gainParts.push(`+${crownsGain} 🪙${questSuffix}`)
   }
   const toastMessage = `Le brouillard se lève sur ce lieu 🔍 ${gainParts.join(' / ')}`
 
