@@ -1216,11 +1216,23 @@
   padding: 0 2px;
   font-family: var(--font-accent);
 }
-/* Petit emoji du tag primary du lieu, juste avant le titre. */
-.player-modal-place-tile-tag-icon {
-  display: inline;
-  margin-right: 4px;
-  font-size: 0.95em;
+/* Petite boule colorée avec l'icône du tag primary du lieu, juste avant le titre. */
+.player-modal-place-tile-tag-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: -3px;
+  flex-shrink: 0;
+}
+.player-modal-place-tile-tag-bubble img {
+  width: 10px;
+  height: 10px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 /* Tile "Voir tout" — fond pointillé + grand "+N" centré. */

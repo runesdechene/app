@@ -9,8 +9,10 @@ export interface PlaceCard {
   title: string
   type: string
   imageUrl: string | null
-  /** Emoji du tag primary du lieu (ex. '🌲' pour Forêt). Null si pas de tag primary. */
+  /** URL de l'icône du tag primary du lieu (image servie sur Supabase). Null si pas de tag primary. */
   tagIcon: string | null
+  /** Couleur du tag primary (fond du cercle qui entoure l'icône). Null si pas de tag primary. */
+  tagColor: string | null
 }
 
 export interface AuthoredPlace extends PlaceCard {
