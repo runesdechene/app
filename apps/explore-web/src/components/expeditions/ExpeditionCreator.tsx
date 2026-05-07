@@ -214,6 +214,45 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
     <>
       {header}
 
+      {/* Esprit Rune de Chêne — quel type d'événement, quelle mentalité.
+          Pattern visuel aligné sur "Règles de l'explorateur érudit"
+          (ExpeditionModal section bienséance). N'apparaît qu'à la création. */}
+      {!isEdit && (
+        <section className="expedition-creator-spirit">
+          <h3>L'esprit Rune de Chêne</h3>
+          <div className="ec-spirit-grid">
+            <div className="ec-spirit-rule">
+              <span className="ec-spirit-icon">🤝</span>
+              <div>
+                <strong>Une rencontre, une quête, une proposition culturelle</strong>
+                <small>Bivouac, balade, conte au feu, atelier, lecture, vernissage…</small>
+              </div>
+            </div>
+            <div className="ec-spirit-rule">
+              <span className="ec-spirit-icon">🌳</span>
+              <div>
+                <strong>Toujours en lien</strong>
+                <small>Histoire, patrimoine, nature — un lieu qui te touche.</small>
+              </div>
+            </div>
+            <div className="ec-spirit-rule">
+              <span className="ec-spirit-icon">📜</span>
+              <div>
+                <strong>Tu transmets, tu invites</strong>
+                <small>Pas un cours magistral. Une curiosité partagée.</small>
+              </div>
+            </div>
+            <div className="ec-spirit-rule">
+              <span className="ec-spirit-icon">🪶</span>
+              <div>
+                <strong>L'esprit du chevalier errant</strong>
+                <small>Camaraderie, lenteur, attention au paysage.</small>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="expedition-creator-body">
           <div className="ec-col ec-col-identity">
 
