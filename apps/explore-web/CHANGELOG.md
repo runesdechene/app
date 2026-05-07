@@ -7,20 +7,26 @@ Plus de cap silencieux à 15 coffres par jour. Maintenant chaque lieu veillé te
 ### 🗺️ Découvrir un lieu rapporte une Couronne
 Que tu **découvres un nouveau lieu à distance** (en dépensant ton énergie) ou que tu **poses ta marque sur place** en passant à proximité, tu gagnes désormais **+1 Couronne**. Toute première rencontre avec un lieu compte.
 
-### 🎯 Mini-quête du jour : trois découvertes à distance
-**Découvre 3 lieux à distance dans la même journée** → bonus **+1 Couronne**. Une carotte pour ceux qui investissent leur énergie à révéler la carte. Une fois par jour, dédupliquée.
-
-La quête s'affiche désormais dans le panneau **Événements** (en haut à gauche de la carte), juste au-dessus de tes événements en cours, sous une pilule **« Du jour »**. Tu vois ton avancement (`1/3`, `2/3`…) sans rien ouvrir. Click sur la card → modale détaillée avec barre de progression et heure de complétion une fois accomplie.
-
 ### Pour les voyageurs sans lieu veillé
 Avant, sans un seul plantage, tu ne touchais aucune Couronne en dehors des énigmes. Maintenant, **explorer = gagner**. La porte d'entrée est ouverte à tout le monde, qu'on soit bâtisseur ou nouveau venu.
+
+### 🎯 Quêtes en cours — les missions du jour s'invitent dans le HUD
+Le panneau gauche s'étoffe : ta liste d'événements gagne un voisin du dessus, **les quêtes en cours**. La première quête du jour est en place — **Découvre 3 lieux à distance** (récompense +1 🪙) — avec une pilule « Du jour » pour la distinguer des événements.
+
+Tu vois ton avancement (`1/3`, `2/3`, `✓`) sans rien ouvrir. Click sur la card → modale détaillée plein écran avec barre de progression, récompense, et heure de complétion une fois accomplie. Architecture pensée pour accueillir d'autres quêtes plus tard (énigme du jour, lieu à visiter…).
+
+### 🎖️ Toasts énigme : la Couronne enfin créditée à l'écran
+Quand tu résolvais une énigme, le toast disait `+3 Gloire / +1 Coupe` — la Couronne (gagnée pourtant depuis la V0.7 phase 5) était oubliée à l'affichage. Désormais : `🎖️ +3 / 🏆 +1 / 🪙 +1`, icônes inline, format cohérent avec la modale de résultat.
 
 ### Sous le capot
 - Mig 121 : externalisation des paramètres éco Couronnes vers `app_settings` (ajustables à chaud, sans nouvelle migration)
 - Mig 122 : refonte `get_my_crowns_state` + `harvest_crown` — tirage indépendant par lieu (formule p(N) = K/√N), drip intra-journée déterministe via hash `(user, lieu, date)`
 - Mig 123 + 124 : `discover_place` étendue — gain Couronne sur découverte (remote ET GPS), bonus mini-quête sur 3 découvertes remote du jour (énergie dépensée), déduplicaté via `activity_log`
-- Mig 125 : RPC `get_today_quests_state` — array de quêtes du jour avec `progress`, `target`, `reward`, `completedAt`. Architecture ouverte multi-quêtes pour accueillir énigme du jour, lieu à visiter, etc. plus tard
+- Mig 125 : RPC `get_today_quests_state` — array de quêtes du jour avec `progress`, `target`, `reward`, `completedAt`. Architecture ouverte multi-quêtes
 - Frontend : `DailyQuestsList` + `DailyQuestCard` + `DailyQuestModal` montés en tête de `QuestsBoardPanel`, refetch déclenché depuis `discoverPlace` après chaque action remote
+- Modale quête réutilise `InfoModal` (portal vers `document.body`, style canonique des badges Gloire/Couronnes/Coupe) — slot `extraContent` ajouté au composant pour la barre de progression
+- Toasts énigme harmonisés (`hooks/usePlayer.ts` + `lib/loadRecentActivityToasts.ts`) : icônes 🎖️/🏆/🪙 inline, fini les 🦉/📖 résiduels, gain Couronne lu depuis `data.crownsGain` (présent dans `activity_log` depuis mig 080)
+- Renaming UX : panneau « Événements » → **« Quêtes en cours »** (aligné sur le contenu hybride)
 - Plafond stock inchangé (500), gain par récolte inchangé (+1 solo / +2 si lieu partagé à 2+)
 - Signatures RPC inchangées : compatible avec les anciens clients en cache
 
