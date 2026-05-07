@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom'
+import type { ReactNode } from 'react'
 import './InfoModal.css'
 
 interface InfoRow {
@@ -14,9 +15,11 @@ interface InfoModalProps {
   rows: InfoRow[]
   onClose: () => void
   action?: { label: string; onClick: () => void }
+  /** Slot optionnel rendu entre la description et les rows (progress bar, image, etc.). */
+  extraContent?: ReactNode
 }
 
-export function InfoModal({ icon, title, description, rows, onClose, action }: InfoModalProps) {
+export function InfoModal({ icon, title, description, rows, onClose, action, extraContent }: InfoModalProps) {
   // Portal vers document.body : sort de tout stacking context parent (chatbox,
   // toastbox, map container, etc.) qui pourrait plafonner le z-index de la modal.
   // Sans portal, le z-index 100000 est relatif au stacking context du parent qui
@@ -32,6 +35,9 @@ export function InfoModal({ icon, title, description, rows, onClose, action }: I
           <h3 className="info-modal-title">{title}</h3>
         </div>
         <p className="info-modal-desc">{description}</p>
+        {extraContent && (
+          <div className="info-modal-extra">{extraContent}</div>
+        )}
         {rows.length > 0 && (
           <div className="info-modal-stats">
             {rows.map((row, i) => (

@@ -61,6 +61,9 @@
   margin: 0 0 16px;
   opacity: 0.85;
 }
+.info-modal-extra {
+  margin: 0 0 14px;
+}
 .info-modal-stats {
   display: flex;
   flex-direction: column;
