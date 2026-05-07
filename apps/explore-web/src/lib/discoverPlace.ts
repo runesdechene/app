@@ -5,6 +5,7 @@ import { supabase } from './supabase'
 import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
+import { useCrownsStore } from '../stores/crownsStore'
 import { refreshLevelStateGlobal } from '../hooks/useLevel'
 
 const GPS_PROXIMITY_M = 500
@@ -85,9 +86,15 @@ export async function discoverPlace(
   const rules = useGloryRulesStore.getState().rules
   const gloryGain = rules['glory.discover_remote'] ?? 1
   const coupeGain = rules['coupe.discover_remote'] ?? 0
+  const crownsGain = (data?.crownsGain ?? 0) + (data?.questBonus ?? 0)
+
   const gainParts: string[] = []
   if (gloryGain > 0) gainParts.push(`+${gloryGain} Gloire`)
   if (coupeGain > 0) gainParts.push(`+${coupeGain} Coupe`)
+  if (crownsGain > 0) {
+    const questSuffix = (data?.questBonus ?? 0) > 0 ? ' (Mini-quête !)' : ''
+    gainParts.push(`+${crownsGain} 👑${questSuffix}`)
+  }
   const toastMessage = `Le brouillard se lève sur ce lieu 🔍 ${gainParts.join(' / ')}`
 
   useToastStore.getState().addToast({
@@ -95,6 +102,11 @@ export async function discoverPlace(
     message: toastMessage,
     timestamp: Date.now(),
   })
+
+  // V0.7+ — refresh balance Couronnes après découverte (gain potentiel + bonus quête)
+  if (crownsGain > 0 && typeof data?.newCrownsBalance === 'number') {
+    useCrownsStore.getState().setBalance(data.newCrownsBalance)
+  }
 
   // Rafraîchir l'état de niveau pour que useLevelUp détecte le changement
   await refreshLevelStateGlobal(userId)

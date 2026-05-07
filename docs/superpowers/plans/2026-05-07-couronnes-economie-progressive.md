@@ -159,12 +159,13 @@ DECLARE
 BEGIN
   v_h := md5(p_user_id || '-' || p_place_id || '-' || current_date::text);
 
-  -- Tirage proba par lieu : convertir 8 premiers chars hex (32 bits) en entier 0..2^32-1
-  -- puis mod 1000 pour comparer à proba * 1000 (entier).
+  -- Tirage proba par lieu : convertir 8 premiers chars hex (32 bits) en bigint
+  -- puis abs() avant le modulo (le cast bit(32)::bigint donne un signed → la
+  -- moitié des hashes seraient négatifs et tomberaient jamais dans le seuil).
   v_h_lo := substr(v_h, 1, 8);
   v_proba := public._crown_proba_for_n(p_n_total);
   v_proba_int := (FLOOR(v_proba * 1000))::integer;
-  IF (('x' || v_h_lo)::bit(32)::bigint % 1000) >= v_proba_int THEN
+  IF (abs(('x' || v_h_lo)::bit(32)::bigint) % 1000) >= v_proba_int THEN
     RETURN false;
   END IF;
 
@@ -173,7 +174,7 @@ BEGIN
   v_drip_h1     := COALESCE((SELECT value::integer FROM public.app_settings WHERE key = 'crowns_drip_end_hour'),   20);
   v_drip_window := GREATEST(60, (v_drip_h1 - v_drip_h0) * 60);  -- safety floor 60 min
 
-  v_h_hi := (('x' || substr(v_h, 9, 8))::bit(32)::bigint % v_drip_window)::integer;
+  v_h_hi := (abs(('x' || substr(v_h, 9, 8))::bit(32)::bigint) % v_drip_window)::integer;
   v_drip_minute := v_drip_h0 * 60 + v_h_hi;
 
   v_now_minute := EXTRACT(HOUR FROM now())::integer * 60 + EXTRACT(MINUTE FROM now())::integer;

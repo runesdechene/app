@@ -1,3 +1,27 @@
+# ALPHA V0.7.6
+## Couronnes — l'économie qui respecte tous les voyageurs
+
+### 🌅 Les coffres apparaissent au fil de la journée
+Plus de cap silencieux à 15 coffres par jour. Maintenant chaque lieu veillé tente sa chance indépendamment, et les coffres apparaissent **progressivement entre 6h et 20h** — un petit matin tranquille, plus dense en fin d'après-midi. Tu n'as plus besoin de spammer la carte au lever du soleil pour ne rien rater.
+
+### 🗺️ Récompense la découverte
+Atteindre un nouveau lieu en **vraie présence GPS** rapporte désormais **+1 Couronne** au passage. Ta première marque sur le terrain, ça compte.
+
+### 🎯 Mini-quête du jour : trois découvertes
+Découvre **3 lieux en GPS dans la même journée** → bonus **+1 Couronne**. Une petite carotte pour les balades, une fois par jour.
+
+### Pour les voyageurs sans lieu veillé
+Avant, sans un seul plantage, tu ne touchais aucune Couronne en dehors des énigmes. Maintenant, marcher = gagner. La porte d'entrée est ouverte à tout le monde.
+
+### Sous le capot
+- Mig 121 : externalisation des paramètres éco Couronnes vers `app_settings` (ajustables à chaud, sans nouvelle migration)
+- Mig 122 : refonte `get_my_crowns_state` + `harvest_crown` — tirage indépendant par lieu (formule p(N) = K/√N), drip intra-journée déterministe via hash `(user, lieu, date)`
+- Mig 123 : `discover_place` étendue — gain Couronne 1ère visite GPS + bonus mini-quête déduplicaté via `activity_log`
+- Plafond stock inchangé (500), gain par récolte inchangé (+1 solo / +2 si lieu partagé à 2+)
+- Signatures RPC inchangées : compatible avec les anciens clients en cache
+
+---
+
 # ALPHA V0.7.5
 ## Affinage des Événements — plein écran mobile, navigation fluide
 
