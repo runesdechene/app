@@ -376,10 +376,18 @@ export function usePlayer() {
                        : 'coupe.enigma_easy'
             const gainG = r[keyG] ?? 1
             const gainC = r[keyC] ?? 1
+            const gainK = (e.data as { crownsGain?: number })?.crownsGain ?? 0
+            // V0.7.6 — toast énigme avec icônes inline par gain (pas de 🦉 / 📖
+            // résiduel — Uriel 7/05). Format aligné avec EnigmaResult.tsx.
+            const enigmaParts: string[] = []
+            if (gainG > 0) enigmaParts.push(`🎖️ +${gainG}`)
+            if (gainC > 0) enigmaParts.push(`🏆 +${gainC}`)
+            if (gainK > 0) enigmaParts.push(`🪙 +${gainK}`)
+            const enigmaGains = enigmaParts.join(' / ')
             if (isSelf) {
-              message = `Énigme ${kindLabel} résolue (${diffLabel}) 🦉 ${fmt(gainG, gainC)}`
+              message = `Énigme ${kindLabel} résolue (${diffLabel}) ${enigmaGains}`
             } else {
-              message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${fmt(gainG, gainC)}`
+              message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) ${enigmaGains}`
             }
             // V070 — push le nom du fragment en highlight pour le rendre cliquable
             if (kind === 'fragment' && fragmentName) {

@@ -178,10 +178,13 @@ export async function loadRecentActivityToasts(currentUserId: string) {
                  : 'coupe.enigma_easy'
       const gainG = r[keyG] ?? 1
       const gainC = r[keyC] ?? 1
+      const gainK = (e.data as { crownsGain?: number })?.crownsGain ?? 0
+      // V0.7.6 — icônes inline par gain (aligné avec EnigmaResult / usePlayer).
       const parts: string[] = []
-      if (gainG > 0) parts.push(`+${gainG} Gloire`)
-      if (gainC > 0) parts.push(`+${gainC} Coupe`)
-      message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) 📖 ${parts.join(' / ')}`
+      if (gainG > 0) parts.push(`🎖️ +${gainG}`)
+      if (gainC > 0) parts.push(`🏆 +${gainC}`)
+      if (gainK > 0) parts.push(`🪙 +${gainK}`)
+      message = `${name} a résolu une énigme ${kindLabel} (${diffLabel}) ${parts.join(' / ')}`
       highlights.push(name)
       if (kind === 'fragment' && fragmentName) {
         highlights.push(fragmentName)

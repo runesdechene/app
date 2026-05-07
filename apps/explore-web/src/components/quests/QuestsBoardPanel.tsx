@@ -49,7 +49,7 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
     >
       <header className="qbp-header">
         <div className="qbp-titlewrap">
-          <h2 className="qbp-title">Événements</h2>
+          <h2 className="qbp-title">Quêtes & Expéditions</h2>
         </div>
         <div className="qbp-actions">
           <button className="qbp-cta-mini" onClick={onOpenCreator}>+ Créer</button>
