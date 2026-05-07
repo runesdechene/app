@@ -8,13 +8,17 @@ import { InfoModal } from '../modals/InfoModal'
 // d'encodage source / PWA cache observés par le passé.
 
 const TXT_TITLE       = 'Couronnes de Chêne'
-const TXT_DESCRIPTION = 'La monnaie du jeu. Récoltez les coffres qui apparaissent chaque jour sur vos lieux veillés, et gagnez-en en résolvant les énigmes. Investissez vos Couronnes en mécénat sur un lieu pour soutenir un veilleur ou poser votre marque à distance — plus un lieu reçoit de Couronnes, plus il rayonne sur la carte.'
-const TXT_ROW_SOLO    = 'Récolte solo'
-const TXT_ROW_SOLO_VAL = '+1 Couronne'
-const TXT_ROW_EXP     = 'Récolte en expédition'
-const TXT_ROW_EXP_VAL = '+2 Couronnes'
-const TXT_ROW_ENIGMA  = 'Énigme correcte'
-const TXT_ROW_ENIGMA_VAL = '+1 à +3 selon la difficulté'
+const TXT_DESCRIPTION = "La monnaie du royaume. Tu en gagnes en récoltant les coffres qui poussent chaque jour sur tes lieux veillés, en sortant de nouveaux lieux du brouillard, et en résolvant des énigmes. Tu peux ensuite les investir en mécénat sur un lieu pour soutenir son veilleur ou y poser ta marque à distance — plus un lieu reçoit de Couronnes, plus il rayonne sur la carte."
+const TXT_ROW_SOLO    = 'Coffre — lieu veillé seul'
+const TXT_ROW_SOLO_VAL = '+1 🪙'
+const TXT_ROW_EXP     = 'Coffre — lieu veillé à plusieurs'
+const TXT_ROW_EXP_VAL = '+2 🪙'
+const TXT_ROW_DISCOVER = 'Sortir un lieu du brouillard'
+const TXT_ROW_DISCOVER_VAL = '+1 🪙'
+const TXT_ROW_QUEST   = '3 lieux découverts à distance / jour'
+const TXT_ROW_QUEST_VAL = '+1 🪙 bonus'
+const TXT_ROW_ENIGMA  = 'Énigme résolue'
+const TXT_ROW_ENIGMA_VAL = '+1 à +3 🪙 selon la difficulté'
 
 export function CrownsBadge() {
   const balance = useCrownsStore(s => s.balance)
@@ -47,6 +51,8 @@ export function CrownsBadge() {
             { label: 'Stock actuel', value: `${balance} / 500`, highlight: true },
             { label: TXT_ROW_SOLO, value: TXT_ROW_SOLO_VAL },
             { label: TXT_ROW_EXP, value: TXT_ROW_EXP_VAL },
+            { label: TXT_ROW_DISCOVER, value: TXT_ROW_DISCOVER_VAL },
+            { label: TXT_ROW_QUEST, value: TXT_ROW_QUEST_VAL },
             { label: TXT_ROW_ENIGMA, value: TXT_ROW_ENIGMA_VAL },
           ]}
           onClose={() => setShowInfo(false)}
