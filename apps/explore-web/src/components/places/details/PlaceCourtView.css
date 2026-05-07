@@ -407,3 +407,27 @@
   border-radius: 6px;
   margin: 0;
 }
+
+/* ─── Mobile : boutons Cour empilés en colonne ───
+   Sur mobile étroit (≤580px), "Soutenir le veilleur" + "Influencer" ne tiennent
+   pas côte à côte (label nowrap + icon + cost = ~180px chacun). On les passe
+   en colonne pleine largeur, et on réduit la hauteur du bouton pour économiser
+   l'espace vertical une fois superposés. */
+@media (max-width: 580px) {
+  .court-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .court-actions button {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 14px;
+    gap: 6px;
+  }
+  .court-btn-label {
+    font-size: 12px;
+  }
+  .court-btn-cost {
+    font-size: 10px;
+  }
+}
