@@ -6,6 +6,7 @@ import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { useCrownsStore } from '../stores/crownsStore'
+import { useDailyQuestsStore } from '../stores/dailyQuestsStore'
 import { refreshLevelStateGlobal } from '../hooks/useLevel'
 
 const GPS_PROXIMITY_M = 500
@@ -106,6 +107,11 @@ export async function discoverPlace(
   // V0.7+ — refresh balance Couronnes après découverte (gain potentiel + bonus quête)
   if (crownsGain > 0 && typeof data?.newCrownsBalance === 'number') {
     useCrownsStore.getState().setBalance(data.newCrownsBalance)
+  }
+
+  // V0.7.6 — refresh quêtes du jour si découverte remote (fait avancer "Découvre 3 lieux")
+  if (method === 'remote') {
+    useDailyQuestsStore.getState().refresh(userId)
   }
 
   // Rafraîchir l'état de niveau pour que useLevelUp détecte le changement

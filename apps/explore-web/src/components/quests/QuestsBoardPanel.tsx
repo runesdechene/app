@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { ExpeditionsList } from '../expeditions/ExpeditionsList'
+import { DailyQuestsList } from './DailyQuestsList'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import './QuestsBoardPanel.css'
+import './DailyQuests.css'
 
 /**
  * Panneau Tableau de Quêtes — toujours monté.
@@ -67,6 +69,7 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
       {/* On ne démonte PAS la liste au repli — sinon flash de re-fetch au déploiement.
           On la cache en CSS via la classe parent .qbp-collapsed. */}
       <div className="qbp-content">
+        <DailyQuestsList />
         <ExpeditionsList onOpenExpedition={onOpenExpedition} />
       </div>
 

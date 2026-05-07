@@ -1,0 +1,254 @@
+/* DailyQuests — section "Du jour" du panneau et modale détaillée. */
+
+/* ─────────── Liste & Card ─────────── */
+
+.daily-quests-list {
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.25);
+  margin-bottom: 4px;
+}
+
+.daily-quest-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+  cursor: pointer;
+  transition: background 0.18s;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-ink);
+}
+.daily-quest-card:last-child { border-bottom: none; }
+.daily-quest-card:hover { background: rgba(193, 154, 107, 0.1); }
+.daily-quest-card:focus-visible {
+  outline: 2px solid var(--color-sepia);
+  outline-offset: -2px;
+}
+
+.daily-quest-card-icon {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f4e4b8, #e0c98a);
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px #faf2dd, 0 0 0 3px rgba(161, 74, 42, 0.45);
+}
+
+.daily-quest-card-pill {
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a14a2a;
+  background: rgba(161, 74, 42, 0.12);
+  padding: 2px 7px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.daily-quest-card-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-signature);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.daily-quest-card-progress {
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: rgba(193, 154, 107, 0.18);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.daily-quest-card-completed .daily-quest-card-title { opacity: 0.55; }
+.daily-quest-card-completed .daily-quest-card-progress {
+  background: rgba(46, 125, 50, 0.18);
+  color: #2e7d32;
+}
+
+/* ─────────── Modale ─────────── */
+
+.daily-quest-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 12, 6, 0.55);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+}
+
+.daily-quest-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: var(--color-parchment, #fcf1d6);
+  border-radius: 14px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 12px 40px rgba(20, 12, 6, 0.35);
+  font-family: var(--font-body);
+  color: var(--color-ink);
+}
+
+.daily-quest-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--color-ink-light);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.daily-quest-modal-close:hover { background: rgba(193, 154, 107, 0.18); }
+
+.daily-quest-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.daily-quest-modal-icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f4e4b8, #e0c98a);
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 0 2px #faf2dd, 0 0 0 3px rgba(161, 74, 42, 0.45);
+}
+
+.daily-quest-modal-pill {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a14a2a;
+  background: rgba(161, 74, 42, 0.12);
+  padding: 4px 10px;
+  border-radius: 11px;
+}
+
+.daily-quest-modal-title {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 4px 0 6px;
+  line-height: 1.2;
+}
+
+.daily-quest-modal-description {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-ink);
+  margin: 0 0 18px;
+}
+
+.daily-quest-modal-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.daily-quest-modal-progress-bar {
+  flex: 1 1 auto;
+  height: 10px;
+  background: rgba(193, 154, 107, 0.22);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.daily-quest-modal-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c98a3a, #a14a2a);
+  transition: width 0.3s ease;
+}
+.daily-quest-modal-progress-fill.completed {
+  background: linear-gradient(90deg, #4caf50, #2e7d32);
+}
+
+.daily-quest-modal-progress-label {
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-ink);
+  flex-shrink: 0;
+}
+
+.daily-quest-modal-footer {
+  border-top: 1px solid rgba(193, 154, 107, 0.25);
+  padding-top: 12px;
+}
+
+.daily-quest-modal-reward,
+.daily-quest-modal-completed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.daily-quest-modal-reward-label,
+.daily-quest-modal-completed-at {
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-light);
+}
+
+.daily-quest-modal-reward-value {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 700;
+  color: #a14a2a;
+}
+
+.daily-quest-modal-completed-badge {
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #2e7d32;
+  background: rgba(46, 125, 50, 0.12);
+  padding: 5px 12px;
+  border-radius: 12px;
+}
