@@ -9,9 +9,9 @@ import { InfoModal } from '../modals/InfoModal'
 
 const TXT_TITLE       = 'Couronnes de Chêne'
 const TXT_DESCRIPTION = "La monnaie du royaume. Tu en gagnes en récoltant les coffres qui poussent chaque jour sur tes lieux veillés, en sortant de nouveaux lieux du brouillard, et en résolvant des énigmes. Tu peux ensuite les investir en mécénat sur un lieu pour soutenir son veilleur ou y poser ta marque à distance — plus un lieu reçoit de Couronnes, plus il rayonne sur la carte."
-const TXT_ROW_SOLO    = 'Coffre — lieu veillé seul'
+const TXT_ROW_SOLO    = 'Coffre aléatoire — lieu veillé seul'
 const TXT_ROW_SOLO_VAL = '+1 🪙'
-const TXT_ROW_EXP     = 'Coffre — lieu veillé à plusieurs'
+const TXT_ROW_EXP     = 'Coffre aléatoire — lieu veillé à plusieurs'
 const TXT_ROW_EXP_VAL = '+2 🪙'
 const TXT_ROW_DISCOVER = 'Sortir un lieu du brouillard'
 const TXT_ROW_DISCOVER_VAL = '+1 🪙'

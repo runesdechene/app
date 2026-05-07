@@ -226,7 +226,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
               7/05 : avant cette section était hors body et cassait le scroll). */}
           {!isEdit && (
             <section className="expedition-creator-spirit ec-section-fullwidth">
-              <h3>L'esprit Rune de Chêne</h3>
+              <h3>Que publier ?</h3>
               <div className="ec-spirit-grid">
                 <div className="ec-spirit-rule">
                   <span className="ec-spirit-icon">🤝</span>
@@ -239,14 +239,14 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
                   <span className="ec-spirit-icon">🌳</span>
                   <div>
                     <strong>Toujours en lien</strong>
-                    <small>Histoire, patrimoine, Nature — l'esprit Runes de Chêne doit transparaître. Pas d'auto-promotion sans un lien avec l'esprit de la marque.</small>
+                    <small>Histoire, patrimoine, Nature — l'esprit Runes de Chêne doit transparaître. Pas de promotion sans un lien avec l'esprit de la marque.</small>
                   </div>
                 </div>
                 <div className="ec-spirit-rule">
                   <span className="ec-spirit-icon">📜</span>
                   <div>
                     <strong>Tu transmets, tu invites</strong>
-                    <small>Pas un cours magistral. Une curiosité partagée, une envie de partir à l'aventure ou de transmettre.</small>
+                    <small>Pas un cours magistral. Une curiosité partagée, une envie de partir à l'aventure ou de transmettre, de partager.</small>
                   </div>
                 </div>
                 <div className="ec-spirit-rule">
@@ -443,7 +443,7 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
                 onChange={(e) => setLiabilityAccepted(e.target.checked)}
               />
               <span>
-                Je comprends que Rune de Chêne ne peut être tenue responsable de l'événement que je propose et de tous ceux qui pourraient s'en suivre.
+                Je comprends que Rune de Chêne ne peut être tenue responsable de l'événement, des gens qui y participent, de ce qui y est dit ou fait. Je suis maître de mon destin, capitaine de mon âme.
               </span>
             </label>
           )}

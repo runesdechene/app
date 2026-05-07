@@ -7,6 +7,7 @@
   border: 1px solid rgba(193, 154, 107, 0.25);
   border-radius: 10px;
   padding: 14px 16px 16px;
+  margin-bottom: 15px;
 }
 
 /* Sections pleine largeur insérées dans le body — important en mode embedded

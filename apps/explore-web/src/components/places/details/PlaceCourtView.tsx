@@ -376,7 +376,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
 
       {balance < 1 && (
         <p className="court-no-balance">
-          Vous n'avez plus de Couronnes. Récoltez sur vos lieux veillés ou résolvez des énigmes pour en gagner.
+          Vous n'avez plus de Couronnes. Récoltez sur vos lieux veillés, sortez des lieux du brouillard ou résolvez des énigmes.
         </p>
       )}
       {errorMsg && <p className="court-error">{errorMsg}</p>}
