@@ -220,46 +220,46 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
     <>
       {header}
 
-      {/* Esprit Rune de Chêne — quel type d'événement, quelle mentalité.
-          Pattern visuel aligné sur "Règles de l'explorateur érudit"
-          (ExpeditionModal section bienséance). N'apparaît qu'à la création. */}
-      {!isEdit && (
-        <section className="expedition-creator-spirit">
-          <h3>L'esprit Rune de Chêne</h3>
-          <div className="ec-spirit-grid">
-            <div className="ec-spirit-rule">
-              <span className="ec-spirit-icon">🤝</span>
-              <div>
-                <strong>Une rencontre, une quête, une proposition culturelle</strong>
-                <small>Bivouac, aventure, balade, conte au feu, atelier, banquet, événement culturel…</small>
-              </div>
-            </div>
-            <div className="ec-spirit-rule">
-              <span className="ec-spirit-icon">🌳</span>
-              <div>
-                <strong>Toujours en lien</strong>
-                <small>Histoire, patrimoine, Nature — l'esprit Runes de Chêne doit transparaître. Pas d'auto-promotion sans un lien avec l'esprit de la marque.</small>
-              </div>
-            </div>
-            <div className="ec-spirit-rule">
-              <span className="ec-spirit-icon">📜</span>
-              <div>
-                <strong>Tu transmets, tu invites</strong>
-                <small>Pas un cours magistral. Une curiosité partagée, une envie de partir à l'aventure ou de transmettre.</small>
-              </div>
-            </div>
-            <div className="ec-spirit-rule">
-              <span className="ec-spirit-icon">🪶</span>
-              <div>
-                <strong>L'esprit du chevalier errant</strong>
-                <small>Camaraderie, honneur, bienveillance & sécurité. Vous êtes responsables de vous même, et des personnes qui vous font confiance.</small>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       <div className="expedition-creator-body">
+          {/* Esprit Rune de Chêne — quel type d'événement, quelle mentalité.
+              Section pleine largeur en tête du body scrollable (cf. fix mobile
+              7/05 : avant cette section était hors body et cassait le scroll). */}
+          {!isEdit && (
+            <section className="expedition-creator-spirit ec-section-fullwidth">
+              <h3>L'esprit Rune de Chêne</h3>
+              <div className="ec-spirit-grid">
+                <div className="ec-spirit-rule">
+                  <span className="ec-spirit-icon">🤝</span>
+                  <div>
+                    <strong>Une rencontre, une quête, une proposition culturelle</strong>
+                    <small>Bivouac, aventure, balade, conte au feu, atelier, banquet, événement culturel…</small>
+                  </div>
+                </div>
+                <div className="ec-spirit-rule">
+                  <span className="ec-spirit-icon">🌳</span>
+                  <div>
+                    <strong>Toujours en lien</strong>
+                    <small>Histoire, patrimoine, Nature — l'esprit Runes de Chêne doit transparaître. Pas d'auto-promotion sans un lien avec l'esprit de la marque.</small>
+                  </div>
+                </div>
+                <div className="ec-spirit-rule">
+                  <span className="ec-spirit-icon">📜</span>
+                  <div>
+                    <strong>Tu transmets, tu invites</strong>
+                    <small>Pas un cours magistral. Une curiosité partagée, une envie de partir à l'aventure ou de transmettre.</small>
+                  </div>
+                </div>
+                <div className="ec-spirit-rule">
+                  <span className="ec-spirit-icon">🪶</span>
+                  <div>
+                    <strong>L'esprit du chevalier errant</strong>
+                    <small>Camaraderie, honneur, bienveillance & sécurité. Vous êtes responsables de vous même, et des personnes qui vous font confiance.</small>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           <div className="ec-col ec-col-identity">
 
           {/* Image de couverture (optionnelle) */}
@@ -433,31 +433,32 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
 
           </div>{/* /ec-col-rdv */}
 
+          {/* Décharge de responsabilité — pleine largeur dans le body scrollable
+              (avant : dans le footer fixed, qui amputait l'espace en mobile). */}
+          {!isEdit && (
+            <label className="ec-liability ec-section-fullwidth">
+              <input
+                type="checkbox"
+                checked={liabilityAccepted}
+                onChange={(e) => setLiabilityAccepted(e.target.checked)}
+              />
+              <span>
+                Je comprends que Rune de Chêne ne peut être tenue responsable de l'événement que je propose et de tous ceux qui pourraient s'en suivre.
+              </span>
+            </label>
+          )}
+
           {error && <div className="ec-error ec-error-full">{error}</div>}
         </div>
 
         <footer className="expedition-creator-footer">
-          <div className="ec-footer-stack">
-            {!isEdit && (
-              <label className="ec-liability">
-                <input
-                  type="checkbox"
-                  checked={liabilityAccepted}
-                  onChange={(e) => setLiabilityAccepted(e.target.checked)}
-                />
-                <span>
-                  Je comprends que Rune de Chêne ne peut être tenue responsable de l'événement que je propose et de tous ceux qui pourraient s'en suivre.
-                </span>
-              </label>
-            )}
-            <button
-              className="ec-primary-btn"
-              onClick={handleSubmit}
-              disabled={submitting || (!isEdit && !liabilityAccepted)}
-            >
-              {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'événement")}
-            </button>
-          </div>
+          <button
+            className="ec-primary-btn"
+            onClick={handleSubmit}
+            disabled={submitting || (!isEdit && !liabilityAccepted)}
+          >
+            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'événement")}
+          </button>
         </footer>
     </>
   )
