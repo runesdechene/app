@@ -59,6 +59,8 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
   const [slotsMode, setSlotsMode] = useState<'fixed' | 'open'>(existing?.slots_open ? 'open' : 'fixed')
   const [slotsMax, setSlotsMax] = useState(existing?.slots_max ?? 5)
   const [validationMode, setValidationMode] = useState<'manual' | 'free'>(existing?.validation_mode ?? 'manual')
+  // Décharge de responsabilité — obligatoire à la création (déjà acceptée si édition).
+  const [liabilityAccepted, setLiabilityAccepted] = useState(!!existing)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -121,6 +123,10 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
     setError(null)
     if (name.trim().length < 3) { setError('Le nom doit faire au moins 3 caractères'); return }
     if (rdvLat == null || rdvLng == null) { setError('Choisis un point de RDV'); return }
+    if (!isEdit && !liabilityAccepted) {
+      setError('Tu dois accepter la décharge de responsabilité pour publier.')
+      return
+    }
     let rdvAtIso: string | null = null
     if (!rdvUnset) {
       const rdvDate = new Date(rdvAt)
@@ -225,28 +231,28 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
               <span className="ec-spirit-icon">🤝</span>
               <div>
                 <strong>Une rencontre, une quête, une proposition culturelle</strong>
-                <small>Bivouac, balade, conte au feu, atelier, lecture, vernissage…</small>
+                <small>Bivouac, aventure, balade, conte au feu, atelier, banquet, événement culturel…</small>
               </div>
             </div>
             <div className="ec-spirit-rule">
               <span className="ec-spirit-icon">🌳</span>
               <div>
                 <strong>Toujours en lien</strong>
-                <small>Histoire, patrimoine, nature — un lieu qui te touche.</small>
+                <small>Histoire, patrimoine, Nature — l'esprit Runes de Chêne doit transparaître. Pas d'auto-promotion sans un lien avec l'esprit de la marque.</small>
               </div>
             </div>
             <div className="ec-spirit-rule">
               <span className="ec-spirit-icon">📜</span>
               <div>
                 <strong>Tu transmets, tu invites</strong>
-                <small>Pas un cours magistral. Une curiosité partagée.</small>
+                <small>Pas un cours magistral. Une curiosité partagée, une envie de partir à l'aventure ou de transmettre.</small>
               </div>
             </div>
             <div className="ec-spirit-rule">
               <span className="ec-spirit-icon">🪶</span>
               <div>
                 <strong>L'esprit du chevalier errant</strong>
-                <small>Camaraderie, lenteur, attention au paysage.</small>
+                <small>Camaraderie, honneur, bienveillance & sécurité. Vous êtes responsables de vous même, et des personnes qui vous font confiance.</small>
               </div>
             </div>
           </div>
@@ -431,13 +437,27 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
         </div>
 
         <footer className="expedition-creator-footer">
-          <button
-            className="ec-primary-btn"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'événement")}
-          </button>
+          <div className="ec-footer-stack">
+            {!isEdit && (
+              <label className="ec-liability">
+                <input
+                  type="checkbox"
+                  checked={liabilityAccepted}
+                  onChange={(e) => setLiabilityAccepted(e.target.checked)}
+                />
+                <span>
+                  Je comprends que Rune de Chêne ne peut être tenue responsable de l'événement que je propose et de tous ceux qui pourraient s'en suivre.
+                </span>
+              </label>
+            )}
+            <button
+              className="ec-primary-btn"
+              onClick={handleSubmit}
+              disabled={submitting || (!isEdit && !liabilityAccepted)}
+            >
+              {submitting ? (isEdit ? 'Enregistrement…' : 'Publication…') : (isEdit ? 'Enregistrer les modifications' : "Publier l'événement")}
+            </button>
+          </div>
         </footer>
     </>
   )

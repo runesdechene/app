@@ -521,6 +521,40 @@
   margin-bottom: 12px;
 }
 
+/* Stack interne pour empiler la checkbox de décharge + le bouton submit
+   sans casser le flex-row du footer (qui aligne aussi d'autres boutons
+   secondaires dans certains contextes). */
+.ec-footer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.ec-liability {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(193, 154, 107, 0.12);
+  border: 1px solid rgba(193, 154, 107, 0.35);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4a3a25;
+  cursor: pointer;
+  user-select: none;
+}
+.ec-liability input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #a14a2a;
+}
+
 .expedition-creator-footer {
   display: flex;
   justify-content: space-between;
