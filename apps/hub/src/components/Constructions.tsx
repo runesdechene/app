@@ -128,13 +128,16 @@ export function Constructions() {
 
   async function saveSettings() {
     setSavingSettings(true)
-    const now = new Date().toISOString()
-    await Promise.all([
-      supabase.from('app_settings').update({ value: zoneMult, updated_at: now }).eq('key', 'zone_fort_multiplier'),
-      supabase.from('app_settings').update({ value: sizeMult, updated_at: now }).eq('key', 'territory_size_defense_mult'),
-      supabase.from('app_settings').update({ value: radiusKm, updated_at: now }).eq('key', 'zone_detection_radius_km'),
-    ])
-    setSavingSettings(false)
+    try {
+      const now = new Date().toISOString()
+      await Promise.all([
+        supabase.from('app_settings').update({ value: zoneMult, updated_at: now }).eq('key', 'zone_fort_multiplier'),
+        supabase.from('app_settings').update({ value: sizeMult, updated_at: now }).eq('key', 'territory_size_defense_mult'),
+        supabase.from('app_settings').update({ value: radiusKm, updated_at: now }).eq('key', 'zone_detection_radius_km'),
+      ])
+    } finally {
+      setSavingSettings(false)
+    }
   }
 
   // --- Creer ---

@@ -223,45 +223,41 @@ export function Enigmas() {
   async function handleSaveForm() {
     setSaving(true)
     setSaveError(null)
-
-    const payload = {
-      type: editForm.type,
-      difficulty: editForm.difficulty,
-      heritage_id: editForm.heritage_id || null,
-      place_tag: editForm.place_tag || null,
-      lore_text: editForm.lore_text,
-      question: editForm.question,
-      format: editForm.format,
-      choices: editForm.format === 'qcm'
-        ? (editForm.choices || []).filter(c => c.trim())
-        : null,
-      answer: editForm.answer,
-      explanation: editForm.explanation,
-      active: editForm.active,
-    }
-
-    if (editingId === 'new') {
-      const { error } = await supabase.from('enigmas').insert(payload)
-      if (error) {
-        setSaveError(error.message)
-        setSaving(false)
-        return
+    try {
+      const payload = {
+        type: editForm.type,
+        difficulty: editForm.difficulty,
+        heritage_id: editForm.heritage_id || null,
+        place_tag: editForm.place_tag || null,
+        lore_text: editForm.lore_text,
+        question: editForm.question,
+        format: editForm.format,
+        choices: editForm.format === 'qcm'
+          ? (editForm.choices || []).filter(c => c.trim())
+          : null,
+        answer: editForm.answer,
+        explanation: editForm.explanation,
+        active: editForm.active,
       }
-    } else {
-      const { error } = await supabase
-        .from('enigmas')
-        .update(payload)
-        .eq('id', editingId!)
-      if (error) {
-        setSaveError(error.message)
-        setSaving(false)
-        return
-      }
-    }
 
-    setSaving(false)
-    setEditingId(null)
-    await fetchData()
+      if (editingId === 'new') {
+        const { error } = await supabase.from('enigmas').insert(payload)
+        if (error) { setSaveError(error.message); return }
+      } else {
+        const { error } = await supabase
+          .from('enigmas')
+          .update(payload)
+          .eq('id', editingId!)
+        if (error) { setSaveError(error.message); return }
+      }
+
+      setEditingId(null)
+      await fetchData()
+    } catch (e) {
+      setSaveError(`${e}`)
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Delete

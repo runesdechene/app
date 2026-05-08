@@ -60,45 +60,44 @@ export function Divers() {
     if (!file) return
 
     setUploading(true)
+    try {
+      // Supprimer TOUS les anciens fichiers unknown-place-icon.*
+      const { data: existing } = await supabase.storage.from('app-assets').list('', {
+        search: 'unknown-place-icon',
+      })
+      if (existing && existing.length > 0) {
+        await supabase.storage.from('app-assets').remove(existing.map(f => f.name))
+      }
 
-    // Supprimer TOUS les anciens fichiers unknown-place-icon.*
-    const { data: existing } = await supabase.storage.from('app-assets').list('', {
-      search: 'unknown-place-icon',
-    })
-    if (existing && existing.length > 0) {
-      await supabase.storage.from('app-assets').remove(existing.map(f => f.name))
-    }
+      // Upload avec un timestamp pour casser le cache
+      const ext = file.name.split('.').pop()
+      const path = `unknown-place-icon-${Date.now()}.${ext}`
 
-    // Upload avec un timestamp pour casser le cache
-    const ext = file.name.split('.').pop()
-    const path = `unknown-place-icon-${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('app-assets')
+        .upload(path, file)
 
-    const { error: uploadError } = await supabase.storage
-      .from('app-assets')
-      .upload(path, file)
+      if (uploadError) return
 
-    if (uploadError) {
+      // Récupérer l'URL publique
+      const { data: urlData } = supabase.storage
+        .from('app-assets')
+        .getPublicUrl(path)
+
+      const publicUrl = urlData.publicUrl
+
+      // Sauvegarder dans app_settings
+      await supabase
+        .from('app_settings')
+        .upsert({ key: 'unknown_place_icon', value: publicUrl, updated_at: new Date().toISOString() })
+
+      setUnknownIcon(publicUrl)
+
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    } finally {
       setUploading(false)
-      return
     }
-
-    // Récupérer l'URL publique
-    const { data: urlData } = supabase.storage
-      .from('app-assets')
-      .getPublicUrl(path)
-
-    const publicUrl = urlData.publicUrl
-
-    // Sauvegarder dans app_settings
-    await supabase
-      .from('app_settings')
-      .upsert({ key: 'unknown_place_icon', value: publicUrl, updated_at: new Date().toISOString() })
-
-    setUnknownIcon(publicUrl)
-    setUploading(false)
-
-    // Reset input
-    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleRemove() {

@@ -80,8 +80,11 @@ export function Factions() {
   async function saveUnderdogMultiplier(value: number) {
     setUnderdogMultiplier(value)
     setSavingUnderdog(true)
-    await supabase.from('app_settings').update({ value: String(value) }).eq('key', 'underdog_multiplier')
-    setSavingUnderdog(false)
+    try {
+      await supabase.from('app_settings').update({ value: String(value) }).eq('key', 'underdog_multiplier')
+    } finally {
+      setSavingUnderdog(false)
+    }
   }
 
   async function fetchFactions() {

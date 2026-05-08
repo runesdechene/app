@@ -37,16 +37,21 @@ export function TutorialManager() {
 
   async function fetchSlides() {
     setLoading(true)
-    const { data, error: err } = await supabase
-      .from('tutorial_slides')
-      .select('*')
-      .order('phase')
-      .order('position')
-    if (err) { setError(err.message); setLoading(false); return }
-    const list = (data ?? []) as Slide[]
-    setSlides(JSON.parse(JSON.stringify(list)))
-    setSavedSlides(JSON.parse(JSON.stringify(list)))
-    setLoading(false)
+    try {
+      const { data, error: err } = await supabase
+        .from('tutorial_slides')
+        .select('*')
+        .order('phase')
+        .order('position')
+      if (err) { setError(err.message); return }
+      const list = (data ?? []) as Slide[]
+      setSlides(JSON.parse(JSON.stringify(list)))
+      setSavedSlides(JSON.parse(JSON.stringify(list)))
+    } catch (e) {
+      setError(`${e}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   function addSlide(phase: 'before' | 'after') {
@@ -94,36 +99,40 @@ export function TutorialManager() {
   async function handleSave() {
     setSaving(true)
     setError(null)
-
-    const savedIds = savedSlides.map(s => s.id).filter(Boolean) as number[]
-    const currentIds = slides.map(s => s.id).filter(Boolean) as number[]
-    const toDelete = savedIds.filter(id => !currentIds.includes(id))
-    if (toDelete.length > 0) {
-      const { error: delErr } = await supabase.from('tutorial_slides').delete().in('id', toDelete)
-      if (delErr) { setError(delErr.message); setSaving(false); return }
-    }
-
-    for (const slide of slides) {
-      const row = {
-        phase: slide.phase,
-        position: slide.position,
-        title: slide.title,
-        body: slide.body,
-        image_url: slide.image_url,
-        active: slide.active,
-        updated_at: new Date().toISOString(),
+    try {
+      const savedIds = savedSlides.map(s => s.id).filter(Boolean) as number[]
+      const currentIds = slides.map(s => s.id).filter(Boolean) as number[]
+      const toDelete = savedIds.filter(id => !currentIds.includes(id))
+      if (toDelete.length > 0) {
+        const { error: delErr } = await supabase.from('tutorial_slides').delete().in('id', toDelete)
+        if (delErr) { setError(delErr.message); return }
       }
-      if (slide.id) {
-        const { error: upErr } = await supabase.from('tutorial_slides').update(row).eq('id', slide.id)
-        if (upErr) { setError(upErr.message); setSaving(false); return }
-      } else {
-        const { error: insErr } = await supabase.from('tutorial_slides').insert(row)
-        if (insErr) { setError(insErr.message); setSaving(false); return }
-      }
-    }
 
-    await fetchSlides()
-    setSaving(false)
+      for (const slide of slides) {
+        const row = {
+          phase: slide.phase,
+          position: slide.position,
+          title: slide.title,
+          body: slide.body,
+          image_url: slide.image_url,
+          active: slide.active,
+          updated_at: new Date().toISOString(),
+        }
+        if (slide.id) {
+          const { error: upErr } = await supabase.from('tutorial_slides').update(row).eq('id', slide.id)
+          if (upErr) { setError(upErr.message); return }
+        } else {
+          const { error: insErr } = await supabase.from('tutorial_slides').insert(row)
+          if (insErr) { setError(insErr.message); return }
+        }
+      }
+
+      await fetchSlides()
+    } catch (e) {
+      setError(`${e}`)
+    } finally {
+      setSaving(false)
+    }
   }
 
   function handleCancel() {
