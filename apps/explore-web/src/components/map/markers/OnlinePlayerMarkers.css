@@ -58,6 +58,14 @@
   animation: user-pulse 2s ease-out infinite;
 }
 
+/* V0.7.6 (8/05) — perf mobile : désactive le pulse infini sur tactile.
+   Cf. audit perf 8/05 (top suspect : animations infinies cumulées). */
+@media (hover: none) and (pointer: coarse) {
+  .user-position-pulse {
+    animation: none;
+  }
+}
+
 @keyframes user-pulse {
   0% {
     transform: translate(-50%, -50%) scale(1);

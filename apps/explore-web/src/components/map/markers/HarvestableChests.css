@@ -30,6 +30,15 @@
   animation: chest-bob 2.6s ease-in-out infinite;
 }
 
+/* V0.7.6 (8/05) — perf mobile : désactive l'animation infinite sur tactile.
+   Sur écran moyen 10-30 coffres animés simultanément = 60+ repaints/sec,
+   gros poste de jank mobile (cf. audit perf 8/05). */
+@media (hover: none) and (pointer: coarse) {
+  .harvestable-chest-btn {
+    animation: none;
+  }
+}
+
 .harvestable-chest-btn:hover {
   transform: scale(1.12);
 }

@@ -59,6 +59,15 @@
 .expedition-banner.is-today {
   animation: expedition-banner-pulse 2s ease-in-out infinite;
 }
+
+/* V0.7.6 (8/05) — perf mobile : désactive le pulse infini sur tactile.
+   Cf. audit perf 8/05 (top suspect : animations infinies cumulées). */
+@media (hover: none) and (pointer: coarse) {
+  .expedition-banner.is-today {
+    animation: none;
+  }
+}
+
 @keyframes expedition-banner-pulse {
   0%, 100% {
     filter: drop-shadow(0 0 12px rgba(212, 170, 90, 0.85))
