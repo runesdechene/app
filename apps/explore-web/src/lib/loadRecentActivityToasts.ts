@@ -117,7 +117,11 @@ export async function loadRecentActivityToasts(currentUserId: string) {
       if (e.actor_id !== currentUserId) continue
       const gain = (e.data as { gain?: number })?.gain ?? 1
       message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
-      highlights.push(place)
+      // V0.7.6 (8/05) — push 'Vous' avant place pour que GameToast bind
+      // correctement : actorId + highlights[0]='Vous' → clic 'Vous' ouvre profil
+      // de soi, clic place ouvre le lieu. Avant : highlights=[place] +
+      // actorId set → clic place ouvrait le profil au lieu du lieu (bug).
+      highlights.push('Vous', place)
       type = 'harvest_crown'
     } else if (e.type === 'plant_flag') {
       message = `${name} a planté son étendard sur ${place} 🚩`
