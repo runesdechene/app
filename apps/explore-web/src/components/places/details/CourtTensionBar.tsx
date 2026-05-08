@@ -119,12 +119,16 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, patrons, veilleur 
         role="img"
         aria-label={`Faveur veilleur ${scoreVeilleur}, menace ${menaceHaute}${isCritical ? ' (bascule imminente)' : ''}`}
       >
-        <div className="ctb-fill ctb-defense" style={{ width: `${veilleurPct}%` }}>
-          {showVeilleurNumber && <span className="ctb-num">{scoreVeilleur}</span>}
-        </div>
-        <div className="ctb-fill ctb-attack" style={{ width: `${100 - veilleurPct}%` }}>
-          {showMenaceNumber && <span className="ctb-num">{menaceHaute}</span>}
-        </div>
+        {scoreVeilleur > 0 && (
+          <div className="ctb-fill ctb-defense" style={{ width: `${veilleurPct}%` }}>
+            {showVeilleurNumber && <span className="ctb-num">{scoreVeilleur}</span>}
+          </div>
+        )}
+        {menaceHaute > 0 && (
+          <div className="ctb-fill ctb-attack" style={{ width: `${100 - veilleurPct}%` }}>
+            {showMenaceNumber && <span className="ctb-num">{menaceHaute}</span>}
+          </div>
+        )}
         {isCritical && <div className="ctb-critical-hint" aria-hidden />}
       </div>
 
