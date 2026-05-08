@@ -5,12 +5,14 @@ export type SiegeStatus = 'siege' | 'critical'
 
 export interface SiegeRow {
   place_id: string
-  latitude: number
-  longitude: number
   challenger_count: number
   max_challenger_score: number
-  /** Score du veilleur actuel (= défenseur). null si pas d'investissement défensif. */
-  defender_score: number | null
+  /** Score effectif du défenseur (= 50 + défense investie pour veilleur GPS plein,
+   *  défense investie seule pour veilleur par influence). Cf. mig 131. */
+  defender_effective_score: number
+  /** True si le challenger leader a atteint 50% du score effectif défenseur
+   *  (= seuil bascule imminente, aligné sur la notif 'place_court_high_threat'). */
+  is_at_risk: boolean
 }
 
 interface SiegeStoreState {
@@ -23,20 +25,11 @@ interface SiegeStoreState {
   reset: () => void
 }
 
-/**
- * Calcule le statut d'un lieu à partir de l'écart score défenseur / challenger leader.
- * - 'critical' : pas de veilleur défensif, OU le challenger leader >= défenseur
- * - 'siege'    : la défense tient encore (challenger leader < défenseur)
- */
-function deriveStatus(row: SiegeRow): SiegeStatus {
-  if (row.defender_score == null) return 'critical'
-  if (row.max_challenger_score >= row.defender_score) return 'critical'
-  return 'siege'
-}
-
 function rowsToStatusMap(rows: SiegeRow[]): Map<string, SiegeStatus> {
   const map = new Map<string, SiegeStatus>()
-  for (const r of rows) map.set(r.place_id, deriveStatus(r))
+  for (const r of rows) {
+    map.set(r.place_id, r.is_at_risk ? 'critical' : 'siege')
+  }
   return map
 }
 
