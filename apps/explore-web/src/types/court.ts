@@ -35,6 +35,8 @@ export interface CourtThreat {
 export interface Patron {
   userId: string
   displayName: string
+  /** V0.7.6 (8/05) — vrai avatar du joueur (null si pas d'avatar défini) */
+  avatarUrl: string | null
   total: number
   /** V089 — décomposition Soutien (defense) vs Influence (attack) */
   defenseTotal: number
@@ -66,6 +68,12 @@ export interface PlaceCourtState {
   /** Null si vacant */
   veilleur: CourtVeilleur | null
   scoreVeilleur: number
+  /** V0.7.6 (8/05) — bonus IRL "faveur" du plant_flag (50 + 30×membres-1, capé).
+   *  0 si by_influence (pas de bonus). Permet à CourtTensionBar de séparer
+   *  visuellement la part "gratos par plantage" de la part "investie". */
+  defenseFavorPoints: number
+  /** V0.7.6 — Couronnes réellement investies en défense par l'expé veilleur. */
+  defenseInvested: number
   threats: CourtThreat[]
   menaceHaute: number | null
   /** Score à dépasser : score veilleur si veillé, 50 si vacant */

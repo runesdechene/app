@@ -104,6 +104,20 @@ export function AddPlaceFlow() {
     }
   }, [coords, coordsFocused])
 
+  // V0.7.6 (8/05) — Au mount, recentre la carte sur la position GPS de l'user.
+  // Sinon le viseur reste là où la carte était centrée avant (souvent loin),
+  // et l'user peut valider sans réaliser que le pin n'est pas chez lui.
+  // Si l'user veut ajouter à distance (lieu vu en vacances, etc.), il peut
+  // toujours bouger la carte après. Ne déclenche le fly-to qu'une fois au mount
+  // (ref + flag pour ne pas répéter à chaque update de userPosition).
+  const initialFlyToDoneRef = useRef(false)
+  useEffect(() => {
+    if (initialFlyToDoneRef.current) return
+    if (!userPosition) return
+    initialFlyToDoneRef.current = true
+    useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
+  }, [userPosition])
+
   function handleGPS() {
     if (userPosition) {
       useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
@@ -684,15 +698,22 @@ export function AddPlaceFlow() {
 
           {/* Rewards preview */}
           {confirmedCoords && (() => {
-            const isOnSite = userPosition
-              ? (() => {
-                  const R = 6371
-                  const dLat = (confirmedCoords.lat - userPosition.lat) * Math.PI / 180
-                  const dLng = (confirmedCoords.lng - userPosition.lng) * Math.PI / 180
-                  const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(confirmedCoords.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-                  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.5
-                })()
-              : false
+            const distanceKm = userPosition
+              ? haversineKm(userPosition.lat, userPosition.lng, confirmedCoords.lat, confirmedCoords.lng)
+              : null
+            const isOnSite = distanceKm !== null && distanceKm < 0.5
+            // V0.7.6 (8/05) — zone "tu pensais être sur place mais le pin tombe à côté".
+            // Si l'utilisateur a une position GPS valide et que le pin est entre 200m
+            // et 50km de lui, on suggère explicitement de recentrer (vrai cas le plus
+            // fréquent du bug "création créée sans plant_flag automatique").
+            const isMisplaced = distanceKm !== null && distanceKm >= 0.2 && distanceKm < 50
+            const recenterOnUser = () => {
+              if (!userPosition) return
+              setConfirmedCoords({ lat: userPosition.lat, lng: userPosition.lng })
+              setLatInput(userPosition.lat.toFixed(7))
+              setLngInput(userPosition.lng.toFixed(7))
+              useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
+            }
             return (
               <div className="add-place-rewards">
                 <p className="add-place-rewards-title">{isOnSite ? '🎯 Vous êtes sur place !' : '📍 Ajout à distance'}</p>
@@ -702,6 +723,25 @@ export function AddPlaceFlow() {
                   {!isOnSite && <span className="add-place-reward">🧭 +5 exploration</span>}
                   {!isOnSite && <span className="add-place-reward add-place-reward-hint">💡 Rendez-vous sur place pour devenir veilleur du lieu !</span>}
                 </div>
+                {!isOnSite && isMisplaced && userPosition && (
+                  <div className="add-place-misplaced-warning">
+                    <p className="add-place-misplaced-text">
+                      ⚠️ Tu sembles à <strong>
+                        {distanceKm! < 1
+                          ? `${Math.round(distanceKm! * 1000)} m`
+                          : `${distanceKm!.toFixed(1)} km`}
+                      </strong> du point posé.
+                      {' '}Si tu es en réalité sur place, recentre le pin pour devenir veilleur automatiquement.
+                    </p>
+                    <button
+                      type="button"
+                      className="add-place-misplaced-cta"
+                      onClick={recenterOnUser}
+                    >
+                      📍 Recentrer sur ma position
+                    </button>
+                  </div>
+                )}
               </div>
             )
           })()}

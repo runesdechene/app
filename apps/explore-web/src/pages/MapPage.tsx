@@ -53,6 +53,8 @@ import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
 import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
+import { VictoryModal } from '../components/map/modals/VictoryModal'
+import { useVictoryModalStore } from '../stores/victoryModalStore'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -179,6 +181,8 @@ export default function MapPage() {
   // V0.7 — Système de niveaux
   useLevel(true)
   const { pendingLevelUp, dismiss } = useLevelUp()
+  const pendingVictory = useVictoryModalStore(s => s.pending)
+  const dismissVictory = useVictoryModalStore(s => s.dismiss)
   const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
   const [showVeteranWelcome, setShowVeteranWelcome] = useState(false)
 
@@ -538,6 +542,17 @@ export default function MapPage() {
       )}
       {showVeteranWelcome && (
         <VeteranWelcomeModal onClose={handleVeteranWelcomeClose} />
+      )}
+
+      {/* V0.7.6 — Modale Victoire (lieu pris par mécénat).
+          Trigger via useVictoryModalStore depuis useCourtNotifications. */}
+      {pendingVictory && (
+        <VictoryModal
+          placeTitle={pendingVictory.placeTitle}
+          fromVacant={pendingVictory.fromVacant}
+          factionColor={pendingVictory.factionColor}
+          onClose={dismissVictory}
+        />
       )}
 
       {/* Overlay texture parchemin */}

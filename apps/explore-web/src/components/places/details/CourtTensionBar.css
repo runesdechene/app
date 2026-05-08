@@ -1,65 +1,220 @@
 /* ==========================================
-   COUR TENSION BAR — Faveur vs Menace
-   Esprit Rune de Chêne : cuir/parchemin, chiffres intégrés
+   COUR TENSION BAR — V0.7.6 (8/05)
+   Jauge gravée + cluster d'avatars Discord-style.
+   Mobile-first (tient en 360px / ~50px de haut).
    ========================================== */
 
-.court-tension-bar {
+.ctb-wrap {
   display: flex;
-  height: 14px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctb-bar {
+  width: 100%;
+  height: 18px;
   border-radius: 999px;
+  background: rgba(74, 55, 40, 0.14);
+  border: 1px solid rgba(90, 64, 40, 0.5);
+  display: flex;
   overflow: hidden;
-  background: rgba(74, 55, 40, 0.12);
-  border: 1px solid rgba(193, 154, 107, 0.5);
-  box-shadow: inset 0 1px 2px rgba(74, 55, 40, 0.15),
-              0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 3px rgba(74, 55, 40, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.55);
   position: relative;
 }
 
-.court-tension-fill {
+/* Texture grain léger — esprit parchemin gravé */
+.ctb-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    transparent 1px,
+    transparent 3px,
+    rgba(74, 55, 40, 0.06) 4px);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.ctb-fill {
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-/* Bleu violet — faveur du veilleur (loyauté, calme) */
-.court-tension-fill.veilleur {
-  background: linear-gradient(180deg, #7a6bb0 0%, #5a4f8a 100%);
-  border-right: 1px solid rgba(74, 55, 40, 0.25);
-}
-
-/* Bordeaux — menace ennemie (intrigue, sang) */
-.court-tension-fill.challenger {
-  background: linear-gradient(180deg, #a85a5a 0%, #8b3a3a 100%);
-}
-
-/* Chiffre intégré dans la zone (faveur ou menace) */
-.court-tension-num {
+  padding: 0 8px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 1;
-  font-family: var(--font-accent, 'Cormorant Garamond', serif);
-  font-size: 10px;
-  font-weight: 700;
-  color: #f5e6d3;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.2px;
-  line-height: 1;
+}
+.ctb-defense {
+  background: #5a4f8a;
+  justify-content: flex-start;
+  border-right: 1px solid rgba(58, 32, 16, 0.5);
+}
+.ctb-attack {
+  background: #8b3a3a;
+  justify-content: flex-end;
 }
 
-/* Trait '50 acquis' — entaille discrète parchemin */
-.court-tension-mark {
+.ctb-num {
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f7eed7;
+  text-shadow: 0 1px 1px rgba(40, 24, 12, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.ctb-critical-hint {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
+  top: 2px; bottom: 2px;
+  left: 50%;
   width: 2px;
-  background: rgba(245, 230, 211, 0.85);
-  box-shadow: 0 0 0 1px rgba(74, 55, 40, 0.4);
-  pointer-events: none;
-  transform: translateX(-1px);
-  z-index: 2;
+  background: #b8430a;
+  transform: translateX(-50%);
+  animation: ctb-critical-pulse 1.5s ease-in-out infinite;
   border-radius: 1px;
+  z-index: 3;
+}
+@keyframes ctb-critical-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ==========================================
+   Clusters d'avatars sous la jauge
+   ========================================== */
+.ctb-clusters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 26px;
+}
+
+.ctb-cluster {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.ctb-cluster-left { justify-content: flex-start; }
+.ctb-cluster-right { justify-content: flex-end; }
+
+.ctb-av {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: #fff;
+  cursor: pointer;
+  margin-left: -8px;
+  flex-shrink: 0;
+  position: relative;
+  padding: 0;
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, z-index 0s 0.15s;
+}
+.ctb-cluster-left .ctb-av:first-child,
+.ctb-cluster-right .ctb-av:first-child { margin-left: 0; }
+
+.ctb-av:hover {
+  transform: scale(1.15);
+  z-index: 10;
+  transition: transform 0.15s ease, z-index 0s;
+}
+.ctb-av:focus-visible {
+  outline: 2px solid var(--color-sepia, #c19a6b);
+  outline-offset: 2px;
+}
+
+/* V0.7.6 (8/05) — vraie photo d'avatar utilisateur (object-fit cover dans le cercle) */
+.ctb-av-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.ctb-av-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cadre or simple pour le mécène principal — un seul anneau, lisible */
+.ctb-av-leader {
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 0 0 4px #b89548,
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Cadre rouge simple — challenger leader menaçant (>= 50% effectif) */
+.ctb-av-threat {
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 0 0 4px #8b3a14,
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.ctb-crown {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+/* Sceau parchemin doré — contributeurs au-delà du top 5 */
+.ctb-overflow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #d4b87a, #a87f3a);
+  color: #2a1f10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  margin-left: -8px;
+  flex-shrink: 0;
+  border: 1.5px solid #5a4028;
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.ctb-cluster-left .ctb-overflow:first-child,
+.ctb-cluster-right .ctb-overflow:first-child { margin-left: 0; }
+
+/* ==========================================
+   Mobile : 3 avatars max visibles par cluster, taille réduite
+   ========================================== */
+@media (max-width: 480px) {
+  .ctb-av { width: 22px; height: 22px; font-size: 10px; }
+  .ctb-overflow { width: 22px; height: 22px; font-size: 10px; }
+  /* Cache les avatars 4 et 5 (premier=leader visible, 2-3=others, 4-5=cachés) */
+  .ctb-cluster-left .ctb-av:nth-child(n+4):not(.ctb-overflow),
+  .ctb-cluster-right .ctb-av:nth-child(n+4):not(.ctb-overflow) {
+    display: none;
+  }
 }

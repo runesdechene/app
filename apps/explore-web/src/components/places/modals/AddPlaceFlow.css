@@ -386,6 +386,53 @@
   color: var(--color-ink-light);
 }
 
+/* V0.7.6 (8/05) — Avertissement "le pin n'est pas à ta position GPS".
+   Cas le plus fréquent du bug "création sans plant_flag" : l'user pose le pin
+   à l'œil sur la carte et ne réalise pas qu'il est à 1km de sa vraie position.
+   Encart orangé visible avec CTA recentrer. */
+.add-place-misplaced-warning {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(220, 130, 50, 0.12);
+  border: 1px solid rgba(220, 130, 50, 0.4);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-place-misplaced-text {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.4;
+  color: #7a4419;
+}
+
+.add-place-misplaced-text strong {
+  color: #b8430a;
+  font-weight: 700;
+}
+
+.add-place-misplaced-cta {
+  align-self: flex-start;
+  background: #c46420;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.add-place-misplaced-cta:hover {
+  background: #a8521a;
+}
+
 /* ===== Résumé récompenses (écran succès) ===== */
 
 .add-place-rewards-summary {

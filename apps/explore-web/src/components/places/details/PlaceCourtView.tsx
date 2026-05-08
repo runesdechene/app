@@ -189,7 +189,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     return <div className="court-loading">{errorMsg ?? 'Chargement…'}</div>
   }
 
-  const { vacant, veilleur, scoreVeilleur, threats, menaceHaute, status, topPatrons, callerContext } = state
+  const { vacant, veilleur, scoreVeilleur, defenseFavorPoints, threats, menaceHaute, status, topPatrons, callerContext } = state
   const isMember = callerContext?.isMemberOfVeilleur ?? false
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
@@ -234,16 +234,9 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     queueTap('attack', r.expeditionId)
   }
 
-  // Initiales pour fallback avatar (vide si vacant)
-  const initials = veilleur
-    ? veilleur.leaderName
-        .split(/\s+/)
-        .map(w => w[0])
-        .filter(Boolean)
-        .slice(0, 2)
-        .join('')
-        .toUpperCase()
-    : ''
+  // V0.7.6 — variable `initials` retirée (l'avatar du veilleur n'est plus
+  // dupliqué dans le header, il est rendu par CourtTensionBar avec sa propre
+  // logique de fallback initiale).
 
   return (
     <div className={`court-view court-status-${status}`}>
@@ -264,36 +257,10 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         </div>
       )}
 
-      {/* Ligne veilleur : avatar + texte + petit icône faction */}
+      {/* V0.7.6 (8/05) — Ligne veilleur : texte seul, l'avatar n'est plus
+          dupliqué ici (il apparaît à côté de la jauge de tension en dessous). */}
       {!vacant && veilleur && (
       <div className="court-leader-row">
-        {veilleur.leaderUserId ? (
-          <button
-            type="button"
-            className="court-leader-avatar court-leader-avatar-btn"
-            style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
-            onClick={() => useMapStore.getState().setSelectedPlayerId(veilleur.leaderUserId!)}
-            title={`Voir le profil de ${veilleur.leaderName}`}
-            aria-label={`Voir le profil de ${veilleur.leaderName}`}
-          >
-            {veilleur.leaderAvatarUrl ? (
-              <img src={veilleur.leaderAvatarUrl} alt="" />
-            ) : (
-              <span className="court-leader-avatar-initials">{initials || '?'}</span>
-            )}
-          </button>
-        ) : (
-          <div
-            className="court-leader-avatar"
-            style={{ borderColor: veilleur.factionColor ?? 'rgba(193, 154, 107, 0.5)' }}
-          >
-            {veilleur.leaderAvatarUrl ? (
-              <img src={veilleur.leaderAvatarUrl} alt={veilleur.leaderName} />
-            ) : (
-              <span className="court-leader-avatar-initials">{initials || '?'}</span>
-            )}
-          </div>
-        )}
         <div className="court-leader-text">
           <span className="court-leader-label">Lieu veillé par</span>
           <div className="court-leader-name-row">
@@ -332,10 +299,13 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       </div>
       )}
 
-      {/* Jauge faveur / menace avec trait à 50 (chiffres intégrés) */}
+      {/* V0.7.6 — Jauge gravée + cluster avatars (cf. mockup F validé) */}
       <CourtTensionBar
         scoreVeilleur={optimisticVeilleurScore}
         menaceHaute={optimisticMenace}
+        defenseFavorPoints={defenseFavorPoints ?? 0}
+        patrons={topPatrons}
+        veilleur={veilleur}
       />
 
       {/* Boutons tap-rafale */}
