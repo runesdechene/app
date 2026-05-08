@@ -21,6 +21,32 @@ interface Tag {
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 Mo
 
+/**
+ * V0.7.6 (8/05) — récupère une position GPS fraîche pour le check serveur,
+ * fallback silencieux sur null. Le store userPosition peut être stale ou
+ * absent (notamment au premier rendu après login), ce qui faisait échouer
+ * silencieusement l'auto-plant pour des users physiquement sur place.
+ */
+async function getFreshPosition(timeoutMs = 5000): Promise<{ lat: number; lng: number } | null> {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) return null
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: timeoutMs, maximumAge: 30000 },
+    )
+  })
+}
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLng = (lng2 - lng1) * Math.PI / 180
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.sin(dLng / 2) ** 2 * Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
 export function AddPlaceFlow() {
   const [step, setStep] = useState<Step>('location')
   const [title, setTitle] = useState('')
@@ -220,6 +246,12 @@ export function AddPlaceFlow() {
         imageEntries.push({ id: imageId, url: fullUrl.publicUrl, thumb: thumbUrl })
       }
 
+      // V0.7.6 (8/05) — position fraîche au moment du submit. Le store
+      // userPosition peut être stale ou null (premier rendu, geoloc non
+      // encore renvoyée). Fallback sur store si l'OS refuse.
+      const freshPos = await getFreshPosition()
+      const submitPos = freshPos ?? userPosition ?? null
+
       // 2. Create place via RPC (toutes les photos + premier tag, atomique)
       const { data, error: rpcError } = await supabase.rpc('create_place', {
         p_user_id: userId,
@@ -231,8 +263,8 @@ export function AddPlaceFlow() {
         p_address: address.trim(),
         p_text: description.trim(),
         p_carnet_title: carnetTitle.trim() || null,
-        p_user_lat: userPosition?.lat ?? null,
-        p_user_lng: userPosition?.lng ?? null,
+        p_user_lat: submitPos?.lat ?? null,
+        p_user_lng: submitPos?.lng ?? null,
         p_era_id: eraId,
         p_year_exact: yearExact,
       })
@@ -265,15 +297,49 @@ export function AddPlaceFlow() {
       // plant_flag depuis le client après le succès de create_place pour ne
       // pas coupler les deux RPCs (un échec de plant_flag ne doit pas casser
       // create_place — décision Uriel 2026-05-02).
-      if (data.isGps && userPosition) {
-        const { error: plantErr } = await supabase.rpc('plant_flag', {
+      //
+      // V0.7.6 (8/05) — surface les erreurs via toast (avant : silencieux,
+      // bug remonté par Tugdual qui voyait son lieu créé sans étendard sans
+      // savoir pourquoi).
+      if (data.isGps && submitPos) {
+        const { data: plantData, error: plantErr } = await supabase.rpc('plant_flag', {
           p_user_id: userId,
           p_place_id: placeId,
-          p_user_lat: userPosition.lat,
-          p_user_lng: userPosition.lng,
+          p_user_lat: submitPos.lat,
+          p_user_lng: submitPos.lng,
           p_partners_user_ids: [],
         })
-        if (plantErr) console.warn('[AddPlaceFlow] auto plant_flag failed', plantErr)
+        if (plantErr) {
+          console.warn('[AddPlaceFlow] auto plant_flag failed', plantErr)
+          useToastStore.getState().addToast({
+            type: 'plant_flag',
+            message: `Lieu créé. Étendard non planté : ${plantErr.message}. Tu pourras réessayer depuis la fiche du lieu en t'approchant à moins de 100 m du point exact.`,
+            timestamp: Date.now(),
+          })
+        } else if (plantData?.error === 'too_far') {
+          useToastStore.getState().addToast({
+            type: 'plant_flag',
+            message: `Lieu créé. Tu es à ${plantData.distanceKm} km du point exact — rapproche-toi à moins de 100 m pour planter ton étendard.`,
+            timestamp: Date.now(),
+          })
+        } else if (plantData?.error) {
+          useToastStore.getState().addToast({
+            type: 'plant_flag',
+            message: `Lieu créé. Étendard non planté (${plantData.error}). Tu pourras réessayer depuis la fiche du lieu.`,
+            timestamp: Date.now(),
+          })
+        }
+      } else if (!data.isGps) {
+        // Le serveur a calculé que le user n'est pas sur place. On informe
+        // explicitement pour qu'il sache pourquoi son étendard n'apparaît pas.
+        const distNote = submitPos
+          ? `Tu sembles être à ${haversineKm(submitPos.lat, submitPos.lng, confirmedCoords.lat, confirmedCoords.lng).toFixed(2)} km du point exact.`
+          : 'Ta position GPS n\'a pas été fournie (vérifie les autorisations de ton navigateur).'
+        useToastStore.getState().addToast({
+          type: 'plant_flag',
+          message: `Lieu créé à distance. ${distNote} Pour devenir veilleur, déplace-toi sur place et plante ton étendard depuis la fiche du lieu.`,
+          timestamp: Date.now(),
+        })
       }
 
       // 3. Si plusieurs tags, insérer les tags secondaires
