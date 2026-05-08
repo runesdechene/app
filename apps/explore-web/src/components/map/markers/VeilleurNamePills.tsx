@@ -1,6 +1,7 @@
 ﻿import { memo, useMemo } from 'react'
 import { Marker } from '@vis.gl/react-maplibre'
 import { useMapStore } from '../../../stores/mapStore'
+import { useSiegeStore } from '../../../stores/siegeStore'
 import type { PlacesGeoJSON } from '../../../hooks/usePlaces'
 import './VeilleurNamePills.css'
 
@@ -26,6 +27,7 @@ interface Props {
  */
 export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom, bounds }: Props) {
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
+  const siegeStatusByPlace = useSiegeStore(s => s.statusByPlaceId)
 
   const pills = useMemo(() => {
     if (!geojson || !bounds || zoom < MIN_ZOOM) return []
@@ -57,29 +59,43 @@ export const VeilleurNamePills = memo(function VeilleurNamePills({ geojson, zoom
 
   return (
     <>
-      {pills.map(({ placeId, userId, longitude, latitude, name, extraCount }) => (
-        <Marker
-          key={placeId}
-          longitude={longitude}
-          latitude={latitude}
-          anchor="top"
-          offset={[0, 18]}
-        >
-          <div
-            className="veilleur-name-pill"
-            onClick={e => {
-              e.stopPropagation()
-              e.nativeEvent.stopPropagation()
-              setSelectedPlayerId(userId)
-            }}
+      {pills.map(({ placeId, userId, longitude, latitude, name, extraCount }) => {
+        const siegeStatus = siegeStatusByPlace.get(placeId)
+        const siegeIcon = siegeStatus === 'critical' ? '🔥'
+                       : siegeStatus === 'siege'    ? '⚔️'
+                       : null
+        const siegeLabel = siegeStatus === 'critical' ? 'Lieu sur le point d\'être pris'
+                        : siegeStatus === 'siege'    ? 'Lieu en siège'
+                        : undefined
+        return (
+          <Marker
+            key={placeId}
+            longitude={longitude}
+            latitude={latitude}
+            anchor="top"
+            offset={[0, 18]}
           >
-            <span className="veilleur-name-pill-text">{name}</span>
-            {extraCount > 0 && (
-              <span className="veilleur-name-pill-extra">+{extraCount}</span>
-            )}
-          </div>
-        </Marker>
-      ))}
+            <div
+              className={`veilleur-name-pill${siegeStatus ? ' is-' + siegeStatus : ''}`}
+              onClick={e => {
+                e.stopPropagation()
+                e.nativeEvent.stopPropagation()
+                setSelectedPlayerId(userId)
+              }}
+            >
+              {siegeIcon && (
+                <span className="veilleur-name-pill-siege" aria-label={siegeLabel} title={siegeLabel}>
+                  {siegeIcon}
+                </span>
+              )}
+              <span className="veilleur-name-pill-text">{name}</span>
+              {extraCount > 0 && (
+                <span className="veilleur-name-pill-extra">+{extraCount}</span>
+              )}
+            </div>
+          </Marker>
+        )
+      })}
     </>
   )
 })

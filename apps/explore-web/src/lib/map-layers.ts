@@ -212,39 +212,6 @@ export const iconLayer: LayerSpecification = {
   },
 }
 
-/**
- * V0.7.6 (8/05) — Lieux en siège mécénat (au moins une expé challenger investit
- * des Couronnes contre l'expé veilleur). Source : 'places-in-siege' alimentée par
- * la RPC list_places_in_siege() via siegeStore.
- *
- * Architecture : symbol layer GPU (pas de Marker DOM) — perf-safe même à plusieurs
- * centaines de lieux. Pas d'animation pour ne pas regresser sur mobile.
- */
-export const siegeIconLayer: LayerSpecification = {
-  id: 'places-siege-icon',
-  type: 'symbol',
-  source: 'places-in-siege',
-  minzoom: 8,
-  layout: {
-    'text-field': '⚔️',
-    'text-size': [
-      'interpolate', ['linear'], ['zoom'],
-      8, 12,
-      12, 18,
-      16, 22,
-    ],
-    'text-offset': [0, -1.6],
-    'text-allow-overlap': false,
-    'text-ignore-placement': false,
-  },
-  paint: {
-    'text-opacity': [
-      'interpolate', ['linear'], ['zoom'],
-      8, 0,
-      10, 0.85,
-      14, 1,
-    ],
-    'text-halo-color': 'rgba(255, 255, 255, 0.85)',
-    'text-halo-width': 1,
-  },
-}
+// V0.7.6 (8/05) — siegeIconLayer retiré : recadrage Uriel, l'icône siège vit
+// désormais dans la pilule du veilleur (VeilleurNamePills) à côté du nom,
+// pas en symbol layer au-dessus du marker. Plus clair UX.

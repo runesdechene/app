@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  buildTerritoryHoverLabelLayer, siegeIconLayer,
+  buildTerritoryHoverLabelLayer,
 } from '../../../lib/map-layers'
 import { useMapStore } from '../../../stores/mapStore'
 import { usePlayerStore } from '../../../stores/playerStore'
@@ -125,10 +125,9 @@ export const ExploreMap = memo(function ExploreMap() {
     if (currentUserId) refreshCrowns(currentUserId)
   }, [currentUserId, refreshCrowns])
 
-  // V0.7.6 (8/05) — Lieux en siège mécénat : layer GeoJSON dédié au-dessus du
-  // marker du lieu. Refresh au mount + sur events realtime de place_court_score.
-  // Architecture symbol layer (pas Marker DOM) pour ne pas regresser perf mobile.
-  const siegeGeoJSON = useSiegeStore(s => s.geojson)
+  // V0.7.6 (8/05) — Lieux en siège mécénat : statut ⚔️/🔥 affiché dans la pilule
+  // du veilleur (VeilleurNamePills consomme directement le store). Refresh au
+  // mount + sur events realtime de place_court_score.
   const refreshSiege = useSiegeStore(s => s.refresh)
 
   useEffect(() => {
@@ -903,14 +902,9 @@ export const ExploreMap = memo(function ExploreMap() {
           Visible uniquement sur les lieux où le user actuel peut récolter (filtré par crownsStore). */}
       <HarvestableChests geojson={enrichedGeojson} />
 
-      {/* V0.7.6 (8/05) — Lieux en siège mécénat : symbol layer GPU (pas Marker DOM).
-          Source alimentée par siegeStore + RPC list_places_in_siege() + realtime
-          place_court_score. Pas d'animation pour ne pas regresser perf mobile. */}
-      {siegeGeoJSON.features.length > 0 && (
-        <Source id="places-in-siege" type="geojson" data={siegeGeoJSON}>
-          <Layer {...siegeIconLayer} />
-        </Source>
-      )}
+      {/* V0.7.6 (8/05) — Statut siège affiché dans VeilleurNamePills directement
+          (à côté du nom du veilleur), pas via un layer GeoJSON séparé. Refresh
+          du store déclenché par le useEffect au mount + realtime ci-dessus. */}
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>

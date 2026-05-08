@@ -35,6 +35,27 @@
   padding-top: 1px;              /* compensation visuelle du baseline */
 }
 
+/* V0.7.6 (8/05) — Icône statut siège mécénat à gauche du nom :
+   ⚔️ siege (un challenger investit, défense tient encore)
+   🔥 critical (challenger >= défenseur, ou pas de défense investie)
+   Pas d'animation pour ne pas regresser perf mobile (cf. audit 8/05). */
+.veilleur-name-pill-siege {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Liseré subtil sur la pilule pour signaler que ce lieu est contesté */
+.veilleur-name-pill.is-siege {
+  box-shadow: 0 2px 5px rgba(60, 30, 10, 0.25),
+              0 0 0 1.5px rgba(193, 110, 50, 0.55);
+}
+.veilleur-name-pill.is-critical {
+  box-shadow: 0 2px 5px rgba(60, 30, 10, 0.25),
+              0 0 0 1.5px rgba(220, 70, 40, 0.85);
+}
+
 /* Badge "+N" pour les expéditions de plus de 3 membres */
 .veilleur-name-pill-extra {
   display: inline-flex;

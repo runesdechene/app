@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import type { FeatureCollection, Point } from 'geojson'
 import { supabase } from '../lib/supabase'
+
+export type SiegeStatus = 'siege' | 'critical'
 
 export interface SiegeRow {
   place_id: string
@@ -8,47 +9,46 @@ export interface SiegeRow {
   longitude: number
   challenger_count: number
   max_challenger_score: number
+  /** Score du veilleur actuel (= défenseur). null si pas d'investissement défensif. */
+  defender_score: number | null
 }
 
 interface SiegeStoreState {
   rows: SiegeRow[]
+  /** Lookup rapide placeId → statut, recalculé à chaque set des rows. */
+  statusByPlaceId: Map<string, SiegeStatus>
   loading: boolean
-  /** GeoJSON dérivé pour MapLibre source — recalculé à chaque set des rows. */
-  geojson: FeatureCollection<Point>
 
   refresh: () => Promise<void>
   reset: () => void
 }
 
-const EMPTY_GEOJSON: FeatureCollection<Point> = { type: 'FeatureCollection', features: [] }
+/**
+ * Calcule le statut d'un lieu à partir de l'écart score défenseur / challenger leader.
+ * - 'critical' : pas de veilleur défensif, OU le challenger leader >= défenseur
+ * - 'siege'    : la défense tient encore (challenger leader < défenseur)
+ */
+function deriveStatus(row: SiegeRow): SiegeStatus {
+  if (row.defender_score == null) return 'critical'
+  if (row.max_challenger_score >= row.defender_score) return 'critical'
+  return 'siege'
+}
 
-function rowsToGeoJSON(rows: SiegeRow[]): FeatureCollection<Point> {
-  return {
-    type: 'FeatureCollection',
-    features: rows.map((r) => ({
-      type: 'Feature',
-      id: r.place_id,
-      geometry: { type: 'Point', coordinates: [r.longitude, r.latitude] },
-      properties: {
-        placeId: r.place_id,
-        challengerCount: r.challenger_count,
-        maxChallengerScore: r.max_challenger_score,
-      },
-    })),
-  }
+function rowsToStatusMap(rows: SiegeRow[]): Map<string, SiegeStatus> {
+  const map = new Map<string, SiegeStatus>()
+  for (const r of rows) map.set(r.place_id, deriveStatus(r))
+  return map
 }
 
 /**
  * Lieux "en siège" — au moins une expédition challenger a investi des Couronnes
- * contre l'expé veilleur. Source unique pour le layer GeoJSON MapLibre dédié.
- *
- * Performance : le rendu se fait en symbol layer GPU (pas en Marker DOM) —
- * critique vu qu'on peut avoir plusieurs centaines de lieux en siège à terme.
+ * contre l'expé veilleur. Affiché côté UI dans la pilule du veilleur sur la carte
+ * (cf. VeilleurNamePills) — pas de layer GeoJSON séparé.
  */
 export const useSiegeStore = create<SiegeStoreState>((set) => ({
   rows: [],
+  statusByPlaceId: new Map(),
   loading: false,
-  geojson: EMPTY_GEOJSON,
 
   refresh: async () => {
     set({ loading: true })
@@ -59,8 +59,8 @@ export const useSiegeStore = create<SiegeStoreState>((set) => ({
       return
     }
     const rows = (data as SiegeRow[]) ?? []
-    set({ rows, geojson: rowsToGeoJSON(rows), loading: false })
+    set({ rows, statusByPlaceId: rowsToStatusMap(rows), loading: false })
   },
 
-  reset: () => set({ rows: [], geojson: EMPTY_GEOJSON, loading: false }),
+  reset: () => set({ rows: [], statusByPlaceId: new Map(), loading: false }),
 }))
