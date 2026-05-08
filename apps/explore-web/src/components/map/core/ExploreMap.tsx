@@ -12,7 +12,7 @@ import { loadColoredSvgIcon, loadBannerIcon, loadShieldIcon, loadFactionTile } f
 import {
   buildTerritoryFillLayer, buildTerritoryBorderLayer, buildTerritoryPatternLayer, UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
-  buildTerritoryHoverLabelLayer,
+  buildTerritoryHoverLabelLayer, siegeIconLayer,
 } from '../../../lib/map-layers'
 import { useMapStore } from '../../../stores/mapStore'
 import { usePlayerStore } from '../../../stores/playerStore'
@@ -30,6 +30,7 @@ import { ExpeditionBanners } from '../markers/ExpeditionBanners'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
+import { useSiegeStore } from '../../../stores/siegeStore'
 import { useVoronoiTuningStore } from '../../../stores/voronoiTuningStore'
 import {
   HERITAGE_CUP_DOT_COLOR,
@@ -123,6 +124,23 @@ export const ExploreMap = memo(function ExploreMap() {
   useEffect(() => {
     if (currentUserId) refreshCrowns(currentUserId)
   }, [currentUserId, refreshCrowns])
+
+  // V0.7.6 (8/05) — Lieux en siège mécénat : layer GeoJSON dédié au-dessus du
+  // marker du lieu. Refresh au mount + sur events realtime de place_court_score.
+  // Architecture symbol layer (pas Marker DOM) pour ne pas regresser perf mobile.
+  const siegeGeoJSON = useSiegeStore(s => s.geojson)
+  const refreshSiege = useSiegeStore(s => s.refresh)
+
+  useEffect(() => {
+    void refreshSiege()
+    const ch = supabase
+      .channel('siege-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'place_court_score' }, () => {
+        void refreshSiege()
+      })
+      .subscribe()
+    return () => { void supabase.removeChannel(ch) }
+  }, [refreshSiege])
 
   useEffect(() => {
     // V0.7 — coloriage initial par veille
@@ -884,6 +902,15 @@ export const ExploreMap = memo(function ExploreMap() {
           Rendu en React Markers DOM pour gérer animation +N + click sans toucher MapLibre.
           Visible uniquement sur les lieux où le user actuel peut récolter (filtré par crownsStore). */}
       <HarvestableChests geojson={enrichedGeojson} />
+
+      {/* V0.7.6 (8/05) — Lieux en siège mécénat : symbol layer GPU (pas Marker DOM).
+          Source alimentée par siegeStore + RPC list_places_in_siege() + realtime
+          place_court_score. Pas d'animation pour ne pas regresser perf mobile. */}
+      {siegeGeoJSON.features.length > 0 && (
+        <Source id="places-in-siege" type="geojson" data={siegeGeoJSON}>
+          <Layer {...siegeIconLayer} />
+        </Source>
+      )}
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>
