@@ -34,6 +34,12 @@ export function AssignFragments() {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null)
   const [pendingFragmentIds, setPendingFragmentIds] = useState<Set<number>>(new Set())
 
+  // Création compte stand (festival) — modale avec champ prénom focus auto
+  const [firstNameInput, setFirstNameInput] = useState('')
+  const [creatingAccount, setCreatingAccount] = useState(false)
+  const [accountModalOpen, setAccountModalOpen] = useState(false)
+  const [accountModalEmail, setAccountModalEmail] = useState('')
+
   const [toggling, setToggling] = useState<number | null>(null)
 
   // Quel mode est actif
@@ -96,6 +102,7 @@ export function AssignFragments() {
     setSelectedPlayer(null)
     setSearch('')
     setResults([])
+    setFirstNameInput('')
 
     // Charger les fragments pending existants pour cet email
     const { data } = await supabase
@@ -109,11 +116,79 @@ export function AssignFragments() {
     setPlayerFragmentIds(new Set())
   }
 
+  function openCreateAccountModal() {
+    const email = search.trim().toLowerCase()
+    if (!email) return
+    setAccountModalEmail(email)
+    setFirstNameInput('')
+    setAccountModalOpen(true)
+  }
+
+  function closeCreateAccountModal() {
+    if (creatingAccount) return
+    setAccountModalOpen(false)
+    setFirstNameInput('')
+  }
+
+  async function confirmCreateStandAccount() {
+    if (!accountModalEmail || creatingAccount) return
+
+    setCreatingAccount(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const jwt = session?.access_token
+      if (!jwt) {
+        alert('Session expirée — reconnecte-toi.')
+        return
+      }
+
+      const resp = await fetch('/.netlify/functions/stand-create-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          email: accountModalEmail,
+          firstName: firstNameInput.trim() || null,
+        }),
+      })
+
+      const data = await resp.json()
+      if (!resp.ok || !data.success) {
+        alert(`Échec création compte : ${data.error || resp.statusText}`)
+        return
+      }
+
+      // Bascule en mode joueur existant avec le user retourné
+      const u = data.user as { id: string; first_name: string | null; email_address: string; avatar_url: string | null }
+      setSelectedPlayer({
+        id: u.id,
+        first_name: u.first_name,
+        email_address: u.email_address,
+        avatar_url: u.avatar_url,
+      })
+      setPendingEmail(null)
+      setSearch('')
+      setResults([])
+      setFirstNameInput('')
+      setAccountModalOpen(false)
+      setAccountModalEmail('')
+      setPlayerFragmentIds(new Set())
+      setPendingFragmentIds(new Set())
+    } catch (err) {
+      alert(`Erreur : ${err}`)
+    } finally {
+      setCreatingAccount(false)
+    }
+  }
+
   function resetSelection() {
     setSelectedPlayer(null)
     setPendingEmail(null)
     setPlayerFragmentIds(new Set())
     setPendingFragmentIds(new Set())
+    setFirstNameInput('')
   }
 
   async function toggleFragment(fragmentId: number) {
@@ -240,11 +315,24 @@ export function AssignFragments() {
                   </button>
                 ))}
                 {noResults && isEmail && (
-                  <button className="assign-search-result assign-create-option" onClick={selectPendingEmail}>
-                    <div className="assign-result-avatar-fallback assign-create-icon">+</div>
-                    <span className="assign-result-name">Enregistrer pour {search.trim()}</span>
-                    <span className="assign-result-email">Fragments en attente d'inscription</span>
-                  </button>
+                  <>
+                    <button
+                      className="assign-search-result assign-create-option assign-create-account"
+                      onClick={openCreateAccountModal}
+                    >
+                      <div className="assign-result-avatar-fallback assign-create-icon">+</div>
+                      <span className="assign-result-name">Créer un compte pour {search.trim()}</span>
+                      <span className="assign-result-email">Compte + email Shopify de bienvenue</span>
+                    </button>
+                    <button
+                      className="assign-search-result assign-create-option assign-create-pending"
+                      onClick={selectPendingEmail}
+                    >
+                      <div className="assign-result-avatar-fallback assign-create-icon">…</div>
+                      <span className="assign-result-name">Mettre en attente pour {search.trim()}</span>
+                      <span className="assign-result-email">Fragments en attente, claim plus tard</span>
+                    </button>
+                  </>
                 )}
               </div>
             )}
@@ -291,6 +379,54 @@ export function AssignFragments() {
       {!isActive && (
         <div className="assign-empty">
           Recherchez un joueur ou entrez un email pour associer des fragments.
+        </div>
+      )}
+
+      {accountModalOpen && (
+        <div className="modal-overlay" onClick={closeCreateAccountModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">Créer un compte au stand</h2>
+            <p className="modal-subtitle">
+              Email : <strong>{accountModalEmail}</strong>
+            </p>
+
+            <label className="modal-label">Prénom du client</label>
+            <input
+              type="text"
+              autoFocus
+              value={firstNameInput}
+              onChange={e => setFirstNameInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') confirmCreateStandAccount()
+                if (e.key === 'Escape') closeCreateAccountModal()
+              }}
+              placeholder="Alice"
+              className="modal-input"
+              disabled={creatingAccount}
+            />
+            <p className="modal-hint">
+              Optionnel — utilisé pour personnaliser l'email Shopify de bienvenue.
+            </p>
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-btn modal-btn-cancel"
+                onClick={closeCreateAccountModal}
+                disabled={creatingAccount}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                className="modal-btn modal-btn-confirm"
+                onClick={confirmCreateStandAccount}
+                disabled={creatingAccount}
+              >
+                {creatingAccount ? 'Création…' : 'Créer le compte'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import { ShopifyHealthBadge } from './ShopifyHealthBadge'
 
 interface SidebarProps {
   user: User | null
@@ -82,6 +83,8 @@ export function Sidebar({ user }: SidebarProps) {
           Synchro Emails
         </NavLink>
       </nav>
+
+      <ShopifyHealthBadge />
 
       <div className="sidebar-footer">
         <span>{user?.email}</span>
