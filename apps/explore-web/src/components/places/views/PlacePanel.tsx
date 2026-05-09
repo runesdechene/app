@@ -29,17 +29,21 @@ interface PlacePanelProps {
   onClose: () => void
   userEmail: string | null
   onAuthPrompt?: () => void
+  /** Sur mobile, force le panel à occuper tout l'écran (sans la marge top
+   * de 120px utilisée pour laisser visible le header partagé sur la carte).
+   * Utilisé sur la home où on veut couvrir intégralement l'interface. */
+  mobileFullscreen?: boolean
 }
 
-export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
+export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt, mobileFullscreen }: PlacePanelProps) {
   const { place, loading, error, refetch } = usePlace(placeId)
   const isOpen = placeId !== null
 
   return (
     <>
-      {isOpen && <div className="place-panel-backdrop" onClick={onClose} />}
+      {isOpen && <div className={`place-panel-backdrop${mobileFullscreen ? ' modal-mobile-fullscreen-backdrop' : ''}`} onClick={onClose} />}
 
-      <div className={`place-panel ${isOpen ? 'place-panel-open' : ''}`}>
+      <div className={`place-panel${isOpen ? ' place-panel-open' : ''}${mobileFullscreen ? ' modal-mobile-fullscreen' : ''}`}>
         {loading && (
           <div className="place-panel-loading">
             <p>Chargement...</p>

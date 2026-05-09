@@ -138,7 +138,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
   }
 
   return (
-    <div className="notification-panel">
+    <div className="notification-panel modal-mobile-fullscreen">
       <div className="notification-panel-header">
         <span className="notification-panel-title">Notifications</span>
         <button className="notification-panel-close" onClick={onClose}>{'\u2715'}</button>

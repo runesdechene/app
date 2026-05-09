@@ -1,0 +1,61 @@
+.mobile-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-parchment);
+  border-bottom: 1px solid var(--color-sepia);
+  z-index: 10;
+}
+
+.mobile-topbar-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.mobile-topbar-logo {
+  height: 34px;
+  width: auto;
+}
+
+.mobile-topbar-xp-hint {
+  font-size: 10px;
+  font-family: var(--font-signature);
+  font-style: italic;
+  color: var(--color-sepia-dark, #7a5c3a);
+  opacity: 0.8;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.mobile-topbar-spacer {
+  flex: 1;
+}
+
+.mobile-topbar-shop {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.mobile-topbar-shop img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.8;
+}
+.mobile-topbar-shop:active { transform: scale(0.92); }
+
+.mobile-topbar--fade {
+  border-bottom: none;
+}
+
+@media (min-width: 750px) {
+  .mobile-topbar { display: none; }
+}

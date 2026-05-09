@@ -1,0 +1,16 @@
+.mobile-stats-bar {
+  position: relative;
+  background: var(--color-parchment);
+}
+
+.mobile-stats-bar--fade::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -16px;
+  height: 16px;
+  background: linear-gradient(180deg, var(--color-parchment) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 5;
+}

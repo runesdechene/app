@@ -1,3 +1,33 @@
+# ALPHA V0.7.8
+## Une vraie page d'accueil sur mobile
+
+### 🏠 Mobile — l'app a maintenant un hub
+Sur mobile, l'app ne s'ouvre plus directement sur la carte. Tu arrives sur **/accueil** : tes énigmes du jour en haut, tes événements et expéditions ensuite, tes lieux récents, et la vie de la communauté en bas. Trois raisons de revenir, en un seul écran.
+
+### 💬 Le Chat a sa propre page plein écran
+Avant : un panel flottant en coin de carte. Maintenant : un onglet **Chat** dédié dans la navbar du bas. Trois canaux comme avant (général, faction, bugs) plus l'accès aux conversations d'expéditions. Plus de doublon avec la carte.
+
+### 🔔 L'Activité a sa propre page aussi
+Tout ce qui bouge sur la carte — qui devient mécène, qui lève le brouillard, qui rejoint la confrérie — accessible en un tap. Sur la home un teaser des 3 dernières lignes ; pour tout voir, tu cliques.
+
+### 🗺️ Une navbar pour s'y retrouver
+**Accueil · Chat · ➕ · Activité · Carte** — les 5 endroits où tu vas, toujours à portée de pouce. Le bouton + central ouvre le menu de création (expédition, lieu, etc.) comme avant.
+
+### 🖥️ Sur PC, rien ne change
+Tu arrives toujours directement sur la carte. La home et les pages plein écran sont uniquement mobile — sur grand écran la carte reste le centre de gravité.
+
+### Sous le capot
+- Nouvelle branche `home-mobile-hub`, ressuscitation chirurgicale des composants du pivot du matin (StatsBar, DailyEnigmaCard, EnigmaFragmentsList, PlacesSection, ActivityFeed)
+- 2 composants partagés : `MobileTopBar` (logo + boutique + cloche + profil) et `MobileStatsBar` (niveau + énergie + couronnes), montés sur `/accueil` ET `/carte` mobile pour cohérence
+- 3 nouvelles pages : `HomePage`, `ChatPage`, `ActivityPage` (lazy-loaded — pas de surcoût desktop)
+- `ActivityFeed` paramétré avec `limit` et `onSeeMore` (3 lignes en teaser, 30 en page complète)
+- `BottomTabbar` 5 cellules avec FAB central et badges non-lus
+- Routing platform-aware : `RootRedirect` envoie sur `/accueil` (mobile) ou `/carte` (desktop), `MobileOnly` wrapper redirige les routes mobile vers `/carte` sur desktop
+- `MapPage` mobile : header partagé en haut, BottomTabbar en bas, suppression du `ChatPanel` flottant et de l'ancien `MobileHeader` (doublons éliminés)
+- HUD mobile recalibré pour laisser place au bandeau supérieur (~120px) et à la navbar (~64px)
+
+---
+
 # ALPHA V0.7.7
 ## Notifications push — les raisons de revenir
 

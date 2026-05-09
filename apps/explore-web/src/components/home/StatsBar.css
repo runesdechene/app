@@ -1,0 +1,64 @@
+.stats-bar {
+  display: flex;
+  padding: 10px 12px;
+  gap: 6px;
+  background: var(--color-parchment);
+  border-bottom: 1px solid var(--color-sepia);
+}
+
+.stats-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 6px;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  border-radius: 10px;
+  color: var(--color-ink);
+  min-width: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.stats-cell:active {
+  transform: scale(0.97);
+  background: var(--color-parchment);
+}
+
+.stats-cell-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.stats-cell-value {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-accent);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Cellule Énergie : pile valeur principale + taux de régen vert dessous. */
+.stats-cell-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.stats-cell-rate {
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-accent);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #4d8c3a;
+  white-space: nowrap;
+}

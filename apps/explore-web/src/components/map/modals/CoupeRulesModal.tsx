@@ -3,6 +3,11 @@ import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 
 interface Props {
   onClose: () => void
+  /** Si défini, ajoute un bouton "Voir les scores" en bas qui ouvre la
+   * CoupeModal (tableau interactif des scores Maisons / joueurs).
+   * Utilisé depuis la StatsBar de la home pour offrir un parcours en 2 temps :
+   * comprendre le barème puis voir le classement live. */
+  onOpenScores?: () => void
 }
 
 /**
@@ -13,7 +18,7 @@ interface Props {
  * pas à chercher les hard en ligne). Toutes les valeurs viennent du store
  * useGloryRulesStore (mig 067) — éditable depuis le Hub admin.
  */
-export function CoupeRulesModal({ onClose }: Props) {
+export function CoupeRulesModal({ onClose, onOpenScores }: Props) {
   const get = useGloryRulesStore(s => s.get)
   const visite   = get('coupe.visit_gps')
   const plantage = get('coupe.plant_flag')
@@ -37,6 +42,7 @@ export function CoupeRulesModal({ onClose }: Props) {
         { label: 'Combo créateur sur place',       value: `${visite + lieu + plantage + carnet} pts` },
       ]}
       onClose={onClose}
+      action={onOpenScores ? { label: 'Voir les scores', onClick: onOpenScores } : undefined}
     />
   )
 }

@@ -3,7 +3,7 @@ import { ExploreMap } from '../components/map/core/ExploreMap'
 import { EnergyIndicator } from '../components/map/badges/EnergyIndicator'
 import { CrownsBadge } from '../components/map/badges/CrownsBadge'
 import { CoupeBadge } from '../components/map/badges/CoupeBadge'
-import { useGlory } from '../hooks/useGlory'
+import { NotorietyInfoModal } from '../components/map/modals/NotorietyInfoModal'
 import { PlacePanel } from '../components/places/views/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -31,8 +31,12 @@ import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
 import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
-import { MobileHeader } from '../components/map/controls/MobileHeader'
+// MobileHeader legacy — import supprimé (composant désactivé, remplacé par MobileTopBar partagée)
 import { useMobileNavStore } from '../stores/mobileNavStore'
+import { useIsDesktop } from '../hooks/useMediaQuery'
+import { MobileTopBar } from '../components/navigation/MobileTopBar'
+import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
+import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { AdScreen } from '../components/map/overlays/AdScreen'
@@ -63,17 +67,9 @@ import '../styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   // V0.7 — affiche le NIVEAU dans le badge (au lieu de la Gloire brute).
-  // Au clic : modale narrative avec le détail des compteurs par axe d'action.
-  const { state: glory } = useGlory(true, 30000)
+  // Au clic : NotorietyInfoModal partagée (source unique avec StatsBar).
   const level = usePlayerStore(s => s.level)
-  const xpTotal = usePlayerStore(s => s.xpTotal)
-  const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
   const [showInfo, setShowInfo] = useState(false)
-
-  const isCap = level >= 50
-  const description = isCap
-    ? `Tu as atteint le sommet — ${xpTotal} Gloire cumulée. Tu es Légende.`
-    : `Ton parcours de Veilleur — ${xpTotal} Gloire récoltée au fil de tes pas. Encore ${xpToNextLevel} avant le niveau ${level + 1}.`
 
   return (
     <>
@@ -90,35 +86,9 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
       </div>
 
       {showInfo && (
-        <InfoModal
-          icon={'🎖️'}
-          title={`Niveau ${level}`}
-          description={description}
-          rows={
-            glory ? [
-              { label: '🥾 Lieux foulés (GPS)',           value: `${glory.lieuxExplores}` },
-              { label: '📜 Lieux cartographiés',          value: `${glory.lieuxAjoutes}` },
-              { label: '🏴 Plantages de bannière',        value: `${glory.plantages}` },
-              { label: '✍️ Récits écrits',                value: `${glory.carnets}` },
-              { label: '📷 Photos ajoutées',              value: `${glory.photos}` },
-              (() => {
-                const easyTotal = glory.enigmes.easy + glory.enigmes.veryEasy
-                const parts = [
-                  glory.enigmes.hard   ? `${glory.enigmes.hard} difficile${glory.enigmes.hard > 1 ? 's' : ''}`     : null,
-                  glory.enigmes.medium ? `${glory.enigmes.medium} moyenne${glory.enigmes.medium > 1 ? 's' : ''}`   : null,
-                  easyTotal            ? `${easyTotal} facile${easyTotal > 1 ? 's' : ''} ou très facile${easyTotal > 1 ? 's' : ''}` : null,
-                ].filter(Boolean).join(', ')
-                return {
-                  label: glory.enigmes.total > 0
-                    ? `🦉 Énigmes résolues (${parts})`
-                    : '🦉 Énigmes résolues',
-                  value: `${glory.enigmes.total}`,
-                }
-              })(),
-            ] : []
-          }
+        <NotorietyInfoModal
           onClose={() => setShowInfo(false)}
-          action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
+          onOpenLeaderboard={onClick}
         />
       )}
     </>
@@ -314,6 +284,7 @@ export default function MapPage() {
   }
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
+  const isDesktop = useIsDesktop()
 
   return (
     <div className="app" data-mobile-panel={mobilePanel || ''}>
@@ -323,6 +294,15 @@ export default function MapPage() {
       {showAdScreen && isAuthenticated && !authLoading && (
         <AdScreen onDone={() => setShowAdScreen(false)} />
       )}
+
+      {/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
+      {!isDesktop && (
+        <div className="map-mobile-header-fixed">
+          <MobileTopBar fadeOutBottom onFactionModal={() => setShowFactionModal(true)} />
+          <MobileStatsBar fadeOutBottom />
+        </div>
+      )}
+
       <ExploreMap />
       <InstallPrompt />
       <OfflineIndicator />
@@ -339,13 +319,15 @@ export default function MapPage() {
           <ExpeditionsHud />
         </div>
       )}
-      {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
+      {/* ChatPanel flottant : desktop uniquement. Sur mobile, le chat passe par /chat. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <ChatPanel />}
       {!addPlaceMode && !authLoading && isAuthenticated && isAdmin && <VoronoiTuningPanel />}
 
-      {/* Header mobile (logo + hamburger, masqué sur desktop) */}
-      {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
-        <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
-      )}
+      {/* MobileHeader legacy — désactivé : remplacé par MobileTopBar + MobileStatsBar ci-dessus.
+          Garder l'import pour éviter une refacto partielle (chore: remove legacy MobileHeader plus tard).
+          {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
+            <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
+          )} */}
 
       {/* Bouton Boutique permanent desktop (masqué sur mobile + quand auth modal ouverte) */}
       {!addPlaceMode && !showAuthModal && (
@@ -454,6 +436,7 @@ export default function MapPage() {
           onClose={() => setSelectedPlaceId(null)}
           userEmail={user?.email ?? null}
           onAuthPrompt={() => setShowAuthModal(true)}
+          mobileFullscreen
         />
       )}
 
@@ -533,8 +516,13 @@ export default function MapPage() {
 
       {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
 
-      {/* Navbar mobile (masquée sur desktop via CSS) */}
-      {!addPlaceMode && !authLoading && isAuthenticated && <MobileNavbar />}
+      {/* MobileNavbar legacy — supprimée sur mobile (remplacée par BottomTabbar partagée).
+          Reste montée uniquement sur desktop pour ne pas casser les data-mobile-panel= CSS existants
+          si jamais ce code est atteint sur desktop (MobileNavbar est de toute façon invisible via CSS). */}
+      {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <MobileNavbar />}
+
+      {/* BottomTabbar partagée — masquée sur desktop via CSS (min-width: 750px → display:none) */}
+      {!isDesktop && <BottomTabbar />}
 
       {/* V0.7 — Modales niveau */}
       {pendingLevelUp && (

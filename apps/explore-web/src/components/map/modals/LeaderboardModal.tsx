@@ -67,8 +67,8 @@ export function LeaderboardModal({ onClose }: Props) {
   }
 
   return (
-    <div className="leaderboard-overlay" onClick={onClose}>
-      <div className="leaderboard-modal" onClick={e => e.stopPropagation()}>
+    <div className="leaderboard-overlay modal-mobile-fullscreen-backdrop" onClick={onClose}>
+      <div className="leaderboard-modal modal-mobile-fullscreen" onClick={e => e.stopPropagation()}>
         <button className="player-modal-close" onClick={onClose} aria-label="Fermer">
           &#10005;
         </button>

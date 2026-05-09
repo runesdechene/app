@@ -28,14 +28,14 @@ export default function LandingPage() {
 
   function handleCtaClick() {
     if (user) {
-      navigate('/carte')
+      navigate('/post-login')
     } else {
       setMode('auth')
     }
   }
 
   function handleAuthSuccess() {
-    navigate('/carte')
+    navigate('/post-login')
   }
 
   function handleBack() {

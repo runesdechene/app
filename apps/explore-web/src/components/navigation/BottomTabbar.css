@@ -1,0 +1,87 @@
+.bottom-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: stretch;
+  height: 64px;
+  background: var(--color-parchment);
+  border-top: 1px solid var(--color-sepia);
+  z-index: 9990;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.bottom-tabbar-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color-ink);
+  font-family: var(--font-accent);
+  font-size: 11px;
+  position: relative;
+  transition: color 0.15s ease;
+}
+/* Indicateur de section active : border-top dorée sur la cellule.
+   Approche brutale et garantie : pas de pseudo, pas de span absolute.
+   border-top transparent par défaut pour que la hauteur soit constante. */
+.bottom-tabbar-cell {
+  border-top: 4px solid transparent;
+}
+.bottom-tabbar-cell.active {
+  color: var(--color-gold);
+  border-top-color: var(--color-gold);
+}
+
+.bottom-tabbar-icon { font-size: 20px; line-height: 1; }
+.bottom-tabbar-label { font-size: 10px; letter-spacing: 0.5px; }
+
+.bottom-tabbar-badge {
+  position: absolute;
+  top: 6px;
+  right: 22%;
+  background: #c0392b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 5px;
+  border-radius: 9px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.bottom-tabbar-plus {
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.bottom-tabbar-plus-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: var(--color-ink);
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -7px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  transition: transform 0.15s ease;
+}
+.bottom-tabbar-plus:active .bottom-tabbar-plus-circle { transform: scale(0.92); }
+
+@media (min-width: 750px) {
+  .bottom-tabbar { display: none; }
+}

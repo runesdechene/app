@@ -1,0 +1,30 @@
+.chat-page-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 64px;
+}
+
+/* Forcer le ChatPanel en plein conteneur (override de son mode flottant
+   ET du display:none mobile.css ligne 915 — le chat est caché par défaut
+   sur mobile sauf en mode data-mobile-panel="chat" de la carte).
+   bottom: 64px réserve l'espace de la BottomTabbar pour que le champ
+   de saisie reste accessible (sinon il passe sous la navbar). */
+.chat-page-content .chat-panel {
+  display: flex !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: var(--color-parchment);
+}
+
+/* Cacher le bouton toggle interne du ChatPanel sur cette page (toujours ouvert) */
+.chat-page-content .chat-toggle-btn { display: none; }

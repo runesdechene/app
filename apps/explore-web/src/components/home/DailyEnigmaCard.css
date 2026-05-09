@@ -1,0 +1,74 @@
+.daily-enigma-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin: 0;
+  padding: 16px 18px;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(74, 55, 40, 0.12);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.daily-enigma-card:not(.done):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(74, 55, 40, 0.18);
+}
+
+.daily-enigma-card:active {
+  transform: scale(0.99);
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.12);
+}
+
+.daily-enigma-card.done {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.daily-enigma-card-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.daily-enigma-card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.daily-enigma-card-title {
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  font-family: var(--font-title);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.daily-enigma-card-sub {
+  font-size: 13px;
+  font-style: italic;
+  font-family: var(--font-signature);
+  margin-top: 4px;
+  color: var(--color-ink-light);
+}
+
+.daily-enigma-card-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  background: var(--color-sepia, #8b6340);
+  color: var(--color-parchment, #f5ead0);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-accent);
+  white-space: nowrap;
+}
