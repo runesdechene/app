@@ -4,7 +4,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 0 80px;
+  /* Padding-bottom = hauteur navbar 64 + safe-area iOS + 16px d'air */
+  padding: 0 0 calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .home-section {

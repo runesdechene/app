@@ -3,21 +3,22 @@
   min-height: 0;
   overflow: hidden;
   position: relative;
-  padding-bottom: 64px;
+  /* La BottomTabbar fait 64px + env(safe-area-inset-bottom) sur iOS. */
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Forcer le ChatPanel en plein conteneur (override de son mode flottant
    ET du display:none mobile.css ligne 915 — le chat est caché par défaut
    sur mobile sauf en mode data-mobile-panel="chat" de la carte).
-   bottom: 64px réserve l'espace de la BottomTabbar pour que le champ
-   de saisie reste accessible (sinon il passe sous la navbar). */
+   bottom: hauteur réelle de la BottomTabbar (64 + safe-area iOS) pour
+   que le champ de saisie reste accessible. */
 .chat-page-content .chat-panel {
   display: flex !important;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 64px;
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   width: 100%;
   height: auto;
   border-radius: 0;

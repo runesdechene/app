@@ -2,7 +2,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 16px 80px;
+  /* Padding-bottom = navbar 64 + safe-area iOS + 16px d'air */
+  padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .activity-page-title {
