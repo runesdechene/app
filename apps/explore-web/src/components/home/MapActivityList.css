@@ -1,0 +1,42 @@
+.map-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-activity-list-row {
+  position: relative;
+}
+
+/* ToastItem est conçu pour être en absolute floating sur la carte —
+   ici on le force en flux normal pour l'usage embed dans la home. */
+.map-activity-list-row > .game-toast {
+  position: static;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.map-activity-list-empty {
+  padding: 16px 0;
+  font-family: var(--font-signature);
+  font-style: italic;
+  color: var(--color-ink-light);
+  text-align: center;
+}
+
+.map-activity-list-more {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px;
+  background: transparent;
+  border: 1px dashed var(--color-sepia);
+  border-radius: 8px;
+  color: var(--color-ink);
+  font-family: var(--font-accent);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.map-activity-list-more:hover { background: var(--color-parchment-dark); }

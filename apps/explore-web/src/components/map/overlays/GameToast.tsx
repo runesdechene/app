@@ -104,7 +104,7 @@ function renderMessage(
   )
 }
 
-function ToastItem({ toast }: { toast: GameToastType }) {
+export function ToastItem({ toast }: { toast: GameToastType }) {
   const removeToast = useToastStore(s => s.removeToast)
   const requestFlyTo = useMapStore(s => s.requestFlyTo)
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)

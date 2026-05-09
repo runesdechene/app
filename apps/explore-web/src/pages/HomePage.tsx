@@ -14,7 +14,7 @@ import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { DailyQuestsList } from '../components/quests/DailyQuestsList'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
-import { NotificationPanel } from '../components/notifications/NotificationPanel'
+import { MapActivityList } from '../components/home/MapActivityList'
 import { FactionModal } from '../components/auth/FactionModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
@@ -99,8 +99,9 @@ export default function HomePage() {
           <PlacesSection />
         </section>
 
-        <section className="home-section home-section--activity">
-          <NotificationPanel onClose={() => navigate('/activite')} />
+        <section className="home-section">
+          <h2 className="home-section-title">Activité de la carte</h2>
+          <MapActivityList limit={5} onSeeMore={() => navigate('/activite')} />
         </section>
       </main>
 
