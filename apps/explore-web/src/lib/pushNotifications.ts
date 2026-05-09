@@ -8,13 +8,21 @@ import { supabase } from './supabase'
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string
 
 // Flag local : "l'utilisateur a explicitement désactivé les notifs depuis Settings".
-// Empêche syncSubscription / PushAutoPrompt de re-créer une sub silencieusement
-// après un reload — sinon le toggle off se ré-active tout seul. Cleared au prochain
-// toggle on explicite.
+// Stocke un timestamp pour expirer après 30 jours — au-delà on lui re-propose
+// (au cas où il aurait changé d'avis depuis). Empêche syncSubscription /
+// PushAutoPrompt de re-créer une sub silencieusement après un reload tant que
+// le cooldown court.
 const USER_DISABLED_KEY = 'push_user_disabled'
+const USER_DISABLED_COOLDOWN_MS = 30 * 24 * 3600 * 1000  // 30 jours
 
 export function isUserDisabled(): boolean {
-  try { return localStorage.getItem(USER_DISABLED_KEY) === '1' } catch { return false }
+  try {
+    const v = localStorage.getItem(USER_DISABLED_KEY)
+    if (!v) return false
+    const ts = Number(v)
+    if (!Number.isFinite(ts) || ts <= 0) return false
+    return (Date.now() - ts) < USER_DISABLED_COOLDOWN_MS
+  } catch { return false }
 }
 
 export type PushSupportStatus = 'native' | 'ios-needs-install' | 'unsupported'
@@ -119,7 +127,7 @@ export async function subscribeUser(_userId: string): Promise<PushSubscription |
 export async function unsubscribeUser(): Promise<void> {
   // Marque l'intention AVANT toute action async — comme ça même si l'unsub
   // navigateur échoue, le sync auto au boot ne re-créera pas une sub.
-  try { localStorage.setItem(USER_DISABLED_KEY, '1') } catch { /* noop */ }
+  try { localStorage.setItem(USER_DISABLED_KEY, String(Date.now())) } catch { /* noop */ }
   const reg = await getRegistration()
   if (!reg) return
   const sub = await reg.pushManager.getSubscription()
