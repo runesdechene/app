@@ -1,41 +1,25 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { usePlayer } from '../hooks/usePlayer'
-import { usePlayerStore } from '../stores/playerStore'
-import { useResourceTimers } from '../hooks/useResourceTimers'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
-import { MobileTopBar } from '../components/navigation/MobileTopBar'
-import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
-import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
-// EnigmaFragmentsList masquée — fragments absorbés par badge DailyEnigmaCard (maquette 09/05/2026)
-// import { EnigmaFragmentsList } from '../components/home/EnigmaFragmentsList'
 import { DailyQuestsList } from '../components/quests/DailyQuestsList'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { MapActivityList } from '../components/home/MapActivityList'
-import { FactionModal } from '../components/auth/FactionModal'
-import { GameToast } from '../components/map/overlays/GameToast'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
-import { PlacePanel } from '../components/places/views/PlacePanel'
-import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
-import { useMapStore } from '../stores/mapStore'
 import './HomePage.css'
 
+/**
+ * Page /accueil — hub des 3 raisons de revenir (rituel/lien/aventure).
+ * MobileTopBar / BottomTabbar / hooks d'init / modales lieu&joueur sont
+ * dans MobileLayout parent. Cette page rend juste le scroll de sections
+ * + les modales spécifiques à la home (énigme, fragment, expédition).
+ */
 export default function HomePage() {
-  const { user } = useAuth()
   const navigate = useNavigate()
-  const userFactionId = usePlayerStore((s) => s.userFactionId)
-  const selectedPlaceId = useMapStore((s) => s.selectedPlaceId)
-  const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
-  const selectedPlayerId = useMapStore((s) => s.selectedPlayerId)
-  const setSelectedPlayerId = useMapStore((s) => s.setSelectedPlayerId)
-
-  const [showFactionModal, setShowFactionModal] = useState(false)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{
@@ -47,7 +31,7 @@ export default function HomePage() {
   const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
   const [creatorOpen, setCreatorOpen] = useState(false)
 
-  // Sync store → local state pour expéditions (même pattern que home-pivot)
+  // Sync store → local state pour expéditions
   const pendingOpenExp = useExpeditionsStore((s) => s.pendingOpenExpeditionId)
   const requestOpenExp = useExpeditionsStore((s) => s.requestOpenExpedition)
   useEffect(() => {
@@ -66,20 +50,12 @@ export default function HomePage() {
     }
   }, [pendingCreator, requestCreator])
 
-  usePlayer()
-  useResourceTimers()
-
   useEffect(() => {
     document.title = 'Runes de Chêne — Accueil'
   }, [])
 
-  if (!user) return null
-
   return (
-    <div className="home-page">
-      <MobileTopBar onFactionModal={() => setShowFactionModal(true)} />
-      <MobileStatsBar />
-
+    <>
       <main className="home-page-scroll">
         <section className="home-section">
           <DailyEnigmaCard
@@ -87,7 +63,6 @@ export default function HomePage() {
             onOpenFragment={(f) => setFragmentEnigma(f)}
             refreshKey={enigmaRefreshKey}
           />
-          {/* EnigmaFragmentsList retirée — compteur fragments intégré au badge DailyEnigmaCard */}
         </section>
 
         <section className="home-section">
@@ -117,14 +92,6 @@ export default function HomePage() {
         </section>
       </main>
 
-      <BottomTabbar />
-
-      {showFactionModal && (
-        <FactionModal
-          onClose={() => setShowFactionModal(false)}
-          currentFactionId={userFactionId}
-        />
-      )}
       {showDailyEnigma && (
         <DailyEnigma
           onClose={() => {
@@ -157,22 +124,6 @@ export default function HomePage() {
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}
-      {/* Modale lieu — s'ouvre par-dessus la home quand on clique un lieu
-          dans MapActivityList ou PlacesSection (state partagé useMapStore). */}
-      <PlacePanel
-        placeId={selectedPlaceId}
-        onClose={() => setSelectedPlaceId(null)}
-        userEmail={user?.email ?? null}
-        mobileFullscreen
-      />
-      {/* Modale profil joueur — clic sur un nom dans MapActivityList. */}
-      {selectedPlayerId && (
-        <PlayerProfileModal
-          playerId={selectedPlayerId}
-          onClose={() => setSelectedPlayerId(null)}
-        />
-      )}
-      <GameToast />
-    </div>
+    </>
   )
 }
