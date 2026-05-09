@@ -42,8 +42,6 @@ import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { NotificationBell } from '../components/notifications/NotificationBell'
 import { ExpeditionsHud } from '../components/expeditions/ExpeditionsHud'
-import { CreateMenu } from '../components/map/controls/CreateMenu'
-import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
@@ -135,8 +133,6 @@ export default function MapPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
-  const [showCreateMenu, setShowCreateMenu] = useState(false)
-  const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
@@ -150,17 +146,10 @@ export default function MapPage() {
   const userName = usePlayerStore(s => s.userName)
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
-  const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
-  // Gating Cartographier : 3 lieux découverts (décision Uriel 2026-05-02 — règle simple,
-  // indépendante du système de niveaux/quêtes). Le titre "Explorateur" reste un titre de
-  // profil mais ne gate plus l'ajout de lieu.
-  const discoveriesCount = usePlayerStore(s => s.discoveredIds.size)
-  const MIN_DISCOVERIES_FOR_ADD_PLACE = 3
-  const canAddPlace = discoveriesCount >= MIN_DISCOVERIES_FOR_ADD_PLACE
-  const discoveriesNeeded = Math.max(0, MIN_DISCOVERIES_FOR_ADD_PLACE - discoveriesCount)
+  // Gating "Cartographier" (3 lieux découverts) déplacé dans BottomTabbarPlusMenu — 9 mai 2026.
 
   // Initialiser le fog state (découvertes + énergie) dès l'auth
   usePlayer()
@@ -390,48 +379,7 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* FAB Créer (lieu OU expédition) — toujours actif, le menu gère le verrou lieu */}
-      {!authLoading && isAuthenticated && userId && !addPlaceMode && (
-        <button
-          className="add-place-fab"
-          onClick={() => setShowCreateMenu(true)}
-          aria-label="Créer un lieu ou un événement"
-        >+</button>
-      )}
-
-      {showCreateMenu && (
-        <CreateMenu
-          canAddPlace={canAddPlace}
-          discoveriesNeeded={discoveriesNeeded}
-          onAddPlace={() => {
-            setShowCreateMenu(false)
-            setAddPlaceMode(true)
-          }}
-          onAddPlaceLocked={() => {
-            setShowCreateMenu(false)
-            setShowAddPlaceInfo(true)
-          }}
-          onCreateExpedition={() => {
-            setShowCreateMenu(false)
-            useExpeditionsStore.getState().requestOpenCreator(true)
-          }}
-          onClose={() => setShowCreateMenu(false)}
-        />
-      )}
-
-      {showAddPlaceInfo && !canAddPlace && (
-        <InfoModal
-          icon="🗺️"
-          title="Cartographier"
-          description={`Pour ajouter un lieu sur la carte, découvre d'abord ${MIN_DISCOVERIES_FOR_ADD_PLACE} lieux. Continue d'explorer pour le débloquer.`}
-          rows={[
-            { label: 'Condition', value: `Découvrir ${MIN_DISCOVERIES_FOR_ADD_PLACE} lieux` },
-            { label: 'Découvertes actuelles', value: `${discoveriesCount} / ${MIN_DISCOVERIES_FOR_ADD_PLACE}` },
-            { label: 'Reste', value: discoveriesNeeded === 0 ? 'Débloqué !' : `${discoveriesNeeded} découverte${discoveriesNeeded > 1 ? 's' : ''}` },
-          ]}
-          onClose={() => setShowAddPlaceInfo(false)}
-        />
-      )}
+      {/* FAB "+" et CreateMenu déplacés dans BottomTabbar (+) — 9 mai 2026 (pivot home-first) */}
 
       {/* Daily Enigma modal */}
       {showDailyEnigma && (
