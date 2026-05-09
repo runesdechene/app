@@ -1,4 +1,5 @@
 import { useAuth } from '../../hooks/useAuth'
+import { usePlayerStore } from '../../stores/playerStore'
 import { ProfileMenu } from '../auth/ProfileMenu'
 import { NotificationBell } from '../notifications/NotificationBell'
 import logoImg from '../../assets/logo_couleur_mobile.webp'
@@ -15,10 +16,20 @@ interface MobileTopBarProps {
 
 export function MobileTopBar({ fadeOutBottom = false, onFactionModal }: MobileTopBarProps) {
   const { user, signOut } = useAuth()
+  const level = usePlayerStore((s) => s.level)
+  const xpToNextLevel = usePlayerStore((s) => s.xpToNextLevel)
+  const levelInitialized = usePlayerStore((s) => s.levelInitialized)
 
   return (
     <header className={`mobile-topbar${fadeOutBottom ? ' mobile-topbar--fade' : ''}`}>
-      <img src={logoImg} alt="Runes de Chêne" className="mobile-topbar-logo" />
+      <div className="mobile-topbar-brand">
+        <img src={logoImg} alt="Runes de Chêne" className="mobile-topbar-logo" />
+        {levelInitialized && (
+          <span className="mobile-topbar-xp-hint">
+            {xpToNextLevel} XP avant palier {level + 1}
+          </span>
+        )}
+      </div>
       <div className="mobile-topbar-spacer" />
       <a
         href={SHOPIFY_URL}

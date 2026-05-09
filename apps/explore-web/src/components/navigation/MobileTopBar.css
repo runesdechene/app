@@ -9,9 +9,26 @@
   z-index: 10;
 }
 
+.mobile-topbar-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
 .mobile-topbar-logo {
   height: 28px;
   width: auto;
+}
+
+.mobile-topbar-xp-hint {
+  font-size: 10px;
+  font-family: var(--font-signature);
+  font-style: italic;
+  color: var(--color-sepia-dark, #7a5c3a);
+  opacity: 0.8;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .mobile-topbar-spacer {
