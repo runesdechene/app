@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
-import { ActivityFeed } from '../components/home/ActivityFeed'
+import { MapActivityList } from '../components/home/MapActivityList'
+import { markActivitySeen } from '../hooks/useUnreadActivityCount'
 import './ActivityPage.css'
 
 export default function ActivityPage() {
@@ -10,6 +11,9 @@ export default function ActivityPage() {
 
   useEffect(() => {
     document.title = 'Runes de Chêne — Activité'
+    // Marquer toute l'activité comme lue à l'entrée de la page
+    // → reset le badge rouge sur l'onglet Activité.
+    markActivitySeen()
   }, [])
 
   if (!user) return null
@@ -19,7 +23,7 @@ export default function ActivityPage() {
       <MobileTopBar />
       <main className="activity-page-scroll">
         <h1 className="activity-page-title">Activité de la carte</h1>
-        <ActivityFeed limit={30} />
+        <MapActivityList limit={50} />
       </main>
       <BottomTabbar />
     </div>

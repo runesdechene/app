@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom'
 import { useState } from 'react'
 import { BottomTabbarPlusMenu } from './BottomTabbarPlusMenu'
-import { useNotificationStore } from '../../stores/notificationStore'
+import { useUnreadActivityCount } from '../../hooks/useUnreadActivityCount'
 import './BottomTabbar.css'
 
 export function BottomTabbar() {
   const [plusOpen, setPlusOpen] = useState(false)
 
-  // unreadCount est une fonction-getter dans le store (pas une propriété directe)
-  const unreadActivity = useNotificationStore((s) => s.unreadCount())
+  // Activité = events publics de la carte (toastStore), pas notifs perso (NotificationStore).
+  const unreadActivity = useUnreadActivityCount()
   // chatStore n'a pas de unread natif aujourd'hui — placeholder à 0.
   const unreadChat = 0
 
