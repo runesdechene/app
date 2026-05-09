@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { EmailChangeModal } from './EmailChangeModal'
+import { PushSettings } from '../notifications/PushSettings'
 import { supabase } from '../../lib/supabase'
 
 interface ProfileMenuProps {
@@ -150,6 +151,8 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
               👁️ Position GPS exacte
             </button>
           </div>
+
+          <PushSettings />
 
           <div className="profile-dropdown-divider" />
 

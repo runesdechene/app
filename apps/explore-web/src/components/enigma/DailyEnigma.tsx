@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
+import { useEnsurePushPermission } from '../../hooks/useEnsurePushPermission'
 import { EnigmaResult } from './EnigmaResult'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
@@ -65,6 +66,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
   const [freeAnswer, setFreeAnswer] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const ensurePush = useEnsurePushPermission()
   const [result, setResult] = useState<AnswerResult | null>(null)
   const [rpcError, setRpcError] = useState<string | null>(null)
   const [, setTotalGains] = useState({ influence: 0, erudition: 0 })
@@ -154,6 +156,14 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         setCrownsBalance(r.newCrownsBalance)
       }
       if (userId) void refreshLevelStateGlobal(userId)
+      // Well-timed prompt : on vient juste de résoudre l'énigme du jour,
+      // c'est l'instant idéal pour proposer les notifs (rituel quotidien).
+      // Le hook ne re-prompt jamais s'il a déjà été refusé une fois.
+      ensurePush({
+        reason: 'daily_enigma',
+        title: 'Veux-tu être prévenu chaque jour ?',
+        body:  'On te ping quand ton énigme du jour est prête.',
+      })
     }
     setSubmitting(false)
   }
