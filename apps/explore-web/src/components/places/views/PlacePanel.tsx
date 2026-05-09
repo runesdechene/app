@@ -873,7 +873,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               eraId={place.eraId ?? null}
               eraName={place.eraName ?? null}
               yearExact={place.yearExact ?? null}
-              onRefresh={refreshV05}
+              onRefresh={() => { refreshV05(); onRefetch() }}
             />
           </div>
         )}
