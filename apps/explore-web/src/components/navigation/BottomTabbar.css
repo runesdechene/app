@@ -26,21 +26,15 @@
   position: relative;
   transition: color 0.15s ease;
 }
-.bottom-tabbar-cell.active { color: var(--color-gold); }
-
-/* Indicateur de section active — span enfant explicite (pas ::before pour
-   éviter les bizarreries de cascade). Barre dorée 32x4px en haut de la
-   cellule active. */
-.bottom-tabbar-active-indicator {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 32px;
-  height: 4px;
-  background: var(--color-gold);
-  border-radius: 0 0 4px 4px;
-  pointer-events: none;
+/* Indicateur de section active : border-top dorée sur la cellule.
+   Approche brutale et garantie : pas de pseudo, pas de span absolute.
+   border-top transparent par défaut pour que la hauteur soit constante. */
+.bottom-tabbar-cell {
+  border-top: 4px solid transparent;
+}
+.bottom-tabbar-cell.active {
+  color: var(--color-gold);
+  border-top-color: var(--color-gold);
 }
 
 .bottom-tabbar-icon { font-size: 20px; line-height: 1; }
