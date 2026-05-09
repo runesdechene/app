@@ -1,23 +1,25 @@
 .places-section {
-  margin: 0 0 16px;
   font-family: var(--font-body);
   color: var(--color-ink);
 }
 
 .places-section-title {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--color-ink-light);
-  margin: 0 0 10px 16px;
+  margin: 0 0 12px;
   font-family: var(--font-accent);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
 }
 
-/* Carrousel horizontal — 9 lieux scrollables */
+/* Carrousel horizontal — 9 lieux scrollables.
+   Le margin négatif permet de déborder du padding 16px de la home-section
+   parente pour que le scroll horizontal aille bord à bord, et les cards
+   ne soient pas tronquées par le padding parent. */
 .places-section-scroll {
   display: flex;
   gap: 10px;
+  margin: 0 -16px;
   padding: 0 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
