@@ -5,10 +5,12 @@ import { useResourceTimers } from '../hooks/useResourceTimers'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { StatsBar } from '../components/home/StatsBar'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
+import { HomeQuestsBoard } from '../components/home/HomeQuestsBoard'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionModal } from '../components/auth/FactionModal'
 import { NotificationBell } from '../components/notifications/NotificationBell'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
+import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
 import logoImg from '../assets/logo_couleur_mobile.webp'
 import './HomePage.css'
 
@@ -17,6 +19,7 @@ export default function HomePage() {
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
+  const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
 
   // Initialiser fog state + énergie + couronnes (mêmes hooks que MapPage)
   usePlayer()
@@ -51,6 +54,8 @@ export default function HomePage() {
         refreshKey={enigmaRefreshKey}
       />
 
+      <HomeQuestsBoard onOpenExpedition={setSelectedExpeditionId} />
+
       <p className="home-page-skeleton">Sections à venir…</p>
 
       {showDailyEnigma && (
@@ -59,6 +64,12 @@ export default function HomePage() {
             setShowDailyEnigma(false)
             setEnigmaRefreshKey((k) => k + 1)
           }}
+        />
+      )}
+      {selectedExpeditionId && (
+        <ExpeditionModal
+          expeditionId={selectedExpeditionId}
+          onClose={() => setSelectedExpeditionId(null)}
         />
       )}
       {showFactionModal && <FactionModal onClose={() => setShowFactionModal(false)} />}
