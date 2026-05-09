@@ -43,14 +43,25 @@ interface PushPayload {
 }
 
 self.addEventListener('push', (event: PushEvent) => {
-  if (!event.data) return
-  let payload: PushPayload
-  try {
-    payload = event.data.json() as PushPayload
-  } catch {
-    return
+  // Robuste : on tente .json() puis .text(), avec fallback titre/body neutre.
+  // userVisibleOnly:true exige qu'on affiche TOUJOURS une notif visible —
+  // si on quitte sans showNotification, le navigateur affiche un fallback vide.
+  let payload: Partial<PushPayload> = {}
+  let rawText = ''
+  if (event.data) {
+    try {
+      payload = event.data.json() as Partial<PushPayload>
+    } catch {
+      try {
+        rawText = event.data.text()
+      } catch {
+        // ignore
+      }
+    }
   }
-  const { title, body, url } = payload
+  const title = payload.title || 'Runes de Chêne'
+  const body  = payload.body  || rawText || 'Tu as une nouvelle notification.'
+  const url   = payload.url   || '/'
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
