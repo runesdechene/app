@@ -470,6 +470,7 @@ export default function MapPage() {
           onClose={() => setSelectedPlaceId(null)}
           userEmail={user?.email ?? null}
           onAuthPrompt={() => setShowAuthModal(true)}
+          mobileFullscreen
         />
       )}
 
