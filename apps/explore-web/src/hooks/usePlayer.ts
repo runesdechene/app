@@ -239,9 +239,10 @@ export function usePlayer() {
             }
           }
 
-          // Ignorer ses propres actions (sauf likes et enigma_success)
+          // Ignorer ses propres actions (sauf celles qui méritent un feedback à
+          // l'auteur : likes, énigmes résolues, contributions sur fiche de lieu).
           const isSelf = e.actor_id === currentUserId
-          if (isSelf && e.type !== 'like' && e.type !== 'enigma_success') return
+          if (isSelf && e.type !== 'like' && e.type !== 'enigma_success' && e.type !== 'contribute') return
           // Ignorer le tracking interne fragment_enigma (pas un toast)
           if (e.type === 'fragment_enigma') return
 

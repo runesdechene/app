@@ -146,8 +146,17 @@ export async function loadRecentActivityToasts(currentUserId: string) {
       highlights.push(name)
       type = 'new_user'
     } else if (e.type === 'contribute') {
-      const contribType = e.data?.contributionType === 'photo' ? 'une photo' : 'un récit'
-      message = `${name} a ajouté ${contribType} sur ${place} 📜`
+      // V0.7 — wording aligné par contributionType (cf. usePlayer.ts ligne ~329)
+      const ct = e.data?.contributionType ?? 'carnet'
+      switch (ct) {
+        case 'photo':         message = `${name} a ajouté une photo de ${place} 📜`; break
+        case 'carnet':        message = `${name} a écrit un récit sur ${place} 📜`; break
+        case 'accessibility': message = `${name} a renseigné l'accessibilité de ${place}`; break
+        case 'season':        message = `${name} a renseigné la saison idéale de ${place}`; break
+        case 'warning':       message = `${name} a ajouté une mise en garde sur ${place}`; break
+        case 'epoch':         message = `${name} a renseigné l'époque de ${place}`; break
+        default:              message = `${name} a enrichi la fiche de ${place}`
+      }
       highlights.push(name, place)
       type = 'contribute'
       color = e.data?.factionColor ?? undefined
