@@ -6,6 +6,7 @@ import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { StatsBar } from '../components/home/StatsBar'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { HomeQuestsBoard } from '../components/home/HomeQuestsBoard'
+import { FragmentsCarousel } from '../components/home/FragmentsCarousel'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionModal } from '../components/auth/FactionModal'
 import { NotificationBell } from '../components/notifications/NotificationBell'
@@ -55,6 +56,8 @@ export default function HomePage() {
       />
 
       <HomeQuestsBoard onOpenExpedition={setSelectedExpeditionId} />
+
+      <FragmentsCarousel />
 
       <p className="home-page-skeleton">Sections à venir…</p>
 
