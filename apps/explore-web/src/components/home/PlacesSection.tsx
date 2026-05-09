@@ -21,15 +21,15 @@ interface Place {
 function formatTimeAgo(iso?: string): string {
   if (!iso) return ''
   const ms = Date.now() - new Date(iso).getTime()
-  if (ms < 60_000) return 'à l’instant'
+  if (ms < 60_000) return 'maintenant'
   const min = Math.floor(ms / 60_000)
-  if (min < 60) return `il y a ${min} min`
+  if (min < 60) return `${min}min`
   const h = Math.floor(min / 60)
-  if (h < 24) return `il y a ${h}h`
+  if (h < 24) return `${h}h`
   const d = Math.floor(h / 24)
-  if (d < 30) return `il y a ${d}j`
+  if (d < 30) return `${d}j`
   const mo = Math.floor(d / 30)
-  return `il y a ${mo} mois`
+  return `${mo}mo`
 }
 
 /**

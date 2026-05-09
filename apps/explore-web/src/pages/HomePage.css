@@ -53,6 +53,13 @@
   gap: 10px;
 }
 
+.home-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .home-card-title {
   margin: 0;
   font-family: var(--font-accent);
@@ -61,6 +68,23 @@
   text-transform: uppercase;
   color: var(--color-ink);
 }
+
+/* Bouton "Créer" — réplique de .qbp-cta-mini (carte desktop) :
+   marron foncé, parchemin texte, compact en haut à droite. */
+.home-card-cta-mini {
+  background: var(--color-ink);
+  color: var(--color-parchment);
+  border: none;
+  border-radius: 14px;
+  padding: 6px 12px;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.home-card-cta-mini:hover { background: #2c2018; }
 
 /* Bouton CTA "Créer une expédition" sous Événements & Quêtes */
 .home-section-cta {

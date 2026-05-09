@@ -1117,17 +1117,24 @@
   }
 }
 
-/* Notification panel — mobile */
+/* Notification panel — mobile : plein écran (couvre header partagé + navbar) */
 @media (max-width: 768px) {
   .notification-panel {
     position: fixed;
-    top: 120px;
+    top: 0;
     bottom: 0;
     right: 0;
     left: 0;
-    min-height: calc(100vh - 120px);
     width: auto;
+    max-height: none;
+    height: 100vh;
     border-radius: 0;
+    z-index: 200;
+  }
+  @supports (height: 100dvh) {
+    .notification-panel {
+      height: 100dvh;
+    }
   }
 }
 

@@ -136,6 +136,8 @@
 .places-section-card-time {
   white-space: nowrap;
   flex-shrink: 0;
+  font-size: 10px;
+  opacity: 0.75;
 }
 
 .places-section-card-sub {

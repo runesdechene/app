@@ -91,16 +91,18 @@ export default function HomePage() {
 
         <section className="home-section">
           <div className="home-card">
-            <h2 className="home-card-title">Événements & Quêtes</h2>
+            <header className="home-card-header">
+              <h2 className="home-card-title">Événements & Quêtes</h2>
+              <button
+                type="button"
+                className="home-card-cta-mini"
+                onClick={() => setCreatorOpen(true)}
+              >
+                + Créer
+              </button>
+            </header>
             <DailyQuestsList />
             <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
-            <button
-              type="button"
-              className="home-section-cta"
-              onClick={() => setCreatorOpen(true)}
-            >
-              + Créer une expédition
-            </button>
           </div>
         </section>
 
