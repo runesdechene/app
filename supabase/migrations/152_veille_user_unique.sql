@@ -303,6 +303,12 @@ BEGIN
       VALUES ('place_taken_remote', p_user_id, p_place_id, v_notif_data);
       INSERT INTO public.activity_log (type, actor_id, place_id, data)
       VALUES ('place_taken_remote_self', p_user_id, p_place_id, v_notif_data);
+
+      -- V152.1 : notif personnelle au veilleur user déchu (cas user-centric)
+      IF v_current_veilleur_user IS NOT NULL AND v_current_veilleur_user != p_user_id THEN
+        PERFORM public.notify(v_current_veilleur_user, 'place_taken_remote', v_notif_data);
+      END IF;
+      -- Legacy : notif aux membres de l'expé veilleuse legacy (groupes multi-membres)
       PERFORM public._notify_court_members(v_current_veilleur_exp, 'place_taken_remote', v_notif_data, p_user_id);
       PERFORM public.notify(p_user_id, 'place_taken_remote_self', v_notif_data);
     END IF;
@@ -322,6 +328,11 @@ BEGIN
       );
       INSERT INTO public.activity_log (type, actor_id, place_id, data)
       VALUES ('place_court_attack', p_user_id, p_place_id, v_notif_data);
+
+      -- V152.1 : notif perso au veilleur user
+      IF v_current_veilleur_user IS NOT NULL AND v_current_veilleur_user != p_user_id THEN
+        PERFORM public.notify(v_current_veilleur_user, 'place_court_attack', v_notif_data);
+      END IF;
       PERFORM public._notify_court_members(v_current_veilleur_exp, 'place_court_attack', v_notif_data, p_user_id);
     END IF;
 
@@ -338,6 +349,11 @@ BEGIN
       );
       INSERT INTO public.activity_log (type, actor_id, place_id, data)
       VALUES ('place_court_high_threat', p_user_id, p_place_id, v_notif_data);
+
+      -- V152.1 : notif perso au veilleur user
+      IF v_current_veilleur_user IS NOT NULL AND v_current_veilleur_user != p_user_id THEN
+        PERFORM public.notify(v_current_veilleur_user, 'place_court_high_threat', v_notif_data);
+      END IF;
       PERFORM public._notify_court_members(v_current_veilleur_exp, 'place_court_high_threat', v_notif_data, p_user_id);
     END IF;
   END IF;
