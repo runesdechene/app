@@ -8,10 +8,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 0 calc(16px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, #f4ecd8, #e6dcc4);
-  border-top: 1px solid #8a6a3a;
-  box-shadow: 0 -6px 20px rgba(42, 36, 24, 0.2);
-  font-family: Georgia, serif;
+  background: var(--color-parchment);
+  border-top: 1px solid var(--color-sepia);
+  box-shadow: 0 -6px 20px rgba(74, 55, 40, 0.18);
+  font-family: var(--font-accent);
 }
 
 .bottom-tabbar::before {
@@ -21,7 +21,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #8a6a3a, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-sepia), transparent);
   pointer-events: none;
 }
 
@@ -33,16 +33,17 @@
   gap: 4px;
   padding: 4px 0;
   text-decoration: none;
-  color: #5a4a2a;
+  color: var(--color-ink-light);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 12px;
   font-weight: 600;
+  font-family: var(--font-accent);
   transition: color 0.2s ease;
 }
 
 .bottom-tabbar-cell.active {
-  color: #2a1808;
+  color: var(--color-ink);
 }
 
 .bottom-tabbar-icon {
@@ -63,13 +64,13 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff5d8, #d4a857 60%, #7a5a2a);
-  border: 2px solid #f4ecd8;
-  box-shadow: 0 0 0 1px #8a6a3a, 0 4px 12px rgba(42, 36, 24, 0.4);
-  color: #5a3a18;
+  background: radial-gradient(circle at 35% 35%, var(--color-parchment), var(--color-sepia) 70%, var(--color-sepia-dark));
+  border: 2px solid var(--color-parchment);
+  box-shadow: 0 0 0 1px var(--color-sepia-dark), 0 4px 12px rgba(74, 55, 40, 0.4);
+  color: var(--color-ink);
   font-size: 30px;
   font-weight: 300;
-  font-family: Georgia, serif;
+  font-family: var(--font-title);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -79,4 +80,11 @@
 
 .bottom-tabbar-plus:active {
   transform: translateX(-50%) scale(0.95);
+}
+
+/* Desktop : tabbar cachée — la nav se fait via le panel split (V1.3) */
+@media screen and (min-width: 750px) {
+  .bottom-tabbar {
+    display: none;
+  }
 }

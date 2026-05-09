@@ -1,16 +1,17 @@
 .activity-feed {
   margin: 0 16px 24px;
-  font-family: Georgia, serif;
-  color: #2a1808;
+  font-family: var(--font-body);
+  color: var(--color-ink);
 }
 
 .activity-feed-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #5a3a18;
+  color: var(--color-ink-light);
   margin: 0 0 10px;
+  font-family: var(--font-accent);
 }
 
 .activity-feed-list {
@@ -27,8 +28,8 @@
   align-items: flex-start;
   gap: 12px;
   padding: 10px 12px;
-  background: rgba(244, 236, 216, 0.55);
-  border: 1px solid rgba(138, 106, 58, 0.2);
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
   border-radius: 8px;
 }
 
@@ -41,11 +42,13 @@
 .activity-feed-text {
   font-size: 14px;
   line-height: 1.4;
+  color: var(--color-ink);
 }
 
 .activity-feed-time {
   font-size: 12px;
-  opacity: 0.6;
+  color: var(--color-ink-light);
   font-style: italic;
+  font-family: var(--font-signature);
   margin-top: 2px;
 }

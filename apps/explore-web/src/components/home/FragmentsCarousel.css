@@ -4,12 +4,12 @@
 }
 
 .fragments-carousel-title {
-  font-family: Georgia, serif;
-  font-size: 14px;
+  font-family: var(--font-accent);
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #5a3a18;
+  color: var(--color-ink-light);
   margin: 0 0 10px 16px;
 }
 
@@ -26,13 +26,14 @@
 .fragments-carousel-card {
   flex: 0 0 auto;
   width: 120px;
-  background: rgba(244, 236, 216, 0.9);
-  border: 1px solid rgba(138, 106, 58, 0.4);
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
   border-radius: 12px;
   padding: 8px;
   cursor: pointer;
   transition: transform 0.15s ease;
-  font-family: Georgia, serif;
+  font-family: var(--font-body);
+  color: var(--color-ink);
 }
 
 .fragments-carousel-card:active { transform: scale(0.97); }
@@ -42,7 +43,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: rgba(122, 90, 42, 0.1);
+  background: var(--color-parchment);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -61,7 +62,7 @@
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  color: rgba(122, 90, 42, 0.6);
+  color: var(--color-sepia-dark);
 }
 
 .fragments-carousel-owned-badge {
@@ -70,8 +71,8 @@
   right: 6px;
   width: 22px;
   height: 22px;
-  background: #2a1808;
-  color: #f4ecd8;
+  background: var(--color-ink);
+  color: var(--color-parchment);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -83,10 +84,11 @@
 .fragments-carousel-name {
   margin-top: 6px;
   font-size: 13px;
-  color: #2a1808;
+  color: var(--color-ink);
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: var(--font-accent);
 }

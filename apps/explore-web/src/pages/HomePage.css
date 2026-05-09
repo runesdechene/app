@@ -1,7 +1,13 @@
+/* HomePage — page d'accueil loggée. Utilise les tokens parchemin de l'app. */
+
 .home-page {
-  min-height: 100dvh;
-  background-color: #eee8dc;
-  padding-bottom: 96px; /* place pour la BottomTabbar */
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: var(--color-parchment);
+  color: var(--color-ink);
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  font-family: var(--font-body);
 }
 
 .home-topbar {
@@ -9,13 +15,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(180deg, rgba(244, 236, 216, 0.95), rgba(238, 232, 220, 0.85));
-  border-bottom: 1px solid rgba(138, 106, 58, 0.3);
+  background: var(--color-parchment);
+  border-bottom: 1px solid var(--color-sepia);
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 .home-topbar-logo {
@@ -31,8 +35,15 @@
 
 .home-page-skeleton {
   padding: 32px 16px;
-  font-family: Georgia, serif;
-  color: #5a3a18;
+  font-family: var(--font-signature);
+  color: var(--color-ink-light);
   font-style: italic;
   text-align: center;
+}
+
+/* Sur desktop la BottomTabbar est cachée (cf. V1.3 — split view) — pas besoin de padding */
+@media screen and (min-width: 750px) {
+  .home-page {
+    padding-bottom: 0;
+  }
 }
