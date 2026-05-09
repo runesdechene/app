@@ -19,6 +19,13 @@
   border-radius: 10px;
   color: var(--color-ink);
   min-width: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.stats-cell:active {
+  transform: scale(0.97);
+  background: var(--color-parchment);
 }
 
 .stats-cell-icon {

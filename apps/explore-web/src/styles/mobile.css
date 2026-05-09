@@ -433,6 +433,23 @@
     }
   }
 
+  /* Mode mobileFullscreen — utilisé sur /accueil pour couvrir intégralement
+     l'interface (au-dessus du MobileTopBar/MobileStatsBar et de la BottomTabbar). */
+  .place-panel.place-panel--mobile-fullscreen {
+    top: 0;
+    height: 100vh;
+    padding-bottom: var(--safe-bottom, 0px);
+    z-index: 100;
+  }
+  @supports (height: 100dvh) {
+    .place-panel.place-panel--mobile-fullscreen {
+      height: 100dvh;
+    }
+  }
+  .place-panel-backdrop.place-panel-backdrop--mobile-fullscreen {
+    z-index: 99;
+  }
+
   .place-panel-open {
     opacity: 1;
     pointer-events: auto;

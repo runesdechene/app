@@ -5,6 +5,7 @@
 
 .places-section-title {
   margin: 0 0 12px;
+  padding: 0 16px;
   font-family: var(--font-accent);
   font-size: 16px;
   letter-spacing: 0.06em;
@@ -12,16 +13,15 @@
   color: var(--color-ink);
 }
 
-/* Carrousel horizontal — 9 lieux scrollables.
-   margin négatif des 2 côtés → le scroll occupe toute la largeur du viewport.
-   Padding interne 16px → la première card commence à 16px du bord (alignée
-   sur le titre) ET la dernière card a 16px d'air à droite quand scrollée.
-   Quand on scroll, les cards disparaissent BORD à BORD du viewport (pas
-   tronquées à 16px du bord). */
+/* Carrousel horizontal — 9 lieux scrollables, bord à bord.
+   La section parente n'a plus de padding horizontal (.home-section--no-padding).
+   Le scroll s'étend sur toute la largeur, padding interne 16px gauche/droite
+   pour aligner la première card avec le titre et donner de l'air à la
+   dernière card. Quand on scroll, les cards disparaissent BORD à BORD du
+   viewport. */
 .places-section-scroll {
   display: flex;
   gap: 10px;
-  margin: 0 -16px;
   padding: 0 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;

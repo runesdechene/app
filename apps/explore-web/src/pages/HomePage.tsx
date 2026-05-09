@@ -104,7 +104,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="home-section">
+        <section className="home-section home-section--no-padding">
           <PlacesSection />
         </section>
 
@@ -160,6 +160,7 @@ export default function HomePage() {
         placeId={selectedPlaceId}
         onClose={() => setSelectedPlaceId(null)}
         userEmail={user?.email ?? null}
+        mobileFullscreen
       />
       {/* Modale profil joueur — clic sur un nom dans MapActivityList. */}
       {selectedPlayerId && (
