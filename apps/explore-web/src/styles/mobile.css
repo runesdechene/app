@@ -519,10 +519,9 @@
     display: none;
   }
 
-  /* --- Add Place FAB --- */
+  /* --- Add Place FAB : caché sur mobile (doublon avec le + de la BottomTabbar) --- */
   .add-place-fab {
-    width: 56px;
-    height: 56px;
+    display: none;
   }
 
   /* --- Version Badge --- */
