@@ -14,6 +14,23 @@
   display: none;
 }
 
+/* ==========================================
+   MAP MOBILE HEADER FIXED
+   Wrapper fixe pour MobileTopBar + MobileStatsBar sur /carte mobile.
+   Permet de superposer le bandeau au-dessus de MapLibre (position: absolute).
+   Masqué sur desktop via le {!isDesktop} conditionnel JSX.
+   ========================================== */
+
+.map-mobile-header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+}
+
 .offline-indicator {
   position: fixed;
   top: calc(var(--safe-top, 0px) + 52px);
@@ -212,7 +229,7 @@
   .mobile-energy-slot {
     display: flex;
     position: absolute;
-    top: calc(var(--safe-top, 0px) + 120px);
+    top: calc(var(--safe-top, 0px) + 220px);
     right: 7px;
     z-index: 10;
   }
@@ -344,7 +361,7 @@
 
   /* --- Game Toast --- */
   .game-toast-container {
-    top: calc(var(--safe-top, 0px) + 48px);
+    top: calc(var(--safe-top, 0px) + 130px);
     left: 8px;
     max-width: calc(100vw - 140px);
     padding: 6px;
@@ -394,13 +411,13 @@
     padding: 12px;
   }
 
-  /* --- Place Panel (fullscreen under navbar on mobile) --- */
+  /* --- Place Panel (fullscreen under header on mobile) --- */
   .place-panel {
     width: 100%;
-    top: 60px;
+    top: 120px;
     left: 0;
     max-height: none;
-    height: calc(100vh - 48px);
+    height: calc(100vh - 120px);
     border-radius: 0;
     box-shadow: none;
     transform: none;
@@ -412,7 +429,7 @@
 
   @supports (height: 100dvh) {
     .place-panel {
-      height: calc(100dvh - 60px);
+      height: calc(100dvh - 120px);
     }
   }
 
@@ -484,7 +501,7 @@
   /* --- MapLibre Controls — bas gauche, au-dessus du bouton layers --- */
   .maplibregl-ctrl-top-right {
     top: auto !important;
-    bottom: calc(var(--safe-bottom, 0px) + 150px) !important;
+    bottom: calc(var(--safe-bottom, 0px) + 160px) !important;
     right: auto !important;
     left: 8px !important;
   }
@@ -841,9 +858,9 @@
     z-index: 9999;
   }
 
-  /* Toolbar descend sous le header */
+  /* Toolbar descend sous le bandeau mobile (MobileTopBar ~50px + MobileStatsBar ~70px = ~120px) */
   .app-toolbar {
-    top: calc(var(--safe-top, 0px) + 60px);
+    top: calc(var(--safe-top, 0px) + 120px);
     padding-top: 6px;
     justify-content: left;
     background: transparent;
@@ -854,7 +871,7 @@
   /* Date référentiel sous la toolbar */
   .calendar-date-wrapper {
     position: fixed;
-    top: calc(var(--safe-top, 0px) + 60px + 110px);
+    top: calc(var(--safe-top, 0px) + 120px + 110px);
     left: 8px;
     right: auto;
     z-index: 14;
@@ -901,11 +918,10 @@
     overflow-y: auto;
     z-index: 9000;
     border-radius: 0;
-    padding-top: calc(var(--safe-top, 0px) + 12px);
-    padding-bottom: calc(var(--safe-bottom, 0px) + 60px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 70px);
     background: rgba(252, 241, 214, 0.97);
     backdrop-filter: blur(10px);
-    padding-top: 70px;
+    padding-top: calc(var(--safe-top, 0px) + 130px);
   }
 
 [data-mobile-panel="notifications"] .game-toast
@@ -923,7 +939,7 @@
 
   .influence-area
   {
-    bottom: calc(var(--safe-bottom, 0px) + 65px);
+    bottom: calc(var(--safe-bottom, 0px) + 70px);
     top: auto;
     right: 8px;
   }
@@ -950,7 +966,7 @@
 
   .conquest-indicator
   {
-    top: calc(var(--safe-top, 0px) + 120px);
+    top: calc(var(--safe-top, 0px) + 220px);
     bottom: auto;
     left: 7px;
     right: auto;
@@ -960,14 +976,14 @@
     display: flex !important;
     position: fixed;
     top: 0;
-    bottom: calc(var(--safe-bottom, 0px) + 52px);
+    bottom: calc(var(--safe-bottom, 0px) + 64px);
     left: 0;
     right: 0;
     height: auto;
     width: auto;
     border-radius: 0;
     z-index: 9000;
-    padding-top: calc(var(--safe-top, 0px) + 8px);
+    padding-top: calc(var(--safe-top, 0px) + 130px);
     background: rgba(250, 231, 212, 0.97);
     backdrop-filter: blur(10px);
   }
@@ -985,7 +1001,7 @@
     display: flex !important;
     position: fixed;
     top: 0;
-    bottom: calc(var(--safe-bottom, 0px) + 52px);
+    bottom: calc(var(--safe-bottom, 0px) + 64px);
     left: 0;
     right: 0;
     width: auto;
@@ -995,9 +1011,8 @@
     border-radius: 0;
     border: none;
     z-index: 9000;
-    /* La mobile-header (z 9998) fait safe-top + 6 + 44 + 6 = safe-top + 56px.
-       On laisse 8px de respiration sous le bord inférieur de la header. */
-    padding-top: calc(var(--safe-top, 0px) + 70px);
+    /* MobileTopBar (~50px) + MobileStatsBar (~70px) = ~120px + respiration = 130px */
+    padding-top: calc(var(--safe-top, 0px) + 130px);
     background: rgba(250, 231, 212, 0.97);
     backdrop-filter: blur(10px);
   }
@@ -1060,26 +1075,26 @@
     display: none;
   }
 
-  /* --- Ajuster positions avec la navbar en bas --- */
+  /* --- Ajuster positions avec la BottomTabbar en bas (64px) --- */
   .add-place-fab {
-    bottom: calc(var(--safe-bottom, 0px) + 76px);
+    bottom: calc(var(--safe-bottom, 0px) + 80px);
     left: 50%;
     font-weight: 300;
     transform: translateX(-50%);
   }
 
   .version-badge {
-    bottom: calc(var(--safe-bottom, 0px) + 65px);
+    bottom: calc(var(--safe-bottom, 0px) + 70px);
   }
 
   .install-prompt {
-    bottom: calc(var(--safe-bottom, 0px) + 68px);
+    bottom: calc(var(--safe-bottom, 0px) + 72px);
   }
 
   /* Bouton style carte — bas gauche, au-dessus du badge version */
   .map-style-select {
     top: auto;
-    bottom: calc(var(--safe-bottom, 0px) + 100px);
+    bottom: calc(var(--safe-bottom, 0px) + 108px);
     left: 8px;
     right: auto;
   }
@@ -1089,11 +1104,11 @@
 @media (max-width: 768px) {
   .notification-panel {
     position: fixed;
-    top: 60px;
+    top: 120px;
     bottom: 0;
     right: 0;
     left: 0;
-    min-height: 100vh;
+    min-height: calc(100vh - 120px);
     width: auto;
     border-radius: 0;
   }

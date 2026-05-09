@@ -31,8 +31,12 @@ import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
 import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
-import { MobileHeader } from '../components/map/controls/MobileHeader'
+// MobileHeader legacy — import supprimé (composant désactivé, remplacé par MobileTopBar partagée)
 import { useMobileNavStore } from '../stores/mobileNavStore'
+import { useIsDesktop } from '../hooks/useMediaQuery'
+import { MobileTopBar } from '../components/navigation/MobileTopBar'
+import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
+import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { AdScreen } from '../components/map/overlays/AdScreen'
@@ -314,6 +318,7 @@ export default function MapPage() {
   }
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
+  const isDesktop = useIsDesktop()
 
   return (
     <div className="app" data-mobile-panel={mobilePanel || ''}>
@@ -323,6 +328,15 @@ export default function MapPage() {
       {showAdScreen && isAuthenticated && !authLoading && (
         <AdScreen onDone={() => setShowAdScreen(false)} />
       )}
+
+      {/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
+      {!isDesktop && (
+        <div className="map-mobile-header-fixed">
+          <MobileTopBar fadeOutBottom onFactionModal={() => setShowFactionModal(true)} />
+          <MobileStatsBar fadeOutBottom />
+        </div>
+      )}
+
       <ExploreMap />
       <InstallPrompt />
       <OfflineIndicator />
@@ -339,13 +353,15 @@ export default function MapPage() {
           <ExpeditionsHud />
         </div>
       )}
-      {!addPlaceMode && !authLoading && isAuthenticated && <ChatPanel />}
+      {/* ChatPanel flottant : desktop uniquement. Sur mobile, le chat passe par /chat. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <ChatPanel />}
       {!addPlaceMode && !authLoading && isAuthenticated && isAdmin && <VoronoiTuningPanel />}
 
-      {/* Header mobile (logo + hamburger, masqué sur desktop) */}
-      {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
-        <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
-      )}
+      {/* MobileHeader legacy — désactivé : remplacé par MobileTopBar + MobileStatsBar ci-dessus.
+          Garder l'import pour éviter une refacto partielle (chore: remove legacy MobileHeader plus tard).
+          {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
+            <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
+          )} */}
 
       {/* Bouton Boutique permanent desktop (masqué sur mobile + quand auth modal ouverte) */}
       {!addPlaceMode && !showAuthModal && (
@@ -533,8 +549,13 @@ export default function MapPage() {
 
       {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
 
-      {/* Navbar mobile (masquée sur desktop via CSS) */}
-      {!addPlaceMode && !authLoading && isAuthenticated && <MobileNavbar />}
+      {/* MobileNavbar legacy — supprimée sur mobile (remplacée par BottomTabbar partagée).
+          Reste montée uniquement sur desktop pour ne pas casser les data-mobile-panel= CSS existants
+          si jamais ce code est atteint sur desktop (MobileNavbar est de toute façon invisible via CSS). */}
+      {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <MobileNavbar />}
+
+      {/* BottomTabbar partagée — masquée sur desktop via CSS (min-width: 750px → display:none) */}
+      {!isDesktop && <BottomTabbar />}
 
       {/* V0.7 — Modales niveau */}
       {pendingLevelUp && (
