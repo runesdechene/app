@@ -1,0 +1,121 @@
+.places-section {
+  margin: 0 0 16px;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+}
+
+.places-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-light);
+  margin: 0 0 8px 16px;
+  font-family: var(--font-accent);
+}
+
+.places-section-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 16px 12px;
+}
+
+.places-section-tab {
+  padding: 6px 14px;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-sepia);
+  border-radius: 14px;
+  color: var(--color-ink-light);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.places-section-tab.active {
+  background: var(--color-ink-light);
+  border-color: var(--color-ink-light);
+  color: var(--color-parchment);
+}
+
+/* Carrousel horizontal — même pattern que FragmentsCarousel */
+.places-section-track {
+  display: flex;
+  gap: 10px;
+  padding: 0 16px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.places-section-track::-webkit-scrollbar { display: none; }
+
+.places-section-card {
+  flex: 0 0 auto;
+  width: 140px;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+}
+
+.places-section-card:active { transform: scale(0.97); }
+
+.places-section-card-img-wrapper {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--color-parchment);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.places-section-card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.places-section-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--color-sepia-dark);
+}
+
+.places-section-card-name {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--color-ink);
+  font-weight: 700;
+  font-family: var(--font-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.places-section-card-sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--color-ink-light);
+  font-style: italic;
+  font-family: var(--font-signature);
+}
+
+.places-section-fallback,
+.places-section-empty,
+.places-section-loading {
+  font-size: 14px;
+  font-style: italic;
+  font-family: var(--font-signature);
+  color: var(--color-ink-light);
+  margin: 8px 16px;
+}

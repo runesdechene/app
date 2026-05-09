@@ -1,0 +1,66 @@
+.enigma-fragments-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: -8px 16px 16px; /* -8px : se serre contre le DailyEnigmaCard au-dessus */
+  padding: 4px 0;
+}
+
+.enigma-fragment-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  transition: transform 0.15s ease;
+}
+
+.enigma-fragment-icon:not(.done):hover {
+  transform: translateY(-2px);
+}
+
+.enigma-fragment-icon:active:not(.done) {
+  transform: scale(0.95);
+}
+
+.enigma-fragment-icon.done {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.enigma-fragment-icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 18px;
+}
+
+.enigma-fragment-icon:not(.done) .enigma-fragment-icon-bubble {
+  /* Halo doré subtil pour signaler "dispo" */
+  box-shadow: 0 0 0 2px var(--color-sepia), 0 0 8px rgba(193, 154, 107, 0.4);
+}
+
+.enigma-fragment-icon-bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.enigma-fragment-icon-timer {
+  font-size: 11px;
+  color: var(--color-ink-light);
+  font-family: var(--font-accent);
+  font-weight: 600;
+  line-height: 1;
+}
