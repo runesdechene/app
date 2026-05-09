@@ -3,6 +3,49 @@
    ========================================== */
 
 /* ==========================================
+   MODALES PLEIN ÉCRAN MOBILE — CONVENTION PARTAGÉE
+   ==========================================
+   Toute modale qui doit prendre tout l'écran sur mobile (transformation
+   modale → page) doit utiliser ces 2 classes utility plutôt que de
+   redéfinir ses propres règles.
+
+   Usage :
+     <div className="my-modal-overlay modal-mobile-fullscreen-backdrop">
+       <div className="my-modal modal-mobile-fullscreen">...</div>
+     </div>
+
+   Les valeurs de z-index sont calibrées pour passer AU-DESSUS de
+   .map-mobile-header-fixed (z-index 9998) qui overlay la carte sur
+   /carte mobile. Sur les autres pages le header partagé est en flux
+   normal (z-index ~10), pas de conflit.
+   ========================================== */
+@media (max-width: 768px) {
+  .modal-mobile-fullscreen {
+    position: fixed !important;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
+    z-index: 9999;
+    overflow-y: auto;
+  }
+  @supports (height: 100dvh) {
+    .modal-mobile-fullscreen {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+  }
+
+  .modal-mobile-fullscreen-backdrop {
+    z-index: 9998;
+  }
+}
+
+/* ==========================================
    MOBILE NAVBAR (masquee sur desktop)
    ========================================== */
 
@@ -418,22 +461,8 @@
     }
   }
 
-  /* Mode mobileFullscreen — utilisé sur /accueil pour couvrir intégralement
-     l'interface (au-dessus du MobileTopBar/MobileStatsBar et de la BottomTabbar). */
-  .place-panel.place-panel--mobile-fullscreen {
-    top: 0;
-    height: 100vh;
-    padding-bottom: var(--safe-bottom, 0px);
-    z-index: 100;
-  }
-  @supports (height: 100dvh) {
-    .place-panel.place-panel--mobile-fullscreen {
-      height: 100dvh;
-    }
-  }
-  .place-panel-backdrop.place-panel-backdrop--mobile-fullscreen {
-    z-index: 99;
-  }
+  /* Mode mobileFullscreen pour PlacePanel : sizing/z-index gérés par
+     .modal-mobile-fullscreen ajouté au className. Plus de règles dédiées. */
 
   .place-panel-open {
     opacity: 1;
@@ -530,22 +559,10 @@
      - Largeur : 78vw au lieu de 95vw → ne touche plus les bords écran.
      - Hauteur : 72vh + padding bottom 150px → s'arrête au-dessus du FAB "+".
      - Paddings/avatars/fonts internes réduits pour densité. */
+  /* leaderboard-overlay/modal : sizing/z-index gérés par .modal-mobile-fullscreen
+     ajouté au className dans le composant. On garde juste le reset padding. */
   .leaderboard-overlay {
     padding: 0;
-  }
-
-  .leaderboard-modal {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-  @supports (height: 100dvh) {
-    .leaderboard-modal {
-      height: 100dvh;
-      max-height: 100dvh;
-    }
   }
 
   .leaderboard-title {
@@ -1112,29 +1129,8 @@
   }
 }
 
-/* Notification panel — mobile : plein écran (couvre header partagé + navbar).
-   z-index 9999 pour passer au-dessus de .map-mobile-header-fixed (9998) sur
-   /carte mobile. Sur les autres pages le header partagé a un z-index plus
-   bas (~10), pas de conflit. */
-@media (max-width: 768px) {
-  .notification-panel {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: auto;
-    max-height: none;
-    height: 100vh;
-    border-radius: 0;
-    z-index: 9999;
-  }
-  @supports (height: 100dvh) {
-    .notification-panel {
-      height: 100dvh;
-    }
-  }
-}
+/* Notification panel — mobile : utilise la convention .modal-mobile-fullscreen
+   ajoutée au className dans le composant. Plus de règles CSS dédiées ici. */
 
 /* ==========================================
    PlayerProfileModal — refonte mobile (2026-05-02 Uriel) :

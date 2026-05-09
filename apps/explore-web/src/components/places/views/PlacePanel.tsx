@@ -41,9 +41,9 @@ export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt, mobileFu
 
   return (
     <>
-      {isOpen && <div className={`place-panel-backdrop${mobileFullscreen ? ' place-panel-backdrop--mobile-fullscreen' : ''}`} onClick={onClose} />}
+      {isOpen && <div className={`place-panel-backdrop${mobileFullscreen ? ' modal-mobile-fullscreen-backdrop' : ''}`} onClick={onClose} />}
 
-      <div className={`place-panel${isOpen ? ' place-panel-open' : ''}${mobileFullscreen ? ' place-panel--mobile-fullscreen' : ''}`}>
+      <div className={`place-panel${isOpen ? ' place-panel-open' : ''}${mobileFullscreen ? ' modal-mobile-fullscreen' : ''}`}>
         {loading && (
           <div className="place-panel-loading">
             <p>Chargement...</p>
