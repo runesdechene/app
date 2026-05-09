@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ExploreMap } from '../components/map/core/ExploreMap'
 import { EnergyIndicator } from '../components/map/badges/EnergyIndicator'
 import { CrownsBadge } from '../components/map/badges/CrownsBadge'
@@ -124,8 +125,23 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
 }
 
 export default function MapPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const selectedPlaceId = useMapStore(state => state.selectedPlaceId)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
+
+  // Deeplink ?placeId=... (depuis la HomePage notamment)
+  useEffect(() => {
+    const placeIdParam = searchParams.get('placeId')
+    if (placeIdParam) {
+      setSelectedPlaceId(placeIdParam)
+      // Nettoyer le param de l'URL pour éviter ré-ouverture en boucle au refresh
+      const next = new URLSearchParams(searchParams)
+      next.delete('placeId')
+      setSearchParams(next, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const selectedPlayerId = useMapStore(state => state.selectedPlayerId)
   const setSelectedPlayerId = useMapStore(state => state.setSelectedPlayerId)
   const { user, isAuthenticated, signOut, loading: authLoading } = useAuth()

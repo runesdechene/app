@@ -1,0 +1,86 @@
+.places-section {
+  margin: 0 16px 16px;
+  font-family: Georgia, serif;
+  color: #2a1808;
+}
+
+.places-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5a3a18;
+  margin: 0 0 8px;
+}
+
+.places-section-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.places-section-tab {
+  padding: 6px 14px;
+  background: rgba(244, 236, 216, 0.6);
+  border: 1px solid rgba(138, 106, 58, 0.3);
+  border-radius: 14px;
+  color: #5a3a18;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.places-section-tab.active {
+  background: #5a3a18;
+  border-color: #5a3a18;
+  color: #f4ecd8;
+}
+
+.places-section-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.places-section-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px;
+  background: rgba(244, 236, 216, 0.85);
+  border: 1px solid rgba(138, 106, 58, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: Georgia, serif;
+  color: #2a1808;
+  transition: transform 0.15s ease;
+}
+
+.places-section-card:active { transform: scale(0.99); }
+
+.places-section-card-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.places-section-card-title { font-size: 15px; font-weight: 700; }
+.places-section-card-sub { font-size: 12px; opacity: 0.7; font-style: italic; margin-top: 2px; }
+
+.places-section-fallback,
+.places-section-empty,
+.places-section-loading {
+  font-size: 14px;
+  font-style: italic;
+  opacity: 0.7;
+  margin: 8px 0;
+}
