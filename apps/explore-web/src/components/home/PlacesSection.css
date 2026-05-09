@@ -14,21 +14,21 @@
 }
 
 /* Carrousel horizontal — 9 lieux scrollables, bord à bord.
-   La section parente n'a plus de padding horizontal (.home-section--no-padding).
-   Le scroll s'étend sur toute la largeur, padding interne 16px gauche/droite
-   pour aligner la première card avec le titre et donner de l'air à la
-   dernière card. Quand on scroll, les cards disparaissent BORD à BORD du
-   viewport. */
+   On utilise des margins sur la première et dernière card plutôt qu'un
+   padding sur le scroll : Chromium ignore parfois le padding-end avec
+   overflow-x:auto + flex. Avec des margins explicites, c'est robuste. */
 .places-section-scroll {
   display: flex;
   gap: 10px;
-  padding: 0 16px;
+  padding: 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 .places-section-scroll::-webkit-scrollbar { display: none; }
+.places-section-scroll > :first-child { margin-left: 16px; }
+.places-section-scroll > :last-child { margin-right: 16px; }
 
 .places-section-card {
   flex: 0 0 45%;
