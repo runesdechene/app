@@ -1112,7 +1112,10 @@
   }
 }
 
-/* Notification panel — mobile : plein écran (couvre header partagé + navbar) */
+/* Notification panel — mobile : plein écran (couvre header partagé + navbar).
+   z-index 9999 pour passer au-dessus de .map-mobile-header-fixed (9998) sur
+   /carte mobile. Sur les autres pages le header partagé a un z-index plus
+   bas (~10), pas de conflit. */
 @media (max-width: 768px) {
   .notification-panel {
     position: fixed;
@@ -1124,7 +1127,7 @@
     max-height: none;
     height: 100vh;
     border-radius: 0;
-    z-index: 200;
+    z-index: 9999;
   }
   @supports (height: 100dvh) {
     .notification-panel {
