@@ -6,6 +6,14 @@
   [headers.values]
     Content-Security-Policy = "frame-ancestors https://runesdechene.com https://*.runesdechene.com https://*.myshopify.com"
 
+# Canonicalisation : carte.runesdechene.com (legacy) → app.runesdechene.com (PWA canonical).
+# Doit rester AVANT le SPA fallback `/*` pour ne pas être intercepté.
+[[redirects]]
+  from = "https://carte.runesdechene.com/*"
+  to = "https://app.runesdechene.com/:splat"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/lieu/*"
   to = "https://rdc-seo-pages.netlify.app/lieu/:splat"
