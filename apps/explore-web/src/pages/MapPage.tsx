@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useIsDesktop } from '../hooks/useMediaQuery'
 import { ExploreMap } from '../components/map/core/ExploreMap'
 import { EnergyIndicator } from '../components/map/badges/EnergyIndicator'
 import { CrownsBadge } from '../components/map/badges/CrownsBadge'
@@ -126,6 +127,7 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
 
 export default function MapPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const isDesktopSplit = useIsDesktop()
   const selectedPlaceId = useMapStore(state => state.selectedPlaceId)
   const setSelectedPlaceId = useMapStore(state => state.setSelectedPlaceId)
 
@@ -409,7 +411,9 @@ export default function MapPage() {
       {/* Flow ajout de lieu (immersif) */}
       {addPlaceMode && <AddPlaceFlow />}
 
-      {!addPlaceMode && (
+      {/* PlacePanel : monté ici uniquement sur mobile.
+          Sur desktop split, il est monté dans MainShell (panel gauche). */}
+      {!addPlaceMode && !isDesktopSplit && (
         <PlacePanel
           placeId={selectedPlaceId}
           onClose={() => setSelectedPlaceId(null)}

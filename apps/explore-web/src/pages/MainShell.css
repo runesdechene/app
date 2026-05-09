@@ -27,6 +27,7 @@
 .main-shell-panel-inner {
   width: 460px;
   height: 100%;
+  position: relative; /* permet au PlacePanel "in-panel" (position: absolute) de se positionner */
 }
 
 .main-shell-collapsed .main-shell-panel {

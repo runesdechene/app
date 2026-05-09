@@ -29,17 +29,21 @@ interface PlacePanelProps {
   onClose: () => void
   userEmail: string | null
   onAuthPrompt?: () => void
+  /** "modal" (défaut) → affichage centré sur l'écran avec backdrop (mobile + desktop classique).
+   *  "in-panel"        → affichage en panel gauche (desktop split-view) — pas de backdrop, taille du parent. */
+  mode?: 'modal' | 'in-panel'
 }
 
-export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt }: PlacePanelProps) {
+export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt, mode = 'modal' }: PlacePanelProps) {
   const { place, loading, error, refetch } = usePlace(placeId)
   const isOpen = placeId !== null
+  const variantClass = mode === 'in-panel' ? 'place-panel--in-panel' : ''
 
   return (
     <>
-      {isOpen && <div className="place-panel-backdrop" onClick={onClose} />}
+      {isOpen && mode === 'modal' && <div className="place-panel-backdrop" onClick={onClose} />}
 
-      <div className={`place-panel ${isOpen ? 'place-panel-open' : ''}`}>
+      <div className={`place-panel ${variantClass} ${isOpen ? 'place-panel-open' : ''}`}>
         {loading && (
           <div className="place-panel-loading">
             <p>Chargement...</p>
