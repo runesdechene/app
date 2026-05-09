@@ -5,6 +5,7 @@ import {
   pushSupportStatus,
   subscribeUser,
   unsubscribeUser,
+  usePushSubStore,
 } from '../../lib/pushNotifications'
 import './PushSettings.css'
 
@@ -12,10 +13,10 @@ export function PushSettings() {
   const userId = usePlayerStore((s) => s.userId)
   const [important, setImportant] = useState(true)
   const [recap, setRecap] = useState(true)
-  // hasSub = "il existe une sub navigateur active" (pas juste 'permission hasSub'
-  // qui reste true même après unsubscribe). C'est cette sub qui détermine si
-  // l'utilisateur reçoit réellement les push.
-  const [hasSub, setHasSub] = useState(false)
+  // hasSub vient du store global → reste sync avec subscribe/unsubscribe peu
+  // importe d'où ils sont déclenchés (auto-prompt, settings, sync au boot).
+  const hasSub = usePushSubStore((s) => s.hasSub)
+  const setHasSub = usePushSubStore((s) => s.setHasSub)
   const supported = pushSupportStatus() === 'native'
   const [loading, setLoading] = useState(true)
 
@@ -45,7 +46,7 @@ export function PushSettings() {
       setLoading(false)
     })()
     return () => { cancelled = true }
-  }, [userId])
+  }, [userId, setHasSub])
 
   async function persist(field: 'push_important_enabled' | 'push_recap_enabled', value: boolean) {
     if (!userId) return
@@ -54,12 +55,12 @@ export function PushSettings() {
 
   async function toggleMaster() {
     if (!userId) return
+    // subscribeUser et unsubscribeUser updatent eux-mêmes le store global,
+    // pas besoin de setter ici.
     if (hasSub) {
       await unsubscribeUser()
-      setHasSub(false)
     } else {
-      const sub = await subscribeUser(userId)
-      setHasSub(Boolean(sub))
+      await subscribeUser(userId)
     }
   }
 

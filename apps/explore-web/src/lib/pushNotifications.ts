@@ -3,9 +3,23 @@
 // - pushSupportStatus : détection iOS standalone vs unsupported vs native
 // Spec : docs/superpowers/specs/2026-05-09-push-notifications-design.md
 
+import { create } from 'zustand'
 import { supabase } from './supabase'
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string
+
+// État global partagé : "il existe une push subscription navigateur active".
+// Mis à jour à chaque subscribe/unsubscribe pour que tous les composants UI
+// (PushSettings dans ProfileMenu et MobileHeader) reflètent l'état réel
+// même si l'action vient d'un autre composant (ex: PushAutoPrompt).
+interface PushSubStore {
+  hasSub: boolean
+  setHasSub: (v: boolean) => void
+}
+export const usePushSubStore = create<PushSubStore>((set) => ({
+  hasSub: false,
+  setHasSub: (v) => set({ hasSub: v }),
+}))
 
 // Flag local : "l'utilisateur a explicitement désactivé les notifs depuis Settings".
 // Stocke un timestamp pour expirer après 30 jours — au-delà on lui re-propose
@@ -121,6 +135,7 @@ export async function subscribeUser(_userId: string): Promise<PushSubscription |
   }
   // L'user vient d'activer explicitement → on lève le flag "désactivé"
   try { localStorage.removeItem(USER_DISABLED_KEY) } catch { /* noop */ }
+  usePushSubStore.getState().setHasSub(true)
   return sub
 }
 
@@ -128,6 +143,7 @@ export async function unsubscribeUser(): Promise<void> {
   // Marque l'intention AVANT toute action async — comme ça même si l'unsub
   // navigateur échoue, le sync auto au boot ne re-créera pas une sub.
   try { localStorage.setItem(USER_DISABLED_KEY, String(Date.now())) } catch { /* noop */ }
+  usePushSubStore.getState().setHasSub(false)
   const reg = await getRegistration()
   if (!reg) return
   const sub = await reg.pushManager.getSubscription()
@@ -150,11 +166,13 @@ export async function syncSubscription(userId: string): Promise<void> {
   const sub = await reg.pushManager.getSubscription()
 
   if (!sub) {
+    usePushSubStore.getState().setHasSub(false)
     if (Notification.permission === 'granted') {
       await subscribeUser(userId)
     }
     return
   }
+  usePushSubStore.getState().setHasSub(true)
 
   const json = sub.toJSON()
   const endpoint = json.endpoint ?? ''
