@@ -13,26 +13,32 @@
   color: var(--color-ink);
 }
 
-/* Carrousel horizontal — 9 lieux scrollables, bord à bord.
-   On utilise des margins sur la première et dernière card plutôt qu'un
-   padding sur le scroll : Chromium ignore parfois le padding-end avec
-   overflow-x:auto + flex. Avec des margins explicites, c'est robuste. */
+/* Carrousel horizontal — strict copie du pattern .player-modal-places-row
+   du PlayerProfileModal (qui marche). Wrapper flex pour fournir le contexte,
+   row en flex:1 + padding 16px qui s'applique correctement. */
+.places-section-scroll-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .places-section-scroll {
   display: flex;
   gap: 10px;
-  padding: 0;
+  flex-wrap: nowrap;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  overflow-y: visible;
+  flex: 1;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 16px 8px 16px;
 }
 .places-section-scroll::-webkit-scrollbar { display: none; }
-.places-section-scroll > :first-child { margin-left: 16px; }
-.places-section-scroll > :last-child { margin-right: 16px; }
 
 .places-section-card {
-  flex: 0 0 45%;
-  max-width: 160px;
+  flex: 0 0 auto;
+  width: 140px;
   scroll-snap-align: start;
   background: var(--color-parchment-dark);
   border: 1px solid var(--color-sepia);

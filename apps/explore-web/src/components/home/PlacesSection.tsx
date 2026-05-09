@@ -91,8 +91,9 @@ export function PlacesSection() {
       )}
 
       {!loading && places.length > 0 && (
-        <div className="places-section-scroll">
-          {places.map((p) => (
+        <div className="places-section-scroll-wrapper">
+          <div className="places-section-scroll">
+            {places.map((p) => (
             <button
               key={p.id}
               type="button"
@@ -115,7 +116,8 @@ export function PlacesSection() {
                 </div>
               )}
             </button>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </section>
