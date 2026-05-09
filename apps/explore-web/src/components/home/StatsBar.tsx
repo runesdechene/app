@@ -7,6 +7,7 @@ import { useFractionalEnergy, formatEnergy } from '../../hooks/useFractionalEner
 import { InfoModal } from '../map/modals/InfoModal'
 import { LeaderboardModal } from '../map/modals/LeaderboardModal'
 import { CoupeModal } from '../map/modals/CoupeModal'
+import { CoupeRulesModal } from '../map/modals/CoupeRulesModal'
 import './StatsBar.css'
 
 type StatId = 'level' | 'crowns' | 'energy' | null
@@ -31,7 +32,8 @@ export function StatsBar() {
 
   const [openInfo, setOpenInfo] = useState<StatId>(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
-  const [showCoupe, setShowCoupe] = useState(false)
+  const [showCoupeRules, setShowCoupeRules] = useState(false)
+  const [showCoupeScores, setShowCoupeScores] = useState(false)
 
   // Bonus regen faction (cf. EnergyIndicator) — pour rows InfoModal énergie
   const energyCycle = usePlayerStore((s) => s.energyCycle)
@@ -52,7 +54,7 @@ export function StatsBar() {
           <span className="stats-cell-value">Niv. {level}</span>
         </button>
 
-        <button type="button" className="stats-cell" onClick={() => setShowCoupe(true)}>
+        <button type="button" className="stats-cell" onClick={() => setShowCoupeRules(true)}>
           <span className="stats-cell-icon" aria-hidden>🏆</span>
           <span className="stats-cell-value">
             {coupeScore !== null ? coupeScore : '—'}
@@ -79,8 +81,15 @@ export function StatsBar() {
         <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
       )}
 
-      {showCoupe && (
-        <CoupeModal onClose={() => setShowCoupe(false)} />
+      {showCoupeRules && (
+        <CoupeRulesModal
+          onClose={() => setShowCoupeRules(false)}
+          onOpenScores={() => { setShowCoupeRules(false); setShowCoupeScores(true) }}
+        />
+      )}
+
+      {showCoupeScores && (
+        <CoupeModal onClose={() => setShowCoupeScores(false)} />
       )}
 
       {openInfo === 'level' && (
