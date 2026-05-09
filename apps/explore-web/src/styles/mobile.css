@@ -163,24 +163,12 @@
     margin-top: env(safe-area-inset-top, 0px);
   }
 
-  /* --- Toolbar compact --- */
+  /* --- Toolbar carte mobile : entièrement cachée sur mobile.
+     Niveau / Coupe / Couronnes / Énergie sont dans MobileStatsBar (partagé
+     home + carte). Cloche + Profil sont dans MobileTopBar. Énigmes du jour
+     se lancent depuis la home (DailyEnigmaCard). NotorietyBadge → leaderboard
+     accessible via le ProfileMenu (à recâbler si besoin). */
   .app-toolbar {
-    top: 0;
-    left: 0;
-    right: 56px;
-    padding: calc(var(--safe-top, 0px) + 6px) 8px 6px;
-    gap: 4px;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(245, 230, 211, 0.9);
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid rgba(193, 154, 107, 0.2);
-  }
-
-  /* Énergie sortie de la toolbar mobile : remontée à droite de la barre "lieux découverts"
-     (cf. .conquest-indicator + .mobile-energy-slot). Libère de la place pour les autres
-     badges (Gloire/Coupe/Couronnes/Énigme/Cloche) qui s'étalent sur toute la largeur. */
-  .app-toolbar .energy-indicator {
     display: none;
   }
 
