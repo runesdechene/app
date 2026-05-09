@@ -131,3 +131,28 @@ export function PushSubscriptionSync() {
   }, [userId])
   return null
 }
+
+// Prompt doux au boot : si l'user n'a pas encore décidé ET pas de sub
+// active, on propose la modale après un délai de 6 secondes (le temps
+// que la carte charge et que l'user voit où il est). Cooldown de 7 jours
+// si "Plus tard" a été cliqué — pas de harcèlement.
+export function PushAutoPrompt() {
+  const userId = usePlayerStore((s) => s.userId)
+  const ensurePush = useEnsurePushPermission()
+
+  useEffect(() => {
+    if (!userId) return
+    const timer = setTimeout(() => {
+      // ensurePush gère déjà les checks : permission === 'denied' → noop,
+      // already subscribed → noop, ios needs install → modale install.
+      ensurePush({
+        reason: 'auto_boot',
+        title: 'Reste connecté à Runes de Chêne',
+        body:  'Active les notifications pour suivre tes énigmes du jour, tes lieux et tes expéditions.',
+      })
+    }, 6000)
+    return () => clearTimeout(timer)
+  }, [userId, ensurePush])
+
+  return null
+}
