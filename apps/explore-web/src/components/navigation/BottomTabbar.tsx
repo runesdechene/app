@@ -4,6 +4,34 @@ import { BottomTabbarPlusMenu } from './BottomTabbarPlusMenu'
 import { useUnreadActivityCount } from '../../hooks/useUnreadActivityCount'
 import './BottomTabbar.css'
 
+interface CellProps {
+  to: string
+  icon: string
+  label: string
+  unreadBadge?: number
+}
+
+/** Cellule unique avec span indicateur explicite pour le tab actif. */
+function TabbarCell({ to, icon, label, unreadBadge }: CellProps) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && <span className="bottom-tabbar-active-indicator" aria-hidden />}
+          <span className="bottom-tabbar-icon" aria-hidden>{icon}</span>
+          <span className="bottom-tabbar-label">{label}</span>
+          {unreadBadge !== undefined && unreadBadge > 0 && (
+            <span className="bottom-tabbar-badge">{unreadBadge}</span>
+          )}
+        </>
+      )}
+    </NavLink>
+  )
+}
+
 export function BottomTabbar() {
   const [plusOpen, setPlusOpen] = useState(false)
 
@@ -15,22 +43,8 @@ export function BottomTabbar() {
   return (
     <>
       <nav className="bottom-tabbar" aria-label="Navigation principale">
-        <NavLink
-          to="/accueil"
-          className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
-        >
-          <span className="bottom-tabbar-icon" aria-hidden>🏠</span>
-          <span className="bottom-tabbar-label">Accueil</span>
-        </NavLink>
-
-        <NavLink
-          to="/chat"
-          className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
-        >
-          <span className="bottom-tabbar-icon" aria-hidden>💬</span>
-          <span className="bottom-tabbar-label">Chat</span>
-          {unreadChat > 0 && <span className="bottom-tabbar-badge">{unreadChat}</span>}
-        </NavLink>
+        <TabbarCell to="/accueil" icon="🏠" label="Accueil" />
+        <TabbarCell to="/chat" icon="💬" label="Chat" unreadBadge={unreadChat} />
 
         <button
           type="button"
@@ -41,23 +55,8 @@ export function BottomTabbar() {
           <span className="bottom-tabbar-plus-circle" aria-hidden>+</span>
         </button>
 
-
-        <NavLink
-          to="/activite"
-          className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
-        >
-          <span className="bottom-tabbar-icon" aria-hidden>🔔</span>
-          <span className="bottom-tabbar-label">Activité</span>
-          {unreadActivity > 0 && <span className="bottom-tabbar-badge">{unreadActivity}</span>}
-        </NavLink>
-
-        <NavLink
-          to="/carte"
-          className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
-        >
-          <span className="bottom-tabbar-icon" aria-hidden>🗺️</span>
-          <span className="bottom-tabbar-label">Carte</span>
-        </NavLink>
+        <TabbarCell to="/activite" icon="🔔" label="Activité" unreadBadge={unreadActivity} />
+        <TabbarCell to="/carte" icon="🗺️" label="Carte" />
       </nav>
 
       {plusOpen && <BottomTabbarPlusMenu onClose={() => setPlusOpen(false)} />}

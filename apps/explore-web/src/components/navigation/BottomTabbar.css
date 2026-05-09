@@ -28,17 +28,19 @@
 }
 .bottom-tabbar-cell.active { color: var(--color-gold); }
 
-/* Indicateur de section active : petite barre dorée en haut de la cellule. */
-.bottom-tabbar-cell.active::before {
-  content: '';
+/* Indicateur de section active — span enfant explicite (pas ::before pour
+   éviter les bizarreries de cascade). Barre dorée 32x4px en haut de la
+   cellule active. */
+.bottom-tabbar-active-indicator {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 28px;
-  height: 3px;
+  width: 32px;
+  height: 4px;
   background: var(--color-gold);
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 4px 4px;
+  pointer-events: none;
 }
 
 .bottom-tabbar-icon { font-size: 20px; line-height: 1; }
@@ -69,18 +71,18 @@
   padding: 0;
 }
 .bottom-tabbar-plus-circle {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: var(--color-gold);
   color: var(--color-ink);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: bold;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0;
+  margin-top: -7px;
   box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
   transition: transform 0.15s ease;
 }
