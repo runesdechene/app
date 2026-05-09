@@ -977,8 +977,8 @@
   .conquest-indicator
   {
     /* Collée au header partagé (MobileTopBar ~50px + MobileStatsBar ~70px = ~120px)
-       avec un petit écart de 8px pour la respiration. */
-    top: calc(var(--safe-top, 0px) + 128px);
+       avec un écart respirable. */
+    top: calc(var(--safe-top, 0px) + 140px);
     bottom: auto;
     left: 7px;
     right: auto;
