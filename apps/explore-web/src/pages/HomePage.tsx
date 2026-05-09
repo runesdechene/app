@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { usePlayer } from '../hooks/usePlayer'
+import { usePlayerStore } from '../stores/playerStore'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { StatsBar } from '../components/home/StatsBar'
@@ -19,6 +20,7 @@ import './HomePage.css'
 
 export default function HomePage() {
   const { user, signOut } = useAuth()
+  const userFactionId = usePlayerStore((s) => s.userFactionId)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
@@ -79,7 +81,12 @@ export default function HomePage() {
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}
-      {showFactionModal && <FactionModal onClose={() => setShowFactionModal(false)} />}
+      {showFactionModal && (
+        <FactionModal
+          onClose={() => setShowFactionModal(false)}
+          currentFactionId={userFactionId}
+        />
+      )}
       <BottomTabbar />
     </div>
   )
