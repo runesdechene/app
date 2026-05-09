@@ -534,13 +534,21 @@
      - Hauteur : 72vh + padding bottom 150px → s'arrête au-dessus du FAB "+".
      - Paddings/avatars/fonts internes réduits pour densité. */
   .leaderboard-overlay {
-    padding: 16px;
-    padding-bottom: calc(var(--safe-bottom, 0px) + 150px);
+    padding: 0;
   }
 
   .leaderboard-modal {
-    max-width: 78vw;
-    max-height: 72vh;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  @supports (height: 100dvh) {
+    .leaderboard-modal {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
   }
 
   .leaderboard-title {
