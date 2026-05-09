@@ -1,0 +1,55 @@
+.daily-enigma-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 32px);
+  margin: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(244, 236, 216, 0.95), rgba(220, 200, 160, 0.85));
+  border: 1px solid rgba(138, 106, 58, 0.5);
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(42, 36, 24, 0.15);
+  text-align: left;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  color: #2a1808;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.daily-enigma-card:not(.done):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(42, 36, 24, 0.2);
+}
+
+.daily-enigma-card:active {
+  transform: scale(0.99);
+  box-shadow: 0 2px 8px rgba(42, 36, 24, 0.15);
+}
+
+.daily-enigma-card.done {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.daily-enigma-card-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.daily-enigma-card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.daily-enigma-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.daily-enigma-card-sub {
+  font-size: 13px;
+  font-style: italic;
+  margin-top: 4px;
+  opacity: 0.8;
+}
