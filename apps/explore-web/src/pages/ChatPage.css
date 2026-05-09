@@ -6,8 +6,11 @@
   padding-bottom: 64px;
 }
 
-/* Forcer le ChatPanel en plein conteneur (override de son mode flottant) */
+/* Forcer le ChatPanel en plein conteneur (override de son mode flottant
+   ET du display:none mobile.css ligne 915 — le chat est caché par défaut
+   sur mobile sauf en mode data-mobile-panel="chat" de la carte). */
 .chat-page-content .chat-panel {
+  display: flex !important;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -15,6 +18,7 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
+  background: var(--color-parchment);
 }
 
 /* Cacher le bouton toggle interne du ChatPanel sur cette page (toujours ouvert) */
