@@ -173,7 +173,7 @@ function ToastItem({ toast }: { toast: GameToastType }) {
 
   return (
     <div
-      className={`game-toast${toast.type === 'contribute' || toast.type === 'new_place' ? ' game-toast-content' : ''}`}
+      className={`game-toast${toast.type === 'contribute' || toast.type === 'new_place' ? ' game-toast--has-border' : ''}`}
       style={toast.type === 'contribute' || toast.type === 'new_place' ? { borderLeftColor: toast.color || 'var(--color-sepia)' } : undefined}
     >
       {toast.contested ? (

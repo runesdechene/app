@@ -327,18 +327,48 @@ export function usePlayer() {
             message = `${name} a rejoint la carte`
             type = 'new_user'
           } else if (e.type === 'contribute') {
-            const isPhoto = e.data?.contributionType === 'photo'
-            const g = isPhoto ? r['glory.photo'] : r['glory.carnet']
-            const c = isPhoto ? r['coupe.photo'] : r['coupe.carnet']
-            message = isSelf
-              ? isPhoto
-                ? `📷 Tu as ajouté une photo de ${place} ${fmt(g, c)}`
-                : `✍️ Tu as écrit un récit sur ${place} ${fmt(g, c)}`
-              : `${name} a ${isPhoto ? 'ajouté une photo de' : 'écrit un récit sur'} ${place} 📜`
-            highlights.push(place)
+            // V0.7 (mai 2026) : 6 types de contribution.
+            // - photo / carnet : valorisés (gloire + coupe) via barème app_settings
+            // - accessibility / season / warning / epoch : INFOS communautaires
+            //   sans points (cf. décision Uriel 2026-05-03 dans contribute_to_place RPC)
+            const ct = e.data?.contributionType ?? 'carnet'
             type = 'contribute'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
+
+            if (ct === 'photo') {
+              const g = r['glory.photo'], c = r['coupe.photo']
+              message = isSelf
+                ? `📷 Tu as ajouté une photo de ${place} ${fmt(g, c)}`
+                : `${name} a ajouté une photo de ${place} 📜`
+            } else if (ct === 'carnet') {
+              const g = r['glory.carnet'], c = r['coupe.carnet']
+              message = isSelf
+                ? `✍️ Tu as écrit un récit sur ${place} ${fmt(g, c)}`
+                : `${name} a écrit un récit sur ${place} 📜`
+            } else if (ct === 'accessibility') {
+              message = isSelf
+                ? `♿ Tu as renseigné l'accessibilité de ${place}`
+                : `${name} a renseigné l'accessibilité de ${place}`
+            } else if (ct === 'season') {
+              message = isSelf
+                ? `🌿 Tu as renseigné la saison idéale de ${place}`
+                : `${name} a renseigné la saison idéale de ${place}`
+            } else if (ct === 'warning') {
+              message = isSelf
+                ? `⚠️ Tu as ajouté une mise en garde sur ${place}`
+                : `${name} a ajouté une mise en garde sur ${place}`
+            } else if (ct === 'epoch') {
+              message = isSelf
+                ? `🏛️ Tu as renseigné l'époque de ${place}`
+                : `${name} a renseigné l'époque de ${place}`
+            } else {
+              // Type inconnu — fallback générique
+              message = isSelf
+                ? `📜 Tu as enrichi la fiche de ${place}`
+                : `${name} a enrichi la fiche de ${place}`
+            }
+            highlights.push(place)
           } else if (e.type === 'revisit_gps') {
             // V0.6 — pas de gain pour la revisite (formule V0.7 = DISTINCT place_id)
             message = isSelf
