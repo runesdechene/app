@@ -215,11 +215,8 @@
   }
 
   .mobile-energy-slot {
-    display: flex;
-    position: absolute;
-    top: calc(var(--safe-top, 0px) + 220px);
-    right: 7px;
-    z-index: 10;
+    /* Doublon avec MobileStatsBar (énergie déjà dans le header partagé). */
+    display: none;
   }
 
   .energy-indicator {

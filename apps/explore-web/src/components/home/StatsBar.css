@@ -44,3 +44,21 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Cellule Énergie : pile valeur principale + taux de régen vert dessous. */
+.stats-cell-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.stats-cell-rate {
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-accent);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #4d8c3a;
+  white-space: nowrap;
+}

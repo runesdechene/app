@@ -53,10 +53,13 @@ export function StatsBar() {
           <span className="stats-cell-value">{crownsBalance}</span>
         </button>
 
-        <button type="button" className="stats-cell" onClick={() => setOpenInfo('energy')}>
+        <button type="button" className="stats-cell stats-cell--energy" onClick={() => setOpenInfo('energy')}>
           <span className="stats-cell-icon" aria-hidden>⚡</span>
-          <span className="stats-cell-value">
-            {formatEnergy(energy, maxEnergy)}/{maxEnergy}
+          <span className="stats-cell-stack">
+            <span className="stats-cell-value">
+              {formatEnergy(energy, maxEnergy)}/{maxEnergy}
+            </span>
+            <span className="stats-cell-rate">+{ratePerHour.toFixed(1)}/h</span>
           </span>
         </button>
       </div>
