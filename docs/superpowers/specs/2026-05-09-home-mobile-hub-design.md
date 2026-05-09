@@ -2,8 +2,8 @@
 
 **Date :** 2026-05-09
 **Auteur :** Uriel + XO
-**Statut :** Design validé, en attente de relecture utilisateur avant plan d'implémentation
-**Branche cible :** à trancher dans le plan (`home-pivot-v2` from main, vs rebase de `home-pivot` existante)
+**Statut :** Design validé par Uriel le 9 mai 2026, prêt pour le plan d'implémentation
+**Branche cible :** nouvelle branche depuis `main` (nom à confirmer dans le plan, ex. `home-pivot-v2`). La branche `home-pivot` originale est conservée en local et sur `origin` comme archive — ses commits utiles seront repris ou réécrits sur la nouvelle branche.
 
 ---
 
@@ -75,13 +75,17 @@ La détection mobile/desktop suit le pattern existant (`mobileNavStore` ou match
 
 ### 3.3 Page `/accueil` — ordre du scroll
 
-1. **`MobileTopBar`** (sticky en haut)
-2. **`MobileStatsBar`**
+1. **`MobileTopBar`** — sticky en haut, toujours visible au scroll
+2. **`MobileStatsBar`** — scrolle avec le contenu (pas sticky)
 3. **Énigmes du jour** — `DailyEnigmaCard` + `EnigmaFragmentsList` compactée (commits existants `21dfff0` et `689164d`/`fc85126` de home-pivot)
 4. **Événements & Quêtes** — `QuestsBoardPanel` embed (existant V0.7+, livré 6 mai)
 5. **Lieux récents** — `PlacesSection` (carrousel horizontal Nouveaux/Proches, commits `642b57d` et `bfdcad1` de home-pivot)
 6. **Teaser Activité** — 3 dernières lignes de l'`ActivityFeed` + lien `Voir tout →` qui pousse vers `/activite`
 7. **`BottomTabbar`** (fixe en bas)
+
+**Pas de `FragmentsCarousel`** dans le scroll de `/accueil` (commit `b9a1dec` de home-pivot **non repris** sur la nouvelle branche). Si un besoin de mise en avant des fragments narratifs émerge plus tard, on en rediscutera dans un brainstorming dédié.
+
+**Pas d'animations de transition** entre onglets ou pages — comportement React Router standard. Si le besoin émerge à l'usage, c'est un ajout polish indépendant.
 
 ### 3.4 Page `/chat` (mobile)
 
@@ -151,18 +155,7 @@ Aucune. Tous les composants réutilisent des RPCs existantes (`get_today_quests_
 
 ---
 
-## 6. Ouvert à la review utilisateur
-
-Points qui ne ressortaient pas explicitement de la conversation et qui méritent un coup d'œil d'Uriel à la lecture :
-
-- **`FragmentsCarousel`** (10 derniers fragments, click ouvre Shopify, commit `b9a1dec`) : présent sur home-pivot mais **pas mentionné** dans la maquette finale d'Uriel. **Proposition par défaut : retiré du scroll de `/accueil`** pour respecter l'ordre validé. Si Uriel le veut, peut être inséré entre Lieux récents et Teaser Activité.
-- **Sticky vs scroll de `MobileTopBar` sur `/accueil`** : la topbar reste visible au scroll ou disparaît ? Proposition par défaut : **sticky** (toujours visible, comme sur `/carte`).
-- **Animation de transition entre onglets** : aucune (transitions React Router standard). Si Uriel veut quelque chose de plus expressif (slide, fade), à mentionner.
-- **Choix de branche** : continuer sur `home-pivot` (rebase sur main) ou créer `home-pivot-v2` from main et rapatrier ce qui est utile (les 25+ commits sont tous présents en local) ? Décision pour le plan d'implémentation.
-
----
-
-## 7. Out of scope (rappel explicite)
+## 6. Out of scope (rappel explicite)
 
 - DM joueur-joueur 1-to-1
 - Refonte du contenu de `ChatPanel`
@@ -173,7 +166,7 @@ Points qui ne ressortaient pas explicitement de la conversation et qui méritent
 
 ---
 
-## 8. Critères de succès
+## 7. Critères de succès
 
 - Login mobile → utilisateur atterrit sur `/accueil` avec ses 3 piliers visibles en 1 scroll
 - Login desktop → utilisateur atterrit sur `/carte` (comportement inchangé)
