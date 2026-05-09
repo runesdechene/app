@@ -14,15 +14,22 @@
   font-family: var(--font-accent);
 }
 
-/* Grille 2 colonnes — remplace le carrousel */
-.places-section-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* Carrousel horizontal — 9 lieux scrollables */
+.places-section-scroll {
+  display: flex;
   gap: 10px;
   padding: 0 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.places-section-scroll::-webkit-scrollbar { display: none; }
 
 .places-section-card {
+  flex: 0 0 45%;
+  max-width: 160px;
+  scroll-snap-align: start;
   background: var(--color-parchment-dark);
   border: 1px solid var(--color-sepia);
   border-radius: 12px;

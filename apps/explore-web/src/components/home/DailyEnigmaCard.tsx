@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import parcheminIcon from '../../assets/parchemin.png'
 import './DailyEnigmaCard.css'
 
 interface Props {
@@ -64,7 +65,7 @@ export function DailyEnigmaCard({ onOpen, refreshKey }: Props) {
       onClick={onOpen}
       disabled={dailyDone}
     >
-      <span className="daily-enigma-card-icon" aria-hidden>📜</span>
+      <img src={parcheminIcon} alt="" className="daily-enigma-card-icon" aria-hidden />
       <span className="daily-enigma-card-content">
         <span className="daily-enigma-card-title">Énigmes du jour</span>
         <span className="daily-enigma-card-sub">

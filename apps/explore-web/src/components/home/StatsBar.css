@@ -1,7 +1,7 @@
 .stats-bar {
   display: flex;
-  padding: 10px 16px;
-  gap: 8px;
+  padding: 10px 12px;
+  gap: 6px;
   background: var(--color-parchment);
   border-bottom: 1px solid var(--color-sepia);
 }
@@ -9,26 +9,31 @@
 .stats-cell {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 8px 10px;
+  gap: 6px;
+  padding: 8px 6px;
   background: var(--color-parchment-dark);
   border: 1px solid var(--color-sepia);
   border-radius: 10px;
   color: var(--color-ink);
+  min-width: 0;
 }
 
 .stats-cell-icon {
   font-size: 16px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .stats-cell-value {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-accent);
   letter-spacing: 0.02em;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

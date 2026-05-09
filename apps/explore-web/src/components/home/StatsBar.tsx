@@ -4,12 +4,14 @@ import { useCoupe } from '../../hooks/useCoupe'
 import './StatsBar.css'
 
 /**
- * Barre de stats épurée — partagée entre /accueil et /carte mobile.
- * 3 cellules : Niveau | Coupe (score saison) | Couronnes (balance)
- * Design plat, fond parchemin, icône + valeur. Pas de sub-text.
+ * Barre de stats inline — partagée entre /accueil et /carte mobile.
+ * 4 cellules : Niveau · Coupe · Couronnes · Énergie.
+ * Format : icône + valeur sur la même ligne (pas en colonne).
  */
 export function StatsBar() {
   const level = usePlayerStore((s) => s.level)
+  const energy = usePlayerStore((s) => s.energy)
+  const maxEnergy = usePlayerStore((s) => s.maxEnergy)
   const crownsBalance = useCrownsStore((s) => s.balance)
   const { state: coupeState } = useCoupe(true)
   const coupeScore = coupeState?.myBreakdown?.score ?? null
@@ -17,7 +19,7 @@ export function StatsBar() {
   return (
     <div className="stats-bar">
       <div className="stats-cell">
-        <span className="stats-cell-icon" aria-hidden>👑</span>
+        <span className="stats-cell-icon" aria-hidden>🎖️</span>
         <span className="stats-cell-value">Niv. {level}</span>
       </div>
 
@@ -31,6 +33,13 @@ export function StatsBar() {
       <div className="stats-cell">
         <span className="stats-cell-icon" aria-hidden>🪙</span>
         <span className="stats-cell-value">{crownsBalance}</span>
+      </div>
+
+      <div className="stats-cell">
+        <span className="stats-cell-icon" aria-hidden>⚡</span>
+        <span className="stats-cell-value">
+          {energy.toFixed(1)}/{maxEnergy}
+        </span>
       </div>
     </div>
   )

@@ -32,8 +32,10 @@
 }
 
 .daily-enigma-card-icon {
-  font-size: 32px;
-  line-height: 1;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .daily-enigma-card-content {

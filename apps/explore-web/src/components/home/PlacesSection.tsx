@@ -16,9 +16,11 @@ interface Place {
 
 /**
  * Section Lieux de la home mobile.
- * Affiche 2 lieux en grille (portrait), sans tabs ni carrousel.
+ * Carrousel horizontal des 9 lieux à proximité (GPS) ou des 9 plus récents.
  * Priorité GPS (get_nearby_places) → fallback récents (get_recent_places).
  */
+const LIMIT = 9
+
 export function PlacesSection() {
   const navigate = useNavigate()
   const [places, setPlaces] = useState<Place[]>([])
@@ -29,9 +31,9 @@ export function PlacesSection() {
     let cancelled = false
 
     function loadRecent() {
-      supabase.rpc('get_recent_places', { p_limit: 2 }).then(({ data, error }) => {
+      supabase.rpc('get_recent_places', { p_limit: LIMIT }).then(({ data, error }) => {
         if (cancelled) return
-        if (!error && data) setPlaces((data as Place[]).slice(0, 2))
+        if (!error && data) setPlaces((data as Place[]).slice(0, LIMIT))
         setSubtitle('Lieux récents')
         setLoading(false)
       })
@@ -48,11 +50,11 @@ export function PlacesSection() {
         supabase.rpc('get_nearby_places', {
           p_lat: pos.coords.latitude,
           p_lng: pos.coords.longitude,
-          p_limit: 2,
+          p_limit: LIMIT,
         }).then(({ data, error }) => {
           if (cancelled) return
           if (!error && data && (data as Place[]).length > 0) {
-            setPlaces((data as Place[]).slice(0, 2))
+            setPlaces((data as Place[]).slice(0, LIMIT))
             setSubtitle('Lieux à proximité')
           } else {
             loadRecent()
@@ -87,7 +89,7 @@ export function PlacesSection() {
       )}
 
       {!loading && places.length > 0 && (
-        <div className="places-section-grid">
+        <div className="places-section-scroll">
           {places.map((p) => (
             <button
               key={p.id}
