@@ -6,6 +6,10 @@
   height: 100dvh;
   overflow: hidden;
   background: var(--color-parchment);
+  /* iOS : décale tout le contenu sous la status bar (heure/réseau/batterie).
+     env(safe-area-inset-top) ≈ 47-50px sur iPhone, 0 partout ailleurs. */
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: border-box;
 }
 
 /* Le main scrollable rendu par chaque page enfant (HomePage / ActivityPage /

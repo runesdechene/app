@@ -6,6 +6,10 @@
   width: 100%;
   height: 100%;
   position: relative;
+  /* iOS : décale tout le contenu sous la status bar (heure/réseau/batterie).
+     env(safe-area-inset-top) est ~47-50px sur iPhone récent, 0 partout ailleurs. */
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: border-box;
 }
 
 /* Masquer le point bleu natif de GeolocateControl (on a notre propre marqueur) */

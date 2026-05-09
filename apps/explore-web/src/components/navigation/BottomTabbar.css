@@ -5,11 +5,15 @@
   right: 0;
   display: flex;
   align-items: stretch;
-  height: 64px;
+  /* iOS : étend la barre pour couvrir la zone home indicator
+     (env(safe-area-inset-bottom) ~ 34px sur iPhone Pro). */
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--color-parchment);
   border-top: 1px solid var(--color-sepia);
   z-index: 9990;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
 .bottom-tabbar-cell {
