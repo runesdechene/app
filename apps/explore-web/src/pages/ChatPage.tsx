@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { usePlayer } from '../hooks/usePlayer'
 import { useChat } from '../hooks/useChat'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
@@ -9,7 +10,10 @@ import './ChatPage.css'
 
 export default function ChatPage() {
   const { user } = useAuth()
-  // Charge les messages + subscribe Realtime (sinon store vide → panel vide)
+  // usePlayer set playerStore.userId — pré-requis pour que useChat fetch
+  // (cas reload direct sur /chat sans passer par /accueil).
+  usePlayer()
+  // Charge les messages + subscribe Realtime
   useChat()
 
   useEffect(() => {
