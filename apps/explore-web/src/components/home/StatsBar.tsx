@@ -6,9 +6,13 @@ import { useGlory } from '../../hooks/useGlory'
 import { useFractionalEnergy, formatEnergy } from '../../hooks/useFractionalEnergy'
 import { InfoModal } from '../map/modals/InfoModal'
 import { LeaderboardModal } from '../map/modals/LeaderboardModal'
+import { CoupeModal } from '../map/modals/CoupeModal'
 import './StatsBar.css'
 
-type StatId = 'level' | 'coupe' | 'crowns' | 'energy' | null
+type StatId = 'level' | 'crowns' | 'energy' | null
+
+// Wording exact repris de CrownsBadge.tsx — cohérence app
+const CROWNS_DESCRIPTION = "La monnaie du royaume. Tu en gagnes en récoltant les coffres qui poussent chaque jour sur tes lieux veillés, en sortant de nouveaux lieux du brouillard, et en résolvant des énigmes. Tu peux ensuite les investir en mécénat sur un lieu pour soutenir son veilleur ou y poser ta marque à distance — plus un lieu reçoit de Couronnes, plus il rayonne sur la carte."
 
 /**
  * Barre de stats inline — partagée entre /accueil et /carte mobile.
@@ -27,6 +31,13 @@ export function StatsBar() {
 
   const [openInfo, setOpenInfo] = useState<StatId>(null)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showCoupe, setShowCoupe] = useState(false)
+
+  // Bonus regen faction (cf. EnergyIndicator) — pour rows InfoModal énergie
+  const energyCycle = usePlayerStore((s) => s.energyCycle)
+  const baseCycle = 7200
+  const baseRate = 3600 / baseCycle
+  const hasRegenBonus = energyCycle !== baseCycle
 
   const isLevelCap = level >= 50
   const levelDescription = isLevelCap
@@ -41,7 +52,7 @@ export function StatsBar() {
           <span className="stats-cell-value">Niv. {level}</span>
         </button>
 
-        <button type="button" className="stats-cell" onClick={() => setOpenInfo('coupe')}>
+        <button type="button" className="stats-cell" onClick={() => setShowCoupe(true)}>
           <span className="stats-cell-icon" aria-hidden>🏆</span>
           <span className="stats-cell-value">
             {coupeScore !== null ? coupeScore : '—'}
@@ -66,6 +77,10 @@ export function StatsBar() {
 
       {showLeaderboard && (
         <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+      )}
+
+      {showCoupe && (
+        <CoupeModal onClose={() => setShowCoupe(false)} />
       )}
 
       {openInfo === 'level' && (
@@ -104,38 +119,37 @@ export function StatsBar() {
         />
       )}
 
-      {openInfo === 'coupe' && (
-        <InfoModal
-          icon="🏆"
-          title="Coupe des Héritages"
-          description="La Coupe est le score de la saison en cours, partagé avec ta Maison. Énigmes, plantages, contributions, mécénats — tout y rapporte."
-          rows={[
-            { label: 'Ton score saison', value: coupeScore !== null ? `${coupeScore}` : '—' },
-          ]}
-          onClose={() => setOpenInfo(null)}
-        />
-      )}
-
+      {/* Couronnes : reprise EXACTE de CrownsBadge — wording + rows complets. */}
       {openInfo === 'crowns' && (
         <InfoModal
           icon="🪙"
           title="Couronnes de Chêne"
-          description="Les Couronnes sont la monnaie d'influence. Tu en gagnes en résolvant des énigmes ou en découvrant des lieux à distance, et tu les investis dans des lieux pour devenir Mécène."
+          description={CROWNS_DESCRIPTION}
           rows={[
-            { label: 'Solde', value: `${crownsBalance}` },
+            { label: 'Stock actuel', value: `${crownsBalance} / 500`, highlight: true },
+            { label: 'Coffre aléatoire — lieu veillé seul', value: '+1 🪙' },
+            { label: 'Coffre aléatoire — lieu veillé à plusieurs', value: '+2 🪙' },
+            { label: 'Sortir un lieu du brouillard', value: '+1 🪙' },
+            { label: '3 lieux découverts à distance / jour', value: '+1 🪙 bonus' },
+            { label: 'Énigme résolue', value: '+1 à +3 🪙 selon la difficulté' },
           ]}
           onClose={() => setOpenInfo(null)}
         />
       )}
 
+      {/* Énergie : reprise EXACTE de EnergyIndicator — wording + rows + bonus regen faction. */}
       {openInfo === 'energy' && (
         <InfoModal
           icon="⚡"
-          title="Énergie"
-          description="L'énergie permet de découvrir et protéger des lieux. Elle se régénère automatiquement avec le temps."
+          title="Energie"
+          description="L'energie permet de decouvrir et proteger des lieux. Le cout varie selon le type de lieu. Elle se regenere automatiquement."
           rows={[
             { label: 'Points actuels', value: `${formatEnergy(energy, maxEnergy)} / ${maxEnergy}` },
-            { label: 'Régénération', value: `+${ratePerHour.toFixed(2)} / heure` },
+            { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
+            ...(hasRegenBonus ? [
+              { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
+              { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
+            ] : []),
           ]}
           onClose={() => setOpenInfo(null)}
         />
