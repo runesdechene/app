@@ -22,7 +22,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         lang: 'fr',
-        start_url: '/carte',
+        start_url: '/post-login',
         scope: '/',
         icons: [
           {

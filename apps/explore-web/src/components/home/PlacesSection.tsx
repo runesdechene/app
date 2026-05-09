@@ -18,6 +18,8 @@ interface Place {
   author_name?: string | null
 }
 
+type Tab = 'recent' | 'nearby'
+
 function formatTimeAgo(iso?: string): string {
   if (!iso) return ''
   const ms = Date.now() - new Date(iso).getTime()
@@ -33,35 +35,42 @@ function formatTimeAgo(iso?: string): string {
 }
 
 /**
- * Section Lieux de la home mobile.
- * Carrousel horizontal des 9 lieux à proximité (GPS) ou des 9 plus récents.
- * Priorité GPS (get_nearby_places) → fallback récents (get_recent_places).
+ * Section Lieux de la home mobile. 2 tabs :
+ *  - Récents (par défaut) : derniers lieux ajoutés sur la carte
+ *  - À proximité : lieux GPS-proches du joueur (si géoloc autorisée)
+ *
+ * Carrousel horizontal de 9 lieux par tab.
  */
 const LIMIT = 9
 
 export function PlacesSection() {
   const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
-  const [places, setPlaces] = useState<Place[]>([])
-  const [loading, setLoading] = useState(true)
-  const [subtitle, setSubtitle] = useState('Lieux à proximité')
+  const [tab, setTab] = useState<Tab>('recent')
+  const [recentPlaces, setRecentPlaces] = useState<Place[]>([])
+  const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([])
+  const [recentLoading, setRecentLoading] = useState(true)
+  const [nearbyLoading, setNearbyLoading] = useState(true)
+  const [nearbyAvailable, setNearbyAvailable] = useState(true)
 
+  // Load recents en parallèle
   useEffect(() => {
     let cancelled = false
+    supabase.rpc('get_recent_places', { p_limit: LIMIT }).then(({ data, error }) => {
+      if (cancelled) return
+      if (!error && data) setRecentPlaces((data as Place[]).slice(0, LIMIT))
+      setRecentLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [])
 
-    function loadRecent() {
-      supabase.rpc('get_recent_places', { p_limit: LIMIT }).then(({ data, error }) => {
-        if (cancelled) return
-        if (!error && data) setPlaces((data as Place[]).slice(0, LIMIT))
-        setSubtitle('Lieux récents')
-        setLoading(false)
-      })
-    }
-
+  // Load nearby si geoloc dispo
+  useEffect(() => {
+    let cancelled = false
     if (!('geolocation' in navigator)) {
-      loadRecent()
+      setNearbyAvailable(false)
+      setNearbyLoading(false)
       return
     }
-
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         if (cancelled) return
@@ -71,36 +80,47 @@ export function PlacesSection() {
           p_limit: LIMIT,
         }).then(({ data, error }) => {
           if (cancelled) return
-          if (!error && data && (data as Place[]).length > 0) {
-            setPlaces((data as Place[]).slice(0, LIMIT))
-            setSubtitle('Lieux à proximité')
-          } else {
-            loadRecent()
-            return
-          }
-          setLoading(false)
+          if (!error && data) setNearbyPlaces((data as Place[]).slice(0, LIMIT))
+          setNearbyLoading(false)
         })
       },
       () => {
-        if (!cancelled) loadRecent()
+        if (cancelled) return
+        setNearbyAvailable(false)
+        setNearbyLoading(false)
       },
       { timeout: 4000, maximumAge: 60000 }
     )
-
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [])
 
   function handlePlaceClick(p: Place) {
-    // Ouvre la modale lieu sur la home (PlacePanel monté dans HomePage lit
-    // useMapStore.selectedPlaceId), sans naviguer vers /carte.
     setSelectedPlaceId(p.id)
   }
 
+  const places = tab === 'recent' ? recentPlaces : nearbyPlaces
+  const loading = tab === 'recent' ? recentLoading : nearbyLoading
+
   return (
     <section className="places-section">
-      <h2 className="places-section-title">{subtitle}</h2>
+      <div className="places-section-tabs">
+        <button
+          type="button"
+          className={`places-section-tab${tab === 'recent' ? ' active' : ''}`}
+          onClick={() => setTab('recent')}
+        >
+          Lieux récents
+        </button>
+        {nearbyAvailable && (
+          <button
+            type="button"
+            className={`places-section-tab${tab === 'nearby' ? ' active' : ''}`}
+            onClick={() => setTab('nearby')}
+          >
+            À proximité
+          </button>
+        )}
+      </div>
 
       {loading && <p className="places-section-loading">Chargement…</p>}
 
@@ -112,43 +132,43 @@ export function PlacesSection() {
         <div className="places-section-scroll-wrapper">
           <div className="places-section-scroll">
             {places.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className="places-section-card"
-              onClick={() => handlePlaceClick(p)}
-            >
-              <div className="places-section-card-img-wrapper">
-                {p.image_url ? (
-                  <img src={p.image_url} alt="" />
-                ) : (
-                  <div className="places-section-card-placeholder">📍</div>
-                )}
-              </div>
-              <div className="places-section-card-name">
-                {p.tag_icon && (
-                  <span
-                    className="places-section-card-tag-bubble"
-                    style={{ background: p.tag_color ?? '#8A7B6A' }}
-                    aria-hidden
-                  >
-                    <img src={p.tag_icon} alt="" />
-                  </span>
-                )}
-                <span className="places-section-card-name-text">{p.title}</span>
-              </div>
-              <div className="places-section-card-meta">
-                {p.author_name && <span className="places-section-card-author">{p.author_name}</span>}
-                {p.created_at && <span className="places-section-card-time">{formatTimeAgo(p.created_at)}</span>}
-              </div>
-              {p.distance_km != null && (
-                <div className="places-section-card-sub">
-                  {p.distance_km < 1
-                    ? `${Math.round(p.distance_km * 1000)} m`
-                    : `${p.distance_km.toFixed(1)} km`}
+              <button
+                key={p.id}
+                type="button"
+                className="places-section-card"
+                onClick={() => handlePlaceClick(p)}
+              >
+                <div className="places-section-card-img-wrapper">
+                  {p.image_url ? (
+                    <img src={p.image_url} alt="" />
+                  ) : (
+                    <div className="places-section-card-placeholder">📍</div>
+                  )}
                 </div>
-              )}
-            </button>
+                <div className="places-section-card-name">
+                  {p.tag_icon && (
+                    <span
+                      className="places-section-card-tag-bubble"
+                      style={{ background: p.tag_color ?? '#8A7B6A' }}
+                      aria-hidden
+                    >
+                      <img src={p.tag_icon} alt="" />
+                    </span>
+                  )}
+                  <span className="places-section-card-name-text">{p.title}</span>
+                </div>
+                <div className="places-section-card-meta">
+                  {p.author_name && <span className="places-section-card-author">{p.author_name}</span>}
+                  {p.created_at && <span className="places-section-card-time">{formatTimeAgo(p.created_at)}</span>}
+                </div>
+                {p.distance_km != null && (
+                  <div className="places-section-card-sub">
+                    {p.distance_km < 1
+                      ? `${Math.round(p.distance_km * 1000)} m`
+                      : `${p.distance_km.toFixed(1)} km`}
+                  </div>
+                )}
+              </button>
             ))}
           </div>
         </div>
