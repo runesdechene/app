@@ -33,6 +33,40 @@
   top: 0;
 }
 
+/* Bouton CTA "Créer une expédition" sous Événements & Quêtes */
+.home-section-cta {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  background: transparent;
+  border: 1px dashed var(--color-sepia);
+  border-radius: 8px;
+  color: var(--color-ink);
+  font-family: var(--font-accent);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.home-section-cta:hover { background: var(--color-parchment-dark); }
+
+/* NotificationPanel embed dans la home (override du mode flottant) */
+.home-section--activity {
+  padding: 16px 0; /* on retire le padding horizontal pour laisser le panel prendre toute la largeur */
+}
+.home-section--activity .notification-panel {
+  position: static;
+  top: auto;
+  right: auto;
+  width: 100%;
+  max-height: none;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  box-shadow: none;
+  z-index: auto;
+}
+
 @media (min-width: 750px) {
   .home-page { display: none; }
 }

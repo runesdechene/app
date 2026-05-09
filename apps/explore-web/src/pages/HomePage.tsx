@@ -11,9 +11,10 @@ import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 // EnigmaFragmentsList masquée — fragments absorbés par badge DailyEnigmaCard (maquette 09/05/2026)
 // import { EnigmaFragmentsList } from '../components/home/EnigmaFragmentsList'
-import { QuestsBoardPanel } from '../components/quests/QuestsBoardPanel'
+import { DailyQuestsList } from '../components/quests/DailyQuestsList'
+import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
-import { ActivityFeed } from '../components/home/ActivityFeed'
+import { NotificationPanel } from '../components/notifications/NotificationPanel'
 import { FactionModal } from '../components/auth/FactionModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
@@ -83,19 +84,23 @@ export default function HomePage() {
 
         <section className="home-section">
           <h2 className="home-section-title">Événements & Quêtes</h2>
-          <QuestsBoardPanel
-            onOpenExpedition={setSelectedExpeditionId}
-            onOpenCreator={() => setCreatorOpen(true)}
-          />
+          <DailyQuestsList />
+          <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
+          <button
+            type="button"
+            className="home-section-cta"
+            onClick={() => setCreatorOpen(true)}
+          >
+            + Créer une expédition
+          </button>
         </section>
 
         <section className="home-section">
           <PlacesSection />
         </section>
 
-        <section className="home-section">
-          <h2 className="home-section-title">Activité de la carte</h2>
-          <ActivityFeed limit={3} onSeeMore={() => navigate('/activite')} />
+        <section className="home-section home-section--activity">
+          <NotificationPanel onClose={() => navigate('/activite')} />
         </section>
       </main>
 

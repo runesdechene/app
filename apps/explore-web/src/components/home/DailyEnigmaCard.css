@@ -2,8 +2,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  width: calc(100% - 32px);
-  margin: 16px;
+  width: 100%;
+  margin: 0;
   padding: 16px 18px;
   background: var(--color-parchment-dark);
   border: 1px solid var(--color-sepia);

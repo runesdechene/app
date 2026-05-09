@@ -55,8 +55,7 @@
   cursor: pointer;
   padding: 0;
 }
-.bottom-tabbar-plus::before {
-  content: '+';
+.bottom-tabbar-plus-circle {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -64,6 +63,7 @@
   color: var(--color-parchment);
   font-size: 28px;
   font-weight: bold;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +71,7 @@
   box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);
   transition: transform 0.15s ease;
 }
-.bottom-tabbar-plus:active::before { transform: scale(0.92); }
+.bottom-tabbar-plus:active .bottom-tabbar-plus-circle { transform: scale(0.92); }
 
 @media (min-width: 750px) {
   .bottom-tabbar { display: none; }

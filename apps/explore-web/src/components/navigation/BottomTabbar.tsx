@@ -37,7 +37,9 @@ export function BottomTabbar() {
           className="bottom-tabbar-plus"
           onClick={() => setPlusOpen(true)}
           aria-label="Créer un élément"
-        />
+        >
+          <span className="bottom-tabbar-plus-circle" aria-hidden>+</span>
+        </button>
 
 
         <NavLink
