@@ -42,6 +42,16 @@ interface PushPayload {
   url: string
 }
 
+// Normalise toute URL push pour qu'elle commence par /carte (start_url
+// du manifest). Sans ça, l'OS Android ouvre Chrome au lieu de la PWA
+// installée. Si l'URL est déjà sur /carte, on la laisse telle quelle.
+function normalizeAppUrl(raw: string): string {
+  if (raw.startsWith('/carte')) return raw
+  const queryIdx = raw.indexOf('?')
+  const query = queryIdx >= 0 ? raw.slice(queryIdx) : ''
+  return '/carte' + query
+}
+
 self.addEventListener('push', (event: PushEvent) => {
   // Robuste : on tente .json() puis .text(), avec fallback titre/body neutre.
   // userVisibleOnly:true exige qu'on affiche TOUJOURS une notif visible —
@@ -61,7 +71,7 @@ self.addEventListener('push', (event: PushEvent) => {
   }
   const title = payload.title || 'Runes de Chêne'
   const body  = payload.body  || rawText || 'Tu as une nouvelle notification.'
-  const url   = payload.url   || '/'
+  const url   = normalizeAppUrl(payload.url || '/carte')
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
@@ -75,7 +85,8 @@ self.addEventListener('push', (event: PushEvent) => {
 
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close()
-  const targetUrl = (event.notification.data as { url?: string })?.url ?? '/'
+  const rawUrl = (event.notification.data as { url?: string })?.url ?? '/carte'
+  const targetUrl = normalizeAppUrl(rawUrl)
   event.waitUntil((async () => {
     const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
     for (const client of allClients) {

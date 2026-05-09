@@ -18,7 +18,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: 'Ton énigme du jour',
         body:  'Le coffre t’attend.',
-        url:   '/?enigma=daily',
+        url:   '/carte?enigma=daily',
       }
 
     case 'expedition_message': {
@@ -29,7 +29,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: `Message — ${expeditionName}`,
         body:  preview ? `${author} : ${preview}` : `${author} a écrit.`,
-        url:   expeditionId ? `/?expedition=${expeditionId}` : '/',
+        url:   expeditionId ? `/carte?expedition=${expeditionId}` : '/carte',
       }
     }
 
@@ -43,7 +43,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
           ? `${placeName} t’a échappé`
           : `${placeName} a changé de mains`,
         body:  'Reviens jeter un œil sur la carte.',
-        url:   placeId ? `/?placeId=${placeId}` : '/',
+        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
       }
     }
 
@@ -53,7 +53,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: `Plus que ${xpDiff} XP avant niveau ${nextLevel}`,
         body:  'Reviens jouer une énigme.',
-        url:   '/?enigma=daily',
+        url:   '/carte?enigma=daily',
       }
     }
 
@@ -63,7 +63,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: `${count} nouveaux lieux cette semaine`,
         body:  samples ? `${samples}…` : 'Découvre la nouvelle carte.',
-        url:   '/?layer=new',
+        url:   '/carte?layer=new',
       }
     }
 
