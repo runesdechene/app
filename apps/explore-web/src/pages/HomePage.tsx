@@ -8,6 +8,7 @@ import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { HomeQuestsBoard } from '../components/home/HomeQuestsBoard'
 import { FragmentsCarousel } from '../components/home/FragmentsCarousel'
 import { PlacesSection } from '../components/home/PlacesSection'
+import { ActivityFeed } from '../components/home/ActivityFeed'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionModal } from '../components/auth/FactionModal'
 import { NotificationBell } from '../components/notifications/NotificationBell'
@@ -62,7 +63,7 @@ export default function HomePage() {
 
       <PlacesSection />
 
-      <p className="home-page-skeleton">Sections à venir…</p>
+      <ActivityFeed />
 
       {showDailyEnigma && (
         <DailyEnigma

@@ -1,0 +1,51 @@
+.activity-feed {
+  margin: 0 16px 24px;
+  font-family: Georgia, serif;
+  color: #2a1808;
+}
+
+.activity-feed-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5a3a18;
+  margin: 0 0 10px;
+}
+
+.activity-feed-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(244, 236, 216, 0.55);
+  border: 1px solid rgba(138, 106, 58, 0.2);
+  border-radius: 8px;
+}
+
+.activity-feed-icon {
+  font-size: 18px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.activity-feed-text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.activity-feed-time {
+  font-size: 12px;
+  opacity: 0.6;
+  font-style: italic;
+  margin-top: 2px;
+}
