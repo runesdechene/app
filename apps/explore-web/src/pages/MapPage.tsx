@@ -3,7 +3,7 @@ import { ExploreMap } from '../components/map/core/ExploreMap'
 import { EnergyIndicator } from '../components/map/badges/EnergyIndicator'
 import { CrownsBadge } from '../components/map/badges/CrownsBadge'
 import { CoupeBadge } from '../components/map/badges/CoupeBadge'
-import { useGlory } from '../hooks/useGlory'
+import { NotorietyInfoModal } from '../components/map/modals/NotorietyInfoModal'
 import { PlacePanel } from '../components/places/views/PlacePanel'
 import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
@@ -67,17 +67,9 @@ import '../styles/mobile.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   // V0.7 — affiche le NIVEAU dans le badge (au lieu de la Gloire brute).
-  // Au clic : modale narrative avec le détail des compteurs par axe d'action.
-  const { state: glory } = useGlory(true, 30000)
+  // Au clic : NotorietyInfoModal partagée (source unique avec StatsBar).
   const level = usePlayerStore(s => s.level)
-  const xpTotal = usePlayerStore(s => s.xpTotal)
-  const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
   const [showInfo, setShowInfo] = useState(false)
-
-  const isCap = level >= 50
-  const description = isCap
-    ? `Tu as atteint le sommet — ${xpTotal} Gloire cumulée. Tu es Légende.`
-    : `Ton parcours de Veilleur — ${xpTotal} Gloire récoltée au fil de tes pas. Encore ${xpToNextLevel} avant le niveau ${level + 1}.`
 
   return (
     <>
@@ -94,35 +86,9 @@ function NotorietyBadge({ onClick }: { onClick: () => void }) {
       </div>
 
       {showInfo && (
-        <InfoModal
-          icon={'🎖️'}
-          title={`Niveau ${level}`}
-          description={description}
-          rows={
-            glory ? [
-              { label: '🥾 Lieux foulés (GPS)',           value: `${glory.lieuxExplores}` },
-              { label: '📜 Lieux cartographiés',          value: `${glory.lieuxAjoutes}` },
-              { label: '🏴 Plantages de bannière',        value: `${glory.plantages}` },
-              { label: '✍️ Récits écrits',                value: `${glory.carnets}` },
-              { label: '📷 Photos ajoutées',              value: `${glory.photos}` },
-              (() => {
-                const easyTotal = glory.enigmes.easy + glory.enigmes.veryEasy
-                const parts = [
-                  glory.enigmes.hard   ? `${glory.enigmes.hard} difficile${glory.enigmes.hard > 1 ? 's' : ''}`     : null,
-                  glory.enigmes.medium ? `${glory.enigmes.medium} moyenne${glory.enigmes.medium > 1 ? 's' : ''}`   : null,
-                  easyTotal            ? `${easyTotal} facile${easyTotal > 1 ? 's' : ''} ou très facile${easyTotal > 1 ? 's' : ''}` : null,
-                ].filter(Boolean).join(', ')
-                return {
-                  label: glory.enigmes.total > 0
-                    ? `🦉 Énigmes résolues (${parts})`
-                    : '🦉 Énigmes résolues',
-                  value: `${glory.enigmes.total}`,
-                }
-              })(),
-            ] : []
-          }
+        <NotorietyInfoModal
           onClose={() => setShowInfo(false)}
-          action={{ label: 'Voir le classement', onClick: () => { setShowInfo(false); onClick() } }}
+          onOpenLeaderboard={onClick}
         />
       )}
     </>
