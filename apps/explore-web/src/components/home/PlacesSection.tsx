@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useMapStore } from '../../stores/mapStore'
 import './PlacesSection.css'
 
 interface Place {
@@ -22,7 +22,7 @@ interface Place {
 const LIMIT = 9
 
 export function PlacesSection() {
-  const navigate = useNavigate()
+  const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
   const [places, setPlaces] = useState<Place[]>([])
   const [loading, setLoading] = useState(true)
   const [subtitle, setSubtitle] = useState('Lieux à proximité')
@@ -75,7 +75,9 @@ export function PlacesSection() {
   }, [])
 
   function handlePlaceClick(p: Place) {
-    navigate(`/carte?placeId=${encodeURIComponent(p.id)}`)
+    // Ouvre la modale lieu sur la home (PlacePanel monté dans HomePage lit
+    // useMapStore.selectedPlaceId), sans naviguer vers /carte.
+    setSelectedPlaceId(p.id)
   }
 
   return (

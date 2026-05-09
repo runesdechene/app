@@ -21,12 +21,16 @@ import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
+import { PlacePanel } from '../components/places/views/PlacePanel'
+import { useMapStore } from '../stores/mapStore'
 import './HomePage.css'
 
 export default function HomePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const userFactionId = usePlayerStore((s) => s.userFactionId)
+  const selectedPlaceId = useMapStore((s) => s.selectedPlaceId)
+  const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
 
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
@@ -147,6 +151,13 @@ export default function HomePage() {
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}
+      {/* Modale lieu — s'ouvre par-dessus la home quand on clique un lieu
+          dans MapActivityList ou PlacesSection (state partagé useMapStore). */}
+      <PlacePanel
+        placeId={selectedPlaceId}
+        onClose={() => setSelectedPlaceId(null)}
+        userEmail={user?.email ?? null}
+      />
       <GameToast />
     </div>
   )

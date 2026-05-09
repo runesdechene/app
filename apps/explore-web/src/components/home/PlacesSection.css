@@ -12,14 +12,14 @@
   color: var(--color-ink);
 }
 
-/* Carrousel horizontal — 9 lieux scrollables, bord à bord.
-   margin négatif compense le padding 16px de la home-section parente.
-   Padding interne 0 → la première card colle au bord gauche du viewport.
-   La dernière card peut être scrollée jusqu'à être visible. */
+/* Carrousel horizontal — 9 lieux scrollables.
+   margin négatif uniquement à droite : la première card reste à 16px du
+   bord gauche (padding parent intact), mais la dernière card peut être
+   scrollée jusqu'au bord droit du viewport sans être tronquée. */
 .places-section-scroll {
   display: flex;
   gap: 10px;
-  margin: 0 -16px;
+  margin: 0 -16px 0 0;
   padding: 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;

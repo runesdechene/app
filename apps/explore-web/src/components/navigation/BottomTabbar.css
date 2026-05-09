@@ -60,8 +60,8 @@
   height: 48px;
   border-radius: 50%;
   background: var(--color-gold);
-  color: var(--color-parchment);
-  font-size: 28px;
+  color: var(--color-ink);
+  font-size: 32px;
   font-weight: bold;
   line-height: 1;
   display: flex;
