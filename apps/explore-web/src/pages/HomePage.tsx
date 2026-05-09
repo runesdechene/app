@@ -9,7 +9,8 @@ import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
-import { EnigmaFragmentsList } from '../components/home/EnigmaFragmentsList'
+// EnigmaFragmentsList masquée — fragments absorbés par badge DailyEnigmaCard (maquette 09/05/2026)
+// import { EnigmaFragmentsList } from '../components/home/EnigmaFragmentsList'
 import { QuestsBoardPanel } from '../components/quests/QuestsBoardPanel'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { ActivityFeed } from '../components/home/ActivityFeed'
@@ -77,10 +78,7 @@ export default function HomePage() {
             onOpen={() => setShowDailyEnigma(true)}
             refreshKey={enigmaRefreshKey}
           />
-          <EnigmaFragmentsList
-            onOpenFragment={(f) => setFragmentEnigma(f)}
-            refreshKey={enigmaRefreshKey}
-          />
+          {/* EnigmaFragmentsList retirée — compteur fragments intégré au badge DailyEnigmaCard */}
         </section>
 
         <section className="home-section">
