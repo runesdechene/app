@@ -84,6 +84,7 @@ export default function HomePage() {
         <section className="home-section">
           <DailyEnigmaCard
             onOpen={() => setShowDailyEnigma(true)}
+            onOpenFragment={(f) => setFragmentEnigma(f)}
             refreshKey={enigmaRefreshKey}
           />
           {/* EnigmaFragmentsList retirée — compteur fragments intégré au badge DailyEnigmaCard */}
