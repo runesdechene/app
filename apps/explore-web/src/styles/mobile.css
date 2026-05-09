@@ -311,6 +311,8 @@
   .notification-bell {
     width: auto;
     padding: 9px 12px;
+    border: none;
+    box-shadow: none;
   }
 
   .notification-bell-icon {
