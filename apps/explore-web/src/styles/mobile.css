@@ -35,11 +35,21 @@
     transform: none !important;
     z-index: 9999 !important;
     overflow-y: auto !important;
+    /* iOS : décale le contenu sous la status bar et au-dessus du home indicator. */
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    box-sizing: border-box !important;
   }
   @supports (height: 100dvh) {
     .modal-mobile-fullscreen {
       height: 100dvh !important;
       max-height: 100dvh !important;
+    }
+  }
+  /* iOS Safari browser mode : env() = 0 → force min 47px de status bar. */
+  @supports (-webkit-touch-callout: none) {
+    .modal-mobile-fullscreen {
+      padding-top: max(env(safe-area-inset-top, 0px), 47px) !important;
     }
   }
 
