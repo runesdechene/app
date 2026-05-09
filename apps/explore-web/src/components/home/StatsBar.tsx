@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
+import { useFractionalEnergy, formatEnergy } from '../../hooks/useFractionalEnergy'
 import { InfoModal } from '../map/modals/InfoModal'
 import './StatsBar.css'
 
@@ -16,15 +17,12 @@ export function StatsBar() {
   const level = usePlayerStore((s) => s.level)
   const xpTotal = usePlayerStore((s) => s.xpTotal)
   const xpToNextLevel = usePlayerStore((s) => s.xpToNextLevel)
-  const energy = usePlayerStore((s) => s.energy)
-  const maxEnergy = usePlayerStore((s) => s.maxEnergy)
-  const energyCycle = usePlayerStore((s) => s.energyCycle)
+  const { energy, maxEnergy, ratePerHour } = useFractionalEnergy()
   const crownsBalance = useCrownsStore((s) => s.balance)
   const { state: coupeState } = useCoupe(true)
   const coupeScore = coupeState?.myBreakdown?.score ?? null
 
   const [openInfo, setOpenInfo] = useState<StatId>(null)
-  const ratePerHour = energyCycle > 0 ? 3600 / energyCycle : 0
 
   return (
     <>
@@ -49,7 +47,7 @@ export function StatsBar() {
         <button type="button" className="stats-cell" onClick={() => setOpenInfo('energy')}>
           <span className="stats-cell-icon" aria-hidden>⚡</span>
           <span className="stats-cell-value">
-            {energy.toFixed(1)}/{maxEnergy}
+            {formatEnergy(energy, maxEnergy)}/{maxEnergy}
           </span>
         </button>
       </div>
@@ -98,7 +96,7 @@ export function StatsBar() {
           title="Énergie"
           description="L'énergie permet de découvrir et protéger des lieux. Elle se régénère automatiquement avec le temps."
           rows={[
-            { label: 'Points actuels', value: `${energy.toFixed(1)} / ${maxEnergy}` },
+            { label: 'Points actuels', value: `${formatEnergy(energy, maxEnergy)} / ${maxEnergy}` },
             { label: 'Régénération', value: `+${ratePerHour.toFixed(2)} / heure` },
           ]}
           onClose={() => setOpenInfo(null)}

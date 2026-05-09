@@ -1,31 +1,15 @@
 ﻿import { useState } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useFractionalEnergy, formatEnergy } from '../../../hooks/useFractionalEnergy'
 import { InfoModal } from '../modals/InfoModal'
 import './EnergyIndicator.css'
 
 export function EnergyIndicator() {
-  const energy = usePlayerStore(s => s.energy)
-  const maxEnergy = usePlayerStore(s => s.maxEnergy)
   const cycleSeconds = usePlayerStore(s => s.energyCycle)
-  const nextPointIn = usePlayerStore(s => s.nextPointIn)
-  const isFull = energy >= maxEnergy
-
-  // Energie fractionnaire en temps reel
-  const elapsedInTick = cycleSeconds - nextPointIn
-  const fractionOfTick = cycleSeconds > 0 ? elapsedInTick / cycleSeconds : 0
-  const fractionalEnergy = isFull
-    ? maxEnergy
-    : Math.min(energy + fractionOfTick, maxEnergy)
-
-  function formatEnergy(n: number): string {
-    if (n >= maxEnergy) return maxEnergy.toFixed(1)
-    const rounded = Math.floor(n * 10) / 10
-    return rounded.toFixed(1)
-  }
+  const { energy: fractionalEnergy, maxEnergy, ratePerHour } = useFractionalEnergy()
 
   const fillPercent = (fractionalEnergy / maxEnergy) * 100
   const regenBonus = cycleSeconds < 7200 ? 'bonus' : cycleSeconds > 7200 ? 'malus' : ''
-  const ratePerHour = 3600 / cycleSeconds
   const [showInfo, setShowInfo] = useState(false)
 
   const baseCycle = 7200
@@ -38,7 +22,7 @@ export function EnergyIndicator() {
         <div className="energy-main">
           <span className="energy-icon">{'\u26A1'}</span>
           <span className="energy-count">
-            {formatEnergy(fractionalEnergy)}/{maxEnergy}
+            {formatEnergy(fractionalEnergy, maxEnergy)}/{maxEnergy}
           </span>
           <div className="energy-bar">
             <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />
@@ -56,7 +40,7 @@ export function EnergyIndicator() {
           title="Energie"
           description="L'energie permet de decouvrir et proteger des lieux. Le cout varie selon le type de lieu. Elle se regenere automatiquement."
           rows={[
-            { label: 'Points actuels', value: `${formatEnergy(fractionalEnergy)} / ${maxEnergy}` },
+            { label: 'Points actuels', value: `${formatEnergy(fractionalEnergy, maxEnergy)} / ${maxEnergy}` },
             { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
             ...(hasRegenBonus ? [
               { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
