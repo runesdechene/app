@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { EmailChangeModal } from './EmailChangeModal'
+import { HouseAvatarBadge } from '../home/HouseAvatarBadge'
 import { supabase } from '../../lib/supabase'
 
 interface ProfileMenuProps {
@@ -71,6 +72,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
         className="toolbar-btn profile-btn"
         onClick={() => setOpen(o => !o)}
         aria-label="Mon profil"
+        style={{ position: 'relative' }}
       >
         {userAvatarUrl ? (
           <img
@@ -81,6 +83,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
         ) : (
           <span className="profile-btn-initial">{initial}</span>
         )}
+        <HouseAvatarBadge size={20} />
       </button>
 
       {open && (

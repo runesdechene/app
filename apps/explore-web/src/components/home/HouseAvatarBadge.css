@@ -1,0 +1,19 @@
+.house-avatar-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  border-radius: 50%;
+  border: 2px solid #f0e6d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* l'avatar gère le click */
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.house-avatar-badge-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
