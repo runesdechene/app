@@ -83,7 +83,7 @@
 
 .game-toast {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   border-left: 3px solid transparent;
   padding: 5px 8px;
@@ -91,6 +91,7 @@
   font-size: 13px;
   color: var(--color-ink);
   animation: toast-slide-in 0.3s ease-out;
+  flex-shrink: 0;
 }
 
 .game-toast-content {
