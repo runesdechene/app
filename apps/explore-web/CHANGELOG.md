@@ -1,3 +1,42 @@
+# ALPHA V0.7.7
+## Notifications push — les raisons de revenir
+
+### 🔔 L'app peut maintenant te prévenir
+À midi pile, ton énigme du jour t'attend. Un compagnon écrit dans ton expédition. Quelqu'un conteste un lieu que tu surveilles. Avant, il fallait ouvrir l'app pour le savoir. Maintenant, on peut te ping — tu décides quand revenir.
+
+### 🌿 Six moments retenus en V1
+- **Ton énigme du jour est prête** (12h30 pile, heure de Paris)
+- **Message dans ton expédition** (un compagnon t'écrit)
+- **Lieu contesté ou repris** (carte qui bouge sur ton territoire)
+- **Tu approches d'un palier de niveau** (rappel doux quand tu es à 5 XP du suivant)
+- **Récap hebdo des nouveaux lieux** (lundi matin, si la carte s'est étoffée)
+
+Tout le reste reste **dans l'app** uniquement (cloche notifs comme avant). On n'inonde pas.
+
+### 🛡️ On te demande au bon moment, pas à l'arrivée
+Pas de prompt pénible au premier launch. La permission est demandée au moment où elle a du sens — quand tu termines ton énigme, quand tu crées une expédition. Tu peux refuser, on n'insiste pas.
+
+### 📱 iPhone : ajouter à l'écran d'accueil
+iOS exige que l'app soit **ajoutée à l'écran d'accueil** pour recevoir des notifications. Si tu ouvres RdC dans Safari sans l'avoir ajoutée, on te montre comment faire (4 étapes). Ensuite tout marche normalement.
+
+### ⚙️ Tu pilotes
+Dans ton menu profil → **Notifications** : un toggle maître + deux catégories (Importantes / Récap). Tu peux couper les rappels doux et garder les vrais signaux. Ou désactiver tout.
+
+### Sous le capot
+- Mig 141 : table `push_subscriptions` (1 row par appareil) + RLS strict + 2 colonnes `users.push_*_enabled`
+- Mig 142 : trigger `AFTER INSERT ON notifications` → `pg_net.http_post` vers Edge Function (fail-open : l'INSERT ne casse pas si la config manque)
+- Mig 143 : seed `app_config` (URL Edge Function + service key, à remplir post-deploy)
+- Mig 144 : cron énigme — fenêtre cron 4× UTC + filtre `Europe/Paris` 12h30 ± 5min (DST-safe été/hiver)
+- Mig 145 : cron level-up imminent — quotidien 17h UTC, 1×/7j/user, basé sur `xp_total` + `_xp_for_level`
+- Mig 146 : cron récap hebdo — lundi 8h UTC, seuil min 3 nouveaux lieux
+- Edge Function Deno `send-push` : npm:web-push, VAPID auth, parallel send, cleanup automatique des subs 410/404
+- Bascule `vite-plugin-pwa` mode `injectManifest` → SW custom (`src/sw.ts`) avec push handler + notificationclick (focus tab existante ou ouvre)
+- Hook `useEnsurePushPermission` réutilisable + `PushPromptHost` mounté une fois dans MapPage
+- Détection iOS Safari non-standalone → `IOSInstallGuideModal` (4 étapes visuelles)
+- Tout type non listé reste **silent** (in-app uniquement) — élargissement type par type plus tard
+
+---
+
 # ALPHA V0.7.6
 ## Couronnes — l'économie qui respecte tous les voyageurs
 
