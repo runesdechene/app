@@ -1135,6 +1135,27 @@
 /* Notification panel — mobile : utilise la convention .modal-mobile-fullscreen
    ajoutée au className dans le composant. Plus de règles CSS dédiées ici. */
 
+/* Menu de sélection d'énigme (EnigmaMenu) — mobile : centré 80vw / 80dvh
+   au lieu de l'alignement haut-droite desktop. */
+@media (max-width: 768px) {
+  .enigma-menu-overlay {
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .enigma-menu {
+    width: 80vw;
+    max-width: 80vw;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  @supports (height: 100dvh) {
+    .enigma-menu {
+      max-height: 80dvh;
+    }
+  }
+}
+
 /* ==========================================
    PlayerProfileModal — refonte mobile (2026-05-02 Uriel) :
    layout vertical centré (avatar haut, nom, niveau, barre XP) +
