@@ -85,17 +85,16 @@
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  border-left: 3px solid transparent;
+  /* Bordure gauche sépia par défaut sur tous les toasts.
+     Pour contribute/new_place, le style inline override la couleur
+     avec celle de la faction du contributeur. */
+  border-left: 3px solid var(--color-sepia);
   padding: 5px 8px;
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--color-ink);
   animation: toast-slide-in 0.3s ease-out;
   flex-shrink: 0;
-}
-
-.game-toast--has-border {
-  border-left: 3px solid var(--color-sepia);
 }
 
 .game-toast-icon-bubble {
