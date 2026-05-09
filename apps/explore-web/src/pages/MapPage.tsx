@@ -47,6 +47,7 @@ import { TutorialModal } from '../components/tutorial/TutorialModal'
 import type { TutorialSlide } from '../components/tutorial/TutorialModal'
 import { useNotifications } from '../hooks/useNotifications'
 import { useCourtNotifications } from '../hooks/useCourtNotifications'
+import { PushPromptHost, PushSubscriptionSync } from '../hooks/useEnsurePushPermission'
 import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
 import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
@@ -316,6 +317,8 @@ export default function MapPage() {
 
   return (
     <div className="app" data-mobile-panel={mobilePanel || ''}>
+      <PushPromptHost />
+      <PushSubscriptionSync />
       {showAdScreen && isAuthenticated && !authLoading && (
         <AdScreen onDone={() => setShowAdScreen(false)} />
       )}

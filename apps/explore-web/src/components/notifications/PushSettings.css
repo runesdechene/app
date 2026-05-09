@@ -1,0 +1,62 @@
+.push-settings {
+  padding: 16px;
+  border-top: 1px solid var(--color-parchment-dark, #E8D5BE);
+}
+
+.push-settings h3 {
+  font-family: var(--font-title, 'Bebas Neue'), serif;
+  font-size: 18px;
+  margin: 0 0 12px;
+  color: var(--color-ink, #4A3728);
+  letter-spacing: 0.02em;
+}
+
+.push-settings-row { margin-bottom: 12px; }
+
+.push-settings-label {
+  display: flex; gap: 10px; align-items: center;
+  font-family: var(--font-body, 'Cabin'), sans-serif;
+  font-size: 16px;
+  color: var(--color-ink, #4A3728);
+  cursor: pointer;
+}
+
+.push-settings-cats {
+  display: flex; flex-direction: column; gap: 12px;
+  padding-left: 8px;
+}
+.push-settings-cats.is-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.push-settings-cat {
+  display: flex; gap: 12px; align-items: flex-start;
+  cursor: pointer;
+}
+
+.push-settings-cat input[type="checkbox"] {
+  margin-top: 4px;
+}
+
+.push-settings-cat strong {
+  font-family: var(--font-accent, 'Cabin Condensed'), sans-serif;
+  font-size: 15px;
+  color: var(--color-ink, #4A3728);
+  display: block;
+}
+
+.push-settings-cat small {
+  font-family: var(--font-body, 'Cabin'), sans-serif;
+  font-size: 13px;
+  color: var(--color-ink-light, #7D5A3C);
+  display: block;
+  line-height: 1.4;
+}
+
+.push-settings--unsupported p {
+  font-family: var(--font-body, 'Cabin'), sans-serif;
+  font-size: 14px;
+  color: var(--color-ink-light, #7D5A3C);
+  margin: 0;
+}
