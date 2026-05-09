@@ -12,6 +12,24 @@ interface Place {
   image_url: string | null
   distance_km?: number
   created_at?: string
+  tag_icon?: string | null
+  tag_color?: string | null
+  author_id?: string | null
+  author_name?: string | null
+}
+
+function formatTimeAgo(iso?: string): string {
+  if (!iso) return ''
+  const ms = Date.now() - new Date(iso).getTime()
+  if (ms < 60_000) return 'à l’instant'
+  const min = Math.floor(ms / 60_000)
+  if (min < 60) return `il y a ${min} min`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `il y a ${h}h`
+  const d = Math.floor(h / 24)
+  if (d < 30) return `il y a ${d}j`
+  const mo = Math.floor(d / 30)
+  return `il y a ${mo} mois`
 }
 
 /**
@@ -107,7 +125,22 @@ export function PlacesSection() {
                   <div className="places-section-card-placeholder">📍</div>
                 )}
               </div>
-              <div className="places-section-card-name">{p.title}</div>
+              <div className="places-section-card-name">
+                {p.tag_icon && (
+                  <span
+                    className="places-section-card-tag-bubble"
+                    style={{ background: p.tag_color ?? '#8A7B6A' }}
+                    aria-hidden
+                  >
+                    <img src={p.tag_icon} alt="" />
+                  </span>
+                )}
+                <span className="places-section-card-name-text">{p.title}</span>
+              </div>
+              <div className="places-section-card-meta">
+                {p.author_name && <span className="places-section-card-author">{p.author_name}</span>}
+                {p.created_at && <span className="places-section-card-time">{formatTimeAgo(p.created_at)}</span>}
+              </div>
               {p.distance_km != null && (
                 <div className="places-section-card-sub">
                   {p.distance_km < 1

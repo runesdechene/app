@@ -79,22 +79,71 @@
 }
 
 .places-section-card-name {
-  padding: 8px 10px 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px 2px;
   font-size: 13px;
   color: var(--color-ink);
   font-weight: 700;
   font-family: var(--font-accent);
+  min-width: 0;
+}
+
+.places-section-card-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tag bubble — réplique exacte de .player-modal-place-tile-tag-bubble
+   du PlayerProfileModal (cohérence avec le design existant). */
+.places-section-card-tag-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.places-section-card-tag-bubble img {
+  width: 10px;
+  height: 10px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Meta line : auteur + temps écoulé sous le titre */
+.places-section-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 10px 6px;
+  font-size: 11px;
+  color: var(--color-ink-light);
+  font-family: var(--font-signature);
+  font-style: italic;
+}
+.places-section-card-author {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.places-section-card-time {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
 .places-section-card-sub {
   padding: 0 10px 8px;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-ink-light);
-  font-style: italic;
-  font-family: var(--font-signature);
+  font-family: var(--font-accent);
+  letter-spacing: 0.04em;
 }
 
 .places-section-fallback,
