@@ -9,6 +9,9 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
         name: 'Runes de Chêne',
@@ -42,9 +45,8 @@ export default defineConfig({
           }
         ]
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
-        navigateFallbackDenylist: [/^\/lieu\//,  /^\/sitemap/]
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}']
       }
     })
   ],
