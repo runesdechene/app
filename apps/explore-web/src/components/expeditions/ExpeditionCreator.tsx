@@ -9,6 +9,7 @@ import {
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { listUpcomingExpeditions, getExpeditionCoverUrl } from '../../lib/expeditionsApi'
 import { useMapStore } from '../../stores/mapStore'
+import { useEnsurePushPermission } from '../../hooks/useEnsurePushPermission'
 import type { ExpeditionDetail } from '../../types/expedition'
 import './ExpeditionCreator.css'
 
@@ -34,6 +35,7 @@ interface Props {
 export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, existing, embedded }: Props) {
   const isEdit = !!existing
   const setUpcoming = useExpeditionsStore((s) => s.setUpcoming)
+  const ensurePush = useEnsurePushPermission()
 
   const [name, setName] = useState(existing?.name ?? '')
   const [callText, setCallText] = useState(existing?.call_text ?? '')
@@ -188,6 +190,17 @@ export function ExpeditionCreator({ onClose, onCreated, initialLat, initialLng, 
     setSubmitting(false)
 
     listUpcomingExpeditions().then(setUpcoming).catch(() => {})
+
+    // Well-timed prompt : seulement à la création (pas en édition).
+    // Le hook ne re-prompt jamais s'il a déjà été refusé une fois.
+    if (!isEdit) {
+      ensurePush({
+        reason: 'expedition_created',
+        title: 'Reste connecté avec tes compagnons',
+        body:  'On te ping quand un compagnon écrit dans l’expédition.',
+      })
+    }
+
     onCreated(expeditionId)
   }
 
