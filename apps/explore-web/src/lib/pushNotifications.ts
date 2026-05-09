@@ -52,7 +52,10 @@ async function getRegistration(): Promise<ServiceWorkerRegistration | null> {
   }
 }
 
-export async function subscribeUser(userId: string): Promise<PushSubscription | null> {
+// Note : on passe par les RPCs register/unregister_push_subscription
+// (SECURITY DEFINER) côté serveur — pattern RdC pour toutes les écritures.
+// Le user_id est dérivé de auth.uid() côté serveur, on n'a pas à le passer.
+export async function subscribeUser(_userId: string): Promise<PushSubscription | null> {
   if (pushSupportStatus() !== 'native') return null
   if (!VAPID_PUBLIC_KEY) {
     console.error('[push] missing VITE_VAPID_PUBLIC_KEY')
@@ -60,7 +63,10 @@ export async function subscribeUser(userId: string): Promise<PushSubscription | 
   }
 
   const reg = await getRegistration()
-  if (!reg) return null
+  if (!reg) {
+    console.error('[push] service worker not ready')
+    return null
+  }
 
   let sub = await reg.pushManager.getSubscription()
   if (!sub) {
@@ -82,22 +88,17 @@ export async function subscribeUser(userId: string): Promise<PushSubscription | 
 
   if (!endpoint || !p256dh || !auth) {
     console.error('[push] sub keys incomplete', json)
-    return sub
+    return null
   }
 
-  const { error } = await supabase.from('push_subscriptions').upsert(
-    {
-      user_id: userId,
-      endpoint,
-      p256dh,
-      auth,
-      user_agent: navigator.userAgent,
-      last_seen_at: new Date().toISOString(),
-    },
-    { onConflict: 'endpoint' },
-  )
-  if (error) {
-    console.error('[push] upsert sub failed', error)
+  const { data, error } = await supabase.rpc('register_push_subscription', {
+    p_endpoint:   endpoint,
+    p_p256dh:     p256dh,
+    p_auth:       auth,
+    p_user_agent: navigator.userAgent,
+  })
+  if (error || (data && (data as { error?: string }).error)) {
+    console.error('[push] register_push_subscription failed', error || data)
     return null
   }
   return sub
@@ -110,12 +111,12 @@ export async function unsubscribeUser(): Promise<void> {
   if (!sub) return
   const endpoint = sub.endpoint
   await sub.unsubscribe()
-  await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint)
+  await supabase.rpc('unregister_push_subscription', { p_endpoint: endpoint })
 }
 
 // Au boot après login : aligne la sub locale avec la DB.
 // - Sub navigateur absente mais permission granted → re-subscribe silencieusement
-// - Sub navigateur présente → upsert (re-attribue au user_id courant si change de compte)
+// - Sub navigateur présente → re-register (re-attribue au user_id courant)
 export async function syncSubscription(userId: string): Promise<void> {
   if (pushSupportStatus() !== 'native') return
   const reg = await getRegistration()
@@ -132,17 +133,14 @@ export async function syncSubscription(userId: string): Promise<void> {
 
   const json = sub.toJSON()
   const endpoint = json.endpoint ?? ''
-  if (!endpoint) return
+  const p256dh   = json.keys?.p256dh ?? ''
+  const auth     = json.keys?.auth ?? ''
+  if (!endpoint || !p256dh || !auth) return
 
-  await supabase.from('push_subscriptions').upsert(
-    {
-      user_id: userId,
-      endpoint,
-      p256dh: json.keys?.p256dh ?? '',
-      auth:   json.keys?.auth ?? '',
-      user_agent: navigator.userAgent,
-      last_seen_at: new Date().toISOString(),
-    },
-    { onConflict: 'endpoint' },
-  )
+  await supabase.rpc('register_push_subscription', {
+    p_endpoint:   endpoint,
+    p_p256dh:     p256dh,
+    p_auth:       auth,
+    p_user_agent: navigator.userAgent,
+  })
 }

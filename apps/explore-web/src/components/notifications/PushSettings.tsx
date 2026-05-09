@@ -44,11 +44,12 @@ export function PushSettings() {
     if (!userId) return
     if (granted) {
       await unsubscribeUser()
-      setGranted(false)
     } else {
-      const sub = await subscribeUser(userId)
-      setGranted(Boolean(sub))
+      await subscribeUser(userId)
     }
+    // Resync sur l'état réel du navigateur — robuste même si l'upsert plante
+    // ou si l'user a accepté/refusé entre temps via les settings du navigateur.
+    setGranted(typeof Notification !== 'undefined' && Notification.permission === 'granted')
   }
 
   if (!supported) {
