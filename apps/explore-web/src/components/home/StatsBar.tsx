@@ -4,9 +4,10 @@ import { useCrownsStore } from '../../stores/crownsStore'
 import { useCoupe } from '../../hooks/useCoupe'
 import { useFractionalEnergy, formatEnergy } from '../../hooks/useFractionalEnergy'
 import { InfoModal } from '../map/modals/InfoModal'
+import { LeaderboardModal } from '../map/modals/LeaderboardModal'
 import './StatsBar.css'
 
-type StatId = 'level' | 'coupe' | 'crowns' | 'energy' | null
+type StatId = 'coupe' | 'crowns' | 'energy' | null
 
 /**
  * Barre de stats inline — partagée entre /accueil et /carte mobile.
@@ -15,19 +16,18 @@ type StatId = 'level' | 'coupe' | 'crowns' | 'energy' | null
  */
 export function StatsBar() {
   const level = usePlayerStore((s) => s.level)
-  const xpTotal = usePlayerStore((s) => s.xpTotal)
-  const xpToNextLevel = usePlayerStore((s) => s.xpToNextLevel)
   const { energy, maxEnergy, ratePerHour } = useFractionalEnergy()
   const crownsBalance = useCrownsStore((s) => s.balance)
   const { state: coupeState } = useCoupe(true)
   const coupeScore = coupeState?.myBreakdown?.score ?? null
 
   const [openInfo, setOpenInfo] = useState<StatId>(null)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   return (
     <>
       <div className="stats-bar">
-        <button type="button" className="stats-cell" onClick={() => setOpenInfo('level')}>
+        <button type="button" className="stats-cell" onClick={() => setShowLeaderboard(true)}>
           <span className="stats-cell-icon" aria-hidden>🎖️</span>
           <span className="stats-cell-value">Niv. {level}</span>
         </button>
@@ -52,18 +52,8 @@ export function StatsBar() {
         </button>
       </div>
 
-      {openInfo === 'level' && (
-        <InfoModal
-          icon="🎖️"
-          title="Niveau"
-          description="Ton niveau monte avec ton XP total. Plus tu joues, plus tu progresses dans la hiérarchie de la confrérie."
-          rows={[
-            { label: 'Niveau actuel', value: `${level}` },
-            { label: 'XP total', value: `${xpTotal}` },
-            { label: 'XP avant palier suivant', value: `${xpToNextLevel}` },
-          ]}
-          onClose={() => setOpenInfo(null)}
-        />
+      {showLeaderboard && (
+        <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
       )}
 
       {openInfo === 'coupe' && (
