@@ -13,14 +13,16 @@
 }
 
 /* Carrousel horizontal — 9 lieux scrollables.
-   margin négatif uniquement à droite : la première card reste à 16px du
-   bord gauche (padding parent intact), mais la dernière card peut être
-   scrollée jusqu'au bord droit du viewport sans être tronquée. */
+   margin négatif des 2 côtés → le scroll occupe toute la largeur du viewport.
+   Padding interne 16px → la première card commence à 16px du bord (alignée
+   sur le titre) ET la dernière card a 16px d'air à droite quand scrollée.
+   Quand on scroll, les cards disparaissent BORD à BORD du viewport (pas
+   tronquées à 16px du bord). */
 .places-section-scroll {
   display: flex;
   gap: 10px;
-  margin: 0 -16px 0 0;
-  padding: 0;
+  margin: 0 -16px;
+  padding: 0 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;

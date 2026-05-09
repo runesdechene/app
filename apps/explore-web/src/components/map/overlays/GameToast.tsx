@@ -135,6 +135,10 @@ export function ToastItem({ toast }: { toast: GameToastType }) {
       if (toast.placeLocation) {
         actions.set(placeHL, () => {
           useMobileNavStore.getState().closePanel()
+          // setSelectedPlaceId d'abord pour que le PlacePanel s'ouvre dans
+          // tous les contextes (carte ET home — où la map n'est pas montée
+          // pour consommer pendingFlyTo). flyTo en plus si la carte est là.
+          useMapStore.getState().setSelectedPlaceId(toast.placeId!)
           requestFlyTo({
             lng: toast.placeLocation!.longitude,
             lat: toast.placeLocation!.latitude,

@@ -22,6 +22,7 @@ import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
 import { PlacePanel } from '../components/places/views/PlacePanel'
+import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
 import { useMapStore } from '../stores/mapStore'
 import './HomePage.css'
 
@@ -31,6 +32,8 @@ export default function HomePage() {
   const userFactionId = usePlayerStore((s) => s.userFactionId)
   const selectedPlaceId = useMapStore((s) => s.selectedPlaceId)
   const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
+  const selectedPlayerId = useMapStore((s) => s.selectedPlayerId)
+  const setSelectedPlayerId = useMapStore((s) => s.setSelectedPlayerId)
 
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
@@ -158,6 +161,13 @@ export default function HomePage() {
         onClose={() => setSelectedPlaceId(null)}
         userEmail={user?.email ?? null}
       />
+      {/* Modale profil joueur — clic sur un nom dans MapActivityList. */}
+      {selectedPlayerId && (
+        <PlayerProfileModal
+          playerId={selectedPlayerId}
+          onClose={() => setSelectedPlayerId(null)}
+        />
+      )}
       <GameToast />
     </div>
   )
