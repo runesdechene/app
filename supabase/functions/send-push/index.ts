@@ -136,9 +136,11 @@ serve(async (req) => {
   const payloadJson = JSON.stringify(payload)
 
   // 5. Envoi parallèle, cleanup 410
+  console.log('send-push start', { recipient_id, type, category, sub_count: subList.length, payload })
+
   await Promise.all(subList.map(async (sub) => {
     try {
-      await webpush.sendNotification(
+      const result = await webpush.sendNotification(
         {
           endpoint: sub.endpoint,
           keys: { p256dh: sub.p256dh, auth: sub.auth },
@@ -149,18 +151,22 @@ serve(async (req) => {
           urgency: category === 'important' ? 'high' : 'normal',
         },
       )
+      console.log('push_sent_ok', {
+        sub_id: sub.id,
+        push_service: new URL(sub.endpoint).hostname,
+        status_code: (result as { statusCode?: number })?.statusCode,
+        body: (result as { body?: string })?.body,
+      })
       await supabase
         .from('push_subscriptions')
         .update({ last_seen_at: new Date().toISOString() })
         .eq('id', sub.id)
     } catch (err: unknown) {
       const status = (err as { statusCode?: number })?.statusCode
+      const body = (err as { body?: string })?.body
+      console.error('push_failed', { sub_id: sub.id, status, body, err_message: (err as Error)?.message })
       if (status === 410 || status === 404) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id)
-      } else if (status === 429) {
-        console.warn('rate_limited', sub.id)
-      } else {
-        console.error('push_failed', sub.id, err)
       }
     }
   }))

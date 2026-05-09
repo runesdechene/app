@@ -4,6 +4,7 @@ import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
 import { supabase } from '../../../lib/supabase'
 import { EmailChangeModal } from '../../auth/EmailChangeModal'
+import { PushSettings } from '../../notifications/PushSettings'
 import logoImg from '../../../assets/logo_couleur_mobile.webp'
 import shopIcon from '../../../assets/shop_icon.webp'
 
@@ -150,6 +151,8 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
               👁️ Position GPS exacte
             </button>
           </div>
+
+          <PushSettings />
 
           <div className="profile-dropdown-divider" />
 

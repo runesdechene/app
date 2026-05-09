@@ -16,6 +16,8 @@ export interface Notification {
     | 'expedition_validated' | 'expedition_rejected'
     | 'expedition_modified' | 'expedition_cancelled'
     | 'expedition_report_posted' | 'expedition_message'
+    // V0.7.7 — Push notifications V1
+    | 'daily_enigma_ready' | 'level_up_imminent' | 'weekly_new_places_recap'
   data: {
     actorName?: string
     actorId?: string
@@ -50,6 +52,11 @@ export interface Notification {
     message?: string | null
     changedFields?: string[]
     preview?: string
+    // V0.7.7 — Push notifications V1
+    xp_diff?: number
+    next_level?: number
+    count?: number
+    sample_names_csv?: string
   }
   read: boolean
   created_at: string

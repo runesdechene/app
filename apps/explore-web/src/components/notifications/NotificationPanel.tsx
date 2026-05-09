@@ -27,6 +27,10 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   expedition_cancelled: '\uD83D\uDEAB',         // \uD83D\uDEAB
   expedition_report_posted: '\uD83D\uDCDC',     // \uD83D\uDCDC
   expedition_message: '\uD83D\uDCAC',           // \uD83D\uDCAC
+  // V0.7.7 \u2014 Push notifications V1
+  daily_enigma_ready: '\uD83C\uDF31',           // \uD83C\uDF31
+  level_up_imminent: '\uD83C\uDF96\uFE0F',      // \uD83C\uDF96\uFE0F
+  weekly_new_places_recap: '\uD83D\uDDFA\uFE0F', // \uD83D\uDDFA\uFE0F
 }
 
 function formatMessage(notif: Notification): string {
@@ -93,6 +97,15 @@ function formatMessage(notif: Notification): string {
       return `${d.authorName || 'Un compagnon'} a laissé un compte rendu sur ${d.expeditionName || 'l\'événement'}`
     case 'expedition_message':
       return `${d.authorName || 'Un compagnon'} t'a écrit dans ${d.expeditionName || 'l\'événement'}${d.preview ? ' : « ' + d.preview + ' »' : ''}`
+    // V0.7.7 — Push notifications V1
+    case 'daily_enigma_ready':
+      return `Ton énigme du jour t'attend.`
+    case 'level_up_imminent':
+      return `Plus que ${d.xp_diff ?? '?'} XP avant le niveau ${d.next_level ?? '?'}.`
+    case 'weekly_new_places_recap':
+      return d.sample_names_csv
+        ? `${d.count ?? 0} nouveaux lieux cette semaine — ${d.sample_names_csv}…`
+        : `${d.count ?? 0} nouveaux lieux cette semaine.`
   }
 }
 
