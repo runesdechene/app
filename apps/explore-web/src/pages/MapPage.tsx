@@ -28,6 +28,7 @@ import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
 import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
+import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
@@ -557,6 +558,8 @@ export default function MapPage() {
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}
+
+      <BottomTabbar />
     </div>
   )
 }

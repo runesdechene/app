@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import './HomePage.css'
 
 export default function HomePage() {
@@ -14,6 +15,7 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <p className="home-page-skeleton">HomePage — sections à venir</p>
+      <BottomTabbar />
     </div>
   )
 }
