@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
+import { MobileSelectionModals } from '../components/navigation/MobileSelectionModals'
 import { MapActivityList } from '../components/home/MapActivityList'
 import { markActivitySeen } from '../hooks/useUnreadActivityCount'
 import './ActivityPage.css'
@@ -26,6 +27,7 @@ export default function ActivityPage() {
         <MapActivityList limit={50} />
       </main>
       <BottomTabbar />
+      <MobileSelectionModals />
     </div>
   )
 }

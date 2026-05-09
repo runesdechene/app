@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
+import { MobileSelectionModals } from '../components/navigation/MobileSelectionModals'
 import { ChatPanel } from '../components/chat/ChatPanel'
 import './ChatPage.css'
 
@@ -21,6 +22,7 @@ export default function ChatPage() {
         <ChatPanel />
       </main>
       <BottomTabbar />
+      <MobileSelectionModals />
     </div>
   )
 }

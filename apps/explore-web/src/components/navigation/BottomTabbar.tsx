@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useMatch } from 'react-router-dom'
 import { useState } from 'react'
 import { BottomTabbarPlusMenu } from './BottomTabbarPlusMenu'
 import { useUnreadActivityCount } from '../../hooks/useUnreadActivityCount'
@@ -11,22 +11,17 @@ interface CellProps {
   unreadBadge?: number
 }
 
-/** Cellule unique avec span indicateur explicite pour le tab actif. */
+/** Cellule unique avec span indicateur explicite pour le tab actif.
+ *  useMatch détermine isActive — plus prévisible que NavLink render-prop. */
 function TabbarCell({ to, icon, label, unreadBadge }: CellProps) {
+  const isActive = !!useMatch(to)
   return (
-    <NavLink
-      to={to}
-      className={({ isActive }) => `bottom-tabbar-cell${isActive ? ' active' : ''}`}
-    >
-      {({ isActive }) => (
-        <>
-          {isActive && <span className="bottom-tabbar-active-indicator" aria-hidden />}
-          <span className="bottom-tabbar-icon" aria-hidden>{icon}</span>
-          <span className="bottom-tabbar-label">{label}</span>
-          {unreadBadge !== undefined && unreadBadge > 0 && (
-            <span className="bottom-tabbar-badge">{unreadBadge}</span>
-          )}
-        </>
+    <NavLink to={to} className={`bottom-tabbar-cell${isActive ? ' active' : ''}`}>
+      {isActive && <span className="bottom-tabbar-active-indicator" aria-hidden />}
+      <span className="bottom-tabbar-icon" aria-hidden>{icon}</span>
+      <span className="bottom-tabbar-label">{label}</span>
+      {unreadBadge !== undefined && unreadBadge > 0 && (
+        <span className="bottom-tabbar-badge">{unreadBadge}</span>
       )}
     </NavLink>
   )
