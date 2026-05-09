@@ -3,6 +3,19 @@
   border-top: 1px solid var(--color-parchment-dark, #E8D5BE);
 }
 
+/* Reset universel * { padding:0 } d'index.css peut effondrer les checkboxes
+   natives → on rétablit explicitement leur apparence et taille. */
+.push-settings input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--color-gold, #d4af37);
+  cursor: pointer;
+}
+
 .push-settings h3 {
   font-family: var(--font-title, 'Bebas Neue'), serif;
   font-size: 18px;
