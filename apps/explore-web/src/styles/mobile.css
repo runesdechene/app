@@ -997,12 +997,18 @@
 
   .conquest-indicator
   {
-    /* Collée au header partagé (MobileTopBar ~50px + MobileStatsBar ~70px = ~120px)
-       avec un écart respirable. */
-    top: calc(var(--safe-top, 0px) + 140px);
+    /* Collée juste sous la stats bar (MobileTopBar ~50px + MobileStatsBar ~50px
+       = ~100px) avec une petite marge d'air. Inclut le safe-area-inset-top iOS. */
+    top: calc(env(safe-area-inset-top, 0px) + 100px);
     bottom: auto;
     left: 7px;
     right: auto;
+  }
+  /* iOS Safari browser mode : env() = 0 → fallback 47px de status bar. */
+  @supports (-webkit-touch-callout: none) {
+    .conquest-indicator {
+      top: calc(max(env(safe-area-inset-top, 0px), 47px) + 100px);
+    }
   }
 
   [data-mobile-panel="chat"] .chat-panel {

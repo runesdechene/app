@@ -7,9 +7,18 @@
   height: 100%;
   position: relative;
   /* iOS : décale tout le contenu sous la status bar (heure/réseau/batterie).
-     env(safe-area-inset-top) est ~47-50px sur iPhone récent, 0 partout ailleurs. */
+     env() vaut 0 en Safari browser mode → on force min 47px sur iOS. */
   padding-top: env(safe-area-inset-top, 0px);
   box-sizing: border-box;
+}
+
+/* iOS-only fallback : si env() retourne 0 (Safari browser mode non-installé),
+   force un minimum de 47px pour ne pas passer sous la status bar.
+   @supports (-webkit-touch-callout) matche iOS Safari + iOS PWA standalone. */
+@supports (-webkit-touch-callout: none) {
+  .app {
+    padding-top: max(env(safe-area-inset-top, 0px), 47px);
+  }
 }
 
 /* Masquer le point bleu natif de GeolocateControl (on a notre propre marqueur) */

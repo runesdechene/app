@@ -6,10 +6,18 @@
   height: 100dvh;
   overflow: hidden;
   background: var(--color-parchment);
-  /* iOS : décale tout le contenu sous la status bar (heure/réseau/batterie).
-     env(safe-area-inset-top) ≈ 47-50px sur iPhone, 0 partout ailleurs. */
+  /* iOS : décale tout le contenu sous la status bar.
+     env() vaut 0 en Safari browser mode → fallback @supports plus bas. */
   padding-top: env(safe-area-inset-top, 0px);
   box-sizing: border-box;
+}
+
+/* iOS-only fallback : minimum 47px sur iOS Safari/PWA pour ne pas passer
+   sous la status bar même si env() retourne 0 en browser mode. */
+@supports (-webkit-touch-callout: none) {
+  .mobile-layout {
+    padding-top: max(env(safe-area-inset-top, 0px), 47px);
+  }
 }
 
 /* Le main scrollable rendu par chaque page enfant (HomePage / ActivityPage /
