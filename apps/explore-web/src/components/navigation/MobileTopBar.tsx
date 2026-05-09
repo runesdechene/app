@@ -2,6 +2,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { ProfileMenu } from '../auth/ProfileMenu'
 import { NotificationBell } from '../notifications/NotificationBell'
 import logoImg from '../../assets/logo_couleur_mobile.webp'
+import shopIcon from '../../assets/shop_icon.webp'
 import './MobileTopBar.css'
 
 const SHOPIFY_URL = 'https://runesdechene.com'
@@ -27,7 +28,7 @@ export function MobileTopBar({ fadeOutBottom = false, onFactionModal }: MobileTo
         className="mobile-topbar-shop"
         aria-label="Visiter la boutique"
       >
-        🏪
+        <img src={shopIcon} alt="" />
       </a>
       <NotificationBell />
       {user?.email && (
