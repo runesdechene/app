@@ -37,9 +37,8 @@ export function BottomTabbar() {
           className="bottom-tabbar-plus"
           onClick={() => setPlusOpen(true)}
           aria-label="Créer un élément"
-        >
-          +
-        </button>
+        />
+
 
         <NavLink
           to="/activite"

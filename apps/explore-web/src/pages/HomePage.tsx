@@ -90,7 +90,6 @@ export default function HomePage() {
         </section>
 
         <section className="home-section">
-          <h2 className="home-section-title">Lieux récents</h2>
           <PlacesSection />
         </section>
 
