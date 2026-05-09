@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { useCallback, useEffect } from 'react'
 import { PushPermissionModal } from '../components/notifications/PushPermissionModal'
 import { IOSInstallGuideModal } from '../components/notifications/IOSInstallGuideModal'
-import { pushSupportStatus, subscribeUser, syncSubscription } from '../lib/pushNotifications'
+import { pushSupportStatus, subscribeUser, syncSubscription, isUserDisabled } from '../lib/pushNotifications'
 import { usePlayerStore } from '../stores/playerStore'
 
 type ModalKind = 'none' | 'permission' | 'ios'
@@ -43,6 +43,8 @@ export function useEnsurePushPermission(): (args: EnsureArgs) => void {
   return useCallback(
     (args: EnsureArgs) => {
       if (!userId) return
+      // Respecte l'intention explicite de désactivation
+      if (isUserDisabled()) return
       const status = pushSupportStatus()
 
       if (status === 'unsupported') return
