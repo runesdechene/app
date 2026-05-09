@@ -16,16 +16,6 @@ Tout ce qui bouge sur la carte — qui devient mécène, qui lève le brouillard
 ### 🖥️ Sur PC, rien ne change
 Tu arrives toujours directement sur la carte. La home et les pages plein écran sont uniquement mobile — sur grand écran la carte reste le centre de gravité.
 
-### Sous le capot
-- Nouvelle branche `home-mobile-hub`, ressuscitation chirurgicale des composants du pivot du matin (StatsBar, DailyEnigmaCard, EnigmaFragmentsList, PlacesSection, ActivityFeed)
-- 2 composants partagés : `MobileTopBar` (logo + boutique + cloche + profil) et `MobileStatsBar` (niveau + énergie + couronnes), montés sur `/accueil` ET `/carte` mobile pour cohérence
-- 3 nouvelles pages : `HomePage`, `ChatPage`, `ActivityPage` (lazy-loaded — pas de surcoût desktop)
-- `ActivityFeed` paramétré avec `limit` et `onSeeMore` (3 lignes en teaser, 30 en page complète)
-- `BottomTabbar` 5 cellules avec FAB central et badges non-lus
-- Routing platform-aware : `RootRedirect` envoie sur `/accueil` (mobile) ou `/carte` (desktop), `MobileOnly` wrapper redirige les routes mobile vers `/carte` sur desktop
-- `MapPage` mobile : header partagé en haut, BottomTabbar en bas, suppression du `ChatPanel` flottant et de l'ancien `MobileHeader` (doublons éliminés)
-- HUD mobile recalibré pour laisser place au bandeau supérieur (~120px) et à la navbar (~64px)
-
 ---
 
 # ALPHA V0.7.7
@@ -52,19 +42,6 @@ iOS exige que l'app soit **ajoutée à l'écran d'accueil** pour recevoir des no
 ### ⚙️ Tu pilotes
 Dans ton menu profil → **Notifications** : un toggle maître + deux catégories (Importantes / Récap). Tu peux couper les rappels doux et garder les vrais signaux. Ou désactiver tout.
 
-### Sous le capot
-- Mig 141 : table `push_subscriptions` (1 row par appareil) + RLS strict + 2 colonnes `users.push_*_enabled`
-- Mig 142 : trigger `AFTER INSERT ON notifications` → `pg_net.http_post` vers Edge Function (fail-open : l'INSERT ne casse pas si la config manque)
-- Mig 143 : seed `app_config` (URL Edge Function + service key, à remplir post-deploy)
-- Mig 144 : cron énigme — fenêtre cron 4× UTC + filtre `Europe/Paris` 12h30 ± 5min (DST-safe été/hiver)
-- Mig 145 : cron level-up imminent — quotidien 17h UTC, 1×/7j/user, basé sur `xp_total` + `_xp_for_level`
-- Mig 146 : cron récap hebdo — lundi 8h UTC, seuil min 3 nouveaux lieux
-- Edge Function Deno `send-push` : npm:web-push, VAPID auth, parallel send, cleanup automatique des subs 410/404
-- Bascule `vite-plugin-pwa` mode `injectManifest` → SW custom (`src/sw.ts`) avec push handler + notificationclick (focus tab existante ou ouvre)
-- Hook `useEnsurePushPermission` réutilisable + `PushPromptHost` mounté une fois dans MapPage
-- Détection iOS Safari non-standalone → `IOSInstallGuideModal` (4 étapes visuelles)
-- Tout type non listé reste **silent** (in-app uniquement) — élargissement type par type plus tard
-
 ---
 
 # ALPHA V0.7.6
@@ -86,18 +63,6 @@ Tu vois ton avancement (`1/3`, `2/3`, `✓`) sans rien ouvrir. Click sur la card
 
 ### 🎖️ Toasts énigme : la Couronne enfin créditée à l'écran
 Quand tu résolvais une énigme, le toast disait `+3 Gloire / +1 Coupe` — la Couronne (gagnée pourtant depuis la V0.7 phase 5) était oubliée à l'affichage. Désormais : `🎖️ +3 / 🏆 +1 / 🪙 +1`, icônes inline, format cohérent avec la modale de résultat.
-
-### Sous le capot
-- Mig 121 : externalisation des paramètres éco Couronnes vers `app_settings` (ajustables à chaud, sans nouvelle migration)
-- Mig 122 : refonte `get_my_crowns_state` + `harvest_crown` — tirage indépendant par lieu (formule p(N) = K/√N), drip intra-journée déterministe via hash `(user, lieu, date)`
-- Mig 123 + 124 : `discover_place` étendue — gain Couronne sur découverte (remote ET GPS), bonus mini-quête sur 3 découvertes remote du jour (énergie dépensée), déduplicaté via `activity_log`
-- Mig 125 : RPC `get_today_quests_state` — array de quêtes du jour avec `progress`, `target`, `reward`, `completedAt`. Architecture ouverte multi-quêtes
-- Frontend : `DailyQuestsList` + `DailyQuestCard` + `DailyQuestModal` montés en tête de `QuestsBoardPanel`, refetch déclenché depuis `discoverPlace` après chaque action remote
-- Modale quête réutilise `InfoModal` (portal vers `document.body`, style canonique des badges Gloire/Couronnes/Coupe) — slot `extraContent` ajouté au composant pour la barre de progression
-- Toasts énigme harmonisés (`hooks/usePlayer.ts` + `lib/loadRecentActivityToasts.ts`) : icônes 🎖️/🏆/🪙 inline, fini les 🦉/📖 résiduels, gain Couronne lu depuis `data.crownsGain` (présent dans `activity_log` depuis mig 080)
-- Renaming UX : panneau « Événements » → **« Quêtes en cours »** (aligné sur le contenu hybride)
-- Plafond stock inchangé (500), gain par récolte inchangé (+1 solo / +2 si lieu partagé à 2+)
-- Signatures RPC inchangées : compatible avec les anciens clients en cache
 
 ---
 
@@ -122,14 +87,6 @@ Si tu n'as pas mis de photo à ton événement, c'est l'avatar du chef qui s'aff
 ### 🗺️ Profil joueur : carrousels affinés
 Les 3 carrousels (cartographié / planté / visité) affichent désormais l'**icône du type de lieu** avant chaque nom. Sur PC, des flèches gauche/droite pour naviguer ; la scrollbar moche a disparu. Sur mobile, swipe naturel.
 
-### Sous le capot
-- Modale plein écran via `100dvh` + safe-area iOS (notch + home indicator)
-- Footer modale, chat input et footer création ancrés au viewport (position fixed) : plus rien ne se cache derrière la barre du navigateur
-- Titre / appel / lieu descendent dans la zone scrollable plutôt qu'en sticky — tout l'écran sert à lire
-- Mode édition : header allégé (« Modifier l'événement » + ← Retour), tabs masquées
-- FAB debug Voronoï ramené au niveau de l'interface carte — ne masque plus les notifications
-- Mig 118 : `get_player_profile` retourne désormais `tagIcon` (emoji du tag primary)
-
 ---
 
 # ALPHA V0.7.4
@@ -146,12 +103,6 @@ Une fois validés, les compagnons accèdent à un **chat privé** pour s'organis
 
 ### ✨ L'appel
 Sous le titre de l'expédition, une phrase qui dit pourquoi vous y allez. **Tous les compagnons peuvent la modifier** — l'appel s'écrit à plusieurs.
-
-### Sous le capot
-- Panneau « Expéditions » dans le HUD gauche, sous les toasts d'activité (mobile : page entière)
-- Chat Realtime, notifications pour acceptation, refus, modifs, annulation, rappel J-1
-- Bucket public dédié pour les images de couverture
-- Comptes rendus + galerie commune posés en backend, ouverts dès qu'une expédition est passée
 
 ---
 
@@ -173,13 +124,6 @@ Sur chaque fiche, l'avatar et le nom du veilleur ouvrent maintenant son profil. 
 ### 🔔 Notifications personnelles
 Quand quelqu'un attaque un de tes lieux, perd ou prend un lieu auprès de toi, tu reçois maintenant une **notification persistante dans la cloche** — même si tu n'étais pas en ligne au moment de l'event. Plus rien ne se perd.
 
-### Sous le capot
-- Faveur 50 réservée aux veilleurs IRL : un veilleur "par influence" n'a pas de bonus diplomatique, juste ses Couronnes.
-- Réaffirmation IRL : le bouton "Planter mon étendard" sur ton propre lieu efface les challengers en cours (mais garde ta défense).
-- Replant interdit en pure perte : le bouton ne s'affiche que quand il a un sens.
-- Refonte UX en parchemin / encres bordeaux et violet pour aligner avec l'esprit Rune de Chêne.
-- **Voronoï pondéré activé en prod** (1.6 km de base, +0.9 km par décade de Couronnes investies, plafond 10 km) : les lieux avec beaucoup de Couronnes irradient plus loin sur la carte. Le panel admin de calibration reste accessible.
-
 ---
 
 # ALPHA V0.7.2
@@ -199,12 +143,6 @@ Chaque énigme correctement résolue (du jour, d'un lieu ou d'un fragment) créd
 
 ### 🏛️ Le Trône des Mécènes
 Sur chaque lieu, les 5 plus généreux mécènes sont nommés à vie. Le premier d'entre eux porte le titre **Mécène Principal de [Lieu]**. Quatre nouveaux titres généraux récompensent ton engagement : **Bourse Légère** (50 Couronnes), **Coffre d'Or** (200), **Trésorier** (1000), **Premier Mécène** (#1 sur 3 lieux ou plus).
-
-### Sous le capot
-- Faveur 50 implicite, jamais stockée — calculée à la volée pour réduire la dette d'état.
-- Bascule atomique en transaction, journal append-only pour la chronique et le leaderboard mécènes.
-- Anciens scores d'influence V0.5 droppés. Tout le monde repart à zéro sur la nouvelle Cour.
-- Notifications temps réel : tu sauras qui s'intéresse à tes lieux, et quand tu deviens Mécène Principal d'un endroit.
 
 ---
 
@@ -228,11 +166,6 @@ Un nouvel onglet **📜 Quêtes** dans la barre de navigation : 4 quêtes journa
 - **👋 Lance un emoji ou réagis à une note** — +3 XP
 
 **+16 XP par jour** si tu fais tout. Reset à minuit dans ta timezone. Pas de bouton "récolter", pas de friction — un toast 🎯 t'avertit dès qu'une quête se complète.
-
-### Sous le capot
-- Le brouillage GPS est calculé une seule fois par session pour rester crédible (pas de "fantôme qui clignote").
-- Les actions des quêtes sont trackées par triggers SQL : aucun risque d'oublier de comptabiliser une découverte ou une moisson.
-- Réseau temps réel : channel emoji-throws broadcast pur (zéro DB), notes en presence + DB pour la persistence inter-sessions, quêtes en postgres_changes pour les toasts de complétion.
 
 ---
 
