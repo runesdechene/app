@@ -1,6 +1,9 @@
 // Supabase Edge Function : send-push
 // POST endpoint appelé par le trigger SQL after INSERT ON notifications.
-// Filtre par catégorie + préférences user, envoie via web-push, cleanup 410.
+// - Lit VAPID + push_trigger_secret depuis app_settings (pas de Supabase secrets car
+//   l'API MCP ne les expose pas — tout en DB)
+// - Vérifie l'header X-Push-Secret pour bloquer les calls non autorisés
+// - Filtre par catégorie + préférences user, envoie via web-push, cleanup 410
 // Spec : docs/superpowers/specs/2026-05-09-push-notifications-design.md
 
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
@@ -12,11 +15,6 @@ import { formatPayload } from './payloads.ts'
 
 const SUPABASE_URL              = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const VAPID_PUBLIC_KEY          = Deno.env.get('VAPID_PUBLIC_KEY')!
-const VAPID_PRIVATE_KEY         = Deno.env.get('VAPID_PRIVATE_KEY')!
-const VAPID_SUBJECT             = Deno.env.get('VAPID_SUBJECT')!
-
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -36,6 +34,44 @@ interface SubRow {
   auth:     string
 }
 
+interface AppConfig {
+  vapid_public_key:     string
+  vapid_private_key:    string
+  vapid_subject:        string
+  push_trigger_secret:  string
+}
+
+let cachedConfig: AppConfig | null = null
+
+async function loadConfig(): Promise<AppConfig | null> {
+  if (cachedConfig) return cachedConfig
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('key, value')
+    .in('key', ['vapid_public_key', 'vapid_private_key', 'vapid_subject', 'push_trigger_secret'])
+  if (error || !data) {
+    console.error('app_settings_lookup_failed', error)
+    return null
+  }
+  const map = Object.fromEntries(data.map((r) => [r.key, r.value])) as Record<string, string>
+  if (!map.vapid_public_key || !map.vapid_private_key || !map.vapid_subject || !map.push_trigger_secret) {
+    console.error('app_settings_missing_keys', Object.keys(map))
+    return null
+  }
+  cachedConfig = {
+    vapid_public_key:    map.vapid_public_key,
+    vapid_private_key:   map.vapid_private_key,
+    vapid_subject:       map.vapid_subject,
+    push_trigger_secret: map.push_trigger_secret,
+  }
+  webpush.setVapidDetails(
+    cachedConfig.vapid_subject,
+    cachedConfig.vapid_public_key,
+    cachedConfig.vapid_private_key,
+  )
+  return cachedConfig
+}
+
 const ok = () => new Response(JSON.stringify({ ok: true }), {
   headers: { 'Content-Type': 'application/json' },
 })
@@ -43,6 +79,17 @@ const ok = () => new Response(JSON.stringify({ ok: true }), {
 serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response('method not allowed', { status: 405 })
+  }
+
+  const config = await loadConfig()
+  if (!config) {
+    return new Response('config not loaded', { status: 503 })
+  }
+
+  // Auth shared-secret : le trigger SQL envoie X-Push-Secret depuis app_config.
+  const providedSecret = req.headers.get('x-push-secret')
+  if (providedSecret !== config.push_trigger_secret) {
+    return new Response('unauthorized', { status: 401 })
   }
 
   let body: RequestBody
