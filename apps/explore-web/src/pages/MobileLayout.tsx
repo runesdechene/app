@@ -4,11 +4,13 @@ import { useAuth } from '../hooks/useAuth'
 import { usePlayer } from '../hooks/usePlayer'
 import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
+import { useGeolocationWatch } from '../hooks/useGeolocationWatch'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { MobileSelectionModals } from '../components/navigation/MobileSelectionModals'
 import { FactionModal } from '../components/auth/FactionModal'
+import { GeolocationPrompt } from '../components/auth/GeolocationPrompt'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
 import './MobileLayout.css'
@@ -41,6 +43,9 @@ export default function MobileLayout() {
   usePlayer()
   useResourceTimers()
   useChat()
+  // V0.7.7 (10/05) — déclenche le prompt de geoloc dès le lancement de
+  // l'app (avant, on attendait que l'utilisateur ouvre la carte).
+  useGeolocationWatch()
 
   if (!user) return null
 
@@ -61,6 +66,7 @@ export default function MobileLayout() {
         />
       )}
       <GameToast />
+      <GeolocationPrompt />
     </div>
   )
 }

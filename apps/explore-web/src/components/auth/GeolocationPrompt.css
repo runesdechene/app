@@ -1,0 +1,93 @@
+.geoloc-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  background: rgba(20, 12, 5, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.geoloc-prompt-card {
+  background: var(--color-parchment);
+  border-radius: 16px;
+  border: 1px solid rgba(193, 154, 107, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  max-width: 380px;
+  width: 100%;
+  padding: 28px 22px 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.geoloc-prompt-icon {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.geoloc-prompt-title {
+  margin: 0;
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-ink, #4a3728);
+}
+
+.geoloc-prompt-desc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--color-ink, #4a3728);
+}
+
+.geoloc-prompt-hint {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(74, 55, 40, 0.6);
+}
+
+.geoloc-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.geoloc-prompt-btn-primary {
+  background: var(--color-ink, #4a3728);
+  color: var(--color-parchment);
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.geoloc-prompt-btn-primary:hover {
+  background: #2c2018;
+}
+
+.geoloc-prompt-btn-secondary {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: rgba(74, 55, 40, 0.6);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.geoloc-prompt-btn-secondary:hover {
+  color: var(--color-ink, #4a3728);
+}
