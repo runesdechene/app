@@ -25,18 +25,19 @@ export function Banners() {
   useEffect(() => { fetchAll() }, [])
 
   async function fetchAll() {
+    setLoading(true)
     try {
       const { data, error } = await supabase
         .from('home_banners')
         .select('*')
         .order('created_at', { ascending: false })
       if (error) throw error
-      if (data) {
-        setBanners(data as HomeBanner[])
-        setSavedBanners(JSON.parse(JSON.stringify(data)))
-      }
+      const list = (data ?? []) as HomeBanner[]
+      setBanners(JSON.parse(JSON.stringify(list)))
+      setSavedBanners(JSON.parse(JSON.stringify(list)))
     } catch (err) {
       console.error('[Banners] fetchAll failed', err)
+      setSaveError(err instanceof Error ? err.message : `${err}`)
     } finally {
       setLoading(false)
     }
@@ -50,38 +51,42 @@ export function Banners() {
 
     const ext = file.name.split('.').pop() || 'webp'
     const path = `banner-${Date.now()}.${ext}`
-    const { error: upErr } = await supabase.storage
-      .from('home-banners')
-      .upload(path, file, { contentType: file.type })
 
-    if (upErr) {
-      alert(`Erreur upload: ${upErr.message}`)
+    try {
+      const { error: upErr } = await supabase.storage
+        .from('home-banners')
+        .upload(path, file, { contentType: file.type })
+      if (upErr) {
+        alert(`Erreur upload: ${upErr.message}`)
+        return
+      }
+
+      const { data: urlData } = supabase.storage.from('home-banners').getPublicUrl(path)
+      const imageUrl = urlData.publicUrl
+
+      const { data, error } = await supabase
+        .from('home_banners')
+        .insert({ image_url: imageUrl, title: '', link_url: '' })
+        .select()
+        .single()
+
+      if (error || !data) {
+        console.error('[Banners] insert failed', error)
+        alert(`Erreur création bannière : ${error?.message ?? 'aucune ligne retournée'}`)
+        // Cleanup du fichier orphelin pour pas encrasser le bucket
+        await supabase.storage.from('home-banners').remove([path])
+        return
+      }
+
+      const newRow = data as HomeBanner
+      setBanners(prev => [newRow, ...prev])
+      setSavedBanners(prev => [JSON.parse(JSON.stringify(newRow)), ...prev])
+    } catch (err) {
+      console.error('[Banners] upload threw', err)
+      alert(`Erreur upload: ${err instanceof Error ? err.message : err}`)
+    } finally {
       setUploading(false)
-      return
     }
-
-    const { data: urlData } = supabase.storage.from('home-banners').getPublicUrl(path)
-    const imageUrl = urlData.publicUrl
-
-    const { data, error } = await supabase
-      .from('home_banners')
-      .insert({ image_url: imageUrl, title: '', link_url: '' })
-      .select()
-      .single()
-
-    if (error || !data) {
-      console.error('[Banners] insert failed', error)
-      alert(`Erreur création bannière : ${error?.message ?? 'aucune ligne retournée'}`)
-      // Cleanup du fichier orphelin pour pas encrasser le bucket
-      await supabase.storage.from('home-banners').remove([path])
-      setUploading(false)
-      return
-    }
-
-    const newRow = data as HomeBanner
-    setBanners(prev => [newRow, ...prev])
-    setSavedBanners(prev => [newRow, ...prev])
-    setUploading(false)
   }
 
   function update(id: number, field: keyof HomeBanner, value: string | boolean | null) {
@@ -92,21 +97,23 @@ export function Banners() {
     setSaving(true)
     setSaveError(null)
     try {
-      const promises = []
       for (const b of banners) {
         const saved = savedBanners.find(s => s.id === b.id)
         if (!saved || JSON.stringify(b) === JSON.stringify(saved)) continue
-        promises.push(supabase.from('home_banners').update({
+        const { error } = await supabase.from('home_banners').update({
           title: b.title,
           subtitle: b.subtitle,
           link_url: b.link_url,
           active: b.active,
-        }).eq('id', b.id).then(() => {}))
+        }).eq('id', b.id)
+        if (error) {
+          setSaveError(error.message)
+          return
+        }
       }
-      await Promise.all(promises)
       await fetchAll()
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Erreur inconnue')
+      setSaveError(err instanceof Error ? err.message : `${err}`)
     } finally {
       setSaving(false)
     }
@@ -119,17 +126,24 @@ export function Banners() {
 
   async function handleDelete(id: number) {
     if (!window.confirm('Supprimer cette bannière ?')) return
-    const banner = banners.find(b => b.id === id)
-    if (banner) {
-      const fileName = banner.image_url.split('/').pop()?.split('?')[0]
-      if (fileName) {
-        await supabase.storage.from('home-banners').remove([fileName])
+    try {
+      const banner = banners.find(b => b.id === id)
+      if (banner) {
+        const fileName = banner.image_url.split('/').pop()?.split('?')[0]
+        if (fileName) {
+          await supabase.storage.from('home-banners').remove([fileName])
+        }
       }
-    }
-    const { error } = await supabase.from('home_banners').delete().eq('id', id)
-    if (!error) {
+      const { error } = await supabase.from('home_banners').delete().eq('id', id)
+      if (error) {
+        alert(`Erreur suppression: ${error.message}`)
+        return
+      }
       setBanners(prev => prev.filter(b => b.id !== id))
       setSavedBanners(prev => prev.filter(b => b.id !== id))
+    } catch (err) {
+      console.error('[Banners] delete threw', err)
+      alert(`Erreur suppression: ${err instanceof Error ? err.message : err}`)
     }
   }
 
