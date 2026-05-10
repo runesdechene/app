@@ -69,11 +69,18 @@ export function Banners() {
       .select()
       .single()
 
-    if (!error && data) {
-      const newRow = data as HomeBanner
-      setBanners(prev => [newRow, ...prev])
-      setSavedBanners(prev => [newRow, ...prev])
+    if (error || !data) {
+      console.error('[Banners] insert failed', error)
+      alert(`Erreur création bannière : ${error?.message ?? 'aucune ligne retournée'}`)
+      // Cleanup du fichier orphelin pour pas encrasser le bucket
+      await supabase.storage.from('home-banners').remove([path])
+      setUploading(false)
+      return
     }
+
+    const newRow = data as HomeBanner
+    setBanners(prev => [newRow, ...prev])
+    setSavedBanners(prev => [newRow, ...prev])
     setUploading(false)
   }
 
