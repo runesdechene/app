@@ -324,8 +324,10 @@ export default function MapPage() {
       <PushPromptHost />
       <PushSubscriptionSync />
       <PushAutoPrompt />
-{/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
-      {!isDesktop && (
+{/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop
+          via CSS, et pendant addPlaceMode pour laisser la place à la top bar
+          du flow qui contient Retour / Placer ici / coordonnées). */}
+      {!isDesktop && !addPlaceMode && (
         <div className="map-mobile-header-fixed">
           <MobileTopBar onFactionModal={() => setShowFactionModal(true)} />
           <MobileStatsBar fadeOutBottom />
@@ -554,8 +556,10 @@ export default function MapPage() {
           si jamais ce code est atteint sur desktop (MobileNavbar est de toute façon invisible via CSS). */}
       {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <MobileNavbar />}
 
-      {/* BottomTabbar partagée — masquée sur desktop via CSS (min-width: 750px → display:none) */}
-      {!isDesktop && <BottomTabbar />}
+      {/* BottomTabbar partagée — masquée sur desktop via CSS (min-width: 750px → display:none),
+          ET pendant addPlaceMode pour libérer le footer du flow d'ajout (cohérent avec
+          .map-mobile-header-fixed cachée plus haut dans la même condition). */}
+      {!isDesktop && !addPlaceMode && <BottomTabbar />}
 
       {/* V0.7 — Modales niveau */}
       {pendingLevelUp && (

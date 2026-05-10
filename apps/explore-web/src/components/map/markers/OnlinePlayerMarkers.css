@@ -1182,10 +1182,6 @@
   .places-arrow {
     display: none;
   }
-  .player-modal-places-row {
-    /* Mobile : pas de flèches → padding réduit pour gagner de la place. */
-    padding: 4px 12px 8px 12px;
-  }
 }
 
 /* Tiles portrait — ratio 3:4 (88 × 117 px), plus naturel pour des photos de lieux. */
@@ -1207,7 +1203,7 @@
   width: 160px;
   height: 220px;
   object-fit: cover;
-  border-radius: 0px;
+  border-radius: 15px;
   background: rgba(193, 154, 107, 0.15);
   display: flex;
   align-items: center;

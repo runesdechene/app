@@ -34,6 +34,7 @@ export default function HomePage() {
     iconUrl: string | null
   } | null>(null)
   const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
+  const [selectedExpeditionTab, setSelectedExpeditionTab] = useState<'info' | 'chat'>('info')
   const [creatorOpen, setCreatorOpen] = useState(false)
 
   // Sync store → local state pour expéditions
@@ -42,6 +43,7 @@ export default function HomePage() {
   useEffect(() => {
     if (pendingOpenExp) {
       setSelectedExpeditionId(pendingOpenExp)
+      setSelectedExpeditionTab(useExpeditionsStore.getState().pendingOpenExpeditionTab)
       requestOpenExp(null)
     }
   }, [pendingOpenExp, requestOpenExp])
@@ -148,7 +150,9 @@ export default function HomePage() {
       )}
       {selectedExpeditionId && (
         <ExpeditionModal
+          key={selectedExpeditionId}
           expeditionId={selectedExpeditionId}
+          initialMobileTab={selectedExpeditionTab}
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}

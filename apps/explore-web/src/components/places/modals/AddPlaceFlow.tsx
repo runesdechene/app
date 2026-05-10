@@ -67,7 +67,9 @@ export function AddPlaceFlow() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [confirmedCoords, setConfirmedCoords] = useState<{ lng: number; lat: number } | null>(null)
   const [charterChecks, setCharterChecks] = useState([false, false, false])
-  const [eraId, setEraId] = useState<string | null>(null)
+  // V0.7.13 (11/05) — default 'unknown' (Indéfinie) pour ne plus bloquer le
+  // create si l'utilisateur ne connaît pas l'époque. cf. mig 165.
+  const [eraId, setEraId] = useState<string | null>('unknown')
   const [yearExact, setYearExact] = useState<number | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -714,13 +716,42 @@ export function AddPlaceFlow() {
               setLngInput(userPosition.lng.toFixed(7))
               useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
             }
+            // V0.7.13 (11/05) — barème dynamique lu depuis app_settings (gloryRulesStore),
+            // plus de "+15 exploration" hardcodé. Cohérent avec le bloc Success.
+            const r = useGloryRulesStore.getState().rules
+            const gAdd = Number(r['glory.add_place'] ?? 0)
+            const gGps = Number(r['glory.visit_gps'] ?? 0)
+            const gPlant = Number(r['glory.plant_flag'] ?? 0)
+            const cAdd = Number(r['coupe.add_place'] ?? 0)
+            const cGps = Number(r['coupe.visit_gps'] ?? 0)
+            const cPlant = Number(r['coupe.plant_flag'] ?? 0)
+            const fmtGain = (g: number, c: number) => {
+              const parts: string[] = []
+              if (g > 0) parts.push(`+${g} 🎖️ Gloire`)
+              if (c > 0) parts.push(`+${c} 🏆 Coupe des Héritages`)
+              return parts.join(' · ')
+            }
             return (
               <div className="add-place-rewards">
                 <p className="add-place-rewards-title">{isOnSite ? '🎯 Vous êtes sur place !' : '📍 Ajout à distance'}</p>
                 <div className="add-place-rewards-list">
                   {isOnSite && <span className="add-place-reward add-place-reward-bonus">🏴 Vous devenez veilleur du lieu</span>}
-                  {isOnSite && <span className="add-place-reward">🧭 +15 exploration (5 base + 10 GPS)</span>}
-                  {!isOnSite && <span className="add-place-reward">🧭 +5 exploration</span>}
+                  <span className="add-place-reward">
+                    <span className="add-place-reward-pill">Lieu ajouté</span>
+                    <span className="add-place-reward-gain">{fmtGain(gAdd, cAdd)}</span>
+                  </span>
+                  {isOnSite && (
+                    <span className="add-place-reward">
+                      <span className="add-place-reward-pill add-place-reward-pill-gps">Visite sur place</span>
+                      <span className="add-place-reward-gain">{fmtGain(gGps, cGps)}</span>
+                    </span>
+                  )}
+                  {isOnSite && (gPlant > 0 || cPlant > 0) && (
+                    <span className="add-place-reward">
+                      <span className="add-place-reward-pill add-place-reward-pill-gps">Étendard planté</span>
+                      <span className="add-place-reward-gain">{fmtGain(gPlant, cPlant)}</span>
+                    </span>
+                  )}
                   {!isOnSite && <span className="add-place-reward add-place-reward-hint">💡 Rendez-vous sur place pour devenir veilleur du lieu !</span>}
                 </div>
                 {!isOnSite && isMisplaced && userPosition && (

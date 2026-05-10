@@ -106,13 +106,15 @@ export function EraSelector({ eraId, yearExact, onChange, required }: EraSelecto
         <option value="" disabled>Choisir une époque...</option>
         {eras.map(era => (
           <option key={era.id} value={era.id}>
-            {era.name} — {formatEraRange(era.year_start, era.year_end)}
+            {era.year_start === null && era.year_end === null
+              ? era.name
+              : `${era.name} — ${formatEraRange(era.year_start, era.year_end)}`}
           </option>
         ))}
       </select>
 
-      {/* Date précise (affiché après choix d'époque) */}
-      {eraId && (
+      {/* Date précise — masquée pour 'unknown' (Indéfinie) : pas de fourchette d'années */}
+      {eraId && eraId !== 'unknown' && (
         <div className="era-date-section">
           <label className="era-label">
             Date précise <span className="era-optional">(optionnel)</span>

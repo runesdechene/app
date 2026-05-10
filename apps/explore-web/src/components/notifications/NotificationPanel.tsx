@@ -1,5 +1,6 @@
 import { useNotificationStore, Notification } from '../../stores/notificationStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { useUserAvatars } from '../../hooks/useUserAvatars'
 import './NotificationPanel.css'
 
@@ -171,7 +172,14 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
   const avatars = useUserAvatars(actorIds)
 
   function handleClick(notif: Notification) {
-    if (notif.data.placeId) {
+    const d = notif.data as Record<string, unknown>
+    const expeditionId = typeof d.expeditionId === 'string' ? d.expeditionId : null
+    if (expeditionId) {
+      // Notif `expedition_message` → ouvre direct sur le tab Chat (mobile).
+      // Autres expedition_* → tab Info par défaut (récap statut, validation, etc.).
+      const tab: 'info' | 'chat' = notif.type === 'expedition_message' ? 'chat' : 'info'
+      useExpeditionsStore.getState().requestOpenExpedition(expeditionId, tab)
+    } else if (notif.data.placeId) {
       useMapStore.getState().setSelectedPlaceId(notif.data.placeId)
     }
     onClose()

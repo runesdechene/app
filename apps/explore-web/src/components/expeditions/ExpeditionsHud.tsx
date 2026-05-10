@@ -18,13 +18,16 @@ import { useExpeditionsStore } from '../../stores/expeditionsStore'
 export function ExpeditionsHud() {
   const [creatorOpen, setCreatorOpen] = useState(false)
   const [selectedExpeditionId, setSelectedExpeditionId] = useState<string | null>(null)
+  const [selectedExpeditionTab, setSelectedExpeditionTab] = useState<'info' | 'chat'>('info')
 
-  // Demande d'ouverture déclenchée depuis ailleurs (ex : tap bannière sur la carte)
+  // Demande d'ouverture déclenchée depuis ailleurs (ex : tap bannière sur la carte,
+  // clic notif `expedition_message` → tab 'chat' au lieu de 'info' par défaut)
   const pendingOpen = useExpeditionsStore((s) => s.pendingOpenExpeditionId)
   const requestOpen = useExpeditionsStore((s) => s.requestOpenExpedition)
   useEffect(() => {
     if (pendingOpen) {
       setSelectedExpeditionId(pendingOpen)
+      setSelectedExpeditionTab(useExpeditionsStore.getState().pendingOpenExpeditionTab)
       requestOpen(null)
     }
   }, [pendingOpen, requestOpen])
@@ -58,7 +61,9 @@ export function ExpeditionsHud() {
 
       {selectedExpeditionId && (
         <ExpeditionModal
+          key={selectedExpeditionId}
           expeditionId={selectedExpeditionId}
+          initialMobileTab={selectedExpeditionTab}
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}

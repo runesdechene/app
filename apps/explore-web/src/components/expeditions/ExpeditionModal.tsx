@@ -14,6 +14,7 @@ import {
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { ExpeditionChat } from './ExpeditionChat'
 import { ExpeditionGallery } from './ExpeditionGallery'
 import { ReportEditor } from './ReportEditor'
@@ -25,9 +26,12 @@ import './ExpeditionModal.css'
 interface Props {
   expeditionId: string
   onClose: () => void
+  /** Tab affiché au mount sur mobile. Default 'info'. Utilisé quand on ouvre
+   *  via une notif `expedition_message` pour atterrir directement sur le chat. */
+  initialMobileTab?: 'info' | 'chat'
 }
 
-export function ExpeditionModal({ expeditionId, onClose }: Props) {
+export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'info' }: Props) {
   const myUserId = usePlayerStore((s) => s.userId)
   const current = useExpeditionsStore((s) => s.current)
   const setCurrent = useExpeditionsStore((s) => s.setCurrent)
@@ -38,7 +42,11 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
   const [reportEditorOpen, setReportEditorOpen] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [flagOpen, setFlagOpen] = useState(false)
-  const [mobileTab, setMobileTab] = useState<'info' | 'chat'>('info')
+  const [mobileTab, setMobileTab] = useState<'info' | 'chat'>(initialMobileTab)
+  const isMobile = useMediaQuery('(max-width: 768px)')
+  // Sur desktop la chat-col est toujours visible. Sur mobile elle ne l'est
+  // qu'en tab=chat. Sert à re-déclencher l'auto-scroll en bas dans le chat.
+  const chatActive = !isMobile || mobileTab === 'chat'
 
   // Charge le détail à l'ouverture / refresh
   async function refresh() {
@@ -547,6 +555,7 @@ export function ExpeditionModal({ expeditionId, onClose }: Props) {
               participantsById={participantsById}
               readOnly={e.status === 'passed'}
               onAuthorClick={openProfile}
+              active={chatActive}
             />
           </aside>
         )}

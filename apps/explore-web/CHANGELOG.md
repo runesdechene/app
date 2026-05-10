@@ -1,3 +1,22 @@
+# ALPHA V0.8.7
+## Polish mobile : Maison, événements, ajout de lieu
+
+Une passe de fixes ciblée sur l'expérience iPhone.
+
+### 🛡️ La fenêtre d'une Maison
+Sur mobile, l'image de la Maison ne s'affichait plus en entier (rognée), et un grand vide apparaissait sous le classement. C'est réparé : un seul scroll naturel qui descend image → bonus → membres, plein écran qui respecte l'iPhone (encoche en haut, home indicator en bas).
+
+### 💬 Notifications d'événement qui amènent où il faut
+Cliquer sur *« X t'a écrit dans Y »* ouvre maintenant directement le **chat** de l'événement. Les autres notifs d'événement (validation, modification, demande à rejoindre) ouvrent l'onglet **Infos**. Et quand tu bascules de l'onglet Événement vers Chat, le défilement se met automatiquement sur le dernier message — fini de scroller à la main.
+
+### 📍 Ajouter un lieu sur mobile
+Trois corrections :
+- Le bouton **Placer ici** (au moment du choix de l'emplacement) et le bouton **Créer le lieu** (au moment du formulaire) étaient masqués par les barres natives — ils sont désormais toujours visibles.
+- L'**époque** n'est plus obligatoire. Si tu ne sais pas, *Indéfinie* est sélectionnée par défaut, et un explorateur érudit pourra compléter plus tard depuis la fiche.
+- L'aperçu des récompenses suit désormais le **vrai barème** (qui peut évoluer), avec une lecture claire : `Lieu ajouté · +X 🎖️ Gloire · +Y 🏆 Coupe des Héritages`. Plus de "+15 exploration" hérité d'avant.
+
+---
+
 # ALPHA V0.8.6
 ## Notifications personnelles : fini les notifs de toi-même
 

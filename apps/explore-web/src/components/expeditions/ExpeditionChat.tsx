@@ -16,6 +16,10 @@ interface Props {
   readOnly?: boolean
   /** Click sur avatar/nom — ouvre le profil et ferme la modale parente. */
   onAuthorClick?: (userId: string) => void
+  /** Le chat est-il visuellement visible ? Mobile : false quand tab=info (la
+   *  chat-col est `display:none`). Sert à re-déclencher l'auto-scroll en bas
+   *  quand on bascule sur le tab Chat (sinon scrollHeight=0 au mount initial). */
+  active?: boolean
 }
 
 function formatChatDate(iso: string): string {
@@ -32,7 +36,7 @@ function formatChatDate(iso: string): string {
     : { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + time
 }
 
-export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAuthorClick }: Props) {
+export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAuthorClick, active = true }: Props) {
   useExpeditionChat(expeditionId)
 
   // /!\ NE PAS faire `s.messagesByExpedition[id] ?? []` directement dans le selector :
@@ -44,12 +48,12 @@ export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAut
   const [sending, setSending] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll au bas à chaque nouveau message
+  // Auto-scroll au bas : à chaque nouveau message, ET quand le chat redevient
+  // visible (sinon scrollHeight=0 au mount mobile avec tab=info par défaut).
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [messages.length])
+    if (!active || !scrollRef.current) return
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+  }, [messages.length, active])
 
   async function handleSend() {
     const content = draft.trim()

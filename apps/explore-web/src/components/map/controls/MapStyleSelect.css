@@ -103,10 +103,18 @@
 
 .add-place-form {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* dvh = dynamic viewport height (exclut barre Safari iOS quand visible).
+     PAS de `bottom: 0` sinon le navigateur ignore height. */
+  height: 100dvh;
   z-index: 40;
   background: #F5E6D3;
-  overflow-y: auto;
+  /* overflow:hidden ici, le scroll est UNIQUEMENT sur .add-place-form-body.
+     Sans ça, header + footer scrollaient avec le body et le footer pouvait
+     se retrouver derrière la barre Safari iOS / home indicator. */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -115,14 +123,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  /* iOS : safe-area-top pour ne pas passer sous status bar / dynamic island.
+     Fallback iOS Safari (env() = 0) géré dans @supports plus bas. */
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
   border-bottom: 1px solid #b8a47a;
   background: rgba(245, 230, 211, 0.95);
   flex-shrink: 0;
 }
+@supports (-webkit-touch-callout: none) {
+  .add-place-form-header {
+    padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 12px);
+  }
+}
 
 .add-place-form-body {
+  /* flex:1 + min-height:0 = le body absorbe l'espace restant entre header et
+     footer (eux flex-shrink:0). overflow-y:auto rend le scroll INTERNE au body
+     pour garder header + footer toujours visibles. */
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
@@ -390,7 +410,9 @@
 .add-place-form-footer {
   display: flex;
   gap: 12px;
-  padding: 16px 20px;
+  /* iOS : safe-area-bottom pour ne pas passer sous le home indicator / barre
+     Safari. Min 16px si env() = 0 (cf. @supports plus bas pour Safari). */
+  padding: 16px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
   border-top: 1px solid #b8a47a;
   background: rgba(245, 230, 211, 0.95);
   flex-shrink: 0;
@@ -398,6 +420,11 @@
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
+}
+@supports (-webkit-touch-callout: none) {
+  .add-place-form-footer {
+    padding-bottom: calc(max(env(safe-area-inset-bottom, 0px), 20px) + 16px);
+  }
 }
 
 .add-place-cancel-btn {
@@ -462,13 +489,17 @@
 /* Success */
 
 .add-place-success {
+  /* Le parent .add-place-form est en overflow:hidden ; le success peut être
+     long (rewards summary), donc il scrolle lui-même si besoin. */
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 32px;
+  padding: 32px 32px calc(env(safe-area-inset-bottom, 0px) + 32px);
   text-align: center;
 }
 

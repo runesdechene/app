@@ -690,48 +690,8 @@
     padding: 28px 20px;
   }
 
-  /* Faction members modal : 1 colonne mobile */
-  .faction-members-modal {
-    width: 95vw;
-    max-height: 90vh;
-    /* iOS PWA standalone : padding-top safe-area pour ne pas passer sous la
-       status bar (heure/batterie). 20px + safe-area-inset-top. */
-    padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px 20px;
-    overflow-y: auto;
-  }
-  /* iOS Safari browser mode : env() = 0 → fallback 47px de status bar. */
-  @supports (-webkit-touch-callout: none) {
-    .faction-members-modal {
-      padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 20px);
-    }
-  }
-
-  .faction-members-layout {
-    flex-direction: column;
-    gap: 16px;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .faction-members-sidebar {
-    flex: none;
-    position: static;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .faction-members-img {
-    height: auto;
-    width: 50vw;
-    margin: auto;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-
-  .faction-members-main {
-    max-height: none;
-    overflow: visible;
-  }
+  /* Faction Members Modal : règles desktop + mobile co-located dans
+     components/map/modals/FactionMembersModal.css (migration du 11/05/2026). */
 
   /* --- Offline Indicator --- */
   .offline-indicator {

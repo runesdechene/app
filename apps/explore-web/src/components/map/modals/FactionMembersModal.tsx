@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { useMapStore } from '../../../stores/mapStore'
 import { TagBonusList } from './TagBonusList'
+import './FactionMembersModal.css'
 
 interface FactionMember {
   userId: string

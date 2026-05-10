@@ -84,7 +84,7 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
               </button>
             </div>
           </div>
-        ) : eraId && eraName ? (
+        ) : eraId && eraId !== 'unknown' && eraName ? (
           <div className="info-content">
             <p>
               {eraName}
