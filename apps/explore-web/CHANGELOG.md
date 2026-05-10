@@ -1,3 +1,10 @@
+# ALPHA V0.7.14
+## Polissages visuels du HUD carte
+
+Ajustements fins sur la jauge de découvertes en bas à gauche et l'intégration du badge version sur le logo. Pour que tout soit pixel-perfect avant le festival.
+
+---
+
 # ALPHA V0.7.13
 ## Logo cliquable, jauge de découvertes mise en avant
 

@@ -1033,7 +1033,7 @@ export const ExploreMap = memo(function ExploreMap() {
       return total > 0 ? (
         <div className="conquest-indicator">
           <div className="conquest-text">
-            <span className="conquest-count">{discovered}/{total} lieux découverts</span>
+            <span className="conquest-count">{discovered}/{total} lieux dcverts.</span>
             <span className="conquest-pct">{Math.round(pct)}%</span>
           </div>
           <div className="conquest-bar">
