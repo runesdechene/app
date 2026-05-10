@@ -505,8 +505,17 @@
     margin-top: 0;
   }
 
+  /* V0.7.13 (10/05) — push sous la status bar iOS + zone de tap large
+     (le caractère × seul faisait 22px = trop petit pour un touch reliable). */
   .territory-panel .place-panel-close {
-    top: 8px;
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    line-height: 1;
   }
 
   .place-body {
