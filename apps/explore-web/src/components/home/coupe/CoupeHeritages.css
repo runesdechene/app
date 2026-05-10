@@ -32,6 +32,7 @@
 
 /* =========================================
    PODIUM (état "user dans une Maison")
+   4 marches proportionnelles, ordre 3-1-2-4
    ========================================= */
 .coupe-podium-frame {
   padding: 14px 12px 10px;
@@ -40,13 +41,16 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 12px;
+  padding: 0 4px;
 }
 .coupe-step {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
+  min-width: 0;
   cursor: pointer;
   transition: transform 120ms ease-out;
 }
@@ -54,8 +58,8 @@
   transform: translateY(-2px);
 }
 .coupe-step-emblem {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -73,34 +77,35 @@
   outline: 2px solid #b8860b;
   outline-offset: 2px;
 }
-.coupe-step-1 .coupe-step-emblem {
-  width: 48px;
-  height: 48px;
+.coupe-step-leader .coupe-step-emblem {
+  width: 42px;
+  height: 42px;
   box-shadow: 0 0 14px rgba(184, 134, 11, 0.55), 0 2px 6px rgba(74, 55, 40, 0.3);
 }
-.coupe-step-1 .coupe-step-emblem-img {
-  width: 28px;
-  height: 28px;
+.coupe-step-leader .coupe-step-emblem-img {
+  width: 26px;
+  height: 26px;
 }
 .coupe-step-name {
   font-family: 'Cinzel', 'Georgia', serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   color: #2a1f10;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   text-align: center;
-  max-width: 76px;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.2;
 }
 .coupe-step-pts {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .coupe-step-block {
-  width: 70px;
+  width: 100%;
   background: linear-gradient(180deg, #d8c08a 0%, #b8945e 100%);
   border: 1px solid #8a6f4a;
   border-bottom: none;
@@ -109,20 +114,13 @@
   align-items: center;
   justify-content: center;
   font-family: 'Cinzel', serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #2a1f10;
 }
-.coupe-step-1 .coupe-step-block {
-  height: 64px;
+.coupe-step-leader .coupe-step-block {
   background: linear-gradient(180deg, #e8c869 0%, #b8860b 100%);
   box-shadow: inset 0 -2px 4px rgba(74, 55, 40, 0.3);
-}
-.coupe-step-2 .coupe-step-block {
-  height: 48px;
-}
-.coupe-step-3 .coupe-step-block {
-  height: 36px;
 }
 .coupe-crown {
   font-size: 16px;
@@ -133,50 +131,11 @@
   height: 18px;
 }
 
-/* ---- 4ème en pied ---- */
-.coupe-outsider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 4px;
-  border-top: 1px solid rgba(184, 148, 94, 0.4);
-  font-size: 11px;
-  color: #6a4f2a;
-  cursor: pointer;
-  transition: background 120ms ease-out;
-  border-radius: 6px;
-}
-.coupe-outsider:hover {
-  background: rgba(184, 148, 94, 0.08);
-}
-.coupe-outsider-mine {
-  background: rgba(184, 134, 11, 0.08);
-}
-.coupe-outsider-emblem {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.coupe-outsider-emblem-img {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-}
-.coupe-outsider-name {
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-}
-
 /* ---- Pilule identité utilisateur ---- */
 .coupe-mine-pill-wrap {
   text-align: center;
-  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(184, 148, 94, 0.4);
 }
 .coupe-mine-pill {
   display: inline-block;

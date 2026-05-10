@@ -9,15 +9,25 @@ interface CoupePodiumProps {
   seasonName: string
   /** Pattern URL par factionId (depuis la table factions). */
   patternByFactionId: Record<string, string | null>
-  /** Click sur marche du podium ou ligne 4ème : ouvre FactionMembersModal de cette Maison. */
+  /** Click sur une marche : ouvre FactionMembersModal de cette Maison. */
   onClickFaction: (factionId: string, factionTitle: string, factionColor: string) => void
-  /** Click sur titre / fond / footer : ouvre CoupeModal complète. */
+  /** Click sur titre / footer : ouvre CoupeModal complète. */
   onClickAll: () => void
 }
 
 /**
- * État "user dans une Maison" — Podium I-II-III avec 4ème en pied.
- * Couronne 👑 sur le 1er si scores > 0, embl&egrave;me cerclé or pour la Maison du user.
+ * État "user dans une Maison" — Podium 4 marches proportionnelles.
+ *
+ * Ordre des colonnes : 3-1-2-4 (le leader occupe la 2e colonne, presque-au-centre,
+ * crée une silhouette en cloche : 3e descend, 1er culmine, 2e reste haute, 4e basse).
+ *
+ * Hauteur de chaque marche = max(score/topScore × 80px, 12px).
+ * Le 12px minimum garantit que toutes les marches restent visibles même à 0 pt
+ * (début de saison).
+ *
+ * - Couronne 👑 sur le 1er si scores > 0
+ * - Embl&egrave;me cerclé or pour la Maison du user (où qu'elle soit)
+ * - Marche du 1er en gradient or
  */
 export function CoupePodium({
   factions,
@@ -28,11 +38,18 @@ export function CoupePodium({
   onClickAll,
 }: CoupePodiumProps) {
   const [first, second, third, fourth] = factions
-  const topScore = first?.score ?? 0
+  const topScore = first.score
   const userFaction = factions.find(f => f.factionId === userFactionId)
   const userRank = userFaction?.rank ?? 0
   const gapToTop = topScore - (userFaction?.score ?? 0)
-  const gapToPodium = (third?.score ?? 0) - (fourth?.score ?? 0)
+
+  // Ordre d'affichage 3-1-2-4 (silhouette en cloche, leader presque-au-centre)
+  const displayOrder: Array<{ faction: CoupeFactionEntry; position: 1 | 2 | 3 | 4 }> = [
+    { faction: third, position: 3 },
+    { faction: first, position: 1 },
+    { faction: second, position: 2 },
+    { faction: fourth, position: 4 },
+  ]
 
   return (
     <>
@@ -46,64 +63,18 @@ export function CoupePodium({
       </h2>
       <div className="coupe-frame coupe-podium-frame">
         <div className="coupe-podium">
-          {/* 2ème (gauche) */}
-          <PodiumStep
-            faction={second}
-            position={2}
-            isLeader={false}
-            isMine={second.factionId === userFactionId}
-            patternUrl={patternByFactionId[second.factionId] ?? null}
-            onClick={() => onClickFaction(second.factionId, second.factionTitle, second.factionColor)}
-          />
-          {/* 1er (centre) */}
-          <PodiumStep
-            faction={first}
-            position={1}
-            isLeader={topScore > 0}
-            isMine={first.factionId === userFactionId}
-            patternUrl={patternByFactionId[first.factionId] ?? null}
-            onClick={() => onClickFaction(first.factionId, first.factionTitle, first.factionColor)}
-          />
-          {/* 3ème (droite) */}
-          <PodiumStep
-            faction={third}
-            position={3}
-            isLeader={false}
-            isMine={third.factionId === userFactionId}
-            patternUrl={patternByFactionId[third.factionId] ?? null}
-            onClick={() => onClickFaction(third.factionId, third.factionTitle, third.factionColor)}
-          />
-        </div>
-
-        {/* 4ème en pied */}
-        <div
-          className={`coupe-outsider${fourth.factionId === userFactionId ? ' coupe-outsider-mine' : ''}`}
-          onClick={() => onClickFaction(fourth.factionId, fourth.factionTitle, fourth.factionColor)}
-          role="button"
-          tabIndex={0}
-        >
-          <span
-            className="coupe-outsider-emblem"
-            style={{ background: fourth.factionColor }}
-          >
-            {patternByFactionId[fourth.factionId] && (
-              <img
-                src={patternByFactionId[fourth.factionId] ?? undefined}
-                alt=""
-                className="coupe-outsider-emblem-img"
-              />
-            )}
-          </span>
-          <span>
-            <span className="coupe-outsider-name">{fourth.factionTitle}</span>
-            {' · '}
-            {fourth.score} pts
-            {topScore > 0 && (
-              <>
-                {' · '}à {gapToPodium} du podium
-              </>
-            )}
-          </span>
+          {displayOrder.map(({ faction, position }) => (
+            <PodiumStep
+              key={faction.factionId}
+              faction={faction}
+              position={position}
+              isLeader={position === 1 && topScore > 0}
+              isMine={faction.factionId === userFactionId}
+              patternUrl={patternByFactionId[faction.factionId] ?? null}
+              blockHeight={blockHeightPx(faction.score, topScore)}
+              onClick={() => onClickFaction(faction.factionId, faction.factionTitle, faction.factionColor)}
+            />
+          ))}
         </div>
 
         {/* Pilule identité user */}
@@ -122,17 +93,23 @@ export function CoupePodium({
 
 interface PodiumStepProps {
   faction: CoupeFactionEntry
-  position: 1 | 2 | 3
+  position: 1 | 2 | 3 | 4
   isLeader: boolean
   isMine: boolean
   patternUrl: string | null
+  blockHeight: number
   onClick: () => void
 }
 
-function PodiumStep({ faction, position, isLeader, isMine, patternUrl, onClick }: PodiumStepProps) {
-  const roman = position === 1 ? 'I' : position === 2 ? 'II' : 'III'
+function PodiumStep({ faction, position, isLeader, isMine, patternUrl, blockHeight, onClick }: PodiumStepProps) {
+  const roman = position === 1 ? 'I' : position === 2 ? 'II' : position === 3 ? 'III' : 'IV'
   return (
-    <div className={`coupe-step coupe-step-${position}`} onClick={onClick}>
+    <div
+      className={`coupe-step${isLeader ? ' coupe-step-leader' : ''}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+    >
       {isLeader ? (
         <span className="coupe-crown" aria-hidden="true">👑</span>
       ) : (
@@ -148,9 +125,18 @@ function PodiumStep({ faction, position, isLeader, isMine, patternUrl, onClick }
       </span>
       <span className="coupe-step-name">{faction.factionTitle}</span>
       <span className="coupe-step-pts" style={{ color: faction.factionColor }}>{faction.score}</span>
-      <span className="coupe-step-block">{roman}</span>
+      <span className="coupe-step-block" style={{ height: `${blockHeight}px` }}>{roman}</span>
     </div>
   )
+}
+
+/**
+ * Hauteur de marche en pixels, proportionnelle au score relatif.
+ * Plancher 12px pour garantir que la marche reste visible (cas début saison à 0 pt).
+ */
+function blockHeightPx(score: number, topScore: number): number {
+  if (topScore <= 0) return 12
+  return Math.max(Math.round((score / topScore) * 80), 12)
 }
 
 /**
