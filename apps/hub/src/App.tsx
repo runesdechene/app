@@ -18,6 +18,7 @@ import { Fragments } from './components/Fragments'
 import { AssignFragments } from './components/AssignFragments'
 import { ShopifyUnlocks } from './components/ShopifyUnlocks'
 import { Ads } from './components/Ads'
+import { Banners } from './components/Banners'
 import { Enigmas } from './components/Enigmas'
 import { Settings } from './components/Settings'
 import { GameRules } from './components/GameRules'
@@ -91,6 +92,7 @@ function App() {
           <Route path="/carte/associer" element={<AssignFragments />} />
           <Route path="/carte/shopify" element={<ShopifyUnlocks />} />
           <Route path="/carte/publicites" element={<Ads />} />
+          <Route path="/carte/bannieres" element={<Banners />} />
           <Route path="/carte/enigmes" element={<Enigmas />} />
           <Route path="/carte/reglages" element={<Settings />} />
           <Route path="/carte/divers" element={<Divers />} />
