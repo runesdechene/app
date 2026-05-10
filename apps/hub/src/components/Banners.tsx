@@ -14,10 +14,11 @@ interface HomeBanner {
   tag_color: string
   title_color: string
   subtitle_color: string
+  shadow_color: string
+  shadow_strength: number
 }
 
-/** Construit le gradient overlay à partir d'une couleur hex + opacity max.
- *  Doit rester aligné sur buildOverlayGradient() de explore-web/HomeBannerCard.tsx. */
+/** Doit rester aligné sur buildOverlayGradient() de explore-web/HomeBannerCard.tsx. */
 function buildOverlayGradient(hexColor: string, opacity: number): string {
   const r = parseInt(hexColor.slice(1, 3), 16) || 0
   const g = parseInt(hexColor.slice(3, 5), 16) || 0
@@ -27,6 +28,16 @@ function buildOverlayGradient(hexColor: string, opacity: number): string {
   const mid = op * (0.5 / 0.85)
   const right = op * (0.2 / 0.85)
   return `linear-gradient(90deg, rgba(${r},${g},${b},${left}) 0%, rgba(${r},${g},${b},${mid}) 60%, rgba(${r},${g},${b},${right}) 100%)`
+}
+
+/** Doit rester aligné sur buildTextShadow() de explore-web/HomeBannerCard.tsx. */
+function buildTextShadow(hexColor: string, strength: number): string {
+  const s = Math.max(0, Math.min(1, strength))
+  if (s === 0) return 'none'
+  const r = parseInt(hexColor.slice(1, 3), 16) || 0
+  const g = parseInt(hexColor.slice(3, 5), 16) || 0
+  const b = parseInt(hexColor.slice(5, 7), 16) || 0
+  return `0 1px 3px rgba(${r},${g},${b},${s})`
 }
 
 export function Banners() {
@@ -127,6 +138,8 @@ export function Banners() {
           tag_color: b.tag_color,
           title_color: b.title_color,
           subtitle_color: b.subtitle_color,
+          shadow_color: b.shadow_color,
+          shadow_strength: b.shadow_strength,
         }).eq('id', b.id)
         if (error) {
           setSaveError(error.message)
@@ -289,6 +302,30 @@ export function Banners() {
                     onChange={e => update(b.id, 'subtitle_color', e.target.value)}
                     style={{ width: 36, height: 28, padding: 0, border: '1px solid #ccc', cursor: 'pointer', justifySelf: 'start' }}
                   />
+
+                  <label htmlFor={`shadow-color-${b.id}`}>Shadow</label>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      id={`shadow-color-${b.id}`}
+                      type="color"
+                      value={b.shadow_color}
+                      onChange={e => update(b.id, 'shadow_color', e.target.value)}
+                      style={{ width: 36, height: 28, padding: 0, border: '1px solid #ccc', cursor: 'pointer' }}
+                    />
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={b.shadow_strength}
+                      onChange={e => update(b.id, 'shadow_strength', Number(e.target.value))}
+                      style={{ flex: 1 }}
+                      title={`Force: ${b.shadow_strength.toFixed(2)}`}
+                    />
+                    <span style={{ fontSize: 11, color: '#666', width: 32, textAlign: 'right' }}>
+                      {b.shadow_strength.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -324,18 +361,21 @@ export function Banners() {
                       fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em',
                       color: b.tag_color, fontWeight: 700,
                       fontFamily: "'Cabin Condensed', sans-serif",
+                      textShadow: buildTextShadow(b.shadow_color, b.shadow_strength),
                     }}>Boutique</span>
                     <span style={{
                       fontSize: 20, color: b.title_color,
                       fontWeight: 400, letterSpacing: '0.04em', textTransform: 'uppercase',
                       lineHeight: 1.15,
                       fontFamily: "'Bebas Neue', sans-serif",
+                      textShadow: buildTextShadow(b.shadow_color, b.shadow_strength),
                     }}>{b.title || '(titre vide)'}</span>
                     {b.subtitle && (
                       <span style={{
                         fontSize: 13, color: b.subtitle_color, lineHeight: 1.3,
                         fontStyle: 'italic',
                         fontFamily: "'Alegreya', 'Cabin', serif",
+                        textShadow: buildTextShadow(b.shadow_color, b.shadow_strength),
                       }}>{b.subtitle}</span>
                     )}
                   </div>

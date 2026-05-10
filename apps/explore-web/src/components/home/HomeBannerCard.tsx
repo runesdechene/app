@@ -13,6 +13,8 @@ interface Banner {
   tagColor: string
   titleColor: string
   subtitleColor: string
+  shadowColor: string
+  shadowStrength: number
 }
 
 /** Construit le gradient overlay à partir de la couleur hex + opacity max.
@@ -27,6 +29,18 @@ export function buildOverlayGradient(hexColor: string, opacity: number): string 
   const mid = op * (0.5 / 0.85)
   const right = op * (0.2 / 0.85)
   return `linear-gradient(90deg, rgba(${r},${g},${b},${left}) 0%, rgba(${r},${g},${b},${mid}) 60%, rgba(${r},${g},${b},${right}) 100%)`
+}
+
+/** Construit la text-shadow à partir d'une couleur hex + force (0→1).
+ *  À force=0 retourne 'none' (pas de shadow). Sinon : offset 0 1px, blur 3px,
+ *  opacity = strength. */
+export function buildTextShadow(hexColor: string, strength: number): string {
+  const s = Math.max(0, Math.min(1, strength))
+  if (s === 0) return 'none'
+  const r = parseInt(hexColor.slice(1, 3), 16) || 0
+  const g = parseInt(hexColor.slice(3, 5), 16) || 0
+  const b = parseInt(hexColor.slice(5, 7), 16) || 0
+  return `0 1px 3px rgba(${r},${g},${b},${s})`
 }
 
 export function HomeBannerCard() {
@@ -57,10 +71,10 @@ export function HomeBannerCard() {
           aria-hidden
         />
         <div className="home-banner-card-text">
-          <span className="home-banner-card-tag" style={{ color: banner.tagColor }}>Boutique</span>
-          <span className="home-banner-card-title" style={{ color: banner.titleColor }}>{banner.title}</span>
+          <span className="home-banner-card-tag" style={{ color: banner.tagColor, textShadow: buildTextShadow(banner.shadowColor, banner.shadowStrength) }}>Boutique</span>
+          <span className="home-banner-card-title" style={{ color: banner.titleColor, textShadow: buildTextShadow(banner.shadowColor, banner.shadowStrength) }}>{banner.title}</span>
           {banner.subtitle && (
-            <span className="home-banner-card-sub" style={{ color: banner.subtitleColor }}>{banner.subtitle}</span>
+            <span className="home-banner-card-sub" style={{ color: banner.subtitleColor, textShadow: buildTextShadow(banner.shadowColor, banner.shadowStrength) }}>{banner.subtitle}</span>
           )}
         </div>
       </button>
