@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react'
+﻿import { useEffect, useRef } from 'react'
 import changelogRaw from '../../../../CHANGELOG.md?raw'
 import { safeStorage } from '../../../lib/safeStorage'
 import { usePlayerStore } from '../../../stores/playerStore'
@@ -105,14 +105,21 @@ export function ChangelogModal() {
   const isOpen = useChangelogStore(s => s.isOpen)
   const openStore = useChangelogStore(s => s.open)
   const close = useChangelogStore(s => s.close)
+  // Subscribe au store : le check d'auto-open doit attendre que le store
+  // soit hydraté avec la vraie valeur (initialement null, mis à jour par
+  // usePlayer après fetch DB). Sans ça, le useEffect se lance trop tôt et
+  // l'auto-open n'arrive jamais. (Bug repéré V0.8.0.)
+  const tutorialCompletedAt = usePlayerStore(s => s.tutorialCompletedAt)
+  const checkedRef = useRef(false)
 
   useEffect(() => {
+    if (checkedRef.current) return
     if (!current) return
-    if (usePlayerStore.getState().tutorialCompletedAt === null) return
+    if (tutorialCompletedAt === null) return
+    checkedRef.current = true
     const seen = safeStorage.get(SEEN_KEY)
     if (seen !== current.version) openStore()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [tutorialCompletedAt, openStore])
 
   function handleClose() {
     if (current) safeStorage.set(SEEN_KEY, current.version)

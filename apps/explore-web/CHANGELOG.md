@@ -1,4 +1,4 @@
-# ALPHA V0.8.0
+# ALPHA V0.8.1
 ## L'app devient plus humaine
 
 Une grosse mise à jour qui touche à tout : le tutoriel, les notifications, l'arrivée dans l'app, les actions sur la carte. Le fil rouge — qu'on sente plus la communauté, et moins l'algorithme.
