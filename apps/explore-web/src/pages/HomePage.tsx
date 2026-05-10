@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { DailyQuestsList } from '../components/quests/DailyQuestsList'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { MapActivityList } from '../components/home/MapActivityList'
+import { CoupeHeritagesSection } from '../components/home/coupe/CoupeHeritagesSection'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
+import type { MobileLayoutContext } from './MobileLayout'
 import './HomePage.css'
 
 /**
@@ -20,6 +22,7 @@ import './HomePage.css'
  */
 export default function HomePage() {
   const navigate = useNavigate()
+  const { openFactionModal } = useOutletContext<MobileLayoutContext>()
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{
@@ -84,6 +87,10 @@ export default function HomePage() {
 
         <section className="home-section home-section--no-padding">
           <PlacesSection />
+        </section>
+
+        <section className="home-section">
+          <CoupeHeritagesSection openFactionModal={openFactionModal} />
         </section>
 
         <section className="home-section">
