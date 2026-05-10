@@ -16,7 +16,6 @@ import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
 import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
 import { LeaderboardModal } from '../components/map/modals/LeaderboardModal'
-import { VersionBadge } from '../components/map/badges/VersionBadge'
 import { TerritoryPanel } from '../components/map/modals/TerritoryPanel'
 import { useMapStore } from '../stores/mapStore'
 import { usePlayerStore } from '../stores/playerStore'
@@ -38,6 +37,7 @@ import { useIsDesktop } from '../hooks/useMediaQuery'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
+import { VersionBadge } from '../components/map/badges/VersionBadge'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
@@ -544,7 +544,11 @@ export default function MapPage() {
       )}
 
 
-      {!addPlaceMode && !authLoading && isAuthenticated && <VersionBadge />}
+      {/* VersionBadge : sur mobile en overlay sur le logo (MobileTopBar) ;
+          sur desktop pas de logo en haut, on garde un mini badge floating. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && (
+        <VersionBadge variant="floating" />
+      )}
 
       {/* MobileNavbar legacy — supprimée sur mobile (remplacée par BottomTabbar partagée).
           Reste montée uniquement sur desktop pour ne pas casser les data-mobile-panel= CSS existants

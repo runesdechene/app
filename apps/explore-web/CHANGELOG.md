@@ -1,3 +1,17 @@
+# ALPHA V0.7.13
+## Logo cliquable, jauge de découvertes mise en avant
+
+### 📜 Le logo ouvre maintenant le changelog
+Tape sur le logo "Runes de Chêne" en haut de l'écran : ça ouvre la note de version. Plus besoin de chercher le petit badge en bas — un geste naturel pour voir ce qui change.
+
+### 🪪 Le numéro de version migre sur le logo
+Mini badge en haut à droite du logo, discret. À sa place en bas à gauche : la jauge de progression "X/Y lieux découverts" — l'info utile qui mérite la visibilité.
+
+### 📊 Jauge de découvertes plus lisible
+Repositionnée à la place de l'ancien numéro de version, en bas à gauche de la carte. Couleur plus douce, format compact mais lisible.
+
+---
+
 # ALPHA V0.7.12
 ## La pub d'accueil refondue + des têtes partout
 

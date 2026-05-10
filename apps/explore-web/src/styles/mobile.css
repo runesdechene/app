@@ -1030,19 +1030,12 @@
 
   .conquest-indicator
   {
-    /* Posée sous la stats bar : MobileTopBar (~54px) + MobileStatsBar (~60px)
-       = ~114px réels + ~16px d'air = 130px. Aligné avec .game-toast-container
-       et .app-toolbar pour cohérence. Inclut le safe-area-inset-top iOS. */
-    top: calc(env(safe-area-inset-top, 0px) + 130px);
-    bottom: auto;
-    left: 7px;
+    /* Repositionnée 11/05 en bas-gauche, au-dessus de la BottomTabbar (64px
+       + safe-area-inset-bottom). VersionBadge a migré sur le logo en haut. */
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+    left: 12px;
     right: auto;
-  }
-  /* iOS Safari browser mode : env() = 0 → fallback 47px de status bar. */
-  @supports (-webkit-touch-callout: none) {
-    .conquest-indicator {
-      top: calc(max(env(safe-area-inset-top, 0px), 47px) + 130px);
-    }
   }
 
   [data-mobile-panel="chat"] .chat-panel {

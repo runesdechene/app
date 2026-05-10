@@ -2,9 +2,11 @@
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
+import { useChangelogStore } from '../../../stores/changelogStore'
 import { supabase } from '../../../lib/supabase'
 import { EmailChangeModal } from '../../auth/EmailChangeModal'
 import { PushSettings } from '../../notifications/PushSettings'
+import { VersionBadge } from '../badges/VersionBadge'
 import logoImg from '../../../assets/logo_couleur_mobile.webp'
 import shopIcon from '../../../assets/shop_icon.webp'
 
@@ -61,17 +63,25 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
 
   return (
     <div className="mobile-header" ref={ref}>
-      <img
-        src={logoImg}
-        alt="Runes de Chêne"
-        className="mobile-header-logo"
+      <button
+        type="button"
+        className="mobile-header-logo-btn"
         onClick={() => {
           setMenuOpen(false)
           useMobileNavStore.getState().closePanel()
           useMapStore.getState().setSelectedPlayerId(null)
           useMapStore.getState().setSelectedPlaceId(null)
+          useChangelogStore.getState().open()
         }}
-      />
+        aria-label="Voir le changelog"
+      >
+        <img
+          src={logoImg}
+          alt="Runes de Chêne"
+          className="mobile-header-logo"
+        />
+        <VersionBadge />
+      </button>
 
       <div className="mobile-header-right">
         <a href="https://runesdechene.com" target="_blank" rel="noopener noreferrer" className="mobile-header-shop">

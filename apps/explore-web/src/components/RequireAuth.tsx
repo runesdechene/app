@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { usePlayerStore } from '../stores/playerStore'
 import { AdScreen } from './map/overlays/AdScreen'
+import { ChangelogModal } from './map/badges/VersionBadge'
 
 export default function RequireAuth() {
   const { user, loading } = useAuth()
@@ -31,6 +32,7 @@ export default function RequireAuth() {
   return (
     <>
       <Outlet />
+      <ChangelogModal />
       {canShowAd && <AdScreen onDone={() => setShowAd(false)} />}
     </>
   )

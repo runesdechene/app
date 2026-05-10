@@ -1,7 +1,8 @@
-﻿import { useState } from 'react'
+﻿import { useEffect } from 'react'
 import changelogRaw from '../../../../CHANGELOG.md?raw'
 import { safeStorage } from '../../../lib/safeStorage'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useChangelogStore } from '../../../stores/changelogStore'
 import './VersionBadge.css'
 
 /**
@@ -62,19 +63,60 @@ const versions = parseChangelog(changelogRaw)
 const current = versions[0]
 const SEEN_KEY = 'changelog_seen_version'
 
-export function VersionBadge() {
-  // Fresh user (tutorial pas encore terminé) : pas d'auto-open du changelog,
-  // ça pollue l'arrivée dans le jeu. Le badge reste cliquable s'il veut le lire.
-  const [open, setOpen] = useState(() => {
-    if (!current) return false
-    if (usePlayerStore.getState().tutorialCompletedAt === null) return false
+/** Format compact pour le mini badge sur le logo : "0.7.12" depuis "ALPHA V0.7.12" */
+function shortVersion(v: string): string {
+  const m = v.match(/V?(\d+\.\d+\.\d+)/)
+  return m ? m[1] : v
+}
+
+interface VersionBadgeProps {
+  /** 'overlay' (default) : posé en absolute par-dessus le logo dans la top
+   *  bar mobile. 'floating' : fixed en bas à droite, pour les contextes sans
+   *  logo (desktop carte). */
+  variant?: 'overlay' | 'floating'
+}
+
+/**
+ * Mini badge cliquable. Au clic, ouvre le ChangelogModal via le store. Sur
+ * mobile, posé par-dessus le logo (variant overlay). Sur desktop, en floating
+ * bas-droite (variant floating).
+ */
+export function VersionBadge({ variant = 'overlay' }: VersionBadgeProps = {}) {
+  const open = useChangelogStore(s => s.open)
+  if (!current) return null
+  return (
+    <button
+      type="button"
+      className={`version-badge version-badge-${variant}`}
+      onClick={(e) => { e.stopPropagation(); open() }}
+      aria-label={`Voir le changelog (${current.version})`}
+    >
+      {shortVersion(current.version)}
+    </button>
+  )
+}
+
+/**
+ * Modal changelog séparé. Monté une seule fois dans RequireAuth, écoute le
+ * store. Auto-open au mount si l'utilisateur n'a pas encore vu cette version
+ * (et que le tuto est complété — ne pas polluer l'arrivée d'un nouveau).
+ */
+export function ChangelogModal() {
+  const isOpen = useChangelogStore(s => s.isOpen)
+  const openStore = useChangelogStore(s => s.open)
+  const close = useChangelogStore(s => s.close)
+
+  useEffect(() => {
+    if (!current) return
+    if (usePlayerStore.getState().tutorialCompletedAt === null) return
     const seen = safeStorage.get(SEEN_KEY)
-    return seen !== current.version
-  })
+    if (seen !== current.version) openStore()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleClose() {
     if (current) safeStorage.set(SEEN_KEY, current.version)
-    setOpen(false)
+    close()
   }
 
   async function forceUpdate() {
@@ -96,58 +138,50 @@ export function VersionBadge() {
     window.location.reload()
   }
 
-  if (!current) return null
+  if (!current || !isOpen) return null
 
   return (
-    <>
-      <button className="version-badge" onClick={() => setOpen(true)}>
-        {current.version}
-      </button>
-
-      {open && (
-        <div className="version-modal-overlay" onClick={() => handleClose()}>
-          <div className="version-modal" onClick={e => e.stopPropagation()}>
-            <div className="version-modal-header">
-              <h2>{current.version}</h2>
-              <button className="version-modal-close" onClick={() => handleClose()}>
-                &#10005;
-              </button>
-            </div>
-            {current.title && <h3 className="version-modal-title">{current.title}</h3>}
-            <div className="version-modal-content">
-              {current.lines.map((entry, i) => {
-                if (entry.type === 'heading') return <h4 key={i} className="version-modal-section">{entry.text}</h4>
-                if (entry.type === 'paragraph') return <p key={i} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
-                return <p key={i} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
-              })}
-            </div>
-
-            <div className="version-modal-update">
-              <button className="version-modal-update-btn" onClick={forceUpdate}>
-                🔄 Forcer la mise à jour
-              </button>
-              <small>Si tu ne vois pas la dernière version, ce bouton recharge l'app proprement.</small>
-            </div>
-
-            {versions.length > 1 && (
-              <div className="version-modal-history">
-                {versions.slice(1, 4).map((v, i) => (
-                  <details key={i}>
-                    <summary>{v.version}{v.title ? ` — ${v.title}` : ''}</summary>
-                    <div className="version-modal-content">
-                      {v.lines.map((entry, j) => {
-                        if (entry.type === 'heading') return <h4 key={j} className="version-modal-section">{entry.text}</h4>
-                        if (entry.type === 'paragraph') return <p key={j} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
-                        return <p key={j} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
-                      })}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            )}
-          </div>
+    <div className="version-modal-overlay" onClick={handleClose}>
+      <div className="version-modal" onClick={e => e.stopPropagation()}>
+        <div className="version-modal-header">
+          <h2>{current.version}</h2>
+          <button className="version-modal-close" onClick={handleClose}>
+            &#10005;
+          </button>
         </div>
-      )}
-    </>
+        {current.title && <h3 className="version-modal-title">{current.title}</h3>}
+        <div className="version-modal-content">
+          {current.lines.map((entry, i) => {
+            if (entry.type === 'heading') return <h4 key={i} className="version-modal-section">{entry.text}</h4>
+            if (entry.type === 'paragraph') return <p key={i} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
+            return <p key={i} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
+          })}
+        </div>
+
+        <div className="version-modal-update">
+          <button className="version-modal-update-btn" onClick={forceUpdate}>
+            🔄 Forcer la mise à jour
+          </button>
+          <small>Si tu ne vois pas la dernière version, ce bouton recharge l'app proprement.</small>
+        </div>
+
+        {versions.length > 1 && (
+          <div className="version-modal-history">
+            {versions.slice(1, 4).map((v, i) => (
+              <details key={i}>
+                <summary>{v.version}{v.title ? ` — ${v.title}` : ''}</summary>
+                <div className="version-modal-content">
+                  {v.lines.map((entry, j) => {
+                    if (entry.type === 'heading') return <h4 key={j} className="version-modal-section">{entry.text}</h4>
+                    if (entry.type === 'paragraph') return <p key={j} className="version-modal-paragraph">{renderMarkdown(entry.text)}</p>
+                    return <p key={j} className="version-modal-bullet">— {renderMarkdown(entry.text)}</p>
+                  })}
+                </div>
+              </details>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

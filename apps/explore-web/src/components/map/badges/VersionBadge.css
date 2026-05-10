@@ -34,27 +34,57 @@
   color: #8a7050;
 }
 
+/* Mini badge — base commune (overlay sur logo + floating desktop). */
 .version-badge {
-  position: fixed;
-  bottom: 12px;
-  left: 60px;
-  z-index: 15;
-  background: rgba(44, 24, 16, 0.55);
-  color: rgba(255, 248, 230, 0.7);
-  border: none;
-  padding: 3px 10px;
-  border-radius: 6px;
+  background: rgba(44, 24, 16, 0.85);
+  color: #f4d694;
+  border: 1px solid rgba(244, 214, 148, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
   font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  pointer-events: auto;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .version-badge:hover {
-  background: rgba(44, 24, 16, 0.8);
-  color: #fff;
+  background: rgba(44, 24, 16, 0.95);
+}
+
+/* Variant overlay : posé en absolute par-dessus le logo (haut-droite). Le
+   parent .mobile-*-logo-btn doit être en position: relative. */
+.version-badge-overlay {
+  position: absolute;
+  top: -2px;
+  right: -8px;
+}
+
+/* Variant floating : fixed bas-droite pour desktop carte (pas de logo dans
+   la app-toolbar). z-index aligné avec hud. */
+.version-badge-floating {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 15;
+}
+
+/* Wrapper button autour du logo : reset des styles button par défaut +
+   position relative pour que le .version-badge enfant se cale dessus. */
+.mobile-topbar-logo-btn,
+.mobile-header-logo-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
 }
 
 .version-modal-overlay {

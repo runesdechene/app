@@ -1,6 +1,8 @@
 import { useAuth } from '../../hooks/useAuth'
 import { ProfileMenu } from '../auth/ProfileMenu'
 import { NotificationBell } from '../notifications/NotificationBell'
+import { VersionBadge } from '../map/badges/VersionBadge'
+import { useChangelogStore } from '../../stores/changelogStore'
 import logoImg from '../../assets/logo_couleur_mobile.webp'
 import shopIcon from '../../assets/shop_icon.webp'
 import './MobileTopBar.css'
@@ -17,7 +19,15 @@ export function MobileTopBar({ onFactionModal }: MobileTopBarProps) {
 
   return (
     <header className="mobile-topbar">
-      <img src={logoImg} alt="Runes de Chêne" className="mobile-topbar-logo" />
+      <button
+        type="button"
+        className="mobile-topbar-logo-btn"
+        onClick={() => useChangelogStore.getState().open()}
+        aria-label="Voir le changelog"
+      >
+        <img src={logoImg} alt="Runes de Chêne" className="mobile-topbar-logo" />
+        <VersionBadge />
+      </button>
       <div className="mobile-topbar-spacer" />
       <a
         href={SHOPIFY_URL}

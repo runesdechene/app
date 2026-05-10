@@ -260,9 +260,12 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
 
   return (
     <>
-      <div className="place-panel-backdrop" onClick={onClose} />
+      <div className="place-panel-backdrop modal-mobile-fullscreen-backdrop" onClick={onClose} />
 
-      <div className="place-panel place-panel-open territory-panel">
+      {/* V0.7.11 (10/05) — modal-mobile-fullscreen ajouté pour plein écran
+          + safe-area-inset-top/bottom sur iOS PWA (cf. mobile.css l. 23-55).
+          Aligné avec PlacePanel mobileFullscreen. */}
+      <div className="place-panel place-panel-open territory-panel modal-mobile-fullscreen">
         <button className="place-panel-close" onClick={onClose} aria-label="Fermer">
           &times;
         </button>
