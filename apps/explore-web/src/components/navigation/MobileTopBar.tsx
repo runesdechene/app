@@ -8,17 +8,15 @@ import './MobileTopBar.css'
 const SHOPIFY_URL = 'https://runesdechene.com'
 
 interface MobileTopBarProps {
-  /** Quand true, applique un dégradé en bas (sur /carte mobile pour fondre vers la carte). */
-  fadeOutBottom?: boolean
   /** Callback ouverture modale faction (transmis à ProfileMenu). */
   onFactionModal?: () => void
 }
 
-export function MobileTopBar({ fadeOutBottom = false, onFactionModal }: MobileTopBarProps) {
+export function MobileTopBar({ onFactionModal }: MobileTopBarProps) {
   const { user, signOut } = useAuth()
 
   return (
-    <header className={`mobile-topbar${fadeOutBottom ? ' mobile-topbar--fade' : ''}`}>
+    <header className="mobile-topbar">
       <img src={logoImg} alt="Runes de Chêne" className="mobile-topbar-logo" />
       <div className="mobile-topbar-spacer" />
       <a

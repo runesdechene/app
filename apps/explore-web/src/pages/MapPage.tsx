@@ -298,7 +298,7 @@ export default function MapPage() {
       {/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
       {!isDesktop && (
         <div className="map-mobile-header-fixed">
-          <MobileTopBar fadeOutBottom onFactionModal={() => setShowFactionModal(true)} />
+          <MobileTopBar onFactionModal={() => setShowFactionModal(true)} />
           <MobileStatsBar fadeOutBottom />
         </div>
       )}

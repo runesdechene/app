@@ -1,9 +1,8 @@
 .stats-bar {
   display: flex;
-  padding: 10px 12px;
+  padding: 10px 16px;
   gap: 6px;
   background: var(--color-parchment);
-  border-bottom: 1px solid var(--color-sepia);
 }
 
 .stats-cell {

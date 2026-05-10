@@ -5,9 +5,7 @@
 .daily-quests-list {
   list-style: none;
   padding: 4px 0;
-  margin: 0;
-  border-bottom: 1px solid rgba(193, 154, 107, 0.25);
-  margin-bottom: 4px;
+  margin: 0 0 4px;
 }
 
 .daily-quest-card {
