@@ -323,18 +323,21 @@ export function Banners() {
                     <span style={{
                       fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em',
                       color: b.tag_color, fontWeight: 700,
+                      fontFamily: "'Cabin Condensed', sans-serif",
                       textShadow: '0 1px 3px rgba(0,0,0,0.85)',
                     }}>Boutique</span>
                     <span style={{
                       fontSize: 20, color: b.title_color,
                       fontWeight: 400, letterSpacing: '0.04em', textTransform: 'uppercase',
-                      lineHeight: 1.15, fontFamily: 'serif',
+                      lineHeight: 1.15,
+                      fontFamily: "'Bebas Neue', sans-serif",
                       textShadow: '0 1px 4px rgba(0,0,0,0.9)',
                     }}>{b.title || '(titre vide)'}</span>
                     {b.subtitle && (
                       <span style={{
                         fontSize: 13, color: b.subtitle_color, lineHeight: 1.3,
                         fontStyle: 'italic',
+                        fontFamily: "'Alegreya', 'Cabin', serif",
                         textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                       }}>{b.subtitle}</span>
                     )}
