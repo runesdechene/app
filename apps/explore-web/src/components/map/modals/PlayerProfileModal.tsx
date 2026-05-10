@@ -654,7 +654,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
       {showTitlePicker && (
         <div className="player-modal-overlay" onClick={() => setShowTitlePicker(false)} style={{ zIndex: 10002 }}>
-          <div className="player-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 900, maxHeight: '85vh', overflow: 'auto', padding: '24px', alignItems: 'stretch' }}>
+          <div className="player-modal title-picker-modal" onClick={e => e.stopPropagation()}>
             <button className="player-modal-close" onClick={() => setShowTitlePicker(false)}>&#10005;</button>
             <h3 style={{ margin: '0 0 4px', fontFamily: 'var(--font-accent)', textAlign: 'left' }}>Choisissez vos titres</h3>
             <p style={{ fontSize: 12, color: '#8A7B6A', margin: '0 0 16px', textAlign: 'left' }}>

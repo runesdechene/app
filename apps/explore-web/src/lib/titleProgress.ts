@@ -1,7 +1,8 @@
 // Helpers d'affichage pour la progression des titres jouables.
 // Extraits de PlayerProfileModal pendant le sprint Purification (B15, mai 2026).
 
-/** Labels FR pour chaque stat utilisée dans les conditions de titres. */
+/** Labels FR pour chaque stat utilisée dans les conditions de titres.
+ *  Source des stats : `get_all_player_titles` (mig 082, 045 et suivantes). */
 export const STAT_LABELS: Record<string, string> = {
   discoveries: 'découvertes',
   claims: 'protections',
@@ -9,6 +10,13 @@ export const STAT_LABELS: Record<string, string> = {
   likes: 'likes',
   fortifications: 'fortifications',
   places_added: 'lieux ajoutés',
+  level: 'niveau',
+  places_visited: 'lieux visités',
+  enigma_score: 'pts énigmes',
+  plantages: 'plantages',
+  carnets: 'carnets',
+  mecenat_total: 'Couronnes investies',
+  mecenat_top1_count: 'mécénats principaux',
 }
 
 /** Condition d'obtention d'un titre : seuil min sur une stat OU rang à atteindre. */

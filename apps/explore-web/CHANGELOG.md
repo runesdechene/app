@@ -1,3 +1,10 @@
+# ALPHA V0.8.4
+## La fenêtre des Titres respire mieux
+
+Sur mobile, la fenêtre **Choisissez vos titres** prend désormais tout l'écran et respecte l'encoche iPhone (en haut comme en bas). Les descriptions des titres ne dépassent plus du bord — elles passent sous le nom du titre quand l'espace manque. Les barres de progression ("0 / 1000 Couronnes investies", "0 / 3 mécénats principaux"…) ont aussi gagné des libellés propres au lieu des noms techniques.
+
+---
+
 # ALPHA V0.8.3
 ## L'app devient plus humaine
 
