@@ -1,3 +1,12 @@
+# ALPHA V0.8.6
+## Notifications personnelles : fini les notifs de toi-même
+
+Tes notifications personnelles ne te disent plus *"tu as pris ce lieu"* ou *"tu as réaffirmé ton drapeau"* — tu viens de le faire, tu sais. Elles se concentrent sur ce qui se passe pendant que tu n'es pas là : un autre joueur prend ton lieu, un like sur ton récit, une demande à rejoindre ton expédition.
+
+Exception : *"Premier Mécène"*. Quand tu deviens le mécène principal d'un lieu, on continue de te le dire — tu peux ne pas avoir vu que ta dernière mise faisait basculer le score.
+
+---
+
 # ALPHA V0.8.5
 ## Plus de fausse pastille rouge sur Activité
 

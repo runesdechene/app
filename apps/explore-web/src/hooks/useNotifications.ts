@@ -3,6 +3,25 @@ import { supabase } from '../lib/supabase'
 import { useNotificationStore, Notification } from '../stores/notificationStore'
 import { usePlayerStore } from '../stores/playerStore'
 
+/**
+ * Une notif perso est "self" quand son acteur (data.actorId) c'est toi.
+ * Sémantique : tu viens de faire l'action, c'est inutile de te la notifier.
+ * Couvre place_taken_remote_self, place_reaffirmed et tout autre trigger
+ * qui s'enverrait à lui-même via actorId.
+ *
+ * Exception : mecene_principal_gained — tu peux ne pas avoir su que ta
+ * dernière mise faisait basculer le top1 (le score adverse n'est pas
+ * forcément visible), donc l'info de bascule reste utile.
+ */
+function isSelfNotification(
+  notif: { type: string; data: Record<string, unknown> | null | undefined },
+  currentUserId: string,
+): boolean {
+  if (notif.type === 'mecene_principal_gained') return false
+  const actorId = (notif.data as { actorId?: string } | null | undefined)?.actorId
+  return actorId === currentUserId
+}
+
 export function useNotifications() {
   const userId = usePlayerStore((s) => s.userId)
   const setNotifications = useNotificationStore((s) => s.setNotifications)
@@ -23,15 +42,14 @@ export function useNotifications() {
         .limit(50)
 
       if (data) {
-        setNotifications(
-          data.map((row) => ({
-            id: row.id,
-            type: row.type,
-            data: row.data,
-            read: row.read,
-            created_at: row.created_at,
-          })) as Notification[]
-        )
+        const mapped = data.map((row) => ({
+          id: row.id,
+          type: row.type,
+          data: row.data,
+          read: row.read,
+          created_at: row.created_at,
+        })) as Notification[]
+        setNotifications(mapped.filter((n) => !isSelfNotification(n, userId!)))
       }
     }
 
@@ -56,6 +74,7 @@ export function useNotifications() {
             read: boolean
             created_at: string
           }
+          if (isSelfNotification(row, userId!)) return
           addNotification({
             id: row.id,
             type: row.type as Notification['type'],
