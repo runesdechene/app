@@ -1,3 +1,10 @@
+# ALPHA V0.8.5
+## Plus de fausse pastille rouge sur Activité
+
+La pastille rouge sur l'onglet **Activité** ne te compte plus tes propres actions. Tu plantes un drapeau, tu écris un récit, tu résous une énigme — pas de notification pour toi-même. Tu vois toujours tes actions dans le fil, mais sans le badge qui te disait "regarde, t'as 1 truc à voir".
+
+---
+
 # ALPHA V0.8.4
 ## La fenêtre des Titres respire mieux
 
