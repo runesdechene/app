@@ -17,7 +17,8 @@
    Les valeurs de z-index sont calibrées pour passer AU-DESSUS de
    .map-mobile-header-fixed (z-index 9998) qui overlay la carte sur
    /carte mobile. Sur les autres pages le header partagé est en flux
-   normal (z-index ~10), pas de conflit.
+   normal (z-index 9990, aligné BottomTabbar) pour rester au-dessus
+   des panneaux de page (chat-panel z=15, etc.).
    ========================================== */
 @media (max-width: 768px) {
   .modal-mobile-fullscreen {
@@ -667,8 +668,16 @@
   .faction-members-modal {
     width: 95vw;
     max-height: 90vh;
-    padding: 20px 16px;
+    /* iOS PWA standalone : padding-top safe-area pour ne pas passer sous la
+       status bar (heure/batterie). 20px + safe-area-inset-top. */
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px 20px;
     overflow-y: auto;
+  }
+  /* iOS Safari browser mode : env() = 0 → fallback 47px de status bar. */
+  @supports (-webkit-touch-callout: none) {
+    .faction-members-modal {
+      padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 20px);
+    }
   }
 
   .faction-members-layout {
@@ -1007,9 +1016,10 @@
 
   .conquest-indicator
   {
-    /* Collée juste sous la stats bar (MobileTopBar ~50px + MobileStatsBar ~50px
-       = ~100px) avec une petite marge d'air. Inclut le safe-area-inset-top iOS. */
-    top: calc(env(safe-area-inset-top, 0px) + 100px);
+    /* Posée sous la stats bar : MobileTopBar (~54px) + MobileStatsBar (~60px)
+       = ~114px réels + ~16px d'air = 130px. Aligné avec .game-toast-container
+       et .app-toolbar pour cohérence. Inclut le safe-area-inset-top iOS. */
+    top: calc(env(safe-area-inset-top, 0px) + 130px);
     bottom: auto;
     left: 7px;
     right: auto;
@@ -1017,7 +1027,7 @@
   /* iOS Safari browser mode : env() = 0 → fallback 47px de status bar. */
   @supports (-webkit-touch-callout: none) {
     .conquest-indicator {
-      top: calc(max(env(safe-area-inset-top, 0px), 47px) + 100px);
+      top: calc(max(env(safe-area-inset-top, 0px), 47px) + 130px);
     }
   }
 
