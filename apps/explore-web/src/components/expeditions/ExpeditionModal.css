@@ -224,6 +224,13 @@
     padding-bottom: calc(var(--safe-bottom, 0px) + 12px);
     background: #f5e9d4;
   }
+  /* V0.7.7 (10/05) — bug iOS : le spacer ::after dans un flex container
+     scrollable était parfois ignoré (les derniers messages restaient cachés
+     sous le chat-input fixed). On pose le padding directement sur le
+     container scrollable, plus robuste. ::after gardé en belt-and-suspenders. */
+  .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 130px);
+  }
   .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages::after {
     content: '';
     display: block;

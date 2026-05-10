@@ -33,6 +33,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const xpTotal = usePlayerStore(s => s.xpTotal)
   const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
   const xpForNextLevel = usePlayerStore(s => s.xpForNextLevel)
+  const xpForCurrentLevel = usePlayerStore(s => s.xpForCurrentLevel)
   const veteranFirstEra = usePlayerStore(s => s.veteranFirstEra)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
@@ -326,6 +327,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   xpTotal={isSelf ? xpTotal : (profile.xpTotal ?? 0)}
                   xpToNextLevel={isSelf ? xpToNextLevel : (profile.xpToNextLevel ?? 5)}
                   xpForNextLevel={isSelf ? xpForNextLevel : (profile.xpForNextLevel ?? 5)}
+                  xpForCurrentLevel={isSelf ? xpForCurrentLevel : (profile.xpForCurrentLevel ?? 0)}
                 />
                 {/* V0.7 phase 3.5 \u2014 3 stats (Coupe / Couronnes / \u00C9nigmes) wrapp\u00E9es
                     dans un container : display: contents sur desktop (rendu inchang\u00E9,

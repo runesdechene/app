@@ -50,7 +50,7 @@ export function ShareButton({ placeName, placeSlug }: ShareButtonProps) {
   return (
     <>
       <button
-        className="share-btn"
+        className="place-hero-pill place-hero-pill-icon share-btn"
         onClick={handleShare}
         aria-label="Partager ce lieu"
         title="Partager"

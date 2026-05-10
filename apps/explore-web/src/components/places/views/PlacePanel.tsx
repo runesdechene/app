@@ -21,6 +21,7 @@ import { useCalendarRef } from '../../../hooks/useCalendarRef'
 import { formatYear } from '../../../lib/calendarUtils'
 import { AddCarnetModal } from '../modals/AddCarnetModal'
 import { PhotoLightbox } from '../modals/PhotoLightbox'
+import { PlaceExplorersModal } from '../modals/PlaceExplorersModal'
 import type { V05Detail, PlacePanelActiveTab } from '../../../types/placeDetail'
 import './PlacePanel.css'
 
@@ -132,6 +133,8 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   const [ratingValue, setRatingValue] = useState(0)
   const [ratingSaved, setRatingSaved] = useState(false)
   const [visitRewards, setVisitRewards] = useState<{ stock: number; exploration: number; visitNumber: number; nextVisitGain?: number } | null>(null)
+  // V0.7.7 (10/05) — modale "Tous les explorateurs" déclenchée par le bouton +X
+  const [showExplorersModal, setShowExplorersModal] = useState(false)
 
   // Bouton "Revisiter (sur place)" retiré 2026-05-02 (Uriel) — la mécanique
   // de revisite GPS V0.5 (gain influence par revisite) est obsolète depuis
@@ -205,12 +208,17 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     return copy
   }, [explorers, authorId, guardianId])
 
+  // V0.7.7 (10/05) — limit visible avatars + bouton +X qui ouvre la modale "tous les explorers"
+  const MAX_VISIBLE_AVATARS = 5
+  const visibleExplorers = sorted.slice(0, MAX_VISIBLE_AVATARS)
+  const overflowCount = Math.max(0, sorted.length - MAX_VISIBLE_AVATARS)
+
   return (
     <div className="place-explorers-unified">
       <p className="place-exp-title">Ils ont foulé ces terres <span className="place-exp-title-lenght">{sorted.length}</span></p>
       <div className="place-explorers-avatars">
         <div className="place-explorers-avatars-list">
-          {sorted.map(exp => {
+          {visibleExplorers.map(exp => {
             const isAuthor = exp.userId === authorId
             const isGuardian = exp.userId === guardianId
             const color = factionColors.get(exp.factionId) ?? '#8A7B6A'
@@ -233,6 +241,16 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
               </button>
             )
           })}
+          {overflowCount > 0 && (
+            <button
+              className="place-exp-overflow"
+              onClick={() => setShowExplorersModal(true)}
+              title={`Voir les ${sorted.length} explorateurs`}
+              aria-label={`Voir les ${sorted.length} explorateurs`}
+            >
+              +{overflowCount}
+            </button>
+          )}
           {userId && !isExplorer && !userFactionId && (
             <button
               className={`place-exp-visit-btn${!isOnSite ? ' place-exp-visit-btn-disabled' : ''}`}
@@ -317,6 +335,16 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       {sorted.length === 0 && (
         <p className="place-exp-empty">Personne n'a encore exploré ce lieu en personne.</p>
       )}
+
+      {showExplorersModal && (
+        <PlaceExplorersModal
+          explorers={sorted}
+          authorId={authorId}
+          guardianId={guardianId}
+          factionColors={factionColors}
+          onClose={() => setShowExplorersModal(false)}
+        />
+      )}
     </div>
   )
 }
@@ -327,6 +355,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const { calendarRef } = useCalendarRef()
   const [imageIndex, setImageIndex] = useState(0)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
+  const [showAddressMenu, setShowAddressMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [activeTab, setActiveTab] = useState<PlacePanelActiveTab>('carnets')
@@ -587,7 +616,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         {/* Top-right: share + close buttons */}
         <div className="place-hero-top-right">
           <ShareButton placeName={place.title} placeSlug={place.slug} />
-          <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+          <button onClick={onClose} className="place-hero-pill place-hero-pill-icon place-hero-close" aria-label="Fermer">
             &#10005;
           </button>
         </div>
@@ -712,27 +741,71 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             <p className="place-address">
               <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               <span className="place-address-text">{place.address}</span>
-              <button
-                className="place-goto-btn"
-                onClick={() => {
-                  if (window.innerWidth <= 768) {
-                    useMapStore.getState().setSelectedPlaceId(null)
-                    useMapStore.getState().requestFlyTo({
-                      lng: place.location.longitude,
-                      lat: place.location.latitude,
-                    })
-                  } else {
-                    useMapStore.getState().requestFlyTo({
-                      lng: place.location.longitude,
-                      lat: place.location.latitude,
-                      placeId: place.id,
-                    })
-                  }
-                }}
-                title="Voir sur la carte"
-              >
-                <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-              </button>
+              <div className="place-goto-wrap">
+                <button
+                  className="place-goto-btn"
+                  onClick={() => setShowAddressMenu(v => !v)}
+                  title="Voir le lieu"
+                  aria-haspopup="menu"
+                  aria-expanded={showAddressMenu}
+                >
+                  <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                </button>
+                {showAddressMenu && (
+                  <>
+                    <div className="place-options-backdrop" onClick={() => setShowAddressMenu(false)} />
+                    <div className="place-options-menu">
+                      <button
+                        className="place-options-item"
+                        onClick={() => {
+                          setShowAddressMenu(false)
+                          if (window.innerWidth <= 768) {
+                            useMapStore.getState().setSelectedPlaceId(null)
+                            useMapStore.getState().requestFlyTo({
+                              lng: place.location.longitude,
+                              lat: place.location.latitude,
+                            })
+                          } else {
+                            useMapStore.getState().requestFlyTo({
+                              lng: place.location.longitude,
+                              lat: place.location.latitude,
+                              placeId: place.id,
+                            })
+                          }
+                        }}
+                      >
+                        🗺️ Voir sur la carte
+                      </button>
+                      <button
+                        className="place-options-item"
+                        onClick={() => {
+                          setShowAddressMenu(false)
+                          window.open(
+                            `https://www.google.com/maps/dir/?api=1&destination=${place.location.latitude},${place.location.longitude}`,
+                            '_blank',
+                            'noopener,noreferrer'
+                          )
+                        }}
+                      >
+                        📍 Google Maps
+                      </button>
+                      <button
+                        className="place-options-item"
+                        onClick={() => {
+                          setShowAddressMenu(false)
+                          window.open(
+                            `https://www.waze.com/ul?ll=${place.location.latitude},${place.location.longitude}&navigate=yes`,
+                            '_blank',
+                            'noopener,noreferrer'
+                          )
+                        }}
+                      >
+                        🚗 Waze
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </p>
           )}
 

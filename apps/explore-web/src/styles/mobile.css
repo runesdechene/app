@@ -86,6 +86,18 @@
   z-index: 9998;
   display: flex;
   flex-direction: column;
+  /* V0.7.7 (10/05) — safe-area iOS PWA standalone : aligne avec MobileLayout
+     qui fait pareil pour les pages /accueil, /chat, /activite. Sans ça, le
+     bandeau (logo, stats, notifs, avatar) passait sous la status bar
+     (heure/batterie iOS). env() vaut 0 en Safari mode → fallback iOS-only
+     plus bas. */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@supports (-webkit-touch-callout: none) {
+  .map-mobile-header-fixed {
+    padding-top: max(env(safe-area-inset-top, 0px), 47px);
+  }
 }
 
 .offline-indicator {
@@ -216,9 +228,11 @@
     top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
   }
 
-  .place-hero-close {
-    margin-top: env(safe-area-inset-top, 0px);
-  }
+  /* V0.7.7 (10/05) — margin-top safe-area retiré du seul bouton close :
+     ça décalait le close de la safe-area sur iOS sans toucher au bouton
+     share dans le même container, créant un offset vertical entre les deux.
+     La safe-area est maintenant gérée au niveau .place-hero-top-right
+     (cf. PlacePanel.css), ce qui pousse les 2 boutons ensemble. */
 
   /* --- Toolbar carte mobile : entièrement cachée sur mobile.
      Niveau / Coupe / Couronnes / Énergie sont dans MobileStatsBar (partagé

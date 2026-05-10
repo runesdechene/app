@@ -10,6 +10,68 @@
   margin-top: 6px;
 }
 
+/* V0.7.7 (10/05) — toggle pour replier la liste par défaut (sobriété d'écran) */
+.patrons-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(193, 154, 107, 0.08);
+  border: 1px solid rgba(193, 154, 107, 0.25);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink, #4a3728);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.patrons-toggle:hover {
+  background: rgba(193, 154, 107, 0.16);
+}
+
+.patrons-list.is-open .patrons-toggle {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+
+.patrons-toggle-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.patrons-toggle-label {
+  flex: 1;
+  text-align: left;
+}
+
+.patrons-toggle-count {
+  font-variant-numeric: tabular-nums;
+  color: rgba(74, 55, 40, 0.55);
+  font-weight: 400;
+}
+
+.patrons-toggle-chevron {
+  font-size: 14px;
+  color: rgba(74, 55, 40, 0.55);
+  transition: transform 0.18s ease;
+  display: inline-block;
+}
+
+.patrons-toggle-chevron.open {
+  transform: rotate(180deg);
+}
+
+.patrons-list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0 0;
+}
+
 .patron-row {
   display: flex;
   align-items: center;
@@ -144,6 +206,37 @@
   font-size: 13px;
   opacity: 0.55;
   padding: 12px;
+}
+
+/* V0.7.7 (10/05) — sections : Mécène + Soutiens (indenté) puis Challengers */
+.patrons-section-label {
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(74, 55, 40, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 10px 12px 2px;
+  margin-top: 4px;
+}
+
+.patrons-section-challengers {
+  border-top: 1px dashed rgba(193, 154, 107, 0.3);
+  margin-top: 8px;
+  padding-top: 12px;
+  color: rgba(122, 40, 40, 0.7);
+}
+
+.patron-row-supporter {
+  margin-left: 18px;
+  padding-left: 8px;
+  font-size: 13px;
+}
+
+.patron-row-supporter .patron-rank {
+  width: 16px;
+  font-size: 16px;
+  color: rgba(74, 55, 40, 0.4);
 }
 
 .patrons-footer {

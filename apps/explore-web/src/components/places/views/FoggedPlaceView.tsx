@@ -87,7 +87,7 @@ export function FoggedPlaceView({
       {/* Close button — outside hero so not affected by blur */}
       <div className="fogged-close">
         <ShareButton placeName={place.title} placeSlug={place.slug} />
-        <button onClick={onClose} className="place-hero-pill place-hero-close" aria-label="Fermer">
+        <button onClick={onClose} className="place-hero-pill place-hero-pill-icon place-hero-close" aria-label="Fermer">
           &#10005;
         </button>
       </div>

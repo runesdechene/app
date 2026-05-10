@@ -4,6 +4,11 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* V0.7.7 (10/05) — background explicite parchemin : sur iOS PWA standalone,
+     le scroll container peut afficher une couleur de fond différente du
+     parent quand peu d'items ne remplissent pas l'écran (zone "blanche"
+     visible entre le content et la tabbar). On force le bon parchemin. */
+  background: var(--color-parchment);
   /* Padding-bottom = hauteur navbar 64 + safe-area iOS + 16px d'air */
   padding: 0 0 calc(80px + env(safe-area-inset-bottom, 0px));
 }

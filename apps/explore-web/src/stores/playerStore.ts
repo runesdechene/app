@@ -40,9 +40,11 @@ interface PlayerState {
   xpTotal: number
   xpToNextLevel: number
   xpForNextLevel: number
+  /** V158 (10/05) — seuil bas du niveau courant, pour fix progress bar UI */
+  xpForCurrentLevel: number
   veteranFirstEra: boolean
   levelInitialized: boolean
-  setLevelState: (s: { level: number; xpTotal: number; xpToNextLevel: number; xpForNextLevel: number; veteranFirstEra: boolean }) => void
+  setLevelState: (s: { level: number; xpTotal: number; xpToNextLevel: number; xpForNextLevel: number; xpForCurrentLevel: number; veteranFirstEra: boolean }) => void
 
   /** Position GPS du joueur */
   userPosition: { lng: number; lat: number } | null
@@ -122,6 +124,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   xpTotal: 0,
   xpToNextLevel: 5,
   xpForNextLevel: 5,
+  xpForCurrentLevel: 0,
   veteranFirstEra: false,
   levelInitialized: false,
   setLevelState: (s) => set({
@@ -129,6 +132,7 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     xpTotal: s.xpTotal,
     xpToNextLevel: s.xpToNextLevel,
     xpForNextLevel: s.xpForNextLevel,
+    xpForCurrentLevel: s.xpForCurrentLevel,
     veteranFirstEra: s.veteranFirstEra,
     levelInitialized: true,
   }),

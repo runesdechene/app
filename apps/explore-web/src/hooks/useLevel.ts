@@ -22,6 +22,7 @@ export async function refreshLevelStateGlobal(userId: string): Promise<void> {
     xpTotal: Number(profile.xpTotal ?? 0),
     xpToNextLevel: Number(profile.xpToNextLevel ?? 5),
     xpForNextLevel: Number(profile.xpForNextLevel ?? 5),
+    xpForCurrentLevel: Number(profile.xpForCurrentLevel ?? 0),
     veteranFirstEra: Boolean(profile.veteranFirstEra ?? false),
   })
 }
@@ -54,6 +55,7 @@ export function useLevel(autoLoad = true) {
       xpTotal: Number(profile.xpTotal ?? 0),
       xpToNextLevel: Number(profile.xpToNextLevel ?? 5),
       xpForNextLevel: Number(profile.xpForNextLevel ?? 5),
+      xpForCurrentLevel: Number(profile.xpForCurrentLevel ?? 0),
       veteranFirstEra: Boolean(profile.veteranFirstEra ?? false),
     })
   }, [userId, setLevelState])

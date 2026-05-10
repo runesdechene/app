@@ -351,7 +351,12 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       )}
       {errorMsg && <p className="court-error">{errorMsg}</p>}
 
-      <PatronsList patrons={topPatrons} currentUserId={userId ?? undefined} />
+      <PatronsList
+        patrons={topPatrons}
+        currentUserId={userId ?? undefined}
+        veilleurUserId={veilleur?.leaderUserId ?? null}
+        scoreVeilleur={optimisticVeilleurScore}
+      />
     </div>
   )
 }

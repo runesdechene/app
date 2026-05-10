@@ -2,6 +2,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* V0.7.7 (10/05) — background explicite (cf. HomePage.css). */
+  background: var(--color-parchment);
   /* Padding-bottom = navbar 64 + safe-area iOS + 16px d'air */
   padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
 }

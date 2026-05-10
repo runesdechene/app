@@ -1036,13 +1036,19 @@
     gap: 10px;
   }
 
+  /* V0.7.7 (10/05) — safe-area iOS PWA standalone : padding top pour ne
+     pas passer sous la status bar (heure/batterie), padding bottom pour
+     que le lien "Réclamer mes fragments" reste accessible au-dessus du
+     home indicator (iOS) ou de la barre de navigation (Android).
+     100dvh au lieu de 100vh : 100vh inclut la barre nav du browser sur
+     Safari mobile, faisant que le bas dépasse l'écran visible. */
   .fragment-collection-modal {
     width: 100vw !important;
     max-width: none !important;
-    max-height: 100vh !important;
-    height: 100vh;
+    max-height: 100dvh !important;
+    height: 100dvh;
     border-radius: 0 !important;
-    padding: 16px !important;
+    padding: calc(var(--safe-top, 0px) + 16px) 16px calc(var(--safe-bottom, 0px) + 16px) 16px !important;
   }
 }
 

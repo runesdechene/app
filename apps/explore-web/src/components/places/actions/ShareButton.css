@@ -1,27 +1,12 @@
-.share-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 999px;
-  cursor: pointer;
-  color: #4A3728;
-  transition: background 0.15s ease, transform 0.1s ease;
-}
-
-.share-btn:hover {
-  background: rgba(255, 255, 255, 1);
-}
-
-.share-btn:active {
-  transform: scale(0.95);
-}
+/* V0.7.7 (10/05) — alignement avec le bouton fermer : .share-btn n'apporte
+   plus que le sizing du SVG. Style + dimensions viennent de
+   .place-hero-pill + .place-hero-pill-icon (cf. PlacePanel.css). */
 
 .share-btn svg {
   width: 20px;
   height: 20px;
+}
+
+.share-btn:active {
+  transform: scale(0.95);
 }

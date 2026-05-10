@@ -67,6 +67,8 @@ export interface PlayerProfile {
   xpTotal?: number
   xpToNextLevel?: number
   xpForNextLevel?: number
+  /** V158 (10/05) — seuil bas du niveau courant (pour fix progress bar) */
+  xpForCurrentLevel?: number
   veteranFirstEra?: boolean
   /** V0.7 — Couronnes & Coupe exposés pour tous les profils (mig 051) */
   crownsBalance?: number
