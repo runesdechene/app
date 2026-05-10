@@ -63,9 +63,13 @@ export function GeolocationPrompt() {
   // pas dismissed cette session. V0.7.7 (10/05) : 'denied' inclus aussi —
   // sinon l'utilisateur qui a refusé une fois ne voit jamais de relance, alors
   // que c'est précisément le moment où il faut lui dire "voici comment réactiver".
+  // V0.8.2 (11/05) : on attend que la query permission soit RÉSOLUE — sinon
+  // 'unknown' déclenche l'affichage avant la vraie valeur, et la modal flashe
+  // une fraction de seconde avant de disparaître si la geoloc est en fait
+  // 'granted'. On exclut donc 'unknown' du déclenchement auto.
   useEffect(() => {
     if (autoShown) return
-    if (state !== 'prompt' && state !== 'denied' && state !== 'unknown') return
+    if (state !== 'prompt' && state !== 'denied') return
     if (sessionStorage.getItem(DISMISS_KEY) === '1') return
     setAutoShown(true)
   }, [state, autoShown])
@@ -160,14 +164,14 @@ export function GeolocationPrompt() {
             <h3 className="geoloc-prompt-title">Active ta position</h3>
             <p className="geoloc-prompt-desc">
               Pour planter ton étendard sur les lieux que tu visites et révéler ce qui t'entoure
-              sur la carte, Runes de Chêne a besoin de ta position GPS.
+              sur la carte, Runes de Chêne a besoin de ta position GPS. Active le GPS sur ton téléphone.
             </p>
             <p className="geoloc-prompt-hint">
-              Tu pourras la désactiver à tout moment dans les réglages de ton téléphone.
+              Tu pourras la désactiver plus tard. Si cela ne marche pas, vérifie les réglages de tes applications ou de ton navigateur.
             </p>
             <div className="geoloc-prompt-actions">
               <button className="geoloc-prompt-btn-primary" onClick={activate}>
-                Activer ma position
+                Réessayer
               </button>
               <button className="geoloc-prompt-btn-secondary" onClick={later}>
                 Plus tard

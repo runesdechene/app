@@ -12,7 +12,6 @@ import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { MobileSelectionModals } from '../components/navigation/MobileSelectionModals'
 import { FactionModal } from '../components/auth/FactionModal'
-import { GeolocationPrompt } from '../components/auth/GeolocationPrompt'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
 import './MobileLayout.css'
@@ -75,7 +74,7 @@ export default function MobileLayout() {
         />
       )}
       <GameToast />
-      <GeolocationPrompt />
+      {/* GeolocationPrompt déplacé dans RequireAuth (overlay racine). */}
     </div>
   )
 }

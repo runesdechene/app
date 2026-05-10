@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { usePlayerStore } from '../stores/playerStore'
 import { AdScreen } from './map/overlays/AdScreen'
 import { ChangelogModal } from './map/badges/VersionBadge'
+import { GeolocationPrompt } from './auth/GeolocationPrompt'
 
 export default function RequireAuth() {
   const { user, loading } = useAuth()
@@ -33,6 +34,7 @@ export default function RequireAuth() {
     <>
       <Outlet />
       <ChangelogModal />
+      <GeolocationPrompt />
       {canShowAd && <AdScreen onDone={() => setShowAd(false)} />}
     </>
   )

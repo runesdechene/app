@@ -9,7 +9,6 @@ import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
-import { GeolocationPrompt } from '../components/auth/GeolocationPrompt'
 import { FactionBar } from '../components/map/badges/FactionBar'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
@@ -584,7 +583,8 @@ export default function MapPage() {
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}
 
-      <GeolocationPrompt />
+      {/* GeolocationPrompt déplacé dans RequireAuth (overlay racine, monté
+          une seule fois — plus de flash au remount entre /accueil et /carte). */}
     </div>
   )
 }
