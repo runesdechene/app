@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
+import { HomeBannerCard } from '../components/home/HomeBannerCard'
 import { DailyQuestsList } from '../components/quests/DailyQuestsList'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
@@ -60,6 +61,8 @@ export default function HomePage() {
   return (
     <>
       <main className="home-page-scroll">
+        <HomeBannerCard />
+
         <section className="home-section">
           <DailyEnigmaCard
             onOpen={() => setShowDailyEnigma(true)}
