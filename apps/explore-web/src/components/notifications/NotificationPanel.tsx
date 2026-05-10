@@ -1,6 +1,35 @@
 import { useNotificationStore, Notification } from '../../stores/notificationStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useUserAvatars } from '../../hooks/useUserAvatars'
 import './NotificationPanel.css'
+
+/** Types de notif où l'avatar de l'acteur a plus de sens que l'icône
+ *  (action interpersonnelle directe : like, message, demande, attaque mécène…). */
+const AVATAR_NOTIF_TYPES = new Set<Notification['type']>([
+  'like_carnet',
+  'new_carnet',
+  'place_court_attack',
+  'place_taken_remote',
+  'place_taken_back_gps',
+  'place_reaffirmed',
+  'expedition_join_request',
+  'expedition_auto_joined',
+  'expedition_report_posted',
+  'expedition_message',
+])
+
+function getActorIdForNotif(notif: Notification): string | null {
+  const d = notif.data as Record<string, unknown>
+  if (typeof d.actorId === 'string') return d.actorId
+  if (typeof d.requesterUserId === 'string') return d.requesterUserId
+  if (typeof d.authorUserId === 'string') return d.authorUserId
+  // place_taken_* embarquent l'avatar du nouveau veilleur dans members[0]
+  const members = d.members as Array<{ userId?: string }> | undefined
+  if (members && members.length > 0 && typeof members[0]?.userId === 'string') {
+    return members[0].userId
+  }
+  return null
+}
 
 const TYPE_ICONS: Record<Notification['type'], string> = {
   like_carnet: '\u2764\uFE0F',
@@ -13,6 +42,7 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   // V097 \u2014 La Cour
   place_court_attack: '\u2694\uFE0F',
   place_court_high_threat: '\uD83D\uDD25',
+  place_court_support: '\uD83E\uDD1D',
   place_taken_remote: '\u26A1',
   place_taken_remote_self: '\uD83C\uDFF4',
   place_taken_back_gps: '\uD83D\uDEE1\uFE0F',
@@ -61,6 +91,10 @@ function formatMessage(notif: Notification): string {
       return `${d.actorName || 'Quelqu\'un'} s'intéresse à ${place}`
     case 'place_court_high_threat':
       return `${place} est sous forte pression`
+    case 'place_court_support': {
+      const amt = d.amount ?? 0
+      return `${d.actorName || 'Quelqu\'un'} est venu à votre secours sur ${place}${amt > 0 ? ` (+${amt} 🪙)` : ''}`
+    }
     case 'place_taken_remote':
       return `Vous avez perdu ${place} — un mécène a pris l'ascendant`
     case 'place_taken_remote_self':
@@ -129,6 +163,12 @@ interface NotificationPanelProps {
 
 export function NotificationPanel({ onClose }: NotificationPanelProps) {
   const notifications = useNotificationStore((s) => s.notifications)
+  // Batch fetch des avatars : seulement pour les types o\u00f9 l'avatar a du sens
+  // (parcimonie \u2014 ne pas humaniser les events syst\u00e9miques type milestones).
+  const actorIds = notifications
+    .filter((n) => AVATAR_NOTIF_TYPES.has(n.type))
+    .map(getActorIdForNotif)
+  const avatars = useUserAvatars(actorIds)
 
   function handleClick(notif: Notification) {
     if (notif.data.placeId) {
@@ -147,19 +187,27 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         {notifications.length === 0 ? (
           <div className="notification-panel-empty">Aucune notification</div>
         ) : (
-          notifications.map((notif) => (
-            <button
-              key={notif.id}
-              className={`notification-item${notif.read ? '' : ' notification-unread'}`}
-              onClick={() => handleClick(notif)}
-            >
-              <span className="notification-icon">{TYPE_ICONS[notif.type]}</span>
-              <div className="notification-content">
-                <span className="notification-message">{formatMessage(notif)}</span>
-                <span className="notification-time">{getTimeAgo(notif.created_at)}</span>
-              </div>
-            </button>
-          ))
+          notifications.map((notif) => {
+            const actorId = AVATAR_NOTIF_TYPES.has(notif.type) ? getActorIdForNotif(notif) : null
+            const avatarUrl = actorId ? avatars[actorId] : null
+            return (
+              <button
+                key={notif.id}
+                className={`notification-item${notif.read ? '' : ' notification-unread'}`}
+                onClick={() => handleClick(notif)}
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="notification-avatar" />
+                ) : (
+                  <span className="notification-icon">{TYPE_ICONS[notif.type]}</span>
+                )}
+                <div className="notification-content">
+                  <span className="notification-message">{formatMessage(notif)}</span>
+                  <span className="notification-time">{getTimeAgo(notif.created_at)}</span>
+                </div>
+              </button>
+            )
+          })
         )}
       </div>
     </div>

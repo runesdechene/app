@@ -266,7 +266,9 @@ export function usePlayer() {
             return parts.join(' / ')
           }
 
-          if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
+          if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence' || e.type === 'harvest_crown') {
+            // harvest_crown : feedback déjà donné par l'animation du coffre +
+            // le compteur Couronnes dans la stats bar — toast redondant.
             return
           } else if (e.type === 'plant_flag') {
             message = isSelf
@@ -284,15 +286,6 @@ export function usePlayer() {
                 factionPattern: iconUrl,
               })
             }
-          } else if (e.type === 'harvest_crown') {
-            const gain = (e.data as { gain?: number })?.gain ?? 1
-            if (isSelf) {
-              message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
-              highlights.push(place)
-            } else {
-              return
-            }
-            type = 'harvest_crown'
           } else if (e.type === 'discover') {
             if (isSelf) {
               // V067 — découverte = mêmes points peu importe la méthode

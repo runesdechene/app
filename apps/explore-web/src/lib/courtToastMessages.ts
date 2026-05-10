@@ -12,6 +12,7 @@ export interface CourtActivityRow {
     expeditionId?: string
     score?: number
     total?: number
+    amount?: number
     oldExpeditionId?: string
     newExpeditionId?: string
     reclaimedBy?: string
@@ -23,6 +24,7 @@ export interface CourtActivityRow {
 export const COURT_TYPES = new Set<string>([
   'place_court_attack',
   'place_court_high_threat',
+  'place_court_support',
   'place_taken_remote',
   'place_taken_remote_self',
   'place_taken_back_gps',
@@ -61,6 +63,22 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
         highlights: [placeTitle],
         hasActorInHighlights: false,
       }
+    case 'place_court_support': {
+      const amt = row.data?.amount ?? 0
+      const suffix = amt > 0 ? ` (+${amt} 🪙)` : ''
+      if (isSelf) {
+        return {
+          message: `🤝 Vous avez soutenu le veilleur de ${placeTitle}${suffix}`,
+          highlights: [placeTitle],
+          hasActorInHighlights: false,
+        }
+      }
+      return {
+        message: `🤝 ${actorName} soutient le veilleur de ${placeTitle}${suffix}`,
+        highlights: [actorName, placeTitle],
+        hasActorInHighlights: true,
+      }
+    }
     case 'place_taken_remote':
       if (isSelf) return null
       return {

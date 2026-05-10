@@ -3,6 +3,7 @@ import { useToastStore } from '../../../stores/toastStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useUserAvatars } from '../../../hooks/useUserAvatars'
 import type { GameToast as GameToastType } from '../../../stores/toastStore'
 import './GameToast.css'
 
@@ -104,10 +105,13 @@ function renderMessage(
   )
 }
 
-export function ToastItem({ toast }: { toast: GameToastType }) {
+export function ToastItem({ toast, fetchedAvatar }: { toast: GameToastType; fetchedAvatar?: string | null }) {
   const removeToast = useToastStore(s => s.removeToast)
   const requestFlyTo = useMapStore(s => s.requestFlyTo)
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
+  // Priorité à l'avatar embarqué dans le toast (évite flicker au mount) ;
+  // fallback sur celui fetché en batch via useUserAvatars dans le container.
+  const resolvedAvatar = toast.actorAvatarUrl || fetchedAvatar || null
 
   // Collecter tous les highlights
   const highlights = toast.highlights || []
@@ -181,22 +185,18 @@ export function ToastItem({ toast }: { toast: GameToastType }) {
       style={toast.type === 'contribute' || toast.type === 'new_place' ? { borderLeftColor: toast.color || 'var(--color-sepia)' } : undefined}
     >
       {toast.contested ? (
-        <span className="game-toast-icon-bubble">
-          {'\uD83D\uDD25'}
-        </span>
+        // Conqu\u00EAte contest\u00E9e : feu rouge prioritaire, plus expressif que l'avatar.
+        <span className="game-toast-icon-bubble">{'\uD83D\uDD25'}</span>
+      ) : toast.actorId && resolvedAvatar ? (
+        // Action personnelle avec avatar dispo \u2192 on humanise.
+        <img src={resolvedAvatar} alt="" className="game-toast-avatar" />
       ) : toast.type === 'new_user' ? (
-        toast.actorAvatarUrl ? (
-          <img
-            src={toast.actorAvatarUrl}
-            alt=""
-            className="game-toast-avatar"
-                      />
-        ) : (
-          <span className="game-toast-avatar-fallback" style={{ borderColor: toast.color || 'var(--color-sepia)' }}>
-            {'\uD83D\uDC64'}
-          </span>
-        )
+        // new_user sans avatar URL : silhouette avec bordure faction.
+        <span className="game-toast-avatar-fallback" style={{ borderColor: toast.color || 'var(--color-sepia)' }}>
+          {'\uD83D\uDC64'}
+        </span>
       ) : (
+        // Pas d'acteur (info g\u00E9n\u00E9raliste, lieu) ou avatar pas encore r\u00E9solu \u2192 ic\u00F4ne type.
         <span className="game-toast-icon-bubble">{ICONS[toast.type]}</span>
       )}
       <span className="game-toast-message">
@@ -220,6 +220,11 @@ export function GameToast() {
   const [minimized, setMinimized] = useState(false)
   const [, setTick] = useState(0)
   const mobilePanel = useMobileNavStore(s => s.activePanel)
+  // Batch fetch des avatars de tous les acteurs présents dans les toasts —
+  // une seule query DB pour tous les toasts. Les toasts qui embarquent déjà
+  // actorAvatarUrl (new_user) n'attendront pas le fetch (fallback prioritaire).
+  const actorIds = toasts.map(t => t.actorId)
+  const avatars = useUserAvatars(actorIds)
 
   // Rafraîchir les timestamps toutes les 30s
   useEffect(() => {
@@ -258,7 +263,11 @@ export function GameToast() {
       <div className={`game-toast-content${minimized ? ' is-minimized' : ''}`}>
         <div className="game-toast-list" ref={containerRef}>
           {sortedToasts.map(toast => (
-            <ToastItem key={toast.id} toast={toast} />
+            <ToastItem
+              key={toast.id}
+              toast={toast}
+              fetchedAvatar={toast.actorId ? avatars[toast.actorId] : null}
+            />
           ))}
         </div>
       </div>

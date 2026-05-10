@@ -13,6 +13,7 @@ import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../components/expeditions/ExpeditionModal'
 import type { MobileLayoutContext } from './MobileLayout'
+import { UpdateBanner } from '../components/pwa/UpdateBanner'
 import './HomePage.css'
 
 /**
@@ -58,9 +59,26 @@ export default function HomePage() {
     document.title = 'Runes de Chêne — Accueil'
   }, [])
 
+  // V0.7.11 (10/05) — au mount, parse ?expedition=<id> pour ouvrir la modale
+  // d'expé directement (utilisé par les push notifications type
+  // expedition_message qui pointent sur /accueil?expedition=<id>). On nettoie
+  // l'URL après pour qu'un refresh ne ré-ouvre pas la modale.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const expeditionId = params.get('expedition')
+    if (expeditionId) {
+      requestOpenExp(expeditionId)
+      params.delete('expedition')
+      const newSearch = params.toString()
+      const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [requestOpenExp])
+
   return (
     <>
       <main className="home-page-scroll">
+        <UpdateBanner />
         <HomeBannerCard />
 
         <section className="home-section">

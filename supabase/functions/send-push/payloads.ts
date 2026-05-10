@@ -29,7 +29,9 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: `Message — ${expeditionName}`,
         body:  preview ? `${author} : ${preview}` : `${author} a écrit.`,
-        url:   expeditionId ? `/carte?expedition=${expeditionId}` : '/carte',
+        // V0.7.11 (10/05) — pointe sur /accueil (où ExpeditionModal est mounted)
+        // au lieu de /carte (qui n'a ni parser ?expedition= ni la modale).
+        url:   expeditionId ? `/accueil?expedition=${expeditionId}` : '/accueil',
       }
     }
 

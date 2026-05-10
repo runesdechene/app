@@ -40,7 +40,6 @@ import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
-import { AdScreen } from '../components/map/overlays/AdScreen'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
@@ -108,7 +107,6 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
-  const [showAdScreen, setShowAdScreen] = useState(true)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{ fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null>(null)
@@ -327,11 +325,7 @@ export default function MapPage() {
       <PushPromptHost />
       <PushSubscriptionSync />
       <PushAutoPrompt />
-      {showAdScreen && isAuthenticated && !authLoading && tutorialCompletedAt !== null && !showOnboarding && tutorialPhase === null && (
-        <AdScreen onDone={() => setShowAdScreen(false)} />
-      )}
-
-      {/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
+{/* Header mobile partagé — fixé au-dessus de la carte (masqué sur desktop via CSS) */}
       {!isDesktop && (
         <div className="map-mobile-header-fixed">
           <MobileTopBar onFactionModal={() => setShowFactionModal(true)} />
@@ -380,7 +374,7 @@ export default function MapPage() {
 
       {/* Toolbar flottante (masquée en mode ajout) */}
       {!addPlaceMode && (
-        <div className="app-toolbar" style={showAdScreen && tutorialCompletedAt !== null && !showOnboarding && tutorialPhase === null ? { visibility: 'hidden' } : undefined}>
+        <div className="app-toolbar">
           {!authLoading && isAuthenticated && (
             <>
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />

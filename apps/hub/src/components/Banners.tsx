@@ -146,7 +146,14 @@ export function Banners() {
           return
         }
       }
-      await fetchAll()
+      // V0.7.10 (10/05) — sync local immédiat au lieu d'un refetch Supabase.
+      // Bug récurrent (recharger la page pour re-save/re-ajouter) :
+      // l'ancien `await fetchAll()` ici pouvait abort silencieusement
+      // (wrapper fetch Hub + cas pending sans reject) → savedBanners restait
+      // désynchro → hasChanges restait true → SaveBar continuait d'afficher
+      // "Sauvegarder" en boucle. Sync local = pas de dépendance réseau,
+      // déterministe, et on a déjà toutes les données nécessaires.
+      setSavedBanners(JSON.parse(JSON.stringify(banners)))
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : `${err}`)
     } finally {

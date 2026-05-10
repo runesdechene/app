@@ -5,6 +5,8 @@ import { usePlayer } from '../hooks/usePlayer'
 import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { useGeolocationWatch } from '../hooks/useGeolocationWatch'
+import { useNotifications } from '../hooks/useNotifications'
+import { useLevel } from '../hooks/useLevel'
 import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
@@ -46,6 +48,13 @@ export default function MobileLayout() {
   // V0.7.7 (10/05) — déclenche le prompt de geoloc dès le lancement de
   // l'app (avant, on attendait que l'utilisateur ouvre la carte).
   useGeolocationWatch()
+  // V0.7.7 (10/05) — fetch + Realtime des notifs perso. Avant, ce hook
+  // tournait UNIQUEMENT dans MapPage : si l'utilisateur démarrait sur
+  // /accueil ou /activite, il n'avait aucune notification (cloche vide).
+  useNotifications()
+  // V0.7.11 (10/05) — fetch initial du niveau via get_player_profile (sinon
+  // la stats bar reste à niveau 1 tant qu'on n'a pas ouvert la carte).
+  useLevel()
 
   if (!user) return null
 

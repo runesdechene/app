@@ -131,6 +131,15 @@
   margin-top: 2px;
 }
 
+.notification-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-parchment-dark, #e8dcc4);
+}
+
 .notification-content {
   display: flex;
   flex-direction: column;

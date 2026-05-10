@@ -86,16 +86,13 @@
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 16px;
+  justify-content: center;
+  padding: 8px;
   background: rgba(26, 20, 16, 0.6);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border-radius: 50%;
   color: #f4d694;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-accent, "Cabin Condensed", serif);
   cursor: pointer;
   transition: all 0.15s;
 }

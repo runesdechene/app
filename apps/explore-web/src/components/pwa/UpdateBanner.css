@@ -1,7 +1,44 @@
-.geoloc-prompt-overlay {
+/* V0.7.7 (10/05) — bandeau "mise à jour disponible" sur la home page.
+   Doré sur parchemin pour attirer l'œil sans agresser. */
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08));
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-ink, #4a3728);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  margin: 12px 16px 0;
+}
+
+.update-banner:hover {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.28), rgba(212, 175, 55, 0.14));
+}
+
+.update-banner-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.update-banner-text {
+  flex: 1;
+}
+
+/* ── Modal ── */
+
+.update-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100001;
+  z-index: 100002;
   background: rgba(20, 12, 5, 0.55);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -13,10 +50,10 @@
   padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
-.geoloc-prompt-card {
+.update-modal {
   background: var(--color-parchment);
   border-radius: 16px;
-  border: 1px solid rgba(193, 154, 107, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.5);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   max-width: 380px;
   width: 100%;
@@ -28,7 +65,7 @@
   position: relative;
 }
 
-.geoloc-prompt-close {
+.update-modal-close {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -42,16 +79,12 @@
   color: var(--color-ink, #4a3728);
 }
 
-.geoloc-prompt-close:hover {
-  background: rgba(74, 55, 40, 0.18);
-}
-
-.geoloc-prompt-icon {
+.update-modal-icon {
   font-size: 38px;
   line-height: 1;
 }
 
-.geoloc-prompt-title {
+.update-modal-title {
   margin: 0;
   font-family: var(--font-accent, 'Cormorant Garamond', serif);
   font-size: 22px;
@@ -59,44 +92,28 @@
   color: var(--color-ink, #4a3728);
 }
 
-.geoloc-prompt-desc {
+.update-modal-desc {
   margin: 0;
   font-size: 15px;
   line-height: 1.45;
   color: var(--color-ink, #4a3728);
 }
 
-.geoloc-prompt-hint {
+.update-modal-hint {
   margin: 0;
   font-size: 12px;
   font-style: italic;
   color: rgba(74, 55, 40, 0.6);
 }
 
-.geoloc-prompt-steps {
-  margin: 0;
-  padding-left: 20px;
-  text-align: left;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-ink, #4a3728);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.geoloc-prompt-steps li strong {
-  color: var(--color-ink, #4a3728);
-}
-
-.geoloc-prompt-actions {
+.update-modal-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 6px;
 }
 
-.geoloc-prompt-btn-primary {
+.update-modal-btn-primary {
   background: var(--color-ink, #4a3728);
   color: var(--color-parchment);
   border: none;
@@ -109,11 +126,11 @@
   transition: background 0.15s ease;
 }
 
-.geoloc-prompt-btn-primary:hover {
+.update-modal-btn-primary:hover {
   background: #2c2018;
 }
 
-.geoloc-prompt-btn-secondary {
+.update-modal-btn-secondary {
   background: none;
   border: none;
   font-family: inherit;
@@ -121,8 +138,4 @@
   color: rgba(74, 55, 40, 0.6);
   cursor: pointer;
   padding: 6px;
-}
-
-.geoloc-prompt-btn-secondary:hover {
-  color: var(--color-ink, #4a3728);
 }

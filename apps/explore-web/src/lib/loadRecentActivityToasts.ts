@@ -108,21 +108,11 @@ export async function loadRecentActivityToasts(currentUserId: string) {
     let contested = false
 
     // V0.6 — toasts d'historique (7 derniers jours) épurés.
-    // Skip V0.5 figés (claim, fortify, place_influence). Pour harvest_crown,
-    // on n'affiche que les siennes (récolte de couronnes — le système est
-    // perso, pas social).
-    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence') {
+    // Skip V0.5 figés (claim, fortify, place_influence) + harvest_crown
+    // (récolte de couronne : feedback déjà donné par l'animation du coffre +
+    // le compteur Couronnes dans la stats bar — le toast est redondant).
+    if (e.type === 'claim' || e.type === 'fortify' || e.type === 'place_influence' || e.type === 'harvest_crown') {
       continue
-    } else if (e.type === 'harvest_crown') {
-      if (e.actor_id !== currentUserId) continue
-      const gain = (e.data as { gain?: number })?.gain ?? 1
-      message = `Vous avez récolté ${gain} Couronne${gain > 1 ? 's' : ''} sur ${place} 🪙`
-      // V0.7.6 (8/05) — push 'Vous' avant place pour que GameToast bind
-      // correctement : actorId + highlights[0]='Vous' → clic 'Vous' ouvre profil
-      // de soi, clic place ouvre le lieu. Avant : highlights=[place] +
-      // actorId set → clic place ouvrait le profil au lieu du lieu (bug).
-      highlights.push('Vous', place)
-      type = 'harvest_crown'
     } else if (e.type === 'plant_flag') {
       message = `${name} a planté son étendard sur ${place} 🚩`
       highlights.push(name, place)

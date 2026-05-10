@@ -1,3 +1,23 @@
+# ALPHA V0.7.12
+## La pub d'accueil refondue + des têtes partout
+
+### 🎬 La pub d'accueil s'ouvre à l'ouverture de l'app, peu importe la page
+Avant, la pub interstitielle n'apparaissait que quand tu arrivais sur la carte. Maintenant elle s'ouvre **dès l'ouverture de l'app**, peu importe que tu atterrisses sur l'accueil, la carte, le chat ou l'activité. Une seule fois par session — relance ou F5 pour la revoir.
+
+### ✕ Croix de fermeture en haut, plus de "Entrer sur la carte"
+Le bouton du haut a été remplacé par une simple croix discrète. Plus universel maintenant que la pub peut s'afficher avant n'importe quelle page.
+
+### 🎨 Fond opaque immédiat pendant le chargement
+Avant, on voyait brièvement la page derrière avant que la pub apparaisse. Maintenant un fond crème opaque cache tout dès le mount, puis la pub fait son fade-in propre.
+
+### 👤 Têtes des joueurs dans les notifs, le feed et les toasts
+Quand quelqu'un fait une action perso (like, mécène, carnet, attaque, message d'expé, levée de brouillard…), tu vois maintenant **sa tête** au lieu d'une icône générique. Pareil dans le feed Activités sur la home et dans les toasts en bas de la carte. Les events systémiques (jalons, niveau, énigme du jour, récap hebdo) gardent leur icône — parcimonie.
+
+### 🪙 Plus de toast quand on récolte une Couronne
+L'animation du coffre + le compteur Couronnes en haut à droite suffisent comme feedback. Le toast "Vous avez récolté X Couronne" n'apparaît plus, ça désencombre la map.
+
+---
+
 # ALPHA V0.7.11
 ## Le clavier reste ouvert dans le Chat
 

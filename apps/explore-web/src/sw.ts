@@ -42,11 +42,12 @@ interface PushPayload {
   url: string
 }
 
-// Normalise toute URL push pour qu'elle commence par /carte (start_url
-// du manifest). Sans ça, l'OS Android ouvre Chrome au lieu de la PWA
-// installée. Si l'URL est déjà sur /carte, on la laisse telle quelle.
+// Normalise toute URL push pour qu'elle pointe vers une route in-PWA
+// (/carte ou /accueil). Sans ça, l'OS Android ouvre Chrome au lieu de la
+// PWA installée. V0.7.11 (10/05) : /accueil ajouté pour permettre aux
+// notifs expedition_message d'ouvrir la modale d'expé (montée sur HomePage).
 function normalizeAppUrl(raw: string): string {
-  if (raw.startsWith('/carte')) return raw
+  if (raw.startsWith('/carte') || raw.startsWith('/accueil')) return raw
   const queryIdx = raw.indexOf('?')
   const query = queryIdx >= 0 ? raw.slice(queryIdx) : ''
   return '/carte' + query

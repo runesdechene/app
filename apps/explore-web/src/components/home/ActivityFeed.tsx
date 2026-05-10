@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useUserAvatars } from '../../hooks/useUserAvatars'
 import './ActivityFeed.css'
 
 // Types narratifs présents dans activity_log (cf. migs 001, 005, 081, 094, 095…)
@@ -96,10 +97,14 @@ export function ActivityFeed({ limit = 30, onSeeMore }: ActivityFeedProps) {
     }
   }, [])
 
+  const displayed = items.slice(0, limit)
+  // Toutes les actions du feed sont personnelles (visite, contribute, etc.) —
+  // on fetch les avatars de tous les acteurs en batch et on les affiche
+  // à la place de l'icône quand dispo.
+  const avatars = useUserAvatars(displayed.map((r) => r.actor_id))
+
   if (loading) return null
   if (items.length === 0) return null
-
-  const displayed = items.slice(0, limit)
 
   return (
     <section className="activity-feed">
@@ -107,9 +112,14 @@ export function ActivityFeed({ limit = 30, onSeeMore }: ActivityFeedProps) {
       <ul className="activity-feed-list">
         {displayed.map((row) => {
           const { icon, text } = formatActivity(row)
+          const avatarUrl = row.actor_id ? avatars[row.actor_id] : null
           return (
             <li key={row.id} className="activity-feed-item">
-              <span className="activity-feed-icon" aria-hidden>{icon}</span>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="activity-feed-avatar" />
+              ) : (
+                <span className="activity-feed-icon" aria-hidden>{icon}</span>
+              )}
               <div className="activity-feed-body">
                 <div className="activity-feed-text">{text}</div>
                 <div className="activity-feed-time">{formatRelativeTime(row.created_at)}</div>

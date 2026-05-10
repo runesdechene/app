@@ -60,8 +60,11 @@ export function AdScreen({ onDone }: Props) {
     }
   }
 
-  // Fond opaque immédiat pendant le chargement (cache la carte)
-  if (dismissed || !ad) return null
+  if (dismissed) return null
+  // Fond opaque immédiat pendant le fetch RPC + image load — cache la page
+  // derrière dès le mount, avant que la pub elle-même soit prête à afficher.
+  if (!ad) return <div className="loading-screen loading-screen-preload" aria-hidden />
+
 
   return (
     <div className={`loading-screen${visible ? ' visible' : ''}`}>
@@ -80,14 +83,12 @@ export function AdScreen({ onDone }: Props) {
           />
           <div className="loading-screen-image-overlay" />
 
-          {/* Bouton entrer (petit, en haut à droite) */}
-          <button className="loading-screen-buy" onClick={onDone}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
+          {/* Croix de fermeture (haut à droite) */}
+          <button className="loading-screen-buy" onClick={onDone} aria-label="Fermer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-            Entrer sur la carte
           </button>
         </div>
 
@@ -102,23 +103,15 @@ export function AdScreen({ onDone }: Props) {
           )}
         </div>
 
-        {/* Bouton action pub (gros, en bas) */}
-        {ad.screen.productUrl ? (
+        {/* Bouton CTA pub (gros, en bas) — affiché seulement s'il y a un
+            lien produit ; sinon la croix en haut suffit pour fermer. */}
+        {ad.screen.productUrl && (
           <button className="loading-screen-enter loading-screen-enter-inline" onClick={handleBuy}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
             <span>{ad.screen.title || 'Decouvrir'}</span>
-          </button>
-        ) : (
-          <button className="loading-screen-enter loading-screen-enter-inline" onClick={onDone}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
-            </svg>
-            <span>Entrer sur la carte</span>
           </button>
         )}
       </div>
