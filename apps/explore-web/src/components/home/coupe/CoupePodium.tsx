@@ -18,8 +18,8 @@ interface CoupePodiumProps {
 /**
  * État "user dans une Maison" — Podium 4 marches proportionnelles.
  *
- * Ordre des colonnes : 3-1-2-4 (le leader occupe la 2e colonne, presque-au-centre,
- * crée une silhouette en cloche : 3e descend, 1er culmine, 2e reste haute, 4e basse).
+ * Ordre des colonnes : 4-3-2-1 (croissant — la silhouette monte de gauche à droite,
+ * le leader couronné à droite est l'apothéose visuelle).
  *
  * Hauteur de chaque marche = max(score/topScore × 80px, 12px).
  * Le 12px minimum garantit que toutes les marches restent visibles même à 0 pt
@@ -43,12 +43,12 @@ export function CoupePodium({
   const userRank = userFaction?.rank ?? 0
   const gapToTop = topScore - (userFaction?.score ?? 0)
 
-  // Ordre d'affichage 3-1-2-4 (silhouette en cloche, leader presque-au-centre)
+  // Ordre d'affichage 4-3-2-1 (croissant, leader à droite)
   const displayOrder: Array<{ faction: CoupeFactionEntry; position: 1 | 2 | 3 | 4 }> = [
-    { faction: third, position: 3 },
-    { faction: first, position: 1 },
-    { faction: second, position: 2 },
     { faction: fourth, position: 4 },
+    { faction: third, position: 3 },
+    { faction: second, position: 2 },
+    { faction: first, position: 1 },
   ]
 
   return (
