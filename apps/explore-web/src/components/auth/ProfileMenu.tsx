@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
+import { useGeolocPromptStore } from '../../stores/geolocPromptStore'
 import { EmailChangeModal } from './EmailChangeModal'
 import { PushSettings } from '../notifications/PushSettings'
 import { supabase } from '../../lib/supabase'
@@ -153,6 +154,20 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
           </div>
 
           <PushSettings />
+
+          <button
+            className="profile-dropdown-action"
+            onClick={() => { setOpen(false); useGeolocPromptStore.getState().open() }}
+          >
+            📍 Activer ma position GPS
+          </button>
+
+          <button
+            className="profile-dropdown-action"
+            onClick={() => { setOpen(false); usePlayerStore.getState().setReplayTutorial(true) }}
+          >
+            🎓 Rejouer le tutoriel
+          </button>
 
           <div className="profile-dropdown-divider" />
 

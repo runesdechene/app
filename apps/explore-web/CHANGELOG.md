@@ -1,3 +1,23 @@
+# ALPHA V0.7.10
+## Tutoriel refondu — plein écran, swipe et "rejouer"
+
+### 📚 Le tutoriel passe en plein écran sur mobile
+Fini la petite carte qui flottait au milieu et qui passait sous la barre du téléphone ou sous la navbar. Le tutoriel occupe désormais tout l'écran, contenu centré, bouton "Suivant" toujours visible en bas.
+
+### 👆 Tu peux maintenant swiper entre les pages
+Glisse le doigt à gauche pour passer à la page suivante, à droite pour revenir en arrière. Le bouton "Suivant" reste là si tu préfères taper.
+
+### ✨ Animation de glissement
+Quand tu changes de page, le contenu glisse au lieu de claquer. Petit détail, gros effet sur le ressenti.
+
+### 🎓 "Rejouer le tutoriel" dans le menu profil
+Nouvelle option dans le menu profil (clic sur ton avatar) : **🎓 Rejouer le tutoriel**. Pour les nouveaux qui ont cliqué trop vite, ou pour réviser les bases.
+
+### 🐛 Plus de pub par-dessus le tuto à la première visite
+Bug agaçant fixé : au tout premier lancement, la pub d'accueil ne s'affiche plus par-dessus le tutoriel et l'écran "Créez votre Aventurier". Elle attend que tu aies fini d'arriver.
+
+---
+
 # ALPHA V0.7.9
 ## La Coupe des Héritages s'affiche sur la home
 

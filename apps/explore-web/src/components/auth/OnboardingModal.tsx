@@ -74,14 +74,15 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
   const initial = name.trim() ? name.trim()[0].toUpperCase() : '?'
 
   return (
-    <div className="onboarding-overlay">
-      <div className="onboarding-modal">
-        <h2 className="onboarding-title">Creez votre Aventurier</h2>
-        <p className="onboarding-subtitle">
-          Personnalisez votre profil avant de rejoindre une Faction
-        </p>
-
+    <div className="onboarding-overlay modal-mobile-fullscreen-backdrop">
+      <div className="onboarding-modal modal-mobile-fullscreen">
         <form onSubmit={handleSubmit} className="onboarding-form">
+          <div className="onboarding-scroll">
+            <h2 className="onboarding-title">Creez votre Aventurier</h2>
+            <p className="onboarding-subtitle">
+              Personnalisez votre profil avant de rejoindre une Faction
+            </p>
+
           {/* Avatar */}
           <div className="onboarding-avatar-section">
             <button
@@ -151,6 +152,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
           </label>
 
           {error && <p className="onboarding-error">{error}</p>}
+          </div>
 
           <button
             type="submit"

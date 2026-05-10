@@ -81,6 +81,9 @@ interface PlayerState {
   /** Tutorial complété */
   tutorialCompletedAt: string | null
   setTutorialCompletedAt: (v: string | null) => void
+  /** Replay tutoriel demandé via menu profil — n'écrase pas tutorialCompletedAt en DB */
+  replayTutorial: boolean
+  setReplayTutorial: (v: boolean) => void
 
   /** Chargement initial */
   loading: boolean
@@ -166,6 +169,9 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   tutorialCompletedAt: null,
   setTutorialCompletedAt: (v) => set({ tutorialCompletedAt: v }),
+
+  replayTutorial: false,
+  setReplayTutorial: (v) => set({ replayTutorial: v }),
 
   loading: true,
   setLoading: (loading) => set({ loading }),

@@ -9,6 +9,7 @@ import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
+import { GeolocationPrompt } from '../components/auth/GeolocationPrompt'
 import { FactionBar } from '../components/map/badges/FactionBar'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
@@ -114,6 +115,7 @@ export default function MapPage() {
   const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
   const [tutorialSlides, setTutorialSlides] = useState<TutorialSlide[]>([])
   const tutorialCompletedAt = usePlayerStore(s => s.tutorialCompletedAt)
+  const replayTutorial = usePlayerStore(s => s.replayTutorial)
 
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -240,6 +242,30 @@ export default function MapPage() {
       })
   }, [userId, tutorialCompletedAt])
 
+  // Replay tutoriel via menu profil. Si slides déjà chargées, on rejoue direct ;
+  // sinon on fetch puis on rejoue. Ne touche pas à tutorialCompletedAt en DB.
+  useEffect(() => {
+    if (!replayTutorial || !userId || tutorialPhase !== null) return
+    if (tutorialSlides.length > 0) {
+      setTutorialPhase('before')
+    } else {
+      supabase
+        .from('tutorial_slides')
+        .select('id, phase, position, title, body, image_url')
+        .eq('active', true)
+        .order('phase')
+        .order('position')
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setTutorialSlides(data as TutorialSlide[])
+            setTutorialPhase('before')
+          } else {
+            usePlayerStore.getState().setReplayTutorial(false)
+          }
+        })
+    }
+  }, [replayTutorial, userId, tutorialPhase, tutorialSlides.length])
+
   function handleTutorialBeforeComplete() {
     setTutorialPhase(null)
     // Nouveau joueur → onboarding (puis slides "after" → faction au onComplete de l'onboarding)
@@ -259,6 +285,11 @@ export default function MapPage() {
 
   function handleTutorialAfterComplete() {
     setTutorialPhase(null)
+    // Replay : on sort proprement, ni faction modal ni mark_complete (déjà fait).
+    if (usePlayerStore.getState().replayTutorial) {
+      usePlayerStore.getState().setReplayTutorial(false)
+      return
+    }
     // Si nouveau joueur sans faction → ouvrir FactionModal AVANT de marquer le tuto terminé
     // (la fermeture de FactionModal marquera le tuto terminé)
     if (!usePlayerStore.getState().userFactionId) {
@@ -270,6 +301,11 @@ export default function MapPage() {
 
   function markTutorialComplete() {
     if (!userId) return
+    // En replay, ne pas re-marquer le tuto en DB — on remet juste le flag à false.
+    if (usePlayerStore.getState().replayTutorial) {
+      usePlayerStore.getState().setReplayTutorial(false)
+      return
+    }
     supabase.rpc('mark_tutorial_complete', { p_user_id: userId }).then(({ data, error }) => {
       if (error) {
         console.warn('[MapPage] mark_tutorial_complete failed', error)
@@ -291,7 +327,7 @@ export default function MapPage() {
       <PushPromptHost />
       <PushSubscriptionSync />
       <PushAutoPrompt />
-      {showAdScreen && isAuthenticated && !authLoading && (
+      {showAdScreen && isAuthenticated && !authLoading && tutorialCompletedAt !== null && !showOnboarding && tutorialPhase === null && (
         <AdScreen onDone={() => setShowAdScreen(false)} />
       )}
 
@@ -344,7 +380,7 @@ export default function MapPage() {
 
       {/* Toolbar flottante (masquée en mode ajout) */}
       {!addPlaceMode && (
-        <div className="app-toolbar" style={showAdScreen ? { visibility: 'hidden' } : undefined}>
+        <div className="app-toolbar" style={showAdScreen && tutorialCompletedAt !== null && !showOnboarding && tutorialPhase === null ? { visibility: 'hidden' } : undefined}>
           {!authLoading && isAuthenticated && (
             <>
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
@@ -549,6 +585,8 @@ export default function MapPage() {
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}
+
+      <GeolocationPrompt />
     </div>
   )
 }
