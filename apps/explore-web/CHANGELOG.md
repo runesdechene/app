@@ -1,3 +1,22 @@
+# ALPHA V0.7.9
+## La Coupe des Héritages s'affiche sur la home
+
+### 🏆 Une nouvelle section sur l'accueil
+Au-dessus de l'activité, tu vois maintenant le podium de la saison en cours : les quatre Maisons côte à côte, hauteur des marches proportionnelle à leur score, couronne 👑 sur celle qui mène la course. Ton emblème est cerclé d'or pour que tu retrouves ta Maison d'un coup d'œil. Le 1er à droite, la silhouette monte vers lui — la course se lit en un instant.
+
+Touche une marche pour voir le classement de cette Maison, ou le titre de la section pour le tableau complet.
+
+### ⚜ Pas encore de Maison ? Choisis par cœur
+Si tu n'as pas encore prêté allégeance, la section te présente les quatre héritages avec leur emblème et leur nom — **sans révéler le classement**. Tu choisis par cœur, pas par calcul.
+
+### 📱 iOS — la page d'une Maison ne passe plus sous l'heure
+Quand tu cliques sur une Maison depuis la carte ou la home, son titre ne se cache plus derrière la barre de l'iPhone. Marge de sécurité corrigée pour respecter le notch.
+
+### 🪶 Polissages de la home
+Bordures retirées entre les sections pour un rendu plus respirant. La stats bar (Niveau / Coupe / Couronnes / Énergie) et la top bar (logo, boutique, notifs, avatar) sont alignées sur le même padding que le reste de la page. Tout coule mieux à l'œil.
+
+---
+
 # ALPHA V0.7.8
 ## Une vraie page d'accueil sur mobile
 
