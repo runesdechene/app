@@ -1,7 +1,37 @@
-# ALPHA V0.7.14
-## Polissages visuels du HUD carte
+# ALPHA V0.8.0
+## L'app devient plus humaine
 
-Ajustements fins sur la jauge de découvertes en bas à gauche et l'intégration du badge version sur le logo. Pour que tout soit pixel-perfect avant le festival.
+Une grosse mise à jour qui touche à tout : le tutoriel, les notifications, l'arrivée dans l'app, les actions sur la carte. Le fil rouge — qu'on sente plus la communauté, et moins l'algorithme.
+
+### 🎓 Un tuto qu'on a envie de lire
+Refonte complète. Plein écran sur mobile, on swipe entre les pages avec le doigt, le contenu glisse au lieu de claquer. Et si tu l'as cliqué trop vite la première fois ou que tu veux le rejouer pour quelqu'un, il y a un bouton **🎓 Rejouer le tutoriel** dans ton menu profil. Disponible à tout moment.
+
+### 👤 Des têtes partout, plus d'icônes génériques
+Quand quelqu'un aime ton récit, prend un de tes lieux par mécénat, t'envoie un message d'expédition, ou lève le brouillard sur un lieu que tu connais — tu vois désormais **sa tête** au lieu d'un cœur ou d'une couronne. Dans les notifications, dans le feed Activités, dans les toasts en bas de la carte. La communauté prend un visage.
+
+Les events systémiques (jalons, niveau, énigme du jour, récap hebdo) gardent leur icône — on a fait du tri pour que ça reste lisible.
+
+### 🎬 La pub d'accueil bien placée
+Elle s'ouvre maintenant dès l'ouverture de l'app, peu importe que tu atterrisses sur l'accueil, la carte, le chat ou l'activité. Une fois par session, et plus jamais par-dessus le tutoriel à la première visite. Croix de fermeture en haut à droite — ou clic sur le bouton du bas si elle te propose une découverte intéressante.
+
+### 📜 Le logo qui parle
+Tape sur le logo **Runes de Chêne** en haut de l'écran : ça ouvre cette page de nouveautés. Le numéro de version vit en mini, en haut à droite du logo. Plus besoin de chercher pour voir ce qui change.
+
+### 📊 La jauge de découvertes prend la lumière
+À l'emplacement où vivait le numéro de version (en bas à gauche de la carte) : la barre **X/Y lieux découverts**. L'info qui mérite la visibilité — qui te rappelle où tu en es de ton exploration.
+
+### 🪙 L'écran s'allège
+Plus de toast *"Vous avez récolté X Couronne sur Y"* à chaque coffre cliqué. L'animation du coffre qui pop + le compteur Couronnes en haut à droite suffisent largement.
+
+### ⌨️ Le clavier Chat reste ouvert (iOS)
+Petit fix qui change tout : tu envoies un message sur ton iPhone, le clavier reste là, tu enchaînes. Plus de re-tap forcé après chaque envoi.
+
+### 🔄 Bandeau "Mise à jour disponible"
+Quand une nouvelle version est en ligne, un petit bandeau te le signale en haut de la home — pour ne plus jamais rester bloqué sur un vieux bundle. Un clic, et tu es à jour.
+
+---
+
+Bonne route, voyageur. La carte t'attend. ⚜
 
 ---
 
