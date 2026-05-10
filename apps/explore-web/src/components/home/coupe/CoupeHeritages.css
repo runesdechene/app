@@ -1,0 +1,327 @@
+/* ============================================
+   COUPE DES HÉRITAGES — Section Home
+   Styles partagés CoupePodium + CoupeOnboarding
+   ============================================ */
+
+/* ---- Titre de section (commun) ---- */
+.coupe-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+  color: #2a1f10;
+}
+.coupe-season {
+  font-size: 11px;
+  font-style: italic;
+  color: #8a6f4a;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* ---- Cadre intérieur (commun) ---- */
+.coupe-frame {
+  background: #f4e4b8;
+  border: 1px solid #b8945e;
+  border-radius: 14px;
+  box-shadow: inset 0 0 18px rgba(184, 148, 94, 0.18);
+}
+
+/* =========================================
+   PODIUM (état "user dans une Maison")
+   ========================================= */
+.coupe-podium-frame {
+  padding: 14px 12px 10px;
+}
+.coupe-podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.coupe-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 120ms ease-out;
+}
+.coupe-step:hover {
+  transform: translateY(-2px);
+}
+.coupe-step-emblem {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 6px rgba(74, 55, 40, 0.3);
+}
+.coupe-step-emblem-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.coupe-step-mine {
+  outline: 2px solid #b8860b;
+  outline-offset: 2px;
+}
+.coupe-step-1 .coupe-step-emblem {
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 0 14px rgba(184, 134, 11, 0.55), 0 2px 6px rgba(74, 55, 40, 0.3);
+}
+.coupe-step-1 .coupe-step-emblem-img {
+  width: 28px;
+  height: 28px;
+}
+.coupe-step-name {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2a1f10;
+  margin-bottom: 4px;
+  text-align: center;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.coupe-step-pts {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.coupe-step-block {
+  width: 70px;
+  background: linear-gradient(180deg, #d8c08a 0%, #b8945e 100%);
+  border: 1px solid #8a6f4a;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2a1f10;
+}
+.coupe-step-1 .coupe-step-block {
+  height: 64px;
+  background: linear-gradient(180deg, #e8c869 0%, #b8860b 100%);
+  box-shadow: inset 0 -2px 4px rgba(74, 55, 40, 0.3);
+}
+.coupe-step-2 .coupe-step-block {
+  height: 48px;
+}
+.coupe-step-3 .coupe-step-block {
+  height: 36px;
+}
+.coupe-crown {
+  font-size: 16px;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+.coupe-crown-spacer {
+  height: 18px;
+}
+
+/* ---- 4ème en pied ---- */
+.coupe-outsider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 4px;
+  border-top: 1px solid rgba(184, 148, 94, 0.4);
+  font-size: 11px;
+  color: #6a4f2a;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+  border-radius: 6px;
+}
+.coupe-outsider:hover {
+  background: rgba(184, 148, 94, 0.08);
+}
+.coupe-outsider-mine {
+  background: rgba(184, 134, 11, 0.08);
+}
+.coupe-outsider-emblem {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.coupe-outsider-emblem-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.coupe-outsider-name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+/* ---- Pilule identité utilisateur ---- */
+.coupe-mine-pill-wrap {
+  text-align: center;
+  margin-top: 8px;
+}
+.coupe-mine-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(184, 134, 11, 0.18);
+  border: 1px solid rgba(184, 134, 11, 0.4);
+  color: #6a5008;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+}
+
+/* ---- Footer "Voir le classement complet" ---- */
+.coupe-podium-footer {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 10px;
+  color: #8a6f4a;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  padding: 4px 0;
+  font-family: inherit;
+}
+.coupe-podium-footer:hover {
+  color: #5a4020;
+}
+
+/* =========================================
+   ONBOARDING (état "user sans Maison")
+   ========================================= */
+.coupe-onboarding-frame {
+  padding: 20px 14px 14px;
+  text-align: center;
+}
+.coupe-cup-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+  position: relative;
+}
+.coupe-cup-halo {
+  position: absolute;
+  inset: -8px -20px;
+  background: radial-gradient(ellipse at center, rgba(232, 200, 105, 0.32) 0%, transparent 60%);
+  pointer-events: none;
+}
+.coupe-cup {
+  width: 86px;
+  height: 86px;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(74, 55, 40, 0.35));
+  position: relative;
+}
+.coupe-tagline {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #2a1f10;
+  margin: 0 0 6px;
+}
+.coupe-blurb {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #6a4f2a;
+  margin: 0 14px 16px;
+}
+.coupe-banners {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 4px;
+  padding-top: 14px;
+  margin-bottom: 14px;
+  border-top: 1px solid rgba(184, 148, 94, 0.45);
+}
+.coupe-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  border-radius: 6px;
+  transition: background 120ms ease-out, transform 120ms ease-out;
+  font-family: inherit;
+}
+.coupe-banner:hover {
+  background: rgba(184, 148, 94, 0.1);
+  transform: translateY(-2px);
+}
+.coupe-banner-emblem {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(74, 55, 40, 0.3);
+}
+.coupe-banner-emblem-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.coupe-banner-name {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+  color: #2a1f10;
+}
+.coupe-cta {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  background: linear-gradient(180deg, #e8c869 0%, #b8860b 100%);
+  border: 1px solid #8a6508;
+  border-radius: 999px;
+  color: #2a1f10;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(184, 134, 11, 0.4), inset 0 -2px 3px rgba(74, 55, 40, 0.2);
+  transition: transform 120ms ease-out;
+}
+.coupe-cta:active {
+  transform: scale(0.98);
+}
