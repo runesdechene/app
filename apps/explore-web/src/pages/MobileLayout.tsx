@@ -13,6 +13,11 @@ import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
 import './MobileLayout.css'
 
+export interface MobileLayoutContext {
+  /** Ouvre la FactionModal (sélection/changement de Maison). Montée par MobileLayout. */
+  openFactionModal: () => void
+}
+
 /**
  * Layout commun aux pages mobile (/accueil, /chat, /activite).
  *
@@ -44,7 +49,7 @@ export default function MobileLayout() {
       <MobileTopBar onFactionModal={() => setShowFactionModal(true)} />
       <MobileStatsBar />
 
-      <Outlet />
+      <Outlet context={{ openFactionModal: () => setShowFactionModal(true) } satisfies MobileLayoutContext} />
 
       <BottomTabbar />
       <MobileSelectionModals />
