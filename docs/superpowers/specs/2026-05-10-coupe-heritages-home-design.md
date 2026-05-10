@@ -2,8 +2,10 @@
 
 **Date :** 2026-05-10
 **Auteur :** Uriel + XO
-**Statut :** Design validé par Uriel le 10 mai 2026, prêt pour le plan d'implémentation
-**Branche cible :** nouvelle branche depuis `main` (nom à confirmer dans le plan, suggestion `coupe-heritages-home`)
+**Statut :** Design validé par Uriel le 10 mai 2026, implémenté sur branche `coupe-heritages-home`
+**Branche cible :** `coupe-heritages-home`
+
+> **Évolution post-prévisualisation (10 mai 2026, après livraison)** : le Podium "top 3 + 4ème en pied" a été remplacé par un **podium 4 marches proportionnelles, ordre 3-1-2-4** (silhouette en cloche, leader presque-au-centre). Hauteur de chaque marche = `max(score / topScore × 80, 12)` px. La logique du 4ème en pied (ligne `.coupe-outsider`, écart au podium "à X du podium") a été supprimée. Tout le reste du design reste valide. Cf. §4.1 ci-dessous pour le détail du nouveau rendu — l'ASCII art initial décrit l'ancienne version, conservé pour traçabilité.
 
 ---
 
