@@ -1,3 +1,11 @@
+# ALPHA V0.7.11
+## Le clavier reste ouvert dans le Chat
+
+### ⌨️ Tu peux enchaîner les messages sans re-tap
+Sur mobile, après avoir envoyé un message, le clavier se fermait et tu devais re-cliquer sur le champ pour continuer à écrire. Bug corrigé : le focus reste sur l'input, le clavier reste ouvert, tu peux enchaîner direct.
+
+---
+
 # ALPHA V0.7.10
 ## Tutoriel refondu — plein écran, swipe et "rejouer"
 

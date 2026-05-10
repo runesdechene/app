@@ -185,10 +185,10 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
       setTimeout(() => setSendError(null), 4000)
     }
     setSending(false)
-    // Focus après envoi — uniquement sur desktop (évite le clavier mobile qui clignote)
-    if (window.innerWidth > 768) {
-      setTimeout(() => inputRef.current?.focus(), 0)
-    }
+    // Pas besoin de re-focus : l'input ne perd jamais le focus parce que
+    // - touche Enter : focus déjà sur l'input
+    // - bouton Envoyer : onMouseDown preventDefault empêche le vol de focus
+    // → le clavier mobile reste ouvert sans clignoter.
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -240,10 +240,11 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
           onKeyDown={handleKeyDown}
           placeholder="Ecrire un message..."
           maxLength={500}
-          disabled={sending}
+          readOnly={sending}
           className="chat-input-field"
         />
         <button
+          onMouseDown={(e) => e.preventDefault()}
           onClick={handleSend}
           disabled={sending || !text.trim()}
           className="chat-send-btn"
