@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useMapStore } from '../../../stores/mapStore'
@@ -66,7 +67,7 @@ export function LeaderboardModal({ onClose }: Props) {
     useMapStore.getState().setSelectedPlayerId(playerId)
   }
 
-  return (
+  const modal = (
     <div className="leaderboard-overlay modal-mobile-fullscreen-backdrop" onClick={onClose}>
       <div className="leaderboard-modal modal-mobile-fullscreen" onClick={e => e.stopPropagation()}>
         <button className="player-modal-close" onClick={onClose} aria-label="Fermer">
@@ -128,4 +129,8 @@ export function LeaderboardModal({ onClose }: Props) {
       </div>
     </div>
   )
+
+  // Portal au body pour echapper a tout stacking context parent (StatsBar,
+  // MapPage, MobileLayout) qui pourrait pieger la modale sous l'UI.
+  return createPortal(modal, document.body)
 }

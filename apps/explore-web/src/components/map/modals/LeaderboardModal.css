@@ -6,7 +6,10 @@
   position: fixed;
   inset: 0;
   background: rgba(20, 12, 5, 0.6);
-  z-index: 1100;
+  /* 9998 : au-dessus de BottomTabbar/MobileTopBar (z=9990) et du HUD carte.
+     Mobile : modal-mobile-fullscreen-backdrop override avec !important au
+     meme z-index, OK. */
+  z-index: 9998;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,6 +24,9 @@
   width: 100%;
   max-width: 400px;
   max-height: 80vh;
+  /* 9999 : juste au-dessus de l'overlay, sous AdScreen (99999) et
+     DailyEnigma (999999). */
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   overflow: hidden;

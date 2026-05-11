@@ -1,3 +1,10 @@
+# ALPHA V0.8.11
+## Le Classement enfin par-dessus tout
+
+Le **Classement** (Gloire / Lieux revendiqués / Lieux ajoutés) passait sous la barre du bas et le haut de l'interface, peu importe d'où tu l'ouvrais. Désormais il s'affiche en plein écran par-dessus tout — sur desktop comme sur mobile, sur la home comme sur la carte. Plus de modale coincée derrière la navigation.
+
+---
+
 # ALPHA V0.8.9
 ## Énergie : le HUD aussi affiche la vraie valeur
 
