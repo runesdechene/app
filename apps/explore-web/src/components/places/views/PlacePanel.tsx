@@ -82,7 +82,19 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
         isAuthenticated={isAuthenticated}
         isOwnFaction={isOwnFaction}
         onDiscover={async () => {
-          await discoverPlace(place.id, place.location.latitude, place.location.longitude)
+          const result = await discoverPlace(place.id, place.location.latitude, place.location.longitude)
+          if (!result.success && result.error) {
+            // Defense-in-depth : si le serveur refuse (typiquement not_enough_energy
+            // sur une desync avec le check front), on toast pour eviter le clic mort.
+            const msg = result.error === 'not_enough_energy'
+              ? "Pas assez d'energie pour decouvrir ce lieu."
+              : `Decouverte impossible : ${result.error}`
+            useToastStore.getState().addToast({
+              type: 'error',
+              message: msg,
+              timestamp: Date.now(),
+            })
+          }
         }}
         onAuthPrompt={onAuthPrompt}
       />

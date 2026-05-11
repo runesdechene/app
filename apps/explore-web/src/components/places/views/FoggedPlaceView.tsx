@@ -28,22 +28,25 @@ interface Props {
   onAuthPrompt?: () => void
 }
 
+/** "3m 12s" / "45s" / "2m". Vide si seconds ≤ 0. */
+function formatNextPoint(seconds: number): string {
+  if (seconds <= 0) return ''
+  if (seconds < 60) return `${seconds}s`
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return s > 0 ? `${m}m ${s}s` : `${m}m`
+}
+
 export function FoggedPlaceView({
   place, onClose, isAuthenticated, isOwnFaction, onDiscover, onAuthPrompt,
 }: Props) {
   const maxEnergy = usePlayerStore(s => s.maxEnergy)
   const energy = usePlayerStore(s => s.energy)
   const nextPointIn = usePlayerStore(s => s.nextPointIn)
-  const energyCycle = usePlayerStore(s => s.energyCycle)
   const userId = usePlayerStore(s => s.userId)
   const [discovering, setDiscovering] = useState(false)
   const [preview, setPreview] = useState<CostPreview | null>(null)
   const [previewLoading, setPreviewLoading] = useState(true)
-
-  const isFull = energy >= maxEnergy
-  const elapsedInTick = energyCycle - nextPointIn
-  const fractionOfTick = energyCycle > 0 ? elapsedInTick / energyCycle : 0
-  const fractionalEnergy = isFull ? maxEnergy : Math.min(energy + fractionOfTick, maxEnergy)
 
   useEffect(() => {
     if (!userId) return
@@ -62,9 +65,15 @@ export function FoggedPlaceView({
   }, [userId, place.id])
 
   const cost = preview?.cost ?? 1
-  const canAfford = cost === 0 || fractionalEnergy >= cost
+  // Le check utilise `energy` (vraie valeur DB, NUMERIC(6,1)) et PAS la
+  // fractionalité illusoire calculee cote client. Sans ca, le bouton parait
+  // actif a 1.9 (illusion de regen) mais le serveur refuse car energy_points
+  // entier = 1 < 1.5. Cf. discover_place mig 124:87-89.
+  const canAfford = cost === 0 || energy >= cost
   const d = preview?.detail
   const images = place.images || []
+  const isFull = energy >= maxEnergy
+  const nextPointLabel = !isFull ? formatNextPoint(nextPointIn) : ''
 
   return (
     <>
@@ -137,7 +146,10 @@ export function FoggedPlaceView({
             )}
 
             <div className="fog-energy-info">
-              <span className="fog-energy-count">{fractionalEnergy.toFixed(1)}/{maxEnergy}</span> énergie
+              <span className="fog-energy-count">{energy.toFixed(1)}/{maxEnergy}</span> énergie
+              {nextPointLabel && (
+                <span className="fog-energy-next"> · +1 dans {nextPointLabel}</span>
+              )}
               {!canAfford && (
                 <p className="fog-energy-empty">
                   Pas assez d'énergie. Revenez plus tard ou déplacez-vous à proximité.

@@ -1,3 +1,19 @@
+# ALPHA V0.8.8
+## Énergie : fini le bug du bouton mort à 1.9
+
+Le bug d'énergie qu'on traîne depuis des mois. Tu avais *"1.9 énergie"*, le lieu coûtait 1.5, et le bouton ne réagissait pas — il fallait remonter à 2 pour pouvoir découvrir.
+
+La cause : l'affichage de l'énergie comptait une *fraction de regen en cours* (purement cosmétique, pour donner l'effet d'une jauge qui monte). Mais cette fraction n'existait pas côté serveur — qui ne voyait que ton *vraie* énergie utilisable. Tu cliquais sur un bouton qui semblait actif, le serveur refusait silencieusement, et rien ne se passait.
+
+Désormais sur la fenêtre **Découvrir un lieu** :
+- L'énergie affichée est celle que tu peux **vraiment dépenser** (pas l'illusion de regen). Si la DB dit 1.5, tu vois 1.5. Pas plus, pas moins.
+- Un petit timer **+1 dans 3m 12s** te dit quand tu auras le prochain point.
+- Et au cas où une désync se glisserait encore, un toast d'erreur t'explique pourquoi si le serveur refuse — plus de clic mort sans feedback.
+
+L'indicateur d'énergie en HUD de la carte garde son animation fluide (c'est joli, et ça reste un indicateur de progression — pas une interface d'action).
+
+---
+
 # ALPHA V0.8.7
 ## Polish mobile : Maison, événements, ajout de lieu
 

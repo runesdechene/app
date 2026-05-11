@@ -95,6 +95,11 @@
   color: var(--color-ink);
 }
 
+.fog-energy-next {
+  color: var(--color-ink-light);
+  opacity: 0.85;
+}
+
 .fog-energy-empty {
   margin: 8px 0 0;
   font-size: 13px;
