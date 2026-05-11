@@ -190,9 +190,9 @@ export function ReviewSubmit() {
               : <p>Votre adresse email <strong>{form.email}</strong> est deja associee a un compte <strong>Runes de Chene</strong>. Votre avis a ete rattache a votre compte. Retrouvez la communaute sur l'application <strong>Carte</strong>.</p>
             }
           </div>
-          <button onClick={resetForm} className="btn-primary">
-            Envoyer un autre avis
-          </button>
+          <a href="https://app.runesdechene.com" className="btn-primary">
+            Essayer l'application
+          </a>
         </div>
       </div>
     )
