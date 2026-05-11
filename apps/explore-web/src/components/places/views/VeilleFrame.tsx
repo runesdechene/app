@@ -1,5 +1,6 @@
 ﻿import { useState, useCallback, useEffect } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useToastStore } from '../../../stores/toastStore'
 import { useVeille } from '../../../hooks/useVeille'
 import { VeillePartageeModal } from '../modals/VeillePartageeModal'
 import { pushVeilleOverride } from '../../../lib/loadInitialVeilles'
@@ -10,6 +11,7 @@ import './VeilleFrame.css'
 
 interface Props {
   placeId: string
+  placeTitle: string
   placeLocation: { latitude: number; longitude: number }
 }
 
@@ -32,7 +34,7 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
  *
  * 1 tap = visit + plant_flag (visit en parallèle, erreurs ignorées).
  */
-export function VeilleFrame({ placeId, placeLocation }: Props) {
+export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userPosition = usePlayerStore(s => s.userPosition)
@@ -45,7 +47,15 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   // (cas D "réaffirmation IRL"). On garde le refresh au mount pour la
   // donnée de veille (utilisée ailleurs si besoin).
   useEffect(() => { void refresh() }, [refresh])
-  void veille // évite warn unused — l'état est utilisé via refresh
+
+  // V0.8.10 (11/05) — Détection : suis-je déjà veilleur GPS de ce lieu ?
+  // Si oui → l'action est défensive (efface les menaces) et ne rapporte plus
+  // de bonus (cf. mig 166). Le label du bouton change pour éviter la
+  // confusion "+50 à chaque clic" (exploit colmaté).
+  const isAlreadyVeilleurGps = !!(
+    veille && !veille.vacant && !veille.byInfluence && userId &&
+    veille.members.some(m => m.userId === userId)
+  )
 
   const distanceKm = userPosition
     ? haversineKm({ lat: userPosition.lat, lng: userPosition.lng },
@@ -84,9 +94,38 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
       alert(msg)
       return
     }
-    pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
+    // V0.8.10 (11/05) — Toast de feedback adapté au mode (fini le clic mort
+    // sans confirmation visuelle, et message honnête sur le gain réel).
+    const addToast = useToastStore.getState().addToast
+    if (result.mode === 'reaffirm_gps') {
+      const cleared = result.threatsCleared ?? 0
+      addToast({
+        type: 'plant_flag',
+        message: cleared > 0
+          ? `🛡️ Présence réaffirmée sur ${placeTitle} — ${cleared} menace${cleared > 1 ? 's' : ''} effacée${cleared > 1 ? 's' : ''}`
+          : `🛡️ Présence réaffirmée sur ${placeTitle}`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
+        timestamp: Date.now(),
+      })
+    } else {
+      // plant / confirm_gps / reclaim_gps : tu deviens (ou reprends) veilleur
+      const verb = result.mode === 'plant' ? 'Tu deviens veilleur de'
+                 : result.mode === 'reclaim_gps' ? 'Tu reprends'
+                 : 'Veille confirmée sur'
+      addToast({
+        type: 'plant_flag',
+        message: `🏴 ${verb} ${placeTitle} (+${result.plantBonus} score Cour)`,
+        highlights: [placeTitle],
+        placeId,
+        placeLocation,
+        timestamp: Date.now(),
+      })
+    }
+    pushVeilleOverride(placeId, result.factionId ?? null, result.isNeutral ?? false, result.members)
     await refresh()
-  }, [userId, userPosition, plant, refresh, placeId])
+  }, [userId, userPosition, plant, refresh, placeId, placeTitle, placeLocation])
 
   const handlePlant = useCallback(async () => {
     if (!userId || !userPosition) return
@@ -103,14 +142,20 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   return (
     <>
       <button
-        className={`veille-plant-btn${planting ? ' planting' : ''}`}
+        className={`veille-plant-btn${planting ? ' planting' : ''}${isAlreadyVeilleurGps ? ' reaffirm' : ''}`}
         disabled={!canPlant}
         onClick={handlePlant}
-        title={onSpot ? 'Planter ton étendard sur ce lieu' : 'Vous devez être à moins de 100 m du lieu'}
-        aria-label="Planter mon étendard (GPS)"
+        title={
+          !onSpot
+            ? 'Vous devez être à moins de 100 m du lieu'
+            : isAlreadyVeilleurGps
+              ? 'Tu veilles déjà — réaffirmer efface les menaces de la Cour (pas de nouveau bonus)'
+              : 'Planter ton étendard sur ce lieu (+50 score Cour)'
+        }
+        aria-label={isAlreadyVeilleurGps ? 'Réaffirmer ma vigilance (GPS)' : 'Planter mon étendard (GPS)'}
       >
         <img src={etendardIcon} alt="" className="veille-plant-icon" />
-        <span>{planting ? '…' : 'Planter mon étendard (GPS)'}</span>
+        <span>{planting ? '…' : isAlreadyVeilleurGps ? 'Réaffirmer ma vigilance' : 'Planter mon étendard (GPS)'}</span>
       </button>
 
       {optInCandidates && (

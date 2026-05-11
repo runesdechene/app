@@ -275,7 +275,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
           )}
         </div>
         {userFactionId && (
-          <VeilleFrame placeId={placeId} placeLocation={placeLocation} />
+          <VeilleFrame placeId={placeId} placeTitle={place.title} placeLocation={placeLocation} />
         )}
       </div>
 
