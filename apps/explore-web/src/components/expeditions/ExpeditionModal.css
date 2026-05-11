@@ -214,9 +214,7 @@
     height: calc(var(--safe-bottom, 0px) + 110px);
   }
 
-  /* V0.8.8 (11/05) — Retour au pattern fixed input + padding compensatoire :
-     les tentatives de flex layout naturel ne propageaient pas correctement
-     la hauteur sur tous les Android. Pattern fixed = robuste partout. */
+  /* Chat input — fixed bottom en mode chat. */
   .expedition-modal.mobile-tab-chat .expedition-chat-input {
     position: fixed;
     left: 0;
@@ -226,13 +224,18 @@
     padding-bottom: calc(var(--safe-bottom, 0px) + 12px);
     background: #f5e9d4;
   }
-  /* V0.8.9 (11/05) — Padding-bottom = hauteur RÉELLE de l'input mesurée au
-     runtime (cf. useEffect dans ExpeditionChat.tsx : getBoundingClientRect +
-     ResizeObserver expose --chat-input-height sur le scrollable). Plus de
-     valeurs hardcodées qui se trompent selon font / OS / safe-area.
-     Fallback 110px si le JS n'a pas (encore) tourné. +8px de buffer visuel. */
+  /* V0.7.7 (10/05) — bug iOS : le spacer ::after dans un flex container
+     scrollable était parfois ignoré (les derniers messages restaient cachés
+     sous le chat-input fixed). On pose le padding directement sur le
+     container scrollable, plus robuste. ::after gardé en belt-and-suspenders. */
   .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages {
-    padding-bottom: calc(var(--chat-input-height, 110px) + 20px);
+    padding-bottom: calc(var(--safe-bottom, 0px) + 130px);
+  }
+  .expedition-modal.mobile-tab-chat .expedition-modal-chat-col .expedition-chat-messages::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    height: calc(var(--safe-bottom, 0px) + 110px);
   }
 }
 

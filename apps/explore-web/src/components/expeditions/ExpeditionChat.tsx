@@ -47,26 +47,6 @@ export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAut
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLDivElement>(null)
-
-  // V0.8.9 (11/05) — Mesure dynamique de la hauteur réelle de l'input chat
-  // (qui est en position:fixed bottom sur mobile-tab-chat) et expose en CSS
-  // var sur le containeur scrollable. Le padding-bottom des messages s'y
-  // ajuste exactement, plus de calcul à l'aveugle (cf. CSS).
-  // ResizeObserver pour réagir : clavier mobile, rotation, font reflow.
-  useEffect(() => {
-    const input = inputRef.current
-    const scroll = scrollRef.current
-    if (!input || !scroll) return
-    const apply = () => {
-      const h = input.getBoundingClientRect().height
-      if (h > 0) scroll.style.setProperty('--chat-input-height', `${Math.ceil(h)}px`)
-    }
-    apply()
-    const ro = new ResizeObserver(apply)
-    ro.observe(input)
-    return () => ro.disconnect()
-  }, [active])
 
   // Auto-scroll au bas : à chaque nouveau message, ET quand le chat redevient
   // visible (sinon scrollHeight=0 au mount mobile avec tab=info par défaut).
@@ -148,7 +128,7 @@ export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAut
         })}
       </div>
       {!readOnly && (
-        <div className="expedition-chat-input" ref={inputRef}>
+        <div className="expedition-chat-input">
           <input
             type="text"
             value={draft}

@@ -1,18 +1,3 @@
-# ALPHA V0.8.10
-## Vigilance, chat, pastilles : une passe de propre
-
-### 🛡️ Réaffirmer ta vigilance sur tes lieux
-Quand tu es déjà veilleur GPS d'un lieu, le bouton change : **"Réaffirmer ma vigilance"**, ton sépia. L'action reste utile (elle efface les menaces de la Cour qui pèsent sur ton lieu), mais elle ne génère plus de bonus de score — sinon on pourrait farmer le score en spam de clic. Et désormais un toast confirme **chaque** action : *"🛡️ Présence réaffirmée — X menaces effacées"* ou *"🏴 Tu deviens veilleur de ..."*. Plus de clic mort sans feedback visuel.
-
-### 💬 Le chat d'événement, enfin calibré
-La marge sous le dernier message se calcule maintenant à partir de la **hauteur réelle** de la barre d'écriture, mesurée au runtime. Fini le trou géant sur Android et fini le dernier message coupé sur iPhone — la marge s'adapte précisément, en pixel.
-
-### 🔴 La pastille rouge d'activité
-- Elle se réinitialise vraiment quand tu visites la page **Activité**, peu importe d'où tu y arrives (avant ça ne marchait que depuis la carte).
-- Tes propres actions ne la déclenchent plus : tu découvres un lieu, résous une énigme, plantes un drapeau — la pastille reste à zéro. Elle ne te signale que ce que **les autres** font.
-
----
-
 # ALPHA V0.8.9
 ## Énergie : le HUD aussi affiche la vraie valeur
 
