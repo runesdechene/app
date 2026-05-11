@@ -1,3 +1,12 @@
+# ALPHA V0.8.9
+## Énergie : le HUD aussi affiche la vraie valeur
+
+Suite du fix de V0.8.8. On avait corrigé la fenêtre Découvrir un lieu, mais l'indicateur d'énergie sur la carte (et la barre de stats sur la home) continuait d'afficher la valeur "fluide" — d'où l'incohérence si tu venais de dépenser 1.5 sur un lieu : la stat affichait 8.8 alors que ta vraie énergie était 8.5.
+
+Désormais tout l'app affiche la même chose : ta vraie énergie utilisable. L'indicateur reste informatif via le **+X/h** à côté qui te rappelle le rythme de regen. Plus de divergence entre le HUD et l'action.
+
+---
+
 # ALPHA V0.8.8
 ## Énergie : fini le bug du bouton mort à 1.9
 
