@@ -61,6 +61,24 @@
   line-height: 1.4;
 }
 
+/* V0.8.10 — Section gains (Gloire / Coupe / score Cour) sous la quote */
+.victory-gains {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  background: rgba(196, 106, 58, 0.12);
+  border: 1px solid rgba(196, 106, 58, 0.35);
+  border-radius: 8px;
+}
+.victory-gain {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0d8a8;
+  letter-spacing: 0.3px;
+}
+
 .victory-btn {
   background: var(--victory-accent);
   color: #1a1010;

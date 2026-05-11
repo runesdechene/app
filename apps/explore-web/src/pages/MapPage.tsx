@@ -580,6 +580,11 @@ export default function MapPage() {
           placeTitle={pendingVictory.placeTitle}
           fromVacant={pendingVictory.fromVacant}
           factionColor={pendingVictory.factionColor}
+          mode={pendingVictory.mode}
+          gloryGain={pendingVictory.gloryGain}
+          coupeGain={pendingVictory.coupeGain}
+          courBonus={pendingVictory.courBonus}
+          threatsCleared={pendingVictory.threatsCleared}
           onClose={dismissVictory}
         />
       )}

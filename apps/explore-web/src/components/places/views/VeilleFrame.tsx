@@ -1,5 +1,7 @@
 ﻿import { useState, useCallback, useEffect } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
+import { useVictoryModalStore } from '../../../stores/victoryModalStore'
 import { useVeille } from '../../../hooks/useVeille'
 import { VeillePartageeModal } from '../modals/VeillePartageeModal'
 import { pushVeilleOverride } from '../../../lib/loadInitialVeilles'
@@ -10,6 +12,7 @@ import './VeilleFrame.css'
 
 interface Props {
   placeId: string
+  placeTitle: string
   placeLocation: { latitude: number; longitude: number }
 }
 
@@ -32,9 +35,10 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
  *
  * 1 tap = visit + plant_flag (visit en parallèle, erreurs ignorées).
  */
-export function VeilleFrame({ placeId, placeLocation }: Props) {
+export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
+  const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const userPosition = usePlayerStore(s => s.userPosition)
   const { veille, refresh, plant, fetchNearby } = useVeille(placeId)
   const [planting, setPlanting] = useState(false)
@@ -45,7 +49,16 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   // (cas D "réaffirmation IRL"). On garde le refresh au mount pour la
   // donnée de veille (utilisée ailleurs si besoin).
   useEffect(() => { void refresh() }, [refresh])
-  void veille // évite warn unused — l'état est utilisé via refresh
+
+  // V0.8.10 (11/05) — Détection : suis-je déjà veilleur GPS de ce lieu ?
+  // Si oui, le bouton change de label ("Réaffirmer mon étendard") pour
+  // signaler que l'action est défensive (efface les menaces de la Cour),
+  // pas une conquête. Le bonus +50 est désactivé côté SQL pour ce cas
+  // (mig 166) afin d'éviter le farm.
+  const isAlreadyVeilleurGps = !!(
+    veille && veille.vacant === false && !veille.byInfluence &&
+    userId && veille.members.some(m => m.userId === userId)
+  )
 
   const distanceKm = userPosition
     ? haversineKm({ lat: userPosition.lat, lng: userPosition.lng },
@@ -57,6 +70,8 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
   const doPlant = useCallback(async (partners: string[]) => {
     if (!userId || !userPosition) return
     setPlanting(true)
+    // Snapshot AVANT plant pour la VictoryModal (fromVacant si lieu vacant)
+    const wasVacant = !!(veille && veille.vacant === true)
     // 1 tap = visit + plant. visit_place_gps en parallèle, erreurs ignorées
     // (place_explorers a ON CONFLICT DO NOTHING — doublon silencieux).
     const visitPromise = Promise.resolve(supabase.rpc('visit_place_gps', {
@@ -86,7 +101,25 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
     }
     pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
     await refresh()
-  }, [userId, userPosition, plant, refresh, placeId])
+    // V0.8.10 (11/05) — Pop-up Victoire (réutilise VictoryModal existante,
+    // déjà montée dans MapPage et triggerée par useCourtNotifications pour
+    // les prises à distance). On la trigger aussi pour le plant GPS, avec
+    // mode='reaffirm_gps' si l'user était déjà veilleur (label "Vigilance"
+    // + wording défensif au lieu de "Victoire").
+    const isReaffirm = isAlreadyVeilleurGps
+    const rules = useGloryRulesStore.getState().rules
+    useVictoryModalStore.getState().show({
+      placeTitle,
+      fromVacant: wasVacant,
+      factionColor: userFactionColor,
+      mode: isReaffirm ? 'reaffirm_gps' : 'plant_gps',
+      // Gains uniquement sur plant (pas reaffirm — défensif, pas de gain)
+      gloryGain:  isReaffirm ? undefined : Number(rules['glory.plant_flag'] ?? 0),
+      coupeGain:  isReaffirm ? undefined : Number(rules['coupe.plant_flag'] ?? 0),
+      courBonus:  isReaffirm ? undefined : (result.plantBonus ?? 0),
+      threatsCleared: isReaffirm ? (result.threatsCleared ?? 0) : undefined,
+    })
+  }, [userId, userPosition, plant, refresh, placeId, placeTitle, userFactionColor, veille, isAlreadyVeilleurGps])
 
   const handlePlant = useCallback(async () => {
     if (!userId || !userPosition) return
@@ -106,11 +139,17 @@ export function VeilleFrame({ placeId, placeLocation }: Props) {
         className={`veille-plant-btn${planting ? ' planting' : ''}`}
         disabled={!canPlant}
         onClick={handlePlant}
-        title={onSpot ? 'Planter ton étendard sur ce lieu' : 'Vous devez être à moins de 100 m du lieu'}
-        aria-label="Planter mon étendard (GPS)"
+        title={
+          !onSpot
+            ? 'Vous devez être à moins de 100 m du lieu'
+            : isAlreadyVeilleurGps
+              ? 'Tu veilles déjà ce lieu — réaffirmer efface les menaces de la Cour (pas de nouveau bonus)'
+              : 'Planter ton étendard sur ce lieu'
+        }
+        aria-label={isAlreadyVeilleurGps ? 'Réaffirmer mon étendard' : 'Planter mon étendard (GPS)'}
       >
         <img src={etendardIcon} alt="" className="veille-plant-icon" />
-        <span>{planting ? '…' : 'Planter mon étendard (GPS)'}</span>
+        <span>{planting ? '…' : isAlreadyVeilleurGps ? 'Réaffirmer mon étendard' : 'Planter mon étendard (GPS)'}</span>
       </button>
 
       {optInCandidates && (

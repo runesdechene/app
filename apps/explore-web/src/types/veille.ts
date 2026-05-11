@@ -31,12 +31,18 @@ export interface NearbyPlanter {
 
 export interface PlantFlagSuccess {
   success: true
+  /** V0.8.10 — mode retourné par la RPC, sert au feedback UX */
+  mode?: 'plant' | 'confirm_gps' | 'reclaim_gps' | 'reaffirm_gps'
   placeId: string
   isNeutral: boolean
   factionId: string | null
   expeditionId: string
   members: VeilleMember[]
   plantedAt: string
+  /** Bonus +N inséré dans place_court_action. 0 sur reaffirm_gps (mig 166). */
+  plantBonus?: number
+  /** Nombre de menaces (Cour) effacées — uniquement renseigné en reaffirm_gps */
+  threatsCleared?: number
 }
 
 export interface PlantFlagError {

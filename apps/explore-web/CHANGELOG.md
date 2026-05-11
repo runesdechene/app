@@ -1,3 +1,30 @@
+# ALPHA V0.8.13
+## Safe-area iPhone restaurée sur les lieux dans le brouillard
+
+Les boutons **Partager** et **Fermer** en haut de la fenêtre d'un lieu encore dans le brouillard passaient sous la status bar iPhone (heure, signal, batterie). Ils respectent à nouveau l'encoche et restent accessibles.
+
+---
+
+# ALPHA V0.8.12
+## Vigilance sur tes lieux + symétrie totale Gloire/Coupe
+
+### 🛡️ Bouton "Réaffirmer mon étendard"
+Quand tu es **déjà veilleur GPS** d'un lieu, le bouton change de label : **"Réaffirmer mon étendard"** (ton sépia). C'est une action **purement défensive** — elle efface les couronnes des mécènes adverses qui cherchent à te piquer le lieu, mais ne génère **aucun gain** (Gloire, Coupe, Cour). Sinon on pourrait farmer en spam de clic.
+
+### 🏆 Modale Victoire / Vigilance
+Chaque plant d'étendard ouvre maintenant une **modale plein écran** avec ton placetitre, ta couleur de Maison, et le détail des gains :
+- *"Tu as planté ton étendard et pris ce lieu — +7 🎖️ Gloire · +7 🏆 Coupe des Héritages · +50 ⚔️ score Cour"*
+- *"Tu as réduit à néant l'investissement des autres mécènes ! 💪 (3 menaces effacées)"* sur réaffirmation
+
+Plus de clic mort sans feedback. Tu sais exactement ce que ton geste rapporte.
+
+### ⚖️ Suppression d'un lieu : symétrie parfaite
+**Bug grave corrigé** : supprimer un lieu retirait jusqu'à 2× plus de Gloire et Coupe que ce que la création avait apporté (triggers SQL avec valeurs hardcodées d'un ancien barème). Désormais, ce que tu gagnes en créant un lieu = exactement ce que tu perds en le supprimant. Tout lit le barème dynamique du Hub : si on ajuste les valeurs, la rétrocession suit automatiquement.
+
+Cleanup des données passées : les rares plants en doublon intra-24h (test/spam) ont été nettoyés, retournant à un état propre.
+
+---
+
 # ALPHA V0.8.11
 ## Le Classement enfin par-dessus tout
 
