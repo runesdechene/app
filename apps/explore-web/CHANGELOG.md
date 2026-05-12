@@ -1,3 +1,10 @@
+# ALPHA V0.8.16
+## Chat des expéditions — les 50 derniers messages, pas les 50 premiers
+
+Le hook chat chargeait les messages en ordre chronologique croissant avec une limite de 50. Conséquence : sur les expéditions de plus de 50 messages (comme Echo & Merveilles 2026), on récupérait les 50 PREMIERS, jamais les plus récents. Du jour où le seuil a été franchi, les nouveaux messages devenaient invisibles au chargement. Désormais on récupère les 50 derniers, et la fenêtre glisse correctement à chaque ouverture.
+
+---
+
 # ALPHA V0.8.15
 ## Chat des expéditions live + bouton "Mettre à jour" qui fonctionne enfin
 

@@ -36,19 +36,27 @@ export function useExpeditionChat(expeditionId: string | null) {
     let cancelled = false
 
     async function fetchAndMerge() {
+      // Récupère les MAX_INITIAL DERNIERS messages (pas les premiers).
+      // V0.8.16 fix : order ASC + limit 50 ne renvoyait que les 50 plus
+      // anciens, donc dès qu'un voyage dépassait 50 messages les nouveaux
+      // n'étaient JAMAIS rapatriés. On order DESC pour borner par les
+      // récents, puis on reverse pour rendre l'ordre chronologique attendu
+      // par le composant.
       const { data } = await supabase
         .from('voyage_messages')
         .select('*')
         .eq('voyage_id', expeditionId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .limit(MAX_INITIAL)
       if (cancelled || !data) return
-      // Merge plutôt qu'écrase : on conserve les messages live arrivés
-      // entre le subscribe et la fin du SELECT (sinon ils seraient perdus).
       const store = useExpeditionsStore.getState()
       const existing = store.messagesByExpedition[expeditionId!] ?? []
-      const fetched = data.map((r) => rowToMessage(r as Record<string, unknown>))
+      const fetched = data
+        .map((r) => rowToMessage(r as Record<string, unknown>))
+        .reverse()
       const fetchedIds = new Set(fetched.map((m) => m.id))
+      // Conserve les messages live arrivés entre subscribe et fin de fetch,
+      // ou les messages plus récents que la fenêtre des MAX_INITIAL derniers.
       const extras = existing.filter((m) => !fetchedIds.has(m.id))
       const merged = [...fetched, ...extras].sort((a, b) =>
         a.created_at.localeCompare(b.created_at),
