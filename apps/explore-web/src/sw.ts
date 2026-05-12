@@ -7,7 +7,7 @@
 // - Push notifications (showNotification + click → focus tab)
 // Spec : docs/superpowers/specs/2026-05-09-push-notifications-design.md
 
-import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching'
+import { precacheAndRoute, cleanupOutdatedCaches, matchPrecache } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 
 declare const self: ServiceWorkerGlobalScope
@@ -19,20 +19,50 @@ precacheAndRoute(self.__WB_MANIFEST)
 // SPA navigation fallback (sauf SEO pages et sitemap qui sont en redirect Netlify)
 const denylist: RegExp[] = [/^\/lieu\//, /^\/sitemap/]
 
+// IMPORTANT : matchPrecache résout dynamiquement le nom de cache workbox
+// (workbox-precache-v2-<scope>). Avant : caches.open('workbox-precache-v2')
+// créait un cache vide, fallback fetch systématique → TypeError "Load failed"
+// dès un blip réseau (iOS+Android, intermittent). Bug introduit V0.7.7,
+// révélé par le switch domaine carte→app (mai 2026).
 registerRoute(
   new NavigationRoute(
     async ({ event }) => {
       const fetchEvent = event as FetchEvent
       const url = new URL(fetchEvent.request.url)
       if (denylist.some((re) => re.test(url.pathname))) {
-        return fetch(fetchEvent.request)
+        try {
+          return await fetch(fetchEvent.request)
+        } catch {
+          return offlineFallback()
+        }
       }
-      const cache = await caches.open('workbox-precache-v2')
-      const match = await cache.match('/index.html')
-      return match ?? fetch(fetchEvent.request)
+      try {
+        const cached = await matchPrecache('/index.html')
+        if (cached) return cached
+      } catch {
+        // précache pas prêt → on tente le réseau
+      }
+      try {
+        return await fetch(fetchEvent.request)
+      } catch {
+        return offlineFallback()
+      }
     },
   ),
 )
+
+// Dernier recours : ne JAMAIS laisser respondWith() rejeter (sinon le navigateur
+// remonte "Fetch event respond with received an error: TypeError: Load failed").
+function offlineFallback(): Response {
+  return new Response(
+    '<!doctype html><meta charset=utf-8><title>Runes de Chêne</title>' +
+      '<body style="font-family:system-ui;padding:2rem;text-align:center;background:#f8f3e7;color:#5a4632">' +
+      '<h1 style="margin-top:3rem">Réseau perdu</h1>' +
+      '<p>Recharge la page quand la connexion revient.</p>' +
+      '</body>',
+    { headers: { 'content-type': 'text/html; charset=utf-8' }, status: 503 },
+  )
+}
 
 // === Push notifications ===
 

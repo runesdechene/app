@@ -1,3 +1,10 @@
+# ALPHA V0.8.14
+## L'app ne plante plus au lancement quand le réseau tousse
+
+Depuis le changement de domaine `carte → app`, plusieurs joueurs voyaient l'app refuser de se lancer (écran blanc, erreur "Load failed") quand leur 4G/Wi-Fi clignotait au démarrage. Le Service Worker cherchait son cache au mauvais nom interne — du coup chaque ouverture dépendait d'un fetch réseau parfait. Corrigé : le cache local est désormais bien retrouvé, et un dernier filet de sécurité empêche tout crash silencieux même offline. iOS et Android.
+
+---
+
 # ALPHA V0.8.13
 ## Safe-area iPhone restaurée sur les lieux dans le brouillard
 
