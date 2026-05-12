@@ -65,7 +65,72 @@ Au démarrage de la session sur cette machine, le HARD GATE du `CLAUDE.md` racin
 4. **Check 3** : routing par sujet (cf. CLAUDE.md vault).
 5. **Check 4** : pour toute opération DB, lire `docs/db/gotchas.md` avant d'écrire du SQL.
 
-## 6. Production / Migrations en attente
+## 6. Deploy à distance (sans `netlify link`)
+
+Une machine fraîche ne peut pas faire `netlify deploy` sans projet linké
+localement — `netlify link` est interactif et bloque le XO. Workaround :
+deploy direct avec `--site <SITE_ID>`, listés ci-dessous.
+
+**Pré-requis** : `netlify` CLI installé + connecté (`netlify status` doit
+montrer "Uriel Lahoussaye"). L'auth est stockée dans `%APPDATA%\netlify\Config\config.json`
+sur Windows et survit aux redémarrages.
+
+### SITE_IDs Netlify
+
+| Site Netlify | SITE_ID | Domaine prod |
+|---|---|---|
+| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` (+ alias `carte.runesdechene.com`) |
+| `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
+| `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | `rdc-seo-pages.netlify.app` (sert `/lieu/*` via rewrite) |
+
+### Commandes deploy
+
+```bash
+# explore-web (app publique) — PAS de --functions
+cd apps/explore-web && pnpm build
+netlify deploy --prod \
+  --site 1b29da09-c7af-44bf-9c31-465bfaae9d74 \
+  --dir "$PWD/dist" --no-build
+
+# hub (back-office) — TOUJOURS --functions
+cd apps/hub && pnpm build
+netlify deploy --prod \
+  --site d1cac03c-19a1-4b92-be72-fa3805428cd1 \
+  --dir "$PWD/dist" \
+  --functions "$PWD/netlify/functions" --no-build
+```
+
+### Après chaque deploy explore-web
+
+Bump la version en DB pour que les users sur ancien bundle voient
+l'`UpdateBanner` et puissent migrer :
+
+```bash
+node scripts/sync-app-version.mjs
+```
+
+Lit le `# X.Y.Z` en tête de `apps/explore-web/CHANGELOG.md` et upsert
+`app_settings.app.latest_version`. Requiert `SUPABASE_SERVICE_ROLE_KEY` dans le `.env` racine.
+
+### Vérif post-deploy
+
+```bash
+# Le nouveau SW est-il bien en prod ?
+curl -s https://app.runesdechene.com/sw.js | grep -oE "matchPrecache|KILL_SWITCH"
+# La DB a-t-elle la bonne version ?
+curl -s "$VITE_SUPABASE_URL/rest/v1/app_settings?key=eq.app.latest_version&select=value" \
+  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY"
+```
+
+### Lister tous les sites accessibles (rappel d'identité)
+
+```bash
+netlify sites:list --json | python -c "import json,sys; \
+  [print(f\"{s['name']:<30} {s['site_id']}  {s.get('custom_domain','')}\") \
+   for s in json.load(sys.stdin)]"
+```
+
+## 7. Production / Migrations en attente
 
 État au 11/05/2026 (V0.8.13 en prod) :
 - Mig SQL : 165 (era_indefinie), 166 (plant_flag_no_reaffirm_bonus), 167 (xp_delete_triggers
@@ -73,7 +138,7 @@ Au démarrage de la session sur cette machine, le HARD GATE du `CLAUDE.md` racin
 - Frontend déployé sur https://app.runesdechene.com
 - Aucune mig orpheline locale
 
-## 7. Si quelque chose casse en prod
+## 8. Si quelque chose casse en prod
 
 Cycle de rollback éprouvé :
 ```bash
