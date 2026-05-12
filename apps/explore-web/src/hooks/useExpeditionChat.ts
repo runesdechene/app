@@ -20,6 +20,13 @@ function rowToMessage(row: Record<string, unknown>): ExpeditionMessage {
 /**
  * Hook chat live d'une expédition. À appeler quand la modale ouvre.
  * Pattern aligné sur useChat.ts mais filtré par voyage_id.
+ *
+ * V0.8.15 — la souscription Realtime mourait en silence (réseau, hibernation
+ * tab, kick serveur) et le user restait avec son snapshot initial. Trois
+ * filets ajoutés : subscribe AVANT fetch initial (capture les INSERT
+ * pendant le SELECT, dédup côté store par id), callback de status pour
+ * resync sur CLOSED/ERROR/TIMED_OUT, et listener visibilitychange (pattern
+ * useCoupe) pour re-fetch au retour de focus.
  */
 export function useExpeditionChat(expeditionId: string | null) {
   const channelRef = useRef<RealtimeChannel | null>(null)
@@ -28,23 +35,28 @@ export function useExpeditionChat(expeditionId: string | null) {
     if (!expeditionId) return
     let cancelled = false
 
-    const setMessages = useExpeditionsStore.getState().setMessages
-    const addMessage = useExpeditionsStore.getState().addMessage
-
-    async function init() {
-      // Charge les messages initiaux
+    async function fetchAndMerge() {
       const { data } = await supabase
         .from('voyage_messages')
         .select('*')
         .eq('voyage_id', expeditionId)
         .order('created_at', { ascending: true })
         .limit(MAX_INITIAL)
-
       if (cancelled || !data) return
+      // Merge plutôt qu'écrase : on conserve les messages live arrivés
+      // entre le subscribe et la fin du SELECT (sinon ils seraient perdus).
+      const store = useExpeditionsStore.getState()
+      const existing = store.messagesByExpedition[expeditionId!] ?? []
+      const fetched = data.map((r) => rowToMessage(r as Record<string, unknown>))
+      const fetchedIds = new Set(fetched.map((m) => m.id))
+      const extras = existing.filter((m) => !fetchedIds.has(m.id))
+      const merged = [...fetched, ...extras].sort((a, b) =>
+        a.created_at.localeCompare(b.created_at),
+      )
+      store.setMessages(expeditionId!, merged)
+    }
 
-      setMessages(expeditionId!, data.map((r) => rowToMessage(r as Record<string, unknown>)))
-
-      // Souscription Realtime sur les nouveaux messages de cette expé
+    function subscribe() {
       const ch = supabase.channel(`expedition-chat:${expeditionId}`)
       ch.on(
         'postgres_changes',
@@ -55,28 +67,48 @@ export function useExpeditionChat(expeditionId: string | null) {
           filter: `voyage_id=eq.${expeditionId}`,
         },
         (payload) => {
-          addMessage(expeditionId!, rowToMessage(payload.new as Record<string, unknown>))
-          // Marque immédiatement comme lu — la modale est ouverte
+          const store = useExpeditionsStore.getState()
+          store.addMessage(expeditionId!, rowToMessage(payload.new as Record<string, unknown>))
           markExpeditionMessagesRead(expeditionId!).catch(() => {})
         },
       )
-      ch.subscribe()
+      ch.subscribe((status) => {
+        // Si le channel ferme ou erre, on resync depuis la DB pour rattraper
+        // ce qu'on a manqué en silence. Le store dédup par id.
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          if (!cancelled) fetchAndMerge()
+        }
+      })
       channelRef.current = ch
-
-      // Mark read au mount + refresh la liste pour effacer la pastille
-      try {
-        await markExpeditionMessagesRead(expeditionId!)
-        const updated = useExpeditionsStore.getState().setUpcoming
-        listUpcomingExpeditions().then((list) => updated(list)).catch(() => {})
-      } catch {
-        // ignore
-      }
     }
 
-    init()
+    // Ordre critique : subscribe AVANT le fetch initial. Les INSERT qui
+    // arrivent pendant le SELECT sont capturés via Realtime puis dédupés
+    // côté store par id (cf. expeditionsStore.addMessage).
+    subscribe()
+    fetchAndMerge()
+
+    // Filet : au retour de focus (tab background → premier plan, mobile
+    // OS resume), on re-fetch même si Realtime semble OK. Couvre le cas
+    // où la WebSocket est tombée sans event CLOSED côté client.
+    function onVisible() {
+      if (document.visibilityState === 'visible' && !cancelled) {
+        fetchAndMerge()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
+    // Mark read au mount + refresh la liste pour effacer la pastille
+    markExpeditionMessagesRead(expeditionId!)
+      .then(() => listUpcomingExpeditions())
+      .then((list) => {
+        if (!cancelled) useExpeditionsStore.getState().setUpcoming(list)
+      })
+      .catch(() => {})
 
     return () => {
       cancelled = true
+      document.removeEventListener('visibilitychange', onVisible)
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null

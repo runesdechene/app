@@ -1,3 +1,19 @@
+# ALPHA V0.8.15
+## Chat des expéditions live + bouton "Mettre à jour" qui fonctionne enfin
+
+Trois corrections critiques en marge du switch de domaine `carte → app` :
+
+### 💬 Le chat des expéditions reçoit enfin les messages en live
+Le hook chat ouvrait une souscription Realtime, mais si elle mourait en silence (passage en arrière-plan, hibernation du PC, réseau qui clignote), tu ne recevais plus rien jusqu'à fermer/rouvrir la modale. Désormais : on souscrit AVANT de charger l'historique (plus aucun message perdu pendant le chargement), un filet relance la souscription si elle tombe, et chaque retour de focus de l'onglet rapatrie automatiquement les nouveaux messages. Le push notif et le chat sont enfin synchrones, sur PC comme sur mobile.
+
+### 🔁 Le bouton "Mettre à jour" met vraiment à jour
+Sur certaines installations PWA, le bouton désinscrivait bien le Service Worker mais celui-ci restait actif jusqu'à la fermeture complète des onglets — le rechargement repassait par le SW poisoné et l'app restait sur l'ancienne version. Désormais le SW se désinscrit depuis l'intérieur sur demande, l'app attend qu'il lâche le contrôle, et le rechargement final embarque un cache-buster pour balayer les caches HTTP résiduels.
+
+### ☠️ Kill-switch pour les anciennes installations
+Quelques joueurs avaient installé la PWA depuis l'ancien domaine `carte.runesdechene.com` avant le switch et restaient prisonniers d'un SW qui ne pouvait plus s'updater (cross-origin bloqué pour les SW). Une exception côté Netlify sert maintenant à cet ancien domaine un SW spécial qui se suicide proprement et migre la PWA vers `app.runesdechene.com` au prochain lancement. Plus besoin de désinstaller/réinstaller à la main.
+
+---
+
 # ALPHA V0.8.14
 ## L'app ne plante plus au lancement quand le réseau tousse
 

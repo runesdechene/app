@@ -31,6 +31,26 @@ function isLocalOlder(local: string, remote: string): boolean {
 async function forceUpdate() {
   try {
     if ('serviceWorker' in navigator) {
+      const reg = await navigator.serviceWorker.getRegistration()
+      // unregister() côté client laisse le SW contrôleur actif jusqu'à
+      // fermeture de toutes les pages. Le reload qui suivait était donc
+      // intercepté par le SW mort-vivant et restait sur l'ancien bundle.
+      // KILL_SWITCH demande au SW de se désinscrire depuis l'intérieur
+      // — la seule façon de garantir qu'il lâche le contrôle.
+      if (reg?.active) {
+        reg.active.postMessage({ type: 'KILL_SWITCH' })
+        await Promise.race([
+          new Promise<void>((resolve) => {
+            navigator.serviceWorker.addEventListener(
+              'controllerchange',
+              () => resolve(),
+              { once: true },
+            )
+          }),
+          new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+        ])
+      }
+      // Cleanup défensif au cas où le SW n'aurait pas répondu
       const regs = await navigator.serviceWorker.getRegistrations()
       await Promise.all(regs.map((r) => r.unregister()))
     }
@@ -41,7 +61,8 @@ async function forceUpdate() {
   } catch {
     /* ignore — on recharge dans tous les cas */
   }
-  window.location.reload()
+  // Hard nav avec cache buster pour bypass tout HTTP cache résiduel
+  window.location.replace(window.location.pathname + '?_v=' + Date.now())
 }
 
 /**
