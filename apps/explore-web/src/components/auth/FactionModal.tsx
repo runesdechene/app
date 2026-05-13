@@ -168,18 +168,8 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   return (
     <div className="auth-overlay" onClick={() => onClose(false)} style={isMobile ? { zIndex: 10001 } : undefined}>
       <div
-        className="faction-modal"
+        className={`faction-modal${isMobile ? ' faction-modal-mobile' : ''}`}
         onClick={e => e.stopPropagation()}
-        style={isMobile ? {
-          width: '100vw',
-          maxWidth: 'none',
-          maxHeight: '100vh',
-          minHeight: '100vh',
-          borderRadius: 0,
-          border: 'none',
-          padding: '16px',
-          boxSizing: 'border-box' as const,
-        } : undefined}
       >
         <button className="auth-modal-close" onClick={() => onClose(false)} aria-label="Fermer">
           &#10005;

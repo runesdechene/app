@@ -1,3 +1,10 @@
+# ALPHA V0.8.18
+## Choix de Maison — safe-area iPhone respectée
+
+La modale de choix d'Héritage passait en fullscreen sur mobile mais sans tenir compte de la safe-area iOS : le titre passait sous l'heure/batterie en haut, et le bouton "Devenir un sans-bannière" se faisait avaler par le home indicator en bas. Désormais les paddings haut et bas s'ajustent à la safe-area, comme déjà fait sur les autres modales fullscreen.
+
+---
+
 # ALPHA V0.8.17
 ## Les nouveaux joueurs voient enfin le tutoriel
 

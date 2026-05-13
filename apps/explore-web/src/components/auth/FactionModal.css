@@ -293,3 +293,28 @@
     flex: 0 0 85%;
   }
 }
+
+/* Variante mobile fullscreen (V0.8.18) : avant, un style inline appliquait
+   width 100vw + padding 16px sans safe-area iOS → contenu coupé sous la
+   status bar (haut) et le home indicator (bas) sur iPhone. Pattern aligné
+   sur .modal-mobile-fullscreen dans mobile.css. */
+.faction-modal-mobile {
+  width: 100vw;
+  max-width: none;
+  max-height: 100vh;
+  min-height: 100vh;
+  border-radius: 0;
+  border: none;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 16px)
+    16px
+    calc(env(safe-area-inset-bottom, 0px) + 16px);
+  box-sizing: border-box;
+}
+
+/* iOS Safari mode navigateur : env() retourne 0 → force 47px de status bar. */
+@supports (-webkit-touch-callout: none) {
+  .faction-modal-mobile {
+    padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 16px);
+  }
+}
