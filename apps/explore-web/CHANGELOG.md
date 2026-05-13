@@ -1,3 +1,10 @@
+# ALPHA V0.8.17
+## Les nouveaux joueurs voient enfin le tutoriel
+
+Depuis le passage à la home mobile (V0.7.8), les nouveaux comptes mobiles atterrissaient sur l'accueil au lieu de la carte. Or le tutoriel d'introduction + l'écran de choix de Maison n'ont jamais été montés sur l'accueil, uniquement sur la carte. Conséquence : un nouveau joueur voyait l'accueil avec son bandeau de mise à jour et la pub, mais zéro tutoriel et aucune sélection de Maison. Désormais, tant que tu n'as pas terminé le tutoriel, l'app t'amène automatiquement sur la carte au lancement pour te faire passer par tout le flux d'introduction. Une fois le tutoriel terminé et ta Maison choisie, l'accueil redevient normal.
+
+---
+
 # ALPHA V0.8.16
 ## Chat des expéditions — les 50 derniers messages, pas les 50 premiers
 

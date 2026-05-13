@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { usePlayer } from '../hooks/usePlayer'
 import { useChat } from '../hooks/useChat'
@@ -37,7 +37,10 @@ export interface MobileLayoutContext {
 export default function MobileLayout() {
   const { user } = useAuth()
   const userFactionId = usePlayerStore((s) => s.userFactionId)
+  const userId = usePlayerStore((s) => s.userId)
+  const tutorialCompletedAt = usePlayerStore((s) => s.tutorialCompletedAt)
   const [showFactionModal, setShowFactionModal] = useState(false)
+  const navigate = useNavigate()
 
   // Init globaux — appelés une seule fois au layout, partagés entre toutes
   // les routes enfants. Plus besoin de les répéter dans HomePage / ChatPage / etc.
@@ -55,7 +58,22 @@ export default function MobileLayout() {
   // la stats bar reste à niveau 1 tant qu'on n'a pas ouvert la carte).
   useLevel()
 
+  // V0.8.17 — depuis V0.7.8 (RootRedirect platform-aware) les nouveaux users
+  // mobile atterrissent sur /accueil, où le flux tutoriel + onboarding +
+  // sélection de Maison n'a JAMAIS été monté (il vit dans MapPage). Résultat :
+  // ils voyaient UpdateBanner + pub mais aucun tuto. Redirection vers /carte
+  // tant que tutorial_completed_at est null. userId set = data fetched par
+  // usePlayer (sinon on attendrait sur l'état initial null du store et on
+  // redirigerait à tort un user dont les data ne sont pas encore arrivées).
+  useEffect(() => {
+    if (userId && tutorialCompletedAt === null) {
+      navigate('/carte', { replace: true })
+    }
+  }, [userId, tutorialCompletedAt, navigate])
+
   if (!user) return null
+  // Pendant le redirect : pas de flash de HomePage avec UpdateBanner + pub
+  if (userId && tutorialCompletedAt === null) return null
 
   return (
     <div className="mobile-layout">
