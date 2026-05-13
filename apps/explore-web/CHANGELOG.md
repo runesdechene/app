@@ -1,3 +1,14 @@
+# ALPHA V0.8.19
+## Images des lieux 18× plus légères + padding choix de Maison
+
+### 🚀 Cards "Lieux récents" et "À proximité" — chargement éclair
+Les RPCs renvoyaient l'URL pleine résolution (5+ MB pour la Cathédrale Sainte-Cécile par ex.) là où un thumbnail webp de 300 KB existait déjà. Sur 4G, 9 cards × 5 MB faisait grincer la home. Désormais on sert le thumb, fallback URL pleine si l'image est trop vieille pour avoir un thumb. Gain net : ~18× moins de données pour le scroll des lieux.
+
+### 📐 Choix de Maison — padding 36px haut et bas
+Les 16px précédents collaient quand même un peu le titre à la status bar et le bouton "Devenir sans-bannière" au home indicator. Passé à 36px de chaque côté en plus de la safe-area iOS.
+
+---
+
 # ALPHA V0.8.18
 ## Choix de Maison — safe-area iPhone respectée
 

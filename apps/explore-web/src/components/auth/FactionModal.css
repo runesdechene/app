@@ -306,15 +306,15 @@
   border-radius: 0;
   border: none;
   padding:
-    calc(env(safe-area-inset-top, 0px) + 16px)
+    calc(env(safe-area-inset-top, 0px) + 36px)
     16px
-    calc(env(safe-area-inset-bottom, 0px) + 16px);
+    calc(env(safe-area-inset-bottom, 0px) + 36px);
   box-sizing: border-box;
 }
 
 /* iOS Safari mode navigateur : env() retourne 0 → force 47px de status bar. */
 @supports (-webkit-touch-callout: none) {
   .faction-modal-mobile {
-    padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 16px);
+    padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 36px);
   }
 }
