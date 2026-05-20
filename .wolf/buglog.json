@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-05-16",
+    "error_message": "Unauthorized (401) when user tries to join a faction after Supabase Auth signup",
+    "symptom": "User signs up via app, sees 'Unauthorized' on faction selection / chat / other RPCs. Reported for maxime.lauza@gmail.com, also affects 6 others including Pierrick Valence.",
+    "root_cause": "Trigger handle_new_user (mig 074) maintains a hardcoded list of UPDATE statements to migrate FK columns from the old user id (shopify-* or app-*) to the new Supabase Auth UUID. Many tables added since the baseline (notifications, voyage_*, user_crowns, place_court_action, push_subscriptions, note_reactions, etc.) reference public.users(id) but are NOT in the trigger's list. When the trigger reaches the final DELETE FROM public.users WHERE id = v_existing.id, a foreign key violation on an unlisted table (notifications.recipient_id for Maxime) causes the EXCEPTION block to fire, which inserts a stub row with email_address = '__migrated_<uuid>'. The user is then authenticated but his real profile is on the old id, unreachable by his JWT — every RPC that joins on users.id by auth.uid() returns NULL or unauthorized.",
+    "fix": "Migration 170 redefines handle_new_user and migrate_user_to_auth_id to enumerate FK columns dynamically via information_schema instead of a hardcoded list. Migration 171 cleans up the 7 existing stubs by matching them to their old row via auth.users.email and merging data + redirecting all FKs.",
+    "files": [
+      "supabase/migrations/170_handle_new_user_dynamic_fk.sql",
+      "supabase/migrations/171_merge_orphan_users_to_auth.sql"
+    ],
+    "tags": ["auth", "trigger", "shopify-to-auth-migration", "schema-drift", "foreign-key"]
+  }
+]
