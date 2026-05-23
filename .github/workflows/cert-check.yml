@@ -1,9 +1,13 @@
 name: TLS Cert Expiry Check
 
 # Filet de sécurité : les certs Let's Encrypt de app. et hub. avaient échoué
-# leur auto-renouvellement (incident 2026-05). Ce job vérifie chaque lundi que
-# les certs servis sont valides ET expirent dans > 21 jours. En cas de problème,
-# le run échoue → GitHub notifie les admins du repo par email.
+# leur auto-renouvellement (incident 2026-05, hub. expiré 11 jours sans alerte).
+# Ce job interroge l'API Netlify chaque lundi et échoue si un cert manque ou
+# expire dans < 21 jours → GitHub notifie les admins du repo par email.
+#
+# On passe par l'API (et non un handshake TLS depuis le runner) car la
+# résolution DNS de app./hub. est intermittente sur les clients IPv4-only
+# comme les runners GitHub (CNAME o2switch → *.netlify.app, A TTL court).
 
 on:
   schedule:
@@ -14,25 +18,29 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check app. + hub. TLS certs
+      - name: Check app. + hub. cert expiry (Netlify API)
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: |
           THRESHOLD_DAYS=21
           fail=0
-          for host in app.runesdechene.com hub.runesdechene.com; do
-            # 1. Handshake TLS valide ? (attrape expiré / mauvais nom / chaîne cassée)
-            if ! curl -sS -o /dev/null --max-time 20 "https://$host"; then
-              echo "::error::$host — handshake TLS ÉCHOUÉ (cert invalide, expiré, ou mauvais nom). Renouveler sur Netlify."
-              fail=1
-              continue
+          check_site () {
+            local host="$1" sid="$2"
+            local end
+            end=$(curl -sS -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+              "https://api.netlify.com/api/v1/sites/$sid/ssl_certificate" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin).get('expires_at',''))" 2>/dev/null)
+            if [ -z "$end" ]; then
+              echo "::error::$host — aucun certificat provisionné sur Netlify."
+              fail=1; return
             fi
-            # 2. Alerte précoce si expiration proche
-            end=$(echo | openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null \
-                  | openssl x509 -noout -enddate | cut -d= -f2)
-            days=$(( ( $(date -d "$end" +%s) - $(date +%s) ) / 86400 ))
-            echo "$host — OK, expire dans $days jour(s) ($end)"
+            local days=$(( ( $(date -d "$end" +%s) - $(date +%s) ) / 86400 ))
+            echo "$host — expire dans $days jour(s) ($end)"
             if [ "$days" -lt "$THRESHOLD_DAYS" ]; then
-              echo "::error::$host — cert expire dans $days jours (< $THRESHOLD_DAYS). Renouveler sur Netlify."
+              echo "::error::$host — cert expire dans $days jours (< $THRESHOLD_DAYS). Renouveler sur Netlify (Domain management → Renew certificate)."
               fail=1
             fi
-          done
+          }
+          check_site app.runesdechene.com 1b29da09-c7af-44bf-9c31-465bfaae9d74
+          check_site hub.runesdechene.com d1cac03c-19a1-4b92-be72-fa3805428cd1
           exit $fail
