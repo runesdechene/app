@@ -33,7 +33,7 @@ export function renderPage(input: RenderPageInput): string {
 
   const firstImageUrl = place.images?.[0]?.url ?? null;
   const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
-  const canonicalUrl = `https://carte.runesdechene.com/lieu/${place.slug}`;
+  const canonicalUrl = `https://app.runesdechene.com/lieu/${place.slug}`;
   const tagLabel = place.primaryTag?.title ?? 'Lieu';
   const title = `${place.title} — Runes de Chêne`;
   const ogImage = firstImageUrl || '/og-default.png';
@@ -74,8 +74,8 @@ export function renderPage(input: RenderPageInput): string {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Runes de Chêne', item: 'https://carte.runesdechene.com' },
-      { '@type': 'ListItem', position: 2, name: tagLabel, item: `https://carte.runesdechene.com/lieu?tag=${encodeURIComponent(tagLabel.toLowerCase())}` },
+      { '@type': 'ListItem', position: 1, name: 'Runes de Chêne', item: 'https://app.runesdechene.com' },
+      { '@type': 'ListItem', position: 2, name: tagLabel, item: `https://app.runesdechene.com/lieu?tag=${encodeURIComponent(tagLabel.toLowerCase())}` },
       { '@type': 'ListItem', position: 3, name: place.title },
     ],
   };

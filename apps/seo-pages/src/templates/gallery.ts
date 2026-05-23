@@ -62,7 +62,7 @@ ${images.map((img, i) => `  <div class="thumb${i === 0 ? ' active' : ''}" data-g
     <div class="hero-breadcrumb">
       <a href="https://runesdechene.com">Runes de Ch\u00EAne</a>
       <span class="sep">\u203A</span>
-      <a href="https://carte.runesdechene.com/lieu?tag=${breadcrumbTagEncoded}">${escapeHtml(breadcrumbTag)}</a>
+      <a href="https://app.runesdechene.com/lieu?tag=${breadcrumbTagEncoded}">${escapeHtml(breadcrumbTag)}</a>
       <span class="sep">\u203A</span>
       ${escapeHtml(title)}
     </div>
@@ -76,7 +76,7 @@ ${images.map((img, i) => `  <div class="thumb${i === 0 ? ' active' : ''}" data-g
 ${thumbsHtml}
 
 <!-- GALLERY CTA -->
-<a href="https://carte.runesdechene.com" class="gallery-cta">
+<a href="https://app.runesdechene.com" class="gallery-cta">
   <img src="https://rdc-seo-pages.netlify.app/app-icon.png" alt="Runes de Ch\u00EAne" class="gallery-cta-logo" loading="lazy" />
   <span>
     D\u00E9couvrir ce lieu sur l'application

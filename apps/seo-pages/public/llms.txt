@@ -16,7 +16,7 @@ Chaque page utilise Schema.org avec les types TouristAttraction et BreadcrumbLis
 
 ## Contact
 Site : https://runesdechene.com
-Application : https://carte.runesdechene.com
+Application : https://app.runesdechene.com
 Instagram : https://www.instagram.com/runesdechene
 
 ## Politique

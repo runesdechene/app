@@ -10,5 +10,26 @@
       "supabase/migrations/171_merge_orphan_users_to_auth.sql"
     ],
     "tags": ["auth", "trigger", "shopify-to-auth-migration", "schema-drift", "foreign-key"]
+  },
+  {
+    "date": "2026-05-23",
+    "error_message": "Users report 'site inaccessible' / 'erreur DNS' on app.runesdechene.com; shared place links and SEO-page CTAs dead",
+    "symptom": "Intermittent failures reaching the app, Instagram in-app browser won't open it, vague/uncertain errors reported as 'DNS'. A client who had NEVER used carte. also failed on app.",
+    "root_cause": "Two distinct issues misattributed to DNS. DNS for app. was healthy (resolved 24/24 on Google/Cloudflare, served HTTP 200, ns1/ns2 o2switch consistent, no CAA). (1) The TLS certificate for app.runesdechene.com had expired / failed to auto-renew on Netlify -> SSL handshake failures for fresh clients and strict WebViews (Instagram), commonly misreported as DNS errors. hub.runesdechene.com has the SAME issue: Netlify serves its default *.netlify.app cert -> name mismatch (SEC_E_WRONG_PRINCIPAL). Probable recurrence cause: o2switch AND Netlify both attempting Let's Encrypt issuance for the same FQDN -> rate-limit/validation conflict (user couldn't generate on EITHER). (2) Every share link plus all seo-pages CTAs / canonical / sitemap / JSON-LD still hardcoded the dead legacy domain carte.runesdechene.com (NXDOMAIN, removed from Netlify domain_aliases) -> dead links from shares and from Google results.",
+    "fix": "User reinstalled the app. cert on Netlify (reissued 2026-05-23 18:00 UTC, chain complete leaf+E8->ISRG Root X1, verify OK). Code purge carte.->app.: ShareButton.tsx + all seo-pages templates (page/header/gallery/footer/place-content/sitemap) + robots.txt + llms.txt; removed legacy carte. redirects from explore-web netlify.toml and the IS_LEGACY_ORIGIN kill-switch branch from sw.ts; updated root+app CLAUDE.md and BOOTSTRAP. PENDING (manual, Netlify UI, no code): provision/renew cert for hub.runesdechene.com; make Netlify the sole Let's Encrypt issuer for app./hub. (remove app/hub as o2switch cPanel subdomains + disable their AutoSSL; keep only the DNS CNAME -> *.netlify.app).",
+    "files": [
+      "apps/explore-web/src/components/places/actions/ShareButton.tsx",
+      "apps/explore-web/src/sw.ts",
+      "apps/explore-web/netlify.toml",
+      "apps/seo-pages/src/templates/page.ts",
+      "apps/seo-pages/src/templates/header.ts",
+      "apps/seo-pages/src/templates/gallery.ts",
+      "apps/seo-pages/src/templates/footer.ts",
+      "apps/seo-pages/src/templates/place-content.ts",
+      "apps/seo-pages/src/templates/sitemap.ts",
+      "apps/seo-pages/public/robots.txt",
+      "apps/seo-pages/public/llms.txt"
+    ],
+    "tags": ["dns", "tls", "lets-encrypt", "netlify", "o2switch", "carte-to-app-migration", "service-worker", "seo", "cert-renewal", "false-dns-attribution"]
   }
 ]

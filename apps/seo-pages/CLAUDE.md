@@ -1,12 +1,12 @@
 # `apps/seo-pages` — Pages SEO Node.js
 
 > Pages indexables Google pour chaque lieu de Runes de Chêne.
-> En production sur `carte.runesdechene.com/lieu/[slug]`.
+> En production sur `app.runesdechene.com/lieu/[slug]`.
 
 ## Essentiel
 
 - **Stack** : Node.js / TypeScript pur (template literals, **zéro framework**)
-- **Route prod** : `carte.runesdechene.com/lieu/[slug]`
+- **Route prod** : `app.runesdechene.com/lieu/[slug]`
 - **Source de données** : Supabase directe (service role key)
 - **Déploiement** : Netlify (site `rdc-seo-pages`, ID `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9`)
 - **Cron nightly** : GitHub Actions à 3h UTC (`.github/workflows/seo-nightly.yml`)

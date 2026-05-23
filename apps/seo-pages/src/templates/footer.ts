@@ -15,7 +15,7 @@ export function renderFooter(): string {
   </p>
   <nav class="footer-links">
     <a href="https://runesdechene.com">La Boutique</a>
-    <a href="https://carte.runesdechene.com">Télécharger l'app</a>
+    <a href="https://app.runesdechene.com">Télécharger l'app</a>
     <a href="https://www.instagram.com/runesdechene" target="_blank" rel="noopener">Instagram</a>
   </nav>
   <p class="footer-copy">&copy; ${year} Runes de Chêne — Tous droits réservés. Marque et application développées par Lahoussaye EI.</p>

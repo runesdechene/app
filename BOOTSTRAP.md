@@ -79,7 +79,7 @@ sur Windows et survit aux redémarrages.
 
 | Site Netlify | SITE_ID | Domaine prod |
 |---|---|---|
-| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` (+ alias `carte.runesdechene.com`) |
+| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | `rdc-seo-pages.netlify.app` (sert `/lieu/*` via rewrite) |
 

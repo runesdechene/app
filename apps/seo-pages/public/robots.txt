@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://carte.runesdechene.com/sitemap-index.xml
+Sitemap: https://app.runesdechene.com/sitemap-index.xml

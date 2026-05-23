@@ -1,3 +1,10 @@
+# ALPHA V0.8.20
+## Liens de partage et pages SEO réparés — fin de `carte.runesdechene.com`
+
+Le bouton Partager d'un lieu, tous les CTA des pages SEO publiques (« Ouvrir l'application », « Télécharger l'app »), les URLs canonical, le sitemap soumis à Google et les données structurées pointaient encore vers l'ancien domaine `carte.runesdechene.com`, qui ne résout plus. Conséquence : chaque lieu partagé et chaque page trouvée via Google menaient à une erreur. Tout est désormais sur `app.runesdechene.com`. Le code de migration legacy (Service Worker « suicide » + redirections Netlify côté `carte.`) a aussi été retiré, devenu inutile.
+
+---
+
 # ALPHA V0.8.19
 ## Images des lieux 18× plus légères + padding choix de Maison
 

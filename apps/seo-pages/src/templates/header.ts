@@ -6,7 +6,7 @@ interface RenderHeaderInput {
 
 export function renderHeader({ placeName, placeSlug, shareTextTemplate }: RenderHeaderInput): string {
   const shareText = shareTextTemplate.replace('{name}', placeName)
-  const shareUrl = `https://carte.runesdechene.com/lieu/${placeSlug}`
+  const shareUrl = `https://app.runesdechene.com/lieu/${placeSlug}`
 
   return `<nav class="nav">
   <a href="https://runesdechene.com" class="nav-logo">
@@ -34,7 +34,7 @@ export function renderHeader({ placeName, placeSlug, shareTextTemplate }: Render
         <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
       </svg>
     </button>
-    <a href="https://carte.runesdechene.com" class="nav-cta">Ouvrir l'application</a>
+    <a href="https://app.runesdechene.com" class="nav-cta">Ouvrir l'application</a>
   </div>
 </nav>
 

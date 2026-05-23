@@ -6,26 +6,6 @@
   [headers.values]
     Content-Security-Policy = "frame-ancestors https://runesdechene.com https://*.runesdechene.com https://*.myshopify.com"
 
-# Exception kill-switch SW : les browsers ne suivent pas les redirects
-# cross-origin pour /sw.js → les SW historiques installés à carte.* sont
-# prisonniers de leur ancienne version. On sert /sw.js en 200 sur carte.*,
-# le SW détecte self.location.hostname et active son mode kill-switch
-# (unregister + clear caches + navigate vers app.*). DOIT rester AVANT le
-# 301 catch-all.
-[[redirects]]
-  from = "https://carte.runesdechene.com/sw.js"
-  to = "/sw.js"
-  status = 200
-  force = true
-
-# Canonicalisation : carte.runesdechene.com (legacy) → app.runesdechene.com (PWA canonical).
-# Doit rester AVANT le SPA fallback `/*` pour ne pas être intercepté.
-[[redirects]]
-  from = "https://carte.runesdechene.com/*"
-  to = "https://app.runesdechene.com/:splat"
-  status = 301
-  force = true
-
 [[redirects]]
   from = "/lieu/*"
   to = "https://rdc-seo-pages.netlify.app/lieu/:splat"

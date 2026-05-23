@@ -20,7 +20,7 @@ export function ShareButton({ placeName, placeSlug }: ShareButtonProps) {
 
   async function handleShare() {
     const text = template.replace('{name}', placeName)
-    const url = `https://carte.runesdechene.com/lieu/${placeSlug}`
+    const url = `https://app.runesdechene.com/lieu/${placeSlug}`
     const fullText = `${text}\n${url}`
 
     // Touch-first = mobile/tablette → share sheet natif (iOS/Android OK).

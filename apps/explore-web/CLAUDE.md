@@ -1,6 +1,6 @@
 # explore-web — La Carte
 
-> App publique (V0.5 — L'Érudition Conquérante). Port dev 3000. Prod : carte.runesdechene.com (Netlify).
+> App publique (V0.5 — L'Érudition Conquérante). Port dev 3000. Prod : app.runesdechene.com (Netlify).
 
 ## Mémoire projet
 

@@ -25,7 +25,7 @@ interface PlaceContentProps {
 export function renderPlaceContent(props: PlaceContentProps): string {
   const { description, accessibility, contributions, placeName, placeSlug, shareTextTemplate } = props;
   const shareText = shareTextTemplate.replace('{name}', placeName);
-  const shareUrl = `https://carte.runesdechene.com/lieu/${placeSlug}`;
+  const shareUrl = `https://app.runesdechene.com/lieu/${placeSlug}`;
   const featured = contributions[0] ?? null;
   const remaining = contributions.slice(1);
 
@@ -57,7 +57,7 @@ ${remaining.map(c => renderContributionCard(c)).join('\n')}
   ${descHtml}
   ${accessHtml}
   ${contribHtml}
-  <a href="https://carte.runesdechene.com" class="contribute-btn">Ajouter ma contribution</a>
+  <a href="https://app.runesdechene.com" class="contribute-btn">Ajouter ma contribution</a>
   <button
     class="share-cta share-btn-js"
     type="button"

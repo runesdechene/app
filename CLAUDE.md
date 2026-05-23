@@ -34,9 +34,9 @@ Les deux pipelines sont indépendantes — les nodes SQL (`category: "sql"`) sur
 | Projet | Lieu | Rôle |
 |--------|------|------|
 | **La Citadelle** | `~/citadelle/` (symlink) | QG partagé (marque + dev + stratégie) |
-| **explore-web** | `apps/explore-web/` | App publique (`carte.runesdechene.com`) |
+| **explore-web** | `apps/explore-web/` | App publique (`app.runesdechene.com`) |
 | **hub** | `apps/hub/` | Back-office (`hub.runesdechene.com`) |
-| **seo-pages** | `apps/seo-pages/` | Pages SEO Node.js (`carte.runesdechene.com/lieu/*`) |
+| **seo-pages** | `apps/seo-pages/` | Pages SEO Node.js (`app.runesdechene.com/lieu/*`) |
 | **Supabase** | `supabase/` | DB + migrations + RPCs |
 | **Boutique Shopify** | externe | E-commerce `runesdechene.com` |
 
