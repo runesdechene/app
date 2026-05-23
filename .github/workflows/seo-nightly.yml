@@ -40,6 +40,8 @@ jobs:
 
       - name: Deploy to Netlify
         working-directory: apps/seo-pages
-        run: npx netlify-cli@23.15.1 deploy --prod --no-build --dir=dist --site=5a5b9cb9-d330-41d7-a037-6bd65ac67eb9
+        # --dir DOIT être absolu ($PWD/dist), sinon netlify-cli le résout depuis
+        # la racine du repo → "deploy directory not found". Cf. seo-pages/CLAUDE.md.
+        run: npx netlify-cli@23.15.1 deploy --prod --no-build --dir="$PWD/dist" --site=5a5b9cb9-d330-41d7-a037-6bd65ac67eb9
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
