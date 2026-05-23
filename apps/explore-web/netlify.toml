@@ -19,14 +19,8 @@
   force = true
 
 [[redirects]]
-  from = "/sitemap-index.xml"
-  to = "https://rdc-seo-pages.netlify.app/sitemap-index.xml"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/sitemap-0.xml"
-  to = "https://rdc-seo-pages.netlify.app/sitemap-0.xml"
+  from = "/sitemap.xml"
+  to = "https://rdc-seo-pages.netlify.app/sitemap.xml"
   status = 200
   force = true
 

@@ -31,5 +31,14 @@
       "apps/seo-pages/public/llms.txt"
     ],
     "tags": ["dns", "tls", "lets-encrypt", "netlify", "o2switch", "carte-to-app-migration", "service-worker", "seo", "cert-renewal", "false-dns-attribution"]
+  },
+  {
+    "date": "2026-05-23",
+    "error_message": "GitHub Actions SEO nightly deploy fails: 'We've detected multiple projects inside your repository. Projects detected: explore-web, hub, @runes/seo-pages, @runes/supabase-client. Configure the project you want to work with and try again.'",
+    "symptom": "Nightly SEO build (.github/workflows/seo-nightly.yml) exits 1 at the Deploy step; seo-pages stopped auto-deploying (slugs/SEO descriptions/sitemap no longer refreshed).",
+    "root_cause": "The deploy step ran `npx netlify-cli deploy ...` from the monorepo ROOT with an unpinned netlify-cli, which installed v26.0.1. netlify-cli v26+ hard-errors when it detects multiple pnpm workspace projects and none is selected, even when --site is explicitly passed. v23.x (used by the local manual deploys that succeeded) does not have this behavior.",
+    "fix": "Pin netlify-cli@23.15.1 and run the deploy step with working-directory: apps/seo-pages + --dir=dist, so only a single project is visible and the detection error never triggers. Reproduces the proven local manual deploy exactly.",
+    "files": [".github/workflows/seo-nightly.yml"],
+    "tags": ["ci", "github-actions", "netlify-cli", "monorepo", "pnpm-workspace", "version-pinning"]
   }
 ]
