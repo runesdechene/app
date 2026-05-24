@@ -193,14 +193,35 @@ BEGIN
       );
       INSERT INTO public.activity_log (type, actor_id, place_id, data)
       VALUES ('place_taken_remote', p_user_id, p_place_id, v_notif_data);
+      -- V173 : la prise du lieu ("self") revient au BÉNÉFICIAIRE (= nouveau
+      -- veilleur), pas forcément au caller. En mécénat d'un challenger, le
+      -- caller (mécène) ≠ bénéficiaire. actor_id = bénéficiaire pour que la
+      -- pop-up Victoire se déclenche chez le bon user (useCourtNotifications
+      -- teste actor_id === userId). En self-attaque legacy, v_beneficiary =
+      -- p_user_id → comportement identique.
       INSERT INTO public.activity_log (type, actor_id, place_id, data)
-      VALUES ('place_taken_remote_self', p_user_id, p_place_id, v_notif_data);
+      VALUES ('place_taken_remote_self', v_beneficiary, p_place_id, v_notif_data);
 
       IF v_current_veilleur_user IS NOT NULL AND v_current_veilleur_user != p_user_id THEN
         PERFORM public.notify(v_current_veilleur_user, 'place_taken_remote', v_notif_data);
       END IF;
       PERFORM public._notify_court_members(v_current_veilleur_exp, 'place_taken_remote', v_notif_data, p_user_id);
-      PERFORM public.notify(p_user_id, 'place_taken_remote_self', v_notif_data);
+      PERFORM public.notify(v_beneficiary, 'place_taken_remote_self', v_notif_data);
+
+      -- V173 : bascule déclenchée par un mécène (caller ≠ bénéficiaire) →
+      -- prévenir le mécène que son soutien a fait basculer le lieu.
+      IF v_beneficiary IS DISTINCT FROM p_user_id THEN
+        PERFORM public.notify(p_user_id, 'place_court_support', jsonb_build_object(
+          'placeId',         p_place_id,
+          'placeTitle',      v_place_title,
+          'actorId',         p_user_id,
+          'actorName',       v_actor_name,
+          'amount',          p_amount,
+          'targetSide',      'attack',
+          'beneficiaryName', (SELECT COALESCE(display_name, first_name, 'le challenger')
+                              FROM public.users WHERE id = v_beneficiary)
+        ));
+      END IF;
     END IF;
   ELSIF v_side = 'attack' AND NOT v_was_vacant THEN
     IF NOT EXISTS (
