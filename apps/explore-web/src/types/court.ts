@@ -47,6 +47,18 @@ export interface Patron {
   factionPattern: string | null
 }
 
+export interface Challenger {
+  userId: string
+  displayName: string
+  avatarUrl: string | null
+  score: number
+  factionColor: string | null
+  factionPattern: string | null
+  /** Expé challenger du user sur ce lieu — passée telle quelle à invest_crowns.
+   *  Null seulement dans un cas anormal (challenger sans expé) → bouton désactivé. */
+  expeditionId: string | null
+}
+
 export interface ChronicleEntry {
   ts: string
   actorName: string
@@ -79,6 +91,7 @@ export interface PlaceCourtState {
   /** Score à dépasser : score veilleur si veillé, 50 si vacant */
   scoreToBeat: number | null
   topPatrons: Patron[]
+  challengers: Challenger[]
   chronicle: ChronicleEntry[]
   status: CourtStatus
   callerContext: CourtCallerContext | null
