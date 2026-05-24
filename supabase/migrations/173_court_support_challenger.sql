@@ -72,13 +72,26 @@ BEGIN
       v_side := 'defense';
       v_beneficiary := v_current_veilleur_user;
     ELSE
-      -- Le bénéficiaire doit être un challenger réel (score > 0, ≠ veilleur).
-      IF (NOT v_was_vacant AND p_beneficiary_user_id = v_current_veilleur_user)
-         OR COALESCE(public._user_place_score(p_beneficiary_user_id, p_place_id), 0) <= 0 THEN
+      -- Le bénéficiaire doit être un challenger réel (score > 0).
+      IF COALESCE(public._user_place_score(p_beneficiary_user_id, p_place_id), 0) <= 0 THEN
         RETURN json_build_object('error', 'not_a_challenger');
       END IF;
       v_side := 'attack';
       v_beneficiary := p_beneficiary_user_id;
+      -- V173 : on NE fait PAS confiance au p_target_expedition_id du client pour
+      -- un mécénat de challenger. On dérive l'expé challenger du bénéficiaire
+      -- côté serveur (celle utilisée pour le score legacy + la bascule), pour
+      -- éviter un place_veille incohérent (user crédité ≠ expédition plantée).
+      SELECT e.id INTO p_target_expedition_id
+      FROM public.expeditions e
+      JOIN public.expedition_members em ON em.expedition_id = e.id
+      WHERE em.user_id = p_beneficiary_user_id
+        AND e.place_id = p_place_id
+        AND (v_current_veilleur_exp IS NULL OR e.id != v_current_veilleur_exp)
+      LIMIT 1;
+      IF p_target_expedition_id IS NULL THEN
+        RETURN json_build_object('error', 'challenger_expedition_missing');
+      END IF;
     END IF;
   ELSIF v_target_is_veilleur THEN
     v_side := 'defense';
