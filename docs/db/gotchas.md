@@ -95,13 +95,17 @@ Exemples de régressions passées :
 - `get_place_by_id` réécrit en inventant `v_place.description`, `v_place.score`, `unnest(v_place.images)` qui n'existaient pas (29 mars 2026) — 3 erreurs en cascade
 - `place_influence_action` mig 196 a écrasé la suppression de la limite remote (mig 051), réintroduisant un cap de 5 pts/jour (régression silencieuse)
 - `get_user_titles` réécrit 3 fois (mig 182, 191, 193) sans `unlocks` → bouton "Ajouter un lieu" grisé pour tous
+- `invest_crowns` redéfinie **10 fois** (079→094→095→097→119→133→138→150→152→164). XO a failli repartir de la **150** parce que son nom (`preserve_invests_on_basculement`) *sonnait* abouti, alors que **152** (refonte user-centric) et **164** (baseline courante) la suivaient (24 mai 2026). Rattrapé uniquement par le domaine d'Uriel.
+
+> **⚠️ "La plus récente" = le plus HAUT NUMÉRO de migration, jamais le nom de fichier qui sonne le plus définitif.** Une fonction critique peut être redéfinie 10×. Le nom (`_fix_`, `_polish_`, `_preserve_`) ne dit rien de l'ordre. Trier numériquement et lire la dernière — point.
 
 **Procédure** :
-1. Grep les migrations pour la version la plus récente :
+1. Grep les migrations pour TOUTES les définitions, puis trier — la dernière par numéro gagne :
    ```bash
-   grep -r "CREATE OR REPLACE FUNCTION nom_fonction" supabase/migrations/ | sort
+   grep -rn "CREATE OR REPLACE FUNCTION public.nom_fonction" supabase/migrations/ | sort -t/ -k3 -n
    ```
-2. Lire la migration la plus récente intégralement.
+   (ou via le graph SQL : couche 2 de la 4-Layer Rule, AVANT le fichier brut.)
+2. Lire la migration au plus haut numéro intégralement.
 3. Copier-coller la fonction entière dans la nouvelle migration.
 4. Modifier UNIQUEMENT la partie concernée par le changement.
 5. Comparer chaque comportement (limites, colonnes retournées, JSON build, RLS) avec l'ancien.
