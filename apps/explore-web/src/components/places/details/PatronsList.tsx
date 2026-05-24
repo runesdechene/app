@@ -1,7 +1,7 @@
 import './PatronsList.css'
 import { useState } from 'react'
 import { useMapStore } from '../../../stores/mapStore'
-import type { Patron } from '../../../types/court'
+import type { Patron, Challenger } from '../../../types/court'
 
 interface PatronsListProps {
   patrons: Patron[]
@@ -10,6 +10,10 @@ interface PatronsListProps {
   veilleurUserId?: string | null
   /** Score agrégé du mécène (= scoreVeilleur du state). Affiché à côté du nom. */
   scoreVeilleur?: number
+  /** V173 — liste user-centric des attaquants soutenables (cibles à dépasser). */
+  challengers?: Challenger[]
+  /** V173 — clic « Soutenir » sur un challenger. */
+  onSupportChallenger?: (c: Challenger) => void
 }
 
 interface PatronRowProps {
@@ -58,7 +62,7 @@ function PatronRow({ patron, side, rank, isYou, onOpen, className }: PatronRowPr
   )
 }
 
-export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur }: PatronsListProps) {
+export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, challengers = [], onSupportChallenger }: PatronsListProps) {
   const [open, setOpen] = useState(false)
 
   if (patrons.length === 0) return null
@@ -71,9 +75,6 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
   const supporters = patrons
     .filter(p => p.userId !== veilleurUserId && p.defenseTotal > 0)
     .sort((a, b) => b.defenseTotal - a.defenseTotal)
-  const challengers = patrons
-    .filter(p => p.userId !== veilleurUserId && p.attackTotal > 0)
-    .sort((a, b) => b.attackTotal - a.attackTotal)
 
   const meceneScore = scoreVeilleur ?? mecenePatron?.defenseTotal ?? 0
   const participantCount = patrons.length
@@ -153,15 +154,46 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
       {challengers.length > 0 && (
         <>
           <div className="patrons-section-label patrons-section-challengers">⚔ Challengers</div>
-          {challengers.map((p, i) => (
-            <PatronRow
-              key={p.userId}
-              patron={p}
-              side="attack"
-              rank={`#${i + 1}`}
-              isYou={currentUserId === p.userId}
-              onOpen={openProfile}
-            />
+          {challengers.map((c, i) => (
+            <div
+              key={c.userId}
+              className={`patron-row patron-row-challenger${currentUserId === c.userId ? ' is-you' : ''}`}
+            >
+              <span className="patron-rank">{`#${i + 1}`}</span>
+              <button
+                type="button"
+                className="patron-name"
+                onClick={() => openProfile(c.userId)}
+                title={`Voir le profil de ${c.displayName}`}
+              >
+                {c.displayName}
+                {c.factionPattern && c.factionColor && (
+                  <span
+                    className="patron-faction-icon"
+                    style={{
+                      backgroundColor: c.factionColor,
+                      WebkitMaskImage: `url(${c.factionPattern})`,
+                      maskImage: `url(${c.factionPattern})`,
+                    }}
+                    aria-hidden
+                  />
+                )}
+                {currentUserId === c.userId && <span className="patron-you">(vous)</span>}
+              </button>
+              <span className="patron-breakdown">
+                <span className="patron-side patron-side-influence" title="Score d'attaque">⚔ {c.score}</span>
+              </span>
+              {onSupportChallenger && currentUserId !== c.userId && c.expeditionId && (
+                <button
+                  type="button"
+                  className="patron-support-btn"
+                  onClick={() => onSupportChallenger(c)}
+                  title={`Soutenir ${c.displayName}`}
+                >
+                  🪙 Soutenir
+                </button>
+              )}
+            </div>
           ))}
         </>
       )}
