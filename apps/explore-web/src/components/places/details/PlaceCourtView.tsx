@@ -5,8 +5,9 @@ import { useCrownsStore } from '../../../stores/crownsStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
+import { InvestCrownsModal } from '../actions/InvestCrownsModal'
 import './PlaceCourtView.css'
-import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus } from '../../../types/court'
+import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
 interface PlaceCourtViewProps {
   placeId: string
@@ -54,6 +55,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const [notVeilled, setNotVeilled] = useState(false)
   const [creatingExp, setCreatingExp] = useState(false)
   const [bursts, setBursts] = useState<BurstAnim[]>([])
+  const [supportTarget, setSupportTarget] = useState<Challenger | null>(null)
   // Tick pour forcer rerender quand pendingTapsRef change
   const [, forceUpdate] = useState(0)
 
@@ -356,7 +358,29 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         currentUserId={userId ?? undefined}
         veilleurUserId={veilleur?.leaderUserId ?? null}
         scoreVeilleur={optimisticVeilleurScore}
+        challengers={state.challengers}
+        onSupportChallenger={setSupportTarget}
       />
+
+      {supportTarget && supportTarget.expeditionId && (
+        <InvestCrownsModal
+          placeId={placeId}
+          placeTitle={_placeTitle}
+          expeditionId={supportTarget.expeditionId}
+          expeditionName={supportTarget.displayName}
+          side="attack"
+          scoreToBeat={scoreVeilleur}
+          currentScore={supportTarget.score}
+          balance={balance}
+          beneficiaryUserId={supportTarget.userId}
+          onClose={() => setSupportTarget(null)}
+          onSuccess={() => {
+            setSupportTarget(null)
+            if (userId) void refreshCrowns(userId)
+            void fetchState()
+          }}
+        />
+      )}
     </div>
   )
 }
