@@ -18,6 +18,8 @@ export interface CourtActivityRow {
     reclaimedBy?: string
     fromVacant?: boolean
     threatsCleared?: number
+    targetSide?: string
+    beneficiaryName?: string
   } | null
 }
 
@@ -66,6 +68,22 @@ export function buildCourtToast(row: CourtActivityRow, currentUserId: string): C
     case 'place_court_support': {
       const amt = row.data?.amount ?? 0
       const suffix = amt > 0 ? ` (+${amt} 🪙)` : ''
+      const isAttack = row.data?.targetSide === 'attack'
+      if (isAttack) {
+        const benef = row.data?.beneficiaryName ?? 'un attaquant'
+        if (isSelf) {
+          return {
+            message: `🤝 Vous soutenez l'offensive de ${benef} sur ${placeTitle}${suffix}`,
+            highlights: [benef, placeTitle],
+            hasActorInHighlights: false,
+          }
+        }
+        return {
+          message: `🤝 ${actorName} soutient l'offensive de ${benef} sur ${placeTitle}${suffix}`,
+          highlights: [actorName, placeTitle],
+          hasActorInHighlights: true,
+        }
+      }
       if (isSelf) {
         return {
           message: `🤝 Vous avez soutenu le veilleur de ${placeTitle}${suffix}`,
