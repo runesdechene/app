@@ -5,7 +5,6 @@ import { useCrownsStore } from '../../../stores/crownsStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
-import { InvestCrownsModal } from '../actions/InvestCrownsModal'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -26,11 +25,14 @@ interface PendingTaps {
   side: CourtSide
   expId: string
   count: number
+  /** V0.8.23 — si défini, crédite ce challenger (mécénat) au lieu du caller. */
+  beneficiaryUserId?: string
 }
 
 interface BurstAnim {
   id: number
-  side: CourtSide
+  /** 'defense' | 'attack' pour les boutons principaux, ou `chal:<userId>` pour un challenger. */
+  key: string
 }
 
 const TAP_DEBOUNCE_MS = 250
@@ -55,7 +57,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const [notVeilled, setNotVeilled] = useState(false)
   const [creatingExp, setCreatingExp] = useState(false)
   const [bursts, setBursts] = useState<BurstAnim[]>([])
-  const [supportTarget, setSupportTarget] = useState<Challenger | null>(null)
   // Tick pour forcer rerender quand pendingTapsRef change
   const [, forceUpdate] = useState(0)
 
@@ -124,6 +125,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         p_place_id: placeId,
         p_target_expedition_id: pending.expId,
         p_amount: pending.count,
+        p_beneficiary_user_id: pending.beneficiaryUserId ?? null,
       })
       if (error) {
         console.error('[PlaceCourtView] invest_crowns error', error)
@@ -153,7 +155,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     }
   }, [userId, placeId, fetchState, refreshCrowns, setCrownsBalance])
 
-  const queueTap = useCallback((side: CourtSide, expId: string) => {
+  const pushTap = useCallback((opts: { side: CourtSide; expId: string; beneficiaryUserId?: string; burstKey: string }) => {
     const currentPending = readPending()
     if (balance < 1 + (currentPending?.count ?? 0)) return // plus de Couronnes en stock optimistic
 
@@ -164,17 +166,19 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
 
     // Burst animation
     const id = Date.now() + Math.random()
-    setBursts(prev => [...prev, { id, side }])
+    setBursts(prev => [...prev, { id, key: opts.burstKey }])
     window.setTimeout(() => {
       setBursts(prev => prev.filter(b => b.id !== id))
     }, 900)
 
-    // Empile le tap
+    // Empile le tap (même cible = même expé + même bénéficiaire)
     const existing = readPending()
-    if (!existing || existing.expId !== expId) {
-      pendingRef.current = { side, expId, count: 1 }
-    } else {
+    if (existing
+        && existing.expId === opts.expId
+        && (existing.beneficiaryUserId ?? null) === (opts.beneficiaryUserId ?? null)) {
       existing.count += 1
+    } else {
+      pendingRef.current = { side: opts.side, expId: opts.expId, count: 1, beneficiaryUserId: opts.beneficiaryUserId }
     }
     forceUpdate(n => n + 1)
 
@@ -185,6 +189,12 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       void sendPendingTaps()
     }, TAP_DEBOUNCE_MS)
   }, [balance, setCrownsBalance, sendPendingTaps])
+
+  // V0.8.23 — soutenir un challenger : 1 clic = 1 Couronne créditée au challenger.
+  const queueSupportTap = useCallback((c: Challenger) => {
+    if (!c.expeditionId || balance < 1) return
+    pushTap({ side: 'attack', expId: c.expeditionId, beneficiaryUserId: c.userId, burstKey: `chal:${c.userId}` })
+  }, [balance, pushTap])
 
   if (notVeilled) return null
   if (loading || !state) {
@@ -204,16 +214,23 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const optimisticChallengerScore = (challengerThreat?.score ?? 0) + pendingAttack
   const optimisticMenace = userChallengerExp ? Math.max(menaceHaute ?? 0, optimisticChallengerScore) : (menaceHaute ?? 0)
 
+  // V0.8.23 — score optimiste du challenger soutenu (celui en cours de tap-mécénat)
+  const optimisticChallengers = state.challengers.map(c =>
+    pendingTaps && pendingTaps.beneficiaryUserId === c.userId
+      ? { ...c, score: c.score + pendingTaps.count }
+      : c,
+  )
+
   const supportExpId = veilleur?.expeditionId ?? null
   const handleSupportTap = () => {
     if (!supportExpId || balance < 1) return
-    queueTap('defense', supportExpId)
+    pushTap({ side: 'defense', expId: supportExpId, burstKey: 'defense' })
   }
 
   const handleContestTap = async () => {
     if (balance < 1 || creatingExp) return
     if (userChallengerExp) {
-      queueTap('attack', userChallengerExp)
+      pushTap({ side: 'attack', expId: userChallengerExp, burstKey: 'attack' })
       return
     }
     // Premier tap : il faut créer l'expé challenger d'abord
@@ -233,7 +250,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       return
     }
     await fetchState()
-    queueTap('attack', r.expeditionId)
+    pushTap({ side: 'attack', expId: r.expeditionId, burstKey: 'attack' })
   }
 
   // V0.7.6 — variable `initials` retirée (l'avatar du veilleur n'est plus
@@ -322,7 +339,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             <span className="court-btn-icon">🛡</span>
             <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
             <span className="court-btn-cost">−1 🪙</span>
-            {bursts.filter(b => b.side === 'defense').map(b => (
+            {bursts.filter(b => b.key === 'defense').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}
           </button>
@@ -339,7 +356,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               {creatingExp ? 'Préparation…' : (vacant ? 'Poser ma marque' : 'Influencer')}
             </span>
             <span className="court-btn-cost">−1 🪙</span>
-            {bursts.filter(b => b.side === 'attack').map(b => (
+            {bursts.filter(b => b.key === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}
           </button>
@@ -358,29 +375,11 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         currentUserId={userId ?? undefined}
         veilleurUserId={veilleur?.leaderUserId ?? null}
         scoreVeilleur={optimisticVeilleurScore}
-        challengers={state.challengers}
-        onSupportChallenger={setSupportTarget}
+        challengers={optimisticChallengers}
+        onSupportTap={queueSupportTap}
+        supportDisabled={balance < 1}
+        bursts={bursts}
       />
-
-      {supportTarget && supportTarget.expeditionId && (
-        <InvestCrownsModal
-          placeId={placeId}
-          placeTitle={_placeTitle}
-          expeditionId={supportTarget.expeditionId}
-          expeditionName={supportTarget.displayName}
-          side="attack"
-          scoreToBeat={scoreVeilleur}
-          currentScore={supportTarget.score}
-          balance={balance}
-          beneficiaryUserId={supportTarget.userId}
-          onClose={() => setSupportTarget(null)}
-          onSuccess={() => {
-            setSupportTarget(null)
-            if (userId) void refreshCrowns(userId)
-            void fetchState()
-          }}
-        />
-      )}
     </div>
   )
 }

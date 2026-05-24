@@ -12,8 +12,12 @@ interface PatronsListProps {
   scoreVeilleur?: number
   /** V173 — liste user-centric des attaquants soutenables (cibles à dépasser). */
   challengers?: Challenger[]
-  /** V173 — clic « Soutenir » sur un challenger. */
-  onSupportChallenger?: (c: Challenger) => void
+  /** V0.8.23 — tap « Soutenir » sur un challenger (1 clic = 1 Couronne créditée). */
+  onSupportTap?: (c: Challenger) => void
+  /** V0.8.23 — désactive les boutons Soutenir (plus de Couronnes en stock). */
+  supportDisabled?: boolean
+  /** V0.8.23 — bursts en cours, clé `chal:<userId>` pour un challenger. */
+  bursts?: { id: number; key: string }[]
 }
 
 interface PatronRowProps {
@@ -62,7 +66,7 @@ function PatronRow({ patron, side, rank, isYou, onOpen, className }: PatronRowPr
   )
 }
 
-export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, challengers = [], onSupportChallenger }: PatronsListProps) {
+export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, challengers = [], onSupportTap, supportDisabled, bursts = [] }: PatronsListProps) {
   const [open, setOpen] = useState(false)
 
   if (patrons.length === 0) return null
@@ -155,43 +159,68 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
         <>
           <div className="patrons-section-label patrons-section-challengers">⚔ Challengers</div>
           {challengers.map((c, i) => (
-            <div
-              key={c.userId}
-              className={`patron-row patron-row-challenger${currentUserId === c.userId ? ' is-you' : ''}`}
-            >
-              <span className="patron-rank">{`#${i + 1}`}</span>
-              <button
-                type="button"
-                className="patron-name"
-                onClick={() => openProfile(c.userId)}
-                title={`Voir le profil de ${c.displayName}`}
-              >
-                {c.displayName}
-                {c.factionPattern && c.factionColor && (
-                  <span
-                    className="patron-faction-icon"
-                    style={{
-                      backgroundColor: c.factionColor,
-                      WebkitMaskImage: `url(${c.factionPattern})`,
-                      maskImage: `url(${c.factionPattern})`,
-                    }}
-                    aria-hidden
-                  />
-                )}
-                {currentUserId === c.userId && <span className="patron-you">(vous)</span>}
-              </button>
-              <span className="patron-breakdown">
-                <span className="patron-side patron-side-influence" title="Score d'attaque">⚔ {c.score}</span>
-              </span>
-              {onSupportChallenger && currentUserId !== c.userId && c.expeditionId && (
+            <div key={c.userId} className="patron-challenger-block">
+              <div className={`patron-row patron-row-challenger${currentUserId === c.userId ? ' is-you' : ''}`}>
+                <span className="patron-rank">{`#${i + 1}`}</span>
                 <button
                   type="button"
-                  className="patron-support-btn"
-                  onClick={() => onSupportChallenger(c)}
-                  title={`Soutenir ${c.displayName}`}
+                  className="patron-name"
+                  onClick={() => openProfile(c.userId)}
+                  title={`Voir le profil de ${c.displayName}`}
                 >
-                  🪙 Soutenir
+                  {c.displayName}
+                  {c.factionPattern && c.factionColor && (
+                    <span
+                      className="patron-faction-icon"
+                      style={{
+                        backgroundColor: c.factionColor,
+                        WebkitMaskImage: `url(${c.factionPattern})`,
+                        maskImage: `url(${c.factionPattern})`,
+                      }}
+                      aria-hidden
+                    />
+                  )}
+                  {currentUserId === c.userId && <span className="patron-you">(vous)</span>}
                 </button>
+                <span className="patron-breakdown">
+                  <span className="patron-side patron-side-influence" title="Score d'attaque">⚔ {c.score}</span>
+                </span>
+                {onSupportTap && currentUserId !== c.userId && c.expeditionId && (
+                  <button
+                    type="button"
+                    className="patron-support-btn"
+                    onClick={() => onSupportTap(c)}
+                    disabled={supportDisabled}
+                    title={`Soutenir ${c.displayName} (1 🪙)`}
+                  >
+                    🪙 Soutenir
+                    {bursts.filter(b => b.key === `chal:${c.userId}`).map(b => (
+                      <span key={b.id} className="patron-support-burst">+1</span>
+                    ))}
+                  </button>
+                )}
+              </div>
+              {c.supporters.length > 0 && (
+                <div className="patron-chal-supporters">
+                  <span className="patron-chal-supporters-arrow" aria-hidden>↳</span>
+                  {c.supporters.map((s, idx) => (
+                    <span
+                      key={s.userId}
+                      className={`patron-chal-supporter${currentUserId === s.userId ? ' is-you' : ''}`}
+                    >
+                      {idx > 0 && <span className="patron-chal-sep" aria-hidden> · </span>}
+                      <button
+                        type="button"
+                        className="patron-chal-supporter-btn"
+                        onClick={() => openProfile(s.userId)}
+                        title={`Voir le profil de ${s.displayName}`}
+                      >
+                        {currentUserId === s.userId ? 'Vous' : s.displayName}
+                        <span className="patron-chal-supporter-amt"> 🪙{s.amount}</span>
+                      </button>
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           ))}

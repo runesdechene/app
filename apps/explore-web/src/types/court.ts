@@ -47,6 +47,13 @@ export interface Patron {
   factionPattern: string | null
 }
 
+/** V0.8.23 — un mécène qui finance un challenger (hors le challenger lui-même). */
+export interface ChallengerSupporter {
+  userId: string
+  displayName: string
+  amount: number
+}
+
 export interface Challenger {
   userId: string
   displayName: string
@@ -57,6 +64,9 @@ export interface Challenger {
   /** Expé challenger du user sur ce lieu — passée telle quelle à invest_crowns.
    *  Null seulement dans un cas anormal (challenger sans expé) → bouton désactivé. */
   expeditionId: string | null
+  /** V0.8.23 — mécènes qui soutiennent cette offensive (hors le challenger lui-même),
+   *  triés par montant décroissant. Affichés en sous-liste « ↳ Soutiens ». */
+  supporters: ChallengerSupporter[]
 }
 
 export interface ChronicleEntry {
