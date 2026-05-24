@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { PlacePanelActiveTab } from '../types/placeDetail'
 
 interface PlaceOverride {
   tagTitle?: string
@@ -35,7 +36,10 @@ export interface TerritorySelection {
 
 interface MapState {
   selectedPlaceId: string | null
-  setSelectedPlaceId: (id: string | null) => void
+  /** Onglet sur lequel ouvrir le PlacePanel (null = défaut 'carnets').
+   *  Posé par les notifications Cour → 'infos' (La Cour). Lu au mount du panel. */
+  selectedPlaceTab: PlacePanelActiveTab | null
+  setSelectedPlaceId: (id: string | null, tab?: PlacePanelActiveTab | null) => void
 
   /** ID du joueur dont le profil est ouvert (global) */
   selectedPlayerId: string | null
@@ -104,7 +108,8 @@ interface MapState {
 
 export const useMapStore = create<MapState>((set) => ({
   selectedPlaceId: null,
-  setSelectedPlaceId: (id) => set({ selectedPlaceId: id }),
+  selectedPlaceTab: null,
+  setSelectedPlaceId: (id, tab = null) => set({ selectedPlaceId: id, selectedPlaceTab: tab }),
 
   selectedPlayerId: null,
   setSelectedPlayerId: (id) => set({ selectedPlayerId: id }),

@@ -1,3 +1,10 @@
+# ALPHA V0.8.24
+## Les notifications de La Cour rouvrent enfin le bon lieu
+
+Certaines notifications personnelles — une attaque sur l'un de vos lieux, une pression montante, un lieu repris à la marche, un soutien reçu — ne menaient nulle part : un clic (ou l'ouverture depuis une notification Push) ne rouvrait ni le lieu visé ni La Cour. En cause, une confusion interne : ces notifications portent l'identifiant de l'expédition de Cour, que l'app prenait à tort pour une expédition de voyage, et finissait par n'ouvrir rien du tout. Désormais le bon lieu s'ouvre directement sur La Cour, et les notifications Push de lieu mènent elles aussi à la bonne fiche.
+
+---
+
 # ALPHA V0.8.23
 ## Soutenir un attaquant, pas seulement le veilleur
 

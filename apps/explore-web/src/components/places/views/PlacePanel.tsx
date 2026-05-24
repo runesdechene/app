@@ -370,7 +370,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [showAddressMenu, setShowAddressMenu] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [activeTab, setActiveTab] = useState<PlacePanelActiveTab>('carnets')
+  // Onglet d'ouverture : posé par les notifications (ex. Cour → 'infos'). Lu une
+  // seule fois au mount — PlaceContent remonte par key={place.id}, donc chaque
+  // ouverture de lieu relit la cible courante. Défaut 'carnets'.
+  const [activeTab, setActiveTab] = useState<PlacePanelActiveTab>(
+    () => useMapStore.getState().selectedPlaceTab ?? 'carnets',
+  )
   const tabsRef = useRef<HTMLDivElement>(null)
   const scrollToTab = useCallback((tab: PlacePanelActiveTab) => {
     setActiveTab(tab)

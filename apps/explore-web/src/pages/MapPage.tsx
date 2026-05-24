@@ -148,6 +148,19 @@ export default function MapPage() {
   useCourtInvestedLoad(isAuthenticated)
   useResourceTimers()
 
+  // Push notifications de lieu (place_taken_*) → /carte?placeId=<id>. On parse au
+  // mount pour ouvrir la fiche du lieu sur l'onglet La Cour, puis on nettoie l'URL
+  // (sinon un refresh ré-ouvrirait le panel). Symétrique de HomePage ?expedition=.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const placeId = params.get('placeId')
+    if (!placeId) return
+    setSelectedPlaceId(placeId, 'infos')
+    params.delete('placeId')
+    const newSearch = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash)
+  }, [setSelectedPlaceId])
+
   // V0.7 — Système de niveaux
   useLevel(true)
   const { pendingLevelUp, dismiss } = useLevelUp()
