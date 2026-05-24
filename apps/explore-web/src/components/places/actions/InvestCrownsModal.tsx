@@ -11,6 +11,9 @@ interface InvestCrownsModalProps {
   expeditionId: string
   expeditionName: string
   side: CourtSide
+  /** V173 — si fourni, l'investissement crédite ce challenger (mécénat d'attaque)
+   *  au lieu du caller. Transmis tel quel à invest_crowns. */
+  beneficiaryUserId?: string
   /** Pour attaque : score à dépasser (= 50 + défense veilleur). Undefined si défense. */
   scoreToBeat?: number
   /** Score actuel de l'expé cible (pour preview "X → X+amount") */
@@ -21,7 +24,7 @@ interface InvestCrownsModalProps {
 }
 
 export function InvestCrownsModal(props: InvestCrownsModalProps) {
-  const { placeId, placeTitle, expeditionId, expeditionName, side, scoreToBeat, currentScore, balance, onClose, onSuccess } = props
+  const { placeId, placeTitle, expeditionId, expeditionName, side, scoreToBeat, currentScore, balance, beneficiaryUserId, onClose, onSuccess } = props
   const userId = usePlayerStore(s => s.userId)
   const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const [amount, setAmount] = useState(1)
@@ -41,6 +44,7 @@ export function InvestCrownsModal(props: InvestCrownsModalProps) {
       p_place_id: placeId,
       p_target_expedition_id: expeditionId,
       p_amount: amount,
+      p_beneficiary_user_id: beneficiaryUserId ?? null,
     })
     setSubmitting(false)
     if (rpcError) {
@@ -62,7 +66,7 @@ export function InvestCrownsModal(props: InvestCrownsModalProps) {
       <div className="invest-modal" onClick={e => e.stopPropagation()}>
         <button className="invest-close" onClick={onClose}>{'✕'}</button>
         <h3 className="invest-title">
-          {side === 'defense' ? 'Soutenir' : 'Défier'}
+          {beneficiaryUserId ? 'Soutenir' : (side === 'defense' ? 'Soutenir' : 'Défier')}
         </h3>
         <p className="invest-target">
           {expeditionName} sur <strong>{placeTitle}</strong>
