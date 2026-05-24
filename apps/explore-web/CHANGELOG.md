@@ -1,3 +1,10 @@
+# ALPHA V0.8.22
+## Soutenir un attaquant, pas seulement le veilleur
+
+Dans La Cour d'un lieu, vous pouviez verser vos Couronnes pour soutenir le veilleur en place — mais pour attaquer, vous ne pouviez financer que votre propre offensive. Désormais, dans la liste des mécènes, chaque challenger affiche un bouton « Soutenir » : concentrez vos Couronnes derrière l'attaquant de votre choix pour le faire basculer plus vite. S'il l'emporte, c'est lui qui prend le lieu — vous restez son mécène. Vous pouvez soutenir n'importe quel attaquant, quelle que soit sa Maison.
+
+---
+
 # ALPHA V0.8.21
 ## Les expéditions passées quittent la carte
 
