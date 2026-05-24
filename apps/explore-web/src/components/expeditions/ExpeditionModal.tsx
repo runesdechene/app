@@ -31,6 +31,12 @@ interface Props {
   initialMobileTab?: 'info' | 'chat'
 }
 
+// Section compte rendu masquée le 2026-05-24 en attendant la refonte
+// "album-souvenir chef uniquement" (cf. Bible Game Design + spec
+// 2026-05-24-expeditions-map-lifecycle). Les RPCs compte rendu restent en place
+// (dormance UI uniquement). Repasser à true au moment de la refonte.
+const REPORTS_SECTION_ENABLED = false
+
 export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'info' }: Props) {
   const myUserId = usePlayerStore((s) => s.userId)
   const current = useExpeditionsStore((s) => s.current)
@@ -504,8 +510,8 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
           </section>
         )}
 
-        {/* Comptes rendus (date passée) */}
-        {(e.status === 'passed' || e.status === 'archived') && (
+        {/* Comptes rendus (date passée) — masqué en dormance (cf. REPORTS_SECTION_ENABLED) */}
+        {REPORTS_SECTION_ENABLED && (e.status === 'passed' || e.status === 'archived') && (
           <section className="expedition-modal-section">
             <h3>Comptes rendus · galerie</h3>
             <ExpeditionGallery reports={reports} />

@@ -30,6 +30,15 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
   const isSoon = diffMs !== null && diffMs >= 2 * day && diffMs < 7 * day
   const isFuture = diffMs !== null && diffMs >= 7 * day
 
+  // Expédition passée (plus de 24h après le RDV) : N&B + opacité dégressive
+  // de 1.0 (J+1) à 0.35 (J+7). Le cron retire la bannière de la carte à J+7.
+  // Calculé sur rdv_at (robuste au décalage ≤ 1h du cron de transition).
+  const passedAgeDays = diffMs !== null && diffMs < 0 ? -diffMs / day : 0
+  const isPassed = passedAgeDays > 1
+  const passedOpacity = isPassed
+    ? Math.max(0.35, 1 - (0.65 * (passedAgeDays - 1)) / 6)
+    : 1
+
   const className = [
     'expedition-banner',
     isToday && 'is-today',
@@ -37,6 +46,7 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
     isSoon && 'is-soon',
     isFuture && 'is-future',
     isUnset && 'is-unset',
+    isPassed && 'is-passed',
   ].filter(Boolean).join(' ')
 
   // Image source : cover > avatar chef > rien (fallback emoji)
@@ -55,6 +65,7 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
       onClick={onClick}
       aria-label={`Événement ${expedition.name}`}
       title={expedition.name}
+      style={isPassed ? { opacity: passedOpacity } : undefined}
     >
       <span className="expedition-banner-medallion" style={factionRingStyle}>
         {imgSrc ? (

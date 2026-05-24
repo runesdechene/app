@@ -115,6 +115,17 @@ export async function listUpcomingExpeditions(): Promise<ExpeditionListItem[]> {
   return (data as ExpeditionListItem[] | null) ?? []
 }
 
+/**
+ * Liste des expéditions à afficher sur la carte : 'published' + 'passed'.
+ * Les 'passed' (RDV dépassé, < 7j) sont rendues en N&B + fade par ExpeditionBanner.
+ * Distinct de listUpcomingExpeditions (published-only, pour la liste HUD).
+ */
+export async function listExpeditionsForMap(): Promise<ExpeditionListItem[]> {
+  const { data, error } = await supabase.rpc('list_voyages_for_map')
+  if (error) throw error
+  return (data as ExpeditionListItem[] | null) ?? []
+}
+
 export async function listArchivedExpeditions(limit = 50, offset = 0): Promise<ExpeditionListItem[]> {
   const { data, error } = await supabase.rpc('list_voyages_archives', {
     p_limit: limit, p_offset: offset,

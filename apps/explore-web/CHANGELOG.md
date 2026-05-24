@@ -1,3 +1,10 @@
+# ALPHA V0.8.21
+## Les expéditions passées quittent la carte
+
+Une fois la date d'une expédition dépassée, sa bannière restait sur la carte indéfiniment : le mécanisme d'archivage existait mais n'avait jamais été activé. Désormais, dès que le rendez-vous est passé, la bannière passe en noir & blanc et s'estompe doucement sur la carte pendant 7 jours, puis disparaît et rejoint les Archives. Un nettoyage automatique tourne toutes les heures.
+
+---
+
 # ALPHA V0.8.20
 ## Liens de partage et pages SEO réparés — fin de `carte.runesdechene.com`
 

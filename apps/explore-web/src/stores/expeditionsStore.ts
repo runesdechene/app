@@ -16,6 +16,9 @@ import type {
 
 interface ExpeditionsState {
   upcoming: ExpeditionListItem[]
+  /** Bannières carte : published + passed (passed = rendu N&B + fade).
+   *  Distinct de `upcoming` qui reste published-only pour la liste HUD. */
+  mapBanners: ExpeditionListItem[]
   archives: ExpeditionListItem[]
   current: ExpeditionFullPayload | null
   messagesByExpedition: Record<string, ExpeditionMessage[]>
@@ -31,6 +34,7 @@ interface ExpeditionsState {
   pendingOpenCreator: boolean
 
   setUpcoming: (l: ExpeditionListItem[]) => void
+  setMapBanners: (l: ExpeditionListItem[]) => void
   setArchives: (l: ExpeditionListItem[]) => void
   setCurrent: (p: ExpeditionFullPayload | null) => void
   setMessages: (expeditionId: string, m: ExpeditionMessage[]) => void
@@ -42,6 +46,7 @@ interface ExpeditionsState {
 
 export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
   upcoming: [],
+  mapBanners: [],
   archives: [],
   current: null,
   messagesByExpedition: {},
@@ -50,6 +55,7 @@ export const useExpeditionsStore = create<ExpeditionsState>((set) => ({
   pendingOpenCreator: false,
 
   setUpcoming: (l) => set({ upcoming: l }),
+  setMapBanners: (l) => set({ mapBanners: l }),
   requestOpenExpedition: (id, tab = 'info') =>
     set({ pendingOpenExpeditionId: id, pendingOpenExpeditionTab: tab }),
   requestOpenCreator: (open) => set({ pendingOpenCreator: open }),
