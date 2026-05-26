@@ -2,7 +2,7 @@ import { mkdir, writeFile, cp, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotalPlaceCount } from './lib/places';
-import { getShareTextTemplate } from './lib/appSettings';
+import { getShareTextTemplate, getLandingImageUrl } from './lib/appSettings';
 import { renderPage } from './templates/page';
 import { renderSitemap } from './templates/sitemap';
 import { getMovementWallPhotos } from './lib/movement';
@@ -59,10 +59,10 @@ async function build() {
   await writeFile(join(DIST, 'sitemap.xml'), sitemapXml, 'utf-8');
 
   // Page Le Mouvement (manifeste + mur UGC)
-  const wallPhotos = await getMovementWallPhotos();
+  const [wallPhotos, movementBg] = await Promise.all([getMovementWallPhotos(), getLandingImageUrl()]);
   await mkdir(join(DIST, 'mouvement'), { recursive: true });
-  await writeFile(join(DIST, 'mouvement', 'index.html'), renderMovementPage(wallPhotos), 'utf-8');
-  console.log(`Mouvement: ${wallPhotos.length} photos`);
+  await writeFile(join(DIST, 'mouvement', 'index.html'), renderMovementPage(wallPhotos, movementBg), 'utf-8');
+  console.log(`Mouvement: ${wallPhotos.length} photos (bg: ${movementBg ? 'oui' : 'non'})`);
 
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`\nDone: ${generated} pages + sitemap in ${elapsed}s`);

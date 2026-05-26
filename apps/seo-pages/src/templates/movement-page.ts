@@ -1,5 +1,5 @@
 // apps/seo-pages/src/templates/movement-page.ts
-// Page "Le Mouvement" : manifeste epique (hero sombre cartographique) + mur communautaire (parchemin).
+// Page "Le Mouvement" : manifeste epique (hero image landing -> degrade parchemin) + mur communautaire.
 // HTML statique autonome (charge ses propres polices de marque). Design : heritage / conquete.
 import type { WallPhoto } from '../lib/movement';
 
@@ -34,13 +34,16 @@ function photoCard(p: WallPhoto, index: number): string {
 </figure>`;
 }
 
-export function renderMovementPage(photos: WallPhoto[]): string {
+export function renderMovementPage(photos: WallPhoto[], bgUrl: string | null = null): string {
   const grid = photos.map((p, i) => photoCard(p, i)).join('\n');
   const urls = JSON.stringify(photos.map(p => p.imageUrl)).replace(/</g, '\\u003c');
   const count = photos.length;
   const countLabel = count > 0
     ? `${count} ${count > 1 ? 'visages du Mouvement' : 'visage du Mouvement'}`
     : 'Le Mouvement se rassemble';
+  // Image de fond (landing) — injectee en variable CSS si presente et valide
+  const safeBg = bgUrl && /^https:\/\/[^\s"'()\\]+$/.test(bgUrl) ? bgUrl : null;
+  const bgVar = safeBg ? `<style>:root{--mv-bg:url("${safeBg}");}</style>` : '';
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -65,7 +68,7 @@ export function renderMovementPage(photos: WallPhoto[]): string {
     --night:#190f08; --night-2:#2a160f;
     --oxblood:#7c2d2d; --oxblood-deep:#5b1d1d;
     --bronze:#c49a5b; --bronze-soft:#d9bd8a;
-    --maxw:1180px;
+    --maxw:1180px; --pad-x:clamp(18px,5vw,64px);
   }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -82,55 +85,61 @@ export function renderMovementPage(photos: WallPhoto[]): string {
   .mv-kicker { font-family:'Cabin Condensed',sans-serif; text-transform:uppercase; letter-spacing:.42em;
     font-weight:600; font-size:13px; }
 
-  /* ====== HERO sombre, cartographique ====== */
+  /* ====== HERO : image landing -> degrade parchemin ====== */
   .mv-hero {
     position:relative; min-height:100svh; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; text-align:center; padding:8vh 24px 12vh;
+    align-items:center; justify-content:center; text-align:center; padding:8vh 24px 18vh;
     color:var(--cream); overflow:hidden; isolation:isolate;
-    background:
-      radial-gradient(120% 80% at 50% -10%, rgba(124,45,45,.55), transparent 60%),
-      radial-gradient(100% 100% at 50% 120%, rgba(196,154,91,.18), transparent 55%),
-      linear-gradient(160deg, var(--night) 0%, var(--night-2) 55%, #1f120b 100%);
+    background-color:var(--night);
+    background-image:
+      linear-gradient(180deg,
+        rgba(18,11,5,.58) 0%, rgba(18,11,5,.30) 36%, rgba(18,11,5,.40) 64%,
+        rgba(241,227,204,0) 85%, var(--parchment) 100%),
+      var(--mv-bg, none);
+    background-size:cover; background-position:center top; background-repeat:no-repeat;
   }
   /* courbes topographiques discretes */
   .mv-hero::before {
-    content:""; position:absolute; inset:-10%; z-index:-1; opacity:.5;
+    content:""; position:absolute; inset:-10%; z-index:-1; opacity:.32;
     background-image:
       repeating-radial-gradient(circle at 22% 18%, transparent 0 38px, rgba(196,154,91,.07) 38px 39px),
-      repeating-radial-gradient(circle at 82% 92%, transparent 0 52px, rgba(196,154,91,.06) 52px 53px);
-    -webkit-mask-image:radial-gradient(120% 120% at 50% 40%, #000 40%, transparent 85%);
-            mask-image:radial-gradient(120% 120% at 50% 40%, #000 40%, transparent 85%);
+      repeating-radial-gradient(circle at 82% 84%, transparent 0 52px, rgba(196,154,91,.06) 52px 53px);
+    -webkit-mask-image:radial-gradient(120% 110% at 50% 38%, #000 38%, transparent 78%);
+            mask-image:radial-gradient(120% 110% at 50% 38%, #000 38%, transparent 78%);
   }
-  /* vignette */
+  /* vignette laterale/haute — masquee en bas pour preserver le fondu parchemin */
   .mv-hero::after {
     content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-    box-shadow:inset 0 0 220px 60px rgba(12,7,3,.85);
+    background:radial-gradient(130% 80% at 50% 26%, transparent 56%, rgba(12,7,3,.55) 100%);
+    -webkit-mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 86%);
+            mask-image:linear-gradient(180deg,#000 0,#000 58%,transparent 86%);
   }
   .mv-hero__inner { max-width:880px; }
   .mv-hero .mv-kicker { color:var(--bronze); margin:0 0 26px;
     opacity:0; animation:rise .9s .1s cubic-bezier(.2,.7,.2,1) forwards; }
   .mv-hero__rule { width:54px; height:2px; margin:0 auto 26px; background:var(--bronze);
     opacity:0; animation:grow .8s .15s cubic-bezier(.2,.7,.2,1) forwards; transform-origin:center; }
-  .mv-title { font-family:'Bebas Neue',Impact,sans-serif; line-height:.82; margin:0;
-    letter-spacing:.02em; text-shadow:0 2px 40px rgba(0,0,0,.45); }
+  .mv-title { font-family:'Bebas Neue',Impact,sans-serif; line-height:.84; margin:0;
+    letter-spacing:.02em; text-shadow:0 2px 40px rgba(0,0,0,.5); }
   .mv-title span { display:block; }
-  .mv-title .t1 { font-size:clamp(34px,6vw,68px); color:var(--bronze-soft); letter-spacing:.16em;
+  .mv-title .t1 { font-size:clamp(30px,5vw,56px); color:var(--bronze-soft); letter-spacing:.18em;
     opacity:0; animation:rise .9s .25s cubic-bezier(.2,.7,.2,1) forwards; }
-  .mv-title .t2 { font-size:clamp(78px,17vw,210px); color:var(--cream);
+  .mv-title .t2 { font-size:clamp(58px,11vw,138px); color:var(--cream);
     opacity:0; animation:rise 1s .38s cubic-bezier(.2,.7,.2,1) forwards; }
   .mv-hero__lead { font-family:'Cabin Condensed',sans-serif; font-weight:600;
     font-size:clamp(18px,2.4vw,25px); color:var(--bronze-soft); margin:22px auto 18px; max-width:620px;
-    opacity:0; animation:rise .9s .55s cubic-bezier(.2,.7,.2,1) forwards; }
-  .mv-hero__body { color:rgba(246,236,216,.78); font-size:clamp(15px,1.6vw,18px);
-    max-width:600px; margin:0 auto; opacity:0; animation:rise .9s .7s cubic-bezier(.2,.7,.2,1) forwards; }
-  .mv-scroll { position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    opacity:0; animation:rise .9s .55s cubic-bezier(.2,.7,.2,1) forwards; text-shadow:0 1px 16px rgba(0,0,0,.5); }
+  .mv-hero__body { color:var(--cream); font-size:clamp(15px,1.6vw,18px);
+    max-width:600px; margin:0 auto; opacity:0; animation:rise .9s .7s cubic-bezier(.2,.7,.2,1) forwards;
+    text-shadow:0 1px 16px rgba(0,0,0,.55); }
+  .mv-scroll { position:absolute; bottom:6vh; left:50%; transform:translateX(-50%);
     font-family:'Cabin Condensed',sans-serif; text-transform:uppercase; letter-spacing:.3em; font-size:11px;
-    color:var(--bronze); opacity:0; animation:fade 1s 1.1s forwards; }
-  .mv-scroll span { display:block; width:1px; height:34px; margin:10px auto 0;
-    background:linear-gradient(var(--bronze),transparent); animation:bob 1.8s ease-in-out infinite; }
+    color:var(--ink-soft); opacity:0; animation:fade 1s 1.1s forwards; }
+  .mv-scroll span { display:block; width:1px; height:30px; margin:9px auto 0;
+    background:linear-gradient(var(--ink-soft),transparent); animation:bob 1.8s ease-in-out infinite; }
 
   /* ====== GALERIE parchemin ====== */
-  .mv-gallery { position:relative; padding:clamp(56px,9vw,120px) clamp(18px,5vw,64px) 40px; }
+  .mv-gallery { position:relative; padding:clamp(40px,6vw,80px) var(--pad-x) 40px; }
   .mv-gallery__head { max-width:var(--maxw); margin:0 auto clamp(32px,5vw,56px);
     display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
     border-bottom:1px solid rgba(124,45,45,.22); padding-bottom:20px; }
@@ -172,21 +181,28 @@ export function renderMovementPage(photos: WallPhoto[]): string {
   .mv-empty { max-width:520px; margin:0 auto; text-align:center; padding:6vh 24px 8vh; color:var(--ink-soft);
     font-family:'Cabin Condensed',sans-serif; font-size:20px; }
 
-  /* ====== CTA ====== */
-  .mv-cta { position:relative; margin-top:clamp(40px,7vw,90px); padding:clamp(60px,10vw,120px) 24px;
+  /* ====== CTA : carte contenue (largeur photos), bord arrondi, image en fond ====== */
+  .mv-cta-wrap { max-width:var(--maxw); margin:clamp(36px,6vw,72px) auto 0; padding:0 var(--pad-x); }
+  .mv-cta { position:relative; padding:clamp(54px,9vw,108px) 24px; border-radius:22px;
     text-align:center; color:var(--cream); overflow:hidden; isolation:isolate;
-    background:linear-gradient(160deg, var(--oxblood) 0%, var(--oxblood-deep) 100%); }
+    background-color:var(--oxblood-deep);
+    background-image:
+      linear-gradient(160deg, rgba(124,45,45,.84) 0%, rgba(91,29,29,.92) 100%),
+      var(--mv-bg, none);
+    background-size:cover; background-position:center;
+    box-shadow:0 30px 60px -28px rgba(42,22,12,.6); border:1px solid rgba(196,154,91,.28); }
   .mv-cta::before { content:""; position:absolute; inset:0; z-index:-1; opacity:.5;
     background-image:repeating-radial-gradient(circle at 50% 120%, transparent 0 46px, rgba(196,154,91,.08) 46px 47px); }
-  .mv-cta h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,6vw,72px); margin:0 0 8px; letter-spacing:.03em; }
-  .mv-cta p { color:rgba(246,236,216,.8); margin:0 0 30px; }
+  .mv-cta h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(34px,5.5vw,64px); margin:0 0 8px; letter-spacing:.03em;
+    text-shadow:0 2px 24px rgba(0,0,0,.4); }
+  .mv-cta p { color:var(--cream); margin:0 0 30px; text-shadow:0 1px 14px rgba(0,0,0,.45); }
   .mv-btn { display:inline-block; font-family:'Cabin Condensed',sans-serif; text-transform:uppercase;
     letter-spacing:.18em; font-weight:700; font-size:15px; color:var(--ink); background:var(--bronze);
     padding:16px 38px; border-radius:2px; text-decoration:none;
     box-shadow:0 14px 30px -10px rgba(0,0,0,.5); transition:transform .3s, box-shadow .3s, background .3s; }
   .mv-btn:hover { transform:translateY(-3px); background:var(--bronze-soft);
     box-shadow:0 20px 40px -12px rgba(0,0,0,.6); }
-  .mv-foot { text-align:center; padding:26px; font-family:'Cabin Condensed',sans-serif;
+  .mv-foot { text-align:center; padding:30px 24px 38px; font-family:'Cabin Condensed',sans-serif;
     text-transform:uppercase; letter-spacing:.22em; font-size:11px; color:var(--ink-soft);
     background:var(--parchment); }
 
@@ -208,6 +224,7 @@ export function renderMovementPage(photos: WallPhoto[]): string {
     html{ scroll-behavior:auto; }
   }
 </style>
+${bgVar}
 </head>
 <body>
   <header class="mv-hero">
@@ -231,11 +248,13 @@ export function renderMovementPage(photos: WallPhoto[]): string {
       : `<p class="mv-empty">Les premiers visages du Mouvement arrivent bientôt. Contribue, et rejoins le mur.</p>`}
   </main>
 
-  <section class="mv-cta">
-    <h2>Rejoins le Mouvement</h2>
-    <p>Pars à l'aventure sur La Carte. Gratuit.</p>
-    <a class="mv-btn" href="https://app.runesdechene.com">Rejoindre La Carte</a>
-  </section>
+  <div class="mv-cta-wrap">
+    <section class="mv-cta">
+      <h2>Rejoins le Mouvement</h2>
+      <p>Pars à l'aventure sur La Carte. Gratuit.</p>
+      <a class="mv-btn" href="https://app.runesdechene.com">Rejoindre La Carte</a>
+    </section>
+  </div>
   <footer class="mv-foot">Runes de Chêne — Lahoussaye EI</footer>
 
   <div class="mv-lb" data-mv-lb><img src="" alt="" data-mv-lb-img /></div>

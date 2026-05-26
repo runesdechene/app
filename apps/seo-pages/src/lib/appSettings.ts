@@ -16,3 +16,18 @@ export async function getShareTextTemplate(): Promise<string> {
 
   return data.value
 }
+
+export async function getLandingImageUrl(): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'landing_image_desktop_url')
+    .single()
+
+  if (error || !data || !data.value) {
+    console.warn('[appSettings] landing_image_desktop_url indisponible:', error?.message)
+    return null
+  }
+
+  return data.value
+}
