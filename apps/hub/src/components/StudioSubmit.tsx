@@ -175,7 +175,7 @@ export function StudioSubmit() {
     return (
       <div className="studio" style={bgUrl ? { backgroundImage: `url(${bgUrl})` } : undefined}>
         <div className="studio__card studio__card--center">
-          <div className="success-icon">⚜</div>
+          <img className="success-banner" src="/assets/drapeau.svg" alt="Runes de Chêne" />
           <h2>Bienvenue dans le Mouvement !</h2>
           <p>Tes contenus partent en validation. Dès qu'ils sont adoubés, tes Couronnes de Chêne atterrissent sur ton compte — on te prévient par email.</p>
           {isNewAccount && welcomeCrowns > 0 && (

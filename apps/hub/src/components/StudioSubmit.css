@@ -62,7 +62,8 @@ textarea.studio__field { resize:none; }
 .studio__card { background:var(--cream); border-radius:18px; padding:40px 34px; max-width:460px; box-shadow:0 26px 60px rgba(20,14,6,.45); text-align:center; }
 .studio__card--center { display:flex; flex-direction:column; align-items:center; gap:12px; }
 .studio__cta { display:inline-block; margin-top:8px; background:var(--ink); color:#fff; text-decoration:none; padding:13px 26px; border-radius:12px; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:.04em; cursor:pointer; }
-.success-icon { font-size:2.4rem; } .error-icon { font-size:2rem; color:var(--red); }
+.success-banner { width:78px; height:auto; display:block; margin:0 auto 4px; }
+.error-icon { font-size:2rem; color:var(--red); }
 .reward-badge { display:flex; flex-direction:column; align-items:center; gap:4px; margin:8px auto; padding:14px 22px; background:#241d12; color:#e9d9b6; border-radius:12px; }
 .reward-badge-label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; opacity:.8; } .reward-badge-amount { font-size:22px; font-weight:700; }
 
