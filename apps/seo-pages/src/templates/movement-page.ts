@@ -85,6 +85,19 @@ export function renderMovementPage(photos: WallPhoto[], bgUrl: string | null = n
   .mv-kicker { font-family:'Cabin Condensed',sans-serif; text-transform:uppercase; letter-spacing:.42em;
     font-weight:600; font-size:13px; }
 
+  /* ====== Barre du haut (retour boutique) ====== */
+  .mv-topbar { position:absolute; top:0; left:0; right:0; z-index:5;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:20px var(--pad-x); opacity:0; animation:fade .9s .15s forwards; }
+  .mv-topbar__brand { font-family:'Bebas Neue',sans-serif; letter-spacing:.14em; font-size:21px;
+    color:var(--cream); text-decoration:none; opacity:.92; text-shadow:0 1px 12px rgba(0,0,0,.5); }
+  .mv-topbar__brand:hover { opacity:1; }
+  .mv-topbar__shop { font-family:'Cabin Condensed',sans-serif; text-transform:uppercase; letter-spacing:.16em;
+    font-size:13px; font-weight:700; color:var(--ink); background:var(--bronze);
+    padding:9px 18px; border-radius:2px; text-decoration:none; white-space:nowrap;
+    transition:background .3s, transform .3s; }
+  .mv-topbar__shop:hover { background:var(--bronze-soft); transform:translateY(-1px); }
+
   /* ====== HERO : image landing -> degrade parchemin ====== */
   .mv-hero {
     position:relative; min-height:100svh; display:flex; flex-direction:column;
@@ -202,6 +215,17 @@ export function renderMovementPage(photos: WallPhoto[], bgUrl: string | null = n
     box-shadow:0 14px 30px -10px rgba(0,0,0,.5); transition:transform .3s, box-shadow .3s, background .3s; }
   .mv-btn:hover { transform:translateY(-3px); background:var(--bronze-soft);
     box-shadow:0 20px 40px -12px rgba(0,0,0,.6); }
+  .mv-btn--ghost { background:transparent; color:var(--cream); border:1px solid var(--bronze-soft);
+    box-shadow:none; }
+  .mv-btn--ghost:hover { background:rgba(217,189,138,.16); color:var(--cream); }
+  .mv-cta__grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(22px,4vw,52px);
+    max-width:760px; margin:30px auto 0; }
+  @media (max-width:620px){ .mv-cta__grid{ grid-template-columns:1fr; gap:34px; } }
+  .mv-cta__dest { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .mv-cta__dest h3 { font-family:'Bebas Neue',sans-serif; font-size:clamp(26px,4vw,38px); margin:0;
+    letter-spacing:.05em; color:var(--cream); text-shadow:0 2px 18px rgba(0,0,0,.4); }
+  .mv-cta__dest p { margin:0 0 10px; font-size:15px; color:var(--cream); opacity:.92; line-height:1.45;
+    text-shadow:0 1px 12px rgba(0,0,0,.4); }
   .mv-foot { text-align:center; padding:30px 24px 38px; font-family:'Cabin Condensed',sans-serif;
     text-transform:uppercase; letter-spacing:.22em; font-size:11px; color:var(--ink-soft);
     background:var(--parchment); }
@@ -228,6 +252,10 @@ ${bgVar}
 </head>
 <body>
   <header class="mv-hero">
+    <nav class="mv-topbar">
+      <a class="mv-topbar__brand" href="https://runesdechene.com">Runes de Chêne</a>
+      <a class="mv-topbar__shop" href="https://runesdechene.com">← La Boutique</a>
+    </nav>
     <div class="mv-hero__inner">
       <p class="mv-kicker">${MANIFESTO_KICKER}</p>
       <div class="mv-hero__rule"></div>
@@ -251,8 +279,19 @@ ${bgVar}
   <div class="mv-cta-wrap">
     <section class="mv-cta">
       <h2>Rejoins le Mouvement</h2>
-      <p>Pars à l'aventure sur La Carte. Gratuit.</p>
-      <a class="mv-btn" href="https://app.runesdechene.com">Rejoindre La Carte</a>
+      <p>Deux chemins, un même élan.</p>
+      <div class="mv-cta__grid">
+        <div class="mv-cta__dest">
+          <h3>La Carte</h3>
+          <p>Pars à l'aventure. 2 600+ lieux à explorer. Gratuit.</p>
+          <a class="mv-btn" href="https://app.runesdechene.com">Ouvrir La Carte</a>
+        </div>
+        <div class="mv-cta__dest">
+          <h3>La Boutique</h3>
+          <p>Porte le Mouvement. Découvre les pièces.</p>
+          <a class="mv-btn mv-btn--ghost" href="https://runesdechene.com">Visiter la Boutique</a>
+        </div>
+      </div>
     </section>
   </div>
   <footer class="mv-foot">Runes de Chêne — Lahoussaye EI</footer>
