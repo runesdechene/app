@@ -20,9 +20,9 @@ ALTER TABLE public.hub_review_submissions
 -- Montants de départ (50 / 20) — à ajuster par Uriel.
 -- ============================================================
 INSERT INTO public.app_settings (key, value) VALUES
-  ('ugc_welcome_crowns',          '50'),
-  ('ugc_reward_crowns',           '20'),
-  ('ugc_first_contribution_crowns','100'),
+  ('ugc_welcome_crowns',          '20'),
+  ('ugc_reward_crowns',           '10'),
+  ('ugc_first_contribution_crowns','30'),
   ('email_from',                  'Runes de Chêne <communaute@runesdechene.com>'),
   ('email_trigger_secret',        'PLACEHOLDER_set_after_deploy'),
   ('edge_function_send_email_url','PLACEHOLDER_set_after_deploy'),

@@ -268,7 +268,7 @@ INSERT INTO public.hub_photo_submissions (user_id, submitter_name, submitter_ema
 VALUES ('test-ugc-1','Testeur','test-ugc-1@example.com','pending') RETURNING id;
 -- (remplacer <ID> par l'id retourné)
 SELECT public.moderate_submission('<ID>','approved');
-SELECT balance FROM public.user_crowns WHERE user_id='test-ugc-1';          -- attendu 170 (50 bienvenue + 20 reward + 100 1re contribution)
+SELECT balance FROM public.user_crowns WHERE user_id='test-ugc-1';          -- attendu 60 (20 bienvenue + 10 reward + 30 1re contribution)
 SELECT contributions_count FROM public.users WHERE id='test-ugc-1';          -- attendu 1
 -- ré-approbation : ne doit PAS re-payer
 SELECT public.moderate_submission('<ID>','archived');
