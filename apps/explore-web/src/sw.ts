@@ -3,7 +3,7 @@
 
 // Service Worker custom — Runes de Chêne PWA
 // - Précache via injectManifest (workbox)
-// - SPA navigation fallback (sauf /lieu/* et /sitemap*)
+// - SPA navigation fallback (sauf /lieu/*, /sitemap* et /mouvement — servis par seo-pages)
 // - Push notifications (showNotification + click → focus tab)
 // - Handler message KILL_SWITCH pour UpdateBanner.forceUpdate
 // Spec push : docs/superpowers/specs/2026-05-09-push-notifications-design.md
@@ -17,7 +17,7 @@ cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
 
 // SPA navigation fallback (sauf SEO pages et sitemap)
-const denylist: RegExp[] = [/^\/lieu\//, /^\/sitemap/]
+const denylist: RegExp[] = [/^\/lieu\//, /^\/sitemap/, /^\/mouvement(\/|$)/]
 
 // matchPrecache résout dynamiquement le nom de cache workbox
 // (workbox-precache-v2-<scope>). caches.open('workbox-precache-v2')
