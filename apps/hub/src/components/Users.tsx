@@ -21,7 +21,6 @@ interface HubUser {
   isClient?: boolean
   exploration_points?: number
   erudition_points?: number
-  influence_stock?: number
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -64,7 +63,7 @@ export function Users() {
         while (true) {
           let query = supabase
             .from('users')
-            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, exploration_points, erudition_points, influence_stock, factions(title)')
+            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, exploration_points, erudition_points, factions(title)')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
 
@@ -433,7 +432,7 @@ export function Users() {
                         : <span style={{ color: '#8A7B6A' }}>Non</span>
                       }
                     </td>
-                    <td style={{ fontSize: 11, textAlign: 'center' }} title={`Exploration: ${user.exploration_points ?? 0} | Erudition: ${user.erudition_points ?? 0} | Influence: ${user.influence_stock ?? 0}`}>
+                    <td style={{ fontSize: 11, textAlign: 'center' }} title={`Exploration: ${user.exploration_points ?? 0} | Erudition: ${user.erudition_points ?? 0}`}>
                       {user.isPending ? '-' : (user.exploration_points ?? 0) + (user.erudition_points ?? 0)}
                     </td>
                     <td>

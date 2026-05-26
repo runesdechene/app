@@ -18,7 +18,6 @@ interface UserInfo {
   notoriety_points: number
   exploration_points: number
   erudition_points: number
-  influence_stock: number
   energy_points: number
   max_energy: number
   game_mode: string | null
@@ -86,7 +85,7 @@ export function UserDetail() {
       // Fetch user
       const { data: userData, error: userErr } = await supabase
         .from('users')
-        .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, faction_id, account_source, shopify_customer_id, avatar_url, notoriety_points, exploration_points, erudition_points, influence_stock, energy_points, max_energy, game_mode')
+        .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, faction_id, account_source, shopify_customer_id, avatar_url, notoriety_points, exploration_points, erudition_points, energy_points, max_energy, game_mode')
         .eq('id', userId!)
         .single()
 
@@ -208,10 +207,6 @@ export function UserDetail() {
         <div className="ud-card">
           <div className="ud-card-label">Erudition</div>
           <div className="ud-card-value">{user.erudition_points ?? 0}</div>
-        </div>
-        <div className="ud-card">
-          <div className="ud-card-label">Influence</div>
-          <div className="ud-card-value">{user.influence_stock ?? 0}</div>
         </div>
         <div className="ud-card">
           <div className="ud-card-label">Energie</div>
