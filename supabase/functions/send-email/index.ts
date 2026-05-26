@@ -54,20 +54,44 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
   // (re)connecter. La ligne « connecte-toi avec cet email » couvre aussi les ~10% de comptes neufs.
   return {
     subject: 'Ta contribution rejoint le Mouvement ⚜️',
-    html: `<!doctype html><html><body style="margin:0;background:#f4efe6;font-family:Georgia,serif;color:#2b2218">
-  <div style="max-width:560px;margin:0 auto;padding:40px 28px">
-    <h1 style="font-size:24px;margin:0 0 8px">Merci, ${name}.</h1>
-    <p style="font-size:16px;line-height:1.6">Ta contribution vient d'être adoubée par notre équipe et rejoint <strong>Le Mouvement Runes de Chêne</strong>.</p>
-    <div style="margin:24px 0;padding:18px 22px;background:#2b2218;color:#e9d9b6;border-radius:10px;text-align:center">
-      <div style="font-size:14px;letter-spacing:.05em;text-transform:uppercase;opacity:.8">Créditées sur ton compte</div>
-      <div style="font-size:28px;font-weight:bold;margin-top:4px">+${crowns} Couronnes de Chêne</div>
-    </div>
-    <p style="font-size:16px;line-height:1.6">Retrouve-les sur <strong>La Carte</strong> — connecte-toi avec cet email pour les dépenser.</p>
-    <p style="text-align:center;margin:28px 0">
-      <a href="https://app.runesdechene.com" style="display:inline-block;background:#8a6d3b;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:16px">Ouvrir La Carte →</a>
-    </p>
-    <p style="font-size:13px;color:#8a7d68;line-height:1.5">Tu reçois cet email parce que tu as partagé du contenu avec Runes de Chêne. À très vite sur les chemins.</p>
-  </div></body></html>`,
+    html: `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"></head>
+<body style="margin:0;padding:0;background:#e3d4b6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e9ddc7;background:linear-gradient(180deg,#efe4cf 0%,#e1d1b2 100%);padding:32px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
+        <tr><td style="height:6px;background:linear-gradient(90deg,#b8945a,#9a7b41,#cda86a);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td align="center" style="padding:36px 40px 0;">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:6px;color:#9a7b41;text-transform:uppercase;">Runes de Chêne</div>
+          <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#b6a07a;text-transform:uppercase;margin-top:8px;">⚜&nbsp;&nbsp;Le Mouvement&nbsp;&nbsp;⚜</div>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 44px 0;">
+          <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#2b2114;">Merci, ${name}.</h1>
+          <p style="margin:14px 0 0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Ta contribution a été <em>adoubée</em> par notre équipe.<br>Elle rejoint désormais le Mouvement Runes de Chêne.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:30px 0 4px;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" width="152" height="152" style="width:152px;height:152px;background:#241d12;background:radial-gradient(circle at 50% 36%,#352a19,#1b150c);border:2px solid #b8945a;border-radius:50%;">
+            <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#c8ad79;text-transform:uppercase;">Créditées</div>
+            <div style="font-family:Georgia,'Hoefler Text',serif;font-size:48px;line-height:1;color:#e8cd92;padding:4px 0;">+${crowns}</div>
+            <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:2px;color:#c8ad79;text-transform:uppercase;">Couronnes</div>
+          </td></tr></table>
+        </td></tr>
+        <tr><td align="center" style="padding:16px 48px 0;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Tes Couronnes de Chêne t'attendent sur <strong style="color:#2b2114;">l'application</strong>.<br>Connecte-toi avec cet email pour les dépenser.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:28px 0 4px;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" style="border-radius:10px;background:#8a6d3b;background:linear-gradient(180deg,#a9874c,#876a39);box-shadow:0 6px 16px rgba(138,109,59,0.40);">
+            <a href="https://app.runesdechene.com" style="display:inline-block;padding:15px 36px;font-family:Georgia,serif;font-size:16px;color:#fff7e8;text-decoration:none;letter-spacing:.5px;">Ouvrir l'application&nbsp;→</a>
+          </td></tr></table>
+        </td></tr>
+        <tr><td align="center" style="padding:30px 48px 0;"><div style="font-size:13px;color:#c4ac80;letter-spacing:5px;">✦&nbsp;⚜&nbsp;✦</div></td></tr>
+        <tr><td align="center" style="padding:14px 48px 38px;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:12px;line-height:1.6;color:#9b8b6e;font-style:italic;">Tu reçois ce message car tu as partagé du contenu avec Runes de Chêne.<br>À très vite sur les chemins.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
   }
 }
 

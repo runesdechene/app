@@ -342,17 +342,17 @@ export function PhotoSubmit() {
             {isNewAccount ? (
               <p>
                 Votre compte <strong>Runes de Chêne</strong> ({form.email}) vient d'être créé.
-                Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.
+                Retrouvez vos Couronnes et la communauté sur <strong>l'application</strong>.
               </p>
             ) : (
               <p>
                 Vos photos sont rattachées à votre compte <strong>Runes de Chêne</strong> ({form.email}).
-                Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.
+                Retrouvez vos Couronnes et la communauté sur <strong>l'application</strong>.
               </p>
             )}
           </div>
           <a href="https://app.runesdechene.com" target="_blank" rel="noopener noreferrer" className="btn-primary">
-            Découvrir La Carte →
+            Découvrir l'application →
           </a>
           <button onClick={resetForm} className="btn-secondary">
             Envoyer d'autres photos
