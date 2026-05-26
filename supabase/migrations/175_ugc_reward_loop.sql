@@ -17,7 +17,7 @@ ALTER TABLE public.hub_review_submissions
 
 -- ============================================================
 -- CONFIG (montants tunables + secrets email ; PLACEHOLDER = renseignés post-deploy)
--- Montants de départ (50 / 20) — à ajuster par Uriel.
+-- Montants validés Uriel (2026-05-26) : 20 bienvenue / 10 par contribution / 30 première.
 -- ============================================================
 INSERT INTO public.app_settings (key, value) VALUES
   ('ugc_welcome_crowns',          '20'),

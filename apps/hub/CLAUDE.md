@@ -43,3 +43,20 @@ Toujours requêter par **email** (pas par id), voir Citadelle `DEV/Architecture/
 `Divers.tsx` héberge la section **Bascules récentes** (V0.7 phase 5, 5 mai 2026) :
 listing des `place_taken_remote` des 30 derniers jours pour suivre l'usage de
 **La Cour** (influence à distance) et détecter d'éventuels abus.
+
+## Boucle récompense UGC (Brique 1, mai 2026)
+
+> Spec : `docs/superpowers/specs/2026-05-26-ugc-mouvement-model-design.md` · Plan : `docs/superpowers/plans/2026-05-26-ugc-brique1-boucle-recompense.md` (mig 175)
+
+La modération (`Photos.tsx` / `Reviews.tsx` → `moderate_submission` / `moderate_review`)
+crédite des **Couronnes** + incrémente `users.contributions_count` **à la 1re validation**
+(idempotent via `rewarded_at` — re-valider un archivé ne re-paie pas). `create_user_from_submission`
+crédite un **bonus de bienvenue** (comptes neufs). Un **bonus 1re contribution** s'ajoute pour
+tout compte (`contributions_count = 0`). La **Gloire n'est jamais touchée** (anti-triche, mig 024).
+
+À la validation, une notif `contribution_approved` est insérée → trigger `email_on_notification`
+→ edge function **`send-email`** (Resend) qui envoie l'email d'acceptation (+ push existant en bonus).
+Montants tunables dans `app_settings` : `ugc_welcome_crowns` (20), `ugc_reward_crowns` (10),
+`ugc_first_contribution_crowns` (30). Secrets email aussi dans `app_settings`
+(`resend_api_key`, `email_trigger_secret`, `edge_function_send_email_url`, `email_from`).
+Les écrans de fin des formulaires publics affichent les Couronnes via la RPC `get_ugc_reward_config`.
