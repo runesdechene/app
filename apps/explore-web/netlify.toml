@@ -25,6 +25,12 @@
   force = true
 
 [[redirects]]
+  from = "/mouvement"
+  to = "https://rdc-seo-pages.netlify.app/mouvement"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
