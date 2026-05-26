@@ -22,6 +22,7 @@ ALTER TABLE public.hub_review_submissions
 INSERT INTO public.app_settings (key, value) VALUES
   ('ugc_welcome_crowns',          '50'),
   ('ugc_reward_crowns',           '20'),
+  ('ugc_first_contribution_crowns','100'),
   ('email_from',                  'Runes de Chêne <communaute@runesdechene.com>'),
   ('email_trigger_secret',        'PLACEHOLDER_set_after_deploy'),
   ('edge_function_send_email_url','PLACEHOLDER_set_after_deploy'),
@@ -65,6 +66,7 @@ DECLARE
   v_user_id  text;
   v_rewarded timestamptz;
   v_reward   int;
+  v_count    int;
 BEGIN
   UPDATE hub_photo_submissions
   SET status = p_status, moderated_at = NOW()
@@ -73,6 +75,14 @@ BEGIN
 
   IF p_status = 'approved' AND v_rewarded IS NULL AND v_user_id IS NOT NULL THEN
     SELECT COALESCE(value::int, 0) INTO v_reward FROM app_settings WHERE key = 'ugc_reward_crowns';
+
+    -- Bonus "première contribution" : pour TOUT compte (neuf ou client existant) dont c'est
+    -- la 1re contribution validée (contributions_count encore à 0 avant l'incrément ci-dessous).
+    SELECT contributions_count INTO v_count FROM users WHERE id = v_user_id;
+    IF COALESCE(v_count, 0) = 0 THEN
+      v_reward := v_reward + COALESCE((SELECT value::int FROM app_settings WHERE key = 'ugc_first_contribution_crowns'), 0);
+    END IF;
+
     IF v_reward > 0 THEN
       INSERT INTO public.user_crowns (user_id, balance, updated_at)
       VALUES (v_user_id, LEAST(500, v_reward), now())
@@ -100,6 +110,7 @@ DECLARE
   v_user_id  text;
   v_rewarded timestamptz;
   v_reward   int;
+  v_count    int;
 BEGIN
   UPDATE hub_review_submissions
   SET status = p_status, moderated_at = NOW(), rejection_reason = p_rejection_reason
@@ -108,6 +119,14 @@ BEGIN
 
   IF p_status = 'approved' AND v_rewarded IS NULL AND v_user_id IS NOT NULL THEN
     SELECT COALESCE(value::int, 0) INTO v_reward FROM app_settings WHERE key = 'ugc_reward_crowns';
+
+    -- Bonus "première contribution" : pour TOUT compte (neuf ou client existant) dont c'est
+    -- la 1re contribution validée (contributions_count encore à 0 avant l'incrément ci-dessous).
+    SELECT contributions_count INTO v_count FROM users WHERE id = v_user_id;
+    IF COALESCE(v_count, 0) = 0 THEN
+      v_reward := v_reward + COALESCE((SELECT value::int FROM app_settings WHERE key = 'ugc_first_contribution_crowns'), 0);
+    END IF;
+
     IF v_reward > 0 THEN
       INSERT INTO public.user_crowns (user_id, balance, updated_at)
       VALUES (v_user_id, LEAST(500, v_reward), now())

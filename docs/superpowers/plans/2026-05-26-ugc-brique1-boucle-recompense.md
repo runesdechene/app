@@ -66,6 +66,8 @@ Faits vérifiés : `user_crowns(user_id text PK, balance int CHECK 0..500, updat
 **Files:**
 - Create: `supabase/migrations/175_ugc_reward_loop.sql`
 
+> **MAJ 2026-05-26 (décision D5bis)** : la migration livrée inclut en plus un **bonus « première contribution »** (`app_settings.ugc_first_contribution_crowns`, défaut 100). Les RPC `moderate_submission`/`moderate_review` lisent `contributions_count` avant l'incrément : si `= 0`, elles ajoutent ce bonus à `v_reward`. La notif `data.crowns` reflète le **total** crédité (pour que l'email affiche le bon montant). Le fichier `175_ugc_reward_loop.sql` réel est la source de vérité.
+
 - [ ] **Step 1 : Écrire la migration complète**
 
 ```sql
@@ -266,14 +268,14 @@ INSERT INTO public.hub_photo_submissions (user_id, submitter_name, submitter_ema
 VALUES ('test-ugc-1','Testeur','test-ugc-1@example.com','pending') RETURNING id;
 -- (remplacer <ID> par l'id retourné)
 SELECT public.moderate_submission('<ID>','approved');
-SELECT balance FROM public.user_crowns WHERE user_id='test-ugc-1';          -- attendu 70 (50+20)
+SELECT balance FROM public.user_crowns WHERE user_id='test-ugc-1';          -- attendu 170 (50 bienvenue + 20 reward + 100 1re contribution)
 SELECT contributions_count FROM public.users WHERE id='test-ugc-1';          -- attendu 1
 -- ré-approbation : ne doit PAS re-payer
 SELECT public.moderate_submission('<ID>','archived');
 SELECT public.moderate_submission('<ID>','approved');
 SELECT balance, contributions_count FROM public.user_crowns c JOIN public.users u ON u.id=c.user_id WHERE c.user_id='test-ugc-1';
 ```
-Expected: après ré-approbation, `balance` reste **70** et `contributions_count` reste **1** (idempotent via `rewarded_at`).
+Expected: après ré-approbation, `balance` reste **170** et `contributions_count` reste **1** (idempotent via `rewarded_at`).
 
 - [ ] **Step 5 : Vérifier la notif émise**
 

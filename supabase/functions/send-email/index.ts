@@ -49,19 +49,22 @@ const ok = () => new Response(JSON.stringify({ ok: true }), { headers: { 'Conten
 
 function renderContributionApproved(firstName: string, crowns: number): { subject: string; html: string } {
   const name = firstName?.trim() || 'Ami du Mouvement'
+  // Tonalité pensée pour la majorité (~90% de comptes déjà existants, clients Shopify/stand
+  // avec fragments activés) : on n'introduit pas l'appli comme à un inconnu, on invite à se
+  // (re)connecter. La ligne « connecte-toi avec cet email » couvre aussi les ~10% de comptes neufs.
   return {
     subject: 'Ta contribution rejoint le Mouvement ⚜️',
     html: `<!doctype html><html><body style="margin:0;background:#f4efe6;font-family:Georgia,serif;color:#2b2218">
   <div style="max-width:560px;margin:0 auto;padding:40px 28px">
     <h1 style="font-size:24px;margin:0 0 8px">Merci, ${name}.</h1>
-    <p style="font-size:16px;line-height:1.6">Ta contribution a été adoubée par notre équipe et rejoint <strong>Le Mouvement Runes de Chêne</strong>.</p>
+    <p style="font-size:16px;line-height:1.6">Ta contribution vient d'être adoubée par notre équipe et rejoint <strong>Le Mouvement Runes de Chêne</strong>.</p>
     <div style="margin:24px 0;padding:18px 22px;background:#2b2218;color:#e9d9b6;border-radius:10px;text-align:center">
-      <div style="font-size:14px;letter-spacing:.05em;text-transform:uppercase;opacity:.8">Récompense créditée</div>
+      <div style="font-size:14px;letter-spacing:.05em;text-transform:uppercase;opacity:.8">Créditées sur ton compte</div>
       <div style="font-size:28px;font-weight:bold;margin-top:4px">+${crowns} Couronnes de Chêne</div>
     </div>
-    <p style="font-size:16px;line-height:1.6">Elles t'attendent sur <strong>La Carte</strong>, notre application communautaire.</p>
+    <p style="font-size:16px;line-height:1.6">Retrouve-les sur <strong>La Carte</strong> — connecte-toi avec cet email pour les dépenser.</p>
     <p style="text-align:center;margin:28px 0">
-      <a href="https://app.runesdechene.com" style="display:inline-block;background:#8a6d3b;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:16px">Récupérer mes Couronnes →</a>
+      <a href="https://app.runesdechene.com" style="display:inline-block;background:#8a6d3b;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:16px">Ouvrir La Carte →</a>
     </p>
     <p style="font-size:13px;color:#8a7d68;line-height:1.5">Tu reçois cet email parce que tu as partagé du contenu avec Runes de Chêne. À très vite sur les chemins.</p>
   </div></body></html>`,

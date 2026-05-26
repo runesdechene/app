@@ -75,6 +75,12 @@ on ne récompense que le contenu qu'on garde.
 - **Récompense par contribution** (Couronnes + `Contributions++`) livrée **à la validation**,
   par **email d'acceptation**.
 
+### D5bis — Réalité 90/10 + bonus « première contribution » pour tous (validé 2026-05-26)
+**Fait produit** : ~90% des contributeurs ont **déjà un compte** (précompte Shopify + stand, fragments activés). Seuls ~10% sont des emails inconnus. Conséquences :
+- Le **bonus de bienvenue** (D5) ne se déclenche donc que pour les ~10% de comptes neufs — c'est correct par construction (lié à `create_user_from_submission`).
+- Pour récompenser aussi les 90% de clients fidèles, on ajoute un **bonus « première contribution »** : la **1re contribution validée de N'IMPORTE QUEL compte** (neuf ou existant, détecté via `contributions_count = 0` au moment de la validation) reçoit un bonus majoré. Stacke avec le bonus de bienvenue pour un compte neuf — montants tunables dans `app_settings` (`ugc_first_contribution_crowns`).
+- L'**email d'acceptation** est rédigé pour la majorité (compte déjà existant) : pas de ton « inconnu / découvre l'appli », mais « tes Couronnes sont créditées sur ton compte, connecte-toi » — formulation inclusive qui couvre aussi les 10% neufs. Template **unique** (pas de branchement new/returning : YAGNI).
+
 ### D6 — Canal de notification : email primaire, push secondaire (validé)
 - **Email = universel.** On a l'email (clé du compte). L'email d'acceptation **EST le CTA de
   conversion**, envoyé au meilleur moment. Atteint le client pur qui n'a pas l'appli.
