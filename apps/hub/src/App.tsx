@@ -5,7 +5,7 @@ import { Dashboard } from './components/Dashboard'
 import { Users } from './components/Users'
 import { UserDetail } from './components/UserDetail'
 import { Photos } from './components/Photos'
-import { PhotoSubmit } from './components/PhotoSubmit'
+import { StudioSubmit } from './components/StudioSubmit'
 import { Reviews } from './components/Reviews'
 import { ReviewSubmit } from './components/ReviewSubmit'
 import { TagsManager } from './components/TagsManager'
@@ -51,7 +51,7 @@ function App() {
   if (isPublicRoute) {
     return (
       <Routes>
-        <Route path="/soumettre-contenu" element={<PhotoSubmit />} />
+        <Route path="/soumettre-contenu" element={<StudioSubmit />} />
         <Route path="/soumettre-avis" element={<ReviewSubmit />} />
       </Routes>
     )
