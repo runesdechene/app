@@ -202,6 +202,10 @@ export function Photos() {
         ...s,
         hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, status } : img),
       })))
+      // si on archive une image déjà poussée sur une fiche produit, la retirer de Shopify
+      if (status === 'archived') {
+        await unlinkImageFromProduct(subId, imageId)
+      }
     }
   }
 
