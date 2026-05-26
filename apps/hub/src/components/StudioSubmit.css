@@ -34,7 +34,7 @@
 .studio__h { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,4vw,2.7rem); line-height:1; color:var(--red); margin:.2rem 0 0; }
 .studio__lead { opacity:.9; margin:.3rem 0 0; }
 
-.studio__drop { margin-top:16px; border:2px dashed var(--line); border-radius:14px; background:rgba(255,255,255,.4); padding:28px; text-align:center; cursor:pointer; font-family:'Cabin Condensed',sans-serif; color:var(--ink); transition:.2s; }
+.studio__drop { flex:1; min-height:220px; margin-top:16px; display:flex; align-items:center; justify-content:center; text-align:center; border:2px dashed var(--line); border-radius:14px; background:rgba(255,255,255,.4); padding:28px; cursor:pointer; font-family:'Cabin Condensed',sans-serif; font-size:1.05rem; color:var(--ink); transition:.2s; }
 .studio__drop:hover { border-color:var(--red); background:rgba(150,62,62,.06); }
 .studio__thumbs { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
 .studio__thumb { position:relative; width:84px; height:84px; }
