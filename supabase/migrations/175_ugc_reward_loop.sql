@@ -23,7 +23,7 @@ INSERT INTO public.app_settings (key, value) VALUES
   ('ugc_welcome_crowns',          '20'),
   ('ugc_reward_crowns',           '10'),
   ('ugc_first_contribution_crowns','30'),
-  ('email_from',                  'Runes de Chêne <communaute@runesdechene.com>'),
+  ('email_from',                  'Runes de Chêne <communaute@mail.runesdechene.com>'),
   ('email_trigger_secret',        'PLACEHOLDER_set_after_deploy'),
   ('edge_function_send_email_url','PLACEHOLDER_set_after_deploy'),
   ('resend_api_key',              'PLACEHOLDER_set_in_dashboard')
