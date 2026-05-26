@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import JSZip from 'jszip'
 import { supabase } from '../lib/supabase'
+import { searchShopifyProducts, pushImageToProduct, deleteProductImage, type ShopifyProductHit } from '../lib/shopifyProducts'
 
 type PhotoStatus = 'pending' | 'approved' | 'archived'
 type SubmitterRole = 'client' | 'ambassadeur' | 'partenaire'
@@ -15,6 +16,10 @@ interface SubmissionImage {
   status: 'pending' | 'approved' | 'archived'
   size: string | null            // valeur taille, 'none' = aucun produit porté, null = non renseigné
   product_worn: string | null    // produit tagué au hub, par photo
+  shopify_product_id: string | null
+  shopify_product_handle: string | null
+  shopify_product_title: string | null
+  shopify_media_id: string | null
 }
 
 interface PhotoTag {
@@ -97,6 +102,13 @@ export function Photos() {
   const [editingProductId, setEditingProductId] = useState<string | null>(null)
   const [editingProductText, setEditingProductText] = useState('')
 
+  // Shopify product picker state
+  const [pickerImageId, setPickerImageId] = useState<string | null>(null)
+  const [pickerTerm, setPickerTerm] = useState('')
+  const [pickerHits, setPickerHits] = useState<ShopifyProductHit[]>([])
+  const [pickerBusy, setPickerBusy] = useState(false)
+  const [pickerError, setPickerError] = useState<string | null>(null)
+
   // Download state
   const [downloadSince, setDownloadSince] = useState('')
   const [isDownloading, setIsDownloading] = useState(false)
@@ -147,6 +159,20 @@ export function Photos() {
     fetchSubmissions()
   }, [filter])
 
+  // Debounced Shopify product search
+  useEffect(() => {
+    if (!pickerImageId) return
+    const t = setTimeout(async () => {
+      try {
+        setPickerError(null)
+        setPickerHits(await searchShopifyProducts(pickerTerm))
+      } catch (e) {
+        setPickerError(e instanceof Error ? e.message : String(e))
+      }
+    }, 300)
+    return () => clearTimeout(t)
+  }, [pickerTerm, pickerImageId])
+
   const filteredSubmissions = submissions
     .filter(s => roleFilter === 'all' || s.submitter_role === roleFilter)
     .filter(s => tagFilter === 'all' || s.tags.some(t => t.id === tagFilter))
@@ -179,14 +205,53 @@ export function Photos() {
     }
   }
 
-  const setImageProduct = async (subId: string, imageId: string, product: string) => {
-    const clean = product.trim() || null
-    const { error } = await supabase.rpc('set_submission_image_product', { p_image_id: imageId, p_product: clean })
-    if (!error) {
+  const linkImageToProduct = async (subId: string, imageId: string, hit: ShopifyProductHit) => {
+    const sub = submissions.find(s => s.id === subId)
+    const img = sub?.hub_submission_images.find(i => i.id === imageId)
+    if (!sub || !img) return
+    setPickerBusy(true)
+    setPickerError(null)
+    try {
+      const alt = sub.submitter_name || 'Communaute Runes de Chene'
+      const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
+      await supabase.rpc('set_submission_image_shopify_product', {
+        p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title,
+      })
+      await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
       setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
         ...s,
-        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, product_worn: clean } : img),
+        hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? {
+          ...i, shopify_product_id: hit.productId, shopify_product_handle: hit.handle,
+          shopify_product_title: hit.title, shopify_media_id: mediaId,
+        } : i),
       })))
+      setPickerImageId(null); setPickerTerm(''); setPickerHits([])
+    } catch (e) {
+      setPickerError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setPickerBusy(false)
+    }
+  }
+
+  const unlinkImageFromProduct = async (subId: string, imageId: string) => {
+    const sub = submissions.find(s => s.id === subId)
+    const img = sub?.hub_submission_images.find(i => i.id === imageId)
+    if (!sub || !img || !img.shopify_product_id) return
+    setPickerBusy(true)
+    setPickerError(null)
+    try {
+      if (img.shopify_media_id) await deleteProductImage(img.shopify_product_id, img.shopify_media_id)
+      await supabase.rpc('clear_submission_image_shopify_product', { p_image_id: imageId })
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
+        ...s,
+        hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? {
+          ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null,
+        } : i),
+      })))
+    } catch (e) {
+      setPickerError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setPickerBusy(false)
     }
   }
 
@@ -738,11 +803,36 @@ export function Photos() {
                             <button className={img.status === 'approved' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'approved')}>Garder</button>
                             <button className={img.status === 'archived' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'archived')}>Archiver</button>
                           </div>
-                          <input
-                            className="img-product" placeholder="Produit porté (tag hub)"
-                            defaultValue={img.product_worn ?? ''}
-                            onBlur={(e) => setImageProduct(sub.id, img.id, e.target.value)}
-                          />
+                          {img.shopify_product_id ? (
+                            <div className="img-product-linked">
+                              <span title={`Relie a ${img.shopify_product_title}`}>🏷 {img.shopify_product_title}</span>
+                              <button type="button" className="img-product-unlink" disabled={pickerBusy}
+                                onClick={() => unlinkImageFromProduct(sub.id, img.id)}>Retirer ✕</button>
+                            </div>
+                          ) : pickerImageId === img.id ? (
+                            <div className="img-product-picker">
+                              <input autoFocus className="img-product" placeholder="Chercher un produit..."
+                                value={pickerTerm} onChange={e => setPickerTerm(e.target.value)} disabled={pickerBusy} />
+                              {pickerError && <div className="img-product-error">{pickerError}</div>}
+                              <ul className="img-product-results">
+                                {pickerHits.map(hit => (
+                                  <li key={hit.productId}>
+                                    <button type="button" disabled={pickerBusy} onClick={() => linkImageToProduct(sub.id, img.id, hit)}>
+                                      {hit.imageUrl && <img src={hit.imageUrl} alt="" width={28} height={28} />}
+                                      <span>{hit.title}</span>
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                              <button type="button" className="img-product-cancel"
+                                onClick={() => { setPickerImageId(null); setPickerTerm(''); setPickerHits([]) }}>Annuler</button>
+                            </div>
+                          ) : (
+                            <button type="button" className="img-product-link-btn"
+                              onClick={() => { setPickerImageId(img.id); setPickerTerm(''); setPickerHits([]); setPickerError(null) }}>
+                              🔗 Relier à un produit
+                            </button>
+                          )}
                         </div>
                         <button
                           className="btn-download-img"
