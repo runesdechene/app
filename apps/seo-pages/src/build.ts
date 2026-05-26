@@ -5,6 +5,8 @@ import { getAllPlacesWithSlugs, getPlaceContributions, getNearbyPlaces, getTotal
 import { getShareTextTemplate } from './lib/appSettings';
 import { renderPage } from './templates/page';
 import { renderSitemap } from './templates/sitemap';
+import { getMovementWallPhotos } from './lib/movement';
+import { renderMovementPage } from './templates/movement-page';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -55,6 +57,12 @@ async function build() {
 
   const sitemapXml = renderSitemap(places.map(p => p.slug));
   await writeFile(join(DIST, 'sitemap.xml'), sitemapXml, 'utf-8');
+
+  // Page Le Mouvement (manifeste + mur UGC)
+  const wallPhotos = await getMovementWallPhotos();
+  await mkdir(join(DIST, 'mouvement'), { recursive: true });
+  await writeFile(join(DIST, 'mouvement', 'index.html'), renderMovementPage(wallPhotos), 'utf-8');
+  console.log(`Mouvement: ${wallPhotos.length} photos`);
 
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`\nDone: ${generated} pages + sitemap in ${elapsed}s`);
