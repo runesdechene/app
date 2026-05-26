@@ -219,6 +219,14 @@ export function StudioSubmit() {
         </aside>
 
         <section className="studio__panel">
+          <ol className="studio__steps-h" aria-hidden="true">
+            {STEP_LABELS.map((label, i) => (
+              <li key={label} className={`studio__step-h ${step === i + 1 ? 'now' : ''} ${step > i + 1 ? 'done' : ''}`}>
+                <span className="n">{step > i + 1 ? '✓' : i + 1}</span>
+                <span className="t">{label}</span>
+              </li>
+            ))}
+          </ol>
           {step === 1 && (
             <>
               <div className="studio__kick">Étape 1 sur 4</div>

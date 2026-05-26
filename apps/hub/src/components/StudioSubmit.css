@@ -32,6 +32,17 @@
 .studio__step .t { font-family:'Cabin Condensed',sans-serif; }
 .studio__quote { margin-top:auto; font-style:italic; font-size:.88rem; color:#e2d4b4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 
+/* Stepper horizontal — affiché sur mobile uniquement (frise en ligne) */
+.studio__steps-h { display:none; list-style:none; margin:0 0 20px; padding:0; }
+.studio__step-h { flex:1; position:relative; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; opacity:.5; }
+.studio__step-h.now, .studio__step-h.done { opacity:1; }
+.studio__step-h .n { position:relative; z-index:1; width:30px; height:30px; border-radius:50%; border:2px solid var(--line); background:var(--cream); color:var(--brown); display:flex; align-items:center; justify-content:center; font-family:'Cabin Condensed',sans-serif; font-weight:700; }
+.studio__step-h.now .n { background:var(--ink); color:#fff; border-color:var(--ink); }
+.studio__step-h.done .n { border-color:#6b8a5a; color:#6b8a5a; }
+.studio__step-h .t { font-size:.62rem; font-family:'Cabin Condensed',sans-serif; color:var(--brown); line-height:1.1; }
+.studio__step-h:not(:last-child)::after { content:''; position:absolute; top:15px; left:50%; width:100%; height:2px; background:var(--line); z-index:0; }
+.studio__step-h.done::after { background:#6b8a5a; }
+
 .studio__panel { flex:1; background:var(--cream); padding:36px 34px 28px; display:flex; flex-direction:column; min-height:520px; }
 .studio__kick { font-size:.74rem; letter-spacing:.2em; text-transform:uppercase; color:#9a7b41; font-weight:700; }
 .studio__h { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,4vw,2.7rem); line-height:1; color:var(--red); margin:.2rem 0 0; }
@@ -74,13 +85,12 @@ textarea.studio__field { resize:none; }
 .reward-badge-label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; opacity:.8; } .reward-badge-amount { font-size:22px; font-weight:700; }
 
 @media (max-width:900px) {
-  .studio { padding:14px 10px; }
-  .studio__console { flex-direction:column; }
-  .studio__aside { width:100%; min-width:0; padding:24px 22px 22px; }
-  .studio__title { font-size:2rem; }
-  .studio__steps { margin-top:18px; gap:14px; }
-  .studio__step:not(:last-child) .n::after { height:14px; }
-  .studio__quote { margin-top:18px; }
-  .studio__panel { min-height:0; padding:26px 22px 24px; }
+  /* Mobile : formulaire plein écran sur parchemin, sans image ni colonne sombre, frise horizontale en haut */
+  .studio { padding:0; background-image:none !important; background-color:#e9e0cc; }
+  .studio::before { display:none; }
+  .studio__console { flex-direction:column; width:100%; border-radius:0; box-shadow:none; }
+  .studio__aside { display:none; }
+  .studio__steps-h { display:flex; }
+  .studio__panel { min-height:100dvh; padding:26px 20px 24px; }
 }
 @media (prefers-reduced-motion: reduce) { .studio__console { animation:none; } }
