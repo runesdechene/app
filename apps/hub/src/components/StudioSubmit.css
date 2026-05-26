@@ -32,6 +32,10 @@
 .studio__step .t { font-family:'Cabin Condensed',sans-serif; }
 .studio__quote { margin-top:auto; font-style:italic; font-size:.88rem; color:#e2d4b4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 
+/* Bandeau-titre noir — mobile uniquement */
+.studio__mobile-header { display:none; }
+.studio__mobile-title { font-family:'Bebas Neue',sans-serif; color:#fff; font-size:1.9rem; line-height:1; margin:2px 0 0; }
+
 /* Stepper horizontal — affiché sur mobile uniquement (frise en ligne) */
 .studio__steps-h { display:none; list-style:none; margin:0 0 20px; padding:0; }
 .studio__step-h { flex:1; position:relative; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; opacity:.5; }
@@ -92,5 +96,8 @@ textarea.studio__field { resize:none; }
   .studio__aside { display:none; }
   .studio__steps-h { display:flex; }
   .studio__panel { min-height:100dvh; padding:26px 20px 24px; }
+  /* Bandeau-titre noir full-bleed en haut du formulaire */
+  .studio__mobile-header { display:block; background:#241d12; margin:-26px -20px 20px; padding:20px 20px 16px; text-align:center; }
+  .studio__mobile-header .studio__kicker { color:#cbb486; }
 }
 @media (prefers-reduced-motion: reduce) { .studio__console { animation:none; } }

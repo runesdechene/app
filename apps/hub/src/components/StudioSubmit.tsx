@@ -219,6 +219,10 @@ export function StudioSubmit() {
         </aside>
 
         <section className="studio__panel">
+          <div className="studio__mobile-header">
+            <span className="studio__kicker">Runes de Chêne</span>
+            <h1 className="studio__mobile-title">Envoyer mes contenus</h1>
+          </div>
           <ol className="studio__steps-h" aria-hidden="true">
             {STEP_LABELS.map((label, i) => (
               <li key={label} className={`studio__step-h ${step === i + 1 ? 'now' : ''} ${step > i + 1 ? 'done' : ''}`}>
