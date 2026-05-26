@@ -44,6 +44,8 @@ export function Reviews() {
   const [reviews, setReviews] = useState<ReviewSubmission[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<ReviewStatus | 'all'>('pending')
+  const [crownInput, setCrownInput] = useState<Record<string, number>>({})
+  const crownsFor = (id: string) => (crownInput[id] ?? 10)
 
   useEffect(() => {
     async function fetchReviews() {
@@ -61,11 +63,12 @@ export function Reviews() {
     fetchReviews()
   }, [filter])
 
-  const moderate = async (reviewId: string, status: ReviewStatus) => {
+  const moderate = async (reviewId: string, status: ReviewStatus, crowns?: number) => {
     const { error } = await supabase.rpc('moderate_review', {
       p_review_id: reviewId,
       p_status: status,
-      p_rejection_reason: null
+      p_rejection_reason: null,
+      p_crowns: crowns ?? null
     })
 
     if (!error) {
@@ -171,12 +174,17 @@ export function Reviews() {
 
               {review.status === 'pending' && (
                 <div className="photo-actions">
-                  <button
-                    className="btn-approve"
-                    onClick={() => moderate(review.id, 'approved')}
-                  >
-                    Valider
-                  </button>
+                  <div className="crown-validate">
+                    <label>🪙</label>
+                    <input
+                      type="number" min={0} className="crown-input"
+                      value={crownsFor(review.id)}
+                      onChange={(e) => setCrownInput(prev => ({ ...prev, [review.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
+                    />
+                    <button className="btn-approve" onClick={() => moderate(review.id, 'approved', crownsFor(review.id))}>
+                      Valider (+{crownsFor(review.id)})
+                    </button>
+                  </div>
                   <button
                     className="btn-approve-avg"
                     onClick={() => moderate(review.id, 'archived')}

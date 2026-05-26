@@ -4299,3 +4299,13 @@ table select {
 .tutorial-reset-btn:hover {
   background: rgba(192, 57, 43, 0.2);
 }
+
+/* UGC Brique 1bis-A — récompense manuelle + curation par photo */
+.crown-validate { display: inline-flex; align-items: center; gap: 6px; }
+.crown-input { width: 64px; padding: 6px 8px; border: 1px solid #c9b48a; border-radius: 6px; }
+.img-curate { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.img-size { font-size: 11px; color: #6b8a5a; }
+.img-curate-btns button { font-size: 11px; padding: 2px 6px; margin-right: 4px; border: 1px solid #c9b48a; border-radius: 4px; background: #fff; cursor: pointer; }
+.img-curate-btns button.on { background: #2a2418; color: #fff; }
+.img-product { font-size: 11px; padding: 3px 6px; border: 1px solid #c9b48a; border-radius: 4px; }
+.photo-quest { font-size: 12px; color: #8a6d3b; }

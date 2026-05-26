@@ -12,6 +12,9 @@ interface SubmissionImage {
   id: string
   image_url: string
   sort_order: number
+  status: 'pending' | 'approved' | 'archived'
+  size: string | null            // valeur taille, 'none' = aucun produit porté, null = non renseigné
+  product_worn: string | null    // produit tagué au hub, par photo
 }
 
 interface PhotoTag {
@@ -36,6 +39,9 @@ interface PhotoSubmission {
   consent_brand_usage: boolean
   status: PhotoStatus
   created_at: string
+  departement: string | null
+  quest_ref: string | null
+  reward_crowns: number | null
   hub_submission_images: SubmissionImage[]
   tags: PhotoTag[]
 }
@@ -72,6 +78,10 @@ export function Photos() {
   const [tagFilter, setTagFilter] = useState<string | 'all'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ images: SubmissionImage[], index: number } | null>(null)
+
+  // Montant de Couronnes saisi à la validation, par soumission (défaut suggéré : 10)
+  const [crownInput, setCrownInput] = useState<Record<string, number>>({})
+  const crownsFor = (subId: string) => (crownInput[subId] ?? 10)
 
   // Tags state
   const [allTags, setAllTags] = useState<PhotoTag[]>([])
@@ -141,10 +151,11 @@ export function Photos() {
     .filter(s => roleFilter === 'all' || s.submitter_role === roleFilter)
     .filter(s => tagFilter === 'all' || s.tags.some(t => t.id === tagFilter))
 
-  const moderate = async (subId: string, status: PhotoStatus) => {
+  const moderate = async (subId: string, status: PhotoStatus, crowns?: number) => {
     const { error } = await supabase.rpc('moderate_submission', {
       p_submission_id: subId,
-      p_status: status
+      p_status: status,
+      p_crowns: crowns ?? null
     })
 
     if (!error) {
@@ -157,6 +168,30 @@ export function Photos() {
       }
     }
   }
+
+  const setImageStatus = async (subId: string, imageId: string, status: SubmissionImage['status']) => {
+    const { error } = await supabase.rpc('set_submission_image_status', { p_image_id: imageId, p_status: status })
+    if (!error) {
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
+        ...s,
+        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, status } : img),
+      })))
+    }
+  }
+
+  const setImageProduct = async (subId: string, imageId: string, product: string) => {
+    const clean = product.trim() || null
+    const { error } = await supabase.rpc('set_submission_image_product', { p_image_id: imageId, p_product: clean })
+    if (!error) {
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
+        ...s,
+        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, product_worn: clean } : img),
+      })))
+    }
+  }
+
+  const sizeLabel = (size: string | null) =>
+    size == null ? 'Taille non renseignée' : size === 'none' ? 'Aucun produit porté' : `Taille ${size}`
 
   const deleteSubmission = async (subId: string) => {
     if (!window.confirm('Supprimer definitivement cette soumission ?')) return
@@ -572,6 +607,12 @@ export function Photos() {
                     {[sub.location_name, sub.location_zip].filter(Boolean).join(' — ')}
                   </span>
                 )}
+                {sub.departement && (
+                  <span className="photo-location">Département : {sub.departement}</span>
+                )}
+                {sub.quest_ref && (
+                  <span className="photo-quest">⚑ Quête : {sub.quest_ref}</span>
+                )}
                 {(sub.product_size || sub.model_height_cm || sub.model_shoulder_width_cm) && (
                   <div className="photo-sizing">
                     {sub.product_size && <span className="sizing-badge">Taille : {sub.product_size}</span>}
@@ -681,7 +722,7 @@ export function Photos() {
               </div>
 
               {/* Expanded images */}
-              {expandedId === sub.id && sub.hub_submission_images?.length > 1 && (
+              {expandedId === sub.id && sub.hub_submission_images?.length >= 1 && (
                 <div className="expanded-images">
                   {sub.hub_submission_images
                     .sort((a, b) => a.sort_order - b.sort_order)
@@ -691,6 +732,18 @@ export function Photos() {
                           ? <video src={img.image_url} muted playsInline onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
                           : <img src={img.image_url} alt="" onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
                         }
+                        <div className="img-curate">
+                          <span className="img-size">{sizeLabel(img.size)}</span>
+                          <div className="img-curate-btns">
+                            <button className={img.status === 'approved' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'approved')}>Garder</button>
+                            <button className={img.status === 'archived' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'archived')}>Archiver</button>
+                          </div>
+                          <input
+                            className="img-product" placeholder="Produit porté (tag hub)"
+                            defaultValue={img.product_worn ?? ''}
+                            onBlur={(e) => setImageProduct(sub.id, img.id, e.target.value)}
+                          />
+                        </div>
                         <button
                           className="btn-download-img"
                           onClick={() => downloadSingleImage(sub, img.image_url, idx)}
@@ -701,21 +754,29 @@ export function Photos() {
                 </div>
               )}
 
-              {sub.hub_submission_images?.length > 1 && (
+              {sub.hub_submission_images?.length >= 1 && (
                 <button
                   className="expand-btn"
                   onClick={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
                 >
-                  {expandedId === sub.id ? 'Masquer' : `Voir les ${sub.hub_submission_images.length} photos`}
+                  {expandedId === sub.id ? 'Masquer' : `Gérer les ${sub.hub_submission_images.length} photo(s)`}
                 </button>
               )}
 
               {/* Actions by status */}
               {sub.status === 'pending' && (
                 <div className="photo-actions">
-                  <button className="btn-approve" onClick={() => moderate(sub.id, 'approved')}>
-                    Valider
-                  </button>
+                  <div className="crown-validate">
+                    <label>🪙</label>
+                    <input
+                      type="number" min={0} className="crown-input"
+                      value={crownsFor(sub.id)}
+                      onChange={(e) => setCrownInput(prev => ({ ...prev, [sub.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
+                    />
+                    <button className="btn-approve" onClick={() => moderate(sub.id, 'approved', crownsFor(sub.id))}>
+                      Valider (+{crownsFor(sub.id)})
+                    </button>
+                  </div>
                   <button className="btn-archive" onClick={() => moderate(sub.id, 'archived')}>
                     Archiver
                   </button>
