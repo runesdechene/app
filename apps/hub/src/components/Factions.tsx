@@ -212,7 +212,7 @@ export function Factions() {
 
     setCreating(true)
     const newFaction: Faction = {
-      id, title, color: '#C19A6B', pattern: null, description: null, image_url: null,
+      id, title, adjective: '', color: '#C19A6B', pattern: null, description: null, image_url: null,
       order: factions.length,
       bonus_energy: 0, bonus_conquest: 0, bonus_construction: 0, bonus_vitalite: 0,
       bonus_regen_energy: 0, bonus_regen_conquest: 0, bonus_regen_construction: 0, bonus_regen_vitalite: 0,

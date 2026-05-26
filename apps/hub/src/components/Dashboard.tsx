@@ -159,7 +159,7 @@ export function Dashboard() {
           .limit(500)
         if (topPlacesData) {
           const placeCounts = new Map<string, { title: string; count: number }>()
-          for (const row of topPlacesData as Array<{ place_id: string; places: { title: string } | null }>) {
+          for (const row of topPlacesData as unknown as Array<{ place_id: string; places: { title: string } | null }>) {
             const key = row.place_id
             const existing = placeCounts.get(key)
             if (existing) {
