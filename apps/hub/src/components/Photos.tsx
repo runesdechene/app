@@ -51,6 +51,20 @@ interface PhotoSubmission {
   tags: PhotoTag[]
 }
 
+/** Texte alternatif Shopify : "Pierre mesure 1m83 et porte du M" (parties omises si absentes). */
+function buildImageAlt(name: string | null, heightCm: number | null, size: string | null): string {
+  const n = (name ?? '').trim()
+  const heightStr = typeof heightCm === 'number' && heightCm > 0
+    ? `${Math.floor(heightCm / 100)}m${String(Math.round(heightCm % 100)).padStart(2, '0')}`
+    : ''
+  const sz = size && size !== 'none' ? size.trim() : ''
+  if (n && heightStr && sz) return `${n} mesure ${heightStr} et porte du ${sz}`
+  if (n && heightStr) return `${n} mesure ${heightStr}`
+  if (n && sz) return `${n} porte du ${sz}`
+  if (n) return n
+  return 'Communauté Runes de Chêne'
+}
+
 const STATUS_LABELS: Record<PhotoStatus, string> = {
   pending: 'En attente',
   approved: 'Validees',
@@ -216,7 +230,7 @@ export function Photos() {
     setPickerBusy(true)
     setPickerError(null)
     try {
-      const alt = sub.submitter_name || 'Communaute Runes de Chene'
+      const alt = buildImageAlt(sub.submitter_name, sub.model_height_cm, img.size)
       const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
       try {
         await supabase.rpc('set_submission_image_shopify_product', {

@@ -73,6 +73,7 @@ export function StudioSubmit() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [departement, setDepartement] = useState('')
+  const [heightCm, setHeightCm] = useState('')
   const [consentBrand, setConsentBrand] = useState(false)
   const [consentAccount, setConsentAccount] = useState(false)
   const [phase, setPhase] = useState<Phase>('wizard')
@@ -135,11 +136,13 @@ export function StudioSubmit() {
       }
 
       setProgress('Enregistrement…')
+      const parsedHeightCm = (() => { const h = parseInt(heightCm, 10); return Number.isFinite(h) && h >= 100 && h <= 250 ? h : null })()
       const { data: subId, error: subErr } = await supabase.rpc('create_photo_submission', {
         p_user_id: userId, p_submitter_name: name.trim(), p_submitter_email: email.toLowerCase().trim(),
         p_submitter_instagram: null, p_message: message.trim() || null,
         p_consent_brand: consentBrand, p_consent_account: consentAccount,
         p_departement: departement || null, p_quest_ref: questRef,
+        p_model_height_cm: parsedHeightCm,
       })
       if (subErr) throw new Error(`Soumission : ${subErr.message}`)
 
@@ -311,6 +314,9 @@ export function StudioSubmit() {
               <input className="studio__field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ton prénom" />
               <label className="studio__label">Email *</label>
               <input className="studio__field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="toi@email.com" />
+              <label className="studio__label">Ta taille (optionnel)</label>
+              <input className="studio__field" type="number" inputMode="numeric" min={100} max={250} value={heightCm}
+                onChange={(e) => setHeightCm(e.target.value)} placeholder="ex. 178 (en cm)" />
               <label className="studio__consent"><input type="checkbox" checked={consentBrand} onChange={(e) => setConsentBrand(e.target.checked)} /> J'accepte que mes contenus soient diffusés par la marque ou ses réseaux. *</label>
               <label className="studio__consent"><input type="checkbox" checked={consentAccount} onChange={(e) => setConsentAccount(e.target.checked)} /> J'accepte la création de mon compte Runes de Chêne (accès à l'application). *</label>
               <div className="studio__nav">
