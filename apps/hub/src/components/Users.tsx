@@ -21,6 +21,7 @@ interface HubUser {
   isClient?: boolean
   exploration_points?: number
   erudition_points?: number
+  crowns_balance?: number
 }
 
 const ROLE_LABELS: Record<Role, string> = {
@@ -45,6 +46,7 @@ export function Users() {
   const navigate = useNavigate()
   const [users, setUsers] = useState<HubUser[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [editingRole, setEditingRole] = useState<string | null>(null)
   const [sortAsc, setSortAsc] = useState(false)
@@ -56,6 +58,7 @@ export function Users() {
 
     async function fetchUsers() {
       try {
+        setFetchError(null)
         const PAGE_SIZE = 1000
         let allUsers: HubUser[] = []
         let from = 0
@@ -63,7 +66,7 @@ export function Users() {
         while (true) {
           let query = supabase
             .from('users')
-            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, exploration_points, erudition_points, factions(title)')
+            .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, exploration_points, erudition_points, factions(title), user_crowns(balance)')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
 
@@ -71,14 +74,20 @@ export function Users() {
             query = query.or(`email_address.ilike.%${search}%,first_name.ilike.%${search}%,display_name.ilike.%${search}%`)
           }
 
-          const { data } = await query
+          const { data, error } = await query
           if (ignore) return
+          if (error) {
+            console.error('[Users] erreur de chargement:', error.message, error.details, error.hint)
+            setFetchError(error.message)
+            break
+          }
           if (data && data.length > 0) {
             const mapped = data.map((u: Record<string, unknown>) => {
-              const { factions, ...rest } = u
+              const { factions, user_crowns, ...rest } = u
               return {
                 ...rest,
                 faction_title: (factions as { title: string } | null)?.title ?? null,
+                crowns_balance: (user_crowns as { balance: number } | null)?.balance ?? 0,
               }
             }) as unknown as HubUser[]
             allUsers = allUsers.concat(mapped)
@@ -234,22 +243,6 @@ export function Users() {
     setEditingRole(null)
   }
 
-  const toggleActive = async (userId: string, currentActive: boolean) => {
-    const { error } = await supabase
-      .from('users')
-      .update({ is_active: !currentActive })
-      .eq('id', userId)
-
-    if (!error) {
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_active: !currentActive } : u))
-      // Sync tags vers Shopify (fire-and-forget)
-      const user = users.find(u => u.id === userId)
-      if (user?.shopify_customer_id) {
-        syncUserTagsToShopify(user).catch(() => {})
-      }
-    }
-  }
-
   const now = Date.now()
   const [showExport, setShowExport] = useState(false)
 
@@ -379,6 +372,12 @@ export function Users() {
         </>
       )}
 
+      {fetchError && (
+        <div className="empty" style={{ color: '#b91c1c', background: 'rgba(185,28,28,0.08)', borderRadius: 8, padding: '10px 14px', marginBottom: 12 }}>
+          Erreur de chargement des utilisateurs : {fetchError}
+        </div>
+      )}
+
       {loading ? (
         <div className="loading">Chargement...</div>
       ) : users.length === 0 ? (
@@ -393,6 +392,7 @@ export function Users() {
                 <th>Source</th>
                 <th>Client</th>
                 <th>Gloire</th>
+                <th>Couronnes</th>
                 <th>Role</th>
                 <th>Statut</th>
                 <th
@@ -434,6 +434,9 @@ export function Users() {
                     </td>
                     <td style={{ fontSize: 11, textAlign: 'center' }} title={`Exploration: ${user.exploration_points ?? 0} | Erudition: ${user.erudition_points ?? 0}`}>
                       {user.isPending ? '-' : (user.exploration_points ?? 0) + (user.erudition_points ?? 0)}
+                    </td>
+                    <td style={{ fontSize: 11, textAlign: 'center', color: '#b8860b', fontWeight: 600 }}>
+                      {user.isPending ? '-' : `${user.crowns_balance ?? 0} 🪙`}
                     </td>
                     <td>
                       {user.isPending ? (
