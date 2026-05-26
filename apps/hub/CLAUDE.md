@@ -69,4 +69,8 @@ conservée (`rewarded_at`). **Curation par photo** : `hub_submission_images` gag
 (pending/approved/archived) + `size` (`'none'` = aucun produit porté) + `product_worn` (tagué au hub),
 via RPC `set_submission_image_status` / `set_submission_image_product`. Envoi : `+ departement`,
 `+ quest_ref` (pré-câblage quête, système Phase 2), `+ reward_crowns`. Le **studio public** de
-soumission (wizard guidé) = Brique 1bis-B (à venir).
+soumission = `StudioSubmit.tsx` (wizard guidé 4 étapes : drop / tailles par photo + « aucun produit » /
+mot + département / identité), sur `/soumettre-contenu` (remplace l'ancien `PhotoSubmit.tsx`, supprimé).
+Écrit `departement`/`quest_ref` (`?quete=`) + `size` par photo via `create_photo_submission` /
+`add_submission_image` étendus (mig 177) ; config images via `get_studio_config` (`app_settings`
+`studio_bg_image_url`/`studio_aside_image_url`). Esthétique parchemin/landing (Bebas/Cabin).
