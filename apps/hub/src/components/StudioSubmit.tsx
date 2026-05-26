@@ -317,6 +317,9 @@ export function StudioSubmit() {
               <label className="studio__label">Ta taille (optionnel)</label>
               <input className="studio__field" type="number" inputMode="numeric" min={100} max={250} value={heightCm}
                 onChange={(e) => setHeightCm(e.target.value)} placeholder="ex. 178 (en cm)" />
+              <p style={{ fontSize: '.8rem', opacity: .7, margin: '.35rem 0 .2rem', lineHeight: 1.4 }}>
+                Si ta photo est retenue sur une fiche produit, ça aide les autres à choisir leur taille.
+              </p>
               <label className="studio__consent"><input type="checkbox" checked={consentBrand} onChange={(e) => setConsentBrand(e.target.checked)} /> J'accepte que mes contenus soient diffusés par la marque ou ses réseaux. *</label>
               <label className="studio__consent"><input type="checkbox" checked={consentAccount} onChange={(e) => setConsentAccount(e.target.checked)} /> J'accepte la création de mon compte Runes de Chêne (accès à l'application). *</label>
               <div className="studio__nav">
