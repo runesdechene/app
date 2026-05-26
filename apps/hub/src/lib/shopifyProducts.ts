@@ -26,7 +26,7 @@ function proxyUrl(endpoint: string): string {
 export async function searchShopifyProducts(term: string): Promise<ShopifyProductHit[]> {
   const clean = term.trim()
   if (clean.length < 2) return []
-  const escaped = clean.replace(/"/g, '\\"')
+  const escaped = clean.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
   const query = `{ products(first: 8, query: "title:*${escaped}*") { edges { node { legacyResourceId title handle featuredImage { url } } } } }`
 
   const resp = await fetch(proxyUrl('graphql.json'), {

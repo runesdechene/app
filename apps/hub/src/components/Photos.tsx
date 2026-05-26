@@ -218,10 +218,16 @@ export function Photos() {
     try {
       const alt = sub.submitter_name || 'Communaute Runes de Chene'
       const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
-      await supabase.rpc('set_submission_image_shopify_product', {
-        p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title,
-      })
-      await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
+      try {
+        await supabase.rpc('set_submission_image_shopify_product', {
+          p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title,
+        })
+        await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
+      } catch (rpcErr) {
+        // compensation : la persistance a echoue, on retire l'image orpheline de Shopify
+        await deleteProductImage(hit.productId, mediaId).catch(() => {})
+        throw rpcErr
+      }
       setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
         ...s,
         hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? {

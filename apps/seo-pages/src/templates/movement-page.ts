@@ -25,7 +25,7 @@ function photoCard(p: WallPhoto): string {
 
 export function renderMovementPage(photos: WallPhoto[]): string {
   const grid = photos.map(photoCard).join('\n');
-  const urls = JSON.stringify(photos.map(p => p.imageUrl));
+  const urls = JSON.stringify(photos.map(p => p.imageUrl)).replace(/</g, '\\u003c');
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
