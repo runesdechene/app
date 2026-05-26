@@ -23,7 +23,10 @@
 .studio__steps { list-style:none; margin:32px 0 0; padding:0; display:flex; flex-direction:column; gap:16px; }
 .studio__step { display:flex; gap:12px; align-items:center; opacity:.55; }
 .studio__step.now { opacity:1; } .studio__step.done { opacity:.95; }
-.studio__step .n { width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center; font-family:'Cabin Condensed',sans-serif; font-weight:700; }
+.studio__step .n { position:relative; width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,.35); display:flex; align-items:center; justify-content:center; font-family:'Cabin Condensed',sans-serif; font-weight:700; flex:none; }
+/* Frise : trait reliant les pastilles */
+.studio__step:not(:last-child) .n::after { content:''; position:absolute; left:50%; top:calc(100% + 1px); transform:translateX(-50%); width:2px; height:16px; background:rgba(255,255,255,.28); }
+.studio__step.done .n::after { background:#8fc079; }
 .studio__step.now .n { border-color:var(--gold); background:var(--gold); color:#241d12; }
 .studio__step.done .n { border-color:#8fc079; color:#8fc079; }
 .studio__step .t { font-family:'Cabin Condensed',sans-serif; }
@@ -70,5 +73,14 @@ textarea.studio__field { resize:none; }
 .reward-badge { display:flex; flex-direction:column; align-items:center; gap:4px; margin:8px auto; padding:14px 22px; background:#241d12; color:#e9d9b6; border-radius:12px; }
 .reward-badge-label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; opacity:.8; } .reward-badge-amount { font-size:22px; font-weight:700; }
 
-@media (max-width:900px) { .studio__console { flex-direction:column; } .studio__aside { width:100%; min-height:200px; } .studio__panel { min-height:0; } }
+@media (max-width:900px) {
+  .studio { padding:14px 10px; }
+  .studio__console { flex-direction:column; }
+  .studio__aside { width:100%; min-width:0; padding:24px 22px 22px; }
+  .studio__title { font-size:2rem; }
+  .studio__steps { margin-top:18px; gap:14px; }
+  .studio__step:not(:last-child) .n::after { height:14px; }
+  .studio__quote { margin-top:18px; }
+  .studio__panel { min-height:0; padding:26px 22px 24px; }
+}
 @media (prefers-reduced-motion: reduce) { .studio__console { animation:none; } }
