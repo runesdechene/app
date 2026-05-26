@@ -219,12 +219,17 @@ export function Reviews() {
 
               {review.status === 'archived' && (
                 <div className="photo-actions">
-                  <button
-                    className="btn-approve"
-                    onClick={() => moderate(review.id, 'approved')}
-                  >
-                    Valider
-                  </button>
+                  <div className="crown-validate">
+                    <label>🪙</label>
+                    <input
+                      type="number" min={0} className="crown-input"
+                      value={crownsFor(review.id)}
+                      onChange={(e) => setCrownInput(prev => ({ ...prev, [review.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
+                    />
+                    <button className="btn-approve" onClick={() => moderate(review.id, 'approved', crownsFor(review.id))}>
+                      Restaurer (+{crownsFor(review.id)})
+                    </button>
+                  </div>
                   <button
                     className="btn-reject"
                     onClick={() => deleteReview(review.id)}

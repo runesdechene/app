@@ -799,9 +799,17 @@ export function Photos() {
 
               {sub.status === 'archived' && (
                 <div className="photo-actions">
-                  <button className="btn-approve" onClick={() => moderate(sub.id, 'approved')}>
-                    Restaurer
-                  </button>
+                  <div className="crown-validate">
+                    <label>🪙</label>
+                    <input
+                      type="number" min={0} className="crown-input"
+                      value={crownsFor(sub.id)}
+                      onChange={(e) => setCrownInput(prev => ({ ...prev, [sub.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
+                    />
+                    <button className="btn-approve" onClick={() => moderate(sub.id, 'approved', crownsFor(sub.id))}>
+                      Restaurer (+{crownsFor(sub.id)})
+                    </button>
+                  </div>
                   <button className="btn-reject" onClick={() => deleteSubmission(sub.id)}>
                     Supprimer
                   </button>
