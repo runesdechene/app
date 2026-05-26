@@ -57,7 +57,7 @@ Faits vérifiés : `user_crowns(user_id text PK, balance int CHECK 0..500, updat
 - **Modify** `apps/hub/src/components/ReviewSubmit.tsx` — fetch config + écran de fin refondu.
 - **Modify** `apps/hub/src/components/PublicForm.css` — styles de l'écran de fin (badge Couronnes, CTA).
 
-**Note testing** : ce repo n'a pas de runner de tests TS frontend. La vérification SQL se fait via le MCP Supabase (`execute_sql` sur une branche de dev) ; l'edge function via `supabase functions serve` + curl ; le frontend via `pnpm --filter hub build` (tsc strict) + checklist manuelle. C'est la discipline du projet (xo-discipline E1).
+**Note testing** : ce repo n'a pas de runner de tests TS frontend. La vérification SQL se fait via le MCP Supabase (`execute_sql` sur une branche de dev) ; l'edge function via `supabase functions serve` + curl ; le frontend via **`npx tsc --noEmit`** (type-check TS strict) + checklist manuelle. ⚠️ `pnpm --filter hub build` = `vite build` seul (esbuild transpile **sans** type-check) : un build vert ne prouve PAS la conformité TS — toujours lancer `tsc --noEmit` (4 erreurs préexistantes connues hors de cette brique : Dashboard/Factions/TitlesManager/Users).
 
 ---
 

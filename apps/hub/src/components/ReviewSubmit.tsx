@@ -210,6 +210,9 @@ export function ReviewSubmit() {
           <a href="https://app.runesdechene.com" target="_blank" rel="noopener noreferrer" className="btn-primary">
             Découvrir La Carte →
           </a>
+          <button onClick={resetForm} className="btn-secondary">
+            Envoyer un autre avis
+          </button>
         </div>
       </div>
     )
