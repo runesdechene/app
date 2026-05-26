@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import "./PublicForm.css";
 
@@ -117,6 +117,13 @@ export function PhotoSubmit() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isNewAccount, setIsNewAccount] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [rewardConfig, setRewardConfig] = useState<{ welcome_crowns: number; reward_crowns: number }>({ welcome_crowns: 0, reward_crowns: 0 });
+
+  useEffect(() => {
+    supabase.rpc("get_ugc_reward_config").then(({ data }) => {
+      if (data) setRewardConfig(data as { welcome_crowns: number; reward_crowns: number });
+    });
+  }, []);
 
   const updateField = (field: keyof FormData, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -318,30 +325,36 @@ export function PhotoSubmit() {
     return (
       <div className="submit-page">
         <div className="submit-card success-card">
-          <div className="success-icon">✓</div>
-          <h2>Merci pour votre contribution !</h2>
+          <div className="success-icon">⚜️</div>
+          <h2>Bienvenue dans le Mouvement !</h2>
           <p>
-            Vos photos ont ete envoyees avec succes. Elles seront examinees par
-            notre equipe avant publication.
+            Vos photos partent en validation. Dès qu'elles sont adoubées par notre équipe,
+            <strong> {rewardConfig.reward_crowns} Couronnes de Chêne</strong> atterrissent dans votre compte —
+            on vous prévient par email.
           </p>
+          {isNewAccount && rewardConfig.welcome_crowns > 0 && (
+            <div className="reward-badge">
+              <span className="reward-badge-label">Cadeau de bienvenue</span>
+              <span className="reward-badge-amount">+{rewardConfig.welcome_crowns} Couronnes</span>
+            </div>
+          )}
           <div className="account-info-box">
             {isNewAccount ? (
               <p>
-                Felicitations, votre adresse email <strong>{form.email}</strong>{" "}
-                a permis la creation d'un compte <strong>Runes de Chene</strong>
-                . Vous pouvez l'utiliser sur l'application{" "}
-                <strong>Carte</strong> pour connecter avec la communaute.
+                Votre compte <strong>Runes de Chêne</strong> ({form.email}) vient d'être créé.
+                Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.
               </p>
             ) : (
               <p>
-                Votre adresse email <strong>{form.email}</strong> est deja
-                associee a un compte <strong>Runes de Chene</strong>. Vos photos
-                ont ete rattachees a votre compte. Retrouvez la communaute sur
-                l'application <strong>Carte</strong>.
+                Vos photos sont rattachées à votre compte <strong>Runes de Chêne</strong> ({form.email}).
+                Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.
               </p>
             )}
           </div>
-          <button onClick={resetForm} className="btn-primary">
+          <a href="https://app.runesdechene.com" target="_blank" rel="noopener noreferrer" className="btn-primary">
+            Découvrir La Carte →
+          </a>
+          <button onClick={resetForm} className="btn-secondary">
             Envoyer d'autres photos
           </button>
         </div>

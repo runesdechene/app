@@ -445,3 +445,38 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+/* Récompense UGC — écran de fin (Brique 1) */
+.reward-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 18px auto;
+  padding: 16px 24px;
+  max-width: 320px;
+  background: #2b2218;
+  color: #e9d9b6;
+  border-radius: 12px;
+}
+.reward-badge-label {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.reward-badge-amount {
+  font-size: 24px;
+  font-weight: 700;
+}
+.btn-secondary {
+  display: inline-block;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid #8a6d3b;
+  color: #8a6d3b;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}

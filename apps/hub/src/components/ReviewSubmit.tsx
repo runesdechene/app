@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import './PublicForm.css'
 
@@ -47,6 +47,13 @@ export function ReviewSubmit() {
   const [isNewAccount, setIsNewAccount] = useState(false)
   const [hoverRating, setHoverRating] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [rewardConfig, setRewardConfig] = useState<{ welcome_crowns: number; reward_crowns: number }>({ welcome_crowns: 0, reward_crowns: 0 })
+
+  useEffect(() => {
+    supabase.rpc('get_ugc_reward_config').then(({ data }) => {
+      if (data) setRewardConfig(data as { welcome_crowns: number; reward_crowns: number })
+    })
+  }, [])
 
   const updateField = (field: keyof FormData, value: string | number | boolean) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -181,17 +188,27 @@ export function ReviewSubmit() {
     return (
       <div className="submit-page">
         <div className="submit-card success-card">
-          <div className="success-icon">✓</div>
+          <div className="success-icon">⚜️</div>
           <h2>Merci pour votre avis !</h2>
-          <p>Votre avis a ete envoye avec succes. Il sera examine par notre equipe avant publication.</p>
+          <p>
+            Votre avis part en validation. Dès qu'il est adoubé par notre équipe,
+            <strong> {rewardConfig.reward_crowns} Couronnes de Chêne</strong> atterrissent dans votre compte —
+            on vous prévient par email.
+          </p>
+          {isNewAccount && rewardConfig.welcome_crowns > 0 && (
+            <div className="reward-badge">
+              <span className="reward-badge-label">Cadeau de bienvenue</span>
+              <span className="reward-badge-amount">+{rewardConfig.welcome_crowns} Couronnes</span>
+            </div>
+          )}
           <div className="account-info-box">
             {isNewAccount
-              ? <p>Felicitations, votre adresse email <strong>{form.email}</strong> a permis la creation d'un compte <strong>Runes de Chene</strong>. Vous pouvez l'utiliser sur l'application <strong>Carte</strong> pour connecter avec la communaute.</p>
-              : <p>Votre adresse email <strong>{form.email}</strong> est deja associee a un compte <strong>Runes de Chene</strong>. Votre avis a ete rattache a votre compte. Retrouvez la communaute sur l'application <strong>Carte</strong>.</p>
+              ? <p>Votre compte <strong>Runes de Chêne</strong> ({form.email}) vient d'être créé. Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.</p>
+              : <p>Votre avis est rattaché à votre compte <strong>Runes de Chêne</strong> ({form.email}). Retrouvez vos Couronnes et la communauté sur l'application <strong>La Carte</strong>.</p>
             }
           </div>
-          <a href="https://app.runesdechene.com" className="btn-primary">
-            Essayer l'application
+          <a href="https://app.runesdechene.com" target="_blank" rel="noopener noreferrer" className="btn-primary">
+            Découvrir La Carte →
           </a>
         </div>
       </div>
