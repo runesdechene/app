@@ -7,25 +7,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Configuration Supabase manquante. Verifiez votre fichier .env')
 }
 
-const FETCH_TIMEOUT_MS = 30_000
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  global: {
-    fetch: (url, options = {}) => {
-      const controller = new AbortController()
-      const timeout = setTimeout(
-        () => controller.abort(new DOMException(`Timeout apres ${FETCH_TIMEOUT_MS / 1000}s`, 'TimeoutError')),
-        FETCH_TIMEOUT_MS
-      )
-      // Fusionne le signal eventuel de supabase-js avec NOTRE controller (au lieu de
-      // l'ignorer) : timeout + annulation amont coexistent, aucun n'est perdu.
-      const upstream = options.signal
-      if (upstream) {
-        if (upstream.aborted) controller.abort(upstream.reason)
-        else upstream.addEventListener('abort', () => controller.abort(upstream.reason), { once: true })
-      }
-      return fetch(url, { ...options, signal: controller.signal })
-        .finally(() => clearTimeout(timeout))
-    },
-  },
-})
+// Client Supabase standard. Pas de wrapper fetch maison : l'ancien override imposait
+// un AbortController/timeout global qui pouvait faire pendre la requete de refresh et
+// bloquer le verrou auth (getSession ne rendait jamais la main -> deconnexion au reload
+// + requetes vides). supabase-js gere lui-meme ses timeouts/refresh de facon robuste.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
