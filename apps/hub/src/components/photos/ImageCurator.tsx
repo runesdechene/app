@@ -1,0 +1,95 @@
+// apps/hub/src/components/photos/ImageCurator.tsx
+// Curation d'une photo : aperçu, Garder/Archiver, picker produit (recherche + prix), download.
+import { useEffect, useState } from 'react'
+import { isVideoUrl, type SubmissionImage, type PhotoStatus } from './types'
+import { searchShopifyProducts, type ShopifyProductHit } from '../../lib/shopifyProducts'
+
+interface ImageCuratorProps {
+  image: SubmissionImage
+  onOpenLightbox: () => void
+  onSetStatus: (status: PhotoStatus) => void
+  onLink: (hit: ShopifyProductHit) => Promise<void>
+  onUnlink: () => Promise<void>
+  onDownload: () => void
+}
+
+const sizeLabel = (s: string | null) => s == null ? '' : s === 'none' ? 'Aucun produit' : s
+
+export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnlink, onDownload }: ImageCuratorProps) {
+  const [open, setOpen] = useState(false)
+  const [term, setTerm] = useState('')
+  const [hits, setHits] = useState<ShopifyProductHit[]>([])
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const t = setTimeout(async () => {
+      try { setError(null); setHits(await searchShopifyProducts(term)) }
+      catch (e) { setError(e instanceof Error ? e.message : String(e)) }
+    }, 300)
+    return () => clearTimeout(t)
+  }, [term, open])
+
+  const doLink = async (hit: ShopifyProductHit) => {
+    setBusy(true); setError(null)
+    try { await onLink(hit); setOpen(false); setTerm(''); setHits([]) }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)) }
+    finally { setBusy(false) }
+  }
+  const doUnlink = async () => {
+    setBusy(true); setError(null)
+    try { await onUnlink() }
+    catch (e) { setError(e instanceof Error ? e.message : String(e)) }
+    finally { setBusy(false) }
+  }
+
+  return (
+    <div className="mod-curator">
+      <div className="mod-curator__media" onClick={onOpenLightbox} style={{ cursor: 'pointer' }}>
+        {isVideoUrl(image.image_url)
+          ? <video src={image.image_url} muted playsInline />
+          : <img src={image.image_url} alt="" />}
+      </div>
+      <div className="mod-curator__body">
+        {sizeLabel(image.size) && <span className="mod-curator__size">{sizeLabel(image.size)}</span>}
+        <div className="mod-curator__status">
+          <button className={image.status === 'approved' ? 'is-on' : ''} onClick={() => onSetStatus('approved')}>Garder</button>
+          <button className={image.status === 'archived' ? 'is-on' : ''} onClick={() => onSetStatus('archived')}>Archiver</button>
+        </div>
+
+        {image.shopify_product_id ? (
+          <div className="mod-curator__linked">
+            <span title={`Relié à ${image.shopify_product_title}`}>🏷 {image.shopify_product_title}</span>
+            <button className="mod-curator__unlink" disabled={busy} onClick={doUnlink}>Retirer ✕</button>
+          </div>
+        ) : open ? (
+          <div className="mod-curator__picker">
+            <input autoFocus className="mod-curator__search" placeholder="Rechercher un produit…"
+              value={term} onChange={e => setTerm(e.target.value)} disabled={busy} />
+            {error && <div className="mod-curator__error">{error}</div>}
+            <ul className="mod-curator__results">
+              {hits.map(hit => (
+                <li key={hit.productId}>
+                  <button className="mod-hit" disabled={busy} onClick={() => doLink(hit)}>
+                    {hit.imageUrl && <img className="mod-hit__img" src={hit.imageUrl} alt="" width={34} height={34} />}
+                    <span className="mod-hit__title">{hit.title}</span>
+                    {hit.price && <span className="mod-hit__price">{hit.price}</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button className="mod-curator__cancel" onClick={() => { setOpen(false); setTerm(''); setHits([]) }}>Annuler</button>
+          </div>
+        ) : (
+          <button className="mod-curator__link-btn" onClick={() => { setOpen(true); setTerm(''); setHits([]); setError(null) }}>
+            🔗 Relier à un produit
+          </button>
+        )}
+
+        <button className="mod-curator__dl" onClick={onDownload} title="Télécharger">↓</button>
+        {error && !open && <div className="mod-curator__error">{error}</div>}
+      </div>
+    </div>
+  )
+}
