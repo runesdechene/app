@@ -11,10 +11,10 @@ interface AuthState {
   loading: boolean
 }
 
-// Le role admin est porte par le JWT via app_metadata.user_role, pose par un trigger
-// public.users.role -> auth.users (migration 179). On lit le role de facon SYNCHRONE
-// depuis la session — aucune requete DB de gating (fini le bug recurrent "User not admin"
-// et l'ecran "Chargement..." infini : plus aucun await dans le callback onAuthStateChange).
+// Le role admin est porte par le JWT via app_metadata.user_role, pose par le trigger
+// public.users.role -> auth.users (migration 179). Lecture SYNCHRONE depuis la session :
+// aucune requete DB, aucun await dans le chemin de gating. loading se resout TOUJOURS
+// (getSession OU evenement INITIAL_SESSION OU filet de securite) — jamais de blocage.
 function roleFromSession(session: Session | null): UserRole | null {
   const r = session?.user?.app_metadata?.user_role
   return (r as UserRole) ?? null
@@ -30,36 +30,26 @@ export function useAuth() {
 
   useEffect(() => {
     let active = true
-    let ready = false
 
-    function apply(session: Session | null) {
+    const apply = (session: Session | null) => {
       if (!active) return
       setState({ user: session?.user ?? null, session, role: roleFromSession(session), loading: false })
     }
 
-    async function init() {
-      const { data: { session } } = await supabase.auth.getSession()
-      // Transition : une session emise avant la migration n'a pas encore le claim user_role.
-      // Un seul refresh (hors callback) pour obtenir un token frais qui le porte.
-      if (session?.user && !session.user.app_metadata?.user_role) {
-        const { data: { session: refreshed } } = await supabase.auth.refreshSession()
-        apply(refreshed ?? session)
-      } else {
-        apply(session)
-      }
-      ready = true
-    }
+    // 1) Lecture initiale (resout loading des qu'elle revient ; tolere une erreur).
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => apply(session))
+      .catch(() => { if (active) setState(s => ({ ...s, loading: false })) })
 
-    init()
+    // 2) Login / logout / refresh — SYNCHRONE (aucun await ici -> pas de deadlock).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => apply(session))
 
-    // Synchrone : aucun await/requete ici. init() assure le premier rendu (et le refresh
-    // de transition) ; ensuite ce callback gere login / logout / refresh.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!ready) return
-      apply(session)
-    })
+    // 3) Filet anti-blocage : si rien n'a resolu en 4s, on debloque (au pire -> LoginPage).
+    const safety = setTimeout(() => {
+      if (active) setState(s => (s.loading ? { ...s, loading: false } : s))
+    }, 4000)
 
-    return () => { active = false; subscription.unsubscribe() }
+    return () => { active = false; clearTimeout(safety); subscription.unsubscribe() }
   }, [])
 
   const signOut = async () => {
