@@ -59,6 +59,7 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
             <span>{new Date(sub.created_at).toLocaleDateString('fr-FR')}</span>
             {sub.rating_experience && <span>Expérience : {'★'.repeat(sub.rating_experience)}{'☆'.repeat(5 - sub.rating_experience)}</span>}
             {sub.rating_products && <span>Produits : {'★'.repeat(sub.rating_products)}{'☆'.repeat(5 - sub.rating_products)}</span>}
+            {sub.model_height_cm && <span>Hauteur : {sub.model_height_cm} cm</span>}
           </div>
         </div>
         <button className="mod-detail__dl-all" onClick={props.onDownloadSubmission}>⬇ Tout télécharger</button>
@@ -99,10 +100,9 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
         />
       )}
 
-      {(sub.product_size || sub.model_height_cm || sub.model_shoulder_width_cm) && (
+      {(sub.product_size || sub.model_shoulder_width_cm) && (
         <div className="mod-detail__sizing">
           {sub.product_size && <span className="mod-chip">Taille : {sub.product_size}</span>}
-          {sub.model_height_cm && <span className="mod-chip">Hauteur : {sub.model_height_cm} cm</span>}
           {sub.model_shoulder_width_cm && <span className="mod-chip">Épaules : {sub.model_shoulder_width_cm} cm</span>}
         </div>
       )}

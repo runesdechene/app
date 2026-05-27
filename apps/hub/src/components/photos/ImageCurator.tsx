@@ -59,28 +59,28 @@ export function ImageCurator({ image, onOpenLightbox, onSetWall, onDelete, onLin
 
         <div className="mod-curator__toggles">
           <label className="mod-curator__switch-row">
-            <span>Mur communautaire</span>
             <span className="mod-switch">
               <input type="checkbox" checked={image.show_on_wall} disabled={busy}
                 onChange={async e => { setBusy(true); setError(null); try { await onSetWall(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
               <span className="mod-switch__slider" />
             </span>
+            <span className="mod-curator__switch-label">Mur communautaire</span>
           </label>
           <label className={`mod-curator__switch-row${image.shopify_product_id ? '' : ' is-disabled'}`} title={image.shopify_product_id ? '' : 'Relie un produit pour activer'}>
-            <span>Galerie du produit</span>
             <span className="mod-switch">
               <input type="checkbox" checked={image.shopify_media_id != null} disabled={busy || !image.shopify_product_id}
                 onChange={async e => { setBusy(true); setError(null); try { await onSetPhotoProduit(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
               <span className="mod-switch__slider" />
             </span>
+            <span className="mod-curator__switch-label">Galerie du produit</span>
           </label>
           <label className={`mod-curator__switch-row${image.shopify_product_id ? '' : ' is-disabled'}`} title={image.shopify_product_id ? '' : 'Relie un produit pour activer'}>
-            <span>Bloc communauté du produit</span>
             <span className="mod-switch">
               <input type="checkbox" checked={image.show_in_community} disabled={busy || !image.shopify_product_id}
                 onChange={async e => { setBusy(true); setError(null); try { await onSetCommunity(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
               <span className="mod-switch__slider" />
             </span>
+            <span className="mod-curator__switch-label">Bloc communauté du produit</span>
           </label>
         </div>
 
@@ -114,7 +114,7 @@ export function ImageCurator({ image, onOpenLightbox, onSetWall, onDelete, onLin
         )}
 
         <div className="mod-curator__footer">
-          <button className="mod-curator__dl" onClick={onDownload} title="Télécharger">↓</button>
+          <button className="mod-curator__dl" onClick={onDownload} title="Télécharger">↓ Télécharger</button>
           <button className="mod-curator__delete" onClick={onDelete} title="Supprimer définitivement">🗑 Supprimer</button>
         </div>
         {error && !open && <div className="mod-curator__error">{error}</div>}
