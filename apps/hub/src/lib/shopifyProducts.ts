@@ -9,6 +9,7 @@ export interface ShopifyProductHit {
   title: string
   handle: string
   imageUrl: string | null
+  price: string | null  // prix formaté, ex. "49 €"
 }
 
 async function authHeader(): Promise<Record<string, string>> {
@@ -27,7 +28,7 @@ export async function searchShopifyProducts(term: string): Promise<ShopifyProduc
   const clean = term.trim()
   if (clean.length < 2) return []
   const escaped = clean.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-  const query = `{ products(first: 8, query: "title:*${escaped}*") { edges { node { legacyResourceId title handle featuredImage { url } } } } }`
+  const query = `{ products(first: 8, query: "title:*${escaped}*") { edges { node { legacyResourceId title handle featuredImage { url } priceRangeV2 { minVariantPrice { amount currencyCode } } } } } }`
 
   const resp = await fetch(proxyUrl('graphql.json'), {
     method: 'POST',
@@ -36,15 +37,30 @@ export async function searchShopifyProducts(term: string): Promise<ShopifyProduc
   })
   if (!resp.ok) throw new Error(`Recherche produit: HTTP ${resp.status}`)
   const json = await resp.json() as {
-    data?: { products?: { edges?: Array<{ node: { legacyResourceId: string; title: string; handle: string; featuredImage: { url: string } | null } }> } }
+    data?: { products?: { edges?: Array<{ node: {
+      legacyResourceId: string; title: string; handle: string;
+      featuredImage: { url: string } | null;
+      priceRangeV2: { minVariantPrice: { amount: string; currencyCode: string } } | null;
+    } }> } }
   }
   const edges = json.data?.products?.edges ?? []
-  return edges.map(e => ({
-    productId: e.node.legacyResourceId,
-    title: e.node.title,
-    handle: e.node.handle,
-    imageUrl: e.node.featuredImage?.url ?? null,
-  }))
+  return edges.map(e => {
+    const mp = e.node.priceRangeV2?.minVariantPrice
+    let price: string | null = null
+    if (mp) {
+      const amount = Number(mp.amount)
+      price = Number.isFinite(amount)
+        ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: mp.currencyCode || 'EUR', maximumFractionDigits: 0 }).format(amount)
+        : null
+    }
+    return {
+      productId: e.node.legacyResourceId,
+      title: e.node.title,
+      handle: e.node.handle,
+      imageUrl: e.node.featuredImage?.url ?? null,
+      price,
+    }
+  })
 }
 
 /** Pousse une image (URL publique) dans la galerie native d'un produit. Retourne l'ID image Shopify. */
