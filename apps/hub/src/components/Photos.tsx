@@ -331,19 +331,29 @@ export function Photos() {
   }
 
   const linkImage = async (subId: string, imageId: string, hit: ShopifyProductHit) => {
+    await supabase.rpc('set_submission_image_shopify_product', { p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title })
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: hit.productId, shopify_product_handle: hit.handle, shopify_product_title: hit.title } : i) }) ))
+  }
+
+  const setPhotoProduit = async (subId: string, imageId: string, on: boolean) => {
     const sub = submissions.find(s => s.id === subId)
     const img = sub?.hub_submission_images.find(i => i.id === imageId)
-    if (!sub || !img) return
-    const alt = buildImageAlt(sub.submitter_name, sub.model_height_cm, img.size)
-    const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
-    try {
-      await supabase.rpc('set_submission_image_shopify_product', { p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title })
+    if (!sub || !img || !img.shopify_product_id) return
+    if (on) {
+      const alt = buildImageAlt(sub.submitter_name, sub.model_height_cm, img.size)
+      const mediaId = await pushImageToProduct(img.shopify_product_id, img.image_url, alt)
       await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
-    } catch (rpcErr) {
-      await deleteProductImage(hit.productId, mediaId).catch(() => {})
-      throw rpcErr
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_media_id: mediaId } : i) }) ))
+    } else {
+      if (img.shopify_media_id) await deleteProductImage(img.shopify_product_id, img.shopify_media_id)
+      await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: '' })
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_media_id: null } : i) }) ))
     }
-    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: hit.productId, shopify_product_handle: hit.handle, shopify_product_title: hit.title, shopify_media_id: mediaId } : i) }) ))
+  }
+
+  const setImageCommunity = async (subId: string, imageId: string, on: boolean) => {
+    await supabase.rpc('set_submission_image_community', { p_image_id: imageId, p_show: on })
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, show_in_community: on } : i) }) ))
   }
 
   const unlinkImage = async (subId: string, imageId: string) => {
@@ -352,7 +362,7 @@ export function Photos() {
     if (!sub || !img || !img.shopify_product_id) return
     if (img.shopify_media_id) await deleteProductImage(img.shopify_product_id, img.shopify_media_id)
     await supabase.rpc('clear_submission_image_shopify_product', { p_image_id: imageId })
-    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null } : i) }) ))
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null, show_in_community: false } : i) }) ))
   }
 
   const setImageStatus = async (subId: string, imageId: string, status: PhotoStatus) => {
@@ -409,6 +419,8 @@ export function Photos() {
               onSetImageStatus={(imageId, status) => setImageStatus(selected.id, imageId, status)}
               onLinkImage={(imageId, hit) => linkImage(selected.id, imageId, hit)}
               onUnlinkImage={(imageId) => unlinkImage(selected.id, imageId)}
+              onSetPhotoProduit={(imageId, on) => setPhotoProduit(selected.id, imageId, on)}
+              onSetCommunity={(imageId, on) => setImageCommunity(selected.id, imageId, on)}
               onOpenLightbox={(index) => openLightbox(selected.hub_submission_images, index)}
               onDownloadSubmission={() => downloadSingleSubmission(selected)}
               onDownloadImage={(index) => { const imgs = [...selected.hub_submission_images].sort((a, b) => a.sort_order - b.sort_order); downloadSingleImage(selected, imgs[index].image_url, index) }}

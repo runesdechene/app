@@ -21,6 +21,8 @@ interface SubmissionDetailProps {
   onSetImageStatus: (imageId: string, status: PhotoStatus) => void
   onLinkImage: (imageId: string, hit: ShopifyProductHit) => Promise<void>
   onUnlinkImage: (imageId: string) => Promise<void>
+  onSetPhotoProduit: (imageId: string, on: boolean) => Promise<void>
+  onSetCommunity: (imageId: string, on: boolean) => Promise<void>
   onOpenLightbox: (index: number) => void
   onDownloadSubmission: () => void
   onDownloadImage: (index: number) => void
@@ -54,6 +56,8 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
             {sub.departement && <span>Département : {sub.departement}</span>}
             {sub.quest_ref && <span>⚑ {sub.quest_ref}</span>}
             <span>{new Date(sub.created_at).toLocaleDateString('fr-FR')}</span>
+            {sub.rating_experience && <span>Expérience : {'★'.repeat(sub.rating_experience)}{'☆'.repeat(5 - sub.rating_experience)}</span>}
+            {sub.rating_products && <span>Produits : {'★'.repeat(sub.rating_products)}{'☆'.repeat(5 - sub.rating_products)}</span>}
           </div>
         </div>
         <button className="mod-detail__dl-all" onClick={props.onDownloadSubmission}>⬇ Tout télécharger</button>
@@ -87,6 +91,8 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
           onSetStatus={(status) => props.onSetImageStatus(active.id, status)}
           onLink={(hit) => props.onLinkImage(active.id, hit)}
           onUnlink={() => props.onUnlinkImage(active.id)}
+          onSetPhotoProduit={(on) => props.onSetPhotoProduit(active.id, on)}
+          onSetCommunity={(on) => props.onSetCommunity(active.id, on)}
           onDownload={() => props.onDownloadImage(activeIdx)}
         />
       )}
@@ -110,6 +116,12 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
       ) : (
         <p className="mod-detail__msg" onClick={() => { setEditingMsg(true); setMsgText(sub.message || '') }} title="Cliquer pour modifier">
           {sub.message || <span className="mod-detail__msg-empty">+ Ajouter un message…</span>}
+        </p>
+      )}
+
+      {sub.team_note && (
+        <p className="mod-detail__msg" style={{ borderLeft: '3px solid #e0a73d', paddingLeft: '.6rem', fontStyle: 'italic' }} title="Privé — non publié">
+          🔒 {sub.team_note}
         </p>
       )}
 

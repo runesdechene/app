@@ -10,12 +10,14 @@ interface ImageCuratorProps {
   onSetStatus: (status: PhotoStatus) => void
   onLink: (hit: ShopifyProductHit) => Promise<void>
   onUnlink: () => Promise<void>
+  onSetPhotoProduit: (on: boolean) => Promise<void>
+  onSetCommunity: (on: boolean) => Promise<void>
   onDownload: () => void
 }
 
 const sizeLabel = (s: string | null) => s == null ? '' : s === 'none' ? 'Aucun produit' : s
 
-export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnlink, onDownload }: ImageCuratorProps) {
+export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnlink, onSetPhotoProduit, onSetCommunity, onDownload }: ImageCuratorProps) {
   const [open, setOpen] = useState(false)
   const [term, setTerm] = useState('')
   const [hits, setHits] = useState<ShopifyProductHit[]>([])
@@ -61,6 +63,18 @@ export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnl
         {image.shopify_product_id ? (
           <div className="mod-curator__linked">
             <span title={`Relié à ${image.shopify_product_title}`}>🏷 {image.shopify_product_title}</span>
+            <div className="mod-curator__dest">
+              <label className="mod-curator__toggle">
+                <input type="checkbox" checked={image.shopify_media_id != null} disabled={busy}
+                  onChange={async e => { setBusy(true); setError(null); try { await onSetPhotoProduit(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+                Photo produit (galerie)
+              </label>
+              <label className="mod-curator__toggle">
+                <input type="checkbox" checked={image.show_in_community} disabled={busy}
+                  onChange={async e => { setBusy(true); setError(null); try { await onSetCommunity(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+                Communauté (bloc fiche)
+              </label>
+            </div>
             <button className="mod-curator__unlink" disabled={busy} onClick={doUnlink}>Retirer ✕</button>
           </div>
         ) : open ? (
