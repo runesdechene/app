@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
@@ -18,9 +18,9 @@ export function useAuth() {
     role: null,
     loading: true
   })
-  const initialised = useRef(false)
-
   useEffect(() => {
+    let active = true
+
     async function fetchRole(email: string): Promise<UserRole | null> {
       try {
         const { data, error } = await supabase
@@ -29,36 +29,35 @@ export function useAuth() {
           .eq('email_address', email)
           .single()
         if (error) {
+          console.error('[useAuth] fetchRole error:', error.message)
           return null
         }
         return (data?.role as UserRole) ?? null
       } catch (e) {
+        console.error('[useAuth] fetchRole exception:', e)
         return null
       }
     }
 
-    async function init() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        const role = session?.user?.email ? await fetchRole(session.user.email) : null
-        setState({ user: session?.user ?? null, session, role, loading: false })
-      } catch {
-        setState(prev => ({ ...prev, loading: false }))
-      }
-      initialised.current = true
+    // IMPORTANT : ne JAMAIS await un appel Supabase directement dans le callback
+    // onAuthStateChange — ça deadlock le verrou auth (la requete pend jusqu'au timeout
+    // -> role null -> faux "pas admin"). On differe hors du callback via setTimeout(0).
+    function applySession(session: Session | null) {
+      setTimeout(async () => {
+        if (!active) return
+        const email = session?.user?.email
+        const role = email ? await fetchRole(email) : null
+        if (active) setState({ user: session?.user ?? null, session, role, loading: false })
+      }, 0)
     }
 
-    init()
+    supabase.auth.getSession().then(({ data: { session } }) => { if (active) applySession(session) })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (!initialised.current) return
-        const role = session?.user?.email ? await fetchRole(session.user.email) : null
-        setState({ user: session?.user ?? null, session, role, loading: false })
-      }
-    )
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      applySession(session)
+    })
 
-    return () => subscription.unsubscribe()
+    return () => { active = false; subscription.unsubscribe() }
   }, [])
 
   const signOut = async () => {
