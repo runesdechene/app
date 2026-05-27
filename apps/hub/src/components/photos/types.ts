@@ -17,6 +17,7 @@ export interface SubmissionImage {
   shopify_product_handle: string | null
   shopify_product_title: string | null
   shopify_media_id: string | null
+  show_in_community: boolean
 }
 
 export interface PhotoTag {
@@ -44,6 +45,9 @@ export interface PhotoSubmission {
   departement: string | null
   quest_ref: string | null
   reward_crowns: number | null
+  rating_experience: number | null
+  rating_products: number | null
+  team_note: string | null
   hub_submission_images: SubmissionImage[]
   tags: PhotoTag[]
 }
