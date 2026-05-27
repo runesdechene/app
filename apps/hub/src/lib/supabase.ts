@@ -17,8 +17,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         () => controller.abort(new DOMException(`Timeout apres ${FETCH_TIMEOUT_MS / 1000}s`, 'TimeoutError')),
         FETCH_TIMEOUT_MS
       )
-      const signal = options.signal ?? controller.signal
-      return fetch(url, { ...options, signal })
+      // Fusionne le signal eventuel de supabase-js avec NOTRE controller (au lieu de
+      // l'ignorer) : timeout + annulation amont coexistent, aucun n'est perdu.
+      const upstream = options.signal
+      if (upstream) {
+        if (upstream.aborted) controller.abort(upstream.reason)
+        else upstream.addEventListener('abort', () => controller.abort(upstream.reason), { once: true })
+      }
+      return fetch(url, { ...options, signal: controller.signal })
         .finally(() => clearTimeout(timeout))
     },
   },
