@@ -72,6 +72,11 @@ export function StudioSubmit() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [ratingExperience, setRatingExperience] = useState(0)
+  const [ratingProducts, setRatingProducts] = useState(0)
+  const [hoverExp, setHoverExp] = useState(0)
+  const [hoverProd, setHoverProd] = useState(0)
+  const [teamNote, setTeamNote] = useState('')
   const [departement, setDepartement] = useState('')
   const [heightCm, setHeightCm] = useState('')
   const [consentBrand, setConsentBrand] = useState(false)
@@ -143,6 +148,9 @@ export function StudioSubmit() {
         p_consent_brand: consentBrand, p_consent_account: consentAccount,
         p_departement: departement || null, p_quest_ref: questRef,
         p_model_height_cm: parsedHeightCm,
+        p_rating_experience: ratingExperience || null,
+        p_rating_products: ratingProducts || null,
+        p_team_note: teamNote.trim() || null,
       })
       if (subErr) throw new Error(`Soumission : ${subErr.message}`)
 
@@ -291,9 +299,33 @@ export function StudioSubmit() {
             <>
               <div className="studio__kick">Étape 3 sur 4</div>
               <h2 className="studio__h">Ton histoire</h2>
-              <label className="studio__label">Un mot sur ton shooting (optionnel)</label>
+              <label className="studio__label">Ton avis public (marque, expérience…) (optionnel)</label>
               <textarea className="studio__field" rows={4} maxLength={MAX_MESSAGE} value={message}
-                onChange={(e) => setMessage(e.target.value)} placeholder="Raconte-nous…" />
+                onChange={(e) => setMessage(e.target.value)} placeholder="Ce que tu veux partager publiquement sur Runes de Chêne…" />
+
+              <label className="studio__label">Comment fut votre expérience Runes de Chêne ?</label>
+              <div className="studio__stars">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button key={star} type="button"
+                    className={`studio__star ${star <= (hoverExp || ratingExperience) ? 'on' : ''}`}
+                    onClick={() => setRatingExperience(star === ratingExperience ? 0 : star)}
+                    onMouseEnter={() => setHoverExp(star)} onMouseLeave={() => setHoverExp(0)}>★</button>
+                ))}
+              </div>
+
+              <label className="studio__label">Comment appréciez-vous vos produits ?</label>
+              <div className="studio__stars">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button key={star} type="button"
+                    className={`studio__star ${star <= (hoverProd || ratingProducts) ? 'on' : ''}`}
+                    onClick={() => setRatingProducts(star === ratingProducts ? 0 : star)}
+                    onMouseEnter={() => setHoverProd(star)} onMouseLeave={() => setHoverProd(0)}>★</button>
+                ))}
+              </div>
+
+              <label className="studio__label">Un mot pour l'équipe ? <span style={{ opacity: .6 }}>(privé — ne sera jamais publié)</span></label>
+              <textarea className="studio__field" rows={3} maxLength={MAX_MESSAGE} value={teamNote}
+                onChange={(e) => setTeamNote(e.target.value)} placeholder="Message privé à l'équipe Runes de Chêne…" />
               <label className="studio__label">Département (optionnel)</label>
               <select className="studio__field" value={departement} onChange={(e) => setDepartement(e.target.value)}>
                 <option value="">— Je préfère ne pas dire / hors France —</option>
