@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import { ShopifyHealthBadge } from './ShopifyHealthBadge'
@@ -8,6 +9,16 @@ interface SidebarProps {
 }
 
 export function Sidebar({ user }: SidebarProps) {
+  const [pending, setPending] = useState(0)
+
+  useEffect(() => {
+    let active = true
+    supabase.rpc('get_photo_submissions', { p_status: 'pending' }).then(({ data }) => {
+      if (active && Array.isArray(data)) setPending(data.length)
+    })
+    return () => { active = false }
+  }, [])
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
   }
@@ -28,10 +39,12 @@ export function Sidebar({ user }: SidebarProps) {
           Utilisateurs
         </NavLink>
         <NavLink to="/photos" className={({ isActive }) => isActive ? 'active' : ''}>
-          Photos
-        </NavLink>
-        <NavLink to="/reviews" className={({ isActive }) => isActive ? 'active' : ''}>
-          Avis
+          Contenu communautaire
+          {pending > 0 && (
+            <span style={{ marginLeft: 8, background: '#e0a73d', color: '#2b2b2b', fontSize: 11, fontWeight: 700, minWidth: 18, display: 'inline-block', textAlign: 'center', padding: '1px 7px', borderRadius: 999, verticalAlign: 'middle' }}>
+              {pending}
+            </span>
+          )}
         </NavLink>
 
         <div className="sidebar-section-label">La Carte</div>

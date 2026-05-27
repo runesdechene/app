@@ -6,7 +6,6 @@ import { Users } from './components/Users'
 import { UserDetail } from './components/UserDetail'
 import { Photos } from './components/Photos'
 import { StudioSubmit } from './components/StudioSubmit'
-import { Reviews } from './components/Reviews'
 import { ReviewSubmit } from './components/ReviewSubmit'
 import { TagsManager } from './components/TagsManager'
 import { Factions } from './components/Factions'
@@ -83,7 +82,6 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<UserDetail />} />
           <Route path="/photos" element={<Photos />} />
-          <Route path="/reviews" element={<Reviews />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
           <Route path="/carte/constructions" element={<Constructions />} />
