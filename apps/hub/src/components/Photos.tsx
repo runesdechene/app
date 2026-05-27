@@ -1,55 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import JSZip from 'jszip'
 import { supabase } from '../lib/supabase'
-import { searchShopifyProducts, pushImageToProduct, deleteProductImage, type ShopifyProductHit } from '../lib/shopifyProducts'
-
-type PhotoStatus = 'pending' | 'approved' | 'archived'
-type SubmitterRole = 'client' | 'ambassadeur' | 'partenaire'
-
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm', '.avi', '.mkv', '.m4v']
-const isVideoUrl = (url: string) => VIDEO_EXTENSIONS.some(ext => url.toLowerCase().endsWith(ext))
-
-interface SubmissionImage {
-  id: string
-  image_url: string
-  sort_order: number
-  status: 'pending' | 'approved' | 'archived'
-  size: string | null            // valeur taille, 'none' = aucun produit porté, null = non renseigné
-  product_worn: string | null    // produit tagué au hub, par photo
-  shopify_product_id: string | null
-  shopify_product_handle: string | null
-  shopify_product_title: string | null
-  shopify_media_id: string | null
-}
-
-interface PhotoTag {
-  id: string
-  name: string
-}
-
-interface PhotoSubmission {
-  id: string
-  user_id: string
-  submitter_name: string
-  submitter_email: string
-  submitter_instagram: string | null
-  submitter_role: SubmitterRole | null
-  location_name: string | null
-  location_zip: string | null
-  message: string | null
-  product_size: string | null
-  model_height_cm: number | null
-  model_shoulder_width_cm: number | null
-  product_worn: string | null
-  consent_brand_usage: boolean
-  status: PhotoStatus
-  created_at: string
-  departement: string | null
-  quest_ref: string | null
-  reward_crowns: number | null
-  hub_submission_images: SubmissionImage[]
-  tags: PhotoTag[]
-}
+import { pushImageToProduct, deleteProductImage, type ShopifyProductHit } from '../lib/shopifyProducts'
+import {
+  type PhotoStatus, type SubmitterRole, type SubmissionImage, type PhotoTag, type PhotoSubmission,
+} from './photos/types'
+import { PhotosToolbar } from './photos/PhotosToolbar'
+import { SubmissionList } from './photos/SubmissionList'
+import { SubmissionDetail } from './photos/SubmissionDetail'
+import { TagManager } from './photos/TagManager'
+import { Lightbox } from './photos/Lightbox'
+import './photos/Photos.css'
 
 /** Texte alternatif Shopify : "Pierre mesure 1m83 et porte du M" (parties omises si absentes). */
 function buildImageAlt(name: string | null, heightCm: number | null, size: string | null): string {
@@ -65,68 +26,22 @@ function buildImageAlt(name: string | null, heightCm: number | null, size: strin
   return 'Communauté Runes de Chêne'
 }
 
-const STATUS_LABELS: Record<PhotoStatus, string> = {
-  pending: 'En attente',
-  approved: 'Validees',
-  archived: 'Archivees'
-}
-
-const STATUS_COLORS: Record<PhotoStatus, string> = {
-  pending: '#f59e0b',
-  approved: '#22c55e',
-  archived: '#6b7280'
-}
-
-const ROLE_LABELS: Record<SubmitterRole, string> = {
-  client: 'Client',
-  ambassadeur: 'Ambassadeur',
-  partenaire: 'Partenaire'
-}
-
-const ROLE_COLORS: Record<SubmitterRole, string> = {
-  client: '#6366f1',
-  ambassadeur: '#f59e0b',
-  partenaire: '#06b6d4'
-}
-
 export function Photos() {
   const [submissions, setSubmissions] = useState<PhotoSubmission[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<PhotoStatus | 'all'>('pending')
-  const [roleFilter, setRoleFilter] = useState<SubmitterRole | 'all'>('all')
-  const [tagFilter, setTagFilter] = useState<string | 'all'>('all')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [lightbox, setLightbox] = useState<{ images: SubmissionImage[], index: number } | null>(null)
-
-  // Montant de Couronnes saisi à la validation, par soumission (défaut suggéré : 10)
-  const [crownInput, setCrownInput] = useState<Record<string, number>>({})
-  const crownsFor = (subId: string) => (crownInput[subId] ?? 10)
-
-  // Tags state
   const [allTags, setAllTags] = useState<PhotoTag[]>([])
-  const [newTagName, setNewTagName] = useState('')
+  const [filter, setFilter] = useState<PhotoStatus | 'all'>('pending')
+  const [roleFilter, setRoleFilter] = useState<'all' | SubmitterRole>('all')
+  const [tagFilter, setTagFilter] = useState<'all' | string>('all')
+  const [search, setSearch] = useState('')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showTagManager, setShowTagManager] = useState(false)
-  const [tagDropdownId, setTagDropdownId] = useState<string | null>(null)
-
-  // Message editing state
-  const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [editingMessageText, setEditingMessageText] = useState('')
-
-  // Product worn editing state
-  const [editingProductId, setEditingProductId] = useState<string | null>(null)
-  const [editingProductText, setEditingProductText] = useState('')
-
-  // Shopify product picker state
-  const [pickerImageId, setPickerImageId] = useState<string | null>(null)
-  const [pickerTerm, setPickerTerm] = useState('')
-  const [pickerHits, setPickerHits] = useState<ShopifyProductHit[]>([])
-  const [pickerBusy, setPickerBusy] = useState(false)
-  const [pickerError, setPickerError] = useState<string | null>(null)
-
-  // Download state
+  const [newTagName, setNewTagName] = useState('')
   const [downloadSince, setDownloadSince] = useState('')
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState('')
+  const [crownInput, setCrownInput] = useState<Record<string, number>>({})
+  const [lightbox, setLightbox] = useState<{ images: SubmissionImage[]; index: number } | null>(null)
 
   // Fetch tags
   useEffect(() => {
@@ -173,23 +88,31 @@ export function Photos() {
     fetchSubmissions()
   }, [filter])
 
-  // Debounced Shopify product search
-  useEffect(() => {
-    if (!pickerImageId) return
-    const t = setTimeout(async () => {
-      try {
-        setPickerError(null)
-        setPickerHits(await searchShopifyProducts(pickerTerm))
-      } catch (e) {
-        setPickerError(e instanceof Error ? e.message : String(e))
-      }
-    }, 300)
-    return () => clearTimeout(t)
-  }, [pickerTerm, pickerImageId])
+  const crownsFor = (id: string) => crownInput[id] ?? 10
 
-  const filteredSubmissions = submissions
-    .filter(s => roleFilter === 'all' || s.submitter_role === roleFilter)
-    .filter(s => tagFilter === 'all' || s.tags.some(t => t.id === tagFilter))
+  const filteredSubmissions = useMemo(() => submissions.filter(s => {
+    if (filter !== 'all' && s.status !== filter) return false
+    if (roleFilter !== 'all' && s.submitter_role !== roleFilter) return false
+    if (tagFilter !== 'all' && !s.tags.some(t => t.id === tagFilter)) return false
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      if (!s.submitter_name.toLowerCase().includes(q) && !s.submitter_email.toLowerCase().includes(q)) return false
+    }
+    return true
+  }), [submissions, filter, roleFilter, tagFilter, search])
+
+  useEffect(() => {
+    if (filteredSubmissions.length === 0) { if (selectedId !== null) setSelectedId(null); return }
+    if (!selectedId || !filteredSubmissions.some(s => s.id === selectedId)) setSelectedId(filteredSubmissions[0].id)
+  }, [filteredSubmissions, selectedId])
+
+  const selected = filteredSubmissions.find(s => s.id === selectedId) ?? null
+  const pendingCount = useMemo(() => submissions.filter(s => s.status === 'pending').length, [submissions])
+
+  const downloadableSubmissions = downloadSince
+    ? filteredSubmissions.filter(s => new Date(s.created_at) >= new Date(downloadSince))
+    : []
+  const downloadableImageCount = downloadableSubmissions.reduce((sum, s) => sum + (s.hub_submission_images?.length || 0), 0)
 
   const moderate = async (subId: string, status: PhotoStatus, crowns?: number) => {
     const { error } = await supabase.rpc('moderate_submission', {
@@ -208,79 +131,6 @@ export function Photos() {
       }
     }
   }
-
-  const setImageStatus = async (subId: string, imageId: string, status: SubmissionImage['status']) => {
-    const { error } = await supabase.rpc('set_submission_image_status', { p_image_id: imageId, p_status: status })
-    if (!error) {
-      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
-        ...s,
-        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, status } : img),
-      })))
-      // si on archive une image déjà poussée sur une fiche produit, la retirer de Shopify
-      if (status === 'archived') {
-        await unlinkImageFromProduct(subId, imageId)
-      }
-    }
-  }
-
-  const linkImageToProduct = async (subId: string, imageId: string, hit: ShopifyProductHit) => {
-    const sub = submissions.find(s => s.id === subId)
-    const img = sub?.hub_submission_images.find(i => i.id === imageId)
-    if (!sub || !img) return
-    setPickerBusy(true)
-    setPickerError(null)
-    try {
-      const alt = buildImageAlt(sub.submitter_name, sub.model_height_cm, img.size)
-      const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
-      try {
-        await supabase.rpc('set_submission_image_shopify_product', {
-          p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title,
-        })
-        await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
-      } catch (rpcErr) {
-        // compensation : la persistance a echoue, on retire l'image orpheline de Shopify
-        await deleteProductImage(hit.productId, mediaId).catch(() => {})
-        throw rpcErr
-      }
-      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
-        ...s,
-        hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? {
-          ...i, shopify_product_id: hit.productId, shopify_product_handle: hit.handle,
-          shopify_product_title: hit.title, shopify_media_id: mediaId,
-        } : i),
-      })))
-      setPickerImageId(null); setPickerTerm(''); setPickerHits([])
-    } catch (e) {
-      setPickerError(e instanceof Error ? e.message : String(e))
-    } finally {
-      setPickerBusy(false)
-    }
-  }
-
-  const unlinkImageFromProduct = async (subId: string, imageId: string) => {
-    const sub = submissions.find(s => s.id === subId)
-    const img = sub?.hub_submission_images.find(i => i.id === imageId)
-    if (!sub || !img || !img.shopify_product_id) return
-    setPickerBusy(true)
-    setPickerError(null)
-    try {
-      if (img.shopify_media_id) await deleteProductImage(img.shopify_product_id, img.shopify_media_id)
-      await supabase.rpc('clear_submission_image_shopify_product', { p_image_id: imageId })
-      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
-        ...s,
-        hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? {
-          ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null,
-        } : i),
-      })))
-    } catch (e) {
-      setPickerError(e instanceof Error ? e.message : String(e))
-    } finally {
-      setPickerBusy(false)
-    }
-  }
-
-  const sizeLabel = (size: string | null) =>
-    size == null ? 'Taille non renseignée' : size === 'none' ? 'Aucun produit porté' : `Taille ${size}`
 
   const deleteSubmission = async (subId: string) => {
     if (!window.confirm('Supprimer definitivement cette soumission ?')) return
@@ -344,50 +194,6 @@ export function Photos() {
     }
   }
 
-  const startEditingMessage = (subId: string, currentMessage: string | null) => {
-    setEditingMessageId(subId)
-    setEditingMessageText(currentMessage || '')
-  }
-
-  const saveMessage = async (subId: string) => {
-    const newMessage = editingMessageText.trim() || null
-    const { error } = await supabase.rpc('update_submission_message', {
-      p_submission_id: subId,
-      p_message: newMessage
-    })
-    if (!error) {
-      setSubmissions(prev => prev.map(s =>
-        s.id === subId ? { ...s, message: newMessage } : s
-      ))
-    }
-    setEditingMessageId(null)
-    setEditingMessageText('')
-  }
-
-  const startEditingProduct = (subId: string, currentProduct: string | null) => {
-    setEditingProductId(subId)
-    setEditingProductText(currentProduct || '')
-  }
-
-  const saveProductWorn = async (subId: string) => {
-    const newProduct = editingProductText.trim() || null
-    const { error } = await supabase.rpc('update_submission_product_worn', {
-      p_submission_id: subId,
-      p_product_worn: newProduct
-    })
-    if (!error) {
-      setSubmissions(prev => prev.map(s =>
-        s.id === subId ? { ...s, product_worn: newProduct } : s
-      ))
-    }
-    setEditingProductId(null)
-    setEditingProductText('')
-  }
-
-  const openLightbox = (images: SubmissionImage[], index: number) => {
-    setLightbox({ images: [...images].sort((a, b) => a.sort_order - b.sort_order), index })
-  }
-
   // Download helpers
   const sanitizeFilename = (str: string) =>
     str.replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim()
@@ -396,18 +202,9 @@ export function Photos() {
     const ext = url.split('.').pop()?.split('?')[0] || 'webp'
     const parts = [sanitizeFilename(sub.submitter_name)]
     if (sub.submitter_instagram) parts.push(sanitizeFilename(sub.submitter_instagram))
-    if (sub.product_worn) parts.push(sanitizeFilename(sub.product_worn))
     parts.push(String(index + 1))
     return parts.join(' - ') + '.' + ext
   }
-
-  const downloadableSubmissions = downloadSince
-    ? filteredSubmissions.filter(s => new Date(s.created_at) >= new Date(downloadSince))
-    : []
-
-  const downloadableImageCount = downloadableSubmissions.reduce(
-    (sum, s) => sum + (s.hub_submission_images?.length || 0), 0
-  )
 
   const handleDownloadZip = async () => {
     if (downloadableSubmissions.length === 0) return
@@ -522,436 +319,107 @@ export function Photos() {
     } catch (err) { console.error('[Photos] downloadSingleImage failed', err); alert('Erreur lors du téléchargement') }
   }
 
+  const openLightbox = (images: SubmissionImage[], index: number) => {
+    setLightbox({ images: [...images].sort((a, b) => a.sort_order - b.sort_order), index })
+  }
+
   const closeLightbox = () => setLightbox(null)
 
-  const lightboxPrev = () => {
-    if (!lightbox) return
-    setLightbox({ ...lightbox, index: (lightbox.index - 1 + lightbox.images.length) % lightbox.images.length })
+  const saveMessage = async (subId: string, msg: string | null) => {
+    const { error } = await supabase.rpc('update_submission_message', { p_submission_id: subId, p_message: msg })
+    if (!error) setSubmissions(prev => prev.map(s => s.id === subId ? { ...s, message: msg } : s))
   }
 
-  const lightboxNext = () => {
-    if (!lightbox) return
-    setLightbox({ ...lightbox, index: (lightbox.index + 1) % lightbox.images.length })
+  const linkImage = async (subId: string, imageId: string, hit: ShopifyProductHit) => {
+    const sub = submissions.find(s => s.id === subId)
+    const img = sub?.hub_submission_images.find(i => i.id === imageId)
+    if (!sub || !img) return
+    const alt = buildImageAlt(sub.submitter_name, sub.model_height_cm, img.size)
+    const mediaId = await pushImageToProduct(hit.productId, img.image_url, alt)
+    try {
+      await supabase.rpc('set_submission_image_shopify_product', { p_image_id: imageId, p_product_id: hit.productId, p_handle: hit.handle, p_title: hit.title })
+      await supabase.rpc('set_submission_image_media', { p_image_id: imageId, p_media_id: mediaId })
+    } catch (rpcErr) {
+      await deleteProductImage(hit.productId, mediaId).catch(() => {})
+      throw rpcErr
+    }
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: hit.productId, shopify_product_handle: hit.handle, shopify_product_title: hit.title, shopify_media_id: mediaId } : i) }) ))
   }
+
+  const unlinkImage = async (subId: string, imageId: string) => {
+    const sub = submissions.find(s => s.id === subId)
+    const img = sub?.hub_submission_images.find(i => i.id === imageId)
+    if (!sub || !img || !img.shopify_product_id) return
+    if (img.shopify_media_id) await deleteProductImage(img.shopify_product_id, img.shopify_media_id)
+    await supabase.rpc('clear_submission_image_shopify_product', { p_image_id: imageId })
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null } : i) }) ))
+  }
+
+  const setImageStatus = async (subId: string, imageId: string, status: PhotoStatus) => {
+    const { error } = await supabase.rpc('set_submission_image_status', { p_image_id: imageId, p_status: status })
+    if (!error) {
+      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
+        ...s,
+        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, status } : img),
+      })))
+      // si on archive une image déjà poussée sur une fiche produit, la retirer de Shopify
+      if (status === 'archived') {
+        await unlinkImage(subId, imageId)
+      }
+    }
+  }
+
+  if (loading) return <div className="mod"><div className="mod-loading">Chargement…</div></div>
 
   return (
-    <div className="photos">
-      <div className="page-header">
-        <h1>Soumissions photos</h1>
-        <a href="/soumettre-contenu" target="_blank" rel="noopener noreferrer" className="form-link">
-          Ouvrir le formulaire photos ↗
-        </a>
-        <div className="filter-tabs">
-          {(['pending', 'approved', 'archived', 'all'] as const).map(f => (
-            <button
-              key={f}
-              className={`filter-tab ${filter === f ? 'active' : ''}`}
-              onClick={() => setFilter(f)}
-            >
-              {f === 'all' ? 'Toutes' : STATUS_LABELS[f]}
-            </button>
-          ))}
-        </div>
-        <div className="filter-tabs role-filters">
-          {(['all', 'client', 'ambassadeur', 'partenaire'] as const).map(r => (
-            <button
-              key={r}
-              className={`filter-tab ${roleFilter === r ? 'active' : ''}`}
-              onClick={() => setRoleFilter(r)}
-            >
-              {r === 'all' ? 'Tous' : ROLE_LABELS[r]}
-            </button>
-          ))}
-        </div>
-        {allTags.length > 0 && (
-          <div className="filter-tabs tag-filters">
-            <button
-              className={`filter-tab ${tagFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setTagFilter('all')}
-            >
-              Tous tags
-            </button>
-            {allTags.map(tag => (
-              <button
-                key={tag.id}
-                className={`filter-tab tag-filter-tab ${tagFilter === tag.id ? 'active' : ''}`}
-                onClick={() => setTagFilter(tag.id)}
-              >
-                #{tag.name}
-              </button>
-            ))}
-          </div>
-        )}
-        <button
-          className="btn-tag-manager"
-          onClick={() => setShowTagManager(!showTagManager)}
-        >
-          {showTagManager ? 'Fermer' : 'Gerer les tags'}
-        </button>
-
-        {/* Download section */}
-        <div className="download-section">
-          <label className="download-label">Telecharger depuis le :</label>
-          <input
-            type="date"
-            className="download-date-input"
-            value={downloadSince}
-            onChange={(e) => setDownloadSince(e.target.value)}
-          />
-          {downloadSince && (
-            <span className="download-count">
-              {downloadableSubmissions.length} soumission(s), {downloadableImageCount} fichier(s)
-            </span>
-          )}
-          <button
-            className="btn-download"
-            onClick={handleDownloadZip}
-            disabled={isDownloading || downloadableImageCount === 0}
-          >
-            {isDownloading ? downloadProgress : 'Telecharger (.zip)'}
-          </button>
-          {downloadSince && (
-            <button className="btn-download-clear" onClick={() => setDownloadSince('')}>
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Tag Manager */}
+    <div className="mod">
+      <PhotosToolbar
+        filter={filter} onFilter={(f) => { setFilter(f); setSelectedId(null) }}
+        roleFilter={roleFilter} onRoleFilter={(r) => { setRoleFilter(r); setSelectedId(null) }}
+        tagFilter={tagFilter} onTagFilter={(t) => { setTagFilter(t); setSelectedId(null) }}
+        tags={allTags}
+        search={search} onSearch={setSearch}
+        pendingCount={pendingCount}
+        onToggleTagManager={() => setShowTagManager(v => !v)}
+        downloadSince={downloadSince} onDownloadSince={setDownloadSince}
+        downloadCount={{ subs: downloadableSubmissions.length, files: downloadableImageCount }}
+        isDownloading={isDownloading} downloadProgress={downloadProgress} onDownloadZip={handleDownloadZip}
+      />
       {showTagManager && (
-        <div className="tag-manager">
-          <h3>Tags disponibles</h3>
-          <div className="tag-manager-list">
-            {allTags.map(tag => (
-              <div key={tag.id} className="tag-manager-item">
-                <span className="tag-pill">#{tag.name}</span>
-                <button className="tag-delete-btn" onClick={() => deleteTag(tag.id)}>✕</button>
-              </div>
-            ))}
-          </div>
-          <div className="tag-create-form">
-            <input
-              type="text"
-              placeholder="Nouveau tag..."
-              value={newTagName}
-              onChange={(e) => setNewTagName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && createTag()}
-            />
-            <button onClick={createTag} disabled={!newTagName.trim()}>Creer</button>
-          </div>
-        </div>
+        <TagManager tags={allTags} newTagName={newTagName} onNewTagName={setNewTagName}
+          onCreate={createTag} onDelete={deleteTag} onClose={() => setShowTagManager(false)} />
       )}
-
-      {loading ? (
-        <div className="loading">Chargement...</div>
-      ) : filteredSubmissions.length === 0 ? (
-        <div className="empty">Aucune soumission {filter !== 'all' ? STATUS_LABELS[filter].toLowerCase() : ''}{roleFilter !== 'all' ? ` (${ROLE_LABELS[roleFilter]})` : ''}</div>
+      {filteredSubmissions.length === 0 ? (
+        <div className="mod-empty">Aucune soumission</div>
       ) : (
-        <div className="photos-grid">
-          {filteredSubmissions.map(sub => {
-            const isInDownload = downloadSince && new Date(sub.created_at) >= new Date(downloadSince)
-            return (
-            <div key={sub.id} className={`photo-card ${sub.status}${isInDownload ? ' download-selected' : ''}`}>
-              {/* First image as cover */}
-              {sub.hub_submission_images?.length > 0 && (
-                <div className="photo-image" style={{ position: 'relative' }}>
-                  <div onClick={() => openLightbox(sub.hub_submission_images, 0)} style={{ cursor: 'pointer' }}>
-                    {(() => {
-                      const first = sub.hub_submission_images.sort((a, b) => a.sort_order - b.sort_order)[0]
-                      return isVideoUrl(first.image_url)
-                        ? <video src={first.image_url} muted playsInline />
-                        : <img src={first.image_url} alt={sub.message || 'Photo communautaire'} />
-                    })()}
-                  </div>
-                  {sub.hub_submission_images.length > 1 && (
-                    <span className="photo-count">{sub.hub_submission_images.length} fichiers</span>
-                  )}
-                  <button
-                    className="btn-download-img"
-                    onClick={(e) => { e.stopPropagation(); downloadSingleImage(sub, sub.hub_submission_images.sort((a, b) => a.sort_order - b.sort_order)[0].image_url, 0) }}
-                    title="Telecharger cette photo"
-                  >↓</button>
-                </div>
-              )}
-
-              <div className="photo-info">
-                <div className="photo-name-row">
-                  <span className="photo-name">{sub.submitter_name}</span>
-                  {sub.submitter_role && (
-                    <span
-                      className="role-badge"
-                      style={{ backgroundColor: ROLE_COLORS[sub.submitter_role] }}
-                    >
-                      {ROLE_LABELS[sub.submitter_role]}
-                    </span>
-                  )}
-                </div>
-                <span className="photo-email">{sub.submitter_email}</span>
-                {sub.submitter_instagram && (
-                  <span className="photo-instagram">{sub.submitter_instagram}</span>
-                )}
-                {(sub.location_name || sub.location_zip) && (
-                  <span className="photo-location">
-                    {[sub.location_name, sub.location_zip].filter(Boolean).join(' — ')}
-                  </span>
-                )}
-                {sub.departement && (
-                  <span className="photo-location">Département : {sub.departement}</span>
-                )}
-                {sub.quest_ref && (
-                  <span className="photo-quest">⚑ Quête : {sub.quest_ref}</span>
-                )}
-                {(sub.product_size || sub.model_height_cm || sub.model_shoulder_width_cm) && (
-                  <div className="photo-sizing">
-                    {sub.product_size && <span className="sizing-badge">Taille : {sub.product_size}</span>}
-                    {sub.model_height_cm && <span className="sizing-badge">Hauteur : {sub.model_height_cm} cm</span>}
-                    {sub.model_shoulder_width_cm && <span className="sizing-badge">Epaules : {sub.model_shoulder_width_cm} cm</span>}
-                  </div>
-                )}
-                {editingMessageId === sub.id ? (
-                  <div className="message-edit">
-                    <textarea
-                      value={editingMessageText}
-                      onChange={(e) => setEditingMessageText(e.target.value)}
-                      rows={3}
-                      maxLength={500}
-                      autoFocus
-                    />
-                    <div className="message-edit-actions">
-                      <button className="btn-approve" onClick={() => saveMessage(sub.id)}>Enregistrer</button>
-                      <button className="btn-archive" onClick={() => { setEditingMessageId(null); setEditingMessageText('') }}>Annuler</button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="photo-caption" onClick={() => startEditingMessage(sub.id, sub.message)} title="Cliquer pour modifier">
-                    {sub.message || <span className="photo-caption-empty">Ajouter un message...</span>}
-                  </p>
-                )}
-
-                {/* Product worn */}
-                {editingProductId === sub.id ? (
-                  <div className="message-edit">
-                    <input
-                      type="text"
-                      value={editingProductText}
-                      onChange={(e) => setEditingProductText(e.target.value)}
-                      placeholder="Ref. produit (ex: VESTE-LAINE-001)"
-                      autoFocus
-                      onKeyDown={(e) => { if (e.key === 'Enter') saveProductWorn(sub.id); if (e.key === 'Escape') { setEditingProductId(null); setEditingProductText('') } }}
-                    />
-                    <div className="message-edit-actions">
-                      <button className="btn-approve" onClick={() => saveProductWorn(sub.id)}>OK</button>
-                      <button className="btn-archive" onClick={() => { setEditingProductId(null); setEditingProductText('') }}>Annuler</button>
-                    </div>
-                  </div>
-                ) : (
-                  <span className="product-worn-badge" onClick={() => startEditingProduct(sub.id, sub.product_worn)} title="Cliquer pour modifier le produit porté">
-                    {sub.product_worn ? `🏷 ${sub.product_worn}` : <span className="photo-caption-empty">+ Produit porté</span>}
-                  </span>
-                )}
-
-                {/* Tags on card */}
-                <div className="photo-tags">
-                  {sub.tags.map(tag => (
-                    <span key={tag.id} className="tag-pill" onClick={() => removeTagFromSubmission(sub.id, tag.id)} title="Cliquer pour retirer">
-                      #{tag.name} ✕
-                    </span>
-                  ))}
-                  <button
-                    className="tag-add-btn"
-                    onClick={() => setTagDropdownId(tagDropdownId === sub.id ? null : sub.id)}
-                  >
-                    + tag
-                  </button>
-                  {tagDropdownId === sub.id && (
-                    <div className="tag-dropdown">
-                      {allTags
-                        .filter(t => !sub.tags.some(st => st.id === t.id))
-                        .map(tag => (
-                          <button
-                            key={tag.id}
-                            className="tag-dropdown-item"
-                            onClick={() => {
-                              addTagToSubmission(sub.id, tag.id)
-                              setTagDropdownId(null)
-                            }}
-                          >
-                            #{tag.name}
-                          </button>
-                        ))}
-                      {allTags.filter(t => !sub.tags.some(st => st.id === t.id)).length === 0 && (
-                        <span className="tag-dropdown-empty">Aucun tag disponible</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="photo-meta">
-                  <span className="photo-date">
-                    {new Date(sub.created_at).toLocaleDateString('fr-FR')}
-                  </span>
-                  <span
-                    className="status-badge"
-                    style={{ backgroundColor: STATUS_COLORS[sub.status] }}
-                  >
-                    {STATUS_LABELS[sub.status]}
-                  </span>
-                  {sub.consent_brand_usage && (
-                    <span className="consent-badge">Diffusion OK</span>
-                  )}
-                  <button
-                    className="btn-download-single"
-                    onClick={() => downloadSingleSubmission(sub)}
-                    title="Telecharger les photos"
-                  >
-                    ↓
-                  </button>
-                </div>
-              </div>
-
-              {/* Expanded images */}
-              {expandedId === sub.id && sub.hub_submission_images?.length >= 1 && (
-                <div className="expanded-images">
-                  {sub.hub_submission_images
-                    .sort((a, b) => a.sort_order - b.sort_order)
-                    .map((img, idx) => (
-                      <div key={img.id} className="expanded-img-wrap">
-                        {isVideoUrl(img.image_url)
-                          ? <video src={img.image_url} muted playsInline onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
-                          : <img src={img.image_url} alt="" onClick={() => openLightbox(sub.hub_submission_images, idx)} style={{ cursor: 'pointer' }} />
-                        }
-                        <div className="img-curate">
-                          <span className="img-size">{sizeLabel(img.size)}</span>
-                          <div className="img-curate-btns">
-                            <button className={img.status === 'approved' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'approved')}>Garder</button>
-                            <button className={img.status === 'archived' ? 'on' : ''} onClick={() => setImageStatus(sub.id, img.id, 'archived')}>Archiver</button>
-                          </div>
-                          {img.shopify_product_id ? (
-                            <div className="img-product-linked">
-                              <span title={`Relie a ${img.shopify_product_title}`}>🏷 {img.shopify_product_title}</span>
-                              <button type="button" className="img-product-unlink" disabled={pickerBusy}
-                                onClick={() => unlinkImageFromProduct(sub.id, img.id)}>Retirer ✕</button>
-                            </div>
-                          ) : pickerImageId === img.id ? (
-                            <div className="img-product-picker">
-                              <input autoFocus className="img-product" placeholder="Chercher un produit..."
-                                value={pickerTerm} onChange={e => setPickerTerm(e.target.value)} disabled={pickerBusy} />
-                              {pickerError && <div className="img-product-error">{pickerError}</div>}
-                              <ul className="img-product-results">
-                                {pickerHits.map(hit => (
-                                  <li key={hit.productId}>
-                                    <button type="button" disabled={pickerBusy} onClick={() => linkImageToProduct(sub.id, img.id, hit)}>
-                                      {hit.imageUrl && <img src={hit.imageUrl} alt="" width={28} height={28} />}
-                                      <span>{hit.title}</span>
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
-                              <button type="button" className="img-product-cancel"
-                                onClick={() => { setPickerImageId(null); setPickerTerm(''); setPickerHits([]) }}>Annuler</button>
-                            </div>
-                          ) : (
-                            <button type="button" className="img-product-link-btn"
-                              onClick={() => { setPickerImageId(img.id); setPickerTerm(''); setPickerHits([]); setPickerError(null) }}>
-                              🔗 Relier à un produit
-                            </button>
-                          )}
-                        </div>
-                        <button
-                          className="btn-download-img"
-                          onClick={() => downloadSingleImage(sub, img.image_url, idx)}
-                          title="Telecharger cette photo"
-                        >↓</button>
-                      </div>
-                    ))}
-                </div>
-              )}
-
-              {sub.hub_submission_images?.length >= 1 && (
-                <button
-                  className="expand-btn"
-                  onClick={() => setExpandedId(expandedId === sub.id ? null : sub.id)}
-                >
-                  {expandedId === sub.id ? 'Masquer' : `Gérer les ${sub.hub_submission_images.length} photo(s)`}
-                </button>
-              )}
-
-              {/* Actions by status */}
-              {sub.status === 'pending' && (
-                <div className="photo-actions">
-                  <div className="crown-validate">
-                    <label>🪙</label>
-                    <input
-                      type="number" min={0} className="crown-input"
-                      value={crownsFor(sub.id)}
-                      onChange={(e) => setCrownInput(prev => ({ ...prev, [sub.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
-                    />
-                    <button className="btn-approve" onClick={() => moderate(sub.id, 'approved', crownsFor(sub.id))}>
-                      Valider (+{crownsFor(sub.id)})
-                    </button>
-                  </div>
-                  <button className="btn-archive" onClick={() => moderate(sub.id, 'archived')}>
-                    Archiver
-                  </button>
-                  <button className="btn-reject" onClick={() => deleteSubmission(sub.id)}>
-                    Supprimer
-                  </button>
-                </div>
-              )}
-
-              {sub.status === 'approved' && (
-                <div className="photo-actions">
-                  <button className="btn-archive" onClick={() => moderate(sub.id, 'archived')}>
-                    Archiver
-                  </button>
-                  <button className="btn-reject" onClick={() => deleteSubmission(sub.id)}>
-                    Supprimer
-                  </button>
-                </div>
-              )}
-
-              {sub.status === 'archived' && (
-                <div className="photo-actions">
-                  <div className="crown-validate">
-                    <label>🪙</label>
-                    <input
-                      type="number" min={0} className="crown-input"
-                      value={crownsFor(sub.id)}
-                      onChange={(e) => setCrownInput(prev => ({ ...prev, [sub.id]: Math.max(0, parseInt(e.target.value || '0', 10)) }))}
-                    />
-                    <button className="btn-approve" onClick={() => moderate(sub.id, 'approved', crownsFor(sub.id))}>
-                      Restaurer (+{crownsFor(sub.id)})
-                    </button>
-                  </div>
-                  <button className="btn-reject" onClick={() => deleteSubmission(sub.id)}>
-                    Supprimer
-                  </button>
-                </div>
-              )}
-            </div>
-          )})}
+        <div className="mod-split">
+          <SubmissionList submissions={filteredSubmissions} selectedId={selectedId} onSelect={setSelectedId} />
+          {selected ? (
+            <SubmissionDetail
+              key={selected.id}
+              submission={selected}
+              allTags={allTags}
+              crowns={crownsFor(selected.id)}
+              onCrowns={(n) => setCrownInput(prev => ({ ...prev, [selected.id]: n }))}
+              onModerate={(status, crowns) => moderate(selected.id, status, crowns)}
+              onDelete={() => deleteSubmission(selected.id)}
+              onSaveMessage={(msg) => saveMessage(selected.id, msg)}
+              onAddTag={(tagId) => addTagToSubmission(selected.id, tagId)}
+              onRemoveTag={(tagId) => removeTagFromSubmission(selected.id, tagId)}
+              onSetImageStatus={(imageId, status) => setImageStatus(selected.id, imageId, status)}
+              onLinkImage={(imageId, hit) => linkImage(selected.id, imageId, hit)}
+              onUnlinkImage={(imageId) => unlinkImage(selected.id, imageId)}
+              onOpenLightbox={(index) => openLightbox(selected.hub_submission_images, index)}
+              onDownloadSubmission={() => downloadSingleSubmission(selected)}
+              onDownloadImage={(index) => { const imgs = [...selected.hub_submission_images].sort((a, b) => a.sort_order - b.sort_order); downloadSingleImage(selected, imgs[index].image_url, index) }}
+            />
+          ) : <div className="mod-detail mod-detail--empty">Sélectionne une soumission</div>}
         </div>
       )}
       {lightbox && (
-        <div className="lightbox-overlay" onClick={closeLightbox}>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <button className="lightbox-close" onClick={closeLightbox}>✕</button>
-            {lightbox.images.length > 1 && (
-              <button className="lightbox-nav lightbox-prev" onClick={lightboxPrev}>‹</button>
-            )}
-            {isVideoUrl(lightbox.images[lightbox.index].image_url)
-              ? <video src={lightbox.images[lightbox.index].image_url} controls autoPlay playsInline />
-              : <img src={lightbox.images[lightbox.index].image_url} alt="" />
-            }
-            {lightbox.images.length > 1 && (
-              <button className="lightbox-nav lightbox-next" onClick={lightboxNext}>›</button>
-            )}
-            {lightbox.images.length > 1 && (
-              <span className="lightbox-counter">{lightbox.index + 1} / {lightbox.images.length}</span>
-            )}
-          </div>
-        </div>
+        <Lightbox images={lightbox.images} index={lightbox.index}
+          onClose={closeLightbox}
+          onIndex={(i) => setLightbox(lb => lb ? { ...lb, index: i } : lb)} />
       )}
     </div>
   )
