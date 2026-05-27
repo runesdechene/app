@@ -126,3 +126,9 @@
   .mod-split { grid-template-columns: 1fr; }
   .mod-list { max-height: none; }
 }
+
+.mod-curator__toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; margin: 4px 0; }
+.mod-curator__dest { display: flex; flex-direction: column; gap: 2px; margin: 4px 0; }
+.mod-curator__footer { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+.mod-curator__delete { background: none; border: 1px solid #ef4444; color: #ef4444; border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+.mod-curator__delete:hover { background: #ef4444; color: #fff; }

@@ -18,7 +18,8 @@ interface SubmissionDetailProps {
   onSaveMessage: (msg: string | null) => void
   onAddTag: (tagId: string) => void
   onRemoveTag: (tagId: string) => void
-  onSetImageStatus: (imageId: string, status: PhotoStatus) => void
+  onSetImageWall: (imageId: string, on: boolean) => Promise<void>
+  onDeleteImage: (imageId: string) => Promise<void>
   onLinkImage: (imageId: string, hit: ShopifyProductHit) => Promise<void>
   onUnlinkImage: (imageId: string) => Promise<void>
   onSetPhotoProduit: (imageId: string, on: boolean) => Promise<void>
@@ -88,7 +89,8 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
           key={active.id}
           image={active}
           onOpenLightbox={() => props.onOpenLightbox(activeIdx)}
-          onSetStatus={(status) => props.onSetImageStatus(active.id, status)}
+          onSetWall={(on) => props.onSetImageWall(active.id, on)}
+          onDelete={() => props.onDeleteImage(active.id)}
           onLink={(hit) => props.onLinkImage(active.id, hit)}
           onUnlink={() => props.onUnlinkImage(active.id)}
           onSetPhotoProduit={(on) => props.onSetPhotoProduit(active.id, on)}

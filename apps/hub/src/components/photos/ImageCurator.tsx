@@ -1,13 +1,14 @@
 // apps/hub/src/components/photos/ImageCurator.tsx
-// Curation d'une photo : aperçu, Garder/Archiver, picker produit (recherche + prix), download.
+// Curation d'une photo : aperçu, toggles de destination (mur global / galerie produit / bloc communauté), relier produit, suppression.
 import { useEffect, useState } from 'react'
-import { isVideoUrl, type SubmissionImage, type PhotoStatus } from './types'
+import { isVideoUrl, type SubmissionImage } from './types'
 import { searchShopifyProducts, type ShopifyProductHit } from '../../lib/shopifyProducts'
 
 interface ImageCuratorProps {
   image: SubmissionImage
   onOpenLightbox: () => void
-  onSetStatus: (status: PhotoStatus) => void
+  onSetWall: (on: boolean) => Promise<void>
+  onDelete: () => void
   onLink: (hit: ShopifyProductHit) => Promise<void>
   onUnlink: () => Promise<void>
   onSetPhotoProduit: (on: boolean) => Promise<void>
@@ -17,7 +18,7 @@ interface ImageCuratorProps {
 
 const sizeLabel = (s: string | null) => s == null ? '' : s === 'none' ? 'Aucun produit' : s
 
-export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnlink, onSetPhotoProduit, onSetCommunity, onDownload }: ImageCuratorProps) {
+export function ImageCurator({ image, onOpenLightbox, onSetWall, onDelete, onLink, onUnlink, onSetPhotoProduit, onSetCommunity, onDownload }: ImageCuratorProps) {
   const [open, setOpen] = useState(false)
   const [term, setTerm] = useState('')
   const [hits, setHits] = useState<ShopifyProductHit[]>([])
@@ -55,10 +56,11 @@ export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnl
       </div>
       <div className="mod-curator__body">
         {sizeLabel(image.size) && <span className="mod-curator__size">{sizeLabel(image.size)}</span>}
-        <div className="mod-curator__status">
-          <button className={image.status === 'approved' ? 'is-on' : ''} onClick={() => onSetStatus('approved')}>Garder</button>
-          <button className={image.status === 'archived' ? 'is-on' : ''} onClick={() => onSetStatus('archived')}>Archiver</button>
-        </div>
+        <label className="mod-curator__toggle">
+          <input type="checkbox" checked={image.show_on_wall} disabled={busy}
+            onChange={async e => { setBusy(true); setError(null); try { await onSetWall(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+          Mur communautaire (global)
+        </label>
 
         {image.shopify_product_id ? (
           <div className="mod-curator__linked">
@@ -67,12 +69,12 @@ export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnl
               <label className="mod-curator__toggle">
                 <input type="checkbox" checked={image.shopify_media_id != null} disabled={busy}
                   onChange={async e => { setBusy(true); setError(null); try { await onSetPhotoProduit(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
-                Photo produit (galerie)
+                Galerie du produit
               </label>
               <label className="mod-curator__toggle">
                 <input type="checkbox" checked={image.show_in_community} disabled={busy}
                   onChange={async e => { setBusy(true); setError(null); try { await onSetCommunity(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
-                Communauté (bloc fiche)
+                Bloc communauté du produit
               </label>
             </div>
             <button className="mod-curator__unlink" disabled={busy} onClick={doUnlink}>Retirer ✕</button>
@@ -101,7 +103,10 @@ export function ImageCurator({ image, onOpenLightbox, onSetStatus, onLink, onUnl
           </button>
         )}
 
-        <button className="mod-curator__dl" onClick={onDownload} title="Télécharger">↓</button>
+        <div className="mod-curator__footer">
+          <button className="mod-curator__dl" onClick={onDownload} title="Télécharger">↓</button>
+          <button className="mod-curator__delete" onClick={onDelete} title="Supprimer définitivement">🗑 Supprimer</button>
+        </div>
         {error && !open && <div className="mod-curator__error">{error}</div>}
       </div>
     </div>

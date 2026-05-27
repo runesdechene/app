@@ -18,6 +18,8 @@ export interface SubmissionImage {
   shopify_product_title: string | null
   shopify_media_id: string | null
   show_in_community: boolean
+  show_on_wall: boolean
+  storage_path: string | null
 }
 
 export interface PhotoTag {

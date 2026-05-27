@@ -356,6 +356,26 @@ export function Photos() {
     setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, show_in_community: on } : i) }) ))
   }
 
+  const setImageWall = async (subId: string, imageId: string, on: boolean) => {
+    await supabase.rpc('set_submission_image_wall', { p_image_id: imageId, p_show: on })
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, show_on_wall: on } : i) }) ))
+  }
+
+  const deleteImage = async (subId: string, imageId: string) => {
+    if (!window.confirm('Supprimer définitivement cette photo ? Action irréversible.')) return
+    const sub = submissions.find(s => s.id === subId)
+    const img = sub?.hub_submission_images.find(i => i.id === imageId)
+    if (!img) return
+    if (img.shopify_product_id && img.shopify_media_id) {
+      await deleteProductImage(img.shopify_product_id, img.shopify_media_id).catch(() => {})
+    }
+    if (img.storage_path) {
+      await supabase.storage.from('community-photos').remove([img.storage_path]).catch(() => {})
+    }
+    await supabase.rpc('delete_submission_image', { p_image_id: imageId })
+    setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.filter(i => i.id !== imageId) }) ))
+  }
+
   const unlinkImage = async (subId: string, imageId: string) => {
     const sub = submissions.find(s => s.id === subId)
     const img = sub?.hub_submission_images.find(i => i.id === imageId)
@@ -365,19 +385,6 @@ export function Photos() {
     setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({ ...s, hub_submission_images: s.hub_submission_images.map(i => i.id === imageId ? { ...i, shopify_product_id: null, shopify_product_handle: null, shopify_product_title: null, shopify_media_id: null, show_in_community: false } : i) }) ))
   }
 
-  const setImageStatus = async (subId: string, imageId: string, status: PhotoStatus) => {
-    const { error } = await supabase.rpc('set_submission_image_status', { p_image_id: imageId, p_status: status })
-    if (!error) {
-      setSubmissions(prev => prev.map(s => s.id !== subId ? s : ({
-        ...s,
-        hub_submission_images: s.hub_submission_images.map(img => img.id === imageId ? { ...img, status } : img),
-      })))
-      // si on archive une image déjà poussée sur une fiche produit, la retirer de Shopify
-      if (status === 'archived') {
-        await unlinkImage(subId, imageId)
-      }
-    }
-  }
 
   if (loading) return <div className="mod"><div className="mod-loading">Chargement…</div></div>
 
@@ -416,7 +423,8 @@ export function Photos() {
               onSaveMessage={(msg) => saveMessage(selected.id, msg)}
               onAddTag={(tagId) => addTagToSubmission(selected.id, tagId)}
               onRemoveTag={(tagId) => removeTagFromSubmission(selected.id, tagId)}
-              onSetImageStatus={(imageId, status) => setImageStatus(selected.id, imageId, status)}
+              onSetImageWall={(imageId, on) => setImageWall(selected.id, imageId, on)}
+              onDeleteImage={(imageId) => deleteImage(selected.id, imageId)}
               onLinkImage={(imageId, hit) => linkImage(selected.id, imageId, hit)}
               onUnlinkImage={(imageId) => unlinkImage(selected.id, imageId)}
               onSetPhotoProduit={(imageId, on) => setPhotoProduit(selected.id, imageId, on)}
