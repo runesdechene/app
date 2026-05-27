@@ -56,27 +56,37 @@ export function ImageCurator({ image, onOpenLightbox, onSetWall, onDelete, onLin
       </div>
       <div className="mod-curator__body">
         {sizeLabel(image.size) && <span className="mod-curator__size">{sizeLabel(image.size)}</span>}
-        <label className="mod-curator__toggle">
-          <input type="checkbox" checked={image.show_on_wall} disabled={busy}
-            onChange={async e => { setBusy(true); setError(null); try { await onSetWall(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
-          Mur communautaire (global)
-        </label>
+
+        <div className="mod-curator__toggles">
+          <label className="mod-curator__switch-row">
+            <span>Mur communautaire</span>
+            <span className="mod-switch">
+              <input type="checkbox" checked={image.show_on_wall} disabled={busy}
+                onChange={async e => { setBusy(true); setError(null); try { await onSetWall(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+              <span className="mod-switch__slider" />
+            </span>
+          </label>
+          <label className={`mod-curator__switch-row${image.shopify_product_id ? '' : ' is-disabled'}`} title={image.shopify_product_id ? '' : 'Relie un produit pour activer'}>
+            <span>Galerie du produit</span>
+            <span className="mod-switch">
+              <input type="checkbox" checked={image.shopify_media_id != null} disabled={busy || !image.shopify_product_id}
+                onChange={async e => { setBusy(true); setError(null); try { await onSetPhotoProduit(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+              <span className="mod-switch__slider" />
+            </span>
+          </label>
+          <label className={`mod-curator__switch-row${image.shopify_product_id ? '' : ' is-disabled'}`} title={image.shopify_product_id ? '' : 'Relie un produit pour activer'}>
+            <span>Bloc communauté du produit</span>
+            <span className="mod-switch">
+              <input type="checkbox" checked={image.show_in_community} disabled={busy || !image.shopify_product_id}
+                onChange={async e => { setBusy(true); setError(null); try { await onSetCommunity(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
+              <span className="mod-switch__slider" />
+            </span>
+          </label>
+        </div>
 
         {image.shopify_product_id ? (
           <div className="mod-curator__linked">
             <span title={`Relié à ${image.shopify_product_title}`}>🏷 {image.shopify_product_title}</span>
-            <div className="mod-curator__dest">
-              <label className="mod-curator__toggle">
-                <input type="checkbox" checked={image.shopify_media_id != null} disabled={busy}
-                  onChange={async e => { setBusy(true); setError(null); try { await onSetPhotoProduit(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
-                Galerie du produit
-              </label>
-              <label className="mod-curator__toggle">
-                <input type="checkbox" checked={image.show_in_community} disabled={busy}
-                  onChange={async e => { setBusy(true); setError(null); try { await onSetCommunity(e.target.checked) } catch (er) { setError(er instanceof Error ? er.message : String(er)) } finally { setBusy(false) } }} />
-                Bloc communauté du produit
-              </label>
-            </div>
             <button className="mod-curator__unlink" disabled={busy} onClick={doUnlink}>Retirer ✕</button>
           </div>
         ) : open ? (
