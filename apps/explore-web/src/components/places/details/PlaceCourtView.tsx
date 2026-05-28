@@ -215,11 +215,16 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const optimisticMenace = userChallengerExp ? Math.max(menaceHaute ?? 0, optimisticChallengerScore) : (menaceHaute ?? 0)
 
   // V0.8.23 — score optimiste du challenger soutenu (celui en cours de tap-mécénat)
-  const optimisticChallengers = state.challengers.map(c =>
-    pendingTaps && pendingTaps.beneficiaryUserId === c.userId
+  // V0.8.25 — si pas de beneficiary explicite (tap "Influencer" pour soi via
+  // handleContestTap), le bénéficiaire effectif est l'user courant. Sinon le
+  // segment de l'auteur ne bougeait pas tant que le RPC n'était pas revenu.
+  const optimisticChallengers = state.challengers.map(c => {
+    if (!pendingTaps) return c
+    const effectiveBeneficiary = pendingTaps.beneficiaryUserId ?? userId
+    return effectiveBeneficiary === c.userId
       ? { ...c, score: c.score + pendingTaps.count }
-      : c,
-  )
+      : c
+  })
 
   const supportExpId = veilleur?.expeditionId ?? null
   const handleSupportTap = () => {
@@ -319,9 +324,14 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       )}
 
       {/* V0.7.6 — Jauge gravée + cluster avatars (cf. mockup F validé) */}
+      {/* V0.8.25 — passe challengers[] (et plus seulement menaceHaute) :
+          la barre segmente N rouges par challenger pour que les taps sur
+          le n°2+ soient visibles immédiatement. menaceHaute reste utilisé
+          pour le aria-label total et le seuil "bascule imminente". */}
       <CourtTensionBar
         scoreVeilleur={optimisticVeilleurScore}
         menaceHaute={optimisticMenace}
+        challengers={optimisticChallengers}
         defenseFavorPoints={defenseFavorPoints ?? 0}
         patrons={topPatrons}
         veilleur={veilleur}

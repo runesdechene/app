@@ -1,3 +1,10 @@
+# ALPHA V0.8.25
+## La jauge de La Cour affiche tous les challengers
+
+Quand plusieurs joueurs attaquaient un même lieu, la jauge de tension n'affichait qu'une seule menace — celle de l'attaquant en tête. Verser des Couronnes derrière le challenger n°2 ne faisait visuellement rien bouger, alors même que les Couronnes étaient bien comptabilisées côté serveur. Désormais, la zone rouge de la jauge se découpe en un segment par challenger, dans la couleur de sa Maison, et chaque tap fait grimper le bon segment immédiatement. Au-delà des trois principaux, les autres sont agrégés en un segment « +N autres ».
+
+---
+
 # ALPHA V0.8.24
 ## Les notifications de La Cour rouvrent enfin le bon lieu
 

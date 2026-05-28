@@ -1,10 +1,16 @@
 import './CourtTensionBar.css'
-import type { CourtStatus, CourtVeilleur, Patron } from '../../../types/court'
+import type { Challenger, CourtStatus, CourtVeilleur, Patron } from '../../../types/court'
 import { useMapStore } from '../../../stores/mapStore'
 
 interface CourtTensionBarProps {
   scoreVeilleur: number
+  /** Somme des scores de tous les challengers. Sert au libellé aria + au flag
+   *  "bascule imminente". Le rendu visuel utilise `challengers[]` segmenté. */
   menaceHaute: number
+  /** V0.8.25 — un segment rouge par challenger (top-3 visuels + reste agrégé
+   *  en "+N autres"). Largeur proportionnelle au score, couleur faction du
+   *  challenger. Avant : 1 seule barre = top1, taps sur n°2+ invisibles. */
+  challengers?: Challenger[]
   /** V0.7.6 (8/05) — bonus IRL "faveur" du plant_flag. Pour info sémantique
    *  uniquement (la barre ne sépare plus visuellement faveur vs invest depuis
    *  la refonte avatars/cluster). Conservé en prop pour rétrocompat. */
@@ -20,6 +26,9 @@ interface CourtTensionBarProps {
   /** @deprecated V086 — le statut est désormais dans la pilule top-right de PlaceCourtView */
   status?: CourtStatus
 }
+
+const MAX_ATTACK_SEGMENTS = 3
+const FALLBACK_ATTACK_COLOR = '#8b3a3a'
 
 const initials = (name: string): string =>
   name?.trim().charAt(0).toUpperCase() || '?'
@@ -60,12 +69,22 @@ function AvatarChip({ patron, side, decoration }: AvatarChipProps) {
   )
 }
 
-export function CourtTensionBar({ scoreVeilleur, menaceHaute, patrons, veilleur }: CourtTensionBarProps) {
+export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur }: CourtTensionBarProps) {
   const total = scoreVeilleur + menaceHaute
-  const veilleurPct = total > 0 ? Math.round((scoreVeilleur / total) * 100) : 100
+  const veilleurPct = total > 0 ? (scoreVeilleur / total) * 100 : 100
   const showVeilleurNumber = veilleurPct >= 18
-  const showMenaceNumber = menaceHaute > 0 && (100 - veilleurPct) >= 18
   const isCritical = scoreVeilleur > 0 && menaceHaute >= scoreVeilleur / 2
+
+  // V0.8.25 — découpe la zone d'attaque en segments par challenger.
+  // Largeur de chaque segment = (challenger.score / total) * 100. Top-3 rendus
+  // tels quels, reste agrégé en un segment "+N autres" gris.
+  const sortedChallengers = (challengers ?? [])
+    .filter(c => c.score > 0)
+    .sort((a, b) => b.score - a.score)
+  const topSegments = sortedChallengers.slice(0, MAX_ATTACK_SEGMENTS)
+  const overflowChallengers = sortedChallengers.slice(MAX_ATTACK_SEGMENTS)
+  const overflowScore = overflowChallengers.reduce((sum, c) => sum + c.score, 0)
+  const overflowCount = overflowChallengers.length
 
   const list = patrons ?? []
   const defendersFromPatrons = list
@@ -124,9 +143,32 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, patrons, veilleur 
             {showVeilleurNumber && <span className="ctb-num">{scoreVeilleur}</span>}
           </div>
         )}
-        {menaceHaute > 0 && (
-          <div className="ctb-fill ctb-attack" style={{ width: `${100 - veilleurPct}%` }}>
-            {showMenaceNumber && <span className="ctb-num">{menaceHaute}</span>}
+        {topSegments.map(c => {
+          const widthPct = total > 0 ? (c.score / total) * 100 : 0
+          const showNum = widthPct >= 18
+          return (
+            <div
+              key={c.userId}
+              className="ctb-fill ctb-attack ctb-attack-segment"
+              style={{
+                width: `${widthPct}%`,
+                backgroundColor: c.factionColor ?? FALLBACK_ATTACK_COLOR,
+              }}
+              title={`${c.displayName} · ${c.score} 🪙`}
+            >
+              {showNum && <span className="ctb-num">{c.score}</span>}
+            </div>
+          )
+        })}
+        {overflowScore > 0 && (
+          <div
+            className="ctb-fill ctb-attack ctb-attack-overflow"
+            style={{ width: `${total > 0 ? (overflowScore / total) * 100 : 0}%` }}
+            title={`${overflowCount} autres challengers · ${overflowScore} 🪙`}
+          >
+            {(overflowScore / total) * 100 >= 18 && (
+              <span className="ctb-num">+{overflowCount}</span>
+            )}
           </div>
         )}
         {isCritical && <div className="ctb-critical-hint" aria-hidden />}
