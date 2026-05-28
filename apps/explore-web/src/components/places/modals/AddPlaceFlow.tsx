@@ -329,13 +329,13 @@ export function AddPlaceFlow() {
           console.warn('[AddPlaceFlow] auto plant_flag failed', plantErr)
           useToastStore.getState().addToast({
             type: 'plant_flag',
-            message: `Lieu créé. Étendard non planté : ${plantErr.message}. Tu pourras réessayer depuis la fiche du lieu en t'approchant à moins de 100 m du point exact.`,
+            message: `Lieu créé. Étendard non planté : ${plantErr.message}. Tu pourras réessayer depuis la fiche du lieu en t'approchant à moins de 200 m du point exact.`,
             timestamp: Date.now(),
           })
         } else if (plantData?.error === 'too_far') {
           useToastStore.getState().addToast({
             type: 'plant_flag',
-            message: `Lieu créé. Tu es à ${plantData.distanceKm} km du point exact — rapproche-toi à moins de 100 m pour planter ton étendard.`,
+            message: `Lieu créé. Tu es à ${plantData.distanceKm} km du point exact — rapproche-toi à moins de 200 m pour planter ton étendard.`,
             timestamp: Date.now(),
           })
         } else if (plantData?.error) {

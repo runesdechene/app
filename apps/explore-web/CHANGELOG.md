@@ -1,3 +1,10 @@
+# ALPHA V0.8.26
+## Rayon GPS porté à 200 m
+
+Le rayon dans lequel vous pouviez agir physiquement sur un lieu (planter votre étendard, visiter, revisiter) était de 100 m autour du point exact. Trop strict pour les grands ouvrages — viaducs, ponts, cathédrales, lieux paysagers : le point de référence est souvent au cœur de l'objet (en hauteur, sur le tablier, au centre d'une nef), tandis qu'on s'en approche par un accès en contrebas. Repère porté à **200 m**. Les actions à distance via Couronnes restent inchangées.
+
+---
+
 # ALPHA V0.8.25
 ## La jauge de La Cour affiche tous les challengers
 

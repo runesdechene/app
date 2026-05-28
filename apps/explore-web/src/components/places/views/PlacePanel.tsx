@@ -159,7 +159,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     const dLat = (placeLocation.latitude - userPosition.lat) * Math.PI / 180
     const dLng = (placeLocation.longitude - userPosition.lng) * Math.PI / 180
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(userPosition.lat * Math.PI / 180) * Math.cos(placeLocation.latitude * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.1
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 0.2
   }, [userPosition, placeLocation])
 
   const needsRefreshRef = useRef(false)

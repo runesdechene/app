@@ -64,7 +64,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
     ? haversineKm({ lat: userPosition.lat, lng: userPosition.lng },
                   { lat: placeLocation.latitude, lng: placeLocation.longitude })
     : null
-  const onSpot = distanceKm !== null && distanceKm <= 0.1
+  const onSpot = distanceKm !== null && distanceKm <= 0.2
   const canPlant = !!(userId && userFactionId && onSpot && !planting)
 
   const doPlant = useCallback(async (partners: string[]) => {
@@ -86,7 +86,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
     setOptInCandidates(null)
     if ('error' in result) {
       const msg = result.error === 'too_far'
-        ? `Trop loin (${result.distanceKm} km). Approche-toi à moins de 100 m.`
+        ? `Trop loin (${result.distanceKm} km). Approche-toi à moins de 200 m.`
         : result.error === 'no_faction'
           ? 'Tu n\'as pas encore choisi d\'Héritage.'
           : result.error === 'place_not_found'
@@ -141,7 +141,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
         onClick={handlePlant}
         title={
           !onSpot
-            ? 'Vous devez être à moins de 100 m du lieu'
+            ? 'Vous devez être à moins de 200 m du lieu'
             : isAlreadyVeilleurGps
               ? 'Tu veilles déjà ce lieu — réaffirmer efface les menaces de la Cour (pas de nouveau bonus)'
               : 'Planter ton étendard sur ce lieu'

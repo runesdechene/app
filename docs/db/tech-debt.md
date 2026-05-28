@@ -5,6 +5,20 @@
 
 ---
 
+## D0. Drift repo/prod — mig 175 patche dynamiquement 3 RPCs
+
+**Origine** : 28 mai 2026 — bump du rayon GPS 100m → 200m (bug RICKNON viaduc de la Borrèze). Au lieu de recopier 350 lignes de RPCs pour 3 fonctions (`plant_flag`, `revisit_place_gps`, `_visit_place_gps_internal`), la mig 175 fait un `pg_get_functiondef` + `replace('v_distance_km > 0.1', 'v_distance_km > 0.2')` + `EXECUTE` dynamique. Idempotent et court (~15 lignes utiles).
+
+**Drift** : les définitions en repo des 3 RPCs (mig 166 pour `plant_flag` ; définitions historiques implicites pour les 2 autres) restent à `0.1`. La prod est à `0.2`. Le prochain qui édite un de ces RPCs DOIT partir de `pg_get_functiondef` en prod, **pas** du repo, sinon réintroduit `0.1`.
+
+**Dette à traiter** : prochaine fois qu'on touche `plant_flag` (probable — sujet sensible), créer une mig CREATE OR REPLACE complète avec `0.2` et supprimer cette note D0.
+
+**Coût** : 0 (corrigé "naturellement" au prochain travail sur ces RPCs).
+
+**Urgence** : basse — tant que le repo n'est pas pris comme source de vérité aveugle pour ces 3 RPCs.
+
+---
+
 ## D1. Tables Plantage à renommer : `expeditions` → `plantage_groups`
 
 **Origine** : 6 mai 2026 — pendant le brainstorm du sous-système "Expéditions joueur-joueur" (V0.7+), on a découvert que la table `expeditions` existait déjà côté Plantage/Veille V0.7 (mig 015), où elle représente un *groupe de veilleurs qui plantent ensemble* (concept proche, mais distinct).
