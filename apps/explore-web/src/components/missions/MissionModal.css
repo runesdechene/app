@@ -1,0 +1,466 @@
+/* MissionModal — fenêtre Mission (onglets Mission / Salon).
+   Langage visuel parchemin, miroir de ExpeditionModal.css.
+   Tokens : parchment #f5e9d4/#faf2dd, card #fff8eb,
+            ink #2a1f10/#4a3925, gold #b89a6a/#8a7050/#6e5435,
+            red #a14a2a, green #5e7044. */
+
+/* ─────────── Overlay ─────────── */
+.mission-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 30, 20, 0.5);
+  z-index: 9510;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* ─────────── Modal container ─────────── */
+.mission-modal {
+  background: #f5e9d4;
+  border: 1px solid #b89a6a;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  height: 90vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32);
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+}
+
+/* ─────────── Loading state ─────────── */
+.mission-modal-loading {
+  background: #f5e9d4;
+  border-radius: 14px;
+  padding: 32px;
+  font-family: var(--font-body);
+  font-style: italic;
+  color: #8a7050;
+  text-align: center;
+}
+
+/* ─────────── Sticky tabs ─────────── */
+.mission-modal-tabs {
+  display: flex;
+  align-items: stretch;
+  background: #faf2dd;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.45);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.mission-modal-tabs button {
+  flex: 1;
+  padding: 14px 8px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a7050;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.mission-modal-tabs button.is-active {
+  color: #2a1f10;
+  border-bottom-color: #2a1f10;
+}
+.mission-modal-tabs button:hover:not(.is-active):not(.mission-modal-close) {
+  color: #4a3925;
+}
+
+/* Close button lives in tabs row */
+.mission-modal-close {
+  flex: 0 0 48px !important;
+  font-size: 26px !important;
+  font-weight: 300 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: #6b5230 !important;
+  border-bottom: 2px solid transparent !important;
+  padding: 0 !important;
+  line-height: 1;
+}
+.mission-modal-close:hover {
+  color: #a14a2a !important;
+  background: none;
+}
+
+/* ─────────── Main tab — scrollable content area ─────────── */
+.mission-modal-main {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  /* hidden scrollbar — matches ExpeditionModal pattern */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mission-modal-main::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* ─────────── Intro block ─────────── */
+.mission-modal-intro {
+  padding: 20px 22px 16px;
+  background: linear-gradient(180deg, #faf2dd, #f5e9d4);
+  border-bottom: 1px solid rgba(184, 154, 106, 0.45);
+}
+.mission-modal-eyebrow {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8a6f4a;
+  margin-bottom: 6px;
+}
+.mission-modal-title {
+  font-family: var(--font-signature);
+  font-weight: 600;
+  font-size: 27px;
+  color: #2a1f10;
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+.mission-modal-call {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 15px;
+  color: #6e5435;
+  line-height: 1.4;
+}
+
+/* ─────────── Cover 16:9 ─────────── */
+.mission-modal-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: radial-gradient(120% 90% at 70% 10%, #7a5a2e, #3c2a16 60%, #241710);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+  overflow: hidden;
+}
+.mission-modal-jx {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: #a14a2a;
+  color: #fff;
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 11px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+.mission-modal-emblem {
+  font-size: 3em;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55));
+  line-height: 1;
+}
+
+/* ─────────── Sections ─────────── */
+.mission-modal-section {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(184, 154, 106, 0.25);
+}
+.mission-modal-section h3 {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8a7050;
+  margin: 0 0 12px;
+}
+
+/* ─────────── Rewards ─────────── */
+.mission-modal-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mm-rw {
+  background: rgba(94, 112, 68, 0.14);
+  border: 1px solid rgba(94, 112, 68, 0.4);
+  color: #3d4a2c;
+  border-radius: 16px;
+  padding: 5px 11px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.mm-rw.gold {
+  background: rgba(161, 74, 42, 0.12);
+  border-color: rgba(161, 74, 42, 0.4);
+  color: #a14a2a;
+}
+
+/* ─────────── Brief ─────────── */
+.mission-modal-brief {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4a3925;
+  margin: 0 0 12px;
+}
+
+/* ─────────── CTA link (product) ─────────── */
+.mission-modal-cta {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  background: linear-gradient(180deg, #c79a4e, #b8863b);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(184, 134, 59, 0.4);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.mission-modal-cta:hover {
+  background: linear-gradient(180deg, #d4a85a, #c49040);
+}
+
+/* ─────────── Pending status banner ─────────── */
+.mission-modal-status {
+  margin: 0 22px 0;
+  padding: 12px 14px;
+  background: rgba(184, 154, 106, 0.12);
+  border: 1px dashed #b8863b;
+  border-radius: 10px;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  color: #6e5435;
+  text-align: center;
+}
+
+/* ─────────── Contributions gallery (3-col grid) ─────────── */
+.mission-modal-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.mission-modal-tile {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  background-color: #d9c79d;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 5px;
+}
+.mission-modal-tile-name {
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ─────────── Primary CTA (submit livrable) ─────────── */
+.mission-modal-primary {
+  display: block;
+  margin: 14px 22px 18px;
+  background: #2a1f10;
+  color: #faf2dd;
+  border: none;
+  padding: 13px 22px;
+  border-radius: 8px;
+  font-family: var(--font-accent);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.mission-modal-primary:hover {
+  background: #000;
+}
+
+/* ─────────── Salon tab ─────────── */
+.mission-salon {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mission-salon-intro {
+  padding: 12px 16px;
+  background: rgba(184, 154, 106, 0.12);
+  border-bottom: 1px solid rgba(184, 154, 106, 0.3);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 14px;
+  color: #6e5435;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+
+.mission-salon-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* hidden scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mission-salon-messages::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.mission-salon-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 88%;
+}
+.mission-salon-author {
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b5230;
+  letter-spacing: 0.04em;
+}
+.mission-salon-bubble {
+  background: #fff8eb;
+  border: 1px solid rgba(184, 154, 106, 0.4);
+  padding: 7px 11px;
+  border-radius: 13px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: #2a1f10;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ─────────── Salon input (fixed to bottom of flex column) ─────────── */
+.mission-salon-input {
+  display: flex;
+  gap: 8px;
+  padding: 11px 14px;
+  background: #f5e9d4;
+  border-top: 1px solid rgba(184, 154, 106, 0.3);
+  flex-shrink: 0;
+}
+.mission-salon-input input {
+  flex: 1;
+  background: #fff8eb;
+  border: 1px solid rgba(184, 154, 106, 0.4);
+  border-radius: 18px;
+  padding: 9px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: #2a1f10;
+  outline: none;
+}
+.mission-salon-input input:focus {
+  border-color: #b89a6a;
+  box-shadow: 0 0 0 2px rgba(184, 154, 106, 0.2);
+}
+.mission-salon-input button {
+  flex: 0 0 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #2a1f10;
+  color: #faf2dd;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.mission-salon-input button:hover {
+  background: #000;
+}
+.mission-salon-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─────────── Mobile ─────────── */
+@media (max-width: 760px) {
+  .mission-modal-overlay {
+    padding: 0;
+    align-items: stretch;
+    z-index: 10010;
+  }
+  .mission-modal {
+    height: 100dvh;
+    max-height: 100dvh;
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+  }
+  /* Safe-area: tabs are the first element — they absorb the notch. */
+  .mission-modal-tabs {
+    padding-top: var(--safe-top, 0px);
+  }
+  /* Fixed bottom input on mobile so keyboard doesn't push it off screen. */
+  .mission-salon-input {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10011;
+    padding-bottom: calc(var(--safe-bottom, 0px) + 11px);
+    background: #f5e9d4;
+  }
+  /* Compensate for fixed input height in salon messages area. */
+  .mission-salon-messages {
+    padding-bottom: calc(var(--safe-bottom, 0px) + 80px);
+  }
+  /* Spacer at bottom of main tab for safe area. */
+  .mission-modal-main::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    height: calc(var(--safe-bottom, 0px) + 24px);
+  }
+}
