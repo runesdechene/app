@@ -162,11 +162,17 @@ missions(
   cover_image_url text,
   deliverable_kind text NOT NULL DEFAULT 'photo'
      CHECK (deliverable_kind IN ('photo','video','other')),  -- extensible
-  product_handle text,        -- OPTIONNEL : Shopify, pour CTA + galerie produit existante
+  product_handle text,        -- OPTIONNEL : Shopify, UNIQUEMENT pour la galerie communauté par produit
+  cta_label text,             -- CTA découplé du produit (ex. « Rejoindre la boutique »)
+  cta_url text,               -- cible libre : fiche produit, collection ou URL
   starts_at timestamptz, ends_at timestamptz,
-  floor_glory int, floor_crowns int,     -- plancher de butin ANNONCÉ (D-REC-2)
+  floor_glory int, floor_crowns int,     -- plancher de butin ANNONCÉ (D-REC-2) ; pré-remplit la validation
   reward_hint text,           -- ex. « + titre & code possibles »
+  salon_intro text,           -- message d'accueil épinglé en tête du salon (optionnel)
+  notify_on_launch boolean NOT NULL DEFAULT true,    -- push « nouvelle mission » à la publication
+  featured_on_home boolean NOT NULL DEFAULT false,   -- carte sur /accueil en plus du HUD
   status text CHECK (status IN ('draft','published','passed','archived')) DEFAULT 'draft'
+  -- salon : lecture seule quand status IN ('passed','archived') (pas de champ dédié)
 )
 mission_participants(         -- adhésion OUVERTE (relever la mission / entrer au salon)
   mission_slug text REFERENCES missions(slug),
@@ -279,6 +285,10 @@ action ciblée (ex. ajout d'un château) → trigger increment_community_quest
    catégorie « château » est exploitable dans le schéma `places` (vérif au plan).
 5. **Genéricité Mission** : on livre le chemin photo (studio UGC) ; vidéo / chasse au trésor sont
    prévus par `deliverable_kind` mais **non implémentés** (chaque nouveau livrable = son plan).
+6. **Réglages Mission verrouillés** (mockup `hub-mission-editor`, validé 2026-06-02) : `notify_on_launch`
+   (push, défaut oui), `featured_on_home` (défaut non), `cta_label`+`cta_url` (CTA libre découplé du
+   produit), `salon_intro` (mot épinglé), salon **lecture seule** après fin, validation **pré-remplie au
+   plancher**. ✅
 
 ---
 
