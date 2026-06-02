@@ -17,13 +17,17 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
     ;(async () => {
       const state = await getMissionState(slug)
       if (cancelled) return
+      let finalState = state
       if (state) {
-        if (!state.isParticipant) { await joinMission(slug); state.isParticipant = true }
+        if (!state.isParticipant && state.status === 'published') {
+          await joinMission(slug)
+          finalState = { ...state, isParticipant: true }
+        }
         const [sList, st] = await Promise.all([getMissionSubmissions(slug), getMySubmissionStatus(slug)])
         if (cancelled) return
         setSubs(sList); setMyStatus(st)
       }
-      setM(state)
+      setM(finalState)
       setLoading(false)
     })()
     return () => { cancelled = true }
