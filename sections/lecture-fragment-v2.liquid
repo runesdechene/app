@@ -1,0 +1,554 @@
+{%- liquid
+  # Évaluer la condition d'affichage personnalisée
+  assign should_show = section.settings.show_section
+-%}
+
+
+{%- liquid
+  # Ne rien afficher si la condition retourne false (comparaison de string)
+  if should_show == 'false' or should_show == false or should_show == blank
+    break
+  endif
+
+  # Récupérer l'image de fond avec priorité : métaobjet > image par défaut
+  assign background_image_url = blank
+
+  # Priorité 1 : Image depuis le métaobjet sélectionnée dans le customizer
+  if section.settings.background_image_metaobject != blank
+    assign background_image_url = section.settings.background_image_metaobject | image_url: width: 1920
+  endif
+
+  # Priorité 2 : Image par défaut
+  if background_image_url == blank and section.settings.background_image != blank
+    assign background_image_url = section.settings.background_image | image_url: width: 1920
+  endif
+-%}
+
+<div class="lecture-fragment{% if section.settings.collapsed_default %} lecture-fragment--collapsed{% endif %}">
+  <div class="lecture-fragment__container section section--full-width">
+    <div
+      class="lecture-fragment__content-wrapper section-content-wrapper page-width"
+      {% if background_image_url != blank %}
+        style="background-image: url('{{ background_image_url }}');"
+      {% endif %}
+    >
+      <span class="lecture-fragment__chevron-label">Cliquez pour lire</span>
+      <button class="lecture-fragment__chevron" aria-label="Afficher/masquer le contenu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="lecture-fragment__content">
+        {%- comment -%} Contenu textuel à gauche {%- endcomment -%}
+        <div class="lecture-fragment__text-content">
+          {%- comment -%} En-tête avec icône et titre {%- endcomment -%}
+          <div class="lecture-fragment__header">
+            {%- if section.settings.icon_image != blank -%}
+              <div class="lecture-fragment__icon">
+                {{
+                  section.settings.icon_image
+                  | image_url: width: 160
+                  | image_tag: loading: 'lazy', width: 80, height: 80
+                }}
+              </div>
+            {%- endif -%}
+            <div class="lecture-fragment__title-wrapper">
+              {%- if section.settings.pretitle != blank -%}
+                <p class="lecture-fragment__subtitle">{{ section.settings.pretitle }}</p>
+              {%- endif -%}
+              {%- if section.settings.title != blank -%}
+                <h2 class="lecture-fragment__title">{{ section.settings.title }}</h2>
+              {%- endif -%}
+            </div>
+          </div>
+          {%- if section.settings.description != blank -%}
+            <div class="lecture-fragment__description">
+              {{ section.settings.description }}
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.artist != blank -%}
+            <p class="lecture-fragment__artist">
+              <strong>Artiste : {{ section.settings.artist }}</strong>
+            </p>
+          {%- endif -%}
+        </div>
+
+        {%- comment -%} Illustration principale à droite {%- endcomment -%}
+        {%- if section.settings.main_illustration != blank -%}
+          <div class="lecture-fragment__main-image">
+            {{ section.settings.main_illustration | image_url: width: 800 | image_tag: loading: 'lazy' }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Accordéon mobile + mode replié desktop
+  document.addEventListener('DOMContentLoaded', function () {
+    function toggleFragment(el) {
+      const root = el.closest('.lecture-fragment');
+      if (!root) return;
+      const isMobile = window.matchMedia('(max-width: 749px)').matches;
+      const isCollapsedMode = root.classList.contains('lecture-fragment--collapsed');
+      if (isMobile || isCollapsedMode) {
+        root.classList.toggle('is-open');
+      }
+    }
+
+    document.querySelectorAll('.lecture-fragment__content-wrapper').forEach((wrapper) => {
+      wrapper.addEventListener('click', function () {
+        toggleFragment(this);
+      });
+    });
+  });
+</script>
+
+{% stylesheet %}
+  .lecture-fragment {
+    width: 100%;
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .lecture-fragment__container {
+    position: relative;
+  }
+
+  .lecture-fragment__content-wrapper {
+    background-color: #f5f1e8;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 60px 80px;
+    border-radius: 20px;
+    border: 2px solid #ac9c89ff;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media screend and (max-width: 798px) {
+    .lecture-fragment__content-wrapper {
+      padding: 40px;
+    }
+  }
+
+  .lecture-fragment__content-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    background-color: transparent;
+    opacity: 0.15;
+    border-radius: inherit;
+    z-index: 0;
+  }
+
+  .lecture-fragment__content-wrapper.page-width {
+    grid-column: 2 / 3;
+  }
+
+  .lecture-fragment__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 'left image';
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .lecture-fragment__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lecture-fragment__chevron {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: currentColor;
+    transition: transform 0.3s ease;
+    position: absolute;
+    right: 0;
+    background: rgba(197, 193, 173, 0.4);
+    border-radius: 40px;
+  }
+
+  /* Mode replié sur desktop */
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__chevron {
+    display: block;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__content-wrapper {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__content-wrapper {
+    cursor: default;
+    user-select: auto;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__chevron {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lecture-fragment__chevron-label {
+    display: none;
+    position: absolute;
+    right: 100px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: inherit;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 1);
+    opacity: 0.6;
+    text-transform: uppercase;
+    font-weight: 700;
+    white-space: nowrap;
+    font-family: var(--font-accent--family);
+    z-index: 3;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__chevron-label {
+    display: inline;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__chevron-label {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .lecture-fragment__chevron-label {
+      display: none !important;
+    }
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__chevron {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__description,
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__artist,
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__main-image {
+    display: none;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__description,
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__artist,
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__main-image {
+    display: block;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed .lecture-fragment__content-wrapper {
+    padding: 20px 40px 10px 40px;
+  }
+
+  .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__content-wrapper {
+    padding: 60px 80px;
+  }
+
+  @media screen and (max-width: 798px) {
+    .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__content-wrapper {
+      padding: 30px 40px;
+    }
+
+    .lecture-fragment.lecture-fragment .lecture-fragment__icon {
+      display: none;
+    }
+
+    .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__title {
+      text-align: center;
+      display: block;
+    }
+
+    .lecture-fragment.lecture-fragment--collapsed.is-open .lecture-fragment__subtitle {
+      text-align: center;
+    }
+  }
+
+  .lecture-fragment__chevron svg {
+    display: block;
+  }
+
+  .lecture-fragment__icon {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(247, 243, 233, 0.7);
+    box-shadow: 0 0 30px 30px rgba(247, 243, 233, 0.7);
+    border-radius: 20px;
+  }
+
+  .lecture-fragment__title-wrapper {
+    flex: 1;
+  }
+
+  .lecture-fragment__subtitle {
+    position: relative;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    margin: 0;
+    font-weight: 400;
+    opacity: 0.9;
+    z-index: 9;
+    font-family: var(--font-heading--family);
+  }
+
+  .lecture-fragment__title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    display: inline-block;
+    background: rgba(247, 243, 233, 0.7);
+    box-shadow: 0 0 30px 20px rgba(247, 243, 233, 0.7);
+    border-radius: 20px;
+  }
+
+  .lecture-fragment__text-content {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .lecture-fragment__description {
+    font-family: var(--font-fragment--family);
+    font-size: 1.1rem;
+    text-align: justify;
+    margin-bottom: 1rem;
+    color: #312b2bff;
+    background: rgba(247, 243, 233, 0.7);
+    box-shadow: 0 0 20px 20px rgba(247, 243, 233, 0.7);
+    border-radius: 20px;
+    max-width: 570px;
+    line-height: 1.6rem;
+    z-index: 6;
+  }
+
+  .lecture-fragment__description p {
+    margin-bottom: 1rem;
+  }
+
+  .lecture-fragment__description p:last-child {
+    margin-bottom: 0;
+  }
+
+  .lecture-fragment__artist {
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: 0.02rem;
+    font-family: var(--font-heading--family);
+    font-weight: 300;
+    z-index: 4;
+    display: inline-block;
+    background: rgba(247, 243, 233, 0.7);
+    box-shadow: 0 0 30px 20px rgba(247, 243, 233, 0.7);
+    border-radius: 80px;
+  }
+
+  .lecture-fragment__main-image {
+    grid-area: image;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    margin-left: 3rem;
+    background: rgba(247, 243, 233, 0.7);
+    box-shadow: 0 0 30px 30px rgba(247, 243, 233, 0.7);
+    border-radius: 60px;
+    opacity: 0.8;
+  }
+
+  .lecture-fragment__main-image svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Mobile */
+  @media screen and (max-width: 749px) {
+    .lecture-fragment__content-wrapper {
+      padding: 20px;
+      background-position: bottom;
+      background-size: contain;
+    }
+
+    .lecture-fragment__content {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'header'
+        'image'
+        'left';
+      gap: 0.5rem;
+    }
+
+    .lecture-fragment__header {
+      cursor: pointer;
+      user-select: none;
+      padding-right: 1.5rem;
+      display: flex;
+    }
+
+    .lecture-fragment__chevron {
+      display: block;
+    }
+
+    .lecture-fragment__content.is-open .lecture-fragment__chevron {
+      transform: rotate(180deg);
+    }
+
+    .lecture-fragment__icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    .lecture-fragment__subtitle {
+      font-size: 1.2rem;
+    }
+
+    .lecture-fragment__title {
+      position: relative;
+      font-size: 2.25rem;
+      z-index: 8;
+    }
+
+    /* Masquer le contenu par défaut sur mobile (sauf le header) */
+    .lecture-fragment__description,
+    .lecture-fragment__artist,
+    .lecture-fragment__main-image {
+      display: none;
+    }
+
+    /* Afficher le contenu quand ouvert */
+    .lecture-fragment__content.is-open .lecture-fragment__description,
+    .lecture-fragment__content.is-open .lecture-fragment__artist,
+    .lecture-fragment__content.is-open .lecture-fragment__main-image {
+      display: block;
+    }
+
+    .lecture-fragment__main-image {
+      padding: 1rem;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .lecture-fragment__description {
+      text-align: left;
+      font-size: 1.1rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Lecture Fragment",
+  "tag": "section",
+  "class": "lecture-fragment-wrapper section-wrapper",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Version de test avec contenu fictif. Affiche l'histoire d'une illustration."
+    },
+    {
+      "type": "liquid",
+      "id": "show_section",
+      "label": "Condition d'affichage (Liquid)",
+      "info": "Entrez du code Liquid qui retourne true ou false. La section s'affichera seulement si le résultat est true.",
+      "default": "true"
+    },
+    {
+      "type": "checkbox",
+      "id": "collapsed_default",
+      "label": "Replié par défaut (même sur desktop)",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Contenu"
+    },
+    {
+      "type": "text",
+      "id": "pretitle",
+      "label": "Pré-titre",
+      "default": "L'HISTOIRE DERRIÈRE CE FRAGMENT"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "VARÈGUE"
+    },
+    {
+      "type": "text",
+      "id": "artist",
+      "label": "Artiste",
+      "default": "URIEL"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Les Varègues apparaissent à l'époque médiévale comme un phénomène historique singulier : des hommes venus du Nord, principalement de Scandinavie, qui s'inscrivent durablement dans les réseaux commerciaux, militaires puis politiques, reliant l'Europe septentrionale à l'Asie mineure.</p><p>Ils participent activement à la formation des premiers États slaves, tout en conservant une identité propre. Le terme « Varègue » désigne moins un peuple qu'un rôle : celui d'hommes mobiles, capables de naviguer entre cultures, langues et systèmes politiques très différents.</p><p>Leur présence à Constantinople marque l'apogée de leur trajectoire. Recrutés comme mercenaires d'élite, ils forment la célèbre Garde varègue, chargée de la protection rapprochée de l'empereur byzantin. Leur réputation repose sur des éléments concrets : discipline, efficacité au combat et fidélité stricte à leur employeur. Étrangers aux intrigues locales, ils sont considérés comme plus fiables que les troupes issues de l'aristocratie byzantine elle-même.</p><p>Les Varègues incarnent ainsi un modèle rare au Moyen Âge : celui d'hommes capables de préserver à des structures impériales complexes sans renoncer à leurs traditions. Leur équipement, leur organisation et leurs rites témoignent d'un équilibre entre héritage scandinave et adaptation à un environnement méditerranéen et chrétien oriental.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_image",
+      "label": "Icône à gauche du titre",
+      "info": "Petite icône affichée à côté du titre"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_illustration",
+      "label": "Illustration principale",
+      "info": "Grande illustration affichée à droite du texte"
+    },
+    {
+      "type": "header",
+      "content": "Image de fond"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image_metaobject",
+      "label": "Image de fond depuis le métaobjet",
+      "info": "Sélectionnez une image depuis le métaobjet illustration_produit. Prioritaire sur l'image par défaut ci-dessous."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Image de fond par défaut",
+      "info": "Image de secours si aucune image n'est sélectionnée depuis le métaobjet"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lecture Fragment"
+    }
+  ]
+}
+{% endschema %}

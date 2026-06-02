@@ -1,0 +1,62 @@
+{% style %}
+.footer-immersif, footer, .footer-utilities, .announcement-bar
+{
+  display: none;
+}
+{% endstyle %}
+
+<div
+  id="rdc-map-embed"
+  style="
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    {% if section.settings.border_radius > 0 %}border-radius: {{ section.settings.border_radius }}px;{% endif %}
+  "
+></div>
+
+<script>
+  (function() {
+    var container = document.getElementById('rdc-map-embed');
+    if (!container) return;
+
+    function setHeight() {
+      var top = container.getBoundingClientRect().top + window.scrollY;
+      container.style.height = 'calc(100vh - ' + top + 'px)';
+    }
+
+    setHeight();
+    window.addEventListener('resize', setHeight);
+
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://runesdecheneconquete.netlify.app/';
+    iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
+    iframe.title = 'La Carte — Runes de Chêne';
+    iframe.allowFullscreen = true;
+    iframe.allow = 'geolocation';
+    container.appendChild(iframe);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "La Carte (embed)",
+  "settings": [
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Arrondi des coins",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "La Carte (embed)"
+    }
+  ]
+}
+{% endschema %}

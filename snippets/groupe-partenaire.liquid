@@ -1,0 +1,142 @@
+{%- doc -%}
+  Snippet de rendu pour le block "Groupe partenaires".
+  Appelé depuis blocks/groupe-partenaire.liquid.
+
+  @param {object} settings          - Les settings du block.
+  @param {string} shopify_attributes - Attributs Shopify pour l'éditeur.
+{%- enddoc -%}
+
+
+{%- liquid
+  assign image_size         = settings.image_size            | default: 80
+  assign images_per_row_mob = settings.images_per_row_mobile | default: 3
+  assign gap                = settings.gap                   | default: 16
+  assign grayscale          = settings.grayscale             | default: false
+-%}
+
+
+<div
+  class="partner-group{% if grayscale %} partner-group--grayscale{% endif %}"
+  style="
+    --partner-size: {{ image_size }}px;
+    --partner-gap: {{ gap }}px;
+    --partner-cols-mobile: {{ images_per_row_mob }};
+  "
+  {{ shopify_attributes }}
+>
+  <div class="partner-group__track">
+
+    {%- for i in (1..8) -%}
+      {%- assign img_key  = 'image_' | append: i -%}
+      {%- assign link_key = 'link_'  | append: i -%}
+      {%- assign img      = settings[img_key] -%}
+
+      {%- if img != blank -%}
+        <div class="partner-group__item">
+          {%- if settings[link_key] != blank -%}
+            <a href="{{ settings[link_key] }}" class="partner-group__link" aria-label="Partenaire {{ i }}">
+          {%- endif -%}
+
+          {{- img
+              | image_url: width: 500
+              | image_tag:
+                loading: 'lazy',
+                class: 'partner-group__img',
+                alt: img.alt | default: 'Logo partenaire'
+          -}}
+
+          {%- if settings[link_key] != blank -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    {%- endfor -%}
+
+  </div>
+</div>
+
+
+{% stylesheet %}
+
+/* ─── Conteneur ─────────────────────────────────────── */
+.partner-group {
+  width: 100%;
+}
+
+.partner-group__track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--partner-gap, 16px);
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Item ───────────────────────────────────────────── */
+.partner-group__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ─── Image : hauteur fixe, largeur auto, pas de rognage */
+.partner-group__img {
+  display: block;
+  height: var(--partner-size, 80px);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* ─── Lien ───────────────────────────────────────────── */
+.partner-group__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Niveaux de gris optionnels ─────────────────────── */
+.partner-group--grayscale .partner-group__img {
+  filter: grayscale(100%);
+  opacity: 0.55;
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+.partner-group--grayscale .partner-group__item:hover .partner-group__img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* ─── Mobile : carrousel multi-items ─────────────────── */
+@media (max-width: 749px) {
+
+  .partner-group__track {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    padding-inline: calc(var(--partner-gap, 16px) / 2);
+  }
+
+  .partner-group__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+    Largeur de chaque item = (100% - espaces entre les N items visibles) / N
+    Exemple : 3 logos visibles, gap 16px
+    → (100% - 2×16px) / 3
+  */
+  .partner-group__item {
+    flex: 0 0 calc(
+      (100% - (var(--partner-cols-mobile, 3) - 1) * var(--partner-gap, 16px))
+      / var(--partner-cols-mobile, 3)
+    );
+    scroll-snap-align: start;
+  }
+
+}
+
+{% endstylesheet %}

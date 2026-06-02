@@ -1,0 +1,382 @@
+{%- comment -%}
+  Bloc Guide de Tailles
+  Affiche un tableau de mesures à partir d'un champ JSON du métaobjet produit
+{%- endcomment -%}
+
+{% assign block_settings = block.settings %}
+
+{%- liquid
+  assign metaobject_handle = block_settings.metaobject_handle | default: 'illustration_produit'
+  assign json_field_handle = block_settings.json_field_handle | default: 'guide_de_tailles'
+  
+  assign metaobject = product.metafields.custom[metaobject_handle].value
+  if metaobject
+    assign size_guide_json = metaobject[json_field_handle].value
+  endif
+-%}
+
+{%- if size_guide_json != blank -%}
+  {%- liquid
+    if size_guide_json.size_guide
+      assign guide = size_guide_json.size_guide
+    else
+      assign size_guide_data = size_guide_json | parse_json
+      assign guide = size_guide_data.size_guide
+    endif
+  -%}
+
+  <div class="size-guide" {{ block.shopify_attributes }}>
+    {%- if block_settings.title != blank -%}
+      <h3 class="size-guide__title {{ block_settings.title_preset }}">
+        {{ block_settings.title }}
+      </h3>
+    {%- endif -%}
+
+    {%- if block_settings.description != blank -%}
+      <div class="size-guide__description">
+        {{ block_settings.description }}
+      </div>
+    {%- endif -%}
+
+    {%- if guide.sizes.size > 0 -%}
+      <div class="size-guide__table-wrapper">
+        <table class="size-guide__table">
+          <thead>
+            <tr>
+              <th>Taille</th>
+              <th>Poitrine<br><span class="size-guide__unit">({{ guide.unit | default: 'cm' }})</span></th>
+              <th>Longueur<br><span class="size-guide__unit">({{ guide.unit | default: 'cm' }})</span></th>
+              <th>Épaules<br><span class="size-guide__unit">({{ guide.unit | default: 'cm' }})</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for size_item in guide.sizes -%}
+              <tr>
+                <td class="size-guide__size-name">{{ size_item.size }}</td>
+                <td>{{ size_item.chest_width }}</td>
+                <td>{{ size_item.length }}</td>
+                <td>{{ size_item.shoulder_width }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+      </div>
+
+      {%- if block_settings.note != blank -%}
+        <div class="size-guide__note">
+          {{ block_settings.note }}
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <p class="size-guide__empty">{{ 'size_guide.no_data' | t | default: 'Aucune donnée de taille disponible.' }}</p>
+    {%- endif -%}
+  </div>
+{%- else -%}
+  <div class="size-guide size-guide--empty" {{ block.shopify_attributes }}>
+    <p>{{ 'size_guide.configure' | t | default: 'Veuillez configurer le guide de tailles dans les paramètres du bloc.' }}</p>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .size-guide {
+    width: 100%;
+    padding: var(--margin-m) 0;
+  }
+
+  .size-guide__title {
+    margin: 0 0 var(--margin-s) 0;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    color: var(--color-text-primary);
+  }
+
+  .size-guide__description {
+    margin-bottom: var(--margin-m);
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .size-guide__table-wrapper {
+    margin-bottom: var(--margin-m);
+    border-radius: var(--style-border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .size-guide__table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+    background-color: var(--color-background-primary);
+  }
+
+  .size-guide__table thead {
+    background: linear-gradient(135deg, var(--color-background-secondary) 0%, var(--color-background-primary) 100%);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .size-guide__table th {
+    padding: 12px 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+    width: 25%;
+  }
+
+  .size-guide__table th:first-child {
+    text-align: left;
+    padding-left: 16px;
+    width: 20%;
+  }
+
+  .size-guide__unit {
+    font-size: 0.65rem;
+    font-weight: 400;
+    opacity: 0.8;
+    text-transform: none;
+  }
+
+  .size-guide__table td {
+    padding: 14px 6px;
+    text-align: center;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  .size-guide__table td:first-child {
+    text-align: left;
+    padding-left: 16px;
+  }
+
+  .size-guide__size-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    letter-spacing: 0.5px;
+  }
+
+  .size-guide__table tbody tr {
+    transition: all 0.2s ease;
+  }
+
+  .size-guide__table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+    transform: scale(1.01);
+  }
+
+  .size-guide__table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .size-guide__note {
+    padding: var(--margin-s);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--style-border-radius);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .size-guide__empty,
+  .size-guide--empty p {
+    color: var(--color-text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: var(--margin-m);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .size-guide__table {
+      font-size: 0.8rem;
+    }
+
+    .size-guide__table th {
+      padding: 10px 4px;
+      font-size: 0.65rem;
+    }
+
+    .size-guide__table td {
+      padding: 12px 4px;
+      font-size: 0.85rem;
+    }
+
+    .size-guide__table th:first-child,
+    .size-guide__table td:first-child {
+      padding-left: 8px;
+    }
+
+    .size-guide__unit {
+      font-size: 0.6rem;
+    }
+
+    .size-guide__size-name {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Very small screens - vertical cards */
+  @media (max-width: 480px) {
+    .size-guide__table thead {
+      display: none;
+    }
+
+    .size-guide__table,
+    .size-guide__table tbody,
+    .size-guide__table tr,
+    .size-guide__table td {
+      display: block;
+      width: 100%;
+    }
+
+    .size-guide__table tr {
+      margin-bottom: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--style-border-radius);
+      padding: 16px;
+      background: linear-gradient(135deg, var(--color-background-primary) 0%, var(--color-background-secondary) 100%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .size-guide__table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border: none;
+      text-align: right;
+    }
+
+    .size-guide__table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      text-align: left;
+      color: var(--color-text-primary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .size-guide__size-name {
+      font-size: 1.1rem;
+    }
+
+    .size-guide__size-name::before {
+      content: 'Taille';
+    }
+
+    .size-guide__table td:nth-child(2)::before {
+      content: 'Poitrine (cm)';
+    }
+
+    .size-guide__table td:nth-child(3)::before {
+      content: 'Longueur (cm)';
+    }
+
+    .size-guide__table td:nth-child(4)::before {
+      content: 'Épaules (cm)';
+    }
+
+    .size-guide__table tbody tr:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+ 
+{% schema %}
+{
+  "name": "Guide de Tailles",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenu"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Guide des tailles"
+    },
+    {
+      "type": "select",
+      "id": "title_preset",
+      "label": "Style du titre",
+      "options": [
+        {
+          "value": "",
+          "label": "Par défaut"
+        },
+        {
+          "value": "h1",
+          "label": "H1"
+        },
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "h4",
+          "label": "H4"
+        },
+        {
+          "value": "h5",
+          "label": "H5"
+        },
+        {
+          "value": "h6",
+          "label": "H6"
+        }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Les mesures de nos coupes varient selon les modèles. Économisez-vous du temps !</p>"
+    },
+    {
+      "type": "header",
+      "content": "Source de données"
+    },
+    {
+      "type": "text",
+      "id": "metaobject_handle",
+      "label": "Handle du métaobjet",
+      "default": "illustration_produit",
+      "info": "Le handle du métaobjet contenant le guide de tailles (par défaut: illustration_produit)"
+    },
+    {
+      "type": "text",
+      "id": "json_field_handle",
+      "label": "Handle du champ JSON",
+      "default": "guide_de_tailles",
+      "info": "Le handle du champ JSON dans le métaobjet (par défaut: guide_de_tailles)"
+    },
+    {
+      "type": "richtext",
+      "id": "note",
+      "label": "Note additionnelle",
+      "info": "Texte affiché sous le tableau (ex: conseils de mesure)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Guide de Tailles"
+    }
+  ]
+}
+{% endschema %}

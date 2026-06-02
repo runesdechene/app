@@ -1,0 +1,368 @@
+{%- liquid
+  assign block_settings = block.settings
+  assign product = closest.product
+  assign product_meta = product.metafields.custom.base.value
+  assign elements = product_meta.elements.value
+
+  assign keyword_1_lower = block_settings.keyword_1 | downcase
+  assign keyword_2_lower = block_settings.keyword_2 | downcase
+  assign keyword_3_lower = block_settings.keyword_3 | downcase
+  assign keyword_4_lower = block_settings.keyword_4 | downcase
+  assign keyword_5_lower = block_settings.keyword_5 | downcase
+  assign keyword_6_lower = block_settings.keyword_6 | downcase
+  assign keyword_7_lower = block_settings.keyword_7 | downcase
+  assign keyword_8_lower = block_settings.keyword_8 | downcase
+  assign keyword_9_lower = block_settings.keyword_9 | downcase
+  assign keyword_10_lower = block_settings.keyword_10 | downcase
+-%}
+
+{%- if elements != blank -%}
+  <div class="product-features-list spacing-style" {{ block.shopify_attributes }}>
+    {%- if block_settings.heading != blank -%}
+      <h3 class="product-features-list__heading">{{ block_settings.heading }}</h3>
+    {%- endif -%}
+
+    <div class="product-features-list__grid">
+      {%- for element in elements -%}
+        {%- assign formulation_text = element.system.name | default: element -%}
+        {%- assign formulation_lower = formulation_text | downcase -%}
+        {%- assign current_icon = blank -%}
+
+        {%- comment -%} Chercher l'icône par mot-clé (contains) {%- endcomment -%}
+        {%- if keyword_1_lower != blank and formulation_lower contains keyword_1_lower -%}
+          {%- assign current_icon = block_settings.icon_1 -%}
+        {%- elsif keyword_2_lower != blank and formulation_lower contains keyword_2_lower -%}
+          {%- assign current_icon = block_settings.icon_2 -%}
+        {%- elsif keyword_3_lower != blank and formulation_lower contains keyword_3_lower -%}
+          {%- assign current_icon = block_settings.icon_3 -%}
+        {%- elsif keyword_4_lower != blank and formulation_lower contains keyword_4_lower -%}
+          {%- assign current_icon = block_settings.icon_4 -%}
+        {%- elsif keyword_5_lower != blank and formulation_lower contains keyword_5_lower -%}
+          {%- assign current_icon = block_settings.icon_5 -%}
+        {%- elsif keyword_6_lower != blank and formulation_lower contains keyword_6_lower -%}
+          {%- assign current_icon = block_settings.icon_6 -%}
+        {%- elsif keyword_7_lower != blank and formulation_lower contains keyword_7_lower -%}
+          {%- assign current_icon = block_settings.icon_7 -%}
+        {%- elsif keyword_8_lower != blank and formulation_lower contains keyword_8_lower -%}
+          {%- assign current_icon = block_settings.icon_8 -%}
+        {%- elsif keyword_9_lower != blank and formulation_lower contains keyword_9_lower -%}
+          {%- assign current_icon = block_settings.icon_9 -%}
+        {%- elsif keyword_10_lower != blank and formulation_lower contains keyword_10_lower -%}
+          {%- assign current_icon = block_settings.icon_10 -%}
+        {%- endif -%}
+
+        <div class="product-feature-item">
+          {%- if current_icon != blank -%}
+            <div class="product-feature-item__icon">
+              {{ current_icon | image_url: width: 80 | image_tag: loading: 'lazy', alt: formulation_text }}
+            </div>
+          {%- else -%}
+            <span class="product-feature-item__check">✓</span>
+          {%- endif -%}
+          <div class="product-feature-item__text">
+            {{ formulation_text }}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-features-list {
+    width: 100%;
+  }
+
+  .product-features-list__heading {
+    margin: 0 0 1em 0;
+    font-size: var(--font-h4--size);
+    font-weight: var(--font-heading--weight);
+    color: var(--color-foreground-heading);
+  }
+
+  .product-features-list__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .product-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #e7dcca;
+    border-radius: 50px;
+    padding-right: 20px;
+    padding-left: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  @media screen and (max-width: 798px) {
+    .product-feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #e7dcca;
+      border-radius: 50px;
+      padding-right: 15px;
+      padding-left: 15px;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .slideshow-controls__thumbnail img {
+    background: #e7dcca;
+  }
+
+  .product-feature-item:hover {
+    transform: scale(1.05);
+    cursor: default;
+  }
+
+  .product-feature-item__check {
+    color: #5a5a5a;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .product-feature-item__icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-left: -20px;
+  }
+
+  @media screen and (max-width: 798px) {
+    .product-feature-item__icon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .product-feature-item__icon img {
+    object-fit: cover;
+  }
+
+  .product-feature-item__text {
+    font-size: 15px;
+    font-family: var(--font-accent--family);
+    padding: 7px;
+    font-weight: 600;
+  }
+
+  @media screen and (max-width: 798px) {
+    .product-feature-item__text {
+      font-size: 13px;
+      font-family: var(--font-accent--family);
+      padding: 3px;
+      font-weight: 600;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-features-list__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 1rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .product-features-list__grid {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Caractéristiques produit",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Affiche automatiquement les éléments du métaobjet Base du produit"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Titre"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 1"
+    },
+    {
+      "type": "text",
+      "id": "keyword_1",
+      "label": "Mot-clé 1",
+      "info": "Ex: bio, coton, illustration..."
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_1",
+      "label": "Icône 1"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 2"
+    },
+    {
+      "type": "text",
+      "id": "keyword_2",
+      "label": "Mot-clé 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_2",
+      "label": "Icône 2"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 3"
+    },
+    {
+      "type": "text",
+      "id": "keyword_3",
+      "label": "Mot-clé 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_3",
+      "label": "Icône 3"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 4"
+    },
+    {
+      "type": "text",
+      "id": "keyword_4",
+      "label": "Mot-clé 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_4",
+      "label": "Icône 4"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 5"
+    },
+    {
+      "type": "text",
+      "id": "keyword_5",
+      "label": "Mot-clé 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_5",
+      "label": "Icône 5"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 6"
+    },
+    {
+      "type": "text",
+      "id": "keyword_6",
+      "label": "Mot-clé 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_6",
+      "label": "Icône 6"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 7"
+    },
+    {
+      "type": "text",
+      "id": "keyword_7",
+      "label": "Mot-clé 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_7",
+      "label": "Icône 7"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 8"
+    },
+    {
+      "type": "text",
+      "id": "keyword_8",
+      "label": "Mot-clé 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_8",
+      "label": "Icône 8"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 9"
+    },
+    {
+      "type": "text",
+      "id": "keyword_9",
+      "label": "Mot-clé 9"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_9",
+      "label": "Icône 9"
+    },
+    {
+      "type": "header",
+      "content": "Mapping 10"
+    },
+    {
+      "type": "text",
+      "id": "keyword_10",
+      "label": "Mot-clé 10"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_10",
+      "label": "Icône 10"
+    },
+    {
+      "type": "header",
+      "content": "Espacement"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Haut",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bas",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Caractéristiques produit",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

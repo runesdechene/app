@@ -1,0 +1,406 @@
+{%- liquid
+  assign section_settings = section.settings
+-%}
+
+{% style %}
+  .similar-products__content-wrapper {
+    background-color: {{ section_settings.background_color }};
+    padding-top: {{ section_settings.padding_top }}px;
+    padding-right: {{ section_settings.padding_right }}px;
+    padding-bottom: {{ section_settings.padding_bottom }}px;
+    padding-left: {{ section_settings.padding_left }}px;
+    border-radius: {{ section_settings.border_radius }}px;
+    border: {{ section_settings.border_width }}px solid {{ section_settings.border_color }};
+  }
+
+  .rdc-aussi-disponible__grid {
+    justify-content: {{ section_settings.items_alignment }};
+  }
+{% endstyle %}
+<div class="similar-products color-{{ section_settings.color_scheme }}">
+  <div class="similar-products__container spacing-style section section--full-width">
+    <div class="similar-products__content-wrapper section-content-wrapper {{ section_settings.section_width }}">
+      {%- assign illustration_metafield = product.metafields.custom.illustration_produit -%}
+
+      {%- if illustration_metafield != blank -%}
+        {%- assign illustration = illustration_metafield.value -%}
+        {%- comment -%} Priorité 1 : collection liée au métaobjet illustration {%- endcomment -%}
+        {%- assign dynamic_collection = illustration.collection.value -%}
+        {%- comment -%} Fallback : collection par handle du métaobjet {%- endcomment -%}
+        {%- if dynamic_collection == blank -%}
+          {%- assign dynamic_collection = collections[illustration.system.handle] -%}
+        {%- endif -%}
+
+        {%- if dynamic_collection != blank and dynamic_collection.products.size > 0 -%}
+          <div class="rdc-aussi-disponible" {{ section.shopify_attributes }}>
+            <div class="rdc-aussi-disponible__grid">
+              {%- comment -%} Afficher d'abord le produit actuel {%- endcomment -%}
+              <div class="rdc-aussi-disponible__item rdc-aussi-disponible__item--current">
+                <a href="{{ product.url }}" class="rdc-aussi-disponible__link">
+                  {%- assign product_meta = product.metafields.custom.base.value -%}
+                  {%- assign product_icon = blank -%}
+                  {%- assign display_label = product.type -%}
+
+                  {%- comment -%} Récupérer l'icône et le label depuis le métaobjet {%- endcomment -%}
+                  {%- if product_meta != blank -%}
+                    {%- if product_meta.icone != blank -%}
+                      {%- assign product_icon = product_meta.icone -%}
+                    {%- endif -%}
+                    {%- if product_meta.label != blank -%}
+                      {%- assign display_label = product_meta.label -%}
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if product_icon != blank -%}
+                    <div class="rdc-product-type-icon">
+                      {{
+                        product_icon
+                        | image_url: width: 120
+                        | image_tag: loading: 'lazy', alt: display_label, width: 60, height: 60
+                      }}
+                    </div>
+                  {%- endif -%}
+                  <span class="rdc-aussi-disponible__label">{{ display_label }}</span>
+                </a>
+              </div>
+
+              {%- comment -%} Puis afficher les autres produits {%- endcomment -%}
+              {%- for other_product in dynamic_collection.products -%}
+                {%- if other_product.id != product.id -%}
+                  {%- assign other_product_meta = other_product.metafields.custom.base.value -%}
+                  {%- assign other_product_icon = blank -%}
+                  {%- assign display_label = other_product.type -%}
+
+                  {%- comment -%} Récupérer l'icône et le label depuis le métaobjet {%- endcomment -%}
+                  {%- if other_product_meta != blank -%}
+                    {%- if other_product_meta.icone != blank -%}
+                      {%- assign other_product_icon = other_product_meta.icone -%}
+                    {%- endif -%}
+                    {%- if other_product_meta.label != blank -%}
+                      {%- assign display_label = other_product_meta.label -%}
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  <div class="rdc-aussi-disponible__item">
+                    <a href="{{ other_product.url }}" class="rdc-aussi-disponible__link">
+                      {%- if other_product_icon != blank -%}
+                        <div class="rdc-product-type-icon">
+                          {{
+                            other_product_icon
+                            | image_url: width: 120
+                            | image_tag: loading: 'lazy', alt: display_label, width: 60, height: 60
+                          }}
+                        </div>
+                      {%- endif -%}
+                      <span class="rdc-aussi-disponible__label">{{ display_label }}</span>
+                    </a>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .similar-products {
+    width: 100%;
+  }
+
+  .similar-products__container {
+    position: relative;
+  }
+
+  .similar-products__content-wrapper.page-width {
+    grid-column: 2 / 3;
+  }
+
+  .rdc-aussi-disponible {
+    text-align: left;
+  }
+
+  .rdc-aussi-disponible__grid {
+    display: flex;
+    gap: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rdc-aussi-disponible__grid {
+      overflow-x: scroll;
+      overflow-y: hidden;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 0.5rem;
+    }
+  }
+
+  .rdc-aussi-disponible__grid::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .rdc-aussi-disponible__grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .rdc-aussi-disponible__grid::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  .rdc-aussi-disponible__grid::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .rdc-aussi-disponible__item {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+
+  .rdc-aussi-disponible__item--current .rdc-aussi-disponible__link {
+    border: 2px solid #a8a293ff;
+    background: rgba(252, 247, 235, 1);
+  }
+
+  .rdc-aussi-disponible__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: #534f4f;
+    transition: all 0.3s ease;
+    background: #e9e0d3ff;
+    border-radius: 6px;
+    min-width: 120px;
+    border-radius: 14px;
+    padding: 0.5rem;
+  }
+
+  .rdc-aussi-disponible__link:hover {
+    background: #e0ddd4;
+    transform: translateY(-2px);
+  }
+
+  .rdc-product-type-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rdc-product-type-icon img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+  }
+
+  .rdc-aussi-disponible__link:hover .rdc-product-type-icon svg {
+    stroke: #000;
+  }
+
+  .rdc-aussi-disponible__label {
+    font-size: 0.8rem;
+    font-weight: 400;
+    font-family: var(--font-accent--family);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .rdc-aussi-disponible__empty {
+    color: #96928a;
+    font-style: italic;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rdc-aussi-disponible__grid {
+      gap: 0.5rem;
+    }
+
+    .rdc-aussi-disponible__link {
+      min-width: 100px;
+      padding: 0.7rem;
+    }
+
+    .rdc-aussi-disponible__item {
+      min-width: 100px;
+    }
+  }
+{% endstylesheet %}
+{% schema %}
+{
+  "name": "Produits similaires",
+  "tag": "section",
+  "class": "similar-products-wrapper section-wrapper",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Affiche automatiquement les produits qui partagent la même illustration (métaobjet)"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Nombre de produits à afficher",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Largeur de la section",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Pleine largeur"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Schéma de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Style du conteneur"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Couleur de fond",
+      "default": "transparent"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacement haut",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Espacement droit",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacement bas",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Espacement gauche",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Arrondi des coins",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Épaisseur de la bordure",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Couleur de la bordure",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "items_alignment",
+      "label": "Alignement des produits",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Gauche"
+        },
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "flex-end",
+          "label": "Droite"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Espacement de la section"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Haut",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bas",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Produits similaires"
+    }
+  ]
+}
+{% endschema %}

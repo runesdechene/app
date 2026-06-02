@@ -1,0 +1,103 @@
+{%- render 'groupe-partenaire',
+  settings: block.settings,
+  shopify_attributes: block.shopify_attributes
+-%}
+
+
+{% schema %}
+{
+  "name": "Groupe partenaires",
+  "tag": null,
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Mise en page"
+    },
+    {
+      "type": "range",
+      "id": "image_size",
+      "label": "Hauteur des logos",
+      "info": "En pixels — la largeur s'adapte automatiquement",
+      "min": 50,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Espacement entre logos",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "images_per_row_mobile",
+      "label": "Logos visibles simultanément",
+      "info": "Nombre affiché en même temps dans le carrousel mobile",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+
+    {
+      "type": "header",
+      "content": "Apparence"
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale",
+      "label": "Logos en niveaux de gris",
+      "info": "Repasse en couleur au survol",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Logos (jusqu'à 8)"
+    },
+
+    { "type": "image_picker", "id": "image_1", "label": "Logo 1" },
+    { "type": "url",          "id": "link_1",  "label": "Lien — Logo 1" },
+
+    { "type": "image_picker", "id": "image_2", "label": "Logo 2" },
+    { "type": "url",          "id": "link_2",  "label": "Lien — Logo 2" },
+
+    { "type": "image_picker", "id": "image_3", "label": "Logo 3" },
+    { "type": "url",          "id": "link_3",  "label": "Lien — Logo 3" },
+
+    { "type": "image_picker", "id": "image_4", "label": "Logo 4" },
+    { "type": "url",          "id": "link_4",  "label": "Lien — Logo 4" },
+
+    { "type": "image_picker", "id": "image_5", "label": "Logo 5" },
+    { "type": "url",          "id": "link_5",  "label": "Lien — Logo 5" },
+
+    { "type": "image_picker", "id": "image_6", "label": "Logo 6" },
+    { "type": "url",          "id": "link_6",  "label": "Lien — Logo 6" },
+
+    { "type": "image_picker", "id": "image_7", "label": "Logo 7" },
+    { "type": "url",          "id": "link_7",  "label": "Lien — Logo 7" },
+
+    { "type": "image_picker", "id": "image_8", "label": "Logo 8" },
+    { "type": "url",          "id": "link_8",  "label": "Lien — Logo 8" }
+
+  ],
+  "presets": [
+    {
+      "name": "Groupe partenaires",
+      "category": "Partenaires"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,2272 @@
+{%- style -%}
+/* ============================================
+   RDC — Bento Collection List
+============================================ */
+
+.rdc-bento-{{ section.id }} {
+  margin-top: {{ section.settings.section_margin_top }}px;
+  margin-bottom: {{ section.settings.section_margin_bottom }}px;
+  padding: {{ section.settings.section_padding_top }}px 0 {{ section.settings.section_padding_bottom }}px;
+  background-color: rgba(var(--color-background), 1);
+  color: rgba(var(--color-foreground), 1);
+}
+
+.rdc-bento-container-{{ section.id }} {
+  margin: 0 auto;
+}
+
+{%- if section.settings.section_width == 'page' -%}
+.rdc-bento-container-{{ section.id }} {
+  max-width: var(--page-width, {{ section.settings.section_max_width }}px);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+{%- else -%}
+.rdc-bento-container-{{ section.id }} {
+  max-width: none;
+  padding-left: {{ section.settings.section_padding_horizontal }}px;
+  padding-right: {{ section.settings.section_padding_horizontal }}px;
+}
+{%- endif -%}
+
+.rdc-bento-row-{{ section.id }} {
+  display: flex;
+  gap: {{ section.settings.cards_gap }}px;
+  margin-bottom: {{ section.settings.cards_gap }}px;
+  align-items: {{ section.settings.desktop_cards_vertical_align }};
+}
+
+.rdc-bento-row-{{ section.id }}:last-child {
+  margin-bottom: 0;
+}
+
+.rdc-bento-row-{{ section.id }}.rdc-row-3equal > .rdc-bento-card-{{ section.id }},
+.rdc-bento-row-{{ section.id }}.rdc-row-1full > .rdc-bento-card-{{ section.id }} {
+  flex: 1;
+}
+
+.rdc-bento-card-{{ section.id }} {
+  position: relative;
+  border-radius: {{ section.settings.card_border_radius }}px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  background-color: {{ section.settings.card_bg_color }};
+  color: inherit;
+  isolation: isolate;
+}
+
+.rdc-bento-card-img-wrap-{{ section.id }} {
+  width: 100%;
+  display: block;
+  line-height: 0;
+  position: relative;
+  overflow: hidden;
+  background-color: {{ section.settings.card_bg_color }};
+}
+
+.rdc-bento-card-img-wrap-{{ section.id }}::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, {{ section.settings.hover_overlay_opacity | divided_by: 100.0 }});
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.45s ease;
+}
+
+.rdc-bento-card-{{ section.id }} .rdc-bento-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.165, 0.84, 0.44, 1), filter 0.7s ease, opacity 0.7s ease;
+}
+
+{%- if section.settings.desktop_image_max_height > 0 -%}
+.rdc-bento-desktop-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} {
+  max-height: {{ section.settings.desktop_image_max_height }}px;
+}
+
+.rdc-bento-desktop-{{ section.id }} .rdc-bento-card-{{ section.id }} .rdc-bento-img {
+  max-height: {{ section.settings.desktop_image_max_height }}px;
+  object-fit: {{ section.settings.desktop_image_fit }};
+}
+{%- endif -%}
+
+{%- unless section.settings.disable_animation -%}
+.rdc-bento-card-{{ section.id }}:not(.rdc-bento-brand-card-{{ section.id }}):hover .rdc-bento-img {
+  transform: scale({{ section.settings.hover_zoom_scale | divided_by: 100.0 }});
+  filter: saturate({{ section.settings.hover_saturation }}%);
+}
+
+.rdc-bento-card-{{ section.id }}:not(.rdc-bento-brand-card-{{ section.id }}):hover .rdc-bento-card-img-wrap-{{ section.id }}::after {
+  opacity: 1;
+}
+
+.rdc-bento-brand-card-{{ section.id }}:hover .rdc-bento-brand-bg-image-{{ section.id }} {
+  transform: scale(1.1);
+}
+{%- endunless -%}
+
+/* --- Composition marque --- */
+.rdc-bento-brand-card-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }}::after {
+  display: none;
+}
+
+.rdc-bento-brand-card-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} {
+  background: transparent;
+}
+
+.rdc-bento-brand-bg-image-{{ section.id }} {
+  position: relative;
+  z-index: 0;
+  filter: blur(var(--rdc-brand-bg-blur, 0px));
+  transform: scale(1.06);
+  opacity: var(--rdc-brand-bg-opacity, 1);
+}
+
+.rdc-bento-brand-overlay-{{ section.id }},
+.rdc-bento-brand-gradient-left-{{ section.id }},
+.rdc-bento-brand-gradient-right-{{ section.id }},
+.rdc-bento-brand-motif-{{ section.id }} {
+  position: absolute;
+  pointer-events: none;
+}
+
+.rdc-bento-brand-overlay-{{ section.id }} {
+  inset: 0;
+  z-index: 1;
+  background: var(--rdc-brand-overlay-color, #000000);
+  opacity: var(--rdc-brand-overlay-opacity, 0.35);
+}
+
+.rdc-bento-brand-gradient-left-{{ section.id }} {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--rdc-brand-gradient-width, 30%);
+  z-index: 2;
+  background: linear-gradient(to right, var(--rdc-brand-gradient-color, #000000), transparent);
+  opacity: var(--rdc-brand-gradient-opacity, 0.45);
+}
+
+.rdc-bento-brand-gradient-right-{{ section.id }} {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: var(--rdc-brand-gradient-width, 30%);
+  z-index: 2;
+  background: linear-gradient(to left, var(--rdc-brand-gradient-color, #000000), transparent);
+  opacity: var(--rdc-brand-gradient-opacity, 0.45);
+}
+
+.rdc-bento-brand-motif-{{ section.id }} {
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: auto;
+  max-width: none;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  opacity: var(--rdc-brand-motif-opacity, 1);
+  filter: blur(var(--rdc-brand-motif-blur, 0px));
+}
+
+.rdc-bento-brand-motif-left-{{ section.id }} {
+  left: var(--rdc-brand-left-motif-offset-desktop, 0%);
+  object-position: left center;
+}
+
+.rdc-bento-brand-motif-right-{{ section.id }} {
+  right: var(--rdc-brand-right-motif-offset-desktop, 0%);
+  object-position: right center;
+}
+
+.rdc-bento-brand-content-{{ section.id }} {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: {{ section.settings.title_padding }}px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.rdc-bento-brand-title-image-{{ section.id }} {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, var(--rdc-title-image-max-width, 420px));
+  max-height: var(--rdc-title-image-max-height, 180px);
+  object-fit: contain;
+}
+
+.rdc-bento-brand-title-text-{{ section.id }} {
+  margin: 0;
+  color: {{ section.settings.title_color_on_image }};
+  font-size: clamp(22px, 3vw, 44px);
+  font-weight: {{ section.settings.title_font_weight }};
+  line-height: 1.1;
+}
+
+/* --- Badge --- */
+.rdc-bento-badge-{{ section.id }} {
+  position: absolute;
+  top: {{ section.settings.badge_offset }}px;
+  right: {{ section.settings.badge_offset }}px;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  overflow: hidden;
+  background: var(--rdc-badge-bg);
+  color: var(--rdc-badge-color);
+}
+
+.rdc-bento-badge-{{ section.id }}.rdc-badge-shine::before {
+  content: "";
+  position: absolute;
+  top: -70%;
+  right: -80%;
+  width: 45%;
+  height: 240%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+  transform: translateX(160%) rotate(24deg);
+  animation: rdc-badge-shine-{{ section.id }} 3.2s ease-in-out infinite;
+}
+
+@keyframes rdc-badge-shine-{{ section.id }} {
+  0% {
+    transform: translateX(180%) rotate(24deg);
+  }
+  42%, 100% {
+    transform: translateX(-360%) rotate(24deg);
+  }
+}
+
+/* --- Titres classiques --- */
+.rdc-bento-title-overlay-{{ section.id }} {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: {{ section.settings.title_padding }}px;
+  background: linear-gradient(to top, rgba(0,0,0,{{ section.settings.title_overlay_opacity | divided_by: 100.0 }}) 0%, transparent 100%);
+  z-index: 4;
+}
+
+.rdc-bento-title-below-{{ section.id }} {
+  padding: {{ section.settings.title_padding }}px;
+}
+
+.rdc-bento-title-content-{{ section.id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: var(--rdc-title-image-align, flex-start);
+}
+
+.rdc-bento-title-overlay-{{ section.id }} .rdc-bento-title,
+.rdc-bento-title-below-{{ section.id }} .rdc-bento-title {
+  font-size: {{ section.settings.title_font_size }}px;
+  font-weight: {{ section.settings.title_font_weight }};
+  margin: 0;
+  line-height: 1.2;
+  width: 100%;
+  text-align: var(--rdc-title-text-align, left);
+}
+
+.rdc-bento-title-overlay-{{ section.id }} .rdc-bento-title {
+  color: {{ section.settings.title_color_on_image }};
+}
+
+.rdc-bento-title-below-{{ section.id }} .rdc-bento-title {
+  color: {{ section.settings.title_color_below }};
+}
+
+.rdc-bento-card-title-image-{{ section.id }} {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, var(--rdc-title-image-max-width, 260px));
+  max-height: var(--rdc-title-image-max-height, 120px);
+  object-fit: contain;
+}
+
+/* --- Collection à venir --- */
+.rdc-bento-upcoming-card-{{ section.id }} {
+  cursor: default;
+}
+
+.rdc-bento-upcoming-card-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} {
+  min-height: 320px;
+}
+
+.rdc-bento-upcoming-card-{{ section.id }} .rdc-bento-img {
+  filter: blur(var(--rdc-upcoming-blur, 0px));
+  transform: scale(1.06);
+  opacity: var(--rdc-upcoming-image-opacity, 1);
+}
+
+.rdc-bento-upcoming-content-{{ section.id }} {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: clamp(20px, 4vw, 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: var(--rdc-upcoming-content-align, center);
+  text-align: var(--rdc-upcoming-text-align, center);
+  color: #ffffff;
+  isolation: isolate;
+}
+
+.rdc-bento-upcoming-content-{{ section.id }}::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--rdc-upcoming-overlay-color, #000000);
+  opacity: var(--rdc-upcoming-overlay-opacity, 0.35);
+}
+
+.rdc-bento-upcoming-title-{{ section.id }} {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1.1;
+  font-weight: 700;
+  color: inherit;
+}
+
+.rdc-bento-upcoming-title-image-{{ section.id }} {
+  display: flex;
+  justify-content: var(--rdc-upcoming-title-image-align, center);
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.rdc-bento-upcoming-title-image-{{ section.id }} img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, var(--rdc-upcoming-title-image-max-width, 620px));
+  max-height: var(--rdc-upcoming-title-image-max-height, 240px);
+  object-fit: contain;
+}
+
+.rdc-bento-countdown-{{ section.id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: inherit;
+  margin-bottom: 18px;
+}
+
+.rdc-bento-countdown-intro-{{ section.id }} {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.rdc-bento-countdown-values-{{ section.id }} {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.rdc-bento-countdown-item-{{ section.id }} {
+  min-width: 58px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(8px);
+}
+
+.rdc-bento-countdown-number-{{ section.id }} {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rdc-bento-countdown-label-{{ section.id }} {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.rdc-bento-upcoming-form-{{ section.id }} {
+  width: min(100%, 420px);
+}
+
+.rdc-bento-upcoming-form-row-{{ section.id }} {
+  display: flex;
+  gap: 8px;
+}
+
+.rdc-bento-upcoming-input-{{ section.id }} {
+  min-width: 0;
+  flex: 1;
+  min-height: 42px;
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: rgba(255,255,255,0.9);
+  color: #111111;
+}
+
+.rdc-bento-upcoming-button-{{ section.id }} {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 16px;
+  background: #ffffff;
+  color: #111111;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rdc-bento-upcoming-success-{{ section.id }} {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* ===== Mobile upcoming ===== */
+.rdc-bento-mobile-upcoming-{{ section.id }} {
+  display: none;
+}
+
+/* ===== Carrousel mobile ===== */
+.rdc-bento-carousel-{{ section.id }} {
+  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.rdc-carousel-track-{{ section.id }} {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.rdc-carousel-slide-{{ section.id }} {
+  min-width: 100%;
+  flex: 0 0 100%;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.rdc-carousel-slide-{{ section.id }} .rdc-bento-card-{{ section.id }} {
+  width: calc(100% - {{ section.settings.mobile_slide_gap }}px);
+  border-radius: {{ section.settings.card_border_radius }}px;
+}
+
+.rdc-carousel-dots-{{ section.id }} {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  min-height: 14px;
+  position: relative;
+  z-index: 20;
+}
+
+.rdc-carousel-dot-{{ section.id }} {
+  display: block;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(var(--color-foreground), 0.35);
+  border: 1px solid rgba(var(--color-background), 0.8);
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+  opacity: 1;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.rdc-carousel-dot-{{ section.id }}.active {
+  background: rgba(var(--color-foreground), 0.9);
+  transform: scale(1.25);
+}
+
+/* ===== Mobile ===== */
+@media screen and (max-width: 749px) {
+  .rdc-bento-desktop-{{ section.id }} {
+    display: none !important;
+  }
+
+  .rdc-bento-mobile-upcoming-{{ section.id }} {
+    display: block;
+    margin-bottom: {{ section.settings.cards_gap }}px;
+  }
+
+  .rdc-bento-mobile-upcoming-list-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ section.settings.cards_gap }}px;
+  }
+
+  .rdc-bento-carousel-{{ section.id }} {
+    display: block;
+    overflow: visible;
+  }
+
+  .rdc-bento-card-{{ section.id }}:not(.rdc-bento-brand-card-{{ section.id }}):hover .rdc-bento-img {
+    transform: none;
+    filter: none;
+  }
+
+  .rdc-bento-card-{{ section.id }}:not(.rdc-bento-brand-card-{{ section.id }}):hover .rdc-bento-card-img-wrap-{{ section.id }}::after {
+    opacity: 0;
+  }
+
+  .rdc-bento-brand-bg-image-{{ section.id }} {
+    transform: scale(1.06);
+  }
+
+  .rdc-bento-brand-motif-left-{{ section.id }} {
+    left: var(--rdc-brand-left-motif-offset-mobile, 0%);
+  }
+
+  .rdc-bento-brand-motif-right-{{ section.id }} {
+    right: var(--rdc-brand-right-motif-offset-mobile, 0%);
+  }
+
+  .rdc-bento-brand-title-image-{{ section.id }},
+  .rdc-bento-card-title-image-{{ section.id }} {
+    max-width: min(100%, var(--rdc-title-image-mobile-max-width, 220px));
+    max-height: var(--rdc-title-image-mobile-max-height, 100px);
+  }
+
+  .rdc-bento-title-overlay-{{ section.id }} .rdc-bento-title,
+  .rdc-bento-title-below-{{ section.id }} .rdc-bento-title {
+    font-size: {{ section.settings.mobile_title_font_size }}px;
+  }
+
+  .rdc-bento-upcoming-card-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} {
+    min-height: 420px;
+  }
+
+  .rdc-bento-upcoming-title-image-{{ section.id }} img {
+    max-width: min(100%, var(--rdc-upcoming-title-image-max-width-mobile, 420px));
+    max-height: var(--rdc-upcoming-title-image-max-height-mobile, 210px);
+  }
+
+  .rdc-bento-upcoming-form-row-{{ section.id }} {
+    flex-direction: column;
+  }
+
+  .rdc-bento-carousel-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} {
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .rdc-bento-carousel-{{ section.id }} .rdc-bento-img,
+  .rdc-bento-carousel-{{ section.id }} .rdc-bento-card-img-wrap-{{ section.id }} > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .rdc-bento-carousel-{{ section.id }} .rdc-bento-brand-bg-image-{{ section.id }} {
+    transform: scale(1.06);
+  }
+}
+{%- endstyle -%}
+
+{%- assign all_cards = '' -%}
+{%- assign has_upcoming = false -%}
+{%- assign upcoming_form_class = 'rdc-bento-upcoming-form-' | append: section.id -%}
+
+{%- for block in section.blocks -%}
+  {%- if block.type == 'card' or block.type == 'upcoming_collection' -%}
+    {%- if all_cards != '' -%}{%- assign all_cards = all_cards | append: ',' -%}{%- endif -%}
+    {%- assign all_cards = all_cards | append: block.id -%}
+  {%- endif -%}
+
+  {%- if block.type == 'upcoming_collection' -%}
+    {%- assign has_upcoming = true -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign card_ids = all_cards | split: ',' -%}
+{%- assign card_index = 0 -%}
+
+<section class="rdc-bento-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <div class="rdc-bento-container-{{ section.id }}">
+
+    <div class="rdc-bento-desktop-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'row' -%}
+          {%- assign row_layout = block.settings.row_layout -%}
+          {%- assign row_class = 'rdc-row-' | append: row_layout -%}
+
+          {%- if row_layout == '3equal' -%}
+            {%- assign cards_in_row = 3 -%}
+          {%- elsif row_layout == '1full' -%}
+            {%- assign cards_in_row = 1 -%}
+          {%- else -%}
+            {%- assign cards_in_row = 2 -%}
+          {%- endif -%}
+
+          <div class="rdc-bento-row-{{ section.id }} {{ row_class }}" {{ block.shopify_attributes }}>
+            {%- for i in (1..cards_in_row) -%}
+              {%- if card_index < card_ids.size -%}
+                {%- assign current_card_id = card_ids[card_index] -%}
+
+                {%- for b in section.blocks -%}
+                  {%- if b.id == current_card_id -%}
+                    {%- assign card_flex_style = '' -%}
+
+                    {%- if row_layout == '2split' -%}
+                      {%- assign split = block.settings.split_ratio -%}
+                      {%- if split == '30-70' -%}
+                        {%- if i == 1 -%}{%- assign card_pct = 30 -%}{%- else -%}{%- assign card_pct = 70 -%}{%- endif -%}
+                      {%- elsif split == '40-60' -%}
+                        {%- if i == 1 -%}{%- assign card_pct = 40 -%}{%- else -%}{%- assign card_pct = 60 -%}{%- endif -%}
+                      {%- elsif split == '50-50' -%}
+                        {%- assign card_pct = 50 -%}
+                      {%- elsif split == '60-40' -%}
+                        {%- if i == 1 -%}{%- assign card_pct = 60 -%}{%- else -%}{%- assign card_pct = 40 -%}{%- endif -%}
+                      {%- elsif split == '70-30' -%}
+                        {%- if i == 1 -%}{%- assign card_pct = 70 -%}{%- else -%}{%- assign card_pct = 30 -%}{%- endif -%}
+                      {%- else -%}
+                        {%- assign card_pct = 50 -%}
+                      {%- endif -%}
+
+                      {%- capture card_flex_style -%}flex: 0 0 calc({{ card_pct }}% - {{ section.settings.cards_gap | divided_by: 2 }}px);{%- endcapture -%}
+                    {%- endif -%}
+
+                    {%- if b.type == 'card' -%}
+                      {%- assign card_tag = 'div' -%}
+                      {%- assign card_href = '' -%}
+
+                      {%- if b.settings.link != blank -%}
+                        {%- assign card_tag = 'a' -%}
+                        {%- assign card_href = b.settings.link -%}
+                      {%- elsif b.settings.collection != blank -%}
+                        {%- assign card_tag = 'a' -%}
+                        {%- assign card_href = b.settings.collection.url -%}
+                      {%- endif -%}
+
+                      {%- assign display_title = b.settings.title -%}
+                      {%- if display_title == blank and b.settings.collection != blank -%}
+                        {%- assign display_title = b.settings.collection.title -%}
+                      {%- endif -%}
+
+                      {%- assign is_brand_card = b.settings.brand_visual_enabled -%}
+
+                      {%- assign title_align = 'left' -%}
+                      {%- if b.settings.title_image != blank -%}
+                        {%- assign title_align = b.settings.title_image_alignment | default: 'center' -%}
+                      {%- endif -%}
+
+                      {%- if title_align == 'center' -%}
+                        {%- assign title_align_css = 'center' -%}
+                        {%- assign title_text_align = 'center' -%}
+                      {%- elsif title_align == 'right' -%}
+                        {%- assign title_align_css = 'flex-end' -%}
+                        {%- assign title_text_align = 'right' -%}
+                      {%- else -%}
+                        {%- assign title_align_css = 'flex-start' -%}
+                        {%- assign title_text_align = 'left' -%}
+                      {%- endif -%}
+
+                      {%- assign show_title_area = false -%}
+                      {%- if section.settings.title_position != 'hidden' -%}
+                        {%- if display_title != blank or b.settings.title_image != blank -%}
+                          {%- assign show_title_area = true -%}
+                        {%- endif -%}
+                      {%- endif -%}
+
+                      {%- capture brand_style -%}
+                        --rdc-brand-bg-blur: {{ b.settings.brand_bg_blur }}px;
+                        --rdc-brand-bg-opacity: {{ b.settings.brand_bg_opacity | divided_by: 100.0 }};
+                        --rdc-brand-overlay-color: {{ b.settings.brand_overlay_color }};
+                        --rdc-brand-overlay-opacity: {{ b.settings.brand_overlay_opacity | divided_by: 100.0 }};
+                        --rdc-brand-gradient-color: {{ b.settings.brand_side_gradient_color }};
+                        --rdc-brand-gradient-opacity: {{ b.settings.brand_side_gradient_opacity | divided_by: 100.0 }};
+                        --rdc-brand-gradient-width: {{ b.settings.brand_side_gradient_width }}%;
+                        --rdc-brand-motif-opacity: {{ b.settings.brand_motif_opacity | divided_by: 100.0 }};
+                        --rdc-brand-motif-blur: {{ b.settings.brand_motif_blur }}px;
+                        --rdc-brand-left-motif-offset-desktop: {{ b.settings.brand_left_motif_offset_desktop }}%;
+                        --rdc-brand-right-motif-offset-desktop: {{ b.settings.brand_right_motif_offset_desktop }}%;
+                        --rdc-brand-left-motif-offset-mobile: {{ b.settings.brand_left_motif_offset_mobile }}%;
+                        --rdc-brand-right-motif-offset-mobile: {{ b.settings.brand_right_motif_offset_mobile }}%;
+                        --rdc-title-image-max-width: {{ b.settings.title_image_max_width_desktop | default: 260 }}px;
+                        --rdc-title-image-max-height: {{ b.settings.title_image_max_height_desktop | default: 120 }}px;
+                        --rdc-title-image-mobile-max-width: {{ b.settings.title_image_max_width_mobile | default: 220 }}px;
+                        --rdc-title-image-mobile-max-height: {{ b.settings.title_image_max_height_mobile | default: 100 }}px;
+                      {%- endcapture -%}
+
+                      <{{ card_tag }}{% if card_tag == 'a' %} href="{{ card_href }}"{% endif %} class="rdc-bento-card-{{ section.id }}{% if is_brand_card %} rdc-bento-brand-card-{{ section.id }}{% endif %}" style="{{ card_flex_style }}{% if is_brand_card %} {{ brand_style | strip }}{% endif %}" {{ b.shopify_attributes }}>
+                        <div class="rdc-bento-card-img-wrap-{{ section.id }}">
+                          {%- if b.settings.image_desktop != blank -%}
+                            <img src="{{ b.settings.image_desktop | image_url: width: 1200 }}" alt="{{ b.settings.image_desktop.alt | default: display_title | escape }}" class="rdc-bento-img{% if is_brand_card %} rdc-bento-brand-bg-image-{{ section.id }}{% endif %}" loading="lazy" width="{{ b.settings.image_desktop.width }}" height="{{ b.settings.image_desktop.height }}">
+                          {%- elsif b.settings.collection != blank and b.settings.collection.image != blank -%}
+                            <img src="{{ b.settings.collection.image | image_url: width: 1200 }}" alt="{{ b.settings.collection.title | escape }}" class="rdc-bento-img{% if is_brand_card %} rdc-bento-brand-bg-image-{{ section.id }}{% endif %}" loading="lazy">
+                          {%- else -%}
+                            {%- if is_brand_card -%}
+                              {%- assign brand_placeholder_class = 'rdc-bento-img rdc-bento-brand-bg-image-' | append: section.id -%}
+                              {{ 'collection-1' | placeholder_svg_tag: brand_placeholder_class }}
+                            {%- else -%}
+                              {{ 'collection-1' | placeholder_svg_tag: 'rdc-bento-img' }}
+                            {%- endif -%}
+                          {%- endif -%}
+
+                          {%- if is_brand_card -%}
+                            <span class="rdc-bento-brand-overlay-{{ section.id }}"></span>
+                            <span class="rdc-bento-brand-gradient-left-{{ section.id }}"></span>
+                            <span class="rdc-bento-brand-gradient-right-{{ section.id }}"></span>
+
+                            {%- if b.settings.brand_left_motif != blank -%}
+                              <img src="{{ b.settings.brand_left_motif | image_url: width: 1000 }}" alt="{{ b.settings.brand_left_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-left-{{ section.id }}" loading="lazy" width="{{ b.settings.brand_left_motif.width }}" height="{{ b.settings.brand_left_motif.height }}">
+                            {%- endif -%}
+
+                            {%- if b.settings.brand_right_motif != blank -%}
+                              <img src="{{ b.settings.brand_right_motif | image_url: width: 1000 }}" alt="{{ b.settings.brand_right_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-right-{{ section.id }}" loading="lazy" width="{{ b.settings.brand_right_motif.width }}" height="{{ b.settings.brand_right_motif.height }}">
+                            {%- endif -%}
+                          {%- endif -%}
+                        </div>
+
+                        {%- if b.settings.show_badge and b.settings.badge_text != blank -%}
+                          <span class="rdc-bento-badge-{{ section.id }}{% if b.settings.badge_shine %} rdc-badge-shine{% endif %}" style="--rdc-badge-bg: {{ b.settings.badge_bg_color }}; --rdc-badge-color: {{ b.settings.badge_text_color }};">
+                            {{ b.settings.badge_text }}
+                          </span>
+                        {%- endif -%}
+
+                        {%- if is_brand_card -%}
+                          <div class="rdc-bento-brand-content-{{ section.id }}">
+                            {%- if b.settings.title_image != blank -%}
+                              <img src="{{ b.settings.title_image | image_url: width: 1000 }}" alt="{{ b.settings.title_image.alt | default: display_title | escape }}" class="rdc-bento-brand-title-image-{{ section.id }}" loading="lazy" width="{{ b.settings.title_image.width }}" height="{{ b.settings.title_image.height }}">
+                            {%- elsif display_title != blank -%}
+                              <h3 class="rdc-bento-brand-title-text-{{ section.id }}">{{ display_title }}</h3>
+                            {%- endif -%}
+                          </div>
+                        {%- elsif show_title_area -%}
+                          {%- capture title_style -%}
+                            --rdc-title-image-align: {{ title_align_css }};
+                            --rdc-title-text-align: {{ title_text_align }};
+                            --rdc-title-image-max-width: {{ b.settings.title_image_max_width_desktop | default: 260 }}px;
+                            --rdc-title-image-max-height: {{ b.settings.title_image_max_height_desktop | default: 120 }}px;
+                            --rdc-title-image-mobile-max-width: {{ b.settings.title_image_max_width_mobile | default: 220 }}px;
+                            --rdc-title-image-mobile-max-height: {{ b.settings.title_image_max_height_mobile | default: 100 }}px;
+                          {%- endcapture -%}
+
+                          {%- if section.settings.title_position == 'on_image' -%}
+                            <div class="rdc-bento-title-overlay-{{ section.id }}" style="{{ title_style | strip }}">
+                              <div class="rdc-bento-title-content-{{ section.id }}">
+                                {%- if display_title != blank -%}<h3 class="rdc-bento-title">{{ display_title }}</h3>{%- endif -%}
+                                {%- if b.settings.title_image != blank -%}
+                                  <img src="{{ b.settings.title_image | image_url: width: 800 }}" alt="{{ b.settings.title_image.alt | default: display_title | escape }}" class="rdc-bento-card-title-image-{{ section.id }}" loading="lazy" width="{{ b.settings.title_image.width }}" height="{{ b.settings.title_image.height }}">
+                                {%- endif -%}
+                              </div>
+                            </div>
+                          {%- elsif section.settings.title_position == 'below_image' -%}
+                            <div class="rdc-bento-title-below-{{ section.id }}" style="{{ title_style | strip }}">
+                              <div class="rdc-bento-title-content-{{ section.id }}">
+                                {%- if display_title != blank -%}<h3 class="rdc-bento-title">{{ display_title }}</h3>{%- endif -%}
+                                {%- if b.settings.title_image != blank -%}
+                                  <img src="{{ b.settings.title_image | image_url: width: 800 }}" alt="{{ b.settings.title_image.alt | default: display_title | escape }}" class="rdc-bento-card-title-image-{{ section.id }}" loading="lazy" width="{{ b.settings.title_image.width }}" height="{{ b.settings.title_image.height }}">
+                                {%- endif -%}
+                              </div>
+                            </div>
+                          {%- endif -%}
+                        {%- endif -%}
+                      </{{ card_tag }}>
+                    {%- endif -%}
+
+                    {%- if b.type == 'upcoming_collection' -%}
+                      {%- assign upcoming_title = b.settings.title | default: 'Collection à venir' -%}
+                      {%- assign upcoming_align = b.settings.title_image_alignment | default: 'center' -%}
+
+                      {%- if upcoming_align == 'left' -%}
+                        {%- assign upcoming_content_align = 'flex-start' -%}
+                        {%- assign upcoming_text_align = 'left' -%}
+                        {%- assign upcoming_image_align = 'flex-start' -%}
+                      {%- elsif upcoming_align == 'right' -%}
+                        {%- assign upcoming_content_align = 'flex-end' -%}
+                        {%- assign upcoming_text_align = 'right' -%}
+                        {%- assign upcoming_image_align = 'flex-end' -%}
+                      {%- else -%}
+                        {%- assign upcoming_content_align = 'center' -%}
+                        {%- assign upcoming_text_align = 'center' -%}
+                        {%- assign upcoming_image_align = 'center' -%}
+                      {%- endif -%}
+
+                      <div class="rdc-bento-card-{{ section.id }} rdc-bento-brand-card-{{ section.id }} rdc-bento-upcoming-card-{{ section.id }}" style="{{ card_flex_style }} --rdc-upcoming-blur: {{ b.settings.image_blur }}px; --rdc-upcoming-image-opacity: {{ b.settings.image_opacity | divided_by: 100.0 }}; --rdc-upcoming-overlay-color: {{ b.settings.overlay_color }}; --rdc-upcoming-overlay-opacity: {{ b.settings.overlay_opacity | divided_by: 100.0 }}; --rdc-upcoming-content-align: {{ upcoming_content_align }}; --rdc-upcoming-text-align: {{ upcoming_text_align }}; --rdc-upcoming-title-image-align: {{ upcoming_image_align }}; --rdc-upcoming-title-image-max-width: {{ b.settings.title_image_max_width_desktop }}px; --rdc-upcoming-title-image-max-height: {{ b.settings.title_image_max_height_desktop }}px; --rdc-upcoming-title-image-max-width-mobile: {{ b.settings.title_image_max_width_mobile }}px; --rdc-upcoming-title-image-max-height-mobile: {{ b.settings.title_image_max_height_mobile }}px; --rdc-brand-gradient-color: {{ b.settings.brand_side_gradient_color }}; --rdc-brand-gradient-opacity: {{ b.settings.brand_side_gradient_opacity | divided_by: 100.0 }}; --rdc-brand-gradient-width: {{ b.settings.brand_side_gradient_width }}%; --rdc-brand-motif-opacity: {{ b.settings.brand_motif_opacity | divided_by: 100.0 }}; --rdc-brand-motif-blur: {{ b.settings.brand_motif_blur }}px; --rdc-brand-left-motif-offset-desktop: {{ b.settings.brand_left_motif_offset_desktop }}%; --rdc-brand-right-motif-offset-desktop: {{ b.settings.brand_right_motif_offset_desktop }}%; --rdc-brand-left-motif-offset-mobile: {{ b.settings.brand_left_motif_offset_mobile }}%; --rdc-brand-right-motif-offset-mobile: {{ b.settings.brand_right_motif_offset_mobile }}%;" {{ b.shopify_attributes }}>
+                        <div class="rdc-bento-card-img-wrap-{{ section.id }}">
+                          {%- if b.settings.image_desktop != blank -%}
+                            <img src="{{ b.settings.image_desktop | image_url: width: 1400 }}" alt="{{ b.settings.image_desktop.alt | default: upcoming_title | escape }}" class="rdc-bento-img" loading="lazy" width="{{ b.settings.image_desktop.width }}" height="{{ b.settings.image_desktop.height }}">
+                          {%- else -%}
+                            {{ 'collection-2' | placeholder_svg_tag: 'rdc-bento-img' }}
+                          {%- endif -%}
+
+                          {%- if b.settings.brand_visual_enabled -%}
+                            <span class="rdc-bento-brand-gradient-left-{{ section.id }}"></span>
+                            <span class="rdc-bento-brand-gradient-right-{{ section.id }}"></span>
+
+                            {%- if b.settings.brand_left_motif != blank -%}
+                              <img src="{{ b.settings.brand_left_motif | image_url: width: 1000 }}" alt="{{ b.settings.brand_left_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-left-{{ section.id }}" loading="lazy" width="{{ b.settings.brand_left_motif.width }}" height="{{ b.settings.brand_left_motif.height }}">
+                            {%- endif -%}
+
+                            {%- if b.settings.brand_right_motif != blank -%}
+                              <img src="{{ b.settings.brand_right_motif | image_url: width: 1000 }}" alt="{{ b.settings.brand_right_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-right-{{ section.id }}" loading="lazy" width="{{ b.settings.brand_right_motif.width }}" height="{{ b.settings.brand_right_motif.height }}">
+                            {%- endif -%}
+                          {%- endif -%}
+
+                          <div class="rdc-bento-upcoming-content-{{ section.id }}">
+                            <h3 class="rdc-bento-upcoming-title-{{ section.id }}">{{ upcoming_title }}</h3>
+
+                            {%- if b.settings.title_image != blank -%}
+                              <div class="rdc-bento-upcoming-title-image-{{ section.id }}">
+                                <img src="{{ b.settings.title_image | image_url: width: 1000 }}" alt="{{ b.settings.title_image.alt | default: upcoming_title | escape }}" loading="lazy" width="{{ b.settings.title_image.width }}" height="{{ b.settings.title_image.height }}">
+                              </div>
+                            {%- endif -%}
+
+                            <div class="rdc-bento-countdown-{{ section.id }}" data-rdc-countdown-section="{{ section.id }}" data-countdown-target="{{ b.settings.release_date | escape }}">
+                              <span class="rdc-bento-countdown-intro-{{ section.id }}">{{ b.settings.countdown_intro }}</span>
+                              <div class="rdc-bento-countdown-values-{{ section.id }}">
+                                <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-days>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Jours</small></span>
+                                <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-hours>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Heures</small></span>
+                                <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-minutes>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Min</small></span>
+                                <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-seconds>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Sec</small></span>
+                              </div>
+                            </div>
+
+                            {%- form 'customer', class: upcoming_form_class -%}
+                              {%- if form.posted_successfully? -%}
+                                <p class="rdc-bento-upcoming-success-{{ section.id }}">{{ b.settings.success_message }}</p>
+                              {%- else -%}
+                                <input type="hidden" name="contact[tags]" value="newsletter, collection-a-venir">
+                                <div class="rdc-bento-upcoming-form-row-{{ section.id }}">
+                                  <input class="rdc-bento-upcoming-input-{{ section.id }}" type="email" name="contact[email]" placeholder="{{ b.settings.newsletter_placeholder | escape }}" required>
+                                  <button class="rdc-bento-upcoming-button-{{ section.id }}" type="submit">{{ b.settings.newsletter_button }}</button>
+                                </div>
+                                {{ form.errors | default_errors }}
+                              {%- endif -%}
+                            {%- endform -%}
+                          </div>
+                        </div>
+                      </div>
+                    {%- endif -%}
+
+                    {%- assign card_index = card_index | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if has_upcoming -%}
+      <div class="rdc-bento-mobile-upcoming-{{ section.id }}">
+        <div class="rdc-bento-mobile-upcoming-list-{{ section.id }}">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'upcoming_collection' -%}
+              {%- assign upcoming_title = block.settings.title | default: 'Collection à venir' -%}
+              {%- assign upcoming_align = block.settings.title_image_alignment | default: 'center' -%}
+
+              {%- if upcoming_align == 'left' -%}
+                {%- assign upcoming_content_align = 'flex-start' -%}
+                {%- assign upcoming_text_align = 'left' -%}
+                {%- assign upcoming_image_align = 'flex-start' -%}
+              {%- elsif upcoming_align == 'right' -%}
+                {%- assign upcoming_content_align = 'flex-end' -%}
+                {%- assign upcoming_text_align = 'right' -%}
+                {%- assign upcoming_image_align = 'flex-end' -%}
+              {%- else -%}
+                {%- assign upcoming_content_align = 'center' -%}
+                {%- assign upcoming_text_align = 'center' -%}
+                {%- assign upcoming_image_align = 'center' -%}
+              {%- endif -%}
+
+              <div class="rdc-bento-card-{{ section.id }} rdc-bento-brand-card-{{ section.id }} rdc-bento-upcoming-card-{{ section.id }}" style="--rdc-upcoming-blur: {{ block.settings.image_blur }}px; --rdc-upcoming-image-opacity: {{ block.settings.image_opacity | divided_by: 100.0 }}; --rdc-upcoming-overlay-color: {{ block.settings.overlay_color }}; --rdc-upcoming-overlay-opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }}; --rdc-upcoming-content-align: {{ upcoming_content_align }}; --rdc-upcoming-text-align: {{ upcoming_text_align }}; --rdc-upcoming-title-image-align: {{ upcoming_image_align }}; --rdc-upcoming-title-image-max-width: {{ block.settings.title_image_max_width_desktop }}px; --rdc-upcoming-title-image-max-height: {{ block.settings.title_image_max_height_desktop }}px; --rdc-upcoming-title-image-max-width-mobile: {{ block.settings.title_image_max_width_mobile }}px; --rdc-upcoming-title-image-max-height-mobile: {{ block.settings.title_image_max_height_mobile }}px; --rdc-brand-gradient-color: {{ block.settings.brand_side_gradient_color }}; --rdc-brand-gradient-opacity: {{ block.settings.brand_side_gradient_opacity | divided_by: 100.0 }}; --rdc-brand-gradient-width: {{ block.settings.brand_side_gradient_width }}%; --rdc-brand-motif-opacity: {{ block.settings.brand_motif_opacity | divided_by: 100.0 }}; --rdc-brand-motif-blur: {{ block.settings.brand_motif_blur }}px; --rdc-brand-left-motif-offset-desktop: {{ block.settings.brand_left_motif_offset_desktop }}%; --rdc-brand-right-motif-offset-desktop: {{ block.settings.brand_right_motif_offset_desktop }}%; --rdc-brand-left-motif-offset-mobile: {{ block.settings.brand_left_motif_offset_mobile }}%; --rdc-brand-right-motif-offset-mobile: {{ block.settings.brand_right_motif_offset_mobile }}%;">
+                <div class="rdc-bento-card-img-wrap-{{ section.id }}">
+                  {%- if block.settings.image_mobile != blank -%}
+                    <img src="{{ block.settings.image_mobile | image_url: width: 900 }}" alt="{{ block.settings.image_mobile.alt | default: upcoming_title | escape }}" class="rdc-bento-img" loading="lazy" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}">
+                  {%- elsif block.settings.image_desktop != blank -%}
+                    <img src="{{ block.settings.image_desktop | image_url: width: 900 }}" alt="{{ block.settings.image_desktop.alt | default: upcoming_title | escape }}" class="rdc-bento-img" loading="lazy">
+                  {%- else -%}
+                    {{ 'collection-2' | placeholder_svg_tag: 'rdc-bento-img' }}
+                  {%- endif -%}
+
+                  {%- if block.settings.brand_visual_enabled -%}
+                    <span class="rdc-bento-brand-gradient-left-{{ section.id }}"></span>
+                    <span class="rdc-bento-brand-gradient-right-{{ section.id }}"></span>
+
+                    {%- if block.settings.brand_left_motif != blank -%}
+                      <img src="{{ block.settings.brand_left_motif | image_url: width: 1000 }}" alt="{{ block.settings.brand_left_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-left-{{ section.id }}" loading="lazy" width="{{ block.settings.brand_left_motif.width }}" height="{{ block.settings.brand_left_motif.height }}">
+                    {%- endif -%}
+
+                    {%- if block.settings.brand_right_motif != blank -%}
+                      <img src="{{ block.settings.brand_right_motif | image_url: width: 1000 }}" alt="{{ block.settings.brand_right_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-right-{{ section.id }}" loading="lazy" width="{{ block.settings.brand_right_motif.width }}" height="{{ block.settings.brand_right_motif.height }}">
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  <div class="rdc-bento-upcoming-content-{{ section.id }}">
+                    <h3 class="rdc-bento-upcoming-title-{{ section.id }}">{{ upcoming_title }}</h3>
+
+                    {%- if block.settings.title_image != blank -%}
+                      <div class="rdc-bento-upcoming-title-image-{{ section.id }}">
+                        <img src="{{ block.settings.title_image | image_url: width: 1000 }}" alt="{{ block.settings.title_image.alt | default: upcoming_title | escape }}" loading="lazy" width="{{ block.settings.title_image.width }}" height="{{ block.settings.title_image.height }}">
+                      </div>
+                    {%- endif -%}
+
+                    <div class="rdc-bento-countdown-{{ section.id }}" data-rdc-countdown-section="{{ section.id }}" data-countdown-target="{{ block.settings.release_date | escape }}">
+                      <span class="rdc-bento-countdown-intro-{{ section.id }}">{{ block.settings.countdown_intro }}</span>
+                      <div class="rdc-bento-countdown-values-{{ section.id }}">
+                        <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-days>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Jours</small></span>
+                        <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-hours>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Heures</small></span>
+                        <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-minutes>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Min</small></span>
+                        <span class="rdc-bento-countdown-item-{{ section.id }}"><strong class="rdc-bento-countdown-number-{{ section.id }}" data-seconds>00</strong><small class="rdc-bento-countdown-label-{{ section.id }}">Sec</small></span>
+                      </div>
+                    </div>
+
+                    {%- form 'customer', class: upcoming_form_class -%}
+                      {%- if form.posted_successfully? -%}
+                        <p class="rdc-bento-upcoming-success-{{ section.id }}">{{ block.settings.success_message }}</p>
+                      {%- else -%}
+                        <input type="hidden" name="contact[tags]" value="newsletter, collection-a-venir">
+                        <div class="rdc-bento-upcoming-form-row-{{ section.id }}">
+                          <input class="rdc-bento-upcoming-input-{{ section.id }}" type="email" name="contact[email]" placeholder="{{ block.settings.newsletter_placeholder | escape }}" required>
+                          <button class="rdc-bento-upcoming-button-{{ section.id }}" type="submit">{{ block.settings.newsletter_button }}</button>
+                        </div>
+                        {{ form.errors | default_errors }}
+                      {%- endif -%}
+                    {%- endform -%}
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <div class="rdc-bento-carousel-{{ section.id }}">
+      <div class="rdc-carousel-track-{{ section.id }}" id="rdc-carousel-track-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'card' -%}
+            {%- assign card_tag_m = 'div' -%}
+            {%- assign card_href_m = '' -%}
+
+            {%- if block.settings.link != blank -%}
+              {%- assign card_tag_m = 'a' -%}
+              {%- assign card_href_m = block.settings.link -%}
+            {%- elsif block.settings.collection != blank -%}
+              {%- assign card_tag_m = 'a' -%}
+              {%- assign card_href_m = block.settings.collection.url -%}
+            {%- endif -%}
+
+            {%- assign display_title_m = block.settings.title -%}
+            {%- if display_title_m == blank and block.settings.collection != blank -%}
+              {%- assign display_title_m = block.settings.collection.title -%}
+            {%- endif -%}
+
+            {%- assign is_brand_card_m = block.settings.brand_visual_enabled -%}
+
+            {%- assign title_align_m = 'left' -%}
+            {%- if block.settings.title_image != blank -%}
+              {%- assign title_align_m = block.settings.title_image_alignment | default: 'center' -%}
+            {%- endif -%}
+
+            {%- if title_align_m == 'center' -%}
+              {%- assign title_align_css_m = 'center' -%}
+              {%- assign title_text_align_m = 'center' -%}
+            {%- elsif title_align_m == 'right' -%}
+              {%- assign title_align_css_m = 'flex-end' -%}
+              {%- assign title_text_align_m = 'right' -%}
+            {%- else -%}
+              {%- assign title_align_css_m = 'flex-start' -%}
+              {%- assign title_text_align_m = 'left' -%}
+            {%- endif -%}
+
+            {%- assign show_title_area_m = false -%}
+            {%- if section.settings.title_position != 'hidden' -%}
+              {%- if display_title_m != blank or block.settings.title_image != blank -%}
+                {%- assign show_title_area_m = true -%}
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- capture brand_style_m -%}
+              --rdc-brand-bg-blur: {{ block.settings.brand_bg_blur }}px;
+              --rdc-brand-bg-opacity: {{ block.settings.brand_bg_opacity | divided_by: 100.0 }};
+              --rdc-brand-overlay-color: {{ block.settings.brand_overlay_color }};
+              --rdc-brand-overlay-opacity: {{ block.settings.brand_overlay_opacity | divided_by: 100.0 }};
+              --rdc-brand-gradient-color: {{ block.settings.brand_side_gradient_color }};
+              --rdc-brand-gradient-opacity: {{ block.settings.brand_side_gradient_opacity | divided_by: 100.0 }};
+              --rdc-brand-gradient-width: {{ block.settings.brand_side_gradient_width }}%;
+              --rdc-brand-motif-opacity: {{ block.settings.brand_motif_opacity | divided_by: 100.0 }};
+              --rdc-brand-motif-blur: {{ block.settings.brand_motif_blur }}px;
+              --rdc-brand-left-motif-offset-desktop: {{ block.settings.brand_left_motif_offset_desktop }}%;
+              --rdc-brand-right-motif-offset-desktop: {{ block.settings.brand_right_motif_offset_desktop }}%;
+              --rdc-brand-left-motif-offset-mobile: {{ block.settings.brand_left_motif_offset_mobile }}%;
+              --rdc-brand-right-motif-offset-mobile: {{ block.settings.brand_right_motif_offset_mobile }}%;
+              --rdc-title-image-max-width: {{ block.settings.title_image_max_width_desktop | default: 260 }}px;
+              --rdc-title-image-max-height: {{ block.settings.title_image_max_height_desktop | default: 120 }}px;
+              --rdc-title-image-mobile-max-width: {{ block.settings.title_image_max_width_mobile | default: 220 }}px;
+              --rdc-title-image-mobile-max-height: {{ block.settings.title_image_max_height_mobile | default: 100 }}px;
+            {%- endcapture -%}
+
+            <div class="rdc-carousel-slide-{{ section.id }}">
+              <{{ card_tag_m }}{% if card_tag_m == 'a' %} href="{{ card_href_m }}"{% endif %} class="rdc-bento-card-{{ section.id }}{% if is_brand_card_m %} rdc-bento-brand-card-{{ section.id }}{% endif %}" style="{% if is_brand_card_m %}{{ brand_style_m | strip }}{% endif %}">
+                <div class="rdc-bento-card-img-wrap-{{ section.id }}">
+                  {%- if block.settings.image_mobile != blank -%}
+                    <img src="{{ block.settings.image_mobile | image_url: width: 800 }}" alt="{{ block.settings.image_mobile.alt | default: display_title_m | escape }}" class="rdc-bento-img{% if is_brand_card_m %} rdc-bento-brand-bg-image-{{ section.id }}{% endif %}" loading="lazy" width="{{ block.settings.image_mobile.width }}" height="{{ block.settings.image_mobile.height }}">
+                  {%- elsif block.settings.image_desktop != blank -%}
+                    <img src="{{ block.settings.image_desktop | image_url: width: 800 }}" alt="{{ block.settings.image_desktop.alt | default: display_title_m | escape }}" class="rdc-bento-img{% if is_brand_card_m %} rdc-bento-brand-bg-image-{{ section.id }}{% endif %}" loading="lazy">
+                  {%- elsif block.settings.collection != blank and block.settings.collection.image != blank -%}
+                    <img src="{{ block.settings.collection.image | image_url: width: 800 }}" alt="{{ block.settings.collection.title | escape }}" class="rdc-bento-img{% if is_brand_card_m %} rdc-bento-brand-bg-image-{{ section.id }}{% endif %}" loading="lazy">
+                  {%- else -%}
+                    {%- if is_brand_card_m -%}
+                      {%- assign brand_placeholder_class_m = 'rdc-bento-img rdc-bento-brand-bg-image-' | append: section.id -%}
+                      {{ 'collection-1' | placeholder_svg_tag: brand_placeholder_class_m }}
+                    {%- else -%}
+                      {{ 'collection-1' | placeholder_svg_tag: 'rdc-bento-img' }}
+                    {%- endif -%}
+                  {%- endif -%}
+
+                  {%- if is_brand_card_m -%}
+                    <span class="rdc-bento-brand-overlay-{{ section.id }}"></span>
+                    <span class="rdc-bento-brand-gradient-left-{{ section.id }}"></span>
+                    <span class="rdc-bento-brand-gradient-right-{{ section.id }}"></span>
+
+                    {%- if block.settings.brand_left_motif != blank -%}
+                      <img src="{{ block.settings.brand_left_motif | image_url: width: 1000 }}" alt="{{ block.settings.brand_left_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-left-{{ section.id }}" loading="lazy" width="{{ block.settings.brand_left_motif.width }}" height="{{ block.settings.brand_left_motif.height }}">
+                    {%- endif -%}
+
+                    {%- if block.settings.brand_right_motif != blank -%}
+                      <img src="{{ block.settings.brand_right_motif | image_url: width: 1000 }}" alt="{{ block.settings.brand_right_motif.alt | escape }}" class="rdc-bento-brand-motif-{{ section.id }} rdc-bento-brand-motif-right-{{ section.id }}" loading="lazy" width="{{ block.settings.brand_right_motif.width }}" height="{{ block.settings.brand_right_motif.height }}">
+                    {%- endif -%}
+                  {%- endif -%}
+                </div>
+
+                {%- if block.settings.show_badge and block.settings.badge_text != blank -%}
+                  <span class="rdc-bento-badge-{{ section.id }}{% if block.settings.badge_shine %} rdc-badge-shine{% endif %}" style="--rdc-badge-bg: {{ block.settings.badge_bg_color }}; --rdc-badge-color: {{ block.settings.badge_text_color }};">
+                    {{ block.settings.badge_text }}
+                  </span>
+                {%- endif -%}
+
+                {%- if is_brand_card_m -%}
+                  <div class="rdc-bento-brand-content-{{ section.id }}">
+                    {%- if block.settings.title_image != blank -%}
+                      <img src="{{ block.settings.title_image | image_url: width: 1000 }}" alt="{{ block.settings.title_image.alt | default: display_title_m | escape }}" class="rdc-bento-brand-title-image-{{ section.id }}" loading="lazy" width="{{ block.settings.title_image.width }}" height="{{ block.settings.title_image.height }}">
+                    {%- elsif display_title_m != blank -%}
+                      <h3 class="rdc-bento-brand-title-text-{{ section.id }}">{{ display_title_m }}</h3>
+                    {%- endif -%}
+                  </div>
+                {%- elsif show_title_area_m -%}
+                  {%- capture title_style_m -%}
+                    --rdc-title-image-align: {{ title_align_css_m }};
+                    --rdc-title-text-align: {{ title_text_align_m }};
+                    --rdc-title-image-max-width: {{ block.settings.title_image_max_width_desktop | default: 260 }}px;
+                    --rdc-title-image-max-height: {{ block.settings.title_image_max_height_desktop | default: 120 }}px;
+                    --rdc-title-image-mobile-max-width: {{ block.settings.title_image_max_width_mobile | default: 220 }}px;
+                    --rdc-title-image-mobile-max-height: {{ block.settings.title_image_max_height_mobile | default: 100 }}px;
+                  {%- endcapture -%}
+
+                  {%- if section.settings.title_position == 'on_image' -%}
+                    <div class="rdc-bento-title-overlay-{{ section.id }}" style="{{ title_style_m | strip }}">
+                      <div class="rdc-bento-title-content-{{ section.id }}">
+                        {%- if display_title_m != blank -%}<h3 class="rdc-bento-title">{{ display_title_m }}</h3>{%- endif -%}
+                        {%- if block.settings.title_image != blank -%}
+                          <img src="{{ block.settings.title_image | image_url: width: 800 }}" alt="{{ block.settings.title_image.alt | default: display_title_m | escape }}" class="rdc-bento-card-title-image-{{ section.id }}" loading="lazy" width="{{ block.settings.title_image.width }}" height="{{ block.settings.title_image.height }}">
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  {%- elsif section.settings.title_position == 'below_image' -%}
+                    <div class="rdc-bento-title-below-{{ section.id }}" style="{{ title_style_m | strip }}">
+                      <div class="rdc-bento-title-content-{{ section.id }}">
+                        {%- if display_title_m != blank -%}<h3 class="rdc-bento-title">{{ display_title_m }}</h3>{%- endif -%}
+                        {%- if block.settings.title_image != blank -%}
+                          <img src="{{ block.settings.title_image | image_url: width: 800 }}" alt="{{ block.settings.title_image.alt | default: display_title_m | escape }}" class="rdc-bento-card-title-image-{{ section.id }}" loading="lazy" width="{{ block.settings.title_image.width }}" height="{{ block.settings.title_image.height }}">
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  {%- endif -%}
+                {%- endif -%}
+              </{{ card_tag_m }}>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      <div class="rdc-carousel-dots-{{ section.id }}" id="rdc-carousel-dots-{{ section.id }}"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var sid = '{{ section.id }}';
+
+  function initRdcCarousel() {
+    var track = document.getElementById('rdc-carousel-track-' + sid);
+    var dotsWrap = document.getElementById('rdc-carousel-dots-' + sid);
+
+    if (!track || !dotsWrap) return;
+    if (track.dataset.rdcCarouselInitialized === 'true') return;
+
+    track.dataset.rdcCarouselInitialized = 'true';
+
+    var slides = track.querySelectorAll('.rdc-carousel-slide-' + sid);
+    var total = slides.length;
+
+    dotsWrap.innerHTML = '';
+
+    if (total < 1) {
+      dotsWrap.style.display = 'none';
+      return;
+    }
+
+    dotsWrap.style.display = 'flex';
+
+    var current = 0;
+    var autoDelay = {{ section.settings.autoplay_speed }};
+    var autoTimer = null;
+    var dots = [];
+    var startX = 0;
+
+    function goTo(idx) {
+      current = Math.max(0, Math.min(idx, total - 1));
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+
+      dots.forEach(function(dot, dotIndex) {
+        dot.classList.toggle('active', dotIndex === current);
+      });
+
+      resetAuto();
+    }
+
+    for (var i = 0; i < total; i++) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'rdc-carousel-dot-' + sid + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+
+      (function(idx) {
+        dot.addEventListener('click', function() {
+          goTo(idx);
+        });
+      })(i);
+
+      dotsWrap.appendChild(dot);
+      dots.push(dot);
+    }
+
+    if (total < 2) return;
+
+    track.addEventListener('touchstart', function(event) {
+      startX = event.touches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function(event) {
+      var diff = startX - event.changedTouches[0].clientX;
+
+      if (Math.abs(diff) > 40) {
+        if (diff > 0 && current < total - 1) {
+          goTo(current + 1);
+        } else if (diff < 0 && current > 0) {
+          goTo(current - 1);
+        }
+      }
+    }, { passive: true });
+
+    function startAuto() {
+      if (autoDelay <= 0) return;
+
+      autoTimer = setInterval(function() {
+        goTo((current + 1) % total);
+      }, autoDelay);
+    }
+
+    function resetAuto() {
+      clearInterval(autoTimer);
+      startAuto();
+    }
+
+    startAuto();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRdcCarousel);
+  } else {
+    initRdcCarousel();
+  }
+
+  document.addEventListener('shopify:section:load', initRdcCarousel);
+})();
+</script>
+
+<script>
+(function() {
+  var countdowns = document.querySelectorAll('[data-rdc-countdown-section="{{ section.id }}"]');
+
+  if (!countdowns.length) return;
+
+  function pad(value) {
+    return String(value).padStart(2, '0');
+  }
+
+  function updateCountdown(countdown) {
+    var targetValue = countdown.getAttribute('data-countdown-target');
+    var targetDate = new Date(targetValue);
+
+    if (!targetValue || isNaN(targetDate.getTime())) return;
+
+    var now = new Date();
+    var distance = targetDate.getTime() - now.getTime();
+
+    if (distance < 0) {
+      distance = 0;
+    }
+
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+    var minutes = Math.floor((distance / (1000 * 60)) % 60);
+    var seconds = Math.floor((distance / 1000) % 60);
+
+    var daysEl = countdown.querySelector('[data-days]');
+    var hoursEl = countdown.querySelector('[data-hours]');
+    var minutesEl = countdown.querySelector('[data-minutes]');
+    var secondsEl = countdown.querySelector('[data-seconds]');
+
+    if (daysEl) daysEl.textContent = pad(days);
+    if (hoursEl) hoursEl.textContent = pad(hours);
+    if (minutesEl) minutesEl.textContent = pad(minutes);
+    if (secondsEl) secondsEl.textContent = pad(seconds);
+  }
+
+  function tick() {
+    countdowns.forEach(updateCountdown);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "RDC — Bento Collections",
+  "max_blocks": 16,
+  "class": "rdc-bento-collections",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Combinaison de couleurs"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinaison de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "📐 Section"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Largeur de la section",
+      "options": [
+        {
+          "value": "page",
+          "label": "Largeur de page"
+        },
+        {
+          "value": "full",
+          "label": "Pleine largeur"
+        }
+      ],
+      "default": "page"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "label": "Largeur max fallback",
+      "min": 600,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "section_margin_top",
+      "label": "Marge supérieure",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_margin_bottom",
+      "label": "Marge inférieure",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding supérieur",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding inférieur",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "label": "Padding horizontal pleine largeur",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "🃏 Cartes"
+    },
+    {
+      "type": "range",
+      "id": "cards_gap",
+      "label": "Espacement entre cartes",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Arrondi des coins",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Fond derrière l'image",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "desktop_image_max_height",
+      "label": "Hauteur max image desktop",
+      "min": 0,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 620,
+      "info": "0 = aucune limite."
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_fit",
+      "label": "Comportement image desktop",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Remplir / rogner"
+        },
+        {
+          "value": "contain",
+          "label": "Contenir"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "desktop_cards_vertical_align",
+      "label": "Alignement vertical des cartes desktop",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Haut"
+        },
+        {
+          "value": "center",
+          "label": "Milieu"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bas"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "header",
+      "content": "✨ Animation"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_animation",
+      "label": "Désactiver l'animation hover",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "hover_zoom_scale",
+      "label": "Zoom image hover",
+      "min": 100,
+      "max": 115,
+      "step": 1,
+      "unit": "%",
+      "default": 106
+    },
+    {
+      "type": "range",
+      "id": "hover_saturation",
+      "label": "Saturation image hover",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "hover_overlay_opacity",
+      "label": "Opacité overlay hover",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Balise"
+    },
+    {
+      "type": "range",
+      "id": "badge_offset",
+      "label": "Décalage de la balise",
+      "min": 6,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "🔤 Titre"
+    },
+    {
+      "type": "select",
+      "id": "title_position",
+      "label": "Position du titre classique",
+      "options": [
+        {
+          "value": "on_image",
+          "label": "Sur l'image overlay"
+        },
+        {
+          "value": "below_image",
+          "label": "Sous l'image"
+        },
+        {
+          "value": "hidden",
+          "label": "Masqué"
+        }
+      ],
+      "default": "on_image"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Taille desktop",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_font_size",
+      "label": "Taille mobile",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Graisse",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "title_padding",
+      "label": "Padding du titre",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "title_color_on_image",
+      "label": "Couleur titre sur image",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_overlay_opacity",
+      "label": "Opacité du dégradé overlay",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "title_color_below",
+      "label": "Couleur titre sous image",
+      "default": "#2c2420"
+    },
+    {
+      "type": "header",
+      "content": "📱 Carrousel mobile"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Défilement auto ms",
+      "min": 0,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "default": 4000
+    },
+    {
+      "type": "range",
+      "id": "mobile_slide_gap",
+      "label": "Marge latérale des slides",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_image_max_height",
+      "label": "Hauteur max image mobile",
+      "min": 0,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = aucune limite."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Ligne Bento",
+      "settings": [
+        {
+          "type": "select",
+          "id": "row_layout",
+          "label": "Disposition",
+          "options": [
+            {
+              "value": "3equal",
+              "label": "3 colonnes égales"
+            },
+            {
+              "value": "1full",
+              "label": "1 pleine largeur"
+            },
+            {
+              "value": "2split",
+              "label": "2 colonnes asymétriques"
+            }
+          ],
+          "default": "3equal"
+        },
+        {
+          "type": "select",
+          "id": "split_ratio",
+          "label": "Ratio si 2 colonnes",
+          "options": [
+            {
+              "value": "30-70",
+              "label": "30 / 70"
+            },
+            {
+              "value": "40-60",
+              "label": "40 / 60"
+            },
+            {
+              "value": "50-50",
+              "label": "50 / 50"
+            },
+            {
+              "value": "60-40",
+              "label": "60 / 40"
+            },
+            {
+              "value": "70-30",
+              "label": "70 / 30"
+            }
+          ],
+          "default": "60-40"
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre personnalisé",
+          "info": "Laissez vide pour utiliser le titre de la collection."
+        },
+        {
+          "type": "image_picker",
+          "id": "title_image",
+          "label": "Image de titre"
+        },
+        {
+          "type": "select",
+          "id": "title_image_alignment",
+          "label": "Alignement image de titre classique",
+          "options": [
+            {
+              "value": "left",
+              "label": "Gauche"
+            },
+            {
+              "value": "center",
+              "label": "Centre"
+            },
+            {
+              "value": "right",
+              "label": "Droite"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_width_desktop",
+          "label": "Largeur max image titre desktop",
+          "min": 60,
+          "max": 700,
+          "step": 10,
+          "unit": "px",
+          "default": 320
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_height_desktop",
+          "label": "Hauteur max image titre desktop",
+          "min": 30,
+          "max": 300,
+          "step": 10,
+          "unit": "px",
+          "default": 140
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_width_mobile",
+          "label": "Largeur max image titre mobile",
+          "min": 60,
+          "max": 500,
+          "step": 10,
+          "unit": "px",
+          "default": 260
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_height_mobile",
+          "label": "Hauteur max image titre mobile",
+          "min": 30,
+          "max": 260,
+          "step": 10,
+          "unit": "px",
+          "default": 120
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Lien personnalisé",
+          "info": "Remplace le lien de la collection si renseigné."
+        },
+        {
+          "type": "header",
+          "content": "🖼️ Images"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_desktop",
+          "label": "Image Desktop"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image Mobile"
+        },
+        {
+          "type": "header",
+          "content": "🎭 Composition marque"
+        },
+        {
+          "type": "checkbox",
+          "id": "brand_visual_enabled",
+          "label": "Activer la composition marque",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "brand_bg_blur",
+          "label": "Flou de l'image de fond",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "default": 6
+        },
+        {
+          "type": "range",
+          "id": "brand_bg_opacity",
+          "label": "Opacité image de fond",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "color",
+          "id": "brand_overlay_color",
+          "label": "Couleur overlay",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "brand_overlay_opacity",
+          "label": "Intensité overlay",
+          "min": 0,
+          "max": 80,
+          "step": 5,
+          "unit": "%",
+          "default": 30
+        },
+        {
+          "type": "image_picker",
+          "id": "brand_left_motif",
+          "label": "Motif gauche"
+        },
+        {
+          "type": "image_picker",
+          "id": "brand_right_motif",
+          "label": "Motif droit"
+        },
+        {
+          "type": "range",
+          "id": "brand_left_motif_offset_desktop",
+          "label": "Décalage horizontal motif gauche desktop",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_right_motif_offset_desktop",
+          "label": "Décalage horizontal motif droit desktop",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_left_motif_offset_mobile",
+          "label": "Décalage horizontal motif gauche mobile",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_right_motif_offset_mobile",
+          "label": "Décalage horizontal motif droit mobile",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_motif_opacity",
+          "label": "Opacité motifs",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "brand_motif_blur",
+          "label": "Flou motifs",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "brand_side_gradient_color",
+          "label": "Couleur dégradés latéraux",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "brand_side_gradient_opacity",
+          "label": "Intensité dégradés latéraux",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 45
+        },
+        {
+          "type": "range",
+          "id": "brand_side_gradient_width",
+          "label": "Largeur dégradés latéraux",
+          "min": 0,
+          "max": 70,
+          "step": 1,
+          "unit": "%",
+          "default": 30
+        },
+        {
+          "type": "header",
+          "content": "🏷️ Balise"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "Afficher une balise",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Texte de la balise",
+          "default": "Nouveau"
+        },
+        {
+          "type": "color",
+          "id": "badge_bg_color",
+          "label": "Couleur fond balise",
+          "default": "#f7d98b"
+        },
+        {
+          "type": "color",
+          "id": "badge_text_color",
+          "label": "Couleur texte balise",
+          "default": "#2c2420"
+        },
+        {
+          "type": "checkbox",
+          "id": "badge_shine",
+          "label": "Animation lueur verre",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "upcoming_collection",
+      "name": "Collection à venir",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titre",
+          "default": "Collection à venir"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_desktop",
+          "label": "Image Desktop"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image Mobile"
+        },
+        {
+          "type": "range",
+          "id": "image_blur",
+          "label": "Flou de l'image",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "default": 5
+        },
+        {
+          "type": "range",
+          "id": "image_opacity",
+          "label": "Opacité image",
+          "min": 10,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 80
+        },
+        {
+          "type": "color",
+          "id": "overlay_color",
+          "label": "Couleur overlay",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "overlay_opacity",
+          "label": "Opacité overlay",
+          "min": 0,
+          "max": 90,
+          "step": 5,
+          "unit": "%",
+          "default": 35
+        },
+        {
+          "type": "image_picker",
+          "id": "title_image",
+          "label": "Image sous le titre"
+        },
+        {
+          "type": "select",
+          "id": "title_image_alignment",
+          "label": "Alignement de l'image sous le titre",
+          "options": [
+            {
+              "value": "left",
+              "label": "Gauche"
+            },
+            {
+              "value": "center",
+              "label": "Centre"
+            },
+            {
+              "value": "right",
+              "label": "Droite"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_width_desktop",
+          "label": "Largeur max image titre desktop",
+          "min": 120,
+          "max": 900,
+          "step": 20,
+          "unit": "px",
+          "default": 620
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_height_desktop",
+          "label": "Hauteur max image titre desktop",
+          "min": 60,
+          "max": 360,
+          "step": 10,
+          "unit": "px",
+          "default": 240
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_width_mobile",
+          "label": "Largeur max image titre mobile",
+          "min": 120,
+          "max": 520,
+          "step": 20,
+          "unit": "px",
+          "default": 420
+        },
+        {
+          "type": "range",
+          "id": "title_image_max_height_mobile",
+          "label": "Hauteur max image titre mobile",
+          "min": 60,
+          "max": 300,
+          "step": 10,
+          "unit": "px",
+          "default": 210
+        },
+        {
+          "type": "header",
+          "content": "🎭 Composition marque"
+        },
+        {
+          "type": "checkbox",
+          "id": "brand_visual_enabled",
+          "label": "Activer motifs et dégradés marque",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "brand_left_motif",
+          "label": "Motif gauche"
+        },
+        {
+          "type": "image_picker",
+          "id": "brand_right_motif",
+          "label": "Motif droit"
+        },
+        {
+          "type": "range",
+          "id": "brand_left_motif_offset_desktop",
+          "label": "Décalage horizontal motif gauche desktop",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_right_motif_offset_desktop",
+          "label": "Décalage horizontal motif droit desktop",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_left_motif_offset_mobile",
+          "label": "Décalage horizontal motif gauche mobile",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_right_motif_offset_mobile",
+          "label": "Décalage horizontal motif droit mobile",
+          "min": -50,
+          "max": 50,
+          "step": 1,
+          "unit": "%",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "brand_motif_opacity",
+          "label": "Opacité motifs",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "brand_motif_blur",
+          "label": "Flou motifs",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "brand_side_gradient_color",
+          "label": "Couleur dégradés latéraux",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "brand_side_gradient_opacity",
+          "label": "Intensité dégradés latéraux",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "default": 45
+        },
+        {
+          "type": "range",
+          "id": "brand_side_gradient_width",
+          "label": "Largeur dégradés latéraux",
+          "min": 0,
+          "max": 70,
+          "step": 1,
+          "unit": "%",
+          "default": 30
+        },
+        {
+          "type": "text",
+          "id": "release_date",
+          "label": "Date de sortie",
+          "default": "2026-12-31T18:00:00+01:00",
+          "info": "Format recommandé : 2026-12-31T18:00:00+01:00"
+        },
+        {
+          "type": "text",
+          "id": "countdown_intro",
+          "label": "Introduction compte à rebours",
+          "default": "Sortie dans :"
+        },
+        {
+          "type": "text",
+          "id": "newsletter_placeholder",
+          "label": "Placeholder email",
+          "default": "Votre email"
+        },
+        {
+          "type": "text",
+          "id": "newsletter_button",
+          "label": "Texte bouton",
+          "default": "Me prévenir"
+        },
+        {
+          "type": "text",
+          "id": "success_message",
+          "label": "Message de confirmation",
+          "default": "Merci, vous serez averti(e)."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "RDC — Bento Collections",
+      "blocks": [
+        {
+          "type": "row",
+          "settings": {
+            "row_layout": "3equal"
+          }
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "row",
+          "settings": {
+            "row_layout": "1full"
+          }
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "row",
+          "settings": {
+            "row_layout": "2split",
+            "split_ratio": "60-40"
+          }
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

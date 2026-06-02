@@ -3,24 +3,36 @@ import type { Defi } from '../../types/defi'
 interface Props {
   defi: Defi
   label: string
+  onClick: () => void
 }
 
 /**
- * Carte d'un défi (individuel ou collectif).
+ * Carte d'un défi (individuel ou collectif). Cliquable → ouvre la modale détail.
  * Réutilise les classes CSS daily-quest-card et cqc-* existantes.
  *
  * Individuel  : progress / target + ✓ si claimed.
  * Collectif   : barre communauté + ligne "ta contribution" + ✓ si claimed.
  */
-export function DefiCard({ defi, label }: Props) {
+export function DefiCard({ defi, label, onClick }: Props) {
   const isCollective = defi.scope === 'collective'
   const progress = Math.min(defi.progress, defi.target)
   const pct = defi.target > 0 ? Math.min(100, Math.round((progress / defi.target) * 100)) : 0
   const progressLabel = defi.claimed ? '✓' : `${progress}/${defi.target}`
 
+  const keyActivate = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
+  }
+
   if (isCollective) {
     return (
-      <div className={`community-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}>
+      <div
+        className={`community-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={keyActivate}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="cqc-head">
           <span aria-hidden>{defi.icon}</span>{' '}
           {defi.title}
@@ -38,7 +50,13 @@ export function DefiCard({ defi, label }: Props) {
 
   return (
     <ul className="daily-quests-list" style={{ margin: 0 }}>
-      <li className={`daily-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}>
+      <li
+        className={`daily-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={keyActivate}
+      >
         <span className="daily-quest-card-icon" aria-hidden>{defi.icon}</span>
         <span className="daily-quest-card-pill">{label}</span>
         <span className="daily-quest-card-title">{defi.title}</span>

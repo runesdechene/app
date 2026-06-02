@@ -1,0 +1,674 @@
+{%- style -%}
+  .rdc-section-{{ section.id }} {
+    display: block;
+    width: 100%;
+    margin-top: {{ section.settings.section_margin_top }}px;
+    margin-bottom: {{ section.settings.section_margin_bottom }}px;
+    padding: {{ section.settings.section_padding_top }}px 0 {{ section.settings.section_padding_bottom }}px;
+    background-color: rgba(var(--color-background), 1);
+    color: rgba(var(--color-foreground), 1);
+  }
+
+  .rdc-container-{{ section.id }} {
+    display: flex;
+    gap: {{ section.settings.cards_gap }}px;
+    margin: 0 auto;
+  }
+
+  /* Largeur : page (max-width du thème) ou pleine largeur */
+  {%- if section.settings.section_width == 'page' -%}
+    .rdc-container-{{ section.id }} {
+      max-width: var(--page-width, {{ section.settings.section_max_width }}px);
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  {%- else -%}
+    .rdc-container-{{ section.id }} {
+      max-width: none;
+      padding-left: {{ section.settings.section_padding_horizontal }}px;
+      padding-right: {{ section.settings.section_padding_horizontal }}px;
+    }
+  {%- endif -%}
+
+  /* --- CARTES --- */
+  {%- for block in section.blocks -%}
+    #rdc-card-{{ block.id }} {
+      position: relative;
+      flex: 1;
+      min-height: {{ section.settings.card_height }}px;
+      border-radius: {{ section.settings.card_border_radius }}px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: {{ section.settings.content_vertical_alignment }};
+      align-items: {{ section.settings.content_horizontal_alignment }};
+      padding: {{ section.settings.card_padding }}px;
+      text-decoration: none;
+    }
+
+    /* --- IMAGE DE FOND --- */
+    #rdc-card-{{ block.id }} .rdc-card-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: saturate({{ block.settings.saturation_rest | divided_by: 100.0 }});
+      transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), filter 0.6s ease;
+    }
+
+    /* --- OVERLAY INDIVIDUEL --- */
+    #rdc-card-{{ block.id }} .rdc-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background-color: {{ block.settings.overlay_color }};
+      opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};
+      transition: opacity 0.4s ease;
+    }
+
+    /* --- ANIMATION HOVER : zoom image + saturation --- */
+    {%- unless block.settings.disable_animation -%}
+      #rdc-card-{{ block.id }}:hover .rdc-card-img {
+        transform: scale({{ block.settings.zoom_factor | divided_by: 100.0 }});
+        filter: saturate(1);
+      }
+      #rdc-card-{{ block.id }}:hover .rdc-overlay {
+        opacity: {{ block.settings.overlay_opacity_hover | divided_by: 100.0 }};
+      }
+    {%- endunless -%}
+
+    /* --- BOUTON INDIVIDUEL --- */
+    #rdc-card-{{ block.id }} .rdc-btn {
+      display: inline-block;
+      padding: {{ section.settings.button_padding_vertical }}px {{ section.settings.button_padding_horizontal }}px;
+      background-color: {{ block.settings.btn_bg }};
+      color: {{ block.settings.btn_text_color }};
+      text-decoration: none;
+      border-radius: {{ section.settings.button_border_radius }}px;
+      font-size: {{ section.settings.button_font_size }}px;
+      font-weight: {{ section.settings.button_font_weight }};
+      border: {{ section.settings.button_border_width }}px solid {{ block.settings.btn_border_color }};
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 4;
+      cursor: pointer;
+    }
+    #rdc-card-{{ block.id }} .rdc-btn:hover {
+      background-color: {{ block.settings.btn_hover_bg }};
+      color: {{ block.settings.btn_hover_text_color }};
+      border-color: {{ block.settings.btn_hover_border_color }};
+    }
+  {%- endfor -%}
+
+  /* --- CONTENU --- */
+  .rdc-content-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    text-align: {{ section.settings.text_alignment }};
+    max-width: 100%;
+  }
+
+  .rdc-title-{{ section.id }} {
+    color: {{ section.settings.title_color }};
+    font-size: {{ section.settings.title_font_size }}px;
+    font-weight: {{ section.settings.title_font_weight }};
+    margin: 0 0 {{ section.settings.title_margin_bottom }}px;
+    line-height: 1.15;
+  }
+
+  .rdc-subtitle-{{ section.id }} {
+    color: {{ section.settings.subtitle_color }};
+    font-size: {{ section.settings.subtitle_font_size }}px;
+    font-weight: {{ section.settings.subtitle_font_weight }};
+    margin: 0 0 {{ section.settings.subtitle_margin_bottom }}px;
+    opacity: 0.9;
+    line-height: 1.4;
+  }
+
+  /* --- MOBILE --- */
+  @media screen and (max-width: 749px) {
+    .rdc-container-{{ section.id }} {
+      flex-direction: column;
+      gap: {{ section.settings.mobile_cards_gap }}px;
+    }
+
+    {%- for block in section.blocks -%}
+      #rdc-card-{{ block.id }} {
+        width: {{ section.settings.mobile_card_width }}%;
+        min-height: {{ section.settings.mobile_card_height }}px;
+        margin: 0 auto;
+      }
+    {%- endfor -%}
+
+    .rdc-title-{{ section.id }} {
+      font-size: {{ section.settings.mobile_title_font_size }}px;
+    }
+
+    .rdc-subtitle-{{ section.id }} {
+      font-size: {{ section.settings.mobile_subtitle_font_size }}px;
+    }
+
+    #rdc-card-{{ block.id }} .rdc-btn,
+    .rdc-btn-mobile-size {
+      font-size: {{ section.settings.mobile_button_font_size }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="rdc-section-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <div class="rdc-container-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      {%- comment -%} Choix : lien global (toute la carte) ou lien bouton uniquement {%- endcomment -%}
+      {%- assign card_tag = 'div' -%}
+      {%- assign card_link_attr = '' -%}
+      {%- if block.settings.link_mode == 'card' and block.settings.card_link != blank -%}
+        {%- assign card_tag = 'a' -%}
+        {%- assign card_link_attr = 'href="' | append: block.settings.card_link | append: '"' -%}
+      {%- endif -%}
+
+      <{{ card_tag }} {{ card_link_attr }} id="rdc-card-{{ block.id }}" {{ block.shopify_attributes }}>
+        {%- if block.settings.image != blank -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1200 }}"
+            alt="{{ block.settings.image.alt | default: block.settings.title | escape }}"
+            class="rdc-card-img"
+            loading="lazy"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+          >
+        {%- else -%}
+          {{ 'collection-1' | placeholder_svg_tag: 'rdc-card-img' }}
+        {%- endif -%}
+
+        <div class="rdc-overlay"></div>
+
+        <div class="rdc-content-{{ section.id }}">
+          {%- if block.settings.title != blank -%}
+            <h2 class="rdc-title-{{ section.id }}">{{ block.settings.title }}</h2>
+          {%- endif -%}
+          {%- if block.settings.subtitle != blank -%}
+            <p class="rdc-subtitle-{{ section.id }}">{{ block.settings.subtitle }}</p>
+          {%- endif -%}
+          {%- if block.settings.btn_label != blank -%}
+            {%- if block.settings.link_mode == 'button' and block.settings.btn_link != blank -%}
+              <a href="{{ block.settings.btn_link }}" class="rdc-btn">{{ block.settings.btn_label }}</a>
+            {%- else -%}
+              <span class="rdc-btn">{{ block.settings.btn_label }}</span>
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+      </{{ card_tag }}>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "RDC – Double Carrés",
+  "max_blocks": 3,
+  "class": "rdc-dual-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Combinaison de couleurs"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinaison de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "📐 Section"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Largeur de la section",
+      "options": [
+        { "value": "page", "label": "Largeur de page" },
+        { "value": "full", "label": "Pleine largeur" }
+      ],
+      "default": "page",
+      "info": "Largeur de page : s'aligne avec les autres sections du thème. Pleine largeur : occupe tout l'écran."
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "label": "Largeur max (si largeur de page)",
+      "min": 600,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "default": 1400,
+      "info": "Utilisé uniquement en mode Largeur de page, comme fallback si --page-width n'est pas défini par le thème."
+    },
+    {
+      "type": "range",
+      "id": "section_margin_top",
+      "label": "Marge supérieure",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_margin_bottom",
+      "label": "Marge inférieure",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding supérieur",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding inférieur",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "label": "Padding horizontal",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "🃏 Cartes — Dimensions"
+    },
+    {
+      "type": "range",
+      "id": "cards_gap",
+      "label": "Espacement entre cartes (desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Hauteur (desktop)",
+      "min": 200,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 450
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Padding interne",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Arrondi des coins",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile"
+    },
+    {
+      "type": "range",
+      "id": "mobile_cards_gap",
+      "label": "Espacement entre cartes (mobile)",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_height",
+      "label": "Hauteur (mobile)",
+      "min": 150,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "label": "Largeur mobile",
+      "min": 80,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "↕️ Alignement du contenu"
+    },
+    {
+      "type": "select",
+      "id": "content_vertical_alignment",
+      "label": "Alignement vertical",
+      "options": [
+        { "value": "flex-start", "label": "Haut" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Bas" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_horizontal_alignment",
+      "label": "Alignement horizontal",
+      "options": [
+        { "value": "flex-start", "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Droite" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignement du texte",
+      "options": [
+        { "value": "left", "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right", "label": "Droite" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Titre"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Taille (desktop)",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_font_size",
+      "label": "Taille (mobile)",
+      "min": 14,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Graisse",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "label": "Marge sous le titre",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "🔤 Sous-titre"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Couleur",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_font_size",
+      "label": "Taille (desktop)",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_subtitle_font_size",
+      "label": "Taille (mobile)",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "subtitle_font_weight",
+      "label": "Graisse",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_margin_bottom",
+      "label": "Marge sous le sous-titre",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "🔘 Bouton — Structure globale"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Taille texte (desktop)",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_font_size",
+      "label": "Taille texte (mobile)",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "button_font_weight",
+      "label": "Graisse",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Padding vertical",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Padding horizontal",
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Arrondi",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Épaisseur bordure",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Carte",
+      "settings": [
+        { "type": "header", "content": "🖼️ Image" },
+        { "type": "image_picker", "id": "image", "label": "Image de fond" },
+
+        { "type": "header", "content": "📝 Textes" },
+        { "type": "text", "id": "title", "label": "Titre", "default": "Titre" },
+        { "type": "text", "id": "subtitle", "label": "Sous-titre", "default": "Sous-titre ici" },
+
+        { "type": "header", "content": "🔗 Lien" },
+        {
+          "type": "select",
+          "id": "link_mode",
+          "label": "Mode de lien",
+          "options": [
+            { "value": "card", "label": "Carte entière cliquable" },
+            { "value": "button", "label": "Bouton uniquement" }
+          ],
+          "default": "card",
+          "info": "Carte entière : toute la carte est un lien. Bouton : seul le bouton est cliquable."
+        },
+        { "type": "url", "id": "card_link", "label": "Lien de la carte (si mode carte)" },
+        { "type": "url", "id": "btn_link", "label": "Lien du bouton (si mode bouton)" },
+
+        { "type": "header", "content": "🔘 Bouton — Couleurs" },
+        { "type": "text", "id": "btn_label", "label": "Label bouton", "default": "Découvrir" },
+        { "type": "color", "id": "btn_bg", "label": "Fond bouton", "default": "#FAE3D6" },
+        { "type": "color", "id": "btn_text_color", "label": "Texte bouton", "default": "#962B21" },
+        { "type": "color", "id": "btn_border_color", "label": "Bordure bouton", "default": "#FAE3D6" },
+        { "type": "color", "id": "btn_hover_bg", "label": "Fond bouton (hover)", "default": "#962B21" },
+        { "type": "color", "id": "btn_hover_text_color", "label": "Texte bouton (hover)", "default": "#ffffff" },
+        { "type": "color", "id": "btn_hover_border_color", "label": "Bordure bouton (hover)", "default": "#962B21" },
+
+        { "type": "header", "content": "🌫️ Overlay" },
+        { "type": "color", "id": "overlay_color", "label": "Couleur overlay", "default": "#000000" },
+        {
+          "type": "range", "id": "overlay_opacity",
+          "label": "Opacité overlay (repos)",
+          "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35
+        },
+        {
+          "type": "range", "id": "overlay_opacity_hover",
+          "label": "Opacité overlay (hover)",
+          "min": 0, "max": 100, "step": 5, "unit": "%", "default": 20,
+          "info": "Réduit au hover pour laisser l'image ressortir"
+        },
+
+        { "type": "header", "content": "✨ Animation" },
+        {
+          "type": "checkbox", "id": "disable_animation",
+          "label": "Désactiver l'animation", "default": false
+        },
+        {
+          "type": "range", "id": "zoom_factor",
+          "label": "Intensité du zoom photo",
+          "min": 100, "max": 140, "step": 1, "unit": "%", "default": 110,
+          "info": "100% = pas de zoom · 110% = léger · 130% = prononcé"
+        },
+        {
+          "type": "range", "id": "saturation_rest",
+          "label": "Saturation au repos",
+          "min": 0, "max": 100, "step": 5, "unit": "%", "default": 75,
+          "info": "100% = couleurs normales · 75% = légèrement désaturé · 0% = noir & blanc"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "RDC – Double Carrés",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" }
+      ]
+    }
+  ]
+}
+{% endschema %}

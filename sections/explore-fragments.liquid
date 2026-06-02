@@ -1,0 +1,859 @@
+{{ 'explore-fragments.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  {% if section.settings.mode_ecran %}
+    header, .announcement-bar {
+      display: none !important;
+    }
+  {% endif %}
+
+  #section-{{ section.id }}.rdc-fragments-section {
+    {% if section.settings.background_image != blank %}
+      background-image: url('{{ section.settings.background_image | image_url: width: 1920 }}');
+    {% else %}
+      background-image: url('{{ "explore_fond_default.webp" | asset_url }}');
+    {% endif %}
+    background-size: cover;
+  }
+
+  #section-{{ section.id }} .fragments-title {
+    font-size: {{ section.settings.title_size }}px;
+    color: {{ section.settings.title_color }};
+  }
+
+  #section-{{ section.id }} .fragments-subtitle {
+    font-size: {{ section.settings.subtitle_size }}px;
+    color: {{ section.settings.subtitle_color }};
+  }
+
+  #section-{{ section.id }} .fragment-card-title {
+    font-size: {{ section.settings.card_title_size }}px;
+    color: {{ section.settings.card_title_color }};
+  }
+
+  #section-{{ section.id }} .fragment-card-artist {
+    color: {{ section.settings.card_artist_color }};
+  }
+
+  #section-{{ section.id }} .fragment-card-summary {
+    color: {{ section.settings.card_summary_color }};
+  }
+
+  #section-{{ section.id }} .fragments-back-btn {
+    background: {{ section.settings.nav_button_bg }};
+    color: {{ section.settings.nav_button_color }};
+  }
+
+  @media screen and (min-width: 799px) and (max-height: 950px) {
+    #section-{{ section.id }} .fragments-title {
+      font-size: {{ section.settings.title_size | divided_by: 2 }}px;
+    }
+    #section-{{ section.id }} .fragments-subtitle {
+      font-size: {{ section.settings.subtitle_size | divided_by: 2 }}px;
+    }
+    #section-{{ section.id }} .fragment-card-title {
+      font-size: {{ section.settings.card_title_size | divided_by: 1.4 | round }}px;
+    }
+  }
+
+  @media screen and (min-width: 799px) and (max-height: 750px) {
+    #section-{{ section.id }} .fragments-title {
+      font-size: {{ section.settings.title_size | divided_by: 3 }}px;
+    }
+    #section-{{ section.id }} .fragments-subtitle {
+      font-size: {{ section.settings.subtitle_size | divided_by: 3 }}px;
+    }
+    #section-{{ section.id }} .fragment-card-title {
+      font-size: {{ section.settings.card_title_size | divided_by: 1.8 | round }}px;
+    }
+  }
+
+  @media screen and (max-width: 798px) {
+    #section-{{ section.id }} .fragments-title {
+      font-size: 1.6rem;
+    }
+    #section-{{ section.id }} .fragments-subtitle {
+      font-size: 1rem;
+    }
+    #section-{{ section.id }} .fragment-card-title {
+      font-size: {{ section.settings.card_title_size | divided_by: 1.5 | round }}px;
+    }
+  }
+{% endstyle %}
+
+{%- comment -%} Récupérer tous les métaobjets du type spécifié {%- endcomment -%}
+{%- assign metaobject_handle = section.settings.metaobject_type | default: 'reliques' -%}
+{%- assign reliques = shop.metaobjects[metaobject_handle].values -%}
+
+<div id="section-{{ section.id }}" class="rdc-fragments-section section section--{{ section.settings.section_width }}" data-section-id="{{ section.id }}">
+  <div class="rdc-fragments-background-actif"></div>
+  <div class="fragments-hero">
+    {%- comment -%} Bouton de retour {%- endcomment -%}
+    {% if section.settings.show_back_button and section.settings.mode_ecran != true %}
+      <a href="{{ section.settings.back_url | default: '/' }}" class="fragments-back-btn" aria-label="Retour">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </a>
+    {% endif %}
+
+    {%- comment -%} Compter les artistes uniques {%- endcomment -%}
+    {%- assign all_artists = '' -%}
+    {% for relique in reliques %}
+      {% if relique.artiste.value != blank %}
+        {%- assign artist_name = relique.artiste.value.nom.value | strip -%}
+        {%- unless all_artists contains artist_name -%}
+          {%- if all_artists == '' -%}
+            {%- assign all_artists = artist_name -%}
+          {%- else -%}
+            {%- assign all_artists = all_artists | append: '|' | append: artist_name -%}
+          {%- endif -%}
+        {%- endunless -%}
+      {% endif %}
+    {% endfor %}
+    {%- assign artists_array = all_artists | split: '|' -%}
+    {%- assign artists_count = artists_array.size -%}
+
+    {%- comment -%} Titre et sous-titre alignés à gauche {%- endcomment -%}
+    <div class="fragments-header-title{% if section.settings.mode_ecran == true %} no-back-btn{% endif %}">
+      <h1 class="fragments-title">
+        {{ section.settings.title | default: 'EXPLORER' }}
+        <span class="fragments-subtitle">{{ section.settings.subtitle | default: 'NOS CRÉATIONS' }}</span>
+      </h1>
+
+      <p class="fragments-meta">
+        {{ reliques.size }} {{ section.settings.items_label | default: 'illustrations disponibles' }}{% if artists_count > 0 %}, {{ artists_count }} artiste{% if artists_count > 1 %}s{% endif %}{% endif %}
+      </p>
+    </div>
+
+    {%- comment -%} Filtres de catégories personnalisés (en haut à droite) {%- endcomment -%}
+    {% if section.settings.show_filters %}
+    <div class="fragments-filters">
+      <button class="fragments-filter active" data-filter="all" style="padding-left: 15px;">{{ section.settings.filter_all_label }}</button>
+      {% if section.settings.mode_ecran %}
+      <button class="fragments-filter" data-filter="sur-stand" data-filter-type="stand" style="padding-left: 15px;">
+        ✅ Dispo sur stand
+      </button>
+      {% endif %}
+
+      {%- comment -%} Collecter les collections d'héritage uniques (titre|image_url|couleur) {%- endcomment -%}
+      {%- assign all_collection_tags = '' -%}
+      {%- assign seen_titles = '' -%}
+      {% for relique in reliques %}
+        {%- if relique.collection_d_heritage != blank -%}
+          {%- if relique.collection_d_heritage.value -%}
+            {%- assign col_obj = relique.collection_d_heritage.value -%}
+          {%- else -%}
+            {%- assign col_obj = relique.collection_d_heritage -%}
+          {%- endif -%}
+          {%- assign col_title = col_obj.title | strip -%}
+          {%- if col_title != '' -%}
+            {%- unless seen_titles contains col_title -%}
+              {%- assign col_image = '' -%}
+              {%- if col_obj.image -%}
+                {%- assign col_image = col_obj.image | image_url: width: 80 -%}
+              {%- endif -%}
+              {%- assign col_color = '' -%}
+              {%- if col_obj.metafields.custom.couleur -%}
+                {%- assign col_color = col_obj.metafields.custom.couleur.value | default: col_obj.metafields.custom.couleur -%}
+              {%- endif -%}
+              {%- assign entry = col_title | append: '::' | append: col_image | append: '::' | append: col_color -%}
+              {%- if all_collection_tags == '' -%}
+                {%- assign all_collection_tags = entry -%}
+                {%- assign seen_titles = col_title -%}
+              {%- else -%}
+                {%- assign all_collection_tags = all_collection_tags | append: '||' | append: entry -%}
+                {%- assign seen_titles = seen_titles | append: '|' | append: col_title -%}
+              {%- endif -%}
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endif -%}
+      {% endfor %}
+
+      {%- comment -%} Afficher un bouton pour chaque collection unique avec image et couleur {%- endcomment -%}
+      {%- assign collection_entries = all_collection_tags | split: '||' -%}
+      {% for entry in collection_entries %}
+        {%- assign parts = entry | split: '::' -%}
+        {%- assign col_tag = parts[0] -%}
+        {%- assign col_img = parts[1] -%}
+        {%- assign col_clr = parts[2] | default: '#5a4d4d' -%}
+        <button class="fragments-filter" data-filter="{{ col_tag | handleize }}" style="--filter-color: {{ col_clr }};">
+          {%- if col_img != blank -%}
+            <span class="fragments-filter-img-wrap">
+              <img src="{{ col_img }}" alt="{{ col_tag }}" class="fragments-filter-img" width="28" height="28" loading="lazy">
+            </span>
+          {%- endif -%}
+          {{ col_tag }}
+        </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {%- comment -%} Bouton toggle thème sombre {%- endcomment -%}
+    <div class="theme-toggle-container">
+      <button class="theme-toggle" id="theme-toggle-{{ section.id }}" aria-label="Basculer le thème">
+        <svg
+          class="theme-icon sun-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg
+          class="theme-icon moon-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span class="theme-toggle-slider"></span>
+      </button>
+    </div>
+
+    {%- comment -%} Barre de recherche {%- endcomment -%}
+    <div class="fragments-search">
+      <input
+        type="text"
+        class="fragments-search-input"
+        placeholder="{{ section.settings.search_placeholder | default: 'Rechercher un fragment...' }}"
+        id="fragments-search-{{ section.id }}"
+      >
+    </div>
+  </div>
+
+  {%- comment -%} Carrousel horizontal scrollable {%- endcomment -%}
+  <div class="fragments-carousel-container">
+    <div class="fragments-carousel" id="fragments-carousel-{{ section.id }}">
+      {%- comment -%} Cartes depuis les metaobjects Reliques {%- endcomment -%}
+
+      {% if reliques.size > 0 %}
+        {% for relique in reliques %}
+          {%- comment -%} Tag = titre de la collection principale (pour le filtre par collection) {%- endcomment -%}
+          {%- assign tags_string = '' -%}
+          {%- if relique.collection_d_heritage != blank -%}
+            {%- if relique.collection_d_heritage.value -%}
+              {%- assign tags_string = relique.collection_d_heritage.value.title | strip -%}
+            {%- elsif relique.collection_d_heritage.title -%}
+              {%- assign tags_string = relique.collection_d_heritage.title | strip -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- comment -%} Récupérer l'URL et la date de l'article {%- endcomment -%}
+          {%- assign article_url = '' -%}
+          {%- assign article_published_at = '' -%}
+          {%- if relique.recit != blank -%}
+            {%- if relique.recit.url -%}
+              {%- assign article_url = relique.recit.url -%}
+              {%- assign article_published_at = relique.recit.published_at -%}
+            {%- elsif relique.recit.value.url -%}
+              {%- assign article_url = relique.recit.value.url -%}
+              {%- assign article_published_at = relique.recit.value.published_at -%}
+            {%- elsif relique.recit -%}
+              {%- assign article_url = relique.recit -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- comment -%} Récupérer la collection reliée au métaobjet {%- endcomment -%}
+          {%- assign product_count = 0 -%}
+          {%- assign collection_url = '' -%}
+          {%- assign linked_collection = null -%}
+          {%- if relique.collection != blank -%}
+            {%- if relique.collection.value -%}
+              {%- assign linked_collection = relique.collection.value -%}
+              {%- assign product_count = linked_collection.products.size -%}
+              {%- assign collection_url = linked_collection.url -%}
+            {%- elsif relique.collection.url -%}
+              {%- assign collection_url = relique.collection.url -%}
+              {%- assign product_count = relique.collection.products.size -%}
+            {%- endif -%}
+          {%- endif -%}
+          
+          {%- comment -%} Collecter toutes les couleurs uniques des produits de la collection {%- endcomment -%}
+          {%- assign all_colors = '' -%}
+          {%- assign all_color_swatches = '' -%}
+          {%- if linked_collection -%}
+            {% for product in linked_collection.products %}
+              {%- comment -%} Trouver l'option "Couleurs" spécifiquement {%- endcomment -%}
+              {% for option in product.options_with_values %}
+                {% if option.name == 'Couleurs' or option.name == 'Couleur' or option.name == 'Color' or option.name == 'couleurs' or option.name == 'couleur' %}
+                  {%- comment -%} Parcourir les valeurs de l'option couleur avec leurs swatches Shopify {%- endcomment -%}
+                  {% for option_value in option.values %}
+                    {%- assign color_name = option_value.name | strip -%}
+                    {%- if color_name != blank -%}
+                      {%- comment -%} Récupérer la couleur RGB depuis le swatch Shopify {%- endcomment -%}
+                      {%- if option_value.swatch.color -%}
+                        {%- assign color_rgb = option_value.swatch.color.rgb -%}
+                        {%- assign color_hex = 'rgb(' | append: color_rgb | append: ')' -%}
+                      {%- else -%}
+                        {%- assign color_hex = color_name | handleize -%}
+                      {%- endif -%}
+                      {%- assign color_data = color_name | append: ':' | append: color_hex -%}
+                      {%- unless all_color_swatches contains color_data -%}
+                        {%- unless all_colors contains color_name -%}
+                          {%- if all_colors == '' -%}
+                            {%- assign all_colors = color_name -%}
+                            {%- assign all_color_swatches = color_data -%}
+                          {%- else -%}
+                            {%- assign all_colors = all_colors | append: '|' | append: color_name -%}
+                            {%- assign all_color_swatches = all_color_swatches | append: '|' | append: color_data -%}
+                          {%- endif -%}
+                        {%- endunless -%}
+                      {%- endunless -%}
+                    {%- endif -%}
+                  {% endfor %}
+                  {%- break -%}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {%- endif -%}
+
+          <div
+            class="fragment-card"
+            data-index="{{ forloop.index0 }}"
+            data-block-id="{{ relique.id }}"
+            data-card-title="{{ relique.nom }}"
+            data-filter-gid="{{ relique.filter_gid }}"
+            data-excerpt="{{ relique.description | metafield_text | strip_html | truncate: 200 | escape }}"
+            data-tags="{{ tags_string }}"
+            data-article-url="{{ article_url }}"
+            data-article-published-at="{{ article_published_at }}"
+            data-fragment-date="{{ relique.date }}"
+            data-product-count="{{ product_count }}"
+            data-collection-url="{{ collection_url }}"
+            data-debug-recit="{{ relique.recit }}"
+            data-sur-stand="{% if relique.suivi_sur_stand == true or relique.suivi_sur_stand.value == true %}true{% else %}false{% endif %}"
+            data-background-image="{% if relique.image_fond_de_fragment != blank %}{{ relique.image_fond_de_fragment | image_url: width: 1920 }}{% endif %}"
+          >
+            <div class="fragment-card-wrapper">
+              {%- comment -%} Image en haut {%- endcomment -%}
+              <div class="fragment-card-image-col">
+                {%- assign image_field = section.settings.image_field_handle | default: 'image_pour_fond_clair' -%}
+                {%- assign relique_image = relique[image_field] -%}
+                {% if relique_image != blank %}
+                  <img
+                    src="{{ relique_image | image_url: width: 600 }}"
+                    alt="{{ relique.nom }}"
+                    class="fragment-image"
+                    data-light-image="{{ relique.image_pour_fond_clair | image_url: width: 600 }}"
+                    data-dark-image="{{ relique.image_pour_fond_sombre | image_url: width: 600 }}"
+                  >
+                {% else %}
+                  <div class="fragment-image-placeholder"></div>
+                {% endif %}
+              </div>
+
+              {%- comment -%} Infos sous l'image : Titre, Artiste, Résumé {%- endcomment -%}
+              <div class="fragment-card-content-col">
+                <h2 class="fragment-card-title">{{ relique.nom | default: "Titre de l'illustration" }}
+                </h2>
+
+
+                {%- assign summary_field = section.settings.summary_field_handle | default: 'resume' -%}
+                {%- assign relique_summary = relique[summary_field] -%}
+                {% if relique_summary != blank %}
+                  <p class="fragment-card-summary">
+                    {{ relique_summary }}
+                    {%- if relique.artiste.value.nom.value != blank %} — <span class="fragment-card-par">par</span> <span class="fragment-card-artiste">{{ relique.artiste.value.nom.value }}</span>{% endif -%}
+                  </p>
+                {% endif %}
+
+                                 {%- comment -%} Badge NOUVEAU (sera géré par JS) {%- endcomment -%}
+                <div class="fragment-new-badge" style="display: none;">
+                  🔥 NOUVEAU MOTIF
+                </div>
+
+                {%- comment -%} Description borne {%- endcomment -%}
+                {% if relique.description_borne != blank %}
+                  <div class="fragment-card-histoire">
+                    {{ relique.description_borne | metafield_tag }}
+                  </div>
+                {% endif %}
+
+                {%- comment -%} Mode écran (stand) : disponibilité stand / commande / déstockage {%- endcomment -%}
+                {%- if section.settings.mode_ecran -%}
+                  {%- assign suivi_stand = relique.suivi_sur_stand -%}
+                  {%- if suivi_stand == true or suivi_stand.value == true -%}
+                    <div class="fragment-card-stock fragment-stock-on-stand">
+                      <span class="fragment-stock-on-stand-badge">✅</span>
+                      <div class="fragment-stock-on-stand-text">
+                        <span class="fragment-stock-on-stand-title">Disponible sur ce stand</span>
+                        <span class="fragment-stock-on-stand-sub">Stock limité — profitez-en maintenant</span>
+                      </div>
+                    </div>
+                  {%- else -%}
+                    <div class="fragment-stock-cards">
+                      <div class="fragment-card-stock fragment-stock-order">
+                        <div class="fragment-stock-order-text">
+                          <span class="fragment-stock-order-title">Disponible à la commande</span>
+                          {%- if section.settings.qr_code_url != blank -%}
+                            <span class="fragment-stock-order-sub">Scannez pour commander</span>
+                          {%- endif -%}
+                        </div>
+                        {%- if section.settings.qr_code_url != blank -%}
+                          <div class="fragment-stock-qr-wrap">
+                            <img class="fragment-stock-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://runesdechene.com{{ section.settings.qr_code_url | url_encode }}" alt="QR commande" width="90" height="90">
+                          </div>
+                        {%- endif -%}
+                      </div>
+                      <span class="fragment-stock-ou">ou</span>
+                      <div class="fragment-card-stock fragment-stock-destock">
+                        <span class="fragment-stock-destock-title">Peut-être en déstockage</span>
+                        <span class="fragment-stock-destock-sub">Demandez à l'équipe sur le stand !</span>
+                      </div>
+                    </div>
+                  {%- endif -%}
+
+                {%- endif -%}
+
+                {%- comment -%} Bouton vers la collection (masqué en mode écran) {%- endcomment -%}
+                {%- unless section.settings.mode_ecran -%}
+                  {%- if collection_url != blank -%}
+                    <a href="{{ collection_url }}" class="fragment-collection-btn">
+                      <span class="fragment-collection-btn-text">Accéder à la collection</span>
+                      <span class="fragment-collection-btn-count">{{ product_count }} produit{% if product_count > 1 %}s{% endif %}</span>
+                      <svg class="fragment-collection-btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  {%- else -%}
+                    <span class="fragment-collection-btn fragment-collection-btn--disabled">
+                      <span class="fragment-collection-btn-text">Collection non reliée</span>
+                    </span>
+                  {%- endif -%}
+                {%- endunless -%}
+
+                {%- comment -%} Pastilles de couleur {%- endcomment -%}
+                {% if section.settings.show_color_swatches %}
+                  {% if all_color_swatches != '' %}
+                    {%- assign colors_array = all_color_swatches | split: '|' -%}
+                    <div class="fragment-color-swatches">
+                        {% for color_data in colors_array %}
+                        {%- assign color_parts = color_data | split: ':' -%}
+                        {%- assign color_name = color_parts[0] -%}
+                        {%- assign color_hex = color_parts[1] | default: '#cccccc' -%}
+                        <span class="color-swatch" data-color="{{ color_name | handleize }}" title="{{ color_name }}" style="background-color: {{ color_hex }};">
+                          <span class="color-swatch-inner"></span>
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <small style="display: block; text-align: center; color: #999;">Aucune couleur détectée (vérifier variant.option1)</small>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+      {% else %}
+        {%- comment -%} Fallback: Carte de test si aucun metaobject n'existe {%- endcomment -%}
+        <div class="fragment-card" data-index="0">
+          <div class="fragment-card-wrapper">
+            <div class="fragment-card-image-col">
+              <div class="fragment-image-placeholder"></div>
+            </div>
+            <div class="fragment-card-content-col">
+              <h3 class="fragment-card-title">Aucune illustration</h3>
+              <p>Créez des metaobjects de type "Reliques" pour afficher des illustrations</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Contrôles de navigation {%- endcomment -%}
+    <button class="carousel-nav carousel-nav-prev" aria-label="Précédent">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="carousel-nav carousel-nav-next" aria-label="Suivant">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  {%- comment -%} Compteur de cartes {%- endcomment -%}
+  <div class="fragments-counter" id="fragments-counter-{{ section.id }}">
+    <span class="counter-current">1</span> / <span class="counter-total">{{ reliques.size }}</span>
+  </div>
+
+  {%- comment -%} Bouton collection flottant mobile {%- endcomment -%}
+  {%- unless section.settings.mode_ecran -%}
+    <a href="#" class="fragment-mobile-collection-btn" id="fragment-mobile-collection-btn-{{ section.id }}" style="display:none;">
+      <span class="fragment-collection-btn-text">Accéder à la collection</span>
+      <span class="fragment-collection-btn-count"></span>
+      <svg class="fragment-collection-btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  {%- endunless -%}
+
+  {%- comment -%} Module avis flottant en bas à gauche {%- endcomment -%}
+  {%- if section.settings.avis_url != blank and section.settings.mode_ecran == true -%}
+    <div class="fragment-avis-float">
+      <div class="fragment-avis-text">
+        <span class="fragment-avis-title">Laissez-nous un avis ! ⭐</span>
+        <span class="fragment-avis-sub">Vous aimez notre mission ? Vous avez apprécié le moment sur le stand ? Scannez et laissez-nous un encouragement</span>
+      </div>
+      <div class="fragment-stock-qr-wrap">
+        <img class="fragment-stock-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ section.settings.avis_url | url_encode }}" alt="QR avis" width="90" height="90">
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Images de décoration en bas {%- endcomment -%}
+  {%- assign opacity_value = section.settings.bottom_images_opacity | default: 100 | divided_by: 100.0 -%}
+  <div class="bottom-decoration-images" style="opacity: {{ opacity_value }};">
+    {% if section.settings.bottom_image_left != blank %}
+      <img
+        src="{{ section.settings.bottom_image_left | image_url: width: 400 }}"
+        alt="Décoration gauche"
+        class="bottom-image bottom-image-left"
+      >
+    {% endif %}
+
+    {% if section.settings.bottom_image_center != blank %}
+      <img
+        src="{{ section.settings.bottom_image_center | image_url: width: 1920 }}"
+        alt="Décoration centre"
+        class="bottom-image bottom-image-center"
+      >
+    {% endif %}
+
+    {% if section.settings.bottom_image_right != blank %}
+      <img
+        src="{{ section.settings.bottom_image_right | image_url: width: 400 }}"
+        alt="Décoration droite"
+        class="bottom-image bottom-image-right"
+      >
+    {% endif %}
+  </div>
+</div>
+
+<script src="{{ 'explore-fragments.js' | asset_url }}" defer="defer"></script>
+
+{% unless section.settings.mode_ecran %}
+<script>
+  (function() {
+    var s = document.getElementById('section-{{ section.id }}');
+    if (!s) return;
+    function setHeight() {
+      var top = s.getBoundingClientRect().top + window.scrollY;
+      s.style.setProperty('--section-height', (window.innerHeight - top) + 'px');
+    }
+    setHeight();
+    window.addEventListener('resize', setHeight);
+  })();
+</script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "Explorer : Fragments",
+  "tag": "section",
+  "class": "section-explore-fragments",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Source des données"
+    },
+    {
+      "type": "text",
+      "id": "metaobject_type",
+      "label": "Type de métaobjet",
+      "info": "Handle du métaobjet à afficher (ex: reliques, artistes, collections_speciales)",
+      "default": "illustrations"
+    },
+    {
+      "type": "text",
+      "id": "image_field_handle",
+      "label": "Handle du champ image",
+      "info": "Nom du champ image du métaobjet (ex: image_pour_fond_clair, image_principale)",
+      "default": "image_pour_fond_clair"
+    },
+    {
+      "type": "text",
+      "id": "artist_field_handle",
+      "label": "Handle du champ artiste !!",
+      "info": "Nom du champ artiste du métaobjet (ex: artiste, createur)",
+      "default": "artiste"
+    },
+    {
+      "type": "text",
+      "id": "book_field_handle",
+      "label": "Handle du champ livre",
+      "info": "Nom du champ livre du métaobjet (ex: livre, ouvrage)",
+      "default": "livre"
+    },
+    {
+      "type": "text",
+      "id": "artist_prefix",
+      "label": "Préfixe artiste (texte libre)",
+      "info": "Texte affiché avant l'artiste (ex: Artiste :, Par). Laisser vide pour ne rien afficher."
+    },
+    {
+      "type": "text",
+      "id": "book_prefix",
+      "label": "Préfixe livre (texte libre)",
+      "info": "Texte affiché avant le livre (ex: Livre :, Dans). Laisser vide pour ne rien afficher."
+    },
+    {
+      "type": "text",
+      "id": "extra_field_handle",
+      "label": "Handle du champ supplémentaire",
+      "info": "Nom du champ supplémentaire du métaobjet (ex: edition, annee)",
+      "default": "edition"
+    },
+    {
+      "type": "text",
+      "id": "extra_field_prefix",
+      "label": "Préfixe champ supplémentaire (texte libre)",
+      "info": "Texte affiché avant le champ supplémentaire (ex: Édition :, Année :). Laisser vide pour ne rien afficher."
+    },
+    {
+      "type": "text",
+      "id": "summary_field_handle",
+      "label": "Handle du champ résumé",
+      "info": "Nom du champ résumé du métaobjet (ex: resume, description)",
+      "default": "resume"
+    },
+    {
+      "type": "text",
+      "id": "tags_field_handle",
+      "label": "Handle du champ tags",
+      "info": "Nom du champ tags du métaobjet (ex: tags, categories)",
+      "default": "tags"
+    },
+    {
+      "type": "checkbox",
+      "id": "mode_ecran",
+      "label": "Mode Écran (stand)",
+      "info": "Désactive les liens, la navigation externe et tout ce qui permet de quitter la page",
+      "default": false
+    },
+    {
+      "type": "url",
+      "id": "qr_code_url",
+      "label": "URL du QR code (Borne de commande)",
+      "info": "Lien vers la Borne de commande. Affiché en QR code pour les motifs non disponibles sur le stand."
+    },
+    {
+      "type": "url",
+      "id": "avis_url",
+      "label": "URL du QR code Avis",
+      "info": "Lien pour laisser un avis. Affiché en bas à gauche avec un QR code."
+    },
+    {
+      "type": "header",
+      "content": "Mise en page"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Largeur de la section",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Pleine largeur"
+        }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Image de fond"
+    },
+    {
+      "type": "header",
+      "content": "Titre et sous-titre"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre principal",
+      "default": "EXPLORER"
+    },
+    {
+      "type": "text",
+      "id": "items_label",
+      "label": "Libellé des éléments",
+      "info": "Texte affiché après le nombre d'éléments (ex: illustrations disponibles, machines disponibles)",
+      "default": "illustrations disponibles"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Taille du titre (desktop)",
+      "default": 96
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur du titre",
+      "default": "#635e4c"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "NOS CRÉATIONS"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Taille du sous-titre (desktop)",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Couleur du sous-titre",
+      "default": "#a39b8c"
+    },
+    {
+      "type": "header",
+      "content": "Cartes"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_color_swatches",
+      "label": "Afficher les pastilles de couleur",
+      "info": "Affiche les couleurs disponibles des produits de la collection",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Taille du titre des cartes",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Couleur du titre des cartes",
+      "default": "#494141"
+    },
+    {
+      "type": "color",
+      "id": "card_artist_color",
+      "label": "Couleur de l'artiste",
+      "default": "#796e6d"
+    },
+    {
+      "type": "color",
+      "id": "card_summary_color",
+      "label": "Couleur du résumé",
+      "default": "#665f56"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_button",
+      "label": "Afficher le bouton retour",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "back_url",
+      "label": "URL du bouton retour",
+      "default": "/"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_bg",
+      "label": "Couleur de fond des boutons navigation",
+      "default": "#e6dcc7"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_color",
+      "label": "Couleur des icônes navigation",
+      "default": "#5e5444"
+    },
+    {
+      "type": "header",
+      "content": "Filtres"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Afficher les filtres",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "filter_all_label",
+      "label": "Libellé du filtre 'Tous'",
+      "default": "✨ Toutes les reliques"
+    },
+    {
+      "type": "header",
+      "content": "Images de décoration"
+    },
+    {
+      "type": "image_picker",
+      "id": "bottom_image_left",
+      "label": "Image décoration bas gauche"
+    },
+    {
+      "type": "image_picker",
+      "id": "bottom_image_center",
+      "label": "Image décoration bas centre (pleine largeur)"
+    },
+    {
+      "type": "image_picker",
+      "id": "bottom_image_right",
+      "label": "Image décoration bas droite"
+    },
+    {
+      "type": "range",
+      "id": "bottom_images_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacité des images de décoration",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Explorer : Fragments"
+    }
+  ]
+}
+{% endschema %}

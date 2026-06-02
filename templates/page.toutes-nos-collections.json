@@ -1,0 +1,147 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "Title",
+          "settings": {
+            "text": "<h1>Toute nos collections</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "center",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {},
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "color_scheme": "",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "double_carres_MHj4Yt": {
+      "type": "double-carres",
+      "blocks": {
+        "card_Cp4jxy": {
+          "type": "card",
+          "settings": {
+            "title": "les mysteres celtes",
+            "subtitle": "Sous-titre",
+            "link": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 40,
+            "btn_bg": "#FAE3D6",
+            "btn_text": "#962B21",
+            "btn_label": "Découvrir",
+            "btn_link": "",
+            "disable_all": false,
+            "disable_zoom": false,
+            "disable_rotate": false,
+            "zoom_factor": 105,
+            "shrink_factor": 96,
+            "rotate_angle": 2
+          }
+        },
+        "card_bm43ER": {
+          "type": "card",
+          "settings": {
+            "title": "Titre",
+            "subtitle": "Sous-titre",
+            "link": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 40,
+            "btn_bg": "#FAE3D6",
+            "btn_text": "#962B21",
+            "btn_label": "Découvrir",
+            "btn_link": "",
+            "disable_all": false,
+            "disable_zoom": false,
+            "disable_rotate": false,
+            "zoom_factor": 105,
+            "shrink_factor": 96,
+            "rotate_angle": 2
+          }
+        },
+        "card_TqtUQL": {
+          "type": "card",
+          "settings": {
+            "title": "Titre",
+            "subtitle": "Sous-titre",
+            "link": "",
+            "overlay_color": "#000000",
+            "overlay_opacity": 40,
+            "btn_bg": "#FAE3D6",
+            "btn_text": "#962B21",
+            "btn_label": "Découvrir",
+            "btn_link": "",
+            "disable_all": false,
+            "disable_zoom": false,
+            "disable_rotate": false,
+            "zoom_factor": 105,
+            "shrink_factor": 96,
+            "rotate_angle": 2
+          }
+        }
+      },
+      "block_order": [
+        "card_Cp4jxy",
+        "card_bm43ER",
+        "card_TqtUQL"
+      ],
+      "name": "RDC - Double Carrés Granulaire",
+      "settings": {
+        "container_width": 1200,
+        "gap": 30,
+        "border_radius": 20,
+        "card_height": 500,
+        "card_height_mobile": 350,
+        "title_size": 32,
+        "subtitle_size": 18,
+        "section_bg": "transparent",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": [
+    "main",
+    "double_carres_MHj4Yt"
+  ]
+}

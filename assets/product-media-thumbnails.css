@@ -1,0 +1,133 @@
+/* ==========================================================================
+   Product Media Thumbnails - Custom Styles
+   Styles for vertical thumbnails (left/right position) in product gallery
+   ========================================================================== */
+
+/* Media caption (ALT text display) */
+.product-media__caption {
+  z-index: 40;
+  margin: 0;
+  padding: 5px 0 0 0; 
+  font-size: var(--font-paragraph-small--size);
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
+  text-align: left;
+  width: 100%;
+}
+
+/* Retire le fond de l'image */
+
+.media-fit-contain :is(img, .deferred-media__poster-image)
+{
+  background-color: #e7dcca !important;
+ /* border-radius: 10px; */
+}
+
+/* Force slideshow slides to display in column layout when caption is present */
+slideshow-slide:has(.product-media__caption) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Ensure the media container takes full width in column layout */
+slideshow-slide:has(.product-media__caption) .product-media-container {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Add gap between slides to prevent rendering artifacts */
+.media-gallery--carousel slideshow-slides {
+  gap: var(--gap-xs, 8px);
+}
+
+/* Adjust slide width to account for gap */
+.media-gallery--carousel slideshow-slide {
+  flex-shrink: 0;
+}
+
+/* Force carousel slides to fit content height */
+.media-gallery--carousel slideshow-slide {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: unset !important;
+  align-self: flex-start !important;
+}
+
+.media-gallery--carousel .product-media-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: unset !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.media-gallery--carousel slideshow-slides {
+  align-items: flex-start !important;
+}
+
+/* Product media background wrapper - fits image height with gray background */
+.product-media-bg-wrapper {
+  display: inline-block;
+  background-color: #f5f5f5;
+  width: 100%;
+  height: auto !important;
+}
+
+.product-media-bg-wrapper .product-media {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  aspect-ratio: unset !important;
+}
+
+.product-media-bg-wrapper .product-media__image {
+  display: block;
+  width: 100%;
+  height: auto !important;
+}
+
+.product-media-container.media-fit-contain  {
+padding: 0;
+}
+
+.product-media-container.media-fit-contain img {
+  object-position: center center;
+  object-fit: auto;
+  height: 100%;  
+}
+
+.slideshow-controls__thumbnails-container
+{
+  height: auto;
+}
+
+.slideshow-controls__thumbnails .slideshow-control {
+  overflow: hidden;
+}
+
+.slideshow-controls__thumbnails {
+}
+
+.slideshow-controls__thumbnails {
+    & .slideshow-control {
+        &:is([aria-selected='true']) {
+
+        }
+    }
+}
+
+/* Vertical thumbnails (left/right position) - use original aspect ratio */
+@media screen and (min-width: 750px) {
+  slideshow-controls[thumbnails]:is([pagination-position='right'], [pagination-position='left']) .slideshow-controls__thumbnails .slideshow-control {
+    width: var(--thumbnail-width);
+    aspect-ratio: var(--aspect-ratio);
+  }
+
+  slideshow-controls[thumbnails]:is([pagination-position='right'], [pagination-position='left']) .slideshow-controls__thumbnails .slideshow-control img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--thumbnail-radius, var(--media-radius));
+  }
+}

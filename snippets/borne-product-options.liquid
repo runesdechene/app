@@ -1,0 +1,53 @@
+{%- doc -%}
+  Renders product variant options generically for the Borne kiosk.
+  Supports any number of options (Couleur, Taille, Modèle, etc.)
+  Uses swatch visuals when available, text buttons otherwise.
+
+  @param {object} product - The product object
+{%- enddoc -%}
+
+{%- if product.variants.size > 1 -%}
+  <script type="application/json" class="rdc-borne__variants-json">
+  [
+    {%- for variant in product.variants -%}
+      {
+        "id": {{ variant.id }},
+        "available": {{ variant.available }},
+        "options": {{ variant.options | json }},
+        "image": {% if variant.image %}"{{ variant.image | image_url: width: 600 }}"{% else %}null{% endif %}
+      }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+  </script>
+
+  {%- for option in product.options_with_values -%}
+    {%- assign option_index = forloop.index0 -%}
+    {%- assign has_swatches = false -%}
+    {%- for value in option.values -%}
+      {%- if value.swatch.image != blank or value.swatch.color != blank -%}
+        {%- assign has_swatches = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    <div class="rdc-borne__option-group" data-option-index="{{ option_index }}">
+      <h3 class="rdc-borne__option-label">{{ option.name }} <span class="rdc-borne__option-selected-value"></span></h3>
+      <div class="rdc-borne__swatches{% if has_swatches %} rdc-borne__swatches--visual{% else %} rdc-borne__swatches--text{% endif %}">
+        {%- for value in option.values -%}
+          <button class="rdc-borne__swatch{% if has_swatches %} rdc-borne__swatch--visual{% else %} rdc-borne__swatch--text{% endif %}"
+            data-option-index="{{ option_index }}"
+            data-value="{{ value.name | escape }}"
+          >
+            {%- if value.swatch.image != blank -%}
+              <img src="{{ value.swatch.image | image_url: width: 60 }}" alt="{{ value.name }}" loading="lazy">
+            {%- elsif value.swatch.color != blank -%}
+              <span class="rdc-borne__swatch-color" style="background: rgb({{ value.swatch.color.rgb }});"></span>
+            {%- else -%}
+              {{ value.name }}
+            {%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endfor -%}
+{%- endif -%}

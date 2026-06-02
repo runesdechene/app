@@ -1,0 +1,18 @@
+{
+  "session_id": "session-2026-04-14-2350",
+  "started": "2026-04-14T21:50:12.056Z",
+  "files_read": {
+    "C:/Users/uriel/.claude/CLAUDE.md": {
+      "count": 1,
+      "tokens": 643,
+      "first_read": "2026-04-14T21:53:09.961Z"
+    }
+  },
+  "files_written": [],
+  "edit_counts": {},
+  "anatomy_hits": 1,
+  "anatomy_misses": 0,
+  "repeated_reads_warned": 0,
+  "cerebrum_warnings": 0,
+  "stop_count": 6
+}

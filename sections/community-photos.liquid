@@ -1,0 +1,712 @@
+{% comment %}
+  Section "Ils nous portent" — Galerie photos communautaires (v2 Instagram-style)
+  Récupère les photos approuvées depuis Supabase via l'API RPC get_approved_photos_by_tag.
+  
+  Features :
+  - Grid portrait 2/3
+  - Overlay dégradé blur sombre avec infos discrètes
+  - Mini-carrousel par carte (swipe entre photos)
+  - Location au lieu de email/taille
+{% endcomment %}
+
+<style>
+  .community-photos {
+    padding: 1rem 40px 5rem 40px;
+  } 
+
+  .community-photos--page-width {
+    max-width: 1440px;
+    margin: auto;
+  }
+
+  @media (max-width: 1520px) {
+    .community-photos {
+      padding-inline: 80px;
+    }
+  }
+
+    @media (max-width: 990px) {
+    .community-photos {
+      padding-inline: 70px;
+    }
+  }
+
+      @media (max-width: 798px) {
+    .community-photos {
+      padding-inline: 10px;
+    }
+  }
+
+  .community-photos--full-width {
+    max-width: none;
+    padding-inline: 40px;
+  }
+
+  .community-photos__header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .community-photos__title {
+    font-size: 2.4rem;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.04em;
+  }
+
+  .community-photos__subtitle {
+    font-size: 1rem;
+    color: #6b4c3b;
+  }
+
+  .community-photos__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--community-photos-columns, 3), 1fr);
+    gap: 12px;
+  }
+
+  /* --- Card --- */
+  .community-photos__card {
+    position: relative;
+    overflow: hidden;
+    background: #111;
+    aspect-ratio: 2 / 3;
+  }
+
+  /* --- Carousel interne --- */
+  .community-photos__carousel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .community-photos__carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .community-photos__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .community-photos__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .community-photos__card:hover .community-photos__slide img {
+    transform: scale(1.05);
+  }
+
+  /* Dots indicateur */
+  .community-photos__dots {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 5px;
+    z-index: 3;
+  }
+
+  .community-photos__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    transition: background 0.25s, transform 0.25s;
+  }
+
+  .community-photos__dot.active {
+    background: #fff;
+    transform: scale(1.25);
+  }
+
+  /* Flèches carrousel — chevrons visibles au hover */
+  .community-photos__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-70%);
+    z-index: 4;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .community-photos__card:hover .community-photos__nav {
+    opacity: 1;
+  }
+
+  .community-photos__nav:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .community-photos__nav:focus { outline: none; }
+
+  .community-photos__nav svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .community-photos__nav--prev { left: 6px; }
+  .community-photos__nav--next { right: 6px; }
+
+  /* Masquer les flèches sur mobile (swipe natif) */
+  @media (hover: none) {
+    .community-photos__nav { display: none; }
+  }
+
+  /* --- Overlay dégradé blur --- */
+  .community-photos__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 14px 14px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 55%, transparent 100%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+  }
+
+  .community-photos__overlay > * {
+    pointer-events: auto;
+  }
+
+  .community-photos__name {
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: #fff;
+    line-height: 1.2;
+    font-family: var(--font-heading--family);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .community-photos__instagram {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.15s;
+    font-family: var(--font-body--family);
+  }
+
+  .community-photos__instagram:hover {
+    color: #fff;
+  }
+
+  .community-photos__location {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .community-photos__location svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+
+  .community-photos__product {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.12);
+    padding: 6px 12px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    width: fit-content;
+    font-family: var(--font-accent--family);
+  }
+
+  .community-photos__product:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+  }
+
+  .community-photos__product svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  .community-photos__message {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    line-height: 1.4;
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* --- Lightbox --- */
+  .community-photos__lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.92);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .community-photos__lightbox.active {
+    display: flex;
+  }
+
+  .community-photos__lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .community-photos__lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+    line-height: 1;
+  }
+
+  .community-photos__lightbox-close:hover {
+    opacity: 1;
+  }
+
+  /* --- States --- */
+  .community-photos__loading,
+  .community-photos__empty {
+    text-align: center;
+    padding: 3rem;
+    color: #8b6f5e;
+    font-size: 0.95rem;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 900px) {
+    .community-photos__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .community-photos__card {
+      aspect-ratio: 1.5 / 3;
+    }
+  }
+
+  @media (max-width: 798px) {
+
+    .community-photos__grid {
+      gap: 6px;
+    }
+
+    .community-photos__title {
+      font-size: 1.8rem;
+    }
+
+    .community-photos__card {
+      border-radius: 10px;
+    }
+
+    .community-photos__overlay {
+      padding: 30px 10px 10px;
+    }
+
+    .community-photos__name {
+      font-size: 0.78rem;
+    }
+      
+    .community-photos__message {
+      font-size: 0.72rem;
+    }
+  }
+</style>
+
+<div class="community-photos community-photos--{{ section.settings.section_width }}" id="community-photos-{{ section.id }}" style="--community-photos-columns: {{ section.settings.columns_desktop }};">
+  {% if section.settings.title != blank or section.settings.subtitle != blank %}
+    <div class="community-photos__header">
+      {% if section.settings.title != blank %}
+        <h2 class="community-photos__title">{{ section.settings.title }}</h2>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="community-photos__subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="community-photos__loading" id="community-photos-loading-{{ section.id }}">
+    Chargement des photos...
+  </div>
+
+  <div class="community-photos__grid" id="community-photos-grid-{{ section.id }}" style="display: none;"></div>
+
+  <div class="community-photos__empty" id="community-photos-empty-{{ section.id }}" style="display: none;">
+    Aucune photo pour le moment.
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="community-photos__lightbox" id="community-photos-lightbox-{{ section.id }}">
+  <button class="community-photos__lightbox-close" aria-label="Fermer">&#x2715;</button>
+  <img id="community-photos-lightbox-img-{{ section.id }}" src="" alt="" />
+</div>
+
+<script>
+  (function() {
+    var SUPABASE_URL = {{ section.settings.supabase_url | json }};
+    var SUPABASE_KEY = {{ section.settings.supabase_anon_key | json }};
+    var TAG_NAME = {{ section.settings.tag_name | json }};
+    var SECTION_ID = {{ section.id | json }};
+
+    var gridEl = document.getElementById('community-photos-grid-' + SECTION_ID);
+    var loadingEl = document.getElementById('community-photos-loading-' + SECTION_ID);
+    var emptyEl = document.getElementById('community-photos-empty-' + SECTION_ID);
+    var lightboxEl = document.getElementById('community-photos-lightbox-' + SECTION_ID);
+    var lightboxImg = document.getElementById('community-photos-lightbox-img-' + SECTION_ID);
+    var lightboxClose = lightboxEl.querySelector('.community-photos__lightbox-close');
+
+    /* --- Lightbox --- */
+    function openLightbox(url) {
+      lightboxImg.src = url;
+      lightboxEl.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightboxEl.classList.remove('active');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxEl.addEventListener('click', function(e) {
+      if (e.target === lightboxEl) closeLightbox();
+    });
+
+    if (!SUPABASE_URL || !SUPABASE_KEY || !TAG_NAME) {
+      loadingEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      emptyEl.textContent = 'Configuration manquante. Renseignez les paramètres de la section.';
+      return;
+    }
+
+    fetch(SUPABASE_URL + '/rest/v1/rpc/get_approved_photos_by_tag', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      },
+      body: JSON.stringify({ p_tag_name: TAG_NAME })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      loadingEl.style.display = 'none';
+
+      if (!data || data.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      /* Group by submission id */
+      var submissions = {};
+      data.forEach(function(row) {
+        if (!submissions[row.id]) {
+          submissions[row.id] = {
+            id: row.id,
+            name: row.submitter_name,
+            instagram: row.submitter_instagram,
+            location: row.location_name || '',
+            location_zip: row.location_zip || '',
+            product_worn: row.product_worn || '',
+            message: row.message,
+            created_at: row.created_at,
+            images: []
+          };
+        }
+        if (row.image_url) {
+          submissions[row.id].images.push({
+            url: row.image_url,
+            order: row.image_sort_order || 0
+          });
+        }
+      });
+
+      var sorted = Object.values(submissions).sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      gridEl.style.display = 'grid';
+
+      sorted.forEach(function(sub) {
+        /* Shuffle images randomly */
+        for (var si = sub.images.length - 1; si > 0; si--) {
+          var sj = Math.floor(Math.random() * (si + 1));
+          var tmp = sub.images[si];
+          sub.images[si] = sub.images[sj];
+          sub.images[sj] = tmp;
+        }
+        if (!sub.images.length) return;
+
+        var card = document.createElement('div');
+        card.className = 'community-photos__card';
+
+        var html = '';
+
+        /* Carousel */
+        html += '<div class="community-photos__carousel">';
+        sub.images.forEach(function(img) {
+          html += '<div class="community-photos__slide">';
+          html += '<img src="' + img.url + '" alt="Photo de ' + (sub.name || 'la communauté').replace(/"/g, '&quot;') + '" loading="lazy" />';
+          html += '</div>';
+        });
+        html += '</div>';
+
+        /* Dots (only if multiple images) */
+        if (sub.images.length > 1) {
+          html += '<div class="community-photos__dots">';
+          sub.images.forEach(function(_, i) {
+            html += '<span class="community-photos__dot' + (i === 0 ? ' active' : '') + '"></span>';
+          });
+          html += '</div>';
+          html += '<button class="community-photos__nav community-photos__nav--prev" aria-label="Photo précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>';
+          html += '<button class="community-photos__nav community-photos__nav--next" aria-label="Photo suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button>';
+        }
+
+        /* Overlay */
+        html += '<div class="community-photos__overlay">';
+        if (sub.name || sub.instagram) {
+          html += '<div class="community-photos__name">';
+          if (sub.name) {
+            html += sub.name;
+          }
+          if (sub.instagram) {
+            var handle = sub.instagram.replace('@', '');
+            html += '<a class="community-photos__instagram" href="https://instagram.com/' + handle + '" target="_blank" rel="noopener">@' + handle + '</a>';
+          }
+          html += '</div>';
+        }
+        if (sub.location) {
+          html += '<span class="community-photos__location">';
+          html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+          html += sub.location + (sub.location_zip ? ' (' + sub.location_zip + ')' : '');
+          html += '</span>';
+        }
+        if (sub.product_worn) {
+          html += '<button class="community-photos__product" data-search-term="' + sub.product_worn.replace(/"/g, '&quot;') + '">';
+          html += '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+          html += sub.product_worn;
+          html += '</button>';
+        }
+        if (sub.message) {
+          html += '<p class="community-photos__message">' + sub.message + '</p>';
+        }
+        html += '</div>';
+
+        card.innerHTML = html;
+        gridEl.appendChild(card);
+
+        /* --- Wire up carousel & lightbox per card --- */
+        var carousel = card.querySelector('.community-photos__carousel');
+        var dots = card.querySelectorAll('.community-photos__dot');
+        var slides = card.querySelectorAll('.community-photos__slide');
+        var currentIdx = 0;
+
+        var prevBtn = card.querySelector('.community-photos__nav--prev');
+        var nextBtn = card.querySelector('.community-photos__nav--next');
+
+        function updateNavVisibility() {
+          if (prevBtn) prevBtn.style.display = currentIdx <= 0 ? 'none' : '';
+          if (nextBtn) nextBtn.style.display = currentIdx >= slides.length - 1 ? 'none' : '';
+        }
+
+        function goTo(idx) {
+          if (idx < 0 || idx >= slides.length) return;
+          currentIdx = idx;
+          slides[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+          dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+          updateNavVisibility();
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', function(e) { e.stopPropagation(); goTo(currentIdx - 1); });
+        if (nextBtn) nextBtn.addEventListener('click', function(e) { e.stopPropagation(); goTo(currentIdx + 1); });
+        updateNavVisibility();
+
+        /* Scroll-snap sync dots */
+        if (dots.length > 1) {
+          var scrollTimer;
+          carousel.addEventListener('scroll', function() {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(function() {
+              var scrollLeft = carousel.scrollLeft;
+              var width = carousel.offsetWidth;
+              var newIdx = Math.round(scrollLeft / width);
+              if (newIdx !== currentIdx && newIdx >= 0 && newIdx < slides.length) {
+                currentIdx = newIdx;
+                dots.forEach(function(d, i) { d.classList.toggle('active', i === currentIdx); });
+                updateNavVisibility();
+              }
+            }, 60);
+          });
+        }
+
+        /* Tap image → lightbox */
+        slides.forEach(function(slide, i) {
+          slide.addEventListener('click', function() {
+            openLightbox(sub.images[i].url);
+          });
+        });
+      });
+    })
+    .catch(function(err) {
+      console.error('Community photos error:', err);
+      loadingEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+    });
+    /* --- Product button → open search modal with pre-filled term --- */
+    gridEl.addEventListener('click', function(e) {
+      var btn = e.target.closest('.community-photos__product');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      var term = btn.dataset.searchTerm || '';
+      var searchModal = document.querySelector('#search-modal');
+      if (searchModal) {
+        /* Open the dialog */
+        var dialog = searchModal.querySelector('dialog');
+        if (dialog && typeof dialog.showModal === 'function' && !dialog.open) {
+          dialog.showModal();
+        } else if (typeof searchModal.showDialog === 'function') {
+          searchModal.showDialog();
+        }
+
+        setTimeout(function() {
+          var input = searchModal.querySelector('.search-input, input[type="search"]');
+          if (input) {
+            /* Use native setter to properly trigger framework reactivity */
+            var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+            nativeSetter.call(input, term);
+            input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: term }));
+            input.focus();
+          }
+        }, 250);
+      } else {
+        window.location.href = '/search?q=' + encodeURIComponent(term);
+      }
+    });
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Galerie communautaire",
+  "tag": "section",
+  "class": "section-community-photos",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Largeur de la section",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Pleine largeur"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Colonnes (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre",
+      "default": "Ils nous portent"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "Découvrez notre communauté en Runes de Chêne"
+    },
+    {
+      "type": "text",
+      "id": "tag_name",
+      "label": "Nom du tag",
+      "info": "Le tag utilisé dans le Hub pour filtrer les photos (ex: ils-nous-portent)",
+      "default": "ils-nous-portent"
+    },
+    {
+      "type": "text",
+      "id": "supabase_url",
+      "label": "URL Supabase",
+      "info": "L'URL de votre projet Supabase (ex: https://xxxxx.supabase.co)"
+    },
+    {
+      "type": "text",
+      "id": "supabase_anon_key",
+      "label": "Clé Supabase (anon)",
+      "info": "La clé publique anon de votre projet Supabase"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Galerie communautaire"
+    }
+  ]
+}
+{% endschema %}

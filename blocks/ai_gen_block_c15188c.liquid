@@ -1,0 +1,624 @@
+{% doc %}
+  @prompt
+    Je souhaiterais une section comprenant deux carrés, ces deux carrés doivent :
+    Prendre le meme espacement sur PC.
+    Avoir une image de fond
+    Un titre
+    Un bouton avec lien pour renvoi de page
+    Un overlay
+    
+    La section doit être la plus personnalisable possible.
+    Voici les éléments qui doivent se retrouver personnalisés :
+    
+    - Fond
+    - Overlay
+    - Texte
+    - Elements du bouton
+    - Taille/Largeur/GAP/Padding des carrés
+    - Largeur/Hauteur de la section
+    - Margin de la section.
+    
+    
+    Important : les carrés sur format mobile doivent se retouvés EMPILES et prenant chacun La largeur totale de la section (modifiable également dynamiquement), Je souhaiterais uue la modification de l'overlay sois différente selon la carte (pas qu'elles aient le même overlay quoi)
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-dual-cards-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    margin-top: {{ block.settings.section_margin_top }}px;
+    margin-bottom: {{ block.settings.section_margin_bottom }}px;
+    padding: {{ block.settings.section_padding_top }}px {{ block.settings.section_padding_horizontal }}px {{ block.settings.section_padding_bottom }}px;
+    background-color: {{ block.settings.section_background }};
+  }
+
+  .ai-dual-cards-container-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.cards_gap }}px;
+    max-width: {{ block.settings.section_max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-dual-card-{{ ai_gen_id }} {
+    position: relative;
+    flex: 1;
+    min-height: {{ block.settings.card_height }}px;
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: {{ block.settings.content_vertical_alignment }};
+    align-items: {{ block.settings.content_horizontal_alignment }};
+    padding: {{ block.settings.card_padding }}px;
+  }
+
+  .ai-dual-card-background-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .ai-dual-card-overlay-1-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.card_1_overlay_color }};
+    opacity: {{ block.settings.card_1_overlay_opacity | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  .ai-dual-card-overlay-2-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ block.settings.card_2_overlay_color }};
+    opacity: {{ block.settings.card_2_overlay_opacity | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  .ai-dual-card-content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 3;
+    text-align: {{ block.settings.text_alignment }};
+    max-width: 100%;
+  }
+
+  .ai-dual-card-title-{{ ai_gen_id }} {
+    color: {{ block.settings.title_color }};
+    font-size: {{ block.settings.title_font_size }}px;
+    margin: 0 0 {{ block.settings.title_margin_bottom }}px;
+    font-weight: {{ block.settings.title_font_weight }};
+  }
+
+  .ai-dual-card-button-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: {{ block.settings.button_font_weight }};
+    transition: all 0.3s ease;
+    border: {{ block.settings.button_border_width }}px solid {{ block.settings.button_border_color }};
+  }
+
+  .ai-dual-card-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-dual-cards-container-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-dual-card-{{ ai_gen_id }} {
+      width: {{ block.settings.mobile_card_width }}%;
+      min-height: {{ block.settings.mobile_card_height }}px;
+    }
+
+    .ai-dual-card-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_title_font_size }}px;
+    }
+
+    .ai-dual-card-button-{{ ai_gen_id }} {
+      font-size: {{ block.settings.mobile_button_font_size }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-dual-cards-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-dual-cards-container-{{ ai_gen_id }}">
+    <div class="ai-dual-card-{{ ai_gen_id }}">
+      {% if block.settings.card_1_image %}
+        <img
+          src="{{ block.settings.card_1_image | image_url: width: 1200 }}"
+          alt="{{ block.settings.card_1_image.alt | escape }}"
+          class="ai-dual-card-background-{{ ai_gen_id }}"
+          loading="lazy"
+          width="{{ block.settings.card_1_image.width }}"
+          height="{{ block.settings.card_1_image.height }}"
+        >
+      {% endif %}
+      <div class="ai-dual-card-overlay-1-{{ ai_gen_id }}"></div>
+      <div class="ai-dual-card-content-{{ ai_gen_id }}">
+        {% if block.settings.card_1_title != blank %}
+          <h2 class="ai-dual-card-title-{{ ai_gen_id }}">{{ block.settings.card_1_title }}</h2>
+        {% endif %}
+        {% if block.settings.card_1_button_text != blank %}
+          <a href="{{ block.settings.card_1_button_link }}" class="ai-dual-card-button-{{ ai_gen_id }}">
+            {{ block.settings.card_1_button_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ai-dual-card-{{ ai_gen_id }}">
+      {% if block.settings.card_2_image %}
+        <img
+          src="{{ block.settings.card_2_image | image_url: width: 1200 }}"
+          alt="{{ block.settings.card_2_image.alt | escape }}"
+          class="ai-dual-card-background-{{ ai_gen_id }}"
+          loading="lazy"
+          width="{{ block.settings.card_2_image.width }}"
+          height="{{ block.settings.card_2_image.height }}"
+        >
+      {% endif %}
+      <div class="ai-dual-card-overlay-2-{{ ai_gen_id }}"></div>
+      <div class="ai-dual-card-content-{{ ai_gen_id }}">
+        {% if block.settings.card_2_title != blank %}
+          <h2 class="ai-dual-card-title-{{ ai_gen_id }}">{{ block.settings.card_2_title }}</h2>
+        {% endif %}
+        {% if block.settings.card_2_button_text != blank %}
+          <a href="{{ block.settings.card_2_button_link }}" class="ai-dual-card-button-{{ ai_gen_id }}">
+            {{ block.settings.card_2_button_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Deux cartes",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "label": "Largeur maximale",
+      "min": 600,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "color",
+      "id": "section_background",
+      "label": "Couleur de fond",
+      "default": "#f4eee1"
+    },
+    {
+      "type": "range",
+      "id": "section_margin_top",
+      "label": "Marge supérieure",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_margin_bottom",
+      "label": "Marge inférieure",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding supérieur",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding inférieur",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "section_padding_horizontal",
+      "label": "Padding horizontal",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Cartes"
+    },
+    {
+      "type": "range",
+      "id": "cards_gap",
+      "label": "Espacement entre cartes",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_height",
+      "label": "Hauteur (desktop)",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_height",
+      "label": "Hauteur (mobile)",
+      "min": 150,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "label": "Largeur mobile",
+      "min": 80,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "card_padding",
+      "label": "Padding interne",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "label": "Arrondi des coins",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Alignement du contenu"
+    },
+    {
+      "type": "select",
+      "id": "content_vertical_alignment",
+      "label": "Alignement vertical",
+      "options": [
+        { "value": "flex-start", "label": "Haut" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Bas" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_horizontal_alignment",
+      "label": "Alignement horizontal",
+      "options": [
+        { "value": "flex-start", "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "flex-end", "label": "Droite" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Alignement du texte",
+      "options": [
+        { "value": "left", "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right", "label": "Droite" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Titre"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Taille (desktop)",
+      "min": 16,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "mobile_title_font_size",
+      "label": "Taille (mobile)",
+      "min": 14,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Graisse",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom",
+      "label": "Marge inférieure",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Bouton"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Fond",
+      "default": "#f4d694"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Fond au survol",
+      "default": "#e1d9cb"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Texte",
+      "default": "#623c3c"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Texte au survol",
+      "default": "#202219"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Bordure",
+      "default": "#f4d694"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Bordure au survol",
+      "default": "#e1d9cb"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Épaisseur bordure",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Taille (desktop)",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "mobile_button_font_size",
+      "label": "Taille (mobile)",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "button_font_weight",
+      "label": "Graisse",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Padding vertical",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Padding horizontal",
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Arrondi",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Carte 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_1_image",
+      "label": "Image de fond"
+    },
+    {
+      "type": "text",
+      "id": "card_1_title",
+      "label": "Titre",
+      "default": "Première carte"
+    },
+    {
+      "type": "text",
+      "id": "card_1_button_text",
+      "label": "Texte du bouton",
+      "default": "Découvrir"
+    },
+    {
+      "type": "url",
+      "id": "card_1_button_link",
+      "label": "Lien du bouton"
+    },
+    {
+      "type": "color",
+      "id": "card_1_overlay_color",
+      "label": "Couleur overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "card_1_overlay_opacity",
+      "label": "Opacité overlay",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Carte 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_2_image",
+      "label": "Image de fond"
+    },
+    {
+      "type": "text",
+      "id": "card_2_title",
+      "label": "Titre",
+      "default": "Deuxième carte"
+    },
+    {
+      "type": "text",
+      "id": "card_2_button_text",
+      "label": "Texte du bouton",
+      "default": "Découvrir"
+    },
+    {
+      "type": "url",
+      "id": "card_2_button_link",
+      "label": "Lien du bouton"
+    },
+    {
+      "type": "color",
+      "id": "card_2_overlay_color",
+      "label": "Couleur overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "card_2_overlay_opacity",
+      "label": "Opacité overlay",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Deux cartes"
+    }
+  ]
+}
+{% endschema %}

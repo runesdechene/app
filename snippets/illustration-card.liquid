@@ -1,0 +1,273 @@
+{%- doc -%}
+  Illustration Card Snippet
+  
+  Displays a card with ONE product from a collection.
+  The product can be random or the first one.
+  
+  @param {object} collection - The collection to get a product from
+  @param {boolean} random_product - Whether to pick a random product
+  @param {boolean} show_collection_title - Show the collection title
+  @param {boolean} show_product_title - Show the product title
+  @param {boolean} show_price - Show the product price
+  @param {object} section - The section object
+{%- enddoc -%}
+
+{% liquid
+  assign selected_product = nil
+  assign selected_image = nil
+  assign onboarding = false
+  assign eligible_count = 0
+  
+  if collection != blank and collection.products.size > 0
+    # First pass: count eligible products (those with at least one image with CUSTOM alt - not auto-filled by Shopify)
+    # Shopify auto-fills image.alt with product title if empty, so we check if alt is different from product title
+    for product in collection.products
+      for image in product.images
+        if image.alt != blank and image.alt != '' and image.alt != product.title
+          assign eligible_count = eligible_count | plus: 1
+          break
+        endif
+      endfor
+    endfor
+    
+    if eligible_count > 0
+      # Pick which eligible product to select
+      if random_product
+        assign target_index = 'now' | date: '%S' | modulo: eligible_count
+      else
+        assign target_index = 0
+      endif
+      
+      # Second pass: find the nth eligible product
+      assign current_eligible_index = 0
+      for product in collection.products
+        assign product_has_real_image = false
+        assign product_real_image = nil
+        
+        for image in product.images
+          if image.alt != blank and image.alt != '' and image.alt != product.title
+            assign product_has_real_image = true
+            assign product_real_image = image
+            break
+          endif
+        endfor
+        
+        if product_has_real_image
+          if current_eligible_index == target_index
+            assign selected_product = product
+            assign selected_image = product_real_image
+            break
+          endif
+          assign current_eligible_index = current_eligible_index | plus: 1
+        endif
+      endfor
+    else
+      # No eligible products - fallback to collection image
+      assign selected_image = collection.image
+      assign use_collection_fallback = true
+    endif
+  else
+    assign onboarding = true
+  endif
+%}
+
+{% liquid
+  # Get the linked Illustrations metaobject from the collection
+  # Try different possible namespace/key combinations
+  assign illustration_metaobject = nil
+  assign summary = nil
+  
+  # Try custom.illustrations
+  if collection.metafields.custom.illustrations.value != blank
+    assign illustration_metaobject = collection.metafields.custom.illustrations.value
+  elsif collection.metafields.custom.illustrations != blank
+    assign illustration_metaobject = collection.metafields.custom.illustrations
+  endif
+  
+  if illustration_metaobject != blank
+    assign summary = illustration_metaobject.resume
+  endif
+%}
+
+<div class="illustration-card" style="--image-height: {{ image_height | default: 30 }}vh;">
+  <a 
+    class="illustration-card__link"
+    {% if use_collection_fallback or selected_product == blank %}
+      href="{{ collection.url }}"
+    {% else %}
+      href="{{ selected_product.url }}"
+    {% endif %}
+  >
+    <div class="illustration-card__image">
+      {% if selected_image != blank %}
+        {{ selected_image | image_url: width: 600 | image_tag: 
+          alt: selected_image.alt | default: collection.title, 
+          loading: 'lazy', 
+          class: 'illustration-card__img'
+        }}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </div>
+    
+    <div class="illustration-card__content">
+      <div class="illustration-card__header">
+        {% if show_collection_title and collection != blank %}
+          <h3 class="illustration-card__collection-title illustration-card__collection-title--{{ title_size | default: 'md' }}">{{ collection.title }}</h3>
+        {% elsif show_collection_title and onboarding %}
+          <h3 class="illustration-card__collection-title illustration-card__collection-title--{{ title_size | default: 'md' }}">{{ 'placeholders.collection_title' | t }}</h3>
+        {% endif %}
+        
+        {% comment %} Pilules avec infos du métaobjet Produits (via champ Base) {% endcomment %}
+        {% if selected_product != blank %}
+          {% assign product_meta = selected_product.metafields.custom.base.value %}
+          {% if product_meta != blank %}
+            <div class="illustration-card__pills">
+              {% if product_meta.coupe != blank %}
+                <span class="illustration-card__pill">Coupe {{ product_meta.coupe }}</span>
+              {% endif %}
+              {% if product_meta.tissu != blank %}
+                {% assign tissu_value = product_meta.tissu | split: '' | first %}
+                {% if tissu_value == '[' %}
+                  {% assign tissu_value = product_meta.tissu | remove: '["' | remove: '"]' | remove: '"' %}
+                {% else %}
+                  {% assign tissu_value = product_meta.tissu %}
+                {% endif %}
+                <span class="illustration-card__pill">{{ tissu_value }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+      
+      {% if show_summary and summary != blank %}
+        <p class="illustration-card__summary">{{ summary }}</p>
+      {% endif %}
+      
+      {% if show_product_title and selected_product != blank %}
+        <p class="illustration-card__product-title">{{ selected_product.title }}</p>
+      {% elsif show_product_title and onboarding %}
+        <p class="illustration-card__product-title">{{ 'placeholders.product_title' | t }}</p>
+      {% endif %}
+      
+      {% if show_price %}
+        <p class="illustration-card__price">
+          {% if use_collection_fallback %}
+            Voir toute la collection
+          {% elsif selected_product != blank %}
+            {{ selected_product.price | money }}
+          {% else %}
+            {{ 2999 | money }}
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </a>
+</div>
+
+{% stylesheet %}
+  .illustration-card {
+    position: relative;
+    overflow: hidden;
+    flex: 1 1 var(--card-width-small);
+  }
+  
+  .illustration-card__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
+  }
+  
+  .illustration-card__link:hover {
+    transform: translateY(-4px);
+  }
+  
+  .illustration-card__image {
+    position: relative;
+    height: var(--image-height, 30vh);
+    overflow: hidden;
+    background: rgb(var(--color-foreground-rgb) / 0.05);
+  }
+  
+  .illustration-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+  .illustration-card__image svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .illustration-card__content {
+    padding-top: var(--padding-sm);
+    text-align: left;
+  }
+  
+  .illustration-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .illustration-card__collection-title {
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 4px 0;
+    flex: 1;
+  }
+  
+  .illustration-card__collection-title--sm {
+    font-size: var(--font-size--h4);
+  }
+  
+  .illustration-card__collection-title--md {
+    font-size: var(--font-size--h3);
+  }
+  
+  .illustration-card__collection-title--lg {
+    font-size: var(--font-size--h2);
+  }
+  
+  .illustration-card__collection-title--xl {
+    font-size: var(--font-size--h1);
+  }
+  
+  .illustration-card__product-title {
+    font-size: var(--font-size-sm);
+    color: var(--color-foreground-secondary);
+    margin: 0 0 4px 0;
+  }
+  
+  .illustration-card__summary {
+    font-size: var(--font-size-sm);
+    color: var(--color-foreground-secondary);
+    margin: 0 0 4px 0;
+  }
+  
+  .illustration-card__price {
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.6;
+  }
+  
+  .illustration-card__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  
+  .illustration-card__pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: rgb(var(--color-foreground-rgb) / 0.6);
+    background: rgb(var(--color-foreground-rgb) / 0.08);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+{% endstylesheet %}

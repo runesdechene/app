@@ -1,0 +1,241 @@
+{%- liquid
+  assign desktop_image = section.settings.image
+  assign mobile_image  = section.settings.image_mobile | default: desktop_image
+  assign link_url      = section.settings.link_url
+  assign overlay_on    = section.settings.show_overlay
+  assign overlay_color = section.settings.overlay_color
+  assign overlay_opacity = section.settings.overlay_opacity | divided_by: 100.0
+-%}
+
+{%- style -%}
+  #hero-section-{{ section.id }} {
+    width: 100%;
+    background-color: {{ section.settings.bg_color }};
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Hauteur fixée dynamiquement */
+    height: {{ section.settings.desktop_height }}vh;
+  }
+
+  @media screen and (max-width: 749px) {
+    #hero-section-{{ section.id }} {
+      height: {{ section.settings.mobile_height }}vh;
+    }
+  }
+
+  /* Force le lien et la picture à prendre toute la hauteur */
+  #hero-section-{{ section.id }} .hero-section__link,
+  #hero-section-{{ section.id }} picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  #hero-section-{{ section.id }} .hero-section__img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    /* Mode Contain pur */
+    object-fit: contain; 
+  }
+
+  /* Overlay */
+  .hero-section__overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Contenu Texte */
+  .hero-section__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: {{ section.settings.content_padding }}px;
+    pointer-events: none;
+    z-index: 2;
+    gap: 0 !important;
+  }
+
+  .hero-section__content > * { pointer-events: auto; }
+
+  /* Positions */
+  .hero-section__content--top_left     { justify-content: flex-start; align-items: flex-start; }
+  .hero-section__content--top_center   { justify-content: flex-start; align-items: center; }
+  .hero-section__content--top_right    { justify-content: flex-start; align-items: flex-end; }
+  .hero-section__content--middle_left  { justify-content: center;      align-items: flex-start; }
+  .hero-section__content--middle_center { justify-content: center;     align-items: center; }
+  .hero-section__content--middle_right { justify-content: center;      align-items: flex-end; }
+  .hero-section__content--bottom_left   { justify-content: flex-end;    align-items: flex-start; }
+  .hero-section__content--bottom_center { justify-content: flex-end;   align-items: center; }
+  .hero-section__content--bottom_right  { justify-content: flex-end;    align-items: flex-end; }
+
+  /* Hard Reset Marges */
+  .hero-section__content h1, .hero-section__content h2, .hero-section__content p {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+{%- endstyle -%}
+
+<div class="hero-section" id="hero-section-{{ section.id }}">
+  {%- if link_url != blank -%}<a class="hero-section__link" href="{{ link_url }}">{%- else -%}<div class="hero-section__link">{%- endif -%}
+
+    {%- if desktop_image != blank -%}
+      <picture>
+        {%- if section.settings.image_mobile != blank -%}
+          <source media="(max-width: 749px)" srcset="{{ mobile_image | image_url: width: 800 }}">
+        {%- endif -%}
+        <img class="hero-section__img" 
+             src="{{ desktop_image | image_url: width: 2000 }}" 
+             alt="{{ desktop_image.alt }}" 
+             loading="eager" 
+             fetchpriority="high">
+      </picture>
+    {%- else -%}<div class="hero-section__placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>{%- endif -%}
+
+    {%- if overlay_on -%}<div class="hero-section__overlay" style="background-color: {{ overlay_color }}; opacity: {{ overlay_opacity }};"></div>{%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="hero-section__content hero-section__content--{{ section.settings.content_position }}">
+        {%- for block in section.blocks -%}
+          {%- style -%}
+            .block-{{ block.id }} {
+              {% if block.type != 'button' %}
+                max-width: {{ block.settings.max_width }}% !important;
+                margin-top: {{ block.settings.m_t }}px !important;
+                margin-bottom: {{ block.settings.m_b }}px !important;
+                margin-left: {{ block.settings.m_l }}px !important;
+                margin-right: {{ block.settings.m_r }}px !important;
+                padding-left: {{ block.settings.p_l }}px !important;
+                padding-right: {{ block.settings.p_r }}px !important;
+                color: {{ block.settings.text_color }} !important;
+                text-align: {{ section.settings.content_position | split: '_' | last }};
+              {% else %}
+                margin-top: {{ block.settings.m_t }}px !important;
+                margin-bottom: {{ block.settings.m_b }}px !important;
+              {% endif %}
+            }
+            .block-{{ block.id }}.hero-text {
+                font-size: {{ block.settings.font_size }}px !important;
+                line-height: 1.1 !important;
+            }
+            @media screen and (max-width: 749px) {
+                .block-{{ block.id }}.hero-text {
+                    font-size: {{ block.settings.font_size_mobile }}px !important;
+                }
+            }
+          {%- endstyle -%}
+
+          {%- case block.type -%}
+            {%- when 'heading' -%}
+              <{{ block.settings.heading_tag }} class="hero-section__heading hero-text block-{{ block.id }} {{ block.settings.heading_tag }}">
+                {{ block.settings.heading }}
+              </{{ block.settings.heading_tag }}>
+
+            {%- when 'subheading' -%}
+              <div class="hero-section__subheading hero-text block-{{ block.id }} rte">
+                {{ block.settings.subheading }}
+              </div>
+
+            {%- when 'button' -%}
+              <a class="hero-section__btn block-{{ block.id }}" href="{{ block.settings.btn_url }}" 
+                 style="background: {% if block.settings.btn_style == 'primary' %}#000{% else %}transparent{% endif %}; 
+                        color: #fff; border: 2px solid #fff; padding: 12px 30px; text-decoration: none; font-weight: bold; display: inline-block;">
+                {{ block.settings.btn_label }}
+              </a>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  {%- if link_url != blank -%}</a>{%- else -%}</div>{%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Hero Pro Precision",
+  "tag": "section",
+  "settings": [
+    { "type": "header", "content": "Dimensions" },
+    { "type": "range", "id": "desktop_height", "label": "Hauteur Desktop (VH)", "min": 20, "max": 100, "step": 5, "default": 60 },
+    { "type": "range", "id": "mobile_height", "label": "Hauteur Mobile (VH)", "min": 20, "max": 100, "step": 5, "default": 50 },
+    { "type": "color", "id": "bg_color", "label": "Fond de zone", "default": "#000000" },
+    { "type": "header", "content": "Images" },
+    { "type": "image_picker", "id": "image", "label": "Image desktop" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Image mobile" },
+    { "type": "header", "content": "Overlay" },
+    { "type": "checkbox", "id": "show_overlay", "label": "Activer Overlay", "default": false },
+    { "type": "color", "id": "overlay_color", "label": "Couleur", "default": "#000000" },
+    { "type": "range", "id": "overlay_opacity", "label": "Opacité", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 30 },
+    { "type": "header", "content": "Contenu Texte" },
+    { "type": "select", "id": "content_position", "label": "Position", "options": [
+        { "value": "top_left", "label": "Haut gauche" }, { "value": "top_center", "label": "Haut centre" }, { "value": "top_right", "label": "Haut droite" },
+        { "value": "middle_left", "label": "Milieu gauche" }, { "value": "middle_center", "label": "Milieu centre" }, { "value": "middle_right", "label": "Milieu droite" },
+        { "value": "bottom_left", "label": "Bas gauche" }, { "value": "bottom_center", "label": "Bas centre" }, { "value": "bottom_right", "label": "Bas droite" }
+      ], "default": "middle_center" },
+    { "type": "range", "id": "content_padding", "label": "Padding global", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "url", "id": "link_url", "label": "Lien global" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Titre",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Texte", "default": "Titre Hero" },
+        { "type": "select", "id": "heading_tag", "label": "Balise", "options": [
+            { "value": "h1", "label": "H1" }, { "value": "h2", "label": "H2" }, { "value": "h3", "label": "H3" }
+          ], "default": "h1" },
+        { "type": "color", "id": "text_color", "label": "Couleur", "default": "#ffffff" },
+        { "type": "range", "id": "max_width", "label": "Largeur max (%)", "min": 10, "max": 100, "step": 5, "default": 100 },
+        { "type": "range", "id": "font_size", "label": "Taille Desktop", "min": 20, "max": 120, "step": 2, "unit": "px", "default": 60 },
+        { "type": "range", "id": "font_size_mobile", "label": "Taille Mobile", "min": 10, "max": 80, "step": 2, "unit": "px", "default": 32 },
+        { "type": "range", "id": "m_t", "label": "Marge Haut", "min": -50, "max": 100, "step": 2, "default": 0 },
+        { "type": "range", "id": "m_b", "label": "Marge Bas", "min": -50, "max": 100, "step": 2, "default": 10 },
+        { "type": "range", "id": "p_l", "label": "Padding G", "min": 0, "max": 100, "step": 2, "default": 0 },
+        { "type": "range", "id": "p_r", "label": "Padding D", "min": 0, "max": 100, "step": 2, "default": 0 }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Sous-titre",
+      "settings": [
+        { "type": "richtext", "id": "subheading", "label": "Texte", "default": "<p>Description Hero</p>" },
+        { "type": "color", "id": "text_color", "label": "Couleur", "default": "#ffffff" },
+        { "type": "range", "id": "max_width", "label": "Largeur max (%)", "min": 10, "max": 100, "step": 5, "default": 100 },
+        { "type": "range", "id": "font_size", "label": "Taille Desktop", "min": 10, "max": 60, "step": 1, "unit": "px", "default": 20 },
+        { "type": "range", "id": "font_size_mobile", "label": "Taille Mobile", "min": 8, "max": 40, "step": 1, "unit": "px", "default": 16 },
+        { "type": "range", "id": "m_t", "label": "Marge Haut (Gap)", "min": -50, "max": 100, "step": 2, "default": 0 },
+        { "type": "range", "id": "m_b", "label": "Marge Bas", "min": -50, "max": 100, "step": 2, "default": 0 },
+        { "type": "range", "id": "p_l", "label": "Padding G", "min": 0, "max": 100, "step": 2, "default": 0 },
+        { "type": "range", "id": "p_r", "label": "Padding D", "min": 0, "max": 100, "step": 2, "default": 0 }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Bouton",
+      "settings": [
+        { "type": "text", "id": "btn_label", "label": "Label", "default": "DÉCOUVRIR" },
+        { "type": "url", "id": "btn_url", "label": "Lien" },
+        { "type": "select", "id": "btn_style", "label": "Style", "options": [
+            { "value": "primary", "label": "Plein" }, { "value": "secondary", "label": "Contour" }
+          ], "default": "primary" },
+        { "type": "range", "id": "m_t", "label": "Marge Haut", "min": 0, "max": 100, "step": 2, "default": 20 },
+        { "type": "range", "id": "m_b", "label": "Marge Bas", "min": 0, "max": 100, "step": 2, "default": 0 }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Hero Pro Precision", "blocks": [{ "type": "heading" }, { "type": "subheading" }, { "type": "button" }] }
+  ]
+}
+{% endschema %}

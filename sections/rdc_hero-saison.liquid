@@ -1,0 +1,1478 @@
+{%- comment -%}
+  rdc_hero-saison.liquid
+
+  Modal popup saisonnière de la home Boutique.
+  S'affiche au-dessus du contenu existant après X secondes.
+  Spec : docs/superpowers/specs/2026-04-23-hero-saison-home-design.md
+{%- endcomment -%}
+
+{%- liquid
+  assign overlay_r = section.settings.overlay_color | color_extract: 'red'
+  assign overlay_g = section.settings.overlay_color | color_extract: 'green'
+  assign overlay_b = section.settings.overlay_color | color_extract: 'blue'
+  assign overlay_strength = section.settings.overlay_strength
+  assign overlay_blur = section.settings.overlay_blur
+  assign backdrop_r = section.settings.backdrop_color | color_extract: 'red'
+  assign backdrop_g = section.settings.backdrop_color | color_extract: 'green'
+  assign backdrop_b = section.settings.backdrop_color | color_extract: 'blue'
+  assign backdrop_strength = section.settings.backdrop_strength
+  assign backdrop_blur = section.settings.backdrop_blur
+  assign text_r = section.settings.text_color | color_extract: 'red'
+  assign text_g = section.settings.text_color | color_extract: 'green'
+  assign text_b = section.settings.text_color | color_extract: 'blue'
+  assign title_r = section.settings.title_color | color_extract: 'red'
+  assign title_g = section.settings.title_color | color_extract: 'green'
+  assign title_b = section.settings.title_color | color_extract: 'blue'
+  assign cta_primary_r = section.settings.cta_primary_color | color_extract: 'red'
+  assign cta_primary_g = section.settings.cta_primary_color | color_extract: 'green'
+  assign cta_primary_b = section.settings.cta_primary_color | color_extract: 'blue'
+  assign perk_1_r = section.settings.perk_1_color | color_extract: 'red'
+  assign perk_1_g = section.settings.perk_1_color | color_extract: 'green'
+  assign perk_1_b = section.settings.perk_1_color | color_extract: 'blue'
+  assign perk_2_r = section.settings.perk_2_color | color_extract: 'red'
+  assign perk_2_g = section.settings.perk_2_color | color_extract: 'green'
+  assign perk_2_b = section.settings.perk_2_color | color_extract: 'blue'
+  assign ken_burns_class = ''
+  if section.settings.enable_ken_burns
+    assign ken_burns_class = ' rdc-hero__media--ken-burns'
+  endif
+  assign popup_delay = section.settings.popup_delay | default: 3
+  assign popup_storage_key = section.settings.popup_storage_key | default: 'rdc_hero_seen'
+  assign popup_show_once = section.settings.popup_show_once
+  assign modal_max_width = section.settings.modal_max_width | default: 820
+  assign modal_padding_block = section.settings.modal_padding_block | default: 60
+  assign modal_padding_inline = section.settings.modal_padding_inline | default: 40
+  assign taglines_max_width = section.settings.taglines_max_width | default: 480
+-%}
+
+{%- if section.settings.reopen_enable -%}
+  <button type="button" class="rdc-hero__reopen" data-rdc-hero-reopen data-rdc-hero-target="RdcHeroSaison-{{ section.id }}" aria-label="Rouvrir la popup" style="--rdc-hero-cta-primary-rgb: {{ cta_primary_r }}, {{ cta_primary_g }}, {{ cta_primary_b }}; --rdc-hero-cta-primary-color: rgb({{ cta_primary_r }}, {{ cta_primary_g }}, {{ cta_primary_b }});">
+    {%- if section.settings.reopen_image != blank -%}
+      {{ section.settings.reopen_image | image_url: width: 200 | image_tag: alt: '', class: 'rdc-hero__reopen-img', loading: 'lazy' }}
+    {%- else -%}
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="5" y="2" width="14" height="20" rx="2.5" ry="2.5"></rect>
+        <line x1="12" y1="18.5" x2="12.01" y2="18.5"></line>
+      </svg>
+    {%- endif -%}
+  </button>
+{%- endif -%}
+
+<div
+  id="RdcHeroSaison-{{ section.id }}"
+  class="rdc-hero color-{{ section.settings.color_scheme }}"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="RdcHeroSaison-title-{{ section.id }}"
+  aria-hidden="true"
+  data-popup-delay="{{ popup_delay }}"
+  data-popup-storage-key="{{ popup_storage_key }}"
+  data-popup-show-once="{{ popup_show_once }}"
+  style="--rdc-hero-overlay-rgb: {{ overlay_r }}, {{ overlay_g }}, {{ overlay_b }}; --rdc-hero-overlay-strength: {{ overlay_strength }}; --rdc-hero-overlay-blur: {{ overlay_blur }}px; --rdc-hero-backdrop-rgb: {{ backdrop_r }}, {{ backdrop_g }}, {{ backdrop_b }}; --rdc-hero-backdrop-strength: {{ backdrop_strength }}; --rdc-hero-backdrop-blur: {{ backdrop_blur }}px; --rdc-hero-modal-max-width: {{ modal_max_width }}px; --rdc-hero-modal-padding-block: {{ modal_padding_block }}px; --rdc-hero-modal-padding-inline: {{ modal_padding_inline }}px; --rdc-hero-text-rgb: {{ text_r }}, {{ text_g }}, {{ text_b }}; --rdc-hero-text-color: rgb({{ text_r }}, {{ text_g }}, {{ text_b }}); --rdc-hero-title-color: rgb({{ title_r }}, {{ title_g }}, {{ title_b }}); --rdc-hero-cta-primary-rgb: {{ cta_primary_r }}, {{ cta_primary_g }}, {{ cta_primary_b }}; --rdc-hero-cta-primary-color: rgb({{ cta_primary_r }}, {{ cta_primary_g }}, {{ cta_primary_b }}); --rdc-hero-taglines-max-width: {{ taglines_max_width }}px;"
+>
+  <div class="rdc-hero__backdrop" data-rdc-hero-close></div>
+
+  <div class="rdc-hero__modal" role="document">
+    <button
+      type="button"
+      class="rdc-hero__close"
+      aria-label="Fermer"
+      data-rdc-hero-close
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="rdc-hero__media{{ ken_burns_class }}">
+      {%- if section.settings.image_desktop != blank or section.settings.image_mobile != blank -%}
+        <picture>
+          {%- if section.settings.image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ section.settings.image_mobile | image_url: width: 600 }} 600w,
+                {{ section.settings.image_mobile | image_url: width: 900 }} 900w,
+                {{ section.settings.image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="100vw"
+              width="{{ section.settings.image_mobile.width }}"
+              height="{{ section.settings.image_mobile.height }}"
+            >
+          {%- endif -%}
+          {%- if section.settings.image_desktop != blank -%}
+            {{
+              section.settings.image_desktop
+              | image_url: width: 1920
+              | image_tag:
+                widths: '600, 900, 1200, 1600, 1920',
+                width: section.settings.image_desktop.width,
+                height: section.settings.image_desktop.height,
+                alt: section.settings.image_alt,
+                sizes: '(min-width: 750px) 90vw, 100vw',
+                loading: 'eager',
+                class: 'rdc-hero__image'
+            }}
+          {%- elsif section.settings.image_mobile != blank -%}
+            {{
+              section.settings.image_mobile
+              | image_url: width: 1200
+              | image_tag:
+                widths: '600, 900, 1200',
+                width: section.settings.image_mobile.width,
+                height: section.settings.image_mobile.height,
+                alt: section.settings.image_alt,
+                sizes: '100vw',
+                loading: 'eager',
+                class: 'rdc-hero__image'
+            }}
+          {%- endif -%}
+        </picture>
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'rdc-hero__image rdc-hero__image--placeholder' }}
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.frame_image != blank or section.settings.frame_image_mobile != blank -%}
+      <div class="rdc-hero__frame" style="--rdc-hero-frame-opacity: {{ section.settings.frame_opacity | default: 100 | divided_by: 100.0 }};" aria-hidden="true">
+        <picture>
+          {%- if section.settings.frame_image_mobile != blank -%}
+            <source
+              media="(max-width: 749px)"
+              srcset="
+                {{ section.settings.frame_image_mobile | image_url: width: 600 }} 600w,
+                {{ section.settings.frame_image_mobile | image_url: width: 900 }} 900w,
+                {{ section.settings.frame_image_mobile | image_url: width: 1200 }} 1200w
+              "
+              sizes="100vw"
+              width="{{ section.settings.frame_image_mobile.width }}"
+              height="{{ section.settings.frame_image_mobile.height }}"
+            >
+          {%- endif -%}
+          {%- if section.settings.frame_image != blank -%}
+            {{
+              section.settings.frame_image
+              | image_url: width: 1920
+              | image_tag:
+                widths: '600, 900, 1200, 1600, 1920',
+                width: section.settings.frame_image.width,
+                height: section.settings.frame_image.height,
+                alt: '',
+                sizes: '(min-width: 750px) 90vw, 100vw',
+                loading: 'eager',
+                class: 'rdc-hero__frame-img'
+            }}
+          {%- elsif section.settings.frame_image_mobile != blank -%}
+            {{
+              section.settings.frame_image_mobile
+              | image_url: width: 1200
+              | image_tag:
+                widths: '600, 900, 1200',
+                width: section.settings.frame_image_mobile.width,
+                height: section.settings.frame_image_mobile.height,
+                alt: '',
+                sizes: '100vw',
+                loading: 'eager',
+                class: 'rdc-hero__frame-img'
+            }}
+          {%- endif -%}
+        </picture>
+      </div>
+    {%- endif -%}
+
+    <div class="rdc-hero__overlay" aria-hidden="true"></div>
+
+    <div class="rdc-hero__content">
+      <div class="rdc-hero__top">
+        {%- if section.settings.top_image != blank -%}
+          <div class="rdc-hero__top-image" style="--rdc-hero-top-image-max-width: {{ section.settings.top_image_max_width | default: 140 }}px;">
+            {{ section.settings.top_image | image_url: width: 600 | image_tag: alt: '', class: 'rdc-hero__top-image-img', loading: 'eager' }}
+          </div>
+        {%- endif -%}
+        {%- if section.settings.overline != blank -%}
+          <p class="rdc-hero__overline">{{ section.settings.overline | escape }}</p>
+        {%- endif -%}
+        {%- if section.settings.title != blank -%}
+          <h2 id="RdcHeroSaison-title-{{ section.id }}" class="rdc-hero__title">{{ section.settings.title | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <div class="rdc-hero__subtitle">{{ section.settings.subtitle }}</div>
+        {%- endif -%}
+        {%- if section.settings.pitch != blank -%}
+          <p class="rdc-hero__pitch">{{ section.settings.pitch | escape }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.perk_1_text != blank or section.settings.perk_2_text != blank -%}
+        <div class="rdc-hero__perks">
+          {%- if section.settings.perk_1_text != blank -%}
+            <span class="rdc-hero__perk" style="--perk-color: rgb({{ perk_1_r }}, {{ perk_1_g }}, {{ perk_1_b }}); --perk-rgb: {{ perk_1_r }}, {{ perk_1_g }}, {{ perk_1_b }};">
+              <svg class="rdc-hero__perk-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+              <span>{{ section.settings.perk_1_text | escape }}</span>
+            </span>
+          {%- endif -%}
+          {%- if section.settings.perk_2_text != blank -%}
+            <span class="rdc-hero__perk" style="--perk-color: rgb({{ perk_2_r }}, {{ perk_2_g }}, {{ perk_2_b }}); --perk-rgb: {{ perk_2_r }}, {{ perk_2_g }}, {{ perk_2_b }};">
+              <svg class="rdc-hero__perk-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+              <span>{{ section.settings.perk_2_text | escape }}</span>
+            </span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.cta_primary_label != blank or section.settings.cta_secondary_label != blank -%}
+        <div class="rdc-hero__ctas">
+          {%- if section.settings.cta_primary_label != blank -%}
+            <a
+              href="{{ section.settings.cta_primary_url | default: '#' }}"
+              class="rdc-hero__cta rdc-hero__cta--primary button"
+            >
+              <svg class="rdc-hero__cta-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="2" width="14" height="20" rx="2.5" ry="2.5"></rect>
+                <line x1="12" y1="18.5" x2="12.01" y2="18.5"></line>
+              </svg>
+              <span>{{ section.settings.cta_primary_label | escape }}</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.cta_secondary_label != blank -%}
+            <a
+              href="{{ section.settings.cta_secondary_url | default: '#' }}"
+              class="rdc-hero__cta rdc-hero__cta--secondary button button-secondary"
+            >
+              <span>{{ section.settings.cta_secondary_label | escape }}</span>
+              <svg class="rdc-hero__cta-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="rdc-hero__taglines" data-rdc-tagline-slideshow>
+          <div class="rdc-hero__taglines-track">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'tagline' -%}
+                <p class="rdc-hero__tagline rdc-hero__tagline--slide{% if forloop.first %} is-active{% endif %}"
+                   data-tagline-index="{{ forloop.index0 }}"
+                   {{ block.shopify_attributes }}>« {{ block.settings.text | escape }} »</p>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if section.blocks.size > 1 -%}
+            <div class="rdc-hero__taglines-dots" role="tablist" aria-label="Sélection des taglines">
+              {%- for block in section.blocks -%}
+                {%- if block.type == 'tagline' -%}
+                  <button type="button"
+                          class="rdc-hero__taglines-dot{% if forloop.first %} is-active{% endif %}"
+                          data-dot-index="{{ forloop.index0 }}"
+                          aria-label="Tagline {{ forloop.index }}"
+                          role="tab"
+                          aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"></button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .rdc-hero {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 3vw, 2rem);
+    color: var(--rdc-hero-text-color, #2a2418);
+    pointer-events: none;
+    background: transparent !important;
+  }
+
+  .rdc-hero-section,
+  .shopify-section:has(> .rdc-hero) {
+    background: transparent !important;
+  }
+
+  .rdc-hero.is-open {
+    display: flex;
+    pointer-events: auto;
+    animation: rdcHeroFadeIn 0.4s ease-out;
+    backdrop-filter: blur(var(--rdc-hero-backdrop-blur, 10px)) saturate(1.1);
+    -webkit-backdrop-filter: blur(var(--rdc-hero-backdrop-blur, 10px)) saturate(1.1);
+  }
+
+  @keyframes rdcHeroFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .rdc-hero__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(var(--rdc-hero-backdrop-rgb, 245, 240, 230));
+    opacity: calc(var(--rdc-hero-backdrop-strength, 40) / 100);
+    cursor: pointer;
+  }
+
+  /* Modal box : on garde l'ombre de la modal elle-même (sépare visuellement du backdrop). */
+  .rdc-hero__modal {
+    position: relative;
+    width: 100%;
+    max-width: var(--rdc-hero-modal-max-width, 820px);
+    height: auto;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35), 0 8px 16px rgba(0, 0, 0, 0.18);
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    animation: rdcHeroModalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes rdcHeroModalIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .rdc-hero__close {
+    position: absolute;
+    top: 0.875rem;
+    right: 0.875rem;
+    z-index: 10;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.55);
+    color: #d3cccc;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background 0.2s ease, transform 0.2s ease;
+    padding: 0;
+  }
+
+  .rdc-hero__close:hover {
+    background: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.8);
+    transform: scale(1.05);
+  }
+
+  .rdc-hero__close:focus-visible {
+    outline: 2px solid var(--rdc-hero-text-color, #2a2418);
+    outline-offset: 2px;
+  }
+
+  .rdc-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .rdc-hero__media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .rdc-hero__image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center;
+    display: block;
+    max-width: none !important;
+  }
+
+  .rdc-hero__media--ken-burns .rdc-hero__image {
+    animation: rdcHeroKenBurns 20s ease-in-out infinite alternate !important;
+    transform-origin: center center !important;
+    will-change: transform;
+  }
+
+  @keyframes rdcHeroKenBurns {
+    from { transform: scale(1.00); }
+    to   { transform: scale(1.18); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rdc-hero__media--ken-burns .rdc-hero__image,
+    .rdc-hero.is-open,
+    .rdc-hero__modal {
+      animation: none;
+    }
+  }
+
+  /* Frame image (parchemin déchiré PNG) : par-dessus l'image animée, statique */
+  .rdc-hero__frame {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: var(--rdc-hero-frame-opacity, 1);
+  }
+
+  .rdc-hero__frame picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .rdc-hero__frame-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+
+  .rdc-hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(
+        to top,
+        rgba(var(--rdc-hero-overlay-rgb), calc(var(--rdc-hero-overlay-strength) / 100)) 0%,
+        rgba(var(--rdc-hero-overlay-rgb), calc(var(--rdc-hero-overlay-strength) / 200)) 50%,
+        rgba(var(--rdc-hero-overlay-rgb), calc(var(--rdc-hero-overlay-strength) / 350)) 100%
+      );
+    backdrop-filter: blur(var(--rdc-hero-overlay-blur));
+    -webkit-backdrop-filter: blur(var(--rdc-hero-overlay-blur));
+    pointer-events: none;
+  }
+
+  .rdc-hero__content {
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-block: var(--rdc-hero-modal-padding-block, 60px);
+    padding-inline: var(--rdc-hero-modal-padding-inline, 40px);
+    gap: 1.25rem;
+    pointer-events: none;
+    text-align: left;
+  }
+
+  .rdc-hero__content > * {
+    pointer-events: auto;
+  }
+
+  .rdc-hero__top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 58%;
+    margin: 0;
+  }
+
+  .rdc-hero__top-image {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: var(--rdc-hero-top-image-max-width, 140px);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .rdc-hero__top-image-img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .rdc-hero__overline {
+    margin: 1.25rem 0 -0.8rem;
+    padding-top: 20px;
+    font-family: var(--font-heading--family);
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rdc-hero-text-color, #2a2418);
+    font-weight: 600;
+  }
+
+  .rdc-hero__title {
+    margin: 0;
+    font-family: var(--font-heading--family);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: 0.005em;
+    font-weight: 700;
+    color: var(--rdc-hero-title-color, var(--rdc-hero-text-color, #2a2418));
+    text-wrap: balance;
+  }
+
+  .rdc-hero__subtitle {
+    margin-top: 0.5rem;
+    font-family: var(--font-body--family);
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    line-height: 1.55;
+    color: var(--rdc-hero-text-color, #2a2418);
+    opacity: 0.92;
+    max-width: 540px;
+    font-weight: 400;
+  }
+
+  .rdc-hero__subtitle > * {
+    margin: 0;
+  }
+
+  .rdc-hero__pitch {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    color: var(--rdc-hero-text-color, #2a2418);
+    max-width: 540px;
+    font-weight: 600;
+  }
+
+  /* Perks : 2 gélules colorées au-dessus des CTAs, expliquent les bonus dans l'app */
+  .rdc-hero__perks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .rdc-hero__perk {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.4rem 0.8rem;
+    font-family: var(--font-body--family);
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--perk-color, #c8956b);
+    background-color: rgba(var(--perk-rgb, 200, 149, 107), 0.14);
+    border: 1.5px solid rgba(var(--perk-rgb, 200, 149, 107), 0.4);
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+
+  .rdc-hero__perk-icon {
+    flex-shrink: 0;
+  }
+
+  .rdc-hero__ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* CTAs : couleurs sombres, background uniforme (pas de gradient = pas de flash au hover) */
+  .rdc-hero__cta {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 52px;
+    padding: 0.875rem 2rem !important;
+    font-family: var(--font-body--family);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px !important;
+    border: 1.5px solid transparent;
+    background-color: transparent;
+    transition: transform 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    line-height: 1.2;
+  }
+
+  .rdc-hero__cta-icon {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .rdc-hero__cta--primary {
+    background-color: var(--rdc-hero-cta-primary-color, var(--rdc-hero-text-color, #2a2418)) !important;
+    color: #fff !important;
+    border-color: var(--rdc-hero-cta-primary-color, var(--rdc-hero-text-color, #2a2418)) !important;
+  }
+
+  .rdc-hero__cta--primary:hover {
+    background-color: rgba(var(--rdc-hero-cta-primary-rgb, var(--rdc-hero-text-rgb, 42, 36, 24)), 0.85) !important;
+    border-color: rgba(var(--rdc-hero-cta-primary-rgb, var(--rdc-hero-text-rgb, 42, 36, 24)), 0.85) !important;
+    transform: translateY(-2px);
+  }
+
+  .rdc-hero__cta--primary:hover .rdc-hero__cta-icon {
+    transform: translateY(-1px);
+  }
+
+  .rdc-hero__cta--secondary {
+    background-color: transparent !important;
+    color: var(--rdc-hero-text-color, #2a2418) !important;
+    border-color: var(--rdc-hero-text-color, #2a2418) !important;
+  }
+
+  .rdc-hero__cta--secondary:hover {
+    background-color: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.08) !important;
+    transform: translateY(-2px);
+  }
+
+  .rdc-hero__cta--secondary:hover .rdc-hero__cta-icon {
+    transform: translateX(3px);
+  }
+
+  /* Slideshow taglines */
+  .rdc-hero__taglines {
+    position: relative;
+    margin: 0.75rem 0 0;
+    width: 100%;
+    max-width: var(--rdc-hero-taglines-max-width, 480px);
+  }
+
+  .rdc-hero__taglines-track {
+    position: relative;
+    min-height: 1.6em;
+  }
+
+  .rdc-hero__tagline {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-style: italic;
+    font-size: clamp(0.8rem, 1vw, 0.95rem);
+    color: var(--rdc-hero-text-color, #2a2418);
+    max-width: var(--rdc-hero-taglines-max-width, 480px);
+  }
+
+  .rdc-hero__tagline--slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .rdc-hero__tagline--slide.is-active {
+    opacity: 0.85;
+    position: relative;
+    pointer-events: auto;
+  }
+
+  .rdc-hero__taglines-dots {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+    align-items: center;
+  }
+
+  .rdc-hero__taglines-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.25);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .rdc-hero__taglines-dot:hover {
+    background: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.55);
+    transform: scale(1.15);
+  }
+
+  .rdc-hero__taglines-dot.is-active {
+    background: rgba(var(--rdc-hero-text-rgb, 42, 36, 24), 0.85);
+  }
+
+  .rdc-hero__taglines-dot:focus-visible {
+    outline: 2px solid var(--rdc-hero-text-color, #2a2418);
+    outline-offset: 2px;
+  }
+
+  /* Mobile : affiche cinématique. Image Friedrich plein écran en fond,
+     overlay noir dégradé (fort en bas), texte blanc aligné bas d'écran. */
+  @media screen and (max-width: 749px) {
+
+      .rdc-hero__taglines-dot {
+      background: rgba(150,150,150,0.5);
+    }
+
+  .rdc-hero__taglines-dot.is-active {
+      background: rgba(190,190,190,0.9);
+    }
+
+
+    .rdc-hero {
+      padding: 0;
+      z-index: 2147483647; /* max int 32-bit, passe au-dessus de tout (chat Shopify inclus) */
+    }
+
+    .rdc-hero__modal {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-height: none;
+      border-radius: 0;
+      box-shadow: none;
+      display: block;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      background-color: #0a0804;
+    }
+
+    /* Image fixée au viewport : reste en fond même quand le contenu scroll */
+    .rdc-hero__media {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .rdc-hero__media img {
+      object-position: center center;
+    }
+
+    /* Parchemin masqué sur mobile */
+    .rdc-hero__frame {
+      display: none;
+    }
+
+    /* Overlay fixe, uniforme sur toute la hauteur du viewport */
+    .rdc-hero__overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: rgba(54, 42, 42, 0.5);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    /* Contenu aligné haut, texte commence dès le haut de l'écran */
+    .rdc-hero__content {
+      position: relative;
+      inset: auto;
+      z-index: 5;
+      padding: 0.5rem 1.25rem 2.5rem;
+      min-height: 100vh;
+      min-height: 100dvh;
+      justify-content: flex-start;
+      pointer-events: auto;
+      margin-top: 0;
+      max-width: 100vw;
+      box-sizing: border-box;
+    }
+
+    /* Close : translucide blanc, fixed viewport */
+    .rdc-hero__close {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      top: 1rem;
+      right: 1rem;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .rdc-hero__close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Tous les textes en blanc, sans ombre (overlay uniforme suffit) */
+    .rdc-hero__overline,
+    .rdc-hero__title,
+    .rdc-hero__subtitle,
+    .rdc-hero__subtitle *,
+    .rdc-hero__pitch,
+    .rdc-hero__tagline {
+      color: #fff !important;
+    }
+
+    .rdc-hero__title {
+      font-size: 2.6rem;
+    }
+
+    .rdc-hero__overline {
+      font-size: 1.5rem;
+      letter-spacing: 0.15em;
+      margin: 0 0 -0.25rem;
+      opacity: 0.92;
+    }
+
+    .rdc-hero__top {
+      max-width: 100%;
+      gap: 10px;
+    }
+
+    .rdc-hero__subtitle {
+      font-size: 1rem;
+      text-align: left;
+    }
+
+    /* Perks : pastilles translucides blanches */
+    .rdc-hero__perk {
+      background-color: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #fff;
+    }
+
+    /* CTA primaire : inversé, fond blanc sur cinématique sombre */
+    .rdc-hero__cta--primary {
+      background-color: #fff !important;
+      color: #1a1410 !important;
+      border-color: #fff !important;
+      padding: 0.875rem 1rem !important;
+      font-size: 0.95rem;
+      min-height: 48px;
+    }
+
+    .rdc-hero__cta--primary:hover {
+      background-color: rgba(255, 255, 255, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    /* CTA secondaire : transparent, bordure + texte blanc */
+    .rdc-hero__cta--secondary {
+      background-color: transparent !important;
+      color: #fff !important;
+      border-color: rgba(255, 255, 255, 0.75) !important;
+      padding: 0.875rem 1rem !important;
+      font-size: 0.95rem;
+      min-height: 48px;
+    }
+
+    .rdc-hero__cta--secondary:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border-color: #fff !important;
+    }
+  }
+
+  /* Macaron flottant — bas-gauche, fixed, permet de rouvrir la modal */
+  .rdc-hero__reopen {
+    position: fixed;
+    bottom: 2.25rem;
+    left: 2.25rem;
+    z-index: 9998;
+    width: 104px;
+    height: 104px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--rdc-hero-cta-primary-color, var(--rdc-hero-text-color, #2a2418));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.05);
+    animation: rdcHeroReopenPulse 2.4s ease-in-out infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    pointer-events: auto;
+  }
+
+  .rdc-hero__reopen:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation-play-state: paused;
+  }
+
+  .rdc-hero__reopen-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+
+  @keyframes rdcHeroReopenPulse {
+    0%, 100% { box-shadow: 0 6px 24px rgba(199, 114, 114, 0.25), 0 0 0 0 rgba(var(--rdc-hero-cta-primary-rgb, 42, 36, 24), 0.4); }
+    50%      { box-shadow: 0 6px 24px rgba(197, 39, 39, 0.25), 0 0 0 14px rgba(var(--rdc-hero-cta-primary-rgb, 42, 36, 24), 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rdc-hero__reopen { animation: none; }
+  }
+
+  /* Cacher le macaron quand la modal est ouverte */
+  body:has(.rdc-hero.is-open) .rdc-hero__reopen {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  /* Mobile : macaron un peu plus petit, plus serré au bord */
+  @media screen and (max-width: 749px) {
+    .rdc-hero__reopen {
+      width: 56px;
+      height: 56px;
+      bottom: 1rem;
+      left: 1rem;
+    }
+  }
+
+  /* Masquer le chat Shopify Inbox (et variantes) quand la popup est ouverte */
+  body:has(.rdc-hero.is-open) #shopify-chat,
+  body:has(.rdc-hero.is-open) [id^="shopify-chat"],
+  body:has(.rdc-hero.is-open) [id^="shopify-inbox"],
+  body:has(.rdc-hero.is-open) shopify-chat,
+  body:has(.rdc-hero.is-open) iframe[name*="shopify_inbox"],
+  body:has(.rdc-hero.is-open) iframe[src*="shopify_inbox"] {
+    display: none !important;
+  }
+
+  /* Theme editor : forcer l'affichage en design mode pour pouvoir éditer la modal */
+  .shopify-section[data-shopify-editor-active] .rdc-hero,
+  .rdc-hero[data-shopify-design-mode="true"] {
+    display: flex;
+    pointer-events: auto;
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    var modal = document.getElementById('RdcHeroSaison-{{ section.id }}');
+    if (!modal) {
+      console.warn('[rdc-hero] modal element not found');
+      return;
+    }
+
+    var delay = parseFloat(modal.getAttribute('data-popup-delay')) || 0;
+    var storageKey = modal.getAttribute('data-popup-storage-key') || 'rdc_hero_seen';
+    var showOnce = modal.getAttribute('data-popup-show-once') === 'true';
+
+    var savedScrollY = 0;
+
+    function lockBodyScroll() {
+      savedScrollY = window.scrollY || window.pageYOffset || 0;
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + savedScrollY + 'px';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    }
+
+    function unlockBodyScroll() {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      window.scrollTo(0, savedScrollY);
+    }
+
+    function open() {
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.addEventListener('keydown', onKey);
+      lockBodyScroll();
+    }
+
+    function close(markSeen) {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', onKey);
+      unlockBodyScroll();
+      if (markSeen && showOnce) {
+        try { localStorage.setItem(storageKey, '1'); } catch (e) {}
+      }
+    }
+
+    function onKey(e) {
+      if (e.key === 'Escape') close(false);
+    }
+
+    modal.querySelectorAll('[data-rdc-hero-close]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var markSeen = el.classList.contains('rdc-hero__close');
+        close(markSeen);
+      });
+    });
+
+    // Macaron de réouverture (placé hors du .rdc-hero, donc on le cherche dans le DOM global)
+    var reopenBtn = document.querySelector('[data-rdc-hero-reopen][data-rdc-hero-target="' + modal.id + '"]');
+    if (reopenBtn) {
+      reopenBtn.addEventListener('click', function () {
+        try { localStorage.removeItem(storageKey); } catch (e) {}
+        open();
+      });
+    }
+
+    // Tagline slideshow : auto-rotation 4s + dots cliquables
+    var slideshow = modal.querySelector('[data-rdc-tagline-slideshow]');
+    if (slideshow) {
+      var slides = slideshow.querySelectorAll('.rdc-hero__tagline--slide');
+      var dots = slideshow.querySelectorAll('.rdc-hero__taglines-dot');
+      var current = 0;
+      var slideInterval = null;
+      var ROTATION_MS = 4000;
+
+      function showSlide(index) {
+        slides.forEach(function (s, i) { s.classList.toggle('is-active', i === index); });
+        dots.forEach(function (d, i) {
+          d.classList.toggle('is-active', i === index);
+          d.setAttribute('aria-selected', i === index ? 'true' : 'false');
+        });
+        current = index;
+      }
+
+      function nextSlide() { showSlide((current + 1) % slides.length); }
+
+      if (slides.length > 1) {
+        slideInterval = setInterval(nextSlide, ROTATION_MS);
+
+        dots.forEach(function (dot, i) {
+          dot.addEventListener('click', function () {
+            clearInterval(slideInterval);
+            showSlide(i);
+            slideInterval = setInterval(nextSlide, ROTATION_MS);
+          });
+        });
+      }
+    }
+
+    var inEditor = window.Shopify && window.Shopify.designMode;
+    if (inEditor) {
+      open();
+      return;
+    }
+
+    if (showOnce) {
+      try {
+        if (localStorage.getItem(storageKey)) return;
+      } catch (e) {}
+    }
+
+    if (delay > 0) {
+      setTimeout(open, delay * 1000);
+    } else {
+      open();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "RDC Hero saison",
+  "tag": "section",
+  "class": "rdc-hero-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Comportement de la popup"
+    },
+    {
+      "type": "checkbox",
+      "id": "reopen_enable",
+      "label": "Afficher le macaron flottant de réouverture",
+      "default": true,
+      "info": "Petit bouton circulaire fixé en bas-gauche de l'écran pour rouvrir la popup à tout moment."
+    },
+    {
+      "type": "image_picker",
+      "id": "reopen_image",
+      "label": "Image du macaron (PNG/SVG circulaire)",
+      "info": "Si vide, affiche une icône smartphone par défaut. Recommandé : image carrée ou ronde, ~200x200px."
+    },
+    {
+      "type": "range",
+      "id": "popup_delay",
+      "label": "Délai avant apparition",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 3,
+      "unit": "s",
+      "info": "Secondes avant que la popup apparaisse au chargement de la page."
+    },
+    {
+      "type": "checkbox",
+      "id": "popup_show_once",
+      "label": "Ne plus afficher après fermeture",
+      "default": true,
+      "info": "Si coché : la popup ne se réaffiche pas pour un visiteur qui l'a fermée."
+    },
+    {
+      "type": "text",
+      "id": "popup_storage_key",
+      "label": "Clé localStorage",
+      "default": "rdc_hero_seen_summer_2026",
+      "info": "Changez cette clé à chaque saison pour réafficher la popup à tous."
+    },
+    {
+      "type": "header",
+      "content": "Image — Bureau (paysage)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Image desktop"
+    },
+    {
+      "type": "header",
+      "content": "Image — Mobile (portrait)"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Image mobile"
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Texte alternatif (accessibilité)",
+      "default": "Personne face aux montagnes"
+    },
+    {
+      "type": "header",
+      "content": "Frame parchemin (par-dessus l'image)"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_image",
+      "label": "PNG parchemin desktop (paysage)",
+      "info": "Image PNG superposée à l'image principale sur desktop. Doit avoir des zones transparentes pour révéler la photo derrière."
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_image_mobile",
+      "label": "PNG parchemin mobile (portrait)",
+      "info": "Image PNG dédiée au mobile. Si fournie, remplace le parchemin desktop sur mobile (sans rotation). Doit être préparée en orientation portrait."
+    },
+    {
+      "type": "range",
+      "id": "frame_opacity",
+      "label": "Opacité du parchemin",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Image au-dessus du contenu"
+    },
+    {
+      "type": "image_picker",
+      "id": "top_image",
+      "label": "Image affichée au-dessus du surtitre",
+      "info": "Centrée dans le bloc texte, juste au-dessus de « CET ÉTÉ, ». Optionnel."
+    },
+    {
+      "type": "range",
+      "id": "top_image_max_width",
+      "label": "Largeur max de l'image",
+      "min": 60,
+      "max": 320,
+      "step": 10,
+      "default": 140,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Contenu textuel"
+    },
+    {
+      "type": "text",
+      "id": "overline",
+      "label": "Surtitre (signature saisonnière)",
+      "default": "CET ÉTÉ,"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titre principal",
+      "default": "MARCHEZ DANS L'HISTOIRE."
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Sous-titre",
+      "default": "<p>Une marque française, une application, une Confrérie. Pour redécouvrir nos contrées.</p>"
+    },
+    {
+      "type": "text",
+      "id": "pitch",
+      "label": "Accroche chiffrée",
+      "default": "+ de 2600 lieux magiques, partout en France."
+    },
+    {
+      "type": "header",
+      "content": "Bonus dans l'application (gélules)"
+    },
+    {
+      "type": "text",
+      "id": "perk_1_text",
+      "label": "Gélule 1",
+      "default": "Un fragment acheté = un bonus"
+    },
+    {
+      "type": "text",
+      "id": "perk_2_text",
+      "label": "Gélule 2",
+      "default": "Un fragment = un titre débloqué"
+    },
+    {
+      "type": "color",
+      "id": "perk_1_color",
+      "label": "Couleur gélule 1",
+      "default": "#c8956b"
+    },
+    {
+      "type": "color",
+      "id": "perk_2_color",
+      "label": "Couleur gélule 2",
+      "default": "#7a8e6f"
+    },
+    {
+      "type": "header",
+      "content": "Boutons (CTA)"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "Bouton primaire — libellé",
+      "default": "Télécharger l'application"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Bouton primaire — URL"
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_label",
+      "label": "Bouton secondaire — libellé",
+      "default": "Découvrir les Fragments"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_url",
+      "label": "Bouton secondaire — URL"
+    },
+    {
+      "type": "header",
+      "content": "Taglines (slideshow)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Ajoutez plusieurs blocs « Tagline » via le bouton « Ajouter un bloc » en bas de cette section. Elles défileront automatiquement (4s par slide) avec des points de navigation."
+    },
+    {
+      "type": "range",
+      "id": "taglines_max_width",
+      "label": "Largeur max des taglines",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "default": 480,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Couleur du texte"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Couleur du texte (sous-titre, accroche, tagline)",
+      "default": "#2a2418",
+      "info": "Couleur générale du texte. Prévue pour fond clair (parchemin)."
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur du titre",
+      "default": "#2a2418",
+      "info": "Couleur dédiée au titre principal (« MARCHEZ DANS L'HISTOIRE. »). Permet un accent distinct."
+    },
+    {
+      "type": "color",
+      "id": "cta_primary_color",
+      "label": "Couleur du bouton primaire",
+      "default": "#2a2418",
+      "info": "Background du bouton « Télécharger l'application ». Texte du bouton reste blanc."
+    },
+    {
+      "type": "header",
+      "content": "Dimensions de la popup"
+    },
+    {
+      "type": "range",
+      "id": "modal_max_width",
+      "label": "Largeur max de la popup",
+      "min": 400,
+      "max": 1400,
+      "step": 20,
+      "default": 820,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "modal_padding_block",
+      "label": "Padding vertical (haut/bas)",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "default": 60,
+      "unit": "px",
+      "info": "Espace au-dessus et en-dessous du contenu."
+    },
+    {
+      "type": "range",
+      "id": "modal_padding_inline",
+      "label": "Padding horizontal (gauche/droite)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop (fond derrière la popup)"
+    },
+    {
+      "type": "color",
+      "id": "backdrop_color",
+      "label": "Couleur du backdrop",
+      "default": "#f5f0e6",
+      "info": "Parchemin clair par défaut."
+    },
+    {
+      "type": "range",
+      "id": "backdrop_strength",
+      "label": "Intensité du backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "backdrop_blur",
+      "label": "Flou du backdrop",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Apparence (overlay sur l'image dans la popup)"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Schéma de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Couleur de l'overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_strength",
+      "label": "Intensité de l'overlay",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "overlay_blur",
+      "label": "Flou (blur) sur l'image",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_ken_burns",
+      "label": "Activer animation Ken Burns (zoom lent)",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tagline",
+      "name": "Tagline",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texte de la tagline",
+          "default": "Le Pokémon Go du patrimoine."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "RDC Hero saison",
+      "category": "Custom RDC",
+      "blocks": [
+        {
+          "type": "tagline",
+          "settings": { "text": "Le Pokémon Go du patrimoine." }
+        },
+        {
+          "type": "tagline",
+          "settings": { "text": "L'Histoire à portée de pas." }
+        },
+        {
+          "type": "tagline",
+          "settings": { "text": "Une Confrérie, des contrées, une Rune." }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

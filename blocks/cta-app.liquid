@@ -1,0 +1,440 @@
+{%- style -%}
+  /* ============================================
+     RDC — Bloc App CTA (style pop-up)
+     ============================================ */
+
+  .rdc-app-cta-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    background-color: #1a1612;
+  }
+
+  /* --- Image de fond --- */
+  .rdc-app-cta-{{ section.id }} .rdc-app-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  /* --- Forme déchirée parchemin (overlay gauche) --- */
+  .rdc-app-cta-{{ section.id }} .rdc-app-parchment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    z-index: 2;
+    background: linear-gradient(
+      to right,
+      #f5f0e8 0%,
+      #f5f0e8 70%,
+      rgba(245, 240, 232, 0.95) 78%,
+      rgba(245, 240, 232, 0.7) 85%,
+      rgba(245, 240, 232, 0.3) 92%,
+      rgba(245, 240, 232, 0) 100%
+    );
+  }
+
+  /* Texture de bord déchiré via pseudo-élément */
+  .rdc-app-cta-{{ section.id }} .rdc-app-parchment::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -30px;
+    width: 60px;
+    height: 100%;
+    z-index: 3;
+    background: linear-gradient(
+      to right,
+      rgba(245, 240, 232, 0.4) 0%,
+      rgba(245, 240, 232, 0.15) 30%,
+      rgba(245, 240, 232, 0.05) 60%,
+      transparent 100%
+    );
+    filter: url(#rdc-torn-edge-{{ section.id }});
+  }
+
+  /* --- Bordure celtique haut/bas --- */
+  .rdc-app-cta-{{ section.id }} .rdc-celtic-border {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    z-index: 5;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 4px,
+      #c4a97d 4px,
+      #c4a97d 5px,
+      transparent 5px,
+      transparent 14px,
+      #c4a97d 14px,
+      #c4a97d 15px
+    );
+    opacity: 0.35;
+  }
+  .rdc-app-cta-{{ section.id }} .rdc-celtic-border.rdc-top { top: 0; }
+  .rdc-app-cta-{{ section.id }} .rdc-celtic-border.rdc-bottom { bottom: 0; }
+
+  /* --- Contenu texte --- */
+  .rdc-app-cta-{{ section.id }} .rdc-app-content {
+    position: relative;
+    z-index: 4;
+    max-width: 520px;
+    padding: 60px 40px 60px 60px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #c4943d;
+    margin-bottom: 8px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-eyebrow svg {
+    width: 18px;
+    height: 18px;
+    fill: #c4943d;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-title {
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin: 0 0 24px;
+    letter-spacing: -0.5px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-title .rdc-line-dark {
+    display: block;
+    color: #2c2420;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-title .rdc-line-brand {
+    display: block;
+    color: #8b2e2e;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-desc {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #4a4340;
+    margin: 0 0 12px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-app-desc-bold {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #2c2420;
+    font-weight: 600;
+    margin: 0 0 28px;
+  }
+
+  /* --- Boutons --- */
+  .rdc-app-cta-{{ section.id }} .rdc-app-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 340px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 28px;
+    background-color: #3d342e;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-primary:hover {
+    background-color: #2a2320;
+    transform: translateY(-1px);
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-primary svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 1.5;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background-color: #e6d6c0;
+    color: #3d342e;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-secondary:hover {
+    background-color: #d9c7ad;
+    transform: translateY(-1px);
+  }
+
+  .rdc-app-cta-{{ section.id }} .rdc-btn-secondary svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #3d342e;
+    stroke-width: 2;
+  }
+
+  /* --- Citation --- */
+  .rdc-app-cta-{{ section.id }} .rdc-app-quote {
+    margin-top: 28px;
+    font-size: 13px;
+    font-style: italic;
+    color: #8a7e76;
+    letter-spacing: 0.2px;
+  }
+
+  /* --- MOBILE --- */
+  @media screen and (max-width: 749px) {
+    .rdc-app-cta-{{ section.id }} {
+      min-height: auto;
+      flex-direction: column;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-parchment {
+      position: relative;
+      width: 100%;
+      height: auto;
+      background: #f5f0e8;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-parchment::after {
+      display: none;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-content {
+      padding: 40px 24px 44px;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-title {
+      font-size: 30px;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-buttons {
+      max-width: 100%;
+    }
+
+    .rdc-app-cta-{{ section.id }} .rdc-app-bg {
+      position: relative;
+      height: 260px;
+    }
+  }
+{%- endstyle -%}
+
+<!-- SVG filter pour le bord déchiré (invisible, juste un filtre) -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <filter id="rdc-torn-edge-{{ section.id }}">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="4" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
+
+<section class="rdc-app-cta-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <!-- Bordures celtiques -->
+  <div class="rdc-celtic-border rdc-top"></div>
+  <div class="rdc-celtic-border rdc-bottom"></div>
+
+  <!-- Image de fond -->
+  {%- if section.settings.bg_image != blank -%}
+    <img
+      src="{{ section.settings.bg_image | image_url: width: 1600 }}"
+      alt="{{ section.settings.bg_image.alt | default: 'Runes de Chêne' | escape }}"
+      class="rdc-app-bg"
+      loading="lazy"
+      width="{{ section.settings.bg_image.width }}"
+      height="{{ section.settings.bg_image.height }}"
+    >
+  {%- endif -%}
+
+  <!-- Overlay parchemin déchiré -->
+  <div class="rdc-app-parchment">
+    <div class="rdc-app-content">
+      <!-- Eyebrow -->
+      <div class="rdc-app-eyebrow">
+        <svg viewBox="0 0 24 24"><path d="M7 10l5-6 5 6M7 14l5 6 5-6"/></svg>
+        {{ section.settings.eyebrow_text }}
+      </div>
+
+      <!-- Titre -->
+      <h2 class="rdc-app-title">
+        <span class="rdc-line-dark">{{ section.settings.title_line_1 }}</span>
+        <span class="rdc-line-brand">{{ section.settings.title_line_2 }}</span>
+      </h2>
+
+      <!-- Description -->
+      <p class="rdc-app-desc">{{ section.settings.description_text }}</p>
+      <p class="rdc-app-desc-bold">{{ section.settings.description_bold }}</p>
+
+      <!-- Boutons -->
+      <div class="rdc-app-buttons">
+        {%- if section.settings.btn_primary_text != blank -%}
+          <a href="{{ section.settings.btn_primary_link }}" class="rdc-btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12" y2="18.01"/>
+            </svg>
+            {{ section.settings.btn_primary_text }}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.btn_secondary_text != blank -%}
+          <a href="{{ section.settings.btn_secondary_link }}" class="rdc-btn-secondary">
+            {{ section.settings.btn_secondary_text }}
+            <svg viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </a>
+        {%- endif -%}
+      </div>
+
+      <!-- Citation -->
+      {%- if section.settings.quote_text != blank -%}
+        <p class="rdc-app-quote">{{ section.settings.quote_text }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "RDC — App CTA",
+  "class": "rdc-app-cta-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Combinaison de couleurs"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinaison de couleurs",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "🖼️ Image de fond"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Image de fond (paysage recommandé)"
+    },
+    {
+      "type": "header",
+      "content": "📝 Textes"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_text",
+      "label": "Sur-titre (eyebrow)",
+      "default": "CET ÉTÉ, VIVEZ"
+    },
+    {
+      "type": "text",
+      "id": "title_line_1",
+      "label": "Titre — Ligne 1 (sombre)",
+      "default": "L'EXPÉRIENCE"
+    },
+    {
+      "type": "text",
+      "id": "title_line_2",
+      "label": "Titre — Ligne 2 (bordeaux)",
+      "default": "RUNES DE CHÊNE"
+    },
+    {
+      "type": "textarea",
+      "id": "description_text",
+      "label": "Description",
+      "default": "Une marque + Une application. L'une vous fait porter l'Histoire. La seconde vous la fait vivre."
+    },
+    {
+      "type": "textarea",
+      "id": "description_bold",
+      "label": "Description (accroche en gras)",
+      "default": "Explore + de 2600 lieux uniques, échange avec la communauté Runes de Chêne et participe à la Coupe des Héritages !"
+    },
+    {
+      "type": "text",
+      "id": "quote_text",
+      "label": "Citation en bas",
+      "default": "« Un mmorpg dans la vraie vie »"
+    },
+    {
+      "type": "header",
+      "content": "🔘 Bouton principal"
+    },
+    {
+      "type": "text",
+      "id": "btn_primary_text",
+      "label": "Texte",
+      "default": "Essayer l'application"
+    },
+    {
+      "type": "url",
+      "id": "btn_primary_link",
+      "label": "Lien",
+    },
+    {
+      "type": "header",
+      "content": "🔘 Bouton secondaire"
+    },
+    {
+      "type": "text",
+      "id": "btn_secondary_text",
+      "label": "Texte",
+      "default": "Retourner sur la boutique"
+    },
+    {
+      "type": "url",
+      "id": "btn_secondary_link",
+      "label": "Lien"
+    }
+  ],
+  "presets": [
+    {
+      "name": "RDC — App CTA"
+    }
+  ]
+}
+{% endschema %}

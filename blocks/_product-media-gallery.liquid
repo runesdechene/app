@@ -1,0 +1,847 @@
+{{ 'product-media-thumbnails.css' | asset_url | stylesheet_tag }}
+
+{% render 'product-media-gallery-content',
+  media_presentation: block.settings.media_presentation,
+  block_settings: block.settings,
+  block_id: block.id,
+  block_shopify_attributes: block.shopify_attributes
+%}
+
+<style>
+  /* ============================================================
+     MODAL ZOOM MOBILE — v4 FINALE
+     Cible la VRAIE structure :
+       dialog[open] > ul.dialog-zoomed-gallery > li > drag-zoom-wrapper > div.product-media > img
+     ============================================================ */
+  @media screen and (max-width: 749px) {
+
+    /* --- DIALOG : plein écran, fond crème --- */
+    dialog[open]:has(.dialog-zoomed-gallery) {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      background: #F4EEE1 !important;
+      z-index: 999999 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* Supprimer le backdrop par défaut du dialog */
+    dialog[open]:has(.dialog-zoomed-gallery)::backdrop {
+      background: #F4EEE1 !important;
+    }
+
+    /* --- THUMBNAILS en bas de la modal --- */
+    dialog[open] .dialog-thumbnails-list-container {
+      display: block !important;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      z-index: 10000001 !important;
+      background: #F4EEE1 !important;
+      padding: 12px 0 !important;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 15px) !important;
+      margin-bottom: 0 !important;
+      border-top: none !important;
+      box-shadow: none !important;
+      box-sizing: border-box !important;
+      overflow: visible !important;
+    }
+
+    dialog[open] .dialog-thumbnails-list {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      overflow-y: visible !important;
+      gap: 8px !important;
+      padding: 4px 16px !important;
+      scrollbar-width: none !important;
+      justify-content: center !important;
+      margin-bottom: 0 !important;
+      mask-image: none !important;
+      -webkit-mask-image: none !important;
+    }
+
+    dialog[open] .dialog-thumbnails-list::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    dialog[open] .dialog-thumbnails-list__thumbnail {
+      flex: 0 0 auto !important;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 8px !important;
+      overflow: visible !important;
+      border: 2px solid transparent !important;
+      padding: 0 !important;
+      opacity: 0.5 !important;
+      transition: opacity 0.2s ease, border-color 0.2s ease !important;
+    }
+
+    dialog[open] .dialog-thumbnails-list__thumbnail[aria-selected="true"] {
+      opacity: 1 !important;
+      border-color: #ECD6A5 !important;
+    }
+
+    dialog[open] .dialog-thumbnails-list__thumbnail img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
+      border-radius: 6px !important;
+      clip-path: none !important;
+      -webkit-clip-path: none !important;
+    }
+
+    /* --- UL GALLERY : scroll horizontal snap --- */
+    dialog[open] ul.dialog-zoomed-gallery,
+    dialog[open] .dialog-zoomed-gallery {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      scroll-snap-type: x mandatory !important;
+      -webkit-overflow-scrolling: touch !important;
+      scrollbar-width: none !important;
+      width: 100vw !important;
+      height: calc(100vh - 86px) !important;
+      height: calc(100dvh - 86px) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: 0 !important;
+      list-style: none !important;
+      flex: 1 !important;
+      box-sizing: border-box !important;
+    }
+
+    dialog[open] .dialog-zoomed-gallery::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    /* --- CHAQUE LI = 1 slide plein écran --- */
+    dialog[open] .dialog-zoomed-gallery > li,
+    dialog[open] .dialog-zoomed-gallery > li.product-media-container {
+      flex: 0 0 100vw !important;
+      min-width: 100vw !important;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: calc(100vh - 86px) !important;
+      height: calc(100dvh - 86px) !important;
+      scroll-snap-align: start !important;
+      scroll-snap-stop: always !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      background: #F4EEE1 !important;
+      position: relative !important;
+      touch-action: pan-x !important;
+      pointer-events: auto !important;
+    }
+
+    /* --- DRAG-ZOOM-WRAPPER : neutraliser le zoom drag natif --- */
+    dialog[open] .dialog-zoomed-gallery drag-zoom-wrapper,
+    dialog[open] .dialog-zoomed-gallery .product-media__drag-zoom-wrapper {
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      --drag-zoom-scale: 1 !important;
+      --drag-zoom-translate-x: 0px !important;
+      --drag-zoom-translate-y: 0px !important;
+      transform: none !important;
+      pointer-events: none !important;
+      touch-action: none !important;
+    }
+
+    /* --- DIV.PRODUCT-MEDIA : conteneur de l'image --- */
+    dialog[open] .dialog-zoomed-gallery .product-media {
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* --- IMAGE : format natif, centrée, sans crop --- */
+    dialog[open] .dialog-zoomed-gallery .product-media__image,
+    dialog[open] .dialog-zoomed-gallery .product-media img {
+      max-width: 92vw !important;
+      max-height: calc(100vh - 110px) !important;
+      max-height: calc(100dvh - 110px) !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+      display: block !important;
+      margin: auto !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+      pointer-events: none !important;
+      -webkit-user-drag: none !important;
+    }
+
+    /* --- BOUTON FERMER (X) --- */
+    dialog[open] .dialog-zoomed-gallery__close-button,
+    dialog[open] .close-button {
+      position: fixed !important;
+      top: 14px !important;
+      right: 14px !important;
+      z-index: 10000002 !important;
+      background: rgba(244, 238, 225, 0.75) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      color: #352D24 !important;
+      border: none !important;
+      border-radius: 50% !important;
+      width: 44px !important;
+      height: 44px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+    }
+
+    dialog[open] .dialog-zoomed-gallery__close-button svg,
+    dialog[open] .close-button svg {
+      color: #352D24 !important;
+      stroke: #352D24 !important;
+    }
+
+    /* ============================================================
+       FLÈCHES DE NAVIGATION (injectées par JS)
+       ============================================================ */
+    .rdc-nav-arrow {
+      position: fixed !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      z-index: 10000001 !important;
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 50% !important;
+      border: none !important;
+      background: #ECD6A5 !important;
+      color: #352D24 !important;
+      box-shadow: 0 2px 8px rgba(53, 45, 36, 0.15) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      -webkit-tap-highlight-color: transparent !important;
+      touch-action: manipulation !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transition: opacity 0.2s ease, transform 0.15s ease !important;
+    }
+
+    .rdc-nav-arrow--prev { left: 10px !important; }
+    .rdc-nav-arrow--next { right: 10px !important; }
+
+    .rdc-nav-arrow:active {
+      transform: translateY(-50%) scale(0.9) !important;
+      background: #e0c88e !important;
+    }
+
+    /* ============================================================
+       COMPTEUR (ex: 1 / 5)
+       ============================================================ */
+    .rdc-slide-counter {
+      display: none !important;
+      position: fixed !important;
+      bottom: 90px !important;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px) !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 10000001 !important;
+      background: rgba(53, 45, 36, 0.7) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      color: #F4EEE1 !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.5px !important;
+      padding: 6px 18px !important;
+      border-radius: 20px !important;
+      pointer-events: none !important;
+      white-space: nowrap !important;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    'use strict';
+
+    /* ==========================================================
+       MODAL ZOOM MOBILE — v4 FINALE
+       Cible : dialog[open] > ul.dialog-zoomed-gallery > li
+       ========================================================== */
+
+    var chevronLeft = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#352D24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+    var chevronRight = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#352D24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+    function cleanup() {
+      document.querySelectorAll('.rdc-nav-arrow, .rdc-slide-counter').forEach(function(el) {
+        el.remove();
+      });
+    }
+
+    function setup() {
+      /* Mobile uniquement */
+      if (window.innerWidth > 749) return;
+
+      /* Trouver le dialog ouvert */
+      var dialog = document.querySelector('dialog[open]');
+      if (!dialog) return;
+
+      /* Trouver la galerie */
+      var gallery = dialog.querySelector('ul.dialog-zoomed-gallery, .dialog-zoomed-gallery');
+      if (!gallery) return;
+
+      /* Nettoyage */
+      cleanup();
+
+      /* Récupérer les slides (li) */
+      var slides = Array.from(gallery.querySelectorAll(':scope > li'));
+      var total = slides.length;
+      if (total === 0) return;
+
+      var current = 0;
+
+      /* Désactiver le on:click="/close" sur les li pour ne pas fermer au tap */
+      slides.forEach(function(li) {
+        li.removeAttribute('on:click');
+        /* Neutraliser complètement le drag-zoom-wrapper */
+        var wrapper = li.querySelector('drag-zoom-wrapper');
+        if (wrapper) {
+          wrapper.style.setProperty('--drag-zoom-scale', '1', 'important');
+          wrapper.style.setProperty('--drag-zoom-translate-x', '0px', 'important');
+          wrapper.style.setProperty('--drag-zoom-translate-y', '0px', 'important');
+          wrapper.style.setProperty('touch-action', 'none', 'important');
+          wrapper.style.setProperty('pointer-events', 'none', 'important');
+        }
+        /* Neutraliser aussi les events sur l'image et le div.product-media */
+        var media = li.querySelector('.product-media');
+        if (media) {
+          media.style.setProperty('pointer-events', 'none', 'important');
+        }
+        var img = li.querySelector('img');
+        if (img) {
+          img.style.setProperty('pointer-events', 'none', 'important');
+          img.style.setProperty('-webkit-user-drag', 'none', 'important');
+        }
+        /* Le li lui-même doit capturer les touch events */
+        li.style.setProperty('touch-action', 'pan-x', 'important');
+        li.style.setProperty('pointer-events', 'auto', 'important');
+      });
+
+      /* --- Compteur --- */
+      var counter = document.createElement('div');
+      counter.className = 'rdc-slide-counter';
+      counter.textContent = '1 / ' + total;
+      document.body.appendChild(counter);
+
+      /* Récupérer les thumbnails */
+      var thumbnails = Array.from(dialog.querySelectorAll('.dialog-thumbnails-list__thumbnail'));
+
+      function updateUI() {
+        counter.textContent = (current + 1) + ' / ' + total;
+        if (prevBtn) prevBtn.style.opacity = current === 0 ? '0.3' : '1';
+        if (nextBtn) nextBtn.style.opacity = current === total - 1 ? '0.3' : '1';
+        /* Synchroniser les thumbnails */
+        thumbnails.forEach(function(thumb, i) {
+          thumb.setAttribute('aria-selected', i === current ? 'true' : 'false');
+        });
+      }
+
+      /* Clic sur une thumbnail → aller au slide correspondant */
+      thumbnails.forEach(function(thumb, i) {
+        thumb.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          current = i;
+          gallery.scrollTo({
+            left: i * window.innerWidth,
+            behavior: 'smooth'
+          });
+          updateUI();
+        }, true);
+      });
+
+      /* --- Flèches (seulement si 2+ slides) --- */
+      var prevBtn = null;
+      var nextBtn = null;
+
+      if (total >= 2) {
+        prevBtn = document.createElement('button');
+        prevBtn.className = 'rdc-nav-arrow rdc-nav-arrow--prev';
+        prevBtn.setAttribute('type', 'button');
+        prevBtn.setAttribute('aria-label', 'Image précédente');
+        prevBtn.innerHTML = chevronLeft;
+
+        nextBtn = document.createElement('button');
+        nextBtn.className = 'rdc-nav-arrow rdc-nav-arrow--next';
+        nextBtn.setAttribute('type', 'button');
+        nextBtn.setAttribute('aria-label', 'Image suivante');
+        nextBtn.innerHTML = chevronRight;
+
+        document.body.appendChild(prevBtn);
+        document.body.appendChild(nextBtn);
+
+        function goTo(index) {
+          if (index < 0 || index >= total) return;
+          current = index;
+          gallery.scrollTo({
+            left: index * window.innerWidth,
+            behavior: 'smooth'
+          });
+          updateUI();
+        }
+
+        prevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          goTo(current - 1);
+        }, true);
+
+        nextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          goTo(current + 1);
+        }, true);
+      }
+
+      /* --- Détection du swipe natif --- */
+      var scrollTimer;
+      gallery.addEventListener('scroll', function() {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function() {
+          var idx = Math.round(gallery.scrollLeft / window.innerWidth);
+          if (idx !== current && idx >= 0 && idx < total) {
+            current = idx;
+            updateUI();
+          }
+        }, 100);
+      }, { passive: true });
+
+      /* --- TOUCH SWIPE MANUEL --- */
+      var touchStartX = 0;
+      var touchStartY = 0;
+      var touchDeltaX = 0;
+      var isSwiping = false;
+      var swipeThreshold = 50;
+
+      function onTouchStart(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchDeltaX = 0;
+        isSwiping = false;
+      }
+
+      function onTouchMove(e) {
+        var dx = e.touches[0].clientX - touchStartX;
+        var dy = e.touches[0].clientY - touchStartY;
+        touchDeltaX = dx;
+
+        /* Si le mouvement est plus horizontal que vertical, c'est un swipe */
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+          isSwiping = true;
+          e.preventDefault();
+          /* Déplacer visuellement la galerie pendant le swipe */
+          var targetLeft = current * window.innerWidth - dx;
+          gallery.scrollLeft = targetLeft;
+        }
+      }
+
+      function onTouchEnd(e) {
+        if (!isSwiping) return;
+
+        if (touchDeltaX < -swipeThreshold && current < total - 1) {
+          /* Swipe vers la gauche → image suivante */
+          current++;
+        } else if (touchDeltaX > swipeThreshold && current > 0) {
+          /* Swipe vers la droite → image précédente */
+          current--;
+        }
+
+        gallery.scrollTo({
+          left: current * window.innerWidth,
+          behavior: 'smooth'
+        });
+        updateUI();
+        isSwiping = false;
+      }
+
+      /* Attacher sur la galerie */
+      gallery.addEventListener('touchstart', onTouchStart, { passive: true });
+      gallery.addEventListener('touchmove', onTouchMove, { passive: false });
+      gallery.addEventListener('touchend', onTouchEnd, { passive: true });
+
+      /* Attacher aussi sur chaque slide (li) pour capturer les swipes sur l'image */
+      slides.forEach(function(li) {
+        li.addEventListener('touchstart', onTouchStart, { passive: true });
+        li.addEventListener('touchmove', onTouchMove, { passive: false });
+        li.addEventListener('touchend', onTouchEnd, { passive: true });
+      });
+
+      /* Position initiale */
+      requestAnimationFrame(function() {
+        gallery.scrollTo({ left: 0, behavior: 'instant' });
+      });
+      updateUI();
+    }
+
+    /* --- Observer les dialog pour détecter open/close ET changement de variante --- */
+    function observe() {
+      /* Observer tous les dialog existants */
+      document.querySelectorAll('dialog').forEach(function(d) {
+        var obs = new MutationObserver(function(mutations) {
+          for (var i = 0; i < mutations.length; i++) {
+            if (mutations[i].attributeName === 'open') {
+              if (d.hasAttribute('open') && d.querySelector('.dialog-zoomed-gallery')) {
+                setTimeout(setup, 200);
+              } else {
+                cleanup();
+              }
+            }
+          }
+        });
+        obs.observe(d, { attributes: true });
+
+        /* Observer les changements de contenu DANS le dialog (changement de variante) */
+        var contentObs = new MutationObserver(function(mutations) {
+          /* Si le dialog est ouvert et que le contenu a changé, ré-initialiser */
+          if (d.hasAttribute('open') && d.querySelector('.dialog-zoomed-gallery')) {
+            setTimeout(setup, 250);
+          }
+        });
+        contentObs.observe(d, { childList: true, subtree: true });
+      });
+
+      /* Observer le body pour les dialog injectés dynamiquement */
+      var bodyObs = new MutationObserver(function(mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var added = mutations[i].addedNodes;
+          for (var j = 0; j < added.length; j++) {
+            var node = added[j];
+            if (node.nodeType === 1 && node.tagName === 'DIALOG') {
+              var dObs = new MutationObserver(function(muts) {
+                for (var k = 0; k < muts.length; k++) {
+                  if (muts[k].attributeName === 'open') {
+                    if (node.hasAttribute('open') && node.querySelector('.dialog-zoomed-gallery')) {
+                      setTimeout(setup, 200);
+                    } else {
+                      cleanup();
+                    }
+                  }
+                }
+              });
+              dObs.observe(node, { attributes: true });
+
+              /* Observer aussi le contenu des dialog dynamiques */
+              var dynContentObs = new MutationObserver(function() {
+                if (node.hasAttribute('open') && node.querySelector('.dialog-zoomed-gallery')) {
+                  setTimeout(setup, 250);
+                }
+              });
+              dynContentObs.observe(node, { childList: true, subtree: true });
+
+              /* Si déjà ouvert */
+              if (node.hasAttribute('open') && node.querySelector('.dialog-zoomed-gallery')) {
+                setTimeout(setup, 200);
+              }
+            }
+          }
+        }
+      });
+      bodyObs.observe(document.body, { childList: true, subtree: true });
+
+      /* Observer les changements de variante sur la page produit */
+      document.addEventListener('change', function(e) {
+        /* Quand un sélecteur de variante change, ré-init après un délai */
+        var target = e.target;
+        if (target && (target.name === 'id' || target.closest('[class*="variant"]') || target.closest('[class*="option"]'))) {
+          setTimeout(function() {
+            var openDialog = document.querySelector('dialog[open]');
+            if (openDialog && openDialog.querySelector('.dialog-zoomed-gallery')) {
+              setTimeout(setup, 300);
+            }
+          }, 500);
+        }
+      });
+    }
+
+    /* --- Init --- */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', observe);
+    } else {
+      observe();
+    }
+
+    document.addEventListener('shopify:section:load', function() {
+      setTimeout(observe, 300);
+    });
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "t:names.product_media",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "media_presentation",
+      "label": "t:settings.type",
+      "options": [
+        { "value": "grid", "label": "t:options.grid" },
+        { "value": "carousel", "label": "t:options.carousel" }
+      ],
+      "default": "grid",
+      "info": "t:info.carousel_layout_on_mobile"
+    },
+    {
+      "type": "header",
+      "content": "t:content.grid",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "select",
+      "id": "media_columns",
+      "label": "t:settings.columns",
+      "options": [
+        { "value": "one", "label": "t:options.one_number" },
+        { "value": "two", "label": "t:options.two_number" }
+      ],
+      "default": "one",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "image_gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "unit": "px",
+      "step": 1,
+      "default": 0,
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "large_first_image",
+      "label": "t:settings.full_width_first_image",
+      "default": false,
+      "visible_if": "{{ block.settings.media_presentation == 'grid' and block.settings.media_columns == 'two' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.carousel"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "t:settings.icons",
+      "options": [
+        { "value": "arrow", "label": "t:options.arrows" },
+        { "value": "chevron", "label": "t:options.chevrons" },
+        { "value": "arrows_large", "label": "t:options.large_arrows" },
+        { "value": "chevron_large", "label": "t:options.large_chevrons" }
+      ],
+      "default": "arrow",
+      "visible_if": "{{ block.settings.media_presentation == 'carousel' }}"
+    },
+    {
+      "type": "select",
+      "id": "slideshow_controls_style",
+      "label": "t:settings.desktop_pagination",
+      "options": [
+        { "value": "dots", "label": "t:options.dots" },
+        { "value": "counter", "label": "t:options.counter" },
+        { "value": "thumbnails", "label": "t:options.thumbnails" }
+      ],
+      "visible_if": "{{ block.settings.media_presentation == 'carousel' }}"
+    },
+    {
+      "type": "select",
+      "id": "slideshow_mobile_controls_style",
+      "label": "t:settings.mobile_pagination",
+      "options": [
+        { "value": "dots", "label": "t:options.dots" },
+        { "value": "counter", "label": "t:options.counter" },
+        { "value": "hint", "label": "t:options.hint" },
+        { "value": "thumbnails", "label": "t:options.thumbnails" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Galerie mobile alternative"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_gallery",
+      "label": "Activer la galerie mobile alternative",
+      "info": "Affiche l'image principale à gauche et les thumbnails à droite sur mobile",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.thumbnails",
+      "visible_if": "{{ block.settings.slideshow_controls_style == 'thumbnails' or block.settings.slideshow_mobile_controls_style == 'thumbnails' }}"
+    },
+    {
+      "type": "select",
+      "id": "thumbnail_position",
+      "label": "t:settings.desktop_position",
+      "options": [
+        { "value": "left", "label": "t:options.left" },
+        { "value": "bottom", "label": "t:options.bottom" },
+        { "value": "right", "label": "t:options.right" }
+      ],
+      "default": "bottom",
+      "visible_if": "{{ block.settings.slideshow_controls_style == 'thumbnails' }}"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_width",
+      "label": "t:settings.width_desktop",
+      "min": 44,
+      "max": 144,
+      "step": 1,
+      "unit": "px",
+      "default": 64,
+      "visible_if": "{{ block.settings.slideshow_controls_style == 'thumbnails' }}"
+    },
+    {
+      "type": "range",
+      "id": "thumbnail_radius",
+      "label": "t:settings.corner_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.slideshow_controls_style == 'thumbnails' or block.settings.slideshow_mobile_controls_style == 'thumbnails' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.media"
+    },
+    {
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "t:settings.aspect_ratio",
+      "options": [
+        { "value": "adapt", "label": "t:options.auto" },
+        { "value": "1/1.25", "label": "t:options.portrait" },
+        { "value": "1", "label": "t:options.square" },
+        { "value": "2/1", "label": "t:options.landscape" }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "checkbox",
+      "id": "constrain_to_viewport",
+      "label": "t:settings.limit_media_to_screen_height",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "t:settings.media_fit",
+      "options": [
+        { "value": "cover", "label": "t:options.cover" },
+        { "value": "contain", "label": "t:options.contain" }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.aspect_ratio == 'adapt' and block.settings.constrain_to_viewport == true }}"
+    },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "label": "t:settings.border_radius",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "extend_media",
+      "label": "t:settings.extend_media_to_screen_edge",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "zoom",
+      "label": "t:settings.enable_zoom",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "video_loop",
+      "label": "t:settings.enable_video_looping",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_variants",
+      "default": false,
+      "label": "t:settings.hide_unselected_variant_media"
+    },
+    {
+      "type": "checkbox",
+      "id": "filter_by_variant_color",
+      "default": false,
+      "label": "t:settings.filter_by_variant_color",
+      "info": "t:info.filter_by_variant_color"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_media_alt",
+      "default": false,
+      "label": "t:settings.show_media_alt",
+      "info": "t:info.show_media_alt"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_arrows_desktop",
+      "default": false,
+      "label": "t:settings.hide_arrows_desktop"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    { "type": "range", "id": "padding-block-start", "label": "t:settings.top", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding-block-end", "label": "t:settings.bottom", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding-inline-start", "label": "t:settings.left", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding-inline-end", "label": "t:settings.right", "min": 0, "max": 100, "step": 1, "unit": "px", "default": 0 }
+  ],
+  "presets": [
+    { "name": "t:names.product_media" }
+  ]
+}
+{% endschema %}
