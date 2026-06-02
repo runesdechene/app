@@ -223,27 +223,29 @@
 
 /* ─────────── CTA link (product) ─────────── */
 .mission-modal-cta {
-  display: block;
-  width: 100%;
-  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
   background: linear-gradient(180deg, #c79a4e, #b8863b);
   color: #fff;
   border: none;
-  border-radius: 9px;
-  padding: 11px 14px;
+  border-radius: 999px;
+  padding: 10px 20px;
   font-family: var(--font-accent);
   font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.03em;
-  text-align: center;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
   text-decoration: none;
-  box-shadow: 0 2px 6px rgba(184, 134, 59, 0.4);
+  box-shadow: 0 3px 9px rgba(184, 134, 59, 0.45);
   cursor: pointer;
-  box-sizing: border-box;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 .mission-modal-cta:hover {
-  background: linear-gradient(180deg, #d4a85a, #c49040);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 13px rgba(184, 134, 59, 0.55);
 }
+.mission-modal-cta:active { transform: translateY(1px); }
 
 /* ─────────── Pending status banner ─────────── */
 .mission-modal-status {
@@ -289,27 +291,38 @@
 }
 
 /* ─────────── Primary CTA (submit livrable) ─────────── */
+.mission-modal-butin-note {
+  margin: 8px 0 0;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-style: italic;
+  color: #8a7050;
+  line-height: 1.4;
+}
+
 .mission-modal-primary {
-  display: block;
-  margin: 14px 22px 18px;
-  background: #2a1f10;
-  color: #faf2dd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 16px 22px 18px;
+  background: linear-gradient(180deg, #5e7a45, #45602f);
+  color: #fff;
   border: none;
-  padding: 13px 22px;
-  border-radius: 8px;
+  padding: 15px 22px;
+  border-radius: 12px;
   font-family: var(--font-accent);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(69, 96, 47, 0.4);
   box-sizing: border-box;
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
-.mission-modal-primary:hover {
-  background: #000;
-}
+.mission-modal-primary:hover { filter: brightness(1.08); }
+.mission-modal-primary:active { transform: translateY(1px); }
 
 /* ─────────── Salon tab ─────────── */
 .mission-salon {

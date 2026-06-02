@@ -72,10 +72,11 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
             <section className="mission-modal-section">
               <h3>Butin</h3>
               <div className="mission-modal-rewards">
-                {m.floor.glory > 0 && <span className="mm-rw">🎖️ {m.floor.glory} Gloire</span>}
-                {m.floor.crowns > 0 && <span className="mm-rw">🪙 {m.floor.crowns} Couronnes</span>}
+                <span className="mm-rw">🎖️ Gloire</span>
+                <span className="mm-rw">🪙 Couronnes</span>
                 {m.rewardHint && <span className="mm-rw gold">{m.rewardHint}</span>}
               </div>
+              <p className="mission-modal-butin-note">Récompense fixée à la validation, selon la qualité de ta contribution.</p>
             </section>
 
             {m.brief && (
@@ -118,7 +119,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                📷 Présenter mon livrable
+                📷 Ajouter ma contribution
               </a>
             )}
           </div>
