@@ -65,6 +65,16 @@ export function HarvestableChests({ geojson }: Props) {
     // RPC en arrière-plan — on n'attend pas pour démonter, sinon l'animation est tronquée.
     const harvestPromise = harvest(userId, placeId)
 
+    // Rafraîchit les Défis du jour dès que la récolte est confirmée (feedback quasi
+    // instantané, découplé de l'animation de 1.7s ci-dessous).
+    void harvestPromise.then(result => {
+      if ('error' in result) {
+        console.warn('[crowns] harvest failed:', result.error)
+      } else if (userId) {
+        useDailyQuestsStore.getState().refresh(userId)
+      }
+    })
+
     // Cleanup synchronisé avec la fin de l'animation pièce qui s'élève (1.6s + marge).
     window.setTimeout(() => {
       setBursts(prev => prev.filter(n => n.id !== burstId))
@@ -72,13 +82,6 @@ export function HarvestableChests({ geojson }: Props) {
         const next = new Set(prev)
         next.delete(placeId)
         return next
-      })
-      void harvestPromise.then(result => {
-        if ('error' in result) {
-          console.warn('[crowns] harvest failed:', result.error)
-        } else if (userId) {
-          useDailyQuestsStore.getState().refresh(userId)
-        }
       })
     }, 1700)
   }, [userId, harvestable, harvest, busyPlaceIds])

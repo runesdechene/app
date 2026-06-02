@@ -38,7 +38,7 @@ export function QuestRewardModal() {
             <span className="victory-gain">+{reward.crowns} 🪙 Couronnes</span>
           </div>
         )}
-        <button className="victory-btn" onClick={shiftReward}>Continuer</button>
+        <button className="victory-btn" onClick={shiftReward}>Accepter</button>
       </div>
     </div>
   )

@@ -1,3 +1,10 @@
+# ALPHA V0.8.29
+## Progression des Défis quasi-instantanée après une récolte
+
+La progression d'un Défi du jour se met à jour dès que la récolte est confirmée, sans attendre la fin de l'animation du coffre.
+
+---
+
 # ALPHA V0.8.28
 ## Butin des Défis du jour en Couronnes
 
