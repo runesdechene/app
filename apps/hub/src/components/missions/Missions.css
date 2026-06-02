@@ -87,6 +87,16 @@
 .missions-field input[readonly] { opacity: 0.6; cursor: default; background: var(--color-bg); }
 .missions-field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
 .missions-hint { font-size: 0.72rem; color: var(--color-text-secondary); opacity: 0.85; line-height: 1.4; }
+.missions-cover-row { display: flex; gap: 8px; align-items: stretch; }
+.missions-cover-row input { flex: 1; min-width: 0; }
+.missions-upload-btn {
+  flex-shrink: 0; display: inline-flex; align-items: center; padding: 0.6rem 0.95rem;
+  background: var(--color-surface-hover); border: 1px solid var(--color-border); border-radius: var(--radius);
+  color: var(--color-text); font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: border-color 0.12s;
+}
+.missions-upload-btn:hover { border-color: var(--color-primary); }
+.missions-upload-btn.is-uploading { opacity: 0.6; cursor: wait; }
 .missions-cover-preview { margin-top: 8px; max-height: 130px; border-radius: var(--radius); object-fit: cover; max-width: 100%; border: 1px solid var(--color-border); }
 .missions-checks { display: flex; flex-wrap: wrap; gap: 18px; }
 .missions-check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-text); cursor: pointer; }

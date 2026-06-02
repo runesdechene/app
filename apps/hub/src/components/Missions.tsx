@@ -269,6 +269,22 @@ interface MissionEditorProps {
 }
 
 function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleCoverUpload(file: File) {
+    setUploading(true)
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+      const path = `mission-covers/${mission.slug}-${Date.now()}.${ext}`
+      const { error } = await supabase.storage.from('home-banners').upload(path, file, { upsert: true, contentType: file.type })
+      if (error) { window.alert('Téléversement échoué : ' + error.message); return }
+      const { data } = supabase.storage.from('home-banners').getPublicUrl(path)
+      onUpdate('cover_image_url', data.publicUrl)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <>
       <div className="missions-editor-head">
@@ -286,8 +302,20 @@ function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
           <Field label="Eyebrow (surtitre)"><input type="text" value={mission.eyebrow ?? ''} onChange={e => onUpdate('eyebrow', e.target.value || null)} placeholder="Mission à thème" /></Field>
           <Field label="Call (accroche)"><input type="text" value={mission.call ?? ''} onChange={e => onUpdate('call', e.target.value || null)} placeholder="Accroche courte" /></Field>
           <Field label="Slug (non modifiable)"><input type="text" value={mission.slug} readOnly /></Field>
-          <Field label="Image de couverture (URL)" full>
-            <input type="url" value={mission.cover_image_url ?? ''} onChange={e => onUpdate('cover_image_url', e.target.value || null)} placeholder="https://…" />
+          <Field label="Image de couverture" full>
+            <div className="missions-cover-row">
+              <input type="url" value={mission.cover_image_url ?? ''} onChange={e => onUpdate('cover_image_url', e.target.value || null)} placeholder="Colle une URL, ou téléverse →" />
+              <label className={`missions-upload-btn${uploading ? ' is-uploading' : ''}`}>
+                {uploading ? 'Envoi…' : '📤 Téléverser'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={uploading}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f); e.target.value = '' }}
+                />
+              </label>
+            </div>
             {mission.cover_image_url && <img className="missions-cover-preview" src={mission.cover_image_url} alt="" />}
           </Field>
         </div>
