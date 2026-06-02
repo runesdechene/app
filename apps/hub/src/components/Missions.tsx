@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { SaveBar } from './SaveBar'
 import { MissionProductPicker } from './missions/MissionProductPicker'
@@ -58,7 +59,6 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, '')
 }
 
-// Convert ISO string to datetime-local value (no seconds)
 function toDatetimeLocal(iso: string | null): string {
   if (!iso) return ''
   try {
@@ -70,7 +70,6 @@ function toDatetimeLocal(iso: string | null): string {
   }
 }
 
-// Convert datetime-local value to ISO string (or null if empty)
 function fromDatetimeLocal(value: string): string | null {
   if (!value) return null
   try {
@@ -93,9 +92,7 @@ export function Missions() {
 
   const hasChanges = JSON.stringify(missions) !== JSON.stringify(savedMissions)
 
-  useEffect(() => {
-    void fetchMissions()
-  }, [])
+  useEffect(() => { void fetchMissions() }, [])
 
   async function fetchMissions() {
     setLoading(true)
@@ -104,7 +101,6 @@ export function Missions() {
         .from('missions')
         .select('*')
         .order('created_at', { ascending: false })
-
       if (!error && data) {
         const mapped = (data as Record<string, unknown>[]).map(row => ({
           slug: String(row.slug ?? ''),
@@ -148,33 +144,8 @@ export function Missions() {
         return JSON.stringify(m) !== JSON.stringify(saved)
       })
       if (dirty.length === 0) return
-
-      const { error } = await supabase.from('missions').upsert(
-        dirty.map(m => ({
-          slug: m.slug,
-          title: m.title,
-          eyebrow: m.eyebrow,
-          call: m.call,
-          brief: m.brief,
-          emblem: m.emblem,
-          cover_image_url: m.cover_image_url,
-          deliverable_kind: m.deliverable_kind,
-          product_handle: m.product_handle,
-          cta_label: m.cta_label,
-          cta_url: m.cta_url,
-          starts_at: m.starts_at,
-          ends_at: m.ends_at,
-          reward_hint: m.reward_hint,
-          salon_intro: m.salon_intro,
-          notify_on_launch: m.notify_on_launch,
-          featured_on_home: m.featured_on_home,
-          status: m.status,
-        }))
-      )
-      if (error) {
-        setSaveError(error.message)
-        return
-      }
+      const { error } = await supabase.from('missions').upsert(dirty)
+      if (error) { setSaveError(error.message); return }
       await fetchMissions()
     } finally {
       setSaving(false)
@@ -189,46 +160,11 @@ export function Missions() {
   async function handleCreate() {
     const raw = newSlug.trim()
     const slug = slugify(raw)
-    if (!slug) {
-      setNewSlugError('Slug invalide')
-      return
-    }
-    if (missions.some(m => m.slug === slug)) {
-      setNewSlugError('Ce slug existe déjà')
-      return
-    }
+    if (!slug) { setNewSlugError('Slug invalide'); return }
+    if (missions.some(m => m.slug === slug)) { setNewSlugError('Ce slug existe déjà'); return }
     setNewSlugError(null)
     setCreating(true)
-    const now = new Date().toISOString()
-    const newMission: Mission = {
-      slug,
-      title: raw,
-      eyebrow: null,
-      call: null,
-      brief: null,
-      emblem: null,
-      cover_image_url: null,
-      deliverable_kind: 'photo',
-      product_handle: null,
-      cta_label: null,
-      cta_url: null,
-      starts_at: null,
-      ends_at: null,
-      reward_hint: null,
-      salon_intro: null,
-      notify_on_launch: false,
-      featured_on_home: false,
-      status: 'draft',
-      created_at: now,
-    }
-    const { error } = await supabase.from('missions').insert({
-      slug: newMission.slug,
-      title: newMission.title,
-      deliverable_kind: newMission.deliverable_kind,
-      notify_on_launch: newMission.notify_on_launch,
-      featured_on_home: newMission.featured_on_home,
-      status: newMission.status,
-    })
+    const { error } = await supabase.from('missions').insert({ slug, title: raw, status: 'draft' })
     if (!error) {
       await fetchMissions()
       setSelectedSlug(slug)
@@ -260,89 +196,55 @@ export function Missions() {
       </div>
 
       <div className="missions-admin-layout">
-        {/* ── Liste gauche ── */}
-        <div className="missions-admin-list">
-          {/* Création */}
-          <div className="faction-create" style={{ marginBottom: 12 }}>
+        {/* ── Liste ── */}
+        <aside className="missions-admin-list">
+          <div className="missions-create">
             <input
               type="text"
-              className="faction-create-input"
-              placeholder="Slug ou titre de la mission..."
+              className="missions-create-input"
+              placeholder="Slug ou titre…"
               value={newSlug}
               onChange={e => { setNewSlug(e.target.value); setNewSlugError(null) }}
               onKeyDown={e => e.key === 'Enter' && void handleCreate()}
               disabled={creating}
             />
-            <button
-              className="faction-create-btn"
-              onClick={() => void handleCreate()}
-              disabled={creating || !newSlug.trim()}
-            >
-              {creating ? '...' : '+ Nouvelle Mission'}
+            <button className="missions-create-btn" onClick={() => void handleCreate()} disabled={creating || !newSlug.trim()}>
+              {creating ? '…' : '+ Nouvelle'}
             </button>
           </div>
-          {newSlugError && (
-            <p style={{ color: '#c0392b', fontSize: 12, margin: '-8px 0 8px' }}>{newSlugError}</p>
-          )}
+          {newSlugError && <p className="missions-create-error">{newSlugError}</p>}
 
-          {/* Liste */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {missions.length === 0 && (
-              <p style={{ opacity: 0.5, fontSize: 13 }}>Aucune mission.</p>
-            )}
+          <div className="missions-list">
+            {missions.length === 0 && <p className="missions-empty-list">Aucune mission.</p>}
             {missions.map(m => {
               const isDirty = JSON.stringify(m) !== JSON.stringify(savedMissions.find(s => s.slug === m.slug))
               return (
                 <button
                   key={m.slug}
                   type="button"
+                  className={`missions-list-item${selectedSlug === m.slug ? ' active' : ''}`}
                   onClick={() => setSelectedSlug(m.slug)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '8px 10px',
-                    borderRadius: 6,
-                    border: selectedSlug === m.slug ? '2px solid #8A7B6A' : '1px solid rgba(138,123,106,0.25)',
-                    background: selectedSlug === m.slug ? 'rgba(138,123,106,0.12)' : 'transparent',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    width: '100%',
-                  }}
                 >
-                  {m.emblem && <span style={{ fontSize: 18 }}>{m.emblem}</span>}
-                  <span style={{ flex: 1, overflow: 'hidden' }}>
-                    <span style={{ fontWeight: 600, fontSize: 13, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {m.title || m.slug}
-                      {isDirty && <span style={{ marginLeft: 5, color: '#e0a73d', fontSize: 11 }}>●</span>}
+                  {m.emblem && <span className="missions-list-emblem">{m.emblem}</span>}
+                  <span className="missions-list-text">
+                    <span className="missions-list-name">
+                      {m.title || m.slug}{isDirty && <span className="missions-dot">●</span>}
                     </span>
-                    <span style={{ fontSize: 11, opacity: 0.55 }}>{m.slug}</span>
+                    <span className="missions-list-slug">{m.slug}</span>
                   </span>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      padding: '2px 6px',
-                      borderRadius: 999,
-                      background: STATUS_COLORS[m.status] + '22',
-                      color: STATUS_COLORS[m.status],
-                      flexShrink: 0,
-                    }}
-                  >
+                  <span className="missions-status-pill" style={{ background: STATUS_COLORS[m.status] + '22', color: STATUS_COLORS[m.status] }}>
                     {STATUS_LABELS[m.status]}
                   </span>
                 </button>
               )
             })}
           </div>
-        </div>
+        </aside>
 
-        {/* ── Éditeur droite ── */}
+        {/* ── Éditeur ── */}
         <div className="missions-admin-editor">
           {selectedMission === null ? (
-            <div style={{ opacity: 0.4, fontSize: 14, marginTop: 40, textAlign: 'center' }}>
-              Sélectionnez une mission ou créez-en une nouvelle.
-            </div>
+            <div className="missions-editor-empty">Sélectionnez une mission ou créez-en une nouvelle.</div>
           ) : (
             <MissionEditor
               mission={selectedMission}
@@ -353,18 +255,12 @@ export function Missions() {
         </div>
       </div>
 
-      <SaveBar
-        hasChanges={hasChanges}
-        saving={saving}
-        error={saveError}
-        onSave={() => void handleSave()}
-        onCancel={handleCancel}
-      />
+      <SaveBar hasChanges={hasChanges} saving={saving} error={saveError} onSave={() => void handleSave()} onCancel={handleCancel} />
     </div>
   )
 }
 
-// ─── Sub-component : editor ───────────────────────────────────────────────────
+// ─── Editor ───────────────────────────────────────────────────────────────────
 
 interface MissionEditorProps {
   mission: Mission
@@ -374,263 +270,114 @@ interface MissionEditorProps {
 
 function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-      {/* Header éditeur */}
-      <div className="missions-admin-editor-head">
-        <h2>
-          {mission.emblem && <span style={{ marginRight: 8 }}>{mission.emblem}</span>}
-          {mission.title || mission.slug}
-        </h2>
-        <button type="button" className="missions-admin-delete" onClick={onDelete}>
-          Supprimer
-        </button>
+    <>
+      <div className="missions-editor-head">
+        <h2>{mission.emblem ? `${mission.emblem} ` : ''}{mission.title || mission.slug}</h2>
+        <span className="missions-status-pill" style={{ background: STATUS_COLORS[mission.status] + '22', color: STATUS_COLORS[mission.status] }}>
+          {STATUS_LABELS[mission.status]}
+        </span>
+        <button type="button" className="missions-admin-delete" onClick={onDelete}>Supprimer</button>
       </div>
 
-      {/* Slug (lecture seule) */}
-      <div className="faction-field">
-        <label className="faction-field-label">Slug (non modifiable)</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.slug}
-          readOnly
-          style={{ opacity: 0.5, cursor: 'default' }}
-        />
-      </div>
-
-      {/* ── GROUPE : Identité ── */}
-      <SectionLabel>Identité</SectionLabel>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Titre</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.title}
-          onChange={e => onUpdate('title', e.target.value)}
-          placeholder="Nom de la mission"
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Eyebrow (surtitre)</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.eyebrow ?? ''}
-          onChange={e => onUpdate('eyebrow', e.target.value || null)}
-          placeholder="ex: Mission saisonnière"
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Call (accroche)</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.call ?? ''}
-          onChange={e => onUpdate('call', e.target.value || null)}
-          placeholder="Accroche courte"
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Emblème (emoji)</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.emblem ?? ''}
-          onChange={e => onUpdate('emblem', e.target.value || null)}
-          placeholder="🌿"
-          style={{ width: 80 }}
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Image de couverture (URL)</label>
-        <input
-          type="url"
-          className="faction-title-input"
-          value={mission.cover_image_url ?? ''}
-          onChange={e => onUpdate('cover_image_url', e.target.value || null)}
-          placeholder="https://..."
-        />
-        {mission.cover_image_url && (
-          <img
-            src={mission.cover_image_url}
-            alt=""
-            style={{ marginTop: 6, maxHeight: 120, borderRadius: 6, objectFit: 'cover', maxWidth: '100%' }}
-          />
-        )}
-      </div>
-
-      {/* ── GROUPE : Brief & Livrable ── */}
-      <SectionLabel>Brief & Livrable</SectionLabel>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Brief</label>
-        <textarea
-          className="faction-description-input"
-          rows={4}
-          value={mission.brief ?? ''}
-          onChange={e => onUpdate('brief', e.target.value || null)}
-          placeholder="Description de la mission..."
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Type de livrable</label>
-        <select
-          className="faction-title-input"
-          value={mission.deliverable_kind}
-          onChange={e => onUpdate('deliverable_kind', e.target.value as DeliverableKind)}
-        >
-          {(Object.entries(DELIVERABLE_LABELS) as [DeliverableKind, string][]).map(([k, l]) => (
-            <option key={k} value={k}>{l}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* ── GROUPE : Produit + CTA ── */}
-      <SectionLabel>Produit & CTA</SectionLabel>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Produit Shopify lié</label>
-        <MissionProductPicker
-          value={mission.product_handle}
-          onChange={h => onUpdate('product_handle', h)}
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Label du bouton CTA</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.cta_label ?? ''}
-          onChange={e => onUpdate('cta_label', e.target.value || null)}
-          placeholder="ex: Voir le produit"
-        />
-      </div>
-
-      <div className="faction-field">
-        <label className="faction-field-label">URL CTA</label>
-        <input
-          type="url"
-          className="faction-title-input"
-          value={mission.cta_url ?? ''}
-          onChange={e => onUpdate('cta_url', e.target.value || null)}
-          placeholder="https://..."
-        />
-      </div>
-
-      {/* ── GROUPE : Fenêtre temporelle ── */}
-      <SectionLabel>Fenêtre temporelle</SectionLabel>
-
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        <div className="faction-field" style={{ flex: 1, minWidth: 200 }}>
-          <label className="faction-field-label">Début</label>
-          <input
-            type="datetime-local"
-            className="faction-title-input"
-            value={toDatetimeLocal(mission.starts_at)}
-            onChange={e => onUpdate('starts_at', fromDatetimeLocal(e.target.value))}
-          />
+      <Card title="Identité">
+        <div className="missions-grid">
+          <Field label="Titre"><input type="text" value={mission.title} onChange={e => onUpdate('title', e.target.value)} placeholder="Nom de la mission" /></Field>
+          <Field label="Emblème" narrow><input type="text" value={mission.emblem ?? ''} onChange={e => onUpdate('emblem', e.target.value || null)} placeholder="⚔️" /></Field>
+          <Field label="Eyebrow (surtitre)"><input type="text" value={mission.eyebrow ?? ''} onChange={e => onUpdate('eyebrow', e.target.value || null)} placeholder="Mission à thème" /></Field>
+          <Field label="Call (accroche)"><input type="text" value={mission.call ?? ''} onChange={e => onUpdate('call', e.target.value || null)} placeholder="Accroche courte" /></Field>
+          <Field label="Slug (non modifiable)"><input type="text" value={mission.slug} readOnly /></Field>
+          <Field label="Image de couverture (URL)" full>
+            <input type="url" value={mission.cover_image_url ?? ''} onChange={e => onUpdate('cover_image_url', e.target.value || null)} placeholder="https://…" />
+            {mission.cover_image_url && <img className="missions-cover-preview" src={mission.cover_image_url} alt="" />}
+          </Field>
         </div>
-        <div className="faction-field" style={{ flex: 1, minWidth: 200 }}>
-          <label className="faction-field-label">Fin</label>
-          <input
-            type="datetime-local"
-            className="faction-title-input"
-            value={toDatetimeLocal(mission.ends_at)}
-            onChange={e => onUpdate('ends_at', fromDatetimeLocal(e.target.value))}
-          />
+      </Card>
+
+      <Card title="Brief & livrable">
+        <div className="missions-grid">
+          <Field label="Brief" full>
+            <textarea rows={4} value={mission.brief ?? ''} onChange={e => onUpdate('brief', e.target.value || null)} placeholder="Ce qui est demandé aux joueurs…" />
+          </Field>
+          <Field label="Type de livrable">
+            <select value={mission.deliverable_kind} onChange={e => onUpdate('deliverable_kind', e.target.value as DeliverableKind)}>
+              {(Object.entries(DELIVERABLE_LABELS) as [DeliverableKind, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+            </select>
+          </Field>
         </div>
-      </div>
+      </Card>
 
-      {/* ── GROUPE : Récompense ── */}
-      <SectionLabel>Récompense</SectionLabel>
+      <Card title="Produit & CTA">
+        <div className="missions-grid">
+          <Field label="Produit Shopify lié (optionnel)" full>
+            <MissionProductPicker value={mission.product_handle} onChange={h => onUpdate('product_handle', h)} />
+          </Field>
+          <Field label="Label du bouton"><input type="text" value={mission.cta_label ?? ''} onChange={e => onUpdate('cta_label', e.target.value || null)} placeholder="Rejoindre la boutique" /></Field>
+          <Field label="URL du bouton"><input type="url" value={mission.cta_url ?? ''} onChange={e => onUpdate('cta_url', e.target.value || null)} placeholder="https://…" /></Field>
+        </div>
+      </Card>
 
-      <div className="faction-field">
-        <label className="faction-field-label">Indice récompense (reward_hint)</label>
-        <input
-          type="text"
-          className="faction-title-input"
-          value={mission.reward_hint ?? ''}
-          onChange={e => onUpdate('reward_hint', e.target.value || null)}
-          placeholder="🎁 Cadeau & code de réduction offert"
-        />
-        <p style={{ fontSize: 12, opacity: 0.55, marginTop: 4 }}>
-          Le butin réel (Gloire + Couronnes + cadeau + code) se fixe à la validation des contributions — ce champ est un indice visible librement.
-        </p>
-      </div>
+      <Card title="Fenêtre temporelle">
+        <div className="missions-grid">
+          <Field label="Début"><input type="datetime-local" value={toDatetimeLocal(mission.starts_at)} onChange={e => onUpdate('starts_at', fromDatetimeLocal(e.target.value))} /></Field>
+          <Field label="Fin"><input type="datetime-local" value={toDatetimeLocal(mission.ends_at)} onChange={e => onUpdate('ends_at', fromDatetimeLocal(e.target.value))} /></Field>
+        </div>
+      </Card>
 
-      {/* ── GROUPE : Salon ── */}
-      <SectionLabel>Salon</SectionLabel>
+      <Card title="Récompense">
+        <div className="missions-grid">
+          <Field label="Mention récompense" full>
+            <input type="text" value={mission.reward_hint ?? ''} onChange={e => onUpdate('reward_hint', e.target.value || null)} placeholder="🎁 Cadeau & code de réduction offert" />
+            <span className="missions-hint">Le butin réel (Gloire + Couronnes + cadeau + code) se fixe à la validation des contributions — ce champ n'est qu'une mention affichée aux joueurs.</span>
+          </Field>
+        </div>
+      </Card>
 
-      <div className="faction-field">
-        <label className="faction-field-label">Intro du salon</label>
-        <textarea
-          className="faction-description-input"
-          rows={3}
-          value={mission.salon_intro ?? ''}
-          onChange={e => onUpdate('salon_intro', e.target.value || null)}
-          placeholder="Message d'introduction affiché dans le salon de la mission..."
-        />
-      </div>
+      <Card title="Salon">
+        <div className="missions-grid">
+          <Field label="Mot d'accueil du salon" full>
+            <textarea rows={3} value={mission.salon_intro ?? ''} onChange={e => onUpdate('salon_intro', e.target.value || null)} placeholder="Message épinglé en tête du salon…" />
+          </Field>
+        </div>
+      </Card>
 
-      {/* ── GROUPE : Diffusion ── */}
-      <SectionLabel>Diffusion</SectionLabel>
-
-      <div className="faction-field">
-        <label className="faction-field-label">Statut</label>
-        <select
-          className="faction-title-input"
-          value={mission.status}
-          onChange={e => onUpdate('status', e.target.value as MissionStatus)}
-          style={{ color: STATUS_COLORS[mission.status] }}
-        >
-          {(Object.entries(STATUS_LABELS) as [MissionStatus, string][]).map(([k, l]) => (
-            <option key={k} value={k}>{l}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="faction-field" style={{ display: 'flex', gap: 24 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={mission.notify_on_launch}
-            onChange={e => onUpdate('notify_on_launch', e.target.checked)}
-          />
-          Notifier au lancement
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={mission.featured_on_home}
-            onChange={e => onUpdate('featured_on_home', e.target.checked)}
-          />
-          Mise en avant (accueil)
-        </label>
-      </div>
-    </div>
+      <Card title="Diffusion">
+        <div className="missions-grid">
+          <Field label="Statut">
+            <select value={mission.status} onChange={e => onUpdate('status', e.target.value as MissionStatus)}>
+              {(Object.entries(STATUS_LABELS) as [MissionStatus, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+            </select>
+          </Field>
+          <Field label="Options" full>
+            <div className="missions-checks">
+              <label className="missions-check">
+                <input type="checkbox" checked={mission.notify_on_launch} onChange={e => onUpdate('notify_on_launch', e.target.checked)} />
+                Notifier au lancement
+              </label>
+              <label className="missions-check">
+                <input type="checkbox" checked={mission.featured_on_home} onChange={e => onUpdate('featured_on_home', e.target.checked)} />
+                Mise en avant (accueil)
+              </label>
+            </div>
+          </Field>
+        </div>
+      </Card>
+    </>
   )
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div style={{
-      fontSize: 11,
-      fontWeight: 700,
-      letterSpacing: '0.08em',
-      textTransform: 'uppercase',
-      color: '#8A7B6A',
-      borderBottom: '1px solid rgba(138,123,106,0.25)',
-      paddingBottom: 4,
-      marginTop: 20,
-      marginBottom: 12,
-    }}>
+    <section className="missions-card">
+      <h3 className="missions-card-title">{title}</h3>
+      {children}
+    </section>
+  )
+}
+
+function Field({ label, full, narrow, children }: { label: string; full?: boolean; narrow?: boolean; children: ReactNode }) {
+  return (
+    <div className={`missions-field${full ? ' full' : ''}${narrow ? ' narrow' : ''}`}>
+      <label>{label}</label>
       {children}
     </div>
   )

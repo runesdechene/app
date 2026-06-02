@@ -1,66 +1,93 @@
-/* Page d'authoring des Missions (Hub) — mise en page propre.
-   Surcharge les inputs empruntés à Factions (transparents/inline) en vrais
-   champs de formulaire visibles, et rend la mise en page responsive. */
+/* Page d'authoring des Missions (Hub) — design en cartes, grille responsive. */
 
-.missions-admin .faction-title-input,
-.missions-admin .faction-description-input,
-.missions-admin select.faction-title-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.55rem 0.75rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.9rem;
-}
-.missions-admin .faction-title-input:hover,
-.missions-admin .faction-description-input:hover {
-  border-color: var(--color-border);
-}
-.missions-admin .faction-title-input:focus,
-.missions-admin .faction-description-input:focus,
-.missions-admin select.faction-title-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: var(--color-surface);
-}
-.missions-admin .faction-field { margin-bottom: 14px; max-width: 680px; }
+.missions-admin { max-width: 1120px; }
 
-/* Layout 2 colonnes responsive */
-.missions-admin-layout {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-.missions-admin-list { width: 280px; flex-shrink: 0; }
-.missions-admin-editor { flex: 1; min-width: 0; }
+.missions-admin-layout { display: flex; gap: 24px; align-items: flex-start; }
+.missions-admin-list { width: 300px; flex-shrink: 0; }
+.missions-admin-editor { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 
-@media (max-width: 860px) {
+@media (max-width: 880px) {
   .missions-admin-layout { flex-direction: column; }
   .missions-admin-list { width: 100%; }
 }
 
-/* En-tête de l'éditeur : titre à gauche, bouton Supprimer compact à droite */
-.missions-admin-editor-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
+/* ── Création ── */
+.missions-create { display: flex; gap: 8px; margin-bottom: 12px; }
+.missions-create-input {
+  flex: 1; min-width: 0; padding: 0.55rem 0.75rem;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); color: var(--color-text); font-family: inherit; font-size: 0.85rem;
 }
-.missions-admin-editor-head h2 { margin: 0; font-size: 18px; min-width: 0; }
+.missions-create-input:focus { outline: none; border-color: var(--color-primary); }
+.missions-create-btn {
+  flex-shrink: 0; padding: 0.55rem 0.9rem; background: var(--color-primary); border: none;
+  border-radius: var(--radius); color: #fff; font-size: 0.8rem; font-family: inherit; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.missions-create-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.missions-create-error { color: #c0392b; font-size: 12px; margin: -6px 0 8px; }
+
+/* ── Liste ── */
+.missions-list { display: flex; flex-direction: column; gap: 6px; }
+.missions-empty-list { opacity: 0.5; font-size: 13px; }
+.missions-list-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border: 1px solid var(--color-border); border-radius: var(--radius);
+  background: var(--color-surface); cursor: pointer; text-align: left; width: 100%;
+  transition: border-color 0.12s, background 0.12s;
+}
+.missions-list-item:hover { background: var(--color-surface-hover); }
+.missions-list-item.active { border-color: var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
+.missions-list-emblem { font-size: 18px; flex-shrink: 0; }
+.missions-list-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.missions-list-name { font-weight: 600; font-size: 13px; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.missions-list-slug { font-size: 11px; color: var(--color-text-secondary); opacity: 0.7; }
+.missions-dot { color: #e0a73d; margin-left: 5px; }
+.missions-status-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; flex-shrink: 0; white-space: nowrap; }
+
+/* ── Éditeur ── */
+.missions-editor-empty { opacity: 0.45; font-size: 14px; text-align: center; margin-top: 56px; }
+.missions-editor-head { display: flex; align-items: center; gap: 12px; }
+.missions-editor-head h2 { margin: 0; font-size: 19px; flex: 1; min-width: 0; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .missions-admin-delete {
-  flex: 0 0 auto;
-  padding: 0.45rem 0.9rem;
-  background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  color: rgba(239, 68, 68, 0.85);
-  border-radius: var(--radius);
-  font-size: 0.8rem;
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap;
+  flex-shrink: 0; padding: 0.45rem 0.9rem; background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.35); color: rgba(239, 68, 68, 0.85);
+  border-radius: var(--radius); font-size: 0.78rem; font-family: inherit; cursor: pointer; white-space: nowrap;
 }
 .missions-admin-delete:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+/* ── Cartes de section ── */
+.missions-card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 12px; box-shadow: var(--shadow-sm); padding: 18px 20px;
+}
+.missions-card-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-primary); margin: 0 0 14px;
+}
+
+/* ── Grille de champs ── */
+.missions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 16px; }
+.missions-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.missions-field.full { grid-column: 1 / -1; }
+.missions-field.narrow { max-width: 130px; }
+.missions-field > label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--color-text-secondary); }
+.missions-field input,
+.missions-field select,
+.missions-field textarea {
+  width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem;
+  background: #fffdf8; border: 1px solid var(--color-border); border-radius: var(--radius);
+  color: var(--color-text); font-family: inherit; font-size: 0.9rem;
+}
+.missions-field input:focus,
+.missions-field select:focus,
+.missions-field textarea:focus {
+  outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(128, 28, 28, 0.12);
+}
+.missions-field input[readonly] { opacity: 0.6; cursor: default; background: var(--color-bg); }
+.missions-field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+.missions-hint { font-size: 0.72rem; color: var(--color-text-secondary); opacity: 0.85; line-height: 1.4; }
+.missions-cover-preview { margin-top: 8px; max-height: 130px; border-radius: var(--radius); object-fit: cover; max-width: 100%; border: 1px solid var(--color-border); }
+.missions-checks { display: flex; flex-wrap: wrap; gap: 18px; }
+.missions-check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-text); cursor: pointer; }
+.missions-check input { width: auto; }
