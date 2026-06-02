@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { HomeBannerCard } from '../components/home/HomeBannerCard'
-import { DailyQuestsList } from '../components/quests/DailyQuestsList'
+import { DefisBoard } from '../components/quests/DefisBoard'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { MapActivityList } from '../components/home/MapActivityList'
@@ -103,7 +103,7 @@ export default function HomePage() {
                 + Créer
               </button>
             </header>
-            <DailyQuestsList />
+            <DefisBoard />
             <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
           </div>
         </section>

@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useDailyQuestsStore } from '../../stores/dailyQuestsStore'
+import { useDefisStore } from '../../stores/defisStore'
 import '../map/modals/VictoryModal.css'
 
 /**
- * Butin d'un Défi du jour complété. Réutilise le style canonique de récompense
+ * Butin d'un Défi accompli. Réutilise le style canonique de récompense
  * (VictoryModal / LevelUpModal) — overlay sombre, label, grande icône, titre,
  * encart gains, bouton « Continuer » — pour rester cohérent avec le reste du jeu.
  * Accent doré (vs rouge conquête de VictoryModal) via --victory-accent.
  */
 export function QuestRewardModal() {
-  const reward = useDailyQuestsStore((s) => s.pendingRewards[0] ?? null)
-  const shiftReward = useDailyQuestsStore((s) => s.shiftReward)
+  const reward = useDefisStore((s) => s.pendingRewards[0] ?? null)
+  const shiftReward = useDefisStore((s) => s.shiftReward)
 
   useEffect(() => {
     if (!reward) return

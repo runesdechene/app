@@ -6,7 +6,7 @@ import { usePlayerStore } from '../stores/playerStore'
 import { useToastStore } from '../stores/toastStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { useCrownsStore } from '../stores/crownsStore'
-import { useDailyQuestsStore } from '../stores/dailyQuestsStore'
+import { useDefisStore } from '../stores/defisStore'
 import { refreshLevelStateGlobal } from '../hooks/useLevel'
 
 const GPS_PROXIMITY_M = 500
@@ -109,10 +109,8 @@ export async function discoverPlace(
     useCrownsStore.getState().setBalance(data.newCrownsBalance)
   }
 
-  // V0.7.6 — refresh quêtes du jour si découverte remote (fait avancer "Découvre 3 lieux")
-  if (method === 'remote') {
-    useDailyQuestsStore.getState().refresh(userId)
-  }
+  // Refresh défis après découverte (remote = révéler, gps = visiter — les deux font avancer les défis)
+  useDefisStore.getState().refresh(userId)
 
   // Rafraîchir l'état de niveau pour que useLevelUp détecte le changement
   await refreshLevelStateGlobal(userId)

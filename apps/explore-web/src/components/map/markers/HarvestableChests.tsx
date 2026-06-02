@@ -4,7 +4,6 @@ import type { FeatureCollection, Point } from 'geojson'
 import type { PlaceProperties } from '../../../hooks/usePlaces'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { usePlayerStore } from '../../../stores/playerStore'
-import { useDailyQuestsStore } from '../../../stores/dailyQuestsStore'
 import './HarvestableChests.css'
 
 interface ClickBurst {
@@ -65,13 +64,9 @@ export function HarvestableChests({ geojson }: Props) {
     // RPC en arrière-plan — on n'attend pas pour démonter, sinon l'animation est tronquée.
     const harvestPromise = harvest(userId, placeId)
 
-    // Rafraîchit les Défis du jour dès que la récolte est confirmée (feedback quasi
-    // instantané, découplé de l'animation de 1.7s ci-dessous).
     void harvestPromise.then(result => {
       if ('error' in result) {
         console.warn('[crowns] harvest failed:', result.error)
-      } else if (userId) {
-        useDailyQuestsStore.getState().refresh(userId)
       }
     })
 

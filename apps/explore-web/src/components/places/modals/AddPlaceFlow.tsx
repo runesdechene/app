@@ -5,6 +5,7 @@ import { useMapStore } from '../../../stores/mapStore'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useToastStore } from '../../../stores/toastStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
+import { useDefisStore } from '../../../stores/defisStore'
 import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
 import { EraSelector } from './EraSelector'
 import './AddPlaceFlow.css'
@@ -394,6 +395,8 @@ export function AddPlaceFlow() {
         placeLocation: { latitude: confirmedCoords.lat, longitude: confirmedCoords.lng },
       })
 
+      // Refresh défis — actions add + veilleur (si GPS) font avancer les défis
+      useDefisStore.getState().refresh(userId)
       setStep('success')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')

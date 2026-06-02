@@ -2,6 +2,7 @@
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { useVictoryModalStore } from '../../../stores/victoryModalStore'
+import { useDefisStore } from '../../../stores/defisStore'
 import { useVeille } from '../../../hooks/useVeille'
 import { VeillePartageeModal } from '../modals/VeillePartageeModal'
 import { pushVeilleOverride } from '../../../lib/loadInitialVeilles'
@@ -101,6 +102,8 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
     }
     pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
     await refresh()
+    // Refresh défis — action veilleur fait avancer le défi correspondant
+    useDefisStore.getState().refresh(userId)
     // V0.8.10 (11/05) — Pop-up Victoire (réutilise VictoryModal existante,
     // déjà montée dans MapPage et triggerée par useCourtNotifications pour
     // les prises à distance). On la trigger aussi pour le plant GPS, avec
