@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ExpeditionsList } from '../expeditions/ExpeditionsList'
 import { DailyQuestsList } from './DailyQuestsList'
+import { CommunityQuestCard } from './CommunityQuestCard'
+import { MissionEntryCard } from './MissionEntryCard'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
 import './QuestsBoardPanel.css'
 import './DailyQuests.css'
@@ -69,7 +71,9 @@ export function QuestsBoardPanel({ onOpenExpedition, onOpenCreator }: Props) {
       {/* On ne démonte PAS la liste au repli — sinon flash de re-fetch au déploiement.
           On la cache en CSS via la classe parent .qbp-collapsed. */}
       <div className="qbp-content">
-        <DailyQuestsList />
+        <section className="qbp-section"><h4 className="qbp-section-title">Défis du jour</h4><DailyQuestsList /></section>
+        <section className="qbp-section"><h4 className="qbp-section-title">Le défi de la semaine</h4><CommunityQuestCard /></section>
+        <section className="qbp-section"><h4 className="qbp-section-title">Mission</h4><MissionEntryCard /></section>
         <ExpeditionsList onOpenExpedition={onOpenExpedition} />
       </div>
 

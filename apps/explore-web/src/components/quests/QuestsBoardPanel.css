@@ -99,3 +99,106 @@
 /* FAB "+" — caché desktop. Visible uniquement quand .qbp passe en mode
    mobile-fullscreen (cf. mobile.css). */
 .qbp-fab-add { display: none; }
+
+/* ─── Sections titrées ────────────────────────────────────────────────────── */
+
+.qbp-section {
+  padding: 8px 0 4px;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.18);
+}
+.qbp-section:last-of-type {
+  border-bottom: none;
+}
+
+.qbp-section-title {
+  font-family: var(--font-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gold, #c19a6b);
+  margin: 0 0 6px 2px;
+  line-height: 1;
+}
+
+/* ─── Community Quest Card ────────────────────────────────────────────────── */
+
+.community-quest-card {
+  background: rgba(193, 154, 107, 0.1);
+  border: 1px solid rgba(193, 154, 107, 0.3);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cqc-head {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.cqc-bar {
+  height: 6px;
+  background: rgba(193, 154, 107, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cqc-bar-fill {
+  height: 100%;
+  background: var(--color-gold, #c19a6b);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.cqc-meta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-ink-light, #7a6a55);
+}
+
+/* ─── Mission Entry Card ──────────────────────────────────────────────────── */
+
+.mission-entry-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(252, 241, 214, 0.7);
+  border: 1px solid rgba(193, 154, 107, 0.35);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.mission-entry-card:hover {
+  background: rgba(193, 154, 107, 0.18);
+  border-color: rgba(193, 154, 107, 0.6);
+}
+
+.mec-emblem {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.mec-title {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.mec-go {
+  font-size: 14px;
+  color: var(--color-gold, #c19a6b);
+  flex-shrink: 0;
+}
