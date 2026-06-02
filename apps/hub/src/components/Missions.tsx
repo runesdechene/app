@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { SaveBar } from './SaveBar'
 import { MissionProductPicker } from './missions/MissionProductPicker'
+import './missions/Missions.css'
 
 type DeliverableKind = 'photo' | 'video' | 'other'
 type MissionStatus = 'draft' | 'published' | 'passed' | 'archived'
@@ -252,15 +253,15 @@ export function Missions() {
   if (loading) return <div className="loading">Chargement...</div>
 
   return (
-    <div style={{ paddingBottom: hasChanges ? 70 : 0 }}>
+    <div className="missions-admin" style={{ paddingBottom: hasChanges ? 80 : 0 }}>
       <div className="page-header">
         <h1>Missions</h1>
         <span className="tags-count">{missions.length} mission{missions.length !== 1 ? 's' : ''}</span>
       </div>
 
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+      <div className="missions-admin-layout">
         {/* ── Liste gauche ── */}
-        <div style={{ width: 280, flexShrink: 0 }}>
+        <div className="missions-admin-list">
           {/* Création */}
           <div className="faction-create" style={{ marginBottom: 12 }}>
             <input
@@ -337,7 +338,7 @@ export function Missions() {
         </div>
 
         {/* ── Éditeur droite ── */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="missions-admin-editor">
           {selectedMission === null ? (
             <div style={{ opacity: 0.4, fontSize: 14, marginTop: 40, textAlign: 'center' }}>
               Sélectionnez une mission ou créez-en une nouvelle.

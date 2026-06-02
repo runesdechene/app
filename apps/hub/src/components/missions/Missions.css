@@ -1,0 +1,43 @@
+/* Page d'authoring des Missions (Hub) — mise en page propre.
+   Surcharge les inputs empruntés à Factions (transparents/inline) en vrais
+   champs de formulaire visibles, et rend la mise en page responsive. */
+
+.missions-admin .faction-title-input,
+.missions-admin .faction-description-input,
+.missions-admin select.faction-title-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.missions-admin .faction-title-input:hover,
+.missions-admin .faction-description-input:hover {
+  border-color: var(--color-border);
+}
+.missions-admin .faction-title-input:focus,
+.missions-admin .faction-description-input:focus,
+.missions-admin select.faction-title-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+.missions-admin .faction-field { margin-bottom: 14px; max-width: 680px; }
+
+/* Layout 2 colonnes responsive */
+.missions-admin-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+.missions-admin-list { width: 280px; flex-shrink: 0; }
+.missions-admin-editor { flex: 1; min-width: 0; }
+
+@media (max-width: 860px) {
+  .missions-admin-layout { flex-direction: column; }
+  .missions-admin-list { width: 100%; }
+}
