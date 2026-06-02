@@ -1,0 +1,9 @@
+.court-fold-wrap{margin-bottom:16px}
+.court-fold-bar{width:100%;display:flex;align-items:center;gap:9px;background:rgba(74,55,40,.07);
+  border:1px solid rgba(160,120,76,.22);border-radius:999px;padding:8px 14px;cursor:pointer;
+  font-family:var(--font-accent);font-size:13px;color:var(--color-ink-light)}
+.court-fold-crown{font-size:15px}
+.court-fold-label b{color:var(--color-ink)}
+.court-fold-chev{margin-left:auto;color:var(--color-sepia-dark);font-size:14px;transition:transform .2s}
+.court-fold-chev.open{transform:rotate(180deg)}
+.court-fold-body{margin-top:10px}
