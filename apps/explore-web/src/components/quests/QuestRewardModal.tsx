@@ -1,20 +1,47 @@
-import { InfoModal } from '../map/modals/InfoModal'
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useDailyQuestsStore } from '../../stores/dailyQuestsStore'
+import '../map/modals/VictoryModal.css'
 
+/**
+ * Butin d'un Défi du jour complété. Réutilise le style canonique de récompense
+ * (VictoryModal / LevelUpModal) — overlay sombre, label, grande icône, titre,
+ * encart gains, bouton « Continuer » — pour rester cohérent avec le reste du jeu.
+ * Accent doré (vs rouge conquête de VictoryModal) via --victory-accent.
+ */
 export function QuestRewardModal() {
   const reward = useDailyQuestsStore((s) => s.pendingRewards[0] ?? null)
   const shiftReward = useDailyQuestsStore((s) => s.shiftReward)
+
+  useEffect(() => {
+    if (!reward) return
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') shiftReward() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [reward, shiftReward])
+
   if (!reward) return null
-  const rows: { label: string; value: string; highlight?: boolean }[] = []
-  if (reward.xp > 0) rows.push({ label: 'Expérience', value: `+${reward.xp} XP`, highlight: true })
-  if (reward.crowns > 0) rows.push({ label: 'Couronnes', value: `+${reward.crowns} 🪙`, highlight: true })
-  return (
-    <InfoModal
-      icon={reward.icon || '🏆'}
-      title="Défi accompli !"
-      description={reward.title}
-      rows={rows}
-      onClose={shiftReward}
-    />
+
+  const node = (
+    <div className="victory-overlay" onClick={shiftReward}>
+      <div
+        className="victory-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{ '--victory-accent': '#c9a24a' } as React.CSSProperties}
+      >
+        <div className="victory-label">Défi accompli</div>
+        <div className="victory-icon" aria-hidden>{reward.icon || '🏆'}</div>
+        <div className="victory-place">{reward.title}</div>
+        <div className="victory-quote">Ton effort est récompensé.</div>
+        {reward.crowns > 0 && (
+          <div className="victory-gains">
+            <span className="victory-gain">+{reward.crowns} 🪙 Couronnes</span>
+          </div>
+        )}
+        <button className="victory-btn" onClick={shiftReward}>Continuer</button>
+      </div>
+    </div>
   )
+
+  return createPortal(node, document.body)
 }

@@ -5,6 +5,18 @@
 
 ---
 
+## D-UI1. Unifier les modales de récompense en un seul `<RewardModal>`
+
+**Origine** : 2 juin 2026 — la `QuestRewardModal` (butin des Défis du jour) réutilise le CSS de `VictoryModal` (classes `victory-*`) mais reste un **composant séparé** (markup dupliqué). Il existe en parallèle `LevelUpModal` (CSS `lvlup-*`, distinct). → 3 composants de récompense, 2 feuilles de style.
+
+**Dette à traiter** : extraire un composant présentationnel unique `<RewardModal>` (1 fichier + 1 CSS : label, icône, titre, citation, encart gains, bouton, accent themable) et faire passer Victoire + Palier + Quête dessus. Style/structure modifiés à **un seul endroit**.
+
+**Coût** : moyen — touche `VictoryModal` + `LevelUpModal` en prod (Cour/Veilles/level-up), tests soigneux requis.
+
+**Urgence** : basse — le CSS Quête+Victoire est déjà mutualisé ; seuls le Palier et le markup divergent. (Demandé par Uriel le 2026-06-02 : "on garde pour l'instant, à unifier un jour".)
+
+---
+
 ## D0. Drift repo/prod — mig 175 patche dynamiquement 3 RPCs
 
 **Origine** : 28 mai 2026 — bump du rayon GPS 100m → 200m (bug RICKNON viaduc de la Borrèze). Au lieu de recopier 350 lignes de RPCs pour 3 fonctions (`plant_flag`, `revisit_place_gps`, `_visit_place_gps_internal`), la mig 175 fait un `pg_get_functiondef` + `replace('v_distance_km > 0.1', 'v_distance_km > 0.2')` + `EXECUTE` dynamique. Idempotent et court (~15 lignes utiles).

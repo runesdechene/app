@@ -1,3 +1,10 @@
+# ALPHA V0.8.28
+## Butin des Défis du jour en Couronnes
+
+Les Défis du jour récompensent désormais en **Couronnes** (et non plus en points d'expérience, qui n'étaient pas une monnaie visible). La fenêtre de butin reprend le style des autres pop-ups de victoire du jeu.
+
+---
+
 # ALPHA V0.8.27
 ## Défis du jour — progression live et butin automatique
 
