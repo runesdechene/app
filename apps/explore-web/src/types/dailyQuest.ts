@@ -24,4 +24,12 @@ export interface DailyQuest {
   reward: QuestReward
   /** ISO timestamp si accomplie aujourd'hui, null sinon. */
   completedAt: string | null
+  claimed: boolean
+}
+
+export interface QuestRewardPopup {
+  icon: string
+  title: string
+  xp: number
+  crowns: number
 }

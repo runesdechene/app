@@ -4,6 +4,7 @@ import type { FeatureCollection, Point } from 'geojson'
 import type { PlaceProperties } from '../../../hooks/usePlaces'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useDailyQuestsStore } from '../../../stores/dailyQuestsStore'
 import './HarvestableChests.css'
 
 interface ClickBurst {
@@ -73,7 +74,11 @@ export function HarvestableChests({ geojson }: Props) {
         return next
       })
       void harvestPromise.then(result => {
-        if ('error' in result) console.warn('[crowns] harvest failed:', result.error)
+        if ('error' in result) {
+          console.warn('[crowns] harvest failed:', result.error)
+        } else if (userId) {
+          useDailyQuestsStore.getState().refresh(userId)
+        }
       })
     }, 1700)
   }, [userId, harvestable, harvest, busyPlaceIds])

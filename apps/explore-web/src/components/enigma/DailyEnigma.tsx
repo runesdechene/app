@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { useEnsurePushPermission } from '../../hooks/useEnsurePushPermission'
+import { useDailyQuestsStore } from '../../stores/dailyQuestsStore'
 import { EnigmaResult } from './EnigmaResult'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
@@ -156,6 +157,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
         setCrownsBalance(r.newCrownsBalance)
       }
       if (userId) void refreshLevelStateGlobal(userId)
+      if (userId) useDailyQuestsStore.getState().refresh(userId)
       // Well-timed prompt : on vient juste de résoudre l'énigme du jour,
       // c'est l'instant idéal pour proposer les notifs (rituel quotidien).
       // Le hook ne re-prompt jamais s'il a déjà été refusé une fois.

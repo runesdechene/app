@@ -1,3 +1,10 @@
+# ALPHA V0.8.27
+## Défis du jour — progression live et butin automatique
+
+Les quêtes du jour se mettent maintenant à jour en temps réel après chaque action qui les fait progresser (récolte de Couronnes, énigme du jour, découverte à distance). Dès qu'un défi est complété, la récompense est réclamée automatiquement et une modale de butin s'affiche avec le détail XP / Couronnes gagnés.
+
+---
+
 # ALPHA V0.8.26
 ## Rayon GPS porté à 200 m
 

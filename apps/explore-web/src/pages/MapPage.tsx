@@ -59,6 +59,7 @@ import { LevelUpModal } from '../components/levelup/LevelUpModal'
 import { VeteranWelcomeModal } from '../components/levelup/VeteranWelcomeModal'
 import { VictoryModal } from '../components/map/modals/VictoryModal'
 import { useVictoryModalStore } from '../stores/victoryModalStore'
+import { QuestRewardModal } from '../components/quests/QuestRewardModal'
 import { supabase } from '../lib/supabase'
 import shopIcon from '../assets/shop_icon.webp'
 import '../App.css'
@@ -601,6 +602,9 @@ export default function MapPage() {
           onClose={dismissVictory}
         />
       )}
+
+      {/* V0.8 — Modale butin quête du jour (auto-claim à la complétion). */}
+      <QuestRewardModal />
 
       {/* Overlay texture parchemin */}
       {!addPlaceMode && <div className="parchment-overlay" />}
