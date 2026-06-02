@@ -1,4 +1,5 @@
 import type { Defi } from '../../types/defi'
+import { DefiTagBadge } from './DefiTagBadge'
 
 interface Props {
   defi: Defi
@@ -34,7 +35,7 @@ export function DefiCard({ defi, label, onClick }: Props) {
         style={{ cursor: 'pointer' }}
       >
         <div className="cqc-head">
-          <span aria-hidden>{defi.icon}</span>{' '}
+          <DefiTagBadge defi={defi} size={20} />{' '}
           {defi.title}
         </div>
         <div className="cqc-bar">
@@ -57,7 +58,7 @@ export function DefiCard({ defi, label, onClick }: Props) {
         tabIndex={0}
         onKeyDown={keyActivate}
       >
-        <span className="daily-quest-card-icon" aria-hidden>{defi.icon}</span>
+        <span className="daily-quest-card-icon"><DefiTagBadge defi={defi} size={24} /></span>
         <span className="daily-quest-card-pill">{label}</span>
         <span className="daily-quest-card-title">{defi.title}</span>
         <span

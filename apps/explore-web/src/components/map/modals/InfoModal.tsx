@@ -9,7 +9,7 @@ interface InfoRow {
 }
 
 interface InfoModalProps {
-  icon: string
+  icon: ReactNode
   title: string
   description: string
   rows: InfoRow[]

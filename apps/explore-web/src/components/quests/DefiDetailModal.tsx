@@ -1,4 +1,5 @@
 import { InfoModal } from '../map/modals/InfoModal'
+import { DefiTagBadge } from './DefiTagBadge'
 import type { Defi } from '../../types/defi'
 
 /** Explication de l'action attendue, par type de défi. */
@@ -41,7 +42,7 @@ export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => 
 
   return (
     <InfoModal
-      icon={defi.icon}
+      icon={<DefiTagBadge defi={defi} size={44} />}
       title={defi.title}
       description={description}
       rows={rows}

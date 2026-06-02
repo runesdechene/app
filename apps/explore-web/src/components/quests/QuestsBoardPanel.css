@@ -202,3 +202,8 @@
   color: var(--color-gold, #c19a6b);
   flex-shrink: 0;
 }
+
+/* Pastille de tag d un defi (fond couleur + icone blanche masquee, style carte) */
+.defi-tag-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;flex:0 0 auto;box-shadow:0 1px 3px rgba(0,0,0,.3);vertical-align:middle}
+.defi-tag-badge-icon{width:100%;height:100%;display:block;background-color:#fff;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:58%;mask-size:58%}
+.defi-tag-badge-emoji{display:inline-flex;align-items:center;justify-content:center;line-height:1}
