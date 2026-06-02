@@ -47,3 +47,15 @@ mockups/
 __pycache__/
 *.pyc
 supabase/.temp/
+
+# Thème Shopify égaré + archives (non suivis, ajoutés par erreur via git add -A le 2026-06-02)
+/assets/
+/blocks/
+/config/
+/layout/
+/locales/
+/sections/
+/snippets/
+/templates/
+.wolf-archive/
+*.openwolf-era
