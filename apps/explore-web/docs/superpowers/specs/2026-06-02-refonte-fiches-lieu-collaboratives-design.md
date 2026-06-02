@@ -26,10 +26,15 @@ d'explorateurs érudits :
 3. Identité : titre · ★ note · tags · adresse · infos rapides (accessibilité / saison /
    époque / alerte). — inchangé.
 4. **« Ils ont foulé ces terres »** (rangée explorateurs). — inchangé.
-5. **La Cour** (influence par Couronnes). — inchangée.
+5. **La Cour / Conquête** (influence par Couronnes) — **repliée par défaut** : réduite à un
+   bandeau d'une ligne (« 👑 Conquête — veillé par {nom} · ⌄ déplier ») qu'on **déplie au tap**
+   pour révéler `PlaceCourtView` (barre de tension + prétendants + mécènes). Garde la fiche
+   centrée sur le carnet ; la conquête reste accessible sans écraser.
 6. **📖 Le lieu** — *description collaborative*. Bloc principal de la fiche.
    - Barre : **❤️ J'aime** · **✏️ Contribuer** · mention « enrichi par N aventuriers · voir l'historique ».
-7. **Onglets : Galerie · Discussion · Infos** (l'onglet « Carnets » disparaît ; « Admin » conservé).
+7. **Onglets : Discussion · Galerie · Infos** (« Admin » conservé). **Discussion = premier onglet et
+   sélectionné par défaut** à l'ouverture (remplace le défaut actuel `'carnets'`). L'onglet
+   « Carnets » disparaît.
 
 ## 3. La description collaborative (wiki ouvert)
 
@@ -83,6 +88,26 @@ d'explorateurs érudits :
   Si aucun carnet : description **vide** avec invite « Sois le premier à décrire ce lieu ».
 - **Notes ★** → système de notation du lieu **inchangé** (prompt après visite GPS, `rate_place`).
 
+## 7bis. Direction visuelle (validée en maquette)
+
+Esprit **« carnet de route d'explorateur érudit »** — fidèle à la ligne éditoriale
+(chevalier errant / sublime). Maquettes validées : `.superpowers/brainstorm/.../design-v3.html`.
+
+- **Fond de modal = vraie texture parchemin** (`src/assets/parchemin.png`, celle de la landing),
+  avec un léger voile clair (`rgba(247,237,225,.18→.42)`) pour la lisibilité du texte par-dessus.
+- **Typographie** (tokens existants `index.css`) : titres en **Bebas Neue** (`--font-title`),
+  labels/UI en **Cabin Condensed** (`--font-accent`), corps en **Cabin** (`--font-body`),
+  et **la description collaborative en Alegreya** (`--font-signature`) — la « voix littéraire » du lieu.
+- **Description = encart de manuscrit** posé sur le parchemin : panneau crème translucide
+  (`rgba(255,251,244,.82)`), **filet orné** en tête (`— LE LIEU —`), **lettrine** Bebas sur la
+  première lettre, texte justifié.
+- **❤️ = sceau** (pastille arrondie), passe en teinte cire/rouge quand liké. **Contribuer** = pilule encre pleine.
+- **Commentaires = entrées de journal** : avatar rond (initiale + badge rôle ⭐/🛡️), nom en Cabin
+  Condensed, filets sépia fins en séparateur, photos en vignettes arrondies bord clair, réponse indentée.
+- **Slideshow** sous le hero : vignettes 74×56 arrondies + tuile **＋ Photo** pointillée.
+- **Onglets** : libellés Bebas soulignés sépia (onglet actif = filet `--color-sepia-dark`).
+- Palette : strictement les tokens `@theme` d'`index.css` (parchemin / encre / sépia / sauge / eau).
+
 ## 8. Modèle de données proposé
 
 > Approche recommandée : **maximiser la réutilisation de `place_contributions`** plutôt que
@@ -114,7 +139,9 @@ Côté RPC (`SECURITY DEFINER`, logique serveur) :
 ## 9. Impact front (composants)
 
 - `PlacePanel.tsx` : réorganiser l'anatomie ; slideshow sous le hero ; remplacer l'onglet
-  « Carnets » par « Discussion » ; hero/slideshow alimentés par la galerie.
+  « Carnets » par « Discussion » (premier + défaut `useState('discussion')`) ; **replier
+  `PlaceCourtView` derrière un bandeau dépliable** (nouveau wrapper `CourtFold`, fermé par défaut) ;
+  hero/slideshow alimentés par la galerie ; appliquer le fond parchemin sur `.place-panel`.
 - **Nouveaux** : `PlaceDescription` (bloc + édition + historique), `PlaceDescriptionHistoryModal`,
   `DiscussionThread` + `CommentCard` (texte/photos/❤️/réponse), `CommentComposer`,
   `PhotoSlideshow` (bandeau hero), `AddPhotoModal` (upload sans texte).
