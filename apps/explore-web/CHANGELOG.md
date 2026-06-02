@@ -1,3 +1,10 @@
+# ALPHA V0.8.30
+## Défis renouvelés : du jour, de la semaine, collectifs
+
+Le tableau de quêtes accueille les Défis : un Défi du jour, un Défi de la semaine et un Défi collectif, tirés parmi une grande variété de défis thématiques liés aux lieux (châteaux, cathédrales, mégalithes, sources, arbres maîtres…). Chaque défi affiche la vraie icône de son tag, son explication au clic, sa progression en temps réel et son butin en Couronnes. Côté Missions à thème : fenêtre peaufinée.
+
+---
+
 # ALPHA V0.8.29
 ## Progression des Défis quasi-instantanée après une récolte
 
