@@ -25,8 +25,8 @@ const COURT_NOTIF_TYPES = new Set<Notification['type']>([
   'mecene_principal_gained', 'claim_lost',
 ])
 
-/** Types dont l'action utile est le carnet (onglet Carnets). */
-const CARNET_NOTIF_TYPES = new Set<Notification['type']>([
+/** Types dont l'action utile est la discussion (onglet Discussion). */
+const DISCUSSION_NOTIF_TYPES = new Set<Notification['type']>([
   'like_carnet', 'new_carnet', 'milestone_likes',
 ])
 
@@ -46,7 +46,7 @@ export function resolveNotificationTarget(notif: Notification): NotificationTarg
 
   const tab: PlacePanelActiveTab | null =
     COURT_NOTIF_TYPES.has(notif.type) ? 'infos'
-    : CARNET_NOTIF_TYPES.has(notif.type) ? 'carnets'
+    : DISCUSSION_NOTIF_TYPES.has(notif.type) ? 'discussion'
     : null
   return { kind: 'place', id: placeId, tab }
 }
