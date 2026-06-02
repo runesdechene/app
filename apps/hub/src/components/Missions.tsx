@@ -376,17 +376,12 @@ function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* Header éditeur */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 18 }}>
+      <div className="missions-admin-editor-head">
+        <h2>
           {mission.emblem && <span style={{ marginRight: 8 }}>{mission.emblem}</span>}
           {mission.title || mission.slug}
         </h2>
-        <button
-          type="button"
-          className="faction-delete-btn"
-          onClick={onDelete}
-          style={{ marginLeft: 12 }}
-        >
+        <button type="button" className="missions-admin-delete" onClick={onDelete}>
           Supprimer
         </button>
       </div>

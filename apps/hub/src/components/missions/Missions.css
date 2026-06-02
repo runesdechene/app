@@ -41,3 +41,26 @@
   .missions-admin-layout { flex-direction: column; }
   .missions-admin-list { width: 100%; }
 }
+
+/* En-tête de l'éditeur : titre à gauche, bouton Supprimer compact à droite */
+.missions-admin-editor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.missions-admin-editor-head h2 { margin: 0; font-size: 18px; min-width: 0; }
+.missions-admin-delete {
+  flex: 0 0 auto;
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: rgba(239, 68, 68, 0.85);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.missions-admin-delete:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
