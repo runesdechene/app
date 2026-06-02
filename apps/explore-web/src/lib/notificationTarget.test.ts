@@ -54,11 +54,11 @@ const cases: Array<{ name: string; notif: Notification; expect: NotificationTarg
     notif: notif('mecene_principal_gained', { placeId: 'p-6' }),
     expect: { kind: 'place', id: 'p-6', tab: 'infos' },
   },
-  // Carnets → onglet carnets.
+  // Carnets → onglet discussion.
   {
-    name: 'like_carnet → place, tab carnets',
+    name: 'like_carnet → place, tab discussion',
     notif: notif('like_carnet', { placeId: 'p-7', actorId: 'u' }),
-    expect: { kind: 'place', id: 'p-7', tab: 'carnets' },
+    expect: { kind: 'place', id: 'p-7', tab: 'discussion' },
   },
   // Sans cible exploitable → none (pas de crash, ferme juste le panneau).
   {

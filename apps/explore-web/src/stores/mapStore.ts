@@ -36,7 +36,7 @@ export interface TerritorySelection {
 
 interface MapState {
   selectedPlaceId: string | null
-  /** Onglet sur lequel ouvrir le PlacePanel (null = défaut 'carnets').
+  /** Onglet sur lequel ouvrir le PlacePanel (null = défaut 'discussion').
    *  Posé par les notifications Cour → 'infos' (La Cour). Lu au mount du panel. */
   selectedPlaceTab: PlacePanelActiveTab | null
   setSelectedPlaceId: (id: string | null, tab?: PlacePanelActiveTab | null) => void
