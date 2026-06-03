@@ -3,6 +3,7 @@
 .photo-slideshow-thumb{flex:0 0 auto;width:74px;height:56px;border-radius:10px;overflow:hidden;
   border:1.5px solid rgba(255,255,255,.5);box-shadow:0 2px 6px rgba(74,55,40,.22);padding:0;cursor:pointer;background:none}
 .photo-slideshow-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-slideshow-thumb.active{border-color:var(--color-sepia-dark);box-shadow:0 0 0 2px var(--color-sepia-dark)}
 .photo-slideshow-add{flex:0 0 auto;width:74px;height:56px;border-radius:10px;border:1.5px dashed var(--color-sepia-dark);
   color:var(--color-sepia-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;
   font-family:var(--font-accent);font-size:11px;gap:1px;cursor:pointer;background:rgba(255,255,255,.25)}

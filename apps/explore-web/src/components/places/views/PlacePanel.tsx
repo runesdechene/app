@@ -539,6 +539,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             alt={place.title}
             className="place-hero-img"
             loading="lazy"
+            style={{ cursor: 'zoom-in' }}
+            onClick={() => currentHeroPhotos.length > 0 && setLightbox({ photos: currentHeroPhotos, index: imageIndex % currentHeroPhotos.length })}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
           />
         ) : (
@@ -585,8 +587,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         )}
       </div>
 
-      {/* Photo slideshow strip */}
-      <PhotoSlideshow photos={heroPhotos} onOpen={(p, i) => setLightbox({ photos: p, index: i })} onAddPhoto={() => setShowAddPhoto(true)} />
+      {/* Photo slideshow strip — clic = change l'image du hero au-dessus */}
+      <PhotoSlideshow
+        photos={heroPhotos}
+        activeIndex={currentHeroPhotos.length ? imageIndex % currentHeroPhotos.length : 0}
+        onSelect={setImageIndex}
+        onAddPhoto={() => setShowAddPhoto(true)}
+      />
 
       {/* Zone 2 — Body */}
       <div className="place-body">

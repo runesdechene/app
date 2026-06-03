@@ -47,7 +47,14 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
       <p className="place-descr-text">{description.content}</p>
       <div className="place-descr-foot">
         <span className="place-descr-credit">
-          {description.revisionCount > 1 ? `Enrichi par plusieurs aventuriers · ` : ''}
+          {description.editorName && (
+            <>
+              {description.revisionCount > 1
+                ? <>Enrichi par <b>{description.editorName}</b> et d'autres</>
+                : <>Par <b>{description.editorName}</b></>}
+              {' · '}
+            </>
+          )}
           <button className="place-descr-history" onClick={onOpenHistory}>voir l'historique</button>
         </span>
         <div className="place-descr-actions">
