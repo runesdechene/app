@@ -503,6 +503,37 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setEditingTitle(false)
   }
 
+  // --- Modales plein panneau (prise de contrôle du panneau, comme l'éditeur de carnet historique) ---
+  if (showEditDescr) {
+    return (
+      <DescriptionEditModal
+        placeId={place.id}
+        initial={v05?.description?.content ?? ''}
+        onClose={() => setShowEditDescr(false)}
+        onSaved={() => { setShowEditDescr(false); refreshV05() }}
+      />
+    )
+  }
+  if (showHistory) {
+    return (
+      <DescriptionHistoryModal
+        placeId={place.id}
+        canRestore={canEditDescription}
+        onClose={() => setShowHistory(false)}
+        onRestored={() => { setShowHistory(false); refreshV05() }}
+      />
+    )
+  }
+  if (showAddPhoto) {
+    return (
+      <AddPhotoModal
+        placeId={place.id}
+        onClose={() => setShowAddPhoto(false)}
+        onSaved={() => { setShowAddPhoto(false); refreshV05() }}
+      />
+    )
+  }
+
   return (
     <>
       {/* Dialog confirmation suppression */}
@@ -901,19 +932,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           </div>
         )}
       </div>
-
-      {/* Description modals */}
-      {showEditDescr && (
-        <DescriptionEditModal placeId={place.id} initial={v05?.description?.content ?? ''}
-          onClose={() => setShowEditDescr(false)} onSaved={refreshV05} />
-      )}
-      {showHistory && (
-        <DescriptionHistoryModal placeId={place.id} canRestore={canEditDescription}
-          onClose={() => setShowHistory(false)} onRestored={refreshV05} />
-      )}
-      {showAddPhoto && (
-        <AddPhotoModal placeId={place.id} onClose={() => setShowAddPhoto(false)} onSaved={refreshV05} />
-      )}
 
       {lightbox && (
         <PhotoLightbox
