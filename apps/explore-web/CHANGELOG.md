@@ -1,3 +1,10 @@
+# ALPHA V0.9.0
+## Les fiches de lieu deviennent de vrais carnets de route
+
+Fini les récits chacun dans son coin. Chaque lieu a désormais une **description collaborative**, co-écrite par les aventuriers qui l'ont découvert — avec mise en forme (gras, italique, listes, sauts de ligne), historique des versions et **l'avatar de chaque contributeur**. En dessous, une **discussion** ouverte à tous : commentaires avec photos, j'aime et réponses. Les **photos** s'ajoutent en un geste, sans rien rédiger, et défilent en bandeau sous la grande image, qu'on agrandit d'un tap. La Conquête se replie pour laisser le carnet au premier plan.
+
+---
+
 # ALPHA V0.8.30
 ## Défis renouvelés : du jour, de la semaine, collectifs
 
