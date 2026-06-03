@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import './AddCarnetModal.css'
@@ -34,9 +35,9 @@ export function AddPhotoModal({ placeId, onClose, onSaved }: Props) {
     setSaving(false); onSaved(); onClose()
   }
 
-  return (
-    <div className="add-carnet-overlay">
-      <div className="add-carnet-modal">
+  return createPortal(
+    <div className="add-carnet-overlay" onClick={onClose}>
+      <div className="add-carnet-modal" onClick={e => e.stopPropagation()}>
         <div className="add-carnet-header"><h3>Ajouter une photo</h3><button className="add-carnet-close" onClick={onClose}>✕</button></div>
         <div className="add-carnet-body">
           <div className="add-carnet-photos-grid">
@@ -52,6 +53,7 @@ export function AddPhotoModal({ placeId, onClose, onSaved }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

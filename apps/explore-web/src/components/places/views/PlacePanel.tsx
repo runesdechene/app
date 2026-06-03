@@ -503,37 +503,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setEditingTitle(false)
   }
 
-  // --- Modales plein panneau (prise de contrôle du panneau, comme l'éditeur de carnet historique) ---
-  if (showEditDescr) {
-    return (
-      <DescriptionEditModal
-        placeId={place.id}
-        initial={v05?.description?.content ?? ''}
-        onClose={() => setShowEditDescr(false)}
-        onSaved={() => { setShowEditDescr(false); refreshV05() }}
-      />
-    )
-  }
-  if (showHistory) {
-    return (
-      <DescriptionHistoryModal
-        placeId={place.id}
-        canRestore={canEditDescription}
-        onClose={() => setShowHistory(false)}
-        onRestored={() => { setShowHistory(false); refreshV05() }}
-      />
-    )
-  }
-  if (showAddPhoto) {
-    return (
-      <AddPhotoModal
-        placeId={place.id}
-        onClose={() => setShowAddPhoto(false)}
-        onSaved={() => { setShowAddPhoto(false); refreshV05() }}
-      />
-    )
-  }
-
   return (
     <>
       {/* Dialog confirmation suppression */}
@@ -843,7 +812,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         <CourtFold placeId={place.id} placeTitle={place.title} guardianName={v05?.guardian?.name ?? null} />
 
         {/* Description collaborative */}
-        <PlaceDescription description={v05?.description ?? null} canEdit={canEditDescription}
+        <PlaceDescription placeId={place.id} description={v05?.description ?? null} canEdit={canEditDescription}
           onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
@@ -932,6 +901,31 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           </div>
         )}
       </div>
+
+      {/* Modales flottantes (portal vers body) */}
+      {showEditDescr && (
+        <DescriptionEditModal
+          placeId={place.id}
+          initial={v05?.description?.content ?? ''}
+          onClose={() => setShowEditDescr(false)}
+          onSaved={() => { setShowEditDescr(false); refreshV05() }}
+        />
+      )}
+      {showHistory && (
+        <DescriptionHistoryModal
+          placeId={place.id}
+          canRestore={canEditDescription}
+          onClose={() => setShowHistory(false)}
+          onRestored={() => { setShowHistory(false); refreshV05() }}
+        />
+      )}
+      {showAddPhoto && (
+        <AddPhotoModal
+          placeId={place.id}
+          onClose={() => setShowAddPhoto(false)}
+          onSaved={() => { setShowAddPhoto(false); refreshV05() }}
+        />
+      )}
 
       {lightbox && (
         <PhotoLightbox

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import './AddCarnetModal.css'
@@ -23,9 +24,9 @@ export function DescriptionHistoryModal({ placeId, canRestore, onClose, onRestor
     if ((data as { success?: boolean } | null)?.success) { onRestored(); onClose() }
   }
 
-  return (
-    <div className="add-carnet-overlay">
-      <div className="add-carnet-modal">
+  return createPortal(
+    <div className="add-carnet-overlay" onClick={onClose}>
+      <div className="add-carnet-modal" onClick={e => e.stopPropagation()}>
         <div className="add-carnet-header"><h3>Historique du lieu</h3><button className="add-carnet-close" onClick={onClose}>✕</button></div>
         <div className="add-carnet-body">
           {revs.length === 0 && <p>Aucune révision.</p>}
@@ -44,6 +45,7 @@ export function DescriptionHistoryModal({ placeId, canRestore, onClose, onRestor
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

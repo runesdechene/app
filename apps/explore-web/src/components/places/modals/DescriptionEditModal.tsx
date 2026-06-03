@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import './AddCarnetModal.css'
@@ -22,9 +23,9 @@ export function DescriptionEditModal({ placeId, initial, onClose, onSaved }: Pro
     setSaving(false); onSaved(); onClose()
   }
 
-  return (
-    <div className="add-carnet-overlay">
-      <div className="add-carnet-modal">
+  return createPortal(
+    <div className="add-carnet-overlay" onClick={onClose}>
+      <div className="add-carnet-modal" onClick={e => e.stopPropagation()}>
         <div className="add-carnet-header"><h3>Décrire ce lieu</h3><button className="add-carnet-close" onClick={onClose}>✕</button></div>
         <div className="add-carnet-body">
           <p style={{ fontSize: 13, color: 'var(--color-ink-light)', marginBottom: 8 }}>
@@ -40,6 +41,7 @@ export function DescriptionEditModal({ placeId, initial, onClose, onSaved }: Pro
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

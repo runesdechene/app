@@ -5,6 +5,7 @@ import type { V05Description } from '../../../types/placeDetail'
 import './PlaceDescription.css'
 
 interface Props {
+  placeId: string
   description: V05Description | null
   canEdit: boolean              // a découvert le lieu
   onEdit: () => void
@@ -12,21 +13,25 @@ interface Props {
   onChanged: () => void
 }
 
-export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, onChanged }: Props) {
+export function PlaceDescription({ placeId, description, canEdit, onEdit, onOpenHistory, onChanged }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const [liked, setLiked] = useState(description?.likedByMe ?? false)
   const [count, setCount] = useState(description?.votesUp ?? 0)
   const [busy, setBusy] = useState(false)
 
+  // La description est collaborative : like ouvert à tous (y compris le contributeur),
+  // via une RPC dédiée sans le garde "cannot_vote_own" de vote_contribution.
   async function toggleLike() {
     if (!userId || !description || busy) return
     setBusy(true)
-    const rpc = liked ? 'unlike_contribution' : 'vote_contribution'
-    const args = liked ? { p_user_id: userId, p_contribution_id: description.id }
-      : { p_user_id: userId, p_contribution_id: description.id, p_vote: 1 }
-    const { data, error } = await supabase.rpc(rpc, args)
-    if (!error && (data as { success?: boolean } | null)?.success) {
-      setLiked(!liked); setCount(c => liked ? Math.max(0, c - 1) : c + 1); onChanged()
+    const { data, error } = await supabase.rpc('toggle_place_description_like', {
+      p_user_id: userId, p_place_id: placeId,
+    })
+    const res = data as { success?: boolean; liked?: boolean; votesUp?: number } | null
+    if (!error && res?.success) {
+      setLiked(res.liked ?? false)
+      setCount(res.votesUp ?? 0)
+      onChanged()
     }
     setBusy(false)
   }
