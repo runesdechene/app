@@ -47,6 +47,7 @@ export interface V05Description {
   votesUp: number
   revisionCount: number
   likedByMe: boolean
+  contributors: Array<{ userId: string; name: string | null; avatar: string | null }>
 }
 
 /** Onglets actifs dans le PlacePanel (vue découverte). */

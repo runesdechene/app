@@ -52,17 +52,35 @@ export function PlaceDescription({ placeId, description, canEdit, onEdit, onOpen
       <div className="place-descr-rule"><span>LE LIEU</span></div>
       <div className="place-descr-text">{renderRichText(description.content)}</div>
       <div className="place-descr-foot">
-        <span className="place-descr-credit">
-          {description.editorName && (
-            <>
-              {description.revisionCount > 1
-                ? <>Enrichi par <b>{description.editorName}</b> et d'autres</>
-                : <>Par <b>{description.editorName}</b></>}
-              {' · '}
-            </>
+        <div className="place-descr-byline">
+          {description.contributors.length > 0 && (
+            <div className="place-descr-avatars">
+              {description.contributors.slice(0, 6).map((c, i) => (
+                c.avatar ? (
+                  <img key={c.userId} className="place-descr-av" src={c.avatar} alt={c.name ?? ''} title={c.name ?? undefined} style={{ zIndex: 10 - i }} />
+                ) : (
+                  <span key={c.userId} className="place-descr-av place-descr-av-fb" title={c.name ?? undefined} style={{ zIndex: 10 - i }}>
+                    {(c.name ?? '?').charAt(0).toUpperCase()}
+                  </span>
+                )
+              ))}
+              {description.contributors.length > 6 && (
+                <span className="place-descr-av place-descr-av-more">+{description.contributors.length - 6}</span>
+              )}
+            </div>
           )}
-          <button className="place-descr-history" onClick={onOpenHistory}>voir l'historique</button>
-        </span>
+          <span className="place-descr-credit">
+            {description.editorName && (
+              <>
+                {description.contributors.length > 1
+                  ? <>Enrichi par <b>{description.editorName}</b> &amp; {description.contributors.length - 1} autre{description.contributors.length - 1 > 1 ? 's' : ''}</>
+                  : <>Par <b>{description.editorName}</b></>}
+                {' · '}
+              </>
+            )}
+            <button className="place-descr-history" onClick={onOpenHistory}>voir l'historique</button>
+          </span>
+        </div>
         <div className="place-descr-actions">
           <button className={`place-descr-seal${liked ? ' liked' : ''}`} onClick={toggleLike} disabled={!userId || busy}>
             {liked ? '❤' : '🤍'} {count > 0 ? count : ''}
