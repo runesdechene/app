@@ -349,6 +349,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
+  const discoveredIds = usePlayerStore(s => s.discoveredIds)
   const { calendarRef } = useCalendarRef()
   const [imageIndex, setImageIndex] = useState(0)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
@@ -429,8 +430,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
   const isAuthor = place.author?.id === userId
 
-  const canEditDescription = (v05?.isExplorer === true) || isAuthor
-    || usePlayerStore.getState().discoveredIds.has(place.id)
+  const canEditDescription = (v05?.isExplorer === true) || isAuthor || discoveredIds.has(place.id)
 
   const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
   const heroPhotoUrl = currentHeroPhotos.length > 0
