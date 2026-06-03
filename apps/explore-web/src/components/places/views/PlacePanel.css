@@ -31,9 +31,8 @@
   max-height: calc(100vh - 70px);
   border-radius: 20px;
   background-color: var(--color-parchment);
-  /* Texture parchemin = même image que le cadre de la landing
-     (landingFrameUrl via appConfigStore), injectée en style inline sur le
-     .place-panel. Fallback : la couleur parchemin ci-dessus. */
+  /* Texture parchemin dédiée (asset local). Fallback : couleur parchemin ci-dessus. */
+  background-image: url('../../../assets/fond_parchemin.webp');
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;

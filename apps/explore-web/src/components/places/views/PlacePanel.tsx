@@ -6,7 +6,6 @@ import { useMapStore } from '../../../stores/mapStore'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useToastStore } from '../../../stores/toastStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
-import { useAppConfigStore } from '../../../stores/appConfigStore'
 import { discoverPlace } from '../../../lib/discoverPlace'
 import { useAuth } from '../../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
@@ -43,17 +42,12 @@ interface PlacePanelProps {
 export function PlacePanel({ placeId, onClose, userEmail, onAuthPrompt, mobileFullscreen }: PlacePanelProps) {
   const { place, loading, error, refetch } = usePlace(placeId)
   const isOpen = placeId !== null
-  // Fond parchemin = même texture que le cadre de la landing (config app).
-  const parchmentUrl = useAppConfigStore(s => s.landingFrameUrl)
 
   return (
     <>
       {isOpen && <div className={`place-panel-backdrop${mobileFullscreen ? ' modal-mobile-fullscreen-backdrop' : ''}`} onClick={onClose} />}
 
-      <div
-        className={`place-panel${isOpen ? ' place-panel-open' : ''}${mobileFullscreen ? ' modal-mobile-fullscreen' : ''}`}
-        style={parchmentUrl ? { backgroundImage: `url(${parchmentUrl})` } : undefined}
-      >
+      <div className={`place-panel${isOpen ? ' place-panel-open' : ''}${mobileFullscreen ? ' modal-mobile-fullscreen' : ''}`}>
         {loading && (
           <div className="place-panel-loading">
             <p>Chargement...</p>
