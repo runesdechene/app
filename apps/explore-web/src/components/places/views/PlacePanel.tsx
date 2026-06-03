@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePlace } from '../../../hooks/usePlace'
 import type { PlaceDetail } from '../../../hooks/usePlace'
 import { supabase } from '../../../lib/supabase'
@@ -10,19 +10,22 @@ import { discoverPlace } from '../../../lib/discoverPlace'
 import { useAuth } from '../../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from '../actions/WishlistButton'
-import { CarnetCard } from '../cards/CarnetCard'
-import type { Carnet } from '../cards/CarnetCard'
 import { VeilleFrame } from './VeilleFrame'
-import { PlaceCourtView } from '../details/PlaceCourtView'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
+import { PhotoSlideshow } from './PhotoSlideshow'
+import { CourtFold } from '../details/CourtFold'
+import { PlaceDescription } from '../details/PlaceDescription'
+import { DiscussionThread } from '../discussion/DiscussionThread'
 import { ShareButton } from '../actions/ShareButton'
 import { useCalendarRef } from '../../../hooks/useCalendarRef'
 import { formatYear } from '../../../lib/calendarUtils'
-import { AddCarnetModal } from '../modals/AddCarnetModal'
+import { DescriptionEditModal } from '../modals/DescriptionEditModal'
+import { DescriptionHistoryModal } from '../modals/DescriptionHistoryModal'
+import { AddPhotoModal } from '../modals/AddPhotoModal'
 import { PhotoLightbox } from '../modals/PhotoLightbox'
 import { PlaceExplorersModal } from '../modals/PlaceExplorersModal'
-import type { V05Detail, PlacePanelActiveTab } from '../../../types/placeDetail'
+import type { V05Detail, V05Contribution, PlacePanelActiveTab } from '../../../types/placeDetail'
 import './PlacePanel.css'
 
 interface PlacePanelProps {
@@ -121,7 +124,7 @@ function QuickInfoChip({ icon, value, placeholder, onClick }: {
 }
 
 /** Unified explorer row — discoverer (⭐) and guardian (🛡) get badges on their avatars */
-function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited, userHasCarnet, onWriteCarnet }: {
+function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited }: {
   explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
   authorId: string | null
   guardianId: string | null
@@ -131,8 +134,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   placeLocation: { latitude: number; longitude: number }
   isExplorer: boolean
   onVisited: () => void
-  userHasCarnet: boolean
-  onWriteCarnet: () => void
 }) {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
@@ -202,10 +203,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
     if (!userId || ratingValue === 0) return
     await supabase.rpc('rate_place', { p_user_id: userId, p_place_id: placeId, p_rating: ratingValue })
     setRatingSaved(true)
-    // Si le joueur a déjà un carnet, pas de CTA → auto-fermer après 1.5s
-    if (userHasCarnet) {
-      setTimeout(finishRatingFlow, 1500)
-    }
+    setTimeout(finishRatingFlow, 1500)
   }
 
   // Sort: author first, then guardian, then rest by visit date
@@ -328,19 +326,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
       {showRating && ratingSaved && (
         <div className="place-rating-prompt">
           <p className="place-rating-prompt-text">Merci pour votre avis ! ⭐</p>
-          {!userHasCarnet && (
-            <div className="place-rating-cta">
-              <p className="place-rating-cta-text">Envie de laisser une page de carnet ?<br /><span className="place-rating-cta-hint">Même un mot, ça compte.</span></p>
-              <div className="place-rating-cta-actions">
-                <button className="place-rating-cta-write" onClick={() => { finishRatingFlow(); onWriteCarnet() }}>
-                  Écrire une page
-                </button>
-                <button className="place-rating-skip" onClick={finishRatingFlow}>
-                  Passer
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -372,9 +357,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [deleting, setDeleting] = useState(false)
   // Onglet d'ouverture : posé par les notifications (ex. Cour → 'infos'). Lu une
   // seule fois au mount — PlaceContent remonte par key={place.id}, donc chaque
-  // ouverture de lieu relit la cible courante. Défaut 'carnets'.
+  // ouverture de lieu relit la cible courante. Défaut 'discussion'.
   const [activeTab, setActiveTab] = useState<PlacePanelActiveTab>(
-    () => useMapStore.getState().selectedPlaceTab ?? 'carnets',
+    () => useMapStore.getState().selectedPlaceTab ?? 'discussion',
   )
   const tabsRef = useRef<HTMLDivElement>(null)
   const scrollToTab = useCallback((tab: PlacePanelActiveTab) => {
@@ -384,9 +369,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleDraft, setTitleDraft] = useState(place.title)
   const [titleSaving, setTitleSaving] = useState(false)
-  const [showAddCarnet, setShowAddCarnet] = useState(false)
-  const [editingCarnet, setEditingCarnet] = useState<Carnet | null>(null)
-  const [deleteConfirmPlaceId, setDeleteConfirmPlaceId] = useState<string | null>(null)
+  const [showEditDescr, setShowEditDescr] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [showAddPhoto, setShowAddPhoto] = useState(false)
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
 
   // V0.7 — overrides (veilleur principal posé par loadInitialVeilles / pushVeilleOverride)
@@ -396,9 +381,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [v05, setV05] = useState<V05Detail | null>(null)
   const [v05Key, setV05Key] = useState(0)
 
-  // Faction visual data cache (colors + svgs only — patterns/names plus utilisés depuis le retrait d'InfluenceFrame, B2)
+  // Faction visual data cache (colors only — svgs no longer needed since carnet cards were replaced)
   const [factionColors, setFactionColors] = useState<Map<string, string>>(new Map())
-  const [factionSvgs, setFactionSvgs] = useState<Map<string, string>>(new Map())
 
   // Fetch V0.5 detail + all faction visuals
   useEffect(() => {
@@ -411,13 +395,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
       if (cancelled || error) return
       if (allFactions) {
         const colors = new Map<string, string>()
-        const svgs = new Map<string, string>()
         for (const f of allFactions as Array<{ id: string; color: string; pattern: string }>) {
           colors.set(f.id, f.color)
-          if (f.pattern) svgs.set(f.id, f.pattern)
         }
         setFactionColors(colors)
-        setFactionSvgs(svgs)
       }
       const d = data as V05Detail | null
       if (d) setV05(d)
@@ -430,53 +411,35 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
   // --- Data transformations ---
 
-  // Carnets: filter contributions with type 'carnet', sorted by votesUp DESC
-  const carnets: Carnet[] = useMemo(() => {
-    if (!v05?.contributions) return []
-    return v05.contributions
-      .filter(c => c.type === 'carnet')
-      .sort((a, b) => b.votesUp - a.votesUp)
-      .map(c => ({
-        id: c.id,
-        userId: c.userId,
-        factionId: c.factionId,
-        title: c.title ?? null,
-        content: c.content ?? '',
-        images: c.images ?? (c.imageUrl ? [c.imageUrl] : []),
-        rating: c.rating ?? null,
-        votesUp: c.votesUp,
-        votesDown: c.votesDown,
-        createdAt: c.createdAt,
-        userName: c.userName,
-        userAvatar: c.userAvatar,
-      }))
-  }, [v05?.contributions])
+  const comments = useMemo<V05Contribution[]>(
+    () => (v05?.contributions ?? []).filter(c => c.type === 'comment'),
+    [v05?.contributions],
+  )
 
-  const userHasCarnet = useMemo(() => carnets.some(c => c.userId === userId), [carnets, userId])
+  const galleryPhotos = useMemo(() => {
+    const fromContrib = (v05?.contributions ?? [])
+      .filter(c => c.type === 'comment' || c.type === 'photo' || c.type === 'description')
+      .flatMap(c => c.images.map(url => ({ url, carnetId: c.id })))
+    const fromPlace = (place.images ?? []).map(img => ({ url: img.url, carnetId: -1 }))
+    const seen = new Set<string>()
+    return [...fromContrib, ...fromPlace].filter(p => (seen.has(p.url) ? false : (seen.add(p.url), true)))
+  }, [v05?.contributions, place.images])
 
-  // Hero photo: random from top-3 voted carnets' images, fallback to place.images
-  const heroPhotos = useMemo(() => {
-    const top3 = carnets.slice(0, 3)
-    const carnetPhotos = top3.flatMap(c => c.images)
-    if (carnetPhotos.length > 0) return carnetPhotos
-    return (place.images || []).map(img => img.url)
-  }, [carnets, place.images])
+  const heroPhotos = useMemo(() => galleryPhotos.map(p => p.url), [galleryPhotos])
+
+  const isAuthor = place.author?.id === userId
+
+  const canEditDescription = (v05?.isExplorer === true) || isAuthor
+    || usePlayerStore.getState().discoveredIds.has(place.id)
 
   const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
   const heroPhotoUrl = currentHeroPhotos.length > 0
     ? currentHeroPhotos[imageIndex % currentHeroPhotos.length]
     : null
 
-  // Average rating from carnets
+  // Average rating from v05
   const avgRating = v05?.avgRating ?? null
   const ratingCount = v05?.ratingCount ?? 0
-
-  // Gallery photos: flatten all carnet images
-  const galleryPhotos = useMemo(() => {
-    return carnets.flatMap(c =>
-      c.images.map(url => ({ url, carnetId: c.id }))
-    )
-  }, [carnets])
 
   // Info fields: filter contributions of type accessibility, season, warning
   const infoFields = useMemo(() => {
@@ -492,20 +455,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
       }))
   }, [v05?.contributions])
 
-  const isAuthor = place.author?.id === userId
-
   const cacheBust = useMemo(() => Date.now(), [place.id])
 
   // Hero gallery navigation
   const prevHero = () => setImageIndex(i => (i - 1 + currentHeroPhotos.length) % currentHeroPhotos.length)
   const nextHero = () => setImageIndex(i => (i + 1) % currentHeroPhotos.length)
-
-  function scrollToCarnet(carnetId: number) {
-    setActiveTab('carnets')
-    setTimeout(() => {
-      document.getElementById(`carnet-${carnetId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 100)
-  }
 
   async function handleDeletePlace() {
     if (!userId || deleting) return
@@ -524,19 +478,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     setDeleting(false)
     setShowDeleteConfirm(false)
     onClose()
-  }
-
-  async function handleDeleteCarnet() {
-    if (!userId) return
-    const { data, error } = await supabase.rpc('delete_carnet', {
-      p_user_id: userId,
-      p_place_id: place.id,
-    })
-    const result = data as { success?: boolean; error?: string } | null
-    if (!error && result?.success) {
-      refreshV05()
-    }
-    setDeleteConfirmPlaceId(null)
   }
 
   async function handleRenamePlace() {
@@ -560,23 +501,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
     }
     setTitleSaving(false)
     setEditingTitle(false)
-  }
-
-  // --- Carnet modal: takes over entire panel ---
-  if (showAddCarnet || editingCarnet) {
-    return (
-      <AddCarnetModal
-        placeId={place.id}
-        canRate={v05?.isExplorer === true || isAuthor}
-        onClose={() => { setShowAddCarnet(false); setEditingCarnet(null) }}
-        onSaved={() => { refreshV05(); setEditingCarnet(null); setShowAddCarnet(false) }}
-        existingCarnet={editingCarnet ? {
-          title: editingCarnet.title,
-          content: editingCarnet.content,
-          images: editingCarnet.images,
-        } : undefined}
-      />
-    )
   }
 
   return (
@@ -661,6 +585,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         )}
       </div>
 
+      {/* Photo slideshow strip */}
+      <PhotoSlideshow photos={heroPhotos} onOpen={(p, i) => setLightbox({ photos: p, index: i })} onAddPhoto={() => setShowAddPhoto(true)} />
+
       {/* Zone 2 — Body */}
       <div className="place-body">
         {/* Identity */}
@@ -687,7 +614,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             ) : (
               <h2 className="place-title">
                 {place.title}
-                {userHasCarnet && (
+                {isAuthor && (
                   <button className="place-title-edit-pencil" onClick={() => setEditingTitle(true)} title="Renommer ce lieu">
                     ✏️
                   </button>
@@ -750,7 +677,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             ))}
             {/* V0.7 phase 5 (6 mai) — pilule "Revendiqué par {nom}" retirée :
                 redondante avec la section "Lieu protégé par Diane" affichée
-                par PlaceCourtView juste en-dessous du panel. */}
+                par CourtFold juste en-dessous du panel. */}
           </div>
 
           {/* Address */}
@@ -870,27 +797,24 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               placeLocation={place.location}
               isExplorer={v05.isExplorer}
               onVisited={() => { refreshV05(); onRefetch() }}
-              userHasCarnet={userHasCarnet}
-              onWriteCarnet={() => setShowAddCarnet(true)}
             />
           )}
         </div>
 
-        {/* V0.7 — Plantage de l'étendard désormais à droite du titre "Ils ont foulé ces
-            terres" dans ExplorerRow (décision Uriel 2026-05-02 — bouton inline plus
-            compact, état déjà visible dans la pilule "Veillé par" sous le titre du lieu). */}
+        {/* V0.7 phase 5 — La Cour : repliée, toujours visible au-dessus des onglets. */}
+        <CourtFold placeId={place.id} placeTitle={place.title} guardianName={v05?.guardian?.name ?? null} />
 
-        {/* V0.7 phase 5 — La Cour : toujours visible au-dessus des onglets. */}
-        <PlaceCourtView placeId={place.id} placeTitle={place.title} />
+        {/* Description collaborative */}
+        <PlaceDescription description={v05?.description ?? null} canEdit={canEditDescription}
+          onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
         <div className="place-tabs" ref={tabsRef}>
           <button
-            className={`place-tab${activeTab === 'carnets' ? ' active' : ''}`}
-            onClick={() => setActiveTab('carnets')}
+            className={`place-tab${activeTab === 'discussion' ? ' active' : ''}`}
+            onClick={() => setActiveTab('discussion')}
           >
-            Carnets 
-            <span className="place-tab-lenght">{carnets.length}</span>
+            Discussion <span className="place-tab-lenght">{comments.length}</span>
           </button>
           <button
             className={`place-tab${activeTab === 'galerie' ? ' active' : ''}`}
@@ -917,45 +841,16 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         </div>
 
         {/* Tab content */}
-        {activeTab === 'carnets' && (
+        {activeTab === 'discussion' && (
           <div className="place-tab-content">
-            {carnets.length === 0 ? (
-              <p className="place-tab-empty">Aucun carnet pour l'instant. Soyez le premier à écrire !</p>
-            ) : (
-              carnets.map((c, i) => (
-                <CarnetCard
-                  key={c.id}
-                  carnet={c}
-                  isTop={i === 0}
-                  rank={i + 1}
-                  factionColor={factionColors.get(c.factionId) ?? null}
-                  factionSvg={factionSvgs.get(c.factionId) ?? null}
-                  permanentInfluence={v05?.influence?.find(inf => inf.factionId === c.factionId)?.permanent ?? 0}
-                  onVoted={refreshV05}
-                  onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
-                  onEdit={c.userId === userId ? () => setEditingCarnet(c) : undefined}
-                  onDelete={c.userId === userId ? () => setDeleteConfirmPlaceId(c.userId) : undefined}
-                />
-              ))
-            )}
-            {userId && (
-              <button
-                className="place-add-carnet-btn"
-                onClick={() => setShowAddCarnet(true)}
-              >
-                Ajouter mon propre récit
-              </button>
-            )}
+            <DiscussionThread placeId={place.id} comments={comments}
+              onPhotoOpen={(p, i) => setLightbox({ photos: p, index: i })} onChanged={refreshV05} />
           </div>
         )}
 
         {activeTab === 'galerie' && (
           <div className="place-tab-content">
-            <PlaceGallery
-              photos={galleryPhotos}
-              onPhotoClick={scrollToCarnet}
-              onPhotoOpen={(photos, idx) => setLightbox({ photos, index: idx })}
-            />
+            <PlaceGallery photos={galleryPhotos} onPhotoOpen={(p, i) => setLightbox({ photos: p, index: i })} />
           </div>
         )}
 
@@ -1000,22 +895,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         )}
       </div>
 
-      {/* Delete carnet confirmation */}
-      {deleteConfirmPlaceId && (
-        <div className="place-delete-confirm-overlay" onClick={() => setDeleteConfirmPlaceId(null)}>
-          <div className="place-delete-confirm" onClick={e => e.stopPropagation()}>
-            <p>Supprimer votre page de carnet ?</p>
-            <p className="place-delete-confirm-warning">Cette action est irréversible.</p>
-            <div className="place-delete-confirm-actions">
-              <button className="place-delete-btn" onClick={handleDeleteCarnet}>
-                Supprimer
-              </button>
-              <button className="place-delete-cancel-btn" onClick={() => setDeleteConfirmPlaceId(null)}>
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Description modals */}
+      {showEditDescr && (
+        <DescriptionEditModal placeId={place.id} initial={v05?.description?.content ?? ''}
+          onClose={() => setShowEditDescr(false)} onSaved={refreshV05} />
+      )}
+      {showHistory && (
+        <DescriptionHistoryModal placeId={place.id} canRestore={canEditDescription}
+          onClose={() => setShowHistory(false)} onRestored={refreshV05} />
+      )}
+      {showAddPhoto && (
+        <AddPhotoModal placeId={place.id} onClose={() => setShowAddPhoto(false)} onSaved={refreshV05} />
       )}
 
       {lightbox && (

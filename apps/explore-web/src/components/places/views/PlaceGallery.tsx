@@ -7,15 +7,14 @@ interface GalleryPhoto {
 
 interface PlaceGalleryProps {
   photos: GalleryPhoto[]
-  onPhotoClick: (carnetId: number) => void
   onPhotoOpen?: (photos: string[], index: number) => void
 }
 
-export function PlaceGallery({ photos, onPhotoClick: _onPhotoClick, onPhotoOpen }: PlaceGalleryProps) {
+export function PlaceGallery({ photos, onPhotoOpen }: PlaceGalleryProps) {
   if (photos.length === 0) {
     return (
       <div className="gallery-empty">
-        Aucune photo pour l'instant. Ajoutez des photos à votre carnet !
+        Aucune photo pour l'instant.
       </div>
     )
   }
