@@ -4,7 +4,14 @@
 .place-descr-rule:before,.place-descr-rule:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--color-sepia),transparent)}
 .place-descr-rule span{font-family:var(--font-title);letter-spacing:.14em;font-size:15px;color:var(--color-sepia-dark)}
 .place-descr-text{font-family:var(--font-signature);font-size:16px;line-height:1.62;color:#3f2f22;text-align:justify}
-.place-descr-text::first-letter{font-family:var(--font-title);font-size:46px;float:left;line-height:.78;padding:6px 9px 0 0;color:var(--color-sepia-dark)}
+.place-descr-text .rich-p{margin:0 0 7px}
+.place-descr-text .rich-p:last-child{margin-bottom:0}
+.place-descr-text .rich-p:first-child::first-letter{font-family:var(--font-title);font-size:46px;float:left;line-height:.78;padding:6px 9px 0 0;color:var(--color-sepia-dark)}
+.place-descr-text .rich-ul{margin:4px 0 8px;padding-left:20px;text-align:left}
+.place-descr-text .rich-ul li{margin:3px 0}
+.place-descr-text .rich-gap{height:7px}
+.place-descr-text strong{font-weight:700}
+.place-descr-text em{font-style:italic}
 .place-descr-invite{font-family:var(--font-signature);font-style:italic;color:var(--color-ink-light);margin:6px 0 10px}
 .place-descr-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:9px;border-top:1px dashed #e0cdae;gap:8px;flex-wrap:wrap}
 .place-descr-credit{font-family:var(--font-accent);font-size:12px;color:var(--color-ink-light)}

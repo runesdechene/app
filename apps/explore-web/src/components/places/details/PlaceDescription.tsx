@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import type { V05Description } from '../../../types/placeDetail'
+import { renderRichText } from '../../../lib/renderRichText'
 import './PlaceDescription.css'
 
 interface Props {
@@ -49,7 +50,7 @@ export function PlaceDescription({ placeId, description, canEdit, onEdit, onOpen
   return (
     <div className="place-descr">
       <div className="place-descr-rule"><span>LE LIEU</span></div>
-      <p className="place-descr-text">{description.content}</p>
+      <div className="place-descr-text">{renderRichText(description.content)}</div>
       <div className="place-descr-foot">
         <span className="place-descr-credit">
           {description.editorName && (

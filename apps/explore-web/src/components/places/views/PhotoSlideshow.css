@@ -1,4 +1,4 @@
-.photo-slideshow{display:flex;gap:8px;padding:12px 16px 4px;overflow-x:auto;scrollbar-width:none}
+.photo-slideshow{display:flex;flex-shrink:0;gap:8px;padding:12px 16px 4px;overflow-x:auto;overflow-y:visible;scrollbar-width:none}
 .photo-slideshow::-webkit-scrollbar{display:none}
 .photo-slideshow-thumb{flex:0 0 auto;width:74px;height:56px;border-radius:10px;overflow:hidden;
   border:1.5px solid rgba(255,255,255,.5);box-shadow:0 2px 6px rgba(74,55,40,.22);padding:0;cursor:pointer;background:none}
