@@ -68,3 +68,11 @@ python3 scripts/graphify-sql.py
 ```
 
 Idempotent. Voir `CLAUDE.md` racine, section Graphify.
+
+## Graphify-SQL = vue fiable du live (sous invariant)
+
+Le nœud SQL d'une fonction pointe vers sa définition à **numéro de migration le plus haut** (dédup keep-last, depuis le 4 juin — avant, il pointait vers la PLUS VIEILLE, ce qui a causé la régression `get_defis_board`/`tag`). Donc consulter graphify (couche 2) donne bien la **dernière** définition, sans grep.
+
+**Invariant qui garantit "dernière migration == live"** : tout DDL passe par un **fichier de migration numéroté**. Ne JAMAIS faire un `CREATE OR REPLACE FUNCTION` via `execute_sql`/MCP sans créer le fichier correspondant — sinon le live diverge du graphe silencieusement. (`apply_migration` MCP applique au live mais n'écrit PAS le fichier local : écrire le `.sql` numéroté en parallèle.)
+
+Source de vérité ultime en cas de doute : `pg_get_functiondef(...)` sur le live (cf. `gotchas.md`).

@@ -214,12 +214,19 @@ def main() -> int:
         all_defined.update(r["defined_ids"])
         print(f"  {sql_file.name}: {len(r['nodes'])} nodes, {len(r['edges'])} edges")
 
-    seen: set[str] = set()
-    deduped: list[dict] = []
+    # Dédup : pour une fonction redéfinie sur plusieurs migrations, garder la
+    # DERNIÈRE définition (numéro le plus haut) — sql_files est trié croissant,
+    # donc la dernière occurrence gagne. Sinon le nœud pointait vers la plus
+    # VIEILLE migration (régression get_defis_board du 4 juin : couche 2 renvoyait
+    # vers la mig 192 au lieu de la 193). On préserve l'ordre de première vue.
+    last_node: dict[str, dict] = {}
+    order: list[str] = []
     for n in all_nodes:
-        if n["id"] not in seen:
-            seen.add(n["id"])
-            deduped.append(n)
+        if n["id"] not in last_node:
+            order.append(n["id"])
+        last_node[n["id"]] = n
+    deduped: list[dict] = [last_node[i] for i in order]
+    seen: set[str] = set(last_node)
 
     referenced = {e["target"] for e in all_edges if e["relation"] == "uses"}
     missing = referenced - seen
