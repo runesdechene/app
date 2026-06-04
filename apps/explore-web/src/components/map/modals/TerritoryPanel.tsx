@@ -321,7 +321,7 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
               <p className="territory-panel-hint">Chargement...</p>
             ) : votePower < 1 ? (
               <p className="territory-panel-hint">
-                Rejoignez l'héritage {data.factionTitle} pour voter et proposer des noms.
+                Rejoignez la faction {data.factionTitle} pour voter et proposer des noms.
               </p>
             ) : (
               <>

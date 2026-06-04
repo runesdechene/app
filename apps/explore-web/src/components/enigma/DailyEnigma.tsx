@@ -246,18 +246,11 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
                         }}
                       />
                     )}
-                    Héritage {f.adjective}
+                    Faction {f.adjective}
                   </div>
                 )
               })()}
             </div>
-
-            {(enigma.rewardInfluence > 0 || enigma.rewardErudition > 0) && (
-              <div className="enigma-rewards-preview">
-                {enigma.rewardInfluence > 0 && <span className="enigma-reward influence">🏴 +{enigma.rewardInfluence} influence</span>}
-                {enigma.rewardErudition > 0 && <span className="enigma-reward erudition">📜 +{enigma.rewardErudition} érudition</span>}
-              </div>
-            )}
 
             <p className="enigma-lore">{enigma.loreText}</p>
             <p className="enigma-question">{enigma.question}</p>

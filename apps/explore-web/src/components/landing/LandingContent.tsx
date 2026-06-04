@@ -52,7 +52,7 @@ const PERKS: Perk[] = [
     ),
   },
   {
-    text: 'Coupe des Héritages',
+    text: 'Coupe des Factions',
     color: '#646e2c',
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

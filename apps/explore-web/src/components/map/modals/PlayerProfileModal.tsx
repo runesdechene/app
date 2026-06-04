@@ -286,7 +286,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     alt=""
                     className="player-modal-faction-badge clickable"
                     onClick={(e) => { e.stopPropagation(); setShowFactionMembers(true) }}
-                    title={profile.factionTitle ?? 'Héritage'}
+                    title={profile.factionTitle ?? 'Faction'}
                   />
                 )}
                 <input

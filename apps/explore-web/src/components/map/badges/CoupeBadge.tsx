@@ -25,8 +25,8 @@ export function CoupeBadge() {
         type="button"
         className="notoriety-badge coupe-badge"
         onClick={(e) => { e.stopPropagation(); setOpen(true) }}
-        title={'Héritages'}
-        aria-label={'Héritages'}
+        title={'Factions'}
+        aria-label={'Factions'}
       >
         <span className="notoriety-icon" aria-hidden>{'🏆'}</span>
         <span className="notoriety-value" key={`coupe-${myScore}`}>{myScore}</span>

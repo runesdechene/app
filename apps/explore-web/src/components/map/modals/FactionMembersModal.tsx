@@ -143,7 +143,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
             {isUnderdog && (
               <div className="faction-card-underdog" style={{ position: 'relative', marginTop: 8, marginBottom: 12, border: '1px solid rgba(255, 180, 50, 0.3)', borderRadius: 8 }}>
                 <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                <p className="faction-card-underdog-desc">Cet héritage lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
+                <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
               </div>
             )}
             <h3 className="faction-members-list-title">Classement</h3>

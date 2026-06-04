@@ -107,7 +107,7 @@ export function FoggedPlaceView({
 
         <p className="fog-mystery-text">
           {isOwnFaction
-            ? 'Ce lieu est sous influence de votre héritage. Découvrez-le à moindre coût.'
+            ? 'Ce lieu est sous influence de votre faction. Découvrez-le à moindre coût.'
             : 'Ce lieu est encore dans le brouillard. Dépensez votre énergie pour le réler.'
           }
         </p>
@@ -140,7 +140,7 @@ export function FoggedPlaceView({
                   <span className="fog-cost-bonus">Territoire alli\u00e9 : co\u00fbt /2</span>
                 )}
                 {d.tagReduction > 0 && (
-                  <span className="fog-cost-bonus">Héritagee : -{d.tagReduction}%</span>
+                  <span className="fog-cost-bonus">Faction : -{d.tagReduction}%</span>
                 )}
               </div>
             )}

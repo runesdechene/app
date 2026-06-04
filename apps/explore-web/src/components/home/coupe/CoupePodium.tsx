@@ -58,7 +58,7 @@ export function CoupePodium({
         onClick={onClickAll}
         style={{ cursor: 'pointer' }}
       >
-        ⚜ Coupe des Héritages
+        ⚜ Coupe des Factions
         <span className="coupe-season">— {seasonName}</span>
       </h2>
       <div className="coupe-frame coupe-podium-frame">
@@ -146,9 +146,9 @@ function blockHeightPx(score: number, topScore: number): number {
  * - User 2-4e avec score > 0            → "⚜ Ta Maison est Xème · Y du sommet"
  */
 function minePillLabel(topScore: number, userRank: number, gapToTop: number): string {
-  if (topScore <= 0) return '⚜ Ta Maison · 0 pts'
-  if (userRank === 1) return '⚜ Ta Maison mène la course'
-  return `⚜ Ta Maison est ${ordinalFr(userRank)} · ${gapToTop} du sommet`
+  if (topScore <= 0) return '⚜ Ta Faction · 0 pts'
+  if (userRank === 1) return '⚜ Ta Faction mène la course'
+  return `⚜ Ta Faction est ${ordinalFr(userRank)} · ${gapToTop} du sommet`
 }
 
 function ordinalFr(n: number): string {

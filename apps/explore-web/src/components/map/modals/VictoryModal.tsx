@@ -77,7 +77,7 @@ export function VictoryModal({
               <span className="victory-gain">+{gloryGain} 🎖️ Gloire</span>
             )}
             {coupeGain !== undefined && coupeGain > 0 && (
-              <span className="victory-gain">+{coupeGain} 🏆 Coupe des Héritages</span>
+              <span className="victory-gain">+{coupeGain} 🏆 Coupe des Factions</span>
             )}
             {courBonus !== undefined && courBonus > 0 && (
               <span className="victory-gain">+{courBonus} ⚔️ score Cour</span>

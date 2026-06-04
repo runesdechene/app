@@ -18,14 +18,14 @@ export function HeritagesToggle() {
       <div className="influence-toggle-wrap">
         <button className="influence-toggle" onClick={() => setFactionColorMode(!factionColorMode)}>
           <span className="influence-toggle-icon">{'⚔️'}</span>
-          <span className="influence-toggle-label">Héritages</span>
+          <span className="influence-toggle-label">Factions</span>
           <span className={`influence-toggle-switch ${factionColorMode ? 'on' : ''}`} />
         </button>
         <button
           type="button"
           className="influence-toggle-info"
           onClick={(e) => { e.stopPropagation(); setShowRules(true) }}
-          aria-label="Voir les règles de la Coupe des Héritages"
+          aria-label="Voir les règles de la Coupe des Factions"
           title="Voir les règles"
         >
           {'ⓘ'}

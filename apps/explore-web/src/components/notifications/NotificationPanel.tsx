@@ -99,7 +99,7 @@ function formatMessage(notif: Notification): string {
     case 'milestone_exploration':
       return `L'un de vos lieux a atteint ${d.explorerCount} explorateurs`
     case 'claim_lost':
-      return `Une autre Maison d'Héritage a pris l'ascendant sur l'un de vos lieux`
+      return `Une autre Faction a pris l'ascendant sur l'un de vos lieux`
     // V097 — La Cour
     case 'place_court_attack':
       return `${d.actorName || 'Quelqu\'un'} s'intéresse à ${place}`

@@ -1,3 +1,10 @@
+# ALPHA V0.9.11
+## « Héritage » devient « Faction » + fenêtre de choix dépoussiérée
+
+La fenêtre de choix se nomme désormais **« Choisissez votre Faction »**, avec un message clair : votre Faction, c'est **votre manière d'agir**, mais **tous les joueurs collaborent** pour réenchanter le monde et protéger l'Histoire. La légende abandonne les mentions obsolètes d'Exploration et d'Érudition (héritage de la V0.5) au profit des mécaniques actuelles : **Énergie, Gloire, Couronnes, Coupe**. Le terme « Héritage » (et « Maison ») laisse partout sa place à **« Faction »** — y compris la **Coupe des Factions**.
+
+---
+
 # ALPHA V0.9.10
 ## Retour des vraies icônes de tag sur les défis
 

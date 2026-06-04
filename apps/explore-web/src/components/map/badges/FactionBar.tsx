@@ -29,7 +29,7 @@ interface FactionMeta {
   order: number
 }
 
-const COUPE_LABEL = 'Héritages'
+const COUPE_LABEL = 'Factions'
 
 export function FactionBar() {
   const userFactionId = usePlayerStore(s => s.userFactionId)
@@ -154,7 +154,7 @@ export function FactionBar() {
           type="button"
           className="faction-scoreboard-live"
           onClick={() => setShowCoupeModal(true)}
-          title={'Voir le classement complet de la Coupe des Héritages'}
+          title={'Voir le classement complet de la Coupe des Factions'}
         >
           <span className="faction-scoreboard-live-dot" />
           {COUPE_LABEL}

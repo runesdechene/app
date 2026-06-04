@@ -107,7 +107,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     })
 
     if (data?.error === 'cooldown') {
-      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer d'Héritage.`)
+      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de Faction.`)
       setConfirmFaction(null)
       setSelecting(false)
       return
@@ -175,9 +175,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           &#10005;
         </button>
 
-        <h2 className="faction-modal-title">Choisissez votre Héritage</h2>
+        <h2 className="faction-modal-title">Choisissez votre Faction</h2>
         <p className="faction-modal-subtitle">
-          Placez-vous sous un Héritage pour favoriser vos exploits. Vous profiterez d'un "dortoir commun" avec vos compagnons d'aventure.
+          Votre Faction, c'est votre manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
         </p>
 
         {loading ? (
@@ -216,7 +216,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                     {isUnderdog && (
                       <div className="faction-card-underdog">
                         <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                        <p className="faction-card-underdog-desc">Cet héritage lutte pour sa survie ! Régénération d'énergie multipliée.</p>
+                        <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! Régénération d'énergie multipliée.</p>
                       </div>
                     )}
                     {isActive && (
@@ -230,11 +230,11 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         )}
         <div className="faction-legend">
           <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
-          <span className="faction-legend-item">🧭 Exploration — Gagnée en découvrant des lieux</span>
-          <span className="faction-legend-item">📖 Érudition — Gagnée en réussissant des énigmes</span>
-          <span className="faction-legend-item">🎖️ Gloire — Exploration + Érudition, votre prestige total</span>
+          <span className="faction-legend-item">🎖️ Gloire — Votre prestige total, à vie</span>
+          <span className="faction-legend-item">🪙 Couronnes — Votre influence à la Cour des lieux</span>
+          <span className="faction-legend-item">🏆 Coupe — Le classement des Factions cette saison</span>
           {currentFactionId && (
-            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer d'Héritage n'est possible qu'une fois tous les 30 jours</span>
+            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible qu'une fois tous les 30 jours</span>
           )}
         </div>
 
@@ -265,7 +265,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Êtes-vous sûr ? Changer d'Héritage n'est possible <strong>qu'une fois tous les 30 jours</strong>.
+                Êtes-vous sûr ? Changer de Faction n'est possible <strong>qu'une fois tous les 30 jours</strong>.
               </p>
               <div className="faction-confirm-actions">
                 <button onClick={() => setConfirmFaction(null)} disabled={selecting}>

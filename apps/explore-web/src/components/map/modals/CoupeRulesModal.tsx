@@ -30,8 +30,8 @@ export function CoupeRulesModal({ onClose, onOpenScores }: Props) {
   return (
     <InfoModal
       icon={'🏆'}
-      title={'Coupe des Héritages'}
-      description={'Chaque saison, les Héritages s\'affrontent dans une compétition saine d\'actions personnelles. Tes plantages, tes carnets, tes énigmes résolues — tout compte pour ton Héritage. La faction qui cumule le plus de points à la clôture remporte la Coupe. Même formule que la Gloire à vie, sur la fenêtre de la saison.'}
+      title={'Coupe des Factions'}
+      description={'Chaque saison, les Factions s\'affrontent dans une compétition saine d\'actions personnelles. Tes plantages, tes carnets, tes énigmes résolues — tout compte pour ta Faction. La Faction qui cumule le plus de points à la clôture remporte la Coupe. Même formule que la Gloire à vie, sur la fenêtre de la saison.'}
       rows={[
         { label: 'Visite GPS d\'un nouveau lieu',  value: `+${visite} pt${visite > 1 ? 's' : ''}` },
         { label: 'Énigme résolue (toute diff.)',   value: `+${enigme} pt${enigme > 1 ? 's' : ''}` },
