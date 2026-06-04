@@ -1199,24 +1199,18 @@
     justify-content: center;
   }
 
-  /* V0.9 — sur mobile, la row garde la bannière à droite, la grille stats prend
-     le reste de la largeur. */
-  .player-modal-stats-row {
-    margin-top: 12px;
-    align-items: stretch;
+  /* V0.9 — ligne « Membre de » centrée sur mobile (cohérent avec info-top centré). */
+  .player-modal-faction-member {
+    justify-content: center;
   }
 
-  .player-modal-faction-link {
-    align-self: center;
-  }
-
-  /* Sur mobile, c'est un vrai grid 3 colonnes (et non plus le flex column desktop). */
+  /* Désactive le display:contents desktop : sur mobile, c'est un vrai grid 3 colonnes. */
   .player-modal-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    margin-top: 12px;
   }
 
   .player-modal-stat {

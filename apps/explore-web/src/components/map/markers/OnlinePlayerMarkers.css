@@ -246,52 +246,46 @@
   color: #fff;
 }
 
-/* V0.9 — lien « Membre de … » cliquable sous le nom + niveau. */
+/* V0.9 — ligne « Membre de [faction] » sous le nom : icône SVG de faction
+   (pattern teinté à la couleur de faction) à gauche, puis « Membre de » en
+   texte et le nom de la faction en lien cliquable. */
+.player-modal-faction-member {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 6px;
+  font-size: 13px;
+  color: #5f483e;
+}
+
+/* Emblème SVG teinté via masque (même technique que le hub) */
+.player-modal-faction-member-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+/* Lien cliquable porté UNIQUEMENT par le nom de la faction : gras, non souligné,
+   teinté couleur faction (via style inline). */
 .player-modal-faction-link {
-  align-self: flex-start;
   background: none;
   border: none;
   padding: 0;
-  margin: 2px 0 6px;
-  font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 13px;
-  font-weight: 600;
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
-  opacity: 0.9;
+  text-decoration: none;
   transition: opacity 0.15s;
 }
 
 .player-modal-faction-link:hover {
-  opacity: 1;
-}
-
-/* V0.9 — ligne stats + bannière : les 3 lignes (Coupe/Couronnes/Énigmes) à
-   gauche, la bannière de faction (étendard) à droite, sur toute leur hauteur. */
-.player-modal-stats-row {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-/* V0.9 — bannière de faction (étendard vertical) à droite des stats, hauteur =
-   celle des 3 lignes. Remplace l'ancien emblème. Cliquable → membres. */
-.player-modal-faction-banner {
-  align-self: stretch;
-  width: 46px;
-  flex-shrink: 0;
-  object-fit: contain;
-  cursor: pointer;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
-  transition: transform 0.15s;
-}
-
-.player-modal-faction-banner:hover {
-  transform: scale(1.05);
+  opacity: 0.75;
 }
 
 .player-modal-info {
@@ -309,15 +303,10 @@
   gap: 8px;
 }
 
-/* Desktop : colonne flex (les 3 stats restent en lignes empilées comme avant,
-   mais groupées pour laisser la bannière se caler à droite à la même hauteur).
-   Mobile : grid 3 colonnes (cf. mobile.css). */
+/* Desktop : container transparent (les 3 stats restent en lignes empilées
+   comme avant). Mobile : grid 3 colonnes (cf. mobile.css). */
 .player-modal-stats {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  min-width: 0;
+  display: contents;
 }
 .player-modal-stat {
   display: flex;
