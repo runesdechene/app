@@ -13,6 +13,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   const [tab, setTab] = useState<'mission' | 'salon'>('mission')
   const [loading, setLoading] = useState(true)
   const [sealing, setSealing] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -48,6 +49,12 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
     } finally {
       setSealing(false)
     }
+  }
+
+  function handlePactClick() {
+    if (!m) return
+    if (m.ctaUrl) { setConfirming(true); return }
+    void sealPact(false)
   }
 
   if (loading || !m) {
@@ -161,7 +168,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
             </div>
             {!m.isParticipant && m.status === 'published' && (
               <div className="mission-modal-pactbar">
-                <button className="mission-modal-pact" onClick={() => sealPact(false)} disabled={sealing}>
+                <button className="mission-modal-pact" onClick={handlePactClick} disabled={sealing}>
                   <span className="mission-modal-pact-seal">⚔</span> Je relève ce défi
                 </button>
               </div>
@@ -169,6 +176,40 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
           </>
         ) : (
           <MissionSalon slug={m.slug} intro={m.salonIntro} readOnly={readOnlySalon} />
+        )}
+
+        {confirming && m.ctaUrl && (
+          <div className="mission-modal-confirm-dim" onClick={() => !sealing && setConfirming(false)}>
+            <div className="mission-modal-confirm" onClick={(e) => e.stopPropagation()}>
+              <div className="mission-modal-confirm-top">
+                <div
+                  className="mission-modal-confirm-thumb"
+                  style={m.coverImageUrl ? { backgroundImage: `url(${m.coverImageUrl})` } : undefined}
+                >
+                  {!m.coverImageUrl && <span>{m.emblem}</span>}
+                </div>
+                <div className="mission-modal-confirm-q">
+                  <div className="mission-modal-confirm-lbl">Avant de sceller</div>
+                  <div className="mission-modal-confirm-txt">
+                    As-tu déjà <strong>{m.ctaLabel ?? 'le matériel'}</strong> pour accomplir ta mission ?
+                  </div>
+                </div>
+              </div>
+              <div className="mission-modal-confirm-acts">
+                <button
+                  className="mission-modal-confirm-yes"
+                  disabled={sealing}
+                  onClick={() => { void sealPact(false).then(() => setConfirming(false)) }}
+                >⚔ Oui — je scelle le pacte</button>
+                <button
+                  className="mission-modal-confirm-no"
+                  disabled={sealing}
+                  onClick={() => { void sealPact(true).then(() => setConfirming(false)) }}
+                >🛒 Pas encore — montre-moi la boutique</button>
+                <div className="mission-modal-confirm-note">Dans les deux cas, te voilà engagé.</div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>,
