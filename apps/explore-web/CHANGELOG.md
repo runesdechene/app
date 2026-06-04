@@ -1,3 +1,10 @@
+# ALPHA V0.9.15
+## Une faction qui recrute, ça se voit
+
+Le fil d'activité annonce désormais quand une **Faction gagne un joueur** — qu'un nouveau venu choisisse sa première bannière ou qu'un vétéran bascule vers elle. Un toast aux **couleurs de la faction**, avec son emblème : *« Un renfort pour [faction] : [joueur] 🛡️ »*. Cliquable pour ouvrir le profil du renfort.
+
+---
+
 # ALPHA V0.9.14
 ## Les missions se relèvent comme un pacte
 
