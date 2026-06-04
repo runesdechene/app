@@ -1,3 +1,10 @@
+# ALPHA V0.9.16
+## Deux chances de choisir sa Faction
+
+En cas d'erreur, on n'est plus bloqué : tu peux désormais changer de Faction **2 fois par fenêtre de 30 jours** (au lieu d'une seule). De quoi rattraper un mauvais choix sans attendre un mois.
+
+---
+
 # ALPHA V0.9.15
 ## Une faction qui recrute, ça se voit
 
