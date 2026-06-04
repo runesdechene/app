@@ -50,6 +50,9 @@ export interface PlayerProfile {
   factionTitle: string | null
   factionColor: string | null
   factionPattern: string | null
+  /** V0.9 — bannière illustrée de la faction (factions.image_url), affichée à gauche
+   *  du nom. Fallback sur factionPattern si la faction n'a pas encore de bannière. */
+  factionImage: string | null
   profileImage: string | null
   notorietyPoints: number
   /** V0.5 fields */

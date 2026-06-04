@@ -280,15 +280,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 {isEditing && isSelf && (
                   <span className="player-modal-avatar-edit-label">Modifier</span>
                 )}
-                {profile.factionPattern && !isEditing && (
-                  <img
-                    src={profile.factionPattern}
-                    alt=""
-                    className="player-modal-faction-badge clickable"
-                    onClick={(e) => { e.stopPropagation(); setShowFactionMembers(true) }}
-                    title={profile.factionTitle ?? 'Faction'}
-                  />
-                )}
                 <input
                   ref={avatarInputRef}
                   type="file"
@@ -300,6 +291,15 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
+                  {(profile.factionImage ?? profile.factionPattern) && (
+                    <img
+                      src={(profile.factionImage ?? profile.factionPattern)!}
+                      alt={profile.factionTitle ?? 'Faction'}
+                      className="player-modal-faction-banner"
+                      onClick={() => setShowFactionMembers(true)}
+                      title={profile.factionTitle ?? 'Faction'}
+                    />
+                  )}
                   <h2 className="player-modal-name">{profile.name}</h2>
                   <LevelText level={isSelf ? level : (profile.level ?? 1)} />
                   {(isSelf ? veteranFirstEra : (profile.veteranFirstEra ?? false)) && (

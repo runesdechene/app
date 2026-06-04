@@ -19,6 +19,7 @@ import './FactionBar.css'
 
 interface FactionRowEnriched extends CoupeFactionEntry {
   pattern: string
+  image: string  // V0.9 — bannière illustrée (factions.image_url), '' si absente → fallback emblème
 }
 
 interface FactionMeta {
@@ -26,6 +27,7 @@ interface FactionMeta {
   title: string
   color: string
   pattern: string | null
+  image_url: string | null
   order: number
 }
 
@@ -46,7 +48,7 @@ export function FactionBar() {
     async function load() {
       const [coupeRes, factionsRes] = await Promise.all([
         supabase.rpc('get_coupe_state', { p_user_id: userId, p_season_id: null }),
-        supabase.from('factions').select('id, title, color, pattern, order').order('order'),
+        supabase.from('factions').select('id, title, color, pattern, image_url, order').order('order'),
       ])
       if (cancelled) return
 
@@ -78,6 +80,7 @@ export function FactionBar() {
             memberCount:  s?.memberCount ?? 0,
             rank:         s?.rank ?? 0,           // 0 = sans rang officiel (à 0 pt)
             pattern:      f.pattern ?? '',
+            image:        f.image_url ?? '',
           }
         })
         .sort((a, b) => {
@@ -136,11 +139,15 @@ export function FactionBar() {
                 ) : (
                   <span className="faction-scoreboard-crown-spacer" aria-hidden />
                 )}
-                <span className="faction-scoreboard-emblem">
-                  {faction.pattern && (
-                    <img src={faction.pattern} alt="" className="faction-scoreboard-emblem-img" />
-                  )}
-                </span>
+                {faction.image ? (
+                  <img src={faction.image} alt="" className="faction-scoreboard-banner" />
+                ) : (
+                  <span className="faction-scoreboard-emblem">
+                    {faction.pattern && (
+                      <img src={faction.pattern} alt="" className="faction-scoreboard-emblem-img" />
+                    )}
+                  </span>
+                )}
                 <span className="faction-scoreboard-track">
                   <span className="faction-scoreboard-fill" style={{ height: `${heightPct}%` }} />
                 </span>
