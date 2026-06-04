@@ -100,16 +100,21 @@ Exemples de régressions passées :
 > **⚠️ "La plus récente" = le plus HAUT NUMÉRO de migration, jamais le nom de fichier qui sonne le plus définitif.** Une fonction critique peut être redéfinie 10×. Le nom (`_fix_`, `_polish_`, `_preserve_`) ne dit rien de l'ordre. Trier numériquement et lire la dernière — point.
 
 **Procédure** :
-1. Grep les migrations pour TOUTES les définitions, puis trier — la dernière par numéro gagne :
+1. **Récupérer la définition LIVE** — source de vérité unique, à l'épreuve du "mauvais fichier choisi" :
+   ```sql
+   select pg_get_functiondef('public.nom_fonction(text)'::regprocedure);
+   ```
+   Les fichiers de migration mentent par omission : une fonction est souvent enrichie par N migrations successives (corps en 192, champ `tag` ajouté en 193…). Repartir d'un vieux fichier fait sauter les enrichissements ultérieurs. Le grep+tri reste un contre-check, PAS la base — l'exemple `invest_crowns` (10 redéfinitions) montre qu'on se trompe de "dernière" en se fiant au nom de fichier.
    ```bash
    grep -rn "CREATE OR REPLACE FUNCTION public.nom_fonction" supabase/migrations/ | sort -t/ -k3 -n
    ```
-   (ou via le graph SQL : couche 2 de la 4-Layer Rule, AVANT le fichier brut.)
-2. Lire la migration au plus haut numéro intégralement.
-3. Copier-coller la fonction entière dans la nouvelle migration.
-4. Modifier UNIQUEMENT la partie concernée par le changement.
-5. Comparer chaque comportement (limites, colonnes retournées, JSON build, RLS) avec l'ancien.
-6. Vérifier les noms de colonnes contre la structure réelle avant commit.
+2. Copier-coller la def LIVE entière dans la nouvelle migration.
+3. Modifier UNIQUEMENT la partie concernée par le changement.
+4. Comparer chaque comportement (limites, colonnes retournées, JSON build, RLS) avec la def live d'origine.
+5. Vérifier les noms de colonnes contre la structure réelle avant commit.
+6. Après apply : re-fetch `pg_get_functiondef` et confirmer que le delta voulu est là ET que rien d'autre n'a sauté.
+
+> **Régression du 4 juin 2026** : `get_defis_board` réécrit depuis le corps de la mig 192 → champ `tag` (icône SVG ajoutée en 193) perdu → défis en emoji au lieu de la pastille custom. Exactement cette classe. La def live l'aurait montré immédiatement.
 
 **Règle absolue** : ne jamais deviner un nom de colonne. Toujours le vérifier.
 

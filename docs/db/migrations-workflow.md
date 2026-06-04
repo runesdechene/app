@@ -5,7 +5,11 @@
 1. **Numérotées** dans `supabase/migrations/`, format `NNN_description.sql`.
 2. **Séquentielles** — incrémenter le plus haut numéro existant.
 3. **En-tête commenté obligatoire** (rationale "WHY : ...") — Graphify-SQL parse ces commentaires comme description du nœud, donc c'est ce que Claude lira en priorité plus tard.
-4. **Avant de réécrire une RPC** : lire la version la plus récente intégralement (voir `gotchas.md` → "Lire avant de réécrire").
+4. **Avant tout `CREATE OR REPLACE FUNCTION`** : récupérer la définition **LIVE** comme base, JAMAIS reconstruire depuis une migration ancienne.
+   ```sql
+   select pg_get_functiondef('public.ma_fonction(text)'::regprocedure);
+   ```
+   La DB live est la seule source de vérité : une fonction est souvent enrichie par plusieurs migrations successives (ex. `get_defis_board` : corps en 192, champ `tag` ajouté en 193). Repartir d'un vieux fichier fait silencieusement sauter les enrichissements ultérieurs. Copier la def live, appliquer UNIQUEMENT le delta voulu, ré-appliquer. (voir `gotchas.md` → "Lire avant de réécrire").
 
 ## Preview obligatoire avant apply (RPCs)
 
