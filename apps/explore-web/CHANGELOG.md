@@ -1,3 +1,10 @@
+# ALPHA V0.9.1
+## Fiches collaboratives : activité, notifications et discussion soignée
+
+Vos contributions sur les lieux vivent enfin dans le jeu. Commenter, enrichir une description ou ajouter une photo apparaît dans le fil d'activité et **prévient les bonnes personnes** : l'auteur du lieu, les contributeurs de la description, ou l'auteur d'un commentaire auquel on répond. Les **commentaires** ont désormais un vrai design (bulles, avatars, mise en forme) et on peut aimer le sien. Correctifs importants : l'**ajout de lieu** et la pose d'**informations** refonctionnent, et le formulaire d'ajout parle maintenant de la « description » du lieu plutôt que d'un récit.
+
+---
+
 # ALPHA V0.9.0
 ## Les fiches de lieu deviennent de vrais carnets de route
 
