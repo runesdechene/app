@@ -1,7 +1,7 @@
 # ALPHA V0.9.13
 ## La bannière de faction remplace l'emblème
 
-Là où l'app affichait l'**emblème** de faction (petite icône teintée), elle montre désormais la **vraie bannière illustrée**. Sur le **profil**, la bannière se pose à gauche du nom (cliquable → membres de la faction) ; sur le **scoreboard** de la carte, elle coiffe chaque jauge à la place de la pastille ronde. Les factions sans bannière retombent proprement sur l'ancien emblème.
+Là où l'app affichait l'**emblème** de faction (petite icône teintée), elle montre désormais la **vraie bannière illustrée**. Sur le **profil**, une ligne **« Membre de … »** cliquable apparaît sous le nom, et la bannière se dresse à droite des compteurs (Coupe / Couronnes / Énigmes) ; sur le **scoreboard** de la carte, elle coiffe chaque jauge à la place de la pastille ronde. Les factions sans bannière retombent proprement sur l'ancien emblème.
 
 ---
 

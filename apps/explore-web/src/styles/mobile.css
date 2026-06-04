@@ -1199,13 +1199,24 @@
     justify-content: center;
   }
 
-  /* Désactive le display:contents desktop : sur mobile, c'est un vrai grid 3 colonnes. */
+  /* V0.9 — sur mobile, la row garde la bannière à droite, la grille stats prend
+     le reste de la largeur. */
+  .player-modal-stats-row {
+    margin-top: 12px;
+    align-items: stretch;
+  }
+
+  .player-modal-faction-link {
+    align-self: center;
+  }
+
+  /* Sur mobile, c'est un vrai grid 3 colonnes (et non plus le flex column desktop). */
   .player-modal-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    width: 100%;
-    margin-top: 12px;
+    flex: 1;
+    min-width: 0;
   }
 
   .player-modal-stat {

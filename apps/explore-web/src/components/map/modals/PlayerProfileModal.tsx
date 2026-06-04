@@ -291,15 +291,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
               <div className="player-modal-info">
                 <div className="player-modal-info-top">
-                  {(profile.factionImage ?? profile.factionPattern) && (
-                    <img
-                      src={(profile.factionImage ?? profile.factionPattern)!}
-                      alt={profile.factionTitle ?? 'Faction'}
-                      className="player-modal-faction-banner"
-                      onClick={() => setShowFactionMembers(true)}
-                      title={profile.factionTitle ?? 'Faction'}
-                    />
-                  )}
                   <h2 className="player-modal-name">{profile.name}</h2>
                   <LevelText level={isSelf ? level : (profile.level ?? 1)} />
                   {(isSelf ? veteranFirstEra : (profile.veteranFirstEra ?? false)) && (
@@ -311,6 +302,17 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     </button>
                   )}
                 </div>
+
+                {profile.factionTitle && (
+                  <button
+                    type="button"
+                    className="player-modal-faction-link"
+                    style={{ color: profile.factionColor ?? undefined }}
+                    onClick={() => setShowFactionMembers(true)}
+                  >
+                    Membre de {profile.factionTitle}
+                  </button>
+                )}
 
                 {/* V0.7 phase 3.5 — Titres déplacés sous le nom (depuis le
                     bas du header) pour densifier l'identité visuelle.
@@ -332,8 +334,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                 {/* V0.7 phase 3.5 \u2014 3 stats (Coupe / Couronnes / \u00C9nigmes) wrapp\u00E9es
                     dans un container : display: contents sur desktop (rendu inchang\u00E9,
                     lignes empil\u00E9es), grid 3 colonnes sur mobile (blocs centr\u00E9s). */}
+                <div className="player-modal-stats-row">
                 <div className="player-modal-stats">
-                  {/* Coupe \u2014 score live pour soi, depuis le profil pour les autres */}
+                  {/* Coupe\u2014 score live pour soi, depuis le profil pour les autres */}
                   {isSelf ? (
                     coupeState?.myBreakdown ? (
                       <div className="player-modal-stat">
@@ -375,6 +378,16 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     <span className="player-modal-stat-value">{profile.enigmasSolved ?? 0}</span>
                     <span className="player-modal-stat-label">{'\u00E9nigmes'}</span>
                   </div>
+                </div>
+                {(profile.factionImage ?? profile.factionPattern) && (
+                  <img
+                    src={(profile.factionImage ?? profile.factionPattern)!}
+                    alt={profile.factionTitle ?? 'Faction'}
+                    className="player-modal-faction-banner"
+                    onClick={() => setShowFactionMembers(true)}
+                    title={profile.factionTitle ?? 'Faction'}
+                  />
+                )}
                 </div>
               </div>
             </div>

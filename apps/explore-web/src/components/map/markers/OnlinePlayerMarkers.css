@@ -246,20 +246,52 @@
   color: #fff;
 }
 
-/* V0.9 — bannière de faction (étendard vertical) à gauche du nom, remplace
-   l'ancien badge emblème posé dans le coin de l'avatar. Cliquable → membres. */
+/* V0.9 — lien « Membre de … » cliquable sous le nom + niveau. */
+.player-modal-faction-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 2px 0 6px;
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  opacity: 0.9;
+  transition: opacity 0.15s;
+}
+
+.player-modal-faction-link:hover {
+  opacity: 1;
+}
+
+/* V0.9 — ligne stats + bannière : les 3 lignes (Coupe/Couronnes/Énigmes) à
+   gauche, la bannière de faction (étendard) à droite, sur toute leur hauteur. */
+.player-modal-stats-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+/* V0.9 — bannière de faction (étendard vertical) à droite des stats, hauteur =
+   celle des 3 lignes. Remplace l'ancien emblème. Cliquable → membres. */
 .player-modal-faction-banner {
-  width: 34px;
-  height: 52px;
+  align-self: stretch;
+  width: 46px;
   flex-shrink: 0;
   object-fit: contain;
   cursor: pointer;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
   transition: transform 0.15s;
 }
 
 .player-modal-faction-banner:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .player-modal-info {
@@ -277,10 +309,15 @@
   gap: 8px;
 }
 
-/* Desktop : container transparent (les 3 stats restent en lignes empilées
-   comme avant). Mobile : grid 3 colonnes (cf. mobile.css). */
+/* Desktop : colonne flex (les 3 stats restent en lignes empilées comme avant,
+   mais groupées pour laisser la bannière se caler à droite à la même hauteur).
+   Mobile : grid 3 colonnes (cf. mobile.css). */
 .player-modal-stats {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
 }
 .player-modal-stat {
   display: flex;
