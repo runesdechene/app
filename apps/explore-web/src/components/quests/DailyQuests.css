@@ -88,6 +88,87 @@
 }
 .defi-card-completed .cqc-bar-fill { background: #4caf50; }
 
+/* ─── Participants d'un défi collectif (modale détail, palette InfoModal sombre) ─── */
+
+.defi-participants { margin-top: 14px; }
+
+.defi-participants-head {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #c9a84c;
+  margin-bottom: 8px;
+}
+
+.defi-participants-empty {
+  margin: 14px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.defi-participants-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.defi-participant {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.defi-participant-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #cda866;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a2a14;
+}
+.defi-participant-av-fb { background: linear-gradient(135deg, #e9d5a8, #cda866); }
+
+.defi-participant-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #f3ead6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.defi-participant-count {
+  flex-shrink: 0;
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  color: #c9a84c;
+}
+
+.defi-participant-time {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 /* ─────────── Progress bar dans InfoModal (slot extraContent) ─────────── */
 /* Style aligné sur la palette InfoModal (sombre/doré). */
 

@@ -1,3 +1,17 @@
+# ALPHA V0.9.9
+## Défi collectif compté depuis son lancement
+
+Correctif de fond : un défi collectif mis en place en cours de semaine ne comptabilise plus que les actions réalisées **depuis sa date de lancement** (avant, il comptait depuis le lundi, donc des actions antérieures au défi). L'objectif « veiller sur les arbres maîtres » repart proprement à **10**.
+
+---
+
+# ALPHA V0.9.8
+## Défi collectif : qui relève le défi, et quand
+
+Ouvre la **fenêtre d'un défi collectif** : tu y vois désormais **la liste des joueurs qui l'ont relevé cette semaine** — avatar, nom et **moment de leur dernière action** (« il y a 3h »), du plus récent au plus ancien. La conquête devient un effort visiblement collectif, sans encombrer la carte.
+
+---
+
 # ALPHA V0.9.7
 ## Défis harmonisés : un seul design pour les trois
 

@@ -1,5 +1,6 @@
 import { InfoModal } from '../map/modals/InfoModal'
 import { DefiTagBadge } from './DefiTagBadge'
+import { DefiParticipants } from './DefiParticipants'
 import type { Defi } from '../../types/defi'
 
 /** Explication de l'action attendue, par type de défi. */
@@ -34,10 +35,13 @@ export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => 
   rows.push({ label: 'Récompense', value: `+${defi.reward} 🪙 Couronnes` })
   if (defi.claimed) rows.push({ label: 'Statut', value: 'Butin déjà perçu ✓', highlight: true })
 
-  const progressBar = (
-    <div className="cqc-bar" style={{ marginTop: 4 }}>
-      <div className="cqc-bar-fill" style={{ width: `${pct}%` }} />
-    </div>
+  const extra = (
+    <>
+      <div className="cqc-bar" style={{ marginTop: 4 }}>
+        <div className="cqc-bar-fill" style={{ width: `${pct}%` }} />
+      </div>
+      {isCollective && <DefiParticipants defiId={defi.id} />}
+    </>
   )
 
   return (
@@ -47,7 +51,7 @@ export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => 
       description={description}
       rows={rows}
       onClose={onClose}
-      extraContent={progressBar}
+      extraContent={extra}
     />
   )
 }
