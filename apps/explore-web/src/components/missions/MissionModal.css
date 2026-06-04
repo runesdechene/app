@@ -220,29 +220,33 @@
   line-height: 1.6;
   color: #4a3925;
   margin: 0 0 12px;
+  white-space: pre-line;
 }
 
-/* ─────────── CTA link (product) ─────────── */
+/* ─────────── Lien boutique discret (sous l'ordre) ─────────── */
 .mission-modal-cta {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 12px;
-  background: transparent;
-  color: #6e5435;
-  border: 1.5px solid rgba(184, 154, 106, 0.6);
-  border-radius: 8px;
-  padding: 13px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  background: none;
+  color: #8a6f4a;
+  border: none;
+  border-bottom: 1px dotted #b89a6a;
+  padding: 0 0 1px;
   font-family: var(--font-accent);
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
   text-decoration: none;
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
 }
-.mission-modal-cta:hover { background: rgba(184, 154, 106, 0.12); }
+.mission-modal-cta:hover {
+  color: #6e5435;
+  border-bottom-color: #8a7050;
+}
 
 /* ─────────── Pending status banner ─────────── */
 .mission-modal-status {

@@ -69,6 +69,18 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
               {!m.coverImageUrl && <span className="mission-modal-emblem">{m.emblem}</span>}
             </div>
 
+            {m.brief && (
+              <section className="mission-modal-section">
+                <h3>L'ordre</h3>
+                <p className="mission-modal-brief">{m.brief}</p>
+                {m.ctaUrl && (
+                  <a className="mission-modal-cta" href={m.ctaUrl} target="_blank" rel="noopener noreferrer">
+                    🛒 {m.ctaLabel ?? 'Voir le produit'}
+                  </a>
+                )}
+              </section>
+            )}
+
             <section className="mission-modal-section">
               <h3>Butin</h3>
               <div className="mission-modal-rewards">
@@ -78,18 +90,6 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
               </div>
               <p className="mission-modal-butin-note">Récompense fixée à la validation, selon la qualité de ta contribution.</p>
             </section>
-
-            {m.brief && (
-              <section className="mission-modal-section">
-                <h3>La mission</h3>
-                <p className="mission-modal-brief">{m.brief}</p>
-                {m.ctaUrl && (
-                  <a className="mission-modal-cta" href={m.ctaUrl} target="_blank" rel="noopener noreferrer">
-                    🛒 {m.ctaLabel ?? 'Voir le produit'}
-                  </a>
-                )}
-              </section>
-            )}
 
             {myStatus === 'pending' && (
               <div className="mission-modal-status">
