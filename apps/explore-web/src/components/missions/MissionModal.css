@@ -24,8 +24,9 @@
   border-radius: 14px;
   width: 100%;
   max-width: 520px;
-  height: auto;
-  max-height: 90vh;
+  /* Hauteur figée : la modale ne saute plus en changeant d'onglet (Mission ↔ Salon).
+     Les deux onglets remplissent/scrollent dans la même hauteur. */
+  height: min(90vh, 680px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32);
@@ -358,14 +359,25 @@
 
 .mission-salon-msg {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-width: 88%;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 92%;
 }
+.mission-salon-av-btn { padding: 0; border: none; background: none; cursor: pointer; flex: 0 0 auto; margin-top: 2px; }
+.mission-salon-av {
+  width: 30px; height: 30px; border-radius: 50%; object-fit: cover; display: block;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+}
+.mission-salon-av-fb {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-sepia, #c19a6b); color: #fff;
+  font-family: var(--font-accent); font-weight: 700; font-size: 13px;
+}
+.mission-salon-msg-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .mission-salon-author {
   font-family: var(--font-accent);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #6b5230;
   letter-spacing: 0.04em;
 }

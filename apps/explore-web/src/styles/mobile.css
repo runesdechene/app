@@ -1058,6 +1058,19 @@
     max-height: none;
   }
 
+  /* Sur mobile, tout le contenu (Défis + Mission + Expéditions) défile ensemble.
+     Sinon .qbp-content (overflow:hidden) + .expeditions-list seule scrollable
+     clippait la section Mission hors écran quand le DefisBoard est haut. */
+  [data-mobile-panel="quests"] .qbp-content {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  [data-mobile-panel="quests"] .qbp-content::-webkit-scrollbar { display: none; }
+  [data-mobile-panel="quests"] .qbp .expeditions-list {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
   /* Cards expéditions mobile : chaque ligne devient une "tuile" sépia
      avec padding et radius. Plus lisible qu'une simple liste avec
      border-bottom. */
