@@ -3,6 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import type { V05Description } from '../../../types/placeDetail'
 import { renderRichText } from '../../../lib/renderRichText'
+import { LikeButton } from '../discussion/LikeButton'
 import './PlaceDescription.css'
 
 interface Props {
@@ -81,9 +82,7 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
           </span>
         </div>
         <div className="place-descr-actions">
-          <button className={`place-descr-seal${liked ? ' liked' : ''}`} onClick={toggleLike} disabled={!userId || busy}>
-            {liked ? '❤' : '🤍'} {count > 0 ? count : ''}
-          </button>
+          <LikeButton liked={liked} count={count} disabled={!userId || busy} variant="seal" onToggle={toggleLike} />
           {canEdit && <button className="place-descr-contribute" onClick={onEdit}>✎ Contribuer</button>}
         </div>
       </div>

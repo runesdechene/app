@@ -29,6 +29,16 @@ function parseInline(text: string, keyPrefix: string): ReactNode[] {
   return nodes
 }
 
+/**
+ * Variante inline (commentaires compacts) : **gras**, *italique* et sauts de
+ * ligne, sans blocs <p>/<ul> — le texte coule à la suite du nom de l'auteur.
+ */
+export function renderInlineRichText(text: string): ReactNode {
+  return text.split('\n').map((line, i) => (
+    <span key={i}>{i > 0 && <br />}{parseInline(line, `il${i}`)}</span>
+  ))
+}
+
 export function renderRichText(text: string): ReactNode {
   const lines = text.split('\n')
   const blocks: ReactNode[] = []

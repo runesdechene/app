@@ -1,0 +1,47 @@
+.like-btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-accent); font-weight: 600;
+  cursor: pointer; background: none; border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.like-btn:disabled { opacity: 0.5; cursor: default; }
+.like-btn-ico { line-height: 1; display: inline-block; }
+.like-btn-n { font-variant-numeric: tabular-nums; }
+
+/* variante discrète (commentaire) */
+.like-btn-mini { font-size: 11.5px; color: var(--color-ink-light); }
+.like-btn-mini.liked { color: #d24a36; }
+
+/* variante sceau (description) */
+.like-btn-seal {
+  font-size: 12.5px; color: var(--color-ink);
+  background: #fff; border: 1px solid #e6d3b8; border-radius: 999px; padding: 4px 11px;
+}
+.like-btn-seal.liked { background: #f3d9d0; border-color: #e0b3a4; color: #9a3a28; }
+
+/* pop de l'icône au moment du like */
+.like-btn.liked .like-btn-ico { animation: like-pop 0.34s cubic-bezier(.2,1.4,.4,1); }
+@keyframes like-pop {
+  0% { transform: scale(0.7); }
+  45% { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+
+/* cœur qui s'envole */
+.like-burst {
+  position: absolute; left: 50%; top: 45%;
+  transform: translate(-50%, -50%);
+  font-size: 15px; color: #d24a36; pointer-events: none;
+  animation: like-burst 0.6s ease-out forwards;
+}
+@keyframes like-burst {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-8deg); }
+  25%  { opacity: 1; transform: translate(-50%, -150%) scale(1.5) rotate(4deg); }
+  100% { opacity: 0; transform: translate(-50%, -340%) scale(1) rotate(-2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .like-btn.liked .like-btn-ico { animation: none; }
+  .like-burst { display: none; }
+}

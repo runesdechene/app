@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useMapStore } from '../../../stores/mapStore'
-import { renderRichText } from '../../../lib/renderRichText'
+import { renderInlineRichText } from '../../../lib/renderRichText'
+import { LikeButton } from './LikeButton'
 import type { V05Contribution } from '../../../types/placeDetail'
 import './CommentCard.css'
 
@@ -21,7 +22,7 @@ export function CommentCard({ comment, replies, isReply = false, onPhotoOpen, on
   const [count, setCount] = useState(comment.votesUp)
   const [busy, setBusy] = useState(false)
 
-  // Like générique : ouvert à tous, y compris son propre commentaire (collaboratif).
+  // Like générique : ouvert à tous, y compris son propre commentaire.
   async function toggleLike() {
     if (!userId || busy) return
     setBusy(true)
@@ -29,45 +30,33 @@ export function CommentCard({ comment, replies, isReply = false, onPhotoOpen, on
       p_user_id: userId, p_contribution_id: comment.id,
     })
     const res = data as { success?: boolean; liked?: boolean; votesUp?: number } | null
-    if (!error && res?.success) {
-      setLiked(res.liked ?? false)
-      setCount(res.votesUp ?? 0)
-      onChanged()
-    }
+    if (!error && res?.success) { setLiked(res.liked ?? false); setCount(res.votesUp ?? 0); onChanged() }
     setBusy(false)
   }
 
   return (
-    <div className={`cmt${isReply ? ' cmt-is-reply' : ''}`} id={`comment-${comment.id}`}>
+    <div className={`cmt${isReply ? ' cmt-reply' : ''}`} id={`comment-${comment.id}`}>
       <button className="cmt-av-btn" onClick={() => useMapStore.getState().setSelectedPlayerId(comment.userId)} aria-label={comment.userName}>
         {comment.userAvatar
           ? <img className="cmt-av" src={comment.userAvatar} alt="" />
-          : <span className="cmt-av cmt-av-fallback">{comment.userName.charAt(0).toUpperCase()}</span>}
+          : <span className="cmt-av cmt-av-fb">{comment.userName.charAt(0).toUpperCase()}</span>}
       </button>
-      <div className="cmt-body">
-        <div className="cmt-bubble">
-          <div className="cmt-head">
-            <span className="cmt-name">{comment.userName}</span>
-            <span className="cmt-time">{timeAgo(comment.createdAt)}</span>
-          </div>
-          {comment.content && <div className="cmt-text">{renderRichText(comment.content)}</div>}
-          {comment.images.length > 0 && (
-            <div className="cmt-photos">
-              {comment.images.map((u, i) => (
-                <img key={i} src={u} alt="" loading="lazy" onClick={() => onPhotoOpen(comment.images, i)} />
-              ))}
-            </div>
-          )}
+      <div className="cmt-main">
+        <div className="cmt-top">
+          <span className="cmt-name">{comment.userName}</span>
+          {comment.content && <span className="cmt-text"> {renderInlineRichText(comment.content)}</span>}
         </div>
-        <div className="cmt-foot">
-          <button className={`cmt-act${liked ? ' liked' : ''}`} onClick={toggleLike} disabled={!userId || busy}>
-            <span className="cmt-act-ico">{liked ? '❤' : '🤍'}</span>{count > 0 && <span className="cmt-act-n">{count}</span>}
-          </button>
-          {!isReply && (
-            <button className="cmt-act" onClick={() => onReply(comment.id)}>
-              <span className="cmt-act-ico">↩</span> Répondre
-            </button>
-          )}
+        {comment.images.length > 0 && (
+          <div className="cmt-photos">
+            {comment.images.map((u, i) => (
+              <img key={i} src={u} alt="" loading="lazy" onClick={() => onPhotoOpen(comment.images, i)} />
+            ))}
+          </div>
+        )}
+        <div className="cmt-meta">
+          <span className="cmt-time">{timeAgo(comment.createdAt)}</span>
+          <LikeButton liked={liked} count={count} disabled={!userId || busy} variant="mini" onToggle={toggleLike} />
+          {!isReply && <button className="cmt-reply-btn" onClick={() => onReply(comment.id)}>Répondre</button>}
         </div>
 
         {replies.length > 0 && (
@@ -85,8 +74,8 @@ export function CommentCard({ comment, replies, isReply = false, onPhotoOpen, on
 function timeAgo(d: string): string {
   const m = Math.floor((Date.now() - new Date(d).getTime()) / 60000)
   if (m < 1) return "à l'instant"
-  if (m < 60) return `il y a ${m} min`
-  const h = Math.floor(m / 60); if (h < 24) return `il y a ${h} h`
-  const j = Math.floor(h / 24); if (j < 7) return `il y a ${j} j`
-  return `il y a ${Math.floor(j / 7)} sem.`
+  if (m < 60) return `${m} min`
+  const h = Math.floor(m / 60); if (h < 24) return `${h} h`
+  const j = Math.floor(h / 24); if (j < 7) return `${j} j`
+  return `${Math.floor(j / 7)} sem.`
 }

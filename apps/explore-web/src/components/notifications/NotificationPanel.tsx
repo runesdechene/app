@@ -160,7 +160,9 @@ function formatMessage(notif: Notification): string {
     case 'comment_reply':
       return `${d.actorName || 'Quelqu\'un'} a répondu à votre commentaire sur ${d.placeTitle || 'un lieu'}`
     case 'like_contribution':
-      return `${d.actorName || 'Quelqu\'un'} a aimé votre ${d.contributionType === 'description' ? 'description' : 'commentaire'} sur ${d.placeTitle || 'un lieu'}`
+      return d.contributionType === 'description'
+        ? `${d.actorName || 'Quelqu\'un'} a aimé la description de ${d.placeTitle || 'un lieu'} que vous avez enrichie`
+        : `${d.actorName || 'Quelqu\'un'} a aimé votre commentaire sur ${d.placeTitle || 'un lieu'}`
     case 'description_edited':
       return `${d.actorName || 'Quelqu\'un'} a enrichi la description de ${d.placeTitle || 'un lieu'} que vous avez contribuée`
     case 'new_photo':
