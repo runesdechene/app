@@ -1,3 +1,10 @@
+# ALPHA V0.9.2
+## Discussion repensée, likes vivants et notifications de contribution
+
+La discussion d'un lieu devient un vrai **fil façon messagerie** : commentaires compacts dans un cadre dédié, et une **barre d'envoi en bas** (photo + message) comme une appli de chat. Les **likes prennent vie** — un cœur s'envole avec le son des Couronnes — et marchent partout, y compris sur ses propres contributions. **Notifications** (in-app et push) : tu es prévenu quand on commente ton lieu, qu'on aime une description que tu as enrichie, ou qu'on aime ton commentaire. Correctif : la scrollbar du formulaire d'ajout est masquée proprement.
+
+---
+
 # ALPHA V0.9.1
 ## Fiches collaboratives : activité, notifications et discussion soignée
 
