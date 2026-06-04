@@ -1,7 +1,7 @@
-# ALPHA V0.9.17
+# ALPHA V0.9.18
 ## Marqueurs d'événements plus nets
 
-Les médaillons d'événements sur la carte perdent leur liseré coloré (couleur de faction du chef) au profit d'un cadre parchemin sobre. Plus lisible, moins criard.
+Les médaillons d'événements sur la carte perdent leur bordure (auparavant teintée à la couleur de faction du chef) : juste la photo, détachée par une ombre douce. Plus lisible, moins criard.
 
 ---
 
