@@ -432,13 +432,15 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 14px 18px 0;
-  padding: 12px 14px;
+  margin-top: 12px;
+  padding: 10px 12px;
   border-radius: 10px;
   background: rgba(94, 112, 68, 0.14);
   border: 1px solid rgba(94, 112, 68, 0.45);
   color: #3d4a2c;
 }
+/* Avatars calés à droite dans la bannière « Pacte scellé ». */
+.mission-modal-engaged .mission-engaged-avs { margin-left: auto; }
 .mission-modal-engaged-stamp {
   flex: 0 0 30px;
   width: 30px;

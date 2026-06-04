@@ -96,7 +96,18 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                 <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'}</div>
                 <h2 className="mission-modal-title">{m.title}</h2>
                 {m.call && <div className="mission-modal-call">« {m.call} »</div>}
-                <MissionParticipants participants={engaged.participants} total={engaged.total} sealed={m.isParticipant} />
+                {m.isParticipant ? (
+                  <div className="mission-modal-engaged">
+                    <span className="mission-modal-engaged-stamp">✓</span>
+                    <div className="mission-modal-engaged-text">
+                      <strong>Pacte scellé.</strong>
+                      <span>Tu es l'un des {engaged.total} engagés.</span>
+                    </div>
+                    <MissionParticipants participants={engaged.participants} total={engaged.total} sealed hideLabel />
+                  </div>
+                ) : (
+                  <MissionParticipants participants={engaged.participants} total={engaged.total} sealed={false} />
+                )}
               </div>
               <div
                 className="mission-modal-cover"
@@ -105,16 +116,6 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                 {daysLeft != null && <span className="mission-modal-jx">J-{daysLeft}</span>}
                 {!m.coverImageUrl && <span className="mission-modal-emblem">{m.emblem}</span>}
               </div>
-
-              {m.isParticipant && (
-                <div className="mission-modal-engaged">
-                  <span className="mission-modal-engaged-stamp">✓</span>
-                  <div className="mission-modal-engaged-text">
-                    <strong>Pacte scellé.</strong>
-                    <span>Tu es l'un des {engaged.total} engagés.</span>
-                  </div>
-                </div>
-              )}
 
               {m.brief && (
                 <section className="mission-modal-section">

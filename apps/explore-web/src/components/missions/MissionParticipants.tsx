@@ -11,39 +11,50 @@ export function MissionParticipants({
   participants,
   total,
   sealed,
+  hideLabel,
 }: {
   participants: MissionParticipant[]
   total: number
   sealed: boolean
+  /** N'afficher que la pile d'avatars (pour l'insérer dans la bannière « Pacte scellé »). */
+  hideLabel?: boolean
 }) {
   if (total === 0) {
-    return <div className="mission-engaged-row mission-engaged-empty">Sois le premier à relever ce défi.</div>
+    return hideLabel ? null : (
+      <div className="mission-engaged-row mission-engaged-empty">Sois le premier à relever ce défi.</div>
+    )
   }
 
   const extra = total - participants.length
 
+  const avatars = (
+    <div className="mission-engaged-avs">
+      {participants.map((p) => (
+        <button
+          key={p.userId}
+          className="mission-engaged-av-btn"
+          onClick={() => useMapStore.getState().setSelectedPlayerId(p.userId)}
+          aria-label={p.name ?? 'Engagé'}
+          title={p.name ?? 'Engagé'}
+        >
+          {p.avatar ? (
+            <img className="mission-engaged-av" src={p.avatar} alt="" />
+          ) : (
+            <span className="mission-engaged-av mission-engaged-av-fb">
+              {(p.name ?? '?').charAt(0).toUpperCase()}
+            </span>
+          )}
+        </button>
+      ))}
+      {extra > 0 && <span className="mission-engaged-av mission-engaged-more">+{extra}</span>}
+    </div>
+  )
+
+  if (hideLabel) return avatars
+
   return (
     <div className="mission-engaged-row">
-      <div className="mission-engaged-avs">
-        {participants.map((p) => (
-          <button
-            key={p.userId}
-            className="mission-engaged-av-btn"
-            onClick={() => useMapStore.getState().setSelectedPlayerId(p.userId)}
-            aria-label={p.name ?? 'Engagé'}
-            title={p.name ?? 'Engagé'}
-          >
-            {p.avatar ? (
-              <img className="mission-engaged-av" src={p.avatar} alt="" />
-            ) : (
-              <span className="mission-engaged-av mission-engaged-av-fb">
-                {(p.name ?? '?').charAt(0).toUpperCase()}
-              </span>
-            )}
-          </button>
-        ))}
-        {extra > 0 && <span className="mission-engaged-av mission-engaged-more">+{extra}</span>}
-      </div>
+      {avatars}
       <span className="mission-engaged-label">
         {sealed
           ? `${total} engagé${total > 1 ? 's' : ''}`
