@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { getMissionState, getMissionSubmissions, getMySubmissionStatus, joinMission } from '../../lib/missionsApi'
-import type { MissionState, MissionSubmission, MySubmissionStatus } from '../../types/mission'
+import { getMissionState, getMissionSubmissions, getMySubmissionStatus, getMissionParticipants, joinMission } from '../../lib/missionsApi'
+import type { MissionState, MissionSubmission, MySubmissionStatus, MissionParticipantsPayload } from '../../types/mission'
 import { MissionSalon } from './MissionSalon'
+import { MissionParticipants } from './MissionParticipants'
 import { useToastStore } from '../../stores/toastStore'
 import './MissionModal.css'
 
@@ -14,6 +15,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   const [loading, setLoading] = useState(true)
   const [sealing, setSealing] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [engaged, setEngaged] = useState<MissionParticipantsPayload>({ total: 0, participants: [] })
 
   useEffect(() => {
     let cancelled = false
@@ -21,9 +23,13 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
       const state = await getMissionState(slug)
       if (cancelled) return
       if (state) {
-        const [sList, st] = await Promise.all([getMissionSubmissions(slug), getMySubmissionStatus(slug)])
+        const [sList, st, eng] = await Promise.all([
+          getMissionSubmissions(slug),
+          getMySubmissionStatus(slug),
+          getMissionParticipants(slug),
+        ])
         if (cancelled) return
-        setSubs(sList); setMyStatus(st)
+        setSubs(sList); setMyStatus(st); setEngaged(eng)
       }
       setM(state)
       setLoading(false)
@@ -39,7 +45,8 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
     setSealing(true)
     try {
       await joinMission(m.slug)
-      setM({ ...m, isParticipant: true, participantsCount: m.participantsCount + 1 })
+      setM({ ...m, isParticipant: true })
+      setEngaged(await getMissionParticipants(m.slug))
     } catch {
       useToastStore.getState().addToast({
         type: 'error',
@@ -86,9 +93,10 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
           <>
             <div className="mission-modal-main">
               <div className="mission-modal-intro">
-                <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'} · {m.participantsCount} engagés</div>
+                <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'}</div>
                 <h2 className="mission-modal-title">{m.title}</h2>
                 {m.call && <div className="mission-modal-call">« {m.call} »</div>}
+                <MissionParticipants participants={engaged.participants} total={engaged.total} sealed={m.isParticipant} />
               </div>
               <div
                 className="mission-modal-cover"
@@ -103,7 +111,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                   <span className="mission-modal-engaged-stamp">✓</span>
                   <div className="mission-modal-engaged-text">
                     <strong>Pacte scellé.</strong>
-                    <span>Tu es l'un des {m.participantsCount} engagés.</span>
+                    <span>Tu es l'un des {engaged.total} engagés.</span>
                   </div>
                 </div>
               )}

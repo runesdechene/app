@@ -13,3 +13,9 @@ export interface MissionSubmission {
   submissionId: string; imageUrl: string; submitterName: string; createdAt: string
 }
 export type MySubmissionStatus = 'pending' | 'approved' | 'archived' | null
+export interface MissionParticipant {
+  userId: string; name: string | null; avatar: string | null; joinedAt: string
+}
+export interface MissionParticipantsPayload {
+  total: number; participants: MissionParticipant[]
+}

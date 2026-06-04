@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { MissionState, MissionSubmission, MySubmissionStatus } from '../types/mission'
+import type { MissionState, MissionSubmission, MySubmissionStatus, MissionParticipantsPayload } from '../types/mission'
 
 export async function getMissionState(slug: string): Promise<MissionState | null> {
   const { data, error } = await supabase.rpc('get_mission_state', { p_slug: slug })
@@ -15,6 +15,11 @@ export async function getMySubmissionStatus(slug: string): Promise<MySubmissionS
   const { data, error } = await supabase.rpc('get_my_mission_submission_status', { p_slug: slug })
   if (error) throw error
   return (data as MySubmissionStatus) ?? null
+}
+export async function getMissionParticipants(slug: string): Promise<MissionParticipantsPayload> {
+  const { data, error } = await supabase.rpc('get_mission_participants', { p_slug: slug, p_limit: 12 })
+  if (error) throw error
+  return (data as MissionParticipantsPayload) ?? { total: 0, participants: [] }
 }
 export async function joinMission(slug: string): Promise<void> {
   const { error } = await supabase.rpc('join_mission', { p_mission_slug: slug })

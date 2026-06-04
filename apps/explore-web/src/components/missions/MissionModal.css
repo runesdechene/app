@@ -143,6 +143,68 @@
   line-height: 1.4;
 }
 
+/* ─────────── Rangée d'avatars des engagés (la « vie ») ─────────── */
+.mission-engaged-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.mission-engaged-empty {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  color: #8a7050;
+}
+.mission-engaged-avs { display: flex; align-items: center; }
+.mission-engaged-av-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-left: -8px;
+  transition: transform 0.12s;
+}
+.mission-engaged-av-btn:first-child { margin-left: 0; }
+.mission-engaged-av-btn:hover { transform: translateY(-2px); position: relative; z-index: 2; }
+.mission-engaged-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid #faf2dd;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.mission-engaged-av-fb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-sepia, #c19a6b);
+  color: #fff;
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+.mission-engaged-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  background: #e8dcc0;
+  color: #6e5435;
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-size: 11px;
+}
+.mission-engaged-label {
+  font-family: var(--font-accent);
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a6f4a;
+}
+
 /* ─────────── Cover 16:9 ─────────── */
 .mission-modal-cover {
   position: relative;
