@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import './LikeButton.css'
 
 // Son des couronnes (réutilisé depuis HarvestableChests / PlaceCourtView).
@@ -17,17 +17,23 @@ interface LikeButtonProps {
   disabled?: boolean
   /** 'mini' = action discrète (commentaire) · 'seal' = pilule sceau (description) */
   variant?: 'mini' | 'seal'
-  onToggle: () => void
+  onToggle: () => void | Promise<void>
 }
 
 export function LikeButton({ liked, count, disabled, variant = 'mini', onToggle }: LikeButtonProps) {
   const [burst, setBurst] = useState(0)
+  // Verrou SYNCHRONE : empêche un 2e déclenchement dans le même tick (tap mobile
+  // touch+click, double-clic) qui ferait like puis unlike = net zéro → le like
+  // semblait "ne pas s'enregistrer". Le state `disabled` est asynchrone et ne
+  // suffisait pas.
+  const lock = useRef(false)
 
-  function handle() {
-    if (disabled) return
+  async function handle() {
+    if (disabled || lock.current) return
+    lock.current = true
     // Animation cœur + son uniquement quand on AIME (pas quand on retire).
     if (!liked) { playCrownSound(); setBurst(b => b + 1) }
-    onToggle()
+    try { await onToggle() } finally { lock.current = false }
   }
 
   return (

@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import type { V05Description } from '../../../types/placeDetail'
 import { renderRichText } from '../../../lib/renderRichText'
 import { LikeButton } from '../discussion/LikeButton'
+import { LikersModal } from '../modals/LikersModal'
 import './PlaceDescription.css'
 
 interface Props {
@@ -19,6 +20,7 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
   const [liked, setLiked] = useState(description?.likedByMe ?? false)
   const [count, setCount] = useState(description?.votesUp ?? 0)
   const [busy, setBusy] = useState(false)
+  const [showLikers, setShowLikers] = useState(false)
 
   // La description est collaborative : like ouvert à tous (y compris le contributeur),
   // via une RPC dédiée sans le garde "cannot_vote_own" de vote_contribution.
@@ -79,6 +81,9 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
               </>
             )}
             <button className="place-descr-history" onClick={onOpenHistory}>voir l'historique</button>
+            {count > 0 && (
+              <> · <button className="place-descr-history" onClick={() => setShowLikers(true)}>aimé par {count}</button></>
+            )}
           </span>
         </div>
         <div className="place-descr-actions">
@@ -86,6 +91,10 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
           {canEdit && <button className="place-descr-contribute" onClick={onEdit}>✎ Contribuer</button>}
         </div>
       </div>
+
+      {showLikers && (
+        <LikersModal contributionId={description.id} title="Aimé par" onClose={() => setShowLikers(false)} />
+      )}
     </div>
   )
 }
