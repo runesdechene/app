@@ -1,3 +1,10 @@
+# ALPHA V0.9.14
+## Les missions se relèvent comme un pacte
+
+Les **missions** ne se rejoignent plus en douce : tu lis l'ordre, puis tu **scelles le pacte** (« Je relève ce défi ») — un vrai engagement qui débloque le Salon et les contributions. La description respecte enfin les sauts de ligne, et les **engagés s'affichent en avatars cliquables** (tu vois qui est là, tu ouvres leur profil). Si la mission demande un produit, on te demande gentiment si tu l'as déjà — sinon on te glisse un **code promo** avant de filer à la boutique.
+
+---
+
 # ALPHA V0.9.13
 ## La bannière de faction remplace l'emblème
 
