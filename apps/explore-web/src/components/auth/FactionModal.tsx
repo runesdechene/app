@@ -234,7 +234,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <span className="faction-legend-item">🪙 Couronnes — Influencer un lieu à distance (mécénat)</span>
           <span className="faction-legend-item">🏆 Coupe — Le classement des Factions cette saison</span>
           {currentFactionId && (
-            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible qu'une fois tous les 30 jours</span>
+            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible que 2 fois tous les 30 jours</span>
           )}
         </div>
 
@@ -265,7 +265,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Êtes-vous sûr ? Changer de Faction n'est possible <strong>qu'une fois tous les 30 jours</strong>.
+                Êtes-vous sûr ? Changer de Faction n'est possible <strong>que 2 fois tous les 30 jours</strong>.
               </p>
               <div className="faction-confirm-actions">
                 <button onClick={() => setConfirmFaction(null)} disabled={selecting}>
