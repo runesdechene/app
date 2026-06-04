@@ -35,16 +35,15 @@ export function DefisBoard() {
 
   return (
     <>
-      {rendered.map(({ key, label }) => {
-        const defi = board[key]
-        if (!defi) return null
-        return (
-          <section key={key} className="qbp-section">
-            <h4 className="qbp-section-title">{label}</h4>
-            <DefiCard defi={defi} label={label} onClick={() => setOpenKey(key)} />
-          </section>
-        )
-      })}
+      {/* Une seule section : les trois défis partagent un design unifié et la
+          pastille de cadence porte le label, donc plus de titre par défi. */}
+      <section className="qbp-section">
+        {rendered.map(({ key, label }) => {
+          const defi = board[key]
+          if (!defi) return null
+          return <DefiCard key={key} defi={defi} label={label} onClick={() => setOpenKey(key)} />
+        })}
+      </section>
       {openDefi && <DefiDetailModal defi={openDefi} onClose={() => setOpenKey(null)} />}
     </>
   )

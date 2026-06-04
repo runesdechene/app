@@ -8,14 +8,15 @@ interface Props {
 }
 
 /**
- * Carte d'un défi (individuel ou collectif). Cliquable → ouvre la modale détail.
- * Réutilise les classes CSS daily-quest-card et cqc-* existantes.
+ * Carte d'un défi — design unifié pour les trois cadences (jour / semaine /
+ * collectif). Cliquable → ouvre la modale détail.
  *
- * Individuel  : progress / target + ✓ si claimed.
- * Collectif   : barre communauté + ligne "ta contribution" + ✓ si claimed.
+ * Même rangée pour tous : pastille de cadence près de l'icône (porte le label,
+ * donc plus de titre de section au-dessus), titre, pastille d'avancement, puis
+ * une barre de progression fine. Le collectif n'a plus de cadre dédié : juste
+ * la même barre (le détail "ta contribution" reste dans la modale).
  */
 export function DefiCard({ defi, label, onClick }: Props) {
-  const isCollective = defi.scope === 'collective'
   const progress = Math.min(defi.progress, defi.target)
   const pct = defi.target > 0 ? Math.min(100, Math.round((progress / defi.target) * 100)) : 0
   const progressLabel = defi.claimed ? '✓' : `${progress}/${defi.target}`
@@ -24,50 +25,30 @@ export function DefiCard({ defi, label, onClick }: Props) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
   }
 
-  if (isCollective) {
-    return (
-      <div
-        className={`community-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}
-        onClick={onClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={keyActivate}
-        style={{ cursor: 'pointer' }}
-      >
-        <div className="cqc-head">
-          <DefiTagBadge defi={defi} size={20} />{' '}
-          {defi.title}
+  return (
+    <div
+      className={`defi-card${defi.claimed ? ' defi-card-completed' : ''}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={keyActivate}
+    >
+      <span className="defi-card-icon"><DefiTagBadge defi={defi} size={28} /></span>
+      <div className="defi-card-body">
+        <div className="defi-card-head">
+          <span className="defi-card-pill">{label}</span>
+          <span className="defi-card-title">{defi.title}</span>
+          <span
+            className="defi-card-progress"
+            aria-label={`Avancement ${progress} sur ${defi.target}`}
+          >
+            {progressLabel}
+          </span>
         </div>
         <div className="cqc-bar">
           <div className="cqc-bar-fill" style={{ width: `${pct}%` }} />
         </div>
-        <div className="cqc-meta">
-          {progress}/{defi.target} · ta contribution : {defi.myContribution}
-          {defi.claimed && <span style={{ marginLeft: 6, color: '#2e7d32', fontWeight: 700 }}>✓</span>}
-        </div>
       </div>
-    )
-  }
-
-  return (
-    <ul className="daily-quests-list" style={{ margin: 0 }}>
-      <li
-        className={`daily-quest-card${defi.claimed ? ' daily-quest-card-completed' : ''}`}
-        onClick={onClick}
-        role="button"
-        tabIndex={0}
-        onKeyDown={keyActivate}
-      >
-        <span className="daily-quest-card-icon"><DefiTagBadge defi={defi} size={24} /></span>
-        <span className="daily-quest-card-pill">{label}</span>
-        <span className="daily-quest-card-title">{defi.title}</span>
-        <span
-          className="daily-quest-card-progress"
-          aria-label={`Avancement ${progress} sur ${defi.target}`}
-        >
-          {progressLabel}
-        </span>
-      </li>
-    </ul>
+    </div>
   )
 }

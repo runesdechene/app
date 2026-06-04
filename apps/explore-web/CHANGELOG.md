@@ -1,3 +1,10 @@
+# ALPHA V0.9.7
+## Défis harmonisés : un seul design pour les trois
+
+Le **défi du jour**, le **défi de la semaine** et le **défi collectif** partagent enfin **le même design** : une rangée épurée avec la pastille de cadence près de l'icône (plus de titre redondant au-dessus), le libellé, l'avancement et une **barre de progression** identique pour tous. Le défi collectif perd son cadre : juste la barre, comme les autres. Et l'objectif communautaire « veiller sur les arbres maîtres » passe à **20** (vous êtes nombreux !).
+
+---
+
 # ALPHA V0.9.6
 ## La Mission s'ouvre vraiment sur mobile + likes visibles d'emblée
 
