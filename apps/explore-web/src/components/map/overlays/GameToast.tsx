@@ -30,6 +30,8 @@ const ICONS: Record<GameToastType['type'], string> = {
   quest_completed: '\uD83C\uDFAF', // cible (qu\u00EAte accomplie)
   // V0.7 phase 5 \u2014 La Cour (attaque, bascule, m\u00E9c\u00E8ne principal)
   court: '\uD83D\uDC51', // couronne
+  // Une Faction gagne un joueur (1er choix ou bascule)
+  faction_join: '\uD83D\uDEE1\uFE0F', // bouclier
 }
 
 function formatTimeAgo(ts: number): string {

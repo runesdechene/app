@@ -320,6 +320,13 @@ export function usePlayer() {
           } else if (e.type === 'new_user') {
             message = `${name} a rejoint la carte`
             type = 'new_user'
+          } else if (e.type === 'faction_join') {
+            const factionTitle = e.data?.factionTitle || 'une faction'
+            message = `Un renfort pour ${factionTitle} : ${name} 🛡️`
+            highlights.push(factionTitle)
+            type = 'faction_join'
+            color = e.data?.factionColor ?? undefined
+            iconUrl = e.data?.factionPattern ?? undefined
           } else if (e.type === 'contribute') {
             // V0.7 (mai 2026) : 6 types de contribution.
             // - photo / carnet : valorisés (gloire + coupe) via barème app_settings

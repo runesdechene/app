@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 export interface GameToast {
   id: string
-  type: 'claim' | 'discover' | 'explore' | 'new_place' | 'new_user' | 'like' | 'fortify' | 'contribute' | 'revisit' | 'enigma' | 'influence' | 'info' | 'error' | 'plant_flag' | 'harvest_crown' | 'quest_completed' | 'court'
+  type: 'claim' | 'discover' | 'explore' | 'new_place' | 'new_user' | 'like' | 'fortify' | 'contribute' | 'revisit' | 'enigma' | 'influence' | 'info' | 'error' | 'plant_flag' | 'harvest_crown' | 'quest_completed' | 'court' | 'faction_join'
   message: string
   color?: string
   /** Texte(s) à mettre en avant (bold) dans le message */
