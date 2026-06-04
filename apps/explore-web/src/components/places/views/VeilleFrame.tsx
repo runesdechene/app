@@ -146,7 +146,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
           !onSpot
             ? 'Vous devez être à moins de 200 m du lieu'
             : isAlreadyVeilleurGps
-              ? 'Tu veilles déjà ce lieu — réaffirmer efface les menaces de la Cour (pas de nouveau bonus)'
+              ? 'Tu veilles déjà ce lieu — réaffirmer efface les menaces sur le lieu (pas de nouveau bonus)'
               : 'Planter ton étendard sur ce lieu'
         }
         aria-label={isAlreadyVeilleurGps ? 'Réaffirmer mon étendard' : 'Planter mon étendard (GPS)'}

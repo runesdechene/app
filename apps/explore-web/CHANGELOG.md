@@ -1,3 +1,10 @@
+# ALPHA V0.9.12
+## Fini le jargon « Cour » côté joueur
+
+Le terme **« Cour »** disparaît des textes visibles au profit du vocabulaire qu'on emploie vraiment : les Couronnes servent à **influencer un lieu à distance (mécénat)**, le gain affiché à la prise d'un lieu devient **« ⚔️ Influence »**, et l'info-bulle de réaffirmation parle des **menaces sur le lieu**. (Le système technique garde son nom en coulisses.)
+
+---
+
 # ALPHA V0.9.11
 ## « Héritage » devient « Faction » + fenêtre de choix dépoussiérée
 

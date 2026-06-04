@@ -231,7 +231,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
         <div className="faction-legend">
           <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
           <span className="faction-legend-item">🎖️ Gloire — Votre prestige total, à vie</span>
-          <span className="faction-legend-item">🪙 Couronnes — Votre influence à la Cour des lieux</span>
+          <span className="faction-legend-item">🪙 Couronnes — Influencer un lieu à distance (mécénat)</span>
           <span className="faction-legend-item">🏆 Coupe — Le classement des Factions cette saison</span>
           {currentFactionId && (
             <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible qu'une fois tous les 30 jours</span>
