@@ -1,3 +1,10 @@
+# ALPHA V0.9.5
+## Salon des Missions soigné + Mission visible sur mobile
+
+Le **salon** d'une Mission affiche enfin l'**avatar et le nom** de chaque participant (fini l'identifiant brut), et la fenêtre garde une **hauteur stable** en passant de l'onglet Mission au Salon. Correctif **mobile** : la **Mission réapparaît** dans « Quêtes & Expéditions » — tout le panneau défile correctement.
+
+---
+
 # ALPHA V0.9.4
 ## La Cour : dépliée en mode Héritages + bon veilleur
 
