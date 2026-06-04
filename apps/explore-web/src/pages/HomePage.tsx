@@ -4,6 +4,8 @@ import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { DailyEnigmaCard } from '../components/home/DailyEnigmaCard'
 import { HomeBannerCard } from '../components/home/HomeBannerCard'
 import { DefisBoard } from '../components/quests/DefisBoard'
+import { MissionEntryCard } from '../components/quests/MissionEntryCard'
+import { MissionModalHost } from '../components/missions/MissionModalHost'
 import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { MapActivityList } from '../components/home/MapActivityList'
@@ -104,6 +106,7 @@ export default function HomePage() {
               </button>
             </header>
             <DefisBoard />
+            <section className="qbp-section"><h4 className="qbp-section-title">Mission</h4><MissionEntryCard /></section>
             <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
           </div>
         </section>
@@ -156,6 +159,7 @@ export default function HomePage() {
           onClose={() => setSelectedExpeditionId(null)}
         />
       )}
+      <MissionModalHost />
     </>
   )
 }

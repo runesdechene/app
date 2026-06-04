@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import type { V05Description } from '../../../types/placeDetail'
@@ -21,6 +21,15 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
   const [count, setCount] = useState(description?.votesUp ?? 0)
   const [busy, setBusy] = useState(false)
   const [showLikers, setShowLikers] = useState(false)
+
+  // Re-synchronise l'état du like quand la description arrive/se rafraîchit :
+  // au 1er montage `description` peut être null (panel en chargement), donc
+  // l'init de useState valait 0/false → sans ça, les likes existants restaient
+  // invisibles jusqu'à ce qu'on like soi-même.
+  useEffect(() => {
+    setLiked(description?.likedByMe ?? false)
+    setCount(description?.votesUp ?? 0)
+  }, [description?.id, description?.likedByMe, description?.votesUp])
 
   // La description est collaborative : like ouvert à tous (y compris le contributeur),
   // via une RPC dédiée sans le garde "cannot_vote_own" de vote_contribution.

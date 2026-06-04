@@ -1,3 +1,10 @@
+# ALPHA V0.9.6
+## La Mission s'ouvre vraiment sur mobile + likes visibles d'emblée
+
+La **Mission** apparaît désormais dans « Événements & Quêtes » sur l'**accueil mobile** et, surtout, s'**ouvre** au tap (la fenêtre était absente côté mobile — un seul et même composant est maintenant partagé entre la carte et l'accueil, fini la divergence). Et sur les fiches de lieu, les **likes existants de la description sont visibles immédiatement**, sans avoir besoin de liker soi-même d'abord.
+
+---
+
 # ALPHA V0.9.5
 ## Salon des Missions soigné + Mission visible sur mobile
 

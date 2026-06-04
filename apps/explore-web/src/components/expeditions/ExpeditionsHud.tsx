@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { QuestsBoardPanel } from '../quests/QuestsBoardPanel'
 import { ExpeditionCreator } from './ExpeditionCreator'
 import { ExpeditionModal } from './ExpeditionModal'
-import { MissionModal } from '../missions/MissionModal'
+import { MissionModalHost } from '../missions/MissionModalHost'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
-import { useMissionsStore } from '../../stores/missionsStore'
 
 /**
  * Orchestrateur du sous-système Expéditions côté HUD.
@@ -44,15 +43,6 @@ export function ExpeditionsHud() {
     }
   }, [pendingCreator, requestCreator])
 
-  // Demande d'ouverture d'une Mission (depuis QuestsBoardPanel ou notif)
-  const pendingMission = useMissionsStore((s) => s.pendingOpenMissionSlug)
-  const openMissionSlug = useMissionsStore((s) => s.openMissionSlug)
-  const consumePendingMission = useMissionsStore((s) => s.consumePending)
-  const closeMission = useMissionsStore((s) => s.close)
-  useEffect(() => {
-    if (pendingMission) consumePendingMission()
-  }, [pendingMission, consumePendingMission])
-
   return (
     <>
       <QuestsBoardPanel
@@ -79,13 +69,7 @@ export function ExpeditionsHud() {
         />
       )}
 
-      {openMissionSlug && (
-        <MissionModal
-          key={openMissionSlug}
-          slug={openMissionSlug}
-          onClose={closeMission}
-        />
-      )}
+      <MissionModalHost />
     </>
   )
 }
