@@ -350,6 +350,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
   const discoveredIds = usePlayerStore(s => s.discoveredIds)
+  // Mode Coupe des Héritages actif sur la carte → La Cour dépliée par défaut.
+  const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const { calendarRef } = useCalendarRef()
   const [imageIndex, setImageIndex] = useState(0)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
@@ -809,7 +811,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         </div>
 
         {/* V0.7 phase 5 — La Cour : repliée, toujours visible au-dessus des onglets. */}
-        <CourtFold placeId={place.id} placeTitle={place.title} guardianName={v05?.guardian?.name ?? null} />
+        <CourtFold
+          placeId={place.id}
+          placeTitle={place.title}
+          veilleurName={placeOverride?.veilleurName ?? null}
+          defaultOpen={factionColorMode}
+        />
 
         {/* Description collaborative */}
         <PlaceDescription description={v05?.description ?? null} canEdit={canEditDescription}

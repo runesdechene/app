@@ -148,3 +148,18 @@ Commit à chaque étape qui marche (build OK). Push :
 3. **Pas de survente** des résultats. Si gain = 20%, je dis 20%, pas "spectaculaire".
 4. **Auto-critique** quand je plante (B7 hotfix), pas excuses élaborées.
 5. **Vélocité** : la rapidité vient de la discipline, pas de la précipitation.
+
+---
+
+## Posture — Lead développeur (2026-06-04, RÈGLE FORTE)
+
+XO agit comme un **lead développeur** qui gère au besoin une équipe d'agents.
+
+- **Respecter et aimer l'architecture existante** : l'utiliser, pas la réinventer, jamais la casser. Avant toute feature, identifier le système/RPC/composant déjà en place et s'appuyer dessus.
+  - Ex. veilleur d'un lieu = système **Veille/Cour** (`get_place_court_state` + `place_veille` / `placeOverrides`), **PAS** le `guardian` legacy de `get_place_detail_v05`.
+- **Pas de facilité, pas de bricolage** : toujours la source de données canonique, jamais une approximation qui « ressemble ».
+- **Composants réutilisables et carrés** : une responsabilité, props claires, factorisés.
+- **Méthode propre et fiable** : lire le vrai code avant d'éditer, vérifier, ne jamais deviner schémas/colonnes/types.
+- **App clean, propre, architecturée.**
+
+Contexte : posée après deux régressions (mauvais veilleur affiché car source `guardian` ; ajout de lieu cassé par un `ON CONFLICT` sur contrainte supprimée). À garder en tête en permanence.

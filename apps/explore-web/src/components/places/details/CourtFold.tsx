@@ -5,17 +5,20 @@ import './CourtFold.css'
 interface CourtFoldProps {
   placeId: string
   placeTitle: string
-  guardianName: string | null
+  /** Nom du veilleur principal — source canonique : placeOverrides.veilleurName. */
+  veilleurName: string | null
+  /** Déplié d'emblée (ex. quand le mode Coupe des Héritages est actif sur la carte). */
+  defaultOpen?: boolean
 }
 
-export function CourtFold({ placeId, placeTitle, guardianName }: CourtFoldProps) {
-  const [open, setOpen] = useState(false)
+export function CourtFold({ placeId, placeTitle, veilleurName, defaultOpen = false }: CourtFoldProps) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
     <div className="court-fold-wrap">
       <button className="court-fold-bar" onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <span className="court-fold-crown">👑</span>
         <span className="court-fold-label">
-          Conquête{guardianName ? <> — veillé par <b>{guardianName}</b></> : null}
+          Conquête{veilleurName ? <> — veillé par <b>{veilleurName}</b></> : null}
         </span>
         <span className={`court-fold-chev${open ? ' open' : ''}`}>⌄</span>
       </button>

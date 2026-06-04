@@ -344,10 +344,10 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             className="court-btn-support"
             onClick={handleSupportTap}
             disabled={balance < 1}
-            aria-label={isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}
+            aria-label={isMember ? 'Renforcer la veille' : `Soutenir ${veilleur?.leaderName ?? 'le veilleur'}`}
           >
             <span className="court-btn-icon">🛡</span>
-            <span className="court-btn-label">{isMember ? 'Renforcer la veille' : 'Soutenir le veilleur'}</span>
+            <span className="court-btn-label">{isMember ? 'Renforcer la veille' : `Soutenir ${veilleur?.leaderName ?? 'le veilleur'}`}</span>
             <span className="court-btn-cost">−1 🪙</span>
             {bursts.filter(b => b.key === 'defense').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
