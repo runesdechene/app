@@ -1,3 +1,10 @@
+# ALPHA V0.9.17
+## Marqueurs d'événements plus nets
+
+Les médaillons d'événements sur la carte perdent leur liseré coloré (couleur de faction du chef) au profit d'un cadre parchemin sobre. Plus lisible, moins criard.
+
+---
+
 # ALPHA V0.9.16
 ## Deux chances de choisir sa Faction
 
