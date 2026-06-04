@@ -565,6 +565,43 @@
   margin-top: 2px;
 }
 
+/* ─────────── Modale code promo (3ᵉ étape, si « pas encore ») ─────────── */
+.mission-modal-promo-thumb {
+  background: radial-gradient(120% 90% at 70% 10%, #d8a23e, #a8762a 60%, #6e4a18);
+  font-size: 26px;
+}
+.mission-modal-promo-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: calc(100% - 32px);
+  margin: 14px 16px 0;
+  box-sizing: border-box;
+  background: #fff8eb;
+  border: 1.5px dashed #b8863b;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.mission-modal-promo-code:hover { background: #fdeecb; border-color: #a8762a; }
+.mission-modal-promo-code-value {
+  font-family: var(--font-accent);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.14em;
+  color: #6e4a18;
+}
+.mission-modal-promo-copy {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #a8762a;
+  white-space: nowrap;
+}
+
 /* ─────────── Salon tab ─────────── */
 .mission-salon {
   flex: 1 1 auto;

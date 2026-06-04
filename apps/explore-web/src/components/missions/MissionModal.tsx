@@ -15,6 +15,8 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   const [loading, setLoading] = useState(true)
   const [sealing, setSealing] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [showPromo, setShowPromo] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [engaged, setEngaged] = useState<MissionParticipantsPayload>({ total: 0, participants: [] })
 
   useEffect(() => {
@@ -37,11 +39,8 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
     return () => { cancelled = true }
   }, [slug])
 
-  async function sealPact(openShop: boolean) {
+  async function seal() {
     if (!m || sealing) return
-    if (openShop && m.ctaUrl) {
-      window.open(m.ctaUrl, '_blank', 'noopener,noreferrer')
-    }
     setSealing(true)
     try {
       await joinMission(m.slug)
@@ -61,7 +60,32 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   function handlePactClick() {
     if (!m) return
     if (m.ctaUrl) { setConfirming(true); return }
-    void sealPact(false)
+    void seal()
+  }
+
+  function openShop() {
+    if (m?.ctaUrl) window.open(m.ctaUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  // « Oui, j'ai déjà le produit » → on scelle, point.
+  function confirmYes() {
+    setConfirming(false)
+    void seal()
+  }
+
+  // « Pas encore » → on scelle quand même (l'engagement est pris), puis on aiguille :
+  // code promo dispo → 3ᵉ modale ; sinon boutique directe (clic = geste, pas de pop-up bloqué).
+  function confirmNotYet() {
+    if (!m) return
+    setConfirming(false)
+    void seal()
+    if (m.promoCode) { setCopied(false); setShowPromo(true) }
+    else { openShop() }
+  }
+
+  async function copyPromo() {
+    if (!m?.promoCode) return
+    try { await navigator.clipboard.writeText(m.promoCode); setCopied(true) } catch { /* clipboard indispo */ }
   }
 
   if (loading || !m) {
@@ -200,22 +224,42 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                 <div className="mission-modal-confirm-q">
                   <div className="mission-modal-confirm-lbl">Avant de sceller</div>
                   <div className="mission-modal-confirm-txt">
-                    As-tu déjà <strong>{m.ctaLabel ?? 'le matériel'}</strong> pour accomplir ta mission ?
+                    {m.pactQuestion ?? 'As-tu déjà de quoi accomplir cette mission ?'}
                   </div>
                 </div>
               </div>
               <div className="mission-modal-confirm-acts">
-                <button
-                  className="mission-modal-confirm-yes"
-                  disabled={sealing}
-                  onClick={() => { void sealPact(false).then(() => setConfirming(false)) }}
-                >⚔ Oui — je scelle le pacte</button>
-                <button
-                  className="mission-modal-confirm-no"
-                  disabled={sealing}
-                  onClick={() => { void sealPact(true).then(() => setConfirming(false)) }}
-                >🛒 Pas encore — montre-moi la boutique</button>
+                <button className="mission-modal-confirm-yes" disabled={sealing} onClick={confirmYes}>
+                  ⚔ Oui — je scelle le pacte
+                </button>
+                <button className="mission-modal-confirm-no" disabled={sealing} onClick={confirmNotYet}>
+                  🛒 Pas encore — montre-moi la boutique
+                </button>
                 <div className="mission-modal-confirm-note">Dans les deux cas, te voilà engagé.</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showPromo && m.promoCode && (
+          <div className="mission-modal-confirm-dim" onClick={() => setShowPromo(false)}>
+            <div className="mission-modal-confirm" onClick={(e) => e.stopPropagation()}>
+              <div className="mission-modal-confirm-top">
+                <div className="mission-modal-confirm-thumb mission-modal-promo-thumb"><span>🎟️</span></div>
+                <div className="mission-modal-confirm-q">
+                  <div className="mission-modal-confirm-lbl">Ton code promo</div>
+                  {m.promoNote && <div className="mission-modal-confirm-txt">{m.promoNote}</div>}
+                </div>
+              </div>
+              <button type="button" className="mission-modal-promo-code" onClick={copyPromo} title="Copier le code">
+                <span className="mission-modal-promo-code-value">{m.promoCode}</span>
+                <span className="mission-modal-promo-copy">{copied ? '✓ Copié' : '📋 Copier'}</span>
+              </button>
+              <div className="mission-modal-confirm-acts">
+                <button className="mission-modal-confirm-yes" onClick={() => { openShop(); setShowPromo(false) }}>
+                  🛒 Aller à la boutique
+                </button>
+                <div className="mission-modal-confirm-note">Pacte scellé — à toi de jouer, Veilleur.</div>
               </div>
             </div>
           </div>

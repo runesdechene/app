@@ -20,6 +20,9 @@ interface Mission {
   product_handle: string | null
   cta_label: string | null
   cta_url: string | null
+  pact_question: string | null
+  promo_code: string | null
+  promo_note: string | null
   starts_at: string | null
   ends_at: string | null
   reward_hint: string | null
@@ -114,6 +117,9 @@ export function Missions() {
           product_handle: (row.product_handle as string | null) ?? null,
           cta_label: (row.cta_label as string | null) ?? null,
           cta_url: (row.cta_url as string | null) ?? null,
+          pact_question: (row.pact_question as string | null) ?? null,
+          promo_code: (row.promo_code as string | null) ?? null,
+          promo_note: (row.promo_note as string | null) ?? null,
           starts_at: (row.starts_at as string | null) ?? null,
           ends_at: (row.ends_at as string | null) ?? null,
           reward_hint: (row.reward_hint as string | null) ?? null,
@@ -341,6 +347,20 @@ function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
           </Field>
           <Field label="Label du bouton"><input type="text" value={mission.cta_label ?? ''} onChange={e => onUpdate('cta_label', e.target.value || null)} placeholder="Rejoindre la boutique" /></Field>
           <Field label="URL du bouton"><input type="url" value={mission.cta_url ?? ''} onChange={e => onUpdate('cta_url', e.target.value || null)} placeholder="https://…" /></Field>
+        </div>
+      </Card>
+
+      <Card title="Pacte & code promo">
+        <div className="missions-grid">
+          <Field label="Question du pacte" full>
+            <input type="text" value={mission.pact_question ?? ''} onChange={e => onUpdate('pact_question', e.target.value || null)} placeholder="As-tu déjà au moins un produit de la collection grecque ?" />
+            <span className="missions-hint">Posée au clic « Je relève ce défi » (si la mission a un bouton boutique). Vide → « As-tu déjà de quoi accomplir cette mission ? ».</span>
+          </Field>
+          <Field label="Code promo (optionnel)"><input type="text" value={mission.promo_code ?? ''} onChange={e => onUpdate('promo_code', e.target.value || null)} placeholder="GREC10" /></Field>
+          <Field label="Descriptif du code" full>
+            <input type="text" value={mission.promo_note ?? ''} onChange={e => onUpdate('promo_note', e.target.value || null)} placeholder="−10% sur toute la collection grecque" />
+            <span className="missions-hint">Si le joueur répond « pas encore », ce descriptif + le code s'affichent avant la boutique. Code vide → étape sautée.</span>
+          </Field>
         </div>
       </Card>
 

@@ -4,6 +4,7 @@ export interface MissionState {
   brief: string | null; emblem: string | null; coverImageUrl: string | null
   deliverableKind: 'photo' | 'video' | 'other'
   productHandle: string | null; ctaLabel: string | null; ctaUrl: string | null
+  pactQuestion: string | null; promoCode: string | null; promoNote: string | null
   startsAt: string | null; endsAt: string | null
   floor: MissionFloor; rewardHint: string | null; salonIntro: string | null
   status: 'draft' | 'published' | 'passed' | 'archived'
