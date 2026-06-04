@@ -1,3 +1,10 @@
+# ALPHA V0.9.4
+## La Cour : dépliée en mode Héritages + bon veilleur
+
+Quand le **mode Coupe des Héritages** est actif sur la carte, le panneau de Conquête s'ouvre **déplié par défaut** sur la fiche d'un lieu. Le **nom du veilleur** affiché est désormais le bon (le véritable veilleur du lieu), et le bouton de soutien indique **« Soutenir {nom du veilleur} »**.
+
+---
+
 # ALPHA V0.9.3
 ## Likes fiables + voir qui a aimé
 
