@@ -151,6 +151,13 @@
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
+  /* Scrollbar masquée (cohérent avec .place-panel & co) : le contenu défile
+     proprement sur tout écran, sans la barre chunky par défaut. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.add-place-form-body::-webkit-scrollbar {
+  display: none;
 }
 
 .add-place-label {
