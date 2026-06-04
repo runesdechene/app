@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { getMissionState, getMissionSubmissions, getMySubmissionStatus, joinMission } from '../../lib/missionsApi'
 import type { MissionState, MissionSubmission, MySubmissionStatus } from '../../types/mission'
 import { MissionSalon } from './MissionSalon'
+import { useToastStore } from '../../stores/toastStore'
 import './MissionModal.css'
 
 export function MissionModal({ slug, onClose }: { slug: string; onClose: () => void }) {
@@ -11,27 +12,43 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   const [myStatus, setMyStatus] = useState<MySubmissionStatus>(null)
   const [tab, setTab] = useState<'mission' | 'salon'>('mission')
   const [loading, setLoading] = useState(true)
+  const [sealing, setSealing] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       const state = await getMissionState(slug)
       if (cancelled) return
-      let finalState = state
       if (state) {
-        if (!state.isParticipant && state.status === 'published') {
-          await joinMission(slug)
-          finalState = { ...state, isParticipant: true }
-        }
         const [sList, st] = await Promise.all([getMissionSubmissions(slug), getMySubmissionStatus(slug)])
         if (cancelled) return
         setSubs(sList); setMyStatus(st)
       }
-      setM(finalState)
+      setM(state)
       setLoading(false)
     })()
     return () => { cancelled = true }
   }, [slug])
+
+  async function sealPact(openShop: boolean) {
+    if (!m || sealing) return
+    if (openShop && m.ctaUrl) {
+      window.open(m.ctaUrl, '_blank', 'noopener,noreferrer')
+    }
+    setSealing(true)
+    try {
+      await joinMission(m.slug)
+      setM({ ...m, isParticipant: true, participantsCount: m.participantsCount + 1 })
+    } catch {
+      useToastStore.getState().addToast({
+        type: 'error',
+        message: 'Le pacte n\'a pas pu être scellé. Réessaie.',
+        timestamp: Date.now(),
+      })
+    } finally {
+      setSealing(false)
+    }
+  }
 
   if (loading || !m) {
     return createPortal(
@@ -50,79 +67,106 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
       <div className="mission-modal" onClick={(e) => e.stopPropagation()}>
         <div className="mission-modal-tabs" role="tablist">
           <button className={tab === 'mission' ? 'is-active' : ''} onClick={() => setTab('mission')}>Mission</button>
-          <button className={tab === 'salon' ? 'is-active' : ''} onClick={() => setTab('salon')}>Salon</button>
+          <button
+            className={tab === 'salon' ? 'is-active' : ''}
+            onClick={() => m.isParticipant && setTab('salon')}
+            disabled={!m.isParticipant}
+          >{m.isParticipant ? 'Salon' : '🔒 Salon'}</button>
           <button className="mission-modal-close" onClick={onClose} aria-label="Fermer">×</button>
         </div>
 
         {tab === 'mission' ? (
-          <div className="mission-modal-main">
-            <div className="mission-modal-intro">
-              <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'} · {m.participantsCount} engagés</div>
-              <h2 className="mission-modal-title">{m.title}</h2>
-              {m.call && <div className="mission-modal-call">« {m.call} »</div>}
-            </div>
-            <div
-              className="mission-modal-cover"
-              style={m.coverImageUrl ? { backgroundImage: `url(${m.coverImageUrl})` } : undefined}
-            >
-              {daysLeft != null && <span className="mission-modal-jx">J-{daysLeft}</span>}
-              {!m.coverImageUrl && <span className="mission-modal-emblem">{m.emblem}</span>}
-            </div>
-
-            {m.brief && (
-              <section className="mission-modal-section">
-                <h3>L'ordre</h3>
-                <p className="mission-modal-brief">{m.brief}</p>
-                {m.ctaUrl && (
-                  <a className="mission-modal-cta" href={m.ctaUrl} target="_blank" rel="noopener noreferrer">
-                    🛒 {m.ctaLabel ?? 'Voir le produit'}
-                  </a>
-                )}
-              </section>
-            )}
-
-            <section className="mission-modal-section">
-              <h3>Butin</h3>
-              <div className="mission-modal-rewards">
-                <span className="mm-rw">🎖️ Gloire</span>
-                <span className="mm-rw">🪙 Couronnes</span>
-                {m.rewardHint && <span className="mm-rw gold">{m.rewardHint}</span>}
+          <>
+            <div className="mission-modal-main">
+              <div className="mission-modal-intro">
+                <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'} · {m.participantsCount} engagés</div>
+                <h2 className="mission-modal-title">{m.title}</h2>
+                {m.call && <div className="mission-modal-call">« {m.call} »</div>}
               </div>
-              <p className="mission-modal-butin-note">Récompense fixée à la validation, selon la qualité de ta contribution.</p>
-            </section>
-
-            {myStatus === 'pending' && (
-              <div className="mission-modal-status">
-                ⏳ Ton offrande est en cours d'examen par l'État-Major.
-              </div>
-            )}
-
-            <section className="mission-modal-section">
-              <h3>Les contributions · {subs.length}</h3>
-              <div className="mission-modal-gallery">
-                {subs.map((s) => (
-                  <div
-                    key={s.submissionId}
-                    className="mission-modal-tile"
-                    style={{ backgroundImage: `url(${s.imageUrl})` }}
-                  >
-                    <span className="mission-modal-tile-name">{s.submitterName}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {m.status === 'published' && (
-              <a
-                className="mission-modal-primary"
-                href={`https://hub.runesdechene.com/soumettre-contenu?quete=${m.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <div
+                className="mission-modal-cover"
+                style={m.coverImageUrl ? { backgroundImage: `url(${m.coverImageUrl})` } : undefined}
               >
-                📷 Ajouter ma contribution
-              </a>
+                {daysLeft != null && <span className="mission-modal-jx">J-{daysLeft}</span>}
+                {!m.coverImageUrl && <span className="mission-modal-emblem">{m.emblem}</span>}
+              </div>
+
+              {m.isParticipant && (
+                <div className="mission-modal-engaged">
+                  <span className="mission-modal-engaged-stamp">✓</span>
+                  <div className="mission-modal-engaged-text">
+                    <strong>Pacte scellé.</strong>
+                    <span>Tu es l'un des {m.participantsCount} engagés.</span>
+                  </div>
+                </div>
+              )}
+
+              {m.brief && (
+                <section className="mission-modal-section">
+                  <h3>L'ordre</h3>
+                  <p className="mission-modal-brief">{m.brief}</p>
+                  {m.ctaUrl && (
+                    <a className="mission-modal-cta" href={m.ctaUrl} target="_blank" rel="noopener noreferrer">
+                      🛒 {m.ctaLabel ?? 'Voir le produit'}
+                    </a>
+                  )}
+                </section>
+              )}
+
+              <section className="mission-modal-section">
+                <h3>Butin</h3>
+                <div className="mission-modal-rewards">
+                  <span className="mm-rw">🎖️ Gloire</span>
+                  <span className="mm-rw">🪙 Couronnes</span>
+                  {m.rewardHint && <span className="mm-rw gold">{m.rewardHint}</span>}
+                </div>
+                <p className="mission-modal-butin-note">Récompense fixée à la validation, selon la qualité de ta contribution.</p>
+              </section>
+
+              {m.isParticipant && (
+                <>
+                  {myStatus === 'pending' && (
+                    <div className="mission-modal-status">
+                      ⏳ Ton offrande est en cours d'examen par l'État-Major.
+                    </div>
+                  )}
+
+                  <section className="mission-modal-section">
+                    <h3>Les contributions · {subs.length}</h3>
+                    <div className="mission-modal-gallery">
+                      {subs.map((s) => (
+                        <div
+                          key={s.submissionId}
+                          className="mission-modal-tile"
+                          style={{ backgroundImage: `url(${s.imageUrl})` }}
+                        >
+                          <span className="mission-modal-tile-name">{s.submitterName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {m.status === 'published' && (
+                    <a
+                      className="mission-modal-primary"
+                      href={`https://hub.runesdechene.com/soumettre-contenu?quete=${m.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      📷 Ajouter ma contribution
+                    </a>
+                  )}
+                </>
+              )}
+            </div>
+            {!m.isParticipant && m.status === 'published' && (
+              <div className="mission-modal-pactbar">
+                <button className="mission-modal-pact" onClick={() => sealPact(false)} disabled={sealing}>
+                  <span className="mission-modal-pact-seal">⚔</span> Je relève ce défi
+                </button>
+              </div>
             )}
-          </div>
+          </>
         ) : (
           <MissionSalon slug={m.slug} intro={m.salonIntro} readOnly={readOnlySalon} />
         )}
