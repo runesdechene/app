@@ -11,6 +11,9 @@ export const CATEGORY_BY_TYPE: Record<string, Category> = {
   place_reaffirmed:         'important',
   level_up_imminent:        'recap',
   weekly_new_places_recap:  'recap',
+  // V0.9 — fiches collaboratives
+  new_comment:              'important',
+  like_contribution:        'important',
 }
 
 export function categoryOf(type: string): Category {

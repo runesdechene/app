@@ -69,6 +69,29 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       }
     }
 
+    case 'new_comment': {
+      const actor   = fr(data.actorName, 'Quelqu’un')
+      const place   = fr(data.placeTitle, 'un de tes lieux')
+      const placeId = fr(data.placeId)
+      return {
+        title: `${actor} a commenté ${place}`,
+        body:  'Va voir ce qu’on en dit.',
+        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
+      }
+    }
+
+    case 'like_contribution': {
+      const actor   = fr(data.actorName, 'Quelqu’un')
+      const place   = fr(data.placeTitle, 'un lieu')
+      const placeId = fr(data.placeId)
+      const isDesc  = fr(data.contributionType) === 'description'
+      return {
+        title: isDesc ? `${actor} a aimé une description` : `${actor} a aimé ton commentaire`,
+        body:  isDesc ? `La description de ${place} que tu as enrichie.` : `Sur ${place}.`,
+        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
+      }
+    }
+
     default:
       return null
   }
