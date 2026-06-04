@@ -54,9 +54,6 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
     ? getExpeditionCoverUrl(expedition.cover_image_url)
     : null
   const imgSrc = coverUrl ?? expedition.chief.avatar_url
-  const factionRingStyle = expedition.chief.faction_color
-    ? { borderColor: expedition.chief.faction_color }
-    : undefined
 
   return (
     <button
@@ -67,7 +64,7 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
       title={expedition.name}
       style={isPassed ? { opacity: passedOpacity } : undefined}
     >
-      <span className="expedition-banner-medallion" style={factionRingStyle}>
+      <span className="expedition-banner-medallion">
         {imgSrc ? (
           <img src={imgSrc} alt="" />
         ) : (
