@@ -278,7 +278,7 @@ export function Factions() {
     if (uploadError) { setUploading(null); return }
 
     const { data: urlData } = supabase.storage.from('faction-patterns').getPublicUrl(path)
-    const patternUrl = urlData.publicUrl
+    const patternUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
     setFactions(prev => prev.map(f => f.id === factionId ? { ...f, pattern: patternUrl } : f))
     setUploading(null)
@@ -315,7 +315,7 @@ export function Factions() {
     }
 
     const { data: urlData } = supabase.storage.from('faction-patterns').getPublicUrl(path)
-    const imageUrl = urlData.publicUrl
+    const imageUrl = `${urlData.publicUrl}?t=${Date.now()}`
 
     setFactions(prev => prev.map(f => f.id === factionId ? { ...f, image_url: imageUrl } : f))
     setUploading(null)
