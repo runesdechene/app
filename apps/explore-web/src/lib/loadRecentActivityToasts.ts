@@ -139,7 +139,10 @@ export async function loadRecentActivityToasts(currentUserId: string) {
       // V0.7 — wording aligné par contributionType (cf. usePlayer.ts ligne ~329)
       const ct = e.data?.contributionType ?? 'carnet'
       switch (ct) {
-        case 'photo':         message = `${name} a ajouté une photo de ${place} 📜`; break
+        case 'photo':         message = `${name} a ajouté une photo de ${place} 📷`; break
+        case 'comment':       message = `${name} a commenté ${place} 💬`; break
+        case 'reply':         message = `${name} a répondu à un commentaire sur ${place} 💬`; break
+        case 'description':   message = `${name} a enrichi la description de ${place} 📖`; break
         case 'carnet':        message = `${name} a écrit un récit sur ${place} 📜`; break
         case 'accessibility': message = `${name} a renseigné l'accessibilité de ${place}`; break
         case 'season':        message = `${name} a renseigné la saison idéale de ${place}`; break

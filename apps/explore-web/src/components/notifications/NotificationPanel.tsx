@@ -18,6 +18,12 @@ const AVATAR_NOTIF_TYPES = new Set<Notification['type']>([
   'expedition_auto_joined',
   'expedition_report_posted',
   'expedition_message',
+  // V0.9 — Fiches collaboratives (actions interpersonnelles directes)
+  'new_comment',
+  'comment_reply',
+  'like_contribution',
+  'description_edited',
+  'new_photo',
 ])
 
 function getActorIdForNotif(notif: Notification): string | null {
@@ -63,6 +69,12 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   daily_enigma_ready: '\uD83C\uDF31',           // \uD83C\uDF31
   level_up_imminent: '\uD83C\uDF96\uFE0F',      // \uD83C\uDF96\uFE0F
   weekly_new_places_recap: '\uD83D\uDDFA\uFE0F', // \uD83D\uDDFA\uFE0F
+  // V0.9 \u2014 Fiches collaboratives
+  new_comment: '\uD83D\uDCAC',                  // \uD83D\uDCAC
+  comment_reply: '\u21A9\uFE0F',                // \u21A9\uFE0F
+  like_contribution: '\u2764\uFE0F',            // \u2764\uFE0F
+  description_edited: '\u270F\uFE0F',           // \u270F\uFE0F
+  new_photo: '\uD83D\uDCF7',                    // \uD83D\uDCF7
 }
 
 function formatMessage(notif: Notification): string {
@@ -142,6 +154,17 @@ function formatMessage(notif: Notification): string {
       return d.sample_names_csv
         ? `${d.count ?? 0} nouveaux lieux cette semaine — ${d.sample_names_csv}…`
         : `${d.count ?? 0} nouveaux lieux cette semaine.`
+    // V0.9 — Fiches collaboratives
+    case 'new_comment':
+      return `${d.actorName || 'Quelqu\'un'} a commenté ${d.placeTitle || 'un de vos lieux'}`
+    case 'comment_reply':
+      return `${d.actorName || 'Quelqu\'un'} a répondu à votre commentaire sur ${d.placeTitle || 'un lieu'}`
+    case 'like_contribution':
+      return `${d.actorName || 'Quelqu\'un'} a aimé votre ${d.contributionType === 'description' ? 'description' : 'commentaire'} sur ${d.placeTitle || 'un lieu'}`
+    case 'description_edited':
+      return `${d.actorName || 'Quelqu\'un'} a enrichi la description de ${d.placeTitle || 'un lieu'} que vous avez contribuée`
+    case 'new_photo':
+      return `${d.actorName || 'Quelqu\'un'} a ajouté une photo à ${d.placeTitle || 'un de vos lieux'}`
   }
 }
 

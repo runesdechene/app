@@ -18,6 +18,9 @@ export interface Notification {
     | 'expedition_report_posted' | 'expedition_message'
     // V0.7.7 — Push notifications V1
     | 'daily_enigma_ready' | 'level_up_imminent' | 'weekly_new_places_recap'
+    // V0.9 — Fiches collaboratives (carnet de route)
+    | 'new_comment' | 'comment_reply' | 'like_contribution'
+    | 'description_edited' | 'new_photo'
   data: {
     actorName?: string
     actorId?: string
@@ -25,6 +28,7 @@ export interface Notification {
     placeTitle?: string
     placeId?: string
     contributionId?: number
+    contributionType?: string
     likeCount?: number
     viewCount?: number
     explorerCount?: number

@@ -1,15 +1,64 @@
-.cmt{padding:13px 0;border-top:1px solid rgba(160,120,76,.28)}
-.cmt:first-of-type{border-top:none}
-.cmt-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.cmt-av-btn{padding:0;border:none;background:none;cursor:pointer}
-.cmt-av{width:30px;height:30px;border-radius:50%;object-fit:cover;display:flex;align-items:center;justify-content:center}
-.cmt-av-fallback{background:var(--color-sepia);color:#fff;font-family:var(--font-accent);font-weight:700;font-size:12px}
-.cmt-name{font-family:var(--font-accent);font-weight:700;font-size:13.5px;color:var(--color-ink)}
-.cmt-time{font-family:var(--font-accent);font-size:11.5px;color:var(--color-sepia-dark);margin-left:auto;opacity:.8}
-.cmt-photos{display:flex;gap:7px;margin:4px 0 7px;flex-wrap:wrap}
-.cmt-photos img{width:84px;height:62px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(255,255,255,.5);box-shadow:0 1px 5px rgba(74,55,40,.22);cursor:pointer}
-.cmt-text{font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--color-ink)}
-.cmt-foot{display:flex;align-items:center;gap:16px;margin-top:7px}
-.cmt-mini{font-family:var(--font-accent);font-size:12.5px;color:var(--color-ink-light);cursor:pointer;background:none;border:none;display:flex;align-items:center;gap:4px}
-.cmt-mini.liked{color:#9a3a28}
-.cmt-replies{margin:10px 0 0 22px;padding-left:12px;border-left:2px solid rgba(160,120,76,.3)}
+/* Commentaire — entrée de discussion (avatar + bulle parchemin + actions) */
+.cmt {
+  display: flex;
+  gap: 9px;
+  padding: 11px 0;
+  border-top: 1px solid rgba(160, 120, 76, 0.22);
+}
+.cmt:first-of-type { border-top: none; }
+.cmt-is-reply { padding: 9px 0 2px; border-top: none; }
+
+.cmt-av-btn { padding: 0; border: none; background: none; cursor: pointer; flex: 0 0 auto; }
+.cmt-av {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover; display: block;
+  border: 1.5px solid rgba(255, 255, 255, 0.6); box-shadow: 0 1px 3px rgba(74, 55, 40, 0.18);
+}
+.cmt-is-reply .cmt-av { width: 28px; height: 28px; }
+.cmt-av-fallback {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-sepia); color: #fff;
+  font-family: var(--font-accent); font-weight: 700; font-size: 14px;
+}
+
+.cmt-body { flex: 1; min-width: 0; }
+
+.cmt-bubble {
+  background: rgba(255, 251, 244, 0.82);
+  border: 1px solid rgba(160, 120, 76, 0.32);
+  border-radius: 4px 14px 14px 14px;
+  padding: 9px 12px 10px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+.cmt-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+.cmt-name { font-family: var(--font-accent); font-weight: 700; font-size: 13.5px; color: var(--color-ink); }
+.cmt-time { font-family: var(--font-accent); font-size: 11px; color: var(--color-sepia-dark); opacity: 0.8; margin-left: auto; }
+
+.cmt-text { font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--color-ink); word-break: break-word; }
+.cmt-text .rich-p { margin: 0 0 4px; }
+.cmt-text .rich-p:last-child { margin-bottom: 0; }
+.cmt-text .rich-ul { margin: 3px 0; padding-left: 18px; }
+.cmt-text strong { font-weight: 700; }
+.cmt-text em { font-style: italic; }
+
+.cmt-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+.cmt-photos img {
+  width: 88px; height: 66px; border-radius: 9px; object-fit: cover; cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.6); box-shadow: 0 1px 4px rgba(74, 55, 40, 0.2);
+}
+
+/* Actions — pilules discrètes sous la bulle */
+.cmt-foot { display: flex; align-items: center; gap: 8px; margin: 5px 0 0 2px; }
+.cmt-act {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-accent); font-weight: 600; font-size: 12px;
+  color: var(--color-ink-light);
+  background: none; border: 1px solid transparent; border-radius: 999px;
+  padding: 3px 9px; cursor: pointer; transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.cmt-act:hover:not(:disabled) { background: rgba(160, 120, 76, 0.12); border-color: rgba(160, 120, 76, 0.25); }
+.cmt-act:disabled { opacity: 0.5; cursor: default; }
+.cmt-act-ico { font-size: 13px; line-height: 1; }
+.cmt-act-n { font-variant-numeric: tabular-nums; }
+.cmt-act.liked { color: #9a3a28; background: #f5ddd5; border-color: #e6b9ab; }
+
+.cmt-replies { margin-top: 8px; padding-left: 12px; border-left: 2px solid rgba(160, 120, 76, 0.25); }

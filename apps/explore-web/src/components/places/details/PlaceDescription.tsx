@@ -6,7 +6,6 @@ import { renderRichText } from '../../../lib/renderRichText'
 import './PlaceDescription.css'
 
 interface Props {
-  placeId: string
   description: V05Description | null
   canEdit: boolean              // a découvert le lieu
   onEdit: () => void
@@ -14,7 +13,7 @@ interface Props {
   onChanged: () => void
 }
 
-export function PlaceDescription({ placeId, description, canEdit, onEdit, onOpenHistory, onChanged }: Props) {
+export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, onChanged }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const [liked, setLiked] = useState(description?.likedByMe ?? false)
   const [count, setCount] = useState(description?.votesUp ?? 0)
@@ -25,8 +24,8 @@ export function PlaceDescription({ placeId, description, canEdit, onEdit, onOpen
   async function toggleLike() {
     if (!userId || !description || busy) return
     setBusy(true)
-    const { data, error } = await supabase.rpc('toggle_place_description_like', {
-      p_user_id: userId, p_place_id: placeId,
+    const { data, error } = await supabase.rpc('toggle_contribution_like', {
+      p_user_id: userId, p_contribution_id: description.id,
     })
     const res = data as { success?: boolean; liked?: boolean; votesUp?: number } | null
     if (!error && res?.success) {

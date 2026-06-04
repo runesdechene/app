@@ -28,7 +28,12 @@ const COURT_NOTIF_TYPES = new Set<Notification['type']>([
 /** Types dont l'action utile est la discussion (onglet Discussion). */
 const DISCUSSION_NOTIF_TYPES = new Set<Notification['type']>([
   'like_carnet', 'new_carnet', 'milestone_likes',
+  // V0.9 — fiches collaboratives
+  'new_comment', 'comment_reply', 'like_contribution', 'description_edited',
 ])
+
+/** Types dont l'action utile est la galerie (onglet Galerie). */
+const GALLERY_NOTIF_TYPES = new Set<Notification['type']>(['new_photo'])
 
 export function resolveNotificationTarget(notif: Notification): NotificationTarget {
   const d = notif.data as Record<string, unknown>
@@ -47,6 +52,7 @@ export function resolveNotificationTarget(notif: Notification): NotificationTarg
   const tab: PlacePanelActiveTab | null =
     COURT_NOTIF_TYPES.has(notif.type) ? 'infos'
     : DISCUSSION_NOTIF_TYPES.has(notif.type) ? 'discussion'
+    : GALLERY_NOTIF_TYPES.has(notif.type) ? 'galerie'
     : null
   return { kind: 'place', id: placeId, tab }
 }

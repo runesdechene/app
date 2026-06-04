@@ -56,7 +56,6 @@ export function AddPlaceFlow() {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [address, setAddress] = useState('')
   const [description, setDescription] = useState('')
-  const [carnetTitle, setCarnetTitle] = useState('')
   const [rewards, setRewards] = useState<{ permanentInfluence: number; explorationGain: number; contentPoints: number; isExplorer: boolean; isGps: boolean } | null>(null)
   const [tags, setTags] = useState<Tag[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -279,7 +278,7 @@ export function AddPlaceFlow() {
         p_images: imageEntries,
         p_address: address.trim(),
         p_text: description.trim(),
-        p_carnet_title: carnetTitle.trim() || null,
+        p_carnet_title: null,
         p_user_lat: submitPos?.lat ?? null,
         p_user_lng: submitPos?.lng ?? null,
         p_era_id: eraId,
@@ -600,13 +599,13 @@ export function AddPlaceFlow() {
             placeholder="Ex: 12 rue du Chateau, 06000 Nice"
           />
 
-          {/* Carnet d'explorateur */}
+          {/* Description initiale du lieu */}
           <div className="add-place-carnet-frame">
             <div className="add-place-carnet-header">
-              <span className="add-place-carnet-icon">📜</span>
+              <span className="add-place-carnet-icon">📖</span>
               <div>
-                <p className="add-place-carnet-title">Votre première note d'explorateur</p>
-                <p className="add-place-carnet-subtitle">Vous êtes le premier à fouler ce lieu. Immortalisez-le.</p>
+                <p className="add-place-carnet-title">La description du lieu</p>
+                <p className="add-place-carnet-subtitle">Vous posez la première pierre. Les autres aventuriers pourront l'enrichir.</p>
               </div>
             </div>
 
@@ -654,23 +653,13 @@ export function AddPlaceFlow() {
               </button>
             )}
 
-            {/* Titre du carnet (optionnel) */}
-            <input
-              className="add-place-input add-place-carnet-title-input"
-              type="text"
-              value={carnetTitle}
-              onChange={e => setCarnetTitle(e.target.value)}
-              placeholder="Titre de votre note (optionnel)"
-              maxLength={120}
-            />
-
-            {/* Texte du carnet */}
+            {/* Texte de la description */}
             <textarea
               className="add-place-textarea"
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="Qu'avez-vous découvert ici ? Racontez ce lieu, son histoire, votre ressenti..."
-              rows={4}
+              placeholder="Décrivez ce lieu : son histoire, son intérêt, comment y accéder, votre ressenti…"
+              rows={5}
             />
           </div>
           {/* Charte du lieu */}

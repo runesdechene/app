@@ -812,7 +812,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         <CourtFold placeId={place.id} placeTitle={place.title} guardianName={v05?.guardian?.name ?? null} />
 
         {/* Description collaborative */}
-        <PlaceDescription placeId={place.id} description={v05?.description ?? null} canEdit={canEditDescription}
+        <PlaceDescription description={v05?.description ?? null} canEdit={canEditDescription}
           onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
