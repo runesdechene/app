@@ -46,7 +46,10 @@ BEGIN
                         public._defi_effective_ws(cadence, counts_from)),
     'claimed', EXISTS (SELECT 1 FROM public.defi_claims dc
                         WHERE dc.user_id = v_uid AND dc.defi_id = id
-                          AND dc.period_key = public._defi_period_key(cadence))
+                          AND dc.period_key = public._defi_period_key(cadence)),
+    -- Visuels du tag (mig 193) : conservés ici, sinon le front retombe sur l'emoji.
+    'tag', (SELECT json_build_object('icon', t.icon, 'color', t.color, 'background', t.background, 'title', t.title)
+             FROM public.tags t WHERE t.id = tag_id)
   ) END) INTO v FROM picks;
 
   RETURN COALESCE(v, '{}'::json);

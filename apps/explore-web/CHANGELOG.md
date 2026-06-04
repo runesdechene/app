@@ -1,3 +1,10 @@
+# ALPHA V0.9.10
+## Retour des vraies icônes de tag sur les défis
+
+Correctif : les défis réaffichent la **pastille du tag de lieu** (disque coloré + icône maison, comme sur la carte) au lieu d'un emoji. Une icône de tag avait sauté par mégarde lors du correctif précédent — c'est réparé. Seule l'énigme garde son 🗝️ (elle n'a pas de lieu associé).
+
+---
+
 # ALPHA V0.9.9
 ## Défi collectif compté depuis son lancement
 
