@@ -659,7 +659,7 @@ export function AddPlaceFlow() {
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Décrivez ce lieu : son histoire, son intérêt, comment y accéder, votre ressenti…"
-              rows={5}
+              rows={4}
             />
           </div>
           {/* Charte du lieu */}
