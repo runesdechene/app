@@ -105,13 +105,14 @@ Tout le filtrage et la recherche de lieux sont **100 % client-side** (les lieux 
 Seuls manquent quelques champs dans le payload.
 
 ### 5.1 Extension de `get_map_places` (migration)
-Le payload actuel ne renvoie que le **tag primaire**, pas l'époque, pas l'état découverte. Ajouter :
+Le payload actuel ne renvoie que le **tag primaire**, pas l'époque. Ajouter :
 - `eraId` (`places.era_id`)
 - `tagIds` : **tableau de tous** les `tag_id` du lieu (pas seulement `is_primary`)
 - `address` (`places.address`) — pour la recherche/sous-titre
-- `discoveredByMe` (bool) — dérivé de `places_explored` × `p_user_id` (déjà paramètre de la RPC)
 
 Aucun nouveau round-trip : ces colonnes/JOIN sont déjà presque tous présents.
+**`discoveredByMe` n'est PAS nécessaire** : l'état découverte est déjà client-side via
+`usePlayerStore.discoveredIds` (enrichi dans `usePlaces` → `PlaceProperties.discovered`).
 
 ### 5.2 Nouvelle RPC `search_players(p_query text)`
 `SECURITY DEFINER`, `ILIKE` accent-insensible sur `userName`, **sans coordonnées**, limite 10.
@@ -122,6 +123,7 @@ Aucun nouveau round-trip : ces colonnes/JOIN sont déjà presque tous présents.
 | Faction qui contrôle | store **veille** (`ensureFactionsCache` / `loadInitialVeilles`) |
 | En siège / critique | **`siegeStore.statusByPlaceId`** |
 | Mode faction (gating) | **`playerStore.factionColorMode`** |
+| Découvert par moi | **`playerStore.discoveredIds`** (déjà chargé) |
 | Événements (couche) | **`expeditionsStore.mapBanners`** |
 | Lieux (recherche + filtres) | **`usePlaces`** (payload étendu) |
 
@@ -209,6 +211,6 @@ interface SearchFilterState {
 
 ---
 
-## 11. Hypothèse unique à confirmer (relecture)
+## 11. Hypothèse confirmée (Uriel, 2026-06-04)
 - **Filtre « Événements »** = toggle d'affichage des **bannières d'expéditions actives** (couche),
-  pas un filtre d'attribut de lieu. À valider — sinon redéfinir ce que « événement » filtre.
+  pas un filtre d'attribut de lieu. ✅ **Confirmé.**
