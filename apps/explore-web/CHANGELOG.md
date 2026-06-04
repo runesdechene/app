@@ -1,3 +1,10 @@
+# ALPHA V0.9.3
+## Likes fiables + voir qui a aimé
+
+Correction du like sur la description : un double-tap (fréquent sur mobile) pouvait l'enregistrer **puis l'annuler aussitôt** — le like « disparaissait » à la réouverture. C'est verrouillé. Et tu peux maintenant **voir qui a aimé** : clique sur « aimé par N » sous la description.
+
+---
+
 # ALPHA V0.9.2
 ## Discussion repensée, likes vivants et notifications de contribution
 
