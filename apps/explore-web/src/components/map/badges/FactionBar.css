@@ -82,15 +82,11 @@
 /* V0.9 — bannière illustrée (étendard vertical) au-dessus de la jauge, remplace
    l'emblème rond. Fallback sur .faction-scoreboard-emblem si pas de bannière. */
 .faction-scoreboard-banner {
-  width: 26px;
-  height: 40px;
+  width: 36px;
+  height: 50px;
   object-fit: contain;
   flex-shrink: 0;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-.faction-scoreboard-col-mine .faction-scoreboard-banner {
-  filter: drop-shadow(0 0 4px var(--faction-color));
 }
 
 /* Track (fond) + fill (proportionnel) de la jauge verticale.
