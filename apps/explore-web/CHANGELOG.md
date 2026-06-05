@@ -1,3 +1,14 @@
+# ALPHA V0.9.19
+## Recherche & Filtres — trouve, et façonne la carte
+
+La dernière grande pièce manquante est là. Une **barre de recherche** fait voler la carte droit jusqu'au lieu que tu cherches — par son nom ou son adresse, instantanément.
+
+Et un **panneau de filtres** sculpte la carte selon ton envie du moment : par **tags** (mégalithes, sources, châteaux & fortins, cathédrales…), par **époque**, ou pour ne montrer que ce qu'il te reste **à explorer**. Tout se combine, et la carte réagit en direct.
+
+Sur ordinateur, on tape directement dans la barre et les filtres s'ouvrent juste en dessous ; sur mobile, recherche en plein écran et filtres en tiroir.
+
+---
+
 # ALPHA V0.9.18
 ## Marqueurs d'événements plus nets
 
