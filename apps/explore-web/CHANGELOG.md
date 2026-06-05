@@ -1,3 +1,10 @@
+# ALPHA V0.9.21
+## Barre de recherche — placement mobile
+
+Sur mobile, la barre de recherche descend sous les statistiques (elle les chevauchait). Petit ajustement de placement.
+
+---
+
 # ALPHA V0.9.20
 ## Fenêtre Niveau — au propre
 
