@@ -20,6 +20,7 @@ import { DiscussionThread } from '../discussion/DiscussionThread'
 import { ShareButton } from '../actions/ShareButton'
 import { useCalendarRef } from '../../../hooks/useCalendarRef'
 import { formatYear } from '../../../lib/calendarUtils'
+import { formatRelativeTime } from '../../../lib/dateFormat'
 import { DescriptionEditModal } from '../modals/DescriptionEditModal'
 import { DescriptionHistoryModal } from '../modals/DescriptionHistoryModal'
 import { AddPhotoModal } from '../modals/AddPhotoModal'
@@ -755,10 +756,36 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                       >
                         🚗 Waze
                       </button>
+                      {(isAuthor || v05?.isExplorer === true) && (
+                        <button
+                          className="place-options-item"
+                          onClick={() => {
+                            setShowAddressMenu(false)
+                            const m = useMapStore.getState()
+                            m.setEditPositionTarget({
+                              placeId: place.id,
+                              lat: place.location.latitude,
+                              lng: place.location.longitude,
+                              address: place.address ?? '',
+                            })
+                            m.setMapPickerPurpose('editPosition')
+                            m.setAddPlaceMode(true)
+                          }}
+                        >
+                          ✏️ Corriger la position
+                        </button>
+                      )}
                     </div>
                   </>
                 )}
               </div>
+            </p>
+          )}
+
+          {v05?.lastPositionEdit && (
+            <p className="place-position-edited info-meta">
+              📍 Position modifiée par {v05.lastPositionEdit.editorName ?? 'un joueur'}
+              {' · '}{formatRelativeTime(v05.lastPositionEdit.createdAt)}
             </p>
           )}
 
