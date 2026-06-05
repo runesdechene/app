@@ -1,3 +1,10 @@
+# ALPHA V0.9.23
+## Barre de recherche — placement affiné
+
+Léger ajustement de la hauteur de la barre de recherche sur mobile.
+
+---
+
 # ALPHA V0.9.22
 ## Filtres — bouton fermer + placement
 

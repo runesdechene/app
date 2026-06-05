@@ -2,7 +2,7 @@
 .map-search-bar {
   position: absolute; left: 10px; right: 10px; z-index: 5;
   /* Sous le header fixe empilé (MobileTopBar ~67px + StatsBar ~52px). */
-  top: calc(env(safe-area-inset-top, 0px) + 145px);
+  top: calc(env(safe-area-inset-top, 0px) + 135px);
   display: flex; gap: 8px;
 }
 /* iOS PWA standalone : le header force max(safe-area, 47px) (cf. mobile.css).
