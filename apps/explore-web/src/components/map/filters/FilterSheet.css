@@ -3,7 +3,9 @@
 .filter-sheet-grab { width: 38px; height: 4px; background: #cbb48c; border-radius: 2px; margin: 8px auto 4px; }
 .filter-sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 16px 8px; border-bottom: 1px solid #e4d6bc; }
 .filter-sheet-head h4 { margin: 0; color: #84352f; font-size: 15px; }
+.filter-sheet-head-actions { display: flex; align-items: center; gap: 4px; }
 .filter-sheet-reset { background: none; border: none; color: #a9260f; font-size: 12px; }
+.filter-sheet-close { background: none; border: none; color: #84352f; font-size: 18px; line-height: 1; padding: 2px 8px; cursor: pointer; }
 .filter-sheet-body { flex: 1; overflow-y: auto; padding: 4px 14px 12px; }
 .filter-fam { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #a98a5f; font-weight: 700; margin: 14px 0 6px; }
 .filter-row { display: flex; flex-wrap: wrap; gap: 6px; }

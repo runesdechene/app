@@ -39,7 +39,10 @@ export function FilterSheet() {
         <div className="filter-sheet-grab" />
         <div className="filter-sheet-head">
           <h4>Filtrer la carte</h4>
-          <button className="filter-sheet-reset" onClick={resetFilters}>Réinitialiser</button>
+          <div className="filter-sheet-head-actions">
+            <button className="filter-sheet-reset" onClick={resetFilters}>Réinitialiser</button>
+            <button className="filter-sheet-close" onClick={close} aria-label="Fermer les filtres">✕</button>
+          </div>
         </div>
 
         <div className="filter-sheet-body">

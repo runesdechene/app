@@ -2,13 +2,13 @@
 .map-search-bar {
   position: absolute; left: 10px; right: 10px; z-index: 5;
   /* Sous le header fixe empilé (MobileTopBar ~67px + StatsBar ~52px). */
-  top: calc(env(safe-area-inset-top, 0px) + 130px);
+  top: calc(env(safe-area-inset-top, 0px) + 145px);
   display: flex; gap: 8px;
 }
 /* iOS PWA standalone : le header force max(safe-area, 47px) (cf. mobile.css).
    On reflète la même logique pour rester aligné sous les stats. */
 @supports (-webkit-touch-callout: none) {
-  .map-search-bar { top: calc(max(env(safe-area-inset-top, 0px), 47px) + 130px); }
+  .map-search-bar { top: calc(max(env(safe-area-inset-top, 0px), 47px) + 145px); }
 }
 .map-search-pill {
   flex: 1; display: flex; align-items: center; gap: 8px;

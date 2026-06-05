@@ -1,3 +1,10 @@
+# ALPHA V0.9.22
+## Filtres — bouton fermer + placement
+
+Le panneau de filtres gagne une **croix pour le refermer** (à côté de « Réinitialiser ») — plus besoin de chercher comment sortir. Et sur mobile, la barre de recherche descend encore un peu pour bien dégager les statistiques.
+
+---
+
 # ALPHA V0.9.21
 ## Barre de recherche — placement mobile
 
