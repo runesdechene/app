@@ -1,3 +1,10 @@
+# ALPHA V0.9.24
+## Recherche mobile — fenêtre réparée
+
+Sur mobile, la fenêtre de recherche plein écran s'affichait sous le bandeau et la barre du bas : le champ et le bouton « Annuler » étaient inaccessibles, impossible de la refermer. Elle passe désormais bien au-dessus de toute l'interface.
+
+---
+
 # ALPHA V0.9.23
 ## Barre de recherche — placement affiné
 

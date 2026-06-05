@@ -1,5 +1,7 @@
 .search-overlay {
-  position: fixed; inset: 0; z-index: 1200;
+  /* z-index au-dessus du header mobile (9998) et de la barre du bas (9990),
+     sinon l'input + Annuler sont cachés derrière et l'overlay paraît cassé. */
+  position: fixed; inset: 0; z-index: 10000;
   background: #f7f1e4; display: flex; flex-direction: column;
   padding-top: env(safe-area-inset-top, 0px);
 }
