@@ -31,6 +31,7 @@ import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { useSiegeStore } from '../../../stores/siegeStore'
+import { useSearchFilterStore, placeMatchesFilters } from '../../../stores/searchFilterStore'
 import { useVoronoiTuningStore } from '../../../stores/voronoiTuningStore'
 import {
   HERITAGE_CUP_DOT_COLOR,
@@ -771,6 +772,22 @@ export const ExploreMap = memo(function ExploreMap() {
     }
   }, [geojson, placeOverrides, factionColorMode, harvestableSet])
 
+  // Recherche & Filtres (Lot 1) — masque les marqueurs hors filtre (prédicat partagé).
+  const filterTagIds = useSearchFilterStore(s => s.tagIds)
+  const filterEraIds = useSearchFilterStore(s => s.eraIds)
+  const filterProgress = useSearchFilterStore(s => s.progress)
+  const filteredGeojson = useMemo(() => {
+    if (!enrichedGeojson) return enrichedGeojson
+    if (filterTagIds.size === 0 && filterEraIds.size === 0 && filterProgress === 'all') {
+      return enrichedGeojson
+    }
+    const criteria = { tagIds: filterTagIds, eraIds: filterEraIds, progress: filterProgress }
+    return {
+      ...enrichedGeojson,
+      features: enrichedGeojson.features.filter(f => placeMatchesFilters(f.properties, criteria)),
+    }
+  }, [enrichedGeojson, filterTagIds, filterEraIds, filterProgress])
+
   if (!mapStyle) {
     return (
       <div className="flex items-center justify-center h-full bg-[var(--color-parchment)]">
@@ -872,7 +889,7 @@ export const ExploreMap = memo(function ExploreMap() {
           Viewport-filtré + zoom-gated >= 9 pour la perf. */}
       {factionColorMode && (
         <VeilleurNamePills
-          geojson={enrichedGeojson}
+          geojson={filteredGeojson}
           zoom={zoomLevel}
           bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
         />
@@ -881,11 +898,11 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* V0.7+ Expéditions — bannières sur la carte (chaque expé published) */}
       <ExpeditionBanners />
 
-      {enrichedGeojson && (
+      {filteredGeojson && (
         <Source
           id="places"
           type="geojson"
-          data={enrichedGeojson}
+          data={filteredGeojson}
         >
           <Layer {...undiscoveredCircleFinal} />
           <Layer {...undiscoveredIconFinal} />
@@ -900,7 +917,7 @@ export const ExploreMap = memo(function ExploreMap() {
       {/* V0.7 phase 2 — Couronnes de Chêne : coffres récoltables (1+/jour selon expé).
           Rendu en React Markers DOM pour gérer animation +N + click sans toucher MapLibre.
           Visible uniquement sur les lieux où le user actuel peut récolter (filtré par crownsStore). */}
-      <HarvestableChests geojson={enrichedGeojson} />
+      <HarvestableChests geojson={filteredGeojson} />
 
       {/* V0.7.6 (8/05) — Statut siège affiché dans VeilleurNamePills directement
           (à côté du nom du veilleur), pas via un layer GeoJSON séparé. Refresh
