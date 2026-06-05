@@ -19,6 +19,15 @@ interface PlaceOverride {
   veilleurExtraCount?: number
 }
 
+export type MapPickerPurpose = 'add' | 'editPosition'
+
+export interface EditPositionTarget {
+  placeId: string
+  lat: number
+  lng: number
+  address: string
+}
+
 export interface TerritorySelection {
   territoryTitle: string
   customName: string | null
@@ -73,6 +82,10 @@ interface MapState {
   /** Mode ajout de lieu */
   addPlaceMode: boolean
   setAddPlaceMode: (active: boolean) => void
+  mapPickerPurpose: MapPickerPurpose
+  setMapPickerPurpose: (p: MapPickerPurpose) => void
+  editPositionTarget: EditPositionTarget | null
+  setEditPositionTarget: (t: EditPositionTarget | null) => void
 
   /** Coordonnées du centre de la carte (pour le viseur d'ajout) */
   pendingNewPlaceCoords: { lng: number; lat: number } | null
@@ -144,6 +157,10 @@ export const useMapStore = create<MapState>((set) => ({
 
   addPlaceMode: false,
   setAddPlaceMode: (active) => set({ addPlaceMode: active }),
+  mapPickerPurpose: 'add',
+  setMapPickerPurpose: (p) => set({ mapPickerPurpose: p }),
+  editPositionTarget: null,
+  setEditPositionTarget: (t) => set({ editPositionTarget: t }),
 
   expeditionPinMode: false,
   setExpeditionPinMode: (active) => set({ expeditionPinMode: active }),
