@@ -14,6 +14,13 @@ export interface V05Detail {
   isExplorer: boolean
   guardian: { userId: string; name: string; avatar: string | null; factionId: string } | null
   description: V05Description | null
+  /** Dernière correction de position (null si jamais corrigé) */
+  lastPositionEdit: {
+    editorName: string | null
+    editorId: string
+    createdAt: string
+    distanceKm: number
+  } | null
 }
 
 /** Raw contribution from the RPC */

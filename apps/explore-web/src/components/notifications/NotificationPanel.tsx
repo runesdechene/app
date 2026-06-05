@@ -75,6 +75,8 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   like_contribution: '\u2764\uFE0F',            // \u2764\uFE0F
   description_edited: '\u270F\uFE0F',           // \u270F\uFE0F
   new_photo: '\uD83D\uDCF7',                    // \uD83D\uDCF7
+  // Correction de position de lieu
+  place_position_edited: '\uD83D\uDCCD',        // \uD83D\uDCCD
 }
 
 function formatMessage(notif: Notification): string {
@@ -167,6 +169,11 @@ function formatMessage(notif: Notification): string {
       return `${d.actorName || 'Quelqu\'un'} a enrichi la description de ${d.placeTitle || 'un lieu'} que vous avez contribuée`
     case 'new_photo':
       return `${d.actorName || 'Quelqu\'un'} a ajouté une photo à ${d.placeTitle || 'un de vos lieux'}`
+    // Correction de position de lieu
+    case 'place_position_edited': {
+      const km = d.distanceKm != null ? ` (${d.distanceKm} km)` : ''
+      return `${d.actorName || 'Quelqu\'un'} a corrigé la position de ${d.placeTitle || 'un lieu'}${km}`
+    }
   }
 }
 

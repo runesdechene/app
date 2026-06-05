@@ -21,6 +21,8 @@ export interface Notification {
     // V0.9 — Fiches collaboratives (carnet de route)
     | 'new_comment' | 'comment_reply' | 'like_contribution'
     | 'description_edited' | 'new_photo'
+    // Correction de position de lieu
+    | 'place_position_edited'
   data: {
     actorName?: string
     actorId?: string
@@ -31,6 +33,7 @@ export interface Notification {
     contributionType?: string
     likeCount?: number
     viewCount?: number
+    distanceKm?: number
     explorerCount?: number
     visitorsToday?: number
     lastVisitorName?: string
