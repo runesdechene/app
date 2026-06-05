@@ -29,8 +29,12 @@ export function renderPlaceContent(props: PlaceContentProps): string {
   const featured = contributions[0] ?? null;
   const remaining = contributions.slice(1);
 
+  // La description peut provenir du texte brut saisi par l'utilisateur → on
+  // échappe systématiquement le HTML (anti-XSS) avant de reconstruire les
+  // paragraphes. Le sous-ensemble Haiku ne contient jamais de balises, donc
+  // l'échappement est inoffensif pour lui.
   const descHtml = description
-    ? `<div class="description">${description.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')}</div>`
+    ? `<div class="description"><p>${escapeHtml(description).replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p></div>`
     : '';
 
   const accessHtml = accessibility

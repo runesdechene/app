@@ -8,6 +8,7 @@ import { renderGallery } from './gallery';
 import { renderPlaceContent } from './place-content';
 import { renderNearbyPlaces } from './nearby-places';
 import { renderFooter } from './footer';
+import { selectBodyDescription } from '../lib/seo';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const globalCss = readFileSync(join(__dirname, '..', 'styles', 'global.css'), 'utf-8');
@@ -32,7 +33,8 @@ export function renderPage(input: RenderPageInput): string {
   const { place, contributions, nearby, placeCount, shareTextTemplate } = input;
 
   const firstImageUrl = place.images?.[0]?.url ?? null;
-  const metaDescription = (place.seo_description || place.text || '').slice(0, 155);
+  const { description: bodyDescription } = selectBodyDescription(place.text, place.seo_description);
+  const metaDescription = (bodyDescription || '').slice(0, 155);
   const canonicalUrl = `https://app.runesdechene.com/lieu/${place.slug}`;
   const tagLabel = place.primaryTag?.title ?? 'Lieu';
   const title = `${place.title} — Runes de Chêne`;
@@ -80,7 +82,7 @@ export function renderPage(input: RenderPageInput): string {
     ],
   };
 
-  const sectionLabel = place.seo_description
+  const sectionLabel = bodyDescription
     ? `<div class="section-label">À propos de ${escapeHtml(place.title)}</div>`
     : '';
 
@@ -146,7 +148,7 @@ ${globalCss}
     <div class="content">
       ${sectionLabel}
       ${renderPlaceContent({
-        description: place.seo_description,
+        description: bodyDescription,
         accessibility: place.accessibility,
         contributions,
         placeName: place.title,

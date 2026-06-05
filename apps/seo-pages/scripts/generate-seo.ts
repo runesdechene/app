@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import 'dotenv/config';
+import { isRichText, seoSourceHash } from '../src/lib/seo';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -11,23 +12,42 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-const BATCH_SIZE = 50;
+const PAGE_SIZE = 1000;
 
-async function getStalePlaces() {
-  const { data, error } = await supabase
-    .from('places')
-    .select(`
-      id, title, text, address, accessibility,
-      place_types ( title )
-    `)
-    .not('slug', 'is', null)
-    .is('seo_description', null)
-    .eq('private', false)
-    .eq('masked', false)
-    .limit(BATCH_SIZE);
+interface Candidate {
+  id: string;
+  title: string;
+  text: string | null;
+  address: string | null;
+  seo_description: string | null;
+  seo_source_hash: string | null;
+  place_types: { title: string } | null;
+}
 
-  if (error) throw error;
-  return data ?? [];
+// Tous les lieux publics indexables. On filtre/diff côté JS car la décision
+// (texte riche ? hash à jour ?) dépend de calculs non exprimables en PostgREST.
+async function getCandidates(): Promise<Candidate[]> {
+  let all: Candidate[] = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from('places')
+      .select(`
+        id, title, text, address, seo_description, seo_source_hash,
+        place_types ( title )
+      `)
+      .not('slug', 'is', null)
+      .eq('private', false)
+      .eq('masked', false)
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(data as unknown as Candidate[]);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+  return all;
 }
 
 async function getContributionsForPlace(placeId: string) {
@@ -85,69 +105,72 @@ ${contribTexts || 'Aucun récit disponible.'}
 }
 
 async function run() {
-  let totalProcessed = 0;
-  let batchNumber = 0;
+  const candidates = await getCandidates();
+  console.log(`${candidates.length} lieux publics à évaluer.\n`);
 
-  while (true) {
-    batchNumber++;
-    const places = await getStalePlaces();
+  let generated = 0;
+  let skippedRich = 0;
+  let upToDate = 0;
+  let processed = 0;
 
-    if (places.length === 0) {
-      console.log(`\nTerminé — ${totalProcessed} descriptions générées au total.`);
-      break;
+  for (const place of candidates) {
+    processed++;
+    const userText = (place.text ?? '').trim();
+
+    // 1. Texte utilisateur riche → affiché tel quel, aucun appel Haiku.
+    if (isRichText(userText)) {
+      skippedRich++;
+      continue;
     }
 
-    console.log(`\n--- Batch ${batchNumber} (${places.length} lieux) ---`);
-    let batchProcessed = 0;
+    // 2. Texte pauvre → Haiku en secours. On régénère si jamais généré ou
+    //    si la source (texte + récits) a changé depuis la dernière fois.
+    const contributions = await getContributionsForPlace(place.id);
+    const hash = seoSourceHash(userText, contributions.map((c) => c.content ?? ''));
 
-    for (const place of places) {
-      const contributions = await getContributionsForPlace(place.id);
-      const placeType = (place as any).place_types?.title ?? 'Lieu';
+    if (place.seo_description && place.seo_source_hash === hash) {
+      upToDate++;
+      continue;
+    }
 
-      console.log(`  [${totalProcessed + batchProcessed + 1}] ${place.title} (${contributions.length} récits)...`);
+    const placeType = place.place_types?.title ?? 'Lieu';
+    console.log(`  [${processed}/${candidates.length}] ${place.title} (${contributions.length} récits)${place.seo_description ? ' ↻ refresh' : ''}...`);
 
-      try {
-        const description = await generateDescription(
-          place.title,
-          placeType,
-          place.text,
-          place.address,
-          contributions
-        );
+    try {
+      const description = await generateDescription(
+        place.title,
+        placeType,
+        userText,
+        place.address ?? '',
+        contributions
+      );
 
-        const { error } = await supabase
-          .from('places')
-          .update({
-            seo_description: description,
-            seo_generated_at: new Date().toISOString(),
-          })
-          .eq('id', place.id);
+      const { error } = await supabase
+        .from('places')
+        .update({
+          seo_description: description,
+          seo_generated_at: new Date().toISOString(),
+          seo_source_hash: hash,
+        })
+        .eq('id', place.id);
 
-        if (error) {
-          console.error(`    ✗ DB: ${error.message}`);
-        } else {
-          console.log(`    ✓ ${description.length} chars`);
-          batchProcessed++;
-        }
-      } catch (err: any) {
-        if (err?.status === 429) {
-          console.log('    ⏳ Rate limit — pause 60s...');
-          await new Promise((r) => setTimeout(r, 60_000));
-          continue;
-        }
+      if (error) {
+        console.error(`    ✗ DB: ${error.message}`);
+      } else {
+        console.log(`    ✓ ${description.length} chars`);
+        generated++;
+      }
+    } catch (err: any) {
+      if (err?.status === 429) {
+        console.log('    ⏳ Rate limit — pause 60s...');
+        await new Promise((r) => setTimeout(r, 60_000));
+      } else {
         console.error(`    ✗ API: ${err.message}`);
       }
     }
-
-    totalProcessed += batchProcessed;
-    console.log(`  Batch ${batchNumber}: ${batchProcessed}/${places.length} — Total: ${totalProcessed}`);
-
-    // Petite pause entre les batches pour pas stresser l'API
-    if (places.length === BATCH_SIZE) {
-      console.log('  Pause 5s avant le prochain batch...');
-      await new Promise((r) => setTimeout(r, 5_000));
-    }
   }
+
+  console.log(`\nTerminé — ${generated} générées · ${skippedRich} texte riche (skip) · ${upToDate} déjà à jour.`);
 }
 
 run().catch(console.error);

@@ -9,6 +9,7 @@ import { getPlaceBySlug, getPlaceContributions, getNearbyPlaces, getTotalPlaceCo
 import { getShareTextTemplate } from '../src/lib/appSettings';
 import { slugify } from '../src/lib/slugify';
 import { renderPage } from '../src/templates/page';
+import { isRichText, seoSourceHash } from '../src/lib/seo';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -66,12 +67,15 @@ async function ensureSlug(placeId: string): Promise<string> {
 async function ensureSeoDescription(placeId: string): Promise<void> {
   const { data } = await supabase
     .from('places')
-    .select('id, title, text, address, seo_description, place_types(title)')
+    .select('id, title, text, address, seo_description, seo_source_hash, place_types(title)')
     .eq('id', placeId)
     .single();
 
   if (!data) throw new Error(`Place ${placeId} not found`);
-  if (data.seo_description) return;
+
+  const userText = (data.text ?? '').trim();
+  // Texte utilisateur riche → affiché tel quel, pas d'appel Haiku.
+  if (isRichText(userText)) return;
 
   const { data: contribs } = await supabase
     .from('place_contributions')
@@ -79,6 +83,10 @@ async function ensureSeoDescription(placeId: string): Promise<void> {
     .eq('place_id', placeId)
     .eq('type', 'carnet')
     .order('votes_up', { ascending: false });
+
+  // Régénère si jamais généré, ou si la source (texte + récits) a changé.
+  const hash = seoSourceHash(userText, (contribs ?? []).map((c) => c.content ?? ''));
+  if (data.seo_description && data.seo_source_hash === hash) return;
 
   const placeType = (data as any).place_types?.title ?? 'Lieu';
   const contribTexts = (contribs ?? [])
@@ -97,7 +105,7 @@ async function ensureSeoDescription(placeId: string): Promise<void> {
 **Lieu :** ${data.title}
 **Type :** ${placeType}
 **Adresse :** ${data.address || 'Non renseignée'}
-**Description originale :** ${data.text || 'Aucune'}
+**Description originale :** ${userText || 'Aucune'}
 
 **Récits des visiteurs :**
 ${contribTexts || 'Aucun récit disponible.'}
@@ -115,7 +123,7 @@ ${contribTexts || 'Aucun récit disponible.'}
 
   await supabase
     .from('places')
-    .update({ seo_description: block.text.trim(), seo_generated_at: new Date().toISOString() })
+    .update({ seo_description: block.text.trim(), seo_generated_at: new Date().toISOString(), seo_source_hash: hash })
     .eq('id', placeId);
 
   console.log(`  SEO: ${block.text.trim().length} chars`);
