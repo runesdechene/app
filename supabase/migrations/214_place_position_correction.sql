@@ -53,6 +53,14 @@ DECLARE
   v_editor_name text;
   v_distance_km numeric;
 BEGIN
+  -- Identité non spoofable : p_user_id doit correspondre au caller authentifié.
+  -- Convention de l'app (cf. plant_flag mig 017, invest_crowns mig 021). Crucial
+  -- ici : le modèle anti-abus repose sur la transparence (trace + notif), donc
+  -- l'acteur tracé DOIT être authentique.
+  IF p_user_id IS NULL OR p_user_id != auth.uid()::text THEN
+    RETURN json_build_object('error', 'unauthorized');
+  END IF;
+
   SELECT author_id, latitude, longitude, address, title
     INTO v_author_id, v_old_lat, v_old_lng, v_old_address, v_place_title
     FROM public.places WHERE id = p_place_id;
