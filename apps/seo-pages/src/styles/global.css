@@ -391,6 +391,48 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: 0;
 }
 
+.description-byline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 56px;
+  padding-top: 18px;
+  border-top: 1px solid var(--tag-border, rgba(74, 55, 40, 0.14));
+}
+
+.byline-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--sepia);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--font-accent);
+  font-size: 16px;
+}
+
+.byline-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.byline-name {
+  font-family: var(--font-accent);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.byline-role {
+  font-size: 13px;
+  color: var(--ink-light);
+}
+
 .place-accessibility {
   font-size: 16px;
   color: var(--ink-light);

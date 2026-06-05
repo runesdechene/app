@@ -33,7 +33,7 @@ export function renderPage(input: RenderPageInput): string {
   const { place, contributions, nearby, placeCount, shareTextTemplate } = input;
 
   const firstImageUrl = place.images?.[0]?.url ?? null;
-  const { description: bodyDescription } = selectBodyDescription(place.text, place.seo_description);
+  const { description: bodyDescription, isUserAuthored } = selectBodyDescription(place.text, place.seo_description);
   const metaDescription = (bodyDescription || '').slice(0, 155);
   const canonicalUrl = `https://app.runesdechene.com/lieu/${place.slug}`;
   const tagLabel = place.primaryTag?.title ?? 'Lieu';
@@ -149,6 +149,9 @@ ${globalCss}
       ${sectionLabel}
       ${renderPlaceContent({
         description: bodyDescription,
+        descriptionByAuthor: isUserAuthored,
+        authorName: place.author_name,
+        authorAvatar: place.author_avatar,
         accessibility: place.accessibility,
         contributions,
         placeName: place.title,

@@ -36,6 +36,7 @@ export interface Place {
   seo_description: string | null;
   place_type: PlaceType;
   author_name: string;
+  author_avatar: string | null;
   tags: PlaceTag[];
   primaryTag: PlaceTag | null;
 }
@@ -96,13 +97,15 @@ export async function getPlaceBySlug(slug: string): Promise<Place | null> {
   const primary = tags.find(t => t.isPrimary) ?? tags[0] ?? null;
 
   let authorName = '';
+  let authorAvatar: string | null = null;
   if (data.author_id) {
     const { data: author } = await supabase
       .from('users')
-      .select('first_name')
+      .select('first_name, avatar_url')
       .eq('id', data.author_id)
       .single();
     authorName = author?.first_name ?? '';
+    authorAvatar = author?.avatar_url ?? null;
   }
 
   return {
@@ -119,6 +122,7 @@ export async function getPlaceBySlug(slug: string): Promise<Place | null> {
     seo_description: data.seo_description,
     place_type: (data as any).place_types,
     author_name: authorName,
+    author_avatar: authorAvatar,
     tags,
     primaryTag: primary,
   };
@@ -192,15 +196,15 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
   }
 
   const authorIds = [...new Set(allPlaces.map((p: any) => p.author_id).filter(Boolean))];
-  const authorMap = new Map<string, string>();
+  const authorMap = new Map<string, { name: string; avatar: string | null }>();
   for (let i = 0; i < authorIds.length; i += TAG_BATCH_SIZE) {
     const batch = authorIds.slice(i, i + TAG_BATCH_SIZE);
     const { data: authors } = await supabase
       .from('users')
-      .select('id, first_name')
+      .select('id, first_name, avatar_url')
       .in('id', batch);
     for (const a of authors ?? []) {
-      authorMap.set(a.id, a.first_name ?? '');
+      authorMap.set(a.id, { name: a.first_name ?? '', avatar: a.avatar_url ?? null });
     }
   }
 
@@ -220,7 +224,8 @@ export async function getAllPlacesWithSlugs(): Promise<Place[]> {
       sensible: row.sensible,
       seo_description: row.seo_description,
       place_type: row.place_types,
-      author_name: authorMap.get(row.author_id) ?? '',
+      author_name: authorMap.get(row.author_id)?.name ?? '',
+      author_avatar: authorMap.get(row.author_id)?.avatar ?? null,
       tags,
       primaryTag: primary,
     };

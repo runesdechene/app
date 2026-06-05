@@ -15,6 +15,9 @@ function escapeAttr(s: string): string {
 
 interface PlaceContentProps {
   description: string | null;
+  descriptionByAuthor: boolean;
+  authorName: string;
+  authorAvatar: string | null;
   accessibility: string | null;
   contributions: Contribution[];
   placeName: string;
@@ -23,18 +26,35 @@ interface PlaceContentProps {
 }
 
 export function renderPlaceContent(props: PlaceContentProps): string {
-  const { description, accessibility, contributions, placeName, placeSlug, shareTextTemplate } = props;
+  const { description, descriptionByAuthor, authorName, authorAvatar, accessibility, contributions, placeName, placeSlug, shareTextTemplate } = props;
   const shareText = shareTextTemplate.replace('{name}', placeName);
   const shareUrl = `https://app.runesdechene.com/lieu/${placeSlug}`;
   const featured = contributions[0] ?? null;
   const remaining = contributions.slice(1);
 
+  // Signature de l'auteur — uniquement quand la description affichée est bien
+  // son texte (pas la synthèse Haiku), sinon l'attribution serait trompeuse.
+  const showByline = descriptionByAuthor && !!authorName;
+  const bylineHtml = showByline
+    ? `<div class="description-byline">
+    <div class="byline-avatar">${authorAvatar
+      ? `<img src="${escapeAttr(authorAvatar)}" alt="${escapeAttr(authorName)}" loading="lazy" />`
+      : escapeHtml(authorName.charAt(0).toUpperCase())}</div>
+    <div class="byline-meta">
+      <div class="byline-name">Décrit par ${escapeHtml(authorName)}</div>
+      <div class="byline-role">Explorateur·rice</div>
+    </div>
+  </div>`
+    : '';
+
   // La description peut provenir du texte brut saisi par l'utilisateur → on
   // échappe systématiquement le HTML (anti-XSS) avant de reconstruire les
   // paragraphes. Le sous-ensemble Haiku ne contient jamais de balises, donc
   // l'échappement est inoffensif pour lui.
+  // Quand la signature suit, on resserre la marge basse de la description.
+  const descStyle = showByline ? ' style="margin-bottom:20px"' : '';
   const descHtml = description
-    ? `<div class="description"><p>${escapeHtml(description).replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p></div>`
+    ? `<div class="description"${descStyle}><p>${escapeHtml(description).replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p></div>${bylineHtml}`
     : '';
 
   const accessHtml = accessibility
