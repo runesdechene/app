@@ -190,6 +190,10 @@ interface SearchFilterState {
   de la famille gated sont **neutralisés** (pas effacés — réactivés si on rebascule ON dans la session).
 - **Accents / casse** : normalisation NFD systématique (lieux ET joueurs).
 - **Lieu sans tag / sans époque** (rares) : exclu si un filtre tag/époque est actif, inclus sinon.
+- **Calques liés aux lieux** (décision Uriel, 2026-06-05) : le filtre s'applique non seulement aux
+  marqueurs (`Source` places) mais aussi à **VeilleurNamePills** ET **HarvestableChests** — un lieu
+  masqué ne montre ni icône, ni pilule de veilleur, ni coffre Couronnes (cohérence visuelle totale).
+  La `Minimap` reste sur le jeu complet (aide à la navigation).
 
 ---
 
