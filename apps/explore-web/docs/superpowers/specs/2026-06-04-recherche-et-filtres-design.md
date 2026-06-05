@@ -31,6 +31,10 @@ Deux intentions distinctes, jamais empilées :
 
 Pas de 6ᵉ onglet (la barre du bas est pleine : Carte · Activité · Messages · Quêtes · Profil).
 
+**Responsive (décision Uriel, 2026-06-05)** — seuil `useIsDesktop()` = 750px :
+- **Mobile** : la barre est un bouton → la recherche s'ouvre en **overlay plein écran** ; les filtres en **bottom-sheet**.
+- **Desktop** : la barre est un **vrai champ** (on tape directement) → résultats en **menu déroulant ancré sous la barre** ; les filtres s'ouvrent en **popover ancré sous la barre** (~480px, fond transparent, clic-dehors pour fermer), pas en bas d'écran.
+
 ```
 ┌───────────────────────────────┐
 │ 🌳 Runes              🛒  ☰    │  ← MobileHeader existant
