@@ -8,6 +8,7 @@ import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { useDefisStore } from '../../../stores/defisStore'
 import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
 import { EraSelector } from './EraSelector'
+import { MapCrosshairPicker } from '../shared/MapCrosshairPicker'
 import './AddPlaceFlow.css'
 
 type Step = 'location' | 'form' | 'submitting' | 'success'
@@ -60,9 +61,6 @@ export function AddPlaceFlow() {
   const [tags, setTags] = useState<Tag[]>([])
   const [error, setError] = useState<string | null>(null)
   const [newPlaceId, setNewPlaceId] = useState<string | null>(null)
-  const [latInput, setLatInput] = useState('')
-  const [lngInput, setLngInput] = useState('')
-  const [coordsFocused, setCoordsFocused] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [confirmedCoords, setConfirmedCoords] = useState<{ lng: number; lat: number } | null>(null)
@@ -74,7 +72,6 @@ export function AddPlaceFlow() {
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const coords = useMapStore(s => s.pendingNewPlaceCoords)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
@@ -98,14 +95,6 @@ export function AddPlaceFlow() {
     setAddPlaceMode(false)
   }
 
-  // Sync inputs GPS depuis le centre de la carte (sauf si l'utilisateur édite)
-  useEffect(() => {
-    if (coords && !coordsFocused) {
-      setLatInput(coords.lat.toFixed(7))
-      setLngInput(coords.lng.toFixed(7))
-    }
-  }, [coords, coordsFocused])
-
   // V0.7.6 (8/05) — Au mount, recentre la carte sur la position GPS de l'user.
   // Sinon le viseur reste là où la carte était centrée avant (souvent loin),
   // et l'user peut valider sans réaliser que le pin n'est pas chez lui.
@@ -120,32 +109,14 @@ export function AddPlaceFlow() {
     useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
   }, [userPosition])
 
-  function handleGPS() {
-    if (userPosition) {
-      useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
-    }
-  }
-
-  function handleCoordsSubmit() {
-    const lat = parseFloat(latInput)
-    const lng = parseFloat(lngInput)
-    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      useMapStore.getState().requestFlyTo({ lng, lat })
-      setCoordsFocused(false)
-    }
-  }
-
-  function handleConfirmLocation() {
-    if (!coords) return
-    setConfirmedCoords({ lng: coords.lng, lat: coords.lat })
+  function handleConfirmLocation(confirmed: { lat: number; lng: number }) {
+    setConfirmedCoords({ lng: confirmed.lng, lat: confirmed.lat })
     setStep('form')
     // Reverse geocoding — toujours mettre à jour l'adresse
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&accept-language=fr`)
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${confirmed.lat}&lon=${confirmed.lng}&format=json&accept-language=fr`)
       .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(data => {
-        if (data?.display_name) {
-          setAddress(data.display_name)
-        }
+        if (data?.display_name) setAddress(data.display_name)
       })
       .catch(err => console.warn('[AddPlaceFlow] reverse-geocoding failed', err))
   }
@@ -431,81 +402,12 @@ export function AddPlaceFlow() {
   // ===== STEP 1 : Location =====
   if (step === 'location') {
     return (
-      <>
-        {/* Top bar */}
-        <div className="add-place-top-bar">
-          <button className="add-place-back-btn" onClick={handleClose}>
-            &#8592; Retour
-          </button>
-          <span className="add-place-step-title">Placer un lieu</span>
-          <button
-            className="add-place-next-btn"
-            onClick={handleConfirmLocation}
-            disabled={!coords}
-          >
-            Placer ici
-          </button>
-        </div>
-
-        {/* Crosshair */}
-        <div className="add-place-crosshair">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            {/* Bordures blanches (ombre) */}
-            <circle cx="24" cy="24" r="20" stroke="#ffffff" strokeWidth="6" strokeDasharray="4 3" opacity="0.6" />
-            <circle cx="24" cy="24" r="7" fill="#ffffff" opacity="0.6" />
-            <line x1="24" y1="0" x2="24" y2="16" stroke="#ffffff" strokeWidth="6" opacity="0.5" />
-            <line x1="24" y1="32" x2="24" y2="48" stroke="#ffffff" strokeWidth="6" opacity="0.5" />
-            <line x1="0" y1="24" x2="16" y2="24" stroke="#ffffff" strokeWidth="6" opacity="0.5" />
-            <line x1="32" y1="24" x2="48" y2="24" stroke="#ffffff" strokeWidth="6" opacity="0.5" />
-            {/* Traits principaux */}
-            <circle cx="24" cy="24" r="20" stroke="#4A3728" strokeWidth="2" strokeDasharray="4 3" opacity="0.7" />
-            <circle cx="24" cy="24" r="4" fill="#4A3728" />
-            <line x1="24" y1="0" x2="24" y2="16" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
-            <line x1="24" y1="32" x2="24" y2="48" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
-            <line x1="0" y1="24" x2="16" y2="24" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
-            <line x1="32" y1="24" x2="48" y2="24" stroke="#4A3728" strokeWidth="2" opacity="0.8" />
-          </svg>
-        </div>
-
-        {/* Zoom buttons */}
-        <div className="add-place-zoom-btns">
-          <button className="add-place-zoom-btn" onClick={() => useMapStore.getState().requestZoom('in')}>+</button>
-          <button className="add-place-zoom-btn" onClick={() => useMapStore.getState().requestZoom('out')}>&minus;</button>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="add-place-bottom-bar">
-          <button className="add-place-gps-btn" onClick={handleGPS} disabled={!userPosition}>
-            📍 Ma position
-          </button>
-          <div className="add-place-coords-inputs">
-            <label className="add-place-coord-label">Lat</label>
-            <input
-              className="add-place-coord-input"
-              type="text"
-              inputMode="decimal"
-              value={latInput}
-              onChange={e => setLatInput(e.target.value)}
-              onFocus={() => setCoordsFocused(true)}
-              onBlur={() => { setCoordsFocused(false); handleCoordsSubmit() }}
-              onKeyDown={e => { if (e.key === 'Enter') { handleCoordsSubmit(); (e.target as HTMLInputElement).blur() } }}
-              placeholder="43.7000"
-            />
-            <label className="add-place-coord-label">Lng</label>
-            <input
-              className="add-place-coord-input"
-              type="text"
-              inputMode="decimal"
-              value={lngInput}
-              onChange={e => setLngInput(e.target.value)}
-              onFocus={() => setCoordsFocused(true)}
-              onBlur={() => { setCoordsFocused(false); handleCoordsSubmit() }}
-              onKeyDown={e => { if (e.key === 'Enter') { handleCoordsSubmit(); (e.target as HTMLInputElement).blur() } }}
-              placeholder="7.2600"
-            />
-          </div>
-        </div>
-      </>
+      <MapCrosshairPicker
+        title="Placer un lieu"
+        confirmLabel="Placer ici"
+        onConfirm={handleConfirmLocation}
+        onCancel={handleClose}
+      />
     )
   }
 
@@ -704,8 +606,6 @@ export function AddPlaceFlow() {
             const recenterOnUser = () => {
               if (!userPosition) return
               setConfirmedCoords({ lat: userPosition.lat, lng: userPosition.lng })
-              setLatInput(userPosition.lat.toFixed(7))
-              setLngInput(userPosition.lng.toFixed(7))
               useMapStore.getState().requestFlyTo({ lng: userPosition.lng, lat: userPosition.lat })
             }
             // V0.7.13 (11/05) — barème dynamique lu depuis app_settings (gloryRulesStore),
