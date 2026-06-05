@@ -49,7 +49,7 @@ DECLARE
   v_old_address text;
   v_place_title text;
   v_is_eligible boolean;
-  v_guardian_id text;
+  v_veilleur_id text;
   v_editor_name text;
   v_distance_km numeric;
 BEGIN
@@ -90,8 +90,11 @@ BEGIN
          address = p_address, updated_at = NOW()
    WHERE id = p_place_id;
 
-  -- Notifications : auteur + veilleur, en excluant l'éditeur.
-  v_guardian_id := public.get_place_guardian(p_place_id);
+  -- Notifications : auteur + veilleur actuel, en excluant l'éditeur.
+  -- Le veilleur = détenteur d'étendard V0.7 (place_veille.veilleur_user_id),
+  -- pas le top contributeur de carnet. NULL si le lieu est vacant.
+  SELECT pv.veilleur_user_id INTO v_veilleur_id
+    FROM public.place_veille pv WHERE pv.place_id = p_place_id;
   v_distance_km := public.haversine_km(v_old_lat, v_old_lng, p_latitude, p_longitude);
   SELECT first_name INTO v_editor_name FROM public.users WHERE id = p_user_id;
 
@@ -102,10 +105,10 @@ BEGIN
       'distanceKm', ROUND(v_distance_km, 2)));
   END IF;
 
-  IF v_guardian_id IS NOT NULL
-     AND v_guardian_id <> p_user_id
-     AND v_guardian_id <> COALESCE(v_author_id, '') THEN
-    PERFORM public.notify(v_guardian_id, 'place_position_edited', jsonb_build_object(
+  IF v_veilleur_id IS NOT NULL
+     AND v_veilleur_id <> p_user_id
+     AND v_veilleur_id <> COALESCE(v_author_id, '') THEN
+    PERFORM public.notify(v_veilleur_id, 'place_position_edited', jsonb_build_object(
       'actorName', v_editor_name, 'actorId', p_user_id,
       'placeId', p_place_id, 'placeTitle', v_place_title,
       'distanceKm', ROUND(v_distance_km, 2)));
