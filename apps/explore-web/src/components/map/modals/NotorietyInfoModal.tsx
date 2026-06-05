@@ -35,7 +35,6 @@ export function NotorietyInfoModal({ onClose, onOpenLeaderboard }: Props) {
           { label: '🥾 Lieux foulés (GPS)',           value: `${glory.lieuxExplores}` },
           { label: '📜 Lieux cartographiés',          value: `${glory.lieuxAjoutes}` },
           { label: '🏴 Plantages de bannière',        value: `${glory.plantages}` },
-          { label: '✍️ Récits écrits',                value: `${glory.carnets}` },
           { label: '📷 Photos ajoutées',              value: `${glory.photos}` },
           (() => {
             const easyTotal = glory.enigmes.easy + glory.enigmes.veryEasy
