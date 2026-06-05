@@ -56,7 +56,12 @@ export function FilterSheet() {
                     : { background: t.background, color: t.color, borderColor: t.color }}
                   onClick={() => toggleTag(t.id)}
                 >
-                  {t.icon && <img src={t.icon} alt="" className={`filter-chip-ico${on ? ' on' : ''}`} />}
+                  {t.icon && (
+                    <span
+                      className="filter-chip-ico"
+                      style={{ maskImage: `url("${t.icon}")`, WebkitMaskImage: `url("${t.icon}")` }}
+                    />
+                  )}
                   {t.title}
                 </button>
               )
