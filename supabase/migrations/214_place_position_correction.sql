@@ -95,7 +95,9 @@ BEGIN
   -- pas le top contributeur de carnet. NULL si le lieu est vacant.
   SELECT pv.veilleur_user_id INTO v_veilleur_id
     FROM public.place_veille pv WHERE pv.place_id = p_place_id;
-  v_distance_km := public.haversine_km(v_old_lat, v_old_lng, p_latitude, p_longitude);
+  -- haversine_km a la signature (numeric,...) ; les colonnes/vars sont real → cast.
+  v_distance_km := public.haversine_km(
+    v_old_lat::numeric, v_old_lng::numeric, p_latitude::numeric, p_longitude::numeric);
   SELECT first_name INTO v_editor_name FROM public.users WHERE id = p_user_id;
 
   IF v_author_id IS NOT NULL AND v_author_id <> p_user_id THEN
@@ -224,7 +226,9 @@ BEGIN
     'editorName', u.first_name,
     'editorId', h.user_id,
     'createdAt', h.created_at,
-    'distanceKm', ROUND(public.haversine_km(h.old_latitude, h.old_longitude, h.new_latitude, h.new_longitude), 2)
+    'distanceKm', ROUND(public.haversine_km(
+      h.old_latitude::numeric, h.old_longitude::numeric,
+      h.new_latitude::numeric, h.new_longitude::numeric), 2)
   ) INTO v_last_position_edit
   FROM place_position_history h
   JOIN users u ON u.id = h.user_id
