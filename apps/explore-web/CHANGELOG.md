@@ -1,3 +1,10 @@
+# ALPHA V0.9.20
+## Fenêtre Niveau — au propre
+
+Petit ménage dans la fenêtre de Niveau : la mention des **Récits** (une mécanique retirée) disparaît, et le compteur **Photos** affiche enfin le bon total — il oubliait jusqu'ici toutes les photos ajoutées à la création d'un lieu.
+
+---
+
 # ALPHA V0.9.19
 ## Recherche & Filtres — trouve, et façonne la carte
 
