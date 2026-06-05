@@ -1,3 +1,10 @@
+# ALPHA V0.9.25
+## Corriger la position d'un lieu
+
+Un lieu mal placé sur la Carte ? Son auteur — ou tout aventurier qui s'y est rendu — peut désormais corriger sa position. Ouvrez la fiche du lieu, touchez l'icône carte près de l'adresse, puis « ✏️ Corriger la position » : déplacez le viseur, ajustez l'adresse proposée, validez. Le marqueur se déplace aussitôt pour tous, l'auteur et le veilleur du lieu sont prévenus, et la fiche conserve la trace de la dernière correction.
+
+---
+
 # ALPHA V0.9.24
 ## Recherche mobile — fenêtre réparée
 
