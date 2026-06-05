@@ -1,3 +1,10 @@
+# ALPHA V0.9.26
+## Défis — la rotation reprend du service
+
+Les Défis tournaient en rond : le Défi du jour revenait sans cesse sur les mêmes lieux, et le Défi de la semaine restait figé semaine après semaine. Pire, les aventuriers qui plantaient leur étendard sur le terrain n'avaient aucun défi hebdomadaire pour les en récompenser. Le tirage est réparé : jour et semaine puisent désormais dans tout le vivier de défis, et les défis « plante ton étendard » réapparaissent dans la rotation — butin et fanfare à la clé.
+
+---
+
 # ALPHA V0.9.25
 ## Corriger la position d'un lieu
 
