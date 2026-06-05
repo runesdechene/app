@@ -30,6 +30,7 @@ import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
 import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
+import { SearchBar } from '../components/map/search/SearchBar'
 // MobileHeader legacy — import supprimé (composant désactivé, remplacé par MobileTopBar partagée)
 import { useMobileNavStore } from '../stores/mobileNavStore'
 import { useIsDesktop } from '../hooks/useMediaQuery'
@@ -364,6 +365,7 @@ export default function MapPage() {
           <ExpeditionsHud />
         </div>
       )}
+      {!addPlaceMode && !authLoading && isAuthenticated && <SearchBar />}
       {/* ChatPanel flottant : desktop uniquement. Sur mobile, le chat passe par /chat. */}
       {!addPlaceMode && !authLoading && isAuthenticated && isDesktop && <ChatPanel />}
       {!addPlaceMode && !authLoading && isAuthenticated && isAdmin && <VoronoiTuningPanel />}
