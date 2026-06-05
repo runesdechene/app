@@ -20,3 +20,18 @@ export function formatRelativeTime(input: string | Date | null | undefined): str
   const d = Math.floor(h / 24)
   return `il y a ${d}j`
 }
+
+/**
+ * Formatage relatif court (« il y a 15 min », « il y a 3 h », « il y a 2 j »).
+ * `nowMs` injectable pour les tests ; défaut = Date.now().
+ */
+export function formatTimeAgo(iso: string, nowMs: number = Date.now()): string {
+  const diffSec = Math.max(0, Math.floor((nowMs - new Date(iso).getTime()) / 1000))
+  if (diffSec < 60) return "à l'instant"
+  const min = Math.floor(diffSec / 60)
+  if (min < 60) return `il y a ${min} min`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `il y a ${h} h`
+  const j = Math.floor(h / 24)
+  return `il y a ${j} j`
+}
