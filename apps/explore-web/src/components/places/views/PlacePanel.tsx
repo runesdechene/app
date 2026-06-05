@@ -639,7 +639,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
               {v05 && (
                 <WishlistButton placeId={place.id} isWishlisted={v05.isWishlisted} />
               )}
-              {isAdmin && (
+              {(isAdmin || canEditPosition) && (
                 <div className="place-options-wrap">
                   <button
                     className="place-toolbar-btn"
@@ -652,12 +652,33 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                     <>
                       <div className="place-options-backdrop" onClick={() => setShowOptionsMenu(false)} />
                       <div className="place-options-menu">
-                        <button
-                          className="place-options-item danger"
-                          onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
-                        >
-                          Supprimer ce lieu
-                        </button>
+                        {canEditPosition && (
+                          <button
+                            className="place-options-item"
+                            onClick={() => {
+                              setShowOptionsMenu(false)
+                              const m = useMapStore.getState()
+                              m.setEditPositionTarget({
+                                placeId: place.id,
+                                lat: place.location.latitude,
+                                lng: place.location.longitude,
+                                address: place.address ?? '',
+                              })
+                              m.setMapPickerPurpose('editPosition')
+                              m.setAddPlaceMode(true)
+                            }}
+                          >
+                            ✏️ Corriger la position
+                          </button>
+                        )}
+                        {isAdmin && (
+                          <button
+                            className="place-options-item danger"
+                            onClick={() => { setShowOptionsMenu(false); setShowDeleteConfirm(true) }}
+                          >
+                            Supprimer ce lieu
+                          </button>
+                        )}
                       </div>
                     </>
                   )}
@@ -694,13 +715,11 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 par CourtFold juste en-dessous du panel. */}
           </div>
 
-          {/* Address — affiché si une adresse existe OU si l'utilisateur peut
-              corriger la position (sinon le point d'entrée serait inaccessible
-              pour les lieux créés sans adresse). */}
-          {(place.address || canEditPosition) && (
+          {/* Address */}
+          {place.address && (
             <p className="place-address">
               <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span className="place-address-text">{place.address || 'Position non renseignée'}</span>
+              <span className="place-address-text">{place.address}</span>
               <div className="place-goto-wrap">
                 <button
                   className="place-goto-btn"
@@ -762,25 +781,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                       >
                         🚗 Waze
                       </button>
-                      {canEditPosition && (
-                        <button
-                          className="place-options-item"
-                          onClick={() => {
-                            setShowAddressMenu(false)
-                            const m = useMapStore.getState()
-                            m.setEditPositionTarget({
-                              placeId: place.id,
-                              lat: place.location.latitude,
-                              lng: place.location.longitude,
-                              address: place.address ?? '',
-                            })
-                            m.setMapPickerPurpose('editPosition')
-                            m.setAddPlaceMode(true)
-                          }}
-                        >
-                          ✏️ Corriger la position
-                        </button>
-                      )}
                     </div>
                   </>
                 )}
