@@ -3,11 +3,15 @@ import type { FeatureCollection, Point } from 'geojson'
 import { supabase } from '../lib/supabase'
 import { usePlayerStore } from '../stores/playerStore'
 import { useMapStore } from '../stores/mapStore'
+import { useSearchFilterStore } from '../stores/searchFilterStore'
 import { useAuth } from './useAuth'
 
 interface MapPlace {
   id: string
   title: string
+  address: string | null
+  eraId: string | null
+  tagIds: string[]
   type: {
     id: string
     title: string
@@ -37,6 +41,9 @@ interface MapPlace {
 export interface PlaceProperties {
   id: string
   title: string
+  address: string
+  eraId: string | null
+  tagIds: string[]
   tagTitle: string
   tagColor: string
   /** Couleur du tag primaire (jamais ecrasee par la faction) — pour les icones */
@@ -136,6 +143,9 @@ export function usePlaces() {
             properties: {
               id: place.id,
               title: place.title,
+              address: place.address ?? '',
+              eraId: place.eraId ?? null,
+              tagIds: Array.isArray(place.tagIds) ? place.tagIds : [],
               tagTitle: place.faction?.title ?? place.primaryTag?.title ?? '',
               tagColor: place.faction?.color ?? place.primaryTag?.color ?? '#C19A6B',
               iconColor: place.primaryTag?.color ?? '#C19A6B',
@@ -205,6 +215,22 @@ export function usePlaces() {
         }),
     }
   }, [rawGeojson, discoveredIds, userFactionId, isAuthenticated, deletedPlaceIds])
+
+  useEffect(() => {
+    const features = geojson?.features ?? []
+    useSearchFilterStore.getState().setPlaces(
+      features.map(f => ({
+        id: f.properties.id,
+        title: f.properties.title,
+        address: f.properties.address,
+        lng: f.geometry.coordinates[0],
+        lat: f.geometry.coordinates[1],
+        eraId: f.properties.eraId,
+        tagIds: f.properties.tagIds,
+        discovered: f.properties.discovered,
+      })),
+    )
+  }, [geojson])
 
   return { geojson, rawGeojson, loading: loading || fogLoading, error }
 }
