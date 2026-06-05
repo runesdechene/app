@@ -27,6 +27,7 @@ import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
 import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
+import { EditPositionFlow } from '../components/places/modals/EditPositionFlow'
 import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
@@ -121,6 +122,7 @@ export default function MapPage() {
   const userName = usePlayerStore(s => s.userName)
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
+  const mapPickerPurpose = useMapStore(s => s.mapPickerPurpose)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
@@ -475,7 +477,7 @@ export default function MapPage() {
       )}
 
       {/* Flow ajout de lieu (immersif) */}
-      {addPlaceMode && <AddPlaceFlow />}
+      {addPlaceMode && (mapPickerPurpose === 'editPosition' ? <EditPositionFlow /> : <AddPlaceFlow />)}
 
       {!addPlaceMode && (
         <PlacePanel
