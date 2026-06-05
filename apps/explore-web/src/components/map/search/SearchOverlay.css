@@ -7,10 +7,3 @@
 .search-overlay-input { flex: 1; background: #fff; border: 1px solid #b9956a; border-radius: 20px; padding: 9px 14px; font-size: 15px; color: #3f3326; }
 .search-overlay-cancel { background: none; border: none; color: #84352f; font-size: 14px; padding: 4px 6px; }
 .search-overlay-results { flex: 1; overflow-y: auto; }
-.search-overlay-group { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #a98a5f; font-weight: 700; padding: 12px 16px 4px; }
-.search-overlay-row { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px solid #ece0c6; padding: 11px 16px; color: #4f3c28; }
-.search-overlay-ico { width: 26px; height: 26px; border-radius: 7px; background: #e7d6b4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.search-overlay-text { display: flex; flex-direction: column; }
-.search-overlay-title { font-size: 14px; }
-.search-overlay-sub { font-size: 12px; color: #a08a66; }
-.search-overlay-empty { color: #a08a66; text-align: center; padding: 30px 16px; }

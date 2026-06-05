@@ -3,8 +3,11 @@ import { createPortal } from 'react-dom'
 import { useSearchFilterStore, type SearchablePlace } from '../../../stores/searchFilterStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { searchPlaces } from '../../../lib/placeSearch'
+import { SearchResultsList } from './SearchResultsList'
 import './SearchOverlay.css'
 
+/** Overlay plein écran de recherche de lieux — MOBILE uniquement (le desktop tape
+ *  directement dans la barre via un menu déroulant, cf. SearchBar). */
 export function SearchOverlay() {
   const open = useSearchFilterStore(s => s.overlayOpen)
   const close = useSearchFilterStore(s => s.closeOverlay)
@@ -39,23 +42,7 @@ export function SearchOverlay() {
       </div>
 
       <div className="search-overlay-results">
-        {query.trim() && results.length === 0 && (
-          <p className="search-overlay-empty">Aucun lieu trouvé.</p>
-        )}
-        {results.length > 0 && (
-          <>
-            <div className="search-overlay-group">Lieux · {results.length}</div>
-            {results.map(p => (
-              <button key={p.id} className="search-overlay-row" onClick={() => pick(p)}>
-                <span className="search-overlay-ico">📍</span>
-                <span className="search-overlay-text">
-                  <span className="search-overlay-title">{p.title}</span>
-                  {p.address && <span className="search-overlay-sub">{p.address}</span>}
-                </span>
-              </button>
-            ))}
-          </>
-        )}
+        <SearchResultsList results={results} query={query} onPick={pick} />
       </div>
     </div>,
     document.body,

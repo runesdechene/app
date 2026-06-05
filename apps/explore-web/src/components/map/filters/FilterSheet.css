@@ -13,3 +13,16 @@
 .filter-toggle.on { background: #2b211a; color: #e8c87a; border-color: #2b211a; }
 .filter-sheet-foot { padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e4d6bc; }
 .filter-sheet-cta { width: 100%; background: #84352f; color: #fff; border: none; border-radius: 14px; padding: 12px; font-weight: 700; font-size: 14px; }
+
+/* ── Desktop (≥750px) : popover ancré sous la barre de recherche, pas un
+   bottom-sheet. Fond transparent (clic-dehors pour fermer), largeur contenue. */
+@media (min-width: 750px) {
+  .filter-sheet-backdrop { background: transparent; align-items: flex-start; justify-content: center; }
+  .filter-sheet {
+    width: 480px; max-width: 92vw; max-height: 72vh;
+    margin-top: 70px; border-radius: 16px;
+    border: 1px solid #d8c39e; box-shadow: 0 8px 28px rgba(0,0,0,.28);
+  }
+  .filter-sheet-grab { display: none; }
+  .filter-sheet-foot { padding: 10px 14px 12px; }
+}
