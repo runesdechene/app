@@ -433,6 +433,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
   const isAuthor = place.author?.id === userId
 
+  // Corriger la position : auteur ou visiteur. L'autorité reste la RPC serveur ;
+  // ce booléen ne fait qu'afficher/masquer le point d'entrée.
+  const canEditPosition = isAuthor || v05?.isExplorer === true
+
   const canEditDescription = (v05?.isExplorer === true) || isAuthor || discoveredIds.has(place.id)
 
   const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
@@ -690,11 +694,13 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 par CourtFold juste en-dessous du panel. */}
           </div>
 
-          {/* Address */}
-          {place.address && (
+          {/* Address — affiché si une adresse existe OU si l'utilisateur peut
+              corriger la position (sinon le point d'entrée serait inaccessible
+              pour les lieux créés sans adresse). */}
+          {(place.address || canEditPosition) && (
             <p className="place-address">
               <svg className="place-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span className="place-address-text">{place.address}</span>
+              <span className="place-address-text">{place.address || 'Position non renseignée'}</span>
               <div className="place-goto-wrap">
                 <button
                   className="place-goto-btn"
@@ -756,7 +762,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                       >
                         🚗 Waze
                       </button>
-                      {(isAuthor || v05?.isExplorer === true) && (
+                      {canEditPosition && (
                         <button
                           className="place-options-item"
                           onClick={() => {

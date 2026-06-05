@@ -20,7 +20,9 @@ export function EditPositionFlow() {
 
   const [step, setStep] = useState<Step>('position')
   const [confirmedCoords, setConfirmedCoords] = useState<{ lat: number; lng: number } | null>(null)
-  const [address, setAddress] = useState('')
+  // Pré-rempli avec l'adresse actuelle ; le reverse-geocoding l'écrase en cas de
+  // succès, mais on garde l'ancienne en filet si Nominatim échoue.
+  const [address, setAddress] = useState(target?.address ?? '')
   const [error, setError] = useState<string | null>(null)
   const flyDoneRef = useRef(false)
 
