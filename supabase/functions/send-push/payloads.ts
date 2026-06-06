@@ -103,6 +103,17 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       }
     }
 
+    case 'announcement': {
+      const slug      = fr(data.slug)
+      const title     = fr(data.title, 'Une nouvelle de Runes de Chêne')
+      const pushText  = fr(data.push_text, '').slice(0, 120)
+      return {
+        title,
+        body:  pushText || 'Touche pour lire la nouvelle.',
+        url:   slug ? `/article/${slug}` : '/nouvelles',
+      }
+    }
+
     default:
       return null
   }

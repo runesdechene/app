@@ -15,6 +15,8 @@ export const CATEGORY_BY_TYPE: Record<string, Category> = {
   new_comment:              'important',
   comment_reply:            'important',
   like_contribution:        'important',
+  // Annonces multi-canal (broadcast)
+  announcement:             'important',
 }
 
 export function categoryOf(type: string): Category {
