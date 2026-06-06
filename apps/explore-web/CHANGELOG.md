@@ -1,3 +1,10 @@
+# ALPHA V0.9.32
+## Les Nouvelles entrent dans l'app
+
+Un espace **Nouvelles** fait son apparition : les annonces de Runes de Chêne — nouveautés de l'app, de la boutique, de la marque — se lisent désormais dans un vrai lecteur, sans quitter la carte, et s'invitent sur votre accueil. Réagissez d'un ❤️ et laissez un commentaire : la discussion est ouverte sous chaque nouvelle.
+
+---
+
 # ALPHA V0.9.31
 ## Territoires — noms fantômes et couleurs figées corrigés
 
