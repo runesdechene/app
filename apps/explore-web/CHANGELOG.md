@@ -1,3 +1,10 @@
+# ALPHA V0.9.36
+## « Aimé par » — l'heure partout
+
+La fenêtre « Aimé par » affiche désormais « il y a X » pour chaque personne, aussi bien sur une nouvelle que sous un commentaire — un seul et même affichage, partout.
+
+---
+
 # ALPHA V0.9.35
 ## « Aimé par » — fignolage
 

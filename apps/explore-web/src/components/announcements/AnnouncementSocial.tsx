@@ -104,7 +104,6 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
             const { data } = await supabase.rpc('get_announcement_likers', { p_announcement_id: announcementId })
             return (data as Liker[]) ?? []
           }}
-          withTime
           onClose={() => setShowLikers(false)}
         />
       )}
@@ -202,9 +201,8 @@ function Avatar({ name, url, userId }: { name: string; url: string | null; userI
   )
 }
 
-function AnnLikersModal({ load, withTime = false, onClose }: {
+function AnnLikersModal({ load, onClose }: {
   load: () => Promise<Liker[]>
-  withTime?: boolean
   onClose: () => void
 }) {
   const [likers, setLikers] = useState<Liker[]>([])
@@ -244,7 +242,7 @@ function AnnLikersModal({ load, withTime = false, onClose }: {
                   ? <img className="ann-likers-av" src={l.avatar} alt="" />
                   : <span className="ann-likers-av ann-likers-av-fb">{(l.name ?? '?').charAt(0).toUpperCase()}</span>}
                 <span className="ann-likers-name">{l.name ?? '—'}</span>
-                {withTime && l.likedAt && (
+                {l.likedAt && (
                   <span className="ann-likers-time">{formatRelativeTime(l.likedAt)}</span>
                 )}
               </button>
