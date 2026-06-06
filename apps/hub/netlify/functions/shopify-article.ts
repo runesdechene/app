@@ -1,7 +1,9 @@
 // Netlify Function: publie/met à jour un article de blog Shopify (miroir public
 // d'une annonce). Sync à sens unique Hub -> Shopify. Auth admin requise.
 // Mirroir des patterns existants (requireAdmin, json, SHOPIFY_ACCESS_TOKEN, API 2026-01).
-import { marked } from 'marked'
+// NB: le rendu Markdown -> HTML est fait côté Hub (renderMarkdown) et envoyé en
+// body_html ; on n'importe AUCUN package npm ici (les fonctions sans import sont
+// les seules qui bundlent proprement dans ce repo).
 
 const SUPABASE_URL  = process.env.VITE_SUPABASE_URL!
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -46,7 +48,7 @@ function shopify(endpoint: string, init: RequestInit) {
 
 interface AnnouncementInput {
   title: string
-  body: string            // Markdown
+  body_html: string       // HTML déjà rendu côté Hub
   cover_image?: string | null
   type?: string
 }
@@ -93,11 +95,10 @@ export default async function handler(request: Request) {
   const blogId = await resolveBlogId()
   if (!blogId) return json({ error: 'no_shopify_blog' }, 500)
 
-  const body_html = marked.parse(announcement.body ?? '', { async: false }) as string
   const articleBody = {
     article: {
       title: announcement.title,
-      body_html,
+      body_html: announcement.body_html ?? '',
       ...(announcement.cover_image ? { image: { src: announcement.cover_image } } : {}),
       tags: announcement.type ? `annonce,${announcement.type}` : 'annonce',
     },

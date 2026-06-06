@@ -112,7 +112,7 @@ function ComposerEditor({ id }: { id: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
         body: JSON.stringify({
-          announcement: { title: ann.title, body: ann.body, cover_image: ann.cover_image, type: ann.type },
+          announcement: { title: ann.title, body_html: renderMarkdown(ann.body), cover_image: ann.cover_image, type: ann.type },
           shopify_article_id: ann.shopify_article_id,
         }),
       })
