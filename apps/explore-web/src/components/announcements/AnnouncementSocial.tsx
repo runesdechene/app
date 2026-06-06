@@ -1,12 +1,17 @@
 import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 import { useAnnouncementSocial } from '../../hooks/useAnnouncements'
 import { formatRelativeTime } from '../../lib/dateFormat'
 import type { AnnouncementComment } from '../../types/announcement'
+import '../places/modals/LikersModal.css'
 import './AnnouncementSocial.css'
 
-/** Réactions (❤️) + fil de commentaires (réponses 1 niveau) sous une annonce. */
+interface Liker { userId: string; name: string | null; avatar: string | null }
+
+/** Réactions (❤️) + fil de commentaires (réponses 1 niveau, like par commentaire) sous une annonce. */
 export function AnnouncementSocial({ announcementId }: { announcementId: string }) {
   const userId = usePlayerStore(s => s.userId)
   const { social, refresh } = useAnnouncementSocial(announcementId, userId)
@@ -14,6 +19,7 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(0)
   const [likeBusy, setLikeBusy] = useState(false)
+  const [showLikers, setShowLikers] = useState(false)
   const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null)
 
   useEffect(() => {
@@ -23,12 +29,11 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
   async function toggleLike() {
     if (!userId || likeBusy) return
     setLikeBusy(true)
-    // optimiste
-    const next = !liked
-    setLiked(next); setLikeCount(c => c + (next ? 1 : -1))
+    const prevLiked = liked, prevCount = likeCount
+    setLiked(!prevLiked); setLikeCount(c => c + (prevLiked ? -1 : 1))
     const { data, error } = await supabase.rpc('toggle_announcement_like', { p_announcement_id: announcementId })
     const res = data as { liked?: boolean; count?: number } | null
-    if (error || !res) { setLiked(liked); setLikeCount(likeCount) } // rollback
+    if (error || !res) { setLiked(prevLiked); setLikeCount(prevCount) }
     else { setLiked(!!res.liked); setLikeCount(res.count ?? 0) }
     setLikeBusy(false)
   }
@@ -59,9 +64,14 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
           aria-label={liked ? "Je n'aime plus" : "J'aime"}
         >
           <span className="ann-like-heart">{liked ? '❤️' : '🤍'}</span>
-          {likeCount > 0 && <span className="ann-like-count">{likeCount}</span>}
         </button>
-        <span className="ann-react-label">Cette nouvelle vous parle ?</span>
+        {likeCount > 0 ? (
+          <button className="ann-likers-link" onClick={() => setShowLikers(true)}>
+            Aimé par {likeCount}
+          </button>
+        ) : (
+          <span className="ann-react-label">Cette nouvelle vous parle ?</span>
+        )}
       </div>
 
       <h2 className="ann-social-title">Commentaires</h2>
@@ -70,7 +80,7 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
           <p className="ann-comments-empty">Personne n'a encore réagi. Lancez la discussion !</p>
         ) : (
           roots.map(c => (
-            <AnnCommentCard
+            <AnnCommentRow
               key={c.id}
               comment={c}
               replies={repliesByParent.get(c.id) ?? []}
@@ -88,19 +98,45 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
           onPosted={() => { setReplyTo(null); refresh() }}
         />
       )}
+
+      {showLikers && (
+        <AnnLikersModal
+          load={async () => {
+            const { data } = await supabase.rpc('get_announcement_likers', { p_announcement_id: announcementId })
+            return (data as Liker[]) ?? []
+          }}
+          onClose={() => setShowLikers(false)}
+        />
+      )}
     </section>
   )
 }
 
-function AnnCommentCard({ comment, replies, onReply }: {
+function AnnCommentRow({ comment, replies, isReply = false, onReply }: {
   comment: AnnouncementComment
   replies: AnnouncementComment[]
+  isReply?: boolean
   onReply: () => void
 }) {
+  const userId = usePlayerStore(s => s.userId)
+  const [liked, setLiked] = useState(comment.likedByMe)
+  const [count, setCount] = useState(comment.votesUp)
+  const [busy, setBusy] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [showLikers, setShowLikers] = useState(false)
+
+  async function toggleLike() {
+    if (!userId || busy) return
+    setBusy(true)
+    const { data, error } = await supabase.rpc('toggle_announcement_comment_like', { p_comment_id: comment.id })
+    const res = data as { liked?: boolean; votesUp?: number } | null
+    if (!error && res) { setLiked(!!res.liked); setCount(res.votesUp ?? 0) }
+    setBusy(false)
+  }
+
   return (
-    <div className="ann-cmt">
-      <Avatar name={comment.userName} url={comment.userAvatar} />
+    <div className={`ann-cmt${isReply ? ' ann-cmt-isreply' : ''}`}>
+      <Avatar name={comment.userName} url={comment.userAvatar} userId={comment.userId} />
       <div className="ann-cmt-main">
         <div className="ann-cmt-top">
           <span className="ann-cmt-name">{comment.userName}</span>
@@ -108,7 +144,20 @@ function AnnCommentCard({ comment, replies, onReply }: {
         </div>
         <div className="ann-cmt-meta">
           <span className="ann-cmt-time">{formatRelativeTime(comment.createdAt)}</span>
-          <button className="ann-cmt-reply" onClick={onReply}>Répondre</button>
+          <button
+            className={`ann-cmt-like${liked ? ' on' : ''}`}
+            onClick={toggleLike}
+            disabled={!userId || busy}
+            aria-label={liked ? "Je n'aime plus" : "J'aime"}
+          >
+            {liked ? '❤️' : '🤍'}
+          </button>
+          {!isReply && <button className="ann-cmt-reply" onClick={onReply}>Répondre</button>}
+          {count > 0 && (
+            <button className="ann-cmt-likecount" onClick={() => setShowLikers(true)} aria-label={`Aimé par ${count}`}>
+              ❤ {count}
+            </button>
+          )}
         </div>
 
         {replies.length > 0 && (
@@ -116,19 +165,7 @@ function AnnCommentCard({ comment, replies, onReply }: {
             <>
               <div className="ann-cmt-replies">
                 {replies.map(r => (
-                  <div className="ann-cmt ann-cmt-isreply" key={r.id}>
-                    <Avatar name={r.userName} url={r.userAvatar} />
-                    <div className="ann-cmt-main">
-                      <div className="ann-cmt-top">
-                        <span className="ann-cmt-name">{r.userName}</span>
-                        <span className="ann-cmt-text"> {r.content}</span>
-                      </div>
-                      <div className="ann-cmt-meta">
-                        <span className="ann-cmt-time">{formatRelativeTime(r.createdAt)}</span>
-                        <button className="ann-cmt-reply" onClick={onReply}>Répondre</button>
-                      </div>
-                    </div>
-                  </div>
+                  <AnnCommentRow key={r.id} comment={r} replies={[]} isReply onReply={onReply} />
                 ))}
               </div>
               <button className="ann-cmt-toggle" onClick={() => setExpanded(false)}>Masquer les réponses</button>
@@ -140,14 +177,71 @@ function AnnCommentCard({ comment, replies, onReply }: {
           )
         )}
       </div>
+
+      {showLikers && (
+        <AnnLikersModal
+          load={async () => {
+            const { data } = await supabase.rpc('get_announcement_comment_likers', { p_comment_id: comment.id })
+            return (data as Liker[]) ?? []
+          }}
+          onClose={() => setShowLikers(false)}
+        />
+      )}
     </div>
   )
 }
 
-function Avatar({ name, url }: { name: string; url: string | null }) {
-  return url
-    ? <img className="ann-cmt-av" src={url} alt="" />
-    : <span className="ann-cmt-av ann-cmt-av-fb">{name.charAt(0).toUpperCase()}</span>
+function Avatar({ name, url, userId }: { name: string; url: string | null; userId: string }) {
+  const open = () => useMapStore.getState().setSelectedPlayerId(userId)
+  return (
+    <button className="ann-cmt-av-btn" onClick={open} aria-label={name}>
+      {url
+        ? <img className="ann-cmt-av" src={url} alt="" />
+        : <span className="ann-cmt-av ann-cmt-av-fb">{name.charAt(0).toUpperCase()}</span>}
+    </button>
+  )
+}
+
+function AnnLikersModal({ load, onClose }: { load: () => Promise<Liker[]>; onClose: () => void }) {
+  const [likers, setLikers] = useState<Liker[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    let cancelled = false
+    load().then(l => { if (!cancelled) { setLikers(l); setLoading(false) } })
+    return () => { cancelled = true }
+  }, [load])
+
+  return createPortal(
+    <div className="likers-overlay" onClick={onClose}>
+      <div className="likers-modal" onClick={e => e.stopPropagation()}>
+        <div className="likers-header">
+          <h3>❤ Aimé par</h3>
+          <button className="likers-close" onClick={onClose} aria-label="Fermer">✕</button>
+        </div>
+        <div className="likers-list">
+          {loading ? (
+            <p className="likers-empty">Chargement…</p>
+          ) : likers.length === 0 ? (
+            <p className="likers-empty">Personne pour l'instant.</p>
+          ) : (
+            likers.map(l => (
+              <button
+                key={l.userId}
+                className="likers-row"
+                onClick={() => { useMapStore.getState().setSelectedPlayerId(l.userId); onClose() }}
+              >
+                {l.avatar
+                  ? <img className="likers-av" src={l.avatar} alt="" />
+                  : <span className="likers-av likers-av-fb">{(l.name ?? '?').charAt(0).toUpperCase()}</span>}
+                <span className="likers-name">{l.name ?? '—'}</span>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
 }
 
 function AnnComposer({ announcementId, replyingTo, onCancelReply, onPosted }: {

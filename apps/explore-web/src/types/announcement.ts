@@ -25,6 +25,8 @@ export interface AnnouncementComment {
   content: string
   parentId: number | null
   createdAt: string
+  votesUp: number
+  likedByMe: boolean
 }
 
 export interface AnnouncementSocial {

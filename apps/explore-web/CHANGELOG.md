@@ -1,3 +1,10 @@
+# ALPHA V0.9.33
+## Nouvelles — aimez et discutez
+
+Sous une nouvelle, un ❤️ suffit pour réagir — et d'un coup d'œil vous voyez qui a aimé. Les commentaires **et** les réponses peuvent eux aussi être aimés, avec leur « Aimé par ». La discussion prend vie.
+
+---
+
 # ALPHA V0.9.32
 ## Les Nouvelles entrent dans l'app
 

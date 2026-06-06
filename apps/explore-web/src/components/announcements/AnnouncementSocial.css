@@ -28,6 +28,11 @@
 .ann-like:disabled { opacity: .6; cursor: default; }
 .ann-like-count { font-size: 14px; font-weight: 600; color: var(--color-ink); }
 .ann-react-label { font-size: 14px; opacity: .7; }
+.ann-likers-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--color-ink);
+  text-decoration: underline; text-underline-offset: 2px;
+}
 
 .ann-social-title {
   font-family: var(--font-accent);
@@ -44,9 +49,10 @@
 
 .ann-cmt { display: flex; gap: 10px; }
 .ann-cmt-isreply { margin-top: 12px; }
+.ann-cmt-av-btn { background: none; border: none; padding: 0; cursor: pointer; flex-shrink: 0; }
 .ann-cmt-av {
   width: 34px; height: 34px; border-radius: 50%;
-  object-fit: cover; flex-shrink: 0;
+  object-fit: cover; display: block;
 }
 .ann-cmt-av-fb {
   display: inline-flex; align-items: center; justify-content: center;
@@ -59,6 +65,16 @@
 .ann-cmt-meta { display: flex; align-items: center; gap: 14px; margin-top: 3px; }
 .ann-cmt-time { font-size: 12px; opacity: .55; }
 .ann-cmt-reply {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 12px; font-weight: 600; color: var(--color-ink); opacity: .7;
+}
+.ann-cmt-like {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 13px; line-height: 1; filter: grayscale(0.2);
+}
+.ann-cmt-like.on { filter: none; }
+.ann-cmt-like:disabled { opacity: .5; cursor: default; }
+.ann-cmt-likecount {
   background: none; border: none; padding: 0; cursor: pointer;
   font-size: 12px; font-weight: 600; color: var(--color-ink); opacity: .7;
 }
