@@ -1,3 +1,10 @@
+# ALPHA V0.9.37
+## Mise à jour visible aussi sur la carte
+
+La bannière « Mise à jour disponible » apparaît désormais aussi sur la carte, pas seulement sur l'accueil — utile surtout sur ordinateur, où la carte est l'écran principal.
+
+---
+
 # ALPHA V0.9.36
 ## « Aimé par » — l'heure partout
 

@@ -46,6 +46,7 @@ import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { NotificationBell } from '../components/notifications/NotificationBell'
 import { ExpeditionsHud } from '../components/expeditions/ExpeditionsHud'
+import { UpdateBanner } from '../components/pwa/UpdateBanner'
 import { CreateMenu } from '../components/map/controls/CreateMenu'
 import { useExpeditionsStore } from '../stores/expeditionsStore'
 import { TutorialModal } from '../components/tutorial/TutorialModal'
@@ -369,6 +370,18 @@ export default function MapPage() {
         <div className="hud-left-stack">
           <GameToast />
           <ExpeditionsHud />
+        </div>
+      )}
+      {/* Bannière « Mise à jour » — aussi sur la carte (la home /accueil est mobile-only,
+          donc sur PC c'était le seul endroit où on ne la voyait jamais). Hôte fixe en haut. */}
+      {!authLoading && isAuthenticated && (
+        <div
+          style={{
+            position: 'fixed', top: 8, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 5000, width: 'min(560px, calc(100% - 24px))', pointerEvents: 'none',
+          }}
+        >
+          <div style={{ pointerEvents: 'auto' }}><UpdateBanner /></div>
         </div>
       )}
       {!addPlaceMode && !authLoading && isAuthenticated && <SearchBar />}
