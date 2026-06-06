@@ -6,10 +6,9 @@ import { useMapStore } from '../../stores/mapStore'
 import { useAnnouncementSocial } from '../../hooks/useAnnouncements'
 import { formatRelativeTime } from '../../lib/dateFormat'
 import type { AnnouncementComment } from '../../types/announcement'
-import '../places/modals/LikersModal.css'
 import './AnnouncementSocial.css'
 
-interface Liker { userId: string; name: string | null; avatar: string | null }
+interface Liker { userId: string; name: string | null; avatar: string | null; likedAt?: string }
 
 /** Réactions (❤️) + fil de commentaires (réponses 1 niveau, like par commentaire) sous une annonce. */
 export function AnnouncementSocial({ announcementId }: { announcementId: string }) {
@@ -105,6 +104,7 @@ export function AnnouncementSocial({ announcementId }: { announcementId: string 
             const { data } = await supabase.rpc('get_announcement_likers', { p_announcement_id: announcementId })
             return (data as Liker[]) ?? []
           }}
+          withTime
           onClose={() => setShowLikers(false)}
         />
       )}
@@ -202,7 +202,11 @@ function Avatar({ name, url, userId }: { name: string; url: string | null; userI
   )
 }
 
-function AnnLikersModal({ load, onClose }: { load: () => Promise<Liker[]>; onClose: () => void }) {
+function AnnLikersModal({ load, withTime = false, onClose }: {
+  load: () => Promise<Liker[]>
+  withTime?: boolean
+  onClose: () => void
+}) {
   const [likers, setLikers] = useState<Liker[]>([])
   const [loading, setLoading] = useState(true)
   useEffect(() => {
@@ -211,29 +215,38 @@ function AnnLikersModal({ load, onClose }: { load: () => Promise<Liker[]>; onClo
     return () => { cancelled = true }
   }, [load])
 
+  useEffect(() => {
+    function onKey(e: globalThis.KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return createPortal(
-    <div className="likers-overlay" onClick={onClose}>
-      <div className="likers-modal" onClick={e => e.stopPropagation()}>
-        <div className="likers-header">
-          <h3>❤ Aimé par</h3>
-          <button className="likers-close" onClick={onClose} aria-label="Fermer">✕</button>
+    <div className="ann-likers-overlay" onClick={onClose}>
+      <div className="ann-likers-modal" onClick={e => e.stopPropagation()}>
+        <div className="ann-likers-header">
+          <h3 className="ann-likers-title">❤ Aimé par</h3>
+          <button className="ann-likers-close" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
-        <div className="likers-list">
+        <div className="ann-likers-list">
           {loading ? (
-            <p className="likers-empty">Chargement…</p>
+            <p className="ann-likers-empty">Chargement…</p>
           ) : likers.length === 0 ? (
-            <p className="likers-empty">Personne pour l'instant.</p>
+            <p className="ann-likers-empty">Personne pour l'instant.</p>
           ) : (
             likers.map(l => (
               <button
                 key={l.userId}
-                className="likers-row"
+                className="ann-likers-row"
                 onClick={() => { useMapStore.getState().setSelectedPlayerId(l.userId); onClose() }}
               >
                 {l.avatar
-                  ? <img className="likers-av" src={l.avatar} alt="" />
-                  : <span className="likers-av likers-av-fb">{(l.name ?? '?').charAt(0).toUpperCase()}</span>}
-                <span className="likers-name">{l.name ?? '—'}</span>
+                  ? <img className="ann-likers-av" src={l.avatar} alt="" />
+                  : <span className="ann-likers-av ann-likers-av-fb">{(l.name ?? '?').charAt(0).toUpperCase()}</span>}
+                <span className="ann-likers-name">{l.name ?? '—'}</span>
+                {withTime && l.likedAt && (
+                  <span className="ann-likers-time">{formatRelativeTime(l.likedAt)}</span>
+                )}
               </button>
             ))
           )}

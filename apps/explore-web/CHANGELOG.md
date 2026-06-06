@@ -1,3 +1,10 @@
+# ALPHA V0.9.35
+## « Aimé par » — fignolage
+
+La fenêtre « Aimé par » d'une nouvelle s'affiche désormais bien centrée, et indique pour chaque personne depuis combien de temps elle a aimé.
+
+---
+
 # ALPHA V0.9.34
 ## Nouvelles sur la carte (ordinateur)
 
