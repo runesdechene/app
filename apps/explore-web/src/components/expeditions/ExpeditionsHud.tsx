@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { QuestsBoardPanel } from '../quests/QuestsBoardPanel'
+import { DesktopNewsPanel } from '../announcements/DesktopNewsPanel'
 import { ExpeditionCreator } from './ExpeditionCreator'
 import { ExpeditionModal } from './ExpeditionModal'
 import { MissionModalHost } from '../missions/MissionModalHost'
@@ -49,6 +50,9 @@ export function ExpeditionsHud() {
         onOpenExpedition={(id) => setSelectedExpeditionId(id)}
         onOpenCreator={() => setCreatorOpen(true)}
       />
+
+      {/* Bloc Nouvelles — carte desktop uniquement, sous Quêtes & Expéditions. */}
+      <DesktopNewsPanel />
 
       {creatorOpen && (
         <ExpeditionCreator

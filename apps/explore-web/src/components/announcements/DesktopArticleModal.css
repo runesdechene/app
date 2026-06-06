@@ -1,0 +1,59 @@
+.dam-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  background: rgba(40, 30, 18, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.dam-modal {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--color-parchment, #f5edd8);
+  border: 1px solid var(--color-sepia, #c8b08a);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(40, 30, 18, 0.4);
+  padding: 24px 28px 28px;
+}
+.dam-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  font-size: 15px;
+}
+.dam-close:hover { background: rgba(0, 0, 0, 0.16); }
+.dam-state { padding: 40px 0; text-align: center; opacity: .7; }
+.dam-cover {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--color-sepia, #c8b08a);
+  margin-bottom: 16px;
+  object-fit: cover;
+}
+.dam-title {
+  font-family: var(--font-accent);
+  font-size: 24px;
+  line-height: 1.15;
+  color: var(--color-ink, #3a2e1e);
+  margin: 0 0 6px;
+  padding-right: 32px;
+}
+.dam-date { font-size: 13px; opacity: .65; margin: 0 0 18px; }
+.dam-body { font-size: 16px; line-height: 1.65; color: var(--color-ink, #3a2e1e); }
+.dam-body h2 { font-family: var(--font-accent); font-size: 20px; margin: 22px 0 8px; }
+.dam-body h3 { font-family: var(--font-accent); font-size: 17px; margin: 16px 0 6px; }
+.dam-body p { margin: 0 0 14px; }
+.dam-body img { max-width: 100%; border-radius: 10px; }
+.dam-body a { color: var(--color-accent, #8a5a2b); }
+.dam-body ul, .dam-body ol { padding-left: 22px; margin: 0 0 14px; }

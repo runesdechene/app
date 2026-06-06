@@ -1,3 +1,10 @@
+# ALPHA V0.9.34
+## Nouvelles sur la carte (ordinateur)
+
+Sur ordinateur, un bloc « Nouvelles » rejoint le tableau de bord de la carte, juste sous Quêtes & Expéditions. Un clic ouvre la nouvelle en grand — avec ses réactions et sa discussion — sans quitter la carte.
+
+---
+
 # ALPHA V0.9.33
 ## Nouvelles — aimez et discutez
 
