@@ -935,8 +935,11 @@ export const ExploreMap = memo(function ExploreMap() {
           plus juste (chaque lieu veillé montre sa faction, pas une approximation de blob). */}
       {/* Noms custom des territoires — HTML Markers pour contrôle CSS total */}
       {zoomLevel >= 6 && territoryLabelsGeojson?.features.map(f => {
-        const { customName, tagColor } = f.properties as Record<string, unknown>
-        if (!customName) return null
+        const { customName, tagColor, placesCount } = f.properties as Record<string, unknown>
+        // Un nom custom n'est valide qu'au-dessus du seuil de nommage (3 lieux = tier
+        // "Campement"). Sinon un nom gagné en V1 persiste sur un blob réduit à 1 lieu.
+        // Même seuil que le clic territoire (cf. handler placesCount >= 3).
+        if (!customName || (typeof placesCount === 'number' ? placesCount : 0) < 3) return null
         const [lon, lat] = (f.geometry as unknown as { coordinates: [number, number] }).coordinates
         // V0.7 — taille du titre interpolée sur le zoom : 18px (zoom 6) → 25px (zoom 16)
         const fontSize = Math.round(18 + Math.max(0, Math.min(zoomLevel, 16) - 6) * 0.7)

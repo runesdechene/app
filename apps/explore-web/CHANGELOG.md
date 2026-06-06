@@ -1,3 +1,10 @@
+# ALPHA V0.9.31
+## Territoires — noms fantômes et couleurs figées corrigés
+
+Deux scories héritées des toutes premières versions disparaissent. Un nom de territoire (comme « Le Chant de Montségur ») ne s'affiche plus tant que le territoire ne réunit pas au moins 3 lieux — fini les noms qui survivaient sur un unique lieu isolé. Et la couleur d'un lieu veillé suit désormais la faction **actuelle** de son veilleur : si un aventurier rejoint une nouvelle bannière, ses lieux changent de couleur avec lui, au lieu de rester figés sur son ancienne faction.
+
+---
+
 # ALPHA V0.9.30
 ## Photos — votre décompte ne perd plus une miette
 
