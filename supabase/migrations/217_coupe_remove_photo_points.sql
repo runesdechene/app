@@ -1,0 +1,23 @@
+-- 217_coupe_remove_photo_points.sql
+-- WHY : les photos ne doivent plus rapporter de points à la Coupe (compétition
+-- saisonnière entre Factions). Trois raisons :
+--   1. Anti-farm — une photo est quasi gratuite à produire ; 1 pt/photo dans un
+--      classement compétitif invite à spammer des clichés sans valeur.
+--   2. Cohérence — une "photo" arrive par 3 chemins disjoints (création de lieu →
+--      places.images, bouton dédié → contribution type='photo', commentaire →
+--      type='comment'). La Coupe ne comptait que le chemin type='photo', donc un
+--      créateur de lieux voyait "Photos ajoutées : 0" dans son breakdown malgré
+--      N photos de création (plainte Nolroc / "Pin de Napoléon", juin 2026).
+--      Mettre le barème à 0 dissout le problème pour le classement.
+--   3. Gloire ≠ Coupe — la Gloire (XP, progression perso) continue de récompenser
+--      les photos (glory.photo INCHANGÉ). Seul le classement compétitif les retire.
+--
+-- Mécanique : _user_coupe_score et get_coupe_state multiplient COUNT(type='photo')
+-- par _barem('coupe.photo'). Passer la valeur à 0 retire les photos du total ET
+-- des CTE de classement, de façon cohérente, sans réécrire le SQL des fonctions.
+-- Le front retire en parallèle les lignes "Photos ajoutées" et "Carnets" (type mort
+-- depuis le refactor carnet→description) du breakdown Coupe.
+--
+-- Data-only (pas de RPC). Réversible : remettre '1' pour réactiver.
+
+UPDATE public.app_settings SET value = '0' WHERE key = 'coupe.photo';

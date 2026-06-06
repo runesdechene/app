@@ -42,9 +42,7 @@ export function CoupeModal({ onClose }: Props) {
   const ruleGet = useGloryRulesStore(s => s.get)
   const cAdd     = ruleGet('coupe.add_place')
   const cPlant   = ruleGet('coupe.plant_flag')
-  const cCarnet  = ruleGet('coupe.carnet')
   const cVisit   = ruleGet('coupe.visit_gps')
-  const cPhoto   = ruleGet('coupe.photo')
   const cEnigma  = ruleGet('coupe.enigma_easy') // fixe quelle que soit la diff.
 
   // Fetch les couleurs / patterns de faction une seule fois pour enrichir le
@@ -192,19 +190,9 @@ export function CoupeModal({ onClose }: Props) {
                           <span className="coupe-breakdown-pts">{state.myBreakdown.plantages * cPlant} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
-                          <span className="coupe-breakdown-label">Carnets</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.carnets} × {cCarnet}</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.carnets * cCarnet} pts</span>
-                        </div>
-                        <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">Lieux explorés (GPS)</span>
                           <span className="coupe-breakdown-meta">{state.myBreakdown.lieuxExplores} × {cVisit}</span>
                           <span className="coupe-breakdown-pts">{state.myBreakdown.lieuxExplores * cVisit} pts</span>
-                        </div>
-                        <div className="coupe-breakdown-row">
-                          <span className="coupe-breakdown-label">Photos ajoutées</span>
-                          <span className="coupe-breakdown-meta">{state.myBreakdown.photos} × {cPhoto}</span>
-                          <span className="coupe-breakdown-pts">{state.myBreakdown.photos * cPhoto} pts</span>
                         </div>
                         <div className="coupe-breakdown-row">
                           <span className="coupe-breakdown-label">

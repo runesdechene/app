@@ -1,3 +1,10 @@
+# ALPHA V0.9.29
+## La Coupe — un barème plus juste
+
+Les photos ne rapportent plus de points à la Coupe des Factions. Ajouter un cliché enrichit toujours votre Gloire et la fiche du lieu — mais la compétition saisonnière se gagne sur le terrain : lieux cartographiés, foulés en personne, bannières plantées, énigmes percées. Le détail de votre contribution s'allège en conséquence : les lignes « Photos ajoutées » et « Carnets » (un vestige sans usage) quittent le décompte.
+
+---
+
 # ALPHA V0.9.28
 ## Notifications — les réponses vous préviennent, et au bon endroit
 
