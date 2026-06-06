@@ -163,7 +163,9 @@
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
 }
-.composer-file-input { display: none; }
+/* spécificité 0,2,0 pour battre `.composer-corps input` (0,1,1) qui sinon réaffiche
+   l'input fichier natif (le bouton "moche") */
+.composer-cover .composer-file-input { display: none; }
 .composer-upload-btn {
   display: inline-block;
   padding: 0.5rem 1.1rem;
