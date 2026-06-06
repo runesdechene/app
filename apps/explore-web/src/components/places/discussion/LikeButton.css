@@ -9,9 +9,10 @@
 .like-btn-ico { line-height: 1; display: inline-block; }
 .like-btn-n { font-variant-numeric: tabular-nums; }
 
-/* variante discrète (commentaire) */
-.like-btn-mini { font-size: 11.5px; color: var(--color-ink-light); }
-.like-btn-mini.liked { color: #d24a36; }
+/* variante action texte « J'aime » (commentaire) */
+.like-btn-action { font-size: 11.5px; color: var(--color-ink-light); }
+.like-btn-action.liked { color: #d24a36; }
+.like-btn-action.liked .like-btn-label { animation: like-pop 0.34s cubic-bezier(.2,1.4,.4,1); }
 
 /* variante sceau (description) */
 .like-btn-seal {

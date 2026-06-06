@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { renderInlineRichText } from '../../../lib/renderRichText'
 import { LikeButton } from './LikeButton'
+import { LikersModal } from '../modals/LikersModal'
 import type { V05Contribution } from '../../../types/placeDetail'
 import './CommentCard.css'
 
@@ -21,6 +22,8 @@ export function CommentCard({ comment, replies, isReply = false, onPhotoOpen, on
   const [liked, setLiked] = useState(comment.likedByMe)
   const [count, setCount] = useState(comment.votesUp)
   const [busy, setBusy] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const [showLikers, setShowLikers] = useState(false)
 
   // Like générique : ouvert à tous, y compris son propre commentaire.
   async function toggleLike() {
@@ -55,18 +58,46 @@ export function CommentCard({ comment, replies, isReply = false, onPhotoOpen, on
         )}
         <div className="cmt-meta">
           <span className="cmt-time">{timeAgo(comment.createdAt)}</span>
-          <LikeButton liked={liked} count={count} disabled={!userId || busy} variant="mini" onToggle={toggleLike} />
+          <LikeButton liked={liked} disabled={!userId || busy} variant="action" onToggle={toggleLike} />
           {!isReply && <button className="cmt-reply-btn" onClick={() => onReply(comment.id)}>Répondre</button>}
+          {count > 0 && (
+            <button className="cmt-likecount" onClick={() => setShowLikers(true)} aria-label={`Aimé par ${count}`}>
+              <span className="cmt-likecount-h">❤</span>{count}
+            </button>
+          )}
         </div>
 
         {replies.length > 0 && (
-          <div className="cmt-replies">
-            {replies.map(r => (
-              <CommentCard key={r.id} comment={r} replies={[]} isReply onPhotoOpen={onPhotoOpen} onReply={() => onReply(comment.id)} onChanged={onChanged} />
-            ))}
-          </div>
+          expanded ? (
+            <>
+              <div className="cmt-replies">
+                {replies.map(r => (
+                  <CommentCard key={r.id} comment={r} replies={[]} isReply onPhotoOpen={onPhotoOpen} onReply={() => onReply(comment.id)} onChanged={onChanged} />
+                ))}
+              </div>
+              <button className="cmt-toggle" onClick={() => setExpanded(false)}>
+                <span className="cmt-toggle-rail" />Masquer les réponses
+              </button>
+            </>
+          ) : (
+            <button className="cmt-toggle" onClick={() => setExpanded(true)}>
+              <span className="cmt-toggle-rail" />
+              <span className="cmt-toggle-stack">
+                {replies.slice(0, 3).map(r => (
+                  r.userAvatar
+                    ? <img key={r.id} className="cmt-toggle-av" src={r.userAvatar} alt="" />
+                    : <span key={r.id} className="cmt-toggle-av cmt-toggle-av-fb">{r.userName.charAt(0).toUpperCase()}</span>
+                ))}
+              </span>
+              {replies.length === 1 ? 'Voir la réponse' : `Voir les ${replies.length} réponses`}
+            </button>
+          )
         )}
       </div>
+
+      {showLikers && (
+        <LikersModal contributionId={comment.id} title="Aimé par" onClose={() => setShowLikers(false)} />
+      )}
     </div>
   )
 }

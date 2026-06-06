@@ -13,14 +13,14 @@ function playCrownSound() {
 
 interface LikeButtonProps {
   liked: boolean
-  count: number
+  count?: number
   disabled?: boolean
-  /** 'mini' = action discrète (commentaire) · 'seal' = pilule sceau (description) */
-  variant?: 'mini' | 'seal'
+  /** 'action' = texte « J'aime » (commentaire) · 'seal' = pilule sceau (description) */
+  variant?: 'action' | 'seal'
   onToggle: () => void | Promise<void>
 }
 
-export function LikeButton({ liked, count, disabled, variant = 'mini', onToggle }: LikeButtonProps) {
+export function LikeButton({ liked, count = 0, disabled, variant = 'action', onToggle }: LikeButtonProps) {
   const [burst, setBurst] = useState(0)
   // Verrou SYNCHRONE : empêche un 2e déclenchement dans le même tick (tap mobile
   // touch+click, double-clic) qui ferait like puis unlike = net zéro → le like
@@ -44,8 +44,14 @@ export function LikeButton({ liked, count, disabled, variant = 'mini', onToggle 
       aria-pressed={liked}
       aria-label={liked ? 'Ne plus aimer' : 'Aimer'}
     >
-      <span className="like-btn-ico">{liked ? '❤' : '🤍'}</span>
-      {count > 0 && <span className="like-btn-n">{count}</span>}
+      {variant === 'action' ? (
+        <span className="like-btn-label">J'aime</span>
+      ) : (
+        <>
+          <span className="like-btn-ico">{liked ? '❤' : '🤍'}</span>
+          {count > 0 && <span className="like-btn-n">{count}</span>}
+        </>
+      )}
       {burst > 0 && <span key={burst} className="like-burst" aria-hidden="true">❤</span>}
     </button>
   )

@@ -1,3 +1,10 @@
+# ALPHA V0.9.27
+## Fil de discussion — réponses plus lisibles & « Aimé par »
+
+Les fils de réponses sous les commentaires d'un lieu se lisent enfin comme un vrai fil. L'avatar du commentaire reste épinglé en haut (fini la dérive quand les réponses s'accumulent), et les réponses se replient derrière un « Voir les N réponses » avec un aperçu des avatars — un toucher pour déplier. Côté likes : « J'aime » devient un bouton à part qui se colore quand vous aimez, et le petit compteur ❤ s'ouvre désormais en fenêtre « Aimé par » pour voir qui a apprécié — comme pour la description du lieu.
+
+---
+
 # ALPHA V0.9.26
 ## Défis — la rotation reprend du service
 

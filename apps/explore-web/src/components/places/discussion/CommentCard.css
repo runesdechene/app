@@ -4,9 +4,11 @@
   gap: 9px;
   padding: 11px 0;
   border-top: 1px solid rgba(160, 120, 76, 0.16);
+  /* avatar épinglé en haut : sinon il suit l'étirement de la colonne quand le fil s'allonge */
+  align-items: flex-start;
 }
 .cmt:first-child { border-top: none; }
-.cmt-reply { margin-left: 30px; }
+.cmt-reply { padding: 7px 0; }
 
 .cmt-av-btn { padding: 0; border: none; background: none; cursor: pointer; flex: 0 0 auto; }
 .cmt-av {
@@ -35,7 +37,7 @@
   border: 1.5px solid rgba(255, 255, 255, 0.55); box-shadow: 0 1px 4px rgba(74, 55, 40, 0.18);
 }
 
-.cmt-meta { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.cmt-meta { display: flex; align-items: center; gap: 14px; margin-top: 5px; }
 .cmt-time { font-family: var(--font-accent); font-size: 11px; color: #b09a7e; }
 .cmt-reply-btn {
   font-family: var(--font-accent); font-weight: 600; font-size: 11.5px;
@@ -43,4 +45,39 @@
 }
 .cmt-reply-btn:hover { color: var(--color-sepia-dark); }
 
-.cmt-replies { margin-top: 4px; }
+/* compteur de likes cliquable (poussé à droite) → ouvre la modal « Aimé par » */
+.cmt-likecount {
+  display: inline-flex; align-items: center; gap: 4px; margin-left: auto;
+  font-family: var(--font-accent); font-weight: 600; font-size: 11.5px; color: var(--color-ink-light);
+  background: rgba(160, 120, 76, 0.12); border: none; border-radius: 999px; padding: 3px 9px; cursor: pointer;
+}
+.cmt-likecount:hover { background: rgba(160, 120, 76, 0.2); }
+.cmt-likecount-h { color: #d24a36; font-size: 11px; line-height: 1; }
+
+/* bloc réponses : sous-fil indenté à liseré sépia */
+.cmt-replies {
+  margin: 2px 0 0 0;
+  padding-left: 14px;
+  border-left: 2px solid rgba(193, 154, 107, 0.4);
+}
+
+/* bouton voir / masquer les réponses */
+.cmt-toggle {
+  display: inline-flex; align-items: center; gap: 9px;
+  margin: 6px 0 2px; padding: 4px 0;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-accent); font-weight: 600; font-size: 12px; color: var(--color-sepia-dark);
+}
+.cmt-toggle:hover { color: var(--color-ink); }
+.cmt-toggle-rail { width: 22px; height: 1px; background: rgba(160, 120, 76, 0.5); flex: 0 0 auto; }
+.cmt-toggle-stack { display: flex; }
+.cmt-toggle-av {
+  width: 20px; height: 20px; border-radius: 50%; object-fit: cover;
+  margin-left: -7px; border: 1.5px solid #f4ead7;
+}
+.cmt-toggle-av:first-child { margin-left: 0; }
+.cmt-toggle-av-fb {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-sepia); color: #fff;
+  font-family: var(--font-accent); font-weight: 700; font-size: 9px;
+}
