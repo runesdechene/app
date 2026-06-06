@@ -10,6 +10,7 @@ import { ExpeditionsList } from '../components/expeditions/ExpeditionsList'
 import { PlacesSection } from '../components/home/PlacesSection'
 import { MapActivityList } from '../components/home/MapActivityList'
 import { CoupeHeritagesSection } from '../components/home/coupe/CoupeHeritagesSection'
+import { HomeNouvellesSection } from '../components/home/HomeNouvellesSection'
 import { DailyEnigma } from '../components/enigma/DailyEnigma'
 import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../components/expeditions/ExpeditionCreator'
@@ -92,6 +93,8 @@ export default function HomePage() {
             refreshKey={enigmaRefreshKey}
           />
         </section>
+
+        <HomeNouvellesSection />
 
         <section className="home-section">
           <div className="home-card">

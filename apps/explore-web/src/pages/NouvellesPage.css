@@ -1,0 +1,68 @@
+.nouvelles-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--color-parchment);
+  padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
+}
+.nouvelles-title {
+  font-family: var(--font-accent);
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--color-ink);
+  margin: 4px 0 16px;
+}
+.nouvelles-state {
+  opacity: .7;
+  padding: 24px 0;
+  text-align: center;
+}
+.nouvelles-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nouvelles-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 14px rgba(74, 55, 40, .12);
+}
+.nouvelles-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.nouvelles-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.nouvelles-tag {
+  font-family: var(--font-accent);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .65;
+}
+.nouvelles-card-title {
+  font-size: 16px;
+  color: var(--color-ink);
+  margin: 0;
+}
+.nouvelles-card-date {
+  font-size: 12px;
+  opacity: .6;
+}

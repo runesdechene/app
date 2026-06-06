@@ -59,7 +59,12 @@ interface PushPayload {
 }
 
 function normalizeAppUrl(raw: string): string {
-  if (raw.startsWith('/carte') || raw.startsWith('/accueil')) return raw
+  if (
+    raw.startsWith('/carte') ||
+    raw.startsWith('/accueil') ||
+    raw.startsWith('/article/') ||
+    raw.startsWith('/nouvelles')
+  ) return raw
   const queryIdx = raw.indexOf('?')
   const query = queryIdx >= 0 ? raw.slice(queryIdx) : ''
   return '/carte' + query
