@@ -1,3 +1,10 @@
+# ALPHA V0.9.28
+## Notifications — les réponses vous préviennent, et au bon endroit
+
+Quand un aventurier répond à l'un de vos commentaires, vous recevez désormais une vraie notification (push comprise) — plus seulement quand on l'aime. Et au clic sur une notification de discussion (commentaire, réponse, like), la fiche du lieu s'ouvre directement sur l'onglet **Discussion** au lieu de l'onglet Infos.
+
+---
+
 # ALPHA V0.9.27
 ## Fil de discussion — réponses plus lisibles & « Aimé par »
 

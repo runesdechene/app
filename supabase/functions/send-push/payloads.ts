@@ -76,7 +76,18 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: `${actor} a commenté ${place}`,
         body:  'Va voir ce qu’on en dit.',
-        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
+        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
+      }
+    }
+
+    case 'comment_reply': {
+      const actor   = fr(data.actorName, 'Quelqu’un')
+      const place   = fr(data.placeTitle, 'un lieu')
+      const placeId = fr(data.placeId)
+      return {
+        title: `${actor} t’a répondu`,
+        body:  `Sur ${place}.`,
+        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
       }
     }
 
@@ -88,7 +99,7 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
       return {
         title: isDesc ? `${actor} a aimé une description` : `${actor} a aimé ton commentaire`,
         body:  isDesc ? `La description de ${place} que tu as enrichie.` : `Sur ${place}.`,
-        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
+        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
       }
     }
 

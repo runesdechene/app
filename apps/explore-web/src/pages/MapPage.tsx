@@ -152,15 +152,19 @@ export default function MapPage() {
   useCourtInvestedLoad(isAuthenticated)
   useResourceTimers()
 
-  // Push notifications de lieu (place_taken_*) → /carte?placeId=<id>. On parse au
-  // mount pour ouvrir la fiche du lieu sur l'onglet La Cour, puis on nettoie l'URL
+  // Push notifications de lieu → /carte?placeId=<id>[&placeTab=<onglet>]. On parse
+  // au mount pour ouvrir la fiche sur le bon onglet (infos/La Cour par défaut, mais
+  // discussion pour les notifs de commentaire/réponse/like), puis on nettoie l'URL
   // (sinon un refresh ré-ouvrirait le panel). Symétrique de HomePage ?expedition=.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const placeId = params.get('placeId')
     if (!placeId) return
-    setSelectedPlaceId(placeId, 'infos')
+    const rawTab = params.get('placeTab')
+    const tab = rawTab === 'discussion' || rawTab === 'galerie' || rawTab === 'admin' ? rawTab : 'infos'
+    setSelectedPlaceId(placeId, tab)
     params.delete('placeId')
+    params.delete('placeTab')
     const newSearch = params.toString()
     window.history.replaceState({}, '', window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash)
   }, [setSelectedPlaceId])

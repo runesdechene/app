@@ -13,6 +13,7 @@ export const CATEGORY_BY_TYPE: Record<string, Category> = {
   weekly_new_places_recap:  'recap',
   // V0.9 — fiches collaboratives
   new_comment:              'important',
+  comment_reply:            'important',
   like_contribution:        'important',
 }
 
