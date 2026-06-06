@@ -1,0 +1,83 @@
+.composer { padding: 16px; max-width: 860px; }
+.composer-status {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+.composer-status--draft { background: #e8dcc2; }
+.composer-status--published { background: #c8e0c0; }
+.composer-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 12px 0;
+  border-bottom: 1px solid #c8b08a;
+}
+.composer-tabs button {
+  padding: 8px 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+.composer-tabs button.active {
+  border-bottom: 2px solid #4a3728;
+  font-weight: 600;
+}
+.composer-corps label,
+.composer-channel label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.composer-corps input,
+.composer-corps textarea,
+.composer-corps select,
+.composer-channel input,
+.composer-channel textarea {
+  width: 100%;
+  margin-top: 4px;
+  font-weight: 400;
+}
+.composer-preview {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 12px;
+  background: #fffef8;
+}
+.composer-publish {
+  margin-top: 24px;
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+.channel-row {
+  display: grid;
+  grid-template-columns: 160px 90px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.channel-state {
+  font-size: 12px;
+  text-transform: uppercase;
+  opacity: .7;
+}
+.channel-state--published,
+.channel-state--sent {
+  color: #2e7d32;
+  opacity: 1;
+}
+.composer-insta-kit pre {
+  white-space: pre-wrap;
+  background: #f6f0e2;
+  padding: 12px;
+  border-radius: 8px;
+}
+.composer-error { color: #b00020; }
+.composer-hint { font-size: 13px; opacity: .7; }
+.composer-new { padding: 24px; max-width: 480px; }
+.composer-new label { display: block; margin-bottom: 14px; font-weight: 600; }
+.composer-new input,
+.composer-new select { width: 100%; margin-top: 4px; }

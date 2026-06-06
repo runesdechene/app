@@ -23,6 +23,8 @@ import { Settings } from './components/Settings'
 import { GameRules } from './components/GameRules'
 import { TutorialManager } from './components/TutorialManager'
 import { ShopifySync } from './components/ShopifySync'
+import { AnnouncementsList } from './components/annonces/AnnouncementsList'
+import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
 import { Sidebar } from './components/Sidebar'
 import './App.css'
 
@@ -98,6 +100,9 @@ function App() {
           <Route path="/carte/regles" element={<GameRules />} />
           <Route path="/carte/tutoriel" element={<TutorialManager />} />
           <Route path="/shopify/sync" element={<ShopifySync />} />
+          <Route path="/annonces" element={<AnnouncementsList />} />
+          <Route path="/annonces/nouvelle" element={<ComposerAnnonce />} />
+          <Route path="/annonces/:id" element={<ComposerAnnonce />} />
         </Routes>
       </main>
     </div>
