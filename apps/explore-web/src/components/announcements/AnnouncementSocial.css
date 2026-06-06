@@ -1,0 +1,102 @@
+.ann-social {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-sepia);
+}
+
+/* ❤️ réaction */
+.ann-react {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.ann-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-sepia);
+  border-radius: 999px;
+  background: var(--color-parchment-dark);
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform .12s ease, background .15s;
+}
+.ann-like:active { transform: scale(0.94); }
+.ann-like.on { background: rgba(180, 60, 60, .12); border-color: rgba(180, 60, 60, .4); }
+.ann-like:disabled { opacity: .6; cursor: default; }
+.ann-like-count { font-size: 14px; font-weight: 600; color: var(--color-ink); }
+.ann-react-label { font-size: 14px; opacity: .7; }
+
+.ann-social-title {
+  font-family: var(--font-accent);
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--color-ink);
+  margin: 0 0 14px;
+}
+
+/* fil de commentaires */
+.ann-comments { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+.ann-comments-empty { opacity: .6; font-size: 14px; padding: 8px 0; }
+
+.ann-cmt { display: flex; gap: 10px; }
+.ann-cmt-isreply { margin-top: 12px; }
+.ann-cmt-av {
+  width: 34px; height: 34px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+}
+.ann-cmt-av-fb {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--color-sepia); color: #fff; font-weight: 700; font-size: 14px;
+}
+.ann-cmt-main { flex: 1; min-width: 0; }
+.ann-cmt-top { line-height: 1.4; }
+.ann-cmt-name { font-weight: 700; color: var(--color-ink); font-size: 14px; }
+.ann-cmt-text { font-size: 14px; color: var(--color-ink); word-wrap: break-word; }
+.ann-cmt-meta { display: flex; align-items: center; gap: 14px; margin-top: 3px; }
+.ann-cmt-time { font-size: 12px; opacity: .55; }
+.ann-cmt-reply {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 12px; font-weight: 600; color: var(--color-ink); opacity: .7;
+}
+.ann-cmt-replies {
+  margin-top: 4px; padding-left: 8px;
+  border-left: 2px solid var(--color-sepia);
+}
+.ann-cmt-toggle {
+  background: none; border: none; padding: 4px 0; cursor: pointer;
+  font-size: 12px; font-weight: 600; color: var(--color-accent, #8a5a2b);
+}
+
+/* composer */
+.ann-composer { position: sticky; bottom: 0; padding-top: 8px; }
+.ann-composer-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; padding: 6px 10px; margin-bottom: 6px;
+  background: var(--color-parchment-dark); border-radius: 8px;
+}
+.ann-composer-chip button { background: none; border: none; cursor: pointer; font-size: 13px; }
+.ann-composer-bar { display: flex; gap: 8px; align-items: center; }
+.ann-composer-field {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--color-sepia);
+  border-radius: 999px;
+  background: var(--color-parchment-dark);
+  font-size: 14px;
+  color: var(--color-ink);
+}
+.ann-composer-send {
+  flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-accent, #8a5a2b);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.ann-composer-send:disabled { opacity: .4; cursor: default; }

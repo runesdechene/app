@@ -16,3 +16,19 @@ export interface AnnouncementDetail extends AnnouncementListItem {
   body: string            // Markdown canonique
   audience: string
 }
+
+export interface AnnouncementComment {
+  id: number
+  userId: string
+  userName: string
+  userAvatar: string | null
+  content: string
+  parentId: number | null
+  createdAt: string
+}
+
+export interface AnnouncementSocial {
+  likeCount: number
+  likedByMe: boolean
+  comments: AnnouncementComment[]
+}

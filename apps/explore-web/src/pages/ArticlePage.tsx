@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useAnnouncement } from '../hooks/useAnnouncements'
 import { renderMarkdown } from '../lib/markdown'
 import { formatFrenchLongDate } from '../lib/dateFormat'
+import { AnnouncementSocial } from '../components/announcements/AnnouncementSocial'
 import './ArticlePage.css'
 
 export default function ArticlePage() {
@@ -38,6 +39,7 @@ export default function ArticlePage() {
         <p className="article-date">{formatFrenchLongDate(item.published_at)}</p>
       )}
       <article className="article-body" dangerouslySetInnerHTML={{ __html: html }} />
+      <AnnouncementSocial announcementId={item.id} />
     </main>
   )
 }

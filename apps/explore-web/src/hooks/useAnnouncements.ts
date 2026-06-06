@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import type { AnnouncementDetail, AnnouncementListItem } from '../types/announcement'
+import type { AnnouncementDetail, AnnouncementListItem, AnnouncementSocial } from '../types/announcement'
 
 /** Liste des annonces publiées (RPC publique list_published_announcements). */
 export function useAnnouncementsList(limit = 30) {
@@ -51,4 +51,22 @@ export function useAnnouncement(slug: string | undefined) {
   }, [slug])
 
   return { item, loading, error }
+}
+
+/** Like + commentaires d'une annonce (RPC get_announcement_social). */
+export function useAnnouncementSocial(announcementId: string | undefined, userId: string | null) {
+  const [social, setSocial] = useState<AnnouncementSocial | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const refresh = useCallback(async () => {
+    if (!announcementId) { setLoading(false); return }
+    const { data, error } = await supabase.rpc('get_announcement_social', {
+      p_announcement_id: announcementId, p_user_id: userId,
+    })
+    setLoading(false)
+    if (!error && data) setSocial(data as AnnouncementSocial)
+  }, [announcementId, userId])
+
+  useEffect(() => { refresh() }, [refresh])
+  return { social, loading, refresh }
 }
