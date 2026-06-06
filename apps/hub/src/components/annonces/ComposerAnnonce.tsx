@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode, type ChangeEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { SaveBar } from '../SaveBar'
@@ -29,6 +29,7 @@ function ComposerEditor({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<Tab>('corps')
   const [busyChannel, setBusyChannel] = useState<Channel | null>(null)
+  const [uploadingCover, setUploadingCover] = useState(false)
 
   const hasChanges = JSON.stringify(ann) !== JSON.stringify(saved)
 
@@ -148,6 +149,26 @@ function ComposerEditor({ id }: { id: string }) {
     await refetch()
   }
 
+  async function handleCoverUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setUploadingCover(true)
+    setError(null)
+    try {
+      const ext = file.name.split('.').pop() || 'webp'
+      const path = `cover-${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('announcement-covers')
+        .upload(path, file, { contentType: file.type })
+      if (upErr) { setError(`Erreur upload : ${upErr.message}`); return }
+      const { data: urlData } = supabase.storage.from('announcement-covers').getPublicUrl(path)
+      setField('cover_image', urlData.publicUrl)
+    } finally {
+      setUploadingCover(false)
+    }
+  }
+
   if (loading) return <div className="loading">Chargement…</div>
   if (!ann) return <div className="loading">Annonce introuvable. {error}</div>
 
@@ -182,9 +203,19 @@ function ComposerEditor({ id }: { id: string }) {
           <label>Titre
             <input type="text" value={ann.title} onChange={(e) => setField('title', e.target.value)} />
           </label>
-          <label>Image de couverture (URL)
-            <input type="text" value={ann.cover_image ?? ''} onChange={(e) => setField('cover_image', e.target.value || null)} />
-          </label>
+          <div className="composer-field">
+            <span className="composer-field-label">Image de couverture</span>
+            <div className="composer-cover">
+              {ann.cover_image && <img className="composer-cover-thumb" src={ann.cover_image} alt="" />}
+              <input id="cover-upload" className="composer-file-input" type="file" accept="image/*" onChange={handleCoverUpload} />
+              <label htmlFor="cover-upload" className="composer-upload-btn">
+                {uploadingCover ? 'Envoi…' : ann.cover_image ? "Changer l'image" : 'Choisir une image'}
+              </label>
+              {ann.cover_image && (
+                <button type="button" className="composer-cover-remove" onClick={() => setField('cover_image', null)}>Retirer</button>
+              )}
+            </div>
+          </div>
           <label>Corps (Markdown)
             <textarea rows={16} value={ann.body} onChange={(e) => setField('body', e.target.value)} />
           </label>

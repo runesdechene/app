@@ -146,6 +146,48 @@
 
 .composer-new { max-width: 480px; }
 
+/* ---- Upload image de couverture ---- */
+.composer-field { margin-bottom: 14px; }
+.composer-field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-accent-family);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+.composer-cover { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.composer-cover-thumb {
+  width: 120px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+.composer-file-input { display: none; }
+.composer-upload-btn {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  background: var(--color-button);
+  color: var(--color-button--text);
+  border-radius: var(--radius);
+  font-family: var(--font-accent-family);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.composer-upload-btn:hover { opacity: 0.85; }
+.composer-cover-remove {
+  padding: 0.4rem 0.9rem;
+  background: none;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  color: var(--color-text-secondary);
+  font-family: var(--font-accent-family);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 /* ---- Liste / historique ---- */
 .annonces-header {
   display: flex;
