@@ -1,83 +1,165 @@
-.composer { padding: 16px; max-width: 860px; }
+/* Annonces — Composer + liste. Aligné sur le thème parchemin global (App.css).
+   Utilise les variables --color-* / --radius ; pas de couleur en dur. */
+
+/* ---- Boutons thémés (le hub n'a pas de style <button> global) ---- */
+.composer-publish button,
+.composer-new button,
+.composer-insta-kit button,
+.annonces-new-btn {
+  padding: 0.5rem 1.1rem;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-accent-family);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.composer-publish button:hover,
+.composer-new button:hover,
+.composer-insta-kit button:hover,
+.annonces-new-btn:hover { opacity: 0.85; }
+.composer-publish button:disabled,
+.composer-new button:disabled { opacity: 0.45; cursor: default; }
+
+.annonces-new-btn { text-decoration: none; display: inline-block; }
+
+/* ---- Composer ---- */
+.composer { max-width: 860px; }
+
 .composer-status {
-  padding: 2px 10px;
+  padding: 2px 12px;
   border-radius: 999px;
   font-size: 12px;
   text-transform: uppercase;
-  margin-left: 10px;
+  font-family: var(--font-accent-family);
+  margin-left: 12px;
 }
-.composer-status--draft { background: #e8dcc2; }
-.composer-status--published { background: #c8e0c0; }
+.composer-status--draft { background: var(--color-surface-hover); color: var(--color-text-secondary); }
+.composer-status--published { background: rgba(42, 122, 48, 0.15); color: var(--color-success); }
+
 .composer-tabs {
   display: flex;
   gap: 4px;
-  margin: 12px 0;
-  border-bottom: 1px solid #c8b08a;
+  margin: 16px 0;
+  border-bottom: 1px solid var(--color-border-strong);
 }
 .composer-tabs button {
-  padding: 8px 14px;
+  padding: 8px 16px;
   border: none;
   background: none;
   cursor: pointer;
+  font-family: var(--font-accent-family);
   font-size: 14px;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 .composer-tabs button.active {
-  border-bottom: 2px solid #4a3728;
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
   font-weight: 600;
 }
+
 .composer-corps label,
-.composer-channel label {
+.composer-channel label,
+.composer-new label {
   display: block;
-  margin-bottom: 12px;
-  font-weight: 600;
+  margin-bottom: 14px;
+  font-family: var(--font-accent-family);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
 }
 .composer-corps input,
 .composer-corps textarea,
 .composer-corps select,
 .composer-channel input,
-.composer-channel textarea {
+.composer-channel textarea,
+.composer-new input,
+.composer-new select {
+  display: block;
   width: 100%;
-  margin-top: 4px;
-  font-weight: 400;
+  margin-top: 5px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
 }
+.composer-corps textarea,
+.composer-channel textarea { resize: vertical; line-height: 1.5; }
+
 .composer-preview {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
   margin-top: 12px;
-  background: #fffef8;
+  background: var(--color-surface);
+  line-height: 1.6;
 }
+.composer-preview h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+.composer-preview h2 { font-size: 1.2rem; margin: 1rem 0 0.4rem; }
+.composer-preview p { margin: 0 0 0.8rem; }
+.composer-preview a { color: var(--color-primary); }
+
 .composer-publish {
-  margin-top: 24px;
-  border-top: 1px solid #ddd;
-  padding-top: 16px;
+  margin-top: 28px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 18px;
 }
+.composer-publish h2 { font-size: 1.1rem; margin-bottom: 14px; }
+
 .channel-row {
   display: grid;
-  grid-template-columns: 160px 90px 1fr;
+  grid-template-columns: 150px 90px 1fr;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
 }
+.channel-row:last-child { border-bottom: none; }
+.channel-name { font-family: var(--font-accent-family); font-weight: 600; }
 .channel-state {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  opacity: .7;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
 }
 .channel-state--published,
-.channel-state--sent {
-  color: #2e7d32;
-  opacity: 1;
-}
+.channel-state--sent { color: var(--color-success); font-weight: 600; }
+.channel-state--ready { color: var(--color-shopify); }
+
+.composer-insta-kit { margin-top: 12px; }
 .composer-insta-kit pre {
   white-space: pre-wrap;
-  background: #f6f0e2;
-  padding: 12px;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-body-family);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
 }
-.composer-error { color: #b00020; }
-.composer-hint { font-size: 13px; opacity: .7; }
-.composer-new { padding: 24px; max-width: 480px; }
-.composer-new label { display: block; margin-bottom: 14px; font-weight: 600; }
-.composer-new input,
-.composer-new select { width: 100%; margin-top: 4px; }
+
+.composer-error { color: var(--color-danger); margin-top: 12px; }
+.composer-hint { font-size: 13px; color: var(--color-text-secondary); }
+
+.composer-new { max-width: 480px; }
+
+/* ---- Liste / historique ---- */
+.annonces-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.annonces-header h1 { margin: 0; }
+.annonces-channels { font-size: 12px; color: var(--color-text-secondary); }
+.annonces-empty { color: var(--color-muted); padding: 2rem 0; }
+.announcements-table a { color: var(--color-primary); text-decoration: none; font-weight: 600; }
+.announcements-table a:hover { text-decoration: underline; }
+.annonces-status {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-family: var(--font-accent-family);
+}
