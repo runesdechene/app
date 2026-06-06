@@ -1,3 +1,10 @@
+# ALPHA V0.9.30
+## Photos — votre décompte ne perd plus une miette
+
+Votre compteur « Photos ajoutées » (fenêtre Niveau) prend désormais en compte **toutes** vos photos — y compris celles glissées dans un commentaire de lieu, jusqu'ici oubliées. Et il se met à jour aussitôt : ajoutez une photo, créez un lieu, et le total grimpe sans attendre la prochaine ouverture.
+
+---
+
 # ALPHA V0.9.29
 ## La Coupe — un barème plus juste
 

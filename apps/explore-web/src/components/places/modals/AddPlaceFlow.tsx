@@ -7,6 +7,7 @@ import { useToastStore } from '../../../stores/toastStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { useDefisStore } from '../../../stores/defisStore'
 import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
+import { refreshGloryGlobal } from '../../../hooks/useGlory'
 import { EraSelector } from './EraSelector'
 import { MapCrosshairPicker } from '../shared/MapCrosshairPicker'
 import './AddPlaceFlow.css'
@@ -276,6 +277,7 @@ export function AddPlaceFlow() {
       }
 
       void refreshLevelStateGlobal(userId)
+      refreshGloryGlobal() // photos de création → recompte "Photos ajoutées"
       const placeId = data.placeId as string
       if (data.rewards) setRewards({ ...(data.rewards as Record<string, unknown>), isGps: !!data.isGps } as NonNullable<typeof rewards>)
 

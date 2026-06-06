@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { refreshGloryGlobal } from '../../../hooks/useGlory'
 import './AddCarnetModal.css'
 
 interface Props { placeId: string; onClose: () => void; onSaved: () => void }
@@ -32,7 +33,7 @@ export function AddPhotoModal({ placeId, onClose, onSaved }: Props) {
     }
     const { data, error } = await supabase.rpc('add_place_photos', { p_user_id: userId, p_place_id: placeId, p_images: urls })
     if (error || (data as { error?: string } | null)?.error) { setError('Erreur'); setSaving(false); return }
-    setSaving(false); onSaved(); onClose()
+    setSaving(false); refreshGloryGlobal(); onSaved(); onClose()
   }
 
   return createPortal(

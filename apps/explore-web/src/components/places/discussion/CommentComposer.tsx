@@ -1,6 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { refreshGloryGlobal } from '../../../hooks/useGlory'
 
 interface Props {
   placeId: string
@@ -40,6 +41,7 @@ export function CommentComposer({ placeId, replyingTo = null, onCancelReply, onP
       p_parent_id: replyingTo?.id ?? null,
     })
     if (!error && (data as { success?: boolean } | null)?.success) {
+      if (urls.length) refreshGloryGlobal() // photo en commentaire → recompte "Photos ajoutées"
       setText(''); setFiles([]); setPreviews([]); onPosted()
     }
     setBusy(false)
