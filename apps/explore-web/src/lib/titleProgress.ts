@@ -14,7 +14,6 @@ export const STAT_LABELS: Record<string, string> = {
   places_visited: 'lieux visités',
   enigma_score: 'pts énigmes',
   plantages: 'plantages',
-  carnets: 'carnets',
   mecenat_total: 'Couronnes investies',
   mecenat_top1_count: 'mécénats principaux',
 }

@@ -1,3 +1,10 @@
+# ALPHA V0.9.42
+## Titres : fin des paliers « carnets » indébloquables
+
+Quatre titres (Page, Conteur, Chroniqueur, Maître Conteur) récompensaient l'écriture de carnets. Depuis que les carnets ont fusionné avec les descriptions de lieu, ces paliers étaient devenus impossibles à atteindre. Ils disparaissent de la liste des titres.
+
+---
+
 # ALPHA V0.9.41
 ## Fragments : fin des bonus d'affinité fantômes
 
