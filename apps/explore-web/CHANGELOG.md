@@ -1,3 +1,10 @@
+# ALPHA V0.9.46
+## Classement de faction : les actifs en un coup d'œil
+
+Dans le classement d'une faction pour la Coupe, les membres qui n'ont pas encore contribué cette saison sont désormais regroupés dans un volet repliable. Tu vois immédiatement qui a réellement œuvré, sans dérouler une longue liste de scores à 0.
+
+---
+
 # ALPHA V0.9.45
 ## Défi « visiter un type de lieu » : enfin validé
 

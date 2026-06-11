@@ -34,6 +34,7 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
   const [members, setMembers] = useState<FactionMember[]>([])
   const [factionInfo, setFactionInfo] = useState<FactionInfo | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showInactive, setShowInactive] = useState(false)
 
   const [isUnderdog, setIsUnderdog] = useState(false)
   const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
@@ -96,6 +97,40 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
     useMapStore.getState().setSelectedPlayerId(playerId)
   }
 
+  // Sépare les actifs de la saison (score > 0) des membres sans contribution, pour
+  // que le classement montre d'un coup d'œil qui a réellement œuvré cette saison.
+  const activeMembers = members.filter(m => m.coupeScore > 0)
+  const inactiveMembers = members.filter(m => m.coupeScore <= 0)
+
+  const renderRow = (m: FactionMember, rankLabel: string, inactive = false) => (
+    <div
+      key={m.userId}
+      className={`faction-member-row${inactive ? ' faction-member-row--inactive' : ''}`}
+      onClick={() => handleMemberClick(m.userId)}
+    >
+      <span className="faction-member-rank">{rankLabel}</span>
+      {m.profileImage ? (
+        <img src={m.profileImage} alt="" className="faction-member-avatar" />
+      ) : (
+        <div className="faction-member-avatar-fallback" style={{ background: factionColor }}>
+          {m.name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="faction-member-info">
+        <span className="faction-member-name">{m.name}</span>
+        {m.factionTitle2 && (
+          <div className="faction-member-titles">
+            <span className="title-badge title-badge-faction">
+              {m.factionTitle2.icon} {m.factionTitle2.name}
+            </span>
+          </div>
+        )}
+      </div>
+      <span className="faction-member-notoriety">
+        {'🏆'} {m.coupeScore}
+      </span>
+    </div>
+  )
 
   const isMobile = window.innerWidth <= 768
 
@@ -156,38 +191,26 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
 
             {!loading && members.length > 0 && (
               <div className="faction-members-list">
-                {members.map((m, i) => (
-                  <div
-                    key={m.userId}
-                    className="faction-member-row"
-                    onClick={() => handleMemberClick(m.userId)}
-                  >
-                    <span className="faction-member-rank">#{i + 1}</span>
-                    {m.profileImage ? (
-                      <img src={m.profileImage} alt="" className="faction-member-avatar" />
-                    ) : (
-                      <div
-                        className="faction-member-avatar-fallback"
-                        style={{ background: factionColor }}
-                      >
-                        {m.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="faction-member-info">
-                      <span className="faction-member-name">{m.name}</span>
-                      {m.factionTitle2 && (
-                        <div className="faction-member-titles">
-                          <span className="title-badge title-badge-faction">
-                            {m.factionTitle2.icon} {m.factionTitle2.name}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <span className="faction-member-notoriety">
-                      {'\uD83C\uDFC6'} {m.coupeScore}
-                    </span>
-                  </div>
-                ))}
+                {activeMembers.map((m, i) => renderRow(m, `#${i + 1}`))}
+
+                {activeMembers.length === 0 && (
+                  <p className="faction-members-empty-active">Personne n'a encore contribu\u00E9 cette saison.</p>
+                )}
+
+                {inactiveMembers.length > 0 && (
+                  <>
+                    <button
+                      type="button"
+                      className="faction-members-toggle"
+                      onClick={() => setShowInactive(v => !v)}
+                      aria-expanded={showInactive}
+                    >
+                      <span className="faction-members-toggle-caret">{showInactive ? '\u25BE' : '\u25B8'}</span>
+                      {inactiveMembers.length} membre{inactiveMembers.length > 1 ? 's' : ''} sans contribution cette saison
+                    </button>
+                    {showInactive && inactiveMembers.map(m => renderRow(m, '\u2014', true))}
+                  </>
+                )}
               </div>
             )}
           </div>

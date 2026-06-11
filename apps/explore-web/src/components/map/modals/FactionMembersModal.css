@@ -112,6 +112,39 @@
   text-align: center;
 }
 
+/* Repli des membres sans contribution de la saison */
+.faction-members-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(184, 164, 122, 0.25);
+  font-family: var(--font-accent, 'Cabin Condensed', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: #8A7B6A;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.faction-members-toggle:hover { color: #5e5345; }
+.faction-members-toggle-caret { font-size: 11px; }
+
+.faction-member-row--inactive { opacity: 0.6; }
+.faction-member-row--inactive .faction-member-notoriety { color: #a0917a; }
+
+.faction-members-empty-active {
+  font-size: 13px;
+  color: #a0917a;
+  font-style: italic;
+  margin: 4px 0;
+}
+
 .faction-member-avatar {
   width: 36px;
   height: 36px;
