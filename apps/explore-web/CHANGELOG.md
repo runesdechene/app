@@ -1,3 +1,10 @@
+# ALPHA V0.9.40
+## Coupe des Factions : barème nettoyé
+
+Le barème de la Coupe affichait encore « Photo ajoutée » et « Carnet écrit » alors que ces actions ne rapportent plus de points (les photos ont été retirées du classement compétitif, et les carnets ont fusionné avec les descriptions). Ces deux lignes disparaissent, et le « combo créateur » est recalculé en conséquence.
+
+---
+
 # ALPHA V0.9.39
 ## Photos en plein écran : la croix respire sur iPhone
 

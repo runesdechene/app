@@ -23,23 +23,19 @@ export function CoupeRulesModal({ onClose, onOpenScores }: Props) {
   const visite   = get('coupe.visit_gps')
   const plantage = get('coupe.plant_flag')
   const lieu     = get('coupe.add_place')
-  const carnet   = get('coupe.carnet')
-  const photo    = get('coupe.photo')
   const enigme   = get('coupe.enigma_easy') // valeur "fixe" (toutes diff. = même)
 
   return (
     <InfoModal
       icon={'🏆'}
       title={'Coupe des Factions'}
-      description={'Chaque saison, les Factions s\'affrontent dans une compétition saine d\'actions personnelles. Tes plantages, tes carnets, tes énigmes résolues — tout compte pour ta Faction. La Faction qui cumule le plus de points à la clôture remporte la Coupe. Même formule que la Gloire à vie, sur la fenêtre de la saison.'}
+      description={'Chaque saison, les Factions s\'affrontent dans une compétition saine d\'actions personnelles. Tes plantages, tes visites, tes énigmes résolues — tout compte pour ta Faction. La Faction qui cumule le plus de points à la clôture remporte la Coupe. Même formule que la Gloire à vie, sur la fenêtre de la saison.'}
       rows={[
         { label: 'Visite GPS d\'un nouveau lieu',  value: `+${visite} pt${visite > 1 ? 's' : ''}` },
         { label: 'Énigme résolue (toute diff.)',   value: `+${enigme} pt${enigme > 1 ? 's' : ''}` },
-        { label: 'Photo ajoutée à un lieu',        value: `+${photo} pt${photo > 1 ? 's' : ''}` },
-        { label: 'Carnet écrit sur un lieu',       value: `+${carnet} pt${carnet > 1 ? 's' : ''}` },
         { label: 'Plantage de bannière (terrain)', value: `+${plantage} pt${plantage > 1 ? 's' : ''}`, highlight: true },
         { label: 'Lieu ajouté',                    value: `+${lieu} pt${lieu > 1 ? 's' : ''}`, highlight: true },
-        { label: 'Combo créateur sur place',       value: `${visite + lieu + plantage + carnet} pts` },
+        { label: 'Combo créateur sur place',       value: `${visite + lieu + plantage} pts` },
       ]}
       onClose={onClose}
       action={onOpenScores ? { label: 'Voir les scores', onClick: onOpenScores } : undefined}
