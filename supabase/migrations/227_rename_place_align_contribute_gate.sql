@@ -20,7 +20,7 @@ BEGIN;
 CREATE OR REPLACE FUNCTION public._caller_user_id()
 RETURNS text
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO 'public'
-AS $$
+AS $caller$
 DECLARE
   v_uid uuid := auth.uid();
   v_id  text;
@@ -42,7 +42,7 @@ BEGIN
     AND LOWER(u.email_address) = LOWER((SELECT email FROM auth.users WHERE id = v_uid));
   RETURN v_id;
 END;
-$$;
+$caller$;
 
 ALTER FUNCTION public._caller_user_id() OWNER TO postgres;
 REVOKE ALL ON FUNCTION public._caller_user_id() FROM PUBLIC, anon;
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION public.rename_place(
   p_user_id text, p_place_id text, p_title text  -- p_user_id : déprécié, ignoré (identité = JWT)
 ) RETURNS json
 LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
-AS $$
+AS $rename$
 DECLARE
   v_caller   text := public._caller_user_id();
   v_trimmed  text;
@@ -86,7 +86,7 @@ BEGIN
 
   RETURN json_build_object('success', true, 'title', v_trimmed);
 END;
-$$;
+$rename$;
 
 ALTER FUNCTION public.rename_place(text, text, text) OWNER TO postgres;
 -- anon révoqué : renommer exige une session authentifiée.
