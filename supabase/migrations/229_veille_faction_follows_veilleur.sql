@@ -1,4 +1,4 @@
--- 215_veille_faction_follows_veilleur.sql
+-- 229_veille_faction_follows_veilleur.sql (ex-215 : renuméroté pour lever le doublon de version 215 — réconciliation historique migrations, juin 2026)
 -- WHY : place_veille.faction_id est dénormalisé à la plantation. Quand le veilleur
 -- change de faction (set_user_faction, mig 211), ses veilles gardaient l'ANCIENNE
 -- couleur → un lieu veillé par un Pèlerin restait affiché bleu (cas remonté :

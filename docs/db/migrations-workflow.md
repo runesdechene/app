@@ -27,21 +27,55 @@ Le script affiche pour chaque fonction modifiée :
 
 Pour les migrations purement DDL/data (pas de RPC), le script affiche "rien à vérifier" et exit 0.
 
-## Application
+## Application — CANAL UNIQUE : `db push`
 
-Toujours via CLI, jamais manuellement :
-
-```bash
-npx supabase db query --linked -f supabase/migrations/XXX_nom.sql
-```
-
-Ne JAMAIS demander à l'humain d'appliquer manuellement.
-
-## Marquer une migration comme appliquée (si faite hors CLI)
+Depuis la réconciliation de juin 2026 (voir plus bas), l'historique distant
+(`schema_migrations`) est aligné sur les fichiers `NNN`. **On applique donc via
+`db push`, qui applique le SQL ET enregistre l'historique de façon atomique** :
 
 ```bash
-npx supabase migration repair <version> --status applied
+npx supabase db push --linked          # applique tous les NNN en attente + les enregistre
+npx supabase db push --dry-run --linked  # vérif AVANT : liste ce qui serait appliqué
 ```
+
+Workflow : écrire le fichier `NNN_nom.sql` → `db push --dry-run` (contrôle) → `db push`. Point.
+
+**INTERDITS (ils créent la divergence repo/prod qu'on vient de nettoyer)** :
+- ❌ MCP `apply_migration` — enregistre sous un nom *timestamp* ≠ `NNN` → orphelins dans l'historique.
+- ❌ Dashboard SQL editor pour une migration — applique sans enregistrer le bon `NNN`.
+- ❌ `db query -f` — exécute le SQL mais **n'enregistre pas** l'historique → `db push` le re-tentera.
+
+Ces canaux ne sont QUE des secours d'urgence si `db push` est cassé — et dans ce cas,
+`migration repair --status applied <NNN>` juste après, sans faute, pour réaligner.
+
+Ne JAMAIS demander à l'humain d'appliquer manuellement (sauf panne totale du CLI).
+
+## Numéros : séquentiels et UNIQUES
+
+Un numéro `NNN` = un seul fichier. **Jamais deux fichiers au même numéro** : le CLI
+en marque un « appliqué » et considère l'autre « en attente » à chaque `db push`.
+(Cas réel nettoyé en juin 2026 : doublons 175 et 215 → renumérotés 228 et 229.)
+
+## Marquer une migration comme appliquée (réparation d'historique)
+
+```bash
+npx supabase migration repair --status applied <version> --linked    # marque appliqué SANS rejouer le SQL
+npx supabase migration repair --status reverted <version> --linked   # retire la ligne d'historique
+```
+`repair` ne touche QUE la table de bookkeeping — jamais le schéma ni les données.
+
+## Réconciliation de l'historique — juin 2026
+
+Contexte : de mi-mai à début juin, des migrations avaient été appliquées via MCP
+`apply_migration` / dashboard → 37 enregistrements *timestamp* dans `schema_migrations`
+sans contrepartie `NNN`, plus 2 doublons de version (175, 215). `db push` refusait de
+tourner (« Remote migration versions not found in local »).
+
+Nettoyage (tout via `migration repair`, zéro impact schéma) :
+1. `--status applied` sur tous les `NNN` réellement en prod mais non enregistrés (175→227).
+2. `--status reverted` sur les 37 timestamps orphelins.
+3. Doublons 175/215 → renumérotés 228 (`gps_radius`) et 229 (`veille_faction_follows`).
+4. `db push --dry-run` → **« Remote database is up to date »**. Canal propre.
 
 ## Avant un backfill massif
 

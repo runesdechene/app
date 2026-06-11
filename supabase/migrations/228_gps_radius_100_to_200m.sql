@@ -1,4 +1,4 @@
--- 175_gps_radius_100_to_200m.sql
+-- 228_gps_radius_100_to_200m.sql (ex-175 : renuméroté pour lever le doublon de version 175 — réconciliation historique migrations, juin 2026)
 -- WHY : decision Uriel 28/05/2026 — le rayon GPS de 100 m est trop strict pour
 -- les grands ouvrages (viaducs, ponts, cathedrales, lieux paysagers). Cas
 -- concret : RICKNON au pied du viaduc de la Borrèze (Souillac), bouton
