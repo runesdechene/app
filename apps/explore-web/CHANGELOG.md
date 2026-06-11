@@ -1,3 +1,10 @@
+# ALPHA V0.9.45
+## Défi « visiter un type de lieu » : enfin validé
+
+Le défi qui demande de visiter un certain type de lieu (château, cathédrale, sanctuaire…) ne se validait jamais : tes visites GPS n'étaient pas comptabilisées si tu avais déjà révélé le lieu à distance. C'est corrigé — toute visite sur place compte désormais pour le défi.
+
+---
+
 # ALPHA V0.9.44
 ## Défis : la date limite enfin visible
 
