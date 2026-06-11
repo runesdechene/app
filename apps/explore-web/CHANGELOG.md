@@ -1,3 +1,10 @@
+# ALPHA V0.9.43
+## Titres : la jauge de progression avance enfin
+
+La barre « 7 / 10 » sous un titre à débloquer restait collée à 0 jusqu'au déblocage réel. Les compteurs (niveau, lieux visités, énigmes, bannières plantées, mécénat…) n'étaient tout simplement pas transmis à l'écran. C'est réparé : la jauge reflète maintenant ta vraie progression.
+
+---
+
 # ALPHA V0.9.42
 ## Titres : fin des paliers « carnets » indébloquables
 
