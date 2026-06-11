@@ -94,9 +94,11 @@ CREATE TABLE public.place_tags_revisions (
 );
 ```
 
-`set_place_tags` insère une révision (old vs new) + une entrée `activity_log` à chaque changement effectif.
+`set_place_tags` insère une révision (old vs new, + `changed_by`) à chaque appel. C'est le trail d'audit canonique : qui a changé quoi quand, et de quoi vers quoi.
 
-Objectifs : détection des patterns suspects, rollback possible, base pour une future revue Hub des changements **signalés** (non bloquante).
+Objectifs : détection des patterns suspects (requête sur `place_tags_revisions`), rollback possible (restaurer `old_tag_ids`), base pour une future revue Hub des changements **signalés** (non bloquante).
+
+> **Note implémentation :** l'entrée `activity_log` (feed social/admin) est **déférée en follow-up** — la table dédiée `place_tags_revisions` couvre déjà détection + rollback, et rester hors du feed colle au choix « audit-only ». À brancher si on veut rendre les changements de tags visibles dans le feed.
 
 ## Hors périmètre (YAGNI)
 
@@ -122,4 +124,5 @@ Objectifs : détection des patterns suspects, rollback possible, base pour une f
 4. Retaguer son propre lieu déjà créé pour matcher un défi `add` → **pas** de nouveau crédit.
 5. Éditer un lieu pour ajouter un 2e tag sans toucher le tag d'origine d'un autre → la paternité du tag conservé n'est **pas** réécrite.
 6. Lieux/tags legacy (`created_by = NULL`) → comptent normalement, aucune régression.
-7. Chaque appel `set_place_tags` produit une ligne `place_tags_revisions` + `activity_log`.
+7. Chaque appel `set_place_tags` produit une ligne `place_tags_revisions` (`activity_log` déféré).
+8. Défi **collectif** (compteur communautaire) : le prédicat anti-self-edit est neutralisé (`p_collective` court-circuite l'exclusion) → le total objectif n'est pas faussé. Le compteur collectif reste de toute façon protégé par le gate d'édition (il faut présence/veille sur *chaque* lieu retagué → mass-inflation impraticable).
