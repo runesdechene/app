@@ -437,7 +437,9 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   // ce booléen ne fait qu'afficher/masquer le point d'entrée.
   const canEditPosition = isAuthor || v05?.isExplorer === true
 
-  const canEditDescription = (v05?.isExplorer === true) || isAuthor || discoveredIds.has(place.id)
+  // Condition canonique « peut contribuer » (= bouton Contribuer) : visiteur GPS,
+  // créateur, ou découvreur à distance. Gouverne description, révisions ET renommage.
+  const canContribute = (v05?.isExplorer === true) || isAuthor || discoveredIds.has(place.id)
 
   const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
   const heroPhotoUrl = currentHeroPhotos.length > 0
@@ -628,7 +630,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             ) : (
               <h2 className="place-title">
                 {place.title}
-                {isAuthor && (
+                {canContribute && (
                   <button className="place-title-edit-pencil" onClick={() => setEditingTitle(true)} title="Renommer ce lieu">
                     ✏️
                   </button>
@@ -852,7 +854,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         />
 
         {/* Description collaborative */}
-        <PlaceDescription description={v05?.description ?? null} canEdit={canEditDescription}
+        <PlaceDescription description={v05?.description ?? null} canEdit={canContribute}
           onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
@@ -954,7 +956,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
       {showHistory && (
         <DescriptionHistoryModal
           placeId={place.id}
-          canRestore={canEditDescription}
+          canRestore={canContribute}
           onClose={() => setShowHistory(false)}
           onRestored={() => { setShowHistory(false); refreshV05() }}
         />

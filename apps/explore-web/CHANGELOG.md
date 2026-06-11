@@ -1,3 +1,10 @@
+# ALPHA V0.9.38
+## Renommer un lieu : enfin possible
+
+Le renommage d'un lieu était cassé : impossible d'enregistrer le nouveau nom. C'est corrigé. Et comme pour le bouton « Contribuer », le crayon est désormais accessible à tous ceux qui ont un lien avec le lieu — l'avoir visité en GPS, le tenir à distance, ou en être le créateur.
+
+---
+
 # ALPHA V0.9.37
 ## Mise à jour visible aussi sur la carte
 
