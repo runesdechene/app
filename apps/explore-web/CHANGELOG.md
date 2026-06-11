@@ -1,3 +1,10 @@
+# ALPHA V0.9.48
+## Scrollbars masquées dans toute l'app
+
+La barre de défilement disparaît partout dans l'application, pour une interface plus épurée. Le défilement reste évidemment fonctionnel.
+
+---
+
 # ALPHA V0.9.47
 ## Classement de faction : scrollbar masquée
 

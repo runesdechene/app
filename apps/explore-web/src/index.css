@@ -36,6 +36,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* Scrollbar masquée partout (le défilement reste fonctionnel).
+     Firefox + Edge legacy ; WebKit/Chrome/Safari via la pseudo ci-dessous. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 html, body, #root {
