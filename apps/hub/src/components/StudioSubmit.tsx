@@ -90,13 +90,25 @@ export function StudioSubmit() {
   const [asideUrl, setAsideUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const questRef = new URLSearchParams(window.location.search).get('quete')
+  // Mission rattachée à l'envoi. Défaut : aucune (« envoi libre »). Un envoi
+  // classique ne doit JAMAIS être compté dans une mission sans choix explicite.
+  // Le param `?quete=` (deep-link depuis le CTA d'une mission) ne fait que
+  // pré-sélectionner — l'utilisateur voit et peut changer.
+  const [activeMissions, setActiveMissions] = useState<Array<{ slug: string; title: string }>>([])
+  const [selectedQuest, setSelectedQuest] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.rpc('get_studio_config').then(({ data }) => {
       const c = data as { bg_image_url?: string; aside_image_url?: string; welcome_crowns?: number } | null
       if (c) { setBgUrl(c.bg_image_url || ''); setAsideUrl(c.aside_image_url || ''); setWelcomeCrowns(c.welcome_crowns || 0) }
     })
+    supabase.from('missions').select('slug, title').eq('status', 'published').order('starts_at', { ascending: false })
+      .then(({ data }) => {
+        const missions = (data as Array<{ slug: string; title: string }>) ?? []
+        setActiveMissions(missions)
+        const fromUrl = new URLSearchParams(window.location.search).get('quete')
+        if (fromUrl && missions.some(m => m.slug === fromUrl)) setSelectedQuest(fromUrl)
+      })
   }, [])
 
   const addFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +158,7 @@ export function StudioSubmit() {
         p_user_id: userId, p_submitter_name: name.trim(), p_submitter_email: email.toLowerCase().trim(),
         p_submitter_instagram: null, p_message: message.trim() || null,
         p_consent_brand: consentBrand, p_consent_account: consentAccount,
-        p_departement: departement || null, p_quest_ref: questRef,
+        p_departement: departement || null, p_quest_ref: selectedQuest,
         p_model_height_cm: parsedHeightCm,
         p_rating_experience: ratingExperience || null,
         p_rating_products: ratingProducts || null,
@@ -247,6 +259,18 @@ export function StudioSubmit() {
               <div className="studio__kick">Étape 1 sur 4</div>
               <h2 className="studio__h">Tes contenus</h2>
               <p className="studio__lead">Dépose tes photos et vidéos — jusqu'à {MAX_FILES}.</p>
+              {activeMissions.length > 0 && (
+                <div style={{ margin: '0 0 1.1rem' }}>
+                  <label className="studio__label">Ces contenus répondent-ils à une mission en cours ?</label>
+                  <select className="studio__field" value={selectedQuest ?? ''} onChange={(e) => setSelectedQuest(e.target.value || null)}>
+                    <option value="">Envoi libre — aucune mission</option>
+                    {activeMissions.map(m => <option key={m.slug} value={m.slug}>{m.title}</option>)}
+                  </select>
+                  <p style={{ fontSize: '.8rem', opacity: .7, margin: '.35rem 0 0', lineHeight: 1.4 }}>
+                    Choisis une mission seulement si tes contenus correspondent à son thème. Sinon, laisse « Envoi libre ».
+                  </p>
+                </div>
+              )}
               <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={addFiles} style={{ display: 'none' }} />
               <div className="studio__drop" onClick={() => fileInputRef.current?.click()}>⬆ Glisse ou clique pour ajouter</div>
               {previews.length > 0 && (
