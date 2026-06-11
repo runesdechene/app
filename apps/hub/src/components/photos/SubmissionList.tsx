@@ -6,9 +6,10 @@ interface SubmissionListProps {
   submissions: PhotoSubmission[]
   selectedId: string | null
   onSelect: (id: string) => void
+  missionTitles: Record<string, string>
 }
 
-export function SubmissionList({ submissions, selectedId, onSelect }: SubmissionListProps) {
+export function SubmissionList({ submissions, selectedId, onSelect, missionTitles }: SubmissionListProps) {
   return (
     <div className="mod-list">
       {submissions.map(sub => {
@@ -29,6 +30,11 @@ export function SubmissionList({ submissions, selectedId, onSelect }: Submission
             </div>
             <div className="mod-row__info">
               <span className="mod-row__name">{sub.submitter_name}</span>
+              {sub.quest_ref && (
+                <span className="mod-row__quest" title={`Rattachée à la mission : ${missionTitles[sub.quest_ref] ?? sub.quest_ref}`}>
+                  ⚑ {missionTitles[sub.quest_ref] ?? sub.quest_ref}
+                </span>
+              )}
               <span className="mod-row__meta">
                 {imgs.length > 1 && <span>{imgs.length} fichiers</span>}
                 {sub.tags.length > 0 && <span>#{sub.tags.length}</span>}

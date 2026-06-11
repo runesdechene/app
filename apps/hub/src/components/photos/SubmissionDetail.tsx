@@ -11,6 +11,7 @@ import type { ShopifyProductHit } from '../../lib/shopifyProducts'
 interface SubmissionDetailProps {
   submission: PhotoSubmission
   allTags: PhotoTag[]
+  missionTitles: Record<string, string>
   crowns: number
   onCrowns: (n: number) => void
   onModerate: (status: PhotoStatus, crowns?: number) => void
@@ -30,7 +31,7 @@ interface SubmissionDetailProps {
 }
 
 export function SubmissionDetail(props: SubmissionDetailProps) {
-  const { submission: sub, allTags } = props
+  const { submission: sub, allTags, missionTitles } = props
   const images = [...sub.hub_submission_images].sort((a, b) => a.sort_order - b.sort_order)
   const [activeIdx, setActiveIdx] = useState(0)
   const [editingMsg, setEditingMsg] = useState(false)
@@ -55,7 +56,7 @@ export function SubmissionDetail(props: SubmissionDetailProps) {
             {sub.submitter_instagram && <span>{sub.submitter_instagram}</span>}
             {(sub.location_name || sub.location_zip) && <span>{[sub.location_name, sub.location_zip].filter(Boolean).join(' — ')}</span>}
             {sub.departement && <span>Département : {sub.departement}</span>}
-            {sub.quest_ref && <span>⚑ {sub.quest_ref}</span>}
+            {sub.quest_ref && <span className="mod-detail__quest">⚑ Mission : {missionTitles[sub.quest_ref] ?? sub.quest_ref}</span>}
             <span>{new Date(sub.created_at).toLocaleDateString('fr-FR')}</span>
             {sub.rating_experience && <span>Expérience : {'★'.repeat(sub.rating_experience)}{'☆'.repeat(5 - sub.rating_experience)}</span>}
             {sub.rating_products && <span>Produits : {'★'.repeat(sub.rating_products)}{'☆'.repeat(5 - sub.rating_products)}</span>}

@@ -42,6 +42,7 @@ export function Photos() {
   const [downloadProgress, setDownloadProgress] = useState('')
   const [crownInput, setCrownInput] = useState<Record<string, number>>({})
   const [lightbox, setLightbox] = useState<{ images: SubmissionImage[]; index: number } | null>(null)
+  const [missionTitles, setMissionTitles] = useState<Record<string, string>>({})
 
   // Fetch tags
   useEffect(() => {
@@ -50,6 +51,15 @@ export function Photos() {
       if (data) setAllTags(data)
     }
     fetchTags()
+  }, [])
+
+  // Map slug→titre des missions, pour afficher le rattachement quest_ref en clair.
+  useEffect(() => {
+    supabase.from('missions').select('slug, title').then(({ data }) => {
+      const map: Record<string, string> = {}
+      for (const m of (data as Array<{ slug: string; title: string }> | null) ?? []) map[m.slug] = m.title
+      setMissionTitles(map)
+    })
   }, [])
 
   // Fetch submissions
@@ -410,12 +420,13 @@ export function Photos() {
         <div className="mod-empty">Aucune soumission</div>
       ) : (
         <div className="mod-split">
-          <SubmissionList submissions={filteredSubmissions} selectedId={selectedId} onSelect={setSelectedId} />
+          <SubmissionList submissions={filteredSubmissions} selectedId={selectedId} onSelect={setSelectedId} missionTitles={missionTitles} />
           {selected ? (
             <SubmissionDetail
               key={selected.id}
               submission={selected}
               allTags={allTags}
+              missionTitles={missionTitles}
               crowns={crownsFor(selected.id)}
               onCrowns={(n) => setCrownInput(prev => ({ ...prev, [selected.id]: n }))}
               onModerate={(status, crowns) => moderate(selected.id, status, crowns)}
