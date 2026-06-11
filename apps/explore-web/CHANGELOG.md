@@ -1,3 +1,10 @@
+# ALPHA V0.9.39
+## Photos en plein écran : la croix respire sur iPhone
+
+La croix de fermeture des photos ouvertes en plein écran était collée trop haut sur iPhone, sous l'encoche. Elle respecte désormais la zone de sécurité de l'écran — comme le compteur de photos en bas.
+
+---
+
 # ALPHA V0.9.38
 ## Renommer un lieu : enfin possible
 
