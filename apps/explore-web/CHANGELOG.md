@@ -1,3 +1,10 @@
+# ALPHA V0.9.50
+## Ajout de photo : même règle que le reste
+
+L'ajout d'une photo à un lieu suit désormais la même règle que le nom, les types et la description : réservé à l'ajouteur du lieu, aux personnes qui y sont allées sur place, et aux veilleurs. Révéler le lieu à distance ne suffit plus.
+
+---
+
 # ALPHA V0.9.49
 ## Modifier le type d'un lieu + qui peut éditer
 

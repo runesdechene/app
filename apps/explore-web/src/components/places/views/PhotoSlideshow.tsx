@@ -7,9 +7,12 @@ interface PhotoSlideshowProps {
   /** Clic sur une vignette → affiche cette photo dans le hero au-dessus. */
   onSelect: (index: number) => void
   onAddPhoto: () => void
+  /** « Présence ou veille » : seuls ajouteur / venus sur place / veilleurs peuvent
+   *  ajouter une photo. L'autorité reste la RPC ; ce booléen masque le bouton. */
+  canAddPhoto: boolean
 }
 
-export function PhotoSlideshow({ photos, activeIndex, onSelect, onAddPhoto }: PhotoSlideshowProps) {
+export function PhotoSlideshow({ photos, activeIndex, onSelect, onAddPhoto, canAddPhoto }: PhotoSlideshowProps) {
   return (
     <div className="photo-slideshow">
       {photos.map((url, i) => (
@@ -21,9 +24,11 @@ export function PhotoSlideshow({ photos, activeIndex, onSelect, onAddPhoto }: Ph
           <img src={url} alt="" loading="lazy" />
         </button>
       ))}
-      <button className="photo-slideshow-add" onClick={onAddPhoto}>
-        <span>+</span>Photo
-      </button>
+      {canAddPhoto && (
+        <button className="photo-slideshow-add" onClick={onAddPhoto}>
+          <span>+</span>Photo
+        </button>
+      )}
     </div>
   )
 }

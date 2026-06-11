@@ -606,6 +606,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         activeIndex={currentHeroPhotos.length ? imageIndex % currentHeroPhotos.length : 0}
         onSelect={setImageIndex}
         onAddPhoto={() => setShowAddPhoto(true)}
+        canAddPhoto={canEditMeta}
       />
 
       {/* Zone 2 — Body */}
