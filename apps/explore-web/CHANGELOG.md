@@ -1,3 +1,10 @@
+# ALPHA V0.9.41
+## Fragments : fin des bonus d'affinité fantômes
+
+La liste « Fragments disponibles » affichait encore un bonus « +X/j 🏴 » par affinité. Ce bonus ne donnait plus rien depuis le gel de la V0.5 — il laissait croire à des points jamais crédités. On le retire.
+
+---
+
 # ALPHA V0.9.40
 ## Coupe des Factions : barème nettoyé
 

@@ -48,7 +48,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [viewAllSection, setViewAllSection] = useState<PlacesTab | null>(null)
   const [showFactionMembers, setShowFactionMembers] = useState(false)
   const [showFragmentStore, setShowFragmentStore] = useState(false)
-  const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null; owned: boolean }>>([])
+  const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; owned: boolean }>>([])
   const [loadingFragments, setLoadingFragments] = useState(false)
   const [showTitlePicker, setShowTitlePicker] = useState(false)
   const [titleCategories, setTitleCategories] = useState<{
@@ -59,7 +59,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [playerStats, setPlayerStats] = useState<Record<string, number>>({})
   const [selectedTitleIds, setSelectedTitleIds] = useState<number[]>([])
   const [savingTitles, setSavingTitles] = useState(false)
-  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null; affinities: Array<{ tagId: string; tagTitle: string; tagIcon: string | null; tagColor: string; bonusPoints: number }> | null }>>([])
+  const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null }>>([])
 
   const { isMuted, muteUser, unmuteUser } = useMutedUsers()
 
@@ -635,21 +635,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     <div className="frag-grid-info">
                       <h3 className="frag-grid-name">{f.name}</h3>
                       {f.description && <p className="frag-grid-desc">{f.description}</p>}
-                      {f.affinities && f.affinities.length > 0 && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
-                          {f.affinities.map(a => (
-                            <span key={a.tagId} className="frag-grid-bonus" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                              <span style={{
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                width: 18, height: 18, borderRadius: '50%', background: a.tagColor, flexShrink: 0,
-                              }}>
-                                {a.tagIcon && <img src={a.tagIcon} alt="" style={{ width: 11, height: 11, filter: 'brightness(0) invert(1)' }} />}
-                              </span>
-                              <span>+{a.bonusPoints}/j 🏴 {a.tagTitle}</span>
-                            </span>
-                          ))}
-                        </div>
-                      )}
                       {f.link_url && (
                         <button className="frag-grid-shop-btn" onClick={() => window.open(f.link_url!, '_blank', 'noopener,noreferrer')}>
                           <img src={shopIcon} alt="" style={{ width: 14, height: 14, verticalAlign: 'middle', marginRight: 4, display: 'inline' }} />Découvrir la collection
