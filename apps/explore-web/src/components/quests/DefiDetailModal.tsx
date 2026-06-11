@@ -1,6 +1,7 @@
 import { InfoModal } from '../map/modals/InfoModal'
 import { DefiTagBadge } from './DefiTagBadge'
 import { DefiParticipants } from './DefiParticipants'
+import { formatDeadlineCountdown } from '../../lib/deadlineCountdown'
 import type { Defi } from '../../types/defi'
 
 /** Explication de l'action attendue, par type de défi. */
@@ -18,6 +19,7 @@ const ACTION_HINT: Record<Defi['action'], string> = {
  */
 export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => void }) {
   const isCollective = defi.scope === 'collective'
+  const countdown = defi.cadence === 'weekly' ? formatDeadlineCountdown(defi.endsAt) : null
   const progress = Math.min(defi.progress, defi.target)
   const pct = defi.target > 0 ? Math.min(100, Math.round((progress / defi.target) * 100)) : 0
 
@@ -32,6 +34,7 @@ export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => 
   } else {
     rows.push({ label: 'Avancement', value: `${progress} / ${defi.target}`, highlight: true })
   }
+  if (countdown) rows.push({ label: 'Date limite', value: `⏳ ${countdown}` })
   rows.push({ label: 'Récompense', value: `+${defi.reward} 🪙 Couronnes` })
   if (defi.claimed) rows.push({ label: 'Statut', value: 'Butin déjà perçu ✓', highlight: true })
 

@@ -11,6 +11,8 @@ export interface Defi {
   progress: number
   myContribution: number
   claimed: boolean
+  /** Fin de la fenêtre du défi (ISO). Sert au compte à rebours sur les défis hebdo. */
+  endsAt: string | null
   /** Visuels du tag de lieu ciblé (null si pas de tag, ex. énigme). */
   tag: { icon: string | null; color: string; background: string; title: string } | null
 }

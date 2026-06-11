@@ -1,5 +1,6 @@
 import type { Defi } from '../../types/defi'
 import { DefiTagBadge } from './DefiTagBadge'
+import { formatDeadlineCountdown } from '../../lib/deadlineCountdown'
 
 interface Props {
   defi: Defi
@@ -20,6 +21,8 @@ export function DefiCard({ defi, label, onClick }: Props) {
   const progress = Math.min(defi.progress, defi.target)
   const pct = defi.target > 0 ? Math.min(100, Math.round((progress / defi.target) * 100)) : 0
   const progressLabel = defi.claimed ? '✓' : `${progress}/${defi.target}`
+  // Date limite : compte à rebours uniquement sur les défis hebdo non réclamés.
+  const countdown = defi.cadence === 'weekly' && !defi.claimed ? formatDeadlineCountdown(defi.endsAt) : null
 
   const keyActivate = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
@@ -48,6 +51,7 @@ export function DefiCard({ defi, label, onClick }: Props) {
         <div className="cqc-bar">
           <div className="cqc-bar-fill" style={{ width: `${pct}%` }} />
         </div>
+        {countdown && <span className="defi-card-deadline">⏳ {countdown}</span>}
       </div>
     </div>
   )

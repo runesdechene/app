@@ -5,6 +5,7 @@ import type { MissionState, MissionSubmission, MySubmissionStatus, MissionPartic
 import { MissionSalon } from './MissionSalon'
 import { MissionParticipants } from './MissionParticipants'
 import { useToastStore } from '../../stores/toastStore'
+import { formatDeadlineCountdown } from '../../lib/deadlineCountdown'
 import './MissionModal.css'
 
 export function MissionModal({ slug, onClose }: { slug: string; onClose: () => void }) {
@@ -98,6 +99,7 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
   }
 
   const daysLeft = m.endsAt ? Math.max(0, Math.ceil((new Date(m.endsAt).getTime() - Date.now()) / 86400000)) : null
+  const countdown = formatDeadlineCountdown(m.endsAt)
   const readOnlySalon = m.status !== 'published'
 
   return createPortal(
@@ -120,6 +122,9 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                 <div className="mission-modal-eyebrow">{m.eyebrow ?? 'Mission'}</div>
                 <h2 className="mission-modal-title">{m.title}</h2>
                 {m.call && <div className="mission-modal-call">« {m.call} »</div>}
+                {countdown && m.status === 'published' && (
+                  <div className="mission-modal-countdown">⏳ {countdown}</div>
+                )}
                 {m.isParticipant ? (
                   <div className="mission-modal-engaged">
                     <span className="mission-modal-engaged-stamp">✓</span>

@@ -81,6 +81,16 @@
   border-radius: 10px;
 }
 
+.defi-card-deadline {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-accent);
+  font-size: 11px;
+  font-weight: 600;
+  color: #a14a2a;
+  opacity: 0.85;
+}
+
 .defi-card-completed .defi-card-title { opacity: 0.55; }
 .defi-card-completed .defi-card-progress {
   background: rgba(46, 125, 50, 0.18);

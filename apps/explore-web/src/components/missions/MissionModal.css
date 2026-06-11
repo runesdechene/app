@@ -143,6 +143,18 @@
   line-height: 1.4;
 }
 
+.mission-modal-countdown {
+  margin-top: 8px;
+  display: inline-block;
+  font-family: var(--font-accent);
+  font-size: 13px;
+  font-weight: 700;
+  color: #a14a2a;
+  background: rgba(161, 74, 42, 0.1);
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+
 /* ─────────── Rangée d'avatars des engagés (la « vie ») ─────────── */
 .mission-engaged-row {
   display: flex;

@@ -1,3 +1,10 @@
+# ALPHA V0.9.44
+## Défis : la date limite enfin visible
+
+Les défis hebdomadaires (collectif et individuel) et les missions photo affichent désormais un compte à rebours clair — « Plus que 3 jours », « Dernier jour » — sur la carte du défi comme dans son détail. Fini de deviner quand un défi se termine.
+
+---
+
 # ALPHA V0.9.43
 ## Titres : la jauge de progression avance enfin
 
