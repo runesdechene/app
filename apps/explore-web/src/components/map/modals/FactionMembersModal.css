@@ -35,7 +35,8 @@
   text-align: center;
   overflow-y: auto;
   max-height: calc(85vh - 80px);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .faction-members-title {
@@ -74,7 +75,15 @@
   min-width: 0;
   overflow-y: auto;
   max-height: calc(85vh - 80px);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Scrollbar masquée (scroll conservé) — WebKit/Chrome/Safari */
+.faction-members-sidebar::-webkit-scrollbar,
+.faction-members-main::-webkit-scrollbar,
+.faction-members-modal::-webkit-scrollbar {
+  display: none;
 }
 
 .faction-members-list-title {
@@ -208,6 +217,8 @@
       16px
       calc(env(safe-area-inset-bottom, 0px) + 20px);
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   /* iOS Safari browser mode : env() = 0 → fallbacks (47px haut, 20px bas). */
   @supports (-webkit-touch-callout: none) {

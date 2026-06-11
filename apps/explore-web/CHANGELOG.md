@@ -1,3 +1,10 @@
+# ALPHA V0.9.47
+## Classement de faction : scrollbar masquée
+
+Petite touche esthétique — la barre de défilement disparaît du classement de faction (le défilement, lui, reste).
+
+---
+
 # ALPHA V0.9.46
 ## Classement de faction : les actifs en un coup d'œil
 
