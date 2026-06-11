@@ -1,0 +1,137 @@
+.edit-tags-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.edit-tags-modal {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--color-parchment, #f7ede1);
+  border: 1px solid rgba(193, 154, 107, 0.4);
+  border-radius: 14px;
+  padding: 22px 20px 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.edit-tags-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(193, 154, 107, 0.18);
+  color: var(--color-ink, #4a3728);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-tags-title {
+  font-family: var(--font-title, serif);
+  font-size: 22px;
+  color: var(--color-ink, #4a3728);
+  margin: 0 0 2px;
+}
+
+.edit-tags-sub {
+  font-size: 13px;
+  color: #8a7b6a;
+  margin: 0 0 14px;
+}
+
+.edit-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-tags-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  font-family: var(--font-accent, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s, border-color 0.15s, transform 0.1s;
+}
+.edit-tags-pill:hover { opacity: 0.85; }
+.edit-tags-pill.selected {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.edit-tags-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.edit-tags-icon {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.edit-tags-error {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #b5443a;
+}
+
+.edit-tags-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.edit-tags-cancel,
+.edit-tags-save {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-family: var(--font-accent, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(193, 154, 107, 0.4);
+}
+.edit-tags-cancel {
+  background: transparent;
+  color: #8a7b6a;
+}
+.edit-tags-save {
+  background: var(--color-sepia, #c19a6b);
+  color: #fff;
+  border-color: var(--color-sepia, #c19a6b);
+}
+.edit-tags-save:disabled,
+.edit-tags-cancel:disabled { opacity: 0.5; cursor: default; }

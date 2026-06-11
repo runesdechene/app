@@ -24,6 +24,7 @@ import { formatRelativeTime } from '../../../lib/dateFormat'
 import { DescriptionEditModal } from '../modals/DescriptionEditModal'
 import { DescriptionHistoryModal } from '../modals/DescriptionHistoryModal'
 import { AddPhotoModal } from '../modals/AddPhotoModal'
+import { EditPlaceTagsModal } from '../modals/EditPlaceTagsModal'
 import { PhotoLightbox } from '../modals/PhotoLightbox'
 import { PlaceExplorersModal } from '../modals/PlaceExplorersModal'
 import type { V05Detail, V05Contribution, PlacePanelActiveTab } from '../../../types/placeDetail'
@@ -350,7 +351,6 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
 function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
-  const discoveredIds = usePlayerStore(s => s.discoveredIds)
   // Mode Coupe des Héritages actif sur la carte → La Cour dépliée par défaut.
   const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const { calendarRef } = useCalendarRef()
@@ -374,6 +374,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [titleDraft, setTitleDraft] = useState(place.title)
   const [titleSaving, setTitleSaving] = useState(false)
   const [showEditDescr, setShowEditDescr] = useState(false)
+  const [showEditTags, setShowEditTags] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showAddPhoto, setShowAddPhoto] = useState(false)
   const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null)
@@ -437,9 +438,12 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   // ce booléen ne fait qu'afficher/masquer le point d'entrée.
   const canEditPosition = isAuthor || v05?.isExplorer === true
 
-  // Condition canonique « peut contribuer » (= bouton Contribuer) : visiteur GPS,
-  // créateur, ou découvreur à distance. Gouverne description, révisions ET renommage.
-  const canContribute = (v05?.isExplorer === true) || isAuthor || discoveredIds.has(place.id)
+  // « Présence ou veille » — édite l'IDENTITÉ du lieu (titre, tags, description) :
+  // ajouteur, venu sur place (GPS), ou veilleur. PAS la simple révélation au
+  // brouillard. L'autorité reste la RPC (gate _can_edit_place_meta) ; ce booléen
+  // ne fait qu'afficher/masquer les crayons.
+  const isVeilleurMe = placeOverride?.veilleurUserId != null && placeOverride.veilleurUserId === userId
+  const canEditMeta = isAuthor || v05?.isExplorer === true || isVeilleurMe
 
   const currentHeroPhotos = heroPhotos.length > 0 ? heroPhotos : []
   const heroPhotoUrl = currentHeroPhotos.length > 0
@@ -630,7 +634,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             ) : (
               <h2 className="place-title">
                 {place.title}
-                {canContribute && (
+                {canEditMeta && (
                   <button className="place-title-edit-pencil" onClick={() => setEditingTitle(true)} title="Renommer ce lieu">
                     ✏️
                   </button>
@@ -712,6 +716,15 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
                 {tag.title}
               </span>
             ))}
+            {canEditMeta && (
+              <button
+                className="place-tags-edit-pencil"
+                onClick={() => setShowEditTags(true)}
+                title="Modifier les types de ce lieu"
+              >
+                ✏️
+              </button>
+            )}
             {/* V0.7 phase 5 (6 mai) — pilule "Revendiqué par {nom}" retirée :
                 redondante avec la section "Lieu protégé par Diane" affichée
                 par CourtFold juste en-dessous du panel. */}
@@ -854,7 +867,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         />
 
         {/* Description collaborative */}
-        <PlaceDescription description={v05?.description ?? null} canEdit={canContribute}
+        <PlaceDescription description={v05?.description ?? null} canEdit={canEditMeta}
           onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
@@ -956,9 +969,17 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
       {showHistory && (
         <DescriptionHistoryModal
           placeId={place.id}
-          canRestore={canContribute}
+          canRestore={canEditMeta}
           onClose={() => setShowHistory(false)}
           onRestored={() => { setShowHistory(false); refreshV05() }}
+        />
+      )}
+      {showEditTags && (
+        <EditPlaceTagsModal
+          placeId={place.id}
+          currentTagIds={place.tags.map(t => t.id)}
+          onClose={() => setShowEditTags(false)}
+          onSaved={() => { setShowEditTags(false); refreshV05(); onRefetch() }}
         />
       )}
       {showAddPhoto && (

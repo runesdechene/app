@@ -386,8 +386,23 @@
 .place-tags {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   margin-bottom: 10px;
+}
+
+.place-tags-edit-pencil {
+  background: none;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.4;
+  padding: 0 2px;
+  line-height: 1;
+  transition: opacity 0.15s;
+}
+.place-tags-edit-pencil:hover {
+  opacity: 0.8;
 }
 
 .place-tag {

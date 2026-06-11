@@ -1,3 +1,10 @@
+# ALPHA V0.9.49
+## Modifier le type d'un lieu + qui peut éditer
+
+On peut désormais corriger les **types (tags)** d'un lieu, comme son nom — via un petit crayon à côté des pastilles. Et surtout, on clarifie **qui peut éditer** l'identité d'un lieu (nom, types, description) : son ajouteur, les personnes qui y sont allées sur place, ou ses veilleurs. Avoir simplement révélé le lieu à distance ne suffit plus — fini les modifications « de passage ».
+
+---
+
 # ALPHA V0.9.48
 ## Scrollbars masquées dans toute l'app
 
