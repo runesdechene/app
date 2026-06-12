@@ -1,3 +1,10 @@
+# ALPHA V0.9.51
+## Les photos validées des quêtes s'affichent enfin
+
+Les photos envoyées pour une quête (ex. « D'Ombre & d'Airain ») et validées par l'État-Major apparaissent désormais dans la galerie « Les contributions » de la modale de mission. Un ancien verrou d'affichage par image, abandonné depuis longtemps, les masquait à tort.
+
+---
+
 # ALPHA V0.9.50
 ## Ajout de photo : même règle que le reste
 

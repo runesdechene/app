@@ -179,9 +179,9 @@ export function MissionModal({ slug, onClose }: { slug: string; onClose: () => v
                   <section className="mission-modal-section">
                     <h3>Les contributions · {subs.length}</h3>
                     <div className="mission-modal-gallery">
-                      {subs.map((s) => (
+                      {subs.map((s, i) => (
                         <div
-                          key={s.submissionId}
+                          key={`${s.submissionId}-${i}`}
                           className="mission-modal-tile"
                           style={{ backgroundImage: `url(${s.imageUrl})` }}
                         >
