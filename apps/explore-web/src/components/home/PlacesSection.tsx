@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useMapStore } from '../../stores/mapStore'
+import { useDragScroll } from '../../hooks/useDragScroll'
 import './PlacesSection.css'
 
 interface Place {
@@ -45,6 +46,7 @@ const LIMIT = 9
 
 export function PlacesSection() {
   const setSelectedPlaceId = useMapStore((s) => s.setSelectedPlaceId)
+  const scrollRef = useDragScroll<HTMLDivElement>()
   const [tab, setTab] = useState<Tab>('recent')
   const [recentPlaces, setRecentPlaces] = useState<Place[]>([])
   const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([])
@@ -130,7 +132,7 @@ export function PlacesSection() {
 
       {!loading && places.length > 0 && (
         <div className="places-section-scroll-wrapper">
-          <div className="places-section-scroll">
+          <div className="places-section-scroll" ref={scrollRef}>
             {places.map((p) => (
               <button
                 key={p.id}

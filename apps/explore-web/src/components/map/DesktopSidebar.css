@@ -142,6 +142,17 @@
   display: none;
 }
 
+/* Scrub souris (useDragScroll) : curseur main. */
+.desktop-sidebar .home-nouvelles-row,
+.desktop-sidebar .places-section-scroll {
+  cursor: grab;
+}
+.desktop-sidebar .home-nouvelles-row.is-dragging,
+.desktop-sidebar .places-section-scroll.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 /* Blocs Nouvelles un peu plus larges + accroche au scroll. */
 .desktop-sidebar .home-nouvelles-card {
   flex: 0 0 200px;
@@ -149,12 +160,12 @@
 }
 
 .desktop-sidebar .home-nouvelles-thumb {
-  height: 116px;
+  height: 76px;
 }
 
 /* Lieux récents : marge à gauche (sinon le 1er bloc colle au bord du rail). */
 .desktop-sidebar .places-section {
-  padding-left: 10px;
+  padding-left: 15px;
 }
 
 @media (max-width: 749px) {

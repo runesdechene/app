@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAnnouncementsList } from '../../hooks/useAnnouncements'
+import { useDragScroll } from '../../hooks/useDragScroll'
 import './HomeNouvellesSection.css'
 
 interface Props {
@@ -15,16 +16,17 @@ interface Props {
  */
 export function HomeNouvellesSection({ onOpenArticle }: Props = {}) {
   const { items, loading } = useAnnouncementsList(3)
+  const rowRef = useDragScroll<HTMLDivElement>()
   if (loading || items.length === 0) return null
 
   return (
     <section className="home-section home-nouvelles">
       <header className="home-nouvelles-header">
-        <h2 className="home-section-title">Nouvelles</h2>
+        <h2 className="home-section-title">Nouveautés</h2>
         {/* "Tout voir" → /nouvelles (mobile-only). Masqué en mode modale desktop. */}
         {!onOpenArticle && <Link to="/nouvelles" className="home-nouvelles-all">Tout voir →</Link>}
       </header>
-      <div className="home-nouvelles-row">
+      <div className="home-nouvelles-row" ref={rowRef}>
         {items.map((a) =>
           onOpenArticle ? (
             <button
