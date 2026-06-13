@@ -49,7 +49,7 @@ export function DesktopSidebar({ openFactionModal }: { openFactionModal: () => v
 
       <div className="desktop-sidebar-content">
         {tab === 'home' ? (
-          <HomeFeed openFactionModal={openFactionModal} showActivity={false} showCoupe={false} />
+          <HomeFeed openFactionModal={openFactionModal} showActivity={false} showCoupe={false} placesFirst />
         ) : (
           <main className="activity-page-scroll">
             <h1 className="activity-page-title">Activité de la carte</h1>

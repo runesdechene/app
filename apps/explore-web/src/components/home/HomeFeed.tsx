@@ -29,6 +29,9 @@ export interface HomeFeedProps {
   /** Affiche la section "Coupe des Héritages". Défaut : true.
    *  Desktop : false — masquée dans la leftbar. */
   showCoupe?: boolean
+  /** Place "Lieux récents" avant "Événements & Quêtes". Défaut : false.
+   *  Desktop : true. */
+  placesFirst?: boolean
 }
 
 /**
@@ -38,7 +41,7 @@ export interface HomeFeedProps {
  * au feed (énigme, fragment, expédition, mission). Les hooks d'init globaux
  * (usePlayer/useChat/etc.) sont montés par le parent (MobileLayout / MapPage).
  */
-export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true }: HomeFeedProps) {
+export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true, placesFirst = false }: HomeFeedProps) {
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{
@@ -103,27 +106,33 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
 
         <HomeNouvellesSection />
 
-        <section className="home-section">
-          <div className="home-card">
-            <header className="home-card-header">
-              <h2 className="home-card-title">Événements & Quêtes</h2>
-              <button
-                type="button"
-                className="home-card-cta-mini"
-                onClick={() => setCreatorOpen(true)}
-              >
-                + Créer
-              </button>
-            </header>
-            <DefisBoard />
-            <section className="qbp-section"><h4 className="qbp-section-title">Mission</h4><MissionEntryCard /></section>
-            <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
-          </div>
-        </section>
-
-        <section className="home-section home-section--no-padding">
-          <PlacesSection />
-        </section>
+        {(() => {
+          const eventsQuests = (
+            <section key="events" className="home-section">
+              <div className="home-card">
+                <header className="home-card-header">
+                  <h2 className="home-card-title">Événements & Quêtes</h2>
+                  <button
+                    type="button"
+                    className="home-card-cta-mini"
+                    onClick={() => setCreatorOpen(true)}
+                  >
+                    + Créer
+                  </button>
+                </header>
+                <DefisBoard />
+                <section className="qbp-section"><h4 className="qbp-section-title">Mission</h4><MissionEntryCard /></section>
+                <ExpeditionsList onOpenExpedition={setSelectedExpeditionId} />
+              </div>
+            </section>
+          )
+          const places = (
+            <section key="places" className="home-section home-section--no-padding">
+              <PlacesSection />
+            </section>
+          )
+          return placesFirst ? [places, eventsQuests] : [eventsQuests, places]
+        })()}
 
         {showCoupe && (
           <section className="home-section">
