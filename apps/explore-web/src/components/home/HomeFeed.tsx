@@ -10,6 +10,7 @@ import { PlacesSection } from './PlacesSection'
 import { MapActivityList } from './MapActivityList'
 import { CoupeHeritagesSection } from './coupe/CoupeHeritagesSection'
 import { HomeNouvellesSection } from './HomeNouvellesSection'
+import { ArticleModal } from '../announcements/ArticleModal'
 import { DailyEnigma } from '../enigma/DailyEnigma'
 import { FragmentEnigma } from '../enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../expeditions/ExpeditionCreator'
@@ -32,6 +33,9 @@ export interface HomeFeedProps {
   /** Place "Lieux récents" avant "Événements & Quêtes". Défaut : false.
    *  Desktop : true. */
   placesFirst?: boolean
+  /** Ouvre les Nouvelles en modale (au lieu de naviguer vers /article/:slug,
+   *  route mobile-only). Défaut : false. Desktop : true. */
+  articleAsModal?: boolean
 }
 
 /**
@@ -41,7 +45,8 @@ export interface HomeFeedProps {
  * au feed (énigme, fragment, expédition, mission). Les hooks d'init globaux
  * (usePlayer/useChat/etc.) sont montés par le parent (MobileLayout / MapPage).
  */
-export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true, placesFirst = false }: HomeFeedProps) {
+export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true, placesFirst = false, articleAsModal = false }: HomeFeedProps) {
+  const [articleSlug, setArticleSlug] = useState<string | null>(null)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{
@@ -104,7 +109,7 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
           />
         </section>
 
-        <HomeNouvellesSection />
+        <HomeNouvellesSection onOpenArticle={articleAsModal ? setArticleSlug : undefined} />
 
         {(() => {
           const eventsQuests = (
@@ -183,6 +188,9 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
         />
       )}
       <MissionModalHost />
+      {articleSlug && (
+        <ArticleModal slug={articleSlug} onClose={() => setArticleSlug(null)} />
+      )}
     </>
   )
 }

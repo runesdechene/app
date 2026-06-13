@@ -1,0 +1,57 @@
+/* ==========================================
+   ARTICLE MODAL — lecteur d'une Nouvelle (desktop)
+   ========================================== */
+
+.article-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.article-modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--color-parchment);
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.article-modal-close {
+  position: sticky;
+  top: 0;
+  float: right;
+  width: 34px;
+  height: 34px;
+  margin: -8px -8px 0 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-parchment-dark);
+  color: var(--color-ink);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.2);
+  z-index: 1;
+}
+
+.article-modal-close:hover {
+  background: var(--color-sepia);
+  color: var(--color-parchment);
+}
+
+/* Les classes de contenu (.article-cover/.article-title/.article-date/
+   .article-body) sont héritées d'ArticlePage.css (importé par le composant). */
+.article-modal .article-cover {
+  margin-top: 4px;
+}

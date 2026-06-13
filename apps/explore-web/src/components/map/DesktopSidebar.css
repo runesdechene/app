@@ -14,7 +14,11 @@
   background: var(--color-parchment);
   border-right: 1px solid var(--color-sepia);
   box-shadow: 2px 0 12px rgba(74, 55, 40, 0.12);
-  z-index: 12;
+  /* PAS de z-index : en tant que flex-item, un z-index créerait un contexte
+     d'empilement qui plafonnerait les modales rendues dans la sidebar
+     (EnigmaMenu, DailyEnigma, ExpeditionModal…) sous les contrôles carte
+     (z-index 15). Sans z-index, ces modales (position:fixed) s'empilent au
+     niveau racine et passent bien par-dessus tout. */
 }
 
 /* Rail vertical de sélection (gauche) */
