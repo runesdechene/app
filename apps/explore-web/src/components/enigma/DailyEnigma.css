@@ -20,7 +20,7 @@
   border-radius: 16px;
   padding: 24px;
   width: 100%;
-  max-width: 440px;
+  max-width: 560px;
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
@@ -376,9 +376,11 @@
   background: rgba(0, 0, 0, 0.3);
   z-index: 10000;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 60px 16px 0;
+  /* Centré au milieu de la page (avant : haut-droite, hérité du chest button
+     carte qui n'existe plus). */
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 
 .enigma-menu {
@@ -386,8 +388,9 @@
   border: 2px solid #c9a96e;
   border-radius: 12px;
   padding: 12px;
+  width: 100%;
   min-width: 240px;
-  max-width: 300px;
+  max-width: 420px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 

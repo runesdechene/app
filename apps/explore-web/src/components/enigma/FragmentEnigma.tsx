@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
@@ -114,7 +115,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
     setSubmitting(false)
   }
 
-  return (
+  return createPortal(
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <button className="enigma-close" onClick={onClose}>{'\u2715'}</button>
@@ -178,6 +179,7 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

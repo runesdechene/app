@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
@@ -184,7 +185,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const isLast = currentIndex >= enigmas.length - 1
   const progress = enigmas.length > 0 ? `${currentIndex + 1} / ${enigmas.length}` : ''
 
-  return (
+  return createPortal(
     <div className="enigma-overlay" onClick={onClose}>
       <div className="enigma-modal" onClick={e => e.stopPropagation()}>
         <button className="enigma-close-x" onClick={onClose}>&#10005;</button>
@@ -304,6 +305,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

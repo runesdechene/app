@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
@@ -39,7 +40,7 @@ function getTimeUntil(isoDate: string | null): string {
 export function EnigmaMenu({ dailyDone, dailyCountdown, fragments, onSelectDaily, onSelectFragment, onClose }: Props) {
   const visibleFragments = fragments.filter((f) => f.hasEnigma || f.enigmaCooldown)
 
-  return (
+  return createPortal(
     <div className="enigma-menu-overlay" onClick={onClose}>
       <div className="enigma-menu" onClick={(e) => e.stopPropagation()}>
         <p className="enigma-menu-title">Choisissez une énigme</p>
@@ -88,6 +89,7 @@ export function EnigmaMenu({ dailyDone, dailyCountdown, fragments, onSelectDaily
           )
         })}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
