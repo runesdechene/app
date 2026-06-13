@@ -12,6 +12,13 @@
     flex-direction: row;
   }
 
+  /* Replié : la leftbar se réduit à son rail (64px). Le contenu (flex:1) tombe
+     alors à 0 et est masqué (cf. DesktopSidebar.css). Carte + contrôles bas
+     suivent automatiquement via --sidebar-w. */
+  .app[data-sidebar-collapsed='true'] {
+    --sidebar-w: 64px;
+  }
+
   /* La carte devient un flex-item qui prend l'espace restant à droite de la
      leftbar (flex-basis:0 → ignore le width:100% inline de MAP_CONTAINER_STYLE). */
   .explore-map-root {
@@ -21,8 +28,8 @@
 
   /* Contrôles bas-gauche : décalés pour ne pas passer sous la leftbar. */
   .add-place-fab {
-    left: calc(var(--sidebar-w, 364px) + 24px);
-    bottom: 24px;
+    left: calc(var(--sidebar-w, 364px) + 34px);
+    bottom: 34px;
   }
 
   /* Compteur de lieux découverts → bas-droite, empilé au-dessus des layers

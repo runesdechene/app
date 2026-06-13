@@ -14,11 +14,19 @@
   background: var(--color-parchment);
   border-right: 1px solid var(--color-sepia);
   box-shadow: 2px 0 12px rgba(74, 55, 40, 0.12);
+  transition: flex-basis 0.18s ease, width 0.18s ease;
   /* PAS de z-index : en tant que flex-item, un z-index créerait un contexte
      d'empilement qui plafonnerait les modales rendues dans la sidebar
      (EnigmaMenu, DailyEnigma, ExpeditionModal…) sous les contrôles carte
      (z-index 15). Sans z-index, ces modales (position:fixed) s'empilent au
      niveau racine et passent bien par-dessus tout. */
+}
+
+/* Replié : le contenu (flex:1) tombe à 0 (rail = 64px = toute la largeur).
+   On clippe le débordement et on coupe l'interaction ; HomeFeed reste monté. */
+.desktop-sidebar.is-collapsed .desktop-sidebar-content {
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Rail vertical de sélection (gauche) */
@@ -31,6 +39,29 @@
   padding: 12px 6px;
   background: var(--color-parchment-dark);
   border-right: 1px solid var(--color-sepia);
+}
+
+/* Bouton replier/déplier (chevron) en haut du rail. */
+.desktop-sidebar-collapse {
+  align-self: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 6px;
+  border: 1px solid var(--color-sepia);
+  border-radius: 8px;
+  background: var(--color-parchment);
+  color: var(--color-ink-light);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.desktop-sidebar-collapse:hover {
+  background: var(--color-sepia);
+  color: var(--color-parchment);
 }
 
 .desktop-sidebar-tab {
@@ -169,7 +200,6 @@
 
 /* Lieux récents : marge à gauche (sinon le 1er bloc colle au bord du rail). */
 .desktop-sidebar .places-section {
-  padding-left: 15px;
 }
 
 @media (max-width: 749px) {

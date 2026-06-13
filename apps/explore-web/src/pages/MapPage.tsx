@@ -61,6 +61,7 @@ import { VictoryModal } from '../components/map/modals/VictoryModal'
 import { useVictoryModalStore } from '../stores/victoryModalStore'
 import { QuestRewardModal } from '../components/quests/QuestRewardModal'
 import { supabase } from '../lib/supabase'
+import { safeStorage } from '../lib/safeStorage'
 import { DesktopSidebar } from '../components/map/DesktopSidebar'
 import '../App.css'
 import '../styles/mobile.css'
@@ -108,6 +109,7 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => safeStorage.get('desktop_sidebar_collapsed') === '1')
   const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
   const [tutorialSlides, setTutorialSlides] = useState<TutorialSlide[]>([])
   const tutorialCompletedAt = usePlayerStore(s => s.tutorialCompletedAt)
@@ -337,7 +339,11 @@ export default function MapPage() {
   const isDesktop = useIsDesktop()
 
   return (
-    <div className="app" data-mobile-panel={mobilePanel || ''}>
+    <div
+      className="app"
+      data-mobile-panel={mobilePanel || ''}
+      data-sidebar-collapsed={isDesktop && sidebarCollapsed ? 'true' : undefined}
+    >
       <PushPromptHost />
       <PushSubscriptionSync />
       <PushAutoPrompt />
@@ -354,7 +360,15 @@ export default function MapPage() {
       {/* Leftbar desktop — Accueil (HomeFeed) / Activité. Rendue AVANT la carte
           pour être le 1er flex-item (à gauche) ; la carte prend le reste. */}
       {isDesktop && !addPlaceMode && !authLoading && isAuthenticated && (
-        <DesktopSidebar openFactionModal={() => setShowFactionModal(true)} />
+        <DesktopSidebar
+          openFactionModal={() => setShowFactionModal(true)}
+          collapsed={sidebarCollapsed}
+          onToggleCollapsed={() => setSidebarCollapsed(c => {
+            const next = !c
+            safeStorage.set('desktop_sidebar_collapsed', next ? '1' : '0')
+            return next
+          })}
+        />
       )}
 
       <ExploreMap />
