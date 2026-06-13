@@ -1,3 +1,10 @@
+# ALPHA V0.9.54
+## Couronnes : discrétion totale
+
+Le nombre de Couronnes disparaît complètement de la fiche de profil — y compris la vôtre. Votre solde reste affiché en permanence dans la barre de l'application, donc rien n'est perdu : on évite juste de l'étaler sur le profil.
+
+---
+
 # ALPHA V0.9.53
 ## Le profil raconte le vrai explorateur
 

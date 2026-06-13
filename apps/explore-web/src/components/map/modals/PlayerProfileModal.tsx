@@ -4,7 +4,6 @@ import { supabase } from '../../../lib/supabase'
 import { uploadAvatar } from '../../../lib/avatarUpload'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import { usePlayerStore } from '../../../stores/playerStore'
-import { useCrownsStore } from '../../../stores/crownsStore'
 import { useCoupe } from '../../../hooks/useCoupe'
 import shopIcon from '../../../assets/shop_icon.webp'
 import { useMapStore } from '../../../stores/mapStore'
@@ -27,7 +26,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   const currentUserId = usePlayerStore(s => s.userId)
-  const crownsBalance = useCrownsStore(s => s.balance)
   const { state: coupeState } = useCoupe(true)
   const level = usePlayerStore(s => s.level)
   const xpTotal = usePlayerStore(s => s.xpTotal)
@@ -375,15 +373,9 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     ) : null
                   )}
 
-                  {/* Couronnes \u2014 priv\u00E9es : visibles uniquement sur son propre
-                      profil. On ne doit pas pouvoir jauger la richesse d'autrui. */}
-                  {isSelf && (
-                    <div className="player-modal-stat">
-                      <span className="player-modal-stat-icon">{'\uD83E\uDE99'}</span>
-                      <span className="player-modal-stat-value">{crownsBalance}</span>
-                      <span className="player-modal-stat-label">{'Couronne'}{crownsBalance > 1 ? 's' : ''}</span>
-                    </div>
-                  )}
+                  {/* Couronnes retir\u00E9es du profil (V0.9.54) \u2014 le solde vit d\u00E9j\u00E0
+                      dans la barre de l'app ; inutile de le redonder, et \u00E7a reste
+                      priv\u00E9 vis-\u00E0-vis des autres. */}
 
                   {/* Lieux prot\u00E9g\u00E9s \u2014 affich\u00E9 pour tous, \u00E0 la place des Couronnes.
                       Source : veilledPlaces (place_veille), qui couvre le plantage
