@@ -370,21 +370,27 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     ) : null
                   )}
 
-                  {/* Couronnes */}
-                  {isSelf ? (
+                  {/* Couronnes \u2014 priv\u00E9es : visibles uniquement sur son propre
+                      profil. On ne doit pas pouvoir jauger la richesse d'autrui. */}
+                  {isSelf && (
                     <div className="player-modal-stat">
                       <span className="player-modal-stat-icon">{'\uD83E\uDE99'}</span>
                       <span className="player-modal-stat-value">{crownsBalance}</span>
                       <span className="player-modal-stat-label">{'Couronne'}{crownsBalance > 1 ? 's' : ''}</span>
                     </div>
-                  ) : (
-                    (profile.crownsBalance ?? 0) > 0 ? (
-                      <div className="player-modal-stat">
-                        <span className="player-modal-stat-icon">{'\uD83E\uDE99'}</span>
-                        <span className="player-modal-stat-value">{profile.crownsBalance}</span>
-                        <span className="player-modal-stat-label">{'Couronne'}{(profile.crownsBalance ?? 0) > 1 ? 's' : ''}</span>
-                      </div>
-                    ) : null
+                  )}
+
+                  {/* Territoires veill\u00E9s \u2014 affich\u00E9 pour tous, \u00E0 la place des
+                      Couronnes. Source : veilledPlaces (place_veille), qui couvre le
+                      plantage GPS ET la tenue \u00E0 distance via La Cour (basculement
+                      Couronnes, cf. invest_crowns mig 150). M\u00EAme compte que le
+                      carrousel \u00AB \u00C9tendard plant\u00E9 sur\u2026 \u00BB juste en dessous. */}
+                  {(profile.veilledPlaces?.length ?? 0) > 0 && (
+                    <div className="player-modal-stat">
+                      <span className="player-modal-stat-icon">{'\uD83D\uDEA9'}</span>
+                      <span className="player-modal-stat-value">{profile.veilledPlaces.length}</span>
+                      <span className="player-modal-stat-label">{'territoire'}{profile.veilledPlaces.length > 1 ? 's' : ''}</span>
+                    </div>
                   )}
 
                   {/* \u00C9nigmes r\u00E9solues */}

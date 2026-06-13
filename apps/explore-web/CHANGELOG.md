@@ -1,3 +1,10 @@
+# ALPHA V0.9.52
+## La fortune devient discrète, la vigilance se voit
+
+Le nombre de Couronnes n'apparaît plus sur le profil des autres explorateurs : impossible désormais de jauger qui est riche et qui ne l'est pas. À la place, chaque profil affiche le **nombre de territoires veillés** — qu'ils soient tenus sur place (étendard planté) ou à distance via La Cour. Vous gardez bien sûr la vue sur vos propres Couronnes.
+
+---
+
 # ALPHA V0.9.51
 ## Les photos validées des quêtes s'affichent enfin
 
