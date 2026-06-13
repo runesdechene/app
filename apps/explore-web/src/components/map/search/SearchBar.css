@@ -27,6 +27,23 @@
   display: flex; align-items: center; justify-content: center; padding: 0 4px;
 }
 
+/* Bouton « calques » (MapStyleSelect) intégré à la barre, à droite du filtre,
+   au même style que le funnel. Scopé .map-search-bar pour battre les règles
+   de positionnement d'origine (carte) + overrides mobile.css. */
+.map-search-bar .map-style-select {
+  position: relative; top: auto; left: auto; bottom: auto; z-index: auto;
+  flex-shrink: 0;
+}
+.map-search-bar .map-style-trigger {
+  width: 44px; height: 44px; border-radius: 22px;
+  background: #fbf6ea; border: 1px solid #b9956a; color: #84352f;
+  box-shadow: 0 3px 8px rgba(0,0,0,.18); backdrop-filter: none;
+}
+.map-search-bar .map-style-trigger:hover { background: #fff; }
+.map-search-bar .map-style-dropdown {
+  top: calc(100% + 8px); bottom: auto; right: 0; left: auto;
+}
+
 /* ── Desktop (≥750px, aligné sur useIsDesktop) ──────────────────────────────
    Barre ancrée en haut-centre ; on tape directement dans le champ, les
    résultats s'affichent dans un menu déroulant ancré sous la barre. */

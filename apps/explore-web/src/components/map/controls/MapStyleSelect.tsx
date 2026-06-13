@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useMapStore } from '../../../stores/mapStore'
 import './MapStyleSelect.css'
 
 export type MapStyleMode = 'game' | 'detailed' | 'satellite'
@@ -9,13 +10,14 @@ const STYLE_OPTIONS: { mode: MapStyleMode; label: string; icon: string }[] = [
   { mode: 'satellite', label: 'Satellite', icon: '\uD83D\uDEF0\uFE0F' },  // 🛰️
 ]
 
-interface Props {
-  mode: MapStyleMode
-  onChange: (m: MapStyleMode) => void
-  addPlaceMode: boolean
-}
-
-export function MapStyleSelect({ mode, onChange, addPlaceMode }: Props) {
+/**
+ * Bouton « calques » (sélecteur de style de carte). Autonome : lit/écrit
+ * mapStyleMode dans useMapStore, donc montable n'importe où (rendu dans la
+ * barre de recherche, à droite du filtre — cf. SearchBar).
+ */
+export function MapStyleSelect() {
+  const mode = useMapStore(s => s.mapStyleMode)
+  const onChange = useMapStore(s => s.setMapStyleMode)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -32,11 +34,7 @@ export function MapStyleSelect({ mode, onChange, addPlaceMode }: Props) {
   const current = STYLE_OPTIONS.find(o => o.mode === mode)!
 
   return (
-    <div
-      ref={ref}
-      className="map-style-select"
-      style={addPlaceMode ? { bottom: 70 } : undefined}
-    >
+    <div ref={ref} className="map-style-select">
       {/* Dropdown (s'ouvre vers le haut) */}
       {open && (
         <div className="map-style-dropdown">

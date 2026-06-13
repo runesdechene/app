@@ -23,7 +23,6 @@ import { OnlinePlayerMarkers } from '../markers/OnlinePlayerMarkers'
 import { FlyingEmojiLayer, type AvatarPositionResolver } from '../../social/FlyingEmojiLayer'
 import { useEmojiThrows } from '../../../hooks/useEmojiThrows'
 import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
-import { MapStyleSelect } from '../controls/MapStyleSelect'
 import { EnergyIndicator } from '../badges/EnergyIndicator'
 import { VeilleurNamePills } from '../markers/VeilleurNamePills'
 import { ExpeditionBanners } from '../markers/ExpeditionBanners'
@@ -73,7 +72,6 @@ export const ExploreMap = memo(function ExploreMap() {
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
   const factionColorMode = usePlayerStore(s => s.factionColorMode)
-  const setMapStyleMode = useMapStore(s => s.setMapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
 
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations.
@@ -1070,12 +1068,8 @@ export const ExploreMap = memo(function ExploreMap() {
       <div className="mobile-energy-slot"><EnergyIndicator /></div>
     )}
 
-    {/* Sélecteur de style de carte (toujours visible) */}
-    <MapStyleSelect
-      mode={mapStyleMode}
-      onChange={setMapStyleMode}
-      addPlaceMode={addPlaceMode}
-    />
+    {/* MapStyleSelect (bouton calques) déplacé dans la barre de recherche
+        (SearchBar), à droite du filtre. */}
 
     </div>
   )

@@ -6,6 +6,7 @@ import { searchPlaces } from '../../../lib/placeSearch'
 import { SearchResultsList } from './SearchResultsList'
 import { SearchOverlay } from './SearchOverlay'
 import { FilterSheet } from '../filters/FilterSheet'
+import { MapStyleSelect } from '../controls/MapStyleSelect'
 import './SearchBar.css'
 
 export function SearchBar() {
@@ -70,6 +71,9 @@ export function SearchBar() {
           <span aria-hidden>⚙︎</span>
           {activeCount > 0 && <span className="map-search-funnel-badge">{activeCount}</span>}
         </button>
+
+        {/* Bouton calques (style de carte) — à droite du filtre, même style. */}
+        <MapStyleSelect />
       </div>
 
       {!isDesktop && <SearchOverlay />}
