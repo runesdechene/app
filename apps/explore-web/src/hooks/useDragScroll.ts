@@ -42,6 +42,9 @@ export function useDragScroll<T extends HTMLElement>() {
 
     function onPointerMove(e: PointerEvent) {
       if (!down) return
+      // Filet de sécurité : si le bouton n'est plus pressé mais qu'on a raté le
+      // pointerup (drag natif avorté, focus perdu…), on arrête proprement.
+      if (e.buttons === 0) { onPointerUp(); return }
       const dx = e.clientX - startX
       if (!moved && Math.abs(dx) > THRESHOLD) {
         moved = true
@@ -58,6 +61,13 @@ export function useDragScroll<T extends HTMLElement>() {
       if (!down) return
       down = false
       el!.classList.remove('is-dragging')
+      try { el!.releasePointerCapture(pointerId) } catch { /* best-effort */ }
+    }
+
+    // Empêche le drag-and-drop natif (images/liens dans les cartes) qui sinon
+    // détourne le geste et avale le pointerup → le scroll « collait » au curseur.
+    function onDragStart(e: Event) {
+      e.preventDefault()
     }
 
     // Supprime le clic consécutif à un drag (sinon ouvre la carte sous le curseur).
@@ -72,13 +82,17 @@ export function useDragScroll<T extends HTMLElement>() {
     el.addEventListener('pointerdown', onPointerDown)
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerUp)
     el.addEventListener('click', onClickCapture, true)
+    el.addEventListener('dragstart', onDragStart)
 
     cleanupRef.current = () => {
       el.removeEventListener('pointerdown', onPointerDown)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerUp)
       el.removeEventListener('click', onClickCapture, true)
+      el.removeEventListener('dragstart', onDragStart)
     }
   }, [])
 
