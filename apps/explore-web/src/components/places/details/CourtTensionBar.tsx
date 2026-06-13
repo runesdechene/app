@@ -1,6 +1,7 @@
 import './CourtTensionBar.css'
 import type { Challenger, CourtStatus, CourtVeilleur, Patron } from '../../../types/court'
 import { useMapStore } from '../../../stores/mapStore'
+import { capitalizeFirst } from '../../../lib/textFormat'
 
 interface CourtTensionBarProps {
   scoreVeilleur: number
@@ -198,11 +199,10 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
             {isGroupPill ? (
               <span
                 className="ctb-expedition-pill"
-                style={{ borderColor: veilleur?.factionColor ?? '#D4AF37' }}
-                title={`Veillé par la compagnie « ${expeditionTitle} »`}
+                title={`Veillé par la compagnie « ${capitalizeFirst(expeditionTitle)} »`}
               >
                 <span className="ctb-expedition-pill-crown" aria-hidden>👑</span>
-                <span className="ctb-expedition-pill-name">{expeditionTitle}</span>
+                <span className="ctb-expedition-pill-name">{capitalizeFirst(expeditionTitle)}</span>
               </span>
             ) : (
               <>

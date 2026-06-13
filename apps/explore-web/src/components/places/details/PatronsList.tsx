@@ -1,6 +1,7 @@
 import './PatronsList.css'
 import { useState } from 'react'
 import { useMapStore } from '../../../stores/mapStore'
+import { capitalizeFirst } from '../../../lib/textFormat'
 import type { Patron, Challenger } from '../../../types/court'
 
 interface PatronsListProps {
@@ -112,7 +113,7 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
             {isGroup ? (
               <span className="patron-name patron-name-expedition">
                 <span className="patron-expedition-crown" aria-hidden>👑</span>
-                {expeditionTitle}
+                {capitalizeFirst(expeditionTitle)}
                 <span className="patron-title">Compagnie veilleuse</span>
               </span>
             ) : mecenePatron ? (

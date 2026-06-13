@@ -1,3 +1,10 @@
+# ALPHA V0.9.60
+## Compagnies de veille : couleur et majuscule
+
+La gélule d'une compagnie dans la Cour n'emprunte plus la couleur de faction d'un de ses membres (elle restait bleue) — elle est désormais **neutre**, cohérente avec une compagnie de plusieurs factions. Et le nom d'une compagnie prend enfin une **majuscule initiale** partout où il s'affiche (carte, Cour, mécènes).
+
+---
+
 # ALPHA V0.9.59
 ## Compagnies de veille : finitions
 

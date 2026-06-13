@@ -6,6 +6,7 @@ import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
+import { capitalizeFirst } from '../../../lib/textFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -302,7 +303,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             <>
               <span className="court-leader-label">Veillé par {veilleMembers.length} compagnons</span>
               <div className="court-leader-name-row">
-                <span className="court-leader-name">{expeditionTitle}</span>
+                <span className="court-leader-name">{capitalizeFirst(expeditionTitle)}</span>
               </div>
               <div className="court-leader-facepile">
                 {veilleMembers.map(m => (
