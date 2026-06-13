@@ -138,6 +138,26 @@
   text-align: center;
 }
 
+/* Variante pastille (point) — onglet « Mise à jour » : juste un point rouge. */
+.desktop-sidebar-tab-badge--dot {
+  min-width: 0;
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border-radius: 50%;
+  top: 6px;
+  right: 12px;
+}
+
+/* Sous-titre version dans l'onglet Mise à jour. */
+.desktop-sidebar-maj-version {
+  margin: -8px 0 14px;
+  font-family: var(--font-accent);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--color-sepia-dark, #8a7050);
+}
+
 /* Zone de contenu (droite du rail) */
 .desktop-sidebar-content {
   flex: 1;

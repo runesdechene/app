@@ -1,3 +1,10 @@
+# ALPHA V0.9.68
+## Les mises à jour, sans le pop-up intrusif
+
+Fini la fenêtre qui s'ouvrait de force à chaque lancement de l'app ! Les nouveautés ont désormais leur **place dédiée** : un onglet **« Mise à jour »** dans la barre latérale sur grand écran, et une **carte « Mise à jour »** dans l'accueil mobile. Une pastille discrète signale quand il y a du nouveau, et tu consultes le journal des versions **quand tu veux** — plus quand l'app décide. Le badge de version reste cliquable partout pour rouvrir le détail.
+
+---
+
 # ALPHA V0.9.67
 ## La version PC a sa colonne d'accueil
 

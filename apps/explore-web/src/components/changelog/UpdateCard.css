@@ -1,0 +1,70 @@
+/* Carte « Mise à jour » du feed d'accueil mobile. */
+.update-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-sepia);
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(74, 55, 40, 0.12);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--color-ink);
+}
+
+.update-card-icon {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.update-card-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.update-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.update-card-new {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #fff;
+  background: #b91c1c;
+  border-radius: 8px;
+  padding: 1px 7px;
+}
+
+.update-card-sub {
+  font-family: var(--font-signature);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--color-ink-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.update-card-chevron {
+  font-size: 22px;
+  color: var(--color-sepia);
+  flex-shrink: 0;
+}
