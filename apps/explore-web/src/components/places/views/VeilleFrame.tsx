@@ -106,7 +106,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation, onVisit, alrea
       alert(msg)
       return
     }
-    pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
+    pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members, expeditionName)
     await refresh()
     useDefisStore.getState().refresh(userId)
     const isReaffirm = isAlreadyVeilleurGps

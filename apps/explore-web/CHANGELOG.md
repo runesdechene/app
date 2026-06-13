@@ -1,3 +1,10 @@
+# ALPHA V0.9.56
+## Les compagnies de veille s'affichent enfin
+
+Quand un lieu est veillé par **plusieurs compagnons**, on le voit désormais comme tel : la carte et la fiche affichent le **nom de l'expédition** (au lieu d'un seul veilleur), la fiche indique « **veillé par N compagnons** » avec les **avatars de tous les membres**, et les territoires **neutres** (compagnies de factions mêlées) prennent leur couleur **dorée** sur la carte.
+
+---
+
 # ALPHA V0.9.55
 ## Sur place : visiter, ou planter — et avec qui
 

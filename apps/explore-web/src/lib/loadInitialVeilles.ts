@@ -2,7 +2,8 @@ import { supabase } from './supabase'
 import { useMapStore } from '../stores/mapStore'
 import type { MapVeille } from '../types/veille'
 
-const NEUTRAL_COLOR = '#8a6f4a'
+// V0.9.56 — les veilles neutres (expéditions multi-faction) passent en doré.
+const NEUTRAL_COLOR = '#D4AF37'
 
 // Cache module-level des couleurs/patterns de faction, peuplé au premier loadInitialVeilles
 // puis réutilisé par pushVeilleOverride pour les plants suivants.
@@ -41,7 +42,7 @@ export async function loadInitialVeilles(): Promise<void> {
 
   const veilles = (veillesData as MapVeille[] | null) ?? []
   for (const v of veilles) {
-    pushVeilleOverride(v.placeId, v.factionId, v.isNeutral, v.members)
+    pushVeilleOverride(v.placeId, v.factionId, v.isNeutral, v.members, v.expeditionTitle)
   }
 }
 
@@ -55,13 +56,18 @@ export function pushVeilleOverride(
   factionId: string | null,
   isNeutral: boolean,
   members: PushMember[] = [],
+  expeditionTitle?: string | null,
 ): void {
   const lead = members[0]
   const veilleurUserId = lead?.userId || undefined
-  const veilleurName = lead?.displayName?.trim() || undefined
   const veilleurAvatarUrl = lead?.avatarUrl || undefined
-  // V0.7 — extraCount = nombre de co-veilleurs en plus du lead (badge "+N" sur la pilule)
-  const veilleurExtraCount = Math.max(0, members.length - 1)
+  // V0.9.56 — veille à plusieurs (expédition nommée) : la pilule carte porte le
+  // NOM DE L'EXPÉDITION, pas celui du lead. Solo : nom du veilleur (inchangé).
+  const isGroup = members.length > 1
+  const groupName = expeditionTitle?.trim() || undefined
+  const veilleurName = (isGroup && groupName) ? groupName : (lead?.displayName?.trim() || undefined)
+  // Le nom d'expédition porte déjà l'idée du groupe → pas de badge "+N" en plus.
+  const veilleurExtraCount = (isGroup && groupName) ? 0 : Math.max(0, members.length - 1)
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.
   if (!factionsLoaded) {
     void ensureFactionsCache()

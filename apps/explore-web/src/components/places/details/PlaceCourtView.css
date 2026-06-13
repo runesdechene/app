@@ -178,6 +178,40 @@
   min-width: 0;
 }
 
+/* V0.9.56 — facepile des co-veilleurs (veille d'expédition à plusieurs) */
+.court-leader-facepile {
+  display: flex;
+  align-items: center;
+  margin-top: 6px;
+}
+.court-leader-face {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  border: 2px solid var(--color-parchment, #f6efe0);
+  background: #d8c8a8;
+  margin-left: -8px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.court-leader-face:first-child { margin-left: 0; }
+.court-leader-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.court-leader-face-fallback {
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a3728;
+}
+
 .court-leader-name {
   font-family: var(--font-accent, 'Cormorant Garamond', serif);
   font-size: 22px;

@@ -5,6 +5,7 @@ import { useCrownsStore } from '../../../stores/crownsStore'
 import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
+import { useVeille } from '../../../hooks/useVeille'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -50,6 +51,10 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const balance = useCrownsStore(s => s.balance)
   const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const refreshCrowns = useCrownsStore(s => s.refresh)
+
+  // V0.9.56 — membres + titre d'expédition (pour l'affichage veille à plusieurs)
+  const { veille, refresh: refreshVeille } = useVeille(placeId)
+  useEffect(() => { void refreshVeille() }, [refreshVeille])
 
   const [state, setState] = useState<PlaceCourtState | null>(null)
   const [loading, setLoading] = useState(true)
@@ -202,6 +207,13 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   }
 
   const { vacant, veilleur, scoreVeilleur, defenseFavorPoints, threats, menaceHaute, status, topPatrons, callerContext } = state
+
+  // V0.9.56 — veille à plusieurs (expédition nommée) : on affiche le nom d'expédition
+  // + la facepile des membres + « veillé par N compagnons ». Solo : inchangé.
+  const veilleData = veille && !veille.vacant ? veille : null
+  const veilleMembers = veilleData?.members ?? []
+  const isGroupVeille = veilleMembers.length > 1
+  const expeditionTitle = veilleData?.expeditionTitle ?? null
   const isMember = callerContext?.isMemberOfVeilleur ?? false
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
@@ -286,33 +298,59 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       {!vacant && veilleur && (
       <div className="court-leader-row">
         <div className="court-leader-text">
-          <span className="court-leader-label">Lieu veillé par</span>
-          <div className="court-leader-name-row">
-            {veilleur.leaderUserId ? (
-              <button
-                type="button"
-                className="court-leader-name court-leader-name-btn"
-                onClick={() => useMapStore.getState().setSelectedPlayerId(veilleur.leaderUserId!)}
-                title={`Voir le profil de ${veilleur.leaderName}`}
-              >
-                {veilleur.leaderName}
-              </button>
-            ) : (
-              <span className="court-leader-name">{veilleur.leaderName}</span>
-            )}
-            {veilleur.factionPattern && veilleur.factionColor && (
-              <span
-                className="court-leader-faction-icon"
-                style={{
-                  backgroundColor: veilleur.factionColor,
-                  WebkitMaskImage: `url(${veilleur.factionPattern})`,
-                  maskImage: `url(${veilleur.factionPattern})`,
-                }}
-                title={veilleur.name}
-                aria-label={`Faction : ${veilleur.name}`}
-              />
-            )}
-          </div>
+          {isGroupVeille && expeditionTitle ? (
+            <>
+              <span className="court-leader-label">Veillé par {veilleMembers.length} compagnons</span>
+              <div className="court-leader-name-row">
+                <span className="court-leader-name">{expeditionTitle}</span>
+              </div>
+              <div className="court-leader-facepile">
+                {veilleMembers.map(m => (
+                  <button
+                    key={m.userId}
+                    type="button"
+                    className="court-leader-face"
+                    title={`Voir le profil de ${m.displayName}`}
+                    onClick={() => useMapStore.getState().setSelectedPlayerId(m.userId)}
+                  >
+                    {m.avatarUrl
+                      ? <img src={m.avatarUrl} alt={m.displayName} />
+                      : <span className="court-leader-face-fallback">{m.displayName.charAt(0).toUpperCase()}</span>}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <span className="court-leader-label">Lieu veillé par</span>
+              <div className="court-leader-name-row">
+                {veilleur.leaderUserId ? (
+                  <button
+                    type="button"
+                    className="court-leader-name court-leader-name-btn"
+                    onClick={() => useMapStore.getState().setSelectedPlayerId(veilleur.leaderUserId!)}
+                    title={`Voir le profil de ${veilleur.leaderName}`}
+                  >
+                    {veilleur.leaderName}
+                  </button>
+                ) : (
+                  <span className="court-leader-name">{veilleur.leaderName}</span>
+                )}
+                {veilleur.factionPattern && veilleur.factionColor && (
+                  <span
+                    className="court-leader-faction-icon"
+                    style={{
+                      backgroundColor: veilleur.factionColor,
+                      WebkitMaskImage: `url(${veilleur.factionPattern})`,
+                      maskImage: `url(${veilleur.factionPattern})`,
+                    }}
+                    title={veilleur.name}
+                    aria-label={`Faction : ${veilleur.name}`}
+                  />
+                )}
+              </div>
+            </>
+          )}
           {!veilleur.byInfluence && (
             <span className="court-faveur-acquise">Acquis par sa visite sur le lieu</span>
           )}

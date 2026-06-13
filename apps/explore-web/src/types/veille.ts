@@ -15,6 +15,8 @@ export type PlaceVeille =
       isNeutral: boolean
       factionId: string | null     // null si neutral
       expeditionId: string
+      /** V0.9.56 — titre de l'expédition (null si veille solo sans nom) */
+      expeditionTitle: string | null
       plantedAt: string
       /** V093 — true si l'expé veille à distance (n'a pas confirmé IRL) */
       byInfluence: boolean
@@ -70,5 +72,7 @@ export interface MapVeille {
   factionId: string | null
   isNeutral: boolean
   plantedAt: string
+  /** V0.9.56 — titre de l'expédition (null si veille solo sans nom) */
+  expeditionTitle: string | null
   members: MapVeilleMember[]
 }
