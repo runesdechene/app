@@ -1,3 +1,10 @@
+# ALPHA V0.9.62
+## La Cour aux couleurs des factions
+
+La Cour parle désormais le langage des bannières : la barre de score du veilleur prend la **couleur de sa faction** (ou **dorée** pour une compagnie neutre), le bouton **Soutenir** aussi, et le bouton **Influencer** prend la couleur de **votre** faction. La gélule d'une compagnie liste maintenant ses **membres** entre parenthèses.
+
+---
+
 # ALPHA V0.9.61
 ## Compagnies de veille : sceaux bien placés, mains qui s'entraident
 

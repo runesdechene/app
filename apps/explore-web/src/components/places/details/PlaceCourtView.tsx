@@ -6,7 +6,7 @@ import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
-import { capitalizeFirst } from '../../../lib/textFormat'
+import { capitalizeFirst, readableTextOn } from '../../../lib/textFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -49,6 +49,7 @@ function playClickSound() {
 
 export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtViewProps) {
   const userId = usePlayerStore(s => s.userId)
+  const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const balance = useCrownsStore(s => s.balance)
   const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const refreshCrowns = useCrownsStore(s => s.refresh)
@@ -215,6 +216,12 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const veilleMembers = veilleData?.members ?? []
   const isGroupVeille = veilleMembers.length > 1
   const expeditionTitle = veilleData?.expeditionTitle ?? null
+
+  // V0.9.62 — couleurs Cour : défense/soutien = faction du veilleur (doré si neutre) ;
+  // influencer = faction du joueur (sinon terre neutre).
+  const isNeutralVeille = veilleData?.isNeutral ?? false
+  const veilleurColor = isNeutralVeille ? '#F4B400' : (veilleur?.factionColor ?? '#8a6f4a')
+  const playerColor = userFactionColor ?? '#8a6f4a'
   const isMember = callerContext?.isMemberOfVeilleur ?? false
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
@@ -380,6 +387,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         veilleur={veilleur}
         coVeilleurs={isGroupVeille ? veilleMembers : undefined}
         expeditionTitle={expeditionTitle}
+        defenseColor={veilleurColor}
       />
 
       {/* Boutons tap-rafale */}
@@ -389,6 +397,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             className="court-btn-support"
             onClick={handleSupportTap}
             disabled={balance < 1}
+            style={{ background: veilleurColor, color: readableTextOn(veilleurColor) }}
             aria-label={isMember ? 'Renforcer la veille' : `Soutenir ${veilleur?.leaderName ?? 'le veilleur'}`}
           >
             <span className="court-btn-icon">🛡</span>
@@ -404,6 +413,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             className="court-btn-contest"
             onClick={handleContestTap}
             disabled={balance < 1 || creatingExp}
+            style={{ background: playerColor, color: readableTextOn(playerColor) }}
             aria-label={vacant ? 'Poser ma marque sur ce lieu vierge' : 'Influencer ce lieu'}
           >
             <span className="court-btn-icon">⚔</span>

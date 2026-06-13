@@ -28,8 +28,10 @@ interface CourtTensionBarProps {
    *  défenseurs primaires (pas seulement le lead). Le 1er (lead) garde la couronne. */
   coVeilleurs?: Array<{ userId: string; displayName: string; avatarUrl: string | null; factionId: string }>
   /** V0.9.57 — nom de l'expédition : pour une veille à plusieurs, on affiche une
-   *  gélule « 👑 {expédition} » côté défense au lieu de répéter les avatars. */
+   *  gélule « 🤝 {expédition} » côté défense au lieu de répéter les avatars. */
   expeditionTitle?: string | null
+  /** V0.9.62 — couleur de la barre de défense (faction du veilleur, ou doré si neutre). */
+  defenseColor?: string
   /** @deprecated V086 — le statut est désormais dans la pilule top-right de PlaceCourtView */
   status?: CourtStatus
 }
@@ -76,7 +78,7 @@ function AvatarChip({ patron, side, decoration }: AvatarChipProps) {
   )
 }
 
-export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur, coVeilleurs, expeditionTitle }: CourtTensionBarProps) {
+export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur, coVeilleurs, expeditionTitle, defenseColor }: CourtTensionBarProps) {
   // V0.9.57 — veille à plusieurs : gélule expédition côté défense (pas de facepile).
   const isGroupPill = !!(coVeilleurs && coVeilleurs.length > 1 && expeditionTitle)
   const total = scoreVeilleur + menaceHaute
@@ -158,7 +160,10 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
         aria-label={`Faveur veilleur ${scoreVeilleur}, menace ${menaceHaute}${isCritical ? ' (bascule imminente)' : ''}`}
       >
         {scoreVeilleur > 0 && (
-          <div className="ctb-fill ctb-defense" style={{ width: `${veilleurPct}%` }}>
+          <div
+            className="ctb-fill ctb-defense"
+            style={{ width: `${veilleurPct}%`, ...(defenseColor ? { background: defenseColor } : {}) }}
+          >
             {showVeilleurNumber && <span className="ctb-num">{scoreVeilleur}</span>}
           </div>
         )}
@@ -203,6 +208,9 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
               >
                 <span className="ctb-expedition-pill-crown" aria-hidden>🤝</span>
                 <span className="ctb-expedition-pill-name">{capitalizeFirst(expeditionTitle)}</span>
+                {coVeilleurs && coVeilleurs.length > 0 && (
+                  <span className="ctb-expedition-pill-members">({coVeilleurs.map(m => m.displayName).join(', ')})</span>
+                )}
               </span>
             ) : (
               <>
