@@ -18,10 +18,29 @@ const SEEN_KEY = 'activity_last_seen_at'
  * chaque entrée sur la carte affichait une pastille pour ses propres
  * actions, ce qui n'a pas de sens.
  */
+// Garde « une fois par session JS ». Un reload (= arrivée sur l'appli) repart à
+// false ; une navigation interne SPA garde la même valeur (pas de reset).
+let sessionBaselineSet = false
+
+/**
+ * Au lancement de l'app, cale la référence du badge sur « maintenant » : le
+ * badge ne compte donc que l'activité arrivée DEPUIS l'arrivée sur l'appli
+ * (l'activité passée, rejouée au boot par loadRecentActivityToasts, ne compte
+ * pas). L'ouverture de l'onglet Activité remet ensuite la référence à zéro.
+ */
+export function ensureActivitySessionBaseline(): void {
+  if (sessionBaselineSet) return
+  sessionBaselineSet = true
+  markActivitySeen()
+}
+
 export function useUnreadActivityCount(): number {
   const toasts = useToastStore((s) => s.toasts)
   const currentUserId = usePlayerStore((s) => s.userId)
   const [seenAt, setSeenAt] = useState<number>(() => {
+    // Au 1er montage de la session, cale la référence sur « maintenant » AVANT
+    // de la lire (sinon on lirait l'ancienne valeur de la session précédente).
+    ensureActivitySessionBaseline()
     const raw = safeStorage.get(SEEN_KEY)
     const parsed = raw ? Number(raw) : 0
     return Number.isFinite(parsed) ? parsed : 0
