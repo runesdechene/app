@@ -32,9 +32,13 @@ export interface FavoritePlace extends PlaceCard {
 export interface VeilledPlace extends PlaceCard {
   plantedAt: string
   memberCount: number
+  /** V0.9.53 — false = étendard planté en GPS, true = lieu tenu à distance via La
+   *  Cour (Couronnes). Le carrousel « Étendard planté » ne garde que le GPS ;
+   *  le badge « lieux protégés » compte les deux (veilledPlaces.length). */
+  byInfluence?: boolean
 }
 
-export type PlacesTab = 'authored' | 'discovered' | 'veilled'
+export type PlacesTab = 'authored' | 'discovered' | 'veilled' | 'wishlist'
 
 export interface TitleInfo {
   id: number
@@ -88,5 +92,7 @@ export interface PlayerProfile {
   favoritePlaces: FavoritePlace[]
   /** V0.7 phase 3.5 — lieux actuellement veillés (mig 032) */
   veilledPlaces: VeilledPlace[]
+  /** V0.9.53 — lieux « à visiter » (place_wishlist), publics (mig 245) */
+  wishlistPlaces: PlaceCard[]
   unlockedGeneralTitles: Array<{ id: number; name: string; icon: string; unlocks: string[]; order: number }> | null
 }

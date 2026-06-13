@@ -1,3 +1,10 @@
+# ALPHA V0.9.53
+## Le profil raconte le vrai explorateur
+
+Les catégories de lieux du profil gagnent en clarté. « Étendard planté sur… » ne montre désormais que les lieux où l'on a **vraiment planté son étendard sur place (GPS)** — plus les lieux tenus à distance via La Cour (ceux-là restent comptés dans le badge « lieux protégés »). Et nouveauté : une catégorie **« Veut s'y rendre… »** affiche les lieux que l'explorateur a enregistrés pour plus tard.
+
+---
+
 # ALPHA V0.9.52
 ## La fortune devient discrète, la vigilance se voit
 

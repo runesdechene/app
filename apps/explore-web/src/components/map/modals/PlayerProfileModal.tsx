@@ -65,6 +65,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
   const isSelf = profile?.userId === currentUserId
 
+  // V0.9.53 — « Étendard planté sur… » = GPS pur (by_influence false). Les lieux
+  // tenus à distance via La Cour ne comptent que dans le badge « lieux protégés »
+  // (veilledPlaces.length, total). plantedPlaces alimente le carrousel + son « voir tout ».
+  const plantedPlaces = (profile?.veilledPlaces ?? []).filter(p => !p.byInfluence)
+
   // V070 — toast d'énigme de fragment cliquable : si le mapStore demande
   // l'ouverture de la galerie Fragments, on l'ouvre ici (le profil chargé
   // est nécessaire pour que get_all_fragments retourne les bonnes données).
@@ -598,17 +603,26 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
               />
               <PlacesCarousel
                 emoji={''}
-                titleText="Étendard planté sur..."
-                places={profile.veilledPlaces ?? []}
-                onPlaceClick={handlePlaceClick}
-                onViewAll={() => setViewAllSection('veilled')}
-              />
-              <PlacesCarousel
-                emoji={''}
                 titleText="S'est rendu à..."
                 places={profile.discoveredPlaces ?? []}
                 onPlaceClick={handlePlaceClick}
                 onViewAll={() => setViewAllSection('discovered')}
+              />
+              {/* V0.9.53 — GPS pur (plantedPlaces), pas les prises à distance. */}
+              <PlacesCarousel
+                emoji={''}
+                titleText="Étendard planté sur..."
+                places={plantedPlaces}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('veilled')}
+              />
+              {/* V0.9.53 — wishlist publique « à visiter ». */}
+              <PlacesCarousel
+                emoji={''}
+                titleText="Veut s'y rendre..."
+                places={profile.wishlistPlaces ?? []}
+                onPlaceClick={handlePlaceClick}
+                onViewAll={() => setViewAllSection('wishlist')}
               />
             </div>
           </>
@@ -769,11 +783,13 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         const places: PlaceCard[] =
           viewAllSection === 'authored' ? (profile.authoredPlaces ?? []) :
           viewAllSection === 'discovered' ? (profile.discoveredPlaces ?? []) :
-          (profile.veilledPlaces ?? [])
+          viewAllSection === 'wishlist' ? (profile.wishlistPlaces ?? []) :
+          plantedPlaces
         const meta =
           viewAllSection === 'authored' ? { emoji: '\u{1F3DB}️', text: 'Ajoutés' } :
           viewAllSection === 'discovered' ? { emoji: '\u{1F9ED}', text: 'Explorés' } :
-          { emoji: '\u{1F6A9}', text: 'Revendiqués' }
+          viewAllSection === 'wishlist' ? { emoji: '\u{1F516}', text: 'À visiter' } :
+          { emoji: '\u{1F6A9}', text: 'Étendard planté' }
         return (
           <div className="player-modal-overlay" onClick={() => setViewAllSection(null)} style={{ zIndex: 10003 }}>
             <div className="player-modal player-modal-view-all" onClick={e => e.stopPropagation()}>
