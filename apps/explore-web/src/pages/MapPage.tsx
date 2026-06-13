@@ -373,11 +373,9 @@ export default function MapPage() {
           <FactionBar />
         </div>
       )}
-      {/* GameToast : toasts transitoires (activité, Cour, niveau). Sur desktop
-          il flotte en haut de la carte (cf. MapDesktopLayout.css) ; sur mobile
-          il garde son ancrage top-left. L'ancien wrapper .hud-left-stack
-          (Quêtes + Nouvelles) est remplacé par la leftbar sur desktop. */}
-      {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
+      {/* GameToast (« Activité de la carte ») : feed d'activité live, mobile-only.
+          Sur desktop il faisait doublon avec l'onglet Activité de la leftbar. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && !isDesktop && <GameToast />}
       {/* ExpeditionsHud : orchestre les modales d'expédition (tap bannière sur
           la carte). Desktop : remplacé par HomeFeed dans la leftbar. */}
       {!addPlaceMode && !authLoading && isAuthenticated && !isDesktop && <ExpeditionsHud />}

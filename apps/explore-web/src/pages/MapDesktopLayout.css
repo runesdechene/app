@@ -44,16 +44,4 @@
   .map-search-bar {
     transform: translateX(calc(-50% + var(--sidebar-w, 0px) / 2));
   }
-
-  /* GameToast : feed transitoire, flotte en haut de la zone carte
-     (l'ancien wrapper .hud-left-stack a été retiré). */
-  .game-toast-container {
-    position: fixed;
-    top: 68px;
-    left: calc(var(--sidebar-w, 364px) + 16px);
-    width: 320px;
-    max-width: calc(100vw - var(--sidebar-w, 364px) - 32px);
-    max-height: calc(100vh - 120px);
-    overflow: hidden auto;
-  }
 }
