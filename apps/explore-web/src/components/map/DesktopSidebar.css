@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: row;
   min-height: 0;
+  border-right: 1px solid rgba(80,3,0,0.2);
   background: var(--color-parchment);
   transition: flex-basis 0.18s ease, width 0.18s ease;
   /* PAS de z-index : en tant que flex-item, un z-index créerait un contexte
@@ -34,10 +35,10 @@
   top: 0;
   bottom: 0;
   left: 100%;
-  width: 16px;
+  width: 36px;
   z-index: 5;
   pointer-events: none;
-  background: linear-gradient(to right, rgba(74, 55, 40, 0.32), rgba(74, 55, 40, 0));
+  background: linear-gradient(to right, rgba(74, 55, 40, 0.12), rgba(74, 55, 40, 0));
 }
 
 /* Replié : le contenu (flex:1) tombe à 0 (rail = 64px = toute la largeur).
