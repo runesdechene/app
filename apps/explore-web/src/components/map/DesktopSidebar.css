@@ -5,6 +5,7 @@
    ========================================== */
 
 .desktop-sidebar {
+  position: relative;
   flex: 0 0 var(--sidebar-w, 364px);
   width: var(--sidebar-w, 364px);
   align-self: stretch;
@@ -12,14 +13,31 @@
   flex-direction: row;
   min-height: 0;
   background: var(--color-parchment);
-  border-right: 1px solid var(--color-sepia);
-  box-shadow: 2px 0 12px rgba(74, 55, 40, 0.12);
   transition: flex-basis 0.18s ease, width 0.18s ease;
   /* PAS de z-index : en tant que flex-item, un z-index créerait un contexte
      d'empilement qui plafonnerait les modales rendues dans la sidebar
      (EnigmaMenu, DailyEnigma, ExpeditionModal…) sous les contrôles carte
      (z-index 15). Sans z-index, ces modales (position:fixed) s'empilent au
-     niveau racine et passent bien par-dessus tout. */
+     niveau racine et passent bien par-dessus tout.
+     position:relative (sans z-index) ne crée PAS de contexte d'empilement —
+     juste l'ancre du ::after ci-dessous. */
+}
+
+/* Ombre du joint sidebar/carte : un box-shadow sur la sidebar serait recouvert
+   par le canvas MapLibre (peint après, frère flex suivant). On peint donc un
+   dégradé d'ombre via ::after, ancré au bord droit, avec son propre z-index
+   (rejoint la pile racine car la sidebar n'est pas un contexte d'empilement)
+   → passe par-dessus le bord gauche de la carte. */
+.desktop-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 16px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(74, 55, 40, 0.32), rgba(74, 55, 40, 0));
 }
 
 /* Replié : le contenu (flex:1) tombe à 0 (rail = 64px = toute la largeur).
