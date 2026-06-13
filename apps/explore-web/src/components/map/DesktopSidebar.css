@@ -124,6 +124,28 @@
   color: var(--color-ink);
 }
 
+/* Carrousels horizontaux scrubables dans la leftbar (Nouvelles + Lieux).
+   Scopé .desktop-sidebar → la home mobile garde ses réglages. */
+.desktop-sidebar .home-nouvelles-row,
+.desktop-sidebar .places-section-scroll {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+/* Blocs Nouvelles un peu plus larges + accroche au scroll. */
+.desktop-sidebar .home-nouvelles-card {
+  flex: 0 0 200px;
+  scroll-snap-align: start;
+}
+
+.desktop-sidebar .home-nouvelles-thumb {
+  height: 116px;
+}
+
 @media (max-width: 749px) {
   .desktop-sidebar { display: none; }
 }
