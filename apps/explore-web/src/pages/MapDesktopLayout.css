@@ -47,8 +47,13 @@
     bottom: 330px;
   }
 
-  /* SearchBar (top, centrée) : recentrée sur la zone carte. */
+  /* SearchBar + filtre : ancrée en haut, collée à gauche de la zone carte
+     (juste à droite de la leftbar). Suit --sidebar-w (donc le repli). */
   .map-search-bar {
-    transform: translateX(calc(-50% + var(--sidebar-w, 0px) / 2));
+    left: calc(var(--sidebar-w, 0px) + 16px);
+    right: auto;
+    transform: none;
+    width: 380px;
+    max-width: calc(100% - var(--sidebar-w, 0px) - 32px);
   }
 }
