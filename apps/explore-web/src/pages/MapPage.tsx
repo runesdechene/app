@@ -41,9 +41,6 @@ import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { VersionBadge } from '../components/map/badges/VersionBadge'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
-import { DailyEnigma } from '../components/enigma/DailyEnigma'
-import { EnigmaChestButton } from '../components/enigma/EnigmaChestButton'
-import { FragmentEnigma } from '../components/enigma/FragmentEnigma'
 import { NotificationBell } from '../components/notifications/NotificationBell'
 import { ExpeditionsHud } from '../components/expeditions/ExpeditionsHud'
 import { UpdateBanner } from '../components/pwa/UpdateBanner'
@@ -111,9 +108,6 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
-  const [showDailyEnigma, setShowDailyEnigma] = useState(false)
-  const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
-  const [fragmentEnigma, setFragmentEnigma] = useState<{ fragmentId: number; name: string; icon: string | null; iconUrl: string | null } | null>(null)
   const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
   const [tutorialSlides, setTutorialSlides] = useState<TutorialSlide[]>([])
   const tutorialCompletedAt = usePlayerStore(s => s.tutorialCompletedAt)
@@ -410,11 +404,6 @@ export default function MapPage() {
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
               <CoupeBadge />
               <CrownsBadge />
-              <EnigmaChestButton
-                onOpenDaily={() => setShowDailyEnigma(true)}
-                onOpenFragment={(f) => setFragmentEnigma(f)}
-                refreshKey={enigmaRefreshKey}
-              />
               <NotificationBell />
               <EnergyIndicator />
             </>
@@ -476,15 +465,6 @@ export default function MapPage() {
           ]}
           onClose={() => setShowAddPlaceInfo(false)}
         />
-      )}
-
-      {/* Daily Enigma modal */}
-      {showDailyEnigma && (
-        <DailyEnigma onClose={() => { setShowDailyEnigma(false); setEnigmaRefreshKey(k => k + 1) }} />
-      )}
-
-      {fragmentEnigma && (
-        <FragmentEnigma fragment={fragmentEnigma} onClose={() => { setFragmentEnigma(null); setEnigmaRefreshKey(k => k + 1) }} />
       )}
 
       {/* Flow ajout de lieu (immersif) */}
