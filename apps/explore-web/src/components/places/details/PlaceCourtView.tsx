@@ -7,6 +7,7 @@ import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
 import { capitalizeFirst, pastel, shade } from '../../../lib/textFormat'
+import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -364,11 +365,13 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           {!veilleur.byInfluence && (
             <span className="court-faveur-acquise">
               {isGroupVeille ? 'Acquis par leur visite sur le lieu' : 'Acquis par sa visite sur le lieu'}
+              {veilleData?.plantedAt ? ` le ${formatFrenchLongDate(veilleData.plantedAt)}` : ''}
             </span>
           )}
           {veilleur.byInfluence && (
             <span className="court-by-influence">
               {isGroupVeille ? 'tiennent ce lieu à distance' : 'tient ce lieu à distance'}
+              {veilleData?.plantedAt ? ` depuis le ${formatFrenchLongDate(veilleData.plantedAt)}` : ''}
             </span>
           )}
         </div>

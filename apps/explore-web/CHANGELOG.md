@@ -1,3 +1,10 @@
+# ALPHA V0.9.65
+## La date du plantage dans la Cour
+
+La fiche d'un lieu veillé indique désormais **depuis quand** : « Acquis par leur visite sur le lieu **le 10 juin 2026** » (ou « tiennent ce lieu à distance **depuis le …** »). Un petit détail qui ancre chaque veille dans le temps.
+
+---
+
 # ALPHA V0.9.64
 ## Compagnie : les noms sous le titre
 
