@@ -5,7 +5,9 @@
 .article-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999999;
+  /* < 100000 (z-index de .ann-likers-overlay) pour que la liste des likes,
+     ouverte DEPUIS cette modale, s'affiche par-dessus et non dessous. */
+  z-index: 10000;
   background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;

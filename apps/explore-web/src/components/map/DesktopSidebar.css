@@ -132,8 +132,14 @@
   flex-wrap: nowrap;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
   overscroll-behavior-x: contain;
+  /* Pas de scrollbar visible (scrub uniquement). */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.desktop-sidebar .home-nouvelles-row::-webkit-scrollbar,
+.desktop-sidebar .places-section-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 /* Blocs Nouvelles un peu plus larges + accroche au scroll. */
@@ -144,6 +150,11 @@
 
 .desktop-sidebar .home-nouvelles-thumb {
   height: 116px;
+}
+
+/* Lieux récents : marge à gauche (sinon le 1er bloc colle au bord du rail). */
+.desktop-sidebar .places-section {
+  padding-left: 10px;
 }
 
 @media (max-width: 749px) {
