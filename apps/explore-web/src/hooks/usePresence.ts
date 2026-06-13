@@ -51,6 +51,14 @@ export function usePresence() {
       const addToast = useToastStore.getState().addToast
       const { setPlayer, removePlayer } = usePlayersStore.getState()
 
+      // À l'abonnement, Supabase émet un `join` pour TOUS les joueurs déjà
+      // présents → sans garde, on toastait « X vient de se connecter » pour
+      // chaque connecté en arrivant sur la carte (pastille Activité = nb de
+      // connectés). On ne toaste donc que les VRAIES nouvelles connexions :
+      // après la 1ère sync (ready) et pour un userId pas déjà connu.
+      let ready = false
+      const known = new Set<string>()
+
       const channel = supabase.channel('map-presence', {
         config: { presence: { key: userId! } },
       })
@@ -60,16 +68,20 @@ export function usePresence() {
           for (const p of newPresences) {
             const payload = p as unknown as PresencePayload
             if (payload.userId === userId) continue
-            addToast({
-              type: 'new_user',
-              message: `${payload.name} vient de se connecter`,
-              highlights: [payload.name],
-              actorId: payload.userId,
-              actorAvatarUrl: payload.avatarUrl ?? undefined,
-              color: payload.factionColor ?? undefined,
-              iconUrl: payload.factionPattern ?? undefined,
-              timestamp: Date.now(),
-            })
+            const isNewConnection = ready && !known.has(payload.userId)
+            known.add(payload.userId)
+            if (isNewConnection) {
+              addToast({
+                type: 'new_user',
+                message: `${payload.name} vient de se connecter`,
+                highlights: [payload.name],
+                actorId: payload.userId,
+                actorAvatarUrl: payload.avatarUrl ?? undefined,
+                color: payload.factionColor ?? undefined,
+                iconUrl: payload.factionPattern ?? undefined,
+                timestamp: Date.now(),
+              })
+            }
             if (payload.lat != null && payload.lng != null) {
               setPlayer({
                 userId: payload.userId,
@@ -86,6 +98,12 @@ export function usePresence() {
         })
         .on('presence', { event: 'sync' }, () => {
           const state = channel.presenceState()
+          // 1ère sync : on enregistre tous les présents actuels comme « connus »
+          // (déjà connectés avant notre arrivée) → pas de toast pour eux.
+          if (!ready) {
+            for (const key of Object.keys(state)) known.add(key)
+            ready = true
+          }
           for (const [key, presences] of Object.entries(state)) {
             if (key === userId) continue
             const raw = presences[0] as Record<string, unknown>
@@ -108,6 +126,7 @@ export function usePresence() {
           for (const p of leftPresences) {
             const payload = p as unknown as PresencePayload
             if (payload.userId === userId) continue
+            known.delete(payload.userId)
             removePlayer(payload.userId)
           }
         })

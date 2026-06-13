@@ -14,6 +14,7 @@ import { MobileSelectionModals } from '../components/navigation/MobileSelectionM
 import { FactionModal } from '../components/auth/FactionModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
+import { useCrownsStore } from '../stores/crownsStore'
 import './MobileLayout.css'
 
 export interface MobileLayoutContext {
@@ -57,6 +58,14 @@ export default function MobileLayout() {
   // V0.7.11 (10/05) — fetch initial du niveau via get_player_profile (sinon
   // la stats bar reste à niveau 1 tant qu'on n'a pas ouvert la carte).
   useLevel()
+
+  // Le solde de Couronnes n'était rafraîchi que dans ExploreMap (au montage de
+  // la carte) → sur /accueil, /activite… la StatsBar affichait la valeur cachée
+  // (safeStorage), donc inexacte tant qu'on n'allait pas sur la Carte. On le
+  // rafraîchit ici dès que userId est connu, pour toutes les pages mobile.
+  useEffect(() => {
+    if (userId) useCrownsStore.getState().refresh(userId)
+  }, [userId])
 
   // V0.8.17 — depuis V0.7.8 (RootRedirect platform-aware) les nouveaux users
   // mobile atterrissent sur /accueil, où le flux tutoriel + onboarding +
