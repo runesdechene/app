@@ -7,7 +7,7 @@
 @media (min-width: 750px) {
   /* Largeur de la leftbar, exposée aux descendants (SearchBar, GameToast…). */
   .app {
-    --sidebar-w: 364px;
+    --sidebar-w: 440px;
     display: flex;
     flex-direction: row;
   }
