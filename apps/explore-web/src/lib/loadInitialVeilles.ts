@@ -3,7 +3,8 @@ import { useMapStore } from '../stores/mapStore'
 import type { MapVeille } from '../types/veille'
 
 // V0.9.56 — les veilles neutres (expéditions multi-faction) passent en doré.
-const NEUTRAL_COLOR = '#D4AF37'
+// V0.9.57 — doré renforcé (plus vif, plus lisible sur la carte).
+const NEUTRAL_COLOR = '#F4B400'
 
 // Cache module-level des couleurs/patterns de faction, peuplé au premier loadInitialVeilles
 // puis réutilisé par pushVeilleOverride pour les plants suivants.
@@ -65,7 +66,8 @@ export function pushVeilleOverride(
   // NOM DE L'EXPÉDITION, pas celui du lead. Solo : nom du veilleur (inchangé).
   const isGroup = members.length > 1
   const groupName = expeditionTitle?.trim() || undefined
-  const veilleurName = (isGroup && groupName) ? groupName : (lead?.displayName?.trim() || undefined)
+  // V0.9.57 — ⭐ préfixe le nom d'expédition sur la carte (signale une compagnie).
+  const veilleurName = (isGroup && groupName) ? `⭐ ${groupName}` : (lead?.displayName?.trim() || undefined)
   // Le nom d'expédition porte déjà l'idée du groupe → pas de badge "+N" en plus.
   const veilleurExtraCount = (isGroup && groupName) ? 0 : Math.max(0, members.length - 1)
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.

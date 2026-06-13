@@ -26,6 +26,9 @@ interface CourtTensionBarProps {
   /** V0.9.56 — co-veilleurs (membres de l'expédition) : tous affichés comme
    *  défenseurs primaires (pas seulement le lead). Le 1er (lead) garde la couronne. */
   coVeilleurs?: Array<{ userId: string; displayName: string; avatarUrl: string | null; factionId: string }>
+  /** V0.9.57 — nom de l'expédition : pour une veille à plusieurs, on affiche une
+   *  gélule « 👑 {expédition} » côté défense au lieu de répéter les avatars. */
+  expeditionTitle?: string | null
   /** @deprecated V086 — le statut est désormais dans la pilule top-right de PlaceCourtView */
   status?: CourtStatus
 }
@@ -72,7 +75,9 @@ function AvatarChip({ patron, side, decoration }: AvatarChipProps) {
   )
 }
 
-export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur, coVeilleurs }: CourtTensionBarProps) {
+export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur, coVeilleurs, expeditionTitle }: CourtTensionBarProps) {
+  // V0.9.57 — veille à plusieurs : gélule expédition côté défense (pas de facepile).
+  const isGroupPill = !!(coVeilleurs && coVeilleurs.length > 1 && expeditionTitle)
   const total = scoreVeilleur + menaceHaute
   const veilleurPct = total > 0 ? (scoreVeilleur / total) * 100 : 100
   const showVeilleurNumber = veilleurPct >= 18
@@ -190,12 +195,25 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
       {(defenders.length > 0 || attackers.length > 0) && (
         <div className="ctb-clusters">
           <div className="ctb-cluster ctb-cluster-left">
-            {defLeader && <AvatarChip key={defLeader.userId} patron={defLeader} side="defense" decoration="leader" />}
-            {defOthers.map(p => <AvatarChip key={p.userId} patron={p} side="defense" decoration="none" />)}
-            {defOverflow > 0 && (
-              <span className="ctb-overflow" aria-label={`${defOverflow} autres mécènes en défense`}>
-                +{defOverflow}
+            {isGroupPill ? (
+              <span
+                className="ctb-expedition-pill"
+                style={{ borderColor: veilleur?.factionColor ?? '#D4AF37' }}
+                title={`Veillé par la compagnie « ${expeditionTitle} »`}
+              >
+                <span className="ctb-expedition-pill-crown" aria-hidden>👑</span>
+                <span className="ctb-expedition-pill-name">{expeditionTitle}</span>
               </span>
+            ) : (
+              <>
+                {defLeader && <AvatarChip key={defLeader.userId} patron={defLeader} side="defense" decoration="leader" />}
+                {defOthers.map(p => <AvatarChip key={p.userId} patron={p} side="defense" decoration="none" />)}
+                {defOverflow > 0 && (
+                  <span className="ctb-overflow" aria-label={`${defOverflow} autres mécènes en défense`}>
+                    +{defOverflow}
+                  </span>
+                )}
+              </>
             )}
           </div>
           <div className="ctb-cluster ctb-cluster-right">

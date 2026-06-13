@@ -117,6 +117,28 @@
 .ctb-cluster-left { justify-content: flex-start; }
 .ctb-cluster-right { justify-content: flex-end; }
 
+/* V0.9.57 — gélule expédition (veille à plusieurs) côté défense */
+.ctb-expedition-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 3px 10px 3px 7px;
+  border-radius: 999px;
+  border: 1.5px solid #D4AF37;
+  background: #fffdf7;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a3728;
+  line-height: 1.2;
+}
+.ctb-expedition-pill-crown { font-size: 12px; flex-shrink: 0; }
+.ctb-expedition-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ctb-av {
   width: 24px;
   height: 24px;

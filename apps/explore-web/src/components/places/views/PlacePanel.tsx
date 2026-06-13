@@ -11,6 +11,7 @@ import { useAuth } from '../../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from '../actions/WishlistButton'
 import { VeilleFrame } from './VeilleFrame'
+import { useVeille } from '../../../hooks/useVeille'
 import { PlaceGallery } from './PlaceGallery'
 import { PlaceInfos } from './PlaceInfos'
 import { PhotoSlideshow } from './PhotoSlideshow'
@@ -387,6 +388,14 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
 
   // V0.7 — overrides (veilleur principal posé par loadInitialVeilles / pushVeilleOverride)
   const placeOverride = useMapStore(s => s.placeOverrides.get(place.id))
+
+  // V0.9.56 — ids veilleurs dérivés de la veille RÉELLE du lieu (robuste, indépendant
+  // de l'état de l'override carte) → badge 🛡️ sur TOUS les co-veilleurs.
+  const { veille: panelVeille, refresh: refreshPanelVeille } = useVeille(place.id)
+  useEffect(() => { void refreshPanelVeille() }, [refreshPanelVeille])
+  const veilleurUserIds = panelVeille && !panelVeille.vacant
+    ? panelVeille.members.map(m => m.userId)
+    : (placeOverride?.veilleurUserIds ?? (placeOverride?.veilleurUserId ? [placeOverride.veilleurUserId] : []))
 
   // V0.5 detail data
   const [v05, setV05] = useState<V05Detail | null>(null)
@@ -854,7 +863,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             <ExplorerRow
               explorers={v05.explorers ?? []}
               authorId={place.author?.id ?? null}
-              guardianIds={placeOverride?.veilleurUserIds ?? (placeOverride?.veilleurUserId ? [placeOverride.veilleurUserId] : [])}
+              guardianIds={veilleurUserIds}
               factionColors={factionColors}
               placeId={place.id}
               placeTitle={place.title}

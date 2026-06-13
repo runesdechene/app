@@ -378,6 +378,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         patrons={topPatrons}
         veilleur={veilleur}
         coVeilleurs={isGroupVeille ? veilleMembers : undefined}
+        expeditionTitle={expeditionTitle}
       />
 
       {/* Boutons tap-rafale */}

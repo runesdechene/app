@@ -1,3 +1,10 @@
+# ALPHA V0.9.58
+## Compagnies de veille : plus lisibles d'un coup d'œil
+
+Affinages : dans la Cour, une veille à plusieurs affiche désormais une **gélule au nom de l'expédition** (plutôt que d'empiler les avatars). Sur la carte, le nom d'une compagnie est précédé d'une **⭐** pour la distinguer, et le **doré** des territoires neutres est **plus vif**. Et le sceau 🛡️ s'affiche bien sur **chaque** compagnon dans « Ils ont foulé ces terres ».
+
+---
+
 # ALPHA V0.9.57
 ## Compagnies de veille : tous les compagnons à l'honneur
 
