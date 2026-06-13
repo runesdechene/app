@@ -1,3 +1,10 @@
+# ALPHA V0.9.63
+## La Cour : pas de trahison, et des couleurs plus douces
+
+On ne peut plus influencer un lieu que l'on veille soi-même : si vous faites partie de la compagnie qui tient les lieux, le bouton **Influencer** est désormais **grisé** (fini la trahison de l'intérieur — y compris pour les co-veilleurs, pas seulement le chef). Et les boutons de la Cour passent en **teintes pastel** de la faction, plus douces à l'œil.
+
+---
+
 # ALPHA V0.9.62
 ## La Cour aux couleurs des factions
 

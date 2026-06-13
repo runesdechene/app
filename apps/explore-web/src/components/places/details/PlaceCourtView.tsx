@@ -6,7 +6,7 @@ import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
-import { capitalizeFirst, readableTextOn } from '../../../lib/textFormat'
+import { capitalizeFirst, pastel, shade } from '../../../lib/textFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
 
@@ -223,6 +223,8 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const veilleurColor = isNeutralVeille ? '#F4B400' : (veilleur?.factionColor ?? '#8a6f4a')
   const playerColor = userFactionColor ?? '#8a6f4a'
   const isMember = callerContext?.isMemberOfVeilleur ?? false
+  // V0.9.63 — un membre de la compagnie ne peut pas influencer contre les siens.
+  const contestBlockedAsMember = !vacant && isMember
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
   const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
 
@@ -397,7 +399,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             className="court-btn-support"
             onClick={handleSupportTap}
             disabled={balance < 1}
-            style={{ background: veilleurColor, color: readableTextOn(veilleurColor) }}
+            style={{ background: pastel(veilleurColor), color: shade(veilleurColor) }}
             aria-label={isMember ? 'Renforcer la veille' : `Soutenir ${veilleur?.leaderName ?? 'le veilleur'}`}
           >
             <span className="court-btn-icon">🛡</span>
@@ -408,24 +410,25 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             ))}
           </button>
         )}
-        {(vacant || !isMember) && (
           <button
             className="court-btn-contest"
             onClick={handleContestTap}
-            disabled={balance < 1 || creatingExp}
-            style={{ background: playerColor, color: readableTextOn(playerColor) }}
+            disabled={balance < 1 || creatingExp || contestBlockedAsMember}
+            style={contestBlockedAsMember
+              ? { background: '#e3dccd', color: '#9b8e79' }
+              : { background: pastel(playerColor), color: shade(playerColor) }}
+            title={contestBlockedAsMember ? 'Vous veillez ce lieu — impossible de l\'influencer contre votre compagnie' : undefined}
             aria-label={vacant ? 'Poser ma marque sur ce lieu vierge' : 'Influencer ce lieu'}
           >
             <span className="court-btn-icon">⚔</span>
             <span className="court-btn-label">
               {creatingExp ? 'Préparation…' : (vacant ? 'Poser ma marque' : 'Influencer')}
             </span>
-            <span className="court-btn-cost">−1 🪙</span>
+            {!contestBlockedAsMember && <span className="court-btn-cost">−1 🪙</span>}
             {bursts.filter(b => b.key === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}
           </button>
-        )}
       </div>
 
       {balance < 1 && (
