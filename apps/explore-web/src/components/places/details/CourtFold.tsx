@@ -18,7 +18,7 @@ export function CourtFold({ placeId, placeTitle, veilleurName, defaultOpen = fal
       <button className="court-fold-bar" onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <span className="court-fold-crown">👑</span>
         <span className="court-fold-label">
-          Conquête{veilleurName ? <> — veillé par <b>{veilleurName}</b></> : null}
+          Territoire{veilleurName ? <> veillé par <b>{veilleurName}</b></> : null}
         </span>
         <span className={`court-fold-chev${open ? ' open' : ''}`}>⌄</span>
       </button>

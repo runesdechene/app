@@ -37,7 +37,6 @@
 .dam-cover {
   width: 100%;
   border-radius: 12px;
-  border: 1px solid var(--color-sepia, #c8b08a);
   margin-bottom: 16px;
   object-fit: cover;
 }

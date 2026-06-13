@@ -1,3 +1,10 @@
+# ALPHA V0.9.66
+## Petits ajustements
+
+« Conquête » devient « Territoire » sur le repli de la Cour, et l'image de couverture des Nouvelles s'affiche sans bordure.
+
+---
+
 # ALPHA V0.9.65
 ## La date du plantage dans la Cour
 
