@@ -1,3 +1,15 @@
+# ALPHA V0.9.55
+## Sur place : visiter, ou planter — et avec qui
+
+Quand vous êtes sur un lieu, un seul bouton **« Marquer ma visite »**. Il ouvre vos options :
+- **Planter mon étendard** (seul) — vous devenez veilleur.
+- **Planter avec des compagnons** — les explorateurs connectés autour de vous apparaissent : sélectionnez-les, nommez votre expédition, et vous plantez ensemble (ils rejoignent l'expédition et sont marqués comme ayant visité le lieu).
+- **Marquer ma visite, sans planter** — vous laissez une trace de votre passage par respect pour le veilleur en place, sans rien lui prendre.
+
+Et dans tous les cas, planter un étendard compte désormais comme une visite — comme il se doit, puisqu'il faut y être.
+
+---
+
 # ALPHA V0.9.54
 ## Couronnes : discrétion totale
 

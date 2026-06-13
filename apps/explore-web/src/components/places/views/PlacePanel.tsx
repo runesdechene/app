@@ -270,12 +270,18 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
               disabled={!isOnSite || loading}
               title={isOnSite ? 'Valider votre visite GPS' : 'Rendez-vous sur place pour valider'}
             >
-              {loading && !isExplorer ? '...' : isOnSite ? '📍 J\'y suis allé' : '📍 Sur place uniquement'}
+              {loading && !isExplorer ? '...' : isOnSite ? '📍 Marquer ma visite' : '📍 Sur place uniquement'}
             </button>
           )}
         </div>
         {userFactionId && (
-          <VeilleFrame placeId={placeId} placeTitle={placeTitle} placeLocation={placeLocation} />
+          <VeilleFrame
+            placeId={placeId}
+            placeTitle={placeTitle}
+            placeLocation={placeLocation}
+            onVisit={handleVisit}
+            alreadyVisited={isExplorer}
+          />
         )}
       </div>
 

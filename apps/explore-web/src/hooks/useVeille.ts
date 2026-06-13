@@ -35,6 +35,7 @@ export function useVeille(placeId: string) {
     lat: number,
     lng: number,
     partnersIds: string[],
+    expeditionName?: string,
   ): Promise<PlantFlagResult> => {
     const { data, error } = await supabase.rpc('plant_flag', {
       p_user_id: userId,
@@ -42,6 +43,7 @@ export function useVeille(placeId: string) {
       p_user_lat: lat,
       p_user_lng: lng,
       p_partners_user_ids: partnersIds,
+      p_expedition_name: expeditionName ?? null,
     })
     if (error) {
       console.error('plant_flag error:', error.message, error.details, error.hint)

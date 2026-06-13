@@ -1,13 +1,13 @@
-﻿import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { usePlayersStore } from '../../../stores/playersStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { useVictoryModalStore } from '../../../stores/victoryModalStore'
 import { useDefisStore } from '../../../stores/defisStore'
 import { useVeille } from '../../../hooks/useVeille'
 import { VeillePartageeModal } from '../modals/VeillePartageeModal'
+import { OnSiteActionModal } from '../modals/OnSiteActionModal'
 import { pushVeilleOverride } from '../../../lib/loadInitialVeilles'
-import { supabase } from '../../../lib/supabase'
-import etendardIcon from '../../../assets/etendard.png'
 import type { NearbyPlanter } from '../../../types/veille'
 import './VeilleFrame.css'
 
@@ -15,6 +15,10 @@ interface Props {
   placeId: string
   placeTitle: string
   placeLocation: { latitude: number; longitude: number }
+  /** Délègue la visite (sans planter) au flux de PlacePanel (visit_place_gps + notation). */
+  onVisit?: () => void
+  /** Le joueur a déjà visité ce lieu (place_explorers) → option visite grisée. */
+  alreadyVisited?: boolean
 }
 
 function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
@@ -28,34 +32,26 @@ function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: num
 }
 
 /**
- * V0.7 — Bouton inline "Planter mon étendard". Refonte 2026-05-02 : ce composant
- * était une grosse frame avec header + état + hint. Tout ça est désormais
- * redondant : la pilule "Veillé par {nom}" sous le titre du lieu donne déjà
- * l'état, et le bouton vit dans la ligne "Ils ont foulé ces terres" (ExplorerRow).
- * Plus que le bouton + la modale opt-in expédition.
- *
- * 1 tap = visit + plant_flag (visit en parallèle, erreurs ignorées).
+ * V0.9.55 — Action unique sur place : bouton « Marquer ma visite » qui ouvre un
+ * popup à 3 choix (planter seul / planter avec des compagnons / visiter sans planter).
+ * Les compagnons sont les joueurs CONNECTÉS à < 200 m (positions live via presence,
+ * usePlayersStore) — les sélectionner les ajoute à l'expédition ET les marque visiteurs
+ * (plant_flag, mig 246). La visite sans planter est déléguée à PlacePanel (onVisit).
  */
-export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
+export function VeilleFrame({ placeId, placeTitle, placeLocation, onVisit, alreadyVisited }: Props) {
   const userId = usePlayerStore(s => s.userId)
+  const userName = usePlayerStore(s => s.userName)
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const userFactionColor = usePlayerStore(s => s.userFactionColor)
   const userPosition = usePlayerStore(s => s.userPosition)
-  const { veille, refresh, plant, fetchNearby } = useVeille(placeId)
+  const players = usePlayersStore(s => s.players)
+  const { veille, refresh, plant } = useVeille(placeId)
   const [planting, setPlanting] = useState(false)
-  const [optInCandidates, setOptInCandidates] = useState<NearbyPlanter[] | null>(null)
+  const [showActionModal, setShowActionModal] = useState(false)
+  const [showCompanions, setShowCompanions] = useState(false)
 
-  // V096 — le bouton reste affiché même pour le veilleur plein, car
-  // replanter sur son propre lieu efface désormais les menaces challengers
-  // (cas D "réaffirmation IRL"). On garde le refresh au mount pour la
-  // donnée de veille (utilisée ailleurs si besoin).
   useEffect(() => { void refresh() }, [refresh])
 
-  // V0.8.10 (11/05) — Détection : suis-je déjà veilleur GPS de ce lieu ?
-  // Si oui, le bouton change de label ("Réaffirmer mon étendard") pour
-  // signaler que l'action est défensive (efface les menaces de la Cour),
-  // pas une conquête. Le bonus +50 est désactivé côté SQL pour ce cas
-  // (mig 166) afin d'éviter le farm.
   const isAlreadyVeilleurGps = !!(
     veille && veille.vacant === false && !veille.byInfluence &&
     userId && veille.members.some(m => m.userId === userId)
@@ -66,25 +62,35 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
                   { lat: placeLocation.latitude, lng: placeLocation.longitude })
     : null
   const onSpot = distanceKm !== null && distanceKm <= 0.2
-  const canPlant = !!(userId && userFactionId && onSpot && !planting)
 
-  const doPlant = useCallback(async (partners: string[]) => {
+  // Compagnons = joueurs connectés (presence) à < 200 m du lieu, hors soi.
+  const companions: NearbyPlanter[] = useMemo(() => {
+    const out: NearbyPlanter[] = []
+    for (const p of players.values()) {
+      if (p.userId === userId) continue
+      const d = haversineKm({ lat: p.position.lat, lng: p.position.lng },
+                            { lat: placeLocation.latitude, lng: placeLocation.longitude })
+      if (d <= 0.2) {
+        out.push({
+          userId: p.userId,
+          displayName: p.name,
+          avatarUrl: p.avatarUrl,
+          factionColor: p.factionColor,
+          factionId: '',
+        })
+      }
+    }
+    return out
+  }, [players, userId, placeLocation])
+
+  const doPlant = useCallback(async (partners: string[], expeditionName?: string) => {
     if (!userId || !userPosition) return
     setPlanting(true)
-    // Snapshot AVANT plant pour la VictoryModal (fromVacant si lieu vacant)
     const wasVacant = !!(veille && veille.vacant === true)
-    // 1 tap = visit + plant. visit_place_gps en parallèle, erreurs ignorées
-    // (place_explorers a ON CONFLICT DO NOTHING — doublon silencieux).
-    const visitPromise = Promise.resolve(supabase.rpc('visit_place_gps', {
-      p_user_id: userId,
-      p_place_id: placeId,
-      p_user_lat: userPosition.lat,
-      p_user_lng: userPosition.lng,
-    })).then(() => {}, () => {/* visite secondaire, on ignore */})
-    const result = await plant(userId, userPosition.lat, userPosition.lng, partners)
-    await visitPromise
+    const result = await plant(userId, userPosition.lat, userPosition.lng, partners, expeditionName)
     setPlanting(false)
-    setOptInCandidates(null)
+    setShowCompanions(false)
+    setShowActionModal(false)
     if ('error' in result) {
       const msg = result.error === 'too_far'
         ? `Trop loin (${result.distanceKm} km). Approche-toi à moins de 200 m.`
@@ -102,13 +108,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
     }
     pushVeilleOverride(placeId, result.factionId, result.isNeutral, result.members)
     await refresh()
-    // Refresh défis — action veilleur fait avancer le défi correspondant
     useDefisStore.getState().refresh(userId)
-    // V0.8.10 (11/05) — Pop-up Victoire (réutilise VictoryModal existante,
-    // déjà montée dans MapPage et triggerée par useCourtNotifications pour
-    // les prises à distance). On la trigger aussi pour le plant GPS, avec
-    // mode='reaffirm_gps' si l'user était déjà veilleur (label "Vigilance"
-    // + wording défensif au lieu de "Victoire").
     const isReaffirm = isAlreadyVeilleurGps
     const rules = useGloryRulesStore.getState().rules
     useVictoryModalStore.getState().show({
@@ -116,7 +116,6 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
       fromVacant: wasVacant,
       factionColor: userFactionColor,
       mode: isReaffirm ? 'reaffirm_gps' : 'plant_gps',
-      // Gains uniquement sur plant (pas reaffirm — défensif, pas de gain)
       gloryGain:  isReaffirm ? undefined : Number(rules['glory.plant_flag'] ?? 0),
       coupeGain:  isReaffirm ? undefined : Number(rules['coupe.plant_flag'] ?? 0),
       courBonus:  isReaffirm ? undefined : (result.plantBonus ?? 0),
@@ -124,42 +123,39 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation }: Props) {
     })
   }, [userId, userPosition, plant, refresh, placeId, placeTitle, userFactionColor, veille, isAlreadyVeilleurGps])
 
-  const handlePlant = useCallback(async () => {
-    if (!userId || !userPosition) return
-    const candidates = await fetchNearby(userId)
-    if (candidates.length === 0) {
-      await doPlant([])
-      return
-    }
-    setOptInCandidates(candidates)
-  }, [userId, userPosition, fetchNearby, doPlant])
-
   if (!userId || !userFactionId) return null
 
   return (
     <>
       <button
         className={`veille-plant-btn${planting ? ' planting' : ''}`}
-        disabled={!canPlant}
-        onClick={handlePlant}
-        title={
-          !onSpot
-            ? 'Vous devez être à moins de 200 m du lieu'
-            : isAlreadyVeilleurGps
-              ? 'Tu veilles déjà ce lieu — réaffirmer efface les menaces sur le lieu (pas de nouveau bonus)'
-              : 'Planter ton étendard sur ce lieu'
-        }
-        aria-label={isAlreadyVeilleurGps ? 'Réaffirmer mon étendard' : 'Planter mon étendard (GPS)'}
+        disabled={!onSpot || planting}
+        onClick={() => setShowActionModal(true)}
+        title={onSpot ? 'Marquer ma visite / planter mon étendard' : 'Vous devez être à moins de 200 m du lieu'}
+        aria-label="Marquer ma visite"
       >
-        <img src={etendardIcon} alt="" className="veille-plant-icon" />
-        <span>{planting ? '…' : isAlreadyVeilleurGps ? 'Réaffirmer mon étendard' : 'Planter mon étendard (GPS)'}</span>
+        <span>{'\u{1F4CD}'} {planting ? '…' : 'Marquer ma visite'}</span>
       </button>
 
-      {optInCandidates && (
+      {showActionModal && (
+        <OnSiteActionModal
+          placeTitle={placeTitle}
+          isAlreadyVeilleurGps={isAlreadyVeilleurGps}
+          alreadyVisited={!!alreadyVisited}
+          hasCompanionsNearby={companions.length > 0}
+          onPlantSolo={() => { setShowActionModal(false); void doPlant([]) }}
+          onPlantCompanions={() => { setShowActionModal(false); setShowCompanions(true) }}
+          onVisit={() => { setShowActionModal(false); onVisit?.() }}
+          onClose={() => setShowActionModal(false)}
+        />
+      )}
+
+      {showCompanions && (
         <VeillePartageeModal
-          candidates={optInCandidates}
-          onCancel={() => setOptInCandidates(null)}
-          onConfirm={(ids) => doPlant(ids)}
+          candidates={companions}
+          defaultName={userName ? `Expédition de ${userName}` : ''}
+          onCancel={() => setShowCompanions(false)}
+          onConfirm={(ids, name) => doPlant(ids, name)}
         />
       )}
     </>
