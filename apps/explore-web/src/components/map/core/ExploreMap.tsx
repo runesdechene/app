@@ -799,7 +799,7 @@ export const ExploreMap = memo(function ExploreMap() {
   }
 
   return (
-    <div style={MAP_CONTAINER_STYLE} data-map-style={mapStyleMode}>
+    <div className="explore-map-root" style={MAP_CONTAINER_STYLE} data-map-style={mapStyleMode}>
     <MapGL
       ref={mapRef}
       initialViewState={INITIAL_VIEW}

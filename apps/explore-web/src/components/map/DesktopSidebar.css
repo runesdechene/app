@@ -1,0 +1,125 @@
+/* ==========================================
+   DESKTOP SIDEBAR — leftbar (Accueil / Activité)
+   Remplace les panneaux flottants top-left + bouton Boutique.
+   Largeur pilotée par --sidebar-w (définie sur .app, cf. MapDesktopLayout.css).
+   ========================================== */
+
+.desktop-sidebar {
+  flex: 0 0 var(--sidebar-w, 364px);
+  width: var(--sidebar-w, 364px);
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  background: var(--color-parchment);
+  border-right: 1px solid var(--color-sepia);
+  box-shadow: 2px 0 12px rgba(74, 55, 40, 0.12);
+  z-index: 12;
+}
+
+/* Rail vertical de sélection (gauche) */
+.desktop-sidebar-rail {
+  flex: 0 0 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 12px 6px;
+  background: var(--color-parchment-dark);
+  border-right: 1px solid var(--color-sepia);
+}
+
+.desktop-sidebar-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 2px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-ink-light);
+  font-family: var(--font-accent);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.desktop-sidebar-tab:hover {
+  background: rgba(74, 55, 40, 0.08);
+  color: var(--color-ink);
+}
+
+.desktop-sidebar-tab.is-active {
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  box-shadow: 0 1px 4px rgba(74, 55, 40, 0.15);
+}
+
+.desktop-sidebar-tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.desktop-sidebar-tab-label {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.desktop-sidebar-tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* Zone de contenu (droite du rail) */
+.desktop-sidebar-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Le feed (HomeFeed) et l'activité réutilisent les scrolls existants ;
+   on neutralise le padding-bottom calé sur la BottomTabbar mobile. */
+.desktop-sidebar .home-page-scroll,
+.desktop-sidebar .activity-page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--color-parchment);
+}
+
+.desktop-sidebar .home-page-scroll {
+  padding-bottom: 24px;
+}
+
+.desktop-sidebar .activity-page-scroll {
+  padding: 16px 16px 24px;
+}
+
+.desktop-sidebar .activity-page-title {
+  margin: 0 0 16px;
+  font-family: var(--font-accent);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+@media (max-width: 749px) {
+  .desktop-sidebar { display: none; }
+}

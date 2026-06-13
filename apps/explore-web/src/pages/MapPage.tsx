@@ -64,9 +64,10 @@ import { VictoryModal } from '../components/map/modals/VictoryModal'
 import { useVictoryModalStore } from '../stores/victoryModalStore'
 import { QuestRewardModal } from '../components/quests/QuestRewardModal'
 import { supabase } from '../lib/supabase'
-import shopIcon from '../assets/shop_icon.webp'
+import { DesktopSidebar } from '../components/map/DesktopSidebar'
 import '../App.css'
 import '../styles/mobile.css'
+import './MapDesktopLayout.css'
 
 function NotorietyBadge({ onClick }: { onClick: () => void }) {
   // V0.7 — affiche le NIVEAU dans le badge (au lieu de la Gloire brute).
@@ -356,6 +357,12 @@ export default function MapPage() {
         </div>
       )}
 
+      {/* Leftbar desktop — Accueil (HomeFeed) / Activité. Rendue AVANT la carte
+          pour être le 1er flex-item (à gauche) ; la carte prend le reste. */}
+      {isDesktop && !addPlaceMode && !authLoading && isAuthenticated && (
+        <DesktopSidebar openFactionModal={() => setShowFactionModal(true)} />
+      )}
+
       <ExploreMap />
       <InstallPrompt />
       <OfflineIndicator />
@@ -366,12 +373,14 @@ export default function MapPage() {
           <FactionBar />
         </div>
       )}
-      {!addPlaceMode && !authLoading && isAuthenticated && (
-        <div className="hud-left-stack">
-          <GameToast />
-          <ExpeditionsHud />
-        </div>
-      )}
+      {/* GameToast : toasts transitoires (activité, Cour, niveau). Sur desktop
+          il flotte en haut de la carte (cf. MapDesktopLayout.css) ; sur mobile
+          il garde son ancrage top-left. L'ancien wrapper .hud-left-stack
+          (Quêtes + Nouvelles) est remplacé par la leftbar sur desktop. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && <GameToast />}
+      {/* ExpeditionsHud : orchestre les modales d'expédition (tap bannière sur
+          la carte). Desktop : remplacé par HomeFeed dans la leftbar. */}
+      {!addPlaceMode && !authLoading && isAuthenticated && !isDesktop && <ExpeditionsHud />}
       {/* Bannière « Mise à jour » — aussi sur la carte (la home /accueil est mobile-only,
           donc sur PC c'était le seul endroit où on ne la voyait jamais). Hôte fixe en haut. */}
       {!authLoading && isAuthenticated && (
@@ -394,19 +403,6 @@ export default function MapPage() {
           {!addPlaceMode && !authLoading && isAuthenticated && user?.email && (
             <MobileHeader email={user.email} onSignOut={signOut} onFactionModal={() => setShowFactionModal(true)} />
           )} */}
-
-      {/* Bouton Boutique permanent desktop (masqué sur mobile + quand auth modal ouverte) */}
-      {!addPlaceMode && !showAuthModal && (
-        <a
-          href="https://runesdechene.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="desktop-shop-button"
-        >
-          <img src={shopIcon} alt="" className="desktop-shop-icon" />
-          <span>Visiter la Boutique officielle</span>
-        </a>
-      )}
 
       {/* Toolbar flottante (masquée en mode ajout) */}
       {!addPlaceMode && (

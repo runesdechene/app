@@ -1,3 +1,10 @@
+# ALPHA V0.9.67
+## La version PC a sa colonne d'accueil
+
+Sur grand écran, la carte gagne enfin une **vraie barre latérale à gauche** qui reprend tout le contenu de l'accueil mobile (énigme du jour, événements & quêtes, lieux, Coupe des Héritages, nouvelles…), avec un petit rail de boutons **Accueil / Activité**. Fini les panneaux flottants épars : les Quêtes, les Nouvelles et l'Activité sont regroupés au même endroit. Le bouton **+**, les **calques** et le **compteur de lieux découverts** glissent en bas de la carte.
+
+---
+
 # ALPHA V0.9.66
 ## Petits ajustements
 

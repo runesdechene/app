@@ -1,0 +1,59 @@
+/* ==========================================
+   DESKTOP LAYOUT — leftbar + carte côte à côte
+   Importé en DERNIER par MapPage pour gagner les overlaps de breakpoint
+   avec mobile.css. Tout est gated >= 750px (cohérent avec useIsDesktop).
+   ========================================== */
+
+@media (min-width: 750px) {
+  /* Largeur de la leftbar, exposée aux descendants (SearchBar, GameToast…). */
+  .app {
+    --sidebar-w: 364px;
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* La carte devient un flex-item qui prend l'espace restant à droite de la
+     leftbar (flex-basis:0 → ignore le width:100% inline de MAP_CONTAINER_STYLE). */
+  .explore-map-root {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* Contrôles bas-gauche : décalés pour ne pas passer sous la leftbar. */
+  .add-place-fab {
+    left: calc(var(--sidebar-w, 364px) + 24px);
+    bottom: 24px;
+  }
+
+  /* Compteur de lieux découverts → bas-droite, empilé au-dessus des layers
+     (influence-area) et de la minimap. Ancré par le bas → croît vers le haut,
+     donc pas de collision quelle que soit la hauteur de la FactionBar. */
+  .conquest-indicator {
+    left: auto;
+    right: 25px;
+    bottom: 292px;
+  }
+
+  /* Layers (HeritagesToggle + FactionBar) : remontés juste au-dessus du
+     compteur (~34px de haut + marge). */
+  .influence-area {
+    bottom: 330px;
+  }
+
+  /* SearchBar (top, centrée) : recentrée sur la zone carte. */
+  .map-search-bar {
+    transform: translateX(calc(-50% + var(--sidebar-w, 0px) / 2));
+  }
+
+  /* GameToast : feed transitoire, flotte en haut de la zone carte
+     (l'ancien wrapper .hud-left-stack a été retiré). */
+  .game-toast-container {
+    position: fixed;
+    top: 68px;
+    left: calc(var(--sidebar-w, 364px) + 16px);
+    width: 320px;
+    max-width: calc(100vw - var(--sidebar-w, 364px) - 32px);
+    max-height: calc(100vh - 120px);
+    overflow: hidden auto;
+  }
+}
