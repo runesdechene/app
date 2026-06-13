@@ -1,3 +1,10 @@
+# ALPHA V0.9.64
+## Compagnie : les noms sous le titre
+
+Les noms des membres d'une compagnie ne s'entassent plus dans la gélule : ils s'affichent désormais **en léger, sous le titre de l'expédition**, dans l'en-tête de la Cour (« Veillé par 3 compagnons » → « La compagnie du bon buffet » → *Gautier · Uriel · Mathéo*). Chaque nom reste cliquable vers son profil.
+
+---
+
 # ALPHA V0.9.63
 ## La Cour : pas de trahison, et des couleurs plus douces
 

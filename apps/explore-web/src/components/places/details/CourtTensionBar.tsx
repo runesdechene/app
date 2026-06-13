@@ -208,9 +208,6 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
               >
                 <span className="ctb-expedition-pill-crown" aria-hidden>🤝</span>
                 <span className="ctb-expedition-pill-name">{capitalizeFirst(expeditionTitle)}</span>
-                {coVeilleurs && coVeilleurs.length > 0 && (
-                  <span className="ctb-expedition-pill-members">({coVeilleurs.map(m => m.displayName).join(', ')})</span>
-                )}
               </span>
             ) : (
               <>

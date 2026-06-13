@@ -178,38 +178,26 @@
   min-width: 0;
 }
 
-/* V0.9.56 — facepile des co-veilleurs (veille d'expédition à plusieurs) */
-.court-leader-facepile {
-  display: flex;
-  align-items: center;
-  margin-top: 6px;
+/* V0.9.64 — noms des membres de la compagnie, en léger sous le titre */
+.court-leader-members {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--color-ink-light, #8a7b6a);
 }
-.court-leader-face {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+.court-leader-members-sep { color: var(--color-sepia, #c19a6b); }
+.court-leader-member-btn {
+  background: none;
+  border: none;
   padding: 0;
-  border: 2px solid var(--color-parchment, #f6efe0);
-  background: #d8c8a8;
-  margin-left: -8px;
-  overflow: hidden;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-.court-leader-face:first-child { margin-left: 0; }
-.court-leader-face img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.court-leader-face-fallback {
-  font-size: 13px;
-  font-weight: 700;
-  color: #4a3728;
+.court-leader-member-btn:hover {
+  text-decoration: underline;
+  text-decoration-color: rgba(193, 154, 107, 0.6);
+  text-underline-offset: 2px;
 }
 
 .court-leader-name {

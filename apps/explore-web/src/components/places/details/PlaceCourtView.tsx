@@ -314,19 +314,19 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               <div className="court-leader-name-row">
                 <span className="court-leader-name">{capitalizeFirst(expeditionTitle)}</span>
               </div>
-              <div className="court-leader-facepile">
-                {veilleMembers.map(m => (
-                  <button
-                    key={m.userId}
-                    type="button"
-                    className="court-leader-face"
-                    title={`Voir le profil de ${m.displayName}`}
-                    onClick={() => useMapStore.getState().setSelectedPlayerId(m.userId)}
-                  >
-                    {m.avatarUrl
-                      ? <img src={m.avatarUrl} alt={m.displayName} />
-                      : <span className="court-leader-face-fallback">{m.displayName.charAt(0).toUpperCase()}</span>}
-                  </button>
+              <div className="court-leader-members">
+                {veilleMembers.map((m, i) => (
+                  <span key={m.userId}>
+                    {i > 0 && <span className="court-leader-members-sep"> · </span>}
+                    <button
+                      type="button"
+                      className="court-leader-member-btn"
+                      title={`Voir le profil de ${m.displayName}`}
+                      onClick={() => useMapStore.getState().setSelectedPlayerId(m.userId)}
+                    >
+                      {m.displayName}
+                    </button>
+                  </span>
                 ))}
               </div>
             </>
