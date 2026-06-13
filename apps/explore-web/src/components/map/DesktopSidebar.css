@@ -130,12 +130,17 @@
 .desktop-sidebar .places-section-scroll {
   overflow-x: auto;
   flex-wrap: nowrap;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
+  /* PAS de scroll-snap : il tressaute pendant le drag souris manuel. */
+  scroll-snap-type: none;
+  scroll-behavior: auto;
   overscroll-behavior-x: contain;
   /* Pas de scrollbar visible (scrub uniquement). */
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+.desktop-sidebar .home-nouvelles-card,
+.desktop-sidebar .places-section-card {
+  scroll-snap-align: none;
 }
 .desktop-sidebar .home-nouvelles-row::-webkit-scrollbar,
 .desktop-sidebar .places-section-scroll::-webkit-scrollbar {
@@ -153,10 +158,9 @@
   user-select: none;
 }
 
-/* Blocs Nouvelles un peu plus larges + accroche au scroll. */
+/* Blocs Nouvelles un peu plus larges. */
 .desktop-sidebar .home-nouvelles-card {
   flex: 0 0 200px;
-  scroll-snap-align: start;
 }
 
 .desktop-sidebar .home-nouvelles-thumb {
