@@ -585,20 +585,18 @@
   z-index: 4;
 }
 
+/* V0.9.61 — positions fixes pour éviter toute collision dans la facepile chevauchée :
+   bouclier veilleur EN HAUT-CENTRE, étoile auteur EN BAS-CENTRE. */
 .place-exp-badge-author {
-  bottom: -2px;
-  right: -2px;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .place-exp-badge-guardian {
-  bottom: -2px;
-  left: -2px;
-}
-
-.place-exp-badge-guardian.place-exp-badge-offset {
-  left: auto;
-  right: -2px;
-  bottom: 10px;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .place-exp-visit-btn {

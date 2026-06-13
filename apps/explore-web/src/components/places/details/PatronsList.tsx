@@ -112,7 +112,7 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
             <span className="patron-rank">#1</span>
             {isGroup ? (
               <span className="patron-name patron-name-expedition">
-                <span className="patron-expedition-crown" aria-hidden>👑</span>
+                <span className="patron-expedition-crown" aria-hidden>🤝</span>
                 {capitalizeFirst(expeditionTitle)}
                 <span className="patron-title">Compagnie veilleuse</span>
               </span>

@@ -201,7 +201,7 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
                 className="ctb-expedition-pill"
                 title={`Veillé par la compagnie « ${capitalizeFirst(expeditionTitle)} »`}
               >
-                <span className="ctb-expedition-pill-crown" aria-hidden>👑</span>
+                <span className="ctb-expedition-pill-crown" aria-hidden>🤝</span>
                 <span className="ctb-expedition-pill-name">{capitalizeFirst(expeditionTitle)}</span>
               </span>
             ) : (

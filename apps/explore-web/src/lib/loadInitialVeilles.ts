@@ -67,8 +67,8 @@ export function pushVeilleOverride(
   // NOM DE L'EXPÉDITION, pas celui du lead. Solo : nom du veilleur (inchangé).
   const isGroup = members.length > 1
   const groupName = expeditionTitle?.trim() || undefined
-  // V0.9.57 — ⭐ préfixe le nom d'expédition sur la carte (signale une compagnie).
-  const veilleurName = (isGroup && groupName) ? `⭐ ${capitalizeFirst(groupName)}` : (lead?.displayName?.trim() || undefined)
+  // V0.9.61 — 🤝 (mains qui s'entraident) préfixe le nom d'expédition sur la carte.
+  const veilleurName = (isGroup && groupName) ? `🤝 ${capitalizeFirst(groupName)}` : (lead?.displayName?.trim() || undefined)
   // Le nom d'expédition porte déjà l'idée du groupe → pas de badge "+N" en plus.
   const veilleurExtraCount = (isGroup && groupName) ? 0 : Math.max(0, members.length - 1)
   // Le cache de factions doit être chargé — on l'amorce best-effort en lazy.

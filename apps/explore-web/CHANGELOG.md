@@ -1,3 +1,10 @@
+# ALPHA V0.9.61
+## Compagnies de veille : sceaux bien placés, mains qui s'entraident
+
+Le sceau 🛡️ du veilleur se place désormais **en haut au centre** de l'avatar et l'étoile ⭐ d'ajout **en bas** — fini les deux boucliers qui se chevauchaient et disparaissaient. Et l'emblème d'une compagnie devient une poignée de **mains qui s'entraident 🤝** (sur la carte et dans la Cour), plus parlant qu'une étoile pour une veille à plusieurs.
+
+---
+
 # ALPHA V0.9.60
 ## Compagnies de veille : couleur et majuscule
 

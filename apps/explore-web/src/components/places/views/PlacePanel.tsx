@@ -250,7 +250,7 @@ function ExplorerRow({ explorers, authorId, guardianIds, factionColors, placeId,
                   </div>
                 )}
                 {isAuthor && <span className="place-exp-badge place-exp-badge-author">⭐</span>}
-                {isGuardian && <span className={`place-exp-badge place-exp-badge-guardian${isAuthor ? ' place-exp-badge-offset' : ''}`}>🛡️</span>}
+                {isGuardian && <span className="place-exp-badge place-exp-badge-guardian">🛡️</span>}
               </button>
             )
           })}
