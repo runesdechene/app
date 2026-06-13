@@ -1,3 +1,10 @@
+# ALPHA V0.9.59
+## Compagnies de veille : finitions
+
+Le sceau 🛡️ du veilleur s'affiche maintenant sur **chaque** compagnon (un bug d'empilement d'avatars le cachait), la **gélule** de la compagnie dans la Cour est mise au propre, et le **Mécène Principal** d'un lieu tenu à plusieurs devient la **compagnie veilleuse** (avec ses membres) plutôt qu'un seul joueur.
+
+---
+
 # ALPHA V0.9.58
 ## Compagnies de veille : plus lisibles d'un coup d'œil
 

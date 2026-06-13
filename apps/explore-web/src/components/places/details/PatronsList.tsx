@@ -10,6 +10,9 @@ interface PatronsListProps {
   veilleurUserId?: string | null
   /** Score agrégé du mécène (= scoreVeilleur du state). Affiché à côté du nom. */
   scoreVeilleur?: number
+  /** V0.9.59 — veille à plusieurs : le #1 représente la COMPAGNIE (expédition), pas un joueur. */
+  expeditionTitle?: string | null
+  coVeilleurs?: Array<{ userId: string; displayName: string; avatarUrl: string | null; factionId: string }>
   /** V173 — liste user-centric des attaquants soutenables (cibles à dépasser). */
   challengers?: Challenger[]
   /** V0.8.23 — tap « Soutenir » sur un challenger (1 clic = 1 Couronne créditée). */
@@ -66,8 +69,10 @@ function PatronRow({ patron, side, rank, isYou, onOpen, className }: PatronRowPr
   )
 }
 
-export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, challengers = [], onSupportTap, supportDisabled, bursts = [] }: PatronsListProps) {
+export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, expeditionTitle, coVeilleurs, challengers = [], onSupportTap, supportDisabled, bursts = [] }: PatronsListProps) {
   const [open, setOpen] = useState(false)
+  // V0.9.59 — veille à plusieurs : le #1 est la COMPAGNIE (expédition), pas un joueur.
+  const isGroup = !!(coVeilleurs && coVeilleurs.length > 1 && expeditionTitle)
 
   if (patrons.length === 0) return null
 
@@ -104,7 +109,13 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
         <>
           <div className={`patron-row first${currentUserId === veilleurUserId ? ' is-you' : ''}`}>
             <span className="patron-rank">#1</span>
-            {mecenePatron ? (
+            {isGroup ? (
+              <span className="patron-name patron-name-expedition">
+                <span className="patron-expedition-crown" aria-hidden>👑</span>
+                {expeditionTitle}
+                <span className="patron-title">Compagnie veilleuse</span>
+              </span>
+            ) : mecenePatron ? (
               <button
                 type="button"
                 className="patron-name"
@@ -135,6 +146,26 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
               <span className="patron-side patron-side-support" title="Score de la veille">🛡 {meceneScore}</span>
             </span>
           </div>
+
+          {/* V0.9.59 — membres de la compagnie veilleuse (clic = profil) */}
+          {isGroup && coVeilleurs && (
+            <div className="patron-chal-supporters patron-compagnie-membres">
+              <span className="patron-chal-supporters-arrow" aria-hidden>↳</span>
+              {coVeilleurs.map((m, idx) => (
+                <span key={m.userId} className={`patron-chal-supporter${currentUserId === m.userId ? ' is-you' : ''}`}>
+                  {idx > 0 && <span className="patron-chal-sep" aria-hidden> · </span>}
+                  <button
+                    type="button"
+                    className="patron-chal-supporter-btn"
+                    onClick={() => openProfile(m.userId)}
+                    title={`Voir le profil de ${m.displayName}`}
+                  >
+                    {currentUserId === m.userId ? 'Vous' : m.displayName}
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
 
           {supporters.length > 0 && (
             <>

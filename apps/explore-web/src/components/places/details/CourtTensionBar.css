@@ -117,22 +117,24 @@
 .ctb-cluster-left { justify-content: flex-start; }
 .ctb-cluster-right { justify-content: flex-end; }
 
-/* V0.9.57 — gélule expédition (veille à plusieurs) côté défense */
+/* V0.9.59 — gélule expédition (veille à plusieurs) côté défense, dans le ton Cour */
 .ctb-expedition-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   max-width: 100%;
-  padding: 3px 10px 3px 7px;
+  padding: 4px 12px;
   border-radius: 999px;
-  border: 1.5px solid #D4AF37;
-  background: #fffdf7;
-  font-size: 12px;
-  font-weight: 600;
-  color: #4a3728;
-  line-height: 1.2;
+  border: 1.5px solid var(--color-sepia, #c19a6b);
+  background: linear-gradient(180deg, rgba(244, 180, 0, 0.16), rgba(193, 154, 107, 0.10));
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink, #4a3728);
+  line-height: 1.15;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
-.ctb-expedition-pill-crown { font-size: 12px; flex-shrink: 0; }
+.ctb-expedition-pill-crown { font-size: 13px; flex-shrink: 0; filter: saturate(1.1); }
 .ctb-expedition-pill-name {
   overflow: hidden;
   text-overflow: ellipsis;

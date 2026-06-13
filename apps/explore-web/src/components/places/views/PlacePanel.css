@@ -579,6 +579,10 @@
   font-size: 10px;
   line-height: 1;
   pointer-events: none;
+  /* V0.9.59 — les avatars de la facepile se chevauchent (margin-right négatif) ;
+     sans z-index, un badge (ex. 🛡️ veilleur) pouvait passer SOUS l'avatar voisin.
+     z-index positif sur un parent sans stacking-context → badge toujours visible. */
+  z-index: 4;
 }
 
 .place-exp-badge-author {

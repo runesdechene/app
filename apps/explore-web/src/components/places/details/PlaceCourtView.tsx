@@ -429,6 +429,8 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         currentUserId={userId ?? undefined}
         veilleurUserId={veilleur?.leaderUserId ?? null}
         scoreVeilleur={optimisticVeilleurScore}
+        expeditionTitle={expeditionTitle}
+        coVeilleurs={isGroupVeille ? veilleMembers : undefined}
         challengers={optimisticChallengers}
         onSupportTap={queueSupportTap}
         supportDisabled={balance < 1}

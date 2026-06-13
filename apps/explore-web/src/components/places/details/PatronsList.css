@@ -166,6 +166,16 @@
   white-space: nowrap;
 }
 
+/* V0.9.59 — #1 = compagnie veilleuse (expédition) au lieu d'un joueur */
+.patron-name-expedition {
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-weight: 700;
+  cursor: default;
+}
+.patron-name-expedition:hover { text-decoration: none; }
+.patron-expedition-crown { font-size: 13px; flex-shrink: 0; }
+.patron-compagnie-membres { margin-top: 2px; }
+
 .patron-you {
   opacity: 0.6;
   font-style: italic;
