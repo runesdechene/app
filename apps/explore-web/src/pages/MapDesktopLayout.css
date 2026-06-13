@@ -5,18 +5,22 @@
    ========================================== */
 
 @media (min-width: 750px) {
-  /* Largeur de la leftbar, exposée aux descendants (SearchBar, GameToast…). */
-  .app {
+  /* Largeur de la leftbar — sur :root pour être lisible aussi par les éléments
+     portalés vers <body> (ex. FilterSheet, qui s'ancre sous la barre). */
+  :root {
     --sidebar-w: 440px;
-    display: flex;
-    flex-direction: row;
+  }
+  /* Replié : la leftbar se réduit à son rail (64px). Le contenu (flex:1) tombe
+     alors à 0 et est masqué (cf. DesktopSidebar.css). Carte + contrôles bas +
+     popups ancrés suivent automatiquement via --sidebar-w.
+     data-sidebar-collapsed est posé sur <html> par MapPage. */
+  :root[data-sidebar-collapsed='true'] {
+    --sidebar-w: 64px;
   }
 
-  /* Replié : la leftbar se réduit à son rail (64px). Le contenu (flex:1) tombe
-     alors à 0 et est masqué (cf. DesktopSidebar.css). Carte + contrôles bas
-     suivent automatiquement via --sidebar-w. */
-  .app[data-sidebar-collapsed='true'] {
-    --sidebar-w: 64px;
+  .app {
+    display: flex;
+    flex-direction: row;
   }
 
   /* La carte devient un flex-item qui prend l'espace restant à droite de la

@@ -3,7 +3,7 @@
 .filter-sheet-backdrop { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; }
 .filter-sheet { width: 100%; max-height: 82vh; background: #f7f1e4; border-radius: 18px 18px 0 0; box-shadow: 0 -6px 18px rgba(0,0,0,.25); display: flex; flex-direction: column; }
 .filter-sheet-grab { width: 38px; height: 4px; background: #cbb48c; border-radius: 2px; margin: 8px auto 4px; }
-.filter-sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 16px 8px; border-bottom: 1px solid #e4d6bc; }
+.filter-sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px 10px 15px; border-bottom: 1px solid #e4d6bc; }
 .filter-sheet-head h4 { margin: 0; color: #84352f; font-size: 15px; }
 .filter-sheet-head-actions { display: flex; align-items: center; gap: 4px; }
 .filter-sheet-reset { background: none; border: none; color: #a9260f; font-size: 12px; }
@@ -29,10 +29,15 @@
 /* ── Desktop (≥750px) : popover ancré sous la barre de recherche, pas un
    bottom-sheet. Fond transparent (clic-dehors pour fermer), largeur contenue. */
 @media (min-width: 750px) {
-  .filter-sheet-backdrop { background: transparent; align-items: flex-start; justify-content: center; }
+  /* Popover ancré SOUS la barre de recherche (haut-gauche de la carte), pas
+     centré sur l'écran. Même largeur/left que .map-search-bar → centré dessous. */
+  .filter-sheet-backdrop { background: transparent; align-items: flex-start; justify-content: flex-start; }
   .filter-sheet {
-    width: 480px; max-width: 92vw; max-height: 72vh;
-    margin-top: 70px; border-radius: 16px;
+    width: 380px;
+    max-width: calc(100vw - var(--sidebar-w, 0px) - 32px);
+    max-height: 72vh;
+    margin-left: calc(var(--sidebar-w, 0px) + 16px);
+    margin-top: 68px; border-radius: 16px;
     border: 1px solid #d8c39e; box-shadow: 0 8px 28px rgba(0,0,0,.28);
   }
   .filter-sheet-grab { display: none; }

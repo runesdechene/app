@@ -338,12 +338,18 @@ export default function MapPage() {
   const mobilePanel = useMobileNavStore(s => s.activePanel)
   const isDesktop = useIsDesktop()
 
+  // Repli de la leftbar : posé sur <html> pour que --sidebar-w (défini sur
+  // :root, cf. MapDesktopLayout.css) bascule à 64px et soit lisible y compris
+  // par les éléments portalés vers <body> (FilterSheet, CreateMenu…).
+  useEffect(() => {
+    const root = document.documentElement
+    if (isDesktop && sidebarCollapsed) root.setAttribute('data-sidebar-collapsed', 'true')
+    else root.removeAttribute('data-sidebar-collapsed')
+    return () => root.removeAttribute('data-sidebar-collapsed')
+  }, [isDesktop, sidebarCollapsed])
+
   return (
-    <div
-      className="app"
-      data-mobile-panel={mobilePanel || ''}
-      data-sidebar-collapsed={isDesktop && sidebarCollapsed ? 'true' : undefined}
-    >
+    <div className="app" data-mobile-panel={mobilePanel || ''}>
       <PushPromptHost />
       <PushSubscriptionSync />
       <PushAutoPrompt />

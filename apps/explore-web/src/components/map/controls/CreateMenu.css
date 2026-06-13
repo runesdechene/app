@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  padding: 0 0 160px 30px; /* aligné au-dessus du FAB */
+  padding: 0 0 180px 30px; /* aligné au-dessus du FAB */
 }
 
 .create-menu {
@@ -88,5 +88,17 @@
   .create-menu {
     width: calc(100vw - 32px);
     max-width: 360px;
+  }
+}
+
+/* Desktop : ancré juste au-dessus du FAB "+" (left: --sidebar-w + 34px ;
+   bottom: 34px, hauteur 68px). Suit le repli de la leftbar via --sidebar-w
+   (sur :root, lisible par le portail body). Placé après la règle mobile pour
+   gagner l'overlap 750-760px. */
+@media (min-width: 750px) {
+  .create-menu-overlay {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 0 0 110px calc(var(--sidebar-w, 0px) + 34px);
   }
 }
