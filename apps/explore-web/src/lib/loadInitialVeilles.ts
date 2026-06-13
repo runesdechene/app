@@ -94,5 +94,6 @@ export function pushVeilleOverride(
     veilleurName,
     veilleurAvatarUrl,
     veilleurExtraCount,
+    veilleurUserIds: members.map(m => m.userId),
   })
 }

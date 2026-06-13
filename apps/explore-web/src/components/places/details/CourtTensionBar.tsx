@@ -23,6 +23,9 @@ interface CourtTensionBarProps {
    *  premier à gauche avec sa couronne, MÊME s'il n'a investi aucune Couronne
    *  en défense. C'est lui le défenseur primaire (par sa veille). */
   veilleur?: CourtVeilleur | null
+  /** V0.9.56 — co-veilleurs (membres de l'expédition) : tous affichés comme
+   *  défenseurs primaires (pas seulement le lead). Le 1er (lead) garde la couronne. */
+  coVeilleurs?: Array<{ userId: string; displayName: string; avatarUrl: string | null; factionId: string }>
   /** @deprecated V086 — le statut est désormais dans la pilule top-right de PlaceCourtView */
   status?: CourtStatus
 }
@@ -69,7 +72,7 @@ function AvatarChip({ patron, side, decoration }: AvatarChipProps) {
   )
 }
 
-export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur }: CourtTensionBarProps) {
+export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patrons, veilleur, coVeilleurs }: CourtTensionBarProps) {
   const total = scoreVeilleur + menaceHaute
   const veilleurPct = total > 0 ? (scoreVeilleur / total) * 100 : 100
   const showVeilleurNumber = veilleurPct >= 18
@@ -98,25 +101,35 @@ export function CourtTensionBar({ scoreVeilleur, menaceHaute, challengers, patro
   // même sans investissement Couronnes (il défend par sa veille). On le préfixe.
   // Si déjà présent dans defendersFromPatrons, on dédup.
   const defenders: Patron[] = (() => {
-    if (!veilleur || !veilleur.leaderUserId) return defendersFromPatrons
-    const leaderInList = defendersFromPatrons.find(p => p.userId === veilleur.leaderUserId)
-    if (leaderInList) {
-      // Le leader a investi : on le promeut en tête (déjà via tri si plus gros score)
-      return [leaderInList, ...defendersFromPatrons.filter(p => p.userId !== veilleur.leaderUserId)]
-    }
-    // Le leader n'a pas investi : on le synthétise comme défenseur primaire (defenseTotal = 0)
-    const synthLeader: Patron = {
-      userId: veilleur.leaderUserId,
-      displayName: veilleur.leaderName,
-      avatarUrl: veilleur.leaderAvatarUrl,
-      total: 0,
-      defenseTotal: 0,
-      attackTotal: 0,
-      factionId: veilleur.factionId,
-      factionColor: veilleur.factionColor,
-      factionPattern: veilleur.factionPattern,
-    }
-    return [synthLeader, ...defendersFromPatrons]
+    // V0.9.56 — les défenseurs primaires = TOUS les membres de l'expédition (co-veille),
+    // pas seulement le lead. Fallback sur le seul leader si coVeilleurs absent (veille solo).
+    const members = (coVeilleurs && coVeilleurs.length > 0)
+      ? coVeilleurs
+      : (veilleur?.leaderUserId
+          ? [{ userId: veilleur.leaderUserId, displayName: veilleur.leaderName, avatarUrl: veilleur.leaderAvatarUrl, factionId: veilleur.factionId ?? '' }]
+          : [])
+    if (members.length === 0) return defendersFromPatrons
+    // Lead (veilleur_user_id) en tête → garde la couronne (defenders[0]).
+    const ordered = [...members].sort((a, b) =>
+      (a.userId === veilleur?.leaderUserId ? 0 : 1) - (b.userId === veilleur?.leaderUserId ? 0 : 1))
+    const memberIds = new Set(ordered.map(m => m.userId))
+    const synthMembers: Patron[] = ordered.map(m => {
+      const inList = defendersFromPatrons.find(p => p.userId === m.userId)
+      if (inList) return inList // a investi : on garde ses vrais totaux
+      return {
+        userId: m.userId,
+        displayName: m.displayName,
+        avatarUrl: m.avatarUrl,
+        total: 0,
+        defenseTotal: 0,
+        attackTotal: 0,
+        factionId: m.factionId || veilleur?.factionId || '',
+        factionColor: veilleur?.factionColor ?? '#D4AF37',
+        factionPattern: veilleur?.factionPattern ?? null,
+      }
+    })
+    const others = defendersFromPatrons.filter(p => !memberIds.has(p.userId))
+    return [...synthMembers, ...others]
   })()
 
   // Limites d'affichage : 3 sur mobile, 5 sur desktop. Géré via CSS — on en

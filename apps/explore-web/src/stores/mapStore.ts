@@ -17,6 +17,9 @@ interface PlaceOverride {
   veilleurAvatarUrl?: string
   /** V0.7 — nombre de co-veilleurs en plus du lead (badge "+N" sur la pilule, 0 si solo) */
   veilleurExtraCount?: number
+  /** V0.9.56 — tous les userId veilleurs (membres de l'expédition), pour badger
+   *  chaque co-veilleur dans « Ils ont foulé ces terres ». */
+  veilleurUserIds?: string[]
 }
 
 export type MapPickerPurpose = 'add' | 'editPosition'

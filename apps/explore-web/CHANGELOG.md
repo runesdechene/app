@@ -1,3 +1,10 @@
+# ALPHA V0.9.57
+## Compagnies de veille : tous les compagnons à l'honneur
+
+On pousse plus loin l'affichage des veilles à plusieurs : **chaque compagnon** porte le sceau du veilleur 🛡️ dans « Ils ont foulé ces terres », **tous les avatars** apparaissent ensemble dans la barre de score de la Cour (et pas seulement le premier), et le texte passe au pluriel (« Acquis par leur visite sur le lieu »). Rappel : planter à plusieurs additionne les points de chacun — un lieu tenu par une compagnie est donc plus dur à reprendre.
+
+---
+
 # ALPHA V0.9.56
 ## Les compagnies de veille s'affichent enfin
 

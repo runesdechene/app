@@ -352,10 +352,14 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             </>
           )}
           {!veilleur.byInfluence && (
-            <span className="court-faveur-acquise">Acquis par sa visite sur le lieu</span>
+            <span className="court-faveur-acquise">
+              {isGroupVeille ? 'Acquis par leur visite sur le lieu' : 'Acquis par sa visite sur le lieu'}
+            </span>
           )}
           {veilleur.byInfluence && (
-            <span className="court-by-influence">tient ce lieu à distance</span>
+            <span className="court-by-influence">
+              {isGroupVeille ? 'tiennent ce lieu à distance' : 'tient ce lieu à distance'}
+            </span>
           )}
         </div>
       </div>
@@ -373,6 +377,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         defenseFavorPoints={defenseFavorPoints ?? 0}
         patrons={topPatrons}
         veilleur={veilleur}
+        coVeilleurs={isGroupVeille ? veilleMembers : undefined}
       />
 
       {/* Boutons tap-rafale */}

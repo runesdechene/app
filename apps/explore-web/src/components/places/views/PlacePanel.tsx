@@ -126,10 +126,10 @@ function QuickInfoChip({ icon, value, placeholder, onClick }: {
 }
 
 /** Unified explorer row — discoverer (⭐) and guardian (🛡) get badges on their avatars */
-function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited }: {
+function ExplorerRow({ explorers, authorId, guardianIds, factionColors, placeId, placeTitle, placeLocation, isExplorer, onVisited }: {
   explorers: Array<{ userId: string; visitedAt: string; userName: string; userAvatar: string | null; factionId: string }>
   authorId: string | null
-  guardianId: string | null
+  guardianIds: string[]
   factionColors: Map<string, string>
   placeId: string
   placeTitle: string
@@ -212,13 +212,13 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
   const sorted = useMemo(() => {
     const copy = [...explorers]
     copy.sort((a, b) => {
-      const aScore = (a.userId === authorId ? 0 : a.userId === guardianId ? 1 : 2)
-      const bScore = (b.userId === authorId ? 0 : b.userId === guardianId ? 1 : 2)
+      const aScore = (a.userId === authorId ? 0 : guardianIds.includes(a.userId) ? 1 : 2)
+      const bScore = (b.userId === authorId ? 0 : guardianIds.includes(b.userId) ? 1 : 2)
       if (aScore !== bScore) return aScore - bScore
       return new Date(a.visitedAt).getTime() - new Date(b.visitedAt).getTime()
     })
     return copy
-  }, [explorers, authorId, guardianId])
+  }, [explorers, authorId, guardianIds])
 
   // V0.7.7 (10/05) — limit visible avatars + bouton +X qui ouvre la modale "tous les explorers"
   const MAX_VISIBLE_AVATARS = 5
@@ -232,7 +232,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
         <div className="place-explorers-avatars-list">
           {visibleExplorers.map(exp => {
             const isAuthor = exp.userId === authorId
-            const isGuardian = exp.userId === guardianId
+            const isGuardian = guardianIds.includes(exp.userId)
             const color = factionColors.get(exp.factionId) ?? '#8A7B6A'
             return (
               <button
@@ -345,7 +345,7 @@ function ExplorerRow({ explorers, authorId, guardianId, factionColors, placeId, 
         <PlaceExplorersModal
           explorers={sorted}
           authorId={authorId}
-          guardianId={guardianId}
+          guardianId={guardianIds[0] ?? null}
           factionColors={factionColors}
           onClose={() => setShowExplorersModal(false)}
         />
@@ -854,7 +854,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
             <ExplorerRow
               explorers={v05.explorers ?? []}
               authorId={place.author?.id ?? null}
-              guardianId={placeOverride?.veilleurUserId ?? null}
+              guardianIds={placeOverride?.veilleurUserIds ?? (placeOverride?.veilleurUserId ? [placeOverride.veilleurUserId] : [])}
               factionColors={factionColors}
               placeId={place.id}
               placeTitle={place.title}
