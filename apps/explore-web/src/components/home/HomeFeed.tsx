@@ -26,6 +26,9 @@ export interface HomeFeedProps {
   showActivity?: boolean
   /** Handler du bouton "voir plus" d'activité (mobile : navigate('/activite')). */
   onSeeMoreActivity?: () => void
+  /** Affiche la section "Coupe des Héritages". Défaut : true.
+   *  Desktop : false — masquée dans la leftbar. */
+  showCoupe?: boolean
 }
 
 /**
@@ -35,7 +38,7 @@ export interface HomeFeedProps {
  * au feed (énigme, fragment, expédition, mission). Les hooks d'init globaux
  * (usePlayer/useChat/etc.) sont montés par le parent (MobileLayout / MapPage).
  */
-export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity }: HomeFeedProps) {
+export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true }: HomeFeedProps) {
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
   const [fragmentEnigma, setFragmentEnigma] = useState<{
@@ -122,9 +125,11 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
           <PlacesSection />
         </section>
 
-        <section className="home-section">
-          <CoupeHeritagesSection openFactionModal={openFactionModal} />
-        </section>
+        {showCoupe && (
+          <section className="home-section">
+            <CoupeHeritagesSection openFactionModal={openFactionModal} />
+          </section>
+        )}
 
         {showActivity && (
           <section className="home-section">
