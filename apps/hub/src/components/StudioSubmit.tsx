@@ -33,6 +33,7 @@ const DEPARTEMENTS = [
 const isVideo = (f: File) => f.type.startsWith('video/')
 const isImage = (f: File) => f.type.startsWith('image/')
 const maxSizeFor = (f: File) => (isVideo(f) ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE)
+const mb = (bytes: number) => (bytes / 1024 / 1024).toFixed(1)
 
 /** Redimensionne + convertit en WebP avant upload. */
 function compressImage(file: File): Promise<File> {
@@ -88,6 +89,7 @@ export function StudioSubmit() {
   const [welcomeCrowns, setWelcomeCrowns] = useState(0)
   const [bgUrl, setBgUrl] = useState('')
   const [asideUrl, setAsideUrl] = useState('')
+  const [fileNotice, setFileNotice] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Mission rattachée à l'envoi. Défaut : aucune (« envoi libre »). Un envoi
@@ -112,8 +114,24 @@ export function StudioSubmit() {
   }, [])
 
   const addFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files || []).filter(f => (isImage(f) || isVideo(f)) && f.size <= maxSizeFor(f))
+    const incoming = Array.from(e.target.files || [])
+    const rejected: string[] = []
+    const selected = incoming.filter(f => {
+      if (!isImage(f) && !isVideo(f)) {
+        rejected.push(`« ${f.name} » n'est ni une photo ni une vidéo`)
+        return false
+      }
+      if (f.size > maxSizeFor(f)) {
+        const limit = isVideo(f) ? '50 Mo' : '10 Mo'
+        rejected.push(`« ${f.name} » fait ${mb(f.size)} Mo — la limite est de ${limit}`)
+        return false
+      }
+      return true
+    })
     const merged = [...files, ...selected].slice(0, MAX_FILES)
+    const droppedForLimit = files.length + selected.length - merged.length
+    if (droppedForLimit > 0) rejected.push(`Maximum ${MAX_FILES} contenus — ${droppedForLimit} de plus non ajouté${droppedForLimit > 1 ? 's' : ''}`)
+    setFileNotice(rejected.join(' · '))
     previews.forEach(p => URL.revokeObjectURL(p))
     setFiles(merged)
     setPreviews(merged.map(f => URL.createObjectURL(f)))
@@ -273,6 +291,11 @@ export function StudioSubmit() {
               )}
               <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={addFiles} style={{ display: 'none' }} />
               <div className="studio__drop" onClick={() => fileInputRef.current?.click()}>⬆ Glisse ou clique pour ajouter</div>
+              {fileNotice && (
+                <p role="alert" style={{ margin: '.7rem 0 0', padding: '.6rem .8rem', borderRadius: 8, background: 'rgba(176, 58, 46, .1)', border: '1px solid rgba(176, 58, 46, .35)', color: '#8c2d22', fontSize: '.85rem', lineHeight: 1.45 }}>
+                  {fileNotice}
+                </p>
+              )}
               {previews.length > 0 && (
                 <div className="studio__thumbs">
                   {previews.map((src, i) => (
