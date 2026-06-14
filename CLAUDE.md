@@ -38,9 +38,18 @@ Les deux pipelines sont indépendantes — les nodes SQL (`category: "sql"`) sur
 | **hub** | `apps/hub/` | Back-office (`hub.runesdechene.com`) |
 | **seo-pages** | `apps/seo-pages/` | Pages SEO Node.js (`app.runesdechene.com/lieu/*`) |
 | **Supabase** | `supabase/` | DB + migrations + RPCs |
-| **Boutique Shopify** | externe | E-commerce `runesdechene.com` |
+| **Boutique Shopify** | `../shopify (Runes de Chêne)/` (voisin) | Thème Crépuscule, e-commerce `runesdechene.com` |
 
 Commandes, stack et règles spécifiques par app : voir `apps/<app>/CLAUDE.md`.
+
+### Repo voisin — thème Shopify (accès cross-repo, PAS de fusion)
+
+Décision 2026-06-14 : le thème Shopify reste un **repo séparé**, voisin sur le disque (`../shopify (Runes de Chêne)/`) — pipelines, Graphify et déploiements distincts. Mais il **consomme des RPC anon de CE monorepo** et reçoit des push du hub, donc un changement ici peut impacter le thème :
+
+- `supabase/functions/` + `supabase/migrations/` — RPC anon lues par le thème : `get_community_photos_by_product` (mur « Ils nous portent »), `get_fragment_unlocks_by_product` (bloc app-unlock fiche produit). **Modifier/supprimer une de ces RPC casse une section du thème** → vérifier l'usage côté `../shopify (Runes de Chêne)/sections/`.
+- `apps/hub/` — pousse avis & photos communautaires vers le thème.
+
+> Graphify n'indexe pas le Liquid → le thème n'est pas dans ce graphe. Sa source de design/contenu vit dans son propre repo (`docs/superpowers/`).
 
 ## Conventions monorepo-wide
 
