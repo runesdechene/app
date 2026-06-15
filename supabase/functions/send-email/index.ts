@@ -115,7 +115,6 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
         </td></tr>
         <tr><td align="center" style="padding:26px 44px 0;">
           <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#2b2114;">Bravo, ${name}.</h1>
-          <p style="margin:14px 0 0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Tu viens d'être récompensé par l'équipe Runes de Chêne.</p>
         </td></tr>
         <tr><td align="center" style="padding:30px 40px 0;">
           <div style="font-family:Georgia,'Hoefler Text',serif;font-size:52px;line-height:1;color:#8a6d3b;">+${crowns}</div>
