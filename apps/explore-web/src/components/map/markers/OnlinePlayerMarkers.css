@@ -134,7 +134,11 @@
 .player-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  /* 10001 : juste au-dessus de la couche modale standard (10000 : nouvelles,
+     partage, recherche, lightbox...) pour qu'un profil ouvert DEPUIS une de ces
+     modales s'affiche par-dessus et non dessous. Reste sous AdScreen (99999) et
+     InfoModal/likers (100000). */
+  z-index: 10001;
   background: rgba(20, 12, 5, 0.45);
   display: flex;
   align-items: center;
