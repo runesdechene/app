@@ -77,6 +77,8 @@ const TYPE_ICONS: Record<Notification['type'], string> = {
   new_photo: '\uD83D\uDCF7',                    // \uD83D\uDCF7
   // Correction de position de lieu
   place_position_edited: '\uD83D\uDCCD',        // \uD83D\uDCCD
+  // R\u00E9compense Couronnes manuelle (admin)
+  crowns_awarded: '\uD83E\uDE99',                // \uD83E\uDE99
 }
 
 function formatMessage(notif: Notification): string {
@@ -174,6 +176,10 @@ function formatMessage(notif: Notification): string {
       const km = d.distanceKm != null ? ` (${d.distanceKm} km)` : ''
       return `${d.actorName || 'Quelqu\'un'} a corrigé la position de ${d.placeTitle || 'un lieu'}${km}`
     }
+    case 'crowns_awarded':
+      return d.reason
+        ? `Tu as reçu ${d.crowns ?? 0} 🪙 — ${d.reason}`
+        : `Tu as reçu ${d.crowns ?? 0} 🪙`
   }
 }
 

@@ -78,4 +78,10 @@ describe('resolveNotificationTarget', () => {
       { kind: 'none' }
     )
   })
+
+  it('crowns_awarded → none (pas de cible, clic no-op)', () => {
+    expect(resolveNotificationTarget(notif('crowns_awarded', { crowns: 50, reason: 'Merci' }))).toEqual(
+      { kind: 'none' }
+    )
+  })
 })

@@ -23,6 +23,8 @@ export interface Notification {
     | 'description_edited' | 'new_photo'
     // Correction de position de lieu
     | 'place_position_edited'
+    // Récompense Couronnes manuelle (admin)
+    | 'crowns_awarded'
   data: {
     actorName?: string
     actorId?: string
@@ -65,6 +67,9 @@ export interface Notification {
     next_level?: number
     count?: number
     sample_names_csv?: string
+    // Récompense Couronnes manuelle
+    crowns?: number
+    reason?: string
   }
   read: boolean
   created_at: string
