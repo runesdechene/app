@@ -15,6 +15,8 @@ export interface AnnouncementListItem {
 export interface AnnouncementDetail extends AnnouncementListItem {
   body: string            // Markdown canonique
   audience: string
+  cta_url: string | null
+  cta_label: string | null
 }
 
 export interface AnnouncementComment {
