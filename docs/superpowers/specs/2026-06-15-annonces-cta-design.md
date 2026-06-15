@@ -23,7 +23,10 @@ Table `announcements` (mig 219) — deux nouvelles colonnes nullables :
 
 Le bouton n'est rendu que si `cta_url` est non-vide.
 
-### Migration `220_announcements_cta.sql`
+### Migration `254_announcements_cta.sql`
+
+> Numéro réel : `254` (220 était déjà pris par `220_announcements_broadcast_push.sql` ; 254 = prochain libre au moment de l'implémentation).
+
 
 - `ALTER TABLE public.announcements ADD COLUMN cta_url text, ADD COLUMN cta_label text;`
 - `DROP` de l'ancienne signature 7-args de `update_announcement`, puis recréation

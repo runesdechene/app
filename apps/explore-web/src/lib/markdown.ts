@@ -3,11 +3,12 @@ import DOMPurify from 'dompurify'
 
 marked.setOptions({ breaks: true, gfm: true })
 
-// Liens du corps -> nouvel onglet + rel sécurisé. Enregistré une seule fois.
-// No-op hors navigateur (tests node) où addHook n'est pas disponible.
+// Liens EXTERNES du corps -> nouvel onglet + rel sécurisé. Enregistré une seule
+// fois. No-op hors navigateur (tests node) où addHook n'est pas disponible.
+// Garde sur http(s) : un éventuel lien interne ne serait pas forcé en _blank.
 if (typeof DOMPurify.addHook === 'function') {
   DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    if (node.tagName === 'A') {
+    if (node.tagName === 'A' && /^https?:\/\//i.test(node.getAttribute('href') ?? '')) {
       node.setAttribute('target', '_blank')
       node.setAttribute('rel', 'noopener noreferrer')
     }
