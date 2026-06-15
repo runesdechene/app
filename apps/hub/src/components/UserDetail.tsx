@@ -74,6 +74,12 @@ export function UserDetail() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [awardAmount, setAwardAmount] = useState('')
+  const [awardReason, setAwardReason] = useState('')
+  const [awarding, setAwarding] = useState(false)
+  const [awardError, setAwardError] = useState<string | null>(null)
+  const [awardOk, setAwardOk] = useState<string | null>(null)
+
   useEffect(() => {
     if (!userId) return
     fetchAll()
@@ -147,6 +153,31 @@ export function UserDetail() {
       setError(`Erreur: ${err}`)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleAward() {
+    const amount = parseInt(awardAmount, 10)
+    const reason = awardReason.trim()
+    if (!user || !Number.isFinite(amount) || amount <= 0 || !reason) return
+    if (!window.confirm(`Envoyer ${amount} 🪙 à ${user.display_name || user.first_name || user.email_address} ? Un email lui sera envoyé.`)) return
+
+    setAwarding(true)
+    setAwardError(null)
+    setAwardOk(null)
+    try {
+      const { error: e } = await supabase.rpc('award_crowns_manual', {
+        p_user_id: user.id,
+        p_amount: amount,
+        p_reason: reason,
+      })
+      if (e) { setAwardError(e.message); return }
+      setAwardAmount('')
+      setAwardReason('')
+      setAwardOk(`+${amount} 🪙 envoyées`)
+      await fetchAll()
+    } finally {
+      setAwarding(false)
     }
   }
 
@@ -233,6 +264,37 @@ export function UserDetail() {
               : 'Jamais'}
           </div>
         </div>
+      </div>
+
+      {/* Envoyer des Couronnes */}
+      <div className="ud-section">
+        <h2>Envoyer des Couronnes</h2>
+        <div className="ud-award">
+          <input
+            type="number"
+            min={1}
+            className="ud-award-amount"
+            placeholder="Montant"
+            value={awardAmount}
+            onChange={e => setAwardAmount(e.target.value)}
+          />
+          <input
+            type="text"
+            className="ud-award-reason"
+            placeholder="Motif (ex. Gagnant du concours de juin)"
+            value={awardReason}
+            onChange={e => setAwardReason(e.target.value)}
+          />
+          <button
+            className="ud-award-btn"
+            onClick={handleAward}
+            disabled={awarding || !awardReason.trim() || !(parseInt(awardAmount, 10) > 0)}
+          >
+            {awarding ? 'Envoi…' : 'Envoyer'}
+          </button>
+        </div>
+        {awardError && <p className="ud-error">{awardError}</p>}
+        {awardOk && <p className="ud-award-ok">{awardOk}</p>}
       </div>
 
       {/* Fragments */}

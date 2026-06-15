@@ -4309,3 +4309,38 @@ table select {
 .img-curate-btns button.on { background: #2a2418; color: #fff; }
 .img-product { font-size: 11px; padding: 3px 6px; border: 1px solid #c9b48a; border-radius: 4px; }
 .photo-quest { font-size: 12px; color: #8a6d3b; }
+
+.ud-award {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.ud-award-amount {
+  width: 110px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.ud-award-reason {
+  flex: 1;
+  min-width: 220px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.ud-award-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ud-award-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ud-award-ok { color: var(--color-primary); margin-top: 8px; }
