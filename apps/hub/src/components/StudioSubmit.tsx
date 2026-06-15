@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import './StudioSubmit.css'
 
 const MAX_FILES = 10
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+const MAX_IMAGE_SIZE = 15 * 1024 * 1024
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024
 const MAX_MESSAGE = 500
 const IMAGE_MAX_DIMENSION = 1920
@@ -122,7 +122,7 @@ export function StudioSubmit() {
         return false
       }
       if (f.size > maxSizeFor(f)) {
-        const limit = isVideo(f) ? '50 Mo' : '10 Mo'
+        const limit = isVideo(f) ? '50 Mo' : '15 Mo'
         rejected.push(`« ${f.name} » fait ${mb(f.size)} Mo — la limite est de ${limit}`)
         return false
       }
