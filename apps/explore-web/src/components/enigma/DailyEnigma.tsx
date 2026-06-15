@@ -17,7 +17,7 @@ interface Enigma {
   question: string
   format: 'qcm' | 'free'
   choices: string[] | null
-  heritageId: string | null
+  theme: string | null
   rewardInfluence: number
   rewardErudition: number
 }
@@ -72,17 +72,17 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const [result, setResult] = useState<AnswerResult | null>(null)
   const [rpcError, setRpcError] = useState<string | null>(null)
   const [, setTotalGains] = useState({ influence: 0, erudition: 0 })
-  const [factions, setFactions] = useState<Map<string, { color: string; pattern: string; title: string; adjective: string }>>(new Map())
+  const [themes, setThemes] = useState<Map<string, { label: string; color: string | null; icon: string | null }>>(new Map())
 
-  // Load faction visuals once
+  // Load theme visuals once (macaron)
   useEffect(() => {
-    supabase.from('factions').select('id, color, pattern, title, adjective').order('order').then(({ data }) => {
+    supabase.from('enigma_themes').select('id, label, color, icon').then(({ data }) => {
       if (!data) return
-      const map = new Map<string, { color: string; pattern: string; title: string; adjective: string }>()
-      for (const f of data as Array<{ id: string; color: string; pattern: string; title: string; adjective: string }>) {
-        map.set(f.id, { color: f.color, pattern: f.pattern, title: f.title, adjective: f.adjective || f.title })
+      const map = new Map<string, { label: string; color: string | null; icon: string | null }>()
+      for (const t of data as Array<{ id: string; label: string; color: string | null; icon: string | null }>) {
+        map.set(t.id, { label: t.label, color: t.color, icon: t.icon })
       }
-      setFactions(map)
+      setThemes(map)
     })
   }, [])
 
@@ -117,7 +117,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
           question: e.question as string,
           format: e.format as 'qcm' | 'free',
           choices: e.choices as string[] | null,
-          heritageId: e.heritageId as string | null,
+          theme: e.theme as string | null,
           rewardInfluence: (e.rewardInfluence as number) ?? 0,
           rewardErudition: (e.rewardErudition as number) ?? 0,
         }))
@@ -233,21 +233,22 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
               <div className={`enigma-difficulty ${enigma.difficulty}`}>
                 {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
               </div>
-              {enigma.heritageId && factions.get(enigma.heritageId) && (() => {
-                const f = factions.get(enigma.heritageId!)!
+              {enigma.theme && themes.get(enigma.theme) && (() => {
+                const t = themes.get(enigma.theme!)!
+                const c = t.color ?? '#c19a6b'
                 return (
-                  <div className="enigma-heritage-pill" style={{ backgroundColor: `${f.color}20`, color: f.color }}>
-                    {f.pattern && (
+                  <div className="enigma-heritage-pill" style={{ backgroundColor: `${c}20`, color: c }}>
+                    {t.icon && (
                       <span
                         className="enigma-heritage-icon"
                         style={{
-                          WebkitMaskImage: `url(${f.pattern})`,
-                          maskImage: `url(${f.pattern})`,
-                          backgroundColor: f.color,
+                          WebkitMaskImage: `url(${t.icon})`,
+                          maskImage: `url(${t.icon})`,
+                          backgroundColor: c,
                         }}
                       />
                     )}
-                    Faction {f.adjective}
+                    {t.label}
                   </div>
                 )
               })()}
