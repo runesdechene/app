@@ -17,10 +17,13 @@ interface Fragment {
   icon_url: string | null
   image_url: string | null
   collection: string | null
+  theme: string | null
   link_url: string | null
   visible: boolean
   words: FragmentWord[]
 }
+
+interface ThemeOption { id: string; label: string }
 
 interface PlayerResult {
   id: string
@@ -47,6 +50,7 @@ interface FactionOption {
 export function Fragments() {
   const [fragments, setFragments] = useState<Fragment[]>([])
   const [factions, setFactions] = useState<FactionOption[]>([])
+  const [themes, setThemes] = useState<ThemeOption[]>([])
   const [savedFragments, setSavedFragments] = useState<Fragment[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -80,18 +84,20 @@ export function Fragments() {
 
   async function fetchFragments() {
     try {
-      const [fragsRes, wordsRes, factionsRes, ownersRes, tagsRes, affRes] = await Promise.all([
+      const [fragsRes, wordsRes, factionsRes, ownersRes, tagsRes, affRes, themesRes] = await Promise.all([
         supabase.from('title_fragments').select('*').order('created_at', { ascending: false }),
         supabase.from('fragment_words').select('*').order('id'),
         supabase.from('factions').select('id, title').order('order'),
         supabase.from('user_fragments').select('user_id, fragment_id, users!inner(first_name, email_address)'),
         supabase.from('tags').select('id, title').order('title'),
         supabase.from('fragment_tag_affinities').select('*'),
+        supabase.from('enigma_themes').select('id, label').order('sort_order'),
       ])
 
       const frags = fragsRes.data
       if (!frags) return
       if (factionsRes.data) setFactions(factionsRes.data as FactionOption[])
+      if (themesRes.data) setThemes(themesRes.data as ThemeOption[])
       if (tagsRes.data) setTags(tagsRes.data as TagOption[])
       const aff = (affRes.data ?? []) as Affinity[]
       setAffinities(aff)
@@ -114,7 +120,7 @@ export function Fragments() {
       const result: Fragment[] = (frags as Array<{
         id: number; name: string; description: string | null;
         icon: string | null; icon_url: string | null; image_url: string | null; collection: string | null;
-        link_url: string | null; visible: boolean
+        theme: string | null; link_url: string | null; visible: boolean
       }>).map(f => ({
         ...f,
         words: ((words ?? []) as Array<{
@@ -214,6 +220,7 @@ export function Fragments() {
           image_url: f.image_url,
           link_url: f.link_url || null,
           collection: f.collection || null,
+          theme: f.theme || null,
           visible: f.visible,
         }).eq('id', f.id).then(r => r)
       }).filter(Boolean)
@@ -552,6 +559,23 @@ export function Fragments() {
                   <option value="">Aucune</option>
                   {factions.map(f => (
                     <option key={f.id} value={f.id}>{f.title}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Thème — pool de pioche des énigmes du motif */}
+            <div className="faction-bonus-row">
+              <label className="faction-bonus-input">
+                <span>Thème (pioche énigmes)</span>
+                <select
+                  value={frag.theme ?? ''}
+                  onChange={e => updateFragment(frag.id, 'theme', e.target.value || null)}
+                  className="fragment-select"
+                >
+                  <option value="">Aucun</option>
+                  {themes.map(t => (
+                    <option key={t.id} value={t.id}>{t.label}</option>
                   ))}
                 </select>
               </label>
