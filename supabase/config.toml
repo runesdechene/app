@@ -34,3 +34,11 @@ enabled = false
 [storage]
 enabled = true
 file_size_limit = "50MiB"
+
+# send-email est appelée par un trigger SQL (pg_net) avec un X-Email-Secret, PAS
+# un JWT utilisateur → il faut désactiver la vérif JWT plateforme, sinon 401 avant
+# même d'exécuter la fonction (la fonction fait sa propre vérif du secret).
+# Un redéploiement CLI SANS --no-verify-jwt réactivait la vérif → emails cassés
+# (incident 2026-06-15). Ce bloc verrouille le bon comportement.
+[functions.send-email]
+verify_jwt = false
