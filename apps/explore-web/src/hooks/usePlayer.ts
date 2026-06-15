@@ -74,11 +74,39 @@ export function usePlayer() {
           p_new_id: authId,
         })
         if (migResult?.error) {
-          console.error('[usePlayer] Migration failed:', migResult.error)
+          console.error('[usePlayer] Migration RPC error:', migResult.error)
         } else {
           console.info('[usePlayer] Migration successful:', migResult)
-          // Utiliser le nouvel ID
-          userData.id = authId
+        }
+
+        // Vérifier l'état réel plutôt que le retour de la RPC : la migration a pu
+        // être faite par le trigger d'auth (handle_new_user) en parallèle. On se
+        // fie à la présence d'une ligne à l'auth.uid().
+        const { data: migrated } = await supabase
+          .from('users')
+          .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes')
+          .eq('id', authId)
+          .single()
+
+        if (cancelled) {
+          setLoading(false)
+          return
+        }
+
+        if (migrated) {
+          // Migration aboutie (par la RPC ou par le trigger) — basculer sur le nouvel ID.
+          Object.assign(userData, migrated)
+        } else {
+          // Échec réel : ne pas continuer avec un id périmé, sinon la RLS
+          // (auth.uid() = users.id) échouerait silencieusement pour toute la session.
+          console.error('[usePlayer] Migration incomplète : aucune ligne à auth.uid()')
+          useToastStore.getState().addToast({
+            type: 'error',
+            message: 'Un souci est survenu à la connexion. Réessaie de te reconnecter dans un instant.',
+            timestamp: Date.now(),
+          })
+          setLoading(false)
+          return
         }
       }
 
