@@ -10,7 +10,7 @@ interface Enigma {
   id: number
   type: EnigmaType
   difficulty: Difficulty
-  heritage_id: string | null
+  theme: string | null
   place_tag: string | null
   lore_text: string
   question: string
@@ -22,9 +22,9 @@ interface Enigma {
   created_at: string
 }
 
-interface Faction {
+interface Theme {
   id: string
-  title: string
+  label: string
 }
 
 interface Tag {
@@ -56,7 +56,7 @@ const PER_PAGE = 20
 const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at'> = {
   type: 'daily',
   difficulty: 'easy',
-  heritage_id: null,
+  theme: null,
   place_tag: null,
   lore_text: '',
   question: '',
@@ -70,7 +70,7 @@ const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at'> = {
 export function Enigmas() {
   const [enigmas, setEnigmas] = useState<Enigma[]>([])
   const [savedEnigmas, setSavedEnigmas] = useState<Enigma[]>([])
-  const [factions, setFactions] = useState<Faction[]>([])
+  const [themes, setThemes] = useState<Theme[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -79,7 +79,7 @@ export function Enigmas() {
   // Filters
   const [filterType, setFilterType] = useState<EnigmaType | 'all'>('all')
   const [filterDifficulty, setFilterDifficulty] = useState<Difficulty | 'all'>('all')
-  const [filterHeritage, setFilterHeritage] = useState<string>('all')
+  const [filterTheme, setFilterTheme] = useState<string>('all')
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -95,9 +95,9 @@ export function Enigmas() {
   async function fetchData() {
     setLoading(true)
     try {
-      const [enigmasRes, factionsRes, tagsRes] = await Promise.all([
+      const [enigmasRes, themesRes, tagsRes] = await Promise.all([
         supabase.from('enigmas').select('*').order('created_at', { ascending: false }),
-        supabase.from('factions').select('id, title').order('title'),
+        supabase.from('enigma_themes').select('id, label').order('sort_order'),
         supabase.from('tags').select('id, title').order('order'),
       ])
 
@@ -106,7 +106,7 @@ export function Enigmas() {
           id: Number(e.id),
           type: (e.type as EnigmaType) || 'daily',
           difficulty: (e.difficulty as Difficulty) || 'easy',
-          heritage_id: (e.heritage_id as string | null) ?? null,
+          theme: (e.theme as string | null) ?? null,
           place_tag: (e.place_tag as string | null) ?? null,
           lore_text: String(e.lore_text ?? ''),
           question: String(e.question ?? ''),
@@ -120,7 +120,7 @@ export function Enigmas() {
         setEnigmas(mapped)
         setSavedEnigmas(JSON.parse(JSON.stringify(mapped)))
       }
-      if (factionsRes.data) setFactions(factionsRes.data as Faction[])
+      if (themesRes.data) setThemes(themesRes.data as Theme[])
       if (tagsRes.data) setTags(tagsRes.data as Tag[])
     } finally {
       setLoading(false)
@@ -133,13 +133,13 @@ export function Enigmas() {
     return enigmas.filter(e => {
       if (filterType !== 'all' && e.type !== filterType) return false
       if (filterDifficulty !== 'all' && e.difficulty !== filterDifficulty) return false
-      if (filterHeritage !== 'all' && e.heritage_id !== filterHeritage) return false
+      if (filterTheme !== 'all' && e.theme !== filterTheme) return false
       if (filterActive === 'active' && !e.active) return false
       if (filterActive === 'inactive' && e.active) return false
       if (q && !e.question.toLowerCase().includes(q) && !e.lore_text.toLowerCase().includes(q) && !e.answer.toLowerCase().includes(q)) return false
       return true
     })
-  }, [enigmas, filterType, filterDifficulty, filterHeritage, filterActive, searchQuery])
+  }, [enigmas, filterType, filterDifficulty, filterTheme, filterActive, searchQuery])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const paged = useMemo(() => {
@@ -176,7 +176,7 @@ export function Enigmas() {
     setEditForm({
       type: enigma.type,
       difficulty: enigma.difficulty,
-      heritage_id: enigma.heritage_id,
+      theme: enigma.theme,
       place_tag: enigma.place_tag,
       lore_text: enigma.lore_text,
       question: enigma.question,
@@ -227,7 +227,7 @@ export function Enigmas() {
       const payload = {
         type: editForm.type,
         difficulty: editForm.difficulty,
-        heritage_id: editForm.heritage_id || null,
+        theme: editForm.theme || null,
         place_tag: editForm.place_tag || null,
         lore_text: editForm.lore_text,
         question: editForm.question,
@@ -285,7 +285,7 @@ export function Enigmas() {
             .update({
               type: e.type,
               difficulty: e.difficulty,
-              heritage_id: e.heritage_id,
+              theme: e.theme,
               place_tag: e.place_tag,
               lore_text: e.lore_text,
               question: e.question,
@@ -357,15 +357,15 @@ export function Enigmas() {
               </select>
             </label>
             <label className="settings-global-field">
-              <span>Heritage</span>
+              <span>Thème</span>
               <select
-                value={editForm.heritage_id || ''}
-                onChange={e => setEditForm(prev => ({ ...prev, heritage_id: e.target.value || null }))}
+                value={editForm.theme || ''}
+                onChange={e => setEditForm(prev => ({ ...prev, theme: e.target.value || null }))}
                 className="settings-input"
               >
                 <option value="">Aucun (universel)</option>
-                {factions.map(f => (
-                  <option key={f.id} value={f.id}>{f.title}</option>
+                {themes.map(t => (
+                  <option key={t.id} value={t.id}>{t.label}</option>
                 ))}
               </select>
             </label>
@@ -554,13 +554,13 @@ export function Enigmas() {
           <option value="hard">Difficile</option>
         </select>
         <select
-          value={filterHeritage}
-          onChange={e => { setFilterHeritage(e.target.value); setPage(1) }}
+          value={filterTheme}
+          onChange={e => { setFilterTheme(e.target.value); setPage(1) }}
           className="settings-input"
         >
-          <option value="all">Tous heritages</option>
-          {factions.map(f => (
-            <option key={f.id} value={f.id}>{f.title}</option>
+          <option value="all">Tous thèmes</option>
+          {themes.map(t => (
+            <option key={t.id} value={t.id}>{t.label}</option>
           ))}
         </select>
         <select
@@ -586,15 +586,15 @@ export function Enigmas() {
                 <th>Type</th>
                 <th>Difficulte</th>
                 <th>Question</th>
-                <th>Heritage</th>
+                <th>Thème</th>
                 <th>Active</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paged.map(e => {
-                const factionName = e.heritage_id
-                  ? factions.find(f => f.id === e.heritage_id)?.title ?? '-'
+                const themeName = e.theme
+                  ? themes.find(t => t.id === e.theme)?.label ?? '-'
                   : 'Universel'
                 return (
                   <tr key={e.id}>
@@ -610,7 +610,7 @@ export function Enigmas() {
                     <td style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {e.question || <span style={{ opacity: 0.4 }}>Pas de question</span>}
                     </td>
-                    <td style={{ fontSize: 11 }}>{factionName}</td>
+                    <td style={{ fontSize: 11 }}>{themeName}</td>
                     <td style={{ textAlign: 'center' }}>
                       <button
                         onClick={() => toggleActive(e.id)}
