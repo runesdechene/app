@@ -10,6 +10,11 @@ describe('renderMarkdown', () => {
   it('gère une entrée vide', () => {
     expect(renderMarkdown('')).toBe('')
   })
+  it('rend un lien markdown en ancre', () => {
+    const html = renderMarkdown('Voir [la boutique](https://runesdechene.com)')
+    expect(html).toContain('href="https://runesdechene.com"')
+    expect(html).toContain('la boutique')
+  })
 })
 
 describe('excerpt', () => {

@@ -3,6 +3,17 @@ import DOMPurify from 'dompurify'
 
 marked.setOptions({ breaks: true, gfm: true })
 
+// Liens du corps -> nouvel onglet + rel sécurisé. Enregistré une seule fois.
+// No-op hors navigateur (tests node) où addHook n'est pas disponible.
+if (typeof DOMPurify.addHook === 'function') {
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A') {
+      node.setAttribute('target', '_blank')
+      node.setAttribute('rel', 'noopener noreferrer')
+    }
+  })
+}
+
 /**
  * Rendu Markdown → HTML sanitisé (DOMPurify — défense en profondeur, le contenu
  * est rédigé en admin mais affiché à tous les joueurs). DOMPurify ne fonctionne
