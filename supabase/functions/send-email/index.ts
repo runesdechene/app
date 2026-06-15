@@ -60,7 +60,9 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e9ddc7;background:linear-gradient(180deg,#efe4cf 0%,#e1d1b2 100%);padding:32px 12px;">
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
-        <tr><td style="height:6px;background:linear-gradient(90deg,#b8945a,#9a7b41,#cda86a);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="font-size:0;line-height:0;">
+          <img src="https://app.runesdechene.com/email-banner.jpg" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+        </td></tr>
         <tr><td align="center" style="padding:34px 40px 0;">
           <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="360" style="display:block;width:360px;max-width:88%;height:auto;border:0;" />
         </td></tr>
@@ -71,9 +73,6 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
         <tr><td align="center" style="padding:30px 40px 0;">
           <div style="font-family:Georgia,'Hoefler Text',serif;font-size:52px;line-height:1;color:#8a6d3b;">+${crowns} 🪙</div>
           <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;color:#9a7b41;text-transform:uppercase;margin-top:6px;">Couronnes</div>
-        </td></tr>
-        <tr><td align="center" style="padding:16px 40px 0;">
-          <img src="https://app.runesdechene.com/email-crowns-v2.png" alt="Couronnes de Chêne" width="286" style="display:block;width:286px;max-width:74%;height:auto;border:0;border-radius:50%;" />
         </td></tr>
         <tr><td align="center" style="padding:16px 48px 0;">
           <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Tes Couronnes de Chêne t'attendent sur <strong style="color:#2b2114;">l'application</strong>.<br>Connecte-toi avec cet email pour les dépenser.</p>
@@ -109,7 +108,9 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e9ddc7;background:linear-gradient(180deg,#efe4cf 0%,#e1d1b2 100%);padding:32px 12px;">
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
-        <tr><td style="height:6px;background:linear-gradient(90deg,#b8945a,#9a7b41,#cda86a);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="font-size:0;line-height:0;">
+          <img src="https://app.runesdechene.com/email-banner.jpg" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+        </td></tr>
         <tr><td align="center" style="padding:34px 40px 0;">
           <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="360" style="display:block;width:360px;max-width:88%;height:auto;border:0;" />
         </td></tr>
@@ -119,9 +120,6 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
         <tr><td align="center" style="padding:30px 40px 0;">
           <div style="font-family:Georgia,'Hoefler Text',serif;font-size:52px;line-height:1;color:#8a6d3b;">+${crowns} 🪙</div>
           <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;color:#9a7b41;text-transform:uppercase;margin-top:6px;">Couronnes</div>
-        </td></tr>
-        <tr><td align="center" style="padding:16px 40px 0;">
-          <img src="https://app.runesdechene.com/email-crowns-v2.png" alt="Couronnes de Chêne" width="286" style="display:block;width:286px;max-width:74%;height:auto;border:0;border-radius:50%;" />
         </td></tr>
         ${safeReason ? `<tr><td align="center" style="padding:22px 48px 0;">
           <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#9a7b41;text-transform:uppercase;">Pour</div>
