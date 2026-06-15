@@ -61,9 +61,8 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
         <tr><td style="height:6px;background:linear-gradient(90deg,#b8945a,#9a7b41,#cda86a);font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td align="center" style="padding:36px 40px 0;">
-          <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:6px;color:#9a7b41;text-transform:uppercase;">Runes de Chêne</div>
-          <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#b6a07a;text-transform:uppercase;margin-top:8px;">⚜&nbsp;&nbsp;Le Mouvement&nbsp;&nbsp;⚜</div>
+        <tr><td align="center" style="padding:34px 40px 0;">
+          <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="180" style="display:block;width:180px;max-width:62%;height:auto;border:0;" />
         </td></tr>
         <tr><td align="center" style="padding:26px 44px 0;">
           <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#2b2114;">Merci, ${name}.</h1>
@@ -111,9 +110,8 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
         <tr><td style="height:6px;background:linear-gradient(90deg,#b8945a,#9a7b41,#cda86a);font-size:0;line-height:0;">&nbsp;</td></tr>
-        <tr><td align="center" style="padding:36px 40px 0;">
-          <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:6px;color:#9a7b41;text-transform:uppercase;">Runes de Chêne</div>
-          <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#b6a07a;text-transform:uppercase;margin-top:8px;">⚜&nbsp;&nbsp;Le Mouvement&nbsp;&nbsp;⚜</div>
+        <tr><td align="center" style="padding:34px 40px 0;">
+          <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="180" style="display:block;width:180px;max-width:62%;height:auto;border:0;" />
         </td></tr>
         <tr><td align="center" style="padding:26px 44px 0;">
           <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#2b2114;">Bravo, ${name}.</h1>
