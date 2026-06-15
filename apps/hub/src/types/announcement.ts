@@ -13,6 +13,8 @@ export interface Announcement {
   body: string
   push_text: string | null
   insta_caption: string | null
+  cta_url: string | null
+  cta_label: string | null
   status: 'draft' | 'published'
   audience: string
   shopify_article_id: string | null

@@ -76,6 +76,8 @@ function ComposerEditor({ id }: { id: string }) {
         p_push_text: ann.push_text,
         p_insta_caption: ann.insta_caption,
         p_type: ann.type,
+        p_cta_url: ann.cta_url,
+        p_cta_label: ann.cta_label,
       })
       if (e) { setError(e.message); return }
       const row = data as Announcement
@@ -220,6 +222,28 @@ function ComposerEditor({ id }: { id: string }) {
             <textarea rows={16} value={ann.body} onChange={(e) => setField('body', e.target.value)} />
           </label>
           <div className="composer-preview" dangerouslySetInnerHTML={{ __html: renderMarkdown(ann.body) }} />
+          <label>Lien du bouton (CTA)
+            <input
+              type="url"
+              placeholder="https://runesdechene.com/products/..."
+              value={ann.cta_url ?? ''}
+              onChange={(e) => setField('cta_url', e.target.value || null)}
+            />
+          </label>
+          <label>Texte du bouton
+            <input
+              type="text"
+              placeholder="Découvrir"
+              value={ann.cta_label ?? ''}
+              onChange={(e) => setField('cta_label', e.target.value || null)}
+            />
+          </label>
+          {ann.cta_url && (
+            <div className="composer-cta-preview">
+              <span className="composer-field-label">Aperçu du bouton</span>
+              <span className="composer-cta-btn">{(ann.cta_label || 'Découvrir')} →</span>
+            </div>
+          )}
         </div>
       )}
 
