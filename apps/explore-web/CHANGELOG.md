@@ -1,3 +1,10 @@
+# ALPHA V0.9.69
+## Un nouveau chapitre : la Grèce Antique
+
+Des dizaines de nouvelles énigmes sur la Grèce Antique font leur entrée — guerres médiques, philosophes, cités, sciences et cultes à mystères. De quoi défier ta culture pendant des semaines. Et désormais, chaque énigme arbore un petit **macaron coloré** indiquant son thème, sur l'énigme du jour comme sur celles de tes motifs.
+
+---
+
 # ALPHA V0.9.68
 ## Les mises à jour, sans le pop-up intrusif
 
