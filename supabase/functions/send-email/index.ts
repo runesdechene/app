@@ -95,9 +95,13 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
   }
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 function renderCrownsAwarded(firstName: string, crowns: number, reason: string): { subject: string; html: string } {
-  const name = firstName?.trim() || 'Ami du Mouvement'
-  const safeReason = (reason || '').trim()
+  const name = escapeHtml(firstName?.trim() || 'Ami du Mouvement')
+  const safeReason = escapeHtml((reason || '').trim())
   return {
     subject: `Tu as reçu ${crowns} Couronnes ⚜️`,
     html: `<!doctype html>

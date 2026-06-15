@@ -282,6 +282,7 @@ export function UserDetail() {
             type="text"
             className="ud-award-reason"
             placeholder="Motif (ex. Gagnant du concours de juin)"
+            maxLength={120}
             value={awardReason}
             onChange={e => setAwardReason(e.target.value)}
           />
