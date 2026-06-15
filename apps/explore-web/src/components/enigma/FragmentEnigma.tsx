@@ -27,6 +27,7 @@ interface Enigma {
   question: string
   format: string
   choices: string[] | null
+  theme: string | null
 }
 
 interface AnswerResult {
@@ -49,6 +50,19 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<AnswerResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [themes, setThemes] = useState<Map<string, { label: string; color: string | null; icon: string | null }>>(new Map())
+
+  // Charger les visuels de thème (macaron) une fois
+  useEffect(() => {
+    supabase.from('enigma_themes').select('id, label, color, icon').then(({ data }) => {
+      if (!data) return
+      const map = new Map<string, { label: string; color: string | null; icon: string | null }>()
+      for (const t of data as Array<{ id: string; label: string; color: string | null; icon: string | null }>) {
+        map.set(t.id, { label: t.label, color: t.color, icon: t.icon })
+      }
+      setThemes(map)
+    })
+  }, [])
 
   // Charger l'énigme au montage
   useEffect(() => {
@@ -131,6 +145,27 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
 
         {enigma && !result && (
           <>
+            {enigma.theme && themes.get(enigma.theme) && (() => {
+              const t = themes.get(enigma.theme!)!
+              const c = t.color ?? '#c19a6b'
+              return (
+                <div className="enigma-meta">
+                  <div className="enigma-heritage-pill" style={{ backgroundColor: `${c}20`, color: c }}>
+                    {t.icon && (
+                      <span
+                        className="enigma-heritage-icon"
+                        style={{
+                          WebkitMaskImage: `url(${t.icon})`,
+                          maskImage: `url(${t.icon})`,
+                          backgroundColor: c,
+                        }}
+                      />
+                    )}
+                    {t.label}
+                  </div>
+                </div>
+              )
+            })()}
             <p className="enigma-lore">{enigma.loreText}</p>
             <p className="enigma-question">{enigma.question}</p>
 
