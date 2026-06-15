@@ -4,6 +4,7 @@ import { useAnnouncement } from '../../hooks/useAnnouncements'
 import { renderMarkdown } from '../../lib/markdown'
 import { formatFrenchLongDate } from '../../lib/dateFormat'
 import { AnnouncementSocial } from './AnnouncementSocial'
+import { AnnouncementCta } from './AnnouncementCta'
 import '../../pages/ArticlePage.css'
 import './ArticleModal.css'
 
@@ -39,6 +40,7 @@ export function ArticleModal({ slug, onClose }: { slug: string; onClose: () => v
               <p className="article-date">{formatFrenchLongDate(item.published_at)}</p>
             )}
             <article className="article-body" dangerouslySetInnerHTML={{ __html: html }} />
+            <AnnouncementCta url={item.cta_url} label={item.cta_label} />
             <AnnouncementSocial announcementId={item.id} />
           </>
         )}

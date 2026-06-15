@@ -4,6 +4,7 @@ import { useAnnouncement } from '../hooks/useAnnouncements'
 import { renderMarkdown } from '../lib/markdown'
 import { formatFrenchLongDate } from '../lib/dateFormat'
 import { AnnouncementSocial } from '../components/announcements/AnnouncementSocial'
+import { AnnouncementCta } from '../components/announcements/AnnouncementCta'
 import './ArticlePage.css'
 
 export default function ArticlePage() {
@@ -39,6 +40,7 @@ export default function ArticlePage() {
         <p className="article-date">{formatFrenchLongDate(item.published_at)}</p>
       )}
       <article className="article-body" dangerouslySetInnerHTML={{ __html: html }} />
+      <AnnouncementCta url={item.cta_url} label={item.cta_label} />
       <AnnouncementSocial announcementId={item.id} />
     </main>
   )
