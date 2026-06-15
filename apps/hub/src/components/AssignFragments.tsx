@@ -66,13 +66,14 @@ export function AssignFragments() {
 
   async function handleSearch(query: string) {
     setSearch(query)
-    if (query.length < 2) { setResults([]); return }
+    const q = query.trim()
+    if (q.length < 2) { setResults([]); return }
     setSearching(true)
 
     const { data } = await supabase
       .from('users')
       .select('id, first_name, email_address, avatar_url')
-      .or(`first_name.ilike.%${query}%,email_address.ilike.%${query}%`)
+      .or(`first_name.ilike.%${q}%,email_address.ilike.%${q}%`)
       .limit(8)
 
     setResults((data ?? []) as PlayerResult[])
