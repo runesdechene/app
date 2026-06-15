@@ -73,7 +73,7 @@ function renderContributionApproved(firstName: string, crowns: number): { subjec
           <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;color:#9a7b41;text-transform:uppercase;margin-top:6px;">Couronnes</div>
         </td></tr>
         <tr><td align="center" style="padding:16px 40px 0;">
-          <img src="https://app.runesdechene.com/email-crowns-round.png" alt="Couronnes de Chêne" width="220" style="display:block;width:220px;max-width:62%;height:auto;border:0;border-radius:50%;" />
+          <img src="https://app.runesdechene.com/email-crowns-v2.png" alt="Couronnes de Chêne" width="286" style="display:block;width:286px;max-width:74%;height:auto;border:0;border-radius:50%;" />
         </td></tr>
         <tr><td align="center" style="padding:16px 48px 0;">
           <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Tes Couronnes de Chêne t'attendent sur <strong style="color:#2b2114;">l'application</strong>.<br>Connecte-toi avec cet email pour les dépenser.</p>
@@ -122,7 +122,7 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
           <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:4px;color:#9a7b41;text-transform:uppercase;margin-top:6px;">Couronnes</div>
         </td></tr>
         <tr><td align="center" style="padding:16px 40px 0;">
-          <img src="https://app.runesdechene.com/email-crowns-round.png" alt="Couronnes de Chêne" width="220" style="display:block;width:220px;max-width:62%;height:auto;border:0;border-radius:50%;" />
+          <img src="https://app.runesdechene.com/email-crowns-v2.png" alt="Couronnes de Chêne" width="286" style="display:block;width:286px;max-width:74%;height:auto;border:0;border-radius:50%;" />
         </td></tr>
         ${safeReason ? `<tr><td align="center" style="padding:22px 48px 0;">
           <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;color:#9a7b41;text-transform:uppercase;">Pour</div>
