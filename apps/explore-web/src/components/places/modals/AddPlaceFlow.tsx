@@ -371,7 +371,15 @@ export function AddPlaceFlow() {
       useDefisStore.getState().refresh(userId)
       setStep('success')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue'
+      // Lecture du fichier impossible (snapshot iOS recyclé entre la sélection
+      // et l'envoi) → message actionnable : il faut re-sélectionner les photos.
+      const isReadError = msg.startsWith('Failed to read file')
+      setError(
+        isReadError
+          ? 'Impossible de lire tes photos (elles ont peut-être expiré sur ton téléphone). Retire-les et re-sélectionne-les, puis réessaie.'
+          : msg,
+      )
       setStep('form')
     }
   }

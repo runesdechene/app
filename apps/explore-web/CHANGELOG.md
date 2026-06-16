@@ -1,3 +1,10 @@
+# ALPHA V0.9.71
+## Ajout de lieu : fini le « Failed to read file »
+
+Sur iPhone, l'ajout d'un lieu pouvait échouer au moment de l'envoi avec un message « Failed to read file » : tes photos, sélectionnées plusieurs minutes plus tôt, avaient « expiré » côté iOS le temps que tu remplisses le formulaire. L'app **réessaie désormais automatiquement** la lecture, et si ça bloque vraiment, le message t'explique clairement **quoi faire** (re-sélectionner les photos) au lieu d'un charabia technique.
+
+---
+
 # ALPHA V0.9.70
 ## La Cour, enfin limpide : soutenir, conquérir, rallier
 

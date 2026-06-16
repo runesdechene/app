@@ -1,5 +1,33 @@
 const IMAGE_QUALITY = 0.82
 
+/** Lit un File en data-URL, avec retry.
+ *  Sur iOS, un File issu de l'input photo est adossé à un snapshot OS
+ *  éphémère : si la lecture intervient longtemps après la sélection (l'user
+ *  remplit le formulaire d'ajout), le snapshot peut avoir été recyclé
+ *  (pression mémoire, onglet backgroundé, photo iCloud/lourde) →
+ *  `readAsDataURL` échoue avec `NotReadableError`. Cette erreur est le plus
+ *  souvent transitoire : une relecture au tick suivant repasse. On retry et,
+ *  en cas d'échec final, on remonte le vrai nom de l'exception (diagnostic). */
+function readFileAsDataURL(file: File, attempts = 3): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const tryRead = (remaining: number) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = () => {
+        const name = reader.error?.name ?? 'unknown'
+        if (remaining > 1) {
+          // Laisse iOS re-matérialiser le blob avant de réessayer.
+          setTimeout(() => tryRead(remaining - 1), 120)
+          return
+        }
+        reject(new Error(`Failed to read file (${name})`))
+      }
+      reader.readAsDataURL(file)
+    }
+    tryRead(attempts)
+  })
+}
+
 /** Redimensionne et convertit une image en WebP avant upload.
  *  Utilise FileReader (pas URL.createObjectURL) : sur iOS / mobile, l'input
  *  camera renvoie parfois un File "lazy-loaded" dont le contenu n'est pas
@@ -7,13 +35,8 @@ const IMAGE_QUALITY = 0.82
  *  ("Failed to load image"). FileReader force la lecture complète du blob
  *  avant tout, fiable sur tous les devices. */
 export function compressImage(file: File, maxDimension = 1920): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onerror = () => reject(new Error('Failed to read file'))
-
-    reader.onload = () => {
-      const dataUrl = reader.result as string
+  return readFileAsDataURL(file).then((dataUrl) => {
+    return new Promise<File>((resolve, reject) => {
       const img = new Image()
 
       img.onerror = () => reject(new Error('Failed to load image'))
@@ -54,8 +77,6 @@ export function compressImage(file: File, maxDimension = 1920): Promise<File> {
       }
 
       img.src = dataUrl
-    }
-
-    reader.readAsDataURL(file)
+    })
   })
 }
