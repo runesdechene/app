@@ -1,13 +1,15 @@
 const IMAGE_QUALITY = 0.82
 
 /** Lit un File en data-URL, avec retry.
- *  Sur iOS, un File issu de l'input photo est adossé à un snapshot OS
- *  éphémère : si la lecture intervient longtemps après la sélection (l'user
- *  remplit le formulaire d'ajout), le snapshot peut avoir été recyclé
- *  (pression mémoire, onglet backgroundé, photo iCloud/lourde) →
- *  `readAsDataURL` échoue avec `NotReadableError`. Cette erreur est le plus
- *  souvent transitoire : une relecture au tick suivant repasse. On retry et,
- *  en cas d'échec final, on remonte le vrai nom de l'exception (diagnostic). */
+ *  Un File issu de l'input photo mobile est adossé à une ressource éphémère :
+ *  snapshot OS sur iOS, URI `content://` (souvent Google Photos / fichier
+ *  cloud-only) sur Android. Si la lecture intervient longtemps après la
+ *  sélection (l'user remplit le formulaire d'ajout), la ressource peut avoir
+ *  été recyclée / le grant révoqué (pression mémoire, onglet backgroundé,
+ *  photo lourde) → `readAsDataURL` échoue avec `NotReadableError`. Cette
+ *  erreur est souvent transitoire : une relecture au tick suivant repasse
+ *  (re-fetch côté content provider). On retry et, en cas d'échec final, on
+ *  remonte le vrai nom de l'exception (diagnostic). */
 function readFileAsDataURL(file: File, attempts = 3): Promise<string> {
   return new Promise((resolve, reject) => {
     const tryRead = (remaining: number) => {

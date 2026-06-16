@@ -372,8 +372,9 @@ export function AddPlaceFlow() {
       setStep('success')
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur inconnue'
-      // Lecture du fichier impossible (snapshot iOS recyclé entre la sélection
-      // et l'envoi) → message actionnable : il faut re-sélectionner les photos.
+      // Lecture du fichier impossible (ressource photo mobile recyclée entre la
+      // sélection et l'envoi : snapshot iOS ou URI content:// Android révoquée)
+      // → message actionnable : il faut re-sélectionner les photos.
       const isReadError = msg.startsWith('Failed to read file')
       setError(
         isReadError
