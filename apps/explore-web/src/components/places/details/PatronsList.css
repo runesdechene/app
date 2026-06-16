@@ -267,48 +267,6 @@
   display: flex;
   align-items: center;
 }
-.patron-support-btn {
-  position: relative;
-  margin-left: 8px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  border-radius: 6px;
-  background: rgba(212, 175, 55, 0.12);
-  color: #d4af37;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.08s ease;
-}
-.patron-support-btn:hover {
-  background: rgba(212, 175, 55, 0.22);
-}
-.patron-support-btn:active {
-  transform: scale(0.94);
-}
-.patron-support-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Burst « +1 » qui s'envole depuis le bouton Soutenir (cf. court-btn-burst) */
-.patron-support-burst {
-  position: absolute;
-  top: -4px;
-  right: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #d4af37;
-  pointer-events: none;
-  animation: patron-support-burst-rise 0.9s ease-out forwards;
-}
-@keyframes patron-support-burst-rise {
-  0%   { opacity: 0; transform: translateY(0) scale(0.8); }
-  20%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-22px) scale(1.1); }
-}
-
 /* Sous-liste « ↳ Soutiens » d'un challenger (symétrie veilleur) */
 .patron-chal-supporters {
   display: flex;

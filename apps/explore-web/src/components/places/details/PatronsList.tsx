@@ -16,12 +16,6 @@ interface PatronsListProps {
   coVeilleurs?: Array<{ userId: string; displayName: string; avatarUrl: string | null; factionId: string }>
   /** V173 — liste user-centric des attaquants soutenables (cibles à dépasser). */
   challengers?: Challenger[]
-  /** V0.8.23 — tap « Soutenir » sur un challenger (1 clic = 1 Couronne créditée). */
-  onSupportTap?: (c: Challenger) => void
-  /** V0.8.23 — désactive les boutons Soutenir (plus de Couronnes en stock). */
-  supportDisabled?: boolean
-  /** V0.8.23 — bursts en cours, clé `chal:<userId>` pour un challenger. */
-  bursts?: { id: number; key: string }[]
 }
 
 interface PatronRowProps {
@@ -70,7 +64,7 @@ function PatronRow({ patron, side, rank, isYou, onOpen, className }: PatronRowPr
   )
 }
 
-export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, expeditionTitle, coVeilleurs, challengers = [], onSupportTap, supportDisabled, bursts = [] }: PatronsListProps) {
+export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeilleur, expeditionTitle, coVeilleurs, challengers = [] }: PatronsListProps) {
   const [open, setOpen] = useState(false)
   // V0.9.59 — veille à plusieurs : le #1 est la COMPAGNIE (expédition), pas un joueur.
   const isGroup = !!(coVeilleurs && coVeilleurs.length > 1 && expeditionTitle)
@@ -217,20 +211,6 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
                 <span className="patron-breakdown">
                   <span className="patron-side patron-side-influence" title="Score d'attaque">⚔ {c.score}</span>
                 </span>
-                {onSupportTap && currentUserId !== c.userId && c.expeditionId && (
-                  <button
-                    type="button"
-                    className="patron-support-btn"
-                    onClick={() => onSupportTap(c)}
-                    disabled={supportDisabled}
-                    title={`Soutenir ${c.displayName} (1 🪙)`}
-                  >
-                    🪙 Soutenir
-                    {bursts.filter(b => b.key === `chal:${c.userId}`).map(b => (
-                      <span key={b.id} className="patron-support-burst">+1</span>
-                    ))}
-                  </button>
-                )}
               </div>
               {c.supporters.length > 0 && (
                 <div className="patron-chal-supporters">

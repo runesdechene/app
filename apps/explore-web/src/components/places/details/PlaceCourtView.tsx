@@ -532,9 +532,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         expeditionTitle={expeditionTitle}
         coVeilleurs={isGroupVeille ? veilleMembers : undefined}
         challengers={optimisticChallengers}
-        onSupportTap={queueSupportTap}
-        supportDisabled={balance < 1}
-        bursts={bursts}
       />
     </div>
   )
