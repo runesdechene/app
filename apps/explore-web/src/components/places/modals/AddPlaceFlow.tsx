@@ -22,6 +22,17 @@ interface Tag {
   icon: string | null
 }
 
+/** Photo déjà compressée en mémoire (webp), prête à uploader.
+ *  On compresse dès la sélection (pas au submit) pour lire le File pendant
+ *  que le grant du picker mobile est encore frais — sinon, sur Android, l'URI
+ *  content:// peut être révoquée le temps de remplir le formulaire et la
+ *  lecture échoue avec NotReadableError ("Failed to read file"). */
+interface PreparedPhoto {
+  full: File
+  thumb: File
+  preview: string
+}
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 Mo
 
 /**
@@ -53,8 +64,8 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 export function AddPlaceFlow() {
   const [step, setStep] = useState<Step>('location')
   const [title, setTitle] = useState('')
-  const [photoFiles, setPhotoFiles] = useState<File[]>([])
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([])
+  const [photos, setPhotos] = useState<PreparedPhoto[]>([])
+  const [preparingPhotos, setPreparingPhotos] = useState(false)
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [address, setAddress] = useState('')
   const [description, setDescription] = useState('')
@@ -122,29 +133,51 @@ export function AddPlaceFlow() {
       .catch(err => console.warn('[AddPlaceFlow] reverse-geocoding failed', err))
   }
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
+    // Reset input tout de suite (avant tout await) pour pouvoir resélectionner
+    // le même fichier, et capturer la liste de manière synchrone.
+    e.target.value = ''
     if (!files.length) return
 
     // Filtrer les fichiers > 10 Mo
     const tooLarge = files.filter(f => f.size > MAX_FILE_SIZE)
     const valid = files.filter(f => f.size <= MAX_FILE_SIZE)
-    if (tooLarge.length > 0) {
-      setError(`${tooLarge.length} fichier(s) dépassent 10 Mo et ont été ignorés.`)
+    if (!valid.length) {
+      if (tooLarge.length > 0) setError(`${tooLarge.length} fichier(s) dépassent 10 Mo et ont été ignorés.`)
+      return
     }
-    if (!valid.length) { e.target.value = ''; return }
 
-    setPhotoFiles(prev => [...prev, ...valid])
-    const urls = valid.map(f => URL.createObjectURL(f))
-    setPhotoPreviews(prev => [...prev, ...urls])
-    // Reset input pour pouvoir resélectionner le même fichier
-    e.target.value = ''
+    // Compression immédiate (full 1920 + thumb 400) : on lit le File pendant
+    // que le grant du picker est frais. Une photo illisible est signalée ici,
+    // pas après que l'user a rempli tout le formulaire.
+    setPreparingPhotos(true)
+    setError(null)
+    const prepared: PreparedPhoto[] = []
+    let failed = 0
+    for (const file of valid) {
+      try {
+        const [full, thumb] = await Promise.all([
+          compressImage(file),
+          compressImage(file, 400),
+        ])
+        prepared.push({ full, thumb, preview: URL.createObjectURL(full) })
+      } catch {
+        failed++
+      }
+    }
+    if (prepared.length) setPhotos(prev => [...prev, ...prepared])
+
+    const msgs: string[] = []
+    if (tooLarge.length > 0) msgs.push(`${tooLarge.length} fichier(s) dépassent 10 Mo et ont été ignorés.`)
+    if (failed > 0) msgs.push(`${failed} photo(s) n'ont pas pu être lues sur ton téléphone — re-sélectionne-les.`)
+    setError(msgs.length ? msgs.join(' ') : null)
+    setPreparingPhotos(false)
   }
 
   function handleRemovePhoto(index: number) {
-    URL.revokeObjectURL(photoPreviews[index])
-    setPhotoFiles(prev => prev.filter((_, i) => i !== index))
-    setPhotoPreviews(prev => prev.filter((_, i) => i !== index))
+    URL.revokeObjectURL(photos[index].preview)
+    setPhotos(prev => prev.filter((_, i) => i !== index))
   }
 
   function handleDragStart(index: number) {
@@ -162,13 +195,7 @@ export function AddPlaceFlow() {
       setDragOverIndex(null)
       return
     }
-    setPhotoFiles(prev => {
-      const arr = [...prev]
-      const [moved] = arr.splice(dragIndex, 1)
-      arr.splice(index, 0, moved)
-      return arr
-    })
-    setPhotoPreviews(prev => {
+    setPhotos(prev => {
       const arr = [...prev]
       const [moved] = arr.splice(dragIndex, 1)
       arr.splice(index, 0, moved)
@@ -198,26 +225,23 @@ export function AddPlaceFlow() {
   }
 
   async function handleSubmit() {
-    if (!userId || !confirmedCoords || photoFiles.length === 0 || selectedTagIds.length === 0 || !title.trim()) return
+    if (!userId || !confirmedCoords || photos.length === 0 || selectedTagIds.length === 0 || !title.trim()) return
     setStep('submitting')
     setError(null)
 
     try {
-      // 1. Compress & upload toutes les photos (full + thumb)
+      // 1. Upload toutes les photos (full + thumb) — déjà compressées en webp
+      // à la sélection, donc plus aucune lecture de File volatile ici.
       const imageEntries: { id: string; url: string; thumb: string }[] = []
 
-      for (const file of photoFiles) {
-        const [compressed, thumbnail] = await Promise.all([
-          compressImage(file),
-          compressImage(file, 400),
-        ])
+      for (const photo of photos) {
         const imageId = crypto.randomUUID()
         const fullPath = `places/${userId}/${imageId}.webp`
         const thumbPath = `places/${userId}/${imageId}_thumb.webp`
 
         const [fullUpload, thumbUpload] = await Promise.all([
-          supabase.storage.from('place-images').upload(fullPath, compressed, { contentType: 'image/webp', upsert: false }),
-          supabase.storage.from('place-images').upload(thumbPath, thumbnail, { contentType: 'image/webp', upsert: false }),
+          supabase.storage.from('place-images').upload(fullPath, photo.full, { contentType: 'image/webp', upsert: false }),
+          supabase.storage.from('place-images').upload(thumbPath, photo.thumb, { contentType: 'image/webp', upsert: false }),
         ])
 
         if (fullUpload.error) {
@@ -371,16 +395,9 @@ export function AddPlaceFlow() {
       useDefisStore.getState().refresh(userId)
       setStep('success')
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Erreur inconnue'
-      // Lecture du fichier impossible (ressource photo mobile recyclée entre la
-      // sélection et l'envoi : snapshot iOS ou URI content:// Android révoquée)
-      // → message actionnable : il faut re-sélectionner les photos.
-      const isReadError = msg.startsWith('Failed to read file')
-      setError(
-        isReadError
-          ? 'Impossible de lire tes photos (elles ont peut-être expiré sur ton téléphone). Retire-les et re-sélectionne-les, puis réessaie.'
-          : msg,
-      )
+      // Les photos sont déjà lues/compressées à la sélection : ici on ne peut
+      // plus tomber sur "Failed to read file", seulement upload/RPC/réseau.
+      setError(err instanceof Error ? err.message : 'Erreur inconnue')
       setStep('form')
     }
   }
@@ -393,8 +410,8 @@ export function AddPlaceFlow() {
 
   function handleAddAnother() {
     setTitle('')
-    setPhotoFiles([])
-    setPhotoPreviews([])
+    photos.forEach(p => URL.revokeObjectURL(p.preview))
+    setPhotos([])
     setSelectedTagIds([])
     setAddress('')
     setDescription('')
@@ -408,7 +425,7 @@ export function AddPlaceFlow() {
   }
 
   const allCharterChecked = charterChecks.every(Boolean)
-  const canSubmit = title.trim().length > 0 && photoFiles.length > 0 && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked && eraId !== null
+  const canSubmit = title.trim().length > 0 && photos.length > 0 && !preparingPhotos && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked && eraId !== null
 
   // ===== STEP 1 : Location =====
   if (step === 'location') {
@@ -531,11 +548,11 @@ export function AddPlaceFlow() {
               onChange={handlePhotoChange}
               style={{ display: 'none' }}
             />
-            {photoPreviews.length > 0 ? (
+            {photos.length > 0 ? (
               <div className="add-place-photos-grid">
-                {photoPreviews.map((url, i) => (
+                {photos.map((photo, i) => (
                   <div
-                    key={url}
+                    key={photo.preview}
                     className={`add-place-photo-thumb${dragIndex === i ? ' dragging' : ''}${dragOverIndex === i ? ' drag-over' : ''}`}
                     draggable
                     onDragStart={() => handleDragStart(i)}
@@ -543,7 +560,7 @@ export function AddPlaceFlow() {
                     onDrop={() => handleDrop(i)}
                     onDragEnd={handleDragEnd}
                   >
-                    <img src={url} alt={`Photo ${i + 1}`} draggable={false} />
+                    <img src={photo.preview} alt={`Photo ${i + 1}`} draggable={false} />
                     {i === 0 && <span className="add-place-photo-main">Principale</span>}
                     <button
                       className="add-place-photo-remove"
@@ -556,13 +573,18 @@ export function AddPlaceFlow() {
                 <button
                   className="add-place-photo-add-more"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={preparingPhotos}
                 >
-                  +
+                  {preparingPhotos ? '…' : '+'}
                 </button>
               </div>
             ) : (
-              <button className="add-place-photo-btn" onClick={() => fileInputRef.current?.click()}>
-                📷 Ajouter des photos
+              <button
+                className="add-place-photo-btn"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={preparingPhotos}
+              >
+                {preparingPhotos ? '⏳ Préparation des photos…' : '📷 Ajouter des photos'}
               </button>
             )}
 

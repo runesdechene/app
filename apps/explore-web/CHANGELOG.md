@@ -1,7 +1,7 @@
 # ALPHA V0.9.71
 ## Ajout de lieu : fini le « Failed to read file »
 
-Sur mobile (Android comme iPhone), l'ajout d'un lieu pouvait échouer au moment de l'envoi avec un message « Failed to read file » : tes photos, sélectionnées plusieurs minutes plus tôt, avaient « expiré » côté téléphone le temps que tu remplisses le formulaire. L'app **réessaie désormais automatiquement** la lecture, et si ça bloque vraiment, le message t'explique clairement **quoi faire** (re-sélectionner les photos) au lieu d'un charabia technique.
+Sur mobile (Android comme iPhone), l'ajout d'un lieu pouvait échouer au moment de l'envoi avec un message « Failed to read file » : tes photos, sélectionnées plusieurs minutes plus tôt, avaient « expiré » côté téléphone le temps que tu remplisses le formulaire. Désormais, **tes photos sont préparées dès que tu les choisis** (plus pendant l'envoi), ce qui supprime le problème à la racine. Si une photo est vraiment illisible, c'est signalé **tout de suite** — tu re-sélectionnes et tu continues, sans perdre ton formulaire.
 
 ---
 
