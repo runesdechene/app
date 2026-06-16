@@ -411,6 +411,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       <div className="court-actions">
         {actionsVis.showSupport && (
           <button
+            type="button"
             className="court-btn-support"
             onClick={handleSupportTap}
             disabled={balance < 1}
@@ -426,6 +427,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           </button>
         )}
           <button
+            type="button"
             className="court-btn-contest"
             onClick={handleContestTap}
             disabled={balance < 1 || creatingExp || contestBlockedAsMember}
@@ -433,7 +435,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               ? { background: '#e3dccd', color: '#9b8e79' }
               : { background: pastel(playerColor), color: shade(playerColor) }}
             title={contestBlockedAsMember ? 'Vous veillez ce lieu — impossible de l\'influencer contre votre compagnie' : undefined}
-            aria-label={vacant ? 'Poser ma marque sur ce lieu vierge' : 'Influencer ce lieu'}
+            aria-label={vacant ? 'Poser ma marque sur ce lieu vierge' : 'Prendre le lieu pour moi'}
           >
             <span className="court-btn-icon">⚔</span>
             <span className="court-btn-label">
