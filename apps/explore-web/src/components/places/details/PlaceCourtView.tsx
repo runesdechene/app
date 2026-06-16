@@ -465,7 +465,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         <div id="court-attackers-list" className="court-attackers-list">
           {optimisticChallengers.map(c => {
             const isYou = c.userId === userId
-            const initial = c.displayName?.trim().charAt(0).toUpperCase() || '?'
+            const initial = c.displayName.trim().charAt(0).toUpperCase() || '?'
             return (
               <div key={c.userId} className={`court-attacker-row${isYou ? ' is-you' : ''}`}>
                 <span
