@@ -29,9 +29,17 @@ On **garde la structure actuelle** (jauge de tension + facepile + actions) et on
 
 | État du lieu | Boutons affichés |
 |---|---|
-| **Vierge** (vacant) | 1 : `⚔ Poser ma marque` (−1 🪙) |
+| **Vierge** (vacant) | 1 : `⚔ Poser ma marque` |
 | **Veillé, 0 attaquant** | 2 : `🛡 Soutenir {veilleur}` · `⚔ Prendre le lieu pour moi` |
 | **Veillé, ≥1 attaquant** | 3 : + `🤝 Soutenir un attaquant (N) ▾` |
+
+### Cadrage du coût — « +1 » partout (uniforme)
+
+Tous les boutons d'action utilisent le **même cadrage « apport »** : chaque tap affiche **`+1`** (le point ajouté au camp), pas un coût par bouton. La règle « ça coûte 1 Couronne » reste vraie et **lisible via le solde global de Couronnes** (compteur HUD) qui décrémente à chaque tap.
+
+- On **retire le libellé de coût `−1 🪙`** des boutons (l'ancien mélangeait `−1 🪙` + burst `+1`, source d'incohérence).
+- **Exigence** : le solde de Couronnes du joueur doit rester **visible à proximité des actions** pendant les taps, pour que la dépense reste perceptible. Si le joueur tombe à 0, message « plus de Couronnes » + boutons désactivés (inchangé).
+- Le `+1` sert à la fois d'**affordance statique** (ce tap ajoute +1 au camp) et d'**animation burst** au clic.
 
 - **Libellés explicites « pour qui »** (lèvent l'ambiguïté) :
   - Bouton 1 reprend le **nom du veilleur** (solo : `Soutenir Léa` ; compagnie : `Soutenir {nom d'expédition}`), couleur faction du veilleur (doré si neutre).
@@ -46,7 +54,7 @@ Au clic, la **liste des attaquants en cours** se déplie *inline* sous le bouton
 - **avatar** (image ou initiale fallback, bordure/fond couleur faction) — cliquable → profil joueur ;
 - **nom** + **icône de faction** (pattern masqué + couleur) ;
 - **score** d'attaque ;
-- bouton **tap `🪙 +1`** (1 clic = 1 Couronne créditée à ce challenger ; cross-faction libre).
+- bouton **tap de soutien** au cadrage uniforme **`+1`** (cf. section « Cadrage du coût »). Au clic : 1 Couronne débitée au joueur (visible via le solde global), 1 point crédité au score du challenger ; cross-faction libre.
 
 > Cohérence visuelle : les avatars de cette liste reprennent le même traitement que la facepile de la jauge.
 
