@@ -41,6 +41,14 @@ interface AnswerResult {
   newErudition?: number
 }
 
+// Aligné sur DailyEnigma (même barème de libellés).
+const DIFFICULTY_LABELS: Record<string, string> = {
+  very_easy: 'Facile',
+  easy: 'Intermédiaire',
+  medium: 'Avancé',
+  hard: 'Expert',
+}
+
 export function FragmentEnigma({ fragment, onClose }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const setCrownsBalance = useCrownsStore(s => s.setBalance)
@@ -145,11 +153,14 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
 
         {enigma && !result && (
           <>
-            {enigma.theme && themes.get(enigma.theme) && (() => {
-              const t = themes.get(enigma.theme!)!
-              const c = t.color ?? '#c19a6b'
-              return (
-                <div className="enigma-meta">
+            <div className="enigma-meta">
+              <div className={`enigma-difficulty ${enigma.difficulty}`}>
+                {DIFFICULTY_LABELS[enigma.difficulty] ?? enigma.difficulty}
+              </div>
+              {enigma.theme && themes.get(enigma.theme) && (() => {
+                const t = themes.get(enigma.theme!)!
+                const c = t.color ?? '#c19a6b'
+                return (
                   <div className="enigma-heritage-pill" style={{ backgroundColor: `${c}20`, color: c }}>
                     {t.icon && (
                       <span
@@ -163,9 +174,9 @@ export function FragmentEnigma({ fragment, onClose }: Props) {
                     )}
                     {t.label}
                   </div>
-                </div>
-              )
-            })()}
+                )
+              })()}
+            </div>
             <p className="enigma-lore">{enigma.loreText}</p>
             <p className="enigma-question">{enigma.question}</p>
 

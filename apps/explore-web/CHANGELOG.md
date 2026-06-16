@@ -1,3 +1,10 @@
+# ALPHA V0.9.72
+## La difficulté s'affiche aussi sur les énigmes de Fragment
+
+Les énigmes ouvertes depuis un Fragment affichent désormais leur **niveau de difficulté** (Facile / Intermédiaire / Avancé / Expert), comme l'énigme du jour. Tu sais à quoi t'attendre avant de te lancer.
+
+---
+
 # ALPHA V0.9.71
 ## Ajout de lieu : fini le « Failed to read file »
 
