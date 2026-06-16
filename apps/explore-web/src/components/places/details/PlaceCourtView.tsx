@@ -7,6 +7,7 @@ import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
 import { capitalizeFirst, pastel, shade } from '../../../lib/textFormat'
+import { getCourtActionsVisibility } from '../../../lib/courtActionsVisibility'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
@@ -64,6 +65,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [notVeilled, setNotVeilled] = useState(false)
   const [creatingExp, setCreatingExp] = useState(false)
+  const [attackersOpen, setAttackersOpen] = useState(false)
   const [bursts, setBursts] = useState<BurstAnim[]>([])
   // Tick pour forcer rerender quand pendingTapsRef change
   const [, forceUpdate] = useState(0)
@@ -249,6 +251,8 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       : c
   })
 
+  const actionsVis = getCourtActionsVisibility(vacant, optimisticChallengers.length)
+
   const supportExpId = veilleur?.expeditionId ?? null
   const handleSupportTap = () => {
     if (!supportExpId || balance < 1) return
@@ -395,9 +399,17 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
         defenseColor={veilleurColor}
       />
 
+      {/* V0.9.70 — solde visible près des actions : le « coût » se lit ici (le
+          compteur descend à chaque tap), puisque les boutons cadrent en « +1 ». */}
+      <div className="court-balance">
+        <span className="court-balance-icon" aria-hidden>🪙</span>
+        <span className="court-balance-label">Tes Couronnes</span>
+        <span className="court-balance-amount">{balance}</span>
+      </div>
+
       {/* Boutons tap-rafale */}
       <div className="court-actions">
-        {!vacant && (
+        {actionsVis.showSupport && (
           <button
             className="court-btn-support"
             onClick={handleSupportTap}
@@ -407,7 +419,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           >
             <span className="court-btn-icon">🛡</span>
             <span className="court-btn-label">{isMember ? 'Renforcer la veille' : `Soutenir ${veilleur?.leaderName ?? 'le veilleur'}`}</span>
-            <span className="court-btn-cost">−1 🪙</span>
+            <span className="court-btn-cost">+1</span>
             {bursts.filter(b => b.key === 'defense').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}
@@ -425,14 +437,83 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
           >
             <span className="court-btn-icon">⚔</span>
             <span className="court-btn-label">
-              {creatingExp ? 'Préparation…' : (vacant ? 'Poser ma marque' : 'Influencer')}
+              {creatingExp ? 'Préparation…' : (vacant ? 'Poser ma marque' : 'Prendre le lieu pour moi')}
             </span>
-            {!contestBlockedAsMember && <span className="court-btn-cost">−1 🪙</span>}
+            {!contestBlockedAsMember && <span className="court-btn-cost">+1</span>}
             {bursts.filter(b => b.key === 'attack').map(b => (
               <span key={b.id} className="court-btn-burst">+1</span>
             ))}
           </button>
+          {actionsVis.showAttackers && (
+            <button
+              type="button"
+              className={`court-btn-attackers${attackersOpen ? ' is-open' : ''}`}
+              onClick={() => setAttackersOpen(o => !o)}
+              aria-expanded={attackersOpen}
+              aria-controls="court-attackers-list"
+            >
+              <span className="court-btn-icon">🤝</span>
+              <span className="court-btn-label">Soutenir un attaquant ({optimisticChallengers.length})</span>
+              <span className="court-btn-chevron" aria-hidden>{attackersOpen ? '▴' : '▾'}</span>
+            </button>
+          )}
       </div>
+
+      {actionsVis.showAttackers && attackersOpen && (
+        <div id="court-attackers-list" className="court-attackers-list">
+          {optimisticChallengers.map(c => {
+            const isYou = c.userId === userId
+            const initial = c.displayName?.trim().charAt(0).toUpperCase() || '?'
+            return (
+              <div key={c.userId} className={`court-attacker-row${isYou ? ' is-you' : ''}`}>
+                <span
+                  className="court-attacker-avatar"
+                  style={{ borderColor: c.factionColor ?? '#8b3a3a', backgroundColor: c.factionColor ?? '#8b3a3a' }}
+                >
+                  {c.avatarUrl
+                    ? <img src={c.avatarUrl} alt="" />
+                    : <span className="court-attacker-initial">{initial}</span>}
+                </span>
+                <button
+                  type="button"
+                  className="court-attacker-name"
+                  onClick={() => useMapStore.getState().setSelectedPlayerId(c.userId)}
+                  title={`Voir le profil de ${c.displayName}`}
+                >
+                  {c.displayName}
+                  {c.factionPattern && c.factionColor && (
+                    <span
+                      className="court-attacker-faction-icon"
+                      style={{
+                        backgroundColor: c.factionColor,
+                        WebkitMaskImage: `url(${c.factionPattern})`,
+                        maskImage: `url(${c.factionPattern})`,
+                      }}
+                      aria-hidden
+                    />
+                  )}
+                  {isYou && <span className="court-attacker-you">(vous)</span>}
+                </button>
+                <span className="court-attacker-score">⚔ {c.score}</span>
+                {!isYou && c.expeditionId && (
+                  <button
+                    type="button"
+                    className="court-attacker-tap"
+                    onClick={() => queueSupportTap(c)}
+                    disabled={balance < 1}
+                    aria-label={`Soutenir ${c.displayName}`}
+                  >
+                    +1
+                    {bursts.filter(b => b.key === `chal:${c.userId}`).map(b => (
+                      <span key={b.id} className="court-attacker-burst">+1</span>
+                    ))}
+                  </button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {balance < 1 && (
         <p className="court-no-balance">
