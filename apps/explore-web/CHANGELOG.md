@@ -1,3 +1,10 @@
+# ALPHA V0.9.70
+## La Cour, enfin limpide : soutenir, conquérir, rallier
+
+La fiche de lieu montre désormais d'un coup d'œil **les trois façons d'agir** : soutenir le veilleur en place, prendre le lieu pour toi, ou **rallier un attaquant** déjà lancé (y compris d'une autre Maison — les alliances spontanées sont de retour au grand jour). Le bouton « Soutenir un attaquant » déploie la liste des prétendants avec leur portrait, et ton solde de Couronnes reste sous les yeux à chaque geste.
+
+---
+
 # ALPHA V0.9.69
 ## Un nouveau chapitre : la Grèce Antique
 
