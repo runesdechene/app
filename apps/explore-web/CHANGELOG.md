@@ -1,7 +1,7 @@
 # ALPHA V0.9.73
 ## Les énigmes grecques, plus envoûtantes que scolaires
 
-On a retravaillé les énigmes sur la Grèce antique les plus pointues : fini les noms de généraux obscurs et le jargon de spécialiste. Place aux récits qui font rêver — le **cheval de Troie**, l'**énigme du Sphinx**, l'**Eurêka** d'Archimède, l'**Atlantide**, la **boîte de Pandore**… Chaque énigme te prend par la main, et son explication se lit comme une petite histoire qu'on a envie de retenir. On ne révise pas la Grèce : on la **redécouvre**.
+On a retravaillé en profondeur les énigmes sur la Grèce antique : fini les noms de généraux obscurs et le jargon de spécialiste. Place aux récits qui font rêver — le **cheval de Troie**, l'**énigme du Sphinx**, l'**Eurêka** d'Archimède, l'**Atlantide**, la **boîte de Pandore**, mais aussi **Icare**, **Pégase**, **Prométhée**, le **talon d'Achille**, **Sisyphe**, le **fil d'Ariane** ou les **Amazones**. Chaque énigme te prend par la main, et son explication se lit comme une petite histoire qu'on a envie de retenir. On ne révise pas la Grèce : on la **redécouvre**.
 
 ---
 
