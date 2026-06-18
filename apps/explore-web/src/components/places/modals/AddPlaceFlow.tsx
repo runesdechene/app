@@ -517,6 +517,8 @@ export function AddPlaceFlow() {
     setEraId(null)
     setYearExact(null)
     // Repart sur un ajout normal : on purge tout résidu du mode publication.
+    setPublishingDraft(null)
+    draftPrefillDoneRef.current = false
     setDraftImages([])
     setNearby([])
     setMergeChoice(null)
