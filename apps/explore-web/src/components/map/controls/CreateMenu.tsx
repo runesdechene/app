@@ -13,6 +13,7 @@ interface Props {
   onAddPlace: () => void
   onAddPlaceLocked: () => void
   onCreateExpedition: () => void
+  onAddGpsMark: () => void
   onClose: () => void
 }
 
@@ -22,6 +23,7 @@ export function CreateMenu({
   onAddPlace,
   onAddPlaceLocked,
   onCreateExpedition,
+  onAddGpsMark,
   onClose,
 }: Props) {
   useEffect(() => {
@@ -61,6 +63,17 @@ export function CreateMenu({
           <div className="create-menu-text">
             <div className="create-menu-title">Créer un événement</div>
             <div className="create-menu-help">Convoquer des compagnons pour partir ensemble</div>
+          </div>
+        </button>
+
+        <button
+          className="create-menu-option"
+          onClick={onAddGpsMark}
+        >
+          <span className="create-menu-icon">📍</span>
+          <div className="create-menu-text">
+            <div className="create-menu-title">Ajouter une marque GPS</div>
+            <div className="create-menu-help">Prouve que tu es passé ici — finis la fiche plus tard</div>
           </div>
         </button>
       </div>

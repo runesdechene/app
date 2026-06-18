@@ -1,0 +1,16 @@
+.gps-mark-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 6000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.gps-mark-modal { background: var(--color-parchment); border: 1px solid var(--color-sepia); border-radius: 14px; padding: 20px; width: min(440px, 100%); max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 28px rgba(74,55,40,.3); }
+.gps-mark-title { font-family: var(--font-title); margin: 0 0 8px; color: var(--color-ink); }
+.gps-mark-help { font-size: 14px; color: var(--color-ink); opacity: .8; margin: 0 0 14px; }
+.gps-mark-error { background: #f8d7da; color: #842029; border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 10px; }
+.gps-mark-label { display: block; font-family: var(--font-title); font-size: 14px; margin: 10px 0 4px; color: var(--color-ink); }
+.gps-mark-optional { font-weight: 400; opacity: .6; }
+.gps-mark-input { width: 100%; padding: 10px; border: 1px solid var(--color-sepia); border-radius: 8px; background: #fff; font-size: 15px; box-sizing: border-box; }
+.gps-mark-photos { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.gps-mark-photos img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+.gps-mark-photo-btn { width: 100%; margin-top: 10px; padding: 10px; border: 1px dashed var(--color-sepia); border-radius: 8px; background: transparent; cursor: pointer; }
+.gps-mark-actions { display: flex; gap: 10px; margin-top: 18px; }
+.gps-mark-cancel, .gps-mark-submit { flex: 1; padding: 12px; border-radius: 10px; font-family: var(--font-title); cursor: pointer; border: 1px solid var(--color-sepia); }
+.gps-mark-cancel { background: transparent; color: var(--color-ink); }
+.gps-mark-submit { background: var(--color-ink); color: var(--color-parchment); border-color: var(--color-ink); }
+.gps-mark-submit:disabled, .gps-mark-cancel:disabled { opacity: .5; cursor: default; }

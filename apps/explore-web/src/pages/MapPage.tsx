@@ -53,6 +53,7 @@ import { useCourtNotifications } from '../hooks/useCourtNotifications'
 import { PushPromptHost, PushSubscriptionSync, PushAutoPrompt } from '../hooks/useEnsurePushPermission'
 import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
 import { useGpsMarksStore } from '../stores/gpsMarksStore'
+import { AddGpsMarkModal } from '../components/places/modals/AddGpsMarkModal'
 import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
@@ -110,6 +111,7 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
+  const [showAddGpsMark, setShowAddGpsMark] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => safeStorage.get('desktop_sidebar_collapsed') === '1')
   const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
   const [tutorialSlides, setTutorialSlides] = useState<TutorialSlide[]>([])
@@ -475,6 +477,10 @@ export default function MapPage() {
             setShowCreateMenu(false)
             useExpeditionsStore.getState().requestOpenCreator(true)
           }}
+          onAddGpsMark={() => {
+            setShowCreateMenu(false)
+            setShowAddGpsMark(true)
+          }}
           onClose={() => setShowCreateMenu(false)}
         />
       )}
@@ -492,6 +498,8 @@ export default function MapPage() {
           onClose={() => setShowAddPlaceInfo(false)}
         />
       )}
+
+      {showAddGpsMark && <AddGpsMarkModal onClose={() => setShowAddGpsMark(false)} />}
 
       {/* Flow ajout de lieu (immersif) */}
       {addPlaceMode && (mapPickerPurpose === 'editPosition' ? <EditPositionFlow /> : <AddPlaceFlow />)}
