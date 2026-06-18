@@ -453,6 +453,8 @@
   outline-offset: 1px;
   border-color: transparent;
 }
+.expedition-modal-title.is-editable { cursor: pointer; }
+.expedition-modal-title.is-editable:hover { text-decoration: underline dotted; text-underline-offset: 4px; }
 .expedition-modal-title-call {
   display: flex;
   align-items: flex-start;

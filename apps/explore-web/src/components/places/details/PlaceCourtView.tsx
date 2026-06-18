@@ -66,6 +66,8 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   const [notVeilled, setNotVeilled] = useState(false)
   const [creatingExp, setCreatingExp] = useState(false)
   const [attackersOpen, setAttackersOpen] = useState(false)
+  const [editingExpName, setEditingExpName] = useState(false)
+  const [expNameDraft, setExpNameDraft] = useState('')
   const [bursts, setBursts] = useState<BurstAnim[]>([])
   // Tick pour forcer rerender quand pendingTapsRef change
   const [, forceUpdate] = useState(0)
@@ -259,6 +261,22 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     pushTap({ side: 'defense', expId: supportExpId, burstKey: 'defense' })
   }
 
+  // Renommage de l'expédition de plantage — réservé aux membres (rename_expedition,
+  // mig 268). Le titre vit dans expeditions.title ; on rafraîchit Cour + veille.
+  async function saveExpName() {
+    const trimmed = expNameDraft.trim()
+    if (!userId || !veilleur?.expeditionId || trimmed.length < 3) return
+    const { error } = await supabase.rpc('rename_expedition', {
+      p_user_id: userId,
+      p_expedition_id: veilleur.expeditionId,
+      p_name: trimmed,
+    })
+    if (error) { console.error('[PlaceCourtView] rename_expedition error', error); return }
+    setEditingExpName(false)
+    void fetchState()
+    void refreshVeille()
+  }
+
   const handleContestTap = async () => {
     if (balance < 1 || creatingExp) return
     if (userChallengerExp) {
@@ -317,7 +335,35 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
             <>
               <span className="court-leader-label">Veillé par {veilleMembers.length} compagnons</span>
               <div className="court-leader-name-row">
-                <span className="court-leader-name">{capitalizeFirst(expeditionTitle)}</span>
+                {editingExpName ? (
+                  <span className="court-leader-name-edit">
+                    <input
+                      className="court-leader-name-input"
+                      value={expNameDraft}
+                      maxLength={60}
+                      autoFocus
+                      onChange={e => setExpNameDraft(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') void saveExpName()
+                        else if (e.key === 'Escape') setEditingExpName(false)
+                      }}
+                    />
+                    <button type="button" className="court-leader-name-save" onClick={() => void saveExpName()} disabled={expNameDraft.trim().length < 3}>✓</button>
+                    <button type="button" className="court-leader-name-cancel" onClick={() => setEditingExpName(false)}>×</button>
+                  </span>
+                ) : isMember ? (
+                  <button
+                    type="button"
+                    className="court-leader-name court-leader-name-editable"
+                    title="Renommer l'expédition"
+                    onClick={() => { setExpNameDraft(expeditionTitle ?? ''); setEditingExpName(true) }}
+                  >
+                    {capitalizeFirst(expeditionTitle)}
+                    <span className="court-leader-name-pencil" aria-hidden> ✎</span>
+                  </button>
+                ) : (
+                  <span className="court-leader-name">{capitalizeFirst(expeditionTitle)}</span>
+                )}
               </div>
               <div className="court-leader-members">
                 {veilleMembers.map((m, i) => (

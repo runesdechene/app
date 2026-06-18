@@ -303,16 +303,13 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
               </div>
             </div>
           ) : (
-            <h2 className="expedition-modal-title">
+            <h2
+              className={`expedition-modal-title${canEditName ? ' is-editable' : ''}`}
+              onClick={canEditName ? () => { setNameDraft(e.name); setEditingName(true) } : undefined}
+              title={canEditName ? "Renommer l'événement" : undefined}
+            >
               {e.name}
-              {canEditName && (
-                <button
-                  className="expedition-modal-name-edit"
-                  onClick={() => { setNameDraft(e.name); setEditingName(true) }}
-                  title="Renommer l'événement"
-                  aria-label="Renommer l'événement"
-                >✎</button>
-              )}
+              {canEditName && <span className="expedition-modal-name-edit" aria-hidden>✎</span>}
             </h2>
           )}
 

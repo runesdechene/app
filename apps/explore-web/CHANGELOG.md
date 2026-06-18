@@ -1,3 +1,10 @@
+# ALPHA V0.9.77
+## Renomme ton expédition de plantage
+
+Quand vous plantez un étendard à plusieurs, votre expédition porte un nom. Tu peux désormais le **changer à tout moment depuis La Cour du lieu** : touche le nom de l'expédition, corrige-le, et c'est réglé. Et ce n'est pas réservé à celui qui a planté — **n'importe quel compagnon de l'expédition** peut l'ajuster.
+
+---
+
 # ALPHA V0.9.76
 ## Renommer un événement, même passé
 
