@@ -72,3 +72,13 @@
 **Convention temporaire** : toute nouvelle RPC qui retourne un nom user doit faire `COALESCE(u.display_name, u.first_name, 'Voyageur')`.
 
 **Mise à jour 28 mai 2026 — souffrance immédiate résolue** : mig 182 ajoute un trigger BEFORE INSERT/UPDATE OF first_name sur `users` qui force `display_name := first_name` à chaque écriture. + backfill one-shot des 9 users actifs touchés (Yaz, etc.). Les 2475 comptes dormants (`first_name = display_name = 'Un voyageur sans nom'`) sont laissés intacts — ils seront sync automatiquement à leur prochain edit. La dette structurelle (drop d'une colonne, choix Option A vs B) reste à trancher au prochain sprint cleanup.
+
+---
+
+## Marques GPS — photos orphelines (suivi)
+Les marques GPS (place_drafts) périmées et jamais publiées laissent leurs photos
+dans le bucket `place-images/places/<userId>/drafts/`. La suppression manuelle d'une
+marque nettoie ses photos (GpsMarkActionModal), mais les marques abandonnées non
+supprimées ne sont pas purgées. À planifier : edge function + pg_cron listant les
+`place_drafts` `status='open'` et `created_at < now() - interval '90 days'`, supprimant
+storage + ligne. Hors périmètre V1.

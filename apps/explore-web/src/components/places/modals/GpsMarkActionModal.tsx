@@ -4,6 +4,7 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import { useGpsMarksStore } from '../../../stores/gpsMarksStore'
 import { deleteGpsMark } from '../../../lib/gpsMarksApi'
 import { gpsMarkAgeDays, isGpsMarkFresh } from '../../../lib/gpsMarkFreshness'
+import { supabase } from '../../../lib/supabase'
 import type { GpsMark } from '../../../types/gpsMark'
 import './GpsMarkActionModal.css'
 
@@ -26,6 +27,13 @@ export function GpsMarkActionModal({ mark }: { mark: GpsMark }) {
 
   async function remove() {
     if (!userId) return
+    if (mark.images.length > 0) {
+      const paths = mark.images.flatMap(img => {
+        const rel = (u: string) => u.split('/place-images/')[1]
+        return [rel(img.url), rel(img.thumb)].filter(Boolean) as string[]
+      })
+      if (paths.length) await supabase.storage.from('place-images').remove(paths)
+    }
     const ok = await deleteGpsMark(userId, mark.id)
     if (ok) useGpsMarksStore.getState().removeLocal(mark.id)
     close()
