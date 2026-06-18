@@ -344,3 +344,6 @@
   70%  { transform: scale(0.95); }
   100% { transform: scale(1); }
 }
+
+.gps-marks-badge { border-color: var(--color-sepia); }
+.gps-marks-badge .notoriety-icon { font-size: 15px; }

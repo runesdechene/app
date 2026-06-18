@@ -2,6 +2,7 @@
 import { ExploreMap } from '../components/map/core/ExploreMap'
 import { EnergyIndicator } from '../components/map/badges/EnergyIndicator'
 import { CrownsBadge } from '../components/map/badges/CrownsBadge'
+import { GpsMarksBadge } from '../components/map/badges/GpsMarksBadge'
 import { CoupeBadge } from '../components/map/badges/CoupeBadge'
 import { NotorietyInfoModal } from '../components/map/modals/NotorietyInfoModal'
 import { PlacePanel } from '../components/places/views/PlacePanel'
@@ -438,6 +439,7 @@ export default function MapPage() {
               <CrownsBadge />
               <NotificationBell />
               <EnergyIndicator />
+              <GpsMarksBadge />
             </>
           )}
 
