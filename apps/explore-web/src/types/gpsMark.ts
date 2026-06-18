@@ -22,5 +22,4 @@ export interface NearbyPlace {
   placeId: string
   title: string
   distanceM: number
-  hasVeilleur: boolean
 }

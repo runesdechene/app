@@ -5,15 +5,15 @@ import { useMapStore } from '../../stores/mapStore'
 import { useExpeditionsStore } from '../../stores/expeditionsStore'
 import { CreateMenu } from '../map/controls/CreateMenu'
 import { InfoModal } from '../map/modals/InfoModal'
-import { AddGpsMarkModal } from '../places/modals/AddGpsMarkModal'
 
 const MIN_DISCOVERIES_FOR_ADD_PLACE = 3
 
 interface Props {
   onClose: () => void
+  onRequestAddGpsMark: () => void
 }
 
-export function BottomTabbarPlusMenu({ onClose }: Props) {
+export function BottomTabbarPlusMenu({ onClose, onRequestAddGpsMark }: Props) {
   const navigate = useNavigate()
   const location = useLocation()
   const discoveriesCount = usePlayerStore((s) => s.discoveredIds.size)
@@ -21,7 +21,6 @@ export function BottomTabbarPlusMenu({ onClose }: Props) {
   const discoveriesNeeded = Math.max(0, MIN_DISCOVERIES_FOR_ADD_PLACE - discoveriesCount)
 
   const [showLockedInfo, setShowLockedInfo] = useState(false)
-  const [showAddGpsMark, setShowAddGpsMark] = useState(false)
 
   const isOnMap = location.pathname.startsWith('/carte')
 
@@ -43,8 +42,7 @@ export function BottomTabbarPlusMenu({ onClose }: Props) {
   }
 
   function handleAddGpsMark() {
-    onClose()
-    setShowAddGpsMark(true)
+    onRequestAddGpsMark()
   }
 
   return (
@@ -73,7 +71,6 @@ export function BottomTabbarPlusMenu({ onClose }: Props) {
         />
       )}
 
-      {showAddGpsMark && <AddGpsMarkModal onClose={() => setShowAddGpsMark(false)} />}
     </>
   )
 }

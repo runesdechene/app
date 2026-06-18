@@ -61,8 +61,8 @@ export async function deleteGpsMark(userId: string, draftId: string): Promise<bo
 export async function findNearbyPlaces(lat: number, lng: number, radiusM: number): Promise<NearbyPlace[]> {
   const { data, error } = await supabase.rpc('find_nearby_places', { p_lat: lat, p_lng: lng, p_radius_m: radiusM })
   if (error) { console.warn('[gpsMarksApi] nearby failed', error); return [] }
-  return (data as { place_id: string; title: string; distance_m: number; has_veilleur: boolean }[])
-    .map(r => ({ placeId: r.place_id, title: r.title, distanceM: r.distance_m, hasVeilleur: r.has_veilleur }))
+  return (data as { place_id: string; title: string; distance_m: number }[])
+    .map(r => ({ placeId: r.place_id, title: r.title, distanceM: r.distance_m }))
 }
 
 export interface PublishMarkArgs {
