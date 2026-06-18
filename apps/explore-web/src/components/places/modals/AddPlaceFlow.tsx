@@ -8,6 +8,9 @@ import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { useDefisStore } from '../../../stores/defisStore'
 import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
 import { refreshGloryGlobal } from '../../../hooks/useGlory'
+import { useGpsMarksStore } from '../../../stores/gpsMarksStore'
+import { findNearbyPlaces, publishGpsMark } from '../../../lib/gpsMarksApi'
+import type { NearbyPlace } from '../../../types/gpsMark'
 import { EraSelector } from './EraSelector'
 import { MapCrosshairPicker } from '../shared/MapCrosshairPicker'
 import './AddPlaceFlow.css'
@@ -88,6 +91,13 @@ export function AddPlaceFlow() {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
 
+  // === Mode "publication d'une marque GPS" (brouillon de lieu) ===
+  const publishingDraft = useMapStore(s => s.publishingDraft)
+  const setPublishingDraft = useMapStore(s => s.setPublishingDraft)
+  const [nearby, setNearby] = useState<NearbyPlace[]>([])
+  const [mergeChoice, setMergeChoice] = useState<string | null>(null) // placeId, ou 'new', ou null
+  const [draftImages, setDraftImages] = useState<{ id: string; url: string; thumb: string }[]>([])
+
   // Fetch tags au montage
   useEffect(() => {
     supabase
@@ -103,7 +113,31 @@ export function AddPlaceFlow() {
       })
   }, [])
 
+  // Pré-remplissage depuis la marque GPS (une seule fois quand publishingDraft est posé).
+  const draftPrefillDoneRef = useRef(false)
+  useEffect(() => {
+    if (draftPrefillDoneRef.current || !publishingDraft) return
+    draftPrefillDoneRef.current = true
+    setConfirmedCoords({ lat: publishingDraft.latitude, lng: publishingDraft.longitude })
+    if (publishingDraft.title) setTitle(publishingDraft.title)
+    setDraftImages(publishingDraft.images)
+    setStep('form')
+    useMapStore.getState().requestFlyTo({ lng: publishingDraft.longitude, lat: publishingDraft.latitude })
+  }, [publishingDraft])
+
+  // Détection de collision : lieux existants à proximité de la marque.
+  useEffect(() => {
+    if (!publishingDraft || step !== 'form') return
+    let cancelled = false
+    void (async () => {
+      const r = await findNearbyPlaces(publishingDraft.latitude, publishingDraft.longitude, 30)
+      if (!cancelled) setNearby(r)
+    })()
+    return () => { cancelled = true }
+  }, [publishingDraft, step])
+
   function handleClose() {
+    setPublishingDraft(null)
     setAddPlaceMode(false)
   }
 
@@ -225,6 +259,67 @@ export function AddPlaceFlow() {
   }
 
   async function handleSubmit() {
+    // === Branche publication d'une marque GPS ===
+    if (publishingDraft) {
+      if (!userId || !confirmedCoords || !title.trim() || selectedTagIds.length === 0) return
+      if ((photos.length + draftImages.length) === 0) return
+      setStep('submitting'); setError(null)
+      try {
+        const newImages: { id: string; url: string; thumb: string }[] = []
+        for (const photo of photos) {
+          const imageId = crypto.randomUUID()
+          const fullPath = `places/${userId}/${imageId}.webp`
+          const thumbPath = `places/${userId}/${imageId}_thumb.webp`
+          const [fullUp, thumbUp] = await Promise.all([
+            supabase.storage.from('place-images').upload(fullPath, photo.full, { contentType: 'image/webp', upsert: false }),
+            supabase.storage.from('place-images').upload(thumbPath, photo.thumb, { contentType: 'image/webp', upsert: false }),
+          ])
+          if (fullUp.error) { setError(`Upload: ${fullUp.error.message}`); setStep('form'); return }
+          const full = supabase.storage.from('place-images').getPublicUrl(fullPath).data.publicUrl
+          const thumb = thumbUp.error ? full : supabase.storage.from('place-images').getPublicUrl(thumbPath).data.publicUrl
+          newImages.push({ id: imageId, url: full, thumb })
+        }
+        const allImages = [...draftImages, ...newImages]
+
+        const res = await publishGpsMark({
+          userId, draftId: publishingDraft.id, title: title.trim(),
+          latitude: confirmedCoords.lat, longitude: confirmedCoords.lng,
+          tagId: selectedTagIds[0], images: allImages, address: address.trim(), text: description.trim(),
+          eraId, yearExact, secondaryTagIds: selectedTagIds.slice(1),
+          mergeIntoPlaceId: mergeChoice && mergeChoice !== 'new' ? mergeChoice : null,
+        })
+        if (res.error === 'not_enough_discoveries') {
+          setError(`Tu dois avoir découvert au moins ${res.requiredDiscoveries} lieux pour publier (tu en as ${res.currentDiscoveries}).`)
+          setStep('form'); return
+        }
+        if (res.error) { setError(res.error); setStep('form'); return }
+
+        useGpsMarksStore.getState().removeLocal(publishingDraft.id)
+        setPublishingDraft(null)
+        void refreshLevelStateGlobal(userId)
+        refreshGloryGlobal()
+        if (res.placeId) {
+          setNewPlaceId(res.placeId)
+          usePlayerStore.getState().addDiscoveredId(res.placeId)
+          useMapStore.getState().incrementPlacesRefreshKey()
+        }
+        useDefisStore.getState().refresh(userId)
+        useToastStore.getState().addToast({
+          type: 'new_place',
+          message: res.mode === 'merged'
+            ? `📍 Visite enregistrée sur un lieu existant${res.isGps ? ' (+ bonus GPS)' : ''}.`
+            : `📜 Tu as cartographié ${title.trim()}${res.isGps ? ' (+ visite GPS)' : ''}`,
+          timestamp: Date.now(),
+          placeId: res.placeId,
+          placeLocation: { latitude: confirmedCoords.lat, longitude: confirmedCoords.lng },
+        })
+        setStep('success')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur inconnue'); setStep('form')
+      }
+      return
+    }
+
     if (!userId || !confirmedCoords || photos.length === 0 || selectedTagIds.length === 0 || !title.trim()) return
     setStep('submitting')
     setError(null)
@@ -421,11 +516,17 @@ export function AddPlaceFlow() {
     setCharterChecks([false, false, false])
     setEraId(null)
     setYearExact(null)
+    // Repart sur un ajout normal : on purge tout résidu du mode publication.
+    setDraftImages([])
+    setNearby([])
+    setMergeChoice(null)
     setStep('location')
   }
 
   const allCharterChecked = charterChecks.every(Boolean)
-  const canSubmit = title.trim().length > 0 && photos.length > 0 && !preparingPhotos && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked && eraId !== null
+  // En mode publication, une collision non tranchée bloque le submit (choix conscient).
+  const collisionPending = publishingDraft !== null && nearby.length > 0 && mergeChoice === null
+  const canSubmit = title.trim().length > 0 && (photos.length + draftImages.length) > 0 && !preparingPhotos && selectedTagIds.length > 0 && description.trim().length > 0 && allCharterChecked && eraId !== null && !collisionPending
 
   // ===== STEP 1 : Location =====
   if (step === 'location') {
@@ -548,8 +649,19 @@ export function AddPlaceFlow() {
               onChange={handlePhotoChange}
               style={{ display: 'none' }}
             />
-            {photos.length > 0 ? (
+            {(photos.length + draftImages.length) > 0 ? (
               <div className="add-place-photos-grid">
+                {draftImages.map((img) => (
+                  <div key={img.id} className="add-place-photo-thumb">
+                    <img src={img.thumb} alt="Photo de la marque" draggable={false} />
+                    <button
+                      className="add-place-photo-remove"
+                      onClick={() => setDraftImages(prev => prev.filter(x => x.id !== img.id))}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
                 {photos.map((photo, i) => (
                   <div
                     key={photo.preview}
@@ -561,7 +673,7 @@ export function AddPlaceFlow() {
                     onDragEnd={handleDragEnd}
                   >
                     <img src={photo.preview} alt={`Photo ${i + 1}`} draggable={false} />
-                    {i === 0 && <span className="add-place-photo-main">Principale</span>}
+                    {i === 0 && draftImages.length === 0 && <span className="add-place-photo-main">Principale</span>}
                     <button
                       className="add-place-photo-remove"
                       onClick={() => handleRemovePhoto(i)}
@@ -624,6 +736,72 @@ export function AddPlaceFlow() {
               </label>
             ))}
           </div>
+
+          {/* Collision : lieux existants proches de la marque */}
+          {publishingDraft && nearby.length > 0 && (
+            <div
+              style={{
+                background: 'var(--parchment-bg, #f4ecd8)',
+                border: '1px solid var(--parchment-border, #c9b890)',
+                borderRadius: 8,
+                padding: '12px 14px',
+                margin: '12px 0',
+              }}
+            >
+              <p style={{ margin: '0 0 10px', fontWeight: 600 }}>
+                Ce lieu existe peut-être déjà — est-ce l'un de ceux-ci ?
+              </p>
+              {nearby.map(c => {
+                const selected = mergeChoice === c.placeId
+                return (
+                  <button
+                    key={c.placeId}
+                    type="button"
+                    onClick={() => setMergeChoice(c.placeId)}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      textAlign: 'left',
+                      gap: 8,
+                      padding: '8px 10px',
+                      marginBottom: 6,
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      border: selected
+                        ? '2px solid var(--parchment-accent, #7a5c2e)'
+                        : '1px solid var(--parchment-border, #c9b890)',
+                      background: selected ? 'var(--parchment-accent-bg, #e8dcc0)' : 'transparent',
+                      fontWeight: selected ? 600 : 400,
+                    }}
+                  >
+                    <span>{c.title}</span>
+                    <span style={{ opacity: 0.7, whiteSpace: 'nowrap' }}>{Math.round(c.distanceM)} m</span>
+                  </button>
+                )
+              })}
+              <button
+                type="button"
+                onClick={() => setMergeChoice('new')}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '8px 10px',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  border: mergeChoice === 'new'
+                    ? '2px solid var(--parchment-accent, #7a5c2e)'
+                    : '1px solid var(--parchment-border, #c9b890)',
+                  background: mergeChoice === 'new' ? 'var(--parchment-accent-bg, #e8dcc0)' : 'transparent',
+                  fontWeight: mergeChoice === 'new' ? 600 : 400,
+                }}
+              >
+                Non, créer un nouveau lieu
+              </button>
+            </div>
+          )}
 
           {/* Rewards preview */}
           {confirmedCoords && (() => {
