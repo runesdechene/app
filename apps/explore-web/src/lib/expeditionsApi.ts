@@ -196,6 +196,18 @@ export async function updateExpeditionCall(expeditionId: string, callText: strin
   return data as { success: boolean; error?: string }
 }
 
+/** Renomme une expédition. Collaboratif : chef OU participant validé, y compris
+ *  sur une expédition passée (RPC update_voyage_name, mig 267). */
+export async function updateExpeditionName(expeditionId: string, name: string) {
+  const { data, error } = await supabase.rpc('update_voyage_name', {
+    p_user_id: userIdOrThrow(),
+    p_voyage_id: expeditionId,
+    p_name: name,
+  })
+  if (error) return { success: false, error: error.message }
+  return data as { success: boolean; error?: string }
+}
+
 // ─────────── CHAT ───────────
 
 export async function sendExpeditionMessage(expeditionId: string, content: string) {

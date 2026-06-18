@@ -8,6 +8,7 @@ import {
   ejectExpeditionParticipant,
   cancelExpedition,
   updateExpeditionCall,
+  updateExpeditionName,
   flagExpedition,
   getExpeditionCoverUrl,
 } from '../../lib/expeditionsApi'
@@ -45,6 +46,8 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
   const [requestMessage, setRequestMessage] = useState('')
   const [editingCall, setEditingCall] = useState(false)
   const [callDraft, setCallDraft] = useState('')
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
   const [reportEditorOpen, setReportEditorOpen] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [flagOpen, setFlagOpen] = useState(false)
@@ -126,6 +129,9 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
   // Edition inline de l'appel : réservée aux validés non-chef.
   // Le chef passe par le bouton "✎ Modifier" du header (édition globale).
   const canEditCall = isValidated && !isChief && (e.status === 'published' || e.status === 'passed')
+  // Renommage collaboratif : tout membre validé (chef inclus), tant que l'expé
+  // n'est pas archivée. Distinct de l'édition globale (chef + published only).
+  const canEditName = isMember && (e.status === 'published' || e.status === 'passed')
   const canRequest = !isChief && !isValidated && !isPending && e.status === 'published'
   const validatedCount = validatedParticipants.length + 1 // chef inclus
   const isFull = !e.slots_open && e.slots_max != null && validatedCount >= e.slots_max
@@ -161,6 +167,13 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
   async function handleSaveCall() {
     await updateExpeditionCall(expeditionId, callDraft.trim() || null)
     setEditingCall(false)
+    refresh()
+  }
+  async function handleSaveName() {
+    const trimmed = nameDraft.trim()
+    if (trimmed.length < 3) return
+    await updateExpeditionName(expeditionId, trimmed)
+    setEditingName(false)
     refresh()
   }
   function onReportSaved() {
@@ -274,7 +287,34 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
               ? 'toi'
               : <NameLink name={chief.display_name} onClick={() => openProfile(chief.user_id)} />}
           </div>
-          <h2 className="expedition-modal-title">{e.name}</h2>
+          {editingName ? (
+            <div className="expedition-modal-name-edit-row">
+              <input
+                className="expedition-modal-name-input"
+                value={nameDraft}
+                maxLength={80}
+                autoFocus
+                onChange={(ev) => setNameDraft(ev.target.value)}
+                placeholder="Nom de l'événement"
+              />
+              <div className="expedition-modal-call-actions">
+                <button onClick={() => setEditingName(false)}>Annuler</button>
+                <button onClick={handleSaveName} className="is-primary" disabled={nameDraft.trim().length < 3}>Enregistrer</button>
+              </div>
+            </div>
+          ) : (
+            <h2 className="expedition-modal-title">
+              {e.name}
+              {canEditName && (
+                <button
+                  className="expedition-modal-name-edit"
+                  onClick={() => { setNameDraft(e.name); setEditingName(true) }}
+                  title="Renommer l'événement"
+                  aria-label="Renommer l'événement"
+                >✎</button>
+              )}
+            </h2>
+          )}
 
           {/* L'appel — intégré directement sous le titre, pas dans un bloc séparé */}
           {(e.call_text || canEditCall) && (

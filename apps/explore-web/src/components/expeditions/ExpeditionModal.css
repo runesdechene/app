@@ -423,6 +423,36 @@
   line-height: 1.15;
   margin: 0 0 6px;
 }
+/* Renommage collaboratif — crayon discret à côté du titre + éditeur inline. */
+.expedition-modal-title .expedition-modal-name-edit {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #b89a6a;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  vertical-align: middle;
+}
+.expedition-modal-title .expedition-modal-name-edit:hover { color: #a14a2a; }
+.expedition-modal-name-edit-row { width: 100%; margin: 0 0 8px; }
+.expedition-modal-name-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(193, 154, 107, 0.45);
+  border-radius: 8px;
+  background: #fff8eb;
+  font-family: var(--font-signature);
+  font-size: 22px;
+  font-weight: 600;
+  color: #2a1f10;
+  box-sizing: border-box;
+}
+.expedition-modal-name-input:focus {
+  outline: 2px solid #a14a2a;
+  outline-offset: 1px;
+  border-color: transparent;
+}
 .expedition-modal-title-call {
   display: flex;
   align-items: flex-start;

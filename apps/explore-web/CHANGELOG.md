@@ -1,3 +1,10 @@
+# ALPHA V0.9.76
+## Renommer un événement, même passé
+
+Tu peux maintenant **renommer un événement** directement depuis sa fiche, via le petit crayon ✎ à côté du titre. Et ce n'est plus réservé au chef ni aux événements à venir : **n'importe quel compagnon validé** peut ajuster le nom, **y compris une fois l'événement passé** — pratique pour le ranger dans les souvenirs avec un titre qui lui rend justice.
+
+---
+
 # ALPHA V0.9.75
 ## Marque ton passage, rédige la fiche plus tard
 
