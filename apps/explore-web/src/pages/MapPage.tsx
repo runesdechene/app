@@ -52,6 +52,7 @@ import { useNotifications } from '../hooks/useNotifications'
 import { useCourtNotifications } from '../hooks/useCourtNotifications'
 import { PushPromptHost, PushSubscriptionSync, PushAutoPrompt } from '../hooks/useEnsurePushPermission'
 import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
+import { useGpsMarksStore } from '../stores/gpsMarksStore'
 import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
@@ -149,6 +150,11 @@ export default function MapPage() {
   // V0.7.3 — charge les Couronnes investies par lieu pour pondérer le Voronoï
   useCourtInvestedLoad(isAuthenticated)
   useResourceTimers()
+
+  // Marques GPS (brouillons) du joueur — chargées une fois pour le rendu carte + badge.
+  useEffect(() => {
+    if (isAuthenticated && userId) void useGpsMarksStore.getState().refresh()
+  }, [isAuthenticated, userId])
 
   // Push notifications de lieu → /carte?placeId=<id>[&placeTab=<onglet>]. On parse
   // au mount pour ouvrir la fiche sur le bon onglet (infos/La Cour par défaut, mais
