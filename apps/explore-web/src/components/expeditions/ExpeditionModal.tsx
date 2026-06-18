@@ -559,7 +559,6 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
             <ExpeditionChat
               expeditionId={expeditionId}
               participantsById={participantsById}
-              readOnly={e.status === 'passed'}
               onAuthorClick={openProfile}
               active={chatActive}
             />

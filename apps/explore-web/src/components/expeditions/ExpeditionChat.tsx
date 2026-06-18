@@ -13,7 +13,6 @@ interface Props {
   expeditionId: string
   /** Lookup display_name + avatar_url pour chaque user_id participant. */
   participantsById: Record<string, { display_name: string; avatar_url: string | null; faction_color: string | null }>
-  readOnly?: boolean
   /** Click sur avatar/nom — ouvre le profil et ferme la modale parente. */
   onAuthorClick?: (userId: string) => void
   /** Le chat est-il visuellement visible ? Mobile : false quand tab=info (la
@@ -36,7 +35,7 @@ function formatChatDate(iso: string): string {
     : { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + time
 }
 
-export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAuthorClick, active = true }: Props) {
+export function ExpeditionChat({ expeditionId, participantsById, onAuthorClick, active = true }: Props) {
   useExpeditionChat(expeditionId)
 
   // /!\ NE PAS faire `s.messagesByExpedition[id] ?? []` directement dans le selector :
@@ -127,19 +126,17 @@ export function ExpeditionChat({ expeditionId, participantsById, readOnly, onAut
           )
         })}
       </div>
-      {!readOnly && (
-        <div className="expedition-chat-input">
-          <input
-            type="text"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Écrire un message…"
-            maxLength={500}
-          />
-          <button onClick={handleSend} disabled={!draft.trim() || sending} aria-label="Envoyer">↑</button>
-        </div>
-      )}
+      <div className="expedition-chat-input">
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Écrire un message…"
+          maxLength={500}
+        />
+        <button onClick={handleSend} disabled={!draft.trim() || sending} aria-label="Envoyer">↑</button>
+      </div>
     </div>
   )
 }
