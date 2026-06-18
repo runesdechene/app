@@ -1,3 +1,10 @@
+# ALPHA V0.9.74
+## Le chat d'événement reste ouvert pendant l'événement (et après)
+
+Le chat d'un événement se fermait à l'écriture **dès l'heure de début** — alors que justement, c'est à ce moment-là que vous avez le plus besoin de vous coordonner sur place ! Désormais le chat **reste ouvert pendant toute la durée de l'événement, et encore 7 jours après**, pour débriefer, partager et garder le lien. Il ne se ferme qu'au moment où l'événement quitte la carte pour rejoindre les Archives.
+
+---
+
 # ALPHA V0.9.73
 ## Les énigmes grecques, plus envoûtantes que scolaires
 
