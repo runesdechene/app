@@ -25,6 +25,7 @@ import { useEmojiThrows } from '../../../hooks/useEmojiThrows'
 import { AvatarActionsPopover } from '../../social/AvatarActionsPopover'
 import { EnergyIndicator } from '../badges/EnergyIndicator'
 import { VeilleurNamePills } from '../markers/VeilleurNamePills'
+import { GpsMarkMarkers } from '../markers/GpsMarkMarkers'
 import { ExpeditionBanners } from '../markers/ExpeditionBanners'
 import { HarvestableChests } from '../markers/HarvestableChests'
 import { loadInitialVeilles } from '../../../lib/loadInitialVeilles'
@@ -892,6 +893,9 @@ export const ExploreMap = memo(function ExploreMap() {
           bounds={viewBounds ? { minLng: viewBounds.west, maxLng: viewBounds.east, minLat: viewBounds.south, maxLat: viewBounds.north } : null}
         />
       )}
+
+      {/* Brouillons GPS du joueur — marqueurs 📍 interactifs (Task 9/10) */}
+      <GpsMarkMarkers />
 
       {/* V0.7+ Expéditions — bannières sur la carte (chaque expé published) */}
       <ExpeditionBanners />

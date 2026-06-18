@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { PlacePanelActiveTab } from '../types/placeDetail'
+import type { GpsMark } from '../types/gpsMark'
 
 interface PlaceOverride {
   tagTitle?: string
@@ -120,6 +121,13 @@ interface MapState {
   territoryNames: Map<string, { customName: string | null; namedBy: string }>
   setTerritoryNames: (names: Map<string, { customName: string | null; namedBy: string }>) => void
   setTerritoryName: (anchorPlaceId: string, customName: string | null, namedBy: string) => void
+
+  /** Marque GPS dont l'action "Compléter / Supprimer" est ouverte (null = fermée). */
+  openGpsMarkId: string | null
+  setOpenGpsMarkId: (id: string | null) => void
+  /** Marque en cours de publication (pré-remplit AddPlaceFlow). null = aucune. */
+  publishingDraft: GpsMark | null
+  setPublishingDraft: (d: GpsMark | null) => void
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -193,4 +201,9 @@ export const useMapStore = create<MapState>((set) => ({
       next.set(anchorPlaceId, { customName, namedBy })
       return { territoryNames: next }
     }),
+
+  openGpsMarkId: null,
+  setOpenGpsMarkId: (id) => set({ openGpsMarkId: id }),
+  publishingDraft: null,
+  setPublishingDraft: (d) => set({ publishingDraft: d }),
 }))

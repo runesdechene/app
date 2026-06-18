@@ -54,6 +54,7 @@ import { PushPromptHost, PushSubscriptionSync, PushAutoPrompt } from '../hooks/u
 import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
 import { useGpsMarksStore } from '../stores/gpsMarksStore'
 import { AddGpsMarkModal } from '../components/places/modals/AddGpsMarkModal'
+import { GpsMarkActionModal } from '../components/places/modals/GpsMarkActionModal'
 import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
@@ -127,6 +128,9 @@ export default function MapPage() {
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
   const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
+  const openGpsMarkId = useMapStore(s => s.openGpsMarkId)
+  const gpsMarks = useGpsMarksStore(s => s.marks)
+  const openGpsMark = gpsMarks.find(m => m.id === openGpsMarkId) ?? null
 
   // Gating Cartographier : 3 lieux découverts (décision Uriel 2026-05-02 — règle simple,
   // indépendante du système de niveaux/quêtes). Le titre "Explorateur" reste un titre de
@@ -500,6 +504,8 @@ export default function MapPage() {
       )}
 
       {showAddGpsMark && <AddGpsMarkModal onClose={() => setShowAddGpsMark(false)} />}
+
+      {openGpsMark && <GpsMarkActionModal mark={openGpsMark} />}
 
       {/* Flow ajout de lieu (immersif) */}
       {addPlaceMode && (mapPickerPurpose === 'editPosition' ? <EditPositionFlow /> : <AddPlaceFlow />)}
