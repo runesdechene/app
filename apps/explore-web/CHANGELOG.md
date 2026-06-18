@@ -1,3 +1,10 @@
+# ALPHA V0.9.75
+## Marque ton passage, rédige la fiche plus tard
+
+Pas le temps de t'arrêter pour cartographier un lieu en plein voyage ? Pose une **marque GPS** en un geste depuis le bouton **+** : on enregistre ta position (et une photo ou un titre, si tu veux), et tu repars aussitôt. Plus tard, tranquille chez toi, tu transformes ta marque en vraie fiche de lieu — et tu **récupères ton bonus de visite GPS comme si tu y étais**, parce que ta marque prouve que tu es bien passé là (tant que tu finalises dans les 30 jours). Tes marques t'attendent **sur la carte, visibles de toi seul**, avec un petit compteur pour les retrouver d'un coup. Et si un autre aventurier a cartographié le lieu entre-temps, pas de panique : ta visite est quand même comptée.
+
+---
+
 # ALPHA V0.9.74
 ## Le chat d'événement reste ouvert pendant l'événement (et après)
 

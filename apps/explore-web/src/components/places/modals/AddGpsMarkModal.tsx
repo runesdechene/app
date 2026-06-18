@@ -50,9 +50,16 @@ export function AddGpsMarkModal({ onClose }: { onClose: () => void }) {
   async function handleSubmit() {
     if (!userId) return
     setBusy(true); setError(null)
-    const pos = await getFreshPosition()
-    if (!pos) {
-      setError('Position GPS indisponible. Active ta localisation pour poser une marque.')
+    // Position : GPS frais en priorité ; à défaut, fallback sur la position connue
+    // du joueur sur la carte (store userPosition, alimentée par le watchPosition /
+    // la GeolocateControl). Évite de bloquer la pose quand getCurrentPosition timeout
+    // ou est momentanément refusé alors qu'on a déjà un fix récent.
+    const fresh = await getFreshPosition()
+    const fallback = usePlayerStore.getState().userPosition
+    const geo: { lat: number; lng: number; accuracy: number | null } | null =
+      fresh ?? (fallback ? { lat: fallback.lat, lng: fallback.lng, accuracy: null } : null)
+    if (!geo) {
+      setError('Position indisponible. Active ta localisation pour poser une marque.')
       setBusy(false); return
     }
     try {
@@ -71,12 +78,12 @@ export function AddGpsMarkModal({ onClose }: { onClose: () => void }) {
         images.push({ id: imageId, url: full, thumb })
       }
       const res = await createGpsMark({
-        userId, lat: pos.lat, lng: pos.lng, accuracy: pos.accuracy,
+        userId, lat: geo.lat, lng: geo.lng, accuracy: geo.accuracy,
         title: title.trim() || null, images,
       })
       if ('error' in res) { setError(res.error); setBusy(false); return }
       useGpsMarksStore.getState().addLocal({
-        id: res.id, latitude: pos.lat, longitude: pos.lng, accuracyM: pos.accuracy,
+        id: res.id, latitude: geo.lat, longitude: geo.lng, accuracyM: geo.accuracy,
         title: title.trim() || null, images, createdAt: res.createdAt, status: 'open',
       })
       useToastStore.getState().addToast({
