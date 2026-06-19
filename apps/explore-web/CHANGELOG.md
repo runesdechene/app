@@ -1,3 +1,10 @@
+# ALPHA V0.9.79
+## Le pop-up « Installer l'application » est de retour
+
+Le petit bandeau qui propose d'**installer l'application sur ton écran d'accueil** réapparaît dès l'arrivée sur le site — **avant même de créer ton compte**. Il avait disparu depuis qu'on accueille les nouveaux venus sur la page d'accueil : le navigateur proposait l'installation trop tôt, alors que la carte n'était pas encore ouverte, et la proposition était perdue. C'est corrigé.
+
+---
+
 # ALPHA V0.9.78
 ## Le chat d'un événement, visible avant même de rejoindre
 

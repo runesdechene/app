@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import MapPage from './pages/MapPage'
 import LandingPage from './components/landing/LandingPage'
 import RequireAuth from './components/RequireAuth'
+import { InstallPrompt } from './components/pwa/InstallPrompt'
 import { useIsDesktop } from './hooks/useMediaQuery'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
@@ -44,6 +45,10 @@ export default function App() {
           </Route>
         </Routes>
       </Suspense>
+      {/* Pop-up d'installation PWA — monte a la racine pour etre present des
+          `/` (landing, avant creation de compte) et capter `beforeinstallprompt`
+          quelle que soit la route d'arrivee. */}
+      <InstallPrompt />
     </BrowserRouter>
   )
 }

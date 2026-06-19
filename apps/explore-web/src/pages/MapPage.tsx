@@ -29,7 +29,6 @@ import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
 import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
 import { EditPositionFlow } from '../components/places/modals/EditPositionFlow'
-import { InstallPrompt } from '../components/pwa/InstallPrompt'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
 import { MobileNavbar } from '../components/map/controls/MobileNavbar'
 import { SearchBar } from '../components/map/search/SearchBar'
@@ -391,7 +390,6 @@ export default function MapPage() {
       )}
 
       <ExploreMap />
-      <InstallPrompt />
       <OfflineIndicator />
 
       {!addPlaceMode && !authLoading && isAuthenticated && (

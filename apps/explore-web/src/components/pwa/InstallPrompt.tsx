@@ -1,25 +1,21 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import './InstallPrompt.css'
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
+import { getInstallPrompt, subscribeInstall, triggerInstall } from '../../lib/pwaInstall'
 
 export function InstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
-  const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null)
 
   useEffect(() => {
     // Deja installe en PWA
     if (window.matchMedia('(display-mode: standalone)').matches) return
+    if (sessionStorage.getItem('pwa-install-dismissed')) return
 
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
     const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
 
     if (isIOSDevice && isSafari) {
-      // iOS : montrer apres 30s
+      // iOS : pas de beforeinstallprompt, on montre le guide apres 30s
       const timer = setTimeout(() => {
         if (!sessionStorage.getItem('pwa-install-dismissed')) {
           setIsIOS(true)
@@ -29,27 +25,20 @@ export function InstallPrompt() {
       return () => clearTimeout(timer)
     }
 
-    // Android/Chrome : capturer beforeinstallprompt
-    function handleBeforeInstall(e: Event) {
-      e.preventDefault()
-      deferredPrompt.current = e as BeforeInstallPromptEvent
-      if (!sessionStorage.getItem('pwa-install-dismissed')) {
-        setShowPrompt(true)
-      }
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+    // Android/Chrome : l'evenement a pu etre capture AVANT le montage de ce
+    // composant (capture globale dans lib/pwaInstall, des le chargement). On lit
+    // l'etat courant puis on s'abonne aux captures ulterieures.
+    if (getInstallPrompt()) setShowPrompt(true)
+    return subscribeInstall(() => {
+      const available = getInstallPrompt() !== null
+      setShowPrompt(available && !sessionStorage.getItem('pwa-install-dismissed'))
+    })
   }, [])
 
   async function handleInstall() {
-    if (deferredPrompt.current) {
-      await deferredPrompt.current.prompt()
-      const { outcome } = await deferredPrompt.current.userChoice
-      if (outcome === 'accepted') {
-        setShowPrompt(false)
-      }
-      deferredPrompt.current = null
+    const outcome = await triggerInstall()
+    if (outcome === 'accepted' || outcome === 'unavailable') {
+      setShowPrompt(false)
     }
   }
 
