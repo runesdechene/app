@@ -13,6 +13,10 @@ interface Props {
   expeditionId: string
   /** Lookup display_name + avatar_url pour chaque user_id participant. */
   participantsById: Record<string, { display_name: string; avatar_url: string | null; faction_color: string | null }>
+  /** L'utilisateur courant peut-il écrire ? (chef ou participant validé) */
+  canWrite: boolean
+  /** Handler « Rejoindre l'équipage » — fourni seulement si rejoindre est possible. */
+  onJoin?: () => void
   /** Click sur avatar/nom — ouvre le profil et ferme la modale parente. */
   onAuthorClick?: (userId: string) => void
   /** Le chat est-il visuellement visible ? Mobile : false quand tab=info (la
@@ -35,8 +39,9 @@ function formatChatDate(iso: string): string {
     : { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + time
 }
 
-export function ExpeditionChat({ expeditionId, participantsById, onAuthorClick, active = true }: Props) {
-  useExpeditionChat(expeditionId)
+export function ExpeditionChat({ expeditionId, participantsById, canWrite, onJoin, onAuthorClick, active = true }: Props) {
+  // canWrite sert aussi de trackRead : seuls les membres marquent les messages lus.
+  useExpeditionChat(expeditionId, canWrite)
 
   // /!\ NE PAS faire `s.messagesByExpedition[id] ?? []` directement dans le selector :
   // ça retourne un nouveau [] à chaque render et déclenche une boucle infinie Zustand.
@@ -126,17 +131,28 @@ export function ExpeditionChat({ expeditionId, participantsById, onAuthorClick, 
           )
         })}
       </div>
-      <div className="expedition-chat-input">
-        <input
-          type="text"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Écrire un message…"
-          maxLength={500}
-        />
-        <button onClick={handleSend} disabled={!draft.trim() || sending} aria-label="Envoyer">↑</button>
-      </div>
+      {canWrite ? (
+        <div className="expedition-chat-input">
+          <input
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Écrire un message…"
+            maxLength={500}
+          />
+          <button onClick={handleSend} disabled={!draft.trim() || sending} aria-label="Envoyer">↑</button>
+        </div>
+      ) : (
+        <div className="expedition-chat-spectator">
+          <span className="expedition-chat-spectator-label">👁️ Tu observes cet événement</span>
+          {onJoin && (
+            <button className="expedition-chat-spectator-join" onClick={onJoin}>
+              Rejoindre l'équipage
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

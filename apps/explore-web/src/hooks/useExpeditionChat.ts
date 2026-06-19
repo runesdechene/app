@@ -28,7 +28,7 @@ function rowToMessage(row: Record<string, unknown>): ExpeditionMessage {
  * resync sur CLOSED/ERROR/TIMED_OUT, et listener visibilitychange (pattern
  * useCoupe) pour re-fetch au retour de focus.
  */
-export function useExpeditionChat(expeditionId: string | null) {
+export function useExpeditionChat(expeditionId: string | null, trackRead = true) {
   const channelRef = useRef<RealtimeChannel | null>(null)
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export function useExpeditionChat(expeditionId: string | null) {
         (payload) => {
           const store = useExpeditionsStore.getState()
           store.addMessage(expeditionId!, rowToMessage(payload.new as Record<string, unknown>))
-          markExpeditionMessagesRead(expeditionId!).catch(() => {})
+          if (trackRead) markExpeditionMessagesRead(expeditionId!).catch(() => {})
         },
       )
       ch.subscribe((status) => {
@@ -106,13 +106,16 @@ export function useExpeditionChat(expeditionId: string | null) {
     }
     document.addEventListener('visibilitychange', onVisible)
 
-    // Mark read au mount + refresh la liste pour effacer la pastille
-    markExpeditionMessagesRead(expeditionId!)
-      .then(() => listUpcomingExpeditions())
-      .then((list) => {
-        if (!cancelled) useExpeditionsStore.getState().setUpcoming(list)
-      })
-      .catch(() => {})
+    // Mark read au mount + refresh la liste pour effacer la pastille.
+    // Spectateurs (trackRead=false) : on ne touche ni aux lectures ni au badge.
+    if (trackRead) {
+      markExpeditionMessagesRead(expeditionId!)
+        .then(() => listUpcomingExpeditions())
+        .then((list) => {
+          if (!cancelled) useExpeditionsStore.getState().setUpcoming(list)
+        })
+        .catch(() => {})
+    }
 
     return () => {
       cancelled = true
@@ -122,5 +125,5 @@ export function useExpeditionChat(expeditionId: string | null) {
         channelRef.current = null
       }
     }
-  }, [expeditionId])
+  }, [expeditionId, trackRead])
 }

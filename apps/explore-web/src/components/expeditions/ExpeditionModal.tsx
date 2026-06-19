@@ -182,7 +182,9 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
   }
 
 
-  const chatVisible = isMember && (e.status === 'published' || e.status === 'passed')
+  // Chat lisible par TOUS (spectateurs en lecture seule) tant que l'événement
+  // est sur la carte. L'écriture reste réservée aux membres (cf. canWrite).
+  const chatVisible = e.status === 'published' || e.status === 'passed'
 
   return createPortal(
     <div className="expedition-modal-overlay" onClick={onClose}>
@@ -591,11 +593,13 @@ export function ExpeditionModal({ expeditionId, onClose, initialMobileTab = 'inf
         {chatVisible && (
           <aside className="expedition-modal-chat-col">
             <div className="expedition-modal-chat-col-header">
-              <h3>Préparation · chat privé</h3>
+              <h3>Préparation · chat de l'équipage</h3>
             </div>
             <ExpeditionChat
               expeditionId={expeditionId}
               participantsById={participantsById}
+              canWrite={isMember}
+              onJoin={canRequest ? handleRequest : undefined}
               onAuthorClick={openProfile}
               active={chatActive}
             />

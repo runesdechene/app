@@ -214,8 +214,9 @@
     height: calc(var(--safe-bottom, 0px) + 110px);
   }
 
-  /* Chat input — fixed bottom en mode chat. */
-  .expedition-modal.mobile-tab-chat .expedition-chat-input {
+  /* Chat input / bandeau spectateur — fixed bottom en mode chat. */
+  .expedition-modal.mobile-tab-chat .expedition-chat-input,
+  .expedition-modal.mobile-tab-chat .expedition-chat-spectator {
     position: fixed;
     left: 0;
     right: 0;
@@ -1235,6 +1236,35 @@ button.expedition-chat-avatar.is-clickable:hover {
   flex-shrink: 0;
 }
 .expedition-chat-input button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─────────── Bandeau spectateur (non-membre, lecture seule) ─────────── */
+.expedition-chat-spectator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(184, 154, 106, 0.3);
+  background: #f5e9d4;
+  flex-shrink: 0;
+}
+.expedition-chat-spectator-label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #6b5836;
+}
+.expedition-chat-spectator-join {
+  background: #2a1f10;
+  color: #faf2dd;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 18px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.expedition-chat-spectator-join:hover { background: #3a2c16; }
 
 /* ─────────── Gallery ─────────── */
 .expedition-gallery {

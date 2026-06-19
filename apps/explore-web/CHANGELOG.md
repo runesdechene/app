@@ -1,3 +1,10 @@
+# ALPHA V0.9.78
+## Le chat d'un événement, visible avant même de rejoindre
+
+Curieux d'un événement mais pas encore décidé ? Tu peux désormais **lire la discussion de l'équipage** avant de t'engager — pour sentir l'ambiance et voir ce qui s'y prépare. Tu restes spectateur (lecture seule), et un bouton **« Rejoindre l'équipage »** est là dès que tu veux entrer dans la conversation.
+
+---
+
 # ALPHA V0.9.77
 ## Renomme ton expédition de plantage
 
