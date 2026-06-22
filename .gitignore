@@ -59,3 +59,5 @@ supabase/.temp/
 /templates/
 .wolf-archive/
 *.openwolf-era
+.mcp.json
+.xo/
