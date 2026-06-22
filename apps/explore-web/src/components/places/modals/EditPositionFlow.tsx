@@ -72,6 +72,11 @@ export function EditPositionFlow() {
         setError('Tu n\'es pas autorisé à corriger ce lieu (auteur ou visiteur uniquement).')
         setStep('address'); return
       }
+      if (data?.error === 'too_far') {
+        const drift = typeof data.driftMeters === 'number' ? ` (${data.driftMeters} m demandés)` : ''
+        setError(`La position doit rester à moins de 500 m du lieu d'origine${drift}. Reviens en arrière et rapproche le marqueur.`)
+        setStep('address'); return
+      }
       if (data?.error) { setError(data.error); setStep('address'); return }
 
       const m = useMapStore.getState()

@@ -1,3 +1,10 @@
+# ALPHA V0.9.80
+## La correction de position reste près du lieu
+
+Corriger l'emplacement d'un lieu reste possible, mais le marqueur ne peut plus s'éloigner de **plus de 500 m de son emplacement d'origine**. De quoi rectifier un placement approximatif sans permettre de déplacer un lieu loin de là où il a réellement été découvert.
+
+---
+
 # ALPHA V0.9.79
 ## Le pop-up « Installer l'application » est de retour
 
