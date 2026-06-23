@@ -47,14 +47,14 @@ function App() {
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
-  const publicRoutes = ['/soumettre-contenu', '/flyer']
+  const publicRoutes = ['/soumettre-contenu', '/flyercadeau']
   const isPublicRoute = publicRoutes.includes(location.pathname)
 
   if (isPublicRoute) {
     return (
       <Routes>
         <Route path="/soumettre-contenu" element={<StudioSubmit />} />
-        <Route path="/flyer" element={<FlyerGift />} />
+        <Route path="/flyercadeau" element={<FlyerGift />} />
       </Routes>
     )
   }
