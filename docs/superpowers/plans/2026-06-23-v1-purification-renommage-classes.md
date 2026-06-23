@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - **Migrations additives uniquement** : CREATE / colonnes nullable / UPDATE de données / RPC redéfinies. Zéro DROP, zéro NOT NULL sur colonne peuplée. Tout retrait définitif → noté dans `docs/db/cleanup-v1-identity.md`.
-- **Numérotation migrations** : séquentielle à partir de **270** (dernière = `269_cap_place_position_move.sql`).
+- **Numérotation migrations** : séquentielle à partir de **271** — le **270 est réservé** par le flyer (`270_flyer_account_source_and_rate_limit.sql`, appliqué prod via MCP mais sur branche flyer, pas mergé ; `schema_migrations` prod s'arrête à 269). On évite la collision.
 - **`users.faction_id` CONSERVÉ** — porteur de la classe. Jamais touché.
 - **Registre UI** : « type d'explorateur » / « classe ». Jamais « Ordre » / « Chevalier Errant » en label (réservés au lore/descriptions).
 - **Mapping faction→classe** (par `id`, verbatim) : `faction-byzantine`=L'Archiviste 🟣 `#a93d76` · `faction-celtique`=Le Pèlerin 🟢 `#57b33d` · `faction-nordique`=Le Rôdeur 🔵 `#3c56be` · `faction-romaine`=Le Protecteur 🔴 `#c94436`.
@@ -24,10 +24,10 @@
 ## File Structure
 
 **SQL (nouvelles migrations, `supabase/migrations/`)**
-- `270_factions_to_classes_rename.sql` — UPDATE titres/descriptions/adjectifs des 4 factions.
-- `271_neutralize_faction_bonuses.sql` — met les `bonus_*` à 0 + court-circuite `faction_tag_bonuses`.
-- `272_strip_set_user_faction_side_effects.sql` — redéfinit `set_user_faction` sans bonus/underdog ; `get_factions_for_choice` sans tri d'équilibrage.
-- `273_park_territory_names.sql` — `propose_territory_name` / `vote_territory_name` refusent poliment (parking).
+- `271_factions_to_classes_rename.sql` — UPDATE titres/descriptions/adjectifs des 4 factions.
+- `272_neutralize_faction_bonuses.sql` — met les `bonus_*` à 0 + court-circuite `faction_tag_bonuses`.
+- `273_strip_set_user_faction_side_effects.sql` — redéfinit `set_user_faction` sans bonus/underdog ; `get_factions_for_choice` sans tri d'équilibrage.
+- `274_park_territory_names.sql` — `propose_territory_name` / `vote_territory_name` refusent poliment (parking).
 
 **Front (`apps/explore-web/src/`)**
 - `lib/map-layers.ts`, `workers/territoryWorker.ts`, `components/map/core/ExploreMap.tsx` — retrait couche territoire.
@@ -45,7 +45,7 @@
 
 ## Task 1 — Migration : renommage des 4 factions en classes (DB)
 
-**Files:** Create `supabase/migrations/270_factions_to_classes_rename.sql`
+**Files:** Create `supabase/migrations/271_factions_to_classes_rename.sql`
 
 **Interfaces:** Produces — `public.factions` rows avec `title`/`description`/`adjective` de classe (mêmes `id`, mêmes `color`).
 
@@ -57,7 +57,7 @@ Noter les valeurs actuelles (rollback).
 - [ ] **Step 2 — Écrire la migration**
 
 ```sql
--- 270_factions_to_classes_rename.sql
+-- 271_factions_to_classes_rename.sql
 -- Renomme les 4 factions en classes (identité visuelle). Additif : UPDATE de données,
 -- id et color conservés. Rollback = restaurer les anciens titres.
 update public.factions set
@@ -92,15 +92,15 @@ where id = 'faction-romaine';
 - [ ] **Step 4 — Commit** (l'application en prod se fait en phase finale coordonnée)
 
 ```bash
-git add supabase/migrations/270_factions_to_classes_rename.sql
-git commit -m "feat(db): renomme les 4 factions en classes (mig 270, additif)"
+git add supabase/migrations/271_factions_to_classes_rename.sql
+git commit -m "feat(db): renomme les 4 factions en classes (mig 271, additif)"
 ```
 
 ---
 
 ## Task 2 — Migration : neutraliser les bonus de faction (DB)
 
-**Files:** Create `supabase/migrations/271_neutralize_faction_bonuses.sql`
+**Files:** Create `supabase/migrations/272_neutralize_faction_bonuses.sql`
 
 **Interfaces:** Produces — toutes les colonnes `bonus_*` de `factions` à 0 ; `faction_tag_bonuses` vidée de son effet.
 
@@ -112,7 +112,7 @@ Et : `select count(*) from public.faction_tag_bonuses;`
 - [ ] **Step 2 — Écrire la migration** (mettre à 0 toutes les colonnes bonus listées au Step 1 ; adapter la liste exacte)
 
 ```sql
--- 271_neutralize_faction_bonuses.sql
+-- 272_neutralize_faction_bonuses.sql
 -- Identité pure : zéro bonus mécanique. Additif : on met les bonus à 0 (colonnes conservées),
 -- et on vide l'effet des bonus par tag. Rollback = restaurer les valeurs.
 update public.factions set
@@ -128,15 +128,15 @@ delete from public.faction_tag_bonuses;
 - [ ] **Step 3 — Commit**
 
 ```bash
-git add supabase/migrations/271_neutralize_faction_bonuses.sql
-git commit -m "feat(db): neutralise les bonus de faction (mig 271, identite pure)"
+git add supabase/migrations/272_neutralize_faction_bonuses.sql
+git commit -m "feat(db): neutralise les bonus de faction (mig 272, identite pure)"
 ```
 
 ---
 
 ## Task 3 — Migration : `set_user_faction` sans effets de bord + choix sans équilibrage (DB)
 
-**Files:** Create `supabase/migrations/272_strip_set_user_faction_side_effects.sql`
+**Files:** Create `supabase/migrations/273_strip_set_user_faction_side_effects.sql`
 
 **Interfaces:** Consumes — baselines actuelles de `set_user_faction`, `get_factions_for_choice`. Produces — mêmes signatures, sans bonus/underdog/tri.
 
@@ -149,7 +149,7 @@ Run : `select pg_get_functiondef('public.get_factions_for_choice'::regprocedure)
 - [ ] **Step 2 — Écrire la migration** : recoller chaque corps, puis **retirer** (a) toute application de bonus/regen, (b) tout appel à `get_underdog_faction_id` / logique Baroud d'Honneur, (c) dans `get_factions_for_choice`, retirer le `ORDER BY` d'équilibrage par effectif → ordre stable `ORDER BY "order"`. Conserver : cooldown de changement, mise à jour `faction_id`/`faction_changed_at`, sync éventuelle.
 
 ```sql
--- 272_strip_set_user_faction_side_effects.sql
+-- 273_strip_set_user_faction_side_effects.sql
 -- Redéfinit set_user_faction (changement de CLASSE) sans bonus ni underdog,
 -- et get_factions_for_choice sans tri d'équilibrage. Corps = baseline copiée, effets retirés.
 -- (COLLER ici les CREATE OR REPLACE FUNCTION complets issus du Step 1, nettoyés.)
@@ -160,15 +160,15 @@ Run : `select pg_get_functiondef('public.get_factions_for_choice'::regprocedure)
 - [ ] **Step 4 — Commit**
 
 ```bash
-git add supabase/migrations/272_strip_set_user_faction_side_effects.sql
-git commit -m "feat(db): set_user_faction sans bonus/underdog + choix sans equilibrage (mig 272)"
+git add supabase/migrations/273_strip_set_user_faction_side_effects.sql
+git commit -m "feat(db): set_user_faction sans bonus/underdog + choix sans equilibrage (mig 273)"
 ```
 
 ---
 
 ## Task 4 — Migration : parquer les noms de territoires (DB)
 
-**Files:** Create `supabase/migrations/273_park_territory_names.sql`
+**Files:** Create `supabase/migrations/274_park_territory_names.sql`
 
 **Interfaces:** Produces — `propose_territory_name` / `vote_territory_name` refusent poliment ; données conservées.
 
@@ -177,7 +177,7 @@ git commit -m "feat(db): set_user_faction sans bonus/underdog + choix sans equil
 - [ ] **Step 2 — Migration** : redéfinir chaque RPC pour qu'elle retourne une erreur douce / no-op (`RAISE EXCEPTION 'Fonctionnalité temporairement indisponible'` ou retour `json_build_object('parked', true)` selon le contrat front). Ne PAS toucher aux tables `territory_name_proposals` / `_votes` (conservées).
 
 ```sql
--- 273_park_territory_names.sql
+-- 274_park_territory_names.sql
 -- Parking : la proposition/vote de noms de territoire est gelée jusqu'au SPEC 3.
 -- Tables conservées. (COLLER les CREATE OR REPLACE retournant un parked/erreur douce.)
 ```
@@ -185,8 +185,8 @@ git commit -m "feat(db): set_user_faction sans bonus/underdog + choix sans equil
 - [ ] **Step 3 — Commit**
 
 ```bash
-git add supabase/migrations/273_park_territory_names.sql
-git commit -m "feat(db): parque les noms de territoire jusqu'au SPEC 3 (mig 273)"
+git add supabase/migrations/274_park_territory_names.sql
+git commit -m "feat(db): parque les noms de territoire jusqu'au SPEC 3 (mig 274)"
 ```
 
 ---
@@ -331,7 +331,7 @@ git commit -m "feat(territoire): masque le nommage de territoire (parke jusqu'au
 
 - [ ] **Step 3 — Test local complet** : `pnpm -C apps/explore-web dev` — parcours : carte neutre, ouvrir un lieu (Cour individuelle), écran de choix (4 classes, pas de bonus), profil (« Classe »), Dortoir (chat OK). Aucun crash. (Mémoire : build OK ≠ runtime OK — ce test est obligatoire.)
 
-- [ ] **Step 4 — Appliquer les migrations prod** (additives, réversibles) : `pnpm dlx supabase db push` (migrations 270→273). Vérifier manuellement : `select id, title from public.factions;` montre les 4 classes ; `set_user_faction` fonctionne.
+- [ ] **Step 4 — Appliquer les migrations prod** (additives, réversibles) : `pnpm dlx supabase db push` (migrations 271→274). Vérifier manuellement : `select id, title from public.factions;` montre les 4 classes ; `set_user_faction` fonctionne.
 
 - [ ] **Step 5 — Deploy front** : depuis `apps/explore-web`, `netlify deploy --prod --dir "<abs>/apps/explore-web/dist" --message "feat: purification factions + classes"`.
 
