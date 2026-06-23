@@ -358,8 +358,6 @@ function ExplorerRow({ explorers, authorId, guardianIds, factionColors, placeId,
 function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefetch }: { place: PlaceDetail; onClose: () => void; userEmail: string | null; onRefetch: () => void }) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const userId = usePlayerStore(s => s.userId)
-  // Mode Coupe des Héritages actif sur la carte → La Cour dépliée par défaut.
-  const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const { calendarRef } = useCalendarRef()
   const [imageIndex, setImageIndex] = useState(0)
   const [showOptionsMenu, setShowOptionsMenu] = useState(false)
@@ -879,7 +877,7 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
           placeId={place.id}
           placeTitle={place.title}
           veilleurName={placeOverride?.veilleurName ?? null}
-          defaultOpen={factionColorMode}
+          defaultOpen={false}
         />
 
         {/* Description collaborative */}

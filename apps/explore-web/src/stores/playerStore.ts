@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { safeStorage } from '../lib/safeStorage'
 
 interface PlayerState {
   /** IDs des lieux découverts par l'utilisateur (lookup O(1)) */
@@ -69,10 +68,6 @@ interface PlayerState {
   /** Titres affichés sur la carte (max 3, ordonnés) */
   displayedTitles: string[]
   setDisplayedTitles: (titles: string[]) => void
-
-  /** Mode coloration carte : true = billes colorées par faction */
-  factionColorMode: boolean
-  setFactionColorMode: (on: boolean) => void
 
   /** Admin */
   isAdmin: boolean
@@ -157,12 +152,6 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   displayedTitles: [],
   setDisplayedTitles: (titles) => set({ displayedTitles: titles }),
-
-  factionColorMode: safeStorage.get('factionColorMode') === 'true',
-  setFactionColorMode: (on) => {
-    safeStorage.set('factionColorMode', String(on))
-    set({ factionColorMode: on })
-  },
 
   isAdmin: false,
   setIsAdmin: (v) => set({ isAdmin: v }),
