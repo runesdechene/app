@@ -100,7 +100,7 @@ export function FlyerGift() {
             <p style={body}>Utilise ce code à la boutique en ligne :</p>
             <div style={codeBox}>{promoCode}</div>
             <a href={`${SHOP_URL}/discount/${promoCode}`} style={ctaLink}>
-              J'en profite à la boutique
+              J'en profite sur la boutique
             </a>
             <p style={{ ...body, fontSize: 16, color: C.inkLight, margin: '18px 0 0' }}>
               On te l'a aussi envoyé par email. À bientôt, Compagnon !
