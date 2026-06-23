@@ -44,7 +44,7 @@
 }
 
 .flyer-links-emblem {
-  width: min(290px, 82%);
+  width: 340px;
   height: auto;
   object-fit: contain;
   margin-bottom: 14px;
@@ -80,7 +80,7 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-decoration: none;
-  box-shadow: 0 6px 18px rgba(20, 12, 6, 0.28);
+  box-shadow: 0 6px 18px rgba(107, 57, 19, 0.28);
   transition: transform 0.12s ease;
 }
 
@@ -95,11 +95,9 @@
 .flyer-link--primary {
   background: var(--ink);
   color: var(--parchment);
-  border: 1px solid var(--ink);
 }
 
 .flyer-link--secondary {
   background: var(--parchment);
   color: var(--ink);
-  border: 1px solid var(--sepia);
 }
