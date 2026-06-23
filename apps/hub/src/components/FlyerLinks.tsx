@@ -30,7 +30,7 @@ export function FlyerLinks() {
     <div style={page}>
       <div style={column}>
         <div style={header}>
-          <img src="/rune-de-chene.png" alt="Runes de Chêne" style={emblem} />
+          <img src="/logo-marron.webp" alt="Runes de Chêne" style={emblem} />
           <h1 style={title}>Runes de Chêne</h1>
           <p style={tagline}>Pendant que le monde scrolle, un mouvement s'éveille.</p>
         </div>
