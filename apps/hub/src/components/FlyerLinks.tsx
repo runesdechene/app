@@ -23,7 +23,6 @@ export function FlyerLinks() {
       <div className="flyer-links-column">
         <div className="flyer-links-header">
           <img src="/logo-slogan.webp" alt="Runes de Chêne — Portez l'Histoire" className="flyer-links-emblem" />
-          <p className="flyer-links-tagline">Pendant que le monde scrolle, un mouvement s'éveille.</p>
         </div>
 
         <nav className="flyer-links-nav">
