@@ -128,7 +128,7 @@ export function FlyerGift() {
 const panel: React.CSSProperties = {
   width: '100%',
   maxWidth: 440,
-  background: C.parchment,
+  background: `${C.parchment} url(/background-parchemin.jpg) center / cover no-repeat`,
   border: `1px solid ${C.sepia}`,
   borderRadius: 18,
   padding: '40px 32px',
