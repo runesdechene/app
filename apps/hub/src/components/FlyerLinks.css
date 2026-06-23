@@ -1,0 +1,105 @@
+/* Page publique « plaque tournante » (Linktree parchemin) — route /flyer.
+   Couleurs réglables via les variables ci-dessous. */
+.flyer-links-page {
+  --parchment: #f7ede1;
+  --parchment-dark: #e8d5be;
+  --ink: #4a3728;
+  --ink-light: #7d5a3c;
+  --sepia: #c19a6b;
+  --sepia-dark: #a0784c;
+
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  font-family: 'Cabin', sans-serif;
+  background: url(/fond-explore.webp) center / cover no-repeat;
+}
+
+.flyer-links-column {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Halo parcheminé clair derrière l'en-tête : lisibilité sans overlay sombre. */
+.flyer-links-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 28px 24px;
+  margin-bottom: 26px;
+  border-radius: 28px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(247, 237, 225, 0.88) 0%,
+    rgba(247, 237, 225, 0.55) 48%,
+    rgba(247, 237, 225, 0) 78%
+  );
+}
+
+.flyer-links-emblem {
+  width: min(290px, 82%);
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 14px;
+  opacity: 0.9;
+}
+
+.flyer-links-tagline {
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 0;
+  text-shadow: 0 1px 8px rgba(247, 237, 225, 0.95);
+}
+
+.flyer-links-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flyer-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 18px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-family: 'Cabin Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(20, 12, 6, 0.28);
+  transition: transform 0.12s ease;
+}
+
+.flyer-link:hover {
+  transform: translateY(-2px);
+}
+
+.flyer-link__emoji {
+  font-size: 20px;
+}
+
+.flyer-link--primary {
+  background: var(--ink);
+  color: var(--parchment);
+  border: 1px solid var(--ink);
+}
+
+.flyer-link--secondary {
+  background: var(--parchment);
+  color: var(--ink);
+  border: 1px solid var(--sepia);
+}
