@@ -67,7 +67,7 @@ export function FlyerGift() {
         {phase === 'form' ? (
           <>
             <h1 style={title}>
-              <span style={{ display: 'block', color: C.sepiaDark }}>Pendant que le monde scrolle,</span>
+              <span style={{ display: 'block', color: C.sepiaDark, fontSize: '0.6em' }}>Pendant que le monde scrolle,</span>
               <span style={{ display: 'block', color: C.ink }}>un mouvement s'éveille</span>
             </h1>
             <p style={body}>
