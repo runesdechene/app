@@ -15,7 +15,6 @@ import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
 import { PlayerProfileModal } from '../components/map/modals/PlayerProfileModal'
 import { LeaderboardModal } from '../components/map/modals/LeaderboardModal'
-import { TerritoryPanel } from '../components/map/modals/TerritoryPanel'
 import { useMapStore } from '../stores/mapStore'
 import { usePlayerStore } from '../stores/playerStore'
 import { useAuth } from '../hooks/useAuth'
@@ -124,8 +123,6 @@ export default function MapPage() {
   const addPlaceMode = useMapStore(s => s.addPlaceMode)
   const mapPickerPurpose = useMapStore(s => s.mapPickerPurpose)
   const setAddPlaceMode = useMapStore(s => s.setAddPlaceMode)
-  const selectedTerritoryData = useMapStore(s => s.selectedTerritoryData)
-  const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
   const openGpsMarkId = useMapStore(s => s.openGpsMarkId)
   const gpsMarks = useGpsMarksStore(s => s.marks)
   const openGpsMark = gpsMarks.find(m => m.id === openGpsMarkId) ?? null
@@ -512,20 +509,7 @@ export default function MapPage() {
         />
       )}
 
-      {!addPlaceMode && selectedTerritoryData && (
-        <TerritoryPanel
-          data={selectedTerritoryData}
-          onClose={() => setSelectedTerritoryData(null)}
-          onNameSaved={(anchorPlaceId, customName: string | null) => {
-            setSelectedTerritoryData({
-              ...selectedTerritoryData,
-              customName,
-              anchorPlaceId,
-            })
-          }}
-          onFactionModal={() => setShowFactionModal(true)}
-        />
-      )}
+      {/* TerritoryPanel démonté — nommage de territoire par faction obsolète (V1 identité) */}
 
       {tutorialPhase === 'before' && (
         <TutorialModal

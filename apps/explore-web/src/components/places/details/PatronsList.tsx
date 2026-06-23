@@ -39,17 +39,6 @@ function PatronRow({ patron, side, rank, isYou, onOpen, className }: PatronRowPr
         title={`Voir le profil de ${patron.displayName}`}
       >
         {patron.displayName}
-        {patron.factionPattern && patron.factionColor && (
-          <span
-            className="patron-faction-icon"
-            style={{
-              backgroundColor: patron.factionColor,
-              WebkitMaskImage: `url(${patron.factionPattern})`,
-              maskImage: `url(${patron.factionPattern})`,
-            }}
-            aria-hidden
-          />
-        )}
         {isYou && <span className="patron-you">(vous)</span>}
       </button>
       <span className="patron-breakdown">
@@ -118,17 +107,6 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
                 title={`Voir le profil de ${mecenePatron.displayName}`}
               >
                 {mecenePatron.displayName}
-                {mecenePatron.factionPattern && mecenePatron.factionColor && (
-                  <span
-                    className="patron-faction-icon"
-                    style={{
-                      backgroundColor: mecenePatron.factionColor,
-                      WebkitMaskImage: `url(${mecenePatron.factionPattern})`,
-                      maskImage: `url(${mecenePatron.factionPattern})`,
-                    }}
-                    aria-hidden
-                  />
-                )}
                 <span className="patron-title">Mécène Principal</span>
                 {currentUserId === mecenePatron.userId && <span className="patron-you">(vous)</span>}
               </button>
@@ -195,17 +173,6 @@ export function PatronsList({ patrons, currentUserId, veilleurUserId, scoreVeill
                   title={`Voir le profil de ${c.displayName}`}
                 >
                   {c.displayName}
-                  {c.factionPattern && c.factionColor && (
-                    <span
-                      className="patron-faction-icon"
-                      style={{
-                        backgroundColor: c.factionColor,
-                        WebkitMaskImage: `url(${c.factionPattern})`,
-                        maskImage: `url(${c.factionPattern})`,
-                      }}
-                      aria-hidden
-                    />
-                  )}
                   {currentUserId === c.userId && <span className="patron-you">(vous)</span>}
                 </button>
                 <span className="patron-breakdown">

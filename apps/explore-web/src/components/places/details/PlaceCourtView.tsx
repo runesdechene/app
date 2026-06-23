@@ -3,7 +3,6 @@ import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { useMapStore } from '../../../stores/mapStore'
-import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
 import { useVeille } from '../../../hooks/useVeille'
 import { capitalizeFirst, pastel, shade } from '../../../lib/textFormat'
@@ -11,6 +10,7 @@ import { getCourtActionsVisibility } from '../../../lib/courtActionsVisibility'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import './PlaceCourtView.css'
 import type { PlaceCourtState, CourtSide, CreateChallengerExpeditionResult, InvestCrownsResult, CourtStatus, Challenger } from '../../../types/court'
+// CourtTensionBar supprimé — Cour individuelle sans dimension faction/tension
 
 interface PlaceCourtViewProps {
   placeId: string
@@ -213,7 +213,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     return <div className="court-loading">{errorMsg ?? 'Chargement…'}</div>
   }
 
-  const { vacant, veilleur, scoreVeilleur, defenseFavorPoints, threats, menaceHaute, status, topPatrons, callerContext } = state
+  const { vacant, veilleur, scoreVeilleur, status, topPatrons, callerContext } = state
 
   // V0.9.56 — veille à plusieurs (expédition nommée) : on affiche le nom d'expédition
   // + la facepile des membres + « veillé par N compagnons ». Solo : inchangé.
@@ -231,15 +231,10 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
   // V0.9.63 — un membre de la compagnie ne peut pas influencer contre les siens.
   const contestBlockedAsMember = !vacant && isMember
   const userChallengerExp = callerContext?.challengerExpeditions?.[0]
-  const challengerThreat = userChallengerExp ? threats.find(x => x.expeditionId === userChallengerExp) : null
-
   // Score optimistic (en local + pending)
   const pendingTaps = readPending()
   const pendingDefense = pendingTaps && veilleur && pendingTaps.expId === veilleur.expeditionId && pendingTaps.side === 'defense' ? pendingTaps.count : 0
-  const pendingAttack = pendingTaps && userChallengerExp && pendingTaps.expId === userChallengerExp && pendingTaps.side === 'attack' ? pendingTaps.count : 0
   const optimisticVeilleurScore = scoreVeilleur + pendingDefense
-  const optimisticChallengerScore = (challengerThreat?.score ?? 0) + pendingAttack
-  const optimisticMenace = userChallengerExp ? Math.max(menaceHaute ?? 0, optimisticChallengerScore) : (menaceHaute ?? 0)
 
   // V0.8.23 — score optimiste du challenger soutenu (celui en cours de tap-mécénat)
   // V0.8.25 — si pas de beneficiary explicite (tap "Influencer" pour soi via
@@ -397,18 +392,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
                 ) : (
                   <span className="court-leader-name">{veilleur.leaderName}</span>
                 )}
-                {veilleur.factionPattern && veilleur.factionColor && (
-                  <span
-                    className="court-leader-faction-icon"
-                    style={{
-                      backgroundColor: veilleur.factionColor,
-                      WebkitMaskImage: `url(${veilleur.factionPattern})`,
-                      maskImage: `url(${veilleur.factionPattern})`,
-                    }}
-                    title={veilleur.name}
-                    aria-label={`Faction : ${veilleur.name}`}
-                  />
-                )}
               </div>
             </>
           )}
@@ -428,22 +411,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       </div>
       )}
 
-      {/* V0.7.6 — Jauge gravée + cluster avatars (cf. mockup F validé) */}
-      {/* V0.8.25 — passe challengers[] (et plus seulement menaceHaute) :
-          la barre segmente N rouges par challenger pour que les taps sur
-          le n°2+ soient visibles immédiatement. menaceHaute reste utilisé
-          pour le aria-label total et le seuil "bascule imminente". */}
-      <CourtTensionBar
-        scoreVeilleur={optimisticVeilleurScore}
-        menaceHaute={optimisticMenace}
-        challengers={optimisticChallengers}
-        defenseFavorPoints={defenseFavorPoints ?? 0}
-        patrons={topPatrons}
-        veilleur={veilleur}
-        coVeilleurs={isGroupVeille ? veilleMembers : undefined}
-        expeditionTitle={expeditionTitle}
-        defenseColor={veilleurColor}
-      />
+      {/* CourtTensionBar retiré — Cour individuelle, sans barre de tension faction */}
 
       {/* V0.9.70 — solde visible près des actions : le « coût » se lit ici (le
           compteur descend à chaque tap), puisque les boutons cadrent en « +1 ». */}
@@ -516,7 +484,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
               <div key={c.userId} className={`court-attacker-row${isYou ? ' is-you' : ''}`}>
                 <span
                   className="court-attacker-avatar"
-                  style={{ borderColor: c.factionColor ?? '#8b3a3a', backgroundColor: c.factionColor ?? '#8b3a3a' }}
                 >
                   {c.avatarUrl
                     ? <img src={c.avatarUrl} alt="" />
@@ -529,17 +496,6 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
                   title={`Voir le profil de ${c.displayName}`}
                 >
                   {c.displayName}
-                  {c.factionPattern && c.factionColor && (
-                    <span
-                      className="court-attacker-faction-icon"
-                      style={{
-                        backgroundColor: c.factionColor,
-                        WebkitMaskImage: `url(${c.factionPattern})`,
-                        maskImage: `url(${c.factionPattern})`,
-                      }}
-                      aria-hidden
-                    />
-                  )}
                   {isYou && <span className="court-attacker-you">(vous)</span>}
                 </button>
                 <span className="court-attacker-score">⚔ {c.score}</span>
