@@ -2,6 +2,7 @@
 import { Map as MapGL, Source, Layer, Popup, Marker, NavigationControl, GeolocateControl } from '@vis.gl/react-maplibre'
 import type { MapLayerMouseEvent, MapRef } from '@vis.gl/react-maplibre'
 import type { StyleSpecification } from 'maplibre-gl'
+import type { FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { usePlaces } from '../../../hooks/usePlaces'
@@ -9,6 +10,7 @@ import type { PlaceProperties } from '../../../hooks/usePlaces'
 import { loadParchmentStyle, loadParchmentDetailedStyle, loadSatelliteStyle } from '../../../lib/map-style'
 import { loadColoredSvgIcon, loadShieldIcon } from '../../../lib/map-icons'
 import {
+  buildTerritoryFillLayer, buildTerritoryBorderLayer,
   UNKNOWN_ICON_ID,
   undiscoveredCircleLayer, undiscoveredIconLayer, pointLayer, iconLayer,
 } from '../../../lib/map-layers'
@@ -40,6 +42,8 @@ import type { PopupInfo } from '../../../lib/exploreMapConstants'
 export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
   const { geojson, rawGeojson, loading, error } = usePlaces()
+  const [territories, setTerritories] = useState<FeatureCollection<Polygon | MultiPolygon> | null>(null)
+  const workerRef = useRef<Worker | null>(null)
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null)
   const [zoomLevel, setZoomLevel] = useState(8)
   const [mapStyle, setMapStyle] = useState<StyleSpecification | null>(null)
@@ -54,6 +58,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
   const userName = usePlayerStore(s => s.userName)
   const userDisplayedTitles = usePlayerStore(s => s.displayedTitles)
+  const discoveredIds = usePlayerStore(s => s.discoveredIds)
   const currentUserId = usePlayerStore(s => s.userId)
   const onlinePlayers = usePlayersStore(s => s.players)
   const setSelectedPlayerId = useMapStore(s => s.setSelectedPlayerId)
@@ -149,6 +154,7 @@ export const ExploreMap = memo(function ExploreMap() {
     return [
       'places-undiscovered-circle', 'places-undiscovered-icon',
       'places-point', 'places-icon',
+      'territories-fill',
     ]
   }, [])
 
@@ -187,6 +193,57 @@ export const ExploreMap = memo(function ExploreMap() {
     loadedIconsRef.current.clear()
   }, [mapStyleMode])
 
+  // Web Worker : calcul des territoires en arrière-plan
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('../../../workers/territoryWorker.ts', import.meta.url),
+      { type: 'module' },
+    )
+    worker.onmessage = (e) => {
+      if (e.data.type === 'progress') return
+      setTerritories(e.data as FeatureCollection<Polygon | MultiPolygon>)
+    }
+    workerRef.current = worker
+    return () => { worker.terminate() }
+  }, [])
+
+  // Envoyer les données au worker quand les lieux ou veilles changent
+  const workerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    if (!rawGeojson || !workerRef.current) return
+    if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current)
+    workerDebounceRef.current = setTimeout(() => {
+      if (!workerRef.current) return
+      workerRef.current.postMessage({
+        features: rawGeojson.features
+          .filter(f => placeOverrides.get(f.properties.id)?.claimed)
+          .map(f => {
+            const ov = placeOverrides.get(f.properties.id)!
+            return {
+              coordinates: f.geometry.coordinates as [number, number],
+              placeId: f.properties.id,
+              faction: ov.factionId ?? '__neutral__',
+              factionTitle: ov.factionTitle ?? '',
+              tagColor: ov.tagColor ?? f.properties.tagColor,
+              factionPattern: ov.factionPattern ?? '',
+              score: 1,
+              likes: f.properties.likes ?? 0,
+              discovered: discoveredIds.has(f.properties.id),
+              totalInfluence: 0,
+              influenceByFaction: {},
+              crownsTotal: 0,
+            }
+          }),
+        tiers: [],
+        radiusTuning: { enabled: false, baseKm: 1.0, stepKm: 0.2, capKm: 3.0 },
+      })
+    }, 500)
+    return () => { if (workerDebounceRef.current) clearTimeout(workerDebounceRef.current) }
+  }, [rawGeojson, placeOverrides, discoveredIds])
+
+  // Layers territoire mémorisés (gris neutres, sans paramètre faction)
+  const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(), [])
+  const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(), [])
 
   // Géolocalisation navigateur : centrer la carte + alimenter playerStore
   // On stocke la position dans une ref pour l'utiliser dans onMapLoad
@@ -545,6 +602,13 @@ export const ExploreMap = memo(function ExploreMap() {
 
       {/* V0.7+ Expéditions — bannières sur la carte (chaque expé published) */}
       <ExpeditionBanners />
+
+      {territories && (
+        <Source id="territories" type="geojson" data={territories}>
+          <Layer {...territoryFillLayer} />
+          <Layer {...territoryBorderLayer} />
+        </Source>
+      )}
 
       {filteredGeojson && (
         <Source

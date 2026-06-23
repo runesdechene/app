@@ -1,6 +1,33 @@
 import type { LayerSpecification } from 'maplibre-gl'
 import { MAP_COLORS } from './map-style'
 
+// --- Layer style : Territoires (zones grises neutres — couleur faction retirée) ---
+
+export function buildTerritoryFillLayer(): LayerSpecification {
+  return {
+    id: 'territories-fill',
+    type: 'fill',
+    source: 'territories',
+    paint: {
+      'fill-color': 'rgba(120,120,120,0.18)',
+      'fill-antialias': false,
+    },
+  }
+}
+
+export function buildTerritoryBorderLayer(): LayerSpecification {
+  return {
+    id: 'territories-border',
+    type: 'line',
+    source: 'territories',
+    paint: {
+      'line-dasharray': [4, 2],
+      'line-color': 'rgba(90,90,90,0.45)',
+      'line-width': 1.5,
+    },
+  }
+}
+
 // --- Layer style : Markers ---
 
 export const UNKNOWN_ICON_ID = '__unknown-place'

@@ -1,0 +1,439 @@
+/**
+ * Web Worker : calcul des territoires (Voronoi + cercles clippés)
+ *
+ * Algorithme :
+ * 1. Voronoi : chaque lieu reçoit sa cellule naturelle (zone la plus proche)
+ * 2. Cercle : rayon = f(likes) → portée d'influence du lieu
+ * 3. Clip : Sutherland-Hodgman (cercle ∩ cellule Voronoi convexe)
+ *    → ~50ms pour 2400 lieux (vs 5s+ avec turf/intersect)
+ *    → Chaque lieu a TOUJOURS un territoire (garanti par Voronoi)
+ *    → Zéro superposition (garanti par Voronoi)
+ */
+import { Delaunay } from 'd3-delaunay'
+import { union } from '@turf/union'
+import { polygon as turfPolygon, featureCollection } from '@turf/helpers'
+import type { Feature, Polygon, MultiPolygon, Position } from 'geojson'
+
+// --- Constantes ---
+
+const BASE_RADIUS_KM = 1.0       // V0.7 : rayon fixe 1km pour tout lieu veillé
+const KM_PER_DEG_LAT = 111
+const KM_PER_DEG_LON = 79        // approximation à ~45° latitude
+const CIRCLE_SEGMENTS = 12        // octogone
+const VORONOI_PAD_DEG = 2
+const UNION_EPSILON = 0.00003  // ~3m — comble les micro-gaps floating-point pour l'union
+
+// --- Types ---
+
+interface PlaceInput {
+  coordinates: [number, number]
+  placeId: string
+  faction: string
+  factionTitle: string
+  tagColor: string
+  factionPattern: string
+  score: number
+  likes: number
+  /** Lieu personnellement découvert par le user — sert à neutraliser les blobs entièrement fogged */
+  discovered: boolean
+  /** V0.5 : influence totale (toutes factions) sur le lieu */
+  totalInfluence?: number
+  /** V0.5 : influence par faction { factionId: score } */
+  influenceByFaction?: Record<string, number>
+  /** V098 — total Couronnes investies sur ce lieu (pour Voronoï pondéré) */
+  crownsTotal?: number
+}
+
+interface TierDef {
+  minPlaces: number
+  title: string
+}
+
+/** V098 — params de tuning Voronoï pondéré (panel admin). Si enabled = false,
+ *  on retombe sur le rayon fixe BASE_RADIUS_KM (comportement V0.7 actuel). */
+interface RadiusTuning {
+  enabled: boolean
+  baseKm: number
+  stepKm: number
+  capKm: number
+}
+
+interface WorkerMessage {
+  features: PlaceInput[]
+  tiers: TierDef[]
+  /** Optionnel — défaut = rayon fixe historique */
+  radiusTuning?: RadiusTuning
+}
+
+/** Titre progressif selon le nombre de lieux (tiers trié desc) */
+function getTerritoryTitle(count: number, tiers: TierDef[]): string {
+  for (const tier of tiers) {
+    if (count >= tier.minPlaces) return tier.title
+  }
+  return ''
+}
+
+// --- Helpers ---
+
+/** Douglas-Peucker simplification — réduit les vertices d'un ring */
+const SIMPLIFY_TOLERANCE = 0.0001 // ~11m — imperceptible visuellement
+function simplifyRing(ring: Position[], tolerance: number = SIMPLIFY_TOLERANCE): Position[] {
+  if (ring.length <= 4) return ring // triangle minimum
+
+  let maxDist = 0, maxIdx = 0
+  const first = ring[0], last = ring[ring.length - 2] // -2 car dernier = premier (fermé)
+
+  for (let i = 1; i < ring.length - 1; i++) {
+    const d = perpendicularDist(ring[i], first, last)
+    if (d > maxDist) { maxDist = d; maxIdx = i }
+  }
+
+  if (maxDist <= tolerance) {
+    return [first, ring[ring.length - 1]] // trop simple → juste start/end
+  }
+
+  const left = simplifyRing(ring.slice(0, maxIdx + 1), tolerance)
+  const right = simplifyRing(ring.slice(maxIdx), tolerance)
+  return [...left.slice(0, -1), ...right]
+}
+
+function perpendicularDist(p: Position, a: Position, b: Position): number {
+  const dx = b[0] - a[0], dy = b[1] - a[1]
+  const lenSq = dx * dx + dy * dy
+  if (lenSq === 0) return Math.sqrt((p[0] - a[0]) ** 2 + (p[1] - a[1]) ** 2)
+  const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / lenSq))
+  const projX = a[0] + t * dx, projY = a[1] + t * dy
+  return Math.sqrt((p[0] - projX) ** 2 + (p[1] - projY) ** 2)
+}
+
+/** Simplifie toutes les rings d'une geometry Polygon/MultiPolygon */
+function simplifyGeometry(geom: Polygon | MultiPolygon): Polygon | MultiPolygon {
+  if (geom.type === 'Polygon') {
+    return { type: 'Polygon', coordinates: geom.coordinates.map(ring => simplifyRing(ring)) }
+  }
+  return {
+    type: 'MultiPolygon',
+    coordinates: geom.coordinates.map(poly => poly.map(ring => simplifyRing(ring))),
+  }
+}
+
+/** V0.7 : rayon fixe 300m pour tout lieu veillé. score <= 0 = pas de zone (filtré en amont). */
+function radiusForScore(score: number): number {
+  if (score <= 0) return 0
+  return BASE_RADIUS_KM
+}
+
+/** V098 — rayon pondéré par Couronnes investies. Formule log10 avec cap.
+ *  Appelée uniquement si tuning.enabled = true. */
+function radiusForCrowns(crowns: number, tuning: RadiusTuning): number {
+  const c = Math.max(0, crowns)
+  const r = tuning.baseKm + Math.log10(1 + c) * tuning.stepKm
+  return Math.min(tuning.capKm, r)
+}
+
+/** V0.7 : faction = celle de la veille (déjà résolue dans la dispatch ExploreMap depuis ov.factionId).
+ *  Pour les expéditions multi-faction (neutres), `place.faction` vaut '__neutral__' — utilisé comme clé de groupe. */
+function getDominantFaction(place: PlaceInput): string {
+  return place.faction
+}
+
+/** V0.7 : score binaire — 1 si veillé (radiusForScore renverra le rayon fixe), 0 sinon. */
+function getPlaceScore(place: PlaceInput): number {
+  return place.score > 0 ? 1 : 0
+}
+
+/** Génère un polygone circulaire fermé [lon, lat][] */
+function makeCircle(center: [number, number], radiusKm: number): Position[] {
+  const [lon, lat] = center
+  const coords: Position[] = []
+  for (let i = 0; i <= CIRCLE_SEGMENTS; i++) {
+    const angle = (2 * Math.PI * i) / CIRCLE_SEGMENTS
+    const dx = (radiusKm * Math.cos(angle)) / KM_PER_DEG_LON
+    const dy = (radiusKm * Math.sin(angle)) / KM_PER_DEG_LAT
+    coords.push([lon + dx, lat + dy])
+  }
+  return coords
+}
+
+/** Dilate légèrement un anneau convexe depuis son centroïde (comble les micro-gaps pour union) */
+function expandRing(ring: Position[]): Position[] {
+  const n = ring.length - 1 // exclure le point de fermeture
+  let cx = 0, cy = 0
+  for (let i = 0; i < n; i++) { cx += ring[i][0]; cy += ring[i][1] }
+  cx /= n; cy /= n
+
+  return ring.map(([x, y]) => {
+    const dx = x - cx, dy = y - cy
+    const d = Math.sqrt(dx * dx + dy * dy)
+    if (d < 1e-12) return [x, y]
+    return [x + (dx / d) * UNION_EPSILON, y + (dy / d) * UNION_EPSILON]
+  })
+}
+
+
+// --- Sutherland-Hodgman : clip polygon to convex cell ---
+
+/** Détermine si un point est du côté intérieur d'une arête */
+function isInside(p: Position, edgeA: Position, edgeB: Position): boolean {
+  return (edgeB[0] - edgeA[0]) * (p[1] - edgeA[1]) -
+         (edgeB[1] - edgeA[1]) * (p[0] - edgeA[0]) >= 0
+}
+
+/** Intersection entre le segment [p1,p2] et la droite passant par [edgeA,edgeB] */
+function lineIntersect(p1: Position, p2: Position, eA: Position, eB: Position): Position {
+  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1]
+  const x3 = eA[0], y3 = eA[1], x4 = eB[0], y4 = eB[1]
+  const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+  if (Math.abs(denom) < 1e-12) return p1 // parallèles, fallback
+  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
+  return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)]
+}
+
+/** Clip un polygone (sujet) par un polygone convexe (clip). Retourne un anneau fermé. */
+function clipToConvex(subject: Position[], clip: Position[]): Position[] | null {
+  let output = subject.slice(0, -1) // retirer le point de fermeture
+  const clipLen = clip.length - 1    // dernier point = premier
+
+  for (let i = 0; i < clipLen; i++) {
+    if (output.length === 0) return null
+    const input = output
+    output = []
+    const eA = clip[i]
+    const eB = clip[i + 1]
+
+    for (let j = 0; j < input.length; j++) {
+      const curr = input[j]
+      const prev = input[(j + input.length - 1) % input.length]
+      const currIn = isInside(curr, eA, eB)
+      const prevIn = isInside(prev, eA, eB)
+
+      if (currIn) {
+        if (!prevIn) output.push(lineIntersect(prev, curr, eA, eB))
+        output.push(curr)
+      } else if (prevIn) {
+        output.push(lineIntersect(prev, curr, eA, eB))
+      }
+    }
+  }
+
+  if (output.length < 3) return null
+  output.push(output[0]) // fermer l'anneau
+  return output
+}
+
+/** Point-in-polygon (ray casting) — teste si [x,y] est à l'intérieur d'un anneau fermé */
+function pointInRing(x: number, y: number, ring: Position[]): boolean {
+  let inside = false
+  for (let i = 0, j = ring.length - 2; i < ring.length - 1; j = i++) {
+    const xi = ring[i][0], yi = ring[i][1]
+    const xj = ring[j][0], yj = ring[j][1]
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
+// --- Main ---
+
+self.onmessage = (e: MessageEvent<WorkerMessage>) => {
+  const { features, tiers, radiusTuning } = e.data
+  const tuningOn = radiusTuning?.enabled === true
+
+  if (features.length === 0) {
+    self.postMessage({ type: 'FeatureCollection', partial: false, features: [] })
+    return
+  }
+
+  // 1. Voronoi
+  const points: [number, number][] = features.map(p => p.coordinates)
+  const delaunay = Delaunay.from(points)
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const [x, y] of points) {
+    if (x < minX) minX = x
+    if (y < minY) minY = y
+    if (x > maxX) maxX = x
+    if (y > maxY) maxY = y
+  }
+
+  const voronoi = delaunay.voronoi([
+    minX - VORONOI_PAD_DEG, minY - VORONOI_PAD_DEG,
+    maxX + VORONOI_PAD_DEG, maxY + VORONOI_PAD_DEG,
+  ])
+
+  // 2. Per-place: clip circle to Voronoi cell (Sutherland-Hodgman)
+  //    Grouper par faction (nom) pour fusion visuelle
+  const factionRings = new Map<string, { polygons: Position[][][], totalScore: number, totalHourlyRate: number, totalFortification: number, count: number, color: string, pattern: string, title: string, players: Set<string>, centroidSum: [number, number], placeCoords: [number, number][], placeNames: Map<string, string>, placeHourlyRates: Map<string, number>, placeFortLevels: Map<string, number>, placeIds: Map<string, string>, placeClaimedByIds: Map<string, string>, placeScores: Map<string, number>, placeDiscovered: Map<string, boolean> }>()
+
+  for (let i = 0; i < features.length; i++) {
+    const place = features[i]
+    // V0.5 : use influence-based score, fallback to V0.4
+    const effectiveScore = getPlaceScore(place)
+    if (effectiveScore <= 0) continue
+    // V098 : pondération par Couronnes si admin tuning actif, sinon rayon fixe
+    const rKm = tuningOn && radiusTuning
+      ? radiusForCrowns(place.crownsTotal ?? 0, radiusTuning)
+      : radiusForScore(effectiveScore)
+    if (rKm <= 0) continue
+
+    const cellCoords = voronoi.cellPolygon(i)
+    if (!cellCoords) continue
+
+    const circleCoords = makeCircle(place.coordinates, rKm)
+    const clipped = clipToConvex(circleCoords, cellCoords as unknown as Position[])
+
+    if (clipped) {
+      const key = getDominantFaction(place)
+      if (!factionRings.has(key)) {
+        factionRings.set(key, { polygons: [], totalScore: 0, totalHourlyRate: 0, totalFortification: 0, count: 0, color: place.tagColor, pattern: place.factionPattern, title: place.factionTitle, players: new Set(), centroidSum: [0, 0], placeCoords: [], placeNames: new Map(), placeHourlyRates: new Map(), placeFortLevels: new Map(), placeIds: new Map(), placeClaimedByIds: new Map(), placeScores: new Map(), placeDiscovered: new Map() })
+      }
+      const group = factionRings.get(key)!
+      group.polygons.push([clipped])  // chaque polygon = [ring]
+      // Plus de fortification (système V0 mort en mai 2026) → rate uniforme = 1
+      group.totalScore += place.score
+      group.totalHourlyRate += 1
+      group.count++
+      group.placeCoords.push(place.coordinates)
+      const coordKey = `${place.coordinates[0]},${place.coordinates[1]}`
+      group.placeHourlyRates.set(coordKey, 1)
+      group.placeFortLevels.set(coordKey, 0)
+      group.placeIds.set(coordKey, place.placeId)
+      group.placeScores.set(coordKey, place.score)
+      group.placeDiscovered.set(coordKey, place.discovered)
+      group.centroidSum[0] += place.coordinates[0]
+      group.centroidSum[1] += place.coordinates[1]
+    }
+  }
+
+  // 3. Union géométrique par faction → contour extérieur uniquement
+  const territories: Feature<Polygon | MultiPolygon>[] = []
+  let id = 0
+
+  for (const [factionId, group] of factionRings) {
+    let geometry: Polygon | MultiPolygon
+
+    if (group.polygons.length === 1) {
+      geometry = { type: 'Polygon', coordinates: group.polygons[0] }
+    } else {
+      try {
+        const polys = group.polygons.map(coords => turfPolygon([expandRing(coords[0])]))
+        const merged = union(featureCollection(polys))
+        if (!merged) continue
+        geometry = merged.geometry
+      } catch {
+        // Fallback : MultiPolygon brut si union échoue
+        geometry = { type: 'MultiPolygon', coordinates: group.polygons }
+      }
+    }
+
+    const baseProps = {
+      tagColor: group.color,
+      pattern: group.pattern,
+      score: group.totalScore,
+      faction: factionId,
+      factionTitle: group.title,
+    }
+
+    const smoothed = geometry  // pas de lissage → contours angulaires
+
+    // Helper : collecter les stats d'un blob via point-in-polygon
+    function collectBlobStats(outerRing: Position[]) {
+      let blobCount = 0, blobHourlyRate = 0, blobFort = 0
+      const blobPlayers = new Set<string>()
+      const blobPlaceIds: string[] = []
+      const claimCounts = new Map<string, number>()
+      const claimNames = new Map<string, string>()
+      let bestScore = -1, anchorPlaceId = ''
+      let revealed = false
+
+      for (const [px, py] of group.placeCoords) {
+        if (!pointInRing(px, py, outerRing)) continue
+        const ck = `${px},${py}`
+        blobCount++
+        blobHourlyRate += group.placeHourlyRates.get(ck) ?? 1
+        blobFort += group.placeFortLevels.get(ck) ?? 0
+        const name = group.placeNames.get(ck)
+        if (name) blobPlayers.add(name)
+
+        const pid = group.placeIds.get(ck)
+        if (pid) blobPlaceIds.push(pid)
+
+        const uid = group.placeClaimedByIds.get(ck)
+        if (uid) {
+          claimCounts.set(uid, (claimCounts.get(uid) ?? 0) + 1)
+          if (name) claimNames.set(uid, name)
+        }
+
+        const sc = group.placeScores.get(ck) ?? 0
+        if (sc > bestScore && pid) { bestScore = sc; anchorPlaceId = pid }
+
+        if (group.placeDiscovered.get(ck)) revealed = true
+      }
+
+      // Top contributeur
+      let topId = '', topName = '', topCount = 0
+      for (const [uid, cnt] of claimCounts) {
+        if (cnt > topCount) { topCount = cnt; topId = uid; topName = claimNames.get(uid) ?? '' }
+      }
+
+      return {
+        placesCount: blobCount,
+        hourlyRate: blobHourlyRate,
+        totalFortification: blobFort,
+        players: Array.from(blobPlayers).join(', '),
+        placeIds: JSON.stringify(blobPlaceIds),
+        anchorPlaceId,
+        topContributorId: topId,
+        topContributorName: topName,
+        territoryTitle: getTerritoryTitle(blobCount, tiers),
+        revealed,
+      }
+    }
+
+    // Éclater les MultiPolygon en features séparées (chaque blob = son propre ID)
+    // et compter les lieux + joueurs dans chaque blob via point-in-polygon
+    // + pré-calculer les positions label/emblem (évite O(n×m) côté render thread)
+    function addTerritory(polyCoords: Position[][], outerRing: Position[]) {
+      const stats = collectBlobStats(outerRing)
+
+      // Point le plus au nord (pour le label texte au hover)
+      let topLon = outerRing[0][0], topLat = outerRing[0][1]
+      for (let i = 1; i < outerRing.length - 1; i++) {
+        if (outerRing[i][1] > topLat) { topLon = outerRing[i][0]; topLat = outerRing[i][1] }
+      }
+      // Bounding box NE pour positionner l'emblème
+      let maxLon = -Infinity, maxLat = -Infinity
+      for (let i = 0; i < outerRing.length - 1; i++) {
+        if (outerRing[i][0] > maxLon) maxLon = outerRing[i][0]
+        if (outerRing[i][1] > maxLat) maxLat = outerRing[i][1]
+      }
+      const emblemLon = maxLon - (maxLon - topLon) * 0.55
+      const emblemLat = maxLat - (maxLat - topLat) * 0.65
+
+      // Simplifier les vertices (Douglas-Peucker) avant envoi à MapLibre
+      const simplified = simplifyGeometry({ type: 'Polygon', coordinates: polyCoords })
+
+      territories.push({
+        type: 'Feature',
+        id: id++,
+        geometry: simplified,
+        properties: {
+          ...baseProps, ...stats,
+          labelLon: topLon, labelLat: topLat,
+          emblemLon, emblemLat,
+        },
+      })
+    }
+
+    if (smoothed.type === 'MultiPolygon') {
+      for (const polyCoords of smoothed.coordinates) {
+        addTerritory(polyCoords, polyCoords[0])
+      }
+    } else {
+      addTerritory(smoothed.coordinates, smoothed.coordinates[0])
+    }
+  }
+
+  self.postMessage({ type: 'FeatureCollection', partial: false, features: territories })
+}
