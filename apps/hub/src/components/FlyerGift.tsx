@@ -21,20 +21,18 @@ export function FlyerGift() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [bgUrl, setBgUrl] = useState('')
-  const [logoUrl, setLogoUrl] = useState('')
 
-  // Réutilise les assets « ambiance parchemin » de la home de l'app (app_settings,
-  // lisibles en anon). Si absents, on retombe sur un dégradé parchemin.
+  // Réutilise l'image de fond hero de la home de l'app (app_settings, lisible en
+  // anon). Si absente, on retombe sur un dégradé parchemin.
   useEffect(() => {
     supabase
       .from('app_settings')
       .select('key, value')
-      .in('key', ['landing_image_mobile_url', 'landing_image_desktop_url', 'landing_logo_url'])
+      .in('key', ['landing_image_mobile_url', 'landing_image_desktop_url'])
       .then(({ data }) => {
         if (!data) return
         const map = Object.fromEntries(data.map(r => [r.key, r.value])) as Record<string, string>
         setBgUrl(map.landing_image_mobile_url || map.landing_image_desktop_url || '')
-        setLogoUrl(map.landing_logo_url || '')
       })
   }, [])
 
@@ -82,7 +80,7 @@ export function FlyerGift() {
   return (
     <div style={pageStyle}>
       <div style={panel}>
-        {logoUrl && <img src={logoUrl} alt="Runes de Chêne" style={logo} />}
+        <img src="/rune-de-chene.png" alt="Runes de Chêne" style={logo} />
 
         {phase === 'form' ? (
           <>
@@ -137,10 +135,10 @@ const panel: React.CSSProperties = {
   boxShadow: '0 18px 50px rgba(20, 12, 6, 0.45)',
 }
 const logo: React.CSSProperties = {
-  maxHeight: 64,
-  maxWidth: '70%',
+  height: 84,
+  width: 'auto',
   objectFit: 'contain',
-  margin: '0 auto 20px',
+  margin: '0 auto 16px',
   display: 'block',
 }
 const kicker: React.CSSProperties = {
