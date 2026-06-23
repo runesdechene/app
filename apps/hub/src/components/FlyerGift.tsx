@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { useState } from 'react'
 
 type Phase = 'form' | 'done'
 
@@ -20,21 +19,6 @@ export function FlyerGift() {
   const [promoCode, setPromoCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [bgUrl, setBgUrl] = useState('')
-
-  // Réutilise l'image de fond hero de la home de l'app (app_settings, lisible en
-  // anon). Si absente, on retombe sur un dégradé parchemin.
-  useEffect(() => {
-    supabase
-      .from('app_settings')
-      .select('key, value')
-      .in('key', ['landing_image_mobile_url', 'landing_image_desktop_url'])
-      .then(({ data }) => {
-        if (!data) return
-        const map = Object.fromEntries(data.map(r => [r.key, r.value])) as Record<string, string>
-        setBgUrl(map.landing_image_mobile_url || map.landing_image_desktop_url || '')
-      })
-  }, [])
 
   async function submit() {
     const value = email.trim().toLowerCase()
@@ -72,9 +56,7 @@ export function FlyerGift() {
     padding: 20,
     boxSizing: 'border-box',
     fontFamily: "'Cabin', sans-serif",
-    background: bgUrl
-      ? `linear-gradient(rgba(34,24,16,0.55), rgba(34,24,16,0.72)), url(${bgUrl}) center / cover no-repeat`
-      : `linear-gradient(160deg, ${C.parchmentDark}, ${C.sepia})`,
+    background: `linear-gradient(rgba(34,24,16,0.45), rgba(34,24,16,0.62)), url(/flyer-bg.webp) center / cover no-repeat`,
   }
 
   return (
