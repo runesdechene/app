@@ -8,14 +8,15 @@ type LinkItem = {
   href: string
   external?: boolean
   primary?: boolean
+  icon?: string
 }
 
 const LINKS: LinkItem[] = [
   { emoji: '🛒', label: 'La boutique', href: 'https://runesdechene.com', external: true, primary: true },
   { emoji: '📱', label: "L'application", href: 'https://app.runesdechene.com', external: true },
-  { emoji: '🎁', label: 'Ton cadeau de bienvenue', href: '/flyercadeau' },
-  { emoji: '📸', label: 'Instagram', href: 'https://www.instagram.com/runesdechene', external: true },
-  { emoji: '🎪', label: 'Fellowship — nos événements', href: 'https://flw.sh', external: true },
+  { emoji: '🎁', label: 'Ton cadeau de bienvenue', href: '/flyercadeau', icon: '/cadeau.webp' },
+  { emoji: '📸', label: 'Instagram', href: 'https://www.instagram.com/runesdechene', external: true, icon: '/instagram.svg' },
+  { emoji: '🎪', label: 'Fellowship — nos événements', href: 'https://flw.sh', external: true, icon: '/fellowship-icon.png' },
 ]
 
 export function FlyerLinks() {
@@ -34,7 +35,9 @@ export function FlyerLinks() {
               {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className={`flyer-link ${link.primary ? 'flyer-link--primary' : 'flyer-link--secondary'}`}
             >
-              <span className="flyer-link__emoji">{link.emoji}</span>
+              {link.icon
+                ? <img src={link.icon} alt="" className="flyer-link__icon" />
+                : <span className="flyer-link__emoji">{link.emoji}</span>}
               <span>{link.label}</span>
             </a>
           ))}

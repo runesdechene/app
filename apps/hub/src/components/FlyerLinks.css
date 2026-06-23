@@ -92,6 +92,12 @@
   font-size: 20px;
 }
 
+.flyer-link__icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
 .flyer-link--primary {
   background: var(--ink);
   color: var(--parchment);
