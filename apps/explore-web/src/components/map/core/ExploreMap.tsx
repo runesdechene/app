@@ -154,7 +154,9 @@ export const ExploreMap = memo(function ExploreMap() {
     return [
       'places-undiscovered-circle', 'places-undiscovered-icon',
       'places-point', 'places-icon',
-      'territories-fill',
+      // 'territories-fill' retiré : les zones de territoire sont décoratives (grises,
+      // purifiées) et non-cliquables — sinon le clic captait la zone au lieu du lieu,
+      // ouvrant une sélection territoire alors que TerritoryPanel est démonté (→ écran flou vide).
     ]
   }, [])
 
