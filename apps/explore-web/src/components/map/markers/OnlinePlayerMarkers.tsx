@@ -20,6 +20,8 @@ interface Props {
   throwEmoji: (toUserId: string, emoji: string) => Promise<void>
 }
 
+const NEUTRAL_MARKER_COLOR = '#C19A6B'
+
 export const OnlinePlayerMarkers = memo(function OnlinePlayerMarkers({ players, onSelectPlayer, throwEmoji }: Props) {
   const [popoverFor, setPopoverFor] = useState<string | null>(null)
 
@@ -69,7 +71,7 @@ function OtherPlayerMarker({
         <div
           ref={setAvatarEl}
           className="other-player-marker"
-          style={{ '--faction-color': player.factionColor ?? '#888' } as React.CSSProperties}
+          style={{ '--faction-color': NEUTRAL_MARKER_COLOR } as React.CSSProperties}
           onClick={(e) => {
             e.stopPropagation()
             onTogglePopover()
