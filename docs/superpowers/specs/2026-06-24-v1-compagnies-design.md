@@ -55,7 +55,7 @@ Les échelons sont des **seuils**, pas des sièges uniques : **tous** ceux au-de
 |---|---|---|
 | **Membre** | entrée | Plante sous la bannière, chatte, compte au score de la Coupe |
 | **Porte-voix** | `T1` | + poste une **annonce / un ralliement** à toute la Compagnie ; **modère** le chat (mute, effacer) |
-| **Capitaine** | `T2` | + **édite l'identité** (emblème, devise, couleur) ; **exclut** un membre |
+| **Capitaine** | `T2` | + **édite l'identité** (nom, image, couleur, description ; cf. §4) ; **exclut** un membre |
 
 > `T1`, `T2` = seuils de valeur de service, molettes d'équilibrage. À l'implémentation : seuils relatifs (ex. percentile interne) ou absolus — tranché au plan, en gardant l'esprit « plusieurs Capitaines possibles ».
 
@@ -70,10 +70,14 @@ Les échelons sont des **seuils**, pas des sièges uniques : **tous** ceux au-de
 
 ## 4. Identité
 
-- **Nom** : unique (insensible à la casse), requis à la fondation.
-- **Emblème + couleur** : choisis à la fondation dans une **palette sobre cohérente RdC** (touches signifiantes, **pas** de blason RPG clinquant — cf. ligne UI « sobre logiciel »). La **couleur** est l'identité de la Compagnie sur la carte (le *rendu* carte appartient à la spec Territoire).
-- **Devise** : optionnelle, éditable par les Capitaines.
-- Édition de l'identité = pouvoir **Capitaine** (§3.2).
+Le créateur pose les **quatre éléments** à la fondation. Ensuite, **seuls les plus influents** (échelon **Capitaine**, §3.2) peuvent les modifier.
+
+- **Nom** : unique (insensible à la casse), requis.
+- **Image** : un logo / une bannière **uploadée** par le créateur (cadre sobre cohérent RdC ; pas de blason RPG clinquant — cf. ligne UI « sobre logiciel »). ⚠️ **Bucket Supabase à créer** : `company-emblems` (public, images, taille plafonnée) — cf. §8.
+- **Couleur** : identité de la Compagnie sur la carte (le *rendu* carte appartient à la spec Territoire).
+- **Description (mission)** : texte libre qui dit **la mission / la raison d'être** de la Compagnie — sert au recrutement (un nouveau venu choisit une Compagnie sur sa mission). Requise mais éditable.
+
+Édition de ces quatre éléments = pouvoir **Capitaine** uniquement (§3.2).
 
 ## 5. Le chat de Compagnie
 
@@ -98,7 +102,8 @@ Les échelons sont des **seuils**, pas des sièges uniques : **tous** ceux au-de
 
 > Doctrine campagne : **migrations additives uniquement** (CREATE, colonnes nullable/défaut, nouvelles RPC). Zéro DROP / ALTER cassant. L'ancien monde (Maisons/factions, Dortoir) tourne sous les users pendant la bascule.
 
-- `companies` — `id`, `name` (unique, citext), `emblem`, `color`, `motto?`, `founder_user_id`, `created_at`. Le coût de fondation est **débité une fois** à la création.
+- `companies` — `id`, `name` (unique, citext), `image_url` (vers le bucket), `color`, `description`, `founder_user_id`, `created_at`. Les 4 éléments d'identité sont éditables par les Capitaines. Le coût de fondation est **débité une fois** à la création.
+- **Bucket Supabase `company-emblems`** (public, type image, taille plafonnée) — à créer. Stocke les logos/bannières uploadés.
 - `company_members` — `company_id`, `user_id` (**unique** → appartenance exclusive), `joined_at`, `service_value` (numeric), échelon **dérivé** de `service_value` (vue/fonction, pas stocké).
 - `company_bans` — `company_id`, `user_id`, `until` (bannissement court post-exclusion).
 - Chat : nouvelle table de messages de Compagnie (réemploi du moteur de chat existant si possible ; chat de Maison parqué).
