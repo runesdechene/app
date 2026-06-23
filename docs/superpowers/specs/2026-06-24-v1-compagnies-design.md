@@ -18,27 +18,31 @@ Sa singularité de design : **la hiérarchie interne est organique**. Personne n
 
 ---
 
-## 1. Appartenance
+## 1. Appartenance & bannière active
 
-- **Exclusive : un joueur appartient à au plus UNE Compagnie à la fois.** Identité forte, rivalité lisible, score non dilué. (Contrainte data : `company_members.user_id` unique.)
-- **Rejoindre = ouvert à tous, en un clic.** Pas de validation de candidature. La porte est ouverte ; la sélection se fait, si besoin, par l'exclusion (échelon Capitaine, cf. §3).
-- **Quitter = libre, à tout moment.** En partant :
-  - le **territoire** que le joueur avait pris **reste à la Compagnie** (le territoire est attaché à la Compagnie, pas au membre — cf. spec Territoire) ;
-  - sa **valeur de service** pour cette Compagnie est **perdue** (repart de zéro s'il revient ou rejoint ailleurs).
-- **Le solo reste un jeu complet** (garde-fou cold-start du socle) : un joueur sans Compagnie plante, tient du territoire sous sa **bannière perso**, grimpe le classement solo, gagne des médailles. La Compagnie amplifie, ne conditionne jamais.
+- **Jusqu'à DEUX Compagnies par joueur.** (Sa Compagnie de cœur + une seconde — crew d'amis + crew régional, p. ex.) Plafond strict = 2 (molette : `MAX_COMPAGNIES = 2`).
+- **Une seule bannière ACTIVE à la fois.** Le joueur « porte » les couleurs d'**une** de ses Compagnies. Un **toggle** permet de basculer. Conséquences :
+  - le **lieu pris** va à la Compagnie **active**, et la carte se colore de **sa** couleur ;
+  - les actes (territoire, présence) nourrissent la **valeur de service** de la Compagnie active **seulement** — on nourrit une Compagnie en **flottant ses couleurs** (§3.1). La valeur de service est donc **par Compagnie**.
+- **Garde-fou anti-triche — délai de bascule** : on ne peut pas changer de bannière à volonté (sinon on optimiserait le score lieu par lieu, ce qui reviendrait à « choix par action »). Cooldown entre deux bascules = molette (`COOLDOWN_BASCULE`, ex. quelques heures).
+- **Rejoindre = ouvert à tous, en un clic** — tant qu'on a un emplacement libre (< 2). Pas de validation. La sélection, si besoin, se fait par l'exclusion (échelon Capitaine, §3).
+- **Quitter = libre, à tout moment.** Libère un emplacement. En partant :
+  - le **territoire** pris **reste à la Compagnie** (attaché à la Compagnie, pas au membre — cf. spec Territoire) ;
+  - sa **valeur de service** pour cette Compagnie est **perdue** (repart de zéro s'il y revient).
+- **Le solo reste un jeu complet** (garde-fou cold-start du socle) : un joueur sans Compagnie — ou en bannière « perso » — plante, tient du territoire sous sa **bannière perso**, grimpe le classement solo, gagne des médailles. La Compagnie amplifie, ne conditionne jamais.
 
 ## 2. Fondation
 
 - **Fonder coûte des Couronnes.** C'est le débouché clair qui manquait à la monnaie, et un filtre anti-Compagnies-fantômes. La dépense **n'est pas perdue** : elle se convertit en **avance de valeur de service** pour le fondateur (cf. §3).
   - *Montant par défaut : 150 Couronnes* — molette d'équilibrage, valeur finale calée à l'implémentation contre le taux de gain courant (cap 15/j → ~10 jours d'effort, significatif mais atteignable).
 - Au moment de fonder, le joueur choisit l'**identité** de la Compagnie (cf. §4).
-- Fonder une Compagnie **fait quitter** l'éventuelle Compagnie courante (appartenance exclusive).
+- Fonder occupe **un des deux emplacements** du joueur. Si ses deux emplacements sont déjà pris, il doit en **quitter une** d'abord. La Compagnie fondée devient sa **bannière active** par défaut.
 
 ## 3. Hiérarchie organique (la singularité)
 
 ### 3.1 La valeur de service
 
-Chaque membre porte une **valeur de service** *dans sa Compagnie courante* (remise à zéro s'il la quitte). Elle monte avec ce qu'il fait **pour la Compagnie** :
+Chaque membre porte une **valeur de service par Compagnie** (remise à zéro s'il la quitte). Elle ne monte **que quand il porte la bannière de cette Compagnie** (§1) — on sert le crew dont on flotte les couleurs. Elle monte avec ce qu'il fait **pour la Compagnie** :
 
 - **Tenir du territoire** sous la bannière de la Compagnie (lieux/zones pris et veillés) — le cœur.
 - **Activité / présence** : planter, résoudre des énigmes, visiter en GPS, être actif. Récompense les piliers présents même sans gros territoire.
@@ -116,7 +120,8 @@ Les Compagnies **ne s'allient pas globalement** — il n'existe **aucun statut d
 
 - `companies` — `id`, `name` (unique, citext), `image_url` (vers le bucket), `color`, `description`, `founder_user_id`, `created_at`. Les 4 éléments d'identité sont éditables par les Capitaines. Le coût de fondation est **débité une fois** à la création.
 - **Bucket Supabase `company-emblems`** (public, type image, taille plafonnée) — à créer. Stocke les logos/bannières uploadés.
-- `company_members` — `company_id`, `user_id` (**unique** → appartenance exclusive), `joined_at`, `service_value` (numeric), échelon **dérivé** de `service_value` (vue/fonction, pas stocké).
+- `company_members` — `company_id`, `user_id`, `joined_at`, `service_value` (numeric par couple user×company), échelon **dérivé** de `service_value` (vue/fonction, pas stocké). **Contrainte : au plus 2 lignes par `user_id`** (plafond `MAX_COMPAGNIES`, via trigger/check).
+- **Bannière active** — `users.active_company_id` (nullable → bannière perso) + `active_banner_switched_at` (pour le cooldown de bascule). Les actes ne créditent que `active_company_id`.
 - `company_bans` — `company_id`, `user_id`, `until` (bannissement court post-exclusion).
 - Chat : nouvelle table de messages de Compagnie (réemploi du moteur de chat existant si possible ; chat de Maison parqué).
 - **Valeur de service** : alimentée par les événements territoire + présence (RPC/trigger ou recompute périodique) et érodée dans le temps. Mécanisme exact (event-sourced vs recompute) tranché au plan.
@@ -135,4 +140,5 @@ Les Compagnies **ne s'allient pas globalement** — il n'existe **aucun statut d
 - **Capture du pouvoir / Fondateur absent** : réglé par l'**érosion** + **échelons-seuils multiples** (le pouvoir suit les présents, pas un titre figé).
 - **Avantage de nombre** : réglé par la **normalisation du score** en SPEC 3, pas par un cap.
 - **Dissolution hostile** : impossible — pas de bouton dissoudre, extinction seulement à 0 membre.
+- **Optimisation de bannière** (basculer à chaque prise pour répartir le score sur ses 2 Compagnies) : réglée par le **cooldown de bascule** (§1).
 - **Méga-bloc d'alliances** : impossible par construction — pas d'alliance globale, seulement des **pactes liés à un lieu** qui s'éteignent à la perte de la co-tenue (§5bis).
