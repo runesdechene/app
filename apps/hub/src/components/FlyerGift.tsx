@@ -97,7 +97,7 @@ export function FlyerGift() {
             <p style={body}>Utilise ce code à la boutique en ligne :</p>
             <div style={codeBox}>{promoCode}</div>
             <p style={{ ...body, fontSize: 16, color: C.inkLight, marginBottom: 0 }}>
-              On te l'a aussi envoyé par email. À bientôt, Confrère.
+              On te l'a aussi envoyé par email. À bientôt, Compagnon !
             </p>
           </>
         )}
