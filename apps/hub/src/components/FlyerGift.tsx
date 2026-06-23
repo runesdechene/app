@@ -62,7 +62,7 @@ export function FlyerGift() {
   return (
     <div style={pageStyle}>
       <div style={panel}>
-        <img src="/rune-de-chene.png" alt="Runes de Chêne" style={logo} />
+        <img src="/cadeau.webp" alt="Cadeau Runes de Chêne" style={logo} />
 
         {phase === 'form' ? (
           <>
@@ -123,7 +123,6 @@ const logo: React.CSSProperties = {
   objectFit: 'contain',
   margin: '0 auto 16px',
   display: 'block',
-  opacity: 0.9,
 }
 const kicker: React.CSSProperties = {
   fontFamily: "'Cabin Condensed', sans-serif",
