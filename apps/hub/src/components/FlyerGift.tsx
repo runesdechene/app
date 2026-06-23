@@ -84,11 +84,9 @@ export function FlyerGift() {
 
         {phase === 'form' ? (
           <>
-            <p style={kicker}>Bienvenue dans</p>
-            <h1 style={title}>La Confrérie</h1>
+            <h1 style={title}>Pendant que le monde scrolle, un mouvement s'éveille</h1>
             <p style={body}>
-              Laisse ton email : on t'offre un code promo pour la boutique, et tu rejoins
-              le Mouvement. Pas de mot de passe, rien à installer.
+              Répondez à l'appel pour débloquer votre premier cadeau chez Runes de Chêne.
             </p>
             <input
               type="email"
@@ -152,11 +150,11 @@ const kicker: React.CSSProperties = {
 }
 const title: React.CSSProperties = {
   fontFamily: "'Bebas Neue', sans-serif",
-  fontSize: 'clamp(40px, 11vw, 56px)',
-  lineHeight: 1.02,
+  fontSize: 'clamp(30px, 7.5vw, 42px)',
+  lineHeight: 1.05,
   letterSpacing: '0.02em',
   color: C.ink,
-  margin: '0 0 20px',
+  margin: '0 0 18px',
 }
 const body: React.CSSProperties = {
   fontSize: 18,
