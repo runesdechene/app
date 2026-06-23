@@ -103,7 +103,7 @@ export function FlyerGift() {
               J'en profite sur la boutique
             </a>
             <p style={{ ...body, fontSize: 16, color: C.inkLight, margin: '18px 0 0' }}>
-              On te l'a aussi envoyé par email. À bientôt, Compagnon !
+              Garde-le précieusement. À bientôt, Compagnon !
             </p>
           </>
         )}
