@@ -312,8 +312,8 @@ export function TerritoryPanel({ data, onClose, onNameSaved, onFactionModal }: P
           </div>
         )}
 
-        {/* Section Vote */}
-        {userId && (
+        {/* Section Vote — parqué jusqu'au SPEC 3 */}
+        {false && userId && (
           <div className="territory-panel-section">
             <h3 className="territory-panel-section-title">Nommer ce territoire</h3>
 
