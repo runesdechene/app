@@ -135,7 +135,7 @@ const kicker: React.CSSProperties = {
 }
 const title: React.CSSProperties = {
   fontFamily: "'Bebas Neue', sans-serif",
-  fontSize: 'clamp(30px, 7.5vw, 42px)',
+  fontSize: 'clamp(26px, 6.2vw, 36px)',
   lineHeight: 1.05,
   letterSpacing: '0.02em',
   color: C.ink,
