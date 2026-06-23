@@ -29,7 +29,7 @@ export function EnergyInfoModal({ onClose }: Props) {
         { label: 'Regeneration', value: `+${ratePerHour.toFixed(2)} / heure` },
         ...(hasRegenBonus ? [
           { label: 'Regen de base', value: `+${baseRate.toFixed(2)} / heure` },
-          { label: 'Bonus regen faction', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
+          { label: 'Bonus regen classe', value: `+${(ratePerHour - baseRate).toFixed(2)} / heure`, highlight: true },
         ] : []),
       ]}
       onClose={onClose}

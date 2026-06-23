@@ -58,7 +58,7 @@ export function CoupePodium({
         onClick={onClickAll}
         style={{ cursor: 'pointer' }}
       >
-        ⚜ Coupe des Factions
+        ⚜ Coupe des Classes
         <span className="coupe-season">— {seasonName}</span>
       </h2>
       <div className="coupe-frame coupe-podium-frame">

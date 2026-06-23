@@ -24,7 +24,7 @@ export function CoupeOnboarding({
   return (
     <>
       <h2 className="coupe-section-title">
-        ⚜ Coupe des Factions
+        ⚜ Coupe des Classes
         <span className="coupe-season">— {seasonName}</span>
       </h2>
       <div className="coupe-frame coupe-onboarding-frame">
@@ -32,9 +32,9 @@ export function CoupeOnboarding({
           <div className="coupe-cup-halo" />
           <CoupeCupSvg />
         </div>
-        <div className="coupe-tagline">Une saison. Quatre Factions.</div>
+        <div className="coupe-tagline">Une saison. Quatre classes.</div>
         <div className="coupe-blurb">
-          Chaque énigme résolue, chaque lieu visité, chaque récit partagé fait grandir ta Faction. À la fin de la saison, l'une d'elles soulève la Coupe.
+          Chaque énigme résolue, chaque lieu visité, chaque récit partagé fait grandir ta classe. À la fin de la saison, l'une d'elles soulève la Coupe.
         </div>
         <div className="coupe-banners">
           {factions.map(f => (

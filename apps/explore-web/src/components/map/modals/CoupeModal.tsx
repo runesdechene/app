@@ -74,7 +74,7 @@ export function CoupeModal({ onClose }: Props) {
           </button>
 
           <h2 className="leaderboard-title">
-            {'🏆'} Coupe des Factions
+            {'🏆'} Coupe des Classes
           </h2>
           {state?.season && (
             <p className="coupe-season-label">
@@ -150,7 +150,7 @@ export function CoupeModal({ onClose }: Props) {
                             <span
                               className="coupe-user-faction-emblem"
                               style={{ background: meta.color }}
-                              title="Faction du joueur"
+                              title="Classe du joueur"
                               aria-hidden
                             >
                               {meta.pattern && (

@@ -19,8 +19,6 @@ interface FactionMember {
 interface FactionInfo {
   image_url: string | null
   description: string | null
-  bonus_energy: number
-  bonus_regen_energy: number
 }
 
 interface Props {
@@ -36,8 +34,6 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
   const [loading, setLoading] = useState(true)
   const [showInactive, setShowInactive] = useState(false)
 
-  const [isUnderdog, setIsUnderdog] = useState(false)
-  const [underdogMultiplier, setUnderdogMultiplier] = useState(2)
   const [tagBonusesPrimary, setTagBonusesPrimary] = useState<Array<{ title: string; icon: string | null; color: string; bg: string }>>([])
   const [tagBonusesSecondary, setTagBonusesSecondary] = useState<Array<{ title: string; icon: string | null; color: string; bg: string }>>([])
   const [primaryReduction, setPrimaryReduction] = useState<number | undefined>()
@@ -46,14 +42,12 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
 
   useEffect(() => {
     async function load() {
-      const [membersRes, factionRes, underdogRes, multRes, bonusRes, tagsRes] = await Promise.all([
+      const [membersRes, factionRes, bonusRes, tagsRes] = await Promise.all([
         supabase.rpc('get_faction_members', { p_faction_id: factionId }),
         supabase.from('factions')
-          .select('image_url, description, bonus_energy, bonus_regen_energy')
+          .select('image_url, description')
           .eq('id', factionId)
           .single(),
-        supabase.rpc('get_underdog_faction_id'),
-        supabase.from('app_settings').select('value').eq('key', 'underdog_multiplier').single(),
         supabase.from('faction_tag_bonuses').select('tag_id, cost_reduction').eq('faction_id', factionId),
         supabase.from('tags').select('id, title, icon, color, background'),
       ])
@@ -62,12 +56,6 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
       }
       if (factionRes.data) {
         setFactionInfo(factionRes.data as FactionInfo)
-      }
-      if (underdogRes.data) {
-        setIsUnderdog((underdogRes.data as string) === factionId)
-      }
-      if (multRes.data) {
-        setUnderdogMultiplier(parseFloat(multRes.data.value) || 2)
       }
       if (bonusRes.data && tagsRes.data) {
         const tagMap = new Map((tagsRes.data as Array<{ id: string; title: string; icon: string | null; color: string; background: string }>).map(t => [t.id, t]))
@@ -175,12 +163,6 @@ export function FactionMembersModal({ factionId, factionTitle, factionColor, onC
 
           {/* Colonne droite : classement des membres */}
           <div className="faction-members-main">
-            {isUnderdog && (
-              <div className="faction-card-underdog" style={{ position: 'relative', marginTop: 8, marginBottom: 12, border: '1px solid rgba(255, 180, 50, 0.3)', borderRadius: 8 }}>
-                <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! x{underdogMultiplier} sur toutes les ressources</p>
-              </div>
-            )}
             <h3 className="faction-members-list-title">Classement</h3>
 
             {loading && <div className="player-modal-loading">Chargement...</div>}

@@ -80,7 +80,7 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
           <div className="onboarding-scroll">
             <h2 className="onboarding-title">Creez votre Aventurier</h2>
             <p className="onboarding-subtitle">
-              Personnalisez votre profil avant de rejoindre une Faction
+              Personnalisez votre profil avant de choisir votre classe
             </p>
 
           {/* Avatar */}

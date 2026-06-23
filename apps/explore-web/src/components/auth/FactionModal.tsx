@@ -1,6 +1,5 @@
 ﻿import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { TagBonusList } from '../map/modals/TagBonusList'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import './FactionModal.css'
@@ -36,33 +35,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const incrementPlacesRefreshKey = useMapStore(s => s.incrementPlacesRefreshKey)
   const [cooldownError, setCooldownError] = useState<string | null>(null)
 
-  const [underdogFactionId, setUnderdogFactionId] = useState<string | null>(null)
-  const [tagBonuses, setTagBonuses] = useState<Record<string, Array<{ tagTitle: string; tagIcon: string | null; tagColor: string; tagBg: string; reduction: number }>>>({})
-
   useEffect(() => {
-    Promise.all([
-      // V0.7+ Mig 065 : factions triées par nombre de membres ASC (les plus
-      // faibles d'abord) pour auto-équilibrage des inscriptions.
-      supabase.rpc('get_factions_for_choice'),
-      supabase.rpc('get_underdog_faction_id'),
-      supabase.from('faction_tag_bonuses').select('faction_id, tag_id, cost_reduction'),
-      supabase.from('tags').select('id, title, icon, color, background'),
-    ]).then(([factionsRes, underdogRes, bonusRes, tagsRes]) => {
-      if (factionsRes.data) setFactions(factionsRes.data as FactionData[])
-      if (underdogRes.data) setUnderdogFactionId(underdogRes.data as string)
-
-      if (bonusRes.data && tagsRes.data) {
-        const tagMap = new Map((tagsRes.data as Array<{ id: string; title: string; icon: string | null; color: string; background: string }>).map(t => [t.id, { title: t.title, icon: t.icon, color: t.color, bg: t.background }]))
-        const map: Record<string, Array<{ tagTitle: string; tagIcon: string | null; tagColor: string; tagBg: string; reduction: number }>> = {}
-        for (const row of bonusRes.data as Array<{ faction_id: string; tag_id: string; cost_reduction: number }>) {
-          if (row.cost_reduction <= 0) continue
-          if (!map[row.faction_id]) map[row.faction_id] = []
-          const tag = tagMap.get(row.tag_id)
-          map[row.faction_id].push({ tagTitle: tag?.title ?? row.tag_id, tagIcon: tag?.icon ?? null, tagColor: tag?.color ?? '#C19A6B', tagBg: tag?.bg ?? '#F5E6D3', reduction: row.cost_reduction })
-        }
-        setTagBonuses(map)
-      }
-
+    supabase.rpc('get_factions_for_choice').then(({ data }) => {
+      if (data) setFactions(data as FactionData[])
       setLoading(false)
     })
   }, [])
@@ -107,7 +82,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     })
 
     if (data?.error === 'cooldown') {
-      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de Faction.`)
+      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de classe.`)
       setConfirmFaction(null)
       setSelecting(false)
       return
@@ -175,9 +150,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           &#10005;
         </button>
 
-        <h2 className="faction-modal-title">Choisissez votre Faction</h2>
+        <h2 className="faction-modal-title">Choisis ton type d'explorateur</h2>
         <p className="faction-modal-subtitle">
-          Votre Faction, c'est votre manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
+          Ta classe, c'est ta manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
         </p>
 
         {loading ? (
@@ -186,11 +161,10 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-modal-grid">
             {factions.map(f => {
               const isActive = currentFactionId === f.id
-              const isUnderdog = underdogFactionId === f.id
               return (
                 <button
                   key={f.id}
-                  className={`faction-card${isActive ? ' active' : ''}${isUnderdog ? ' underdog' : ''}`}
+                  className={`faction-card${isActive ? ' active' : ''}`}
                   style={{ '--faction-color': f.color } as React.CSSProperties}
                   onClick={() => handleFactionClick(f.id)}
                   disabled={selecting}
@@ -205,20 +179,6 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                     {f.description && (
                       <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
                     )}
-                    {tagBonuses[f.id]?.length > 0 && (
-                      <TagBonusList
-                        primary={tagBonuses[f.id].filter(b => b.reduction >= 50).map(b => ({ title: b.tagTitle, icon: b.tagIcon, color: b.tagColor, bg: b.tagBg }))}
-                        secondary={tagBonuses[f.id].filter(b => b.reduction > 0 && b.reduction < 50).map(b => ({ title: b.tagTitle, icon: b.tagIcon, color: b.tagColor, bg: b.tagBg }))}
-                        primaryReduction={tagBonuses[f.id].find(b => b.reduction >= 50)?.reduction}
-                        secondaryReduction={tagBonuses[f.id].find(b => b.reduction > 0 && b.reduction < 50)?.reduction}
-                      />
-                    )}
-                    {isUnderdog && (
-                      <div className="faction-card-underdog">
-                        <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                        <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! Régénération d'énergie multipliée.</p>
-                      </div>
-                    )}
                     {isActive && (
                       <span className="faction-card-badge">Actuelle</span>
                     )}
@@ -232,9 +192,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
           <span className="faction-legend-item">🎖️ Gloire — Votre prestige total, à vie</span>
           <span className="faction-legend-item">🪙 Couronnes — Influencer un lieu à distance (mécénat)</span>
-          <span className="faction-legend-item">🏆 Coupe — Le classement des Factions cette saison</span>
+          <span className="faction-legend-item">🏆 Coupe — Le classement des classes cette saison</span>
           {currentFactionId && (
-            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible que 2 fois tous les 30 jours</span>
+            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de classe n'est possible que 2 fois tous les 30 jours</span>
           )}
         </div>
 
@@ -244,7 +204,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
             onClick={leaveFaction}
             disabled={selecting}
           >
-            Devenir un sans-bannière
+            Rester sans classe
           </button>
         )}
 
@@ -265,7 +225,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Êtes-vous sûr ? Changer de Faction n'est possible <strong>que 2 fois tous les 30 jours</strong>.
+                Êtes-vous sûr ? Changer de classe n'est possible <strong>que 2 fois tous les 30 jours</strong>.
               </p>
               <div className="faction-confirm-actions">
                 <button onClick={() => setConfirmFaction(null)} disabled={selecting}>

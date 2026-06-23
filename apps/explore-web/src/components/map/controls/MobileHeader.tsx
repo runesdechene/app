@@ -129,7 +129,7 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
                 {userFactionTitle}
               </span>
             ) : (
-              'Rejoindre une faction'
+              'Choisir ta classe'
             )}
           </button>
 

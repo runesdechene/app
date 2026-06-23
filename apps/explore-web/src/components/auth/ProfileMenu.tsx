@@ -115,7 +115,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
                 {userFactionTitle}
               </span>
             ) : (
-              'Rejoindre une faction'
+              'Choisir ta classe'
             )}
           </button>
 
