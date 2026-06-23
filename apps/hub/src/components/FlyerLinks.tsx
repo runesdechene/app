@@ -31,7 +31,6 @@ export function FlyerLinks() {
       <div style={column}>
         <div style={header}>
           <img src="/logo-marron.webp" alt="Runes de Chêne" style={emblem} />
-          <h1 style={title}>Runes de Chêne</h1>
           <p style={tagline}>Pendant que le monde scrolle, un mouvement s'éveille.</p>
         </div>
 
@@ -88,14 +87,6 @@ const emblem: React.CSSProperties = {
   objectFit: 'contain',
   marginBottom: 12,
   opacity: 0.9,
-}
-const title: React.CSSProperties = {
-  fontFamily: "'Bebas Neue', sans-serif",
-  fontSize: 'clamp(34px, 9vw, 46px)',
-  letterSpacing: '0.04em',
-  color: C.ink,
-  margin: '0 0 6px',
-  textShadow: '0 1px 10px rgba(247,237,225,0.95)',
 }
 const tagline: React.CSSProperties = {
   fontSize: 16,
