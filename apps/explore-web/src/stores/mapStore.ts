@@ -128,6 +128,10 @@ interface MapState {
   /** Marque en cours de publication (pré-remplit AddPlaceFlow). null = aucune. */
   publishingDraft: GpsMark | null
   setPublishingDraft: (d: GpsMark | null) => void
+
+  /** Mode parchemin : force tous les marqueurs de lieux en couleur parchemin uniforme */
+  parchmentMode: boolean
+  setParchmentMode: (v: boolean) => void
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -206,4 +210,12 @@ export const useMapStore = create<MapState>((set) => ({
   setOpenGpsMarkId: (id) => set({ openGpsMarkId: id }),
   publishingDraft: null,
   setPublishingDraft: (d) => set({ publishingDraft: d }),
+
+  parchmentMode: (() => {
+    try { return localStorage.getItem('rdc-parchment-mode') === 'true' } catch { return false }
+  })(),
+  setParchmentMode: (v) => {
+    try { localStorage.setItem('rdc-parchment-mode', String(v)) } catch {}
+    set({ parchmentMode: v })
+  },
 }))

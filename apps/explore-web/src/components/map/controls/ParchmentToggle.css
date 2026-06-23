@@ -1,0 +1,70 @@
+.parchment-toggle {
+  position: fixed;
+  bottom: 340px;
+  right: 25px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(236, 223, 192, 0.92);
+  border: 1.5px solid #b8a47a;
+  border-radius: 20px;
+  padding: 6px 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(45, 31, 15, 0.18);
+  transition: background 0.18s, border-color 0.18s;
+  user-select: none;
+}
+
+.parchment-toggle:hover {
+  background: rgba(236, 223, 192, 1);
+  border-color: #9a7c4f;
+}
+
+.parchment-toggle--on {
+  background: rgba(184, 164, 122, 0.95);
+  border-color: #9a7c4f;
+}
+
+.parchment-toggle__icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.parchment-toggle__switch {
+  width: 28px;
+  height: 16px;
+  background: #c8b48a;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.18s;
+  flex-shrink: 0;
+}
+
+.parchment-toggle--on .parchment-toggle__switch {
+  background: #9a7c4f;
+}
+
+.parchment-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: #fff8ed;
+  border-radius: 50%;
+  transition: transform 0.18s;
+  box-shadow: 0 1px 3px rgba(45, 31, 15, 0.25);
+}
+
+.parchment-toggle--on .parchment-toggle__knob {
+  transform: translateX(12px);
+}
+
+@media (max-width: 750px) {
+  .parchment-toggle {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 110px);
+    right: auto;
+    left: 10px;
+  }
+}

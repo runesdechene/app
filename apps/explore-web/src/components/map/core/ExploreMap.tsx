@@ -36,8 +36,10 @@ import {
   MAP_STYLE_PROP,
   MAP_CONTAINER_STYLE,
   INITIAL_VIEW,
+  HERITAGE_CUP_DOT_COLOR,
 } from '../../../lib/exploreMapConstants'
 import type { PopupInfo } from '../../../lib/exploreMapConstants'
+import { ParchmentToggle } from '../controls/ParchmentToggle'
 
 export const ExploreMap = memo(function ExploreMap() {
   const mapRef = useRef<MapRef>(null)
@@ -66,6 +68,7 @@ export const ExploreMap = memo(function ExploreMap() {
   const setPendingNewPlaceCoords = useMapStore(s => s.setPendingNewPlaceCoords)
   const mapStyleMode = useMapStore(s => s.mapStyleMode)
   const setSelectedTerritoryData = useMapStore(s => s.setSelectedTerritoryData)
+  const parchmentMode = useMapStore(s => s.parchmentMode)
 
   // V0.7+ Micro-social — channel emoji-throws + queue d'animations.
   // Instance unique du hook : `throwEmoji` est passé à OnlinePlayerMarkers en prop pour
@@ -452,10 +455,10 @@ export const ExploreMap = memo(function ExploreMap() {
     setUserPosition({ lng: e.coords.longitude, lat: e.coords.latitude })
   }, [setUserPosition])
 
-  // Apply placeOverrides + harvestable to geojson
+  // Apply placeOverrides + harvestable + parchmentMode to geojson
   const enrichedGeojson = useMemo(() => {
     if (!geojson) return geojson
-    const needsEnrich = placeOverrides.size > 0 || harvestableSet.size > 0
+    const needsEnrich = placeOverrides.size > 0 || harvestableSet.size > 0 || parchmentMode
     if (!needsEnrich) return geojson
     return {
       ...geojson,
@@ -478,10 +481,13 @@ export const ExploreMap = memo(function ExploreMap() {
           if (ov.veilleurAvatarUrl !== undefined) props.veilleurAvatarUrl = ov.veilleurAvatarUrl
           if (ov.veilleurExtraCount !== undefined) props.veilleurExtraCount = ov.veilleurExtraCount
         }
+        if (parchmentMode) {
+          props.iconColor = HERITAGE_CUP_DOT_COLOR
+        }
         return { ...f, properties: props }
       }),
     }
-  }, [geojson, placeOverrides, harvestableSet])
+  }, [geojson, placeOverrides, harvestableSet, parchmentMode])
 
   // Recherche & Filtres (Lot 1) — masque les marqueurs hors filtre (prédicat partagé).
   const filterTagIds = useSearchFilterStore(s => s.tagIds)
@@ -714,6 +720,9 @@ export const ExploreMap = memo(function ExploreMap() {
         </div>
       ) : null
     })()}
+
+    {/* Mode parchemin — toggle placeholder futur mode Compagnie */}
+    {!addPlaceMode && <ParchmentToggle />}
 
     {/* Énergie déplacée hors de la toolbar du haut sur mobile : posée à droite de la
         barre "lieux découverts" pour libérer la 1ère ligne (Gloire/Coupe/Couronnes/etc.).
