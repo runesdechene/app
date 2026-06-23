@@ -39,6 +39,7 @@ export function FactionBar() {
   const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
+  const [seasonActive, setSeasonActive] = useState(true)
   const [selectedFaction, setSelectedFaction] = useState<FactionRowEnriched | null>(null)
   const [showCoupeModal, setShowCoupeModal] = useState(false)
 
@@ -93,6 +94,7 @@ export function FactionBar() {
 
       setStats(enriched)
       setSeasonName(state.season?.name ?? null)
+      setSeasonActive(state.season?.isActive ?? true)
     }
 
     if (!factionColorMode) return  // mode Coupe désactivé : pas de fetch, pas de scoreboard
@@ -110,10 +112,23 @@ export function FactionBar() {
   const maxScore = stats[0]?.score ?? 0
   // Pas de couronne quand tout le monde est à 0 (début de saison, pas de leader)
   const leaderId = maxScore > 0 ? stats[0].factionId : null
+  // Saison figée (ended_at posé) → on sacre le vainqueur d'un bandeau au-dessus du scoreboard.
+  const winner = (!seasonActive && maxScore > 0) ? stats[0] : null
 
   return (
     <>
       <div className="faction-scoreboard">
+        {winner && (
+          <div
+            className="faction-victory"
+            style={{ '--faction-color': winner.factionColor } as React.CSSProperties}
+          >
+            <span className="faction-victory-trophy" aria-hidden>{'🏆'}</span>
+            <span className="faction-victory-text">
+              <strong>{winner.factionTitle}</strong> remportent la Coupe du Printemps
+            </span>
+          </div>
+        )}
         <div className="faction-scoreboard-bars">
           {stats.map(faction => {
             const isLeader = faction.factionId === leaderId
