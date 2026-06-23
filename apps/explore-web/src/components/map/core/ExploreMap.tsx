@@ -393,7 +393,8 @@ export const ExploreMap = memo(function ExploreMap() {
         const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::`
         if (!loadedIconsRef.current.has(inkKey)) {
           loadedIconsRef.current.add(inkKey)
-          loadColoredSvgIcon(map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR).catch(() => {
+          // Bordure marron discrète sur la variante parchemin (lisibilité du lieu sur la carte).
+          loadColoredSvgIcon(map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR, '#8a6a45').catch(() => {
             loadedIconsRef.current.delete(inkKey)
           })
         }
@@ -637,8 +638,11 @@ export const ExploreMap = memo(function ExploreMap() {
 
       {territories && (
         <Source id="territories" type="geojson" data={territories}>
-          <Layer {...territoryFillLayer} />
-          <Layer {...territoryBorderLayer} />
+          {/* beforeId : insère les zones SOUS les lieux. Sans ça, l'état `territories`
+              se peuplant après le montage des lieux, la couche grise s'ajoutait au-dessus
+              et assombrissait les marqueurs (notamment en mode parchemin). */}
+          <Layer {...territoryFillLayer} beforeId="places-undiscovered-circle" />
+          <Layer {...territoryBorderLayer} beforeId="places-undiscovered-circle" />
         </Source>
       )}
 
