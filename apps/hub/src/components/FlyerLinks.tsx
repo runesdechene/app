@@ -29,9 +29,11 @@ export function FlyerLinks() {
   return (
     <div style={page}>
       <div style={column}>
-        <img src="/rune-de-chene.png" alt="Runes de Chêne" style={emblem} />
-        <h1 style={title}>Runes de Chêne</h1>
-        <p style={tagline}>Pendant que le monde scrolle, un mouvement s'éveille.</p>
+        <div style={header}>
+          <img src="/rune-de-chene.png" alt="Runes de Chêne" style={emblem} />
+          <h1 style={title}>Runes de Chêne</h1>
+          <p style={tagline}>Pendant que le monde scrolle, un mouvement s'éveille.</p>
+        </div>
 
         <nav style={links}>
           {LINKS.map(link => (
@@ -59,7 +61,7 @@ const page: React.CSSProperties = {
   padding: '40px 20px',
   boxSizing: 'border-box',
   fontFamily: "'Cabin', sans-serif",
-  background: `linear-gradient(rgba(34,24,16,0.35), rgba(34,24,16,0.55)), url(/fond-explore.webp) center / cover no-repeat`,
+  background: `url(/fond-explore.webp) center / cover no-repeat`,
 }
 const column: React.CSSProperties = {
   width: '100%',
@@ -69,29 +71,38 @@ const column: React.CSSProperties = {
   alignItems: 'center',
   textAlign: 'center',
 }
+// Halo parcheminé clair derrière l'en-tête : lisibilité du texte marron foncé
+// directement sur le fond, sans overlay sombre.
+const header: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '20px 28px 24px',
+  marginBottom: 26,
+  borderRadius: 28,
+  background: 'radial-gradient(ellipse at center, rgba(247,237,225,0.88) 0%, rgba(247,237,225,0.55) 48%, rgba(247,237,225,0) 78%)',
+}
 const emblem: React.CSSProperties = {
   height: 92,
   width: 'auto',
   objectFit: 'contain',
-  marginBottom: 14,
+  marginBottom: 12,
   opacity: 0.9,
-  filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.35))',
 }
 const title: React.CSSProperties = {
   fontFamily: "'Bebas Neue', sans-serif",
   fontSize: 'clamp(34px, 9vw, 46px)',
   letterSpacing: '0.04em',
-  color: C.parchment,
+  color: C.ink,
   margin: '0 0 6px',
-  textShadow: '0 2px 14px rgba(0,0,0,0.5)',
+  textShadow: '0 1px 10px rgba(247,237,225,0.95)',
 }
 const tagline: React.CSSProperties = {
   fontSize: 16,
   lineHeight: 1.4,
-  color: C.parchment,
-  opacity: 0.92,
-  margin: '0 0 28px',
-  textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+  color: C.ink,
+  margin: 0,
+  textShadow: '0 1px 8px rgba(247,237,225,0.95)',
 }
 const links: React.CSSProperties = {
   width: '100%',
