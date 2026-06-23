@@ -13,7 +13,7 @@ Sa singularité de design : **la hiérarchie interne est organique**. Personne n
 
 ## Ce que la Compagnie n'est PAS
 
-- **≠ Expédition / Voyage.** Une Expédition, c'est plusieurs joueurs — **peu importe leur Compagnie** — qui se retrouvent **physiquement (GPS) sur un même lieu** et se groupent le temps d'une sortie. Éphémère, géographique, cross-Compagnie. Aucun recouvrement avec la Compagnie (persistante, identitaire). Les deux coexistent sans se toucher.
+- **≠ Expédition / Voyage.** Une Expédition, c'est plusieurs joueurs — **peu importe leur Compagnie** — qui se retrouvent **physiquement (GPS) sur un même lieu** et se groupent le temps d'une sortie. Éphémère, géographique, cross-Compagnie. La Compagnie (persistante, identitaire) ne s'y substitue pas — mais l'Expédition est le **berceau des pactes de lieu** entre Compagnies (cf. §5bis).
 - **≠ Classe.** La Classe (ex-Maison) est une identité **perso** (type d'explorateur). La Compagnie est un **collectif**. Un membre garde sa Classe en rejoignant n'importe quelle Compagnie ; une Compagnie mélange librement les Classes (et c'est désirable — synergies de classes, vision post-1.0 du socle).
 
 ---
@@ -85,6 +85,18 @@ Le créateur pose les **quatre éléments** à la fondation. Ensuite, **seuls le
 - Modération : mute / effacer = pouvoir **Porte-voix** ; exclusion d'un membre = pouvoir **Capitaine**.
 - **Additif** : on crée le chat de Compagnie ; le chat de Maison/Dortoir est **parqué** (pas droppé pendant la campagne) — dette tracée dans `docs/db/cleanup-v1-identity.md`.
 
+## 5bis. Pactes de lieu (alliances contextuelles)
+
+Les Compagnies **ne s'allient pas globalement** — il n'existe **aucun statut d'alliance permanent** entre deux Compagnies (c'est ce qui tue d'avance le risque de **méga-bloc** qui raflerait la Coupe : rien à fusionner). À la place, l'alliance est **liée à un lieu** et **émerge du terrain** :
+
+- Quand des joueurs de **deux Compagnies (ou plus)** reprennent un lieu **ensemble, en Expédition sur place**, ils **pactisent sur ce lieu**.
+- **Tant qu'ils le co-tiennent**, ce lieu **rapporte davantage de Couronnes** à chacune des Compagnies pactisées. C'est l'incitation à coopérer sur le terrain contre l'Oubli.
+- Le pacte **s'éteint** dès qu'elles ne co-tiennent plus le lieu. Contextuel, vivant, mérité — jamais déclaré dans un menu.
+
+> Exemple (Uriel) : « La Compagnie du Loup et la Compagnie du Chêne ont pactisé sur le lieu X. Les Couronnes seront plus nombreuses pour eux tant qu'ils le tiendront. »
+
+**Frontière de spec** : le **concept** (pacte de lieu né d'une expédition commune, bonus Couronnes pendant la co-tenue) se grave ici. Le **chiffrage** (taux du bonus, comment un lieu co-tenu compte pour le score de Coupe de chacune, nombre max de Compagnies sur un même pacte, anti-abus) appartient à **SPEC 3 — Territoire & scoring** (qui possède déjà la mécanique Couronnes/territoire et les Expéditions).
+
 ## 6. Score & territoire (frontières de spec)
 
 - La Compagnie **a un score à la Coupe** et **prend des lieux/zones en groupe** — c'est sa raison d'être compétitive.
@@ -123,3 +135,4 @@ Le créateur pose les **quatre éléments** à la fondation. Ensuite, **seuls le
 - **Capture du pouvoir / Fondateur absent** : réglé par l'**érosion** + **échelons-seuils multiples** (le pouvoir suit les présents, pas un titre figé).
 - **Avantage de nombre** : réglé par la **normalisation du score** en SPEC 3, pas par un cap.
 - **Dissolution hostile** : impossible — pas de bouton dissoudre, extinction seulement à 0 membre.
+- **Méga-bloc d'alliances** : impossible par construction — pas d'alliance globale, seulement des **pactes liés à un lieu** qui s'éteignent à la perte de la co-tenue (§5bis).
