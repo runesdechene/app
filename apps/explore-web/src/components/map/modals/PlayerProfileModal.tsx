@@ -4,7 +4,6 @@ import { supabase } from '../../../lib/supabase'
 import { uploadAvatar } from '../../../lib/avatarUpload'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import { usePlayerStore } from '../../../stores/playerStore'
-import { useCoupe } from '../../../hooks/useCoupe'
 import shopIcon from '../../../assets/shop_icon.webp'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
@@ -26,7 +25,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   const currentUserId = usePlayerStore(s => s.userId)
-  const { state: coupeState } = useCoupe(true)
   const level = usePlayerStore(s => s.level)
   const xpTotal = usePlayerStore(s => s.xpTotal)
   const xpToNextLevel = usePlayerStore(s => s.xpToNextLevel)
@@ -354,25 +352,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                     dans un container : display: contents sur desktop (rendu inchang\u00E9,
                     lignes empil\u00E9es), grid 3 colonnes sur mobile (blocs centr\u00E9s). */}
                 <div className="player-modal-stats">
-                  {/* Coupe\u2014 score live pour soi, depuis le profil pour les autres */}
-                  {isSelf ? (
-                    coupeState?.myBreakdown ? (
-                      <div className="player-modal-stat">
-                        <span className="player-modal-stat-icon">{'\uD83C\uDFC6'}</span>
-                        <span className="player-modal-stat-value">{coupeState.myBreakdown.score}</span>
-                        <span className="player-modal-stat-label">{'\u00E0 la Coupe'}</span>
-                      </div>
-                    ) : null
-                  ) : (
-                    (profile.coupeScoreCurrentSeason ?? 0) > 0 ? (
-                      <div className="player-modal-stat">
-                        <span className="player-modal-stat-icon">{'\uD83C\uDFC6'}</span>
-                        <span className="player-modal-stat-value">{profile.coupeScoreCurrentSeason}</span>
-                        <span className="player-modal-stat-label">{'\u00E0 la Coupe'}</span>
-                      </div>
-                    ) : null
-                  )}
-
                   {/* Couronnes retir\u00E9es du profil (V0.9.54) \u2014 le solde vit d\u00E9j\u00E0
                       dans la barre de l'app ; inutile de le redonder, et \u00E7a reste
                       priv\u00E9 vis-\u00E0-vis des autres. */}

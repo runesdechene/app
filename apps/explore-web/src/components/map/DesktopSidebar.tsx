@@ -87,7 +87,7 @@ export function DesktopSidebar({ openFactionModal, collapsed, onToggleCollapsed 
 
       <div className="desktop-sidebar-content" aria-hidden={collapsed}>
         {tab === 'home' && (
-          <HomeFeed openFactionModal={openFactionModal} showActivity={false} showCoupe={false} showUpdates={false} placesFirst articleAsModal />
+          <HomeFeed openFactionModal={openFactionModal} showActivity={false} showUpdates={false} placesFirst articleAsModal />
         )}
         {tab === 'activite' && (
           <main className="activity-page-scroll">

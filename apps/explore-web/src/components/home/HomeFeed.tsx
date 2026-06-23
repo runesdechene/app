@@ -8,7 +8,6 @@ import { MissionModalHost } from '../missions/MissionModalHost'
 import { ExpeditionsList } from '../expeditions/ExpeditionsList'
 import { PlacesSection } from './PlacesSection'
 import { MapActivityList } from './MapActivityList'
-import { CoupeHeritagesSection } from './coupe/CoupeHeritagesSection'
 import { HomeNouvellesSection } from './HomeNouvellesSection'
 import { ArticleModal } from '../announcements/ArticleModal'
 import { UpdateCard } from '../changelog/UpdateCard'
@@ -28,10 +27,7 @@ export interface HomeFeedProps {
   showActivity?: boolean
   /** Handler du bouton "voir plus" d'activité (mobile : navigate('/activite')). */
   onSeeMoreActivity?: () => void
-  /** Affiche la section "Coupe des Héritages". Défaut : true.
-   *  Desktop : false — masquée dans la leftbar. */
-  showCoupe?: boolean
-  /** Place "Lieux récents" avant "Événements & Quêtes". Défaut : false.
+/** Place "Lieux récents" avant "Événements & Quêtes". Défaut : false.
    *  Desktop : true. */
   placesFirst?: boolean
   /** Ouvre les Nouvelles en modale (au lieu de naviguer vers /article/:slug,
@@ -49,7 +45,7 @@ export interface HomeFeedProps {
  * au feed (énigme, fragment, expédition, mission). Les hooks d'init globaux
  * (usePlayer/useChat/etc.) sont montés par le parent (MobileLayout / MapPage).
  */
-export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActivity, showCoupe = true, placesFirst = false, articleAsModal = false, showUpdates = true }: HomeFeedProps) {
+export function HomeFeed({ showActivity = true, onSeeMoreActivity, placesFirst = false, articleAsModal = false, showUpdates = true }: HomeFeedProps) {
   const [articleSlug, setArticleSlug] = useState<string | null>(null)
   const [showDailyEnigma, setShowDailyEnigma] = useState(false)
   const [enigmaRefreshKey, setEnigmaRefreshKey] = useState(0)
@@ -148,12 +144,6 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
           )
           return placesFirst ? [places, eventsQuests] : [eventsQuests, places]
         })()}
-
-        {showCoupe && (
-          <section className="home-section">
-            <CoupeHeritagesSection openFactionModal={openFactionModal} />
-          </section>
-        )}
 
         {showActivity && (
           <section className="home-section">
