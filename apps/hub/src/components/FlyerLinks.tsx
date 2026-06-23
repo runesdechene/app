@@ -15,6 +15,7 @@ const LINKS: LinkItem[] = [
   { emoji: '📱', label: "L'application", href: 'https://app.runesdechene.com', external: true },
   { emoji: '🎁', label: 'Ton cadeau de bienvenue', href: '/flyercadeau' },
   { emoji: '📸', label: 'Instagram', href: 'https://www.instagram.com/runesdechene', external: true },
+  { emoji: '🎪', label: 'Fellowship — nos événements', href: 'https://flw.sh', external: true },
 ]
 
 export function FlyerLinks() {
