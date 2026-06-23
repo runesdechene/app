@@ -14,7 +14,7 @@ type LinkItem = {
 const LINKS: LinkItem[] = [
   { emoji: '🛒', label: 'La boutique', href: 'https://runesdechene.com', external: true, primary: true },
   { emoji: '📱', label: "L'application", href: 'https://app.runesdechene.com', external: true },
-  { emoji: '🎁', label: 'Ton cadeau de bienvenue', href: '/flyercadeau', icon: '/cadeau.webp' },
+  { emoji: '🎁', label: 'Ton cadeau de bienvenue', href: '/flyercadeau' },
   { emoji: '📸', label: 'Instagram', href: 'https://www.instagram.com/runesdechene', external: true, icon: '/instagram.svg' },
   { emoji: '🎪', label: 'Fellowship — nos événements', href: 'https://flw.sh', external: true, icon: '/fellowship-icon.png' },
 ]
