@@ -10,7 +10,6 @@ import { AuthModal } from '../components/auth/AuthModal'
 import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
-import { FactionBar } from '../components/map/badges/FactionBar'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
@@ -55,7 +54,6 @@ import { useCourtInvestedLoad } from '../hooks/useCourtInvestedLoad'
 import { useGpsMarksStore } from '../stores/gpsMarksStore'
 import { AddGpsMarkModal } from '../components/places/modals/AddGpsMarkModal'
 import { GpsMarkActionModal } from '../components/places/modals/GpsMarkActionModal'
-import { HeritagesToggle } from '../components/map/controls/HeritagesToggle'
 import { useLevel } from '../hooks/useLevel'
 import { useLevelUp } from '../hooks/useLevelUp'
 import { LevelUpModal } from '../components/levelup/LevelUpModal'
@@ -392,12 +390,6 @@ export default function MapPage() {
       <ExploreMap />
       <OfflineIndicator />
 
-      {!addPlaceMode && !authLoading && isAuthenticated && (
-        <div className="influence-area">
-          <HeritagesToggle />
-          <FactionBar />
-        </div>
-      )}
       {/* GameToast (« Activité de la carte ») : feed d'activité live, mobile-only.
           Sur desktop il faisait doublon avec l'onglet Activité de la leftbar. */}
       {!addPlaceMode && !authLoading && isAuthenticated && !isDesktop && <GameToast />}
