@@ -1,6 +1,7 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FeatureCollection, Point } from 'geojson'
 import type { PlaceProperties } from '../../../hooks/usePlaces'
+import './Minimap.css'
 
 interface ViewBounds {
   north: number

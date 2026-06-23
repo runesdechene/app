@@ -64,6 +64,10 @@ import { supabase } from '../lib/supabase'
 import { safeStorage } from '../lib/safeStorage'
 import { DesktopSidebar } from '../components/map/DesktopSidebar'
 import '../App.css'
+// Styles de BASE des overlays carte (.conquest-*, labels). DOIT charger AVANT mobile.css /
+// MapDesktopLayout.css pour que leurs surcharges responsive (left/right/bottom) gagnent la
+// cascade. (Fichier mal nommé — vestige du toggle Héritages retiré ; à renommer map-overlays.css.)
+import '../components/map/controls/HeritagesToggle.css'
 import '../styles/mobile.css'
 import './MapDesktopLayout.css'
 
