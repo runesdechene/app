@@ -13,6 +13,8 @@ const C = {
   sepiaDark: '#A0784C',
 }
 
+const SHOP_URL = 'https://runesdechene.com'
+
 export function FlyerGift() {
   const [email, setEmail] = useState('')
   const [phase, setPhase] = useState<Phase>('form')
@@ -61,6 +63,7 @@ export function FlyerGift() {
 
   return (
     <div style={pageStyle}>
+      <a href={SHOP_URL} style={backBtn}>← Retourner sur la boutique</a>
       <div style={panel}>
         <img src="/cadeau.webp" alt="Cadeau Runes de Chêne" style={logo} />
 
@@ -96,7 +99,10 @@ export function FlyerGift() {
             <h1 style={title}>Code promo boutique</h1>
             <p style={body}>Utilise ce code à la boutique en ligne :</p>
             <div style={codeBox}>{promoCode}</div>
-            <p style={{ ...body, fontSize: 16, color: C.inkLight, marginBottom: 0 }}>
+            <a href={`${SHOP_URL}/discount/${promoCode}`} style={ctaLink}>
+              J'en profite à la boutique
+            </a>
+            <p style={{ ...body, fontSize: 16, color: C.inkLight, margin: '18px 0 0' }}>
               On te l'a aussi envoyé par email. À bientôt, Compagnon !
             </p>
           </>
@@ -188,4 +194,39 @@ const errorText: React.CSSProperties = {
   color: '#a83232',
   fontSize: 15,
   margin: '0 0 12px',
+}
+const backBtn: React.CSSProperties = {
+  position: 'fixed',
+  top: 'calc(env(safe-area-inset-top, 0px) + 14px)',
+  left: 14,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '9px 14px',
+  borderRadius: 999,
+  background: 'rgba(34, 24, 16, 0.6)',
+  color: C.parchment,
+  border: '1px solid rgba(247, 237, 225, 0.45)',
+  fontFamily: "'Cabin Condensed', sans-serif",
+  fontSize: 15,
+  letterSpacing: '0.02em',
+  textDecoration: 'none',
+  zIndex: 10,
+  backdropFilter: 'blur(2px)',
+}
+const ctaLink: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '15px 16px',
+  fontSize: 17,
+  fontFamily: "'Cabin Condensed', sans-serif",
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  borderRadius: 10,
+  background: C.ink,
+  color: C.parchment,
+  textDecoration: 'none',
+  textAlign: 'center',
 }
