@@ -1,0 +1,266 @@
+/* ==========================================
+   COUR TENSION BAR — V0.7.6 (8/05)
+   Jauge gravée + cluster d'avatars Discord-style.
+   Mobile-first (tient en 360px / ~50px de haut).
+   ========================================== */
+
+.ctb-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctb-bar {
+  width: 100%;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(74, 55, 40, 0.14);
+  border: 1px solid rgba(90, 64, 40, 0.5);
+  display: flex;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 3px rgba(74, 55, 40, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.55);
+  position: relative;
+}
+
+/* Texture grain léger — esprit parchemin gravé */
+.ctb-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    transparent 1px,
+    transparent 3px,
+    rgba(74, 55, 40, 0.06) 4px);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+.ctb-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+.ctb-defense {
+  background: #5a4f8a;
+  justify-content: flex-start;
+  border-right: 1px solid rgba(58, 32, 16, 0.5);
+}
+.ctb-attack {
+  background: #8b3a3a;
+  justify-content: flex-end;
+}
+
+/* V0.8.25 — segments d'attaque multiples (1 par challenger). Couleur faction
+   pilotée par style inline ; séparation visuelle par border-left sombre. */
+.ctb-attack-segment + .ctb-attack-segment,
+.ctb-attack-segment + .ctb-attack-overflow {
+  border-left: 1px solid rgba(40, 18, 10, 0.55);
+}
+.ctb-attack-overflow {
+  background: linear-gradient(180deg, #6a4a3a, #4a3024);
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.ctb-num {
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f7eed7;
+  text-shadow: 0 1px 1px rgba(40, 24, 12, 0.6);
+  letter-spacing: 0.02em;
+}
+
+.ctb-critical-hint {
+  position: absolute;
+  top: 2px; bottom: 2px;
+  left: 50%;
+  width: 2px;
+  background: #b8430a;
+  transform: translateX(-50%);
+  animation: ctb-critical-pulse 1.5s ease-in-out infinite;
+  border-radius: 1px;
+  z-index: 3;
+}
+@keyframes ctb-critical-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ==========================================
+   Clusters d'avatars sous la jauge
+   ========================================== */
+.ctb-clusters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 26px;
+}
+
+.ctb-cluster {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.ctb-cluster-left { justify-content: flex-start; }
+.ctb-cluster-right { justify-content: flex-end; }
+
+/* V0.9.59 — gélule expédition (veille à plusieurs) côté défense, dans le ton Cour */
+.ctb-expedition-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-sepia, #c19a6b);
+  background: linear-gradient(180deg, rgba(244, 180, 0, 0.16), rgba(193, 154, 107, 0.10));
+  font-family: var(--font-accent, 'Cormorant Garamond', serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink, #4a3728);
+  line-height: 1.15;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.ctb-expedition-pill-crown { font-size: 13px; flex-shrink: 0; filter: saturate(1.1); }
+.ctb-expedition-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ctb-expedition-pill-members {
+  font-family: var(--font-base, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-ink-light, #7a6a55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ctb-av {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 11px;
+  color: #fff;
+  cursor: pointer;
+  margin-left: -8px;
+  flex-shrink: 0;
+  position: relative;
+  padding: 0;
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, z-index 0s 0.15s;
+}
+.ctb-cluster-left .ctb-av:first-child,
+.ctb-cluster-right .ctb-av:first-child { margin-left: 0; }
+
+.ctb-av:hover {
+  transform: scale(1.15);
+  z-index: 10;
+  transition: transform 0.15s ease, z-index 0s;
+}
+.ctb-av:focus-visible {
+  outline: 2px solid var(--color-sepia, #c19a6b);
+  outline-offset: 2px;
+}
+
+/* V0.7.6 (8/05) — vraie photo d'avatar utilisateur (object-fit cover dans le cercle) */
+.ctb-av-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.ctb-av-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cadre or simple pour le mécène principal — un seul anneau, lisible */
+.ctb-av-leader {
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 0 0 4px #b89548,
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Cadre rouge simple — challenger leader menaçant (>= 50% effectif) */
+.ctb-av-threat {
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 0 0 4px #8b3a14,
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.ctb-crown {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+/* Sceau parchemin doré — contributeurs au-delà du top 5 */
+.ctb-overflow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #d4b87a, #a87f3a);
+  color: #2a1f10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-signature, 'Alegreya'), serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  margin-left: -8px;
+  flex-shrink: 0;
+  border: 1.5px solid #5a4028;
+  box-shadow:
+    0 0 0 2px var(--color-parchment-dark, #f0e3c4),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.ctb-cluster-left .ctb-overflow:first-child,
+.ctb-cluster-right .ctb-overflow:first-child { margin-left: 0; }
+
+/* ==========================================
+   Mobile : 3 avatars max visibles par cluster, taille réduite
+   ========================================== */
+@media (max-width: 480px) {
+  .ctb-av { width: 22px; height: 22px; font-size: 10px; }
+  .ctb-overflow { width: 22px; height: 22px; font-size: 10px; }
+  /* Cache les avatars 4 et 5 (premier=leader visible, 2-3=others, 4-5=cachés) */
+  .ctb-cluster-left .ctb-av:nth-child(n+4):not(.ctb-overflow),
+  .ctb-cluster-right .ctb-av:nth-child(n+4):not(.ctb-overflow) {
+    display: none;
+  }
+}
