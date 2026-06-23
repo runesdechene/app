@@ -84,7 +84,10 @@ export function FlyerGift() {
 
         {phase === 'form' ? (
           <>
-            <h1 style={title}>Pendant que le monde scrolle, un mouvement s'éveille</h1>
+            <h1 style={title}>
+              <span style={{ display: 'block', color: C.sepiaDark }}>Pendant que le monde scrolle,</span>
+              <span style={{ display: 'block', color: C.ink }}>un mouvement s'éveille</span>
+            </h1>
             <p style={body}>
               Répondez à l'appel pour débloquer votre premier cadeau chez Runes de Chêne.
             </p>
