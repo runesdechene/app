@@ -37,6 +37,8 @@ import {
   MAP_CONTAINER_STYLE,
   INITIAL_VIEW,
   HERITAGE_CUP_DOT_COLOR,
+  HERITAGE_CUP_INK_COLOR,
+  HERITAGE_CUP_INK_PREFIX,
 } from '../../../lib/exploreMapConstants'
 import type { PopupInfo } from '../../../lib/exploreMapConstants'
 import { ParchmentToggle } from '../controls/ParchmentToggle'
@@ -197,6 +199,11 @@ export const ExploreMap = memo(function ExploreMap() {
     // Après changement de style, MapLibre perd les images custom → re-injecter depuis le cache
     loadedIconsRef.current.clear()
   }, [mapStyleMode])
+
+  // Quand parchmentMode bascule, forcer le rechargement des variantes encre
+  useEffect(() => {
+    loadedIconsRef.current.clear()
+  }, [parchmentMode])
 
   // Web Worker : calcul des territoires en arrière-plan
   useEffect(() => {
@@ -372,14 +379,27 @@ export const ExploreMap = memo(function ExploreMap() {
 
     for (const f of rawGeojson.features) {
       const { tagIcon, iconColor } = f.properties
+
+      // Icône normale (couleur tag)
       if (tagIcon && !loadedIconsRef.current.has(tagIcon)) {
         loadedIconsRef.current.add(tagIcon)
         loadColoredSvgIcon(map, tagIcon, iconColor).catch(() => {
           loadedIconsRef.current.delete(tagIcon)
         })
       }
+
+      // Variante encre parchemin — chargée systématiquement pour que la bascule ON/OFF soit instantanée
+      if (tagIcon) {
+        const inkKey = `${HERITAGE_CUP_INK_PREFIX}${tagIcon}::`
+        if (!loadedIconsRef.current.has(inkKey)) {
+          loadedIconsRef.current.add(inkKey)
+          loadColoredSvgIcon(map, tagIcon, HERITAGE_CUP_DOT_COLOR, inkKey, tagIcon, HERITAGE_CUP_INK_COLOR).catch(() => {
+            loadedIconsRef.current.delete(inkKey)
+          })
+        }
+      }
     }
-  }, [rawGeojson])
+  }, [rawGeojson, parchmentMode])
 
   // Charger les boucliers de fortification (niveaux 1-6)
   const loadedShieldsRef = useRef(new Set<number>())
@@ -483,6 +503,10 @@ export const ExploreMap = memo(function ExploreMap() {
         }
         if (parchmentMode) {
           props.iconColor = HERITAGE_CUP_DOT_COLOR
+          // Bascule l'icône vers la variante encre brune (fond parchemin, icône encre)
+          if (props.tagIcon) {
+            props.tagIcon = `${HERITAGE_CUP_INK_PREFIX}${props.tagIcon}::`
+          }
         }
         return { ...f, properties: props }
       }),
