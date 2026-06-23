@@ -30,7 +30,7 @@ export function FlyerLinks() {
     <div style={page}>
       <div style={column}>
         <div style={header}>
-          <img src="/logo-marron.webp" alt="Runes de Chêne" style={emblem} />
+          <img src="/logo-slogan.webp" alt="Runes de Chêne — Portez l'Histoire" style={emblem} />
           <p style={tagline}>Pendant que le monde scrolle, un mouvement s'éveille.</p>
         </div>
 
@@ -82,10 +82,10 @@ const header: React.CSSProperties = {
   background: 'radial-gradient(ellipse at center, rgba(247,237,225,0.88) 0%, rgba(247,237,225,0.55) 48%, rgba(247,237,225,0) 78%)',
 }
 const emblem: React.CSSProperties = {
-  height: 92,
-  width: 'auto',
+  width: 'min(290px, 82%)',
+  height: 'auto',
   objectFit: 'contain',
-  marginBottom: 12,
+  marginBottom: 14,
   opacity: 0.9,
 }
 const tagline: React.CSSProperties = {
