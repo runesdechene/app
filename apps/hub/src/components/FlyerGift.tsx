@@ -140,6 +140,7 @@ const logo: React.CSSProperties = {
   objectFit: 'contain',
   margin: '0 auto 16px',
   display: 'block',
+  opacity: 0.9,
 }
 const kicker: React.CSSProperties = {
   fontFamily: "'Cabin Condensed', sans-serif",
