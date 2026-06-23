@@ -1,6 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 type Phase = 'form' | 'done'
+
+// Palette parchemin de l'app (index.css explore-web) — répliquée ici car le hub
+// n'a pas ces variables. Polices Bebas Neue / Cabin déjà chargées par index.html.
+const C = {
+  parchment: '#f7ede1',
+  parchmentDark: '#E8D5BE',
+  ink: '#4A3728',
+  inkLight: '#7D5A3C',
+  sepia: '#C19A6B',
+  sepiaDark: '#A0784C',
+}
 
 export function FlyerGift() {
   const [email, setEmail] = useState('')
@@ -8,6 +20,23 @@ export function FlyerGift() {
   const [promoCode, setPromoCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [bgUrl, setBgUrl] = useState('')
+  const [logoUrl, setLogoUrl] = useState('')
+
+  // Réutilise les assets « ambiance parchemin » de la home de l'app (app_settings,
+  // lisibles en anon). Si absents, on retombe sur un dégradé parchemin.
+  useEffect(() => {
+    supabase
+      .from('app_settings')
+      .select('key, value')
+      .in('key', ['landing_image_mobile_url', 'landing_image_desktop_url', 'landing_logo_url'])
+      .then(({ data }) => {
+        if (!data) return
+        const map = Object.fromEntries(data.map(r => [r.key, r.value])) as Record<string, string>
+        setBgUrl(map.landing_image_mobile_url || map.landing_image_desktop_url || '')
+        setLogoUrl(map.landing_logo_url || '')
+      })
+  }, [])
 
   async function submit() {
     const value = email.trim().toLowerCase()
@@ -37,13 +66,28 @@ export function FlyerGift() {
     }
   }
 
+  const pageStyle: React.CSSProperties = {
+    minHeight: '100dvh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    boxSizing: 'border-box',
+    fontFamily: "'Cabin', sans-serif",
+    background: bgUrl
+      ? `linear-gradient(rgba(34,24,16,0.55), rgba(34,24,16,0.72)), url(${bgUrl}) center / cover no-repeat`
+      : `linear-gradient(160deg, ${C.parchmentDark}, ${C.sepia})`,
+  }
+
   return (
-    <div style={wrap}>
-      <div style={card}>
+    <div style={pageStyle}>
+      <div style={panel}>
+        {logoUrl && <img src={logoUrl} alt="Runes de Chêne" style={logo} />}
+
         {phase === 'form' ? (
           <>
-            <p style={kicker}>Bienvenue dans la Confrérie</p>
-            <h1 style={title}>Voici ton cadeau</h1>
+            <p style={kicker}>Bienvenue dans</p>
+            <h1 style={title}>La Confrérie</h1>
             <p style={body}>
               Laisse ton email : on t'offre un code promo pour la boutique, et tu rejoins
               le Mouvement. Pas de mot de passe, rien à installer.
@@ -71,7 +115,7 @@ export function FlyerGift() {
             <h1 style={title}>Code promo boutique</h1>
             <p style={body}>Utilise ce code à la boutique en ligne :</p>
             <div style={codeBox}>{promoCode}</div>
-            <p style={{ ...body, fontSize: 15, opacity: 0.7 }}>
+            <p style={{ ...body, fontSize: 16, color: C.inkLight, marginBottom: 0 }}>
               On te l'a aussi envoyé par email. À bientôt, Confrère.
             </p>
           </>
@@ -81,65 +125,86 @@ export function FlyerGift() {
   )
 }
 
-const wrap: React.CSSProperties = {
-  minHeight: '100vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: '#1c1814',
-  padding: 24,
-  boxSizing: 'border-box',
-}
-const card: React.CSSProperties = {
+const panel: React.CSSProperties = {
   width: '100%',
-  maxWidth: 420,
-  background: '#262019',
-  border: '1px solid #3a3026',
-  borderRadius: 16,
-  padding: 32,
-  color: '#f0e9dd',
+  maxWidth: 440,
+  background: C.parchment,
+  border: `1px solid ${C.sepia}`,
+  borderRadius: 18,
+  padding: '40px 32px',
+  color: C.ink,
   textAlign: 'center',
+  boxShadow: '0 18px 50px rgba(20, 12, 6, 0.45)',
+}
+const logo: React.CSSProperties = {
+  maxHeight: 64,
+  maxWidth: '70%',
+  objectFit: 'contain',
+  margin: '0 auto 20px',
+  display: 'block',
 }
 const kicker: React.CSSProperties = {
+  fontFamily: "'Cabin Condensed', sans-serif",
   textTransform: 'uppercase',
-  letterSpacing: 2,
-  fontSize: 13,
-  color: '#c9a24b',
-  margin: '0 0 8px',
+  letterSpacing: '0.18em',
+  fontSize: 15,
+  color: C.sepiaDark,
+  margin: '0 0 4px',
 }
-const title: React.CSSProperties = { fontSize: 28, margin: '0 0 16px', fontWeight: 700 }
-const body: React.CSSProperties = { fontSize: 18, lineHeight: 1.5, margin: '0 0 20px' }
+const title: React.CSSProperties = {
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 'clamp(40px, 11vw, 56px)',
+  lineHeight: 1.02,
+  letterSpacing: '0.02em',
+  color: C.ink,
+  margin: '0 0 20px',
+}
+const body: React.CSSProperties = {
+  fontSize: 18,
+  lineHeight: 1.5,
+  color: C.ink,
+  margin: '0 0 22px',
+}
 const input: React.CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
   padding: '14px 16px',
   fontSize: 18,
+  fontFamily: "'Cabin', sans-serif",
   borderRadius: 10,
-  border: '1px solid #4a3e30',
-  background: '#1c1814',
-  color: '#f0e9dd',
+  border: `1px solid ${C.sepia}`,
+  background: '#fffaf3',
+  color: C.ink,
   marginBottom: 12,
+  outline: 'none',
 }
 const button: React.CSSProperties = {
   width: '100%',
-  padding: '14px 16px',
-  fontSize: 18,
+  padding: '15px 16px',
+  fontSize: 17,
+  fontFamily: "'Cabin Condensed', sans-serif",
   fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
   borderRadius: 10,
   border: 'none',
-  background: '#c9a24b',
-  color: '#1c1814',
+  background: C.ink,
+  color: C.parchment,
   cursor: 'pointer',
 }
 const codeBox: React.CSSProperties = {
-  fontSize: 26,
-  fontWeight: 700,
-  letterSpacing: 3,
-  padding: '16px 12px',
-  borderRadius: 10,
-  border: '1px dashed #c9a24b',
-  background: '#1c1814',
-  color: '#c9a24b',
-  margin: '0 0 16px',
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 34,
+  letterSpacing: '0.12em',
+  padding: '18px 12px',
+  borderRadius: 12,
+  border: `2px dashed ${C.sepiaDark}`,
+  background: C.parchmentDark,
+  color: C.ink,
+  margin: '0 0 18px',
 }
-const errorText: React.CSSProperties = { color: '#e08a7a', fontSize: 15, margin: '0 0 12px' }
+const errorText: React.CSSProperties = {
+  color: '#a83232',
+  fontSize: 15,
+  margin: '0 0 12px',
+}
