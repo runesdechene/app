@@ -4,7 +4,7 @@
 
 **Goal:** Une page publique du Hub, atteinte par un QR de flyer, qui crée un compte app transparent à partir d'un email et affiche un code promo boutique.
 
-**Architecture :** On calque le pattern existant `stand-create-account.ts` (compte fantôme festival) dans une nouvelle Netlify function **publique** `flyer-create-account.ts`, plus une page React publique `FlyerGift.tsx` montée sur la route `/cadeau`. Une migration SQL ajoute `'flyer'` au CHECK `account_source` et crée une table de rate-limit par IP.
+**Architecture :** On calque le pattern existant `stand-create-account.ts` (compte fantôme festival) dans une nouvelle Netlify function **publique** `flyer-create-account.ts`, plus une page React publique `FlyerGift.tsx` montée sur la route `/flyer`. Une migration SQL ajoute `'flyer'` au CHECK `account_source` et crée une table de rate-limit par IP.
 
 **Tech Stack :** React + react-router-dom (apps/hub), Netlify Functions (Web `Request`/`Response` API), Supabase REST (service role), Shopify Admin API 2026-01, Postgres (Supabase).
 
@@ -27,7 +27,7 @@
 - **Create** `supabase/migrations/270_flyer_account_source_and_rate_limit.sql` — étend le CHECK `account_source` + table `flyer_signup_log`.
 - **Create** `apps/hub/netlify/functions/flyer-create-account.ts` — endpoint public idempotent + rate-limit + Shopify + user fantôme + renvoie le code promo.
 - **Create** `apps/hub/src/components/FlyerGift.tsx` — page publique « Bienvenue dans la Confrérie ».
-- **Modify** `apps/hub/src/App.tsx` — ajoute `/cadeau` aux routes publiques.
+- **Modify** `apps/hub/src/App.tsx` — ajoute `/flyer` aux routes publiques.
 
 ---
 
@@ -332,7 +332,7 @@ git commit -m "feat(hub): endpoint public flyer-create-account (idempotent + rat
 
 ---
 
-## Task 3: Page publique `FlyerGift.tsx` + route `/cadeau`
+## Task 3: Page publique `FlyerGift.tsx` + route `/flyer`
 
 **Files:**
 - Create: `apps/hub/src/components/FlyerGift.tsx`
@@ -340,7 +340,7 @@ git commit -m "feat(hub): endpoint public flyer-create-account (idempotent + rat
 
 **Interfaces:**
 - Consumes : `POST /.netlify/functions/flyer-create-account` (Task 2), réponse `{ success, action, promoCode }`.
-- Produces : route publique `/cadeau` rendant `<FlyerGift />`.
+- Produces : route publique `/flyer` rendant `<FlyerGift />`.
 
 - [ ] **Step 1: Écrire la page**
 
@@ -522,14 +522,14 @@ with:
 
 ```tsx
   // Routes publiques (pas besoin d'auth)
-  const publicRoutes = ['/soumettre-contenu', '/cadeau']
+  const publicRoutes = ['/soumettre-contenu', '/flyer']
   const isPublicRoute = publicRoutes.includes(location.pathname)
 
   if (isPublicRoute) {
     return (
       <Routes>
         <Route path="/soumettre-contenu" element={<StudioSubmit />} />
-        <Route path="/cadeau" element={<FlyerGift />} />
+        <Route path="/flyer" element={<FlyerGift />} />
       </Routes>
     )
   }
@@ -544,7 +544,7 @@ Expected : build OK, aucune erreur TS.
 
 ```bash
 git add apps/hub/src/components/FlyerGift.tsx apps/hub/src/App.tsx
-git commit -m "feat(hub): page publique /cadeau (flyer QR → email → code promo)"
+git commit -m "feat(hub): page publique /flyer (flyer QR → email → code promo)"
 ```
 
 ---
@@ -566,7 +566,7 @@ Note : le code doit exister comme **discount code** dans Shopify pour être vali
 - [ ] **Step 2: Click-flow local**
 
 Run : `cd apps/hub && pnpm dev`
-Dans le navigateur, ouvrir `http://localhost:<port>/cadeau`.
+Dans le navigateur, ouvrir `http://localhost:<port>/flyer`.
 Vérifier dans l'ordre :
 1. La page « Bienvenue dans la Confrérie / Voici ton cadeau » s'affiche, lisible (textes ≥ 18px).
 2. Email vide ou invalide → message d'erreur, pas d'appel réseau réussi.
@@ -601,20 +601,20 @@ Et supprimer les users/customers de test créés pendant le click-flow (Hub → 
 
 - [ ] **Step 6: Déployer**
 
-Déployer le hub selon le protocole habituel (Netlify). Re-tester `/cadeau` en prod (un email réel jetable) avant d'imprimer le QR sur les flyers.
+Déployer le hub selon le protocole habituel (Netlify). Re-tester `/flyer` en prod (un email réel jetable) avant d'imprimer le QR sur les flyers.
 
 ---
 
 ## QR code du flyer
 
-L'URL à encoder dans le QR : `https://<domaine-du-hub>/cadeau` (domaine de prod du hub — à confirmer avec Uriel, c'est le même host que `/soumettre-contenu`).
+L'URL à encoder dans le QR : `https://hub.runesdechene.com/flyer` (confirmé : domaine de prod du hub, même host/route publique que `/soumettre-contenu`).
 
 ---
 
 ## Self-Review
 
-- **Spec coverage :** QR→page publique (Task 3, `/cadeau`) ; écran « Bienvenue dans la Confrérie » (Task 3) ; email→compte transparent (Task 2, user fantôme) ; idempotence (Task 2, branche `already_exists`) ; Shopify customer + consent subscribed + tag `source:flyer` (Task 2, `buildTags`) ; `account_source='flyer'` + CHECK (Task 1) ; rate-limit IP (Task 1 table + Task 2 logique) ; code promo générique côté serveur (Task 2 env `FLYER_PROMO_CODE`, jamais en dur côté front) ; pas de token secret (respecté — aucun token). Tous les points de spec sont couverts.
+- **Spec coverage :** QR→page publique (Task 3, `/flyer`) ; écran « Bienvenue dans la Confrérie » (Task 3) ; email→compte transparent (Task 2, user fantôme) ; idempotence (Task 2, branche `already_exists`) ; Shopify customer + consent subscribed + tag `source:flyer` (Task 2, `buildTags`) ; `account_source='flyer'` + CHECK (Task 1) ; rate-limit IP (Task 1 table + Task 2 logique) ; code promo générique côté serveur (Task 2 env `FLYER_PROMO_CODE`, jamais en dur côté front) ; pas de token secret (respecté — aucun token). Tous les points de spec sont couverts.
 - **Placeholders :** aucun — tout le code est complet.
-- **Type consistency :** la function renvoie `{ success, action, promoCode }` (Task 2), consommé tel quel par `FlyerGift.tsx` (Task 3). Route `/cadeau` ajoutée à `publicRoutes` ET au `<Routes>` (Task 3). Numéro de migration 270 cohérent (dernière = 269).
+- **Type consistency :** la function renvoie `{ success, action, promoCode }` (Task 2), consommé tel quel par `FlyerGift.tsx` (Task 3). Route `/flyer` ajoutée à `publicRoutes` ET au `<Routes>` (Task 3). Numéro de migration 270 cohérent (dernière = 269).
 - **Hors scope (non traité, noté dans la spec) :** code promo unique par personne ; tunnel d'onboarding ; nettoyage des points exploration/érudition morts depuis 0.6 ; filtrage du compteur public `movement_stats`. `computeSourceTag` (shopifyTags.ts) ne mappe pas `flyer`→`source:flyer`, mais ce chemin (`syncUserTagsToShopify`) n'est pas utilisé par ce flow ; la function a son propre `buildTags`. Idem `stand` n'y est pas mappé — comportement préexistant inchangé.
 ```
