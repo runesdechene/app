@@ -17,6 +17,21 @@ function initials(name: string): string {
 }
 
 /**
+ * Rend la mission en n'autorisant QUE le gras <b> et les sauts de ligne — tout
+ * le reste est échappé (pas d'injection HTML possible depuis un texte joueur).
+ */
+function renderMission(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  return escaped
+    .replace(/&lt;b&gt;/gi, '<b>')
+    .replace(/&lt;\/b&gt;/gi, '</b>')
+    .replace(/\n/g, '<br>')
+}
+
+/**
  * Hall de Compagnie — variante C (empilé, une colonne) : identité + mission +
  * classement (par Coupe ; le 1er = Chef, détrônable) + footer (Quitter / Éditer).
  * Mécanique = faction ; user-facing = « Compagnie ». Détail via get_faction_detail.
@@ -138,7 +153,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           <div className="faction-hall-section">
             <h3 className="faction-hall-section-title">La mission</h3>
             {detail.description ? (
-              <p className="faction-hall-mission-text">{detail.description}</p>
+              <p className="faction-hall-mission-text"
+                 dangerouslySetInnerHTML={{ __html: renderMission(detail.description) }} />
             ) : (
               <p className="faction-hall-mission-empty">Cette Compagnie n'a pas encore écrit sa mission.</p>
             )}
@@ -182,28 +198,29 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           </div>
         </div>
 
-        {/* Footer actions */}
-        <div className="faction-hall-footer">
-          {isMember ? (
+        {/* Bas du Hall : rejoindre (non-membre) = gros CTA central ; sinon footer discret */}
+        {isMember ? (
+          <div className="faction-hall-footer">
             <button className="faction-hall-leave" onClick={handleLeave} disabled={leaving}>
               {leaving ? 'En cours…' : 'Quitter la Compagnie'}
             </button>
-          ) : (
+            {isChef && (
+              <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer l'identité</button>
+            )}
+          </div>
+        ) : (
+          <div className="faction-hall-joinbar">
             <button
-              className="faction-hall-join"
-              style={{ background: detail.color }}
+              className="faction-hall-join-big"
+              style={{ background: atLimit ? undefined : detail.color }}
               onClick={handleJoin}
               disabled={joining || atLimit}
-              title={atLimit ? 'Tu fais déjà partie de 2 Compagnies' : undefined}
             >
-              {joining ? 'En cours…' : atLimit ? 'Limite de 2 atteinte' : 'Rejoindre cette Compagnie'}
+              {joining ? 'En cours…' : atLimit ? 'Tu fais déjà partie de 2 Compagnies' : '⚔️ Rejoindre cette Compagnie'}
             </button>
-          )}
-          {isChef && (
-            <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer l'identité</button>
-          )}
-        </div>
-        {joinError && <p className="faction-hall-joinerror">{joinError}</p>}
+            {joinError && <p className="faction-hall-joinerror">{joinError}</p>}
+          </div>
+        )}
       </div>
 
       {/* Édition (Chef) */}

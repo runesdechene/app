@@ -109,7 +109,8 @@
   font-size: 12px; font-weight: 600; color: #4a3728; cursor: pointer;
   white-space: nowrap;
 }
-.faction-scoreboard-found:hover { background: rgba(193, 154, 107, 0.2); }
+.faction-scoreboard-found:hover:not(:disabled) { background: rgba(193, 154, 107, 0.2); }
+.faction-scoreboard-found:disabled { opacity: 0.45; cursor: not-allowed; }
 
 @media (max-width: 768px) {
   .faction-scoreboard { max-width: 100%; }

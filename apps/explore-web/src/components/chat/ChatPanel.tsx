@@ -25,6 +25,7 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
   const toggleFaction = useChatStore((s) => s.toggleShowFaction)
   const toggleBugs = useChatStore((s) => s.toggleShowBugs)
   const userFactionColor = usePlayerStore((s) => s.userFactionColor)
+  const companyName = usePlayerStore((s) => s.userFactionTitle) || 'Compagnie'
 
   return (
     <div className="chat-filters">
@@ -35,7 +36,7 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
       {hasFaction && (
         <label className="chat-filter chat-filter-faction" style={{ color: userFactionColor || undefined }}>
           <input type="checkbox" checked={showFaction} onChange={toggleFaction} style={{ accentColor: userFactionColor || undefined }} />
-          Dortoir
+          {companyName}
         </label>
       )}
       <label className="chat-filter chat-filter-bugs">
@@ -119,6 +120,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
   const sendChannel = useChatStore((s) => s.sendChannel)
   const setSendChannel = useChatStore((s) => s.setSendChannel)
   const userFactionColor = usePlayerStore((s) => s.userFactionColor)
+  const companyName = usePlayerStore((s) => s.userFactionTitle) || 'Compagnie'
 
   async function handleSend() {
     const raw = text.trim()
@@ -214,7 +216,7 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
             onClick={() => setSendChannel('faction')}
             style={{ color: userFactionColor || undefined, borderColor: sendChannel === 'faction' ? userFactionColor || undefined : undefined }}
           >
-            @ Dortoir
+            @ {companyName}
           </button>
         )}
         <button

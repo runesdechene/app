@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
+import { useCrownsStore } from '../../../stores/crownsStore'
 import { useFactionGroupStore } from '../../../stores/factionGroupStore'
 import { FactionHallModal } from '../../factions/FactionHallModal'
 import { FactionCreateForm } from '../../factions/FactionCreateForm'
@@ -32,7 +33,10 @@ interface FactionMeta {
 export function FactionBar() {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
+  const balance = useCrownsStore(s => s.balance)
   const loadMine = useFactionGroupStore(s => s.loadMine)
+  const FOUND_COST = 200
+  const canAfford = balance >= FOUND_COST
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
   const [hallFactionId, setHallFactionId] = useState<string | null>(null)
@@ -139,8 +143,14 @@ export function FactionBar() {
           })}
 
           {userId && (
-            <button type="button" className="faction-scoreboard-found" onClick={() => setShowCreate(true)}>
-              ⚔️ Fonder
+            <button
+              type="button"
+              className="faction-scoreboard-found"
+              onClick={() => setShowCreate(true)}
+              disabled={!canAfford}
+              title={canAfford ? undefined : `Il te faut ${FOUND_COST} 🪙 pour fonder une Compagnie`}
+            >
+              ⚔️ Fonder — {FOUND_COST} 🪙
             </button>
           )}
         </div>
