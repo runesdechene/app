@@ -1,5 +1,6 @@
 import { useAuth } from '../../hooks/useAuth'
 import { ProfileMenu } from '../auth/ProfileMenu'
+import { BannerToggle } from '../factions/BannerToggle'
 import { NotificationBell } from '../notifications/NotificationBell'
 import { VersionBadge } from '../map/badges/VersionBadge'
 import { useChangelogStore } from '../../stores/changelogStore'
@@ -39,6 +40,7 @@ export function MobileTopBar({ onFactionModal }: MobileTopBarProps) {
         <img src={shopIcon} alt="" />
       </a>
       <NotificationBell />
+      <BannerToggle />
       {user?.email && (
         <ProfileMenu
           email={user.email}

@@ -14,6 +14,7 @@ import { FactionBar } from '../components/map/badges/FactionBar'
 import { FactionHallModal } from '../components/factions/FactionHallModal'
 import { CompanyIntroModal } from '../components/factions/CompanyIntroModal'
 import { FactionCreateForm } from '../components/factions/FactionCreateForm'
+import { BannerToggle } from '../components/factions/BannerToggle'
 import { useFactionHallStore } from '../stores/factionHallStore'
 import { useFactionGroupStore } from '../stores/factionGroupStore'
 import { InfoModal } from '../components/map/modals/InfoModal'
@@ -462,6 +463,7 @@ export default function MapPage() {
               <NotificationBell />
               <EnergyIndicator />
               <GpsMarksBadge />
+              <BannerToggle />
             </>
           )}
 
