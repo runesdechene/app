@@ -38,36 +38,40 @@ export function CompaniesJoinCreateModal({ userId, onClose }: Props) {
   const atLimit = myCompanies.length >= 2
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.card} onClick={(e) => e.stopPropagation()}>
-        <div style={styles.header}>
-          <h2 style={styles.title}>Rejoindre ou fonder une Compagnie</h2>
-          <button style={styles.close} onClick={onClose} aria-label="Fermer">×</button>
-        </div>
+    <>
+      {/* Fond : ferme seulement si on clique le fond lui-même (pas un enfant) */}
+      <div style={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+        <div style={styles.card}>
+          <div style={styles.header}>
+            <h2 style={styles.title}>Rejoindre ou fonder une Compagnie</h2>
+            <button style={styles.close} onClick={onClose} aria-label="Fermer">×</button>
+          </div>
 
-        <div style={styles.body}>
-          <CompanyDirectoryList
-            onJoined={() => {
-              // Aller au hall : on bascule la sidebar sur Compagnie (le focus est
-              // déjà posé par le store au join) et on ferme la modale.
-              useSidebarStore.getState().setTab('compagnie')
-              onClose()
-            }}
-          />
-        </div>
+          <div style={styles.body}>
+            <CompanyDirectoryList
+              onJoined={() => {
+                // Aller au hall : on bascule la sidebar sur Compagnie (le focus est
+                // déjà posé par le store au join) et on ferme la modale.
+                useSidebarStore.getState().setTab('compagnie')
+                onClose()
+              }}
+            />
+          </div>
 
-        <div style={styles.footer}>
-          <button
-            style={{ ...styles.foundBtn, opacity: atLimit ? 0.5 : 1, cursor: atLimit ? 'not-allowed' : 'pointer' }}
-            onClick={() => !atLimit && setShowCreate(true)}
-            disabled={atLimit}
-            title={atLimit ? 'Vous faites déjà partie de 2 Compagnies' : undefined}
-          >
-            + Fonder une Compagnie
-          </button>
+          <div style={styles.footer}>
+            <button
+              style={{ ...styles.foundBtn, opacity: atLimit ? 0.5 : 1, cursor: atLimit ? 'not-allowed' : 'pointer' }}
+              onClick={() => !atLimit && setShowCreate(true)}
+              disabled={atLimit}
+              title={atLimit ? 'Vous faites déjà partie de 2 Compagnies' : undefined}
+            >
+              + Fonder une Compagnie
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Hors de l'overlay : le formulaire (z-index supérieur) ne propage pas ses clics vers le fond */}
       {showCreate && (
         <CompanyCreateForm
           userId={userId}
@@ -75,7 +79,7 @@ export function CompaniesJoinCreateModal({ userId, onClose }: Props) {
           onCancel={() => setShowCreate(false)}
         />
       )}
-    </div>
+    </>
   )
 }
 

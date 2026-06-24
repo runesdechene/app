@@ -358,7 +358,7 @@ BEGIN
     'memberCount', (SELECT count(*) FROM company_members m WHERE m.company_id = c.id)
   ) INTO v_company FROM companies c WHERE c.id = p_company_id;
 
-  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t.joined_at), '[]'::json) INTO v_members
+  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t."joinedAt"), '[]'::json) INTO v_members
   FROM (
     SELECT m.user_id AS "userId",
            COALESCE(u.display_name, u.first_name, 'Quelqu''un') AS name,
