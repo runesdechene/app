@@ -1,3 +1,17 @@
+# ALPHA V0.10.0
+## Les Compagnies sont arrivées ⚔️
+
+Rassemblez-vous sous une même bannière. Vous pouvez désormais **fonder votre propre Compagnie** ou **en rejoindre une** : un nom, des couleurs, un emblème, une mission — et les vôtres autour de vous.
+
+- **Portez ses couleurs** : les lieux que vous veillez prennent la teinte de votre Compagnie sur la carte.
+- **La Coupe des Compagnies** : chaque Compagnie grimpe au classement grâce aux actions de ses membres. À vous de la hisser en tête de saison.
+- **Invitez vos amis** d'un simple lien : ils vous rejoignent droit dans la Compagnie.
+- Changez de bannière quand vous voulez, et retrouvez tout dans le nouvel onglet **Compagnies**.
+
+On réenchante le monde bien mieux à plusieurs. Trouvez les vôtres. 🛡️
+
+---
+
 # ALPHA V0.9.80
 ## La correction de position reste près du lieu
 
