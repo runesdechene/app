@@ -142,7 +142,7 @@ BEGIN
   END IF;
   v_name := btrim(coalesce(p_name, ''));
   IF v_name = '' THEN RETURN json_build_object('error', 'name_required'); END IF;
-  IF length(v_name) > 60 THEN RETURN json_build_object('error', 'name_too_long'); END IF;
+  IF length(v_name) > 40 THEN RETURN json_build_object('error', 'name_too_long'); END IF;
   IF EXISTS (SELECT 1 FROM companies WHERE lower(name) = lower(v_name)) THEN
     RETURN json_build_object('error', 'name_taken');
   END IF;
@@ -383,7 +383,7 @@ BEGIN
   SELECT active_company_id INTO v_active FROM users WHERE id = p_user_id;
   SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t.joined_at), '[]'::json) INTO v_rows
   FROM (
-    SELECT c.id, c.name, c.color, c.image_url AS "imageUrl", c.is_official AS "isOfficial",
+    SELECT c.id, c.name, c.color, c.image_url AS "imageUrl", c.description, c.is_official AS "isOfficial",
            (SELECT count(*) FROM company_members m2 WHERE m2.company_id = c.id) AS "memberCount",
            (c.id = v_active) AS "isActive",
            (c.founder_user_id = p_user_id) AS "isFounder",
@@ -411,7 +411,7 @@ BEGIN
   END IF;
   v_name := btrim(coalesce(p_name, ''));
   IF v_name = '' THEN RETURN json_build_object('error', 'name_required'); END IF;
-  IF length(v_name) > 60 THEN RETURN json_build_object('error', 'name_too_long'); END IF;
+  IF length(v_name) > 40 THEN RETURN json_build_object('error', 'name_too_long'); END IF;
   IF EXISTS (SELECT 1 FROM companies WHERE lower(name) = lower(v_name) AND id <> p_company_id) THEN
     RETURN json_build_object('error', 'name_taken');
   END IF;

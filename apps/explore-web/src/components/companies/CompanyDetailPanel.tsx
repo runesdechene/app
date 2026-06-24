@@ -166,6 +166,7 @@ export function CompanyDetailPanel({ companyId, onClose }: Props) {
             name: detail.name,
             color: detail.color,
             imageUrl: detail.imageUrl,
+            description: detail.description,
             isOfficial: detail.isOfficial,
             memberCount: detail.memberCount,
             isActive,

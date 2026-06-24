@@ -8,6 +8,7 @@ export interface MyCompany {
   name: string
   color: string
   imageUrl: string | null
+  description: string | null
   isOfficial: boolean
   memberCount: number
   isActive: boolean
@@ -196,7 +197,11 @@ export const useCompanyStore = create<CompanyStoreState>((set) => ({
     }
     const result = data as ActionResult<{ activeCompanyId: string | null }>
     if ('success' in result && result.success) {
-      set({ activeCompanyId: result.activeCompanyId })
+      // I1 : resync les flags isActive pour que le badge de bannière (menus) suive
+      set((state) => ({
+        activeCompanyId: result.activeCompanyId,
+        myCompanies: state.myCompanies.map((c) => ({ ...c, isActive: c.id === result.activeCompanyId })),
+      }))
     }
     return result
   },

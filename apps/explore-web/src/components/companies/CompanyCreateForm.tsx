@@ -39,7 +39,7 @@ export function CompanyCreateForm({ userId, editCompany, onSuccess, onCancel }: 
 
   const [name, setName] = useState(editCompany?.name ?? '')
   const [color, setColor] = useState(editCompany?.color ?? COLOR_PALETTE[0])
-  const [description, setDescription] = useState('')
+  const [description, setDescription] = useState(editCompany?.description ?? '')
   const [file, setFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
