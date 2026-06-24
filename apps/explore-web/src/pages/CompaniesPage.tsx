@@ -7,6 +7,7 @@ import { useFactionHallStore } from '../stores/factionHallStore'
 import { FactionModal } from '../components/auth/FactionModal'
 import { FactionCreateForm } from '../components/factions/FactionCreateForm'
 import { CoupeModal } from '../components/map/modals/CoupeModal'
+import '../components/home/coupe/CoupeHeritages.css'
 import './CompaniesPage.css'
 
 const FOUND_COST = 200
@@ -50,14 +51,42 @@ export default function CompaniesPage() {
     <main className="activity-page-scroll companies-page">
       <h1 className="activity-page-title">Compagnies</h1>
 
-      {/* Bannière Coupe → classement complet */}
-      <button className="cp-coupe-banner" onClick={() => setShowCoupe(true)}>
-        <div className="cp-coupe-banner-text">
-          <span className="cp-coupe-eyebrow">Saison en cours</span>
-          <span className="cp-coupe-title">Coupe des Compagnies</span>
-        </div>
-        <span className="cp-coupe-cta">Voir →</span>
-      </button>
+      {/* Podium Coupe des Compagnies (réutilise le look « Coupe des Héritages ») */}
+      {directory.length > 0 && (() => {
+        const topScore = directory[0]?.score ?? 0
+        const podium = [directory[2], directory[1], directory[0]].filter(Boolean) // 3-2-1 (leader à droite)
+        return (
+          <>
+            <h2 className="coupe-section-title" onClick={() => setShowCoupe(true)} style={{ cursor: 'pointer' }}>
+              ⚜ Coupe des Compagnies
+            </h2>
+            <div className="coupe-frame coupe-podium-frame">
+              <div className="coupe-podium">
+                {podium.map((c) => {
+                  const rank = directory.findIndex(d => d.id === c.id) + 1
+                  const isLeader = rank === 1 && topScore > 0
+                  const h = topScore <= 0 ? 12 : Math.max(Math.round((c.score / topScore) * 80), 12)
+                  const roman = rank === 1 ? 'I' : rank === 2 ? 'II' : 'III'
+                  return (
+                    <div key={c.id} className={`coupe-step${isLeader ? ' coupe-step-leader' : ''}`} role="button" tabIndex={0} onClick={() => openHall(c.id)}>
+                      {isLeader ? <span className="coupe-crown" aria-hidden>👑</span> : <span className="coupe-crown-spacer" aria-hidden />}
+                      <span className="coupe-step-emblem" style={{ background: c.color }}>
+                        {c.imageUrl && <img src={c.imageUrl} alt="" className="coupe-step-emblem-img" />}
+                      </span>
+                      <span className="coupe-step-name">{c.name}</span>
+                      <span className="coupe-step-pts" style={{ color: c.color }}>{c.score}</span>
+                      <span className="coupe-step-block" style={{ height: `${h}px` }}>{roman}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              <button type="button" className="coupe-podium-footer" onClick={() => setShowCoupe(true)}>
+                ▸ Voir le classement complet
+              </button>
+            </div>
+          </>
+        )
+      })()}
 
       {/* Mes Compagnies */}
       <h2 className="cp-section">Mes Compagnies {myFactions.length > 0 && <span className="cp-section-count">({myFactions.length}/2)</span>}</h2>
