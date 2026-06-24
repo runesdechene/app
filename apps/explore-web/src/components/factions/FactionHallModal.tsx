@@ -131,7 +131,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           <div className="faction-hall-intro">
             <div className="faction-hall-eyebrow">
               <span className="faction-hall-dot" style={{ background: detail.color }} />
-              {detail.isOfficial ? 'Compagnie officielle' : 'Compagnie'}
+              Compagnie
             </div>
             <div className="faction-hall-head">
               {detail.imageUrl ? (
