@@ -92,6 +92,7 @@
   font-size: 13px; font-weight: 600; color: #4a3728;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+.faction-chip-active { flex: none; font-size: 12px; color: var(--faction-color); }
 .faction-chip-score {
   flex: none;
   font-family: var(--font-accent, 'Cinzel', serif);

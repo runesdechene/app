@@ -188,6 +188,14 @@
   font-size: 12px; font-weight: 600; color: #2a1f10;
 }
 .faction-hall-edit:hover { background: rgba(193, 154, 107, 0.28); }
+.faction-hall-setactive {
+  border: none; cursor: pointer; padding: 8px 14px; border-radius: 12px; color: #fff;
+  font-family: var(--font-accent, Helvetica, sans-serif); font-size: 12px; font-weight: 700;
+}
+.faction-hall-activebadge {
+  font-family: var(--font-accent, Helvetica, sans-serif); font-size: 12px;
+  font-weight: 700; letter-spacing: 0.04em;
+}
 /* Gros CTA Rejoindre — non-membre. Action forte → bouton ample et central. */
 .faction-hall-joinbar {
   flex-shrink: 0;

@@ -43,7 +43,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
+  const switchBanner = useFactionGroupStore((s) => s.switchBanner)
   const myFactions = useFactionGroupStore((s) => s.myFactions)
+  const activeFactionId = useFactionGroupStore((s) => s.activeFactionId)
 
   const [detail, setDetail] = useState<FactionDetail | null>(null)
   const [showEdit, setShowEdit] = useState(false)
@@ -115,6 +117,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const isChef = chefId === userId
   const isMember = detail.members.some((m) => m.userId === userId)
   const atLimit = !isMember && myFactions.length >= 2
+  const isActive = activeFactionId === factionId
 
   // Objet MyFaction minimal pour le formulaire d'édition.
   const editFaction: MyFaction = {
@@ -209,9 +212,19 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             <button className="faction-hall-leave" onClick={handleLeave} disabled={leaving}>
               {leaving ? 'En cours…' : 'Quitter la Compagnie'}
             </button>
-            {isChef && (
-              <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer l'identité</button>
-            )}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {isActive ? (
+                <span className="faction-hall-activebadge" style={{ color: detail.color }}>⚑ Bannière active</span>
+              ) : (
+                <button className="faction-hall-setactive" style={{ background: detail.color }}
+                  onClick={async () => { if (userId) await switchBanner(userId, factionId) }}>
+                  ⚑ Porter ces couleurs
+                </button>
+              )}
+              {isChef && (
+                <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer</button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="faction-hall-joinbar">

@@ -137,6 +137,7 @@ export function FactionBar() {
                   </span>
                 )}
                 <span className="faction-chip-name">{faction.factionTitle}</span>
+                {isMine && <span className="faction-chip-active" title="Ta bannière active">⚑</span>}
                 <span className="faction-chip-score">{'🏆'} {faction.score}</span>
               </button>
             )
