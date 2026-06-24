@@ -59,7 +59,7 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS active_banner_switched_at time
 
 -- 6. Réglages (app_settings(key, value) — value text, casté ::int à la lecture)
 INSERT INTO public.app_settings (key, value) VALUES
-  ('company_founding_cost', '150'),
+  ('company_founding_cost', '200'),
   ('banner_switch_cooldown_hours', '6'),
   ('company_max_count', '2'),
   ('company_ban_hours', '24')
