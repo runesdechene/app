@@ -27,6 +27,8 @@ export interface FactionSummary {
   memberCount: number
   /** Score de Coupe de la saison active — classement du scoreboard. */
   score: number
+  /** Tags/mots-clés de la Compagnie. */
+  tags: string[]
 }
 
 export interface FactionMember {
@@ -47,6 +49,7 @@ export interface FactionDetail {
   color: string
   imageUrl: string | null
   description: string | null
+  tags: string[]
   createdBy: string | null
   isOfficial: boolean
   memberCount: number
@@ -91,7 +94,7 @@ interface FactionGroupState {
   loadDirectory: (search?: string) => Promise<void>
   create: (
     userId: string,
-    params: { name: string; color: string; description: string; imageUrl: string | null },
+    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[] },
   ) => Promise<ActionResult<{ factionId: string; cost: number }>>
   join: (userId: string, factionId: string) => Promise<ActionResult>
   leave: (userId: string, factionId: string) => Promise<ActionResult<{ extinguished: boolean }>>
@@ -99,7 +102,7 @@ interface FactionGroupState {
   updateIdentity: (
     userId: string,
     factionId: string,
-    params: { name: string; color: string; description: string; imageUrl: string | null },
+    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[] },
   ) => Promise<ActionResult>
   removeMember: (userId: string, factionId: string, targetUserId: string) => Promise<ActionResult>
 }
@@ -138,13 +141,14 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     set({ directory: (data as FactionSummary[]) ?? [] })
   },
 
-  create: async (userId, { name, color, description, imageUrl }) => {
+  create: async (userId, { name, color, description, imageUrl, tags }) => {
     const { data, error } = await supabase.rpc('create_faction', {
       p_user_id: userId,
       p_name: name,
       p_color: color,
       p_description: description,
       p_image_url: imageUrl,
+      p_tags: tags,
     })
     if (error) {
       console.error('[faction] create_faction error:', error.message)
@@ -227,7 +231,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     return result
   },
 
-  updateIdentity: async (userId, factionId, { name, color, description, imageUrl }) => {
+  updateIdentity: async (userId, factionId, { name, color, description, imageUrl, tags }) => {
     const { data, error } = await supabase.rpc('update_faction_identity', {
       p_user_id: userId,
       p_faction_id: factionId,
@@ -235,6 +239,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       p_color: color,
       p_description: description,
       p_image_url: imageUrl,
+      p_tags: tags,
     })
     if (error) {
       console.error('[faction] update_faction_identity error:', error.message)

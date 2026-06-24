@@ -118,6 +118,17 @@
   text-align: left;
 }
 
+.faction-card-tags {
+  display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px;
+}
+.faction-card-tag {
+  font-family: var(--font-accent, "Cabin Condensed", sans-serif);
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--color-sepia);
+  border-radius: 999px; padding: 2px 9px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
 .faction-card-desc {
   font-size: 14px;
   text-align: left;

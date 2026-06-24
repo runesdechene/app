@@ -160,6 +160,13 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                 <span>🪙 <b>{detail.totalCrowns.toLocaleString('fr-FR')}</b> investies</span>
               )}
             </div>
+            {detail.tags && detail.tags.length > 0 && (
+              <div className="faction-hall-tags">
+                {detail.tags.map(t => (
+                  <span key={t} className="faction-hall-tag" style={{ borderColor: detail.color, color: detail.color }}>{t}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Mission */}
@@ -254,6 +261,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
         <FactionCreateForm
           userId={userId}
           editFaction={editFaction}
+          editTags={detail.tags}
           onSuccess={() => { setShowEdit(false); reload() }}
           onCancel={() => setShowEdit(false)}
         />

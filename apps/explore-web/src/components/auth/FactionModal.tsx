@@ -90,6 +90,13 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                     <div className="faction-card-desc" style={{ opacity: 0.7, marginTop: 4 }}>
                       👥 {c.memberCount} membre{c.memberCount !== 1 ? 's' : ''}
                     </div>
+                    {c.tags && c.tags.length > 0 && (
+                      <div className="faction-card-tags">
+                        {c.tags.slice(0, 4).map(t => (
+                          <span key={t} className="faction-card-tag" style={{ borderColor: c.color, color: c.color }}>{t}</span>
+                        ))}
+                      </div>
+                    )}
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
                   </div>
                 </button>

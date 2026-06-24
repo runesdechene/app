@@ -25,18 +25,22 @@ interface Props {
   userId: string
   /** Si fourni : mode édition (updateIdentity) */
   editFaction?: MyFaction
+  /** Tags existants (mode édition) pour préremplir. */
+  editTags?: string[]
   onSuccess: () => void
   onCancel: () => void
 }
 
 /** Fonder / éditer une Compagnie (mécanique = faction). */
-export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: Props) {
+export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, onCancel }: Props) {
   const create = useFactionGroupStore((s) => s.create)
   const updateIdentity = useFactionGroupStore((s) => s.updateIdentity)
 
   const [name, setName] = useState(editFaction?.name ?? '')
   const [color, setColor] = useState(editFaction?.color ?? COLOR_PALETTE[0])
   const [description, setDescription] = useState(editFaction?.description ?? '')
+  const [tags, setTags] = useState((editTags ?? []).join(', '))
+  const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 6)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(editFaction?.imageUrl ?? null)
   const [submitting, setSubmitting] = useState(false)
@@ -71,7 +75,7 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
         }
       }
       const result = await updateIdentity(userId, editFaction.id, {
-        name: name.trim(), color, description: description.trim(), imageUrl,
+        name: name.trim(), color, description: description.trim(), imageUrl, tags: tagsArray,
       })
       if ('error' in result) {
         const errKey = String(result.error)
@@ -84,7 +88,7 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
       }
     } else {
       const result = await create(userId, {
-        name: name.trim(), color, description: description.trim(), imageUrl: null,
+        name: name.trim(), color, description: description.trim(), imageUrl: null, tags: tagsArray,
       })
       if ('error' in result) {
         const errKey = String(result.error)
@@ -99,7 +103,7 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
         try {
           const url = await uploadFactionImage(result.factionId, file)
           await updateIdentity(userId, result.factionId, {
-            name: name.trim(), color, description: description.trim(), imageUrl: url,
+            name: name.trim(), color, description: description.trim(), imageUrl: url, tags: tagsArray,
           })
         } catch {
           // image optionnelle — échec silencieux, la Compagnie existe quand même
@@ -135,6 +139,21 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
               disabled={submitting} rows={3}
             />
           </label>
+
+          <label className="faction-form-label">
+            Tags (mots-clés, séparés par des virgules)
+            <input
+              className="faction-form-input" type="text" value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="Local, Convivial, Lyon, Compétitif…"
+              disabled={submitting}
+            />
+          </label>
+          {tagsArray.length > 0 && (
+            <div className="faction-form-tags-preview">
+              {tagsArray.map(t => <span key={t} className="faction-form-tag">{t}</span>)}
+            </div>
+          )}
 
           <div className="faction-form-label">
             Couleur
