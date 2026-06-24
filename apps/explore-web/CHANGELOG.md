@@ -1,3 +1,15 @@
+# ALPHA V0.10.1
+## Donnez un blason à votre Compagnie 🛡️
+
+Plus besoin de chercher une image : choisissez l'emblème de votre Compagnie parmi un **set de symboles** — fleur de lys, aigle, temple grec, triskèle, croix, arbre-monde, chêne… — posé sur vos couleurs. Vous préférez votre propre logo ? **Importez-le**, et passez-le en blanc ou noir d'un geste.
+
+- Nouveau **choix d'emblème** à la création comme à l'édition de la Compagnie, avec aperçu en direct.
+- **Lien d'invitation** simplifié et neutre.
+
+Que votre bannière vous ressemble. ⚜
+
+---
+
 # ALPHA V0.10.0
 ## Les Compagnies sont arrivées ⚔️
 
