@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import MapPage from './pages/MapPage'
 import LandingPage from './components/landing/LandingPage'
 import RequireAuth from './components/RequireAuth'
@@ -28,6 +28,16 @@ function MobileOnly({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  // Lien d'invitation Compagnie : capturer ?company=<id> dès le chargement (même
+  // déconnecté sur la LandingPage) → consommé après auth par useCompanyInvite.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('company')
+    if (id) {
+      sessionStorage.setItem('pendingCompanyInvite', id)
+      window.history.replaceState({}, '', window.location.pathname + window.location.hash)
+    }
+  }, [])
+
   return (
     <BrowserRouter>
       <Suspense fallback={null}>
