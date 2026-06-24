@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useCrownsStore } from '../../stores/crownsStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from '../factions/FactionCreateForm'
@@ -26,6 +27,8 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
   const myFactions = useFactionGroupStore(s => s.myFactions)
   const loadMine = useFactionGroupStore(s => s.loadMine)
   const openHall = useFactionHallStore(s => s.open)
+  const balance = useCrownsStore(s => s.balance)
+  const FOUND_COST = 200
 
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -85,7 +88,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                       <div className="faction-card-desc">{c.description}</div>
                     )}
                     <div className="faction-card-desc" style={{ opacity: 0.7, marginTop: 4 }}>
-                      👥 {c.memberCount} · 🏆 {c.score}
+                      👥 {c.memberCount} membre{c.memberCount !== 1 ? 's' : ''}
                     </div>
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
                   </div>
@@ -96,12 +99,16 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
         )}
 
         <button
-          className="faction-modal-leave"
-          onClick={() => !atLimit && setShowCreate(true)}
-          disabled={atLimit}
-          title={atLimit ? 'Tu fais déjà partie de 2 Compagnies' : undefined}
+          className="faction-modal-found"
+          onClick={() => { if (!atLimit && balance >= FOUND_COST) setShowCreate(true) }}
+          disabled={atLimit || balance < FOUND_COST}
+          title={
+            atLimit ? 'Tu fais déjà partie de 2 Compagnies'
+            : balance < FOUND_COST ? `Il te faut ${FOUND_COST} 🪙 pour fonder une Compagnie`
+            : undefined
+          }
         >
-          ⚔️ Fonder une Compagnie — 200 🪙
+          ⚔️ Fonder ma propre Compagnie — {FOUND_COST} 🪙
         </button>
       </div>
 

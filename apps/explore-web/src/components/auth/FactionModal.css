@@ -252,6 +252,26 @@
   border-radius: 20px;
 }
 
+/* Bouton Fonder — clair et proéminent, grisé si Couronnes insuffisantes */
+.faction-modal-found {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 13px;
+  background: #2a1f10;
+  color: #faf2dd;
+  font-family: var(--font-accent, "Cabin Condensed", sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(20, 14, 5, 0.25);
+  transition: transform 120ms ease-out, filter 120ms ease-out;
+}
+.faction-modal-found:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+.faction-modal-found:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+
 .faction-modal-leave {
   display: inline-block;
   margin-top: 16px;
