@@ -14,6 +14,11 @@
   padding: 16px;
 }
 
+/* Mobile : plein écran (sinon le padding/centrage crée des bandes sur les côtés) */
+@media (max-width: 768px) {
+  .faction-explore-overlay { padding: 0; align-items: stretch; justify-content: stretch; }
+}
+
 .faction-modal {
   position: relative;
   width: 95vw;
