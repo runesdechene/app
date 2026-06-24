@@ -30,6 +30,8 @@ export interface CompanyMember {
   name: string
   joinedAt: string
   isFounder: boolean
+  /** Gloire lifetime du membre — détermine le rang interne (le 1er = Chef). */
+  gloire: number
 }
 
 export interface CompanyDetail {
@@ -41,6 +43,8 @@ export interface CompanyDetail {
   founderUserId: string
   isOfficial: boolean
   memberCount: number
+  /** Somme des gloires des membres. */
+  totalGloire: number
   members: CompanyMember[]
 }
 

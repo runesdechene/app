@@ -126,6 +126,22 @@ CREATE POLICY "company_messages_read_members" ON public.company_messages
 -- Aucune policy INSERT/UPDATE/DELETE nulle part : toutes les écritures passent
 -- par les RPC ci-dessous (SECURITY DEFINER, qui contournent la RLS).
 
+-- Chat de Compagnie = canal de chat_messages (channel = company_id), comme le
+-- Dortoir = channel=factionId. Les policies chat_*_faction existantes ne couvrent
+-- que la faction → on ajoute le canal Compagnie (un membre lit/écrit son canal).
+DROP POLICY IF EXISTS "chat_read_company" ON public.chat_messages;
+CREATE POLICY "chat_read_company" ON public.chat_messages
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.company_members m
+                 WHERE m.company_id::text = chat_messages.channel AND m.user_id = auth.uid()::text));
+
+DROP POLICY IF EXISTS "chat_insert_company" ON public.chat_messages;
+CREATE POLICY "chat_insert_company" ON public.chat_messages
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.uid()::text = user_id::text
+              AND EXISTS (SELECT 1 FROM public.company_members m
+                          WHERE m.company_id::text = chat_messages.channel AND m.user_id = auth.uid()::text));
+
 -- ============================================================================
 -- RPCs — cycle de vie
 -- ============================================================================
@@ -355,15 +371,19 @@ BEGIN
   SELECT json_build_object(
     'id', c.id, 'name', c.name, 'color', c.color, 'imageUrl', c.image_url,
     'description', c.description, 'founderUserId', c.founder_user_id, 'isOfficial', c.is_official,
-    'memberCount', (SELECT count(*) FROM company_members m WHERE m.company_id = c.id)
+    'memberCount', (SELECT count(*) FROM company_members m WHERE m.company_id = c.id),
+    'totalGloire', (SELECT COALESCE(sum(public._user_glory_score(m.user_id)), 0)
+                    FROM company_members m WHERE m.company_id = c.id)
   ) INTO v_company FROM companies c WHERE c.id = p_company_id;
 
-  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t."joinedAt"), '[]'::json) INTO v_members
+  -- Membres classés par GLOIRE décroissante (le 1er = Chef de Compagnie, détrônable).
+  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t.gloire DESC, t."joinedAt"), '[]'::json) INTO v_members
   FROM (
     SELECT m.user_id AS "userId",
            COALESCE(u.display_name, u.first_name, 'Quelqu''un') AS name,
            m.joined_at AS "joinedAt",
-           (m.user_id = v_founder) AS "isFounder"
+           (m.user_id = v_founder) AS "isFounder",
+           COALESCE(public._user_glory_score(m.user_id), 0) AS gloire
     FROM company_members m JOIN users u ON u.id = m.user_id
     WHERE m.company_id = p_company_id
   ) t;

@@ -16,9 +16,11 @@ interface Props {
   companyId: string
   members: CompanyMember[]
   accentColor: string
+  /** Remplit toute la hauteur du conteneur (colonne droite du Hall) au lieu du cadre compact. */
+  fill?: boolean
 }
 
-export function CompanyChatPanel({ companyId, members, accentColor }: Props) {
+export function CompanyChatPanel({ companyId, members, accentColor, fill }: Props) {
   const { messages, send, loading } = useCompanyChat(companyId)
   const [text, setText] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
@@ -45,7 +47,7 @@ export function CompanyChatPanel({ companyId, members, accentColor }: Props) {
   }
 
   return (
-    <div style={s.panel}>
+    <div style={fill ? { ...s.panel, ...s.panelFill } : s.panel}>
       <div style={{ ...s.header, borderColor: accentColor }}>
         <span style={s.headerTitle}>Messages de la Compagnie</span>
       </div>
@@ -101,6 +103,9 @@ const s: Record<string, React.CSSProperties> = {
     background: 'rgba(255,255,255,0.35)',
     overflow: 'hidden',
     minHeight: '220px', maxHeight: '340px',
+  },
+  panelFill: {
+    height: '100%', minHeight: 0, maxHeight: 'none', flex: 1, borderRadius: 0, border: 'none',
   },
   header: {
     padding: '8px 12px',
