@@ -3,7 +3,7 @@
 .faction-form-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9600; /* au-dessus du Hall (9510) et de l'UI carte */
+  z-index: 10060; /* au-dessus du Hall (10050) — sous AdScreen/InfoModal */
   background: rgba(40, 30, 20, 0.55);
   display: flex;
   align-items: center;
@@ -129,5 +129,5 @@
 .faction-form-submit:disabled { opacity: 0.6; cursor: wait; }
 
 @media (max-width: 768px) {
-  .faction-form-overlay { z-index: 10020; }
+  .faction-form-overlay { z-index: 10060; }
 }
