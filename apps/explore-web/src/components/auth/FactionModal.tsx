@@ -78,28 +78,30 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                   style={{ '--faction-color': c.color } as React.CSSProperties}
                   onClick={() => handleCardClick(c.id)}
                 >
-                  {c.imageUrl ? (
-                    <img src={c.imageUrl} alt={c.name} className="faction-card-img" />
-                  ) : (
-                    <div className="faction-card-placeholder" style={{ backgroundColor: c.color }} />
-                  )}
-                  <div className="faction-card-body">
-                    <span className="faction-card-name">{c.name}</span>
-                    {c.description && (
-                      <div className="faction-card-desc">{c.description}</div>
-                    )}
-                    <div className="faction-card-desc" style={{ opacity: 0.7, marginTop: 4 }}>
-                      👥 {c.memberCount} membre{c.memberCount !== 1 ? 's' : ''}
-                    </div>
-                    {c.tags && c.tags.length > 0 && (
-                      <div className="faction-card-tags">
-                        {c.tags.slice(0, 4).map(t => (
-                          <span key={t} className="faction-card-tag" style={{ borderColor: c.color, color: c.color }}>{t}</span>
-                        ))}
+                  <div className="faction-card-head">
+                    {c.imageUrl ? (
+                      <img src={c.imageUrl} alt={c.name} className="faction-card-img" />
+                    ) : (
+                      <div className="faction-card-placeholder" style={{ backgroundColor: c.color }}>
+                        {c.name.charAt(0).toUpperCase()}
                       </div>
                     )}
+                    <span className="faction-card-name">{c.name}</span>
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
                   </div>
+                  {c.description && (
+                    <div className="faction-card-desc">{c.description}</div>
+                  )}
+                  <div className="faction-card-meta">
+                    👥 {c.memberCount} membre{c.memberCount !== 1 ? 's' : ''}
+                  </div>
+                  {c.tags && c.tags.length > 0 && (
+                    <div className="faction-card-tags">
+                      {c.tags.slice(0, 4).map(t => (
+                        <span key={t} className="faction-card-tag" style={{ borderColor: c.color, color: c.color }}>{t}</span>
+                      ))}
+                    </div>
+                  )}
                 </button>
               )
             })}
