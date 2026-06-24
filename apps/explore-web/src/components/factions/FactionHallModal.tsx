@@ -18,9 +18,8 @@ const SOURCE_META: Record<string, { icon: string; label: string }> = {
   ajouts:  { icon: '➕', label: 'lieux ajoutés' },
   veilles: { icon: '⚑', label: 'veilles' },
   photos:  { icon: '📷', label: 'photos' },
-  or:      { icon: '🪙', label: "conquête à l'or" },
 }
-const SOURCE_ORDER = ['enigmes', 'visites', 'ajouts', 'veilles', 'photos', 'or']
+const SOURCE_ORDER = ['enigmes', 'visites', 'ajouts', 'veilles', 'photos']
 
 interface Props {
   factionId: string
@@ -241,10 +240,15 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                       )}
                     </div>
                   </button>
-                  <span className="faction-hall-rank-stats">
-                    🏆 {m.coupe.toLocaleString('fr-FR')}
-                    {m.crownsInvested > 0 && <>{'  '}🪙 {m.crownsInvested.toLocaleString('fr-FR')}</>}
-                  </span>
+                  {(() => {
+                    const tresor = m.crownsInvested + (m.crownsConquered ?? 0)
+                    return (
+                      <span className="faction-hall-rank-stats">
+                        🏆 {m.coupe.toLocaleString('fr-FR')}
+                        {tresor > 0 && <>{'  '}🪙 {tresor.toLocaleString('fr-FR')}</>}
+                      </span>
+                    )
+                  })()}
                   {isChef && !memberIsChef && m.userId !== userId && (
                     <button className="faction-hall-rank-remove" onClick={() => handleRemove(m.userId)}
                       disabled={removingId === m.userId} aria-label={`Exclure ${m.name}`}>

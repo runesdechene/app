@@ -1,3 +1,12 @@
+# ALPHA V0.10.4
+## La Coupe au mérite, l'or pour bâtir la Compagnie
+
+La Coupe des Compagnies se gagne désormais **uniquement par vos actions** — énigmes, visites, veilles, ajouts de lieux… L'or n'y donne plus de points : le classement reste **loyal**, il récompense l'engagement réel.
+
+Et vos **couronnes** ? Celles que vous dépensez **pour votre Compagnie** (conquérir un lieu sous sa bannière, soutenir un de ses membres) alimentent son **trésor** et vous font **gravir les échelons** vers le rang de Chef. Le mérite mène la Coupe, l'or bâtit la maison.
+
+---
+
 # ALPHA V0.10.3
 ## Le Hall de Compagnie devient lisible
 

@@ -45,10 +45,12 @@ export interface FactionMember {
   isFounder: boolean
   /** Coupe de la saison active. */
   coupe: number
-  /** Couronnes investies dans la Compagnie (le fondateur part avec le coût payé). */
+  /** Couronnes investies (fondation). */
   crownsInvested: number
-  /** Détail des points par source (clés non-nulles seulement) : enigmes/visites/ajouts/veilles/photos/or. */
-  breakdown?: Partial<Record<'enigmes' | 'visites' | 'ajouts' | 'veilles' | 'photos' | 'or', number>>
+  /** Couronnes conquises pour la Compagnie (conquête sous bannière / soutien à un membre). */
+  crownsConquered?: number
+  /** Détail de la Coupe (mérite) par source, clés non-nulles : enigmes/visites/ajouts/veilles/photos. */
+  breakdown?: Partial<Record<'enigmes' | 'visites' | 'ajouts' | 'veilles' | 'photos', number>>
 }
 
 export interface FactionDetail {

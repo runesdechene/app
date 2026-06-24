@@ -1,0 +1,5 @@
+-- 286_gold_coupe_uncapped.sql — ABANDONNÉ, JAMAIS APPLIQUÉ.
+-- Approche « 10🪙 = 1 pt Coupe sans plafond » écartée au profit du MODÈLE B
+-- (l'or ne compte pas à la Coupe, seulement au trésor de la Compagnie).
+-- Voir : 286_model_b_gold_treasury_not_coupe.sql (la migration réellement appliquée).
+-- Fichier conservé vide volontairement (pas de SQL à exécuter).
