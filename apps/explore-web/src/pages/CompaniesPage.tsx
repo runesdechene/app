@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useCompanyStore } from '../stores/companyStore'
 import { usePlayerStore } from '../stores/playerStore'
 import { CompanyDirectoryList } from '../components/companies/CompanyDirectoryList'
-import { CompanyDetailPanel } from '../components/companies/CompanyDetailPanel'
+import { CompanyHallModal } from '../components/companies/CompanyHallModal'
 import { CompanyCreateForm } from '../components/companies/CompanyCreateForm'
 import './CompaniesPage.css'
 
@@ -31,18 +31,6 @@ export default function CompaniesPage() {
   function handleCreateSuccess() {
     setShowCreateForm(false)
     if (userId) loadMine(userId)
-  }
-
-  // Vue détail
-  if (selectedId) {
-    return (
-      <main className="companies-page">
-        <CompanyDetailPanel
-          companyId={selectedId}
-          onClose={() => setSelectedId(null)}
-        />
-      </main>
-    )
   }
 
   return (
@@ -127,6 +115,11 @@ export default function CompaniesPage() {
           onSuccess={handleCreateSuccess}
           onCancel={() => setShowCreateForm(false)}
         />
+      )}
+
+      {/* Hall (modale 2 colonnes / onglets mobile) */}
+      {selectedId && (
+        <CompanyHallModal companyId={selectedId} onClose={() => setSelectedId(null)} />
       )}
     </main>
   )

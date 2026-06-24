@@ -1,0 +1,120 @@
+.company-hall-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(40, 28, 18, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.company-hall-modal {
+  position: relative;
+  width: min(860px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-parchment, #f5e6d3);
+  border-radius: 16px;
+  border-top: 5px solid var(--color-ink-light, #c19a6b);
+  overflow: hidden;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.4);
+}
+
+.company-hall-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 3;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--color-ink-light, #8d745e);
+}
+
+/* Body : 2 colonnes desktop */
+.company-hall-body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+}
+
+.company-hall-info {
+  flex: 1.35;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* Le CompanyDetailPanel rend sa propre carte parchemin ; on neutralise sa bordure
+   ici pour qu'il se fonde dans la colonne. */
+.company-hall-info > div {
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.company-hall-chat {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(193, 154, 107, 0.3);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.company-hall-chat > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.company-hall-chat-loading {
+  padding: 24px;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-ink-light, #8d745e);
+}
+
+/* Onglets mobile */
+.company-hall-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(193, 154, 107, 0.3);
+}
+
+.company-hall-tab {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink-light, #8d745e);
+  border-bottom: 2px solid transparent;
+}
+
+.company-hall-tab.is-active {
+  color: var(--color-ink, #4a3728);
+  border-bottom-color: var(--color-ink, #4a3728);
+}
+
+/* Mobile : une seule colonne (l'onglet pilote info/chat) */
+@media (max-width: 768px) {
+  .company-hall-overlay {
+    padding: 0;
+  }
+  .company-hall-modal {
+    width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    border-top: none;
+  }
+  .company-hall-body {
+    flex-direction: column;
+  }
+  .company-hall-chat {
+    border-left: none;
+  }
+}

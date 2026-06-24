@@ -12,9 +12,11 @@ interface Props {
   onClose: () => void
   /** Masque le bouton retour (‹) — utile en sidebar desktop où le hall est la vue directe. */
   hideBack?: boolean
+  /** Masque la section chat — en modale 2 colonnes le chat est dans la colonne de droite. */
+  hideChat?: boolean
 }
 
-export function CompanyDetailPanel({ companyId, onClose, hideBack }: Props) {
+export function CompanyDetailPanel({ companyId, onClose, hideBack, hideChat }: Props) {
   const userId = usePlayerStore((s) => s.userId)
   const activeCompanyId = useCompanyStore((s) => s.activeCompanyId)
   const leave = useCompanyStore((s) => s.leave)
@@ -137,14 +139,16 @@ export function CompanyDetailPanel({ companyId, onClose, hideBack }: Props) {
         </ul>
       </div>
 
-      {/* Chat */}
-      <div style={s.section}>
-        <CompanyChatPanel
-          companyId={companyId}
-          members={detail.members}
-          accentColor={detail.color}
-        />
-      </div>
+      {/* Chat (masqué en modale 2 colonnes — il vit dans la colonne de droite) */}
+      {!hideChat && (
+        <div style={s.section}>
+          <CompanyChatPanel
+            companyId={companyId}
+            members={detail.members}
+            accentColor={detail.color}
+          />
+        </div>
+      )}
 
       {/* Quitter */}
       {!isFounder && (

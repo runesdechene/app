@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useCompanyStore } from '../../stores/companyStore'
 import { usePlayerStore } from '../../stores/playerStore'
-import { CompanyDetailPanel } from './CompanyDetailPanel'
 import { CompaniesJoinCreateModal } from './CompaniesJoinCreateModal'
+import { CompanyHallModal } from './CompanyHallModal'
 
 /**
- * Onglet « Compagnie » de la sidebar desktop. Affiche directement le HALL de
- * ta Compagnie (focus/active/première). Sélecteur si tu en as deux. Si aucune,
- * un appel à rejoindre/fonder qui ouvre la modale. Les actions (rejoindre,
- * fonder) vivent dans la modale ; ici on consulte. Classement → SPEC 3.
+ * Onglet « Compagnie » de la sidebar desktop. Liste ta/tes Compagnie(s) ;
+ * un clic ouvre le HALL en modale centrale 2 colonnes (CompanyHallModal).
+ * Rejoindre/fonder ouvre la modale dédiée. Après un join, le Hall de la
+ * compagnie rejointe s'ouvre automatiquement (focus posé par le store).
  */
 export function CompanySidebarPanel() {
   const userId = usePlayerStore((s) => s.userId)
@@ -19,80 +19,89 @@ export function CompanySidebarPanel() {
   const focusCompanyId = useCompanyStore((s) => s.focusCompanyId)
   const setFocusCompany = useCompanyStore((s) => s.setFocusCompany)
 
-  const [showModal, setShowModal] = useState(false)
+  const [showJoinCreate, setShowJoinCreate] = useState(false)
+  const [hallCompanyId, setHallCompanyId] = useState<string | null>(null)
 
   useEffect(() => {
     if (userId) loadMine(userId)
   }, [userId, loadMine])
 
+  // Après un join : ouvrir le Hall de la compagnie rejointe.
+  useEffect(() => {
+    if (focusCompanyId && myCompanies.some((c) => c.id === focusCompanyId)) {
+      setHallCompanyId(focusCompanyId)
+      setFocusCompany(null)
+    }
+  }, [focusCompanyId, myCompanies, setFocusCompany])
+
   if (!userId) return null
-
-  // Chargement initial
-  if (!companiesLoaded && myCompanies.length === 0) {
-    return (
-      <main className="activity-page-scroll">
-        <h1 className="activity-page-title">Ma Compagnie</h1>
-        <p style={styles.state}>Chargement…</p>
-      </main>
-    )
-  }
-
-  // Aucune Compagnie → appel à l'action (la modale fait le rejoindre/fonder)
-  if (myCompanies.length === 0) {
-    return (
-      <main className="activity-page-scroll">
-        <h1 className="activity-page-title">Ma Compagnie</h1>
-        <div style={styles.empty}>
-          <p style={styles.emptyText}>Tu ne fais partie d'aucune Compagnie.</p>
-          <button style={styles.primaryBtn} onClick={() => setShowModal(true)}>
-            Rejoindre ou fonder une Compagnie
-          </button>
-        </div>
-        {showModal && <CompaniesJoinCreateModal userId={userId} onClose={() => setShowModal(false)} />}
-      </main>
-    )
-  }
-
-  // ≥1 Compagnie : hall de la compagnie focus / active / première
-  const has = (id: string | null) => !!id && myCompanies.some((c) => c.id === id)
-  const shownId = (has(focusCompanyId) && focusCompanyId)
-    || (has(activeCompanyId) && activeCompanyId)
-    || myCompanies[0].id
 
   return (
     <main className="activity-page-scroll">
-      {myCompanies.length > 1 && (
-        <div style={styles.switcher}>
-          {myCompanies.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setFocusCompany(c.id)}
-              style={{
-                ...styles.switchBtn,
-                borderColor: c.id === shownId ? c.color : 'rgba(193,154,107,0.4)',
-                fontWeight: c.id === shownId ? 700 : 500,
-              }}
-            >
-              <span style={{ ...styles.switchDot, background: c.color }} />
-              {c.name}
-            </button>
-          ))}
+      <h1 className="activity-page-title">Ma Compagnie</h1>
+
+      {!companiesLoaded && myCompanies.length === 0 && (
+        <p style={styles.state}>Chargement…</p>
+      )}
+
+      {companiesLoaded && myCompanies.length === 0 && (
+        <div style={styles.empty}>
+          <p style={styles.emptyText}>Tu ne fais partie d'aucune Compagnie.</p>
+          <button style={styles.primaryBtn} onClick={() => setShowJoinCreate(true)}>
+            Rejoindre ou fonder une Compagnie
+          </button>
         </div>
       )}
 
-      <CompanyDetailPanel
-        companyId={shownId}
-        hideBack
-        onClose={() => setFocusCompany(null)}
-      />
+      {myCompanies.length > 0 && (
+        <>
+          <ul style={styles.list}>
+            {myCompanies.map((c) => (
+              <li
+                key={c.id}
+                style={{
+                  ...styles.card,
+                  borderColor: c.id === activeCompanyId ? c.color : 'rgba(193,154,107,0.25)',
+                }}
+                onClick={() => setHallCompanyId(c.id)}
+              >
+                <div style={{ ...styles.colorBar, background: c.color }} />
+                <div style={styles.emblemWrap}>
+                  {c.imageUrl ? (
+                    <img src={c.imageUrl} alt="" style={styles.emblem} />
+                  ) : (
+                    <div style={{ ...styles.emblemFallback, background: c.color }}>
+                      {c.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div style={styles.info}>
+                  <span style={styles.name}>{c.name}</span>
+                  <span style={styles.meta}>
+                    {c.memberCount} membre{c.memberCount !== 1 ? 's' : ''}
+                    {c.isFounder && ' · Fondateur'}
+                    {c.id === activeCompanyId && ' · Bannière active'}
+                  </span>
+                </div>
+                <span style={styles.arrow} aria-hidden>›</span>
+              </li>
+            ))}
+          </ul>
 
-      {myCompanies.length < 2 && (
-        <button style={styles.secondaryBtn} onClick={() => setShowModal(true)}>
-          Rejoindre ou fonder une autre Compagnie
-        </button>
+          {myCompanies.length < 2 && (
+            <button style={styles.secondaryBtn} onClick={() => setShowJoinCreate(true)}>
+              Rejoindre ou fonder une autre Compagnie
+            </button>
+          )}
+        </>
       )}
 
-      {showModal && <CompaniesJoinCreateModal userId={userId} onClose={() => setShowModal(false)} />}
+      {showJoinCreate && (
+        <CompaniesJoinCreateModal userId={userId} onClose={() => setShowJoinCreate(false)} />
+      )}
+      {hallCompanyId && (
+        <CompanyHallModal companyId={hallCompanyId} onClose={() => setHallCompanyId(null)} />
+      )}
     </main>
   )
 }
@@ -111,12 +120,21 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid rgba(193,154,107,0.5)', background: 'transparent',
     fontSize: '15px', color: 'var(--color-ink, #4A3728)', cursor: 'pointer',
   },
-  switcher: { display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' },
-  switchBtn: {
-    display: 'flex', alignItems: 'center', gap: '6px',
-    padding: '6px 12px', borderRadius: '999px', border: '1.5px solid',
-    background: 'rgba(255,255,255,0.4)', cursor: 'pointer',
-    fontSize: '14px', color: 'var(--color-ink, #4A3728)',
+  list: { listStyle: 'none', padding: 0, margin: '8px 0 0', display: 'flex', flexDirection: 'column', gap: '8px' },
+  card: {
+    display: 'flex', alignItems: 'center', gap: '12px',
+    background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(193,154,107,0.25)',
+    borderRadius: '10px', padding: '12px', position: 'relative', overflow: 'hidden', cursor: 'pointer',
   },
-  switchDot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0 },
+  colorBar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px' },
+  emblemWrap: { marginLeft: '4px', flexShrink: 0 },
+  emblem: { width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' },
+  emblemFallback: {
+    width: '40px', height: '40px', borderRadius: '8px', display: 'flex',
+    alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: 700,
+  },
+  info: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' },
+  name: { fontSize: '16px', fontWeight: 600, color: 'var(--color-ink, #4A3728)' },
+  meta: { fontSize: '14px', color: 'var(--color-ink-light, #8d745e)' },
+  arrow: { flexShrink: 0, fontSize: '20px', color: 'var(--color-ink-light, #8d745e)' },
 }
