@@ -1,5 +1,15 @@
 /* Page /compagnies (mobile) — style parchemin */
 
+/* Podium Coupe : les emblèmes de Compagnie sont des PHOTOS, pas des patterns
+   monochromes → on annule le filtre invert (sinon carré blanc) et on remplit. */
+.companies-page .coupe-step-emblem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: none;
+  border-radius: 50%;
+}
+
 /* Wrapper + titre (répliqués depuis ActivityPage.css, non importé ici) */
 .companies-page.activity-page-scroll {
   flex: 1;
