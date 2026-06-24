@@ -1,3 +1,10 @@
+# ALPHA V0.10.3
+## Le Hall de Compagnie devient lisible
+
+Dans le Hall, chaque membre affiche désormais **d'où viennent ses points de Coupe** — énigmes, visites GPS, veilles, conquête à l'or… On voit d'un coup d'œil qui apporte quoi à la Compagnie. Et vous pouvez **toucher un membre pour ouvrir son profil**.
+
+---
+
 # ALPHA V0.10.2
 ## L'emblème importé s'affiche bien
 

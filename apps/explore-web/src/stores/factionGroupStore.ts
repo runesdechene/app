@@ -47,6 +47,8 @@ export interface FactionMember {
   coupe: number
   /** Couronnes investies dans la Compagnie (le fondateur part avec le coût payé). */
   crownsInvested: number
+  /** Détail des points par source (clés non-nulles seulement) : enigmes/visites/ajouts/veilles/photos/or. */
+  breakdown?: Partial<Record<'enigmes' | 'visites' | 'ajouts' | 'veilles' | 'photos' | 'or', number>>
 }
 
 export interface FactionDetail {

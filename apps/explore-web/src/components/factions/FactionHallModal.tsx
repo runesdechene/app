@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { useMapStore } from '../../stores/mapStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from './FactionCreateForm'
@@ -9,6 +10,17 @@ import { CompanyInviteModal } from './CompanyInviteModal'
 import { CompanyEmblem } from './CompanyEmblem'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
+
+// Sources de points pour le détail par membre (icône + libellé).
+const SOURCE_META: Record<string, { icon: string; label: string }> = {
+  enigmes: { icon: '📜', label: 'énigmes' },
+  visites: { icon: '📍', label: 'visites GPS' },
+  ajouts:  { icon: '➕', label: 'lieux ajoutés' },
+  veilles: { icon: '⚑', label: 'veilles' },
+  photos:  { icon: '📷', label: 'photos' },
+  or:      { icon: '🪙', label: "conquête à l'or" },
+}
+const SOURCE_ORDER = ['enigmes', 'visites', 'ajouts', 'veilles', 'photos', 'or']
 
 interface Props {
   factionId: string
@@ -195,21 +207,40 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             )}
             {detail.members.map((m, i) => {
               const memberIsChef = i === 0
+              const sources = SOURCE_ORDER
+                .filter((k) => m.breakdown && m.breakdown[k as keyof typeof m.breakdown])
+                .map((k) => ({ k, pts: m.breakdown![k as keyof typeof m.breakdown] as number }))
+              const openProfile = () => {
+                useMapStore.getState().setSelectedPlayerId(m.userId)
+                onClose()
+              }
               return (
                 <div key={m.userId} className="faction-hall-rank-row"
                   style={memberIsChef ? { borderColor: detail.color, background: `${detail.color}14` } : undefined}>
                   <span className="faction-hall-rank-num" style={memberIsChef ? { color: detail.color } : undefined}>{i + 1}</span>
-                  {m.avatarUrl ? (
-                    <img className="faction-hall-rank-avatar" src={m.avatarUrl} alt="" />
-                  ) : (
-                    <span className="faction-hall-rank-avatar" style={{ background: detail.color }}>{initials(m.name)}</span>
-                  )}
-                  <div className="faction-hall-rank-info">
-                    <div className="faction-hall-rank-name">{m.name}</div>
-                    {memberIsChef && (
-                      <div className="faction-hall-rank-chef" style={{ color: detail.color }}>♛ Chef de Compagnie</div>
+                  <button type="button" className="faction-hall-rank-id" onClick={openProfile}
+                    title={`Voir le profil de ${m.name}`}>
+                    {m.avatarUrl ? (
+                      <img className="faction-hall-rank-avatar" src={m.avatarUrl} alt="" />
+                    ) : (
+                      <span className="faction-hall-rank-avatar" style={{ background: detail.color }}>{initials(m.name)}</span>
                     )}
-                  </div>
+                    <div className="faction-hall-rank-info">
+                      <div className="faction-hall-rank-name">{m.name}</div>
+                      {memberIsChef && (
+                        <div className="faction-hall-rank-chef" style={{ color: detail.color }}>♛ Chef de Compagnie</div>
+                      )}
+                      {sources.length > 0 && (
+                        <div className="faction-hall-rank-sources">
+                          {sources.map(({ k, pts }) => (
+                            <span key={k} className="faction-hall-rank-src" title={`${pts} pt${pts > 1 ? 's' : ''} — ${SOURCE_META[k].label}`}>
+                              {SOURCE_META[k].icon} {pts}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </button>
                   <span className="faction-hall-rank-stats">
                     🏆 {m.coupe.toLocaleString('fr-FR')}
                     {m.crownsInvested > 0 && <>{'  '}🪙 {m.crownsInvested.toLocaleString('fr-FR')}</>}
