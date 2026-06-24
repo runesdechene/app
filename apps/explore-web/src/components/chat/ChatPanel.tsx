@@ -3,6 +3,7 @@ import { useChatStore } from '../../stores/chatStore'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useMobileNavStore } from '../../stores/mobileNavStore'
+import { useFactionGroupStore, type MyFaction } from '../../stores/factionGroupStore'
 import { sendChatMessage } from '../../hooks/useChat'
 import { supabase } from '../../lib/supabase'
 import type { ChatMessage } from '../../stores/chatStore'
@@ -17,15 +18,13 @@ function formatTime(iso: string): string {
 
 // ---- Sub-components ----
 
-function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
+function ChannelFilters({ companies }: { companies: MyFaction[] }) {
   const showGeneral = useChatStore((s) => s.showGeneral)
-  const showFaction = useChatStore((s) => s.showFaction)
   const showBugs = useChatStore((s) => s.showBugs)
+  const showCompany = useChatStore((s) => s.showCompany)
   const toggleGeneral = useChatStore((s) => s.toggleShowGeneral)
-  const toggleFaction = useChatStore((s) => s.toggleShowFaction)
   const toggleBugs = useChatStore((s) => s.toggleShowBugs)
-  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
-  const companyName = usePlayerStore((s) => s.userFactionTitle) || 'Compagnie'
+  const toggleCompany = useChatStore((s) => s.toggleShowCompany)
 
   return (
     <div className="chat-filters">
@@ -33,12 +32,17 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
         <input type="checkbox" checked={showGeneral} onChange={toggleGeneral} />
         Général
       </label>
-      {hasFaction && (
-        <label className="chat-filter chat-filter-faction" style={{ color: userFactionColor || undefined }}>
-          <input type="checkbox" checked={showFaction} onChange={toggleFaction} style={{ accentColor: userFactionColor || undefined }} />
-          {companyName}
+      {companies.map((c) => (
+        <label key={c.id} className="chat-filter chat-filter-faction" style={{ color: c.color }}>
+          <input
+            type="checkbox"
+            checked={showCompany[c.id] !== false}
+            onChange={() => toggleCompany(c.id)}
+            style={{ accentColor: c.color }}
+          />
+          {c.name}
         </label>
-      )}
+      ))}
       <label className="chat-filter chat-filter-bugs">
         <input type="checkbox" checked={showBugs} onChange={toggleBugs} />
         Bugs
@@ -47,61 +51,41 @@ function ChannelFilters({ hasFaction }: { hasFaction: boolean }) {
   )
 }
 
-function MessageList({
-  messages,
-  userFactionColor,
-}: {
-  messages: ChatMessage[]
-  userFactionColor: string | null
-}) {
+function MessageList({ messages, companies }: { messages: ChatMessage[]; companies: MyFaction[] }) {
   const listRef = useRef<HTMLDivElement>(null)
   const mobilePanel = useMobileNavStore(s => s.activePanel)
+  const companyIds = useMemo(() => new Set(companies.map(c => c.id)), [companies])
 
   useEffect(() => {
-    if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight
-    }
+    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages.length, mobilePanel])
 
   if (messages.length === 0) {
-    return (
-      <div className="chat-messages chat-empty">
-        Aucun message. Soyez le premier !
-      </div>
-    )
+    return <div className="chat-messages chat-empty">Aucun message. Soyez le premier !</div>
   }
 
   return (
     <div className="chat-messages" ref={listRef}>
       {messages.map((msg) => {
-        const isFaction = msg.channel !== 'general' && msg.channel !== 'bugs'
         const isBugs = msg.channel === 'bugs'
-        // Faction messages: texte en couleur faction. Bugs: rose. General: texte neutre.
-        const textColor = isBugs
-          ? '#9ea03f'
-          : isFaction
-            ? (msg.factionColor || userFactionColor || 'var(--color-sepia)')
-            : undefined
-
+        const isCompany = msg.channel !== 'general' && !isBugs
+        const textColor = isBugs ? '#9ea03f' : isCompany ? (msg.factionColor || 'var(--color-sepia)') : undefined
         return (
           <div key={msg.id} className="chat-message">
-            {isFaction && (
-              <span className="chat-channel-tag" style={{ color: msg.factionColor || undefined }}>[F]</span>
+            {isCompany && (
+              <span className="chat-channel-tag" style={{ color: msg.factionColor || undefined }}>
+                {companyIds.has(msg.channel) ? '[C]' : '[C]'}
+              </span>
             )}
-            {isBugs && (
-              <span className="chat-channel-tag chat-channel-tag-bugs">[B]</span>
-            )}
+            {isBugs && <span className="chat-channel-tag chat-channel-tag-bugs">[B]</span>}
             <span
               className="chat-message-name"
-              style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px', ...(isFaction ? { color: msg.factionColor || undefined } : undefined) }}
+              style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px', ...(isCompany ? { color: msg.factionColor || undefined } : undefined) }}
               onClick={() => useMapStore.getState().setSelectedPlayerId(msg.userId)}
             >
               {msg.userName}
             </span>
-            <span
-              className="chat-message-content"
-              style={textColor ? { color: textColor } : undefined}
-            >
+            <span className="chat-message-content" style={textColor ? { color: textColor } : undefined}>
               {msg.content}
             </span>
             <span className="chat-message-time">{formatTime(msg.createdAt)}</span>
@@ -112,148 +96,103 @@ function MessageList({
   )
 }
 
-function ChatInput({ hasFaction }: { hasFaction: boolean }) {
+function ChatInput({ companies }: { companies: MyFaction[] }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const sendChannel = useChatStore((s) => s.sendChannel)
   const setSendChannel = useChatStore((s) => s.setSendChannel)
-  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
-  const companyName = usePlayerStore((s) => s.userFactionTitle) || 'Compagnie'
+
+  // Si le canal d'envoi pointe une Compagnie qu'on a quittée, retomber sur Général.
+  useEffect(() => {
+    if (sendChannel !== 'general' && sendChannel !== 'bugs' && !companies.some(c => c.id === sendChannel)) {
+      setSendChannel('general')
+    }
+  }, [companies, sendChannel, setSendChannel])
 
   async function handleSend() {
     const raw = text.trim()
     if (!raw || sending) return
 
-    // Cheat code: recharge toutes les ressources au max (admin only, en base)
+    // Cheat code refill (admin)
     if (raw === '1453') {
       setText('')
       const fog = usePlayerStore.getState()
       if (!fog.userId) return
       const { data } = await supabase.rpc('cheat_refill', { p_user_id: fog.userId })
-      if (data && data.success) {
-        fog.setEnergy(data.energy)
-        fog.setNextPointIn(0)
-      }
+      if (data && data.success) { fog.setEnergy(data.energy); fog.setNextPointIn(0) }
       return
     }
-
-    // Cheat code ciblé: 1453>NomJoueur — refill un autre joueur + message système
     if (raw.startsWith('1453>') && raw.length > 5) {
       setText('')
       const targetName = raw.slice(5).trim()
       if (!targetName) return
       const fog = usePlayerStore.getState()
       if (!fog.userId) return
-      const { data } = await supabase.rpc('cheat_refill_target', {
-        p_caller_id: fog.userId,
-        p_target_name: targetName,
-      })
+      const { data } = await supabase.rpc('cheat_refill_target', { p_caller_id: fog.userId, p_target_name: targetName })
       if (data && data.success) {
-        // Message système dans le chat général
         await supabase.from('chat_messages').insert({
-          channel: 'general',
-          user_id: fog.userId,
-          user_name: 'Les Dieux',
-          content: `${data.targetName} a re\u00E7u un don des Dieux \u26A1 Ses ressources ont \u00E9t\u00E9 recharg\u00E9es`,
+          channel: 'general', user_id: fog.userId, user_name: 'Les Dieux',
+          content: `${data.targetName} a reçu un don des Dieux ⚡ Ses ressources ont été rechargées`,
         })
       }
       return
     }
 
-    // Raccourcis : ! = général, @ = faction, # = bugs
+    // Raccourcis : ! = général, # = bugs
     let channel = sendChannel
     let content = raw
-    if (raw.startsWith('!') && raw.length > 1) {
-      channel = 'general'
-      content = raw.slice(1).trimStart()
-    } else if (raw.startsWith('@') && hasFaction && raw.length > 1) {
-      channel = 'faction'
-      content = raw.slice(1).trimStart()
-    } else if (raw.startsWith('#') && raw.length > 1) {
-      channel = 'bugs'
-      content = raw.slice(1).trimStart()
-    }
+    if (raw.startsWith('!') && raw.length > 1) { channel = 'general'; content = raw.slice(1).trimStart() }
+    else if (raw.startsWith('#') && raw.length > 1) { channel = 'bugs'; content = raw.slice(1).trimStart() }
 
     if (!content) return
     setSending(true)
     setSendError(null)
     const result = await sendChatMessage(content, channel)
-    if (result.success) {
-      setText('')
-    } else {
-      setSendError(result.error ?? 'Erreur inconnue')
-      setTimeout(() => setSendError(null), 4000)
-    }
+    if (result.success) setText('')
+    else { setSendError(result.error ?? 'Erreur inconnue'); setTimeout(() => setSendError(null), 4000) }
     setSending(false)
-    // Pas besoin de re-focus : l'input ne perd jamais le focus parce que
-    // - touche Enter : focus déjà sur l'input
-    // - bouton Envoyer : onMouseDown preventDefault empêche le vol de focus
-    // → le clavier mobile reste ouvert sans clignoter.
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
   return (
     <div className="chat-input-area">
-      {/* Channel selector */}
       <div className="chat-send-channels">
         <button
           className={`chat-send-channel${sendChannel === 'general' ? ' chat-send-channel-active' : ''}`}
           onClick={() => setSendChannel('general')}
-        >
-          ! Général
-        </button>
-        {hasFaction && (
+        >! Général</button>
+        {companies.map((c) => (
           <button
-            className={`chat-send-channel${sendChannel === 'faction' ? ' chat-send-channel-active' : ''}`}
-            onClick={() => setSendChannel('faction')}
-            style={{ color: userFactionColor || undefined, borderColor: sendChannel === 'faction' ? userFactionColor || undefined : undefined }}
-          >
-            @ {companyName}
-          </button>
-        )}
+            key={c.id}
+            className={`chat-send-channel${sendChannel === c.id ? ' chat-send-channel-active' : ''}`}
+            onClick={() => setSendChannel(c.id)}
+            style={{ color: c.color, borderColor: sendChannel === c.id ? c.color : undefined }}
+          >{c.name}</button>
+        ))}
         <button
           className={`chat-send-channel chat-send-channel-bugs${sendChannel === 'bugs' ? ' chat-send-channel-active' : ''}`}
           onClick={() => setSendChannel('bugs')}
-        >
-          # Bugs
-        </button>
+        ># Bugs</button>
       </div>
 
-      {/* Erreur d'envoi */}
-      {sendError && (
-        <div className="chat-send-error">{sendError}</div>
-      )}
+      {sendError && <div className="chat-send-error">{sendError}</div>}
 
-      {/* Input */}
       <div className="chat-input">
         <input
-          ref={inputRef}
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ecrire un message..."
-          maxLength={500}
-          readOnly={sending}
+          ref={inputRef} type="text" value={text}
+          onChange={(e) => setText(e.target.value)} onKeyDown={handleKeyDown}
+          placeholder="Ecrire un message..." maxLength={500} readOnly={sending}
           className="chat-input-field"
         />
         <button
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={handleSend}
-          disabled={sending || !text.trim()}
-          className="chat-send-btn"
-          aria-label="Envoyer"
-        >
-          &#10148;
-        </button>
+          onMouseDown={(e) => e.preventDefault()} onClick={handleSend}
+          disabled={sending || !text.trim()} className="chat-send-btn" aria-label="Envoyer"
+        >&#10148;</button>
       </div>
     </div>
   )
@@ -263,51 +202,43 @@ function ChatInput({ hasFaction }: { hasFaction: boolean }) {
 
 export function ChatPanel() {
   const userId = usePlayerStore((s) => s.userId)
-  const userFactionId = usePlayerStore((s) => s.userFactionId)
-  const userFactionColor = usePlayerStore((s) => s.userFactionColor)
+  const companies = useFactionGroupStore((s) => s.myFactions)
 
   const showGeneral = useChatStore((s) => s.showGeneral)
-  const showFaction = useChatStore((s) => s.showFaction)
   const showBugs = useChatStore((s) => s.showBugs)
+  const showCompany = useChatStore((s) => s.showCompany)
   const generalMessages = useChatStore((s) => s.generalMessages)
-  const factionMessages = useChatStore((s) => s.factionMessages)
   const bugsMessages = useChatStore((s) => s.bugsMessages)
+  const companyMessages = useChatStore((s) => s.companyMessages)
 
   const [isOpen, setIsOpen] = useState(true)
   const mobilePanel = useMobileNavStore(s => s.activePanel)
 
-  // Ouvrir/fermer automatiquement quand la navbar mobile toggle le chat
-  useEffect(() => {
-    if (mobilePanel === 'chat') setIsOpen(true)
-  }, [mobilePanel])
+  useEffect(() => { if (mobilePanel === 'chat') setIsOpen(true) }, [mobilePanel])
 
-  // Fusionner et trier les messages visibles
   const mergedMessages = useMemo(() => {
     const all: ChatMessage[] = []
     if (showGeneral) all.push(...generalMessages)
-    if (showFaction) all.push(...factionMessages)
     if (showBugs) all.push(...bugsMessages)
+    for (const c of companies) {
+      if (showCompany[c.id] !== false) all.push(...(companyMessages[c.id] ?? []))
+    }
     return all.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-  }, [generalMessages, factionMessages, bugsMessages, showGeneral, showFaction, showBugs])
+  }, [generalMessages, bugsMessages, companyMessages, companies, showGeneral, showBugs, showCompany])
 
   if (!userId) return null
-
-  const hasFaction = !!userFactionId
 
   return (
     <div className={`chat-panel${isOpen ? '' : ' chat-panel-closed'}`}>
       <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? '\u2013' : '\uD83D\uDCAC'}
+        {isOpen ? '–' : '💬'}
       </button>
 
       {isOpen && (
         <>
-          <ChannelFilters hasFaction={hasFaction} />
-          <MessageList
-            messages={mergedMessages}
-            userFactionColor={userFactionColor}
-          />
-          <ChatInput hasFaction={hasFaction} />
+          <ChannelFilters companies={companies} />
+          <MessageList messages={mergedMessages} companies={companies} />
+          <ChatInput companies={companies} />
         </>
       )}
     </div>

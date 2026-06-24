@@ -13,7 +13,8 @@ export function MobileNavbar() {
   const userId = usePlayerStore(s => s.userId)
   const unseenCount = useToastStore(s => s.toasts.filter(t => t.timestamp > seenAt && t.actorId !== userId).length)
   const unseenChat = useChatStore(s => {
-    const all = [...s.generalMessages, ...s.factionMessages]
+    const companyMsgs = Object.values(s.companyMessages).flat()
+    const all = [...s.generalMessages, ...companyMsgs]
     return all.filter(m => new Date(m.createdAt).getTime() > chatSeenAt && m.userId !== userId).length
   })
   const avatarUrl = usePlayerStore(s => s.userAvatarUrl)

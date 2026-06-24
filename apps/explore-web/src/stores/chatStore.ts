@@ -12,20 +12,23 @@ export interface ChatMessage {
   createdAt: string
 }
 
-export type ChatChannel = 'general' | 'faction' | 'bugs'
+/** 'general' | 'bugs' | <companyId> (une Compagnie = la faction, channel = son id) */
+export type ChatChannel = string
 
 const MAX_MESSAGES = 100
 
 interface ChatState {
-  /** Filtres d'affichage (quels canaux on voit) */
+  /** Filtres d'affichage des canaux fixes */
   showGeneral: boolean
-  showFaction: boolean
   showBugs: boolean
   toggleShowGeneral: () => void
-  toggleShowFaction: () => void
   toggleShowBugs: () => void
 
-  /** Canal d'envoi (où on écrit) */
+  /** Filtres d'affichage par Compagnie (clé = companyId ; défaut = visible) */
+  showCompany: Record<string, boolean>
+  toggleShowCompany: (companyId: string) => void
+
+  /** Canal d'envoi ('general' | 'bugs' | companyId) */
   sendChannel: ChatChannel
   setSendChannel: (ch: ChatChannel) => void
 
@@ -33,22 +36,29 @@ interface ChatState {
   addGeneralMessage: (msg: ChatMessage) => void
   setGeneralMessages: (msgs: ChatMessage[]) => void
 
-  factionMessages: ChatMessage[]
-  addFactionMessage: (msg: ChatMessage) => void
-  setFactionMessages: (msgs: ChatMessage[]) => void
-
   bugsMessages: ChatMessage[]
   addBugsMessage: (msg: ChatMessage) => void
   setBugsMessages: (msgs: ChatMessage[]) => void
+
+  /** Messages par Compagnie (clé = companyId) */
+  companyMessages: Record<string, ChatMessage[]>
+  addCompanyMessage: (msg: ChatMessage) => void
+  setCompanyMessages: (companyId: string, msgs: ChatMessage[]) => void
+  /** Purge les buckets des Compagnies qu'on ne suit plus. */
+  pruneCompanies: (keepIds: string[]) => void
 }
 
 export const useChatStore = create<ChatState>((set) => ({
   showGeneral: true,
-  showFaction: true,
   showBugs: true,
   toggleShowGeneral: () => set((s) => ({ showGeneral: !s.showGeneral })),
-  toggleShowFaction: () => set((s) => ({ showFaction: !s.showFaction })),
   toggleShowBugs: () => set((s) => ({ showBugs: !s.showBugs })),
+
+  showCompany: {},
+  toggleShowCompany: (companyId) =>
+    set((s) => ({
+      showCompany: { ...s.showCompany, [companyId]: s.showCompany[companyId] === false },
+    })),
 
   sendChannel: 'general',
   setSendChannel: (ch) => set({ sendChannel: ch }),
@@ -61,14 +71,6 @@ export const useChatStore = create<ChatState>((set) => ({
     }),
   setGeneralMessages: (msgs) => set({ generalMessages: msgs.slice(-MAX_MESSAGES) }),
 
-  factionMessages: [],
-  addFactionMessage: (msg) =>
-    set((state) => {
-      if (state.factionMessages.some((m) => m.id === msg.id)) return state
-      return { factionMessages: [...state.factionMessages, msg].slice(-MAX_MESSAGES) }
-    }),
-  setFactionMessages: (msgs) => set({ factionMessages: msgs.slice(-MAX_MESSAGES) }),
-
   bugsMessages: [],
   addBugsMessage: (msg) =>
     set((state) => {
@@ -76,4 +78,27 @@ export const useChatStore = create<ChatState>((set) => ({
       return { bugsMessages: [...state.bugsMessages, msg].slice(-MAX_MESSAGES) }
     }),
   setBugsMessages: (msgs) => set({ bugsMessages: msgs.slice(-MAX_MESSAGES) }),
+
+  companyMessages: {},
+  addCompanyMessage: (msg) =>
+    set((state) => {
+      const current = state.companyMessages[msg.channel] ?? []
+      if (current.some((m) => m.id === msg.id)) return state
+      return {
+        companyMessages: {
+          ...state.companyMessages,
+          [msg.channel]: [...current, msg].slice(-MAX_MESSAGES),
+        },
+      }
+    }),
+  setCompanyMessages: (companyId, msgs) =>
+    set((state) => ({
+      companyMessages: { ...state.companyMessages, [companyId]: msgs.slice(-MAX_MESSAGES) },
+    })),
+  pruneCompanies: (keepIds) =>
+    set((state) => {
+      const next: Record<string, ChatMessage[]> = {}
+      for (const id of keepIds) if (state.companyMessages[id]) next[id] = state.companyMessages[id]
+      return { companyMessages: next }
+    }),
 }))
