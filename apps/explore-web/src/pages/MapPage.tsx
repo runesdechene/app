@@ -318,13 +318,9 @@ export default function MapPage() {
       usePlayerStore.getState().setReplayTutorial(false)
       return
     }
-    // Si nouveau joueur sans faction → ouvrir FactionModal AVANT de marquer le tuto terminé
-    // (la fermeture de FactionModal marquera le tuto terminé)
-    if (!usePlayerStore.getState().userFactionId) {
-      setShowFactionModal(true)
-    } else {
-      markTutorialComplete()
-    }
+    // PIVOT identité (24/06) : aucune Compagnie imposée. Le joueur démarre
+    // sans bannière et fonde/rejoint quand il veut via le scoreboard.
+    markTutorialComplete()
   }
 
   function markTutorialComplete() {
@@ -558,13 +554,13 @@ export default function MapPage() {
       {showOnboarding && (
         <OnboardingModal onComplete={() => {
           setShowOnboarding(false)
-          // Flux nouveau joueur : onboarding → slides "after" → FactionModal
+          // Flux nouveau joueur : onboarding → slides "after" → fin (PAS de Compagnie
+          // imposée depuis le pivot identité 24/06). Le joueur fonde/rejoint plus tard.
           const afterSlides = tutorialSlides.filter(s => s.phase === 'after')
           if (afterSlides.length > 0 && !usePlayerStore.getState().tutorialCompletedAt) {
             setTutorialPhase('after')
-          } else if (!usePlayerStore.getState().userFactionId) {
-            // Pas de slides after → aller directement à la FactionModal
-            setShowFactionModal(true)
+          } else if (!usePlayerStore.getState().tutorialCompletedAt) {
+            markTutorialComplete()
           }
         }} />
       )}

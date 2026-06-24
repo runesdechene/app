@@ -1,125 +1,18 @@
 /* ==========================================
-   FACTION SCOREBOARD — V0.7 phase 3, jauges verticales
-   Identification par emblème + couleur de faction (pas de nom texte
-   pour rester schématique). Click sur une jauge → modal members.
-   Click sur le label bas → modal Coupe complète.
+   SCOREBOARD COMPAGNIES — layout HORIZONTAL (façon Age of Empires)
+   Rangée de chips (emblème + nom + score Coupe), classée. Clic → Hall.
    ========================================== */
 
 .faction-scoreboard {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 6px;
   width: auto;
+  max-width: min(640px, 92vw);
 }
 
-.faction-scoreboard-bars {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 8px 10px 6px;
-  background: rgba(245, 230, 211, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.faction-scoreboard-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 32px;
-  cursor: pointer;
-  transition: transform 120ms ease-out;
-}
-
-.faction-scoreboard-col:hover {
-  transform: translateY(-2px);
-}
-
-.faction-scoreboard-col-mine .faction-scoreboard-emblem {
-  border: 2px solid var(--faction-color);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.18);
-}
-
-/* Couronne 👑 du leader, posée au-dessus de l'emblème */
-.faction-scoreboard-crown {
-  font-size: 14px;
-  line-height: 1;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.faction-scoreboard-crown-spacer {
-  height: 16px;  /* préserve l'alignement vertical des jauges */
-}
-
-/* Emblème faction = cercle de couleur faction + pattern blanc à l'intérieur */
-.faction-scoreboard-emblem {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--faction-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-}
-
-.faction-scoreboard-emblem-img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
-}
-
-/* V0.9 — bannière illustrée (étendard vertical) au-dessus de la jauge, remplace
-   l'emblème rond. Fallback sur .faction-scoreboard-emblem si pas de bannière. */
-.faction-scoreboard-banner {
-  width: 36px;
-  height: 50px;
-  object-fit: contain;
-  flex-shrink: 0;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-/* Track (fond) + fill (proportionnel) de la jauge verticale.
-   Hauteur fixe pour rester schématique, le fill grandit du bas. */
-.faction-scoreboard-track {
-  position: relative;
-  width: 12px;
-  height: 64px;
-  border-radius: 6px;
-  background: rgba(74, 55, 40, 0.15);
-  overflow: hidden;
-}
-
-.faction-scoreboard-fill {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: var(--faction-color);
-  border-radius: 6px;
-  transition: height 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-
-.faction-scoreboard-score {
-  font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--faction-color);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-/* Label bas — cliquable, ouvre la modal Coupe complète */
+/* Label haut — cliquable, ouvre la modale classement complet */
 .faction-scoreboard-live {
   display: inline-flex;
   align-items: center;
@@ -139,28 +32,87 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-
-.faction-scoreboard-live:hover {
-  background: rgba(245, 230, 211, 1);
-  color: rgba(74, 55, 40, 0.9);
-}
-
+.faction-scoreboard-live:hover { background: rgba(245, 230, 211, 1); color: rgba(74, 55, 40, 0.9); }
 .faction-scoreboard-live-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #b8860b;
-  animation: live-pulse 2s ease-in-out infinite;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #b8860b; animation: live-pulse 2s ease-in-out infinite;
+}
+.faction-scoreboard-live-season { text-transform: none; letter-spacing: 0; opacity: 0.7; font-weight: 500; }
+@keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Rail horizontal des chips */
+.faction-scoreboard-rail {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(245, 230, 211, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+.faction-scoreboard-rail::-webkit-scrollbar { height: 0; display: none; }
+
+/* Chip = entrée horizontale d'une Compagnie */
+.faction-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: transform 120ms ease-out, border-color 120ms ease-out;
+}
+.faction-chip:hover { transform: translateY(-1px); }
+.faction-chip-mine { border-color: var(--faction-color); box-shadow: 0 0 0 1px var(--faction-color) inset; }
+
+.faction-chip-crown {
+  position: absolute; top: -9px; left: 4px; font-size: 13px; line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
-.faction-scoreboard-live-season {
-  text-transform: none;
-  letter-spacing: 0;
-  opacity: 0.7;
-  font-weight: 500;
+.faction-chip-emblem {
+  width: 24px; height: 24px; border-radius: 50%; flex: none;
+  background: var(--faction-color);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.faction-chip-emblem-img { width: 16px; height: 16px; object-fit: contain; filter: brightness(0) invert(1); }
+.faction-chip-banner { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex: none; }
+
+.faction-chip-name {
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 13px; font-weight: 600; color: #4a3728;
+  max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.faction-chip-score {
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 12px; font-weight: 700; color: var(--faction-color);
+  font-variant-numeric: tabular-nums; flex: none;
 }
 
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+/* Bouton Fonder en fin de rail */
+.faction-scoreboard-found {
+  flex: none;
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px dashed rgba(74, 55, 40, 0.4);
+  background: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-accent, 'Cinzel', serif);
+  font-size: 12px; font-weight: 600; color: #4a3728; cursor: pointer;
+  white-space: nowrap;
+}
+.faction-scoreboard-found:hover { background: rgba(193, 154, 107, 0.2); }
+
+@media (max-width: 768px) {
+  .faction-scoreboard { max-width: 100%; }
+  .faction-chip-name { max-width: 90px; }
 }

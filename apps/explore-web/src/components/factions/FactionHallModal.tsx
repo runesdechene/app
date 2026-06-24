@@ -23,11 +23,15 @@ function initials(name: string): string {
 export function FactionHallModal({ factionId, onClose }: Props) {
   const userId = usePlayerStore((s) => s.userId)
   const leave = useFactionGroupStore((s) => s.leave)
+  const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
+  const myFactions = useFactionGroupStore((s) => s.myFactions)
 
   const [detail, setDetail] = useState<FactionDetail | null>(null)
   const [showEdit, setShowEdit] = useState(false)
   const [leaving, setLeaving] = useState(false)
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState<string | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
@@ -52,6 +56,23 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     if ('success' in result) onClose()
   }
 
+  async function handleJoin() {
+    if (!userId) return
+    setJoining(true)
+    setJoinError(null)
+    const result = await join(userId, factionId)
+    setJoining(false)
+    if ('error' in result) {
+      setJoinError(
+        result.error === 'too_many' ? 'Tu fais déjà partie de 2 Compagnies.'
+        : result.error === 'already_member' ? 'Tu es déjà membre.'
+        : 'Impossible de rejoindre pour le moment.'
+      )
+      return
+    }
+    reload()
+  }
+
   async function handleRemove(targetId: string) {
     if (!userId) return
     setRemovingId(targetId)
@@ -74,6 +95,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const chefId = detail.members[0]?.userId ?? null
   const isChef = chefId === userId
   const isMember = detail.members.some((m) => m.userId === userId)
+  const atLimit = !isMember && myFactions.length >= 2
 
   // Objet MyFaction minimal pour le formulaire d'édition.
   const editFaction: MyFaction = {
@@ -164,11 +186,22 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             <button className="faction-hall-leave" onClick={handleLeave} disabled={leaving}>
               {leaving ? 'En cours…' : 'Quitter la Compagnie'}
             </button>
-          ) : <span />}
+          ) : (
+            <button
+              className="faction-hall-join"
+              style={{ background: detail.color }}
+              onClick={handleJoin}
+              disabled={joining || atLimit}
+              title={atLimit ? 'Tu fais déjà partie de 2 Compagnies' : undefined}
+            >
+              {joining ? 'En cours…' : atLimit ? 'Limite de 2 atteinte' : 'Rejoindre cette Compagnie'}
+            </button>
+          )}
           {isChef && (
             <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer l'identité</button>
           )}
         </div>
+        {joinError && <p className="faction-hall-joinerror">{joinError}</p>}
       </div>
 
       {/* Édition (Chef) */}

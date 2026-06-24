@@ -188,6 +188,18 @@
   font-size: 12px; font-weight: 600; color: #2a1f10;
 }
 .faction-hall-edit:hover { background: rgba(193, 154, 107, 0.28); }
+.faction-hall-join {
+  border: none; cursor: pointer;
+  padding: 9px 18px; border-radius: 14px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+.faction-hall-join:disabled { opacity: 0.5; cursor: not-allowed; }
+.faction-hall-joinerror {
+  margin: 0; padding: 8px 24px 14px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 12px; color: #c0392b; background: #faf2dd;
+}
 
 @media (max-width: 768px) {
   .faction-hall-overlay { padding: 0; align-items: stretch; z-index: 10010; }
