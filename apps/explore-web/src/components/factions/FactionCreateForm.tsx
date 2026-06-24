@@ -5,10 +5,12 @@ import { uploadFactionImage } from '../../lib/factionImageUpload'
 import type { MyFaction } from '../../stores/factionGroupStore'
 import './FactionCreateForm.css'
 
-// Palette sobre — tons naturels, ni criards ni pastel fade
+// Palette élargie — tons naturels + accents. + un color picker libre à côté.
 const COLOR_PALETTE = [
   '#4A7C59', '#6B4E3D', '#2E5D7E', '#8B6914', '#7C4A6B',
   '#4A6B7C', '#7C6B4A', '#4A4A7C', '#7C4A4A', '#3D6B5D',
+  '#A93D76', '#57B33D', '#3C56BE', '#C94436', '#2E8B57',
+  '#7E3FA0', '#C97A1E', '#1E6F6F', '#9B2D2D', '#5D4037',
 ]
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -170,6 +172,23 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
                   aria-label={`Couleur ${c}`} title={c}
                 />
               ))}
+              {/* Color picker libre (RGB) */}
+              <label
+                className="faction-form-color faction-form-color-picker"
+                style={{
+                  background: COLOR_PALETTE.includes(color) ? undefined : color,
+                  outline: COLOR_PALETTE.includes(color) ? '3px solid transparent' : `3px solid ${color}`,
+                  outlineOffset: '2px',
+                }}
+                title="Couleur personnalisée"
+              >
+                {COLOR_PALETTE.includes(color) && <span aria-hidden>🎨</span>}
+                <input
+                  type="color" value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  disabled={submitting}
+                />
+              </label>
             </div>
           </div>
 
