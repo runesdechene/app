@@ -1,3 +1,10 @@
+# ALPHA V0.10.6
+## Compagnies « complètes », visibles d'un coup d'œil
+
+Quand une Compagnie devient beaucoup plus nombreuse que les autres, elle affiche désormais un badge **🔒 Complète** dans l'explorateur, et le bouton Rejoindre l'indique clairement — pour orienter les nouveaux vers les Compagnies qui ont besoin de monde.
+
+---
+
 # ALPHA V0.10.5
 ## Dissoudre, et des Compagnies plus équilibrées
 
