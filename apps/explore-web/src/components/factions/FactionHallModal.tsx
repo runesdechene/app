@@ -286,12 +286,18 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           <div className="faction-hall-joinbar">
             <button
               className="faction-hall-join-big"
-              style={{ background: atLimit ? undefined : detail.color }}
+              style={{ background: (atLimit || detail.locked) ? undefined : detail.color }}
               onClick={handleJoin}
-              disabled={joining || atLimit}
+              disabled={joining || atLimit || !!detail.locked}
             >
-              {joining ? 'En cours…' : atLimit ? 'Tu fais déjà partie de 2 Compagnies' : '⚔️ Rejoindre cette Compagnie'}
+              {joining ? 'En cours…'
+                : atLimit ? 'Tu fais déjà partie de 2 Compagnies'
+                : detail.locked ? '🔒 Compagnie complète'
+                : '⚔️ Rejoindre cette Compagnie'}
             </button>
+            {detail.locked && !atLimit && (
+              <p className="faction-hall-joinerror">Cette Compagnie est au complet pour l’instant — d’autres ont besoin de toi.</p>
+            )}
             {joinError && <p className="faction-hall-joinerror">{joinError}</p>}
           </div>
         )}

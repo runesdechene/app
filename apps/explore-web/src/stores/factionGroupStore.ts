@@ -35,6 +35,8 @@ export interface FactionSummary {
   score: number
   /** Tags/mots-clés de la Compagnie. */
   tags: string[]
+  /** Compagnie « complète » (trop peuplée vs moyenne) → adhésion bloquée. */
+  locked?: boolean
 }
 
 export interface FactionMember {
@@ -67,6 +69,8 @@ export interface FactionDetail {
   createdBy: string | null
   isOfficial: boolean
   memberCount: number
+  /** Compagnie « complète » (trop peuplée vs moyenne) → adhésion bloquée. */
+  locked?: boolean
   /** Coupe cumulée des membres actifs. */
   totalCoupe: number
   /** Couronnes investies cumulées (fondation + conquête) des membres. */

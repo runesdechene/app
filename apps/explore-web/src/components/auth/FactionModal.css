@@ -216,6 +216,10 @@
   padding: 4px 15px;
   border-radius: 20px;
 }
+.faction-card-badge-full {
+  color: #9b2d2d;
+  background: rgba(155, 45, 45, 0.12);
+}
 
 .faction-card.underdog {
   border-color: rgba(255, 180, 50, 0.5);

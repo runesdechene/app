@@ -87,6 +87,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                     />
                     <span className="faction-card-name">{c.name}</span>
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
+                    {!isMember && c.locked && <span className="faction-card-badge faction-card-badge-full">🔒 Complète</span>}
                   </div>
                   {c.description && (
                     <div className="faction-card-desc">{c.description}</div>
