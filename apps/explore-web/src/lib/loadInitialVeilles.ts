@@ -6,6 +6,10 @@ import type { MapVeille } from '../types/veille'
 // V0.9.56 — les veilles neutres (expéditions multi-faction) passent en doré.
 // V0.9.57 — doré renforcé (plus vif, plus lisible sur la carte).
 const NEUTRAL_COLOR = '#F4B400'
+// V1 — veille SANS Compagnie (veilleur sans faction) = territoire gris neutre,
+// distinct du doré des expéditions multi-faction. (= TERRITORY_MUTED_COLOR)
+const NO_FACTION_COLOR = '#9E9282'
+const NO_FACTION_KEY = '__none__'
 
 // Cache module-level des couleurs/patterns de faction, peuplé au premier loadInitialVeilles
 // puis réutilisé par pushVeilleOverride pour les plants suivants.
@@ -75,9 +79,11 @@ export function pushVeilleOverride(
   if (!factionsLoaded) {
     void ensureFactionsCache()
   }
+  // Sans faction (ni expédition neutre) = veilleur libre → territoire gris neutre.
+  const noFaction = !isNeutral && !factionId
   const tagColor = isNeutral
     ? NEUTRAL_COLOR
-    : (factionId ? factionColors.get(factionId) : undefined)
+    : (factionId ? factionColors.get(factionId) : NO_FACTION_COLOR)
   const factionPattern = isNeutral || !factionId
     ? undefined
     : factionPatterns.get(factionId)
@@ -89,7 +95,8 @@ export function pushVeilleOverride(
     claimed: true,
     // V0.7 : factionId='__neutral__' pour les expéditions multi-faction (clé de groupe distincte
     // dans le territoryWorker, évite le merge avec les territoires colorés).
-    factionId: isNeutral ? '__neutral__' : (factionId ?? undefined),
+    // V1 : '__none__' pour les veilles sans Compagnie → blob gris distinct.
+    factionId: isNeutral ? '__neutral__' : (noFaction ? NO_FACTION_KEY : (factionId ?? undefined)),
     tagColor,
     factionTitle,
     factionPattern,
