@@ -44,7 +44,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
   }
 
   return (
-    <div className="auth-overlay" onClick={() => onClose(false)} style={isMobile ? { zIndex: 10001 } : undefined}>
+    <div className="faction-explore-overlay" onClick={() => onClose(false)}>
       <div
         className={`faction-modal${isMobile ? ' faction-modal-mobile' : ''}`}
         onClick={e => e.stopPropagation()}
