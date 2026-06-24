@@ -40,9 +40,8 @@
 }
 
 .faction-hall-back {
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin: 10px 0 0 12px;
+  display: inline-block;
+  margin-bottom: 12px;
   background: rgba(193, 154, 107, 0.18);
   border: 1px solid rgba(193, 154, 107, 0.4);
   border-radius: 12px;

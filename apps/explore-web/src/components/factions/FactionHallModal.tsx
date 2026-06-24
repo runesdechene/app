@@ -131,14 +131,14 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   return createPortal(
     <div className="faction-hall-overlay" onClick={overlayClick}>
       <div className="faction-hall" style={{ borderTopColor: detail.color }}>
-        {onBack && (
-          <button className="faction-hall-back" onClick={() => { onBack(); onClose() }}>← Retour</button>
-        )}
         <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
 
         <div className="faction-hall-scroll">
           {/* En-tête identité */}
           <div className="faction-hall-intro">
+            {onBack && (
+              <button className="faction-hall-back" onClick={() => { onBack(); onClose() }}>← Retour</button>
+            )}
             <div className="faction-hall-eyebrow">
               <span className="faction-hall-dot" style={{ background: detail.color }} />
               Compagnie
