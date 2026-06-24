@@ -12,6 +12,8 @@ import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { MobileSelectionModals } from '../components/navigation/MobileSelectionModals'
 import { FactionModal } from '../components/auth/FactionModal'
+import { FactionHallModal } from '../components/factions/FactionHallModal'
+import { useFactionHallStore } from '../stores/factionHallStore'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
 import { useCrownsStore } from '../stores/crownsStore'
@@ -41,6 +43,8 @@ export default function MobileLayout() {
   const userId = usePlayerStore((s) => s.userId)
   const tutorialCompletedAt = usePlayerStore((s) => s.tutorialCompletedAt)
   const [showFactionModal, setShowFactionModal] = useState(false)
+  const factionHallId = useFactionHallStore((s) => s.openId)
+  const closeFactionHall = useFactionHallStore((s) => s.close)
   const navigate = useNavigate()
 
   // Init globaux — appelés une seule fois au layout, partagés entre toutes
@@ -100,6 +104,11 @@ export default function MobileLayout() {
           currentFactionId={userFactionId}
         />
       )}
+      {/* Hall de Compagnie global — ouvert depuis la page Compagnies / explorateur */}
+      {factionHallId && (
+        <FactionHallModal factionId={factionHallId} onClose={closeFactionHall} />
+      )}
+
       <GameToast />
       {/* GeolocationPrompt déplacé dans RequireAuth (overlay racine). */}
     </div>
