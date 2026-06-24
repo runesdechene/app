@@ -5,6 +5,7 @@ import { useCrownsStore } from '../../../stores/crownsStore'
 import { useFactionGroupStore } from '../../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../../stores/factionHallStore'
 import { FactionCreateForm } from '../../factions/FactionCreateForm'
+import { FactionModal } from '../../auth/FactionModal'
 import { CoupeModal } from '../modals/CoupeModal'
 import type { CoupeState, CoupeFactionEntry } from '../../../types/coupe'
 import './FactionBar.css'
@@ -41,6 +42,7 @@ export function FactionBar() {
   const [seasonName, setSeasonName] = useState<string | null>(null)
   const openHall = useFactionHallStore(s => s.open)
   const [showCreate, setShowCreate] = useState(false)
+  const [showExplore, setShowExplore] = useState(false)
   const [showCoupeModal, setShowCoupeModal] = useState(false)
 
   useEffect(() => {
@@ -146,6 +148,15 @@ export function FactionBar() {
           {userId && (
             <button
               type="button"
+              className="faction-scoreboard-explore"
+              onClick={() => setShowExplore(true)}
+            >
+              🔍 Explorer les Compagnies
+            </button>
+          )}
+          {userId && (
+            <button
+              type="button"
               className="faction-scoreboard-found"
               onClick={() => setShowCreate(true)}
               disabled={!canAfford}
@@ -156,6 +167,17 @@ export function FactionBar() {
           )}
         </div>
       </div>
+
+      {showExplore && (
+        <FactionModal
+          onClose={() => setShowExplore(false)}
+          currentFactionId={userFactionId}
+          onOpenHall={(id) => {
+            setShowExplore(false)
+            openHall(id, () => setShowExplore(true))  // ← Retour rouvre l'explorateur
+          }}
+        />
+      )}
 
       {showCreate && userId && (
         <FactionCreateForm
