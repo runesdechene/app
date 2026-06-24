@@ -37,6 +37,32 @@ classes `.expedition-modal-*` / `.expedition-chat-*` quand possible** plutôt qu
 > ⚠️ Le `founder_user_id` n'est plus le « chef » affiché : le Chef est calculé (max gloire).
 > Garder `founder_user_id` en base (utile), mais l'UI parle de « Chef de Compagnie ».
 
+## Accès aux Compagnies — SCOREBOARD sur la carte (décidé 24/06)
+
+L'onglet sidebar « Compagnie » est **retiré** (fait). L'accès passe par un **scoreboard
+des Compagnies sur la carte**, calqué sur **l'ancien FactionBar** (panneau persistant retiré
+en SPEC 1, à « remettre » pour les compagnies). Référence visuelle proche : `LeaderboardModal`
++ les badges carte (`MapPage.tsx` ~l.428 : NotorietyBadge/CoupeBadge/CrownsBadge).
+
+Le scoreboard (panneau carte, desktop ; sur mobile : badge → panneau/modale) :
+- **Liste des Compagnies classées** par score (Lot courant = **gloire totale** = somme des
+  `xp_total` des membres ; plus tard = Coupe SPEC 3). Chaque ligne : couleur + emblème + nom +
+  score + nb membres. **Clic sur une compagnie → ouvre `CompanyHallModal`** (déjà fait).
+- Bouton **« Fonder une compagnie — 200 🪙 »** → ouvre `CompanyCreateForm` (coût déjà à 200).
+- Bouton **« Explorer les compagnies »** → ouvre la modale de recherche/annuaire
+  (`CompaniesJoinCreateModal`, ou une variante « browse » de `CompanyDirectoryList`).
+
+### Tâches scoreboard
+1. **`list_companies`** : ajouter `totalGloire` (somme `xp_total` des membres) + `ORDER BY totalGloire DESC`.
+   (prod + fichier 275). Idempotent.
+2. **`CompanyScoreboard.tsx` + `.css`** : panneau carte (mirror FactionBar/LeaderboardModal look,
+   parchemin). Liste + 2 boutons. State pour ouvrir Hall (hallCompanyId), create, explore.
+3. **Placement** dans `MapPage.tsx` (overlay desktop ; mobile = badge `CrownsBadge`-like → ouvre).
+   Vérifier z-index vs sidebar/badges.
+4. Retirer/neutraliser les accès Compagnies devenus morts : `CompanySidebarPanel` (orphelin),
+   l'entrée ProfileMenu (à enlever, l'accès = scoreboard), le `sidebarStore.setTab('compagnie')`
+   dans `CompaniesJoinCreateModal.onJoined` (remplacer par ouverture du Hall).
+
 ## Fichiers / tâches
 
 ### Task 1 — `CompanyChat` (composant chat de canal Compagnie)
