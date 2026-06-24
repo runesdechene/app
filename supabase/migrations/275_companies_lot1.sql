@@ -94,6 +94,38 @@ BEGIN
   END IF;
 END $$;
 
+-- 9. RLS — lecture cadrée, écritures via RPC SECURITY DEFINER uniquement.
+-- (Le projet active la RLS partout ; sans ça le linter sécurité flagge + le
+-- realtime du chat ne livre rien. useRealtimeChat lit company_messages en direct.)
+ALTER TABLE public.companies        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.company_members  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.company_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.company_bans     ENABLE ROW LEVEL SECURITY;
+
+-- Annuaire public (aux utilisateurs connectés) — infos non sensibles
+DROP POLICY IF EXISTS "companies_read" ON public.companies;
+CREATE POLICY "companies_read" ON public.companies
+  FOR SELECT TO authenticated USING (true);
+
+-- Listes de membres lisibles (déjà exposées par get_company) — non sensibles
+DROP POLICY IF EXISTS "company_members_read" ON public.company_members;
+CREATE POLICY "company_members_read" ON public.company_members
+  FOR SELECT TO authenticated USING (true);
+
+-- Chat : un membre lit les messages de SA Compagnie (gate realtime + fetch direct)
+DROP POLICY IF EXISTS "company_messages_read_members" ON public.company_messages;
+CREATE POLICY "company_messages_read_members" ON public.company_messages
+  FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.company_members m
+    WHERE m.company_id = company_messages.company_id
+      AND m.user_id = auth.uid()::text
+  ));
+
+-- company_bans : aucune policy → aucun accès direct (RPC SECURITY DEFINER only).
+-- Aucune policy INSERT/UPDATE/DELETE nulle part : toutes les écritures passent
+-- par les RPC ci-dessous (SECURITY DEFINER, qui contournent la RLS).
+
 -- ============================================================================
 -- RPCs — cycle de vie
 -- ============================================================================
