@@ -12,7 +12,7 @@ interface ProfileMenuProps {
   onFactionModal: () => void
 }
 
-export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuProps) {
+export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
   const [open, setOpen] = useState(false)
   const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -22,9 +22,6 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const userName = usePlayerStore(s => s.userName)
   const userAvatarUrl = usePlayerStore(s => s.userAvatarUrl)
   const isAdmin = usePlayerStore(s => s.isAdmin)
-  const userFactionId = usePlayerStore(s => s.userFactionId)
-  const userFactionColor = usePlayerStore(s => s.userFactionColor)
-  const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
   const brouillerPistes = usePlayerStore(s => s.brouillerPistes)
   const [savingBrouiller, setSavingBrouiller] = useState(false)
 
@@ -102,22 +99,8 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             Voir mon profil
           </button>
 
-          <button
-            className="profile-dropdown-action"
-            onClick={() => { setOpen(false); onFactionModal() }}
-          >
-            {userFactionId ? (
-              <span className="faction-current">
-                <span
-                  className="faction-selector-dot"
-                  style={{ backgroundColor: userFactionColor ?? undefined }}
-                />
-                {userFactionTitle}
-              </span>
-            ) : (
-              'Rejoindre une Compagnie'
-            )}
-          </button>
+          {/* Ancienne sélection de faction retirée du menu (V1) — l'accès aux
+              Compagnies passe par le scoreboard sur la carte. */}
 
           <button
             className="profile-dropdown-action"

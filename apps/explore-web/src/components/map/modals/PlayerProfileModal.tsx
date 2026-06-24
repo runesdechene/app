@@ -8,7 +8,7 @@ import { useCoupe } from '../../../hooks/useCoupe'
 import shopIcon from '../../../assets/shop_icon.webp'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
-import { FactionMembersModal } from './FactionMembersModal'
+import { FactionHallModal } from '../../factions/FactionHallModal'
 import { VeteranBadge } from '../../profile/VeteranBadge'
 import { GloryProgressBar } from '../../profile/GloryProgressBar'
 import { LevelText } from '../../profile/LevelText'
@@ -763,10 +763,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
       )}
 
       {showFactionMembers && profile?.factionId && (
-        <FactionMembersModal
+        <FactionHallModal
           factionId={profile.factionId}
-          factionTitle={profile.factionTitle ?? ''}
-          factionColor={profile.factionColor ?? '#8A7B6A'}
           onClose={() => setShowFactionMembers(false)}
         />
       )}
