@@ -4,12 +4,15 @@ import { useRealtimeChat, type ChatMessage } from './useRealtimeChat'
 import { usePlayerStore } from '../stores/playerStore'
 
 /**
- * Hook chat live d'une compagnie.
+ * Hook chat live d'une Compagnie.
  *
- * - Live via useRealtimeChat (table company_messages / company_id).
- * - Fetch initial via RPC get_company_messages (50 derniers).
- * - Si companyId est null (bannière perso ou non membre) : pas d'abonnement,
- *   messages vides.
+ * Le chat de Compagnie est un CANAL du chat global : `chat_messages` avec
+ * `channel = <companyId>` (comme le Dortoir = `channel = <factionId>`). Du coup
+ * il est aussi accessible depuis l'onglet Tchat — c'est le même canal, répété.
+ *
+ * - Live + fetch initial via useRealtimeChat (table chat_messages / channel).
+ * - Envoi : insert direct dans chat_messages (pattern du chat existant).
+ * - companyId null → pas d'abonnement, messages vides.
  *
  * Retourne { messages, send, loading }.
  */
@@ -18,39 +21,37 @@ export function useCompanyChat(companyId: string | null): {
   send: (content: string) => Promise<void>
   loading: boolean
 } {
-  const userId = usePlayerStore((s) => s.userId)
   const [loading, setLoading] = useState(false)
 
-  // Abonnement Realtime + fetch initial via table directe (useRealtimeChat)
-  const { messages: realtimeMessages } = useRealtimeChat({
-    table: 'company_messages',
-    filterField: 'company_id',
+  const { messages } = useRealtimeChat({
+    table: 'chat_messages',
+    filterField: 'channel',
     filterValue: companyId,
   })
 
   const send = useCallback(
     async (content: string) => {
-      if (!companyId || !userId) return
+      if (!companyId) return
       const trimmed = content.trim()
-      if (!trimmed) return
+      if (!trimmed || trimmed.length > 500) return
+      const { userId, userName, userFactionId, userFactionColor, userFactionPattern } =
+        usePlayerStore.getState()
+      if (!userId) return
       setLoading(true)
-      const { data, error } = await supabase.rpc('send_company_message', {
-        p_user_id: userId,
-        p_company_id: companyId,
-        p_content: trimmed,
+      const { error } = await supabase.from('chat_messages').insert({
+        channel: companyId,
+        user_id: userId,
+        user_name: userName || 'Anonyme',
+        faction_id: userFactionId,
+        faction_color: userFactionColor,
+        faction_pattern: userFactionPattern,
+        content: trimmed,
       })
       setLoading(false)
-      if (error) {
-        console.error('[company] send_company_message error:', error.message)
-        return
-      }
-      const result = data as { success: true; id: number } | { error: string }
-      if ('error' in result) {
-        console.error('[company] send_company_message métier:', result.error)
-      }
+      if (error) console.error('[company] send chat error:', error.message)
     },
-    [companyId, userId],
+    [companyId],
   )
 
-  return { messages: realtimeMessages, send, loading }
+  return { messages, send, loading }
 }
