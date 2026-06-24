@@ -6,15 +6,15 @@ import { CompanyEmblem } from './CompanyEmblem'
 import './BannerToggle.css'
 
 /**
- * Toggle de bannière active — à gauche de l'avatar (desktop + mobile).
- * Montre l'emblème de ta Compagnie active. Tap : bascule vers l'autre Compagnie
- * (si tu en as 2), sinon ouvre son Hall. Caché si tu n'as aucune Compagnie.
+ * Bannière de la Compagnie principale — à gauche de l'avatar (desktop + mobile).
+ * Montre l'emblème de ta Compagnie principale (= active). Tap : ouvre son Hall.
+ * Le changement de principale est délibéré (cooldown) depuis le Hall de l'alliée,
+ * plus de bascule casual ici. Caché si tu n'as aucune Compagnie.
  */
 export function BannerToggle() {
   const userId = usePlayerStore(s => s.userId)
   const myFactions = useFactionGroupStore(s => s.myFactions)
   const activeFactionId = useFactionGroupStore(s => s.activeFactionId)
-  const switchBanner = useFactionGroupStore(s => s.switchBanner)
   const loadMine = useFactionGroupStore(s => s.loadMine)
   const openHall = useFactionHallStore(s => s.open)
 
@@ -23,25 +23,13 @@ export function BannerToggle() {
   if (!userId || myFactions.length === 0) return null
 
   const active = myFactions.find(f => f.id === activeFactionId) ?? myFactions[0]
-  const multi = myFactions.length > 1
-
-  async function handleClick() {
-    if (!userId) return
-    if (multi) {
-      const idx = myFactions.findIndex(f => f.id === active.id)
-      const next = myFactions[(idx + 1) % myFactions.length]
-      await switchBanner(userId, next.id)
-    } else {
-      openHall(active.id)
-    }
-  }
 
   return (
     <button
       className="banner-toggle"
-      onClick={handleClick}
-      title={multi ? `Bannière : ${active.name} — toucher pour changer` : active.name}
-      aria-label="Bannière active"
+      onClick={() => openHall(active.id)}
+      title={active.name}
+      aria-label="Compagnie principale"
     >
       <CompanyEmblem
         className="banner-toggle-emblem" color={active.color} name={active.name}

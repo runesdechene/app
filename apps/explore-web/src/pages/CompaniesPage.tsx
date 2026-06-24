@@ -113,7 +113,9 @@ export default function CompaniesPage() {
                 <div className="cp-card-headtext">
                   <div className="cp-card-name">{c.name}</div>
                   <div className="cp-card-badges">
-                    {isActive && <span className="cp-badge cp-badge-active" style={{ color: c.color, borderColor: c.color }}>⚑ Active</span>}
+                    {isActive
+                      ? <span className="cp-badge cp-badge-active" style={{ color: c.color, borderColor: c.color }}>⚑ Principale</span>
+                      : <span className="cp-badge">🤝 Allié</span>}
                     <span className="cp-badge">{c.isFounder ? 'Chef' : 'Membre'}</span>
                   </div>
                 </div>

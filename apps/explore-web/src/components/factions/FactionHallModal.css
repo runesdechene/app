@@ -199,6 +199,11 @@
   font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
   text-transform: uppercase; margin-top: 1px;
 }
+.faction-hall-rank-ally {
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-top: 1px; color: #8a7a63;
+}
 .faction-hall-rank-stats {
   font-family: var(--font-accent, Helvetica, sans-serif);
   font-size: 12px; color: #6e5435; flex: none;

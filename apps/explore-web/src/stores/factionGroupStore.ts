@@ -45,6 +45,8 @@ export interface FactionMember {
   avatarUrl: string | null
   joinedAt: string
   isFounder: boolean
+  /** Allié : cette Compagnie n'est pas sa principale → 0 point, hors Chef/classement. */
+  isAlly?: boolean
   /** Coupe de la saison active. */
   coupe: number
   /** Couronnes investies (fondation). */
@@ -81,7 +83,7 @@ export interface FactionDetail {
 // ─── Result types ─────────────────────────────────────────────────────────────
 
 type RpcSuccess<T = Record<string, unknown>> = { success: true } & T
-type RpcError = { error: string; cost?: number; balance?: number }
+type RpcError = { error: string; cost?: number; balance?: number; daysRemaining?: number }
 type ActionResult<T = Record<string, unknown>> = RpcSuccess<T> | RpcError
 
 // ─── Sync de la bannière active vers playerStore (couleurs carte / chat) ──────
@@ -116,7 +118,8 @@ interface FactionGroupState {
   ) => Promise<ActionResult<{ factionId: string; cost: number }>>
   join: (userId: string, factionId: string) => Promise<ActionResult>
   leave: (userId: string, factionId: string) => Promise<ActionResult<{ extinguished: boolean }>>
-  switchBanner: (userId: string, factionId: string | null) => Promise<ActionResult<{ activeFactionId: string | null }>>
+  /** Désigne une de mes Compagnies comme principale (délibéré + cooldown + repaint serveur). */
+  setPrimary: (userId: string, factionId: string) => Promise<ActionResult<{ activeFactionId: string | null }>>
   updateIdentity: (
     userId: string,
     factionId: string,
@@ -233,13 +236,13 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     return result
   },
 
-  switchBanner: async (userId, factionId) => {
-    const { data, error } = await supabase.rpc('set_active_faction', {
+  setPrimary: async (userId, factionId) => {
+    const { data, error } = await supabase.rpc('set_primary_faction', {
       p_user_id: userId,
       p_faction_id: factionId,
     })
     if (error) {
-      console.error('[faction] set_active_faction error:', error.message)
+      console.error('[faction] set_primary_faction error:', error.message)
       return { error: 'unknown' }
     }
     const result = data as ActionResult<{ activeFactionId: string | null }>

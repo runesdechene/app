@@ -58,9 +58,9 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
           &#10005;
         </button>
 
-        <h2 className="faction-modal-title">Explorer les Compagnies</h2>
+        <h2 className="faction-modal-title">Explorer Les Compagnies</h2>
         <p className="faction-modal-subtitle">
-          Ouvre une Compagnie pour lire sa mission et son classement, puis postule — ou fonde la tienne.
+          Ouvre une Compagnie pour lire sa mission et son classement, puis postule et grimpe les échelons — ou fonde la tienne. Elles oeuvrent toutes à la mission de Runes de Chêne.
         </p>
 
         {loading ? (
@@ -86,7 +86,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                       size={48} radius={11}
                     />
                     <span className="faction-card-name">{c.name}</span>
-                    {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
+                    {isMember && <span className="faction-card-badge">{isActive ? 'Principale' : 'Allié'}</span>}
                     {!isMember && c.locked && <span className="faction-card-badge faction-card-badge-full">🔒 Complète</span>}
                   </div>
                   {c.description && (

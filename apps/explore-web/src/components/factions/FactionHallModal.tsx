@@ -58,7 +58,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
-  const switchBanner = useFactionGroupStore((s) => s.switchBanner)
+  const setPrimary = useFactionGroupStore((s) => s.setPrimary)
   const myFactions = useFactionGroupStore((s) => s.myFactions)
   const activeFactionId = useFactionGroupStore((s) => s.activeFactionId)
 
@@ -69,6 +69,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [settingPrimary, setSettingPrimary] = useState(false)
+  const [primaryError, setPrimaryError] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc('get_faction_detail', { p_faction_id: factionId })
@@ -118,6 +120,30 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     reload()
   }
 
+  async function handleSetPrimary() {
+    if (!userId || !detail) return
+    const ok = window.confirm(
+      `Désigner « ${detail.name} » comme ta Compagnie principale ?\n\n` +
+      `Tes territoires passeront à ses couleurs et tes prochains points lui reviendront. ` +
+      `Tu ne pourras pas en changer avant un mois.`
+    )
+    if (!ok) return
+    setSettingPrimary(true)
+    setPrimaryError(null)
+    const result = await setPrimary(userId, factionId)
+    setSettingPrimary(false)
+    if ('error' in result) {
+      const d = result.daysRemaining ?? 30
+      setPrimaryError(
+        result.error === 'cooldown'
+          ? `Tu as changé de Compagnie principale récemment — réessaie dans ${d} jour${d > 1 ? 's' : ''}.`
+          : 'Impossible pour le moment.'
+      )
+      return
+    }
+    reload()
+  }
+
   const overlayClick = (e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose() }
 
   if (!detail) {
@@ -129,9 +155,18 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     )
   }
 
-  // Chef = membre de plus haute Coupe (rang 1) ; détrônable.
-  const chefId = detail.members[0]?.userId ?? null
-  const isChef = chefId === userId
+  // Chef = membre PRINCIPAL de plus haute Coupe ; détrônable. L'allié (trié en dernier,
+  // 0 point) ne peut jamais être Chef.
+  const topMember = detail.members[0]
+  const chefId = topMember && !topMember.isAlly ? topMember.userId : null
+  const isChef = chefId !== null && chefId === userId
+
+  // Rang affiché = position parmi les membres PRINCIPAUX uniquement (allié = hors classement).
+  let rankCounter = 0
+  const ranked = detail.members.map((m) => {
+    if (!m.isAlly) rankCounter += 1
+    return { m, rank: m.isAlly ? null : rankCounter }
+  })
   const isMember = detail.members.some((m) => m.userId === userId)
   const atLimit = !isMember && myFactions.length >= 2
   const isActive = activeFactionId === factionId
@@ -205,8 +240,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             {detail.members.length === 0 && (
               <p className="faction-hall-rank-empty">Aucun membre.</p>
             )}
-            {detail.members.map((m, i) => {
-              const memberIsChef = i === 0
+            {ranked.map(({ m, rank }) => {
+              const memberIsChef = m.userId === chefId
               const sources = SOURCE_ORDER
                 .filter((k) => m.breakdown && m.breakdown[k as keyof typeof m.breakdown])
                 .map((k) => ({ k, pts: m.breakdown![k as keyof typeof m.breakdown] as number }))
@@ -217,7 +252,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               return (
                 <div key={m.userId} className="faction-hall-rank-row"
                   style={memberIsChef ? { borderColor: detail.color, background: `${detail.color}14` } : undefined}>
-                  <span className="faction-hall-rank-num" style={memberIsChef ? { color: detail.color } : undefined}>{i + 1}</span>
+                  <span className="faction-hall-rank-num" style={memberIsChef ? { color: detail.color } : undefined}>{rank ?? '·'}</span>
                   <button type="button" className="faction-hall-rank-id" onClick={openProfile}
                     title={`Voir le profil de ${m.name}`}>
                     {m.avatarUrl ? (
@@ -229,6 +264,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                       <div className="faction-hall-rank-name">{m.name}</div>
                       {memberIsChef && (
                         <div className="faction-hall-rank-chef" style={{ color: detail.color }}>♛ Chef de Compagnie</div>
+                      )}
+                      {m.isAlly && (
+                        <div className="faction-hall-rank-ally">🤝 Allié</div>
                       )}
                       {sources.length > 0 && (
                         <div className="faction-hall-rank-sources">
@@ -264,24 +302,29 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
         {/* Bas du Hall : rejoindre (non-membre) = gros CTA central ; sinon footer discret */}
         {isMember ? (
-          <div className="faction-hall-footer">
-            <button className="faction-hall-leave" onClick={handleLeave} disabled={leaving}>
-              {leaving ? 'En cours…' : 'Quitter la Compagnie'}
-            </button>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              {isActive ? (
-                <span className="faction-hall-activebadge" style={{ color: detail.color }}>⚑ Bannière active</span>
-              ) : (
-                <button className="faction-hall-setactive" style={{ background: detail.color }}
-                  onClick={async () => { if (userId) await switchBanner(userId, factionId) }}>
-                  ⚑ Porter ces couleurs
-                </button>
-              )}
-              {isChef && (
-                <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer</button>
-              )}
+          <>
+            <div className="faction-hall-footer">
+              <button className="faction-hall-leave" onClick={handleLeave} disabled={leaving}>
+                {leaving ? 'En cours…' : 'Quitter la Compagnie'}
+              </button>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {isActive ? (
+                  <span className="faction-hall-activebadge" style={{ color: detail.color }}>⚑ Compagnie principale</span>
+                ) : (
+                  <button className="faction-hall-setactive" style={{ background: detail.color }}
+                    onClick={handleSetPrimary} disabled={settingPrimary}>
+                    {settingPrimary ? '…' : '⚑ Désigner comme principale'}
+                  </button>
+                )}
+                {isChef && (
+                  <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer</button>
+                )}
+              </div>
             </div>
-          </div>
+            {primaryError && (
+              <p className="faction-hall-joinerror" style={{ padding: '0 16px 12px' }}>{primaryError}</p>
+            )}
+          </>
         ) : (
           <div className="faction-hall-joinbar">
             <button

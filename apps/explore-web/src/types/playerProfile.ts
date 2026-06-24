@@ -57,6 +57,11 @@ export interface PlayerProfile {
   /** V0.9 — bannière illustrée de la faction (factions.image_url), affichée à gauche
    *  du nom. Fallback sur factionPattern si la faction n'a pas encore de bannière. */
   factionImage: string | null
+  /** Compagnie ALLIÉE (2e adhésion ≠ principale) — null si aucune. Social, 0 point. */
+  allyFactionId: string | null
+  allyFactionTitle: string | null
+  allyFactionColor: string | null
+  allyFactionPattern: string | null
   profileImage: string | null
   notorietyPoints: number
   /** V0.5 fields */

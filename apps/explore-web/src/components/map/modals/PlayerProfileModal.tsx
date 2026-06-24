@@ -336,6 +336,37 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                   </div>
                 )}
 
+                {profile.allyFactionId && profile.allyFactionTitle && (
+                  <div className="player-modal-faction-member">
+                    {profile.allyFactionPattern && (
+                      <span
+                        className="player-modal-faction-member-icon"
+                        style={{
+                          WebkitMaskImage: `url(${profile.allyFactionPattern})`,
+                          maskImage: `url(${profile.allyFactionPattern})`,
+                          backgroundColor: profile.allyFactionColor ?? '#8A7B6A',
+                        }}
+                        aria-hidden
+                      />
+                    )}
+                    <span>
+                      🤝 Allié de la Compagnie{' '}
+                      <button
+                        type="button"
+                        className="player-modal-faction-link"
+                        style={{ color: profile.allyFactionColor ?? undefined }}
+                        onClick={() => {
+                          if (!profile.allyFactionId) return
+                          onClose()
+                          useFactionHallStore.getState().open(profile.allyFactionId)
+                        }}
+                      >
+                        {profile.allyFactionTitle}
+                      </button>
+                    </span>
+                  </div>
+                )}
+
                 {/* V0.7 phase 3.5 — Titres déplacés sous le nom (depuis le
                     bas du header) pour densifier l'identité visuelle.
                     Les compteurs (lieux explorés / énigmes / lieux veillés)
