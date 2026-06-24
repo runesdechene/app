@@ -140,7 +140,7 @@ function ExplorerRow({ explorers, authorId, guardianIds, factionColors, placeId,
 }) {
   const userId = usePlayerStore(s => s.userId)
   const userPosition = usePlayerStore(s => s.userPosition)
-  // Si user a une faction, le bouton "J'y suis allé" est masqué : la visite et
+  // Si user a une Compagnie, le bouton "J'y suis allé" est masqué : la visite et
   // le plantage de l'étendard se font en 1 tap via VeilleFrame plus bas
   // (décision Uriel 2026-05-02 — fini les 2 boutons quasi-identiques).
   const userFactionId = usePlayerStore(s => s.userFactionId)

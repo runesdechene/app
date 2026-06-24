@@ -107,7 +107,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
     })
 
     if (data?.error === 'cooldown') {
-      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de Faction.`)
+      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de Compagnie.`)
       setConfirmFaction(null)
       setSelecting(false)
       return
@@ -175,9 +175,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           &#10005;
         </button>
 
-        <h2 className="faction-modal-title">Choisissez votre Faction</h2>
+        <h2 className="faction-modal-title">Choisissez votre Compagnie</h2>
         <p className="faction-modal-subtitle">
-          Votre Faction, c'est votre manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
+          Votre Compagnie, c'est votre manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
         </p>
 
         {loading ? (
@@ -232,9 +232,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
           <span className="faction-legend-item">🎖️ Gloire — Votre prestige total, à vie</span>
           <span className="faction-legend-item">🪙 Couronnes — Influencer un lieu à distance (mécénat)</span>
-          <span className="faction-legend-item">🏆 Coupe — Le classement des Factions cette saison</span>
+          <span className="faction-legend-item">🏆 Coupe — Le classement des Compagnies cette saison</span>
           {currentFactionId && (
-            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Faction n'est possible que 2 fois tous les 30 jours</span>
+            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Compagnie n'est possible que 2 fois tous les 30 jours</span>
           )}
         </div>
 
@@ -265,7 +265,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           <div className="faction-confirm-overlay">
             <div className="faction-confirm-dialog">
               <p>
-                Êtes-vous sûr ? Changer de Faction n'est possible <strong>que 2 fois tous les 30 jours</strong>.
+                Êtes-vous sûr ? Changer de Compagnie n'est possible <strong>que 2 fois tous les 30 jours</strong>.
               </p>
               <div className="faction-confirm-actions">
                 <button onClick={() => setConfirmFaction(null)} disabled={selecting}>

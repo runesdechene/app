@@ -95,7 +95,7 @@ export function VeilleFrame({ placeId, placeTitle, placeLocation, onVisit, alrea
       const msg = result.error === 'too_far'
         ? `Trop loin (${result.distanceKm} km). Approche-toi à moins de 200 m.`
         : result.error === 'no_faction'
-          ? 'Tu n\'as pas encore choisi de Faction.'
+          ? 'Tu n\'as pas encore choisi de Compagnie.'
           : result.error === 'place_not_found'
             ? 'Ce lieu n\'existe plus.'
             : result.error === 'already_yours'

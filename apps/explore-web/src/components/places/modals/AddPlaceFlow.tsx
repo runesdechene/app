@@ -833,7 +833,7 @@ export function AddPlaceFlow() {
             const fmtGain = (g: number, c: number) => {
               const parts: string[] = []
               if (g > 0) parts.push(`+${g} 🎖️ Gloire`)
-              if (c > 0) parts.push(`+${c} 🏆 Coupe des Factions`)
+              if (c > 0) parts.push(`+${c} 🏆 Coupe des Compagnies`)
               return parts.join(' · ')
             }
             return (

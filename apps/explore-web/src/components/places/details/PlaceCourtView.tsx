@@ -296,7 +296,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
     }
     const r = data as CreateChallengerExpeditionResult & { error?: string }
     if (r.error) {
-      setErrorMsg(r.error === 'no_faction' ? "Vous devez choisir une faction d'abord." : r.error)
+      setErrorMsg(r.error === 'no_faction' ? "Vous devez choisir une Compagnie d'abord." : r.error)
       return
     }
     await fetchState()
@@ -406,7 +406,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
                       maskImage: `url(${veilleur.factionPattern})`,
                     }}
                     title={veilleur.name}
-                    aria-label={`Faction : ${veilleur.name}`}
+                    aria-label={`Compagnie : ${veilleur.name}`}
                   />
                 )}
               </div>

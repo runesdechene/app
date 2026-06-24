@@ -58,7 +58,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
           <>
             <img src={logoImg} alt="Runes de Chêne" className="auth-modal-logo" />
             <p className="auth-modal-subtitle">
-            Découvrez & explorez plus de <b className="auth-modal-places">{placesCount ? `${placesCount}` : '+ de 2000'}</b> lieux Historiques, magiques ou atypiques de votre région. Rejoignez une Faction inspirée par <a href="https://runesdechene.com/">Nos Collections</a>, et
+            Découvrez & explorez plus de <b className="auth-modal-places">{placesCount ? `${placesCount}` : '+ de 2000'}</b> lieux Historiques, magiques ou atypiques de votre région. Rejoignez une Compagnie inspirée par <a href="https://runesdechene.com/">Nos Collections</a>, et
             progressez aux côtés de <b>milliers de clients Runes de Chêne</b> qui cartographient leur patrimoine en s'amusant.
             </p>
 

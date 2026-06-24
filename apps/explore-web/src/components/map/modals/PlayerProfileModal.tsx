@@ -320,7 +320,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                       />
                     )}
                     <span>
-                      Membre de la faction{' '}
+                      Membre de la Compagnie{' '}
                       <button
                         type="button"
                         className="player-modal-faction-link"

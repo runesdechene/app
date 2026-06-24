@@ -169,7 +169,7 @@ export const ExploreMap = memo(function ExploreMap() {
   // Icône custom pour les lieux non découverts (chargée depuis app_settings)
   const [unknownIconLoaded, setUnknownIconLoaded] = useState(false)
 
-  // Layers territoires mémorisés (dépendent de la faction du joueur)
+  // Layers territoires mémorisés (dépendent de la Compagnie du joueur)
   const territoryFillLayer = useMemo(() => buildTerritoryFillLayer(userFactionId, factionColorMode), [userFactionId, factionColorMode])
   const territoryBorderLayer = useMemo(() => buildTerritoryBorderLayer(factionColorMode), [factionColorMode])
   const territoryHoverLabelLayer = useMemo(() => buildTerritoryHoverLabelLayer(factionColorMode), [factionColorMode])
@@ -510,7 +510,7 @@ export const ExploreMap = memo(function ExploreMap() {
     }
   }, [rawGeojson])
 
-  // Recharger les variantes encre quand les overrides modifient la faction dominante (clics influence)
+  // Recharger les variantes encre quand les overrides modifient la Compagnie dominante (clics influence)
   useEffect(() => {
     const map = mapRef.current?.getMap()
     if (!map || !factionColorMode || placeOverrides.size === 0 || !rawGeojson) return

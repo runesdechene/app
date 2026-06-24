@@ -74,7 +74,7 @@ export function CoupeModal({ onClose }: Props) {
           </button>
 
           <h2 className="leaderboard-title">
-            {'🏆'} Coupe des Factions
+            {'🏆'} Coupe des Compagnies
           </h2>
           {state?.season && (
             <p className="coupe-season-label">
