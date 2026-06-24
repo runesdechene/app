@@ -40,36 +40,33 @@
 .faction-scoreboard-live-season { text-transform: none; letter-spacing: 0; opacity: 0.7; font-weight: 500; }
 @keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Rail horizontal des chips */
+/* Liste des Compagnies — chips empilées les unes SOUS les autres (vertical). */
 .faction-scoreboard-rail {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 6px;
-  padding: 6px 8px;
+  padding: 8px;
   background: rgba(245, 230, 211, 0.85);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  overflow-x: auto;
-  scrollbar-width: none;
-  max-width: 100%;
 }
-.faction-scoreboard-rail::-webkit-scrollbar { height: 0; display: none; }
 
-/* Chip = entrée horizontale d'une Compagnie */
+/* Chip = entrée d'une Compagnie (emblème + nom + score) */
 .faction-chip {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 7px;
-  flex: none;
+  width: 100%;
   padding: 5px 10px 5px 6px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.55);
   cursor: pointer;
+  text-align: left;
   transition: transform 120ms ease-out, border-color 120ms ease-out;
 }
 .faction-chip:hover { transform: translateY(-1px); }
@@ -90,19 +87,21 @@
 .faction-chip-banner { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex: none; }
 
 .faction-chip-name {
+  flex: 1 1 auto; min-width: 0;
   font-family: var(--font-accent, 'Cinzel', serif);
   font-size: 13px; font-weight: 600; color: #4a3728;
-  max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .faction-chip-score {
+  flex: none;
   font-family: var(--font-accent, 'Cinzel', serif);
   font-size: 12px; font-weight: 700; color: var(--faction-color);
-  font-variant-numeric: tabular-nums; flex: none;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Bouton Fonder en fin de rail */
+/* Bouton Fonder en fin de liste */
 .faction-scoreboard-found {
-  flex: none;
+  width: 100%;
   padding: 6px 12px; border-radius: 999px;
   border: 1px dashed rgba(74, 55, 40, 0.4);
   background: rgba(255, 255, 255, 0.4);
@@ -114,5 +113,4 @@
 
 @media (max-width: 768px) {
   .faction-scoreboard { max-width: 100%; }
-  .faction-chip-name { max-width: 90px; }
 }
