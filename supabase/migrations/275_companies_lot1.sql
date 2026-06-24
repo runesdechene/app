@@ -315,7 +315,7 @@ BEGIN
   IF v_uid IS NULL OR NOT EXISTS (SELECT 1 FROM company_members WHERE company_id = p_company_id AND user_id = v_uid) THEN
     RETURN json_build_object('error', 'not_member');
   END IF;
-  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t.created_at), '[]'::json) INTO v_rows
+  SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t."createdAt"), '[]'::json) INTO v_rows
   FROM (
     SELECT id, user_id AS "userId", user_name AS "userName", content, created_at AS "createdAt"
     FROM company_messages WHERE company_id = p_company_id
