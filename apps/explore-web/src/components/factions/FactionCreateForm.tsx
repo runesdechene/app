@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { uploadFactionImage } from '../../lib/factionImageUpload'
 import type { MyFaction } from '../../stores/factionGroupStore'
+import './FactionCreateForm.css'
 
 // Palette sobre — tons naturels, ni criards ni pastel fade
 const COLOR_PALETTE = [
@@ -36,12 +38,18 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
   const [color, setColor] = useState(editFaction?.color ?? COLOR_PALETTE[0])
   const [description, setDescription] = useState(editFaction?.description ?? '')
   const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(editFaction?.imageUrl ?? null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [costInfo, setCostInfo] = useState<{ cost?: number; balance?: number } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const isEdit = !!editFaction
+
+  function pickFile(f: File | null) {
+    setFile(f)
+    if (f) setPreview(URL.createObjectURL(f))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -87,7 +95,6 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
         setSubmitting(false)
         return
       }
-      // Upload image après création (optionnelle)
       if (file && result.factionId) {
         try {
           const url = await uploadFactionImage(result.factionId, file)
@@ -103,133 +110,98 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
     setSubmitting(false)
   }
 
-  return (
-    <div style={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>{isEdit ? 'Modifier la Compagnie' : 'Fonder une Compagnie'}</h2>
+  const form = (
+    <div className="faction-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
+      <form className="faction-form" onSubmit={handleSubmit}>
+        <h2 className="faction-form-title">{isEdit ? "Modifier la Compagnie" : 'Fonder une Compagnie'}</h2>
+        <p className="faction-form-sub">{isEdit ? 'Son identité reflète qui vous êtes.' : 'Rassemblez les vôtres sous une même bannière.'}</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label style={styles.label}>
+        <div className="faction-form-body">
+          <label className="faction-form-label">
             Nom
             <input
-              style={styles.input} type="text" value={name}
+              className="faction-form-input" type="text" value={name}
               onChange={(e) => setName(e.target.value)} maxLength={40}
-              placeholder="Nom de la Compagnie" disabled={submitting} required
+              placeholder="Nom de la Compagnie" disabled={submitting} required autoFocus
             />
           </label>
 
-          <label style={styles.label}>
+          <label className="faction-form-label">
             Mission
             <textarea
-              style={{ ...styles.input, ...styles.textarea }} value={description}
+              className="faction-form-textarea" value={description}
               onChange={(e) => setDescription(e.target.value)} maxLength={300}
               placeholder="En quelques mots, la raison d'être de cette Compagnie…"
               disabled={submitting} rows={3}
             />
           </label>
 
-          <fieldset style={styles.fieldset}>
-            <legend style={styles.legend}>Couleur</legend>
-            <div style={styles.palette}>
+          <div className="faction-form-label">
+            Couleur
+            <div className="faction-form-palette">
               {COLOR_PALETTE.map((c) => (
                 <button
                   key={c} type="button" onClick={() => setColor(c)}
+                  className="faction-form-color"
                   style={{
-                    ...styles.colorBtn, backgroundColor: c,
+                    backgroundColor: c,
                     outline: color === c ? `3px solid ${c}` : '3px solid transparent',
-                    outlineOffset: '3px',
+                    outlineOffset: '2px',
                   }}
                   aria-label={`Couleur ${c}`} title={c}
                 />
               ))}
             </div>
-            <div style={{ ...styles.colorPreview, backgroundColor: color }} aria-hidden />
-          </fieldset>
+          </div>
 
-          <label style={styles.label}>
+          <div className="faction-form-label">
             Emblème (optionnel)
-            <input
-              ref={fileRef} type="file" accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              disabled={submitting} style={styles.fileInput}
-            />
-          </label>
+            <div className="faction-form-emblem-row">
+              {preview ? (
+                <img className="faction-form-emblem-preview" src={preview} alt="" />
+              ) : (
+                <span className="faction-form-emblem-preview" style={{ background: color }}>
+                  {name.trim().charAt(0).toUpperCase() || '?'}
+                </span>
+              )}
+              <button
+                type="button" className="faction-form-file-btn"
+                onClick={() => fileRef.current?.click()} disabled={submitting}
+              >
+                📷 {file ? 'Changer l’image' : 'Choisir une image'}
+                <span className="faction-form-file-name">{file ? file.name : 'PNG / JPG'}</span>
+              </button>
+              <input
+                ref={fileRef} type="file" accept="image/*"
+                className="faction-form-file-hidden"
+                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+                disabled={submitting}
+              />
+            </div>
+          </div>
 
           {!isEdit && !costInfo && (
-            <p style={styles.costHint}>Fonder une Compagnie coûte 200 🪙</p>
+            <p className="faction-form-cost">Fonder une Compagnie coûte <b>200 🪙</b></p>
           )}
           {costInfo && (
-            <p style={styles.costDetail}>
-              Coût : {costInfo.cost ?? '?'} 🪙 — Solde actuel : {costInfo.balance ?? '?'} 🪙
+            <p className="faction-form-cost">
+              Coût : {costInfo.cost ?? '?'} 🪙 — Solde : {costInfo.balance ?? '?'} 🪙
             </p>
           )}
+          {error && <p className="faction-form-error">{error}</p>}
 
-          {error && <p style={styles.errorMsg}>{error}</p>}
-
-          <div style={styles.actions}>
-            <button type="button" onClick={onCancel} style={styles.btnCancel} disabled={submitting}>
+          <div className="faction-form-actions">
+            <button type="button" className="faction-form-cancel" onClick={onCancel} disabled={submitting}>
               Annuler
             </button>
-            <button type="submit" style={{ ...styles.btnPrimary, backgroundColor: color }} disabled={submitting}>
+            <button type="submit" className="faction-form-submit" style={{ background: color }} disabled={submitting}>
               {submitting ? 'En cours…' : isEdit ? 'Enregistrer' : 'Fonder'}
             </button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   )
-}
 
-const styles: Record<string, React.CSSProperties> = {
-  overlay: {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 1100, padding: '16px',
-  },
-  card: {
-    background: 'var(--color-parchment, #F5E6D3)', borderRadius: '12px',
-    padding: '24px', width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto',
-  },
-  title: {
-    margin: '0 0 20px', fontFamily: 'var(--font-accent, sans-serif)',
-    fontSize: '20px', color: 'var(--color-ink, #4A3728)',
-  },
-  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
-  label: {
-    display: 'flex', flexDirection: 'column', gap: '6px',
-    fontFamily: 'var(--font-body, sans-serif)', fontSize: '15px', color: 'var(--color-ink, #4A3728)',
-  },
-  input: {
-    padding: '10px 12px', fontSize: '16px', border: '1px solid rgba(193,154,107,0.5)',
-    borderRadius: '8px', background: 'rgba(255,255,255,0.5)',
-    color: 'var(--color-ink, #4A3728)', fontFamily: 'var(--font-body, sans-serif)', outline: 'none',
-  },
-  textarea: { resize: 'vertical', minHeight: '72px' },
-  fieldset: { border: 'none', padding: 0, margin: 0 },
-  legend: {
-    fontSize: '15px', fontFamily: 'var(--font-body, sans-serif)',
-    color: 'var(--color-ink, #4A3728)', marginBottom: '10px',
-  },
-  palette: { display: 'flex', gap: '8px', flexWrap: 'wrap' },
-  colorBtn: { width: '32px', height: '32px', borderRadius: '50%', border: 'none', cursor: 'pointer', flexShrink: 0 },
-  colorPreview: { marginTop: '8px', height: '4px', borderRadius: '2px', opacity: 0.7 },
-  fileInput: { fontSize: '15px', cursor: 'pointer' },
-  costHint: { fontSize: '15px', color: 'var(--color-ink-light, #8d745e)', fontStyle: 'italic', margin: 0 },
-  costDetail: {
-    fontSize: '15px', color: 'var(--color-ink, #4A3728)',
-    background: 'rgba(193,154,107,0.15)', borderRadius: '6px', padding: '8px 12px', margin: 0,
-  },
-  errorMsg: {
-    fontSize: '15px', color: '#c0392b', background: 'rgba(192,57,43,0.08)',
-    borderRadius: '6px', padding: '8px 12px', margin: 0,
-  },
-  actions: { display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '4px' },
-  btnCancel: {
-    padding: '10px 20px', borderRadius: '8px', border: '1px solid rgba(193,154,107,0.5)',
-    background: 'transparent', cursor: 'pointer', fontSize: '16px', color: 'var(--color-ink, #4A3728)',
-  },
-  btnPrimary: {
-    padding: '10px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-    fontSize: '16px', color: '#fff', fontWeight: 600,
-  },
+  return createPortal(form, document.body)
 }

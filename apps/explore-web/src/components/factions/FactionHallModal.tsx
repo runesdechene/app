@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
@@ -84,10 +85,11 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const overlayClick = (e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose() }
 
   if (!detail) {
-    return (
+    return createPortal(
       <div className="faction-hall-overlay" onClick={overlayClick}>
         <div className="faction-hall-loading">Chargement de la Compagnie…</div>
-      </div>
+      </div>,
+      document.body,
     )
   }
 
@@ -104,7 +106,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     memberCount: detail.memberCount, isActive: false, isFounder: isChef,
   }
 
-  return (
+  return createPortal(
     <div className="faction-hall-overlay" onClick={overlayClick}>
       <div className="faction-hall" style={{ borderTopColor: detail.color }}>
         <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
@@ -213,6 +215,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           onCancel={() => setShowEdit(false)}
         />
       )}
-    </div>
+    </div>,
+    document.body,
   )
 }

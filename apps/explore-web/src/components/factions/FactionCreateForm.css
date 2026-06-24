@@ -1,0 +1,133 @@
+/* Fonder / éditer une Compagnie — design parchemin (cohérent avec le Hall). */
+
+.faction-form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9600; /* au-dessus du Hall (9510) et de l'UI carte */
+  background: rgba(40, 30, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.faction-form {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 92vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: var(--color-parchment, #f5e9d4);
+  border: 1px solid rgba(184, 154, 106, 0.6);
+  border-top: 5px solid #b89a6a;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(20, 14, 5, 0.32);
+  padding: 24px 24px 20px;
+}
+.faction-form::-webkit-scrollbar { width: 0; display: none; }
+
+.faction-form-title {
+  margin: 0 0 4px;
+  font-family: var(--font-signature, Georgia, serif);
+  font-style: italic; font-weight: 600; font-size: 24px;
+  color: #2a1f10;
+}
+.faction-form-sub {
+  margin: 0 0 18px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 12px; color: #8a7050;
+}
+
+.faction-form-body { display: flex; flex-direction: column; gap: 16px; }
+
+.faction-form-label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #8a7050;
+}
+.faction-form-input,
+.faction-form-textarea {
+  padding: 11px 12px; font-size: 16px;
+  border: 1px solid rgba(184, 154, 106, 0.55);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.55);
+  color: #2a1f10;
+  font-family: var(--font-body, Georgia, serif);
+  outline: none;
+}
+.faction-form-input:focus,
+.faction-form-textarea:focus { border-color: #b89a6a; }
+.faction-form-textarea { resize: vertical; min-height: 76px; font-style: italic; }
+
+/* Palette de couleurs */
+.faction-form-palette { display: flex; gap: 9px; flex-wrap: wrap; }
+.faction-form-color {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: none; cursor: pointer; flex: none; padding: 0;
+}
+
+/* Sélecteur d'emblème — vrai bouton + aperçu */
+.faction-form-emblem-row { display: flex; align-items: center; gap: 12px; }
+.faction-form-emblem-preview {
+  width: 52px; height: 52px; border-radius: 12px; flex: none;
+  object-fit: cover;
+  display: flex; align-items: center; justify-content: center;
+  color: #faf2dd; font-size: 22px; font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.faction-form-file-btn {
+  flex: 1 1 auto;
+  padding: 11px 14px; border-radius: 10px; cursor: pointer;
+  border: 1px dashed rgba(184, 154, 106, 0.7);
+  background: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 600; color: #4a3925;
+  display: flex; align-items: center; gap: 8px;
+}
+.faction-form-file-btn:hover { background: rgba(193, 154, 107, 0.18); }
+.faction-form-file-name {
+  font-weight: 400; font-style: italic; color: #8a7050;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.faction-form-file-hidden { display: none; }
+
+.faction-form-cost {
+  margin: 0;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; color: #6e5435;
+  background: rgba(193, 154, 107, 0.16);
+  border-radius: 8px; padding: 9px 12px;
+}
+.faction-form-error {
+  margin: 0;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; color: #c0392b;
+  background: rgba(192, 57, 43, 0.08);
+  border-radius: 8px; padding: 9px 12px;
+}
+
+.faction-form-actions {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px;
+}
+.faction-form-cancel {
+  padding: 10px 18px; border-radius: 12px;
+  border: 1px solid rgba(184, 154, 106, 0.5);
+  background: transparent; cursor: pointer;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; color: #6e5435;
+}
+.faction-form-submit {
+  padding: 10px 22px; border-radius: 12px;
+  border: none; cursor: pointer; color: #fff;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 700;
+  box-shadow: 0 2px 8px rgba(20, 14, 5, 0.2);
+}
+.faction-form-submit:disabled { opacity: 0.6; cursor: wait; }
+
+@media (max-width: 768px) {
+  .faction-form-overlay { z-index: 10020; }
+}
