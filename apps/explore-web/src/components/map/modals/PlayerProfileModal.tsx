@@ -8,7 +8,7 @@ import { useCoupe } from '../../../hooks/useCoupe'
 import shopIcon from '../../../assets/shop_icon.webp'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
-import { FactionHallModal } from '../../factions/FactionHallModal'
+import { useFactionHallStore } from '../../../stores/factionHallStore'
 import { VeteranBadge } from '../../profile/VeteranBadge'
 import { GloryProgressBar } from '../../profile/GloryProgressBar'
 import { LevelText } from '../../profile/LevelText'
@@ -44,7 +44,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   // V0.7+ Refonte 2026-05-02 : plus d'onglets — 3 carrousels horizontaux empilés.
   // Si > CAROUSEL_CAP : tile "Voir tout (N)" à la fin → overlay grid.
   const [viewAllSection, setViewAllSection] = useState<PlacesTab | null>(null)
-  const [showFactionMembers, setShowFactionMembers] = useState(false)
   const [showFragmentStore, setShowFragmentStore] = useState(false)
   const [allFragments, setAllFragments] = useState<Array<{ id: number; name: string; description: string | null; icon: string | null; image_url: string | null; link_url: string | null; owned: boolean }>>([])
   const [loadingFragments, setLoadingFragments] = useState(false)
@@ -325,7 +324,11 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                         type="button"
                         className="player-modal-faction-link"
                         style={{ color: profile.factionColor ?? undefined }}
-                        onClick={() => setShowFactionMembers(true)}
+                        onClick={() => {
+                          if (!profile.factionId) return
+                          onClose()  // ferme le profil
+                          useFactionHallStore.getState().open(profile.factionId)  // ouvre le Hall global
+                        }}
                       >
                         {profile.factionTitle}
                       </button>
@@ -762,12 +765,6 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
         </div>
       )}
 
-      {showFactionMembers && profile?.factionId && (
-        <FactionHallModal
-          factionId={profile.factionId}
-          onClose={() => setShowFactionMembers(false)}
-        />
-      )}
 
       {viewAllSection && profile && (() => {
         const places: PlaceCard[] =

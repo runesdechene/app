@@ -11,6 +11,8 @@ import { FactionModal } from '../components/auth/FactionModal'
 import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
+import { FactionHallModal } from '../components/factions/FactionHallModal'
+import { useFactionHallStore } from '../stores/factionHallStore'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
@@ -110,6 +112,8 @@ export default function MapPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showFactionModal, setShowFactionModal] = useState(false)
   const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const factionHallId = useFactionHallStore(s => s.openId)
+  const closeFactionHall = useFactionHallStore(s => s.close)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAddGpsMark, setShowAddGpsMark] = useState(false)
@@ -580,6 +584,11 @@ export default function MapPage() {
 
       {showLeaderboard && (
         <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+      )}
+
+      {/* Hall de Compagnie global — ouvert depuis le scoreboard OU le profil (qui se ferme avant) */}
+      {factionHallId && (
+        <FactionHallModal factionId={factionHallId} onClose={closeFactionHall} />
       )}
 
       {selectedPlayerId && (

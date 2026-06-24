@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { useFactionGroupStore } from '../../../stores/factionGroupStore'
-import { FactionHallModal } from '../../factions/FactionHallModal'
+import { useFactionHallStore } from '../../../stores/factionHallStore'
 import { FactionCreateForm } from '../../factions/FactionCreateForm'
 import { CoupeModal } from '../modals/CoupeModal'
 import type { CoupeState, CoupeFactionEntry } from '../../../types/coupe'
@@ -39,7 +39,7 @@ export function FactionBar() {
   const canAfford = balance >= FOUND_COST
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
-  const [hallFactionId, setHallFactionId] = useState<string | null>(null)
+  const openHall = useFactionHallStore(s => s.open)
   const [showCreate, setShowCreate] = useState(false)
   const [showCoupeModal, setShowCoupeModal] = useState(false)
 
@@ -125,7 +125,7 @@ export function FactionBar() {
                 type="button"
                 className={`faction-chip${isMine ? ' faction-chip-mine' : ''}`}
                 style={{ '--faction-color': faction.factionColor } as React.CSSProperties}
-                onClick={() => setHallFactionId(faction.factionId)}
+                onClick={() => openHall(faction.factionId)}
                 title={faction.factionTitle}
               >
                 {isLeader && <span className="faction-chip-crown">{'👑'}</span>}
@@ -156,10 +156,6 @@ export function FactionBar() {
           )}
         </div>
       </div>
-
-      {hallFactionId && (
-        <FactionHallModal factionId={hallFactionId} onClose={() => setHallFactionId(null)} />
-      )}
 
       {showCreate && userId && (
         <FactionCreateForm
