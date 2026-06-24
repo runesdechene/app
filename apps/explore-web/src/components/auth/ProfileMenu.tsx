@@ -6,6 +6,7 @@ import { useMapStore } from '../../stores/mapStore'
 import { useGeolocPromptStore } from '../../stores/geolocPromptStore'
 import { useCompanyStore } from '../../stores/companyStore'
 import { EmailChangeModal } from './EmailChangeModal'
+import { CompaniesJoinCreateModal } from '../companies/CompaniesJoinCreateModal'
 import { PushSettings } from '../notifications/PushSettings'
 import { supabase } from '../../lib/supabase'
 
@@ -37,14 +38,17 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
 
   // Compagnie active (bannière)
   const myCompanies = useCompanyStore(s => s.myCompanies)
-  const companiesLoading = useCompanyStore(s => s.loading)
+  const companiesLoaded = useCompanyStore(s => s.companiesLoaded)
   const activeCompany = myCompanies.find(c => c.isActive) ?? null
+  const [showCompaniesModal, setShowCompaniesModal] = useState(false)
 
+  // Charge une seule fois (sinon, avec 0 compagnie, la condition se rallume en
+  // boucle → loading bloqué → panneau sidebar coincé sur « Chargement… »).
   useEffect(() => {
-    if (userId && myCompanies.length === 0 && !companiesLoading) {
+    if (userId && !companiesLoaded) {
       useCompanyStore.getState().loadMine(userId)
     }
-  }, [userId, myCompanies.length, companiesLoading])
+  }, [userId, companiesLoaded])
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return
@@ -87,7 +91,10 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
 
   function handleGoCompagnies() {
     setOpen(false)
-    navigate('/compagnies')
+    // Desktop : Compagnies vit dans la carte → on ouvre la modale rejoindre/fonder
+    // (la sidebar 🛡️ sert à voir sa compagnie). Mobile : page dédiée.
+    if (isDesktop) setShowCompaniesModal(true)
+    else navigate('/compagnies')
   }
 
   return (
@@ -125,7 +132,6 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             Voir mon profil
           </button>
 
-          {!isDesktop && (
           <button className="profile-dropdown-action" onClick={handleGoCompagnies}>
             {activeCompany ? (
               <span className="faction-current">
@@ -139,7 +145,6 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
               'Mes Compagnies'
             )}
           </button>
-          )}
 
           <button
             className="profile-dropdown-action"
@@ -220,6 +225,13 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
         <EmailChangeModal
           currentEmail={email}
           onClose={() => setShowEmailChange(false)}
+        />
+      )}
+
+      {showCompaniesModal && userId && (
+        <CompaniesJoinCreateModal
+          userId={userId}
+          onClose={() => setShowCompaniesModal(false)}
         />
       )}
     </div>

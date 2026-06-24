@@ -73,6 +73,8 @@ interface CompanyStoreState {
   activeCompanyId: string | null
   directory: CompanySummary[]
   loading: boolean
+  /** true dès que loadMine a abouti au moins une fois (anti-boucle de fetch). */
+  companiesLoaded: boolean
 
   /** Charge les compagnies de l'utilisateur courant */
   loadMine: (userId: string) => Promise<void>
@@ -104,12 +106,13 @@ export const useCompanyStore = create<CompanyStoreState>((set) => ({
   activeCompanyId: null,
   directory: [],
   loading: false,
+  companiesLoaded: false,
 
   loadMine: async (userId) => {
     if (!userId) return
     set({ loading: true })
     const { data, error } = await supabase.rpc('get_my_companies', { p_user_id: userId })
-    set({ loading: false })
+    set({ loading: false, companiesLoaded: true })
     if (error) {
       console.error('[company] get_my_companies error:', error.message)
       return

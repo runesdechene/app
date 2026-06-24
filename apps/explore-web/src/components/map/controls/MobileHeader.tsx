@@ -36,14 +36,15 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
 
   // Compagnie active (bannière)
   const myCompanies = useCompanyStore(s => s.myCompanies)
-  const companiesLoading = useCompanyStore(s => s.loading)
+  const companiesLoaded = useCompanyStore(s => s.companiesLoaded)
   const activeCompany = myCompanies.find(c => c.isActive) ?? null
 
+  // Charge une seule fois (anti-boucle quand l'utilisateur a 0 compagnie).
   useEffect(() => {
-    if (userId && myCompanies.length === 0 && !companiesLoading) {
+    if (userId && !companiesLoaded) {
       useCompanyStore.getState().loadMine(userId)
     }
-  }, [userId, myCompanies.length, companiesLoading])
+  }, [userId, companiesLoaded])
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return

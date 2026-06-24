@@ -13,7 +13,7 @@ import { CompaniesJoinCreateModal } from './CompaniesJoinCreateModal'
 export function CompanySidebarPanel() {
   const userId = usePlayerStore((s) => s.userId)
   const myCompanies = useCompanyStore((s) => s.myCompanies)
-  const loading = useCompanyStore((s) => s.loading)
+  const companiesLoaded = useCompanyStore((s) => s.companiesLoaded)
   const loadMine = useCompanyStore((s) => s.loadMine)
   const activeCompanyId = useCompanyStore((s) => s.activeCompanyId)
 
@@ -39,11 +39,11 @@ export function CompanySidebarPanel() {
     <main className="activity-page-scroll">
       <h1 className="activity-page-title">Ma Compagnie</h1>
 
-      {loading && myCompanies.length === 0 && (
+      {!companiesLoaded && myCompanies.length === 0 && (
         <p style={styles.state}>Chargement…</p>
       )}
 
-      {!loading && myCompanies.length === 0 && (
+      {companiesLoaded && myCompanies.length === 0 && (
         <div style={styles.empty}>
           <p style={styles.emptyText}>Tu ne fais partie d'aucune Compagnie.</p>
           <button style={styles.primaryBtn} onClick={() => setShowModal(true)}>
