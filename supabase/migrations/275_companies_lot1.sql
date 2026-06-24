@@ -372,18 +372,19 @@ BEGIN
     'id', c.id, 'name', c.name, 'color', c.color, 'imageUrl', c.image_url,
     'description', c.description, 'founderUserId', c.founder_user_id, 'isOfficial', c.is_official,
     'memberCount', (SELECT count(*) FROM company_members m WHERE m.company_id = c.id),
-    'totalGloire', (SELECT COALESCE(sum(public._user_glory_score(m.user_id)), 0)
-                    FROM company_members m WHERE m.company_id = c.id)
+    'totalGloire', (SELECT COALESCE(sum(COALESCE(u.xp_total, 0)), 0)
+                    FROM company_members m JOIN users u ON u.id = m.user_id WHERE m.company_id = c.id)
   ) INTO v_company FROM companies c WHERE c.id = p_company_id;
 
-  -- Membres classés par GLOIRE décroissante (le 1er = Chef de Compagnie, détrônable).
+  -- Membres classés par GLOIRE (= xp_total, la même valeur que le profil) décroissante.
+  -- Le 1er = Chef de Compagnie (détrônable).
   SELECT COALESCE(json_agg(row_to_json(t) ORDER BY t.gloire DESC, t."joinedAt"), '[]'::json) INTO v_members
   FROM (
     SELECT m.user_id AS "userId",
            COALESCE(u.display_name, u.first_name, 'Quelqu''un') AS name,
            m.joined_at AS "joinedAt",
            (m.user_id = v_founder) AS "isFounder",
-           COALESCE(public._user_glory_score(m.user_id), 0) AS gloire
+           COALESCE(u.xp_total, 0) AS gloire
     FROM company_members m JOIN users u ON u.id = m.user_id
     WHERE m.company_id = p_company_id
   ) t;
