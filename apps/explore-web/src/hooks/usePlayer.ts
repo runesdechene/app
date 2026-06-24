@@ -355,6 +355,12 @@ export function usePlayer() {
             type = 'faction_join'
             color = e.data?.factionColor ?? undefined
             iconUrl = e.data?.factionPattern ?? undefined
+          } else if (e.type === 'faction_leave') {
+            const factionTitle = e.data?.factionTitle || 'une Compagnie'
+            message = `${name} a quitté ${factionTitle}`
+            highlights.push(name, factionTitle)
+            type = 'faction_leave'
+            color = e.data?.factionColor ?? undefined
           } else if (e.type === 'contribute') {
             // V0.7 (mai 2026) : 6 types de contribution.
             // - photo / carnet : valorisés (gloire + coupe) via barème app_settings

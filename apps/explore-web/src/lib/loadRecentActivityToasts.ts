@@ -76,7 +76,7 @@ export async function loadRecentActivityToasts(currentUserId: string) {
     // d'avoir rejoint la carte).
     if (e.type === 'new_user' && e.actor_id === currentUserId) continue
     // De même, on ne se notifie pas soi-même d'avoir rejoint une faction.
-    if (e.type === 'faction_join' && e.actor_id === currentUserId) continue
+    if ((e.type === 'faction_join' || e.type === 'faction_leave') && e.actor_id === currentUserId) continue
     // Ignorer le tracking interne fragment_enigma
     if (e.type === 'fragment_enigma') continue
 
@@ -144,6 +144,12 @@ export async function loadRecentActivityToasts(currentUserId: string) {
       type = 'faction_join'
       color = e.data?.factionColor ?? undefined
       iconUrl = e.data?.factionPattern ?? undefined
+    } else if (e.type === 'faction_leave') {
+      const factionTitle = e.data?.factionTitle || 'une Compagnie'
+      message = `${name} a quitté ${factionTitle}`
+      highlights.push(name, factionTitle)
+      type = 'faction_leave'
+      color = e.data?.factionColor ?? undefined
     } else if (e.type === 'contribute') {
       // V0.7 — wording aligné par contributionType (cf. usePlayer.ts ligne ~329)
       const ct = e.data?.contributionType ?? 'carnet'
