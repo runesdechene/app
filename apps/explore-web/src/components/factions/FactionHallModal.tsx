@@ -277,6 +277,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           factionId={detail.id}
           factionName={detail.name}
           color={detail.color}
+          isChef={isChef}
+          isMember={isMember}
           onClose={() => setShowInvite(false)}
         />
       )}

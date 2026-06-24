@@ -6,6 +6,9 @@ interface Props {
   factionId: string
   factionName: string
   color: string
+  /** Rôle de l'inviteur → adapte le ton du message. */
+  isChef?: boolean
+  isMember?: boolean
   onClose: () => void
 }
 
@@ -14,9 +17,14 @@ interface Props {
  * après création de compte / connexion, atterrit directement sur la Compagnie
  * (cf. useCompanyInvite : param ?company=<id> ouvre le Hall après auth).
  */
-export function CompanyInviteModal({ factionId, factionName, color, onClose }: Props) {
+export function CompanyInviteModal({ factionId, factionName, color, isChef, isMember, onClose }: Props) {
   const link = `${window.location.origin}/?company=${factionId}`
-  const message = `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :\n${link}`
+  const intro = isChef
+    ? `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :`
+    : isMember
+      ? `Hey ! ⚔️ Je fais partie de la Compagnie « ${factionName} » sur Runes de Chêne — viens la rejoindre, on a besoin de toi :`
+      : `Hey ! ⚔️ Découvre la Compagnie « ${factionName} » sur Runes de Chêne et rejoins-la :`
+  const message = `${intro}\n${link}`
   const [copied, setCopied] = useState(false)
 
   async function copy() {
@@ -32,11 +40,7 @@ export function CompanyInviteModal({ factionId, factionName, color, onClose }: P
   async function share() {
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: factionName,
-          text: `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :`,
-          url: link,
-        })
+        await navigator.share({ title: factionName, text: intro, url: link })
       } catch { /* annulé */ }
     } else {
       copy()
