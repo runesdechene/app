@@ -15,7 +15,7 @@ import './FactionHallModal.css'
 const SOURCE_META: Record<string, { icon: string; label: string }> = {
   enigmes: { icon: '📜', label: 'énigmes' },
   visites: { icon: '📍', label: 'visites GPS' },
-  ajouts:  { icon: '➕', label: 'lieux ajoutés' },
+  ajouts:  { icon: '🏛️', label: 'lieux ajoutés' },
   veilles: { icon: '⚑', label: 'veilles' },
   photos:  { icon: '📷', label: 'photos' },
 }
