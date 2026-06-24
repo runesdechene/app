@@ -52,6 +52,8 @@ export interface FactionDetail {
   memberCount: number
   /** Coupe cumulée des membres actifs. */
   totalCoupe: number
+  /** Couronnes investies cumulées (fondation + conquête) des membres. */
+  totalCrowns: number
   members: FactionMember[]
 }
 

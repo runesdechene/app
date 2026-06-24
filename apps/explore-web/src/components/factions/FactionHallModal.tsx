@@ -151,6 +151,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             <div className="faction-hall-totals">
               <span>👥 <b>{detail.memberCount}</b> membre{detail.memberCount !== 1 ? 's' : ''}</span>
               <span>🏆 <b>{detail.totalCoupe.toLocaleString('fr-FR')}</b> coupe</span>
+              {detail.totalCrowns > 0 && (
+                <span>🪙 <b>{detail.totalCrowns.toLocaleString('fr-FR')}</b> investies</span>
+              )}
             </div>
           </div>
 
