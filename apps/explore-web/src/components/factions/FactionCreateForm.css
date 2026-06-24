@@ -60,7 +60,7 @@
 }
 .faction-form-input:focus,
 .faction-form-textarea:focus { border-color: #b89a6a; }
-.faction-form-textarea { resize: vertical; min-height: 76px; font-style: italic; }
+.faction-form-textarea { resize: vertical; min-height: 76px; font-style: normal; }
 
 /* Palette de couleurs */
 .faction-form-palette { display: flex; gap: 9px; flex-wrap: wrap; }

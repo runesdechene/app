@@ -28,6 +28,8 @@ function renderMission(text: string): string {
   return escaped
     .replace(/&lt;b&gt;/gi, '<b>')
     .replace(/&lt;\/b&gt;/gi, '</b>')
+    .replace(/&lt;i&gt;/gi, '<i>')
+    .replace(/&lt;\/i&gt;/gi, '</i>')
     .replace(/\n/g, '<br>')
 }
 

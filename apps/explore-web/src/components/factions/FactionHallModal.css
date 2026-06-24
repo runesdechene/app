@@ -112,7 +112,7 @@
 .faction-hall-mission-text {
   margin: 0;
   font-family: var(--font-body, Georgia, serif);
-  font-style: italic; font-size: 16px; line-height: 1.6; color: #4a3925;
+  font-style: normal; font-size: 16px; line-height: 1.6; color: #4a3925;
   white-space: pre-wrap;
 }
 .faction-hall-mission-empty {
