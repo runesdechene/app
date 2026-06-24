@@ -1,6 +1,22 @@
 /* Page /compagnies (mobile) — style parchemin */
 
-.companies-page { padding-bottom: 24px; }
+/* Wrapper + titre (répliqués depuis ActivityPage.css, non importé ici) */
+.companies-page.activity-page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--color-parchment);
+  padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+.companies-page .activity-page-title {
+  margin: 0 0 16px;
+  font-family: var(--font-accent);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
 
 /* Bannière Coupe */
 .cp-coupe-banner {
