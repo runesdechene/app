@@ -117,7 +117,7 @@ export default function CompaniesPage() {
 
       {/* Annuaire */}
       <section className="companies-section">
-        <CompanyDirectoryList />
+        <CompanyDirectoryList onJoined={(id) => setSelectedId(id)} />
       </section>
 
       {/* Modale création */}

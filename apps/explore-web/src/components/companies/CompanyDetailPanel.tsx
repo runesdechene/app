@@ -10,9 +10,11 @@ import type { CompanyDetail } from '../../stores/companyStore'
 interface Props {
   companyId: string
   onClose: () => void
+  /** Masque le bouton retour (‹) — utile en sidebar desktop où le hall est la vue directe. */
+  hideBack?: boolean
 }
 
-export function CompanyDetailPanel({ companyId, onClose }: Props) {
+export function CompanyDetailPanel({ companyId, onClose, hideBack }: Props) {
   const userId = usePlayerStore((s) => s.userId)
   const activeCompanyId = useCompanyStore((s) => s.activeCompanyId)
   const leave = useCompanyStore((s) => s.leave)
@@ -73,7 +75,7 @@ export function CompanyDetailPanel({ companyId, onClose }: Props) {
     <div style={s.panel}>
       {/* En-tête */}
       <div style={{ ...s.header, borderColor: detail.color }}>
-        <button style={s.backBtn} onClick={onClose} aria-label="Fermer">‹</button>
+        {!hideBack && <button style={s.backBtn} onClick={onClose} aria-label="Fermer">‹</button>}
 
         <div style={s.headerContent}>
           {detail.imageUrl ? (

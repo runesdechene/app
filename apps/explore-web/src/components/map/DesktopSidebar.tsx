@@ -5,9 +5,8 @@ import { ChangelogList } from '../changelog/ChangelogList'
 import { CompanySidebarPanel } from '../companies/CompanySidebarPanel'
 import { useUnreadActivityCount, markActivitySeen } from '../../hooks/useUnreadActivityCount'
 import { currentChangelog, isChangelogUnseen, markChangelogSeen } from '../../lib/changelog'
+import { useSidebarStore, type SidebarTab } from '../../stores/sidebarStore'
 import './DesktopSidebar.css'
-
-type SidebarTab = 'home' | 'activite' | 'compagnie' | 'maj'
 
 interface Props {
   openFactionModal: () => void
@@ -26,7 +25,8 @@ interface Props {
  * --sidebar-w (piloté par MapPage sur .app) + overflow:hidden.
  */
 export function DesktopSidebar({ openFactionModal, collapsed, onToggleCollapsed }: Props) {
-  const [tab, setTab] = useState<SidebarTab>('home')
+  const tab = useSidebarStore((s) => s.tab)
+  const setTab = useSidebarStore((s) => s.setTab)
   const unread = useUnreadActivityCount()
   const [majUnseen, setMajUnseen] = useState(isChangelogUnseen())
 

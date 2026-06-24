@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react'
 import { useCompanyStore } from '../../stores/companyStore'
 import { usePlayerStore } from '../../stores/playerStore'
 
-export function CompanyDirectoryList() {
+interface Props {
+  /** Appelé après un join réussi, avec l'id de la Compagnie rejointe (→ aller au hall). */
+  onJoined?: (companyId: string) => void
+}
+
+export function CompanyDirectoryList({ onJoined }: Props = {}) {
   const userId = usePlayerStore((s) => s.userId)
   const directory = useCompanyStore((s) => s.directory)
   const myCompanies = useCompanyStore((s) => s.myCompanies)
@@ -35,7 +40,10 @@ export function CompanyDirectoryList() {
         : 'Erreur lors de la demande.'
       setJoinError(msg)
       setTimeout(() => setJoinError(null), 4000)
+      return
     }
+    // Succès → on amène l'utilisateur au hall de la Compagnie rejointe
+    onJoined?.(companyId)
   }
 
   return (

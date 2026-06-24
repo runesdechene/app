@@ -75,6 +75,9 @@ interface CompanyStoreState {
   loading: boolean
   /** true dès que loadMine a abouti au moins une fois (anti-boucle de fetch). */
   companiesLoaded: boolean
+  /** Compagnie dont on veut afficher le hall (sidebar desktop). Posé au join. */
+  focusCompanyId: string | null
+  setFocusCompany: (id: string | null) => void
 
   /** Charge les compagnies de l'utilisateur courant */
   loadMine: (userId: string) => Promise<void>
@@ -107,6 +110,8 @@ export const useCompanyStore = create<CompanyStoreState>((set) => ({
   directory: [],
   loading: false,
   companiesLoaded: false,
+  focusCompanyId: null,
+  setFocusCompany: (id) => set({ focusCompanyId: id }),
 
   loadMine: async (userId) => {
     if (!userId) return
@@ -168,6 +173,14 @@ export const useCompanyStore = create<CompanyStoreState>((set) => ({
     }
     const result = data as ActionResult
     if ('success' in result && result.success) {
+      // Maj optimiste du compteur de l'annuaire (loadMine ne touche pas `directory`)
+      // + focus sur la compagnie rejointe pour afficher son hall.
+      set((state) => ({
+        focusCompanyId: companyId,
+        directory: state.directory.map((c) =>
+          c.id === companyId ? { ...c, memberCount: c.memberCount + 1 } : c
+        ),
+      }))
       await useCompanyStore.getState().loadMine(userId)
     }
     return result
@@ -184,6 +197,12 @@ export const useCompanyStore = create<CompanyStoreState>((set) => ({
     }
     const result = data as ActionResult<{ extinguished: boolean }>
     if ('success' in result && result.success) {
+      // Maj optimiste du compteur de l'annuaire (−1, plancher 0)
+      set((state) => ({
+        directory: state.directory.map((c) =>
+          c.id === companyId ? { ...c, memberCount: Math.max(0, c.memberCount - 1) } : c
+        ),
+      }))
       await useCompanyStore.getState().loadMine(userId)
     }
     return result

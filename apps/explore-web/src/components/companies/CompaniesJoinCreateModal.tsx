@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCompanyStore } from '../../stores/companyStore'
+import { useSidebarStore } from '../../stores/sidebarStore'
 import { CompanyDirectoryList } from './CompanyDirectoryList'
 import { CompanyCreateForm } from './CompanyCreateForm'
 
@@ -45,7 +46,14 @@ export function CompaniesJoinCreateModal({ userId, onClose }: Props) {
         </div>
 
         <div style={styles.body}>
-          <CompanyDirectoryList />
+          <CompanyDirectoryList
+            onJoined={() => {
+              // Aller au hall : on bascule la sidebar sur Compagnie (le focus est
+              // déjà posé par le store au join) et on ferme la modale.
+              useSidebarStore.getState().setTab('compagnie')
+              onClose()
+            }}
+          />
         </div>
 
         <div style={styles.footer}>
