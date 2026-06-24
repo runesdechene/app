@@ -59,6 +59,8 @@ const DIFFICULTY_ORDER: Array<'very_easy' | 'easy' | 'medium' | 'hard'> = ['very
 
 export function DailyEnigma({ onClose }: DailyEnigmaProps) {
   const userId = usePlayerStore(s => s.userId)
+  const companyName = usePlayerStore(s => s.userFactionTitle)
+  const companyColor = usePlayerStore(s => s.userFactionColor)
   const setCrownsBalance = useCrownsStore(s => s.setBalance)
   const [enigmas, setEnigmas] = useState<Enigma[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -195,6 +197,11 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
             <img src={parcheminImg} alt="" className="enigma-header-chest" />
             <h2 className="enigma-title">{'\u00c9'}nigmes du jour</h2>
             {enigmas.length > 0 && <span className="enigma-progress">{progress}</span>}
+            {companyName && (
+              <span style={{ fontFamily: 'var(--font-accent, sans-serif)', fontSize: 13, fontWeight: 600, color: companyColor || 'var(--color-ink, #4A3728)' }}>
+                ⚔️ pour {companyName}
+              </span>
+            )}
           </div>
         )}
 
