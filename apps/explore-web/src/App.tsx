@@ -12,6 +12,7 @@ const ChatPage = lazy(() => import('./pages/ChatPage'))
 const ActivityPage = lazy(() => import('./pages/ActivityPage'))
 const NouvellesPage = lazy(() => import('./pages/NouvellesPage'))
 const ArticlePage = lazy(() => import('./pages/ArticlePage'))
+const CompaniesPage = lazy(() => import('./pages/CompaniesPage'))
 
 /** Redirige vers /accueil sur mobile et /carte sur desktop. Utilisé pour /post-login. */
 function RootRedirect() {
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/activite" element={<ActivityPage />} />
               <Route path="/nouvelles" element={<NouvellesPage />} />
               <Route path="/article/:slug" element={<ArticlePage />} />
+              <Route path="/compagnies" element={<CompaniesPage />} />
             </Route>
           </Route>
         </Routes>
