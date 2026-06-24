@@ -53,6 +53,7 @@ export function BottomTabbar() {
         </button>
 
         <TabbarCell to="/activite" icon="🔔" label="Activité" unreadBadge={unreadActivity} />
+        <TabbarCell to="/compagnies" icon="⚔️" label="Compagnies" />
         <TabbarCell to="/carte" icon="🗺️" label="Carte" />
       </nav>
 

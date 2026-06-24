@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useGeolocPromptStore } from '../../stores/geolocPromptStore'
+import { useCompanyStore } from '../../stores/companyStore'
 import { EmailChangeModal } from './EmailChangeModal'
 import { PushSettings } from '../notifications/PushSettings'
 import { supabase } from '../../lib/supabase'
@@ -16,6 +18,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const [open, setOpen] = useState(false)
   const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   // Lire directement depuis playerStore au lieu de refaire un appel RPC
   const userId = usePlayerStore(s => s.userId)
@@ -27,6 +30,17 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
   const brouillerPistes = usePlayerStore(s => s.brouillerPistes)
   const [savingBrouiller, setSavingBrouiller] = useState(false)
+
+  // Compagnie active (bannière)
+  const myCompanies = useCompanyStore(s => s.myCompanies)
+  const companiesLoading = useCompanyStore(s => s.loading)
+  const activeCompany = myCompanies.find(c => c.isActive) ?? null
+
+  useEffect(() => {
+    if (userId && myCompanies.length === 0 && !companiesLoading) {
+      useCompanyStore.getState().loadMine(userId)
+    }
+  }, [userId, myCompanies.length, companiesLoading])
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return
@@ -67,6 +81,11 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
     useMapStore.getState().setSelectedPlayerId(userId)
   }
 
+  function handleGoCompagnies() {
+    setOpen(false)
+    navigate('/compagnies')
+  }
+
   return (
     <div className="profile-menu-container" ref={menuRef}>
       <button
@@ -100,6 +119,20 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
 
           <button className="profile-dropdown-action" onClick={handleViewProfile}>
             Voir mon profil
+          </button>
+
+          <button className="profile-dropdown-action" onClick={handleGoCompagnies}>
+            {activeCompany ? (
+              <span className="faction-current">
+                <span
+                  className="faction-selector-dot"
+                  style={{ backgroundColor: activeCompany.color }}
+                />
+                {activeCompany.name}
+              </span>
+            ) : (
+              'Mes Compagnies'
+            )}
           </button>
 
           <button
