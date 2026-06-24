@@ -35,8 +35,10 @@ export interface FactionMember {
   avatarUrl: string | null
   joinedAt: string
   isFounder: boolean
-  /** Coupe de la saison active — détermine le rang (le 1er = Chef). */
+  /** Coupe de la saison active. */
   coupe: number
+  /** Couronnes investies dans la Compagnie (le fondateur part avec le coût payé). */
+  crownsInvested: number
 }
 
 export interface FactionDetail {

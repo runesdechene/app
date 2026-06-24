@@ -185,7 +185,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                       <div className="faction-hall-rank-chef" style={{ color: detail.color }}>♛ Chef de Compagnie</div>
                     )}
                   </div>
-                  <span className="faction-hall-rank-stats">🏆 {m.coupe.toLocaleString('fr-FR')}</span>
+                  <span className="faction-hall-rank-stats">
+                    🏆 {m.coupe.toLocaleString('fr-FR')}
+                    {m.crownsInvested > 0 && <>{'  '}🪙 {m.crownsInvested.toLocaleString('fr-FR')}</>}
+                  </span>
                   {isChef && !memberIsChef && m.userId !== userId && (
                     <button className="faction-hall-rank-remove" onClick={() => handleRemove(m.userId)}
                       disabled={removingId === m.userId} aria-label={`Exclure ${m.name}`}>
