@@ -102,6 +102,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
       setJoinError(
         result.error === 'too_many' ? 'Tu fais déjà partie de 2 Compagnies.'
         : result.error === 'already_member' ? 'Tu es déjà membre.'
+        : result.error === 'faction_full' ? 'Cette Compagnie est au complet pour l’instant — d’autres ont besoin de toi.'
         : 'Impossible de rejoindre pour le moment.'
       )
       return
@@ -302,8 +303,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           userId={userId}
           editFaction={editFaction}
           editTags={detail.tags}
+          canDelete={detail.createdBy === userId}
           onSuccess={() => { setShowEdit(false); reload() }}
           onCancel={() => setShowEdit(false)}
+          onDeleted={() => { setShowEdit(false); onClose() }}
         />
       )}
 

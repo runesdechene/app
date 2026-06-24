@@ -1,3 +1,12 @@
+# ALPHA V0.10.5
+## Dissoudre, et des Compagnies plus équilibrées
+
+- **Dissoudre sa Compagnie** : le fondateur peut désormais la supprimer depuis l'écran d'édition (avec confirmation). Ses territoires redeviennent neutres.
+- **Équilibre** : on ne peut plus rejoindre une Compagnie devenue beaucoup plus nombreuse que les autres — pour laisser leur chance aux plus petites. Fonder la sienne reste toujours possible.
+- Au passage : changer de bannière ne repeint plus tes territoires (chacun garde la couleur de la Compagnie sous laquelle tu l'as pris).
+
+---
+
 # ALPHA V0.10.4
 ## La Coupe au mérite, l'or pour bâtir la Compagnie
 

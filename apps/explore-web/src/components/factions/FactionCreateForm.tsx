@@ -37,14 +37,30 @@ interface Props {
   editFaction?: MyFaction
   /** Tags existants (mode édition) pour préremplir. */
   editTags?: string[]
+  /** Le joueur est-il le fondateur ? (autorise la suppression) */
+  canDelete?: boolean
   onSuccess: () => void
   onCancel: () => void
+  /** Appelé après suppression réussie (ferme tout le Hall). */
+  onDeleted?: () => void
 }
 
 /** Fonder / éditer une Compagnie (mécanique = faction). */
-export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, onCancel }: Props) {
+export function FactionCreateForm({ userId, editFaction, editTags, canDelete, onSuccess, onCancel, onDeleted }: Props) {
   const create = useFactionGroupStore((s) => s.create)
   const updateIdentity = useFactionGroupStore((s) => s.updateIdentity)
+  const deleteFaction = useFactionGroupStore((s) => s.deleteFaction)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  async function handleDelete() {
+    if (!editFaction) return
+    setDeleting(true)
+    const result = await deleteFaction(userId, editFaction.id)
+    setDeleting(false)
+    if ('error' in result) { setError(ERROR_MESSAGES[String(result.error)] ?? ERROR_MESSAGES.unknown) }
+    else { (onDeleted ?? onSuccess)() }
+  }
 
   const [name, setName] = useState(editFaction?.name ?? '')
   const [color, setColor] = useState(editFaction?.color ?? COLOR_PALETTE[0])
@@ -272,6 +288,29 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
               {submitting ? 'En cours…' : isEdit ? 'Enregistrer' : 'Fonder'}
             </button>
           </div>
+
+          {isEdit && canDelete && (
+            <div className="faction-form-danger">
+              {!confirmDelete ? (
+                <button type="button" className="faction-form-delete"
+                  onClick={() => setConfirmDelete(true)} disabled={submitting || deleting}>
+                  🗑 Supprimer la Compagnie
+                </button>
+              ) : (
+                <div className="faction-form-delete-confirm">
+                  <span className="faction-form-delete-q">Supprimer définitivement « {editFaction?.name} » ? C'est irréversible.</span>
+                  <div className="faction-form-delete-row">
+                    <button type="button" className="faction-form-delete-no"
+                      onClick={() => setConfirmDelete(false)} disabled={deleting}>Non</button>
+                    <button type="button" className="faction-form-delete-yes"
+                      onClick={handleDelete} disabled={deleting}>
+                      {deleting ? 'Suppression…' : 'Oui, supprimer'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </form>
     </div>

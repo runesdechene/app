@@ -119,6 +119,8 @@ interface FactionGroupState {
     params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
   ) => Promise<ActionResult>
   removeMember: (userId: string, factionId: string, targetUserId: string) => Promise<ActionResult>
+  /** Supprime une Compagnie (fondateur uniquement) — soft-retire côté serveur. */
+  deleteFaction: (userId: string, factionId: string) => Promise<ActionResult>
 }
 
 export const useFactionGroupStore = create<FactionGroupState>((set) => ({
@@ -283,5 +285,23 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       return { error: 'unknown' }
     }
     return data as ActionResult
+  },
+
+  deleteFaction: async (userId, factionId) => {
+    const { data, error } = await supabase.rpc('delete_faction', {
+      p_user_id: userId,
+      p_faction_id: factionId,
+    })
+    if (error) {
+      console.error('[faction] delete_faction error:', error.message)
+      return { error: 'unknown' }
+    }
+    const result = data as ActionResult
+    if ('success' in result && result.success) {
+      await useFactionGroupStore.getState().loadMine(userId)
+      const s = useFactionGroupStore.getState()
+      await syncActiveToPlayer(s.activeFactionId, s.myFactions)
+    }
+    return result
   },
 }))

@@ -142,6 +142,29 @@
 .faction-form-glyph:hover { background: rgba(193, 154, 107, 0.22); }
 .faction-form-glyph.is-active { border-color: #5d4632; background: rgba(193, 154, 107, 0.3); }
 
+/* Zone danger : suppression de la Compagnie (fondateur) */
+.faction-form-danger { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(155, 45, 45, 0.25); }
+.faction-form-delete {
+  width: 100%; padding: 9px 12px; border-radius: 9px; cursor: pointer;
+  border: 1px solid rgba(155, 45, 45, 0.5); background: rgba(155, 45, 45, 0.06);
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 600; color: #9b2d2d;
+}
+.faction-form-delete:hover:not(:disabled) { background: rgba(155, 45, 45, 0.14); }
+.faction-form-delete-confirm { display: flex; flex-direction: column; gap: 8px; }
+.faction-form-delete-q {
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; color: #9b2d2d;
+}
+.faction-form-delete-row { display: flex; gap: 8px; }
+.faction-form-delete-no, .faction-form-delete-yes {
+  flex: 1 1 0; padding: 9px 12px; border-radius: 9px; cursor: pointer;
+  font-family: var(--font-accent, Helvetica, sans-serif); font-size: 13px; font-weight: 700;
+}
+.faction-form-delete-no { border: 1px solid rgba(74, 55, 40, 0.4); background: rgba(255,255,255,0.5); color: #4a3925; }
+.faction-form-delete-yes { border: none; background: #9b2d2d; color: #fff; }
+.faction-form-delete-yes:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .faction-form-cost {
   margin: 0;
   font-family: var(--font-accent, Helvetica, sans-serif);
