@@ -10,6 +10,7 @@ const MobileLayout = lazy(() => import('./pages/MobileLayout'))
 const HomePage = lazy(() => import('./pages/HomePage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
 const ActivityPage = lazy(() => import('./pages/ActivityPage'))
+const CompaniesPage = lazy(() => import('./pages/CompaniesPage'))
 const NouvellesPage = lazy(() => import('./pages/NouvellesPage'))
 const ArticlePage = lazy(() => import('./pages/ArticlePage'))
 
@@ -39,6 +40,7 @@ export default function App() {
               <Route path="/accueil" element={<HomePage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/activite" element={<ActivityPage />} />
+              <Route path="/compagnies" element={<CompaniesPage />} />
               <Route path="/nouvelles" element={<NouvellesPage />} />
               <Route path="/article/:slug" element={<ArticlePage />} />
             </Route>

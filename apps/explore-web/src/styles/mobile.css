@@ -1246,3 +1246,18 @@
     line-height: 1.2;
   }
 }
+/* ── V1 Compagnies : scoreboard carte allégé sur mobile ──
+   Sur mobile, le scoreboard ne montre que les Compagnies + leur score.
+   Fonder / Explorer vivent dans la page /compagnies (onglet dédié). */
+@media (max-width: 768px) {
+  .faction-scoreboard-explore,
+  .faction-scoreboard-found {
+    display: none;
+  }
+  .faction-scoreboard-rail {
+    max-height: 38vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .faction-scoreboard-rail::-webkit-scrollbar { width: 0; display: none; }
+}

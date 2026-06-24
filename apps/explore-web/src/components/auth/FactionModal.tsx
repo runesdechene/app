@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
@@ -46,7 +47,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
     else { onClose(); openHall(factionId) }
   }
 
-  return (
+  return createPortal(
     <div className="faction-explore-overlay" onClick={() => onClose(false)}>
       <div
         className={`faction-modal${isMobile ? ' faction-modal-mobile' : ''}`}
@@ -126,6 +127,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
           onCancel={() => setShowCreate(false)}
         />
       )}
-    </div>
+    </div>,
+    document.body,
   )
 }

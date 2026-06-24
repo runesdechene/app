@@ -2,7 +2,6 @@ import { NavLink, useMatch } from 'react-router-dom'
 import { useState } from 'react'
 import { BottomTabbarPlusMenu } from './BottomTabbarPlusMenu'
 import { AddGpsMarkModal } from '../places/modals/AddGpsMarkModal'
-import { useUnreadActivityCount } from '../../hooks/useUnreadActivityCount'
 import './BottomTabbar.css'
 
 interface CellProps {
@@ -32,8 +31,6 @@ export function BottomTabbar() {
   const [plusOpen, setPlusOpen] = useState(false)
   const [showAddGpsMark, setShowAddGpsMark] = useState(false)
 
-  // Activité = events publics de la carte (toastStore), pas notifs perso (NotificationStore).
-  const unreadActivity = useUnreadActivityCount()
   // chatStore n'a pas de unread natif aujourd'hui — placeholder à 0.
   const unreadChat = 0
 
@@ -52,7 +49,7 @@ export function BottomTabbar() {
           <span className="bottom-tabbar-plus-circle" aria-hidden>+</span>
         </button>
 
-        <TabbarCell to="/activite" icon="🔔" label="Activité" unreadBadge={unreadActivity} />
+        <TabbarCell to="/compagnies" icon="🛡️" label="Compagnies" />
         <TabbarCell to="/carte" icon="🗺️" label="Carte" />
       </nav>
 
