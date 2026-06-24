@@ -112,7 +112,7 @@ interface FactionGroupState {
   loadDirectory: (search?: string) => Promise<void>
   create: (
     userId: string,
-    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
+    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string; invest: number },
   ) => Promise<ActionResult<{ factionId: string; cost: number }>>
   join: (userId: string, factionId: string) => Promise<ActionResult>
   leave: (userId: string, factionId: string) => Promise<ActionResult<{ extinguished: boolean }>>
@@ -161,7 +161,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     set({ directory: (data as FactionSummary[]) ?? [] })
   },
 
-  create: async (userId, { name, color, description, imageUrl, tags, emblemIcon, emblemMono }) => {
+  create: async (userId, { name, color, description, imageUrl, tags, emblemIcon, emblemMono, invest }) => {
     const { data, error } = await supabase.rpc('create_faction', {
       p_user_id: userId,
       p_name: name,
@@ -171,6 +171,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       p_tags: tags,
       p_emblem_icon: emblemIcon,
       p_emblem_mono: emblemMono,
+      p_invest: invest,
     })
     if (error) {
       console.error('[faction] create_faction error:', error.message)

@@ -30,7 +30,7 @@ export function CompanyIntroModal({ onChoose, onCreate, onClose }: Props) {
             Choisir une Compagnie
           </button>
           <button className="company-intro-btn company-intro-btn-secondary" onClick={onCreate}>
-            Créer une Compagnie — 200 🪙
+            Créer une Compagnie — dès 50 🪙
           </button>
         </div>
 

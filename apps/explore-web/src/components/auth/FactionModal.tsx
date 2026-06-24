@@ -30,7 +30,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
   const loadMine = useFactionGroupStore(s => s.loadMine)
   const openHall = useFactionHallStore(s => s.open)
   const balance = useCrownsStore(s => s.balance)
-  const FOUND_COST = 200
+  const FOUND_COST = 50
 
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)

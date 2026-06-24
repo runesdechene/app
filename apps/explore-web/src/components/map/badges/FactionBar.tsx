@@ -40,7 +40,7 @@ export function FactionBar() {
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const balance = useCrownsStore(s => s.balance)
   const loadMine = useFactionGroupStore(s => s.loadMine)
-  const FOUND_COST = 200
+  const FOUND_COST = 50
   const canAfford = balance >= FOUND_COST
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)

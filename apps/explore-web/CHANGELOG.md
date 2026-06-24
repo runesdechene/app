@@ -1,3 +1,10 @@
+# ALPHA V0.10.7
+## Fonder une Compagnie, plus accessible
+
+Fonder une Compagnie ne coûte plus que **50 🪙** (au lieu de 200). Et si vous voulez démarrer fort, vous pouvez **investir davantage à la fondation** : tout le montant rejoint le **trésor** de votre Compagnie.
+
+---
+
 # ALPHA V0.10.6
 ## Compagnies « complètes », visibles d'un coup d'œil
 

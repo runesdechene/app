@@ -11,7 +11,7 @@ import { CoupeModal } from '../components/map/modals/CoupeModal'
 import '../components/home/coupe/CoupeHeritages.css'
 import './CompaniesPage.css'
 
-const FOUND_COST = 200
+const FOUND_COST = 50
 
 /**
  * Page /compagnies (mobile) — remplace l'Activité. Bannière Coupe (→ classement),

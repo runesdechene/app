@@ -21,6 +21,8 @@ const MONO_OPTIONS: { value: string; label: string }[] = [
   { value: 'black', label: 'Noir' },
 ]
 
+const MIN_FOUND = 50
+
 const ERROR_MESSAGES: Record<string, string> = {
   name_taken: 'Ce nom est déjà utilisé.',
   name_too_long: 'Le nom est trop long (40 caractères max).',
@@ -67,6 +69,7 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
   const [description, setDescription] = useState(editFaction?.description ?? '')
   const [tags, setTags] = useState((editTags ?? []).join(', '))
   const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 6)
+  const [invest, setInvest] = useState(MIN_FOUND)
 
   // Emblème : un glyphe du set OU un PNG importé. Le mono colore/filtre l'emblème.
   const [emblemIcon, setEmblemIcon] = useState<string | null>(editFaction?.emblemIcon ?? null)
@@ -130,6 +133,7 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
       const result = await create(userId, {
         name: name.trim(), color, description: description.trim(), imageUrl: null,
         tags: tagsArray, emblemIcon: file ? null : emblemIcon, emblemMono,
+        invest: Math.max(MIN_FOUND, invest || MIN_FOUND),
       })
       if ('error' in result) { resolveErr(result as { error: string; cost?: number; balance?: number }); setSubmitting(false); return }
       // PNG uploadé après coup (besoin de l'id), puis on rebranche l'identité.
@@ -270,8 +274,19 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
             </div>
           </div>
 
-          {!isEdit && !costInfo && (
-            <p className="faction-form-cost">Fonder une Compagnie coûte <b>200 🪙</b></p>
+          {!isEdit && (
+            <label className="faction-form-label">
+              Investissement de départ
+              <input
+                className="faction-form-input" type="number" min={MIN_FOUND} step={10}
+                value={invest}
+                onChange={(e) => setInvest(Math.max(MIN_FOUND, parseInt(e.target.value, 10) || MIN_FOUND))}
+                disabled={submitting}
+              />
+              <span className="faction-form-cost">
+                Fonder coûte au moins <b>{MIN_FOUND} 🪙</b>. Tout le montant rejoint le <b>trésor</b> de ta Compagnie.
+              </span>
+            </label>
           )}
           {costInfo && (
             <p className="faction-form-cost">
