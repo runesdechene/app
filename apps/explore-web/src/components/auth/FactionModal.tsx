@@ -1,169 +1,66 @@
-﻿import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { TagBonusList } from '../map/modals/TagBonusList'
+import { useEffect, useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
-import { useMapStore } from '../../stores/mapStore'
+import { useFactionGroupStore } from '../../stores/factionGroupStore'
+import { useFactionHallStore } from '../../stores/factionHallStore'
+import { FactionCreateForm } from '../factions/FactionCreateForm'
 import './FactionModal.css'
-
-interface FactionData {
-  id: string
-  title: string
-  color: string
-  pattern: string | null
-  description: string | null
-  image_url: string | null
-  bonus_energy: number
-  bonus_regen_energy: number
-}
 
 interface FactionModalProps {
   onClose: (joined?: boolean) => void
+  /** Compagnie active (bannière) — pour marquer la carte « active ». */
   currentFactionId: string | null
 }
 
+/**
+ * « Explorer les Compagnies » — réutilise l'ancienne modale de choix de faction.
+ * Liste les Compagnies actives (non retirées), rejoindre en 1 clic (join_faction),
+ * ou fonder. Mécanique = faction ; user-facing = Compagnie.
+ */
 export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
-  const [factions, setFactions] = useState<FactionData[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selecting, setSelecting] = useState(false)
-  const [confirmFaction, setConfirmFaction] = useState<string | null>(null)
-
   const userId = usePlayerStore(s => s.userId)
-  const setUserFactionId = usePlayerStore(s => s.setUserFactionId)
-  const setUserFactionColor = usePlayerStore(s => s.setUserFactionColor)
-  const setUserFactionTitle = usePlayerStore(s => s.setUserFactionTitle)
-  const setUserFactionPattern = usePlayerStore(s => s.setUserFactionPattern)
-  const setDiscoveredIds = usePlayerStore(s => s.setDiscoveredIds)
-  const incrementPlacesRefreshKey = useMapStore(s => s.incrementPlacesRefreshKey)
-  const [cooldownError, setCooldownError] = useState<string | null>(null)
+  const directory = useFactionGroupStore(s => s.directory)
+  const loadDirectory = useFactionGroupStore(s => s.loadDirectory)
+  const myFactions = useFactionGroupStore(s => s.myFactions)
+  const loadMine = useFactionGroupStore(s => s.loadMine)
+  const join = useFactionGroupStore(s => s.join)
+  const openHall = useFactionHallStore(s => s.open)
 
-  const [underdogFactionId, setUnderdogFactionId] = useState<string | null>(null)
-  const [tagBonuses, setTagBonuses] = useState<Record<string, Array<{ tagTitle: string; tagIcon: string | null; tagColor: string; tagBg: string; reduction: number }>>>({})
+  const [loading, setLoading] = useState(true)
+  const [joiningId, setJoiningId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => {
-    Promise.all([
-      // V0.7+ Mig 065 : factions triées par nombre de membres ASC (les plus
-      // faibles d'abord) pour auto-équilibrage des inscriptions.
-      supabase.rpc('get_factions_for_choice'),
-      supabase.rpc('get_underdog_faction_id'),
-      supabase.from('faction_tag_bonuses').select('faction_id, tag_id, cost_reduction'),
-      supabase.from('tags').select('id, title, icon, color, background'),
-    ]).then(([factionsRes, underdogRes, bonusRes, tagsRes]) => {
-      if (factionsRes.data) setFactions(factionsRes.data as FactionData[])
-      if (underdogRes.data) setUnderdogFactionId(underdogRes.data as string)
+    if (userId) loadMine(userId)
+    Promise.resolve(loadDirectory()).finally(() => setLoading(false))
+  }, [userId, loadDirectory, loadMine])
 
-      if (bonusRes.data && tagsRes.data) {
-        const tagMap = new Map((tagsRes.data as Array<{ id: string; title: string; icon: string | null; color: string; background: string }>).map(t => [t.id, { title: t.title, icon: t.icon, color: t.color, bg: t.background }]))
-        const map: Record<string, Array<{ tagTitle: string; tagIcon: string | null; tagColor: string; tagBg: string; reduction: number }>> = {}
-        for (const row of bonusRes.data as Array<{ faction_id: string; tag_id: string; cost_reduction: number }>) {
-          if (row.cost_reduction <= 0) continue
-          if (!map[row.faction_id]) map[row.faction_id] = []
-          const tag = tagMap.get(row.tag_id)
-          map[row.faction_id].push({ tagTitle: tag?.title ?? row.tag_id, tagIcon: tag?.icon ?? null, tagColor: tag?.color ?? '#C19A6B', tagBg: tag?.bg ?? '#F5E6D3', reduction: row.cost_reduction })
-        }
-        setTagBonuses(map)
-      }
-
-      setLoading(false)
-    })
-  }, [])
-
-  /** Recharger discoveries + jauges après changement de faction */
-  async function reloadAfterFactionChange() {
-    if (!userId) return
-    const [discRes, energyRes] = await Promise.all([
-      supabase.rpc('get_user_discoveries', { p_user_id: userId }),
-      supabase.rpc('get_user_energy', { p_user_id: userId }),
-    ])
-    if (discRes.data) setDiscoveredIds(discRes.data as string[])
-    if (energyRes.data) {
-      const d = energyRes.data as Record<string, number>
-      usePlayerStore.setState({
-        energy: d.energy ?? 0,
-        maxEnergy: d.maxEnergy ?? 5,
-        nextPointIn: d.nextPointIn ?? 0,
-        energyCycle: d.energyCycle ?? 7200,
-      })
-    }
-  }
-
-  function handleFactionClick(factionId: string) {
-    // Si changement de faction (avait une, passe a une autre) → confirmation
-    if (currentFactionId && currentFactionId !== factionId) {
-      setConfirmFaction(factionId)
-    } else {
-      selectFaction(factionId)
-    }
-  }
-
-  async function selectFaction(factionId: string) {
-    if (!userId || selecting) return
-    setSelecting(true)
-
-    setCooldownError(null)
-
-    const { data } = await supabase.rpc('set_user_faction', {
-      p_user_id: userId,
-      p_faction_id: factionId,
-    })
-
-    if (data?.error === 'cooldown') {
-      setCooldownError(`Vous devez attendre encore ${data.daysRemaining} jour${data.daysRemaining > 1 ? 's' : ''} avant de changer de Compagnie.`)
-      setConfirmFaction(null)
-      setSelecting(false)
-      return
-    }
-
-    if (data?.error) {
-      setCooldownError(data.error)
-      setConfirmFaction(null)
-      setSelecting(false)
-      return
-    }
-
-    const faction = factions.find(f => f.id === factionId)
-    setUserFactionId(factionId)
-    setUserFactionColor(faction?.color ?? null)
-    setUserFactionTitle(faction?.title ?? null)
-    setUserFactionPattern(faction?.pattern ?? null)
-
-    await reloadAfterFactionChange()
-
-    // Mettre à jour les tags Shopify (fire-and-forget)
-    const userEmail = await supabase.auth.getUser().then(({ data }) => data.user?.email)
-    if (userEmail) {
-      fetch('https://hub.runesdechene.com/.netlify/functions/shopify-create-customer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, firstName: usePlayerStore.getState().userName, factionTitle: faction?.title }),
-      })
-        .then(res => { if (!res.ok) console.warn('[FactionModal] shopify sync HTTP', res.status) })
-        .catch(err => console.warn('[FactionModal] shopify sync failed', err))
-    }
-
-    // Re-fetch les places (couleurs de faction changent) + fermer la modal
-    incrementPlacesRefreshKey()
-    setSelecting(false)
-    onClose(true)
-  }
-
-  async function leaveFaction() {
-    if (!userId || selecting) return
-    setSelecting(true)
-
-    await supabase.rpc('set_user_faction', {
-      p_user_id: userId,
-      p_faction_id: null,
-    })
-
-    setUserFactionId(null)
-    setUserFactionColor(null)
-    await reloadAfterFactionChange()
-
-    setSelecting(false)
-    onClose(false)
-  }
-
+  const atLimit = myFactions.length >= 2
   const isMobile = window.innerWidth <= 768
+
+  async function handleCardClick(factionId: string) {
+    if (!userId) return
+    const alreadyMember = myFactions.some(f => f.id === factionId)
+    if (alreadyMember) {
+      onClose()
+      openHall(factionId)
+      return
+    }
+    if (atLimit) { setError('Tu fais déjà partie de 2 Compagnies.'); return }
+    setJoiningId(factionId)
+    setError(null)
+    const result = await join(userId, factionId)
+    setJoiningId(null)
+    if ('error' in result) {
+      setError(
+        result.error === 'too_many' ? 'Tu fais déjà partie de 2 Compagnies.'
+        : 'Impossible de rejoindre pour le moment.'
+      )
+      return
+    }
+    onClose(true)
+    openHall(factionId)
+  }
 
   return (
     <div className="auth-overlay" onClick={() => onClose(false)} style={isMobile ? { zIndex: 10001 } : undefined}>
@@ -175,110 +72,72 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
           &#10005;
         </button>
 
-        <h2 className="faction-modal-title">Choisissez votre Compagnie</h2>
+        <h2 className="faction-modal-title">Explorer les Compagnies</h2>
         <p className="faction-modal-subtitle">
-          Votre Compagnie, c'est votre manière d'agir. Mais quelle qu'elle soit, tous les joueurs collaborent pour réenchanter le monde et protéger l'Histoire.
+          Rejoins une Compagnie pour porter ses couleurs, ou fonde la tienne. Toutes œuvrent à
+          réenchanter le monde — choisis la tienne.
         </p>
 
         {loading ? (
-          <p className="faction-modal-loading">Chargement...</p>
+          <p className="faction-modal-loading">Chargement…</p>
+        ) : directory.length === 0 ? (
+          <p className="faction-modal-loading">Aucune Compagnie pour l'instant. Fonde la première !</p>
         ) : (
           <div className="faction-modal-grid">
-            {factions.map(f => {
-              const isActive = currentFactionId === f.id
-              const isUnderdog = underdogFactionId === f.id
+            {directory.map(c => {
+              const isMember = myFactions.some(f => f.id === c.id)
+              const isActive = currentFactionId === c.id
               return (
                 <button
-                  key={f.id}
-                  className={`faction-card${isActive ? ' active' : ''}${isUnderdog ? ' underdog' : ''}`}
-                  style={{ '--faction-color': f.color } as React.CSSProperties}
-                  onClick={() => handleFactionClick(f.id)}
-                  disabled={selecting}
+                  key={c.id}
+                  className={`faction-card${isActive ? ' active' : ''}`}
+                  style={{ '--faction-color': c.color } as React.CSSProperties}
+                  onClick={() => handleCardClick(c.id)}
+                  disabled={joiningId === c.id}
                 >
-                  {f.image_url ? (
-                    <img src={f.image_url} alt={f.title} className="faction-card-img" />
+                  {c.imageUrl ? (
+                    <img src={c.imageUrl} alt={c.name} className="faction-card-img" />
                   ) : (
-                    <div className="faction-card-placeholder" style={{ backgroundColor: f.color }} />
+                    <div className="faction-card-placeholder" style={{ backgroundColor: c.color }} />
                   )}
                   <div className="faction-card-body">
-                    <span className="faction-card-name">{f.title}</span>
-                    {f.description && (
-                      <div className="faction-card-desc" dangerouslySetInnerHTML={{ __html: f.description.replace(/\n/g, '<br>') }} />
+                    <span className="faction-card-name">{c.name}</span>
+                    {c.description && (
+                      <div className="faction-card-desc">{c.description}</div>
                     )}
-                    {tagBonuses[f.id]?.length > 0 && (
-                      <TagBonusList
-                        primary={tagBonuses[f.id].filter(b => b.reduction >= 50).map(b => ({ title: b.tagTitle, icon: b.tagIcon, color: b.tagColor, bg: b.tagBg }))}
-                        secondary={tagBonuses[f.id].filter(b => b.reduction > 0 && b.reduction < 50).map(b => ({ title: b.tagTitle, icon: b.tagIcon, color: b.tagColor, bg: b.tagBg }))}
-                        primaryReduction={tagBonuses[f.id].find(b => b.reduction >= 50)?.reduction}
-                        secondaryReduction={tagBonuses[f.id].find(b => b.reduction > 0 && b.reduction < 50)?.reduction}
-                      />
-                    )}
-                    {isUnderdog && (
-                      <div className="faction-card-underdog">
-                        <span className="faction-card-underdog-title">{'\uD83D\uDC80'} BAROUD D'HONNEUR {'\uD83D\uDC80'}</span>
-                        <p className="faction-card-underdog-desc">Cette faction lutte pour sa survie ! Régénération d'énergie multipliée.</p>
-                      </div>
-                    )}
-                    {isActive && (
-                      <span className="faction-card-badge">Actuelle</span>
-                    )}
+                    <div className="faction-card-desc" style={{ opacity: 0.7, marginTop: 4 }}>
+                      👥 {c.memberCount} · 🏆 {c.score}
+                    </div>
+                    {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
+                    {joiningId === c.id && <span className="faction-card-badge">…</span>}
                   </div>
                 </button>
               )
             })}
           </div>
         )}
-        <div className="faction-legend">
-          <span className="faction-legend-item">⚡ Énergie — Découvrir, veiller et fortifier les lieux</span>
-          <span className="faction-legend-item">🎖️ Gloire — Votre prestige total, à vie</span>
-          <span className="faction-legend-item">🪙 Couronnes — Influencer un lieu à distance (mécénat)</span>
-          <span className="faction-legend-item">🏆 Coupe — Le classement des Compagnies cette saison</span>
-          {currentFactionId && (
-            <span className="faction-legend-item" style={{ fontWeight: 600 }}>⏳ Changer de Compagnie n'est possible que 2 fois tous les 30 jours</span>
-          )}
-        </div>
 
-        {currentFactionId && (
-          <button
-            className="faction-modal-leave"
-            onClick={leaveFaction}
-            disabled={selecting}
-          >
-            Devenir un sans-bannière
-          </button>
+        {error && (
+          <p className="faction-modal-subtitle" style={{ color: '#c0392b' }}>{error}</p>
         )}
 
-        {/* Erreur cooldown */}
-        {cooldownError && (
-          <div className="faction-confirm-overlay">
-            <div className="faction-confirm-dialog">
-              <p>{cooldownError}</p>
-              <div className="faction-confirm-actions">
-                <button onClick={() => setCooldownError(null)}>Compris</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Confirmation changement de faction */}
-        {confirmFaction && !cooldownError && (
-          <div className="faction-confirm-overlay">
-            <div className="faction-confirm-dialog">
-              <p>
-                Êtes-vous sûr ? Changer de Compagnie n'est possible <strong>que 2 fois tous les 30 jours</strong>.
-              </p>
-              <div className="faction-confirm-actions">
-                <button onClick={() => setConfirmFaction(null)} disabled={selecting}>
-                  Annuler
-                </button>
-                <button onClick={() => selectFaction(confirmFaction)} disabled={selecting}>
-                  {selecting ? '...' : 'Confirmer'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <button
+          className="faction-modal-leave"
+          onClick={() => !atLimit && setShowCreate(true)}
+          disabled={atLimit}
+          title={atLimit ? 'Tu fais déjà partie de 2 Compagnies' : undefined}
+        >
+          ⚔️ Fonder une Compagnie — 200 🪙
+        </button>
       </div>
+
+      {showCreate && userId && (
+        <FactionCreateForm
+          userId={userId}
+          onSuccess={() => { setShowCreate(false); onClose(true) }}
+          onCancel={() => setShowCreate(false)}
+        />
+      )}
     </div>
   )
 }

@@ -13,6 +13,7 @@ import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
 import { FactionHallModal } from '../components/factions/FactionHallModal'
 import { useFactionHallStore } from '../stores/factionHallStore'
+import { useFactionGroupStore } from '../stores/factionGroupStore'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
@@ -114,6 +115,9 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const factionHallId = useFactionHallStore(s => s.openId)
   const closeFactionHall = useFactionHallStore(s => s.close)
+  const companiesLoaded = useFactionGroupStore(s => s.factionsLoaded)
+  const myCompaniesCount = useFactionGroupStore(s => s.myFactions.length)
+  const [companyPromptShown, setCompanyPromptShown] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAddGpsMark, setShowAddGpsMark] = useState(false)
@@ -349,6 +353,21 @@ export default function MapPage() {
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
   const isDesktop = useIsDesktop()
+
+  // Charge les Compagnies du joueur dès qu'on a son id.
+  useEffect(() => {
+    if (userId) useFactionGroupStore.getState().loadMine(userId)
+  }, [userId])
+
+  // À la connexion : proposer « Explorer les Compagnies » aux joueurs sans Compagnie
+  // (non bloquant — fermable). Une fois par session, hors tutoriel/onboarding.
+  useEffect(() => {
+    if (isAuthenticated && companiesLoaded && myCompaniesCount === 0
+        && !companyPromptShown && tutorialPhase === null && !showOnboarding) {
+      setCompanyPromptShown(true)
+      setShowFactionModal(true)
+    }
+  }, [isAuthenticated, companiesLoaded, myCompaniesCount, companyPromptShown, tutorialPhase, showOnboarding])
 
   // Repli de la leftbar : posé sur <html> pour que --sidebar-w (défini sur
   // :root, cf. MapDesktopLayout.css) bascule à 64px et soit lisible y compris
