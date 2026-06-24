@@ -3,6 +3,7 @@
   width: 36px;
   height: 36px;
   flex: none;
+  align-self: center; /* centré verticalement sans imposer align-items à la toolbar */
   padding: 0;
   border: none;
   background: none;

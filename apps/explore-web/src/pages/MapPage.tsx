@@ -457,10 +457,10 @@ export default function MapPage() {
         <div className="app-toolbar">
           {!authLoading && isAuthenticated && (
             <>
+              <BannerToggle />
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
               <CoupeBadge />
               <CrownsBadge />
-              <BannerToggle />
               <NotificationBell />
               <EnergyIndicator />
               <GpsMarksBadge />

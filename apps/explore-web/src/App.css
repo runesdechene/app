@@ -100,7 +100,6 @@
   right: 56px;
   z-index: 15;
   display: flex;
-  align-items: center;
   gap: 8px;
 }
 
