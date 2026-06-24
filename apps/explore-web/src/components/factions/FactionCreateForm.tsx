@@ -130,7 +130,7 @@ export function FactionCreateForm({ userId, editFaction, onSuccess, onCancel }: 
             Mission
             <textarea
               className="faction-form-textarea" value={description}
-              onChange={(e) => setDescription(e.target.value)} maxLength={300}
+              onChange={(e) => setDescription(e.target.value)} maxLength={500}
               placeholder="En quelques mots, la raison d'être de cette Compagnie…"
               disabled={submitting} rows={3}
             />
