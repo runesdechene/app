@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
+import { useIsDesktop } from '../../../hooks/useMediaQuery'
 import { useFactionGroupStore } from '../../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../../stores/factionHallStore'
 import { FactionCreateForm } from '../../factions/FactionCreateForm'
@@ -41,6 +42,7 @@ export function FactionBar() {
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
   const openHall = useFactionHallStore(s => s.open)
+  const isDesktop = useIsDesktop()
   const [showCreate, setShowCreate] = useState(false)
   const [showExplore, setShowExplore] = useState(false)
   const [showCoupeModal, setShowCoupeModal] = useState(false)
@@ -138,7 +140,11 @@ export function FactionBar() {
                     {faction.pattern && <img src={faction.pattern} alt="" className="faction-chip-emblem-img" />}
                   </span>
                 )}
-                <span className="faction-chip-name">{faction.factionTitle}</span>
+                <span className="faction-chip-name">
+                  {isDesktop || faction.factionTitle.length <= 10
+                    ? faction.factionTitle
+                    : `${faction.factionTitle.slice(0, 10)}…`}
+                </span>
                 {isMine && <span className="faction-chip-active" title="Ta bannière active">⚑</span>}
                 <span className="faction-chip-score">{'🏆'} {faction.score}</span>
               </button>
