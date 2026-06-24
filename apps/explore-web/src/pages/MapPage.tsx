@@ -17,6 +17,7 @@ import { FactionCreateForm } from '../components/factions/FactionCreateForm'
 import { BannerToggle } from '../components/factions/BannerToggle'
 import { useFactionHallStore } from '../stores/factionHallStore'
 import { useFactionGroupStore } from '../stores/factionGroupStore'
+import { useCompanyInvite } from '../hooks/useCompanyInvite'
 import { InfoModal } from '../components/map/modals/InfoModal'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { VoronoiTuningPanel } from '../components/map/overlays/VoronoiTuningPanel'
@@ -359,6 +360,7 @@ export default function MapPage() {
 
   const mobilePanel = useMobileNavStore(s => s.activePanel)
   const isDesktop = useIsDesktop()
+  useCompanyInvite()  // lien ?company=<id> → ouvre le Hall après auth
 
   // Charge les Compagnies du joueur dès qu'on a son id.
   useEffect(() => {

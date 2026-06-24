@@ -14,6 +14,7 @@ import { MobileSelectionModals } from '../components/navigation/MobileSelectionM
 import { FactionModal } from '../components/auth/FactionModal'
 import { FactionHallModal } from '../components/factions/FactionHallModal'
 import { useFactionHallStore } from '../stores/factionHallStore'
+import { useCompanyInvite } from '../hooks/useCompanyInvite'
 import { GameToast } from '../components/map/overlays/GameToast'
 import { usePlayerStore } from '../stores/playerStore'
 import { useCrownsStore } from '../stores/crownsStore'
@@ -62,6 +63,7 @@ export default function MobileLayout() {
   // V0.7.11 (10/05) — fetch initial du niveau via get_player_profile (sinon
   // la stats bar reste à niveau 1 tant qu'on n'a pas ouvert la carte).
   useLevel()
+  useCompanyInvite()  // lien ?company=<id> → ouvre le Hall après auth
 
   // Le solde de Couronnes n'était rafraîchi que dans ExploreMap (au montage de
   // la carte) → sur /accueil, /activite… la StatsBar affichait la valeur cachée

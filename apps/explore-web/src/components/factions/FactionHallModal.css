@@ -142,6 +142,20 @@
   font-style: italic; font-size: 15px; color: #8a7050;
 }
 
+/* Bouton « Inviter des amis » en tête du classement */
+.faction-hall-invite {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 11px 14px;
+  border: 1px solid var(--color-sepia);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 700;
+}
+.faction-hall-invite:hover { background: rgba(193, 154, 107, 0.18); }
+
 /* ── Classement ── */
 .faction-hall-rank { padding: 14px 18px 20px; display: flex; flex-direction: column; gap: 6px; }
 .faction-hall-rank-row {

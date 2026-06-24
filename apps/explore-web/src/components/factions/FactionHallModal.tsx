@@ -5,6 +5,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from './FactionCreateForm'
+import { CompanyInviteModal } from './CompanyInviteModal'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
 
@@ -51,6 +52,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
   const [detail, setDetail] = useState<FactionDetail | null>(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [showInvite, setShowInvite] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [joining, setJoining] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
@@ -182,6 +184,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
           {/* Classement */}
           <div className="faction-hall-section" style={{ paddingBottom: 0 }}>
+            <button className="faction-hall-invite" style={{ borderColor: detail.color, color: detail.color }} onClick={() => setShowInvite(true)}>
+              👥 Inviter des amis
+            </button>
             <h3 className="faction-hall-section-title">Classement de la Compagnie</h3>
           </div>
           <div className="faction-hall-rank">
@@ -264,6 +269,15 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           editTags={detail.tags}
           onSuccess={() => { setShowEdit(false); reload() }}
           onCancel={() => setShowEdit(false)}
+        />
+      )}
+
+      {showInvite && (
+        <CompanyInviteModal
+          factionId={detail.id}
+          factionName={detail.name}
+          color={detail.color}
+          onClose={() => setShowInvite(false)}
         />
       )}
     </div>,
