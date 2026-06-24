@@ -31,7 +31,21 @@ Sa singularité de design : **la hiérarchie interne est organique**. Personne n
   - sa **valeur de service** pour cette Compagnie est **perdue** (repart de zéro s'il y revient).
 - **Le solo reste un jeu complet** (garde-fou cold-start du socle) : un joueur sans Compagnie — ou en bannière « perso » — plante, tient du territoire sous sa **bannière perso**, grimpe le classement solo, gagne des médailles. La Compagnie amplifie, ne conditionne jamais.
 
-## 2. Fondation
+## 1bis. Compagnies officielles (seed admin — anti cold-start)
+
+Pour qu'au lancement le plateau ne soit pas vide (le vrai risque à faible densité), **les admins créent 4 grandes Compagnies « officielles »**, *fun*, **animées par les admins**. Elles sont vaguement **inspirées des Classes** (ambiance) mais **pas liées** à elles (pas de mapping, pas d'auto-assignation).
+
+- **Le joueur les rejoint librement** (porte ouverte, comme toute Compagnie) — jamais placé d'office. L'appartenance reste **choisie** (cohérent socle).
+- Elles donnent un **foyer peuplé immédiat** à qui ne veut pas (ou ne peut pas encore) monter son propre crew. Les **petites Compagnies joueur** coexistent à côté.
+- **Différences avec une Compagnie joueur** (drapeau `is_official`) :
+  - créées par un **admin** (RPC admin-gated), **sans coût en Couronnes** ;
+  - **ne s'éteignent pas** à 0 membre (elles persistent, le seed doit tenir) ;
+  - identité **éditée par les admins** (pas par un fondateur — elles n'ont pas de fondateur-joueur) ;
+  - comptent **normalement** dans le plafond de 2 et dans le score, comme les autres.
+
+> Les 4 sont créées **après le déploiement** par un admin (noms/images/couleurs *fun* choisis à la main), pas figées dans une migration — on ne code pas de lore en dur ici.
+
+## 2. Fondation (Compagnies joueur)
 
 - **Fonder coûte des Couronnes.** C'est le débouché clair qui manquait à la monnaie, et un filtre anti-Compagnies-fantômes. La dépense **n'est pas perdue** : elle se convertit en **avance de valeur de service** pour le fondateur (cf. §3).
   - *Montant par défaut : 150 Couronnes* — molette d'équilibrage, valeur finale calée à l'implémentation contre le taux de gain courant (cap 15/j → ~10 jours d'effort, significatif mais atteignable).
@@ -70,7 +84,7 @@ Les échelons sont des **seuils**, pas des sièges uniques : **tous** ceux au-de
 ### 3.4 Exclusion & extinction
 
 - **Exclure** (pouvoir Capitaine) = **bannissement court** : l'exclu ne peut pas re-rejoindre immédiatement (fenêtre = molette). Sans ça, la porte ouverte annulerait toute modération.
-- **Pas de bouton « dissoudre ».** Cela supprime le risque de **dissolution hostile** par un grimpeur. Une Compagnie **s'éteint d'elle-même quand son dernier membre la quitte** — son nom redevient alors disponible (ou est archivé, cf. plan).
+- **Pas de bouton « dissoudre ».** Cela supprime le risque de **dissolution hostile** par un grimpeur. Une Compagnie **joueur s'éteint d'elle-même quand son dernier membre la quitte** — son nom redevient alors disponible (ou est archivé, cf. plan). **Exception : les Compagnies officielles (`is_official`) ne s'éteignent jamais** (§1bis).
 
 ## 4. Identité
 
@@ -118,7 +132,7 @@ Les Compagnies **ne s'allient pas globalement** — il n'existe **aucun statut d
 
 > Doctrine campagne : **migrations additives uniquement** (CREATE, colonnes nullable/défaut, nouvelles RPC). Zéro DROP / ALTER cassant. L'ancien monde (Maisons/factions, Dortoir) tourne sous les users pendant la bascule.
 
-- `companies` — `id`, `name` (unique, citext), `image_url` (vers le bucket), `color`, `description`, `founder_user_id`, `created_at`. Les 4 éléments d'identité sont éditables par les Capitaines. Le coût de fondation est **débité une fois** à la création.
+- `companies` — `id`, `name` (unique, citext), `image_url` (vers le bucket), `color`, `description`, `founder_user_id` (nullable pour les officielles), `is_official` (bool, §1bis), `created_at`. Les 4 éléments d'identité sont éditables par les Capitaines (ou les admins pour les officielles). Le coût de fondation est **débité une fois** à la création d'une Compagnie joueur (les officielles sont gratuites, admin-créées).
 - **Bucket Supabase `company-emblems`** (public, type image, taille plafonnée) — à créer. Stocke les logos/bannières uploadés.
 - `company_members` — `company_id`, `user_id`, `joined_at`, `service_value` (numeric par couple user×company), échelon **dérivé** de `service_value` (vue/fonction, pas stocké). **Contrainte : au plus 2 lignes par `user_id`** (plafond `MAX_COMPAGNIES`, via trigger/check).
 - **Bannière active** — `users.active_company_id` (nullable → bannière perso) + `active_banner_switched_at` (pour le cooldown de bascule). Les actes ne créditent que `active_company_id`.
@@ -135,7 +149,7 @@ Les Compagnies **ne s'allient pas globalement** — il n'existe **aucun statut d
 
 ## 10. Risques & garde-fous
 
-- **Cold-start en faible densité** : une Compagnie s'amorce mal seul. → Le solo complet est le filet ; fonder coûte (on ne crée pas une coquille vide à la légère).
+- **Cold-start en faible densité** : une Compagnie s'amorce mal seul. → Mitigation principale = les **4 Compagnies officielles** seedées par les admins (§1bis), foyer peuplé dès le jour 1. Filets secondaires : le solo complet, et le coût de fondation (on ne crée pas une coquille vide à la légère).
 - **Revolving door** sur porte ouverte + exclusion : réglé par le **bannissement court**.
 - **Capture du pouvoir / Fondateur absent** : réglé par l'**érosion** + **échelons-seuils multiples** (le pouvoir suit les présents, pas un titre figé).
 - **Avantage de nombre** : réglé par la **normalisation du score** en SPEC 3, pas par un cap.
