@@ -117,6 +117,7 @@ export default function MapPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const factionHallId = useFactionHallStore(s => s.openId)
   const closeFactionHall = useFactionHallStore(s => s.close)
+  const openFactionHall = useFactionHallStore(s => s.open)
   const companiesLoaded = useFactionGroupStore(s => s.factionsLoaded)
   const myCompaniesCount = useFactionGroupStore(s => s.myFactions.length)
   const [companyPromptShown, setCompanyPromptShown] = useState(false)
@@ -602,6 +603,10 @@ export default function MapPage() {
             }
           }}
           currentFactionId={userFactionId}
+          onOpenHall={(id) => {
+            setShowFactionModal(false)
+            openFactionHall(id, () => setShowFactionModal(true))  // ← Retour rouvre l'explorateur
+          }}
         />
       )}
 

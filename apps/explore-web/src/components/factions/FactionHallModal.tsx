@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
+import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from './FactionCreateForm'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
@@ -40,6 +41,7 @@ function renderMission(text: string): string {
  */
 export function FactionHallModal({ factionId, onClose }: Props) {
   const userId = usePlayerStore((s) => s.userId)
+  const onBack = useFactionHallStore((s) => s.onBack)
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
@@ -129,6 +131,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   return createPortal(
     <div className="faction-hall-overlay" onClick={overlayClick}>
       <div className="faction-hall" style={{ borderTopColor: detail.color }}>
+        {onBack && (
+          <button className="faction-hall-back" onClick={() => { onBack(); onClose() }}>← Retour</button>
+        )}
         <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
 
         <div className="faction-hall-scroll">

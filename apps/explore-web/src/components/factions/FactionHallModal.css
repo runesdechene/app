@@ -39,6 +39,20 @@
   text-align: center;
 }
 
+.faction-hall-back {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 10px 0 0 12px;
+  background: rgba(193, 154, 107, 0.18);
+  border: 1px solid rgba(193, 154, 107, 0.4);
+  border-radius: 12px;
+  padding: 5px 12px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 12px; font-weight: 600; color: #2a1f10;
+  cursor: pointer;
+}
+.faction-hall-back:hover { background: rgba(193, 154, 107, 0.3); }
+
 .faction-hall-close {
   position: absolute;
   top: 8px;

@@ -9,25 +9,25 @@ interface FactionModalProps {
   onClose: (joined?: boolean) => void
   /** Compagnie active (bannière) — pour marquer la carte « active ». */
   currentFactionId: string | null
+  /** Clic sur une Compagnie → ouvrir son Hall (lecture avant de rejoindre).
+   *  Si fourni, l'hôte gère l'ouverture (+ bouton Retour vers l'explorateur). */
+  onOpenHall?: (factionId: string) => void
 }
 
 /**
- * « Explorer les Compagnies » — réutilise l'ancienne modale de choix de faction.
- * Liste les Compagnies actives (non retirées), rejoindre en 1 clic (join_faction),
- * ou fonder. Mécanique = faction ; user-facing = Compagnie.
+ * « Explorer les Compagnies » — liste les Compagnies actives (non retirées).
+ * Cliquer une Compagnie ouvre son HALL (on lit la mission/le classement, puis on
+ * postule). Pas de join automatique. Ou fonder la sienne.
  */
-export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
+export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionModalProps) {
   const userId = usePlayerStore(s => s.userId)
   const directory = useFactionGroupStore(s => s.directory)
   const loadDirectory = useFactionGroupStore(s => s.loadDirectory)
   const myFactions = useFactionGroupStore(s => s.myFactions)
   const loadMine = useFactionGroupStore(s => s.loadMine)
-  const join = useFactionGroupStore(s => s.join)
   const openHall = useFactionHallStore(s => s.open)
 
   const [loading, setLoading] = useState(true)
-  const [joiningId, setJoiningId] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => {
@@ -38,28 +38,9 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
   const atLimit = myFactions.length >= 2
   const isMobile = window.innerWidth <= 768
 
-  async function handleCardClick(factionId: string) {
-    if (!userId) return
-    const alreadyMember = myFactions.some(f => f.id === factionId)
-    if (alreadyMember) {
-      onClose()
-      openHall(factionId)
-      return
-    }
-    if (atLimit) { setError('Tu fais déjà partie de 2 Compagnies.'); return }
-    setJoiningId(factionId)
-    setError(null)
-    const result = await join(userId, factionId)
-    setJoiningId(null)
-    if ('error' in result) {
-      setError(
-        result.error === 'too_many' ? 'Tu fais déjà partie de 2 Compagnies.'
-        : 'Impossible de rejoindre pour le moment.'
-      )
-      return
-    }
-    onClose(true)
-    openHall(factionId)
+  function handleCardClick(factionId: string) {
+    if (onOpenHall) onOpenHall(factionId)
+    else { onClose(); openHall(factionId) }
   }
 
   return (
@@ -74,8 +55,7 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
 
         <h2 className="faction-modal-title">Explorer les Compagnies</h2>
         <p className="faction-modal-subtitle">
-          Rejoins une Compagnie pour porter ses couleurs, ou fonde la tienne. Toutes œuvrent à
-          réenchanter le monde — choisis la tienne.
+          Ouvre une Compagnie pour lire sa mission et son classement, puis postule — ou fonde la tienne.
         </p>
 
         {loading ? (
@@ -93,7 +73,6 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                   className={`faction-card${isActive ? ' active' : ''}`}
                   style={{ '--faction-color': c.color } as React.CSSProperties}
                   onClick={() => handleCardClick(c.id)}
-                  disabled={joiningId === c.id}
                 >
                   {c.imageUrl ? (
                     <img src={c.imageUrl} alt={c.name} className="faction-card-img" />
@@ -109,16 +88,11 @@ export function FactionModal({ onClose, currentFactionId }: FactionModalProps) {
                       👥 {c.memberCount} · 🏆 {c.score}
                     </div>
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
-                    {joiningId === c.id && <span className="faction-card-badge">…</span>}
                   </div>
                 </button>
               )
             })}
           </div>
-        )}
-
-        {error && (
-          <p className="faction-modal-subtitle" style={{ color: '#c0392b' }}>{error}</p>
         )}
 
         <button
