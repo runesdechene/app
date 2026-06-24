@@ -460,10 +460,10 @@ export default function MapPage() {
               <NotorietyBadge onClick={() => setShowLeaderboard(true)} />
               <CoupeBadge />
               <CrownsBadge />
+              <BannerToggle />
               <NotificationBell />
               <EnergyIndicator />
               <GpsMarksBadge />
-              <BannerToggle />
             </>
           )}
 
