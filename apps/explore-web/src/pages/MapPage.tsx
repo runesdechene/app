@@ -12,6 +12,8 @@ import { OnboardingModal } from '../components/auth/OnboardingModal'
 import { ProfileMenu } from '../components/auth/ProfileMenu'
 import { FactionBar } from '../components/map/badges/FactionBar'
 import { FactionHallModal } from '../components/factions/FactionHallModal'
+import { CompanyIntroModal } from '../components/factions/CompanyIntroModal'
+import { FactionCreateForm } from '../components/factions/FactionCreateForm'
 import { useFactionHallStore } from '../stores/factionHallStore'
 import { useFactionGroupStore } from '../stores/factionGroupStore'
 import { InfoModal } from '../components/map/modals/InfoModal'
@@ -118,6 +120,8 @@ export default function MapPage() {
   const companiesLoaded = useFactionGroupStore(s => s.factionsLoaded)
   const myCompaniesCount = useFactionGroupStore(s => s.myFactions.length)
   const [companyPromptShown, setCompanyPromptShown] = useState(false)
+  const [showCompanyIntro, setShowCompanyIntro] = useState(false)
+  const [showCompanyCreate, setShowCompanyCreate] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
   const [showAddGpsMark, setShowAddGpsMark] = useState(false)
@@ -365,7 +369,7 @@ export default function MapPage() {
     if (isAuthenticated && companiesLoaded && myCompaniesCount === 0
         && !companyPromptShown && tutorialPhase === null && !showOnboarding) {
       setCompanyPromptShown(true)
-      setShowFactionModal(true)
+      setShowCompanyIntro(true)
     }
   }, [isAuthenticated, companiesLoaded, myCompaniesCount, companyPromptShown, tutorialPhase, showOnboarding])
 
@@ -608,6 +612,22 @@ export default function MapPage() {
       {/* Hall de Compagnie global — ouvert depuis le scoreboard OU le profil (qui se ferme avant) */}
       {factionHallId && (
         <FactionHallModal factionId={factionHallId} onClose={closeFactionHall} />
+      )}
+
+      {/* Accueil Compagnies (à la connexion, joueur sans Compagnie) → Choisir / Créer */}
+      {showCompanyIntro && (
+        <CompanyIntroModal
+          onChoose={() => { setShowCompanyIntro(false); setShowFactionModal(true) }}
+          onCreate={() => { setShowCompanyIntro(false); setShowCompanyCreate(true) }}
+          onClose={() => setShowCompanyIntro(false)}
+        />
+      )}
+      {showCompanyCreate && userId && (
+        <FactionCreateForm
+          userId={userId}
+          onSuccess={() => setShowCompanyCreate(false)}
+          onCancel={() => setShowCompanyCreate(false)}
+        />
       )}
 
       {selectedPlayerId && (

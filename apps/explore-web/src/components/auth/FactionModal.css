@@ -5,7 +5,7 @@
 .faction-modal {
   position: relative;
   width: 95vw;
-  max-width: 1300px;
+  max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
   background: var(--color-parchment);
@@ -37,106 +37,85 @@
   padding: 24px 0;
 }
 
+/* Grille de cartes RECTANGULAIRES (emblème à gauche, texte à droite) */
 .faction-modal-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 12px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scroll-padding: 0 4px;
-  padding-bottom: 8px;
-  padding-top: 8px;
+  max-height: 56vh;
+  overflow-y: auto;
+  padding: 4px;
+  scrollbar-width: thin;
 }
-
-/* Masquer scrollbar tout en gardant le scroll */
-.faction-modal-grid::-webkit-scrollbar {
-  height: 4px;
-}
-.faction-modal-grid::-webkit-scrollbar-track {
-  background: transparent;
-}
+.faction-modal-grid::-webkit-scrollbar { width: 5px; }
 .faction-modal-grid::-webkit-scrollbar-thumb {
-  background: var(--color-parchment-dark, #E0D0BA);
-  border-radius: 2px;
+  background: var(--color-parchment-dark, #E0D0BA); border-radius: 3px;
 }
 
 .faction-card {
   position: relative;
   display: flex;
-  flex-direction: column;
-  flex: 0 0 calc(25% - 9px);
-  min-width: 0;
-  scroll-snap-align: start;
-  background: transparent;
-  border: 2px solid var(--color-parchment-dark, #E0D0BA);
-  border-radius: 10px;
-  overflow: hidden;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  min-height: 92px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(193, 154, 107, 0.4);
+  border-left: 5px solid var(--faction-color, var(--color-sepia));
+  border-radius: 12px;
   cursor: pointer;
   font-family: var(--font-body);
   color: var(--color-ink);
   text-align: left;
   transition: border-color 0.2s, background 0.2s, transform 0.15s;
-  padding: 0;
 }
 
 .faction-card:hover {
-  border-color: var(--faction-color, var(--color-sepia));
-  background: rgba(193, 154, 107, 0.06);
+  background: rgba(193, 154, 107, 0.12);
   transform: translateY(-2px);
 }
-
-.faction-card:active {
-  transform: scale(0.97);
-}
-
+.faction-card:active { transform: scale(0.98); }
 .faction-card.active {
   border-color: var(--faction-color, var(--color-sepia));
-  border-width: 3px;
-  background: rgba(193, 154, 107, 0.1);
+  background: rgba(193, 154, 107, 0.14);
 }
-
-.faction-card:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
+.faction-card:disabled { opacity: 0.6; cursor: wait; }
 
 .faction-card-img {
-  aspect-ratio: 1;
-  object-fit: contain;
-  width: 80%;
-  height: 300px;
-  margin: auto;
-  margin-top: 20px;
+  width: 64px; height: 64px; flex: none;
+  border-radius: 12px; object-fit: cover;
+  box-shadow: 0 1px 4px rgba(20, 14, 5, 0.2);
 }
 
 .faction-card-placeholder {
-  width: 100%;
-  aspect-ratio: 1;
-  opacity: 0.3;
+  width: 64px; height: 64px; flex: none;
+  border-radius: 12px; opacity: 1;
+  box-shadow: 0 1px 4px rgba(20, 14, 5, 0.2);
 }
 
 .faction-card-body {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; gap: 3px;
 }
 
 .faction-card-name {
   font-family: var(--font-title);
-  font-size: 23px;
-  font-weight: 500;
-  color: var(--faction-color);
-  filter: grayscale(50%);
-  text-align: center;
+  font-size: 19px; font-weight: 600;
+  color: var(--color-ink);
+  text-align: left;
 }
 
 .faction-card-desc {
-  font-size: 15px;
-  text-align: justify;
-  line-height: 1.2;
+  font-size: 14px;
+  text-align: left;
+  line-height: 1.35;
   color: var(--color-ink-light);
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .faction-card-desc a {
@@ -289,8 +268,9 @@
   .faction-modal {
     padding: 24px 16px;
   }
-  .faction-card {
-    flex: 0 0 85%;
+  .faction-modal-grid {
+    grid-template-columns: 1fr;
+    max-height: 64vh;
   }
 }
 
