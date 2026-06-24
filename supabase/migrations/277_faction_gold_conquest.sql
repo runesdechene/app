@@ -62,7 +62,7 @@ CREATE OR REPLACE FUNCTION public._faction_gold_coupe(
   FROM public.faction_gold_log g
   WHERE g.faction_id = p_faction_id
     AND (p_from IS NULL OR g.day >= p_from::date)
-    AND (p_to   IS NULL OR g.day <  p_to::date);
+    AND (p_to   IS NULL OR g.day <= p_to::date);
 $$;
 GRANT EXECUTE ON FUNCTION public._faction_gold_coupe(text,timestamptz,timestamptz) TO authenticated, anon, service_role;
 
