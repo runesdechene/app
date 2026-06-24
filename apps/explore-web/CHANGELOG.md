@@ -1,3 +1,10 @@
+# ALPHA V0.10.2
+## L'emblème importé s'affiche bien
+
+Quand vous importez votre propre image comme emblème de Compagnie, la nouvelle version s'enregistre et s'affiche immédiatement — fini l'ancienne image qui restait collée.
+
+---
+
 # ALPHA V0.10.1
 ## Donnez un blason à votre Compagnie 🛡️
 

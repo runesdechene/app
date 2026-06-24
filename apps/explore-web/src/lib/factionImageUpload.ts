@@ -29,6 +29,8 @@ export async function uploadFactionImage(factionId: string, file: File): Promise
     throw new Error(error.message)
   }
 
+  // Cache-buster : le chemin est stable (upsert sur factions/<id>.webp), donc sans
+  // ?t= le navigateur resservirait l'ancienne image depuis le cache (bug récurrent).
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
-  return data.publicUrl
+  return `${data.publicUrl}?t=${Date.now()}`
 }
