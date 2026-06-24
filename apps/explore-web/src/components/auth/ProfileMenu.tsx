@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useIsDesktop } from '../../hooks/useMediaQuery'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useMapStore } from '../../stores/mapStore'
 import { useGeolocPromptStore } from '../../stores/geolocPromptStore'
@@ -19,6 +20,9 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
   const [showEmailChange, setShowEmailChange] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+  // Sur desktop, Compagnies vit dans la sidebar de la carte (onglet 🛡️),
+  // pas dans ce menu (la route /compagnies est mobile-only).
+  const isDesktop = useIsDesktop()
 
   // Lire directement depuis playerStore au lieu de refaire un appel RPC
   const userId = usePlayerStore(s => s.userId)
@@ -121,6 +125,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
             Voir mon profil
           </button>
 
+          {!isDesktop && (
           <button className="profile-dropdown-action" onClick={handleGoCompagnies}>
             {activeCompany ? (
               <span className="faction-current">
@@ -134,6 +139,7 @@ export function ProfileMenu({ email, onSignOut, onFactionModal }: ProfileMenuPro
               'Mes Compagnies'
             )}
           </button>
+          )}
 
           <button
             className="profile-dropdown-action"

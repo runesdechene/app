@@ -226,7 +226,7 @@ const styles: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    zIndex: 200, padding: '16px',
+    zIndex: 1100, padding: '16px',
   },
   card: {
     background: 'var(--color-parchment, #F5E6D3)',

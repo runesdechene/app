@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { HomeFeed } from '../home/HomeFeed'
 import { MapActivityList } from '../home/MapActivityList'
 import { ChangelogList } from '../changelog/ChangelogList'
+import { CompanySidebarPanel } from '../companies/CompanySidebarPanel'
 import { useUnreadActivityCount, markActivitySeen } from '../../hooks/useUnreadActivityCount'
 import { currentChangelog, isChangelogUnseen, markChangelogSeen } from '../../lib/changelog'
 import './DesktopSidebar.css'
 
-type SidebarTab = 'home' | 'activite' | 'maj'
+type SidebarTab = 'home' | 'activite' | 'compagnie' | 'maj'
 
 interface Props {
   openFactionModal: () => void
@@ -73,6 +74,15 @@ export function DesktopSidebar({ openFactionModal, collapsed, onToggleCollapsed 
         </button>
         <button
           type="button"
+          className={`desktop-sidebar-tab${tab === 'compagnie' && !collapsed ? ' is-active' : ''}`}
+          onClick={() => pick('compagnie')}
+          aria-current={tab === 'compagnie' && !collapsed}
+        >
+          <span className="desktop-sidebar-tab-icon" aria-hidden>🛡️</span>
+          <span className="desktop-sidebar-tab-label">Compagnie</span>
+        </button>
+        <button
+          type="button"
           className={`desktop-sidebar-tab${tab === 'maj' && !collapsed ? ' is-active' : ''}`}
           onClick={() => pick('maj')}
           aria-current={tab === 'maj' && !collapsed}
@@ -95,6 +105,7 @@ export function DesktopSidebar({ openFactionModal, collapsed, onToggleCollapsed 
             <MapActivityList limit={50} />
           </main>
         )}
+        {tab === 'compagnie' && <CompanySidebarPanel />}
         {tab === 'maj' && (
           <main className="activity-page-scroll">
             <h1 className="activity-page-title">Mises à jour</h1>
