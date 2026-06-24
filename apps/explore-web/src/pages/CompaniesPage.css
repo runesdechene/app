@@ -1,0 +1,181 @@
+.companies-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--color-parchment, #F5E6D3);
+  padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Section wrapper ───────────────────────────────────────── */
+.companies-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.companies-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Titres ────────────────────────────────────────────────── */
+.companies-page-title {
+  margin: 0;
+  font-family: var(--font-accent, sans-serif);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink, #4A3728);
+}
+
+/* ── Bouton Fonder (section header) ────────────────────────── */
+.companies-create-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(193, 154, 107, 0.6);
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  font-family: var(--font-body, sans-serif);
+  color: var(--color-ink, #4A3728);
+  font-weight: 500;
+}
+
+.companies-create-btn:hover {
+  background: rgba(193, 154, 107, 0.12);
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.companies-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  border: 1px dashed rgba(193, 154, 107, 0.4);
+}
+
+.companies-empty p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-ink-light, #8d745e);
+}
+
+.companies-join-cta {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(193, 154, 107, 0.6);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--color-ink, #4A3728);
+  font-weight: 500;
+}
+
+/* ── Liste Mes Compagnies ──────────────────────────────────── */
+.companies-my-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.companies-my-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(193, 154, 107, 0.25);
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.15s;
+}
+
+.companies-my-card:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.companies-my-card--active {
+  border-width: 2px;
+}
+
+.companies-my-card-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.companies-my-card-emblem {
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.companies-emblem-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.companies-emblem-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.companies-my-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.companies-my-card-name {
+  font-family: var(--font-accent, sans-serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-ink, #4A3728);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.companies-my-card-meta {
+  font-size: 14px;
+  color: var(--color-ink-light, #8d745e);
+}
+
+.companies-my-card-arrow {
+  font-size: 20px;
+  color: var(--color-ink-light, #8d745e);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ── State générique ───────────────────────────────────────── */
+.companies-state {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-ink-light, #8d745e);
+  font-style: italic;
+}
