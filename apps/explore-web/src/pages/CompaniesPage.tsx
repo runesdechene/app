@@ -6,6 +6,7 @@ import { useFactionGroupStore } from '../stores/factionGroupStore'
 import { useFactionHallStore } from '../stores/factionHallStore'
 import { FactionModal } from '../components/auth/FactionModal'
 import { FactionCreateForm } from '../components/factions/FactionCreateForm'
+import { CompanyEmblem } from '../components/factions/CompanyEmblem'
 import { CoupeModal } from '../components/map/modals/CoupeModal'
 import '../components/home/coupe/CoupeHeritages.css'
 import './CompaniesPage.css'
@@ -71,7 +72,11 @@ export default function CompaniesPage() {
                     <div key={c.id} className={`coupe-step${isLeader ? ' coupe-step-leader' : ''}`} role="button" tabIndex={0} onClick={() => openHall(c.id)}>
                       {isLeader ? <span className="coupe-crown" aria-hidden>👑</span> : <span className="coupe-crown-spacer" aria-hidden />}
                       <span className="coupe-step-emblem" style={{ background: c.color }}>
-                        {c.imageUrl && <img src={c.imageUrl} alt="" className="coupe-step-emblem-img" />}
+                        <CompanyEmblem
+                          color="transparent" name={c.name} imageUrl={c.imageUrl}
+                          emblemIcon={c.emblemIcon} emblemMono={c.emblemMono}
+                          size={isLeader ? 28 : 24} radius="50%"
+                        />
                       </span>
                       <span className="coupe-step-name">{c.name}</span>
                       <span className="coupe-step-pts" style={{ color: c.color }}>{c.score}</span>
@@ -100,13 +105,11 @@ export default function CompaniesPage() {
           return (
             <div key={c.id} className="cp-card" style={{ borderLeftColor: c.color }}>
               <div className="cp-card-head">
-                {c.imageUrl ? (
-                  <img className="cp-card-emblem" src={c.imageUrl} alt="" />
-                ) : (
-                  <span className="cp-card-emblem cp-card-emblem-fallback" style={{ background: c.color }}>
-                    {c.name.charAt(0).toUpperCase()}
-                  </span>
-                )}
+                <CompanyEmblem
+                  color={c.color} name={c.name} imageUrl={c.imageUrl}
+                  emblemIcon={c.emblemIcon} emblemMono={c.emblemMono}
+                  size={52} radius={12}
+                />
                 <div className="cp-card-headtext">
                   <div className="cp-card-name">{c.name}</div>
                   <div className="cp-card-badges">

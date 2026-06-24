@@ -116,6 +116,32 @@
 }
 .faction-form-file-hidden { display: none; }
 
+/* Emblème : preview + mono + glyphes */
+.faction-form-emblem-head { display: flex; align-items: stretch; gap: 12px; }
+.faction-form-emblem-side { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.faction-form-mono { display: flex; gap: 6px; }
+.faction-form-mono-btn {
+  flex: 1 1 0; padding: 7px 6px; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(184, 154, 106, 0.6);
+  background: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 12px; font-weight: 600; color: #6e5435;
+}
+.faction-form-mono-btn.is-active {
+  background: #5d4632; color: #f6ead2; border-color: #5d4632;
+}
+.faction-form-glyphs {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 7px; margin-top: 10px;
+}
+.faction-form-glyph {
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px; border-radius: 11px; cursor: pointer;
+  border: 2px solid transparent; background: rgba(255, 255, 255, 0.35);
+}
+.faction-form-glyph:hover { background: rgba(193, 154, 107, 0.22); }
+.faction-form-glyph.is-active { border-color: #5d4632; background: rgba(193, 154, 107, 0.3); }
+
 .faction-form-cost {
   margin: 0;
   font-family: var(--font-accent, Helvetica, sans-serif);

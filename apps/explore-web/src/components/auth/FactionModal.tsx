@@ -5,6 +5,7 @@ import { useCrownsStore } from '../../stores/crownsStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from '../factions/FactionCreateForm'
+import { CompanyEmblem } from '../factions/CompanyEmblem'
 import './FactionModal.css'
 
 interface FactionModalProps {
@@ -79,13 +80,11 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                   onClick={() => handleCardClick(c.id)}
                 >
                   <div className="faction-card-head">
-                    {c.imageUrl ? (
-                      <img src={c.imageUrl} alt={c.name} className="faction-card-img" />
-                    ) : (
-                      <div className="faction-card-placeholder" style={{ backgroundColor: c.color }}>
-                        {c.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <CompanyEmblem
+                      color={c.color} name={c.name} imageUrl={c.imageUrl}
+                      emblemIcon={c.emblemIcon} emblemMono={c.emblemMono}
+                      size={48} radius={11}
+                    />
                     <span className="faction-card-name">{c.name}</span>
                     {isMember && <span className="faction-card-badge">{isActive ? 'Active' : 'Membre'}</span>}
                   </div>

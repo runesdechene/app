@@ -10,6 +10,10 @@ export interface MyFaction {
   name: string
   color: string
   imageUrl: string | null
+  /** Slug du glyphe du set (alternative au PNG). */
+  emblemIcon: string | null
+  /** Filtre monochrome de l'emblème : 'none' | 'white' | 'black'. */
+  emblemMono: string | null
   description: string | null
   isOfficial: boolean
   memberCount: number
@@ -22,6 +26,8 @@ export interface FactionSummary {
   name: string
   color: string
   imageUrl: string | null
+  emblemIcon: string | null
+  emblemMono: string | null
   description: string | null
   isOfficial: boolean
   memberCount: number
@@ -48,6 +54,10 @@ export interface FactionDetail {
   name: string
   color: string
   imageUrl: string | null
+  emblemIcon: string | null
+  emblemMono: string | null
+  /** Slug aléatoire stable pour le lien de partage (découplé de l'id/PK). */
+  publicSlug: string | null
   description: string | null
   tags: string[]
   createdBy: string | null
@@ -94,7 +104,7 @@ interface FactionGroupState {
   loadDirectory: (search?: string) => Promise<void>
   create: (
     userId: string,
-    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[] },
+    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
   ) => Promise<ActionResult<{ factionId: string; cost: number }>>
   join: (userId: string, factionId: string) => Promise<ActionResult>
   leave: (userId: string, factionId: string) => Promise<ActionResult<{ extinguished: boolean }>>
@@ -102,7 +112,7 @@ interface FactionGroupState {
   updateIdentity: (
     userId: string,
     factionId: string,
-    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[] },
+    params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
   ) => Promise<ActionResult>
   removeMember: (userId: string, factionId: string, targetUserId: string) => Promise<ActionResult>
 }
@@ -141,7 +151,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     set({ directory: (data as FactionSummary[]) ?? [] })
   },
 
-  create: async (userId, { name, color, description, imageUrl, tags }) => {
+  create: async (userId, { name, color, description, imageUrl, tags, emblemIcon, emblemMono }) => {
     const { data, error } = await supabase.rpc('create_faction', {
       p_user_id: userId,
       p_name: name,
@@ -149,6 +159,8 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       p_description: description,
       p_image_url: imageUrl,
       p_tags: tags,
+      p_emblem_icon: emblemIcon,
+      p_emblem_mono: emblemMono,
     })
     if (error) {
       console.error('[faction] create_faction error:', error.message)
@@ -231,7 +243,7 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     return result
   },
 
-  updateIdentity: async (userId, factionId, { name, color, description, imageUrl, tags }) => {
+  updateIdentity: async (userId, factionId, { name, color, description, imageUrl, tags, emblemIcon, emblemMono }) => {
     const { data, error } = await supabase.rpc('update_faction_identity', {
       p_user_id: userId,
       p_faction_id: factionId,
@@ -240,6 +252,8 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       p_description: description,
       p_image_url: imageUrl,
       p_tags: tags,
+      p_emblem_icon: emblemIcon,
+      p_emblem_mono: emblemMono,
     })
     if (error) {
       console.error('[faction] update_faction_identity error:', error.message)

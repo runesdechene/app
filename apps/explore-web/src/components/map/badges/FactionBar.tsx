@@ -7,6 +7,7 @@ import { useFactionGroupStore } from '../../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../../stores/factionHallStore'
 import { FactionCreateForm } from '../../factions/FactionCreateForm'
 import { FactionModal } from '../../auth/FactionModal'
+import { CompanyEmblem } from '../../factions/CompanyEmblem'
 import { CoupeModal } from '../modals/CoupeModal'
 import type { CoupeState, CoupeFactionEntry } from '../../../types/coupe'
 import './FactionBar.css'
@@ -19,16 +20,18 @@ import './FactionBar.css'
  */
 
 interface FactionRowEnriched extends CoupeFactionEntry {
-  pattern: string
-  image: string
+  imageUrl: string | null
+  emblemIcon: string | null
+  emblemMono: string | null
 }
 
 interface FactionMeta {
   id: string
   title: string
   color: string
-  pattern: string | null
   image_url: string | null
+  emblem_icon: string | null
+  emblem_mono: string | null
   order: number
 }
 
@@ -57,7 +60,7 @@ export function FactionBar() {
     async function load() {
       const [coupeRes, factionsRes] = await Promise.all([
         supabase.rpc('get_coupe_state', { p_user_id: userId, p_season_id: null }),
-        supabase.from('factions').select('id, title, color, pattern, image_url, order').eq('retired', false).order('order'),
+        supabase.from('factions').select('id, title, color, image_url, emblem_icon, emblem_mono, order').eq('retired', false).order('order'),
       ])
       if (cancelled) return
 
@@ -82,8 +85,9 @@ export function FactionBar() {
             score: s?.score ?? 0,
             memberCount: s?.memberCount ?? 0,
             rank: s?.rank ?? 0,
-            pattern: f.pattern ?? '',
-            image: f.image_url ?? '',
+            imageUrl: f.image_url,
+            emblemIcon: f.emblem_icon,
+            emblemMono: f.emblem_mono,
           }
         })
         .sort((a, b) => {
@@ -133,13 +137,11 @@ export function FactionBar() {
                 title={faction.factionTitle}
               >
                 {isLeader && <span className="faction-chip-crown">{'👑'}</span>}
-                {faction.image ? (
-                  <img src={faction.image} alt="" className="faction-chip-banner" />
-                ) : (
-                  <span className="faction-chip-emblem">
-                    {faction.pattern && <img src={faction.pattern} alt="" className="faction-chip-emblem-img" />}
-                  </span>
-                )}
+                <CompanyEmblem
+                  color={faction.factionColor} name={faction.factionTitle}
+                  imageUrl={faction.imageUrl} emblemIcon={faction.emblemIcon} emblemMono={faction.emblemMono}
+                  size={24} radius="50%"
+                />
                 <span className="faction-chip-name">
                   {isDesktop || faction.factionTitle.length <= 10
                     ? faction.factionTitle

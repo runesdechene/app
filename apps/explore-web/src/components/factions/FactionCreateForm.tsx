@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { uploadFactionImage } from '../../lib/factionImageUpload'
+import { COMPANY_GLYPHS } from '../../lib/companyEmblems'
+import { CompanyEmblem } from './CompanyEmblem'
 import type { MyFaction } from '../../stores/factionGroupStore'
 import './FactionCreateForm.css'
 
@@ -11,6 +13,12 @@ const COLOR_PALETTE = [
   '#4A6B7C', '#7C6B4A', '#4A4A7C', '#7C4A4A', '#3D6B5D',
   '#A93D76', '#57B33D', '#3C56BE', '#C94436', '#2E8B57',
   '#7E3FA0', '#C97A1E', '#1E6F6F', '#9B2D2D', '#5D4037',
+]
+
+const MONO_OPTIONS: { value: string; label: string }[] = [
+  { value: 'none', label: 'Original' },
+  { value: 'white', label: 'Blanc' },
+  { value: 'black', label: 'Noir' },
 ]
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -43,8 +51,14 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
   const [description, setDescription] = useState(editFaction?.description ?? '')
   const [tags, setTags] = useState((editTags ?? []).join(', '))
   const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 6)
+
+  // Emblème : un glyphe du set OU un PNG importé. Le mono colore/filtre l'emblème.
+  const [emblemIcon, setEmblemIcon] = useState<string | null>(editFaction?.emblemIcon ?? null)
+  const [emblemMono, setEmblemMono] = useState<string>(editFaction?.emblemMono ?? 'none')
   const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(editFaction?.imageUrl ?? null)
+  const [blobPreview, setBlobPreview] = useState<string | null>(null)
+  const existingImageUrl = editFaction?.imageUrl ?? null
+
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [costInfo, setCostInfo] = useState<{ cost?: number; balance?: number } | null>(null)
@@ -52,9 +66,21 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
 
   const isEdit = !!editFaction
 
+  // Source effective pour la preview : PNG (nouveau ou existant) sauf si un glyphe est choisi.
+  const previewImageUrl = file ? blobPreview : (emblemIcon ? null : existingImageUrl)
+  const previewIcon = file ? null : emblemIcon
+
   function pickFile(f: File | null) {
+    if (!f) return
     setFile(f)
-    if (f) setPreview(URL.createObjectURL(f))
+    setBlobPreview(URL.createObjectURL(f))
+    setEmblemIcon(null) // le PNG prend le pas sur le glyphe
+  }
+
+  function pickGlyph(slug: string) {
+    setEmblemIcon((cur) => (cur === slug ? null : slug))
+    setFile(null)
+    setBlobPreview(null)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -64,52 +90,41 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
     setError(null)
     setCostInfo(null)
 
-    let imageUrl: string | null = editFaction?.imageUrl ?? null
+    // Résolution de la source d'emblème (PNG XOR glyphe).
+    function resolveErr(result: { error: string; cost?: number; balance?: number }) {
+      setError(ERROR_MESSAGES[String(result.error)] ?? ERROR_MESSAGES.unknown)
+      if (result.cost !== undefined || result.balance !== undefined) {
+        setCostInfo({ cost: result.cost, balance: result.balance })
+      }
+    }
 
     if (isEdit) {
+      let imageUrl: string | null = emblemIcon ? null : existingImageUrl
       if (file) {
-        try {
-          imageUrl = await uploadFactionImage(editFaction.id, file)
-        } catch {
-          setError("Erreur lors du téléversement de l'image.")
-          setSubmitting(false)
-          return
-        }
+        try { imageUrl = await uploadFactionImage(editFaction.id, file) }
+        catch { setError("Erreur lors du téléversement de l'image."); setSubmitting(false); return }
       }
       const result = await updateIdentity(userId, editFaction.id, {
-        name: name.trim(), color, description: description.trim(), imageUrl, tags: tagsArray,
+        name: name.trim(), color, description: description.trim(), imageUrl,
+        tags: tagsArray, emblemIcon: imageUrl ? null : emblemIcon, emblemMono,
       })
-      if ('error' in result) {
-        const errKey = String(result.error)
-        setError(ERROR_MESSAGES[errKey] ?? ERROR_MESSAGES.unknown)
-        if (result.cost !== undefined || result.balance !== undefined) {
-          setCostInfo({ cost: result.cost as number | undefined, balance: result.balance as number | undefined })
-        }
-      } else {
-        onSuccess()
-      }
+      if ('error' in result) resolveErr(result as { error: string; cost?: number; balance?: number })
+      else onSuccess()
     } else {
       const result = await create(userId, {
-        name: name.trim(), color, description: description.trim(), imageUrl: null, tags: tagsArray,
+        name: name.trim(), color, description: description.trim(), imageUrl: null,
+        tags: tagsArray, emblemIcon: file ? null : emblemIcon, emblemMono,
       })
-      if ('error' in result) {
-        const errKey = String(result.error)
-        setError(ERROR_MESSAGES[errKey] ?? ERROR_MESSAGES.unknown)
-        if (result.cost !== undefined || result.balance !== undefined) {
-          setCostInfo({ cost: result.cost as number | undefined, balance: result.balance as number | undefined })
-        }
-        setSubmitting(false)
-        return
-      }
+      if ('error' in result) { resolveErr(result as { error: string; cost?: number; balance?: number }); setSubmitting(false); return }
+      // PNG uploadé après coup (besoin de l'id), puis on rebranche l'identité.
       if (file && result.factionId) {
         try {
           const url = await uploadFactionImage(result.factionId, file)
           await updateIdentity(userId, result.factionId, {
-            name: name.trim(), color, description: description.trim(), imageUrl: url, tags: tagsArray,
+            name: name.trim(), color, description: description.trim(), imageUrl: url,
+            tags: tagsArray, emblemIcon: null, emblemMono,
           })
-        } catch {
-          // image optionnelle — échec silencieux, la Compagnie existe quand même
-        }
+        } catch { /* image optionnelle — la Compagnie existe quand même */ }
       }
       onSuccess()
     }
@@ -172,7 +187,6 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
                   aria-label={`Couleur ${c}`} title={c}
                 />
               ))}
-              {/* Color picker libre (RGB) */}
               <label
                 className="faction-form-color faction-form-color-picker"
                 style={{
@@ -192,29 +206,51 @@ export function FactionCreateForm({ userId, editFaction, editTags, onSuccess, on
             </div>
           </div>
 
+          {/* ─── Emblème : preview + set de glyphes + import PNG + mono ─── */}
           <div className="faction-form-label">
-            Emblème (optionnel)
-            <div className="faction-form-emblem-row">
-              {preview ? (
-                <img className="faction-form-emblem-preview" src={preview} alt="" />
-              ) : (
-                <span className="faction-form-emblem-preview" style={{ background: color }}>
-                  {name.trim().charAt(0).toUpperCase() || '?'}
-                </span>
-              )}
-              <button
-                type="button" className="faction-form-file-btn"
-                onClick={() => fileRef.current?.click()} disabled={submitting}
-              >
-                📷 {file ? 'Changer l’image' : 'Choisir une image'}
-                <span className="faction-form-file-name">{file ? file.name : 'PNG / JPG'}</span>
-              </button>
-              <input
-                ref={fileRef} type="file" accept="image/*"
-                className="faction-form-file-hidden"
-                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-                disabled={submitting}
+            Emblème
+            <div className="faction-form-emblem-head">
+              <CompanyEmblem
+                color={color} name={name} imageUrl={previewImageUrl}
+                emblemIcon={previewIcon} emblemMono={emblemMono}
+                size={72} radius={16}
               />
+              <div className="faction-form-emblem-side">
+                <div className="faction-form-mono">
+                  {MONO_OPTIONS.map((o) => (
+                    <button
+                      key={o.value} type="button"
+                      className={`faction-form-mono-btn${emblemMono === o.value ? ' is-active' : ''}`}
+                      onClick={() => setEmblemMono(o.value)} disabled={submitting}
+                    >{o.label}</button>
+                  ))}
+                </div>
+                <button
+                  type="button" className="faction-form-file-btn"
+                  onClick={() => fileRef.current?.click()} disabled={submitting}
+                >
+                  📷 {file ? 'Changer le PNG' : 'Importer un PNG'}
+                  <span className="faction-form-file-name">{file ? file.name : 'PNG / JPG'}</span>
+                </button>
+                <input
+                  ref={fileRef} type="file" accept="image/*"
+                  className="faction-form-file-hidden"
+                  onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+
+            <div className="faction-form-glyphs">
+              {COMPANY_GLYPHS.map((g) => (
+                <button
+                  key={g.slug} type="button" title={g.label}
+                  className={`faction-form-glyph${emblemIcon === g.slug && !file ? ' is-active' : ''}`}
+                  onClick={() => pickGlyph(g.slug)} disabled={submitting}
+                >
+                  <CompanyEmblem color={color} emblemIcon={g.slug} emblemMono={emblemMono} size={38} radius={9} />
+                </button>
+              ))}
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from './FactionCreateForm'
 import { CompanyInviteModal } from './CompanyInviteModal'
+import { CompanyEmblem } from './CompanyEmblem'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
 
@@ -126,6 +127,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   // Objet MyFaction minimal pour le formulaire d'édition.
   const editFaction: MyFaction = {
     id: detail.id, name: detail.name, color: detail.color, imageUrl: detail.imageUrl,
+    emblemIcon: detail.emblemIcon, emblemMono: detail.emblemMono,
     description: detail.description, isOfficial: detail.isOfficial,
     memberCount: detail.memberCount, isActive: false, isFounder: isChef,
   }
@@ -146,13 +148,11 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               Compagnie
             </div>
             <div className="faction-hall-head">
-              {detail.imageUrl ? (
-                <img className="faction-hall-emblem" src={detail.imageUrl} alt="" />
-              ) : (
-                <div className="faction-hall-emblem faction-hall-emblem-fallback" style={{ background: detail.color }}>
-                  {detail.name.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <CompanyEmblem
+                color={detail.color} name={detail.name} imageUrl={detail.imageUrl}
+                emblemIcon={detail.emblemIcon} emblemMono={detail.emblemMono}
+                size={56} radius={13}
+              />
               <h2 className="faction-hall-name">{detail.name}</h2>
             </div>
             <div className="faction-hall-totals">
@@ -275,6 +275,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
       {showInvite && (
         <CompanyInviteModal
           factionId={detail.id}
+          shareKey={detail.publicSlug ?? detail.id}
           factionName={detail.name}
           color={detail.color}
           isChef={isChef}

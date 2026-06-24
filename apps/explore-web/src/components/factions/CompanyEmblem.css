@@ -1,0 +1,25 @@
+.company-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.company-emblem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.company-emblem-glyph {
+  display: block;
+}
+
+.company-emblem-letter {
+  color: #f3e9d2;
+  font-weight: 700;
+  font-family: 'Cinzel', Georgia, serif;
+}

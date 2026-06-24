@@ -4,6 +4,8 @@ import './CompanyInviteModal.css'
 
 interface Props {
   factionId: string
+  /** Clé publique du lien de partage (public_slug aléatoire stable, fallback id). */
+  shareKey: string
   factionName: string
   color: string
   /** Rôle de l'inviteur → adapte le ton du message. */
@@ -17,8 +19,8 @@ interface Props {
  * après création de compte / connexion, atterrit directement sur la Compagnie
  * (cf. useCompanyInvite : param ?company=<id> ouvre le Hall après auth).
  */
-export function CompanyInviteModal({ factionId, factionName, color, isChef, isMember, onClose }: Props) {
-  const link = `${window.location.origin}/?company=${factionId}`
+export function CompanyInviteModal({ shareKey, factionName, color, isChef, isMember, onClose }: Props) {
+  const link = `${window.location.origin}/?company=${shareKey}`
   const intro = isChef
     ? `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :`
     : isMember
