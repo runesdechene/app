@@ -16,15 +16,16 @@ interface Props {
  */
 export function CompanyInviteModal({ factionId, factionName, color, onClose }: Props) {
   const link = `${window.location.origin}/?company=${factionId}`
+  const message = `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :\n${link}`
   const [copied, setCopied] = useState(false)
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(link)
+      await navigator.clipboard.writeText(message)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // clipboard indispo → sélection manuelle via l'input
+      // clipboard indispo → sélection manuelle via le champ
     }
   }
 
@@ -33,7 +34,7 @@ export function CompanyInviteModal({ factionId, factionName, color, onClose }: P
       try {
         await navigator.share({
           title: factionName,
-          text: `Rejoins ma Compagnie « ${factionName} » sur Runes de Chêne !`,
+          text: `Hey ! ⚔️ Je monte ma Compagnie « ${factionName} » sur Runes de Chêne et on a besoin de toi pour la faire grandir. Rejoins-nous :`,
           url: link,
         })
       } catch { /* annulé */ }
@@ -53,14 +54,12 @@ export function CompanyInviteModal({ factionId, factionName, color, onClose }: P
           directement sur la Compagnie pour la rejoindre.
         </p>
 
-        <div className="cinv-linkrow">
-          <input className="cinv-link" type="text" readOnly value={link} onFocus={(e) => e.currentTarget.select()} />
-          <button className="cinv-copy" style={{ background: color }} onClick={copy}>
-            {copied ? '✓ Copié' : 'Copier'}
-          </button>
-        </div>
+        <textarea className="cinv-message" readOnly value={message} rows={4} onFocus={(e) => e.currentTarget.select()} />
+        <button className="cinv-copy cinv-copy-full" style={{ background: color }} onClick={copy}>
+          {copied ? '✓ Message copié' : '📋 Copier le message'}
+        </button>
 
-        <button className="cinv-share" onClick={share}>📤 Partager le lien</button>
+        <button className="cinv-share" onClick={share}>📤 Partager</button>
       </div>
     </div>,
     document.body,

@@ -32,19 +32,20 @@
   font-family: var(--font-body, Georgia, serif);
   font-size: 15px; line-height: 1.55; color: #4a3925;
 }
-.cinv-linkrow { display: flex; gap: 8px; }
-.cinv-link {
-  flex: 1 1 auto; min-width: 0;
+.cinv-message {
+  width: 100%; box-sizing: border-box;
   padding: 11px 12px; border-radius: 10px;
   border: 1px solid rgba(184, 154, 106, 0.55);
   background: rgba(255, 255, 255, 0.6);
-  font-family: var(--font-body, monospace); font-size: 13px; color: #4a3925;
+  font-family: var(--font-body, Georgia, serif); font-size: 14px; line-height: 1.5; color: #4a3925;
+  resize: none;
 }
 .cinv-copy {
-  flex: none; border: none; cursor: pointer; color: #fff;
+  border: none; cursor: pointer; color: #fff;
   padding: 0 16px; border-radius: 10px;
   font-family: var(--font-accent, sans-serif); font-size: 13px; font-weight: 700;
 }
+.cinv-copy-full { width: 100%; padding: 12px; margin-top: 10px; }
 .cinv-share {
   width: 100%; margin-top: 12px;
   padding: 12px; border-radius: 12px; cursor: pointer;
