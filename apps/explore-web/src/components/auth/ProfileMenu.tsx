@@ -24,6 +24,8 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
   const isAdmin = usePlayerStore(s => s.isAdmin)
   const brouillerPistes = usePlayerStore(s => s.brouillerPistes)
   const [savingBrouiller, setSavingBrouiller] = useState(false)
+  const titleGender = usePlayerStore(s => s.titleGender)
+  const [savingTitleGender, setSavingTitleGender] = useState(false)
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return
@@ -39,6 +41,18 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
       usePlayerStore.getState().setBrouillerPistes(!value)
     }
     setSavingBrouiller(false)
+  }
+
+  async function setGender(value: 'm' | 'f' | 'n') {
+    if (savingTitleGender || value === titleGender) return
+    setSavingTitleGender(true)
+    usePlayerStore.getState().setTitleGender(value)
+    const { error } = await supabase.rpc('set_title_gender', { p_gender: value })
+    if (error) {
+      console.warn('[ProfileMenu] set_title_gender failed', error)
+      usePlayerStore.getState().setTitleGender(titleGender)
+    }
+    setSavingTitleGender(false)
   }
 
   // Fermer le menu si clic a l'exterieur
@@ -134,6 +148,24 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
               {!brouillerPistes && <span className="calendar-ref-check">✓</span>}
               👁️ Position GPS exacte
             </button>
+          </div>
+
+          <div className="profile-dropdown-calendar">
+            <span className="profile-dropdown-calendar-label">Mon titre</span>
+            {(['m', 'f', 'n'] as const).map((g) => {
+              const labels: Record<'m' | 'f' | 'n', string> = { m: 'Masculin', f: 'Féminin', n: 'Neutre' }
+              return (
+                <button
+                  key={g}
+                  className={`profile-dropdown-action calendar-ref-option ${titleGender === g ? 'active' : ''}`}
+                  onClick={() => setGender(g)}
+                  disabled={savingTitleGender}
+                >
+                  {titleGender === g && <span className="calendar-ref-check">✓</span>}
+                  {labels[g]}
+                </button>
+              )
+            })}
           </div>
 
           <PushSettings />
