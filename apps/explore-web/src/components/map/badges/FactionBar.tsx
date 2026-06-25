@@ -9,7 +9,8 @@ import { FactionCreateForm } from '../../factions/FactionCreateForm'
 import { FactionModal } from '../../auth/FactionModal'
 import { CompanyEmblem } from '../../factions/CompanyEmblem'
 import { CoupeModal } from '../modals/CoupeModal'
-import type { CoupeState, CoupeFactionEntry } from '../../../types/coupe'
+import { CollectiveCounter } from './CollectiveCounter'
+import type { CoupeState, CoupeFactionEntry, CoupeCollective } from '../../../types/coupe'
 import './FactionBar.css'
 
 /**
@@ -45,6 +46,7 @@ export function FactionBar() {
   const canAfford = balance >= FOUND_COST
   const [stats, setStats] = useState<FactionRowEnriched[]>([])
   const [seasonName, setSeasonName] = useState<string | null>(null)
+  const [collective, setCollective] = useState<CoupeCollective | null>(null)
   const openHall = useFactionHallStore(s => s.open)
   const isDesktop = useIsDesktop()
   const [showCreate, setShowCreate] = useState(false)
@@ -101,6 +103,7 @@ export function FactionBar() {
 
       setStats(enriched)
       setSeasonName(state.season?.name ?? null)
+      setCollective(state.collective ?? null)
     }
 
     load()
@@ -118,6 +121,14 @@ export function FactionBar() {
   return (
     <>
       <div className="faction-scoreboard">
+        {collective && (
+          <CollectiveCounter
+            lieuxSortisOubli={collective.lieuxSortisOubli}
+            lieuxVisites={collective.lieuxVisites}
+            enigmesPercees={collective.enigmesPercees}
+            variant="compact"
+          />
+        )}
         <button
           type="button"
           className="faction-scoreboard-live"

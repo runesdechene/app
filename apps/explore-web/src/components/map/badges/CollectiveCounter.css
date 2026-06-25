@@ -1,0 +1,30 @@
+/* Compteur collectif « Ensemble contre l'Oubli » — DA parchemin sobre. */
+.collective-counter { font-family: var(--font-accent, 'Cinzel', serif); color: #4a3728; }
+
+/* Bandeau complet (modale / accueil) */
+.collective-counter-full {
+  background: rgba(245, 230, 211, 0.75);
+  border: 1px solid rgba(184, 154, 106, 0.45);
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+}
+.collective-counter-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(74, 55, 40, 0.7); margin-bottom: 4px;
+}
+.collective-counter-metrics {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px;
+  font-size: 12px; color: #5a4636;
+}
+.collective-counter-metrics b { color: #8a5a22; font-variant-numeric: tabular-nums; }
+
+/* Compact (scoreboard carte) : 1 ligne dense, alignée à droite comme le scoreboard */
+.collective-counter-compact {
+  display: flex; gap: 8px; justify-content: flex-end; align-self: stretch;
+  font-size: 10px; font-weight: 700; color: rgba(74, 55, 40, 0.75);
+  font-variant-numeric: tabular-nums;
+  background: rgba(245, 230, 211, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 8px;
+  padding: 3px 8px;
+}

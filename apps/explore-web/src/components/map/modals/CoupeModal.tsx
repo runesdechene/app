@@ -7,6 +7,7 @@ import { CoupeRulesModal } from './CoupeRulesModal'
 import { supabase } from '../../../lib/supabase'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
 import { CompanyEmblem } from '../../factions/CompanyEmblem'
+import { CollectiveCounter } from '../badges/CollectiveCounter'
 import './LeaderboardModal.css'
 import './CoupeModal.css'
 
@@ -90,6 +91,15 @@ export function CoupeModal({ onClose }: Props) {
           <button className="coupe-rules-btn" onClick={() => setShowRules(true)}>
             {'ⓘ'} Voir les règles et le barème
           </button>
+
+          {state?.collective && (
+            <CollectiveCounter
+              lieuxSortisOubli={state.collective.lieuxSortisOubli}
+              lieuxVisites={state.collective.lieuxVisites}
+              enigmesPercees={state.collective.enigmesPercees}
+              variant="full"
+            />
+          )}
 
           <div className="leaderboard-tabs">
             {(['classement', 'top', 'moi'] as CoupeTab[]).map(t => (

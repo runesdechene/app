@@ -50,10 +50,18 @@ export interface CoupeMyBreakdown {
   score: number
 }
 
+/** Compteur collectif « Ensemble contre l'Oubli » — totaux de la saison, toute la communauté. */
+export interface CoupeCollective {
+  lieuxSortisOubli: number
+  lieuxVisites: number
+  enigmesPercees: number
+}
+
 export interface CoupeState {
   season: CoupeSeason
   factions: CoupeFactionEntry[]
   topUsers: CoupeUserEntry[]
+  collective: CoupeCollective
   myBreakdown: CoupeMyBreakdown | null
 }
 

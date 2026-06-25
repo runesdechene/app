@@ -6,6 +6,7 @@ import { FactionMembersModal } from '../../map/modals/FactionMembersModal'
 import { CoupeModal } from '../../map/modals/CoupeModal'
 import { CoupePodium } from './CoupePodium'
 import { CoupeOnboarding } from './CoupeOnboarding'
+import { CollectiveCounter } from '../../map/badges/CollectiveCounter'
 import type { CoupeFactionEntry } from '../../../types/coupe'
 
 interface CoupeHeritagesSectionProps {
@@ -104,6 +105,14 @@ export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectio
   if (userFactionId) {
     return (
       <>
+        {state.collective && (
+          <CollectiveCounter
+            lieuxSortisOubli={state.collective.lieuxSortisOubli}
+            lieuxVisites={state.collective.lieuxVisites}
+            enigmesPercees={state.collective.enigmesPercees}
+            variant="full"
+          />
+        )}
         <CoupePodium
           factions={sortedFactions}
           userFactionId={userFactionId}
