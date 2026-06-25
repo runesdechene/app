@@ -269,7 +269,7 @@
   transition: transform 120ms ease-out, filter 120ms ease-out;
 }
 .faction-hall-join-big:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
-.faction-hall-join-big:disabled { background: rgba(110, 84, 53, 0.35); cursor: not-allowed; box-shadow: none; }
+.faction-hall-join-big:disabled { background: rgba(110, 84, 53, 0.35); color: #4a3728; cursor: not-allowed; box-shadow: none; }
 .faction-hall-joinerror {
   margin: 8px 0 0; text-align: center;
   font-family: var(--font-accent, Helvetica, sans-serif);
