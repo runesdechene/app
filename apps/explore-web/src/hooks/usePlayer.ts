@@ -55,7 +55,7 @@ export function usePlayer() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes')
+        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes, title_gender')
         .eq('email_address', user!.email)
         .single()
 
@@ -84,7 +84,7 @@ export function usePlayer() {
         // fie à la présence d'une ligne à l'auth.uid().
         const { data: migrated } = await supabase
           .from('users')
-          .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes')
+          .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes, title_gender')
           .eq('id', authId)
           .single()
 
@@ -114,6 +114,8 @@ export function usePlayer() {
       usePlayerStore.getState().setTutorialCompletedAt(userData.tutorial_completed_at)
       // V0.7+ Brouillage GPS — privacy-by-default true (cohérent avec le DEFAULT SQL)
       usePlayerStore.getState().setBrouillerPistes(userData.brouiller_pistes ?? true)
+      // Genre du titre (mig 305) — défaut masculin, cohérent avec le DEFAULT SQL
+      usePlayerStore.getState().setTitleGender(userData.title_gender ?? 'm')
       setUserFactionId(userData.faction_id)
       // Garder '' pour les nouveaux joueurs (déclenche l'onboarding)
       setUserName(userData.first_name ?? '')

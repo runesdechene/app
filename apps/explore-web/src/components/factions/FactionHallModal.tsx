@@ -382,7 +382,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                             type="text"
                             className="faction-hall-grade-input"
                             value={row.labelM}
-                            maxLength={32}
+                            maxLength={30}
                             onChange={(e) => {
                               const next = [...gradeRows]
                               next[i] = { ...next[i], labelM: e.target.value }
@@ -396,7 +396,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                             type="text"
                             className="faction-hall-grade-input"
                             value={row.labelF}
-                            maxLength={32}
+                            maxLength={30}
                             onChange={(e) => {
                               const next = [...gradeRows]
                               next[i] = { ...next[i], labelF: e.target.value }
@@ -410,7 +410,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                             type="text"
                             className="faction-hall-grade-input"
                             value={row.labelN}
-                            maxLength={32}
+                            maxLength={30}
                             placeholder="—"
                             onChange={(e) => {
                               const next = [...gradeRows]
