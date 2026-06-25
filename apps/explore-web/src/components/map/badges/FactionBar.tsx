@@ -38,6 +38,7 @@ interface FactionMeta {
 export function FactionBar() {
   const userId = usePlayerStore(s => s.userId)
   const userFactionId = usePlayerStore(s => s.userFactionId)
+  const factionColorMode = usePlayerStore(s => s.factionColorMode)
   const balance = useCrownsStore(s => s.balance)
   const loadMine = useFactionGroupStore(s => s.loadMine)
   const FOUND_COST = 50
@@ -55,6 +56,7 @@ export function FactionBar() {
   }, [userId, loadMine])
 
   useEffect(() => {
+    if (!factionColorMode) return  // toggle « Compagnies » désactivé : pas de fetch
     let cancelled = false
 
     async function load() {
@@ -104,10 +106,14 @@ export function FactionBar() {
     load()
     const id = window.setInterval(load, 30000)
     return () => { cancelled = true; window.clearInterval(id) }
-  }, [userId])
+  }, [userId, factionColorMode])
 
   const maxScore = stats[0]?.score ?? 0
   const leaderId = maxScore > 0 ? stats[0].factionId : null
+
+  // Toggle « Compagnies » désactivé → le scoreboard disparaît (régression introduite au
+  // rewrite horizontal 234027e ; comportement d'origine restauré). Le toggle, lui, reste.
+  if (!factionColorMode) return null
 
   return (
     <>
@@ -124,6 +130,7 @@ export function FactionBar() {
         </button>
 
         <div className="faction-scoreboard-rail">
+          <div className="faction-scoreboard-chips">
           {stats.map(faction => {
             const isLeader = faction.factionId === leaderId
             const isMine = faction.factionId === userFactionId
@@ -152,6 +159,7 @@ export function FactionBar() {
               </button>
             )
           })}
+          </div>
 
           {userId && (
             <button
@@ -159,7 +167,7 @@ export function FactionBar() {
               className="faction-scoreboard-explore"
               onClick={() => setShowExplore(true)}
             >
-              🔍 Explorer les Compagnies
+              {isDesktop ? '🔍 Explorer les Compagnies' : '🔍 Explorer'}
             </button>
           )}
           {userId && (

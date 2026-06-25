@@ -1,12 +1,14 @@
 import type { CoupeFactionEntry } from '../../../types/coupe'
+import { CompanyEmblem } from '../../factions/CompanyEmblem'
+import type { FactionEmblem } from './CoupeHeritagesSection'
 import './CoupeHeritages.css'
 
 interface CoupeOnboardingProps {
   factions: CoupeFactionEntry[]
   /** Nom de la saison courante (ex. "Saison du Renouveau"). Affiché en sous-titre. */
   seasonName: string
-  /** Pattern URL par factionId (depuis la table factions, pas dans CoupeFactionEntry). */
-  patternByFactionId: Record<string, string | null>
+  /** Emblème (PNG/glyphe/mono) par factionId — système Compagnies actuel. */
+  emblemByFactionId: Record<string, FactionEmblem>
   /** Ouvre la FactionModal de sélection. Source : Outlet context (MobileLayout). */
   openFactionModal: () => void
 }
@@ -18,7 +20,7 @@ interface CoupeOnboardingProps {
 export function CoupeOnboarding({
   factions,
   seasonName,
-  patternByFactionId,
+  emblemByFactionId,
   openFactionModal,
 }: CoupeOnboardingProps) {
   return (
@@ -45,18 +47,15 @@ export function CoupeOnboarding({
               onClick={openFactionModal}
               aria-label={`En savoir plus sur ${f.factionTitle}`}
             >
-              <span
+              <CompanyEmblem
                 className="coupe-banner-emblem"
-                style={{ background: f.factionColor }}
-              >
-                {patternByFactionId[f.factionId] && (
-                  <img
-                    src={patternByFactionId[f.factionId] ?? undefined}
-                    alt=""
-                    className="coupe-banner-emblem-img"
-                  />
-                )}
-              </span>
+                color={f.factionColor}
+                name={f.factionTitle}
+                imageUrl={emblemByFactionId[f.factionId]?.imageUrl ?? null}
+                emblemIcon={emblemByFactionId[f.factionId]?.emblemIcon ?? null}
+                emblemMono={emblemByFactionId[f.factionId]?.emblemMono ?? null}
+                size={42}
+              />
               <span className="coupe-banner-name">{f.factionTitle}</span>
             </button>
           ))}

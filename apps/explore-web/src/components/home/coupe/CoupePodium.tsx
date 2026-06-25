@@ -1,4 +1,6 @@
 import type { CoupeFactionEntry } from '../../../types/coupe'
+import { CompanyEmblem } from '../../factions/CompanyEmblem'
+import type { FactionEmblem } from './CoupeHeritagesSection'
 import './CoupeHeritages.css'
 
 interface CoupePodiumProps {
@@ -7,8 +9,8 @@ interface CoupePodiumProps {
   /** ID de la Maison de l'utilisateur (toujours non-null à ce stade). */
   userFactionId: string
   seasonName: string
-  /** Pattern URL par factionId (depuis la table factions). */
-  patternByFactionId: Record<string, string | null>
+  /** Emblème (PNG/glyphe/mono) par factionId — système Compagnies actuel. */
+  emblemByFactionId: Record<string, FactionEmblem>
   /** Click sur une marche : ouvre FactionMembersModal de cette Maison. */
   onClickFaction: (factionId: string, factionTitle: string, factionColor: string) => void
   /** Click sur titre / footer : ouvre CoupeModal complète. */
@@ -33,7 +35,7 @@ export function CoupePodium({
   factions,
   userFactionId,
   seasonName,
-  patternByFactionId,
+  emblemByFactionId,
   onClickFaction,
   onClickAll,
 }: CoupePodiumProps) {
@@ -70,7 +72,7 @@ export function CoupePodium({
               position={position}
               isLeader={position === 1 && topScore > 0}
               isMine={faction.factionId === userFactionId}
-              patternUrl={patternByFactionId[faction.factionId] ?? null}
+              emblem={emblemByFactionId[faction.factionId] ?? null}
               blockHeight={blockHeightPx(faction.score, topScore)}
               onClick={() => onClickFaction(faction.factionId, faction.factionTitle, faction.factionColor)}
             />
@@ -96,12 +98,12 @@ interface PodiumStepProps {
   position: 1 | 2 | 3 | 4
   isLeader: boolean
   isMine: boolean
-  patternUrl: string | null
+  emblem: FactionEmblem | null
   blockHeight: number
   onClick: () => void
 }
 
-function PodiumStep({ faction, position, isLeader, isMine, patternUrl, blockHeight, onClick }: PodiumStepProps) {
+function PodiumStep({ faction, position, isLeader, isMine, emblem, blockHeight, onClick }: PodiumStepProps) {
   const roman = position === 1 ? 'I' : position === 2 ? 'II' : position === 3 ? 'III' : 'IV'
   return (
     <div
@@ -115,14 +117,15 @@ function PodiumStep({ faction, position, isLeader, isMine, patternUrl, blockHeig
       ) : (
         <span className="coupe-crown-spacer" aria-hidden="true" />
       )}
-      <span
+      <CompanyEmblem
         className={`coupe-step-emblem${isMine ? ' coupe-step-mine' : ''}`}
-        style={{ background: faction.factionColor }}
-      >
-        {patternUrl && (
-          <img src={patternUrl} alt="" className="coupe-step-emblem-img" />
-        )}
-      </span>
+        color={faction.factionColor}
+        name={faction.factionTitle}
+        imageUrl={emblem?.imageUrl ?? null}
+        emblemIcon={emblem?.emblemIcon ?? null}
+        emblemMono={emblem?.emblemMono ?? null}
+        size={isLeader ? 42 : 36}
+      />
       <span className="coupe-step-name">{faction.factionTitle}</span>
       <span className="coupe-step-pts" style={{ color: faction.factionColor }}>{faction.score}</span>
       <span className="coupe-step-block" style={{ height: `${blockHeight}px` }}>{roman}</span>

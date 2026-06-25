@@ -80,5 +80,15 @@
 }
 
 @media (max-width: 768px) {
-  .company-intro-overlay { z-index: 10055; }
+  /* Safe-area iPhone (portal hors .app) : la carte ne passe pas sous le notch / home indicator. */
+  .company-intro-overlay {
+    z-index: 10055;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  }
+}
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .company-intro-overlay { padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 16px); }
+  }
 }

@@ -54,6 +54,24 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
+/* Liste scrollable des chips : plafonnée en hauteur pour ne pas envahir l'écran quand il y a
+   beaucoup de Compagnies. Les boutons Explorer/Fonder restent épinglés sous la liste (hors scroll). */
+.faction-scoreboard-chips {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 6px;
+  min-height: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px; /* la scrollbar ne recouvre pas les chips */
+}
+.faction-scoreboard-chips::-webkit-scrollbar { width: 5px; }
+.faction-scoreboard-chips::-webkit-scrollbar-thumb {
+  background: rgba(74, 55, 40, 0.3); border-radius: 999px;
+}
+
 /* Chip = entrée d'une Compagnie (emblème + nom + score) */
 .faction-chip {
   position: relative;
@@ -126,4 +144,15 @@
 
 @media (max-width: 768px) {
   .faction-scoreboard { max-width: 100%; }
+
+  /* Mobile = compact : on n'affiche QUE le logo + le score (pas le nom de Compagnie),
+     et tout épouse son contenu, collé au bord droit → scoreboard étroit. */
+  .faction-scoreboard-rail { align-items: flex-end; }
+  .faction-scoreboard-chips { align-self: flex-end; }
+  .faction-chip { width: auto; }
+  .faction-chip-name { display: none; }
+  .faction-chip-active { display: none; }   /* petit ⚑ « ta Compagnie » retiré (le liseré coloré suffit) */
+  .faction-scoreboard-live-season { display: none; }       /* « — Saison 2 … » masqué */
+  .faction-scoreboard-explore,
+  .faction-scoreboard-found { width: auto; align-self: flex-end; }
 }

@@ -19,6 +19,13 @@ interface SelectedFactionState {
   factionColor: string
 }
 
+/** Méta emblème par Compagnie (nouveau système : PNG / glyphe / mono), non retourné par get_coupe_state. */
+export interface FactionEmblem {
+  imageUrl: string | null
+  emblemIcon: string | null
+  emblemMono: string | null
+}
+
 /**
  * Section Home — Coupe des Héritages.
  *
@@ -39,7 +46,7 @@ interface SelectedFactionState {
 export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectionProps) {
   const userFactionId = usePlayerStore(s => s.userFactionId)
   const { state, loading, error, refresh } = useCoupe(true, 0)
-  const [patternByFactionId, setPatternByFactionId] = useState<Record<string, string | null>>({})
+  const [emblemByFactionId, setEmblemByFactionId] = useState<Record<string, FactionEmblem>>({})
   const [selectedFaction, setSelectedFaction] = useState<SelectedFactionState | null>(null)
   const [showCoupeModal, setShowCoupeModal] = useState(false)
 
@@ -52,23 +59,23 @@ export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectio
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [refresh])
 
-  // Charger les pattern URLs des factions (table factions, non retourné par get_coupe_state)
+  // Charger les emblèmes des Compagnies (nouveau système, non retourné par get_coupe_state).
   useEffect(() => {
     let cancelled = false
-    async function loadPatterns() {
-      const { data, error: e } = await supabase.from('factions').select('id, pattern')
+    async function loadEmblems() {
+      const { data, error: e } = await supabase.from('factions').select('id, image_url, emblem_icon, emblem_mono')
       if (cancelled) return
       if (e || !data) {
-        console.warn('[CoupeHeritagesSection] failed to load faction patterns', e?.message)
+        console.warn('[CoupeHeritagesSection] failed to load faction emblems', e?.message)
         return
       }
-      const map: Record<string, string | null> = {}
-      for (const row of data as Array<{ id: string; pattern: string | null }>) {
-        map[row.id] = row.pattern
+      const map: Record<string, FactionEmblem> = {}
+      for (const row of data as Array<{ id: string; image_url: string | null; emblem_icon: string | null; emblem_mono: string | null }>) {
+        map[row.id] = { imageUrl: row.image_url, emblemIcon: row.emblem_icon, emblemMono: row.emblem_mono }
       }
-      setPatternByFactionId(map)
+      setEmblemByFactionId(map)
     }
-    loadPatterns()
+    loadEmblems()
     return () => { cancelled = true }
   }, [])
 
@@ -101,7 +108,7 @@ export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectio
           factions={sortedFactions}
           userFactionId={userFactionId}
           seasonName={seasonName}
-          patternByFactionId={patternByFactionId}
+          emblemByFactionId={emblemByFactionId}
           onClickFaction={(factionId, factionTitle, factionColor) =>
             setSelectedFaction({ factionId, factionTitle, factionColor })
           }
@@ -124,7 +131,7 @@ export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectio
     <CoupeOnboarding
       factions={sortedFactions}
       seasonName={seasonName}
-      patternByFactionId={patternByFactionId}
+      emblemByFactionId={emblemByFactionId}
       openFactionModal={openFactionModal}
     />
   )

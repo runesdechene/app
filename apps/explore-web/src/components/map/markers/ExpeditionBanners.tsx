@@ -35,7 +35,7 @@ export function ExpeditionBanners() {
           key={e.id}
           longitude={e.rdv_lng}
           latitude={e.rdv_lat}
-          anchor="bottom"
+          anchor="center"
         >
           <ExpeditionBanner
             expedition={e}

@@ -1,17 +1,15 @@
 import type { ExpeditionListItem } from '../../../types/expedition'
-import { getExpeditionCoverUrl } from '../../../lib/expeditionsApi'
 import './ExpeditionBanner.css'
 
 /**
- * Marker rond pour une expédition sur la carte.
- * Cf. retours UX 6 mai : médaillon rond > bandeau horizontal.
+ * Marker d'événement sur la carte — SCEAU DE CIRE (refonte 25/06).
+ * Retours UX : l'ancien médaillon photo 56px était trop gros / trop présent.
+ * Désormais : un petit cachet de cire sépia (~30px) avec un étendard ⚑ estampé,
+ * cohérent avec la DA parchemin/héraldique. La photo de couverture ne vit plus
+ * sur la carte — elle s'affiche au tap, dans la modale de l'événement.
  *
- * Affichage :
- * - Si l'expé a une cover_image_url → photo dans le médaillon
- * - Sinon → avatar du chef
- * - Sinon → fond sépia avec 🚩 centré
- * Toujours : un petit 🚩 en pastille superposée bottom-right (signature
- * "expédition") + halo doré pulsant si l'expé est "Aujourd'hui".
+ * États : « aujourd'hui » (liseré doré discret), « passé » (cire grisée + fade
+ * J+1→J+7), badge de messages non lus.
  */
 
 interface Props {
@@ -30,9 +28,8 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
   const isSoon = diffMs !== null && diffMs >= 2 * day && diffMs < 7 * day
   const isFuture = diffMs !== null && diffMs >= 7 * day
 
-  // Expédition passée (plus de 24h après le RDV) : N&B + opacité dégressive
+  // Expédition passée (plus de 24h après le RDV) : cire grisée + opacité dégressive
   // de 1.0 (J+1) à 0.35 (J+7). Le cron retire la bannière de la carte à J+7.
-  // Calculé sur rdv_at (robuste au décalage ≤ 1h du cron de transition).
   const passedAgeDays = diffMs !== null && diffMs < 0 ? -diffMs / day : 0
   const isPassed = passedAgeDays > 1
   const passedOpacity = isPassed
@@ -49,12 +46,6 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
     isPassed && 'is-passed',
   ].filter(Boolean).join(' ')
 
-  // Image source : cover > avatar chef > rien (fallback emoji)
-  const coverUrl = expedition.cover_image_url
-    ? getExpeditionCoverUrl(expedition.cover_image_url)
-    : null
-  const imgSrc = coverUrl ?? expedition.chief.avatar_url
-
   return (
     <button
       type="button"
@@ -64,14 +55,9 @@ export function ExpeditionBanner({ expedition, onClick }: Props) {
       title={expedition.name}
       style={isPassed ? { opacity: passedOpacity } : undefined}
     >
-      <span className="expedition-banner-medallion">
-        {imgSrc ? (
-          <img src={imgSrc} alt="" />
-        ) : (
-          <span className="expedition-banner-fallback" aria-hidden>🚩</span>
-        )}
+      <span className="expedition-seal" aria-hidden>
+        <img className="expedition-seal-icon" src="/event-seal-labarum.png" alt="" />
       </span>
-      <span className="expedition-banner-flag" aria-hidden>🚩</span>
       {(expedition.unread_count ?? 0) > 0 && (
         <span className="expedition-banner-unread" aria-label={`${expedition.unread_count} non lu${(expedition.unread_count ?? 0) > 1 ? 's' : ''}`}>
           {(expedition.unread_count ?? 0) > 9 ? '9+' : expedition.unread_count}

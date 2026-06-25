@@ -1,3 +1,13 @@
+# ALPHA V0.11.0
+## Les Compagnies Alliées & une carte plus claire
+
+- **Compagnie alliée** : tu peux désormais rejoindre une 2ᵉ Compagnie en tant qu'**Alliée** — son chat et ses membres te sont ouverts, sans toucher à ton allégeance principale. Ton profil affiche tes deux Compagnies. Changer de Compagnie **principale** devient un choix délibéré, depuis le Hall.
+- **Carte épurée** : les événements deviennent de discrets **sceaux de cire** (fini les gros médaillons), les autres joueurs sont plus sobres, et le tableau des Compagnies se fait compact sur mobile — il se masque même avec le bouton **Compagnies**.
+- **Coupe plus juste** : seules les actions menées **au sein d'une Compagnie** comptent au classement (fini les contributeurs fantômes), et les emblèmes des Compagnies s'affichent enfin correctement partout.
+- **Hall** : dans le classement des membres, le mérite prime sur l'or.
+
+---
+
 # ALPHA V0.10.7
 ## Fonder une Compagnie, plus accessible
 

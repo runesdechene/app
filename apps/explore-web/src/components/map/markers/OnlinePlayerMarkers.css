@@ -87,47 +87,49 @@
 }
 
 .other-player-dot {
-  width: 18px;
-  height: 18px;
+  width: 13px;
+  height: 13px;
   background: var(--faction-color, #888);
-  border: 2.5px solid #fff;
+  border: 2px solid #fff;
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(0,0,0,0.3);
 }
 
 .other-player-avatar {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 3px solid var(--faction-color, #888);
+  border: 2px solid var(--faction-color, #888);
   box-shadow: 0 0 8px rgba(0,0,0,0.3);
   object-fit: cover;
 }
 
 .other-player-name {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
   color: #2c1810;
   background: rgba(255, 248, 230, 0.85);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 5px;
+  border-radius: 3px;
   white-space: nowrap;
   line-height: 1.2;
 }
 
 .other-player-title {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--faction-color, #6b5a45);
   background: rgba(255, 248, 230, 0.75);
-  padding: 1px 5px;
+  padding: 0 4px;
   border-radius: 3px;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.25;
   font-family: var(--font-accent);
   font-weight: bold;
   letter-spacing: 0.2px;
-  max-width: 140px;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Modal profil explorateur */

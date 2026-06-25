@@ -6,12 +6,16 @@ import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { CoupeRulesModal } from './CoupeRulesModal'
 import { supabase } from '../../../lib/supabase'
 import { formatFrenchLongDate } from '../../../lib/dateFormat'
+import { CompanyEmblem } from '../../factions/CompanyEmblem'
 import './LeaderboardModal.css'
 import './CoupeModal.css'
 
 interface FactionMeta {
   color: string
-  pattern: string | null
+  title: string
+  imageUrl: string | null
+  emblemIcon: string | null
+  emblemMono: string | null
 }
 
 type CoupeTab = 'classement' | 'top' | 'moi'
@@ -48,11 +52,11 @@ export function CoupeModal({ onClose }: Props) {
   // Fetch les couleurs / patterns de faction une seule fois pour enrichir le
   // tab "Top contributeurs" avec un petit emblème à côté de chaque user.
   useEffect(() => {
-    supabase.from('factions').select('id, color, pattern').then(({ data }) => {
+    supabase.from('factions').select('id, title, color, image_url, emblem_icon, emblem_mono').then(({ data }) => {
       if (!data) return
       const m = new Map<string, FactionMeta>()
-      for (const f of data as Array<{ id: string; color: string; pattern: string | null }>) {
-        m.set(f.id, { color: f.color, pattern: f.pattern })
+      for (const f of data as Array<{ id: string; title: string; color: string; image_url: string | null; emblem_icon: string | null; emblem_mono: string | null }>) {
+        m.set(f.id, { color: f.color, title: f.title, imageUrl: f.image_url, emblemIcon: f.emblem_icon, emblemMono: f.emblem_mono })
       }
       setFactionMeta(m)
     })
@@ -110,15 +114,26 @@ export function CoupeModal({ onClose }: Props) {
                   {state.factions.length === 0 ? (
                     <p className="coupe-empty">Aucune action enregistrée pour cette saison.</p>
                   ) : (
-                    state.factions.map(f => (
+                    state.factions.map(f => {
+                      const meta = factionMeta.get(f.factionId)
+                      return (
                       <div key={f.factionId} className="coupe-faction-row" style={{ '--f-color': f.factionColor } as React.CSSProperties}>
                         <span className="coupe-rank">#{f.rank}</span>
-                        <span className="coupe-faction-dot" />
+                        <CompanyEmblem
+                          className="coupe-faction-emblem"
+                          color={f.factionColor}
+                          name={f.factionTitle}
+                          imageUrl={meta?.imageUrl ?? null}
+                          emblemIcon={meta?.emblemIcon ?? null}
+                          emblemMono={meta?.emblemMono ?? null}
+                          size={26}
+                        />
                         <span className="coupe-faction-name">{f.factionTitle}</span>
                         <span className="coupe-faction-meta">{f.memberCount} contributeur{f.memberCount > 1 ? 's' : ''}</span>
                         <span className="coupe-score">{f.score} pts</span>
                       </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
               )}
@@ -147,16 +162,15 @@ export function CoupeModal({ onClose }: Props) {
                           )}
                           <span className="coupe-user-name">{u.displayName}</span>
                           {meta && (
-                            <span
+                            <CompanyEmblem
                               className="coupe-user-faction-emblem"
-                              style={{ background: meta.color }}
-                              title="Faction du joueur"
-                              aria-hidden
-                            >
-                              {meta.pattern && (
-                                <img src={meta.pattern} alt="" className="coupe-user-faction-emblem-img" />
-                              )}
-                            </span>
+                              color={meta.color}
+                              name={meta.title}
+                              imageUrl={meta.imageUrl}
+                              emblemIcon={meta.emblemIcon}
+                              emblemMono={meta.emblemMono}
+                              size={22}
+                            />
                           )}
                           <span className="coupe-score">{u.score} pts</span>
                         </button>

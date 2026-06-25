@@ -200,5 +200,19 @@
 .faction-form-submit:disabled { opacity: 0.6; cursor: wait; }
 
 @media (max-width: 768px) {
-  .faction-form-overlay { z-index: 10060; }
+  /* Safe-area iPhone : portal hors .app → on borne l'overlay au notch (haut) + home indicator (bas)
+     pour que la carte « Nouvelle Compagnie » ne passe jamais dessous. */
+  .faction-form-overlay {
+    z-index: 10060;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  }
+  .faction-form { max-height: 100%; }
+}
+
+/* iOS Safari mode navigateur : env() = 0 → force 47px de status bar. */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .faction-form-overlay { padding-top: calc(max(env(safe-area-inset-top, 0px), 47px) + 16px); }
+  }
 }

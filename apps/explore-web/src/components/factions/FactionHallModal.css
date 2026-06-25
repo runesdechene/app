@@ -282,5 +282,20 @@
     width: 100vw; max-width: 100vw;
     height: 100dvh; max-height: 100dvh;
     border-radius: 0; border: none; border-top: none;
+    /* Safe-area iPhone : le Hall passe par createPortal(body) → hors .app, donc on gère
+       le notch (haut) + le home indicator (bas) ici. */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  /* Le bouton fermer (absolute) ignore le padding → on le descend sous le notch. */
+  .faction-hall-close { top: calc(env(safe-area-inset-top, 0px) + 8px); }
+}
+
+/* iOS Safari mode navigateur : env() = 0 → force 47px de status bar (pattern .app / .modal-mobile-fullscreen). */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 768px) {
+    .faction-hall { padding-top: max(env(safe-area-inset-top, 0px), 47px); }
+    .faction-hall-close { top: calc(max(env(safe-area-inset-top, 0px), 47px) + 8px); }
   }
 }
