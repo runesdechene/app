@@ -269,8 +269,13 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                     )}
                     <div className="faction-hall-rank-info">
                       <div className="faction-hall-rank-name">{m.name}</div>
-                      {memberIsChef && (
-                        <div className="faction-hall-rank-chef" style={{ color: ink }}>♛ Chef de Compagnie</div>
+                      {m.gradeLabel && (
+                        <span className="faction-hall-rank-grade" style={{ color: ink }}>
+                          {m.gradeRank === 1 ? '♛ ' : ''}{m.gradeLabel}
+                        </span>
+                      )}
+                      {m.isFounder && (
+                        <span className="faction-hall-rank-founder">Fondateur historique</span>
                       )}
                       {m.isAlly && (
                         <div className="faction-hall-rank-ally">🤝 Allié</div>

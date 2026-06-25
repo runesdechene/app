@@ -47,6 +47,10 @@ export interface FactionMember {
   isFounder: boolean
   /** Allié : cette Compagnie n'est pas sa principale → 0 point, hors Chef/classement. */
   isAlly?: boolean
+  /** Rang de grade : 1=Seigneur, 2=Co-seigneur, 3=Officier, 4=Membre. null = allié/sans grade. */
+  gradeRank?: number | null
+  /** Libellé du grade, résolu (custom Compagnie sinon défaut) et accordé au genre. null = allié. */
+  gradeLabel?: string | null
   /** Coupe de la saison active. */
   coupe: number
   /** Couronnes investies (fondation). */
