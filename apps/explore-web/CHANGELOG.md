@@ -1,3 +1,11 @@
+# ALPHA V0.11.1
+## Toutes les couleurs permises & défis collectifs plus carrés
+
+- **Ta Compagnie, ta couleur — même le blanc.** Quelle que soit la teinte choisie, même très claire, le nom de la Compagnie, ses scores, ses pastilles et son blason restent lisibles partout : Hall, carte, chat, classements.
+- **Défi collectif :** une fois l'objectif de la communauté atteint, le défi est **accompli**. Ceux qui ont contribué avant gardent leur récompense ; on ne peut plus la décrocher en arrivant après la bataille.
+
+---
+
 # ALPHA V0.11.0
 ## Les Compagnies Alliées & une carte plus claire
 

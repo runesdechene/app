@@ -7,6 +7,7 @@ import { refreshLevelStateGlobal } from '../../hooks/useLevel'
 import { useEnsurePushPermission } from '../../hooks/useEnsurePushPermission'
 import { useDefisStore } from '../../stores/defisStore'
 import { EnigmaResult } from './EnigmaResult'
+import { readableInk } from '../../lib/textFormat'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
@@ -198,7 +199,7 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
             <h2 className="enigma-title">{'\u00c9'}nigmes du jour</h2>
             {enigmas.length > 0 && <span className="enigma-progress">{progress}</span>}
             {companyName && (
-              <span style={{ fontFamily: 'var(--font-accent, sans-serif)', fontSize: 13, fontWeight: 600, color: companyColor || 'var(--color-ink, #4A3728)' }}>
+              <span style={{ fontFamily: 'var(--font-accent, sans-serif)', fontSize: 13, fontWeight: 600, color: companyColor ? readableInk(companyColor) : 'var(--color-ink, #4A3728)' }}>
                 ⚔️ pour {companyName}
               </span>
             )}

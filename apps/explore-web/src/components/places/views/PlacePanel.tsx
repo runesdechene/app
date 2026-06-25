@@ -10,6 +10,7 @@ import { discoverPlace } from '../../../lib/discoverPlace'
 import { useAuth } from '../../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from '../actions/WishlistButton'
+import { readableInk, readableTextOn } from '../../../lib/textFormat'
 import { VeilleFrame } from './VeilleFrame'
 import { useVeille } from '../../../hooks/useVeille'
 import { PlaceGallery } from './PlaceGallery'
@@ -243,9 +244,9 @@ function ExplorerRow({ explorers, authorId, guardianIds, factionColors, placeId,
                 title={`${exp.userName}${isAuthor ? ' — Découvreur' : ''}${isGuardian ? ' — Gardien' : ''}`}
               >
                 {exp.userAvatar ? (
-                  <img src={exp.userAvatar} alt={exp.userName} className="place-exp-avatar" style={{ borderColor: color }} />
+                  <img src={exp.userAvatar} alt={exp.userName} className="place-exp-avatar" style={{ borderColor: readableInk(color) }} />
                 ) : (
-                  <div className="place-exp-avatar place-exp-avatar-fallback" style={{ backgroundColor: color }}>
+                  <div className="place-exp-avatar place-exp-avatar-fallback" style={{ backgroundColor: color, color: readableTextOn(color) }}>
                     {(exp.userName || '?').charAt(0).toUpperCase()}
                   </div>
                 )}

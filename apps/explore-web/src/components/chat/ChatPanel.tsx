@@ -6,6 +6,7 @@ import { useMobileNavStore } from '../../stores/mobileNavStore'
 import { useFactionGroupStore, type MyFaction } from '../../stores/factionGroupStore'
 import { sendChatMessage } from '../../hooks/useChat'
 import { supabase } from '../../lib/supabase'
+import { readableInk } from '../../lib/textFormat'
 import type { ChatMessage } from '../../stores/chatStore'
 import './ChatPanel.css'
 
@@ -33,7 +34,7 @@ function ChannelFilters({ companies }: { companies: MyFaction[] }) {
         Général
       </label>
       {companies.map((c) => (
-        <label key={c.id} className="chat-filter chat-filter-faction" style={{ color: c.color }}>
+        <label key={c.id} className="chat-filter chat-filter-faction" style={{ color: readableInk(c.color) }}>
           <input
             type="checkbox"
             checked={showCompany[c.id] !== false}
@@ -69,18 +70,18 @@ function MessageList({ messages, companies }: { messages: ChatMessage[]; compani
       {messages.map((msg) => {
         const isBugs = msg.channel === 'bugs'
         const isCompany = msg.channel !== 'general' && !isBugs
-        const textColor = isBugs ? '#9ea03f' : isCompany ? (msg.factionColor || 'var(--color-sepia)') : undefined
+        const textColor = isBugs ? '#9ea03f' : isCompany ? (msg.factionColor ? readableInk(msg.factionColor) : 'var(--color-sepia)') : undefined
         return (
           <div key={msg.id} className="chat-message">
             {isCompany && (
-              <span className="chat-channel-tag" style={{ color: msg.factionColor || undefined }}>
+              <span className="chat-channel-tag" style={{ color: msg.factionColor ? readableInk(msg.factionColor) : undefined }}>
                 {companyIds.has(msg.channel) ? '[C]' : '[C]'}
               </span>
             )}
             {isBugs && <span className="chat-channel-tag chat-channel-tag-bugs">[B]</span>}
             <span
               className="chat-message-name"
-              style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px', ...(isCompany ? { color: msg.factionColor || undefined } : undefined) }}
+              style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px', ...(isCompany ? { color: msg.factionColor ? readableInk(msg.factionColor) : undefined } : undefined) }}
               onClick={() => useMapStore.getState().setSelectedPlayerId(msg.userId)}
             >
               {msg.userName}
@@ -171,7 +172,7 @@ function ChatInput({ companies }: { companies: MyFaction[] }) {
             key={c.id}
             className={`chat-send-channel${sendChannel === c.id ? ' chat-send-channel-active' : ''}`}
             onClick={() => setSendChannel(c.id)}
-            style={{ color: c.color, borderColor: sendChannel === c.id ? c.color : undefined }}
+            style={{ color: readableInk(c.color), borderColor: sendChannel === c.id ? readableInk(c.color) : undefined }}
           >{c.name}</button>
         ))}
         <button

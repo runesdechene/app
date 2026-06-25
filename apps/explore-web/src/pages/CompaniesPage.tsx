@@ -8,6 +8,7 @@ import { FactionModal } from '../components/auth/FactionModal'
 import { FactionCreateForm } from '../components/factions/FactionCreateForm'
 import { CompanyEmblem } from '../components/factions/CompanyEmblem'
 import { CoupeModal } from '../components/map/modals/CoupeModal'
+import { readableInk } from '../lib/textFormat'
 import '../components/home/coupe/CoupeHeritages.css'
 import './CompaniesPage.css'
 
@@ -79,7 +80,7 @@ export default function CompaniesPage() {
                         />
                       </span>
                       <span className="coupe-step-name">{c.name}</span>
-                      <span className="coupe-step-pts" style={{ color: c.color }}>{c.score}</span>
+                      <span className="coupe-step-pts" style={{ color: readableInk(c.color) }}>{c.score}</span>
                       <span className="coupe-step-block" style={{ height: `${h}px` }}>{roman}</span>
                     </div>
                   )
@@ -114,7 +115,7 @@ export default function CompaniesPage() {
                   <div className="cp-card-name">{c.name}</div>
                   <div className="cp-card-badges">
                     {isActive
-                      ? <span className="cp-badge cp-badge-active" style={{ color: c.color, borderColor: c.color }}>⚑ Principale</span>
+                      ? <span className="cp-badge cp-badge-active" style={{ color: readableInk(c.color), borderColor: readableInk(c.color) }}>⚑ Principale</span>
                       : <span className="cp-badge">🤝 Allié</span>}
                     <span className="cp-badge">{c.isFounder ? 'Chef' : 'Membre'}</span>
                   </div>

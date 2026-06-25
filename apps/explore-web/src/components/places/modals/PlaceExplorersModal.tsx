@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom'
 import { useMapStore } from '../../../stores/mapStore'
+import { readableInk, readableTextOn } from '../../../lib/textFormat'
 import './PlaceExplorersModal.css'
 
 interface Explorer {
@@ -46,11 +47,11 @@ export function PlaceExplorersModal({ explorers, authorId, guardianId, factionCo
                 onClick={() => handleClick(exp.userId)}
               >
                 {exp.userAvatar ? (
-                  <img src={exp.userAvatar} alt="" className="explorers-modal-avatar" style={{ borderColor: color }} />
+                  <img src={exp.userAvatar} alt="" className="explorers-modal-avatar" style={{ borderColor: readableInk(color) }} />
                 ) : (
                   <div
                     className="explorers-modal-avatar explorers-modal-avatar-fallback"
-                    style={{ backgroundColor: color, borderColor: color }}
+                    style={{ backgroundColor: color, borderColor: readableInk(color), color: readableTextOn(color) }}
                   >
                     {(exp.userName || '?').charAt(0).toUpperCase()}
                   </div>

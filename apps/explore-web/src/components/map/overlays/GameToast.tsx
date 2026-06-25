@@ -5,6 +5,7 @@ import { useMobileNavStore } from '../../../stores/mobileNavStore'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useUserAvatars } from '../../../hooks/useUserAvatars'
 import type { GameToast as GameToastType } from '../../../stores/toastStore'
+import { readableInk } from '../../../lib/textFormat'
 import './GameToast.css'
 
 const isMobile = window.innerWidth <= 768
@@ -196,7 +197,7 @@ export function ToastItem({ toast, fetchedAvatar }: { toast: GameToastType; fetc
         <img src={resolvedAvatar} alt="" className="game-toast-avatar" />
       ) : toast.type === 'new_user' ? (
         // new_user sans avatar URL : silhouette avec bordure faction.
-        <span className="game-toast-avatar-fallback" style={{ borderColor: toast.color || 'var(--color-sepia)' }}>
+        <span className="game-toast-avatar-fallback" style={{ borderColor: toast.color ? readableInk(toast.color) : 'var(--color-sepia)' }}>
           {'\uD83D\uDC64'}
         </span>
       ) : (

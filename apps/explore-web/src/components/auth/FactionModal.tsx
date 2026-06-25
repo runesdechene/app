@@ -99,7 +99,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                   {c.tags && c.tags.length > 0 && (
                     <div className="faction-card-tags">
                       {c.tags.slice(0, 4).map(t => (
-                        <span key={t} className="faction-card-tag" style={{ borderColor: c.color, color: c.color }}>{t}</span>
+                        <span key={t} className="faction-card-tag" style={{ borderColor: readableInk(c.color), color: readableInk(c.color) }}>{t}</span>
                       ))}
                     </div>
                   )}
