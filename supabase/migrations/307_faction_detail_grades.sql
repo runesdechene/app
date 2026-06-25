@@ -114,6 +114,16 @@ BEGIN
     'totalCoupe', v_total,
     'totalCrowns', (SELECT COALESCE(sum(crowns_invested + crowns_conquered), 0)
                     FROM faction_members WHERE faction_id = p_faction_id),
+    -- Libellés bruts des 4 grades (custom Compagnie sinon défaut Noblesse) pour préremplir l'éditeur.
+    'gradeLabels', (
+      SELECT json_agg(json_build_object(
+        'rank', r,
+        'labelM', public._grade_label(p_faction_id, r, 'm'),
+        'labelF', public._grade_label(p_faction_id, r, 'f'),
+        'labelN', public._grade_label(p_faction_id, r, 'n')
+      ) ORDER BY r)
+      FROM generate_series(1, 4) AS r
+    ),
     'members', v_members
   );
 END;$$;
