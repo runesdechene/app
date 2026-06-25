@@ -39,3 +39,34 @@ export function readableTextOn(hex: string): string {
   const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return lum > 0.6 ? '#3d2f20' : '#fff'
 }
+
+/** Luminance relative WCAG (0 noir → 1 blanc). */
+function relLuminance([r, g, b]: [number, number, number]): number {
+  const f = (c: number) => { const s = c / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4 }
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+}
+function contrastRatio(a: number, b: number): number {
+  const [hi, lo] = a > b ? [a, b] : [b, a]
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Fond parchemin de l'app (App.css : #F5E6D3).
+const PARCHMENT_LUM = relLuminance([0xF5, 0xE6, 0xD3])
+
+/** Couleur d'« encre » lisible sur le fond parchemin clair, quand une couleur libre
+ *  (couleur de Compagnie choisie par le joueur) sert de TEXTE/bordure/accent.
+ *  Une couleur trop claire (ex. blanc revendiqué par les Bretons) est foncée par
+ *  crans jusqu'à un contraste suffisant ; une couleur déjà foncée est renvoyée telle
+ *  quelle. À utiliser pour `color:`/`borderColor:`, PAS pour les pastilles pleines
+ *  (là, garder la vraie couleur + `readableTextOn` pour le texte dessus). */
+export function readableInk(hex: string, minContrast = 4): string {
+  const rgb = hexToRgb(hex)
+  if (!rgb) return hex
+  let c = hex
+  for (let i = 0; i < 12; i++) {
+    const cur = hexToRgb(c)
+    if (!cur || contrastRatio(relLuminance(cur), PARCHMENT_LUM) >= minContrast) break
+    c = shade(c, 0.16) // fonce d'un cran vers le noir
+  }
+  return c
+}

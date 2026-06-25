@@ -3,6 +3,7 @@ import { usePlayerStore } from '../../stores/playerStore'
 import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { CompanyEmblem } from './CompanyEmblem'
+import { readableInk } from '../../lib/textFormat'
 import './BannerToggle.css'
 
 /**
@@ -34,7 +35,7 @@ export function BannerToggle() {
       <CompanyEmblem
         className="banner-toggle-emblem" color={active.color} name={active.name}
         imageUrl={active.imageUrl} emblemIcon={active.emblemIcon} emblemMono={active.emblemMono}
-        size={32} radius="50%" style={{ borderColor: active.color }}
+        size={32} radius="50%" style={{ borderColor: readableInk(active.color) }}
       />
       <span className="banner-toggle-flag" aria-hidden>⚑</span>
     </button>

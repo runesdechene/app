@@ -8,6 +8,7 @@ import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from './FactionCreateForm'
 import { CompanyInviteModal } from './CompanyInviteModal'
 import { CompanyEmblem } from './CompanyEmblem'
+import { readableInk, readableTextOn } from '../../lib/textFormat'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
 
@@ -179,9 +180,15 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     memberCount: detail.memberCount, isActive: false, isFounder: isChef,
   }
 
+  // Couleur de Compagnie pour le rendu (le joueur peut choisir n'importe quelle teinte,
+  // y compris le blanc) : `ink` = version lisible en texte/bordure sur le parchemin ;
+  // `onColor` = texte lisible POSÉ sur une pastille pleine de la vraie couleur.
+  const ink = readableInk(detail.color)
+  const onColor = readableTextOn(detail.color)
+
   return createPortal(
     <div className="faction-hall-overlay" onClick={overlayClick}>
-      <div className="faction-hall" style={{ borderTopColor: detail.color }}>
+      <div className="faction-hall" style={{ borderTopColor: ink }}>
         <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
 
         <div className="faction-hall-scroll">
@@ -191,7 +198,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               <button className="faction-hall-back" onClick={() => { onBack(); onClose() }}>← Retour</button>
             )}
             <div className="faction-hall-eyebrow">
-              <span className="faction-hall-dot" style={{ background: detail.color }} />
+              <span className="faction-hall-dot" style={{ background: detail.color, border: `1px solid ${ink}` }} />
               Compagnie
             </div>
             <div className="faction-hall-head">
@@ -212,7 +219,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             {detail.tags && detail.tags.length > 0 && (
               <div className="faction-hall-tags">
                 {detail.tags.map(t => (
-                  <span key={t} className="faction-hall-tag" style={{ borderColor: detail.color, color: detail.color }}>{t}</span>
+                  <span key={t} className="faction-hall-tag" style={{ borderColor: ink, color: ink }}>{t}</span>
                 ))}
               </div>
             )}
@@ -231,7 +238,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
           {/* Classement */}
           <div className="faction-hall-section" style={{ paddingBottom: 0 }}>
-            <button className="faction-hall-invite" style={{ borderColor: detail.color, color: detail.color }} onClick={() => setShowInvite(true)}>
+            <button className="faction-hall-invite" style={{ borderColor: ink, color: ink }} onClick={() => setShowInvite(true)}>
               👥 Inviter des amis
             </button>
             <h3 className="faction-hall-section-title">Classement de la Compagnie</h3>
@@ -251,19 +258,19 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               }
               return (
                 <div key={m.userId} className="faction-hall-rank-row"
-                  style={memberIsChef ? { borderColor: detail.color, background: `${detail.color}14` } : undefined}>
-                  <span className="faction-hall-rank-num" style={memberIsChef ? { color: detail.color } : undefined}>{rank ?? '·'}</span>
+                  style={memberIsChef ? { borderColor: ink, background: `${detail.color}14` } : undefined}>
+                  <span className="faction-hall-rank-num" style={memberIsChef ? { color: ink } : undefined}>{rank ?? '·'}</span>
                   <button type="button" className="faction-hall-rank-id" onClick={openProfile}
                     title={`Voir le profil de ${m.name}`}>
                     {m.avatarUrl ? (
                       <img className="faction-hall-rank-avatar" src={m.avatarUrl} alt="" />
                     ) : (
-                      <span className="faction-hall-rank-avatar" style={{ background: detail.color }}>{initials(m.name)}</span>
+                      <span className="faction-hall-rank-avatar" style={{ background: detail.color, color: onColor, border: '1px solid rgba(61,47,32,0.15)' }}>{initials(m.name)}</span>
                     )}
                     <div className="faction-hall-rank-info">
                       <div className="faction-hall-rank-name">{m.name}</div>
                       {memberIsChef && (
-                        <div className="faction-hall-rank-chef" style={{ color: detail.color }}>♛ Chef de Compagnie</div>
+                        <div className="faction-hall-rank-chef" style={{ color: ink }}>♛ Chef de Compagnie</div>
                       )}
                       {m.isAlly && (
                         <div className="faction-hall-rank-ally">🤝 Allié</div>
@@ -280,11 +287,14 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                     </div>
                   </button>
                   {(() => {
-                    const tresor = m.crownsInvested + (m.crownsConquered ?? 0)
+                    const conquis = m.crownsConquered ?? 0
                     return (
                       <span className="faction-hall-rank-stats">
                         🏆 {m.coupe.toLocaleString('fr-FR')}
-                        {tresor > 0 && <>{'  '}🪙 {tresor.toLocaleString('fr-FR')}</>}
+                        {m.crownsInvested > 0 && (
+                          <span title={`${m.crownsInvested} points de fondation`}>{'  '}⭐ {m.crownsInvested.toLocaleString('fr-FR')}</span>
+                        )}
+                        {conquis > 0 && <span title={`${conquis} couronnes conquises`}>{'  '}🪙 {conquis.toLocaleString('fr-FR')}</span>}
                       </span>
                     )
                   })()}
@@ -309,9 +319,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               </button>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {isActive ? (
-                  <span className="faction-hall-activebadge" style={{ color: detail.color }}>⚑ Compagnie principale</span>
+                  <span className="faction-hall-activebadge" style={{ color: ink }}>⚑ Compagnie principale</span>
                 ) : (
-                  <button className="faction-hall-setactive" style={{ background: detail.color }}
+                  <button className="faction-hall-setactive" style={{ background: detail.color, color: onColor, borderColor: ink }}
                     onClick={handleSetPrimary} disabled={settingPrimary}>
                     {settingPrimary ? '…' : '⚑ Désigner comme principale'}
                   </button>
@@ -329,7 +339,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           <div className="faction-hall-joinbar">
             <button
               className="faction-hall-join-big"
-              style={{ background: (atLimit || detail.locked) ? undefined : detail.color }}
+              style={(atLimit || detail.locked) ? undefined : { background: detail.color, color: onColor, borderColor: ink }}
               onClick={handleJoin}
               disabled={joining || atLimit || !!detail.locked}
             >
