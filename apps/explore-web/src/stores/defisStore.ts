@@ -44,9 +44,16 @@ export const useDefisStore = create<DefisStoreState>((set) => ({
     const popups: DefiRewardPopup[] = []
     for (const d of [next.daily, next.weeklyIndividual, next.weeklyCollective] as Array<Defi | null>) {
       if (!d || d.claimed) continue
+      // Collectif : une fois l'objectif atteint (completedAt), le défi est fermé —
+      // seul un contributeur d'AVANT cet instant est encore récompensé. Les retardataires
+      // sont aussi bloqués côté serveur ('too_late'), mais on évite l'appel inutile.
+      const onTime =
+        d.scope !== 'collective' ||
+        !d.completedAt ||
+        (!!d.myFirstContribAt && d.myFirstContribAt <= d.completedAt)
       const eligible =
         d.scope === 'collective'
-          ? d.progress >= d.target && d.myContribution >= 1
+          ? d.progress >= d.target && d.myContribution >= 1 && onTime
           : d.progress >= d.target
       if (!eligible) continue
       const { data: r } = await supabase.rpc('claim_defi', { p_defi_id: d.id })

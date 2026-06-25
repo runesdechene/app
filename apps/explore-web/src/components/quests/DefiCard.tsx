@@ -20,9 +20,16 @@ interface Props {
 export function DefiCard({ defi, label, onClick }: Props) {
   const progress = Math.min(defi.progress, defi.target)
   const pct = defi.target > 0 ? Math.min(100, Math.round((progress / defi.target) * 100)) : 0
-  const progressLabel = defi.claimed ? '✓' : `${progress}/${defi.target}`
-  // Date limite : compte à rebours uniquement sur les défis hebdo non réclamés.
-  const countdown = defi.cadence === 'weekly' && !defi.claimed ? formatDeadlineCountdown(defi.endsAt) : null
+  // Collectif accompli : objectif atteint. Le joueur a-t-il participé à temps (≤ completedAt) ?
+  const collectiveDone = defi.scope === 'collective' && !!defi.completedAt
+  const tooLate =
+    collectiveDone && (!defi.myFirstContribAt || defi.myFirstContribAt > defi.completedAt!)
+  const progressLabel = defi.claimed ? '✓' : tooLate ? '🔒' : `${progress}/${defi.target}`
+  // Date limite : compte à rebours uniquement sur les défis hebdo non réclamés et non accomplis.
+  const countdown =
+    defi.cadence === 'weekly' && !defi.claimed && !collectiveDone
+      ? formatDeadlineCountdown(defi.endsAt)
+      : null
 
   const keyActivate = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }

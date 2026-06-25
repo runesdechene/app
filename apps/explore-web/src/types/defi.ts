@@ -13,6 +13,12 @@ export interface Defi {
   claimed: boolean
   /** Fin de la fenêtre du défi (ISO). Sert au compte à rebours sur les défis hebdo. */
   endsAt: string | null
+  /** Collectif uniquement : instant où l'objectif a été atteint (ISO), sinon null.
+   *  Une fois atteint, le défi est fermé : seuls les contributeurs d'avant sont récompensés. */
+  completedAt?: string | null
+  /** Collectif uniquement : 1re contribution du joueur sur la fenêtre (ISO), sinon null.
+   *  À temps si ≤ completedAt. */
+  myFirstContribAt?: string | null
   /** Visuels du tag de lieu ciblé (null si pas de tag, ex. énigme). */
   tag: { icon: string | null; color: string; background: string; title: string } | null
 }

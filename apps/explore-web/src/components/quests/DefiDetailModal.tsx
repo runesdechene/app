@@ -34,9 +34,20 @@ export function DefiDetailModal({ defi, onClose }: { defi: Defi; onClose: () => 
   } else {
     rows.push({ label: 'Avancement', value: `${progress} / ${defi.target}`, highlight: true })
   }
-  if (countdown) rows.push({ label: 'Date limite', value: `⏳ ${countdown}` })
+  // Collectif accompli : objectif atteint → défi fermé. Le joueur a-t-il aidé à temps ?
+  const collectiveDone = isCollective && !!defi.completedAt
+  const tooLate =
+    collectiveDone && (!defi.myFirstContribAt || defi.myFirstContribAt > defi.completedAt!)
+  // Pas de date limite affichée une fois le défi collectif accompli (plus rien à courir).
+  if (countdown && !collectiveDone) rows.push({ label: 'Date limite', value: `⏳ ${countdown}` })
   rows.push({ label: 'Récompense', value: `+${defi.reward} 🪙 Couronnes` })
-  if (defi.claimed) rows.push({ label: 'Statut', value: 'Butin déjà perçu ✓', highlight: true })
+  if (defi.claimed) {
+    rows.push({ label: 'Statut', value: 'Butin déjà perçu ✓', highlight: true })
+  } else if (tooLate) {
+    rows.push({ label: 'Statut', value: 'Accompli sans toi — récompense close 🔒', highlight: true })
+  } else if (collectiveDone) {
+    rows.push({ label: 'Statut', value: 'Objectif atteint — butin en route ✓', highlight: true })
+  }
 
   const extra = (
     <>
