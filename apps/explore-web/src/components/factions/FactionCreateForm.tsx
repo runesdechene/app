@@ -4,6 +4,7 @@ import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { uploadFactionImage } from '../../lib/factionImageUpload'
 import { COMPANY_GLYPHS } from '../../lib/companyEmblems'
 import { CompanyEmblem } from './CompanyEmblem'
+import { readableTextOn } from '../../lib/textFormat'
 import type { MyFaction } from '../../stores/factionGroupStore'
 import './FactionCreateForm.css'
 
@@ -299,7 +300,7 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
             <button type="button" className="faction-form-cancel" onClick={onCancel} disabled={submitting}>
               Annuler
             </button>
-            <button type="submit" className="faction-form-submit" style={{ background: color }} disabled={submitting}>
+            <button type="submit" className="faction-form-submit" style={{ background: color, color: readableTextOn(color) }} disabled={submitting}>
               {submitting ? 'En cours…' : isEdit ? 'Enregistrer' : 'Fonder'}
             </button>
           </div>

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { COMPANY_GLYPH_MAP, glyphColor, pngMonoFilter } from '../../lib/companyEmblems'
+import { readableTextOn } from '../../lib/textFormat'
 import './CompanyEmblem.css'
 
 interface Props {
@@ -44,7 +45,7 @@ export function CompanyEmblem({
           {glyph.node}
         </svg>
       ) : (
-        <span className="company-emblem-letter" style={{ fontSize: Math.round(size * 0.44) }}>
+        <span className="company-emblem-letter" style={{ fontSize: Math.round(size * 0.44), color: readableTextOn(color) }}>
           {(name ?? '?').charAt(0).toUpperCase() || '?'}
         </span>
       )}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { readableTextOn } from '../../lib/textFormat'
 import './CompanyInviteModal.css'
 
 interface Props {
@@ -61,7 +62,7 @@ export function CompanyInviteModal({ shareKey, factionName, color, isChef, isMem
         </p>
 
         <textarea className="cinv-message" readOnly value={message} rows={4} onFocus={(e) => e.currentTarget.select()} />
-        <button className="cinv-copy cinv-copy-full" style={{ background: color }} onClick={copy}>
+        <button className="cinv-copy cinv-copy-full" style={{ background: color, color: readableTextOn(color) }} onClick={copy}>
           {copied ? '✓ Message copié' : '📋 Copier le message'}
         </button>
 
