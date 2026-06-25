@@ -9,6 +9,7 @@ import shopIcon from '../../../assets/shop_icon.webp'
 import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
 import { useFactionHallStore } from '../../../stores/factionHallStore'
+import { CompanyEmblem } from '../../factions/CompanyEmblem'
 import { VeteranBadge } from '../../profile/VeteranBadge'
 import { GloryProgressBar } from '../../profile/GloryProgressBar'
 import { LevelText } from '../../profile/LevelText'
@@ -24,6 +25,9 @@ interface Props {
 export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [profile, setProfile] = useState<PlayerProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  // Emblèmes des Compagnies (principale + alliée) — nouveau système, comme CoupeModal/FactionBar.
+  // Remplace l'ancien factionPattern (qui affichait les emblèmes d'héritage obsolètes).
+  const [factionEmblems, setFactionEmblems] = useState<Record<string, { imageUrl: string | null; emblemIcon: string | null; emblemMono: string | null }>>({})
 
   const currentUserId = usePlayerStore(s => s.userId)
   const { state: coupeState } = useCoupe(true)
@@ -79,6 +83,22 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingOpenFragmentStore, profile])
+
+  // Charge les emblèmes des Compagnies du joueur (principale + alliée).
+  useEffect(() => {
+    const ids = [profile?.factionId, profile?.allyFactionId].filter(Boolean) as string[]
+    if (ids.length === 0) return
+    let cancelled = false
+    supabase.from('factions').select('id, image_url, emblem_icon, emblem_mono').in('id', ids).then(({ data }) => {
+      if (cancelled || !data) return
+      const m: Record<string, { imageUrl: string | null; emblemIcon: string | null; emblemMono: string | null }> = {}
+      for (const f of data as Array<{ id: string; image_url: string | null; emblem_icon: string | null; emblem_mono: string | null }>) {
+        m[f.id] = { imageUrl: f.image_url, emblemIcon: f.emblem_icon, emblemMono: f.emblem_mono }
+      }
+      setFactionEmblems(m)
+    })
+    return () => { cancelled = true }
+  }, [profile?.factionId, profile?.allyFactionId])
 
   useEffect(() => {
     async function load() {
@@ -307,15 +327,14 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
                 {profile.factionTitle && (
                   <div className="player-modal-faction-member">
-                    {profile.factionPattern && (
-                      <span
-                        className="player-modal-faction-member-icon"
-                        style={{
-                          WebkitMaskImage: `url(${profile.factionPattern})`,
-                          maskImage: `url(${profile.factionPattern})`,
-                          backgroundColor: profile.factionColor ?? '#8A7B6A',
-                        }}
-                        aria-hidden
+                    {profile.factionId && (
+                      <CompanyEmblem
+                        size={18}
+                        color={profile.factionColor ?? '#8A7B6A'}
+                        name={profile.factionTitle}
+                        imageUrl={factionEmblems[profile.factionId]?.imageUrl ?? profile.factionImage ?? null}
+                        emblemIcon={factionEmblems[profile.factionId]?.emblemIcon ?? null}
+                        emblemMono={factionEmblems[profile.factionId]?.emblemMono ?? null}
                       />
                     )}
                     <span>
@@ -338,17 +357,14 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
 
                 {profile.allyFactionId && profile.allyFactionTitle && (
                   <div className="player-modal-faction-member">
-                    {profile.allyFactionPattern && (
-                      <span
-                        className="player-modal-faction-member-icon"
-                        style={{
-                          WebkitMaskImage: `url(${profile.allyFactionPattern})`,
-                          maskImage: `url(${profile.allyFactionPattern})`,
-                          backgroundColor: profile.allyFactionColor ?? '#8A7B6A',
-                        }}
-                        aria-hidden
-                      />
-                    )}
+                    <CompanyEmblem
+                      size={18}
+                      color={profile.allyFactionColor ?? '#8A7B6A'}
+                      name={profile.allyFactionTitle}
+                      imageUrl={factionEmblems[profile.allyFactionId]?.imageUrl ?? null}
+                      emblemIcon={factionEmblems[profile.allyFactionId]?.emblemIcon ?? null}
+                      emblemMono={factionEmblems[profile.allyFactionId]?.emblemMono ?? null}
+                    />
                     <span>
                       🤝 Allié de la Compagnie{' '}
                       <button
