@@ -89,7 +89,7 @@
   transition: transform 120ms ease-out, border-color 120ms ease-out;
 }
 .faction-chip:hover { transform: translateY(-1px); }
-.faction-chip-mine { border-color: var(--faction-color); box-shadow: 0 0 0 1px var(--faction-color) inset; }
+.faction-chip-mine { border-color: var(--faction-ink); box-shadow: 0 0 0 1px var(--faction-ink) inset; }
 
 .faction-chip-crown {
   position: absolute; top: -9px; right: 4px; left: auto; font-size: 13px; line-height: 1;
@@ -99,6 +99,7 @@
 .faction-chip-emblem {
   width: 24px; height: 24px; border-radius: 50%; flex: none;
   background: var(--faction-color);
+  border: 1px solid rgba(61, 47, 32, 0.15); /* détache un emblème clair/blanc du fond */
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
@@ -111,11 +112,11 @@
   font-size: 13px; font-weight: 600; color: #4a3728;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.faction-chip-active { flex: none; font-size: 12px; color: var(--faction-color); }
+.faction-chip-active { flex: none; font-size: 12px; color: var(--faction-ink); }
 .faction-chip-score {
   flex: none;
   font-family: var(--font-accent, 'Cinzel', serif);
-  font-size: 12px; font-weight: 700; color: var(--faction-color);
+  font-size: 12px; font-weight: 700; color: var(--faction-ink);
   font-variant-numeric: tabular-nums;
 }
 

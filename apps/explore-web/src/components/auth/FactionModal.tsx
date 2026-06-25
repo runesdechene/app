@@ -6,6 +6,7 @@ import { useFactionGroupStore } from '../../stores/factionGroupStore'
 import { useFactionHallStore } from '../../stores/factionHallStore'
 import { FactionCreateForm } from '../factions/FactionCreateForm'
 import { CompanyEmblem } from '../factions/CompanyEmblem'
+import { readableInk } from '../../lib/textFormat'
 import './FactionModal.css'
 
 interface FactionModalProps {
@@ -76,7 +77,7 @@ export function FactionModal({ onClose, currentFactionId, onOpenHall }: FactionM
                 <button
                   key={c.id}
                   className={`faction-card${isActive ? ' active' : ''}`}
-                  style={{ '--faction-color': c.color } as React.CSSProperties}
+                  style={{ '--faction-color': c.color, '--faction-ink': readableInk(c.color) } as React.CSSProperties}
                   onClick={() => handleCardClick(c.id)}
                 >
                   <div className="faction-card-head">

@@ -11,7 +11,7 @@
   height: 68px;
   border-radius: 50%;
   background: #fff0d9;
-  color: var(--faction-color);
+  color: var(--faction-ink, #4a3728); /* jamais blanc sur creme : ink lisible, ou brun par defaut */
   font-size: 42px;
   font-weight: 300;
   cursor: pointer;

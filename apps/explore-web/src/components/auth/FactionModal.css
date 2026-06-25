@@ -151,7 +151,7 @@
 
 .faction-card-desc a {
   font-weight: 700;
-  color: var(--faction-color);
+  color: var(--faction-ink, var(--faction-color));
   text-decoration: underline;
   filter: grayscale(50%);
 }
