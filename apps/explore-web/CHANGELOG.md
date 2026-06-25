@@ -1,3 +1,10 @@
+# ALPHA V0.11.2
+## Publier une marque GPS, sans fausse alerte
+
+- **Marque GPS** : quand tu publies plus tard un point posé sur le terrain (depuis chez toi, par exemple), l'app ne t'avertit plus à tort que « tu n'es pas sur place ». Ton bonus de visite et ton étendard restent bien acquis, au bon endroit.
+
+---
+
 # ALPHA V0.11.1
 ## Toutes les couleurs permises & défis collectifs plus carrés
 

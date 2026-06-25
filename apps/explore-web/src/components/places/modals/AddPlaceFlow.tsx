@@ -10,6 +10,7 @@ import { refreshLevelStateGlobal } from '../../../hooks/useLevel'
 import { refreshGloryGlobal } from '../../../hooks/useGlory'
 import { useGpsMarksStore } from '../../../stores/gpsMarksStore'
 import { findNearbyPlaces, publishGpsMark } from '../../../lib/gpsMarksApi'
+import { isGpsMarkFresh } from '../../../lib/gpsMarkFreshness'
 import type { NearbyPlace } from '../../../types/gpsMark'
 import { EraSelector } from './EraSelector'
 import { MapCrosshairPicker } from '../shared/MapCrosshairPicker'
@@ -810,12 +811,20 @@ export function AddPlaceFlow() {
             const distanceKm = userPosition
               ? haversineKm(userPosition.lat, userPosition.lng, confirmedCoords.lat, confirmedCoords.lng)
               : null
-            const isOnSite = distanceKm !== null && distanceKm < 0.5
+            // Publication d'une marque GPS : le bonus "sur place" est RÉTROACTIF.
+            // Il dépend de la fraîcheur de la marque (posée GPS sur le terrain),
+            // pas de la position actuelle — l'user publie souvent depuis chez lui.
+            // Le serveur (publish_gps_mark, mig 266) tranche pareil (v_fresh).
+            const isFreshDraft = publishingDraft ? isGpsMarkFresh(publishingDraft.createdAt) : false
+            const isOnSite = publishingDraft
+              ? isFreshDraft
+              : distanceKm !== null && distanceKm < 0.5
             // V0.7.6 (8/05) — zone "tu pensais être sur place mais le pin tombe à côté".
             // Si l'utilisateur a une position GPS valide et que le pin est entre 200m
             // et 50km de lui, on suggère explicitement de recentrer (vrai cas le plus
             // fréquent du bug "création créée sans plant_flag automatique").
-            const isMisplaced = distanceKm !== null && distanceKm >= 0.2 && distanceKm < 50
+            // Jamais en mode publication : recentrer déplacerait le lieu loin du point posé.
+            const isMisplaced = !publishingDraft && distanceKm !== null && distanceKm >= 0.2 && distanceKm < 50
             const recenterOnUser = () => {
               if (!userPosition) return
               setConfirmedCoords({ lat: userPosition.lat, lng: userPosition.lng })
