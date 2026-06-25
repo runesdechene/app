@@ -59,6 +59,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
+  const setGradeLabels = useFactionGroupStore((s) => s.setGradeLabels)
   const setPrimary = useFactionGroupStore((s) => s.setPrimary)
   const myFactions = useFactionGroupStore((s) => s.myFactions)
   const activeFactionId = useFactionGroupStore((s) => s.activeFactionId)
@@ -72,6 +73,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [settingPrimary, setSettingPrimary] = useState(false)
   const [primaryError, setPrimaryError] = useState<string | null>(null)
+  const [showGradeEditor, setShowGradeEditor] = useState(false)
+  const [gradeRows, setGradeRows] = useState<{ rank: number; labelM: string; labelF: string; labelN: string }[]>([])
+  const [savingGrades, setSavingGrades] = useState(false)
+  const [gradeError, setGradeError] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc('get_faction_detail', { p_faction_id: factionId })
@@ -80,6 +85,25 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   }, [factionId])
 
   useEffect(() => { reload() }, [reload])
+
+  // Defaults pour les 4 grades si la Compagnie n'a pas de libellés custom.
+  const GRADE_DEFAULTS = [
+    { rank: 1, labelM: 'Seigneur',    labelF: 'Dame',        labelN: '' },
+    { rank: 2, labelM: 'Co-seigneur', labelF: 'Co-dame',     labelN: '' },
+    { rank: 3, labelM: 'Officier',    labelF: 'Officière',   labelN: '' },
+    { rank: 4, labelM: 'Membre',      labelF: 'Membre',      labelN: '' },
+  ]
+
+  useEffect(() => {
+    if (!detail) return
+    const src = detail.gradeLabels
+    if (src && src.length > 0) {
+      setGradeRows(src.map((g) => ({ rank: g.rank, labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '' })))
+    } else {
+      setGradeRows(GRADE_DEFAULTS)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detail?.id])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
@@ -145,6 +169,30 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     reload()
   }
 
+  async function handleSaveGrades() {
+    if (!detail) return
+    setSavingGrades(true)
+    setGradeError(null)
+    const payload = gradeRows.map((r) => ({
+      rank: r.rank,
+      label_m: r.labelM,
+      label_f: r.labelF,
+      label_n: r.labelN || undefined,
+    }))
+    const result = await setGradeLabels(detail.id, payload)
+    setSavingGrades(false)
+    if ('error' in result) {
+      setGradeError(
+        result.error === 'not_governing' ? "Tu n'as pas le grade requis pour modifier les libellés."
+        : result.error === 'unauthorized' ? 'Action non autorisée.'
+        : "Impossible d'enregistrer pour le moment."
+      )
+      return
+    }
+    setShowGradeEditor(false)
+    reload()
+  }
+
   const overlayClick = (e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose() }
 
   if (!detail) {
@@ -161,6 +209,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const topMember = detail.members[0]
   const chefId = topMember && !topMember.isAlly ? topMember.userId : null
   const isChef = chefId !== null && chefId === userId
+
+  // Grade du viewer → gouvernance (rank ≤ 3 = Seigneur / Co-seigneur / Officier).
+  const myGradeRank = detail.members.find((m) => m.userId === userId)?.gradeRank ?? 99
+  const canGovern = myGradeRank <= 3
 
   // Rang affiché = position parmi les membres PRINCIPAUX uniquement (allié = hors classement).
   let rankCounter = 0
@@ -313,6 +365,75 @@ export function FactionHallModal({ factionId, onClose }: Props) {
               )
             })}
           </div>
+          {/* Éditeur de libellés de grades (gouvernants uniquement) */}
+          {canGovern && showGradeEditor && (
+            <div className="faction-hall-section faction-hall-grade-editor">
+              <h3 className="faction-hall-section-title">Renommer les grades</h3>
+              <div className="faction-hall-grade-rows">
+                {gradeRows.map((row, i) => {
+                  const rankLabel = row.rank === 1 ? 'Grade 1 — sommet' : row.rank === 2 ? 'Grade 2' : row.rank === 3 ? 'Grade 3' : 'Grade 4 — base'
+                  return (
+                    <div key={row.rank} className="faction-hall-grade-row">
+                      <span className="faction-hall-grade-rank-label">{rankLabel}</span>
+                      <div className="faction-hall-grade-inputs">
+                        <label className="faction-hall-grade-field">
+                          <span>Masculin</span>
+                          <input
+                            type="text"
+                            className="faction-hall-grade-input"
+                            value={row.labelM}
+                            maxLength={32}
+                            onChange={(e) => {
+                              const next = [...gradeRows]
+                              next[i] = { ...next[i], labelM: e.target.value }
+                              setGradeRows(next)
+                            }}
+                          />
+                        </label>
+                        <label className="faction-hall-grade-field">
+                          <span>Féminin</span>
+                          <input
+                            type="text"
+                            className="faction-hall-grade-input"
+                            value={row.labelF}
+                            maxLength={32}
+                            onChange={(e) => {
+                              const next = [...gradeRows]
+                              next[i] = { ...next[i], labelF: e.target.value }
+                              setGradeRows(next)
+                            }}
+                          />
+                        </label>
+                        <label className="faction-hall-grade-field">
+                          <span>Neutre (optionnel)</span>
+                          <input
+                            type="text"
+                            className="faction-hall-grade-input"
+                            value={row.labelN}
+                            maxLength={32}
+                            placeholder="—"
+                            onChange={(e) => {
+                              const next = [...gradeRows]
+                              next[i] = { ...next[i], labelN: e.target.value }
+                              setGradeRows(next)
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              {gradeError && <p className="faction-hall-joinerror" style={{ marginTop: 8, textAlign: 'left' }}>{gradeError}</p>}
+              <button
+                className="faction-hall-grade-save"
+                onClick={handleSaveGrades}
+                disabled={savingGrades}
+              >
+                {savingGrades ? 'Enregistrement…' : 'Enregistrer'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Bas du Hall : rejoindre (non-membre) = gros CTA central ; sinon footer discret */}
@@ -331,8 +452,13 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                     {settingPrimary ? '…' : '⚑ Désigner comme principale'}
                   </button>
                 )}
-                {isChef && (
+                {canGovern && (
                   <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer</button>
+                )}
+                {canGovern && (
+                  <button className="faction-hall-edit" onClick={() => setShowGradeEditor((v) => !v)}>
+                    {showGradeEditor ? 'Fermer grades' : '✦ Grades'}
+                  </button>
                 )}
               </div>
             </div>
@@ -361,8 +487,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
         )}
       </div>
 
-      {/* Édition (Chef) */}
-      {showEdit && isChef && userId && (
+      {/* Édition identité (grade ≤ 3) */}
+      {showEdit && canGovern && userId && (
         <FactionCreateForm
           userId={userId}
           editFaction={editFaction}

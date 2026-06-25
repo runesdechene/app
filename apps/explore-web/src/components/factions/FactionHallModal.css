@@ -316,3 +316,55 @@
   margin-top: 1px;
   font-style: italic;
 }
+
+/* ── Éditeur de libellés de grades ── */
+.faction-hall-grade-editor {
+  border-top: 1px solid rgba(193, 154, 107, 0.3);
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.faction-hall-grade-rows { display: flex; flex-direction: column; gap: 14px; }
+.faction-hall-grade-row {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.faction-hall-grade-rank-label {
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #8a7050;
+}
+.faction-hall-grade-inputs { display: flex; gap: 8px; flex-wrap: wrap; }
+.faction-hall-grade-field {
+  display: flex; flex-direction: column; gap: 3px; flex: 1 1 120px;
+}
+.faction-hall-grade-field span {
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #8a7050;
+}
+.faction-hall-grade-input {
+  padding: 7px 10px;
+  border: 1px solid rgba(184, 154, 106, 0.55);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body, Georgia, serif);
+  font-size: 14px; color: #2a1f10;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.faction-hall-grade-input:focus {
+  border-color: rgba(184, 154, 106, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+}
+.faction-hall-grade-save {
+  margin-top: 14px;
+  padding: 9px 20px;
+  border: 1px solid rgba(193, 154, 107, 0.45);
+  border-radius: 12px;
+  background: rgba(193, 154, 107, 0.18);
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 700; color: #2a1f10;
+  cursor: pointer;
+}
+.faction-hall-grade-save:hover:not(:disabled) { background: rgba(193, 154, 107, 0.3); }
+.faction-hall-grade-save:disabled { opacity: 0.5; cursor: wait; }
