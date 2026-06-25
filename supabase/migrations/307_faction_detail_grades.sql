@@ -1,8 +1,8 @@
 -- 307_faction_detail_grades.sql
 -- WHY : exposer le grade de chaque membre (rang 1..4 + libellé résolu/genré) dans get_faction_detail,
--- pour l'afficher dans le Hall/profil et gater les pouvoirs côté front. Le rang suit l'ordre déjà
--- utilisé pour le tri des membres (mig 302) + la garde fondation (mig 306). Corps = mig 302
--- + (u.title_gender) + v_founded + CTE de rang + 2 clés JSON. ADDITIF (backward-compatible).
+-- pour l'afficher dans le Hall/profil et gater les pouvoirs côté front. Le rang suit l'ordre du tri
+-- des membres (mig 302) = mérite Coupe saison + investissement de fondation (plein) + conquis ÷10.
+-- Corps = mig 302 + (u.title_gender) + CTE de rang + clés JSON gradeRank/gradeLabel/gradeLabels. ADDITIF.
 
 CREATE OR REPLACE FUNCTION public.get_faction_detail(p_faction_id text)
 RETURNS json LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO 'public' AS $$
@@ -16,14 +16,12 @@ DECLARE
   v_e_e   int := _barem('coupe.enigma_easy', 1);
   v_e_m   int := _barem('coupe.enigma_medium', 1);
   v_e_h   int := _barem('coupe.enigma_hard', 1);
-  v_mc int; v_founded boolean;
+  v_mc int;
 BEGIN
   SELECT * INTO v_f FROM factions WHERE id = p_faction_id;
   IF v_f.id IS NULL THEN RETURN json_build_object('error','not_found'); END IF;
   SELECT started_at, COALESCE(ended_at, now()) INTO v_from, v_to
   FROM coupe_seasons ORDER BY (ended_at IS NULL) DESC, started_at DESC LIMIT 1;
-  -- fondation comptée seulement la saison où la Compagnie a été créée (pas de privilège permanent)
-  v_founded := (v_f.created_at >= v_from AND v_f.created_at < v_to);
 
   WITH iv AS (
     SELECT user_id, started_at, COALESCE(ended_at, now()) AS ended_at
@@ -71,7 +69,7 @@ BEGIN
         ROW_NUMBER() OVER (
           PARTITION BY is_ally
           ORDER BY (vis_pts + add_pts + plant_pts + photo_pts + enig_pts
-                    + CASE WHEN v_founded THEN crowns_invested ELSE 0 END
+                    + crowns_invested
                     + crowns_conquered / 10.0) DESC, joined_at ASC)
       END AS principal_pos
     FROM mem_pts mp
@@ -97,7 +95,7 @@ BEGIN
         'enigmes', NULLIF(enig_pts, 0), 'visites', NULLIF(vis_pts, 0),
         'ajouts',  NULLIF(add_pts, 0), 'veilles', NULLIF(plant_pts, 0), 'photos', NULLIF(photo_pts, 0)
       ))
-    ) ORDER BY is_ally ASC, (vis_pts + add_pts + plant_pts + photo_pts + enig_pts + CASE WHEN v_founded THEN crowns_invested ELSE 0 END + crowns_conquered / 10.0) DESC, joined_at ASC), '[]'::json),
+    ) ORDER BY is_ally ASC, (vis_pts + add_pts + plant_pts + photo_pts + enig_pts + crowns_invested + crowns_conquered / 10.0) DESC, joined_at ASC), '[]'::json),
     COALESCE(sum(vis_pts + add_pts + plant_pts + photo_pts + enig_pts), 0)::int
   INTO v_members, v_total
   FROM graded;
