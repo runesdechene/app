@@ -97,7 +97,6 @@ export function CoupeModal({ onClose }: Props) {
               lieuxSortisOubli={state.collective.lieuxSortisOubli}
               lieuxVisites={state.collective.lieuxVisites}
               enigmesPercees={state.collective.enigmesPercees}
-              variant="full"
             />
           )}
 

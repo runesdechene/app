@@ -4,6 +4,12 @@
   /* Hérite des styles .leaderboard-modal, on ajoute juste de la place pour la saison */
 }
 
+/* Le bandeau collectif « Ensemble » : marges latérales pour ne pas coller aux bords
+   de la modale (alignées sur l'inset du classement). */
+.coupe-modal .collective-counter {
+  margin: 4px 16px 14px;
+}
+
 .coupe-season-label {
   margin: 4px 0 12px;
   text-align: center;

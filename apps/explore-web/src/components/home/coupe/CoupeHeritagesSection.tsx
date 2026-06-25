@@ -110,7 +110,6 @@ export function CoupeHeritagesSection({ openFactionModal }: CoupeHeritagesSectio
             lieuxSortisOubli={state.collective.lieuxSortisOubli}
             lieuxVisites={state.collective.lieuxVisites}
             enigmesPercees={state.collective.enigmesPercees}
-            variant="full"
           />
         )}
         <CoupePodium

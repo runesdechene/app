@@ -1,30 +1,32 @@
-/* Compteur collectif « Ensemble contre l'Oubli » — DA parchemin sobre. */
-.collective-counter { font-family: var(--font-accent, 'Cinzel', serif); color: #4a3728; }
-
-/* Bandeau complet (modale / accueil) */
-.collective-counter-full {
-  background: rgba(245, 230, 211, 0.75);
-  border: 1px solid rgba(184, 154, 106, 0.45);
-  border-radius: 10px;
-  padding: 8px 12px;
-  text-align: center;
+/* Compteur collectif « Ensemble contre l'Oubli » — liste lisible sur parchemin
+   (modale Coupe / accueil). Sur la carte, même contenu dans la gélule du scoreboard
+   (cf. FactionBar.css). DA sobre. */
+.collective-counter {
+  font-family: var(--font-accent, 'Cinzel', serif);
+  background: rgba(245, 230, 211, 0.82);
+  border: 1px solid rgba(184, 154, 106, 0.5);
+  border-radius: 12px;
+  padding: 12px 16px;
 }
 .collective-counter-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: rgba(74, 55, 40, 0.7); margin-bottom: 4px;
+  text-align: center;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(74, 55, 40, 0.75);
+  margin-bottom: 10px;
 }
-.collective-counter-metrics {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px;
-  font-size: 12px; color: #5a4636;
+/* Stats en gélules flex : se mettent en ligne si la place le permet, sinon s'empilent. */
+.collective-counter-pills {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 7px;
 }
-.collective-counter-metrics b { color: #8a5a22; font-variant-numeric: tabular-nums; }
-
-/* Compact (scoreboard carte) : 1 ligne dense, alignée à droite comme le scoreboard */
-.collective-counter-compact {
-  display: flex; gap: 8px; justify-content: flex-end; align-self: stretch;
-  font-size: 10px; font-weight: 700; color: rgba(74, 55, 40, 0.75);
+.cc-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255, 250, 240, 0.7);
+  border: 1px solid rgba(184, 154, 106, 0.5);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px; color: #5a4636; white-space: nowrap;
+}
+.cc-pill b {
+  font-size: 15px; font-weight: 700; color: #8a5a22;
   font-variant-numeric: tabular-nums;
-  background: rgba(245, 230, 211, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 8px;
-  padding: 3px 8px;
 }
