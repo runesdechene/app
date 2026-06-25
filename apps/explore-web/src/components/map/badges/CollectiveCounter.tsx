@@ -21,7 +21,7 @@ export function CollectiveCounter({ lieuxSortisOubli, lieuxVisites, enigmesPerce
       <div className="collective-counter-pills">
         <span className="cc-pill">🏛️ Sorti <b>{fmt(lieuxSortisOubli)}</b> lieux de l'Oubli</span>
         <span className="cc-pill">📍 Visité <b>{fmt(lieuxVisites)}</b> lieux</span>
-        <span className="cc-pill">📜 Validé <b>{fmt(enigmesPercees)}</b> énigmes</span>
+        <span className="cc-pill">📜 Et se sont cultivés avec <b>{fmt(enigmesPercees)}</b> énigmes résolues</span>
       </div>
     </div>
   )
