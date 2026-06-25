@@ -39,11 +39,11 @@
 
 ## File Structure
 
-**Nouveaux fichiers**
-- `supabase/migrations/303_title_gender.sql` — colonne `users.title_gender` + RPC `set_title_gender`.
-- `supabase/migrations/304_faction_grade_labels.sql` — table `faction_grade_labels` + helpers `_grade_label`, `_member_grade_rank`.
-- `supabase/migrations/305_faction_detail_grades.sql` — redéfinit `get_faction_detail` pour exposer `gradeRank` + `gradeLabel`.
-- `supabase/migrations/306_grade_powers_and_labels_rpc.sql` — gate des pouvoirs (`update_faction_identity`, `remove_faction_member`) + RPC `set_faction_grade_labels`.
+**Nouveaux fichiers** *(numéros réels = 305-308 : 303/304 étaient déjà pris par `303_defi_collectif` + `304_gold_note`. Les en-têtes de tâches ci-dessous disent 303-306 par historique — lire +2.)*
+- `supabase/migrations/305_title_gender.sql` — colonne `users.title_gender` + RPC `set_title_gender`.
+- `supabase/migrations/306_faction_grade_labels.sql` — table `faction_grade_labels` + helpers `_grade_label`, `_member_grade_rank` + `_faction_chef` (règle fondation = saison de fondation).
+- `supabase/migrations/307_faction_detail_grades.sql` — redéfinit `get_faction_detail` pour exposer `gradeRank` + `gradeLabel`.
+- `supabase/migrations/308_grade_powers_and_labels_rpc.sql` — gate `update_faction_identity` (rang≤3) + RPC `set_faction_grade_labels` (`remove_faction_member` laissé intact = déjà Chef-only).
 
 **Fichiers modifiés (front)**
 - `apps/explore-web/src/stores/playerStore.ts` — champ `titleGender` + setter.
