@@ -1,4 +1,4 @@
--- 304_faction_grade_labels.sql
+-- 306_faction_grade_labels.sql
 -- WHY : grades des Compagnies. Le grade = position du membre dans le classement de la Compagnie.
 -- 1er=Seigneur, 2e=Co-seigneur, 3-5=Officier, reste=Membre, allié=aucun. Classement = mérite Coupe
 -- saison + (fondation SI saison de fondation) + conquis ÷10 → la fondation ne reseat plus le fondateur

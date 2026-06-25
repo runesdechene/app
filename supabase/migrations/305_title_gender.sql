@@ -1,4 +1,4 @@
--- 303_title_gender.sql
+-- 305_title_gender.sql
 -- WHY : accorder les libellés de grade (Seigneur/Dame…) au genre choisi par le joueur.
 -- Préférence d'affichage personnelle, réglée au profil, défaut masculin (décision Uriel 25/06).
 -- Réutilisable ensuite partout (classes, hauts-faits, toasts). ADDITIF.

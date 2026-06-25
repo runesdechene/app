@@ -1,7 +1,7 @@
--- 305_faction_detail_grades.sql
+-- 307_faction_detail_grades.sql
 -- WHY : exposer le grade de chaque membre (rang 1..4 + libellé résolu/genré) dans get_faction_detail,
 -- pour l'afficher dans le Hall/profil et gater les pouvoirs côté front. Le rang suit l'ordre déjà
--- utilisé pour le tri des membres (mig 302) + la garde fondation (mig 304). Corps = mig 302
+-- utilisé pour le tri des membres (mig 302) + la garde fondation (mig 306). Corps = mig 302
 -- + (u.title_gender) + v_founded + CTE de rang + 2 clés JSON. ADDITIF (backward-compatible).
 
 CREATE OR REPLACE FUNCTION public.get_faction_detail(p_faction_id text)

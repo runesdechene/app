@@ -1,4 +1,4 @@
--- 306_grade_powers_and_labels_rpc.sql
+-- 308_grade_powers_and_labels_rpc.sql
 -- WHY : accorder les pouvoirs de gouvernance au top 5 (grade rang ≤ 3 = Seigneur+Co-seigneur+Officiers).
 -- update_faction_identity passe de « Chef seul » à « gouvernance (rang ≤ 3) ». remove_faction_member
 -- est LAISSÉ INTACT : il restreint déjà au Chef (= Seigneur = rang 1), ce qui est exactement la règle
