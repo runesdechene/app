@@ -135,6 +135,16 @@
   flex-direction: column-reverse;
   align-items: flex-end;
   gap: 6px;
+  /* Le conteneur s'élargit à la largeur du plus large enfant (toggle/boutons), créant une
+     zone transparente à gauche des chips étroites qui volait les touches de la carte
+     (scoreboard « pas tactile »/non scrollable sur mobile). On laisse passer les touches
+     dans le vide ; seuls les éléments visibles ci-dessous restent interactifs. */
+  pointer-events: none;
+}
+.influence-area .influence-toggle,
+.influence-area .faction-scoreboard-live,
+.influence-area .faction-scoreboard-rail {
+  pointer-events: auto;
 }
 
 .influence-toggle {
