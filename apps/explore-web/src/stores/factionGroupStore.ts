@@ -5,6 +5,14 @@ import { useMapStore } from './mapStore'
 
 // ─── Types (user-facing « Compagnie » ; mécanique = faction) ──────────────────
 
+export interface FactionGrade {
+  position: number
+  labelM: string
+  labelF: string
+  labelN: string | null
+  capacity: number | null   // null = « le reste » (catch-all, toujours en dernier)
+}
+
 export interface MyFaction {
   id: string
   name: string
@@ -82,8 +90,8 @@ export interface FactionDetail {
   /** Couronnes investies cumulées (fondation + conquête) des membres. */
   totalCrowns: number
   members: FactionMember[]
-  /** Libellés bruts des 4 grades (custom Compagnie sinon défaut), pour l'éditeur. */
-  gradeLabels?: { rank: number; labelM: string; labelF: string; labelN: string | null }[]
+  grades?: FactionGrade[]
+  governGrades?: number
 }
 
 // ─── Result types ─────────────────────────────────────────────────────────────
@@ -132,9 +140,10 @@ interface FactionGroupState {
     params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
   ) => Promise<ActionResult>
   removeMember: (userId: string, factionId: string, targetUserId: string) => Promise<ActionResult>
-  setGradeLabels: (
+  setGrades: (
     factionId: string,
-    labels: { rank: number; label_m: string; label_f: string; label_n?: string }[],
+    grades: { label_m: string; label_f: string; label_n?: string; capacity?: number | null }[],
+    governGrades: number,
   ) => Promise<ActionResult>
   /** Supprime une Compagnie (fondateur uniquement) — soft-retire côté serveur. */
   deleteFaction: (userId: string, factionId: string) => Promise<ActionResult>
@@ -305,10 +314,9 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
     return data as ActionResult
   },
 
-  setGradeLabels: async (factionId, labels) => {
-    const { data, error } = await supabase.rpc('set_faction_grade_labels', {
-      p_faction_id: factionId,
-      p_labels: labels,
+  setGrades: async (factionId, grades, governGrades) => {
+    const { data, error } = await supabase.rpc('set_faction_grades', {
+      p_faction_id: factionId, p_grades: grades, p_govern_grades: governGrades,
     })
     if (error) return { error: error.message }
     return data as ActionResult

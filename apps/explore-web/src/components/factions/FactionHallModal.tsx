@@ -59,7 +59,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
-  const setGradeLabels = useFactionGroupStore((s) => s.setGradeLabels)
+  const setGrades = useFactionGroupStore((s) => s.setGrades)
   const setPrimary = useFactionGroupStore((s) => s.setPrimary)
   const myFactions = useFactionGroupStore((s) => s.myFactions)
   const activeFactionId = useFactionGroupStore((s) => s.activeFactionId)
@@ -96,9 +96,9 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
   useEffect(() => {
     if (!detail) return
-    const src = detail.gradeLabels
+    const src = detail.grades
     if (src && src.length > 0) {
-      setGradeRows(src.map((g) => ({ rank: g.rank, labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '' })))
+      setGradeRows(src.map((g, i) => ({ rank: i + 1, labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '' })))
     } else {
       setGradeRows(GRADE_DEFAULTS)
     }
@@ -174,12 +174,12 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     setSavingGrades(true)
     setGradeError(null)
     const payload = gradeRows.map((r) => ({
-      rank: r.rank,
       label_m: r.labelM,
       label_f: r.labelF,
       label_n: r.labelN || undefined,
+      capacity: null as null,
     }))
-    const result = await setGradeLabels(detail.id, payload)
+    const result = await setGrades(detail.id, payload, detail?.governGrades ?? 2)
     setSavingGrades(false)
     if ('error' in result) {
       setGradeError(
