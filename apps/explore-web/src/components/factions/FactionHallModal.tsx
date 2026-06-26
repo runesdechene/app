@@ -59,12 +59,14 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const leave = useFactionGroupStore((s) => s.leave)
   const join = useFactionGroupStore((s) => s.join)
   const removeMember = useFactionGroupStore((s) => s.removeMember)
+  const setGrades = useFactionGroupStore((s) => s.setGrades)
   const setPrimary = useFactionGroupStore((s) => s.setPrimary)
   const myFactions = useFactionGroupStore((s) => s.myFactions)
   const activeFactionId = useFactionGroupStore((s) => s.activeFactionId)
 
   const [detail, setDetail] = useState<FactionDetail | null>(null)
-  const [showEdit, setShowEdit] = useState(false)
+  // Vue active de la modale : roster (défaut) ou un éditeur PLEIN ÉCRAN qui remplace le contenu.
+  const [view, setView] = useState<'roster' | 'grades' | 'identity'>('roster')
   const [showInvite, setShowInvite] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [joining, setJoining] = useState(false)
@@ -72,6 +74,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [settingPrimary, setSettingPrimary] = useState(false)
   const [primaryError, setPrimaryError] = useState<string | null>(null)
+  const [gradeRows, setGradeRows] = useState<{ labelM: string; labelF: string; labelN: string; capacity: number | null }[]>([])
+  const [govern, setGovern] = useState(2)
+  const [savingGrades, setSavingGrades] = useState(false)
+  const [gradeError, setGradeError] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc('get_faction_detail', { p_faction_id: factionId })
@@ -80,6 +86,26 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   }, [factionId])
 
   useEffect(() => { reload() }, [reload])
+
+  // Defaults pour les 4 grades si la Compagnie n'a pas de libellés custom.
+  const GRADE_DEFAULTS: { labelM: string; labelF: string; labelN: string; capacity: number | null }[] = [
+    { labelM: 'Seigneur',    labelF: 'Dame',      labelN: '', capacity: 1    },
+    { labelM: 'Co-seigneur', labelF: 'Co-dame',   labelN: '', capacity: 1    },
+    { labelM: 'Officier',    labelF: 'Officière', labelN: '', capacity: 3    },
+    { labelM: 'Membre',      labelF: 'Membre',    labelN: '', capacity: null },
+  ]
+
+  useEffect(() => {
+    if (!detail) return
+    const src = detail.grades
+    if (src && src.length > 0) {
+      setGradeRows(src.map((g) => ({ labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '', capacity: g.capacity ?? null })))
+    } else {
+      setGradeRows(GRADE_DEFAULTS)
+    }
+    setGovern(detail.governGrades ?? 2)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detail?.id])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
@@ -145,6 +171,31 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     reload()
   }
 
+  async function handleSaveGrades() {
+    if (!detail) return
+    setSavingGrades(true)
+    setGradeError(null)
+    const payload = gradeRows.map((r, i) => ({
+      label_m: r.labelM,
+      label_f: r.labelF,
+      label_n: r.labelN || undefined,
+      capacity: i === gradeRows.length - 1 ? null : Math.max(1, r.capacity ?? 1),
+    }))
+    const result = await setGrades(detail.id, payload, govern)
+    setSavingGrades(false)
+    if ('error' in result) {
+      setGradeError(
+        result.error === 'bad_grade_count' ? 'Il faut entre 2 et 6 grades.'
+        : result.error === 'not_governing' ? "Tu n'as pas les pouvoirs requis."
+        : result.error === 'unauthorized' ? 'Action non autorisée.'
+        : "Impossible d'enregistrer pour le moment."
+      )
+      return
+    }
+    setView('roster')
+    reload()
+  }
+
   const overlayClick = (e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose() }
 
   if (!detail) {
@@ -161,6 +212,11 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const topMember = detail.members[0]
   const chefId = topMember && !topMember.isAlly ? topMember.userId : null
   const isChef = chefId !== null && chefId === userId
+
+  // Grade du viewer → gouvernance = grades 1..governGrades (seuil réglé par le Chef).
+  // Aligné sur le gate serveur (update_faction_identity / set_faction_grades / remove_member).
+  const myGradeRank = detail.members.find((m) => m.userId === userId)?.gradeRank ?? 99
+  const canGovern = myGradeRank <= (detail.governGrades ?? 2)
 
   // Rang affiché = position parmi les membres PRINCIPAUX uniquement (allié = hors classement).
   let rankCounter = 0
@@ -186,6 +242,159 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const ink = readableInk(detail.color)
   const onColor = readableTextOn(detail.color)
 
+  // ── VUE : éditeur de grades (remplace tout le contenu de la modale) ──
+  if (view === 'grades') {
+    const isCatchAll = (i: number) => i === gradeRows.length - 1
+    const rankLabel = (i: number) => {
+      if (i === 0) return `Grade 1 — sommet`
+      if (isCatchAll(i)) return `Grade ${i + 1} — reste (tous les autres)`
+      return `Grade ${i + 1}`
+    }
+    return createPortal(
+      <div className="faction-hall-overlay" onClick={overlayClick}>
+        <div className="faction-hall" style={{ borderTopColor: ink }}>
+          <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
+          <div className="faction-hall-subview">
+            <div className="faction-hall-subhead">
+              <button className="faction-hall-back" onClick={() => setView('roster')}>← Retour</button>
+              <h2 className="faction-hall-subtitle">Structure des grades</h2>
+            </div>
+            <p className="faction-hall-subhint">
+              Compose l'échelle de ta Compagnie (2 à 6 grades). Le dernier grade regroupe tous les membres non couverts par les grades supérieurs.
+            </p>
+            <div className="faction-hall-subbody">
+              <div className="faction-hall-grade-rows">
+                {gradeRows.map((row, i) => (
+                  <div key={i} className="faction-hall-grade-row">
+                    <div className="faction-hall-grade-row-header">
+                      <span className="faction-hall-grade-rank-label">{rankLabel(i)}</span>
+                      {!isCatchAll(i) && gradeRows.length > 2 && (
+                        <button
+                          type="button"
+                          className="faction-hall-grade-remove"
+                          aria-label={`Supprimer le grade ${i + 1}`}
+                          onClick={() => {
+                            const next = gradeRows.filter((_, idx) => idx !== i)
+                            setGradeRows(next)
+                            if (govern >= next.length) setGovern(next.length - 1)
+                          }}
+                        >✕</button>
+                      )}
+                    </div>
+                    <div className="faction-hall-grade-inputs">
+                      <label className="faction-hall-grade-field">
+                        <span>Masculin</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelM} maxLength={30}
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelM: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      <label className="faction-hall-grade-field">
+                        <span>Féminin</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelF} maxLength={30}
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelF: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      <label className="faction-hall-grade-field">
+                        <span>Neutre (optionnel)</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelN} maxLength={30} placeholder="—"
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelN: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      {isCatchAll(i) ? (
+                        <span className="faction-hall-grade-catchall">← regroupe le reste</span>
+                      ) : (
+                        <label className="faction-hall-grade-field faction-hall-grade-field-cap">
+                          <span>Capacité (membres max)</span>
+                          <input
+                            type="number"
+                            min={1}
+                            className="faction-hall-grade-input faction-hall-grade-input-cap"
+                            value={row.capacity ?? 1}
+                            onChange={(e) => {
+                              const next = [...gradeRows]
+                              next[i] = { ...next[i], capacity: Math.max(1, parseInt(e.target.value, 10) || 1) }
+                              setGradeRows(next)
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {gradeRows.length < 6 && (
+                <button
+                  type="button"
+                  className="faction-hall-grade-add"
+                  onClick={() => {
+                    const next = [...gradeRows]
+                    next.splice(next.length - 1, 0, { labelM: '', labelF: '', labelN: '', capacity: 1 })
+                    setGradeRows(next)
+                  }}
+                >
+                  + Ajouter un grade
+                </button>
+              )}
+
+              {isChef && (
+                <div className="faction-hall-grade-govern">
+                  <label className="faction-hall-grade-govern-label">
+                    <span>Pouvoirs d'édition, d'invitation et d'exclusion</span>
+                    <select
+                      className="faction-hall-grade-govern-select"
+                      value={govern}
+                      onChange={(e) => setGovern(parseInt(e.target.value, 10))}
+                    >
+                      {Array.from({ length: gradeRows.length - 1 }, (_, idx) => idx + 1).map((n) => (
+                        <option key={n} value={n}>Jusqu'au grade {n}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              )}
+
+              {gradeError && <p className="faction-hall-joinerror" style={{ marginTop: 8, textAlign: 'left' }}>{gradeError}</p>}
+            </div>
+            <div className="faction-hall-subfooter">
+              <button className="faction-hall-grade-save" onClick={handleSaveGrades} disabled={savingGrades}>
+                {savingGrades ? 'Enregistrement…' : 'Enregistrer les grades'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body,
+    )
+  }
+
+  // ── VUE : édition d'identité (formulaire embarqué dans la modale) ──
+  if (view === 'identity' && userId) {
+    return createPortal(
+      <div className="faction-hall-overlay" onClick={overlayClick}>
+        <div className="faction-hall" style={{ borderTopColor: ink }}>
+          <button className="faction-hall-close" onClick={onClose} aria-label="Fermer">×</button>
+          <div className="faction-hall-subview">
+            <div className="faction-hall-subhead">
+              <button className="faction-hall-back" onClick={() => setView('roster')}>← Retour</button>
+            </div>
+            <div className="faction-hall-subbody faction-hall-subbody-flush">
+              <FactionCreateForm
+                embedded
+                userId={userId}
+                editFaction={editFaction}
+                editTags={detail.tags}
+                canDelete={myGradeRank === 1 && !detail.isOfficial}
+                onSuccess={() => { setView('roster'); reload() }}
+                onCancel={() => setView('roster')}
+                onDeleted={() => { setView('roster'); onClose() }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body,
+    )
+  }
+
+  // ── VUE : roster (par défaut) ──
   return createPortal(
     <div className="faction-hall-overlay" onClick={overlayClick}>
       <div className="faction-hall" style={{ borderTopColor: ink }}>
@@ -269,8 +478,13 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                     )}
                     <div className="faction-hall-rank-info">
                       <div className="faction-hall-rank-name">{m.name}</div>
-                      {memberIsChef && (
-                        <div className="faction-hall-rank-chef" style={{ color: ink }}>♛ Chef de Compagnie</div>
+                      {m.gradeLabel && (
+                        <span className="faction-hall-rank-grade" style={{ color: ink }}>
+                          {m.gradeRank === 1 ? '♛ ' : ''}{m.gradeLabel}
+                        </span>
+                      )}
+                      {m.isFounder && (
+                        <span className="faction-hall-rank-founder">Fondateur historique</span>
                       )}
                       {m.isAlly && (
                         <div className="faction-hall-rank-ally">🤝 Allié</div>
@@ -326,8 +540,11 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                     {settingPrimary ? '…' : '⚑ Désigner comme principale'}
                   </button>
                 )}
-                {isChef && (
-                  <button className="faction-hall-edit" onClick={() => setShowEdit(true)}>✎ Éditer</button>
+                {canGovern && (
+                  <button className="faction-hall-edit" onClick={() => setView('identity')}>✎ Éditer</button>
+                )}
+                {canGovern && (
+                  <button className="faction-hall-edit" onClick={() => setView('grades')}>✦ Grades</button>
                 )}
               </div>
             </div>
@@ -355,19 +572,6 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           </div>
         )}
       </div>
-
-      {/* Édition (Chef) */}
-      {showEdit && isChef && userId && (
-        <FactionCreateForm
-          userId={userId}
-          editFaction={editFaction}
-          editTags={detail.tags}
-          canDelete={detail.createdBy === userId}
-          onSuccess={() => { setShowEdit(false); reload() }}
-          onCancel={() => setShowEdit(false)}
-          onDeleted={() => { setShowEdit(false); onClose() }}
-        />
-      )}
 
       {showInvite && (
         <CompanyInviteModal

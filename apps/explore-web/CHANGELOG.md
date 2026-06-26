@@ -1,3 +1,15 @@
+# ALPHA V0.12.0
+## Les Grades de Compagnie
+
+- **Une hiérarchie qui t'appartient.** Chaque Compagnie a désormais ses **grades** — du sommet (le Seigneur) jusqu'aux Membres. Et c'est **toi qui composes l'échelle** : nomme tes grades, choisis combien il y en a (jusqu'à 6) et combien de membres chacun couvre. Ton grade s'affiche dans le Hall et sur ton profil.
+- **Le Héraut.** Quand quelqu'un monte en grade, son ascension est **annoncée dans le chat** de la Compagnie — de quoi célébrer les siens.
+- **Mon titre.** Choisis dans ton profil comment tu veux être titré·e : masculin, féminin ou neutre. Les grades s'accordent.
+- **Gouvernance.** Le Chef décide **quels grades détiennent les pouvoirs** — éditer la Compagnie, inviter, exclure ; lui seul peut la dissoudre.
+- **Tout se passe dans le Hall.** Éditer l'identité et les grades de ta Compagnie se fait maintenant en plein écran, directement dans le Hall.
+- **Carte plus sûre.** Le tableau des Compagnies redevient pleinement tactile sur mobile, capturer un lieu le repeint toujours à **ta** couleur actuelle, et les lieux **sans Compagnie** reviennent au **gris** neutre.
+
+---
+
 # ALPHA V0.11.2
 ## Publier une marque GPS, sans fausse alerte
 

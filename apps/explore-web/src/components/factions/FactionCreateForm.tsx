@@ -46,10 +46,13 @@ interface Props {
   onCancel: () => void
   /** Appelé après suppression réussie (ferme tout le Hall). */
   onDeleted?: () => void
+  /** Si vrai : rend le formulaire SEUL (sans overlay ni portal), pour l'embarquer
+   *  comme vue interne dans une autre modale (ex. le Hall). Défaut : modale plein écran. */
+  embedded?: boolean
 }
 
 /** Fonder / éditer une Compagnie (mécanique = faction). */
-export function FactionCreateForm({ userId, editFaction, editTags, canDelete, onSuccess, onCancel, onDeleted }: Props) {
+export function FactionCreateForm({ userId, editFaction, editTags, canDelete, onSuccess, onCancel, onDeleted, embedded }: Props) {
   const create = useFactionGroupStore((s) => s.create)
   const updateIdentity = useFactionGroupStore((s) => s.updateIdentity)
   const deleteFaction = useFactionGroupStore((s) => s.deleteFaction)
@@ -152,9 +155,8 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
     setSubmitting(false)
   }
 
-  const form = (
-    <div className="faction-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
-      <form className="faction-form" onSubmit={handleSubmit}>
+  const formEl = (
+      <form className={`faction-form${embedded ? ' faction-form-embedded' : ''}`} onSubmit={handleSubmit}>
         <h2 className="faction-form-title">{isEdit ? "Modifier la Compagnie" : 'Fonder une Compagnie'}</h2>
         <p className="faction-form-sub">{isEdit ? 'Son identité reflète qui vous êtes.' : 'Rassemblez les vôtres sous une même bannière.'}</p>
 
@@ -329,8 +331,15 @@ export function FactionCreateForm({ userId, editFaction, editTags, canDelete, on
           )}
         </div>
       </form>
-    </div>
   )
 
-  return createPortal(form, document.body)
+  // Mode embarqué : le formulaire seul, posé dans la modale hôte (le Hall).
+  if (embedded) return formEl
+
+  return createPortal(
+    <div className="faction-form-overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
+      {formEl}
+    </div>,
+    document.body,
+  )
 }

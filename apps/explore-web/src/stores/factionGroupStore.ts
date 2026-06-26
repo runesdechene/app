@@ -5,6 +5,14 @@ import { useMapStore } from './mapStore'
 
 // ─── Types (user-facing « Compagnie » ; mécanique = faction) ──────────────────
 
+export interface FactionGrade {
+  position: number
+  labelM: string
+  labelF: string
+  labelN: string | null
+  capacity: number | null   // null = « le reste » (catch-all, toujours en dernier)
+}
+
 export interface MyFaction {
   id: string
   name: string
@@ -47,6 +55,10 @@ export interface FactionMember {
   isFounder: boolean
   /** Allié : cette Compagnie n'est pas sa principale → 0 point, hors Chef/classement. */
   isAlly?: boolean
+  /** Rang de grade : 1=Seigneur, 2=Co-seigneur, 3=Officier, 4=Membre. null = allié/sans grade. */
+  gradeRank?: number | null
+  /** Libellé du grade, résolu (custom Compagnie sinon défaut) et accordé au genre. null = allié. */
+  gradeLabel?: string | null
   /** Coupe de la saison active. */
   coupe: number
   /** Couronnes investies (fondation). */
@@ -78,6 +90,8 @@ export interface FactionDetail {
   /** Couronnes investies cumulées (fondation + conquête) des membres. */
   totalCrowns: number
   members: FactionMember[]
+  grades?: FactionGrade[]
+  governGrades?: number
 }
 
 // ─── Result types ─────────────────────────────────────────────────────────────
@@ -126,6 +140,11 @@ interface FactionGroupState {
     params: { name: string; color: string; description: string; imageUrl: string | null; tags: string[]; emblemIcon: string | null; emblemMono: string },
   ) => Promise<ActionResult>
   removeMember: (userId: string, factionId: string, targetUserId: string) => Promise<ActionResult>
+  setGrades: (
+    factionId: string,
+    grades: { label_m: string; label_f: string; label_n?: string; capacity?: number | null }[],
+    governGrades: number,
+  ) => Promise<ActionResult>
   /** Supprime une Compagnie (fondateur uniquement) — soft-retire côté serveur. */
   deleteFaction: (userId: string, factionId: string) => Promise<ActionResult>
 }
@@ -292,6 +311,14 @@ export const useFactionGroupStore = create<FactionGroupState>((set) => ({
       console.error('[faction] remove_faction_member error:', error.message)
       return { error: 'unknown' }
     }
+    return data as ActionResult
+  },
+
+  setGrades: async (factionId, grades, governGrades) => {
+    const { data, error } = await supabase.rpc('set_faction_grades', {
+      p_faction_id: factionId, p_grades: grades, p_govern_grades: governGrades,
+    })
+    if (error) return { error: error.message }
     return data as ActionResult
   },
 

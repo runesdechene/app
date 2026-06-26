@@ -54,6 +54,10 @@ interface PlayerState {
   brouillerPistes: boolean
   setBrouillerPistes: (v: boolean) => void
 
+  /** Genre grammatical pour les titres (mig 305). Défaut 'm'. */
+  titleGender: 'm' | 'f' | 'n'
+  setTitleGender: (g: 'm' | 'f' | 'n') => void
+
   /** V0.7+ Brouillage GPS — position publique floutée (50 km autour de userPosition), calculée 1x par session puis stable. */
   publicPosition: { lng: number; lat: number } | null
   setPublicPosition: (pos: { lng: number; lat: number } | null) => void
@@ -145,6 +149,10 @@ export const usePlayerStore = create<PlayerState>((set) => ({
 
   brouillerPistes: true,
   setBrouillerPistes: (v) => set({ brouillerPistes: v }),
+
+  // title_gender hydraté quand get_my_* l'exposera (mig 305 — users.title_gender)
+  titleGender: 'm',
+  setTitleGender: (g) => set({ titleGender: g }),
 
   publicPosition: null,
   setPublicPosition: (pos) => set({ publicPosition: pos }),

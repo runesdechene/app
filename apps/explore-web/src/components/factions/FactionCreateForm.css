@@ -28,6 +28,19 @@
 }
 .faction-form::-webkit-scrollbar { width: 0; display: none; }
 
+/* Mode embarqué (vue interne du Hall) : le formulaire remplit la modale hôte,
+   sans chrome propre ni scroll propre (c'est .faction-hall-subbody qui scrolle). */
+.faction-form.faction-form-embedded {
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0 24px 8px;
+}
+
 .faction-form-title {
   margin: 0 0 4px;
   font-family: var(--font-signature, Georgia, serif);
