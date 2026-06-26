@@ -310,11 +310,18 @@
 }
 .faction-hall-rank-founder {
   display: inline-block;
-  font-size: 11px;
-  font-weight: 500;
-  opacity: 0.6;
-  margin-top: 1px;
-  font-style: italic;
+  vertical-align: middle;
+  margin-left: 7px;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a6d3b;
+  background: rgba(193, 154, 107, 0.18);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
 }
 
 /* ── Sous-vues plein-modale (Grades / Édition) : remplacent le roster.
