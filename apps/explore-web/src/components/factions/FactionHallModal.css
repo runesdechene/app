@@ -317,6 +317,46 @@
   font-style: italic;
 }
 
+/* ── Sous-vues plein-modale (Grades / Édition) : remplacent le roster.
+   Header (retour + titre) + corps scrollable + footer collé en bas. ── */
+.faction-hall-subview {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.faction-hall-subhead {
+  flex: none;
+  padding: 20px 24px 6px;
+}
+.faction-hall-subhead .faction-hall-back { margin-bottom: 10px; }
+.faction-hall-subtitle {
+  margin: 0;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 18px; font-weight: 700; color: #2a1f10;
+}
+.faction-hall-subhint {
+  flex: none;
+  margin: 0;
+  padding: 0 24px 12px;
+  font-family: var(--font-body, Georgia, serif);
+  font-size: 13px; font-style: italic; color: #8a7050;
+}
+.faction-hall-subbody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 24px 16px;
+}
+.faction-hall-subbody-flush { padding: 0; }
+.faction-hall-subfooter {
+  flex: none;
+  padding: 12px 24px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  border-top: 1px solid rgba(184, 154, 106, 0.45);
+  background: var(--color-parchment, #f5e9d4);
+}
+.faction-hall-subfooter .faction-hall-grade-save { width: 100%; margin-top: 0; text-align: center; }
+
 /* ── Éditeur de libellés de grades ── */
 .faction-hall-grade-editor {
   border-top: 1px solid rgba(193, 154, 107, 0.3);
