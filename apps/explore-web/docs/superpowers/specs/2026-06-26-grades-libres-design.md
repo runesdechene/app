@@ -53,7 +53,7 @@ Algorithme : position du membre dans ce classement (1-based) → on parcourt les
 - `_grade_label(faction, position, gender) → text` — lit la ligne à `rank=position` ; **fallback** sur le défaut Noblesse (Seigneur/Co-seigneur/Officier/Membre) **uniquement** pour une Compagnie sans lignes custom.
 - `get_faction_detail` — par membre : `gradeRank` (position) + `gradeLabel` ; + un bloc **`grades`** = la structure complète `[{position, labelM, labelF, labelN, capacity}]` (ordonnée, catch-all en dernier) + `governGrades`, pour préremplir l'éditeur.
 - `set_faction_grades(faction, grades[], govern_grades)` — **remplace** `set_faction_grade_labels` : reçoit la liste ordonnée complète (libellés + capacités) + le seuil. Gate : éditer les grades = top `K` ; mais **`govern_grades` n'est modifiable que par le Chef** (si un non-Chef l'envoie différent, on ignore le champ et on garde l'ancien). Validation serveur (§5).
-- `update_faction_identity` / `remove_faction_member` : gate passe de « rang ≤ 3 » à **« rang ≤ `govern_grades` »** (exclure inclus). `delete_faction` : gate **rang = 1** (Chef) au lieu de `founder`/`created_by` — *(à confirmer en revue : aujourd'hui c'est le fondateur ; Uriel veut le Chef. Voir §9.)*
+- `update_faction_identity` / `remove_faction_member` : gate passe de « rang ≤ 3 » à **« rang ≤ `govern_grades` »** (exclure inclus). `delete_faction` : gate **`_member_grade_rank = 1`** (le Chef courant) au lieu de `founder`/`created_by` (tranché Uriel 26/06). Les Compagnies officielles (`created_by IS NULL`) restent non-supprimables (le front ne montre le bouton que pour une Compagnie créée + Chef).
 
 ## 7. UI — éditeur de grades (vue plein-modale, déjà en place)
 
@@ -74,7 +74,8 @@ L'éditeur d'identité reste la vue interne « ✎ Éditer » (déjà fait). La 
 - Capacités en % ou par score (on reste sur un **nombre** de membres).
 - Héraut de montée (toujours différé, décision séparée).
 
-## 9. À trancher en revue
+## 9. Décisions tranchées (26/06)
 
-1. **`delete_faction`** : aujourd'hui gaté **fondateur** (`created_by`). Uriel veut **Chef** (grade position 1). Le Chef peut différer du fondateur (le fondateur peut se faire dépasser). Confirmer : delete = Chef courant (et non plus le fondateur) ? Conséquence : un fondateur dépassé ne peut plus supprimer « sa » Compagnie ; le nouveau Chef le peut.
-2. **Migration des libellés existants** : confirmé — on garde, capacités 1/1/3/reste.
+1. **`delete_faction` = le Chef courant** (`_member_grade_rank = 1`), plus le fondateur. Conséquence assumée : un fondateur dépassé au classement ne peut plus supprimer « sa » Compagnie ; le Chef du moment le peut. Officielles non-supprimables (inchangé).
+2. **Libellés existants** : conservés, capacités défaut 1/1/3/reste.
+3. **Sizing** = nombre (top N). **Max 6** grades. **Gouvernance** = seuil `govern_grades` réglé par le Chef.
