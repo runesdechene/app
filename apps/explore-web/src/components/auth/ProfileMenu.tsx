@@ -152,8 +152,8 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
 
           <div className="profile-dropdown-calendar">
             <span className="profile-dropdown-calendar-label">Mon titre</span>
-            {(['m', 'f', 'n'] as const).map((g) => {
-              const labels: Record<'m' | 'f' | 'n', string> = { m: 'Masculin', f: 'Féminin', n: 'Neutre' }
+            {(['m', 'f'] as const).map((g) => {
+              const labels: Record<'m' | 'f', string> = { m: 'Masculin', f: 'Féminin' }
               return (
                 <button
                   key={g}
