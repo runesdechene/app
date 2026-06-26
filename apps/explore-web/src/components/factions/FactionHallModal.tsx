@@ -479,7 +479,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                         </span>
                       )}
                       {m.isFounder && (
-                        <span className="faction-hall-rank-founder">Fondateur historique</span>
+                        <span className="faction-hall-rank-founder">{m.titleGender === 'f' ? 'Fondatrice' : 'Fondateur'} historique</span>
                       )}
                       {m.isAlly && (
                         <div className="faction-hall-rank-ally">🤝 Allié</div>

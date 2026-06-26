@@ -55,6 +55,8 @@ export interface FactionMember {
   isFounder: boolean
   /** Allié : cette Compagnie n'est pas sa principale → 0 point, hors Chef/classement. */
   isAlly?: boolean
+  /** Genre du titre du membre ('m'/'f'/'n') — pour accorder les libellés (ex. Fondateur/Fondatrice). */
+  titleGender?: 'm' | 'f' | 'n'
   /** Rang de grade : 1=Seigneur, 2=Co-seigneur, 3=Officier, 4=Membre. null = allié/sans grade. */
   gradeRank?: number | null
   /** Libellé du grade, résolu (custom Compagnie sinon défaut) et accordé au genre. null = allié. */
