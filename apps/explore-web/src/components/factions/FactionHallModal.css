@@ -408,3 +408,84 @@
 }
 .faction-hall-grade-save:hover:not(:disabled) { background: rgba(193, 154, 107, 0.3); }
 .faction-hall-grade-save:disabled { opacity: 0.5; cursor: wait; }
+
+/* ── En-tête de ligne avec bouton ✕ ── */
+.faction-hall-grade-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.faction-hall-grade-remove {
+  flex: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  background: transparent;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 11px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.faction-hall-grade-remove:hover { background: rgba(192, 57, 43, 0.08); }
+
+/* ── Champ capacité (nombre) ── */
+.faction-hall-grade-field-cap { flex: 0 0 auto; min-width: 120px; max-width: 160px; }
+.faction-hall-grade-input-cap { text-align: right; }
+
+/* ── Libellé catch-all ── */
+.faction-hall-grade-catchall {
+  flex: 1 1 120px;
+  font-family: var(--font-body, Georgia, serif);
+  font-style: italic;
+  font-size: 13px;
+  color: #8a7050;
+  align-self: flex-end;
+  padding-bottom: 8px;
+}
+
+/* ── Bouton + Ajouter un grade ── */
+.faction-hall-grade-add {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 14px;
+  border: 1px dashed rgba(184, 154, 106, 0.6);
+  border-radius: 10px;
+  background: transparent;
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 13px; font-weight: 600; color: #6e5435;
+  cursor: pointer;
+  text-align: center;
+}
+.faction-hall-grade-add:hover { background: rgba(193, 154, 107, 0.1); }
+
+/* ── Seuil de gouvernance (Chef uniquement) ── */
+.faction-hall-grade-govern {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(184, 154, 106, 0.35);
+}
+.faction-hall-grade-govern-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.faction-hall-grade-govern-label > span {
+  font-family: var(--font-accent, Helvetica, sans-serif);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #8a7050;
+}
+.faction-hall-grade-govern-select {
+  padding: 7px 10px;
+  border: 1px solid rgba(184, 154, 106, 0.55);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-body, Georgia, serif);
+  font-size: 14px; color: #2a1f10;
+  outline: none;
+  cursor: pointer;
+}
+.faction-hall-grade-govern-select:focus {
+  border-color: rgba(184, 154, 106, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+}

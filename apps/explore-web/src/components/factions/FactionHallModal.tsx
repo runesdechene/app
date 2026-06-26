@@ -74,7 +74,8 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [settingPrimary, setSettingPrimary] = useState(false)
   const [primaryError, setPrimaryError] = useState<string | null>(null)
-  const [gradeRows, setGradeRows] = useState<{ rank: number; labelM: string; labelF: string; labelN: string }[]>([])
+  const [gradeRows, setGradeRows] = useState<{ labelM: string; labelF: string; labelN: string; capacity: number | null }[]>([])
+  const [govern, setGovern] = useState(2)
   const [savingGrades, setSavingGrades] = useState(false)
   const [gradeError, setGradeError] = useState<string | null>(null)
 
@@ -87,21 +88,22 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   useEffect(() => { reload() }, [reload])
 
   // Defaults pour les 4 grades si la Compagnie n'a pas de libellés custom.
-  const GRADE_DEFAULTS = [
-    { rank: 1, labelM: 'Seigneur',    labelF: 'Dame',        labelN: '' },
-    { rank: 2, labelM: 'Co-seigneur', labelF: 'Co-dame',     labelN: '' },
-    { rank: 3, labelM: 'Officier',    labelF: 'Officière',   labelN: '' },
-    { rank: 4, labelM: 'Membre',      labelF: 'Membre',      labelN: '' },
+  const GRADE_DEFAULTS: { labelM: string; labelF: string; labelN: string; capacity: number | null }[] = [
+    { labelM: 'Seigneur',    labelF: 'Dame',      labelN: '', capacity: 1    },
+    { labelM: 'Co-seigneur', labelF: 'Co-dame',   labelN: '', capacity: 1    },
+    { labelM: 'Officier',    labelF: 'Officière', labelN: '', capacity: 3    },
+    { labelM: 'Membre',      labelF: 'Membre',    labelN: '', capacity: null },
   ]
 
   useEffect(() => {
     if (!detail) return
     const src = detail.grades
     if (src && src.length > 0) {
-      setGradeRows(src.map((g, i) => ({ rank: i + 1, labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '' })))
+      setGradeRows(src.map((g) => ({ labelM: g.labelM, labelF: g.labelF, labelN: g.labelN ?? '', capacity: g.capacity ?? null })))
     } else {
       setGradeRows(GRADE_DEFAULTS)
     }
+    setGovern(detail.governGrades ?? 2)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail?.id])
 
@@ -173,17 +175,18 @@ export function FactionHallModal({ factionId, onClose }: Props) {
     if (!detail) return
     setSavingGrades(true)
     setGradeError(null)
-    const payload = gradeRows.map((r) => ({
+    const payload = gradeRows.map((r, i) => ({
       label_m: r.labelM,
       label_f: r.labelF,
       label_n: r.labelN || undefined,
-      capacity: null as null,
+      capacity: i === gradeRows.length - 1 ? null : Math.max(1, r.capacity ?? 1),
     }))
-    const result = await setGrades(detail.id, payload, detail?.governGrades ?? 2)
+    const result = await setGrades(detail.id, payload, govern)
     setSavingGrades(false)
     if ('error' in result) {
       setGradeError(
-        result.error === 'not_governing' ? "Tu n'as pas le grade requis pour modifier les libellés."
+        result.error === 'bad_grade_count' ? 'Il faut entre 2 et 6 grades.'
+        : result.error === 'not_governing' ? "Tu n'as pas les pouvoirs requis."
         : result.error === 'unauthorized' ? 'Action non autorisée.'
         : "Impossible d'enregistrer pour le moment."
       )
@@ -240,6 +243,12 @@ export function FactionHallModal({ factionId, onClose }: Props) {
 
   // ── VUE : éditeur de grades (remplace tout le contenu de la modale) ──
   if (view === 'grades') {
+    const isCatchAll = (i: number) => i === gradeRows.length - 1
+    const rankLabel = (i: number) => {
+      if (i === 0) return `Grade 1 — sommet`
+      if (isCatchAll(i)) return `Grade ${i + 1} — reste (tous les autres)`
+      return `Grade ${i + 1}`
+    }
     return createPortal(
       <div className="faction-hall-overlay" onClick={overlayClick}>
         <div className="faction-hall" style={{ borderTopColor: ink }}>
@@ -247,39 +256,100 @@ export function FactionHallModal({ factionId, onClose }: Props) {
           <div className="faction-hall-subview">
             <div className="faction-hall-subhead">
               <button className="faction-hall-back" onClick={() => setView('roster')}>← Retour</button>
-              <h2 className="faction-hall-subtitle">Renommer les grades</h2>
+              <h2 className="faction-hall-subtitle">Structure des grades</h2>
             </div>
             <p className="faction-hall-subhint">
-              Chaque Compagnie nomme ses propres grades. Le libellé affiché s'accorde au genre choisi par chaque membre.
+              Compose l'échelle de ta Compagnie (2 à 6 grades). Le dernier grade regroupe tous les membres non couverts par les grades supérieurs.
             </p>
             <div className="faction-hall-subbody">
               <div className="faction-hall-grade-rows">
-                {gradeRows.map((row, i) => {
-                  const rankLabel = row.rank === 1 ? 'Grade 1 — sommet' : row.rank === 2 ? 'Grade 2' : row.rank === 3 ? 'Grade 3' : 'Grade 4 — base'
-                  return (
-                    <div key={row.rank} className="faction-hall-grade-row">
-                      <span className="faction-hall-grade-rank-label">{rankLabel}</span>
-                      <div className="faction-hall-grade-inputs">
-                        <label className="faction-hall-grade-field">
-                          <span>Masculin</span>
-                          <input type="text" className="faction-hall-grade-input" value={row.labelM} maxLength={30}
-                            onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelM: e.target.value }; setGradeRows(next) }} />
-                        </label>
-                        <label className="faction-hall-grade-field">
-                          <span>Féminin</span>
-                          <input type="text" className="faction-hall-grade-input" value={row.labelF} maxLength={30}
-                            onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelF: e.target.value }; setGradeRows(next) }} />
-                        </label>
-                        <label className="faction-hall-grade-field">
-                          <span>Neutre (optionnel)</span>
-                          <input type="text" className="faction-hall-grade-input" value={row.labelN} maxLength={30} placeholder="—"
-                            onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelN: e.target.value }; setGradeRows(next) }} />
-                        </label>
-                      </div>
+                {gradeRows.map((row, i) => (
+                  <div key={i} className="faction-hall-grade-row">
+                    <div className="faction-hall-grade-row-header">
+                      <span className="faction-hall-grade-rank-label">{rankLabel(i)}</span>
+                      {!isCatchAll(i) && gradeRows.length > 2 && (
+                        <button
+                          type="button"
+                          className="faction-hall-grade-remove"
+                          aria-label={`Supprimer le grade ${i + 1}`}
+                          onClick={() => {
+                            const next = gradeRows.filter((_, idx) => idx !== i)
+                            setGradeRows(next)
+                            if (govern >= next.length) setGovern(next.length - 1)
+                          }}
+                        >✕</button>
+                      )}
                     </div>
-                  )
-                })}
+                    <div className="faction-hall-grade-inputs">
+                      <label className="faction-hall-grade-field">
+                        <span>Masculin</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelM} maxLength={30}
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelM: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      <label className="faction-hall-grade-field">
+                        <span>Féminin</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelF} maxLength={30}
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelF: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      <label className="faction-hall-grade-field">
+                        <span>Neutre (optionnel)</span>
+                        <input type="text" className="faction-hall-grade-input" value={row.labelN} maxLength={30} placeholder="—"
+                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelN: e.target.value }; setGradeRows(next) }} />
+                      </label>
+                      {isCatchAll(i) ? (
+                        <span className="faction-hall-grade-catchall">← regroupe le reste</span>
+                      ) : (
+                        <label className="faction-hall-grade-field faction-hall-grade-field-cap">
+                          <span>Capacité (membres max)</span>
+                          <input
+                            type="number"
+                            min={1}
+                            className="faction-hall-grade-input faction-hall-grade-input-cap"
+                            value={row.capacity ?? 1}
+                            onChange={(e) => {
+                              const next = [...gradeRows]
+                              next[i] = { ...next[i], capacity: Math.max(1, parseInt(e.target.value, 10) || 1) }
+                              setGradeRows(next)
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              {gradeRows.length < 6 && (
+                <button
+                  type="button"
+                  className="faction-hall-grade-add"
+                  onClick={() => {
+                    const next = [...gradeRows]
+                    next.splice(next.length - 1, 0, { labelM: '', labelF: '', labelN: '', capacity: 1 })
+                    setGradeRows(next)
+                  }}
+                >
+                  + Ajouter un grade
+                </button>
+              )}
+
+              {isChef && (
+                <div className="faction-hall-grade-govern">
+                  <label className="faction-hall-grade-govern-label">
+                    <span>Pouvoirs d'édition, d'invitation et d'exclusion</span>
+                    <select
+                      className="faction-hall-grade-govern-select"
+                      value={govern}
+                      onChange={(e) => setGovern(parseInt(e.target.value, 10))}
+                    >
+                      {Array.from({ length: gradeRows.length - 1 }, (_, idx) => idx + 1).map((n) => (
+                        <option key={n} value={n}>Jusqu'au grade {n}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              )}
+
               {gradeError && <p className="faction-hall-joinerror" style={{ marginTop: 8, textAlign: 'left' }}>{gradeError}</p>}
             </div>
             <div className="faction-hall-subfooter">
