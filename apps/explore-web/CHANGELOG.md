@@ -6,7 +6,7 @@
 - **Mon titre.** Choisis dans ton profil comment tu veux être titré·e : masculin, féminin ou neutre. Les grades s'accordent.
 - **Gouvernance.** Le Chef décide **quels grades détiennent les pouvoirs** — éditer la Compagnie, inviter, exclure ; lui seul peut la dissoudre.
 - **Tout se passe dans le Hall.** Éditer l'identité et les grades de ta Compagnie se fait maintenant en plein écran, directement dans le Hall.
-- **Carte plus sûre.** Le tableau des Compagnies redevient pleinement tactile sur mobile, capturer un lieu le repeint toujours à **ta** couleur actuelle, et les territoires **neutres** s'affichent enfin en **gris**.
+- **Carte plus sûre.** Le tableau des Compagnies redevient pleinement tactile sur mobile, capturer un lieu le repeint toujours à **ta** couleur actuelle, et les lieux **sans Compagnie** reviennent au **gris** neutre.
 
 ---
 

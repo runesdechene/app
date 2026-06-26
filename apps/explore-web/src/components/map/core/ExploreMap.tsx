@@ -450,8 +450,7 @@ export const ExploreMap = memo(function ExploreMap() {
               // V0.7 : faction = celle de la veille (ou '__neutral__' si expédition multi-faction)
               faction: ov.factionId ?? '__neutral__',
               factionTitle: ov.factionTitle ?? '',
-              // Veille NEUTRE (sans faction) = territoire GRIS, jamais le tag jaune du lieu.
-              tagColor: ov.factionId ? (ov.tagColor ?? f.properties.tagColor) : '#9E9282',
+              tagColor: ov.tagColor ?? f.properties.tagColor,
               factionPattern: ov.factionPattern ?? '',
               score: 1,
               likes: f.properties.likes ?? 0,
@@ -637,7 +636,7 @@ export const ExploreMap = memo(function ExploreMap() {
           topContributorId: (tp.topContributorId as string) || '',
           topContributorName: (tp.topContributorName as string) || '',
           factionTitle: (tp.factionTitle as string) || '',
-          tagColor: (tp.tagColor as string) || '#9E9282',
+          tagColor: (tp.tagColor as string) || '#C19A6B',
           placesCount,
           hourlyRate: (typeof tp.hourlyRate === 'number' ? tp.hourlyRate : 0),
           totalFortification: (typeof tp.totalFortification === 'number' ? tp.totalFortification : 0),
