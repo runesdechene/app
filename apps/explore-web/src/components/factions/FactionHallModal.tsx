@@ -292,11 +292,6 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                         <input type="text" className="faction-hall-grade-input" value={row.labelF} maxLength={30}
                           onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelF: e.target.value }; setGradeRows(next) }} />
                       </label>
-                      <label className="faction-hall-grade-field">
-                        <span>Neutre (optionnel)</span>
-                        <input type="text" className="faction-hall-grade-input" value={row.labelN} maxLength={30} placeholder="—"
-                          onChange={(e) => { const next = [...gradeRows]; next[i] = { ...next[i], labelN: e.target.value }; setGradeRows(next) }} />
-                      </label>
                       {isCatchAll(i) ? (
                         <span className="faction-hall-grade-catchall">← regroupe le reste</span>
                       ) : (

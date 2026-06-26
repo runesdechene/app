@@ -62,6 +62,8 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
   const [savingTitles, setSavingTitles] = useState(false)
   const [playerFragments, setPlayerFragments] = useState<Array<{ id: number; name: string; icon: string | null; icon_url: string | null; image_url: string | null; link_url: string | null; collection: string | null }>>([])
 
+  const [gradeLabel, setGradeLabel] = useState<string | null>(null)
+
   const { isMuted, muteUser, unmuteUser } = useMutedUsers()
 
   const isSelf = profile?.userId === currentUserId
@@ -99,6 +101,19 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
     })
     return () => { cancelled = true }
   }, [profile?.factionId, profile?.allyFactionId])
+
+  // Titre de grade du joueur dans sa Compagnie principale (accordé au genre).
+  // Null si pas de Compagnie ou allié → affichage fallback « Membre ».
+  useEffect(() => {
+    let cancelled = false
+    setGradeLabel(null)
+    supabase.rpc('get_member_grade_label', { p_user_id: playerId }).then(({ data, error }) => {
+      if (cancelled) return
+      if (error) { console.warn('[PlayerProfileModal] get_member_grade_label error', error); return }
+      setGradeLabel(typeof data === 'string' ? data : null)
+    })
+    return () => { cancelled = true }
+  }, [playerId])
 
   useEffect(() => {
     async function load() {
@@ -338,7 +353,7 @@ export function PlayerProfileModal({ playerId, onClose }: Props) {
                       />
                     )}
                     <span>
-                      Membre de la Compagnie{' '}
+                      {gradeLabel ?? 'Membre'} de la Compagnie{' '}
                       <button
                         type="button"
                         className="player-modal-faction-link"
