@@ -213,9 +213,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
   const chefId = topMember && !topMember.isAlly ? topMember.userId : null
   const isChef = chefId !== null && chefId === userId
 
-  // Grade du viewer → gouvernance (rank ≤ 3 = Seigneur / Co-seigneur / Officier).
+  // Grade du viewer → gouvernance = grades 1..governGrades (seuil réglé par le Chef).
+  // Aligné sur le gate serveur (update_faction_identity / set_faction_grades / remove_member).
   const myGradeRank = detail.members.find((m) => m.userId === userId)?.gradeRank ?? 99
-  const canGovern = myGradeRank <= 3
+  const canGovern = myGradeRank <= (detail.governGrades ?? 2)
 
   // Rang affiché = position parmi les membres PRINCIPAUX uniquement (allié = hors classement).
   let rankCounter = 0
@@ -380,7 +381,7 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                 userId={userId}
                 editFaction={editFaction}
                 editTags={detail.tags}
-                canDelete={detail.createdBy === userId}
+                canDelete={myGradeRank === 1 && !detail.isOfficial}
                 onSuccess={() => { setView('roster'); reload() }}
                 onCancel={() => setView('roster')}
                 onDeleted={() => { setView('roster'); onClose() }}
