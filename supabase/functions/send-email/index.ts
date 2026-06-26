@@ -144,6 +144,58 @@ function renderCrownsAwarded(firstName: string, crowns: number, reason: string):
   }
 }
 
+// Email marketing « fin de Coupe » — segment actifs S1 non-Pèlerins. Présent boutique -10%.
+function renderFinDeCoupe(firstName: string): { subject: string; html: string } {
+  const name = escapeHtml(firstName?.trim() || 'Porteur')
+  const shopUrl = 'https://runesdechene.com/discount/COUPEPRINTEMPS'
+  return {
+    subject: "Tu t'es battu avec vaillance, Porteur !",
+    html: `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"></head>
+<body style="margin:0;padding:0;background:#e3d4b6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e9ddc7;background:linear-gradient(180deg,#efe4cf 0%,#e1d1b2 100%);padding:32px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
+        <tr><td style="font-size:0;line-height:0;">
+          <img src="https://app.runesdechene.com/email-banner.jpg" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+        </td></tr>
+        <tr><td align="center" style="padding:34px 40px 0;">
+          <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="360" style="display:block;width:360px;max-width:88%;height:auto;border:0;" />
+        </td></tr>
+        <tr><td align="center" style="padding:26px 44px 0;">
+          <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:28px;line-height:1.25;color:#2b2114;">Tu t'es battu avec vaillance, ${name}.</h1>
+        </td></tr>
+        <tr><td style="padding:22px 46px 0;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.7;color:#5b4d38;">La poussière retombe sur les sentiers : la <strong style="color:#2b2114;">Coupe du Printemps</strong> vient de s'achever, et ce sont les <em>Pèlerins des Brumes</em> qui s'emparent de la victoire pour cette première édition.</p>
+          <p style="margin:16px 0 0;font-family:Georgia,serif;font-size:16px;line-height:1.7;color:#5b4d38;">Que tu aies lutté jusqu'au bout ou observé le mouvement de loin, ta présence sur la carte compte. Chaque pas, même petit, est une victoire contre l'Oubli. C'était notre toute première saison — et ce n'est que le début d'un cycle bien plus grand.</p>
+          <p style="margin:16px 0 0;font-family:Georgia,serif;font-size:16px;line-height:1.7;color:#5b4d38;">Nous préparons d'énormes changements pour la saison à venir. L'application va évoluer, les enjeux vont se durcir, et de nouvelles opportunités de faire briller ton Héritage vont apparaître dans les prochains jours.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:28px 40px 0;">
+          <p style="margin:0 0 14px;font-family:Georgia,serif;font-size:16px;line-height:1.6;color:#5b4d38;">Pour te remercier d'avoir fait partie de l'aventure, voici un présent pour t'équiper :</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;border:1px dashed #b8954e;border-radius:12px;background:#fbf5e6;">
+            <tr><td align="center" style="padding:16px 30px;">
+              <div style="font-family:Georgia,serif;font-size:22px;color:#8a6d3b;">🎁 −10 % sur ta commande</div>
+              <div style="font-family:Georgia,serif;font-size:26px;letter-spacing:3px;color:#2b2114;font-weight:bold;margin-top:6px;">COUPEPRINTEMPS</div>
+              <div style="font-family:Georgia,serif;font-size:12px;color:#9b8b6e;margin-top:6px;">Valable jusqu'au 29 juin 2026</div>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 0 4px;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" style="border-radius:10px;background:#8a6d3b;background:linear-gradient(180deg,#a9874c,#876a39);box-shadow:0 6px 16px rgba(138,109,59,0.40);">
+            <a href="${shopUrl}" style="display:inline-block;padding:15px 36px;font-family:Georgia,serif;font-size:16px;color:#fff7e8;text-decoration:none;letter-spacing:.5px;">Découvrir la boutique&nbsp;→</a>
+          </td></tr></table>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 48px 0;"><div style="font-size:13px;color:#c4ac80;letter-spacing:5px;">✦&nbsp;⚜&nbsp;✦</div></td></tr>
+        <tr><td align="center" style="padding:14px 48px 38px;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:13px;line-height:1.7;color:#7a6a4e;font-style:italic;">L'Oubli ne dort jamais, et la prochaine Coupe est déjà arrivée.<br>Prépare ton équipement, l'aventure ne fait que commencer.<br>À très vite sur les sentiers,<br><strong style="color:#5b4d38;">L'équipe des Runes de Chêne</strong></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
+  }
+}
+
 serve(async (req) => {
   if (req.method !== 'POST') return new Response('method not allowed', { status: 405 })
   const config = await loadConfig()
@@ -155,7 +207,7 @@ serve(async (req) => {
   let body: RequestBody
   try { body = await req.json() as RequestBody } catch { return new Response('bad json', { status: 400 }) }
 
-  if (body.type !== 'contribution_approved' && body.type !== 'crowns_awarded') return ok()
+  if (body.type !== 'contribution_approved' && body.type !== 'crowns_awarded' && body.type !== 'fin_de_coupe') return ok()
 
   const { data: user, error } = await supabase
     .from('users')
@@ -166,7 +218,9 @@ serve(async (req) => {
 
   const crowns = Number((body.data as { crowns?: number })?.crowns ?? 0)
   const reason = String((body.data as { reason?: string })?.reason ?? '')
-  const { subject, html } = body.type === 'crowns_awarded'
+  const { subject, html } = body.type === 'fin_de_coupe'
+    ? renderFinDeCoupe(user.first_name ?? '')
+    : body.type === 'crowns_awarded'
     ? renderCrownsAwarded(user.first_name ?? '', crowns, reason)
     : renderContributionApproved(user.first_name ?? '', crowns)
 
