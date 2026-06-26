@@ -151,7 +151,7 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
           </div>
 
           <div className="profile-dropdown-calendar">
-            <span className="profile-dropdown-calendar-label">Mon titre</span>
+            <span className="profile-dropdown-calendar-label">Mes titres de compagnie</span>
             {(['m', 'f'] as const).map((g) => {
               const labels: Record<'m' | 'f', string> = { m: 'Masculin', f: 'Féminin' }
               return (
