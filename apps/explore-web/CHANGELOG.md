@@ -1,3 +1,11 @@
+# ALPHA V0.12.2
+## Fini l'écran blanc au lancement
+
+- **Plus d'écran blanc.** Au démarrage, l'app pouvait parfois rester sur une page blanche et il fallait la relancer. Désormais, si un fichier de l'app a changé (après une mise à jour), elle se **recharge toute seule** au lieu de bloquer — et en cas de souci, un écran clair avec un bouton « Recharger » remplace le blanc.
+- **Mises à jour plus douces.** Les nouvelles versions ne s'installent plus en plein milieu de ta session (ce qui cassait le chargement) : elles s'appliquent au prochain lancement, ou tout de suite si tu touches le bandeau « Mise à jour disponible ».
+
+---
+
 # ALPHA V0.12.1
 ## Le Hall dit enfin les vrais chiffres
 

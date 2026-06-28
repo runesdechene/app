@@ -8,7 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt' (et pas 'autoUpdate') : un nouveau SW ne prend PLUS le contrôle
+      // en pleine session. Couplé à la suppression de skipWaiting dans sw.ts, ça
+      // évite que cleanupOutdatedCaches efface les chunks de l'ancien build
+      // pendant qu'une page vivante les charge encore (cause de l'écran blanc).
+      // La mise à jour délibérée passe par UpdateBanner (KILL_SWITCH + reload).
+      registerType: 'prompt',
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.ts',

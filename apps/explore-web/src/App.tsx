@@ -4,6 +4,7 @@ import MapPage from './pages/MapPage'
 import LandingPage from './components/landing/LandingPage'
 import RequireAuth from './components/RequireAuth'
 import { InstallPrompt } from './components/pwa/InstallPrompt'
+import { AppLoader } from './components/AppLoader'
 import { useIsDesktop } from './hooks/useMediaQuery'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
@@ -40,7 +41,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={null}>
+      <Suspense fallback={<AppLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route element={<RequireAuth />}>

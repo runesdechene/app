@@ -116,9 +116,11 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   })())
 })
 
-self.addEventListener('install', () => {
-  self.skipWaiting()
-})
+// PAS de skipWaiting : un nouveau SW reste "waiting" tant qu'une page de l'ancien
+// build est ouverte. Il ne prend le contrôle (et ne nettoie l'ancien précache via
+// cleanupOutdatedCaches) qu'au prochain démarrage à froid — jamais sous les pieds
+// d'une session vivante. Évite le mismatch index↔chunks (écran blanc post-deploy).
+// Mise à jour immédiate volontaire : UpdateBanner → KILL_SWITCH.
 
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim())
