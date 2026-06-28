@@ -67,8 +67,10 @@ export interface FactionMember {
   crownsInvested: number
   /** Couronnes conquises pour la Compagnie (conquête sous bannière / soutien à un membre). */
   crownsConquered?: number
-  /** Détail de la Coupe (mérite) par source, clés non-nulles : enigmes/visites/ajouts/veilles/photos. */
+  /** Détail de la Coupe en POINTS par source, clés non-nulles : enigmes/visites/ajouts/veilles/photos. */
   breakdown?: Partial<Record<'enigmes' | 'visites' | 'ajouts' | 'veilles' | 'photos', number>>
+  /** Vrais NOMBRES d'actions par source (mêmes clés que breakdown) — ex. 14 lieux ≠ 98 pts. */
+  counts?: Partial<Record<'enigmes' | 'visites' | 'ajouts' | 'veilles' | 'photos', number>>
 }
 
 export interface FactionDetail {

@@ -12,15 +12,16 @@ import { readableInk, readableTextOn } from '../../lib/textFormat'
 import type { FactionDetail, MyFaction } from '../../stores/factionGroupStore'
 import './FactionHallModal.css'
 
-// Sources de points pour le détail par membre (icône + libellé).
-const SOURCE_META: Record<string, { icon: string; label: string }> = {
-  enigmes: { icon: '📜', label: 'énigmes' },
-  visites: { icon: '📍', label: 'visites GPS' },
-  ajouts:  { icon: '🏛️', label: 'lieux ajoutés' },
-  veilles: { icon: '⚑', label: 'veilles' },
-  photos:  { icon: '📷', label: 'photos' },
+// Sources du détail par membre : icône + noms accordés (singulier/pluriel) + libellé tooltip.
+const SOURCE_ORDER = ['enigmes', 'visites', 'ajouts', 'veilles', 'photos'] as const
+type SourceKey = typeof SOURCE_ORDER[number]
+const SOURCE_META: Record<SourceKey, { icon: string; one: string; many: string; label: string }> = {
+  enigmes: { icon: '📜', one: 'énigme', many: 'énigmes', label: 'énigmes résolues' },
+  visites: { icon: '📍', one: 'visite', many: 'visites', label: 'visites GPS' },
+  ajouts:  { icon: '🏛️', one: 'lieu',   many: 'lieux',   label: 'lieux ajoutés' },
+  veilles: { icon: '⚑',  one: 'veille', many: 'veilles', label: 'veilles' },
+  photos:  { icon: '📷', one: 'photo',  many: 'photos',  label: 'photos' },
 }
-const SOURCE_ORDER = ['enigmes', 'visites', 'ajouts', 'veilles', 'photos']
 
 interface Props {
   factionId: string
@@ -453,9 +454,10 @@ export function FactionHallModal({ factionId, onClose }: Props) {
             )}
             {ranked.map(({ m, rank }) => {
               const memberIsChef = m.userId === chefId
+              // Gauche : vrais nombres d'actions (counts) + points apportés (breakdown), non-nuls seulement.
               const sources = SOURCE_ORDER
-                .filter((k) => m.breakdown && m.breakdown[k as keyof typeof m.breakdown])
-                .map((k) => ({ k, pts: m.breakdown![k as keyof typeof m.breakdown] as number }))
+                .map((k) => ({ k, count: m.counts?.[k] ?? 0, pts: m.breakdown?.[k] ?? 0 }))
+                .filter((s) => s.count > 0)
               const openProfile = () => {
                 useMapStore.getState().setSelectedPlayerId(m.userId)
                 onClose()
@@ -486,24 +488,34 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                       )}
                       {sources.length > 0 && (
                         <div className="faction-hall-rank-sources">
-                          {sources.map(({ k, pts }) => (
-                            <span key={k} className="faction-hall-rank-src" title={`${pts} pt${pts > 1 ? 's' : ''} — ${SOURCE_META[k].label}`}>
-                              {SOURCE_META[k].icon} {pts}
-                            </span>
-                          ))}
+                          {sources.map(({ k, count, pts }) => {
+                            const meta = SOURCE_META[k]
+                            return (
+                              <span key={k} className="faction-hall-rank-src"
+                                title={`${count} ${meta.label} — +${pts} pt${pts > 1 ? 's' : ''} pour la Compagnie`}>
+                                {meta.icon} {count} {count > 1 ? meta.many : meta.one} <span className="faction-hall-rank-src-pts">(+{pts})</span>
+                              </span>
+                            )
+                          })}
                         </div>
                       )}
                     </div>
                   </button>
                   {(() => {
                     const conquis = m.crownsConquered ?? 0
+                    const invest = m.crownsInvested ?? 0
                     return (
                       <span className="faction-hall-rank-stats">
-                        🏆 {m.coupe.toLocaleString('fr-FR')}
-                        {m.crownsInvested > 0 && (
-                          <span title={`${m.crownsInvested} points de fondation`}>{'  '}⭐ {m.crownsInvested.toLocaleString('fr-FR')}</span>
+                        <span className="faction-hall-rank-pts" title="Points apportés au score de la Compagnie">
+                          🏆 {m.coupe.toLocaleString('fr-FR')} pts
+                        </span>
+                        {(conquis > 0 || invest > 0) && (
+                          <span className="faction-hall-rank-crowns">
+                            <span title={`${conquis} couronnes conquises pour la Compagnie`}>🪙 {conquis.toLocaleString('fr-FR')}</span>
+                            {' · '}
+                            <span title={`${invest} couronnes investies (fondation)`}>⭐ {invest.toLocaleString('fr-FR')}</span>
+                          </span>
                         )}
-                        {conquis > 0 && <span title={`${conquis} couronnes conquises`}>{'  '}🪙 {conquis.toLocaleString('fr-FR')}</span>}
                       </span>
                     )
                   })()}

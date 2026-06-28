@@ -1,3 +1,11 @@
+# ALPHA V0.12.1
+## Le Hall dit enfin les vrais chiffres
+
+- **Contributions claires dans le Hall.** Sous chaque membre, on lit maintenant le **vrai nombre** d'actions — « 14 lieux », « 20 énigmes », « 6 visites » — avec, entre parenthèses, les points que ça rapporte à la Compagnie. Fini le compteur qui affichait « 98 » (les points) et qu'on prenait pour 98 lieux.
+- **Couronnes et score séparés.** À droite de chaque membre : ses **points** apportés au score, et en dessous ses couronnes **conquises** et **investies**.
+
+---
+
 # ALPHA V0.12.0
 ## Les Grades de Compagnie
 

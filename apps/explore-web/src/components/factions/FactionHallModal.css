@@ -190,6 +190,7 @@
   background: rgba(193, 154, 107, 0.16); border-radius: 6px; padding: 1px 6px;
   white-space: nowrap;
 }
+.faction-hall-rank-src-pts { opacity: 0.6; }
 .faction-hall-rank-name {
   font-family: var(--font-body, Georgia, serif);
   font-size: 15px; font-weight: 500; color: #2a1f10;
@@ -207,7 +208,11 @@
 .faction-hall-rank-stats {
   font-family: var(--font-accent, Helvetica, sans-serif);
   font-size: 12px; color: #6e5435; flex: none;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+  text-align: right; white-space: nowrap;
 }
+.faction-hall-rank-pts { font-weight: 600; }
+.faction-hall-rank-crowns { font-size: 11px; opacity: 0.85; }
 .faction-hall-rank-remove {
   flex: none; width: 26px; height: 26px; border-radius: 50%;
   border: 1px solid rgba(192, 57, 43, 0.35);
