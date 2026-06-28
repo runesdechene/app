@@ -56,7 +56,7 @@ Décision 2026-06-14 : le thème Shopify reste un **repo séparé**, voisin sur 
 - **pnpm** uniquement (jamais npm/yarn). `npx` seulement pour `supabase`.
 - **TypeScript strict** — pas de `any`
 - **Conventional Commits**
-- **Migrations SQL** numérotées dans `supabase/migrations/`
+- **Migrations SQL** numérotées dans `supabase/migrations/`. **Canal unique = `npx supabase db push --linked`** (jamais MCP `apply_migration` ni dashboard SQL : ils créent des orphelins timestamp et cassent `db push`). Tout `CREATE OR REPLACE` se base sur la def **LIVE** (`pg_get_functiondef`). Détail : `docs/db/migrations-workflow.md` (un hook deny bloque `apply_migration`).
 - **Déploiement Netlify manuel**, jamais d'auto-deploy Git
 
 Détail par zone : `~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`
