@@ -28,7 +28,7 @@ export function Sidebar({ user }: SidebarProps) {
       <div className="sidebar-header">
         <h2>HUB</h2>
         <span>Runes de Chene</span>
-        <span className="sidebar-version">v1.2.0</span>
+        <span className="sidebar-version">v1.2.1</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -53,9 +53,6 @@ export function Sidebar({ user }: SidebarProps) {
         </NavLink>
         <NavLink to="/carte/factions" className={({ isActive }) => isActive ? 'active' : ''}>
           Factions
-        </NavLink>
-        <NavLink to="/carte/constructions" className={({ isActive }) => isActive ? 'active' : ''}>
-          Constructions
         </NavLink>
         <NavLink to="/carte/titres" className={({ isActive }) => isActive ? 'active' : ''}>
           Titres

@@ -27,8 +27,6 @@ interface Mission {
   ends_at: string | null
   reward_hint: string | null
   salon_intro: string | null
-  notify_on_launch: boolean
-  featured_on_home: boolean
   status: MissionStatus
   created_at: string
 }
@@ -124,8 +122,6 @@ export function Missions() {
           ends_at: (row.ends_at as string | null) ?? null,
           reward_hint: (row.reward_hint as string | null) ?? null,
           salon_intro: (row.salon_intro as string | null) ?? null,
-          notify_on_launch: Boolean(row.notify_on_launch ?? false),
-          featured_on_home: Boolean(row.featured_on_home ?? false),
           status: ((row.status as MissionStatus) ?? 'draft'),
           created_at: String(row.created_at ?? ''),
         })) satisfies Mission[]
@@ -394,18 +390,6 @@ function MissionEditor({ mission, onUpdate, onDelete }: MissionEditorProps) {
             <select value={mission.status} onChange={e => onUpdate('status', e.target.value as MissionStatus)}>
               {(Object.entries(STATUS_LABELS) as [MissionStatus, string][]).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
             </select>
-          </Field>
-          <Field label="Options" full>
-            <div className="missions-checks">
-              <label className="missions-check">
-                <input type="checkbox" checked={mission.notify_on_launch} onChange={e => onUpdate('notify_on_launch', e.target.checked)} />
-                Notifier au lancement
-              </label>
-              <label className="missions-check">
-                <input type="checkbox" checked={mission.featured_on_home} onChange={e => onUpdate('featured_on_home', e.target.checked)} />
-                Mise en avant (accueil)
-              </label>
-            </div>
           </Field>
         </div>
       </Card>

@@ -11,7 +11,6 @@ import { Factions } from './components/Factions'
 import { TitlesManager } from './components/TitlesManager'
 import { Divers } from './components/Divers'
 import { LandingConfig } from './components/LandingConfig'
-import { Constructions } from './components/Constructions'
 import { Fragments } from './components/Fragments'
 import { AssignFragments } from './components/AssignFragments'
 import { ShopifyUnlocks } from './components/ShopifyUnlocks'
@@ -85,7 +84,6 @@ function App() {
           <Route path="/photos" element={<Photos />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
-          <Route path="/carte/constructions" element={<Constructions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />
           <Route path="/carte/fragments" element={<Fragments />} />
           <Route path="/carte/associer" element={<AssignFragments />} />

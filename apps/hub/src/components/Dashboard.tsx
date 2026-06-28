@@ -19,7 +19,6 @@ interface GrowthStats {
 
 interface V05Stats {
   enigmasToday: number
-  influenceThisWeek: number
   topContributors: Array<{ name: string; points: number }>
   topDocumentedPlaces: Array<{ title: string; contributions: number }>
 }
@@ -44,7 +43,6 @@ export function Dashboard() {
   })
   const [v05Stats, setV05Stats] = useState<V05Stats>({
     enigmasToday: 0,
-    influenceThisWeek: 0,
     topContributors: [],
     topDocumentedPlaces: [],
   })
@@ -112,27 +110,16 @@ export function Dashboard() {
         // V0.5 Stats
         const v05: V05Stats = {
           enigmasToday: 0,
-          influenceThisWeek: 0,
           topContributors: [],
           topDocumentedPlaces: [],
         }
 
         // Enigmas answered today
         const { count: enigmaCount } = await supabase
-          .from('enigma_answers')
+          .from('enigma_responses')
           .select('*', { count: 'exact', head: true })
-          .gte('answered_at', startOfToday)
+          .gte('responded_at', startOfToday)
         v05.enigmasToday = enigmaCount || 0
-
-        // Total influence placed this week
-        const { data: influenceData } = await supabase
-          .from('place_influence')
-          .select('placed_points')
-          .gte('updated_at', ago7d)
-        if (influenceData) {
-          v05.influenceThisWeek = (influenceData as Array<{ placed_points: number }>)
-            .reduce((sum, r) => sum + (r.placed_points || 0), 0)
-        }
 
         // Top contributors by exploration_points
         const { data: topContribData } = await supabase
@@ -250,16 +237,12 @@ export function Dashboard() {
         </div>
       </div>
 
-      <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>V0.5 — Influence &amp; Enigmes</h2>
+      <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Enigmes</h2>
 
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Enigmes aujourd'hui</h3>
           <span className="stat-value" style={{ color: '#6b46c1' }}>{v05Stats.enigmasToday}</span>
-        </div>
-        <div className="stat-card">
-          <h3>Influence placee (7j)</h3>
-          <span className="stat-value" style={{ color: '#3b82f6' }}>{v05Stats.influenceThisWeek}</span>
         </div>
       </div>
 

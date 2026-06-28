@@ -48,7 +48,7 @@ listing des `place_taken_remote` des 30 derniers jours pour suivre l'usage de
 
 > Spec : `docs/superpowers/specs/2026-05-26-ugc-mouvement-model-design.md` · Plan : `docs/superpowers/plans/2026-05-26-ugc-brique1-boucle-recompense.md` (mig 175)
 
-La modération (`Photos.tsx` / `Reviews.tsx` → `moderate_submission` / `moderate_review`)
+La modération (`Photos.tsx` → `moderate_submission`)
 crédite des **Couronnes** + incrémente `users.contributions_count` **à la 1re validation**
 (idempotent via `rewarded_at` — re-valider un archivé ne re-paie pas). `create_user_from_submission`
 crédite un **bonus de bienvenue** (comptes neufs). Un **bonus 1re contribution** s'ajoute pour
@@ -62,7 +62,7 @@ Montants tunables dans `app_settings` : `ugc_welcome_crowns` (20), `ugc_reward_c
 Les écrans de fin des formulaires publics affichent les Couronnes via la RPC `get_ugc_reward_config`.
 
 **Brique 1bis-A (mig 176, 2026-05-26)** : la récompense devient **MANUELLE** à la validation —
-`moderate_submission` / `moderate_review` prennent un param `p_crowns` (le hub `Photos.tsx`/`Reviews.tsx`
+`moderate_submission` prend un param `p_crowns` (le hub `Photos.tsx`
 a un champ Couronnes, défaut 10) ; le crédit auto fixe (`ugc_reward_crowns` + bonus 1re contribution)
 est **abandonné** (clés `app_settings` dépréciées). Le bonus de **bienvenue** reste auto. Idempotence
 conservée (`rewarded_at`). **Curation par photo** : `hub_submission_images` gagne `status`
