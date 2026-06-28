@@ -511,9 +511,13 @@ export function FactionHallModal({ factionId, onClose }: Props) {
                         </span>
                         {(conquis > 0 || invest > 0) && (
                           <span className="faction-hall-rank-crowns">
-                            <span title={`${conquis} couronnes conquises pour la Compagnie`}>🪙 {conquis.toLocaleString('fr-FR')}</span>
-                            {' · '}
-                            <span title={`${invest} couronnes investies (fondation)`}>⭐ {invest.toLocaleString('fr-FR')}</span>
+                            {conquis > 0 && (
+                              <span title={`${conquis} couronnes conquises pour la Compagnie`}>🪙 {conquis.toLocaleString('fr-FR')}</span>
+                            )}
+                            {conquis > 0 && invest > 0 && ' · '}
+                            {invest > 0 && (
+                              <span title={`${invest} couronnes investies (fondation)`}>⭐ {invest.toLocaleString('fr-FR')}</span>
+                            )}
                           </span>
                         )}
                       </span>
