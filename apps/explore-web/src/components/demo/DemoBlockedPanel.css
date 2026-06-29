@@ -1,0 +1,5 @@
+.demo-blocked { display: flex; align-items: center; justify-content: center; min-height: 60vh; padding: 2rem; }
+.demo-blocked-card { max-width: 420px; text-align: center; background: var(--color-surface, #fff); border-radius: 16px; padding: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,.12); }
+.demo-blocked-title { font-size: 22px; margin: 0 0 .75rem; color: var(--color-ink, #4A3728); }
+.demo-blocked-text { font-size: 18px; margin: 0 0 .5rem; }
+.demo-blocked-hint { font-size: 16px; opacity: .7; margin: 0; }
