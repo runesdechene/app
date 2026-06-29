@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePlayerStore } from '../../stores/playerStore'
 import { useCrownsStore } from '../../stores/crownsStore'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import { useCoupe } from '../../hooks/useCoupe'
 import { useFractionalEnergy, formatEnergy } from '../../hooks/useFractionalEnergy'
 import { NotorietyInfoModal } from '../map/modals/NotorietyInfoModal'
@@ -51,7 +52,7 @@ export function StatsBar() {
 
         <button type="button" className="stats-cell" onClick={() => setOpenInfo('crowns')}>
           <span className="stats-cell-icon" aria-hidden>🪙</span>
-          <span className="stats-cell-value">{crownsBalance}</span>
+          <span className="stats-cell-value">{isDemoMode() ? '∞' : crownsBalance}</span>
         </button>
 
         <button type="button" className="stats-cell stats-cell--energy" onClick={() => setOpenInfo('energy')}>

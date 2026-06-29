@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { safeStorage } from '../lib/safeStorage'
+import { isDemoMode } from '../lib/demo/isDemoMode'
 import type { CrownsState, HarvestResult, HarvestablePlace } from '../types/crowns'
 
 interface CrownsStoreState {
@@ -31,6 +32,7 @@ export const useCrownsStore = create<CrownsStoreState>((set, get) => ({
   harvestableSet: new Set(),
 
   refresh: async (userId) => {
+    if (isDemoMode()) { set({ balance: Infinity, capped: false }); return }
     if (!userId) return
     const { data, error } = await supabase.rpc('get_my_crowns_state', { p_user_id: userId })
     if (error) {
@@ -58,6 +60,10 @@ export const useCrownsStore = create<CrownsStoreState>((set, get) => ({
   },
 
   harvest: async (userId, placeId) => {
+    if (isDemoMode()) {
+      set({ balance: Infinity, capped: false })
+      return { success: true as const, placeId, gain: 1, balance: Infinity, harvestedAt: new Date().toISOString() }
+    }
     const { data, error } = await supabase.rpc('harvest_crown', {
       p_user_id: userId,
       p_place_id: placeId,
@@ -86,6 +92,7 @@ export const useCrownsStore = create<CrownsStoreState>((set, get) => ({
   },
 
   setBalance: (newBalance) => {
+    if (isDemoMode()) { set({ balance: Infinity, capped: false }); return }
     safeStorage.set('crownsBalance', String(newBalance))
     set({
       balance: newBalance,

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useCrownsStore } from '../../../stores/crownsStore'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 import { useMapStore } from '../../../stores/mapStore'
 import { CourtTensionBar } from './CourtTensionBar'
 import { PatronsList } from './PatronsList'
@@ -450,7 +451,7 @@ export function PlaceCourtView({ placeId, placeTitle: _placeTitle }: PlaceCourtV
       <div className="court-balance">
         <span className="court-balance-icon" aria-hidden>🪙</span>
         <span className="court-balance-label">Tes Couronnes</span>
-        <span className="court-balance-amount">{balance}</span>
+        <span className="court-balance-amount">{isDemoMode() ? '∞' : balance}</span>
       </div>
 
       {/* Boutons tap-rafale */}
