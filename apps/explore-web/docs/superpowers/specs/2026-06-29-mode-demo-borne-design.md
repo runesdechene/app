@@ -165,7 +165,12 @@ social.
 
 ## À créer / configurer
 
-- **Compte démo Supabase** dédié, **sans droit d'écriture** (à confirmer côté base :
-  RLS / révocation des grants pour ce user).
+- **Compte démo Supabase** — ✅ **créé le 2026-06-29.** Email `demo@runesdechene.com`,
+  display_name « Veilleur d'un Jour », id `7ccc2025-2f3b-4252-9d3b-0de3e4a8835f`,
+  email confirmé, rank `guest`, profil vierge (pas de compagnie). Mot de passe détenu
+  par Uriel (hors git).
+  - Note sécurité : la plupart des RPC sont `SECURITY DEFINER`, donc révoquer les
+    grants Postgres de ce user **ne bloque pas** les écritures. **Le vrai garde-fou
+    « zéro écriture » est le proxy client** (§2). Le filet base est secondaire.
 - **Sous-domaine** `demo.runesdechene.com` + déploiement dédié (Netlify) avec
   `VITE_DEMO_MODE=true`.
