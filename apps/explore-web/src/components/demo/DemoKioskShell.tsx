@@ -1,6 +1,7 @@
 // src/components/demo/DemoKioskShell.tsx
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useDemoStore } from '../../stores/demoStore'
+import { usePlayerStore } from '../../stores/playerStore'
 import './DemoKioskShell.css'
 
 const IDLE_MS = 10 * 60 * 1000 // 10 minutes
@@ -30,6 +31,10 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
 
   function enter() {
     useDemoStore.getState().reset()
+    // Carte vierge pour le prochain visiteur : toggle mode Compagnie OFF + découvertes effacées.
+    const player = usePlayerStore.getState()
+    player.setFactionColorMode(false)
+    player.setDiscoveredIds([])
     setShowIntro(false)
     setShowWelcome(true)
   }

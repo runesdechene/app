@@ -8,6 +8,7 @@ import { useEnsurePushPermission } from '../../hooks/useEnsurePushPermission'
 import { useDefisStore } from '../../stores/defisStore'
 import { EnigmaResult } from './EnigmaResult'
 import { readableInk } from '../../lib/textFormat'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
 
@@ -108,7 +109,8 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
       }
       const d = data as Record<string, unknown>
 
-      if (d.all_answered) {
+      if (d.all_answered && !isDemoMode()) {
+        // Borne démo : on n'affiche jamais « tout résolu » — les énigmes bouclent.
         setAllDone(true)
       } else if (d.error === 'no_enigma_available') {
         setNoEnigma(true)
@@ -180,6 +182,9 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
       setResult(null)
       setSelectedChoice(null)
       setFreeAnswer('')
+    } else if (isDemoMode()) {
+      // Borne démo : énigmes infinies → on recharge la série au lieu de fermer.
+      loadEnigmas()
     } else {
       onClose()
     }

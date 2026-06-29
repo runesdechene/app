@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import { EnigmaMenu, type EnigmaMenuFragment } from './EnigmaMenu'
 import parcheminImg from '../../assets/parchemin.png'
 import './DailyEnigma.css'
@@ -36,7 +37,8 @@ export function EnigmaChestButton({ onOpenDaily, onOpenFragment, refreshKey }: P
     if (!userId) return
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
       const d = data as { all_answered?: boolean } | null
-      setDailyDone(!!d?.all_answered)
+      // Borne démo : énigmes infinies → coffre toujours actif.
+      setDailyDone(isDemoMode() ? false : !!d?.all_answered)
     })
     supabase.rpc('get_my_fragment_status', { p_user_id: userId }).then(({ data }) => {
       if (data && Array.isArray(data)) setFragments(data as FragmentStatus[])

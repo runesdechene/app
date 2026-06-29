@@ -9,10 +9,13 @@ export const FAKED_WRITES: ReadonlySet<string> = new Set([
   'harvest_crown',
 ])
 
+// NB : get_player_profile N'EST PAS overridé — on le laisse passer en lecture
+// réelle pour que la modale profil ait un objet complet (nom, titres, bio…).
+// Le compte démo est un vrai compte vierge (niveau 1) ; la Gloire de session
+// reste visible via les toasts. Faker un profil partiel cassait l'ouverture.
 export const OVERRIDDEN_READS: ReadonlySet<string> = new Set([
   'get_user_energy',
   'get_my_crowns_state',
-  'get_player_profile',
 ])
 
 const READ_PREFIXES = ['get_', 'list_', 'fetch_']
@@ -55,13 +58,6 @@ export function fakeResponse(
     }
     case 'get_my_crowns_state':
       return { data: { balance: Infinity, capped: false, harvestable: [] }, error: null }
-    case 'get_player_profile': {
-      const { glory } = useDemoStore.getState()
-      return {
-        data: { level: 1, xp_total: glory, glory, conquest_points: glory, veteran_first_era: false },
-        error: null,
-      }
-    }
     // FIX 3: unknown name → loud error rather than silent success
     default:
       throw new Error(`[demo] fakeResponse called for unknown name: ${name}`)

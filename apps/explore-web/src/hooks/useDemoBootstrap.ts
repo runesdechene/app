@@ -16,8 +16,14 @@ export function useDemoBootstrap(): { ready: boolean } {
 
     async function boot() {
       try {
+        // Forcer le compte démo : si la session courante n'est PAS le compte démo
+        // (ex. compte perso encore connecté sur localhost), on déconnecte puis on
+        // se reconnecte en démo. Sur la borne (navigateur vierge) c'est juste un login.
         const { data: { session } } = await supabase.auth.getSession()
-        if (!session && DEMO_EMAIL && DEMO_PASSWORD) {
+        const alreadyDemo =
+          session?.user?.email?.toLowerCase() === DEMO_EMAIL?.toLowerCase()
+        if (!alreadyDemo && DEMO_EMAIL && DEMO_PASSWORD) {
+          if (session) await supabase.auth.signOut()
           await supabase.auth.signInWithPassword({ email: DEMO_EMAIL, password: DEMO_PASSWORD })
         }
         // Préchargement carte (réchauffe le cache de résilience)

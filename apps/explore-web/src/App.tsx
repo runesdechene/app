@@ -49,7 +49,7 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<AppLoader />}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={demo ? <Navigate to="/carte" replace /> : <LandingPage />} />
           <Route element={<RequireAuth />}>
             <Route path="/post-login" element={<RootRedirect />} />
             <Route path="/carte" element={<MapPage />} />
@@ -67,7 +67,7 @@ export default function App() {
       {/* Pop-up d'installation PWA — monte a la racine pour etre present des
           `/` (landing, avant creation de compte) et capter `beforeinstallprompt`
           quelle que soit la route d'arrivee. */}
-      <InstallPrompt />
+      {!demo && <InstallPrompt />}
     </BrowserRouter>
   )
 
