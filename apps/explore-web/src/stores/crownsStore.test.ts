@@ -73,4 +73,24 @@ describe('crownsStore — demo mode guards', () => {
     useCrownsStore.getState().setBalance(500)
     expect(useCrownsStore.getState().capped).toBe(true)
   })
+
+  // FIX 5: demo guard on reset()
+  it('reset — demo mode sets Infinity, does not write safeStorage', () => {
+    vi.stubEnv('VITE_DEMO_MODE', 'true')
+    useCrownsStore.setState({ balance: 100, capped: false })
+    useCrownsStore.getState().reset()
+    const s = useCrownsStore.getState()
+    expect(s.balance).toBe(Infinity)
+    expect(s.capped).toBe(false)
+    expect(mockStorageSet).not.toHaveBeenCalledWith('crownsBalance', expect.anything())
+  })
+
+  it('reset — non-demo writes 0 to storage and clears balance', () => {
+    vi.stubEnv('VITE_DEMO_MODE', 'false')
+    useCrownsStore.setState({ balance: 100 })
+    useCrownsStore.getState().reset()
+    const s = useCrownsStore.getState()
+    expect(s.balance).toBe(0)
+    expect(mockStorageSet).toHaveBeenCalledWith('crownsBalance', '0')
+  })
 })

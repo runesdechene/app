@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { classifyRpc, fakeResponse, wrapSupabaseForDemo, FAKED_WRITES, OVERRIDDEN_READS } from './demoSupabase'
 import { useDemoStore } from '../../stores/demoStore'
+import { getCached, setCached } from './demoReadCache'
 
 describe('classifyRpc', () => {
   it('classe les écritures faked', () => {
@@ -33,6 +34,11 @@ describe('fakeResponse', () => {
     expect(r.data.error).toBeUndefined()
     expect(r.data.correct).toBe(true)
   })
+
+  // FIX 3: default branch throws for unknown names
+  it('default branch throws for unknown rpc names', () => {
+    expect(() => fakeResponse('unknown_rpc_xyz', {})).toThrow('[demo] fakeResponse called for unknown name: unknown_rpc_xyz')
+  })
 })
 
 describe('lectures ∞ overridées', () => {
@@ -56,7 +62,7 @@ describe('lectures ∞ overridées', () => {
   })
 })
 
-describe('wrapSupabaseForDemo', () => {
+describe('wrapSupabaseForDemo — rpc', () => {
   beforeEach(() => { useDemoStore.getState().reset() })
 
   it('une écriture faked ne touche jamais le client réel', async () => {
@@ -75,12 +81,127 @@ describe('wrapSupabaseForDemo', () => {
     expect(realRpc).not.toHaveBeenCalled()
   })
 
-  it('une lecture passe au client réel', () => {
+  it('une lecture non-cacheable passe au client réel (synchrone)', () => {
     const builder = {}
     const realRpc = vi.fn().mockReturnValue(builder)
     const wrapped = wrapSupabaseForDemo({ rpc: realRpc })
-    const out = wrapped.rpc('get_map_places', { p_type: 'all' })
-    expect(realRpc).toHaveBeenCalledWith('get_map_places', { p_type: 'all' })
+    // list_places is not in CACHEABLE_READS → must be returned synchronously
+    const out = wrapped.rpc('list_places', { p_type: 'all' })
+    expect(realRpc).toHaveBeenCalledWith('list_places', { p_type: 'all' })
     expect(out).toBe(builder)
+  })
+})
+
+// FIX 1 — from() intercept
+describe('wrapSupabaseForDemo — from(table)', () => {
+  let insertSpy: ReturnType<typeof vi.fn>
+  let selectSpy: ReturnType<typeof vi.fn>
+  let fakeBuilder: any
+  let client: any
+  let wrapped: any
+
+  beforeEach(() => {
+    useDemoStore.getState().reset()
+    insertSpy = vi.fn().mockResolvedValue({ data: [{}], error: null })
+    selectSpy = vi.fn().mockReturnValue({ data: [{}], error: null })
+    fakeBuilder = {
+      insert: insertSpy,
+      select: selectSpy,
+      update: vi.fn(),
+      upsert: vi.fn(),
+      delete: vi.fn(),
+    }
+    client = {
+      rpc: vi.fn(),
+      from: vi.fn().mockReturnValue(fakeBuilder),
+      storage: { from: vi.fn() },
+    }
+    wrapped = wrapSupabaseForDemo(client)
+  })
+
+  it('insert() no-ops: resolves { data: null, error: null }, real insert NOT called', async () => {
+    const result = await wrapped.from('places_viewed').insert({ place_id: 'x' })
+    expect(result).toEqual({ data: null, error: null })
+    expect(insertSpy).not.toHaveBeenCalled()
+  })
+
+  it('insert().select() is chainable and still resolves { data: null, error: null }', async () => {
+    const result = await wrapped.from('places_viewed').insert({ place_id: 'x' }).select()
+    expect(result).toEqual({ data: null, error: null })
+  })
+
+  it('select() delegates to real builder', () => {
+    wrapped.from('places').select('*')
+    expect(selectSpy).toHaveBeenCalledWith('*')
+  })
+})
+
+// FIX 1 — storage intercept
+describe('wrapSupabaseForDemo — storage', () => {
+  let uploadSpy: ReturnType<typeof vi.fn>
+  let getPublicUrlSpy: ReturnType<typeof vi.fn>
+  let fakeFileApi: any
+  let client: any
+  let wrapped: any
+
+  beforeEach(() => {
+    uploadSpy = vi.fn().mockResolvedValue({ data: { path: 'p' }, error: null })
+    getPublicUrlSpy = vi.fn().mockReturnValue({ data: { publicUrl: 'http://example.com/p' } })
+    fakeFileApi = {
+      upload: uploadSpy,
+      update: vi.fn(),
+      remove: vi.fn(),
+      move: vi.fn(),
+      copy: vi.fn(),
+      createSignedUploadUrl: vi.fn(),
+      download: vi.fn(),
+      list: vi.fn(),
+      getPublicUrl: getPublicUrlSpy,
+      createSignedUrl: vi.fn(),
+      createSignedUrls: vi.fn(),
+    }
+    client = {
+      rpc: vi.fn(),
+      from: vi.fn(),
+      storage: { from: vi.fn().mockReturnValue(fakeFileApi) },
+    }
+    wrapped = wrapSupabaseForDemo(client)
+  })
+
+  it('storage.from().upload() resolves { data: { path }, error: null }, real upload NOT called', async () => {
+    const result = await wrapped.storage.from('place-images').upload('mypath', new Blob())
+    expect(result).toEqual({ data: { path: 'mypath' }, error: null })
+    expect(uploadSpy).not.toHaveBeenCalled()
+  })
+
+  it('storage.from().getPublicUrl() delegates to real file API (sync)', () => {
+    wrapped.storage.from('place-images').getPublicUrl('mypath')
+    expect(getPublicUrlSpy).toHaveBeenCalledWith('mypath')
+  })
+})
+
+// FIX 2 — cache live reads
+describe('wrapSupabaseForDemo — cache live (FIX 2)', () => {
+  beforeEach(() => {
+    useDemoStore.getState().reset()
+    // Clear cache using the sentinel
+    setCached('__reset__', null, undefined as any)
+  })
+
+  it('cacheable read success: writes through to cache', async () => {
+    const freshData = [{ id: 1 }]
+    const realRpc = vi.fn().mockResolvedValue({ data: freshData, error: null })
+    const wrapped = wrapSupabaseForDemo({ rpc: realRpc, from: vi.fn(), storage: { from: vi.fn() } })
+    await wrapped.rpc('get_map_places', { p_type: 'all' })
+    expect(getCached('get_map_places', { p_type: 'all' })).toEqual(freshData)
+  })
+
+  it('cacheable read failure: returns cached value when realRpc rejects', async () => {
+    const cachedData = [{ id: 42 }]
+    setCached('get_map_places', { p_type: 'all' }, cachedData)
+    const realRpc = vi.fn().mockRejectedValue(new Error('network error'))
+    const wrapped = wrapSupabaseForDemo({ rpc: realRpc, from: vi.fn(), storage: { from: vi.fn() } })
+    const result = await wrapped.rpc('get_map_places', { p_type: 'all' })
+    expect(result).toEqual({ data: cachedData, error: null })
   })
 })

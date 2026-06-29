@@ -101,6 +101,11 @@ export const useCrownsStore = create<CrownsStoreState>((set, get) => ({
   },
 
   reset: () => {
+    // FIX 5: demo guard — never touch safeStorage or reset to 0 in demo mode
+    if (isDemoMode()) {
+      set({ balance: Infinity, capped: false, harvestable: new Map(), harvestableSet: new Set() })
+      return
+    }
     safeStorage.set('crownsBalance', '0')
     set({
       balance: 0,

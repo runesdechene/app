@@ -1,4 +1,5 @@
 import { useDemoStore } from '../../stores/demoStore'
+import { CACHEABLE_READS, getCached, setCached } from './demoReadCache'
 
 export const FAKED_WRITES: ReadonlySet<string> = new Set([
   'discover_place',
@@ -61,29 +62,146 @@ export function fakeResponse(
         error: null,
       }
     }
+    // FIX 3: unknown name → loud error rather than silent success
     default:
-      return { data: { success: true }, error: null }
+      throw new Error(`[demo] fakeResponse called for unknown name: ${name}`)
   }
 }
 
-/** No-op pour les écritures bloquées : rien ne part au réseau. */
+/** No-op pour les écritures bloquées (rpc) : rien ne part au réseau. */
 function blockedResponse(name: string): { data: null; error: null } {
-  if (import.meta.env.DEV) console.info(`[demo] écriture bloquée (no-op) : ${name}`)
+  // FIX 4: gate the log so it never prints under Vitest
+  if (import.meta.env.DEV && !import.meta.env.VITEST) {
+    console.info(`[demo] écriture bloquée (no-op) : ${name}`)
+  }
   return { data: null, error: null }
+}
+
+// ── FIX 1 helpers ──────────────────────────────────────────────────────────
+
+const MUTATING_METHODS = new Set(['insert', 'update', 'upsert', 'delete'])
+const STORAGE_MUTATING_METHODS = new Set([
+  'upload', 'update', 'remove', 'move', 'copy', 'createSignedUploadUrl',
+])
+
+/**
+ * Returns a self-returning Proxy that is thenable → `await noop` resolves
+ * `{ data: null, error: null }`, and any method call returns the same noop.
+ * Used as the return value of intercepted from().insert/update/upsert/delete.
+ */
+function makeNoOpBuilder(): any {
+  const noop: any = new Proxy({} as any, {
+    get(_t, prop) {
+      if (prop === 'then') {
+        // Standard thenable protocol: call resolve synchronously.
+        return (onFulfilled: (v: any) => any) =>
+          Promise.resolve({ data: null, error: null }).then(onFulfilled)
+      }
+      // Every other property access returns a function that returns noop
+      // so chaining (.select(), .eq(), .single(), …) is always safe.
+      return (..._args: any[]) => noop
+    },
+  })
+  return noop
 }
 
 export function wrapSupabaseForDemo<T extends { rpc: (...a: any[]) => any }>(client: T): T {
   const realRpc = client.rpc.bind(client)
+  // Capture optional from/storage before building the proxy
+  const realFrom: ((table: string) => any) | undefined =
+    typeof (client as any).from === 'function'
+      ? (client as any).from.bind(client)
+      : undefined
+  const realStorage: any = (client as any).storage
+
   return new Proxy(client, {
     get(target, prop, receiver) {
+      // ── rpc ──────────────────────────────────────────────────────────────
       if (prop === 'rpc') {
         return (name: string, args: Record<string, unknown> = {}) => {
           const kind = classifyRpc(name)
-          if (kind === 'read') return realRpc(name, args)
+
+          if (kind === 'read') {
+            // FIX 2: cacheable reads → async wrapper with write-through + fallback
+            if (CACHEABLE_READS.has(name)) {
+              return (async () => {
+                let result: any
+                try {
+                  result = await realRpc(name, args)
+                } catch (_err) {
+                  const cached = getCached(name, args)
+                  if (cached !== undefined) return { data: cached, error: null }
+                  throw _err
+                }
+                if (result.error || !result.data) {
+                  const cached = getCached(name, args)
+                  if (cached !== undefined) return { data: cached, error: null }
+                  return result
+                }
+                setCached(name, args, result.data)
+                return result
+              })()
+            }
+            // Non-cacheable reads: return the real builder synchronously
+            return realRpc(name, args)
+          }
+
           if (kind === 'faked') return Promise.resolve(fakeResponse(name, args))
           return Promise.resolve(blockedResponse(name))
         }
       }
+
+      // ── from(table) ──────────────────────────────────────────────────────
+      if (prop === 'from' && realFrom) {
+        return (table: string) => {
+          return new Proxy({} as any, {
+            get(_b, method) {
+              const methodName = String(method)
+              if (MUTATING_METHODS.has(methodName)) {
+                // Return a function that, when called, returns a no-op builder
+                return (..._args: any[]) => makeNoOpBuilder()
+              }
+              // Non-mutating: delegate to the real query builder
+              const realBuilder = realFrom(table)
+              const val = (realBuilder as any)[methodName]
+              return typeof val === 'function' ? val.bind(realBuilder) : val
+            },
+          })
+        }
+      }
+
+      // ── storage ──────────────────────────────────────────────────────────
+      if (prop === 'storage' && realStorage) {
+        return new Proxy(realStorage, {
+          get(storageTarget, storageProp, storageReceiver) {
+            if (storageProp === 'from') {
+              return (bucket: string) => {
+                const realFileApi = realStorage.from(bucket)
+                return new Proxy(realFileApi, {
+                  get(fileTarget, fileProp, fileReceiver) {
+                    const name = String(fileProp)
+                    if (STORAGE_MUTATING_METHODS.has(name)) {
+                      return (...args: any[]) => {
+                        if (name === 'upload' || name === 'update') {
+                          // Resolve with path so callers reading data.path don't crash
+                          const path = typeof args[0] === 'string' ? args[0] : undefined
+                          return Promise.resolve({ data: { path }, error: null })
+                        }
+                        return Promise.resolve({ data: null, error: null })
+                      }
+                    }
+                    // Read methods (download, list, getPublicUrl, …) pass through
+                    return Reflect.get(fileTarget, fileProp, fileReceiver)
+                  },
+                })
+              }
+            }
+            return Reflect.get(storageTarget, storageProp, storageReceiver)
+          },
+        })
+      }
+
+      // Everything else (auth, channel, …) passes through
       return Reflect.get(target, prop, receiver)
     },
   }) as T
