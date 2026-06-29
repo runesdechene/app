@@ -6,6 +6,9 @@ import RequireAuth from './components/RequireAuth'
 import { InstallPrompt } from './components/pwa/InstallPrompt'
 import { AppLoader } from './components/AppLoader'
 import { useIsDesktop } from './hooks/useMediaQuery'
+import { isDemoMode } from './lib/demo/isDemoMode'
+import { DemoKioskShell } from './components/demo/DemoKioskShell'
+import { useDemoBootstrap } from './hooks/useDemoBootstrap'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -29,6 +32,9 @@ function MobileOnly({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const demo = isDemoMode()
+  useDemoBootstrap()
+
   // Lien d'invitation Compagnie : capturer ?company=<id> dès le chargement (même
   // déconnecté sur la LandingPage) → consommé après auth par useCompanyInvite.
   useEffect(() => {
@@ -39,7 +45,7 @@ export default function App() {
     }
   }, [])
 
-  return (
+  const tree = (
     <BrowserRouter>
       <Suspense fallback={<AppLoader />}>
         <Routes>
@@ -64,4 +70,6 @@ export default function App() {
       <InstallPrompt />
     </BrowserRouter>
   )
+
+  return demo ? <DemoKioskShell>{tree}</DemoKioskShell> : tree
 }

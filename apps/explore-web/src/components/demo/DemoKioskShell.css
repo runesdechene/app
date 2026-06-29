@@ -1,0 +1,11 @@
+/* src/components/demo/DemoKioskShell.css */
+.demo-intro { position: fixed; inset: 0; z-index: 9999; background-image: url('/demo-intro.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+.demo-intro-veil { position: absolute; inset: 0; background: rgba(20,15,10,.55); }
+.demo-intro-content { position: relative; text-align: center; color: #fff; }
+.demo-intro-content h1 { font-size: 48px; margin-bottom: 2rem; letter-spacing: .04em; }
+.demo-intro-cta { font-size: 22px; padding: 1rem 2.5rem; border-radius: 999px; border: none; background: var(--color-accent, #C8A24B); color: #1a1208; cursor: pointer; }
+.demo-welcome { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.demo-welcome-card { max-width: 460px; background: var(--color-surface, #fff); border-radius: 16px; padding: 2rem; text-align: center; }
+.demo-welcome-card h2 { font-size: 22px; margin: 0 0 1rem; }
+.demo-welcome-card p { font-size: 18px; margin: 0 0 1.5rem; }
+.demo-welcome-card button { font-size: 18px; padding: .75rem 2rem; border-radius: 999px; border: none; background: var(--color-accent, #C8A24B); cursor: pointer; }
