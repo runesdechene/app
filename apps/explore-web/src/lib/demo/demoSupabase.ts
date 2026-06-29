@@ -8,10 +8,16 @@ export const FAKED_WRITES: ReadonlySet<string> = new Set([
   'harvest_crown',
 ])
 
+export const OVERRIDDEN_READS: ReadonlySet<string> = new Set([
+  'get_user_energy',
+  'get_my_crowns_state',
+  'get_player_profile',
+])
+
 const READ_PREFIXES = ['get_', 'list_', 'fetch_']
 
 export function classifyRpc(name: string): 'read' | 'faked' | 'blocked' {
-  if (FAKED_WRITES.has(name)) return 'faked'
+  if (FAKED_WRITES.has(name) || OVERRIDDEN_READS.has(name)) return 'faked'
   if (READ_PREFIXES.some((p) => name.startsWith(p))) return 'read'
   return 'blocked'
 }
@@ -42,6 +48,19 @@ export function fakeResponse(
       return { data: { success: true, newCrownsBalance: Infinity }, error: null }
     case 'harvest_crown':
       return { data: { success: true, balance: Infinity }, error: null }
+    case 'get_user_energy': {
+      const { energy, maxEnergy } = useDemoStore.getState()
+      return { data: { energy, maxEnergy, nextPointIn: 0, energyCycle: 0 }, error: null }
+    }
+    case 'get_my_crowns_state':
+      return { data: { balance: Infinity, capped: false, harvestable: [] }, error: null }
+    case 'get_player_profile': {
+      const { glory } = useDemoStore.getState()
+      return {
+        data: { level: 1, xp_total: glory, glory, conquest_points: glory, veteran_first_era: false },
+        error: null,
+      }
+    }
     default:
       return { data: { success: true }, error: null }
   }

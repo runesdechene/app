@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { classifyRpc, fakeResponse, wrapSupabaseForDemo, FAKED_WRITES } from './demoSupabase'
+import { classifyRpc, fakeResponse, wrapSupabaseForDemo, FAKED_WRITES, OVERRIDDEN_READS } from './demoSupabase'
 import { useDemoStore } from '../../stores/demoStore'
 
 describe('classifyRpc', () => {
@@ -9,7 +9,6 @@ describe('classifyRpc', () => {
     expect(classifyRpc('invest_crowns')).toBe('faked')
   })
   it('classe les lectures', () => {
-    expect(classifyRpc('get_user_energy')).toBe('read')
     expect(classifyRpc('get_map_places')).toBe('read')
     expect(classifyRpc('list_something')).toBe('read')
   })
@@ -33,6 +32,27 @@ describe('fakeResponse', () => {
     const r = fakeResponse('answer_enigma', { p_enigma_id: 'e1' }) as { data: any }
     expect(r.data.error).toBeUndefined()
     expect(r.data.correct).toBe(true)
+  })
+})
+
+describe('lectures ∞ overridées', () => {
+  beforeEach(() => { useDemoStore.getState().reset() })
+
+  it('get_user_energy renvoie une jauge pleine', () => {
+    const { data } = fakeResponse('get_user_energy', {}) as { data: any }
+    expect(data.energy).toBe(data.maxEnergy)
+    expect(data.nextPointIn).toBe(0)
+  })
+
+  it('get_my_crowns_state renvoie balance infinie et capped=false', () => {
+    const { data } = fakeResponse('get_my_crowns_state', {}) as { data: any }
+    expect(data.balance).toBe(Infinity)
+    expect(data.capped).toBe(false)
+    expect(Array.isArray(data.harvestable)).toBe(true)
+  })
+
+  it('get_user_energy est classé faked (pas read)', () => {
+    expect(classifyRpc('get_user_energy')).toBe('faked')
   })
 })
 
