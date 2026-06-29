@@ -5,6 +5,7 @@ node_modules/
 # Environment
 .env
 .env.local
+.env.demo
 
 # Build
 dist/
@@ -60,4 +61,3 @@ supabase/.temp/
 .wolf-archive/
 *.openwolf-era
 .mcp.json
-.xo/
