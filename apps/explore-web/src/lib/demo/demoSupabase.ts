@@ -81,8 +81,12 @@ function blockedResponse(name: string): { data: null; error: null } {
 
 const MUTATING_METHODS = new Set(['insert', 'update', 'upsert', 'delete'])
 const STORAGE_MUTATING_METHODS = new Set([
-  'upload', 'update', 'remove', 'move', 'copy', 'createSignedUploadUrl',
+  'upload', 'uploadToSignedUrl', 'update', 'remove', 'move', 'copy', 'createSignedUploadUrl',
 ])
+// NB : les écritures bucket-admin (createBucket/deleteBucket/emptyBucket/updateBucket)
+// vivent sur `storage` lui-même, pas sur `storage.from()`, et passent donc en
+// Reflect.get. Hors scope : aucune n'est appelée dans l'app et le compte démo
+// n'a pas les droits d'admin bucket.
 
 /**
  * Returns a self-returning Proxy that is thenable → `await noop` resolves
