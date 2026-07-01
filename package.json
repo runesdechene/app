@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Runes de Chêne - Monorepo",
+  "packageManager": "pnpm@10.5.2",
   "scripts": {
     "dev": "pnpm --filter explore-web dev",
     "dev:web": "pnpm --filter explore-web dev",
@@ -17,7 +18,10 @@
     "overrides": {
       "react": "19.0.0",
       "react-dom": "19.0.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3"
