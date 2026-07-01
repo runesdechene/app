@@ -1,5 +1,8 @@
 /* src/components/demo/DemoKioskShell.css */
-.demo-intro { position: fixed; inset: 0; z-index: 9999; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.demo-intro { position: fixed; inset: 0; z-index: 9999; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+/* Durcissement kiosque : borne au stand (classe posée par DemoKioskShell). */
+html.demo-kiosk, html.demo-kiosk body { overscroll-behavior: none; touch-action: manipulation; }
+html.demo-kiosk *:not(input):not(textarea) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .demo-intro-bg { position: absolute; inset: 0; background-image: url('/demo-intro.jpg'); background-size: cover; background-position: center; transform-origin: center; will-change: transform; animation: demo-kenburns 28s ease-in-out infinite alternate; }
 @keyframes demo-kenburns {
   from { transform: scale(1.12) translateX(-2.5%); }
@@ -7,11 +10,49 @@
 }
 @media (prefers-reduced-motion: reduce) { .demo-intro-bg { animation: none; transform: scale(1.12); } }
 .demo-intro-veil { position: absolute; inset: 0; background: rgba(20,15,10,.55); }
-.demo-intro-content { position: relative; text-align: center; color: #fff; }
-.demo-intro-content h1 { font-size: 48px; margin-bottom: 2rem; letter-spacing: .04em; }
-.demo-intro-cta { font-size: 22px; padding: 1rem 2.5rem; border-radius: 999px; border: none; background: var(--color-accent, #C8A24B); color: #1a1208; cursor: pointer; }
-.demo-welcome { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
-.demo-welcome-card { max-width: 460px; background: var(--color-surface, #fff); border-radius: 16px; padding: 2rem; text-align: center; }
-.demo-welcome-card h2 { font-size: 22px; margin: 0 0 1rem; }
-.demo-welcome-card p { font-size: 18px; margin: 0 0 1.5rem; }
-.demo-welcome-card button { font-size: 18px; padding: .75rem 2rem; border-radius: 999px; border: none; background: var(--color-accent, #C8A24B); cursor: pointer; }
+.demo-intro-content { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 18vh 24px 11vh; text-align: center; color: #fff; }
+.demo-intro-top { display: flex; flex-direction: column; align-items: center; gap: 2.6rem; }
+.demo-intro-head { display: flex; flex-direction: column; align-items: center; }
+.demo-intro-logo { width: 180px; height: auto; filter: brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.35)); }
+.demo-intro-kicker { margin: 3.5rem 0 0; font-size: clamp(13px, 1.8vw, 47px); font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--color-accent, #cac4b6); text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+.demo-intro-title { margin: 1.5rem 0 0; font-size: clamp(38px, 8vw, 72px); font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1.12; text-shadow: 0 2px 14px rgba(0,0,0,.3); }
+.demo-title-white { color: #fff; }
+.demo-title-gold { color: var(--color-accent, #ecc15b); }
+.demo-intro-tagline { margin: 2.4rem auto 0; max-width: 40ch; font-size: clamp(16px, 2.2vw, 28px); font-weight: 500; line-height: 1.5; color: #faeed8; text-shadow: 0 1px 10px rgba(0,0,0,.1); }
+.demo-tag-num { color: var(--color-accent, #ecc15b); font-weight: 800; }
+.demo-intro-mantra { margin: 2.4rem 0 0; display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; max-width: 920px; }
+.demo-mantra-item { flex: 1 1 220px; max-width: 280px; display: flex; flex-direction: column; align-items: center; }
+.demo-mantra-icon { width: 92px; height: 122px; background-color: #faeed8; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; filter: drop-shadow(0 3px 10px rgba(0,0,0,.4)); }
+.demo-mantra-apprend { -webkit-mask-image: url("/voyageur%20qui%20apprend.svg"); mask-image: url("/voyageur%20qui%20apprend.svg"); }
+.demo-mantra-incarne { -webkit-mask-image: url("/voyageur%20qui%20incarne.svg"); mask-image: url("/voyageur%20qui%20incarne.svg"); }
+.demo-mantra-explore { -webkit-mask-image: url("/voyageur%20qui%20explore.svg"); mask-image: url("/voyageur%20qui%20explore.svg"); }
+.demo-mantra-item b { position: relative; margin-top: 16px; padding-bottom: 9px; font-size: clamp(18px, 2.4vw, 26px); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--color-accent, #ecc15b); }
+.demo-mantra-item b::after { content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 26px; height: 3px; border-radius: 2px; background: var(--color-accent, #ecc15b); }
+.demo-mantra-item > span { margin-top: 8px; font-size: clamp(13px, 1.6vw, 16px); line-height: 1.45; color: #faeed8; opacity: .92; }
+.demo-intro-stand { margin: 6px 0 0; display: flex; align-items: center; gap: 18px; max-width: 34ch; padding: 22px 30px; border-radius: 18px; background: rgba(20,15,10,.42); border: 1px solid rgba(236,193,91,.5); backdrop-filter: blur(4px); font-size: clamp(17px, 2.6vw, 26px); font-weight: 500; line-height: 1.4; color: #faeed8; text-align: left; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.demo-stand-icon { flex: 0 0 auto; width: 42px; height: 42px; fill: var(--color-accent, #ecc15b); }
+.demo-intro-stand b { color: var(--color-accent, #ecc15b); font-weight: 700; }
+.demo-intro-cta-group { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.demo-intro-hand { width: 46px; height: 46px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.55)); overflow: visible; }
+.demo-hand-tap { fill: #faeed8; transform-origin: 11px 12px; animation: demo-tap 1.8s ease-in-out infinite; }
+@keyframes demo-tap { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(3.5px); } }
+.demo-hand-ripple { fill: #faeed8; transform-box: fill-box; transform-origin: center; animation: demo-ripple 1.8s ease-out infinite; }
+@keyframes demo-ripple { 0% { transform: scale(.4); opacity: .55; } 65%, 100% { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .demo-hand-tap, .demo-hand-ripple { animation: none; } }
+.demo-intro-cta { font-size: 32px; font-weight: 600;  text-transform: uppercase; padding: 20px; border-radius: 999px; border: none; color: #faeed8; cursor: pointer; }
+.demo-welcome { position: fixed; inset: 0; z-index: 10000; background: rgba(10,7,4,.62); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; animation: demo-welcome-in .35s ease-out; }
+@keyframes demo-welcome-in { from { opacity: 0; } to { opacity: 1; } }
+.demo-welcome-card { max-width: 440px; width: 100%; background-color: var(--color-parchment, #f7ede1); background-image: url('../../assets/fond_parchemin.webp'); background-size: cover; background-position: center top; background-repeat: no-repeat; border-radius: 22px; padding: 2.2rem 2rem; text-align: center; color: var(--color-ink, #4A3728); box-shadow: 0 20px 60px rgba(74,55,40,.35); animation: demo-welcome-pop .4s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes demo-welcome-pop { from { transform: translateY(14px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+.demo-welcome-logo { display: block; margin: 0 auto; width: 78px; height: 78px; background-color: #5a4634; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; }
+.demo-welcome-title { font-size: 26px; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; margin: .7rem 0 .15rem; }
+.demo-welcome-title span { color: #C8A24B; }
+.demo-welcome-sub { font-size: 15px; line-height: 1.5; opacity: .85; margin: .4rem auto 1.6rem; max-width: 34ch; }
+.demo-welcome-sub b { color: #C8A24B; font-weight: 700; }
+.demo-welcome-steps { list-style: none; margin: .5rem 0 1.8rem; padding: 0; display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 18px; }
+.demo-welcome-steps li { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.demo-welcome-steps svg { flex: 0 0 auto; box-sizing: border-box; width: 54px; height: 54px; padding: 13px; border-radius: 50%; background: rgba(200,162,75,.15); fill: #C8A24B; }
+.demo-welcome-steps b { display: block; font-size: 14px; font-weight: 700; line-height: 1.25; color: var(--color-ink, #4A3728); }
+.demo-welcome-cta { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 15px 36px; border-radius: 999px; border: 1.5px solid #C8A24B; background: #4A3728; color: #f7ede1; cursor: pointer; transition: background .15s ease, transform .1s ease; }
+.demo-welcome-cta:hover { background: #5a4331; }
+.demo-welcome-cta:active { transform: translateY(1px); }
