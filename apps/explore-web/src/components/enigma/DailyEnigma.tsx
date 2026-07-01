@@ -101,7 +101,11 @@ export function DailyEnigma({ onClose }: DailyEnigmaProps) {
     setRpcError(null)
     setTotalGains({ influence: 0, erudition: 0 })
 
-    supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data, error }) => {
+    const request = isDemoMode()
+      ? supabase.rpc('get_demo_enigmas', { p_count: 3 })
+      : supabase.rpc('get_daily_enigma', { p_user_id: userId })
+
+    request.then(({ data, error }) => {
       if (error) {
         setRpcError(`Erreur de chargement : ${error.message ?? 'RPC indisponible'}`)
         setLoading(false)
