@@ -1,5 +1,11 @@
 /* src/components/demo/DemoKioskShell.css */
-.demo-intro { position: fixed; inset: 0; z-index: 9999; background-image: url('/demo-intro.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+.demo-intro { position: fixed; inset: 0; z-index: 9999; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.demo-intro-bg { position: absolute; inset: 0; background-image: url('/demo-intro.jpg'); background-size: cover; background-position: center; transform-origin: center; will-change: transform; animation: demo-kenburns 28s ease-in-out infinite alternate; }
+@keyframes demo-kenburns {
+  from { transform: scale(1.12) translateX(-2.5%); }
+  to   { transform: scale(1.2) translateX(2.5%); }
+}
+@media (prefers-reduced-motion: reduce) { .demo-intro-bg { animation: none; transform: scale(1.12); } }
 .demo-intro-veil { position: absolute; inset: 0; background: rgba(20,15,10,.55); }
 .demo-intro-content { position: relative; text-align: center; color: #fff; }
 .demo-intro-content h1 { font-size: 48px; margin-bottom: 2rem; letter-spacing: .04em; }

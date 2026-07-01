@@ -53,6 +53,7 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
       )}
       {showIntro && (
         <div className="demo-intro">
+          <div className="demo-intro-bg" />
           <div className="demo-intro-veil" />
           <div className="demo-intro-content">
             <h1>Runes de Chêne</h1>
