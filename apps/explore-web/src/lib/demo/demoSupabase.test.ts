@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { classifyRpc, fakeResponse, wrapSupabaseForDemo, FAKED_WRITES, OVERRIDDEN_READS } from './demoSupabase'
+import { classifyRpc, fakeResponse, wrapSupabaseForDemo, FAKED_WRITES, OVERRIDDEN_READS, validatedEnigmaResponse } from './demoSupabase'
 import { useDemoStore } from '../../stores/demoStore'
 import { getCached, setCached } from './demoReadCache'
 
 describe('classifyRpc', () => {
   it('classe les écritures faked', () => {
     expect(classifyRpc('discover_place')).toBe('faked')
-    expect(classifyRpc('answer_enigma')).toBe('faked')
     expect(classifyRpc('invest_crowns')).toBe('faked')
   })
   it('classe les lectures', () => {
@@ -20,6 +19,61 @@ describe('classifyRpc', () => {
   })
 })
 
+describe('classifyRpc — validated', () => {
+  it('classe answer_enigma / answer_fragment_enigma comme validated', () => {
+    expect(classifyRpc('answer_enigma')).toBe('validated')
+    expect(classifyRpc('answer_fragment_enigma')).toBe('validated')
+  })
+})
+
+describe('validatedEnigmaResponse', () => {
+  beforeEach(() => { useDemoStore.getState().reset() })
+
+  it('bonne réponse : renvoie correct/answer/explanation réels + incrémente la Gloire', async () => {
+    const realRpc = vi.fn().mockResolvedValue({
+      data: { correct: true, answer: 'Durin', explanation: 'Roi nain.', difficulty: 'medium' },
+      error: null,
+    })
+    const gloryBefore = useDemoStore.getState().glory
+    const { data, error } = await validatedEnigmaResponse(realRpc, { p_enigma_id: 5, p_answer: 'durin' }) as { data: any; error: any }
+    expect(error).toBeNull()
+    expect(realRpc).toHaveBeenCalledWith('check_enigma_answer', { p_enigma_id: 5, p_answer: 'durin' })
+    expect(data.correct).toBe(true)
+    expect(data.explanation).toBe('Roi nain.')
+    expect(data.crownsGain).toBe(2) // medium
+    expect(data.newCrownsBalance).toBe(Infinity)
+    expect(useDemoStore.getState().glory).toBe(gloryBefore + 1)
+  })
+
+  it('mauvaise réponse : correct=false mais explication présente', async () => {
+    const realRpc = vi.fn().mockResolvedValue({
+      data: { correct: false, answer: 'Durin', explanation: 'Roi nain.', difficulty: 'easy' },
+      error: null,
+    })
+    const { data } = await validatedEnigmaResponse(realRpc, { p_enigma_id: 5, p_answer: 'nope' }) as { data: any }
+    expect(data.correct).toBe(false)
+    expect(data.explanation).toBe('Roi nain.')
+    expect(data.crownsGain).toBe(1) // easy
+  })
+})
+
+describe('wrapSupabaseForDemo — answer_enigma validé', () => {
+  beforeEach(() => { useDemoStore.getState().reset() })
+
+  it('route vers check_enigma_answer, jamais vers answer_enigma réel', async () => {
+    const realRpc = vi.fn().mockResolvedValue({
+      data: { correct: true, answer: 'X', explanation: 'Y', difficulty: 'hard' },
+      error: null,
+    })
+    const wrapped = wrapSupabaseForDemo({ rpc: realRpc, from: vi.fn(), storage: { from: vi.fn() } })
+    const { data } = await wrapped.rpc('answer_enigma', { p_enigma_id: 9, p_answer: 'x' }) as { data: any }
+    expect(realRpc).toHaveBeenCalledWith('check_enigma_answer', { p_enigma_id: 9, p_answer: 'x' })
+    expect(realRpc).not.toHaveBeenCalledWith('answer_enigma', expect.anything())
+    expect(data.correct).toBe(true)
+    expect(data.crownsGain).toBe(3) // hard
+  })
+})
+
 describe('fakeResponse', () => {
   beforeEach(() => { useDemoStore.getState().reset() })
 
@@ -27,12 +81,6 @@ describe('fakeResponse', () => {
     const r = fakeResponse('discover_place', { p_place_id: 'place-9' })
     expect(r.error).toBeNull()
     expect(useDemoStore.getState().discoveredIds.has('place-9')).toBe(true)
-  })
-
-  it('answer_enigma renvoie toujours un succès (pas de champ error)', () => {
-    const r = fakeResponse('answer_enigma', { p_enigma_id: 'e1' }) as { data: any }
-    expect(r.data.error).toBeUndefined()
-    expect(r.data.correct).toBe(true)
   })
 
   // FIX 3: default branch throws for unknown names

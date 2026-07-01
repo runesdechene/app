@@ -3,11 +3,18 @@ import { CACHEABLE_READS, getCached, setCached } from './demoReadCache'
 
 export const FAKED_WRITES: ReadonlySet<string> = new Set([
   'discover_place',
-  'answer_enigma',
-  'answer_fragment_enigma',
   'invest_crowns',
   'harvest_crown',
 ])
+
+export const VALIDATED_WRITES: ReadonlySet<string> = new Set([
+  'answer_enigma',
+  'answer_fragment_enigma',
+])
+
+const CROWNS_BY_DIFFICULTY: Record<string, number> = {
+  very_easy: 1, easy: 1, medium: 2, hard: 3,
+}
 
 // NB : get_player_profile N'EST PAS overridé — on le laisse passer en lecture
 // réelle pour que la modale profil ait un objet complet (nom, titres, bio…).
@@ -20,7 +27,8 @@ export const OVERRIDDEN_READS: ReadonlySet<string> = new Set([
 
 const READ_PREFIXES = ['get_', 'list_', 'fetch_']
 
-export function classifyRpc(name: string): 'read' | 'faked' | 'blocked' {
+export function classifyRpc(name: string): 'read' | 'faked' | 'validated' | 'blocked' {
+  if (VALIDATED_WRITES.has(name)) return 'validated'
   if (FAKED_WRITES.has(name) || OVERRIDDEN_READS.has(name)) return 'faked'
   if (READ_PREFIXES.some((p) => name.startsWith(p))) return 'read'
   return 'blocked'
@@ -41,13 +49,6 @@ export function fakeResponse(
         error: null,
       }
     }
-    case 'answer_enigma':
-    case 'answer_fragment_enigma':
-      demo.addGlory(1)
-      return {
-        data: { correct: true, influenceGain: 1, eruditionGain: 1, newCrownsBalance: Infinity },
-        error: null,
-      }
     case 'invest_crowns':
       return { data: { success: true, newCrownsBalance: Infinity }, error: null }
     case 'harvest_crown':
@@ -61,6 +62,40 @@ export function fakeResponse(
     // FIX 3: unknown name → loud error rather than silent success
     default:
       throw new Error(`[demo] fakeResponse called for unknown name: ${name}`)
+  }
+}
+
+/**
+ * answer_enigma en démo : vraie validation via check_enigma_answer (lecture seule),
+ * puis reconstruction du payload attendu par EnigmaResult. Aucune écriture.
+ */
+export async function validatedEnigmaResponse(
+  realRpc: (name: string, args: Record<string, unknown>) => any,
+  args: Record<string, unknown>,
+): Promise<{ data: unknown; error: unknown }> {
+  const { data, error } = await realRpc('check_enigma_answer', {
+    p_enigma_id: args.p_enigma_id,
+    p_answer: args.p_answer,
+  })
+  if (error || !data || (data as { error?: string }).error) {
+    return { data: null, error: error ?? (data as { error?: string })?.error ?? 'check_failed' }
+  }
+  const d = data as { correct: boolean; answer: string; explanation: string; difficulty: string }
+  const demo = useDemoStore.getState()
+  demo.addGlory(1)
+  return {
+    data: {
+      correct: d.correct,
+      answer: d.answer,
+      explanation: d.explanation,
+      influenceGain: 1,
+      eruditionGain: 1,
+      crownsGain: CROWNS_BY_DIFFICULTY[d.difficulty] ?? 1,
+      newCrownsBalance: Infinity,
+      newErudition: 0,
+      newGlory: useDemoStore.getState().glory,
+    },
+    error: null,
   }
 }
 
@@ -146,6 +181,7 @@ export function wrapSupabaseForDemo<T extends { rpc: (...a: any[]) => any }>(cli
             return realRpc(name, args)
           }
 
+          if (kind === 'validated') return validatedEnigmaResponse(realRpc, args)
           if (kind === 'faked') return Promise.resolve(fakeResponse(name, args))
           return Promise.resolve(blockedResponse(name))
         }
