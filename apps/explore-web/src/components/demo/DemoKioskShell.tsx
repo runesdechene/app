@@ -70,8 +70,8 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
               style={{ WebkitMaskImage: `url(${runeEmblem})`, maskImage: `url(${runeEmblem})` }}
               aria-hidden="true"
             />
-            <h2 className="demo-welcome-title">Bienvenue, <span>Porteur</span></h2>
-            <p className="demo-welcome-sub">Runes de Chêne crée une carte vivante de <b>3000+ lieux</b> anciens, magiques ou atypiques de nos régions, ajoutés ou veillés par notre communauté de clients.</p>
+            <h2 className="demo-welcome-title">Bienvenue, <span>Veilleur</span></h2>
+            <p className="demo-welcome-sub"><b>Runes de Chêne - l'Application</b> est une carte vivante de <b>3000+ lieux</b> anciens, magiques ou atypiques de nos régions, ajoutés ou veillés par notre communauté de clients.</p>
             <ul className="demo-welcome-steps">
               <li>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
@@ -103,7 +103,7 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
                 <span className="demo-title-gold">Une application.</span>
               </h1>
               <p className="demo-intro-tagline">
-                La plus grosse communauté francophone jamais fédérée autour de <span className="demo-tag-num">l'Histoire, l'Aventure &amp; la Nature</span> — dans ta poche.
+                Le plus grand mouvement francophone jamais fédéré autour de <span className="demo-tag-num">l'Histoire, l'Aventure &amp; la Nature</span> — sur ton dos et dans ta poche.
               </p>
             </div>
             <div className="demo-intro-cta-group">
