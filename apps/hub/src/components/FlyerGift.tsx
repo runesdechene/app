@@ -1,0 +1,232 @@
+import { useState } from 'react'
+
+type Phase = 'form' | 'done'
+
+// Palette parchemin de l'app (index.css explore-web) — répliquée ici car le hub
+// n'a pas ces variables. Polices Bebas Neue / Cabin déjà chargées par index.html.
+const C = {
+  parchment: '#f7ede1',
+  parchmentDark: '#E8D5BE',
+  ink: '#4A3728',
+  inkLight: '#7D5A3C',
+  sepia: '#C19A6B',
+  sepiaDark: '#A0784C',
+}
+
+const SHOP_URL = 'https://runesdechene.com'
+
+export function FlyerGift() {
+  const [email, setEmail] = useState('')
+  const [phase, setPhase] = useState<Phase>('form')
+  const [promoCode, setPromoCode] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function submit() {
+    const value = email.trim().toLowerCase()
+    if (!value || !value.includes('@') || !value.includes('.')) {
+      setError('Entre une adresse email valide.')
+      return
+    }
+    setSubmitting(true)
+    setError(null)
+    try {
+      const resp = await fetch('/.netlify/functions/flyer-create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      })
+      const data = await resp.json()
+      if (!resp.ok || !data.success) {
+        setError(data.error || 'Une erreur est survenue, réessaie.')
+        return
+      }
+      setPromoCode(data.promoCode)
+      setPhase('done')
+    } catch {
+      setError('Connexion impossible, réessaie.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const pageStyle: React.CSSProperties = {
+    minHeight: '100dvh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    boxSizing: 'border-box',
+    fontFamily: "'Cabin', sans-serif",
+    background: `linear-gradient(rgba(34,24,16,0.45), rgba(34,24,16,0.62)), url(/flyer-bg.webp) center / cover no-repeat`,
+  }
+
+  return (
+    <div style={pageStyle}>
+      <a href={SHOP_URL} style={backBtn}>← Retourner sur la boutique</a>
+      <div style={panel}>
+        <img src="/cadeau.webp" alt="Cadeau Runes de Chêne" style={logo} />
+
+        {phase === 'form' ? (
+          <>
+            <h1 style={title}>
+              <span style={{ display: 'block', color: C.sepiaDark, fontSize: '0.6em', paddingBottom: 10 }}>Pendant que le monde scrolle,</span>
+              <span style={{ display: 'block', color: C.ink }}>un mouvement s'éveille</span>
+            </h1>
+            <p style={body}>
+              Répondez à l'appel pour débloquer votre premier cadeau chez Runes de Chêne.
+            </p>
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="ton@email.fr"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') submit() }}
+              style={input}
+              disabled={submitting}
+              autoFocus
+            />
+            {error && <p style={errorText}>{error}</p>}
+            <button onClick={submit} disabled={submitting} style={button}>
+              {submitting ? 'Un instant…' : 'Recevoir mon cadeau'}
+            </button>
+          </>
+        ) : (
+          <>
+            <p style={kicker}>Ton cadeau</p>
+            <h1 style={title}>Code promo boutique</h1>
+            <p style={body}>Utilise ce code à la boutique en ligne :</p>
+            <div style={codeBox}>{promoCode}</div>
+            <a href={`${SHOP_URL}/discount/${promoCode}`} style={ctaLink}>
+              J'en profite sur la boutique
+            </a>
+            <p style={{ ...body, fontSize: 16, color: C.inkLight, margin: '18px 0 0' }}>
+              Garde-le précieusement. À bientôt, Compagnon !
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const panel: React.CSSProperties = {
+  width: '100%',
+  maxWidth: 440,
+  background: `${C.parchment} url(/background-parchemin.jpg) center / cover no-repeat`,
+  border: `1px solid ${C.sepia}`,
+  borderRadius: 18,
+  padding: '40px 32px',
+  color: C.ink,
+  textAlign: 'center',
+  boxShadow: '0 18px 50px rgba(20, 12, 6, 0.45)',
+}
+const logo: React.CSSProperties = {
+  height: 84,
+  width: 'auto',
+  objectFit: 'contain',
+  margin: '0 auto 16px',
+  display: 'block',
+}
+const kicker: React.CSSProperties = {
+  fontFamily: "'Cabin Condensed', sans-serif",
+  textTransform: 'uppercase',
+  letterSpacing: '0.18em',
+  fontSize: 15,
+  color: C.sepiaDark,
+  margin: '0 0 4px',
+}
+const title: React.CSSProperties = {
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 'clamp(26px, 6.2vw, 36px)',
+  lineHeight: 1.05,
+  letterSpacing: '0.02em',
+  color: C.ink,
+  margin: '0 0 18px',
+}
+const body: React.CSSProperties = {
+  fontSize: 18,
+  lineHeight: 1.5,
+  color: C.ink,
+  margin: '0 0 22px',
+}
+const input: React.CSSProperties = {
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '14px 16px',
+  fontSize: 18,
+  fontFamily: "'Cabin', sans-serif",
+  borderRadius: 10,
+  border: `1px solid ${C.sepia}`,
+  background: '#fffaf3',
+  color: C.ink,
+  marginBottom: 12,
+  outline: 'none',
+}
+const button: React.CSSProperties = {
+  width: '100%',
+  padding: '15px 16px',
+  fontSize: 17,
+  fontFamily: "'Cabin Condensed', sans-serif",
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  borderRadius: 10,
+  border: 'none',
+  background: C.ink,
+  color: C.parchment,
+  cursor: 'pointer',
+}
+const codeBox: React.CSSProperties = {
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 34,
+  letterSpacing: '0.12em',
+  padding: '18px 12px',
+  borderRadius: 12,
+  border: `2px dashed ${C.sepiaDark}`,
+  background: C.parchmentDark,
+  color: C.ink,
+  margin: '0 0 18px',
+}
+const errorText: React.CSSProperties = {
+  color: '#a83232',
+  fontSize: 15,
+  margin: '0 0 12px',
+}
+const backBtn: React.CSSProperties = {
+  position: 'fixed',
+  top: 'calc(env(safe-area-inset-top, 0px) + 14px)',
+  left: 14,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '9px 14px',
+  borderRadius: 999,
+  background: 'rgba(34, 24, 16, 0.6)',
+  color: C.parchment,
+  border: '1px solid rgba(247, 237, 225, 0.45)',
+  fontFamily: "'Cabin Condensed', sans-serif",
+  fontSize: 15,
+  letterSpacing: '0.02em',
+  textDecoration: 'none',
+  zIndex: 10,
+  backdropFilter: 'blur(2px)',
+}
+const ctaLink: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '15px 16px',
+  fontSize: 17,
+  fontFamily: "'Cabin Condensed', sans-serif",
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  borderRadius: 10,
+  background: C.ink,
+  color: C.parchment,
+  textDecoration: 'none',
+  textAlign: 'center',
+}

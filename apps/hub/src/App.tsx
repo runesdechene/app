@@ -6,6 +6,8 @@ import { Users } from './components/Users'
 import { UserDetail } from './components/UserDetail'
 import { Photos } from './components/Photos'
 import { StudioSubmit } from './components/StudioSubmit'
+import { FlyerGift } from './components/FlyerGift'
+import { FlyerLinks } from './components/FlyerLinks'
 import { TagsManager } from './components/TagsManager'
 import { Factions } from './components/Factions'
 import { TitlesManager } from './components/TitlesManager'
@@ -45,13 +47,15 @@ function App() {
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
-  const publicRoutes = ['/soumettre-contenu']
+  const publicRoutes = ['/soumettre-contenu', '/flyercadeau', '/flyer']
   const isPublicRoute = publicRoutes.includes(location.pathname)
 
   if (isPublicRoute) {
     return (
       <Routes>
         <Route path="/soumettre-contenu" element={<StudioSubmit />} />
+        <Route path="/flyercadeau" element={<FlyerGift />} />
+        <Route path="/flyer" element={<FlyerLinks />} />
       </Routes>
     )
   }
