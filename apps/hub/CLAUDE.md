@@ -74,3 +74,18 @@ mot + département / identité), sur `/soumettre-contenu` (remplace l'ancien `Ph
 Écrit `departement`/`quest_ref` (`?quete=`) + `size` par photo via `create_photo_submission` /
 `add_submission_image` étendus (mig 177) ; config images via `get_studio_config` (`app_settings`
 `studio_bg_image_url`/`studio_aside_image_url`). Esthétique parchemin/landing (Bebas/Cabin).
+
+## Modération des lieux (2026-07-07)
+
+> Spec : `docs/superpowers/specs/2026-07-07-moderation-lieux-hub-design.md`
+> Plan : `docs/superpowers/plans/2026-07-07-moderation-lieux-hub.md` (mig 329)
+
+Page `/moderation` (`components/moderation/`) pour le rôle **`moderator`** (et admin).
+Un modérateur pur n'accède qu'à **Modération** + **Tags** (gate dans `App.tsx` +
+`Sidebar` conditionnée à `isAdmin`). Édition via RPCs privilégiées `mod_*`
+(gate `_is_staff`, jamais la garde présence joueur, aucune écriture jeu) :
+`mod_list_places` / `mod_get_place` / `mod_set_place_tags` / `mod_update_place` /
+`mod_set_masked` / `mod_set_verified`. Audit : `place_moderation_log` +
+`place_tags_revisions`. « Vérifié » = `places.verified_at/verified_by` (action
+explicite, découplée de l'édition). Retrait = **masquage réversible seul**, pas
+de suppression dure côté mod.
