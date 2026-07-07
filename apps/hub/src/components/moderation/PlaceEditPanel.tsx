@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import type { ModTag, ModPlaceDetail } from './types'
 import { TagPicker } from './TagPicker'
@@ -19,9 +19,8 @@ export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Pro
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
 
-  useEffect(() => {
+  const loadDetail = useCallback(() => {
     let active = true
-    setDetail(null)
     supabase.rpc('mod_get_place', { p_place_id: placeId }).then(({ data }) => {
       if (!active || !data || (data as { error?: string }).error) return
       const d = data as ModPlaceDetail
@@ -33,13 +32,21 @@ export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Pro
     return () => { active = false }
   }, [placeId])
 
+  useEffect(() => {
+    setDetail(null)
+    return loadDetail()
+  }, [placeId, loadDetail])
+
   async function call(fn: string, params: Record<string, unknown>, ok: string) {
     setBusy(true); setMsg(null)
     try {
       const { data, error } = await supabase.rpc(fn, params)
       const err = error?.message ?? (data as { error?: string })?.error
       setMsg(err ? `Erreur : ${err}` : ok)
-      if (!err) onChanged()
+      if (!err) {
+        onChanged()
+        loadDetail()
+      }
     } finally {
       setBusy(false)
     }

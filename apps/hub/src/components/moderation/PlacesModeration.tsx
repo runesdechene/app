@@ -10,6 +10,7 @@ export function PlacesModeration() {
   const [filter, setFilter] = useState<ModFilter>('unverified')
   const [search, setSearch] = useState('')
   const [debounced, setDebounced] = useState('')
+  const [tagId, setTagId] = useState('')
   const [page, setPage] = useState(0)
   const [rows, setRows] = useState<ModListRow[]>([])
   const [total, setTotal] = useState(0)
@@ -31,7 +32,7 @@ export function PlacesModeration() {
       const { data, error } = await supabase.rpc('mod_list_places', {
         p_search: debounced || null,
         p_filter: filter,
-        p_tag_id: null,
+        p_tag_id: tagId || null,
         p_limit: PAGE,
         p_offset: page * PAGE,
       })
@@ -43,7 +44,7 @@ export function PlacesModeration() {
     } finally {
       setLoading(false)
     }
-  }, [debounced, filter, page])
+  }, [debounced, filter, tagId, page])
 
   // Compteurs de progression (vérifiés / total) — indépendants du filtre courant.
   const fetchCounters = useCallback(async () => {
@@ -87,10 +88,21 @@ export function PlacesModeration() {
           <button key={f} className={`mod-pill${filter === f ? ' active' : ''}`}
                   onClick={() => { setFilter(f); setPage(0) }}>
             {f === 'unverified' ? 'À traiter' : f === 'verified' ? 'Vérifiés' : 'Tous'}
+            {' '}
+            <span className="mod-pill-count">
+              ({f === 'unverified' ? grandTotal - verifiedTotal : f === 'verified' ? verifiedTotal : grandTotal})
+            </span>
           </button>
         ))}
         <input className="mod-search" placeholder="🔍 Rechercher par titre…"
                value={search} onChange={e => setSearch(e.target.value)} />
+        <select className="mod-select" value={tagId}
+                onChange={e => { setTagId(e.target.value); setPage(0) }}>
+          <option value="">Tous les tags</option>
+          {allTags.map(t => (
+            <option key={t.id} value={t.id}>{t.title}</option>
+          ))}
+        </select>
       </div>
 
       {loading ? <div className="loading">Chargement...</div> : (
