@@ -4344,3 +4344,37 @@ table select {
 }
 .ud-award-btn:disabled { opacity: .5; cursor: not-allowed; }
 .ud-award-ok { color: var(--color-primary); margin-top: 8px; }
+
+/* ── Modération des lieux ─────────────────────────────── */
+.mod-wrap { max-width: 1000px; }
+.mod-head { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+.mod-title { font-size:22px; font-weight:700; margin:0; }
+.mod-progress { flex:1; min-width:220px; }
+.mod-progress-bar { height:8px; background:#e7d9c4; border-radius:6px; overflow:hidden; }
+.mod-progress-fill { height:100%; background:linear-gradient(90deg,#8a6d3b,#c19a6b); transition:width .3s; }
+.mod-progress-label { font-size:12px; color:#7a6a55; margin-top:4px; }
+.mod-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+.mod-pill { padding:6px 12px; border-radius:20px; border:1px solid #d8c6a8; background:#f5ecdd; font-size:13px; cursor:pointer; }
+.mod-pill.active { background:#3a2f25; color:#f5ecdd; border-color:#3a2f25; }
+.mod-search { flex:1; min-width:160px; padding:7px 12px; border-radius:8px; border:1px solid #d8c6a8; background:#fffaf0; font-size:13px; }
+.mod-row { background:#fffaf0; border:1px solid #e7d9c4; border-radius:10px; margin-bottom:8px; overflow:hidden; }
+.mod-row.open { border-color:#c19a6b; box-shadow:0 2px 10px rgba(138,109,59,.12); }
+.mod-row-main { display:grid; grid-template-columns:56px 1fr auto; gap:12px; padding:12px; align-items:center; cursor:pointer; }
+.mod-thumb { width:56px; height:56px; border-radius:8px; background:#e7d9c4; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.mod-row-body h4 { margin:0 0 4px; font-size:15px; }
+.mod-badges { display:flex; gap:5px; flex-wrap:wrap; margin:4px 0; }
+.mod-badge { font-size:11px; padding:2px 9px; border-radius:12px; font-weight:600; }
+.mod-badge.primary { outline:2px solid rgba(0,0,0,.15); outline-offset:1px; }
+.mod-meta { font-size:12px; color:#7a6a55; display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
+.mod-meta b { color:#5a4a38; font-weight:600; }
+.mod-flag { font-size:10px; padding:2px 7px; border-radius:5px; background:#f0e2cc; color:#8a6d3b; }
+.mod-flag.warn { background:#f6dede; color:#a23; }
+.mod-row-state { text-align:right; }
+.mod-vstate { font-size:12px; font-weight:600; }
+.mod-vstate.no { color:#b8860b; }
+.mod-vstate.ok { color:#3d8b3d; }
+.mod-vsub { font-size:11px; color:#9a8a75; }
+.mod-pager { display:flex; gap:12px; align-items:center; justify-content:center; margin-top:14px; font-size:13px; color:#7a6a55; }
+.mod-pager button { padding:6px 12px; border-radius:8px; border:1px solid #d8c6a8; background:#f5ecdd; cursor:pointer; }
+.mod-pager button:disabled { opacity:.4; cursor:default; }
+.mod-empty { color:#7a6a55; font-size:14px; }
