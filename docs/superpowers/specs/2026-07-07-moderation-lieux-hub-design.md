@@ -122,16 +122,35 @@ service_role` (le gate `_is_staff` fait le filtrage réel).
 - Barre de progression : `X / 3083 vérifiés`.
 
 ### Liste (paginée serveur, 50/page)
-Colonnes : titre · tags (badges, style page Tags) · auteur · adresse · pastille
-état vérifié. Pager précédent/suivant (offset/limit) alimenté par `total`.
+Chaque ligne, orientée **jugement rapide** (validé maquette 2026-07-07) :
+vignette · titre · tags (badges, 1er = principal) · **auteur** · **ancienneté**
+(`il y a X`) · adresse · **nb de visites** · **nb de photos** · pastille état
+vérifié. Pager précédent/suivant (offset/limit) alimenté par `total`.
+
+**Signaux d'alerte** affichés en ligne (aident à repérer un lieu à retirer) :
+flag rouge « tag douteux » (heuristique légère, ex. 0 tag ou tag incohérent),
+et mise en avant de `0 visite` / `0 photo` sur un compte récent. Purement
+indicatif, ne bloque rien.
 
 ### Panneau d'édition (clic sur une ligne)
+Deux colonnes.
+
+**Gauche — éditable :**
 - Sélecteur de tags : badges issus de la table `tags`, max 3, 1er sélectionné =
-  primary. Sauve via `mod_set_place_tags`.
+  primary (marqué ★). Sauve via `mod_set_place_tags`.
 - Champs `title`, `text`, toggle `sensible`. Sauve via `mod_update_place`.
-- Boutons d'action :
-  - `Marquer comme vérifié` / `Retirer la vérification` (bascule, `mod_set_verified`).
-  - `Masquer` / `Démasquer` (`mod_set_masked`).
+
+**Droite — contexte lecture seule** (le « maximum d'infos » demandé) : `id`,
+auteur (+ niveau & nombre de lieux créés, pour flairer un compte douteux), date
+de création + de modif, adresse complète, coords (lien Maps), compteurs
+**visites / découvertes / influence / photos / note moyenne**, état
+(visible|masqué, sensible), historique de vérification. Toutes ces valeurs sont
+renvoyées par `mod_list_places` (ou une `mod_get_place(place_id)` dédiée si la
+charge par ligne devient lourde — à trancher au plan).
+
+**Actions :**
+- `Marquer comme vérifié` / `Retirer la vérification` (bascule, `mod_set_verified`).
+- `Masquer` / `Démasquer` (`mod_set_masked`).
 - Après toute action : refetch serveur (règle Hub « refetch après save ») ; la
   ligne se met à jour et sort de la file `À traiter` si vérifiée.
 
