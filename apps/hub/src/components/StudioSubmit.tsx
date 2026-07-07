@@ -156,6 +156,34 @@ export function StudioSubmit() {
     if (!canSubmit) return
     setPhase('uploading')
     try {
+      // 1. Uploader les fichiers AVANT toute écriture métier. Ainsi un échec d'upload
+      //    ne laisse jamais de soumission vide orpheline, et un fichier fautif (vidéo
+      //    trop lourde, format exotique) n'emporte plus tout le lot avec lui.
+      const folder = crypto.randomUUID()
+      const uploaded: { path: string; url: string; size: string | null }[] = []
+      const failures: string[] = []
+      for (let i = 0; i < files.length; i++) {
+        let file = files[i]
+        if (isImage(file)) {
+          setProgress(`Compression ${i + 1}/${files.length}…`)
+          try { file = await compressImage(file) } catch { file = files[i] }
+        }
+        setProgress(`Envoi ${i + 1}/${files.length}…`)
+        const ext = file.name.split('.').pop() || 'webp'
+        const path = `submissions/${folder}/${crypto.randomUUID()}.${ext}`
+        const { error: upErr } = await supabase.storage.from('community-photos').upload(path, file, { contentType: file.type, upsert: false })
+        if (upErr) { failures.push(`« ${files[i].name} » : ${upErr.message}`); continue }
+        const { data: urlData } = supabase.storage.from('community-photos').getPublicUrl(path)
+        uploaded.push({ path, url: urlData.publicUrl, size: sizes[i] })
+      }
+
+      // 2. Aucun fichier n'a pu être envoyé → on n'enregistre RIEN (pas de compte ni de
+      //    soumission créés pour rien). L'utilisateur voit l'erreur réelle du 1er fichier.
+      if (uploaded.length === 0) {
+        throw new Error(failures[0] || "Aucun de tes contenus n'a pu être envoyé. Réessaie ou change de fichier.")
+      }
+
+      // 3. Compte
       setProgress('Vérification du compte…')
       const { data: existing } = await supabase.from('users').select('id').eq('email_address', email.toLowerCase().trim()).limit(1)
       let userId: string
@@ -170,6 +198,7 @@ export function StudioSubmit() {
         userId = newId
       }
 
+      // 4. Soumission (seulement maintenant qu'on a au moins une image en storage)
       setProgress('Enregistrement…')
       const parsedHeightCm = (() => { const h = parseInt(heightCm, 10); return Number.isFinite(h) && h >= 100 && h <= 250 ? h : null })()
       const { data: subId, error: subErr } = await supabase.rpc('create_photo_submission', {
@@ -184,23 +213,17 @@ export function StudioSubmit() {
       })
       if (subErr) throw new Error(`Soumission : ${subErr.message}`)
 
-      for (let i = 0; i < files.length; i++) {
-        let file = files[i]
-        if (isImage(file)) {
-          setProgress(`Compression ${i + 1}/${files.length}…`)
-          try { file = await compressImage(file) } catch { file = files[i] }
-        }
-        setProgress(`Envoi ${i + 1}/${files.length}…`)
-        const ext = file.name.split('.').pop() || 'webp'
-        const path = `submissions/${subId}/${crypto.randomUUID()}.${ext}`
-        const { error: upErr } = await supabase.storage.from('community-photos').upload(path, file, { contentType: file.type, upsert: false })
-        if (upErr) throw new Error(`Upload ${i + 1} : ${upErr.message}`)
-        const { data: urlData } = supabase.storage.from('community-photos').getPublicUrl(path)
+      // 5. Rattacher les images déjà uploadées
+      for (let i = 0; i < uploaded.length; i++) {
+        const img = uploaded[i]
         const { error: imgErr } = await supabase.rpc('add_submission_image', {
-          p_submission_id: subId, p_storage_path: path, p_image_url: urlData.publicUrl, p_sort_order: i, p_size: sizes[i],
+          p_submission_id: subId, p_storage_path: img.path, p_image_url: img.url, p_sort_order: i, p_size: img.size,
         })
-        if (imgErr) throw new Error(`Fichier ${i + 1} : ${imgErr.message}`)
+        if (imgErr) throw new Error(`Enregistrement image ${i + 1} : ${imgErr.message}`)
       }
+
+      // Succès partiel : certains fichiers ont été ignorés mais au moins un est passé.
+      if (failures.length > 0) console.warn('[StudioSubmit] fichiers ignorés :', failures)
       setPhase('success')
     } catch (err) {
       console.error('[StudioSubmit] submit failed', err)
