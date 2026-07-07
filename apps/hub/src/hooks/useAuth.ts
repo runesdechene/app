@@ -61,5 +61,7 @@ export function useAuth() {
     signOut,
     isAuthenticated: !!state.user,
     isAdmin: state.role === 'admin',
+    isModerator: state.role === 'moderator',
+    isStaff: state.role === 'admin' || state.role === 'moderator',
   }
 }

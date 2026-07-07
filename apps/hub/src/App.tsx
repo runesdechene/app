@@ -27,6 +27,7 @@ import { ShopifySync } from './components/ShopifySync'
 import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
 import { Sidebar } from './components/Sidebar'
+import { PlacesModeration } from './components/moderation/PlacesModeration'
 import './App.css'
 
 function AccessDenied({ onSignOut, email, role }: { onSignOut: () => void; email?: string; role?: string | null }) {
@@ -43,7 +44,7 @@ function AccessDenied({ onSignOut, email, role }: { onSignOut: () => void; email
 }
 
 function App() {
-  const { user, role, loading, isAuthenticated, isAdmin, signOut } = useAuth()
+  const { user, role, loading, isAuthenticated, isAdmin, isModerator, isStaff, signOut } = useAuth()
   const location = useLocation()
 
   // Routes publiques (pas besoin d'auth)
@@ -73,19 +74,36 @@ function App() {
     return <LoginPage />
   }
 
-  if (!isAdmin) {
+  if (!isStaff) {
     return <AccessDenied onSignOut={signOut} email={user?.email} role={role} />
+  }
+
+  // Modérateur pur : accès limité à Modération + Tags.
+  if (isModerator && !isAdmin) {
+    return (
+      <div className="app">
+        <Sidebar user={user} role={role} isAdmin={isAdmin} />
+        <main className="main-content">
+          <Routes>
+            <Route path="/moderation" element={<PlacesModeration />} />
+            <Route path="/carte/tags" element={<TagsManager />} />
+            <Route path="*" element={<PlacesModeration />} />
+          </Routes>
+        </main>
+      </div>
+    )
   }
 
   return (
     <div className="app">
-      <Sidebar user={user} />
+      <Sidebar user={user} role={role} isAdmin={isAdmin} />
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<UserDetail />} />
           <Route path="/photos" element={<Photos />} />
+          <Route path="/moderation" element={<PlacesModeration />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />
