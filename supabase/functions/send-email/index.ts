@@ -97,6 +97,53 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+// Relance « tes contenus ne nous sont pas parvenus » — envoyée manuellement aux
+// personnes dont la soumission a échoué en silence (bug storage community-photos,
+// corrigé mig 331). Le prénom vient de data.first_name (celui tapé au formulaire),
+// avec fallback sur le pseudo du compte. Volontairement time-agnostic → réutilisable.
+function renderContentRetry(firstName: string): { subject: string; html: string } {
+  const name = escapeHtml(firstName?.trim() || 'Ami du Mouvement')
+  const studioUrl = 'https://hub.runesdechene.com/soumettre-contenu'
+  return {
+    subject: 'Tes contenus ne nous sont pas parvenus — réessaie ✦',
+    html: `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"></head>
+<body style="margin:0;padding:0;background:#e3d4b6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e9ddc7;background:linear-gradient(180deg,#efe4cf 0%,#e1d1b2 100%);padding:32px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;background:#f7f1e3;border:1px solid #d8c39a;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(40,30,16,0.20);">
+        <tr><td style="font-size:0;line-height:0;">
+          <img src="https://app.runesdechene.com/email-banner.jpg" alt="" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+        </td></tr>
+        <tr><td align="center" style="padding:34px 40px 0;">
+          <img src="https://app.runesdechene.com/email-logo.png" alt="Runes de Chêne" width="360" style="display:block;width:360px;max-width:88%;height:auto;border:0;" />
+        </td></tr>
+        <tr><td align="center" style="padding:26px 44px 0;">
+          <h1 style="margin:0;font-family:Georgia,'Hoefler Text',serif;font-weight:normal;font-size:30px;line-height:1.2;color:#2b2114;">Oups, ${name}…</h1>
+        </td></tr>
+        <tr><td style="padding:22px 46px 0;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.7;color:#5b4d38;">Tu as tenté récemment de partager tes contenus avec le Mouvement — mais un bug de <em>notre</em> côté les a avalés en silence avant qu'ils n'arrivent jusqu'à nous. Rien de ta faute : le formulaire acceptait des fichiers que notre serveur refusait.</p>
+          <p style="margin:16px 0 0;font-family:Georgia,serif;font-size:16px;line-height:1.7;color:#5b4d38;">C'est <strong style="color:#2b2114;">corrigé</strong>, et cette fois ça passera. Renvoie-les quand tu veux :</p>
+        </td></tr>
+        <tr><td align="center" style="padding:26px 0 4px;">
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" style="border-radius:10px;background:#8a6d3b;background:linear-gradient(180deg,#a9874c,#876a39);box-shadow:0 6px 16px rgba(138,109,59,0.40);">
+            <a href="${studioUrl}" style="display:inline-block;padding:15px 36px;font-family:Georgia,serif;font-size:16px;color:#fff7e8;text-decoration:none;letter-spacing:.5px;">Renvoyer mes contenus&nbsp;→</a>
+          </td></tr></table>
+        </td></tr>
+        <tr><td align="center" style="padding:22px 48px 0;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:16px;line-height:1.65;color:#5b4d38;">Tes Couronnes de Chêne t'attendent dès validation.<br>Merci de porter les couleurs.</p>
+        </td></tr>
+        <tr><td align="center" style="padding:30px 48px 0;"><div style="font-size:13px;color:#c4ac80;letter-spacing:5px;">✦&nbsp;⚜&nbsp;✦</div></td></tr>
+        <tr><td align="center" style="padding:14px 48px 38px;">
+          <p style="margin:0;font-family:Georgia,serif;font-size:12px;line-height:1.6;color:#9b8b6e;font-style:italic;">Tu reçois ce message car tu as tenté de partager du contenu avec Runes de Chêne.<br>À très vite sur les chemins.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`,
+  }
+}
+
 function renderCrownsAwarded(firstName: string, crowns: number, reason: string): { subject: string; html: string } {
   const name = escapeHtml(firstName?.trim() || 'Ami du Mouvement')
   const safeReason = escapeHtml((reason || '').trim())
@@ -207,7 +254,7 @@ serve(async (req) => {
   let body: RequestBody
   try { body = await req.json() as RequestBody } catch { return new Response('bad json', { status: 400 }) }
 
-  if (body.type !== 'contribution_approved' && body.type !== 'crowns_awarded' && body.type !== 'fin_de_coupe') return ok()
+  if (body.type !== 'contribution_approved' && body.type !== 'crowns_awarded' && body.type !== 'fin_de_coupe' && body.type !== 'content_retry') return ok()
 
   const { data: user, error } = await supabase
     .from('users')
@@ -218,10 +265,13 @@ serve(async (req) => {
 
   const crowns = Number((body.data as { crowns?: number })?.crowns ?? 0)
   const reason = String((body.data as { reason?: string })?.reason ?? '')
+  const nameOverride = String((body.data as { first_name?: string })?.first_name ?? '')
   const { subject, html } = body.type === 'fin_de_coupe'
     ? renderFinDeCoupe(user.first_name ?? '')
     : body.type === 'crowns_awarded'
     ? renderCrownsAwarded(user.first_name ?? '', crowns, reason)
+    : body.type === 'content_retry'
+    ? renderContentRetry(nameOverride || (user.first_name ?? ''))
     : renderContributionApproved(user.first_name ?? '', crowns)
 
   const resp = await fetch('https://api.resend.com/emails', {
