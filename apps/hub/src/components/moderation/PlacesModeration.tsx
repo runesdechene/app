@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
-import type { ModFilter, ModListResult, ModListRow } from './types'
+import type { ModFilter, ModListResult, ModListRow, ModTag } from './types'
 import { PlaceRow } from './PlaceRow'
+import { PlaceEditPanel } from './PlaceEditPanel'
 
 const PAGE = 50
 
@@ -16,6 +17,7 @@ export function PlacesModeration() {
   const [grandTotal, setGrandTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [openId, setOpenId] = useState<string | null>(null)
+  const [allTags, setAllTags] = useState<ModTag[]>([])
 
   // Debounce recherche
   useEffect(() => {
@@ -56,10 +58,16 @@ export function PlacesModeration() {
   useEffect(() => { fetchList() }, [fetchList])
   useEffect(() => { fetchCounters() }, [fetchCounters])
 
+  useEffect(() => {
+    supabase.from('tags').select('id, title, color, background').order('order')
+      .then(({ data }) => {
+        if (Array.isArray(data)) {
+          setAllTags(data.map(t => ({ ...t, is_primary: false } as ModTag)))
+        }
+      })
+  }, [])
+
   function refreshAll() { fetchList(); fetchCounters() }
-  // Pas encore appelée : câblée sur les actions de modération en Task 4.
-  // Référencée ici pour satisfaire `noUnusedLocals` (tsconfig strict) en attendant.
-  void refreshAll
 
   const pages = Math.max(1, Math.ceil(total / PAGE))
   const pct = grandTotal > 0 ? Math.round((verifiedTotal / grandTotal) * 100) : 0
@@ -92,7 +100,14 @@ export function PlacesModeration() {
             <div key={row.id} className={`mod-row${openId === row.id ? ' open' : ''}`}>
               <PlaceRow row={row} open={openId === row.id}
                         onToggle={() => setOpenId(openId === row.id ? null : row.id)} />
-              {/* Panneau d'édition ajouté en Task 4 */}
+              {openId === row.id && (
+                <PlaceEditPanel
+                  placeId={row.id}
+                  currentTags={row.tags}
+                  allTags={allTags}
+                  onChanged={refreshAll}
+                />
+              )}
             </div>
           ))}
 
