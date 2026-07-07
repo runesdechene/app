@@ -6,6 +6,12 @@ export interface ModTag {
   is_primary: boolean
 }
 
+export interface ModPlaceImage {
+  id?: string
+  url: string
+  thumb?: string
+}
+
 export interface ModListRow {
   id: string
   title: string
@@ -20,6 +26,7 @@ export interface ModListRow {
   author_name: string | null
   verified_by_name: string | null
   photo_count: number
+  thumb_url: string | null
   visit_count: number
   tags: ModTag[]
 }
@@ -53,4 +60,5 @@ export interface ModPlaceDetail {
   rating_avg: number | null
   rating_count: number
   photo_count: number
+  images: ModPlaceImage[]
 }

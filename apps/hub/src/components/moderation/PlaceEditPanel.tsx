@@ -82,7 +82,7 @@ export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Pro
         </div>
         <div className="mod-field">
           <label>Description</label>
-          <textarea rows={3} value={text} onChange={e => setText(e.target.value)} />
+          <textarea className="mod-textarea" rows={10} value={text} onChange={e => setText(e.target.value)} />
         </div>
         <label className="mod-toggle">
           <input type="checkbox" checked={sensible} onChange={e => setSensible(e.target.checked)} />
@@ -108,6 +108,16 @@ export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Pro
           <div><b>Vérif. :</b> {detail.verified_at ? `${detail.verified_by_name ?? ''} · ${new Date(detail.verified_at).toLocaleDateString('fr-FR')}` : 'jamais'}</div>
         </div>
       </div>
+
+      {detail.images.length > 0 && (
+        <div className="mod-gallery">
+          {detail.images.map((img, i) => (
+            <a key={img.id ?? i} href={img.url} target="_blank" rel="noreferrer" title="Ouvrir en grand">
+              <img src={img.thumb ?? img.url} alt="" loading="lazy" />
+            </a>
+          ))}
+        </div>
+      )}
 
       <div className="mod-actions">
         <button className="mod-btn verify" onClick={toggleVerified} disabled={busy}>

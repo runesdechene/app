@@ -11,7 +11,11 @@ export function PlaceRow({ row, open, onToggle }: Props) {
   const suspicious = row.tags.length === 0 || (row.visit_count === 0 && row.photo_count === 0)
   return (
     <div className={`mod-row-main${open ? ' open' : ''}`} onClick={onToggle}>
-      <div className="mod-thumb">🗺️</div>
+      <div className="mod-thumb">
+        {row.thumb_url
+          ? <img src={row.thumb_url} alt="" loading="lazy" />
+          : <span>🗺️</span>}
+      </div>
       <div className="mod-row-body">
         <h4>{row.title || <em>(sans titre)</em>}</h4>
         <div className="mod-badges">
