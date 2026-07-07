@@ -15,6 +15,7 @@ export function PlacesModeration() {
   const [page, setPage] = useState(0)
   const [rows, setRows] = useState<ModListRow[]>([])
   const [total, setTotal] = useState(0)
+  const [unverifiedTotal, setUnverifiedTotal] = useState(0)
   const [verifiedTotal, setVerifiedTotal] = useState(0)
   const [maskedTotal, setMaskedTotal] = useState(0)
   const [grandTotal, setGrandTotal] = useState(0)
@@ -55,12 +56,14 @@ export function PlacesModeration() {
 
   // Compteurs de progression (vérifiés / total) — indépendants du filtre courant.
   const fetchCounters = useCallback(async () => {
-    const [{ data: all }, { data: ver }, { data: msk }] = await Promise.all([
+    const [{ data: all }, { data: unv }, { data: ver }, { data: msk }] = await Promise.all([
       supabase.rpc('mod_list_places', { p_search: null, p_filter: 'all', p_tag_id: null, p_limit: 1, p_offset: 0 }),
+      supabase.rpc('mod_list_places', { p_search: null, p_filter: 'unverified', p_tag_id: null, p_limit: 1, p_offset: 0 }),
       supabase.rpc('mod_list_places', { p_search: null, p_filter: 'verified', p_tag_id: null, p_limit: 1, p_offset: 0 }),
       supabase.rpc('mod_list_places', { p_search: null, p_filter: 'masked', p_tag_id: null, p_limit: 1, p_offset: 0 }),
     ])
     if (all && !(all as { error?: string }).error) setGrandTotal((all as ModListResult).total)
+    if (unv && !(unv as { error?: string }).error) setUnverifiedTotal((unv as ModListResult).total)
     if (ver && !(ver as { error?: string }).error) setVerifiedTotal((ver as ModListResult).total)
     if (msk && !(msk as { error?: string }).error) setMaskedTotal((msk as ModListResult).total)
   }, [])
@@ -95,7 +98,7 @@ export function PlacesModeration() {
       <div className="mod-toolbar">
         {(['unverified', 'verified', 'masked', 'all'] as ModFilter[]).map(f => {
           const label = f === 'unverified' ? 'À traiter' : f === 'verified' ? 'Vérifiés' : f === 'masked' ? 'Masqués' : 'Tous'
-          const count = f === 'unverified' ? grandTotal - verifiedTotal : f === 'verified' ? verifiedTotal : f === 'masked' ? maskedTotal : grandTotal
+          const count = f === 'unverified' ? unverifiedTotal : f === 'verified' ? verifiedTotal : f === 'masked' ? maskedTotal : grandTotal
           return (
             <button key={f} className={`mod-pill${filter === f ? ' active' : ''}`}
                     onClick={() => { setFilter(f); setPage(0) }}>
