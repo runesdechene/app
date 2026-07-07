@@ -4,6 +4,7 @@ import { MapActivityList } from '../home/MapActivityList'
 import { ChangelogList } from '../changelog/ChangelogList'
 import { useUnreadActivityCount, markActivitySeen } from '../../hooks/useUnreadActivityCount'
 import { currentChangelog, isChangelogUnseen, markChangelogSeen } from '../../lib/changelog'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import './DesktopSidebar.css'
 
 type SidebarTab = 'home' | 'activite' | 'maj'
@@ -71,18 +72,21 @@ export function DesktopSidebar({ openFactionModal, collapsed, onToggleCollapsed 
             <span className="desktop-sidebar-tab-badge">{unread > 99 ? '99+' : unread}</span>
           )}
         </button>
-        <button
-          type="button"
-          className={`desktop-sidebar-tab${tab === 'maj' && !collapsed ? ' is-active' : ''}`}
-          onClick={() => pick('maj')}
-          aria-current={tab === 'maj' && !collapsed}
-        >
-          <span className="desktop-sidebar-tab-icon" aria-hidden>✨</span>
-          <span className="desktop-sidebar-tab-label">Mise à jour</span>
-          {majUnseen && (tab !== 'maj' || collapsed) && (
-            <span className="desktop-sidebar-tab-badge desktop-sidebar-tab-badge--dot" aria-label="Nouveautés" />
-          )}
-        </button>
+        {/* Borne démo : pas de bloc « Mise à jour »/nouveautés. */}
+        {!isDemoMode() && (
+          <button
+            type="button"
+            className={`desktop-sidebar-tab${tab === 'maj' && !collapsed ? ' is-active' : ''}`}
+            onClick={() => pick('maj')}
+            aria-current={tab === 'maj' && !collapsed}
+          >
+            <span className="desktop-sidebar-tab-icon" aria-hidden>✨</span>
+            <span className="desktop-sidebar-tab-label">Mise à jour</span>
+            {majUnseen && (tab !== 'maj' || collapsed) && (
+              <span className="desktop-sidebar-tab-badge desktop-sidebar-tab-badge--dot" aria-label="Nouveautés" />
+            )}
+          </button>
+        )}
       </nav>
 
       <div className="desktop-sidebar-content" aria-hidden={collapsed}>

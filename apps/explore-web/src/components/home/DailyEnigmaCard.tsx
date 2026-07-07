@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { usePlayerStore } from '../../stores/playerStore'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import { EnigmaMenu, type EnigmaMenuFragment } from '../enigma/EnigmaMenu'
 import parcheminIcon from '../../assets/parchemin.png'
 import './DailyEnigmaCard.css'
@@ -35,7 +36,8 @@ export function DailyEnigmaCard({ onOpen, onOpenFragment, refreshKey }: Props) {
     supabase.rpc('get_daily_enigma', { p_user_id: userId }).then(({ data }) => {
       if (cancelled) return
       const d = data as { all_answered?: boolean } | null
-      setDailyDone(!!d?.all_answered)
+      // Borne démo : énigmes infinies → la carte reste toujours disponible.
+      setDailyDone(isDemoMode() ? false : !!d?.all_answered)
     })
 
     supabase.rpc('get_my_fragment_status', { p_user_id: userId }).then(({ data }) => {

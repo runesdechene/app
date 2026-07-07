@@ -1,6 +1,7 @@
 import { useChangelogStore } from '../../../stores/changelogStore'
 import { ChangelogList } from '../../changelog/ChangelogList'
 import { currentChangelog, shortVersion, markChangelogSeen } from '../../../lib/changelog'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 import './VersionBadge.css'
 
 interface VersionBadgeProps {
@@ -17,6 +18,7 @@ interface VersionBadgeProps {
  */
 export function VersionBadge({ variant = 'overlay' }: VersionBadgeProps = {}) {
   const open = useChangelogStore(s => s.open)
+  if (isDemoMode()) return null // borne démo : pas de badge nouveautés
   if (!currentChangelog) return null
   return (
     <button

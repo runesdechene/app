@@ -6,6 +6,9 @@ import RequireAuth from './components/RequireAuth'
 import { InstallPrompt } from './components/pwa/InstallPrompt'
 import { AppLoader } from './components/AppLoader'
 import { useIsDesktop } from './hooks/useMediaQuery'
+import { isDemoMode } from './lib/demo/isDemoMode'
+import { DemoKioskShell } from './components/demo/DemoKioskShell'
+import { useDemoBootstrap } from './hooks/useDemoBootstrap'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -29,6 +32,9 @@ function MobileOnly({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const demo = isDemoMode()
+  useDemoBootstrap()
+
   // Lien d'invitation Compagnie : capturer ?company=<id> dès le chargement (même
   // déconnecté sur la LandingPage) → consommé après auth par useCompanyInvite.
   useEffect(() => {
@@ -39,11 +45,11 @@ export default function App() {
     }
   }, [])
 
-  return (
+  const tree = (
     <BrowserRouter>
       <Suspense fallback={<AppLoader />}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={demo ? <Navigate to="/carte" replace /> : <LandingPage />} />
           <Route element={<RequireAuth />}>
             <Route path="/post-login" element={<RootRedirect />} />
             <Route path="/carte" element={<MapPage />} />
@@ -61,7 +67,9 @@ export default function App() {
       {/* Pop-up d'installation PWA — monte a la racine pour etre present des
           `/` (landing, avant creation de compte) et capter `beforeinstallprompt`
           quelle que soit la route d'arrivee. */}
-      <InstallPrompt />
+      {!demo && <InstallPrompt />}
     </BrowserRouter>
   )
+
+  return demo ? <DemoKioskShell>{tree}</DemoKioskShell> : tree
 }

@@ -5,6 +5,7 @@ import { usePlayerStore } from '../stores/playerStore'
 import { AdScreen } from './map/overlays/AdScreen'
 import { ChangelogModal } from './map/badges/VersionBadge'
 import { GeolocationPrompt } from './auth/GeolocationPrompt'
+import { isDemoMode } from '../lib/demo/isDemoMode'
 
 export default function RequireAuth() {
   const { user, loading } = useAuth()
@@ -23,6 +24,15 @@ export default function RequireAuth() {
   }
 
   if (!user) {
+    // En démo, l'auto-login de la borne est en cours : afficher le loader plutôt
+    // que rediriger (évite un ping-pong avec la redirection /→/carte du mode démo).
+    if (isDemoMode()) {
+      return (
+        <div style={{ padding: '4rem', textAlign: 'center', minHeight: '100vh' }}>
+          Chargement...
+        </div>
+      )
+    }
     return <Navigate to="/" replace />
   }
 
@@ -33,9 +43,10 @@ export default function RequireAuth() {
   return (
     <>
       <Outlet />
-      <ChangelogModal />
-      <GeolocationPrompt />
-      {canShowAd && <AdScreen onDone={() => setShowAd(false)} />}
+      {/* Mode démo borne : aucun pop-up (changelog, GPS, pub) — expérience nette. */}
+      {!isDemoMode() && <ChangelogModal />}
+      {!isDemoMode() && <GeolocationPrompt />}
+      {!isDemoMode() && canShowAd && <AdScreen onDone={() => setShowAd(false)} />}
     </>
   )
 }

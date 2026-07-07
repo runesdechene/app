@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { CrownsInfoModal } from '../modals/CrownsInfoModal'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 
 // V0.7 phase 2 — Compteur de Couronnes de Chêne dans la toolbar.
 // L'InfoModal est extraite dans CrownsInfoModal pour partage avec StatsBar
@@ -24,7 +25,7 @@ export function CrownsBadge() {
           className="notoriety-value crowns-value"
           key={`balance-${balance}`}
         >
-          {balance}
+          {isDemoMode() ? '∞' : balance}
         </span>
       </div>
 

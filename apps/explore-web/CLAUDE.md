@@ -76,6 +76,22 @@ pnpm build              # tsc && vite build
 cd apps/explore-web && netlify deploy --prod --dir "$PWD/dist" --no-build
 ```
 
+## Déploiement borne démo
+
+Le mode démo (`demo.runesdechene.com`) s'exécute sur une **borne tactile fullscreen** dédiée.
+
+- **Site Netlify séparé** : `demo.runesdechene.com` (distinct de `app.runesdechene.com`)
+- **Activation** : variable `VITE_DEMO_MODE=true` (fichier `.env.demo` au root monorepo)
+- **Variables d'env requises** (voir `.env.demo.example` comme modèle) :
+  - `VITE_SUPABASE_URL` : URL projet Supabase
+  - `VITE_SUPABASE_ANON_KEY` : clé anon (public)
+  - `VITE_DEMO_MODE=true` : active le mode démo
+  - `VITE_DEMO_EMAIL=demo@runesdechene.com` : compte démo
+  - `VITE_DEMO_PASSWORD` : mot de passe du compte (secret — ne jamais committer)
+- **Kiosk mode** : borne fullscreen (contrôlée par l'OS ou le navigateur en kiosk-mode)
+- **Timeout inactivité** : après 10 min sans interaction, la borne reset à l'écran d'intro
+- **Ressource** : `apps/explore-web/public/demo-intro.jpg` (image d'accueil, à supprimer avant l'événement si absent en prod)
+
 ## Règles inviolables
 
 - **Pas de `any`** (TS strict)

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { safeStorage } from '../lib/safeStorage'
+import { isDemoMode } from '../lib/demo/isDemoMode'
 
 interface PlayerState {
   /** IDs des lieux découverts par l'utilisateur (lookup O(1)) */
@@ -166,9 +167,11 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   displayedTitles: [],
   setDisplayedTitles: (titles) => set({ displayedTitles: titles }),
 
-  factionColorMode: safeStorage.get('factionColorMode') === 'true',
+  // Démo borne : toujours OFF au démarrage, et on ne persiste pas (un visiteur
+  // qui l'active ne le laisse pas allumé pour le suivant — le reset le remet OFF).
+  factionColorMode: isDemoMode() ? false : safeStorage.get('factionColorMode') === 'true',
   setFactionColorMode: (on) => {
-    safeStorage.set('factionColorMode', String(on))
+    if (!isDemoMode()) safeStorage.set('factionColorMode', String(on))
     set({ factionColorMode: on })
   },
 

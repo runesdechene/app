@@ -10,6 +10,7 @@ import { PlacesSection } from './PlacesSection'
 import { MapActivityList } from './MapActivityList'
 import { CoupeHeritagesSection } from './coupe/CoupeHeritagesSection'
 import { HomeNouvellesSection } from './HomeNouvellesSection'
+import { isDemoMode } from '../../lib/demo/isDemoMode'
 import { ArticleModal } from '../announcements/ArticleModal'
 import { UpdateCard } from '../changelog/UpdateCard'
 import { DailyEnigma } from '../enigma/DailyEnigma'
@@ -113,7 +114,8 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
           />
         </section>
 
-        <HomeNouvellesSection onOpenArticle={articleAsModal ? setArticleSlug : undefined} />
+        {/* Borne démo : pas de bloc Nouvelles. */}
+        {!isDemoMode() && <HomeNouvellesSection onOpenArticle={articleAsModal ? setArticleSlug : undefined} />}
 
         {showUpdates && (
           <section className="home-section">

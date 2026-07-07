@@ -1,5 +1,6 @@
 import { useCrownsStore } from '../../../stores/crownsStore'
 import { InfoModal } from './InfoModal'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 
 interface Props {
   onClose: () => void
@@ -22,7 +23,7 @@ export function CrownsInfoModal({ onClose }: Props) {
       title={TXT_TITLE}
       description={TXT_DESCRIPTION}
       rows={[
-        { label: 'Stock actuel', value: `${balance} / 500`, highlight: true },
+        { label: 'Stock actuel', value: isDemoMode() ? '∞' : `${balance} / 500`, highlight: true },
         { label: 'Coffre aléatoire — lieu veillé seul', value: '+1 🪙' },
         { label: 'Coffre aléatoire — lieu veillé à plusieurs', value: '+2 🪙' },
         { label: 'Sortir un lieu du brouillard', value: '+1 🪙' },

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { usePlayerStore } from '../../../stores/playerStore'
 import { useFractionalEnergy, formatEnergy } from '../../../hooks/useFractionalEnergy'
 import { EnergyInfoModal } from '../modals/EnergyInfoModal'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 import './EnergyIndicator.css'
 
 // L'InfoModal est extraite dans EnergyInfoModal pour partage avec StatsBar
@@ -21,7 +22,7 @@ export function EnergyIndicator() {
         <div className="energy-main">
           <span className="energy-icon">{'⚡'}</span>
           <span className="energy-count">
-            {formatEnergy(fractionalEnergy, maxEnergy)}/{maxEnergy}
+            {isDemoMode() ? '∞' : `${formatEnergy(fractionalEnergy, maxEnergy)}/${maxEnergy}`}
           </span>
           <div className="energy-bar">
             <div className="energy-bar-fill" style={{ width: `${fillPercent}%` }} />

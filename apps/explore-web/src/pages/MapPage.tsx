@@ -34,6 +34,7 @@ import { useTimezoneSync } from '../hooks/useTimezoneSync'
 import { useChat } from '../hooks/useChat'
 import { useResourceTimers } from '../hooks/useResourceTimers'
 import { ChatPanel } from '../components/chat/ChatPanel'
+import { isDemoMode } from '../lib/demo/isDemoMode'
 import { AddPlaceFlow } from '../components/places/modals/AddPlaceFlow'
 import { EditPositionFlow } from '../components/places/modals/EditPositionFlow'
 import { OfflineIndicator } from '../components/pwa/OfflineIndicator'
@@ -127,6 +128,7 @@ export default function MapPage() {
   const [showCompanyCreate, setShowCompanyCreate] = useState(false)
   const [showCreateMenu, setShowCreateMenu] = useState(false)
   const [showAddPlaceInfo, setShowAddPlaceInfo] = useState(false)
+  const [showDemoBlockedCreate, setShowDemoBlockedCreate] = useState(false)
   const [showAddGpsMark, setShowAddGpsMark] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => safeStorage.get('desktop_sidebar_collapsed') === '1')
   const [tutorialPhase, setTutorialPhase] = useState<'before' | 'after' | null>(null)
@@ -267,7 +269,7 @@ export default function MapPage() {
   // Tutorial : fetch slides si pas encore complété
   const tutorialFetched = useRef(false)
   useEffect(() => {
-    if (!userId || tutorialCompletedAt !== null || tutorialFetched.current) return
+    if (!userId || tutorialCompletedAt !== null || tutorialFetched.current || isDemoMode()) return // borne démo : pas de tutoriel
     tutorialFetched.current = true
 
     supabase
@@ -371,7 +373,8 @@ export default function MapPage() {
   // (non bloquant — fermable). Une fois par session, hors tutoriel/onboarding.
   useEffect(() => {
     if (isAuthenticated && companiesLoaded && myCompaniesCount === 0
-        && !companyPromptShown && tutorialPhase === null && !showOnboarding) {
+        && !companyPromptShown && tutorialPhase === null && !showOnboarding
+        && !isDemoMode()) { // borne démo : pas de proposition de Compagnie
       setCompanyPromptShown(true)
       setShowCompanyIntro(true)
     }
@@ -499,21 +502,35 @@ export default function MapPage() {
           discoveriesNeeded={discoveriesNeeded}
           onAddPlace={() => {
             setShowCreateMenu(false)
+            if (isDemoMode()) { setShowDemoBlockedCreate(true); return }
             setAddPlaceMode(true)
           }}
           onAddPlaceLocked={() => {
             setShowCreateMenu(false)
+            if (isDemoMode()) { setShowDemoBlockedCreate(true); return }
             setShowAddPlaceInfo(true)
           }}
           onCreateExpedition={() => {
             setShowCreateMenu(false)
+            if (isDemoMode()) { setShowDemoBlockedCreate(true); return }
             useExpeditionsStore.getState().requestOpenCreator(true)
           }}
           onAddGpsMark={() => {
             setShowCreateMenu(false)
+            if (isDemoMode()) { setShowDemoBlockedCreate(true); return }
             setShowAddGpsMark(true)
           }}
           onClose={() => setShowCreateMenu(false)}
+        />
+      )}
+
+      {showDemoBlockedCreate && (
+        <InfoModal
+          icon="🔒"
+          title="Mode démo"
+          description="La création de contenu (ajouter un lieu, organiser un événement, poser une marque) n'est pas possible en version démo. Crée ton compte pour jouer pour de vrai !"
+          rows={[]}
+          onClose={() => setShowDemoBlockedCreate(false)}
         />
       )}
 

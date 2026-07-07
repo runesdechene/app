@@ -9,6 +9,8 @@ import { FactionCreateForm } from '../components/factions/FactionCreateForm'
 import { CompanyEmblem } from '../components/factions/CompanyEmblem'
 import { CoupeModal } from '../components/map/modals/CoupeModal'
 import { readableInk } from '../lib/textFormat'
+import { isDemoMode } from '../lib/demo/isDemoMode'
+import { DemoBlockedPanel } from '../components/demo/DemoBlockedPanel'
 import '../components/home/coupe/CoupeHeritages.css'
 import './CompaniesPage.css'
 
@@ -48,6 +50,8 @@ export default function CompaniesPage() {
 
   const canAfford = balance >= FOUND_COST
   const atLimit = myFactions.length >= 2
+
+  if (isDemoMode()) return <DemoBlockedPanel feature="Les Compagnies" />
 
   return (
     <main className="activity-page-scroll companies-page">
