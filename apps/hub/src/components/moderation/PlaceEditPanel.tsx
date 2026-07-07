@@ -8,9 +8,10 @@ interface Props {
   currentTags: ModTag[]        // tags de la ligne (ordre primary-first)
   allTags: ModTag[]
   onChanged: () => void        // refresh liste + compteurs après action
+  onOpenLightbox: (images: string[], index: number) => void
 }
 
-export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Props) {
+export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged, onOpenLightbox }: Props) {
   const [detail, setDetail] = useState<ModPlaceDetail | null>(null)
   const [tagIds, setTagIds] = useState<string[]>(currentTags.map(t => t.id))
   const [title, setTitle] = useState('')
@@ -112,9 +113,10 @@ export function PlaceEditPanel({ placeId, currentTags, allTags, onChanged }: Pro
       {detail.images.length > 0 && (
         <div className="mod-gallery">
           {detail.images.map((img, i) => (
-            <a key={img.id ?? i} href={img.url} target="_blank" rel="noreferrer" title="Ouvrir en grand">
+            <button key={img.id ?? i} type="button" className="mod-gallery-item" title="Ouvrir en grand"
+                    onClick={() => onOpenLightbox(detail.images.map(im => im.url), i)}>
               <img src={img.thumb ?? img.url} alt="" loading="lazy" />
-            </a>
+            </button>
           ))}
         </div>
       )}

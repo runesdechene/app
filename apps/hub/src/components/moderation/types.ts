@@ -31,7 +31,7 @@ export interface ModListRow {
   tags: ModTag[]
 }
 
-export type ModFilter = 'unverified' | 'verified' | 'all'
+export type ModFilter = 'unverified' | 'verified' | 'masked' | 'all'
 
 export interface ModListResult {
   total: number

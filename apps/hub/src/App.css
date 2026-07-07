@@ -4366,8 +4366,20 @@ table select {
 .mod-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
 .mod-textarea { min-height:180px; resize:vertical; line-height:1.5; font-family:inherit; }
 .mod-gallery { grid-column:1/-1; display:flex; gap:8px; flex-wrap:wrap; padding-top:12px; border-top:1px solid #eaddc6; }
-.mod-gallery a { display:block; width:110px; height:110px; border-radius:8px; overflow:hidden; border:1px solid #d8c6a8; }
+.mod-gallery-item { display:block; width:110px; height:110px; border-radius:8px; overflow:hidden; border:1px solid #d8c6a8; padding:0; background:none; cursor:zoom-in; }
 .mod-gallery img { width:100%; height:100%; object-fit:cover; display:block; }
+.mod-thumb.clickable { cursor:zoom-in; }
+
+/* Lightbox */
+.mod-lightbox { position:fixed; inset:0; z-index:1000; background:rgba(20,14,8,.88); display:flex; align-items:center; justify-content:center; }
+.mod-lightbox-img { max-width:92vw; max-height:88vh; object-fit:contain; border-radius:4px; box-shadow:0 8px 40px rgba(0,0,0,.5); cursor:default; }
+.mod-lightbox-close { position:absolute; top:16px; right:20px; width:40px; height:40px; border-radius:50%; border:none; background:rgba(255,255,255,.15); color:#fff; font-size:20px; cursor:pointer; }
+.mod-lightbox-close:hover { background:rgba(255,255,255,.28); }
+.mod-lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); width:52px; height:52px; border-radius:50%; border:none; background:rgba(255,255,255,.15); color:#fff; font-size:32px; line-height:1; cursor:pointer; }
+.mod-lightbox-nav:hover { background:rgba(255,255,255,.28); }
+.mod-lightbox-nav.prev { left:20px; }
+.mod-lightbox-nav.next { right:20px; }
+.mod-lightbox-count { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:#fff; font-size:13px; background:rgba(0,0,0,.4); padding:4px 12px; border-radius:12px; }
 .mod-row-body h4 { margin:0 0 4px; font-size:15px; }
 .mod-badges { display:flex; gap:5px; flex-wrap:wrap; margin:4px 0; }
 .mod-badge { font-size:11px; padding:2px 9px; border-radius:12px; font-weight:600; }

@@ -5,13 +5,15 @@ interface Props {
   row: ModListRow
   open: boolean
   onToggle: () => void
+  onOpenLightbox: (images: string[], index: number) => void
 }
 
-export function PlaceRow({ row, open, onToggle }: Props) {
+export function PlaceRow({ row, open, onToggle, onOpenLightbox }: Props) {
   const suspicious = row.tags.length === 0 || (row.visit_count === 0 && row.photo_count === 0)
   return (
     <div className={`mod-row-main${open ? ' open' : ''}`} onClick={onToggle}>
-      <div className="mod-thumb">
+      <div className={`mod-thumb${row.thumb_url ? ' clickable' : ''}`}
+           onClick={row.thumb_url ? (e => { e.stopPropagation(); onOpenLightbox([row.thumb_url as string], 0) }) : undefined}>
         {row.thumb_url
           ? <img src={row.thumb_url} alt="" loading="lazy" />
           : <span>🗺️</span>}
