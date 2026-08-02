@@ -98,11 +98,11 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
           <div className="demo-intro-content">
             <div className="demo-intro-head">
               <img className="demo-intro-logo" src={runeEmblem} alt="Runes de Chêne" />
-              <p className="demo-intro-kicker">L'application Runes de Chêne</p>
               <h1 className="demo-intro-title">
-                <span className="demo-title-white">Une marque sur le dos.</span>
-                <span className="demo-title-gold">Une communauté dans la poche.</span>
+                <span className="demo-title-white">Découvrez l'application</span>
+                <span className="demo-title-gold">Runes de Chêne</span>
               </h1>
+              <p className="demo-intro-accroche">Une marque sur le dos. Une communauté dans la poche.</p>
               <p className="demo-intro-tagline">
                 Ils explorent, ils partagent leurs découvertes, ils veillent sur les lieux oubliés. Une carte vivante, tenue par ceux qui portent nos pièces.
               </p>
@@ -114,7 +114,7 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
                   <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
                 </svg>
                 <span>
-                  Chaque pièce porte un lieu réel, et son histoire t'attend dans l'app. <b>Bientôt, tu la scanneras pour la voir prendre vie.</b>
+                  Chaque pièce du stand est un <b>Fragment</b> : elle porte une Histoire. <b>Bientôt, tu la scanneras dans l'app pour la découvrir.</b>
                 </span>
               </div>
               <svg className="demo-intro-hand" viewBox="0 0 24 24" aria-hidden="true">

@@ -13,12 +13,13 @@ html.demo-kiosk *:not(input):not(textarea) { -webkit-user-select: none; user-sel
 .demo-intro-content { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10vh 24px 7vh; text-align: center; color: #fff; }
 .demo-intro-head { display: flex; flex-direction: column; align-items: center; }
 .demo-intro-logo { width: 180px; height: auto; filter: brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.35)); }
-.demo-intro-kicker { margin: 2.6rem 0 0; font-size: clamp(13px, 1.5vw, 30px); font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--color-accent, #cac4b6); text-shadow: 0 1px 8px rgba(0,0,0,.45); }
-.demo-intro-title { margin: 1.4rem 0 0; font-size: clamp(34px, 6.4vw, 68px); font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1.12; text-shadow: 0 2px 14px rgba(0,0,0,.3); }
+.demo-intro-title { margin: 2.4rem 0 0; font-size: clamp(30px, 5vw, 54px); font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1.14; text-shadow: 0 2px 14px rgba(0,0,0,.3); }
 .demo-intro-title span { display: block; }
 .demo-title-white { color: #fff; }
-.demo-title-gold { color: var(--color-accent, #ecc15b); }
-.demo-intro-tagline { margin: 2rem auto 0; max-width: 44ch; font-size: clamp(16px, 2.1vw, 27px); font-weight: 500; line-height: 1.5; color: #faeed8; text-shadow: 0 1px 10px rgba(0,0,0,.1); }
+/* Le nom de la marque porte le titre : plus grand, plus espacé. */
+.demo-title-gold { color: var(--color-accent, #ecc15b); font-size: 1.32em; letter-spacing: .06em; }
+.demo-intro-accroche { margin: 1.6rem auto 0; font-size: clamp(17px, 2.3vw, 30px); font-weight: 700; line-height: 1.35; color: #fff; text-shadow: 0 1px 10px rgba(0,0,0,.35); }
+.demo-intro-tagline { margin: 1.4rem auto 0; max-width: 44ch; font-size: clamp(15px, 1.9vw, 24px); font-weight: 500; line-height: 1.5; color: #faeed8; opacity: .92; text-shadow: 0 1px 10px rgba(0,0,0,.1); }
 .demo-intro-stand { margin: 0 0 4px; display: flex; align-items: center; gap: 18px; max-width: 40ch; padding: 20px 28px; border-radius: 18px; background: rgba(20,15,10,.42); border: 1px solid rgba(236,193,91,.5); backdrop-filter: blur(4px); font-size: clamp(16px, 2.2vw, 24px); font-weight: 500; line-height: 1.4; color: #faeed8; text-align: left; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
 .demo-stand-icon { flex: 0 0 auto; width: 42px; height: 42px; fill: var(--color-accent, #ecc15b); }
 .demo-intro-stand b { color: var(--color-accent, #ecc15b); font-weight: 700; }
@@ -36,9 +37,9 @@ html.demo-kiosk *:not(input):not(textarea) { -webkit-user-select: none; user-sel
 @media (max-height: 820px) {
   .demo-intro-content { padding: 5vh 24px 4vh; }
   .demo-intro-logo { width: 120px; }
-  .demo-intro-kicker { margin-top: 1.4rem; }
-  .demo-intro-title { margin-top: .9rem; }
-  .demo-intro-tagline { margin-top: 1.2rem; }
+  .demo-intro-title { margin-top: 1.4rem; }
+  .demo-intro-accroche { margin-top: 1rem; }
+  .demo-intro-tagline { margin-top: 1rem; }
   .demo-proof { margin-top: 1.4rem; gap: 10px; }
 }
 .demo-welcome { position: fixed; inset: 0; z-index: 10000; background: rgba(10,7,4,.62); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 1.5rem; animation: demo-welcome-in .35s ease-out; }
