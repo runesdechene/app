@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useDemoStore } from '../../stores/demoStore'
 import { usePlayerStore } from '../../stores/playerStore'
-import { DemoLiveProof } from './DemoLiveProof'
 import runeEmblem from '../../assets/rune_de_chene.png'
 import './DemoKioskShell.css'
 
@@ -98,30 +97,29 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
           <div className="demo-intro-content">
             <div className="demo-intro-head">
               <img className="demo-intro-logo" src={runeEmblem} alt="Runes de Chêne" />
+              <p className="demo-intro-kicker">L'Histoire comme terrain d'aventure</p>
               <h1 className="demo-intro-title">
-                <span className="demo-title-white">Découvrez l'application</span>
-                <span className="demo-title-gold">Runes de Chêne</span>
+                <span className="demo-title-white">Une marque.</span>{' '}
+                <span className="demo-title-gold">Une application.</span>
               </h1>
-              <p className="demo-intro-accroche">Une marque sur le dos. Une communauté dans la poche.</p>
               <p className="demo-intro-tagline">
-                Ils explorent, ils partagent leurs découvertes, ils veillent sur les lieux oubliés. Une carte vivante, tenue par ceux qui portent nos pièces.
+                Le plus grand mouvement francophone jamais fédéré autour de <span className="demo-tag-num">l'Histoire, l'Aventure &amp; la Nature</span> - sur ton dos et dans ta poche.
               </p>
-              <DemoLiveProof />
             </div>
             <div className="demo-intro-cta-group">
-              <div className="demo-intro-stand">
-                <svg className="demo-stand-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
-                </svg>
-                <span>
-                  Chaque pièce du stand est un <b>Fragment</b> : elle porte une Histoire. <b>Bientôt, tu la scanneras dans l'app pour la découvrir.</b>
-                </span>
-              </div>
               <svg className="demo-intro-hand" viewBox="0 0 24 24" aria-hidden="true">
                 <circle className="demo-hand-ripple" cx="11.5" cy="3.5" r="2.4" />
                 <path className="demo-hand-tap" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6C13 6.67 12.33 6 11.5 6S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.21 0-.62-.38-1.16-.91-1.38z" />
               </svg>
-              <button className="demo-intro-cta" onClick={enter}>Touche l'écran, entre dans la carte</button>
+              <button className="demo-intro-cta" onClick={enter}>Touche l'écran pour essayer l'app</button>
+              <div className="demo-intro-stand">
+                <svg className="demo-stand-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z" />
+                </svg>
+                <span>
+                  Chaque article acheté sur le stand débloque son <b>Fragment d'Histoire</b> dans l'app - comme un équipement.
+                </span>
+              </div>
             </div>
           </div>
         </div>
