@@ -53,10 +53,10 @@ export function Dashboard() {
       try {
         // Stats de base
         const [usersRes, ambassadorsRes, pendingRes, approvedRes] = await Promise.all([
-          supabase.from('users').select('*', { count: 'exact', head: true }),
-          supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'ambassador'),
-          supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-          supabase.from('hub_photo_submissions').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+          supabase.from('users_admin').select('*', { count: 'exact', head: true }),
+          supabase.from('users_admin').select('*', { count: 'exact', head: true }).eq('role', 'ambassador'),
+          supabase.from('hub_photo_submissions').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.from('hub_photo_submissions').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
         ])
 
         setStats({
@@ -80,20 +80,20 @@ export function Dashboard() {
           reactTodayRes, reactWeekRes, reactMonthRes,
         ] = await Promise.all([
           // Nouveaux : created_at récent
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('created_at', startOfToday),
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('created_at', ago7d),
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('created_at', ago30d),
           // Réactivés : last_login_at récent mais created_at ancien
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('last_login_at', startOfToday)
             .lt('created_at', oldThreshold),
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('last_login_at', ago7d)
             .lt('created_at', oldThreshold),
-          supabase.from('users').select('*', { count: 'exact', head: true })
+          supabase.from('users_admin').select('*', { count: 'exact', head: true })
             .gte('last_login_at', ago30d)
             .lt('created_at', oldThreshold),
         ])

@@ -71,7 +71,7 @@ export function AssignFragments() {
     setSearching(true)
 
     const { data } = await supabase
-      .from('users')
+      .from('users_admin')
       .select('id, first_name, email_address, avatar_url')
       .or(`first_name.ilike.%${q}%,email_address.ilike.%${q}%`)
       .limit(8)

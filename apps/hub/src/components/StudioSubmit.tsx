@@ -185,7 +185,7 @@ export function StudioSubmit() {
 
       // 3. Compte
       setProgress('Vérification du compte…')
-      const { data: existing } = await supabase.from('users').select('id').eq('email_address', email.toLowerCase().trim()).limit(1)
+      const { data: existing } = await supabase.from('users_admin').select('id').eq('email_address', email.toLowerCase().trim()).limit(1)
       let userId: string
       if (existing && existing.length > 0) { userId = existing[0].id; setIsNewAccount(false) }
       else {

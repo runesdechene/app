@@ -10,6 +10,22 @@ import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { loadRecentActivityToasts } from '../lib/loadRecentActivityToasts'
 
 /**
+ * Ligne `users` du joueur courant, telle que la renvoie `get_my_user_row`.
+ * La RPC résout l'identité côté serveur (auth.uid, sinon email du JWT) : le
+ * front n'a plus besoin de lire `users.email_address`, colonne désormais
+ * réservée au staff (mig 337).
+ */
+interface MyUserRow {
+  id: string
+  faction_id: string | null
+  first_name: string | null
+  avatar_url: string | null
+  tutorial_completed_at: string | null
+  brouiller_pistes: boolean | null
+  title_gender: 'm' | 'f' | 'n' | null
+}
+
+/**
  * Hook d'initialisation du fog — à appeler UNE SEULE FOIS au niveau App.
  * Charge les découvertes, énergie, faction et avatar à l'authentification.
  */
@@ -53,11 +69,8 @@ export function usePlayer() {
     async function init() {
       setLoading(true)
 
-      const { data: userData } = await supabase
-        .from('users')
-        .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes, title_gender')
-        .eq('email_address', user!.email)
-        .single()
+      const { data: myRow } = await supabase.rpc('get_my_user_row')
+      const userData = myRow as MyUserRow | null
 
       if (cancelled || !userData) {
         setLoading(false)
@@ -84,7 +97,7 @@ export function usePlayer() {
         // fie à la présence d'une ligne à l'auth.uid().
         const { data: migrated } = await supabase
           .from('users')
-          .select('id, faction_id, first_name, email_address, avatar_url, tutorial_completed_at, brouiller_pistes, title_gender')
+          .select('id, faction_id, first_name, avatar_url, tutorial_completed_at, brouiller_pistes, title_gender')
           .eq('id', authId)
           .single()
 

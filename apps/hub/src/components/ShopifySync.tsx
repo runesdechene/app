@@ -80,7 +80,7 @@ export function ShopifySync() {
 
       // 2. Fetch tous les users de l'app
       const { data: appUsers } = await supabase
-        .from('users')
+        .from('users_admin')
         .select('email_address, first_name, faction_id, notoriety_points')
 
       // 3. Fetch les noms de faction
@@ -214,7 +214,7 @@ export function ShopifySync() {
 
       while (true) {
         const { data } = await supabase
-          .from('users')
+          .from('users_admin')
           .select('email_address, shopify_customer_id, account_source, created_at, faction_id')
           .not('shopify_customer_id', 'is', null)
           .range(from, from + PAGE_SIZE - 1)

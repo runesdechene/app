@@ -107,7 +107,7 @@ export function Settings() {
     try {
       // Charger les valeurs moyennes par role (pour pre-remplir les inputs)
       const { data: usersData } = await supabase
-        .from('users')
+        .from('users_admin')
         .select('id, first_name, email_address, role, max_energy')
         .order('role')
         .order('first_name')

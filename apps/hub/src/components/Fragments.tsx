@@ -88,7 +88,7 @@ export function Fragments() {
         supabase.from('title_fragments').select('*').order('created_at', { ascending: false }),
         supabase.from('fragment_words').select('*').order('id'),
         supabase.from('factions').select('id, title').order('order'),
-        supabase.from('user_fragments').select('user_id, fragment_id, users!inner(first_name, email_address)'),
+        supabase.from('user_fragments').select('user_id, fragment_id, users_admin!inner(first_name, email_address)'),
         supabase.from('tags').select('id, title').order('title'),
         supabase.from('fragment_tag_affinities').select('*'),
         supabase.from('enigma_themes').select('id, label').order('sort_order'),
@@ -106,9 +106,9 @@ export function Fragments() {
       // Regrouper les owners par fragment
       const ownerMap: Record<number, Array<{ userId: string; name: string }>> = {}
       if (ownersRes.data) {
-        for (const row of ownersRes.data as Array<{ user_id: string; fragment_id: number; users: unknown }>) {
+        for (const row of ownersRes.data as Array<{ user_id: string; fragment_id: number; users_admin: unknown }>) {
           if (!ownerMap[row.fragment_id]) ownerMap[row.fragment_id] = []
-          const u = row.users as { first_name: string | null; email_address: string } | Array<{ first_name: string | null; email_address: string }>
+          const u = row.users_admin as { first_name: string | null; email_address: string } | Array<{ first_name: string | null; email_address: string }>
           const user = Array.isArray(u) ? u[0] : u
           if (user) ownerMap[row.fragment_id].push({ userId: row.user_id, name: user.first_name || user.email_address })
         }
@@ -386,7 +386,7 @@ export function Fragments() {
     if (query.length < 2) { setGrantResults([]); return }
 
     const { data } = await supabase
-      .from('users')
+      .from('users_admin')
       .select('id, first_name, email_address')
       .or(`first_name.ilike.%${query}%,email_address.ilike.%${query}%`)
       .limit(10)

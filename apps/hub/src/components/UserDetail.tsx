@@ -91,7 +91,7 @@ export function UserDetail() {
     try {
       // Fetch user
       const { data: userData, error: userErr } = await supabase
-        .from('users')
+        .from('users_admin')
         .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, faction_id, account_source, shopify_customer_id, avatar_url, notoriety_points, exploration_points, erudition_points, energy_points, max_energy, game_mode, user_crowns(balance)')
         .eq('id', userId!)
         .single()

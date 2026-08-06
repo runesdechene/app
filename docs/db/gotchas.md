@@ -201,3 +201,44 @@ Préciser : nom exact, public/privé, policies RLS à mettre.
   - Avatars : `avatars/{userId}.webp`
 
 Voir `storage.md` pour le détail.
+
+## Données personnelles (RGPD)
+
+### `users` : grants colonne par colonne, plus au niveau table (mig 337)
+
+`anon` et `authenticated` n'ont **plus** de `GRANT SELECT` sur la table `users` :
+ils ont une liste blanche de colonnes. `email_address` et `password` en sont
+exclus. Conséquences pratiques :
+
+- **Toute nouvelle colonne de `users` doit être GRANTée explicitement** dans la
+  migration qui la crée, sinon le front lira `permission denied for table users` :
+  ```sql
+  GRANT SELECT (ma_nouvelle_colonne) ON public.users TO anon, authenticated;
+  ```
+  (Volontairement deny-by-default : on préfère une erreur franche à une fuite.)
+- **`select('*')` sur `users` est mort** côté front — l'étoile déplie toutes les
+  colonnes, y compris celles interdites. Lister les colonnes, ou passer par la
+  vue staff.
+- Le back-office lit `public.users_admin`, vue gardée par `_is_staff()`. Les
+  écritures continuent d'aller sur `users`.
+- L'app identifie le joueur au démarrage via `get_my_user_row()` : elle ne peut
+  plus filtrer sur `email_address`.
+
+### Jamais d'email dans un nom affiché (mig 336)
+
+Le nom public d'un joueur vient de `user_public_name(id, display_name, first_name)`
+— **jamais** d'un `COALESCE(..., email_address)`. Sans nom, la fonction rend
+`Explorateur XXXX`. Origine : 444 comptes affichaient leur adresse comme pseudo.
+
+### Une policy sans clause `TO` s'applique à `anon`
+
+`CREATE POLICY "Service role can manage X" ON x FOR ALL USING (true)` sans `TO
+service_role` s'applique à **PUBLIC**, donc à la clé anon publique. C'est comme
+ça que `purchase_log` exposait les emails des acheteurs. Toujours écrire le `TO`.
+
+### Une policy ne lit pas `users` en direct
+
+Un `EXISTS (SELECT 1 FROM users WHERE ...)` inline dans une policy est évalué
+avec les droits de l'appelant : pour `anon`, qui n'a plus accès à `users`, ça ne
+renvoie pas « faux », ça **plante** la requête. Utiliser `_is_staff()` /
+`_is_admin()`, qui sont `SECURITY DEFINER`.

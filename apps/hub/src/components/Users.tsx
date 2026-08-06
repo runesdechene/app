@@ -65,7 +65,7 @@ export function Users() {
 
         while (true) {
           let query = supabase
-            .from('users')
+            .from('users_admin')
             .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, account_source, shopify_customer_id, exploration_points, erudition_points, factions!faction_id(title), user_crowns(balance)')
             .order('created_at', { ascending: false })
             .range(from, from + PAGE_SIZE - 1)
