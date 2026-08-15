@@ -1,11 +1,10 @@
 -- 340 — Compteur d'écoutes des Fragments audio
 --
 -- WHY : le lecteur de voix off tourne depuis plusieurs drops sans aucune mesure.
--- Impossible de dire si les Fragments sont écoutés, et encore moins jusqu'au bout,
--- alors que chaque voix off a un coût de production à chaque drop. Cette table
--- produit la donnée qui tranche : continue-t-on à payer la narration ?
--- Clé = handle du métaobjet Illustration, PAS le tag produit `fragment:*` — les
--- migrations 251/252/253 ont déjà payé le prix des variations de casse des tags.
+-- Impossible de dire si les Fragments sont écoutés, jusqu'au bout ou non, alors que
+-- chaque voix off a un coût de production à chaque drop. Cette table tranche : continue-t-on
+-- à payer la narration ? Clé = handle du métaobjet Illustration, PAS le tag produit
+-- `fragment:*` — les migrations 251/252/253 ont déjà payé le prix des variations de casse.
 
 CREATE TABLE public.fragment_audio_plays (
   id                  bigint      GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

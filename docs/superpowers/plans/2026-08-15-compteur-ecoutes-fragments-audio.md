@@ -38,7 +38,7 @@
 | Fichier | Responsabilité |
 |---|---|
 | `supabase/migrations/340_fragment_audio_plays.sql` (créer) | Table verrouillée + index + RPC d'écriture anon |
-| `supabase/migrations/341_get_fragment_audio_stats.sql` (créer) | RPC d'agrégat réservée au staff |
+| `supabase/migrations/342_get_fragment_audio_stats.sql` (créer) | RPC d'agrégat réservée au staff |
 | `apps/hub/src/components/FragmentsAudio.tsx` (créer) | Écran Hub : tableau des écoutes + bandeau de couverture |
 | `apps/hub/src/lib/shopifyIllustrations.ts` (créer) | Interrogation Admin GraphQL des métaobjets Illustration et des produits |
 | `apps/hub/src/App.tsx` (modifier, ~ligne 122) | Route `/shopify/fragments-audio` |
@@ -240,7 +240,7 @@ git commit -m "feat(db): table et RPC d'écriture des écoutes de Fragments audi
 ## Task 2 : RPC d'agrégat réservée au staff
 
 **Files:**
-- Create: `supabase/migrations/341_get_fragment_audio_stats.sql`
+- Create: `supabase/migrations/342_get_fragment_audio_stats.sql`
 
 **Interfaces:**
 - Consumes: la table `public.fragment_audio_plays` (tâche 1) et la fonction `public._is_staff()` définie en migration 337.
@@ -252,10 +252,10 @@ Lire `supabase/migrations/337_emails_staff_only.sql`, section 1. Confirmer la si
 
 - [ ] **Step 2 : Écrire la migration**
 
-Créer `supabase/migrations/341_get_fragment_audio_stats.sql` :
+Créer `supabase/migrations/342_get_fragment_audio_stats.sql` :
 
 ```sql
--- 341 — Lecture des écoutes de Fragments audio, réservée au staff
+-- 342 — Lecture des écoutes de Fragments audio, réservée au staff
 --
 -- WHY : la table de la mig 340 est fermée à tous les rôles. Le Hub a besoin de la
 -- lire, mais `authenticated` c'est aussi n'importe lequel des ~4900 comptes joueur.
@@ -303,12 +303,15 @@ Le `WHERE public._is_staff()` est dans le corps et non dans un `IF ... RAISE` : 
 - [ ] **Step 3 : Preview, dry-run, apply**
 
 ```bash
-node scripts/migration-preview.mjs supabase/migrations/341_get_fragment_audio_stats.sql
+node scripts/migration-preview.mjs supabase/migrations/342_get_fragment_audio_stats.sql
 npx supabase db push --dry-run --linked
 npx supabase db push --linked
 ```
 
-Attendu : preview sans régression, dry-run listant `341`, apply sans erreur.
+Attendu : preview sans régression, dry-run listant `342`, apply sans erreur.
+
+> Renumérotée de 341 en 342 le 2026-08-15 : le 341 a été pris par le correctif de la garde `NULL` de
+> `log_fragment_audio_play`, trouvé en revue de la tâche 1. Un numéro = un seul fichier.
 
 - [ ] **Step 4 : Vérifier le calcul sur données connues**
 
@@ -343,7 +346,7 @@ Attendu : `reste = 0`.
 
 ```bash
 python3 scripts/graphify-sql.py
-git add supabase/migrations/341_get_fragment_audio_stats.sql graphify-out/
+git add supabase/migrations/342_get_fragment_audio_stats.sql graphify-out/
 git commit -m "feat(db): RPC d'agrégat des écoutes de Fragments audio, staff uniquement"
 ```
 
