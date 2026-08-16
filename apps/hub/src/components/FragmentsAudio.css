@@ -110,6 +110,29 @@
   opacity: 0.55;
 }
 
+/* Or franc : part du RECIT parcourue. Un ton distinct du rouge parce que c'est
+   une autre grandeur — un pourcentage de recit, pas un pourcentage de gens. */
+.frg-jauge-encre--recit {
+  background: var(--frg-or);
+}
+
+.frg-recit {
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.frg-recit strong {
+  color: var(--frg-or);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.frg-taux-valeur--recit {
+  color: var(--frg-or);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .frg-jauge-encre {
     transition: none;

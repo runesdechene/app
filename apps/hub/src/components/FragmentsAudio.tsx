@@ -13,7 +13,14 @@ export interface FragmentAudioStat {
   illustration_handle: string
   ecoutes: number
   completions: number
+  /** Part des auditeurs qui vont au bout. Un pourcentage de GENS. */
   taux: number | null
+  /** Part du récit réellement parcourue en moyenne. Un pourcentage de RÉCIT.
+   *  Unité différente de `taux` — les deux ne se superposent pas. */
+  progression: number | null
+  /** Sur combien d'écoutes `progression` repose : les écoutes dont la durée du
+   *  Fragment n'était pas connue en sont exclues. */
+  mesurables: number
   ecoutes_motif: number
   ecoutes_produit: number
   derniere_ecoute: string | null
@@ -26,14 +33,23 @@ export interface FragmentAudioStat {
  */
 const SEUIL_DECISION = 20
 
-function jauge(taux: number | null, muette = false) {
-  const part = Math.max(0, Math.min(100, taux ?? 0))
+/**
+ * La jauge : une reglure qui s'encre. Le ton dit l'unite — rouge pour une part
+ * d'auditeurs (completion), or pour une part de recit (progression). Les deux
+ * ne se superposent jamais sur une meme reglure : ce sont deux grandeurs
+ * differentes, les melanger produirait un chiffre qui ne veut rien dire.
+ */
+function jauge(valeur: number | null, ton: 'completion' | 'progression' | 'incertain') {
+  const part = Math.max(0, Math.min(100, valeur ?? 0))
+  const classe =
+    ton === 'completion'
+      ? 'frg-jauge-encre'
+      : ton === 'progression'
+        ? 'frg-jauge-encre frg-jauge-encre--recit'
+        : 'frg-jauge-encre frg-jauge-encre--muette'
   return (
     <span className="frg-jauge">
-      <span
-        className={muette ? 'frg-jauge-encre frg-jauge-encre--muette' : 'frg-jauge-encre'}
-        style={{ width: `${part}%` }}
-      />
+      <span className={classe} style={{ width: `${part}%` }} />
     </span>
   )
 }
@@ -138,6 +154,16 @@ export function FragmentsAudio() {
     : null
   const assezPourTrancher = totalEcoutes >= SEUIL_DECISION
 
+  // Progression moyenne toutes surfaces : moyenne ponderee par le nombre d'ecoutes
+  // reellement mesurables, sinon un Fragment ecoute une fois pesserait autant qu'un
+  // Fragment ecoute cent fois.
+  const totalMesurables = stats.reduce((n, s) => n + s.mesurables, 0)
+  const progressionGlobale = totalMesurables > 0
+    ? Math.round(
+      (10 * stats.reduce((n, s) => n + (s.progression ?? 0) * s.mesurables, 0)) / totalMesurables,
+    ) / 10
+    : null
+
   const sansVoix = illustrations.filter((i) => !i.aAudio)
   const jamaisEcoutes = illustrations.filter(
     (i) => i.aAudio && !stats.some((s) => s.illustration_handle === i.handle),
@@ -183,7 +209,14 @@ export function FragmentsAudio() {
                   </span>
                 </span>
               </div>
-              {jauge(tauxGlobal)}
+              {jauge(tauxGlobal, 'completion')}
+              {progressionGlobale !== null ? (
+                <p className="frg-recit">
+                  Ceux qui n&apos;arrivent pas au bout s&apos;arrêtent en chemin :{' '}
+                  <strong>{progressionGlobale} %</strong> du récit sont parcourus en moyenne, sur{' '}
+                  {totalMesurables} {totalMesurables > 1 ? 'écoutes mesurées' : 'écoute mesurée'}.
+                </p>
+              ) : null}
             </>
           ) : (
             <>
@@ -199,7 +232,13 @@ export function FragmentsAudio() {
                   </span>
                 </span>
               </div>
-              {jauge(tauxGlobal, true)}
+              {jauge(tauxGlobal, 'incertain')}
+              {progressionGlobale !== null ? (
+                <p className="frg-recit">
+                  <strong>{progressionGlobale} %</strong> du récit parcourus en moyenne, sur{' '}
+                  {totalMesurables} {totalMesurables > 1 ? 'écoutes mesurées' : 'écoute mesurée'}.
+                </p>
+              ) : null}
             </>
           )}
         </section>
@@ -306,7 +345,8 @@ export function FragmentsAudio() {
                   <th>Fragment</th>
                   <th className="frg-num">Écoutes</th>
                   <th className="frg-num">Au bout</th>
-                  <th className="frg-taux">Complétion</th>
+                  <th className="frg-taux">Complétion — part des auditeurs</th>
+                  <th className="frg-taux">Progression — part du récit</th>
                   <th>Répartition</th>
                   <th>Dernière</th>
                 </tr>
@@ -329,7 +369,27 @@ export function FragmentsAudio() {
                           {s.taux !== null ? `${s.taux} %` : '—'}
                           {mince ? ' · à confirmer' : ''}
                         </span>
-                        {jauge(s.taux, mince)}
+                        {jauge(s.taux, mince ? 'incertain' : 'completion')}
+                      </td>
+                      <td className="frg-taux">
+                        {s.progression !== null ? (
+                          <>
+                            <span className="frg-taux-valeur frg-taux-valeur--recit">
+                              {s.progression} %
+                              {s.mesurables < s.ecoutes
+                                ? ` · ${s.mesurables}/${s.ecoutes} mesurées`
+                                : ''}
+                            </span>
+                            {jauge(s.progression, 'progression')}
+                          </>
+                        ) : (
+                          <span
+                            className="frg-taux-valeur frg-taux-valeur--mince"
+                            title="Aucune écoute de ce Fragment n’a rapporté sa durée"
+                          >
+                            pas encore mesurée
+                          </span>
+                        )}
                       </td>
                       <td className="frg-repartition">
                         {s.ecoutes_motif} motif · {s.ecoutes_produit} produit
