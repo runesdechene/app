@@ -89,3 +89,19 @@ Un modérateur pur n'accède qu'à **Modération** + **Tags** (gate dans `App.ts
 `place_tags_revisions`. « Vérifié » = `places.verified_at/verified_by` (action
 explicite, découplée de l'édition). Retrait = **masquage réversible seul**, pas
 de suppression dure côté mod.
+
+## Compteur d'écoutes Fragments audio (2026-08-15)
+
+`FragmentsAudio` (écran `/shopify/fragments-audio`) affiche le tableau des écoutes
+(RPC `get_fragment_audio_stats`) et un bandeau de couverture séparé (trois compteurs :
+produits actifs sans `illustration_produit`, Illustrations sans voix off, Fragments
+avec voix off et zéro écoute) — chargement indépendant du tableau, une panne du
+bandeau n'empêche jamais le tableau de s'afficher. `lib/shopifyIllustrations.ts`
+interroge l'Admin GraphQL via le proxy (mêmes `authHeader()`/`proxyUrl()` que
+`shopifyProducts.ts`) et **découvre le type de metaobjet Illustration à l'exécution**
+via `metaobjectDefinitions` (jamais de type codé en dur — un mauvais type renverrait
+une liste vide plutôt qu'une erreur). Les deux compteurs basés sur les metaobjets
+dépendent de la portée `read_metaobjects`, **absente de l'app Shopify custom en
+prod au 2026-08-14** : tant qu'elle n'est pas accordée, `fetchIllustrations()` lève
+`ShopifyAccessDeniedError` et le bandeau l'affiche explicitement plutôt que de
+montrer des compteurs vides.
