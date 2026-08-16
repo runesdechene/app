@@ -98,10 +98,11 @@ produits actifs sans `illustration_produit`, Illustrations sans voix off, Fragme
 avec voix off et zéro écoute) — chargement indépendant du tableau, une panne du
 bandeau n'empêche jamais le tableau de s'afficher. `lib/shopifyIllustrations.ts`
 interroge l'Admin GraphQL via le proxy (mêmes `authHeader()`/`proxyUrl()` que
-`shopifyProducts.ts`) et **découvre le type de metaobjet Illustration à l'exécution**
-via `metaobjectDefinitions` (jamais de type codé en dur — un mauvais type renverrait
-une liste vide plutôt qu'une erreur). Les deux compteurs basés sur les metaobjets
-dépendent de la portée `read_metaobjects`, **absente de l'app Shopify custom en
-prod au 2026-08-14** : tant qu'elle n'est pas accordée, `fetchIllustrations()` lève
-`ShopifyAccessDeniedError` et le bandeau l'affiche explicitement plutôt que de
-montrer des compteurs vides.
+`shopifyProducts.ts`). Le type de metaobjet Illustration est **codé en dur** :
+`ILLUSTRATION_TYPE = 'illustrations'` (pluriel), confirmé par sondage direct de
+l'Admin API le 2026-08-16 (22 metaobjets retournés). Champ audio : `fragment_audio`.
+La portée `read_metaobjects` est **accordée** (depuis le 2026-08-16) ;
+`read_metaobject_definitions` ne l'est **pas** et n'est pas nécessaire — la
+découverte de type à l'exécution via `metaobjectDefinitions` a été retirée
+(commit `0ae3583`), elle bouclait sur `ACCESS_DENIED` pour une portée que le
+module n'utilise plus.
