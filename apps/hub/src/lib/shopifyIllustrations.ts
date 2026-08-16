@@ -108,10 +108,26 @@ async function graphql<T>(query: string): Promise<T> {
     headers: { ...(await authHeader()), 'Content-Type': 'application/json' },
     body: JSON.stringify({ query }),
   })
-  const json = await resp.json() as {
+  // Corps lu en texte d'abord. Un proxy absent ou en panne renvoie du vide ou du
+  // HTML, et un resp.json() direct laisse fuir « Failed to execute 'json' on
+  // 'Response' » jusqu'au bandeau. Constate a l'ecran le 2026-08-16 en local, ou
+  // les fonctions Netlify ne sont pas servies : 404 a corps vide, message illisible.
+  // Ce bandeau existe pour rendre les trous lisibles — il doit l'etre lui-meme.
+  const brut = await resp.text()
+  type ReponseGraphQL = {
     data?: T
     errors?: ShopifyGraphQLError[]
     error?: string // erreur emise par le proxy lui-meme (auth/role), pas par Shopify
+  }
+  let json: ReponseGraphQL
+  try {
+    json = JSON.parse(brut) as ReponseGraphQL
+  } catch {
+    throw new Error(
+      resp.ok
+        ? 'Shopify Admin : reponse illisible du proxy (ce n\'est pas du JSON)'
+        : `Shopify Admin : HTTP ${resp.status} — le proxy n'a pas repondu`,
+    )
   }
   if (json.error) throw new Error(`Proxy Shopify : ${json.error}`)
   if (json.errors?.length) {
