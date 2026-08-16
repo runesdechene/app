@@ -72,6 +72,7 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
             <NavLink to="/annonces" className={({ isActive }) => isActive ? 'active' : ''}>Annonces</NavLink>
             <div className="sidebar-section-label">Shopify</div>
             <NavLink to="/shopify/sync" className={({ isActive }) => isActive ? 'active' : ''}>Synchro Emails</NavLink>
+            <NavLink to="/shopify/fragments-audio" className={({ isActive }) => isActive ? 'active' : ''}>Fragments audio</NavLink>
           </>
         )}
       </nav>
