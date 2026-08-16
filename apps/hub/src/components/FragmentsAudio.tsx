@@ -4,6 +4,7 @@ import {
   fetchIllustrations,
   fetchProduitsSansIllustration,
   ShopifyAccessDeniedError,
+  ShopifyEmptyResultError,
 } from '../lib/shopifyIllustrations'
 import type { IllustrationInfo, ProduitSansIllustration } from '../lib/shopifyIllustrations'
 
@@ -26,9 +27,12 @@ export function FragmentsAudio() {
   // ci-dessus : une panne ici ne doit jamais faire disparaitre le tableau.
   const [produitsOrphelins, setProduitsOrphelins] = useState<ProduitSansIllustration[]>([])
   const [produitsErreur, setProduitsErreur] = useState<string | null>(null)
+  const [produitsTronque, setProduitsTronque] = useState(false)
   const [illustrations, setIllustrations] = useState<IllustrationInfo[]>([])
   const [illustrationsScopeManquant, setIllustrationsScopeManquant] = useState<string | null>(null)
+  const [illustrationsVideMessage, setIllustrationsVideMessage] = useState<string | null>(null)
   const [illustrationsErreur, setIllustrationsErreur] = useState<string | null>(null)
+  const [illustrationsTronque, setIllustrationsTronque] = useState(false)
 
   useEffect(() => {
     let vivant = true
@@ -46,15 +50,15 @@ export function FragmentsAudio() {
     return () => { vivant = false }
   }, [])
 
-  // Compteur "produits actifs sans illustration_produit" : seule ligne du bandeau
-  // que le token admin actuel peut servir aujourd'hui (pas de scope metaobjets requis).
+  // Compteur "produits actifs sans illustration_produit".
   useEffect(() => {
     let vivant = true
     async function charger() {
       try {
-        const orphelins = await fetchProduitsSansIllustration()
+        const { produits, tronque } = await fetchProduitsSansIllustration()
         if (!vivant) return
-        setProduitsOrphelins(orphelins)
+        setProduitsOrphelins(produits)
+        setProduitsTronque(tronque)
       } catch (e) {
         if (!vivant) return
         setProduitsErreur(e instanceof Error ? e.message : 'Erreur inconnue')
@@ -64,20 +68,26 @@ export function FragmentsAudio() {
     return () => { vivant = false }
   }, [])
 
-  // Les deux compteurs bases sur les metaobjets Illustration : indisponibles tant que
-  // la portee read_metaobjects manque a l'app Shopify (ShopifyAccessDeniedError) —
-  // voir apps/hub/src/lib/shopifyIllustrations.ts.
+  // Les deux compteurs bases sur les metaobjets Illustration. Trois facons de ne pas
+  // s'afficher normalement, toutes distinguees explicitement (voir
+  // apps/hub/src/lib/shopifyIllustrations.ts) : portee Shopify manquante
+  // (ShopifyAccessDeniedError), type de metaobjet devenu invalide cote admin
+  // (ShopifyEmptyResultError — zero resultat sans erreur, ne pas le lire comme
+  // "tout est couvert"), ou toute autre panne (erreur generique).
   useEffect(() => {
     let vivant = true
     async function charger() {
       try {
-        const ills = await fetchIllustrations()
+        const { illustrations: ills, tronque } = await fetchIllustrations()
         if (!vivant) return
         setIllustrations(ills)
+        setIllustrationsTronque(tronque)
       } catch (e) {
         if (!vivant) return
         if (e instanceof ShopifyAccessDeniedError) {
           setIllustrationsScopeManquant(e.scope)
+        } else if (e instanceof ShopifyEmptyResultError) {
+          setIllustrationsVideMessage(e.message)
         } else {
           setIllustrationsErreur(e instanceof Error ? e.message : 'Erreur inconnue')
         }
@@ -114,7 +124,7 @@ export function FragmentsAudio() {
             ) : (
               <>
                 <strong>{produitsOrphelins.length}</strong> produits actifs sans Illustration
-                reliée (le lecteur y est muet) :{' '}
+                reliée (le lecteur y est muet){produitsTronque ? ' — liste tronquée' : ''} :{' '}
                 {produitsOrphelins.map((p) => p.titre).join(', ') || '—'}
               </>
             )}
@@ -125,13 +135,15 @@ export function FragmentsAudio() {
               <code>{illustrationsScopeManquant}</code> manque à l&apos;app Shopify. Ces deux
               compteurs resteront vides tant qu&apos;elle n&apos;est pas ajoutée.
             </li>
+          ) : illustrationsVideMessage ? (
+            <li>{illustrationsVideMessage}</li>
           ) : illustrationsErreur ? (
             <li>Inventaire des Illustrations indisponible : {illustrationsErreur}</li>
           ) : (
             <>
               <li>
                 <strong>{illustrations.filter((i) => !i.aAudio).length}</strong> Illustrations
-                sans voix off :{' '}
+                sans voix off{illustrationsTronque ? ' — liste tronquée' : ''} :{' '}
                 {illustrations.filter((i) => !i.aAudio).map((i) => i.nom).join(', ') || '—'}
               </li>
               <li>
@@ -142,7 +154,8 @@ export function FragmentsAudio() {
                     ).length
                   }
                 </strong>{' '}
-                Fragments avec voix off et zéro écoute :{' '}
+                Fragments avec voix off et zéro écoute
+                {illustrationsTronque ? ' — liste tronquée' : ''} :{' '}
                 {illustrations
                   .filter((i) => i.aAudio && !stats.some((s) => s.illustration_handle === i.handle))
                   .map((i) => i.nom)

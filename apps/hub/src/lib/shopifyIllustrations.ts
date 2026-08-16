@@ -3,19 +3,32 @@
 // proxy admin-authed. Sert le bandeau de couverture de l'ecran Fragments audio :
 // un metachamp oublie au drop rend le lecteur muet sans aucun signal.
 //
-// Le type de metaobjet "Illustration" n'est jamais code en dur : il est decouvert a
-// chaque appel via metaobjectDefinitions (cf. plan tache 6, ruling 2). Verifie le
-// 2026-08-14 par introspection directe (meme token admin que la prod) : la portee
-// `read_metaobjects` manque a l'app Shopify custom. metaobjectDefinitions et la
-// lecture de metaobjets par GID renvoient tous deux ACCESS_DENIED ; seule la lecture
-// de produits (et de leurs metachamps) fonctionne. Voir ShopifyAccessDeniedError plus
-// bas : tant que la portee n'est pas accordee, fetchIllustrations() echoue toujours
-// avec cette erreur typee, et le bandeau doit degrader explicitement plutot que de
-// se taire.
+// Historique de decouverte (important pour ne pas regresser) :
+// - 2026-08-14, introspection directe (meme token admin que la prod) : la portee
+//   `read_metaobjects` manquait a l'app Shopify custom. metaobjectDefinitions et la
+//   lecture de metaobjets par GID renvoyaient tous deux ACCESS_DENIED.
+// - 2026-08-16, apres que l'humain a accorde `read_metaobjects` : re-sonde a chaud.
+//   `metaobjectDefinitions(first: 25)` refuse TOUJOURS — portee DIFFERENTE et
+//   DISTINCTE (`read_metaobject_definitions`), non accordee et qui ne le sera pas.
+//   En revanche `node(id: "gid://shopify/Metaobject/396064981259")` et
+//   `metaobjects(type: "illustrations", first: 100)` repondent 200 avec les 22
+//   metaobjets attendus. Le type reel est donc "illustrations" (au PLURIEL — le
+//   singulier "illustration" renverrait une liste vide sans lever d'erreur, un piege
+//   silencieux). Ce module n'appelle donc plus jamais metaobjectDefinitions : le type
+//   est fixe ci-dessous, confirme par sondage direct, pas devine.
+// - ShopifyAccessDeniedError reste le garde-fou pour `metaobjects` (et `products`) :
+//   si `read_metaobjects` etait un jour retiree, ces requetes echoueraient de la meme
+//   maniere et le bandeau redeviendrait exact sans changement de code. Ce n'est
+//   simplement plus le chemin normal aujourd'hui.
 import { supabase } from './supabase'
 
 const SHOP = 'runes-de-chene.myshopify.com'
 const AUDIO_FIELD_KEY = 'fragment_audio' // confirme : cle par defaut de sections/rdc_motif.liquid
+
+// Type confirme par sondage direct de l'API Admin le 2026-08-16 (22 metaobjets
+// retournes) — pas une supposition. Au PLURIEL : `illustration` au singulier
+// renverrait une liste vide sans lever d'erreur.
+const ILLUSTRATION_TYPE = 'illustrations'
 
 /** Portee Shopify constatee comme manquante lors de l'introspection du 2026-08-14. */
 const SCOPE_METAOBJECTS_PAR_DEFAUT = 'read_metaobjects'
@@ -26,9 +39,21 @@ export interface IllustrationInfo {
   aAudio: boolean
 }
 
+export interface IllustrationsResult {
+  illustrations: IllustrationInfo[]
+  /** true si metaobjects(first: 100) a une page suivante : la liste ci-dessus est incomplete. */
+  tronque: boolean
+}
+
 export interface ProduitSansIllustration {
   handle: string
   titre: string
+}
+
+export interface ProduitsSansIllustrationResult {
+  produits: ProduitSansIllustration[]
+  /** true si products(first: 250) a une page suivante : le comptage ci-dessus est incomplet. */
+  tronque: boolean
 }
 
 interface ShopifyGraphQLError {
@@ -49,6 +74,20 @@ export class ShopifyAccessDeniedError extends Error {
     this.name = 'ShopifyAccessDeniedError'
     const trouve = shopifyMessage.match(/`([a-z_]+)`\s+access scope/i)
     this.scope = trouve ? trouve[1] : SCOPE_METAOBJECTS_PAR_DEFAUT
+  }
+}
+
+/**
+ * Levee quand `metaobjects(type: ILLUSTRATION_TYPE)` repond sans erreur mais avec
+ * zero element. Un vrai catalogue vide serait suspect en soi, et la cause la plus
+ * probable est que ILLUSTRATION_TYPE ne correspond plus au type reel cote admin —
+ * dans les deux cas, ca merite un message explicite plutot qu'un silencieux
+ * « 0 Illustration sans voix off » qui se lirait comme une bonne nouvelle.
+ */
+export class ShopifyEmptyResultError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ShopifyEmptyResultError'
   }
 }
 
@@ -85,64 +124,43 @@ async function graphql<T>(query: string): Promise<T> {
   return json.data
 }
 
-interface MetaobjectDefinitionNode {
-  type: string
-  fieldDefinitions: Array<{ key: string }>
-}
-
-/**
- * Decouvre le type de metaobjet "Illustration" a l'execution, en cherchant la
- * definition dont un champ porte la cle AUDIO_FIELD_KEY. Ne devine jamais le type :
- * un type code en dur et faux renverrait une liste vide plutot qu'une erreur, ce qui
- * masquerait le probleme au lieu de le signaler (cf. plan tache 6, ruling 2).
- */
-async function discoverIllustrationType(): Promise<string> {
+/** Toutes les Illustrations, avec la presence ou non d'un fichier de voix off. */
+export async function fetchIllustrations(): Promise<IllustrationsResult> {
   const query = `{
-    metaobjectDefinitions(first: 25) {
-      edges { node { type fieldDefinitions { key } } }
+    metaobjects(type: "${ILLUSTRATION_TYPE}", first: 100) {
+      edges { node { handle displayName fields { key value } } }
+      pageInfo { hasNextPage }
     }
   }`
   const data = await graphql<{
-    metaobjectDefinitions: { edges: Array<{ node: MetaobjectDefinitionNode }> }
+    metaobjects: {
+      edges: Array<{ node: {
+        handle: string
+        displayName: string
+        fields: Array<{ key: string; value: string | null }>
+      } }>
+      pageInfo: { hasNextPage: boolean }
+    }
   }>(query)
 
-  const trouvee = data.metaobjectDefinitions.edges.find(({ node }) =>
-    node.fieldDefinitions.some((f) => f.key === AUDIO_FIELD_KEY),
-  )
-  if (!trouvee) {
-    throw new Error(
-      `Aucune definition de metaobjet ne porte le champ "${AUDIO_FIELD_KEY}" — impossible d'identifier le type Illustration.`,
+  if (data.metaobjects.edges.length === 0) {
+    throw new ShopifyEmptyResultError(
+      `Aucune Illustration retournée par Shopify (type "${ILLUSTRATION_TYPE}") — le type a-t-il changé ?`,
     )
   }
-  return trouvee.node.type
-}
 
-/** Toutes les Illustrations, avec la presence ou non d'un fichier de voix off. */
-export async function fetchIllustrations(): Promise<IllustrationInfo[]> {
-  const type = await discoverIllustrationType()
-
-  const query = `{
-    metaobjects(type: "${type}", first: 100) {
-      edges { node { handle displayName fields { key value } } }
-    }
-  }`
-  const data = await graphql<{
-    metaobjects: { edges: Array<{ node: {
-      handle: string
-      displayName: string
-      fields: Array<{ key: string; value: string | null }>
-    } }> }
-  }>(query)
-
-  return data.metaobjects.edges.map(({ node }) => ({
-    handle: node.handle,
-    nom: node.displayName,
-    aAudio: node.fields.some((f) => f.key === AUDIO_FIELD_KEY && !!f.value),
-  }))
+  return {
+    illustrations: data.metaobjects.edges.map(({ node }) => ({
+      handle: node.handle,
+      nom: node.displayName,
+      aAudio: node.fields.some((f) => f.key === AUDIO_FIELD_KEY && !!f.value),
+    })),
+    tronque: data.metaobjects.pageInfo.hasNextPage,
+  }
 }
 
 /** Produits actifs dont le metachamp custom.illustration_produit n'est pas renseigne. */
-export async function fetchProduitsSansIllustration(): Promise<ProduitSansIllustration[]> {
+export async function fetchProduitsSansIllustration(): Promise<ProduitsSansIllustrationResult> {
   const query = `{
     products(first: 250) {
       edges { node {
@@ -151,18 +169,25 @@ export async function fetchProduitsSansIllustration(): Promise<ProduitSansIllust
         status
         metafield(namespace: "custom", key: "illustration_produit") { value }
       } }
+      pageInfo { hasNextPage }
     }
   }`
   const data = await graphql<{
-    products: { edges: Array<{ node: {
-      handle: string
-      title: string
-      status: string
-      metafield: { value: string | null } | null
-    } }> }
+    products: {
+      edges: Array<{ node: {
+        handle: string
+        title: string
+        status: string
+        metafield: { value: string | null } | null
+      } }>
+      pageInfo: { hasNextPage: boolean }
+    }
   }>(query)
 
-  return data.products.edges
-    .filter(({ node }) => node.status === 'ACTIVE' && !node.metafield?.value)
-    .map(({ node }) => ({ handle: node.handle, titre: node.title }))
+  return {
+    produits: data.products.edges
+      .filter(({ node }) => node.status === 'ACTIVE' && !node.metafield?.value)
+      .map(({ node }) => ({ handle: node.handle, titre: node.title })),
+    tronque: data.products.pageInfo.hasNextPage,
+  }
 }
