@@ -7,6 +7,7 @@ import {
   ShopifyEmptyResultError,
 } from '../lib/shopifyIllustrations'
 import type { IllustrationInfo, ProduitSansIllustration } from '../lib/shopifyIllustrations'
+import './FragmentsAudio.css'
 
 export interface FragmentAudioStat {
   illustration_handle: string
@@ -18,13 +19,32 @@ export interface FragmentAudioStat {
   derniere_ecoute: string | null
 }
 
+/**
+ * En dessous de ce nombre d'ecoutes, le taux de completion est du bruit : un
+ * seul auditeur qui va au bout place un Fragment a 100 %. L'ecran refuse alors
+ * de conclure au lieu d'afficher un pourcentage qu'on prendrait pour un signal.
+ */
+const SEUIL_DECISION = 20
+
+function jauge(taux: number | null, muette = false) {
+  const part = Math.max(0, Math.min(100, taux ?? 0))
+  return (
+    <span className="frg-jauge">
+      <span
+        className={muette ? 'frg-jauge-encre frg-jauge-encre--muette' : 'frg-jauge-encre'}
+        style={{ width: `${part}%` }}
+      />
+    </span>
+  )
+}
+
 export function FragmentsAudio() {
   const [stats, setStats] = useState<FragmentAudioStat[]>([])
   const [loading, setLoading] = useState(true)
   const [erreur, setErreur] = useState<string | null>(null)
 
-  // Bandeau de couverture — deux chargements independants du tableau des ecoutes
-  // ci-dessus : une panne ici ne doit jamais faire disparaitre le tableau.
+  // Bandeau de couverture — deux chargements independants du tableau des ecoutes :
+  // une panne ici ne doit jamais faire disparaitre le tableau.
   const [produitsOrphelins, setProduitsOrphelins] = useState<ProduitSansIllustration[]>([])
   const [produitsErreur, setProduitsErreur] = useState<string | null>(null)
   const [produitsTronque, setProduitsTronque] = useState(false)
@@ -108,119 +128,225 @@ export function FragmentsAudio() {
     return () => { vivant = false }
   }, [])
 
-  if (loading) return <div className="page">Chargement…</div>
-  if (erreur) return <div className="page">Erreur de chargement : {erreur}</div>
+  if (loading) return <div className="loading">Chargement…</div>
+  if (erreur) return <div className="loading">Lecture des écoutes impossible : {erreur}</div>
 
   const totalEcoutes = stats.reduce((n, s) => n + s.ecoutes, 0)
   const totalCompletions = stats.reduce((n, s) => n + s.completions, 0)
   const tauxGlobal = totalEcoutes > 0
     ? Math.round((1000 * totalCompletions) / totalEcoutes) / 10
     : null
+  const assezPourTrancher = totalEcoutes >= SEUIL_DECISION
+
+  const sansVoix = illustrations.filter((i) => !i.aAudio)
+  const jamaisEcoutes = illustrations.filter(
+    (i) => i.aAudio && !stats.some((s) => s.illustration_handle === i.handle),
+  )
+
+  const derniere = stats
+    .map((s) => s.derniere_ecoute)
+    .filter((d): d is string => d !== null)
+    .sort()
+    .pop()
 
   return (
-    <div className="page">
-      <h1>Fragments audio</h1>
-      <p>
-        Le taux de complétion est la colonne qui décide : c&apos;est lui qui dit si la voix off
-        mérite de rester au budget de chaque drop. Les écoutes de moins de dix secondes ne sont
-        pas comptées.
-      </p>
-
-      <section className="couverture">
-        <h2>Couverture</h2>
-        <ul>
-          <li>
-            {produitsChargement ? (
-              <>Inventaire des produits Shopify — lecture en cours…</>
-            ) : produitsErreur ? (
-              <>Inventaire des produits Shopify indisponible : {produitsErreur}</>
-            ) : (
-              <>
-                <strong>{produitsOrphelins.length}</strong> produits actifs sans Illustration
-                reliée (le lecteur y est muet){produitsTronque ? ' — liste tronquée' : ''} :{' '}
-                {produitsOrphelins.map((p) => p.titre).join(', ') || '—'}
-              </>
-            )}
-          </li>
-          {illustrationsChargement ? (
-            <li>Inventaire des Illustrations — lecture en cours…</li>
-          ) : illustrationsScopeManquant ? (
-            <li>
-              Inventaire des Illustrations indisponible : la portée{' '}
-              <code>{illustrationsScopeManquant}</code> manque à l&apos;app Shopify. Ces deux
-              compteurs resteront vides tant qu&apos;elle n&apos;est pas ajoutée.
-            </li>
-          ) : illustrationsVideMessage ? (
-            <li>{illustrationsVideMessage}</li>
-          ) : illustrationsErreur ? (
-            <li>Inventaire des Illustrations indisponible : {illustrationsErreur}</li>
-          ) : (
-            <>
-              <li>
-                <strong>{illustrations.filter((i) => !i.aAudio).length}</strong> Illustrations
-                sans voix off{illustrationsTronque ? ' — liste tronquée' : ''} :{' '}
-                {illustrations.filter((i) => !i.aAudio).map((i) => i.nom).join(', ') || '—'}
-              </li>
-              <li>
-                <strong>
-                  {
-                    illustrations.filter(
-                      (i) => i.aAudio && !stats.some((s) => s.illustration_handle === i.handle),
-                    ).length
-                  }
-                </strong>{' '}
-                Fragments avec voix off et zéro écoute
-                {illustrationsTronque ? ' — liste tronquée' : ''} :{' '}
-                {illustrations
-                  .filter((i) => i.aAudio && !stats.some((s) => s.illustration_handle === i.handle))
-                  .map((i) => i.nom)
-                  .join(', ') || '—'}
-              </li>
-            </>
-          )}
-        </ul>
-      </section>
+    <div className="frg">
+      <div className="page-header">
+        <h1>Fragments audio</h1>
+        {derniere ? (
+          <span className="frg-date">
+            Dernière écoute le {new Date(derniere).toLocaleDateString('fr-FR')}
+          </span>
+        ) : null}
+      </div>
 
       {stats.length === 0 ? (
-        <p>Aucune écoute enregistrée pour l&apos;instant.</p>
-      ) : (
-        <>
-          <p>
-            <strong>{totalEcoutes}</strong> écoutes, <strong>{totalCompletions}</strong> allées au
-            bout{tauxGlobal !== null ? <> — <strong>{tauxGlobal} %</strong> de complétion</> : null}
+        <div className="frg-vide">
+          <p className="frg-vide-titre">Personne n&apos;a encore écouté de Fragment</p>
+          <p className="frg-vide-quoi">
+            Le compteur démarre à la première écoute qui dépasse dix secondes. Faire glisser le
+            curseur jusqu&apos;au bout ne compte pas.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Fragment</th>
-                <th>Écoutes</th>
-                <th>Complétions</th>
-                <th>Taux</th>
-                <th>Page motif</th>
-                <th>Fiche produit</th>
-                <th>Dernière écoute</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map((s) => (
-                <tr key={s.illustration_handle}>
-                  <td>{s.illustration_handle}</td>
-                  <td>{s.ecoutes}</td>
-                  <td>{s.completions}</td>
-                  <td>{s.taux !== null ? `${s.taux} %` : '—'}</td>
-                  <td>{s.ecoutes_motif}</td>
-                  <td>{s.ecoutes_produit}</td>
-                  <td>
-                    {s.derniere_ecoute
-                      ? new Date(s.derniere_ecoute).toLocaleDateString('fr-FR')
-                      : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
+        </div>
+      ) : (
+        <section className="frg-verdict">
+          <p className="frg-oeil">Verdict</p>
+          {assezPourTrancher ? (
+            <>
+              <div className="frg-verdict-corps">
+                <span className="frg-chiffre">{tauxGlobal} %</span>
+                <span className="frg-dit">
+                  des écoutes vont <strong>jusqu&apos;au bout</strong> de la narration.
+                  <span className="frg-assiette">
+                    Sur {totalEcoutes} écoutes réelles, {stats.length}{' '}
+                    {stats.length > 1 ? 'Fragments' : 'Fragment'}.
+                  </span>
+                </span>
+              </div>
+              {jauge(tauxGlobal)}
+            </>
+          ) : (
+            <>
+              <div className="frg-verdict-corps">
+                <span className="frg-chiffre frg-chiffre--muet">Pas encore de quoi trancher</span>
+                <span className="frg-dit">
+                  {totalEcoutes} {totalEcoutes > 1 ? 'écoutes réelles' : 'écoute réelle'} pour
+                  l&apos;instant
+                  {tauxGlobal !== null ? <> — {tauxGlobal} % vont au bout</> : null}.
+                  <span className="frg-assiette">
+                    Il en faut une vingtaine avant que ce taux veuille dire quelque chose : un seul
+                    auditeur qui termine suffit à afficher 100 %.
+                  </span>
+                </span>
+              </div>
+              {jauge(tauxGlobal, true)}
+            </>
+          )}
+        </section>
       )}
+
+      <p className="frg-oeil">Couverture</p>
+      <section className="frg-couverture">
+        <div className="frg-releve">
+          {illustrationsChargement ? (
+            <span className="frg-releve-quoi">Lecture de l&apos;inventaire…</span>
+          ) : illustrationsScopeManquant ? (
+            <p className="frg-releve-panne">
+              Inventaire indisponible : la portée <code>{illustrationsScopeManquant}</code> manque à
+              l&apos;app Shopify.
+            </p>
+          ) : illustrationsVideMessage ? (
+            <p className="frg-releve-panne">{illustrationsVideMessage}</p>
+          ) : illustrationsErreur ? (
+            <p className="frg-releve-panne">Inventaire indisponible : {illustrationsErreur}</p>
+          ) : (
+            <>
+              <span
+                className={
+                  sansVoix.length === 0 ? 'frg-releve-compte frg-releve-compte--zero' : 'frg-releve-compte'
+                }
+              >
+                {sansVoix.length}
+              </span>
+              <span className="frg-releve-quoi">
+                Illustrations sans voix off
+                {illustrationsTronque ? <span className="frg-tronque"> — liste tronquée</span> : null}
+              </span>
+              {sansVoix.length > 0 ? (
+                <p className="frg-releve-liste">{sansVoix.map((i) => i.nom).join(' · ')}</p>
+              ) : null}
+            </>
+          )}
+        </div>
+
+        <div className="frg-releve">
+          {illustrationsChargement || illustrationsScopeManquant || illustrationsVideMessage
+            || illustrationsErreur ? (
+            <span className="frg-releve-quoi">
+              {illustrationsChargement ? 'Lecture de l’inventaire…' : 'Compteur indisponible'}
+            </span>
+          ) : (
+            <>
+              <span
+                className={
+                  jamaisEcoutes.length === 0
+                    ? 'frg-releve-compte frg-releve-compte--zero'
+                    : 'frg-releve-compte'
+                }
+              >
+                {jamaisEcoutes.length}
+              </span>
+              <span className="frg-releve-quoi">
+                Fragments enregistrés que personne n&apos;a écoutés
+              </span>
+              {jamaisEcoutes.length > 0 ? (
+                <p className="frg-releve-liste">{jamaisEcoutes.map((i) => i.nom).join(' · ')}</p>
+              ) : null}
+            </>
+          )}
+        </div>
+
+        <div className="frg-releve">
+          {produitsChargement ? (
+            <span className="frg-releve-quoi">Lecture des produits…</span>
+          ) : produitsErreur ? (
+            <p className="frg-releve-panne">Produits indisponibles : {produitsErreur}</p>
+          ) : (
+            <>
+              <span
+                className={
+                  produitsOrphelins.length === 0
+                    ? 'frg-releve-compte frg-releve-compte--zero'
+                    : 'frg-releve-compte'
+                }
+              >
+                {produitsOrphelins.length}
+              </span>
+              <span className="frg-releve-quoi">
+                Produits actifs sans Illustration reliée — le lecteur y reste muet
+                {produitsTronque ? <span className="frg-tronque"> — liste tronquée</span> : null}
+              </span>
+              {produitsOrphelins.length > 0 ? (
+                <p className="frg-releve-liste">
+                  {produitsOrphelins.map((p) => p.titre).join(' · ')}
+                </p>
+              ) : null}
+            </>
+          )}
+        </div>
+      </section>
+
+      {stats.length > 0 ? (
+        <>
+          <p className="frg-oeil">Par Fragment</p>
+          <div className="frg-cadre">
+            <table className="frg-table">
+              <thead>
+                <tr>
+                  <th>Fragment</th>
+                  <th className="frg-num">Écoutes</th>
+                  <th className="frg-num">Au bout</th>
+                  <th className="frg-taux">Complétion</th>
+                  <th>Répartition</th>
+                  <th>Dernière</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.map((s) => {
+                  const mince = s.ecoutes < SEUIL_DECISION
+                  return (
+                    <tr key={s.illustration_handle}>
+                      <td className="frg-nom">{s.illustration_handle}</td>
+                      <td className="frg-num">{s.ecoutes}</td>
+                      <td className="frg-num">{s.completions}</td>
+                      <td className="frg-taux">
+                        <span
+                          className={
+                            mince ? 'frg-taux-valeur frg-taux-valeur--mince' : 'frg-taux-valeur'
+                          }
+                          title={mince ? 'Trop peu d’écoutes pour que ce taux soit fiable' : undefined}
+                        >
+                          {s.taux !== null ? `${s.taux} %` : '—'}
+                          {mince ? ' · à confirmer' : ''}
+                        </span>
+                        {jauge(s.taux, mince)}
+                      </td>
+                      <td className="frg-repartition">
+                        {s.ecoutes_motif} motif · {s.ecoutes_produit} produit
+                      </td>
+                      <td className="frg-date">
+                        {s.derniere_ecoute
+                          ? new Date(s.derniere_ecoute).toLocaleDateString('fr-FR')
+                          : '—'}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }

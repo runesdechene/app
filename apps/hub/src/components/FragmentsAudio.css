@@ -1,0 +1,304 @@
+/* Ecran « Fragments audio ».
+ *
+ * L'ecran a UNE question a trancher : la voix off merite-t-elle son budget ?
+ * La reponse est donc le heros de la page, pas une colonne d'un tableau. Et
+ * quand l'echantillon est trop mince, l'ecran REFUSE de conclure plutot que
+ * d'afficher un pourcentage qui ne veut rien dire.
+ *
+ * Signature : la jauge. Une reglure de manuscrit qui s'encre a mesure que les
+ * auditeurs avancent dans la narration. Un seul geste, repris a deux echelles
+ * (le verdict, puis chaque Fragment) — le reste de l'ecran reste sobre.
+ *
+ * Tokens repris de index.css (parchemin, brun, rouge sang, Cinzel). Rien de
+ * neuf sauf l'or de reglure, derive du --color-border existant.
+ */
+
+.frg {
+  --frg-or: #a8823c;
+  --frg-jauge-vide: rgba(58, 46, 30, 0.09);
+  --frg-encart: rgba(160, 130, 90, 0.16);
+  max-width: 1100px;
+}
+
+/* ---------- Eyebrow commun ---------- */
+
+.frg-oeil {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--frg-or);
+  margin: 0 0 0.75rem;
+}
+
+/* ---------- Verdict : le heros ---------- */
+
+.frg-verdict {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem 2rem 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.frg-verdict-corps {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.frg-chiffre {
+  font-family: var(--font-title-family, 'Cinzel', serif);
+  font-size: clamp(2.75rem, 7vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.frg-chiffre--muet {
+  color: var(--color-text-secondary);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.frg-dit {
+  font-size: 1.05rem;
+  color: var(--color-text);
+  max-width: 34ch;
+}
+
+.frg-dit strong {
+  font-weight: 700;
+}
+
+.frg-assiette {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* ---------- La jauge ---------- */
+
+.frg-jauge {
+  /* display:block obligatoire : c'est un <span>, donc inline par defaut, et ni
+     la hauteur ni la largeur ne s'y appliqueraient — la jauge disparaitrait. */
+  display: block;
+  position: relative;
+  height: 3px;
+  background: var(--frg-jauge-vide);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.frg-verdict .frg-jauge {
+  margin-top: 1.5rem;
+  height: 4px;
+}
+
+.frg-jauge-encre {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.frg-jauge-encre--muette {
+  background: var(--frg-or);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frg-jauge-encre {
+    transition: none;
+  }
+}
+
+/* ---------- Couverture ---------- */
+
+.frg-couverture {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.frg-releve {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+}
+
+.frg-releve--pleine {
+  grid-column: 1 / -1;
+}
+
+.frg-releve-compte {
+  font-family: var(--font-title-family, 'Cinzel', serif);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.frg-releve-compte--zero {
+  color: var(--frg-or);
+}
+
+.frg-releve-quoi {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.frg-releve-liste {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--frg-encart);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.frg-releve-panne {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--color-primary);
+}
+
+.frg-releve-panne code {
+  background: var(--color-primary-light);
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+}
+
+.frg-tronque {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ---------- Le tableau ---------- */
+
+.frg-cadre {
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.frg-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.frg-table th {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--frg-or);
+  text-align: left;
+  padding: 0.9rem 1.15rem;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.frg-table td {
+  padding: 0.95rem 1.15rem;
+  border-bottom: 1px solid var(--frg-encart);
+  vertical-align: middle;
+}
+
+.frg-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.frg-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.frg-nom {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.frg-num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.frg-taux {
+  min-width: 190px;
+}
+
+.frg-taux-valeur {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.4rem;
+}
+
+.frg-taux-valeur--mince {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.frg-repartition {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.frg-date {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Vide ---------- */
+
+.frg-vide {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.frg-vide-titre {
+  font-family: var(--font-title-family, 'Cinzel', serif);
+  font-size: 1.15rem;
+  color: var(--color-text);
+  margin: 0 0 0.5rem;
+}
+
+.frg-vide-quoi {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Etroit ---------- */
+
+@media (max-width: 900px) {
+  .frg-couverture {
+    grid-template-columns: 1fr;
+  }
+
+  .frg-verdict {
+    padding: 1.25rem 1.25rem 1.1rem;
+  }
+}
