@@ -33,6 +33,13 @@ export function FragmentsAudio() {
   const [illustrationsVideMessage, setIllustrationsVideMessage] = useState<string | null>(null)
   const [illustrationsErreur, setIllustrationsErreur] = useState<string | null>(null)
   const [illustrationsTronque, setIllustrationsTronque] = useState(false)
+  // Tant que l'inventaire n'a pas repondu, on n'affiche AUCUN compteur. Sans ca,
+  // la fenetre de chargement montre « 0 Illustration sans voix off », qui se lit
+  // comme « tout est couvert » — exactement le contresens que ce bandeau existe
+  // pour empecher. Constate en production le 2026-08-16 : la page a affiche 0
+  // pendant plusieurs secondes avant d'afficher les 21 reelles.
+  const [produitsChargement, setProduitsChargement] = useState(true)
+  const [illustrationsChargement, setIllustrationsChargement] = useState(true)
 
   useEffect(() => {
     let vivant = true
@@ -62,6 +69,8 @@ export function FragmentsAudio() {
       } catch (e) {
         if (!vivant) return
         setProduitsErreur(e instanceof Error ? e.message : 'Erreur inconnue')
+      } finally {
+        if (vivant) setProduitsChargement(false)
       }
     }
     void charger()
@@ -91,6 +100,8 @@ export function FragmentsAudio() {
         } else {
           setIllustrationsErreur(e instanceof Error ? e.message : 'Erreur inconnue')
         }
+      } finally {
+        if (vivant) setIllustrationsChargement(false)
       }
     }
     void charger()
@@ -119,7 +130,9 @@ export function FragmentsAudio() {
         <h2>Couverture</h2>
         <ul>
           <li>
-            {produitsErreur ? (
+            {produitsChargement ? (
+              <>Inventaire des produits Shopify — lecture en cours…</>
+            ) : produitsErreur ? (
               <>Inventaire des produits Shopify indisponible : {produitsErreur}</>
             ) : (
               <>
@@ -129,7 +142,9 @@ export function FragmentsAudio() {
               </>
             )}
           </li>
-          {illustrationsScopeManquant ? (
+          {illustrationsChargement ? (
+            <li>Inventaire des Illustrations — lecture en cours…</li>
+          ) : illustrationsScopeManquant ? (
             <li>
               Inventaire des Illustrations indisponible : la portée{' '}
               <code>{illustrationsScopeManquant}</code> manque à l&apos;app Shopify. Ces deux
