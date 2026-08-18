@@ -1,7 +1,7 @@
 ---
 updated: 2026-08-18T00:00:00Z
-summary: "Compteur d'écoutes livré et en ligne. Un maillon jamais vérifié."
-next_step: "Écouter un Fragment depuis une fiche produit et vérifier le compteur."
+summary: "App V2 lancée : accueil dessiné, direction artistique calée sur la boutique."
+next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
 ---
 
 <!-- Statut lu par XO sur la carte d'accueil. À tenir à jour à chaque session.
@@ -9,6 +9,15 @@ next_step: "Écouter un Fragment depuis une fiche produit et vérifier le compte
      production vivent dans le xo-status de la Citadelle. -->
 
 ## Tâches
+
+### 🟢 App V2 — refonte en fork parallèle (nouveau, 18/08)
+- [x] Fondations tranchées : pas de compétition, visite en GPS, PWA, remplacera la V1
+- [x] Squelette : barre d'onglets Accueil · Carte · Codex · Campement + avatar
+- [x] Écran Compte client
+- [x] Écran Accueil « Le Seuil » : 5 blocs, bandeau Saga, geste de salut en feuille de chêne
+- [ ] Uriel maquette l'Accueil sur Figma pour fixer la direction artistique
+- [ ] Brainstorm de la Carte, puis du Codex, puis du Campement
+- [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 
 ### 🔴 Vérifier ce qu'on a livré (Fragments audio, en ligne depuis le 16/08)
 - [ ] Écouter un Fragment depuis une **fiche produit** : confirmer que la ligne porte le même identifiant que depuis la page motif — dernier maillon de la chaîne jamais vérifié
@@ -28,6 +37,17 @@ next_step: "Écouter un Fragment depuis une fiche produit et vérifier le compte
 > Dette DB/SQL détaillée : `docs/db/tech-debt.md`.
 
 ## Mémoire
+
+- **App V2 (18 août)** — conception en cours, **aucun code écrit**. Spec vivante :
+  `docs/superpowers/specs/2026-08-18-app-v2-design.md` (fondations, squelette, Compte,
+  Accueil ; restent Carte, Codex, Campement). Principe qui commande tout : *« la V2 n'enlève
+  pas la progression, elle enlève la comparaison »* — moi contre moi-même, des pairs qui
+  saluent au lieu de classer. Tombent donc : Coupe, La Cour/Couronnes, Compagnies, Gloire/XP,
+  énigmes, Expéditions, Quêtes (~60-70 % du code V1). **La DA vient de la boutique, pas de
+  l'app V1** : parchemin `#f4eee1`, titres `#403434`, accent **rouge sang `#833434`**, kaki
+  `#46493c`, Bebas Neue + Cabin — le sépia doré `#C19A6B` de la V1 n'existe pas côté boutique.
+  **Convention à tenir** : toute fonctionnalité V2 reliée au Hub reçoit une pastille
+  « V2 compatible » dans l'interface du Hub.
 
 - **Compteur d'écoutes des Fragments audio (16 août, migs 340-343)** — table `fragment_audio_plays` verrouillée : RLS forcée, zéro policy, privilèges révoqués à `anon` ET `authenticated`, tout passe par deux `SECURITY DEFINER`. `log_fragment_audio_play` (anon, écriture seule, ne lève jamais) et `get_fragment_audio_stats` (staff via `_is_staff()`, `EXECUTE` révoqué à `public` et `anon` — Postgres l'accorde à PUBLIC par défaut, piège déjà rencontré en mig 338). Une ligne par (session, illustration, surface, jour) ; `greatest()`/`OR` : les valeurs ne peuvent que monter. **Clé de comptage = `ill.system.handle` du métaobjet Illustration, JAMAIS le tag produit `fragment:*`** (migs 251-253 ont payé le prix des variations de casse). Le type de métaobjet est `illustrations` **au pluriel** — vérifié par sondage direct de l'API Admin, une constante au singulier aurait renvoyé une liste vide sans erreur. Portée `read_metaobjects` accordée le 16/08 ; `read_metaobject_definitions` ne l'est PAS et n'est pas nécessaire.
 - **Ce que la mesure compte exactement** — le temps joué est accumulé par écarts entre positions successives, en rejetant tout écart supérieur à 1,5 s : c'est ce qui distingue une lecture d'un déplacement de la glissière. Seuil d'écoute : `min(10 s, 25 % de la durée)` de jeu **réel**. Complétion : 90 % du temps réellement joué. Sans ça le chiffre décisif se fabriquait en deux secondes — défaut trouvé en revue finale, pas avant. Si `system.handle` est vide, le lecteur fonctionne mais **la mesure se tait** : aucun repli, un repli aurait écrit des clés divergentes selon la surface.
