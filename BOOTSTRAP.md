@@ -60,7 +60,7 @@ Au démarrage de la session sur cette machine, le HARD GATE du `CLAUDE.md` racin
 
 1. **Check 1** : `hostname` → lookup dans `_system/machines.md` du vault Citadelle pour trouver
    le chemin du repo. Si la machine n'est pas listée, demander à Uriel de l'ajouter.
-2. **Check 1.5** : lire `<repo>/CLAUDE.md` + `apps/<app>/CLAUDE.md` + `docs/db/xo-discipline.md`.
+2. **Check 1.5** : lire `<repo>/CLAUDE.md` + `apps/<app>/CLAUDE.md` + `docs/xo-discipline.md`.
 3. **Check 2** : vérifier que `graphify-out/graph.json` existe. Si absent, exécuter la séquence §3.
 4. **Check 3** : routing par sujet (cf. CLAUDE.md vault).
 5. **Check 4** : pour toute opération DB, lire `docs/db/gotchas.md` avant d'écrire du SQL.
