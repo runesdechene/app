@@ -1,4 +1,4 @@
-# Mémoire de Telos - XO-DEV
+# Mémoire de Telos - Dev Runes de Chêne
 
 Ce que j'ai retenu, une ligne à la fois. Ce fichier m'appartient : Uriel
 peut le lire et l'élaguer, mais il ne me dicte rien — mes consignes sont
