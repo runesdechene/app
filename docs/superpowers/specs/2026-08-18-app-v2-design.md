@@ -165,6 +165,13 @@ ton scolaire).
 **Icône retenue : la feuille de chêne**, en SVG maison — on tend une feuille à qui a marché.
 C'est littéralement la marque, et ça se compte bien (« 64 feuilles »).
 
+> **Maquette du 18/08 — moratoire, pas revirement.** Uriel garde des emoji dans la maquette
+> Figma (📷 mission, ⛺ festival) : ils donnent une illustration en couleur tout de suite et
+> se remplaceront par des dessins maison. **L'interdit ci-dessous tient pour la mise en
+> ligne** ; les emoji sont des repères provisoires de maquette, pas une décision de DA. Le
+> vocabulaire de remplacement existe déjà — les intertitres de la maquette portent de belles
+> icônes gravées (rouleau, sapin, bannière).
+
 > ⛔ **Pas d'emoji.** Un emoji est dessiné par l'OS : brillant, multicolore, différent sur
 > chaque téléphone — le seul élément de l'app hors de ton contrôle, et il jurerait avec le
 > parchemin/kaki/rouge sang. 🎉 dit en plus « bravo pour ton diplôme », pas « je reconnais ta
@@ -176,25 +183,30 @@ C'est littéralement la marque, et ça se compte bien (« 64 feuilles »).
 |---|---|---|
 | 1 | **Nouveauté de la marque** | Le seuil éditorial. Fragment du mois, collection, récit, changement de saison. Grande image, pastille de type, titre, chapô, un lien. |
 | 2 | **L'appel** *(conditionnel)* | La mission ou le rendez-vous en cours (§6). Image, appel, ce qu'on attend, échéance, un bouton pour entrer. |
-| 3 | **Autour de toi** | Carrousel horizontal des lieux **les plus proches**, avec leur distance. Le bloc qui pousse dehors. |
+| 3 | **Ajoutés récemment** | Carrousel horizontal des lieux **fraîchement ajoutés**, avec leur distance et leur contributeur. |
 | 4 | **Bandeau Saga** | Le seul bloc ouvertement commercial. Une collection Saga : nom, « N motifs · N pièces », un lien vers la boutique. |
 | 5 | **Sur les chemins** | Le flux d'activité. Lignes brèves : pastille de type, phrase, méta, bouton **Saluer**. |
 | 6 | **Le plus salué** *(conditionnel)* | Le contenu ayant reçu le plus de saluts ces derniers jours — récit, trouvaille, photo de porteur. Carte à vignette + compteur de saluts + auteur. |
 
 **Deux blocs conditionnels, et c'est volontaire.** La page respire entre 4 et 6 blocs selon
-ce qui est vivant. Sans appel en cours, « Autour de toi » remonte en position 2 — la place
-qu'on lui avait validée. Sans contenu salué, le bas de page s'arrête sur le flux.
+ce qui est vivant. Sans appel en cours, le carrousel de lieux remonte en position 2. Sans
+contenu salué, le bas de page s'arrête sur le flux.
 
-**Pourquoi « Autour de toi » est monté si haut.** C'était le bloc 5, tout en bas, « rarement
-vu — alors que c'est le seul bloc qui pousse dehors ». Trié par **proximité** au lieu de par
-fraîcheur, il est plein dès le premier jour pour tout le monde : il n'attend aucune
-communauté. Il règle du même coup le démarrage à froid de l'ancien bloc 2, qui supposait des
-saluts avant qu'il n'y ait qui que ce soit pour saluer.
+**Pourquoi le carrousel de lieux est monté si haut.** C'était le bloc 5, tout en bas,
+« rarement vu — alors que c'est le seul bloc qui pousse dehors ». Il est plein dès le premier
+jour pour tout le monde : il n'attend aucune communauté, et règle du même coup le démarrage à
+froid de l'ancien bloc 2, qui supposait des saluts avant qu'il n'y ait qui que ce soit pour
+saluer.
 
-**Repli si la géolocalisation est refusée**, ou si le porteur est loin de tout (vacances,
-étranger) : le bloc montre les lieux **récemment ajoutés**, sans distance. C'est l'ancien
-comportement du bloc 5, qui devient le repli au lieu d'être la règle — le bloc ne se vide
-jamais.
+> **Tri : fraîcheur, pas proximité — tranché par Uriel le 18/08.** Un tri par proximité avait
+> été proposé pour garantir que le bloc pousse *vraiment* dehors. Uriel garde les **ajouts
+> récents** : c'est le fil de la vie de la carte, pas un GPS. **Conséquence assumée** : la
+> distance affichée peut être grande (170 km, 342 km en maquette) — le bloc raconte alors ce
+> que la communauté découvre, plutôt qu'il n'invite à sortir aujourd'hui. Si la contradiction
+> gêne un jour, la sortie douce est un **filtre de rayon sur les ajouts récents**, pas un
+> changement de tri.
+
+Si la géolocalisation est refusée, la distance disparaît ; le bloc, lui, ne se vide jamais.
 
 **Pourquoi « L'appel » est si haut.** Il porte une échéance. Un appel qui expire dans trois
 jours n'a rien à faire en bas de page.
@@ -227,8 +239,8 @@ seraient des listes d'inconnus. Alors :
 - l'onglet **Campement apparaît cadenassé mais visible** — on voit qu'il existe, c'est ce
   qui donne envie d'y entrer. Le tap mène à la marche à suivre, jamais à une porte close.
 
-> ⚠️ **Révision du 18/08 — redondance à trancher en maquette.** « Autour de toi » (bloc 3)
-> dit déjà quels lieux attendent et à quelle distance : il fait une partie du travail de
+> ⚠️ **Révision du 18/08 — redondance à trancher en maquette.** Le carrousel de lieux (bloc 3)
+> dit déjà quels lieux existent et à quelle distance : il fait une partie du travail de
 > l'invitation. Soit l'invitation se réduit à la phrase d'accueil et laisse le carrousel
 > faire le reste, soit elle disparaît et le carrousel remonte en 2. **Ne pas afficher les
 > deux** — le nouveau venu lirait deux fois la même chose.
@@ -293,6 +305,19 @@ lié, un statut, des participants, un salon.
 **Un rendez-vous ramène du monde parce qu'il existe dehors** — il se raconte, se photographie,
 intéresse la presse locale et le site patrimonial qui le relaie à ses propres visiteurs. C'est
 la seule chose de toute l'app qui puisse atteindre quelqu'un d'extérieur.
+
+### Traitement visuel — trouvé en maquette le 18/08
+
+**Deux cartes empilées sous un seul intertitre « L'appel », distinguées par la couleur du
+fond** : crème pour la **mission photo**, rosé (rose poudré `#ebd2d2`) pour le **rendez-vous**.
+On voit d'un coup d'œil lequel demande de photographier et lequel demande de marcher, sans
+avoir à lire l'étiquette.
+
+Chaque carte porte : le type, le titre, l'échéance en clair (« Jusqu'au 29 juillet 2026 »,
+« 27 au 30 août 2026 »), des pastilles d'avatars empilées et le nombre de participants.
+
+> Le spec disait « deux types du même objet » sans dire comment on les sépare à l'œil. La
+> maquette a répondu mieux que le texte — c'est elle qui fait foi ici.
 
 ### Ce qui existe DÉJÀ en production — ne rien reconcevoir
 
