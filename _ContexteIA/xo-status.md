@@ -19,14 +19,10 @@ next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
 - [ ] Brainstorm de la Carte, puis du Codex, puis du Campement
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 
-### 🔴 Vérifier ce qu'on a livré (Fragments audio, en ligne depuis le 16/08)
-- [ ] Écouter un Fragment depuis une **fiche produit** : confirmer que la ligne porte le même identifiant que depuis la page motif — dernier maillon de la chaîne jamais vérifié
-- [ ] Comparer l'aspect du lecteur avant/après sur une page motif : les styles sont passés d'une portée limitée à la section à une portée globale, le rendu réel n'a pas été regardé
+### 🟢 Fragments audio (en ligne depuis le 16/08) — écoute confirmée par Uriel le 18/08
+- [x] Écouter un Fragment depuis une **fiche produit** : confirmer que la ligne porte le même identifiant que depuis la page motif — dernier maillon de la chaîne jamais vérifié
+- [x] Comparer l'aspect du lecteur avant/après sur une page motif : les styles sont passés d'une portée limitée à la section à une portée globale, le rendu réel n'a pas été regardé
 - [ ] Back-office connecté : liste joueurs, fiche joueur, tableau de bord, Fragments, Sync Shopify — lectures basculées sur la vue staff, non testables sans session admin
-
-### Release v1 refonte-identité (branche `v1-refonte-identite`)
-- [ ] Écran révélation « ta Maison devient ta classe » + QCM « Quel explorateur es-tu ? »
-- [ ] Release coordonnée : `npx supabase db push --linked` (migs 271-274, non appliquées en prod) + deploy Netlify app prod
 
 ### Dette et améliorations connues
 - [ ] Fenêtre de temps sur l'agrégat des écoutes — aujourd'hui il porte sur toute la durée de vie, pas de vue par drop
