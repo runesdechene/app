@@ -3,7 +3,8 @@
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > Mémoire unifiée : **La Citadelle** (Obsidian) + **Graphify** + **Context7**
 
-> Identité XO, routing Obsidian et HARD GATE : voir `~/citadelle/CLAUDE.md` (auto-chargé au démarrage).
+> Identité de l'agent, HARD GATE et discipline de commit : `_ContexteIA/Équipe/<nom>.md` (dans ce repo).
+> Le vault `~/citadelle/` ne sert que pour la marque, le concept et les arbitrages — pas pour coder.
 
 ## 4-Layer Query Rule
 
