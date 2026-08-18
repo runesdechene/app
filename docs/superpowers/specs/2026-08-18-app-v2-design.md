@@ -263,6 +263,11 @@ La direction artistique vient de **la boutique `runesdechene.com`** (thème Cré
 | Titres | **Bebas Neue** | `type_heading_font` |
 | Corps | **Cabin** | `type_body_font` |
 
+> **Le wordmark n'est pas une police.** « Runes de Chêne » en tête d'écran est le
+> **logotype** — un dessin de marque, posé comme image. Il ne se compose pas en Bebas Neue et
+> n'a pas à s'y conformer. Confirmé par Uriel le 18/08 : la DA de l'interface reste
+> **Bebas Neue + Cabin**, sans exception.
+
 ⚠️ L'app V1 utilise un sépia doré (`#C19A6B`) **absent de la boutique**. La V2 s'aligne sur
 la boutique : le rouge sang remplace le sépia comme accent.
 
