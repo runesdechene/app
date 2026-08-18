@@ -1,6 +1,6 @@
 ---
 updated: 2026-08-18T00:00:00Z
-summary: "App V2 lancée : accueil dessiné, direction artistique calée sur la boutique."
+summary: "Accueil V2 revu : bloc « L'appel » ajouté, missions photo sauvées de l'oubli."
 next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
 ---
 
@@ -15,9 +15,11 @@ next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
 - [x] Squelette : barre d'onglets Accueil · Carte · Codex · Campement + avatar
 - [x] Écran Compte client
 - [x] Écran Accueil « Le Seuil » : 5 blocs, bandeau Saga, geste de salut en feuille de chêne
+- [x] Accueil révisé (18/08) : bloc « L'appel », carrousel « Autour de toi » monté en haut
 - [ ] Uriel maquette l'Accueil sur Figma pour fixer la direction artistique
 - [ ] Brainstorm de la Carte, puis du Codex, puis du Campement
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
+- [ ] Au portage des appels : retirer `floor_glory`/`floor_crowns` et l'emoji par défaut
 
 ### 🟢 Fragments audio (en ligne depuis le 16/08) — écoute confirmée par Uriel le 18/08
 - [x] Écouter un Fragment depuis une **fiche produit** : confirmer que la ligne porte le même identifiant que depuis la page motif — dernier maillon de la chaîne jamais vérifié
@@ -44,6 +46,17 @@ next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
   `#46493c`, Bebas Neue + Cabin — le sépia doré `#C19A6B` de la V1 n'existe pas côté boutique.
   **Convention à tenir** : toute fonctionnalité V2 reliée au Hub reçoit une pastille
   « V2 compatible » dans l'interface du Hub.
+
+- **« L'appel » — missions & rendez-vous (18 août, spec §6)** — les **missions photo
+  existent déjà en production de bout en bout** (table `missions` + salon, écrans Hub de
+  création et de modération, `MissionModal` côté app, `hub_photo_submissions.mission_id`
+  avec `consent_brand_usage`, mur « Ils nous portent » sur la fiche produit). Elles
+  n'étaient **écrites nulle part dans le spec V2** : candidates à mourir par oubli.
+  Ne pas les confondre avec les « Quêtes du jour », qui tombent — l'erreur a déjà été faite.
+  Missions et rendez-vous sont **deux types du même objet** ; delta pour ouvrir le physique :
+  un champ `kind` + un lien vers un lieu. Un appel **rassemble, il ne classe pas** — jamais
+  de gagnant. Contrainte posée pour le Campement : **la face publique d'un appel vit hors du
+  portail**, sinon le nouveau venu qu'un rendez-vous fait marcher se cogne à une porte close.
 
 - **Compteur d'écoutes des Fragments audio (16 août, migs 340-343)** — table `fragment_audio_plays` verrouillée : RLS forcée, zéro policy, privilèges révoqués à `anon` ET `authenticated`, tout passe par deux `SECURITY DEFINER`. `log_fragment_audio_play` (anon, écriture seule, ne lève jamais) et `get_fragment_audio_stats` (staff via `_is_staff()`, `EXECUTE` révoqué à `public` et `anon` — Postgres l'accorde à PUBLIC par défaut, piège déjà rencontré en mig 338). Une ligne par (session, illustration, surface, jour) ; `greatest()`/`OR` : les valeurs ne peuvent que monter. **Clé de comptage = `ill.system.handle` du métaobjet Illustration, JAMAIS le tag produit `fragment:*`** (migs 251-253 ont payé le prix des variations de casse). Le type de métaobjet est `illustrations` **au pluriel** — vérifié par sondage direct de l'API Admin, une constante au singulier aurait renvoyé une liste vide sans erreur. Portée `read_metaobjects` accordée le 16/08 ; `read_metaobject_definitions` ne l'est PAS et n'est pas nécessaire.
 - **Ce que la mesure compte exactement** — le temps joué est accumulé par écarts entre positions successives, en rejetant tout écart supérieur à 1,5 s : c'est ce qui distingue une lecture d'un déplacement de la glissière. Seuil d'écoute : `min(10 s, 25 % de la durée)` de jeu **réel**. Complétion : 90 % du temps réellement joué. Sans ça le chiffre décisif se fabriquait en deux secondes — défaut trouvé en revue finale, pas avant. Si `system.handle` est vide, le lecteur fonctionne mais **la mesure se tait** : aucun repli, un repli aurait écrit des clés divergentes selon la surface.

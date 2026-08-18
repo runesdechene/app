@@ -36,6 +36,11 @@ Tout ce qui relève de la **compétition entre joueurs** :
 | Expéditions joueur-joueur | tables `voyage_*`, chat privé, comptes rendus |
 | Quêtes du jour | `dailyQuestsStore`, drip, mini-quêtes |
 
+> ⚠️ **« Quêtes du jour » n'est pas « Missions ».** Les Quêtes étaient la boucle de rétention
+> quotidienne, et elles tombent. Les **Missions** — les appels photo de la marque, source
+> d'UGC — sont **conservées et portées en V2** : voir §6. Confusion déjà faite une fois ;
+> elle aurait tué le système par oubli.
+
 Ordre de grandeur : **60 à 70 % du code de la V1**, une douzaine de tables, la moitié
 des RPCs. C'est ce qui rend « minimaliste » atteignable.
 
@@ -170,10 +175,29 @@ C'est littéralement la marque, et ça se compte bien (« 64 feuilles »).
 | # | Bloc | Contenu |
 |---|---|---|
 | 1 | **Nouveauté de la marque** | Le seuil éditorial. Fragment du mois, collection, récit, changement de saison. Grande image, pastille de type, titre, chapô, un lien. |
-| 2 | **Le plus salué** | Le contenu ayant reçu le plus de saluts ces derniers jours — récit, trouvaille, photo de porteur. Carte à vignette + compteur de saluts + auteur. |
-| 3 | **Bandeau Saga** | Le seul bloc ouvertement commercial. Une collection Saga : nom, « N motifs · N pièces », un lien vers la boutique. |
-| 4 | **Sur les chemins** | Le flux d'activité. Lignes brèves : pastille de type, phrase, méta, bouton **Saluer**. |
-| 5 | **Nouveaux sur la carte** | Carrousel horizontal des lieux fraîchement ajoutés, **avec leur distance**. Seul bloc qui pousse dehors — il finit le scroll sur une envie de marcher. |
+| 2 | **L'appel** *(conditionnel)* | La mission ou le rendez-vous en cours (§6). Image, appel, ce qu'on attend, échéance, un bouton pour entrer. |
+| 3 | **Autour de toi** | Carrousel horizontal des lieux **les plus proches**, avec leur distance. Le bloc qui pousse dehors. |
+| 4 | **Bandeau Saga** | Le seul bloc ouvertement commercial. Une collection Saga : nom, « N motifs · N pièces », un lien vers la boutique. |
+| 5 | **Sur les chemins** | Le flux d'activité. Lignes brèves : pastille de type, phrase, méta, bouton **Saluer**. |
+| 6 | **Le plus salué** *(conditionnel)* | Le contenu ayant reçu le plus de saluts ces derniers jours — récit, trouvaille, photo de porteur. Carte à vignette + compteur de saluts + auteur. |
+
+**Deux blocs conditionnels, et c'est volontaire.** La page respire entre 4 et 6 blocs selon
+ce qui est vivant. Sans appel en cours, « Autour de toi » remonte en position 2 — la place
+qu'on lui avait validée. Sans contenu salué, le bas de page s'arrête sur le flux.
+
+**Pourquoi « Autour de toi » est monté si haut.** C'était le bloc 5, tout en bas, « rarement
+vu — alors que c'est le seul bloc qui pousse dehors ». Trié par **proximité** au lieu de par
+fraîcheur, il est plein dès le premier jour pour tout le monde : il n'attend aucune
+communauté. Il règle du même coup le démarrage à froid de l'ancien bloc 2, qui supposait des
+saluts avant qu'il n'y ait qui que ce soit pour saluer.
+
+**Repli si la géolocalisation est refusée**, ou si le porteur est loin de tout (vacances,
+étranger) : le bloc montre les lieux **récemment ajoutés**, sans distance. C'est l'ancien
+comportement du bloc 5, qui devient le repli au lieu d'être la règle — le bloc ne se vide
+jamais.
+
+**Pourquoi « L'appel » est si haut.** Il porte une échéance. Un appel qui expire dans trois
+jours n'a rien à faire en bas de page.
 
 **Le bandeau Saga** est traité en **kaki plein** (`scheme-3`), à l'inverse du parchemin des
 blocs communautaires : on voit d'un coup d'œil que c'est la marque qui parle, sans avoir à
@@ -193,7 +217,8 @@ de devenir un classement de *personnes* : on met en avant un contenu, jamais un 
 
 ### L'état vide (premier jour) — validé
 
-Sans lieu visité, les blocs 2-3-4 seraient des listes d'inconnus. Alors :
+Sans lieu visité, les blocs communautaires (**5 Sur les chemins**, **6 Le plus salué**)
+seraient des listes d'inconnus. Alors :
 
 - le seuil **grandit**, pastille « Bienvenue », ton d'accueil
   (*« Ici, on ne gagne rien contre personne. On marche, on trouve, on garde trace. »*) ;
@@ -201,6 +226,12 @@ Sans lieu visité, les blocs 2-3-4 seraient des listes d'inconnus. Alors :
   attendent, à quelle distance est le plus proche, puis « Ouvrir la Carte » ;
 - l'onglet **Campement apparaît cadenassé mais visible** — on voit qu'il existe, c'est ce
   qui donne envie d'y entrer. Le tap mène à la marche à suivre, jamais à une porte close.
+
+> ⚠️ **Révision du 18/08 — redondance à trancher en maquette.** « Autour de toi » (bloc 3)
+> dit déjà quels lieux attendent et à quelle distance : il fait une partie du travail de
+> l'invitation. Soit l'invitation se réduit à la phrase d'accueil et laisse le carrousel
+> faire le reste, soit elle disparaît et le carrousel remonte en 2. **Ne pas afficher les
+> deux** — le nouveau venu lirait deux fois la même chose.
 
 ### DA — source de vérité
 
@@ -230,26 +261,105 @@ graphiques** : ne pas s'en servir comme source de vérité visuelle.
 
 ### Arbitrages laissés à la maquette Figma
 
-- **Longueur du scroll** : ~2,5 hauteurs de téléphone. Le carrousel (bloc 5) est tout en
-  bas, donc rarement vu — alors que c'est le seul bloc qui pousse dehors.
-- **Blocs « Le plus salué » et « Sur les chemins »** montraient tous deux la communauté et
-  risquaient de se confondre. Le bandeau Saga, inséré entre les deux, les sépare — bon effet
-  de bord non prévu. À revérifier en maquette.
+- ~~**Longueur du scroll** : le carrousel est tout en bas, donc rarement vu.~~ **Réglé le
+  18/08** — il est monté en bloc 3. Reste à surveiller : à 6 blocs le scroll approche
+  3 hauteurs de téléphone. Les deux blocs conditionnels sont ce qui l'empêche de filer.
+- ⚠️ **Régression introduite le 18/08** : « Le plus salué » et « Sur les chemins » montraient
+  tous deux la communauté et risquaient de se confondre ; le bandeau Saga les séparait, bon
+  effet de bord non prévu. Le réordonnancement les a rendus **voisins** (5 et 6). À revérifier
+  en maquette : si la confusion revient, intervertir « Le plus salué » et le bandeau Saga.
 - **Bandeau « RUNES DE CHÊNE »** en haut : mange une ligne sur chaque écran. Alternative :
   avatar seul.
 - **Densité du flux** : curseur entre « on voit la vie » et « on lit bien ».
 
-## 6. Carte
+## 6. L'appel — missions & rendez-vous
+
+**Nom retenu : « L'appel ».** Il marche pour les deux formes (« l'appel du mois », « on se
+retrouve à… ») et la colonne `missions.call` porte déjà ce mot. Écarté : *événement*, correct
+mais tiède ; *rassemblement*, qui ne couvre que le physique.
+
+### Un seul objet, deux types
+
+| | **Mission** | **Rendez-vous** |
+|---|---|---|
+| Ce que c'est | un appel photo/vidéo de la marque | un vrai rassemblement, quelque part |
+| Lieu | aucun — on le remplit où on veut | **un lieu et une heure** |
+| Ce qu'on rapporte | de l'**UGC** et de la conversion | des **gens** |
+| Portée | ceux qui sont déjà entrés | ceux qui n'ont jamais entendu parler de la marque |
+
+Tout le reste est commun : un appel, un brief, une image, une fenêtre de dates, un produit
+lié, un statut, des participants, un salon.
+
+**Un rendez-vous ramène du monde parce qu'il existe dehors** — il se raconte, se photographie,
+intéresse la presse locale et le site patrimonial qui le relaie à ses propres visiteurs. C'est
+la seule chose de toute l'app qui puisse atteindre quelqu'un d'extérieur.
+
+### Ce qui existe DÉJÀ en production — ne rien reconcevoir
+
+| Où | Quoi |
+|---|---|
+| **Base** | `missions` (appel, brief, fenêtre, produit lié, statut, `featured_on_home`) · `mission_participants` · `mission_messages` + `mission_message_reads` (un salon par appel). Migs 184, 194, 208, 209, 239, 326. |
+| **Hub** | `Missions.tsx` (créer/publier), `missions/MissionProductPicker.tsx` (lier au produit), `Photos.tsx` + `photos/ImageCurator.tsx` + `photos/SubmissionDetail.tsx` (modérer l'UGC) |
+| **App V1** | `components/missions/MissionModal.tsx` — voir un appel, le rejoindre |
+| **Soumissions** | `hub_photo_submissions` : `mission_id`, modération `pending/approved/archived`, et **`consent_brand_usage`** — le droit de réutilisation est déjà collecté |
+| **Boutique** | RPC anon `get_community_photos_by_product` → mur « Ils nous portent » sur la fiche produit |
+
+La boucle est **complète et bouclée** : appel publié depuis le Hub → participation → envoi de
+photos → modération → publication sur la fiche produit du vêtement concerné.
+
+### À nettoyer au portage V2
+
+- **`floor_glory` et `floor_crowns`** — les appels sont aujourd'hui verrouillés par un plancher
+  de Gloire et de Couronnes, les deux systèmes que la V2 supprime (§1). À retirer, sinon les
+  appels deviennent inaccessibles ou incohérents.
+- **`emblem` vaut `'🎯'` par défaut** — les emoji sont interdits en V2 (§5) : dessinés par l'OS,
+  différents sur chaque téléphone, ils jureraient avec le parchemin. À passer en SVG maison,
+  comme la feuille de chêne.
+
+### Le delta technique pour ouvrir les rendez-vous
+
+Petit : un champ **`kind`** (`mission` | `rendez_vous`) et un **lien optionnel vers un lieu** —
+les lieux sont déjà en base avec leurs coordonnées. Un rendez-vous peut donc s'afficher **sur
+la Carte**, ce qui est cohérent avec le reste de l'app.
+
+> **Garder le nom de table `missions`.** La renommer en `events` obligerait à toucher le Hub
+> et le mur de la boutique pour zéro bénéfice. Le vocabulaire affiché dit « L'appel » sans que
+> la base change de nom.
+
+### ⛔ Contrainte pour la conception du Campement
+
+Un rendez-vous est le meilleur outil de recrutement de la marque, et une mission photo accepte
+**déjà** les gens sans compte (`hub_photo_submissions.user_id` nullable, `consent_account_creation`
+prévu). Mais le salon d'un appel est du Campement — donc fermé aux non-porteurs.
+
+**La face publique d'un appel doit vivre hors du portail ; seule la conversation reste
+derrière.** Sinon le nouveau venu que le rendez-vous a fait marcher avec vous se cogne à une
+porte close, une photo à la main. À traiter en §9, pas après.
+
+### Ce qui n'est PAS un appel
+
+Un appel **rassemble, il ne classe pas**. Pas de gagnant, pas de podium, pas de « meilleure
+photo ». C'est un appel, pas un concours — sinon on réinstalle la compétition que la V2 retire.
+
+## 7. Carte
 
 *(à concevoir)*
 
-## 7. Codex
+- Y afficher les **rendez-vous** en cours (§6), qui portent un lieu.
+
+## 8. Codex
 
 *(à concevoir)*
 
-## 8. Campement
+- **Carrousel produits** — décidé le 18/08. Il vient ici, pas sur l'Accueil : devant un motif
+  qui plaît, l'envie d'acheter existe déjà ; sur l'Accueil elle serait interrompue. Garde
+  l'Accueil à **un seul** bloc commercial (le bandeau Saga).
+
+## 9. Campement
 
 *(à concevoir)*
+
+- Traiter la **contrainte du portail** posée en §6.
 
 ## Points ouverts
 
