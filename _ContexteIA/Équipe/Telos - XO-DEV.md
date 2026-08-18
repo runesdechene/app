@@ -33,7 +33,7 @@ Sur **FONDATION** (PC fixe, poste principal) :
 
 ⚠️ `~/CascadeProjects/RUNES DE CHENE (Shopify)/` est un **vieux clone mort**. Ne jamais y travailler ni y pousser.
 
-Autre machine → `hostname` → `_system/machines.md`. Absente → **demander à Uriel**. Ne jamais deviner un chemin.
+Autre machine → `hostname` → `~/citadelle/_ContexteIA/machines.md`. Absente → **demander à Uriel**. Ne jamais deviner un chemin.
 
 ### 2. Lire les règles du repo
 

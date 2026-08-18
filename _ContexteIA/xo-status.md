@@ -22,9 +22,10 @@ next_step: "Écouter un Fragment depuis une fiche produit et vérifier le compte
 ### Dette et améliorations connues
 - [ ] Fenêtre de temps sur l'agrégat des écoutes — aujourd'hui il porte sur toute la durée de vie, pas de vue par drop
 - [ ] Décider si l'identité de session doit survivre à la fermeture du navigateur — aujourd'hui un second onglet compte une seconde écoute
-- [ ] `_ContexteIA/CLAUDE.md` : dernière ligne tronquée (pointe un dossier, sans backtick fermant) ; le tableau Ecosystem décrit la Citadelle comme lieu de « dev » alors que l'en-tête dit l'inverse ; `docs/xo-discipline.md` n'y est cité nulle part
-- [ ] Trois copies de la fiche d'identité XO-DEV : le repo (vivante), `citadelle/_ContexteIA/Équipe/Anciens/`, et un `.démarrage.md` rangé dans « Mémoire » alors qu'il ne contient que des consignes
-- [ ] Coquilles dans le `CLAUDE.md` de la Citadelle : `_ContextIA` / `_ContectIA` au lieu de `_ContexteIA`, et `xo-status.md (racine)` alors qu'il vit dans `_ContexteIA/`
+- [ ] **À trancher avec Uriel** : `Équipe/Mémoire/<agent>.démarrage.md` existe pour les 3 agents et ne contient que des consignes, pas de la mémoire. Généré au lancement ? Si oui, sa source pointe `_res/` qui n'existe plus. Non touché faute de savoir.
+
+> Chantiers différés (CI, durcissement sécurité, échecs silencieux, dette) : `docs/tech-backlog.md`.
+> Dette DB/SQL détaillée : `docs/db/tech-debt.md`.
 
 ## Mémoire
 
