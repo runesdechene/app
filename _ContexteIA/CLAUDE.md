@@ -3,8 +3,9 @@
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > Mémoire unifiée : **La Citadelle** (Obsidian) + **Graphify** + **Context7**
 
-> Identité de l'agent, HARD GATE et discipline de commit : `_ContexteIA/Équipe/<nom>.md` (dans ce repo).
-> Le vault `~/citadelle/` ne sert que pour la marque, le concept et les arbitrages — pas pour coder.
+> Identité de l'agent et HARD GATE : `_ContexteIA/Équipe/<nom>.md`.
+> Où poser le code, quand pusher, anti-patterns : **`docs/xo-discipline.md`** — source de vérité unique.
+> Le vault `~/citadelle/` : voir « Quand ouvrir la Citadelle » en bas. Jamais au démarrage.
 
 ## 4-Layer Query Rule
 
@@ -34,7 +35,7 @@ Les deux pipelines sont indépendantes — les nodes SQL (`category: "sql"`) sur
 
 | Projet | Lieu | Rôle |
 |--------|------|------|
-| **La Citadelle** | `~/citadelle/` (symlink) | QG partagé (marque + dev + stratégie) |
+| **La Citadelle** | `~/citadelle/` (symlink) | Vault marque + concept + arbitrages — **pas** le code |
 | **explore-web** | `apps/explore-web/` | App publique (`app.runesdechene.com`) |
 | **hub** | `apps/hub/` | Back-office (`hub.runesdechene.com`) |
 | **seo-pages** | `apps/seo-pages/` | Pages SEO Node.js (`app.runesdechene.com/lieu/*`) |
@@ -60,4 +61,27 @@ Décision 2026-06-14 : le thème Shopify reste un **repo séparé**, voisin sur 
 - **Migrations SQL** numérotées dans `supabase/migrations/`. **Canal unique = `npx supabase db push --linked`** (jamais MCP `apply_migration` ni dashboard SQL : ils créent des orphelins timestamp et cassent `db push`). Tout `CREATE OR REPLACE` se base sur la def **LIVE** (`pg_get_functiondef`). Détail : `docs/db/migrations-workflow.md` (un hook deny bloque `apply_migration`).
 - **Déploiement Netlify manuel**, jamais d'auto-deploy Git
 
-Détail conceptuel de l'application : `~/citadelle/📱 L'application (La Carte)
+## Quand ouvrir la Citadelle
+
+Le vault `~/citadelle/` est le QG de la marque, pas de la technique. **Ne pas le lire au
+démarrage** — un agent qui code n'en a pas besoin pour commencer.
+
+L'ouvrir **seulement si** la réponse dépend d'une décision d'entreprise plutôt que du code :
+
+| Si je me demande | J'ouvre |
+|---|---|
+| Ce que l'app *veut dire* — concept, game design, ce qu'un joueur doit ressentir | `L'app/🎮 Bible Game Design.md`, `L'app/Décisions Game Design 2026.md` |
+| Comment Uriel veut qu'on déploie, qu'on release, qu'on reprenne sur un autre poste | `L'app/Préférences Uriel.md` |
+| Le ton, le nom d'une fonctionnalité, un mot affiché à l'utilisateur | `🍁 Identité.md`, `📣 Communication/` |
+| Si un arbitrage a déjà été tranché (pour ne pas le retrancher) | `_ContexteIA/xo-status.md` |
+
+**Ne PAS y chercher** : l'état réel du code, un nom de colonne, une signature de RPC, ce que
+fait l'app *aujourd'hui*. Ça vit ici — `graphify-out/`, `docs/db/`, `docs/superpowers/`. Le
+vault décrit l'intention, le repo décrit le fait ; quand les deux divergent, **le repo a raison
+sur le code** et la note du vault est à corriger.
+
+> ⚠️ `📱 L'application (La Carte)/` est un dossier **vidé** — l'ancien « cimetière de specs ».
+> Le dossier vivant est `L'app/`. Plusieurs notes renvoient encore vers l'ancien nom.
+
+> Le `xo-status.md` du vault porte les tâches d'entreprise (contenu, boutique, production).
+> Celui d'ici ne porte que le dev. Une tâche qui ne se livre pas en commit n'a rien à faire ici.

@@ -47,9 +47,9 @@ Elles ne sont **pas** auto-chargées, contrairement au `CLAUDE.md` du vault. San
 
 Pas en bloc — celle qui concerne ce que tu vas faire :
 
-- commit/push → `xo-discipline.md` §E + `📱 L'application (La Carte)/Préférences Uriel.md`
+- commit/push → `xo-discipline.md` §E + `~/citadelle/L'app/Préférences Uriel.md`
 - migration → `<repo>/docs/db/migrations-workflow.md` + `xo-discipline.md` §B
-- déploiement → `Préférences Uriel.md`, section Netlify
+- déploiement → `~/citadelle/L'app/Préférences Uriel.md`, section Netlify
 
 > Si tu t'apprêtes à demander « tu veux que je le fasse ? », c'est que tu n'as pas lu la note.
 
