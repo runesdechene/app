@@ -227,6 +227,37 @@ blocs communautaires : on voit d'un coup d'œil que c'est la marque qui parle, s
 Le bloc « Le plus salué » est **classé par la communauté, pas par la marque** — et se garde
 de devenir un classement de *personnes* : on met en avant un contenu, jamais un porteur.
 
+### Le flux « Sur les chemins » — langage visuel (maquette du 18/08)
+
+**Le type d'activité est porté par l'icône de gauche**, et par elle seule : empreintes pour
+une visite, ⊕ pour un ajout de lieu, blason pour un fragment réuni. C'est gros, c'est au
+début de la ligne, c'est là que l'œil tombe.
+
+**La feuille de salut garde une seule couleur.** Elle est la marque et le seul geste social
+de l'app : une marque qui existe en quatre couleurs sur un même écran cesse d'être une
+marque. La couleur y encode **l'état, pas le type** — pleine en rouge sang quand j'ai salué,
+en contour discret sinon. Binaire, vrai partout.
+
+**Les liens du flux sont tous en rouge sang.** Pas de teinte par type d'objet. La maquette
+avait un lien bleu-violet (couleur par défaut du navigateur) : **hors palette, écarté**. Avec
+trois types d'activité, colorer par type imposerait d'inventer deux teintes absentes de la DA,
+et l'Accueil se mettrait à ressembler à un fil d'actualité générique.
+
+> Si un jour la couleur par type devient nécessaire, elle va dans le **fond de la pastille de
+> gauche** — kaki, sable, rose poudré. C'est un fond, pas un texte : la palette tient, la
+> feuille reste unique, les liens restent rouges.
+
+**Le type ne doit jamais reposer sur la seule couleur** — une partie des daltoniens ne
+distinguerait pas trois teintes proches. L'icône de gauche règle ça pour tout le monde.
+
+**Les ajouts de lieu sont encadrés.** Un ajout est le seul acte du flux qui *agrandit la
+carte* : c'est lui qui fait grossir le produit. Le cadre doré est donc le **langage permanent
+des contributions**, pas un signal de rareté — un cadre lu comme une catégorie vieillit bien,
+un cadre lu comme une alerte devient du bruit le jour où les ajouts se multiplient (ce qu'on
+veut). Pour le renforcer sans dépendre de la rareté : **afficher la vignette du lieu ajouté**
+sur la ligne. C'est la seule activité qui apporte un objet nouveau ; le montrer pèse plus
+lourd qu'une teinte et reste lisible même sur trois lignes d'affilée.
+
 ### L'état vide (premier jour) — validé
 
 Sans lieu visité, les blocs communautaires (**5 Sur les chemins**, **6 Le plus salué**)
