@@ -251,7 +251,7 @@ en contour discret sinon. Binaire, vrai partout.
 | Couleur | Ce qu'elle veut dire | Où |
 |---|---|---|
 | **Rouge sang** `#833434` | **une action, un état** | pastille de salut, boutons. **Jamais un lien.** |
-| **Ocre doré** *(hex à relever)* | **une activité notable** | le nom, dans une ligne de fragment réuni ou d'ajout de lieu |
+| **Ocre doré** `#A89369` | **une activité notable** | le nom, dans une ligne de fragment réuni ou d'ajout de lieu |
 | Brun `#403434` | une activité ordinaire | le nom, dans une ligne de visite |
 
 **Ce n'est pas une couleur par type d'activité, et c'est pour ça que ça tient** : l'ocre encode
@@ -261,6 +261,15 @@ l'Accueil se serait mis à ressembler à un fil d'actualité générique.
 
 > Le lien bleu-violet d'une première maquette (couleur par défaut du navigateur) est **hors
 > palette, écarté**.
+
+> ⛔ **L'ocre ne passe pas en lisibilité — mesuré le 19/08.** `#A89369` sur parchemin
+> `#f4eee1` donne **2,58:1** de contraste, là où il en faut **4,5:1** pour du texte de taille
+> normale (3:1 pour du gros texte). C'est la seule couleur de la DA qui décroche : brun
+> `#594848` = 7,43:1, rouge sang `#833434` = 7,25:1, titres `#403434` = 10,33:1. Et c'est
+> d'autant plus gênant qu'elle marque **les lignes les plus importantes** du flux.
+> Candidats de remplacement, même famille : **`#7D6330`** (4,91:1, passe franchement),
+> `#8A6F3A` (4,11:1, gros texte seulement). Ils tirent vers le brun-doré et perdent de
+> l'éclat. **Arbitrage d'Uriel, non tranché** — `#A89369` reste la valeur en cours.
 
 > ⚠️ **À surveiller** : ici 2 lignes sur 3 sont ocre. Si les ajouts et les fragments deviennent
 > majoritaires — ce qu'on veut — le marqueur s'aplatit. Il dégrade mieux qu'un cadre (une
@@ -277,9 +286,9 @@ cartes** quand le flux est passé à nu sur le parchemin, et l'ocre l'a remplac�
 même intention, sans carte ni bordure, et ça vieillit mieux — un cadre calibré sur « c'est
 rare » devient du bruit le jour où les ajouts se multiplient.
 
-*Reste ouvert* : **afficher la vignette du lieu ajouté** sur la ligne. C'est la seule activité
-qui apporte un objet nouveau ; le montrer pèse plus lourd qu'une teinte, ne dépend pas de la
-rareté, et fonctionne sur parchemin nu.
+**Retenu, à maquetter par Uriel (19/08)** : **la vignette du lieu ajouté** s'affiche sur la
+ligne. C'est la seule activité qui apporte un objet nouveau ; le montrer pèse plus lourd
+qu'une teinte, ne dépend pas de la rareté, et fonctionne sur parchemin nu.
 
 ### Ce qui a le droit d'entrer dans le flux (19/08)
 
@@ -294,17 +303,22 @@ famille `expedition_*`, tous les `enigma_*`.
 `place_not_found` (de la télémétrie, pas des événements), `place_position_edited`,
 `place_tags`, `place_influence` (micro-corrections vraies mais illisibles).
 
-**Deux registres, et c'est le bouton Saluer qui les sépare** — pas un nouveau langage visuel :
+**La vraie frontière est « une ligne ou un indicateur »**, pas « avec ou sans bouton » :
 
-| Registre | Ce que la ligne dit | Exemples | Saluer ? |
+| | Ce que ça dit | Exemples | Forme |
 |---|---|---|---|
-| **Actes** | *quelqu'un a fait quelque chose* | première visite · ajout ou enrichissement de lieu · fragment réuni · réponse à un appel · post au Campement | **oui** |
-| **Signes de vie** | *il y a du monde ici* | arrivée d'un nouveau porteur | **non** |
-| **Présence** | — | connexions | **pas de ligne du tout** |
+| **Événements** | *quelqu'un a fait quelque chose, ou vient d'arriver* | première visite · ajout ou enrichissement de lieu · fragment réuni · réponse à un appel · post au Campement · **arrivée d'un nouveau porteur** | une **ligne**, avec bouton Saluer |
+| **Présence** | *il y a du monde ici* | connexions | **pas de ligne** — un indicateur ambiant |
 
-**Le bouton n'est pas une décoration, c'est la définition.** Une ligne avec bouton mérite
-qu'on la reconnaisse ; une ligne sans bouton dit seulement que la maison est habitée. L'absence
-de pastille à droite suffit à hiérarchiser.
+**Tout ce qui entre dans le flux porte un bouton Saluer** — tranché par Uriel le 19/08. Une
+étape intermédiaire prévoyait un second registre de lignes non saluables ; l'arrivée d'un
+nouveau porteur en était le seul exemple, et elle est finalement **saluable**. Le registre est
+donc tombé : si une ligne ne mérite pas d'être saluée, elle ne mérite pas d'être une ligne.
+
+> **Conséquence sur le vocabulaire.** La feuille voulait dire « je reconnais ta marche ». Elle
+> en dit maintenant deux choses, très proches : **je reconnais ta marche**, et **bienvenue**.
+> Tendre une feuille à qui arrive, dans une app dont le seul geste est de saluer, c'est un
+> accueil. Cohérent — mais à garder en tête si un jour on écrit un libellé unique pour le geste.
 
 **Inscription ≠ connexion.** Une inscription arrive une fois par personne, à vie : vrai
 événement, elle a sa ligne (« Camille a rejoint les chemins »). Une connexion arrive dix fois
@@ -323,11 +337,6 @@ L'information reste bonne à donner, sous une **autre forme** — un indicateur 
 > sur deux lignes est plus triste qu'une page bavarde. Le filet est **l'appel** : « Luna a
 > répondu à l'appel » est périodique, déclenché par la marque, et arrive en grappe pendant la
 > fenêtre de la mission. C'est le seul robinet du flux qu'on contrôle.
-
-> **Question ouverte — salue-t-on un nouveau venu ?** La feuille veut dire « je reconnais ta
-> marche », et un nouveau n'a pas encore marché. Mais dans une app dont le seul geste est de
-> saluer, tendre une feuille à qui arrive ressemble fort à un accueil. Arbitrage d'Uriel, non
-> tranché.
 
 ### L'état vide (premier jour) — validé
 
