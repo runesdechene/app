@@ -227,7 +227,15 @@ blocs communautaires : on voit d'un coup d'œil que c'est la marque qui parle, s
 Le bloc « Le plus salué » est **classé par la communauté, pas par la marque** — et se garde
 de devenir un classement de *personnes* : on met en avant un contenu, jamais un porteur.
 
-### Le flux « Sur les chemins » — langage visuel (maquette du 18/08)
+### Le flux « Sur les chemins » — langage visuel (maquette des 18-19/08)
+
+**Les lignes du flux posent à nu sur le parchemin** — pas de carte, pas de fond, pas de coin
+arrondi. Décision de maquette : les gravures et l'entrelac disent « imprimé », des cartes
+arrondies partout disaient « iOS ». Effet de bord gagné : le flux est devenu plus discret que
+les blocs du haut, ce qui donne enfin à la page **deux tempos** au lieu d'un seul.
+
+> Conséquence : le filigrane de fond passe désormais **sous** le texte du flux, qui n'a plus de
+> carte pour le protéger. Il reste lisible aux opacités actuelles — **ne pas les monter**.
 
 **Le type d'activité est porté par l'icône de gauche**, et par elle seule : empreintes pour
 une visite, ⊕ pour un ajout de lieu, blason pour un fragment réuni. C'est gros, c'est au
@@ -238,25 +246,40 @@ de l'app : une marque qui existe en quatre couleurs sur un même écran cesse d'
 marque. La couleur y encode **l'état, pas le type** — pleine en rouge sang quand j'ai salué,
 en contour discret sinon. Binaire, vrai partout.
 
-**Les liens du flux sont tous en rouge sang.** Pas de teinte par type d'objet. La maquette
-avait un lien bleu-violet (couleur par défaut du navigateur) : **hors palette, écarté**. Avec
-trois types d'activité, colorer par type imposerait d'inventer deux teintes absentes de la DA,
-et l'Accueil se mettrait à ressembler à un fil d'actualité générique.
+**Deux couleurs, deux rôles, aucun recouvrement** — tranché par Uriel en maquette le 18/08 :
 
-> Si un jour la couleur par type devient nécessaire, elle va dans le **fond de la pastille de
-> gauche** — kaki, sable, rose poudré. C'est un fond, pas un texte : la palette tient, la
-> feuille reste unique, les liens restent rouges.
+| Couleur | Ce qu'elle veut dire | Où |
+|---|---|---|
+| **Rouge sang** `#833434` | **une action, un état** | pastille de salut, boutons. **Jamais un lien.** |
+| **Ocre doré** *(hex à relever)* | **une activité notable** | le nom, dans une ligne de fragment réuni ou d'ajout de lieu |
+| Brun `#403434` | une activité ordinaire | le nom, dans une ligne de visite |
+
+**Ce n'est pas une couleur par type d'activité, et c'est pour ça que ça tient** : l'ocre encode
+un axe **binaire** — notable ou ordinaire — exactement comme la feuille encode salué ou pas.
+Un seul axe par teinte. Une couleur par type aurait imposé d'inventer une hue par catégorie et
+l'Accueil se serait mis à ressembler à un fil d'actualité générique.
+
+> Le lien bleu-violet d'une première maquette (couleur par défaut du navigateur) est **hors
+> palette, écarté**.
+
+> ⚠️ **À surveiller** : ici 2 lignes sur 3 sont ocre. Si les ajouts et les fragments deviennent
+> majoritaires — ce qu'on veut — le marqueur s'aplatit. Il dégrade mieux qu'un cadre (une
+> couleur de texte à 70 % de densité reste calme là où des bordures deviendraient du bruit),
+> mais à regarder sur dix lignes avant de figer.
 
 **Le type ne doit jamais reposer sur la seule couleur** — une partie des daltoniens ne
 distinguerait pas trois teintes proches. L'icône de gauche règle ça pour tout le monde.
 
-**Les ajouts de lieu sont encadrés.** Un ajout est le seul acte du flux qui *agrandit la
-carte* : c'est lui qui fait grossir le produit. Le cadre doré est donc le **langage permanent
-des contributions**, pas un signal de rareté — un cadre lu comme une catégorie vieillit bien,
-un cadre lu comme une alerte devient du bruit le jour où les ajouts se multiplient (ce qu'on
-veut). Pour le renforcer sans dépendre de la rareté : **afficher la vignette du lieu ajouté**
-sur la ligne. C'est la seule activité qui apporte un objet nouveau ; le montrer pèse plus
-lourd qu'une teinte et reste lisible même sur trois lignes d'affilée.
+**Les contributions se distinguent par l'ocre, pas par un cadre.** Un ajout de lieu est le
+seul acte du flux qui *agrandit la carte* : c'est lui qui fait grossir le produit, et il mérite
+de se voir. Une maquette intermédiaire l'encadrait de doré ; le cadre est **tombé avec les
+cartes** quand le flux est passé à nu sur le parchemin, et l'ocre l'a remplacé. Bon échange :
+même intention, sans carte ni bordure, et ça vieillit mieux — un cadre calibré sur « c'est
+rare » devient du bruit le jour où les ajouts se multiplient.
+
+*Reste ouvert* : **afficher la vignette du lieu ajouté** sur la ligne. C'est la seule activité
+qui apporte un objet nouveau ; le montrer pèse plus lourd qu'une teinte, ne dépend pas de la
+rareté, et fonctionne sur parchemin nu.
 
 ### L'état vide (premier jour) — validé
 
