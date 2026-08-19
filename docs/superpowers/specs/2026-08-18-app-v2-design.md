@@ -251,7 +251,7 @@ en contour discret sinon. Binaire, vrai partout.
 | Couleur | Ce qu'elle veut dire | Où |
 |---|---|---|
 | **Rouge sang** `#833434` | **une action, un état** | pastille de salut, boutons. **Jamais un lien.** |
-| **Ocre doré** `#A89369` | **une activité notable** | le nom, dans une ligne de fragment réuni ou d'ajout de lieu |
+| **Ocre doré** `#8A6F3A` | **une activité notable** | le nom, dans une ligne de fragment réuni ou d'ajout de lieu |
 | Brun `#403434` | une activité ordinaire | le nom, dans une ligne de visite |
 
 **Ce n'est pas une couleur par type d'activité, et c'est pour ça que ça tient** : l'ocre encode
@@ -262,14 +262,18 @@ l'Accueil se serait mis à ressembler à un fil d'actualité générique.
 > Le lien bleu-violet d'une première maquette (couleur par défaut du navigateur) est **hors
 > palette, écarté**.
 
-> ⛔ **L'ocre ne passe pas en lisibilité — mesuré le 19/08.** `#A89369` sur parchemin
-> `#f4eee1` donne **2,58:1** de contraste, là où il en faut **4,5:1** pour du texte de taille
-> normale (3:1 pour du gros texte). C'est la seule couleur de la DA qui décroche : brun
-> `#594848` = 7,43:1, rouge sang `#833434` = 7,25:1, titres `#403434` = 10,33:1. Et c'est
-> d'autant plus gênant qu'elle marque **les lignes les plus importantes** du flux.
-> Candidats de remplacement, même famille : **`#7D6330`** (4,91:1, passe franchement),
-> `#8A6F3A` (4,11:1, gros texte seulement). Ils tirent vers le brun-doré et perdent de
-> l'éclat. **Arbitrage d'Uriel, non tranché** — `#A89369` reste la valeur en cours.
+> **Comment l'ocre a été choisi — tranché le 19/08.** Le premier ocre proposé, `#A89369`,
+> donnait **2,58:1** sur parchemin, très en dessous du seuil de 4,5:1 : le nom du lieu pesait
+> visuellement *moins lourd que sa propre méta grise*, alors que c'est lui l'information.
+> Symptôme plus parlant que le chiffre. Trois candidats comparés à taille réelle sur vrai
+> parchemin ; `#7D6330` (4,91:1) passait la norme mais tirait tellement vers le brun qu'il ne
+> se distinguait plus d'une ligne ordinaire — il perdait la seule chose que l'ocre doit faire.
+> **`#8A6F3A` retenu : 4,11:1.** Garde l'or, passe devant sa méta.
+>
+> ⚠️ **Écart assumé** : 4,11 reste sous le seuil AA du texte courant (4,5) et au-dessus de
+> celui du gros texte (3). Si on veut la conformité pleine sans changer la teinte, il suffit de
+> composer le nom en **gras à 19 px ou plus** — il bascule alors dans la catégorie « gros
+> texte », où 3:1 suffit.
 
 > ⚠️ **À surveiller** : ici 2 lignes sur 3 sont ocre. Si les ajouts et les fragments deviennent
 > majoritaires — ce qu'on veut — le marqueur s'aplatit. Il dégrade mieux qu'un cadre (une
@@ -371,6 +375,7 @@ La direction artistique vient de **la boutique `runesdechene.com`** (thème Cré
 | Rose poudré | `#ebd2d2` | scheme-1 `secondary_button_background` |
 | Kaki forêt | `#46493c` | scheme-3 `background` |
 | Sable | `#e7dcca` | scheme-1 `variant_background_color` |
+| **Ocre doré** | `#8A6F3A` | **maquette Figma 19/08** — absent de la boutique |
 | Titres | **Bebas Neue** | `type_heading_font` |
 | Corps | **Cabin** | `type_body_font` |
 
