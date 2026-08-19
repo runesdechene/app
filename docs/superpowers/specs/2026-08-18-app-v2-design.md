@@ -62,9 +62,10 @@ V1 actuels perdront ces systèmes. Le chemin de migration est un chantier à par
 
 - **Compagnies, réincarnées** : plus des Maisons qui s'affrontent, mais des **groupes de
   discussion libres** au sein de la communauté. → Conséquence de conception dès
-  maintenant : le Campement V2.0 est **un** espace, pas **l'**espace. Un fil appartient à
-  un espace dès le départ, même s'il n'y en a qu'un seul. Gratuit aujourd'hui, cher à
-  rattraper plus tard.
+  maintenant : le **registre** V2.0 (§10) est **un** espace, pas **l'**espace. Un message
+  appartient à un canal dès le départ, même s'il n'y en a que deux. Gratuit aujourd'hui, cher
+  à rattraper plus tard. *(Visait le Campement avant la révision du 19/08 ; c'est le registre
+  qui porte la discussion.)*
 - **Code imprimé sur le fragment** pour se déclarer porteur (voir §4).
 
 ## 2. Cadre technique
@@ -103,6 +104,9 @@ de menu et la section**, pas le champ individuel.
 - Chaque onglet **garde son état** quand on en change.
 - L'avatar en haut à droite ouvre le **Compte**.
 - Les 4 zones sont **égales** — aucune n'est enterrée sous une autre.
+- **Le registre (le chat) n'est pas un onglet** : c'est un **tiroir ouvrable depuis n'importe
+  quel écran** (§10). Décision du 19/08 — dans un MMO le chat n'est pas une zone, c'est un
+  panneau ; on discute *en regardant la carte*.
 
 *Écartées* : la Carte comme socle avec le reste en feuilles (c'est la V1, et ça enterre
 Codex + Campement) ; l'Accueil comme hall sans barre permanente (deux fois plus de gestes,
@@ -162,13 +166,17 @@ l'objet et le numérique. À reprendre quand l'emballage sera maîtrisé.
 
 Nom de travail : **Le Seuil**.
 
-### Frontière Accueil / Campement
+### Frontière entre les lieux
 
-> **L'Accueil, on le lit. Le Campement, on y parle.**
+> **L'Accueil, on le lit. Le registre, on y parle. Le Campement, on y décide.**
 
 L'Accueil est **descendant** : la marque publie, la communauté vit, le porteur reçoit.
 Le seul geste social autorisé y est **saluer** — un tap, un compteur, une notification au
-porteur salué. **Pas de commentaire sur l'Accueil** : la conversation appartient au Campement.
+porteur salué. **Pas de commentaire sur l'Accueil** : la conversation appartient au registre.
+
+> **Révision du 19/08.** La formule d'origine était « l'Accueil on le lit, le Campement on y
+> parle ». Le Campement n'est plus la discussion (§9) : la conversation a migré vers le
+> **registre**, un tiroir ouvert à tous (§10). La frontière compte désormais trois lieux.
 
 **Vocabulaire retenu : « saluer / un salut »**, pas « féliciter » (long pour une pilule, et
 ton scolaire).
@@ -483,15 +491,20 @@ la Carte**, ce qui est cohérent avec le reste de l'app.
 > et le mur de la boutique pour zéro bénéfice. Le vocabulaire affiché dit « L'appel » sans que
 > la base change de nom.
 
-### ⛔ Contrainte pour la conception du Campement
+### ✅ La contrainte du portail est levée (19/08)
 
 Un rendez-vous est le meilleur outil de recrutement de la marque, et une mission photo accepte
 **déjà** les gens sans compte (`hub_photo_submissions.user_id` nullable, `consent_account_creation`
-prévu). Mais le salon d'un appel est du Campement — donc fermé aux non-porteurs.
+prévu). Tant que le Campement portait la discussion, le salon d'un appel était fermé aux
+non-porteurs — et le nouveau venu qu'un rendez-vous avait fait marcher se cognait à une porte
+close, une photo à la main.
 
-**La face publique d'un appel doit vivre hors du portail ; seule la conversation reste
-derrière.** Sinon le nouveau venu que le rendez-vous a fait marcher avec vous se cogne à une
-porte close, une photo à la main. À traiter en §9, pas après.
+**Le problème disparaît avec la révision du 19/08** : la discussion vit dans le **registre**
+(§10), ouvert à tous, et le Campement ne garde que la décision (§9). Le salon d'un appel est
+donc public par construction. Rien à inventer.
+
+**Une initiative peut aussi lancer un rendez-vous** (§9) : même objet, deux origines — la
+marque, ou un porteur.
 
 ### Ce qui n'est PAS un appel
 
@@ -664,11 +677,184 @@ Aucun ne fait le travail d'un autre, aucun ne se répète.
 - Combien de lieux sont **datés** (`era_id`) — la synthèse « par époque » en dépend, comme la
   lecture *Le temps* de la Carte (§7).
 
-## 9. Campement
+## 9. Campement — VALIDÉ (structure)
 
-*(à concevoir)*
+Maquette de structure : artefact **« Le Campement »**.
 
-- Traiter la **contrainte du portail** posée en §6.
+**Le Campement est la salle où les porteurs voient d'abord et tranchent ensuite.** Ce n'est
+plus la discussion.
+
+> **Pourquoi ce n'est plus la discussion — arbitrage d'Uriel, 19/08.** Une conversation
+> **gagne** à s'ouvrir : plus il y a de monde, mieux c'est, pour la communauté comme pour la
+> marque. La fermer derrière un achat détruit de la valeur pour fabriquer un privilège. Un
+> **vote**, à l'inverse, ne vaut *que* parce qu'il est réservé — s'il est ouvert à tous, il ne
+> pèse plus rien. La règle qui en sort : **on ouvre ce qui grandit, on réserve ce qui pèse.**
+
+**L'avant-première et le vote sont le même geste.** On montre des motifs candidats que personne
+dehors n'a vus ; **les voir** est le privilège, **choisir** est ce qu'on en fait.
+
+### Les quatre sections
+
+Elles ne sont jamais vides en même temps : un vote court, la première vit ; pas de vote, les
+trois autres tiennent la pièce.
+
+| Section | Contenu |
+|---|---|
+| **En délibération** | le vote en cours : candidats en avant-première, échéance, ta voix |
+| **Ce qui arrive** | le tranché, pas encore public — et la **fenêtre d'achat réservée** |
+| **Initiatives** | ce que la communauté propose et lance |
+| **L'archive** | les décisions passées et **ce qu'elles ont produit** |
+
+### Les règles du vote
+
+- **Un choix entre des candidats, jamais une question ouverte.** Voter entre trois motifs *que
+  la marque a dessinés* l'engage sur la décision sans l'exposer : quoi qu'il arrive, elle sort
+  quelque chose qu'elle voulait faire. Une question ouverte est un chèque en blanc.
+- **Un porteur, une voix.** Pas de poids proportionnel au nombre de fragments — ce serait un
+  classement déguisé, exactement ce que la V2 retire.
+- **Totaux publics, voix anonymes.**
+- **Le score se découvre après avoir voté** — sinon les premières voix orientent les suivantes.
+- **L'engagement est écrit dans l'écran du vote**, pas dans des conditions que personne ne lit.
+  Exemple retenu : *« le motif en tête au 26 août part en production. Nous nous engageons sur le
+  choix, pas sur la date. »*
+
+> ⛔ **Le seul vrai danger.** Un vote qu'on n'honore pas fait plus de dégâts que pas de vote du
+> tout. La question à trancher **avant** d'écrire du code n'est pas « comment on l'affiche »,
+> c'est **sur quoi la marque accepte d'être liée**. Le prochain motif, probablement. La palette
+> d'une Saga, peut-être. Une date de sortie, sûrement pas. **La liste doit être courte et
+> honnête.**
+
+### Les initiatives
+
+**Deux natures, à ne pas confondre :**
+
+| | Ce que ça engage |
+|---|---|
+| **Demande** (« un motif sur les lavoirs ») | engage la marque → **seuil + réponse obligatoires** |
+| **Sortie** (« marche des mégalithes le 12 ») | n'engage rien → la marque **héberge**. Ce sont les **rendez-vous** du §6, lancés par un porteur. |
+
+**Le seuil protège les deux côtés.** Une initiative qui atteint **N soutiens** reçoit une
+réponse officielle — oui, non, ou plus tard, **avec la raison**. En dessous, elle s'éteint sans
+rejet. La règle étant publique, *une idée qui n'a pas convaincu n'a pas été ignorée* : ce n'est
+pas la même blessure. **Un refus motivé ne casse rien ; le silence, si.**
+
+**Une initiative en cours à la fois, par personne.** Plutôt qu'un rang ou un score de mérite,
+qui réinstallerait la comparaison. Chacun doit choisir sa meilleure idée. *Les plus motivés se
+distinguent par ce qu'ils lancent, pas par un badge qui dit qu'ils sont motivés.*
+
+### L'archive garde les refus
+
+*« Écharpe en laine — demandée par 61 porteurs, refusée : pas d'atelier trouvé. »* Une salle qui
+n'affiche que ses succès ne prouve rien. **Le refus motivé est ce qui rend les oui crédibles**,
+et c'est l'archive qui prouve que le vote comptait.
+
+### La porte
+
+Elle dit **ce qui se passe derrière, sans le donner** : le sujet du vote et le nombre de voix,
+**jamais les motifs**. Une porte fermée qu'on voit à travers est une invitation ; opaque, c'est
+un refus.
+
+Le portail existe déjà : `purchase_log` → `user_fragments` détermine qui est porteur (§4). Rien
+à construire pour la serrure.
+
+### Ce que le porteur gagne ailleurs
+
+Le Campement n'est pas le seul privilège. **Sur la Carte**, un contributeur peut restreindre la
+visibilité d'un lieu rare ou fragile — voir §9bis ci-dessous. Être porteur, c'est aussi **voir
+la carte que les autres ne voient pas**.
+
+### À vérifier
+
+- `territory_name_proposals` / `territory_name_votes` (gelées en mig 274) : mécanique de vote
+  déjà écrite, peut-être réutilisable.
+
+## 9bis. Filtre de visibilité des lieux (Carte)
+
+**Les lieux sont ajoutés par les gens** (`places.author_id`). Un lieu rare ou fragile doit
+pouvoir être protégé — c'est ce que font les bases naturalistes et le géocaching depuis
+toujours. **C'est le contributeur qui choisit à qui il l'ouvre.**
+
+| Niveau | Qui voit |
+|---|---|
+| **Ouvert** | tout le monde |
+| **Discret** | tout le monde voit qu'il existe, **position floutée** ; les porteurs voient les coordonnées exactes |
+| **Réservé** | seuls les porteurs |
+| **Personnel** | personne d'autre que l'auteur |
+
+**« Discret » est le niveau le plus utile** : le lieu reste dans sa zone, la carte reste dense
+et vivante pour tout le monde, et la station reste protégée.
+
+- **Le défaut doit être « Ouvert ».** Une restriction proposée par défaut referme tout par
+  prudence et tue la carte. La restriction est un **geste délibéré**.
+- **Le contributeur peut en changer** — un lieu devient fragile après un passage dans la presse,
+  ou cesse de l'être.
+- **Le floutage se fait côté serveur, dans la RPC.** Si les coordonnées exactes partent au
+  client pour être arrondies à l'affichage, la protection ne vaut rien.
+- Points d'accroche existants : **`sensible`** porte déjà cette intention, **`private`** couvre
+  le niveau Personnel. **Ne pas toucher à `masked`** : c'est de la modération (« retrait
+  réversible de l'app ») — mélanger *caché parce que douteux* et *protégé parce que précieux*
+  rendrait les deux illisibles.
+
+## 10. Le registre — la discussion, partout
+
+**Un chat de MMO, pas une messagerie.** Décision d'Uriel le 19/08, après mesure : **10-15
+personnes en simultané**. À cette densité un chat vit — un message reçoit sa réponse pendant que
+son auteur est encore là.
+
+**Ce n'est pas un onglet, c'est un tiroir** ouvrable depuis n'importe quel écran : on discute en
+regardant la Carte. **Ouvert à tous**, porteurs ou non — c'est ce qui grandit.
+
+### Le registre
+
+Une seule colonne **dense** — douze à vingt lignes d'un coup d'œil. Canaux en préfixe coloré,
+noms cliquables, lignes système en italique.
+
+| Canal | Teinte | |
+|---|---|---|
+| **Feu** | brun `#594848` | le salon global |
+| **Atelier** | kaki `#46493c` | bugs et idées |
+| **Système** | pâle `#a3927a` | arrivées, appels — en italique |
+
+**La densité est la fonctionnalité.** C'est elle qui rend inutiles les fils et les citations :
+une réponse reste à portée de vue de sa question. *Un fil fragmente le regard et crée un second
+endroit où personne ne va — mécanique de grosse communauté, nuisible à douze.* Écartés tous les
+deux.
+
+**Le lien d'objet** — un lieu, un fragment, un appel se lient dans la phrase :
+`[Menhir de Kerloas]`, en couleur de son type. Toucher déplie l'objet sur place. Exactement le
+geste de lier un objet dans un chat de MMO, et c'est ce qui distingue le registre d'un Discord.
+
+**Le nom est un bouton** : murmurer, voir son Codex, inviter dans un groupe, saluer. *C'est de
+là que naissent les groupes*, pas d'un écran de création.
+
+**Le titre porté, en chevrons** — `Luna ‹Demiurge›`. Convention MMO, et **la seule raison d'avoir
+un titre** : un titre que personne ne voit ne sert à rien. Il remplace la couleur de Maison V1.
+
+### Les murmures sont à part
+
+**Une vraie boîte, pas un filtre** — décision d'Uriel : un murmure se perdrait dans le flux
+entre deux connexions. Les **groupes** sont du même côté : un groupe est une conversation
+fermée. Frontière : **le registre est public, les murmures sont privés.**
+
+Une **ligne de passerelle** dans le registre signale l'arrivée d'un murmure (« Luna te
+murmure ») sans jamais en montrer le contenu.
+
+### Trois constats de base
+
+1. **Purge à 14 jours.** `cleanup_old_chat_messages()` supprime tout message de plus de deux
+   semaines — cohérent pour un registre public, qui se consume. **Mais la purge doit devenir
+   sélective** : elle épargne les murmures (perdre sa correspondance privée à J+14 est brutal).
+   *Reste à trancher* : épargne-t-elle aussi les messages publics qui **lient un objet**, qui
+   sont justement les « partages » qu'on veut garder ?
+2. ⛔ **`anon` a `GRANT ALL` sur `chat_messages`.** Les policies RLS rattrapent aujourd'hui
+   (`auth.role() = 'authenticated'`), ce qui suffit pour un salon public où tout le monde a le
+   droit de tout lire. **Ça ne suffit plus pour des murmures**, où la règle devient « seuls les
+   deux intéressés ». Ce repo s'est déjà fait avoir deux fois par ce motif — `purchase_log` et
+   le SELECT d'`anon` sur `users` (§ voir `docs/db/gotchas.md`). Retirer le GRANT, et **gater
+   par appartenance à la conversation, pas par le nom du canal**.
+3. `faction_id`, `faction_color`, `faction_pattern` traînent sur chaque message — le chat
+   colorait les noms par Maison. À neutraliser au portage ; **le titre en chevrons prend leur
+   place**.
 
 ## Points ouverts
 

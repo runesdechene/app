@@ -1,7 +1,7 @@
 ---
 updated: 2026-08-19T00:00:00Z
-summary: "Codex tranché : un pokédex, et un mur de macarons pour les lieux."
-next_step: "Concevoir le Campement, la dernière pièce."
+summary: "Conception V2 bouclée : les quatre écrans sont tranchés."
+next_step: "Uriel maquette ; on élaguera ensuite avec ses écrans."
 ---
 
 <!-- Statut lu par XO sur la carte d'accueil. À tenir à jour à chaque session.
@@ -22,7 +22,10 @@ next_step: "Concevoir le Campement, la dernière pièce."
 - [ ] Carte — reste la fiche d'un lieu et la validation de visite à 500 m
 - [ ] Vérifier combien de lieux sont datés (`era_id`) — sinon la lecture « Le temps » est vide
 - [x] Codex — structure tranchée : pokédex à trous, mur de macarons pour les lieux
-- [ ] Campement — la dernière pièce à concevoir
+- [x] Campement — devient la salle de décision des porteurs (votes, avant-premières)
+- [x] Le registre — la discussion sort du Campement et devient un tiroir ouvert à tous
+- [ ] Trancher sur quoi la marque accepte d'être liée par un vote — avant tout code
+- [ ] Uriel maquette Carte, Codex, Campement — on élaguera ensuite
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 - [ ] Au portage des appels : retirer `floor_glory`/`floor_crowns` et l'emoji par défaut
 
@@ -51,6 +54,19 @@ next_step: "Concevoir le Campement, la dernière pièce."
   `#46493c`, Bebas Neue + Cabin — le sépia doré `#C19A6B` de la V1 n'existe pas côté boutique.
   **Convention à tenir** : toute fonctionnalité V2 reliée au Hub reçoit une pastille
   « V2 compatible » dans l'interface du Hub.
+
+- **Le Campement, le registre et le filtre des lieux (19 août, spec §9, 9bis, 10)** —
+  **le Campement n'est plus la discussion.** Règle dégagée : *on ouvre ce qui grandit, on
+  réserve ce qui pèse* — une conversation gagne à s'ouvrir, un vote ne vaut que réservé.
+  Le Campement devient la salle où les porteurs **voient d'abord et tranchent ensuite** :
+  l'avant-première et le vote sont **le même geste**. Vote entre candidats dessinés par la
+  marque (jamais une question ouverte), une voix par porteur, score révélé après le vote,
+  engagement écrit dans l'écran. L'archive **garde les refus** — c'est ce qui rend les oui
+  crédibles. Danger n°1 : **un vote non honoré fait plus de dégâts que pas de vote**.
+  La discussion devient **le registre**, un chat de MMO dense en tiroir ouvert depuis tout
+  écran, ouvert à tous — fils et citations écartés, la densité les rend inutiles. Les
+  murmures ont leur propre boîte. Et les **lieux rares se protègent par un filtre tenu par
+  leur contributeur** (ouvert / discret / réservé / personnel), floutage côté serveur.
 
 - **Le Codex (19 août, spec §8)** — le registre de **ce que tu as**, pas de ce qui existe.
   Quatre collections, en **pokédex** : fragments, titres, badges (à venir, liés aux
