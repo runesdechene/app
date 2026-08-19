@@ -1,6 +1,6 @@
 ---
 updated: 2026-08-19T00:00:00Z
-summary: "Conception V2 bouclée : les quatre écrans sont tranchés."
+summary: "Conception V2 bouclée : cinq écrans, fiche de lieu comprise."
 next_step: "Uriel maquette ; on élaguera ensuite avec ses écrans."
 ---
 
@@ -19,13 +19,15 @@ next_step: "Uriel maquette ; on élaguera ensuite avec ses écrans."
 - [x] Uriel maquette l'Accueil sur Figma — DA fixée (Bebas Neue + Cabin, ocre `#8A6F3A`)
 - [ ] Finir la maquette Accueil : vignette du lieu ajouté, bandeau Saga en kaki
 - [x] Carte — structure tranchée : trois lectures, l'inconnu se tait, clustering obligatoire
-- [ ] Carte — reste la fiche d'un lieu et la validation de visite à 500 m
+- [x] Carte — fiche d'un lieu tranchée : bouton de visite gris + distance si trop loin
+- [ ] Fiche de lieu : libeller les 2 boutons ronds, y poser le filtre de visibilité
 - [ ] Vérifier combien de lieux sont datés (`era_id`) — sinon la lecture « Le temps » est vide
 - [x] Codex — structure tranchée : pokédex à trous, mur de macarons pour les lieux
 - [x] Campement — devient la salle de décision des porteurs (votes, avant-premières)
 - [x] Le registre — la discussion sort du Campement et devient un tiroir ouvert à tous
 - [ ] Trancher sur quoi la marque accepte d'être liée par un vote — avant tout code
-- [ ] Uriel maquette Carte, Codex, Campement — on élaguera ensuite
+- [ ] Uriel maquette le Campement — le reste est maquetté
+- [ ] Afficher la ligne de faits sur la fiche (`era_id`, `best_season`, `accessibility`, `bivouac`)
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 - [ ] Au portage des appels : retirer `floor_glory`/`floor_crowns` et l'emoji par défaut
 

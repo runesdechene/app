@@ -104,9 +104,19 @@ de menu et la section**, pas le champ individuel.
 - Chaque onglet **garde son état** quand on en change.
 - L'avatar en haut à droite ouvre le **Compte**.
 - Les 4 zones sont **égales** — aucune n'est enterrée sous une autre.
-- **Le registre (le chat) n'est pas un onglet** : c'est un **tiroir ouvrable depuis n'importe
-  quel écran** (§10). Décision du 19/08 — dans un MMO le chat n'est pas une zone, c'est un
-  panneau ; on discute *en regardant la carte*.
+**Cinq onglets depuis le 19/08** : *Accueil · Carte · Codex · Registre · Campement.*
+
+> **Le tiroir a été proposé puis écarté.** L'idée venait du chat de MMO — un panneau ouvrable
+> par-dessus n'importe quel écran, pour discuter en regardant la Carte. **La prémisse ne
+> transfère pas** : dans un MMO il y a un monde derrière, on est debout quelque part et on
+> regarde la scène. Sur un téléphone il n'y a pas de monde derrière, la Carte est un écran
+> comme un autre. S'ajoutaient : un tiroir **se cache** là où un onglet se voit et porte une
+> pastille ; et le glissement pour ouvrir **entre en conflit** avec le glissement pour déplacer
+> la carte. Le bénéfice vendu — parler d'un lieu en le regardant — est déjà couvert par le
+> **lien d'objet** (§10) : on lie le lieu, on touche, on saute sur la Carte.
+
+*Réserve de mise en page* : à cinq, les libellés se serrent et « Campement » est le plus long.
+Prévoir des mots plus courts sur la barre, ou deux lignes.
 
 *Écartées* : la Carte comme socle avec le reste en feuilles (c'est la V1, et ça enterre
 Codex + Campement) ; l'Accueil comme hall sans barre permanente (deux fois plus de gestes,
@@ -592,9 +602,54 @@ Le bouton **Compagnies**. Les **écus « ? »** sous leur forme actuelle. Les **
   une coquille vide.
 - Y afficher les **rendez-vous** en cours (§6), qui portent un lieu.
 
-### Reste à concevoir
+### La fiche d'un lieu — VALIDÉ (maquette du 19/08)
 
-- **La fiche d'un lieu** et **la validation de visite à 500 m**.
+Dans l'ordre du scroll : **photo pleine largeur**, galerie de vignettes, titre, badge de type
+(même code couleur que les pastilles de la Carte), adresse, porteurs, bouton de visite, récit,
+crédits.
+
+**Le bord déchiré** entre la photo et le parchemin est le détail qui fait basculer l'écran du
+côté du papier plutôt que de la carte d'application. **À reprendre partout où une image
+rencontre le fond.**
+
+**« 3 Porteurs ont foulé ce lieu »**, avatars empilés — preuve sociale **sans classement** : on
+montre qu'on est passé, on ne dit pas qui est passé le plus.
+
+**L'adresse ouvre le GPS du téléphone** (« Toucher l'adresse pour ouvrir le GPS »).
+
+**Les crédits ferment la page** : *« Lieu ajouté par Luna · Enrichi par Mathéo — Image + Texte »*.
+Le récit est écrit par les contributeurs, pas par la marque.
+
+### Le bouton de visite — le geste le plus important de l'app
+
+C'est lui qui fait passer un lieu de la marque creuse à la pastille pleine. Il se valide à
+**500 m** (`distance_gps_km = 0.5`).
+
+**Il porte l'état avant qu'on le touche** — confirmé par Uriel :
+
+| | |
+|---|---|
+| **À portée** | plein, rouge sang, actif — *« Marquer ma visite (GPS) »* |
+| **Trop loin** | **gris, avec la distance affichée** |
+
+**Le refus est écrit sur le bouton, jamais découvert par l'échec.** Un bouton qui a l'air
+disponible et qui refuse après coup fait apprendre la règle de la pire façon.
+
+### La ligne de faits — réveiller les cinq dimensions qui dorment
+
+La fiche est le **seul endroit naturel** des colonnes que la Carte n'exploite pas :
+**`era_id` / `year_exact`**, **`best_season`**, **`accessibility`**, **`bivouac`**,
+**`sensible`**.
+
+Une ligne sous le badge de type — *« Médiéval · XIIᵉ · idéal au printemps · accès facile ·
+bivouac toléré »* — répond aux quatre questions de quelqu'un qui envisage d'y aller. **Les
+colonnes sont déjà remplies : ça ne coûte que l'affichage.**
+
+### Reste à faire sur la fiche
+
+- **Libeller les deux boutons ronds** en haut à droite (un livre, une cible). Sans libellé,
+  c'est un jeu de devinettes à l'endroit le plus visible de l'écran.
+- **Y poser le filtre de visibilité** (§9bis) : c'est ici que l'auteur le voit et le change.
 - Le comportement quand la géolocalisation est refusée ou qu'on est loin de tout.
 
 ## 8. Codex — VALIDÉ (structure)
@@ -840,8 +895,10 @@ et vivante pour tout le monde, et la station reste protégée.
 personnes en simultané**. À cette densité un chat vit — un message reçoit sa réponse pendant que
 son auteur est encore là.
 
-**Ce n'est pas un onglet, c'est un tiroir** ouvrable depuis n'importe quel écran : on discute en
-regardant la Carte. **Ouvert à tous**, porteurs ou non — c'est ce qui grandit.
+**C'est un onglet plein écran** — le tiroir a été proposé puis écarté (raison en §3).
+**Ouvert à tous**, porteurs ou non : c'est ce qui grandit.
+
+Deux onglets hauts : **LE REGISTRE** et **LES MURMURES** (avec pastille de non-lus).
 
 ### Le registre
 
@@ -853,6 +910,33 @@ noms cliquables, lignes système en italique.
 | **Feu** | brun `#594848` | le salon global |
 | **Atelier** | kaki `#46493c` | bugs et idées |
 | **Système** | pâle `#a3927a` | arrivées, appels — en italique |
+
+> *Uriel a retenu un vert vif pour l'atelier plutôt que le kaki de la palette — arbitrage
+> assumé, noté ici pour mémoire.*
+
+### Les canaux sont des cases à cocher, et le préfixe est conditionnel
+
+Les pastilles de canal se cochent **indépendamment** : on peut en afficher un seul ou plusieurs
+mélangés. D'où la règle, tranchée en maquette le 19/08 :
+
+| | |
+|---|---|
+| **Un seul canal coché** | **pas de préfixe** — la pastille le dit déjà, le répéter sur chaque ligne est du bruit |
+| **Deux canaux ou plus** | **préfixe sur chaque ligne** — c'est là qu'il gagne son existence |
+
+Ainsi il n'est **jamais redondant et jamais manquant**.
+
+- **La couleur va sur le préfixe seul**, pas sur le corps du message. La convention MMO colore
+  la ligne entière, mais elle suppose des lignes courtes et sèches ; ici un message fait deux ou
+  trois lignes repliées, et un paragraphe entier en couleur **crie plus fort que les autres** —
+  or un bug n'est pas plus important qu'une conversation.
+- **Le ✓ va sur toute pastille cochée.** La couleur dit *quel* canal, le ✓ dit *s'il est
+  allumé* — deux informations, deux marques.
+- **Préfixes courts** quand le flux se remplit : `[Bugs]` suffit.
+
+**Deux cas limites à prévoir** : *zéro canal coché* (forcer le dernier à rester, ou un état vide
+qui explique — jamais un écran blanc silencieux) ; et *où part mon message quand j'en lis deux* —
+le sélecteur au-dessus du champ y répond, et devrait **prendre la couleur du canal visé**.
 
 **La densité est la fonctionnalité.** C'est elle qui rend inutiles les fils et les citations :
 une réponse reste à portée de vue de sa question. *Un fil fragmente le regard et crée un second
