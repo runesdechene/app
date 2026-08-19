@@ -493,11 +493,91 @@ porte close, une photo à la main. À traiter en §9, pas après.
 Un appel **rassemble, il ne classe pas**. Pas de gagnant, pas de podium, pas de « meilleure
 photo ». C'est un appel, pas un concours — sinon on réinstalle la compétition que la V2 retire.
 
-## 7. Carte
+## 7. Carte — VALIDÉ (structure)
 
-*(à concevoir)*
+Maquette de structure : artefact **« La Carte »**. Comme pour Le Seuil, ce n'est **pas une
+référence graphique** — le fond de carte y est simulé et les teintes de pastille sont
+indicatives ; la vérité vit dans `place_types.color`.
 
+### Ce que la base sait déjà et que la carte ne dit pas
+
+La pastille ne porte aujourd'hui qu'**une** dimension, le type. Chaque lieu en a cinq autres,
+déjà remplies : **`era_id` / `year_exact`** (+ table `eras` avec bornes d'années),
+**`best_season`**, **`accessibility`**, **`bivouac`**, **`sensible`**. La visite se valide à
+**500 m** (`distance_gps_km = 0.5`).
+
+### Une carte, trois lectures
+
+La question tranchée n'était pas « comment afficher 3292 pastilles » mais **à quelle question
+la Carte répond quand on l'ouvre**. Trois directions étaient possibles — un outil (« où je vais
+aujourd'hui »), une mémoire (« où je suis allé »), un atlas du temps (« qu'est-ce qui s'est
+passé ici »). **Elles ne s'excluent pas, mais une seule peut être le défaut, et c'est ce choix
+qui décide de tout le reste.**
+
+| Lecture | Ce que la carte dit | |
+|---|---|---|
+| **Aujourd'hui** | ce qui est atteignable, pastilles pleines par type | **par défaut** |
+| **Mes pas** | le monde pâlit, tes visites restent allumées, le chemin se dessine | bascule |
+| **Le temps** | la couleur dit l'époque, un curseur remonte les âges | bascule |
+
+**Aujourd'hui par défaut** — pas parce que c'est la plus belle (c'est « Mes pas »), mais parce
+qu'une carte qui s'ouvre sur une mémoire vide ou sur le néolithique **ne fait sortir personne**.
+Elle fait marcher ; « Mes pas » récompense d'avoir marché ; « Le temps » donne envie de
+comprendre. Dans cet ordre. Ce sont des **bascules du même écran**, jamais des écrans séparés.
+
+### L'inconnu se tait
+
+Le changement le plus important de la section, et il ne coûte qu'un changement de dessin.
+
+Aujourd'hui un lieu non découvert est un **écu brun lourd avec un « ? »** — sombre, très
+contrasté, et dix fois plus nombreux que les découvertes. L'œil voit donc d'abord **tout ce
+qu'on n'a pas fait** : les trouvailles se noient, et la carte se lit comme une liste de cases à
+cocher.
+
+**Il devient une petite marque creuse à l'encre pâle du parchemin.** Toujours visible, toujours
+cliquable — mais il invite au lieu de reprocher. Le découvert garde sa pastille pleine, colorée
+par type (le même code que les badges de l'Accueil).
+
+> **Ce que ça règle sans rien ajouter.** Si l'inconnu est pâle et le découvert coloré, la carte
+> **s'allume à mesure qu'on marche** : la « carte-mémoire » devient gratuite, et « Mes pas » ne
+> fait plus qu'accentuer un effet déjà présent par défaut. On récupère la direction la plus
+> émouvante **sans payer son démarrage à froid**.
+
+### Le compteur déménage
+
+`797/3292 lieux découverts · 24 %` quitte l'écran d'ouverture pour **« Mes pas »**. Il reste de
+la progression personnelle — donc conforme au principe — mais un pourcentage contre un total
+fabrique du complétionnisme, et il n'a pas à être la première chose qu'on lit. *(Coquille à
+corriger au passage : « lieux dcverts ».)*
+
+### Le zoom est le seul réglage de portée
+
+Un sélecteur de portée en trois crans (*autour de moi · une sortie · une journée*) a été
+proposé puis **écarté par Uriel le 19/08** : redondant avec le zoom, et trop tôt pour savoir
+s'il servirait. À revoir seulement si l'usage réel montre le besoin.
+
+**Ce qui tient la densité, c'est donc le clustering — pas un filtre de distance.** C'est le
+seul point non négociable de la section : sans lui, la carte redevient le tapis de pastilles
+illisible d'aujourd'hui dès qu'on dézoome.
+
+Les filtres restent, alimentés par des colonnes déjà remplies : **saison**, **accessibilité**,
+**type**, **bivouac**.
+
+### Ce qui tombe
+
+Le bouton **Compagnies**. Les **écus « ? »** sous leur forme actuelle. Les **Titres restent**
+(§1) : ils viennent avec le fragment et ne classent personne.
+
+### À vérifier avant de s'engager
+
+- **Combien de lieux sont réellement datés** (`era_id` / `year_exact`) — sinon « Le temps » est
+  une coquille vide.
 - Y afficher les **rendez-vous** en cours (§6), qui portent un lieu.
+
+### Reste à concevoir
+
+- **La fiche d'un lieu** et **la validation de visite à 500 m**.
+- Le comportement quand la géolocalisation est refusée ou qu'on est loin de tout.
 
 ## 8. Codex
 
