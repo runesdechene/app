@@ -281,6 +281,54 @@ rare » devient du bruit le jour où les ajouts se multiplient.
 qui apporte un objet nouveau ; le montrer pèse plus lourd qu'une teinte, ne dépend pas de la
 rareté, et fonctionne sur parchemin nu.
 
+### Ce qui a le droit d'entrer dans le flux (19/08)
+
+La V1 écrit une quarantaine de types dans `activity_log`. **La moitié meurt avec la
+purification** (§1), sans filtre à écrire : `place_taken_remote`, `place_taken_back_gps`,
+`place_reaffirmed`, `place_court_attack/support/high_threat`, `invest_crowns`,
+`crowns_awarded`, `faction_join`, `faction_leave`, `level`, `level_up_imminent`, toute la
+famille `expedition_*`, tous les `enigma_*`.
+
+**Ce qui survivrait et qu'il faut traiter** : `revisit_gps` / `revisit` (quelqu'un qui habite
+à côté d'un lieu produit une ligne par jour, à vie — le pire parasite), `places_viewed` et
+`place_not_found` (de la télémétrie, pas des événements), `place_position_edited`,
+`place_tags`, `place_influence` (micro-corrections vraies mais illisibles).
+
+**Deux registres, et c'est le bouton Saluer qui les sépare** — pas un nouveau langage visuel :
+
+| Registre | Ce que la ligne dit | Exemples | Saluer ? |
+|---|---|---|---|
+| **Actes** | *quelqu'un a fait quelque chose* | première visite · ajout ou enrichissement de lieu · fragment réuni · réponse à un appel · post au Campement | **oui** |
+| **Signes de vie** | *il y a du monde ici* | arrivée d'un nouveau porteur | **non** |
+| **Présence** | — | connexions | **pas de ligne du tout** |
+
+**Le bouton n'est pas une décoration, c'est la définition.** Une ligne avec bouton mérite
+qu'on la reconnaisse ; une ligne sans bouton dit seulement que la maison est habitée. L'absence
+de pastille à droite suffit à hiérarchiser.
+
+**Inscription ≠ connexion.** Une inscription arrive une fois par personne, à vie : vrai
+événement, elle a sa ligne (« Camille a rejoint les chemins »). Une connexion arrive dix fois
+par jour et par personne : mise en ligne, c'est le pire flood de tous, et ça ne raconte rien.
+L'information reste bonne à donner, sous une **autre forme** — un indicateur ambiant
+(« 14 porteurs sur les chemins aujourd'hui », ou des avatars empilés en tête de section).
+
+**Deux garde-fous mécaniques**, quel que soit le registre :
+
+- **Pas de revisite** — seule la *première* visite d'un lieu par une personne produit une ligne.
+- **Une ligne par personne, par type, par jour** — sinon une seule personne active occupe tout
+  l'écran, et le flux cesse de dire « la communauté vit » pour dire « Luna vit ».
+
+> **Le risque inverse, à ne pas perdre de vue.** Après ce ménage il reste cinq types d'actes.
+> Sur une communauté jeune, le danger devient un flux **trop maigre** — une page qui s'arrête
+> sur deux lignes est plus triste qu'une page bavarde. Le filet est **l'appel** : « Luna a
+> répondu à l'appel » est périodique, déclenché par la marque, et arrive en grappe pendant la
+> fenêtre de la mission. C'est le seul robinet du flux qu'on contrôle.
+
+> **Question ouverte — salue-t-on un nouveau venu ?** La feuille veut dire « je reconnais ta
+> marche », et un nouveau n'a pas encore marché. Mais dans une app dont le seul geste est de
+> saluer, tendre une feuille à qui arrive ressemble fort à un accueil. Arbitrage d'Uriel, non
+> tranché.
+
 ### L'état vide (premier jour) — validé
 
 Sans lieu visité, les blocs communautaires (**5 Sur les chemins**, **6 Le plus salué**)
