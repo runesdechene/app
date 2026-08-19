@@ -1,7 +1,7 @@
 ---
-updated: 2026-08-18T00:00:00Z
-summary: "Accueil V2 revu : bloc « L'appel » ajouté, missions photo sauvées de l'oubli."
-next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
+updated: 2026-08-19T00:00:00Z
+summary: "Carte V2 tranchée : trois lectures, et l'inconnu cesse de crier."
+next_step: "Concevoir la fiche d'un lieu et la visite à 500 m."
 ---
 
 <!-- Statut lu par XO sur la carte d'accueil. À tenir à jour à chaque session.
@@ -16,8 +16,12 @@ next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
 - [x] Écran Compte client
 - [x] Écran Accueil « Le Seuil » : 5 blocs, bandeau Saga, geste de salut en feuille de chêne
 - [x] Accueil révisé (18/08) : bloc « L'appel », carrousel « Autour de toi » monté en haut
-- [ ] Uriel maquette l'Accueil sur Figma pour fixer la direction artistique
-- [ ] Brainstorm de la Carte, puis du Codex, puis du Campement
+- [x] Uriel maquette l'Accueil sur Figma — DA fixée (Bebas Neue + Cabin, ocre `#8A6F3A`)
+- [ ] Finir la maquette Accueil : vignette du lieu ajouté, bandeau Saga en kaki
+- [x] Carte — structure tranchée : trois lectures, l'inconnu se tait, clustering obligatoire
+- [ ] Carte — reste la fiche d'un lieu et la validation de visite à 500 m
+- [ ] Vérifier combien de lieux sont datés (`era_id`) — sinon la lecture « Le temps » est vide
+- [ ] Brainstorm du Codex, puis du Campement
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 - [ ] Au portage des appels : retirer `floor_glory`/`floor_crowns` et l'emoji par défaut
 
@@ -46,6 +50,15 @@ next_step: "Uriel maquette l'accueil sur Figma, puis on brainstorme la Carte."
   `#46493c`, Bebas Neue + Cabin — le sépia doré `#C19A6B` de la V1 n'existe pas côté boutique.
   **Convention à tenir** : toute fonctionnalité V2 reliée au Hub reçoit une pastille
   « V2 compatible » dans l'interface du Hub.
+
+- **La Carte (19 août, spec §7)** — trois lectures du **même écran**, « Aujourd'hui » par
+  défaut. Le geste qui compte : **l'inconnu passe de l'écu brun lourd à une marque creuse à
+  l'encre pâle**. Effet non prévu — la carte s'allume alors à mesure qu'on marche, donc la
+  « carte-mémoire » devient gratuite. Le compteur 797/3292 déménage dans « Mes pas ».
+  Le sélecteur de portée en trois crans est **écarté** (redondant avec le zoom) : ce qui tient
+  la densité est le **clustering**, seul point non négociable. Découverte au passage : la carte
+  n'exploite qu'**une des six dimensions** que la base porte — `era_id`, `best_season`,
+  `accessibility`, `bivouac`, `sensible` dorment.
 
 - **« L'appel » — missions & rendez-vous (18 août, spec §6)** — les **missions photo
   existent déjà en production de bout en bout** (table `missions` + salon, écrans Hub de
