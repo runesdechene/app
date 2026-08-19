@@ -607,10 +607,46 @@ collections, et **un vrai pokédex** : ce que tu as en couleur, le reste en silh
 
 | Collection | Source | Traitement |
 |---|---|---|
-| **Fragments** achetés | `user_fragments` → `title_fragments` | grille à trous |
+| **Fragments** achetés | `user_fragments` → `title_fragments` | **rangées** à trous |
 | **Titres** | `title_fragments` | liste à trous |
 | **Badges** d'événements | *n'existe pas encore* | onglet grisé, sans compteur |
 | **Lieux** visités | `places` + visites | **synthèse + mur de macarons** |
+
+### Des rangées, pas une grille — maquette du 19/08
+
+**Un fragment porte une phrase**, pas seulement un nom : *« Ils étaient la première ligne, celle
+sur laquelle reposait toute leur Cité. »* Une case de grille ne peut pas la contenir ; une
+rangée oui — gravure à gauche, nom, la phrase, et l'action. Une grille à trois colonnes avait
+été proposée puis **écartée par la maquette**.
+
+L'action principale d'un fragment possédé est **« Lire ou écouter ce fragment »** : le lecteur
+audio du 16/08 trouve ici sa place exacte. Celle d'un fragment non possédé est **« Découvrir la
+collection »**.
+
+**Ordre : ce que tu portes d'abord.** Sous un intertitre *« Ce que tu portes »*, puis *« Les
+autres motifs »*. Tout s'affiche — c'est un vrai pokédex — mais **on ouvre sur sa collection,
+pas sur son manque** : sans cet ordre, l'écran serait 55 rangées fanées et une seule en couleur,
+et l'inconnu crierait plus fort que le connu (même défaut que la Carte avant révision, §7).
+
+**Le sceau vert de validation est assumé hors palette** — arbitrage d'Uriel : c'est un code que
+tout le monde lit sans apprentissage, et le sentiment de « validé » vaut l'écart.
+
+### ⛔ Pas de ratio « x sur y »
+
+Les compteurs d'onglet affichent **ce qu'on possède**, jamais un total : `FRAGMENTS 1`, pas
+`1 / 56`.
+
+> **La règle, et elle est plus fine que « le complétionnisme est permis » (§1).** Un ratio
+> n'invite que s'il est **atteignable**. Personne n'achètera 56 motifs, ni ne visitera 3292
+> lieux — alors « 1 / 56 » ne dit pas *« il y a une collection à remplir »*, il dit *« tu n'as
+> presque rien »*. **Un ratio qu'on ne peut pas remplir décourage au lieu d'inviter.**
+>
+> Ça ne contredit pas le pokédex : les cases manquantes restent visibles et désirables, on
+> retire seulement le **score** qui les compte.
+
+> ⚠️ **Incohérence à trancher (§7).** La Carte affiche encore `797 / 3292 · 24 %` dans
+> « Mes pas ». Si le ratio décourage ici, il décourage là aussi — et davantage, le total y étant
+> encore plus hors de portée. **Soit les deux, soit aucun.**
 
 ### Fragment ≠ Titre
 
@@ -644,6 +680,9 @@ retrouve ici une place naturelle.
 **La synthèse** — combien par nature, par époque (`era_id`), par région. Elle produit des
 phrases qui donnent envie de sortir : *« tu as visité 142 mégalithes, 31 abbayes et aucune
 source — il y en a trois à moins de 20 km »*. « 797/3292 » ne dit rien de tel.
+
+> ⚠️ Le compteur `797 / 3292 · 24 %` hérité de la V1 tombe sous la règle « pas de ratio »
+> ci-dessus (§8). À trancher avec Uriel.
 
 **Le mur de macarons** — un disque photo par lieu visité, **anneau à la couleur du type**,
 pastille de type, le nom et **la date de visite**. Les plus récents d'abord.
