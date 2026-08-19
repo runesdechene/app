@@ -31,10 +31,16 @@ Tout ce qui relève de la **compétition entre joueurs** :
 | La Cour — Couronnes, mécénat, veilleurs | `place_court_*`, `invest_crowns` : prendre un lieu à un autre |
 | Contestation de lieu | — |
 | Compagnies (Maisons, principale/alliée, chef, grades) | mig 295, `factionGroupStore`, Hall, bannières |
-| Gloire / XP / niveaux / titres | la progression **comparable** |
+| Gloire / XP / niveaux | la progression **comparable** |
 | Énigmes (daily, fragment, lieu) | + les 3 crons et la boucle de rétention quotidienne |
 | Expéditions joueur-joueur | tables `voyage_*`, chat privé, comptes rendus |
 | Quêtes du jour | `dailyQuestsStore`, drip, mini-quêtes |
+
+> ✅ **Les Titres restent — corrigé le 19/08.** Ils figuraient à tort dans cette liste. Un
+> titre V2 (« Hoplite », « Demiurge »…) **est offert avec l'achat d'un fragment** : il ne se
+> gagne contre personne et ne classe personne, il vient avec l'objet. C'est un marqueur
+> d'identité et d'appartenance, pas un rang. Ce qui tombe, c'est la progression *comparable* —
+> Gloire, XP, niveaux.
 
 > ⚠️ **« Quêtes du jour » n'est pas « Missions ».** Les Quêtes étaient la boucle de rétention
 > quotidienne, et elles tombent. Les **Missions** — les appels photo de la marque, source
