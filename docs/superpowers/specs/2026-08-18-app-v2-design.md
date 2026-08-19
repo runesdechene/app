@@ -21,6 +21,11 @@ Ce que le porteur vient y chercher : **collectionner** (Codex), **se rassembler*
 (Campement), **lire ce que la marque raconte** (Accueil). Ce n'est plus un jeu
 compétitif.
 
+> **Collectionner n'est pas se comparer — précision du 19/08.** Le complétionnisme a été
+> écarté deux fois dans la journée (le compteur de la Carte, puis le Codex) **à tort**. Une
+> grille à trous, c'est moi contre moi-même ; un classement, c'est moi contre les autres.
+> **Seul le second tombe.** Le principe interdit la comparaison, pas la collection.
+
 ### Ce qui ne monte PAS en V2.0
 
 Tout ce qui relève de la **compétition entre joueurs** :
@@ -579,13 +584,85 @@ Le bouton **Compagnies**. Les **écus « ? »** sous leur forme actuelle. Les **
 - **La fiche d'un lieu** et **la validation de visite à 500 m**.
 - Le comportement quand la géolocalisation est refusée ou qu'on est loin de tout.
 
-## 8. Codex
+## 8. Codex — VALIDÉ (structure)
 
-*(à concevoir)*
+Maquette de structure : artefact **« Le Codex »**. Les emblèmes y sont indicatifs — les vraies
+illustrations vivent dans les métaobjets `illustrations` côté Shopify.
 
-- **Carrousel produits** — décidé le 18/08. Il vient ici, pas sur l'Accueil : devant un motif
-  qui plaît, l'envie d'acheter existe déjà ; sur l'Accueil elle serait interrompue. Garde
-  l'Accueil à **un seul** bloc commercial (le bandeau Saga).
+**Le Codex est le registre de ce que tu as** — pas un catalogue de ce qui existe. Quatre
+collections, et **un vrai pokédex** : ce que tu as en couleur, le reste en silhouette.
+
+| Collection | Source | Traitement |
+|---|---|---|
+| **Fragments** achetés | `user_fragments` → `title_fragments` | grille à trous |
+| **Titres** | `title_fragments` | liste à trous |
+| **Badges** d'événements | *n'existe pas encore* | onglet grisé, sans compteur |
+| **Lieux** visités | `places` + visites | **synthèse + mur de macarons** |
+
+### Fragment ≠ Titre
+
+Le **fragment** est l'objet que tu portes ; le **titre** est ce qu'il te confère. Deux
+collections, pas une. **Un seul titre est porté à la fois** — c'est celui que les autres voient.
+
+> ⚠️ **Piège de nommage** : il n'existe **aucune table `fragments`**. Le catalogue, c'est
+> **`title_fragments`** (nom, description, icône, `collection` = la Saga). Ne pas la confondre
+> avec la liste des titres qu'elle sert aussi.
+
+### Le trou a une taille limite
+
+**Sur 14 fragments, montrer les trous est utile : ils sont achetables.** Sur 3292 lieux, 2495
+trous seraient absurdes — et les non-visités vivent déjà sur la Carte. Donc **on inverse pour
+les lieux** : pokédex à trous pour les objets, **mur de trophées** pour les lieux.
+
+### La case voilée remplace le carrousel produits
+
+Décision du 18/08 : le carrousel produits venait dans le Codex plutôt que sur l'Accueil.
+**Il n'y en a finalement pas besoin** — la silhouette *est* le lien. Le contour dit que le
+fragment existe, le pointillé qu'il n'est pas à toi, la mention **« En boutique »** qu'il est à
+portée. C'est le moment de vente le plus contextuel possible : on ne coupe rien, on répond à
+une envie déjà là. L'Accueil garde donc **un seul** bloc commercial (le bandeau Saga), et le
+Codex n'en a aucun qui ressemble à une vitrine.
+
+Un fragment possédé porte aussi **son fragment audio** — le lecteur mis en ligne le 16/08
+retrouve ici une place naturelle.
+
+### Les lieux : compter, puis montrer
+
+**La synthèse** — combien par nature, par époque (`era_id`), par région. Elle produit des
+phrases qui donnent envie de sortir : *« tu as visité 142 mégalithes, 31 abbayes et aucune
+source — il y en a trois à moins de 20 km »*. « 797/3292 » ne dit rien de tel.
+
+**Le mur de macarons** — un disque photo par lieu visité, **anneau à la couleur du type**,
+pastille de type, le nom et **la date de visite**. Les plus récents d'abord.
+
+> Effet non prévu : l'anneau coloré fait que **le mur redit la synthèse, mais à l'œil**. Les
+> deux moitiés de l'onglet disent la même chose à deux grains.
+
+### Les mêmes faits, trois grains
+
+Trois écrans touchent « mes lieux visités ». La règle qui les sépare :
+
+| | Ce qu'il en fait |
+|---|---|
+| **Le Compte** (§4) | il **compte** — une ligne de chiffres, rien de plus |
+| **La Carte** (§7) | elle **situe** — où, dans le paysage |
+| **Le Codex** (§8) | il **montre** — les objets et les preuves, en détail |
+
+Aucun ne fait le travail d'un autre, aucun ne se répète.
+
+### Gardé en réserve
+
+- **`fragment_words`** — chaque fragment donne des mots rangés par fonction (`nom`, `épithète`,
+  `connecteur`) avec leur genre. De quoi **composer** son propre titre au lieu d'en choisir un.
+  Actif dormant, non retenu dans cette version.
+- **`title_fragments.bonus_type` / `bonus_value`** — bonus de jeu V1. À neutraliser au portage,
+  comme les bonus de faction (§1).
+
+### À vérifier
+
+- Combien de **titres** existent réellement.
+- Combien de lieux sont **datés** (`era_id`) — la synthèse « par époque » en dépend, comme la
+  lecture *Le temps* de la Carte (§7).
 
 ## 9. Campement
 

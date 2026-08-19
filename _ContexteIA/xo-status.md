@@ -1,7 +1,7 @@
 ---
 updated: 2026-08-19T00:00:00Z
-summary: "Carte V2 tranchée : trois lectures, et l'inconnu cesse de crier."
-next_step: "Concevoir la fiche d'un lieu et la visite à 500 m."
+summary: "Codex tranché : un pokédex, et un mur de macarons pour les lieux."
+next_step: "Concevoir le Campement, la dernière pièce."
 ---
 
 <!-- Statut lu par XO sur la carte d'accueil. À tenir à jour à chaque session.
@@ -21,7 +21,8 @@ next_step: "Concevoir la fiche d'un lieu et la visite à 500 m."
 - [x] Carte — structure tranchée : trois lectures, l'inconnu se tait, clustering obligatoire
 - [ ] Carte — reste la fiche d'un lieu et la validation de visite à 500 m
 - [ ] Vérifier combien de lieux sont datés (`era_id`) — sinon la lecture « Le temps » est vide
-- [ ] Brainstorm du Codex, puis du Campement
+- [x] Codex — structure tranchée : pokédex à trous, mur de macarons pour les lieux
+- [ ] Campement — la dernière pièce à concevoir
 - [ ] Créer la nouvelle app (rien n'est codé — on est en conception)
 - [ ] Au portage des appels : retirer `floor_glory`/`floor_crowns` et l'emoji par défaut
 
@@ -50,6 +51,15 @@ next_step: "Concevoir la fiche d'un lieu et la visite à 500 m."
   `#46493c`, Bebas Neue + Cabin — le sépia doré `#C19A6B` de la V1 n'existe pas côté boutique.
   **Convention à tenir** : toute fonctionnalité V2 reliée au Hub reçoit une pastille
   « V2 compatible » dans l'interface du Hub.
+
+- **Le Codex (19 août, spec §8)** — le registre de **ce que tu as**, pas de ce qui existe.
+  Quatre collections, en **pokédex** : fragments, titres, badges (à venir, liés aux
+  rendez-vous), lieux. Règle dégagée : **le trou a une taille limite** — utile sur 14
+  fragments (ils sont achetables), absurde sur 3292 lieux. D'où l'inversion : grille à trous
+  pour les objets, **mur de macarons** (photo ronde, anneau couleur du type, date de visite)
+  pour les lieux. **La case voilée remplace le carrousel produits** : la silhouette *est* le
+  lien boutique. Piège : aucune table `fragments` — le catalogue est `title_fragments`.
+  Précision du principe fondateur : **collectionner n'est pas se comparer**.
 
 - **La Carte (19 août, spec §7)** — trois lectures du **même écran**, « Aujourd'hui » par
   défaut. Le geste qui compte : **l'inconnu passe de l'écu brun lourd à une marque creuse à
