@@ -15,6 +15,8 @@ html.demo-kiosk *:not(input):not(textarea) { -webkit-user-select: none; user-sel
 .demo-intro-head { display: flex; flex-direction: column; align-items: center; }
 .demo-intro-logo { width: 180px; height: auto; filter: brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0,0,0,.35)); }
 .demo-intro-kicker { margin: 3.5rem 0 0; font-size: clamp(13px, 1.8vw, 47px); font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--color-accent, #cac4b6); text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+/* Le pilier du mantra que cet écran incarne, détaché du gris-beige du kicker. */
+.demo-intro-kicker b { color: #ecc15b; font-weight: 800; }
 .demo-intro-title { margin: 1.5rem 0 0; font-size: clamp(38px, 8vw, 72px); font-weight: 800; text-transform: uppercase; letter-spacing: .02em; line-height: 1.12; text-shadow: 0 2px 14px rgba(0,0,0,.3); }
 .demo-title-white { color: #fff; }
 .demo-title-gold { color: var(--color-accent, #ecc15b); }
