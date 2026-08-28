@@ -6,11 +6,16 @@ import runeEmblem from '../../assets/rune_de_chene.png'
 import './DemoKioskShell.css'
 
 const IDLE_MS = 3 * 60 * 1000 // 3 minutes
+const LONG_PRESS_MS = 3000
 
 export function DemoKioskShell({ children }: { children: React.ReactNode }) {
   const [showIntro, setShowIntro] = useState(true)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const revealedToday = useDemoStore(s => s.discoveredIds.length)
   const timer = useRef<number | undefined>(undefined)
+  const pressTimer = useRef<number | undefined>(undefined)
+  const longPressFired = useRef(false)
 
   const armIdle = useCallback(() => {
     window.clearTimeout(timer.current)
@@ -50,13 +55,38 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
   }, [showIntro, armIdle])
 
   function enter() {
+    // Session à zéro pour le nouveau visiteur (Gloire, énergie, Couronnes),
+    // mais la carte garde ce que la journée a déjà révélé : le stand dévoile
+    // ses contrées collectivement. Seul resetJournee() (appui long sur le logo)
+    // efface cette mémoire.
     useDemoStore.getState().reset()
-    // Carte vierge pour le prochain visiteur : toggle mode Compagnie OFF + découvertes effacées.
     const player = usePlayerStore.getState()
     player.setFactionColorMode(false)
-    player.setDiscoveredIds([])
+    // On repart des lieux de la borne, PAS des découvertes réelles du compte démo.
+    player.setDiscoveredIds(useDemoStore.getState().discoveredIds)
     setShowIntro(false)
     setShowWelcome(true)
+  }
+
+  // Geste caché : 3 s d'appui sur le logo. Un bouton visible sur une borne de
+  // festival finit toujours par être pressé par un passant.
+  function startLongPress() {
+    longPressFired.current = false
+    window.clearTimeout(pressTimer.current)
+    pressTimer.current = window.setTimeout(() => {
+      longPressFired.current = true
+      setConfirmReset(true)
+    }, LONG_PRESS_MS)
+  }
+
+  function cancelLongPress() {
+    window.clearTimeout(pressTimer.current)
+  }
+
+  function resetJournee() {
+    useDemoStore.getState().resetJournee()
+    // Rechargement complet : le store, la carte et la session repartent propres.
+    window.location.reload()
   }
 
   return (
@@ -96,7 +126,24 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
           <div className="demo-intro-veil" />
           <div className="demo-intro-content">
             <div className="demo-intro-head">
-              <img className="demo-intro-logo" src={runeEmblem} alt="Runes de Chêne" />
+              <img
+                className="demo-intro-logo"
+                src={runeEmblem}
+                alt="Runes de Chêne"
+                onPointerDown={startLongPress}
+                onPointerUp={cancelLongPress}
+                onPointerLeave={cancelLongPress}
+                onPointerCancel={cancelLongPress}
+                onClick={(e) => {
+                  // Toute la zone d'intro porte onClick={enter} : après un appui
+                  // long, il faut avaler le clic, sinon on ouvre la démo en même
+                  // temps que la confirmation de remise à zéro.
+                  if (longPressFired.current) {
+                    e.stopPropagation()
+                    longPressFired.current = false
+                  }
+                }}
+              />
               <p className="demo-intro-kicker">Apprenez · Incarnez · <b>Explorez</b></p>
               <h1 className="demo-intro-title">
                 <span className="demo-title-white">Vous portez l'Histoire.</span>{' '}
@@ -120,8 +167,33 @@ export function DemoKioskShell({ children }: { children: React.ReactNode }) {
                   Chaque <b>Fragment</b> acheté finance la redécouverte de nos régions. Cette carte en est le résultat.
                 </span>
               </div>
+              {revealedToday > 0 && (
+                <p className="demo-intro-tally">
+                  Aujourd'hui, <b>{revealedToday} {revealedToday > 1 ? 'lieux' : 'lieu'}</b>
+                  {revealedToday > 1 ? ' sortis' : ' sorti'} du brouillard par les visiteurs du stand.
+                </p>
+              )}
             </div>
           </div>
+          {confirmReset && (
+            <div className="demo-reset-overlay" onClick={(e) => e.stopPropagation()}>
+              <div className="demo-reset-card">
+                <h2>Effacer la journée ?</h2>
+                <p>
+                  Les <b>{revealedToday} {revealedToday > 1 ? 'lieux' : 'lieu'}</b> révélés
+                  par les visiteurs seront remis dans le brouillard. La borne repart à neuf.
+                </p>
+                <div className="demo-reset-actions">
+                  <button className="demo-reset-cancel" onClick={() => setConfirmReset(false)}>
+                    Annuler
+                  </button>
+                  <button className="demo-reset-confirm" onClick={resetJournee}>
+                    Effacer
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

@@ -34,6 +34,19 @@ html.demo-kiosk *:not(input):not(textarea) { -webkit-user-select: none; user-sel
 .demo-intro-stand { margin: 6px 0 0; display: flex; align-items: center; gap: 18px; max-width: 34ch; padding: 22px 30px; border-radius: 18px; background: rgba(20,15,10,.42); border: 1px solid rgba(236,193,91,.5); backdrop-filter: blur(4px); font-size: clamp(17px, 2.6vw, 26px); font-weight: 500; line-height: 1.4; color: #faeed8; text-align: left; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
 .demo-stand-icon { flex: 0 0 auto; width: 42px; height: 42px; fill: var(--color-accent, #ecc15b); }
 .demo-intro-stand b { color: var(--color-accent, #ecc15b); font-weight: 700; }
+/* Preuve vivante du stand : ce que les visiteurs ont révélé aujourd'hui. */
+.demo-intro-tally { margin: 14px 0 0; max-width: 36ch; font-size: clamp(15px, 2.2vw, 22px); font-weight: 500; line-height: 1.4; color: #faeed8; text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+.demo-intro-tally b { color: var(--color-accent, #ecc15b); font-weight: 800; }
+/* Remise à zéro de la journée (appui long 3 s sur le logo) — jamais vue du public. */
+.demo-reset-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(10,7,4,.72); backdrop-filter: blur(3px); }
+.demo-reset-card { max-width: 460px; width: 100%; padding: 2rem; border-radius: 20px; background: #1c1611; border: 1px solid rgba(236,193,91,.45); text-align: center; color: #faeed8; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.demo-reset-card h2 { margin: 0 0 .8rem; font-size: 26px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+.demo-reset-card p { margin: 0 0 1.6rem; font-size: 17px; line-height: 1.5; opacity: .9; }
+.demo-reset-card b { color: var(--color-accent, #ecc15b); }
+.demo-reset-actions { display: flex; gap: 12px; justify-content: center; }
+.demo-reset-actions button { padding: 14px 28px; border-radius: 999px; border: none; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; cursor: pointer; }
+.demo-reset-cancel { background: rgba(250,238,216,.14); color: #faeed8; }
+.demo-reset-confirm { background: #a14c40; color: #f7ede1; }
 .demo-intro-cta-group { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .demo-intro-hand { width: 46px; height: 46px; filter: drop-shadow(0 2px 8px rgba(0,0,0,.55)); overflow: visible; }
 .demo-hand-tap { fill: #faeed8; transform-origin: 11px 12px; animation: demo-tap 1.8s ease-in-out infinite; }
