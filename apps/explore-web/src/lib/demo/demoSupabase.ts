@@ -27,9 +27,17 @@ export const OVERRIDDEN_READS: ReadonlySet<string> = new Set([
 
 const READ_PREFIXES = ['get_', 'list_', 'fetch_']
 
+// Lectures réelles dont le nom ne porte aucun préfixe reconnu. Liste nominative
+// et pas un préfixe `preview_` : une future RPC ainsi nommée pourrait écrire, et
+// l'invariant de la borne est zéro écriture.
+export const EXTRA_READS: ReadonlySet<string> = new Set([
+  'preview_action_cost',
+])
+
 export function classifyRpc(name: string): 'read' | 'faked' | 'validated' | 'blocked' {
   if (VALIDATED_WRITES.has(name)) return 'validated'
   if (FAKED_WRITES.has(name) || OVERRIDDEN_READS.has(name)) return 'faked'
+  if (EXTRA_READS.has(name)) return 'read'
   if (READ_PREFIXES.some((p) => name.startsWith(p))) return 'read'
   return 'blocked'
 }

@@ -26,6 +26,8 @@ interface Props {
   isOwnFaction: boolean
   onDiscover: () => Promise<void>
   onAuthPrompt?: () => void
+  /** Borne : la découverte part toute seule — on montre la révélation, pas un bouton. */
+  autoDiscovering?: boolean
 }
 
 /** "3m 12s" / "45s" / "2m". Vide si seconds ≤ 0. */
@@ -38,7 +40,7 @@ function formatNextPoint(seconds: number): string {
 }
 
 export function FoggedPlaceView({
-  place, onClose, isAuthenticated, isOwnFaction, onDiscover, onAuthPrompt,
+  place, onClose, isAuthenticated, isOwnFaction, onDiscover, onAuthPrompt, autoDiscovering = false,
 }: Props) {
   const maxEnergy = usePlayerStore(s => s.maxEnergy)
   const energy = usePlayerStore(s => s.energy)
@@ -49,7 +51,9 @@ export function FoggedPlaceView({
   const [previewLoading, setPreviewLoading] = useState(true)
 
   useEffect(() => {
-    if (!userId) return
+    // Sans userId, pas de coût à calculer — mais il faut quand même sortir de
+    // l'état « chargement », sinon le bouton reste désactivé pour toujours.
+    if (!userId) { setPreviewLoading(false); return }
     setPreviewLoading(true)
     const userPos = usePlayerStore.getState().userPosition
     supabase.rpc('preview_action_cost', {
@@ -106,13 +110,15 @@ export function FoggedPlaceView({
         <h2 className="place-title fogged-title">{place.title}</h2>
 
         <p className="fog-mystery-text">
-          {isOwnFaction
-            ? 'Ce lieu est sous influence de votre Compagnie. Découvrez-le à moindre coût.'
-            : 'Ce lieu est encore dans le brouillard. Dépensez votre énergie pour le réler.'
+          {autoDiscovering
+            ? 'Le brouillard se dissipe…'
+            : isOwnFaction
+              ? 'Ce lieu est sous influence de votre Compagnie. Découvrez-le à moindre coût.'
+              : 'Ce lieu est encore dans le brouillard. Dépensez votre énergie pour le réler.'
           }
         </p>
 
-        {isAuthenticated ? (
+        {autoDiscovering ? null : isAuthenticated ? (
           <div className="fog-discover-section">
             <button
               className="discover-btn"

@@ -7,6 +7,7 @@ import { usePlayerStore } from '../../../stores/playerStore'
 import { useToastStore } from '../../../stores/toastStore'
 import { useGloryRulesStore } from '../../../stores/gloryRulesStore'
 import { discoverPlace } from '../../../lib/discoverPlace'
+import { isDemoMode } from '../../../lib/demo/isDemoMode'
 import { useAuth } from '../../../hooks/useAuth'
 import { FoggedPlaceView } from './FoggedPlaceView'
 import { WishlistButton } from '../actions/WishlistButton'
@@ -81,6 +82,40 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
   // À réintroduire post-festival via la Veille (faction du veilleur) si nécessaire.
   const isOwnFaction = false
 
+  const runDiscover = useCallback(async () => {
+    const result = await discoverPlace(place.id, place.location.latitude, place.location.longitude)
+    if (!result.success && result.error) {
+      // Defense-in-depth : si le serveur refuse (typiquement not_enough_energy
+      // sur une desync avec le check front), on toast pour eviter le clic mort.
+      const msg = result.error === 'not_enough_energy'
+        ? "Pas assez d'energie pour decouvrir ce lieu."
+        : `Decouverte impossible : ${result.error}`
+      useToastStore.getState().addToast({
+        type: 'error',
+        message: msg,
+        timestamp: Date.now(),
+      })
+    }
+  }, [place.id, place.location.latitude, place.location.longitude])
+
+  // Borne : le visiteur ne doit avoir qu'un geste à faire. Ouvrir un lieu
+  // embrumé déclenche la découverte, le bouton disparaît, et la révélation
+  // (toast « Le brouillard se lève ») reste intacte. Hors démo, rien ne change :
+  // le brouillard et l'énergie sont la mécanique de jeu.
+  const autoDiscover = isDemoMode()
+  const attempted = useRef<Set<string>>(new Set())
+  const [autoDiscovering, setAutoDiscovering] = useState(false)
+
+  useEffect(() => {
+    if (!autoDiscover || isDiscovered || !isAuthenticated) return
+    // Une seule tentative par lieu : sans ce garde-fou, un échec laisserait
+    // `isDiscovered` à false et l'effet se relancerait en boucle.
+    if (attempted.current.has(place.id)) return
+    attempted.current.add(place.id)
+    setAutoDiscovering(true)
+    void runDiscover().finally(() => setAutoDiscovering(false))
+  }, [autoDiscover, isDiscovered, isAuthenticated, place.id, runDiscover])
+
   if (!isDiscovered) {
     return (
       <FoggedPlaceView
@@ -88,21 +123,8 @@ function PlaceContent({ place, onClose, userEmail, onAuthPrompt, onRefetch }: { 
         onClose={onClose}
         isAuthenticated={isAuthenticated}
         isOwnFaction={isOwnFaction}
-        onDiscover={async () => {
-          const result = await discoverPlace(place.id, place.location.latitude, place.location.longitude)
-          if (!result.success && result.error) {
-            // Defense-in-depth : si le serveur refuse (typiquement not_enough_energy
-            // sur une desync avec le check front), on toast pour eviter le clic mort.
-            const msg = result.error === 'not_enough_energy'
-              ? "Pas assez d'energie pour decouvrir ce lieu."
-              : `Decouverte impossible : ${result.error}`
-            useToastStore.getState().addToast({
-              type: 'error',
-              message: msg,
-              timestamp: Date.now(),
-            })
-          }
-        }}
+        autoDiscovering={autoDiscover && (autoDiscovering || !attempted.current.has(place.id))}
+        onDiscover={runDiscover}
         onAuthPrompt={onAuthPrompt}
       />
     )

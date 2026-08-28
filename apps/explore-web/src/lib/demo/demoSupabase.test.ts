@@ -19,6 +19,18 @@ describe('classifyRpc', () => {
   })
 })
 
+describe('classifyRpc — lectures hors préfixe', () => {
+  // preview_action_cost ne commence pas par get_/list_/fetch_ : sans liste
+  // explicite il tombait en `blocked`, le panneau du lieu retombait sur le coût
+  // de repli 1 ⚡ et n'affichait jamais le détail distance/territoire.
+  it('preview_action_cost part en lecture réelle', () => {
+    expect(classifyRpc('preview_action_cost')).toBe('read')
+  })
+  it("n'ouvre pas la porte à tout ce qui commence par preview_", () => {
+    expect(classifyRpc('preview_something_else')).toBe('blocked')
+  })
+})
+
 describe('classifyRpc — validated', () => {
   it('classe answer_enigma / answer_fragment_enigma comme validated', () => {
     expect(classifyRpc('answer_enigma')).toBe('validated')
