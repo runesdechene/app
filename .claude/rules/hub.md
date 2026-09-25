@@ -81,3 +81,26 @@ Le mot "expédition" dans le code de veille est une scorie de cette falsificatio
 - Si on touche au code de veille, c'est l'occasion de purger le mot "expédition" du domaine. Le mot "Expédition" n'a qu'un seul sens autorisé dans l'app : **événement RDV** (spec 6/05).
 - Avant d'écrire une spec sur la veille / la cour / le mécénat, RELIRE cette mémoire pour ne pas re-falsifier.
 - Quand Uriel donne une règle simple ("le top prend la place, point"), ne pas la complexifier en ajoutant expé/camps/seuils/effective scores. La complexité que je rajoute = la falsification.
+
+## Tout écran du Hub se conçoit, il ne se copie pas
+
+Tout nouvel écran du Hub (`apps/hub`) se conçoit, il ne se copie pas. Charger
+`frontend-design` avant d'écrire le composant, au même titre que pour la boutique.
+
+**Why :** j'ai livré l'écran « Fragments audio » en copiant `ShopifyUnlocks.tsx` —
+`<table>` nu, classes `page` et `couverture` sans aucun style. La revue l'avait
+signalé, je l'avais classé mineur et différé. Uriel a repris là-dessus le
+2026-08-16 : « pourquoi tu oublies continuellement de faire du design lorsqu'on
+travaille sur le hub ». Le raisonnement fautif était « un back-office n'a pas
+besoin d'être beau » — or c'est l'écran qu'il consulte tous les jours, et sa marque
+a une identité forte qu'il remarque quand elle manque.
+
+**How to apply :** le Hub a DÉJÀ un système de tokens dans `apps/hub/src/index.css`
+— parchemin `#f5edd8`, surface `#faf3e0`, brun `#3a2e1e`, rouge sang `#801c1c`,
+Cinzel pour les titres, `--radius: 8px`. Ne pas inventer une identité : rejoindre
+celle-là. Un fichier `<Composant>.css` à côté du `.tsx` est la convention du repo
+(voir `FlyerLinks.css`, `StudioSubmit.css`). Vérifier le rendu réellement, avec
+`claude-in-chrome` — c'est ainsi que j'ai vu qu'une jauge en `<span>` sans
+`display:block` ne s'affichait pas du tout.
+
+Voir aussi [[sonde-avant-hypotheses]].
