@@ -1,9 +1,12 @@
 # Runes de Chêne — Monorepo
 
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
-> Mémoire unifiée : **La Citadelle** (Obsidian) + **Graphify** + **Context7**
+> Mémoire unifiée : **Mon Cerveau** (Obsidian) + **Graphify** + **Context7**
 
-> Identité XO, routing Obsidian et HARD GATE : voir `~/citadelle/CLAUDE.md` (auto-chargé au démarrage).
+> ⚠️ **Mis à jour le 25/09/2026.** Le vault Citadelle a été fusionné dans **Mon Cerveau**
+> (`\\EGIDE\Uriel Lahoussaye\🧠 Mon Cerveau\`) et le symlink `~/citadelle` supprimé — tout renvoi
+> vers lui est mort. Le contexte d'Uriel se charge désormais tout seul par le noyau
+> (`~/.claude/CLAUDE.md`) ; il n'y a plus d'identité d'agent à aller chercher.
 
 ## 4-Layer Query Rule
 
@@ -11,7 +14,7 @@ Avant de lire un fichier brut, interroger dans cet ordre :
 
 1. **Lib externe** (React, Supabase, Netlify, Tailwind, MapLibre…) → **Context7 MCP**
 2. **Structure/relation code local** → **Graphify** (`graphify-out/graph.json`)
-3. **Domaine/marque/décision/préférence** → **Obsidian MCP** (Citadelle)
+3. **Domaine/marque/décision/préférence** → le vault **Mon Cerveau**, par lecture directe : `Projets/Runes de Chêne/Dev.md` (produit), `Identité.md` (les mots), `_Socle/Méthode.md` (comment travailler). *(Le MCP Obsidian pointe encore vers le plugin de Citadelle : hors service tant qu'il n'est pas réinstallé.)*
 4. **Édition ou fallback** → **Read** du fichier brut
 
 ## Graphify
@@ -33,7 +36,7 @@ Les deux pipelines sont indépendantes — les nodes SQL (`category: "sql"`) sur
 
 | Projet | Lieu | Rôle |
 |--------|------|------|
-| **La Citadelle** | `~/citadelle/` (symlink) | QG partagé (marque + dev + stratégie) |
+| **Mon Cerveau** | `\\EGIDE\Uriel Lahoussaye\🧠 Mon Cerveau\` | Vault unique — décisions, état, identité — **pas** le code |
 | **explore-web** | `apps/explore-web/` | App publique (`app.runesdechene.com`) |
 | **hub** | `apps/hub/` | Back-office (`hub.runesdechene.com`) |
 | **seo-pages** | `apps/seo-pages/` | Pages SEO Node.js (`app.runesdechene.com/lieu/*`) |
@@ -59,4 +62,7 @@ Décision 2026-06-14 : le thème Shopify reste un **repo séparé**, voisin sur 
 - **Migrations SQL** numérotées dans `supabase/migrations/`. **Canal unique = `npx supabase db push --linked`** (jamais MCP `apply_migration` ni dashboard SQL : ils créent des orphelins timestamp et cassent `db push`). Tout `CREATE OR REPLACE` se base sur la def **LIVE** (`pg_get_functiondef`). Détail : `docs/db/migrations-workflow.md` (un hook deny bloque `apply_migration`).
 - **Déploiement Netlify manuel**, jamais d'auto-deploy Git
 
-Détail par zone : `~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`
+> ⚠️ Le renvoi qui vivait ici — `~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md` —
+> visait un dossier **vidé le 18/08/2026** puis archivé. L'état réel du produit se lit dans
+> `Projets/Runes de Chêne/Dev.md` du vault ; l'état réel du **code**, ici même, via
+> `graphify-out/GRAPH_REPORT.md` et `docs/db/`.
