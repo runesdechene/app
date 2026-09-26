@@ -19,6 +19,18 @@ describe('classifyRpc', () => {
   })
 })
 
+describe('classifyRpc — lectures hors préfixe', () => {
+  // preview_action_cost ne commence pas par get_/list_/fetch_ : sans liste
+  // explicite il tombait en `blocked`, le panneau du lieu retombait sur le coût
+  // de repli 1 ⚡ et n'affichait jamais le détail distance/territoire.
+  it('preview_action_cost part en lecture réelle', () => {
+    expect(classifyRpc('preview_action_cost')).toBe('read')
+  })
+  it("n'ouvre pas la porte à tout ce qui commence par preview_", () => {
+    expect(classifyRpc('preview_something_else')).toBe('blocked')
+  })
+})
+
 describe('classifyRpc — validated', () => {
   it('classe answer_enigma / answer_fragment_enigma comme validated', () => {
     expect(classifyRpc('answer_enigma')).toBe('validated')
@@ -27,7 +39,7 @@ describe('classifyRpc — validated', () => {
 })
 
 describe('validatedEnigmaResponse', () => {
-  beforeEach(() => { useDemoStore.getState().reset() })
+  beforeEach(() => { useDemoStore.getState().resetJournee() })
 
   it('bonne réponse : renvoie correct/answer/explanation réels + incrémente la Gloire', async () => {
     const realRpc = vi.fn().mockResolvedValue({
@@ -58,7 +70,7 @@ describe('validatedEnigmaResponse', () => {
 })
 
 describe('wrapSupabaseForDemo — answer_enigma validé', () => {
-  beforeEach(() => { useDemoStore.getState().reset() })
+  beforeEach(() => { useDemoStore.getState().resetJournee() })
 
   it('route vers check_enigma_answer, jamais vers answer_enigma réel', async () => {
     const realRpc = vi.fn().mockResolvedValue({
@@ -75,12 +87,12 @@ describe('wrapSupabaseForDemo — answer_enigma validé', () => {
 })
 
 describe('fakeResponse', () => {
-  beforeEach(() => { useDemoStore.getState().reset() })
+  beforeEach(() => { useDemoStore.getState().resetJournee() })
 
   it('discover_place ajoute la découverte et renvoie un succès sans error', () => {
     const r = fakeResponse('discover_place', { p_place_id: 'place-9' })
     expect(r.error).toBeNull()
-    expect(useDemoStore.getState().discoveredIds.has('place-9')).toBe(true)
+    expect(useDemoStore.getState().discoveredIds).toContain('place-9')
   })
 
   // FIX 3: default branch throws for unknown names
@@ -90,7 +102,7 @@ describe('fakeResponse', () => {
 })
 
 describe('lectures ∞ overridées', () => {
-  beforeEach(() => { useDemoStore.getState().reset() })
+  beforeEach(() => { useDemoStore.getState().resetJournee() })
 
   it('get_user_energy renvoie une jauge pleine', () => {
     const { data } = fakeResponse('get_user_energy', {}) as { data: any }
@@ -108,10 +120,22 @@ describe('lectures ∞ overridées', () => {
   it('get_user_energy est classé faked (pas read)', () => {
     expect(classifyRpc('get_user_energy')).toBe('faked')
   })
+
+  // Le compte démo n'a aucune découverte en base. Laissé en lecture réelle,
+  // get_user_discoveries renvoyait [] et écrasait la mémoire du jour dès que
+  // usePlayer résolvait — le brouillard retombait sur toute la carte.
+  it('get_user_discoveries renvoie la mémoire de la borne, pas le compte réel', () => {
+    expect(classifyRpc('get_user_discoveries')).toBe('faked')
+    useDemoStore.getState().resetJournee()
+    useDemoStore.getState().addDiscovered('p1')
+    useDemoStore.getState().addDiscovered('p2')
+    const { data } = fakeResponse('get_user_discoveries', {})
+    expect(data).toEqual(['p1', 'p2'])
+  })
 })
 
 describe('wrapSupabaseForDemo — rpc', () => {
-  beforeEach(() => { useDemoStore.getState().reset() })
+  beforeEach(() => { useDemoStore.getState().resetJournee() })
 
   it('une écriture faked ne touche jamais le client réel', async () => {
     const realRpc = vi.fn()
@@ -149,7 +173,7 @@ describe('wrapSupabaseForDemo — from(table)', () => {
   let wrapped: any
 
   beforeEach(() => {
-    useDemoStore.getState().reset()
+    useDemoStore.getState().resetJournee()
     insertSpy = vi.fn().mockResolvedValue({ data: [{}], error: null })
     selectSpy = vi.fn().mockReturnValue({ data: [{}], error: null })
     fakeBuilder = {
@@ -231,7 +255,7 @@ describe('wrapSupabaseForDemo — storage', () => {
 // FIX 2 — cache live reads
 describe('wrapSupabaseForDemo — cache live (FIX 2)', () => {
   beforeEach(() => {
-    useDemoStore.getState().reset()
+    useDemoStore.getState().resetJournee()
     // Clear cache using the sentinel
     setCached('__reset__', null, undefined as any)
   })

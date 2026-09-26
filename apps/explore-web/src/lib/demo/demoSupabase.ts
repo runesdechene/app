@@ -23,13 +23,24 @@ const CROWNS_BY_DIFFICULTY: Record<string, number> = {
 export const OVERRIDDEN_READS: ReadonlySet<string> = new Set([
   'get_user_energy',
   'get_my_crowns_state',
+  // Le compte démo n'a aucune découverte en base : laissé en lecture réelle,
+  // celui-ci renvoyait [] et écrasait la mémoire du jour de la borne.
+  'get_user_discoveries',
 ])
 
 const READ_PREFIXES = ['get_', 'list_', 'fetch_']
 
+// Lectures réelles dont le nom ne porte aucun préfixe reconnu. Liste nominative
+// et pas un préfixe `preview_` : une future RPC ainsi nommée pourrait écrire, et
+// l'invariant de la borne est zéro écriture.
+export const EXTRA_READS: ReadonlySet<string> = new Set([
+  'preview_action_cost',
+])
+
 export function classifyRpc(name: string): 'read' | 'faked' | 'validated' | 'blocked' {
   if (VALIDATED_WRITES.has(name)) return 'validated'
   if (FAKED_WRITES.has(name) || OVERRIDDEN_READS.has(name)) return 'faked'
+  if (EXTRA_READS.has(name)) return 'read'
   if (READ_PREFIXES.some((p) => name.startsWith(p))) return 'read'
   return 'blocked'
 }
@@ -57,6 +68,9 @@ export function fakeResponse(
       const { energy, maxEnergy } = useDemoStore.getState()
       return { data: { energy, maxEnergy, nextPointIn: 0, energyCycle: 0 }, error: null }
     }
+    case 'get_user_discoveries':
+      // Source de vérité de la borne : ce que la journée a révélé.
+      return { data: useDemoStore.getState().discoveredIds, error: null }
     case 'get_my_crowns_state':
       return { data: { balance: Infinity, capped: false, harvestable: [] }, error: null }
     // FIX 3: unknown name → loud error rather than silent success

@@ -1,13 +1,28 @@
 import path from 'path'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
-  envDir: path.resolve(__dirname, '../..'),
+const ENV_DIR = path.resolve(__dirname, '../..')
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, ENV_DIR, 'VITE_')
+  // Netlify passe ses variables par process.env, pas par un fichier .env.
+  const isDemo = (env.VITE_DEMO_MODE ?? process.env.VITE_DEMO_MODE) === 'true'
+
+  return {
+  envDir: ENV_DIR,
   plugins: [
     react(),
     VitePWA({
+      // Borne (VITE_DEMO_MODE) : AUCUN service worker. Le 6 août 2026, une
+      // migration RGPD a retiré `users.email_address` au rôle authenticated ;
+      // le front corrigé le jour même n'a jamais atteint la borne, restée trois
+      // semaines sur son bundle précaché (énergie 0/3, découverte impossible).
+      // Un SW n'apporte rien à une borne branchée qui recharge toutes les 3 min,
+      // et `registerType: 'prompt'` ne peut pas se mettre à jour sans quelqu'un
+      // pour cliquer. Elle doit exécuter ce qui est déployé, point.
+      disable: isDemo,
       // 'prompt' (et pas 'autoUpdate') : un nouveau SW ne prend PLUS le contrôle
       // en pleine session. Couplé à la suppression de skipWaiting dans sw.ts, ça
       // évite que cleanupOutdatedCaches efface les chunks de l'ancien build
@@ -67,5 +82,6 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
+  }
   }
 })
