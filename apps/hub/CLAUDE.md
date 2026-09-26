@@ -3,12 +3,7 @@
 > Port dev 3001. Prod : hub.runesdechene.com (Netlify).
 > Accès admin uniquement (`users.role = 'admin'`).
 
-## Mémoire projet
-
-Conventions, gotchas, décisions, préférences, architecture :
-**`~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`**
-
-4-Layer Query Rule et règles Graphify : voir `CLAUDE.md` racine monorepo.
+Règles communes, Graphify et démarrage : `CLAUDE.md` racine. Pièges : `.claude/rules/` et `docs/db/`.
 
 ## Spécificités cette app
 
@@ -36,7 +31,7 @@ cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify
 
 ## Auth Hub — fetchRole
 
-Toujours requêter par **email** (pas par id), voir Citadelle `DEV/Architecture/Auth et utilisateurs.md`.
+Toujours requêter par **email** (pas par id), voir `docs/db/auth.md`.
 
 ## Vues de monitoring V0.7 phase 5
 

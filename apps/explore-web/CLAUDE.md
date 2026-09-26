@@ -2,12 +2,7 @@
 
 > App publique (V0.5 — L'Érudition Conquérante). Port dev 3000. Prod : app.runesdechene.com (Netlify).
 
-## Mémoire projet
-
-Conventions, gotchas, décisions, préférences, architecture :
-**`~/citadelle/📱 L'application (La Carte)/🛠️ DEV/_Index DEV.md`**
-
-4-Layer Query Rule et règles Graphify : voir `CLAUDE.md` racine monorepo.
+Règles communes, Graphify et démarrage : `CLAUDE.md` racine. Pièges : `.claude/rules/` et `docs/db/`.
 
 ## Spécificités cette app
 
@@ -99,4 +94,4 @@ Le mode démo (`demo.runesdechene.com`) s'exécute sur une **borne tactile fulls
 - **Pas de code mort** — supprimer si unused
 - **RPCs** — logique métier côté serveur via `SECURITY DEFINER`
 
-Détail : voir Citadelle `DEV/Conventions/` et `DEV/Gotchas/`.
+Détail : `.claude/rules/` et `docs/db/gotchas.md`.

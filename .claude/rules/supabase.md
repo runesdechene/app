@@ -202,3 +202,9 @@ Quand je réécris `get_user_titles`, TOUJOURS inclure `'unlocks', t.unlocks` da
 1. Avant de réécrire `get_user_titles`, LIRE la version actuelle (migration la plus récente)
 2. Vérifier que `'unlocks', t.unlocks` est dans CHAQUE json_build_object (généraux + faction)
 3. Plus généralement : ne jamais retirer un champ du retour d'une RPC sans vérifier qui le consomme côté frontend
+
+## Il n'y a pas de table `fragments`
+
+Le catalogue des Fragments est `title_fragments`. Côté Shopify, la clé d'un Fragment est le
+`system.handle` du métaobjet Illustration (type `illustrations`, au pluriel) — jamais le tag
+produit `fragment:*`, dont la casse varie (migs 251-253).

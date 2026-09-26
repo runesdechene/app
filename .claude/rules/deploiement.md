@@ -12,6 +12,25 @@ paths:
 > Regroupé le 25/09/2026 depuis la mémoire locale de Claude, pour que ce savoir
 > voyage avec le dépôt au lieu de rester sur une seule machine.
 
+## Sites Netlify et cycle de déploiement
+
+Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `--site <SITE_ID>`.
+
+| Site | SITE_ID | Domaine |
+|---|---|---|
+| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
+| `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
+| `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
+| `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — build sur Netlify, auto-deploy de la branche `demo-borne` |
+
+- **Après chaque deploy explore-web** : `node scripts/sync-app-version.mjs` (lit `# X.Y.Z` en tête
+  de `apps/explore-web/CHANGELOG.md`, écrit `app_settings.app.latest_version` → `UpdateBanner`).
+  Requiert `SUPABASE_SERVICE_ROLE_KEY` dans le `.env`.
+- **Vérifier** : `curl -s https://app.runesdechene.com/sw.js | grep -oE "matchPrecache|KILL_SWITCH"`.
+- **Rollback éprouvé** : `git revert HEAD --no-edit`, rebuild, redeploy. Ou rollback Netlify en un clic.
+- **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
+  `packageManager` dans le `package.json` racine. Ne pas les retirer.
+
 ## Netlify deploy — toujours chemin absolu
 
 Toujours utiliser le chemin absolu pour `--dir` dans `netlify deploy`.

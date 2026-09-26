@@ -988,3 +988,14 @@ murmure ») sans jamais en montrer le contenu.
   recevoir de salut se vit plus mal qu'une absence de fonctionnalité. À traiter en
   concevant le Campement.
 - Chemin de bascule V1 → V2 pour les joueurs existants : chantier séparé, non commencé.
+
+### Reste à faire (repris du plan de bataille, 26/09/2026)
+
+- Maquette Accueil : vignette du lieu ajouté, bandeau Saga en kaki.
+- Fiche de lieu : libeller les 2 boutons ronds, y poser le filtre de visibilité.
+- Vérifier combien de lieux sont datés (`era_id`) — sinon la lecture « Le temps » est vide.
+- Afficher la ligne de faits sur la fiche (`era_id`, `best_season`, `accessibility`, `bivouac`).
+- Trancher sur quoi la marque accepte d'être liée par un vote — avant tout code.
+- Uriel maquette le Campement — le reste est maquetté.
+- Au portage des appels : retirer `floor_glory` / `floor_crowns` et l'emoji par défaut.
+- Toute fonctionnalité V2 reliée au Hub reçoit une pastille « V2 compatible » dans le Hub.

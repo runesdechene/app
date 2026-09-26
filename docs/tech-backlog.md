@@ -3,8 +3,7 @@
 > Infra, durcissement, observabilité, dette transverse. Ce qu'on a décidé de **ne pas** faire
 > tout de suite, avec la raison — pour ne pas re-débattre à chaque fois qu'on y repense.
 >
-> Ce fichier ≠ `docs/db/tech-debt.md` (dette **DB/SQL** détaillée, format origine/coût/urgence)
-> ≠ `_ContexteIA/xo-status.md` (ce qu'on fait **maintenant**).
+> Ce fichier ≠ `docs/db/tech-debt.md` (dette **DB/SQL** détaillée, format origine/coût/urgence).
 >
 > *Rapatrié du vault le 18/08/2026 (`L'app/📌 Backlog technique - App.md`, dernière revue 07/07).
 > C'est du dev : ça vit dans le repo, pas dans Obsidian.*
@@ -46,3 +45,9 @@
 ## Idées non instruites
 
 - [ ] **Système d'emails séquencés** — brouillon de schéma jamais appliqué : `docs/db/drafts/systeme-emails-BROUILLON.sql` (tables `email_subscribers`, `email_sequences`, séquences `shopify_welcome` / `app_welcome` / `post_order` en J1/J3/J7/J10). Aucune de ces tables n'existe en prod ni dans le repo. À instruire ou à jeter — pas à appliquer tel quel.
+
+## Fragments audio — mesure des écoutes (en ligne depuis le 16/08)
+
+- Le compteur agrège toute la durée de vie : pas de fenêtre par drop.
+- L'identité de session ne survit pas au navigateur : un second onglet compte une seconde écoute. À trancher.
+- Écrans back-office connectés (liste et fiche joueur, tableau de bord, Fragments, Sync Shopify) basculés sur la vue staff, jamais testés avec une session admin.
