@@ -21,7 +21,7 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 | `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
-| `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — build sur Netlify, auto-deploy de la branche `demo-borne` |
+| `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
 - **Après chaque deploy explore-web** : `node scripts/sync-app-version.mjs` (lit `# X.Y.Z` en tête
   de `apps/explore-web/CHANGELOG.md`, écrit `app_settings.app.latest_version` → `UpdateBanner`).
