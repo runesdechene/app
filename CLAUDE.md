@@ -2,19 +2,19 @@
 
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > L'état du projet, les décisions et la façon de travailler avec Uriel vivent dans le vault
-> **Mon Cerveau** : `1. LE MÉTIER/1. Runes de Chêne/_État.md` et `_Socle/`. Ici, le code seulement.
+> **Mon Cerveau** : lire le Claude.MD du vault, le '\_État.md' associé à ce projet (Runes de Chêne) et '\_Socle'. Ici, le code seulement.
 
 ## Où sont les choses
 
-| Quoi | Où |
-|---|---|
-| App publique V1 (`app.runesdechene.com`) | `apps/explore-web/` |
-| Back-office (`hub.runesdechene.com`) | `apps/hub/` |
-| Pages SEO (`/lieu/*`) | `apps/seo-pages/` |
-| Base, migrations, RPC, edge functions | `supabase/` |
-| Conception V2 — **fait foi**, points ouverts en bas | `docs/superpowers/specs/2026-08-18-app-v2-design.md` |
-| Pièges DB, auth, storage, workflow migrations, dette SQL | `docs/db/` |
-| Chantiers différés | `docs/tech-backlog.md` |
+| Quoi                                                     | Où                                                              |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
+| App publique V1 (`app.runesdechene.com`)                 | `apps/explore-web/`                                             |
+| Back-office (`hub.runesdechene.com`)                     | `apps/hub/`                                                     |
+| Pages SEO (`/lieu/*`)                                    | `apps/seo-pages/`                                               |
+| Base, migrations, RPC, edge functions                    | `supabase/`                                                     |
+| Conception V2 — **fait foi**, points ouverts en bas      | `docs/superpowers/specs/2026-08-18-app-v2-design.md`            |
+| Pièges DB, auth, storage, workflow migrations, dette SQL | `docs/db/`                                                      |
+| Chantiers différés                                       | `docs/tech-backlog.md`                                          |
 | Pièges payés en prod, chargés selon les fichiers touchés | `.claude/rules/` — lire `deploiement.md` avant tout déploiement |
 
 Chaque app a son `CLAUDE.md` (commandes, stack, spécificités).
@@ -35,6 +35,7 @@ Un nom de colonne ou une signature de RPC ne se devine jamais : graph ou `inform
 
 Graphify se reconstruit seul au commit (hook `post-commit`, + `scripts/graphify-sql.py` si
 `supabase/migrations/` bouge). À la main :
+
 - code : `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"`
 - SQL : `python3 scripts/graphify-sql.py`
 
