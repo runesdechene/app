@@ -31,6 +31,15 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 - **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
 
+## V2 : ne jamais déployer la V1 avant le site `rdc-web-v2`
+
+Depuis la branche `feat/v2-socle`, le `netlify.toml` de la V1 redirige `/v2/*` vers le site
+`rdc-web-v2`, et le menu montre « Essayer la V2 » aux comptes autorisés. **Tant que ce site
+n'existe pas et n'est pas déployé**, un déploiement de la V1 contenant ces changements envoie
+`/v2/` vers une 404. Ordre obligatoire : site V2 d'abord, V1 ensuite (spec socle §7).
+Ne pas fusionner `feat/v2-socle` dans `main` avant le premier déploiement de la V2 — ou retirer
+la redirection du `netlify.toml` au moment de la fusion.
+
 ## Netlify deploy — toujours chemin absolu
 
 Toujours utiliser le chemin absolu pour `--dir` dans `netlify deploy`.

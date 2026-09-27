@@ -44,10 +44,11 @@ test('hors connexion : message, bouton Réessayer et lien vers la V1', async () 
   expect(screen.getByRole('link', { name: 'Retour à la V1' })).toHaveAttribute('href', '/')
 })
 
-test('rien pendant le chargement', () => {
+test('pendant le chargement : un message discret, rien de la V2', () => {
   const leave = vi.fn()
   vi.mocked(useV2Access).mockReturnValue({ state: { status: 'loading' }, retry: vi.fn() })
   render(<AccessGate leave={leave}>contenu V2</AccessGate>)
   expect(screen.queryByText('contenu V2')).not.toBeInTheDocument()
+  expect(screen.getByText('Ouverture de la V2…')).toBeInTheDocument()
   expect(leave).not.toHaveBeenCalled()
 })

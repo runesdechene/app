@@ -43,5 +43,14 @@ export function AccessGate({
       </main>
     )
   }
+  if (decision === 'wait') {
+    // Jamais d'écran vide : la vérification peut prendre quelques secondes hors connexion.
+    return (
+      <main className={styles.offline} aria-busy="true">
+        <p>Ouverture de la V2…</p>
+      </main>
+    )
+  }
+  // 'leave' : la redirection vers la V1 est en cours (effet ci-dessus).
   return null
 }

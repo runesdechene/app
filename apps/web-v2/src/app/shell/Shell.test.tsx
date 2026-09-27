@@ -61,3 +61,8 @@ test('l’onglet actif est annoncé', async () => {
     'page',
   )
 })
+
+test('un lien « Revenir à la V1 » est toujours visible pendant la construction', async () => {
+  renderAt('/codex')
+  expect(await screen.findByRole('link', { name: 'Revenir à la V1' })).toHaveAttribute('href', '/')
+})

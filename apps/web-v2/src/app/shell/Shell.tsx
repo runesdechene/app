@@ -13,6 +13,8 @@ import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { CodexScreen } from '@/features/codex/components/CodexScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import logotype from '@/assets/ui/logotype.png'
+import { Text } from '@/shared/ui/Text'
+import { V1_URL } from '../access/AccessGate'
 import { tabOf, TABS, type TabId } from '../navigation/tabs'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
@@ -39,6 +41,11 @@ export function Shell() {
   return (
     <div className={styles.shell} data-detail={detailOpen ? 'open' : undefined}>
       <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
+      {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
+          y compris dans la V2 installée en application, qui n'a pas de barre d'adresse. */}
+      <a className={styles.retourV1} href={V1_URL}>
+        <Text variant="libelle">Revenir à la V1</Text>
+      </a>
       <button
         type="button"
         className={styles.avatar}

@@ -85,6 +85,32 @@ export default tseslint.config(
     },
   },
   {
+    // Les composants d'une zone cumulent les deux interdits. En configuration « flat », un
+    // bloc plus bas REMPLACE la règle d'un bloc plus haut : sans ce bloc, le précédent
+    // effaçait l'interdit « une zone n'importe pas une autre zone » (relecture du 27/09).
+    files: ['src/features/**/components/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: '@supabase/supabase-js', message: 'Un composant ne parle pas à Supabase.' },
+          ],
+          patterns: [
+            V1,
+            OTHER_ZONE_BY_PATH,
+            OTHER_ZONE,
+            { group: ['@/app/*'], message: 'Une zone ne dépend pas de la coquille.' },
+            {
+              group: ['@/shared/supabase/*'],
+              message: 'Un composant ne parle pas à Supabase : hook → api/.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['*.config.{js,ts}', 'eslint.config.js'],
     languageOptions: { globals: globals.node },
     extends: [tseslint.configs.disableTypeChecked],
