@@ -160,6 +160,29 @@ parchemin `#f4eee1`, surface `#f6eddd`, titres `#403434`, texte `#594848`, accen
 Ils vivent dans `shared/styles/tokens.css`, et nulle part ailleurs : aucune couleur en dur
 dans un composant.
 
+## 8bis. La coquille visuelle et ses ressources
+
+Source : maquette Figma **« Runes de Chêne — App v2 »** (fichier `MKqyVhDPreg06PMEAaDxde`,
+écran de référence `51:626`). Le fichier n'a **aucune variable Figma** : les jetons se
+relèvent sur les calques et se confrontent au tableau ci-dessus.
+
+Le socle pose la **coquille** commune aux cinq écrans :
+- **bandeau haut** : logotype à gauche, avatar à droite ;
+- **fond** : parchemin et paysage en filigrane — **fixe par défaut** ; défilant ou fixe se
+  règle par une seule propriété CSS, à trancher sur écran réel ;
+- **barre basse** : fond sable surmonté d'une lisière de forêt, cinq icônes gravées, libellés
+  en Bebas Neue, pastille de notification ;
+- **état vide** centré (« … est à venir ») sur chacun des cinq écrans.
+
+**Les ressources sont posées en brut** : exportées telles quelles depuis Figma, Uriel les
+refait ensuite. Elles vivent toutes dans `src/assets/ui/`, sous des **noms stables**, avec un
+`README.md` qui liste chaque fichier, sa taille attendue et où il s'affiche. Remplacer une
+ressource = remplacer un fichier du même nom, sans toucher au code.
+
+**Libellé du 4ᵉ onglet** : la maquette dit **« Messages »**, la spec V2 dit « Registre ».
+L'interface suit la maquette ; le code garde `registre`, le concept de la spec. *À confirmer
+par Uriel.*
+
 ## 9. Le registre de purge du back
 
 `docs/v2/purge-back.md` — tout ce que le back devra perdre ou corriger une fois la V2 lancée.
