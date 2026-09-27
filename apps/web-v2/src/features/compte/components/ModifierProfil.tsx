@@ -118,7 +118,7 @@ function Formulaire({
       }}
     >
       <div className={styles.photo}>
-        <Avatar url={photo?.apercu ?? valeurs.avatarUrl} nom={valeurs.nom} taille="moyen" />
+        <Avatar url={photo?.apercu ?? valeurs.avatarUrl} nom={valeurs.nom} taille="grand" />
         <input
           ref={choixPhoto}
           type="file"
