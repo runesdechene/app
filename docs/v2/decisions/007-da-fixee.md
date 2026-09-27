@@ -25,3 +25,8 @@ diluait écran par écran. Le Figma de la V2 n'a aucune variable : aucune échel
 ## Conséquences
 - Ajouter une couleur ou une taille = modifier `tokens.css` et la page, visiblement.
 - Une brique hors du guide casse la CI.
+
+## Validation (27/09/2026)
+Uriel a validé le relevé : la maquette Figma fait foi contre la spec V2 §5 (fond `#fcf3e4`, encre
+`#494841`, accent `#a94842`, ocre `#a89369`), Cabin Condensed est la troisième police, le texte
+tient en 4 niveaux, l'écran « Connexion » du Figma est une ébauche ancienne.
