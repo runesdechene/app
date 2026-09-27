@@ -58,14 +58,14 @@
   text-align: center;
 }
 
-/* Un reflet en biais, comme sur une carte glacée : le seul effet, et discret. */
+/* Un reflet en biais, comme sur une carte glacée : le seul effet, à peine visible (Uriel, 27/09). */
 .fragment::after {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     118deg,
     transparent 35%,
-    color-mix(in srgb, var(--color-sur-accent) 50%, transparent) 48%,
+    color-mix(in srgb, var(--color-sur-accent) 25%, transparent) 48%,
     transparent 60%
   );
   content: '';
