@@ -6,7 +6,7 @@
 
 ## 1. Ce que devient le Compte
 
-Le Compte n'est plus un écran unique : c'est **un profil public de Porteur**, le même pour tout
+Le Compte n'est plus un écran unique : c'est **un profil public d'Explorateur**, le même pour tout
 le monde, et **un menu** ouvert par l'avatar. Quatre écrans, tous maquettés dans Figma
 (fichier `MKqyVhDPreg06PMEAaDxde`) :
 
@@ -28,8 +28,8 @@ Tout état navigable est une URL (décision 006) : le retour arrière ferme touj
 | Écran | Adresse | Mobile | Desktop |
 |---|---|---|---|
 | Menu avatar | `/<onglet>/menu` | feuille du bas, fond assombri | feuille sous l'avatar |
-| Profil public | `/<onglet>/porteur/<id>` | plein écran | panneau à gauche |
-| Modifier mon profil | `/<onglet>/porteur/<id>/modifier` | plein écran | panneau |
+| Profil public | `/<onglet>/explorateur/<id>` | plein écran | panneau à gauche |
+| Modifier mon profil | `/<onglet>/explorateur/<id>/modifier` | plein écran | panneau |
 | Préférences | `/<onglet>/preferences` | plein écran | panneau |
 
 - **Le menu a une adresse** : c'est ce qui permet au bouton retour d'Android de le fermer. Il
@@ -38,7 +38,7 @@ Tout état navigable est une URL (décision 006) : le retour arrière ferme touj
   et renvoie vers la V1.
 - **Le détail vide `/<onglet>/compte` du socle disparaît** : le menu le remplace, l'avatar
   ouvre le menu.
-- `/<onglet>/porteur/<id>/modifier` ouvert pour **un autre** que soi → redirigé vers son profil.
+- `/<onglet>/explorateur/<id>/modifier` ouvert pour **un autre** que soi → redirigé vers son profil.
 
 ## 3. Le profil public
 
@@ -86,7 +86,7 @@ Féminin — Chevalière) · **Enregistrer**.
 
 ### Lecture — une seule fonction
 
-**`get_porteur_profile(p_user_id text)`**, `SECURITY DEFINER`, `search_path` épinglé,
+**`get_profil_explorateur(p_user_id text)`**, `SECURITY DEFINER`, `search_path` épinglé,
 exécutable par `authenticated`. Elle renvoie **exactement** ce qu'un profil public a le droit
 de montrer, en un aller-retour : identité, niveau, titres portés, bio, Instagram, date
 d'inscription, badges, ligne d'attache, fragments, et les trois listes **déjà dédoublonnées**
@@ -142,6 +142,6 @@ exacte est à relever au plan, **copiée depuis le live**, jamais devinée.
 - un lieu **ajouté, visité et désiré** → n'apparaît qu'une fois, dans Ajoutés ;
 - une **envie visitée** (V1 ou V2) → sort de la liste, sans action du joueur ;
 - **profil d'un autre** → ni « Modifier », ni données privées ; ses envies seulement s'il les montre ;
-- `/porteur/<autre>/modifier` → redirigé vers son profil ;
+- `/explorateur/<autre>/modifier` → redirigé vers son profil ;
 - **bio** à 300 caractères → refusée au-delà, compteur visible ;
 - **déconnexion** → retour à la V1, jamais un écran blanc.

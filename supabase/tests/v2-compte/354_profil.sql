@@ -1,4 +1,4 @@
--- 354 : le profil public d'un Porteur, vu par un autre et par lui-même. Transaction annulée.
+-- 354 : le profil public d'un Explorateur, vu par un autre et par lui-même. Transaction annulée.
 -- Joue 349-353 d'abord : la lecture s'appuie sur places.departement et users.show_envies.
 BEGIN;
 \ir ../../migrations/349_postgis_geo_reference.sql
@@ -6,7 +6,7 @@ BEGIN;
 \ir ../../migrations/351_places_departement_pays.sql
 \ir ../../migrations/352_envies_sortent_a_la_visite.sql
 \ir ../../migrations/353_preferences_et_titres_v2.sql
-\ir ../../migrations/354_get_porteur_profile.sql
+\ir ../../migrations/354_get_profil_explorateur.sql
 DO $test$
 DECLARE
   a text := '10e4c7d5-7f09-4bdf-8a47-c44db83a196f';
@@ -28,10 +28,10 @@ BEGIN
   UPDATE users SET show_envies = false WHERE id = b;
 
   PERFORM set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
-  inconnu := public.get_porteur_profile('inexistant');
-  vu_par_a := public.get_porteur_profile(b);
+  inconnu := public.get_profil_explorateur('inexistant');
+  vu_par_a := public.get_profil_explorateur(b);
   PERFORM set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
-  vu_par_b := public.get_porteur_profile(b);
+  vu_par_b := public.get_profil_explorateur(b);
 
   SELECT EXISTS (SELECT 1 FROM json_array_elements(vu_par_b->'ajoutes') x WHERE x->>'id' = triple) INTO triple_ajoute;
   SELECT EXISTS (SELECT 1 FROM json_array_elements(vu_par_b->'visites') x WHERE x->>'id' = triple) INTO triple_visite;

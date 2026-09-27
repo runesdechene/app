@@ -1,4 +1,4 @@
-# compte — le Compte du porteur
+# compte — le Compte de l'explorateur
 
 Conception : `docs/superpowers/specs/2026-08-18-app-v2-design.md`, §4.
 

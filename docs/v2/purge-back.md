@@ -47,4 +47,4 @@
 | déclencheur `envie_visitee` (`_trg_envie_visitee`) | une visite retire le lieu des envies (listes exclusives) | mig 352 |
 | `users.show_departement`, `users.show_envies`, `get_my_preferences()`, `set_my_preference(text, boolean)` | Préférences de la V2, sans identifiant fourni | mig 353 |
 | `set_my_displayed_titles(integer[])` | deux titres portés au plus ; remplace à terme `set_displayed_titles_v3` (trois) | mig 353 |
-| `get_porteur_profile(text)` | profil public en une lecture ; remplace à terme `get_player_profile` pour la V2 | mig 354 |
+| `get_profil_explorateur(text)` | profil public en une lecture ; remplace à terme `get_player_profile` pour la V2 | mig 354 |

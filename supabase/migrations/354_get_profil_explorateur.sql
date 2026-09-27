@@ -1,12 +1,12 @@
--- 354 — Le profil public d'un Porteur, en une lecture
+-- 354 — Le profil public d'un Explorateur, en une lecture
 --
 -- WHY : zone Compte. Une seule fonction renvoie exactement ce qu'un profil public a le droit de
 -- montrer — jamais d'e-mail ni de position. Les trois listes arrivent déjà exclusives
--- (Ajoutés > Visités > Envie d'y aller) ; les envies ne sont montrées qu'à soi ou si le Porteur
+-- (Ajoutés > Visités > Envie d'y aller) ; les envies ne sont montrées qu'à soi ou si l'Explorateur
 -- les montre ; les lieux masqués ou privés ne sont jamais montrés à un autre. Lecture seule :
 -- p_user_id est ici le profil CONSULTÉ, pas une identité revendiquée.
 
-CREATE OR REPLACE FUNCTION public.get_porteur_profile(p_user_id text)
+CREATE OR REPLACE FUNCTION public.get_profil_explorateur(p_user_id text)
 RETURNS json
 LANGUAGE plpgsql
 STABLE
@@ -57,7 +57,7 @@ BEGIN
     )
     SELECT json_build_object(
       'id', u.id,
-      'nom', COALESCE(NULLIF(u.display_name, ''), NULLIF(u.first_name, ''), 'Porteur'),
+      'nom', COALESCE(NULLIF(u.display_name, ''), NULLIF(u.first_name, ''), 'Explorateur'),
       'avatarUrl', u.avatar_url,
       'niveau', public._level_from_xp(COALESCE(u.xp_total, 0)),
       'titres', COALESCE((
@@ -86,5 +86,5 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.get_porteur_profile(text) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.get_porteur_profile(text) TO authenticated;
+REVOKE ALL ON FUNCTION public.get_profil_explorateur(text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_profil_explorateur(text) TO authenticated;
