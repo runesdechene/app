@@ -95,6 +95,15 @@
   border-radius: var(--radius-carte);
 }
 
+/* La feuille se pose dans son conteneur positionné : ici, un cadre à la taille d'un bas d'écran. */
+.cadreFeuille {
+  position: relative;
+  height: 14rem;
+  overflow: hidden;
+  border: 1px dashed var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
 /* La coquille montrée dans un téléphone : bandeau en haut, barre d'onglets en bas. */
 .coquille {
   display: grid;

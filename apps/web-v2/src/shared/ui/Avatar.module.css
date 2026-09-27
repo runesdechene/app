@@ -1,0 +1,26 @@
+/*
+ * QUOI     — cercle bordé de rose ; l'initiale en Bebas Neue sur le sable.
+ */
+.avatar {
+  display: inline-grid;
+  place-content: center;
+  flex: none;
+  border: 2px solid var(--color-rose);
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+  color: var(--color-texte-doux);
+  font-family: var(--font-titre);
+  object-fit: cover;
+}
+
+.petit {
+  width: 36px;
+  height: 36px;
+  font-size: var(--titre-carte-size);
+}
+
+.grand {
+  width: 96px;
+  height: 96px;
+  font-size: var(--titre-ecran-size);
+}

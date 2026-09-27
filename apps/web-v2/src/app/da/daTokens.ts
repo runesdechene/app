@@ -25,7 +25,19 @@ export const COLOR_TOKENS = [
   '--color-desactive-texte',
 ] as const
 
-export const DA_SHOWCASED = ['Button', 'EmptyState', 'IconButton', 'Pastille', 'Text'] as const
+export const DA_SHOWCASED = [
+  'Avatar',
+  'Button',
+  'Champ',
+  'EmptyState',
+  'Feuille',
+  'IconButton',
+  'Interrupteur',
+  'Onglets',
+  'Pastille',
+  'PastilleChoix',
+  'Text',
+] as const
 
 export const SPACE_TOKENS = [
   '--space-1',

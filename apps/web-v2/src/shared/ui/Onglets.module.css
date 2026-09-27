@@ -1,0 +1,31 @@
+/*
+ * QUOI     — onglets à parts égales sur un filet ; l'actif est foncé et souligné d'un trait.
+ */
+.onglets {
+  display: flex;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-texte-doux) 20%, transparent);
+}
+
+.onglet {
+  flex: 1;
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-2);
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--color-texte-pale);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  letter-spacing: var(--titre-tracking);
+  white-space: nowrap;
+}
+
+.onglet[aria-selected='true'] {
+  border-bottom-color: var(--color-texte-doux);
+  color: var(--color-texte-doux);
+}
+
+.compte {
+  margin-left: var(--space-1);
+  color: var(--color-texte-pale);
+}

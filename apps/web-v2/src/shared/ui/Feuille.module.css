@@ -1,0 +1,51 @@
+/*
+ * QUOI     — voile encre à 35 %, panneau parchemin aux coins hauts arrondis, poignée sable.
+ * POURQUOI — `position: absolute` et non `fixed` : la feuille reste dans la coquille (et dans
+ *            les faux téléphones de /v2/da), qui est son conteneur positionné.
+ */
+.feuille {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.voile {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-encre) 35%, transparent);
+}
+
+.panneau {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-carte) var(--radius-carte) 0 0;
+  background: var(--color-fond);
+  outline: none;
+  animation: monte 0.2s ease-out;
+}
+
+.poignee {
+  justify-self: center;
+  width: 34px;
+  height: 5px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+@keyframes monte {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panneau {
+    animation: none;
+  }
+}
