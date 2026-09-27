@@ -1,53 +1,39 @@
--- 356 — Les titres de fragment se portent aussi en V2
+-- 356 — Trois titres de jeu, leur origine ; le signe d'un Porteur
 --
--- WHY : décisions d'Uriel (27/09) — en V2 on porte TROIS titres au plus, « généraux ou liés
--- à nos fragments », et toucher un titre explique d'où il vient. Posséder un Fragment débloque ses mots (`fragment_words`), rangés par la V1
--- dans `displayed_title_ids_v3` avec un identifiant NÉGATIF (-fragment_words.id), comme le fait
--- `get_all_player_titles`. Une seule source, `_titres_portables`, dit ce qu'un Explorateur peut
--- porter ; la lecture du formulaire et l'écriture s'y fient toutes les deux. Le profil public
--- renvoie l'origine de chaque titre : le Fragment (nom, image, date d'obtention) ou la condition
--- de jeu (`titles.condition`, que le front met en phrase).
--- Titres de Compagnie : ne se portent plus en V2 (décision du même jour).
+-- WHY : décisions d'Uriel (27/09, brainstorm « titres »).
+--   · Les titres sont des HAUTS FAITS, gagnés en jouant, pour tout le monde : trois au plus
+--     (au lieu de deux), et le profil renvoie leur condition (`titles.condition`) pour que
+--     toucher un titre explique comment il a été obtenu. Titres de Compagnie et mots de
+--     fragment ne se portent pas en V2.
+--   · Un Porteur place son profil « sous le signe » d'un de ses Fragments : l'illustration
+--     veille en filigrane derrière l'en-tête. `users.signe_fragment_id` le retient ;
+--     `set_my_signe` le choisit (un Fragment qu'on possède, ou NULL pour aucun).
 -- `set_my_displayed_titles` part de la 353, `get_profil_explorateur` de la 355 (live), copiées
--- entières ; seuls les passages sur les titres changent.
+-- entières ; seuls la limite, les titres et le signe changent.
 
--- Généraux débloqués, puis mots des Fragments possédés (fragments visibles ; tous pour un
--- admin, comme en V1).
-CREATE OR REPLACE FUNCTION public._titres_portables(p_user_id text)
-RETURNS TABLE(id integer, nom text, fragment text, image_url text)
-LANGUAGE sql
-STABLE
+ALTER TABLE public.users
+  ADD COLUMN IF NOT EXISTS signe_fragment_id integer REFERENCES public.title_fragments(id) ON DELETE SET NULL;
+
+CREATE OR REPLACE FUNCTION public.set_my_signe(p_fragment_id integer)
+RETURNS void
+LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $$
-  SELECT (t->>'id')::int, t->>'name', NULL::text, NULL::text
-    FROM json_array_elements(public.get_user_titles(p_user_id) -> 'unlockedGeneralTitles') t
-  UNION ALL
-  SELECT -fw.id, fw.word::text, tf.name::text, COALESCE(tf.image_url, tf.icon_url)
-    FROM public.fragment_words fw
-    JOIN public.title_fragments tf ON tf.id = fw.fragment_id
-   WHERE EXISTS (SELECT 1 FROM public.user_fragments uf
-                  WHERE uf.user_id = p_user_id AND uf.fragment_id = tf.id)
-     AND (tf.visible OR EXISTS (SELECT 1 FROM public.users u
-                                 WHERE u.id = p_user_id AND u.role = 'admin'));
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Connexion requise' USING ERRCODE = '42501';
+  END IF;
+  IF p_fragment_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM user_fragments WHERE user_id = (auth.uid())::text AND fragment_id = p_fragment_id
+  ) THEN
+    RAISE EXCEPTION 'Fragment non possédé' USING ERRCODE = '42501';
+  END IF;
+  UPDATE users SET signe_fragment_id = p_fragment_id WHERE id = (auth.uid())::text;
+END;
 $$;
-REVOKE ALL ON FUNCTION public._titres_portables(text) FROM PUBLIC, anon, authenticated;
-
--- Ce que l'Explorateur connecté peut porter, pour « Modifier mon profil ».
-CREATE OR REPLACE FUNCTION public.get_my_wearable_titles()
-RETURNS json
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path TO 'public'
-AS $$
-  SELECT COALESCE(json_agg(json_build_object('id', p.id, 'nom', p.nom, 'fragment', p.fragment, 'imageUrl', p.image_url)
-                           ORDER BY p.fragment NULLS FIRST, p.nom), '[]'::json)
-    FROM public._titres_portables((auth.uid())::text) p
-   WHERE auth.uid() IS NOT NULL;
-$$;
-REVOKE ALL ON FUNCTION public.get_my_wearable_titles() FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.get_my_wearable_titles() TO authenticated;
+REVOKE ALL ON FUNCTION public.set_my_signe(integer) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.set_my_signe(integer) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.set_my_displayed_titles(p_title_ids integer[])
 RETURNS void
@@ -65,8 +51,8 @@ BEGIN
   IF cardinality(v_ids) > 3 THEN
     RAISE EXCEPTION 'Trois titres au plus' USING ERRCODE = '22023';
   END IF;
-  SELECT COALESCE(array_agg(p.id), '{}') INTO v_debloques
-    FROM public._titres_portables((auth.uid())::text) p;
+  SELECT COALESCE(array_agg((t->>'id')::int), '{}') INTO v_debloques
+    FROM json_array_elements(public.get_user_titles((auth.uid())::text) -> 'unlockedGeneralTitles') t;
   IF NOT (v_ids <@ v_debloques) THEN
     RAISE EXCEPTION 'Titre non débloqué' USING ERRCODE = '42501';
   END IF;
@@ -132,24 +118,18 @@ BEGIN
       'avatarUrl', u.avatar_url,
       'niveau', public._level_from_xp(COALESCE(u.xp_total, 0)),
       'titres', COALESCE((
-        SELECT json_agg(json_build_object(
-                 'id', g.id, 'nom', g.nom, 'condition', g.condition,
-                 'fragment', CASE WHEN g.fragment IS NULL THEN NULL
-                                  ELSE json_build_object('nom', g.fragment, 'imageUrl', g.image_url,
-                                                         'depuis', g.depuis) END
-               ) ORDER BY g.ord)
-          FROM (SELECT x.tid AS id, COALESCE(t.name, fw.word)::text AS nom, x.ord,
-                       t.condition, tf.name::text AS fragment,
-                       COALESCE(tf.image_url, tf.icon_url) AS image_url,
-                       (SELECT min(uf.unlocked_at) FROM public.user_fragments uf
-                         WHERE uf.user_id = p_user_id AND uf.fragment_id = tf.id) AS depuis
+        SELECT json_agg(json_build_object('id', g.id, 'nom', g.name, 'condition', g.condition) ORDER BY g.ord)
+          FROM (SELECT t.id, t.name, t.condition, x.ord
                   FROM unnest(u.displayed_title_ids_v3) WITH ORDINALITY AS x(tid, ord)
-                  LEFT JOIN public.titles t ON t.id = x.tid AND t.type = 'general'
-                  LEFT JOIN public.fragment_words fw ON fw.id = -x.tid
-                  LEFT JOIN public.title_fragments tf ON tf.id = fw.fragment_id
-                 WHERE COALESCE(t.name, fw.word) IS NOT NULL
+                  JOIN public.titles t ON t.id = x.tid AND t.type = 'general'
                  ORDER BY x.ord
                  LIMIT 3) g), '[]'::json),
+      'signe', (
+        SELECT json_build_object('id', tf.id, 'nom', tf.name, 'imageUrl', COALESCE(tf.image_url, tf.icon_url))
+          FROM public.title_fragments tf
+         WHERE tf.id = u.signe_fragment_id
+           AND EXISTS (SELECT 1 FROM public.user_fragments f
+                        WHERE f.user_id = p_user_id AND f.fragment_id = tf.id)),
       'bio', NULLIF(u.bio, ''),
       'instagram', NULLIF(u.instagram, ''),
       'inscritLe', u.created_at,
