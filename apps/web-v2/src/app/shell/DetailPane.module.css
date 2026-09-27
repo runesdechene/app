@@ -11,13 +11,14 @@
   padding-top: env(safe-area-inset-top);
 }
 
-/* Le fond de la maquette COMPTE, rendu tel quel (parchemin déjà à 50 % dans l'image). */
+/* Le même parchemin que les écrans (frise, sapins, ton chaud) : un détail n'est pas une
+   page blanche posée dessus. */
 .pane::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url('../../assets/ui/fond-section.png') center top / 100% auto no-repeat;
+  background: url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
   pointer-events: none;
 }
 
