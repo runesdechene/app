@@ -1,8 +1,8 @@
 # App Runes de Chêne — V2 (design)
 
-> Statut : **brainstorm en cours**. Document vivant, complété section par section.
-> Rédigé avec Uriel le 18 août 2026. Sections validées : Fondations, Squelette, Compte client, Accueil.
-> Restent à concevoir : Carte, Codex, Campement.
+> Statut : **référence fonctionnelle de la V2**. Rédigé avec Uriel à partir du 18 août 2026.
+> Toutes les zones sont validées en structure ; les points ouverts sont en bas.
+> La fondation technique (où vit le code, la pile, l'accès) est dans `2026-09-26-v2-socle-design.md`.
 
 ## 1. Intention
 
@@ -62,9 +62,9 @@ V1 actuels perdront ces systèmes. Le chemin de migration est un chantier à par
 
 - **Compagnies, réincarnées** : plus des Maisons qui s'affrontent, mais des **groupes de
   discussion libres** au sein de la communauté. → Conséquence de conception dès
-  maintenant : le **registre** V2.0 (§10) est **un** espace, pas **l'**espace. Un message
+  maintenant : l'onglet **Messages** V2.0 (§10) est **un** espace, pas **l'**espace. Un message
   appartient à un canal dès le départ, même s'il n'y en a que deux. Gratuit aujourd'hui, cher
-  à rattraper plus tard. *(Visait le Campement avant la révision du 19/08 ; c'est le registre
+  à rattraper plus tard. *(Visait le Campement avant la révision du 19/08 ; c'est l'onglet Messages
   qui porte la discussion.)*
 - **Code imprimé sur le fragment** pour se déclarer porteur (voir §4).
 
@@ -104,7 +104,8 @@ de menu et la section**, pas le champ individuel.
 - Chaque onglet **garde son état** quand on en change.
 - L'avatar en haut à droite ouvre le **Compte**.
 - Les 4 zones sont **égales** — aucune n'est enterrée sous une autre.
-**Cinq onglets depuis le 19/08** : *Accueil · Carte · Codex · Registre · Campement.*
+**Cinq onglets depuis le 19/08** : *Accueil · Carte · Messages · Codex · Campement* — ordre de la maquette Figma.
+« Registre » a été renommé **« Messages »** le 27/09/2026 : le mot n'était pas clair pour les gens.
 
 > **Le tiroir a été proposé puis écarté.** L'idée venait du chat de MMO — un panneau ouvrable
 > par-dessus n'importe quel écran, pour discuter en regardant la Carte. **La prémisse ne
@@ -178,15 +179,15 @@ Nom de travail : **Le Seuil**.
 
 ### Frontière entre les lieux
 
-> **L'Accueil, on le lit. Le registre, on y parle. Le Campement, on y décide.**
+> **L'Accueil, on le lit. Les Messages, on y parle. Le Campement, on y décide.**
 
 L'Accueil est **descendant** : la marque publie, la communauté vit, le porteur reçoit.
 Le seul geste social autorisé y est **saluer** — un tap, un compteur, une notification au
-porteur salué. **Pas de commentaire sur l'Accueil** : la conversation appartient au registre.
+porteur salué. **Pas de commentaire sur l'Accueil** : la conversation appartient aux Messages.
 
 > **Révision du 19/08.** La formule d'origine était « l'Accueil on le lit, le Campement on y
 > parle ». Le Campement n'est plus la discussion (§9) : la conversation a migré vers le
-> **registre**, un tiroir ouvert à tous (§10). La frontière compte désormais trois lieux.
+> **Messages**, un onglet ouvert à tous (§10). La frontière compte désormais trois lieux.
 
 **Vocabulaire retenu : « saluer / un salut »**, pas « féliciter » (long pour une pilule, et
 ton scolaire).
@@ -509,7 +510,7 @@ prévu). Tant que le Campement portait la discussion, le salon d'un appel était
 non-porteurs — et le nouveau venu qu'un rendez-vous avait fait marcher se cognait à une porte
 close, une photo à la main.
 
-**Le problème disparaît avec la révision du 19/08** : la discussion vit dans le **registre**
+**Le problème disparaît avec la révision du 19/08** : la discussion vit dans les **Messages**
 (§10), ouvert à tous, et le Campement ne garde que la décision (§9). Le salon d'un appel est
 donc public par construction. Rien à inventer.
 
@@ -889,7 +890,11 @@ et vivante pour tout le monde, et la station reste protégée.
   réversible de l'app ») — mélanger *caché parce que douteux* et *protégé parce que précieux*
   rendrait les deux illisibles.
 
-## 10. Le registre — la discussion, partout
+## 10. Messages — la discussion, partout
+
+> **Renommé le 27/09/2026** : l'onglet s'appelait « le registre », mot jugé peu clair pour les
+> gens. Dans cette section, « le registre » désigne encore le **fil public** à l'intérieur de
+> l'onglet ; son libellé final se tranche en concevant la zone.
 
 **Un chat de MMO, pas une messagerie.** Décision d'Uriel le 19/08, après mesure : **10-15
 personnes en simultané**. À cette densité un chat vit — un message reçoit sa réponse pendant que

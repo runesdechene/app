@@ -77,7 +77,7 @@ apps/web-v2/
         components/   l'affichage (.tsx + .module.css côte à côte)
         hooks/        la logique avec état React
         README.md     ce que fait la zone, ses écrans, les RPC utilisées
-      accueil/  carte/  codex/  registre/  campement/
+      accueil/  carte/  messages/  codex/  campement/
     shared/
       supabase/     le client unique + les types générés (jamais édités à la main)
       ui/           les briques génériques
@@ -179,9 +179,8 @@ refait ensuite. Elles vivent toutes dans `src/assets/ui/`, sous des **noms stabl
 `README.md` qui liste chaque fichier, sa taille attendue et où il s'affiche. Remplacer une
 ressource = remplacer un fichier du même nom, sans toucher au code.
 
-**Libellé du 4ᵉ onglet** : la maquette dit **« Messages »**, la spec V2 dit « Registre ».
-L'interface suit la maquette ; le code garde `registre`, le concept de la spec. *À confirmer
-par Uriel.*
+**L'onglet « Messages »** (tranché le 27/09/2026) remplace « Registre », peu clair pour les
+gens. Un seul nom partout : l'interface, le dossier `features/messages/`, la spec V2.
 
 ## 9. Le registre de purge du back
 
