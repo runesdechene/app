@@ -55,6 +55,10 @@ et plusieurs allers-retours énervés sur cette session.
 
 ## Textes toujours trop petits
 
+> **V1 seulement.** La V2 (`apps/web-v2`) suit l'échelle de sa maquette Figma, validée par Uriel
+> le 27/09/2026 (légendes 12 px, flux 13 px, corps 16 px) : « au plus proche de l'esprit des
+> maquettes ». Ses tailles vivent dans `tokens.css` et se voient sur `/v2/da`.
+
 Ne JAMAIS descendre en dessous de 15px pour du texte lisible sur le web. Le body doit être 18px minimum pour du contenu qu'on lit. Les labels/breadcrumbs au minimum 14-15px.
 
 **Why:** Uriel a signalé 3 fois dans la même session que les textes étaient trop petits. Quand XO "corrigeait" il passait de 13→14px, ce qui ne changeait rien. C'est un biais systémique vers l'esthétique "élégante petite" au détriment de la lisibilité.

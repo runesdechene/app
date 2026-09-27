@@ -30,3 +30,8 @@ diluait écran par écran. Le Figma de la V2 n'a aucune variable : aucune échel
 Uriel a validé le relevé : la maquette Figma fait foi contre la spec V2 §5 (fond `#fcf3e4`, encre
 `#494841`, accent `#a94842`, ocre `#a89369`), Cabin Condensed est la troisième police, le texte
 tient en 4 niveaux, l'écran « Connexion » du Figma est une ébauche ancienne.
+
+## L'esprit, en cinq mots (Uriel, 27/09/2026)
+**Plat, parcheminé, aventure, doux — Runes de Chêne.** Toute évolution de la DA se juge contre
+l'ambiance des maquettes, pas seulement leurs valeurs. L'échelle de texte de la maquette prime
+sur la règle V1 « jamais sous 15 px » (`.claude/rules/interface.md`), qui ne vaut que pour la V1.
