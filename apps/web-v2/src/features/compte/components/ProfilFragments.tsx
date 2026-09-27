@@ -5,17 +5,20 @@
  *            ici, là où l'on voit ses Fragments, et son illustration veille ensuite en filigrane.
  * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, Fragment } from '../api/lireProfil'
 import { useChoisirSigne } from '../hooks/useChoisirSigne'
+import { useGlisser } from '../hooks/useGlisser'
 import styles from './ProfilFragments.module.css'
 
 export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   const [ouvert, setOuvert] = useState<Fragment | null>(null)
   const { choisir, echec } = useChoisirSigne(profil.id)
+  const rangee = useRef<HTMLDivElement>(null)
+  useGlisser(rangee)
 
   if (profil.fragments.length === 0) return null
 
@@ -24,7 +27,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
     return (
       <>
         <span className={styles.motifVignette}>
-          {f.imageUrl && <img src={f.imageUrl} alt="" />}
+          {f.imageUrl && <img src={f.imageUrl} alt="" draggable={false} />}
         </span>
         <span className={styles.nom}>{f.nom}</span>
       </>
@@ -32,12 +35,12 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   }
 
   return (
-    <section className={styles.fragments} aria-label="Ses fragments">
-      <h2 className={styles.titre}>Fragments</h2>
+    <section className={styles.fragments} aria-label="Fragments collectés">
+      <h2 className={styles.titre}>Fragments collectés</h2>
       {/* Une seule ligne qui défile, comme en V1 : cadre flex > rangée flex: 1 qui défile >
           vignettes à largeur fixe (règle « carrousel » de .claude/rules/interface.md). */}
       <div className={styles.cadre}>
-        <div className={styles.rangee}>
+        <div ref={rangee} className={styles.rangee}>
           {profil.fragments.map((f) =>
             profil.estMoi ? (
               <button

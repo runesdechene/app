@@ -5,10 +5,12 @@
  *            `envies === null` : l'Explorateur les masque, la section n'existe pas. Une section
  *            vide ne s'affiche pas non plus. Chaque section tient sur une ligne qui défile.
  */
+import { useRef } from 'react'
 import type { Lieu, ExplorateurProfile } from '../api/lireProfil'
 import { useMaPosition } from '../hooks/useMaPosition'
 import type { Point } from '../lib/distance'
 import { LieuCarte } from './LieuCarte'
+import { useGlisser } from '../hooks/useGlisser'
 import styles from './ProfilDecouvertes.module.css'
 
 export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
@@ -40,6 +42,8 @@ function Section({
   position: Point | null
   avecAuteur: boolean
 }) {
+  const rangee = useRef<HTMLUListElement>(null)
+  useGlisser(rangee)
   if (lieux.length === 0) return null
   return (
     <section className={styles.section} aria-label={titre}>
@@ -48,7 +52,7 @@ function Section({
       </h2>
       {/* Carrousel : cadre flex > rangée flex: 1 qui défile (règle de interface.md). */}
       <div className={styles.cadre}>
-        <ul className={styles.rangee}>
+        <ul ref={rangee} className={styles.rangee}>
           {lieux.map((l) => (
             <LieuCarte key={l.id} lieu={l} position={position} avecAuteur={avecAuteur} />
           ))}

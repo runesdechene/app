@@ -6,3 +6,4 @@
 - `usePreferences` — les préférences et `regler` (optimiste, revient si la base refuse).
 - `useChoisirSigne` — place son profil sous le signe d'un de ses Fragments.
 - `useMaPosition` — cette position, gardée dix minutes.
+- `useGlisser` — tenir et tirer une rangée à la souris pour la faire défiler.

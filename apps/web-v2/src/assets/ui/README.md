@@ -17,6 +17,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `fleche-retour.svg`    | 24 × 24         | retour, en tête de chaque détail (maquette COMPTE)                |
 | `coche.svg`            | 10 × 10         | badge « Porteur vérifié »                                         |
 | `etoile.svg`           | 10 × 10         | badge de rôle (« Admin »)                                         |
+| `instagram.svg`        | 18 × 18         | lien Instagram du profil (pochoir, couleur du lien)               |
 | `murmure.svg`          | 16 × 16         | bouton « Envoyer un murmure »                                     |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur

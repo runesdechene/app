@@ -34,6 +34,7 @@
   margin: 0;
   padding: 0 var(--space-6) var(--space-2);
   overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
   list-style: none;
   scrollbar-width: none;
 }

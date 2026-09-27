@@ -30,7 +30,7 @@ export function LieuCarte({
     <li className={styles.carte}>
       <span className={styles.photo}>
         {/* Sans photo, la tuile parchemin reste vide : le nom est écrit juste dessous. */}
-        {lieu.imageUrl && <img src={lieu.imageUrl} alt="" loading="lazy" />}
+        {lieu.imageUrl && <img src={lieu.imageUrl} alt="" loading="lazy" draggable={false} />}
       </span>
       <span className={styles.nom}>{lieu.nom}</span>
       {(distance || lieu.categorie) && (

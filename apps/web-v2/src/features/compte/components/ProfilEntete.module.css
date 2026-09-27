@@ -96,10 +96,21 @@
 }
 
 .instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--color-lien);
   font-family: var(--font-corps);
   font-size: var(--bio-size);
   text-decoration: none;
+}
+
+/* L'icône Instagram de la maquette « Modifier mon profil », teintée comme le lien. */
+.iconeInstagram {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/instagram.svg') center / contain no-repeat;
 }
 
 .depuis,
