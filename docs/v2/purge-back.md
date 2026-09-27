@@ -17,8 +17,7 @@
 | Expéditions joueur-joueur (`voyage_*`) | abandonnées | supprimer | après bascule | spec V2 §1 |
 | Quêtes du jour (et leurs tables) | abandonnées — ≠ Missions, qui restent | supprimer | après bascule | spec V2 §1 |
 | `floor_glory`, `floor_crowns` sur les appels | liés à la Gloire et à la Cour | supprimer | au portage des appels | spec V2, reste à faire |
-
-| Image `app-fragments/fragment-3.webp` (seau de stockage) | l'image de « Demiurge (Admin) », Fragment retiré par la mig 359 | supprimer à la main dans le stockage | mig 359, 27/09 |
+| Image `app-fragments/fragment-3.webp` (seau de stockage) | l'image de « Demiurge (Admin) », Fragment retiré par la mig 359 | supprimer à la main dans le stockage | dès la 359 appliquée | mig 359, 27/09 |
 
 ## 1bis. En sommeil — ne PAS supprimer
 
