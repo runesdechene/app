@@ -12,16 +12,19 @@
   text-align: center;
 }
 
-/* L'illustration du Fragment choisi, en filigrane : à peine visible, jamais devant le texte. */
+/* La couverture (maquette 123:107) : le motif grand et présent, qui se fond vers le bas. */
 .filigrane {
   position: absolute;
-  top: 0;
+  top: calc(var(--space-6) * -1);
   left: 50%;
   z-index: -1;
-  width: 64%;
-  max-width: 260px;
+  width: 78%;
+  max-width: 300px;
   transform: translateX(-50%);
-  opacity: 0.07;
+  opacity: 0.17;
+
+  /* Le motif se fond vers le bas ; pour un masque, seule l'opacité de la couleur compte. */
+  mask: linear-gradient(to bottom, var(--color-encre) 55%, transparent);
   pointer-events: none;
 }
 
@@ -61,14 +64,26 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-2);
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
 }
 
 .titre {
-  display: flex; /* sans lui, le bouton s'aligne sur une ligne de texte et descend la pastille */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   padding: 0;
   border: none;
   background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.marque {
+  color: var(--color-ocre);
+  font-style: normal;
 }
 
 .bio {

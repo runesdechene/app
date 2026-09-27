@@ -2,11 +2,13 @@
 
 - `MenuAvatar` — la feuille ouverte par l'avatar.
 - `ProfilExplorateur` — le profil public ; ses états chargement / erreur / introuvable.
-  - `ProfilEntete` — badges, portrait, nom, niveau, signe (filigrane), titres (origine au
-    toucher), présentation, attache, bouton.
-  - `ProfilFragments` — ses Fragments ; sur son profil, choisir son signe.
+  - `ProfilEntete` — couverture du signe, portrait, nom, niveau, titres en une ligne (origine
+    au toucher), présentation, attache, bouton.
+  - `ProfilChiffres` — le bandeau : lieux ajoutés, visités, fragments.
+  - `ProfilFragments` — les Fragments collectés sur une ligne ; sur son profil, choisir son
+    signe et « + N à découvrir » vers le Codex.
   - `ProfilDecouvertes` — sections Lieux ajoutés / Visités / Envie d'y aller, en lignes qui défilent.
-  - `LieuCarte` — une carte de lieu : photo, nom, distance (si position), catégorie, auteur.
+  - `LieuCarte` — grande carte photo : nom posé dessus, catégorie, distance (si position), auteur.
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.
 - `ModifierProfil` — le formulaire du profil ; ne s'affiche qu'une fois tout chargé.
 - `PreferencesPage` — les trois cartes de réglages.

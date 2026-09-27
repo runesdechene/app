@@ -1,11 +1,14 @@
 /**
- * QUOI     — « Ses fragments » : les Fragments possédés. Sur son propre profil, toucher un
- *            Fragment permet de placer son profil sous son signe (maquette 109:175).
+ * QUOI     — « Fragments collectés » : les Fragments possédés, sur une ligne. Sur son propre
+ *            profil, toucher un Fragment permet de placer son profil sous son signe (maquette
+ *            109:175), et une tuile en empreinte, « + 5 à découvrir », mène au Codex.
  * POURQUOI — le signe est une volonté de se placer sous un motif (Uriel, 27/09) : il se choisit
  *            ici, là où l'on voit ses Fragments, et son illustration veille ensuite en filigrane.
- * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton.
+ * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton, et
+ *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
@@ -18,11 +21,12 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   const [ouvert, setOuvert] = useState<Fragment | null>(null)
   const { choisir, echec } = useChoisirSigne(profil.id)
   const rangee = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   useGlisser(rangee)
 
   if (profil.fragments.length === 0) return null
 
-  // Le motif en format haut, son nom dessous (Uriel, 27/09).
+  // Le motif en format haut, son nom en capitales dans la tuile (maquette 123:107).
   function vignette(f: Fragment) {
     return (
       <>
@@ -36,7 +40,9 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   return (
     <section className={styles.fragments} aria-label="Fragments collectés">
-      <h2 className={styles.titre}>Fragments collectés</h2>
+      <h2 className={styles.titre}>
+        Fragments collectés <span className={styles.nombre}>{profil.fragments.length}</span>
+      </h2>
       {/* Une seule ligne qui défile, comme en V1 : cadre flex > rangée flex: 1 qui défile >
           vignettes à largeur fixe (règle « carrousel » de .claude/rules/interface.md). */}
       <div className={styles.cadre}>
@@ -60,6 +66,19 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
                 {vignette(f)}
               </figure>
             ),
+          )}
+          {profil.fragmentsADecouvrir !== null && profil.fragmentsADecouvrir > 0 && (
+            <button
+              type="button"
+              className={styles.aDecouvrir}
+              aria-label={`+ ${String(profil.fragmentsADecouvrir)} à découvrir, dans le Codex`}
+              onClick={() => {
+                void navigate('/codex')
+              }}
+            >
+              <span className={styles.plus}>+ {profil.fragmentsADecouvrir}</span>
+              <span className={styles.nom}>à découvrir</span>
+            </button>
           )}
         </div>
       </div>

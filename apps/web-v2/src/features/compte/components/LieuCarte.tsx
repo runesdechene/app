@@ -1,9 +1,10 @@
 /**
- * QUOI     — la carte d'un lieu dans le profil (maquette « sous le signe de l'Hoplite ») :
- *            photo arrondie, nom, distance et pastille de catégorie, et son auteur si demandé.
- * POURQUOI — la distance ne s'affiche que si l'on connaît la position de celui qui regarde
- *            (Uriel, 27/09). L'auteur se montre sur les lieux visités ou désirés, pas sur ceux
- *            que le Porteur a lui-même ajoutés.
+ * QUOI     — la carte d'un lieu dans le profil, façon carnet de route (maquette 123:107) : la
+ *            photo en grand, le nom posé dessus, la catégorie en haut à gauche, la distance en
+ *            haut à droite, et l'auteur en bas à droite quand on le demande.
+ * POURQUOI — « J'adore la proposition pour les lieux » (Uriel, 27/09) : la photo est l'héroïne.
+ *            La distance ne s'affiche que si l'on connaît la position de celui qui regarde ;
+ *            l'auteur se montre sur les lieux visités ou désirés, pas sur ceux qu'on a ajoutés.
  * ATTENTION — l'icône de catégorie est un pochoir (comme en V1) : sa forme blanche est posée
  *            sur un rond de la couleur de la catégorie, par variables CSS.
  */
@@ -28,32 +29,26 @@ export function LieuCarte({
 
   return (
     <li className={styles.carte}>
-      <span className={styles.photo}>
-        {/* Sans photo, la tuile parchemin reste vide : le nom est écrit juste dessous. */}
-        {lieu.imageUrl && <img src={lieu.imageUrl} alt="" loading="lazy" draggable={false} />}
+      {lieu.imageUrl && (
+        <img className={styles.photo} src={lieu.imageUrl} alt="" loading="lazy" draggable={false} />
+      )}
+      {lieu.categorie && (
+        <span
+          className={styles.categorie}
+          style={{ '--icone': `url(${lieu.categorie.icone})`, '--nuance': lieu.categorie.couleur }}
+          aria-hidden="true"
+        />
+      )}
+      {distance && <span className={styles.distance}>{distance}</span>}
+      <span className={styles.bas}>
+        <span className={styles.nom}>{lieu.nom}</span>
+        {avecAuteur && lieu.auteur && (
+          <span className={styles.auteur}>
+            par {lieu.auteur.nom}
+            <Avatar url={lieu.auteur.avatarUrl} nom={lieu.auteur.nom} taille="mini" />
+          </span>
+        )}
       </span>
-      <span className={styles.nom}>{lieu.nom}</span>
-      {(distance || lieu.categorie) && (
-        <span className={styles.ligne}>
-          {distance}
-          {lieu.categorie && (
-            <span
-              className={styles.categorie}
-              style={{
-                '--icone': `url(${lieu.categorie.icone})`,
-                '--nuance': lieu.categorie.couleur,
-              }}
-              aria-hidden="true"
-            />
-          )}
-        </span>
-      )}
-      {avecAuteur && lieu.auteur && (
-        <span className={styles.auteur}>
-          <Avatar url={lieu.auteur.avatarUrl} nom={lieu.auteur.nom} taille="mini" />
-          par <strong>{lieu.auteur.nom}</strong>
-        </span>
-      )}
     </li>
   )
 }

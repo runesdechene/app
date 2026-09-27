@@ -13,12 +13,12 @@ import murmure from '@/assets/ui/murmure.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
-import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, TitrePorte } from '../api/lireProfil'
 import { decouperBio } from '../lib/bio'
 import { phraseCondition } from '../lib/conditionTitre'
 import { sousLeSigne } from '../lib/signe'
+import { ProfilChiffres } from './ProfilChiffres'
 import styles from './ProfilEntete.module.css'
 
 const DATE_LONGUE = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' })
@@ -41,8 +41,9 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
           {profil.signe && <p className={styles.signe}>{sousLeSigne(profil.signe.nom)}</p>}
         </div>
 
+        {/* Les titres en une ligne, comme une devise sous le nom (maquette 123:107). */}
         {profil.titres.length > 0 && (
-          <div className={styles.titres}>
+          <p className={styles.titres}>
             {profil.titres.map((t) => (
               <button
                 key={t.id}
@@ -52,11 +53,16 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
                   setTitre(t)
                 }}
               >
-                <PastilleChoix libelle={t.nom} marque="✦" />
+                <span className={styles.marque} aria-hidden="true">
+                  ✦
+                </span>
+                {t.nom}
               </button>
             ))}
-          </div>
+          </p>
         )}
+
+        <ProfilChiffres profil={profil} />
 
         {profil.bio && (
           <p className={styles.bio}>

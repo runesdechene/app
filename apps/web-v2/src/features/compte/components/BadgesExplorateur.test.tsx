@@ -31,6 +31,7 @@ const BASE: ExplorateurProfile = {
   visites: [],
   envies: [],
   signe: null,
+  fragmentsADecouvrir: null,
   estMoi: true,
 }
 

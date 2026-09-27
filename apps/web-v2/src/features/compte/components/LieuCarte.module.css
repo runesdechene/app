@@ -1,56 +1,33 @@
 /*
- * QUOI     — carte de lieu 114 × 155 aux coins arrondis, nom en Bebas Neue, ligne de détails
- *            en Cabin Condensed (maquette « sous le signe de l'Hoplite »).
+ * QUOI     — grande carte photo 290 × 196, coins arrondis, ombre douce ; un dégradé sombre en bas
+ *            porte le nom en Bebas Neue clair (maquette 123:107). Sans photo : le parchemin.
  */
 .carte {
-  display: grid;
+  position: relative;
   flex: 0 0 auto;
-  align-content: start;
-  gap: var(--space-1);
-  width: 114px;
-}
-
-.photo {
-  display: grid;
-  place-content: center;
-  width: 114px;
-  height: 155px;
+  width: 290px;
+  height: 196px;
   overflow: hidden;
   border-radius: var(--radius-carte);
   background: var(--color-barre);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 18%, transparent);
 }
 
-.photo img {
-  width: 114px;
-  height: 155px;
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-}
-
-.nom {
-  margin-top: var(--space-1);
-  overflow: hidden;
-  color: var(--color-texte);
-  font-family: var(--font-titre);
-  font-size: var(--rubrique-size);
-  line-height: var(--titre-leading);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ligne {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--color-texte-pale);
-  font-family: var(--font-condensee);
-  font-size: var(--meta-size);
 }
 
 /* Pochoir de la catégorie : sa forme en blanc, sur un rond de sa couleur. */
 .categorie {
-  position: relative;
-  width: 13px;
-  height: 13px;
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  width: 26px;
+  height: 26px;
   border-radius: var(--radius-rond);
   background: var(--nuance);
 }
@@ -58,18 +35,66 @@
 .categorie::after {
   content: '';
   position: absolute;
-  inset: 2px;
+  inset: 5px;
   background: var(--color-sur-accent);
   mask: var(--icone) center / contain no-repeat;
 }
 
+.distance {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-fond) 90%, transparent);
+  color: var(--color-texte);
+  font-family: var(--font-condensee);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-gras);
+}
+
+/* Le bas de la carte : dégradé sombre, le nom, puis l'auteur à droite. */
+.bas {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-3) var(--space-3);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--color-encre) 75%, transparent)
+  );
+}
+
+.nom {
+  overflow: hidden;
+  color: var(--color-sur-accent);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  line-height: var(--titre-leading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Sans photo, le nom se lit en encre sur le parchemin. */
+.carte:not(:has(.photo)) .bas {
+  background: none;
+}
+
+.carte:not(:has(.photo)) .nom {
+  color: var(--color-encre);
+}
+
 .auteur {
   display: flex;
+  flex: none;
   align-items: center;
   gap: var(--space-1);
-  overflow: hidden;
-  color: var(--color-texte-pale);
+  color: color-mix(in srgb, var(--color-sur-accent) 85%, transparent);
   font-family: var(--font-condensee);
-  font-size: var(--micro-size);
+  font-size: var(--meta-size);
   white-space: nowrap;
 }

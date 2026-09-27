@@ -62,7 +62,7 @@
 
   /* Tailles propres au profil (maquette COMPTE 89:124) */
   --titre-detail-size: 1.375rem; /* « MON COMPTE », en tête d'un détail : 22 px */
-  --nom-profil-size: 1.75rem; /* le nom sous le portrait : 28 px */
+  --nom-profil-size: 2.25rem; /* le nom sous le portrait : 36 px (maquette 123:107) */
   --rangee-size: 1.125rem; /* « Ses fragments », onglets des découvertes : 18 px */
   --bio-size: 0.875rem; /* la présentation : 14 px (Uriel, 27/09 : un cran sous la maquette) */
   --bio-leading: 1.29;

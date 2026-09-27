@@ -31,6 +31,7 @@ const COMPLET = {
   visites: [],
   envies: null,
   signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
+  fragmentsADecouvrir: 5,
   estMoi: true,
 }
 

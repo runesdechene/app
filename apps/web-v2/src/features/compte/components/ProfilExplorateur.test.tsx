@@ -48,13 +48,17 @@ const PROFIL: ExplorateurProfile = {
   visites: [carte('p2', 'Abbaye du Thoronet', 'Gautier de Bilskirnir')],
   envies: [carte('p3', 'Mont Bégo')],
   signe: null,
+  fragmentsADecouvrir: 5,
   estMoi: true,
 }
 
 function afficher(profil: ExplorateurProfile | null) {
   fetchExplorateur.mockResolvedValue(profil)
   const router = createMemoryRouter(
-    [{ path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> }],
+    [
+      { path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> },
+      { path: '/codex', element: null },
+    ],
     { initialEntries: ['/carte/explorateur/u1'] },
   )
   render(
@@ -137,7 +141,7 @@ test('envies masquées : pas de section « Envie d’y aller » du tout', async 
 
 test('un lieu visité dit qui l’a ajouté', async () => {
   afficher(PROFIL)
-  expect(await screen.findByText('Gautier de Bilskirnir')).toBeInTheDocument()
+  expect(await screen.findByText('par Gautier de Bilskirnir')).toBeInTheDocument()
 })
 
 test('sans position autorisée, aucune distance', async () => {
@@ -151,4 +155,24 @@ test('avec la position de celui qui regarde, la distance de chaque lieu', async 
   position.mockResolvedValue({ latitude: 43.7102, longitude: 7.262 })
   afficher(PROFIL)
   expect(await screen.findAllByText('159 km')).toHaveLength(3)
+})
+
+test('le bandeau de chiffres : lieux ajoutés, visités, fragments', async () => {
+  afficher(PROFIL)
+  const chiffres = await screen.findByRole('list', { name: 'En chiffres' })
+  expect(chiffres).toHaveTextContent('1Lieu ajouté')
+  expect(chiffres).toHaveTextContent('1Lieu visité')
+  expect(chiffres).toHaveTextContent('1Fragment')
+})
+
+test('sur mon profil, une tuile invite à découvrir les autres Fragments, vers le Codex', async () => {
+  const router = afficher(PROFIL)
+  await userEvent.click(await screen.findByRole('button', { name: /5 à découvrir/ }))
+  expect(router.state.location.pathname).toBe('/codex')
+})
+
+test('chez un autre, jamais de Fragments manquants', async () => {
+  afficher({ ...PROFIL, estMoi: false, fragmentsADecouvrir: null })
+  await screen.findByText('Hoplite')
+  expect(screen.queryByText(/à découvrir/)).toBeNull()
 })
