@@ -45,7 +45,7 @@ Tout état navigable est une URL (décision 006) : le retour arrière ferme touj
 Dans l'ordre de la maquette :
 
 1. **En-tête** : retour · titre de page · badges **« Porteur vérifié »** (au moins un fragment,
-   quelle que soit sa source) et **rôle** (« Admin », « Modérateur ») s'il y a lieu.
+   quelle que soit sa source — un tap l'explique : c'est un client, il porte un Fragment) et **rôle** (« Admin », « Modérateur ») s'il y a lieu.
 2. **Identité** : grand avatar, nom (`COALESCE(display_name, first_name)`), **« Niveau N »**,
    titres portés en pastilles.
 3. **Présentation** : bio libre (liens et `@mentions` cliquables), Instagram, « Explorateur
