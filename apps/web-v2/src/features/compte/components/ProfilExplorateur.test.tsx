@@ -14,13 +14,15 @@ const fetchExplorateur = vi.hoisted(() =>
   vi.fn<(id: string) => Promise<ExplorateurProfile | null>>(),
 )
 vi.mock('../api/explorateur', () => ({ fetchExplorateur }))
+const choisirSigne = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+vi.mock('../api/monProfil', () => ({ choisirSigne }))
 
 const PROFIL: ExplorateurProfile = {
   id: 'u1',
   nom: 'Uriel',
   avatarUrl: null,
   niveau: 12,
-  titres: [{ id: 1, nom: 'Chevalier errant' }],
+  titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Fondateur de @runesdechene',
   instagram: 'uriel.runesdechene',
   inscritLe: '2024-09-30T10:00:00+00:00',
@@ -31,6 +33,7 @@ const PROFIL: ExplorateurProfile = {
   ajoutes: [{ id: 'p1', nom: 'Dolmen de la Pierre Levée', imageUrl: null }],
   visites: [{ id: 'p2', nom: 'Abbaye du Thoronet', imageUrl: null }],
   envies: [{ id: 'p3', nom: 'Mont Bégo', imageUrl: null }],
+  signe: null,
   estMoi: true,
 }
 
@@ -101,4 +104,31 @@ test('Explorateur introuvable : un message, jamais un écran vide', async () => 
 test('l’onglet « Envie d’y aller » a son nombre, comme les autres', async () => {
   afficher(PROFIL)
   expect(await screen.findByRole('tab', { name: /Envie d’y aller/ })).toHaveTextContent('1')
+})
+
+test('toucher un titre dit comment il a été gagné', async () => {
+  afficher(PROFIL)
+  await userEvent.click(await screen.findByRole('button', { name: /Chevalier errant/ }))
+  expect(screen.getByRole('dialog', { name: 'Chevalier errant' })).toHaveTextContent(
+    'Débloqué en visitant 50 lieux sur place.',
+  )
+})
+
+test('sous le signe d’un Fragment : filigrane et ligne discrète', async () => {
+  afficher({ ...PROFIL, signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' } })
+  expect(await screen.findByText('sous le signe de l’Hoplite')).toBeInTheDocument()
+  expect(document.querySelector('img[src="https://x/h.webp"]')).not.toBeNull()
+})
+
+test('sur mon profil, toucher un Fragment permet de me placer sous son signe', async () => {
+  afficher(PROFIL)
+  await userEvent.click(await screen.findByRole('button', { name: /Hoplite/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'Me placer sous ce signe' }))
+  expect(choisirSigne).toHaveBeenCalledWith(3)
+})
+
+test('sur le profil d’un autre, ses Fragments ne se choisissent pas', async () => {
+  afficher({ ...PROFIL, estMoi: false })
+  await screen.findByText('Hoplite')
+  expect(screen.queryByRole('button', { name: /Hoplite/ })).toBeNull()
 })

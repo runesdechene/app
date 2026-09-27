@@ -1,7 +1,10 @@
 /*
- * QUOI     — l'en-tête centré du profil ; les badges alignés à droite au-dessus du portrait.
+ * QUOI     — l'en-tête centré du profil ; les badges alignés à droite au-dessus du portrait ;
+ *            le filigrane du signe, très pâle, derrière (maquette 109:107).
  */
 .entete {
+  position: relative;
+  isolation: isolate;
   display: grid;
   justify-items: center;
   gap: var(--space-3);
@@ -77,4 +80,38 @@
 .action {
   display: grid;
   justify-self: stretch;
+}
+
+/* L'illustration du Fragment choisi, en filigrane : à peine visible, jamais devant le texte. */
+.filigrane {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  width: 64%;
+  max-width: 260px;
+  transform: translateX(-50%);
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.signe {
+  margin: 0;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.titre {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.marqueGrande {
+  margin: 0;
+  color: var(--color-ocre);
+  font-size: var(--titre-ecran-size);
+  line-height: 1;
 }

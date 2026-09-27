@@ -18,6 +18,7 @@ const api = vi.hoisted(() => ({
       { id: 1, nom: 'Chevalier errant' },
       { id: 2, nom: 'Hoplite' },
       { id: 3, nom: 'Arpenteur' },
+      { id: 4, nom: 'Pèlerin' },
     ]),
   ),
 }))
@@ -42,7 +43,7 @@ const PROFIL: ExplorateurProfile = {
   nom: 'Uriel',
   avatarUrl: null,
   niveau: 12,
-  titres: [{ id: 1, nom: 'Chevalier errant' }],
+  titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Chevalier errant',
   instagram: 'uriel.runesdechene',
   inscritLe: '2024-09-30T10:00:00+00:00',
@@ -53,6 +54,7 @@ const PROFIL: ExplorateurProfile = {
   ajoutes: [],
   visites: [],
   envies: [],
+  signe: null,
   estMoi: true,
 }
 vi.mock('../api/explorateur', () => ({ fetchExplorateur: () => Promise.resolve(PROFIL) }))
@@ -90,12 +92,13 @@ test('une présentation collée trop longue est tronquée à 300, compteur au pl
   expect(screen.getByText('300 / 300').className).toMatch(/plein/)
 })
 
-test('un troisième titre ne se coche pas', async () => {
+test('un quatrième titre ne se coche pas', async () => {
   ouvrir()
-  await userEvent.click(await screen.findByRole('button', { name: 'Hoplite' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Arpenteur' }))
-  expect(screen.getByRole('button', { name: 'Arpenteur' })).toHaveAttribute('aria-pressed', 'false')
-  expect(screen.getByText('Deux au plus')).toBeInTheDocument()
+  await userEvent.click(await screen.findByRole('button', { name: /Hoplite/ }))
+  await userEvent.click(screen.getByRole('button', { name: /Arpenteur/ }))
+  await userEvent.click(screen.getByRole('button', { name: /Pèlerin/ }))
+  expect(screen.getByRole('button', { name: /Pèlerin/ })).toHaveAttribute('aria-pressed', 'false')
+  expect(screen.getByText('Trois au plus')).toBeInTheDocument()
 })
 
 test('Enregistrer écrit le profil, les titres changés, l’accord, puis revient', async () => {

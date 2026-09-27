@@ -3,12 +3,15 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit la migration 354. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-356. Un champ ajouté là-bas s'ajoute ici.
  */
+import type { ConditionTitre } from '../lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from './lire'
 
 export type Lieu = { id: string; nom: string; imageUrl: string | null }
 export type Titre = { id: number; nom: string }
+export type TitrePorte = Titre & { condition: ConditionTitre | null }
+export type Signe = { id: number; nom: string; imageUrl: string | null }
 export type Fragment = { id: number; nom: string; imageUrl: string | null }
 
 export type ExplorateurProfile = {
@@ -16,7 +19,7 @@ export type ExplorateurProfile = {
   nom: string
   avatarUrl: string | null
   niveau: number
-  titres: Titre[]
+  titres: TitrePorte[]
   bio: string | null
   instagram: string | null
   inscritLe: string
@@ -27,6 +30,7 @@ export type ExplorateurProfile = {
   ajoutes: Lieu[]
   visites: Lieu[]
   envies: Lieu[] | null
+  signe: Signe | null
   estMoi: boolean
 }
 
@@ -36,9 +40,25 @@ function lieu(v: unknown): Lieu {
   return { id: chaine(o.id), nom: chaine(o.nom), imageUrl: ouNull(chaine)(o.imageUrl) }
 }
 
-function titre(v: unknown): Titre {
+function titre(v: unknown): TitrePorte {
   const o = objet(v)
-  return { id: nombre(o.id), nom: chaine(o.nom) }
+  return { id: nombre(o.id), nom: chaine(o.nom), condition: condition(o.condition) }
+}
+
+// Une condition illisible ne fait pas tomber le profil : le titre s'affiche, son origine se
+// dit alors « Gagné en jouant ».
+function condition(v: unknown): ConditionTitre | null {
+  try {
+    const o = objet(v)
+    return { stat: chaine(o.stat), min: nombre(o.min) }
+  } catch {
+    return null
+  }
+}
+
+function signe(v: unknown): Signe {
+  const o = objet(v)
+  return { id: nombre(o.id), nom: chaine(o.nom), imageUrl: ouNull(chaine)(o.imageUrl) }
 }
 
 function fragment(v: unknown): Fragment {
@@ -70,6 +90,7 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       ajoutes: liste(lieu)(o.ajoutes),
       visites: liste(lieu)(o.visites),
       envies: ouNull(liste(lieu))(o.envies),
+      signe: ouNull(signe)(o.signe),
       estMoi: booleen(o.estMoi),
     }
   } catch {

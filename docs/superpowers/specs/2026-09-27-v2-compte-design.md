@@ -145,3 +145,19 @@ exacte est à relever au plan, **copiée depuis le live**, jamais devinée.
 - `/explorateur/<autre>/modifier` → redirigé vers son profil ;
 - **bio** à 300 caractères → refusée au-delà, compteur visible ;
 - **déconnexion** → retour à la V1, jamais un écran blanc.
+
+## Révision du 27/09 (brainstorm « titres ») — fait foi sur ce qui précède
+
+- **Titres = hauts faits**, gagnés en jouant, pour tout le monde : **trois au plus**, marqués ✦,
+  tous de la même hauteur. Toucher un titre ouvre une feuille : « Titre gagné en jouant » et la
+  condition en phrase (« Débloqué en visitant 50 lieux sur place. »). Titres de Compagnie et
+  mots de fragment ne se portent pas en V2.
+- **Le signe** : un Porteur place son profil « sous le signe » d'un de ses Fragments. Son
+  illustration veille en filigrane (≈ 7 %) derrière l'en-tête, et une ligne discrète le dit
+  sous le niveau (*sous le signe de l'Hoplite*). Il se choisit sur son propre profil, en
+  touchant un Fragment de « Ses fragments » (« Me placer sous ce signe »). Pas de mot « porté »,
+  pas de marque sur l'avatar ni sur la carte.
+- Base : migration 356 (`set_my_displayed_titles` à 3, `users.signe_fragment_id`,
+  `set_my_signe`, profil avec `titres[].condition` et `signe`). Maquettes Figma 107:107,
+  109:107, 109:175.
+- À venir : les **titres offerts** (circonstanciels) et une page des titres débloquables.

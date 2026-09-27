@@ -1,6 +1,6 @@
 /**
- * QUOI     — les écritures de « Modifier mon profil » : nom, présentation, Instagram, titres
- *            portés, accord des titres ; et la liste des titres qu'on peut porter.
+ * QUOI     — les écritures du profil : nom, présentation, Instagram, titres portés, accord des
+ *            titres, signe ; et la liste des titres qu'on peut porter.
  * POURQUOI — `update_my_profile` et `set_title_gender` sont des fonctions V1 qui répondent
  *            `{ error }` au lieu d'échouer : `verifier` transforme cette réponse en erreur, pour
  *            que l'écran n'ait qu'un seul cas à traiter.
@@ -51,4 +51,10 @@ export async function choisirAccord(genre: 'm' | 'f') {
   const { data, error } = await supabase.rpc('set_title_gender', { p_gender: genre })
   if (error) throw error
   verifier(data)
+}
+
+// Se placer sous le signe d'un de ses Fragments (migration 356 : refusé si on ne l'a pas).
+export async function choisirSigne(fragmentId: number) {
+  const { error } = await supabase.rpc('set_my_signe', { p_fragment_id: fragmentId })
+  if (error) throw error
 }

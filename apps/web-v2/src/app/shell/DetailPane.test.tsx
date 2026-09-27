@@ -24,6 +24,7 @@ vi.mock('@/features/compte/api/session', () => ({
 
 vi.mock('@/features/compte/api/monProfil', () => ({
   titresDebloques: () => Promise.resolve([]),
+  choisirSigne: () => Promise.resolve(),
 }))
 vi.mock('@/features/compte/api/preferences', () => ({
   mesPreferences: () => Promise.resolve({ titleGender: 'm' }),
@@ -45,6 +46,7 @@ const profil = (id: string): ExplorateurProfile => ({
   ajoutes: [],
   visites: [],
   envies: [],
+  signe: null,
   estMoi: id === 'u1',
 })
 vi.mock('@/features/compte/api/explorateur', () => ({

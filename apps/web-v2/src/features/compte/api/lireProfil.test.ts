@@ -9,7 +9,7 @@ const COMPLET = {
   nom: 'Uriel',
   avatarUrl: null,
   niveau: 12,
-  titres: [{ id: 1, nom: 'Chevalier errant' }],
+  titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
   bio: 'Chevalier errant',
   instagram: 'uriel.runesdechene',
   inscritLe: '2024-09-30T10:00:00+00:00',
@@ -20,6 +20,7 @@ const COMPLET = {
   ajoutes: [{ id: 'p1', nom: 'Dolmen', imageUrl: null }],
   visites: [],
   envies: null,
+  signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
   estMoi: true,
 }
 
@@ -49,4 +50,16 @@ test('un rôle inconnu ne donne aucun badge', () => {
 test('les envies masquées restent null, montrées elles sont une liste', () => {
   expect(lireProfil(COMPLET)?.envies).toBeNull()
   expect(lireProfil({ ...COMPLET, envies: [] })?.envies).toEqual([])
+})
+
+test('une condition de titre illisible devient null, le titre reste', () => {
+  const p = lireProfil({
+    ...COMPLET,
+    titres: [{ id: 1, nom: 'Chevalier errant', condition: 'bizarre' }],
+  })
+  expect(p?.titres[0]?.condition).toBeNull()
+})
+
+test('pas de signe : null', () => {
+  expect(lireProfil({ ...COMPLET, signe: null })?.signe).toBeNull()
 })

@@ -1,6 +1,6 @@
 /**
  * QUOI     — « Modifier mon profil » (maquette 91:107) : photo, nom, présentation, Instagram,
- *            deux titres portés au plus, accord des titres.
+ *            trois titres portés au plus, accord des titres.
  * POURQUOI — le formulaire ne s'affiche qu'une fois ses valeurs de départ chargées : il part
  *            d'un état complet et n'a jamais à se resynchroniser.
  * ATTENTION — un échec d'enregistrement laisse le formulaire tel quel, avec un message sous le
@@ -17,7 +17,7 @@ import type { Titre } from '../api/lireProfil'
 import { useModifierProfil, type ValeursProfil } from '../hooks/useModifierProfil'
 import styles from './ModifierProfil.module.css'
 
-const TITRES_MAX = 2
+const TITRES_MAX = 3
 const ACCORDS = [
   { id: 'm', libelle: 'Masculin — Chevalier' },
   { id: 'f', libelle: 'Féminin — Chevalière' },
@@ -165,7 +165,7 @@ function Formulaire({
         </legend>
         <Text variant="legende">
           {titresDebloques.length > 0
-            ? 'Deux au plus, choisis parmi ceux que tes fragments t’ont offerts.'
+            ? 'Trois au plus, choisis parmi ceux que tu as gagnés en jouant.'
             : 'Tu n’as pas encore de titre à porter.'}
         </Text>
         <div className={styles.pastilles}>
@@ -173,6 +173,7 @@ function Formulaire({
             <PastilleChoix
               key={t.id}
               libelle={t.nom}
+              marque="✦"
               choisie={valeurs.titres.includes(t.id)}
               onClick={() => {
                 basculerTitre(t.id)
@@ -180,7 +181,7 @@ function Formulaire({
             />
           ))}
         </div>
-        {tropDeTitres && <p className={styles.avertissement}>Deux au plus</p>}
+        {tropDeTitres && <p className={styles.avertissement}>Trois au plus</p>}
       </fieldset>
 
       <fieldset className={styles.groupe}>

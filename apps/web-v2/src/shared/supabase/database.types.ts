@@ -4376,6 +4376,7 @@ export type Database = {
           shopify_customer_id: number | null
           show_departement: boolean
           show_envies: boolean
+          signe_fragment_id: number | null
           timezone: string
           title_gender: string
           tutorial_completed_at: string | null
@@ -4441,6 +4442,7 @@ export type Database = {
           shopify_customer_id?: number | null
           show_departement?: boolean
           show_envies?: boolean
+          signe_fragment_id?: number | null
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -4506,6 +4508,7 @@ export type Database = {
           shopify_customer_id?: number | null
           show_departement?: boolean
           show_envies?: boolean
+          signe_fragment_id?: number | null
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -4531,6 +4534,13 @@ export type Database = {
             columns: ["faction_id"]
             isOneToOne: false
             referencedRelation: "factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_signe_fragment_id_fkey"
+            columns: ["signe_fragment_id"]
+            isOneToOne: false
+            referencedRelation: "title_fragments"
             referencedColumns: ["id"]
           },
         ]
@@ -6680,6 +6690,7 @@ export type Database = {
         Args: { p_cle: string; p_valeur: boolean }
         Returns: undefined
       }
+      set_my_signe: { Args: { p_fragment_id: number }; Returns: undefined }
       set_place_tags: {
         Args: { p_place_id: string; p_tag_ids: string[] }
         Returns: Json

@@ -1,0 +1,57 @@
+/*
+ * QUOI     — les Fragments en vignettes sable ; celui du signe cerclé d'ocre.
+ */
+.fragments {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+}
+
+.rangee {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.fragment {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  width: 82px;
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  background: var(--color-sable);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  text-align: center;
+}
+
+.fragment img {
+  width: 100%;
+  aspect-ratio: 57 / 79;
+  object-fit: contain;
+}
+
+button.fragment {
+  border: none;
+}
+
+.choisi {
+  outline: 1.5px solid var(--color-ocre);
+}
+
+.motif {
+  width: 110px;
+  aspect-ratio: 57 / 79;
+  justify-self: center;
+  object-fit: contain;
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}

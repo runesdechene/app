@@ -14,3 +14,9 @@ test('avec action : un bouton qui dit s’il est choisi', () => {
   render(<PastilleChoix libelle="Hoplite" choisie onClick={() => undefined} />)
   expect(screen.getByRole('button', { name: /Hoplite/ })).toHaveAttribute('aria-pressed', 'true')
 })
+
+test('une marque (✦) précède le libellé, décorative pour les lecteurs d’écran', () => {
+  render(<PastilleChoix libelle="Pèlerin" marque="✦" />)
+  const marque = screen.getByText('✦')
+  expect(marque).toHaveAttribute('aria-hidden', 'true')
+})

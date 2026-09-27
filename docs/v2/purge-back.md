@@ -49,3 +49,4 @@
 | `users.show_departement`, `users.show_envies`, `get_my_preferences()`, `set_my_preference(text, boolean)` | Préférences de la V2, sans identifiant fourni | mig 353 |
 | `set_my_displayed_titles(integer[])` | deux titres portés au plus ; remplace à terme `set_displayed_titles_v3` (trois) | mig 353 |
 | `get_profil_explorateur(text)` | profil public en une lecture ; remplace à terme `get_player_profile` pour la V2 | mig 354 |
+| `users.signe_fragment_id`, `set_my_signe(integer)` ; `set_my_displayed_titles` passé à 3 | le signe d'un Porteur ; trois titres de jeu (révision du 27/09) | mig 356 |

@@ -2,8 +2,10 @@
 
 - `MenuAvatar` — la feuille ouverte par l'avatar.
 - `ProfilExplorateur` — le profil public ; ses états chargement / erreur / introuvable.
-  - `ProfilEntete` — badges, portrait, nom, niveau, titres, présentation, attache, bouton.
-  - `ProfilDecouvertes` — ses fragments ; Ajoutés / Visités / Envie d'y aller.
+  - `ProfilEntete` — badges, portrait, nom, niveau, signe (filigrane), titres (origine au
+    toucher), présentation, attache, bouton.
+  - `ProfilFragments` — ses Fragments ; sur son profil, choisir son signe.
+  - `ProfilDecouvertes` — Ajoutés / Visités / Envie d'y aller.
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.
 - `ModifierProfil` — le formulaire du profil ; ne s'affiche qu'une fois tout chargé.
 - `PreferencesPage` — les trois cartes de réglages.

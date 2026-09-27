@@ -5,7 +5,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: 34px;
+  height: 32px; /* même hauteur pour toutes, marque ou non */
   padding: 0 var(--space-3);
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-rond);
@@ -23,4 +23,8 @@
 
 .coche {
   color: var(--color-accent);
+}
+
+.marque {
+  color: var(--color-ocre);
 }

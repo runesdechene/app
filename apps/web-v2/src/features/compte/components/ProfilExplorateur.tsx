@@ -11,6 +11,7 @@ import { useExplorateur } from '../hooks/useExplorateur'
 import { ExplorateurIntrouvable } from './ExplorateurIntrouvable'
 import { ProfilDecouvertes } from './ProfilDecouvertes'
 import { ProfilEntete } from './ProfilEntete'
+import { ProfilFragments } from './ProfilFragments'
 import styles from './ProfilExplorateur.module.css'
 
 export function ProfilExplorateur({ id }: { id: string }) {
@@ -32,6 +33,7 @@ export function ProfilExplorateur({ id }: { id: string }) {
   return (
     <div className={styles.profil}>
       <ProfilEntete profil={profil} />
+      <ProfilFragments profil={profil} />
       <ProfilDecouvertes profil={profil} />
     </div>
   )

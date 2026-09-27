@@ -120,7 +120,7 @@ export function DaBriques() {
         <div className={styles.rangee}>
           <PastilleChoix libelle="Chevalier errant" choisie onClick={rien} />
           <PastilleChoix libelle="Arpenteur" onClick={rien} />
-          <PastilleChoix libelle="Hoplite" />
+          <PastilleChoix libelle="Pèlerin" marque="✦" />
           <Text variant="legende">(la dernière : en lecture, sur un profil)</Text>
         </div>
       </DaSection>
