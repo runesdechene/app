@@ -11,5 +11,7 @@ declare module 'react' {
     '--nuance'?: string
     '--mesure'?: string
     '--icone'?: string
+    '--nombre'?: string
+    '--rang'?: string
   }
 }

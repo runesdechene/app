@@ -54,30 +54,6 @@
   gap: var(--space-2);
 }
 
-.segments {
-  display: flex;
-  gap: var(--space-1);
-  padding: 5px;
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--color-vignette) 57%, transparent);
-}
-
-.segment {
-  flex: 1;
-  padding: var(--space-2) 0;
-  border: none;
-  border-radius: var(--radius-petit);
-  background: none;
-  color: var(--color-texte-doux);
-  font-family: var(--font-titre);
-  font-size: var(--rubrique-size);
-}
-
-.segment[aria-checked='true'] {
-  background: var(--color-surface);
-  color: var(--color-encre);
-}
-
 .avertissement {
   margin: 0;
   color: var(--color-accent);

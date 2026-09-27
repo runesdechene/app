@@ -13,3 +13,4 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `Feuille` — le panneau qui monte du bas (menu avatar) ; voile et Échap ferment.
 - `Champ` — saisie avec libellé, aide et limite tenue à la frappe.
 - `PastilleChoix` — un titre porté : en lecture, ou à choisir.
+- `Segments` — un choix exclusif en segments ; la zone éclairée glisse sous le choix.

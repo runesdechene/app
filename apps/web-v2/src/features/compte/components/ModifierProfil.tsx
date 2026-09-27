@@ -14,6 +14,7 @@ import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
+import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import type { Titre } from '../api/lireProfil'
 import { useModifierProfil, type ValeursProfil } from '../hooks/useModifierProfil'
@@ -193,23 +194,14 @@ function Formulaire({
             Tes titres s’accordent au
           </Text>
         </legend>
-        {/* Deux segments, l'un ou l'autre (maquette 91:107). */}
-        <div className={styles.segments} role="radiogroup" aria-label="Accord des titres">
-          {ACCORDS.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              role="radio"
-              aria-checked={valeurs.accord === a.id}
-              className={styles.segment}
-              onClick={() => {
-                changer('accord', a.id)
-              }}
-            >
-              {a.libelle}
-            </button>
-          ))}
-        </div>
+        <Segments
+          libelle="Accord des titres"
+          options={ACCORDS}
+          valeur={valeurs.accord}
+          onChange={(accord) => {
+            changer('accord', accord)
+          }}
+        />
       </fieldset>
 
       <div className={styles.envoi}>

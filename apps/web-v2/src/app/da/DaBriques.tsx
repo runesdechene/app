@@ -14,9 +14,15 @@ import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { Pastille } from '@/shared/ui/Pastille'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
+import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { DaSection } from './DaSection'
 import styles from './DaPage.module.css'
+
+const ACCORDS = [
+  { id: 'm', libelle: 'Masculin — Chevalier' },
+  { id: 'f', libelle: 'Féminin — Chevalière' },
+] as const
 
 const PRESENTATION_PLEINE =
   'Chevalier errant à temps partiel, entrepreneur, illustrateur et technomancien. Fondateur de la marque. '.repeat(
@@ -29,6 +35,7 @@ function rien() {
 
 export function DaBriques() {
   const [allume, setAllume] = useState(true)
+  const [accord, setAccord] = useState<'m' | 'f'>('m')
   const [nom, setNom] = useState('Uriel')
   const [presentation, setPresentation] = useState(PRESENTATION_PLEINE.slice(0, 300))
 
@@ -118,6 +125,10 @@ export function DaBriques() {
           <PastilleChoix libelle="Pèlerin" marque="✦" />
           <Text variant="legende">(la dernière : en lecture, sur un profil)</Text>
         </div>
+      </DaSection>
+
+      <DaSection name="Segments">
+        <Segments libelle="Accord" options={ACCORDS} valeur={accord} onChange={setAccord} />
       </DaSection>
 
       <DaSection name="Feuille">

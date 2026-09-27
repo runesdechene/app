@@ -45,6 +45,7 @@ export const DA_SHOWCASED = [
   'Interrupteur',
   'Pastille',
   'PastilleChoix',
+  'Segments',
   'Text',
 ] as const
 
