@@ -69,6 +69,7 @@ export function UserDetail() {
 
   const [user, setUser] = useState<UserInfo | null>(null)
   const [savingV2, setSavingV2] = useState(false)
+  const [v2Error, setV2Error] = useState<string | null>(null)
   const [faction, setFaction] = useState<FactionInfo | null>(null)
   const [fragments, setFragments] = useState<FragmentInfo[]>([])
   const [purchaseLogs, setPurchaseLogs] = useState<PurchaseLog[]>([])
@@ -189,7 +190,9 @@ export function UserDetail() {
     setSavingV2(true)
     const { error: e } = await supabase.rpc('set_v2_access', { p_user_id: user.id, p_enabled: enabled })
     setSavingV2(false)
-    if (e) { setError(`Accès V2 : ${e.message}`); return }
+    // Erreur locale à la case : la fiche du joueur reste affichée.
+    if (e) { setV2Error(e.message); return }
+    setV2Error(null)
     setUser({ ...user, v2_access: enabled })
   }
 
@@ -251,6 +254,7 @@ export function UserDetail() {
               <span>{user.v2_access ? 'Autorisé' : 'Non autorisé'}</span>
             </label>
           )}
+          {v2Error && <div className="ud-v2-error">{v2Error}</div>}
         </div>
         <div className="ud-card">
           <div className="ud-card-label">Heritage</div>

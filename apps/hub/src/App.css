@@ -4024,6 +4024,12 @@ table select {
   cursor: wait;
 }
 
+.ud-v2-error {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--color-danger);
+}
+
 .ud-section {
   margin-bottom: 28px;
 }
