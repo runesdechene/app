@@ -29,6 +29,11 @@
   --color-kaki: #46493c;
   --color-vert: #9ab788;
 
+  /* Désactivé — « Marquer ma visite (274 km trop loin) », maquette fiche lieu */
+  --color-desactive-fond: color-mix(in srgb, #ffead5 49%, transparent);
+  --color-desactive-bord: #e2c9b9;
+  --color-desactive-texte: #dbbfad;
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;

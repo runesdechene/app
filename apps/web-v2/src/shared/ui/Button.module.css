@@ -36,12 +36,17 @@
   color: var(--color-texte-doux);
 }
 
+/* Désactivé : la teinte de « Marquer ma visite (274 km trop loin) » dans la maquette. */
 .principal:disabled,
-.secondaire:disabled,
+.secondaire:disabled {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+  cursor: not-allowed;
+}
+
+/* Le discret n'a ni fond ni bord : seule sa couleur change. */
 .discret:disabled {
-  border-color: var(--color-sable);
-  background: var(--color-surface);
-  color: var(--color-texte-pale);
-  box-shadow: none;
+  color: var(--color-desactive-texte);
   cursor: not-allowed;
 }

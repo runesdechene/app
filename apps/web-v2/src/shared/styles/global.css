@@ -18,6 +18,12 @@ body,
   height: 100%;
 }
 
+/* Le conteneur « app » : la coquille bascule mobile/desktop selon SA largeur (container
+   queries), ce qui permet aussi de la montrer dans un faux téléphone sur /v2/da. */
+#root {
+  container: app / inline-size;
+}
+
 body {
   background: var(--color-fond);
   color: var(--color-texte);

@@ -20,6 +20,9 @@ export const COLOR_TOKENS = [
   '--color-ocre',
   '--color-kaki',
   '--color-vert',
+  '--color-desactive-fond',
+  '--color-desactive-bord',
+  '--color-desactive-texte',
 ] as const
 
 export const DA_SHOWCASED = ['Button', 'EmptyState', 'IconButton', 'Pastille', 'Text'] as const

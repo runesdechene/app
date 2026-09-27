@@ -1,26 +1,28 @@
 /*
- * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre et lisière de forêt.
- *            Desktop : dans le bandeau, sans fond.
- * POURQUOI — relevé Figma (NAVBAR 46:422) : 85 px de haut, icônes à 70 % d'opacité ;
- *            l'onglet actif passe à pleine opacité.
+ * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
+ *            au-dessus. Desktop : dans le bandeau, sans fond ni lisière.
+ * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
+ *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
+ *            (pas cinq colonnes égales, qui rognaient « Campement ») ; icônes à 70 %
+ *            d'opacité, l'onglet actif à pleine opacité.
  */
 .bar {
   grid-area: nav;
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  min-height: var(--tabbar-height);
-  padding: var(--space-4) var(--space-2) env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  padding: var(--space-2) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom));
   background: var(--color-barre);
 }
 
-/* La lisière de forêt déborde au-dessus de la barre, comme dans la maquette. */
+/* La lisière de forêt, posée juste au-dessus de la barre, dans ses proportions d'origine. */
 .bar::before {
   content: '';
   position: absolute;
-  inset: calc(var(--space-4) * -1) 0 auto;
-  height: var(--space-8);
-  background: url('../../assets/ui/barre-lisiere.png') top center / 100% 100% no-repeat;
+  inset: auto 0 100%;
+  aspect-ratio: 1920 / 74;
+  background: url('../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
   pointer-events: none;
 }
 
@@ -30,9 +32,10 @@
   justify-items: center;
   align-content: end;
   gap: var(--space-1);
-  padding: var(--space-1) 0;
+  padding: 0 var(--space-1);
   border: none;
   background: none;
+  white-space: nowrap;
   opacity: 0.7;
 }
 
@@ -46,14 +49,13 @@
   object-fit: contain;
 }
 
-@media (width >= 1024px) {
+@container app (width >= 1024px) {
   .bar {
-    min-height: 0;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-6);
     padding: 0;
     background: none;
-    grid-template-columns: repeat(5, auto);
-    justify-content: center;
-    gap: var(--space-6);
   }
 
   .bar::before {

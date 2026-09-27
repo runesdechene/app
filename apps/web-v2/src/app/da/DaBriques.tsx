@@ -1,6 +1,6 @@
 /**
- * QUOI     — chaque brique de shared/ui/, dans tous ses états, sur fond clair et sur fond sombre.
- * POURQUOI — une brique se valide dans toutes ses situations, pas seulement la plus flatteuse.
+ * QUOI     — chaque brique de shared/ui/, dans tous ses états, sur le parchemin.
+ * POURQUOI — une brique se valide dans tous ses états, pas seulement le plus flatteur.
  */
 import partager from '@/assets/ui/partager.svg'
 import { Button } from '@/shared/ui/Button'
@@ -11,11 +11,6 @@ import { Text } from '@/shared/ui/Text'
 import { DaSection } from './DaSection'
 import styles from './DaPage.module.css'
 
-const FONDS = [
-  { nom: 'sur fond clair', className: styles.fondClair },
-  { nom: 'sur fond sombre', className: styles.fondSombre },
-]
-
 export function DaBriques() {
   return (
     <>
@@ -24,25 +19,20 @@ export function DaBriques() {
       </DaSection>
 
       <DaSection name="Button">
-        {FONDS.map((fond) => (
-          <div key={fond.nom} className={fond.className}>
-            <Text variant="legende">{fond.nom}</Text>
-            <div className={styles.rangee}>
-              <Button>Marquer ma visite</Button>
-              <Button kind="secondaire">Prêter serment</Button>
-              <Button kind="discret">Lire ou écouter ce fragment</Button>
-            </div>
-            <div className={styles.rangee}>
-              <Button disabled>Trop loin (274 km)</Button>
-              <Button kind="secondaire" disabled>
-                Désactivé
-              </Button>
-              <Button kind="discret" disabled>
-                Désactivé
-              </Button>
-            </div>
-          </div>
-        ))}
+        <div className={styles.rangee}>
+          <Button>Marquer ma visite</Button>
+          <Button kind="secondaire">Prêter serment</Button>
+          <Button kind="discret">Lire ou écouter ce fragment</Button>
+        </div>
+        <div className={styles.rangee}>
+          <Button disabled>Trop loin (274 km)</Button>
+          <Button kind="secondaire" disabled>
+            Désactivé
+          </Button>
+          <Button kind="discret" disabled>
+            Désactivé
+          </Button>
+        </div>
       </DaSection>
 
       <DaSection name="IconButton">

@@ -1,0 +1,46 @@
+/*
+ * QUOI     — le cadre du faux téléphone. Mobile d'abord : sans cadre sur petit écran,
+ *            téléphone 390 × 844 dès qu'il y a la place de le montrer.
+ */
+.phone {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.ecran {
+  container: app / inline-size;
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+  padding: var(--space-4);
+}
+
+.legende {
+  order: -1;
+}
+
+@media (width >= 480px) {
+  .phone {
+    flex: 0 0 auto;
+    width: 390px;
+    scroll-snap-align: start;
+  }
+
+  .legende {
+    order: 0;
+    text-align: center;
+  }
+
+  .ecran {
+    height: 844px;
+    overflow-y: auto;
+    border: 10px solid var(--color-encre);
+    border-radius: 48px;
+    padding: var(--space-8) var(--space-4) var(--space-6);
+    background: var(--color-fond) url('../../assets/ui/fond-parchemin.png') top center / 100% auto
+      no-repeat;
+    box-shadow: var(--ombre-bouton);
+    scrollbar-width: none;
+  }
+}
