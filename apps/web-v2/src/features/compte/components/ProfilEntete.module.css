@@ -15,11 +15,11 @@
 /* La couverture (maquette 123:107) : le motif grand et présent, qui se fond vers le bas. */
 .filigrane {
   position: absolute;
-  top: 3px; /* le portrait se pose sur le motif, à la place de sa tête (Uriel, 27/09) */
+  top: 8px; /* le portrait se pose sur le motif, à la place de sa tête (Uriel, 27/09) */
   left: 50%;
   z-index: -1;
-  width: 78%;
-  max-width: 300px;
+  width: 83%;
+  max-width: 320px;
   transform: translateX(-50%);
   opacity: 0.17;
 
