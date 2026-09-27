@@ -1655,6 +1655,45 @@ export type Database = {
           },
         ]
       }
+      geo_departements: {
+        Row: {
+          code: string
+          de_nom: string
+          geom: unknown
+          nom: string
+        }
+        Insert: {
+          code: string
+          de_nom: string
+          geom: unknown
+          nom: string
+        }
+        Update: {
+          code?: string
+          de_nom?: string
+          geom?: unknown
+          nom?: string
+        }
+        Relationships: []
+      }
+      geo_pays: {
+        Row: {
+          geom: unknown
+          iso2: string
+          nom_fr: string
+        }
+        Insert: {
+          geom: unknown
+          iso2: string
+          nom_fr: string
+        }
+        Update: {
+          geom?: unknown
+          iso2?: string
+          nom_fr?: string
+        }
+        Relationships: []
+      }
       home_banners: {
         Row: {
           active: boolean
@@ -3171,6 +3210,7 @@ export type Database = {
           best_season: string | null
           bivouac: string | null
           created_at: string
+          departement: string | null
           end_at: string | null
           era_id: string | null
           faction_id: string | null
@@ -3180,6 +3220,7 @@ export type Database = {
           latitude: number
           longitude: number
           masked: boolean
+          pays: string | null
           place_type_id: string
           private: boolean
           sensible: boolean | null
@@ -3202,6 +3243,7 @@ export type Database = {
           best_season?: string | null
           bivouac?: string | null
           created_at: string
+          departement?: string | null
           end_at?: string | null
           era_id?: string | null
           faction_id?: string | null
@@ -3211,6 +3253,7 @@ export type Database = {
           latitude: number
           longitude: number
           masked: boolean
+          pays?: string | null
           place_type_id: string
           private: boolean
           sensible?: boolean | null
@@ -3233,6 +3276,7 @@ export type Database = {
           best_season?: string | null
           bivouac?: string | null
           created_at?: string
+          departement?: string | null
           end_at?: string | null
           era_id?: string | null
           faction_id?: string | null
@@ -3242,6 +3286,7 @@ export type Database = {
           latitude?: number
           longitude?: number
           masked?: boolean
+          pays?: string | null
           place_type_id?: string
           private?: boolean
           sensible?: boolean | null
@@ -4329,6 +4374,8 @@ export type Database = {
           rank: string
           role: string
           shopify_customer_id: number | null
+          show_departement: boolean
+          show_envies: boolean
           timezone: string
           title_gender: string
           tutorial_completed_at: string | null
@@ -4392,6 +4439,8 @@ export type Database = {
           rank?: string
           role: string
           shopify_customer_id?: number | null
+          show_departement?: boolean
+          show_envies?: boolean
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -4455,6 +4504,8 @@ export type Database = {
           rank?: string
           role?: string
           shopify_customer_id?: number | null
+          show_departement?: boolean
+          show_envies?: boolean
           timezone?: string
           title_gender?: string
           tutorial_completed_at?: string | null
@@ -5424,6 +5475,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      _rattacher_lieu: {
+        Args: { p_lat: number; p_lng: number }
+        Returns: {
+          departement: string
+          pays: string
+        }[]
+      }
       _require_min_discoveries: {
         Args: { p_min: number; p_user_id: string }
         Returns: Json
@@ -5983,6 +6041,7 @@ export type Database = {
         Args: { p_slug: string }
         Returns: string
       }
+      get_my_preferences: { Args: never; Returns: Json }
       get_my_recent_activity: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: Json
@@ -6079,6 +6138,7 @@ export type Database = {
       get_place_guardian: { Args: { p_place_id: string }; Returns: string }
       get_place_veille: { Args: { p_place_id: string }; Returns: Json }
       get_player_profile: { Args: { p_user_id: string }; Returns: Json }
+      get_profil_explorateur: { Args: { p_user_id: string }; Returns: Json }
       get_random_ad: { Args: never; Returns: Json }
       get_random_home_banner: { Args: never; Returns: Json }
       get_recent_activity: { Args: { p_limit?: number }; Returns: Json }
@@ -6611,6 +6671,14 @@ export type Database = {
       set_faction_grades: {
         Args: { p_faction_id: string; p_govern_grades: number; p_grades: Json }
         Returns: Json
+      }
+      set_my_displayed_titles: {
+        Args: { p_title_ids: number[] }
+        Returns: undefined
+      }
+      set_my_preference: {
+        Args: { p_cle: string; p_valeur: boolean }
+        Returns: undefined
       }
       set_place_tags: {
         Args: { p_place_id: string; p_tag_ids: string[] }
