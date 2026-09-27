@@ -34,9 +34,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
           <img className={styles.filigrane} src={profil.signe.imageUrl} alt="" />
         )}
 
-        <div className={styles.portrait}>
-          <Avatar url={profil.avatarUrl} nom={profil.nom} taille="grand" />
-        </div>
+        <Avatar url={profil.avatarUrl} nom={profil.nom} taille="grand" />
         <div className={styles.identite}>
           <p className={styles.nom}>{profil.nom}</p>
           <p className={styles.niveau}>Niveau {profil.niveau}</p>

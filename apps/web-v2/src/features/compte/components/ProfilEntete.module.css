@@ -15,7 +15,7 @@
 /* La couverture (maquette 123:107) : le motif grand et présent, qui se fond vers le bas. */
 .filigrane {
   position: absolute;
-  top: calc(var(--space-6) * -1);
+  top: -9px; /* le portrait se pose sur le motif, à la place de sa tête (Uriel, 27/09) */
   left: 50%;
   z-index: -1;
   width: 78%;
@@ -26,12 +26,6 @@
   /* Le motif se fond vers le bas ; pour un masque, seule l'opacité de la couleur compte. */
   mask: linear-gradient(to bottom, var(--color-encre) 55%, transparent);
   pointer-events: none;
-}
-
-/* Seul le portrait remonte, entre le titre et les badges ; le reste garde sa place (Uriel, 27/09). */
-.portrait {
-  display: flex;
-  translate: 0 -15px;
 }
 
 .identite {
