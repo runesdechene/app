@@ -42,6 +42,10 @@ Graphify se reconstruit seul au commit (hook `post-commit`, + `scripts/graphify-
 
 ## Règles
 
+- **Le code est un chef-d'œuvre de simplicité** (Uriel, 27/09/2026) : simple, compréhensible,
+  propre, épuré. On ne réinvente pas la roue : l'outil standard avant le code maison. Pas de
+  tournure d'esprit bizarre, pas d'astuce. Si c'est compliqué à lire, c'est à réécrire.
+  Détail : `.claude/rules/v2.md`.
 - **pnpm** uniquement ; `npx` / `pnpm dlx` seulement pour `supabase`.
 - **TS strict** : pas de `any`, `@ts-ignore`, `as unknown as`.
 - **Conventional Commits.**
