@@ -20,7 +20,7 @@
 
 - [ ] **Least-privilege storage par bucket** — aujourd'hui tout user *connecté* peut écrire n'importe quel bucket. Réserver les buckets **admin** (`app-ads`, `app-fragments`, `home-banners`, `app-assets`, `announcement-covers`, `tag-icons`) à `_is_admin()`. ⚠️ `faction-emblems`/`faction-patterns` sont **user-writable** (Compagnies créées V0.10). Mini-projet → à faire avec un filet (staging/branche).
 - [ ] **`function_search_path_mutable` ×162** — `ALTER FUNCTION … SET search_path` (advisor 0011). Mécanique mais risqué sur prod sans filet → tester en transaction `ROLLBACK` ou branche jetable.
-- [ ] **RPC mutation appelables par anon (~245)** — protégées par `auth.uid()` en interne ; `REVOKE EXECUTE` anon possible en defense-in-depth.
+- [ ] **RPC mutation appelables par anon (~245)** — ⚠️ l'hypothèse « protégées par `auth.uid()` en interne » était **fausse pour 41 d'entre elles** (audit 27/09/2026, corrigé migs 346-348 : garde d'identité). Reste : `REVOKE EXECUTE` anon sur celles qui n'ont aucune raison d'être appelées déconnecté, en defense-in-depth.
 - [ ] **2 extensions dans `public`** (`unaccent`, `fuzzystrmatch`) → déplacer vers schéma dédié (prudence : refs non qualifiées).
 - [ ] **Leaked-password protection** — toggle dashboard Auth (impact faible : magic-link).
 - [ ] **`place_tags` INSERT (authenticated, true)** — utilisé en direct par explore-web (`AddPlaceFlow`) → basculer vers RPC pour scoper.
