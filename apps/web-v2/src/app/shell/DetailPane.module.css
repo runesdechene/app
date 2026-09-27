@@ -53,12 +53,12 @@
   outline: none;
 }
 
+/* Le premier badge se centre sur la ligne du titre (44 px) ; les suivants passent dessous. */
 .actions {
   display: grid;
-  margin-top: var(--space-3);
+  grid-template-rows: var(--cible-tactile);
+  place-items: center end;
   margin-left: var(--space-2);
-  justify-items: end;
-  gap: var(--space-1);
 }
 
 /* Le contenu ne défile pas seul : tout le panneau défile, en-tête compris (Uriel, 27/09). */

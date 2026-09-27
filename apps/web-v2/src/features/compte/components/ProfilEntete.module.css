@@ -52,6 +52,15 @@
   font-size: var(--rubrique-size);
 }
 
+/* Une aura de parchemin détache ces petites lignes du Fragment en filigrane (Uriel, 27/09). */
+.niveau,
+.signe {
+  text-shadow:
+    0 0 2px var(--color-fond),
+    0 0 4px var(--color-fond),
+    0 0 8px var(--color-fond);
+}
+
 .signe {
   margin: 0;
   color: var(--color-ocre);
