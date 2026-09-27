@@ -1,0 +1,3 @@
+# QUOI     — fins de ligne LF pour toute la V2.
+# POURQUOI — sous Windows, git convertit en CRLF à l’extraction et Prettier (LF) échouerait.
+* text=auto eol=lf
