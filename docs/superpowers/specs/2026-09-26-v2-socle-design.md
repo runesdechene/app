@@ -16,7 +16,7 @@ remplace. Chaque fichier doit pouvoir être ouvert et compris par un codeur moye
 - `app.runesdechene.com/v2/` s'ouvre pour Uriel, et renvoie tout autre visiteur vers la V1 ;
 - la coquille mobile (barre basse) et desktop (bandeau haut) navigue entre cinq écrans vides
   qui gardent leur état, et le Compte s'ouvre en détail puis se ferme par le retour arrière ;
-- les jetons de la DA sont posés ;
+- la DA est fixée dans `tokens.css`, montrée sur `/v2/da`, et verrouillée par Stylelint ;
 - le client Supabase et les types générés sont branchés ;
 - lint strict, tests, typecheck et build passent en CI ;
 - les conventions de documentation, le registre des décisions et le registre de purge existent.
@@ -204,6 +204,32 @@ parchemin `#f4eee1`, surface `#f6eddd`, titres `#403434`, texte `#594848`, accen
 
 Ils vivent dans `shared/styles/tokens.css`, et nulle part ailleurs : aucune couleur en dur
 dans un composant.
+
+## 8ter. Une DA fixée — pas d'élément sauvage
+
+*Demandé par Uriel le 27/09/2026 : « une VRAIE DA fixée […] pas d'éléments sauvages ».*
+
+**Une échelle fermée.** `tokens.css` porte toutes les valeurs : couleurs, polices, tailles,
+graisses, interlignages, espacements, rayons, ombres. S'y ajoutent des **styles de texte
+nommés** — Titre d'écran, Titre de section, Sous-titre, Corps, Légende, Libellé, Bouton. Un écran
+choisit un style, jamais une taille.
+
+**Des briques uniques** dans `shared/ui/` : `Text`, `Button` (principal, secondaire, discret),
+`IconButton`, `Pastille`, `EmptyState` pour le socle. Toute nouvelle brique naît là.
+
+**Vérifié par l'outil, pas par la discipline** :
+- **Stylelint** refuse, dans tout CSS hors `tokens.css`, une couleur écrite en dur (hex, `rgb`,
+  nom), une `font-family`, une `font-size`, une `font-weight` ou un `line-height` qui ne soit pas
+  une variable ;
+- **ESLint** refuse un `style={…}` inline, sauf pour passer une variable CSS (`'--avatar'`).
+
+**La page de référence `/v2/da`** montre chaque couleur, chaque style de texte, chaque brique
+dans tous ses états, en mobile et en desktop. Hors des onglets, atteinte par son adresse,
+réservée comme toute la V2. **Un test échoue si une brique de `shared/ui/` n'y figure pas.**
+
+**D'où viennent les valeurs** : le Figma n'a aucune variable. Les tailles réellement utilisées
+dans les maquettes sont relevées, une échelle est proposée, **Uriel la valide sur `/v2/da`**.
+Validée, elle est gravée : une valeur nouvelle passe par `tokens.css` et par la page.
 
 ## 8bis. La coquille visuelle et ses ressources
 
