@@ -4,6 +4,8 @@ import { useMapStore } from '../../../stores/mapStore'
 import { useMobileNavStore } from '../../../stores/mobileNavStore'
 import { useChangelogStore } from '../../../stores/changelogStore'
 import { supabase } from '../../../lib/supabase'
+import { useCanTryV2 } from '../../../hooks/useV2Access'
+import { goToV2 } from '../../../lib/v2Access'
 import { EmailChangeModal } from '../../auth/EmailChangeModal'
 import { PushSettings } from '../../notifications/PushSettings'
 import { VersionBadge } from '../badges/VersionBadge'
@@ -30,6 +32,7 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
   const userFactionTitle = usePlayerStore(s => s.userFactionTitle)
   const brouillerPistes = usePlayerStore(s => s.brouillerPistes)
   const [savingBrouiller, setSavingBrouiller] = useState(false)
+  const canTryV2 = useCanTryV2()
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return
@@ -163,6 +166,12 @@ export function MobileHeader({ email, onSignOut, onFactionModal }: MobileHeaderP
           </div>
 
           <PushSettings />
+
+          {canTryV2 && (
+            <button className="profile-dropdown-action" onClick={goToV2}>
+              ✨ Essayer la V2
+            </button>
+          )}
 
           <div className="profile-dropdown-divider" />
 

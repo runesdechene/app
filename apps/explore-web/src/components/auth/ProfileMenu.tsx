@@ -5,6 +5,8 @@ import { useGeolocPromptStore } from '../../stores/geolocPromptStore'
 import { EmailChangeModal } from './EmailChangeModal'
 import { PushSettings } from '../notifications/PushSettings'
 import { supabase } from '../../lib/supabase'
+import { useCanTryV2 } from '../../hooks/useV2Access'
+import { goToV2 } from '../../lib/v2Access'
 
 interface ProfileMenuProps {
   email: string
@@ -26,6 +28,7 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
   const [savingBrouiller, setSavingBrouiller] = useState(false)
   const titleGender = usePlayerStore(s => s.titleGender)
   const [savingTitleGender, setSavingTitleGender] = useState(false)
+  const canTryV2 = useCanTryV2()
 
   async function setBrouiller(value: boolean) {
     if (savingBrouiller || value === brouillerPistes) return
@@ -183,6 +186,12 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
           >
             🎓 Rejouer le tutoriel
           </button>
+
+          {canTryV2 && (
+            <button className="profile-dropdown-action" onClick={goToV2}>
+              ✨ Essayer la V2
+            </button>
+          )}
 
           <div className="profile-dropdown-divider" />
 

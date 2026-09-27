@@ -9,6 +9,7 @@ import { useIsDesktop } from './hooks/useMediaQuery'
 import { isDemoMode } from './lib/demo/isDemoMode'
 import { DemoKioskShell } from './components/demo/DemoKioskShell'
 import { useDemoBootstrap } from './hooks/useDemoBootstrap'
+import { useV2QueryRedirect } from './hooks/useV2Access'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -34,6 +35,8 @@ function MobileOnly({ children }: { children: React.ReactNode }) {
 export default function App() {
   const demo = isDemoMode()
   useDemoBootstrap()
+  // ?v=2 → /v2/ pour les comptes autorisés (V2 en construction, mig 344).
+  useV2QueryRedirect()
 
   // Lien d'invitation Compagnie : capturer ?company=<id> dès le chargement (même
   // déconnecté sur la LandingPage) → consommé après auth par useCompanyInvite.

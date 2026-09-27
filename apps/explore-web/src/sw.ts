@@ -16,8 +16,9 @@ declare const self: ServiceWorkerGlobalScope
 cleanupOutdatedCaches()
 precacheAndRoute(self.__WB_MANIFEST)
 
-// SPA navigation fallback (sauf SEO pages et sitemap)
-const denylist: RegExp[] = [/^\/lieu\//, /^\/sitemap/, /^\/mouvement(\/|$)/]
+// SPA navigation fallback (sauf SEO pages, sitemap, et la V2 — servie par son propre site
+// sous /v2/ ; sans cette exclusion, ce service worker servirait la V1 à la place)
+const denylist: RegExp[] = [/^\/lieu\//, /^\/sitemap/, /^\/mouvement(\/|$)/, /^\/v2(\/|$)/]
 
 // matchPrecache résout dynamiquement le nom de cache workbox
 // (workbox-precache-v2-<scope>). caches.open('workbox-precache-v2')
