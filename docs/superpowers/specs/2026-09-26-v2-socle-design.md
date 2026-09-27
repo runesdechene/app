@@ -14,7 +14,8 @@ remplace. Chaque fichier doit pouvoir être ouvert et compris par un codeur moye
 **Le socle est fini quand** :
 
 - `app.runesdechene.com/v2/` s'ouvre pour Uriel, et renvoie tout autre visiteur vers la V1 ;
-- la barre à cinq onglets navigue entre cinq écrans vides qui gardent leur état ;
+- la coquille mobile (barre basse) et desktop (bandeau haut) navigue entre cinq écrans vides
+  qui gardent leur état, et le Compte s'ouvre en détail puis se ferme par le retour arrière ;
 - les jetons de la DA sont posés ;
 - le client Supabase et les types générés sont branchés ;
 - lint strict, tests, typecheck et build passent en CI ;
@@ -46,7 +47,7 @@ reconnecter. Le jour de la bascule, on inverse les deux et on supprime `apps/exp
 | Données serveur | TanStack Query | Cache, relances, chargement et erreurs gérés en un seul endroit. |
 | État d'interface | Zustand, seulement si React ne suffit pas | Jamais pour stocker des données serveur. |
 | Types de la base | Générés par `supabase gen types` | Un nom de colonne ou une signature de RPC est vérifié par le compilateur. |
-| Navigation | React Router 7 | Déjà connu du dépôt. |
+| Navigation | React Router 8 | Déjà connu du dépôt (la V1 est en 7). |
 | Carte | MapLibre | Le bon outil, gardé. |
 | Style | CSS Modules + jetons CSS | Un `.module.css` à côté de chaque composant, lisible sans rien apprendre. |
 | PWA | vite-plugin-pwa, service worker minimal | |
@@ -57,8 +58,9 @@ reconnecter. Le jour de la bascule, on inverse les deux et on supprime `apps/exp
 Options TypeScript en plus de `strict` : `noUncheckedIndexedAccess`,
 `exactOptionalPropertyTypes`, `noImplicitOverride`, `noFallthroughCasesInSwitch`.
 
-Les versions exactes sont relevées dans la documentation officielle (Context7) au moment
-d'écrire le plan, jamais de mémoire.
+Versions relevées sur le registre npm le 27/09/2026 : React 19.3, Vite 8, React Router 8,
+TanStack Query 5, Vitest 5, ESLint 10. **TypeScript reste en 6.0** : typescript-eslint
+n'accepte pas encore la 7 (`typescript >=4.8.4 <6.1.0`). On monte quand il suit.
 
 *Écarté* : **Tailwind** (utilisé par la V1). Le style dans le balisage se lit mal pour un
 codeur moyen ; un fichier CSS séparé se lit comme du CSS.
@@ -92,6 +94,49 @@ apps/web-v2/
 3. **Rien n'importe la V1.** Aucun chemin vers `apps/explore-web`.
 
 Et une règle de taille : **au-delà de 400 lignes, on découpe.**
+
+## 4bis. Les écrans, la navigation et le desktop
+
+**Mobile d'abord, et exemplaire.** Le téléphone est la cible prioritaire ; le desktop est une
+**édition** du même produit, proche de l'expérience V1 (carte large, panneau latéral), jamais
+une seconde app.
+
+**Tout état navigable est une URL.** Un onglet, une fiche de lieu, le Compte, une feuille qui
+compte : chacun a son adresse. Conséquences, toutes voulues :
+- **le retour arrière est celui du système** — bouton Android, glissement iOS, flèche du
+  navigateur. Aucune pile maison : l'historique du navigateur fait foi ;
+- une feuille ou une fiche ouverte **se ferme par le retour**, jamais en quittant l'app ;
+- tout écran se **partage par un lien** et survit à un rechargement ;
+- ce qui ne mérite pas d'URL (un menu, une confirmation) ne touche pas l'historique.
+
+**Les onglets, selon les conventions mobiles** :
+- changer d'onglet **ajoute une entrée** d'historique : le retour ramène à l'onglet précédent ;
+- chaque onglet **se souvient de sa dernière adresse** : y revenir rouvre là où on l'a laissé ;
+- toucher l'onglet **déjà actif** remonte à sa racine, puis en haut de la page ;
+- les cinq écrans racines **restent montés** : leur état et leur position de défilement
+  survivent au changement d'onglet ;
+- la **position de défilement** est restaurée au retour arrière.
+
+**Une même route, deux mises en page.** Chaque écran déclare un contenu **principal** et,
+s'il en a, un **détail** (une fiche, le Compte). La coquille décide de l'endroit où le détail
+s'affiche :
+
+| | Mobile (< 1024 px) | Desktop (≥ 1024 px) |
+|---|---|---|
+| Navigation | barre basse, 5 onglets | les 5 onglets dans le bandeau haut |
+| Détail | plein écran, par-dessus, retour pour fermer | panneau latéral, à côté du principal |
+| Carte | plein écran | carte large + panneau latéral, comme la V1 |
+
+L'URL est **identique** sur les deux : un lien envoyé depuis un téléphone s'ouvre au bon
+endroit sur un ordinateur. La mise en page change à la largeur, jamais au type d'appareil.
+
+**Contraintes mobiles tenues dès le socle** : zones sûres (`env(safe-area-inset-*)`, encoche
+et barre système), hauteur d'écran dynamique (`100dvh`, pas `100vh`), cibles tactiles de 44 px
+minimum, aucune dépendance au survol.
+
+**La preuve dans le socle** : le Compte (ouvert par l'avatar) est le premier détail. Il n'a pas
+encore de contenu, mais il démontre le patron complet : plein écran sur mobile, panneau sur
+desktop, fermé par le retour, rouvert par son lien.
 
 ## 5. La documentation
 
