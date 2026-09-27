@@ -20,6 +20,8 @@
 }
 
 .header {
+  position: relative;
+  z-index: 1; /* le portrait du profil remonte sous l'en-tête : la flèche reste cliquable */
   display: flex;
   align-items: flex-start;
   gap: 0; /* la flèche (cible de 44 px) touche le titre, comme sur la maquette */

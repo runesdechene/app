@@ -28,6 +28,12 @@
   pointer-events: none;
 }
 
+/* Seul le portrait remonte, entre le titre et les badges ; le reste garde sa place (Uriel, 27/09). */
+.portrait {
+  display: flex;
+  translate: 0 -50px;
+}
+
 .identite {
   display: grid;
   gap: var(--space-1);
