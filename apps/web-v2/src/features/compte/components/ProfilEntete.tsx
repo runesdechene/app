@@ -1,15 +1,15 @@
 /**
- * QUOI     — le haut du profil : badges, portrait, nom, niveau, signe, titres, présentation,
- *            attache.
- * POURQUOI — ordre de la maquette 89:124 (et 109:107 pour le signe). Deux explications au
- *            toucher (décisions d'Uriel, 27/09) : « Porteur vérifié » (c'est un client) et chaque
- *            titre (comment il a été gagné). Le signe : l'illustration du Fragment choisi veille
- *            en filigrane derrière l'en-tête.
+ * QUOI     — le haut du profil : portrait, nom, niveau, signe, titres, présentation, Instagram,
+ *            date, attache, bouton.
+ * POURQUOI — ordre et valeurs de la maquette COMPTE 89:124 (le signe : 109:107). Les badges sont
+ *            à droite du titre du détail (BadgesExplorateur). Chaque titre s'explique au
+ *            toucher (comment il a été gagné) ; le signe veille en filigrane derrière l'en-tête.
  * ATTENTION — `attache` arrive complète de la base (« Noble représentant des Alpes-Maritimes »,
  *            article officiel INSEE) : on l'affiche telle quelle, sans la recomposer.
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import murmure from '@/assets/ui/murmure.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -22,14 +22,10 @@ import { sousLeSigne } from '../lib/signe'
 import styles from './ProfilEntete.module.css'
 
 const DATE_LONGUE = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' })
-const ROLES = { admin: 'Admin', moderator: 'Modérateur' } as const
 
 export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
   const navigate = useNavigate()
-  const [explication, setExplication] = useState<'porteur' | TitrePorte | null>(null)
-  const fermer = () => {
-    setExplication(null)
-  }
+  const [titre, setTitre] = useState<TitrePorte | null>(null)
 
   return (
     <>
@@ -38,29 +34,10 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
           <img className={styles.filigrane} src={profil.signe.imageUrl} alt="" />
         )}
 
-        <div className={styles.badges}>
-          {profil.porteurVerifie && (
-            <button
-              type="button"
-              className={styles.verifie}
-              onClick={() => {
-                setExplication('porteur')
-              }}
-            >
-              ✓ Porteur vérifié
-            </button>
-          )}
-          {profil.role && <span className={styles.role}>{ROLES[profil.role]}</span>}
-        </div>
-
         <Avatar url={profil.avatarUrl} nom={profil.nom} taille="grand" />
         <div className={styles.identite}>
-          <Text variant="titre-ecran" as="p">
-            {profil.nom}
-          </Text>
-          <Text variant="rubrique" as="p">
-            Niveau {profil.niveau}
-          </Text>
+          <p className={styles.nom}>{profil.nom}</p>
+          <p className={styles.niveau}>Niveau {profil.niveau}</p>
           {profil.signe && <p className={styles.signe}>{sousLeSigne(profil.signe.nom)}</p>}
         </div>
 
@@ -72,7 +49,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
                 type="button"
                 className={styles.titre}
                 onClick={() => {
-                  setExplication(t)
+                  setTitre(t)
                 }}
               >
                 <PastilleChoix libelle={t.nom} marque="✦" />
@@ -106,16 +83,16 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
               @{profil.instagram}
             </a>
           )}
-          <Text variant="legende">
+          <p className={styles.depuis}>
             Explorateur depuis le {DATE_LONGUE.format(new Date(profil.inscritLe))}
-          </Text>
-          {profil.attache && <Text variant="sous-titre">{profil.attache}</Text>}
+          </p>
+          {profil.attache && <p className={styles.attache}>{profil.attache}</p>}
         </div>
 
         <div className={styles.action}>
           {profil.estMoi ? (
             <Button
-              kind="secondaire"
+              kind="doux"
               onClick={() => {
                 void navigate('modifier')
               }}
@@ -123,7 +100,8 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
               Modifier mon profil
             </Button>
           ) : (
-            <Button kind="secondaire" disabled>
+            <Button kind="doux" disabled>
+              <img src={murmure} alt="" width={16} height={16} />
               Envoyer un murmure (bientôt)
             </Button>
           )}
@@ -131,25 +109,20 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
       </header>
 
       {/* Hors de l'en-tête : il est positionné pour le filigrane, la feuille doit couvrir l'écran. */}
-      {explication === 'porteur' && (
-        <Feuille titre="Porteur vérifié" onFermer={fermer}>
-          <div className={styles.explication}>
-            <Text variant="titre-carte">Porteur vérifié</Text>
-            <Text variant="corps">
-              {profil.nom} porte au moins un Fragment Runes de Chêne : c’est un client de la marque.
-            </Text>
-          </div>
-        </Feuille>
-      )}
-      {explication !== null && explication !== 'porteur' && (
-        <Feuille titre={explication.nom} onFermer={fermer}>
+      {titre && (
+        <Feuille
+          titre={titre.nom}
+          onFermer={() => {
+            setTitre(null)
+          }}
+        >
           <div className={styles.explication}>
             <p className={styles.marqueGrande} aria-hidden="true">
               ✦
             </p>
-            <Text variant="titre-carte">{explication.nom}</Text>
+            <Text variant="titre-carte">{titre.nom}</Text>
             <Text variant="sous-titre">Titre gagné en jouant</Text>
-            <Text variant="corps">{phraseCondition(explication.condition)}</Text>
+            <Text variant="corps">{phraseCondition(titre.condition)}</Text>
           </div>
         </Feuille>
       )}

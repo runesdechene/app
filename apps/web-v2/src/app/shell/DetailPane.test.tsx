@@ -79,10 +79,10 @@ test('l’avatar ouvre le menu par-dessus l’onglet courant', async () => {
   expect(screen.getByText('La Carte est à venir')).toBeInTheDocument()
 })
 
-test('Mon profil : le détail s’ouvre, titré « Mon profil »', async () => {
+test('Mon profil : le détail s’ouvre, titré « Mon compte »', async () => {
   const router = renderAt('/carte')
   await ouvrirMonProfil(router)
-  expect(await screen.findByRole('heading', { name: 'Mon profil' })).toHaveFocus()
+  expect(await screen.findByRole('heading', { name: 'Mon compte' })).toHaveFocus()
 })
 
 test('fermer mon profil ramène à l’onglet, pas au menu', async () => {

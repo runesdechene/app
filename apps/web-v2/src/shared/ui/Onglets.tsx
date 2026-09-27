@@ -27,8 +27,10 @@ export function Onglets<T extends string>({
             onChange(o.id)
           }}
         >
-          {o.libelle}
-          {o.compte !== undefined && <span className={styles.compte}>{o.compte}</span>}
+          <span className={styles.libelle}>
+            {o.libelle}
+            {o.compte !== undefined && <span className={styles.compte}>{o.compte}</span>}
+          </span>
         </button>
       ))}
     </div>

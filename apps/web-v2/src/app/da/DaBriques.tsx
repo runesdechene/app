@@ -50,6 +50,7 @@ export function DaBriques() {
         <div className={styles.rangee}>
           <Button>Marquer ma visite</Button>
           <Button kind="secondaire">Prêter serment</Button>
+          <Button kind="doux">Envoyer un murmure</Button>
           <Button kind="discret">Lire ou écouter ce fragment</Button>
         </div>
         <div className={styles.rangee}>

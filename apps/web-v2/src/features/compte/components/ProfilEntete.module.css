@@ -1,6 +1,6 @@
 /*
- * QUOI     — l'en-tête centré du profil ; les badges alignés à droite au-dessus du portrait ;
- *            le filigrane du signe, très pâle, derrière (maquette 109:107).
+ * QUOI     — l'en-tête centré du profil (maquette COMPTE 89:124) et le filigrane du signe
+ *            (109:107), très pâle, derrière.
  */
 .entete {
   position: relative;
@@ -10,76 +10,6 @@
   gap: var(--space-3);
   padding: 0 var(--space-6);
   text-align: center;
-}
-
-.badges {
-  justify-self: end;
-  display: grid;
-  justify-items: end;
-  gap: var(--space-1);
-  min-height: var(--space-6);
-}
-
-.verifie,
-.role {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-petit);
-  font-family: var(--font-corps);
-  font-size: var(--legende-size);
-}
-
-.verifie {
-  border: none;
-  background: color-mix(in srgb, var(--color-vert) 35%, var(--color-fond));
-  color: var(--color-kaki);
-}
-
-.role {
-  background: var(--color-rose);
-  color: var(--color-accent);
-}
-
-.identite {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.titres {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-}
-
-.bio {
-  margin: 0;
-  max-width: 34ch;
-  color: var(--color-encre);
-  font-family: var(--font-corps);
-  font-size: var(--corps-size);
-  line-height: var(--corps-leading);
-  white-space: pre-line;
-}
-
-.bio a,
-.instagram {
-  color: var(--color-encre);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.details {
-  display: grid;
-  gap: var(--space-1);
-  color: var(--color-texte-doux);
-}
-
-.action {
-  display: grid;
-  justify-self: stretch;
 }
 
 /* L'illustration du Fragment choisi, en filigrane : à peine visible, jamais devant le texte. */
@@ -95,6 +25,30 @@
   pointer-events: none;
 }
 
+.identite {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.nom,
+.niveau {
+  margin: 0;
+  font-family: var(--font-titre);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+}
+
+.nom {
+  color: var(--color-encre);
+  font-size: var(--titre-ecran-size);
+}
+
+.niveau {
+  color: var(--color-texte-doux);
+  font-size: var(--rubrique-size);
+}
+
 .signe {
   margin: 0;
   color: var(--color-ocre);
@@ -103,10 +57,75 @@
   font-style: italic;
 }
 
+.titres {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
 .titre {
   padding: 0;
   border: none;
   background: none;
+}
+
+.bio {
+  margin: var(--space-2) 0 0;
+  max-width: 32ch;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--dense-leading);
+  white-space: pre-line;
+}
+
+.bio a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.details {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+
+.instagram {
+  color: var(--color-lien);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  text-decoration: none;
+}
+
+.depuis,
+.attache {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.depuis {
+  color: var(--color-texte-pale);
+}
+
+.attache {
+  color: var(--color-texte-doux);
+}
+
+.action {
+  display: grid;
+  justify-self: stretch;
+  margin-top: var(--space-2);
+}
+
+.explication {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
 }
 
 .marqueGrande {
@@ -114,12 +133,4 @@
   color: var(--color-ocre);
   font-size: var(--titre-ecran-size);
   line-height: 1;
-}
-
-/* Le contenu d'une feuille d'explication, centré comme sur la maquette. */
-.explication {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-2);
-  text-align: center;
 }

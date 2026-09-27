@@ -4,6 +4,7 @@
  *            reçoivent le cadre de détail et la fonction de fermeture.
  */
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
+import { BadgesExplorateur } from '@/features/compte/components/BadgesExplorateur'
 import { MenuAvatar } from '@/features/compte/components/MenuAvatar'
 import { ModifierProfil } from '@/features/compte/components/ModifierProfil'
 import { PreferencesPage } from '@/features/compte/components/PreferencesPage'
@@ -22,7 +23,10 @@ export function RouteExplorateur() {
   const { id = '' } = useParams()
   const moi = useMonIdentifiant()
   return (
-    <DetailPane title={id === moi ? 'Mon profil' : 'Profil'}>
+    <DetailPane
+      title={id === moi ? 'Mon compte' : 'Profil'}
+      actions={<BadgesExplorateur id={id} />}
+    >
       <ProfilExplorateur id={id} />
     </DetailPane>
   )

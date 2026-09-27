@@ -3,6 +3,7 @@
  */
 .profil {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* une colonne qui ne s'élargit pas au carrousel */
   gap: var(--space-6);
   padding-top: var(--space-2);
 }

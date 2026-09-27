@@ -5,7 +5,6 @@
  */
 import { useState } from 'react'
 import { Onglets } from '@/shared/ui/Onglets'
-import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, Lieu } from '../api/lireProfil'
 import styles from './ProfilDecouvertes.module.css'
 
@@ -24,7 +23,7 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
 
   return (
     <section className={styles.decouvertes} aria-label="Ses découvertes">
-      <Text variant="titre-section">Ses découvertes</Text>
+      <h2 className={styles.titre}>Ses découvertes</h2>
       <Onglets onglets={onglets} actif={liste} onChange={setListe} />
       {lieux.length === 0 ? (
         <p className={styles.vide}>Rien ici pour l’instant.</p>

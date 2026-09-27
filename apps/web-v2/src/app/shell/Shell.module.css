@@ -92,7 +92,7 @@
   }
 
   .shell > aside {
-    position: static;
+    position: relative; /* reste dans la grille, et porte son fond parchemin */
     grid-area: detail;
     border-right: 1px solid var(--color-sable);
   }

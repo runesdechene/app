@@ -2,6 +2,8 @@
  * QUOI     — le cadre du détail. Mobile : couvre l'écran. Desktop : panneau (voir Shell).
  */
 .pane {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 0;
@@ -9,32 +11,52 @@
   padding-top: env(safe-area-inset-top);
 }
 
+/* Le même parchemin que les écrans, à moitié (maquette COMPTE : fond à 50 %). */
+.pane::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-4) var(--space-3) var(--space-2) var(--space-2);
 }
 
 .close {
+  display: grid;
+  place-content: center;
   min-width: var(--cible-tactile);
   min-height: var(--cible-tactile);
+  margin-top: calc(var(--space-2) * -1);
+  padding: 0;
   border: none;
   background: none;
-  font-size: var(--titre-section-size);
-  color: var(--color-encre);
 }
 
 .title {
+  flex: 1;
   margin: 0;
   font-family: var(--font-titre);
-  font-size: var(--titre-ecran-size);
+  font-size: var(--titre-section-size);
   line-height: var(--titre-leading);
   color: var(--color-encre);
 }
 
 .title:focus {
   outline: none;
+}
+
+.actions {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
 }
 
 .body {

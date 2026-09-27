@@ -1,41 +1,52 @@
 /*
- * QUOI     — les Fragments en vignettes sable ; celui du signe cerclé d'ocre.
+ * QUOI     — « Ses fragments » (maquette COMPTE) : une ligne de vignettes sable qui défile ;
+ *            celle du signe est cerclée d'ocre.
  */
 .fragments {
   display: grid;
-  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.fragments > :first-child {
   padding: 0 var(--space-6);
+}
+
+/* Carrousel : le cadre flex contraint la rangée à sa largeur, la rangée défile. */
+.cadre {
+  display: flex;
 }
 
 .rangee {
   display: flex;
-  flex-wrap: wrap;
+  flex: 1;
   gap: var(--space-3);
+  padding: var(--space-1) var(--space-6);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .fragment {
   display: grid;
-  justify-items: center;
-  gap: var(--space-1);
+  flex: 0 0 auto;
+  place-content: center;
   width: 82px;
+  height: 99px;
   margin: 0;
-  padding: var(--space-2);
+  padding: 0;
+  border: none;
   border-radius: var(--radius);
-  background: var(--color-sable);
+  background: var(--color-barre);
   color: var(--color-texte-doux);
   font-family: var(--font-corps);
   font-size: var(--micro-size);
-  text-align: center;
 }
 
 .fragment img {
-  width: 100%;
-  aspect-ratio: 57 / 79;
+  width: 57px;
+  height: 79px;
   object-fit: contain;
-}
-
-button.fragment {
-  border: none;
+  opacity: 0.8;
 }
 
 .choisi {
@@ -56,7 +67,6 @@ button.fragment {
   font-size: var(--legende-size);
 }
 
-/* Le contenu d'une feuille d'explication, centré comme sur la maquette. */
 .explication {
   display: grid;
   justify-items: center;

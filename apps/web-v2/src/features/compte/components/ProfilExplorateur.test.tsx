@@ -76,12 +76,6 @@ test('l’en-tête dit qui il est', async () => {
   )
 })
 
-test('le badge Porteur vérifié s’explique au toucher', async () => {
-  afficher(PROFIL)
-  await userEvent.click(await screen.findByRole('button', { name: /Porteur vérifié/ }))
-  expect(screen.getByRole('dialog', { name: 'Porteur vérifié' })).toHaveTextContent('client')
-})
-
 test('envies masquées : pas d’onglet « Envie d’y aller » du tout', async () => {
   afficher({ ...PROFIL, estMoi: false, envies: null })
   await screen.findByRole('tab', { name: /Ajoutés/ })

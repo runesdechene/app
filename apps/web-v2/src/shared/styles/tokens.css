@@ -29,6 +29,15 @@
   --color-kaki: #46493c;
   --color-vert: #9ab788;
 
+  /* Profil (maquette COMPTE 89:124, 27/09) */
+  --color-lien: #495cd4; /* @instagram */
+  --color-succes: #5c8f41; /* texte du badge « Porteur vérifié » */
+  --color-succes-fond: #d1f9dc;
+  --color-pastille: #f6e1c3; /* fond des titres portés */
+  --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
+  --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */
+  --color-feuille: #fff9f0; /* la feuille « Ses découvertes » */
+
   /* Désactivé — « Marquer ma visite (274 km trop loin) », maquette fiche lieu */
   --color-desactive-fond: color-mix(in srgb, #ffead5 49%, transparent);
   --color-desactive-bord: #e2c9b9;

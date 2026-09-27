@@ -5,7 +5,8 @@
   display: inline-grid;
   place-content: center;
   flex: none;
-  border: 2px solid var(--color-rose);
+  border: 3px solid var(--color-rose);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-encre) 20%, transparent);
   border-radius: var(--radius-rond);
   background: var(--color-sable);
   color: var(--color-texte-doux);
@@ -20,7 +21,7 @@
 }
 
 .grand {
-  width: 96px;
-  height: 96px;
+  width: 83px;
+  height: 83px;
   font-size: var(--titre-ecran-size);
 }
