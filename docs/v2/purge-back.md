@@ -43,3 +43,4 @@
 | `has_v2_access()` | la V2 demande si l'appelant peut entrer | mig 344 |
 | `set_v2_access(text, boolean)` | le Hub coche / décoche | mig 344 |
 | Supabase Auth — URL `/v2/` | à autoriser quand la zone Compte aura sa propre connexion | spec socle §9 |
+| PostGIS, `geo_departements`, `geo_pays`, `places.departement` / `pays`, `_rattacher_lieu`, déclencheur `places_rattacher` | rattacher chaque lieu (profil, régions parcourues) ; DROM rattachés au pays seulement ; 2 îlots isolés sans rattachement | migs 349-351 |
