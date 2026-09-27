@@ -27,6 +27,7 @@ export const COLOR_TOKENS = [
   '--color-brun',
   '--color-doux-fond',
   '--color-feuille',
+  '--color-ombre',
   '--color-desactive-fond',
   '--color-desactive-bord',
   '--color-desactive-texte',

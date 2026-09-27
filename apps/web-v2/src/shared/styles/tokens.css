@@ -37,6 +37,7 @@
   --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
   --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */
   --color-feuille: #fff9f0; /* la feuille « Ses découvertes » */
+  --color-ombre: #1f1a14; /* l'ombre des photos : un brun presque noir, jamais gris */
 
   /* Désactivé — « Marquer ma visite (274 km trop loin) », maquette fiche lieu */
   --color-desactive-fond: color-mix(in srgb, #ffead5 49%, transparent);
