@@ -142,6 +142,10 @@ mettre l'originalité dans la matière — icônes gravées, textures, pas de pi
 
 ## 4. Compte client — VALIDÉ
 
+> **Révisé le 27/09/2026** : le Compte devient un **profil public de Porteur** + un **menu
+> avatar** (maquettes Figma COMPTE et Menu Avatar). Design complet :
+> `2026-09-27-v2-compte-design.md`. Ce qui suit reste valable pour le lien avec l'achat.
+
 Sous « moi contre moi-même », le Compte n'est **pas une carte de joueur**. Pas de niveau,
 pas de titre, pas de rang. C'est le **registre de son propre parcours**.
 
