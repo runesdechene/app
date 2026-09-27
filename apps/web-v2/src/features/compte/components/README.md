@@ -5,3 +5,5 @@
   - `ProfilEntete` — badges, portrait, nom, niveau, titres, présentation, attache, bouton.
   - `ProfilDecouvertes` — ses fragments ; Ajoutés / Visités / Envie d'y aller.
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.
+- `ModifierProfil` — le formulaire du profil ; ne s'affiche qu'une fois tout chargé.
+- `PreferencesPage` — les trois cartes de réglages.

@@ -5,4 +5,4 @@ besoin du cadre de détail ou de la fermeture, un petit composant d'ici les lui 
 `router.tsx` pointe sur lui.
 
 - `compte.tsx` — le menu avatar (`/<onglet>/menu`), le profil (`/<onglet>/explorateur/<id>`)
-  et sa modification (`…/modifier`, le sien seulement).
+  sa modification (`…/modifier`, le sien seulement) et les Préférences (`/<onglet>/preferences`).

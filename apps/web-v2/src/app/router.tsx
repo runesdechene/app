@@ -9,7 +9,7 @@ import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
-import { RouteExplorateur, RouteMenu, RouteModifier } from './routes/compte'
+import { RouteExplorateur, RouteMenu, RouteModifier, RoutePreferences } from './routes/compte'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
@@ -30,6 +30,7 @@ export const routes: RouteObject[] = [
               { path: 'menu', Component: RouteMenu },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
+              { path: 'preferences', Component: RoutePreferences },
             ],
           },
           { path: '*', element: <Navigate to="/accueil" replace /> },

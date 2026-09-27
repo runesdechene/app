@@ -6,6 +6,7 @@
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import { MenuAvatar } from '@/features/compte/components/MenuAvatar'
 import { ModifierProfil } from '@/features/compte/components/ModifierProfil'
+import { PreferencesPage } from '@/features/compte/components/PreferencesPage'
 import { ProfilExplorateur } from '@/features/compte/components/ProfilExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { useFermerDetail } from '../navigation/useFermerDetail'
@@ -47,6 +48,15 @@ export function RouteModifier() {
   return (
     <DetailPane title="Modifier mon profil">
       <ModifierProfil onTermine={termine} />
+    </DetailPane>
+  )
+}
+
+// /<onglet>/preferences
+export function RoutePreferences() {
+  return (
+    <DetailPane title="Préférences">
+      <PreferencesPage />
     </DetailPane>
   )
 }

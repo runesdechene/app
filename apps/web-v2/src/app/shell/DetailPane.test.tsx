@@ -152,3 +152,12 @@ test('/modifier de mon profil : le formulaire', async () => {
   renderAt('/carte/explorateur/u1/modifier')
   expect(await screen.findByRole('heading', { name: 'Modifier mon profil' })).toBeInTheDocument()
 })
+
+test('Préférences s’ouvre depuis le menu, et le retour ramène à l’onglet', async () => {
+  const router = renderAt('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Préférences' }))
+  expect(await screen.findByRole('heading', { name: 'Préférences' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  expect(router.state.location.pathname).toBe('/carte')
+})
