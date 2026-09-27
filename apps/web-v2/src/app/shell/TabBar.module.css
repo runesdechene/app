@@ -1,0 +1,16 @@
+/*
+ * QUOI     — mise en page minimale de la barre d'onglets. Habillée en Task 8.
+ */
+.bar {
+  grid-area: nav;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.tab {
+  min-height: var(--cible-tactile);
+}
+
+.label {
+  display: block;
+}

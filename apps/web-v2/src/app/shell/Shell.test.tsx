@@ -1,0 +1,63 @@
+/**
+ * QUOI     — la coquille navigue par URL et garde les cinq écrans montés.
+ * POURQUOI — c'est la promesse centrale de la navigation (spec socle §4bis).
+ */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { createMemoryRouter, RouterProvider } from 'react-router'
+import { vi } from 'vitest'
+import { routes } from '../router'
+
+vi.mock('../access/useV2Access', () => ({
+  useV2Access: () => ({
+    state: { status: 'ready', hasSession: true, hasAccess: true },
+    retry: () => undefined,
+  }),
+}))
+
+function renderAt(path: string) {
+  const router = createMemoryRouter(routes, { initialEntries: [path] })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  return router
+}
+
+test('/ redirige vers l’Accueil', async () => {
+  const router = renderAt('/')
+  expect(await screen.findByText('L’Accueil est à venir')).toBeVisible()
+  expect(router.state.location.pathname).toBe('/accueil')
+})
+
+test('un onglet inconnu redirige vers l’Accueil', async () => {
+  const router = renderAt('/nimporte')
+  await screen.findByText('L’Accueil est à venir')
+  expect(router.state.location.pathname).toBe('/accueil')
+})
+
+test('changer d’onglet affiche le nouvel écran et garde l’ancien monté', async () => {
+  const router = renderAt('/accueil')
+  await userEvent.click(await screen.findByRole('button', { name: 'Carte' }))
+  expect(router.state.location.pathname).toBe('/carte')
+  expect(screen.getByText('La Carte est à venir')).toBeVisible()
+  expect(screen.getByText('L’Accueil est à venir')).not.toBeVisible()
+  expect(screen.getByText('L’Accueil est à venir')).toBeInTheDocument()
+})
+
+test('changer d’onglet ajoute une entrée : le retour ramène à l’onglet précédent', async () => {
+  const router = renderAt('/accueil')
+  await userEvent.click(await screen.findByRole('button', { name: 'Codex' }))
+  await router.navigate(-1)
+  expect(router.state.location.pathname).toBe('/accueil')
+})
+
+test('l’onglet actif est annoncé', async () => {
+  renderAt('/messages')
+  expect(await screen.findByRole('button', { name: 'Messages' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  )
+})

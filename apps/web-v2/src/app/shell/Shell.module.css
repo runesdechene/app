@@ -1,0 +1,28 @@
+/*
+ * QUOI     — la grille de la coquille. Mobile : écrans puis barre en bas.
+ */
+.shell {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    'main'
+    'nav';
+}
+
+.main {
+  grid-area: main;
+  position: relative;
+  min-height: 0;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.screen[hidden] {
+  display: none;
+}
