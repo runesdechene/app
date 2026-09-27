@@ -3,7 +3,7 @@
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher). aria-current marque l'onglet actif pour les lecteurs
- *            d'écran. Les icônes sont décoratives (alt="") : le libellé porte le nom.
+ *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
  */
 import { useLocation, useNavigate } from 'react-router'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
@@ -48,7 +48,11 @@ export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
             press(tab.id)
           }}
         >
-          <img className={styles.icon} src={ICONS[tab.id]} alt="" />
+          <span
+            className={styles.icon}
+            style={{ '--icone': `url(${ICONS[tab.id]})` }}
+            aria-hidden="true"
+          />
           <Text variant="libelle">{tab.label}</Text>
         </button>
       ))}

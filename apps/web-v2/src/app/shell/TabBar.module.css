@@ -4,7 +4,7 @@
  * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
  *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
  *            (pas cinq colonnes égales, qui rognaient « Campement ») ; icônes à 70 %
- *            d'opacité, l'onglet actif à pleine opacité.
+ *            d'opacité, celle de l'onglet actif à pleine opacité.
  */
 .bar {
   grid-area: nav;
@@ -12,7 +12,7 @@
   display: flex;
   justify-content: space-evenly;
   align-items: flex-end;
-  padding: var(--space-2) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom));
+  padding: var(--space-4) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom));
   background: var(--color-barre);
 }
 
@@ -36,17 +36,20 @@
   border: none;
   background: none;
   white-space: nowrap;
-  opacity: 0.7;
 }
 
-.tab[aria-current='page'] {
-  opacity: 1;
-}
-
+/* L'icône est un pochoir : sa forme vient de l'image, sa couleur du jeton --color-encre.
+   Toutes les icônes ont ainsi exactement la même teinte, quelle que soit l'image déposée. */
 .icon {
   width: 24px;
   height: 24px;
-  object-fit: contain;
+  background: var(--color-encre);
+  mask: var(--icone) center / contain no-repeat;
+  opacity: 0.7;
+}
+
+.tab[aria-current='page'] .icon {
+  opacity: 1;
 }
 
 @container app (width >= 1024px) {

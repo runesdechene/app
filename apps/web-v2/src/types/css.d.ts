@@ -10,5 +10,6 @@ declare module 'react' {
     '--avatar'?: string
     '--nuance'?: string
     '--mesure'?: string
+    '--icone'?: string
   }
 }

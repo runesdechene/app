@@ -15,5 +15,9 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `onglet-campement.png` | 338 × 342       | icône de l'onglet Campement                                |
 | `partager.svg`         | vectoriel       | exemple d'IconButton sur /v2/da (fiche lieu, « partager ») |
 
+Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
+couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)
+en attendant son remplacement par Uriel.
+
 L'avatar n'a pas d'image par défaut : la maquette montre la photo d'Uriel, qui ne peut pas
 servir à tout le monde. Tant que la zone Compte n'existe pas, c'est un cercle sable.
