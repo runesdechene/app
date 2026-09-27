@@ -7,18 +7,16 @@
   "scripts": {
     "dev": "pnpm --filter explore-web dev",
     "dev:web": "pnpm --filter explore-web dev",
+    "dev:v2": "pnpm --filter web-v2 dev",
     "build": "pnpm --filter explore-web build",
-    "build:web": "pnpm --filter explore-web build"
+    "build:web": "pnpm --filter explore-web build",
+    "build:v2": "pnpm --filter web-v2 build"
   },
   "devDependencies": {
     "sharp": "^0.34.5",
     "typescript": "^5.3.3"
   },
   "pnpm": {
-    "overrides": {
-      "react": "19.0.0",
-      "react-dom": "19.0.0"
-    },
     "onlyBuiltDependencies": [
       "esbuild"
     ]
