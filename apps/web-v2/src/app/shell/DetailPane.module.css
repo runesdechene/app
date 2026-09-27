@@ -67,4 +67,9 @@
 .body {
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none; /* on défile au doigt ou à la molette, sans barre (Uriel, 27/09) */
+}
+
+.body::-webkit-scrollbar {
+  display: none;
 }

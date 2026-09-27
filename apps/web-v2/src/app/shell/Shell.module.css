@@ -59,6 +59,11 @@
   inset: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none; /* comme les détails : on défile sans barre */
+}
+
+.screen::-webkit-scrollbar {
+  display: none;
 }
 
 .screen[hidden] {
