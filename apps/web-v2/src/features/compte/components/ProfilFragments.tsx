@@ -61,35 +61,37 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
             setOuvert(null)
           }}
         >
-          {ouvert.imageUrl && <img className={styles.motif} src={ouvert.imageUrl} alt="" />}
-          <Text variant="titre-carte">{ouvert.nom}</Text>
-          {profil.signe?.id === ouvert.id ? (
-            <Text variant="corps">Ton profil est sous ce signe.</Text>
-          ) : (
-            <>
-              <Text variant="corps">
-                Place ton profil sous le signe de ce Fragment : son illustration veille derrière ton
-                portrait.
-              </Text>
-              <Button
-                onClick={() => {
-                  choisir(ouvert.id).then(
-                    () => {
-                      setOuvert(null)
-                    },
-                    () => undefined,
-                  )
-                }}
-              >
-                Me placer sous ce signe
-              </Button>
-              {echec && (
-                <p role="alert" className={styles.alerte}>
-                  Le signe n’a pas pu être changé. Réessaie dans un instant.
-                </p>
-              )}
-            </>
-          )}
+          <div className={styles.explication}>
+            {ouvert.imageUrl && <img className={styles.motif} src={ouvert.imageUrl} alt="" />}
+            <Text variant="titre-carte">{ouvert.nom}</Text>
+            {profil.signe?.id === ouvert.id ? (
+              <Text variant="corps">Ton profil est sous ce signe.</Text>
+            ) : (
+              <>
+                <Text variant="corps">
+                  Place ton profil sous le signe de ce Fragment : son illustration veille derrière
+                  ton portrait.
+                </Text>
+                <Button
+                  onClick={() => {
+                    choisir(ouvert.id).then(
+                      () => {
+                        setOuvert(null)
+                      },
+                      () => undefined,
+                    )
+                  }}
+                >
+                  Me placer sous ce signe
+                </Button>
+                {echec && (
+                  <p role="alert" className={styles.alerte}>
+                    Le signe n’a pas pu être changé. Réessaie dans un instant.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </Feuille>
       )}
     </section>

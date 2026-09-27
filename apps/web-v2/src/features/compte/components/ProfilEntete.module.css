@@ -115,3 +115,11 @@
   font-size: var(--titre-ecran-size);
   line-height: 1;
 }
+
+/* Le contenu d'une feuille d'explication, centré comme sur la maquette. */
+.explication {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
