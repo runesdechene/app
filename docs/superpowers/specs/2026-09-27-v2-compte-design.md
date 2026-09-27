@@ -50,8 +50,9 @@ Dans l'ordre de la maquette :
    titres portés en pastilles.
 3. **Présentation** : bio libre (liens et `@mentions` cliquables), Instagram, « Explorateur
    depuis le … » (date d'inscription), et la ligne d'attache — **« Noble représentant des
-   Alpes-Maritimes »** (France) ou **« Noble représentant d'Italie »** (hors France). « Noble »
-   est une tournure de style. Pas de ligne si le joueur n'a aucune visite ou l'a masquée.
+   Alpes-Maritimes »** (France, article officiel de l'INSEE) ou **« Noble représentant · Portugal »**
+   (hors France : l'INSEE ne donne pas d'article pour les pays, on n'en devine pas). « Noble » est
+   une tournure de style. Pas de ligne si le joueur n'a aucune visite ou l'a masquée.
 4. **Action** : sur **mon** profil, **« Modifier mon profil »** (comme Instagram) ; sur celui
    d'un autre, **« Envoyer un murmure »** — visible, mène à « bientôt » tant que la zone
    Messages n'existe pas.
@@ -78,7 +79,8 @@ Féminin — Chevalière) · **Enregistrer**.
 - **Ta présence sur la carte** : brouiller tes pistes (50 km) · montrer ton département ·
   **montrer mes envies** (nouveau, activé par défaut — voir §3) ;
 - **Ton compte** : ton adresse e-mail (c'est elle qui relie tes achats) · « Un fragment qui
-  n'apparaît pas ? Écris-nous » (le chemin clair de la spec V2 §4).
+  n'apparaît pas ? Envoie-nous une photo » — **le système existant** : le formulaire public de
+  soumission du Hub (`hub.runesdechene.com/soumettre-contenu`), décision d'Uriel du 27/09.
 
 ## 5. Les données
 
@@ -98,7 +100,9 @@ risque — la classe de faille de `users_admin`) ; une vue (moins claire, piège
 
 1. **`places.departement` et `places.pays`** — remplis **une fois** pour les lieux existants, puis
    à chaque nouveau lieu. France : géocodage inverse de l'État (`api-adresse.data.gouv.fr`,
-   gratuit). Hors France : le pays seul. **Ligne d'attache** d'un joueur = le département (ou,
+   gratuit). Hors France : le pays seul. **Réalisé plutôt en base par PostGIS** (contours IGN et
+   Natural Earth) avec les articles officiels de l'INSEE : aucun appel externe, rattachement à
+   l'insertion de chaque lieu (plan du 27/09). **Ligne d'attache** d'un joueur = le département (ou,
    à défaut, le pays) qui compte le plus de ses visites sur place.
 2. **Un déclencheur** : une visite enregistrée (`place_explorers`) retire le lieu de la liste
    d'envies du joueur. Vit en base : marche aussi pour les visites faites depuis la V1. La
