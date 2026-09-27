@@ -1,15 +1,10 @@
 /*
- * QUOI     — style de l'état vide : Bebas Neue, centré dans l'écran.
+ * QUOI     — centre le message dans l'écran. Le style du texte vient de Text.
  */
 .empty {
-  margin: 0;
   min-height: 100%;
   display: grid;
   place-content: center;
   padding: var(--space-6);
   text-align: center;
-  font-family: var(--font-titre);
-  font-size: var(--titre-section-size);
-  line-height: var(--titre-section-leading);
-  color: var(--color-titres);
 }

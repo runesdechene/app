@@ -1,0 +1,87 @@
+/*
+ * QUOI     — toute la DA en variables : couleurs, polices, échelle de texte, espacements, formes.
+ * POURQUOI — source unique (décision 007). Stylelint refuse toute valeur visuelle ailleurs.
+ *            Valeurs relevées dans la maquette Figma « App v2 » le 27/09/2026 ; les ~25 nuances
+ *            de texte de la maquette sont fondues en 4 niveaux. Validées par Uriel sur /v2/da.
+ * ATTENTION — ajouter une valeur ici = la montrer sur /v2/da (src/app/da/). Un écart avec la
+ *            spec V2 §5 (la boutique) se tranche avec Uriel, jamais en silence.
+ */
+:root {
+  /* Fonds */
+  --color-fond: #fcf3e4;
+  --color-surface: #faedd7;
+  --color-barre: #f6e7cf;
+  --color-sable: #e7dcca;
+  --color-bord: #c9bcbc;
+
+  /* Texte, du plus fort au plus pâle */
+  --color-encre: #494841;
+  --color-texte: #594848;
+  --color-texte-doux: #857575;
+  --color-texte-pale: #ab9d9d;
+  --color-sur-accent: #fffaf2;
+
+  /* Accents */
+  --color-accent: #a94842;
+  --color-accent-clair: #e89f9f;
+  --color-rose: #ebd2d2;
+  --color-ocre: #a89369;
+  --color-kaki: #46493c;
+  --color-vert: #9ab788;
+
+  /* Polices */
+  --font-titre: 'Bebas Neue', sans-serif;
+  --font-corps: 'Cabin', sans-serif;
+  --font-condensee: 'Cabin Condensed', sans-serif;
+  --weight-normal: 400;
+  --weight-semi: 600;
+  --weight-gras: 700;
+
+  /* Styles de texte — Bebas Neue */
+  --titre-ecran-size: 2rem;
+  --titre-section-size: 1.5rem;
+  --titre-carte-size: 1.25rem;
+  --rubrique-size: 1rem;
+  --surtitre-size: 0.875rem;
+  --titre-leading: 1.1;
+  --titre-tracking: 0.01em;
+
+  /* Styles de texte — Cabin */
+  --corps-size: 1rem;
+  --sous-titre-size: 0.875rem;
+  --flux-size: 0.8125rem;
+  --legende-size: 0.75rem;
+  --micro-size: 0.625rem;
+  --corps-leading: 1.45;
+  --dense-leading: 1.25;
+
+  /* Styles de texte — Cabin Condensed */
+  --libelle-size: 0.75rem;
+  --libelle-tracking: 0.03em;
+  --meta-size: 0.75rem;
+
+  /* Bouton */
+  --bouton-size: 0.875rem;
+  --bouton-tracking: 0.02em;
+
+  /* Espacements */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Formes */
+  --radius-vignette: 5px;
+  --radius-petit: 8px;
+  --radius: 10px;
+  --radius-carte: 15px;
+  --radius-rond: 999px;
+  --ombre-bouton: 0 0 8px 5px color-mix(in srgb, var(--color-sable) 40%, transparent);
+
+  /* Coquille */
+  --tabbar-height: 85px;
+  --cible-tactile: 44px;
+  --background-attachment: fixed;
+}

@@ -1,6 +1,8 @@
 /**
  * QUOI     — point d'entrée de la V2 : monte le cache de données et le routeur dans #root.
  */
+import './shared/styles/tokens.css'
+import './shared/styles/global.css'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

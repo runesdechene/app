@@ -1,0 +1,97 @@
+/*
+ * QUOI     — les douze styles de texte. Uniquement des jetons (tokens.css).
+ * POURQUOI — Bebas Neue pour les titres, Cabin pour le corps, Cabin Condensed pour les libellés
+ *            et les métadonnées : les trois polices réellement utilisées dans la maquette.
+ */
+.titreEcran,
+.titreSection,
+.titreCarte,
+.rubrique,
+.surtitre {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+  color: var(--color-encre);
+}
+
+.titreEcran {
+  font-size: var(--titre-ecran-size);
+}
+
+.titreSection {
+  font-size: var(--titre-section-size);
+}
+
+.titreCarte {
+  font-size: var(--titre-carte-size);
+}
+
+.rubrique {
+  font-size: var(--rubrique-size);
+}
+
+.surtitre {
+  font-size: var(--surtitre-size);
+  color: var(--color-texte-pale);
+}
+
+.corps,
+.sousTitre,
+.flux,
+.legende,
+.micro {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-weight: var(--weight-normal);
+  color: var(--color-texte);
+}
+
+.corps {
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.sousTitre {
+  font-size: var(--sous-titre-size);
+  line-height: var(--dense-leading);
+}
+
+.flux {
+  font-size: var(--flux-size);
+  line-height: var(--dense-leading);
+}
+
+.legende {
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+  color: var(--color-texte-doux);
+}
+
+.micro {
+  font-size: var(--micro-size);
+  line-height: var(--dense-leading);
+  color: var(--color-texte-doux);
+}
+
+.libelle,
+.meta {
+  margin: 0;
+  font-family: var(--font-condensee);
+  line-height: var(--dense-leading);
+}
+
+.libelle {
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  color: var(--color-encre);
+}
+
+.meta {
+  font-size: var(--meta-size);
+  font-weight: var(--weight-normal);
+  color: var(--color-texte-pale);
+}

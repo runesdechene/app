@@ -1,0 +1,47 @@
+/*
+ * QUOI     — les trois sortes de bouton et leur état désactivé.
+ */
+.principal,
+.secondaire {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+  box-shadow: var(--ombre-bouton);
+}
+
+.principal {
+  border: 2px solid var(--color-accent-clair);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.secondaire {
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+}
+
+.discret {
+  min-height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  color: var(--color-texte-doux);
+}
+
+.principal:disabled,
+.secondaire:disabled,
+.discret:disabled {
+  border-color: var(--color-sable);
+  background: var(--color-surface);
+  color: var(--color-texte-pale);
+  box-shadow: none;
+  cursor: not-allowed;
+}

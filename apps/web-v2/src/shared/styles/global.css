@@ -1,0 +1,31 @@
+/*
+ * QUOI     — remise à zéro et fond commun.
+ * POURQUOI — une base identique sur tous les navigateurs, et le fond de la DA partout.
+ *            L'image de fond (parchemin) arrive avec la coquille visuelle (Task 8).
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--color-fond);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}

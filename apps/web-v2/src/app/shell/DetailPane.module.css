@@ -5,7 +5,7 @@
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 0;
-  background: var(--color-parchemin);
+  background: var(--color-fond);
   padding-top: env(safe-area-inset-top);
 }
 
@@ -22,15 +22,15 @@
   border: none;
   background: none;
   font-size: var(--titre-section-size);
-  color: var(--color-titres);
+  color: var(--color-encre);
 }
 
 .title {
   margin: 0;
   font-family: var(--font-titre);
   font-size: var(--titre-ecran-size);
-  line-height: var(--titre-ecran-leading);
-  color: var(--color-titres);
+  line-height: var(--titre-leading);
+  color: var(--color-encre);
 }
 
 .title:focus {

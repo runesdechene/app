@@ -35,6 +35,14 @@ export default tseslint.config(
       'no-console': 'error',
       'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
       'no-restricted-imports': ['error', { patterns: [V1, OTHER_ZONE_BY_PATH] }],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "JSXAttribute[name.name='style'] Property[key.type='Identifier']",
+          message:
+            "Pas de style inline : passer par un .module.css et les jetons. Seules les variables CSS ('--nom') sont permises.",
+        },
+      ],
     },
   },
   {

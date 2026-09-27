@@ -1,0 +1,105 @@
+/*
+ * QUOI     — mise en page de /v2/da : une colonne sur mobile, deux sur desktop.
+ */
+.page {
+  min-height: 100dvh;
+  display: grid;
+  gap: var(--space-8);
+  padding: calc(env(safe-area-inset-top) + var(--space-6)) var(--space-4) var(--space-8);
+  background: var(--color-fond);
+}
+
+.entete {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nuance,
+.ligne {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.echantillon {
+  height: 3.5rem;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--nuance);
+}
+
+.espace {
+  width: var(--mesure);
+  height: var(--space-4);
+  background: var(--color-accent);
+}
+
+.rayon {
+  height: 3.5rem;
+  border: 2px solid var(--color-encre);
+  border-radius: var(--mesure);
+}
+
+.rangee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fondClair,
+.fondSombre {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-carte);
+}
+
+.fondClair {
+  background: var(--color-surface);
+}
+
+.fondSombre {
+  background: var(--color-kaki);
+}
+
+.cadre {
+  height: 12rem;
+  border: 1px dashed var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
+@media (width >= 1024px) {
+  .page {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-inline: var(--space-8);
+  }
+
+  .entete {
+    grid-column: 1 / -1;
+  }
+}

@@ -6,6 +6,7 @@
  */
 import { CompteDetail } from '@/features/compte/components/CompteDetail'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
+import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
 import { DetailPane } from './shell/DetailPane'
@@ -16,6 +17,7 @@ export const routes: RouteObject[] = [
     path: '/',
     Component: RootLayout,
     children: [
+      { path: 'da', Component: DaPage },
       {
         Component: Shell,
         children: [

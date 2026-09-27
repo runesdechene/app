@@ -9,7 +9,7 @@
   gap: var(--space-4);
   padding: var(--space-6);
   text-align: center;
-  background: var(--color-parchemin);
+  background: var(--color-fond);
   color: var(--color-texte);
   font-family: var(--font-corps);
 }

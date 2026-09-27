@@ -1,0 +1,41 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-css-modules"],
+  "rules": {
+    "color-no-hex": true,
+    "color-named": "never",
+    "function-disallowed-list": [
+      "rgb",
+      "rgba",
+      "hsl",
+      "hsla",
+      "hwb",
+      "lab",
+      "lch",
+      "oklch",
+      "oklab"
+    ],
+    "declaration-property-value-allowed-list": {
+      "font-family": ["/^var[(]--/", "inherit"],
+      "font-size": ["/^var[(]--/", "inherit"],
+      "font-weight": ["/^var[(]--/", "inherit"],
+      "line-height": ["/^var[(]--/", "inherit", "1"],
+      "letter-spacing": ["/^var[(]--/", "inherit"]
+    },
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]*$",
+    "declaration-block-no-redundant-longhand-properties": [
+      true,
+      {
+        "ignoreShorthands": ["grid-template"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/shared/styles/tokens.css"],
+      "rules": {
+        "color-no-hex": null,
+        "declaration-property-value-allowed-list": null
+      }
+    }
+  ]
+}
