@@ -50,7 +50,12 @@ export async function reglerBrouillage(valeur: boolean) {
   if (error) throw error
 }
 
+// Le lien de confirmation ramène à la V1 : c'est elle qui recopie la nouvelle adresse dans
+// `users.email_address` à la confirmation (événement USER_UPDATED).
 export async function changerEmail(email: string) {
-  const { error } = await supabase.auth.updateUser({ email })
+  const { error } = await supabase.auth.updateUser(
+    { email },
+    { emailRedirectTo: `${window.location.origin}/` },
+  )
   if (error) throw error
 }

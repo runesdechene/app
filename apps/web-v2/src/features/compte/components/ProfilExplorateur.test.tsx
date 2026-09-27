@@ -97,3 +97,8 @@ test('Explorateur introuvable : un message, jamais un écran vide', async () => 
   afficher(null)
   expect(await screen.findByText('Cet Explorateur est introuvable')).toBeInTheDocument()
 })
+
+test('l’onglet « Envie d’y aller » a son nombre, comme les autres', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('tab', { name: /Envie d’y aller/ })).toHaveTextContent('1')
+})

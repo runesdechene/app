@@ -6,7 +6,7 @@
  * ATTENTION — un échec d'enregistrement laisse le formulaire tel quel, avec un message sous le
  *            bouton : l'Explorateur ne perd jamais ce qu'il a écrit.
  */
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
@@ -63,6 +63,15 @@ function Formulaire({
   const [envoi, setEnvoi] = useState(false)
   const [echec, setEchec] = useState(false)
   const choixPhoto = useRef<HTMLInputElement>(null)
+
+  // L'aperçu est une adresse locale au navigateur : on la libère quand la photo change ou
+  // quand on quitte l'écran.
+  useEffect(
+    () => () => {
+      if (photo) URL.revokeObjectURL(photo.apercu)
+    },
+    [photo],
+  )
 
   function changer<K extends keyof ValeursProfil>(cle: K, valeur: ValeursProfil[K]) {
     setValeurs((v) => ({ ...v, [cle]: valeur }))

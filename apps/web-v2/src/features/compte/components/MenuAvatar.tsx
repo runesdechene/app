@@ -7,6 +7,7 @@
  * ATTENTION — Déconnexion ne navigue nulle part : la garde d'accès voit la session tomber et
  *            renvoie vers la V1.
  */
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -20,6 +21,7 @@ export function MenuAvatar({ onFermer }: { onFermer: () => void }) {
   const navigate = useNavigate()
   const moi = useMonIdentifiant()
   const { profil } = useExplorateur(moi)
+  const [echec, setEchec] = useState(false)
 
   return (
     <Feuille titre="Mon compte" onFermer={onFermer}>
@@ -47,11 +49,19 @@ export function MenuAvatar({ onFermer }: { onFermer: () => void }) {
         type="button"
         className={[styles.entree, styles.sortie].join(' ')}
         onClick={() => {
-          void seDeconnecter()
+          setEchec(false)
+          seDeconnecter().catch(() => {
+            setEchec(true)
+          })
         }}
       >
         Déconnexion
       </button>
+      {echec && (
+        <p role="alert" className={styles.alerte}>
+          La déconnexion a échoué. Vérifie ta connexion, puis réessaie.
+        </p>
+      )}
     </Feuille>
   )
 }

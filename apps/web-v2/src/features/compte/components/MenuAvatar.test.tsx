@@ -61,3 +61,10 @@ test('Échap ferme le menu', async () => {
   await userEvent.keyboard('{Escape}')
   expect(onFermer).toHaveBeenCalled()
 })
+
+test('une déconnexion qui échoue le dit', async () => {
+  session.seDeconnecter.mockRejectedValueOnce(new Error('réseau'))
+  ouvrir()
+  await userEvent.click(await screen.findByRole('button', { name: 'Déconnexion' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('La déconnexion a échoué')
+})

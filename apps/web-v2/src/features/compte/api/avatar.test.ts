@@ -48,3 +48,13 @@ test('envoi raté : rien n’est supprimé ni enregistré, l’ancienne photo re
   expect(stockage.remove).not.toHaveBeenCalled()
   expect(rpc).not.toHaveBeenCalled()
 })
+
+test('sans webp (vieux Safari), la photo part en PNG avec la bonne extension', async () => {
+  HTMLCanvasElement.prototype.toBlob = function (rappel: BlobCallback) {
+    rappel(new Blob(['x'], { type: 'image/png' }))
+  }
+  stockage.upload.mockResolvedValueOnce({ error: null })
+  await changerAvatar(fichier)
+  expect(stockage.upload.mock.calls[0]?.[0]).toMatch(/^u1\/avatar-\d+\.png$/)
+  expect(stockage.upload.mock.calls[0]?.[2]).toEqual({ contentType: 'image/png' })
+})

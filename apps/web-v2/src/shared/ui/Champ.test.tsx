@@ -30,3 +30,26 @@ test('multiligne : une zone de texte', () => {
   render(<Pilote multiligne />)
   expect(screen.getByLabelText('Ta présentation').tagName).toBe('TEXTAREA')
 })
+
+function PiloteDepuis({ depart }: { depart: string }) {
+  const [valeur, setValeur] = useState(depart)
+  return <Champ libelle="Ta présentation" valeur={valeur} onChange={setValeur} max={10} />
+}
+
+test('un texte déjà trop long se raccourcit sans être coupé d’un coup', async () => {
+  render(<PiloteDepuis depart={'a'.repeat(15)} />)
+  const champ = screen.getByLabelText('Ta présentation')
+  await userEvent.type(champ, '{Backspace}')
+  expect(champ).toHaveValue('a'.repeat(14))
+  await userEvent.type(champ, 'b')
+  expect(champ).toHaveValue('a'.repeat(14))
+})
+
+test('la limite ne coupe jamais un emoji en deux', async () => {
+  render(<Pilote max={3} />)
+  const champ = screen.getByLabelText('Ta présentation')
+  await userEvent.click(champ)
+  await userEvent.paste('ab🇫🇷x')
+  expect(champ).toHaveValue('ab🇫🇷')
+  expect(screen.getByText('3 / 3')).toBeInTheDocument()
+})

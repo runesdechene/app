@@ -144,3 +144,25 @@ test('titres illisibles : un message et « Réessayer », jamais un écran vide'
   expect(await screen.findByText('Ton profil n’a pas pu être chargé')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
 })
+
+test('changer deux fois de photo libère le premier aperçu', async () => {
+  const revoke = vi.fn()
+  let n = 0
+  vi.stubGlobal('URL', {
+    ...URL,
+    createObjectURL: () => `blob:${String(++n)}`,
+    revokeObjectURL: revoke,
+  })
+  const { container } = render(
+    <QueryClientProvider client={new QueryClient()}>
+      <ModifierProfil onTermine={vi.fn()} />
+    </QueryClientProvider>,
+  )
+  await screen.findByLabelText('Ton nom')
+  const choix = container.querySelector<HTMLInputElement>('input[type=file]')
+  if (!choix) throw new Error('champ photo absent')
+  await userEvent.upload(choix, new File(['a'], 'a.jpg', { type: 'image/jpeg' }))
+  await userEvent.upload(choix, new File(['b'], 'b.jpg', { type: 'image/jpeg' }))
+  expect(revoke).toHaveBeenCalledWith('blob:1')
+  vi.unstubAllGlobals()
+})

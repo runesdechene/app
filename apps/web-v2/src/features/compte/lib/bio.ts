@@ -7,7 +7,8 @@
 export type MorceauBio =
   { type: 'texte'; valeur: string } | { type: 'lien'; valeur: string; href: string }
 
-const LIEN_OU_MENTION = /(https:\/\/\S+|@[\w.]+)/g
+// Une mention commence un mot (« @runesdechene ») ; « uriel@runesdechene.com » est une adresse.
+const LIEN_OU_MENTION = /(https:\/\/\S+|(?<![\w.])@[\w.]+)/g
 
 export function decouperBio(texte: string): MorceauBio[] {
   return texte

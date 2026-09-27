@@ -28,3 +28,9 @@ test('une adresse http ou javascript reste du texte', () => {
     { type: 'texte', valeur: 'javascript:alert(1) http://x.fr' },
   ])
 })
+
+test('une adresse e-mail n’est pas une mention', () => {
+  expect(decouperBio('Écris à uriel@runesdechene.com')).toEqual([
+    { type: 'texte', valeur: 'Écris à uriel@runesdechene.com' },
+  ])
+})

@@ -36,11 +36,11 @@ export async function changerAvatar(fichier: File): Promise<string> {
   const moi = await monIdentifiant()
   if (!moi) throw new Error('Connexion requise')
   const seau = supabase.storage.from(SEAU)
-  const nom = `avatar-${String(Date.now())}.webp`
+  const image = await versWebp(fichier)
+  // Un vieux Safari ne sait pas produire de webp et rend un PNG : on nomme ce qu'on envoie.
+  const nom = `avatar-${String(Date.now())}.${image.type === 'image/webp' ? 'webp' : 'png'}`
 
-  const envoi = await seau.upload(`${moi}/${nom}`, await versWebp(fichier), {
-    contentType: 'image/webp',
-  })
+  const envoi = await seau.upload(`${moi}/${nom}`, image, { contentType: image.type })
   if (envoi.error) throw envoi.error
 
   const url = seau.getPublicUrl(`${moi}/${nom}`).data.publicUrl

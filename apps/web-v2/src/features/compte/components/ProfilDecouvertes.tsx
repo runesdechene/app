@@ -17,7 +17,9 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
     { id: 'ajoutes', libelle: 'Ajoutés', compte: profil.ajoutes.length },
     { id: 'visites', libelle: 'Visités', compte: profil.visites.length },
   ]
-  if (profil.envies !== null) onglets.push({ id: 'envies', libelle: 'Envie d’y aller' })
+  if (profil.envies !== null) {
+    onglets.push({ id: 'envies', libelle: 'Envie d’y aller', compte: profil.envies.length })
+  }
   const lieux: Lieu[] = liste === 'envies' ? (profil.envies ?? []) : profil[liste]
 
   return (
