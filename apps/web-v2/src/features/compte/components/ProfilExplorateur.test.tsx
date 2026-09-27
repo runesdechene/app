@@ -109,7 +109,8 @@ test('toucher un titre dit comment il a été gagné', async () => {
 
 test('sous le signe d’un Fragment : filigrane et ligne discrète', async () => {
   afficher({ ...PROFIL, signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' } })
-  expect(await screen.findByText('sous le signe de l’Hoplite')).toBeInTheDocument()
+  const nom = await screen.findByText('Hoplite', { selector: 'b' }) // le nom du Fragment en gras
+  expect(nom.parentElement).toHaveTextContent('sous le signe de l’Hoplite')
   expect(document.querySelector('img[src="https://x/h.webp"]')).not.toBeNull()
 })
 

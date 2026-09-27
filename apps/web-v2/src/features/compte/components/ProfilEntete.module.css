@@ -65,8 +65,12 @@
   margin: 0;
   color: var(--color-ocre);
   font-family: var(--font-corps);
-  font-size: var(--legende-size);
+  font-size: var(--sous-titre-size); /* 14 px : deux points de plus (Uriel, 27/09) */
   font-style: italic;
+}
+
+.signe b {
+  font-weight: var(--weight-gras);
 }
 
 .titres {

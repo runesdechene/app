@@ -1,5 +1,6 @@
 /**
- * QUOI     — la phrase « sous le signe de … » pour le Fragment choisi par un Porteur.
+ * QUOI     — la phrase « sous le signe de … » pour le Fragment choisi par un Porteur, en deux
+ *            morceaux : le nom se met en gras à l'affichage (Uriel, 27/09).
  * POURQUOI — les noms de Fragments portent parfois leur article (« Le Varègue ») et parfois
  *            non (« Hoplite ») : on contracte (du, des, de la, de l’) et on élide devant une
  *            voyelle ou un h.
@@ -15,10 +16,10 @@ const ARTICLES: [RegExp, string][] = [
   [/^L['’]/, 'de l’'],
 ]
 
-export function sousLeSigne(nom: string): string {
+export function sousLeSigne(nom: string): { avant: string; nom: string } {
   for (const [article, contraction] of ARTICLES) {
-    if (article.test(nom)) return `sous le signe ${contraction}${nom.replace(article, '')}`
+    if (article.test(nom)) return { avant: `sous le signe ${contraction}`, nom: nom.replace(article, '') }
   }
   const elision = /^[aeiouyhàâéèêîôû]/i.test(nom)
-  return `sous le signe ${elision ? 'de l’' : 'de '}${nom}`
+  return { avant: `sous le signe ${elision ? 'de l’' : 'de '}`, nom }
 }

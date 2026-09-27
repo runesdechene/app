@@ -26,6 +26,7 @@ const DATE_LONGUE = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' })
 export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
   const navigate = useNavigate()
   const [titre, setTitre] = useState<TitrePorte | null>(null)
+  const signe = profil.signe && sousLeSigne(profil.signe.nom)
 
   return (
     <>
@@ -38,7 +39,12 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
         <div className={styles.identite}>
           <p className={styles.nom}>{profil.nom}</p>
           <p className={styles.niveau}>Niveau {profil.niveau}</p>
-          {profil.signe && <p className={styles.signe}>{sousLeSigne(profil.signe.nom)}</p>}
+          {signe && (
+            <p className={styles.signe}>
+              {signe.avant}
+              <b>{signe.nom}</b>
+            </p>
+          )}
         </div>
 
         {/* Les titres en une ligne, comme une devise sous le nom (maquette 123:107). */}

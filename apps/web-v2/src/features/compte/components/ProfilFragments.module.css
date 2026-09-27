@@ -47,7 +47,7 @@
   height: 146px;
   margin: 0;
   padding: var(--space-3) var(--space-2) var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--color-ocre) 60%, transparent);
+  border: none; /* l'ombre suffit ; seul le signe choisi porte un liseré (Uriel, 27/09) */
   border-radius: var(--radius);
   background: var(--color-barre);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 16%, transparent);
