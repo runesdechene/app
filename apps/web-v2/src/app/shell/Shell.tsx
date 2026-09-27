@@ -11,8 +11,11 @@ import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CampementScreen } from '@/features/campement/components/CampementScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { CodexScreen } from '@/features/codex/components/CodexScreen'
+import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
+import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import logotype from '@/assets/ui/logotype.png'
+import { Avatar } from '@/shared/ui/Avatar'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
 import { tabOf, TABS, type TabId } from '../navigation/tabs'
@@ -31,18 +34,24 @@ export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const active = tabOf(pathname)
-  // Un détail = un segment après l'onglet (/carte/compte). Segments vides ignorés (/carte/).
-  const detailOpen = pathname.split('/').filter(Boolean).length > 1
+  // Par-dessus l'onglet : un segment après lui (/carte/menu, /carte/explorateur/…). Segments
+  // vides ignorés (/carte/). Le menu est une feuille : il n'ouvre pas le panneau desktop.
+  const segments = pathname.split('/').filter(Boolean)
+  const overlayOpen = segments.length > 1
+  const menuOpen = segments[1] === 'menu'
+  const detailOpen = overlayOpen && !menuOpen
+  const moi = useMonIdentifiant()
+  const { profil } = useExplorateur(moi)
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
   const avatar = useRef<HTMLButtonElement>(null)
-  const detailWasOpen = useRef(false)
+  const overlayWasOpen = useRef(false)
 
-  // À la fermeture d'un détail, le focus revient à l'avatar qui l'a ouvert (clavier, lecteur
+  // À la fermeture d'un détail ou du menu, le focus revient à l'avatar (clavier, lecteur
   // d'écran) au lieu de se perdre en haut de la page.
   useEffect(() => {
-    if (detailWasOpen.current && !detailOpen) avatar.current?.focus()
-    detailWasOpen.current = detailOpen
-  }, [detailOpen])
+    if (overlayWasOpen.current && !overlayOpen) avatar.current?.focus()
+    overlayWasOpen.current = overlayOpen
+  }, [overlayOpen])
 
   function scrollTop(tab: TabId) {
     scrollers.current[tab]?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -62,10 +71,12 @@ export function Shell() {
         className={styles.avatar}
         aria-label="Mon compte"
         onClick={() => {
-          // Le Compte déjà ouvert ne s'empile pas une seconde fois dans l'historique.
-          if (active && !pathname.endsWith('/compte')) void navigate(`/${active}/compte`)
+          // Le menu déjà ouvert ne s'empile pas une seconde fois dans l'historique.
+          if (active && !menuOpen) void navigate(`/${active}/menu`)
         }}
-      />
+      >
+        <Avatar url={profil?.avatarUrl ?? null} nom={profil?.nom ?? ''} taille="petit" />
+      </button>
       <main className={styles.main}>
         {TABS.map(({ id, label }) => {
           const Screen = SCREENS[id]

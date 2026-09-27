@@ -1,11 +1,13 @@
 /**
- * QUOI     — le Compte s'ouvre par l'avatar et se ferme sans jamais quitter l'app.
+ * QUOI     — l'avatar ouvre le menu ; le menu ouvre le profil ; tout se ferme sans jamais
+ *            quitter l'app, et le retour ne rouvre jamais le menu.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
+import type { ExplorateurProfile } from '@/features/compte/api/lireProfil'
 import { routes } from '../router'
 
 vi.mock('../access/useV2Access', () => ({
@@ -13,6 +15,33 @@ vi.mock('../access/useV2Access', () => ({
     state: { status: 'ready', hasSession: true, hasAccess: true },
     retry: () => undefined,
   }),
+}))
+
+vi.mock('@/features/compte/api/session', () => ({
+  monIdentifiant: () => Promise.resolve('u1'),
+  seDeconnecter: () => Promise.resolve(),
+}))
+
+const profil = (id: string): ExplorateurProfile => ({
+  id,
+  nom: id === 'u1' ? 'Uriel' : 'Claire',
+  avatarUrl: null,
+  niveau: 3,
+  titres: [],
+  bio: null,
+  instagram: null,
+  inscritLe: '2024-09-30T10:00:00+00:00',
+  porteurVerifie: false,
+  role: null,
+  attache: null,
+  fragments: [],
+  ajoutes: [],
+  visites: [],
+  envies: [],
+  estMoi: id === 'u1',
+})
+vi.mock('@/features/compte/api/explorateur', () => ({
+  fetchExplorateur: (id: string) => Promise.resolve(profil(id)),
 }))
 
 function renderAt(path: string) {
@@ -25,48 +54,60 @@ function renderAt(path: string) {
   return router
 }
 
-test('l’avatar ouvre le Compte par-dessus l’onglet courant', async () => {
+async function ouvrirMonProfil(router: ReturnType<typeof renderAt>) {
+  await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
+  await userEvent.click(await screen.findByRole('button', { name: /Mon profil/ }))
+  await waitFor(() => {
+    expect(router.state.location.pathname).toBe('/carte/explorateur/u1')
+  })
+}
+
+test('l’avatar ouvre le menu par-dessus l’onglet courant', async () => {
   const router = renderAt('/carte')
   await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
-  expect(router.state.location.pathname).toBe('/carte/compte')
-  expect(screen.getByRole('heading', { name: 'Compte' })).toHaveFocus()
+  expect(router.state.location.pathname).toBe('/carte/menu')
+  expect(screen.getByRole('dialog', { name: 'Mon compte' })).toBeInTheDocument()
   expect(screen.getByText('La Carte est à venir')).toBeInTheDocument()
 })
 
-test('fermer après ouverture = retour à l’onglet', async () => {
+test('Mon profil : le détail s’ouvre, titré « Mon profil »', async () => {
   const router = renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await ouvrirMonProfil(router)
+  expect(await screen.findByRole('heading', { name: 'Mon profil' })).toHaveFocus()
+})
+
+test('fermer mon profil ramène à l’onglet, pas au menu', async () => {
+  const router = renderAt('/carte')
+  await ouvrirMonProfil(router)
+  await userEvent.click(await screen.findByRole('button', { name: 'Fermer' }))
   expect(router.state.location.pathname).toBe('/carte')
 })
 
+test('le profil d’un autre s’intitule « Profil »', async () => {
+  renderAt('/carte/explorateur/u2')
+  expect(await screen.findByRole('heading', { name: 'Profil' })).toBeInTheDocument()
+  expect(await screen.findByText('Claire')).toBeInTheDocument()
+})
+
 test('ouvert à froid, fermer remplace par la racine sans quitter l’app', async () => {
-  const router = renderAt('/codex/compte')
+  const router = renderAt('/codex/explorateur/u2')
   await userEvent.click(await screen.findByRole('button', { name: 'Fermer' }))
   expect(router.state.location.pathname).toBe('/codex')
   expect(router.state.historyAction).toBe('REPLACE')
 })
 
-test('le retour système ferme le détail', async () => {
+test('le retour système ferme le menu', async () => {
   const router = renderAt('/accueil')
   await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
   await router.navigate(-1)
   expect(router.state.location.pathname).toBe('/accueil')
   // router.navigate agit hors du cycle de rendu de React : on attend le rendu suivant.
   await waitFor(() => {
-    expect(screen.queryByRole('heading', { name: 'Compte' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Mon compte' })).not.toBeInTheDocument()
   })
 })
 
-test('revenir sur un onglet rouvre sa dernière adresse', async () => {
-  const router = renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Codex' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
-  expect(router.state.location.pathname).toBe('/carte/compte')
-})
-
-test('le Compte déjà ouvert : l’avatar ne l’empile pas une seconde fois', async () => {
+test('le menu déjà ouvert : l’avatar ne l’empile pas une seconde fois', async () => {
   const router = renderAt('/carte')
   await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
   await userEvent.click(screen.getByRole('button', { name: 'Mon compte' }))
@@ -74,10 +115,19 @@ test('le Compte déjà ouvert : l’avatar ne l’empile pas une seconde fois', 
   expect(router.state.location.pathname).toBe('/carte')
 })
 
-test('fermer le Compte rend le focus à l’avatar', async () => {
+test('revenir sur un onglet rouvre sa dernière adresse', async () => {
+  const router = renderAt('/carte')
+  await ouvrirMonProfil(router)
+  await userEvent.click(screen.getByRole('button', { name: 'Codex' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
+  expect(router.state.location.pathname).toBe('/carte/explorateur/u1')
+})
+
+test('fermer le menu rend le focus à l’avatar', async () => {
   renderAt('/carte')
   await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await screen.findByRole('dialog', { name: 'Mon compte' })
+  await userEvent.keyboard('{Escape}')
   await waitFor(() => {
     expect(screen.getByRole('button', { name: 'Mon compte' })).toHaveFocus()
   })

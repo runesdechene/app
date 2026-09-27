@@ -1,4 +1,7 @@
-# components — l'affichage de la zone Compte
+# components — les écrans de la zone Compte
 
-Les composants visibles de la zone, chacun avec son `.module.css`. Ils n'appellent jamais
-Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe par `../api/`.
+- `MenuAvatar` — la feuille ouverte par l'avatar.
+- `ProfilExplorateur` — le profil public ; ses états chargement / erreur / introuvable.
+  - `ProfilEntete` — badges, portrait, nom, niveau, titres, présentation, attache, bouton.
+  - `ProfilDecouvertes` — ses fragments ; Ajoutés / Visités / Envie d'y aller.
+  - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.

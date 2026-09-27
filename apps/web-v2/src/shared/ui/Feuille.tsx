@@ -18,8 +18,12 @@ export function Feuille({
 }) {
   const panneau = useRef<HTMLDivElement>(null)
 
+  // Le focus entre une seule fois, à l'ouverture ; la touche Échap suit `onFermer`.
   useEffect(() => {
     panneau.current?.focus({ preventScroll: true })
+  }, [])
+
+  useEffect(() => {
     function surTouche(e: KeyboardEvent) {
       if (e.key === 'Escape') onFermer()
     }

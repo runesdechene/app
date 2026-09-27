@@ -5,32 +5,21 @@
  * ATTENTION — le focus va sur le titre à l'ouverture : un lecteur d'écran annonce le détail.
  */
 import { useEffect, useRef, type ReactNode } from 'react'
-import { useLocation, useNavigate } from 'react-router'
-import { closeDetailTarget } from '../navigation/closeDetail'
+import { useFermerDetail } from '../navigation/useFermerDetail'
 import styles from './DetailPane.module.css'
 
 export function DetailPane({ title, children }: { title: string; children: ReactNode }) {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const fermer = useFermerDetail()
   const heading = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     heading.current?.focus()
   }, [])
 
-  function close() {
-    const action = closeDetailTarget({
-      pathname: location.pathname,
-      hasInAppHistory: location.key !== 'default',
-    })
-    if (action.kind === 'back') void navigate(-1)
-    else void navigate(action.to, { replace: true })
-  }
-
   return (
     <aside className={styles.pane} aria-labelledby="detail-title">
       <header className={styles.header}>
-        <button type="button" className={styles.close} onClick={close} aria-label="Fermer">
+        <button type="button" className={styles.close} onClick={fermer} aria-label="Fermer">
           ←
         </button>
         <h1 id="detail-title" ref={heading} tabIndex={-1} className={styles.title}>

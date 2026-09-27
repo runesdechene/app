@@ -1,0 +1,80 @@
+/*
+ * QUOI     — l'en-tête centré du profil ; les badges alignés à droite au-dessus du portrait.
+ */
+.entete {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+  text-align: center;
+}
+
+.badges {
+  justify-self: end;
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
+  min-height: var(--space-6);
+}
+
+.verifie,
+.role {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-petit);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.verifie {
+  border: none;
+  background: color-mix(in srgb, var(--color-vert) 35%, var(--color-fond));
+  color: var(--color-kaki);
+}
+
+.role {
+  background: var(--color-rose);
+  color: var(--color-accent);
+}
+
+.identite {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.titres {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.bio {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+}
+
+.bio a,
+.instagram {
+  color: var(--color-encre);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.details {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-texte-doux);
+}
+
+.action {
+  display: grid;
+  justify-self: stretch;
+}

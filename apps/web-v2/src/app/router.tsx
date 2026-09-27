@@ -1,15 +1,15 @@
 /**
  * QUOI     — toutes les adresses de la V2.
  * POURQUOI — tout état navigable est une URL (spec socle §4bis). Premier segment = l'onglet ;
- *            ce qui suit = un détail ouvert par-dessus (ex. /carte/compte).
+ *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou le menu
+ *            avatar (/carte/menu).
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
-import { CompteDetail } from '@/features/compte/components/CompteDetail'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
-import { DetailPane } from './shell/DetailPane'
+import { RouteExplorateur, RouteMenu } from './routes/compte'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
@@ -27,14 +27,8 @@ export const routes: RouteObject[] = [
             Component: TabRoute,
             children: [
               { index: true, element: null },
-              {
-                path: 'compte',
-                element: (
-                  <DetailPane title="Compte">
-                    <CompteDetail />
-                  </DetailPane>
-                ),
-              },
+              { path: 'menu', Component: RouteMenu },
+              { path: 'explorateur/:id', Component: RouteExplorateur },
             ],
           },
           { path: '*', element: <Navigate to="/accueil" replace /> },

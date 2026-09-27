@@ -20,6 +20,8 @@
 
 .panneau {
   position: relative;
+  align-self: center;
+  width: min(100%, 480px); /* sur grand écran, la feuille ne traverse pas tout l'écran */
   display: grid;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
