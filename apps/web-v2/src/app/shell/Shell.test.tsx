@@ -66,3 +66,9 @@ test('un lien « Revenir à la V1 » est toujours visible pendant la constructio
   renderAt('/codex')
   expect(await screen.findByRole('link', { name: 'Revenir à la V1' })).toHaveAttribute('href', '/')
 })
+
+test('une barre oblique finale n’ouvre pas de détail', async () => {
+  renderAt('/carte/')
+  await screen.findByText('La Carte est à venir')
+  expect(document.querySelector('[data-detail]')).toBeNull()
+})

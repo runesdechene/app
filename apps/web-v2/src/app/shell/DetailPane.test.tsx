@@ -73,3 +73,12 @@ test('le Compte déjà ouvert : l’avatar ne l’empile pas une seconde fois', 
   await router.navigate(-1)
   expect(router.state.location.pathname).toBe('/carte')
 })
+
+test('fermer le Compte rend le focus à l’avatar', async () => {
+  renderAt('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Mon compte' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Mon compte' })).toHaveFocus()
+  })
+})

@@ -7,12 +7,15 @@
  *            `error`, et l'écran propose alors de réessayer ou de revenir à la V1.
  *            Délai de ACCESS_TIMEOUT_MS : hors connexion, supabase-js peut réessayer pendant des
  *            dizaines de secondes ; au-delà du délai, on bascule en `error` plutôt qu'attendre.
+ *            Connexion ou déconnexion (y compris dans un onglet V1) → la vérification est refaite.
  */
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { supabase } from '@/shared/supabase/client'
 import type { AccessState } from './decideAccess'
 
 export const ACCESS_TIMEOUT_MS = 8000
+const ACCESS_KEY = ['v2-access']
 
 async function fetchAccess(): Promise<{ hasSession: boolean; hasAccess: boolean }> {
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
@@ -43,8 +46,21 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 }
 
 export function useV2Access(): { state: AccessState; retry: () => void } {
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        void queryClient.invalidateQueries({ queryKey: ACCESS_KEY })
+      }
+    })
+    return () => {
+      data.subscription.unsubscribe()
+    }
+  }, [queryClient])
+
   const query = useQuery({
-    queryKey: ['v2-access'],
+    queryKey: ACCESS_KEY,
     queryFn: () => withTimeout(fetchAccess(), ACCESS_TIMEOUT_MS),
     staleTime: Infinity,
   })

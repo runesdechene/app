@@ -38,6 +38,18 @@ export default tseslint.config(
       'no-restricted-syntax': [
         'error',
         {
+          // Style inline passé par une variable : on ne peut pas vérifier ce qu'il contient.
+          selector: "JSXAttribute[name.name='style'] > JSXExpressionContainer > Identifier",
+          message:
+            'Pas de style inline par variable : écrire l’objet sur place, variables CSS seulement.',
+        },
+        {
+          // Clé entre guillemets qui n'est pas une variable CSS ('color' au lieu de color).
+          selector:
+            "JSXAttribute[name.name='style'] Property[key.type='Literal'][key.value!=/^--/]",
+          message: "Pas de style inline : seules les variables CSS ('--nom') sont permises.",
+        },
+        {
           selector: "JSXAttribute[name.name='style'] Property[key.type='Identifier']",
           message:
             "Pas de style inline : passer par un .module.css et les jetons. Seules les variables CSS ('--nom') sont permises.",

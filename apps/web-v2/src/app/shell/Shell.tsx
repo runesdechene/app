@@ -5,7 +5,7 @@
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
-import { useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CampementScreen } from '@/features/campement/components/CampementScreen'
@@ -31,8 +31,18 @@ export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const active = tabOf(pathname)
-  const detailOpen = pathname.split('/').length > 2
+  // Un détail = un segment après l'onglet (/carte/compte). Segments vides ignorés (/carte/).
+  const detailOpen = pathname.split('/').filter(Boolean).length > 1
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
+  const avatar = useRef<HTMLButtonElement>(null)
+  const detailWasOpen = useRef(false)
+
+  // À la fermeture d'un détail, le focus revient à l'avatar qui l'a ouvert (clavier, lecteur
+  // d'écran) au lieu de se perdre en haut de la page.
+  useEffect(() => {
+    if (detailWasOpen.current && !detailOpen) avatar.current?.focus()
+    detailWasOpen.current = detailOpen
+  }, [detailOpen])
 
   function scrollTop(tab: TabId) {
     scrollers.current[tab]?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -47,6 +57,7 @@ export function Shell() {
         <Text variant="libelle">Revenir à la V1</Text>
       </a>
       <button
+        ref={avatar}
         type="button"
         className={styles.avatar}
         aria-label="Mon compte"

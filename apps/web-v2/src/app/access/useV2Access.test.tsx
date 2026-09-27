@@ -12,7 +12,10 @@ import { ACCESS_TIMEOUT_MS, useV2Access } from './useV2Access'
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
     // Un réseau qui ne répond jamais.
-    auth: { getSession: () => new Promise(() => undefined) },
+    auth: {
+      getSession: () => new Promise(() => undefined),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } } }),
+    },
     rpc: () => new Promise(() => undefined),
   },
 }))

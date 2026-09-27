@@ -19,7 +19,8 @@
       "font-size": ["/^var[(]--/", "inherit"],
       "font-weight": ["/^var[(]--/", "inherit"],
       "line-height": ["/^var[(]--/", "inherit", "1"],
-      "letter-spacing": ["/^var[(]--/", "inherit"]
+      "letter-spacing": ["/^var[(]--/", "inherit"],
+      "font": ["inherit"]
     },
     "selector-class-pattern": "^[a-z][a-zA-Z0-9]*$",
     "declaration-block-no-redundant-longhand-properties": [
