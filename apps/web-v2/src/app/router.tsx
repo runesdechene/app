@@ -4,9 +4,11 @@
  *            ce qui suit = un détail ouvert par-dessus (ex. /carte/compte).
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
+import { CompteDetail } from '@/features/compte/components/CompteDetail'
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
+import { DetailPane } from './shell/DetailPane'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
@@ -21,7 +23,17 @@ export const routes: RouteObject[] = [
           {
             path: ':tab',
             Component: TabRoute,
-            children: [{ index: true, element: null }],
+            children: [
+              { index: true, element: null },
+              {
+                path: 'compte',
+                element: (
+                  <DetailPane title="Compte">
+                    <CompteDetail />
+                  </DetailPane>
+                ),
+              },
+            ],
           },
           { path: '*', element: <Navigate to="/accueil" replace /> },
         ],

@@ -1,0 +1,43 @@
+/*
+ * QUOI     — le cadre du détail. Mobile : couvre l'écran. Desktop : panneau (voir Shell).
+ */
+.pane {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  background: var(--color-parchemin);
+  padding-top: env(safe-area-inset-top);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+}
+
+.close {
+  min-width: var(--cible-tactile);
+  min-height: var(--cible-tactile);
+  border: none;
+  background: none;
+  font-size: var(--titre-section-size);
+  color: var(--color-titres);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  line-height: var(--titre-ecran-leading);
+  color: var(--color-titres);
+}
+
+.title:focus {
+  outline: none;
+}
+
+.body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

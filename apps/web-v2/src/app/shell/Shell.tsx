@@ -1,12 +1,12 @@
 /**
- * QUOI     — la coquille : barre d'onglets, les cinq écrans racines, et l'emplacement du détail.
+ * QUOI     — la coquille : avatar, barre d'onglets, les cinq écrans racines, le détail.
  * POURQUOI — les cinq écrans restent MONTÉS et seul l'actif est visible : leur état et leur
  *            défilement survivent au changement d'onglet sans aucun code de restauration.
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
 import { useRef, type ReactNode } from 'react'
-import { Outlet, useLocation } from 'react-router'
+import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CampementScreen } from '@/features/campement/components/CampementScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
@@ -26,7 +26,9 @@ const SCREENS: Record<TabId, () => ReactNode> = {
 
 export function Shell() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const active = tabOf(pathname)
+  const detailOpen = pathname.split('/').length > 2
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
 
   function scrollTop(tab: TabId) {
@@ -34,7 +36,16 @@ export function Shell() {
   }
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} data-detail={detailOpen ? 'open' : undefined}>
+      <button
+        type="button"
+        className={styles.avatar}
+        aria-label="Mon compte"
+        onClick={() => {
+          // Le Compte déjà ouvert ne s'empile pas une seconde fois dans l'historique.
+          if (active && !pathname.endsWith('/compte')) void navigate(`/${active}/compte`)
+        }}
+      />
       <main className={styles.main}>
         {TABS.map(({ id, label }) => {
           const Screen = SCREENS[id]
