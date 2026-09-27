@@ -41,7 +41,7 @@
 
 .nom {
   color: var(--color-encre);
-  font-size: var(--titre-ecran-size);
+  font-size: var(--nom-profil-size);
 }
 
 .niveau {
@@ -65,6 +65,7 @@
 }
 
 .titre {
+  display: flex; /* sans lui, le bouton s'aligne sur une ligne de texte et descend la pastille */
   padding: 0;
   border: none;
   background: none;
@@ -72,11 +73,11 @@
 
 .bio {
   margin: var(--space-2) 0 0;
-  max-width: 32ch;
+  max-width: 302px;
   color: var(--color-encre);
   font-family: var(--font-corps);
-  font-size: var(--corps-size);
-  line-height: var(--dense-leading);
+  font-size: var(--bio-size);
+  line-height: var(--bio-leading);
   white-space: pre-line;
 }
 
@@ -89,20 +90,22 @@
 .details {
   display: grid;
   justify-items: center;
-  gap: var(--space-1);
+  gap: 0;
   margin-top: var(--space-3);
+  line-height: var(--bio-leading);
 }
 
 .instagram {
   color: var(--color-lien);
   font-family: var(--font-corps);
-  font-size: var(--corps-size);
+  font-size: var(--bio-size);
   text-decoration: none;
 }
 
 .depuis,
 .attache {
   margin: 0;
+  line-height: var(--bio-leading);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
 }

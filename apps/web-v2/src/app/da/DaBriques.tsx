@@ -44,6 +44,11 @@ export function DaBriques() {
     <>
       <DaSection name="Text">
         <Text variant="corps">Voir la section « Textes » : les douze styles.</Text>
+        <Text variant="legende">Tailles propres au profil (maquette COMPTE) :</Text>
+        <p className={styles.tailleDetail}>Mon compte — --titre-detail-size</p>
+        <p className={styles.tailleNom}>Uriel — --nom-profil-size</p>
+        <p className={styles.tailleRangee}>Ses fragments — --rangee-size</p>
+        <p className={styles.tailleBio}>Chevalier errant à temps partiel — --bio-size</p>
       </DaSection>
 
       <DaSection name="Button">

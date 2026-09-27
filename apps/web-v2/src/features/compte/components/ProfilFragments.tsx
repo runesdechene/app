@@ -19,10 +19,16 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   if (profil.fragments.length === 0) return null
 
-  // Le nom n'est pas écrit sous la vignette (maquette) ; il nomme la vignette pour les
-  // lecteurs d'écran.
+  // Le motif en format haut, son nom dessous (Uriel, 27/09).
   function vignette(f: Fragment) {
-    return f.imageUrl ? <img src={f.imageUrl} alt="" /> : <span>{f.nom}</span>
+    return (
+      <>
+        <span className={styles.motifVignette}>
+          {f.imageUrl && <img src={f.imageUrl} alt="" />}
+        </span>
+        <span className={styles.nom}>{f.nom}</span>
+      </>
+    )
   }
 
   return (
@@ -40,7 +46,6 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
                 className={[styles.fragment, profil.signe?.id === f.id && styles.choisi]
                   .filter(Boolean)
                   .join(' ')}
-                aria-label={f.nom}
                 onClick={() => {
                   setOuvert(f)
                 }}
@@ -48,7 +53,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
                 {vignette(f)}
               </button>
             ) : (
-              <figure key={f.id} className={styles.fragment} aria-label={f.nom}>
+              <figure key={f.id} className={styles.fragment}>
                 {vignette(f)}
               </figure>
             ),

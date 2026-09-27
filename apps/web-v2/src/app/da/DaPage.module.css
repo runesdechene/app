@@ -159,3 +159,31 @@
     min-height: calc(844px - 20px);
   }
 }
+
+/* Les tailles propres au profil, montrées telles qu'elles s'affichent. */
+.tailleDetail,
+.tailleNom,
+.tailleRangee {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+}
+
+.tailleDetail {
+  font-size: var(--titre-detail-size);
+}
+
+.tailleNom {
+  font-size: var(--nom-profil-size);
+}
+
+.tailleRangee {
+  font-size: var(--rangee-size);
+}
+
+.tailleBio {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--bio-size);
+  line-height: var(--bio-leading);
+}

@@ -10,6 +10,7 @@
 
 .fragments > :first-child {
   padding: 0 var(--space-6);
+  font-size: var(--rangee-size);
 }
 
 /* Carrousel : le cadre flex contraint la rangée à sa largeur, la rangée défile. */
@@ -29,27 +30,43 @@
 .fragment {
   display: grid;
   flex: 0 0 auto;
-  place-content: center;
-  width: 82px;
-  height: 99px;
+  align-content: start;
+  justify-items: center;
+  gap: var(--space-1);
+  width: 88px;
   margin: 0;
   padding: 0;
   border: none;
-  border-radius: var(--radius);
-  background: var(--color-barre);
-  color: var(--color-texte-doux);
-  font-family: var(--font-corps);
-  font-size: var(--micro-size);
+  background: none;
+  text-align: center;
 }
 
-.fragment img {
-  width: 57px;
-  height: 79px;
+/* Format haut (Uriel, 27/09) : la tuile sable garde le rapport du motif, 57 × 79. */
+.motifVignette {
+  display: grid;
+  place-content: center;
+  width: 88px;
+  height: 122px;
+  border-radius: var(--radius);
+  background: var(--color-barre);
+}
+
+.motifVignette img {
+  width: 68px;
+  height: 94px;
   object-fit: contain;
   opacity: 0.8;
 }
 
-.choisi {
+.nom {
+  max-width: 88px;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+.choisi .motifVignette {
   outline: 1.5px solid var(--color-ocre);
 }
 

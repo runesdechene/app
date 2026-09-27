@@ -60,6 +60,13 @@
   --titre-leading: 1.1;
   --titre-tracking: 0.01em;
 
+  /* Tailles propres au profil (maquette COMPTE 89:124) */
+  --titre-detail-size: 1.375rem; /* « MON COMPTE », en tête d'un détail : 22 px */
+  --nom-profil-size: 1.75rem; /* le nom sous le portrait : 28 px */
+  --rangee-size: 1.125rem; /* « Ses fragments », onglets des découvertes : 18 px */
+  --bio-size: 0.875rem; /* la présentation : 14 px (Uriel, 27/09 : un cran sous la maquette) */
+  --bio-leading: 1.29;
+
   /* Styles de texte — Cabin */
   --corps-size: 1rem;
   --sous-titre-size: 0.875rem;
@@ -91,6 +98,7 @@
   --radius-petit: 8px;
   --radius: 10px;
   --radius-carte: 15px;
+  --radius-feuille: 20px; /* la feuille « Ses découvertes » */
   --radius-rond: 999px;
   --ombre-bouton: 0 0 8px 5px color-mix(in srgb, var(--color-sable) 40%, transparent);
 

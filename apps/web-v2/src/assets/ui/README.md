@@ -14,6 +14,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `onglet-codex.png`     | 122 × 175       | icône de l'onglet Codex                                    |
 | `onglet-campement.png` | 338 × 342       | icône de l'onglet Campement                                |
 | `partager.svg`         | vectoriel       | exemple d'IconButton sur /v2/da (fiche lieu, « partager ») |
+| `fond-section.png`     | 390 × 867       | fond des détails (maquette COMPTE, parchemin à 50 % inclus) |
 | `fleche-retour.svg`    | 24 × 24         | retour, en tête de chaque détail (maquette COMPTE)         |
 | `coche.svg`            | 10 × 10         | badge « Porteur vérifié »                                  |
 | `etoile.svg`           | 10 × 10         | badge de rôle (« Admin »)                                  |

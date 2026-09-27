@@ -18,7 +18,7 @@
   background: none;
   color: var(--color-texte-pale);
   font-family: var(--font-titre);
-  font-size: var(--rubrique-size);
+  font-size: var(--rangee-size);
   letter-spacing: var(--titre-tracking);
   white-space: nowrap;
 }

@@ -11,21 +11,20 @@
   padding-top: env(safe-area-inset-top);
 }
 
-/* Le même parchemin que les écrans, à moitié (maquette COMPTE : fond à 50 %). */
+/* Le fond de la maquette COMPTE, rendu tel quel (parchemin déjà à 50 % dans l'image). */
 .pane::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
-  opacity: 0.5;
+  background: url('../../assets/ui/fond-section.png') center top / 100% auto no-repeat;
   pointer-events: none;
 }
 
 .header {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-2);
+  gap: 0; /* la flèche (cible de 44 px) touche le titre, comme sur la maquette */
   padding: var(--space-4) var(--space-3) var(--space-2) var(--space-2);
 }
 
@@ -34,17 +33,20 @@
   place-content: center;
   min-width: var(--cible-tactile);
   min-height: var(--cible-tactile);
-  margin-top: calc(var(--space-2) * -1);
   padding: 0;
   border: none;
   background: none;
 }
 
 .title {
+  display: flex; /* centré sur la flèche, dans la même hauteur de 44 px */
   flex: 1;
+  align-items: center;
+  min-height: var(--cible-tactile);
   margin: 0;
+  font-weight: var(--weight-normal); /* Bebas Neue n'a pas de gras : sans ça, un faux gras */
   font-family: var(--font-titre);
-  font-size: var(--titre-section-size);
+  font-size: var(--titre-detail-size);
   line-height: var(--titre-leading);
   color: var(--color-encre);
 }
@@ -55,6 +57,8 @@
 
 .actions {
   display: grid;
+  margin-top: var(--space-3);
+  margin-left: var(--space-2);
   justify-items: end;
   gap: var(--space-1);
 }
