@@ -26,7 +26,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   if (profil.fragments.length === 0) return null
 
-  // Le motif en format haut, son nom en entier dessous (maquette 123:107).
+  // Une carte de collection : le motif, un trait, son nom en entier (maquette 123:107).
   function vignette(f: Fragment) {
     return (
       <>
