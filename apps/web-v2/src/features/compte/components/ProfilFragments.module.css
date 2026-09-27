@@ -41,14 +41,15 @@
 .fragment {
   display: grid;
   flex: 0 0 auto;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 120px auto;
+  gap: 5px;
   justify-items: center;
   width: 106px;
-  height: 146px;
+  height: 163px;
   margin: 0;
-  padding: var(--space-3) var(--space-2) var(--space-3);
-  border: none; /* un fond plus sombre suffit, sans ombre ; seul le signe choisi porte un liseré (Uriel, 27/09) */
-  border-radius: var(--radius);
+  padding: 13px var(--space-2) var(--space-2);
+  border: none; /* un fond parchemin suffit, sans ombre ; seul le signe choisi porte un liseré (Uriel, 27/09) */
+  border-radius: var(--radius-tuile);
   background: var(--color-vignette);
   text-align: center;
 }
@@ -56,12 +57,21 @@
 /* Le motif remplit la tuile, un peu estompé sur le parchemin (Uriel, 27/09). */
 .motifVignette img {
   width: 86px;
-  height: 104px;
+  height: 120px;
   object-fit: contain;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-/* Le nom dans la tuile, en capitales condensées (maquette). */
+/* Le nom du motif, en Bebas Neue : étroit, il tient en entier sans être coupé (Figma 123:107). */
+.nomMotif {
+  color: var(--color-texte);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--libelle-tracking);
+}
+
+/* « à découvrir », en capitales condensées. */
 .nom {
   max-width: 94px;
   overflow: hidden;
@@ -82,9 +92,9 @@
   place-content: center;
   gap: var(--space-1);
   width: 106px;
-  height: 146px;
+  height: 163px;
   border: 1px dashed var(--color-bord);
-  border-radius: var(--radius);
+  border-radius: var(--radius-tuile);
   background: color-mix(in srgb, var(--color-barre) 35%, transparent);
   text-align: center;
 }

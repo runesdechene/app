@@ -60,6 +60,7 @@ export const RADIUS_TOKENS = [
   '--radius-vignette',
   '--radius-petit',
   '--radius',
+  '--radius-tuile',
   '--radius-carte',
   '--radius-feuille',
   '--radius-rond',

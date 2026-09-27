@@ -34,7 +34,7 @@
   --color-succes: #5c8f41; /* texte du badge « Porteur vérifié » */
   --color-succes-fond: #d1f9dc;
   --color-pastille: #f6e1c3; /* fond des titres portés */
-  --color-vignette: #eedcbd; /* fond des Fragments collectés : un parchemin plus sombre, sans ombre */
+  --color-vignette: #eae1d3; /* fond des Fragments collectés : un parchemin sombre, sans ombre (Figma 123:107) */
   --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
   --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */
   --color-feuille: #fff9f0; /* la feuille « Ses découvertes » */
@@ -99,6 +99,7 @@
   --radius-vignette: 5px;
   --radius-petit: 8px;
   --radius: 10px;
+  --radius-tuile: 12px; /* les tuiles des Fragments collectés */
   --radius-carte: 15px;
   --radius-feuille: 20px; /* la feuille « Ses découvertes » */
   --radius-rond: 999px;

@@ -5,7 +5,8 @@
  *            à droite du titre du détail (BadgesExplorateur). Chaque titre s'explique au
  *            toucher (comment il a été gagné) ; le signe veille en filigrane derrière l'en-tête.
  * ATTENTION — `attache` arrive complète de la base (« Noble représentant des Alpes-Maritimes »,
- *            article officiel INSEE) : on l'affiche telle quelle, sans la recomposer.
+ *            article officiel INSEE) : on l'affiche telle quelle, sans la recomposer. Sa
+ *            silhouette (la forme du département) se dessine en pochoir devant (migration 362).
  */
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -98,7 +99,20 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
           <p className={styles.depuis}>
             Explorateur depuis le {DATE_LONGUE.format(new Date(profil.inscritLe))}
           </p>
-          {profil.attache && <p className={styles.attache}>{profil.attache}</p>}
+          {profil.attache && (
+            <p className={styles.attache}>
+              {profil.attache.silhouette && (
+                <svg
+                  className={styles.silhouette}
+                  viewBox={profil.attache.silhouette.viewBox}
+                  aria-hidden="true"
+                >
+                  <path d={profil.attache.silhouette.d} />
+                </svg>
+              )}
+              {profil.attache.texte}
+            </p>
+          )}
         </div>
 
         <div className={styles.action}>

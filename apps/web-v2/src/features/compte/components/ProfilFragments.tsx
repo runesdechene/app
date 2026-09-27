@@ -26,14 +26,14 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   if (profil.fragments.length === 0) return null
 
-  // Le motif en format haut, son nom en capitales dans la tuile (maquette 123:107).
+  // Le motif en format haut, son nom en entier dessous (maquette 123:107).
   function vignette(f: Fragment) {
     return (
       <>
         <span className={styles.motifVignette}>
           {f.imageUrl && <img src={f.imageUrl} alt="" draggable={false} />}
         </span>
-        <span className={styles.nom}>{f.nom}</span>
+        <span className={styles.nomMotif}>{f.nom}</span>
       </>
     )
   }

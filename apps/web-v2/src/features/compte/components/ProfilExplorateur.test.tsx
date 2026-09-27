@@ -42,7 +42,10 @@ const PROFIL: ExplorateurProfile = {
   inscritLe: '2024-09-30T10:00:00+00:00',
   porteurVerifie: true,
   role: 'admin',
-  attache: 'Noble représentant des Alpes-Maritimes',
+  attache: {
+    texte: 'Noble représentant des Alpes-Maritimes',
+    silhouette: { d: 'M 0 0 L 1 0 1 -1 Z', viewBox: '0 -1 1 1' },
+  },
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: null }],
   ajoutes: [carte('p1', 'Dolmen de la Pierre Levée')],
   visites: [carte('p2', 'Abbaye du Thoronet', 'Gautier de Bilskirnir')],

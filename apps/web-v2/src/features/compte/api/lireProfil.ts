@@ -3,7 +3,7 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit les migrations 354-360. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-362. Un champ ajouté là-bas s'ajoute ici.
  */
 import type { ConditionTitre } from '../lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from './lire'
@@ -23,6 +23,9 @@ export type Titre = { id: number; nom: string }
 export type TitrePorte = Titre & { condition: ConditionTitre | null }
 export type Signe = { id: number; nom: string; imageUrl: string | null }
 export type Fragment = { id: number; nom: string; imageUrl: string | null }
+// La forme du département (ou du pays), prête pour un <path> SVG (migration 362).
+export type Silhouette = { d: string; viewBox: string }
+export type Attache = { texte: string; silhouette: Silhouette | null }
 
 export type ExplorateurProfile = {
   id: string
@@ -35,7 +38,7 @@ export type ExplorateurProfile = {
   inscritLe: string
   porteurVerifie: boolean
   role: 'admin' | 'moderator' | null
-  attache: string | null
+  attache: Attache | null
   fragments: Fragment[]
   ajoutes: Lieu[]
   visites: Lieu[]
@@ -104,6 +107,16 @@ function fragment(v: unknown): Fragment {
   return { id: nombre(o.id), nom: chaine(o.nom), imageUrl: ouNull(chaine)(o.imageUrl) }
 }
 
+function attache(v: unknown): Attache {
+  const o = objet(v)
+  return { texte: chaine(o.texte), silhouette: ouNull(silhouette)(o.silhouette) }
+}
+
+function silhouette(v: unknown): Silhouette {
+  const o = objet(v)
+  return { d: chaine(o.d), viewBox: chaine(o.viewBox) }
+}
+
 function role(v: unknown): 'admin' | 'moderator' | null {
   return v === 'admin' || v === 'moderator' ? v : null
 }
@@ -123,7 +136,7 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       inscritLe: chaine(o.inscritLe),
       porteurVerifie: booleen(o.porteurVerifie),
       role: role(o.role),
-      attache: ouNull(chaine)(o.attache),
+      attache: ouNull(attache)(o.attache),
       fragments: liste(fragment)(o.fragments),
       ajoutes: liste(lieu)(o.ajoutes),
       visites: liste(lieu)(o.visites),
