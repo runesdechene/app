@@ -13,6 +13,11 @@ Trois qualités visées : **plus simple, plus propre, orientée marque**.
 
 ### Le principe qui commande tout
 
+> **Révisé le 27/09/2026 — la V2 met fin à la compétition sans fin.** Elle garde la
+> progression visible (niveau, titres, coups d'éclat) et des podiums **qui bougent** : mensuels,
+> remis à zéro, mis en avant ; plus un panthéon éternel. Ce qui tombe, c'est la guerre
+> perpétuelle (Coupe, Cour, capture à distance). *Formule d'origine, conservée pour mémoire :*
+>
 > **La V2 n'enlève pas la progression. Elle enlève la comparaison.**
 > « Moi contre moi-même » : je crée mon profil, j'explore, je progresse — et mes pairs
 > me **félicitent** au lieu de me classer.
@@ -49,9 +54,11 @@ Tout ce qui relève de la **compétition entre joueurs** :
 
 > ✅ **Le niveau reste — révisé le 27/09/2026.** Uriel : la fierté sociale est le sel du jeu
 > (niveau, titres, coups d'éclat). Figer les niveaux V1 en sceau a été écarté : injuste pour les
-> futurs joueurs. **La frontière devient : progression visible oui, classement non.** Aucun
-> tableau, podium ni rang qui ordonne les joueurs entre eux. Ce qui nourrit le niveau en V2 est
-> à définir (l'énergie, les énigmes et la Cour ne l'alimentent plus).
+> futurs joueurs. **Podiums mensuels (remis à zéro, mis en avant) + panthéon éternel** : c'est
+> la compétition **sans fin** qui tombe, pas le classement. **L'XP vient des gestes** : visiter
+> sur place et réunir un fragment (forte), ajouter ou enrichir un lieu et répondre à un appel
+> (moyenne), les énigmes à leur réveil ; **jamais la découverte à distance**, devenue gratuite
+> (sinon cliquer 3 000 pastilles ferait monter de niveau). Montants exacts à régler.
 
 > ⚠️ **« Quêtes du jour » n'est pas « Missions ».** Les Quêtes étaient la boucle de rétention
 > quotidienne, et elles tombent. Les **Missions** — les appels photo de la marque, source
