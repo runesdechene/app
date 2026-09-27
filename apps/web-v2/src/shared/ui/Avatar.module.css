@@ -28,6 +28,12 @@
   font-size: var(--titre-carte-size);
 }
 
+.moyen {
+  width: 96px;
+  height: 96px;
+  font-size: var(--titre-ecran-size);
+}
+
 .grand {
   width: 120px;
   height: 120px;

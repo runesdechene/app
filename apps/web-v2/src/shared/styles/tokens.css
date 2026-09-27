@@ -34,6 +34,7 @@
   --color-succes: #5c8f41; /* texte du badge « Porteur vérifié » */
   --color-succes-fond: #d1f9dc;
   --color-pastille: #f6e1c3; /* fond des titres portés */
+  --color-choisie: #f1dcc0; /* fond d'une pastille choisie (Modifier mon profil) */
   --color-vignette: #ead3ad; /* bas du dégradé des cartes de Fragments : un parchemin doré (Figma 123:107) */
   --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
   --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */

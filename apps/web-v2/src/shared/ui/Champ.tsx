@@ -2,6 +2,7 @@
  * QUOI     — un champ de saisie avec son libellé (« TON NOM ») et, si besoin, une limite et une aide.
  * POURQUOI — la limite se tient à la saisie : un texte collé trop long est coupé tout de suite,
  *            le compteur passe au rouge, et le serveur ne refuse jamais rien pour ça.
+ *            Une `icone` facultative se pose à gauche dans la saisie (Instagram).
  * ATTENTION — on compte les caractères VISIBLES (graphèmes) : un drapeau 🇫🇷 compte pour un et
  *            n'est jamais coupé en deux. Un texte déjà trop long (écrit ailleurs, en V1) n'est
  *            pas coupé d'office : il peut seulement raccourcir.
@@ -30,6 +31,7 @@ export function Champ({
   multiligne = false,
   max,
   aide,
+  icone,
 }: {
   libelle: string
   valeur: string
@@ -37,6 +39,7 @@ export function Champ({
   multiligne?: boolean
   max?: number
   aide?: string
+  icone?: string
 }) {
   const id = useId()
   const saisir = (texte: string) => {
@@ -61,14 +64,17 @@ export function Champ({
           }}
         />
       ) : (
-        <input
-          id={id}
-          className={styles.saisie}
-          value={valeur}
-          onChange={(e) => {
-            saisir(e.target.value)
-          }}
-        />
+        <div className={styles.cadre}>
+          {icone && <img className={styles.icone} src={icone} alt="" />}
+          <input
+            id={id}
+            className={[styles.saisie, icone && styles.avecIcone].filter(Boolean).join(' ')}
+            value={valeur}
+            onChange={(e) => {
+              saisir(e.target.value)
+            }}
+          />
+        </div>
       )}
       {(aide !== undefined || max !== undefined) && (
         <p className={styles.pied}>

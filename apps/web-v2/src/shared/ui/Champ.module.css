@@ -24,7 +24,25 @@
   font-family: var(--font-corps);
   font-size: var(--corps-size);
   line-height: var(--corps-leading);
-  resize: vertical;
+  resize: none;
+  field-sizing: content; /* la présentation s'affiche en entier, sans ascenseur (maquette 91:107) */
+}
+
+.cadre {
+  position: relative;
+}
+
+.icone {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  width: 18px;
+  height: 18px;
+  translate: 0 -50%;
+}
+
+.avecIcone {
+  padding-left: calc(var(--space-4) + 18px + 10px);
 }
 
 .saisie:focus-visible {

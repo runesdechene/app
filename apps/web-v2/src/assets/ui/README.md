@@ -22,6 +22,8 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `cloche.svg`, `calendrier.svg`, `pas.svg`, `repere.svg`, `courriel.svg`, `question.svg` | 22 × 22 | icônes des lignes de Préférences (maquette 91:166) |
 | `coeur.svg`            | 22 × 22         | Préférences, « Montrer tes envies » (Lucide « heart », même trait) |
 | `chevron.svg`          | 18 × 18         | fin des lignes qui ouvrent quelque chose (Préférences)            |
+| `appareil-photo.svg`   | 14 × 14         | « Changer la photo » (Modifier mon profil, maquette 91:107)       |
+| `coche-choisie.svg`    | 12 × 12         | coche rouge d'une pastille choisie (titres portés)                |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
 couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)

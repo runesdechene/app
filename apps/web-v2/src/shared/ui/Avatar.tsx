@@ -1,8 +1,8 @@
 /**
  * QUOI     — le portrait rond d'un Explorateur : sa photo, ou l'initiale de son nom.
  * POURQUOI — beaucoup n'ont pas de photo ; un cercle avec l'initiale vaut mieux qu'un vide.
- *            Trois tailles : « mini » (auteur d'un lieu), « petit » (menu, listes), « grand »
- *            (tête du profil, 120 px).
+ *            Quatre tailles : « mini » (auteur d'un lieu), « petit » (menu, listes), « moyen »
+ *            (Modifier mon profil, 96 px), « grand » (tête du profil, 120 px).
  */
 import styles from './Avatar.module.css'
 
@@ -13,7 +13,7 @@ export function Avatar({
 }: {
   url: string | null
   nom: string
-  taille: 'mini' | 'petit' | 'grand'
+  taille: 'mini' | 'petit' | 'moyen' | 'grand'
 }) {
   const className = [styles.avatar, styles[taille]].join(' ')
   if (url) return <img className={className} src={url} alt={nom} />

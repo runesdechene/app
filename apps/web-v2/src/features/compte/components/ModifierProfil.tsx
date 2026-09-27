@@ -7,6 +7,8 @@
  *            bouton : l'Explorateur ne perd jamais ce qu'il a écrit.
  */
 import { useEffect, useRef, useState } from 'react'
+import appareilPhoto from '@/assets/ui/appareil-photo.svg'
+import instagram from '@/assets/ui/instagram.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
@@ -116,7 +118,7 @@ function Formulaire({
       }}
     >
       <div className={styles.photo}>
-        <Avatar url={photo?.apercu ?? valeurs.avatarUrl} nom={valeurs.nom} taille="grand" />
+        <Avatar url={photo?.apercu ?? valeurs.avatarUrl} nom={valeurs.nom} taille="moyen" />
         <input
           ref={choixPhoto}
           type="file"
@@ -127,9 +129,10 @@ function Formulaire({
             if (fichier) setPhoto({ fichier, apercu: URL.createObjectURL(fichier) })
           }}
         />
-        <Button kind="discret" onClick={() => choixPhoto.current?.click()}>
+        <button type="button" className={styles.changerPhoto} onClick={() => choixPhoto.current?.click()}>
+          <img src={appareilPhoto} alt="" />
           Changer la photo
-        </Button>
+        </button>
       </div>
 
       <Champ
@@ -151,6 +154,7 @@ function Formulaire({
       />
       <Champ
         libelle="Ton Instagram"
+        icone={instagram}
         valeur={valeurs.instagram}
         onChange={(v) => {
           changer('instagram', v)
@@ -173,7 +177,6 @@ function Formulaire({
             <PastilleChoix
               key={t.id}
               libelle={t.nom}
-              marque="✦"
               choisie={valeurs.titres.includes(t.id)}
               onClick={() => {
                 basculerTitre(t.id)
@@ -190,16 +193,21 @@ function Formulaire({
             Tes titres s’accordent au
           </Text>
         </legend>
-        <div className={styles.pastilles}>
+        {/* Deux segments, l'un ou l'autre (maquette 91:107). */}
+        <div className={styles.segments} role="radiogroup" aria-label="Accord des titres">
           {ACCORDS.map((a) => (
-            <PastilleChoix
+            <button
               key={a.id}
-              libelle={a.libelle}
-              choisie={valeurs.accord === a.id}
+              type="button"
+              role="radio"
+              aria-checked={valeurs.accord === a.id}
+              className={styles.segment}
               onClick={() => {
                 changer('accord', a.id)
               }}
-            />
+            >
+              {a.libelle}
+            </button>
           ))}
         </div>
       </fieldset>

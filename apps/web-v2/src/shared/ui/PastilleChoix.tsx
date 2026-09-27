@@ -5,6 +5,7 @@
  *            `marque` (✦ pour un haut fait) précède le libellé ; toutes les pastilles ont la
  *            même hauteur, marque ou non (décision d'Uriel, 27/09).
  */
+import coche from '@/assets/ui/coche-choisie.svg'
 import styles from './PastilleChoix.module.css'
 
 export function PastilleChoix({
@@ -18,13 +19,13 @@ export function PastilleChoix({
   marque?: string
   onClick?: () => void
 }) {
-  const className = [styles.pastille, choisie && styles.choisie].filter(Boolean).join(' ')
+  const className = [styles.pastille, onClick && styles.choix, choisie && styles.choisie]
+    .filter(Boolean)
+    .join(' ')
   const contenu = (
     <>
       {choisie && onClick ? (
-        <span className={styles.coche} aria-hidden="true">
-          ✓
-        </span>
+        <img className={styles.coche} src={coche} alt="" />
       ) : (
         marque && (
           <span className={styles.marque} aria-hidden="true">

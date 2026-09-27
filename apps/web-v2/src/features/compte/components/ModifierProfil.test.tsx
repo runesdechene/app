@@ -108,7 +108,7 @@ test('Enregistrer écrit le profil, les titres changés, l’accord, puis revien
   await userEvent.clear(nom)
   await userEvent.type(nom, 'Uriel L.')
   await userEvent.click(screen.getByRole('button', { name: 'Hoplite' }))
-  await userEvent.click(screen.getByRole('button', { name: /Féminin/ }))
+  await userEvent.click(screen.getByRole('radio', { name: /Féminin/ }))
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
   expect(api.enregistrerProfil).toHaveBeenCalledWith({
     nom: 'Uriel L.',

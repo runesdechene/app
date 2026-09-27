@@ -3,14 +3,35 @@
  */
 .formulaire {
   display: grid;
-  gap: var(--space-6);
+  gap: 28px; /* maquette 91:107 */
   padding: var(--space-4) var(--space-6) var(--space-8);
 }
 
 .photo {
   display: grid;
   justify-items: center;
-  gap: var(--space-1);
+  gap: var(--space-3);
+}
+
+/* « Changer la photo » : une pastille ocre avec son appareil photo. */
+.changerPhoto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px var(--space-3);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ocre) 14%, transparent);
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+}
+
+.changerPhoto img {
+  width: 14px;
+  height: 14px;
 }
 
 .groupe {
@@ -31,6 +52,30 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+.segments {
+  display: flex;
+  gap: var(--space-1);
+  padding: 5px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-vignette) 57%, transparent);
+}
+
+.segment {
+  flex: 1;
+  padding: var(--space-2) 0;
+  border: none;
+  border-radius: var(--radius-petit);
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+}
+
+.segment[aria-checked='true'] {
+  background: var(--color-surface);
+  color: var(--color-encre);
 }
 
 .avertissement {
