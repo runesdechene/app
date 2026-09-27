@@ -42,6 +42,12 @@
 
 - [ ] **2 migrations orphelines non filées** — `grade_founding_always_counts_306/307` (appliquées prod via MCP le 25/06, SQL perdu au `repair --reverted`). Effet **superseded** par 306/307/311/312/318 → repo = source de vérité OK ; à reconstituer seulement si on veut un repo 100 % rejouable.
 
+## V2 — zone Compte, suites (27/09)
+
+- [ ] **Article de chaque Fragment dans le Hub** — un champ (« l' », « le », « la », aucun) pour que le profil dise juste *sous le signe de l'Hoplite / du Varègue / d'Avalon*. Remplace la règle approchée de `apps/web-v2/src/features/compte/lib/signe.ts` (décision d'Uriel).
+- [ ] **Titres offerts** — table (qui, quel titre, pourquoi, quand, offert par), action « Offrir un titre » dans le Hub réservée à Uriel, marque propre et feuille « Offert par Runes de Chêne — pourquoi, quand » dans la V2. Rares, jamais liés à un achat.
+- [ ] **Page « Tous les titres »** — maquette en cours ; les compteurs existent déjà (`get_all_player_titles().stats`).
+
 ## Idées non instruites
 
 - [ ] **Système d'emails séquencés** — brouillon de schéma jamais appliqué : `docs/db/drafts/systeme-emails-BROUILLON.sql` (tables `email_subscribers`, `email_sequences`, séquences `shopify_welcome` / `app_welcome` / `post_order` en J1/J3/J7/J10). Aucune de ces tables n'existe en prod ni dans le repo. À instruire ou à jeter — pas à appliquer tel quel.
