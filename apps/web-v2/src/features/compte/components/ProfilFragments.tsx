@@ -33,7 +33,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
 
   return (
     <section className={styles.fragments} aria-label="Ses fragments">
-      <Text variant="rubrique">Ses fragments</Text>
+      <h2 className={styles.titre}>Fragments</h2>
       {/* Une seule ligne qui défile, comme en V1 : cadre flex > rangée flex: 1 qui défile >
           vignettes à largeur fixe (règle « carrousel » de .claude/rules/interface.md). */}
       <div className={styles.cadre}>

@@ -11,6 +11,5 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `Avatar` — photo ronde, ou l'initiale ; petit (menu) ou grand (profil).
 - `Interrupteur` — le switch des Préférences ; `role="switch"`.
 - `Feuille` — le panneau qui monte du bas (menu avatar) ; voile et Échap ferment.
-- `Onglets` — rangée d'onglets Bebas Neue avec compte (découvertes du profil).
 - `Champ` — saisie avec libellé, aide et limite tenue à la frappe.
 - `PastilleChoix` — un titre porté : en lecture, ou à choisir.

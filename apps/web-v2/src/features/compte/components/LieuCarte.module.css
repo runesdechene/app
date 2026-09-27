@@ -1,0 +1,75 @@
+/*
+ * QUOI     — carte de lieu 114 × 155 aux coins arrondis, nom en Bebas Neue, ligne de détails
+ *            en Cabin Condensed (maquette « sous le signe de l'Hoplite »).
+ */
+.carte {
+  display: grid;
+  flex: 0 0 auto;
+  align-content: start;
+  gap: var(--space-1);
+  width: 114px;
+}
+
+.photo {
+  display: grid;
+  place-content: center;
+  width: 114px;
+  height: 155px;
+  overflow: hidden;
+  border-radius: var(--radius-carte);
+  background: var(--color-barre);
+}
+
+.photo img {
+  width: 114px;
+  height: 155px;
+  object-fit: cover;
+}
+
+.nom {
+  margin-top: var(--space-1);
+  overflow: hidden;
+  color: var(--color-texte);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  line-height: var(--titre-leading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-texte-pale);
+  font-family: var(--font-condensee);
+  font-size: var(--meta-size);
+}
+
+/* Pochoir de la catégorie : sa forme en blanc, sur un rond de sa couleur. */
+.categorie {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border-radius: var(--radius-rond);
+  background: var(--nuance);
+}
+
+.categorie::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--color-sur-accent);
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.auteur {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  overflow: hidden;
+  color: var(--color-texte-pale);
+  font-family: var(--font-condensee);
+  font-size: var(--micro-size);
+  white-space: nowrap;
+}

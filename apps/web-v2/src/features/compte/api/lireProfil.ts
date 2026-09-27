@@ -3,12 +3,22 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit les migrations 354-356. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-358. Un champ ajouté là-bas s'ajoute ici.
  */
 import type { ConditionTitre } from '../lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from './lire'
 
-export type Lieu = { id: string; nom: string; imageUrl: string | null }
+export type Categorie = { icone: string; couleur: string }
+export type Auteur = { id: string; nom: string; avatarUrl: string | null }
+export type Lieu = {
+  id: string
+  nom: string
+  imageUrl: string | null
+  latitude: number | null
+  longitude: number | null
+  categorie: Categorie | null
+  auteur: Auteur | null
+}
 export type Titre = { id: number; nom: string }
 export type TitrePorte = Titre & { condition: ConditionTitre | null }
 export type Signe = { id: number; nom: string; imageUrl: string | null }
@@ -37,7 +47,34 @@ export type ExplorateurProfile = {
 // Chaque lecteur (lire.ts) rend la valeur ou lève une erreur, que lireProfil change en `null`.
 function lieu(v: unknown): Lieu {
   const o = objet(v)
-  return { id: chaine(o.id), nom: chaine(o.nom), imageUrl: ouNull(chaine)(o.imageUrl) }
+  return {
+    id: chaine(o.id),
+    nom: chaine(o.nom),
+    imageUrl: ouNull(chaine)(o.imageUrl),
+    latitude: facultatif(nombre, o.latitude),
+    longitude: facultatif(nombre, o.longitude),
+    categorie: facultatif(categorie, o.categorie),
+    auteur: facultatif(auteur, o.auteur),
+  }
+}
+
+// Les détails d'une carte sont facultatifs : absents ou illisibles, la carte s'affiche sans.
+function facultatif<T>(lire: (v: unknown) => T, v: unknown): T | null {
+  try {
+    return v === null || v === undefined ? null : lire(v)
+  } catch {
+    return null
+  }
+}
+
+function categorie(v: unknown): Categorie {
+  const o = objet(v)
+  return { icone: chaine(o.icone), couleur: chaine(o.couleur) }
+}
+
+function auteur(v: unknown): Auteur {
+  const o = objet(v)
+  return { id: chaine(o.id), nom: chaine(o.nom), avatarUrl: ouNull(chaine)(o.avatarUrl) }
 }
 
 function titre(v: unknown): TitrePorte {

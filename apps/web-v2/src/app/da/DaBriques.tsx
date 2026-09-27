@@ -12,7 +12,6 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { Feuille } from '@/shared/ui/Feuille'
 import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
-import { Onglets } from '@/shared/ui/Onglets'
 import { Pastille } from '@/shared/ui/Pastille'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { Text } from '@/shared/ui/Text'
@@ -24,19 +23,12 @@ const PRESENTATION_PLEINE =
     3,
   )
 
-const DECOUVERTES = [
-  { id: 'ajoutes', libelle: 'Ajoutés', compte: 2 },
-  { id: 'visites', libelle: 'Visités', compte: 18 },
-  { id: 'envies', libelle: "Envie d'y aller" },
-] as const
-
 function rien() {
   return undefined
 }
 
 export function DaBriques() {
   const [allume, setAllume] = useState(true)
-  const [onglet, setOnglet] = useState<(typeof DECOUVERTES)[number]['id']>('visites')
   const [nom, setNom] = useState('Uriel')
   const [presentation, setPresentation] = useState(PRESENTATION_PLEINE.slice(0, 300))
 
@@ -94,6 +86,7 @@ export function DaBriques() {
         <div className={styles.rangee}>
           <Avatar url={null} nom="Claire" taille="grand" />
           <Avatar url={null} nom="Uriel" taille="petit" />
+          <Avatar url={null} nom="Gautier" taille="mini" />
           <Text variant="legende">Sans photo : l’initiale. Avec photo : l’image, même cadre.</Text>
         </div>
       </DaSection>
@@ -104,10 +97,6 @@ export function DaBriques() {
           <Interrupteur libelle="Éteint" actif={false} onChange={rien} />
           <Interrupteur libelle="Désactivé" actif desactive onChange={rien} />
         </div>
-      </DaSection>
-
-      <DaSection name="Onglets">
-        <Onglets onglets={DECOUVERTES} actif={onglet} onChange={setOnglet} />
       </DaSection>
 
       <DaSection name="Champ">

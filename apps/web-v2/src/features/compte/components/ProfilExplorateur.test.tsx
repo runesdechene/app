@@ -16,6 +16,20 @@ const fetchExplorateur = vi.hoisted(() =>
 vi.mock('../api/explorateur', () => ({ fetchExplorateur }))
 const choisirSigne = vi.hoisted(() => vi.fn(() => Promise.resolve()))
 vi.mock('../api/monProfil', () => ({ choisirSigne }))
+const position = vi.hoisted(() =>
+  vi.fn(() => Promise.resolve<{ latitude: number; longitude: number } | null>(null)),
+)
+vi.mock('../api/position', () => ({ positionSiAutorisee: position }))
+
+const carte = (id: string, nom: string, auteur: string | null = null) => ({
+  id,
+  nom,
+  imageUrl: null,
+  latitude: 43.2965,
+  longitude: 5.3698,
+  categorie: { icone: 'https://x/ruines.svg', couleur: '#a9260f' },
+  auteur: auteur ? { id: 'a' + id, nom: auteur, avatarUrl: null } : null,
+})
 
 const PROFIL: ExplorateurProfile = {
   id: 'u1',
@@ -30,9 +44,9 @@ const PROFIL: ExplorateurProfile = {
   role: 'admin',
   attache: 'Noble représentant des Alpes-Maritimes',
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: null }],
-  ajoutes: [{ id: 'p1', nom: 'Dolmen de la Pierre Levée', imageUrl: null }],
-  visites: [{ id: 'p2', nom: 'Abbaye du Thoronet', imageUrl: null }],
-  envies: [{ id: 'p3', nom: 'Mont Bégo', imageUrl: null }],
+  ajoutes: [carte('p1', 'Dolmen de la Pierre Levée')],
+  visites: [carte('p2', 'Abbaye du Thoronet', 'Gautier de Bilskirnir')],
+  envies: [carte('p3', 'Mont Bégo')],
   signe: null,
   estMoi: true,
 }
@@ -76,28 +90,9 @@ test('l’en-tête dit qui il est', async () => {
   )
 })
 
-test('envies masquées : pas d’onglet « Envie d’y aller » du tout', async () => {
-  afficher({ ...PROFIL, estMoi: false, envies: null })
-  await screen.findByRole('tab', { name: /Ajoutés/ })
-  expect(screen.queryByRole('tab', { name: /Envie d’y aller/ })).toBeNull()
-})
-
-test('changer d’onglet change la grille', async () => {
-  afficher(PROFIL)
-  expect(await screen.findByText('Dolmen de la Pierre Levée')).toBeInTheDocument()
-  await userEvent.click(screen.getByRole('tab', { name: /Visités/ }))
-  expect(screen.getByText('Abbaye du Thoronet')).toBeInTheDocument()
-  expect(screen.queryByText('Dolmen de la Pierre Levée')).toBeNull()
-})
-
 test('Explorateur introuvable : un message, jamais un écran vide', async () => {
   afficher(null)
   expect(await screen.findByText('Cet Explorateur est introuvable')).toBeInTheDocument()
-})
-
-test('l’onglet « Envie d’y aller » a son nombre, comme les autres', async () => {
-  afficher(PROFIL)
-  expect(await screen.findByRole('tab', { name: /Envie d’y aller/ })).toHaveTextContent('1')
 })
 
 test('toucher un titre dit comment il a été gagné', async () => {
@@ -125,4 +120,35 @@ test('sur le profil d’un autre, ses Fragments ne se choisissent pas', async ()
   afficher({ ...PROFIL, estMoi: false })
   await screen.findByText('Hoplite')
   expect(screen.queryByRole('button', { name: /Hoplite/ })).toBeNull()
+})
+
+test('les découvertes en trois sections, chacune avec son nombre', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('region', { name: 'Lieux ajoutés' })).toHaveTextContent('1')
+  expect(screen.getByRole('region', { name: 'Visités' })).toHaveTextContent('Abbaye du Thoronet')
+  expect(screen.getByRole('region', { name: 'Envie d’y aller' })).toHaveTextContent('Mont Bégo')
+})
+
+test('envies masquées : pas de section « Envie d’y aller » du tout', async () => {
+  afficher({ ...PROFIL, estMoi: false, envies: null })
+  await screen.findByRole('region', { name: 'Visités' })
+  expect(screen.queryByRole('region', { name: 'Envie d’y aller' })).toBeNull()
+})
+
+test('un lieu visité dit qui l’a ajouté', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByText('Gautier de Bilskirnir')).toBeInTheDocument()
+})
+
+test('sans position autorisée, aucune distance', async () => {
+  position.mockResolvedValue(null)
+  afficher(PROFIL)
+  await screen.findByText('Abbaye du Thoronet')
+  expect(screen.queryByText(/km/)).toBeNull()
+})
+
+test('avec la position de celui qui regarde, la distance de chaque lieu', async () => {
+  position.mockResolvedValue({ latitude: 43.7102, longitude: 7.262 })
+  afficher(PROFIL)
+  expect(await screen.findAllByText('159 km')).toHaveLength(3)
 })

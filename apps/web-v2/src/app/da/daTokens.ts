@@ -40,7 +40,6 @@ export const DA_SHOWCASED = [
   'Feuille',
   'IconButton',
   'Interrupteur',
-  'Onglets',
   'Pastille',
   'PastilleChoix',
   'Text',

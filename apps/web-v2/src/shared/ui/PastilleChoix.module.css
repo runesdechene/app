@@ -8,7 +8,7 @@
   height: 27px; /* même hauteur pour toutes, marque ou non */
   padding: 0 var(--space-3);
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--radius-rond);
   background: var(--color-pastille);
   color: var(--color-texte);
   font-family: var(--font-corps);

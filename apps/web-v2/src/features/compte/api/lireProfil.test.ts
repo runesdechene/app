@@ -17,7 +17,17 @@ const COMPLET = {
   role: 'admin',
   attache: 'Noble représentant des Alpes-Maritimes',
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' }],
-  ajoutes: [{ id: 'p1', nom: 'Dolmen', imageUrl: null }],
+  ajoutes: [
+    {
+      id: 'p1',
+      nom: 'Dolmen',
+      imageUrl: null,
+      latitude: 43.7,
+      longitude: 7.26,
+      categorie: { icone: 'https://x/dolmen.svg', couleur: '#8c3166' },
+      auteur: { id: 'u1', nom: 'Uriel', avatarUrl: null },
+    },
+  ],
   visites: [],
   envies: null,
   signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
@@ -62,4 +72,17 @@ test('une condition de titre illisible devient null, le titre reste', () => {
 
 test('pas de signe : null', () => {
   expect(lireProfil({ ...COMPLET, signe: null })?.signe).toBeNull()
+})
+
+test('une carte sans coordonnées, catégorie ni auteur reste lisible', () => {
+  const p = lireProfil({ ...COMPLET, visites: [{ id: 'p2', nom: 'Abbaye', imageUrl: null }] })
+  expect(p?.visites[0]).toEqual({
+    id: 'p2',
+    nom: 'Abbaye',
+    imageUrl: null,
+    latitude: null,
+    longitude: null,
+    categorie: null,
+    auteur: null,
+  })
 })
