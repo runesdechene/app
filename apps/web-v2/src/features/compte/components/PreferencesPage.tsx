@@ -3,10 +3,19 @@
  *            ton compte.
  * POURQUOI — des phrases, pas des noms de colonnes : chaque réglage dit ce qu'il change pour
  *            l'Explorateur. « Montrer tes envies » s'ajoute à la maquette (spec Compte).
+ *            Chaque ligne porte son icône de la maquette (`assets/ui/`).
  * ATTENTION — un réglage refusé par la base revient à sa place, avec un message : jamais un
  *            interrupteur qui ment.
  */
 import { useState, type ReactNode } from 'react'
+import calendrier from '@/assets/ui/calendrier.svg'
+import chevron from '@/assets/ui/chevron.svg'
+import cloche from '@/assets/ui/cloche.svg'
+import coeur from '@/assets/ui/coeur.svg'
+import courriel from '@/assets/ui/courriel.svg'
+import pas from '@/assets/ui/pas.svg'
+import question from '@/assets/ui/question.svg'
+import repere from '@/assets/ui/repere.svg'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -35,8 +44,8 @@ export function PreferencesPage() {
   if (!preferences) return null
 
   // Une fonction fléchée (et non `function`) : TypeScript garde `preferences` défini.
-  const ligne = (reglage: Reglage, titre: string, description: string) => (
-    <Ligne titre={titre} description={description}>
+  const ligne = (reglage: Reglage, icone: string, titre: string, description: string) => (
+    <Ligne icone={icone} titre={titre} description={description}>
       <Interrupteur
         libelle={titre}
         actif={preferences[reglage]}
@@ -58,11 +67,13 @@ export function PreferencesPage() {
       <Carte titre="Ce qu’on t’envoie">
         {ligne(
           'pushImportant',
+          cloche,
           'Les nouvelles importantes',
           'Un nouveau fragment, un rendez-vous près de chez toi.',
         )}
         {ligne(
           'pushRecap',
+          calendrier,
           'Le récit de la semaine',
           'Chaque lundi, les lieux retrouvés par les Explorateurs.',
         )}
@@ -71,27 +82,35 @@ export function PreferencesPage() {
       <Carte titre="Ta présence sur la carte">
         {ligne(
           'brouillerPistes',
+          pas,
           'Brouiller tes pistes',
           'Les autres voient ta position à 50 km près, jamais ta porte.',
         )}
         {ligne(
           'showDepartement',
+          repere,
           'Montrer ton département',
           '« Noble représentant de… », déduit de tes visites.',
         )}
-        {ligne('showEnvies', 'Montrer tes envies', 'Tes lieux « Envie d’y aller » sur ton profil.')}
+        {ligne(
+          'showEnvies',
+          coeur,
+          'Montrer tes envies',
+          'Tes lieux « Envie d’y aller » sur ton profil.',
+        )}
       </Carte>
 
       <Carte titre="Ton compte">
         <Email actuel={preferences.email} />
         <a className={styles.ligne} href={SOUMETTRE_PHOTO_URL} target="_blank" rel="noreferrer">
+          <img className={styles.icone} src={question} alt="" />
           <span className={styles.texte}>
             <span className={styles.titre}>Un fragment qui n’apparaît pas ?</span>
             <span className={styles.description}>
               Envoie-nous une photo : on le rattache à ton compte.
             </span>
           </span>
-          <span aria-hidden="true">›</span>
+          <img className={styles.chevron} src={chevron} alt="" />
         </a>
       </Carte>
 
@@ -110,16 +129,19 @@ function Carte({ titre, children }: { titre: string; children: ReactNode }) {
 }
 
 function Ligne({
+  icone,
   titre,
   description,
   children,
 }: {
+  icone: string
   titre: string
   description: string
   children: ReactNode
 }) {
   return (
     <div className={styles.ligne}>
+      <img className={styles.icone} src={icone} alt="" />
       <span className={styles.texte}>
         <span className={styles.titre}>{titre}</span>
         <span className={styles.description}>{description}</span>
@@ -155,13 +177,14 @@ function Email({ actuel }: { actuel: string | null }) {
           setOuvert(!ouvert)
         }}
       >
+        <img className={styles.icone} src={courriel} alt="" />
         <span className={styles.texte}>
           <span className={styles.titre}>Ton adresse e-mail</span>
           <span className={styles.description}>
             {actuel ?? '—'} — c’est elle qui relie tes achats.
           </span>
         </span>
-        <span aria-hidden="true">›</span>
+        <img className={styles.chevron} src={chevron} alt="" />
       </button>
       {ouvert && (
         <div className={styles.changement}>

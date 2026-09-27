@@ -19,6 +19,9 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `etoile.svg`           | 10 × 10         | badge de rôle (« Admin »)                                         |
 | `instagram.svg`        | 18 × 18         | lien Instagram du profil (pochoir, couleur du lien)               |
 | `murmure.svg`          | 16 × 16         | bouton « Envoyer un murmure »                                     |
+| `cloche.svg`, `calendrier.svg`, `pas.svg`, `repere.svg`, `courriel.svg`, `question.svg` | 22 × 22 | icônes des lignes de Préférences (maquette 91:166) |
+| `coeur.svg`            | 22 × 22         | Préférences, « Montrer tes envies » (Lucide « heart », même trait) |
+| `chevron.svg`          | 18 × 18         | fin des lignes qui ouvrent quelque chose (Préférences)            |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
 couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)

@@ -25,7 +25,7 @@
 .ligne {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 14px; /* maquette 91:166 */
   width: 100%;
   min-height: var(--cible-tactile);
   padding: var(--space-3) var(--space-4);
@@ -38,6 +38,18 @@
 
 .carte > * + * {
   border-top: 1px solid color-mix(in srgb, var(--color-bord) 60%, transparent);
+}
+
+.icone {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
 }
 
 .texte {
