@@ -1,19 +1,54 @@
 /**
- * QUOI     — configuration de Vite (serveur de dev, build) et de Vitest (tests).
+ * QUOI     — configuration de Vite (serveur de dev, build, PWA) et de Vitest (tests).
  * POURQUOI — la V2 est servie sous /v2/ : `base` fait pointer tous les fichiers générés
  *            vers /v2/…, et `envDir` lit le même .env racine que la V1 et le Hub.
  * ATTENTION — en dev, le proxy sert la V1 sur le même port : lancer `pnpm dev` (V1) ET
  *            `pnpm dev:v2`, puis tout ouvrir sur http://localhost:5174.
+ *            PWA : portée /v2/ — ce service worker ne touche jamais la V1, et celui de la V1
+ *            ignore /v2 (apps/explore-web/src/sw.ts).
  */
 /// <reference types="vitest/config" />
 import path from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+const FOND = '#fcf3e4' // --color-fond (tokens.css) — le manifeste ne lit pas les variables CSS.
 
 export default defineConfig({
   base: '/v2/',
   envDir: path.resolve(import.meta.dirname, '../..'),
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      scope: '/v2/',
+      includeAssets: ['apple-touch-icon.png'],
+      manifest: {
+        name: 'Runes de Chêne',
+        short_name: 'Runes de Chêne',
+        lang: 'fr',
+        start_url: '/v2/accueil',
+        scope: '/v2/',
+        display: 'standalone',
+        background_color: FOND,
+        theme_color: FOND,
+        icons: [
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'icon-512-maskable.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+      },
+    }),
+  ],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, 'src') },
   },

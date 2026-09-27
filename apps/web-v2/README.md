@@ -30,6 +30,12 @@ La V2 lit la session de la V1 (même origine). En local :
    connecter avec le code reçu par email ;
 3. ouvrir **http://localhost:5174/v2/** : même origine, même session.
 
+## PWA
+
+Installable, portée `/v2/`. Icônes dans `public/` (découpées dans l'emblème du logotype, brut) :
+`icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `apple-touch-icon.png`. Pour les
+remplacer, écraser les fichiers sous le même nom.
+
 ## Où sont les choses
 
 Voir `src/README.md`.
