@@ -55,12 +55,15 @@
   outline: none;
 }
 
-/* Le premier badge se centre sur la ligne du titre (44 px) ; les suivants passent dessous. */
+/* Les badges flottent en haut à droite sans pousser le contenu (Uriel, 27/09) : le premier se
+   centre sur la ligne du titre (44 px), les suivants passent dessous. */
 .actions {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-3);
   display: grid;
   grid-template-rows: var(--cible-tactile);
   place-items: center end;
-  margin-left: var(--space-2);
 }
 
 /* Le contenu ne défile pas seul : tout le panneau défile, en-tête compris (Uriel, 27/09). */
