@@ -4333,6 +4333,7 @@ export type Database = {
           title_gender: string
           tutorial_completed_at: string | null
           updated_at: string
+          v2_access: boolean
           veteran_first_era: boolean
           veteran_welcomed_at: string | null
           vitalite_points: number | null
@@ -4395,6 +4396,7 @@ export type Database = {
           title_gender?: string
           tutorial_completed_at?: string | null
           updated_at?: string
+          v2_access?: boolean
           veteran_first_era?: boolean
           veteran_welcomed_at?: string | null
           vitalite_points?: number | null
@@ -4457,6 +4459,7 @@ export type Database = {
           title_gender?: string
           tutorial_completed_at?: string | null
           updated_at?: string
+          v2_access?: boolean
           veteran_first_era?: boolean
           veteran_welcomed_at?: string | null
           vitalite_points?: number | null
@@ -5074,6 +5077,7 @@ export type Database = {
           title_gender: string | null
           tutorial_completed_at: string | null
           updated_at: string | null
+          v2_access: boolean | null
           veteran_first_era: boolean | null
           veteran_welcomed_at: string | null
           vitalite_points: number | null
@@ -5136,6 +5140,7 @@ export type Database = {
           title_gender?: string | null
           tutorial_completed_at?: string | null
           updated_at?: string | null
+          v2_access?: boolean | null
           veteran_first_era?: boolean | null
           veteran_welcomed_at?: string | null
           vitalite_points?: number | null
@@ -5198,6 +5203,7 @@ export type Database = {
           title_gender?: string | null
           tutorial_completed_at?: string | null
           updated_at?: string | null
+          v2_access?: boolean | null
           veteran_first_era?: boolean | null
           veteran_welcomed_at?: string | null
           vitalite_points?: number | null
@@ -6185,6 +6191,7 @@ export type Database = {
         Args: { p_place_id: string; p_user_id: string }
         Returns: Json
       }
+      has_v2_access: { Args: never; Returns: boolean }
       haversine_km: {
         Args: { lat1: number; lat2: number; lng1: number; lng2: number }
         Returns: number
@@ -6646,6 +6653,10 @@ export type Database = {
       set_user_faction: {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: Json
+      }
+      set_v2_access: {
+        Args: { p_enabled: boolean; p_user_id: string }
+        Returns: undefined
       }
       set_voyage_cover_image: {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
