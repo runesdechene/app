@@ -88,10 +88,10 @@
       'main main main main';
   }
 
-  /* Desktop : le détail devient un panneau à gauche, de la largeur d'un téléphone (390 px,
-     la maquette), sur toute la hauteur de l'écran (Uriel, 27/09). */
+  /* Desktop : le détail devient un panneau à gauche, un peu plus large qu'un téléphone
+     (420 px pour une maquette de 390), sur toute la hauteur de l'écran (Uriel, 27/09). */
   .shell[data-detail='open'] {
-    grid-template-columns: 390px auto 1fr auto auto;
+    grid-template-columns: 420px auto 1fr auto auto;
     grid-template-areas:
       'detail logo nav retour avatar'
       'detail main main main main';
