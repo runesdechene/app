@@ -25,7 +25,7 @@ Node 22.22 minimum (React Router 8).
 
 La V2 lit la session de la V1 (même origine). En local :
 
-1. `pnpm dev` (V1, port 5173) **et** `pnpm dev:v2` (V2, port 5174) ;
+1. `pnpm dev` (V1, port 3000) **et** `pnpm dev:v2` (V2, port 5174) ;
 2. ouvrir **http://localhost:5174/** — c'est la V1, servie par le proxy de la V2 — et se
    connecter avec le code reçu par email ;
 3. ouvrir **http://localhost:5174/v2/** : même origine, même session.

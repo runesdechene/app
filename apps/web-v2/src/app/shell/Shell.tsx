@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : avatar, barre d'onglets, les cinq écrans racines, le détail.
+ * QUOI     — la coquille : logotype, avatar, barre d'onglets, les cinq écrans racines, le détail.
  * POURQUOI — les cinq écrans restent MONTÉS et seul l'actif est visible : leur état et leur
  *            défilement survivent au changement d'onglet sans aucun code de restauration.
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
@@ -12,6 +12,7 @@ import { CampementScreen } from '@/features/campement/components/CampementScreen
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { CodexScreen } from '@/features/codex/components/CodexScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
+import logotype from '@/assets/ui/logotype.png'
 import { tabOf, TABS, type TabId } from '../navigation/tabs'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
@@ -37,6 +38,7 @@ export function Shell() {
 
   return (
     <div className={styles.shell} data-detail={detailOpen ? 'open' : undefined}>
+      <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
       <button
         type="button"
         className={styles.avatar}

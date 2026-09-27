@@ -20,9 +20,9 @@ export default defineConfig({
   server: {
     port: 5174,
     // En local comme en prod, V1 et V2 partagent une origine : tout ce qui n'est pas /v2 part
-    // vers le serveur de dev de la V1 (`pnpm dev`, port 5173). Même origine = même session.
+    // vers le serveur de dev de la V1 (`pnpm dev`, port 3000). Même origine = même session.
     proxy: {
-      '^/(?!v2(/|$)).*': { target: 'http://localhost:5173', ws: true },
+      '^/(?!v2(/|$)).*': { target: 'http://localhost:3000', ws: true },
     },
   },
   test: {

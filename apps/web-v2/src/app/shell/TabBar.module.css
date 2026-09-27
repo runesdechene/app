@@ -1,16 +1,68 @@
 /*
- * QUOI     — mise en page minimale de la barre d'onglets. Habillée en Task 8.
+ * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre et lisière de forêt.
+ *            Desktop : dans le bandeau, sans fond.
+ * POURQUOI — relevé Figma (NAVBAR 46:422) : 85 px de haut, icônes à 70 % d'opacité ;
+ *            l'onglet actif passe à pleine opacité.
  */
 .bar {
   grid-area: nav;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  min-height: var(--tabbar-height);
+  padding: var(--space-4) var(--space-2) env(safe-area-inset-bottom);
+  background: var(--color-barre);
+}
+
+/* La lisière de forêt déborde au-dessus de la barre, comme dans la maquette. */
+.bar::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--space-4) * -1) 0 auto;
+  height: var(--space-8);
+  background: url('../../assets/ui/barre-lisiere.png') top center / 100% 100% no-repeat;
+  pointer-events: none;
 }
 
 .tab {
   min-height: var(--cible-tactile);
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  border: none;
+  background: none;
+  opacity: 0.7;
 }
 
-.label {
-  display: block;
+.tab[aria-current='page'] {
+  opacity: 1;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+@media (width >= 1024px) {
+  .bar {
+    min-height: 0;
+    padding: 0;
+    background: none;
+    grid-template-columns: repeat(5, auto);
+    justify-content: center;
+    gap: var(--space-6);
+  }
+
+  .bar::before {
+    display: none;
+  }
+
+  .tab {
+    grid-auto-flow: column;
+    align-content: center;
+    gap: var(--space-2);
+  }
 }

@@ -1,7 +1,9 @@
 /*
  * QUOI     — remise à zéro et fond commun.
  * POURQUOI — une base identique sur tous les navigateurs, et le fond de la DA partout.
- *            L'image de fond (parchemin) arrive avec la coquille visuelle (Task 8).
+ *            Le grain du parchemin est posé sur un pseudo-élément plutôt qu'en
+ *            background-attachment: fixed, qu'iOS Safari ignore ; --background-attachment
+ *            choisit « le fond reste » (fixed) ou « le fond défile » (absolute).
  */
 *,
 *::before,
@@ -23,6 +25,15 @@ body {
   font-size: var(--corps-size);
   line-height: var(--corps-leading);
   -webkit-tap-highlight-color: transparent;
+}
+
+body::before {
+  content: '';
+  position: var(--background-attachment);
+  inset: 0;
+  z-index: -1;
+  background: url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
+  pointer-events: none;
 }
 
 button {
