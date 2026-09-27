@@ -36,7 +36,7 @@ Tout ce qui relève de la **compétition entre joueurs** :
 | La Cour — Couronnes, mécénat, veilleurs | `place_court_*`, `invest_crowns` : prendre un lieu à un autre |
 | Contestation de lieu | — |
 | Compagnies (Maisons, principale/alliée, chef, grades) | mig 295, `factionGroupStore`, Hall, bannières |
-| Gloire / XP / niveaux | la progression **comparable** |
+| ~~Gloire / XP / niveaux~~ | **révisé le 27/09/2026 : le niveau reste** (voir ci-dessous) |
 | Énigmes (daily, fragment, lieu) | + les 3 crons et la boucle de rétention quotidienne |
 | Expéditions joueur-joueur | tables `voyage_*`, chat privé, comptes rendus |
 | Quêtes du jour | `dailyQuestsStore`, drip, mini-quêtes |
@@ -46,6 +46,12 @@ Tout ce qui relève de la **compétition entre joueurs** :
 > gagne contre personne et ne classe personne, il vient avec l'objet. C'est un marqueur
 > d'identité et d'appartenance, pas un rang. Ce qui tombe, c'est la progression *comparable* —
 > Gloire, XP, niveaux.
+
+> ✅ **Le niveau reste — révisé le 27/09/2026.** Uriel : la fierté sociale est le sel du jeu
+> (niveau, titres, coups d'éclat). Figer les niveaux V1 en sceau a été écarté : injuste pour les
+> futurs joueurs. **La frontière devient : progression visible oui, classement non.** Aucun
+> tableau, podium ni rang qui ordonne les joueurs entre eux. Ce qui nourrit le niveau en V2 est
+> à définir (l'énergie, les énigmes et la Cour ne l'alimentent plus).
 
 > ⚠️ **« Quêtes du jour » n'est pas « Missions ».** Les Quêtes étaient la boucle de rétention
 > quotidienne, et elles tombent. Les **Missions** — les appels photo de la marque, source
