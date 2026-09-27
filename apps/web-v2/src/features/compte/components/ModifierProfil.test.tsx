@@ -3,7 +3,7 @@
  *            deux titres au plus, enregistrement, échec qui garde la saisie.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import type { ExplorateurProfile } from '../api/lireProfil'
@@ -60,7 +60,9 @@ vi.mock('../api/explorateur', () => ({ fetchExplorateur: () => Promise.resolve(P
 function ouvrir() {
   const onTermine = vi.fn()
   render(
-    <QueryClientProvider client={new QueryClient()}>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
       <ModifierProfil onTermine={onTermine} />
     </QueryClientProvider>,
   )
@@ -96,11 +98,12 @@ test('un troisième titre ne se coche pas', async () => {
   expect(screen.getByText('Deux au plus')).toBeInTheDocument()
 })
 
-test('Enregistrer écrit le profil, les titres, l’accord, puis revient', async () => {
+test('Enregistrer écrit le profil, les titres changés, l’accord, puis revient', async () => {
   const onTermine = ouvrir()
   const nom = await screen.findByLabelText('Ton nom')
   await userEvent.clear(nom)
   await userEvent.type(nom, 'Uriel L.')
+  await userEvent.click(screen.getByRole('button', { name: 'Hoplite' }))
   await userEvent.click(screen.getByRole('button', { name: /Féminin/ }))
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
   expect(api.enregistrerProfil).toHaveBeenCalledWith({
@@ -108,7 +111,7 @@ test('Enregistrer écrit le profil, les titres, l’accord, puis revient', async
     bio: 'Chevalier errant',
     instagram: 'uriel.runesdechene',
   })
-  expect(api.choisirTitres).toHaveBeenCalledWith([1])
+  expect(api.choisirTitres).toHaveBeenCalledWith([1, 2])
   expect(api.choisirAccord).toHaveBeenCalledWith('f')
   expect(onTermine).toHaveBeenCalledOnce()
 })
@@ -122,4 +125,22 @@ test('un échec : message sous le bouton, saisie conservée', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent('n’a pas pu être enregistré')
   expect(nom).toHaveValue('Uriel bis')
   expect(onTermine).not.toHaveBeenCalled()
+})
+
+test('titres inchangés : on ne les réécrit pas (la V1 garde les siens)', async () => {
+  api.choisirTitres.mockClear()
+  const onTermine = ouvrir()
+  await userEvent.type(await screen.findByLabelText('Ta présentation'), ' !')
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  await waitFor(() => {
+    expect(onTermine).toHaveBeenCalled()
+  })
+  expect(api.choisirTitres).not.toHaveBeenCalled()
+})
+
+test('titres illisibles : un message et « Réessayer », jamais un écran vide', async () => {
+  api.titresDebloques.mockRejectedValueOnce(new Error('réseau'))
+  ouvrir()
+  expect(await screen.findByText('Ton profil n’a pas pu être chargé')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
 })

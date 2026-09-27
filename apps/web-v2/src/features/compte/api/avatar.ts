@@ -1,9 +1,11 @@
 /**
  * QUOI     — change la photo de profil : réduite en webp 400 px, envoyée, puis enregistrée.
- * POURQUOI — même emplacement que la V1 (`place-images/<identifiant>/avatar.webp`) : les deux
- *            versions montrent la même photo. `?t=` force les navigateurs à recharger l'image.
- * ATTENTION — le seau n'a pas de droit de mise à jour, seulement d'ajout et de suppression par
- *            son propriétaire : on supprime l'ancienne photo avant d'envoyer la nouvelle.
+ * POURQUOI — la nouvelle photo part sous un nom NEUF (`avatar-<horodatage>.webp`, dans le
+ *            dossier de l'Explorateur, seau `place-images` comme en V1). Tant qu'elle n'est
+ *            pas envoyée et enregistrée, l'ancienne reste en place : une coupure réseau ne
+ *            laisse jamais une image cassée. Le nom neuf suffit aussi à rafraîchir les caches.
+ * ATTENTION — les anciennes photos du dossier sont supprimées à la fin, sans bloquer si ça
+ *            échoue (un fichier orphelin ne gêne personne).
  */
 import { supabase } from '@/shared/supabase/client'
 import { monIdentifiant } from './session'
@@ -33,17 +35,22 @@ async function versWebp(fichier: File): Promise<Blob> {
 export async function changerAvatar(fichier: File): Promise<string> {
   const moi = await monIdentifiant()
   if (!moi) throw new Error('Connexion requise')
-  const chemin = `${moi}/avatar.webp`
-  const image = await versWebp(fichier)
+  const seau = supabase.storage.from(SEAU)
+  const nom = `avatar-${String(Date.now())}.webp`
 
-  await supabase.storage.from(SEAU).remove([chemin])
-  const envoi = await supabase.storage
-    .from(SEAU)
-    .upload(chemin, image, { contentType: 'image/webp' })
+  const envoi = await seau.upload(`${moi}/${nom}`, await versWebp(fichier), {
+    contentType: 'image/webp',
+  })
   if (envoi.error) throw envoi.error
 
-  const url = `${supabase.storage.from(SEAU).getPublicUrl(chemin).data.publicUrl}?t=${String(Date.now())}`
+  const url = seau.getPublicUrl(`${moi}/${nom}`).data.publicUrl
   const { error } = await supabase.rpc('update_my_profile', { p_user_id: moi, p_avatar_url: url })
   if (error) throw error
+
+  const { data: fichiers } = await seau.list(moi)
+  const anciennes = (fichiers ?? [])
+    .filter((f) => f.name.startsWith('avatar') && f.name !== nom)
+    .map((f) => `${moi}/${f.name}`)
+  if (anciennes.length > 0) await seau.remove(anciennes)
   return url
 }

@@ -10,6 +10,7 @@ import { useRef, useState } from 'react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
+import { EmptyState } from '@/shared/ui/EmptyState'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { Text } from '@/shared/ui/Text'
 import type { Titre } from '../api/lireProfil'
@@ -23,7 +24,17 @@ const ACCORDS = [
 ] as const
 
 export function ModifierProfil({ onTermine }: { onTermine: () => void }) {
-  const { initial, titresDebloques, enregistrer } = useModifierProfil()
+  const { initial, titresDebloques, erreur, reessayer, enregistrer } = useModifierProfil()
+  if (erreur) {
+    return (
+      <div className={styles.formulaire}>
+        <EmptyState>Ton profil n’a pas pu être chargé</EmptyState>
+        <Button kind="secondaire" onClick={reessayer}>
+          Réessayer
+        </Button>
+      </div>
+    )
+  }
   if (!initial) return null
   return (
     <Formulaire

@@ -9,6 +9,7 @@
 import { useState, type ReactNode } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
+import { EmptyState } from '@/shared/ui/EmptyState'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { Text } from '@/shared/ui/Text'
 import {
@@ -20,7 +21,17 @@ import {
 import styles from './PreferencesPage.module.css'
 
 export function PreferencesPage() {
-  const { preferences, regler, echec } = usePreferences()
+  const { preferences, erreurChargement, reessayer, regler, echec } = usePreferences()
+  if (erreurChargement) {
+    return (
+      <div className={styles.page}>
+        <EmptyState>Tes préférences n’ont pas pu être chargées</EmptyState>
+        <Button kind="secondaire" onClick={reessayer}>
+          Réessayer
+        </Button>
+      </div>
+    )
+  }
   if (!preferences) return null
 
   // Une fonction fléchée (et non `function`) : TypeScript garde `preferences` défini.

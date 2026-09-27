@@ -24,11 +24,14 @@ export type ValeursProfil = {
 export function useModifierProfil(): {
   initial: ValeursProfil | undefined
   titresDebloques: Titre[]
+  erreur: boolean
+  reessayer: () => void
   enregistrer: (valeurs: ValeursProfil, photo: File | null) => Promise<void>
 } {
   const moi = useMonIdentifiant()
   const queryClient = useQueryClient()
-  const { profil } = useExplorateur(moi)
+  const explorateur = useExplorateur(moi)
+  const profil = explorateur.profil
   const titres = useQuery({
     queryKey: ['titres-debloques', moi],
     queryFn: titresDebloques,
@@ -48,14 +51,30 @@ export function useModifierProfil(): {
         }
       : undefined
 
+  // Les titres ne s'écrivent que s'ils ont changé : la V1 range dans la même liste des titres
+  // que la V2 ne montre pas (Compagnie, mots de fragment), qu'un simple changement de
+  // présentation ne doit pas effacer. Le cache se rafraîchit même après un échec partiel.
   async function enregistrer(v: ValeursProfil, photo: File | null) {
-    await enregistrerProfil({ nom: v.nom, bio: v.bio, instagram: v.instagram })
-    if (photo) await changerAvatar(photo)
-    await choisirTitres(v.titres)
-    await choisirAccord(v.accord)
-    await queryClient.invalidateQueries({ queryKey: explorateurKey(moi ?? '') })
-    await queryClient.invalidateQueries({ queryKey: ['preferences'] })
+    try {
+      await enregistrerProfil({ nom: v.nom, bio: v.bio, instagram: v.instagram })
+      if (photo) await changerAvatar(photo)
+      if (initial && v.titres.join() !== initial.titres.join()) await choisirTitres(v.titres)
+      await choisirAccord(v.accord)
+    } finally {
+      await queryClient.invalidateQueries({ queryKey: explorateurKey(moi ?? '') })
+      await queryClient.invalidateQueries({ queryKey: ['preferences'] })
+    }
   }
 
-  return { initial, titresDebloques: titres.data ?? [], enregistrer }
+  return {
+    initial,
+    titresDebloques: titres.data ?? [],
+    erreur: explorateur.erreur || titres.isError || preferences.isError,
+    reessayer: () => {
+      explorateur.reessayer()
+      void titres.refetch()
+      void preferences.refetch()
+    },
+    enregistrer,
+  }
 }

@@ -29,7 +29,9 @@ vi.mock('../api/preferences', () => api)
 
 function ouvrir() {
   render(
-    <QueryClientProvider client={new QueryClient()}>
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+    >
       <PreferencesPage />
     </QueryClientProvider>,
   )
@@ -85,4 +87,31 @@ test('« Un fragment qui n’apparaît pas ? » mène au formulaire du Hub', asy
   const lien = await screen.findByRole('link', { name: /Un fragment qui n’apparaît pas/ })
   expect(lien).toHaveAttribute('href', 'https://hub.runesdechene.com/soumettre-contenu')
   expect(lien).toHaveAttribute('target', '_blank')
+})
+
+test('deux réglages de suite, le premier refusé : seul le premier revient', async () => {
+  let refuser: (e: Error) => void = () => undefined
+  api.reglerPreference.mockImplementationOnce(
+    () =>
+      new Promise((_, reject) => {
+        refuser = reject
+      }),
+  )
+  ouvrir()
+  const recit = await screen.findByRole('switch', { name: 'Le récit de la semaine' })
+  const envies = screen.getByRole('switch', { name: 'Montrer tes envies' })
+  await userEvent.click(recit)
+  await userEvent.click(envies)
+  refuser(new Error('réseau'))
+  await waitFor(() => {
+    expect(recit).not.toBeChecked()
+  })
+  expect(envies).not.toBeChecked()
+})
+
+test('préférences illisibles : un message et « Réessayer », jamais un écran vide', async () => {
+  api.mesPreferences.mockRejectedValueOnce(new Error('réseau'))
+  ouvrir()
+  expect(await screen.findByText('Tes préférences n’ont pas pu être chargées')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
 })
