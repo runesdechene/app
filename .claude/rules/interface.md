@@ -39,6 +39,12 @@ verbatim — structure HTML + classes CSS + propriétés flex — au lieu de
 re-déduire ma propre solution. Inventer un raccourci a coûté cinq commits
 et plusieurs allers-retours énervés sur cette session.
 
+**Règle dérivée — dans une grille CSS** (V2, 27/09/2026) : un carrousel placé dans une colonne
+de `display: grid` élargit TOUTE la grille (et la page défile en travers), car une colonne
+`auto` ne descend pas sous la largeur de son contenu. Poser `grid-template-columns:
+minmax(0, 1fr)` sur chaque grille qui contient le carrousel (`ProfilExplorateur`,
+`ProfilFragments`).
+
 ## ProfileMenu (desktop) et MobileHeader (mobile) — toujours modifier les deux ensemble
 
 **Le piège** (rencontré 2026-05-02) : j'avais retiré l'option "Référentiel calendaire" de `ProfileMenu` mais j'ai oublié que le menu mobile vit dans `MobileHeader.tsx` séparément — ce dernier n'avait JAMAIS eu l'option calendrier non plus, mais aussi pas le toggle GPS ni "Changer email". Uriel s'est retrouvé sur mobile sans pouvoir désactiver le brouillage GPS — feature critique.
