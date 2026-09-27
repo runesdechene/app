@@ -6,8 +6,8 @@
 
 ## 1. Intention
 
-La V2 est un **fork parallèle** de `apps/explore-web`, développé pendant que la V1 tourne.
-Même base de données, même techno. Elle **remplacera la V1** à terme.
+La V2 est une **app neuve** (`apps/web-v2`), écrite de zéro pendant que la V1 tourne, contre
+la même base de données. Elle **remplacera la V1** à terme.
 
 Trois qualités visées : **plus simple, plus propre, orientée marque**.
 
@@ -70,8 +70,8 @@ V1 actuels perdront ces systèmes. Le chemin de migration est un chantier à par
 
 ## 2. Cadre technique
 
-- **Fork parallèle** de `apps/explore-web`. Même DB Supabase, même stack
-  (React 18 + Vite + TS strict + MapLibre + Zustand).
+- **App neuve `apps/web-v2`, écrite de zéro** — plus un fork de explore-web. Fondation technique
+  (emplacement, pile, accès, navigation) : `2026-09-26-v2-socle-design.md`.
 - **PWA installable.** Pas de coquille native (Capacitor/Tauri) dans ce chantier.
   On conçoit pour que la porte reste ouverte : pas d'API web exotique, navigation au
   pouce, offline soigné.

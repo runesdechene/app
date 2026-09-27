@@ -9,6 +9,7 @@
 | Quoi                                                     | Où                                                              |
 | -------------------------------------------------------- | --------------------------------------------------------------- |
 | App publique V1 (`app.runesdechene.com`)                 | `apps/explore-web/`                                             |
+| App V2, en construction (`app.runesdechene.com/v2/`)      | `apps/web-v2/` — carnet : `docs/v2/`                            |
 | Back-office (`hub.runesdechene.com`)                     | `apps/hub/`                                                     |
 | Pages SEO (`/lieu/*`)                                    | `apps/seo-pages/`                                               |
 | Base, migrations, RPC, edge functions                    | `supabase/`                                                     |
