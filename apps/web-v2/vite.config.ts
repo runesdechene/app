@@ -20,6 +20,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // Les tests ne dépendent jamais des vraies clés.
+    env: { VITE_SUPABASE_URL: 'http://localhost', VITE_SUPABASE_ANON_KEY: 'test' },
     css: { modules: { classNameStrategy: 'non-scoped' } },
   },
 })
