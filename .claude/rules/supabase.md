@@ -208,3 +208,37 @@ Quand je réécris `get_user_titles`, TOUJOURS inclure `'unlocks', t.unlocks` da
 Le catalogue des Fragments est `title_fragments`. Côté Shopify, la clé d'un Fragment est le
 `system.handle` du métaobjet Illustration (type `illustrations`, au pluriel) — jamais le tag
 produit `fragment:*`, dont la casse varie (migs 251-253).
+
+## Toute fonction SECURITY DEFINER qui reçoit `p_user_id` vérifie l'appelant
+
+**Le piège** (audit du 27/09/2026, migs 346-348) : 41 fonctions `SECURITY DEFINER` agissaient
+pour le `p_user_id` **fourni par l'appelant** sans jamais vérifier qu'il était ce joueur — 33
+appelables même sans connexion. N'importe qui pouvait supprimer un lieu, écrire un message,
+changer des titres **au nom d'un autre**. Le backlog les croyait « protégées par `auth.uid()`
+en interne » : c'était faux pour toutes.
+
+**Why:** `SECURITY DEFINER` passe au-dessus des RLS ; la fonction est alors la seule barrière.
+Un paramètre `p_user_id` venu du client n'est qu'une affirmation de l'appelant.
+
+**How to apply :**
+1. Première instruction du corps, sans exception :
+   ```sql
+   IF p_user_id IS DISTINCT FROM auth.uid()::text THEN
+     RAISE EXCEPTION 'Action refusée : tu ne peux agir que pour ton propre compte' USING ERRCODE = '42501';
+   END IF;
+   ```
+   (Formulaire public où l'identifiant peut manquer : `p_user_id IS NOT NULL AND …`.)
+2. Mieux encore pour du neuf : **ne pas prendre `p_user_id`**, lire `auth.uid()` dans le corps.
+3. Fonction réservée à d'autres fonctions ou déclencheurs : `REVOKE EXECUTE … FROM PUBLIC, anon, authenticated`.
+4. Tester avant d'appliquer : migrations + tentatives d'usurpation dans une transaction
+   `BEGIN … ROLLBACK` (`supabase db query --linked -f`), `request.jwt.claims` réglé sur un compte A,
+   appels au nom d'un compte B → tous doivent lever `insufficient_privilege`.
+5. Requête d'audit à relancer (doit renvoyer 0 ligne exposée) :
+   ```sql
+   select p.proname from pg_proc p
+    where p.pronamespace = 'public'::regnamespace and p.prosecdef
+      and pg_get_function_identity_arguments(p.oid) ~* 'p_user_id'
+      and pg_get_functiondef(p.oid) !~* '(auth\.uid\(\)|auth\.jwt\(\)|auth\.role\(\)|_is_admin\(\)|_is_staff\(\))'
+      and pg_get_functiondef(p.oid) ~* '(insert\s+into|update\s+[a-z_.]+\s+set|delete\s+from)'
+      and has_function_privilege('authenticated', p.oid, 'execute');
+   ```
