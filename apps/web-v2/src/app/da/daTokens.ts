@@ -24,6 +24,7 @@ export const COLOR_TOKENS = [
   '--color-succes',
   '--color-succes-fond',
   '--color-pastille',
+  '--color-vignette',
   '--color-brun',
   '--color-doux-fond',
   '--color-feuille',

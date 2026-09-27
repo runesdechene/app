@@ -118,7 +118,7 @@
 .details {
   display: grid;
   justify-items: center;
-  gap: 0;
+  gap: var(--space-1); /* Instagram, date et département respirent (Uriel, 27/09) */
   margin-top: var(--space-3);
   line-height: var(--bio-leading);
 }
@@ -129,7 +129,7 @@
   gap: var(--space-1);
   color: var(--color-lien);
   font-family: var(--font-corps);
-  font-size: var(--bio-size);
+  font-size: var(--sous-titre-size);
   text-decoration: none;
 }
 

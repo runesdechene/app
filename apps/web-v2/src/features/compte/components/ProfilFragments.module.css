@@ -47,18 +47,18 @@
   height: 146px;
   margin: 0;
   padding: var(--space-3) var(--space-2) var(--space-3);
-  border: none; /* l'ombre suffit ; seul le signe choisi porte un liseré (Uriel, 27/09) */
+  border: none; /* un fond plus sombre suffit, sans ombre ; seul le signe choisi porte un liseré (Uriel, 27/09) */
   border-radius: var(--radius);
-  background: var(--color-barre);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 16%, transparent);
+  background: var(--color-vignette);
   text-align: center;
 }
 
+/* Le motif remplit la tuile, un peu estompé sur le parchemin (Uriel, 27/09). */
 .motifVignette img {
-  width: 66px;
-  height: 92px;
+  width: 86px;
+  height: 104px;
   object-fit: contain;
-  opacity: 0.9;
+  opacity: 0.7;
 }
 
 /* Le nom dans la tuile, en capitales condensées (maquette). */
@@ -67,7 +67,7 @@
   overflow: hidden;
   color: var(--color-texte);
   font-family: var(--font-condensee);
-  font-size: var(--micro-size);
+  font-size: var(--legende-size);
   font-weight: var(--weight-gras);
   letter-spacing: var(--libelle-tracking);
   text-overflow: ellipsis;
