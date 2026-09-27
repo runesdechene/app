@@ -243,3 +243,11 @@ L'inconstance était frustrante : le Visual Companion est super pratique pour br
 ## Trace
 
 - 8 mai 2026 — session V0.7.6 — premier essai HTML standalone bricolé pour la Court Tension Bar, recadrage Uriel ("pourquoi pas un serveur React ?"), création composant React + pnpm dev, puis re-recadrage ("avec l'autre système t'utilisais un port différent et 3 propositions"). Fouille dans les plugins pour identifier le Visual Companion. Cette règle ferme la confusion.
+
+## `calc()` : un nombre × (pourcentage + longueur) perd la longueur dans `translate`
+
+**Le piège** (27/09/2026, brique `Segments`) : `translate: calc(var(--rang) * (100% + var(--space-1)))`
+se calcule dans Chrome comme `100%` tout court. L'écart disparaît et le curseur tombe 4 px à côté.
+
+**How to apply :** distribuer le produit, `calc(var(--rang) * 100% + var(--rang) * var(--space-1))`.
+Vérifier une animation dans un onglet visible : un onglet en arrière-plan fige les transitions.
