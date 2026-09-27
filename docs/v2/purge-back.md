@@ -13,10 +13,17 @@
 | Contestation de lieu | abandonnée | supprimer | après bascule | spec V2 §1 |
 | Compagnies (mig 295, grades, bannières, buckets `faction-emblems` / `faction-patterns`) | Maisons qui s'affrontent, abandonnées | supprimer | après bascule | spec V2 §1 |
 | Gloire / XP / niveaux (`notoriety_points`, `exploration_points`, `erudition_points`…) | progression comparable, abandonnée | supprimer | après bascule | spec V2 §1 |
-| Énigmes (daily, fragment, lieu) + leurs 3 crons | boucle de rétention, abandonnée | supprimer | après bascule | spec V2 §1 |
+| Énergie (`energy_points`, `max_energy`, `energy_reset_at`, `preview_action_cost`, coût de `discover_place`) | supprimée : découvrir devient gratuit | supprimer | après bascule | décision 27/09 |
 | Expéditions joueur-joueur (`voyage_*`) | abandonnées | supprimer | après bascule | spec V2 §1 |
 | Quêtes du jour (et leurs tables) | abandonnées — ≠ Missions, qui restent | supprimer | après bascule | spec V2 §1 |
 | `floor_glory`, `floor_crowns` sur les appels | liés à la Gloire et à la Cour | supprimer | au portage des appels | spec V2, reste à faire |
+
+## 1bis. En sommeil — ne PAS supprimer
+
+| Objet | Constat | Action | Quand | Source |
+|---|---|---|---|---|
+| Couronnes (`user_crowns`, réglages `crowns_*` dans `app_settings`) | ni gagnées ni affichées en V2.0 ; soldes gardés pour un usage futur (cagnotte du Campement ?) | couper les gains, garder tables et soldes | à la bascule | décision 27/09 |
+| Énigmes (daily, fragment, lieu) + leurs 3 crons | en sommeil, on y reviendra | couper les crons, garder les tables | à la bascule | décision 27/09 |
 
 ## 2. À corriger
 

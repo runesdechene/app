@@ -994,6 +994,14 @@ murmure ») sans jamais en montrer le contenu.
 
 ## Points ouverts
 
+- **Décidé le 27/09/2026** : **énergie supprimée** — un lieu sort du brouillard d'un simple clic,
+  gratuitement ; **capture à distance supprimée** ; **Couronnes et énigmes en sommeil** (ni
+  gagnées ni affichées en V2.0, tables et soldes gardés). Piste Couronnes : une cagnotte commune
+  du Campement.
+- **Revendiquer un lieu sur place** — piste qu'Uriel n'exclut pas (« pour la gloire personnelle,
+  saine compétition » ; les joueurs s'en amusent). ⚠️ À concilier avec le principe « on enlève la
+  comparaison » (§1) avant de la concevoir.
+
 - Ordre de construction retenu par Uriel : **Compte client → Accueil → Carte**, puis
   Codex et Campement.
 - Uriel réalise les maquettes dans **Figma** à partir de ces sections ; la DA se fixe là.
