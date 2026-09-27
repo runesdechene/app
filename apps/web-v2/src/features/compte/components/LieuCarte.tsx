@@ -1,12 +1,12 @@
 /**
  * QUOI     — la carte d'un lieu dans le profil, façon carnet de route (maquette 123:107) : la
- *            photo en grand, le nom posé dessus, la catégorie en haut à gauche, la distance en
- *            haut à droite, et l'auteur en bas à droite quand on le demande.
+ *            photo en grand ; en bas, l'icône de catégorie puis le nom, et l'auteur à droite ;
+ *            en haut à droite, la distance.
  * POURQUOI — « J'adore la proposition pour les lieux » (Uriel, 27/09) : la photo est l'héroïne.
  *            La distance ne s'affiche que si l'on connaît la position de celui qui regarde ;
  *            l'auteur se montre sur les lieux visités ou désirés, pas sur ceux qu'on a ajoutés.
- * ATTENTION — l'icône de catégorie est un pochoir (comme en V1) : sa forme blanche est posée
- *            sur un rond de la couleur de la catégorie, par variables CSS.
+ * ATTENTION — l'icône de catégorie est un pochoir (comme en V1), peint en crème, SANS rond de
+ *            couleur : sur une photo, une couleur de catégorie peut jurer (Uriel, 27/09).
  */
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Lieu } from '../api/lireProfil'
@@ -32,15 +32,16 @@ export function LieuCarte({
       {lieu.imageUrl && (
         <img className={styles.photo} src={lieu.imageUrl} alt="" loading="lazy" draggable={false} />
       )}
-      {lieu.categorie && (
-        <span
-          className={styles.categorie}
-          style={{ '--icone': `url(${lieu.categorie.icone})`, '--nuance': lieu.categorie.couleur }}
-          aria-hidden="true"
-        />
-      )}
+      <span className={styles.voileHaut} aria-hidden="true" />
       {distance && <span className={styles.distance}>{distance}</span>}
       <span className={styles.bas}>
+        {lieu.categorie && (
+          <span
+            className={styles.categorie}
+            style={{ '--icone': `url(${lieu.categorie.icone})` }}
+            aria-hidden="true"
+          />
+        )}
         <span className={styles.nom}>{lieu.nom}</span>
         {avecAuteur && lieu.auteur && (
           <span className={styles.auteur}>
