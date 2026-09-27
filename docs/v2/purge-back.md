@@ -33,6 +33,7 @@
 | `chat_messages.faction_id/color/pattern` | colorait les noms par Maison | neutraliser | au portage des Messages | spec V2 §10 |
 | Toutes les vues de `public` en `security_invoker = off` | les default privileges donnent ALL à `authenticated` sur toute nouvelle vue ; une vue qui s'exécute en propriétaire et reste modifiable ouvre l'écriture (cas `users_admin`, corrigé mig 345) | **audité le 27/09** : les 3 autres vues (`daily_enigma_status`, `movement_stats`, `movement_wall_photos`) sont en `security_invoker=true` et non modifiables — leurs droits d'écriture affichés sont sans effet. Révoquer par propreté | après bascule | relecture 27/09 |
 | `cleanup_old_chat_messages()` | purge tout à 14 jours, murmures compris | rendre sélective | avant la zone Messages | spec V2 §10 |
+| Seau `place-images` : policy INSERT ouverte à tout `authenticated` | n'importe quel connecté peut déposer un fichier dans le dossier d'un autre (pas l'écraser : il n'y a pas de policy UPDATE, d'où le « supprimer puis envoyer » des avatars) | restreindre l'INSERT au dossier = `auth.uid()` (et aux dossiers de lieux autorisés) ; ajouter une policy UPDATE propriétaire pour permettre `upsert` | après bascule | Task 8 compte, 27/09 |
 | `@types/react` 18 dans explore-web et hub | React y tourne en 19.0.0 ; hissé à la racine, il sert aussi de types aux bibliothèques de la V2 (react-query) — contourné par un fragment dans `useV2Access.test.tsx` | aligner sur 19, puis retirer le fragment | après bascule | plan socle, Task 1 ; relecture 27/09 |
 
 ## 3. Ajouté pour la V2

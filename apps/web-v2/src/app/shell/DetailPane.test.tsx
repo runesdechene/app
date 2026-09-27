@@ -22,6 +22,13 @@ vi.mock('@/features/compte/api/session', () => ({
   seDeconnecter: () => Promise.resolve(),
 }))
 
+vi.mock('@/features/compte/api/monProfil', () => ({
+  titresDebloques: () => Promise.resolve([]),
+}))
+vi.mock('@/features/compte/api/preferences', () => ({
+  mesPreferences: () => Promise.resolve({ titleGender: 'm' }),
+}))
+
 const profil = (id: string): ExplorateurProfile => ({
   id,
   nom: id === 'u1' ? 'Uriel' : 'Claire',
@@ -131,4 +138,17 @@ test('fermer le menu rend le focus à l’avatar', async () => {
   await waitFor(() => {
     expect(screen.getByRole('button', { name: 'Mon compte' })).toHaveFocus()
   })
+})
+
+test('/modifier d’un autre : redirigé vers son profil, jamais le formulaire', async () => {
+  const router = renderAt('/carte/explorateur/u2/modifier')
+  await waitFor(() => {
+    expect(router.state.location.pathname).toBe('/carte/explorateur/u2')
+  })
+  expect(screen.queryByRole('heading', { name: 'Modifier mon profil' })).toBeNull()
+})
+
+test('/modifier de mon profil : le formulaire', async () => {
+  renderAt('/carte/explorateur/u1/modifier')
+  expect(await screen.findByRole('heading', { name: 'Modifier mon profil' })).toBeInTheDocument()
 })

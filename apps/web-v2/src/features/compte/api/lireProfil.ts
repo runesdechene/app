@@ -5,6 +5,8 @@
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
  * ATTENTION — la forme suit la migration 354. Un champ ajouté là-bas s'ajoute ici.
  */
+import { booleen, chaine, liste, nombre, objet, ouNull } from './lire'
+
 export type Lieu = { id: string; nom: string; imageUrl: string | null }
 export type Titre = { id: number; nom: string }
 export type Fragment = { id: number; nom: string; imageUrl: string | null }
@@ -28,44 +30,7 @@ export type ExplorateurProfile = {
   estMoi: boolean
 }
 
-// Chaque lecteur rend la valeur, ou lève une erreur que lireProfil transforme en `null`.
-type Objet = Record<string, unknown>
-
-function estObjet(v: unknown): v is Objet {
-  return typeof v === 'object' && v !== null && !Array.isArray(v)
-}
-
-function objet(v: unknown): Objet {
-  if (!estObjet(v)) throw new Error('objet attendu')
-  return v
-}
-
-function chaine(v: unknown): string {
-  if (typeof v !== 'string') throw new Error('texte attendu')
-  return v
-}
-
-function nombre(v: unknown): number {
-  if (typeof v !== 'number') throw new Error('nombre attendu')
-  return v
-}
-
-function booleen(v: unknown): boolean {
-  if (typeof v !== 'boolean') throw new Error('booléen attendu')
-  return v
-}
-
-function ouNull<T>(lire: (v: unknown) => T) {
-  return (v: unknown): T | null => (v === null ? null : lire(v))
-}
-
-function liste<T>(lire: (v: unknown) => T) {
-  return (v: unknown): T[] => {
-    if (!Array.isArray(v)) throw new Error('liste attendue')
-    return v.map(lire)
-  }
-}
-
+// Chaque lecteur (lire.ts) rend la valeur ou lève une erreur, que lireProfil change en `null`.
 function lieu(v: unknown): Lieu {
   const o = objet(v)
   return { id: chaine(o.id), nom: chaine(o.nom), imageUrl: ouNull(chaine)(o.imageUrl) }
