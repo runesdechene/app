@@ -86,7 +86,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
               target="_blank"
               rel="noreferrer"
             >
-              <span className={styles.iconeInstagram} aria-hidden="true" />@{profil.instagram}
+              <span className={styles.iconeInstagram} aria-hidden="true" />{profil.instagram}
             </a>
           )}
           <p className={styles.depuis}>
