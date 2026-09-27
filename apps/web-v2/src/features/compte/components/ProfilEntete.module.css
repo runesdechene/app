@@ -31,7 +31,7 @@
 /* Seul le portrait remonte, entre le titre et les badges ; le reste garde sa place (Uriel, 27/09). */
 .portrait {
   display: flex;
-  translate: 0 -25px;
+  translate: 0 -15px;
 }
 
 .identite {
