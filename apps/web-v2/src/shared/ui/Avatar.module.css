@@ -17,7 +17,7 @@
 .mini {
   width: 22px;
   height: 22px;
-  border-width: 1px;
+  border: none; /* l'auteur d'un lieu, sur une photo : sans liseré (Uriel, 27/09) */
   box-shadow: none;
   font-size: var(--micro-size);
 }

@@ -74,9 +74,10 @@
   flex: 1;
   overflow: hidden;
   color: var(--color-sur-accent);
-  font-family: var(--font-titre);
-  font-size: var(--titre-carte-size);
-  line-height: var(--titre-leading);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  line-height: var(--dense-leading);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

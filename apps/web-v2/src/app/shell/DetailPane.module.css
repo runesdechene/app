@@ -6,20 +6,17 @@
   isolation: isolate;
   display: grid;
   grid-template-rows: auto 1fr;
+  align-content: start;
   min-height: 0;
-  background: var(--color-fond);
-  padding-top: env(safe-area-inset-top);
-}
+  overflow-y: auto; /* un seul défilement : l'en-tête part avec le reste, rien ne coupe */
+  overscroll-behavior: contain;
+  scrollbar-width: none;
 
-/* Le même parchemin que les écrans (frise, sapins, ton chaud) : un détail n'est pas une
-   page blanche posée dessus. */
-.pane::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
-  pointer-events: none;
+  /* Le même parchemin que les écrans ; il reste en place pendant que le contenu défile. */
+  background:
+    url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat,
+    var(--color-fond);
+  padding-top: env(safe-area-inset-top);
 }
 
 .header {
@@ -64,12 +61,7 @@
   gap: var(--space-1);
 }
 
+/* Le contenu ne défile pas seul : tout le panneau défile, en-tête compris (Uriel, 27/09). */
 .body {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none; /* on défile au doigt ou à la molette, sans barre (Uriel, 27/09) */
-}
-
-.body::-webkit-scrollbar {
-  display: none;
+  min-height: 0;
 }
