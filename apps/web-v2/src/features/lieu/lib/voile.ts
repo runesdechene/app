@@ -29,7 +29,9 @@ function photoFloutee(ctx: CanvasRenderingContext2D, photo: HTMLImageElement) {
   const petit = document.createElement('canvas')
   petit.width = 24
   petit.height = Math.max(1, Math.round((24 * h) / l))
-  petit.getContext('2d')?.drawImage(photo, partie.x, partie.y, partie.l, partie.h, 0, 0, petit.width, petit.height)
+  petit
+    .getContext('2d')
+    ?.drawImage(photo, partie.x, partie.y, partie.l, partie.h, 0, 0, petit.width, petit.height)
   ctx.imageSmoothingQuality = 'high'
   ctx.drawImage(petit, 0, 0, l, h)
 }
@@ -59,7 +61,14 @@ export function peindreVoile(
   }
   // Les bords brunis, comme une vieille feuille.
   ctx.globalAlpha = 0.55
-  const bords = ctx.createRadialGradient(l / 2, h / 2, Math.min(l, h) * 0.35, l / 2, h / 2, Math.hypot(l, h) / 2)
+  const bords = ctx.createRadialGradient(
+    l / 2,
+    h / 2,
+    Math.min(l, h) * 0.35,
+    l / 2,
+    h / 2,
+    Math.hypot(l, h) / 2,
+  )
   bords.addColorStop(0, 'transparent')
   bords.addColorStop(1, c.bord)
   ctx.fillStyle = bords

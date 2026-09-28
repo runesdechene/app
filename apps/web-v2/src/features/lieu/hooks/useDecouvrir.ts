@@ -25,8 +25,9 @@ export function useDecouvrir(id: string) {
     recompense: mutation.data ?? null,
     echec: mutation.isError,
     acceder: () => {
-      queryClient.setQueryData<FicheLieu>(ficheKey(id), (f) =>
-        f && { ...f, moi: { ...f.moi, decouvert: true } },
+      queryClient.setQueryData<FicheLieu>(
+        ficheKey(id),
+        (f) => f && { ...f, moi: { ...f.moi, decouvert: true } },
       )
     },
   }

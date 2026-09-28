@@ -10,13 +10,18 @@ import { useDecouvrir } from './useDecouvrir'
 
 const RECOMPENSE = { rang: 38, gain: 1, niveau: 12, avant: 0.62, apres: 0.64 }
 const api = vi.hoisted(() => ({
-  decouvrirLieu: vi.fn(() => Promise.resolve({ rang: 38, gain: 1, niveau: 12, avant: 0.62, apres: 0.64 })),
+  decouvrirLieu: vi.fn(() =>
+    Promise.resolve({ rang: 38, gain: 1, niveau: 12, avant: 0.62, apres: 0.64 }),
+  ),
 }))
 vi.mock('../api/lieu', () => api)
 
 function monter() {
   const client = new QueryClient()
-  client.setQueryData(['lieu', 'a'], { id: 'a', moi: { visiteLe: null, envie: false, decouvert: false } })
+  client.setQueryData(['lieu', 'a'], {
+    id: 'a',
+    moi: { visiteLe: null, envie: false, decouvert: false },
+  })
   const relire = vi.spyOn(client, 'invalidateQueries')
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>

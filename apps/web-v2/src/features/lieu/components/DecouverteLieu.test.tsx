@@ -79,7 +79,9 @@ test('une découverte refusée le dit, et se retente', async () => {
   api.decouvrirLieu.mockRejectedValueOnce(new Error('réseau'))
   monter()
   await userEvent.click(screen.getByRole('button', { name: 'Découvrir' }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('La découverte n’a pas pu être enregistrée.')
+  expect(await screen.findByRole('alert')).toHaveTextContent(
+    'La découverte n’a pas pu être enregistrée.',
+  )
   await userEvent.click(screen.getByRole('button', { name: 'Réessayer' }))
   expect(api.decouvrirLieu).toHaveBeenCalledTimes(2)
 })

@@ -33,7 +33,13 @@ export type FicheLieu = {
   moi: { visiteLe: string | null; envie: boolean; decouvert: boolean }
 }
 // Ce que rapporte une découverte : son rang, l'expérience gagnée, et la jauge du niveau (0 à 1).
-export type Recompense = { rang: number; gain: number; niveau: number; avant: number; apres: number }
+export type Recompense = {
+  rang: number
+  gain: number
+  niveau: number
+  avant: number
+  apres: number
+}
 
 function lirePersonne(v: unknown): Personne {
   const p = objet(v)
