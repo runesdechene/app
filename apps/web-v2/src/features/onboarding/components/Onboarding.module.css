@@ -1,0 +1,336 @@
+/*
+ * QUOI     — le cadre et les pièces communes des écrans d'entrée (maquettes 94:142 à 95:107) :
+ *            le parchemin, la flèche de retour, un titre Bebas 32 px centré, les champs en carte
+ *            translucide, l'action rouge en bas (un seul rouge par écran), « Suivant → ».
+ */
+.page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background:
+    url('../../../assets/ui/fond-parchemin.png') center top / 100% auto no-repeat,
+    var(--color-fond);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.haut {
+  min-height: calc(var(--cible-tactile) + var(--space-2));
+  padding: calc(env(safe-area-inset-top) + var(--space-2)) var(--space-3) 0;
+}
+
+.retour {
+  display: grid;
+  place-items: center;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.contenu {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: 0 var(--space-6) var(--space-6);
+}
+
+.bas {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-6) calc(env(safe-area-inset-bottom) + var(--space-4));
+  background: linear-gradient(to bottom, transparent, var(--color-fond) 30%);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+  letter-spacing: var(--titre-tracking);
+  text-align: center;
+}
+
+.chapeau {
+  margin: 0 0 var(--space-4);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  text-align: center;
+}
+
+.chapeau strong {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+}
+
+.embleme {
+  justify-self: center;
+  width: 107px;
+  opacity: 0.7;
+}
+
+.lettre {
+  display: grid;
+  gap: var(--space-3);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.lettre p {
+  margin: 0;
+}
+
+.signature {
+  display: grid;
+}
+
+/* Un champ : une carte translucide, son étiquette Bebas, un trait sous la saisie. */
+.champ {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+}
+
+.etiquette {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  letter-spacing: var(--titre-tracking);
+}
+
+.saisie {
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: none;
+  border-bottom: 1px solid var(--color-bord);
+  outline: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.saisie:focus {
+  border-bottom-color: var(--color-encre);
+}
+
+.precision,
+.note {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.note {
+  text-align: center;
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.aide {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  line-height: var(--corps-leading);
+}
+
+/* L'encart des Fragments qui attendent. */
+.encart {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  column-gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+}
+
+.encartTitre,
+.encartTexte {
+  grid-column: 2;
+  margin: 0;
+  font-family: var(--font-corps);
+}
+
+.encartTitre {
+  grid-row: 1;
+  color: var(--color-encre);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+}
+
+.encartTexte {
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
+.encartTexte strong {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+}
+
+/* L'action rouge du bas : un seul rouge par écran (Uriel, 27/09). */
+.principal {
+  min-height: 48px;
+  border: 2px solid var(--color-accent-clair);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  box-shadow: var(--ombre-bouton);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.principal:disabled {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  box-shadow: none;
+  color: var(--color-desactive-texte);
+}
+
+.principal:active:not(:disabled) {
+  scale: 0.98;
+}
+
+.secondaire {
+  min-height: var(--cible-tactile);
+  border: none;
+  background: none;
+  color: var(--color-kaki);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  text-decoration: underline;
+}
+
+.suivant {
+  display: inline-flex;
+  justify-self: end;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-1);
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-titre);
+  font-size: var(--suivant-size);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.suivant:disabled {
+  opacity: 0.35;
+}
+
+.fleche {
+  width: 24px;
+  height: 24px;
+  background: currentcolor;
+  mask: url('../../../assets/onboarding/suivant.svg') center / contain no-repeat;
+}
+
+/* La bienvenue. */
+.bienvenue {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-8);
+  text-align: center;
+}
+
+.voyageur {
+  width: 116px;
+  opacity: 0.8;
+}
+
+.salut {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  font-family: var(--font-titre);
+  font-weight: var(--weight-normal);
+  line-height: 1;
+}
+
+.salutMot {
+  color: var(--color-texte-doux);
+  font-size: var(--titre-section-size);
+}
+
+.salutNom {
+  color: var(--color-encre);
+  font-size: var(--titre-ecran-size);
+}
+
+.numero {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-vignette);
+  color: var(--color-encre);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--pilule-tracking);
+  text-transform: uppercase;
+}
+
+.souligne {
+  text-decoration: underline;
+}
+
+.promesse {
+  max-width: 326px;
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+
+  .saisie,
+  .principal,
+  .suivant {
+    transition: none;
+  }
+}

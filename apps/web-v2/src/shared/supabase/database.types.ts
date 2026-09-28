@@ -6475,6 +6475,7 @@ export type Database = {
         Returns: Json
       }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
+      mon_entree: { Args: never; Returns: Json }
       migrate_user_to_auth_id: {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
@@ -6516,6 +6517,7 @@ export type Database = {
         Returns: undefined
       }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
+      nommer_explorateur: { Args: { p_nom: string }; Returns: string }
       notify: {
         Args: { p_data: Json; p_recipient: string; p_type: string }
         Returns: undefined
@@ -6826,6 +6828,7 @@ export type Database = {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      signer_charte: { Args: never; Returns: undefined }
       signaler_presence: {
         Args: { p_lat: number; p_lng: number }
         Returns: undefined

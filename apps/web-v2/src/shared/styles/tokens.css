@@ -116,6 +116,9 @@
   --micro-size: 0.625rem;
   --sceau-size: 3.5rem; /* le « ? » du voile d'un lieu inconnu (Figma 250:128) */
   --fete-size: 2.5rem; /* le 🎉 de la récompense (250:140) */
+  --suivant-size: 1.875rem; /* « Suivant → » de l'onboarding : Bebas 30 px (Figma 94:142) */
+  --code-size: 2.875rem; /* les chiffres du code reçu par e-mail : Bebas 46 px (94:319) */
+  --explore-tracking: 0.45em; /* « E X P L O R E » sous le logo (94:107) */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
 
