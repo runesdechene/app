@@ -211,6 +211,20 @@
   margin: 0 var(--space-1) 0 2px;
 }
 
+/* Le texte reste à côté de l'icône, jamais dessous ; l'adresse tient en deux lignes au pire. */
+.adresse {
+  flex: 1;
+  min-width: 0;
+}
+
+.adresseTexte {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .aide {
   display: block;
   color: var(--color-fiche-aide);

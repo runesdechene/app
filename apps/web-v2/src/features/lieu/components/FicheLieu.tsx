@@ -21,6 +21,7 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import type { FicheLieu as Fiche } from '../api/lireLieu'
 import { useEnvie } from '../hooks/useEnvie'
 import { useFiche } from '../hooks/useFiche'
+import { adresseCourte } from '../lib/adresse'
 import { ligneDeFaits } from '../lib/faits'
 import styles from './FicheLieu.module.css'
 
@@ -149,8 +150,10 @@ export function FicheLieu({
 
         <a className={styles.ligne} href={itineraire} target="_blank" rel="noreferrer">
           <img className={styles.icone} src={epingle} alt="" />
-          <span>
-            {fiche.adresse ?? 'Ouvrir l’itinéraire'}
+          <span className={styles.adresse}>
+            <span className={styles.adresseTexte}>
+              {fiche.adresse ? adresseCourte(fiche.adresse) : 'Ouvrir l’itinéraire'}
+            </span>
             <span className={styles.aide}>Toucher l’adresse pour ouvrir le GPS</span>
           </span>
         </a>

@@ -3,3 +3,4 @@
 - `distance.ts` — la distance entre deux points (haversine), son libellé, la portée (200 m).
 - `etatVisite.ts` — l'état du bouton de visite d'après ma position et ma dernière visite.
 - `faits.ts` — la ligne de faits : époque, siècle, saison, accès, bivouac.
+- `adresse.ts` — l'adresse courte : la rue et la commune, sans l'empilement du géocodeur.
