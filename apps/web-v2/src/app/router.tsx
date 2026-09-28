@@ -11,6 +11,7 @@ import { Onboarding } from '@/features/onboarding/components/Onboarding'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
+import { RouteClassement } from './routes/accueil'
 import { RouteAjouter, RouteNotifications } from './routes/carte'
 import { RouteLieu } from './routes/lieu'
 import { RouteMurmure } from './routes/messages'
@@ -41,6 +42,7 @@ export const routes: RouteObject[] = [
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'preferences', Component: RoutePreferences },
               { path: 'murmures/:id', Component: RouteMurmure },
+              { path: 'classement', Component: RouteClassement },
             ],
           },
           { path: '*', element: <Navigate to="/accueil" replace /> },
