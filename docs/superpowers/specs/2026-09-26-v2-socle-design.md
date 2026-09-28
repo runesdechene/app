@@ -22,8 +22,9 @@ remplace. Chaque fichier doit pouvoir être ouvert et compris par un codeur moye
 - les conventions de documentation, le registre des décisions et le registre de purge existent.
 
 **Hors socle** : la connexion (elle arrive avec la zone Compte) et tout écran fonctionnel.
-Chaque zone — Compte, Accueil, Carte, Codex, Campement — aura son propre cycle
-spec → plan → code, dans cet ordre.
+Chaque zone — Compte, Accueil, Carte, Messages — aura son propre cycle
+spec → plan → code, dans cet ordre. *(Révisé le 28/09/2026 : Codex et Campement quittent Explore —
+voir §0 de `2026-08-18-app-v2-design.md`.)*
 
 ## 2. Où vit la V2
 
@@ -123,7 +124,7 @@ s'affiche :
 
 | | Mobile (< 1024 px) | Desktop (≥ 1024 px) |
 |---|---|---|
-| Navigation | barre basse, 5 onglets | les 5 onglets dans le bandeau haut |
+| Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | les 4 onglets dans le bandeau haut |
 | Détail | plein écran, par-dessus, retour pour fermer | panneau latéral, à côté du principal |
 | Carte | plein écran | carte large + panneau latéral, comme la V1 |
 

@@ -4,6 +4,36 @@
 > Toutes les zones sont validées en structure ; les points ouverts sont en bas.
 > La fondation technique (où vit le code, la pile, l'accès) est dans `2026-09-26-v2-socle-design.md`.
 
+## 0. Révision du 28/09/2026 — Explore, et une marque à deux produits
+
+> **Cette section l'emporte sur tout ce qui la contredit plus bas.** Tranchée avec Uriel le
+> 27-28/09/2026 (voir le `_État.md` du projet). Les sections §1 à §9 restent la mémoire de la
+> conception d'origine ; là où elles disent autre chose, c'est ici qui fait foi.
+
+**Pourquoi.** Ce qui fait vendre au stand, c'est l'illustration et l'histoire qu'on raconte — pas
+l'app. Une cliente : « magnifique, mais je ne voyage pas ». La carte ne vit que par une vingtaine
+d'actifs par mois. On arrête de faire avaler une appli globale au client : **une marque, deux
+produits, un seul compte**, et c'est la marque qui guide le client.
+
+**Les deux produits.**
+- **Runes de Chêne Explore** (`apps/web-v2`) — la carte des lieux, **offerte** à la communauté.
+  On la termine, puis on l'entretient sans la développer. « Explore » s'entend comme l'impératif :
+  *va, et explore*.
+- **Le Campement** — plus tard, **sur la boutique** : un bouton flottant qui ouvre, dans un tiroir
+  (web app en iframe, même domaine), *Mes Fragments* (le Codex : récit, audio, Anecdotes réservées
+  aux acheteurs), *Mes Couronnes* (réductions), *Mon compte*. Spec à part, **après** Explore.
+
+**Explore, ce qui reste.** Quatre onglets : **Accueil · Carte · Messages · Compte** (le Compte avec
+l'avatar dans la barre basse). L'en-tête commun porte le logo, **« + »** (Ajouter : un lieu ou un
+pin GPS) et **la cloche** des notifications.
+
+**Ce qui tombe d'Explore.** Le **Codex** (§8 : il vit dans le Campement), le **Campement** (§9 :
+les votes passeront par email, et le nom sert à la boutique), les **trois lectures** de la Carte
+(§7 : « Aujourd'hui / Mes pas / Le temps », incompréhensibles à l'écran). **Explore ne fait pas
+gagner de Couronnes** ; il affiche le solde, et le toucher ouvre le Campement.
+
+**La Carte** a sa propre spec : `2026-09-28-v2-carte-design.md` (elle remplace §7).
+
 ## 1. Intention
 
 La V2 est une **app neuve** (`apps/web-v2`), écrite de zéro pendant que la V1 tourne, contre
