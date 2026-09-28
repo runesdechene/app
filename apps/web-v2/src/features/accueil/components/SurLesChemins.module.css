@@ -58,13 +58,10 @@
   opacity: 0.8;
 }
 
-/* L'icône du type d'un lieu ajouté : un pochoir, peint dans la couleur du type. */
-.typeDeLieu {
-  width: 18px;
-  height: 18px;
-  margin-top: 3px;
-  background: var(--type, var(--color-encre));
-  mask: var(--icone) center / contain no-repeat;
+/* La bille du type d'un lieu ajouté, calée sur la première ligne du texte. */
+.bille {
+  display: grid;
+  margin-top: 1px;
 }
 
 .texte {

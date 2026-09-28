@@ -1,6 +1,6 @@
 /*
  * QUOI     — « Près de toi » : la rubrique (pictogramme, titre, filet), puis une liste compacte —
- *            vignette 56 px, le nom, le type dans sa couleur, la distance à droite ; un filet entre
+ *            vignette 56 px, le nom, le type et sa bille, la distance discrète à droite ; un filet entre
  *            deux lieux. Plus discrète que la rangée de grandes cartes des Ajoutés, juste au-dessus.
  */
 .presDeToi {
@@ -85,26 +85,19 @@
 .type {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  color: var(--type, var(--color-texte-doux));
+  gap: 6px; /* la bille respire, sans s'éloigner du nom du type */
+  color: var(--color-texte-doux);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
   font-weight: var(--weight-semi);
 }
 
-/* L'icône du type : un pochoir, peint dans la couleur du type (comme le badge de la fiche). */
-.typeIcone {
-  width: 14px;
-  height: 14px;
-  background: currentcolor;
-  mask: var(--icone) center / contain no-repeat;
-}
-
+/* La distance, discrète (Uriel, 29/09) : le lieu compte plus que ses mètres. */
 .distance {
-  color: var(--color-texte);
-  font-family: var(--font-condensee);
-  font-size: var(--sous-titre-size);
-  font-weight: var(--weight-gras);
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
   white-space: nowrap;
 }
 

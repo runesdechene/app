@@ -174,7 +174,7 @@ test('on salue à volonté : chaque toucher envoie un cœur, et en fait s’envo
   expect(saluer.querySelectorAll('[data-envol]')).toHaveLength(3)
 })
 
-test('un lieu ajouté porte l’icône de son type, dans sa couleur', async () => {
+test('un lieu ajouté porte la bille de son type, dans sa couleur', async () => {
   api.fetchChemins.mockResolvedValue([
     {
       ...VISITE,
@@ -190,10 +190,9 @@ test('un lieu ajouté porte l’icône de son type, dans sa couleur', async () =
   ])
   monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
-  const icone = fil.querySelector<HTMLElement>('[data-type-de-lieu]')
-  if (!icone) throw new Error('icône du type absente')
-  expect(icone.style.getPropertyValue('--icone')).toBe('url(menhir.svg)')
-  expect(icone.style.getPropertyValue('--type')).toBe('#80974e')
+  const bille = fil.querySelector<HTMLElement>('[data-bille-type]')
+  if (!bille) throw new Error('bille du type absente')
+  expect(bille.style.getPropertyValue('--type')).toBe('#80974e')
 })
 
 test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouvre sa fiche', async () => {
@@ -202,6 +201,7 @@ test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouv
   expect(pres).toHaveTextContent('Dolmen de la Roche-aux-Fées')
   expect(pres).toHaveTextContent('Mégalithe')
   expect(pres).toHaveTextContent('4 km')
+  expect(pres.querySelector('[data-bille-type]')).not.toBeNull()
   expect(api.fetchPresDeMoi).toHaveBeenCalledWith({ latitude: 48.1, longitude: -1.6 })
   await userEvent.click(within(pres).getByRole('link', { name: /Dolmen/ }))
   expect(router.state.location.pathname).toBe('/accueil/lieu/l7')

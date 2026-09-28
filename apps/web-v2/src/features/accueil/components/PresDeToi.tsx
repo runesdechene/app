@@ -12,6 +12,7 @@ import { formatDistance } from '@/shared/lib/distance'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { usePresDeMoi } from '../hooks/useAccueil'
+import { BilleType } from './BilleType'
 import styles from './PresDeToi.module.css'
 
 export function PresDeToi() {
@@ -35,17 +36,8 @@ export function PresDeToi() {
               <span className={styles.texte}>
                 <span className={styles.nom}>{l.nom}</span>
                 {l.type && (
-                  <span
-                    className={styles.type}
-                    style={l.type.couleur ? { '--type': l.type.couleur } : undefined}
-                  >
-                    {l.type.icone && (
-                      <span
-                        className={styles.typeIcone}
-                        style={{ '--icone': `url(${l.type.icone})` }}
-                        aria-hidden="true"
-                      />
-                    )}
+                  <span className={styles.type}>
+                    {l.type.icone && <BilleType icone={l.type.icone} couleur={l.type.couleur} />}
                     {l.type.nom}
                   </span>
                 )}

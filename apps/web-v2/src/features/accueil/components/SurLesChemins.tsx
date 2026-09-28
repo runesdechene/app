@@ -20,6 +20,7 @@ import type { Chemin } from '../api/lireAccueil'
 import { useChemins } from '../hooks/useAccueil'
 import { useSaluer } from '../hooks/useSaluer'
 import { ilYA } from '@/shared/lib/ilYA'
+import { BilleType } from './BilleType'
 import styles from './SurLesChemins.module.css'
 
 const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }
@@ -67,16 +68,10 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
   return (
     <li className={styles.ligne}>
       {chemin.type === 'ajout' && lieu?.type ? (
-        // Un lieu ajouté : l'icône de son type, dans sa couleur (comme le badge de la fiche).
-        <span
-          className={styles.typeDeLieu}
-          data-type-de-lieu
-          aria-hidden="true"
-          style={{
-            '--icone': `url(${lieu.type.icone})`,
-            ...(lieu.type.couleur ? { '--type': lieu.type.couleur } : {}),
-          }}
-        />
+        // Un lieu ajouté : la bille de son type (Uriel, 29/09).
+        <span className={styles.bille}>
+          <BilleType icone={lieu.type.icone} couleur={lieu.type.couleur} />
+        </span>
       ) : (
         <img className={styles.type} src={ICONES[chemin.type]} alt="" />
       )}
