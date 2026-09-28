@@ -33,8 +33,10 @@
 | `chat_messages` : `GRANT ALL` à `anon` | les RLS rattrapent pour un salon public, pas pour des murmures | révoquer, gater par appartenance à la conversation | avant la zone Messages | spec V2 §10 |
 | `chat_messages.faction_id/color/pattern` | colorait les noms par Maison | neutraliser | au portage des Messages | spec V2 §10 |
 | Toutes les vues de `public` en `security_invoker = off` | les default privileges donnent ALL à `authenticated` sur toute nouvelle vue ; une vue qui s'exécute en propriétaire et reste modifiable ouvre l'écriture (cas `users_admin`, corrigé mig 345) | **audité le 27/09** : les 3 autres vues (`daily_enigma_status`, `movement_stats`, `movement_wall_photos`) sont en `security_invoker=true` et non modifiables — leurs droits d'écriture affichés sont sans effet. Révoquer par propreté | après bascule | relecture 27/09 |
-| `cleanup_old_chat_messages()` | purge tout à 14 jours, murmures compris | rendre sélective | avant la zone Messages | spec V2 §10 |
+| `cleanup_old_chat_messages()` | purge tout à 14 jours, murmures compris | **résolu par construction** (28/09) : les murmures vivent dans leur propre table (`murmures`, mig 372), que la purge ne touche pas | — | spec V2 §10 |
 | Seau `place-images` : policy INSERT ouverte à tout `authenticated` | n'importe quel connecté peut déposer un fichier dans le dossier d'un autre (pas l'écraser : il n'y a pas de policy UPDATE, d'où le « supprimer puis envoyer » des avatars) | restreindre l'INSERT au dossier = `auth.uid()` (et aux dossiers de lieux autorisés) ; ajouter une policy UPDATE propriétaire pour permettre `upsert` | après bascule | Task 8 compte, 27/09 |
+| `chat_messages.user_name` écrit par le client | la V1 insère elle-même le nom affiché : n'importe qui peut signer un message du nom d'un autre | la V2 écrit par `ecrire_au_registre` (le nom posé par la base, mig 371) ; côté V1, retirer l'INSERT direct (policies `chat_insert_*`) à la bascule | après bascule | relecture 28/09 |
+| `unlock_pending_fragments(p_user_id, p_email)` | lisait l'e-mail fourni par l'appelant : on pouvait réclamer les Fragments achetés par un autre client | **corrigé** par la mig 369 (l'e-mail vérifié du jeton) — à appliquer | au GO d'Uriel | relecture 28/09 |
 | `@types/react` 18 dans explore-web et hub | React y tourne en 19.0.0 ; hissé à la racine, il sert aussi de types aux bibliothèques de la V2 (react-query) — contourné par un fragment dans `useV2Access.test.tsx` | aligner sur 19, puis retirer le fragment | après bascule | plan socle, Task 1 ; relecture 27/09 |
 
 ## 3. Ajouté pour la V2
@@ -51,3 +53,7 @@
 | `set_my_displayed_titles(integer[])` | deux titres portés au plus ; remplace à terme `set_displayed_titles_v3` (trois) | mig 353 |
 | `get_profil_explorateur(text)` | profil public en une lecture ; remplace à terme `get_player_profile` pour la V2 | mig 354 |
 | `users.signe_fragment_id`, `set_my_signe(integer)` ; `set_my_displayed_titles` passé à 3 | le signe d'un Porteur ; trois titres de jeu (révision du 27/09) | mig 356 |
+| `saluts`, `accueil_nouveaute()`, `accueil_ajoutes(int)`, `sur_les_chemins(int)`, `saluer(text)`, `_auteur_du_chemin(text)` | l'Accueil : nouveauté, ajoutés récemment, le fil et ses saluts | mig 368 |
+| `users.charte_signee_le`, `signer_charte()`, `nommer_explorateur(text)`, `mon_entree()` | l'onboarding : Charte, nom, numéro d'Explorateur | mig 370 |
+| `registre(text[], int)`, `ecrire_au_registre(text, text)` | le Registre (Messages) : lire, écrire, le nom posé par la base | mig 371 |
+| `murmures`, `murmurer(text, text)`, `mes_murmures()`, `conversation(text, int)`, `lire_murmures(text)` | les Murmures, messages privés | mig 372 |
