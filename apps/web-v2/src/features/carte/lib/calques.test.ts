@@ -1,7 +1,7 @@
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
-import { ajouterCalques, enGeoJSON } from './calques'
+import { ajouterCalques, enGeoJSON, taille } from './calques'
 import type { CouleursCarte } from './couleurs'
 
 const couleurs: CouleursCarte = {
@@ -56,4 +56,8 @@ test('aucun lieu n’est regroupé, même dézoomé ; les marques grandissent av
   for (const calque of calques.slice(0, 2)) {
     expect(calque).toHaveProperty(['layout', 'icon-size', 0], 'interpolate')
   }
+})
+
+test('une taille agrandie reste une courbe de zoom au premier niveau (MapLibre l’exige)', () => {
+  expect(taille(2)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 1, 8, 1.6, 12, 2.3])
 })

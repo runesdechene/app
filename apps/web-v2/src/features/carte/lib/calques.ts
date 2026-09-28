@@ -56,21 +56,22 @@ export function enGeoJSON(
 const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
 
 // La marque grandit avec le zoom : un point de loin, le sceau entier de près.
-export const TAILLE: ExpressionSpecification = [
-  'interpolate',
-  ['linear'],
-  ['zoom'],
-  4,
-  0.5,
-  8,
-  0.8,
-  12,
-  1.15,
+const PALIERS: [zoom: number, taille: number][] = [
+  [4, 0.5],
+  [8, 0.8],
+  [12, 1.15],
 ]
+
+// Une taille agrandie (le survol) multiplie chaque palier : MapLibre veut la courbe de zoom au
+// premier niveau, jamais enveloppée dans un calcul.
+export function taille(facteur = 1): ExpressionSpecification {
+  const paliers = PALIERS.flatMap(([zoom, t]) => [zoom, Math.round(t * facteur * 1000) / 1000])
+  return ['interpolate', ['linear'], ['zoom'], ...paliers]
+}
 
 const marque: NonNullable<SymbolLayerSpecification['layout']> = {
   'icon-image': ['get', 'image'],
-  'icon-size': TAILLE,
+  'icon-size': taille(),
   'icon-allow-overlap': true,
   'icon-ignore-placement': true,
 }

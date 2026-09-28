@@ -7,7 +7,7 @@
  * ATTENTION — au doigt, pas de survol : le clic seul fait pulser le lieu touché.
  */
 import type { FilterSpecification, Map as Carte, MapLayerMouseEvent } from 'maplibre-gl'
-import { CALQUE_SURVOL, TAILLE } from './calques'
+import { CALQUE_SURVOL, taille } from './calques'
 
 const SURVOLE = 1.2
 const ENFONCE = 0.85
@@ -22,7 +22,7 @@ export function suivreSurvol(map: Carte, calques: string[]) {
 
   const poser = (facteur: number) => {
     echelle = facteur
-    map.setLayoutProperty(CALQUE_SURVOL, 'icon-size', ['*', TAILLE, facteur])
+    map.setLayoutProperty(CALQUE_SURVOL, 'icon-size', taille(facteur))
   }
 
   // Passe d'échelle en échelle (ex. [0,85, 1,2]) en `duree` ms.
