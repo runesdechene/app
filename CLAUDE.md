@@ -2,7 +2,9 @@
 
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > L'état du projet, les décisions et la façon de travailler avec Uriel vivent dans le vault
-> **Mon Cerveau** : lire le Claude.MD du vault, le '\_État.md' associé à ce projet (Runes de Chêne) et '\_Socle'. Ici, le code seulement.
+> **Mon Cerveau** : lire le Claude.MD du vault, l'état de l'appli
+> `1. LE MÉTIER/1. Runes de Chêne/Explore/_État.md` (la marque a le sien, un dossier au-dessus) et
+> '\_Socle'. Ici, le code seulement.
 
 ## Où sont les choses
 
