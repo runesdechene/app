@@ -18,6 +18,7 @@ const api = vi.hoisted(() => ({
       pushRecap: false,
       showDepartement: true,
       showEnvies: true,
+      lieuxEnCouleur: false,
       titleGender: 'm' as const,
     }),
   ),
@@ -52,6 +53,12 @@ test('un interrupteur écrit sa clé', async () => {
   await userEvent.click(await screen.findByRole('switch', { name: 'Montrer tes envies' }))
   expect(api.reglerPreference).toHaveBeenCalledWith('show_envies', false)
   expect(screen.getByRole('switch', { name: 'Montrer tes envies' })).not.toBeChecked()
+})
+
+test('« Mes lieux en couleur » écrit sa clé', async () => {
+  ouvrir()
+  await userEvent.click(await screen.findByRole('switch', { name: 'Mes lieux en couleur' }))
+  expect(api.reglerPreference).toHaveBeenCalledWith('lieux_en_couleur', true)
 })
 
 test('le brouillage passe par sa propre fonction', async () => {

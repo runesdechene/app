@@ -6,7 +6,7 @@
  *            nouvelle adresse, rien ne change avant le clic.
  */
 import { supabase } from '@/shared/supabase/client'
-import { booleen, chaine, objet, ouNull } from './lire'
+import { booleen, chaine, objet, ouNull } from '@/shared/lib/lire'
 
 // « Un fragment qui n'apparaît pas ? » garde le système existant (décision d'Uriel, 27/09) :
 // on envoie une photo par le formulaire public du Hub, qui rattache le fragment.
@@ -19,11 +19,16 @@ export type Preferences = {
   pushRecap: boolean
   showDepartement: boolean
   showEnvies: boolean
+  lieuxEnCouleur: boolean
   titleGender: 'm' | 'f'
 }
 
 export type ClePreference =
-  'show_departement' | 'show_envies' | 'push_important_enabled' | 'push_recap_enabled'
+  | 'show_departement'
+  | 'show_envies'
+  | 'push_important_enabled'
+  | 'push_recap_enabled'
+  | 'lieux_en_couleur'
 
 export async function mesPreferences(): Promise<Preferences> {
   const { data, error } = await supabase.rpc('get_my_preferences')
@@ -36,6 +41,7 @@ export async function mesPreferences(): Promise<Preferences> {
     pushRecap: booleen(p.pushRecap),
     showDepartement: booleen(p.showDepartement),
     showEnvies: booleen(p.showEnvies),
+    lieuxEnCouleur: booleen(p.lieuxEnCouleur),
     titleGender: p.titleGender === 'f' ? 'f' : 'm',
   }
 }

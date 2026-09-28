@@ -17,13 +17,19 @@ import {
 } from '../api/preferences'
 
 export type Reglage =
-  'pushImportant' | 'pushRecap' | 'brouillerPistes' | 'showDepartement' | 'showEnvies'
+  | 'pushImportant'
+  | 'pushRecap'
+  | 'brouillerPistes'
+  | 'showDepartement'
+  | 'showEnvies'
+  | 'lieuxEnCouleur'
 
 const CLES: Record<Exclude<Reglage, 'brouillerPistes'>, ClePreference> = {
   pushImportant: 'push_important_enabled',
   pushRecap: 'push_recap_enabled',
   showDepartement: 'show_departement',
   showEnvies: 'show_envies',
+  lieuxEnCouleur: 'lieux_en_couleur',
 }
 
 function ecrire(reglage: Reglage, valeur: boolean): Promise<void> {

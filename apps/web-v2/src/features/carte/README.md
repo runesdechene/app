@@ -2,8 +2,9 @@
 
 Conception : `docs/superpowers/specs/2026-08-18-app-v2-design.md`, §7.
 
-État : écran vide (socle). Les écrans, hooks et appels arrivent avec la spec de la zone.
+Conception de l'écran : `docs/superpowers/specs/2026-09-28-v2-carte-design.md`.
 
 - `components/` — l'affichage.
-- `hooks/` — la logique avec état (à venir).
-- `api/` — les seuls fichiers qui parlent à Supabase pour cette zone (à venir).
+- `hooks/` — `useCarteLieux` (les lieux en cache), `useTerritoire` (le nom à inscrire).
+- `api/` — `carte.ts` parle à Supabase (`carte_lieux`, `territoire_en`) ; `lireCarte.ts` lit
+  leur JSON.

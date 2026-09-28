@@ -8,7 +8,7 @@
  *            `COALESCE(display_name, first_name)` (règle de produit.md).
  */
 import { supabase } from '@/shared/supabase/client'
-import { chaine, liste, nombre, objet } from './lire'
+import { chaine, liste, nombre, objet } from '@/shared/lib/lire'
 import type { Titre } from './lireProfil'
 import { monIdentifiant } from './session'
 

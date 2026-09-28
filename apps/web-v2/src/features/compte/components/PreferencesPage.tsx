@@ -13,6 +13,7 @@ import chevron from '@/assets/ui/chevron.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import coeur from '@/assets/ui/coeur.svg'
 import courriel from '@/assets/ui/courriel.svg'
+import palette from '@/assets/ui/palette.svg'
 import pas from '@/assets/ui/pas.svg'
 import question from '@/assets/ui/question.svg'
 import repere from '@/assets/ui/repere.svg'
@@ -97,6 +98,12 @@ export function PreferencesPage() {
           coeur,
           'Montrer tes envies',
           'Tes lieux « Envie d’y aller » sur ton profil.',
+        )}
+        {ligne(
+          'lieuxEnCouleur',
+          palette,
+          'Mes lieux en couleur',
+          'Les lieux que tu as visités prennent la couleur de leur type.',
         )}
       </Carte>
 

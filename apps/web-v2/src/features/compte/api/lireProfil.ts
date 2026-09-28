@@ -6,7 +6,7 @@
  * ATTENTION — la forme suit les migrations 354-362. Un champ ajouté là-bas s'ajoute ici.
  */
 import type { ConditionTitre } from '../lib/conditionTitre'
-import { booleen, chaine, liste, nombre, objet, ouNull } from './lire'
+import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
 export type Categorie = { icone: string; couleur: string }
 export type Auteur = { id: string; nom: string; avatarUrl: string | null }

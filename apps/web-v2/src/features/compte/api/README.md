@@ -6,7 +6,6 @@ lève une erreur ; jamais un `{ error }` à vérifier plus loin.
 - `lireProfil.ts` — la forme d'un profil et sa lecture défensive du JSON (tout ou `null`).
 - `explorateur.ts` — `fetchExplorateur(id)` : `get_profil_explorateur` (migration 354).
 - `session.ts` — qui est connecté ; la déconnexion (partagée avec la V1).
-- `lire.ts` — les petits lecteurs du JSON de la base, partagés.
 - `monProfil.ts` — nom, présentation, Instagram, titres portés, accord des titres, signe.
 - `avatar.ts` — la photo : webp 400 px, `place-images/<id>/avatar.webp`.
 - `preferences.ts` — lecture et réglages (migration 353), e-mail, lien du Hub.
