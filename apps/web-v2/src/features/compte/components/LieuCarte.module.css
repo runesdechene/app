@@ -13,6 +13,25 @@
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 18%, transparent);
 }
 
+/* Le lien couvre toute la carte ; il s'enfonce un peu sous le doigt. */
+.lien {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.lien:active {
+  scale: 0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lien {
+    transition: none;
+  }
+}
+
 .photo {
   position: absolute;
   inset: 0;
