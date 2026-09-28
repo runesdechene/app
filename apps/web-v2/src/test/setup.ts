@@ -7,12 +7,7 @@
 import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
 
-class FausseCarte {
-  on() {}
-  once() {}
-  setStyle() {}
-  setTerrain() {}
-  remove() {}
-}
-
-vi.mock('maplibre-gl', () => ({ default: { Map: FausseCarte } }))
+vi.mock('maplibre-gl', async () => {
+  const { FausseCarte } = await import('./fausseCarte')
+  return { default: { Map: FausseCarte } }
+})

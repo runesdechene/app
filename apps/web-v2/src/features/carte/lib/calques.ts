@@ -27,7 +27,10 @@ type Proprietes = {
   moi?: boolean
 }
 
-export function enGeoJSON(lieux: LieuCarte[], couleurTypes: boolean): FeatureCollection<Point, Proprietes> {
+export function enGeoJSON(
+  lieux: LieuCarte[],
+  couleurTypes: boolean,
+): FeatureCollection<Point, Proprietes> {
   return {
     type: 'FeatureCollection',
     features: lieux.map((l) => ({

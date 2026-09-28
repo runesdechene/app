@@ -3,8 +3,15 @@ import type { LieuCarte } from '../api/lireCarte'
 import { melanger, nomImage } from './sceaux'
 
 const lieu: LieuCarte = {
-  id: 'a', nom: 'Trophée', lat: 43.7, lng: 7.4, nature: 'lieu', icone: 'x.svg',
-  couleur: '#708d44', etat: 'visite', revendication: null,
+  id: 'a',
+  nom: 'Trophée',
+  lat: 43.7,
+  lng: 7.4,
+  nature: 'lieu',
+  icone: 'x.svg',
+  couleur: '#708d44',
+  etat: 'visite',
+  revendication: null,
 }
 
 test('chaque lieu reçoit la marque de son état', () => {

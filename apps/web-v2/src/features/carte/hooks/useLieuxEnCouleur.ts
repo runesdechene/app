@@ -8,6 +8,9 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchLieuxEnCouleur } from '../api/carte'
 
 export function useLieuxEnCouleur(): boolean {
-  const query = useQuery({ queryKey: ['preferences', 'lieuxEnCouleur'], queryFn: fetchLieuxEnCouleur })
+  const query = useQuery({
+    queryKey: ['preferences', 'lieuxEnCouleur'],
+    queryFn: fetchLieuxEnCouleur,
+  })
   return query.data ?? false
 }

@@ -10,3 +10,9 @@ test('sans territoire, rien ne s’inscrit', () => {
   const { container } = render(<Inscription nom={null} />)
   expect(container).toBeEmptyDOMElement()
 })
+
+test('quand le territoire disparaît, le nom s’efface en fondu au lieu de sauter', () => {
+  const { rerender } = render(<Inscription nom="Comté de Nice" />)
+  rerender(<Inscription nom={null} />)
+  expect(screen.getByText('Comté de Nice').closest('p')).toHaveAttribute('aria-hidden', 'true')
+})

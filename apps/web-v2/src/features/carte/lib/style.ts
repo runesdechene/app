@@ -18,15 +18,21 @@ function habiller(l: LayerSpecification, c: CouleursCarte): LayerSpecification {
   const id = l.id
   if (l.type === 'background') return { ...l, paint: { ...l.paint, 'background-color': c.fond } }
   if (l.type === 'fill') {
-    if (id === 'water') return { ...l, paint: { ...l.paint, 'fill-color': c.eau, 'fill-outline-color': c.eau } }
-    if (/wood|park/.test(id)) return { ...l, paint: { ...l.paint, 'fill-color': c.foret, 'fill-opacity': 0.28 } }
-    if (/grass|wetland|sand|ice/.test(id)) return { ...l, paint: { ...l.paint, 'fill-color': c.fond, 'fill-opacity': 0.3 } }
+    if (id === 'water')
+      return { ...l, paint: { ...l.paint, 'fill-color': c.eau, 'fill-outline-color': c.eau } }
+    if (/wood|park/.test(id))
+      return { ...l, paint: { ...l.paint, 'fill-color': c.foret, 'fill-opacity': 0.28 } }
+    if (/grass|wetland|sand|ice/.test(id))
+      return { ...l, paint: { ...l.paint, 'fill-color': c.fond, 'fill-opacity': 0.3 } }
   }
   if (l.type === 'line') {
     if (/waterway/.test(id)) return { ...l, paint: { ...l.paint, 'line-color': c.eau } }
-    if (/motorway|trunk|primary/.test(id)) return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.75 } }
-    if (/road|bridge|tunnel/.test(id)) return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.4 } }
-    if (/boundary/.test(id)) return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.45 } }
+    if (/motorway|trunk|primary/.test(id))
+      return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.75 } }
+    if (/road|bridge|tunnel/.test(id))
+      return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.4 } }
+    if (/boundary/.test(id))
+      return { ...l, paint: { ...l.paint, 'line-color': c.route, 'line-opacity': 0.45 } }
   }
   if (l.type === 'symbol') {
     const italique = /label_(village|town|city)/.test(id)
@@ -71,7 +77,21 @@ export function styleParchemin(style: StyleSpecification, c: CouleursCarte): Sty
     layers,
     sources: {
       ...s.sources,
-      relief: { type: 'raster-dem', encoding: 'terrarium', tileSize: 256, maxzoom: 11, tiles: [TUILES_RELIEF] },
+      relief: {
+        type: 'raster-dem',
+        encoding: 'terrarium',
+        tileSize: 256,
+        maxzoom: 11,
+        tiles: [TUILES_RELIEF],
+      },
+      // Le terrain 3D a sa propre source : MapLibre déconseille de la partager avec l'ombrage.
+      'relief-3d': {
+        type: 'raster-dem',
+        encoding: 'terrarium',
+        tileSize: 256,
+        maxzoom: 11,
+        tiles: [TUILES_RELIEF],
+      },
     },
     // Incliné, l'horizon se fond dans le parchemin au lieu d'un ciel bleu.
     sky: {

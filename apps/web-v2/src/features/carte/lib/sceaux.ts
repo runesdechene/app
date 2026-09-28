@@ -4,8 +4,8 @@
  *            l'étoile (point d'intérêt), le sceau des groupes et le fond des pilules.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3).
- * ATTENTION — une icône de type qui ne se charge pas retombe sur le losange par défaut : jamais
- *            une marque vide. Dessin en pixelRatio 2 (52 px = 26 px à l'écran).
+ * ATTENTION — une icône de type qui ne se charge ou ne se dessine pas retombe sur le losange par
+ *            défaut : jamais une marque vide. Dessin en pixelRatio 2 (52 px = 26 px à l'écran).
  */
 import type { Map as Carte } from 'maplibre-gl'
 import iconeDefaut from '@/assets/ui/sceau-defaut.svg'
@@ -65,7 +65,11 @@ function pochoir(icone: HTMLImageElement, taille: number, teinte: string) {
   return ctx.canvas
 }
 
-function poserIcone(ctx: OffscreenCanvasRenderingContext2D, icone: HTMLImageElement, teinte: string) {
+function poserIcone(
+  ctx: OffscreenCanvasRenderingContext2D,
+  icone: HTMLImageElement,
+  teinte: string,
+) {
   const marge = 12
   const taille = SCEAU - marge * 2
   ctx.drawImage(pochoir(icone, taille, teinte), marge, marge)
@@ -215,12 +219,23 @@ export async function ajouterMarques(
   const icones = new Map(connus.map((l) => [l.icone, chargerIcone(l.icone)]))
   await Promise.all(
     connus.map(async (l) => {
-      const icone = await (icones.get(l.icone) ?? chargerIcone(null))
       const nom = nomImage(l, couleurTypes)
       if (map.hasImage(nom)) return
-      if (l.etat === 'connu') ajouter(map, nom, sceauConnu(icone, c))
-      else if (couleurTypes && l.couleur) ajouter(map, nom, sceauCouleur(icone, l.couleur))
-      else ajouter(map, nom, sceauVisite(icone, c))
+      const dessiner = (icone: HTMLImageElement) => {
+        if (l.etat === 'connu') return sceauConnu(icone, c)
+        if (couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
+        return sceauVisite(icone, c)
+      }
+      const icone = await (icones.get(l.icone) ?? chargerIcone(null))
+      // Une icône qui se charge mais ne se dessine pas (SVG sans taille, par exemple) prend
+      // l'icône par défaut ; si même celle-là échoue, l'erreur remonte à l'écran.
+      let image: ImageData
+      try {
+        image = dessiner(icone)
+      } catch {
+        image = dessiner(await chargerIcone(null))
+      }
+      ajouter(map, nom, image)
     }),
   )
 }

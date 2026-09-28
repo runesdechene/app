@@ -1,20 +1,64 @@
 /**
- * QUOI     — l'écran Carte : si les lieux ne se chargent pas, la carte reste et propose de
- *            réessayer ; sans position, « Ma position » le dit.
- * POURQUOI — MapLibre ne tourne pas dans jsdom : la fausse carte vient de `src/test/setup.ts`.
+ * QUOI     — l'écran Carte : si les lieux ne se chargent ou ne se dessinent pas, la carte reste et
+ *            le dit ; un dessin ancien n'écrase jamais le récent ; la 3D ne se reconstruit pas à
+ *            chaque zoom ; sans position, « Ma position » le dit.
+ * POURQUOI — MapLibre ne tourne pas dans jsdom : la fausse carte vient de `src/test/`.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { vi } from 'vitest'
+import { FausseCarte } from '@/test/fausseCarte'
+import type { LieuCarte } from '../api/lireCarte'
 import { CarteScreen } from './CarteScreen'
 
-vi.mock('../api/carte', () => ({
-  fetchCarteLieux: vi.fn(() => Promise.reject(new Error('réseau'))),
+const api = vi.hoisted(() => ({
+  fetchCarteLieux: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
 }))
+vi.mock('../api/carte', () => api)
+
+const marques = vi.hoisted(() => ({ ajouterMarques: vi.fn<() => Promise<void>>() }))
+vi.mock('../lib/sceaux', async (original) => ({
+  ...(await original<typeof import('../lib/sceaux')>()),
+  ...marques,
+}))
+
+const LIEUX: LieuCarte[] = [
+  {
+    id: 'connu',
+    nom: 'Trophée',
+    lat: 43.7,
+    lng: 7.4,
+    nature: 'lieu',
+    icone: null,
+    couleur: null,
+    etat: 'connu',
+    revendication: null,
+  },
+  {
+    id: 'inconnu',
+    nom: 'Borne',
+    lat: 44,
+    lng: 7,
+    nature: 'lieu',
+    icone: null,
+    couleur: null,
+    etat: 'inconnu',
+    revendication: null,
+  },
+]
+
+beforeEach(() => {
+  api.fetchCarteLieux.mockResolvedValue(LIEUX)
+  marques.ajouterMarques.mockResolvedValue(undefined)
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 function afficher() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -27,11 +71,74 @@ function afficher() {
   )
 }
 
+function carte(): FausseCarte {
+  if (!FausseCarte.derniere) throw new Error('pas de carte')
+  return FausseCarte.derniere
+}
+
+function charger() {
+  act(() => {
+    carte().emettre('load')
+  })
+}
+
 test('si les lieux ne se chargent pas, la carte reste là et propose de réessayer', async () => {
+  api.fetchCarteLieux.mockRejectedValue(new Error('réseau'))
   afficher()
   expect(await screen.findByText('Les lieux n’ont pas pu être chargés')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
   expect(screen.getByTestId('carte')).toBeInTheDocument()
+})
+
+test('si les marques ne peuvent pas se dessiner, le bandeau le dit aussi', async () => {
+  marques.ajouterMarques.mockRejectedValue(new Error('canevas indisponible'))
+  afficher()
+  charger()
+  expect(await screen.findByText('Les lieux n’ont pas pu être chargés')).toBeInTheDocument()
+})
+
+test('un dessin plus ancien n’écrase jamais le plus récent', async () => {
+  let finirPremier = () => {}
+  marques.ajouterMarques.mockImplementationOnce(
+    () =>
+      new Promise(
+        (resolve) =>
+          (finirPremier = () => {
+            resolve()
+          }),
+      ),
+  )
+  afficher()
+  charger()
+  await waitFor(() => {
+    expect(marques.ajouterMarques).toHaveBeenCalledTimes(1)
+  })
+
+  await userEvent.click(screen.getByRole('button', { name: 'Filtre' }))
+  await userEvent.click(screen.getByRole('switch', { name: 'Seulement mes lieux' }))
+  await waitFor(() => {
+    expect(carte().source.setData).toHaveBeenCalledTimes(1)
+  })
+
+  await act(async () => {
+    finirPremier()
+    await Promise.resolve()
+  })
+  expect(carte().source.setData).toHaveBeenCalledTimes(1)
+  expect(carte().source.setData.mock.lastCall?.[0]).toMatchObject({
+    features: [{ properties: { id: 'connu' } }],
+  })
+})
+
+test('la 3D ne se reconstruit pas à chaque zoom', () => {
+  afficher()
+  const map = carte()
+  map.inclinaison = 40
+  map.zoom = 10
+  map.emettre('zoomend')
+  map.emettre('zoomend')
+  map.emettre('pitchend')
+  expect(map.setTerrain).toHaveBeenCalledTimes(1)
 })
 
 test('sans position, « Ma position » le dit sans planter', async () => {
@@ -45,7 +152,13 @@ test('sans position, « Ma position » le dit sans planter', async () => {
   afficher()
   await userEvent.click(screen.getByRole('button', { name: 'Ma position' }))
   expect(await screen.findByText('Position indisponible')).toBeInTheDocument()
-  vi.unstubAllGlobals()
+})
+
+test('sans géolocalisation du tout, « Ma position » le dit aussi', async () => {
+  vi.stubGlobal('navigator', {})
+  afficher()
+  await userEvent.click(screen.getByRole('button', { name: 'Ma position' }))
+  expect(await screen.findByText('Position indisponible')).toBeInTheDocument()
 })
 
 test('le bouton Filtre ouvre la feuille « Seulement mes lieux »', async () => {

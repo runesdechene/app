@@ -9,7 +9,12 @@
   gap: 6px; /* maquette 200:191 */
   margin: 0;
   pointer-events: none;
+  transition: opacity 400ms ease-out;
   animation: apparaitre 400ms ease-out;
+}
+
+.efface {
+  opacity: 0;
 }
 
 .nom {
@@ -40,6 +45,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .inscription {
+    transition: none;
     animation: none;
   }
 }

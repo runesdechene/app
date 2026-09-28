@@ -12,7 +12,10 @@ import styles from './Recherche.module.css'
 const MAX_RESULTATS = 10
 
 const simplifier = (texte: string) =>
-  texte.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
+  texte
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
 
 export function Recherche({
   lieux,
@@ -24,7 +27,9 @@ export function Recherche({
   const [texte, setTexte] = useState('')
   const cherche = simplifier(texte.trim())
   const resultats =
-    cherche === '' ? [] : lieux.filter((l) => simplifier(l.nom).includes(cherche)).slice(0, MAX_RESULTATS)
+    cherche === ''
+      ? []
+      : lieux.filter((l) => simplifier(l.nom).includes(cherche)).slice(0, MAX_RESULTATS)
 
   return (
     <div className={styles.recherche}>

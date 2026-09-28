@@ -48,6 +48,10 @@ export function CarteScreen() {
   const [sansPosition, setSansPosition] = useState(false)
   const [filtreOuvert, setFiltreOuvert] = useState(false)
   const [mesLieux, setMesLieux] = useState(false)
+  // Un dessin des marques qui échoue (canevas absent, icône illisible) se dit comme un échec de
+  // chargement ; « Réessayer » relance les deux.
+  const [marquesEnPanne, setMarquesEnPanne] = useState(false)
+  const [essai, setEssai] = useState(0)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -59,11 +63,12 @@ export function CarteScreen() {
     })
     map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs) })
 
-    // Incliné et d'assez près, les montagnes se lèvent ; sinon, rien que l'ombrage à plat.
+    // Incliné et d'assez près, les montagnes se lèvent ; sinon, rien que l'ombrage à plat. On ne
+    // touche au terrain que s'il doit changer : le reposer le reconstruit, et la carte saccade.
     const relief = () => {
-      map.setTerrain(
-        reliefVoulu(map.getPitch(), map.getZoom()) ? { source: 'relief', exaggeration: 1.1 } : null,
-      )
+      const voulu = reliefVoulu(map.getPitch(), map.getZoom())
+      if (voulu === (map.getTerrain() !== null)) return
+      map.setTerrain(voulu ? { source: 'relief-3d', exaggeration: 1.1 } : null)
     }
     map.on('pitchend', relief)
     map.on('zoomend', relief)
@@ -99,13 +104,24 @@ export function CarteScreen() {
     }
   }, [couleurs, navigate])
 
+  // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
+  // `actif` passe à faux dès qu'un nouveau dessin part, ou que l'écran se ferme.
   useEffect(() => {
     if (!carte || !lieux) return
+    let actif = true
     const montres = mesLieux ? lieux.filter((l) => l.etat !== 'inconnu') : lieux
-    void ajouterMarques(carte, montres, couleurs, couleurTypes).then(() => {
-      carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
-    })
-  }, [carte, lieux, couleurs, couleurTypes, mesLieux])
+    ajouterMarques(carte, montres, couleurs, couleurTypes).then(
+      () => {
+        if (actif) carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
+      },
+      () => {
+        if (actif) setMarquesEnPanne(true)
+      },
+    )
+    return () => {
+      actif = false
+    }
+  }, [carte, lieux, couleurs, couleurTypes, mesLieux, essai])
 
   useEffect(() => {
     if (!sansPosition) return
@@ -118,21 +134,33 @@ export function CarteScreen() {
   }, [sansPosition])
 
   function allerAMaPosition() {
+    if (!('geolocation' in navigator)) {
+      setSansPosition(true)
+      return
+    }
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => carte?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 13 }),
       () => {
         setSansPosition(true)
       },
+      { timeout: 10_000, maximumAge: 60_000 },
     )
   }
 
   return (
     <div className={styles.ecran}>
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
-      {erreur && (
+      {(erreur || marquesEnPanne) && (
         <div role="alert" className={styles.bandeau}>
           <span>Les lieux n’ont pas pu être chargés</span>
-          <Button kind="doux" onClick={reessayer}>
+          <Button
+            kind="doux"
+            onClick={() => {
+              setMarquesEnPanne(false)
+              setEssai((n) => n + 1)
+              reessayer()
+            }}
+          >
             Réessayer
           </Button>
         </div>
