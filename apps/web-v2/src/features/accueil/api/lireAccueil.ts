@@ -43,14 +43,21 @@ function hex(v: unknown, parDefaut: string): string {
   return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : parDefaut
 }
 
+// Le lien part dans un href : seul http(s) passe (un « javascript: » s'exécuterait au clic).
+function estHttp(lien: string): boolean {
+  return URL.canParse(lien) && ['http:', 'https:'].includes(new URL(lien).protocol)
+}
+
 export function lireBanniere(json: unknown): Banniere | null {
   if (json === null) return null
   const b = objet(json)
+  const lien = chaine(b.linkUrl)
+  if (!estHttp(lien)) return null
   return {
     image: chaine(b.imageUrl),
     titre: chaine(b.title).trim(),
     sousTitre: ouNull(chaine)(b.subtitle)?.trim() || null,
-    lien: chaine(b.linkUrl),
+    lien,
     voile: { couleur: hex(b.overlayColor, '#0f0a05'), opacite: Number(b.overlayOpacity ?? 0.85) },
     couleurs: {
       tag: hex(b.tagColor, '#ffffff'),

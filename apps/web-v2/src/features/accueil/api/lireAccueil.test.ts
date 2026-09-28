@@ -68,3 +68,8 @@ test('une bannière de la boutique se lit ; une couleur qui n’est pas un hex r
   expect(banniere?.couleurs.titre).toBe('#5b4949')
   expect(lireBanniere(null)).toBeNull()
 })
+
+test('une bannière dont le lien n’est pas http(s) ne s’affiche pas', () => {
+  const piege = { imageUrl: 'b.jpg', title: 'Piège', linkUrl: 'javascript:alert(1)' }
+  expect(lireBanniere(piege)).toBeNull()
+})
