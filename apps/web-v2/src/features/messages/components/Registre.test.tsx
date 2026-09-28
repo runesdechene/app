@@ -82,3 +82,40 @@ test('on écrit dans le canal choisi ; le champ se vide', async () => {
   expect(api.ecrire).toHaveBeenCalledWith('bugs', 'Merci !')
   expect(screen.getByRole('textbox', { name: 'Écrire quelque chose' })).toHaveValue('')
 })
+
+test('les messages d’affilée d’une même personne se groupent : ni portrait ni nom répétés', async () => {
+  api.fetchRegistre.mockResolvedValue([
+    {
+      id: 1,
+      canal: 'general',
+      texte: 'Toujours.',
+      quand: '2026-09-28T07:14:00Z',
+      auteur: GAUTIER,
+      moi: false,
+    },
+    {
+      id: 2,
+      canal: 'bugs',
+      texte: 'J’en ai marre.',
+      quand: '2026-09-28T07:15:00Z',
+      auteur: GAUTIER,
+      moi: false,
+    },
+    {
+      id: 3,
+      canal: 'general',
+      texte: 'Plus tard.',
+      quand: '2026-09-28T07:40:00Z',
+      auteur: GAUTIER,
+      moi: false,
+    },
+  ])
+  monter()
+  const registre = await screen.findByRole('list', { name: 'Registre' })
+  const [premier, suite, apresUnSilence] = await within(registre).findAllByRole('listitem')
+  expect(premier).toHaveTextContent('Gautier Toujours.')
+  expect(suite).toHaveTextContent('[Bug & Suggestions] J’en ai marre.')
+  expect(suite).not.toHaveTextContent('Gautier')
+  // Vingt-cinq minutes plus tard : un nouveau bloc, avec son nom.
+  expect(apresUnSilence).toHaveTextContent('Gautier Plus tard.')
+})

@@ -63,12 +63,18 @@
   display: none;
 }
 
-.message {
+.message,
+.suite {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 22px 1fr auto;
   align-items: start;
   gap: var(--space-2);
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+/* La suite d'un même auteur : collée au message d'avant (le gap de la liste, moins presque tout). */
+.suite {
+  margin-top: calc(var(--space-1) - var(--space-4));
 }
 
 .heure {
@@ -117,7 +123,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .message {
+  .message,
+  .suite {
     animation: none;
   }
 

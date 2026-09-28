@@ -13,6 +13,7 @@ import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal } from '../api/lireRegistre'
 import { useRegistre } from '../hooks/useRegistre'
+import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
 import styles from './Registre.module.css'
@@ -69,25 +70,37 @@ export function Registre() {
 
       {erreur && <p className={styles.alerte}>Le Registre n’a pas pu être lu.</p>}
       <ol ref={liste} className={styles.messages} aria-label="Registre">
-        {visibles.map((m) => (
-          <li key={m.id} className={styles.message}>
-            <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
-            <p className={styles.texte}>
-              <Link
-                className={styles.nom}
-                to={`/messages/explorateur/${m.auteur.id}`}
-                state={VENU_D_UN_ECRAN}
-              >
-                {m.auteur.nom}
-              </Link>{' '}
-              {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
-              {m.texte}
-            </p>
-            <time className={styles.heure} dateTime={m.quand}>
-              {HEURE.format(new Date(m.quand))}
-            </time>
-          </li>
-        ))}
+        {visibles.map((m, i) => {
+          // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
+          const suite = estLaSuite(visibles[i - 1], m)
+          return (
+            <li key={m.id} className={suite ? styles.suite : styles.message}>
+              {suite ? (
+                <span aria-hidden="true" />
+              ) : (
+                <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
+              )}
+              <p className={styles.texte}>
+                {!suite && (
+                  <>
+                    <Link
+                      className={styles.nom}
+                      to={`/messages/explorateur/${m.auteur.id}`}
+                      state={VENU_D_UN_ECRAN}
+                    >
+                      {m.auteur.nom}
+                    </Link>{' '}
+                  </>
+                )}
+                {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
+                {m.texte}
+              </p>
+              <time className={styles.heure} dateTime={m.quand}>
+                {HEURE.format(new Date(m.quand))}
+              </time>
+            </li>
+          )
+        })}
       </ol>
 
       <BarreEcrire
