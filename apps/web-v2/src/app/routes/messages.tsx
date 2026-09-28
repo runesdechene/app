@@ -22,6 +22,7 @@ export function RouteMurmure() {
         )
       }
       sousTitre={correspondant ? presence(correspondant) : undefined}
+      plume
     >
       <Conversation key={id} avec={id} />
     </DetailPane>

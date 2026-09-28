@@ -4,9 +4,10 @@
  *            16 px), puis la barre d'écriture arrondie, le canal choisi posé sur son bord.
  */
 .registre {
-  display: grid;
-  grid-template-rows: auto auto 1fr auto auto;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  height: 100%;
 }
 
 .filtres {
@@ -47,6 +48,8 @@
 
 .messages {
   display: grid;
+  flex: 1;
+  min-height: 0;
   align-content: start;
   gap: var(--space-4);
   margin: 0;

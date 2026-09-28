@@ -5,7 +5,8 @@
  * ATTENTION — le focus va sur le titre à l'ouverture : un lecteur d'écran annonce le détail.
  *            `actions` : ce qui se range à droite du titre (les badges d'un profil, maquette 89:124).
  *            `avant` et `sousTitre` : un portrait avant le titre, une ligne sous lui (l'en-tête
- *            d'une conversation de Murmures, maquette 264:162).
+ *            d'une conversation de Murmures, maquette 264:162) ; `plume` : le titre en IM Fell,
+ *            comme un nom écrit à la main (la même conversation).
  *            `surImage` : le contenu commence par une photo pleine largeur (la fiche d'un lieu) —
  *            la flèche claire se pose dessus, le titre n'est plus visible mais reste annoncé.
  *            Sur PC, cette flèche ne s'affiche que si un écran du tiroir est derrière
@@ -25,6 +26,7 @@ export function DetailPane({
   surImage = false,
   avant,
   sousTitre,
+  plume = false,
   children,
 }: {
   title: string
@@ -32,6 +34,7 @@ export function DetailPane({
   surImage?: boolean
   avant?: ReactNode | undefined
   sousTitre?: string | undefined
+  plume?: boolean
   children: ReactNode
 }) {
   const fermer = useFermerDetail()
@@ -59,7 +62,9 @@ export function DetailPane({
             id="detail-title"
             ref={heading}
             tabIndex={-1}
-            className={[styles.title, surImage && styles.masque].filter(Boolean).join(' ')}
+            className={[styles.title, surImage && styles.masque, plume && styles.plume]
+              .filter(Boolean)
+              .join(' ')}
           >
             {title}
           </h1>

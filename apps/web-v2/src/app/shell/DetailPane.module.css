@@ -63,6 +63,13 @@
   min-height: 0;
 }
 
+/* Le nom d'un correspondant, comme écrit à la plume (maquette 264:162). */
+.plume {
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+  letter-spacing: var(--inscription-tracking);
+}
+
 /* Sous le titre d'une conversation : la dernière connexion, en IM Fell, discrète. */
 .sousTitre {
   margin: 0;
