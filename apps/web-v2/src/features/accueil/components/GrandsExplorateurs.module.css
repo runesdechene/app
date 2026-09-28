@@ -1,7 +1,8 @@
 /*
- * QUOI     — les Grands Explorateurs (maquette 275:128) : la rubrique, un chapô en italique, les
- *            rangs en chiffres romains (IM Fell), le premier cerclé d'ocre, un filet entre deux
- *            lignes ; ma place sur une pastille dorée ; « Voir tout le classement » en lien discret.
+ * QUOI     — les Grands Explorateurs (maquette 275:128) : la rubrique, le choix du classement
+ *            (segments, puis la période en pastilles), les rangs en chiffres romains droits (IM
+ *            Fell), le premier cerclé d'ocre, un filet entre deux lignes ; ma place, une ligne
+ *            comme les autres, détachée par un filet pointillé ; « Voir tout » en lien discret.
  */
 .grands {
   display: grid;
@@ -34,8 +35,19 @@
   opacity: 0.7;
 }
 
-.chapo {
-  margin: calc(var(--space-1) - var(--space-3)) 0 0;
+.choix {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0 var(--space-6);
+}
+
+.periodes {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vide {
+  margin: 0;
   padding: 0 var(--space-6);
   color: var(--color-texte-doux);
   font-family: var(--font-corps);
@@ -63,18 +75,17 @@
   border-top: 1px solid var(--color-sable);
 }
 
-/* Ma ligne, quand je suis dans ceux qu'on voit. */
-.ligne[data-moi] {
-  margin: 0 calc(-1 * var(--space-2));
-  padding: var(--space-2);
-  border-radius: var(--radius-carte);
-  background: var(--color-pastille);
+/* Ma place, sous la tête : la même ligne, détachée par un filet pointillé. */
+.maPlace {
+  margin: 0 var(--space-6);
+  border-top: 1px dashed var(--color-sable);
 }
 
 .rang {
   color: var(--color-texte-pale);
   font-family: var(--font-inscription);
   font-size: var(--titre-carte-size);
+  font-style: normal;
   text-align: center;
 }
 
@@ -82,7 +93,7 @@
   color: var(--color-ocre);
 }
 
-.lien {
+.qui {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -139,13 +150,6 @@
   font-family: var(--font-corps);
   font-size: var(--micro-size);
   font-weight: var(--weight-semi);
-}
-
-.maPlace {
-  margin: 0 var(--space-6);
-  padding: var(--space-2) var(--space-3) var(--space-2) 0;
-  border-radius: var(--radius-carte);
-  background: var(--color-pastille);
 }
 
 .plus {

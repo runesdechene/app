@@ -1,10 +1,10 @@
 /**
  * QUOI     — les lectures de l'Accueil : la bannière de la boutique, les lieux ajoutés, les lieux
- *            proches, le fil, les Grands Explorateurs du mois.
+ *            proches, le fil, les Grands Explorateurs.
  * POURQUOI — chacune a sa clé, sous ['accueil'] : un bloc qui échoue n'emporte pas les autres,
  *            et une visite ou un ajout relit tout l'Accueil d'une seule invalidation.
  */
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { Point } from '@/shared/lib/distance'
 import {
   fetchAjoutes,
@@ -13,6 +13,7 @@ import {
   fetchGrandsExplorateurs,
   fetchPresDeMoi,
 } from '../api/accueil'
+import type { Periode, TypeDeClassement } from '../api/lireAccueil'
 
 export const cheminsKey = ['accueil', 'chemins'] as const
 
@@ -41,11 +42,15 @@ export function usePresDeMoi(ici: Point | null) {
   return query.data ?? []
 }
 
-// Une visite relit tout l'Accueil (clé ['accueil']) : mon compte du mois suit.
-export function useGrandsExplorateurs() {
-  return (
-    useQuery({ queryKey: ['accueil', 'grands'], queryFn: fetchGrandsExplorateurs }).data ?? null
-  )
+// Une visite relit tout l'Accueil (clé ['accueil']) : mon compte suit. Changer de classement
+// garde l'ancien à l'écran le temps que le nouveau arrive : le bloc ne clignote pas.
+export function useGrandsExplorateurs(type: TypeDeClassement, periode: Periode) {
+  const query = useQuery({
+    queryKey: ['accueil', 'grands', type, periode],
+    queryFn: () => fetchGrandsExplorateurs(type, periode),
+    placeholderData: keepPreviousData,
+  })
+  return query.data ?? null
 }
 
 export function useChemins() {

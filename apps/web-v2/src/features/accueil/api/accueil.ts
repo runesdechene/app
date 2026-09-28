@@ -12,6 +12,8 @@ import {
   lireGrandsExplorateurs,
   lirePresDeMoi,
   lireSalut,
+  type Periode,
+  type TypeDeClassement,
 } from './lireAccueil'
 
 export async function fetchBanniere() {
@@ -36,8 +38,11 @@ export async function fetchPresDeMoi(ici: Point) {
   return lirePresDeMoi(data)
 }
 
-export async function fetchGrandsExplorateurs() {
-  const { data, error } = await supabase.rpc('grands_explorateurs')
+export async function fetchGrandsExplorateurs(type: TypeDeClassement, periode: Periode) {
+  const { data, error } = await supabase.rpc('grands_explorateurs', {
+    p_type: type,
+    p_periode: periode,
+  })
   if (error) throw error
   return lireGrandsExplorateurs(data)
 }

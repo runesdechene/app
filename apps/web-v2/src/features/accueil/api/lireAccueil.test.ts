@@ -126,7 +126,7 @@ test('les Grands Explorateurs se lisent : la tête, ma place, le dixième', () =
         },
         { rang: 2, id: 'u2', nom: 'Luna', avatar: 'l.jpg', niveau: 11, titre: null, lieux: 12 },
       ],
-      moi: { rang: 14, lieux: 3 },
+      moi: { rang: 14, id: 'me', nom: 'Uriel', avatar: null, niveau: 12, titre: null, lieux: 3 },
       dixieme: 4,
     }),
   ).toEqual({
@@ -142,12 +142,21 @@ test('les Grands Explorateurs se lisent : la tête, ma place, le dixième', () =
       },
       { rang: 2, id: 'u2', nom: 'Luna', avatar: 'l.jpg', niveau: 11, titre: null, lieux: 12 },
     ],
-    moi: { rang: 14, lieux: 3 },
+    moi: { rang: 14, id: 'me', nom: 'Uriel', avatar: null, niveau: 12, titre: null, lieux: 3 },
     dixieme: 4,
   })
-  expect(lireGrandsExplorateurs({ tete: [], moi: null, dixieme: null })).toEqual({
+  const pasClasse = {
+    rang: null,
+    id: 'me',
+    nom: 'Uriel',
+    avatar: null,
+    niveau: 12,
+    titre: null,
+    lieux: 0,
+  }
+  expect(lireGrandsExplorateurs({ tete: [], moi: pasClasse, dixieme: null })).toEqual({
     tete: [],
-    moi: null,
+    moi: pasClasse,
     dixieme: null,
   })
 })

@@ -27,7 +27,9 @@ export type LieuProche = {
   metres: number
 }
 
-// Les Grands Explorateurs du mois (mig 377) : les dix premiers, ma place, les lieux du dixième.
+// Les Grands Explorateurs (mig 378) : les dix premiers, ma place, les lieux du dixième.
+export type TypeDeClassement = 'visites' | 'ajouts'
+export type Periode = 'mois' | 'toujours'
 export type GrandExplorateur = {
   rang: number
   id: string
@@ -39,7 +41,8 @@ export type GrandExplorateur = {
 }
 export type GrandsExplorateurs = {
   tete: GrandExplorateur[]
-  moi: { rang: number; lieux: number } | null
+  // Ma place : ma fiche, sans rang tant que je ne suis pas classé.
+  moi: (Omit<GrandExplorateur, 'rang'> & { rang: number | null }) | null
   dixieme: number | null
 }
 
@@ -196,7 +199,7 @@ export function lireGrandsExplorateurs(json: unknown): GrandsExplorateurs {
     tete: liste(lireGrandExplorateur)(c.tete),
     moi: ouNull((v) => {
       const m = objet(v)
-      return { rang: nombre(m.rang), lieux: nombre(m.lieux) }
+      return { ...lireGrandExplorateur({ ...m, rang: 0 }), rang: ouNull(nombre)(m.rang) }
     })(c.moi),
     dixieme: ouNull(nombre)(c.dixieme),
   }
