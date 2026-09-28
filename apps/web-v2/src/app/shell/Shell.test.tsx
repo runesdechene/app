@@ -87,6 +87,17 @@ test('l’onglet Messages porte le nombre de murmures non lus', async () => {
   expect(await screen.findByRole('button', { name: /^Messages ?3 non lus$/ })).toBeInTheDocument()
 })
 
+test('un détail rouvert par son onglet se ferme sur l’onglet, pas sur l’onglet d’avant', async () => {
+  const router = renderAt('/messages/preferences')
+  await userEvent.click(await screen.findByRole('button', { name: 'Accueil' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Messages' }))
+  expect(router.state.location.pathname).toBe('/messages/preferences')
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await vi.waitFor(() => {
+    expect(router.state.location.pathname).toBe('/messages')
+  })
+})
+
 test('un lien « Revenir V1 » est toujours visible pendant la construction', async () => {
   renderAt('/messages')
   expect(await screen.findByRole('link', { name: 'Revenir V1' })).toHaveAttribute('href', '/')

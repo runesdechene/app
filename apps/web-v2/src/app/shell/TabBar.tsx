@@ -19,6 +19,7 @@ import messagesIcon from '@/assets/ui/onglet-messages.png'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
+import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
 import styles from './TabBar.module.css'
@@ -51,7 +52,7 @@ export function TabBar({
   function press(pressed: TabId) {
     onToucher()
     const action = resolveTabPress({ active, pressed, pathname, memory })
-    if (action.kind === 'navigate') void navigate(action.to)
+    if (action.kind === 'navigate') void navigate(action.to, { state: ROUVERT_PAR_UN_ONGLET })
     else onScrollTop(pressed)
   }
 

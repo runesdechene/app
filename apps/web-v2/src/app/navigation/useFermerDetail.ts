@@ -5,7 +5,7 @@
  *            replierDetail.ts.
  */
 import { useLocation, useNavigate } from 'react-router'
-import { closeDetailTarget } from './closeDetail'
+import { closeDetailTarget, rouvertParUnOnglet } from './closeDetail'
 import { replierDetail } from './replierDetail'
 
 export function useFermerDetail(): () => void {
@@ -15,6 +15,7 @@ export function useFermerDetail(): () => void {
     const action = closeDetailTarget({
       pathname: location.pathname,
       hasInAppHistory: location.key !== 'default',
+      rouvertParUnOnglet: rouvertParUnOnglet(location.state),
     })
     void replierDetail().then(() => {
       if (action.kind === 'back') void navigate(-1)

@@ -24,3 +24,13 @@ test('onglet illisible : repli sur l’Accueil', () => {
     to: '/accueil',
   })
 })
+
+test('rouvert par un onglet, fermer = la racine de l’onglet (derrière, c’est un autre onglet)', () => {
+  expect(
+    closeDetailTarget({
+      pathname: '/messages/preferences',
+      hasInAppHistory: true,
+      rouvertParUnOnglet: true,
+    }),
+  ).toEqual({ kind: 'replace', to: '/messages' })
+})
