@@ -191,7 +191,7 @@
     background:
       url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat,
       var(--color-fond);
-    box-shadow: 6px 0 24px color-mix(in srgb, var(--color-ombre) 30%, transparent);
+    box-shadow: 6px 0 24px color-mix(in srgb, var(--color-ombre) 18%, transparent); /* 30 % − 40 % (Uriel, 28/09) */
     transition: translate var(--duree-douce) var(--courbe-douce);
   }
 
