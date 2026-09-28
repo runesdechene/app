@@ -5826,6 +5826,7 @@ export type Database = {
         Args: { p_condition: Json; p_rank_value: number; p_stat_value: number }
         Returns: boolean
       }
+      chercher_explorateurs: { Args: { p_debut: string; p_limite?: number }; Returns: Json }
       claim_daily_quest: { Args: { p_template_id: string }; Returns: Json }
       claim_defi: { Args: { p_defi_id: string }; Returns: Json }
       cleanup_old_chat_messages: { Args: never; Returns: undefined }
@@ -6035,7 +6036,7 @@ export type Database = {
       dmetaphone: { Args: { "": string }; Returns: string }
       dmetaphone_alt: { Args: { "": string }; Returns: string }
       ecrire_au_registre: {
-        Args: { p_canal: string; p_texte: string }
+        Args: { p_canal: string; p_mentions?: string[]; p_texte: string }
         Returns: Json
       }
       edit_place_description: {

@@ -23,7 +23,8 @@ export function useRegistre() {
   )
 
   const envoi = useMutation({
-    mutationFn: (m: { canal: Canal; texte: string }) => ecrire(m.canal, m.texte),
+    mutationFn: (m: { canal: Canal; texte: string; mentions: string[] }) =>
+      ecrire(m.canal, m.texte, m.mentions),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: registreKey })
     },
@@ -32,7 +33,8 @@ export function useRegistre() {
   return {
     messages: query.data,
     erreur: query.isError,
-    ecrire: (canal: Canal, texte: string) => envoi.mutateAsync({ canal, texte }),
+    ecrire: (canal: Canal, texte: string, mentions: string[] = []) =>
+      envoi.mutateAsync({ canal, texte, mentions }),
     echecEnvoi: envoi.isError,
   }
 }

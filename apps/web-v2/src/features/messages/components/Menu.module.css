@@ -1,0 +1,47 @@
+/*
+ * QUOI     — le menu de la messagerie : une petite liste qui s'ouvre au-dessus de la barre
+ *            d'écriture, sur une feuille crème à l'ombre douce (le choix du canal, les mentions).
+ */
+
+/* Au-dessus de ce qui l'ouvre : la barre est en bas de l'écran. */
+.liste {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-1);
+  min-width: 180px;
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+  list-style: none;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.option {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+}
+
+.option[aria-selected='true'] {
+  font-weight: var(--weight-semi);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liste {
+    animation: none;
+  }
+}

@@ -101,6 +101,21 @@
   text-decoration: none;
 }
 
+/* Une mention : le nom en gras, à l'encre, vers son profil. */
+.mention {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+/* Un message qui me mentionne : un voile chaud, à peine posé. */
+.mentionne {
+  margin-inline: calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-petit);
+  background: color-mix(in srgb, var(--color-pastille) 70%, transparent);
+}
+
 .prefixe {
   color: var(--color-canal-bugs-texte);
   font-size: var(--sous-titre-size);

@@ -12,7 +12,11 @@ export type Message = {
   quand: string
   auteur: { id: string; nom: string; avatar: string | null }
   moi: boolean
+  mentions: Mention[] // les Explorateurs mentionnés (@Nom), migration 373
+  mentionneMoi: boolean
 }
+export type Mention = { id: string; nom: string }
+export type Personne = Mention & { avatar: string | null }
 
 export const CANAUX: readonly Canal[] = ['general', 'bugs']
 
@@ -21,6 +25,16 @@ function canal(v: unknown): Canal {
   if (!c) throw new Error('canal inconnu')
   return c
 }
+
+function lireMention(v: unknown): Mention {
+  const m = objet(v)
+  return { id: chaine(m.id), nom: chaine(m.nom) }
+}
+
+export const lirePersonnes = liste((v): Personne => ({
+  ...lireMention(v),
+  avatar: ouNull(chaine)(objet(v).avatar),
+}))
 
 function lireMessage(v: unknown): Message {
   const m = objet(v)
@@ -32,6 +46,9 @@ function lireMessage(v: unknown): Message {
     quand: chaine(m.quand),
     auteur: { id: chaine(a.id), nom: chaine(a.nom), avatar: ouNull(chaine)(a.avatar) },
     moi: booleen(m.moi),
+    // Absents tant que la migration 373 n'est pas passée : aucune mention.
+    mentions: Array.isArray(m.mentions) ? liste(lireMention)(m.mentions) : [],
+    mentionneMoi: m.mentionneMoi === true,
   }
 }
 

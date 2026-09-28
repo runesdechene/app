@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Canal } from '../api/lireRegistre'
 import styles from './ChoixCanal.module.css'
+import menu from './Menu.module.css'
 
 export function ChoixCanal({
   canaux,
@@ -61,13 +62,13 @@ export function ChoixCanal({
         <span className={styles.chevron} aria-hidden="true" />
       </button>
       {ouvert && (
-        <ul className={styles.liste} role="listbox" aria-label="Canal">
+        <ul className={menu.liste} role="listbox" aria-label="Canal">
           {canaux.map((c) => (
             <li
               key={c}
               role="option"
               aria-selected={c === valeur}
-              className={[styles.option, teinte(c)].join(' ')}
+              className={[menu.option, teinte(c)].join(' ')}
               tabIndex={0}
               onClick={() => {
                 choisir(c)

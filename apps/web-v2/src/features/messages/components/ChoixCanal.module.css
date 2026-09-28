@@ -1,6 +1,6 @@
 /*
  * QUOI     — le choix du canal : la pastille à cheval sur le bord de la barre d'écriture, et la
- *            petite liste qui s'ouvre au-dessus, sur une feuille crème à l'ombre douce.
+ *            teinte de chaque canal ; la liste elle-même est le menu commun (Menu.module.css).
  */
 .choix {
   position: absolute;
@@ -46,50 +46,9 @@
   rotate: 180deg;
 }
 
-/* La liste s'ouvre au-dessus de la pastille (la barre est en bas de l'écran). */
-.liste {
-  position: absolute;
-  bottom: calc(100% + var(--space-2));
-  left: 0;
-  z-index: 2;
-  display: grid;
-  gap: var(--space-1);
-  min-width: 180px;
-  margin: 0;
-  padding: var(--space-2);
-  border-radius: var(--radius-petit);
-  background: var(--color-sur-accent);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-ombre) 18%, transparent);
-  list-style: none;
-  animation: apparaitre var(--duree-douce) var(--courbe-douce);
-}
-
-.option {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
-  font-family: var(--font-corps);
-  font-size: var(--sous-titre-size);
-  cursor: pointer;
-}
-
-.option[aria-selected='true'] {
-  font-weight: var(--weight-semi);
-}
-
-@keyframes apparaitre {
-  from {
-    opacity: 0;
-    translate: 0 4px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .pastille,
   .chevron {
     transition: none;
-  }
-
-  .liste {
-    animation: none;
   }
 }

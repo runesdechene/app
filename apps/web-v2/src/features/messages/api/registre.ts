@@ -6,7 +6,7 @@
  *            table : on n'y voit que les canaux qu'on a le droit de lire.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireRegistre, type Canal } from './lireRegistre'
+import { lirePersonnes, lireRegistre, type Canal } from './lireRegistre'
 
 export async function fetchRegistre() {
   const { data, error } = await supabase.rpc('registre', { p_canaux: ['general', 'bugs'] })
@@ -14,9 +14,21 @@ export async function fetchRegistre() {
   return lireRegistre(data)
 }
 
-export async function ecrire(canal: Canal, texte: string) {
-  const { error } = await supabase.rpc('ecrire_au_registre', { p_canal: canal, p_texte: texte })
+// `mentions` : les identifiants des Explorateurs mentionnés (@Nom) — la base vérifie chacun.
+export async function ecrire(canal: Canal, texte: string, mentions: string[]) {
+  const { error } = await supabase.rpc('ecrire_au_registre', {
+    p_canal: canal,
+    p_texte: texte,
+    p_mentions: mentions,
+  })
   if (error) throw error
+}
+
+// Les Explorateurs dont le nom commence par ce qu'on tape après « @ ».
+export async function chercherExplorateurs(debut: string) {
+  const { data, error } = await supabase.rpc('chercher_explorateurs', { p_debut: debut })
+  if (error) throw error
+  return lirePersonnes(data)
 }
 
 // Prévient à chaque nouveau message ; rend de quoi arrêter d'écouter.

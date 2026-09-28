@@ -4,18 +4,23 @@
  * POURQUOI — « un chat de MMO, pas une messagerie » : pas de fils, pas de citations. Un
  *            message de « Bugs & suggestions » porte toujours son préfixe, même seul canal coché :
  *            chaque message dit d'où il vient (Uriel, 28/09). L'heure à droite : on lit d'abord
- *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière.
+ *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière. On mentionne avec
+ *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
+ *            est doucement surligné.
  */
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
-import { CANAUX, type Canal } from '../api/lireRegistre'
+import { CANAUX, type Canal, type Mention } from '../api/lireRegistre'
+import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
+import { decouper } from '../lib/mentions'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
+import { ListeMentions } from './ListeMentions'
 import styles from './Registre.module.css'
 
 const NOMS: Record<Canal, { filtre: string; court: string }> = {
@@ -30,6 +35,10 @@ export function Registre() {
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
   const liste = useRef<HTMLOListElement>(null)
+  const champ = useRef<HTMLInputElement>(null)
+  const [texte, setTexte] = useState('')
+  const [curseur, setCurseur] = useState(0)
+  const mentions = useMentions(texte, curseur)
 
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
 
@@ -74,7 +83,12 @@ export function Registre() {
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
           const suite = estLaSuite(visibles[i - 1], m)
           return (
-            <li key={m.id} className={suite ? styles.suite : styles.message}>
+            <li
+              key={m.id}
+              className={[suite ? styles.suite : styles.message, m.mentionneMoi && styles.mentionne]
+                .filter(Boolean)
+                .join(' ')}
+            >
               {suite ? (
                 <span aria-hidden="true" />
               ) : (
@@ -93,7 +107,7 @@ export function Registre() {
                   </>
                 )}
                 {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
-                {m.texte}
+                <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
               </p>
               <time className={styles.heure} dateTime={m.quand}>
                 {HEURE.format(new Date(m.quand))}
@@ -106,7 +120,35 @@ export function Registre() {
       <BarreEcrire
         invite="Écrire quelque chose"
         maximum={500}
-        onEnvoyer={(t) => ecrire(canal, t)}
+        onEnvoyer={(t) =>
+          ecrire(canal, t, mentions.mentionsDe(t)).then(() => {
+            mentions.oublier()
+          })
+        }
+        saisie={{
+          texte,
+          champ,
+          changer: (t, c) => {
+            setTexte(t)
+            setCurseur(c)
+          },
+        }}
+        dessus={
+          mentions.suggestions.length > 0 && (
+            <ListeMentions
+              personnes={mentions.suggestions}
+              onChoisir={(p) => {
+                const apres = mentions.choisir(p)
+                setTexte(apres.texte)
+                setCurseur(apres.curseur)
+                // Le curseur se pose après « @Nom », dans le champ qui garde la main.
+                requestAnimationFrame(() => {
+                  champ.current?.setSelectionRange(apres.curseur, apres.curseur)
+                })
+              }}
+            />
+          )
+        }
         avant={
           <ChoixCanal
             canaux={CANAUX}
@@ -122,5 +164,23 @@ export function Registre() {
         </p>
       )}
     </div>
+  )
+}
+
+// Le texte d'un message, ses « @Nom » en liens vers les profils.
+function TexteAvecMentions({ texte, mentions }: { texte: string; mentions: Mention[] }) {
+  return decouper(texte, mentions).map((morceau, i) =>
+    'mention' in morceau ? (
+      <Link
+        key={i}
+        className={styles.mention}
+        to={`/messages/explorateur/${morceau.mention.id}`}
+        state={VENU_D_UN_ECRAN}
+      >
+        @{morceau.mention.nom}
+      </Link>
+    ) : (
+      <Fragment key={i}>{morceau.texte}</Fragment>
+    ),
   )
 }

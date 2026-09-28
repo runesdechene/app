@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -13,6 +13,7 @@ const api = vi.hoisted(() => ({
   fetchRegistre: vi.fn(),
   ecrire: vi.fn(),
   ecouterRegistre: vi.fn(() => () => undefined),
+  chercherExplorateurs: vi.fn(),
 }))
 vi.mock('../api/registre', () => api)
 
@@ -28,6 +29,8 @@ beforeEach(() => {
       quand: '2026-09-28T07:12:00Z',
       auteur: URIEL,
       moi: true,
+      mentions: [],
+      mentionneMoi: false,
     },
     {
       id: 2,
@@ -36,6 +39,8 @@ beforeEach(() => {
       quand: '2026-09-28T07:15:00Z',
       auteur: GAUTIER,
       moi: false,
+      mentions: [],
+      mentionneMoi: false,
     },
   ])
   api.ecrire.mockResolvedValue(undefined)
@@ -79,7 +84,7 @@ test('on écrit dans le canal choisi ; le champ se vide', async () => {
   expect(screen.getByRole('button', { name: 'Canal : Bugs & suggestions' })).toBeInTheDocument()
   await userEvent.type(screen.getByRole('textbox', { name: 'Écrire quelque chose' }), '  Merci !  ')
   await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
-  expect(api.ecrire).toHaveBeenCalledWith('bugs', 'Merci !')
+  expect(api.ecrire).toHaveBeenCalledWith('bugs', 'Merci !', [])
   expect(screen.getByRole('textbox', { name: 'Écrire quelque chose' })).toHaveValue('')
 })
 
@@ -92,6 +97,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       quand: '2026-09-28T07:14:00Z',
       auteur: GAUTIER,
       moi: false,
+      mentions: [],
+      mentionneMoi: false,
     },
     {
       id: 2,
@@ -100,6 +107,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       quand: '2026-09-28T07:15:00Z',
       auteur: GAUTIER,
       moi: false,
+      mentions: [],
+      mentionneMoi: false,
     },
     {
       id: 3,
@@ -108,6 +117,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       quand: '2026-09-28T07:40:00Z',
       auteur: GAUTIER,
       moi: false,
+      mentions: [],
+      mentionneMoi: false,
     },
   ])
   monter()
@@ -118,4 +129,42 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
   expect(suite).not.toHaveTextContent('Gautier')
   // Vingt-cinq minutes plus tard : un nouveau bloc, avec son nom.
   expect(apresUnSilence).toHaveTextContent('Gautier Plus tard.')
+})
+
+test('« @ » puis le début d’un nom propose des Explorateurs ; le choisir le mentionne', async () => {
+  api.chercherExplorateurs.mockResolvedValue([
+    { id: 'u2', nom: 'Gautier de Bilskimir', avatar: null },
+  ])
+  monter()
+  await screen.findByRole('list', { name: 'Registre' })
+  const champ = screen.getByRole('textbox', { name: 'Écrire quelque chose' })
+  await userEvent.type(champ, 'Salut @Gau')
+  const proposition = await screen.findByRole('option', { name: /Gautier de Bilskimir/ })
+  fireEvent.pointerDown(proposition)
+  expect(champ).toHaveValue('Salut @Gautier de Bilskimir ')
+  expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
+  await userEvent.type(champ, 'tu as vu ?')
+  await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
+  expect(api.ecrire).toHaveBeenCalledWith('general', 'Salut @Gautier de Bilskimir tu as vu ?', [
+    'u2',
+  ])
+})
+
+test('une mention s’affiche en lien vers le profil ; un message qui me mentionne se distingue', async () => {
+  api.fetchRegistre.mockResolvedValue([
+    {
+      id: 9,
+      canal: 'general',
+      texte: '@Uriel tu passes samedi ?',
+      quand: '2026-09-28T07:12:00Z',
+      auteur: GAUTIER,
+      moi: false,
+      mentions: [{ id: 'u1', nom: 'Uriel' }],
+      mentionneMoi: true,
+    },
+  ])
+  monter()
+  const lien = await screen.findByRole('link', { name: '@Uriel' })
+  expect(lien).toHaveAttribute('href', '/messages/explorateur/u1')
+  expect(lien.closest('li')?.className).toMatch(/mentionne/)
 })

@@ -1,0 +1,21 @@
+/*
+ * QUOI     — la liste des Explorateurs à mentionner : au-dessus de la barre, calée à gauche ;
+ *            chaque ligne, le portrait puis le nom.
+ */
+.mentions {
+  left: var(--space-4);
+  min-width: 220px;
+}
+
+.personne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-texte);
+}
+
+.personne:hover,
+.personne:focus-visible {
+  background: var(--color-pastille);
+  outline: none;
+}

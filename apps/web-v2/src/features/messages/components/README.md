@@ -8,3 +8,6 @@ Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe p
 - `ListeMurmures` — les correspondants, le sceau sur ce qui n'est pas lu.
 - `Conversation` — une conversation de Murmures, sans bulles.
 - `BarreEcrire` — la barre pour écrire, partagée par le Registre et les Murmures.
+- `ChoixCanal` — le choix du canal où l'on écrit (un select maison, à la couleur du canal).
+- `ListeMentions` — les Explorateurs à mentionner quand on tape « @ ».
+- `Menu.module.css` — le style commun des deux menus.
