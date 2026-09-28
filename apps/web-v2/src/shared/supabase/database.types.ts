@@ -388,6 +388,43 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_mentions: {
+        Row: {
+          message_id: number
+          user_id: string
+        }
+        Insert: {
+          message_id: number
+          user_id: string
+        }
+        Update: {
+          message_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_mentions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_mentions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_mentions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           channel: string
@@ -5826,7 +5863,10 @@ export type Database = {
         Args: { p_condition: Json; p_rank_value: number; p_stat_value: number }
         Returns: boolean
       }
-      chercher_explorateurs: { Args: { p_debut: string; p_limite?: number }; Returns: Json }
+      chercher_explorateurs: {
+        Args: { p_debut: string; p_limite?: number }
+        Returns: Json
+      }
       claim_daily_quest: { Args: { p_template_id: string }; Returns: Json }
       claim_defi: { Args: { p_defi_id: string }; Returns: Json }
       cleanup_old_chat_messages: { Args: never; Returns: undefined }
