@@ -104,7 +104,8 @@ suivi en direct à faire tourner.
 - **Ajouter** : troisième choix du « + » — *Un lieu · Un pin GPS · Une curiosité*. Position, une ou
   deux phrases, une photo facultative. Rien d'autre.
 - **La toucher** : une petite feuille — le texte, la photo, qui l'a déposée — et un bouton
-  **« Vu »**, sans valeur de jeu (ni points, ni revendication).
+  **« Vu »**. On voit **qui l'a vue**, et on peut **y réagir** (le même geste de réaction que sur
+  l'Accueil). **On ne peut pas la revendiquer** : ni pilule, ni expédition.
 - **Modérée** comme les lieux, dans le Hub.
 
 ## 7. Ce que ça demande au back
@@ -121,7 +122,7 @@ Couronnes et aux points de compétition.
 | Revendiquer, seul ou à plusieurs | `revendiquer_lieu(p_place_id, compagnons, nom)` | `expeditions`, `expedition_members`, `place_veille.veilleur_user_id`, `veille_history` |
 | Mes noms d'expédition passés | `mes_noms_d_expedition()` | `expedition_members` ⋈ `expeditions.title` |
 | Le territoire historique | table `territoires_historiques` (code département → nom) | — |
-| La Curiosité | colonne `places.nature` (`lieu` \| `curiosite`), fonction `voir_curiosite()` | `places`, table `curiosites_vues` |
+| La Curiosité | colonne `places.nature` (`lieu` \| `curiosite`), fonctions `voir_curiosite()`, `reagir_curiosite()` | `places`, tables `curiosites_vues`, réactions |
 | Mes lieux en couleur | colonne de préférence | `users` |
 
 - **Pas de faction exigée** (la V1 renvoie `no_faction`) : les colonnes `faction_id` de ces tables
@@ -140,7 +141,7 @@ Couronnes et aux points de compétition.
 
 - Les fonctions SQL, dans une transaction annulée (`BEGIN … ROLLBACK`), comme pour le Compte :
   visite trop loin / à portée / déjà faite ; revendication seule, à plusieurs, par un inconnu non
-  passé sur place (refusée) ; noms d'expédition passés ; Curiosité « Vu ».
+  passé sur place (refusée) ; noms d'expédition passés ; Curiosité « Vu », réaction, revendication refusée.
 - L'écran, comparé à la maquette Figma à 390 px (règle du dépôt), à plat et incliné.
 - **La fluidité, sur un vrai téléphone**, en dézoomant jusqu'à la France entière : c'est le critère
   qui a fait tomber la brume.
