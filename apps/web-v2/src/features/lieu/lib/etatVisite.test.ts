@@ -19,7 +19,7 @@ test('déjà visité : de retour on revendique, loin on rappelle la visite', () 
   expect(etatVisite(pres, lieu, '2026-08-03T10:00:00Z')).toEqual({ kind: 'revendiquer' })
   expect(etatVisite(loin, lieu, '2026-08-03T10:00:00Z')).toEqual({
     kind: 'visite',
-    le: '3 août',
+    le: '3 août 2026',
     distance: '274 km',
   })
 })

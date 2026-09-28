@@ -15,7 +15,8 @@ export type EtatVisite =
   | { kind: 'revendiquer' }
   | { kind: 'visite'; le: string; distance: string }
 
-const JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
+// Avec l'année : on se souvient en quelle année on y était (Uriel, 28/09).
+const JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 export function etatVisite(
   position: Position,
