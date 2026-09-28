@@ -31,14 +31,16 @@
   pointer-events: none;
 }
 
-/* Le bord déchiré : la même lisière que la barre d'onglets (Figma « 0101 »). */
+/* Le bord déchiré : la découpe de la lisière (Figma « 0101 »), à la teinte du fond de la fiche,
+   posé 1 px plus bas pour qu'aucun liseré ne passe entre la photo et le parchemin. */
 .photo::after {
   content: '';
   position: absolute;
-  inset: auto 0 0;
+  inset: auto 0 -1px;
   z-index: 1;
   aspect-ratio: 1920 / 74;
-  background: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+  background: var(--color-fiche-lisiere);
+  mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
   pointer-events: none;
 }
 
@@ -73,6 +75,11 @@
 }
 
 .corps {
+  /* Le parchemin de la maquette (« fond de section mobile ») : sa bande du haut reste sous la
+     photo, comme dans Figma (54 px). */
+  background:
+    url('../../../assets/ui/fond-fiche.webp') center -54px / 100% auto no-repeat,
+    var(--color-fond);
   display: grid;
   gap: var(--space-3);
   padding: var(--space-3) 25px var(--space-8);

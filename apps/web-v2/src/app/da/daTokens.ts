@@ -51,6 +51,7 @@ export const COLOR_TOKENS = [
   '--color-fiche-credit-pale',
   '--color-fiche-rond',
   '--color-fiche-vignette',
+  '--color-fiche-lisiere',
   '--color-accent-bord',
   '--color-pilule',
   '--color-pilule-texte',

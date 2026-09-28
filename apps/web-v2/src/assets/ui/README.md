@@ -27,6 +27,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `signet.svg`, `signet-plein.svg`, `options.svg` | 20 × 20 | Fiche : « Envie d'y aller » (vide / cochée) et « Options du lieu » (229:153, 229:149) |
 | `epingle.svg`, `pas.svg`, `drapeau.svg` | 20 × 20 | Fiche : adresse, Explorateurs, revendication — le même trait (229:159, 234:128, 234:132) |
 | `carte-pliee.svg`, `copier.svg`, `partager-encre.svg` | 24 × 24 | Feuilles de la fiche : trouver sur la carte, copier le lien, partager ailleurs (au trait, comme les Préférences) |
+| `fond-fiche.webp`      | 390 × 899       | Fiche d'un lieu : le parchemin sous le contenu (Figma 229:129, rendu exporté) |
 | `etoiles.svg`           | 15 × 14         | Fiche : entre l'auteur et la date (229:179) |
 | `rose-des-vents.svg`   | 74 × 74         | Carte, en bas à gauche (maquette 186:170, exportée d'un bloc) |
 | `fleuron.svg`          | 70 × 14         | Carte, de part et d'autre du nom du territoire ; le second est retourné en CSS (200:193) |

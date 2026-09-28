@@ -67,6 +67,7 @@
   --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */
   --color-fiche-rond: #fbebd3; /* fond des boutons ronds, à 51 % */
   --color-fiche-vignette: #937558; /* le cadre de la vignette choisie */
+  --color-fiche-lisiere: #fdf1e0; /* le bord déchiré : la teinte du fond à la jonction */
   --color-accent-bord: #c96a6a; /* le filet du bouton rouge */
   --color-pilule: #f6ead0; /* la pilule de revendication */
   --color-pilule-texte: #5a4331;

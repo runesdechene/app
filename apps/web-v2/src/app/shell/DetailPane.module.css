@@ -80,6 +80,7 @@
 .surImage .header {
   position: absolute;
   inset: 0 0 auto;
+  z-index: 3; /* au-dessus du dégradé de la photo : la flèche reste blanche */
   pointer-events: none; /* seule la flèche se touche : le partage de la photo reste accessible */
   padding-top: calc(env(safe-area-inset-top) + var(--space-2));
 }
@@ -96,4 +97,12 @@
 
 .surImage .close {
   pointer-events: auto;
+}
+
+/* Sur PC, la fiche vit dans le tiroir : on le replie ou on change d'onglet, la flèche ne sert à
+   rien (Uriel, 28/09). */
+@container app (width >= 1024px) {
+  .surImage .close {
+    display: none;
+  }
 }
