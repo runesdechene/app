@@ -1,15 +1,16 @@
 /**
  * QUOI     — toutes les adresses de la V2.
  * POURQUOI — tout état navigable est une URL (spec socle §4bis). Premier segment = l'onglet ;
- *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou le menu
- *            avatar (/carte/menu).
+ *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou une
+ *            feuille (/carte/ajouter).
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
-import { RouteExplorateur, RouteMenu, RouteModifier, RoutePreferences } from './routes/compte'
+import { RouteAjouter, RouteLieu, RouteNotifications } from './routes/carte'
+import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
@@ -27,7 +28,9 @@ export const routes: RouteObject[] = [
             Component: TabRoute,
             children: [
               { index: true, element: null },
-              { path: 'menu', Component: RouteMenu },
+              { path: 'ajouter', Component: RouteAjouter },
+              { path: 'notifications', Component: RouteNotifications },
+              { path: 'lieu/:id', Component: RouteLieu },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'preferences', Component: RoutePreferences },

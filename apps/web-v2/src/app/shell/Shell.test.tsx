@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille navigue par URL et garde les cinq écrans montés.
+ * QUOI     — la coquille navigue par URL et garde les quatre écrans montés.
  * POURQUOI — c'est la promesse centrale de la navigation (spec socle §4bis).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -49,7 +49,7 @@ test('changer d’onglet affiche le nouvel écran et garde l’ancien monté', a
 
 test('changer d’onglet ajoute une entrée : le retour ramène à l’onglet précédent', async () => {
   const router = renderAt('/accueil')
-  await userEvent.click(await screen.findByRole('button', { name: 'Codex' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Messages' }))
   await router.navigate(-1)
   expect(router.state.location.pathname).toBe('/accueil')
 })
@@ -63,7 +63,7 @@ test('l’onglet actif est annoncé', async () => {
 })
 
 test('un lien « Revenir à la V1 » est toujours visible pendant la construction', async () => {
-  renderAt('/codex')
+  renderAt('/messages')
   expect(await screen.findByRole('link', { name: 'Revenir à la V1' })).toHaveAttribute('href', '/')
 })
 
@@ -71,4 +71,18 @@ test('une barre oblique finale n’ouvre pas de détail', async () => {
   renderAt('/carte/')
   await screen.findByText('La Carte est à venir')
   expect(document.querySelector('[data-detail]')).toBeNull()
+})
+
+test('l’en-tête porte « Ajouter » et « Notifications », la barre porte le Compte', async () => {
+  renderAt('/carte')
+  expect(await screen.findByRole('button', { name: 'Ajouter' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Compte/ })).toBeInTheDocument()
+})
+
+test('« Ajouter » ouvre la feuille par-dessus l’onglet courant', async () => {
+  const router = renderAt('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter' }))
+  expect(router.state.location.pathname).toBe('/carte/ajouter')
+  expect(await screen.findByRole('dialog', { name: 'Ajouter sur la carte' })).toBeInTheDocument()
 })

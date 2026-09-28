@@ -1,8 +1,9 @@
 # compte — le Compte de l'Explorateur
 
-Conception : `docs/superpowers/specs/2026-09-27-v2-compte-design.md`.
+Conception : `docs/superpowers/specs/2026-09-27-v2-compte-design.md` (et §0 de
+`2026-08-18-app-v2-design.md` : le Compte est un onglet depuis le 28/09).
 
-- `/<onglet>/menu` — le menu avatar (feuille) : Mon profil, Préférences, Déconnexion.
+- `/compte` — l'onglet Compte : mon profil, Préférences, Déconnexion.
 - `/<onglet>/explorateur/<id>` — le profil public, le même pour soi et pour les autres.
 - `/<onglet>/explorateur/<moi>/modifier` — Modifier mon profil.
 - `/<onglet>/preferences` — les Préférences.

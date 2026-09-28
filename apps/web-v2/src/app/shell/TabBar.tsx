@@ -1,27 +1,27 @@
 /**
- * QUOI     — la barre des cinq onglets : icône gravée + libellé, lisière de forêt au-dessus.
+ * QUOI     — la barre des quatre onglets : icône gravée + libellé, lisière de forêt au-dessus ;
+ *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
  */
 import { useLocation, useNavigate } from 'react-router'
+import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
+import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
-import campementIcon from '@/assets/ui/onglet-campement.png'
 import carteIcon from '@/assets/ui/onglet-carte.png'
-import codexIcon from '@/assets/ui/onglet-codex.png'
 import messagesIcon from '@/assets/ui/onglet-messages.png'
+import { Avatar } from '@/shared/ui/Avatar'
 import { Text } from '@/shared/ui/Text'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
 import styles from './TabBar.module.css'
 
-const ICONS: Record<TabId, string> = {
+const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
   accueil: accueilIcon,
   carte: carteIcon,
   messages: messagesIcon,
-  codex: codexIcon,
-  campement: campementIcon,
 }
 
 export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
@@ -29,6 +29,7 @@ export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
   const navigate = useNavigate()
   const memory = useTabMemory()
   const active = tabOf(pathname)
+  const { profil } = useExplorateur(useMonIdentifiant())
 
   function press(pressed: TabId) {
     const action = resolveTabPress({ active, pressed, pathname, memory })
@@ -48,11 +49,17 @@ export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
             press(tab.id)
           }}
         >
-          <span
-            className={styles.icon}
-            style={{ '--icone': `url(${ICONS[tab.id]})` }}
-            aria-hidden="true"
-          />
+          {tab.id === 'compte' ? (
+            <span className={styles.avatar} aria-hidden="true">
+              <Avatar url={profil?.avatarUrl ?? null} nom={profil?.nom ?? ''} taille="mini" />
+            </span>
+          ) : (
+            <span
+              className={styles.icon}
+              style={{ '--icone': `url(${ICONS[tab.id]})` }}
+              aria-hidden="true"
+            />
+          )}
           <Text variant="libelle">{tab.label}</Text>
         </button>
       ))}

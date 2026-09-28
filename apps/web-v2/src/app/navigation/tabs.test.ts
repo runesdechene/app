@@ -4,8 +4,10 @@
  */
 import { isTabId, resolveTabPress, tabOf, TABS } from './tabs'
 
-test('cinq onglets, dans l’ordre de la maquette', () => {
-  expect(TABS.map((t) => t.label)).toEqual(['Accueil', 'Carte', 'Messages', 'Codex', 'Campement'])
+test('quatre onglets, dans l’ordre de la maquette', () => {
+  expect(TABS.map((t) => t.id)).toEqual(['accueil', 'carte', 'messages', 'compte'])
+  expect(isTabId('codex')).toBe(false)
+  expect(isTabId('compte')).toBe(true)
 })
 
 test('reconnaît l’onglet à partir du premier segment', () => {
@@ -16,7 +18,7 @@ test('reconnaît l’onglet à partir du premier segment', () => {
 })
 
 test('isTabId filtre les valeurs inconnues', () => {
-  expect(isTabId('codex')).toBe(true)
+  expect(isTabId('messages')).toBe(true)
   expect(isTabId('registre')).toBe(false)
   expect(isTabId(undefined)).toBe(false)
 })
@@ -34,8 +36,8 @@ test('changer d’onglet rouvre sa dernière adresse', () => {
 
 test('changer d’onglet sans mémoire ouvre sa racine', () => {
   expect(
-    resolveTabPress({ active: 'accueil', pressed: 'codex', pathname: '/accueil', memory: {} }),
-  ).toEqual({ kind: 'navigate', to: '/codex' })
+    resolveTabPress({ active: 'accueil', pressed: 'compte', pathname: '/accueil', memory: {} }),
+  ).toEqual({ kind: 'navigate', to: '/compte' })
 })
 
 test('toucher l’onglet actif hors de sa racine remonte à la racine', () => {

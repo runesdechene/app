@@ -11,8 +11,6 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `onglet-accueil.png`   | 120 × 120       | icône de l'onglet Accueil (affichée en 24 px)                     |
 | `onglet-carte.png`     | 120 × 120       | icône de l'onglet Carte                                           |
 | `onglet-messages.png`  | 122 × 175       | icône de l'onglet Messages                                        |
-| `onglet-codex.png`     | 122 × 175       | icône de l'onglet Codex                                           |
-| `onglet-campement.png` | 338 × 342       | icône de l'onglet Campement                                       |
 | `partager.svg`         | vectoriel       | exemple d'IconButton sur /v2/da (fiche lieu, « partager »)        |
 | `fleche-retour.svg`    | 24 × 24         | retour, en tête de chaque détail (maquette COMPTE)                |
 | `coche.svg`            | 10 × 10         | badge « Porteur vérifié »                                         |
@@ -21,6 +19,8 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `murmure.svg`          | 16 × 16         | bouton « Envoyer un murmure »                                     |
 | `cloche.svg`, `calendrier.svg`, `pas.svg`, `repere.svg`, `courriel.svg`, `question.svg` | 22 × 22 | icônes des lignes de Préférences (maquette 91:166) |
 | `coeur.svg`            | 22 × 22         | Préférences, « Montrer tes envies » (Lucide « heart », même trait) |
+| `ajouter.svg`, `cloche.svg` | 24 × 24 | « Ajouter » et la cloche de l'en-tête (pochoirs, maquette 162:107) ; le point rouge de la cloche est à part |
+| `lieu.svg`, `point-interet.svg`, `pin-gps.svg` | 24 × 24 | les trois choix de la feuille « Ajouter » (maquette 201:216) |
 | `chevron.svg`          | 18 × 18         | fin des lignes qui ouvrent quelque chose (Préférences)            |
 | `appareil-photo.svg`   | 14 × 14         | « Changer la photo » (Modifier mon profil, maquette 91:107)       |
 | `coche-choisie.svg`    | 12 × 12         | coche rouge d'une pastille choisie (titres portés)                |

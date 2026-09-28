@@ -1,14 +1,14 @@
 /**
  * QUOI     — « Fragments collectés » : les Fragments possédés, sur une ligne. Sur son propre
  *            profil, toucher un Fragment permet de placer son profil sous son signe (maquette
- *            109:175), et une tuile en empreinte, « + 5 à découvrir », mène au Codex.
+ *            109:175), et une tuile en empreinte, « + 5 à découvrir », mène à la boutique
+ *            (le Codex a quitté Explore le 28/09 : la collection vit dans la boutique).
  * POURQUOI — le signe est une volonté de se placer sous un motif (Uriel, 27/09) : il se choisit
  *            ici, là où l'on voit ses Fragments, et son illustration veille ensuite en filigrane.
  * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton, et
  *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
 import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
@@ -17,11 +17,12 @@ import { useChoisirSigne } from '../hooks/useChoisirSigne'
 import { useGlisser } from '../hooks/useGlisser'
 import styles from './ProfilFragments.module.css'
 
+const BOUTIQUE_URL = 'https://runesdechene.com/collections/all'
+
 export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   const [ouvert, setOuvert] = useState<Fragment | null>(null)
   const { choisir, echec } = useChoisirSigne(profil.id)
   const rangee = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
   useGlisser(rangee)
 
   if (profil.fragments.length === 0) return null
@@ -68,17 +69,16 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
             ),
           )}
           {profil.fragmentsADecouvrir !== null && profil.fragmentsADecouvrir > 0 && (
-            <button
-              type="button"
+            <a
               className={styles.aDecouvrir}
-              aria-label={`+ ${String(profil.fragmentsADecouvrir)} à découvrir, dans le Codex`}
-              onClick={() => {
-                void navigate('/codex')
-              }}
+              href={BOUTIQUE_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`+ ${String(profil.fragmentsADecouvrir)} à découvrir, sur la boutique`}
             >
               <span className={styles.plus}>+ {profil.fragmentsADecouvrir}</span>
               <span className={styles.nom}>à découvrir</span>
-            </button>
+            </a>
           )}
         </div>
       </div>

@@ -4,5 +4,7 @@ Une zone (`features/`) ne dépend jamais de la coquille (`app/`). Quand un écra
 besoin du cadre de détail ou de la fermeture, un petit composant d'ici les lui donne, et
 `router.tsx` pointe sur lui.
 
-- `compte.tsx` — le menu avatar (`/<onglet>/menu`), le profil (`/<onglet>/explorateur/<id>`)
-  sa modification (`…/modifier`, le sien seulement) et les Préférences (`/<onglet>/preferences`).
+- `compte.tsx` — le profil (`/<onglet>/explorateur/<id>`), sa modification (`…/modifier`, le
+  sien seulement) et les Préférences (`/<onglet>/preferences`).
+- `carte.tsx` — la feuille « Ajouter » (`/<onglet>/ajouter`), les notifications
+  (`/<onglet>/notifications`) et la fiche d'un lieu (`/carte/lieu/<id>`).

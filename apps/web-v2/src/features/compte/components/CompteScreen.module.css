@@ -1,0 +1,46 @@
+/*
+ * QUOI     — l'onglet Compte : les badges en haut à droite, le profil, puis les entrées du compte
+ *            (grandes cibles, Cabin semi-gras ; la déconnexion en rouge).
+ */
+.compte {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.badges {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-3);
+  z-index: 1;
+}
+
+.entrees {
+  display: grid;
+  justify-items: start;
+  padding: 0 var(--space-6);
+}
+
+.entree {
+  min-height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+  text-align: left;
+}
+
+.sortie {
+  color: var(--color-accent);
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}

@@ -60,7 +60,6 @@ function afficher(profil: ExplorateurProfile | null) {
   const router = createMemoryRouter(
     [
       { path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> },
-      { path: '/codex', element: null },
     ],
     { initialEntries: ['/carte/explorateur/u1'] },
   )
@@ -169,10 +168,12 @@ test('le bandeau de chiffres : lieux ajoutés, visités, fragments', async () =>
   expect(chiffres).toHaveTextContent('1Fragment')
 })
 
-test('sur mon profil, une tuile invite à découvrir les autres Fragments, vers le Codex', async () => {
-  const router = afficher(PROFIL)
-  await userEvent.click(await screen.findByRole('button', { name: /5 à découvrir/ }))
-  expect(router.state.location.pathname).toBe('/codex')
+test('sur mon profil, une tuile invite à découvrir les autres Fragments, sur la boutique', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('link', { name: /5 à découvrir/ })).toHaveAttribute(
+    'href',
+    'https://runesdechene.com/collections/all',
+  )
 })
 
 test('chez un autre, jamais de Fragments manquants', async () => {

@@ -1,12 +1,12 @@
 # components — les écrans de la zone Compte
 
-- `MenuAvatar` — la feuille ouverte par l'avatar.
+- `CompteScreen` — l'onglet Compte : mes badges, mon profil, Préférences, Déconnexion.
 - `ProfilExplorateur` — le profil public ; ses états chargement / erreur / introuvable.
   - `ProfilEntete` — couverture du signe, portrait, nom, niveau, titres en une ligne (origine
     au toucher), présentation, attache, bouton.
   - `ProfilChiffres` — le bandeau : lieux ajoutés, visités, fragments.
   - `ProfilFragments` — les Fragments collectés sur une ligne ; sur son profil, choisir son
-    signe et « + N à découvrir » vers le Codex.
+    signe et « + N à découvrir » vers la boutique.
   - `ProfilDecouvertes` — sections Lieux ajoutés / Visités / Envie d'y aller, en lignes qui défilent.
   - `LieuCarte` — grande carte photo : nom posé dessus, catégorie, distance (si position), auteur.
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.

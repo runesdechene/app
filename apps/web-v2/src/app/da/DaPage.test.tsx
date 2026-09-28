@@ -3,18 +3,22 @@
  * POURQUOI — « pas d'élément sauvage » (décision 007) : une brique ajoutée sans être montrée
  *            fait échouer ce test ; un jeton de couleur ou un style de texte aussi.
  */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { TEXT_VARIANTS } from '@/shared/ui/textVariants'
 import { DaPage } from './DaPage'
 import { COLOR_TOKENS, DA_SHOWCASED } from './daTokens'
 
-// La page montre la vraie barre d'onglets, qui a besoin d'un routeur.
+// La page montre la vraie barre d'onglets, qui a besoin d'un routeur, et de la base (l'avatar de
+// l'onglet Compte).
 function renderPage() {
   render(
-    <MemoryRouter initialEntries={['/da']}>
-      <DaPage />
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/da']}>
+        <DaPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 

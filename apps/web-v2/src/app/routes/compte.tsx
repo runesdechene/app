@@ -5,18 +5,11 @@
  */
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import { BadgesExplorateur } from '@/features/compte/components/BadgesExplorateur'
-import { MenuAvatar } from '@/features/compte/components/MenuAvatar'
 import { ModifierProfil } from '@/features/compte/components/ModifierProfil'
 import { PreferencesPage } from '@/features/compte/components/PreferencesPage'
 import { ProfilExplorateur } from '@/features/compte/components/ProfilExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
-import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
-
-// /<onglet>/menu
-export function RouteMenu() {
-  return <MenuAvatar onFermer={useFermerDetail()} />
-}
 
 // /<onglet>/explorateur/<id>
 export function RouteExplorateur() {
