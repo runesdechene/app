@@ -1570,9 +1570,9 @@ test.each([
   ['inconnue', null, 'Me localiser pour visiter', true],
   ['refusee', null, 'Position refusée', false],
   [{ lat: 45.0009, lng: 6 }, null, 'Marquer ma visite (GPS)', true],
-  [{ lat: 47.47, lng: 6 }, null, 'Marquer ma visite · 274 km trop loin', false],
+  [{ lat: 47.465, lng: 6 }, null, 'Marquer ma visite · 274 km trop loin', false],
   [{ lat: 45.0009, lng: 6 }, '2026-08-03T10:00:00Z', 'Revendiquer', true],
-  [{ lat: 47.47, lng: 6 }, '2026-08-03T10:00:00Z', '✓ Visité le 3 août · 274 km', false],
+  [{ lat: 47.465, lng: 6 }, '2026-08-03T10:00:00Z', '✓ Visité le 3 août · 274 km', false],
 ] as const)('position %o, visité %s : « %s »', (position, visiteLe, libelle, actif) => {
   position_.mockReturnValue({ position, demander: vi.fn() })
   afficher({ lat: 45, lng: 6, visiteLe })
