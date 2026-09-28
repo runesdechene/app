@@ -1,5 +1,6 @@
 /**
- * QUOI     — les Grands Explorateurs sur l'Accueil : les visites du mois, trois lignes, ma place,
+ * QUOI     — les Grands Explorateurs sur l'Accueil : les visites du mois, trois lignes, ma ligne
+ *            seulement si j'en suis,
  *            et « Voir tout le classement » qui ouvre la page du classement dans l'Accueil.
  *            La page : le choix du classement et toute la liste.
  */
@@ -63,8 +64,14 @@ test('« Voir tout le classement » ouvre la page du classement dans l’Accueil
   expect(router.state.location.pathname).toBe('/accueil/classement')
 })
 
-test('ma place, hors des lignes : une ligne comme les autres, avec ce qui me manque', async () => {
+test('sur l’Accueil, hors des trois : pas de ligne pour moi', async () => {
   monter(<GrandsExplorateurs />)
+  await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
+  expect(screen.queryByLabelText('Ma place')).toBeNull()
+})
+
+test('dans la page, ma place : une ligne comme les autres, avec ce qui me manque', async () => {
+  monter(<PageClassement />)
   const moi = await screen.findByLabelText('Ma place')
   expect(moi).toHaveTextContent('XIV')
   expect(moi).toHaveTextContent('Toi')
@@ -72,13 +79,13 @@ test('ma place, hors des lignes : une ligne comme les autres, avec ce qui me man
   expect(moi).toHaveTextContent('3 lieux')
 })
 
-test('pas encore classé : une invitation, pas un rang', async () => {
+test('dans la page, pas encore classé : une invitation, pas un rang', async () => {
   api.fetchGrandsExplorateurs.mockResolvedValue({
     tete,
     moi: { ...MOI, rang: null, lieux: 0 },
     dixieme: 21,
   })
-  monter(<GrandsExplorateurs />)
+  monter(<PageClassement />)
   const moi = await screen.findByLabelText('Ma place')
   expect(moi).toHaveTextContent('Une visite ce mois-ci te fait entrer au classement')
 })

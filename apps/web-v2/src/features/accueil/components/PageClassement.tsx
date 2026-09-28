@@ -56,6 +56,7 @@ export function PageClassement() {
             type={type}
             periode={periode}
             lignes={classement.tete.length}
+            avecMaPlace
           />
         ))}
     </div>

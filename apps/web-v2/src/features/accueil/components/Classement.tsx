@@ -29,11 +29,13 @@ export function Classement({
   type,
   periode,
   lignes,
+  avecMaPlace,
 }: {
   classement: GrandsExplorateurs
   type: TypeDeClassement
   periode: Periode
   lignes: number
+  avecMaPlace: boolean // hors des lignes, ma place : oui dans la page, non sur l'Accueil
 }) {
   const { tete, moi } = classement
   const visibles = tete.slice(0, lignes)
@@ -45,7 +47,7 @@ export function Classement({
           <Ligne key={g.id} explorateur={g} moi={moi?.rang === g.rang} />
         ))}
       </ol>
-      {moi && !moiVisible && (
+      {avecMaPlace && moi && !moiVisible && (
         <div className={styles.maPlace} aria-label="Ma place">
           <span className={styles.rang}>{moi.rang ? romain(moi.rang) : '—'}</span>
           <span className={styles.qui}>
