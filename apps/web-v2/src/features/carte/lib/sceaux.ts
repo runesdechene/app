@@ -1,7 +1,7 @@
 /**
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
  *            la bille « ? » (lieu inconnu), le sceau crème (connu), le sceau d'encre (visité),
- *            l'étoile (point d'intérêt) et le sceau des groupes.
+ *            l'étoile (point d'intérêt), le sceau des groupes et le fond des pilules.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3).
  * ATTENTION — une icône de type qui ne se charge pas retombe sur le losange par défaut : jamais
@@ -171,6 +171,28 @@ function groupe(c: CouleursCarte) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
+// Le fond d'une pilule : une gélule étirable autour du nom (`icon-text-fit`). La mienne en
+// encre pleine, les autres en parchemin cerclé d'encre pâle.
+function pilule(map: Carte, nom: string, fond: string, bord: string) {
+  const [largeur, hauteur, rayon] = [40, 24, 12]
+  const ctx = new OffscreenCanvas(largeur, hauteur).getContext('2d')
+  if (!ctx) throw new Error('canevas indisponible')
+  ctx.beginPath()
+  ctx.roundRect(1, 1, largeur - 2, hauteur - 2, rayon - 1)
+  ctx.fillStyle = fond
+  ctx.fill()
+  ctx.lineWidth = 2
+  ctx.strokeStyle = bord
+  ctx.stroke()
+  if (map.hasImage(nom)) return
+  map.addImage(nom, ctx.getImageData(0, 0, largeur, hauteur), {
+    pixelRatio: RATIO,
+    stretchX: [[rayon, largeur - rayon]],
+    stretchY: [[rayon - 1, rayon + 1]],
+    content: [rayon, 4, largeur - rayon, hauteur - 4],
+  })
+}
+
 function ajouter(map: Carte, nom: string, image: ImageData) {
   if (!map.hasImage(nom)) map.addImage(nom, image, { pixelRatio: RATIO })
 }
@@ -186,6 +208,8 @@ export async function ajouterMarques(
   ajouter(map, 'bille', bille(c))
   ajouter(map, 'curiosite', etoile(c))
   ajouter(map, 'groupe', groupe(c))
+  pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
+  pilule(map, 'pilule-moi', c.encre, c.encre)
 
   const connus = lieux.filter((l) => l.nature === 'lieu' && l.etat !== 'inconnu')
   const icones = new Map(connus.map((l) => [l.icone, chargerIcone(l.icone)]))

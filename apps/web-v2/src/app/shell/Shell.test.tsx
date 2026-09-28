@@ -42,7 +42,7 @@ test('changer d’onglet affiche le nouvel écran et garde l’ancien monté', a
   const router = renderAt('/accueil')
   await userEvent.click(await screen.findByRole('button', { name: 'Carte' }))
   expect(router.state.location.pathname).toBe('/carte')
-  expect(screen.getByText('La Carte est à venir')).toBeVisible()
+  expect(screen.getByTestId('carte')).toBeVisible()
   expect(screen.getByText('L’Accueil est à venir')).not.toBeVisible()
   expect(screen.getByText('L’Accueil est à venir')).toBeInTheDocument()
 })
@@ -69,7 +69,7 @@ test('un lien « Revenir à la V1 » est toujours visible pendant la constructio
 
 test('une barre oblique finale n’ouvre pas de détail', async () => {
   renderAt('/carte/')
-  await screen.findByText('La Carte est à venir')
+  await screen.findByTestId('carte')
   expect(document.querySelector('[data-detail]')).toBeNull()
 })
 

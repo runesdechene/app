@@ -4,7 +4,8 @@
  *            SEUL ce réglage revient à sa place, et `echec` passe à vrai pour que l'écran le
  *            dise. Deux réglages touchés coup sur coup ne s'annulent donc jamais l'un l'autre.
  * ATTENTION — `cancelQueries` avant d'écrire : une relecture déjà partie ne vient pas écraser
- *            la valeur qu'on vient d'afficher.
+ *            la valeur qu'on vient d'afficher. Après un succès, `['preferences', <réglage>]` est
+ *            rafraîchi : une autre zone qui lit ce seul réglage (la Carte) le voit changer.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -65,6 +66,9 @@ export function usePreferences(): {
       setEchec(false)
       await queryClient.cancelQueries({ queryKey: CLE })
       afficher(reglage, valeur)
+    },
+    onSuccess: (_resultat, { reglage }) => {
+      void queryClient.invalidateQueries({ queryKey: [...CLE, reglage] })
     },
     onError: (_erreur, { reglage, valeur }) => {
       afficher(reglage, !valeur)

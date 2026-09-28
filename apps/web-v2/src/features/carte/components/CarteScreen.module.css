@@ -1,0 +1,31 @@
+/*
+ * QUOI     — la carte plein écran, et le bandeau discret quand les lieux ne se chargent pas.
+ */
+.ecran {
+  position: relative;
+  height: 100%;
+  background: var(--color-carte-fond);
+}
+
+.carte {
+  position: absolute;
+  inset: 0;
+}
+
+.bandeau {
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+  translate: -50% 0;
+}
