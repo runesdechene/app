@@ -100,20 +100,19 @@ par l'échec. **Portée : 200 m.**
 - *« Tu es au [lieu]. Ton nom s'inscrira sous son sceau, pour la gloire — jusqu'à ce qu'un autre
   vienne le reprendre. »*
 - **Seul / En expédition** (le curseur des Segments). Seul : la pilule porte mon nom.
-- **En expédition — « Qui est avec toi ? »** : la liste des compagnons possibles, à cocher :
-  - **les Explorateurs connectés à moins de 200 m du lieu, maintenant** (« à 40 m, ici
-    maintenant ») ;
-  - **les Explorateurs passés ici en GPS dans les 30 dernières minutes** (« passée il y a 25 min »).
-  - *Révise la spec Carte §5 (Uriel, 28/09) : « passés » veut dire « dans le coin », pas
-    seulement « ont visité ». La présence en direct revient, mais c'est le serveur qui calcule
-    qui est proche (§6) : le téléphone ne choisit jamais qui est avec lui.*
+- **En expédition — « Qui est avec toi ? »** : **uniquement les Explorateurs présents en ce
+  moment**, connectés à moins de 200 m du lieu (« à 40 m »), à cocher (Uriel, 28/09).
+  - *Révise la spec Carte §5 : les compagnons ne viennent plus des visites récentes mais de la
+    présence en direct. C'est le serveur qui calcule qui est proche (§6) : le téléphone ne
+    choisit jamais qui est avec lui.*
+  - Personne autour : « Personne d'autre n'est ici en ce moment » — on revendique seul.
 - **Nom de l'expédition** : un champ, et mes noms d'expédition passés en pastilles (toucher =
   remplir). Obligatoire en expédition.
 - **Revendiquer** / **Pas maintenant**. Refuser ne défait pas la visite.
 
 **Ce que fait `revendiquer_lieu`** : il vérifie que l'appelant a visité le lieu en GPS **dans les
-30 dernières minutes** (sinon : refus) et que chaque compagnon coché est proche maintenant ou
-passé dans les 30 minutes (les autres sont ignorés). Puis, comme `plant_flag` de la V1 (sa
+30 dernières minutes** (sinon : refus) et que chaque compagnon coché est **présent maintenant à
+moins de 200 m du lieu** (les autres sont ignorés). Puis, comme `plant_flag` de la V1 (sa
 définition live sera relue avant d'écrire) : une expédition (`expeditions.title`, ses
 `expedition_members`), `place_veille` (le veilleur, l'expédition, `planted_at`), une ligne
 `veille_history`. **Pas de délai entre deux revendications, pas de Cour, pas de Couronnes.** La V1
@@ -131,11 +130,11 @@ place.
 - Une seule ligne par Explorateur (`presences`), **écrasée à chaque signal**, **oubliée au bout de
   10 minutes**. **Aucun historique.** Personne ne lit cette table : seules les fonctions de la
   revendication s'en servent, et elles ne rendent jamais une position, seulement « à 40 m ».
-- **« Brouiller tes pistes »** : l'Explorateur apparaît quand même comme compagnon, **mais
-  seulement à quelqu'un dont la présence le place lui aussi, maintenant, à moins de 200 m du
-  lieu** — qui le voit donc de toute façon. Quelqu'un passé il y a 25 minutes et reparti ne le voit
-  pas. Rien n'est révélé à distance (Uriel, 28/09).
-- Position refusée : aucun signal ; on n'apparaît que par ses visites GPS récentes.
+- **La liste ne se montre qu'à quelqu'un qui est lui-même présent, maintenant, à moins de 200 m
+  du lieu** — qui voit donc de toute façon les gens autour. Rien n'est révélé à distance. C'est
+  aussi ce qui règle **« Brouiller tes pistes »** : l'Explorateur apparaît comme compagnon, mais
+  seulement à quelqu'un qui est sur place (Uriel, 28/09).
+- Position refusée : aucun signal ; on n'apparaît pas comme compagnon.
 
 ## 7. Les données
 
@@ -149,7 +148,7 @@ Toutes les fonctions lisent **`auth.uid()`** et ne prennent jamais d'identifiant
 | Envie d'y aller | `basculer_envie(p_id)` | `places_bookmarked` |
 | Visiter en GPS | `visiter_lieu(p_id, p_lat, p_lng)` | `place_explorers`, `places_discovered` |
 | Signaler sa présence | `signaler_presence(p_lat, p_lng)` | `presences` (nouvelle) |
-| Les compagnons possibles | `compagnons_possibles(p_id)` | `presences`, `place_explorers`, `users` |
+| Les compagnons possibles | `compagnons_possibles(p_id)` | `presences`, `users` |
 | Mes noms d'expédition passés | `mes_noms_d_expedition()` | `expedition_members`, `expeditions` |
 | Revendiquer | `revendiquer_lieu(p_id, p_compagnons, p_nom)` | `expeditions`, `expedition_members`, `place_veille`, `veille_history` |
 
@@ -177,7 +176,7 @@ zone Carte n'en importe rien (elle navigue vers l'adresse).
   remis à jour).
 - `revendiquer_lieu` : seul ; à plusieurs ; sans visite récente (refusé) ; un compagnon ni proche
   ni passé (ignoré) ; la reprise par un autre (la pilule change).
-- `compagnons_possibles` : proche maintenant ; passé il y a 25 min ; passé il y a 40 min (absent) ;
-  présence vieille de 11 min (absente) ; « brouiller » à 150 m (présent pour qui est sur place,
-  absent pour qui est reparti) — et jamais soi-même.
+- `compagnons_possibles` : présent à 40 m (listé) ; à 250 m (absent) ; présence vieille de
+  11 min (absente) ; « brouiller » à 150 m (listé) ; appelant lui-même absent ou loin (liste vide) ;
+  jamais soi-même.
 - Envie d'y aller : bascule, et retour en arrière si la base refuse.

@@ -90,8 +90,8 @@ distance sinon. Portée : **200 m** — la valeur réellement appliquée en V1 (
 
 **Après une visite GPS réussie, une fenêtre propose de revendiquer le lieu.** On peut refuser :
 visiter n'oblige pas à revendiquer.
-> *Révisé le 28/09 par la spec « fiche d'un lieu » (§5-6) : les compagnons sont aussi les
-> Explorateurs connectés à moins de 200 m, présence calculée par le serveur.*
+> *Révisé le 28/09 par la spec « fiche d'un lieu » (§5-6) : les compagnons sont uniquement les
+> Explorateurs présents en ce moment à moins de 200 m, présence calculée par le serveur.*
 
 - **Seul**, ou **à plusieurs** : la fenêtre liste les **compagnons** — les joueurs qui ont
   **eux-mêmes visité ce lieu en GPS dans les 30 dernières minutes**. On les coche.
