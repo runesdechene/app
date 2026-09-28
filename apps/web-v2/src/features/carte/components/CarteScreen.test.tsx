@@ -206,3 +206,13 @@ test('?centre=lat,lng : la carte vole jusqu’au lieu une fois chargée', () => 
     expect.objectContaining({ center: [6.1, 45.9], zoom: 14 }),
   )
 })
+
+test('au survol d’un lieu, la main apparaît et le lieu se détache ; elle s’en va quand on le quitte', () => {
+  afficher()
+  charger()
+  carte().emettre('mousemove', { features: [{ properties: { id: 'connu' } }] })
+  expect(carte().canevas.style.cursor).toBe('pointer')
+  expect(carte().setFilter).toHaveBeenLastCalledWith('survol', ['==', ['get', 'id'], 'connu'])
+  carte().emettre('mouseleave')
+  expect(carte().canevas.style.cursor).toBe('')
+})

@@ -30,8 +30,15 @@ export class FausseCarte {
     if (f) this.ecouteurs.set(type, [...(this.ecouteurs.get(type) ?? []), f])
   }
 
-  emettre(type: string) {
-    for (const f of this.ecouteurs.get(type) ?? []) f()
+  emettre(type: string, evenement?: unknown) {
+    for (const f of this.ecouteurs.get(type) ?? []) f(evenement)
+  }
+
+  canevas = { style: { cursor: '' } }
+  setFilter = vi.fn()
+  setLayoutProperty = vi.fn()
+  getCanvas() {
+    return this.canevas
   }
 
   setStyle() {}

@@ -19,6 +19,7 @@ import { nomImage } from './sceaux'
 
 export const SOURCE = 'lieux'
 export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites']
+export const CALQUE_SURVOL = 'survol'
 
 // De près seulement : les pilules et les points d'intérêt ne chargent pas la vue d'ensemble.
 const DE_PRES = 12
@@ -55,7 +56,7 @@ export function enGeoJSON(
 const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
 
 // La marque grandit avec le zoom : un point de loin, le sceau entier de près.
-const taille: ExpressionSpecification = [
+export const TAILLE: ExpressionSpecification = [
   'interpolate',
   ['linear'],
   ['zoom'],
@@ -69,7 +70,7 @@ const taille: ExpressionSpecification = [
 
 const marque: NonNullable<SymbolLayerSpecification['layout']> = {
   'icon-image': ['get', 'image'],
-  'icon-size': taille,
+  'icon-size': TAILLE,
   'icon-allow-overlap': true,
   'icon-ignore-placement': true,
 }
@@ -103,6 +104,14 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
     source: SOURCE,
     minzoom: DE_PRES,
     filter: ['==', ['get', 'nature'], 'curiosite'],
+    layout: marque,
+  })
+  // Le lieu survolé, redessiné par-dessus : c'est lui qui grossit et « pulse » au clic (survol.ts).
+  map.addLayer({
+    id: CALQUE_SURVOL,
+    type: 'symbol',
+    source: SOURCE,
+    filter: ['==', ['get', 'id'], ''],
     layout: marque,
   })
   map.addLayer({

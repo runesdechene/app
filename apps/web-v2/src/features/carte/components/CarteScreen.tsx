@@ -26,6 +26,7 @@ import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
 import { styleParchemin } from '../lib/style'
+import { suivreSurvol } from '../lib/survol'
 import styles from './CarteScreen.module.css'
 import { FiltreFeuille } from './FiltreFeuille'
 import { Inscription } from './Inscription'
@@ -93,6 +94,7 @@ export function CarteScreen() {
 
     map.on('load', () => {
       ajouterCalques(map, couleurs)
+      suivreSurvol(map, CALQUES_LIEUX)
       setCarte(map)
       lireVue()
     })
