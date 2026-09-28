@@ -37,8 +37,10 @@ export async function lireMurmures(avec: string) {
 
 // Prévient à chaque murmure écrit ou lu ; rend de quoi arrêter d'écouter.
 export function ecouterMurmures(changement: () => void): () => void {
+  // Un canal par écoute : supabase rend le canal existant quand le nom est déjà pris, et
+  // l'onglet Messages écoute en même temps que l'écran (fermer l'un couperait l'autre).
   const canal = supabase
-    .channel('murmures')
+    .channel(`murmures-${crypto.randomUUID()}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'murmures' }, changement)
     .subscribe()
   return () => {

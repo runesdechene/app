@@ -7,14 +7,17 @@
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
+ *            L'onglet Messages porte la pastille des murmures non lus, posée sur son icône.
  */
 import { useLocation, useNavigate } from 'react-router'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
+import { useNonLus } from '@/features/messages/hooks/useMurmures'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
 import carteIcon from '@/assets/ui/onglet-carte.png'
 import messagesIcon from '@/assets/ui/onglet-messages.png'
 import { Avatar } from '@/shared/ui/Avatar'
+import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
@@ -43,6 +46,7 @@ export function TabBar({
   const active = tabOf(pathname)
   const { profil } = useExplorateur(useMonIdentifiant())
   const rang = ONGLETS_PC.findIndex((tab) => tab.id === active)
+  const nonLus = useNonLus()
 
   function press(pressed: TabId) {
     onToucher()
@@ -79,6 +83,11 @@ export function TabBar({
             />
           )}
           <Text variant="libelle">{tab.label}</Text>
+          {tab.id === 'messages' && (
+            <span className={styles.nonLus}>
+              <Pastille count={nonLus} />
+            </span>
+          )}
         </button>
       ))}
     </nav>

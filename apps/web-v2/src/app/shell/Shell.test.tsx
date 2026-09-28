@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
-import { vi } from 'vitest'
+import { beforeEach, vi } from 'vitest'
 import { routes } from '../router'
 
 vi.mock('../access/useV2Access', () => ({
@@ -23,6 +23,16 @@ vi.mock('@/features/accueil/api/accueil', () => ({
   fetchChemins: () => Promise.resolve([]),
   saluer: () => Promise.resolve({ saluts: 0, salue: false }),
 }))
+
+// Les Murmures : personne n'attend de réponse, sauf là où un test le dit.
+const murmures = vi.hoisted(() => ({
+  fetchFils: vi.fn<() => Promise<{ nonLus: number }[]>>(),
+  ecouterMurmures: () => () => undefined,
+}))
+vi.mock('@/features/messages/api/murmures', () => murmures)
+beforeEach(() => {
+  murmures.fetchFils.mockResolvedValue([])
+})
 
 function renderAt(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] })
@@ -68,6 +78,13 @@ test('l’onglet actif est annoncé', async () => {
     'aria-current',
     'page',
   )
+})
+
+test('l’onglet Messages porte le nombre de murmures non lus', async () => {
+  murmures.fetchFils.mockResolvedValue([{ nonLus: 2 }, { nonLus: 0 }, { nonLus: 1 }])
+  renderAt('/accueil')
+  // jsdom ne connaît pas le CSS : il colle « Messages » et « 3 non lus » (pas le navigateur).
+  expect(await screen.findByRole('button', { name: /^Messages ?3 non lus$/ })).toBeInTheDocument()
 })
 
 test('un lien « Revenir V1 » est toujours visible pendant la construction', async () => {

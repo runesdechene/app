@@ -35,6 +35,12 @@ export function useFils() {
   return { fils: query.data, erreur: query.isError }
 }
 
+// Le nombre de murmures reçus et pas encore lus, pour la pastille de l'onglet Messages.
+export function useNonLus() {
+  const { fils } = useFils()
+  return (fils ?? []).reduce((total, f) => total + f.nonLus, 0)
+}
+
 // L'en-tête d'une conversation : la route le lit pour le cadre de détail.
 export function useCorrespondant(avec: string) {
   return useQuery({
