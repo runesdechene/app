@@ -1,9 +1,12 @@
 /**
- * QUOI     — la fonction qui ferme le détail ou le menu ouvert (retour, ou racine de l'onglet).
- * POURQUOI — la même règle pour le cadre de détail et pour le menu avatar : voir closeDetail.ts.
+ * QUOI     — la fonction qui ferme le détail ouvert (retour, ou racine de l'onglet), après l'avoir
+ *            fait glisser hors du tiroir.
+ * POURQUOI — une seule règle de fermeture, voir closeDetail.ts ; l'animation, voir
+ *            replierDetail.ts.
  */
 import { useLocation, useNavigate } from 'react-router'
 import { closeDetailTarget } from './closeDetail'
+import { replierDetail } from './replierDetail'
 
 export function useFermerDetail(): () => void {
   const location = useLocation()
@@ -13,7 +16,9 @@ export function useFermerDetail(): () => void {
       pathname: location.pathname,
       hasInAppHistory: location.key !== 'default',
     })
-    if (action.kind === 'back') void navigate(-1)
-    else void navigate(action.to, { replace: true })
+    void replierDetail().then(() => {
+      if (action.kind === 'back') void navigate(-1)
+      else void navigate(action.to, { replace: true })
+    })
   }
 }

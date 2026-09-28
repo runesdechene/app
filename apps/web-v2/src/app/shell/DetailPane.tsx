@@ -40,6 +40,7 @@ export function DetailPane({
     <aside
       className={[styles.pane, surImage && styles.surImage].filter(Boolean).join(' ')}
       aria-labelledby="detail-title"
+      data-detail
       data-retour={retour || undefined}
     >
       <header className={styles.header}>

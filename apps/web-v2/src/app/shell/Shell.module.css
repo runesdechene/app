@@ -195,16 +195,16 @@
     z-index: 1;
   }
 
-  /* Une seule ombre à la fois : celle du dessus. Sous un détail, l'écran de l'onglet éteint la
-     sienne en douceur — deux ombres superposées faisaient une tache trop forte (Uriel, 28/09). */
-  .screen {
+  /* Un seul tiroir à la fois (Uriel, 28/09) : deux tiroirs superposés doublaient l'ombre et
+     laissaient voir un bord. Sous un détail, l'écran de l'onglet se retire une fois le détail
+     posé (le délai) — sans être démonté : il garde son défilement. Le détail fermé, il revient
+     en glissant : on retrouve le profil. */
+  .shell:has(> aside) .screen:not([data-ecran='carte']) {
+    visibility: hidden;
+    translate: -100% 0;
     transition:
-      translate var(--duree-douce) var(--courbe-douce),
-      box-shadow var(--duree-douce) var(--courbe-douce);
-  }
-
-  .shell:has(> aside) .screen {
-    box-shadow: none;
+      translate 0s linear var(--duree-douce),
+      visibility 0s linear var(--duree-douce);
   }
 
   /* À son apparition (un onglet ouvert depuis la carte, une fiche), il arrive en glissant. */
