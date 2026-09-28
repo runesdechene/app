@@ -185,7 +185,12 @@
     /* Le tiroir se détache de la carte par une ombre franche et un léger arrondi côté carte, sans
        aucune bordure (Uriel, 28/09). */
     border-radius: 0 var(--radius-petit) var(--radius-petit) 0;
-    background: var(--color-fond);
+
+    /* Le parchemin des écrans du téléphone (global.css), ici porté par le tiroir lui-même : il
+       reste en place pendant que le contenu défile. */
+    background:
+      url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat,
+      var(--color-fond);
     box-shadow: 6px 0 24px color-mix(in srgb, var(--color-ombre) 30%, transparent);
     transition: translate var(--duree-douce) var(--courbe-douce);
   }
