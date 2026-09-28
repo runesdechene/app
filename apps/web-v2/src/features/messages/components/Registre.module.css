@@ -1,0 +1,185 @@
+/*
+ * QUOI     — le Registre (maquette 45:278) : les pastilles de canaux (crème, et violette pour
+ *            « Bugs & suggestions »), une colonne dense (heure pâle, portrait, nom gris, texte
+ *            16 px), puis la barre d'écriture arrondie, le canal choisi posé sur son bord.
+ */
+.registre {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  min-height: 0;
+}
+
+.filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-2);
+}
+
+.filtre,
+.filtreBugs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 25px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.filtre {
+  background: var(--color-pastille);
+  color: var(--color-texte);
+}
+
+.filtreBugs {
+  background: var(--color-canal-bugs);
+  color: var(--color-canal-bugs-texte);
+}
+
+.filtre[aria-pressed='false'],
+.filtreBugs[aria-pressed='false'] {
+  opacity: 0.45;
+}
+
+.messages {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-3) var(--space-6);
+  overflow-y: auto;
+  list-style: none;
+}
+
+.message {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.heure {
+  padding-top: 3px;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--dense-leading);
+  overflow-wrap: anywhere;
+}
+
+.nom {
+  color: var(--color-texte-doux);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.prefixe {
+  color: var(--color-canal-bugs-texte);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+/* La barre d'écriture : le canal posé à cheval sur son bord, le champ, le bouton rond. */
+.ecrire {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) var(--space-4) var(--space-3);
+  padding: var(--space-4) var(--space-2) var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-bord) 84%, transparent);
+  border-radius: var(--radius-feuille);
+  background: color-mix(in srgb, var(--color-sur-accent) 72%, transparent);
+}
+
+.canal {
+  position: absolute;
+  top: -13px;
+  left: var(--space-4);
+  height: 25px;
+  padding: 0 var(--space-6) 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius);
+  appearance: none;
+  background:
+    url('../../../assets/ui/chevron-bas.svg') right var(--space-2) center / 14px no-repeat,
+    var(--color-pastille);
+  color: var(--color-brun);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.champ {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.envoyer {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.envoyer:disabled {
+  opacity: 0.5;
+}
+
+.envoyer:active:not(:disabled) {
+  scale: 0.9;
+}
+
+.alerte {
+  margin: 0;
+  padding: 0 var(--space-6) var(--space-2);
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message {
+    animation: none;
+  }
+
+  .filtre,
+  .filtreBugs,
+  .envoyer {
+    transition: none;
+  }
+}

@@ -79,6 +79,10 @@
   --color-confetti-or: #d4a84c;
   --color-confetti-vert: #738c66;
 
+  /* Le Registre (Figma 45:278) : le canal « Bugs & suggestions » a sa couleur */
+  --color-canal-bugs: #c4baeb;
+  --color-canal-bugs-texte: #4f45a8;
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;

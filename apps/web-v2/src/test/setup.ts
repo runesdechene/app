@@ -23,6 +23,8 @@ globalThis.ResizeObserver = FauxResizeObserver
 
 // Toucher l'onglet déjà actif remonte son écran : jsdom ne sait pas défiler.
 Element.prototype.scrollTo = () => undefined
+// Le Registre garde son dernier message en vue : jsdom ne sait pas non plus.
+Element.prototype.scrollIntoView = () => undefined
 
 // Aucune préférence d'affichage (animations réduites, thème) : jsdom ne connaît pas matchMedia.
 class FausseRequeteMedia extends EventTarget implements MediaQueryList {

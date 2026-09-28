@@ -1,9 +1,34 @@
 /**
- * QUOI     — l'écran racine de l'onglet Messages.
- * POURQUOI — vide dans le socle ; la zone Messages a sa propre spec (spec V2 §10).
+ * QUOI     — l'onglet Messages (maquette 45:278, spec V2 §10) : deux onglets en haut — « La
+ *            communauté » (le Registre, public) et « Les Murmures » (privés).
+ * POURQUOI — « le registre est public, les murmures sont privés » : deux lieux à part, pas un
+ *            filtre. Les Murmures n'existent pas encore en base : leur onglet le dit.
  */
+import { useState } from 'react'
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { Segments } from '@/shared/ui/Segments'
+import styles from './MessagesScreen.module.css'
+import { Registre } from './Registre'
+
+const VUES = [
+  { id: 'communaute', libelle: 'La communauté' },
+  { id: 'murmures', libelle: 'Les Murmures' },
+] as const
 
 export function MessagesScreen() {
-  return <EmptyState>Les Messages sont à venir</EmptyState>
+  const [vue, setVue] = useState<'communaute' | 'murmures'>('communaute')
+  return (
+    <div className={styles.messages}>
+      <div className={styles.onglets}>
+        <Segments libelle="Messages" options={VUES} valeur={vue} onChange={setVue} />
+      </div>
+      {vue === 'communaute' ? (
+        <Registre />
+      ) : (
+        <EmptyState>
+          Les Murmures arrivent bientôt : des messages privés, d’Explorateur à Explorateur.
+        </EmptyState>
+      )}
+    </div>
+  )
 }

@@ -5918,6 +5918,7 @@ export type Database = {
       distance_multiplier: { Args: { distance_km: number }; Returns: number }
       dmetaphone: { Args: { "": string }; Returns: string }
       dmetaphone_alt: { Args: { "": string }; Returns: string }
+      ecrire_au_registre: { Args: { p_canal: string; p_texte: string }; Returns: Json }
       edit_place_description: {
         Args: { p_content: string; p_place_id: string; p_user_id: string }
         Returns: Json
@@ -6619,6 +6620,7 @@ export type Database = {
         Args: { p_place_id: string }
         Returns: undefined
       }
+      registre: { Args: { p_canaux?: string[]; p_limite?: number }; Returns: Json }
       register_push_subscription: {
         Args: {
           p_auth: string
