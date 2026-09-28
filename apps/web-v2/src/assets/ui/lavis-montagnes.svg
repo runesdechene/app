@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 164" preserveAspectRatio="none">
   <defs>
     <linearGradient id="loin" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6b6258" stop-opacity="0.10"/>
-      <stop offset="1" stop-color="#6b6258" stop-opacity="0.02"/>
+      <stop offset="0" stop-color="#9c7963" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#9c7963" stop-opacity="0.02"/>
     </linearGradient>
     <linearGradient id="pres" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6b6258" stop-opacity="0.14"/>
-      <stop offset="1" stop-color="#6b6258" stop-opacity="0.03"/>
+      <stop offset="0" stop-color="#9c7963" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#9c7963" stop-opacity="0.03"/>
     </linearGradient>
   </defs>
   <path fill="url(#loin)" d="M0 164V80c40-20 70-60 110-48s60-22 100-32 60 36 100 28 50 22 80 16v120z"/>
