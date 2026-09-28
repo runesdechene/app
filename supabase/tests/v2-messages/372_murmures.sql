@@ -6,7 +6,7 @@ DECLARE
   a text := 'cb16ff47-1ead-4adf-8eff-04d117551541';
   b text; c text;
   boite_b json; conv json; lus int; boite_b_apres json; soi text; vide text;
-  vus_par_c int;
+  vus_par_c int; fiche_a json;
 BEGIN
   SELECT id INTO b FROM users WHERE id <> a AND id ~ '^[0-9a-f-]{36}$' ORDER BY created_at LIMIT 1;
   SELECT id INTO c FROM users WHERE id NOT IN (a, b) AND id ~ '^[0-9a-f-]{36}$' ORDER BY created_at LIMIT 1;
@@ -24,6 +24,7 @@ BEGIN
   boite_b := public.mes_murmures();
   conv := public.conversation(a);
   lus := public.lire_murmures(a);
+  fiche_a := public.correspondant(a);
   PERFORM public.murmurer(a, 'Oui !');
   boite_b_apres := public.mes_murmures();
 
@@ -33,8 +34,8 @@ BEGIN
   SELECT count(*) INTO vus_par_c FROM murmures;
   RESET ROLE;
 
-  RAISE EXCEPTION 'BILAN soi=% vide=% boite_b=% nb_conv=% dernier=% lus=% boite_b_apres_nonlus=% vus_par_c=%',
+  RAISE EXCEPTION 'BILAN soi=% vide=% boite_b=% nb_conv=% dernier=% lus=% boite_b_apres_nonlus=% vus_par_c=% correspondant=%',
     soi, vide, boite_b->0->'nonLus', json_array_length(conv), conv->1->>'texte', lus,
-    boite_b_apres->0->'nonLus', vus_par_c;
+    boite_b_apres->0->'nonLus', vus_par_c, fiche_a;
 END $test$;
 ROLLBACK;

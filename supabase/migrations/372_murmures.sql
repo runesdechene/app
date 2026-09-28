@@ -11,10 +11,15 @@
 --      le nombre de non-lus.
 --   4. conversation(p_avec) : les messages échangés avec quelqu'un, du plus ancien au plus récent.
 --   5. lire_murmures(p_avec) : marquer lus les messages reçus de lui.
+--   6. correspondant(p_avec) : l'en-tête d'une conversation (maquette 264:162) — le nom, le
+--      portrait, la dernière connexion, et sa région entre parenthèses SEULEMENT s'il laisse
+--      « Montrer mon département » allumé (la même règle que son profil : le département le
+--      plus visité). Validé par Uriel le 28/09.
 --   Ils ne s'effacent pas au bout de 14 jours (contrairement au Registre).
 --
--- SCHEMA CHECKED (28/09/2026) : users(id varchar, display_name, first_name, avatar_url) ;
---   user_public_name(text, text, text).
+-- SCHEMA CHECKED (28/09/2026) : users(id varchar, display_name, first_name, avatar_url,
+--   last_login_at timestamptz, show_departement boolean) ; user_public_name(text, text, text) ;
+--   place_explorers(place_id, user_id) ; places(id, departement, pays, masked, private).
 
 CREATE TABLE IF NOT EXISTS public.murmures (
   id bigserial PRIMARY KEY,
@@ -142,3 +147,43 @@ END;
 $$;
 REVOKE ALL ON FUNCTION public.lire_murmures(text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.lire_murmures(text) TO authenticated;
+
+-- La région d'un Explorateur (le département le plus visité, sinon le pays), s'il la montre.
+CREATE OR REPLACE FUNCTION public._region_montree(p_user text)
+RETURNS text
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  SELECT COALESCE(p.departement, p.pays)
+  FROM place_explorers e
+  JOIN places p ON p.id = e.place_id
+  JOIN users u ON u.id = e.user_id
+  WHERE e.user_id = p_user AND u.show_departement IS NOT FALSE
+    AND COALESCE(p.departement, p.pays) IS NOT NULL
+    AND p.masked IS NOT TRUE AND p.private IS NOT TRUE
+  GROUP BY p.departement, p.pays
+  ORDER BY count(*) DESC, max(e.visited_at) DESC
+  LIMIT 1;
+$$;
+REVOKE ALL ON FUNCTION public._region_montree(text) FROM PUBLIC, anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.correspondant(p_avec text)
+RETURNS json
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  SELECT json_build_object(
+    'id', u.id,
+    'nom', user_public_name(u.id, u.display_name, u.first_name),
+    'avatar', u.avatar_url,
+    'derniereConnexion', u.last_login_at,
+    'region', public._region_montree(u.id))
+  FROM users u
+  WHERE u.id = p_avec AND auth.uid() IS NOT NULL AND u.is_active IS NOT FALSE;
+$$;
+REVOKE ALL ON FUNCTION public.correspondant(text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.correspondant(text) TO authenticated;
