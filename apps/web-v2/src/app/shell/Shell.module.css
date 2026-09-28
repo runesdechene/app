@@ -195,6 +195,18 @@
     z-index: 1;
   }
 
+  /* Une seule ombre à la fois : celle du dessus. Sous un détail, l'écran de l'onglet éteint la
+     sienne en douceur — deux ombres superposées faisaient une tache trop forte (Uriel, 28/09). */
+  .screen {
+    transition:
+      translate var(--duree-douce) var(--courbe-douce),
+      box-shadow var(--duree-douce) var(--courbe-douce);
+  }
+
+  .shell:has(> aside) .screen {
+    box-shadow: none;
+  }
+
   /* À son apparition (un onglet ouvert depuis la carte, une fiche), il arrive en glissant. */
   @starting-style {
     .screen,
