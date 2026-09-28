@@ -33,6 +33,13 @@ export const COLOR_TOKENS = [
   '--color-desactive-fond',
   '--color-desactive-bord',
   '--color-desactive-texte',
+  '--color-carte-fond',
+  '--color-carte-eau',
+  '--color-carte-route',
+  '--color-carte-encre',
+  '--color-carte-halo',
+  '--color-carte-foret',
+  '--color-carte-ombre',
 ] as const
 
 export const DA_SHOWCASED = [

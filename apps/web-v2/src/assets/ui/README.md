@@ -20,6 +20,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `cloche.svg`, `calendrier.svg`, `pas.svg`, `repere.svg`, `courriel.svg`, `question.svg` | 22 × 22 | icônes des lignes de Préférences (maquette 91:166) |
 | `coeur.svg`            | 22 × 22         | Préférences, « Montrer tes envies » (Lucide « heart », même trait) |
 | `palette.svg`          | 22 × 22         | Préférences, « Mes lieux en couleur » (maquette 198:184)            |
+| `sceau-defaut.svg`     | 24 × 24         | Carte : l'icône d'un lieu sans type (ou dont l'icône ne charge pas), un losange |
 | `ajouter.svg`, `cloche.svg` | 24 × 24 | « Ajouter » et la cloche de l'en-tête (pochoirs, maquette 162:107) ; le point rouge de la cloche est à part |
 | `lieu.svg`, `point-interet.svg`, `pin-gps.svg` | 24 × 24 | les trois choix de la feuille « Ajouter » (maquette 201:216) |
 | `chevron.svg`          | 18 × 18         | fin des lignes qui ouvrent quelque chose (Préférences)            |

@@ -46,10 +46,20 @@
   --color-desactive-bord: #e2c9b9;
   --color-desactive-texte: #dbbfad;
 
+  /* La carte (spec Carte §2) : lues au démarrage par features/carte/lib/couleurs.ts */
+  --color-carte-fond: #ecdcbb;
+  --color-carte-eau: #bfc3ad;
+  --color-carte-route: #9c7c55;
+  --color-carte-encre: #3f3024;
+  --color-carte-halo: #f4e9d1;
+  --color-carte-foret: #b9b58a;
+  --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;
   --font-condensee: 'Cabin Condensed', sans-serif;
+  --font-inscription: 'IM Fell English', serif; /* le nom du territoire sur la carte */
   --weight-normal: 400;
   --weight-semi: 600;
   --weight-gras: 700;
