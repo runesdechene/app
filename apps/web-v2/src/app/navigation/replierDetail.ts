@@ -4,10 +4,7 @@
  *            disparaît. On anime donc AVANT de naviguer (Uriel, 28/09 : « qu'il se replie »),
  *            avec l'animation du navigateur (Element.animate), aux jetons de mouvement.
  * ATTENTION — rien à animer (pas de détail, animations réduites, navigateur sans animate) : la
- *            promesse se tient tout de suite. Le retour du navigateur, lui, ne passe pas par ici.
- *            Ensuite, l'écran de l'onglet revient en glissant (Shell.module.css : un seul
- *            tiroir à la fois).
- */
+ *            promesse se tient tout de suite. Le retour du navigateur, lui, ne passe pas par ici. */
 export async function replierDetail(): Promise<void> {
   const detail = document.querySelector<HTMLElement>('[data-detail]')
   if (!detail || typeof detail.animate !== 'function') return
