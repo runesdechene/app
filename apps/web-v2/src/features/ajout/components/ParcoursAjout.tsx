@@ -118,9 +118,7 @@ export function ParcoursAjout({
           {ici === 'apercu' && (
             <EtapeApercu
               brouillon={brouillon}
-              onRetour={() => {
-                aller('recit')
-              }}
+              onAller={aller}
               onPose={(ajout) => {
                 setPose({ ajout, nom: brouillon.nom.trim(), photo: brouillon.photos[0]?.grande })
                 void jeter()
