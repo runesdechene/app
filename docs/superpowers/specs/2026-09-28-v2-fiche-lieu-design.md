@@ -46,7 +46,7 @@ La fiche d'origine (cadre « Profil », 54:746) reste en l'état, pour mémoire.
    pleine si c'est moi (ou mon expédition). Toucher le nom : le profil, ou la liste des membres de
    l'expédition. Pas de revendication : la ligne disparaît.
 9. **Le bouton de visite** (§4).
-10. **Le récit** (`places.text`).
+10. **À propos** (`places.text`) — « Le récit » dans la maquette, renommé par Uriel (28/09).
 11. **Crédits** : « Lieu ajouté par X · le … » ; « Enrichi par Y » si le récit a été révisé par
     quelqu'un d'autre (`place_description_revisions.edited_by`, le plus récent).
 

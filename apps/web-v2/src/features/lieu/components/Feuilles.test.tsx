@@ -38,7 +38,7 @@ test('« Copier le lien » copie la phrase et le lien lisible du lieu, et le dit
   dans(<FeuillePartager fiche={FICHE} onFermer={vi.fn()} />)
   await userEvent.click(screen.getByRole('button', { name: /Copier le lien/ }))
   expect(writeText).toHaveBeenCalledWith(
-    'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ? https://app.runesdechene.com/lieu/chateau-de-jonjeac',
+    'J’ai trouvé Château de Jonjeac sur Runes de Chêne EXPLORE - tu connais ?\nhttps://app.runesdechene.com/lieu/chateau-de-jonjeac',
   )
   expect(await screen.findByText('Lien copié')).toBeInTheDocument()
 })
@@ -50,7 +50,7 @@ test('avec le partage natif, « Partager ailleurs… » l’ouvre', async () => 
   await userEvent.click(screen.getByRole('button', { name: /Partager ailleurs/ }))
   expect(share).toHaveBeenCalledWith({
     title: 'Château de Jonjeac',
-    text: 'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ?',
+    text: 'J’ai trouvé Château de Jonjeac sur Runes de Chêne EXPLORE - tu connais ?',
     url: 'https://app.runesdechene.com/lieu/chateau-de-jonjeac',
   })
 })
@@ -67,6 +67,7 @@ test('un lieu sans page publique se partage par l’adresse de sa fiche', async 
   dans(<FeuillePartager fiche={{ ...FICHE, slug: null }} onFermer={vi.fn()} />)
   await userEvent.click(screen.getByRole('button', { name: /Copier le lien/ }))
   expect(writeText).toHaveBeenCalledWith(
-    `Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ? ${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
+    `J’ai trouvé Château de Jonjeac sur Runes de Chêne EXPLORE - tu connais ?
+${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
   )
 })

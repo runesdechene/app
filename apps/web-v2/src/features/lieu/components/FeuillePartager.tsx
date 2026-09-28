@@ -16,7 +16,6 @@ import type { FicheLieu } from '../api/lireLieu'
 import styles from './Feuilles.module.css'
 
 const DUREE_COPIE = 2000
-const PHRASE = 'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ?'
 const PAGES_PUBLIQUES = 'https://app.runesdechene.com/lieu/'
 
 export function FeuillePartager({
@@ -27,6 +26,7 @@ export function FeuillePartager({
   onFermer: () => void
 }) {
   const [copie, setCopie] = useState(false)
+  const phrase = `J’ai trouvé ${fiche.nom} sur Runes de Chêne EXPLORE - tu connais ?`
   const lien = fiche.slug
     ? `${PAGES_PUBLIQUES}${fiche.slug}`
     : `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/${fiche.id}`
@@ -57,7 +57,7 @@ export function FeuillePartager({
         type="button"
         className={styles.choix}
         onClick={() => {
-          void navigator.clipboard.writeText(`${PHRASE} ${lien}`).then(() => {
+          void navigator.clipboard.writeText(`${phrase}\n${lien}`).then(() => {
             setCopie(true)
           })
         }}
@@ -78,7 +78,7 @@ export function FeuillePartager({
           onClick={() => {
             // Annuler le partage n'est pas une erreur : rien à dire.
             void navigator
-              .share({ title: fiche.nom, text: PHRASE, url: lien })
+              .share({ title: fiche.nom, text: phrase, url: lien })
               .catch(() => undefined)
           }}
         >

@@ -186,8 +186,8 @@ export function FicheLieu({
         <div className={styles.visite}>{boutonVisite(fiche)}</div>
 
         {fiche.recit && (
-          <section className={styles.recit} aria-label="Le récit">
-            <h3 className={styles.rubrique}>Le récit</h3>
+          <section className={styles.recit} aria-label="À propos">
+            <h3 className={styles.rubrique}>À propos</h3>
             <p className={styles.texte}>{fiche.recit}</p>
           </section>
         )}
