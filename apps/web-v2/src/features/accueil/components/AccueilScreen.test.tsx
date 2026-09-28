@@ -117,3 +117,23 @@ test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
   )
   expect(within(ajout).queryByRole('button')).toBeNull()
 })
+
+test('le fil montre cinq lignes ; « Afficher plus » montre le reste', async () => {
+  api.fetchChemins.mockResolvedValue(
+    Array.from({ length: 8 }, (_, i) => ({ ...VISITE, id: `visite:l${String(i)}:u2` })),
+  )
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getAllByRole('listitem')).toHaveLength(5)
+  await userEvent.click(screen.getByRole('button', { name: 'Afficher plus' }))
+  expect(within(fil).getAllByRole('listitem')).toHaveLength(8)
+  expect(screen.queryByRole('button', { name: 'Afficher plus' })).toBeNull()
+})
+
+test('sans salut, le cœur est seul : pas de « 0 »', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const arrivee = within(fil).getAllByRole('listitem')[2]
+  if (!arrivee) throw new Error('ligne absente')
+  expect(within(arrivee).getByRole('button', { name: /Saluer Claire/ })).toHaveTextContent(/^$/)
+})

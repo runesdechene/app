@@ -1,10 +1,13 @@
 /**
  * QUOI     — « Sur les chemins » (maquette 27:2) : le fil de la communauté — qui a visité, ajouté
- *            un lieu, rejoint les Explorateurs — et son seul geste, Saluer (la feuille de chêne).
+ *            un lieu, rejoint les Explorateurs — et son seul geste, Saluer (le cœur).
  * POURQUOI — spec V2 §5 : pas de commentaires, pas d'émojis ; un salut et son compteur. On ne
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
- *            un lieu sa fiche — dans l'Accueil, qui reste derrière.
+ *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes d'abord, le reste
+ *            sur demande ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
+ *            que la feuille de chêne : compris de tous (Uriel, 28/09).
  */
+import { useState } from 'react'
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
@@ -20,11 +23,14 @@ import styles from './SurLesChemins.module.css'
 
 const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }
 const VERBES = { visite: 'a visité', ajout: 'a ajouté', arrivee: 'a rejoint les Explorateurs' }
+const D_ABORD = 5
 
 export function SurLesChemins() {
   const { chemins } = useChemins()
   const saluer = useSaluer()
+  const [tout, setTout] = useState(false)
   if (!chemins || chemins.length === 0) return null
+  const visibles = tout ? chemins : chemins.slice(0, D_ABORD)
   return (
     <section className={styles.chemins} aria-label="Sur les chemins">
       <h2 className={styles.rubrique}>
@@ -32,10 +38,21 @@ export function SurLesChemins() {
         Sur les chemins
       </h2>
       <ul className={styles.fil} aria-label="Sur les chemins">
-        {chemins.map((c) => (
+        {visibles.map((c) => (
           <Ligne key={c.id} chemin={c} onSaluer={saluer} />
         ))}
       </ul>
+      {visibles.length < chemins.length && (
+        <button
+          type="button"
+          className={styles.plus}
+          onClick={() => {
+            setTout(true)
+          }}
+        >
+          Afficher plus
+        </button>
+      )}
     </section>
   )
 }
@@ -65,7 +82,7 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
       {chemin.moi ? (
         chemin.saluts > 0 && (
           <span className={styles.salut}>
-            <span className={styles.feuille} aria-hidden="true" />
+            <span className={styles.coeur} aria-hidden="true" />
             {chemin.saluts}
           </span>
         )
@@ -79,8 +96,8 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
             onSaluer(chemin.id)
           }}
         >
-          <span className={styles.feuille} aria-hidden="true" />
-          {chemin.saluts}
+          <span className={styles.coeur} aria-hidden="true" />
+          {chemin.saluts > 0 && chemin.saluts}
         </button>
       )}
     </li>
