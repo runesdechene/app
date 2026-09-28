@@ -5828,6 +5828,22 @@ export type Database = {
         Args: { p_admin_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      ajouter_lieu: {
+        Args: {
+          p_adresse: string
+          p_annee: number | null
+          p_epoque: string | null
+          p_images: Json
+          p_latitude: number
+          p_longitude: number
+          p_ma_latitude?: number | null
+          p_ma_longitude?: number | null
+          p_natures: string[]
+          p_nom: string
+          p_recit: string
+        }
+        Returns: Json
+      }
       answer_enigma: {
         Args: { p_answer: string; p_enigma_id: number; p_user_id: string }
         Returns: Json
@@ -6094,6 +6110,7 @@ export type Database = {
         }
         Returns: Json
       }
+      epoques: { Args: never; Returns: Json }
       explorateurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       fiche_lieu: { Args: { p_id: string }; Returns: Json }
       find_nearby_places: {
@@ -6562,6 +6579,10 @@ export type Database = {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: Json
       }
+      lieux_voisins: {
+        Args: { p_latitude: number; p_longitude: number }
+        Returns: Json
+      }
       lire_murmures: { Args: { p_avec: string }; Returns: number }
       list_announcements_admin: {
         Args: never
@@ -6688,6 +6709,7 @@ export type Database = {
       mon_entree: { Args: never; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
+      natures_de_lieu: { Args: never; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
       notify: {
         Args: { p_data: Json; p_recipient: string; p_type: string }
