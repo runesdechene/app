@@ -124,7 +124,7 @@ s'affiche :
 
 | | Mobile (< 1024 px) | Desktop (≥ 1024 px) |
 |---|---|---|
-| Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | les 4 onglets dans le bandeau haut |
+| Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | une barre verticale à gauche, comme la V1 : emblème, 4 onglets, « + » et cloche en bas (Uriel, 28/09) |
 | Détail | plein écran, par-dessus, retour pour fermer | panneau latéral, à côté du principal |
 | Carte | plein écran | carte large + panneau latéral, comme la V1 |
 

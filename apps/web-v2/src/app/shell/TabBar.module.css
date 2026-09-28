@@ -1,6 +1,6 @@
 /*
  * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
- *            au-dessus. Desktop : dans le bandeau, sans fond ni lisière.
+ *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche.
  * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
  *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
  *            (pas cinq colonnes égales, qui rognaient « Campement ») ; icônes à 70 %
@@ -66,20 +66,15 @@
 
 @container app (width >= 1024px) {
   .bar {
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-4);
     padding: 0;
     background: none;
   }
 
   .bar::before {
     display: none;
-  }
-
-  .tab {
-    grid-auto-flow: column;
-    align-content: center;
-    gap: var(--space-2);
   }
 }

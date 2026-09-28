@@ -120,5 +120,6 @@
   /* Coquille */
   --tabbar-height: 85px;
   --cible-tactile: 44px;
+  --barre-laterale: 88px; /* desktop : la barre verticale des onglets, comme la V1 */
   --background-attachment: fixed;
 }

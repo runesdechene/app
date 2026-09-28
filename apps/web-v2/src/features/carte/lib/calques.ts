@@ -60,11 +60,11 @@ const taille: ExpressionSpecification = [
   ['linear'],
   ['zoom'],
   4,
-  0.4,
+  0.5,
   8,
-  0.65,
+  0.8,
   12,
-  1,
+  1.15,
 ]
 
 const marque: NonNullable<SymbolLayerSpecification['layout']> = {
@@ -117,7 +117,7 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
       'text-size': 8,
       'text-letter-spacing': 0.08,
       'text-anchor': 'top',
-      'text-offset': [0, 1.9], // sous le sceau (26 px)
+      'text-offset': [0, 2.1], // sous le sceau (26 px × 1,15 de près)
       'icon-image': ['case', ['get', 'moi'], 'pilule-moi', 'pilule'],
       'icon-text-fit': 'both',
       'icon-text-fit-padding': [2, 5, 2, 5],

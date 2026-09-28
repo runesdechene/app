@@ -2,7 +2,7 @@
 
 - `Shell.tsx` — la grille : logotype, lien vers la V1, « Ajouter » et la cloche, les quatre écrans
   toujours montés, le détail.
-- `TabBar.tsx` — la barre d'onglets (en bas sur mobile, dans le bandeau sur desktop) ; l'onglet
+- `TabBar.tsx` — la barre d'onglets (en bas sur mobile, dans la barre verticale de gauche sur desktop, comme la V1) ; l'onglet
   Compte porte l'avatar.
 - `DetailPane.tsx` — le cadre d'un détail (plein écran sur mobile, panneau sur desktop).
 

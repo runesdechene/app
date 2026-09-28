@@ -89,26 +89,65 @@
 /* Container query, pas media query : la coquille suit la largeur de son cadre (#root dans
    l'app, un faux téléphone sur /v2/da), jamais celle de l'écran. */
 @container app (width >= 1024px) {
+  /* Desktop : une barre verticale à gauche, comme la V1 (Uriel, 28/09) — l'emblème, les
+     onglets, puis « Ajouter », la cloche et la sortie vers la V1 en bas. */
   .shell {
-    grid-template-columns: auto 1fr auto auto;
-    grid-template-rows: auto 1fr;
+    grid-template-columns: var(--barre-laterale) 1fr;
+    grid-template-rows: auto auto 1fr auto auto;
     grid-template-areas:
-      'logo nav retour actions'
-      'main main main main';
+      'logo main'
+      'nav main'
+      '. main'
+      'actions main'
+      'retour main';
   }
 
-  /* Desktop : le détail devient un panneau à gauche, un peu plus large qu'un téléphone
-     (420 px pour une maquette de 390), sur toute la hauteur de l'écran (Uriel, 27/09). */
+  /* Le fond de la barre : une case de la grille sur toute la hauteur, sous ses boutons. */
+  .shell::before {
+    content: '';
+    grid-row: 1 / -1;
+    grid-column: 1;
+    border-right: 1px solid var(--color-sable);
+    background: var(--color-barre);
+  }
+
+  /* Le détail devient un panneau entre la barre et le principal, un peu plus large qu'un
+     téléphone (420 px pour une maquette de 390), sur toute la hauteur (Uriel, 27/09). */
   .shell[data-detail='open'] {
-    grid-template-columns: 420px auto 1fr auto auto;
+    grid-template-columns: var(--barre-laterale) 420px 1fr;
     grid-template-areas:
-      'detail logo nav retour actions'
-      'detail main main main main';
+      'logo detail main'
+      'nav detail main'
+      '. detail main'
+      'actions detail main'
+      'retour detail main';
   }
 
   .shell > aside {
     position: relative; /* reste dans la grille, et porte son fond parchemin */
     grid-area: detail;
     border-right: 1px solid var(--color-sable);
+  }
+
+  /* Seul l'emblème du logotype tient dans la barre : l'image est recadrée sur sa gauche. */
+  .logo {
+    justify-self: center;
+    width: 44px;
+    max-width: none;
+    height: 44px;
+    margin: var(--space-4) 0 var(--space-6);
+    object-fit: cover;
+    object-position: left center;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: center;
+    margin: 0 0 var(--space-2);
+  }
+
+  .retourV1 {
+    margin: 0 var(--space-1) var(--space-4);
+    text-align: center;
   }
 }
