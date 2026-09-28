@@ -106,8 +106,11 @@
 @container app (width >= 1024px) {
   /* Desktop (spec socle §4bis, Uriel 28/09) : à gauche une barre verticale, comme la V1 —
      l'emblème, les onglets, puis « Ajouter », la cloche et la sortie vers la V1 en bas. La carte
-     est toujours là ; le reste s'ouvre dans un tiroir entre la barre et elle. */
+     occupe tout le reste et ne bouge jamais ; le tiroir glisse PAR-DESSUS elle, et la carte
+     écarte ses propres boutons de la largeur du tiroir (`--decalage-carte`). Rien ne se
+     redimensionne pendant l'animation : pas de saccade (Uriel, 28/09). */
   .shell {
+    overflow: hidden; /* le tiroir replié glisse hors de l'écran, sous la barre */
     grid-template-columns: var(--barre-laterale) 1fr;
     grid-template-rows: auto auto auto 1fr auto auto;
     grid-template-areas:
@@ -120,19 +123,13 @@
   }
 
   .shell[data-tiroir='open'] {
-    grid-template-columns: var(--barre-laterale) var(--tiroir) 1fr;
-    grid-template-areas:
-      'replier tiroir main'
-      'logo tiroir main'
-      'nav tiroir main'
-      '. tiroir main'
-      'actions tiroir main'
-      'retour tiroir main';
+    --decalage-carte: var(--tiroir);
   }
 
   /* En haut de la barre, comme la V1 : replie le tiroir sans jamais le fermer. Un pochoir
      d'encre sans cadre, de la famille de « + » et de la cloche ; retourné pour déplier. */
   .replier {
+    z-index: 3;
     grid-area: replier;
     justify-self: center;
     display: grid;
@@ -154,48 +151,75 @@
     scale: -1 1;
   }
 
-  /* Le fond de la barre : une case de la grille sur toute la hauteur, sous ses boutons. */
+  /* Le fond de la barre : une case de la grille sur toute la hauteur, au-dessus du tiroir. */
   .shell::before {
     content: '';
+    z-index: 2;
     grid-row: 1 / -1;
     grid-column: 1;
     border-right: 1px solid var(--color-sable);
     background: var(--color-barre);
   }
 
-  /* Les écrans deviennent des cases de la grille : la carte à droite, les autres au tiroir. */
+  /* Les écrans deviennent des cases de la grille, toutes dans la zone de la carte. */
   .main {
     display: contents;
   }
 
-  .screen {
+  /* Le tiroir : collé à la barre, par-dessus la carte ; il glisse en translation. */
+  .screen,
+  .shell > aside {
     position: relative;
     inset: auto;
-    grid-area: tiroir;
+    z-index: 1;
+    grid-area: main;
+    justify-self: start;
+    width: var(--tiroir);
     min-height: 0;
     border-right: 1px solid var(--color-sable);
     background: var(--color-fond);
+    transition: translate var(--duree-douce) var(--courbe-douce);
   }
 
+  /* Un détail se pose par-dessus l'écran de l'onglet. */
+  .shell > aside {
+    z-index: 1;
+  }
+
+  /* À son apparition (un onglet ouvert depuis la carte, une fiche), il arrive en glissant. */
+  @starting-style {
+    .screen,
+    .shell > aside {
+      translate: -100% 0;
+    }
+  }
+
+  /* La carte, sous tout le reste, sur toute la largeur. */
   .screen[data-ecran='carte'],
   .screen[data-derriere] {
+    z-index: 0;
     display: block;
-    grid-area: main;
+    justify-self: stretch;
+    width: auto;
     border-right: none;
+    transition: none;
   }
 
-  /* Un détail se pose dans le tiroir, par-dessus l'écran de l'onglet. */
-  .shell > aside {
-    position: relative; /* reste dans la grille, et porte son fond parchemin */
-    z-index: 1;
-    grid-area: tiroir;
-    border-right: 1px solid var(--color-sable);
+  @starting-style {
+    .screen[data-ecran='carte'] {
+      translate: none;
+    }
   }
 
-  /* Tout l'écran du tiroir reste monté quand on le replie : le CSS le cache seulement. */
+  /* Replié, le tiroir glisse sous la barre, puis devient invisible et hors d'atteinte au
+     clavier — une fois qu'il a fini de glisser (le délai), pas avant. */
   .shell:not([data-tiroir]) > aside,
   .shell:not([data-tiroir]) .screen:not([data-ecran='carte']) {
-    display: none;
+    visibility: hidden;
+    translate: -100% 0;
+    transition:
+      translate var(--duree-douce) var(--courbe-douce),
+      visibility 0s linear var(--duree-douce);
   }
 
   .logo {
@@ -204,6 +228,8 @@
 
   /* L'emblème du logotype, découpé à part (assets/ui/embleme.png) : net et centré. */
   .embleme {
+    position: relative;
+    z-index: 3;
     grid-area: logo;
     justify-self: center;
     display: block;
@@ -213,13 +239,24 @@
   }
 
   .actions {
+    position: relative;
+    z-index: 3;
     flex-direction: column;
     align-items: center;
     margin: 0 0 var(--space-2);
   }
 
   .retourV1 {
+    position: relative;
+    z-index: 3;
     justify-self: center;
     margin: 0 0 var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .shell > aside {
+    transition: none;
   }
 }

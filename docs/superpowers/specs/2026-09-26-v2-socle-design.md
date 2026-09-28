@@ -125,8 +125,8 @@ s'affiche :
 | | Mobile (< 1024 px) | Desktop (≥ 1024 px) |
 |---|---|---|
 | Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | une barre verticale à gauche, comme la V1 : « replier » en haut, emblème, Accueil, Messages, Compte (l'actif sur une tuile claire), « + » et cloche en bas (Uriel, 28/09) |
-| Carte | plein écran, un onglet parmi les autres | **toujours présente**, à droite (Uriel, 28/09) |
-| Accueil, Messages, Compte | plein écran | dans un **tiroir** entre la barre et la carte |
+| Carte | plein écran, un onglet parmi les autres | **toujours présente**, plein écran derrière la barre ; le tiroir passe par-dessus et la carte écarte ses boutons (Uriel, 28/09) |
+| Accueil, Messages, Compte | plein écran | dans un **tiroir** collé à la barre, par-dessus la carte ; il glisse en s'ouvrant et en se repliant |
 | Détail (fiche, profil, Préférences) | plein écran, par-dessus, retour pour fermer | dans le tiroir, par-dessus l'écran de l'onglet ; retour pour fermer |
 
 Sur desktop, **il n'y a pas d'onglet Carte** : la carte est toujours là. **Le tiroir ne se ferme

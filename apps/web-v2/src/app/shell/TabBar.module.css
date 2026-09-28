@@ -70,6 +70,7 @@
 @container app (width >= 1024px) {
   .bar {
     position: relative;
+    z-index: 3; /* au-dessus du tiroir qui glisse sous la barre */
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
@@ -106,7 +107,7 @@
     border-radius: var(--radius-petit);
     background: var(--color-sur-accent);
     translate: -50% calc(var(--rang) * 100% + var(--rang) * var(--space-2));
-    transition: translate 0.38s cubic-bezier(0.34, 1.4, 0.55, 1);
+    transition: translate var(--duree-elan) var(--courbe-elan);
   }
 }
 

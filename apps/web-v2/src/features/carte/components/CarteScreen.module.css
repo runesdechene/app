@@ -2,6 +2,9 @@
  * QUOI     — la carte plein écran ; par-dessus : la recherche et le filtre, l'inscription du territoire, la rose des vents
  *            en bas à gauche, « Ma position » en bas à droite (maquette 162:107), et le bandeau
  *            discret quand les lieux ne se chargent pas.
+ * ATTENTION — sur PC, le tiroir de la coquille passe par-dessus la carte : ses boutons se
+ *            décalent de `--decalage-carte` (0 sur mobile ou tiroir replié), en glissant avec
+ *            lui. La carte elle-même ne bouge pas.
  */
 .ecran {
   position: relative;
@@ -17,7 +20,8 @@
 .bandeau {
   position: absolute;
   top: var(--space-3);
-  left: 50%;
+  left: calc(50% + var(--decalage-carte) / 2);
+  transition: left var(--duree-douce) var(--courbe-douce);
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -36,13 +40,15 @@
   position: absolute;
   top: 72px; /* sous la recherche, maquette 162:107 */
   right: 0;
-  left: 0;
+  left: var(--decalage-carte);
+  transition: left var(--duree-douce) var(--courbe-douce);
 }
 
 .rose {
   position: absolute;
   bottom: 20px; /* maquette 162:107 */
-  left: 22px;
+  left: calc(22px + var(--decalage-carte));
+  transition: left var(--duree-douce) var(--courbe-douce);
   width: 74px;
   height: 74px;
   pointer-events: none;
@@ -83,7 +89,8 @@
   position: absolute;
   top: var(--space-3);
   right: 24px;
-  left: 24px;
+  left: calc(24px + var(--decalage-carte));
+  transition: left var(--duree-douce) var(--courbe-douce);
   z-index: 1;
   display: flex;
   gap: 10px; /* maquette 165:128 */
@@ -103,4 +110,13 @@
 .filtre img {
   width: 20px;
   height: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bandeau,
+  .inscription,
+  .rose,
+  .haut {
+    transition: none;
+  }
 }
