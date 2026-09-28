@@ -3583,6 +3583,42 @@ export type Database = {
           },
         ]
       }
+      presences: {
+        Row: {
+          latitude: number
+          longitude: number
+          user_id: string
+          vu_a: string
+        }
+        Insert: {
+          latitude: number
+          longitude: number
+          user_id: string
+          vu_a?: string
+        }
+        Update: {
+          latitude?: number
+          longitude?: number
+          user_id?: string
+          vu_a?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_log: {
         Row: {
           created_at: string | null
@@ -5409,6 +5445,10 @@ export type Database = {
         Returns: number
       }
       _defi_window_start: { Args: { p_cadence: string }; Returns: string }
+      _distance_m: {
+        Args: { p_lat1: number; p_lat2: number; p_lng1: number; p_lng2: number }
+        Returns: number
+      }
       _enigma_answer_matches: {
         Args: { p_correct: string; p_user: string }
         Returns: boolean
@@ -5451,6 +5491,7 @@ export type Database = {
         | { Args: { p_caller: string }; Returns: boolean }
       _is_voyage_admin: { Args: { p_user_id: string }; Returns: boolean }
       _level_from_xp: { Args: { p_xp: number }; Returns: number }
+      _lieu_visible: { Args: { p_id: string }; Returns: boolean }
       _member_gold_coupe: {
         Args: {
           p_faction_id: string
@@ -5506,6 +5547,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      _presents_autour: {
+        Args: { p_id: string }
+        Returns: {
+          distance: number
+          user_id: string
+        }[]
       }
       _rattacher_lieu: {
         Args: { p_lat: number; p_lng: number }
@@ -5645,6 +5693,7 @@ export type Database = {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: Json
       }
+      basculer_envie: { Args: { p_id: string }; Returns: boolean }
       broadcast_announcement_push: { Args: { p_id: string }; Returns: Json }
       cancel_voyage: {
         Args: { p_user_id: string; p_voyage_id: string }
@@ -5671,6 +5720,7 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      compagnons_possibles: { Args: { p_id: string }; Returns: Json }
       contribute_to_place: {
         Args: {
           p_content?: string
@@ -5877,6 +5927,8 @@ export type Database = {
         }
         Returns: Json
       }
+      explorateurs_du_lieu: { Args: { p_id: string }; Returns: Json }
+      fiche_lieu: { Args: { p_id: string }; Returns: Json }
       find_nearby_places: {
         Args: { p_lat: number; p_lng: number; p_radius_m?: number }
         Returns: {
@@ -6419,6 +6471,7 @@ export type Database = {
         Args: { p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      mes_noms_d_expedition: { Args: never; Returns: string[] }
       migrate_user_to_auth_id: {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
@@ -6630,6 +6683,10 @@ export type Database = {
         Args: { p_place_id: string; p_revision_id: number; p_user_id: string }
         Returns: Json
       }
+      revendiquer_lieu: {
+        Args: { p_compagnons: string[]; p_id: string; p_nom: string }
+        Returns: Json
+      }
       revisit_place_gps: {
         Args: {
           p_place_id: string
@@ -6764,6 +6821,10 @@ export type Database = {
       set_voyage_cover_image: {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
         Returns: Json
+      }
+      signaler_presence: {
+        Args: { p_lat: number; p_lng: number }
+        Returns: undefined
       }
       soundex: { Args: { "": string }; Returns: string }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
@@ -6948,6 +7009,10 @@ export type Database = {
           p_user_lat: number
           p_user_lng: number
         }
+        Returns: Json
+      }
+      visiter_lieu: {
+        Args: { p_id: string; p_lat: number; p_lng: number }
         Returns: Json
       }
       vote_contribution: {
