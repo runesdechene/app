@@ -5,9 +5,10 @@
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
  *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes d'abord, le reste
  *            sur demande ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
- *            que la feuille de chêne : compris de tous (Uriel, 28/09).
+ *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
+ *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
@@ -60,6 +61,9 @@ export function SurLesChemins() {
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
   const { qui, lieu } = chemin
   const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
+  // Les cœurs en vol : chacun disparaît à la fin de son envol.
+  const [envols, setEnvols] = useState<number[]>([])
+  const prochain = useRef(0)
   return (
     <li className={styles.ligne}>
       <img className={styles.type} src={ICONES[chemin.type]} alt="" />
@@ -94,10 +98,23 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
           aria-label={`Saluer ${qui.nom} (${String(chemin.saluts)})`}
           onClick={() => {
             onSaluer(chemin.id)
+            const n = prochain.current++
+            setEnvols((avant) => [...avant, n])
           }}
         >
           <span className={styles.coeur} aria-hidden="true" />
           {chemin.saluts > 0 && chemin.saluts}
+          {envols.map((n) => (
+            <span
+              key={n}
+              className={styles.envol}
+              data-envol
+              aria-hidden="true"
+              onAnimationEnd={() => {
+                setEnvols((avant) => avant.filter((e) => e !== n))
+              }}
+            />
+          ))}
         </button>
       )}
     </li>

@@ -109,6 +109,8 @@ test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
   if (!visite || !ajout) throw new Error('lignes absentes')
   const saluer = within(visite).getByRole('button', { name: /Saluer Luna/ })
   expect(saluer).toHaveAttribute('aria-pressed', 'false')
+  // Le fil relu après le salut : la base compte le cœur.
+  api.fetchChemins.mockResolvedValue([{ ...VISITE, saluts: 3, salue: true }])
   await userEvent.click(saluer)
   expect(api.saluer).toHaveBeenCalledWith('visite:l1:u2')
   expect(await within(visite).findByRole('button', { name: /Saluer Luna/ })).toHaveAttribute(
@@ -136,4 +138,17 @@ test('sans salut, le cœur est seul : pas de « 0 »', async () => {
   const arrivee = within(fil).getAllByRole('listitem')[2]
   if (!arrivee) throw new Error('ligne absente')
   expect(within(arrivee).getByRole('button', { name: /Saluer Claire/ })).toHaveTextContent(/^$/)
+})
+
+test('on salue à volonté : chaque toucher envoie un cœur, et en fait s’envoler un', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const visite = within(fil).getAllByRole('listitem')[0]
+  if (!visite) throw new Error('ligne absente')
+  const saluer = within(visite).getByRole('button', { name: /Saluer Luna/ })
+  await userEvent.click(saluer)
+  await userEvent.click(saluer)
+  await userEvent.click(saluer)
+  expect(api.saluer).toHaveBeenCalledTimes(3)
+  expect(saluer.querySelectorAll('[data-envol]')).toHaveLength(3)
 })

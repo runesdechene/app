@@ -163,6 +163,7 @@
   --duree-douce: 0.32s;
   --courbe-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
   --duree-elan: 0.38s;
+  --duree-envol: 0.9s; /* un cœur qui s'envole (le salut de l'Accueil) */
   --courbe-elan: cubic-bezier(0.34, 1.4, 0.55, 1);
   --tiroir: 420px; /* desktop : le tiroir, un peu plus large qu'une maquette de téléphone (390) */
   --decalage-carte: 0px; /* desktop : la marge que la carte laisse au tiroir ouvert — posée par la coquille */

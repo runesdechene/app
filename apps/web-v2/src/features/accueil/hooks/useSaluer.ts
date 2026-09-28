@@ -1,36 +1,35 @@
 /**
- * QUOI     — saluer une ligne du fil, ou retirer son salut.
- * POURQUOI — la feuille de chêne se colore tout de suite (mise à jour optimiste) ; si la base
- *            refuse, la ligne revient comme avant. La réponse de la base fait foi.
+ * QUOI     — saluer une ligne du fil : un cœur de plus à chaque toucher, à volonté (migration 374).
+ * POURQUOI — le cœur compte tout de suite (mise à jour optimiste), pour qu'une rafale se voie.
+ *            Quand le dernier envoi de la rafale est revenu, le fil se relit : la base fait foi,
+ *            et un refus s'efface de lui-même. C'est le motif de TanStack Query pour des mises à
+ *            jour optimistes qui se chevauchent : appliquer la réponse de chaque envoi ferait
+ *            redescendre le compteur en pleine rafale.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { saluer } from '../api/accueil'
 import type { Chemin } from '../api/lireAccueil'
 import { cheminsKey } from './useAccueil'
 
-type Salut = { saluts: number; salue: boolean }
+const saluerKey = ['saluer'] as const
 
 export function useSaluer() {
   const queryClient = useQueryClient()
 
-  const poser = (id: string, salut: (c: Chemin) => Salut) => {
-    queryClient.setQueryData<Chemin[]>(cheminsKey, (chemins) =>
-      chemins?.map((c) => (c.id === id ? { ...c, ...salut(c) } : c)),
-    )
-  }
-
   const mutation = useMutation({
+    mutationKey: saluerKey,
     mutationFn: (id: string) => saluer(id),
-    onMutate: (id) => {
-      const avant = queryClient.getQueryData<Chemin[]>(cheminsKey)
-      poser(id, (c) => ({ salue: !c.salue, saluts: c.saluts + (c.salue ? -1 : 1) }))
-      return { avant }
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: cheminsKey })
+      queryClient.setQueryData<Chemin[]>(cheminsKey, (chemins) =>
+        chemins?.map((c) => (c.id === id ? { ...c, saluts: c.saluts + 1, salue: true } : c)),
+      )
     },
-    onError: (_erreur, _id, contexte) => {
-      queryClient.setQueryData(cheminsKey, contexte?.avant)
-    },
-    onSuccess: (salut, id) => {
-      poser(id, () => salut)
+    onSettled: () => {
+      // Cet envoi compte encore parmi ceux en cours : 1, c'est le dernier de la rafale.
+      if (queryClient.isMutating({ mutationKey: saluerKey }) === 1) {
+        void queryClient.invalidateQueries({ queryKey: cheminsKey })
+      }
     },
   })
 

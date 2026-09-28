@@ -1,5 +1,6 @@
 /**
- * QUOI     — saluer colore la feuille tout de suite ; un refus de la base la remet comme avant.
+ * QUOI     — saluer ajoute un cœur tout de suite, autant de fois qu'on touche ; la rafale finie,
+ *            le fil se relit (la base fait foi), même après un refus.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
@@ -11,10 +12,11 @@ const api = vi.hoisted(() => ({ saluer: vi.fn() }))
 vi.mock('../api/accueil', () => api)
 
 const LIGNE = { id: 'visite:l1:u1', saluts: 2, salue: false }
+const CLE = ['accueil', 'chemins']
 
 function monter() {
   const client = new QueryClient()
-  client.setQueryData(['accueil', 'chemins'], [LIGNE])
+  client.setQueryData(CLE, [LIGNE])
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
@@ -22,35 +24,48 @@ function monter() {
   return { client, saluer: result.current }
 }
 
-test('saluer compte le salut tout de suite, puis garde la réponse de la base', async () => {
-  let repondre: (v: { saluts: number; salue: boolean }) => void = () => undefined
-  api.saluer.mockReturnValue(new Promise((r) => (repondre = r)))
+test('chaque toucher ajoute un cœur tout de suite ; la rafale finie, le fil se relit', async () => {
+  const reponses: ((v: { saluts: number; salue: boolean }) => void)[] = []
+  api.saluer.mockImplementation(() => new Promise((r) => reponses.push(r)))
   const { client, saluer } = monter()
   act(() => {
     saluer(LIGNE.id)
+    saluer(LIGNE.id)
+    saluer(LIGNE.id)
   })
   await waitFor(() => {
-    expect(client.getQueryData(['accueil', 'chemins'])).toEqual([
-      { ...LIGNE, saluts: 3, salue: true },
-    ])
+    expect(client.getQueryData(CLE)).toEqual([{ ...LIGNE, saluts: 5, salue: true }])
   })
+  // Une réponse arrive en pleine rafale : le compteur ne redescend pas, rien ne se relit.
   act(() => {
-    repondre({ saluts: 5, salue: true })
+    reponses[0]?.({ saluts: 3, salue: true })
   })
   await waitFor(() => {
-    expect(client.getQueryData(['accueil', 'chemins'])).toEqual([
-      { ...LIGNE, saluts: 5, salue: true },
-    ])
+    expect(api.saluer).toHaveBeenCalledTimes(3)
+  })
+  expect(client.getQueryData(CLE)).toEqual([{ ...LIGNE, saluts: 5, salue: true }])
+  expect(client.getQueryState(CLE)?.isInvalidated).toBe(false)
+  // Chaque réponse arrive à son heure, comme sur le réseau.
+  await act(async () => {
+    reponses[1]?.({ saluts: 4, salue: true })
+    await Promise.resolve()
+  })
+  expect(client.getQueryState(CLE)?.isInvalidated).toBe(false)
+  act(() => {
+    reponses[2]?.({ saluts: 5, salue: true })
+  })
+  await waitFor(() => {
+    expect(client.getQueryState(CLE)?.isInvalidated).toBe(true)
   })
 })
 
-test('un refus de la base remet la ligne comme avant', async () => {
+test('un refus de la base : le fil se relit', async () => {
   api.saluer.mockRejectedValue(new Error('refus'))
   const { client, saluer } = monter()
   act(() => {
     saluer(LIGNE.id)
   })
   await waitFor(() => {
-    expect(client.getQueryData(['accueil', 'chemins'])).toEqual([LIGNE])
+    expect(client.getQueryState(CLE)?.isInvalidated).toBe(true)
   })
 })
