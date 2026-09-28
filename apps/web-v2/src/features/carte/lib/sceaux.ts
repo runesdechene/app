@@ -129,23 +129,27 @@ function sceauCouleur(icone: HTMLImageElement, couleur: string) {
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }
 
+// Un lieu pas encore découvert : plus petit que les sceaux, mais qu'on voit (Uriel, 28/09) —
+// 17 px à l'écran, fond presque plein, cercle et « ? » d'encre francs.
+const BILLE = 34
+
 function bille(c: CouleursCarte) {
-  const ctx = toile(PETIT)
-  disque(ctx, PETIT / 2 - 1.5)
-  ctx.globalAlpha = 0.75
+  const ctx = toile(BILLE)
+  disque(ctx, BILLE / 2 - 2)
+  ctx.globalAlpha = 0.95
   ctx.fillStyle = c.halo
   ctx.fill()
-  ctx.globalAlpha = 0.55
-  ctx.lineWidth = 2.4
+  ctx.globalAlpha = 0.85
+  ctx.lineWidth = 3
   ctx.strokeStyle = c.encre
   ctx.stroke()
-  ctx.globalAlpha = 0.7
+  ctx.globalAlpha = 0.9
   ctx.fillStyle = c.encre
-  ctx.font = '700 17px Cabin, sans-serif'
+  ctx.font = '700 22px Cabin, sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('?', PETIT / 2, PETIT / 2 + 1)
-  return ctx.getImageData(0, 0, PETIT, PETIT)
+  ctx.fillText('?', BILLE / 2, BILLE / 2 + 1)
+  return ctx.getImageData(0, 0, BILLE, BILLE)
 }
 
 // Une étoile à quatre branches ✦, plus petite que les sceaux.
