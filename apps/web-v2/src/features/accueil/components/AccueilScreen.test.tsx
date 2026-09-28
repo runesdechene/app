@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { AccueilScreen } from './AccueilScreen'
+import { PageChemins } from './PageChemins'
 
 const api = vi.hoisted(() => ({
   fetchBanniere: vi.fn(),
@@ -143,16 +144,35 @@ test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
   expect(within(ajout).queryByRole('button')).toBeNull()
 })
 
-test('le fil montre cinq lignes ; « Afficher plus » montre le reste', async () => {
+test('le fil montre cinq lignes ; « Voir toute l’activité » ouvre le fil dans l’Accueil', async () => {
   api.fetchChemins.mockResolvedValue(
     Array.from({ length: 8 }, (_, i) => ({ ...VISITE, id: `visite:l${String(i)}:u2` })),
   )
-  monter()
+  const router = monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
   expect(within(fil).getAllByRole('listitem')).toHaveLength(5)
-  await userEvent.click(screen.getByRole('button', { name: 'Afficher plus' }))
+  await userEvent.click(screen.getByRole('link', { name: 'Voir toute l’activité' }))
+  expect(router.state.location.pathname).toBe('/accueil/chemins')
+})
+
+test('la page du fil : toute l’activité, et l’on y salue', async () => {
+  api.fetchChemins.mockResolvedValue(
+    Array.from({ length: 8 }, (_, i) => ({ ...VISITE, id: `visite:l${String(i)}:u2` })),
+  )
+  const router = createMemoryRouter([{ path: '*', element: <PageChemins /> }], {
+    initialEntries: ['/accueil/chemins'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
   expect(within(fil).getAllByRole('listitem')).toHaveLength(8)
-  expect(screen.queryByRole('button', { name: 'Afficher plus' })).toBeNull()
+  await userEvent.click(
+    within(fil).getAllByRole('button', { name: /Saluer Luna/ })[0] as HTMLElement,
+  )
+  expect(api.saluer).toHaveBeenCalledWith('visite:l0:u2')
 })
 
 test('sans salut, le cœur est seul : pas de « 0 »', async () => {

@@ -192,18 +192,15 @@ button.salut {
   }
 }
 
-/* « Afficher plus » : un lien discret sous le fil, pas un bouton de plus. */
-.plus {
+/* « Voir toute l'activité » : un lien discret sous le fil, pas un bouton de plus. */
+.tout {
   justify-self: start;
   margin: 0 var(--space-6);
-  padding: 0;
-  border: none;
-  background: none;
   color: var(--color-ocre);
   font-family: var(--font-corps);
   font-size: var(--meta-size);
   font-weight: var(--weight-semi);
-  cursor: pointer;
+  text-decoration: none;
 }
 
 @keyframes apparaitre {

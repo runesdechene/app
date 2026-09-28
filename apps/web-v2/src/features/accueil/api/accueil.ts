@@ -48,7 +48,7 @@ export async function fetchGrandsExplorateurs(type: TypeDeClassement, periode: P
 }
 
 export async function fetchChemins() {
-  const { data, error } = await supabase.rpc('sur_les_chemins', { p_limite: 20 })
+  const { data, error } = await supabase.rpc('sur_les_chemins', { p_limite: 50 })
   if (error) throw error
   return lireChemins(data)
 }

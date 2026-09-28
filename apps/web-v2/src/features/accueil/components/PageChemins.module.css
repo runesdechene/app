@@ -1,0 +1,7 @@
+/*
+ * QUOI     — la page du fil : le fil seul, avec l'air du tiroir en haut et en bas.
+ */
+.page {
+  display: grid;
+  padding: var(--space-4) 0 var(--space-8);
+}

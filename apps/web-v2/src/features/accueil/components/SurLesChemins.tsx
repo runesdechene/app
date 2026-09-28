@@ -3,8 +3,8 @@
  *            un lieu, rejoint les Explorateurs — et son seul geste, Saluer (le cœur).
  * POURQUOI — spec V2 §5 : pas de commentaires, pas d'émojis ; un salut et son compteur. On ne
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
- *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes d'abord, le reste
- *            sur demande ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
+ *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes ; « Voir toute
+ *            l'activité » ouvre le fil entier dans le tiroir (Uriel, 29/09) ; sans salut, le cœur est seul (un « 0 » découragerait). Le cœur plutôt
  *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
  *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée.
  */
@@ -29,33 +29,32 @@ const D_ABORD = 5
 
 export function SurLesChemins() {
   const { chemins } = useChemins()
-  const saluer = useSaluer()
-  const [tout, setTout] = useState(false)
   if (!chemins || chemins.length === 0) return null
-  const visibles = tout ? chemins : chemins.slice(0, D_ABORD)
   return (
     <section className={styles.chemins} aria-label="Sur les chemins">
       <h2 className={styles.rubrique}>
         <img className={styles.icone} src={sectionChemins} alt="" />
         Sur les chemins
       </h2>
-      <ul className={styles.fil} aria-label="Sur les chemins">
-        {visibles.map((c) => (
-          <Ligne key={c.id} chemin={c} onSaluer={saluer} />
-        ))}
-      </ul>
-      {visibles.length < chemins.length && (
-        <button
-          type="button"
-          className={styles.plus}
-          onClick={() => {
-            setTout(true)
-          }}
-        >
-          Afficher plus
-        </button>
+      <FilDesChemins chemins={chemins.slice(0, D_ABORD)} />
+      {chemins.length > D_ABORD && (
+        <Link className={styles.tout} to="/accueil/chemins" state={VENU_D_UN_ECRAN}>
+          Voir toute l’activité
+        </Link>
       )}
     </section>
+  )
+}
+
+// Le fil lui-même, sur l'Accueil (cinq lignes) comme dans sa page (toutes).
+export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
+  const saluer = useSaluer()
+  return (
+    <ul className={styles.fil} aria-label="Sur les chemins">
+      {chemins.map((c) => (
+        <Ligne key={c.id} chemin={c} onSaluer={saluer} />
+      ))}
+    </ul>
   )
 }
 
