@@ -156,6 +156,11 @@
   gap: var(--space-3);
   padding: var(--space-4) var(--space-8) var(--space-6);
   overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+}
+
+.murmures::-webkit-scrollbar {
+  display: none;
 }
 
 .moment {

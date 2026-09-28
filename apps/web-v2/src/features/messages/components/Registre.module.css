@@ -55,22 +55,27 @@
   margin: 0;
   padding: var(--space-3) var(--space-6);
   overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
   list-style: none;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
 }
 
 .message {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: start;
   gap: var(--space-2);
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
 }
 
 .heure {
-  padding-top: 3px;
+  padding-top: 2px;
   color: var(--color-texte-pale);
   font-family: var(--font-corps);
-  font-size: var(--sous-titre-size);
+  font-size: var(--legende-size);
   font-variant-numeric: tabular-nums;
 }
 

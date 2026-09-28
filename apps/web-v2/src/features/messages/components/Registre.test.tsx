@@ -52,7 +52,7 @@ function monter() {
   )
 }
 
-test('deux canaux cochés : chaque message, et le préfixe du canal des bugs', async () => {
+test('chaque message, et le préfixe du canal des bugs', async () => {
   monter()
   const registre = await screen.findByRole('list', { name: 'Registre' })
   expect(await within(registre).findByText(/Il y a du monde ici bas/)).toBeInTheDocument()
@@ -60,13 +60,13 @@ test('deux canaux cochés : chaque message, et le préfixe du canal des bugs', a
   expect(bug).toHaveTextContent('Gautier [Bug & Suggestions] Je ne peux pas planter un lieu.')
 })
 
-test('décocher un canal retire ses messages et le préfixe', async () => {
+test('décocher un canal retire ses messages ; le préfixe « Bug & Suggestions » reste', async () => {
   monter()
   const registre = await screen.findByRole('list', { name: 'Registre' })
   await within(registre).findByText(/Il y a du monde ici bas/)
   await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
   expect(within(registre).queryByText(/Il y a du monde ici bas/)).toBeNull()
-  expect(within(registre).getByRole('listitem')).not.toHaveTextContent('[Bug & Suggestions]')
+  expect(within(registre).getByRole('listitem')).toHaveTextContent('[Bug & Suggestions]')
 })
 
 test('on écrit dans le canal choisi ; le champ se vide', async () => {

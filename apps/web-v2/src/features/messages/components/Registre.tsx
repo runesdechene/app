@@ -1,9 +1,10 @@
 /**
  * QUOI     — le Registre (maquette 45:278, spec V2 §10) : les canaux à cocher, une colonne dense
- *            de messages (l'heure, le portrait, le nom, le texte), et la barre pour écrire.
- * POURQUOI — « un chat de MMO, pas une messagerie » : pas de fils, pas de citations. Le nom du
- *            canal ne précède un message que si plusieurs canaux sont cochés. Un nom ouvre le
- *            profil, dans Messages, qui reste derrière.
+ *            de messages (le portrait, le nom, le texte, l'heure à droite), et la barre pour écrire.
+ * POURQUOI — « un chat de MMO, pas une messagerie » : pas de fils, pas de citations. Un
+ *            message de « Bugs & suggestions » porte toujours son préfixe, même seul canal coché :
+ *            chaque message dit d'où il vient (Uriel, 28/09). L'heure à droite : on lit d'abord
+ *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière.
  */
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -15,10 +16,11 @@ import { useRegistre } from '../hooks/useRegistre'
 import { BarreEcrire } from './BarreEcrire'
 import styles from './Registre.module.css'
 
-const NOMS: Record<Canal, { filtre: string; court: string; prefixe: string }> = {
-  general: { filtre: 'Canal général', court: 'Général', prefixe: '[Général]' },
-  bugs: { filtre: 'Bugs & suggestions', court: 'Bugs', prefixe: '[Bug & Suggestions]' },
+const NOMS: Record<Canal, { filtre: string; court: string }> = {
+  general: { filtre: 'Canal général', court: 'Général' },
+  bugs: { filtre: 'Bugs & suggestions', court: 'Bugs' },
 }
+const PREFIXE_BUGS = '[Bug & Suggestions]'
 const HEURE = new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', minute: '2-digit' })
 
 export function Registre() {
@@ -28,7 +30,6 @@ export function Registre() {
   const liste = useRef<HTMLOListElement>(null)
 
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
-  const plusieurs = coches.size > 1
 
   // Le dernier message reste en vue : à l'ouverture, et à chaque nouveau. Seule la liste
   // défile — jamais la page (le haut et la barre d'écriture restent fixes, Uriel 28/09).
@@ -69,9 +70,6 @@ export function Registre() {
       <ol ref={liste} className={styles.messages} aria-label="Registre">
         {visibles.map((m) => (
           <li key={m.id} className={styles.message}>
-            <time className={styles.heure} dateTime={m.quand}>
-              {HEURE.format(new Date(m.quand))}
-            </time>
             <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
             <p className={styles.texte}>
               <Link
@@ -81,11 +79,12 @@ export function Registre() {
               >
                 {m.auteur.nom}
               </Link>{' '}
-              {plusieurs && m.canal === 'bugs' && (
-                <span className={styles.prefixe}>{NOMS.bugs.prefixe} </span>
-              )}
+              {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
               {m.texte}
             </p>
+            <time className={styles.heure} dateTime={m.quand}>
+              {HEURE.format(new Date(m.quand))}
+            </time>
           </li>
         ))}
       </ol>
