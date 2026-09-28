@@ -61,7 +61,7 @@
   --color-fiche-aide: #b39b9b; /* « Toucher l'adresse… », « depuis le… » */
   --color-fiche-recit: #806262;
   --color-fiche-badge: #9b3f39; /* un type sans couleur */
-  --color-fiche-badge-texte: #ffe2e0;
+  --color-fiche-badge-texte: #fff; /* le texte et l'icône du type, en blanc (Uriel, 28/09) */
   --color-fiche-credit: #bc7f3b; /* « Luna », la date */
   --color-fiche-credit-texte: #524d4d;
   --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */

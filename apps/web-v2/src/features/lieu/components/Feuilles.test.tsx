@@ -24,10 +24,10 @@ function dans(element: React.ReactNode) {
   return router
 }
 
-test('« Trouver sur la carte » mène à la carte centrée sur le lieu', async () => {
+test('« Trouver sur la carte » garde la fiche ouverte et centre la carte sur le lieu', async () => {
   const router = dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} />)
   await userEvent.click(screen.getByRole('button', { name: /Trouver sur la carte/ }))
-  expect(router.state.location.pathname).toBe('/carte')
+  expect(router.state.location.pathname).toBe('/carte/lieu/a')
   expect(router.state.location.search).toBe('?centre=45.9,6.1')
 })
 

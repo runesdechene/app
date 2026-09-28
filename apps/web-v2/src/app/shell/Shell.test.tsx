@@ -141,3 +141,10 @@ test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Car
   await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
   expect(curseur()).toBeNull()
 })
+
+test('sur PC, Préférences et Déconnexion sont dans la barre, sous la cloche', async () => {
+  const router = renderAt('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Préférences' }))
+  expect(router.state.location.pathname).toBe('/carte/preferences')
+  expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+})

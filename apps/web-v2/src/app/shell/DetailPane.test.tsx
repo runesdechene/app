@@ -3,7 +3,7 @@
  *            l'onglet Compte montre mon profil, Préférences et Déconnexion.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
@@ -68,8 +68,10 @@ function renderAt(path: string) {
 test('l’onglet Compte montre mon profil', async () => {
   renderAt('/compte')
   expect(await screen.findByText('Uriel')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Préférences' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+  // La page Compte a ses propres entrées (la barre PC en a aussi : jsdom ne lit pas le CSS).
+  const compte = screen.getByRole('navigation', { name: 'Mon compte' })
+  expect(within(compte).getByRole('button', { name: 'Préférences' })).toBeInTheDocument()
+  expect(within(compte).getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
 })
 
 test('le profil d’un autre s’intitule « Profil »', async () => {

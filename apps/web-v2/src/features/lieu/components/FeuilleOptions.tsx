@@ -2,8 +2,8 @@
  * QUOI     — la feuille « Ce lieu », ouverte par le bouton rond des options (maquette 231:128).
  * POURQUOI — spec fiche §3 : « Trouver sur la carte » ; Modifier, Visibilité et Signaler arrivent
  *            avec la spec 2 — une ligne n'apparaît pas tant qu'elle ne fait rien.
- * ATTENTION — la carte est rejointe par son adresse (`/carte?centre=lat,lng`) : aucune zone
- *            n'importe l'autre.
+ * ATTENTION — la carte est rejointe par son adresse (`/carte/lieu/<id>?centre=lat,lng`) : la fiche
+ *            reste ouverte, la carte vole jusqu'au lieu à côté ; aucune zone n'importe l'autre.
  */
 import { useNavigate } from 'react-router'
 import cartePliee from '@/assets/ui/carte-pliee.svg'
@@ -27,7 +27,8 @@ export function FeuilleOptions({
         type="button"
         className={styles.choix}
         onClick={() => {
-          void navigate(`/carte?centre=${String(fiche.lat)},${String(fiche.lng)}`)
+          void navigate(`/carte/lieu/${fiche.id}?centre=${String(fiche.lat)},${String(fiche.lng)}`)
+          onFermer()
         }}
       >
         <img className={styles.icone} src={cartePliee} alt="" />

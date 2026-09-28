@@ -6,6 +6,8 @@
  */
 .fiche {
   display: grid;
+  grid-template-rows: auto 1fr; /* le parchemin descend au moins jusqu'en bas de l'écran */
+  min-height: 100dvh;
 }
 
 /* La photo pleine largeur, aux proportions de la maquette (390 × 571). */
@@ -16,17 +18,19 @@
   background: var(--color-sable);
 }
 
-/* Un voile en haut : la flèche et le partage se lisent sur n'importe quelle photo. */
+/* Un voile en haut (la flèche et le partage se lisent sur n'importe quelle photo), et le même en
+   bas (Uriel, 28/09). */
 .photo::before {
   content: '';
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0;
   z-index: 1;
-  height: 39%;
   background: linear-gradient(
     to bottom,
     color-mix(in srgb, var(--color-ombre) 49%, transparent),
-    transparent
+    transparent 39%,
+    transparent 61%,
+    color-mix(in srgb, var(--color-ombre) 49%, transparent)
   );
   pointer-events: none;
 }
@@ -160,9 +164,9 @@
   display: inline-flex;
   justify-self: start;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px; /* l'icône respire, sans s'éloigner du nom */
   margin: 0;
-  padding: 0 var(--space-3) 0 var(--space-1);
+  padding: 0 var(--space-3) 0 var(--space-2);
   min-height: 26px;
   border-radius: var(--radius-rond);
   background: var(--type, var(--color-fiche-badge));
@@ -173,8 +177,8 @@
 }
 
 .badgeIcone {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background: var(--color-fiche-badge-texte);
   mask: var(--icone) center / contain no-repeat;
 }

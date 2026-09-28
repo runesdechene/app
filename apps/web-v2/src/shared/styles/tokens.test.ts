@@ -11,7 +11,15 @@ import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 const SRC = path.resolve(import.meta.dirname, '../..')
-const PASSED_INLINE = new Set(['--avatar', '--nuance', '--mesure', '--icone', '--nombre', '--rang', '--type'])
+const PASSED_INLINE = new Set([
+  '--avatar',
+  '--nuance',
+  '--mesure',
+  '--icone',
+  '--nombre',
+  '--rang',
+  '--type',
+])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
   .filter((file) => file.endsWith('.css'))

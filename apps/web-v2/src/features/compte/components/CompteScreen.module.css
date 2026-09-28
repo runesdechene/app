@@ -44,3 +44,10 @@
   font-family: var(--font-corps);
   font-size: var(--legende-size);
 }
+
+/* Sur PC, Préférences et Déconnexion vivent dans la barre de gauche (Uriel, 28/09). */
+@container app (width >= 1024px) {
+  .entrees {
+    display: none;
+  }
+}

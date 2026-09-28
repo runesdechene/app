@@ -18,12 +18,16 @@ import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
+import { seDeconnecter } from '@/features/compte/api/session'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
+import engrenage from '@/assets/ui/engrenage.svg'
 import logotype from '@/assets/ui/logotype.png'
 import replier from '@/assets/ui/replier.svg'
+import sortie from '@/assets/ui/sortie.svg'
+import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
@@ -50,6 +54,8 @@ export function Shell() {
   const tiroirVisible = tiroir && replieSur !== pathname
   // Le dernier onglet ouvert dans le tiroir : « déplier » depuis la Carte y ramène.
   const [dernierTiroir, setDernierTiroir] = useState<TabId>('accueil')
+  // La coquille elle-même : toutes les feuilles s'y posent, leur voile couvre toute l'app.
+  const [racine, setRacine] = useState<HTMLDivElement | null>(null)
   if (active !== null && active !== 'carte' && active !== dernierTiroir) setDernierTiroir(active)
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
   const boutonAjouter = useRef<HTMLButtonElement>(null)
@@ -73,81 +79,110 @@ export function Shell() {
   }
 
   return (
-    <div className={styles.shell} data-tiroir={tiroirVisible ? 'open' : undefined}>
-      {/* Desktop seulement (le CSS le cache sur mobile), comme la V1. */}
-      <button
-        type="button"
-        className={styles.replier}
-        aria-label={tiroirVisible ? 'Replier le panneau' : 'Déplier le panneau'}
-        aria-expanded={tiroirVisible}
-        onClick={() => {
-          if (tiroirVisible) setReplieSur(pathname)
-          else if (tiroir) setReplieSur(null)
-          else void navigate(`/${dernierTiroir}`)
-        }}
+    <RacineDesFeuilles value={racine}>
+      <div
+        ref={setRacine}
+        className={styles.shell}
+        data-tiroir={tiroirVisible ? 'open' : undefined}
       >
-        <img src={replier} alt="" />
-      </button>
-      {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
-      <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
-      <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
-      {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
+        {/* Desktop seulement (le CSS le cache sur mobile), comme la V1. */}
+        <button
+          type="button"
+          className={styles.replier}
+          aria-label={tiroirVisible ? 'Replier le panneau' : 'Déplier le panneau'}
+          aria-expanded={tiroirVisible}
+          onClick={() => {
+            if (tiroirVisible) setReplieSur(pathname)
+            else if (tiroir) setReplieSur(null)
+            else void navigate(`/${dernierTiroir}`)
+          }}
+        >
+          <img src={replier} alt="" />
+        </button>
+        {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
+        <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
+        <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
+        {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
           y compris dans la V2 installée en application, qui n'a pas de barre d'adresse. */}
-      <a className={styles.retourV1} href={V1_URL}>
-        <Text variant="libelle">Revenir V1</Text>
-      </a>
-      <div className={styles.actions}>
-        <button
-          ref={boutonAjouter}
-          type="button"
-          className={styles.action}
-          aria-label="Ajouter"
-          onClick={() => {
-            ouvrir('ajouter')
+        <a className={styles.retourV1} href={V1_URL}>
+          <Text variant="libelle">Revenir V1</Text>
+        </a>
+        <div className={styles.actions}>
+          <button
+            ref={boutonAjouter}
+            type="button"
+            className={styles.action}
+            aria-label="Ajouter"
+            onClick={() => {
+              ouvrir('ajouter')
+            }}
+          >
+            <img src={ajouter} alt="" />
+          </button>
+          <button
+            type="button"
+            className={styles.action}
+            aria-label="Notifications"
+            onClick={() => {
+              ouvrir('notifications')
+            }}
+          >
+            <img src={cloche} alt="" />
+          </button>
+          {/* Sur PC seulement (le CSS les cache sur mobile, où elles vivent sur la page Compte). */}
+          <button
+            type="button"
+            className={[styles.action, styles.pc].join(' ')}
+            aria-label="Préférences"
+            onClick={() => {
+              ouvrir('preferences')
+            }}
+          >
+            <img src={engrenage} alt="" />
+          </button>
+          <button
+            type="button"
+            className={[styles.action, styles.pc].join(' ')}
+            aria-label="Se déconnecter"
+            onClick={() => {
+              // La garde d'accès voit la session tomber et renvoie vers la V1 ; un échec laisse
+              // simplement la session ouverte (la page Compte le dit sur mobile).
+              void seDeconnecter().catch(() => undefined)
+            }}
+          >
+            <img src={sortie} alt="" />
+          </button>
+        </div>
+        <main className={styles.main}>
+          {TABS.map(({ id, label }) => {
+            const Screen = SCREENS[id]
+            return (
+              // La carte n'est jamais cachée : sur desktop elle reste derrière le tiroir ; sur
+              // mobile, le CSS la masque quand un autre onglet est actif.
+              <section
+                key={id}
+                aria-label={label}
+                hidden={id !== active && id !== 'carte'}
+                data-ecran={id}
+                data-derriere={id === 'carte' && active !== 'carte' ? '' : undefined}
+                className={styles.screen}
+                ref={(element) => {
+                  scrollers.current[id] = element
+                }}
+              >
+                <Screen />
+              </section>
+            )
+          })}
+        </main>
+        <Outlet />
+        <TabBar
+          onScrollTop={scrollTop}
+          onToucher={() => {
+            setReplieSur(null)
           }}
-        >
-          <img src={ajouter} alt="" />
-        </button>
-        <button
-          type="button"
-          className={styles.action}
-          aria-label="Notifications"
-          onClick={() => {
-            ouvrir('notifications')
-          }}
-        >
-          <img src={cloche} alt="" />
-        </button>
+        />
       </div>
-      <main className={styles.main}>
-        {TABS.map(({ id, label }) => {
-          const Screen = SCREENS[id]
-          return (
-            // La carte n'est jamais cachée : sur desktop elle reste derrière le tiroir ; sur
-            // mobile, le CSS la masque quand un autre onglet est actif.
-            <section
-              key={id}
-              aria-label={label}
-              hidden={id !== active && id !== 'carte'}
-              data-ecran={id}
-              data-derriere={id === 'carte' && active !== 'carte' ? '' : undefined}
-              className={styles.screen}
-              ref={(element) => {
-                scrollers.current[id] = element
-              }}
-            >
-              <Screen />
-            </section>
-          )
-        })}
-      </main>
-      <Outlet />
-      <TabBar
-        onScrollTop={scrollTop}
-        onToucher={() => {
-          setReplieSur(null)
-        }}
-      />
-    </div>
+    </RacineDesFeuilles>
   )
 }
