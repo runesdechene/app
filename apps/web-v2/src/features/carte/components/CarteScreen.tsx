@@ -1,6 +1,6 @@
 /**
  * QUOI     — l'onglet Carte : le fond parchemin, les lieux en calques, le relief qui se lève
- *            quand on incline (spec Carte).
+ *            quand on incline, le nom du territoire, la rose des vents, « Ma position » (spec Carte).
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
  *            couleur » bascule.
@@ -10,18 +10,25 @@ import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
+import position from '@/assets/ui/position.svg'
+import roseDesVents from '@/assets/ui/rose-des-vents.svg'
 import { Button } from '@/shared/ui/Button'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
+import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUE_GROUPES, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
 import { lireCouleurs } from '../lib/couleurs'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
 import { styleParchemin } from '../lib/style'
 import styles from './CarteScreen.module.css'
+import { Inscription } from './Inscription'
 
 const FOND = 'https://tiles.openfreemap.org/styles/liberty'
 const FRANCE = { center: [2.4, 46.6] as [number, number], zoom: 5 }
+const DUREE_MESSAGE = 3000
+
+type Vue = { lat: number; lng: number; zoom: number }
 
 export function CarteScreen() {
   const conteneur = useRef<HTMLDivElement>(null)
@@ -30,6 +37,9 @@ export function CarteScreen() {
   const { lieux, erreur, reessayer } = useCarteLieux()
   const couleurTypes = useLieuxEnCouleur()
   const navigate = useNavigate()
+  const [vue, setVue] = useState<Vue | null>(null)
+  const territoire = useTerritoire(vue)
+  const [sansPosition, setSansPosition] = useState(false)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -50,6 +60,12 @@ export function CarteScreen() {
     map.on('pitchend', relief)
     map.on('zoomend', relief)
 
+    const lireVue = () => {
+      const { lat, lng } = map.getCenter()
+      setVue({ lat, lng, zoom: map.getZoom() })
+    }
+    map.on('moveend', lireVue)
+
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
       if (typeof id === 'string') void navigate(`/carte/lieu/${id}`)
@@ -68,6 +84,7 @@ export function CarteScreen() {
     map.on('load', () => {
       ajouterCalques(map, couleurs)
       setCarte(map)
+      lireVue()
     })
     return () => {
       map.remove()
@@ -81,6 +98,25 @@ export function CarteScreen() {
     })
   }, [carte, lieux, couleurs, couleurTypes])
 
+  useEffect(() => {
+    if (!sansPosition) return
+    const minuteur = setTimeout(() => {
+      setSansPosition(false)
+    }, DUREE_MESSAGE)
+    return () => {
+      clearTimeout(minuteur)
+    }
+  }, [sansPosition])
+
+  function allerAMaPosition() {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => carte?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 13 }),
+      () => {
+        setSansPosition(true)
+      },
+    )
+  }
+
   return (
     <div className={styles.ecran}>
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
@@ -92,6 +128,23 @@ export function CarteScreen() {
           </Button>
         </div>
       )}
+      <div className={styles.inscription}>
+        <Inscription nom={territoire} />
+      </div>
+      <img className={styles.rose} src={roseDesVents} alt="" />
+      {sansPosition && (
+        <p role="status" className={styles.message}>
+          Position indisponible
+        </p>
+      )}
+      <button
+        type="button"
+        className={styles.position}
+        aria-label="Ma position"
+        onClick={allerAMaPosition}
+      >
+        <img src={position} alt="" />
+      </button>
     </div>
   )
 }

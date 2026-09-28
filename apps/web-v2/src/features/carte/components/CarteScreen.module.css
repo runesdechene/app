@@ -1,5 +1,7 @@
 /*
- * QUOI     — la carte plein écran, et le bandeau discret quand les lieux ne se chargent pas.
+ * QUOI     — la carte plein écran ; par-dessus : l'inscription du territoire, la rose des vents
+ *            en bas à gauche, « Ma position » en bas à droite (maquette 162:107), et le bandeau
+ *            discret quand les lieux ne se chargent pas.
  */
 .ecran {
   position: relative;
@@ -28,4 +30,51 @@
   font-size: var(--legende-size);
   white-space: nowrap;
   translate: -50% 0;
+}
+
+.inscription {
+  position: absolute;
+  top: 70px; /* sous la recherche, maquette 162:107 */
+  right: 0;
+  left: 0;
+}
+
+.rose {
+  position: absolute;
+  bottom: 20px; /* maquette 162:107 */
+  left: 22px;
+  width: 74px;
+  height: 74px;
+  pointer-events: none;
+}
+
+.position {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent); /* maquette 162:129 : #fffaf2 */
+}
+
+.position img {
+  width: 22px;
+  height: 22px;
+}
+
+.message {
+  position: absolute;
+  right: 24px;
+  bottom: 76px;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
 }
