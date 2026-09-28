@@ -8,7 +8,6 @@
   - `ProfilFragments` — les Fragments collectés sur une ligne ; sur son profil, choisir son
     signe et « + N à découvrir » vers la boutique.
   - `ProfilDecouvertes` — sections Lieux ajoutés / Visités / Envie d'y aller, en lignes qui défilent.
-  - `LieuCarte` — grande carte photo : nom posé dessus, catégorie, distance (si position), auteur.
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.
 - `ModifierProfil` — le formulaire du profil ; ne s'affiche qu'une fois tout chargé.
 - `PreferencesPage` — les trois cartes de réglages.

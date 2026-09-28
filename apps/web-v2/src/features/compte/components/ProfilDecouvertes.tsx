@@ -7,10 +7,10 @@
  */
 import { useRef } from 'react'
 import type { Lieu, ExplorateurProfile } from '../api/lireProfil'
-import { useMaPosition } from '../hooks/useMaPosition'
-import type { Point } from '../lib/distance'
-import { LieuCarte } from './LieuCarte'
-import { useGlisser } from '../hooks/useGlisser'
+import { useGlisser } from '@/shared/hooks/useGlisser'
+import { useMaPosition } from '@/shared/hooks/useMaPosition'
+import type { Point } from '@/shared/lib/distance'
+import { LieuCarte } from '@/shared/ui/LieuCarte'
 import styles from './ProfilDecouvertes.module.css'
 
 export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {

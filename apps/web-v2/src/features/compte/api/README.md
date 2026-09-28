@@ -9,4 +9,3 @@ lève une erreur ; jamais un `{ error }` à vérifier plus loin.
 - `monProfil.ts` — nom, présentation, Instagram, titres portés, accord des titres, signe.
 - `avatar.ts` — la photo : webp 400 px, `place-images/<id>/avatar.webp`.
 - `preferences.ts` — lecture et réglages (migration 353), e-mail, lien du Hub.
-- `position.ts` — la position de celui qui regarde, seulement si déjà autorisée (jamais de demande).

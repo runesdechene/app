@@ -19,7 +19,7 @@ vi.mock('../api/monProfil', () => ({ choisirSigne }))
 const position = vi.hoisted(() =>
   vi.fn(() => Promise.resolve<{ latitude: number; longitude: number } | null>(null)),
 )
-vi.mock('../api/position', () => ({ positionSiAutorisee: position }))
+vi.mock('@/shared/lib/position', () => ({ positionSiAutorisee: position }))
 
 const carte = (id: string, nom: string, auteur: string | null = null) => ({
   id,

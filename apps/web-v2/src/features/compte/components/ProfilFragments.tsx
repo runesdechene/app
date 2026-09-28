@@ -14,7 +14,7 @@ import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, Fragment } from '../api/lireProfil'
 import { useChoisirSigne } from '../hooks/useChoisirSigne'
-import { useGlisser } from '../hooks/useGlisser'
+import { useGlisser } from '@/shared/hooks/useGlisser'
 import styles from './ProfilFragments.module.css'
 
 const BOUTIQUE_URL = 'https://runesdechene.com/collections/all'

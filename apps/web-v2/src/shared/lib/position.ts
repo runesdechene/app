@@ -4,7 +4,7 @@
  *            (Uriel, 27/09). Le profil ne DEMANDE jamais la permission : il la lit seulement
  *            si elle a déjà été donnée (en V1, sur la même origine). Sinon : null.
  */
-import type { Point } from '../lib/distance'
+import type { Point } from './distance'
 
 export async function positionSiAutorisee(): Promise<Point | null> {
   if (!('geolocation' in navigator) || !('permissions' in navigator)) return null

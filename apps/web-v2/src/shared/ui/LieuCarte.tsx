@@ -1,5 +1,6 @@
 /**
- * QUOI     — la carte d'un lieu dans le profil, façon carnet de route (maquette 123:107) : la
+ * QUOI     — la carte d'un lieu, façon carnet de route (maquette 123:107, reprise par l'Accueil
+ *            27:2 dans « Ajoutés récemment ») : la
  *            photo en grand ; en bas, l'icône de catégorie puis le nom, et l'auteur à droite ;
  *            en haut à droite, la distance.
  * POURQUOI — « J'adore la proposition pour les lieux » (Uriel, 27/09) : la photo est l'héroïne.
@@ -14,16 +15,26 @@
 import { Link, useLocation } from 'react-router'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
-import type { Lieu } from '../api/lireProfil'
-import { distanceKm, formatDistance, type Point } from '../lib/distance'
+import { distanceKm, formatDistance, type Point } from '@/shared/lib/distance'
 import styles from './LieuCarte.module.css'
+
+// Ce qu'une carte montre d'un lieu. Le profil et l'Accueil lisent la même forme.
+export type LieuDeCarte = {
+  id: string
+  nom: string
+  imageUrl: string | null
+  latitude: number | null
+  longitude: number | null
+  categorie: { icone: string } | null
+  auteur: { nom: string; avatarUrl: string | null } | null
+}
 
 export function LieuCarte({
   lieu,
   position,
   avecAuteur,
 }: {
-  lieu: Lieu
+  lieu: LieuDeCarte
   position: Point | null
   avecAuteur: boolean
 }) {

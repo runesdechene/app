@@ -4,6 +4,7 @@
  *            briques qui réagissent (interrupteur, onglets, champ) sont vivantes : on les essaie.
  */
 import { useState } from 'react'
+import fondFiche from '@/assets/ui/fond-fiche.webp'
 import partager from '@/assets/ui/partager.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
@@ -12,6 +13,7 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { Feuille } from '@/shared/ui/Feuille'
 import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
+import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { Pastille } from '@/shared/ui/Pastille'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { Segments } from '@/shared/ui/Segments'
@@ -28,6 +30,16 @@ const PRESENTATION_PLEINE =
   'Chevalier errant à temps partiel, entrepreneur, illustrateur et technomancien. Fondateur de la marque. '.repeat(
     3,
   )
+
+const LIEU = {
+  id: 'demo',
+  nom: 'Château de Jonjeac',
+  imageUrl: fondFiche,
+  latitude: 45.9,
+  longitude: 6.1,
+  categorie: null,
+  auteur: { nom: 'Luna', avatarUrl: null },
+}
 
 function rien() {
   return undefined
@@ -129,6 +141,13 @@ export function DaBriques() {
 
       <DaSection name="Segments">
         <Segments libelle="Accord" options={ACCORDS} valeur={accord} onChange={setAccord} />
+      </DaSection>
+
+      <DaSection name="LieuCarte">
+        <ul className={styles.rangee}>
+          <LieuCarte lieu={LIEU} position={{ latitude: 45.2, longitude: 5.7 }} avecAuteur />
+          <LieuCarte lieu={{ ...LIEU, imageUrl: null }} position={null} avecAuteur={false} />
+        </ul>
       </DaSection>
 
       <DaSection name="Feuille">

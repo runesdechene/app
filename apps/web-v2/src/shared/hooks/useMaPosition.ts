@@ -3,7 +3,7 @@
  * POURQUOI — lue une fois et gardée dix minutes : toutes les cartes du profil s'en servent.
  */
 import { useQuery } from '@tanstack/react-query'
-import { positionSiAutorisee } from '../api/position'
+import { positionSiAutorisee } from '../lib/position'
 import type { Point } from '../lib/distance'
 
 export function useMaPosition(): Point | null {
