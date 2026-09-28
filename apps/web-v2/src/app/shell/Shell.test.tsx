@@ -62,9 +62,9 @@ test('l’onglet actif est annoncé', async () => {
   )
 })
 
-test('un lien « Revenir à la V1 » est toujours visible pendant la construction', async () => {
+test('un lien « Revenir V1 » est toujours visible pendant la construction', async () => {
   renderAt('/messages')
-  expect(await screen.findByRole('link', { name: 'Revenir à la V1' })).toHaveAttribute('href', '/')
+  expect(await screen.findByRole('link', { name: 'Revenir V1' })).toHaveAttribute('href', '/')
 })
 
 test('une barre oblique finale n’ouvre pas de détail', async () => {

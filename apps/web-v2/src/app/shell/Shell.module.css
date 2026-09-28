@@ -24,8 +24,13 @@
   margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) var(--space-2);
 }
 
+.embleme {
+  display: none;
+}
+
 .retourV1 {
   grid-area: retour;
+  white-space: nowrap;
   align-self: center;
   min-height: var(--cible-tactile);
   display: inline-grid;
@@ -129,15 +134,18 @@
     border-right: 1px solid var(--color-sable);
   }
 
-  /* Seul l'emblème du logotype tient dans la barre : l'image est recadrée sur sa gauche. */
   .logo {
+    display: none;
+  }
+
+  /* L'emblème du logotype, découpé à part (assets/ui/embleme.png) : net et centré. */
+  .embleme {
+    grid-area: logo;
     justify-self: center;
+    display: block;
     width: 44px;
-    max-width: none;
     height: 44px;
     margin: var(--space-4) 0 var(--space-6);
-    object-fit: cover;
-    object-position: left center;
   }
 
   .actions {
@@ -147,7 +155,7 @@
   }
 
   .retourV1 {
-    margin: 0 var(--space-1) var(--space-4);
-    text-align: center;
+    justify-self: center;
+    margin: 0 0 var(--space-4);
   }
 }

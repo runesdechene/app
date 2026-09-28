@@ -15,6 +15,7 @@ import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
+import embleme from '@/assets/ui/embleme.png'
 import logotype from '@/assets/ui/logotype.png'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
@@ -65,11 +66,13 @@ export function Shell() {
 
   return (
     <div className={styles.shell} data-detail={detailOpen ? 'open' : undefined}>
+      {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
       <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
+      <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
       {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
           y compris dans la V2 installée en application, qui n'a pas de barre d'adresse. */}
       <a className={styles.retourV1} href={V1_URL}>
-        <Text variant="libelle">Revenir à la V1</Text>
+        <Text variant="libelle">Revenir V1</Text>
       </a>
       <div className={styles.actions}>
         <button
