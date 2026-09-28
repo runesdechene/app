@@ -143,6 +143,7 @@ AS $$
       'qui', json_build_object('id', u.id, 'nom', user_public_name(u.id, u.display_name, u.first_name), 'avatar', u.avatar_url),
       'lieu', CASE WHEN p.id IS NULL THEN NULL ELSE json_build_object(
                 'id', p.id, 'nom', p.title, 'region', COALESCE(p.departement, p.pays)) END,
+      'moi', r.qui = moi.id, -- ma propre ligne : on ne se salue pas soi-même
       'saluts', (SELECT count(*) FROM saluts s WHERE s.evenement = r.id),
       'salue', EXISTS (SELECT 1 FROM saluts s WHERE s.evenement = r.id AND s.user_id = moi.id))
     ORDER BY r.quand DESC), '[]'::json)
