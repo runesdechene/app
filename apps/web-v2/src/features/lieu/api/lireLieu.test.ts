@@ -3,6 +3,7 @@ import { lireCompagnons, lireFiche } from './lireLieu'
 
 const COMPLET = {
   id: 'a',
+  slug: 'chateau-de-jonjeac',
   nom: 'Château de Jonjeac',
   recit: 'Un récit.',
   adresse: 'Jonjeac',
@@ -22,6 +23,7 @@ const COMPLET = {
 
 test('une fiche complète se lit', () => {
   expect(lireFiche(COMPLET)).toMatchObject({
+    slug: 'chateau-de-jonjeac',
     nom: 'Château de Jonjeac',
     moi: { envie: true },
     revendication: { nom: 'LES LOUPS' },

@@ -12,6 +12,7 @@
 --      acceptant que le bonus s'ajoute aux Couronnes conquises de la Compagnie).
 --   4. Qui est autour : réservé à qui a visité le lieu en GPS dans les 30 minutes et y est encore ;
 --      la distance est arrondie à 50 m. Revendiquer exige aussi d'être encore sur place.
+--   5. fiche_lieu rend aussi le slug : on partage la page publique du lieu, comme la V1.
 --   Chaque fonction part de sa définition live (364-365), copiée entière.
 --
 -- SCHEMA CHECKED (28/09/2026) : place_wishlist(id serial, place_id, user_id, created_at défaut
@@ -30,6 +31,7 @@ AS $$
   WITH moi AS (SELECT (auth.uid())::text AS id)
   SELECT json_build_object(
     'id', l.id,
+    'slug', l.slug, -- la page publique du lieu (/lieu/<slug>), pour le partage
     'nom', l.title,
     'recit', COALESCE(l.text, ''),
     'adresse', NULLIF(btrim(l.address), ''),

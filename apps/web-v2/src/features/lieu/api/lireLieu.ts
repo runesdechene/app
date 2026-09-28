@@ -10,6 +10,7 @@ export type Personne = { id: string; nom: string; avatar: string | null }
 export type Compagnon = Personne & { distance: number }
 export type FicheLieu = {
   id: string
+  slug: string | null // la page publique du lieu (/lieu/<slug>), quand elle existe
   nom: string
   recit: string
   adresse: string | null
@@ -65,6 +66,8 @@ export function lireFiche(json: unknown): FicheLieu | null {
   const moi = objet(f.moi)
   return {
     id: chaine(f.id),
+    // Absent tant que la base ne le rend pas (migration 366) : pas de page publique, pas d'erreur.
+    slug: typeof f.slug === 'string' ? f.slug : null,
     nom: chaine(f.nom),
     recit: chaine(f.recit),
     adresse: ouNull(chaine)(f.adresse),

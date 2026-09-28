@@ -28,7 +28,7 @@ BEGIN
   SELECT count(*) INTO envie_avant FROM place_wishlist WHERE user_id = a;
   PERFORM public.basculer_envie(lieu.id);
   SELECT count(*) INTO envie_apres FROM place_wishlist WHERE user_id = a;
-  fiche_envie := public.fiche_lieu(lieu.id)->'moi'->>'envie';
+  fiche_envie := (public.fiche_lieu(lieu.id)->'moi'->>'envie') || ' slug=' || COALESCE(public.fiche_lieu(lieu.id)->>'slug', '∅');
 
   -- Sans visite récente, même présent : aucune liste de compagnons.
   PERFORM public.signaler_presence(lieu.lat, lieu.lng);

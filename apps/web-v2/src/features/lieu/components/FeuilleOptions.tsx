@@ -16,7 +16,7 @@ export function FeuilleOptions({
   fiche,
   onFermer,
 }: {
-  fiche: Pick<FicheLieu, 'id' | 'nom' | 'lat' | 'lng' | 'type' | 'photos'>
+  fiche: Pick<FicheLieu, 'id' | 'slug' | 'nom' | 'lat' | 'lng' | 'type' | 'photos'>
   onFermer: () => void
 }) {
   const navigate = useNavigate()

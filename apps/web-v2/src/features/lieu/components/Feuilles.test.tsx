@@ -7,6 +7,7 @@ import { FeuillePartager } from './FeuillePartager'
 
 const FICHE = {
   id: 'a',
+  slug: 'chateau-de-jonjeac' as string | null,
   nom: 'Château de Jonjeac',
   lat: 45.9,
   lng: 6.1,
@@ -31,13 +32,13 @@ test('« Trouver sur la carte » garde la fiche ouverte et centre la carte sur l
   expect(router.state.location.search).toBe('?centre=45.9,6.1')
 })
 
-test('« Copier le lien » copie l’adresse de la fiche et le dit', async () => {
+test('« Copier le lien » copie la phrase et le lien lisible du lieu, et le dit', async () => {
   const writeText = vi.fn(() => Promise.resolve())
   vi.stubGlobal('navigator', { clipboard: { writeText } })
   dans(<FeuillePartager fiche={FICHE} onFermer={vi.fn()} />)
   await userEvent.click(screen.getByRole('button', { name: /Copier le lien/ }))
   expect(writeText).toHaveBeenCalledWith(
-    `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
+    'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ? https://app.runesdechene.com/lieu/chateau-de-jonjeac',
   )
   expect(await screen.findByText('Lien copié')).toBeInTheDocument()
 })
@@ -49,7 +50,8 @@ test('avec le partage natif, « Partager ailleurs… » l’ouvre', async () => 
   await userEvent.click(screen.getByRole('button', { name: /Partager ailleurs/ }))
   expect(share).toHaveBeenCalledWith({
     title: 'Château de Jonjeac',
-    url: `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
+    text: 'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ?',
+    url: 'https://app.runesdechene.com/lieu/chateau-de-jonjeac',
   })
 })
 
@@ -57,4 +59,14 @@ test('sans partage natif, « Partager ailleurs… » n’apparaît pas', () => {
   vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn() } })
   dans(<FeuillePartager fiche={FICHE} onFermer={vi.fn()} />)
   expect(screen.queryByRole('button', { name: /Partager ailleurs/ })).toBeNull()
+})
+
+test('un lieu sans page publique se partage par l’adresse de sa fiche', async () => {
+  const writeText = vi.fn(() => Promise.resolve())
+  vi.stubGlobal('navigator', { clipboard: { writeText } })
+  dans(<FeuillePartager fiche={{ ...FICHE, slug: null }} onFermer={vi.fn()} />)
+  await userEvent.click(screen.getByRole('button', { name: /Copier le lien/ }))
+  expect(writeText).toHaveBeenCalledWith(
+    `Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ? ${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
+  )
 })

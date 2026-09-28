@@ -1,7 +1,9 @@
 /**
  * QUOI     — la feuille « Partager ce lieu », ouverte en haut à droite de la photo (maquette
  *            236:128) : l'aperçu, « Copier le lien », « Partager ailleurs… ».
- * POURQUOI — le partage du téléphone existe déjà (`navigator.share`) : on l'ouvre, on ne le
+ * POURQUOI — on partage une phrase et la page publique du lieu (`/lieu/<slug>`, comme la V1) :
+ *            celui qui la reçoit n'a besoin d'aucun compte. Sans page publique, l'adresse de la
+ *            fiche. Le partage du téléphone existe déjà (`navigator.share`) : on l'ouvre, on ne le
  *            refait pas ; sans lui (un ordinateur), la ligne disparaît. « Envoyer à un
  *            Explorateur » arrive avec les Messages.
  */
@@ -14,16 +16,20 @@ import type { FicheLieu } from '../api/lireLieu'
 import styles from './Feuilles.module.css'
 
 const DUREE_COPIE = 2000
+const PHRASE = 'Ma dernière découverte sur Runes de Chêne EXPLORE, tu connais ?'
+const PAGES_PUBLIQUES = 'https://app.runesdechene.com/lieu/'
 
 export function FeuillePartager({
   fiche,
   onFermer,
 }: {
-  fiche: Pick<FicheLieu, 'id' | 'nom' | 'lat' | 'lng' | 'type' | 'photos'>
+  fiche: Pick<FicheLieu, 'id' | 'slug' | 'nom' | 'lat' | 'lng' | 'type' | 'photos'>
   onFermer: () => void
 }) {
   const [copie, setCopie] = useState(false)
-  const lien = `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/${fiche.id}`
+  const lien = fiche.slug
+    ? `${PAGES_PUBLIQUES}${fiche.slug}`
+    : `${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/${fiche.id}`
   const partageNatif = 'share' in navigator
   const vignette = fiche.photos[0]?.vignette
 
@@ -51,7 +57,7 @@ export function FeuillePartager({
         type="button"
         className={styles.choix}
         onClick={() => {
-          void navigator.clipboard.writeText(lien).then(() => {
+          void navigator.clipboard.writeText(`${PHRASE} ${lien}`).then(() => {
             setCopie(true)
           })
         }}
@@ -71,7 +77,9 @@ export function FeuillePartager({
           className={styles.choix}
           onClick={() => {
             // Annuler le partage n'est pas une erreur : rien à dire.
-            void navigator.share({ title: fiche.nom, url: lien }).catch(() => undefined)
+            void navigator
+              .share({ title: fiche.nom, text: PHRASE, url: lien })
+              .catch(() => undefined)
           }}
         >
           <img className={styles.icone} src={partager} alt="" />
