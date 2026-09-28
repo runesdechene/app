@@ -24,6 +24,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `rose-des-vents.svg`   | 74 × 74         | Carte, en bas à gauche (maquette 186:170, exportée d'un bloc) |
 | `fleuron.svg`          | 70 × 14         | Carte, de part et d'autre du nom du territoire ; le second est retourné en CSS (200:193) |
 | `position.svg`         | 22 × 22         | Carte, le bouton « Ma position » (162:130) |
+| `loupe.svg`, `filtre.svg` | 18 × 18, 20 × 20 | Carte, la recherche et le bouton Filtre (165:130, 165:135) |
 | `ajouter.svg`, `cloche.svg` | 24 × 24 | « Ajouter » et la cloche de l'en-tête (pochoirs, maquette 162:107) ; le point rouge de la cloche est à part |
 | `lieu.svg`, `point-interet.svg`, `pin-gps.svg` | 24 × 24 | les trois choix de la feuille « Ajouter » (maquette 201:216) |
 | `chevron.svg`          | 18 × 18         | fin des lignes qui ouvrent quelque chose (Préférences)            |

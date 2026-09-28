@@ -47,3 +47,11 @@ test('sans position, « Ma position » le dit sans planter', async () => {
   expect(await screen.findByText('Position indisponible')).toBeInTheDocument()
   vi.unstubAllGlobals()
 })
+
+test('le bouton Filtre ouvre la feuille « Seulement mes lieux »', async () => {
+  afficher()
+  await userEvent.click(screen.getByRole('button', { name: 'Filtre' }))
+  expect(screen.getByRole('dialog', { name: 'Filtrer la carte' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('switch', { name: 'Seulement mes lieux' }))
+  expect(screen.getByRole('switch', { name: 'Seulement mes lieux' })).toBeChecked()
+})

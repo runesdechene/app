@@ -1,15 +1,19 @@
 /**
  * QUOI     — l'onglet Carte : le fond parchemin, les lieux en calques, le relief qui se lève
- *            quand on incline, le nom du territoire, la rose des vents, « Ma position » (spec Carte).
+ *            quand on incline, la recherche et le filtre, le nom du territoire, la rose des vents,
+ *            « Ma position » (spec Carte).
+ * ATTENTION — la feuille du filtre et « Seulement mes lieux » sont un réglage de la vue, gardé
+ *            ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec leur valeur.
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
  *            couleur » bascule.
- * ATTENTION — l'attribution OpenStreetMap est obligatoire : elle reste, repliée.
+ *            L'attribution OpenStreetMap est obligatoire : elle reste, repliée.
  */
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
+import filtre from '@/assets/ui/filtre.svg'
 import position from '@/assets/ui/position.svg'
 import roseDesVents from '@/assets/ui/rose-des-vents.svg'
 import { Button } from '@/shared/ui/Button'
@@ -22,7 +26,9 @@ import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
 import { styleParchemin } from '../lib/style'
 import styles from './CarteScreen.module.css'
+import { FiltreFeuille } from './FiltreFeuille'
 import { Inscription } from './Inscription'
+import { Recherche } from './Recherche'
 
 const FOND = 'https://tiles.openfreemap.org/styles/liberty'
 const FRANCE = { center: [2.4, 46.6] as [number, number], zoom: 5 }
@@ -40,6 +46,8 @@ export function CarteScreen() {
   const [vue, setVue] = useState<Vue | null>(null)
   const territoire = useTerritoire(vue)
   const [sansPosition, setSansPosition] = useState(false)
+  const [filtreOuvert, setFiltreOuvert] = useState(false)
+  const [mesLieux, setMesLieux] = useState(false)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -93,10 +101,11 @@ export function CarteScreen() {
 
   useEffect(() => {
     if (!carte || !lieux) return
-    void ajouterMarques(carte, lieux, couleurs, couleurTypes).then(() => {
-      carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(lieux, couleurTypes))
+    const montres = mesLieux ? lieux.filter((l) => l.etat !== 'inconnu') : lieux
+    void ajouterMarques(carte, montres, couleurs, couleurTypes).then(() => {
+      carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
     })
-  }, [carte, lieux, couleurs, couleurTypes])
+  }, [carte, lieux, couleurs, couleurTypes, mesLieux])
 
   useEffect(() => {
     if (!sansPosition) return
@@ -128,6 +137,22 @@ export function CarteScreen() {
           </Button>
         </div>
       )}
+      <div className={styles.haut}>
+        <Recherche
+          lieux={lieux ?? []}
+          onAller={({ lat, lng }) => carte?.flyTo({ center: [lng, lat], zoom: 14 })}
+        />
+        <button
+          type="button"
+          className={styles.filtre}
+          aria-label="Filtre"
+          onClick={() => {
+            setFiltreOuvert(true)
+          }}
+        >
+          <img src={filtre} alt="" />
+        </button>
+      </div>
       <div className={styles.inscription}>
         <Inscription nom={territoire} />
       </div>
@@ -145,6 +170,15 @@ export function CarteScreen() {
       >
         <img src={position} alt="" />
       </button>
+      {filtreOuvert && (
+        <FiltreFeuille
+          mesLieux={mesLieux}
+          onMesLieux={setMesLieux}
+          onFermer={() => {
+            setFiltreOuvert(false)
+          }}
+        />
+      )}
     </div>
   )
 }
