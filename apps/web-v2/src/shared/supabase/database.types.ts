@@ -2342,6 +2342,62 @@ export type Database = {
         }
         Relationships: []
       }
+      murmures: {
+        Row: {
+          a: string
+          cree_le: string
+          de: string
+          id: number
+          lu_le: string | null
+          texte: string
+        }
+        Insert: {
+          a: string
+          cree_le?: string
+          de: string
+          id?: number
+          lu_le?: string | null
+          texte: string
+        }
+        Update: {
+          a?: string
+          cree_le?: string
+          de?: string
+          id?: number
+          lu_le?: string | null
+          texte?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "murmures_a_fkey"
+            columns: ["a"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "murmures_a_fkey"
+            columns: ["a"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "murmures_de_fkey"
+            columns: ["de"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "murmures_de_fkey"
+            columns: ["de"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -3890,6 +3946,56 @@ export type Database = {
           },
         ]
       }
+      saluts: {
+        Row: {
+          created_at: string
+          destinataire: string
+          evenement: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          destinataire: string
+          evenement: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          destinataire?: string
+          evenement?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saluts_destinataire_fkey"
+            columns: ["destinataire"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saluts_destinataire_fkey"
+            columns: ["destinataire"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saluts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saluts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_unlocks: {
         Row: {
           created_at: string | null
@@ -4385,6 +4491,7 @@ export type Database = {
           bio: string | null
           biography: string
           brouiller_pistes: boolean
+          charte_signee_le: string | null
           conquest_points: number
           conquest_reset_at: string | null
           construction_points: number
@@ -4452,6 +4559,7 @@ export type Database = {
           bio?: string | null
           biography?: string
           brouiller_pistes?: boolean
+          charte_signee_le?: string | null
           conquest_points?: number
           conquest_reset_at?: string | null
           construction_points?: number
@@ -4519,6 +4627,7 @@ export type Database = {
           bio?: string | null
           biography?: string
           brouiller_pistes?: boolean
+          charte_signee_le?: string | null
           conquest_points?: number
           conquest_reset_at?: string | null
           construction_points?: number
@@ -5362,6 +5471,7 @@ export type Database = {
         }
         Returns: Json
       }
+      _auteur_du_chemin: { Args: { p_evenement: string }; Returns: string }
       _barem: { Args: { p_default?: number; p_key: string }; Returns: number }
       _blob_dominant_faction: {
         Args: { p_blob_place_ids: string[] }
@@ -5562,6 +5672,7 @@ export type Database = {
           pays: string
         }[]
       }
+      _region_montree: { Args: { p_user: string }; Returns: string }
       _require_min_discoveries: {
         Args: { p_min: number; p_user_id: string }
         Returns: Json
@@ -5626,6 +5737,8 @@ export type Database = {
       }
       _xp_epoch: { Args: never; Returns: string }
       _xp_for_level: { Args: { p_level: number }; Returns: number }
+      accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
+      accueil_nouveaute: { Args: never; Returns: Json }
       add_announcement_comment: {
         Args: {
           p_announcement_id: string
@@ -5733,7 +5846,10 @@ export type Database = {
         }
         Returns: Json
       }
-      conversation: { Args: { p_avec: string; p_limite?: number }; Returns: Json }
+      conversation: {
+        Args: { p_avec: string; p_limite?: number }
+        Returns: Json
+      }
       correspondant: { Args: { p_avec: string }; Returns: Json }
       create_announcement: {
         Args: { p_title: string; p_type: string }
@@ -5872,8 +5988,6 @@ export type Database = {
         Returns: Json
       }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
-      accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
-      accueil_nouveaute: { Args: never; Returns: Json }
       decouvrir_lieu: { Args: { p_id: string }; Returns: Json }
       delete_carnet: {
         Args: { p_place_id: string; p_user_id: string }
@@ -5920,7 +6034,10 @@ export type Database = {
       distance_multiplier: { Args: { distance_km: number }; Returns: number }
       dmetaphone: { Args: { "": string }; Returns: string }
       dmetaphone_alt: { Args: { "": string }; Returns: string }
-      ecrire_au_registre: { Args: { p_canal: string; p_texte: string }; Returns: Json }
+      ecrire_au_registre: {
+        Args: { p_canal: string; p_texte: string }
+        Returns: Json
+      }
       edit_place_description: {
         Args: { p_content: string; p_place_id: string; p_user_id: string }
         Returns: Json
@@ -6480,7 +6597,6 @@ export type Database = {
       }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
-      mon_entree: { Args: never; Returns: Json }
       migrate_user_to_auth_id: {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
@@ -6521,6 +6637,7 @@ export type Database = {
         Args: { p_crowns?: number; p_status: string; p_submission_id: string }
         Returns: undefined
       }
+      mon_entree: { Args: never; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
@@ -6625,7 +6742,6 @@ export type Database = {
         Args: { p_place_id: string }
         Returns: undefined
       }
-      registre: { Args: { p_canaux?: string[]; p_limite?: number }; Returns: Json }
       register_push_subscription: {
         Args: {
           p_auth: string
@@ -6644,6 +6760,10 @@ export type Database = {
           p_user_id: string
           p_voyage_id: string
         }
+        Returns: Json
+      }
+      registre: {
+        Args: { p_canaux?: string[]; p_limite?: number }
         Returns: Json
       }
       remove_company_member: {
@@ -6835,11 +6955,11 @@ export type Database = {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
-      signer_charte: { Args: never; Returns: undefined }
       signaler_presence: {
         Args: { p_lat: number; p_lng: number }
         Returns: undefined
       }
+      signer_charte: { Args: never; Returns: undefined }
       soundex: { Args: { "": string }; Returns: string }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
