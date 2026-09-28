@@ -9,12 +9,13 @@
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
  *            septembre ») : minuit coupe aussi un groupe.
  */
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal, type Mention } from '../api/lireRegistre'
+import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
 import { autreJour, jourDe } from '../lib/jour'
@@ -36,20 +37,14 @@ export function Registre() {
   const { messages, erreur, ecrire, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
-  const liste = useRef<HTMLOListElement>(null)
+  // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
+  const coller = useColleEnBas()
   const champ = useRef<HTMLInputElement>(null)
   const [texte, setTexte] = useState('')
   const [curseur, setCurseur] = useState(0)
   const mentions = useMentions(texte, curseur)
 
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
-
-  // Le dernier message reste en vue : à l'ouverture, et à chaque nouveau. Seule la liste
-  // défile — jamais la page (le haut et la barre d'écriture restent fixes, Uriel 28/09).
-  useEffect(() => {
-    const l = liste.current
-    if (l) l.scrollTop = l.scrollHeight
-  }, [visibles.length])
 
   const basculer = (c: Canal) => {
     setCoches((avant) => {
@@ -80,7 +75,7 @@ export function Registre() {
       </div>
 
       {erreur && <p className={styles.alerte}>Le Registre n’a pas pu être lu.</p>}
-      <ol ref={liste} className={styles.messages} aria-label="Registre">
+      <ol ref={coller} className={styles.messages} aria-label="Registre">
         {visibles.map((m, i) => {
           const nouveauJour = autreJour(visibles[i - 1]?.quand, m.quand)
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
