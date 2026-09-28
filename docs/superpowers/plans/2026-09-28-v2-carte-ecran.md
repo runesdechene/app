@@ -208,7 +208,7 @@ Dans `router.tsx`, sous `:tab` : `{ path: 'ajouter', Component: RouteAjouter }`,
 
 **Interfaces:**
 - Produces (JSON) :
-  - `carte_lieux()` → `[{ id, nom, lat, lng, nature: 'lieu'|'curiosite', icone: string|null, etat: 'inconnu'|'connu'|'visite', revendication: { nom: string, moi: boolean } | null }]`
+  - `carte_lieux()` → `[{ id, nom, lat, lng, nature: 'lieu'|'curiosite', icone: string|null, couleur: string|null, etat: 'inconnu'|'connu'|'visite', revendication: { nom: string, moi: boolean } | null }]`
   - `territoire_en(p_lat float8, p_lng float8)` → `{ territoire: string|null, pays: string|null }`
   - `get_my_preferences()` gagne `lieuxEnCouleur: boolean` ; `set_my_preference('lieux_en_couleur', bool)`.
 
@@ -249,7 +249,7 @@ Attendu après la Step 3 : `lieux` ≈ nombre de lieux visibles, `visites` > 0, 
 -- être un lieu) ; l'option « Mes lieux en couleur ». Lectures seules, auth.uid().
 --
 -- SCHEMA CHECKED (28/09/2026) : places(id, title, latitude, longitude, author_id, private, masked,
---   departement, pays) ; place_tags(place_id, tag_id, is_primary) ; tags(id, icon) ;
+--   departement, pays) ; place_tags(place_id, tag_id, is_primary) ; tags(id, icon, color) ;
 --   place_explorers(place_id, user_id) ; places_discovered(user_id, place_id) ;
 --   place_veille(place_id, expedition_id, veilleur_user_id) ; expeditions(id, title) ;
 --   expedition_members(expedition_id, user_id) ; users(display_name, first_name).
@@ -278,7 +278,7 @@ AS $$
   WITH moi AS (SELECT (auth.uid())::text AS id)
   SELECT COALESCE(json_agg(json_build_object(
     'id', p.id, 'nom', p.title, 'lat', p.latitude, 'lng', p.longitude, 'nature', p.nature,
-    'icone', t.icon,
+    'icone', t.icon, 'couleur', t.color,
     'etat', CASE
       WHEN EXISTS (SELECT 1 FROM place_explorers e WHERE e.place_id = p.id AND e.user_id = moi.id) THEN 'visite'
       WHEN p.author_id = moi.id
@@ -350,7 +350,7 @@ Puis **copier entières** les définitions live de `get_my_preferences` et `set_
 export type EtatLieu = 'inconnu' | 'connu' | 'visite'
 export type LieuCarte = {
   id: string; nom: string; lat: number; lng: number
-  nature: 'lieu' | 'curiosite'; icone: string | null; etat: EtatLieu
+  nature: 'lieu' | 'curiosite'; icone: string | null; couleur: string | null; etat: EtatLieu
   revendication: { nom: string; moi: boolean } | null
 }
 export type Territoire = { territoire: string | null; pays: string | null }
@@ -364,18 +364,18 @@ export function useTerritoire(centre: { lat: number; lng: number } | null): stri
 
 ```ts
 test('un lieu complet se lit', () => {
-  expect(lireLieux([{ id: 'a', nom: 'Trophée', lat: 43.7, lng: 7.4, nature: 'lieu', icone: 'x.svg',
+  expect(lireLieux([{ id: 'a', nom: 'Trophée', lat: 43.7, lng: 7.4, nature: 'lieu', icone: 'x.svg', couleur: '#708d44',
     etat: 'visite', revendication: { nom: 'Rémy', moi: false } }])[0]).toMatchObject({ etat: 'visite', revendication: { nom: 'Rémy' } })
 })
 
 test('un lieu sans icône ni revendication reste lisible', () => {
-  const [l] = lireLieux([{ id: 'b', nom: 'Borne', lat: 44, lng: 7, nature: 'curiosite', icone: null, etat: 'inconnu', revendication: null }])
+  const [l] = lireLieux([{ id: 'b', nom: 'Borne', lat: 44, lng: 7, nature: 'curiosite', icone: null, couleur: null, etat: 'inconnu', revendication: null }])
   expect(l.icone).toBeNull()
   expect(l.revendication).toBeNull()
 })
 
 test('un état inconnu de la base est lu comme « inconnu », jamais une erreur', () => {
-  expect(lireLieux([{ id: 'c', nom: 'X', lat: 1, lng: 1, nature: 'lieu', icone: null, etat: 'bizarre', revendication: null }])[0].etat).toBe('inconnu')
+  expect(lireLieux([{ id: 'c', nom: 'X', lat: 1, lng: 1, nature: 'lieu', icone: null, couleur: null, etat: 'bizarre', revendication: null }])[0].etat).toBe('inconnu')
 })
 
 test('au-dessus de la mer, pas de territoire', () => {
@@ -483,8 +483,6 @@ Les ajouter à `daTokens.ts` (la page `/v2/da` les montre) ; le test des jetons 
   - `groupe` : sceau d'encre plein (le nombre est un texte de calque, pas dans l'image) ;
   - pour chaque icône de type distincte (et `null` → icône par défaut `assets/ui/sceau-defaut.svg`, un losange) : `connu-<clé>` (disque crème, filet d'encre 1,5 px, icône masquée en encre) et `visite-<clé>` (disque d'encre plein, icône crème) ; si `couleurTypes`, `visite-<clé>` reprend le rendu « couleur » du prototype `gravure-couleur.html` (trois vagues de la couleur du type désaturée — `color-mix` à 58 % avec `#8c7c66` — icône blanche, sans bordure).
   - Une icône qui ne se charge pas (`Image.onerror`) retombe sur l'icône par défaut : jamais une marque vide.
-
-*Note :* `carte_lieux()` ne renvoie pas la couleur du type. Pour l'option couleur, ajouter `'couleur', t.color` à la Task 2 (et `couleur: string | null` au type) si l'exécutant la traite dans ce plan.
 
 - [ ] **Step 7 :** `pnpm install`, tests verts, lint vert. **Commit** `feat(v2): le fond de carte parchemin, l'ombrage, la regle du relief et les marques`.
 
