@@ -77,6 +77,34 @@
   margin-top: calc(var(--space-1) - var(--space-4));
 }
 
+/* Le jour : un filet au pinceau de part et d'autre, comme les moments des Murmures. */
+.jour {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.jour::before,
+.jour::after {
+  content: '';
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-encre) 20%, transparent)
+  );
+}
+
+.jour::after {
+  rotate: 180deg;
+}
+
 .heure {
   padding-top: 2px;
   color: var(--color-texte-pale);

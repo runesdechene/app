@@ -131,6 +131,33 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
   expect(apresUnSilence).toHaveTextContent('Gautier Plus tard.')
 })
 
+test('un séparateur à chaque nouveau jour ; minuit coupe un groupe', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 8, 28, 21, 0))
+  const message = (id: number, quand: Date, texte: string) => ({
+    id,
+    canal: 'general',
+    texte,
+    quand: quand.toISOString(),
+    auteur: GAUTIER,
+    moi: false,
+    mentions: [],
+    mentionneMoi: false,
+  })
+  api.fetchRegistre.mockResolvedValue([
+    message(1, new Date(2026, 8, 27, 23, 58), 'Bonne nuit.'),
+    message(2, new Date(2026, 8, 28, 0, 2), 'Ah non, encore une chose.'),
+  ])
+  monter()
+  const registre = await screen.findByRole('list', { name: 'Registre' })
+  await within(registre).findByText(/encore une chose/)
+  const jours = within(registre).getAllByRole('separator')
+  expect(jours.map((j) => j.textContent)).toEqual(['Hier', 'Aujourd’hui'])
+  // Quatre minutes d'écart, mais pas le même jour : le nom revient.
+  expect(within(registre).getAllByRole('listitem')[1]).toHaveTextContent('Gautier Ah non')
+  vi.useRealTimers()
+})
+
 test('« @ » puis le début d’un nom propose des Explorateurs ; le choisir le mentionne', async () => {
   api.chercherExplorateurs.mockResolvedValue([
     { id: 'u2', nom: 'Gautier de Bilskimir', avatar: null },

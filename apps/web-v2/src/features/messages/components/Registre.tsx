@@ -6,7 +6,8 @@
  *            chaque message dit d'où il vient (Uriel, 28/09). L'heure à droite : on lit d'abord
  *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière. On mentionne avec
  *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
- *            est doucement surligné.
+ *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
+ *            septembre ») : minuit coupe aussi un groupe.
  */
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -16,6 +17,7 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal, type Mention } from '../api/lireRegistre'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
+import { autreJour, jourDe } from '../lib/jour'
 import { decouper } from '../lib/mentions'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
@@ -80,39 +82,49 @@ export function Registre() {
       {erreur && <p className={styles.alerte}>Le Registre n’a pas pu être lu.</p>}
       <ol ref={liste} className={styles.messages} aria-label="Registre">
         {visibles.map((m, i) => {
+          const nouveauJour = autreJour(visibles[i - 1]?.quand, m.quand)
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
-          const suite = estLaSuite(visibles[i - 1], m)
+          const suite = !nouveauJour && estLaSuite(visibles[i - 1], m)
           return (
-            <li
-              key={m.id}
-              className={[suite ? styles.suite : styles.message, m.mentionneMoi && styles.mentionne]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              {suite ? (
-                <span aria-hidden="true" />
-              ) : (
-                <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
+            <Fragment key={m.id}>
+              {nouveauJour && (
+                <li role="separator" aria-label={jourDe(m.quand)} className={styles.jour}>
+                  {jourDe(m.quand)}
+                </li>
               )}
-              <p className={styles.texte}>
-                {!suite && (
-                  <>
-                    <Link
-                      className={styles.nom}
-                      to={`/messages/explorateur/${m.auteur.id}`}
-                      state={VENU_D_UN_ECRAN}
-                    >
-                      {m.auteur.nom}
-                    </Link>{' '}
-                  </>
+              <li
+                className={[
+                  suite ? styles.suite : styles.message,
+                  m.mentionneMoi && styles.mentionne,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                {suite ? (
+                  <span aria-hidden="true" />
+                ) : (
+                  <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
                 )}
-                {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
-                <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
-              </p>
-              <time className={styles.heure} dateTime={m.quand}>
-                {HEURE.format(new Date(m.quand))}
-              </time>
-            </li>
+                <p className={styles.texte}>
+                  {!suite && (
+                    <>
+                      <Link
+                        className={styles.nom}
+                        to={`/messages/explorateur/${m.auteur.id}`}
+                        state={VENU_D_UN_ECRAN}
+                      >
+                        {m.auteur.nom}
+                      </Link>{' '}
+                    </>
+                  )}
+                  {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
+                  <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
+                </p>
+                <time className={styles.heure} dateTime={m.quand}>
+                  {HEURE.format(new Date(m.quand))}
+                </time>
+              </li>
+            </Fragment>
           )
         })}
       </ol>
