@@ -127,6 +127,7 @@
   --explore-tracking: 0.45em; /* « E X P L O R E » sous le logo (94:107) */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
+  --carnet-leading: 24px; /* une ligne du carnet de l'ajout d'un lieu : le texte s'y pose */
 
   /* Styles de texte — Cabin Condensed */
   --libelle-size: 0.75rem;
