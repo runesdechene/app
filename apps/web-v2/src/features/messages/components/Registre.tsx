@@ -30,9 +30,11 @@ export function Registre() {
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
   const plusieurs = coches.size > 1
 
-  // Le dernier message reste en vue : à l'ouverture, et à chaque nouveau.
+  // Le dernier message reste en vue : à l'ouverture, et à chaque nouveau. Seule la liste
+  // défile — jamais la page (le haut et la barre d'écriture restent fixes, Uriel 28/09).
   useEffect(() => {
-    liste.current?.lastElementChild?.scrollIntoView({ block: 'end' })
+    const l = liste.current
+    if (l) l.scrollTop = l.scrollHeight
   }, [visibles.length])
 
   const basculer = (c: Canal) => {

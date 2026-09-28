@@ -15,10 +15,12 @@ import styles from './Murmures.module.css'
 
 export function Conversation({ avec }: { avec: string }) {
   const { murmures, correspondant, envoyer, echecEnvoi } = useConversation(avec)
-  const fin = useRef<HTMLDivElement>(null)
+  const fil = useRef<HTMLDivElement>(null)
 
+  // Le dernier murmure en vue ; seul le fil défile, l'en-tête et la barre restent fixes.
   useEffect(() => {
-    fin.current?.scrollIntoView({ block: 'end' })
+    const f = fil.current
+    if (f) f.scrollTop = f.scrollHeight
   }, [murmures?.length])
 
   // Le « lu » se pose sous mon dernier murmure, s'il a été lu.
@@ -26,7 +28,7 @@ export function Conversation({ avec }: { avec: string }) {
 
   return (
     <div className={styles.conversation}>
-      <div className={styles.murmures}>
+      <div ref={fil} className={styles.murmures}>
         {murmures && murmures.length === 0 && (
           <div className={styles.silence}>
             <p className={styles.rien}>Rien n’a encore été dit.</p>
@@ -41,7 +43,6 @@ export function Conversation({ avec }: { avec: string }) {
             lu={m === dernierDeMoi && m.luLe !== null}
           />
         ))}
-        <div ref={fin} />
       </div>
       {echecEnvoi && (
         <p role="alert" className={styles.alerte}>
