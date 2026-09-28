@@ -1,0 +1,273 @@
+/*
+ * QUOI     — les Murmures, version zen (maquettes 264:128, 264:162, 264:185) : beaucoup d'air, des
+ *            filets au pinceau qui s'effacent aux deux bouts, les noms et les moments en IM Fell,
+ *            un lavis de montagnes très pâle au pied de l'écran.
+ */
+
+/* Le lavis : des montagnes à peine posées, sous le reste. */
+.liste,
+.conversation {
+  position: relative;
+  isolation: isolate;
+  min-height: 0;
+}
+
+.liste::after,
+.conversation::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 164px;
+  background: url('../../../assets/ui/lavis-montagnes.svg') center bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* ——— La liste ——— */
+
+.liste {
+  display: grid;
+  align-content: start;
+  padding: var(--space-6) var(--space-6) calc(164px + var(--space-4));
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.sousTitre {
+  margin: var(--space-1) 0 var(--space-6);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.fils {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Un filet au pinceau entre deux correspondants : plein au milieu, effacé aux bouts. */
+.fils li + li .fil::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 60px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-encre) 22%, transparent) 25%,
+    color-mix(in srgb, var(--color-encre) 18%, transparent) 70%,
+    transparent
+  );
+}
+
+.fil {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'portrait nom quand'
+    'portrait dernier sceau';
+  gap: var(--space-1) var(--space-4);
+  align-items: center;
+  padding: var(--space-6) 0;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.fil:active {
+  opacity: 0.7;
+}
+
+.fil > :first-child {
+  grid-area: portrait;
+}
+
+.nom {
+  grid-area: nom;
+  color: var(--color-texte);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+}
+
+.fil[data-non-lu] .nom {
+  color: var(--color-encre);
+}
+
+.quand {
+  grid-area: quand;
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.dernier {
+  grid-area: dernier;
+  overflow: hidden;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fil[data-non-lu] .dernier {
+  color: var(--color-texte);
+}
+
+.sceau {
+  grid-area: sceau;
+  width: 22px;
+  height: 22px;
+  animation: poser var(--duree-elan) var(--courbe-elan);
+}
+
+.vide {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+  line-height: var(--corps-leading);
+}
+
+/* ——— Une conversation ——— */
+
+.conversation {
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  height: 100%;
+}
+
+.murmures {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8) var(--space-6);
+  overflow-y: auto;
+}
+
+.moment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) auto var(--space-1);
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.moment::before,
+.moment::after {
+  content: '';
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-encre) 20%, transparent)
+  );
+}
+
+.moment::after {
+  rotate: 180deg;
+}
+
+.deLui,
+.deMoi {
+  max-width: 82%;
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.deLui {
+  justify-self: start;
+  color: var(--color-texte);
+}
+
+.deMoi {
+  justify-self: end;
+  color: var(--color-encre);
+  text-align: right;
+}
+
+.lu {
+  justify-self: end;
+  margin: calc(-1 * var(--space-2)) 0 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.silence {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: 30dvh;
+  text-align: center;
+}
+
+.rien {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+  font-style: italic;
+}
+
+.unMot {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.alerte {
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes poser {
+  from {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deLui,
+  .deMoi,
+  .sceau {
+    animation: none;
+  }
+
+  .fil {
+    transition: none;
+  }
+}

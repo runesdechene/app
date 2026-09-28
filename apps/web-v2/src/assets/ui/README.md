@@ -44,6 +44,8 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `chemin-visite.svg`, `chemin-arrivee.svg`                                               | 14 × 14          | Accueil, « Sur les chemins » : une visite (des pas), une arrivée (27:2) ; un ajout prend `lieu.svg`                |
 | `feuille-de-chene.svg`                                                                  | 9 × 16           | Accueil : la feuille du salut (pochoir, peinte en CSS)                                                             |
 | `envoyer.svg`, `coche-canal.svg`, `chevron-bas.svg`                                     | 16, 10, 14 px    | Messages, le Registre : envoyer, un canal coché, le choix du canal (Figma 45:278)                                  |
+| `sceau-murmure.webp`                                                                    | 88 × 88          | Murmures : le sceau Runes de Chêne sur un murmure pas encore lu (Figma 264:128, image d'Uriel)                     |
+| `lavis-montagnes.svg`                                                                   | vectoriel        | Murmures : le lavis de montagnes très pâle au pied de l'écran (264:128)                                            |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
 couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)

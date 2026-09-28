@@ -11,6 +11,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import murmure from '@/assets/ui/murmure.svg'
+import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -127,9 +128,14 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
               Modifier mon profil
             </Button>
           ) : (
-            <Button kind="doux" disabled>
+            <Button
+              kind="doux"
+              onClick={() => {
+                void navigate(`/messages/murmures/${profil.id}`, { state: VENU_D_UN_ECRAN })
+              }}
+            >
               <img src={murmure} alt="" width={16} height={16} />
-              Envoyer un murmure (bientôt)
+              Envoyer un murmure
             </Button>
           )}
         </div>

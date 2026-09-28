@@ -75,10 +75,12 @@ test('mon profil : « Modifier mon profil », jamais de murmure', async () => {
   expect(screen.queryByRole('button', { name: /murmure/ })).toBeNull()
 })
 
-test('le profil d’un autre : « Envoyer un murmure », jamais « Modifier »', async () => {
-  afficher({ ...PROFIL, estMoi: false })
-  expect(await screen.findByRole('button', { name: /Envoyer un murmure/ })).toBeInTheDocument()
+test('le profil d’un autre : « Envoyer un murmure » ouvre la conversation, jamais « Modifier »', async () => {
+  const router = afficher({ ...PROFIL, estMoi: false })
+  const murmurer = await screen.findByRole('button', { name: /Envoyer un murmure/ })
   expect(screen.queryByRole('button', { name: 'Modifier mon profil' })).toBeNull()
+  await userEvent.click(murmurer)
+  expect(router.state.location.pathname).toBe('/messages/murmures/u1')
 })
 
 test('l’en-tête dit qui il est', async () => {

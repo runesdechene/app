@@ -15,7 +15,7 @@ import { Avatar } from '@/shared/ui/Avatar'
 import type { Chemin } from '../api/lireAccueil'
 import { useChemins } from '../hooks/useAccueil'
 import { useSaluer } from '../hooks/useSaluer'
-import { ilYA } from '../lib/ilYA'
+import { ilYA } from '@/shared/lib/ilYA'
 import styles from './SurLesChemins.module.css'
 
 const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }

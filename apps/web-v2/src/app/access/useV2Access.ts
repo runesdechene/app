@@ -8,6 +8,7 @@
  *            Délai de ACCESS_TIMEOUT_MS : hors connexion, supabase-js peut réessayer pendant des
  *            dizaines de secondes ; au-delà du délai, on bascule en `error` plutôt qu'attendre.
  *            Connexion ou déconnexion (y compris dans un onglet V1) → la vérification est refaite.
+ *            Une entrée autorisée met à jour la dernière connexion (touch_last_login), comme la V1.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
@@ -24,6 +25,10 @@ async function fetchAccess(): Promise<{ hasSession: boolean; hasAccess: boolean 
 
   const { data, error } = await supabase.rpc('has_v2_access')
   if (error) throw error
+  // La dernière connexion (l'en-tête d'un Murmure la montre) : sans attendre, sans bloquer.
+  if (data) {
+    void supabase.rpc('touch_last_login', { p_user_id: sessionData.session.user.id })
+  }
   return { hasSession: true, hasAccess: data }
 }
 

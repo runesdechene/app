@@ -5,7 +5,8 @@
 - `lib/` — le calcul pur partagé : les lecteurs du JSON de la base (`lire.ts`) ; le signal
   « un écran est derrière moi » que les zones posent sur un lien et que le cadre de détail lit
   (`retour.ts`) ; la distance à vol d'oiseau (`distance.ts`) ; la position de celui qui
-  regarde, seulement si déjà autorisée — jamais de demande (`position.ts`).
+  regarde, seulement si déjà autorisée — jamais de demande (`position.ts`) ; « il y a 10 min »
+  (`ilYA.ts`).
 - `hooks/` — la logique avec état partagée : `useMaPosition` (cette position, gardée dix
   minutes), `useGlisser` (tenir et tirer une rangée à la souris).
 - `ui/` — les briques d'interface génériques, dont `LieuCarte` (la grande carte photo d'un lieu,

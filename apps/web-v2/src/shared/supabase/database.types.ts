@@ -5733,6 +5733,8 @@ export type Database = {
         }
         Returns: Json
       }
+      conversation: { Args: { p_avec: string; p_limite?: number }; Returns: Json }
+      correspondant: { Args: { p_avec: string }; Returns: Json }
       create_announcement: {
         Args: { p_title: string; p_type: string }
         Returns: {
@@ -6395,6 +6397,7 @@ export type Database = {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: Json
       }
+      lire_murmures: { Args: { p_avec: string }; Returns: number }
       list_announcements_admin: {
         Args: never
         Returns: {
@@ -6475,6 +6478,7 @@ export type Database = {
         Args: { p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mon_entree: { Args: never; Returns: Json }
       migrate_user_to_auth_id: {
@@ -6517,6 +6521,7 @@ export type Database = {
         Args: { p_crowns?: number; p_status: string; p_submission_id: string }
         Returns: undefined
       }
+      murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
       notify: {

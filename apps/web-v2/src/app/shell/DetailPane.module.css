@@ -51,6 +51,27 @@
   color: var(--color-encre);
 }
 
+.titres {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  min-width: 0;
+  min-height: var(--cible-tactile);
+}
+
+.titres > .title {
+  min-height: 0;
+}
+
+/* Sous le titre d'une conversation : la dernière connexion, en IM Fell, discrète. */
+.sousTitre {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
 .title:focus {
   outline: none;
 }

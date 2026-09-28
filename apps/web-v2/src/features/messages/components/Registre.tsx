@@ -8,11 +8,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import envoyer from '@/assets/ui/envoyer.svg'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal } from '../api/lireRegistre'
 import { useRegistre } from '../hooks/useRegistre'
+import { BarreEcrire } from './BarreEcrire'
 import styles from './Registre.module.css'
 
 const NOMS: Record<Canal, { filtre: string; court: string; prefixe: string }> = {
@@ -25,7 +25,6 @@ export function Registre() {
   const { messages, erreur, ecrire, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
-  const [texte, setTexte] = useState('')
   const liste = useRef<HTMLOListElement>(null)
 
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
@@ -89,50 +88,27 @@ export function Registre() {
         ))}
       </ol>
 
-      <form
-        className={styles.ecrire}
-        onSubmit={(e) => {
-          e.preventDefault()
-          const t = texte.trim()
-          if (!t) return
-          void ecrire(canal, t).then(() => {
-            setTexte('')
-          })
-        }}
-      >
-        <select
-          className={styles.canal}
-          aria-label="Canal"
-          value={canal}
-          onChange={(e) => {
-            setCanal(e.target.value === 'bugs' ? 'bugs' : 'general')
-          }}
-        >
-          {CANAUX.map((c) => (
-            <option key={c} value={c}>
-              {NOMS[c].court}
-            </option>
-          ))}
-        </select>
-        <input
-          className={styles.champ}
-          aria-label="Écrire quelque chose"
-          placeholder="Écrire quelque chose…"
-          maxLength={500}
-          value={texte}
-          onChange={(e) => {
-            setTexte(e.target.value)
-          }}
-        />
-        <button
-          type="submit"
-          className={styles.envoyer}
-          aria-label="Envoyer"
-          disabled={!texte.trim()}
-        >
-          <img src={envoyer} alt="" width={16} height={16} />
-        </button>
-      </form>
+      <BarreEcrire
+        invite="Écrire quelque chose"
+        maximum={500}
+        onEnvoyer={(t) => ecrire(canal, t)}
+        avant={
+          <select
+            className={styles.canal}
+            aria-label="Canal"
+            value={canal}
+            onChange={(e) => {
+              setCanal(e.target.value === 'bugs' ? 'bugs' : 'general')
+            }}
+          >
+            {CANAUX.map((c) => (
+              <option key={c} value={c}>
+                {NOMS[c].court}
+              </option>
+            ))}
+          </select>
+        }
+      />
       {echecEnvoi && (
         <p role="alert" className={styles.alerte}>
           Le message n’est pas parti. Réessaie dans un instant.
