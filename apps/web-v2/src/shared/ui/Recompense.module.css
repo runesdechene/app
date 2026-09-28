@@ -1,0 +1,233 @@
+/*
+ * QUOI     — la récompense, posée sur la photo du lieu (maquette 250:140) : 🎉 et confettis, le
+ *            nom, la phrase du rang, l'expérience gagnée et la jauge du niveau ; deux boutons.
+ * POURQUOI — la même fête pour découvrir un lieu et pour en ajouter un (Uriel, 29/09) : montée
+ *            de la zone Lieu dans shared/ui quand l'ajout d'un lieu en a eu besoin.
+ */
+.recompense {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: end;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+/* Toucher la photo ouvre le lieu. */
+.versLeLieu {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.fermer {
+  position: absolute;
+  top: calc(var(--space-2) + env(safe-area-inset-top));
+  right: var(--space-2);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+  filter: drop-shadow(0 1px 4px color-mix(in srgb, var(--color-ombre) 60%, transparent));
+}
+
+/* Le bas : un dégradé sombre porte le texte ; seuls les boutons captent le doigt. */
+.bas {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: 30dvh var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--color-ombre) 80%, transparent) 45%,
+    color-mix(in srgb, var(--color-ombre) 97%, transparent)
+  );
+  color: var(--color-sur-accent);
+  text-align: center;
+  pointer-events: none;
+}
+
+.bas button {
+  pointer-events: auto;
+}
+
+.fete {
+  font-size: var(--fete-size);
+  animation: eclore var(--duree-elan) var(--courbe-elan) both;
+}
+
+.nom {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--nom-profil-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.type {
+  margin: 0;
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+}
+
+.rang {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-condensee);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-gras);
+  animation: eclore var(--duree-elan) var(--courbe-elan) 0.15s both;
+}
+
+.gain {
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent);
+  color: var(--color-accent);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+  animation: eclore var(--duree-elan) var(--courbe-elan) 0.3s both;
+}
+
+.niveau {
+  justify-self: start;
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.jauge {
+  justify-self: stretch;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-sur-accent) 25%, transparent);
+}
+
+/* La jauge part d'où elle en était et avance jusqu'à la nouvelle valeur. */
+.rempli {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-sur-accent);
+  transform-origin: left;
+  scale: var(--mesure) 1;
+  animation: remplir 0.9s var(--courbe-douce) 0.45s both;
+}
+
+.acceder {
+  justify-self: stretch;
+  min-height: 48px;
+  margin-top: var(--space-3);
+  border: none;
+  border-radius: var(--radius-petit);
+  background: var(--color-sur-accent);
+  color: var(--color-fiche-titre);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.acceder:active {
+  scale: 0.97;
+}
+
+.revenir {
+  min-height: var(--cible-tactile);
+  border: none;
+  background: none;
+  color: color-mix(in srgb, var(--color-sur-accent) 75%, transparent);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+}
+
+/* Les confettis : chacun sa place et son retard, d'après son rang ; quatre couleurs. */
+.confettis {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confettis span {
+  position: absolute;
+  top: -20px;
+  left: calc(mod(var(--rang) * 37 + 5, 95) * 1%);
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  animation: tomber 2.4s cubic-bezier(0.3, 0.6, 0.6, 1) calc(mod(var(--rang) * 7, 10) * 60ms) both;
+}
+
+.confettis span:nth-child(4n + 2) {
+  background: var(--color-sur-accent);
+}
+
+.confettis span:nth-child(4n + 3) {
+  background: var(--color-confetti-or);
+}
+
+.confettis span:nth-child(4n + 4) {
+  background: var(--color-confetti-vert);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes eclore {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes remplir {
+  from {
+    scale: var(--avant) 1;
+  }
+}
+
+@keyframes tomber {
+  from {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+
+  to {
+    translate: 0 110dvh;
+    rotate: 540deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recompense,
+  .fete,
+  .rang,
+  .gain,
+  .rempli {
+    animation: none;
+  }
+
+  .confettis {
+    display: none;
+  }
+
+  .acceder {
+    transition: none;
+  }
+}

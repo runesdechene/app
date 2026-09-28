@@ -16,6 +16,7 @@ import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { Pastille } from '@/shared/ui/Pastille'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
+import { Recompense } from '@/shared/ui/Recompense'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { DaSection } from './DaSection'
@@ -92,6 +93,21 @@ export function DaBriques() {
           <Pastille count={0} />
           <Pastille count={3} />
           <Pastille count={12} />
+        </div>
+      </DaSection>
+
+      <DaSection name="Recompense">
+        <div className={styles.fete} style={{ '--avatar': `url(${fondFiche})` }}>
+          <Recompense
+            nom="Château de Colomars"
+            type="Châteaux & fortins"
+            phrase="Ton 17ᵉ lieu ajouté — et visité !"
+            gain={{ gain: 11, niveau: 12, avant: 0.4, apres: 0.6 }}
+            libelleAcceder="Voir ta fiche"
+            libelleRevenir="Revenir à la carte"
+            onAcceder={rien}
+            onFermer={rien}
+          />
         </div>
       </DaSection>
 

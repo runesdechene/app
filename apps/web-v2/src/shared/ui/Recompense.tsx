@@ -1,38 +1,44 @@
 /**
- * QUOI     — la récompense d'une découverte, posée sur la photo enfin nette (maquette 250:140) :
- *            🎉 et confettis, le nom, le rang, l'expérience gagnée et la jauge du niveau.
- * POURQUOI — Uriel, 28/09 : toucher la photo ou « Accéder au lieu » ouvre la fiche ; la croix et
- *            « Revenir à la carte » y ramènent. Le bouton est crème : le rouge se voyait mal sur
- *            le fond sombre.
+ * QUOI     — la récompense, posée sur la photo du lieu (maquette 250:140) : 🎉 et confettis, le
+ *            nom, la phrase du rang, l'expérience gagnée et la jauge du niveau ; un bouton pour
+ *            aller au lieu, un autre pour revenir.
+ * POURQUOI — la même fête pour découvrir un lieu (Uriel, 28/09) et pour en ajouter un (29/09).
+ *            Toucher la photo ou le bouton ouvre le lieu ; la croix et le lien du bas ramènent.
+ *            Le bouton est crème : le rouge se voyait mal sur le fond sombre.
+ * ATTENTION — la photo est celle du parent : la récompense se pose par-dessus, en absolu.
  */
 import croix from '@/assets/ui/croix.svg'
-import type { FicheLieu, Recompense } from '../api/lireLieu'
-import styles from './DecouverteLieu.module.css'
+import styles from './Recompense.module.css'
 
 const CONFETTIS = 16
 
-function phraseRang(rang: number) {
-  return rang === 1 ? 'Ton 1ᵉʳ lieu découvert !' : `Ton ${String(rang)}ᵉ lieu découvert !`
-}
+export type Gain = { gain: number; niveau: number; avant: number; apres: number }
 
-export function RecompenseDecouverte({
-  fiche,
-  recompense,
+export function Recompense({
+  nom,
+  type,
+  phrase,
+  gain: { gain, niveau, avant, apres },
+  libelleAcceder,
+  libelleRevenir,
   onAcceder,
   onFermer,
 }: {
-  fiche: Pick<FicheLieu, 'nom' | 'type'>
-  recompense: Recompense
+  nom: string
+  type: string | null
+  phrase: string
+  gain: Gain
+  libelleAcceder: string
+  libelleRevenir: string
   onAcceder: () => void
   onFermer: () => void
 }) {
-  const { rang, gain, niveau, avant, apres } = recompense
   return (
     <div className={styles.recompense}>
       <button
         type="button"
         className={styles.versLeLieu}
-        aria-label={`Ouvrir ${fiche.nom}`}
+        aria-label={`Ouvrir ${nom}`}
         onClick={onAcceder}
       />
       <button type="button" className={styles.fermer} aria-label="Fermer" onClick={onFermer}>
@@ -49,9 +55,9 @@ export function RecompenseDecouverte({
         <span className={styles.fete} aria-hidden="true">
           🎉
         </span>
-        <h2 className={styles.nom}>{fiche.nom}</h2>
-        {fiche.type && <p className={styles.type}>{fiche.type.nom}</p>}
-        <p className={styles.rang}>{phraseRang(rang)}</p>
+        <h2 className={styles.nom}>{nom}</h2>
+        {type && <p className={styles.type}>{type}</p>}
+        <p className={styles.rang}>{phrase}</p>
         {gain > 0 && <p className={styles.gain}>+{gain} d’expérience</p>}
         <p className={styles.niveau}>Niveau {niveau}</p>
         <span
@@ -68,10 +74,10 @@ export function RecompenseDecouverte({
           />
         </span>
         <button type="button" className={styles.acceder} onClick={onAcceder}>
-          Accéder au lieu
+          {libelleAcceder}
         </button>
         <button type="button" className={styles.revenir} onClick={onFermer}>
-          Revenir à la carte
+          {libelleRevenir}
         </button>
       </div>
     </div>

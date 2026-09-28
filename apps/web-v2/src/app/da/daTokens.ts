@@ -75,6 +75,7 @@ export const DA_SHOWCASED = [
   'LieuCarte',
   'Pastille',
   'PastilleChoix',
+  'Recompense',
   'Segments',
   'Text',
 ] as const

@@ -15,9 +15,13 @@ import { useDecouvrir } from '../hooks/useDecouvrir'
 import { useGrattage } from '../hooks/useGrattage'
 import { tinter } from '../lib/tintement'
 import styles from './DecouverteLieu.module.css'
-import { RecompenseDecouverte } from './RecompenseDecouverte'
+import { Recompense } from '@/shared/ui/Recompense'
 
 const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+function phraseRang(rang: number) {
+  return rang === 1 ? 'Ton 1ᵉʳ lieu découvert !' : `Ton ${String(rang)}ᵉ lieu découvert !`
+}
 
 export function DecouverteLieu({
   fiche,
@@ -94,9 +98,13 @@ export function DecouverteLieu({
       )}
 
       {revele && (
-        <RecompenseDecouverte
-          fiche={fiche}
-          recompense={recompense}
+        <Recompense
+          nom={fiche.nom}
+          type={fiche.type?.nom ?? null}
+          phrase={phraseRang(recompense.rang)}
+          gain={recompense}
+          libelleAcceder="Accéder au lieu"
+          libelleRevenir="Revenir à la carte"
           onAcceder={acceder}
           onFermer={onFermer}
         />
