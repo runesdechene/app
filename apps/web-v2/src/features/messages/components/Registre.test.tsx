@@ -131,6 +131,30 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
   expect(apresUnSilence).toHaveTextContent('Gautier Plus tard.')
 })
 
+test('dans un groupe, le préfixe « Bug & Suggestions » ne s’écrit qu’une fois', async () => {
+  const bug = (id: number, minute: number, texte: string) => ({
+    id,
+    canal: 'bugs',
+    texte,
+    quand: `2026-09-28T07:${String(minute).padStart(2, '0')}:00Z`,
+    auteur: GAUTIER,
+    moi: false,
+    mentions: [],
+    mentionneMoi: false,
+  })
+  api.fetchRegistre.mockResolvedValue([
+    bug(1, 14, 'La carte ne charge pas.'),
+    bug(2, 15, 'Même en rechargeant.'),
+    bug(3, 16, 'Sur Firefox aussi.'),
+  ])
+  monter()
+  const registre = await screen.findByRole('list', { name: 'Registre' })
+  const [premier, deuxieme, troisieme] = await within(registre).findAllByRole('listitem')
+  expect(premier).toHaveTextContent('[Bug & Suggestions] La carte ne charge pas.')
+  expect(deuxieme).not.toHaveTextContent('[Bug & Suggestions]')
+  expect(troisieme).not.toHaveTextContent('[Bug & Suggestions]')
+})
+
 test('un séparateur à chaque nouveau jour ; minuit coupe un groupe', async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date(2026, 8, 28, 21, 0))

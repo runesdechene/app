@@ -2,8 +2,9 @@
  * QUOI     — le Registre (maquette 45:278, spec V2 §10) : les canaux à cocher, une colonne dense
  *            de messages (le portrait, le nom, le texte, l'heure à droite), et la barre pour écrire.
  * POURQUOI — « un chat de MMO, pas une messagerie » : pas de fils, pas de citations. Un
- *            message de « Bugs & suggestions » porte toujours son préfixe, même seul canal coché :
- *            chaque message dit d'où il vient (Uriel, 28/09). L'heure à droite : on lit d'abord
+ *            message de « Bugs & suggestions » porte son préfixe, même seul canal coché : chaque
+ *            message dit d'où il vient (Uriel, 28/09) — une fois par groupe d'un même auteur, pas
+ *            à chaque ligne (29/09). L'heure à droite : on lit d'abord
  *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière. On mentionne avec
  *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
@@ -80,6 +81,8 @@ export function Registre() {
           const nouveauJour = autreJour(visibles[i - 1]?.quand, m.quand)
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
           const suite = !nouveauJour && estLaSuite(visibles[i - 1], m)
+          // Dans un groupe, le préfixe du canal ne se répète pas : il revient si le canal change.
+          const prefixe = m.canal === 'bugs' && !(suite && visibles[i - 1]?.canal === 'bugs')
           return (
             <Fragment key={m.id}>
               {nouveauJour && (
@@ -112,7 +115,7 @@ export function Registre() {
                       </Link>{' '}
                     </>
                   )}
-                  {m.canal === 'bugs' && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
+                  {prefixe && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
                   <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
                 </p>
                 <time className={styles.heure} dateTime={m.quand}>
