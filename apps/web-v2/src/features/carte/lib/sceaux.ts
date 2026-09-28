@@ -10,7 +10,7 @@
 import type { Map as Carte } from 'maplibre-gl'
 import iconeDefaut from '@/assets/ui/sceau-defaut.svg'
 import type { LieuCarte } from '../api/lireCarte'
-import type { CouleursCarte } from './couleurs'
+import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 const SCEAU = 52
 const PETIT = 26

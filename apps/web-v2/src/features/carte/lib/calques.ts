@@ -14,7 +14,7 @@ import type {
   SymbolLayerSpecification,
 } from 'maplibre-gl'
 import type { LieuCarte } from '../api/lireCarte'
-import type { CouleursCarte } from './couleurs'
+import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 import { nomImage } from './sceaux'
 
 export const SOURCE = 'lieux'

@@ -7,7 +7,7 @@
  *            posé ici ; il s'allume à l'inclinaison (`relief.ts`).
  */
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
-import type { CouleursCarte } from './couleurs'
+import type { CouleursCarte } from './couleursCarte'
 
 const RETIRES =
   /natural_earth|building|aeroway|poi_|shield|one_way|hatching|road_area|airport|highway-name|pitch|track|cemetery|hospital|school|rail|casing|park_outline|residential|minor|service|path|pedestrian|link|secondary|tertiary|street|waterway_other|waterway_tunnel|label_other|boundary_3/
@@ -50,6 +50,10 @@ function habiller(l: LayerSpecification, c: CouleursCarte): LayerSpecification {
   }
   return l
 }
+
+// Le fond vectoriel (OpenFreeMap), que styleParchemin recolore ; et la France vue d'en haut.
+export const FOND = 'https://tiles.openfreemap.org/styles/liberty'
+export const FRANCE = { center: [2.4, 46.6] as [number, number], zoom: 5 }
 
 export function styleParchemin(style: StyleSpecification, c: CouleursCarte): StyleSpecification {
   const s = structuredClone(style)

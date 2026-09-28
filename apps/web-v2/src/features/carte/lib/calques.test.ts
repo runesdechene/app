@@ -2,7 +2,7 @@ import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
 import { ajouterCalques, enGeoJSON, taille } from './calques'
-import type { CouleursCarte } from './couleurs'
+import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 const couleurs: CouleursCarte = {
   fond: '#ecdcbb',

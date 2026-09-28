@@ -21,19 +21,17 @@ import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
-import { lireCouleurs } from '../lib/couleurs'
+import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
-import { styleParchemin } from '../lib/style'
+import { FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { suivreSurvol } from '../lib/survol'
 import styles from './CarteScreen.module.css'
 import { FiltreFeuille } from './FiltreFeuille'
 import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
 
-const FOND = 'https://tiles.openfreemap.org/styles/liberty'
-const FRANCE = { center: [2.4, 46.6] as [number, number], zoom: 5 }
 const DUREE_MESSAGE = 3000
 
 type Vue = { lat: number; lng: number; zoom: number }

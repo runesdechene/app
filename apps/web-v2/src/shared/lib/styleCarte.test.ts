@@ -1,7 +1,7 @@
 import type { StyleSpecification } from 'maplibre-gl'
 import { expect, test } from 'vitest'
-import type { CouleursCarte } from './couleurs'
-import { styleParchemin } from './style'
+import type { CouleursCarte } from './couleursCarte'
+import { styleParchemin } from './styleCarte'
 
 const couleurs: CouleursCarte = {
   fond: '#ecdcbb',
