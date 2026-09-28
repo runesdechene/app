@@ -8,6 +8,7 @@
   grid-template-rows: 1fr auto;
   min-height: 100%;
   overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
 }
 
 .corps {

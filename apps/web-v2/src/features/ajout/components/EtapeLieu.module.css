@@ -45,6 +45,11 @@
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-ombre) 12%, transparent);
 }
 
+.champ:focus {
+  border-color: var(--color-ocre);
+  outline: none;
+}
+
 .resultats {
   display: grid;
   margin: var(--space-1) 0 0;

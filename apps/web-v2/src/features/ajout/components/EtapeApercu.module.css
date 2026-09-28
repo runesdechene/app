@@ -11,6 +11,7 @@
 
 .defile {
   overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
 }
 
 .photo {
