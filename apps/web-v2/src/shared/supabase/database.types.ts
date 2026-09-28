@@ -3220,6 +3220,7 @@ export type Database = {
           latitude: number
           longitude: number
           masked: boolean
+          nature: string
           pays: string | null
           place_type_id: string
           private: boolean
@@ -3253,6 +3254,7 @@ export type Database = {
           latitude: number
           longitude: number
           masked: boolean
+          nature?: string
           pays?: string | null
           place_type_id: string
           private: boolean
@@ -3286,6 +3288,7 @@ export type Database = {
           latitude?: number
           longitude?: number
           masked?: boolean
+          nature?: string
           pays?: string | null
           place_type_id?: string
           private?: boolean
@@ -3946,6 +3949,21 @@ export type Database = {
         }
         Relationships: []
       }
+      territoires_historiques: {
+        Row: {
+          departement: string
+          nom: string
+        }
+        Insert: {
+          departement: string
+          nom: string
+        }
+        Update: {
+          departement?: string
+          nom?: string
+        }
+        Relationships: []
+      }
       territory_name_proposals: {
         Row: {
           anchor_place_id: string
@@ -4360,6 +4378,7 @@ export type Database = {
           last_device_os: string | null
           last_device_version: string | null
           last_login_at: string | null
+          lieux_en_couleur: boolean
           location_name: string | null
           location_zip: string | null
           max_conquest: number
@@ -4426,6 +4445,7 @@ export type Database = {
           last_device_os?: string | null
           last_device_version?: string | null
           last_login_at?: string | null
+          lieux_en_couleur?: boolean
           location_name?: string | null
           location_zip?: string | null
           max_conquest?: number
@@ -4492,6 +4512,7 @@ export type Database = {
           last_device_os?: string | null
           last_device_version?: string | null
           last_login_at?: string | null
+          lieux_en_couleur?: boolean
           location_name?: string | null
           location_zip?: string | null
           max_conquest?: number
@@ -5315,6 +5336,7 @@ export type Database = {
         Args: { p_caller: string; p_place_id: string }
         Returns: boolean
       }
+      _carte_lieu: { Args: { p_place_id: string }; Returns: Json }
       _contribute_to_place_internal: {
         Args: {
           p_content?: string
@@ -5500,6 +5522,7 @@ export type Database = {
         Args: { p_min_level: number; p_user_id: string }
         Returns: Json
       }
+      _silhouette: { Args: { p_geom: unknown }; Returns: Json }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _unlike_contribution_internal: {
         Args: { p_contribution_id: number; p_user_id: string }
@@ -5627,6 +5650,7 @@ export type Database = {
         Args: { p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      carte_lieux: { Args: never; Returns: Json }
       cheat_refill: { Args: { p_user_id: string }; Returns: Json }
       cheat_refill_target: {
         Args: { p_caller_id: string; p_target_name: string }
@@ -6742,6 +6766,7 @@ export type Database = {
         Returns: Json
       }
       soundex: { Args: { "": string }; Returns: string }
+      territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }
       toggle_announcement_comment_like: {
