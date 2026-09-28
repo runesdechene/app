@@ -58,11 +58,9 @@ test('en expédition sans nom : « Revendiquer » attend un nom', async () => {
   expect(screen.getByRole('button', { name: 'Revendiquer' })).toBeDisabled()
 })
 
-test('« Marquer ma visite sans revendiquer le lieu » ferme sans revendiquer (la visite est déjà marquée)', async () => {
+test('« Passer cette étape » ferme sans revendiquer (la visite est déjà marquée)', async () => {
   afficher({ compagnons: [], noms: [] })
-  await userEvent.click(
-    screen.getByRole('button', { name: 'Marquer ma visite sans revendiquer le lieu' }),
-  )
+  await userEvent.click(screen.getByRole('button', { name: 'Passer cette étape' }))
   expect(onFermer).toHaveBeenCalled()
   expect(revendiquer).not.toHaveBeenCalled()
 })

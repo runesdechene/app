@@ -1,8 +1,8 @@
 /**
  * QUOI     — la fenêtre après une visite réussie (maquette 232:128) : revendiquer le lieu seul,
  *            ou en expédition avec les Explorateurs présents autour, sous un nom choisi.
- * POURQUOI — spec fiche §5 : « pour la gloire ». Elle s'ouvre visite déjà marquée : l'autre choix
- *            est de garder la visite sans revendiquer (Uriel, 28/09). Les
+ * POURQUOI — spec fiche §5 : « pour la gloire ». Elle s'ouvre visite déjà marquée : « Passer
+ *            cette étape » la garde, sans revendiquer (Uriel, 28/09). Les
  *            compagnons sont ceux que le serveur voit là maintenant ; il revérifie au moment de
  *            revendiquer.
  */
@@ -118,7 +118,7 @@ export function FenetreRevendication({
         Revendiquer
       </Button>
       <Button kind="discret" onClick={onFermer}>
-        Marquer ma visite sans revendiquer le lieu
+        Passer cette étape
       </Button>
     </Feuille>
   )
