@@ -10,6 +10,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { AccueilScreen } from './AccueilScreen'
 
 const api = vi.hoisted(() => ({
+  fetchBanniere: vi.fn(),
   fetchAjoutes: vi.fn(),
   fetchChemins: vi.fn(),
   saluer: vi.fn(),
@@ -29,6 +30,15 @@ const VISITE = {
 }
 
 beforeEach(() => {
+  api.fetchBanniere.mockResolvedValue({
+    image: 'celtes.jpg',
+    titre: 'Les Mystères Celtes',
+    sousTitre: 'Au cœur de la première Europe',
+    lien: 'https://runesdechene.com/celtes',
+    voile: { couleur: '#e3d5b1', opacite: 0.85 },
+    couleurs: { tag: '#3b4a78', titre: '#5b4949', sousTitre: '#69604f' },
+    ombre: { couleur: '#000000', force: 0 },
+  })
   api.fetchAjoutes.mockResolvedValue([
     {
       id: 'l9',
@@ -73,6 +83,14 @@ function monter() {
   )
   return router
 }
+
+test('une bannière de la boutique, tirée au hasard, mène à la boutique', async () => {
+  monter()
+  const banniere = await screen.findByRole('link', { name: /Les Mystères Celtes/ })
+  expect(banniere).toHaveAttribute('href', 'https://runesdechene.com/celtes')
+  expect(banniere).toHaveTextContent('Boutique')
+  expect(banniere).toHaveTextContent('Au cœur de la première Europe')
+})
 
 test('un lieu ajouté récemment ouvre sa fiche dans l’Accueil', async () => {
   const router = monter()

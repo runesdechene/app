@@ -4,7 +4,13 @@
  *            `auth.uid()` : on n'envoie jamais qui on est.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireAjoutes, lireChemins, lireSalut } from './lireAccueil'
+import { lireAjoutes, lireBanniere, lireChemins, lireSalut } from './lireAccueil'
+
+export async function fetchBanniere() {
+  const { data, error } = await supabase.rpc('get_random_home_banner')
+  if (error) throw error
+  return lireBanniere(data)
+}
 
 export async function fetchAjoutes() {
   const { data, error } = await supabase.rpc('accueil_ajoutes', { p_limite: 10 })

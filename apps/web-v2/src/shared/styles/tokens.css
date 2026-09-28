@@ -111,6 +111,8 @@
   --inscription-tracking: 0.02em;
   --pilule-size: 0.6875rem; /* le nom sur une pilule de revendication : 11 px (Figma 229:188) */
   --pilule-tracking: 0.08em;
+  --bandeau-tracking: 0.12em; /* « BOUTIQUE » sur la bannière de l'Accueil (rendu V1) */
+  --bandeau-titre-tracking: 0.04em; /* le titre de la bannière */
 
   /* Styles de texte — Cabin */
   --corps-size: 1rem;

@@ -1,10 +1,10 @@
 /**
- * QUOI     — l'onglet Accueil (maquette 27:2, spec V2 §5) : Ajoutés récemment, Sur les chemins.
+ * QUOI     — l'onglet Accueil (maquette 27:2, spec V2 §5) : la bannière de la boutique, Ajoutés
+ *            récemment, Sur les chemins.
  * POURQUOI — « L'Accueil, on le lit » : il se nourrit presque seul de ce que fait la communauté.
  *            Un lieu ouvre sa fiche dans l'Accueil, et la fiche sait que l'Accueil est derrière
- *            elle. Un bloc vide ne s'affiche pas. « Nouvelles de la marque » est retirée (Uriel,
- *            28/09) : les annonces du Hub ne sont pas à jour ; la Saga du mois prendra sa place
- *            (maquette 275:128).
+ *            elle. Un bloc vide ne s'affiche pas. En tête, une bannière de la boutique a remplacé
+ *            « Nouvelles de la marque » (Uriel, 28/09 : les annonces du Hub ne sont pas à jour).
  */
 import { useRef } from 'react'
 import sectionAjoutes from '@/assets/ui/section-ajoutes.svg'
@@ -13,11 +13,13 @@ import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { useAjoutes } from '../hooks/useAccueil'
 import styles from './AccueilScreen.module.css'
+import { Banniere } from './Banniere'
 import { SurLesChemins } from './SurLesChemins'
 
 export function AccueilScreen() {
   return (
     <div className={styles.accueil}>
+      <Banniere />
       <Ajoutes />
       <SurLesChemins />
     </div>

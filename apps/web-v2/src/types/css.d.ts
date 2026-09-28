@@ -15,5 +15,13 @@ declare module 'react' {
     '--rang'?: string
     '--type'?: string // la couleur d'un type de lieu (le badge de la fiche)
     '--avant'?: string // la jauge du niveau avant une découverte (elle se remplit jusqu'à --mesure)
+    // La bannière de la boutique : les couleurs réglées dans le Hub, bannière par bannière.
+    '--voile'?: string
+    '--voile-force'?: string
+    '--teinte-tag'?: string
+    '--teinte-titre'?: string
+    '--teinte-sous-titre'?: string
+    '--ombre-texte'?: string
+    '--ombre-force'?: string
   }
 }

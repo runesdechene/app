@@ -20,6 +20,13 @@ const PASSED_INLINE = new Set([
   '--rang',
   '--type',
   '--avant',
+  '--voile',
+  '--voile-force',
+  '--teinte-tag',
+  '--teinte-titre',
+  '--teinte-sous-titre',
+  '--ombre-texte',
+  '--ombre-force',
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

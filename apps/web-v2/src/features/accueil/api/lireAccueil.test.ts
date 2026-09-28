@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireAjoutes, lireChemins, lireSalut } from './lireAccueil'
+import { lireAjoutes, lireBanniere, lireChemins, lireSalut } from './lireAccueil'
 
 const CHEMIN = {
   id: 'visite:l1:u1',
@@ -42,4 +42,29 @@ test('un type de ligne inconnu est refusé, pas deviné', () => {
 
 test('un salut rend le nombre et si je salue', () => {
   expect(lireSalut({ saluts: 3, salue: true })).toEqual({ saluts: 3, salue: true })
+})
+
+test('une bannière de la boutique se lit ; une couleur qui n’est pas un hex retombe par défaut', () => {
+  const banniere = lireBanniere({
+    id: 3,
+    imageUrl: 'b.jpg',
+    title: 'Les Mystères Celtes',
+    subtitle: null,
+    linkUrl: 'https://runesdechene.com/celtes',
+    overlayColor: '#e3d5b1',
+    overlayOpacity: 0.85,
+    tagColor: 'red; background: url(x)',
+    titleColor: '#5b4949',
+    subtitleColor: '#69604f',
+    shadowColor: '#000000',
+    shadowStrength: 0,
+  })
+  expect(banniere).toMatchObject({
+    titre: 'Les Mystères Celtes',
+    sousTitre: null,
+    lien: 'https://runesdechene.com/celtes',
+  })
+  expect(banniere?.couleurs.tag).toBe('#ffffff')
+  expect(banniere?.couleurs.titre).toBe('#5b4949')
+  expect(lireBanniere(null)).toBeNull()
 })
