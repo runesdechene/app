@@ -1,42 +1,54 @@
 /**
- * QUOI     — /<onglet>/lieu/<id> : la fiche dans le cadre de détail, son bouton de visite, et la
- *            fenêtre de revendication qui s'ouvre après une visite réussie.
- * POURQUOI — la zone Lieu ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre. La
- *            fenêtre est un moment, pas une adresse : un état local, fermé par le voile ou Échap.
+ * QUOI     — /<onglet>/lieu/<id> : la fiche dans le cadre de détail, son bouton de visite, la
+ *            fenêtre de revendication (après une visite), et les feuilles « Ce lieu » et
+ *            « Partager ce lieu ».
+ * POURQUOI — la zone Lieu ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre. Fenêtre
+ *            et feuilles sont des moments, pas des adresses : un état local, fermé par le voile ou
+ *            Échap.
  */
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
+import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
+import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
 import { FicheLieu } from '@/features/lieu/components/FicheLieu'
+import { useFiche } from '@/features/lieu/hooks/useFiche'
 import { DetailPane } from '../shell/DetailPane'
+
+type Ouvert = 'options' | 'partager' | 'revendiquer' | null
 
 export function RouteLieu() {
   const { id = '' } = useParams()
-  const [aRevendiquer, setARevendiquer] = useState<{ id: string; nom: string } | null>(null)
+  const { fiche } = useFiche(id)
+  const [ouvert, setOuvert] = useState<Ouvert>(null)
+  const fermer = () => {
+    setOuvert(null)
+  }
 
   return (
     <DetailPane title="Lieu" surImage>
       <FicheLieu
         id={id}
-        onOptions={() => undefined}
-        onPartager={() => undefined}
-        boutonVisite={(fiche) => (
+        onOptions={() => {
+          setOuvert('options')
+        }}
+        onPartager={() => {
+          setOuvert('partager')
+        }}
+        boutonVisite={(f) => (
           <BoutonVisite
-            fiche={fiche}
+            fiche={f}
             onVisite={() => {
-              setARevendiquer({ id: fiche.id, nom: fiche.nom })
+              setOuvert('revendiquer')
             }}
           />
         )}
       />
-      {aRevendiquer && (
-        <FenetreRevendication
-          fiche={aRevendiquer}
-          onFermer={() => {
-            setARevendiquer(null)
-          }}
-        />
+      {fiche && ouvert === 'options' && <FeuilleOptions fiche={fiche} onFermer={fermer} />}
+      {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
+      {fiche && ouvert === 'revendiquer' && (
+        <FenetreRevendication fiche={fiche} onFermer={fermer} />
       )}
     </DetailPane>
   )

@@ -12,7 +12,7 @@
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import position from '@/assets/ui/position.svg'
 import roseDesVents from '@/assets/ui/rose-des-vents.svg'
@@ -47,6 +47,9 @@ export function CarteScreen() {
   const { lieux, erreur, reessayer } = useCarteLieux()
   const couleurTypes = useLieuxEnCouleur()
   const navigate = useNavigate()
+  // « Trouver sur la carte » (fiche d'un lieu) arrive par l'adresse : /carte?centre=lat,lng.
+  const [recherche, setRecherche] = useSearchParams()
+  const centre = recherche.get('centre')
   const [vue, setVue] = useState<Vue | null>(null)
   const territoire = useTerritoire(vue)
   const [sansPosition, setSansPosition] = useState(false)
@@ -115,6 +118,16 @@ export function CarteScreen() {
       observateur.disconnect()
     }
   }, [carte])
+
+  // La carte vole jusqu'au lieu demandé, puis l'adresse redevient /carte (sans historique).
+  useEffect(() => {
+    if (!carte || !centre) return
+    const [lat, lng] = centre.split(',').map(Number)
+    if (lat !== undefined && lng !== undefined && Number.isFinite(lat) && Number.isFinite(lng)) {
+      carte.flyTo({ center: [lng, lat], zoom: 14 })
+    }
+    setRecherche({}, { replace: true })
+  }, [carte, centre, setRecherche])
 
   // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
   // `actif` passe à faux dès qu'un nouveau dessin part, ou que l'écran se ferme.

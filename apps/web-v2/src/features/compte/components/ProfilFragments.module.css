@@ -54,7 +54,12 @@
   border-radius: var(--radius);
   outline: 1px solid color-mix(in srgb, var(--color-ocre) 45%, transparent); /* le filet intérieur */
   outline-offset: -6px;
-  background: linear-gradient(165deg, var(--color-fond), var(--color-pastille) 55%, var(--color-vignette));
+  background: linear-gradient(
+    165deg,
+    var(--color-fond),
+    var(--color-pastille) 55%,
+    var(--color-vignette)
+  );
   text-align: center;
 }
 

@@ -18,6 +18,7 @@ import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
+import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -40,6 +41,8 @@ const SCREENS: Record<TabId, () => ReactNode> = {
 export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  // Tant que l'app est ouverte (position déjà autorisée) : être proposé comme compagnon.
+  useSignalerPresence()
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille
   // L'adresse sur laquelle on a replié le tiroir : ailleurs, il est déplié.

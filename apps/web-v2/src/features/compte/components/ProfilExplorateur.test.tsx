@@ -58,9 +58,7 @@ const PROFIL: ExplorateurProfile = {
 function afficher(profil: ExplorateurProfile | null) {
   fetchExplorateur.mockResolvedValue(profil)
   const router = createMemoryRouter(
-    [
-      { path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> },
-    ],
+    [{ path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> }],
     { initialEntries: ['/carte/explorateur/u1'] },
   )
   render(

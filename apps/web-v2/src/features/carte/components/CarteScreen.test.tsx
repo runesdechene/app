@@ -192,3 +192,17 @@ test('quand le tiroir s’ouvre, la carte vise le centre de sa partie visible', 
     expect.objectContaining({ padding: { left: 420, top: 0, right: 0, bottom: 0 } }),
   )
 })
+test('?centre=lat,lng : la carte vole jusqu’au lieu une fois chargée', () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/carte?centre=45.9,6.1']}>
+        <CarteScreen />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  )
+  charger()
+  expect(carte().flyTo).toHaveBeenCalledWith(
+    expect.objectContaining({ center: [6.1, 45.9], zoom: 14 }),
+  )
+})

@@ -130,7 +130,11 @@ function Formulaire({
             if (fichier) setPhoto({ fichier, apercu: URL.createObjectURL(fichier) })
           }}
         />
-        <button type="button" className={styles.changerPhoto} onClick={() => choixPhoto.current?.click()}>
+        <button
+          type="button"
+          className={styles.changerPhoto}
+          onClick={() => choixPhoto.current?.click()}
+        >
           <img src={appareilPhoto} alt="" />
           Changer la photo
         </button>

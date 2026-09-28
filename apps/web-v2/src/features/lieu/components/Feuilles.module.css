@@ -1,0 +1,99 @@
+/*
+ * QUOI     — les feuilles « Ce lieu » et « Partager ce lieu » (maquettes 231:128, 236:128) : le
+ *            style de la feuille « Ajouter » — titre Bebas, lignes crème bordées, icône, chevron.
+ */
+.titre {
+  margin: 0 0 var(--space-3);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: 10px var(--space-3) 10px 10px;
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-pastille) 60%, transparent);
+}
+
+.vignette {
+  flex: none;
+  width: 48px;
+  height: 50px;
+  border: 2px solid var(--color-fiche-vignette);
+  border-radius: var(--radius-petit);
+  object-fit: cover;
+}
+
+.apercuNom {
+  display: block;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}
+
+.apercuType {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.choix {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* maquette 201:216 */
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+  text-align: left;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.choix:active {
+  scale: 0.98;
+}
+
+.icone {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.description {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choix {
+    transition: none;
+  }
+}

@@ -18,7 +18,8 @@ const ARTICLES: [RegExp, string][] = [
 
 export function sousLeSigne(nom: string): { avant: string; nom: string } {
   for (const [article, contraction] of ARTICLES) {
-    if (article.test(nom)) return { avant: `sous le signe ${contraction}`, nom: nom.replace(article, '') }
+    if (article.test(nom))
+      return { avant: `sous le signe ${contraction}`, nom: nom.replace(article, '') }
   }
   const elision = /^[aeiouyhàâéèêîôû]/i.test(nom)
   return { avant: `sous le signe ${elision ? 'de l’' : 'de '}`, nom }
