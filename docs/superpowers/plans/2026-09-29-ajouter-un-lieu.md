@@ -37,3 +37,27 @@ l'étape d'avant. La photo se sépare du parchemin par la lisière, jamais un d�
    récit, aperçu, fête.
 5. **Vérifier** : tests, typecheck, lint, build ; parcours dans le navigateur jusqu'à l'aperçu
    (sans publier en prod) ; commit à chaque étape, push.
+
+## Où en est la nuit
+
+- Tâche 1 — faite : migration 381 écrite, testée en transaction annulée (+8 à distance, +11 sur
+  place, voisins à 50 m, sept refus attendus). Revue de sécurité : l'adresse d'une photo est
+  désormais vérifiée tout entière (un même chemin sur un autre site passait). **Non appliquée.**
+- Tâche 2 — faite : appels, lecture, photos, adresse (Nominatim), brouillon (IndexedDB).
+- Tâche 3 — faite : route `ajouter/lieu/:etape`, feuille « Ajouter » déplacée dans `ajout/`, cadre
+  plein écran / fenêtre PC, quitter en gardant ou jetant.
+- Tâche 4 — faite : les cinq étapes et la fête. Partagés au passage : la carte parchemin
+  (`shared/lib/styleCarte`, `couleursCarte`) et la récompense (`shared/ui/Recompense`).
+- Tâche 5 — en partie : tests (367), typecheck, lint, build verts ; navigateur vérifié jusqu'à
+  l'étape « Nom » (photo, recherche « Colomars », « Près de Colomars »). Les natures, les voisins
+  et la pose attendent la migration 381.
+
+## Écarts assumés (Ruling)
+
+- Les étapes **remplacent** l'adresse au lieu de s'empiler : on revient en touchant une étape
+  faite ; le retour du navigateur quitte (brouillon gardé). Coût si faux : un `navigate` à changer
+  dans `ParcoursAjout` et la route.
+- `useUrlDe` ne libère jamais les adresses blob: (WeakMap) : au plus vingt par brouillon. Coût si
+  faux : un peu de mémoire le temps de la visite.
+- Tests écrits en même temps que le code pour `brouillon.ts` et `EtapeRecit` (pas vus échouer
+  d'abord).
