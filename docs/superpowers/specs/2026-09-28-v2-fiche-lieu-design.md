@@ -108,7 +108,8 @@ par l'échec. **Portée : 200 m.**
   - Personne autour : « Personne d'autre n'est ici en ce moment » — on revendique seul.
 - **Nom de l'expédition** : un champ, et mes noms d'expédition passés en pastilles (toucher =
   remplir). Obligatoire en expédition.
-- **Revendiquer** / **Pas maintenant**. Refuser ne défait pas la visite.
+- **Revendiquer** / **Marquer ma visite sans revendiquer le lieu** (Uriel, 28/09) : la fenêtre
+  s'ouvre visite déjà marquée ; ce second choix la garde, sans revendiquer.
 
 **Ce que fait `revendiquer_lieu`** : il vérifie que l'appelant a visité le lieu en GPS **dans les
 30 dernières minutes** (sinon : refus) et que chaque compagnon coché est **présent maintenant à
