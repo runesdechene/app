@@ -1,5 +1,5 @@
 /**
- * QUOI     — les badges à droite du titre : « Porteur vérifié » s'explique au toucher, le rôle
+ * QUOI     — les badges à droite du titre : « Client Runes de Chêne » s'explique au toucher, le rôle
  *            s'affiche, rien pour un profil sans badge.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -44,10 +44,10 @@ function afficher(profil: ExplorateurProfile) {
   )
 }
 
-test('« Porteur vérifié » s’explique au toucher', async () => {
+test('« Client Runes de Chêne » s’explique au toucher', async () => {
   afficher(BASE)
-  await userEvent.click(await screen.findByRole('button', { name: /Porteur vérifié/ }))
-  expect(screen.getByRole('dialog', { name: 'Porteur vérifié' })).toHaveTextContent('client')
+  await userEvent.click(await screen.findByRole('button', { name: /Client Runes de Chêne/ }))
+  expect(screen.getByRole('dialog', { name: 'Client Runes de Chêne' })).toHaveTextContent('client')
 })
 
 test('le rôle s’affiche', async () => {
@@ -60,6 +60,6 @@ test('ni client ni rôle : aucun badge', async () => {
   await vi.waitFor(() => {
     expect(fetchExplorateur).toHaveBeenCalled()
   })
-  expect(screen.queryByRole('button', { name: /Porteur vérifié/ })).toBeNull()
+  expect(screen.queryByRole('button', { name: /Client Runes de Chêne/ })).toBeNull()
   expect(screen.queryByText('Admin')).toBeNull()
 })

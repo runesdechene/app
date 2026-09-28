@@ -12,4 +12,4 @@
   - `ExplorateurIntrouvable` — l'adresse d'un Explorateur qui n'existe pas.
 - `ModifierProfil` — le formulaire du profil ; ne s'affiche qu'une fois tout chargé.
 - `PreferencesPage` — les trois cartes de réglages.
-- `BadgesExplorateur` — « Porteur vérifié » et le rôle, à droite du titre du détail.
+- `BadgesExplorateur` — « Client Runes de Chêne » et le rôle, à droite du titre du détail.
