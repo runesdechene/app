@@ -1,7 +1,7 @@
 /**
  * QUOI     — les marques des lieux, dessinées une fois dans un canevas puis confiées à MapLibre :
  *            la bille « ? » (lieu inconnu), le sceau crème (connu), le sceau d'encre (visité),
- *            l'étoile (point d'intérêt), le sceau des groupes et le fond des pilules.
+ *            l'étoile (point d'intérêt) et le fond des pilules.
  * POURQUOI — des images de carte, et non des éléments HTML : des milliers de lieux restent
  *            fluides sur un téléphone (spec Carte §3).
  * ATTENTION — une icône de type qui ne se charge ou ne se dessine pas retombe sur le losange par
@@ -164,17 +164,6 @@ function etoile(c: CouleursCarte) {
   return ctx.getImageData(0, 0, PETIT, PETIT)
 }
 
-function groupe(c: CouleursCarte) {
-  const ctx = toile(SCEAU)
-  disque(ctx, SCEAU / 2 - 2)
-  ctx.fillStyle = c.encre
-  ctx.fill()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = c.halo
-  ctx.stroke()
-  return ctx.getImageData(0, 0, SCEAU, SCEAU)
-}
-
 // Le fond d'une pilule : une gélule étirable autour du nom (`icon-text-fit`). La mienne en
 // encre pleine, les autres en parchemin cerclé d'encre pâle.
 function pilule(map: Carte, nom: string, fond: string, bord: string) {
@@ -211,7 +200,6 @@ export async function ajouterMarques(
   await document.fonts.load('700 17px Cabin')
   ajouter(map, 'bille', bille(c))
   ajouter(map, 'curiosite', etoile(c))
-  ajouter(map, 'groupe', groupe(c))
   pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
   pilule(map, 'pilule-moi', c.encre, c.encre)
 

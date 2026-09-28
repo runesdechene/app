@@ -2,11 +2,11 @@
  * QUOI     — l'onglet Carte : le fond parchemin, les lieux en calques, le relief qui se lève
  *            quand on incline, la recherche et le filtre, le nom du territoire, la rose des vents,
  *            « Ma position » (spec Carte).
- * ATTENTION — la feuille du filtre et « Seulement mes lieux » sont un réglage de la vue, gardé
- *            ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec leur valeur.
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
  *            couleur » bascule.
+ * ATTENTION — la feuille du filtre et « Seulement mes lieux » sont un réglage de la vue, gardé
+ *            ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec leur valeur.
  *            L'attribution OpenStreetMap est obligatoire : elle reste, repliée.
  */
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
@@ -20,7 +20,7 @@ import { Button } from '@/shared/ui/Button'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
-import { ajouterCalques, CALQUE_GROUPES, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
+import { ajouterCalques, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
 import { lireCouleurs } from '../lib/couleurs'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
@@ -82,16 +82,6 @@ export function CarteScreen() {
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
       if (typeof id === 'string') void navigate(`/carte/lieu/${id}`)
-    })
-    map.on('click', CALQUE_GROUPES, (e) => {
-      const groupe = e.features?.[0]
-      const id: unknown = groupe?.properties.cluster_id
-      if (!groupe || groupe.geometry.type !== 'Point' || typeof id !== 'number') return
-      const [lng = 0, lat = 0] = groupe.geometry.coordinates
-      const source = map.getSource<GeoJSONSource>(SOURCE)
-      void source?.getClusterExpansionZoom(id).then((zoom) => {
-        map.easeTo({ center: [lng, lat], zoom })
-      })
     })
 
     map.on('load', () => {

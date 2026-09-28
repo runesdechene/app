@@ -44,8 +44,9 @@ visibles, et bientôt plus, doivent se dessiner par la carte graphique.
 - Tous les sceaux ont **la même taille**. Aucune couleur par défaut : noir et crème, à l'aventurière.
 - **Option « Mes lieux en couleur »** (Préférences, éteinte par défaut) : les lieux visités prennent
   la couleur de leur type, **désaturée**, en trois vagues douces, icône blanche, sans bordure.
-- **Regroupement au dézoom** : les lieux proches se fondent en **un sceau d'encre portant un
-  nombre** (regroupement natif de MapLibre). Le toucher zoome sur le groupe.
+- **Aucun regroupement** (Uriel, 28/09, révise la première version) : comme en V1, la carte
+  dézoomée montre **tous les lieux**, en plus petit — la marque grandit avec le zoom. C'est
+  l'effet de la carte, « un effet WOW même dézoomé ».
 - *Le « ? » contredit l'ancien §7 (« l'inconnu se tait ») : Uriel le veut, petit et pâle.*
 
 ### La revendication — « pour la gloire »
