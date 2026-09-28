@@ -1,12 +1,18 @@
 /**
  * QUOI     — les lectures de l'Accueil : la bannière de la boutique, les lieux ajoutés, les lieux
- *            proches, le fil.
+ *            proches, le fil, les Grands Explorateurs du mois.
  * POURQUOI — chacune a sa clé, sous ['accueil'] : un bloc qui échoue n'emporte pas les autres,
  *            et une visite ou un ajout relit tout l'Accueil d'une seule invalidation.
  */
 import { useQuery } from '@tanstack/react-query'
 import type { Point } from '@/shared/lib/distance'
-import { fetchAjoutes, fetchBanniere, fetchChemins, fetchPresDeMoi } from '../api/accueil'
+import {
+  fetchAjoutes,
+  fetchBanniere,
+  fetchChemins,
+  fetchGrandsExplorateurs,
+  fetchPresDeMoi,
+} from '../api/accueil'
 
 export const cheminsKey = ['accueil', 'chemins'] as const
 
@@ -33,6 +39,13 @@ export function usePresDeMoi(ici: Point | null) {
     enabled: ici !== null,
   })
   return query.data ?? []
+}
+
+// Une visite relit tout l'Accueil (clé ['accueil']) : mon compte du mois suit.
+export function useGrandsExplorateurs() {
+  return (
+    useQuery({ queryKey: ['accueil', 'grands'], queryFn: fetchGrandsExplorateurs }).data ?? null
+  )
 }
 
 export function useChemins() {

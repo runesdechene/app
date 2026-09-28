@@ -5,7 +5,14 @@
  */
 import { supabase } from '@/shared/supabase/client'
 import type { Point } from '@/shared/lib/distance'
-import { lireAjoutes, lireBanniere, lireChemins, lirePresDeMoi, lireSalut } from './lireAccueil'
+import {
+  lireAjoutes,
+  lireBanniere,
+  lireChemins,
+  lireGrandsExplorateurs,
+  lirePresDeMoi,
+  lireSalut,
+} from './lireAccueil'
 
 export async function fetchBanniere() {
   const { data, error } = await supabase.rpc('get_random_home_banner')
@@ -27,6 +34,12 @@ export async function fetchPresDeMoi(ici: Point) {
   })
   if (error) throw error
   return lirePresDeMoi(data)
+}
+
+export async function fetchGrandsExplorateurs() {
+  const { data, error } = await supabase.rpc('grands_explorateurs')
+  if (error) throw error
+  return lireGrandsExplorateurs(data)
 }
 
 export async function fetchChemins() {

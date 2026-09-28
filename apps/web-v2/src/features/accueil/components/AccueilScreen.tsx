@@ -1,6 +1,7 @@
 /**
  * QUOI     — l'onglet Accueil (maquettes 27:2 et 275:128, spec V2 §5) : la bannière de la
- *            boutique, Ajoutés récemment, Près de toi, Sur les chemins.
+ *            boutique, Ajoutés récemment, À explorer près de toi, Sur les chemins, les Grands
+ *            Explorateurs du mois.
  * POURQUOI — « L'Accueil, on le lit » : il se nourrit presque seul de ce que fait la communauté.
  *            Un lieu ouvre sa fiche dans l'Accueil, et la fiche sait que l'Accueil est derrière
  *            elle. Un bloc vide ne s'affiche pas. En tête, une bannière de la boutique a remplacé
@@ -13,6 +14,7 @@ import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { useAjoutes } from '../hooks/useAccueil'
 import styles from './AccueilScreen.module.css'
 import { Banniere } from './Banniere'
+import { GrandsExplorateurs } from './GrandsExplorateurs'
 import { PresDeToi } from './PresDeToi'
 import { SurLesChemins } from './SurLesChemins'
 
@@ -23,6 +25,7 @@ export function AccueilScreen() {
       <Ajoutes />
       <PresDeToi />
       <SurLesChemins />
+      <GrandsExplorateurs />
     </div>
   )
 }

@@ -27,6 +27,22 @@ export type LieuProche = {
   metres: number
 }
 
+// Les Grands Explorateurs du mois (mig 377) : les dix premiers, ma place, les lieux du dixième.
+export type GrandExplorateur = {
+  rang: number
+  id: string
+  nom: string
+  avatar: string | null
+  niveau: number
+  titre: string | null
+  lieux: number
+}
+export type GrandsExplorateurs = {
+  tete: GrandExplorateur[]
+  moi: { rang: number; lieux: number } | null
+  dixieme: number | null
+}
+
 export type TypeDeChemin = 'visite' | 'ajout' | 'arrivee'
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
@@ -160,6 +176,31 @@ function lireLieuProche(json: unknown): LieuProche {
 }
 
 export const lirePresDeMoi = liste(lireLieuProche)
+
+function lireGrandExplorateur(json: unknown): GrandExplorateur {
+  const g = objet(json)
+  return {
+    rang: nombre(g.rang),
+    id: chaine(g.id),
+    nom: chaine(g.nom),
+    avatar: ouNull(chaine)(g.avatar),
+    niveau: nombre(g.niveau),
+    titre: ouNull(chaine)(g.titre),
+    lieux: nombre(g.lieux),
+  }
+}
+
+export function lireGrandsExplorateurs(json: unknown): GrandsExplorateurs {
+  const c = objet(json)
+  return {
+    tete: liste(lireGrandExplorateur)(c.tete),
+    moi: ouNull((v) => {
+      const m = objet(v)
+      return { rang: nombre(m.rang), lieux: nombre(m.lieux) }
+    })(c.moi),
+    dixieme: ouNull(nombre)(c.dixieme),
+  }
+}
 
 export function lireSalut(json: unknown) {
   const s = objet(json)

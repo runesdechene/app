@@ -6500,6 +6500,7 @@ export type Database = {
           winning_name: string
         }[]
       }
+      grands_explorateurs: { Args: never; Returns: Json }
       harvest_crown: {
         Args: { p_place_id: string; p_user_id: string }
         Returns: Json

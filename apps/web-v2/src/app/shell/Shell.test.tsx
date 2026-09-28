@@ -19,6 +19,8 @@ vi.mock('../access/useV2Access', () => ({
 // L'Accueil lit la base : un lieu ajouté, « La loutre », suffit à le reconnaître.
 vi.mock('@/features/accueil/api/accueil', () => ({
   fetchBanniere: () => Promise.resolve(null),
+  fetchPresDeMoi: () => Promise.resolve([]),
+  fetchGrandsExplorateurs: () => Promise.resolve({ tete: [], moi: null, dixieme: null }),
   fetchAjoutes: () =>
     Promise.resolve([
       {

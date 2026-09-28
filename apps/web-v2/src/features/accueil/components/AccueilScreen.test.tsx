@@ -13,6 +13,7 @@ const api = vi.hoisted(() => ({
   fetchBanniere: vi.fn(),
   fetchAjoutes: vi.fn(),
   fetchPresDeMoi: vi.fn(),
+  fetchGrandsExplorateurs: vi.fn(),
   fetchChemins: vi.fn(),
   saluer: vi.fn(),
 }))
@@ -76,6 +77,7 @@ beforeEach(() => {
   ])
   api.saluer.mockResolvedValue({ saluts: 3, salue: true })
   position.positionSiAutorisee.mockResolvedValue({ latitude: 48.1, longitude: -1.6 })
+  api.fetchGrandsExplorateurs.mockResolvedValue({ tete: [], moi: null, dixieme: null })
   api.fetchPresDeMoi.mockResolvedValue([
     {
       id: 'l7',

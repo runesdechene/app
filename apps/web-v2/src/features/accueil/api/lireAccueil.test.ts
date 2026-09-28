@@ -1,5 +1,12 @@
 import { expect, test } from 'vitest'
-import { lireAjoutes, lireBanniere, lireChemins, lirePresDeMoi, lireSalut } from './lireAccueil'
+import {
+  lireAjoutes,
+  lireBanniere,
+  lireChemins,
+  lireGrandsExplorateurs,
+  lirePresDeMoi,
+  lireSalut,
+} from './lireAccueil'
 
 const CHEMIN = {
   id: 'visite:l1:u1',
@@ -102,4 +109,45 @@ test('un lieu proche se lit : photo, type, distance en mètres ; sans type, rien
     metres: 4200,
   })
   expect(sansType?.type).toBeNull()
+})
+
+test('les Grands Explorateurs se lisent : la tête, ma place, le dixième', () => {
+  expect(
+    lireGrandsExplorateurs({
+      tete: [
+        {
+          rang: 1,
+          id: 'u1',
+          nom: 'Gautier',
+          avatar: null,
+          niveau: 14,
+          titre: 'Chevalier errant',
+          lieux: 17,
+        },
+        { rang: 2, id: 'u2', nom: 'Luna', avatar: 'l.jpg', niveau: 11, titre: null, lieux: 12 },
+      ],
+      moi: { rang: 14, lieux: 3 },
+      dixieme: 4,
+    }),
+  ).toEqual({
+    tete: [
+      {
+        rang: 1,
+        id: 'u1',
+        nom: 'Gautier',
+        avatar: null,
+        niveau: 14,
+        titre: 'Chevalier errant',
+        lieux: 17,
+      },
+      { rang: 2, id: 'u2', nom: 'Luna', avatar: 'l.jpg', niveau: 11, titre: null, lieux: 12 },
+    ],
+    moi: { rang: 14, lieux: 3 },
+    dixieme: 4,
+  })
+  expect(lireGrandsExplorateurs({ tete: [], moi: null, dixieme: null })).toEqual({
+    tete: [],
+    moi: null,
+    dixieme: null,
+  })
 })
