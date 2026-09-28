@@ -21,6 +21,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `coeur.svg`            | 22 × 22         | Préférences, « Montrer tes envies » (Lucide « heart », même trait) |
 | `palette.svg`          | 22 × 22         | Préférences, « Mes lieux en couleur » (maquette 198:184)            |
 | `sceau-defaut.svg`     | 24 × 24         | Carte : l'icône d'un lieu sans type (ou dont l'icône ne charge pas), un losange |
+| `replier.svg`          | 24 × 24         | desktop : replier le tiroir (pochoir, retourné en CSS pour déplier) |
 | `embleme.png`          | 176 × 176       | desktop : l'emblème seul en haut de la barre verticale (découpé du logotype, 4× sa taille d'affichage) |
 | `rose-des-vents.svg`   | 74 × 74         | Carte, en bas à gauche (maquette 186:170, exportée d'un bloc) |
 | `fleuron.svg`          | 70 × 14         | Carte, de part et d'autre du nom du territoire ; le second est retourné en CSS (200:193) |

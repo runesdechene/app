@@ -1,7 +1,8 @@
 /*
  * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
  *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche, sans
- *            l'onglet Carte (la carte y est toujours là), l'actif sur une tuile claire (V1).
+ *            l'onglet Carte (la carte y est toujours là) ; l'actif devient un sceau d'encre,
+ *            icône et libellé crème — le geste du lieu visité sur la carte (Uriel, 28/09).
  * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
  *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
  *            (pas cinq colonnes égales, qui rognaient « Campement ») ; toutes les icônes à la
@@ -72,16 +73,24 @@
   .tab {
     width: calc(var(--barre-laterale) - var(--space-4));
     padding: var(--space-2) var(--space-1);
-    border-radius: var(--radius-carte);
+    border-radius: var(--radius-petit);
   }
 
   .tab[data-onglet='carte'] {
     display: none;
   }
 
-  /* L'onglet actif, comme dans la V1 : une tuile claire arrondie, légèrement posée. */
+  /* L'onglet actif : un sceau d'encre plein, plat. */
   .tab[aria-current='page'] {
+    background: var(--color-encre);
+  }
+
+  .tab[aria-current='page'] .icon {
     background: var(--color-sur-accent);
-    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-ombre) 15%, transparent);
+  }
+
+  /* Le libellé (la brique Text, dernier enfant) passe en crème. */
+  .tab[aria-current='page'] > :last-child {
+    color: var(--color-sur-accent);
   }
 }

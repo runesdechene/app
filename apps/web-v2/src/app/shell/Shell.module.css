@@ -130,21 +130,28 @@
       'retour tiroir main';
   }
 
-  /* « / » en haut de la barre, comme la V1 : replie le tiroir sans jamais le fermer. */
+  /* En haut de la barre, comme la V1 : replie le tiroir sans jamais le fermer. Un pochoir
+     d'encre sans cadre, de la famille de « + » et de la cloche ; retourné pour déplier. */
   .replier {
     grid-area: replier;
     justify-self: center;
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
-    margin-top: var(--space-3);
-    border: 1px solid var(--color-bord);
-    border-radius: var(--radius-petit);
-    background: var(--color-sur-accent);
-    color: var(--color-encre);
-    font-size: var(--corps-size);
-    line-height: 1;
+    width: var(--cible-tactile);
+    height: var(--cible-tactile);
+    margin-top: var(--space-2);
+    padding: 0;
+    border: none;
+    background: none;
+  }
+
+  .replier img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .replier[aria-expanded='false'] img {
+    scale: -1 1;
   }
 
   /* Le fond de la barre : une case de la grille sur toute la hauteur, sous ses boutons. */

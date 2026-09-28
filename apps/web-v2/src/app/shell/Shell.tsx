@@ -22,6 +22,7 @@ import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
 import logotype from '@/assets/ui/logotype.png'
+import replier from '@/assets/ui/replier.svg'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
@@ -82,7 +83,7 @@ export function Shell() {
           else void navigate(`/${dernierTiroir}`)
         }}
       >
-        {tiroirVisible ? '«' : '»'}
+        <img src={replier} alt="" />
       </button>
       {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
       <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
