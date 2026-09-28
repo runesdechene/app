@@ -85,6 +85,7 @@
     url('../../../assets/ui/fond-fiche.webp') center -54px / 100% auto no-repeat,
     var(--color-fond);
   display: grid;
+  align-content: start; /* seul le fond descend jusqu'en bas : les écarts restent ceux du contenu */
   gap: var(--space-3);
   padding: var(--space-3) 25px var(--space-8);
 }
