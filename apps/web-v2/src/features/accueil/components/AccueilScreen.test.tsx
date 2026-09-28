@@ -1,6 +1,6 @@
 /**
- * QUOI     — l'Accueil (maquette 27:2) : la nouveauté de la marque mène à la boutique, les lieux
- *            ajoutés ouvrent leur fiche, le fil dit qui a fait quoi, et l'on y salue.
+ * QUOI     — l'Accueil (maquette 27:2) : les lieux ajoutés ouvrent leur fiche, le fil dit qui a
+ *            fait quoi, et l'on y salue.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
@@ -10,7 +10,6 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { AccueilScreen } from './AccueilScreen'
 
 const api = vi.hoisted(() => ({
-  fetchNouveaute: vi.fn(),
   fetchAjoutes: vi.fn(),
   fetchChemins: vi.fn(),
   saluer: vi.fn(),
@@ -30,11 +29,6 @@ const VISITE = {
 }
 
 beforeEach(() => {
-  api.fetchNouveaute.mockResolvedValue({
-    titre: 'La loutre',
-    image: 'loutre.jpg',
-    lien: 'https://runesdechene.com/loutre',
-  })
   api.fetchAjoutes.mockResolvedValue([
     {
       id: 'l9',
@@ -79,12 +73,6 @@ function monter() {
   )
   return router
 }
-
-test('la nouveauté de la marque mène à la boutique', async () => {
-  monter()
-  const lien = await screen.findByRole('link', { name: /La loutre/ })
-  expect(lien).toHaveAttribute('href', 'https://runesdechene.com/loutre')
-})
 
 test('un lieu ajouté récemment ouvre sa fiche dans l’Accueil', async () => {
   const router = monter()

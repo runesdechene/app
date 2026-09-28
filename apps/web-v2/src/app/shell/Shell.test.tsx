@@ -16,10 +16,20 @@ vi.mock('../access/useV2Access', () => ({
   }),
 }))
 
-// L'Accueil lit la base : une nouveauté suffit à le reconnaître.
+// L'Accueil lit la base : un lieu ajouté, « La loutre », suffit à le reconnaître.
 vi.mock('@/features/accueil/api/accueil', () => ({
-  fetchNouveaute: () => Promise.resolve({ titre: 'La loutre', image: null, lien: null }),
-  fetchAjoutes: () => Promise.resolve([]),
+  fetchAjoutes: () =>
+    Promise.resolve([
+      {
+        id: 'l1',
+        nom: 'La loutre',
+        imageUrl: null,
+        latitude: null,
+        longitude: null,
+        categorie: null,
+        auteur: { nom: 'Luna', avatarUrl: null },
+      },
+    ]),
   fetchChemins: () => Promise.resolve([]),
   saluer: () => Promise.resolve({ saluts: 0, salue: false }),
 }))

@@ -1,13 +1,11 @@
 /**
- * QUOI     — la forme des trois blocs de l'Accueil, lus depuis le JSON de la migration 368 :
- *            la nouveauté de la marque, les lieux ajoutés récemment, le fil « Sur les chemins ».
+ * QUOI     — la forme des blocs de l'Accueil, lus depuis le JSON de la migration 368 : les lieux
+ *            ajoutés récemment, le fil « Sur les chemins ».
  * POURQUOI — rien n'est supposé : chaque champ est prouvé. Les lieux prennent la forme des
  *            cartes de lieu partagées (`LieuDeCarte`).
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 import type { LieuDeCarte } from '@/shared/ui/LieuCarte'
-
-export type Nouveaute = { titre: string; image: string | null; lien: string | null }
 
 export type TypeDeChemin = 'visite' | 'ajout' | 'arrivee'
 export type Chemin = {
@@ -27,12 +25,6 @@ function typeDeChemin(v: unknown): TypeDeChemin {
   const t = TYPES.find((type) => type === v)
   if (!t) throw new Error('type de chemin inconnu')
   return t
-}
-
-export function lireNouveaute(json: unknown): Nouveaute | null {
-  if (json === null) return null
-  const n = objet(json)
-  return { titre: chaine(n.titre), image: ouNull(chaine)(n.image), lien: ouNull(chaine)(n.lien) }
 }
 
 function lireLieuDeCarte(v: unknown): LieuDeCarte {

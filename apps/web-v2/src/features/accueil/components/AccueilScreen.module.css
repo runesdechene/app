@@ -35,45 +35,6 @@
   opacity: 0.7;
 }
 
-/* La nouveauté : la photo du Fragment, voilée, et son titre en bas à droite. */
-.nouveaute {
-  position: relative;
-  display: grid;
-  place-items: end end;
-  height: 118px;
-  margin: 0 var(--space-6);
-  padding: var(--space-3) var(--space-4);
-  overflow: hidden;
-  border-radius: var(--radius-carte);
-  background: var(--color-ombre);
-  color: var(--color-sur-accent);
-  text-decoration: none;
-  transition: scale var(--duree-elan) var(--courbe-elan);
-}
-
-.nouveaute:active {
-  scale: 0.98;
-}
-
-.image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.75;
-}
-
-.titreNouveaute {
-  position: relative;
-  max-width: 80%;
-  font-family: var(--font-titre);
-  font-size: var(--titre-section-size);
-  line-height: var(--titre-leading);
-  text-align: right;
-  text-shadow: 0 1px 8px color-mix(in srgb, var(--color-ombre) 60%, transparent);
-}
-
 .cadre {
   display: flex;
 }
@@ -88,10 +49,4 @@
   cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
   list-style: none;
   scrollbar-width: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nouveaute {
-    transition: none;
-  }
 }

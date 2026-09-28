@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireAjoutes, lireChemins, lireNouveaute, lireSalut } from './lireAccueil'
+import { lireAjoutes, lireChemins, lireSalut } from './lireAccueil'
 
 const CHEMIN = {
   id: 'visite:l1:u1',
@@ -11,15 +11,6 @@ const CHEMIN = {
   saluts: 2,
   salue: false,
 }
-
-test('la nouveauté se lit ; sans annonce, rien', () => {
-  expect(lireNouveaute({ titre: 'La loutre', image: 'i.jpg', lien: null })).toEqual({
-    titre: 'La loutre',
-    image: 'i.jpg',
-    lien: null,
-  })
-  expect(lireNouveaute(null)).toBeNull()
-})
 
 test('un lieu ajouté prend la forme d’une carte de lieu', () => {
   const [lieu] = lireAjoutes([

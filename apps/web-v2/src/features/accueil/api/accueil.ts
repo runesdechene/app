@@ -4,13 +4,7 @@
  *            `auth.uid()` : on n'envoie jamais qui on est.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireAjoutes, lireChemins, lireNouveaute, lireSalut } from './lireAccueil'
-
-export async function fetchNouveaute() {
-  const { data, error } = await supabase.rpc('accueil_nouveaute')
-  if (error) throw error
-  return lireNouveaute(data)
-}
+import { lireAjoutes, lireChemins, lireSalut } from './lireAccueil'
 
 export async function fetchAjoutes() {
   const { data, error } = await supabase.rpc('accueil_ajoutes', { p_limite: 10 })
