@@ -19,6 +19,7 @@ export class FausseCarte {
     this.terrain = terrain
   })
   flyTo = vi.fn()
+  jumpTo = vi.fn()
   easeTo = vi.fn()
 
   constructor() {

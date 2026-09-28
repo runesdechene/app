@@ -1,0 +1,285 @@
+/*
+ * QUOI     — l'étape « Où » (maquette 288:178) : la carte plein cadre, un voile parchemin en haut
+ *            sous l'en-tête et la recherche, l'épingle-photo au centre (médaillon crème, pointe,
+ *            ombre au sol), et la feuille du bas arrondie.
+ */
+.lieu {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100%;
+}
+
+.carte {
+  position: absolute;
+  inset: 0;
+}
+
+/* Le haut : un voile parchemin qui rend la recherche lisible sur la carte. */
+.lieu::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 90px;
+  background: linear-gradient(to bottom, var(--color-fond), transparent);
+  pointer-events: none;
+}
+
+.recherche {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-2) var(--space-6) 0;
+}
+
+.champ {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-ombre) 12%, transparent);
+}
+
+.resultats {
+  display: grid;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  list-style: none;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+}
+
+.resultat {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-align: left;
+  cursor: pointer;
+}
+
+.resultat span {
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+}
+
+.resultat:hover,
+.resultat:focus-visible {
+  background: var(--color-pastille);
+  outline: none;
+}
+
+/* L'épingle : au centre exact de la carte, la pointe sur le point. */
+.epingle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  translate: -50% -100%;
+  pointer-events: none;
+}
+
+.medaillon {
+  display: block;
+  width: 72px;
+  height: 72px;
+  padding: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent);
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--color-ombre) 35%, transparent);
+  transition: translate var(--duree-elan) var(--courbe-elan);
+}
+
+.medaillon img {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-rond);
+  object-fit: cover;
+}
+
+.pointe {
+  width: 0;
+  height: 0;
+  margin-top: -1px;
+  border-top: 14px solid var(--color-sur-accent);
+  border-right: 10px solid transparent;
+  border-left: 10px solid transparent;
+  transition: translate var(--duree-elan) var(--courbe-elan);
+}
+
+.ombre {
+  width: 14px;
+  height: 6px;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 30%, transparent);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+/* Pendant le glissé, l'épingle se soulève ; à l'arrêt, elle retombe (courbe élan : un rebond). */
+.epingle[data-souleve] .medaillon,
+.epingle[data-souleve] .pointe {
+  translate: 0 -10px;
+}
+
+.epingle[data-souleve] .ombre {
+  scale: 1.6;
+}
+
+.feuille {
+  position: relative;
+  z-index: 2;
+  grid-row: 3;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  border-radius: var(--radius-feuille) var(--radius-feuille) 0 0;
+  background: var(--color-fond);
+  box-shadow: 0 -4px 18px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+}
+
+.poignee {
+  justify-self: center;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-sable);
+}
+
+.indice {
+  justify-self: start;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  color: var(--color-fiche-titre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.endroit {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.voisin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+}
+
+.bille {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-ocre));
+}
+
+.voisinNom {
+  display: block;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+.voisinLien {
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.gestes {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.ici,
+.cestIci {
+  min-height: 52px;
+  border-radius: var(--radius-carte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.ici {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-bord);
+  background: none;
+  color: var(--color-texte);
+}
+
+.cible {
+  width: 18px;
+  height: 18px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/pin-gps.svg') center / contain no-repeat;
+}
+
+.cestIci {
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.cestIci:disabled {
+  background: var(--color-desactive-bord);
+  cursor: default;
+}
+
+.visite {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medaillon,
+  .pointe,
+  .ombre {
+    transition: none;
+  }
+}
