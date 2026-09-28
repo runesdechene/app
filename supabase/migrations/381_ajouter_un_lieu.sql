@@ -9,7 +9,9 @@
 --      découverte, +3 la visite si l'on est sur place — à 200 m au plus, le rayon de
 --      visiter_lieu). Les photos doivent venir du dossier du compte dans place-images : un lieu
 --      ne pointe jamais vers une image extérieure. Rend le rang et l'expérience, comme
---      decouvrir_lieu (367), pour la fête de la fin.
+--      decouvrir_lieu (367), pour la fête de la fin. L'adresse d'une photo est vérifiée tout
+--      entière (le stockage du projet, le dossier du compte, un nom simple en .webp) : un chemin
+--      pareil sur un autre site ne passe pas (revue de sécurité du 29/09).
 -- SCHEMA CHECKED (29/09/2026, information_schema et définitions live) : places(id varchar,
 --      created_at, updated_at, author_id, place_type_id, title varchar, text NOT NULL, address
 --      varchar NOT NULL, latitude real, longitude real, private, masked, images jsonb, era_id,
@@ -103,6 +105,7 @@ DECLARE
   v_nom text := btrim(p_nom);
   v_recit text := btrim(p_recit);
   v_dossier text;
+  v_fichier text;
   v_image jsonb;
   v_sur_place boolean := false;
   v_xp_avant int;
@@ -142,10 +145,13 @@ BEGIN
   IF jsonb_typeof(p_images) <> 'array' OR jsonb_array_length(p_images) NOT BETWEEN 1 AND 10 THEN
     RAISE EXCEPTION 'De une à dix photos' USING ERRCODE = '22023';
   END IF;
-  v_dossier := '/storage/v1/object/public/place-images/places/' || v_moi || '/';
+  v_dossier := 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/'
+               || v_moi || '/';
   FOR v_image IN SELECT * FROM jsonb_array_elements(p_images) LOOP
-    IF position(v_dossier IN coalesce(v_image->>'url', '')) = 0
-       OR position(v_dossier IN coalesce(v_image->>'thumb', '')) = 0 THEN
+    v_fichier := substr(coalesce(v_image->>'url', ''), length(v_dossier) + 1);
+    IF left(coalesce(v_image->>'url', ''), length(v_dossier)) <> v_dossier
+       OR v_fichier !~ '^[A-Za-z0-9-]+\.webp$'
+       OR coalesce(v_image->>'thumb', '') <> v_dossier || replace(v_fichier, '.webp', '_thumb.webp') THEN
       RAISE EXCEPTION 'Photo hors de ton dossier' USING ERRCODE = '22023';
     END IF;
   END LOOP;

@@ -13,8 +13,8 @@ BEGIN
   PERFORM set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
   photo := jsonb_build_array(jsonb_build_object(
     'id', 'p1',
-    'url', 'https://x.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1.webp',
-    'thumb', 'https://x.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1_thumb.webp'));
+    'url', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1.webp',
+    'thumb', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1_thumb.webp'));
   natures := public.natures_de_lieu();
   epoques := public.epoques();
 
@@ -36,6 +36,12 @@ BEGIN
   BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
     jsonb_build_array(jsonb_build_object('url', 'https://ailleurs.com/a.webp', 'thumb', 'https://ailleurs.com/a.webp')));
     refus := refus || 'photo-exterieure-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
+  -- Le même chemin, sur un autre site : refusé (revue de sécurité du 29/09).
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
+    jsonb_build_array(jsonb_build_object(
+      'url', 'https://ailleurs.com/storage/v1/object/public/place-images/places/' || a || '/p1.webp',
+      'thumb', 'https://ailleurs.com/storage/v1/object/public/place-images/places/' || a || '/p1_thumb.webp')));
+    refus := refus || 'meme-chemin-autre-site-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU','DwlWijqgg','_cjvj91BX','musees'], NULL, NULL, 'R', '', photo);
     refus := refus || 'quatre-natures-ACCEPTEES'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   BEGIN PERFORM public.ajouter_lieu('   ', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
