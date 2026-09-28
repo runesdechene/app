@@ -14,11 +14,12 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal } from '../api/lireRegistre'
 import { useRegistre } from '../hooks/useRegistre'
 import { BarreEcrire } from './BarreEcrire'
+import { ChoixCanal } from './ChoixCanal'
 import styles from './Registre.module.css'
 
 const NOMS: Record<Canal, { filtre: string; court: string }> = {
   general: { filtre: 'Canal général', court: 'Général' },
-  bugs: { filtre: 'Bugs & suggestions', court: 'Bugs' },
+  bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
 }
 const PREFIXE_BUGS = '[Bug & Suggestions]'
 const HEURE = new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', minute: '2-digit' })
@@ -94,20 +95,12 @@ export function Registre() {
         maximum={500}
         onEnvoyer={(t) => ecrire(canal, t)}
         avant={
-          <select
-            className={styles.canal}
-            aria-label="Canal"
-            value={canal}
-            onChange={(e) => {
-              setCanal(e.target.value === 'bugs' ? 'bugs' : 'general')
-            }}
-          >
-            {CANAUX.map((c) => (
-              <option key={c} value={c}>
-                {NOMS[c].court}
-              </option>
-            ))}
-          </select>
+          <ChoixCanal
+            canaux={CANAUX}
+            noms={{ general: NOMS.general.court, bugs: NOMS.bugs.court }}
+            valeur={canal}
+            onChange={setCanal}
+          />
         }
       />
       {echecEnvoi && (

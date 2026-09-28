@@ -101,23 +101,6 @@
   font-weight: var(--weight-gras);
 }
 
-.canal {
-  position: absolute;
-  top: -13px;
-  left: var(--space-4);
-  height: 25px;
-  padding: 0 var(--space-6) 0 var(--space-2);
-  border: none;
-  border-radius: var(--radius);
-  appearance: none;
-  background:
-    url('../../../assets/ui/chevron-bas.svg') right var(--space-2) center / 14px no-repeat,
-    var(--color-pastille);
-  color: var(--color-brun);
-  font-family: var(--font-corps);
-  font-size: var(--legende-size);
-}
-
 .alerte {
   margin: 0;
   padding: 0 var(--space-6) var(--space-2);

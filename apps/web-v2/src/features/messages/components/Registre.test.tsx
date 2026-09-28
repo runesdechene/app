@@ -72,7 +72,11 @@ test('décocher un canal retire ses messages ; le préfixe « Bug & Suggestions 
 test('on écrit dans le canal choisi ; le champ se vide', async () => {
   monter()
   await screen.findByRole('list', { name: 'Registre' })
-  await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Canal' }), 'bugs')
+  const canal = screen.getByRole('button', { name: 'Canal : Général' })
+  await userEvent.click(canal)
+  await userEvent.click(screen.getByRole('option', { name: 'Bugs & suggestions' }))
+  expect(screen.queryByRole('listbox')).toBeNull()
+  expect(screen.getByRole('button', { name: 'Canal : Bugs & suggestions' })).toBeInTheDocument()
   await userEvent.type(screen.getByRole('textbox', { name: 'Écrire quelque chose' }), '  Merci !  ')
   await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
   expect(api.ecrire).toHaveBeenCalledWith('bugs', 'Merci !')
