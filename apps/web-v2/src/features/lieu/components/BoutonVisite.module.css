@@ -1,0 +1,71 @@
+/*
+ * QUOI     — le bouton de visite (maquette 230:128) : rouge et actif quand on peut agir, grisé
+ *            quand le refus est écrit dessus, crème une fois visité. Il change d'état en fondu.
+ */
+.conteneur {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.bouton {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.bouton:enabled:active {
+  scale: 0.98;
+}
+
+.rouge {
+  border-color: var(--color-accent-bord);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  box-shadow: 0 0 8px 5px color-mix(in srgb, var(--color-vignette) 25%, transparent);
+}
+
+.gris {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+}
+
+.visite {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-feuille);
+  color: var(--color-fiche-ligne);
+}
+
+.aide {
+  margin: 0;
+  color: var(--color-fiche-aide);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bouton {
+    animation: none;
+    transition: none;
+  }
+}
