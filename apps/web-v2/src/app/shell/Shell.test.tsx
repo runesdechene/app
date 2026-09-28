@@ -86,3 +86,18 @@ test('« Ajouter » ouvre la feuille par-dessus l’onglet courant', async () =>
   expect(router.state.location.pathname).toBe('/carte/ajouter')
   expect(await screen.findByRole('dialog', { name: 'Ajouter sur la carte' })).toBeInTheDocument()
 })
+
+test('sur l’Accueil, la carte reste montée derrière le tiroir (desktop)', async () => {
+  renderAt('/accueil')
+  await screen.findByText('L’Accueil est à venir')
+  const carte = screen.getByRole('region', { name: 'Carte' })
+  expect(carte).not.toHaveAttribute('hidden')
+  expect(carte).toHaveAttribute('data-derriere')
+  expect(document.querySelector('[data-ecran="messages"]')).toHaveAttribute('hidden')
+})
+
+test('la croix du tiroir ramène à la carte', async () => {
+  const router = renderAt('/compte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Fermer le panneau' }))
+  expect(router.state.location.pathname).toBe('/carte')
+})

@@ -84,6 +84,16 @@
   display: none;
 }
 
+/* Mobile : un seul écran à la fois ; la carte, toujours montée, se retire derrière les autres. */
+.screen[data-derriere] {
+  display: none;
+}
+
+/* La croix du tiroir n'existe que sur desktop. */
+.fermer {
+  display: none;
+}
+
 /* Mobile : le détail couvre tout l'écran, au-dessus de la barre. */
 .shell > aside {
   position: fixed;
@@ -94,8 +104,9 @@
 /* Container query, pas media query : la coquille suit la largeur de son cadre (#root dans
    l'app, un faux téléphone sur /v2/da), jamais celle de l'écran. */
 @container app (width >= 1024px) {
-  /* Desktop : une barre verticale à gauche, comme la V1 (Uriel, 28/09) — l'emblème, les
-     onglets, puis « Ajouter », la cloche et la sortie vers la V1 en bas. */
+  /* Desktop (spec socle §4bis, Uriel 28/09) : à gauche une barre verticale, comme la V1 —
+     l'emblème, les onglets, puis « Ajouter », la cloche et la sortie vers la V1 en bas. La carte
+     est toujours là ; le reste s'ouvre dans un tiroir entre la barre et elle. */
   .shell {
     grid-template-columns: var(--barre-laterale) 1fr;
     grid-template-rows: auto auto 1fr auto auto;
@@ -107,6 +118,16 @@
       'retour main';
   }
 
+  .shell[data-tiroir='open'] {
+    grid-template-columns: var(--barre-laterale) var(--tiroir) 1fr;
+    grid-template-areas:
+      'logo tiroir main'
+      'nav tiroir main'
+      '. tiroir main'
+      'actions tiroir main'
+      'retour tiroir main';
+  }
+
   /* Le fond de la barre : une case de la grille sur toute la hauteur, sous ses boutons. */
   .shell::before {
     content: '';
@@ -116,22 +137,53 @@
     background: var(--color-barre);
   }
 
-  /* Le détail devient un panneau entre la barre et le principal, un peu plus large qu'un
-     téléphone (420 px pour une maquette de 390), sur toute la hauteur (Uriel, 27/09). */
-  .shell[data-detail='open'] {
-    grid-template-columns: var(--barre-laterale) 420px 1fr;
-    grid-template-areas:
-      'logo detail main'
-      'nav detail main'
-      '. detail main'
-      'actions detail main'
-      'retour detail main';
+  /* Les écrans deviennent des cases de la grille : la carte à droite, les autres au tiroir. */
+  .main {
+    display: contents;
   }
 
+  .screen {
+    position: relative;
+    inset: auto;
+    grid-area: tiroir;
+    min-height: 0;
+    border-right: 1px solid var(--color-sable);
+    background: var(--color-fond);
+  }
+
+  .screen[data-ecran='carte'],
+  .screen[data-derriere] {
+    display: block;
+    grid-area: main;
+    border-right: none;
+  }
+
+  /* Un détail se pose dans le tiroir, par-dessus l'écran de l'onglet. */
   .shell > aside {
     position: relative; /* reste dans la grille, et porte son fond parchemin */
-    grid-area: detail;
+    z-index: 1;
+    grid-area: tiroir;
     border-right: 1px solid var(--color-sable);
+  }
+
+  /* La croix, au bord de la carte, sous sa barre de recherche : elle ne masque rien du tiroir. */
+  .shell[data-tiroir='open'] .fermer {
+    z-index: 2;
+    grid-area: main;
+    place-self: start;
+    display: grid;
+    place-items: center;
+    width: var(--cible-tactile);
+    height: var(--cible-tactile);
+    margin: calc(var(--cible-tactile) + var(--space-3) * 2) 0 0 var(--space-3);
+    border: 1px solid var(--color-bord);
+    border-radius: var(--radius-rond);
+    background: var(--color-sur-accent);
+  }
+
+  .fermer img {
+    width: 20px;
+    height: 20px;
   }
 
   .logo {

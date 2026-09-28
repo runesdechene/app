@@ -121,5 +121,6 @@
   --tabbar-height: 85px;
   --cible-tactile: 44px;
   --barre-laterale: 88px; /* desktop : la barre verticale des onglets, comme la V1 */
+  --tiroir: 420px; /* desktop : le tiroir, un peu plus large qu'une maquette de téléphone (390) */
   --background-attachment: fixed;
 }

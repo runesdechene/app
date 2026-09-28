@@ -1,9 +1,11 @@
 /**
  * QUOI     — la coquille : logotype, « Ajouter » et la cloche, barre d'onglets, les quatre écrans
- *            racines, le détail.
- * POURQUOI — les quatre écrans restent MONTÉS et seul l'actif est visible : leur état et leur
- *            défilement survivent au changement d'onglet sans aucun code de restauration. Le
- *            Compte est un onglet (Uriel, 28/09) : l'en-tête garde « Ajouter » et la cloche.
+ *            racines, le détail, et sur desktop le tiroir et sa croix.
+ * POURQUOI — les quatre écrans restent MONTÉS : leur état et leur défilement survivent au
+ *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
+ *            visible. Sur desktop, la carte reste toujours là et l'onglet actif (ou un détail)
+ *            s'ouvre dans un tiroir à côté (spec socle §4bis, Uriel 28/09). Le JavaScript dit
+ *            ce qui est ouvert (`disposition`) ; le CSS place selon la largeur.
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
@@ -15,11 +17,13 @@ import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
+import fermer from '@/assets/ui/fermer.svg'
 import embleme from '@/assets/ui/embleme.png'
 import logotype from '@/assets/ui/logotype.png'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
-import { tabOf, TABS, type TabId } from '../navigation/tabs'
+import { disposition } from '../navigation/disposition'
+import { TABS, type TabId } from '../navigation/tabs'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
 
@@ -30,20 +34,11 @@ const SCREENS: Record<TabId, () => ReactNode> = {
   compte: CompteScreen,
 }
 
-// Ce qui s'ouvre par-dessus l'onglet en FEUILLE (depuis le bas), et non en détail : sur desktop,
-// une feuille n'ouvre pas le panneau latéral.
-const FEUILLES = new Set(['ajouter'])
-
 export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const active = tabOf(pathname)
-  // Par-dessus l'onglet : un segment après lui (/carte/ajouter, /carte/explorateur/…). Segments
-  // vides ignorés (/carte/).
-  const segments = pathname.split('/').filter(Boolean)
-  const overlayOpen = segments.length > 1
-  const feuilleOpen = FEUILLES.has(segments[1] ?? '')
-  const detailOpen = overlayOpen && !feuilleOpen
+  const { actif: active, detail, feuille, tiroir } = disposition(pathname)
+  const overlayOpen = detail || feuille
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
   const boutonAjouter = useRef<HTMLButtonElement>(null)
   const overlayWasOpen = useRef(false)
@@ -61,11 +56,12 @@ export function Shell() {
 
   // Ce qui est déjà ouvert ne s'empile pas une seconde fois dans l'historique.
   function ouvrir(segment: string) {
-    if (active && segments[1] !== segment) void navigate(`/${active}/${segment}`)
+    const adresse = `/${active ?? 'carte'}/${segment}`
+    if (pathname !== adresse) void navigate(adresse)
   }
 
   return (
-    <div className={styles.shell} data-detail={detailOpen ? 'open' : undefined}>
+    <div className={styles.shell} data-tiroir={tiroir ? 'open' : undefined}>
       {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
       <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
       <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
@@ -101,10 +97,14 @@ export function Shell() {
         {TABS.map(({ id, label }) => {
           const Screen = SCREENS[id]
           return (
+            // La carte n'est jamais cachée : sur desktop elle reste derrière le tiroir ; sur
+            // mobile, le CSS la masque quand un autre onglet est actif.
             <section
               key={id}
               aria-label={label}
-              hidden={id !== active}
+              hidden={id !== active && id !== 'carte'}
+              data-ecran={id}
+              data-derriere={id === 'carte' && active !== 'carte' ? '' : undefined}
               className={styles.screen}
               ref={(element) => {
                 scrollers.current[id] = element
@@ -116,6 +116,17 @@ export function Shell() {
         })}
       </main>
       <Outlet />
+      {/* Desktop seulement (le CSS la cache sur mobile) : ferme le tiroir, retour à la carte. */}
+      <button
+        type="button"
+        className={styles.fermer}
+        aria-label="Fermer le panneau"
+        onClick={() => {
+          void navigate('/carte')
+        }}
+      >
+        <img src={fermer} alt="" />
+      </button>
       <TabBar onScrollTop={scrollTop} />
     </div>
   )
