@@ -27,9 +27,9 @@ export type LieuProche = {
   metres: number
 }
 
-// Les Grands Explorateurs (mig 378) : les dix premiers, ma place, les lieux du dixième.
+// Le Panthéon (migs 378 à 380) : les premiers, ma place, les lieux du dixième.
 export type TypeDeClassement = 'visites' | 'ajouts'
-export type Periode = 'mois' | 'toujours'
+export type Periode = '30jours' | 'toujours'
 export type GrandExplorateur = {
   rang: number
   id: string

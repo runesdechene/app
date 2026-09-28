@@ -9,7 +9,7 @@ import { DetailPane } from '../shell/DetailPane'
 // /<onglet>/classement — « Voir tout le classement », depuis l'Accueil.
 export function RouteClassement() {
   return (
-    <DetailPane title="Les Grands Explorateurs">
+    <DetailPane title="Le Panthéon">
       <PageClassement />
     </DetailPane>
   )

@@ -1,5 +1,5 @@
 /**
- * QUOI     — la liste d'un classement des Grands Explorateurs : les lignes (rang en chiffres
+ * QUOI     — la liste d'un classement du Panthéon : les lignes (rang en chiffres
  *            romains, portrait, nom, titre et niveau, lieux), puis ma place, dessinée comme une
  *            ligne, avec ce qui me manque pour entrer dans les dix.
  * POURQUOI — la même liste sur l'Accueil (cinq lignes) et dans la page du classement (toutes).
@@ -9,12 +9,7 @@
 import { Link } from 'react-router'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
-import type {
-  GrandExplorateur,
-  GrandsExplorateurs,
-  Periode,
-  TypeDeClassement,
-} from '../api/lireAccueil'
+import type { GrandExplorateur, GrandsExplorateurs, TypeDeClassement } from '../api/lireAccueil'
 import { romain } from '../lib/romain'
 import styles from './Classement.module.css'
 
@@ -24,16 +19,20 @@ function lieux(n: number) {
   return n > 1 ? 'lieux' : 'lieu'
 }
 
+// Sous le nombre, ce qu'on compte : « lieux visités » ou « lieux ajoutés » (Uriel, 29/09).
+function unite(n: number, type: TypeDeClassement) {
+  const fait = type === 'visites' ? 'visité' : 'ajouté'
+  return `${lieux(n)} ${fait}${n > 1 ? 's' : ''}`
+}
+
 export function Classement({
   classement,
   type,
-  periode,
   lignes,
   avecMaPlace,
 }: {
   classement: GrandsExplorateurs
   type: TypeDeClassement
-  periode: Periode
   lignes: number
   avecMaPlace: boolean // hors des lignes, ma place : oui dans la page, non sur l'Accueil
 }) {
@@ -42,9 +41,9 @@ export function Classement({
   const moiVisible = moi?.rang != null && moi.rang <= visibles.length
   return (
     <div className={styles.classement}>
-      <ol className={styles.tete} aria-label="Les Grands Explorateurs">
+      <ol className={styles.tete} aria-label="Le Panthéon">
         {visibles.map((g) => (
-          <Ligne key={g.id} explorateur={g} moi={moi?.rang === g.rang} />
+          <Ligne key={g.id} explorateur={g} moi={moi?.rang === g.rang} type={type} />
         ))}
       </ol>
       {avecMaPlace && moi && !moiVisible && (
@@ -56,10 +55,10 @@ export function Classement({
             </span>
             <span className={styles.texte}>
               <span className={styles.nom}>Toi</span>
-              <span className={styles.meta}>{ceQuiManque(classement, type, periode)}</span>
+              <span className={styles.meta}>{ceQuiManque(classement, type)}</span>
             </span>
           </span>
-          {moi.rang !== null && <Compte n={moi.lieux} />}
+          {moi.rang !== null && <Compte n={moi.lieux} type={type} />}
         </div>
       )}
     </div>
@@ -67,33 +66,36 @@ export function Classement({
 }
 
 // Jamais « tu es 14e sur 18 » : ce qu'il reste à faire, ou une invitation.
-function ceQuiManque(
-  { moi, dixieme, tete }: GrandsExplorateurs,
-  type: TypeDeClassement,
-  periode: Periode,
-) {
-  const quand = periode === 'mois' ? ' ce mois-ci' : ''
+function ceQuiManque({ moi, dixieme, tete }: GrandsExplorateurs, type: TypeDeClassement) {
   if (!moi?.rang) {
     return type === 'visites'
-      ? `Une visite${quand} te fait entrer au classement`
-      : `Un lieu ajouté${quand} te fait entrer au classement`
+      ? 'Une visite te fait entrer au Panthéon'
+      : 'Un lieu ajouté te fait entrer au Panthéon'
   }
-  if (moi.rang <= DIX || dixieme === null || tete.length < DIX) return `Tu es dans les dix${quand}`
+  if (moi.rang <= DIX || dixieme === null || tete.length < DIX) return 'Tu es dans les dix'
   // À égalité, le premier arrivé passe devant : il faut un lieu de plus que le dixième.
   const manque = dixieme + 1 - moi.lieux
   return `Encore ${String(manque)} ${lieux(manque)} pour entrer dans les dix`
 }
 
-function Compte({ n }: { n: number }) {
+function Compte({ n, type }: { n: number; type: TypeDeClassement }) {
   return (
     <span className={styles.compte}>
       {n}
-      <span className={styles.unite}> {lieux(n)}</span>
+      <span className={styles.unite}> {unite(n, type)}</span>
     </span>
   )
 }
 
-function Ligne({ explorateur: g, moi }: { explorateur: GrandExplorateur; moi: boolean }) {
+function Ligne({
+  explorateur: g,
+  moi,
+  type,
+}: {
+  explorateur: GrandExplorateur
+  moi: boolean
+  type: TypeDeClassement
+}) {
   const qui = [g.titre, `niveau ${String(g.niveau)}`].filter(Boolean).join(' · ')
   return (
     <li
@@ -111,7 +113,7 @@ function Ligne({ explorateur: g, moi }: { explorateur: GrandExplorateur; moi: bo
           <span className={styles.meta}>{qui}</span>
         </span>
       </Link>
-      <Compte n={g.lieux} />
+      <Compte n={g.lieux} type={type} />
     </li>
   )
 }

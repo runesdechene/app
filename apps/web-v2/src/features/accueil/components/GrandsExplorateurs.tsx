@@ -16,18 +16,18 @@ import { Classement } from './Classement'
 import styles from './GrandsExplorateurs.module.css'
 
 export function GrandsExplorateurs() {
-  const classement = useGrandsExplorateurs('visites', 'mois')
+  const classement = useGrandsExplorateurs('visites', '30jours')
   if (!classement || classement.tete.length === 0) return null
   return (
-    <section className={styles.grands} aria-label="Les Grands Explorateurs">
+    <section className={styles.grands} aria-label="Le Panthéon">
       <h2 className={styles.rubrique}>
         <img className={styles.icone} src={sectionGrandsExplorateurs} alt="" />
-        Les Grands Explorateurs
+        Le Panthéon
       </h2>
       <Classement
         classement={classement}
         type="visites"
-        periode="mois"
+
         lignes={3}
         avecMaPlace={false}
       />

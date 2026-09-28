@@ -18,13 +18,13 @@ const TYPES = [
   { id: 'ajouts', libelle: 'Ajoutés' },
 ] as const
 const PERIODES: { id: Periode; libelle: string }[] = [
-  { id: 'mois', libelle: 'Ce mois-ci' },
+  { id: '30jours', libelle: '30 derniers jours' },
   { id: 'toujours', libelle: 'Depuis toujours' },
 ]
 
 export function PageClassement() {
   const [type, setType] = useState<TypeDeClassement>('visites')
-  const [periode, setPeriode] = useState<Periode>('mois')
+  const [periode, setPeriode] = useState<Periode>('30jours')
   const classement = useGrandsExplorateurs(type, periode)
   return (
     <div className={styles.page}>
@@ -46,15 +46,14 @@ export function PageClassement() {
       {classement &&
         (classement.tete.length === 0 ? (
           <p className={styles.vide}>
-            {periode === 'mois'
-              ? 'Personne encore ce mois-ci : à toi d’ouvrir la marche.'
+            {periode === '30jours'
+              ? 'Personne ces 30 derniers jours : à toi d’ouvrir la marche.'
               : 'Personne encore : à toi d’ouvrir la marche.'}
           </p>
         ) : (
           <Classement
             classement={classement}
             type={type}
-            periode={periode}
             lignes={classement.tete.length}
             avecMaPlace
           />

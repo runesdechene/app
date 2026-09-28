@@ -47,14 +47,14 @@ function monter(element: ReactNode) {
 
 test('sur l’Accueil : les visites du mois, trois premiers en chiffres romains', async () => {
   monter(<GrandsExplorateurs />)
-  const liste = await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
+  const liste = await screen.findByRole('list', { name: 'Le Panthéon' })
   const lignes = within(liste).getAllByRole('listitem')
   expect(lignes).toHaveLength(3)
   expect(lignes[0]).toHaveTextContent('I')
   expect(lignes[0]).toHaveTextContent('Explorateur 1')
   expect(lignes[0]).toHaveTextContent('Chevalier errant · niveau 10')
-  expect(lignes[0]).toHaveTextContent('30 lieux')
-  expect(api.fetchGrandsExplorateurs).toHaveBeenCalledWith('visites', 'mois')
+  expect(lignes[0]).toHaveTextContent('30 lieux visités')
+  expect(api.fetchGrandsExplorateurs).toHaveBeenCalledWith('visites', '30jours')
   expect(screen.queryByRole('radiogroup')).toBeNull()
 })
 
@@ -66,7 +66,7 @@ test('« Voir tout le classement » ouvre la page du classement dans l’Accueil
 
 test('sur l’Accueil, hors des trois : pas de ligne pour moi', async () => {
   monter(<GrandsExplorateurs />)
-  await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
+  await screen.findByRole('list', { name: 'Le Panthéon' })
   expect(screen.queryByLabelText('Ma place')).toBeNull()
 })
 
@@ -76,7 +76,7 @@ test('dans la page, ma place : une ligne comme les autres, avec ce qui me manque
   expect(moi).toHaveTextContent('XIV')
   expect(moi).toHaveTextContent('Toi')
   expect(moi).toHaveTextContent('Encore 19 lieux pour entrer dans les dix')
-  expect(moi).toHaveTextContent('3 lieux')
+  expect(moi).toHaveTextContent('3 lieux visités')
 })
 
 test('dans la page, pas encore classé : une invitation, pas un rang', async () => {
@@ -87,7 +87,7 @@ test('dans la page, pas encore classé : une invitation, pas un rang', async () 
   })
   monter(<PageClassement />)
   const moi = await screen.findByLabelText('Ma place')
-  expect(moi).toHaveTextContent('Une visite ce mois-ci te fait entrer au classement')
+  expect(moi).toHaveTextContent('Une visite te fait entrer au Panthéon')
 })
 
 test('dans les lignes affichées : ma ligne dit « Toi », pas de ligne en plus', async () => {
@@ -97,7 +97,7 @@ test('dans les lignes affichées : ma ligne dit « Toi », pas de ligne en plus'
     dixieme: 21,
   })
   monter(<GrandsExplorateurs />)
-  const liste = await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
+  const liste = await screen.findByRole('list', { name: 'Le Panthéon' })
   const maLigne = within(liste).getAllByRole('listitem')[1]
   expect(maLigne).toHaveAttribute('data-moi')
   expect(maLigne).toHaveTextContent('Toi')
@@ -112,16 +112,17 @@ test('personne n’a encore marché ce mois-ci : pas de bloc sur l’Accueil', a
   })
   monter(<GrandsExplorateurs />)
   await new Promise((r) => setTimeout(r, 50))
-  expect(screen.queryByRole('list', { name: 'Les Grands Explorateurs' })).toBeNull()
+  expect(screen.queryByRole('list', { name: 'Le Panthéon' })).toBeNull()
 })
 
 test('la page : toute la liste, et le choix du classement', async () => {
   monter(<PageClassement />)
-  const liste = await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
+  const liste = await screen.findByRole('list', { name: 'Le Panthéon' })
   expect(within(liste).getAllByRole('listitem')).toHaveLength(12)
-  expect(api.fetchGrandsExplorateurs).toHaveBeenLastCalledWith('visites', 'mois')
+  expect(api.fetchGrandsExplorateurs).toHaveBeenLastCalledWith('visites', '30jours')
   await userEvent.click(screen.getByRole('radio', { name: 'Ajoutés' }))
-  expect(api.fetchGrandsExplorateurs).toHaveBeenLastCalledWith('ajouts', 'mois')
+  expect(api.fetchGrandsExplorateurs).toHaveBeenLastCalledWith('ajouts', '30jours')
+  expect(within(liste).getAllByRole('listitem')[0]).toHaveTextContent('30 lieux ajoutés')
   await userEvent.click(screen.getByRole('button', { name: 'Depuis toujours' }))
   expect(api.fetchGrandsExplorateurs).toHaveBeenLastCalledWith('ajouts', 'toujours')
 })
@@ -134,6 +135,6 @@ test('la page, classement vide : une phrase, pas une liste vide', async () => {
   })
   monter(<PageClassement />)
   expect(
-    await screen.findByText('Personne encore ce mois-ci : à toi d’ouvrir la marche.'),
+    await screen.findByText('Personne ces 30 derniers jours : à toi d’ouvrir la marche.'),
   ).toBeInTheDocument()
 })
