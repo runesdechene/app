@@ -5,6 +5,5 @@ Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe p
 
 - `CarteScreen` — la carte vivante : fond, lieux, relief, inscription, rose des vents, « Ma position ».
 - `Inscription` — le nom du territoire entre deux fleurons, en fondu.
-- `AjouterFeuille` — la feuille du « + » de l’en-tête.
 - `Recherche` — « Un lieu, une ville… » parmi les lieux chargés, sans accents ni casse.
 - `FiltreFeuille` — la feuille du bouton Filtre : « Seulement mes lieux ».

@@ -12,7 +12,7 @@ import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
 import { RouteChemins, RouteClassement } from './routes/accueil'
-import { RouteAjouter, RouteNotifications } from './routes/carte'
+import { RouteAjouter, RouteAjouterLieu, RouteNotifications } from './routes/carte'
 import { RouteLieu } from './routes/lieu'
 import { RouteMurmure } from './routes/messages'
 import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
@@ -36,6 +36,7 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: null },
               { path: 'ajouter', Component: RouteAjouter },
+              { path: 'ajouter/lieu/:etape', Component: RouteAjouterLieu },
               { path: 'notifications', Component: RouteNotifications },
               { path: 'lieu/:id', Component: RouteLieu },
               { path: 'explorateur/:id', Component: RouteExplorateur },

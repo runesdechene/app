@@ -47,3 +47,7 @@ class FauxAnimationEvent extends Event implements AnimationEvent {
   readonly pseudoElement = ''
 }
 globalThis.AnimationEvent = FauxAnimationEvent
+
+// jsdom ne crée pas d'adresse blob: pour une image (les photos du brouillon d'un lieu).
+URL.createObjectURL = () => 'blob:test'
+URL.revokeObjectURL = () => undefined

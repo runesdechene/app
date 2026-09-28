@@ -1,0 +1,138 @@
+/*
+ * QUOI     — l'en-tête du parcours : la ligne (croix, titre en Cabin Condensed espacé, brouillon
+ *            enregistré à droite) puis les quatre traits d'étape. Sur une photo (`data-clair`),
+ *            tout passe en crème.
+ */
+.entete {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-6) var(--space-2);
+  color: var(--color-encre);
+}
+
+.entete[data-clair] {
+  color: var(--color-sur-accent);
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: 40px 1fr 140px;
+  align-items: center;
+}
+
+.quitter {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-left: calc(-1 * var(--space-2));
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.croix {
+  width: 18px;
+  height: 18px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/croix.svg') center / contain no-repeat;
+}
+
+.titre {
+  margin: 0;
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-align: center;
+}
+
+.enregistre {
+  justify-self: end;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+  animation: sallumer 1.6s var(--courbe-douce);
+}
+
+.entete[data-clair] .enregistre {
+  color: var(--color-barre);
+}
+
+.etapes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.etape {
+  display: grid;
+  gap: var(--space-1);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+  text-align: left;
+  cursor: pointer;
+}
+
+.etape:disabled {
+  cursor: default;
+}
+
+.etape[aria-current] {
+  color: var(--color-encre);
+}
+
+.entete[data-clair] .etape {
+  color: var(--color-sur-accent);
+}
+
+.trait {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-sable);
+  transition: background-color var(--duree-elan) var(--courbe-elan);
+}
+
+.etape[data-faite] .trait {
+  background: var(--color-accent);
+}
+
+.entete[data-clair] .trait {
+  background: color-mix(in srgb, var(--color-sur-accent) 30%, transparent);
+}
+
+.entete[data-clair] .etape[data-faite] .trait {
+  background: var(--color-sur-accent);
+}
+
+/* « Brouillon enregistré » s'allume un instant, puis reste, discret. */
+@keyframes sallumer {
+  0% {
+    color: var(--color-ocre);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enregistre {
+    animation: none;
+  }
+
+  .trait {
+    transition: none;
+  }
+}

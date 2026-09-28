@@ -41,6 +41,13 @@ export const BROUILLON_VIDE: Brouillon = {
   recit: '',
 }
 
+// Ce que chaque étape reçoit du parcours.
+export type ProprietesEtape = {
+  brouillon: Brouillon
+  changer: (modif: Partial<Brouillon>) => void
+  onSuivant: () => void
+}
+
 // Ce qui empêche de quitter une étape ; null : on peut avancer.
 export function ceQuiManque(b: Brouillon, etape: Etape): string | null {
   switch (etape) {
@@ -61,6 +68,12 @@ export function ceQuiManque(b: Brouillon, etape: Etape): string | null {
 // L'étape la plus loin où l'on peut être : la première qui n'est pas complète.
 export function derniereEtapePossible(b: Brouillon): Etape {
   return ETAPES.find((e) => ceQuiManque(b, e) !== null) ?? 'apercu'
+}
+
+// L'étape où reprendre : celle qu'on avait quittée, sauf si le brouillon ne permet pas d'y être.
+export function etapeDeReprise(b: Brouillon): Etape {
+  const possible = derniereEtapePossible(b)
+  return ETAPES.indexOf(b.etape) <= ETAPES.indexOf(possible) ? b.etape : possible
 }
 
 const CLE = 'runes-de-chene/ajout-lieu'

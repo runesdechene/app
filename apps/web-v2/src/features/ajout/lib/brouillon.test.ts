@@ -1,5 +1,11 @@
 import { expect, test } from 'vitest'
-import { BROUILLON_VIDE, ceQuiManque, derniereEtapePossible, type Brouillon } from './brouillon'
+import {
+  BROUILLON_VIDE,
+  ceQuiManque,
+  derniereEtapePossible,
+  etapeDeReprise,
+  type Brouillon,
+} from './brouillon'
 
 const photo = { id: 'p1', grande: new Blob(), vignette: new Blob() }
 const complet: Brouillon = {
@@ -26,4 +32,9 @@ test('on ne va pas plus loin que la première étape incomplète', () => {
   expect(derniereEtapePossible({ ...complet, natures: [] })).toBe('nom')
   expect(derniereEtapePossible({ ...complet, recit: '' })).toBe('recit')
   expect(derniereEtapePossible(complet)).toBe('apercu')
+})
+
+test('un brouillon se reprend à l’étape gardée, jamais plus loin que possible', () => {
+  expect(etapeDeReprise({ ...complet, etape: 'nom' })).toBe('nom')
+  expect(etapeDeReprise({ ...complet, etape: 'apercu', recit: '' })).toBe('recit')
 })
