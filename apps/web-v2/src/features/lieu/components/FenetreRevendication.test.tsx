@@ -82,3 +82,30 @@ test('échec : le message est écrit, la fenêtre reste', async () => {
   expect(screen.getByRole('alert')).toHaveTextContent('Ta visite date de plus de 30 minutes')
   expect(onFermer).not.toHaveBeenCalled()
 })
+
+test('un compagnon coché qui s’en va ne bloque pas la revendication', async () => {
+  revendication_.mockReturnValue({
+    compagnons: [REMY],
+    noms: [],
+    revendiquer,
+    enCours: false,
+    erreur: null,
+  })
+  const fiche = { id: 'a', nom: 'Château de Jonjeac' }
+  const { rerender } = render(<FenetreRevendication fiche={fiche} onFermer={onFermer} />)
+  await userEvent.click(screen.getByRole('radio', { name: 'En expédition' }))
+  await userEvent.click(screen.getByRole('checkbox', { name: /Rémy/ }))
+  // La relecture suivante ne le voit plus : il est parti.
+  revendication_.mockReturnValue({
+    compagnons: [],
+    noms: [],
+    revendiquer,
+    enCours: false,
+    erreur: null,
+  })
+  rerender(<FenetreRevendication fiche={fiche} onFermer={onFermer} />)
+  const bouton = screen.getByRole('button', { name: 'Revendiquer' })
+  expect(bouton).toBeEnabled()
+  await userEvent.click(bouton)
+  expect(revendiquer).toHaveBeenCalledWith([], null)
+})

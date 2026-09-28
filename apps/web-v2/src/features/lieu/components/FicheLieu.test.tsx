@@ -97,3 +97,12 @@ test('un lieu introuvable le dit', async () => {
   afficher()
   expect(await screen.findByText('Ce lieu n’existe pas ou n’est plus visible')).toBeInTheDocument()
 })
+
+test('si la base refuse l’envie, le signet revient et le dit', async () => {
+  api.basculerEnvie.mockRejectedValueOnce(new Error('réseau'))
+  afficher()
+  const signet = await screen.findByRole('button', { name: 'Envie d’y aller' })
+  await userEvent.click(signet)
+  expect(await screen.findByRole('alert')).toHaveTextContent('L’envie n’a pas pu être enregistrée')
+  expect(signet).toHaveAttribute('aria-pressed', 'false')
+})

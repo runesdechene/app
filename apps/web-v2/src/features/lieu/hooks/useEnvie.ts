@@ -28,6 +28,10 @@ export function useEnvie(id: string): { basculer: () => void; echec: boolean } {
       inverser()
       setEchec(true)
     },
+    onSuccess: () => {
+      // « Mes envies » du profil (zone Compte, clé ['explorateur']) se relit.
+      void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
+    },
   })
   return {
     basculer: () => {

@@ -34,7 +34,9 @@ export function FenetreRevendication({
   const [coches, setCoches] = useState<ReadonlySet<string>>(new Set())
   const [nom, setNom] = useState('')
 
-  const enGroupe = mode === 'expedition' && coches.size > 0
+  // Seuls comptent les cochés encore présents : un compagnon parti ne bloque rien.
+  const choisis = compagnons.filter((c) => coches.has(c.id)).map((c) => c.id)
+  const enGroupe = mode === 'expedition' && choisis.length > 0
   const pret = !enCours && (!enGroupe || nom.trim() !== '')
 
   function cocher(id: string) {
@@ -47,7 +49,7 @@ export function FenetreRevendication({
   }
 
   function valider() {
-    const envoi = enGroupe ? revendiquer([...coches], nom.trim()) : revendiquer([], null)
+    const envoi = enGroupe ? revendiquer(choisis, nom.trim()) : revendiquer([], null)
     envoi.then(onFermer, () => undefined) // l'échec est écrit par `erreur`
   }
 

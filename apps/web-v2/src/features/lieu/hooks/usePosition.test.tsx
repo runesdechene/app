@@ -50,3 +50,12 @@ test('sans géolocalisation : « refusee », jamais une erreur', async () => {
   await act(() => Promise.resolve())
   expect(result.current.position).toBe('refusee')
 })
+
+test('une position lente ou introuvable n’est pas un refus', async () => {
+  geoloc('granted', (_ok, ko) => {
+    ko({ code: 3 })
+  })
+  const { result } = renderHook(() => usePosition())
+  await act(() => Promise.resolve())
+  expect(result.current.position).toBe('inconnue')
+})

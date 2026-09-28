@@ -18,8 +18,13 @@ import { DetailPane } from '../shell/DetailPane'
 
 type Ouvert = 'options' | 'partager' | 'revendiquer' | null
 
+// Un lieu = un état neuf : passer d'un lieu à l'autre efface erreurs, galerie et feuilles ouvertes.
 export function RouteLieu() {
   const { id = '' } = useParams()
+  return <Lieu key={id} id={id} />
+}
+
+function Lieu({ id }: { id: string }) {
   const { fiche } = useFiche(id)
   const [ouvert, setOuvert] = useState<Ouvert>(null)
   const fermer = () => {
@@ -27,7 +32,7 @@ export function RouteLieu() {
   }
 
   return (
-    <DetailPane title="Lieu" surImage>
+    <DetailPane title={fiche?.nom ?? 'Lieu'} surImage={Boolean(fiche)}>
       <FicheLieu
         id={id}
         onOptions={() => {

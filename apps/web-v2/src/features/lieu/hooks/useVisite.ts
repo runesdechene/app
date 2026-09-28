@@ -1,8 +1,9 @@
 /**
  * QUOI     — visiter le lieu en GPS : le serveur juge la portée.
  * POURQUOI — un refus (trop loin, réseau) se dit sous le bouton ; une réussite relit la fiche et
- *            la carte (le sceau devient « visité »). La clé ['carte', 'lieux'] est le contrat
- *            avec la zone Carte (useCarteLieux) : aucune zone n'importe l'autre.
+ *            la carte (le sceau devient « visité ») et les profils. Les clés ['carte', 'lieux'] et
+ *            ['explorateur'] sont les contrats avec les zones Carte et Compte : aucune zone
+ *            n'importe l'autre.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { visiterLieu } from '../api/lieu'
@@ -15,6 +16,7 @@ export function useVisite(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ficheKey(id) })
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
+      void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
     },
   })
   const erreur = mutation.isError

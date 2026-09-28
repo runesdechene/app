@@ -29,8 +29,9 @@ export function usePosition(): { position: Position; demander: () => void } {
       ({ coords }) => {
         setPosition({ lat: coords.latitude, lng: coords.longitude })
       },
-      () => {
-        setPosition('refusee')
+      (erreur) => {
+        // Seul un refus est un refus : une position lente ou introuvable reste « à localiser ».
+        if (erreur.code === 1) setPosition('refusee')
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
     )

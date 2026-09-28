@@ -26,13 +26,16 @@ export function useRevendication(id: string, ouverte: boolean) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ficheKey(id) })
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
+      void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
       void queryClient.invalidateQueries({ queryKey: ['expeditions', 'mes-noms'] })
     },
   })
   const erreur = mutation.isError
     ? mutation.error.message === 'Visite trop ancienne'
       ? 'Ta visite date de plus de 30 minutes : marque-la à nouveau sur place.'
-      : 'La revendication n’a pas pu être enregistrée. Réessaie dans un instant.'
+      : mutation.error.message === 'Pas sur place'
+        ? 'Tu n’es plus sur place : reviens près du lieu pour le revendiquer.'
+        : 'La revendication n’a pas pu être enregistrée. Réessaie dans un instant.'
     : null
   return {
     compagnons: compagnons.data ?? [],
