@@ -3,8 +3,8 @@
  * POURQUOI — ajoute les vérifications DOM lisibles (toBeInTheDocument, toBeVisible…), et
  *            remplace MapLibre : il lui faut WebGL, que jsdom n'a pas. Tout test qui monte la
  *            coquille monte aussi l'onglet Carte. jsdom n'a pas non plus ResizeObserver,
- *            Element.scrollTo ni matchMedia : des faux, muets, en tiennent lieu (un test peut les
- *            remplacer).
+ *            Element.scrollTo, matchMedia ni de canevas qui dessine : des faux, muets, en tiennent
+ *            lieu (un test peut les remplacer).
  */
 import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
@@ -35,3 +35,15 @@ class FausseRequeteMedia extends EventTarget implements MediaQueryList {
   removeListener() {}
 }
 window.matchMedia = (requete: string) => new FausseRequeteMedia(requete)
+
+// jsdom ne dessine pas : un canevas sans contexte (le voile d'un lieu inconnu ne peint rien).
+HTMLCanvasElement.prototype.getContext = () => null
+
+// Sans AnimationEvent, React écoute la fin d'une animation sous un nom préfixé que les tests
+// n'envoient pas (fireEvent.animationEnd).
+class FauxAnimationEvent extends Event implements AnimationEvent {
+  readonly animationName = ''
+  readonly elapsedTime = 0
+  readonly pseudoElement = ''
+}
+globalThis.AnimationEvent = FauxAnimationEvent

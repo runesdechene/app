@@ -19,6 +19,7 @@ const PASSED_INLINE = new Set([
   '--nombre',
   '--rang',
   '--type',
+  '--avant',
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

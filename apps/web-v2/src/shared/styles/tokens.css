@@ -72,6 +72,13 @@
   --color-pilule: #f6ead0; /* la pilule de revendication */
   --color-pilule-texte: #5a4331;
 
+  /* La découverte d'un lieu (Figma 250:128-140) : le voile, sa déchirure, les confettis */
+  --color-voile: #eddbbd; /* le lavis de parchemin posé sur la photo floutée */
+  --color-voile-bord: #734d2e; /* les bords brunis du voile */
+  --color-dechirure: #fdf5e6; /* la lisière claire des fibres arrachées */
+  --color-confetti-or: #d4a84c;
+  --color-confetti-vert: #738c66;
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;
@@ -107,6 +114,8 @@
   --flux-size: 0.8125rem;
   --legende-size: 0.75rem;
   --micro-size: 0.625rem;
+  --sceau-size: 3.5rem; /* le « ? » du voile d'un lieu inconnu (Figma 250:128) */
+  --fete-size: 2.5rem; /* le 🎉 de la récompense (250:140) */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
 

@@ -1,7 +1,7 @@
 /**
  * QUOI     — /<onglet>/lieu/<id> : la fiche dans le cadre de détail, son bouton de visite, la
  *            fenêtre de revendication (après une visite), et les feuilles « Ce lieu » et
- *            « Partager ce lieu ».
+ *            « Partager ce lieu ». Un lieu encore inconnu passe d'abord par sa découverte.
  * POURQUOI — la zone Lieu ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre. Fenêtre
  *            et feuilles sont des moments, pas des adresses : un état local, fermé par le voile ou
  *            Échap.
@@ -9,11 +9,13 @@
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
+import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
 import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
 import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
 import { FicheLieu } from '@/features/lieu/components/FicheLieu'
 import { useFiche } from '@/features/lieu/hooks/useFiche'
+import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
 type Ouvert = 'options' | 'partager' | 'revendiquer' | null
@@ -27,8 +29,18 @@ export function RouteLieu() {
 function Lieu({ id }: { id: string }) {
   const { fiche } = useFiche(id)
   const [ouvert, setOuvert] = useState<Ouvert>(null)
+  const fermerDetail = useFermerDetail()
   const fermer = () => {
     setOuvert(null)
+  }
+
+  // Un lieu inconnu s'ouvre voilé : on le découvre avant de voir sa fiche.
+  if (fiche && !fiche.moi.decouvert) {
+    return (
+      <DetailPane title="Un lieu inconnu" surImage>
+        <DecouverteLieu fiche={fiche} onFermer={fermerDetail} />
+      </DetailPane>
+    )
   }
 
   return (

@@ -1,6 +1,6 @@
 /**
- * QUOI     — la forme d'une fiche de lieu, des Explorateurs et des compagnons, lues depuis le
- *            JSON des fonctions 364-365.
+ * QUOI     — la forme d'une fiche de lieu, des Explorateurs, des compagnons et de la récompense
+ *            d'une découverte, lues depuis le JSON des fonctions 364-367.
  * POURQUOI — rien n'est supposé : chaque champ est prouvé ; `null` veut dire « introuvable ou
  *            invisible », et l'écran le dit.
  */
@@ -30,8 +30,10 @@ export type FicheLieu = {
   auteur: Personne | null
   ajouteLe: string
   enrichiPar: { id: string; nom: string } | null
-  moi: { visiteLe: string | null; envie: boolean }
+  moi: { visiteLe: string | null; envie: boolean; decouvert: boolean }
 }
+// Ce que rapporte une découverte : son rang, l'expérience gagnée, et la jauge du niveau (0 à 1).
+export type Recompense = { rang: number; gain: number; niveau: number; avant: number; apres: number }
 
 function lirePersonne(v: unknown): Personne {
   const p = objet(v)
@@ -90,7 +92,23 @@ export function lireFiche(json: unknown): FicheLieu | null {
     auteur: ouNull(lirePersonne)(f.auteur),
     ajouteLe: chaine(f.ajouteLe),
     enrichiPar: ouNull(lireEnrichi)(f.enrichiPar),
-    moi: { visiteLe: ouNull(chaine)(moi.visiteLe), envie: booleen(moi.envie) },
+    moi: {
+      visiteLe: ouNull(chaine)(moi.visiteLe),
+      envie: booleen(moi.envie),
+      // Absent tant que la base ne le rend pas (migration 367) : la fiche s'ouvre comme avant.
+      decouvert: typeof moi.decouvert === 'boolean' ? moi.decouvert : true,
+    },
+  }
+}
+
+export function lireRecompense(json: unknown): Recompense {
+  const r = objet(json)
+  return {
+    rang: nombre(r.rang),
+    gain: nombre(r.gain),
+    niveau: nombre(r.niveau),
+    avant: nombre(r.avant),
+    apres: nombre(r.apres),
   }
 }
 

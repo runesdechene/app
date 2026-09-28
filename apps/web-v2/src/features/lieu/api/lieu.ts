@@ -1,11 +1,11 @@
 /**
- * QUOI     — tout ce que la fiche d'un lieu demande à Supabase (migrations 364-365).
+ * QUOI     — tout ce que la fiche d'un lieu demande à Supabase (migrations 364-367).
  * POURQUOI — chaque fonction rend une donnée typée ou lève : jamais un `{ error }` à vérifier
  *            plus loin. Les fonctions de la base lisent `auth.uid()` : on n'envoie jamais qui on est.
  */
 import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
-import { lireCompagnons, lireExplorateurs, lireFiche } from './lireLieu'
+import { lireCompagnons, lireExplorateurs, lireFiche, lireRecompense } from './lireLieu'
 
 export async function fetchFiche(id: string) {
   const { data, error } = await supabase.rpc('fiche_lieu', { p_id: id })
@@ -23,6 +23,12 @@ export async function basculerEnvie(id: string) {
   const { data, error } = await supabase.rpc('basculer_envie', { p_id: id })
   if (error) throw error
   return booleen(data)
+}
+
+export async function decouvrirLieu(id: string) {
+  const { data, error } = await supabase.rpc('decouvrir_lieu', { p_id: id })
+  if (error) throw error
+  return lireRecompense(data)
 }
 
 export async function visiterLieu(id: string, lat: number, lng: number) {

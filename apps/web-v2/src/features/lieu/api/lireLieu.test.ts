@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireCompagnons, lireFiche } from './lireLieu'
+import { lireCompagnons, lireFiche, lireRecompense } from './lireLieu'
 
 const COMPLET = {
   id: 'a',
@@ -50,6 +50,26 @@ test('un lieu nu reste lisible : pas de photo, de type, de faits, de revendicati
     type: null,
     revendication: null,
     explorateurs: { nombre: 0 },
+  })
+})
+
+test('la fiche dit si le lieu est encore à découvrir', () => {
+  expect(lireFiche({ ...COMPLET, moi: { ...COMPLET.moi, decouvert: false } })?.moi.decouvert).toBe(
+    false,
+  )
+})
+
+test('sans l’information (avant la migration 367), le lieu se lit découvert : la fiche s’ouvre', () => {
+  expect(lireFiche(COMPLET)?.moi.decouvert).toBe(true)
+})
+
+test('la récompense d’une découverte se lit', () => {
+  expect(lireRecompense({ rang: 38, gain: 1, niveau: 12, avant: 0.62, apres: 0.64 })).toEqual({
+    rang: 38,
+    gain: 1,
+    niveau: 12,
+    avant: 0.62,
+    apres: 0.64,
   })
 })
 

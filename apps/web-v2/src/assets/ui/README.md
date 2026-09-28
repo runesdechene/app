@@ -39,6 +39,7 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `chevron.svg`                                                                           | 18 × 18          | fin des lignes qui ouvrent quelque chose (Préférences)                                                           |
 | `appareil-photo.svg`                                                                    | 14 × 14          | « Changer la photo » (Modifier mon profil, maquette 91:107)                                                      |
 | `coche-choisie.svg`                                                                     | 12 × 12          | coche rouge d'une pastille choisie (titres portés)                                                               |
+| `croix.svg`                                                                             | 24 × 24          | Découverte d'un lieu : fermer la récompense, en haut à droite de la photo (blanc, au trait)                      |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
 couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)

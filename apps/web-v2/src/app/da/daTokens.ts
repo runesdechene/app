@@ -55,6 +55,11 @@ export const COLOR_TOKENS = [
   '--color-accent-bord',
   '--color-pilule',
   '--color-pilule-texte',
+  '--color-voile',
+  '--color-voile-bord',
+  '--color-dechirure',
+  '--color-confetti-or',
+  '--color-confetti-vert',
 ] as const
 
 export const DA_SHOWCASED = [

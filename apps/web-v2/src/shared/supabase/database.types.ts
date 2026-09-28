@@ -5870,6 +5870,7 @@ export type Database = {
         Returns: Json
       }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
+      decouvrir_lieu: { Args: { p_id: string }; Returns: Json }
       delete_carnet: {
         Args: { p_place_id: string; p_user_id: string }
         Returns: Json
