@@ -5870,6 +5870,8 @@ export type Database = {
         Returns: Json
       }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
+      accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
+      accueil_nouveaute: { Args: never; Returns: Json }
       decouvrir_lieu: { Args: { p_id: string }; Returns: Json }
       delete_carnet: {
         Args: { p_place_id: string; p_user_id: string }
@@ -6697,6 +6699,7 @@ export type Database = {
         }
         Returns: Json
       }
+      saluer: { Args: { p_evenement: string }; Returns: Json }
       send_company_message: {
         Args: { p_company_id: string; p_content: string; p_user_id: string }
         Returns: Json
@@ -6828,6 +6831,7 @@ export type Database = {
         Returns: undefined
       }
       soundex: { Args: { "": string }; Returns: string }
+      sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }

@@ -16,6 +16,14 @@ vi.mock('../access/useV2Access', () => ({
   }),
 }))
 
+// L'Accueil lit la base : une nouveauté suffit à le reconnaître.
+vi.mock('@/features/accueil/api/accueil', () => ({
+  fetchNouveaute: () => Promise.resolve({ titre: 'La loutre', image: null, lien: null }),
+  fetchAjoutes: () => Promise.resolve([]),
+  fetchChemins: () => Promise.resolve([]),
+  saluer: () => Promise.resolve({ saluts: 0, salue: false }),
+}))
+
 function renderAt(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] })
   render(
@@ -28,13 +36,13 @@ function renderAt(path: string) {
 
 test('/ redirige vers l’Accueil', async () => {
   const router = renderAt('/')
-  expect(await screen.findByText('L’Accueil est à venir')).toBeVisible()
+  expect(await screen.findByText('La loutre')).toBeVisible()
   expect(router.state.location.pathname).toBe('/accueil')
 })
 
 test('un onglet inconnu redirige vers l’Accueil', async () => {
   const router = renderAt('/nimporte')
-  await screen.findByText('L’Accueil est à venir')
+  await screen.findByText('La loutre')
   expect(router.state.location.pathname).toBe('/accueil')
 })
 
@@ -43,8 +51,8 @@ test('changer d’onglet affiche le nouvel écran et garde l’ancien monté', a
   await userEvent.click(await screen.findByRole('button', { name: 'Carte' }))
   expect(router.state.location.pathname).toBe('/carte')
   expect(screen.getByTestId('carte')).toBeVisible()
-  expect(screen.getByText('L’Accueil est à venir')).not.toBeVisible()
-  expect(screen.getByText('L’Accueil est à venir')).toBeInTheDocument()
+  expect(screen.getByText('La loutre')).not.toBeVisible()
+  expect(screen.getByText('La loutre')).toBeInTheDocument()
 })
 
 test('changer d’onglet ajoute une entrée : le retour ramène à l’onglet précédent', async () => {
@@ -89,7 +97,7 @@ test('« Ajouter » ouvre la feuille par-dessus l’onglet courant', async () =>
 
 test('sur l’Accueil, la carte reste montée derrière le tiroir (desktop)', async () => {
   renderAt('/accueil')
-  await screen.findByText('L’Accueil est à venir')
+  await screen.findByText('La loutre')
   const carte = screen.getByRole('region', { name: 'Carte' })
   expect(carte).not.toHaveAttribute('hidden')
   expect(carte).toHaveAttribute('data-derriere')

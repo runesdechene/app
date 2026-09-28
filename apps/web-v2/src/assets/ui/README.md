@@ -40,6 +40,9 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `appareil-photo.svg`                                                                    | 14 × 14          | « Changer la photo » (Modifier mon profil, maquette 91:107)                                                      |
 | `coche-choisie.svg`                                                                     | 12 × 12          | coche rouge d'une pastille choisie (titres portés)                                                               |
 | `croix.svg`                                                                             | 24 × 24          | Découverte d'un lieu : fermer la récompense, en haut à droite de la photo (blanc, au trait)                      |
+| `section-nouvelles.png`, `section-ajoutes.svg`, `section-chemins.svg`                  | 17 × 24 env.     | Accueil : les pictogrammes des trois rubriques (Figma 27:2 — parchemin, voyageur qui apprend, voyageur qui marche) |
+| `chemin-visite.svg`, `chemin-arrivee.svg`                                               | 14 × 14          | Accueil, « Sur les chemins » : une visite (des pas), une arrivée (27:2) ; un ajout prend `lieu.svg`              |
+| `feuille-de-chene.svg`                                                                  | 9 × 16           | Accueil : la feuille du salut (pochoir, peinte en CSS)                                                           |
 
 Les icônes d'onglets servent de **pochoir** : seule leur forme compte (la transparence), leur
 couleur vient du jeton `--color-encre`. `onglet-carte.png` a été recalé (opacité 70 % → 100 %)
