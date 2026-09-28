@@ -3097,6 +3097,37 @@ table select {
   display: block;
 }
 
+/* « Changer l'image » : posé sur l'image, en bas à droite (Banners). */
+.pub-screen-img-wrap {
+  position: relative;
+}
+
+.pub-screen-img-change {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  background: var(--color-button);
+  color: var(--color-button--text);
+  font-family: var(--font-body-family);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(58, 46, 30, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.pub-screen-img-change:hover {
+  transform: translateY(-1px);
+}
+
+.pub-screen-img-change.disabled {
+  background: var(--color-button--disabled);
+  cursor: default;
+  transform: none;
+}
+
 .pub-screen-fields {
   padding: 10px;
   display: flex;
