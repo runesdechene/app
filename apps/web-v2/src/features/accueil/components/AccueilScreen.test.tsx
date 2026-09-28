@@ -197,7 +197,7 @@ test('un lieu ajouté porte la bille de son type, dans sa couleur', async () => 
 
 test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouvre sa fiche', async () => {
   const router = monter()
-  const pres = await screen.findByRole('list', { name: 'Près de toi' })
+  const pres = await screen.findByRole('list', { name: 'À explorer près de toi' })
   expect(pres).toHaveTextContent('Dolmen de la Roche-aux-Fées')
   expect(pres).toHaveTextContent('Mégalithe')
   expect(pres).toHaveTextContent('4 km')
@@ -211,6 +211,6 @@ test('sans position partagée, pas de « Près de toi »', async () => {
   position.positionSiAutorisee.mockResolvedValue(null)
   monter()
   await screen.findByRole('list', { name: 'Sur les chemins' })
-  expect(screen.queryByRole('list', { name: 'Près de toi' })).toBeNull()
+  expect(screen.queryByRole('list', { name: 'À explorer près de toi' })).toBeNull()
   expect(api.fetchPresDeMoi).not.toHaveBeenCalled()
 })

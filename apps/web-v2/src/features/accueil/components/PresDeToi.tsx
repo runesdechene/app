@@ -1,7 +1,7 @@
 /**
- * QUOI     — « Près de toi » (maquette 275:128, bloc 282:146) : les trois lieux les plus proches, à
- *            100 km au plus, que je n'ai pas encore visités en GPS — la photo, le nom, le type
- *            dans sa couleur, la distance. Un lieu ouvre sa fiche dans l'Accueil.
+ * QUOI     — « À explorer près de toi » (maquette 275:128, bloc 282:146) : les trois lieux les
+ *            plus proches, à 100 km au plus, que je n'ai pas encore visités en GPS — la photo,
+ *            le nom, le type et sa bille, la distance. Un lieu ouvre sa fiche dans l'Accueil.
  * POURQUOI — le seul bloc de l'Accueil qui pousse à sortir aujourd'hui (Uriel, 29/09) : les
  *            Ajoutés racontent ce que la communauté découvre, souvent loin. Sans position
  *            partagée, ou rien à moins de 100 km, le bloc ne s'affiche pas.
@@ -19,12 +19,11 @@ export function PresDeToi() {
   const lieux = usePresDeMoi(useMaPosition())
   if (lieux.length === 0) return null
   return (
-    <section className={styles.presDeToi} aria-label="Près de toi">
+    <section className={styles.presDeToi} aria-label="À explorer près de toi">
       <h2 className={styles.rubrique}>
-        <img className={styles.icone} src={sectionPresDeToi} alt="" />
-        Près de toi
+        <img className={styles.icone} src={sectionPresDeToi} alt="" />À explorer près de toi
       </h2>
-      <ul className={styles.lieux} aria-label="Près de toi">
+      <ul className={styles.lieux} aria-label="À explorer près de toi">
         {lieux.map((l) => (
           <li key={l.id}>
             <Link className={styles.lieu} to={`/accueil/lieu/${l.id}`} state={VENU_D_UN_ECRAN}>
