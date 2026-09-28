@@ -46,9 +46,6 @@ export function PresDeToi() {
           </li>
         ))}
       </ul>
-      <Link className={styles.carte} to="/carte">
-        Voir sur la carte
-      </Link>
     </section>
   )
 }

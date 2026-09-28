@@ -65,7 +65,7 @@
 .ligne,
 .maPlace {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
+  grid-template-columns: 40px minmax(0, 1fr) auto; /* « VIII » tient dans 40 px */
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) 0;
@@ -75,8 +75,10 @@
   border-top: 1px solid var(--color-sable);
 }
 
-/* Ma place, sous la tête : la même ligne, détachée par un filet pointillé. */
+/* Ma place, sous la tête : la même ligne, détachée par un filet pointillé. Son rang peut être
+   long (« CCXLVIII ») : la colonne s'étire. */
 .maPlace {
+  grid-template-columns: minmax(40px, auto) minmax(0, 1fr) auto;
   margin: 0 var(--space-6);
   border-top: 1px dashed var(--color-sable);
 }

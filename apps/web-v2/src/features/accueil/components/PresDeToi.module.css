@@ -100,16 +100,6 @@
   white-space: nowrap;
 }
 
-.carte {
-  justify-self: start;
-  margin: 0 var(--space-6);
-  color: var(--color-ocre);
-  font-family: var(--font-corps);
-  font-size: var(--meta-size);
-  font-weight: var(--weight-semi);
-  text-decoration: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lieu {
     transition: none;
