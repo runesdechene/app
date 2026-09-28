@@ -12,7 +12,9 @@ import parcheminUrl from '@/assets/ui/fond-fiche.webp'
 import { Grille, jalons, type Point } from '../lib/dechirure'
 import { dechirer, peindreVoile } from '../lib/voile'
 
-const RAYON = 30 // un doigt, en pixels CSS
+// La gomme, en pixels CSS : un doigt, ou la souris — plus large, on la passe sans appuyer
+// (Uriel, 28/09).
+const RAYON = { doigt: 30, souris: 55 }
 const MOITIE = 0.5
 
 function charger(src: string): Promise<HTMLImageElement> {
@@ -63,10 +65,11 @@ export function useGrattage(photoUrl: string | null, onMoitie: () => void) {
     const cadre = c.getBoundingClientRect()
     const ici = { x: e.clientX - cadre.left, y: e.clientY - cadre.top }
     const ratio = c.width / cadre.width
-    const points = dernier.current ? jalons(dernier.current, ici, RAYON / 2) : [ici]
+    const rayon = e.pointerType === 'mouse' ? RAYON.souris : RAYON.doigt
+    const points = dernier.current ? jalons(dernier.current, ici, rayon / 2) : [ici]
     for (const p of points) {
-      dechirer(c, { x: p.x * ratio, y: p.y * ratio }, RAYON * ratio)
-      grille.current.gratter(p, RAYON)
+      dechirer(c, { x: p.x * ratio, y: p.y * ratio }, rayon * ratio)
+      grille.current.gratter(p, rayon)
     }
     dernier.current = ici
     if (grille.current.part() >= MOITIE) {
