@@ -43,3 +43,12 @@
   font-weight: var(--weight-semi);
   text-decoration: none;
 }
+
+/* La période, au bout du filet, à droite, discrète (Uriel, 29/09) : après le filet (order). */
+.periode {
+  order: 1;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}

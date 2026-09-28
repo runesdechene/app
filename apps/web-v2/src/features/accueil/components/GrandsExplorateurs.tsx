@@ -23,6 +23,7 @@ export function GrandsExplorateurs() {
       <h2 className={styles.rubrique}>
         <img className={styles.icone} src={sectionGrandsExplorateurs} alt="" />
         Le Panthéon
+        <span className={styles.periode}>30 derniers jours</span>
       </h2>
       <Classement
         classement={classement}
