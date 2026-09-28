@@ -124,14 +124,17 @@ s'affiche :
 
 | | Mobile (< 1024 px) | Desktop (≥ 1024 px) |
 |---|---|---|
-| Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | une barre verticale à gauche, comme la V1 : emblème, 4 onglets, « + » et cloche en bas (Uriel, 28/09) |
+| Navigation | barre basse, 4 onglets (Accueil, Carte, Messages, Compte) | une barre verticale à gauche, comme la V1 : « replier » en haut, emblème, Accueil, Messages, Compte (l'actif sur une tuile claire), « + » et cloche en bas (Uriel, 28/09) |
 | Carte | plein écran, un onglet parmi les autres | **toujours présente**, à droite (Uriel, 28/09) |
 | Accueil, Messages, Compte | plein écran | dans un **tiroir** entre la barre et la carte |
 | Détail (fiche, profil, Préférences) | plein écran, par-dessus, retour pour fermer | dans le tiroir, par-dessus l'écran de l'onglet ; retour pour fermer |
 
-Sur desktop, **l'onglet Carte ferme le tiroir** ; une **croix**, posée au bord de la carte, le
-ferme aussi (elle ramène à `/carte`). Les écrans restent montés : la carte n'est jamais recréée,
-et chaque onglet garde son état et son défilement.
+Sur desktop, **il n'y a pas d'onglet Carte** : la carte est toujours là. **Le tiroir ne se ferme
+jamais, il se replie** (comme la V1) : un bouton « / » en haut de la barre le masque sans
+changer d'adresse ; toucher un onglet, ou changer d'adresse (toucher un lieu), le déplie. Sur
+`/carte` (un lien reçu d'un téléphone), le tiroir est replié et « » » rouvre le dernier onglet du
+tiroir. Replier est un réglage de la vue, pas une adresse. Les écrans restent montés : la carte
+n'est jamais recréée, et chaque onglet garde son état et son défilement.
 
 L'URL est **identique** sur les deux : un lien envoyé depuis un téléphone s'ouvre au bon
 endroit sur un ordinateur. La mise en page change à la largeur, jamais au type d'appareil.

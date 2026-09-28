@@ -1,15 +1,18 @@
 /**
  * QUOI     — la coquille : logotype, « Ajouter » et la cloche, barre d'onglets, les quatre écrans
- *            racines, le détail, et sur desktop le tiroir et sa croix.
+ *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les quatre écrans restent MONTÉS : leur état et leur défilement survivent au
  *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
  *            visible. Sur desktop, la carte reste toujours là et l'onglet actif (ou un détail)
  *            s'ouvre dans un tiroir à côté (spec socle §4bis, Uriel 28/09). Le JavaScript dit
  *            ce qui est ouvert (`disposition`) ; le CSS place selon la largeur.
+ *            Le tiroir se replie sans jamais se fermer (comme la V1) : c'est un réglage de la
+ *            vue, pas une adresse. Replié sur une adresse, il se rouvre dès qu'on en change ou
+ *            qu'on touche un onglet.
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
@@ -17,7 +20,6 @@ import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
-import fermer from '@/assets/ui/fermer.svg'
 import embleme from '@/assets/ui/embleme.png'
 import logotype from '@/assets/ui/logotype.png'
 import { Text } from '@/shared/ui/Text'
@@ -39,6 +41,12 @@ export function Shell() {
   const navigate = useNavigate()
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille
+  // L'adresse sur laquelle on a replié le tiroir : ailleurs, il est déplié.
+  const [replieSur, setReplieSur] = useState<string | null>(null)
+  const tiroirVisible = tiroir && replieSur !== pathname
+  // Le dernier onglet ouvert dans le tiroir : « déplier » depuis la Carte y ramène.
+  const [dernierTiroir, setDernierTiroir] = useState<TabId>('accueil')
+  if (active !== null && active !== 'carte' && active !== dernierTiroir) setDernierTiroir(active)
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
   const boutonAjouter = useRef<HTMLButtonElement>(null)
   const overlayWasOpen = useRef(false)
@@ -61,7 +69,21 @@ export function Shell() {
   }
 
   return (
-    <div className={styles.shell} data-tiroir={tiroir ? 'open' : undefined}>
+    <div className={styles.shell} data-tiroir={tiroirVisible ? 'open' : undefined}>
+      {/* Desktop seulement (le CSS le cache sur mobile), comme la V1. */}
+      <button
+        type="button"
+        className={styles.replier}
+        aria-label={tiroirVisible ? 'Replier le panneau' : 'Déplier le panneau'}
+        aria-expanded={tiroirVisible}
+        onClick={() => {
+          if (tiroirVisible) setReplieSur(pathname)
+          else if (tiroir) setReplieSur(null)
+          else void navigate(`/${dernierTiroir}`)
+        }}
+      >
+        {tiroirVisible ? '«' : '»'}
+      </button>
       {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
       <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
       <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
@@ -116,18 +138,12 @@ export function Shell() {
         })}
       </main>
       <Outlet />
-      {/* Desktop seulement (le CSS la cache sur mobile) : ferme le tiroir, retour à la carte. */}
-      <button
-        type="button"
-        className={styles.fermer}
-        aria-label="Fermer le panneau"
-        onClick={() => {
-          void navigate('/carte')
+      <TabBar
+        onScrollTop={scrollTop}
+        onToucher={() => {
+          setReplieSur(null)
         }}
-      >
-        <img src={fermer} alt="" />
-      </button>
-      <TabBar onScrollTop={scrollTop} />
+      />
     </div>
   )
 }

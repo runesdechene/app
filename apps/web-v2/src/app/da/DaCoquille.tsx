@@ -21,7 +21,7 @@ export function DaCoquille() {
         <span className={styles.avatar} />
       </div>
       <EmptyState>Le Campement est à venir</EmptyState>
-      <TabBar onScrollTop={ignore} />
+      <TabBar onScrollTop={ignore} onToucher={ignore} />
     </div>
   )
 }

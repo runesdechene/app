@@ -1,6 +1,7 @@
 /*
  * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
- *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche.
+ *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche, sans
+ *            l'onglet Carte (la carte y est toujours là), l'actif sur une tuile claire (V1).
  * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
  *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
  *            (pas cinq colonnes égales, qui rognaient « Campement ») ; toutes les icônes à la
@@ -66,5 +67,21 @@
 
   .bar::before {
     display: none;
+  }
+
+  .tab {
+    width: calc(var(--barre-laterale) - var(--space-4));
+    padding: var(--space-2) var(--space-1);
+    border-radius: var(--radius-carte);
+  }
+
+  .tab[data-onglet='carte'] {
+    display: none;
+  }
+
+  /* L'onglet actif, comme dans la V1 : une tuile claire arrondie, légèrement posée. */
+  .tab[aria-current='page'] {
+    background: var(--color-sur-accent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-ombre) 15%, transparent);
   }
 }

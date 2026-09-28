@@ -24,7 +24,13 @@ const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
   messages: messagesIcon,
 }
 
-export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
+export function TabBar({
+  onScrollTop,
+  onToucher,
+}: {
+  onScrollTop: (tab: TabId) => void
+  onToucher: () => void
+}) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const memory = useTabMemory()
@@ -32,6 +38,7 @@ export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
   const { profil } = useExplorateur(useMonIdentifiant())
 
   function press(pressed: TabId) {
+    onToucher()
     const action = resolveTabPress({ active, pressed, pathname, memory })
     if (action.kind === 'navigate') void navigate(action.to)
     else onScrollTop(pressed)
@@ -44,6 +51,7 @@ export function TabBar({ onScrollTop }: { onScrollTop: (tab: TabId) => void }) {
           key={tab.id}
           type="button"
           className={styles.tab}
+          data-onglet={tab.id}
           aria-current={tab.id === active ? 'page' : undefined}
           onClick={() => {
             press(tab.id)

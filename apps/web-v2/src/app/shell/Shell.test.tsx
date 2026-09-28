@@ -96,8 +96,32 @@ test('sur l’Accueil, la carte reste montée derrière le tiroir (desktop)', as
   expect(document.querySelector('[data-ecran="messages"]')).toHaveAttribute('hidden')
 })
 
-test('la croix du tiroir ramène à la carte', async () => {
+function coquille() {
+  const element = document.querySelector('main')?.parentElement
+  if (!element) throw new Error('pas de coquille')
+  return element
+}
+
+test('replier le panneau le masque sans changer d’adresse, et on peut le déplier', async () => {
   const router = renderAt('/compte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Fermer le panneau' }))
-  expect(router.state.location.pathname).toBe('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Replier le panneau' }))
+  expect(router.state.location.pathname).toBe('/compte')
+  expect(coquille()).not.toHaveAttribute('data-tiroir')
+  await userEvent.click(screen.getByRole('button', { name: 'Déplier le panneau' }))
+  expect(coquille()).toHaveAttribute('data-tiroir', 'open')
+})
+
+test('toucher un onglet déplie le panneau, même l’onglet déjà ouvert', async () => {
+  renderAt('/compte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Replier le panneau' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Compte' }))
+  expect(coquille()).toHaveAttribute('data-tiroir', 'open')
+})
+
+test('sur la Carte, déplier rouvre le dernier onglet du tiroir', async () => {
+  const router = renderAt('/messages')
+  await userEvent.click(await screen.findByRole('button', { name: 'Carte' }))
+  expect(coquille()).not.toHaveAttribute('data-tiroir')
+  await userEvent.click(screen.getByRole('button', { name: 'Déplier le panneau' }))
+  expect(router.state.location.pathname).toBe('/messages')
 })

@@ -89,8 +89,8 @@
   display: none;
 }
 
-/* La croix du tiroir n'existe que sur desktop. */
-.fermer {
+/* Le bouton qui replie le tiroir n'existe que sur desktop. */
+.replier {
   display: none;
 }
 
@@ -109,8 +109,9 @@
      est toujours là ; le reste s'ouvre dans un tiroir entre la barre et elle. */
   .shell {
     grid-template-columns: var(--barre-laterale) 1fr;
-    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-rows: auto auto auto 1fr auto auto;
     grid-template-areas:
+      'replier main'
       'logo main'
       'nav main'
       '. main'
@@ -121,11 +122,29 @@
   .shell[data-tiroir='open'] {
     grid-template-columns: var(--barre-laterale) var(--tiroir) 1fr;
     grid-template-areas:
+      'replier tiroir main'
       'logo tiroir main'
       'nav tiroir main'
       '. tiroir main'
       'actions tiroir main'
       'retour tiroir main';
+  }
+
+  /* « / » en haut de la barre, comme la V1 : replie le tiroir sans jamais le fermer. */
+  .replier {
+    grid-area: replier;
+    justify-self: center;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-top: var(--space-3);
+    border: 1px solid var(--color-bord);
+    border-radius: var(--radius-petit);
+    background: var(--color-sur-accent);
+    color: var(--color-encre);
+    font-size: var(--corps-size);
+    line-height: 1;
   }
 
   /* Le fond de la barre : une case de la grille sur toute la hauteur, sous ses boutons. */
@@ -166,24 +185,10 @@
     border-right: 1px solid var(--color-sable);
   }
 
-  /* La croix, au bord de la carte, sous sa barre de recherche : elle ne masque rien du tiroir. */
-  .shell[data-tiroir='open'] .fermer {
-    z-index: 2;
-    grid-area: main;
-    place-self: start;
-    display: grid;
-    place-items: center;
-    width: var(--cible-tactile);
-    height: var(--cible-tactile);
-    margin: calc(var(--cible-tactile) + var(--space-3) * 2) 0 0 var(--space-3);
-    border: 1px solid var(--color-bord);
-    border-radius: var(--radius-rond);
-    background: var(--color-sur-accent);
-  }
-
-  .fermer img {
-    width: 20px;
-    height: 20px;
+  /* Tout l'écran du tiroir reste monté quand on le replie : le CSS le cache seulement. */
+  .shell:not([data-tiroir]) > aside,
+  .shell:not([data-tiroir]) .screen:not([data-ecran='carte']) {
+    display: none;
   }
 
   .logo {
@@ -197,7 +202,7 @@
     display: block;
     width: 44px;
     height: 44px;
-    margin: var(--space-4) 0 var(--space-6);
+    margin: var(--space-3) 0 var(--space-6);
   }
 
   .actions {
