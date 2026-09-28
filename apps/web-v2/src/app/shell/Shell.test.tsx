@@ -125,3 +125,19 @@ test('sur la Carte, déplier rouvre le dernier onglet du tiroir', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Déplier le panneau' }))
   expect(router.state.location.pathname).toBe('/messages')
 })
+
+function curseur() {
+  return screen
+    .getByRole('navigation', { name: 'Navigation principale' })
+    .querySelector('[style*="--rang"]')
+}
+
+test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Carte exclue)', async () => {
+  renderAt('/messages')
+  await screen.findByRole('button', { name: 'Messages' })
+  expect(curseur()?.getAttribute('style')).toContain('--rang: 1')
+  await userEvent.click(screen.getByRole('button', { name: 'Compte' }))
+  expect(curseur()?.getAttribute('style')).toContain('--rang: 2')
+  await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
+  expect(curseur()).toBeNull()
+})

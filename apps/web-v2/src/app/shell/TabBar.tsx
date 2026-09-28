@@ -2,6 +2,8 @@
  * QUOI     — la barre des quatre onglets : icône gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
+ *            Sur PC, un fond clair glisse jusqu'à l'onglet actif : un seul élément, le curseur,
+ *            déplacé en CSS selon son rang (`--rang`), comme la brique Segments.
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
  *            (mémoire, double toucher). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
@@ -17,6 +19,10 @@ import { Text } from '@/shared/ui/Text'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
 import styles from './TabBar.module.css'
+
+// Sur PC, la barre n'a pas d'onglet Carte (la carte y est toujours là) : le curseur se range
+// parmi les trois autres, et disparaît quand la Carte est active.
+const ONGLETS_PC = TABS.filter((tab) => tab.id !== 'carte')
 
 const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
   accueil: accueilIcon,
@@ -36,6 +42,7 @@ export function TabBar({
   const memory = useTabMemory()
   const active = tabOf(pathname)
   const { profil } = useExplorateur(useMonIdentifiant())
+  const rang = ONGLETS_PC.findIndex((tab) => tab.id === active)
 
   function press(pressed: TabId) {
     onToucher()
@@ -46,6 +53,9 @@ export function TabBar({
 
   return (
     <nav className={styles.bar} aria-label="Navigation principale">
+      {rang >= 0 && (
+        <span className={styles.curseur} style={{ '--rang': String(rang) }} aria-hidden="true" />
+      )}
       {TABS.map((tab) => (
         <button
           key={tab.id}

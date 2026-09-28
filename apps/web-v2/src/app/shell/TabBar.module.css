@@ -1,8 +1,8 @@
 /*
  * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
  *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche, sans
- *            l'onglet Carte (la carte y est toujours là) ; l'actif devient un sceau d'encre,
- *            icône et libellé crème — le geste du lieu visité sur la carte (Uriel, 28/09).
+ *            l'onglet Carte (la carte y est toujours là) ; un fond clair glisse jusqu'à l'actif,
+ *            avec l'élan du curseur des Segments (Uriel, 28/09).
  * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
  *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
  *            (pas cinq colonnes égales, qui rognaient « Campement ») ; toutes les icônes à la
@@ -47,6 +47,17 @@
   height: 24px;
   background: var(--color-encre);
   mask: var(--icone) center / contain no-repeat;
+  opacity: 0.7;
+  transition: opacity 0.25s;
+}
+
+.tab[aria-current='page'] .icon {
+  opacity: 1;
+}
+
+/* Le curseur n'existe que sur PC. */
+.curseur {
+  display: none;
 }
 
 .avatar {
@@ -58,10 +69,11 @@
 
 @container app (width >= 1024px) {
   .bar {
+    position: relative;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-2);
     padding: 0;
     background: none;
   }
@@ -71,26 +83,36 @@
   }
 
   .tab {
+    position: relative; /* au-dessus du curseur */
     width: calc(var(--barre-laterale) - var(--space-4));
-    padding: var(--space-2) var(--space-1);
-    border-radius: var(--radius-petit);
+    height: var(--onglet-pc);
+    align-content: center;
+    padding: 0 var(--space-1);
   }
 
   .tab[data-onglet='carte'] {
     display: none;
   }
 
-  /* L'onglet actif : un sceau d'encre plein, plat. */
-  .tab[aria-current='page'] {
-    background: var(--color-encre);
-  }
-
-  .tab[aria-current='page'] .icon {
+  /* Le fond clair de l'onglet actif, qui glisse d'un onglet à l'autre. Le décalage s'écrit en
+     deux termes : Chrome perd l'écart dans « rang × (100 % + écart) » (.claude/rules). */
+  .curseur {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: block;
+    width: calc(var(--barre-laterale) - var(--space-4));
+    height: var(--onglet-pc);
+    border-radius: var(--radius-petit);
     background: var(--color-sur-accent);
+    translate: -50% calc(var(--rang) * 100% + var(--rang) * var(--space-2));
+    transition: translate 0.38s cubic-bezier(0.34, 1.4, 0.55, 1);
   }
+}
 
-  /* Le libellé (la brique Text, dernier enfant) passe en crème. */
-  .tab[aria-current='page'] > :last-child {
-    color: var(--color-sur-accent);
+@media (prefers-reduced-motion: reduce) {
+  .icon,
+  .curseur {
+    transition: none;
   }
 }
