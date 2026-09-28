@@ -73,3 +73,12 @@ test('une bannière dont le lien n’est pas http(s) ne s’affiche pas', () => 
   const piege = { imageUrl: 'b.jpg', title: 'Piège', linkUrl: 'javascript:alert(1)' }
   expect(lireBanniere(piege)).toBeNull()
 })
+
+test('le lieu d’une ligne porte son type (icône, couleur) ; sans type, rien', () => {
+  const [avecType, sansType] = lireChemins([
+    { ...CHEMIN, lieu: { ...CHEMIN.lieu, type: { icone: 't.svg', couleur: '#80974e' } } },
+    { ...CHEMIN, id: 'visite:l2:u1', lieu: { ...CHEMIN.lieu, type: null } },
+  ])
+  expect(avecType?.lieu?.type).toEqual({ icone: 't.svg', couleur: '#80974e' })
+  expect(sansType?.lieu?.type).toBeNull()
+})

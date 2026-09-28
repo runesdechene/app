@@ -66,7 +66,20 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
   const prochain = useRef(0)
   return (
     <li className={styles.ligne}>
-      <img className={styles.type} src={ICONES[chemin.type]} alt="" />
+      {chemin.type === 'ajout' && lieu?.type ? (
+        // Un lieu ajouté : l'icône de son type, dans sa couleur (comme le badge de la fiche).
+        <span
+          className={styles.typeDeLieu}
+          data-type-de-lieu
+          aria-hidden="true"
+          style={{
+            '--icone': `url(${lieu.type.icone})`,
+            ...(lieu.type.couleur ? { '--type': lieu.type.couleur } : {}),
+          }}
+        />
+      ) : (
+        <img className={styles.type} src={ICONES[chemin.type]} alt="" />
+      )}
       <Avatar url={qui.avatar} nom={qui.nom} taille="mini" />
       <p className={styles.texte}>
         <Link className={styles.qui} to={`/accueil/explorateur/${qui.id}`} state={VENU_D_UN_ECRAN}>

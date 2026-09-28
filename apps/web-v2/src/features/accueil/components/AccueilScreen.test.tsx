@@ -158,3 +158,25 @@ test('on salue à volonté : chaque toucher envoie un cœur, et en fait s’envo
   expect(api.saluer).toHaveBeenCalledTimes(3)
   expect(saluer.querySelectorAll('[data-envol]')).toHaveLength(3)
 })
+
+test('un lieu ajouté porte l’icône de son type, dans sa couleur', async () => {
+  api.fetchChemins.mockResolvedValue([
+    {
+      ...VISITE,
+      id: 'ajout:l3',
+      type: 'ajout',
+      lieu: {
+        id: 'l3',
+        nom: 'Menhir de Kerloas',
+        region: 'Finistère',
+        type: { icone: 'menhir.svg', couleur: '#80974e' },
+      },
+    },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const icone = fil.querySelector<HTMLElement>('[data-type-de-lieu]')
+  if (!icone) throw new Error('icône du type absente')
+  expect(icone.style.getPropertyValue('--icone')).toBe('url(menhir.svg)')
+  expect(icone.style.getPropertyValue('--type')).toBe('#80974e')
+})

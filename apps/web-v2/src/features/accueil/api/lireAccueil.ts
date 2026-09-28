@@ -24,7 +24,12 @@ export type Chemin = {
   type: TypeDeChemin
   quand: string
   qui: { id: string; nom: string; avatar: string | null }
-  lieu: { id: string; nom: string; region: string | null } | null
+  lieu: {
+    id: string
+    nom: string
+    region: string | null
+    type: { icone: string; couleur: string | null } | null // mig 375
+  } | null
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -38,9 +43,23 @@ function typeDeChemin(v: unknown): TypeDeChemin {
   return t
 }
 
-// Une couleur réglée dans le Hub part dans un style : seul un hex passe, sinon la couleur par défaut.
+// Une couleur qui part dans un style : un hex, rien d'autre.
+const HEX = /^#[0-9a-f]{6}$/i
+
+// Le type du lieu d'une ligne (mig 375) : son icône, et sa couleur si c'est bien un hex.
+function lireTypeDeLieu(v: unknown): { icone: string; couleur: string | null } | null {
+  if (v === null || v === undefined) return null
+  const t = objet(v)
+  const couleur = ouNull(chaine)(t.couleur)
+  return {
+    icone: chaine(t.icone),
+    couleur: couleur && HEX.test(couleur) ? couleur : null,
+  }
+}
+
+// Une couleur réglée dans le Hub : un hex, sinon la couleur par défaut.
 function hex(v: unknown, parDefaut: string): string {
-  return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : parDefaut
+  return typeof v === 'string' && HEX.test(v) ? v : parDefaut
 }
 
 // Le lien part dans un href : seul http(s) passe (un « javascript: » s'exécuterait au clic).
@@ -96,7 +115,12 @@ function lireChemin(v: unknown): Chemin {
     qui: { id: chaine(qui.id), nom: chaine(qui.nom), avatar: ouNull(chaine)(qui.avatar) },
     lieu: ouNull((l) => {
       const lieu = objet(l)
-      return { id: chaine(lieu.id), nom: chaine(lieu.nom), region: ouNull(chaine)(lieu.region) }
+      return {
+        id: chaine(lieu.id),
+        nom: chaine(lieu.nom),
+        region: ouNull(chaine)(lieu.region),
+        type: lireTypeDeLieu(lieu.type),
+      }
     })(c.lieu),
     moi: booleen(c.moi),
     saluts: nombre(c.saluts),
