@@ -10,6 +10,8 @@ export async function replierDetail(): Promise<void> {
   if (!detail || typeof detail.animate !== 'function') return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+  // Il s'en va : l'écran de dessous rallume son ombre dès maintenant (Shell.module.css).
+  detail.dataset.sortant = ''
   const style = getComputedStyle(detail)
   const duree = parseFloat(style.getPropertyValue('--duree-douce')) * 1000 || 320
   const courbe = style.getPropertyValue('--courbe-douce').trim() || 'ease'

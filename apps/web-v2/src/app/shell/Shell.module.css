@@ -202,14 +202,15 @@
 
   /* Une seule ombre à la fois : celle du dessus. Sous un détail, l'écran de l'onglet reste en
      place (on le retrouve à la fermeture) mais éteint la sienne — deux ombres superposées
-     faisaient une tache trop forte (Uriel, 28/09). */
+     faisaient une tache trop forte (Uriel, 28/09). Dès que le détail commence à partir
+     (`data-sortant`, posé par replierDetail), l'ombre revient en même temps qu'il glisse. */
   .screen {
     transition:
       translate var(--duree-douce) var(--courbe-douce),
       box-shadow var(--duree-douce) var(--courbe-douce);
   }
 
-  .shell:has(> aside) .screen {
+  .shell:has(> aside:not([data-sortant])) .screen {
     box-shadow: none;
   }
 
