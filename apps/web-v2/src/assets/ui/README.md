@@ -23,6 +23,10 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 | `sceau-defaut.svg`     | 24 × 24         | Carte : l'icône d'un lieu sans type (ou dont l'icône ne charge pas), un losange |
 | `replier.svg`          | 24 × 24         | desktop : replier le tiroir (pochoir, retourné en CSS pour déplier) |
 | `embleme.png`          | 176 × 176       | desktop : l'emblème seul en haut de la barre verticale (découpé du logotype, 4× sa taille d'affichage) |
+| `fleche-retour-claire.svg`, `partager-clair.svg` | 24, 35 × 39 | Fiche d'un lieu : sur la photo (Figma 229:132, 229:136) |
+| `signet.svg`, `signet-plein.svg`, `options.svg` | 20 × 20 | Fiche : « Envie d'y aller » (vide / cochée) et « Options du lieu » (229:153, 229:149) |
+| `epingle.svg`, `pas.svg`, `drapeau.svg` | 20 × 20 | Fiche : adresse, Explorateurs, revendication — le même trait (229:159, 234:128, 234:132) |
+| `etoiles.svg`           | 15 × 14         | Fiche : entre l'auteur et la date (229:179) |
 | `rose-des-vents.svg`   | 74 × 74         | Carte, en bas à gauche (maquette 186:170, exportée d'un bloc) |
 | `fleuron.svg`          | 70 × 14         | Carte, de part et d'autre du nom du territoire ; le second est retourné en CSS (200:193) |
 | `position.svg`         | 22 × 22         | Carte, le bouton « Ma position » (162:130) |

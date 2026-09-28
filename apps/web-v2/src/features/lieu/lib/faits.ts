@@ -5,14 +5,34 @@
  */
 import type { FicheLieu } from '../api/lireLieu'
 
-const ACCES: Record<string, string> = { easy: 'accès facile', medium: 'accès moyen', hard: 'accès difficile' }
+const ACCES: Record<string, string> = {
+  easy: 'accès facile',
+  medium: 'accès moyen',
+  hard: 'accès difficile',
+}
 const SAISONS: Record<string, string> = {
-  spring: 'idéal au printemps', summer: 'idéal en été', autumn: 'idéal en automne', winter: 'idéal en hiver',
+  spring: 'idéal au printemps',
+  summer: 'idéal en été',
+  autumn: 'idéal en automne',
+  winter: 'idéal en hiver',
 }
 
 function romain(n: number): string {
-  const table: [number, string][] = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'],
-    [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]
+  const table: [number, string][] = [
+    [1000, 'M'],
+    [900, 'CM'],
+    [500, 'D'],
+    [400, 'CD'],
+    [100, 'C'],
+    [90, 'XC'],
+    [50, 'L'],
+    [40, 'XL'],
+    [10, 'X'],
+    [9, 'IX'],
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ]
   let reste = n
   return table.reduce((acc, [valeur, lettres]) => {
     const fois = Math.floor(reste / valeur)

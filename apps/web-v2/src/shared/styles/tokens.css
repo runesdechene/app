@@ -55,6 +55,22 @@
   --color-carte-foret: #b9b58a;
   --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
 
+  /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */
+  --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */
+  --color-fiche-ligne: #786666; /* adresse, Explorateurs, revendication, faits */
+  --color-fiche-aide: #b39b9b; /* « Toucher l'adresse… », « depuis le… » */
+  --color-fiche-recit: #806262;
+  --color-fiche-badge: #9b3f39; /* un type sans couleur */
+  --color-fiche-badge-texte: #ffe2e0;
+  --color-fiche-credit: #bc7f3b; /* « Luna », la date */
+  --color-fiche-credit-texte: #524d4d;
+  --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */
+  --color-fiche-rond: #fbebd3; /* fond des boutons ronds, à 51 % */
+  --color-fiche-vignette: #937558; /* le cadre de la vignette choisie */
+  --color-accent-bord: #c96a6a; /* le filet du bouton rouge */
+  --color-pilule: #f6ead0; /* la pilule de revendication */
+  --color-pilule-texte: #5a4331;
+
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;
   --font-corps: 'Cabin', sans-serif;
@@ -81,6 +97,8 @@
   --bio-leading: 1.29;
   --inscription-size: 1.875rem; /* le nom du territoire sur la carte : 30 px (maquette 200:192) */
   --inscription-tracking: 0.02em;
+  --pilule-size: 0.6875rem; /* le nom sur une pilule de revendication : 11 px (Figma 229:188) */
+  --pilule-tracking: 0.08em;
 
   /* Styles de texte — Cabin */
   --corps-size: 1rem;

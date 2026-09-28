@@ -40,6 +40,20 @@ export const COLOR_TOKENS = [
   '--color-carte-halo',
   '--color-carte-foret',
   '--color-carte-ombre',
+  '--color-fiche-titre',
+  '--color-fiche-ligne',
+  '--color-fiche-aide',
+  '--color-fiche-recit',
+  '--color-fiche-badge',
+  '--color-fiche-badge-texte',
+  '--color-fiche-credit',
+  '--color-fiche-credit-texte',
+  '--color-fiche-credit-pale',
+  '--color-fiche-rond',
+  '--color-fiche-vignette',
+  '--color-accent-bord',
+  '--color-pilule',
+  '--color-pilule-texte',
 ] as const
 
 export const DA_SHOWCASED = [

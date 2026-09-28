@@ -13,5 +13,6 @@ declare module 'react' {
     '--icone'?: string
     '--nombre'?: string
     '--rang'?: string
+    '--type'?: string // la couleur d'un type de lieu (le badge de la fiche)
   }
 }

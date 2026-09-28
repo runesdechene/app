@@ -70,3 +70,30 @@
 .body {
   min-height: 0;
 }
+
+/* Sur une image (la fiche d'un lieu) : l'en-tête flotte sur la photo, sans rien pousser. */
+.surImage {
+  grid-template-rows: 0 1fr;
+  padding-top: 0;
+}
+
+.surImage .header {
+  position: absolute;
+  inset: 0 0 auto;
+  pointer-events: none; /* seule la flèche se touche : le partage de la photo reste accessible */
+  padding-top: calc(env(safe-area-inset-top) + var(--space-2));
+}
+
+/* Le titre reste pour les lecteurs d'écran : la photo et le nom du lieu le disent à l'œil. */
+.masque {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.surImage .close {
+  pointer-events: auto;
+}

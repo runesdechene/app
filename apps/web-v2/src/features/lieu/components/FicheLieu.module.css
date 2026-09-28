@@ -1,0 +1,329 @@
+/*
+ * QUOI     — la fiche d'un lieu (maquette 229:128) : la photo et son bord déchiré, puis le
+ *            parchemin — Bebas pour le nom et « Le récit », Cabin Condensed pour les lignes.
+ * ATTENTION — la couleur du type et son icône arrivent en variables inline (`--type`, `--icone`),
+ *            la seule forme de style inline autorisée.
+ */
+.fiche {
+  display: grid;
+}
+
+/* La photo pleine largeur, aux proportions de la maquette (390 × 571). */
+.photo {
+  position: relative;
+  aspect-ratio: 390 / 571;
+  overflow: hidden;
+  background: var(--color-sable);
+}
+
+/* Un voile en haut : la flèche et le partage se lisent sur n'importe quelle photo. */
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 39%;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-ombre) 49%, transparent),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Le bord déchiré : la même lisière que la barre d'onglets (Figma « 0101 »). */
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  aspect-ratio: 1920 / 74;
+  background: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+/* Sans photo : le parchemin et l'icône du type, en grand. */
+.sansPhoto {
+  position: absolute;
+  inset: 30%;
+  background: var(--color-fiche-ligne);
+  opacity: 0.35;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.partager {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.corps {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) 25px var(--space-8);
+}
+
+.galerie {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vignette {
+  width: 32px;
+  height: 33px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: var(--radius-petit);
+  background: none;
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.vignette[aria-pressed='true'] {
+  border-color: var(--color-fiche-vignette);
+}
+
+.vignette img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nom {
+  flex: 1;
+  margin: 0;
+  color: var(--color-fiche-titre);
+  font-family: var(--font-titre);
+  font-size: var(--nom-profil-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.rond {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 35px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-ombre) 22%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-fiche-rond) 51%, transparent);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.rond:active {
+  scale: 0.92;
+}
+
+.rond img {
+  width: 20px;
+  height: 20px;
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.badge {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-3) 0 var(--space-1);
+  min-height: 26px;
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-fiche-badge-texte);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.badgeIcone {
+  width: 20px;
+  height: 20px;
+  background: var(--color-fiche-badge-texte);
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.faits {
+  margin: 0;
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+}
+
+/* Une ligne : l'icône au trait (20 px) dans une colonne de 32 px, puis le texte (maquette). */
+.ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  text-decoration: none;
+}
+
+.icone {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 var(--space-1) 0 2px;
+}
+
+.aide {
+  display: block;
+  color: var(--color-fiche-aide);
+  font-size: var(--micro-size);
+}
+
+.avatars {
+  display: flex;
+}
+
+.avatars > * + * {
+  margin-left: -6px;
+}
+
+.pilule,
+.piluleMoi {
+  padding: 2px var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--color-carte-encre) 45%, transparent);
+  border-radius: var(--radius-rond);
+  background: var(--color-pilule);
+  color: var(--color-pilule-texte);
+  font-size: var(--pilule-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--pilule-tracking);
+  text-transform: uppercase;
+}
+
+.piluleMoi {
+  border-color: var(--color-carte-encre);
+  background: var(--color-carte-encre);
+  color: var(--color-pilule);
+}
+
+.depuis {
+  color: var(--color-fiche-aide);
+}
+
+.visite {
+  margin: var(--space-2) 0;
+}
+
+.recit {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.rubrique {
+  margin: 0;
+  color: var(--color-fiche-titre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-fiche-recit);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  text-align: justify;
+  white-space: pre-line;
+}
+
+.credits {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.credit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-fiche-credit-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.nomCredit,
+.date {
+  color: var(--color-fiche-credit);
+}
+
+.etoiles {
+  width: 15px;
+  height: 14px;
+  margin: 0 var(--space-1);
+  vertical-align: middle;
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+}
+
+/* Pendant le chargement : la place de la photo, qui respire doucement. */
+.chargement {
+  aspect-ratio: 390 / 571;
+  background: var(--color-sable);
+  animation: respirer 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes respirer {
+  to {
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image,
+  .chargement {
+    animation: none;
+  }
+
+  .vignette,
+  .rond {
+    transition: none;
+  }
+}

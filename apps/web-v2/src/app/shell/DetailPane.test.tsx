@@ -5,10 +5,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createMemoryRouter, RouterProvider } from 'react-router'
+import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
 import type { ExplorateurProfile } from '@/features/compte/api/lireProfil'
 import { routes } from '../router'
+import { DetailPane } from './DetailPane'
 
 vi.mock('../access/useV2Access', () => ({
   useV2Access: () => ({
@@ -140,4 +141,18 @@ test('Préférences s’ouvre depuis l’onglet Compte, et fermer y ramène', as
   expect(await screen.findByRole('heading', { name: 'Préférences' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   expect(router.state.location.pathname).toBe('/compte')
+})
+
+test('sur une image (la fiche d’un lieu) : la flèche est posée sur la photo, le titre reste pour les lecteurs d’écran', () => {
+  render(
+    <MemoryRouter>
+      <DetailPane title="Château de Jonjeac" surImage>
+        <p>contenu</p>
+      </DetailPane>
+    </MemoryRouter>,
+  )
+  expect(screen.getByRole('button', { name: 'Fermer' })).toBeInTheDocument()
+  const titre = screen.getByRole('heading', { name: 'Château de Jonjeac' })
+  expect(titre.className).toMatch(/masque/)
+  expect(screen.getByRole('complementary').className).toMatch(/surImage/)
 })

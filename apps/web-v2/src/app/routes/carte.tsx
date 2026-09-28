@@ -1,9 +1,9 @@
 /**
  * QUOI     — les adresses de la zone Carte et de l'en-tête, branchées sur la coquille : la feuille
- *            « Ajouter », les notifications, la fiche d'un lieu.
+ *            « Ajouter » et les notifications.
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que ses écrans
  *            reçoivent le cadre de détail et la fonction de fermeture.
- * ATTENTION — les notifications et la fiche d'un lieu arrivent avec le plan 2 de la Carte.
+ * ATTENTION — les notifications arrivent plus tard ; la fiche d'un lieu vit dans lieu.tsx.
  */
 import { AjouterFeuille } from '@/features/carte/components/AjouterFeuille'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -20,15 +20,6 @@ export function RouteNotifications() {
   return (
     <DetailPane title="Notifications">
       <EmptyState>Rien de nouveau</EmptyState>
-    </DetailPane>
-  )
-}
-
-// /carte/lieu/<id>
-export function RouteLieu() {
-  return (
-    <DetailPane title="Lieu">
-      <EmptyState>La fiche du lieu arrive bientôt</EmptyState>
     </DetailPane>
   )
 }

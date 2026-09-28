@@ -26,7 +26,8 @@ export function etatVisite(
   if (position === 'refusee') return { kind: 'refusee' }
   const metres = distanceM(position, lieu)
   const aPortee = metres <= PORTEE_M
-  if (visiteLe === null) return aPortee ? { kind: 'visiter' } : { kind: 'tropLoin', distance: libelleDistance(metres) }
+  if (visiteLe === null)
+    return aPortee ? { kind: 'visiter' } : { kind: 'tropLoin', distance: libelleDistance(metres) }
   if (aPortee) return { kind: 'revendiquer' }
   return { kind: 'visite', le: JOUR.format(new Date(visiteLe)), distance: libelleDistance(metres) }
 }

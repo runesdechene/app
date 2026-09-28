@@ -6,5 +6,6 @@ besoin du cadre de détail ou de la fermeture, un petit composant d'ici les lui 
 
 - `compte.tsx` — le profil (`/<onglet>/explorateur/<id>`), sa modification (`…/modifier`, le
   sien seulement) et les Préférences (`/<onglet>/preferences`).
-- `carte.tsx` — la feuille « Ajouter » (`/<onglet>/ajouter`), les notifications
-  (`/<onglet>/notifications`) et la fiche d'un lieu (`/carte/lieu/<id>`).
+- `carte.tsx` — la feuille « Ajouter » (`/<onglet>/ajouter`) et les notifications
+  (`/<onglet>/notifications`).
+- `lieu.tsx` — la fiche d'un lieu (`/<onglet>/lieu/<id>`), sa fenêtre et ses feuilles.
