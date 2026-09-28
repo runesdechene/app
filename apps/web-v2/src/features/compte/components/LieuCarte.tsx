@@ -6,11 +6,13 @@
  *            La distance ne s'affiche que si l'on connaît la position de celui qui regarde ;
  *            l'auteur se montre sur les lieux visités ou désirés, pas sur ceux qu'on a ajoutés.
  *            Toute la carte est un lien vers la fiche (Uriel, 28/09) ; un glissé du carrousel à
- *            la souris ne l'ouvre pas (useGlisser annule le clic).
+ *            la souris ne l'ouvre pas (useGlisser annule le clic). La fiche sait que le profil est
+ *            derrière elle : sur PC aussi, sa flèche y ramène.
  * ATTENTION — l'icône de catégorie est un pochoir (comme en V1), peint en crème, SANS rond de
  *            couleur : sur une photo, une couleur de catégorie peut jurer (Uriel, 27/09).
  */
 import { Link, useLocation } from 'react-router'
+import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Lieu } from '../api/lireProfil'
 import { distanceKm, formatDistance, type Point } from '../lib/distance'
@@ -35,7 +37,12 @@ export function LieuCarte({
 
   return (
     <li className={styles.carte}>
-      <Link className={styles.lien} to={`/${onglet}/lieu/${lieu.id}`} draggable={false}>
+      <Link
+        className={styles.lien}
+        to={`/${onglet}/lieu/${lieu.id}`}
+        state={VENU_D_UN_ECRAN}
+        draggable={false}
+      >
         {lieu.imageUrl && (
           <img
             className={styles.photo}
