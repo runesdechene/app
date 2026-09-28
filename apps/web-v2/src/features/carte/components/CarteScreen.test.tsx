@@ -168,3 +168,27 @@ test('le bouton Filtre ouvre la feuille « Seulement mes lieux »', async () => 
   await userEvent.click(screen.getByRole('switch', { name: 'Seulement mes lieux' }))
   expect(screen.getByRole('switch', { name: 'Seulement mes lieux' })).toBeChecked()
 })
+
+test('quand le tiroir s’ouvre, la carte vise le centre de sa partie visible', () => {
+  let signaler: (largeur: number) => void = () => {}
+  vi.stubGlobal(
+    'ResizeObserver',
+    class {
+      constructor(rappel: (entrees: { contentRect: { width: number } }[]) => void) {
+        signaler = (largeur) => {
+          rappel([{ contentRect: { width: largeur } }])
+        }
+      }
+      observe() {}
+      disconnect() {}
+    },
+  )
+  afficher()
+  charger()
+  act(() => {
+    signaler(420)
+  })
+  expect(carte().easeTo).toHaveBeenLastCalledWith(
+    expect.objectContaining({ padding: { left: 420, top: 0, right: 0, bottom: 0 } }),
+  )
+})

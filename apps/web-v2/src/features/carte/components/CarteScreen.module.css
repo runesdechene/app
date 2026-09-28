@@ -17,6 +17,16 @@
   inset: 0;
 }
 
+/* Invisible : sa largeur est la place du tiroir, que la carte observe pour se recentrer. */
+.placeDuTiroir {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--decalage-carte);
+  height: 0;
+  pointer-events: none;
+}
+
 .bandeau {
   position: absolute;
   top: var(--space-3);

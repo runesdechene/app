@@ -22,6 +22,7 @@ import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
 import { lireCouleurs } from '../lib/couleurs'
+import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
 import { styleParchemin } from '../lib/style'
@@ -38,6 +39,9 @@ type Vue = { lat: number; lng: number; zoom: number }
 
 export function CarteScreen() {
   const conteneur = useRef<HTMLDivElement>(null)
+  // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
+  // `--decalage-carte` (posée par la coquille ; 0 sur mobile ou tiroir replié).
+  const placeDuTiroir = useRef<HTMLDivElement>(null)
   const [carte, setCarte] = useState<Carte | null>(null)
   const [couleurs] = useState(() => lireCouleurs(document.documentElement))
   const { lieux, erreur, reessayer } = useCarteLieux()
@@ -94,6 +98,24 @@ export function CarteScreen() {
     }
   }, [couleurs, navigate])
 
+  // Quand le tiroir s'ouvre ou se replie, la carte vise le centre de sa partie visible : elle
+  // glisse au rythme du tiroir (MapLibre coupe l'animation si l'on a réduit les animations).
+  useEffect(() => {
+    const repere = placeDuTiroir.current
+    if (!carte || !repere) return
+    const observateur = new ResizeObserver(([entree]) => {
+      if (!entree) return
+      carte.easeTo({
+        padding: { left: entree.contentRect.width, top: 0, right: 0, bottom: 0 },
+        duration: dureeDouce(document.documentElement),
+      })
+    })
+    observateur.observe(repere)
+    return () => {
+      observateur.disconnect()
+    }
+  }, [carte])
+
   // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
   // `actif` passe à faux dès qu'un nouveau dessin part, ou que l'écran se ferme.
   useEffect(() => {
@@ -140,6 +162,7 @@ export function CarteScreen() {
   return (
     <div className={styles.ecran}>
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
+      <div ref={placeDuTiroir} className={styles.placeDuTiroir} aria-hidden="true" />
       {(erreur || marquesEnPanne) && (
         <div role="alert" className={styles.bandeau}>
           <span>Les lieux n’ont pas pu être chargés</span>
