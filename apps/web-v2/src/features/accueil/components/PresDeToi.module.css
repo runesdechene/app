@@ -1,0 +1,125 @@
+/*
+ * QUOI     — « Près de toi » : la rubrique (pictogramme, titre, filet), puis une liste compacte —
+ *            vignette 56 px, le nom, le type dans sa couleur, la distance à droite ; un filet entre
+ *            deux lieux. Plus discrète que la rangée de grandes cartes des Ajoutés, juste au-dessus.
+ */
+.presDeToi {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.rubrique {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.rubrique::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--color-sable);
+}
+
+.icone {
+  width: 18px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+}
+
+.lieux {
+  display: grid;
+  margin: 0;
+  padding: 0 var(--space-6);
+  list-style: none;
+}
+
+.lieux li + li {
+  border-top: 1px solid var(--color-sable);
+}
+
+.lieu {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  color: inherit;
+  text-decoration: none;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.lieu:active {
+  scale: 0.98;
+}
+
+.vignette {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
+  background: var(--color-sable);
+  object-fit: cover;
+}
+
+.texte {
+  display: grid;
+  gap: 2px;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  line-height: var(--dense-leading);
+}
+
+.type {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--type, var(--color-texte-doux));
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+/* L'icône du type : un pochoir, peint dans la couleur du type (comme le badge de la fiche). */
+.typeIcone {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.distance {
+  color: var(--color-texte);
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  white-space: nowrap;
+}
+
+.carte {
+  justify-self: start;
+  margin: 0 var(--space-6);
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lieu {
+    transition: none;
+  }
+}

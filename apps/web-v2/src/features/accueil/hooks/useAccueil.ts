@@ -1,10 +1,12 @@
 /**
- * QUOI     — les lectures de l'Accueil : la bannière de la boutique, les lieux ajoutés, le fil.
+ * QUOI     — les lectures de l'Accueil : la bannière de la boutique, les lieux ajoutés, les lieux
+ *            proches, le fil.
  * POURQUOI — chacune a sa clé, sous ['accueil'] : un bloc qui échoue n'emporte pas les autres,
  *            et une visite ou un ajout relit tout l'Accueil d'une seule invalidation.
  */
 import { useQuery } from '@tanstack/react-query'
-import { fetchAjoutes, fetchBanniere, fetchChemins } from '../api/accueil'
+import type { Point } from '@/shared/lib/distance'
+import { fetchAjoutes, fetchBanniere, fetchChemins, fetchPresDeMoi } from '../api/accueil'
 
 export const cheminsKey = ['accueil', 'chemins'] as const
 
@@ -20,6 +22,17 @@ export function useBanniere() {
 
 export function useAjoutes() {
   return useQuery({ queryKey: ['accueil', 'ajoutes'], queryFn: fetchAjoutes }).data ?? []
+}
+
+// Les lieux proches : seulement avec une position. Arrondie au centième de degré (environ 1 km),
+// pour ne pas relire la base à chaque pas ; une visite relit tout l'Accueil, le lieu disparaît.
+export function usePresDeMoi(ici: Point | null) {
+  const query = useQuery({
+    queryKey: ['accueil', 'pres', ici?.latitude.toFixed(2), ici?.longitude.toFixed(2)],
+    queryFn: () => (ici ? fetchPresDeMoi(ici) : []),
+    enabled: ici !== null,
+  })
+  return query.data ?? []
 }
 
 export function useChemins() {

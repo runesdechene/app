@@ -18,6 +18,15 @@ export type Banniere = {
   ombre: { couleur: string; force: number }
 }
 
+// Un lieu proche (« Près de toi », mig 376) : sa distance vient de la base, en mètres.
+export type LieuProche = {
+  id: string
+  nom: string
+  imageUrl: string | null
+  type: { nom: string; icone: string | null; couleur: string | null } | null
+  metres: number
+}
+
 export type TypeDeChemin = 'visite' | 'ajout' | 'arrivee'
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
@@ -129,6 +138,28 @@ function lireChemin(v: unknown): Chemin {
 }
 
 export const lireChemins = liste(lireChemin)
+
+function lireLieuProche(json: unknown): LieuProche {
+  const l = objet(json)
+  const type = ouNull((v) => {
+    const t = objet(v)
+    const couleur = ouNull(chaine)(t.couleur)
+    return {
+      nom: chaine(t.nom),
+      icone: ouNull(chaine)(t.icone),
+      couleur: couleur && HEX.test(couleur) ? couleur : null,
+    }
+  })(l.type)
+  return {
+    id: chaine(l.id),
+    nom: chaine(l.nom),
+    imageUrl: ouNull(chaine)(l.imageUrl),
+    type,
+    metres: nombre(l.metres),
+  }
+}
+
+export const lirePresDeMoi = liste(lireLieuProche)
 
 export function lireSalut(json: unknown) {
   const s = objet(json)

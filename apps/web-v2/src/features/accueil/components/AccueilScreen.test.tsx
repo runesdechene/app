@@ -12,10 +12,15 @@ import { AccueilScreen } from './AccueilScreen'
 const api = vi.hoisted(() => ({
   fetchBanniere: vi.fn(),
   fetchAjoutes: vi.fn(),
+  fetchPresDeMoi: vi.fn(),
   fetchChemins: vi.fn(),
   saluer: vi.fn(),
 }))
 vi.mock('../api/accueil', () => api)
+
+// La position du téléphone : accordée, sauf là où un test la refuse.
+const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
+vi.mock('@/shared/lib/position', () => position)
 
 const LUNA = { id: 'u2', nom: 'Luna', avatar: null }
 const VISITE = {
@@ -70,6 +75,16 @@ beforeEach(() => {
     },
   ])
   api.saluer.mockResolvedValue({ saluts: 3, salue: true })
+  position.positionSiAutorisee.mockResolvedValue({ latitude: 48.1, longitude: -1.6 })
+  api.fetchPresDeMoi.mockResolvedValue([
+    {
+      id: 'l7',
+      nom: 'Dolmen de la Roche-aux-Fées',
+      imageUrl: 'd.jpg',
+      type: { nom: 'Mégalithe', icone: 'm.svg', couleur: '#80974e' },
+      metres: 4200,
+    },
+  ])
 })
 
 function monter() {
@@ -179,4 +194,23 @@ test('un lieu ajouté porte l’icône de son type, dans sa couleur', async () =
   if (!icone) throw new Error('icône du type absente')
   expect(icone.style.getPropertyValue('--icone')).toBe('url(menhir.svg)')
   expect(icone.style.getPropertyValue('--type')).toBe('#80974e')
+})
+
+test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouvre sa fiche', async () => {
+  const router = monter()
+  const pres = await screen.findByRole('list', { name: 'Près de toi' })
+  expect(pres).toHaveTextContent('Dolmen de la Roche-aux-Fées')
+  expect(pres).toHaveTextContent('Mégalithe')
+  expect(pres).toHaveTextContent('4 km')
+  expect(api.fetchPresDeMoi).toHaveBeenCalledWith({ latitude: 48.1, longitude: -1.6 })
+  await userEvent.click(within(pres).getByRole('link', { name: /Dolmen/ }))
+  expect(router.state.location.pathname).toBe('/accueil/lieu/l7')
+})
+
+test('sans position partagée, pas de « Près de toi »', async () => {
+  position.positionSiAutorisee.mockResolvedValue(null)
+  monter()
+  await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(screen.queryByRole('list', { name: 'Près de toi' })).toBeNull()
+  expect(api.fetchPresDeMoi).not.toHaveBeenCalled()
 })

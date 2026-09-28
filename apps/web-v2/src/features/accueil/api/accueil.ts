@@ -4,7 +4,8 @@
  *            `auth.uid()` : on n'envoie jamais qui on est.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireAjoutes, lireBanniere, lireChemins, lireSalut } from './lireAccueil'
+import type { Point } from '@/shared/lib/distance'
+import { lireAjoutes, lireBanniere, lireChemins, lirePresDeMoi, lireSalut } from './lireAccueil'
 
 export async function fetchBanniere() {
   const { data, error } = await supabase.rpc('get_random_home_banner')
@@ -16,6 +17,16 @@ export async function fetchAjoutes() {
   const { data, error } = await supabase.rpc('accueil_ajoutes', { p_limite: 10 })
   if (error) throw error
   return lireAjoutes(data)
+}
+
+// La position part avec la question et n'est gardée nulle part (mig 376).
+export async function fetchPresDeMoi(ici: Point) {
+  const { data, error } = await supabase.rpc('pres_de_moi', {
+    p_latitude: ici.latitude,
+    p_longitude: ici.longitude,
+  })
+  if (error) throw error
+  return lirePresDeMoi(data)
 }
 
 export async function fetchChemins() {

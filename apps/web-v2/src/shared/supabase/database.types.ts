@@ -6708,6 +6708,10 @@ export type Database = {
         }
         Returns: Json
       }
+      pres_de_moi: {
+        Args: { p_latitude: number; p_longitude: number }
+        Returns: Json
+      }
       preview_action_cost: {
         Args: {
           p_action: string

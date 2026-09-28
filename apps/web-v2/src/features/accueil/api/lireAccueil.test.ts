@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireAjoutes, lireBanniere, lireChemins, lireSalut } from './lireAccueil'
+import { lireAjoutes, lireBanniere, lireChemins, lirePresDeMoi, lireSalut } from './lireAccueil'
 
 const CHEMIN = {
   id: 'visite:l1:u1',
@@ -81,4 +81,25 @@ test('le lieu d’une ligne porte son type (icône, couleur) ; sans type, rien',
   ])
   expect(avecType?.lieu?.type).toEqual({ icone: 't.svg', couleur: '#80974e' })
   expect(sansType?.lieu?.type).toBeNull()
+})
+
+test('un lieu proche se lit : photo, type, distance en mètres ; sans type, rien', () => {
+  const [avecType, sansType] = lirePresDeMoi([
+    {
+      id: 'l1',
+      nom: 'Dolmen de la Roche-aux-Fées',
+      imageUrl: 'd.jpg',
+      type: { nom: 'Mégalithe', icone: 'm.svg', couleur: '#80974e' },
+      metres: 4200,
+    },
+    { id: 'l2', nom: 'Chapelle', imageUrl: null, type: null, metres: 17000 },
+  ])
+  expect(avecType).toEqual({
+    id: 'l1',
+    nom: 'Dolmen de la Roche-aux-Fées',
+    imageUrl: 'd.jpg',
+    type: { nom: 'Mégalithe', icone: 'm.svg', couleur: '#80974e' },
+    metres: 4200,
+  })
+  expect(sansType?.type).toBeNull()
 })
