@@ -8,7 +8,7 @@
  * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton, et
  *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
@@ -22,8 +22,7 @@ const BOUTIQUE_URL = 'https://runesdechene.com/collections/all'
 export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
   const [ouvert, setOuvert] = useState<Fragment | null>(null)
   const { choisir, echec } = useChoisirSigne(profil.id)
-  const rangee = useRef<HTMLDivElement>(null)
-  useGlisser(rangee)
+  const glisser = useGlisser()
 
   if (profil.fragments.length === 0) return null
 
@@ -47,7 +46,7 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
       {/* Une seule ligne qui défile, comme en V1 : cadre flex > rangée flex: 1 qui défile >
           vignettes à largeur fixe (règle « carrousel » de .claude/rules/interface.md). */}
       <div className={styles.cadre}>
-        <div ref={rangee} className={styles.rangee}>
+        <div ref={glisser} className={styles.rangee}>
           {profil.fragments.map((f) =>
             profil.estMoi ? (
               <button

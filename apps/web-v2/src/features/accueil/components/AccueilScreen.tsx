@@ -6,7 +6,6 @@
  *            elle. Un bloc vide ne s'affiche pas. En tête, une bannière de la boutique a remplacé
  *            « Nouvelles de la marque » (Uriel, 28/09 : les annonces du Hub ne sont pas à jour).
  */
-import { useRef } from 'react'
 import sectionAjoutes from '@/assets/ui/section-ajoutes.svg'
 import { useGlisser } from '@/shared/hooks/useGlisser'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
@@ -29,8 +28,7 @@ export function AccueilScreen() {
 function Ajoutes() {
   const lieux = useAjoutes()
   const position = useMaPosition()
-  const rangee = useRef<HTMLUListElement>(null)
-  useGlisser(rangee)
+  const glisser = useGlisser()
   if (lieux.length === 0) return null
   return (
     <section className={styles.section} aria-label="Ajoutés récemment">
@@ -40,7 +38,7 @@ function Ajoutes() {
       </h2>
       {/* Carrousel : cadre flex > rangée flex: 1 qui défile (règle de interface.md). */}
       <div className={styles.cadre}>
-        <ul ref={rangee} className={styles.rangee}>
+        <ul ref={glisser} className={styles.rangee}>
           {lieux.map((l) => (
             <LieuCarte key={l.id} lieu={l} position={position} avecAuteur />
           ))}

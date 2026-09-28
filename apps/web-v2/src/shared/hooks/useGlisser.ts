@@ -3,17 +3,21 @@
  * POURQUOI — au doigt, une rangée `overflow-x: auto` défile déjà ; à la souris, non : sur PC on
  *            ne pouvait pas « tenir et scroller » (Uriel, 27/09). Seule la souris est prise en
  *            charge ici ; le tactile garde le défilement natif du navigateur.
- * ATTENTION — vit dans la zone Compte tant qu'aucune autre zone n'en a besoin (règle de
- *            shared/README.md). Un glissé de plus de 5 px annule le clic qui suit, pour qu'on n'ouvre pas une
+ * ATTENTION — le hook rend une ref à poser sur la rangée (`<ul ref={glisser}>`), pas un
+ *            useRef : React la rappelle quand la rangée apparaît. Une rangée qui n'existe
+ *            qu'après le chargement des données (les Ajoutés de l'Accueil) ne glissait pas, les
+ *            écouteurs ayant été posés sur rien au premier rendu (Uriel, 28/09).
+ *            Un glissé de plus de 5 px annule le clic qui suit, pour qu'on n'ouvre pas une
  *            carte en la lâchant. Un simple clic, lui, passe.
  */
-import { useEffect, type RefObject } from 'react'
+import { useEffect, useState } from 'react'
 
 const SEUIL_PX = 5
 
-export function useGlisser(ref: RefObject<HTMLElement | null>) {
+export function useGlisser(): (zone: HTMLElement | null) => void {
+  const [zone, setZone] = useState<HTMLElement | null>(null)
+
   useEffect(() => {
-    const zone = ref.current
     if (!zone) return
 
     let depart: { x: number; defilement: number } | null = null
@@ -55,5 +59,7 @@ export function useGlisser(ref: RefObject<HTMLElement | null>) {
       zone.removeEventListener('pointerleave', lache)
       zone.removeEventListener('click', clic, true)
     }
-  }, [ref])
+  }, [zone])
+
+  return setZone
 }
