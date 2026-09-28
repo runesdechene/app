@@ -1,7 +1,7 @@
 /**
  * QUOI     — « Les Grands Explorateurs » sur l'Accueil (maquette 275:128) : ceux qui ont le plus
- *            marché ce mois-ci, cinq lignes, ma place ; « Voir tout le classement » ouvre la page
- *            du classement dans l'Accueil.
+ *            marché ce mois-ci, trois lignes (Uriel, 29/09 : « bien assez »), ma place ; « Voir
+ *            tout le classement » ouvre la page du classement dans l'Accueil.
  * POURQUOI — l'Accueil reste simple (Uriel, 29/09 : les choix du classement le rendaient
  *            « bordélique ») : ici, un seul classement, celui du mois qui repart à zéro ; les
  *            autres vivent dans la page. Validé contre la spec V2 §5, qui excluait tout classement.
@@ -24,7 +24,7 @@ export function GrandsExplorateurs() {
         Les Grands Explorateurs
       </h2>
       <p className={styles.chapo}>Ceux qui ont le plus marché ce mois-ci</p>
-      <Classement classement={classement} type="visites" periode="mois" lignes={5} />
+      <Classement classement={classement} type="visites" periode="mois" lignes={3} />
       <Link className={styles.tout} to="/accueil/classement" state={VENU_D_UN_ECRAN}>
         Voir tout le classement
       </Link>

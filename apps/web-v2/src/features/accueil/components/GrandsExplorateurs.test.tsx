@@ -1,5 +1,5 @@
 /**
- * QUOI     — les Grands Explorateurs sur l'Accueil : les visites du mois, cinq lignes, ma place,
+ * QUOI     — les Grands Explorateurs sur l'Accueil : les visites du mois, trois lignes, ma place,
  *            et « Voir tout le classement » qui ouvre la page du classement dans l'Accueil.
  *            La page : le choix du classement et toute la liste.
  */
@@ -44,11 +44,11 @@ function monter(element: ReactNode) {
   return router
 }
 
-test('sur l’Accueil : les visites du mois, cinq premiers en chiffres romains', async () => {
+test('sur l’Accueil : les visites du mois, trois premiers en chiffres romains', async () => {
   monter(<GrandsExplorateurs />)
   const liste = await screen.findByRole('list', { name: 'Les Grands Explorateurs' })
   const lignes = within(liste).getAllByRole('listitem')
-  expect(lignes).toHaveLength(5)
+  expect(lignes).toHaveLength(3)
   expect(lignes[0]).toHaveTextContent('I')
   expect(lignes[0]).toHaveTextContent('Explorateur 1')
   expect(lignes[0]).toHaveTextContent('Chevalier errant · niveau 10')
