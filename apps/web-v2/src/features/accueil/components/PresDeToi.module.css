@@ -1,7 +1,8 @@
 /*
  * QUOI     — « Près de toi » : la rubrique (pictogramme, titre, filet), puis une liste compacte —
- *            vignette 56 px, le nom, le type et sa bille, la distance discrète à droite ; un filet entre
- *            deux lieux. Plus discrète que la rangée de grandes cartes des Ajoutés, juste au-dessus.
+ *            chaque lieu sur une carte d'un parchemin plus clair, arrondie : vignette 56 px, le nom,
+ *            le type et sa bille, la distance discrète à droite. Plus discrète que la rangée de
+ *            grandes cartes des Ajoutés, juste au-dessus.
  */
 .presDeToi {
   display: grid;
@@ -36,13 +37,10 @@
 
 .lieux {
   display: grid;
+  gap: var(--space-2);
   margin: 0;
   padding: 0 var(--space-6);
   list-style: none;
-}
-
-.lieux li + li {
-  border-top: 1px solid var(--color-sable);
 }
 
 .lieu {
@@ -50,7 +48,9 @@
   grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
   color: inherit;
   text-decoration: none;
   transition: scale var(--duree-elan) var(--courbe-elan);

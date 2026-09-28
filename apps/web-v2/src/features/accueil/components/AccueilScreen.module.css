@@ -1,6 +1,6 @@
 /*
- * QUOI     — l'Accueil (maquette 27:2) : des rubriques en Bebas 16 px précédées de leur pictogramme,
- *            la carte de la nouveauté (341 × 118, titre en bas à droite), la rangée des lieux.
+ * QUOI     — l'Accueil (maquette 27:2) : des rubriques en Bebas 16 px précédées de leur pictogramme
+ *            et prolongées d'un filet jusqu'au bord, la rangée des lieux ajoutés.
  */
 .accueil {
   display: grid;
@@ -26,6 +26,13 @@
   font-size: var(--rubrique-size);
   font-weight: var(--weight-normal);
   letter-spacing: var(--titre-tracking);
+}
+
+/* Le filet qui prolonge le titre jusqu'au bord, comme les autres rubriques. */
+.rubrique::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--color-sable);
 }
 
 .icone {
