@@ -8,6 +8,7 @@ import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire
 
 export type Personne = { id: string; nom: string; avatar: string | null }
 export type Compagnon = Personne & { distance: number }
+export type Coeurs = { total: number; miens: number; gens: (Personne & { nombre: number })[] }
 export type FicheLieu = {
   id: string
   slug: string | null // la page publique du lieu (/lieu/<slug>), quand elle existe
@@ -124,4 +125,15 @@ export function lireExplorateurs(json: unknown) {
 
 export function lireCompagnons(json: unknown): Compagnon[] {
   return liste((v) => ({ ...lirePersonne(v), distance: nombre(objet(v).distance) }))(json)
+}
+
+// Les cœurs d'un lieu (mig 384) ; null : le lieu n'est pas visible.
+export function lireCoeurs(json: unknown): Coeurs | null {
+  if (json === null) return null
+  const c = objet(json)
+  return {
+    total: nombre(c.total),
+    miens: nombre(c.miens),
+    gens: liste((v) => ({ ...lirePersonne(v), nombre: nombre(objet(v).nombre) }))(c.gens),
+  }
 }

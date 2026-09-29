@@ -1,7 +1,8 @@
 /**
  * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photo au bord déchiré,
  *            galerie, titre et ses deux boutons ronds, type, ligne de faits, adresse, Explorateurs,
- *            revendication, bouton de visite, récit, crédits.
+ *            revendication, bouton de visite, récit, crédits. Les cœurs (30/09) : la pastille à
+ *            droite de la galerie, « Féliciter » sous les crédits.
  * POURQUOI — spec fiche §2 : chaque ligne sans donnée disparaît, jamais une ligne vide ; la fiche
  *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
@@ -19,10 +20,13 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import type { FicheLieu as Fiche } from '../api/lireLieu'
+import { useCoeurs } from '../hooks/useCoeurs'
 import { useEnvie } from '../hooks/useEnvie'
 import { useFiche } from '../hooks/useFiche'
+import { useMoi } from '../hooks/useMoi'
 import { adresseCourte } from '../lib/adresse'
 import { ligneDeFaits } from '../lib/faits'
+import { CoeursDesAuteurs, PastilleCoeurs } from './CoeursLieu'
 import styles from './FicheLieu.module.css'
 
 const DEPUIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
@@ -38,15 +42,19 @@ export function FicheLieu({
   id,
   onOptions,
   onPartager,
+  onCoeurs,
   boutonVisite,
 }: {
   id: string
   onOptions: () => void
   onPartager: () => void
+  onCoeurs: () => void
   boutonVisite: (fiche: Fiche) => ReactNode
 }) {
   const { fiche, erreur, reessayer } = useFiche(id)
   const { basculer, echec } = useEnvie(id)
+  const { coeurs, aimer } = useCoeurs(id)
+  const moi = useMoi()
   const [grande, setGrande] = useState(0)
 
   if (erreur) {
@@ -64,6 +72,8 @@ export function FicheLieu({
 
   const photo = fiche.photos[grande] ?? fiche.photos[0]
   const faits = ligneDeFaits(fiche.faits)
+  // On ne s'envoie pas de cœurs sur son propre lieu (la base le refuse aussi).
+  const peutAimer = moi !== undefined && moi.id !== fiche.auteur?.id
   const itineraire = `https://www.google.com/maps/dir/?api=1&destination=${String(fiche.lat)},${String(fiche.lng)}`
 
   return (
@@ -87,24 +97,34 @@ export function FicheLieu({
       </div>
 
       <div className={styles.corps}>
-        {fiche.photos.length > 1 && (
-          <div className={styles.galerie}>
-            {fiche.photos.map((p, i) => (
-              <button
-                key={p.url}
-                type="button"
-                className={styles.vignette}
-                aria-label={`Photo ${String(i + 1)}`}
-                aria-pressed={i === grande}
-                onClick={() => {
-                  setGrande(i)
-                }}
-              >
-                <img src={p.vignette} alt="" />
-              </button>
-            ))}
-          </div>
-        )}
+        <div className={styles.haut}>
+          {fiche.photos.length > 1 && (
+            <div className={styles.galerie}>
+              {fiche.photos.map((p, i) => (
+                <button
+                  key={p.url}
+                  type="button"
+                  className={styles.vignette}
+                  aria-label={`Photo ${String(i + 1)}`}
+                  aria-pressed={i === grande}
+                  onClick={() => {
+                    setGrande(i)
+                  }}
+                >
+                  <img src={p.vignette} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
+          {coeurs && moi && (
+            <PastilleCoeurs
+              coeurs={coeurs}
+              peutAimer={peutAimer}
+              onAimer={aimer}
+              onVoir={onCoeurs}
+            />
+          )}
+        </div>
 
         <div className={styles.entete}>
           <h2 className={styles.nom}>{fiche.nom}</h2>
@@ -210,6 +230,15 @@ export function FicheLieu({
                 Enrichi par <strong>{fiche.enrichiPar.nom}</strong>
               </span>
             </p>
+          )}
+          {coeurs && moi && (
+            <CoeursDesAuteurs
+              coeurs={coeurs}
+              peutAimer={peutAimer}
+              onAimer={aimer}
+              onVoir={onCoeurs}
+              auteurs={[fiche.auteur?.nom, fiche.enrichiPar?.nom].filter((n) => n !== undefined)}
+            />
           )}
         </footer>
       </div>

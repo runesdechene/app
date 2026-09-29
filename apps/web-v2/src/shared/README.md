@@ -8,7 +8,8 @@
   regarde, seulement si déjà autorisée — jamais de demande (`position.ts`) ; « il y a 10 min »
   (`ilYA.ts`).
 - `hooks/` — la logique avec état partagée : `useMaPosition` (cette position, gardée dix
-  minutes), `useGlisser` (tenir et tirer une rangée à la souris).
+  minutes), `useGlisser` (tenir et tirer une rangée à la souris), `useEnvols` (les cœurs qui
+  s'envolent d'un bouton).
 - `ui/` — les briques d'interface génériques, dont `LieuCarte` (la grande carte photo d'un lieu,
   du profil et de l'Accueil).
 - `styles/` — les jetons de la DA et la remise à zéro CSS.

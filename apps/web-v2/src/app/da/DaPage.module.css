@@ -198,3 +198,8 @@
   border-radius: var(--radius-carte);
   background: var(--avatar) center / cover;
 }
+
+/* Le bouton de la brique Envols : les cœurs partent de son coin. */
+.envols {
+  position: relative;
+}

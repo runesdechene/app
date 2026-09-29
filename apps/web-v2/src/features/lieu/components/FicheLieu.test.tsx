@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -8,6 +8,9 @@ import { FicheLieu } from './FicheLieu'
 const api = vi.hoisted(() => ({
   fetchFiche: vi.fn(),
   basculerEnvie: vi.fn(() => Promise.resolve(true)),
+  fetchMoi: vi.fn(),
+  fetchCoeurs: vi.fn(),
+  aimerLieu: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/lieu', () => api)
 
@@ -32,9 +35,22 @@ const FICHE = {
   moi: { visiteLe: null, envie: false },
 }
 
+const COEURS = {
+  total: 42,
+  miens: 0,
+  gens: [
+    { id: 'k', nom: 'Kelpie', avatar: null, nombre: 30 },
+    { id: 'x', nom: 'Aelis', avatar: null, nombre: 12 },
+  ],
+}
+
 beforeEach(() => {
   api.fetchFiche.mockResolvedValue(FICHE)
+  api.fetchMoi.mockResolvedValue({ id: 'moi', admin: false })
+  api.fetchCoeurs.mockResolvedValue(COEURS)
 })
+
+const onCoeurs = vi.fn()
 
 function afficher() {
   render(
@@ -46,6 +62,7 @@ function afficher() {
           id="a"
           onOptions={vi.fn()}
           onPartager={vi.fn()}
+          onCoeurs={onCoeurs}
           boutonVisite={() => <span>bouton</span>}
         />
       </MemoryRouter>
@@ -105,4 +122,41 @@ test('si la base refuse l’envie, le signet revient et le dit', async () => {
   await userEvent.click(signet)
   expect(await screen.findByRole('alert')).toHaveTextContent('L’envie n’a pas pu être enregistrée')
   expect(signet).toHaveAttribute('aria-pressed', 'false')
+})
+
+test('aimer un lieu : à volonté, chaque toucher envoie un cœur qui s’envole', async () => {
+  afficher()
+  const coeur = await screen.findByRole('button', { name: 'Envoyer un cœur (42)' })
+  // La base, après la rafale : deux cœurs de plus, les miens.
+  api.fetchCoeurs.mockResolvedValue({ ...COEURS, total: 44, miens: 2 })
+  await userEvent.click(coeur)
+  await userEvent.click(coeur)
+  expect(api.aimerLieu).toHaveBeenCalledTimes(2)
+  expect(await screen.findByRole('button', { name: 'Envoyer un cœur (44)' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  expect(coeur.querySelectorAll('[data-envol]').length).toBeGreaterThan(0)
+})
+
+test('sous les crédits : féliciter ceux qui ont fait le lieu, et voir qui a envoyé des cœurs', async () => {
+  afficher()
+  const feliciter = await screen.findByRole('button', { name: /Féliciter Luna et Mathéo/ })
+  await userEvent.click(feliciter)
+  expect(api.aimerLieu).toHaveBeenCalledWith('a')
+  await userEvent.click(
+    screen.getByRole('button', { name: /Kelpie et Aelis ont envoyé 4\d cœurs/ }),
+  )
+  expect(onCoeurs).toHaveBeenCalled()
+})
+
+test('sur son propre lieu, on lit ses cœurs sans pouvoir s’en envoyer', async () => {
+  api.fetchMoi.mockResolvedValue({ id: 'l', admin: false })
+  afficher()
+  const pastille = await screen.findByRole('button', { name: 'Voir les cœurs (42)' })
+  await userEvent.click(pastille)
+  expect(onCoeurs).toHaveBeenCalled()
+  expect(screen.queryByRole('button', { name: /Féliciter/ })).not.toBeInTheDocument()
+  expect(api.aimerLieu).not.toHaveBeenCalled()
+  expect(within(pastille).getByText('42')).toBeInTheDocument()
 })

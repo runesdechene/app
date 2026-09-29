@@ -90,6 +90,17 @@
   padding: var(--space-3) 25px var(--space-8);
 }
 
+/* La galerie à gauche, la pastille des cœurs à droite (seule, elle se range à droite). */
+.haut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.haut > :only-child {
+  margin-left: auto;
+}
+
 .galerie {
   display: flex;
   gap: var(--space-2);

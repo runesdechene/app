@@ -5828,6 +5828,7 @@ export type Database = {
         Args: { p_admin_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      aimer_lieu: { Args: { p_id: string }; Returns: Json }
       ajouter_lieu: {
         Args: {
           p_adresse: string
@@ -5893,6 +5894,7 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      coeurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       compagnons_possibles: { Args: { p_id: string }; Returns: Json }
       contribute_to_place: {
         Args: {

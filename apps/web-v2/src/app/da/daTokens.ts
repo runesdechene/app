@@ -70,6 +70,7 @@ export const DA_SHOWCASED = [
   'Button',
   'Champ',
   'EmptyState',
+  'Envols',
   'Feuille',
   'IconButton',
   'Interrupteur',

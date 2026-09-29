@@ -11,6 +11,7 @@ import { useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
 import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
+import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
 import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
 import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
 import { FicheLieu } from '@/features/lieu/components/FicheLieu'
@@ -18,7 +19,7 @@ import { useFiche } from '@/features/lieu/hooks/useFiche'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
-type Ouvert = 'options' | 'partager' | 'revendiquer' | null
+type Ouvert = 'options' | 'partager' | 'revendiquer' | 'coeurs' | null
 
 // Un lieu = un état neuf : passer d'un lieu à l'autre efface erreurs, galerie et feuilles ouvertes.
 export function RouteLieu() {
@@ -53,6 +54,9 @@ function Lieu({ id }: { id: string }) {
         onPartager={() => {
           setOuvert('partager')
         }}
+        onCoeurs={() => {
+          setOuvert('coeurs')
+        }}
         boutonVisite={(f) => (
           <BoutonVisite
             fiche={f}
@@ -65,6 +69,7 @@ function Lieu({ id }: { id: string }) {
       {fiche && ouvert === 'options' && (
         <FeuilleOptions fiche={fiche} onFermer={fermer} onSupprime={fermerDetail} />
       )}
+      {ouvert === 'coeurs' && <FeuilleCoeurs id={id} onFermer={fermer} />}
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
       {fiche && ouvert === 'revendiquer' && (
         <FenetreRevendication fiche={fiche} onFermer={fermer} />

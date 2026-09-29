@@ -8,7 +8,6 @@
  *            que la feuille de chêne : compris de tous (Uriel, 28/09). On salue à volonté : chaque
  *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée.
  */
-import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
@@ -21,6 +20,8 @@ import { useChemins } from '../hooks/useAccueil'
 import { useSaluer } from '../hooks/useSaluer'
 import { ilYA } from '@/shared/lib/ilYA'
 import { BilleType } from '@/shared/ui/BilleType'
+import { useEnvols } from '@/shared/hooks/useEnvols'
+import { Envols } from '@/shared/ui/Envols'
 import styles from './SurLesChemins.module.css'
 
 const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }
@@ -61,9 +62,7 @@ export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
   const { qui, lieu } = chemin
   const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
-  // Les cœurs en vol : chacun disparaît à la fin de son envol.
-  const [envols, setEnvols] = useState<number[]>([])
-  const prochain = useRef(0)
+  const { envols, lancer, finir } = useEnvols()
   return (
     <li className={styles.ligne}>
       {chemin.type === 'ajout' && lieu?.type ? (
@@ -105,23 +104,12 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
           aria-label={`Saluer ${qui.nom} (${String(chemin.saluts)})`}
           onClick={() => {
             onSaluer(chemin.id)
-            const n = prochain.current++
-            setEnvols((avant) => [...avant, n])
+            lancer()
           }}
         >
           <span className={styles.coeur} aria-hidden="true" />
           {chemin.saluts > 0 && chemin.saluts}
-          {envols.map((n) => (
-            <span
-              key={n}
-              className={styles.envol}
-              data-envol
-              aria-hidden="true"
-              onAnimationEnd={() => {
-                setEnvols((avant) => avant.filter((e) => e !== n))
-              }}
-            />
-          ))}
+          <Envols envols={envols} onFin={finir} />
         </button>
       )}
     </li>

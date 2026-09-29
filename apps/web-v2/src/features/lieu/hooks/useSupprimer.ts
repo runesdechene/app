@@ -4,13 +4,14 @@
  *            un administrateur ». L'écran ne montre la ligne qu'à eux ; la base le revérifie.
  *            Après : la carte, l'Accueil et les profils se relisent, la fiche s'oublie.
  */
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchMoi, supprimerLieu } from '../api/lieu'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { supprimerLieu } from '../api/lieu'
 import { ficheKey } from './useFiche'
+import { useMoi } from './useMoi'
 
 export function useSupprimer(id: string, auteur: string | null) {
   const queryClient = useQueryClient()
-  const moi = useQuery({ queryKey: ['moi', 'droits'], queryFn: fetchMoi, staleTime: Infinity }).data
+  const moi = useMoi()
   const mutation = useMutation({
     mutationFn: () => {
       if (!moi) throw new Error('sans session')

@@ -3,9 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-const api = vi.hoisted(() => ({ fetchMoi: vi.fn(), supprimerLieu: vi.fn() }))
+const api = vi.hoisted(() => ({ fetchMoi: vi.fn(), supprimerLieu: vi.fn(), fetchCoeurs: vi.fn() }))
 vi.mock('../api/lieu', () => api)
 
+import { FeuilleCoeurs } from './FeuilleCoeurs'
 import { FeuilleOptions } from './FeuilleOptions'
 import { FeuillePartager } from './FeuillePartager'
 
@@ -126,4 +127,21 @@ test('« Garder le lieu » revient aux options sans rien supprimer', async () =>
   await userEvent.click(screen.getByRole('button', { name: 'Garder le lieu' }))
   expect(await screen.findByRole('button', { name: /Supprimer ce lieu/ })).toBeInTheDocument()
   expect(api.supprimerLieu).not.toHaveBeenCalled()
+})
+
+test('« Les cœurs » : qui en a envoyé, et combien, les plus généreux d’abord', async () => {
+  api.fetchCoeurs.mockResolvedValue({
+    total: 29,
+    miens: 0,
+    gens: [
+      { id: 'k', nom: 'Kelpie', avatar: null, nombre: 18 },
+      { id: 'l', nom: 'Luna', avatar: null, nombre: 11 },
+    ],
+  })
+  dans(<FeuilleCoeurs id="a" onFermer={vi.fn()} />)
+  expect(await screen.findByRole('heading', { name: 'Les cœurs · 29' })).toBeInTheDocument()
+  const lignes = screen.getAllByRole('listitem')
+  expect(lignes[0]).toHaveTextContent('Kelpie')
+  expect(lignes[0]).toHaveTextContent('18')
+  expect(lignes[1]).toHaveTextContent('Luna')
 })

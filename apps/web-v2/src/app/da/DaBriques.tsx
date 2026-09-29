@@ -11,7 +11,9 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { BilleType } from '@/shared/ui/BilleType'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
+import { useEnvols } from '@/shared/hooks/useEnvols'
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { Envols } from '@/shared/ui/Envols'
 import { Feuille } from '@/shared/ui/Feuille'
 import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
@@ -95,6 +97,13 @@ export function DaBriques() {
           <BilleType icone={lieu} couleur="#8a5a3c" />
           <Text variant="legende">sans couleur :</Text>
           <BilleType icone={lieu} couleur={null} />
+        </div>
+      </DaSection>
+
+      <DaSection name="Envols">
+        <div className={styles.rangee}>
+          <BoutonEnvols />
+          <Text variant="legende">touche le bouton : un cœur s’envole à chaque fois</Text>
         </div>
       </DaSection>
 
@@ -186,5 +195,17 @@ export function DaBriques() {
         </div>
       </DaSection>
     </>
+  )
+}
+
+function BoutonEnvols() {
+  const { envols, lancer, finir } = useEnvols()
+  return (
+    <span className={styles.envols}>
+      <Button kind="doux" onClick={lancer}>
+        Envoyer un cœur
+      </Button>
+      <Envols envols={envols} onFin={finir} />
+    </span>
   )
 }

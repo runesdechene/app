@@ -5,7 +5,7 @@
  */
 import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
-import { lireCompagnons, lireExplorateurs, lireFiche, lireRecompense } from './lireLieu'
+import { lireCoeurs, lireCompagnons, lireExplorateurs, lireFiche, lireRecompense } from './lireLieu'
 
 export async function fetchFiche(id: string) {
   const { data, error } = await supabase.rpc('fiche_lieu', { p_id: id })
@@ -80,4 +80,16 @@ export async function supprimerLieu(id: string, moi: string) {
   if (error) throw error
   const refus = objet(data).error
   if (refus !== undefined) throw new Error(chaine(refus))
+}
+
+export async function fetchCoeurs(id: string) {
+  const { data, error } = await supabase.rpc('coeurs_du_lieu', { p_id: id })
+  if (error) throw error
+  return lireCoeurs(data)
+}
+
+// Un cœur de plus (mig 384) : à volonté, jamais sur son propre lieu.
+export async function aimerLieu(id: string) {
+  const { error } = await supabase.rpc('aimer_lieu', { p_id: id })
+  if (error) throw error
 }
