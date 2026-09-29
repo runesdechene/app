@@ -1,9 +1,9 @@
 /**
- * QUOI     — un cœur de plus tombe sur le bon mot, qu'il soit un mot ou une réponse.
+ * QUOI     — mon cœur sur un mot s'allume puis s'éteint, sur le bon mot, réponses comprises.
  */
 import { expect, test } from 'vitest'
 import type { Mot } from '../api/lireLieu'
-import { coeurDePlus } from './carnet'
+import { basculerCoeur } from './carnet'
 
 const mot = (id: number, reponses: Mot[] = []): Mot => ({
   id,
@@ -18,10 +18,11 @@ const mot = (id: number, reponses: Mot[] = []): Mot => ({
   reponses,
 })
 
-test('un cœur de plus, sur le mot visé seulement', () => {
+test('un cœur s’allume puis s’éteint, sur le mot visé seulement', () => {
   const carnet = { total: 3, mots: [mot(1, [mot(2)]), mot(3)] }
-  const apres = coeurDePlus(carnet, 2)
-  expect(apres.mots[0]?.coeurs).toBe(2)
-  expect(apres.mots[0]?.reponses[0]).toMatchObject({ coeurs: 3, miens: 1 })
-  expect(apres.mots[1]?.coeurs).toBe(2)
+  const allume = basculerCoeur(carnet, 2)
+  expect(allume.mots[0]?.reponses[0]).toMatchObject({ coeurs: 3, miens: 1 })
+  expect(allume.mots[1]?.coeurs).toBe(2)
+  const eteint = basculerCoeur(allume, 2)
+  expect(eteint.mots[0]?.reponses[0]).toMatchObject({ coeurs: 2, miens: 0 })
 })

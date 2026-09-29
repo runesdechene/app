@@ -154,8 +154,9 @@ export async function ecrireAuCarnet(
   if (error) throw error
 }
 
-export async function aimerMot(id: number) {
-  const { error } = await supabase.rpc('aimer_mot', { p_id: id })
+// Un cœur par personne sur un mot (mig 390) : il s'allume ou s'éteint.
+export async function basculerCoeurMot(id: number) {
+  const { error } = await supabase.rpc('basculer_coeur_mot', { p_id: id })
   if (error) throw error
 }
 

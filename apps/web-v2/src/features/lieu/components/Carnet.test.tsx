@@ -12,7 +12,7 @@ import { Carnet } from './Carnet'
 const api = vi.hoisted(() => ({
   fetchCarnet: vi.fn(),
   ecrireAuCarnet: vi.fn(() => Promise.resolve()),
-  aimerMot: vi.fn(() => Promise.resolve()),
+  basculerCoeurMot: vi.fn(() => Promise.resolve()),
   effacerMot: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/lieu', () => api)
@@ -72,15 +72,30 @@ test('les mots, leurs réponses, « est venu·e », et le lien vers le carnet en
   )
 })
 
-test('un cœur à volonté sur le mot d’un autre ; le sien se lit sans se toucher', async () => {
+test('un cœur par personne : il s’allume, puis s’éteint ; le sien se lit sans se toucher', async () => {
   monter()
-  const coeur = await screen.findByRole('button', { name: 'Envoyer un cœur (14)' })
+  const coeur = await screen.findByRole('button', { name: 'J’aime ce mot (14)' })
+  expect(coeur).toHaveAttribute('aria-pressed', 'false')
+  // La base, après le toucher : mon cœur est allumé.
+  api.fetchCarnet.mockResolvedValue({
+    total: 5,
+    mots: [
+      mot(1, 'Kelpie', 'Le chemin est glissant après la pluie.', {
+        venu: true,
+        coeurs: 15,
+        miens: 1,
+        reponses: [mot(2, 'Moi', 'Merci !', { aMoi: true })],
+      }),
+    ],
+  })
   await userEvent.click(coeur)
-  await userEvent.click(coeur)
-  expect(api.aimerMot).toHaveBeenCalledTimes(2)
-  expect(api.aimerMot).toHaveBeenCalledWith(1, expect.anything())
+  expect(await screen.findByRole('button', { name: 'J’aime ce mot (15)' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  expect(api.basculerCoeurMot).toHaveBeenCalledWith(1, expect.anything())
   const mien = screen.getByText('Merci !').closest('article') as HTMLElement
-  expect(within(mien).queryByRole('button', { name: /Envoyer un cœur/ })).toBeNull()
+  expect(within(mien).queryByRole('button', { name: /J’aime ce mot/ })).toBeNull()
 })
 
 test('écrire un mot, puis répondre : la réponse va sous le mot', async () => {

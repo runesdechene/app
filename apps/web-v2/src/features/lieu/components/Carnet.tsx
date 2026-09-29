@@ -2,17 +2,15 @@
  * QUOI     — le Carnet de passage d'un lieu (maquette Figma « Lieu — le carnet de passage (sur la
  *            fiche) », validée par Uriel le 30/09) : le titre et le nombre de mots, écrire, puis
  *            les mots — qui, « est venu·e » s'il a visité le lieu, quand, le texte, les photos,
- *            ♥ à volonté, « Répondre » (un seul niveau), « Effacer » pour le sien.
+ *            ♥ (un par personne, Uriel 30/09), « Répondre » (un seul niveau), « Effacer » pour le sien.
  * POURQUOI — les commentaires de la V1 reviennent sous la fiche, dans le ton de la V2. Sur la fiche,
  *            les trois derniers mots et « Lire les N mots » ; la page du carnet les montre tous.
  */
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { useEnvols } from '@/shared/hooks/useEnvols'
 import { ilYA } from '@/shared/lib/ilYA'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
-import { Envols } from '@/shared/ui/Envols'
 import type { Mot } from '../api/lireLieu'
 import { useCarnet } from '../hooks/useCarnet'
 import { EcrireAuCarnet } from './EcrireAuCarnet'
@@ -73,7 +71,6 @@ function MotDuCarnet({
   actions: Actions
   parent?: number | null
 }) {
-  const { envols, lancer, finir } = useEnvols()
   const [repondre, setRepondre] = useState(false)
   const [effacer, setEffacer] = useState(false)
 
@@ -108,16 +105,14 @@ function MotDuCarnet({
             <button
               type="button"
               className={styles.coeurs}
-              aria-label={`Envoyer un cœur (${String(mot.coeurs)})`}
+              aria-label={`J’aime ce mot (${String(mot.coeurs)})`}
               aria-pressed={mot.miens > 0}
               onClick={() => {
                 actions.aimer(mot.id)
-                lancer()
               }}
             >
               <span className={styles.coeur} aria-hidden="true" />
               {mot.coeurs > 0 && mot.coeurs}
-              <Envols envols={envols} onFin={finir} />
             </button>
           )}
           <button

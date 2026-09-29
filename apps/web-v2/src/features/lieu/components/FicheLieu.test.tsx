@@ -13,7 +13,7 @@ const api = vi.hoisted(() => ({
   aimerLieu: vi.fn(() => Promise.resolve()),
   fetchCarnet: vi.fn(() => Promise.resolve({ total: 0, mots: [] })),
   ecrireAuCarnet: vi.fn(),
-  aimerMot: vi.fn(),
+  basculerCoeurMot: vi.fn(),
   effacerMot: vi.fn(),
 }))
 vi.mock('../api/lieu', () => api)

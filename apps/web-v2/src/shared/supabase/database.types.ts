@@ -6064,7 +6064,6 @@ export type Database = {
         Returns: Json
       }
       aimer_lieu: { Args: { p_id: string }; Returns: Json }
-      aimer_mot: { Args: { p_id: number }; Returns: Json }
       ajouter_lieu: {
         Args: {
           p_adresse: string
@@ -6103,6 +6102,7 @@ export type Database = {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
         Returns: Json
       }
+      basculer_coeur_mot: { Args: { p_id: number }; Returns: Json }
       basculer_envie: { Args: { p_id: string }; Returns: boolean }
       broadcast_announcement_push: { Args: { p_id: string }; Returns: Json }
       cancel_voyage: {
