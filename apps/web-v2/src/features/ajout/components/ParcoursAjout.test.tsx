@@ -7,6 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider, useParams } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
+import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { BROUILLON_VIDE } from '../lib/brouillon'
 import { ParcoursAjout } from './ParcoursAjout'
 
@@ -38,7 +39,7 @@ function Ailleurs() {
   return null
 }
 
-function monter(chemin: string) {
+function monter(chemin: string, racine: HTMLElement | null = null) {
   const router = createMemoryRouter(
     [
       { path: '/:tab/ajouter/lieu/:etape', Component: Parcours },
@@ -47,9 +48,11 @@ function monter(chemin: string) {
     { initialEntries: [chemin] },
   )
   render(
-    <QueryClientProvider client={new QueryClient()}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
+    <RacineDesFeuilles.Provider value={racine}>
+      <QueryClientProvider client={new QueryClient()}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </RacineDesFeuilles.Provider>,
   )
   return router
 }
@@ -90,4 +93,17 @@ test('un brouillon commencé : quitter demande de le garder ou de le jeter', asy
     expect(quitter).toHaveBeenCalled()
   })
   expect(stockage.del).toHaveBeenCalled()
+})
+
+test('la question de quitter se pose par-dessus le parcours, pas sous lui', async () => {
+  stockage.get.mockResolvedValue({
+    ...BROUILLON_VIDE,
+    photos: [{ id: 'p1', grande: new Blob(), vignette: new Blob() }],
+  })
+  const racine = document.body.appendChild(document.createElement('div'))
+  monter('/carte/ajouter/lieu/photo', racine)
+  await userEvent.click(await screen.findByRole('button', { name: 'Quitter' }))
+  // Le parcours couvre les feuilles de l'app : sa question vit donc en lui, après la fenêtre.
+  const parcours = screen.getByRole('dialog', { name: 'Nouveau lieu' }).parentElement
+  expect(parcours).toContainElement(await screen.findByRole('button', { name: 'Le jeter' }))
 })

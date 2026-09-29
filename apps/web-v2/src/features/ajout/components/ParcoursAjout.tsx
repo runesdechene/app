@@ -140,32 +140,36 @@ export function ParcoursAjout({
       <div className={styles.fenetre} role="dialog" aria-modal="true" aria-label="Nouveau lieu">
         {contenu}
       </div>
+      {/* Sans racine, la feuille se pose ici, au-dessus de la fenêtre : la racine des feuilles
+          de l'app est sous le parcours. */}
       {question && (
-        <Feuille
-          titre="Quitter l’ajout"
-          onFermer={() => {
-            setQuestion(false)
-          }}
-        >
-          <p className={styles.question}>Tu reviens plus tard ?</p>
-          <p className={styles.explication}>
-            Ton brouillon t’attend dans « Ajouter », à l’étape où tu l’as laissé.
-          </p>
-          <div className={styles.choix}>
-            <button type="button" className={styles.garder} onClick={onQuitter}>
-              Garder le brouillon
-            </button>
-            <button
-              type="button"
-              className={styles.jeter}
-              onClick={() => {
-                void jeter().then(onQuitter)
-              }}
-            >
-              Le jeter
-            </button>
-          </div>
-        </Feuille>
+        <RacineDesFeuilles.Provider value={null}>
+          <Feuille
+            titre="Quitter l’ajout"
+            onFermer={() => {
+              setQuestion(false)
+            }}
+          >
+            <p className={styles.question}>Tu reviens plus tard ?</p>
+            <p className={styles.explication}>
+              Ton brouillon t’attend dans « Ajouter », à l’étape où tu l’as laissé.
+            </p>
+            <div className={styles.choix}>
+              <button type="button" className={styles.garder} onClick={onQuitter}>
+                Garder le brouillon
+              </button>
+              <button
+                type="button"
+                className={styles.jeter}
+                onClick={() => {
+                  void jeter().then(onQuitter)
+                }}
+              >
+                Le jeter
+              </button>
+            </div>
+          </Feuille>
+        </RacineDesFeuilles.Provider>
       )}
     </div>
   )
