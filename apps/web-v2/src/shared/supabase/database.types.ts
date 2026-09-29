@@ -4106,6 +4106,75 @@ export type Database = {
         }
         Relationships: []
       }
+      signalements_lieu: {
+        Row: {
+          cree_le: string
+          id: number
+          place_id: string
+          precision: string | null
+          raison: string
+          traite_le: string | null
+          traite_par: string | null
+          user_id: string
+        }
+        Insert: {
+          cree_le?: string
+          id?: number
+          place_id: string
+          precision?: string | null
+          raison: string
+          traite_le?: string | null
+          traite_par?: string | null
+          user_id: string
+        }
+        Update: {
+          cree_le?: string
+          id?: number
+          place_id?: string
+          precision?: string | null
+          raison?: string
+          traite_le?: string | null
+          traite_par?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signalements_lieu_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_lieu_traite_par_fkey"
+            columns: ["traite_par"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_lieu_traite_par_fkey"
+            columns: ["traite_par"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_lieu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_lieu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tag_gauge_mapping: {
         Row: {
           gauge: string
@@ -4859,6 +4928,67 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      versions_lieu: {
+        Row: {
+          annee: number | null
+          auteur: string | null
+          cree_le: string
+          epoque: string | null
+          id: number
+          natures: string[]
+          nom: string
+          note: string | null
+          place_id: string
+          recit: string
+        }
+        Insert: {
+          annee?: number | null
+          auteur?: string | null
+          cree_le?: string
+          epoque?: string | null
+          id?: number
+          natures: string[]
+          nom: string
+          note?: string | null
+          place_id: string
+          recit: string
+        }
+        Update: {
+          annee?: number | null
+          auteur?: string | null
+          cree_le?: string
+          epoque?: string | null
+          id?: number
+          natures?: string[]
+          nom?: string
+          note?: string | null
+          place_id?: string
+          recit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "versions_lieu_auteur_fkey"
+            columns: ["auteur"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "versions_lieu_auteur_fkey"
+            columns: ["auteur"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "versions_lieu_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
             referencedColumns: ["id"]
           },
         ]
@@ -5654,6 +5784,16 @@ export type Database = {
         Args: { p_from?: string; p_to?: string; p_user_id: string }
         Returns: number
       }
+      _etat_du_lieu: {
+        Args: { p_id: string }
+        Returns: {
+          annee: number
+          epoque: string
+          natures: string[]
+          nom: string
+          recit: string
+        }[]
+      }
       _faction_chef: { Args: { p_faction_id: string }; Returns: string }
       _faction_gold_coupe: {
         Args: { p_faction_id: string; p_from?: string; p_to?: string }
@@ -5701,6 +5841,7 @@ export type Database = {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: number
       }
+      _notification_v2: { Args: { p_type: string }; Returns: boolean }
       _notify_court_challengers: {
         Args: {
           p_data: Json
@@ -6745,6 +6886,8 @@ export type Database = {
         Args: { p_place_id: string; p_verified: boolean }
         Returns: Json
       }
+      mod_signalements: { Args: never; Returns: Json }
+      mod_traiter_signalement: { Args: { p_id: number }; Returns: Json }
       mod_update_place: {
         Args: {
           p_place_id: string
