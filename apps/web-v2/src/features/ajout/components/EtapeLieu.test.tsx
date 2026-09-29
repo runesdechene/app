@@ -1,7 +1,7 @@
 /**
  * QUOI     — l'étape « Où » : la carte part de la position de la photo ; l'endroit se dit en
  *            mots ; un lieu voisin se signale ; chercher un village y emmène ; « C'est ici » garde
- *            le point et avance.
+ *            le point et avance — seulement sur place (200 m au plus de moi).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
@@ -16,6 +16,8 @@ const api = vi.hoisted(() => ({ fetchVoisins: vi.fn() }))
 vi.mock('../api/ajout', () => api)
 const geocodeur = vi.hoisted(() => ({ endroitDe: vi.fn(), chercherEndroits: vi.fn() }))
 vi.mock('../lib/adresse', () => geocodeur)
+const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
+vi.mock('@/shared/lib/position', () => position)
 
 const brouillon: Brouillon = {
   ...BROUILLON_VIDE,
@@ -30,6 +32,7 @@ beforeEach(() => {
   changer.mockReset()
   suivant.mockReset()
   api.fetchVoisins.mockResolvedValue([])
+  position.positionSiAutorisee.mockResolvedValue(null)
   geocodeur.endroitDe.mockResolvedValue({
     titre: 'Près de Colomars',
     detail: 'Alpes-Maritimes',
@@ -80,10 +83,20 @@ test('chercher un village y emmène la carte', async () => {
   )
 })
 
-test('« C’est ici » garde le point où la carte s’est posée, et son adresse', async () => {
+test('loin du point, « C’est ici » attend : on ajoute sur place', async () => {
+  position.positionSiAutorisee.mockResolvedValue({ latitude: 48.85, longitude: 2.35 })
   monter()
   await screen.findByText('Près de Colomars')
-  // La carte glisse puis se pose (la fausse carte rend toujours le centre de la France).
+  expect(await screen.findByText(/rapproche le point de toi/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'C’est ici' })).toBeDisabled()
+})
+
+test('« C’est ici » garde le point où la carte s’est posée, et son adresse', async () => {
+  // Je suis là où la carte se pose (la fausse carte rend toujours le centre de la France).
+  position.positionSiAutorisee.mockResolvedValue({ latitude: 46.6, longitude: 2.4 })
+  monter()
+  await screen.findByText('Près de Colomars')
+  // La carte glisse puis se pose.
   act(() => {
     FausseCarte.derniere?.emettre('moveend', { originalEvent: {} })
   })
@@ -93,7 +106,8 @@ test('« C’est ici » garde le point où la carte s’est posée, et son adres
       expect.anything(),
     )
   })
-  await userEvent.click(await screen.findByRole('button', { name: 'C’est ici' }))
+  await screen.findByText('Tu es sur place : ta visite comptera aussi.')
+  await userEvent.click(screen.getByRole('button', { name: 'C’est ici' }))
   expect(changer).toHaveBeenCalledWith(
     expect.objectContaining({ point: { latitude: 46.6, longitude: 2.4 } }),
   )

@@ -62,6 +62,9 @@ l'étape d'avant. La photo se sépare du parchemin par la lisière, jamais un d�
 - Trouvé en chemin : des policies de stockage ouvertes à tous (UPDATE et DELETE `true`) —
   inscrites dans `docs/v2/purge-back.md`, **à trancher par Uriel**, rien supprimé.
 
+- 30/09, Uriel : **sur place seulement, pour l'instant**. Migration 383 (refus au-delà de 200 m
+  ou sans position, indice `sur_place`) ; « C'est ici » attend que le point soit près de moi.
+
 ## Écarts assumés (Ruling)
 
 - Les étapes **remplacent** l'adresse au lieu de s'empiler : on revient en touchant une étape

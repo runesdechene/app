@@ -108,5 +108,9 @@ test('plafond du jour ou fiche refusée : chacun sa phrase', async () => {
   api.ajouterLieu.mockRejectedValueOnce({ message: 'Un nom', code: '22023' })
   await userEvent.click(poser)
   expect(await screen.findByText(/Un détail de la fiche ne passe pas/)).toBeInTheDocument()
+
+  api.ajouterLieu.mockRejectedValueOnce({ message: 'Sur place seulement', hint: 'sur_place' })
+  await userEvent.click(poser)
+  expect(await screen.findByText(/un lieu s’ajoute sur place/)).toBeInTheDocument()
   expect(stockage.del).not.toHaveBeenCalled()
 })

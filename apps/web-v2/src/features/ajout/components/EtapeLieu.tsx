@@ -6,7 +6,8 @@
  * POURQUOI — la carte part de la position de la photo (si l'appareil l'a notée), sinon de la
  *            mienne (si elle est déjà accordée), sinon de la France. Jamais de coordonnées à lire :
  *            des mots. Un lieu à moins de 50 m se signale ici, pas à la fin (« c'est le même ? »).
- *            Si je suis à 200 m au plus du point, la visite comptera : on le dit.
+ *            Pour l'instant, un lieu ne s'ajoute que sur place (Uriel, 30/09) : « C'est ici » attend
+ *            que le point soit à 200 m au plus de moi — la base le vérifie aussi (mig 383).
  * ATTENTION — l'endroit et les voisins ne se demandent qu'une fois la carte posée (moveend) ;
  *            l'épingle se soulève pendant le glissé et retombe à l'arrêt.
  */
@@ -69,12 +70,12 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     })
     carte.current = map
     let fini = false
-    // Ni photo située ni point choisi : la carte part de moi, si je l'ai déjà permis.
-    if (!depart) {
-      void positionSiAutorisee().then((p) => {
-        if (p && !fini) map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
-      })
-    }
+    // Ma position, si je l'ai déjà permise ; sans photo située ni point choisi, la carte part d'elle.
+    void positionSiAutorisee().then((p) => {
+      if (!p || fini) return
+      setMoi(p)
+      if (!depart) map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
+    })
     return () => {
       fini = true
       map.remove()
@@ -154,7 +155,7 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
           <button
             type="button"
             className={styles.cestIci}
-            disabled={!centre}
+            disabled={!centre || !surPlace}
             onClick={() => {
               if (!centre) return
               changer({ point: centre, endroit })
@@ -164,7 +165,13 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
             C’est ici
           </button>
         </div>
-        {surPlace && <p className={styles.visite}>Tu es sur place : ta visite comptera aussi.</p>}
+        <p className={styles.visite}>
+          {surPlace
+            ? 'Tu es sur place : ta visite comptera aussi.'
+            : moi
+              ? 'Pour l’instant, un lieu s’ajoute sur place : rapproche le point de toi (200 m au plus).'
+              : 'Pour l’instant, un lieu s’ajoute sur place : touche « Je suis ici ».'}
+        </p>
       </section>
     </div>
   )

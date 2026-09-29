@@ -19,6 +19,9 @@ function messageDeRefus(erreur: unknown): string {
   if (indice === 'decouvertes') {
     return 'Découvre d’abord trois lieux sur la carte : ils t’apprennent ce qu’on y cherche. Ton brouillon t’attend.'
   }
+  if (indice === 'sur_place') {
+    return 'Pour l’instant, un lieu s’ajoute sur place : rapproche-toi à 200 m au plus, puis réessaie. Ton brouillon t’attend.'
+  }
   if (indice === 'limite') {
     return 'Vingt lieux posés aujourd’hui : c’est le plafond. Ton brouillon t’attend demain.'
   }

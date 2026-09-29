@@ -1,7 +1,8 @@
--- 381 + 382 : ajouter un lieu. Annulé.
+-- 381 + 382 + 383 : ajouter un lieu, sur place seulement. Annulé.
 BEGIN;
-\ir ../../migrations/381_ajouter_un_lieu.sql
-\ir ../../migrations/382_ajouter_lieu_facultatifs.sql
+-- 381 et 382 sont en prod ; la 383 s'essaie par-dessus.
+\ir ../../migrations/383_ajouter_sur_place_seulement.sql
+\ir ../../migrations/383_ajouter_sur_place_seulement.sql
 DO $test$
 DECLARE
   a text := 'cb16ff47-1ead-4adf-8eff-04d117551541';
@@ -25,10 +26,10 @@ BEGIN
   natures := public.natures_de_lieu();
   epoques := public.epoques();
 
-  -- À distance : le lieu, deux natures (la première principale), la découverte « author ».
+  -- Sur place (à ~7 m) : le lieu, deux natures (la première principale), la visite.
   distant := public.ajouter_lieu('  Tour de Test  ', 44.0, 7.2, ARRAY['3fQyu5KCU', 'DwlWijqgg'],
     'Une tour carrée.', 'Colomars', photo, p_epoque => 'late-middle-ages', p_annee => 1142,
-    p_ma_latitude => 48.0, p_ma_longitude => 2.0);
+    p_ma_latitude => 44.00005, p_ma_longitude => 7.20005);
   SELECT count(*) INTO tags_ok FROM place_tags WHERE place_id = distant->>'id';
   SELECT tag_id INTO principal FROM place_tags WHERE place_id = distant->>'id' AND is_primary;
   SELECT count(*) INTO revision FROM place_description_revisions WHERE place_id = distant->>'id';
@@ -41,7 +42,12 @@ BEGIN
   SELECT count(*) INTO explorateur FROM place_explorers WHERE place_id = sur_place->>'id' AND user_id = a;
   voisins := public.lieux_voisins(44.0001, 7.2001);
 
-  -- Ce qui doit être refusé.
+  -- Ce qui doit être refusé. D'abord : à distance, ou sans position (383).
+  BEGIN PERFORM public.ajouter_lieu('Loin', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', photo,
+    p_ma_latitude => 48.0, p_ma_longitude => 2.0);
+    refus := refus || 'distance-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
+  BEGIN PERFORM public.ajouter_lieu('Sans position', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', photo);
+    refus := refus || 'sans-position-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '',
     jsonb_build_array(jsonb_build_object('url', 'https://ailleurs.com/a.webp', 'thumb', 'https://ailleurs.com/a.webp')));
     refus := refus || 'photo-exterieure-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
