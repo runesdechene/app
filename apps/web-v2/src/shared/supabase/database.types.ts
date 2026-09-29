@@ -5831,13 +5831,13 @@ export type Database = {
       ajouter_lieu: {
         Args: {
           p_adresse: string
-          p_annee: number | null
-          p_epoque: string | null
+          p_annee?: number
+          p_epoque?: string
           p_images: Json
           p_latitude: number
           p_longitude: number
-          p_ma_latitude?: number | null
-          p_ma_longitude?: number | null
+          p_ma_latitude?: number
+          p_ma_longitude?: number
           p_natures: string[]
           p_nom: string
           p_recit: string

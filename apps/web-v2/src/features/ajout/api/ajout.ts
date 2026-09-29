@@ -65,13 +65,13 @@ export async function ajouterLieu(b: Brouillon, images: ImageEnvoyee[], ici: Poi
     p_latitude: b.point.latitude,
     p_longitude: b.point.longitude,
     p_natures: b.natures,
-    p_epoque: b.epoque,
-    p_annee: b.annee,
     p_recit: b.recit,
     p_adresse: b.endroit?.adresse ?? '',
     p_images: images,
-    p_ma_latitude: ici?.latitude ?? null,
-    p_ma_longitude: ici?.longitude ?? null,
+    // Facultatifs (mig 382) : omis quand on ne sait pas. Sans ma position, la base me croit loin.
+    ...(b.epoque !== null && { p_epoque: b.epoque }),
+    ...(b.annee !== null && { p_annee: b.annee }),
+    ...(ici && { p_ma_latitude: ici.latitude, p_ma_longitude: ici.longitude }),
   })
   if (error) throw error
   return lireAjout(data)

@@ -1,6 +1,7 @@
--- 381 : ajouter un lieu. Annulé.
+-- 381 + 382 : ajouter un lieu. Annulé.
 BEGIN;
 \ir ../../migrations/381_ajouter_un_lieu.sql
+\ir ../../migrations/382_ajouter_lieu_facultatifs.sql
 DO $test$
 DECLARE
   a text := 'cb16ff47-1ead-4adf-8eff-04d117551541';
@@ -26,7 +27,8 @@ BEGIN
 
   -- À distance : le lieu, deux natures (la première principale), la découverte « author ».
   distant := public.ajouter_lieu('  Tour de Test  ', 44.0, 7.2, ARRAY['3fQyu5KCU', 'DwlWijqgg'],
-    'late-middle-ages', 1142, 'Une tour carrée.', 'Colomars', photo, 48.0, 2.0);
+    'Une tour carrée.', 'Colomars', photo, p_epoque => 'late-middle-ages', p_annee => 1142,
+    p_ma_latitude => 48.0, p_ma_longitude => 2.0);
   SELECT count(*) INTO tags_ok FROM place_tags WHERE place_id = distant->>'id';
   SELECT tag_id INTO principal FROM place_tags WHERE place_id = distant->>'id' AND is_primary;
   SELECT count(*) INTO revision FROM place_description_revisions WHERE place_id = distant->>'id';
@@ -35,41 +37,41 @@ BEGIN
 
   -- Sur place (à ~10 m) : la visite compte, +3 d'expérience de plus.
   sur_place := public.ajouter_lieu('Chapelle de Test', 44.001, 7.201, ARRAY['_cjvj91BX'],
-    NULL, NULL, 'Une chapelle.', '', photo, 44.00108, 7.20105);
+    'Une chapelle.', '', photo, p_ma_latitude => 44.00108, p_ma_longitude => 7.20105);
   SELECT count(*) INTO explorateur FROM place_explorers WHERE place_id = sur_place->>'id' AND user_id = a;
   voisins := public.lieux_voisins(44.0001, 7.2001);
 
   -- Ce qui doit être refusé.
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '',
     jsonb_build_array(jsonb_build_object('url', 'https://ailleurs.com/a.webp', 'thumb', 'https://ailleurs.com/a.webp')));
     refus := refus || 'photo-exterieure-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   -- Le même chemin, sur un autre site : refusé (revue de sécurité du 29/09).
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '',
     jsonb_build_array(jsonb_build_object(
       'url', 'https://ailleurs.com/storage/v1/object/public/place-images/places/' || a || '/p1.webp',
       'thumb', 'https://ailleurs.com/storage/v1/object/public/place-images/places/' || a || '/p1_thumb.webp')));
     refus := refus || 'meme-chemin-autre-site-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU','DwlWijqgg','_cjvj91BX','musees'], NULL, NULL, 'R', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU','DwlWijqgg','_cjvj91BX','musees'], 'R', '', photo);
     refus := refus || 'quatre-natures-ACCEPTEES'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('   ', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('   ', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', photo);
     refus := refus || 'nom-vide-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['nimporte'], NULL, NULL, 'R', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['nimporte'], 'R', '', photo);
     refus := refus || 'nature-inconnue-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, '', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], '', '', photo);
     refus := refus || 'recit-vide-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', '[]'::jsonb);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', '[]'::jsonb);
     refus := refus || 'sans-photo-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', NULL, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('X', NULL, 7, ARRAY['3fQyu5KCU'], 'R', '', photo);
     refus := refus || 'latitude-nulle-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', NULL);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', NULL);
     refus := refus || 'photos-nulles-ACCEPTEES'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '',
     jsonb_build_array(jsonb_build_object(
       'url', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/absente.webp',
       'thumb', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/absente_thumb.webp')));
     refus := refus || 'photo-absente-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   PERFORM set_config('role', 'anon', true);
-  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], 'R', '', photo);
     refus := refus || 'anon-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || 'anon refusé'::text; END;
 
   RAISE EXCEPTION 'BILAN images=% natures=% epoques=% distant=% nom=% tags=%/% principal=% revision=% decouverte=% sur_place=% explorateur=% voisins=% refus=%',
