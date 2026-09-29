@@ -7,7 +7,7 @@
  */
 import { useRef } from 'react'
 import { useNatures } from '../hooks/useAjout'
-import { useUrlDe } from '../hooks/useUrlDe'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { ceQuiManque, type ProprietesEtape } from '../lib/brouillon'
 import { BoutonSuivant } from './BoutonSuivant'
 import styles from './EtapeRecit.module.css'

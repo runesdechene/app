@@ -15,7 +15,7 @@ import lieu from '@/assets/ui/lieu.svg'
 import pinGps from '@/assets/ui/pin-gps.svg'
 import pointInteret from '@/assets/ui/point-interet.svg'
 import { Feuille } from '@/shared/ui/Feuille'
-import { useUrlDe } from '../hooks/useUrlDe'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { chargerBrouillon, etapeDeReprise, type Brouillon, type Etape } from '../lib/brouillon'
 import styles from './AjouterFeuille.module.css'
 

@@ -6,7 +6,7 @@
  *            son étape). La Charte, signée à l'entrée, n'est plus trois cases à cocher : une
  *            phrase au moment de poser. Un refus se dit en clair, avec quoi faire.
  */
-import { useUrlDe } from '../hooks/useUrlDe'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { useEpoques, useNatures, usePoser } from '../hooks/useAjout'
 import type { Ajout } from '../api/lireAjout'
 import type { Brouillon, Etape } from '../lib/brouillon'

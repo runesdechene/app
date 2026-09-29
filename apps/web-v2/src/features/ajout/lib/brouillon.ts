@@ -6,6 +6,7 @@
  *            « Ajouter » propose de le reprendre, à l'étape où on l'a laissé.
  *            Un bouton grisé dit toujours ce qui manque (la V1 ne le disait jamais).
  */
+import type { PhotoAEnvoyer } from '@/shared/lib/photo'
 import { del, get, set } from 'idb-keyval'
 import type { Point } from '@/shared/lib/distance'
 import type { Endroit } from './adresse'
@@ -13,7 +14,7 @@ import type { Endroit } from './adresse'
 export const ETAPES = ['photo', 'lieu', 'nom', 'recit', 'apercu'] as const
 export type Etape = (typeof ETAPES)[number]
 
-export type PhotoBrouillon = { id: string; grande: Blob; vignette: Blob }
+export type PhotoBrouillon = PhotoAEnvoyer
 
 export type Brouillon = {
   etape: Etape

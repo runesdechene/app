@@ -16,6 +16,7 @@ const api = vi.hoisted(() => ({
   ajouterLieu: vi.fn(),
 }))
 vi.mock('../api/ajout', () => api)
+vi.mock('@/shared/supabase/photos', () => ({ envoyerPhotos: api.envoyerPhotos }))
 const stockage = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn(), del: vi.fn() }))
 vi.mock('idb-keyval', () => stockage)
 vi.mock('@/shared/lib/position', () => ({ positionSiAutorisee: () => Promise.resolve(null) }))

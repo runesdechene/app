@@ -14,11 +14,12 @@ const api = vi.hoisted(() => ({
   fetchEpoques: vi.fn(),
   fetchFicheAModifier: vi.fn(),
   modifierLieu: vi.fn(),
-  envoyerPhotos: vi.fn(),
-  ajouterPhotosLieu: vi.fn(() => Promise.resolve()),
+  ajouterPhotosLieu: vi.fn<(id: string, photos: { grande: Blob }[]) => Promise<void>>(() =>
+    Promise.resolve(),
+  ),
 }))
 vi.mock('../api/ajout', () => api)
-vi.mock('../lib/photo', () => ({
+vi.mock('@/shared/lib/photo', () => ({
   preparerPhoto: () => Promise.resolve({ grande: new Blob(['g']), vignette: new Blob(['v']) }),
 }))
 
@@ -82,18 +83,15 @@ test('un refus de la base se dit en clair, et on reste', async () => {
   expect(fini).not.toHaveBeenCalled()
 })
 
-test('des photos s’ajoutent : envoyées, puis rattachées au lieu, sans nouvelle version', async () => {
-  api.envoyerPhotos.mockResolvedValue([
-    { id: 'p', url: 'https://x/p.webp', thumb: 'https://x/p_thumb.webp' },
-  ])
+test('des photos s’ajoutent : rattachées au lieu, sans nouvelle version', async () => {
   monter()
   const choisir = await screen.findByLabelText(/Ajouter des photos/)
   await userEvent.upload(choisir, new File(['x'], 'tour.jpg', { type: 'image/jpeg' }))
   expect(await screen.findByRole('button', { name: 'Retirer cette photo' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
-  expect(api.ajouterPhotosLieu).toHaveBeenCalledWith('a', [
-    { id: 'p', url: 'https://x/p.webp', thumb: 'https://x/p_thumb.webp' },
-  ])
+  const [lieu, photos] = api.ajouterPhotosLieu.mock.lastCall ?? []
+  expect(lieu).toBe('a')
+  expect(photos?.map((p) => p.grande instanceof Blob)).toEqual([true])
   expect(api.modifierLieu).not.toHaveBeenCalled()
   expect(fini).toHaveBeenCalled()
 })

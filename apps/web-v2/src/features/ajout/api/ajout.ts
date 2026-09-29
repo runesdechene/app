@@ -7,11 +7,11 @@
  */
 import type { Point } from '@/shared/lib/distance'
 import { supabase } from '@/shared/supabase/client'
+import type { PhotoAEnvoyer } from '@/shared/lib/photo'
+import { envoyerPhotos, type ImageEnvoyee } from '@/shared/supabase/photos'
 import type { Champs } from '../components/ChampsDuLieu'
-import type { Brouillon, PhotoBrouillon } from '../lib/brouillon'
+import type { Brouillon } from '../lib/brouillon'
 import { lireAjout, lireEpoques, lireFicheAModifier, lireNatures, lireVoisins } from './lireAjout'
-
-const SEAU = 'place-images'
 
 export async function fetchNatures() {
   const { data, error } = await supabase.rpc('natures_de_lieu')
@@ -32,31 +32,6 @@ export async function fetchVoisins(ici: Point) {
   })
   if (error) throw error
   return lireVoisins(data)
-}
-
-export type ImageEnvoyee = { id: string; url: string; thumb: string }
-
-async function envoyer(chemin: string, blob: Blob) {
-  const { error } = await supabase.storage
-    .from(SEAU)
-    .upload(chemin, blob, { contentType: 'image/webp', upsert: true })
-  if (error) throw error
-  return supabase.storage.from(SEAU).getPublicUrl(chemin).data.publicUrl
-}
-
-export async function envoyerPhotos(photos: PhotoBrouillon[]): Promise<ImageEnvoyee[]> {
-  const { data } = await supabase.auth.getSession()
-  const moi = data.session?.user.id
-  if (!moi) throw new Error('Connexion requise')
-  const images: ImageEnvoyee[] = []
-  // Une à une : sur un téléphone en montagne, dix envois à la fois échouent ensemble.
-  for (const photo of photos) {
-    const dossier = `places/${moi}/${photo.id}`
-    const url = await envoyer(`${dossier}.webp`, photo.grande)
-    const thumb = await envoyer(`${dossier}_thumb.webp`, photo.vignette)
-    images.push({ id: photo.id, url, thumb })
-  }
-  return images
 }
 
 export async function ajouterLieu(b: Brouillon, images: ImageEnvoyee[], ici: Point | null) {
@@ -98,8 +73,9 @@ export async function modifierLieu(id: string, f: Champs & { recit: string }, no
   if (error) throw error
 }
 
-// Ajouter des photos à un lieu (mig 388) : elles viennent d'être envoyées dans mon dossier.
-export async function ajouterPhotosLieu(id: string, images: ImageEnvoyee[]) {
+// Ajouter des photos à un lieu (mig 388) : envoyées dans mon dossier, puis rattachées au lieu.
+export async function ajouterPhotosLieu(id: string, photos: PhotoAEnvoyer[]) {
+  const images = await envoyerPhotos(photos)
   const { error } = await supabase.rpc('ajouter_photos_lieu', {
     p_id: id,
     p_images: images.map((i) => ({ url: i.url })),

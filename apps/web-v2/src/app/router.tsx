@@ -13,7 +13,7 @@ import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
 import { RouteChemins, RouteClassement } from './routes/accueil'
 import { RouteAjouter, RouteAjouterLieu, RouteNotifications } from './routes/carte'
-import { RouteLieu, RouteModifierLieu } from './routes/lieu'
+import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteMurmure } from './routes/messages'
 import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
 import { Shell } from './shell/Shell'
@@ -40,6 +40,7 @@ export const routes: RouteObject[] = [
               { path: 'notifications', Component: RouteNotifications },
               { path: 'lieu/:id', Component: RouteLieu },
               { path: 'lieu/:id/modifier', Component: RouteModifierLieu },
+              { path: 'lieu/:id/carnet', Component: RouteCarnet },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'preferences', Component: RoutePreferences },

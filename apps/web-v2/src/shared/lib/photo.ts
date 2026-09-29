@@ -39,6 +39,9 @@ async function reduire(image: ImageBitmap, cote: number): Promise<Blob> {
 
 export type PhotoPreparee = { grande: Blob; vignette: Blob }
 
+// Une photo prête à partir : son identifiant (le nom du fichier), la grande, la vignette.
+export type PhotoAEnvoyer = { id: string; grande: Blob; vignette: Blob }
+
 export async function preparerPhoto(fichier: File): Promise<PhotoPreparee> {
   // imageOrientation : une photo prise en portrait reste en portrait.
   const image = await createImageBitmap(fichier, { imageOrientation: 'from-image' })

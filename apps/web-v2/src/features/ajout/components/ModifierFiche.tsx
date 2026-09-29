@@ -14,11 +14,11 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
-import { ajouterPhotosLieu, envoyerPhotos, fetchFicheAModifier, modifierLieu } from '../api/ajout'
+import { ajouterPhotosLieu, fetchFicheAModifier, modifierLieu } from '../api/ajout'
 import type { Fiche } from '../api/lireAjout'
-import { useUrlDe } from '../hooks/useUrlDe'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import type { PhotoBrouillon } from '../lib/brouillon'
-import { preparerPhoto } from '../lib/photo'
+import { preparerPhoto } from '@/shared/lib/photo'
 import { ChampsDuLieu } from './ChampsDuLieu'
 import nom from './EtapeNom.module.css'
 import recit from './EtapeRecit.module.css'
@@ -90,7 +90,7 @@ function Formulaire({
 
   const enregistrer = useMutation({
     mutationFn: async () => {
-      if (nouvelles.length > 0) await ajouterPhotosLieu(id, await envoyerPhotos(nouvelles))
+      if (nouvelles.length > 0) await ajouterPhotosLieu(id, nouvelles)
       if (champsChanges) {
         await modifierLieu(
           id,

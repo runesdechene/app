@@ -27,6 +27,8 @@ export function phraseDe(n: Notification): Morceau[] {
       return [qui, t(' a ajouté des photos à '), lieu]
     case 'new_comment':
       return [qui, t(' a commenté '), lieu]
+    case 'coeur_mot':
+      return [qui, t(' a aimé ton mot sur '), lieu]
     case 'comment_reply':
       return [qui, t(' t’a répondu sur '), lieu]
     case 'place_position_edited':

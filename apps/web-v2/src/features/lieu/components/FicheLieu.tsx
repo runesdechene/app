@@ -2,7 +2,7 @@
  * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photo au bord déchiré,
  *            galerie, titre et ses deux boutons ronds, type, ligne de faits, adresse, Explorateurs,
  *            revendication, bouton de visite, récit, crédits. Les cœurs (30/09) : la pastille à
- *            droite de la galerie, « Féliciter » sous les crédits.
+ *            droite de la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
  * POURQUOI — spec fiche §2 : chaque ligne sans donnée disparaît, jamais une ligne vide ; la fiche
  *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
@@ -26,6 +26,7 @@ import { useFiche } from '../hooks/useFiche'
 import { useMoi } from '../hooks/useMoi'
 import { adresseCourte } from '../lib/adresse'
 import { ligneDeFaits } from '../lib/faits'
+import { Carnet } from './Carnet'
 import { CoeursDesAuteurs, PastilleCoeurs } from './CoeursLieu'
 import styles from './FicheLieu.module.css'
 
@@ -241,6 +242,8 @@ export function FicheLieu({
             />
           )}
         </footer>
+
+        <Carnet id={id} limite={3} />
       </div>
     </article>
   )

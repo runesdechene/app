@@ -27,6 +27,7 @@ test('les cœurs, les récits, les photos : qui, puis le lieu', () => {
     { texte: ' a envoyé des cœurs à ', sorte: 'texte' },
     { texte: 'Château de Jonjeac', sorte: 'lieu' },
   ])
+  expect(texte({ ...base, type: 'coeur_mot' })).toBe('Kelpie a aimé ton mot sur Château de Jonjeac')
   expect(texte({ ...base, type: 'description_edited' })).toBe(
     'Kelpie a enrichi le récit de Château de Jonjeac',
   )

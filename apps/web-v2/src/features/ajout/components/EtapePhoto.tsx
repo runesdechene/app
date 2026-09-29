@@ -10,8 +10,8 @@
  */
 import { useState } from 'react'
 import type { PhotoBrouillon, ProprietesEtape } from '../lib/brouillon'
-import { positionDeLaPhoto, preparerPhoto } from '../lib/photo'
-import { useUrlDe } from '../hooks/useUrlDe'
+import { positionDeLaPhoto, preparerPhoto } from '@/shared/lib/photo'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import styles from './EtapePhoto.module.css'
 
 const MAX_PHOTOS = 10

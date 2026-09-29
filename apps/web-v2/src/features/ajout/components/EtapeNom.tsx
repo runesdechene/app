@@ -7,7 +7,7 @@
  *            porte sa bille — son icône, puis son rang dès qu'on la choisit. Rien n'est obligatoire
  *            hors le nom et une nature : l'époque et l'année aident, sans bloquer.
  */
-import { useUrlDe } from '../hooks/useUrlDe'
+import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { ceQuiManque, type ProprietesEtape } from '../lib/brouillon'
 import { BoutonSuivant } from './BoutonSuivant'
 import { ChampsDuLieu } from './ChampsDuLieu'

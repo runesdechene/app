@@ -16,6 +16,19 @@ export type Version = {
   note: string | null
   qui: Personne | null
 }
+export type Mot = {
+  id: number
+  quand: string
+  texte: string
+  qui: Personne
+  venu: boolean
+  photos: string[]
+  coeurs: number
+  miens: number
+  aMoi: boolean
+  reponses: Mot[]
+}
+export type Carnet = { total: number; mots: Mot[] }
 export type Coeurs = { total: number; miens: number; gens: (Personne & { nombre: number })[] }
 export type FicheLieu = {
   id: string
@@ -161,4 +174,27 @@ export function lireHistoire(json: unknown): Version[] | null {
       qui: ouNull(lirePersonne)(o.qui),
     }
   })(json)
+}
+
+// Le Carnet de passage (mig 389) ; null : le lieu n'est pas visible.
+function lireMot(v: unknown): Mot {
+  const m = objet(v)
+  return {
+    id: nombre(m.id),
+    quand: chaine(m.quand),
+    texte: chaine(m.texte),
+    qui: lirePersonne(m.qui),
+    venu: booleen(m.venu),
+    photos: liste(chaine)(m.photos),
+    coeurs: nombre(m.coeurs),
+    miens: nombre(m.miens),
+    aMoi: booleen(m.aMoi),
+    reponses: m.reponses === undefined ? [] : liste(lireMot)(m.reponses),
+  }
+}
+
+export function lireCarnet(json: unknown): Carnet | null {
+  if (json === null) return null
+  const c = objet(json)
+  return { total: nombre(c.total), mots: liste(lireMot)(c.mots) }
 }

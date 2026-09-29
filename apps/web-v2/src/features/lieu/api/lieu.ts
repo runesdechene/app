@@ -5,7 +5,10 @@
  */
 import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
+import type { PhotoAEnvoyer } from '@/shared/lib/photo'
+import { envoyerPhotos } from '@/shared/supabase/photos'
 import {
+  lireCarnet,
   lireCoeurs,
   lireCompagnons,
   lireHistoire,
@@ -121,5 +124,42 @@ export async function signalerLieu(id: string, raison: Raison, precision: string
     p_raison: raison,
     p_precision: precision,
   })
+  if (error) throw error
+}
+
+// Le Carnet de passage (mig 389) : les mots d'un lieu (les premiers seulement, pour la fiche).
+export async function fetchCarnet(id: string, limite: number | null) {
+  const { data, error } = await supabase.rpc('carnet_du_lieu', {
+    p_id: id,
+    ...(limite !== null && { p_limite: limite }),
+  })
+  if (error) throw error
+  return lireCarnet(data)
+}
+
+// Écrire au carnet : les photos partent d'abord dans mon dossier, puis le mot.
+export async function ecrireAuCarnet(
+  id: string,
+  texte: string,
+  photos: PhotoAEnvoyer[],
+  parent: number | null,
+) {
+  const images = photos.length > 0 ? await envoyerPhotos(photos) : []
+  const { error } = await supabase.rpc('ecrire_au_carnet', {
+    p_id: id,
+    p_texte: texte,
+    p_images: images.map((i) => ({ url: i.url })),
+    ...(parent !== null && { p_parent: parent }),
+  })
+  if (error) throw error
+}
+
+export async function aimerMot(id: number) {
+  const { error } = await supabase.rpc('aimer_mot', { p_id: id })
+  if (error) throw error
+}
+
+export async function effacerMot(id: number) {
+  const { error } = await supabase.rpc('effacer_mot', { p_id: id })
   if (error) throw error
 }

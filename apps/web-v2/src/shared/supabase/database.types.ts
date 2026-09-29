@@ -529,6 +529,52 @@ export type Database = {
           },
         ]
       }
+      coeurs_mot: {
+        Row: {
+          contribution_id: number
+          dernier_le: string
+          nombre: number
+          premier_le: string
+          user_id: string
+        }
+        Insert: {
+          contribution_id: number
+          dernier_le?: string
+          nombre?: number
+          premier_le?: string
+          user_id: string
+        }
+        Update: {
+          contribution_id?: number
+          dernier_le?: string
+          nombre?: number
+          premier_le?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coeurs_mot_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "place_contributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mot_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mot_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_quest_contributions: {
         Row: {
           count: number
@@ -5841,6 +5887,7 @@ export type Database = {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: number
       }
+      _mot: { Args: { p_id: number }; Returns: Json }
       _notification_v2: { Args: { p_type: string }; Returns: boolean }
       _notify_court_challengers: {
         Args: {
@@ -6017,6 +6064,7 @@ export type Database = {
         Returns: Json
       }
       aimer_lieu: { Args: { p_id: string }; Returns: Json }
+      aimer_mot: { Args: { p_id: number }; Returns: Json }
       ajouter_lieu: {
         Args: {
           p_adresse: string
@@ -6059,6 +6107,10 @@ export type Database = {
       broadcast_announcement_push: { Args: { p_id: string }; Returns: Json }
       cancel_voyage: {
         Args: { p_user_id: string; p_voyage_id: string }
+        Returns: Json
+      }
+      carnet_du_lieu: {
+        Args: { p_id: string; p_limite?: number }
         Returns: Json
       }
       carte_lieux: { Args: never; Returns: Json }
@@ -6288,6 +6340,15 @@ export type Database = {
       distance_multiplier: { Args: { distance_km: number }; Returns: number }
       dmetaphone: { Args: { "": string }; Returns: string }
       dmetaphone_alt: { Args: { "": string }; Returns: string }
+      ecrire_au_carnet: {
+        Args: {
+          p_id: string
+          p_images?: Json
+          p_parent?: number
+          p_texte: string
+        }
+        Returns: Json
+      }
       ecrire_au_registre: {
         Args: { p_canal: string; p_mentions?: string[]; p_texte: string }
         Returns: Json
@@ -6296,6 +6357,7 @@ export type Database = {
         Args: { p_content: string; p_place_id: string; p_user_id: string }
         Returns: Json
       }
+      effacer_mot: { Args: { p_id: number }; Returns: Json }
       eject_voyage_participant: {
         Args: {
           p_chief_user_id: string
