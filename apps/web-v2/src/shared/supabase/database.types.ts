@@ -483,6 +483,52 @@ export type Database = {
           },
         ]
       }
+      coeurs_lieu: {
+        Row: {
+          dernier_le: string
+          nombre: number
+          place_id: string
+          premier_le: string
+          user_id: string
+        }
+        Insert: {
+          dernier_le?: string
+          nombre?: number
+          place_id: string
+          premier_le?: string
+          user_id: string
+        }
+        Update: {
+          dernier_le?: string
+          nombre?: number
+          place_id?: string
+          premier_le?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coeurs_lieu_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_lieu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_lieu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_quest_contributions: {
         Row: {
           count: number
