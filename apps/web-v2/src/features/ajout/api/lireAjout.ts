@@ -71,3 +71,26 @@ export function lireAjout(json: unknown): Ajout {
     apres: nombre(a.apres),
   }
 }
+
+// La fiche telle qu'elle est, pour l'écran « Modifier » (mig 387) ; null : pas visible.
+export type Fiche = {
+  nom: string
+  natures: string[]
+  epoque: string | null
+  annee: number | null
+  recit: string
+  photo: string | null
+}
+
+export function lireFicheAModifier(json: unknown): Fiche | null {
+  if (json === null) return null
+  const f = objet(json)
+  return {
+    nom: chaine(f.nom),
+    natures: liste(chaine)(f.natures),
+    epoque: ouNull(chaine)(f.epoque),
+    annee: ouNull(nombre)(f.annee),
+    recit: chaine(f.recit),
+    photo: ouNull(chaine)(f.photo),
+  }
+}

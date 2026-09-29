@@ -8,6 +8,14 @@ import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire
 
 export type Personne = { id: string; nom: string; avatar: string | null }
 export type Compagnon = Personne & { distance: number }
+export type Version = {
+  id: number | null
+  quand: string
+  origine: boolean
+  champs: string[]
+  note: string | null
+  qui: Personne | null
+}
 export type Coeurs = { total: number; miens: number; gens: (Personne & { nombre: number })[] }
 export type FicheLieu = {
   id: string
@@ -136,4 +144,21 @@ export function lireCoeurs(json: unknown): Coeurs | null {
     miens: nombre(c.miens),
     gens: liste((v) => ({ ...lirePersonne(v), nombre: nombre(objet(v).nombre) }))(c.gens),
   }
+}
+
+// L'histoire d'une fiche (mig 387) ; null : le lieu n'est pas visible. La version d'origine
+// d'un lieu jamais modifié n'a pas d'identifiant : on n'y revient pas.
+export function lireHistoire(json: unknown): Version[] | null {
+  if (json === null) return null
+  return liste((v): Version => {
+    const o = objet(v)
+    return {
+      id: ouNull(nombre)(o.id),
+      quand: chaine(o.quand),
+      origine: booleen(o.origine),
+      champs: liste(chaine)(o.champs),
+      note: ouNull(chaine)(o.note),
+      qui: ouNull(lirePersonne)(o.qui),
+    }
+  })(json)
 }

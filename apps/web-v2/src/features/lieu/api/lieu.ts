@@ -5,7 +5,14 @@
  */
 import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
-import { lireCoeurs, lireCompagnons, lireExplorateurs, lireFiche, lireRecompense } from './lireLieu'
+import {
+  lireCoeurs,
+  lireCompagnons,
+  lireHistoire,
+  lireExplorateurs,
+  lireFiche,
+  lireRecompense,
+} from './lireLieu'
 
 export async function fetchFiche(id: string) {
   const { data, error } = await supabase.rpc('fiche_lieu', { p_id: id })
@@ -91,5 +98,28 @@ export async function fetchCoeurs(id: string) {
 // Un cœur de plus (mig 384) : à volonté, jamais sur son propre lieu.
 export async function aimerLieu(id: string) {
   const { error } = await supabase.rpc('aimer_lieu', { p_id: id })
+  if (error) throw error
+}
+
+export async function fetchHistoire(id: string) {
+  const { data, error } = await supabase.rpc('histoire_du_lieu', { p_id: id })
+  if (error) throw error
+  return lireHistoire(data)
+}
+
+// Reposer une version (mig 387) : les mêmes règles que modifier, et une version de plus.
+export async function revenirAVersion(version: number) {
+  const { error } = await supabase.rpc('revenir_a_version', { p_version: version })
+  if (error) throw error
+}
+
+export type Raison = 'n_existe_pas' | 'prive_ou_dangereux' | 'doublon' | 'contenu' | 'autre'
+
+export async function signalerLieu(id: string, raison: Raison, precision: string) {
+  const { error } = await supabase.rpc('signaler_lieu', {
+    p_id: id,
+    p_raison: raison,
+    p_precision: precision,
+  })
   if (error) throw error
 }

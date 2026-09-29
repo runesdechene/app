@@ -3,12 +3,21 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-const api = vi.hoisted(() => ({ fetchMoi: vi.fn(), supprimerLieu: vi.fn(), fetchCoeurs: vi.fn() }))
+const api = vi.hoisted(() => ({
+  fetchMoi: vi.fn(),
+  supprimerLieu: vi.fn(),
+  fetchCoeurs: vi.fn(),
+  fetchHistoire: vi.fn(),
+  revenirAVersion: vi.fn(() => Promise.resolve()),
+  signalerLieu: vi.fn(() => Promise.resolve()),
+}))
 vi.mock('../api/lieu', () => api)
 
 import { FeuilleCoeurs } from './FeuilleCoeurs'
+import { FeuilleHistoire } from './FeuilleHistoire'
 import { FeuilleOptions } from './FeuilleOptions'
 import { FeuillePartager } from './FeuillePartager'
+import { FeuilleSignaler } from './FeuilleSignaler'
 
 const FICHE = {
   id: 'a',
@@ -45,7 +54,15 @@ function dans(element: React.ReactNode) {
 }
 
 test('« Trouver sur la carte » garde la fiche ouverte et centre la carte sur le lieu', async () => {
-  const router = dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} onSupprime={vi.fn()} />)
+  const router = dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={vi.fn()}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
   await userEvent.click(screen.getByRole('button', { name: /Trouver sur la carte/ }))
   expect(router.state.location.pathname).toBe('/carte/lieu/a')
   expect(router.state.location.search).toBe('?centre=45.9,6.1')
@@ -92,7 +109,15 @@ ${window.location.origin}${import.meta.env.BASE_URL}carte/lieu/a`,
 })
 
 test('supprimer : seulement pour qui l’a ajouté, ou un admin', async () => {
-  dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} onSupprime={vi.fn()} />)
+  dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={vi.fn()}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
   await screen.findByRole('button', { name: /Trouver sur la carte/ })
   await waitFor(() => {
     expect(api.fetchMoi).toHaveBeenCalled()
@@ -102,14 +127,30 @@ test('supprimer : seulement pour qui l’a ajouté, ou un admin', async () => {
 
 test('un admin voit « Supprimer ce lieu »', async () => {
   api.fetchMoi.mockResolvedValue({ id: 'uriel', admin: true })
-  dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} onSupprime={vi.fn()} />)
+  dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={vi.fn()}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
   expect(await screen.findByRole('button', { name: /Supprimer ce lieu/ })).toBeInTheDocument()
 })
 
 test('l’auteur supprime son lieu, après confirmation', async () => {
   api.fetchMoi.mockResolvedValue({ id: 'auteur', admin: false })
   const supprime = vi.fn()
-  dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} onSupprime={supprime} />)
+  dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={supprime}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
   await userEvent.click(await screen.findByRole('button', { name: /Supprimer ce lieu/ }))
   expect(api.supprimerLieu).not.toHaveBeenCalled()
   expect(screen.getByText(/C’est définitif/)).toBeInTheDocument()
@@ -122,7 +163,15 @@ test('l’auteur supprime son lieu, après confirmation', async () => {
 
 test('« Garder le lieu » revient aux options sans rien supprimer', async () => {
   api.fetchMoi.mockResolvedValue({ id: 'auteur', admin: false })
-  dans(<FeuilleOptions fiche={FICHE} onFermer={vi.fn()} onSupprime={vi.fn()} />)
+  dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={vi.fn()}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
   await userEvent.click(await screen.findByRole('button', { name: /Supprimer ce lieu/ }))
   await userEvent.click(screen.getByRole('button', { name: 'Garder le lieu' }))
   expect(await screen.findByRole('button', { name: /Supprimer ce lieu/ })).toBeInTheDocument()
@@ -144,4 +193,59 @@ test('« Les cœurs » : qui en a envoyé, et combien, les plus généreux d’a
   expect(lignes[0]).toHaveTextContent('Kelpie')
   expect(lignes[0]).toHaveTextContent('18')
   expect(lignes[1]).toHaveTextContent('Luna')
+})
+
+test('« Modifier la fiche » mène à l’écran de modification du lieu', async () => {
+  const router = dans(
+    <FeuilleOptions
+      fiche={FICHE}
+      onFermer={vi.fn()}
+      onSupprime={vi.fn()}
+      onHistoire={vi.fn()}
+      onSignaler={vi.fn()}
+    />,
+  )
+  await userEvent.click(screen.getByRole('button', { name: /Modifier la fiche/ }))
+  expect(router.state.location.pathname).toBe('/carte/lieu/a/modifier')
+})
+
+test('« L’histoire de la fiche » : chaque version en mots, et revenir à une ancienne', async () => {
+  api.fetchHistoire.mockResolvedValue([
+    {
+      id: 3,
+      quand: '2026-09-23T10:00:00Z',
+      origine: false,
+      champs: ['recit'],
+      note: null,
+      qui: { id: 'a', nom: 'Aelis', avatar: null },
+    },
+    {
+      id: 1,
+      quand: '2026-08-17T10:00:00Z',
+      origine: true,
+      champs: [],
+      note: null,
+      qui: { id: 'l', nom: 'Luna', avatar: null },
+    },
+  ])
+  dans(<FeuilleHistoire id="a" onFermer={vi.fn()} />)
+  expect(await screen.findByText(/a enrichi le récit/)).toBeInTheDocument()
+  expect(screen.getByText('Actuelle')).toBeInTheDocument()
+  expect(screen.getByText(/a ajouté le lieu/)).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Revenir' }))
+  expect(api.revenirAVersion).toHaveBeenCalledWith(1, expect.anything())
+})
+
+test('« Signaler » : une raison, un mot, puis un merci', async () => {
+  dans(<FeuilleSignaler id="a" onFermer={vi.fn()} />)
+  const envoyer = screen.getByRole('button', { name: 'Envoyer le signalement' })
+  expect(envoyer).toBeDisabled()
+  await userEvent.click(screen.getByRole('radio', { name: 'C’est un doublon d’un autre lieu' }))
+  await userEvent.type(
+    screen.getByRole('textbox', { name: 'Un mot de plus' }),
+    'le château d’à côté',
+  )
+  await userEvent.click(envoyer)
+  expect(api.signalerLieu).toHaveBeenCalledWith('a', 'doublon', 'le château d’à côté')
+  expect(await screen.findByText('Merci')).toBeInTheDocument()
 })

@@ -12,5 +12,6 @@ geste (IndexedDB) et se reprend depuis la feuille « Ajouter ».
   lire sa position), `adresse` (l'endroit en mots, la recherche — Nominatim).
 - `hooks/` — `useBrouillon`, `useAjout` (natures, époques, voisins, l'endroit, poser le lieu),
   `useUrlDe` (afficher une photo du brouillon).
-- `components/` — `AjouterFeuille`, `ParcoursAjout` (le cadre), `EnTete`, `BoutonSuivant`, et une
+- `components/` — `ModifierFiche` (modifier un lieu, mig 387 : mêmes champs que l'ajout, via
+  `ChampsDuLieu`), `AjouterFeuille`, `ParcoursAjout` (le cadre), `EnTete`, `BoutonSuivant`, et une
   étape par fichier : `EtapePhoto`, `EtapeLieu`, `EtapeNom`, `EtapeRecit`, `EtapeApercu`.

@@ -9,17 +9,20 @@
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
+import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
 import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
 import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
+import { FeuilleHistoire } from '@/features/lieu/components/FeuilleHistoire'
 import { FeuilleOptions } from '@/features/lieu/components/FeuilleOptions'
 import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
+import { FeuilleSignaler } from '@/features/lieu/components/FeuilleSignaler'
 import { FicheLieu } from '@/features/lieu/components/FicheLieu'
 import { useFiche } from '@/features/lieu/hooks/useFiche'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
-type Ouvert = 'options' | 'partager' | 'revendiquer' | 'coeurs' | null
+type Ouvert = 'options' | 'partager' | 'revendiquer' | 'coeurs' | 'histoire' | 'signaler' | null
 
 // Un lieu = un état neuf : passer d'un lieu à l'autre efface erreurs, galerie et feuilles ouvertes.
 export function RouteLieu() {
@@ -67,13 +70,37 @@ function Lieu({ id }: { id: string }) {
         )}
       />
       {fiche && ouvert === 'options' && (
-        <FeuilleOptions fiche={fiche} onFermer={fermer} onSupprime={fermerDetail} />
+        <FeuilleOptions
+          fiche={fiche}
+          onFermer={fermer}
+          onSupprime={fermerDetail}
+          onHistoire={() => {
+            setOuvert('histoire')
+          }}
+          onSignaler={() => {
+            setOuvert('signaler')
+          }}
+        />
       )}
       {ouvert === 'coeurs' && <FeuilleCoeurs id={id} onFermer={fermer} />}
+      {ouvert === 'histoire' && <FeuilleHistoire id={id} onFermer={fermer} />}
+      {ouvert === 'signaler' && <FeuilleSignaler id={id} onFermer={fermer} />}
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
       {fiche && ouvert === 'revendiquer' && (
         <FenetreRevendication fiche={fiche} onFermer={fermer} />
       )}
+    </DetailPane>
+  )
+}
+
+// /<onglet>/lieu/<id>/modifier — « Modifier la fiche » (faire vivre un lieu, mig 387). Enregistrer
+// ramène à la fiche, qui se relit.
+export function RouteModifierLieu() {
+  const { id = '' } = useParams()
+  const fermer = useFermerDetail()
+  return (
+    <DetailPane title="Modifier la fiche" surImage>
+      <ModifierFiche id={id} onFini={fermer} />
     </DetailPane>
   )
 }

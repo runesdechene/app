@@ -153,8 +153,81 @@
   mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
 }
 
+/* L'histoire : la version actuelle, et le retour vers une autre. */
+.actuelle,
+.revenir {
+  flex: none;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.actuelle {
+  color: var(--color-ocre);
+}
+
+.revenir {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+/* Signaler : cinq raisons, une seule choisie, puis un mot. */
+.raisons {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: none;
+}
+
+.raisons legend {
+  margin-bottom: var(--space-2);
+}
+
+.raison {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.raison:has(input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent-clair) 18%, transparent);
+}
+
+.raison input {
+  accent-color: var(--color-accent);
+}
+
+.precision {
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  resize: vertical;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .choix {
+  .choix,
+  .raison {
     transition: none;
   }
 }

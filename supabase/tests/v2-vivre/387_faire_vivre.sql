@@ -44,8 +44,8 @@ BEGIN
   file := public.mod_signalements();
   traite := public.mod_traiter_signalement((SELECT id FROM signalements_lieu WHERE place_id = lieu AND user_id = b AND traite_le IS NULL));
 
-  RAISE EXCEPTION 'BILAN histoire=% retour=% (origine=%) versions=% notifs=% ouverts=% file0=% traite=% refus=%',
-    histoire::text, apres_retour, nom_origine, versions, notifs, ouverts, (file->0->>'raison'), traite::text,
+  RAISE EXCEPTION 'BILAN a_modifier=% histoire=% retour=% (origine=%) versions=% notifs=% ouverts=% file0=% traite=% refus=%',
+    left(public.lieu_a_modifier(lieu)::text, 120), histoire::text, apres_retour, nom_origine, versions, notifs, ouverts, (file->0->>'raison'), traite::text,
     array_to_string(refus, ' | ');
 END $test$;
 ROLLBACK;

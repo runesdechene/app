@@ -4,7 +4,8 @@
 --   1. versions_lieu : chaque enregistrement d'une fiche (nom, natures, époque, année, récit) est
 --      une version. Paresseux : la première modification d'un lieu inscrit d'abord sa version
 --      d'origine (son auteur, sa date d'ajout) — rien à recopier pour les 3 481 lieux d'avant.
---   2. modifier_lieu(...) : ouvert à qui a découvert le lieu (la fiche ne se lit qu'après), à son
+--   2. lieu_a_modifier(p_id) : la fiche telle qu'elle est, pour l'écran « Modifier ».
+--      modifier_lieu(...) : ouvert à qui a découvert le lieu (la fiche ne se lit qu'après), à son
 --      auteur et au staff. Mêmes règles que l'ajout (381). Le récit continue d'écrire l'historique
 --      de la V1 (place_description_revisions, place_contributions) : la V1 reste juste. Qui a fait
 --      le lieu est prévenu (« lieu_modifie », ou « description_edited » pour le récit seul).
@@ -68,6 +69,22 @@ AS $function$
   FROM places p WHERE p.id = p_id;
 $function$;
 REVOKE ALL ON FUNCTION public._etat_du_lieu(text) FROM PUBLIC, anon, authenticated;
+
+-- La fiche telle qu'elle est, pour l'écran « Modifier » (et sa photo principale).
+CREATE OR REPLACE FUNCTION public.lieu_a_modifier(p_id text)
+ RETURNS json
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  SELECT CASE WHEN NOT public._lieu_visible(p_id) THEN NULL ELSE (
+    SELECT json_build_object('nom', e.nom, 'natures', e.natures, 'epoque', e.epoque,
+      'annee', e.annee, 'recit', e.recit,
+      'photo', (SELECT p.images->0->>'url' FROM places p WHERE p.id = p_id))
+    FROM public._etat_du_lieu(p_id) e) END;
+$function$;
+REVOKE ALL ON FUNCTION public.lieu_a_modifier(text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.lieu_a_modifier(text) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.modifier_lieu(
   p_id text,

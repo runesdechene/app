@@ -1,0 +1,50 @@
+/*
+ * QUOI     — « Modifier la fiche » : la page défile (photo, champs, récit), le pied reste collé en
+ *            bas avec la note et « Enregistrer les changements ».
+ */
+.modifier {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100%;
+}
+
+.pied {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  border-top: 1px solid var(--color-sable);
+  background: var(--color-fond);
+}
+
+.note {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.note:focus {
+  border-color: var(--color-ocre);
+  outline: none;
+}
+
+.refus {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}
+
+.chargement {
+  min-height: 300px;
+}

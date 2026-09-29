@@ -8,7 +8,14 @@
 import type { Point } from '@/shared/lib/distance'
 import { supabase } from '@/shared/supabase/client'
 import type { Brouillon, PhotoBrouillon } from '../lib/brouillon'
-import { lireAjout, lireEpoques, lireNatures, lireVoisins } from './lireAjout'
+import {
+  lireAjout,
+  lireEpoques,
+  lireFicheAModifier,
+  lireNatures,
+  lireVoisins,
+  type Fiche,
+} from './lireAjout'
 
 const SEAU = 'place-images'
 
@@ -75,4 +82,24 @@ export async function ajouterLieu(b: Brouillon, images: ImageEnvoyee[], ici: Poi
   })
   if (error) throw error
   return lireAjout(data)
+}
+
+export async function fetchFicheAModifier(id: string) {
+  const { data, error } = await supabase.rpc('lieu_a_modifier', { p_id: id })
+  if (error) throw error
+  return lireFicheAModifier(data)
+}
+
+// Modifier une fiche (mig 387) : chaque enregistrement est une version.
+export async function modifierLieu(id: string, f: Fiche, note: string) {
+  const { error } = await supabase.rpc('modifier_lieu', {
+    p_id: id,
+    p_nom: f.nom,
+    p_natures: f.natures,
+    p_recit: f.recit,
+    ...(f.epoque !== null && { p_epoque: f.epoque }),
+    ...(f.annee !== null && { p_annee: f.annee }),
+    ...(note.trim() !== '' && { p_note: note }),
+  })
+  if (error) throw error
 }

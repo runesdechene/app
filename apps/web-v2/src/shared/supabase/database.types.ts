@@ -6579,6 +6579,7 @@ export type Database = {
         Returns: number
       }
       herald_grade_promotions: { Args: never; Returns: undefined }
+      histoire_du_lieu: { Args: { p_id: string }; Returns: Json }
       increment_community_quest: {
         Args: {
           p_amount?: number
@@ -6627,6 +6628,7 @@ export type Database = {
         Args: { p_faction_id: string; p_user_id: string }
         Returns: Json
       }
+      lieu_a_modifier: { Args: { p_id: string }; Returns: Json }
       lieux_voisins: {
         Args: { p_latitude: number; p_longitude: number }
         Returns: Json
@@ -6755,6 +6757,18 @@ export type Database = {
       moderate_submission: {
         Args: { p_crowns?: number; p_status: string; p_submission_id: string }
         Returns: undefined
+      }
+      modifier_lieu: {
+        Args: {
+          p_annee?: number
+          p_epoque?: string
+          p_id: string
+          p_natures: string[]
+          p_nom: string
+          p_note?: string
+          p_recit: string
+        }
+        Returns: Json
       }
       mon_entree: { Args: never; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
@@ -6944,6 +6958,7 @@ export type Database = {
         Args: { p_compagnons: string[]; p_id: string; p_nom: string }
         Returns: Json
       }
+      revenir_a_version: { Args: { p_version: number }; Returns: Json }
       revisit_place_gps: {
         Args: {
           p_place_id: string
@@ -7078,6 +7093,10 @@ export type Database = {
       }
       set_voyage_cover_image: {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
+        Returns: Json
+      }
+      signaler_lieu: {
+        Args: { p_id: string; p_precision?: string; p_raison: string }
         Returns: Json
       }
       signaler_presence: {
