@@ -6712,8 +6712,10 @@ export type Database = {
         Args: { p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      marquer_notifications_lues: { Args: never; Returns: number }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
+      mes_notifications: { Args: never; Returns: Json }
       migrate_user_to_auth_id: {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
@@ -6759,6 +6761,7 @@ export type Database = {
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
       natures_de_lieu: { Args: never; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
+      notifications_non_lues: { Args: never; Returns: number }
       notify: {
         Args: { p_data: Json; p_recipient: string; p_type: string }
         Returns: undefined

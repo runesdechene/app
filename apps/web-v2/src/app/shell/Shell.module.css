@@ -48,6 +48,7 @@
 
 /* « Ajouter » et la cloche : des pochoirs de 24 px dans une cible tactile (maquette 162:107). */
 .action {
+  position: relative;
   width: var(--cible-tactile);
   height: var(--cible-tactile);
   display: grid;
@@ -60,6 +61,14 @@
 .action img {
   width: 24px;
   height: 24px;
+}
+
+/* La pastille des notifications non lues, à cheval sur le coin haut droit de la cloche. */
+.nonLues {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: grid;
 }
 
 .main {

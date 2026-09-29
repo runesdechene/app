@@ -20,6 +20,7 @@ import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
+import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -28,6 +29,7 @@ import logotype from '@/assets/ui/logotype.png'
 import replier from '@/assets/ui/replier.svg'
 import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
+import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
@@ -47,6 +49,7 @@ export function Shell() {
   const navigate = useNavigate()
   // Tant que l'app est ouverte (position déjà autorisée) : être proposé comme compagnon.
   useSignalerPresence()
+  const nonLues = useNonLues()
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille
   // L'adresse sur laquelle on a replié le tiroir : ailleurs, il est déplié.
@@ -131,6 +134,9 @@ export function Shell() {
             }}
           >
             <img src={cloche} alt="" />
+            <span className={styles.nonLues}>
+              <Pastille count={nonLues} />
+            </span>
           </button>
           {/* Sur PC seulement (le CSS les cache sur mobile, où elles vivent sur la page Compte). */}
           <button

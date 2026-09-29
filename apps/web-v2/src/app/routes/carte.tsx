@@ -3,12 +3,12 @@
  *            parcours « Ajouter un lieu » et les notifications.
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que ses écrans
  *            reçoivent le cadre de détail et la fonction de fermeture.
- * ATTENTION — les notifications arrivent plus tard ; la fiche d'un lieu vit dans lieu.tsx.
+ * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
  */
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
 import { ParcoursAjout } from '@/features/ajout/components/ParcoursAjout'
-import { EmptyState } from '@/shared/ui/EmptyState'
+import { Notifications } from '@/features/notifications/components/Notifications'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
@@ -43,7 +43,7 @@ export function RouteAjouterLieu() {
 export function RouteNotifications() {
   return (
     <DetailPane title="Notifications">
-      <EmptyState>Rien de nouveau</EmptyState>
+      <Notifications />
     </DetailPane>
   )
 }
