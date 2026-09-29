@@ -14,8 +14,10 @@ import styles from './EtapeApercu.module.css'
 
 // La base refuse avec un indice (hint) ou un code (migration 381) : chacun a sa phrase.
 function messageDeRefus(erreur: unknown): string {
-  const indice = typeof erreur === 'object' && erreur !== null && 'hint' in erreur ? erreur.hint : null
-  const code = typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
+  const indice =
+    typeof erreur === 'object' && erreur !== null && 'hint' in erreur ? erreur.hint : null
+  const code =
+    typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
   if (indice === 'decouvertes') {
     return 'Découvre d’abord trois lieux sur la carte : ils t’apprennent ce qu’on y cherche. Ton brouillon t’attend.'
   }

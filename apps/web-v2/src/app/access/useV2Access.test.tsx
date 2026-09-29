@@ -22,13 +22,7 @@ vi.mock('@/shared/supabase/client', () => ({
 
 function wrapper({ children }: { children: ReactNode }) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  // Fragment : les types de react-query se résolvent sur @types/react 18, remonté à la racine
-  // par la V1 (docs/v2/purge-back.md) ; un ReactNode 19 nu n'y est pas assignable.
-  return (
-    <QueryClientProvider client={client}>
-      <>{children}</>
-    </QueryClientProvider>
-  )
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
 }
 
 afterEach(() => {

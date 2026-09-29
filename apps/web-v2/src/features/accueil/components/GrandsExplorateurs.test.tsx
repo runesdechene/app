@@ -56,7 +56,9 @@ test('sur l’Accueil : les visites du mois, trois premiers en chiffres romains'
   expect(lignes[0]).toHaveTextContent('30 lieux visités')
   expect(api.fetchGrandsExplorateurs).toHaveBeenCalledWith('visites', '30jours')
   expect(screen.queryByRole('radiogroup')).toBeNull()
-  expect(screen.getByRole('heading', { name: /Le Panthéon/ })).toHaveTextContent('30 derniers jours')
+  expect(screen.getByRole('heading', { name: /Le Panthéon/ })).toHaveTextContent(
+    '30 derniers jours',
+  )
 })
 
 test('« Voir tout le classement » ouvre la page du classement dans l’Accueil', async () => {

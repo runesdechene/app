@@ -160,7 +160,9 @@ function Vignette({
       >
         {url && <img src={url} alt="" />}
       </button>
-      <button type="button" className={styles.retirer}
+      <button
+        type="button"
+        className={styles.retirer}
         aria-label="Retirer"
         disabled={occupe}
         onClick={onRetirer}
