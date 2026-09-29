@@ -63,3 +63,21 @@ export async function revendiquerLieu(id: string, compagnons: string[], nom: str
   if (error) throw error
   return chaine(objet(data).nom)
 }
+
+// Qui regarde : son identifiant, et s'il est admin (le rôle voyage dans le jeton, mig 179).
+export async function fetchMoi() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  const user = data.session?.user
+  if (!user) throw new Error('sans session')
+  return { id: user.id, admin: objet(user.app_metadata).user_role === 'admin' }
+}
+
+// delete_place (V1, gardée par la 347) : auteur ou admin, vérifié en base. Elle rend son refus
+// ({ error }) au lieu de le lever ; la cascade emporte les visites et les découvertes.
+export async function supprimerLieu(id: string, moi: string) {
+  const { data, error } = await supabase.rpc('delete_place', { p_user_id: moi, p_place_id: id })
+  if (error) throw error
+  const refus = objet(data).error
+  if (refus !== undefined) throw new Error(chaine(refus))
+}

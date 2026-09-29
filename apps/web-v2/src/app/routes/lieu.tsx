@@ -62,7 +62,9 @@ function Lieu({ id }: { id: string }) {
           />
         )}
       />
-      {fiche && ouvert === 'options' && <FeuilleOptions fiche={fiche} onFermer={fermer} />}
+      {fiche && ouvert === 'options' && (
+        <FeuilleOptions fiche={fiche} onFermer={fermer} onSupprime={fermerDetail} />
+      )}
       {fiche && ouvert === 'partager' && <FeuillePartager fiche={fiche} onFermer={fermer} />}
       {fiche && ouvert === 'revendiquer' && (
         <FenetreRevendication fiche={fiche} onFermer={fermer} />
