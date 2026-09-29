@@ -5,6 +5,7 @@ DO $test$
 DECLARE
   a text := 'cb16ff47-1ead-4adf-8eff-04d117551541';
   photo jsonb;
+  images_gardees jsonb;
   distant json; sur_place json; natures json; epoques json; voisins json;
   tags_ok int; principal text; revision int; explorateur int; decouverte text;
   refus text[] := '{}';
@@ -15,6 +16,11 @@ BEGIN
     'id', 'p1',
     'url', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1.webp',
     'thumb', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/p1_thumb.webp'));
+  -- Les fichiers existent dans le stockage (sinon la base refuse la photo).
+  INSERT INTO storage.objects (bucket_id, name) VALUES
+    ('place-images', 'places/' || a || '/p1.webp'), ('place-images', 'places/' || a || '/p1_thumb.webp');
+  -- Une clé en trop dans la photo : elle ne doit pas entrer dans la fiche.
+  photo := jsonb_set(photo, '{0,piege}', '"x"');
   natures := public.natures_de_lieu();
   epoques := public.epoques();
 
@@ -25,6 +31,7 @@ BEGIN
   SELECT tag_id INTO principal FROM place_tags WHERE place_id = distant->>'id' AND is_primary;
   SELECT count(*) INTO revision FROM place_description_revisions WHERE place_id = distant->>'id';
   SELECT method INTO decouverte FROM places_discovered WHERE place_id = distant->>'id' AND user_id = a;
+  SELECT images INTO images_gardees FROM places WHERE id = distant->>'id';
 
   -- Sur place (à ~10 m) : la visite compte, +3 d'expérience de plus.
   sur_place := public.ajouter_lieu('Chapelle de Test', 44.001, 7.201, ARRAY['_cjvj91BX'],
@@ -52,12 +59,21 @@ BEGIN
     refus := refus || 'recit-vide-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', '[]'::jsonb);
     refus := refus || 'sans-photo-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
+  BEGIN PERFORM public.ajouter_lieu('X', NULL, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
+    refus := refus || 'latitude-nulle-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', NULL);
+    refus := refus || 'photos-nulles-ACCEPTEES'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
+  BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '',
+    jsonb_build_array(jsonb_build_object(
+      'url', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/absente.webp',
+      'thumb', 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/' || a || '/absente_thumb.webp')));
+    refus := refus || 'photo-absente-ACCEPTEE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   PERFORM set_config('role', 'anon', true);
   BEGIN PERFORM public.ajouter_lieu('X', 44, 7, ARRAY['3fQyu5KCU'], NULL, NULL, 'R', '', photo);
     refus := refus || 'anon-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || 'anon refusé'::text; END;
 
-  RAISE EXCEPTION 'BILAN natures=% epoques=% distant=% nom=% tags=%/% principal=% revision=% decouverte=% sur_place=% explorateur=% voisins=% refus=%',
-    json_array_length(natures), json_array_length(epoques),
+  RAISE EXCEPTION 'BILAN images=% natures=% epoques=% distant=% nom=% tags=%/% principal=% revision=% decouverte=% sur_place=% explorateur=% voisins=% refus=%',
+    images_gardees::text, json_array_length(natures), json_array_length(epoques),
     distant::text, (SELECT title FROM places WHERE id = distant->>'id'), tags_ok, 2, principal, revision, decouverte,
     sur_place::text, explorateur, json_array_length(voisins), array_to_string(refus, ' | ');
 END $test$;

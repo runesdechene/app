@@ -212,6 +212,13 @@
   cursor: default;
 }
 
+/* Pendant la préparation des photos, tout est figé. */
+.galerie:has(input:disabled),
+.declencheur:has(input:disabled) {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 @keyframes poser {
   from {
     opacity: 0;

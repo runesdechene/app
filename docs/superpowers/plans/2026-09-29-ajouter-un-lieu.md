@@ -52,12 +52,24 @@ l'étape d'avant. La photo se sépare du parchemin par la lisière, jamais un d�
   l'étape « Nom » (photo, recherche « Colomars », « Près de Colomars »). Les natures, les voisins
   et la pose attendent la migration 381.
 
+- Relecture de fin (30/09) — neuf points corrigés. En base : valeurs nulles refusées, photos
+  reconstruites (seules `id`, `url`, `thumb` entrent), chaque photo doit exister dans le stockage,
+  plafond de vingt lieux par jour, adresse ≤ 300 signes ; test rejoué en transaction annulée
+  (onze refus attendus). Dans l'app : envoi des photos en `upsert` (une pose ratée se rejoue),
+  brouillon jeté par la pose elle-même, on ne quitte pas pendant la pose, photos figées pendant
+  leur préparation, adresses blob: libérées une seconde après le dernier écran, année bornée,
+  un message par refus (plafond, fiche invalide). 370 tests, typecheck, lint, build verts.
+- Trouvé en chemin : des policies de stockage ouvertes à tous (UPDATE et DELETE `true`) —
+  inscrites dans `docs/v2/purge-back.md`, **à trancher par Uriel**, rien supprimé.
+
 ## Écarts assumés (Ruling)
 
 - Les étapes **remplacent** l'adresse au lieu de s'empiler : on revient en touchant une étape
   faite ; le retour du navigateur quitte (brouillon gardé). Coût si faux : un `navigate` à changer
   dans `ParcoursAjout` et la route.
-- `useUrlDe` ne libère jamais les adresses blob: (WeakMap) : au plus vingt par brouillon. Coût si
-  faux : un peu de mémoire le temps de la visite.
+- `useUrlDe` : adresses partagées, libérées une seconde après le dernier écran (remplace la
+  WeakMap sans libération). Coût si faux : une image qui clignote si une étape met plus d'une
+  seconde à remonter.
+- Les correctifs de la relecture ont leurs tests écrits avec eux, pas vus échouer d'abord.
 - Tests écrits en même temps que le code pour `brouillon.ts` et `EtapeRecit` (pas vus échouer
   d'abord).

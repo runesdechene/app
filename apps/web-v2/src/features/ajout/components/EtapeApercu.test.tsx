@@ -16,6 +16,8 @@ const api = vi.hoisted(() => ({
   ajouterLieu: vi.fn(),
 }))
 vi.mock('../api/ajout', () => api)
+const stockage = vi.hoisted(() => ({ get: vi.fn(), set: vi.fn(), del: vi.fn() }))
+vi.mock('idb-keyval', () => stockage)
 vi.mock('@/shared/lib/position', () => ({ positionSiAutorisee: () => Promise.resolve(null) }))
 
 const brouillon: Brouillon = {
@@ -35,6 +37,7 @@ const pose = vi.fn()
 beforeEach(() => {
   aller.mockReset()
   pose.mockReset()
+  stockage.del.mockReset()
   api.fetchNatures.mockResolvedValue([
     { id: 'chateau', nom: 'Châteaux & fortins', icone: null, couleur: '#a9260f' },
     { id: 'ruines', nom: 'Ruines et vestiges', icone: null, couleur: '#745744' },
@@ -84,6 +87,7 @@ test('« Poser le lieu » envoie les photos, puis crée le lieu', async () => {
     expect(pose).toHaveBeenCalledWith(expect.objectContaining({ id: 'l1', rang: 17 }))
   })
   expect(api.envoyerPhotos).toHaveBeenCalledWith(brouillon.photos)
+  expect(stockage.del).toHaveBeenCalled() // le brouillon est jeté : le lieu est posé
 })
 
 test('trois découvertes manquent : on le dit, sans jargon', async () => {
@@ -92,4 +96,17 @@ test('trois découvertes manquent : on le dit, sans jargon', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Poser le lieu sur la carte' }))
   expect(await screen.findByText(/Découvre d’abord trois lieux sur la carte/)).toBeInTheDocument()
   expect(pose).not.toHaveBeenCalled()
+})
+
+test('plafond du jour ou fiche refusée : chacun sa phrase', async () => {
+  api.ajouterLieu.mockRejectedValueOnce({ message: 'Vingt lieux', hint: 'limite' })
+  monter()
+  const poser = screen.getByRole('button', { name: 'Poser le lieu sur la carte' })
+  await userEvent.click(poser)
+  expect(await screen.findByText(/Vingt lieux posés aujourd’hui/)).toBeInTheDocument()
+
+  api.ajouterLieu.mockRejectedValueOnce({ message: 'Un nom', code: '22023' })
+  await userEvent.click(poser)
+  expect(await screen.findByText(/Un détail de la fiche ne passe pas/)).toBeInTheDocument()
+  expect(stockage.del).not.toHaveBeenCalled()
 })

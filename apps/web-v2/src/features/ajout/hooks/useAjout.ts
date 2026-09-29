@@ -12,7 +12,7 @@ import type { Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterLieu, envoyerPhotos, fetchEpoques, fetchNatures, fetchVoisins } from '../api/ajout'
 import { endroitDe } from '../lib/adresse'
-import type { Brouillon } from '../lib/brouillon'
+import { jeterBrouillon, type Brouillon } from '../lib/brouillon'
 
 export function useNatures() {
   return (
@@ -52,14 +52,20 @@ export function useEndroit(point: Point | null) {
   return query.data ?? null
 }
 
+// La pose en cours se lit ailleurs (on ne quitte pas le parcours pendant qu'elle part).
+export const POSE = ['ajout', 'poser']
+
 export function usePoser() {
   const queryClient = useQueryClient()
   return useMutation({
+    mutationKey: POSE,
     mutationFn: async (b: Brouillon) => {
       const images = await envoyerPhotos(b.photos)
       return ajouterLieu(b, images, await positionSiAutorisee())
     },
+    // Ici et non dans l'écran : le brouillon est jeté même si l'écran a disparu entre-temps.
     onSuccess: () => {
+      void jeterBrouillon()
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
       void queryClient.invalidateQueries({ queryKey: ['accueil'] })
       void queryClient.invalidateQueries({ queryKey: ['explorateur'] })

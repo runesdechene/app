@@ -11,7 +11,10 @@
 --      ne pointe jamais vers une image extérieure. Rend le rang et l'expérience, comme
 --      decouvrir_lieu (367), pour la fête de la fin. L'adresse d'une photo est vérifiée tout
 --      entière (le stockage du projet, le dossier du compte, un nom simple en .webp) : un chemin
---      pareil sur un autre site ne passe pas (revue de sécurité du 29/09).
+--      pareil sur un autre site ne passe pas (revue de sécurité du 29/09). Relecture du 30/09 :
+--      les valeurs nulles sont refusées ; la liste des photos est reconstruite à partir des seuls
+--      champs vérifiés (l'identifiant est le nom du fichier) ; chaque photo doit exister dans le
+--      stockage ; vingt lieux par jour au plus — l'expérience ne se fabrique pas en boucle.
 -- SCHEMA CHECKED (29/09/2026, information_schema et définitions live) : places(id varchar,
 --      created_at, updated_at, author_id, place_type_id, title varchar, text NOT NULL, address
 --      varchar NOT NULL, latitude real, longitude real, private, masked, images jsonb, era_id,
@@ -22,7 +25,8 @@
 --      created_at) ; place_contributions(place_id, user_id, faction_id, type, content,
 --      created_at, updated_at) ; activity_log(type, actor_id, place_id, data) ;
 --      _require_min_discoveries(text, int) ; _distance_m(float8×4) ; _lieu_visible(text) ;
---      _level_from_xp(int) ; _xp_for_level(int) ; user_public_name(text, text, text).
+--      _level_from_xp(int) ; _xp_for_level(int) ; user_public_name(text, text, text) ;
+--      storage.objects(bucket_id text, name text).
 
 -- Les natures (types) d'un lieu, dans l'ordre du Hub.
 CREATE OR REPLACE FUNCTION public.natures_de_lieu()
@@ -106,6 +110,8 @@ DECLARE
   v_recit text := btrim(p_recit);
   v_dossier text;
   v_fichier text;
+  v_nom_fichier text;
+  v_images jsonb := '[]'::jsonb;
   v_image jsonb;
   v_sur_place boolean := false;
   v_xp_avant int;
@@ -121,13 +127,17 @@ BEGIN
   IF public._require_min_discoveries(v_moi, 3) IS NOT NULL THEN
     RAISE EXCEPTION 'Trois découvertes d’abord' USING ERRCODE = 'P0001', HINT = 'decouvertes';
   END IF;
+  IF (SELECT count(*) FROM places WHERE author_id = v_moi AND created_at > now() - interval '1 day') >= 20 THEN
+    RAISE EXCEPTION 'Vingt lieux aujourd’hui : reviens demain' USING ERRCODE = 'P0001', HINT = 'limite';
+  END IF;
   IF v_nom IS NULL OR char_length(v_nom) NOT BETWEEN 1 AND 120 THEN
     RAISE EXCEPTION 'Un nom, de 1 à 120 signes' USING ERRCODE = '22023';
   END IF;
   IF v_recit IS NULL OR char_length(v_recit) NOT BETWEEN 1 AND 5000 THEN
     RAISE EXCEPTION 'Un récit, de 1 à 5000 signes' USING ERRCODE = '22023';
   END IF;
-  IF p_latitude NOT BETWEEN -90 AND 90 OR p_longitude NOT BETWEEN -180 AND 180 THEN
+  IF p_latitude IS NULL OR p_longitude IS NULL
+     OR p_latitude NOT BETWEEN -90 AND 90 OR p_longitude NOT BETWEEN -180 AND 180 THEN
     RAISE EXCEPTION 'Position impossible' USING ERRCODE = '22023';
   END IF;
   IF coalesce(cardinality(p_natures), 0) NOT BETWEEN 1 AND 3
@@ -141,8 +151,11 @@ BEGIN
   IF p_annee IS NOT NULL AND p_annee NOT BETWEEN -10000 AND 2100 THEN
     RAISE EXCEPTION 'Année impossible' USING ERRCODE = '22023';
   END IF;
+  IF char_length(coalesce(p_adresse, '')) > 300 THEN
+    RAISE EXCEPTION 'Adresse trop longue' USING ERRCODE = '22023';
+  END IF;
   -- Les photos : une à dix, toutes dans le dossier du compte (place-images/places/<moi>/).
-  IF jsonb_typeof(p_images) <> 'array' OR jsonb_array_length(p_images) NOT BETWEEN 1 AND 10 THEN
+  IF p_images IS NULL OR jsonb_typeof(p_images) <> 'array' OR jsonb_array_length(p_images) NOT BETWEEN 1 AND 10 THEN
     RAISE EXCEPTION 'De une à dix photos' USING ERRCODE = '22023';
   END IF;
   v_dossier := 'https://ukpapqssgsxirsgmcvof.supabase.co/storage/v1/object/public/place-images/places/'
@@ -154,6 +167,18 @@ BEGIN
        OR coalesce(v_image->>'thumb', '') <> v_dossier || replace(v_fichier, '.webp', '_thumb.webp') THEN
       RAISE EXCEPTION 'Photo hors de ton dossier' USING ERRCODE = '22023';
     END IF;
+    -- La photo et sa vignette doivent exister : on ne pose pas un lieu sur une image rêvée.
+    v_nom_fichier := 'places/' || v_moi || '/' || v_fichier;
+    IF NOT EXISTS (SELECT 1 FROM storage.objects o WHERE o.bucket_id = 'place-images' AND o.name = v_nom_fichier)
+       OR NOT EXISTS (SELECT 1 FROM storage.objects o WHERE o.bucket_id = 'place-images'
+                        AND o.name = replace(v_nom_fichier, '.webp', '_thumb.webp')) THEN
+      RAISE EXCEPTION 'Photo introuvable' USING ERRCODE = '22023';
+    END IF;
+    -- Seuls les champs vérifiés entrent dans la fiche ; l'identifiant est le nom du fichier.
+    v_images := v_images || jsonb_build_array(jsonb_build_object(
+      'id', replace(v_fichier, '.webp', ''),
+      'url', v_image->>'url',
+      'thumb', v_image->>'thumb'));
   END LOOP;
 
   IF p_ma_latitude IS NOT NULL AND p_ma_longitude IS NOT NULL THEN
@@ -165,7 +190,7 @@ BEGIN
   INSERT INTO places (id, created_at, updated_at, author_id, place_type_id, title, text, address,
                       latitude, longitude, images, private, masked, era_id, year_exact)
   VALUES (v_id, now(), now(), v_moi, 'lieu', v_nom, v_recit, coalesce(btrim(p_adresse), ''),
-          p_latitude, p_longitude, p_images, false, false, p_epoque, p_annee);
+          p_latitude, p_longitude, v_images, false, false, p_epoque, p_annee);
 
   -- La première nature est la principale : elle donne sa couleur au lieu.
   FOR v_i IN 1 .. cardinality(p_natures) LOOP

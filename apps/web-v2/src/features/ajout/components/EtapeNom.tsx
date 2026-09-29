@@ -33,7 +33,9 @@ export function EtapeNom({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const avantJC = annee !== null && annee < 0
   const changerAnnee = (valeur: string, avant: boolean) => {
     const n = Number.parseInt(valeur, 10)
-    changer({ annee: Number.isFinite(n) && n > 0 ? (avant ? -n : n) : null })
+    // Les bornes de la base : 10 000 av. J.-C., 2100 après.
+    const borne = Math.min(n, avant ? 10000 : 2100)
+    changer({ annee: Number.isFinite(n) && n > 0 ? (avant ? -borne : borne) : null })
   }
 
   return (

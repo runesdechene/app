@@ -38,7 +38,7 @@ export type ImageEnvoyee = { id: string; url: string; thumb: string }
 async function envoyer(chemin: string, blob: Blob) {
   const { error } = await supabase.storage
     .from(SEAU)
-    .upload(chemin, blob, { contentType: 'image/webp', upsert: false })
+    .upload(chemin, blob, { contentType: 'image/webp', upsert: true })
   if (error) throw error
   return supabase.storage.from(SEAU).getPublicUrl(chemin).data.publicUrl
 }

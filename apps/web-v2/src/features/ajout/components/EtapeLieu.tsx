@@ -68,13 +68,15 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
       if (e.originalEvent) setOrigine('carte')
     })
     carte.current = map
+    let fini = false
     // Ni photo située ni point choisi : la carte part de moi, si je l'ai déjà permis.
     if (!depart) {
       void positionSiAutorisee().then((p) => {
-        if (p) map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
+        if (p && !fini) map.jumpTo({ center: [p.longitude, p.latitude], zoom: ZOOM_PROCHE })
       })
     }
     return () => {
+      fini = true
       map.remove()
       carte.current = null
     }

@@ -21,6 +21,8 @@ export function EtapePhoto({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const [enPreparation, setEnPreparation] = useState(0)
   const [illisible, setIllisible] = useState(false)
   const principale = useUrlDe(photos[0]?.grande)
+  // Pendant la préparation, les photos sont figées : la liste d'arrivée se calcule sur celle du départ.
+  const occupe = enPreparation > 0
 
   async function ajouter(fichiers: FileList | null) {
     const choisis = [...(fichiers ?? [])].slice(0, MAX_PHOTOS - photos.length)
@@ -71,6 +73,7 @@ export function EtapePhoto({ brouillon, changer, onSuivant }: ProprietesEtape) {
                 key={p.id}
                 photo={p}
                 principale={i === 0}
+                occupe={occupe}
                 onPrincipale={() => {
                   changer({ photos: [p, ...photos.filter((q) => q.id !== p.id)] })
                 }}
@@ -94,19 +97,33 @@ export function EtapePhoto({ brouillon, changer, onSuivant }: ProprietesEtape) {
 
         <div className={styles.commandes}>
           <label className={styles.galerie}>
-            <input type="file" accept="image/*" multiple hidden onChange={surChoix} />
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              disabled={occupe || photos.length >= MAX_PHOTOS}
+              onChange={surChoix}
+            />
             <span className={styles.iconeGalerie} aria-hidden="true" />
             Galerie
           </label>
           <label className={styles.declencheur}>
-            <input type="file" accept="image/*" capture="environment" hidden onChange={surChoix} />
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              hidden
+              disabled={occupe || photos.length >= MAX_PHOTOS}
+              onChange={surChoix}
+            />
             <span className={styles.rond} aria-hidden="true" />
             <span className={styles.cache}>Prendre une photo</span>
           </label>
           <button
             type="button"
             className={styles.suivant}
-            disabled={photos.length === 0 || enPreparation > 0}
+            disabled={photos.length === 0 || occupe}
             onClick={onSuivant}
           >
             Suivant
@@ -120,11 +137,13 @@ export function EtapePhoto({ brouillon, changer, onSuivant }: ProprietesEtape) {
 function Vignette({
   photo,
   principale,
+  occupe,
   onPrincipale,
   onRetirer,
 }: {
   photo: PhotoBrouillon
   principale: boolean
+  occupe: boolean
   onPrincipale: () => void
   onRetirer: () => void
 }) {
@@ -136,11 +155,16 @@ function Vignette({
         className={styles.choisir}
         aria-label={principale ? 'Photo principale' : 'Faire de cette photo la principale'}
         aria-pressed={principale}
+        disabled={occupe}
         onClick={onPrincipale}
       >
         {url && <img src={url} alt="" />}
       </button>
-      <button type="button" className={styles.retirer} aria-label="Retirer" onClick={onRetirer}>
+      <button type="button" className={styles.retirer}
+        aria-label="Retirer"
+        disabled={occupe}
+        onClick={onRetirer}
+      >
         <span aria-hidden="true">×</span>
       </button>
     </li>

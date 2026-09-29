@@ -12,15 +12,18 @@ import type { Ajout } from '../api/lireAjout'
 import type { Brouillon, Etape } from '../lib/brouillon'
 import styles from './EtapeApercu.module.css'
 
-// La base refuse avec un indice (hint) quand les trois découvertes manquent (migration 381).
+// La base refuse avec un indice (hint) ou un code (migration 381) : chacun a sa phrase.
 function messageDeRefus(erreur: unknown): string {
-  if (
-    typeof erreur === 'object' &&
-    erreur !== null &&
-    'hint' in erreur &&
-    erreur.hint === 'decouvertes'
-  ) {
+  const indice = typeof erreur === 'object' && erreur !== null && 'hint' in erreur ? erreur.hint : null
+  const code = typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
+  if (indice === 'decouvertes') {
     return 'Découvre d’abord trois lieux sur la carte : ils t’apprennent ce qu’on y cherche. Ton brouillon t’attend.'
+  }
+  if (indice === 'limite') {
+    return 'Vingt lieux posés aujourd’hui : c’est le plafond. Ton brouillon t’attend demain.'
+  }
+  if (code === '22023') {
+    return 'Un détail de la fiche ne passe pas. Relis le nom, les natures et le récit, puis réessaie.'
   }
   return 'Le lieu n’a pas pu être posé. Vérifie ta connexion, puis réessaie : rien n’est perdu.'
 }

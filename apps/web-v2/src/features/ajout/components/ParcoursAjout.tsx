@@ -13,11 +13,13 @@
  */
 import { useContext, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useIsMutating } from '@tanstack/react-query'
 import { Navigate, useNavigate } from 'react-router'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Recompense } from '@/shared/ui/Recompense'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import type { Ajout } from '../api/lireAjout'
+import { POSE } from '../hooks/useAjout'
 import { useBrouillon } from '../hooks/useBrouillon'
 import { useUrlDe } from '../hooks/useUrlDe'
 import { derniereEtapePossible, ETAPES, type Brouillon, type Etape } from '../lib/brouillon'
@@ -54,6 +56,8 @@ export function ParcoursAjout({
   const racine = useContext(RacineDesFeuilles)
   const navigate = useNavigate()
   const [question, setQuestion] = useState(false)
+  // Pendant la pose, on ne quitte pas : le lieu est à moitié parti.
+  const enPose = useIsMutating({ mutationKey: POSE }) > 0
   const [pose, setPose] = useState<{ ajout: Ajout; nom: string; photo: Blob | undefined } | null>(
     null,
   )
@@ -70,6 +74,7 @@ export function ParcoursAjout({
     void navigate(`../${e}`, { relative: 'path', replace: true })
   }
   const quitter = () => {
+    if (enPose) return
     if (commence(brouillon)) setQuestion(true)
     else onQuitter()
   }
@@ -121,7 +126,6 @@ export function ParcoursAjout({
               onAller={aller}
               onPose={(ajout) => {
                 setPose({ ajout, nom: brouillon.nom.trim(), photo: brouillon.photos[0]?.grande })
-                void jeter()
               }}
             />
           )}
