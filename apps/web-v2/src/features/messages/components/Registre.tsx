@@ -11,6 +11,7 @@
  *            septembre ») : minuit coupe aussi un groupe.
  */
 import { Fragment, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
@@ -149,12 +150,13 @@ export function Registre() {
               personnes={mentions.suggestions}
               onChoisir={(p) => {
                 const apres = mentions.choisir(p)
-                setTexte(apres.texte)
-                setCurseur(apres.curseur)
-                // Le curseur se pose après « @Nom », dans le champ qui garde la main.
-                requestAnimationFrame(() => {
-                  champ.current?.setSelectionRange(apres.curseur, apres.curseur)
+                // Le texte s'écrit tout de suite, puis le curseur se pose après « @Nom » : une
+                // lettre tapée aussitôt ne le voit jamais revenir en arrière.
+                flushSync(() => {
+                  setTexte(apres.texte)
+                  setCurseur(apres.curseur)
                 })
+                champ.current?.setSelectionRange(apres.curseur, apres.curseur)
               }}
             />
           )

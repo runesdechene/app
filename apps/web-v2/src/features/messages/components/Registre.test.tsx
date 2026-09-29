@@ -194,7 +194,11 @@ test('« @ » puis le début d’un nom propose des Explorateurs ; le choisir le
   fireEvent.pointerDown(proposition)
   expect(champ).toHaveValue('Salut @Gautier de Bilskimir ')
   expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
-  await userEvent.type(champ, 'tu as vu ?')
+  // Une lettre tapée aussitôt : une image plus tard, le curseur est toujours derrière elle.
+  fireEvent.change(champ, { target: { value: 'Salut @Gautier de Bilskimir t' } })
+  await new Promise(requestAnimationFrame)
+  expect((champ as HTMLInputElement).selectionStart).toBe('Salut @Gautier de Bilskimir t'.length)
+  await userEvent.type(champ, 'u as vu ?')
   await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
   expect(api.ecrire).toHaveBeenCalledWith('general', 'Salut @Gautier de Bilskimir tu as vu ?', [
     'u2',
