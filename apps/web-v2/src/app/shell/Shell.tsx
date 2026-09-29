@@ -72,10 +72,13 @@ export function Shell() {
     scrollers.current[tab]?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Ce qui est déjà ouvert ne s'empile pas une seconde fois dans l'historique.
+  // Ce qui est déjà ouvert ne s'empile pas une seconde fois dans l'historique. Un panneau de
+  // l'en-tête prend la place du détail ouvert (un lieu…) au lieu de s'empiler dessus : le fermer
+  // ramène à l'onglet, sans rouvrir le détail d'avant (Uriel, 30/09).
   function ouvrir(segment: string) {
-    const adresse = `/${active ?? 'carte'}/${segment}`
-    if (pathname !== adresse) void navigate(adresse)
+    const racine = `/${active ?? 'carte'}`
+    const adresse = `${racine}/${segment}`
+    if (pathname !== adresse) void navigate(adresse, { replace: pathname !== racine })
   }
 
   return (

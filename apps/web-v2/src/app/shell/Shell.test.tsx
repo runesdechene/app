@@ -47,8 +47,12 @@ beforeEach(() => {
   murmures.fetchFils.mockResolvedValue([])
 })
 
-function renderAt(path: string) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] })
+function renderAt(path: string | string[]) {
+  const entrees = typeof path === 'string' ? [path] : path
+  const router = createMemoryRouter(routes, {
+    initialEntries: entrees,
+    initialIndex: entrees.length - 1,
+  })
   render(
     <QueryClientProvider client={new QueryClient()}>
       <RouterProvider router={router} />
@@ -108,6 +112,17 @@ test('un détail rouvert par son onglet se ferme sur l’onglet, pas sur l’ong
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   await vi.waitFor(() => {
     expect(router.state.location.pathname).toBe('/messages')
+  })
+})
+
+test('Notifications ouvert par-dessus un détail se ferme sur l’onglet, sans rouvrir le détail', async () => {
+  // Uriel, 30/09 : la flèche de retour rouvrait le dernier lieu ouvert.
+  const router = renderAt(['/accueil', '/accueil/chemins'])
+  await userEvent.click(await screen.findByRole('button', { name: 'Notifications' }))
+  expect(router.state.location.pathname).toBe('/accueil/notifications')
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await vi.waitFor(() => {
+    expect(router.state.location.pathname).toBe('/accueil')
   })
 })
 
