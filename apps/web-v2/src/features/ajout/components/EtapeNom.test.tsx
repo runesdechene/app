@@ -97,3 +97,11 @@ test('une époque, ou « je ne sais pas » ; l’année sur demande, avant J.-C.
   await userEvent.click(screen.getByRole('checkbox', { name: 'av. J.-C.' }))
   expect(dernier()?.annee).toBe(-52)
 })
+
+test('chaque nature porte sa bille : sa couleur, son icône', async () => {
+  monter()
+  const chateau = await screen.findByRole('button', { name: 'Châteaux & fortins' })
+  const bille = chateau.querySelector<HTMLElement>('[data-bille-type]')
+  expect(bille?.style.getPropertyValue('--type')).toBe('#a9260f')
+  expect(bille?.innerHTML).toContain('c.svg')
+})

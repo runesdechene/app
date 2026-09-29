@@ -66,6 +66,7 @@ export const COLOR_TOKENS = [
 
 export const DA_SHOWCASED = [
   'Avatar',
+  'BilleType',
   'Button',
   'Champ',
   'EmptyState',

@@ -6,7 +6,9 @@
 import { useState } from 'react'
 import fondFiche from '@/assets/ui/fond-fiche.webp'
 import partager from '@/assets/ui/partager.svg'
+import lieu from '@/assets/ui/lieu.svg'
 import { Avatar } from '@/shared/ui/Avatar'
+import { BilleType } from '@/shared/ui/BilleType'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -84,6 +86,15 @@ export function DaBriques() {
       <DaSection name="IconButton">
         <div className={styles.rangee}>
           <IconButton label="Partager" icon={partager} />
+        </div>
+      </DaSection>
+
+      <DaSection name="BilleType">
+        <div className={styles.rangee}>
+          <BilleType icone={lieu} couleur="#80974e" />
+          <BilleType icone={lieu} couleur="#8a5a3c" />
+          <Text variant="legende">sans couleur :</Text>
+          <BilleType icone={lieu} couleur={null} />
         </div>
       </DaSection>
 

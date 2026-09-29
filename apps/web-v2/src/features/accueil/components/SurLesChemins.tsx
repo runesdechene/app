@@ -20,7 +20,7 @@ import type { Chemin } from '../api/lireAccueil'
 import { useChemins } from '../hooks/useAccueil'
 import { useSaluer } from '../hooks/useSaluer'
 import { ilYA } from '@/shared/lib/ilYA'
-import { BilleType } from './BilleType'
+import { BilleType } from '@/shared/ui/BilleType'
 import styles from './SurLesChemins.module.css'
 
 const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }

@@ -121,13 +121,17 @@
     scale var(--duree-elan) var(--courbe-elan);
 }
 
+/* Une nature s'ouvre sur sa bille : le bord gauche la serre. */
+.puce {
+  padding-left: 5px;
+}
+
 .puce:active,
 .epoque:active {
   scale: 0.96;
 }
 
 .puce[aria-pressed='true'] {
-  padding-left: 5px;
   border-color: var(--color-ocre);
   background: var(--color-pastille);
   color: var(--color-encre);
@@ -143,8 +147,8 @@
 .bille {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 20px; /* la taille de BilleType : l'icône cède la place au rang sans saut */
+  height: 20px;
   border-radius: var(--radius-rond);
   background: var(--type, var(--color-ocre));
   color: var(--color-sur-accent);

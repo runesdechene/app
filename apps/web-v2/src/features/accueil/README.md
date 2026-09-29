@@ -13,5 +13,5 @@ cœur, à volonté —, puis les Grands Explorateurs du mois (mig 377).
 - `hooks/` — `useAccueil` (les lectures, sous la clé `['accueil']`) et `useSaluer` (un cœur de
   plus à chaque toucher ; le fil se relit à la fin de la rafale).
 - `lib/` — `romain` (le rang en chiffres romains).
-- `components/` — `AccueilScreen` (la page et la rangée des Ajoutés), `Banniere`, `BilleType`,
+- `components/` — `AccueilScreen` (la page et la rangée des Ajoutés), `Banniere`,
   `PresDeToi`, `SurLesChemins` (le fil et ses saluts) et `GrandsExplorateurs`.

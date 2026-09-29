@@ -4,10 +4,11 @@
  *            (trois au plus, numérotées dans l'ordre du choix, la première donne sa couleur au
  *            lieu) ; l'époque, ou « je ne sais pas » ; l'année sur demande.
  * POURQUOI — la fiche prend forme : le nom s'écrit comme le titre qu'il deviendra. Une nature
- *            porte sa bille (sa couleur et son rang) dès qu'on la choisit. Rien n'est obligatoire
+ *            porte sa bille — son icône, puis son rang dès qu'on la choisit. Rien n'est obligatoire
  *            hors le nom et une nature : l'époque et l'année aident, sans bloquer.
  */
 import { useState } from 'react'
+import { BilleType } from '@/shared/ui/BilleType'
 import { useEpoques, useNatures } from '../hooks/useAjout'
 import { useUrlDe } from '../hooks/useUrlDe'
 import { ceQuiManque, type ProprietesEtape } from '../lib/brouillon'
@@ -79,10 +80,13 @@ export function EtapeNom({ brouillon, changer, onSuivant }: ProprietesEtape) {
                   basculer(n.id)
                 }}
               >
-                {rang > 0 && (
+                {/* Sa bille : son icône ; une fois choisie, son rang. */}
+                {rang > 0 ? (
                   <span className={styles.bille} aria-hidden="true">
                     {rang}
                   </span>
+                ) : (
+                  n.icone && <BilleType icone={n.icone} couleur={n.couleur} />
                 )}
                 {n.nom}
               </button>

@@ -14,4 +14,5 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `racineDesFeuilles.ts` — où les feuilles se posent (la coquille) : leur voile couvre toute l'app.
 - `Champ` — saisie avec libellé, aide et limite tenue à la frappe.
 - `PastilleChoix` — un titre porté : en lecture, ou à choisir.
+- `BilleType` — la bille d'un type de lieu : sa couleur, son icône en blanc (Accueil, Ajouter).
 - `Segments` — un choix exclusif en segments ; la zone éclairée glisse sous le choix.

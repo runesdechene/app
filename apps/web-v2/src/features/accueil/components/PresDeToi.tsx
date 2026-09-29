@@ -12,7 +12,7 @@ import { formatDistance } from '@/shared/lib/distance'
 import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { usePresDeMoi } from '../hooks/useAccueil'
-import { BilleType } from './BilleType'
+import { BilleType } from '@/shared/ui/BilleType'
 import styles from './PresDeToi.module.css'
 
 export function PresDeToi() {
