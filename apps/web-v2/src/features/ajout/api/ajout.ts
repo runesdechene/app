@@ -7,15 +7,9 @@
  */
 import type { Point } from '@/shared/lib/distance'
 import { supabase } from '@/shared/supabase/client'
+import type { Champs } from '../components/ChampsDuLieu'
 import type { Brouillon, PhotoBrouillon } from '../lib/brouillon'
-import {
-  lireAjout,
-  lireEpoques,
-  lireFicheAModifier,
-  lireNatures,
-  lireVoisins,
-  type Fiche,
-} from './lireAjout'
+import { lireAjout, lireEpoques, lireFicheAModifier, lireNatures, lireVoisins } from './lireAjout'
 
 const SEAU = 'place-images'
 
@@ -91,7 +85,7 @@ export async function fetchFicheAModifier(id: string) {
 }
 
 // Modifier une fiche (mig 387) : chaque enregistrement est une version.
-export async function modifierLieu(id: string, f: Fiche, note: string) {
+export async function modifierLieu(id: string, f: Champs & { recit: string }, note: string) {
   const { error } = await supabase.rpc('modifier_lieu', {
     p_id: id,
     p_nom: f.nom,
@@ -100,6 +94,15 @@ export async function modifierLieu(id: string, f: Fiche, note: string) {
     ...(f.epoque !== null && { p_epoque: f.epoque }),
     ...(f.annee !== null && { p_annee: f.annee }),
     ...(note.trim() !== '' && { p_note: note }),
+  })
+  if (error) throw error
+}
+
+// Ajouter des photos à un lieu (mig 388) : elles viennent d'être envoyées dans mon dossier.
+export async function ajouterPhotosLieu(id: string, images: ImageEnvoyee[]) {
+  const { error } = await supabase.rpc('ajouter_photos_lieu', {
+    p_id: id,
+    p_images: images.map((i) => ({ url: i.url })),
   })
   if (error) throw error
 }

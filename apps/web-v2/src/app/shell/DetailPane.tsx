@@ -27,6 +27,7 @@ export function DetailPane({
   avant,
   sousTitre,
   plume = false,
+  onFermer,
   children,
 }: {
   title: string
@@ -35,10 +36,14 @@ export function DetailPane({
   avant?: ReactNode | undefined
   sousTitre?: string | undefined
   plume?: boolean
+  // Un écran qui a quelque chose à perdre ferme lui-même (« Abandonner tes changements ? ») :
+  // sa flèche reste alors visible partout, sur PC compris.
+  onFermer?: () => void
   children: ReactNode
 }) {
-  const fermer = useFermerDetail()
-  const retour = venuDUnEcran(useLocation().state)
+  const fermerParDefaut = useFermerDetail()
+  const fermer = onFermer ?? fermerParDefaut
+  const retour = venuDUnEcran(useLocation().state) || onFermer !== undefined
   const heading = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {

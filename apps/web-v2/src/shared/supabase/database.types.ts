@@ -5861,6 +5861,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _photos_du_lieu: { Args: { p_id: string }; Returns: Json }
       _pick_defi: {
         Args: { p_cadence: string; p_scope: string }
         Returns: {
@@ -6030,6 +6031,10 @@ export type Database = {
           p_nom: string
           p_recit: string
         }
+        Returns: Json
+      }
+      ajouter_photos_lieu: {
+        Args: { p_id: string; p_images: Json }
         Returns: Json
       }
       answer_enigma: {

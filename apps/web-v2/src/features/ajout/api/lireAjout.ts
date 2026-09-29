@@ -79,7 +79,7 @@ export type Fiche = {
   epoque: string | null
   annee: number | null
   recit: string
-  photo: string | null
+  photos: { url: string; vignette: string }[]
 }
 
 export function lireFicheAModifier(json: unknown): Fiche | null {
@@ -91,6 +91,9 @@ export function lireFicheAModifier(json: unknown): Fiche | null {
     epoque: ouNull(chaine)(f.epoque),
     annee: ouNull(nombre)(f.annee),
     recit: chaine(f.recit),
-    photo: ouNull(chaine)(f.photo),
+    photos: liste((v) => {
+      const p = objet(v)
+      return { url: chaine(p.url), vignette: chaine(p.vignette) }
+    })(f.photos),
   }
 }

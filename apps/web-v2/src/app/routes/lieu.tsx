@@ -6,10 +6,11 @@
  *            et feuilles sont des moments, pas des adresses : un état local, fermé par le voile ou
  *            Échap.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
 import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
+import { QuestionAbandon } from '@/features/ajout/components/QuestionAbandon'
 import { DecouverteLieu } from '@/features/lieu/components/DecouverteLieu'
 import { FenetreRevendication } from '@/features/lieu/components/FenetreRevendication'
 import { FeuilleCoeurs } from '@/features/lieu/components/FeuilleCoeurs'
@@ -93,14 +94,38 @@ function Lieu({ id }: { id: string }) {
   )
 }
 
-// /<onglet>/lieu/<id>/modifier — « Modifier la fiche » (faire vivre un lieu, mig 387). Enregistrer
-// ramène à la fiche, qui se relit.
+// /<onglet>/lieu/<id>/modifier — « Modifier la fiche » (faire vivre un lieu, migs 387-388).
+// Enregistrer ramène à la fiche, qui se relit. La flèche de retour demande d'abord s'il y a des
+// changements à perdre (Uriel, 30/09) ; sinon elle ferme aussitôt.
 export function RouteModifierLieu() {
   const { id = '' } = useParams()
   const fermer = useFermerDetail()
+  const modifie = useRef(false)
+  const [question, setQuestion] = useState(false)
   return (
-    <DetailPane title="Modifier la fiche" surImage>
-      <ModifierFiche id={id} onFini={fermer} />
+    <DetailPane
+      title="Modifier la fiche"
+      surImage
+      onFermer={() => {
+        if (modifie.current) setQuestion(true)
+        else fermer()
+      }}
+    >
+      <ModifierFiche
+        id={id}
+        onFini={fermer}
+        onModifie={(m) => {
+          modifie.current = m
+        }}
+      />
+      {question && (
+        <QuestionAbandon
+          onContinuer={() => {
+            setQuestion(false)
+          }}
+          onAbandonner={fermer}
+        />
+      )}
     </DetailPane>
   )
 }

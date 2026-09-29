@@ -45,6 +45,95 @@
   text-align: center;
 }
 
+/* Les photos : vignettes carrées en rangée ; une nouvelle porte sa croix pour la retirer. */
+.photos {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.vignettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vignette {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--color-sable);
+}
+
+.vignette img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vignette[data-nouvelle] {
+  outline: 2px solid var(--color-ocre);
+  outline-offset: -2px;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.retirer {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-size: var(--legende-size);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ajouter {
+  justify-self: start;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+}
+
+.ajouter:has(input:disabled) {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.etat {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+@keyframes apparaitre {
+  0% {
+    opacity: 0;
+    scale: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vignette[data-nouvelle] {
+    animation: none;
+  }
+}
+
 .chargement {
   min-height: 300px;
 }

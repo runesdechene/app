@@ -1,6 +1,7 @@
 /**
  * QUOI     — « Modifier la fiche » : les champs partent de la fiche ; enregistrer envoie la fiche
- *            changée et la note, puis revient ; un refus se dit en clair.
+ *            changée et la note, puis revient ; des photos s'ajoutent ; la route sait s'il y a
+ *            quelque chose à perdre ; un refus se dit en clair.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
@@ -13,13 +14,21 @@ const api = vi.hoisted(() => ({
   fetchEpoques: vi.fn(),
   fetchFicheAModifier: vi.fn(),
   modifierLieu: vi.fn(),
+  envoyerPhotos: vi.fn(),
+  ajouterPhotosLieu: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/ajout', () => api)
+vi.mock('../lib/photo', () => ({
+  preparerPhoto: () => Promise.resolve({ grande: new Blob(['g']), vignette: new Blob(['v']) }),
+}))
 
 const fini = vi.fn()
+const modifie = vi.fn()
 
 beforeEach(() => {
   fini.mockReset()
+  modifie.mockReset()
+  api.ajouterPhotosLieu.mockClear()
   api.modifierLieu.mockReset()
   api.fetchNatures.mockResolvedValue([
     { id: 'chateau', nom: 'Châteaux & fortins', icone: 'c.svg', couleur: '#a9260f' },
@@ -31,7 +40,7 @@ beforeEach(() => {
     epoque: null,
     annee: null,
     recit: 'Une tour carrée.',
-    photo: null,
+    photos: [{ url: 'u1', vignette: 'v1' }],
   })
 })
 
@@ -40,7 +49,7 @@ function monter() {
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
-      <ModifierFiche id="a" onFini={fini} />
+      <ModifierFiche id="a" onFini={fini} onModifie={modifie} />
     </QueryClientProvider>,
   )
 }
@@ -61,12 +70,36 @@ test('les champs partent de la fiche ; enregistrer envoie les changements et rev
     'accent',
   )
   expect(fini).toHaveBeenCalled()
+  expect(modifie).toHaveBeenCalledWith(true)
 })
 
-test('rien n’a changé : on le dit, on reste', async () => {
-  api.modifierLieu.mockRejectedValue({ message: 'Rien', hint: 'rien' })
+test('un refus de la base se dit en clair, et on reste', async () => {
+  api.modifierLieu.mockRejectedValue({ message: 'Découvre', hint: 'decouvrir' })
   monter()
-  await userEvent.click(await screen.findByRole('button', { name: 'Enregistrer les changements' }))
-  expect(await screen.findByText(/Rien n’a changé/)).toBeInTheDocument()
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Son nom' }), ' !')
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
+  expect(await screen.findByText(/Découvre ce lieu sur la carte/)).toBeInTheDocument()
   expect(fini).not.toHaveBeenCalled()
+})
+
+test('des photos s’ajoutent : envoyées, puis rattachées au lieu, sans nouvelle version', async () => {
+  api.envoyerPhotos.mockResolvedValue([
+    { id: 'p', url: 'https://x/p.webp', thumb: 'https://x/p_thumb.webp' },
+  ])
+  monter()
+  const choisir = await screen.findByLabelText(/Ajouter des photos/)
+  await userEvent.upload(choisir, new File(['x'], 'tour.jpg', { type: 'image/jpeg' }))
+  expect(await screen.findByRole('button', { name: 'Retirer cette photo' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
+  expect(api.ajouterPhotosLieu).toHaveBeenCalledWith('a', [
+    { id: 'p', url: 'https://x/p.webp', thumb: 'https://x/p_thumb.webp' },
+  ])
+  expect(api.modifierLieu).not.toHaveBeenCalled()
+  expect(fini).toHaveBeenCalled()
+})
+
+test('rien de touché : le bouton attend', async () => {
+  monter()
+  expect(await screen.findByRole('button', { name: 'Enregistrer les changements' })).toBeDisabled()
+  expect(modifie).not.toHaveBeenCalledWith(true)
 })
