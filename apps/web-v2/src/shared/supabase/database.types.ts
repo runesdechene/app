@@ -5873,6 +5873,7 @@ export type Database = {
         | { Args: { p_caller: string }; Returns: boolean }
       _is_voyage_admin: { Args: { p_user_id: string }; Returns: boolean }
       _level_from_xp: { Args: { p_xp: number }; Returns: number }
+      _lieu_public: { Args: { p_id: string }; Returns: boolean }
       _lieu_visible: { Args: { p_id: string }; Returns: boolean }
       _member_gold_coupe: {
         Args: {
@@ -5888,6 +5889,7 @@ export type Database = {
         Returns: number
       }
       _mot: { Args: { p_id: number }; Returns: Json }
+      _nature_de: { Args: { p_id: string }; Returns: Json }
       _notification_v2: { Args: { p_type: string }; Returns: boolean }
       _notify_court_challengers: {
         Args: {
@@ -6014,6 +6016,7 @@ export type Database = {
       _xp_for_level: { Args: { p_level: number }; Returns: number }
       accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
       accueil_nouveaute: { Args: never; Returns: Json }
+      activite_publique: { Args: { p_limite?: number }; Returns: Json }
       add_announcement_comment: {
         Args: {
           p_announcement_id: string
@@ -6097,6 +6100,7 @@ export type Database = {
         }
         Returns: Json
       }
+      apercu_lieu: { Args: { p_id: string }; Returns: Json }
       archive_passed_voyages: { Args: never; Returns: Json }
       award_crowns_manual: {
         Args: { p_amount: number; p_reason: string; p_user_id: string }
@@ -6984,6 +6988,7 @@ export type Database = {
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
       natures_de_lieu: { Args: never; Returns: Json }
+      natures_publiques: { Args: never; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
       notifications_non_lues: { Args: never; Returns: number }
       notify: {
@@ -7090,6 +7095,10 @@ export type Database = {
       recalc_place_content_points: {
         Args: { p_place_id: string }
         Returns: undefined
+      }
+      recherche_publique: {
+        Args: { p_limite?: number; p_nature?: string; p_texte?: string }
+        Returns: Json
       }
       register_push_subscription: {
         Args: {
