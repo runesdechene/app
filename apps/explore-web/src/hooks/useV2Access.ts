@@ -1,6 +1,6 @@
 /**
  * Passerelle V1 → V2 côté React.
- * - useV2QueryRedirect : ?v=2 dans l'URL d'arrivée → /v2/ si le compte y a accès.
+ * - useV2QueryRedirect : ?v=2 dans l'URL d'arrivée → /v2/ (et le choix est retenu).
  *   Le paramètre est lu au PREMIER rendu : la landing peut rediriger avant qu'un effet
  *   ne voie l'URL d'origine.
  * - useCanTryV2 : affiche « Essayer la V2 » dans les menus (ProfileMenu + MobileHeader).

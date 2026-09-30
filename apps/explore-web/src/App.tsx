@@ -10,6 +10,7 @@ import { isDemoMode } from './lib/demo/isDemoMode'
 import { DemoKioskShell } from './components/demo/DemoKioskShell'
 import { useDemoBootstrap } from './hooks/useDemoBootstrap'
 import { useV2QueryRedirect } from './hooks/useV2Access'
+import { NouvelleExploreModal } from './components/v2/NouvelleExploreModal'
 
 const MobileLayout = lazy(() => import('./pages/MobileLayout'))
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -71,6 +72,8 @@ export default function App() {
           `/` (landing, avant creation de compte) et capter `beforeinstallprompt`
           quelle que soit la route d'arrivee. */}
       {!demo && <InstallPrompt />}
+      {/* « La nouvelle Explore est là » : une fois, aux joueurs connectés qui n'ont pas choisi. */}
+      {!demo && <NouvelleExploreModal />}
     </BrowserRouter>
   )
 

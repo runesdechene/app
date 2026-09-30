@@ -189,7 +189,7 @@ export function ProfileMenu({ email, onSignOut }: ProfileMenuProps) {
 
           {canTryV2 && (
             <button className="profile-dropdown-action" onClick={goToV2}>
-              ✨ Essayer la V2
+              ✨ Essayer la nouvelle Explore
             </button>
           )}
 

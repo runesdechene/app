@@ -12,6 +12,7 @@ import calendrier from '@/assets/ui/calendrier.svg'
 import chevron from '@/assets/ui/chevron.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import coeur from '@/assets/ui/coeur.svg'
+import retour from '@/assets/ui/fleche-retour.svg'
 import courriel from '@/assets/ui/courriel.svg'
 import palette from '@/assets/ui/palette.svg'
 import pas from '@/assets/ui/pas.svg'
@@ -28,6 +29,7 @@ import {
   usePreferences,
   type Reglage,
 } from '../hooks/usePreferences'
+import { revenirALAncienneExplore } from '../lib/ancienneExplore'
 import styles from './PreferencesPage.module.css'
 
 export function PreferencesPage() {
@@ -119,6 +121,16 @@ export function PreferencesPage() {
           </span>
           <img className={styles.chevron} src={chevron} alt="" />
         </a>
+        <button type="button" className={styles.ligne} onClick={revenirALAncienneExplore}>
+          <img className={styles.icone} src={retour} alt="" />
+          <span className={styles.texte}>
+            <span className={styles.titre}>Revenir à l’ancienne Explore</span>
+            <span className={styles.description}>
+              Tu pourras revenir ici depuis son menu, à tout moment.
+            </span>
+          </span>
+          <img className={styles.chevron} src={chevron} alt="" />
+        </button>
       </Carte>
 
       <Text variant="libelle">Runes de Chêne — Porte l’Histoire</Text>
