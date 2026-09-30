@@ -63,11 +63,24 @@ const PALIERS: [zoom: number, taille: number][] = [
 ]
 
 // Sur un grand écran, les marques grandissent avec lui (Uriel, 30/09 : sur un écran 2K ou 4K,
-// les lieux étaient bien trop petits). Le plus petit côté de la fenêtre, rapporté à celui d'un
-// portable (900 px) : 1 sur un téléphone ou un portable, jusqu'à 2 sur un grand écran.
+// les lieux étaient bien trop petits). Selon le plus petit côté de la fenêtre : 1 jusqu'à un
+// écran 1080p, 1,4 pour un 2K, 1,8 pour un 4K et au-delà ; entre deux, on glisse de l'un à l'autre.
+const ECRANS: [cote: number, echelle: number][] = [
+  [1080, 1],
+  [1440, 1.4],
+  [2160, 1.8],
+]
+
 export function echelleEcran(largeur: number, hauteur: number): number {
-  const echelle = Math.min(largeur, hauteur) / 900
-  return Math.round(Math.min(2, Math.max(1, echelle)) * 20) / 20
+  const cote = Math.min(largeur, hauteur)
+  const [premier] = ECRANS
+  const dernier = ECRANS[ECRANS.length - 1]
+  if (!premier || !dernier || cote <= premier[0]) return 1
+  if (cote >= dernier[0]) return dernier[1]
+  const i = ECRANS.findIndex(([c]) => c > cote)
+  const [c0, e0] = ECRANS[i - 1] ?? premier
+  const [c1, e1] = ECRANS[i] ?? dernier
+  return Math.round((e0 + ((cote - c0) / (c1 - c0)) * (e1 - e0)) * 20) / 20
 }
 
 // Une taille agrandie (le survol, l'écran) multiplie chaque palier : MapLibre veut la courbe de

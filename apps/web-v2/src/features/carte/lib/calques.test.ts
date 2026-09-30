@@ -62,11 +62,14 @@ test('une taille agrandie reste une courbe de zoom au premier niveau (MapLibre l
   expect(taille(2)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 1, 8, 1.6, 12, 2.3])
 })
 
-test('les marques grandissent avec l’écran : 1 sur un téléphone ou un portable, jusqu’à 2', () => {
+test('les marques grandissent avec l’écran : 1 jusqu’au 1080p, 1,4 en 2K, 1,8 en 4K', () => {
   expect(echelleEcran(390, 844)).toBe(1) // téléphone
   expect(echelleEcran(1440, 900)).toBe(1) // portable
-  expect(echelleEcran(2560, 1440)).toBe(1.6) // écran 2K
-  expect(echelleEcran(3840, 2160)).toBe(2) // écran 4K, plafonné
+  expect(echelleEcran(1920, 1080)).toBe(1) // écran 1080p
+  expect(echelleEcran(2560, 1440)).toBe(1.4) // écran 2K
+  expect(echelleEcran(3440, 1800)).toBe(1.6) // entre les deux : on glisse
+  expect(echelleEcran(3840, 2160)).toBe(1.8) // écran 4K
+  expect(echelleEcran(5120, 2880)).toBe(1.8) // au-delà : plafonné
 })
 
 test('le facteur d’écran multiplie chaque palier de toutes les marques', () => {
