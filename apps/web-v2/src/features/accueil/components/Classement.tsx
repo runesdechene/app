@@ -7,7 +7,6 @@
  *            Un nom ouvre le profil, dans l'Accueil.
  */
 import { Link } from 'react-router'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { GrandExplorateur, GrandsExplorateurs, TypeDeClassement } from '../api/lireAccueil'
 import { romain } from '../lib/romain'
@@ -104,7 +103,7 @@ function Ligne({
       data-premier={g.rang === 1 || undefined}
     >
       <span className={styles.rang}>{romain(g.rang)}</span>
-      <Link className={styles.qui} to={`/accueil/explorateur/${g.id}`} state={VENU_D_UN_ECRAN}>
+      <Link className={styles.qui} to={`/accueil/explorateur/${g.id}`}>
         <span className={styles.portrait}>
           <Avatar url={g.avatar} nom={g.nom} taille="petit" />
         </span>

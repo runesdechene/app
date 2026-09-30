@@ -3,9 +3,8 @@
 - `supabase/` — le client unique, les types de la base, et l'envoi des photos d'un lieu
   (`photos.ts` : ajout, modification, Carnet). Seuls les dossiers `api/` des zones
   (et la garde d'accès) l'importent.
-- `lib/` — le calcul pur partagé : les lecteurs du JSON de la base (`lire.ts`) ; le signal
-  « un écran est derrière moi » que les zones posent sur un lien et que le cadre de détail lit
-  (`retour.ts`) ; la distance à vol d'oiseau (`distance.ts`) ; la position de celui qui
+- `lib/` — le calcul pur partagé : les lecteurs du JSON de la base (`lire.ts`) ; le lieu retenu
+  pour après l'inscription (`apresEntree.ts`) ; la distance à vol d'oiseau (`distance.ts`) ; la position de celui qui
   regarde, seulement si déjà autorisée — jamais de demande (`position.ts`) ; « il y a 10 min »
   (`ilYA.ts`) ; réduire une photo et lire sa position (`photo.ts`).
 - `hooks/` — la logique avec état partagée : `useMaPosition` (cette position, gardée dix

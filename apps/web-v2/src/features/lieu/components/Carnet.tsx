@@ -9,7 +9,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { ilYA } from '@/shared/lib/ilYA'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Mot } from '../api/lireLieu'
 import { useCarnet } from '../hooks/useCarnet'
@@ -47,7 +46,7 @@ export function Carnet({ id, limite }: { id: string; limite: number | null }) {
       </ul>
       {limite !== null &&
         carnet.total > carnet.mots.reduce((n, m) => n + 1 + m.reponses.length, 0) && (
-          <Link className={styles.tout} to="carnet" relative="path" state={VENU_D_UN_ECRAN}>
+          <Link className={styles.tout} to="carnet" relative="path">
             Lire les {pluriel(carnet.total)} ›
           </Link>
         )}

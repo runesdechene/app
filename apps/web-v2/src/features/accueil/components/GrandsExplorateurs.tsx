@@ -10,7 +10,6 @@
  */
 import { Link } from 'react-router'
 import sectionGrandsExplorateurs from '@/assets/ui/section-nouvelles.png'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { useGrandsExplorateurs } from '../hooks/useAccueil'
 import { Classement } from './Classement'
 import styles from './GrandsExplorateurs.module.css'
@@ -32,7 +31,7 @@ export function GrandsExplorateurs() {
         lignes={3}
         avecMaPlace={false}
       />
-      <Link className={styles.tout} to="/accueil/classement" state={VENU_D_UN_ECRAN}>
+      <Link className={styles.tout} to="/accueil/classement">
         Voir tout le classement
       </Link>
     </section>

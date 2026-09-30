@@ -14,7 +14,6 @@ import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal, type Mention } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
@@ -107,11 +106,7 @@ export function Registre() {
                 <p className={styles.texte}>
                   {!suite && (
                     <>
-                      <Link
-                        className={styles.nom}
-                        to={`/messages/explorateur/${m.auteur.id}`}
-                        state={VENU_D_UN_ECRAN}
-                      >
+                      <Link className={styles.nom} to={`/messages/explorateur/${m.auteur.id}`}>
                         {m.auteur.nom}
                       </Link>{' '}
                     </>
@@ -183,12 +178,7 @@ export function Registre() {
 function TexteAvecMentions({ texte, mentions }: { texte: string; mentions: Mention[] }) {
   return decouper(texte, mentions).map((morceau, i) =>
     'mention' in morceau ? (
-      <Link
-        key={i}
-        className={styles.mention}
-        to={`/messages/explorateur/${morceau.mention.id}`}
-        state={VENU_D_UN_ECRAN}
-      >
+      <Link key={i} className={styles.mention} to={`/messages/explorateur/${morceau.mention.id}`}>
         @{morceau.mention.nom}
       </Link>
     ) : (

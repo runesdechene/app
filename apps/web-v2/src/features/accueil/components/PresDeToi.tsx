@@ -9,7 +9,6 @@
 import { Link } from 'react-router'
 import sectionPresDeToi from '@/assets/ui/pin-gps.svg'
 import { formatDistance } from '@/shared/lib/distance'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { usePresDeMoi } from '../hooks/useAccueil'
 import { BilleType } from '@/shared/ui/BilleType'
@@ -26,7 +25,7 @@ export function PresDeToi() {
       <ul className={styles.lieux} aria-label="À explorer près de toi">
         {lieux.map((l) => (
           <li key={l.id}>
-            <Link className={styles.lieu} to={`/accueil/lieu/${l.id}`} state={VENU_D_UN_ECRAN}>
+            <Link className={styles.lieu} to={`/accueil/lieu/${l.id}`}>
               {l.imageUrl ? (
                 <img className={styles.vignette} src={l.imageUrl} alt="" />
               ) : (

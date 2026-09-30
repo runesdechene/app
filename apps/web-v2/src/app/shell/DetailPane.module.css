@@ -126,11 +126,3 @@
 .surImage .close {
   pointer-events: auto;
 }
-
-/* Sur PC, la fiche vit dans le tiroir : on le replie ou on change d'onglet, la flèche ne sert à
-   rien (Uriel, 28/09) — sauf si un écran du tiroir est derrière (un profil) : elle y ramène. */
-@container app (width >= 1024px) {
-  .surImage:not([data-retour]) .close {
-    display: none;
-  }
-}

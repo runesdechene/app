@@ -7,7 +7,6 @@
  */
 import { Link } from 'react-router'
 import sceau from '@/assets/ui/sceau-murmure.webp'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { useFils } from '../hooks/useMurmures'
 import { moment } from '../lib/moment'
@@ -31,7 +30,7 @@ export function ListeMurmures() {
             <Link
               className={styles.fil}
               to={`/messages/murmures/${f.avec.id}`}
-              state={VENU_D_UN_ECRAN}
+
               data-non-lu={f.nonLus > 0 || undefined}
             >
               <Avatar url={f.avec.avatar} nom={f.avec.nom} taille="petit" />

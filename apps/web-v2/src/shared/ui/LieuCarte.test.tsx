@@ -5,7 +5,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { expect, test } from 'vitest'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { LieuCarte } from './LieuCarte'
 
 const LIEU = {
@@ -41,10 +40,4 @@ test('depuis le profil d’un autre, ouvert dans l’Accueil, la fiche s’ouvre
   const router = depuis('/accueil/explorateur/u2')
   await userEvent.click(screen.getByRole('link', { name: /Abbaye de Montmajour/ }))
   expect(router.state.location.pathname).toBe('/accueil/lieu/l1')
-})
-
-test('la fiche ouverte depuis le profil sait qu’un écran est derrière elle (sa flèche y ramène)', async () => {
-  const router = depuis('/compte')
-  await userEvent.click(screen.getByRole('link', { name: /Abbaye de Montmajour/ }))
-  expect(router.state.location.state).toEqual(VENU_D_UN_ECRAN)
 })

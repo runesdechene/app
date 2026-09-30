@@ -7,7 +7,6 @@
  */
 import { Link } from 'react-router'
 import { ilYA } from '@/shared/lib/ilYA'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -84,13 +83,7 @@ function Ligne({ notification: n }: { notification: Notification }) {
   )
   const cible = cibleDe(n)
   return cible ? (
-    <Link
-      className={styles.ligne}
-      data-non-lue={!n.lu || undefined}
-      to={cible}
-      relative="path"
-      state={VENU_D_UN_ECRAN}
-    >
+    <Link className={styles.ligne} data-non-lue={!n.lu || undefined} to={cible} relative="path">
       {contenu}
     </Link>
   ) : (

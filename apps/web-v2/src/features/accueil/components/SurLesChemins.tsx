@@ -13,7 +13,6 @@ import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
 import lieuIcone from '@/assets/ui/lieu.svg'
 import sectionChemins from '@/assets/ui/section-chemins.svg'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Chemin } from '../api/lireAccueil'
 import { useChemins } from '../hooks/useAccueil'
@@ -39,7 +38,7 @@ export function SurLesChemins() {
       </h2>
       <FilDesChemins chemins={chemins.slice(0, D_ABORD)} />
       {chemins.length > D_ABORD && (
-        <Link className={styles.tout} to="/accueil/chemins" state={VENU_D_UN_ECRAN}>
+        <Link className={styles.tout} to="/accueil/chemins">
           Voir toute l’activité
         </Link>
       )}
@@ -75,14 +74,14 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
       )}
       <Avatar url={qui.avatar} nom={qui.nom} taille="mini" />
       <p className={styles.texte}>
-        <Link className={styles.qui} to={`/accueil/explorateur/${qui.id}`} state={VENU_D_UN_ECRAN}>
+        <Link className={styles.qui} to={`/accueil/explorateur/${qui.id}`}>
           {qui.nom}
         </Link>{' '}
         {VERBES[chemin.type]}
         {lieu && (
           <>
             {' '}
-            <Link className={styles.lieu} to={`/accueil/lieu/${lieu.id}`} state={VENU_D_UN_ECRAN}>
+            <Link className={styles.lieu} to={`/accueil/lieu/${lieu.id}`}>
               {lieu.nom}
             </Link>
           </>

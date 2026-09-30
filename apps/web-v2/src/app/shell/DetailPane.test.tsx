@@ -9,7 +9,6 @@ import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
 import type { ExplorateurProfile } from '@/features/compte/api/lireProfil'
 import { routes } from '../router'
-import { VENU_D_UN_ECRAN } from '@/shared/lib/retour'
 import { DetailPane } from './DetailPane'
 
 vi.mock('../access/useV2Access', () => ({
@@ -158,26 +157,4 @@ test('sur une image (la fiche d’un lieu) : la flèche est posée sur la photo,
   const titre = screen.getByRole('heading', { name: 'Château de Jonjeac' })
   expect(titre.className).toMatch(/masque/)
   expect(screen.getByRole('complementary').className).toMatch(/surImage/)
-})
-
-test('ouvert depuis un autre écran du tiroir, le détail le sait : sa flèche reste sur PC', () => {
-  render(
-    <MemoryRouter initialEntries={[{ pathname: '/compte/lieu/a', state: VENU_D_UN_ECRAN }]}>
-      <DetailPane title="Château de Jonjeac" surImage>
-        <p>contenu</p>
-      </DetailPane>
-    </MemoryRouter>,
-  )
-  expect(screen.getByRole('complementary')).toHaveAttribute('data-retour')
-})
-
-test('ouvert depuis la carte, rien derrière : pas de flèche sur PC', () => {
-  render(
-    <MemoryRouter initialEntries={['/carte/lieu/a']}>
-      <DetailPane title="Château de Jonjeac" surImage>
-        <p>contenu</p>
-      </DetailPane>
-    </MemoryRouter>,
-  )
-  expect(screen.getByRole('complementary')).not.toHaveAttribute('data-retour')
 })

@@ -9,14 +9,11 @@
  *            comme un nom écrit à la main (la même conversation).
  *            `surImage` : le contenu commence par une photo pleine largeur (la fiche d'un lieu) —
  *            la flèche claire se pose dessus, le titre n'est plus visible mais reste annoncé.
- *            Sur PC, cette flèche ne s'affiche que si un écran du tiroir est derrière
- *            (`data-retour`, voir shared/lib/retour.ts).
+ *            La flèche est toujours là, sur PC comme sur mobile (Uriel, 30/09).
  */
 import { useEffect, useRef, type ReactNode } from 'react'
 import flecheRetourClaire from '@/assets/ui/fleche-retour-claire.svg'
-import { useLocation } from 'react-router'
 import flecheRetour from '@/assets/ui/fleche-retour.svg'
-import { venuDUnEcran } from '@/shared/lib/retour'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import styles from './DetailPane.module.css'
 
@@ -36,14 +33,12 @@ export function DetailPane({
   avant?: ReactNode | undefined
   sousTitre?: string | undefined
   plume?: boolean
-  // Un écran qui a quelque chose à perdre ferme lui-même (« Abandonner tes changements ? ») :
-  // sa flèche reste alors visible partout, sur PC compris.
+  // Un écran qui a quelque chose à perdre ferme lui-même (« Abandonner tes changements ? »).
   onFermer?: () => void
   children: ReactNode
 }) {
   const fermerParDefaut = useFermerDetail()
   const fermer = onFermer ?? fermerParDefaut
-  const retour = venuDUnEcran(useLocation().state) || onFermer !== undefined
   const heading = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -55,7 +50,6 @@ export function DetailPane({
       className={[styles.pane, surImage && styles.surImage].filter(Boolean).join(' ')}
       aria-labelledby="detail-title"
       data-detail
-      data-retour={retour || undefined}
     >
       <header className={styles.header}>
         <button type="button" className={styles.close} onClick={fermer} aria-label="Fermer">
