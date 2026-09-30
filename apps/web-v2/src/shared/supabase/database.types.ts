@@ -5867,6 +5867,7 @@ export type Database = {
         Args: { p_place_id: string; p_user_id: string }
         Returns: boolean
       }
+      _hasard_fixe: { Args: { p_texte: string }; Returns: number }
       _is_admin: { Args: never; Returns: boolean }
       _is_staff:
         | { Args: never; Returns: boolean }
@@ -6118,6 +6119,7 @@ export type Database = {
         Returns: Json
       }
       carte_lieux: { Args: never; Returns: Json }
+      carte_publique: { Args: never; Returns: Json }
       cheat_refill: { Args: { p_user_id: string }; Returns: Json }
       cheat_refill_target: {
         Args: { p_caller_id: string; p_target_name: string }
