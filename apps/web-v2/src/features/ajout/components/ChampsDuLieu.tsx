@@ -12,6 +12,7 @@ import { useEpoques, useNatures } from '../hooks/useAjout'
 import styles from './EtapeNom.module.css'
 
 const MAX_NATURES = 3
+const NON_CONCERNE = 'not-applicable' // l'époque des lieux sans époque (migration 395)
 
 export type Champs = { nom: string; natures: string[]; epoque: string | null; annee: number | null }
 
@@ -27,10 +28,19 @@ export function ChampsDuLieu({
   const [anneeOuverte, setAnneeOuverte] = useState(valeur.annee !== null)
   const choisies = valeur.natures
 
+  // Une nature sans époque en tête (une source, un spot de van) coche « Non concerné », si aucune
+  // époque n'est choisie ; une nature historique repasse en tête : on le retire. Une époque
+  // choisie à la main n'est jamais touchée (Uriel, 30/09).
   const basculer = (id: string) => {
-    changer({
-      natures: choisies.includes(id) ? choisies.filter((n) => n !== id) : [...choisies, id],
-    })
+    const suivantes = choisies.includes(id) ? choisies.filter((n) => n !== id) : [...choisies, id]
+    const horsEpoque = natures.find((n) => n.id === suivantes[0])?.horsEpoque === true
+    const epoque =
+      horsEpoque && valeur.epoque === null
+        ? NON_CONCERNE
+        : !horsEpoque && valeur.epoque === NON_CONCERNE
+          ? null
+          : valeur.epoque
+    changer({ natures: suivantes, epoque })
   }
 
   const annee = valeur.annee

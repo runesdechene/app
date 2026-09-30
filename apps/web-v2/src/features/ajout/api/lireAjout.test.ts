@@ -1,15 +1,21 @@
 import { expect, test } from 'vitest'
 import { lireAjout, lireEpoques, lireNatures, lireVoisins } from './lireAjout'
 
-test('les natures se lisent ; une couleur qui n’est pas un hex tombe', () => {
+test('les natures se lisent ; une couleur qui n’est pas un hex tombe ; « sans époque » se lit', () => {
   expect(
     lireNatures([
-      { id: 't1', nom: 'Châteaux & fortins', icone: 'c.svg', couleur: '#a9260f' },
-      { id: 't2', nom: 'Naturel', icone: null, couleur: 'rouge' },
+      {
+        id: 't1',
+        nom: 'Châteaux & fortins',
+        icone: 'c.svg',
+        couleur: '#a9260f',
+        horsEpoque: false,
+      },
+      { id: 't2', nom: 'Naturel', icone: null, couleur: 'rouge', horsEpoque: true },
     ]),
   ).toEqual([
-    { id: 't1', nom: 'Châteaux & fortins', icone: 'c.svg', couleur: '#a9260f' },
-    { id: 't2', nom: 'Naturel', icone: null, couleur: null },
+    { id: 't1', nom: 'Châteaux & fortins', icone: 'c.svg', couleur: '#a9260f', horsEpoque: false },
+    { id: 't2', nom: 'Naturel', icone: null, couleur: null, horsEpoque: true },
   ])
 })
 

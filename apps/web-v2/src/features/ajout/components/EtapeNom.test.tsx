@@ -16,13 +16,14 @@ vi.mock('../api/ajout', () => ({
     Promise.resolve([
       { id: 'chateau', nom: 'Châteaux & fortins', icone: 'c.svg', couleur: '#a9260f' },
       { id: 'ruines', nom: 'Ruines et vestiges', icone: 'r.svg', couleur: '#745744' },
-      { id: 'vue', nom: 'Vue emblématique', icone: 'v.svg', couleur: '#80974e' },
+      { id: 'vue', nom: 'Vue emblématique', icone: 'v.svg', couleur: '#80974e', horsEpoque: true },
       { id: 'grotte', nom: 'Grottes & Cairns', icone: 'g.svg', couleur: '#555353' },
     ]),
   fetchEpoques: () =>
     Promise.resolve([
       { id: 'late-middle-ages', nom: 'Bas Moyen Âge' },
       { id: 'renaissance', nom: 'Renaissance' },
+      { id: 'not-applicable', nom: 'Non concerné' },
     ]),
 }))
 
@@ -96,6 +97,24 @@ test('une époque, ou « je ne sais pas » ; l’année sur demande, avant J.-C.
   await userEvent.type(screen.getByRole('spinbutton', { name: 'Année' }), '52')
   await userEvent.click(screen.getByRole('checkbox', { name: 'av. J.-C.' }))
   expect(dernier()?.annee).toBe(-52)
+})
+
+test('une nature sans époque, choisie en premier, coche « Non concerné » ; une autre en tête le retire', async () => {
+  monter()
+  await userEvent.click(await screen.findByRole('button', { name: /Vue emblématique/ }))
+  expect(dernier()?.epoque).toBe('not-applicable')
+  // Une nature historique passe en tête : « Non concerné » n'a plus de sens.
+  await userEvent.click(screen.getByRole('button', { name: /Châteaux & fortins/ }))
+  await userEvent.click(screen.getByRole('button', { name: /Vue emblématique/ }))
+  expect(dernier()?.natures).toEqual(['chateau'])
+  expect(dernier()?.epoque).toBeNull()
+})
+
+test('une époque choisie à la main n’est jamais remplacée', async () => {
+  monter()
+  await userEvent.click(await screen.findByRole('button', { name: 'Renaissance' }))
+  await userEvent.click(screen.getByRole('button', { name: /Vue emblématique/ }))
+  expect(dernier()?.epoque).toBe('renaissance')
 })
 
 test('chaque nature porte sa bille : sa couleur, son icône', async () => {

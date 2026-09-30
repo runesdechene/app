@@ -6,7 +6,14 @@
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
-export type Nature = { id: string; nom: string; icone: string | null; couleur: string | null }
+// `horsEpoque` : une nature sans époque (une source, un spot de van…, migration 395).
+export type Nature = {
+  id: string
+  nom: string
+  icone: string | null
+  couleur: string | null
+  horsEpoque: boolean
+}
 export type Epoque = { id: string; nom: string }
 export type Voisin = {
   id: string
@@ -38,6 +45,7 @@ export const lireNatures = liste((v): Nature => {
     nom: chaine(n.nom),
     icone: ouNull(chaine)(n.icone),
     couleur: couleur(n.couleur),
+    horsEpoque: n.horsEpoque === true,
   }
 })
 
