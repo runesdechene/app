@@ -37,12 +37,20 @@
   padding: 2px var(--space-2) 2px 10px;
   border: none;
   border-radius: var(--radius-rond);
-  background: var(--color-accent);
-  color: var(--color-sur-accent);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-fiche-badge-texte);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
   white-space: nowrap;
   cursor: pointer;
+}
+
+.icone {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
 }
 
 .croix {

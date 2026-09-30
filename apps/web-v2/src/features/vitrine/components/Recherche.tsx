@@ -3,8 +3,8 @@
  *            le nom, la nature et la région. Un résultat ouvre l'aperçu du lieu.
  * POURQUOI — Uriel, 30/09 : « digne d'un moteur de recherche », et ouverte à qui n'a pas de
  *            compte. Au-delà des premiers lieux, l'invitation à rejoindre : la carte entière
- *            est derrière le compte. Une nature choisie se pose dans la barre, en étiquette qu'une
- *            croix retire.
+ *            est derrière le compte. Une nature choisie se pose dans la barre, en étiquette à sa
+ *            couleur et à son icône (comme sur la fiche d'un lieu), qu'une croix retire.
  * ATTENTION — les résultats ne se montrent que tant que la recherche a le focus (CSS
  *            :focus-within) : toucher ailleurs ou Échap les range, sans code d'ouverture.
  */
@@ -40,9 +40,17 @@ export function Recherche({
           <button
             type="button"
             className={styles.etiquette}
+            style={nature.couleur ? { '--type': nature.couleur } : undefined}
             aria-label={`Retirer ${nature.nom}`}
             onClick={onRetirerNature}
           >
+            {nature.icone && (
+              <span
+                className={styles.icone}
+                style={{ '--icone': `url(${nature.icone})` }}
+                aria-hidden="true"
+              />
+            )}
             {nature.nom}
             <span className={styles.croix} aria-hidden="true" />
           </button>

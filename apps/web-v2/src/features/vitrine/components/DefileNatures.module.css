@@ -67,10 +67,11 @@
   scale: 0.96;
 }
 
+/* Choisie : blanche, comme au survol, et elle le reste (Uriel, 30/09). */
 .nature[aria-pressed='true'] {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-sur-accent);
+  border-color: var(--color-sur-accent);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
 }
 
 .icone {
@@ -89,7 +90,8 @@
   }
 
   .nature:hover,
-  .nature:focus-visible {
+  .nature:focus-visible,
+  .nature[aria-pressed='true'] {
     border-color: var(--color-sur-accent);
     background: var(--color-sur-accent);
     color: var(--color-encre);
