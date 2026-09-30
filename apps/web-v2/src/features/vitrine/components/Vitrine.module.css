@@ -211,14 +211,25 @@
     align-items: center;
     max-width: none;
     padding: 30px 0 var(--space-8);
+    background: var(--color-ombre);
+    isolation: isolate; /* la photo, en z-index -1, reste sous le contenu mais dans la page */
+  }
 
-    /* La photo sur tout l'écran, assombrie pour que le crème s'y lise. */
+  /* La photo sur tout l'écran, floutée et assombrie pour que le crème s'y lise (Uriel, 30/09).
+     Elle déborde de 12 px : sans cela, le flou éclaircit ses bords. Pas de flou sur .vitrine
+     elle-même : il couperait celui des gélules et de l'activité (.claude/rules/v2.md). */
+  .vitrine::before {
+    content: '';
+    position: fixed;
+    inset: -12px;
+    z-index: -1;
     background:
       linear-gradient(
-        color-mix(in srgb, var(--color-ombre) 38%, transparent),
-        color-mix(in srgb, var(--color-ombre) 30%, transparent)
+        color-mix(in srgb, var(--color-ombre) 48%, transparent),
+        color-mix(in srgb, var(--color-ombre) 38%, transparent)
       ),
       url('../../../assets/onboarding/photo-accueil.webp') 66% center / cover no-repeat;
+    filter: blur(4px);
   }
 
   .haut {
