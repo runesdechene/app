@@ -3,7 +3,8 @@
  *            rangées par moment, chacune avec le visage de qui a agi (ou la bille d'un palier),
  *            sa phrase, depuis quand ; les non lues sur un voile rose, un point à droite.
  * POURQUOI — ce qui touche tes lieux et toi, pas les rappels quotidiens. Toucher une notification
- *            ouvre le lieu (ou le Registre pour une mention) ; le retour ramène ici.
+ *            ouvre le lieu (le Registre pour une mention, les Nouveautés pour une mise à jour) ;
+ *            le retour ramène ici.
  */
 import { Link } from 'react-router'
 import { ilYA } from '@/shared/lib/ilYA'
@@ -39,7 +40,7 @@ export function Notifications() {
           <h2 className={styles.titre}>{rubrique.titre}</h2>
           <ul className={styles.liste}>
             {rubrique.liste.map((n) => (
-              <li key={n.id}>
+              <li key={`${n.type}-${String(n.id)}`}>
                 <Ligne notification={n} />
               </li>
             ))}
@@ -50,9 +51,11 @@ export function Notifications() {
   )
 }
 
-// Où mène une notification : le lieu, le Registre pour une mention, nulle part sinon.
+// Où mène une notification : le lieu, le Registre pour une mention, les Nouveautés pour une mise à
+// jour, nulle part sinon.
 function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'
+  if (n.type === 'mise_a_jour') return '../nouveautes'
   return n.lieu ? `../lieu/${n.lieu.id}` : null
 }
 
@@ -62,7 +65,11 @@ function Ligne({ notification: n }: { notification: Notification }) {
       {n.qui ? (
         <Avatar url={n.qui.avatar} nom={n.qui.nom} taille="petit" />
       ) : (
-        <span className={styles.bille} aria-hidden="true" />
+        <span
+          className={styles.bille}
+          data-nouveaute={n.type === 'mise_a_jour' || undefined}
+          aria-hidden="true"
+        />
       )}
       <span className={styles.texte}>
         <span className={styles.phrase}>

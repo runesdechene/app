@@ -61,6 +61,20 @@ a.ligne:focus-visible {
   background: var(--color-ocre);
 }
 
+/* Une mise à jour : l'étoile claire sur la bille ocre (maquette « Notifications — une mise à jour »). */
+.bille[data-nouveaute] {
+  display: grid;
+  place-items: center;
+}
+
+.bille[data-nouveaute]::after {
+  width: 18px;
+  height: 18px;
+  background: var(--color-sur-accent);
+  content: '';
+  mask: url('../../../assets/ui/nouveaute.svg') center / contain no-repeat;
+}
+
 .texte {
   display: grid;
   flex: 1;

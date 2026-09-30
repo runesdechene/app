@@ -45,6 +45,12 @@ export function phraseDe(n: Notification): Morceau[] {
       return [lieu, t(` a reçu ${combien} cœurs`)]
     case 'mention':
       return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]
+    case 'mise_a_jour':
+      return [
+        { texte: 'Nouveautés d’Explore', sorte: 'qui' },
+        t(' : '),
+        { texte: n.extrait ?? '', sorte: 'lieu' },
+      ]
     case 'salut':
       if (n.evenement === 'visite') return [qui, t(' a salué ta visite de '), lieu]
       if (n.evenement === 'ajout') return [qui, t(' a salué ton ajout de '), lieu]

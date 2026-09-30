@@ -1,0 +1,101 @@
+/*
+ * QUOI     — la page « Nouveautés » : la dernière sur une carte claire (date ocre en capitales
+ *            condensées, titre Bebas, texte), les précédentes à plat, en plus petit.
+ */
+.nouveautes {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-2) var(--space-4) var(--space-8);
+}
+
+.derniere,
+.precedente {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.derniere {
+  padding: var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+}
+
+.precedentes {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.rubrique,
+.date {
+  margin: 0;
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.rubrique {
+  color: var(--color-texte-doux);
+}
+
+.date {
+  color: var(--color-ocre);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.paragraphe,
+.liste {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-2);
+  padding-left: var(--space-6);
+}
+
+.liste strong {
+  font-weight: var(--weight-semi);
+}
+
+/* Les précédentes : même ordre, en plus petit. */
+.precedente .titre {
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.precedente .date {
+  color: var(--color-texte-doux);
+}
+
+.precedente .paragraphe,
+.precedente .liste {
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+}
+
+.chargement {
+  min-height: 200px;
+}

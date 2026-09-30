@@ -44,6 +44,17 @@ beforeEach(() => {
       extrait: '@Uriel tu passes samedi ?',
       evenement: null,
     },
+    {
+      id: 1,
+      type: 'mise_a_jour',
+      quand: maintenant.toISOString(),
+      lu: false,
+      qui: null,
+      lieu: null,
+      nombre: null,
+      extrait: 'Filtrer la carte',
+      evenement: null,
+    },
   ])
 })
 
@@ -72,6 +83,14 @@ test('rangées par moment ; une notification mène au lieu, une mention au Regis
     'href',
     '/messages',
   )
+})
+
+test('une mise à jour mène aux Nouveautés', async () => {
+  afficher()
+  const aujourdhui = await screen.findByRole('region', { name: 'Aujourd’hui' })
+  expect(
+    within(aujourdhui).getByRole('link', { name: /Nouveautés d’Explore : Filtrer la carte/ }),
+  ).toHaveAttribute('href', '/accueil/nouveautes')
 })
 
 test('ouvrir le tiroir marque tout lu, une seule fois', async () => {

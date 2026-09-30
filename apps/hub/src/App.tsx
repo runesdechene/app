@@ -27,6 +27,7 @@ import { ShopifySync } from './components/ShopifySync'
 import { FragmentsAudio } from './components/FragmentsAudio'
 import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
+import { MisesAJour } from './components/MisesAJour'
 import { Sidebar } from './components/Sidebar'
 import { PlacesModeration } from './components/moderation/PlacesModeration'
 import { Signalements } from './components/moderation/Signalements'
@@ -128,6 +129,7 @@ function App() {
           <Route path="/annonces" element={<AnnouncementsList />} />
           <Route path="/annonces/nouvelle" element={<ComposerAnnonce />} />
           <Route path="/annonces/:id" element={<ComposerAnnonce />} />
+          <Route path="/mises-a-jour" element={<MisesAJour />} />
         </Routes>
       </main>
     </div>

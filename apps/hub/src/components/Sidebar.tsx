@@ -82,6 +82,7 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
             <NavLink to="/carte/tutoriel" className={({ isActive }) => isActive ? 'active' : ''}>Tutoriel</NavLink>
             <div className="sidebar-section-label">Communication</div>
             <NavLink to="/annonces" className={({ isActive }) => isActive ? 'active' : ''}>Annonces</NavLink>
+            <NavLink to="/mises-a-jour" className={({ isActive }) => isActive ? 'active' : ''}>Mises à jour de l'app</NavLink>
             <div className="sidebar-section-label">Shopify</div>
             <NavLink to="/shopify/sync" className={({ isActive }) => isActive ? 'active' : ''}>Synchro Emails</NavLink>
             <NavLink to="/shopify/fragments-audio" className={({ isActive }) => isActive ? 'active' : ''}>Fragments audio</NavLink>

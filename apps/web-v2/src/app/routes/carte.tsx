@@ -1,6 +1,6 @@
 /**
  * QUOI     — les adresses de l'en-tête, branchées sur la coquille : la feuille « Ajouter », le
- *            parcours « Ajouter un lieu » et les notifications.
+ *            parcours « Ajouter un lieu », les notifications et les nouveautés de l'app.
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que ses écrans
  *            reçoivent le cadre de détail et la fonction de fermeture.
  * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
@@ -9,6 +9,7 @@ import { useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
 import { ParcoursAjout } from '@/features/ajout/components/ParcoursAjout'
 import { Notifications } from '@/features/notifications/components/Notifications'
+import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
@@ -44,6 +45,15 @@ export function RouteNotifications() {
   return (
     <DetailPane title="Notifications">
       <Notifications />
+    </DetailPane>
+  )
+}
+
+// /<onglet>/nouveautes — les mises à jour de l'app, ouvertes depuis la cloche
+export function RouteNouveautes() {
+  return (
+    <DetailPane title="Nouveautés">
+      <Nouveautes />
     </DetailPane>
   )
 }
