@@ -34,7 +34,7 @@ export function Carnet({ id, limite }: { id: string; limite: number | null }) {
         {carnet.total > 0 && <span className={styles.compte}>{pluriel(carnet.total)}</span>}
       </h3>
       <p className={styles.chapo}>
-        Ce que les Explorateurs ont laissé ici : conseils, souvenirs, ce qui a changé.
+        Ce que les Explorateurs ont laissé ici : conseils, souvenirs…
       </p>
       <EcrireAuCarnet onEcrire={ecrire.mutate} enCours={ecrire.isPending} erreur={ecrire.error} />
       <ul className={styles.mots}>
