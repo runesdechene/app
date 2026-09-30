@@ -1,6 +1,7 @@
 /**
  * QUOI     — le Préambule (maquette 94:142) : l'emblème, et la lettre d'Uriel à ceux qui entrent.
- * POURQUOI — avant les règles, la raison d'être : un projet annexe, gratuit, financé par la marque.
+ * POURQUOI — avant les règles, la raison d'être : une confrérie, gratuite, financée par la marque.
+ *            Tutoyée comme tout le parcours ; réécrite avec Uriel le 30/09 (le meilleur en tête).
  */
 import embleme from '@/assets/onboarding/embleme.webp'
 import { useParcours } from '../hooks/useParcours'
@@ -23,24 +24,19 @@ export function Preambule() {
       <h1 className={styles.titre}>Préambule</h1>
       <div className={styles.lettre}>
         <p>
-          Cette application fut conçue sur mon temps libre, souvent la nuit, avec le rêve de
-          redonner vie à nos régions et d’inspirer.
+          Cette application est née la nuit, sur mon temps libre, d’un rêve : redonner vie à nos
+          régions.
         </p>
         <p>
-          Sa seule prétention est de vous faire découvrir, d’échanger, de collectionner des points
-          d’intérêt uniques autour de l’Histoire, du patrimoine et de la Nature, sur les traces de
-          nos ancêtres.
+          Camaraderie, amour des vieilles pierres, évasion sauvage, chants au coin du feu… Entre
+          nomadisme et héritage, une confrérie de voyageurs et d’explorateurs-érudits, sur les
+          traces de nos ancêtres. Voilà ce qu’on essaie de bâtir ici.
         </p>
         <p>
-          Elle est un projet annexe, gratuit, et auto-financé par les revenus dégagés de la marque
-          Runes de Chêne. Chaque vêtement vendu finance des initiatives comme celle-ci, pour
-          réenchanter le monde moderne, en y ramenant un peu de la beauté du passé.
+          Elle est gratuite, et le restera : chaque vêtement Runes de Chêne vendu la finance, pour
+          ramener un peu de la beauté du passé dans le monde moderne.
         </p>
-        <p>
-          Camaraderie, amour des vieilles pierres, évasion sauvage, chants au coin du feu, aventure
-          et audace… entre nomadisme et héritage culturel. Une confrérie silencieuse de voyageurs et
-          d’explorateurs-érudits. Voilà ce qu’on essaie de créer ici. J’espère qu’elle vous plaira.
-        </p>
+        <p>J’espère qu’elle te plaira.</p>
         <p className={styles.signature}>
           <strong>Uriel</strong>
           <em>Artiste nomade,</em>
