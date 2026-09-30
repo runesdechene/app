@@ -217,6 +217,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
       <div className={styles.haut}>
         <Recherche
           lieux={lieux ?? []}
+          membres={!visiteur}
           onAller={({ lat, lng }) => carte?.flyTo({ center: [lng, lat], zoom: 14 })}
         />
         {!visiteur && (

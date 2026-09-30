@@ -22,6 +22,9 @@ export type LieuCarte = {
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
+// Un Explorateur trouvé par la recherche de la carte (chercher_explorateurs, migration 373).
+export type ExplorateurTrouve = { id: string; nom: string; avatar: string | null }
+
 function lireEtat(v: unknown): EtatLieu {
   return v === 'connu' || v === 'visite' ? v : 'inconnu'
 }
@@ -54,3 +57,8 @@ export function lireTerritoire(json: unknown): Territoire {
   const t = objet(json)
   return { territoire: ouNull(chaine)(t.territoire), pays: ouNull(chaine)(t.pays) }
 }
+
+export const lireExplorateurs = liste((v): ExplorateurTrouve => {
+  const e = objet(v)
+  return { id: chaine(e.id), nom: chaine(e.nom), avatar: ouNull(chaine)(e.avatar) }
+})

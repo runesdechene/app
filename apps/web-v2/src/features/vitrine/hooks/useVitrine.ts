@@ -5,8 +5,8 @@
  *            « dolmen » ne lance pas six recherches. Les résultats précédents restent affichés
  *            pendant la suivante, la liste ne clignote pas.
  */
-import { useEffect, useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { usePose } from '@/shared/hooks/usePose'
 import {
   chercher,
   fetchActivite,
@@ -38,20 +38,6 @@ export function useActivite() {
     useQuery({ queryKey: ['vitrine', 'activite'], queryFn: fetchActivite, staleTime: 60_000 })
       .data ?? []
   )
-}
-
-// Une valeur qui ne change qu'une fois la frappe posée.
-function usePose<T>(valeur: T, delai: number) {
-  const [posee, setPosee] = useState(valeur)
-  useEffect(() => {
-    const minuteur = setTimeout(() => {
-      setPosee(valeur)
-    }, delai)
-    return () => {
-      clearTimeout(minuteur)
-    }
-  }, [valeur, delai])
-  return posee
 }
 
 export function useRecherche(texte: string, nature: string | null) {

@@ -1,5 +1,6 @@
 /*
- * QUOI     — le champ de recherche de la carte (maquette 165:129) et la liste des lieux trouvés.
+ * QUOI     — le champ de recherche de la carte (maquette 165:129), les lieux trouvés, puis les
+ *            Explorateurs (leur portrait devant le nom).
  */
 .recherche {
   position: relative;
@@ -45,13 +46,28 @@
   left: 0;
   z-index: 1;
   display: grid;
-  overflow: hidden;
+  max-height: min(60dvh, 480px);
+  overflow-y: auto;
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-carte);
   background: var(--color-sur-accent);
 }
 
+.liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste + .liste {
+  border-top: 1px solid var(--color-bord);
+}
+
 .resultat {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
   min-height: var(--cible-tactile);
   padding: var(--space-2) var(--space-4);
   border: none;
@@ -60,8 +76,10 @@
   font-family: var(--font-corps);
   font-size: var(--corps-size);
   text-align: left;
+  text-decoration: none;
 }
 
-.resultat + .resultat {
+/* Un filet entre deux résultats, lieux comme Explorateurs. */
+.liste > * + * {
   border-top: 1px solid var(--color-bord);
 }
