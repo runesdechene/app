@@ -294,10 +294,10 @@
   .accroche {
     margin: 0;
     color: var(--color-sur-accent);
-    font-family: var(--font-titre);
-    font-size: var(--titre-section-size);
-    letter-spacing: var(--titre-tracking);
-    line-height: var(--titre-leading);
+    font-family: var(--font-corps);
+    font-size: var(--vitrine-accroche-size);
+    line-height: var(--corps-leading);
+    text-wrap: balance;
   }
 
   .signature {

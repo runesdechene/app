@@ -128,6 +128,7 @@
   --vitrine-surtitre-size: 1.625rem; /* « Porter l'Histoire » sur la vitrine : 26 px (314:146) */
   --vitrine-surtitre-pc-size: 2.25rem; /* le même, sur ordinateur : 36 px (314:203) */
   --vitrine-titre-pc-size: 4rem; /* « Explorer le monde », sur ordinateur : 64 px */
+  --vitrine-accroche-size: 1.1875rem; /* « Rejoins une confrérie… », sur ordinateur : 19 px */
   --vitrine-phrase-size: 0.9375rem; /* « 3 473 hauts lieux… » : 15 px */
   --vitrine-leading: 1.35; /* la phrase des chiffres et l'activité, sur la photo */
   --corps-leading: 1.45;
