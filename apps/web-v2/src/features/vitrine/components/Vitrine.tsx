@@ -83,11 +83,6 @@ export function Vitrine() {
       <div className={styles.description}>
         {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
         <p className={styles.accroche}>Rejoins une confrérie moderne d’aventuriers.</p>
-        <p className={styles.promesse}>
-          Châteaux oubliés, dolmens millénaires, sources sacrées : des milliers de hauts lieux
-          attendent qu’on les redécouvre. Une carte vivante pour réenchanter le monde et recréer du
-          lien dans nos régions.
-        </p>
         <p className={styles.signature}>
           Gratuite, et offerte avec amour par{' '}
           <a href="https://runesdechene.com" target="_blank" rel="noopener">
