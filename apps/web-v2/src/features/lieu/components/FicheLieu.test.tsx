@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -35,6 +35,7 @@ const FICHE = {
   revendication: { nom: 'LES LOUPS', moi: false, depuis: '2026-09-12T10:00:00Z' },
   auteur: { id: 'l', nom: 'Luna', avatar: null },
   ajouteLe: '2026-01-01T00:00:00Z',
+  ajoutADistance: false,
   enrichiPar: { id: 'm', nom: 'Mathéo' },
   moi: { visiteLe: null, envie: false },
 }
@@ -86,6 +87,19 @@ test('la fiche montre le lieu tel que maquetté', async () => {
     expect.stringContaining('45.9,6.1'),
   )
   expect(screen.getByText(/Enrichi par/)).toBeInTheDocument()
+})
+
+test('ajouté sur place, le crédit est plein ; à distance, il le dit et se fait discret', async () => {
+  afficher()
+  const credit = await screen.findByText(/Lieu ajouté par/)
+  expect(credit.closest('p')).not.toHaveAttribute('data-distance')
+
+  cleanup()
+  api.fetchFiche.mockResolvedValue({ ...FICHE, ajoutADistance: true })
+  afficher()
+  const distant = await screen.findByText(/Lieu ajouté à distance par/)
+  expect(distant).toHaveTextContent('Lieu ajouté à distance par Luna')
+  expect(distant.closest('p')).toHaveAttribute('data-distance')
 })
 
 test('« Envie d’y aller » bascule tout de suite', async () => {

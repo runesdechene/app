@@ -1,7 +1,7 @@
 /**
  * QUOI     — l'étape « Où » : la carte part de la position de la photo ; l'endroit se dit en
  *            mots ; un lieu voisin se signale ; chercher un village y emmène ; « C'est ici » garde
- *            le point et avance — seulement sur place (200 m au plus de moi).
+ *            le point et avance — sur place ou à distance, et la feuille dit lequel.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
@@ -83,12 +83,12 @@ test('chercher un village y emmène la carte', async () => {
   )
 })
 
-test('loin du point, « C’est ici » attend : on ajoute sur place', async () => {
+test('loin du point, le lieu s’ajoute à distance, et la feuille le dit', async () => {
   position.positionSiAutorisee.mockResolvedValue({ latitude: 48.85, longitude: 2.35 })
   monter()
   await screen.findByText('Près de Colomars')
-  expect(await screen.findByText(/rapproche le point de toi/)).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'C’est ici' })).toBeDisabled()
+  expect(await screen.findByText(/marqué « ajouté à distance »/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'C’est ici' })).toBeEnabled()
 })
 
 test('« C’est ici » garde le point où la carte s’est posée, et son adresse', async () => {
@@ -106,7 +106,7 @@ test('« C’est ici » garde le point où la carte s’est posée, et son adres
       expect.anything(),
     )
   })
-  await screen.findByText('Tu es sur place : ta visite comptera aussi.')
+  await screen.findByText('Tu es sur place : ta visite comptera, et le lieu sera à ton nom.')
   await userEvent.click(screen.getByRole('button', { name: 'C’est ici' }))
   expect(changer).toHaveBeenCalledWith(
     expect.objectContaining({ point: { latitude: 46.6, longitude: 2.4 } }),

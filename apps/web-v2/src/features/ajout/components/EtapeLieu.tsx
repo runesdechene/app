@@ -6,8 +6,8 @@
  * POURQUOI — la carte part de la position de la photo (si l'appareil l'a notée), sinon de la
  *            mienne (si elle est déjà accordée), sinon de la France. Jamais de coordonnées à lire :
  *            des mots. Un lieu à moins de 50 m se signale ici, pas à la fin (« c'est le même ? »).
- *            Pour l'instant, un lieu ne s'ajoute que sur place (Uriel, 30/09) : « C'est ici » attend
- *            que le point soit à 200 m au plus de moi — la base le vérifie aussi (mig 383).
+ *            Sur place (200 m au plus de moi), la visite compte et le lieu est à mon nom ; sinon, il
+ *            est « ajouté à distance » (Uriel, 30/09 ; la base en juge, mig 393).
  * ATTENTION — l'endroit et les voisins ne se demandent qu'une fois la carte posée (moveend) ;
  *            l'épingle se soulève pendant le glissé et retombe à l'arrêt.
  */
@@ -155,7 +155,7 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
           <button
             type="button"
             className={styles.cestIci}
-            disabled={!centre || !surPlace}
+            disabled={!centre}
             onClick={() => {
               if (!centre) return
               changer({ point: centre, endroit })
@@ -167,10 +167,8 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
         </div>
         <p className={styles.visite}>
           {surPlace
-            ? 'Tu es sur place : ta visite comptera aussi.'
-            : moi
-              ? 'Pour l’instant, un lieu s’ajoute sur place : rapproche le point de toi (200 m au plus).'
-              : 'Pour l’instant, un lieu s’ajoute sur place : touche « Je suis ici ».'}
+            ? 'Tu es sur place : ta visite comptera, et le lieu sera à ton nom.'
+            : 'Tu n’es pas sur place : le lieu sera marqué « ajouté à distance ».'}
         </p>
       </section>
     </div>

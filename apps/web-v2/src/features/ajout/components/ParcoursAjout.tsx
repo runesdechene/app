@@ -195,7 +195,7 @@ function Fete({
       <Recompense
         nom={pose.nom}
         type={null}
-        phrase={`Ton ${rang} lieu ajouté${ajout.surPlace ? ' — et visité !' : ' !'}`}
+        phrase={`Ton ${rang} lieu ajouté${ajout.surPlace ? ' — visité, et à ton nom !' : ' !'}`}
         gain={ajout}
         libelleAcceder="Voir ta fiche"
         libelleRevenir="Revenir à la carte"

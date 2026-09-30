@@ -320,6 +320,16 @@
   color: var(--color-fiche-credit);
 }
 
+/* Ajouté à distance : tout le crédit en retrait, le nom sans or. */
+.credit[data-distance] {
+  color: var(--color-fiche-aide);
+}
+
+.credit[data-distance] .nomCredit {
+  color: var(--color-fiche-ligne);
+  font-weight: var(--weight-normal);
+}
+
 .etoiles {
   width: 15px;
   height: 14px;

@@ -17,6 +17,7 @@ const COMPLET = {
   revendication: { nom: 'LES LOUPS', moi: false, depuis: '2026-09-12T10:00:00Z' },
   auteur: { id: 'l', nom: 'Luna', avatar: null },
   ajouteLe: '2026-01-01T00:00:00Z',
+  ajoutADistance: false,
   enrichiPar: null,
   moi: { visiteLe: null, envie: true },
 }

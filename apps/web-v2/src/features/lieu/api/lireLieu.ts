@@ -51,6 +51,8 @@ export type FicheLieu = {
   revendication: { nom: string; moi: boolean; depuis: string } | null
   auteur: Personne | null
   ajouteLe: string
+  // Ajouté sans y être (migration 393) : le crédit de l'auteur est plus discret.
+  ajoutADistance: boolean
   enrichiPar: { id: string; nom: string } | null
   moi: { visiteLe: string | null; envie: boolean; decouvert: boolean }
 }
@@ -119,6 +121,7 @@ export function lireFiche(json: unknown): FicheLieu | null {
     revendication: ouNull(lireRevendication)(f.revendication),
     auteur: ouNull(lirePersonne)(f.auteur),
     ajouteLe: chaine(f.ajouteLe),
+    ajoutADistance: booleen(f.ajoutADistance),
     enrichiPar: ouNull(lireEnrichi)(f.enrichiPar),
     moi: {
       visiteLe: ouNull(chaine)(moi.visiteLe),

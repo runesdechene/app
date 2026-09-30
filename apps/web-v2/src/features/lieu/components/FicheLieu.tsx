@@ -215,11 +215,18 @@ export function FicheLieu({
 
         <footer className={styles.credits}>
           {fiche.auteur && (
-            <p className={styles.credit}>
+            // Ajouté sur place : le nom en or et les étoiles ; à distance, un crédit plus discret
+            // (Uriel, 30/09 : « moins fort qu'un ajout en physique »).
+            <p className={styles.credit} data-distance={fiche.ajoutADistance || undefined}>
               <Avatar url={fiche.auteur.avatar} nom={fiche.auteur.nom} taille="mini" />
               <span>
-                Lieu ajouté par <strong className={styles.nomCredit}>{fiche.auteur.nom}</strong>
-                <img className={styles.etoiles} src={etoiles} alt="" />
+                {fiche.ajoutADistance ? 'Lieu ajouté à distance par ' : 'Lieu ajouté par '}
+                <strong className={styles.nomCredit}>{fiche.auteur.nom}</strong>
+                {fiche.ajoutADistance ? (
+                  ' '
+                ) : (
+                  <img className={styles.etoiles} src={etoiles} alt="" />
+                )}
                 <span className={styles.date}>le {LE.format(new Date(fiche.ajouteLe))}</span>
               </span>
             </p>
