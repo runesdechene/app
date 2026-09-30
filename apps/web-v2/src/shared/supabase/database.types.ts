@@ -2270,6 +2270,45 @@ export type Database = {
         }
         Relationships: []
       }
+      mises_a_jour: {
+        Row: {
+          id: number
+          par: string | null
+          publiee_le: string
+          texte: string
+          titre: string
+        }
+        Insert: {
+          id?: number
+          par?: string | null
+          publiee_le?: string
+          texte: string
+          titre: string
+        }
+        Update: {
+          id?: number
+          par?: string | null
+          publiee_le?: string
+          texte?: string
+          titre?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mises_a_jour_par_fkey"
+            columns: ["par"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mises_a_jour_par_fkey"
+            columns: ["par"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mission_message_reads: {
         Row: {
           last_read_at: string
@@ -2564,6 +2603,36 @@ export type Database = {
             foreignKeyName: "notifications_recipient_id_fkey"
             columns: ["recipient_id"]
             isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nouveautes_vues: {
+        Row: {
+          user_id: string
+          vue_le: string
+        }
+        Insert: {
+          user_id: string
+          vue_le: string
+        }
+        Update: {
+          user_id?: string
+          vue_le?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nouveautes_vues_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nouveautes_vues_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users_admin"
             referencedColumns: ["id"]
           },
@@ -5947,6 +6016,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      _nouveautes_lues_jusqua: { Args: never; Returns: string }
       _photos_du_lieu: { Args: { p_id: string }; Returns: Json }
       _pick_defi: {
         Args: { p_cadence: string; p_scope: string }
@@ -6974,6 +7044,7 @@ export type Database = {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
       }
+      mises_a_jour_publiees: { Args: never; Returns: Json }
       mod_get_place: { Args: { p_place_id: string }; Returns: Json }
       mod_list_places: {
         Args: {
@@ -7075,6 +7146,10 @@ export type Database = {
           p_name: string
           p_user_id: string
         }
+        Returns: Json
+      }
+      publier_mise_a_jour: {
+        Args: { p_texte: string; p_titre: string }
         Returns: Json
       }
       publish_announcement: {
@@ -7365,6 +7440,7 @@ export type Database = {
       }
       signer_charte: { Args: never; Returns: undefined }
       soundex: { Args: { "": string }; Returns: string }
+      supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
