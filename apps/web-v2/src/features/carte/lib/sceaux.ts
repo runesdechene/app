@@ -104,27 +104,17 @@ export function melanger(a: string, b: string, part: number): string {
   return `#${canaux.map((v) => v.toString(16).padStart(2, '0')).join('')}`
 }
 
-// « Mes lieux en couleur » : la couleur du type, désaturée, en trois vagues douces (plus claire
-// en haut, plus profonde en bas), icône blanche, sans bordure (prototype gravure-couleur).
+// « Mes lieux en couleur » : la pastille de la V1, très appréciée (Uriel, 30/09) — un disque plein
+// dans la couleur franche du type, éclairé en haut et plus profond en bas, l'icône en blanc.
 function sceauCouleur(icone: HTMLImageElement, couleur: string) {
   const ctx = toile(SCEAU)
-  const teinte = melanger(couleur, '#8c7c66', 0.58)
-  const profond = (part: number) => melanger(teinte, '#1f1a14', part)
-  disque(ctx, SCEAU / 2 - 2)
-  ctx.save()
-  ctx.clip()
-  ctx.fillStyle = melanger(teinte, '#ffffff', 0.82)
-  ctx.fillRect(0, 0, SCEAU, SCEAU)
-  const vague = (x: number, y: number, teinteVague: string) => {
-    ctx.beginPath()
-    ctx.ellipse(x * SCEAU, y * SCEAU, SCEAU * 0.75, SCEAU * 0.3, 0, 0, Math.PI * 2)
-    ctx.fillStyle = teinteVague
-    ctx.fill()
-  }
-  vague(0.35, 0.78, teinte)
-  vague(0.8, 1, profond(0.9))
-  vague(0.25, 1.18, profond(0.78))
-  ctx.restore()
+  const degrade = ctx.createLinearGradient(0, 0, 0, SCEAU)
+  degrade.addColorStop(0, melanger(couleur, '#ffffff', 0.65))
+  degrade.addColorStop(0.5, couleur)
+  degrade.addColorStop(1, melanger(couleur, '#000000', 0.75))
+  disque(ctx, SCEAU / 2 - 1)
+  ctx.fillStyle = degrade
+  ctx.fill()
   poserIcone(ctx, icone, '#fff')
   return ctx.getImageData(0, 0, SCEAU, SCEAU)
 }

@@ -15,14 +15,15 @@ const AUCUN: FilterSpecification = ['==', ['get', 'id'], '']
 
 const animationsReduites = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export function suivreSurvol(map: Carte, calques: string[]) {
+// `ecran` : le facteur de la taille d'écran (echelleEcran), sous l'animation du survol.
+export function suivreSurvol(map: Carte, calques: string[], ecran = 1) {
   let echelle = 1
   let courant = ''
   let image = 0
 
   const poser = (facteur: number) => {
     echelle = facteur
-    map.setLayoutProperty(CALQUE_SURVOL, 'icon-size', taille(facteur))
+    map.setLayoutProperty(CALQUE_SURVOL, 'icon-size', taille(facteur * ecran))
   }
 
   // Passe d'échelle en échelle (ex. [0,85, 1,2]) en `duree` ms.

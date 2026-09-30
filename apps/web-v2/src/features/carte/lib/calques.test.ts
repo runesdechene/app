@@ -1,7 +1,7 @@
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
-import { ajouterCalques, enGeoJSON, taille } from './calques'
+import { ajouterCalques, echelleEcran, enGeoJSON, taille } from './calques'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 const couleurs: CouleursCarte = {
@@ -60,4 +60,21 @@ test('aucun lieu n’est regroupé, même dézoomé ; les marques grandissent av
 
 test('une taille agrandie reste une courbe de zoom au premier niveau (MapLibre l’exige)', () => {
   expect(taille(2)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 1, 8, 1.6, 12, 2.3])
+})
+
+test('les marques grandissent avec l’écran : 1 sur un téléphone ou un portable, jusqu’à 2', () => {
+  expect(echelleEcran(390, 844)).toBe(1) // téléphone
+  expect(echelleEcran(1440, 900)).toBe(1) // portable
+  expect(echelleEcran(2560, 1440)).toBe(1.6) // écran 2K
+  expect(echelleEcran(3840, 2160)).toBe(2) // écran 4K, plafonné
+})
+
+test('le facteur d’écran multiplie chaque palier de toutes les marques', () => {
+  const map = {
+    addSource: vi.fn<(id: string, source: SourceSpecification) => void>(),
+    addLayer: vi.fn<(calque: AddLayerObject) => void>(),
+  }
+  ajouterCalques(map, couleurs, 2)
+  const billes = map.addLayer.mock.calls[0]?.[0]
+  expect(billes).toHaveProperty(['layout', 'icon-size'], taille(2))
 })

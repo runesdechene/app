@@ -23,7 +23,7 @@ import { Button } from '@/shared/ui/Button'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
-import { ajouterCalques, CALQUES_LIEUX, enGeoJSON, SOURCE } from '../lib/calques'
+import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
@@ -107,8 +107,10 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
     })
 
     map.on('load', () => {
-      ajouterCalques(map, couleurs)
-      suivreSurvol(map, CALQUES_LIEUX)
+      // Les marques à la mesure de l'écran (lue à l'ouverture de la carte).
+      const ecran = echelleEcran(window.innerWidth, window.innerHeight)
+      ajouterCalques(map, couleurs, ecran)
+      suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()
     })

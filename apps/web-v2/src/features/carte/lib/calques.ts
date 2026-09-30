@@ -62,18 +62,28 @@ const PALIERS: [zoom: number, taille: number][] = [
   [12, 1.15],
 ]
 
-// Une taille agrandie (le survol) multiplie chaque palier : MapLibre veut la courbe de zoom au
-// premier niveau, jamais enveloppée dans un calcul.
+// Sur un grand écran, les marques grandissent avec lui (Uriel, 30/09 : sur un écran 2K ou 4K,
+// les lieux étaient bien trop petits). Le plus petit côté de la fenêtre, rapporté à celui d'un
+// portable (900 px) : 1 sur un téléphone ou un portable, jusqu'à 2 sur un grand écran.
+export function echelleEcran(largeur: number, hauteur: number): number {
+  const echelle = Math.min(largeur, hauteur) / 900
+  return Math.round(Math.min(2, Math.max(1, echelle)) * 20) / 20
+}
+
+// Une taille agrandie (le survol, l'écran) multiplie chaque palier : MapLibre veut la courbe de
+// zoom au premier niveau, jamais enveloppée dans un calcul.
 export function taille(facteur = 1): ExpressionSpecification {
   const paliers = PALIERS.flatMap(([zoom, t]) => [zoom, Math.round(t * facteur * 1000) / 1000])
   return ['interpolate', ['linear'], ['zoom'], ...paliers]
 }
 
-const marque: NonNullable<SymbolLayerSpecification['layout']> = {
-  'icon-image': ['get', 'image'],
-  'icon-size': taille(),
-  'icon-allow-overlap': true,
-  'icon-ignore-placement': true,
+function marque(ecran: number): NonNullable<SymbolLayerSpecification['layout']> {
+  return {
+    'icon-image': ['get', 'image'],
+    'icon-size': taille(ecran),
+    'icon-allow-overlap': true,
+    'icon-ignore-placement': true,
+  }
 }
 
 // Ce que ce fichier demande à la carte, et rien de plus.
@@ -82,14 +92,14 @@ type SupportDeCalques = {
   addLayer: (calque: AddLayerObject) => void
 }
 
-export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
+export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 1) {
   map.addSource(SOURCE, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
   map.addLayer({
     id: 'billes',
     type: 'symbol',
     source: SOURCE,
     filter: ['all', estLieu, ['==', ['get', 'etat'], 'inconnu']],
-    layout: marque,
+    layout: marque(ecran),
   })
   map.addLayer({
     id: 'sceaux',
@@ -97,7 +107,10 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
     source: SOURCE,
     filter: ['all', estLieu, ['!=', ['get', 'etat'], 'inconnu']],
     // Un lieu visité passe au-dessus d'un lieu seulement connu.
-    layout: { ...marque, 'symbol-sort-key': ['case', ['==', ['get', 'etat'], 'visite'], 2, 1] },
+    layout: {
+      ...marque(ecran),
+      'symbol-sort-key': ['case', ['==', ['get', 'etat'], 'visite'], 2, 1],
+    },
   })
   map.addLayer({
     id: 'curiosites',
@@ -105,7 +118,7 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
     source: SOURCE,
     minzoom: DE_PRES,
     filter: ['==', ['get', 'nature'], 'curiosite'],
-    layout: marque,
+    layout: marque(ecran),
   })
   // Le lieu survolé, redessiné par-dessus : c'est lui qui grossit et « pulse » au clic (survol.ts).
   map.addLayer({
@@ -113,7 +126,7 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte) {
     type: 'symbol',
     source: SOURCE,
     filter: ['==', ['get', 'id'], ''],
-    layout: marque,
+    layout: marque(ecran),
   })
   map.addLayer({
     id: 'pilules',
