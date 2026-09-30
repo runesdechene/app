@@ -46,8 +46,7 @@ export function Vitrine() {
           <div className={styles.vie}>
             {chiffres && (
               <p className={styles.chiffres}>
-                <strong>{NOMBRE.format(chiffres.lieux)}</strong> lieux d’Histoire ·{' '}
-                <strong>{NOMBRE.format(chiffres.explorateurs)}</strong> Explorateurs
+                <strong>{NOMBRE.format(chiffres.lieux)}</strong> lieux d’Histoire sortis de l’oubli
               </p>
             )}
             <ApercuActivite />
