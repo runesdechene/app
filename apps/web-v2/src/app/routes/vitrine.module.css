@@ -90,11 +90,13 @@
   }
 }
 
-/* Un écran d'onboarding : la hauteur d'un téléphone, que ses pages remplissent. */
+/* Un écran d'onboarding : aussi haut que son contenu, jamais plus haut qu'un téléphone ni que l'écran (--hauteur-ecran :
+   plus de hauteur imposée à la page). Ce qui dépasse défile, sans barre visible. */
 .ecran {
-  height: min(860px, 100dvh - 2 * var(--space-4));
+  --hauteur-ecran: auto;
 
-  --hauteur-ecran: 100%;
+  max-height: min(860px, 100dvh - 2 * var(--space-4));
+  scrollbar-width: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
