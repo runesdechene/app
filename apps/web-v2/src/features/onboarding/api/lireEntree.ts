@@ -1,22 +1,14 @@
 /**
- * QUOI     — la forme de ce que l'onboarding lit : les deux chiffres de l'accueil, et « mon
- *            entrée » (nom, numéro d'Explorateur, Fragments, Charte signée).
- * POURQUOI — rien n'est supposé : chaque champ est prouvé (migration 370, get_landing_stats).
+ * QUOI     — la forme de ce que l'onboarding lit : « mon entrée » (nom, numéro d'Explorateur, Fragments, Charte signée).
+ * POURQUOI — rien n'est supposé : chaque champ est prouvé (migration 370).
  */
-import { booleen, liste, nombre, objet, ouNull, chaine } from '@/shared/lib/lire'
+import { booleen, nombre, objet, ouNull, chaine } from '@/shared/lib/lire'
 
-export type Chiffres = { lieux: number; explorateurs: number }
 export type Entree = {
   nom: string | null
   numero: number
   fragments: number
   charteSignee: boolean
-}
-
-export function lireChiffres(json: unknown): Chiffres {
-  const [ligne] = liste(objet)(json)
-  if (!ligne) throw new Error('chiffres absents')
-  return { lieux: nombre(ligne.total_places), explorateurs: nombre(ligne.total_users) }
 }
 
 export function lireEntree(json: unknown): Entree {

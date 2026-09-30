@@ -1,0 +1,69 @@
+/*
+ * QUOI     — le défilé des natures : d'un bord de l'écran à l'autre, sans barre de défilement ;
+ *            des gélules crème à 70 %, filet de 0,75 px, texte de 12 px (maquette 325:317).
+ * ATTENTION — le cadre flex + la rangée flex: 1 : sans eux, la rangée élargit toute la page
+ *            (.claude/rules/interface.md, « Carousel horizontal »).
+ */
+.cadre {
+  display: flex;
+  width: 100%;
+}
+
+.rangee {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  margin: 0;
+  padding: 2px var(--space-6);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.rangee li {
+  flex: 0 0 auto;
+}
+
+.nature {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px var(--space-3) 5px 10px;
+  border: 0.75px solid color-mix(in srgb, var(--color-bord) 70%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-sur-accent) 70%, transparent);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  letter-spacing: var(--titre-tracking);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--duree-elan) var(--courbe-elan),
+    color var(--duree-elan) var(--courbe-elan),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.nature:active {
+  scale: 0.96;
+}
+
+.nature[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.icone {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nature {
+    transition: none;
+  }
+}

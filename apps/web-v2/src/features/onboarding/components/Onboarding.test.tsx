@@ -1,5 +1,5 @@
 /**
- * QUOI     — le parcours d'entrée, de bout en bout : rejoindre, lire, signer la Charte au doigt
+ * QUOI     — le parcours d'entrée, de bout en bout : lire le Préambule, signer la Charte au doigt
  *            maintenu, recevoir un code, entrer, se nommer, être accueilli. Et le client déjà
  *            connu qui se connecte sans avoir signé : il signe, connecté, puis entre.
  * ATTENTION — jsdom n'anime pas : la fin du remplissage du cercle est simulée (`animationEnd`).
@@ -9,10 +9,10 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
+import { retenirLieu } from '@/shared/lib/apresEntree'
 import { Onboarding } from './Onboarding'
 
 const api = vi.hoisted(() => ({
-  fetchChiffres: vi.fn(),
   envoyerCode: vi.fn(),
   verifierCode: vi.fn(),
   reclamerFragments: vi.fn(),
@@ -23,7 +23,6 @@ const api = vi.hoisted(() => ({
 vi.mock('../api/entree', () => api)
 
 beforeEach(() => {
-  api.fetchChiffres.mockResolvedValue({ lieux: 3478, explorateurs: 4978 })
   api.envoyerCode.mockResolvedValue(undefined)
   api.verifierCode.mockResolvedValue('u9')
   api.reclamerFragments.mockResolvedValue(2)
@@ -32,13 +31,14 @@ beforeEach(() => {
   api.fetchEntree.mockResolvedValue({ nom: null, numero: 4979, fragments: 2, charteSignee: true })
 })
 
-function monter() {
+// On entre par la vitrine : « Commencer mon périple » mène au Préambule, « Se connecter » à l'e-mail.
+function monter(depart: string) {
   const router = createMemoryRouter(
     [
-      { path: '/bienvenue/:etape?', element: <Onboarding /> },
+      { path: '/bienvenue/:etape', element: <Onboarding /> },
       { path: '*', element: <p>la carte</p> },
     ],
-    { initialEntries: ['/bienvenue'] },
+    { initialEntries: [depart] },
   )
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -55,23 +55,9 @@ async function signerLaCharte() {
   if (remplissage) fireEvent.animationEnd(remplissage)
 }
 
-test('l’accueil dit les vrais chiffres', async () => {
-  monter()
-  // Les chiffres français se séparent par une espace fine insécable : on la lit en espace.
-  await screen.findByText(/lieux sortis de l’oubli/)
-  const rejoindre = screen.getByRole('button', { name: /Rejoindre/ })
-  expect(rejoindre.textContent.replace(/\s/g, ' ')).toBe('Rejoindre 4 978 Explorateurs')
-  expect(screen.getByText(/lieux sortis de l’oubli/)).toHaveTextContent(
-    '3 478 lieux sortis de l’oubli',
-  )
-})
-
-test('du premier écran à la bienvenue', async () => {
-  const router = monter()
-  await userEvent.click(await screen.findByRole('button', { name: /Rejoindre/ }))
-  expect(router.state.location.pathname).toBe('/bienvenue/preambule')
-
-  await userEvent.click(screen.getByRole('button', { name: /Suivant/ }))
+test('du Préambule à la bienvenue', async () => {
+  const router = monter('/bienvenue/preambule')
+  await userEvent.click(await screen.findByRole('button', { name: /Suivant/ }))
   expect(await screen.findByRole('heading', { name: 'La Charte' })).toBeInTheDocument()
   await signerLaCharte()
   expect(router.state.location.pathname).toBe('/bienvenue/email')
@@ -103,9 +89,8 @@ test('du premier écran à la bienvenue', async () => {
 
 test('un client connu se connecte sans avoir signé : il signe, connecté, puis entre', async () => {
   api.fetchEntree.mockResolvedValue({ nom: 'Luna', numero: 812, fragments: 0, charteSignee: false })
-  const router = monter()
-  await userEvent.click(await screen.findByRole('button', { name: /Se connecter/ }))
-  await userEvent.type(screen.getByLabelText('Ton e-mail'), 'luna@exemple.fr')
+  const router = monter('/bienvenue/email')
+  await userEvent.type(await screen.findByLabelText('Ton e-mail'), 'luna@exemple.fr')
   await userEvent.click(screen.getByRole('button', { name: 'Recevoir mon code' }))
   await userEvent.type(await screen.findByLabelText('Ton code'), '123456')
   expect(await screen.findByRole('heading', { name: 'La Charte' })).toBeInTheDocument()
@@ -120,10 +105,16 @@ test('un client connu se connecte sans avoir signé : il signe, connecté, puis 
 
 test('un code refusé le dit', async () => {
   api.verifierCode.mockRejectedValue(new Error('Token has expired or is invalid'))
-  monter()
-  await userEvent.click(await screen.findByRole('button', { name: /Se connecter/ }))
-  await userEvent.type(screen.getByLabelText('Ton e-mail'), 'luna@exemple.fr')
+  monter('/bienvenue/email')
+  await userEvent.type(await screen.findByLabelText('Ton e-mail'), 'luna@exemple.fr')
   await userEvent.click(screen.getByRole('button', { name: 'Recevoir mon code' }))
   await userEvent.type(await screen.findByLabelText('Ton code'), '000000')
   expect(await screen.findByRole('alert')).toHaveTextContent('Ce code ne marche pas')
+})
+
+test('venu d’un lieu de la vitrine, « Ouvrir la carte » ouvre ce lieu', async () => {
+  retenirLieu('d1')
+  const router = monter('/bienvenue/fin')
+  await userEvent.click(await screen.findByRole('button', { name: 'Ouvrir la carte' }))
+  expect(router.state.location.pathname).toBe('/carte/lieu/d1')
 })

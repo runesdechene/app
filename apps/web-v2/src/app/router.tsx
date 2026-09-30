@@ -3,11 +3,14 @@
  * POURQUOI — tout état navigable est une URL (spec socle §4bis). Premier segment = l'onglet ;
  *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou une
  *            feuille (/carte/ajouter).
- *            /bienvenue/<étape> : les écrans d'entrée, hors de la garde d'accès.
+ *            /bienvenue : la vitrine, où l'on cherche sans compte ; /bienvenue/lieu/<id> : l'aperçu
+ *            d'un lieu ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Onboarding } from '@/features/onboarding/components/Onboarding'
+import { ApercuLieu } from '@/features/vitrine/components/ApercuLieu'
+import { Vitrine } from '@/features/vitrine/components/Vitrine'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
 import { RootLayout } from './RootLayout'
@@ -19,8 +22,10 @@ import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/comp
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
-  // L'entrée (onboarding) : avant la garde d'accès, on y arrive sans compte.
-  { path: '/bienvenue/:etape?', Component: Onboarding },
+  // La vitrine et l'entrée : avant la garde d'accès, on y arrive sans compte.
+  { path: '/bienvenue', Component: Vitrine },
+  { path: '/bienvenue/lieu/:id', Component: ApercuLieu },
+  { path: '/bienvenue/:etape', Component: Onboarding },
   {
     path: '/',
     Component: RootLayout,

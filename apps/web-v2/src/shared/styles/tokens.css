@@ -125,6 +125,12 @@
   --suivant-size: 1.875rem; /* « Suivant → » de l'onboarding : Bebas 30 px (Figma 94:142) */
   --code-size: 2.875rem; /* les chiffres du code reçu par e-mail : Bebas 46 px (94:319) */
   --explore-tracking: 0.45em; /* « E X P L O R E » sous le logo (94:107) */
+  --vitrine-surtitre-size: 1.625rem; /* « Porter l'Histoire » sur la vitrine : 26 px (314:146) */
+  --vitrine-surtitre-pc-size: 2.25rem; /* le même, sur ordinateur : 36 px (314:203) */
+  --vitrine-titre-pc-size: 4rem; /* « Explorer le monde », sur ordinateur : 64 px */
+  --vitrine-phrase-size: 0.9375rem; /* « 3 473 hauts lieux… » : 15 px */
+  --vitrine-leading: 1.35; /* la phrase des chiffres et l'activité, sur la photo */
+  --vitrine-description-size: 1.0625rem; /* la description, sur ordinateur : 17 px */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
   --carnet-leading: 24px; /* une ligne du carnet de l'ajout d'un lieu : le texte s'y pose */

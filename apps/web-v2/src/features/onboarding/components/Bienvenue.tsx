@@ -2,11 +2,13 @@
  * QUOI     — la bienvenue (maquette 95:107) : le voyageur, « Bienvenue Claire », son numéro
  *            d'Explorateur, une promesse, puis « Ouvrir la carte ».
  * POURQUOI — le numéro est le rang de l'inscription (mon_entree, migration 370) : vrai, jamais
- *            inventé. « Voir mes Fragments » n'apparaît que s'il y en a.
+ *            inventé. « Voir mes Fragments » n'apparaît que s'il y en a. Venu d'un lieu de la
+ *            vitrine, « Ouvrir la carte » ouvre ce lieu.
  */
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import voyageur from '@/assets/onboarding/voyageur.webp'
+import { reprendreLieu } from '@/shared/lib/apresEntree'
 import { fetchEntree } from '../api/entree'
 import { enLettres } from '../lib/enLettres'
 import styles from './Onboarding.module.css'
@@ -27,7 +29,8 @@ export function Bienvenue() {
             type="button"
             className={styles.principal}
             onClick={() => {
-              void navigate('/carte', { replace: true })
+              const lieu = reprendreLieu()
+              void navigate(lieu ? `/carte/lieu/${lieu}` : '/carte', { replace: true })
             }}
           >
             Ouvrir la carte

@@ -1,6 +1,5 @@
 /**
- * QUOI     — tout ce que l'onboarding demande à Supabase : les chiffres de l'accueil, le code
- *            par e-mail (envoi et vérification), puis, une fois connecté, les Fragments achetés,
+ * QUOI     — tout ce que l'onboarding demande à Supabase : le code par e-mail (envoi et vérification), puis, une fois connecté, les Fragments achetés,
  *            la Charte, le nom, « mon entrée ».
  * POURQUOI — pas de mot de passe : Supabase envoie un code à 6 chiffres, comme la V1. Un e-mail
  *            inconnu crée le compte (le déclencheur handle_new_user fait le reste).
@@ -8,13 +7,7 @@
  *            l'e-mail passé ici n'est plus qu'une formalité de signature.
  */
 import { supabase } from '@/shared/supabase/client'
-import { lireChiffres, lireEntree } from './lireEntree'
-
-export async function fetchChiffres() {
-  const { data, error } = await supabase.rpc('get_landing_stats')
-  if (error) throw error
-  return lireChiffres(data)
-}
+import { lireEntree } from './lireEntree'
 
 export async function envoyerCode(email: string) {
   const { error } = await supabase.auth.signInWithOtp({
