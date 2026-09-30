@@ -40,7 +40,7 @@ export function Preambule() {
         <p className={styles.signature}>
           <strong>Uriel</strong>
           <em>Artiste nomade,</em>
-          <em>Créateur de Runes de Chêne</em>
+          <em>Créateur de la marque Runes de Chêne</em>
         </p>
       </div>
     </Page>
