@@ -25,6 +25,13 @@ export function tabOf(pathname: string): TabId | null {
   return isTabId(first) ? first : null
 }
 
+// Une adresse qu'un onglet retient. Pas un passage : la feuille « Ajouter » et le parcours d'ajout
+// se ferment et ne se rouvrent jamais d'eux-mêmes (Uriel, 30/09 : quitter l'ajout puis toucher
+// l'Accueil rouvrait l'ajout).
+export function aRetenir(pathname: string): boolean {
+  return !/^\/[^/]+\/ajouter(\/|$)/.test(pathname)
+}
+
 export type TabPressAction = { kind: 'navigate'; to: string } | { kind: 'scrollTop' }
 
 export function resolveTabPress(args: {

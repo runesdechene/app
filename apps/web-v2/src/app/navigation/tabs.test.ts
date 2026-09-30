@@ -2,7 +2,7 @@
  * QUOI     — les règles des onglets : quel onglet est actif, que fait un toucher.
  * POURQUOI — conventions mobiles (spec socle §4bis) ; logique pure, testée ici sans navigateur.
  */
-import { isTabId, resolveTabPress, tabOf, TABS } from './tabs'
+import { aRetenir, isTabId, resolveTabPress, tabOf, TABS } from './tabs'
 
 test('quatre onglets, dans l’ordre de la maquette', () => {
   expect(TABS.map((t) => t.id)).toEqual(['accueil', 'carte', 'messages', 'compte'])
@@ -55,4 +55,12 @@ test('toucher l’onglet actif à sa racine remonte en haut, sans naviguer', () 
   expect(
     resolveTabPress({ active: 'carte', pressed: 'carte', pathname: '/carte', memory: {} }),
   ).toEqual({ kind: 'scrollTop' })
+})
+
+test('un onglet ne retient pas un passage : la feuille « Ajouter » ni le parcours d’ajout', () => {
+  // Retenu, le parcours se rouvrait en revenant sur l'onglet après l'avoir quitté (Uriel, 30/09).
+  expect(aRetenir('/accueil/ajouter')).toBe(false)
+  expect(aRetenir('/accueil/ajouter/lieu/photo')).toBe(false)
+  expect(aRetenir('/accueil/lieu/abc')).toBe(true)
+  expect(aRetenir('/carte')).toBe(true)
 })
