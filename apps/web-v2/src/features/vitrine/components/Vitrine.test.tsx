@@ -101,6 +101,15 @@ test('chercher un mot mène à l’aperçu du lieu', async () => {
   expect(router.state.location.pathname).toBe('/bienvenue/lieu/d1')
 })
 
+test('la copie du défilé se clique aussi', async () => {
+  monter('/bienvenue')
+  await screen.findByRole('button', { name: 'Dolmens & mégalithes' })
+  const copie = screen.getAllByRole('button', { name: 'Dolmens & mégalithes', hidden: true })[1]
+  if (!copie) throw new Error('copie absente')
+  await userEvent.click(copie)
+  expect(api.chercher).toHaveBeenLastCalledWith('', 'n1')
+})
+
 test('toucher une nature montre ses lieux', async () => {
   monter('/bienvenue')
   const nature = await screen.findByRole('button', { name: 'Dolmens & mégalithes' })

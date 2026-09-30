@@ -7,8 +7,9 @@
  *            carte contient, et le défilé montre qu'il y en a plus que l'écran n'en tient. Les
  *            icônes sont celles de l'app, en pochoir couleur d'encre.
  * ATTENTION — la rangée est rendue deux fois, bout à bout : le défilé recule d'une rangée entière
- *            et recommence sans à-coup. La copie est cachée aux lecteurs d'écran et au clavier
- *            (inert). Mouvement réduit : pas de défilé, la rangée défile au doigt.
+ *            et recommence sans à-coup. La copie est cachée aux lecteurs d'écran et au clavier,
+ *            mais reste cliquable : sur un grand écran, c'est souvent elle qui occupe la droite.
+ *            Mouvement réduit : pas de défilé, la rangée défile au doigt.
  */
 import type { NatureComptee } from '../api/lireVitrine'
 import styles from './DefileNatures.module.css'
@@ -27,7 +28,6 @@ export function DefileNatures({
       className={styles.rangee}
       aria-label={copie ? undefined : 'Les natures de lieux'}
       aria-hidden={copie || undefined}
-      inert={copie}
       data-copie={copie || undefined}
     >
       {natures.map((n) => (
@@ -36,6 +36,7 @@ export function DefileNatures({
             type="button"
             className={styles.nature}
             aria-pressed={n.id === choisie}
+            tabIndex={copie ? -1 : undefined}
             onClick={() => {
               onChoisir(n.id === choisie ? null : n.id)
             }}
