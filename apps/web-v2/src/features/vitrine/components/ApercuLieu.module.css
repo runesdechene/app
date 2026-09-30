@@ -1,22 +1,19 @@
 /*
  * QUOI     — l'aperçu d'un lieu, dans les habits de sa fiche (229:128) : la photo et son bord
  *            déchiré, le parchemin, le nom en Bebas, la pastille de la nature ; le récit s'efface
- *            dans le parchemin quand il a une suite ; l'invitation au bas.
+ *            dans le parchemin quand il a une suite ; l'invitation au bas. La fenêtre qui la porte
+ *            (sur la carte) vit dans app/routes/vitrine.
  * ATTENTION — la couleur de la nature et son icône arrivent en variables inline (`--type`,
  *            `--icone`), la seule forme de style inline autorisée.
  */
 .apercu {
   display: grid;
-  grid-template-rows: auto 1fr;
-  min-height: 100dvh;
-  max-width: 480px;
-  margin: 0 auto;
   background: var(--color-fond);
 }
 
 .photo {
   position: relative;
-  aspect-ratio: 390 / 440;
+  aspect-ratio: 440 / 320;
   overflow: hidden;
   background: var(--color-sable);
 }
@@ -52,22 +49,22 @@
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
 }
 
-.fleche {
+.fermer {
   position: absolute;
-  top: calc(env(safe-area-inset-top) + var(--space-2));
-  left: var(--space-2);
+  top: var(--space-2);
+  right: var(--space-2);
   z-index: 2;
   width: var(--cible-tactile);
   height: var(--cible-tactile);
   background: var(--color-sur-accent);
-  mask: url('../../../assets/ui/fleche-retour-claire.svg') center / 24px no-repeat;
+  mask: url('../../../assets/ui/croix.svg') center / 22px no-repeat;
 }
 
 .corps {
   display: grid;
   align-content: start;
   gap: var(--space-3);
-  padding: var(--space-3) 25px calc(env(safe-area-inset-bottom) + var(--space-8));
+  padding: var(--space-3) 25px var(--space-6);
 }
 
 .nom {
@@ -174,7 +171,7 @@
 }
 
 .absent {
-  margin: 30dvh 0 0;
+  margin: var(--space-8) 0 0;
   color: var(--color-fiche-titre);
   font-family: var(--font-corps);
   font-size: var(--corps-size);

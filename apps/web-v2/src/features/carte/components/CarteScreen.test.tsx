@@ -1,20 +1,22 @@
 /**
  * QUOI     — l'écran Carte : si les lieux ne se chargent ou ne se dessinent pas, la carte reste et
  *            le dit ; un dessin ancien n'écrase jamais le récent ; la 3D ne se reconstruit pas à
- *            chaque zoom ; sans position, « Ma position » le dit.
+ *            chaque zoom ; sans position, « Ma position » le dit. Le visiteur sans compte a la
+ *            carte publique, sans filtre ni préférences, et elle glisse jusqu'au lieu ouvert.
  * POURQUOI — MapLibre ne tourne pas dans jsdom : la fausse carte vient de `src/test/`.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
 import { FausseCarte } from '@/test/fausseCarte'
 import type { LieuCarte } from '../api/lireCarte'
-import { CarteScreen } from './CarteScreen'
+import { CarteScreen, CarteVisiteur } from './CarteScreen'
 
 const api = vi.hoisted(() => ({
   fetchCarteLieux: vi.fn<() => Promise<LieuCarte[]>>(),
+  fetchCartePublique: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
 }))
@@ -215,4 +217,27 @@ test('au survol d’un lieu, la main apparaît et le lieu se détache ; elle s�
   expect(carte().setFilter).toHaveBeenLastCalledWith('survol', ['==', ['get', 'id'], 'connu'])
   carte().emettre('mouseleave')
   expect(carte().canevas.style.cursor).toBe('')
+})
+
+test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’au lieu ouvert', async () => {
+  api.fetchCartePublique.mockResolvedValue(LIEUX)
+  api.fetchLieuxEnCouleur.mockClear()
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/bienvenue/carte/lieu/inconnu']}>
+        <Routes>
+          <Route path="/bienvenue/carte/*" element={<CarteVisiteur />}>
+            <Route path="lieu/:id" element={null} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  )
+  charger()
+  await waitFor(() => {
+    expect(carte().flyTo).toHaveBeenCalledWith({ center: [7, 44], zoom: 11 })
+  })
+  expect(api.fetchCarteLieux).not.toHaveBeenCalled()
+  expect(api.fetchLieuxEnCouleur).not.toHaveBeenCalled()
+  expect(screen.queryByRole('button', { name: 'Filtre' })).not.toBeInTheDocument()
 })

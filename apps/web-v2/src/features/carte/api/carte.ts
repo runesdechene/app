@@ -1,6 +1,7 @@
 /**
- * QUOI     — les deux lectures de la carte : tous les lieux vus par l'Explorateur connecté, et
- *            le territoire sous un point.
+ * QUOI     — les lectures de la carte : tous les lieux vus par l'Explorateur connecté, ou par un
+ *            visiteur sans compte (positions floutées, migration 392), et le territoire sous un
+ *            point.
  * POURQUOI — les deux fonctions lisent `auth.uid()` (migration 363) : l'état de chaque lieu
  *            (inconnu, connu, visité) est celui de la personne qui regarde. S'y ajoute l'option
  *            « Mes lieux en couleur », réglée dans les Préférences.
@@ -11,6 +12,13 @@ import { lireLieux, lireTerritoire, type LieuCarte, type Territoire } from './li
 
 export async function fetchCarteLieux(): Promise<LieuCarte[]> {
   const { data, error } = await supabase.rpc('carte_lieux')
+  if (error) throw error
+  return lireLieux(data)
+}
+
+// Sans compte : chaque position est déplacée de quelques kilomètres, tout est « inconnu ».
+export async function fetchCartePublique(): Promise<LieuCarte[]> {
+  const { data, error } = await supabase.rpc('carte_publique')
   if (error) throw error
   return lireLieux(data)
 }

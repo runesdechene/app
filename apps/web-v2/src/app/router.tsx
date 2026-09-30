@@ -3,13 +3,12 @@
  * POURQUOI — tout état navigable est une URL (spec socle §4bis). Premier segment = l'onglet ;
  *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou une
  *            feuille (/carte/ajouter).
- *            /bienvenue : la vitrine, où l'on cherche sans compte ; /bienvenue/lieu/<id> : l'aperçu
- *            d'un lieu ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
+ *            /bienvenue : la vitrine, où l'on cherche sans compte ; /bienvenue/carte : la carte des
+ *            visiteurs, positions floutées, et l'aperçu d'un lieu par-dessus (…/lieu/<id>) ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Onboarding } from '@/features/onboarding/components/Onboarding'
-import { ApercuLieu } from '@/features/vitrine/components/ApercuLieu'
 import { Vitrine } from '@/features/vitrine/components/Vitrine'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
@@ -18,13 +17,18 @@ import { RouteChemins, RouteClassement } from './routes/accueil'
 import { RouteAjouter, RouteAjouterLieu, RouteNotifications } from './routes/carte'
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteMurmure } from './routes/messages'
+import { RouteApercuLieu, RouteCarteVisiteur } from './routes/vitrine'
 import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
   // La vitrine et l'entrée : avant la garde d'accès, on y arrive sans compte.
   { path: '/bienvenue', Component: Vitrine },
-  { path: '/bienvenue/lieu/:id', Component: ApercuLieu },
+  {
+    path: '/bienvenue/carte',
+    Component: RouteCarteVisiteur,
+    children: [{ path: 'lieu/:id', Component: RouteApercuLieu }],
+  },
   { path: '/bienvenue/:etape', Component: Onboarding },
   {
     path: '/',

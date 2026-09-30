@@ -5,6 +5,9 @@
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
  *            couleur » bascule.
+ *            `CarteVisiteur` : la même carte pour qui n'a pas de compte (la vitrine) — positions floutées,
+ *            ni filtre, ni territoire, ni préférences ; toucher un lieu ouvre son aperçu, et la
+ *            carte glisse jusqu'au lieu dont l'aperçu est ouvert.
  * ATTENTION — la feuille du filtre et « Seulement mes lieux » sont un réglage de la vue, gardé
  *            ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec leur valeur.
  *            L'attribution OpenStreetMap est obligatoire : elle reste, repliée.
@@ -12,7 +15,7 @@
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import position from '@/assets/ui/position.svg'
 import roseDesVents from '@/assets/ui/rose-des-vents.svg'
@@ -37,20 +40,31 @@ const DUREE_MESSAGE = 3000
 type Vue = { lat: number; lng: number; zoom: number }
 
 export function CarteScreen() {
+  return <CarteVivante visiteur={false} />
+}
+
+// La carte de la vitrine, pour qui n'a pas de compte.
+export function CarteVisiteur() {
+  return <CarteVivante visiteur />
+}
+
+function CarteVivante({ visiteur }: { visiteur: boolean }) {
   const conteneur = useRef<HTMLDivElement>(null)
   // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
   // `--decalage-carte` (posée par la coquille ; 0 sur mobile ou tiroir replié).
   const placeDuTiroir = useRef<HTMLDivElement>(null)
   const [carte, setCarte] = useState<Carte | null>(null)
   const [couleurs] = useState(() => lireCouleurs(document.documentElement))
-  const { lieux, erreur, reessayer } = useCarteLieux()
-  const couleurTypes = useLieuxEnCouleur()
+  const { lieux, erreur, reessayer } = useCarteLieux(visiteur)
+  const couleurTypes = useLieuxEnCouleur(!visiteur)
   const navigate = useNavigate()
   // « Trouver sur la carte » (fiche d'un lieu) arrive par l'adresse : /carte?centre=lat,lng.
   const [recherche, setRecherche] = useSearchParams()
   const centre = recherche.get('centre')
   const [vue, setVue] = useState<Vue | null>(null)
-  const territoire = useTerritoire(vue)
+  const territoire = useTerritoire(visiteur ? null : vue)
+  // Visiteur : le lieu dont l'aperçu est ouvert (/bienvenue/carte/lieu/<id>).
+  const { id: lieuOuvert } = useParams()
   const [sansPosition, setSansPosition] = useState(false)
   const [filtreOuvert, setFiltreOuvert] = useState(false)
   const [mesLieux, setMesLieux] = useState(false)
@@ -87,7 +101,9 @@ export function CarteScreen() {
 
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
-      if (typeof id === 'string') void navigate(`/carte/lieu/${id}`)
+      if (typeof id === 'string') {
+        void navigate(visiteur ? `/bienvenue/carte/lieu/${id}` : `/carte/lieu/${id}`)
+      }
     })
 
     map.on('load', () => {
@@ -99,7 +115,7 @@ export function CarteScreen() {
     return () => {
       map.remove()
     }
-  }, [couleurs, navigate])
+  }, [couleurs, navigate, visiteur])
 
   // Quand le tiroir s'ouvre ou se replie, la carte vise le centre de sa partie visible : elle
   // glisse au rythme du tiroir (MapLibre coupe l'animation si l'on a réduit les animations).
@@ -128,6 +144,13 @@ export function CarteScreen() {
     }
     setRecherche({}, { replace: true })
   }, [carte, centre, setRecherche])
+
+  // Visiteur : la carte glisse jusqu'au lieu dont l'aperçu s'ouvre (sa position floutée).
+  useEffect(() => {
+    if (!visiteur || !carte || !lieux || !lieuOuvert) return
+    const lieu = lieux.find((l) => l.id === lieuOuvert)
+    if (lieu) carte.flyTo({ center: [lieu.lng, lieu.lat], zoom: 11 })
+  }, [visiteur, carte, lieux, lieuOuvert])
 
   // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
   // `actif` passe à faux dès qu'un nouveau dessin part, ou que l'écran se ferme.
@@ -196,16 +219,18 @@ export function CarteScreen() {
           lieux={lieux ?? []}
           onAller={({ lat, lng }) => carte?.flyTo({ center: [lng, lat], zoom: 14 })}
         />
-        <button
-          type="button"
-          className={styles.filtre}
-          aria-label="Filtre"
-          onClick={() => {
-            setFiltreOuvert(true)
-          }}
-        >
-          <img src={filtre} alt="" />
-        </button>
+        {!visiteur && (
+          <button
+            type="button"
+            className={styles.filtre}
+            aria-label="Filtre"
+            onClick={() => {
+              setFiltreOuvert(true)
+            }}
+          >
+            <img src={filtre} alt="" />
+          </button>
+        )}
       </div>
       <div className={styles.inscription}>
         <Inscription nom={territoire} />

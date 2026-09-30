@@ -11,3 +11,5 @@ besoin du cadre de détail ou de la fermeture, un petit composant d'ici les lui 
 - `carte.tsx` — la feuille « Ajouter » (`/<onglet>/ajouter`) et les notifications
   (`/<onglet>/notifications`).
 - `lieu.tsx` — la fiche d'un lieu (`/<onglet>/lieu/<id>`), sa fenêtre et ses feuilles.
+- `vitrine.tsx` — la carte des visiteurs (`/bienvenue/carte`, positions floutées) et l'aperçu
+  d'un lieu posé dessus (`/bienvenue/carte/lieu/<id>`).
