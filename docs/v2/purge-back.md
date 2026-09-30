@@ -46,9 +46,9 @@
 
 | Objet | Rôle | Source |
 |---|---|---|
-| `users.v2_access` | autorisation V2 par compte | mig 344 |
-| `has_v2_access()` | la V2 demande si l'appelant peut entrer | mig 344 |
-| `set_v2_access(text, boolean)` | le Hub coche / décoche | mig 344 |
+| `users.v2_access` | autorisation V2 par compte — **ne sert plus depuis la mig 398** (V2 ouverte à tous) : à retirer avec la case du Hub | mig 344 |
+| `has_v2_access()` | la V2 demande si l'appelant peut entrer — tout compte connecté depuis la mig 398 ; à retirer à la bascule | mig 344, 398 |
+| `set_v2_access(text, boolean)` | le Hub coche / décoche — sans effet depuis la mig 398 | mig 344 |
 | Supabase Auth — URL `/v2/` | à autoriser quand la zone Compte aura sa propre connexion | spec socle §9 |
 | PostGIS, `geo_departements`, `geo_pays`, `places.departement` / `pays`, `_rattacher_lieu`, déclencheur `places_rattacher` | rattacher chaque lieu (profil, régions parcourues) ; DROM rattachés au pays seulement ; 2 îlots isolés sans rattachement | migs 349-351 |
 | déclencheur `envie_visitee` (`_trg_envie_visitee`) | une visite retire le lieu des envies (listes exclusives) | mig 352 |
