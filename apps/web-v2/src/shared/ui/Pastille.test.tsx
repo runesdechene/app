@@ -18,3 +18,10 @@ test('« 9+ » au-delà de 9', () => {
   render(<Pastille count={12} />)
   expect(screen.getByLabelText('12 non lus')).toHaveTextContent('9+')
 })
+
+test('discrète : un point sans nombre, et rien à zéro', () => {
+  const { container, rerender } = render(<Pastille count={0} discrete />)
+  expect(container).toBeEmptyDOMElement()
+  rerender(<Pastille count={4} discrete />)
+  expect(screen.getByLabelText('Nouveaux messages')).toHaveTextContent('')
+})

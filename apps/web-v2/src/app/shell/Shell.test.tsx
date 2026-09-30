@@ -43,8 +43,19 @@ const murmures = vi.hoisted(() => ({
   ecouterMurmures: () => () => undefined,
 }))
 vi.mock('@/features/messages/api/murmures', () => murmures)
+// La communauté : rien de raté, sauf là où un test le dit.
+const registre = vi.hoisted(() => ({
+  fetchRegistreNonLus: vi.fn<() => Promise<{ messages: number; mentions: number }>>(),
+  ecouterRegistre: () => () => undefined,
+  fetchRegistre: () => Promise.resolve([]),
+  marquerRegistreLu: () => Promise.resolve(),
+  ecrire: () => Promise.resolve(),
+  chercherExplorateurs: () => Promise.resolve([]),
+}))
+vi.mock('@/features/messages/api/registre', () => registre)
 beforeEach(() => {
   murmures.fetchFils.mockResolvedValue([])
+  registre.fetchRegistreNonLus.mockResolvedValue({ messages: 0, mentions: 0 })
 })
 
 function renderAt(path: string | string[]) {
@@ -101,6 +112,28 @@ test('l’onglet Messages porte le nombre de murmures non lus', async () => {
   murmures.fetchFils.mockResolvedValue([{ nonLus: 2 }, { nonLus: 0 }, { nonLus: 1 }])
   renderAt('/accueil')
   // jsdom ne connaît pas le CSS : il colle « Messages » et « 3 non lus » (pas le navigateur).
+  expect(await screen.findByRole('button', { name: /^Messages ?3 non lus$/ })).toBeInTheDocument()
+})
+
+test('sans murmure, des messages ratés de la communauté : un point discret, sans nombre', async () => {
+  registre.fetchRegistreNonLus.mockResolvedValue({ messages: 4, mentions: 0 })
+  renderAt('/accueil')
+  expect(
+    await screen.findByRole('button', { name: /^Messages ?Nouveaux messages$/ }),
+  ).toBeInTheDocument()
+})
+
+test('des murmures et des messages ratés : le rouge des murmures l’emporte', async () => {
+  murmures.fetchFils.mockResolvedValue([{ nonLus: 1 }])
+  registre.fetchRegistreNonLus.mockResolvedValue({ messages: 4, mentions: 0 })
+  renderAt('/accueil')
+  expect(await screen.findByRole('button', { name: /^Messages ?1 non lus$/ })).toBeInTheDocument()
+})
+
+test('mentionné dans la communauté : du rouge, comme un murmure, et les deux s’additionnent', async () => {
+  murmures.fetchFils.mockResolvedValue([{ nonLus: 1 }])
+  registre.fetchRegistreNonLus.mockResolvedValue({ messages: 4, mentions: 2 })
+  renderAt('/accueil')
   expect(await screen.findByRole('button', { name: /^Messages ?3 non lus$/ })).toBeInTheDocument()
 })
 

@@ -113,6 +113,7 @@ export function DaBriques() {
           <Pastille count={0} />
           <Pastille count={3} />
           <Pastille count={12} />
+          <Pastille count={5} discrete />
         </div>
       </DaSection>
 

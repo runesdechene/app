@@ -1,5 +1,6 @@
 /*
- * QUOI     — pastille ronde rouge, chiffre en Cabin Condensed gras.
+ * QUOI     — pastille ronde rouge, chiffre en Cabin Condensed gras ; ou un point brun foncé,
+ *            sans chiffre (la variante discrète), cerclé de crème pour se détacher.
  */
 .pastille {
   min-width: 1.1rem;
@@ -14,4 +15,18 @@
   font-size: var(--micro-size);
   font-weight: var(--weight-gras);
   line-height: 1;
+}
+
+.point {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--color-sur-accent);
+  border-radius: var(--radius-rond);
+  background: var(--color-pilule-texte);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+
+  @starting-style {
+    scale: 0;
+  }
 }

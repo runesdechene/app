@@ -4,9 +4,10 @@
  * POURQUOI — de vrais boutons radio, cachés sous leur libellé : le clavier (flèches), les
  *            lecteurs d'écran et le formulaire marchent sans code maison. La zone éclairée est
  *            un seul élément, déplacé en CSS selon le rang du choix (`--rang`).
+ *            `marque` : ce qui se pose à côté d'un libellé (la pastille des Murmures non lus).
  * ATTENTION — le glissement se coupe quand le système demande moins d'animations.
  */
-import { useId } from 'react'
+import { useId, type ReactNode } from 'react'
 import styles from './Segments.module.css'
 
 export function Segments<T extends string>({
@@ -16,7 +17,7 @@ export function Segments<T extends string>({
   onChange,
 }: {
   libelle: string
-  options: readonly { id: T; libelle: string }[]
+  options: readonly { id: T; libelle: string; marque?: ReactNode }[]
   valeur: T
   onChange: (valeur: T) => void
 }) {
@@ -42,7 +43,10 @@ export function Segments<T extends string>({
               onChange(o.id)
             }}
           />
-          {o.libelle}
+          <span className={styles.libelle}>
+            {o.libelle}
+            {o.marque}
+          </span>
         </label>
       ))}
     </div>

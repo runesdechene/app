@@ -3990,6 +3990,39 @@ export type Database = {
           },
         ]
       }
+      registre_lu: {
+        Row: {
+          lu_jusqua: number
+          maj: string
+          user_id: string
+        }
+        Insert: {
+          lu_jusqua?: number
+          maj?: string
+          user_id: string
+        }
+        Update: {
+          lu_jusqua?: number
+          maj?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registre_lu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "registre_lu_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           created_at: string
@@ -6929,6 +6962,7 @@ export type Database = {
         Returns: Json
       }
       marquer_notifications_lues: { Args: never; Returns: number }
+      marquer_registre_lu: { Args: never; Returns: undefined }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mes_notifications: { Args: never; Returns: Json }
@@ -7126,6 +7160,7 @@ export type Database = {
         Args: { p_canaux?: string[]; p_limite?: number }
         Returns: Json
       }
+      registre_non_lus: { Args: never; Returns: Json }
       remove_company_member: {
         Args: {
           p_company_id: string

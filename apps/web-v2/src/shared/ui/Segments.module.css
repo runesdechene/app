@@ -50,6 +50,13 @@
   outline-offset: -2px;
 }
 
+/* Le libellé et sa marque éventuelle (une pastille), côte à côte. */
+.libelle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
 /* Le vrai bouton radio reste là pour le clavier et les lecteurs d'écran, mais invisible. */
 .radio {
   position: absolute;

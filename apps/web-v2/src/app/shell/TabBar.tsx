@@ -13,6 +13,7 @@ import { useLocation, useNavigate } from 'react-router'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { useNonLus } from '@/features/messages/hooks/useMurmures'
+import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
 import carteIcon from '@/assets/ui/onglet-carte.png'
 import messagesIcon from '@/assets/ui/onglet-messages.png'
@@ -47,7 +48,9 @@ export function TabBar({
   const active = tabOf(pathname)
   const { profil } = useExplorateur(useMonIdentifiant())
   const rang = ONGLETS_PC.findIndex((tab) => tab.id === active)
-  const nonLus = useNonLus()
+  const registre = useRegistreNonLus()
+  // Le rouge, pour ce qui m'est adressé : les Murmures non lus et les mentions de moi.
+  const pourMoi = useNonLus() + registre.mentions
 
   function press(pressed: TabId) {
     onToucher()
@@ -86,7 +89,12 @@ export function TabBar({
           <Text variant="libelle">{tab.label}</Text>
           {tab.id === 'messages' && (
             <span className={styles.nonLus}>
-              <Pastille count={nonLus} />
+              {/* Rien pour moi : le point brun, si la communauté a parlé. */}
+              {pourMoi > 0 ? (
+                <Pastille count={pourMoi} />
+              ) : (
+                <Pastille count={registre.messages} discrete />
+              )}
             </span>
           )}
         </button>

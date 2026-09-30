@@ -14,6 +14,8 @@ const api = vi.hoisted(() => ({
   ecrire: vi.fn(),
   ecouterRegistre: vi.fn(() => () => undefined),
   chercherExplorateurs: vi.fn(),
+  fetchRegistreNonLus: vi.fn(() => Promise.resolve({ messages: 0, mentions: 0 })),
+  marquerRegistreLu: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/registre', () => api)
 
@@ -222,4 +224,12 @@ test('une mention s’affiche en lien vers le profil ; un message qui me mention
   const lien = await screen.findByRole('link', { name: '@Uriel' })
   expect(lien).toHaveAttribute('href', '/messages/explorateur/u1')
   expect(lien.closest('li')?.className).toMatch(/mentionne/)
+})
+
+test('le Registre ouvert est lu : le marqueur avance', async () => {
+  api.marquerRegistreLu.mockClear()
+  monter()
+  await vi.waitFor(() => {
+    expect(api.marquerRegistreLu).toHaveBeenCalled()
+  })
 })
