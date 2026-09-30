@@ -6,7 +6,9 @@
 .page {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  min-height: 100dvh;
+
+  /* Tout l'écran sur téléphone ; sur PC, toute la fenêtre posée sur la carte (--hauteur-ecran). */
+  min-height: var(--hauteur-ecran);
   max-width: 480px;
   margin: 0 auto;
   background:

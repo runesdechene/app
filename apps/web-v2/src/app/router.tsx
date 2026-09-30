@@ -8,7 +8,6 @@
  * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
-import { Onboarding } from '@/features/onboarding/components/Onboarding'
 import { Vitrine } from '@/features/vitrine/components/Vitrine'
 import { DaPage } from './da/DaPage'
 import { TabRoute } from './navigation/TabRoute'
@@ -17,7 +16,7 @@ import { RouteChemins, RouteClassement } from './routes/accueil'
 import { RouteAjouter, RouteAjouterLieu, RouteNotifications } from './routes/carte'
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteMurmure } from './routes/messages'
-import { RouteApercuLieu, RouteCarteVisiteur } from './routes/vitrine'
+import { RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
 import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
 import { Shell } from './shell/Shell'
 
@@ -29,7 +28,7 @@ export const routes: RouteObject[] = [
     Component: RouteCarteVisiteur,
     children: [{ path: 'lieu/:id', Component: RouteApercuLieu }],
   },
-  { path: '/bienvenue/:etape', Component: Onboarding },
+  { path: '/bienvenue/:etape', Component: RouteOnboarding },
   {
     path: '/',
     Component: RootLayout,

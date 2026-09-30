@@ -87,7 +87,10 @@ export function Vitrine() {
           lien dans nos régions.
         </p>
         <p className={styles.signature}>
-          Gratuite, et offerte avec amour par <em>Runes de Chêne</em>
+          Gratuite, et offerte avec amour par{' '}
+          <a href="https://runesdechene.com" target="_blank" rel="noopener">
+            Runes de Chêne
+          </a>
         </p>
       </div>
 

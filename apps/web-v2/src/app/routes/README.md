@@ -12,4 +12,5 @@ besoin du cadre de détail ou de la fermeture, un petit composant d'ici les lui 
   (`/<onglet>/notifications`).
 - `lieu.tsx` — la fiche d'un lieu (`/<onglet>/lieu/<id>`), sa fenêtre et ses feuilles.
 - `vitrine.tsx` — la carte des visiteurs (`/bienvenue/carte`, positions floutées) et l'aperçu
-  d'un lieu posé dessus (`/bienvenue/carte/lieu/<id>`).
+  d'un lieu posé dessus (`/bienvenue/carte/lieu/<id>`) ; sur PC, l'onboarding (`/bienvenue/<étape>`)
+  s'y pose aussi, en écran.

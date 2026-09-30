@@ -90,6 +90,13 @@
   }
 }
 
+/* Un écran d'onboarding : la hauteur d'un téléphone, que ses pages remplissent. */
+.ecran {
+  height: min(860px, 100dvh - 2 * var(--space-4));
+
+  --hauteur-ecran: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .voile,
   .fenetre,

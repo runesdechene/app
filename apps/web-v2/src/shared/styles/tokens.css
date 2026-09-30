@@ -176,6 +176,7 @@
   --duree-defile: 90s; /* un tour complet du défilé des natures, sur la vitrine */
   --duree-activite: 5s; /* une activité de la vitrine : elle apparaît, reste, s'efface */
   --courbe-elan: cubic-bezier(0.34, 1.4, 0.55, 1);
+  --hauteur-ecran: 100dvh; /* un écran d'onboarding : toute la page, ou toute la fenêtre sur la carte (PC) */
   --tiroir: 420px; /* desktop : le tiroir, un peu plus large qu'une maquette de téléphone (390) */
   --decalage-carte: 0px; /* desktop : la marge que la carte laisse au tiroir ouvert — posée par la coquille */
   --background-attachment: fixed;

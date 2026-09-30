@@ -306,9 +306,15 @@
     letter-spacing: var(--libelle-tracking);
   }
 
-  .signature em {
+  .signature a {
     color: var(--color-sur-accent);
+    font-style: italic;
     font-weight: var(--weight-gras);
+    text-decoration: none;
+  }
+
+  .signature a:hover {
+    text-decoration: underline;
   }
 
   .cherche {
