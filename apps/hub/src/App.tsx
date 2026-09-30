@@ -29,6 +29,7 @@ import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
 import { Sidebar } from './components/Sidebar'
 import { PlacesModeration } from './components/moderation/PlacesModeration'
+import { Signalements } from './components/moderation/Signalements'
 import './App.css'
 
 function AccessDenied({ onSignOut, email, role }: { onSignOut: () => void; email?: string; role?: string | null }) {
@@ -87,6 +88,7 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/moderation" element={<PlacesModeration />} />
+            <Route path="/signalements" element={<Signalements />} />
             <Route path="/carte/tags" element={<TagsManager />} />
             <Route path="*" element={<PlacesModeration />} />
           </Routes>
@@ -105,6 +107,7 @@ function App() {
           <Route path="/users/:userId" element={<UserDetail />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/moderation" element={<PlacesModeration />} />
+            <Route path="/signalements" element={<Signalements />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />

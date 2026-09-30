@@ -12,11 +12,15 @@ interface SidebarProps {
 
 export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
   const [pending, setPending] = useState(0)
+  const [signalements, setSignalements] = useState(0)
 
   useEffect(() => {
     let active = true
     supabase.rpc('get_photo_submissions', { p_status: 'pending' }).then(({ data }) => {
       if (active && Array.isArray(data)) setPending(data.length)
+    })
+    supabase.rpc('mod_signalements').then(({ data }) => {
+      if (active && Array.isArray(data)) setSignalements(data.length)
     })
     return () => { active = false }
   }, [])
@@ -36,6 +40,14 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
       <nav className="sidebar-nav">
         <NavLink to="/moderation" className={({ isActive }) => isActive ? 'active' : ''}>
           Modération
+        </NavLink>
+        <NavLink to="/signalements" className={({ isActive }) => isActive ? 'active' : ''}>
+          Signalements
+          {signalements > 0 && (
+            <span style={{ marginLeft: 8, background: '#e0a73d', color: '#2b2b2b', fontSize: 11, fontWeight: 700, minWidth: 18, display: 'inline-block', textAlign: 'center', padding: '1px 7px', borderRadius: 999, verticalAlign: 'middle' }}>
+              {signalements}
+            </span>
+          )}
         </NavLink>
         <div className="sidebar-section-label">La Carte</div>
         <NavLink to="/carte/tags" className={({ isActive }) => isActive ? 'active' : ''}>
