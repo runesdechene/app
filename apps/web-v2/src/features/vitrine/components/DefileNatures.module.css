@@ -1,21 +1,16 @@
 /*
- * QUOI     — le défilé des natures : d'un bord de l'écran à l'autre, fondu aux deux bords ; des
- *            gélules translucides (texte de 12 px, filet de 0,75 px, maquette 325:317) qui
- *            deviennent blanches au survol.
+ * QUOI     — le défilé des natures, d'un bord de l'écran à l'autre : des gélules translucides et
+ *            floutées (texte de 12 px, filet de 0,75 px, maquette 325:317) qui deviennent blanches
+ *            au survol. Sur le parchemin du téléphone, crème ; sur la photo de l'ordinateur, une
+ *            vitre fumée comme celle de l'activité.
  * ATTENTION — chaque rangée finit par le même écart que celui qui sépare deux gélules : reculer
- *            de la moitié de la piste (une rangée) retombe pile sur la copie.
+ *            de la moitié de la piste (une rangée) retombe pile sur la copie. Pas de masque sur le
+ *            cadre (pour fondre les bords) : il couperait le flou des gélules de la photo.
  */
 .cadre {
   width: 100%;
   padding: 2px 0;
   overflow: hidden;
-  mask: linear-gradient(
-    to right,
-    transparent,
-    var(--color-encre) var(--space-6),
-    var(--color-encre) calc(100% - var(--space-6)),
-    transparent
-  );
 }
 
 .piste {
@@ -83,6 +78,22 @@
   height: 14px;
   background: currentcolor;
   mask: var(--icone) center / contain no-repeat;
+}
+
+@media (width >= 1024px) {
+  .nature {
+    border-color: color-mix(in srgb, var(--color-sur-accent) 22%, transparent);
+    background: color-mix(in srgb, var(--color-ombre) 28%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-sur-accent);
+  }
+
+  .nature:hover,
+  .nature:focus-visible {
+    border-color: var(--color-sur-accent);
+    background: var(--color-sur-accent);
+    color: var(--color-encre);
+  }
 }
 
 @keyframes defiler {

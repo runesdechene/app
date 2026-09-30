@@ -1,7 +1,7 @@
 /*
  * QUOI     — la vitre fumée de l'activité (maquette 316:155) : un brun presque noir à 38 %,
- *            flouté derrière, l'épingle rose, le texte crème. À chaque nouvelle activité, la vitre
- *            descend et se pose.
+ *            flouté derrière, l'épingle rose, le texte crème. Chaque vitre apparaît en glissant de
+ *            quelques pixels, reste, puis s'efface avant la suivante.
  */
 .activite {
   display: flex;
@@ -17,13 +17,49 @@
   font-family: var(--font-corps);
   font-size: var(--sous-titre-size);
   line-height: var(--vitrine-leading);
-  transition:
-    opacity var(--duree-douce) var(--courbe-douce),
-    translate var(--duree-elan) var(--courbe-elan);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce) both;
+}
 
-  @starting-style {
+/* Plusieurs activités : chacune fait son tour entier, et sa fin appelle la suivante. */
+.activite[data-tourne] {
+  animation: tour var(--duree-activite) ease-in-out both;
+}
+
+@keyframes apparaitre {
+  from {
     opacity: 0;
-    translate: 0 -12px;
+    translate: 0 -6px;
+  }
+}
+
+@keyframes tour {
+  0% {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+
+  12%,
+  88% {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+/* Mouvement réduit : les vitres se relaient en fondu, sans glisser. */
+@keyframes tour-immobile {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  12%,
+  88% {
+    opacity: 1;
   }
 }
 
@@ -41,6 +77,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .activite {
-    transition: none;
+    animation: none;
+  }
+
+  .activite[data-tourne] {
+    animation-name: tour-immobile;
   }
 }

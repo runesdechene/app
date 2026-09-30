@@ -4,7 +4,7 @@
  *            lieu pour après l'inscription.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -76,6 +76,18 @@ test('la vitrine dit les vrais chiffres et la dernière activité', async () => 
   expect(await screen.findByText(/vient de découvrir/)).toHaveTextContent(
     'Un Compagnon vient de découvrir Fort des Têtes',
   )
+})
+
+test('une activité s’efface, la suivante prend sa place', async () => {
+  api.fetchActivite.mockResolvedValue([
+    { sorte: 'decouverte', quand: new Date().toISOString(), lieu: 'Fort des Têtes' },
+    { sorte: 'visite', quand: new Date().toISOString(), lieu: 'Dolmen de la Chevresse' },
+  ])
+  monter('/bienvenue')
+  const vitre = await screen.findByText(/vient de découvrir/)
+  // jsdom n'anime pas : la fin du tour de la vitre est simulée.
+  fireEvent.animationEnd(vitre)
+  expect(await screen.findByText(/vient de visiter/)).toHaveTextContent('Dolmen de la Chevresse')
 })
 
 test('chercher un mot mène à l’aperçu du lieu', async () => {
