@@ -9,7 +9,7 @@
  *            silhouette (la forme du département) se dessine en pochoir devant (migration 362).
  */
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import murmure from '@/assets/ui/murmure.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
@@ -26,6 +26,10 @@ const DATE_LONGUE = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' })
 
 export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
   const navigate = useNavigate()
+  // L'onglet où l'on est : le profil s'affiche dans l'écran Compte (dessiné par la coquille,
+  // hors des routes de l'onglet) ou en détail d'un autre onglet. Une adresse relative
+  // (« modifier ») partait de la racine sur l'écran Compte et ramenait à l'Accueil (30/09).
+  const onglet = useLocation().pathname.split('/')[1] ?? 'compte'
   const [titre, setTitre] = useState<TitrePorte | null>(null)
   const signe = profil.signe && sousLeSigne(profil.signe.nom)
 
@@ -121,7 +125,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
             <Button
               kind="doux"
               onClick={() => {
-                void navigate('modifier')
+                void navigate(`/${onglet}/explorateur/${profil.id}/modifier`)
               }}
             >
               Modifier mon profil

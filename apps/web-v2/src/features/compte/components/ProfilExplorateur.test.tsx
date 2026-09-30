@@ -75,6 +75,22 @@ test('mon profil : « Modifier mon profil », jamais de murmure', async () => {
   expect(screen.queryByRole('button', { name: /murmure/ })).toBeNull()
 })
 
+test('« Modifier mon profil » ouvre la modification, même depuis l’écran Compte', async () => {
+  // L'écran Compte est dessiné hors des routes de l'onglet : une adresse relative y partait de
+  // la racine (/modifier) et ramenait à l'Accueil.
+  fetchExplorateur.mockResolvedValue(PROFIL)
+  const router = createMemoryRouter([{ path: '*', element: <ProfilExplorateur id="u1" /> }], {
+    initialEntries: ['/compte'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  await userEvent.click(await screen.findByRole('button', { name: 'Modifier mon profil' }))
+  expect(router.state.location.pathname).toBe('/compte/explorateur/u1/modifier')
+})
+
 test('le profil d’un autre : « Envoyer un murmure » ouvre la conversation, jamais « Modifier »', async () => {
   const router = afficher({ ...PROFIL, estMoi: false })
   const murmurer = await screen.findByRole('button', { name: /Envoyer un murmure/ })
