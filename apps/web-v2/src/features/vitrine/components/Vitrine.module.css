@@ -295,6 +295,7 @@
     margin: 0;
     color: var(--color-sur-accent);
     font-family: var(--font-corps);
+    max-width: 640px; /* deux lignes (Uriel, 30/09) */
     font-size: var(--vitrine-accroche-size);
     line-height: var(--corps-leading);
     text-wrap: balance;

@@ -84,7 +84,7 @@ export function Vitrine() {
         {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
         <p className={styles.accroche}>
           Rejoins une confrérie moderne d’aventuriers et découvre des milliers de lieux atypiques
-          autour de chez toi
+          autour de chez toi ou à l’autre bout du monde
         </p>
         <p className={styles.signature}>
           Gratuite, et offerte avec amour par{' '}
