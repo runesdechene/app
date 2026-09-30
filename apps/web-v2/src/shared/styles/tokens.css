@@ -130,7 +130,7 @@
   --vitrine-titre-pc-size: 4rem; /* « Explorer le monde », sur ordinateur : 64 px */
   --vitrine-phrase-size: 0.9375rem; /* « 3 473 hauts lieux… » : 15 px */
   --vitrine-leading: 1.35; /* la phrase des chiffres et l'activité, sur la photo */
-  --vitrine-description-size: 1.0625rem; /* la description, sur ordinateur : 17 px */
+  --vitrine-description-size: 1.3125rem; /* la promesse, sur ordinateur : 21 px (Uriel, 30/09) */
   --corps-leading: 1.45;
   --dense-leading: 1.25;
   --carnet-leading: 24px; /* une ligne du carnet de l'ajout d'un lieu : le texte s'y pose */

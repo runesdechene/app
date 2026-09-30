@@ -22,6 +22,9 @@ import styles from './Vitrine.module.css'
 const NOMBRE = new Intl.NumberFormat('fr-FR')
 // Le nom de la version en cours, à changer à chaque version publiée.
 const VERSION = 'Version Pytheas 0.21'
+// Ce que montrent les moteurs de recherche sous le titre (~155 signes, sans chiffre qui vieillit).
+const DESCRIPTION =
+  'Une carte vivante du patrimoine de France : châteaux, dolmens, sources et lieux oubliés, ajoutés par des milliers d’Explorateurs. Gratuite, offerte par Runes de Chêne.'
 
 export function Vitrine() {
   const chiffres = useChiffres()
@@ -32,6 +35,9 @@ export function Vitrine() {
 
   return (
     <main className={styles.vitrine}>
+      {/* React place le titre et la description dans l'en-tête de la page (moteurs de recherche). */}
+      <title>Runes de Chêne Explore — la carte des lieux d’Histoire et de Nature</title>
+      <meta name="description" content={DESCRIPTION} />
       <div className={styles.haut}>
         <header className={styles.entete}>
           <img className={styles.logo} src={logo} alt="Runes de Chêne" />
@@ -75,11 +81,16 @@ export function Vitrine() {
         <span className={styles.explorer}>Explorer le monde</span>
       </h1>
 
-      <p className={styles.description}>
-        Une carte vivante du patrimoine naturel et historique pour réenchanter le monde et recréer
-        du lien dans nos régions. Propulsé gratuitement et avec <u>amour</u> par la marque{' '}
-        <strong>Runes de Chêne.</strong>
-      </p>
+      <div className={styles.description}>
+        <p className={styles.promesse}>
+          Châteaux oubliés, dolmens millénaires, sources sacrées : des milliers de hauts lieux
+          attendent qu’on les redécouvre. Une carte vivante pour réenchanter le monde et recréer du
+          lien dans nos régions.
+        </p>
+        <p className={styles.signature}>
+          Gratuite, et offerte avec amour par <em>Runes de Chêne</em>
+        </p>
+      </div>
 
       <div className={styles.natures}>
         <DefileNatures

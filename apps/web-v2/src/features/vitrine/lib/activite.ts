@@ -13,5 +13,5 @@ const VERBES: Record<Activite['sorte'], string> = {
 }
 
 export function phraseActivite(a: Activite) {
-  return { debut: `Un Compagnon ${VERBES[a.sorte]} `, lieu: a.lieu }
+  return { debut: `Un Compagnon ${VERBES[a.sorte]} `, lieu: a.lieu.nom }
 }

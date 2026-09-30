@@ -16,6 +16,7 @@
   color: var(--color-sur-accent);
   font-family: var(--font-corps);
   font-size: var(--sous-titre-size);
+  text-decoration: none;
   line-height: var(--vitrine-leading);
   animation: apparaitre var(--duree-douce) var(--courbe-douce) both;
 }
@@ -23,6 +24,12 @@
 /* Plusieurs activités : chacune fait son tour entier, et sa fin appelle la suivante. */
 .activite[data-tourne] {
   animation: tour var(--duree-activite) ease-in-out both;
+}
+
+/* Sous la souris ou le clavier, la vitre attend : elle ne s'efface pas au moment du clic. */
+.activite[data-tourne]:hover,
+.activite[data-tourne]:focus-visible {
+  animation-play-state: paused;
 }
 
 @keyframes apparaitre {
@@ -61,6 +68,10 @@
   88% {
     opacity: 1;
   }
+}
+
+.activite:hover {
+  border-color: color-mix(in srgb, var(--color-sur-accent) 45%, transparent);
 }
 
 .epingle {

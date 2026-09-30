@@ -39,7 +39,7 @@ test('l’activité se dit anonyme ; une sorte inconnue est refusée', () => {
     debut: 'Un Compagnon vient de visiter ',
     lieu: 'Fort des Têtes',
   })
-  expect(() => lireActivite([{ sorte: 'vol', quand: 'x', lieu: { nom: 'y' } }])).toThrow()
+  expect(() => lireActivite([{ sorte: 'vol', quand: 'x', lieu: { id: 'y', nom: 'y' } }])).toThrow()
 })
 
 test('un aperçu : null pour un lieu qui n’est pas public', () => {

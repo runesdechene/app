@@ -279,17 +279,36 @@
     font-size: var(--vitrine-titre-pc-size);
   }
 
+  /* La promesse, droite et aérée, lignes équilibrées ; dessous, la signature, plus discrète. */
   .description {
-    display: block;
+    display: grid;
     order: 2;
-    max-width: 640px;
+    gap: var(--space-3);
+    justify-items: center;
+    max-width: 920px;
     margin: var(--space-6) var(--space-4) 40px;
-    color: var(--color-sur-accent);
     font-family: var(--font-corps);
-    font-size: var(--vitrine-description-size);
-    font-style: italic;
-    line-height: var(--dense-leading);
     text-align: center;
+  }
+
+  .promesse {
+    margin: 0;
+    color: var(--color-sur-accent);
+    font-size: var(--vitrine-description-size);
+    line-height: var(--corps-leading);
+    text-wrap: balance;
+  }
+
+  .signature {
+    margin: 0;
+    color: var(--color-sable);
+    font-size: var(--flux-size);
+    letter-spacing: var(--libelle-tracking);
+  }
+
+  .signature em {
+    color: var(--color-sur-accent);
+    font-weight: var(--weight-gras);
   }
 
   .cherche {

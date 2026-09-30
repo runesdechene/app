@@ -2,8 +2,8 @@
  * QUOI     — la barre de recherche de la vitrine et ses résultats, juste dessous : la vignette,
  *            le nom, la nature et la région. Un résultat ouvre l'aperçu du lieu.
  * POURQUOI — Uriel, 30/09 : « digne d'un moteur de recherche », et ouverte à qui n'a pas de
- *            compte. Au-delà des premiers lieux, l'invitation à rejoindre : la carte entière
- *            est derrière le compte. Une nature choisie se pose dans la barre, en étiquette à sa
+ *            compte. Au-delà des premiers lieux, la carte des visiteurs, où chaque lieu
+ *            s'ouvre en aperçu. Une nature choisie se pose dans la barre, en étiquette à sa
  *            couleur et à son icône (comme sur la fiche d'un lieu), qu'une croix retire.
  * ATTENTION — les résultats ne se montrent que tant que la recherche a le focus (CSS
  *            :focus-within) : toucher ailleurs ou Échap les range, sans code d'ouverture.
@@ -79,7 +79,7 @@ export function Recherche({
             <ul className={styles.liste}>
               {resultats.lieux.map((l) => (
                 <li key={l.id}>
-                  <Link className={styles.lieu} to={`/bienvenue/lieu/${l.id}`}>
+                  <Link className={styles.lieu} to={`/bienvenue/carte/lieu/${l.id}`}>
                     {l.vignette ? (
                       <img className={styles.vignette} src={l.vignette} alt="" loading="lazy" />
                     ) : (
@@ -95,8 +95,8 @@ export function Recherche({
             </ul>
           )}
           {autres > 0 && (
-            <Link className={styles.autres} to="/bienvenue/preambule">
-              Et {NOMBRE.format(autres)} autres lieux, sur la carte des Explorateurs
+            <Link className={styles.autres} to="/bienvenue/carte">
+              Et {NOMBRE.format(autres)} autres lieux : voir la carte
             </Link>
           )}
         </div>

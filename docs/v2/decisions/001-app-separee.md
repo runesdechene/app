@@ -21,4 +21,6 @@ que `/lieu/*` vers `seo-pages`. Même origine, donc même session Supabase.
 
 ## Conséquences
 - Le service worker de la V1 doit ignorer `/v2` ; celui de la V2 a pour portée `/v2/`.
-- Le jour de la bascule : on inverse les deux sites et on supprime `apps/explore-web`.
+- Le jour de la bascule : on inverse les deux sites et on supprime `apps/explore-web` ; les
+  adresses en `/v2/` du `index.html` de la V2 (canonique, image de partage, données structurées)
+  perdent leur `/v2`.

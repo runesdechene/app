@@ -1,7 +1,7 @@
 /**
  * QUOI     — la dernière activité de la carte, sur la photo : « Un Compagnon vient de
  *            découvrir Fort des Têtes · il y a 38 min ». Une autre prend sa place toutes les
- *            cinq secondes, en fondu.
+ *            cinq secondes, en fondu. La toucher ouvre le lieu, en aperçu sur la carte.
  * POURQUOI — la carte vit, et un visiteur doit le sentir avant de s'inscrire (comme en V1).
  *            Anonyme : la vitrine ne dit jamais qui.
  * ATTENTION — c'est l'animation qui fait tourner les activités : chaque vitre apparaît, reste,
@@ -9,6 +9,7 @@
  *            d'accord avec le CSS. Une seule activité reste affichée, sans s'effacer.
  */
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ilYA } from '@/shared/lib/ilYA'
 import { useActivite } from '../hooks/useVitrine'
 import { phraseActivite } from '../lib/activite'
@@ -25,8 +26,9 @@ export function ApercuActivite() {
 
   return (
     // La clé remonte une vitre neuve à chaque activité : son animation repart de zéro.
-    <p
+    <Link
       key={rang}
+      to={`/bienvenue/carte/lieu/${courante.lieu.id}`}
       className={styles.activite}
       data-tourne={tourne || undefined}
       aria-live="polite"
@@ -40,6 +42,6 @@ export function ApercuActivite() {
         {debut}
         <strong>{lieu}</strong> <span className={styles.quand}>· {ilYA(courante.quand)}</span>
       </span>
-    </p>
+    </Link>
   )
 }

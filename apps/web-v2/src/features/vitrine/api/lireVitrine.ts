@@ -16,7 +16,11 @@ export type LieuTrouve = {
   vignette: string | null
 }
 export type Resultats = { total: number; lieux: LieuTrouve[] }
-export type Activite = { sorte: 'decouverte' | 'visite' | 'ajout'; quand: string; lieu: string }
+export type Activite = {
+  sorte: 'decouverte' | 'visite' | 'ajout'
+  quand: string
+  lieu: { id: string; nom: string }
+}
 export type Apercu = {
   id: string
   nom: string
@@ -78,7 +82,12 @@ function sorte(v: unknown): Activite['sorte'] {
 
 export const lireActivite = liste((v): Activite => {
   const a = objet(v)
-  return { sorte: sorte(a.sorte), quand: chaine(a.quand), lieu: chaine(objet(a.lieu).nom) }
+  const lieu = objet(a.lieu)
+  return {
+    sorte: sorte(a.sorte),
+    quand: chaine(a.quand),
+    lieu: { id: chaine(lieu.id), nom: chaine(lieu.nom) },
+  }
 })
 
 export function lireApercu(json: unknown): Apercu | null {

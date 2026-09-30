@@ -4,7 +4,8 @@
  *            l'invitation : « Crée ton compte pour découvrir ce lieu ».
  * POURQUOI — Uriel, 30/09 : voir un lieu sans compte, puis être amené à en créer un. Le reste
  *            (la suite du récit, la position, le Carnet, les cœurs) s'ouvre avec le compte ; le
- *            lieu est retenu, la fin de l'onboarding l'ouvre sur la carte.
+ *            lieu est retenu, la fin de l'onboarding l'ouvre sur la carte. Il s'affiche en
+ *            fenêtre au-dessus de la carte des visiteurs ; la croix y ramène.
  */
 import { Link, useParams } from 'react-router'
 import { retenirLieu } from '@/shared/lib/apresEntree'
@@ -21,18 +22,18 @@ export function ApercuLieu() {
   const { id = '' } = useParams()
   const { apercu, erreur } = useApercu(id)
 
-  if (apercu === undefined && !erreur) return <main className={styles.apercu} aria-busy="true" />
+  if (apercu === undefined && !erreur) return <article className={styles.apercu} aria-busy="true" />
 
   if (!apercu) {
     return (
-      <main className={styles.apercu}>
+      <article className={styles.apercu}>
         <div className={styles.corps}>
           <p className={styles.absent}>Ce lieu ne se montre qu’aux Explorateurs.</p>
-          <Link className={styles.retour} to="/bienvenue">
-            Revenir à la recherche
+          <Link className={styles.retour} to="/bienvenue/carte">
+            Revenir à la carte
           </Link>
         </div>
-      </main>
+      </article>
     )
   }
 
@@ -50,10 +51,12 @@ export function ApercuLieu() {
   }
 
   return (
-    <main className={styles.apercu}>
+    <article className={styles.apercu}>
+      <title>{`${lieu.nom} — Runes de Chêne Explore`}</title>
+      {lieu.extrait && <meta name="description" content={lieu.extrait} />}
       <div className={styles.photo}>
         {lieu.photo && <img className={styles.image} src={lieu.photo} alt="" />}
-        <Link className={styles.fleche} to="/bienvenue" aria-label="Revenir à la recherche" />
+        <Link className={styles.fermer} to="/bienvenue/carte" aria-label="Fermer l’aperçu" />
       </div>
 
       <div className={styles.corps}>
@@ -98,6 +101,6 @@ export function ApercuLieu() {
           </Link>
         </div>
       </div>
-    </main>
+    </article>
   )
 }
