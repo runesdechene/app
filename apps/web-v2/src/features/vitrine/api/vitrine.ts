@@ -1,6 +1,6 @@
 /**
  * QUOI     — ce que la vitrine demande à Supabase, sans compte : les chiffres, les natures,
- *            chercher, l'activité récente, l'aperçu d'un lieu.
+ *            chercher, l'activité récente, l'aperçu d'un lieu ; et si une session est déjà ouverte.
  * POURQUOI — des fonctions en lecture, ouvertes aux visiteurs (migration 391) : jamais de
  *            position, jamais de personne ; le reste s'ouvre avec un compte.
  */
@@ -11,6 +11,13 @@ export async function fetchChiffres() {
   const { data, error } = await supabase.rpc('get_landing_stats')
   if (error) throw error
   return lireChiffres(data)
+}
+
+// Une session ouverte (dans cet onglet, ou dans la V1 : même origine) : les boutons d'entrée
+// mènent alors directement à la carte.
+export async function fetchConnecte() {
+  const { data } = await supabase.auth.getSession()
+  return data.session !== null
 }
 
 export async function fetchNatures() {

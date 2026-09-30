@@ -15,16 +15,18 @@ import { Link, Outlet } from 'react-router'
 import { CarteVisiteur } from '@/features/carte/components/CarteScreen'
 import { Onboarding } from '@/features/onboarding/components/Onboarding'
 import { ApercuLieu } from '@/features/vitrine/components/ApercuLieu'
+import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import styles from './vitrine.module.css'
 
 export function RouteCarteVisiteur() {
+  const connecte = useConnecte()
   return (
     <div className={styles.carte}>
       <CarteVisiteur />
       <div className={styles.invitation}>
         <Link className={styles.retour} to="/bienvenue" aria-label="Revenir à l’accueil" />
-        <Link className={styles.rejoindre} to="/bienvenue/preambule">
+        <Link className={styles.rejoindre} to={connecte ? '/carte' : '/bienvenue/preambule'}>
           Commencer mon périple
         </Link>
       </div>

@@ -7,11 +7,23 @@
  */
 import { useEffect, useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { chercher, fetchActivite, fetchApercu, fetchChiffres, fetchNatures } from '../api/vitrine'
+import {
+  chercher,
+  fetchActivite,
+  fetchApercu,
+  fetchChiffres,
+  fetchConnecte,
+  fetchNatures,
+} from '../api/vitrine'
 
 export function useChiffres() {
   return useQuery({ queryKey: ['vitrine', 'chiffres'], queryFn: fetchChiffres, staleTime: 60_000 })
     .data
+}
+
+// Déjà connecté ? « Commencer mon périple » et « Se connecter » mènent alors à la carte.
+export function useConnecte() {
+  return useQuery({ queryKey: ['vitrine', 'connecte'], queryFn: fetchConnecte }).data ?? false
 }
 
 export function useNatures() {

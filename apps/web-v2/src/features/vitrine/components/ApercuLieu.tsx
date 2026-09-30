@@ -9,7 +9,7 @@
  */
 import { Link, useParams } from 'react-router'
 import { retenirLieu } from '@/shared/lib/apresEntree'
-import { useApercu } from '../hooks/useVitrine'
+import { useApercu, useConnecte } from '../hooks/useVitrine'
 import styles from './ApercuLieu.module.css'
 
 const NOMBRE = new Intl.NumberFormat('fr-FR')
@@ -21,6 +21,7 @@ function pluriel(n: number, mot: string) {
 export function ApercuLieu() {
   const { id = '' } = useParams()
   const { apercu, erreur } = useApercu(id)
+  const connecte = useConnecte()
 
   if (apercu === undefined && !erreur) return <article className={styles.apercu} aria-busy="true" />
 
@@ -93,10 +94,18 @@ export function ApercuLieu() {
             La suite du récit, le chemin jusqu’au lieu et son Carnet de passage s’ouvrent en ayant
             un compte. C’est gratuit.
           </p>
-          <Link className={styles.rejoindre} to="/bienvenue/preambule" onClick={retenir}>
+          <Link
+            className={styles.rejoindre}
+            to={connecte ? `/carte/lieu/${lieu.id}` : '/bienvenue/preambule'}
+            onClick={connecte ? undefined : retenir}
+          >
             Crée ton compte pour découvrir ce lieu
           </Link>
-          <Link className={styles.connecter} to="/bienvenue/email" onClick={retenir}>
+          <Link
+            className={styles.connecter}
+            to={connecte ? `/carte/lieu/${lieu.id}` : '/bienvenue/email'}
+            onClick={connecte ? undefined : retenir}
+          >
             J’ai déjà un compte
           </Link>
         </div>

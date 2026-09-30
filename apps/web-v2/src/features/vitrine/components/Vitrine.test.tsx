@@ -4,7 +4,7 @@
  *            lieu pour après l'inscription.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -18,6 +18,7 @@ const api = vi.hoisted(() => ({
   chercher: vi.fn(),
   fetchActivite: vi.fn(),
   fetchApercu: vi.fn(),
+  fetchConnecte: vi.fn(),
 }))
 vi.mock('../api/vitrine', () => api)
 
@@ -31,6 +32,7 @@ const CHEVRESSE = {
 }
 
 beforeEach(() => {
+  api.fetchConnecte.mockResolvedValue(false)
   api.fetchChiffres.mockResolvedValue({ lieux: 3473, explorateurs: 4750 })
   api.fetchNatures.mockResolvedValue([{ ...DOLMENS, nombre: 37 }])
   api.chercher.mockResolvedValue({ total: 37, lieux: [CHEVRESSE] })
@@ -106,6 +108,18 @@ test('toucher l’activité ouvre son lieu', async () => {
   const router = monter('/bienvenue')
   await userEvent.click(await screen.findByRole('link', { name: /vient de découvrir/ }))
   expect(router.state.location.pathname).toBe('/bienvenue/carte/lieu/f1')
+})
+
+test('déjà connecté, « Commencer mon périple » et « Se connecter » mènent à la carte', async () => {
+  api.fetchConnecte.mockResolvedValue(true)
+  monter('/bienvenue')
+  await waitFor(() => {
+    expect(screen.getByRole('link', { name: 'Commencer mon périple' })).toHaveAttribute(
+      'href',
+      '/carte',
+    )
+  })
+  expect(screen.getByRole('link', { name: /Se connecter/ })).toHaveAttribute('href', '/carte')
 })
 
 test('chercher un mot mène à l’aperçu du lieu', async () => {

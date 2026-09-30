@@ -13,7 +13,7 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import logo from '@/assets/onboarding/logo-clair.webp'
-import { useChiffres, useNatures } from '../hooks/useVitrine'
+import { useChiffres, useConnecte, useNatures } from '../hooks/useVitrine'
 import { ApercuActivite } from './ApercuActivite'
 import { DefileNatures } from './DefileNatures'
 import { Recherche } from './Recherche'
@@ -29,6 +29,7 @@ const DESCRIPTION =
 export function Vitrine() {
   const chiffres = useChiffres()
   const natures = useNatures()
+  const connecte = useConnecte()
   const [texte, setTexte] = useState('')
   const [nature, setNature] = useState<string | null>(null)
   const champ = useRef<HTMLInputElement>(null)
@@ -107,10 +108,10 @@ export function Vitrine() {
       </div>
 
       <div className={styles.actions}>
-        <Link className={styles.commencer} to="/bienvenue/preambule">
+        <Link className={styles.commencer} to={connecte ? '/carte' : '/bienvenue/preambule'}>
           Commencer mon périple
         </Link>
-        <Link className={styles.connecter} to="/bienvenue/email">
+        <Link className={styles.connecter} to={connecte ? '/carte' : '/bienvenue/email'}>
           {/* Un seul bloc de texte : la grille du lien ne coupe pas la phrase en trois. */}
           <span>
             Se connecter avec mon <strong>Compte client</strong>{' '}
