@@ -21,6 +21,7 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 | `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
+| `rdc-web-v2` (la V2) | `64c61b33-40c1-4505-966a-d0b136cac69b` | sert `/v2/*` via rewrite de la V1 (créé le 30/09/2026) |
 | `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
 - **Après chaque deploy explore-web** : `node scripts/sync-app-version.mjs` (lit `# X.Y.Z` en tête
@@ -39,6 +40,10 @@ n'existe pas et n'est pas déployé**, un déploiement de la V1 contenant ces ch
 `/v2/` vers une 404. Ordre obligatoire : site V2 d'abord, V1 ensuite (spec socle §7).
 Ne pas fusionner `feat/v2-socle` dans `main` avant le premier déploiement de la V2 — ou retirer
 la redirection du `netlify.toml` au moment de la fusion.
+
+**Monorepo** : dans le dépôt, `netlify sites:create` (et d'autres commandes) ouvre un choix
+interactif du projet et plante sans terminal. Créer un site par l'API, hors du dépôt :
+`npx netlify-cli api createSiteInTeam --data '{"account_slug":"uriellahoussaye","body":{"name":"…"}}'`.
 
 ## Netlify deploy — toujours chemin absolu
 

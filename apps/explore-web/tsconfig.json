@@ -14,7 +14,13 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    // Deux @types/react dans le dépôt (V1 : 18, V2 : 19) : pnpm n'en remonte qu'un, et les
+    // bibliothèques y lisent leurs types. On épingle les nôtres (.claude/rules/v2.md).
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts"],
