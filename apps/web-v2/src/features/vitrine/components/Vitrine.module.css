@@ -52,13 +52,13 @@
 }
 
 .entete {
-  position: relative;
-  z-index: 1;
   display: grid;
   justify-items: center;
 }
 
 .logo {
+  position: relative;
+  z-index: 1;
   width: 203px;
   animation: apparaitre 0.9s var(--courbe-douce) both;
 }
@@ -70,6 +70,8 @@
 }
 
 .explore {
+  position: relative;
+  z-index: 1;
   margin: var(--space-2) 0 0;
   padding-left: var(--explore-tracking); /* l'espacement des lettres, rééquilibré */
   color: var(--color-sable);
@@ -79,9 +81,14 @@
   text-transform: uppercase;
 }
 
+/* L'activité, posée en haut de l'écran, par-dessus la photo. */
 .vie {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + var(--space-3));
+  inset-inline: 26px;
+  z-index: 3;
   display: grid;
-  margin-top: 42px;
+  justify-items: center;
 }
 
 .phrase {
@@ -221,44 +228,31 @@
   .haut::before,
   .haut::after,
   .logo,
+  .explore,
   .phrase {
     display: none;
   }
 
   .entete {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas:
-      'logotype vie'
-      'explore vie';
-    place-items: start stretch;
     align-self: stretch;
-    padding: 0 28px 0 36px;
+    justify-items: start;
+    padding: 0 36px;
   }
 
   .logotype {
     display: block;
-    grid-area: logotype;
     width: 197px;
-    height: 36px;
+    aspect-ratio: 1263 / 287;
     background: var(--color-sur-accent);
-    mask: url('../../../assets/ui/logotype.png') left center / contain no-repeat;
-  }
-
-  .explore {
-    grid-area: explore;
-    justify-self: start;
-    margin: 0 0 0 49px;
-    padding: 0;
-    color: var(--color-sur-accent);
-    font-size: var(--legende-size);
+    mask: url('../../../assets/ui/logo-explore.webp') left center / contain no-repeat;
   }
 
   .vie {
-    grid-area: vie;
+    top: 30px;
+    right: 28px;
+    left: auto;
     justify-items: end;
     gap: var(--space-4);
-    margin: 0;
   }
 
   .chiffres {

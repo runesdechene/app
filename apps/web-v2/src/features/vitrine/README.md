@@ -12,6 +12,6 @@ Explorateurs.
 - `api/` — `vitrine.ts` (chiffres, natures, recherche, activité, aperçu) et `lireVitrine.ts` (la
   forme des réponses).
 - `hooks/` — `useVitrine` (les lectures ; la recherche attend que la frappe se pose).
-- `lib/` — `activite` (« Un Explorateur vient de découvrir… », anonyme).
+- `lib/` — `activite` (« Un Compagnon vient de découvrir… », anonyme).
 - `components/` — `Vitrine` (la page), `Recherche`, `DefileNatures`, `ApercuActivite`,
   `ApercuLieu`.

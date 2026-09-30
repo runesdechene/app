@@ -7,6 +7,8 @@
  *            s'ouvre en rejoignant. Les chiffres sont vrais (get_landing_stats), jamais en dur.
  * ATTENTION — un seul arbre pour les deux maquettes : sur ordinateur, `.haut` s'efface
  *            (display: contents) et la grille range ses enfants dans l'ordre de la maquette PC.
+ *            L'activité est posée en haut, hors du flux (Uriel, 30/09) : qu'elle tienne sur une
+ *            ligne ou deux, rien ne bouge autour d'elle.
  */
 import { useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -33,7 +35,7 @@ export function Vitrine() {
       <div className={styles.haut}>
         <header className={styles.entete}>
           <img className={styles.logo} src={logo} alt="Runes de Chêne" />
-          <span className={styles.logotype} role="img" aria-label="Runes de Chêne" />
+          <span className={styles.logotype} role="img" aria-label="Runes de Chêne Explore" />
           <p className={styles.explore}>Explore</p>
           <div className={styles.vie}>
             {chiffres && (

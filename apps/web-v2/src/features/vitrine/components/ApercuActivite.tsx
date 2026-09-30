@@ -1,7 +1,7 @@
 /**
- * QUOI     — la dernière activité de la carte, sur la photo : « Un Explorateur vient de
+ * QUOI     — la dernière activité de la carte, sur la photo : « Un Compagnon vient de
  *            découvrir Fort des Têtes · il y a 38 min ». Une autre prend sa place toutes les
- *            cinq secondes.
+ *            cinq secondes : la vitre entière entre de nouveau.
  * POURQUOI — la carte vit, et un visiteur doit le sentir avant de s'inscrire (comme en V1).
  *            Anonyme : la vitrine ne dit jamais qui.
  */
@@ -32,10 +32,10 @@ export function ApercuActivite() {
   const { debut, lieu } = phraseActivite(courante)
 
   return (
-    <p className={styles.activite} aria-live="polite">
+    // La clé relance l'apparition de la vitre à chaque nouvelle activité.
+    <p key={rang} className={styles.activite} aria-live="polite">
       <span className={styles.epingle} aria-hidden="true" />
-      {/* La clé relance l'apparition à chaque nouvelle activité. */}
-      <span key={rang} className={styles.texte}>
+      <span>
         {debut}
         <strong>{lieu}</strong> <span className={styles.quand}>· {ilYA(courante.quand)}</span>
       </span>

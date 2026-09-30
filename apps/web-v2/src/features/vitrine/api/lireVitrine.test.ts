@@ -36,7 +36,7 @@ test('l’activité se dit anonyme ; une sorte inconnue est refusée', () => {
     { sorte: 'visite', quand: '2026-09-30T08:00:00Z', lieu: { id: 'x', nom: 'Fort des Têtes' } },
   ])
   expect(a && phraseActivite(a)).toEqual({
-    debut: 'Un Explorateur vient de visiter ',
+    debut: 'Un Compagnon vient de visiter ',
     lieu: 'Fort des Têtes',
   })
   expect(() => lireActivite([{ sorte: 'vol', quand: 'x', lieu: { nom: 'y' } }])).toThrow()

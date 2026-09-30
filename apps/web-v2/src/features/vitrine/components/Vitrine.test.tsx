@@ -74,7 +74,7 @@ test('la vitrine dit les vrais chiffres et la dernière activité', async () => 
   const phrase = await screen.findByText(/hauts lieux/)
   expect(phrase.textContent.replace(/\s/g, ' ')).toContain('3 473 hauts lieux')
   expect(await screen.findByText(/vient de découvrir/)).toHaveTextContent(
-    'Un Explorateur vient de découvrir Fort des Têtes',
+    'Un Compagnon vient de découvrir Fort des Têtes',
   )
 })
 
