@@ -45,6 +45,11 @@ la redirection du `netlify.toml` au moment de la fusion.
 interactif du projet et plante sans terminal. Créer un site par l'API, hors du dépôt :
 `npx netlify-cli api createSiteInTeam --data '{"account_slug":"uriellahoussaye","body":{"name":"…"}}'`.
 
+**Redirections Netlify : la barre finale ne compte pas.** Une règle `from = "/v2"` attrape aussi
+`/v2/` : « /v2 → /v2/ » en 301 bouclait sur elle-même (30/09/2026, `/v2/` inaccessible juste
+après le premier déploiement). Vérifier toute nouvelle redirection avec
+`curl -sL -o /dev/null -w "%{http_code} %{num_redirects}" <url>`.
+
 ## Netlify deploy — toujours chemin absolu
 
 Toujours utiliser le chemin absolu pour `--dir` dans `netlify deploy`.

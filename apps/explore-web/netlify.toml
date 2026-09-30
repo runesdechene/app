@@ -8,12 +8,8 @@
 
 # V2 en construction (apps/web-v2) : même origine que la V1, donc même session.
 # Le site V2 publie dist/ à sa racine avec base /v2/ — la redirection retire /v2.
-[[redirects]]
-  from = "/v2"
-  to = "/v2/"
-  status = 301
-  force = true
-
+# ATTENTION — pas de règle « /v2 → /v2/ » : Netlify ignore la barre finale en comparant, elle
+# renvoyait /v2/ sur lui-même en boucle (30/09/2026). /v2/* couvre /v2 et /v2/.
 [[redirects]]
   from = "/v2/*"
   to = "https://rdc-web-v2.netlify.app/:splat"
