@@ -90,8 +90,8 @@ export function ApercuLieu() {
 
         <div className={styles.invitation}>
           <p className={styles.promesse}>
-            La suite du récit, le chemin jusqu’au lieu et son Carnet de passage s’ouvrent aux
-            Explorateurs. C’est gratuit.
+            La suite du récit, le chemin jusqu’au lieu et son Carnet de passage s’ouvrent en ayant
+            un compte. C’est gratuit.
           </p>
           <Link className={styles.rejoindre} to="/bienvenue/preambule" onClick={retenir}>
             Crée ton compte pour découvrir ce lieu
