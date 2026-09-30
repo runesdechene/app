@@ -10,11 +10,19 @@ import { supabase } from '@/shared/supabase/client'
 import { booleen, objet } from '@/shared/lib/lire'
 import {
   lireExplorateurs,
+  lireFiltres,
   lireLieux,
   lireTerritoire,
   type LieuCarte,
   type Territoire,
 } from './lireCarte'
+
+// Ce que la feuille des filtres propose : les natures et les époques (migration 396).
+export async function fetchFiltres() {
+  const { data, error } = await supabase.rpc('filtres_de_carte')
+  if (error) throw error
+  return lireFiltres(data)
+}
 
 export async function fetchCarteLieux(): Promise<LieuCarte[]> {
   const { data, error } = await supabase.rpc('carte_lieux')

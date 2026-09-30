@@ -30,6 +30,9 @@ function lieu(l: Partial<LieuCarte>): LieuCarte {
     couleur: null,
     etat: 'connu',
     revendication: null,
+    natures: [],
+    epoque: null,
+    ajoute: false,
     ...l,
   }
 }

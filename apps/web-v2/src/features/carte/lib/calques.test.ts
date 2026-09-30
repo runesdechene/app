@@ -24,6 +24,9 @@ const lieu: LieuCarte = {
   couleur: '#708d44',
   etat: 'visite',
   revendication: { nom: 'Rémy', moi: true },
+  natures: [],
+  epoque: null,
+  ajoute: false,
 }
 
 test('un lieu devient un point avec sa marque et sa pilule', () => {

@@ -4284,6 +4284,7 @@ export type Database = {
           color: string
           created_at: string
           gauge: string
+          hors_epoque: boolean
           icon: string | null
           id: string
           order: number
@@ -4299,6 +4300,7 @@ export type Database = {
           color?: string
           created_at?: string
           gauge?: string
+          hors_epoque?: boolean
           icon?: string | null
           id: string
           order?: number
@@ -4314,6 +4316,7 @@ export type Database = {
           color?: string
           created_at?: string
           gauge?: string
+          hors_epoque?: boolean
           icon?: string | null
           id?: string
           order?: number
@@ -6408,6 +6411,7 @@ export type Database = {
       epoques: { Args: never; Returns: Json }
       explorateurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       fiche_lieu: { Args: { p_id: string }; Returns: Json }
+      filtres_de_carte: { Args: never; Returns: Json }
       find_nearby_places: {
         Args: { p_lat: number; p_lng: number; p_radius_m?: number }
         Returns: {

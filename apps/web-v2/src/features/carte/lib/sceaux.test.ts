@@ -12,6 +12,9 @@ const lieu: LieuCarte = {
   couleur: '#708d44',
   etat: 'visite',
   revendication: null,
+  natures: [],
+  epoque: null,
+  ajoute: false,
 }
 
 test('chaque lieu reçoit la marque de son état', () => {

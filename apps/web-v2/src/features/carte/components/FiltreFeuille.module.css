@@ -1,27 +1,152 @@
 /*
- * QUOI     — la feuille du filtre : le titre de la feuille « Ajouter », une ligne à interrupteur.
+ * QUOI     — la feuille des filtres (maquette « Carte — Filtrer ») : l'en-tête, le milieu qui
+ *            défile, le bouton rouge en bas ; les pastilles d'« Ajouter un lieu ».
  */
+.filtres {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: min(78dvh, 720px);
+}
+
+.tete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
 .titre {
-  margin: 0 0 var(--space-3);
+  margin: 0;
   color: var(--color-encre);
   font-family: var(--font-titre);
   font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
 }
 
-.ligne {
+.reinitialiser {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.defile {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.rubrique {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-bord);
-  border-radius: var(--radius-carte);
-  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+  gap: var(--space-2);
+  align-items: baseline;
+  margin: var(--space-3) 0 0;
 }
 
-.nom {
+.titreRubrique {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.aide {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.puces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.nature,
+.epoque {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  transition:
+    background var(--duree-elan) var(--courbe-elan),
+    border-color var(--duree-elan) var(--courbe-elan),
+    color var(--duree-elan) var(--courbe-elan),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.nature {
+  padding-left: 5px;
+}
+
+.nature:active,
+.epoque:active {
+  scale: 0.96;
+}
+
+.nature[aria-pressed='true'] {
+  border-color: var(--color-ocre);
+  background: var(--color-pastille);
   color: var(--color-encre);
+  font-weight: var(--weight-gras);
+}
+
+.epoque[aria-pressed='true'] {
+  border-color: var(--color-encre);
+  background: var(--color-encre);
+  color: var(--color-sur-accent);
+}
+
+.compte {
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-normal);
+}
+
+.voir {
+  min-height: 52px;
+  margin-top: var(--space-2);
+  border: none;
+  border-radius: var(--radius-carte);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
   font-family: var(--font-corps);
   font-size: var(--corps-size);
-  font-weight: var(--weight-semi);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.voir:active {
+  scale: 0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nature,
+  .epoque,
+  .voir {
+    transition: none;
+  }
 }

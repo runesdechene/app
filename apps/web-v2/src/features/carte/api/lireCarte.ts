@@ -18,7 +18,15 @@ export type LieuCarte = {
   couleur: string | null
   etat: EtatLieu
   revendication: { nom: string; moi: boolean } | null
+  // Pour les filtres (migration 396) : toutes ses natures, son époque, ajouté par moi.
+  natures: string[]
+  epoque: string | null
+  ajoute: boolean
 }
+
+// Ce que la feuille des filtres propose (filtres_de_carte, migration 396).
+export type NatureFiltre = { id: string; nom: string; icone: string | null; couleur: string | null }
+export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: { id: string; nom: string }[] }
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
@@ -46,6 +54,29 @@ function lireLieu(v: unknown): LieuCarte {
     couleur: ouNull(chaine)(l.couleur),
     etat: lireEtat(l.etat),
     revendication: ouNull(lireRevendication)(l.revendication),
+    // La carte des visiteurs (392) ne les rend pas : pas de filtre pour elle.
+    natures: Array.isArray(l.natures) ? liste(chaine)(l.natures) : [],
+    epoque: ouNull(chaine)(l.epoque ?? null),
+    ajoute: l.ajoute === true,
+  }
+}
+
+export function lireFiltres(json: unknown): FiltresDeCarte {
+  const f = objet(json)
+  return {
+    natures: liste((v): NatureFiltre => {
+      const n = objet(v)
+      return {
+        id: chaine(n.id),
+        nom: chaine(n.nom),
+        icone: ouNull(chaine)(n.icone),
+        couleur: ouNull(chaine)(n.couleur),
+      }
+    })(f.natures),
+    epoques: liste((v) => {
+      const e = objet(v)
+      return { id: chaine(e.id), nom: chaine(e.nom) }
+    })(f.epoques),
   }
 }
 

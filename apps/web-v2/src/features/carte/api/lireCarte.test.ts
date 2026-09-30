@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireLieux, lireTerritoire } from './lireCarte'
+import { lireFiltres, lireLieux, lireTerritoire } from './lireCarte'
 
 test('un lieu complet se lit', () => {
   expect(
@@ -57,4 +57,36 @@ test('un état inconnu de la base est lu comme « inconnu », jamais une erreur'
 
 test('au-dessus de la mer, pas de territoire', () => {
   expect(lireTerritoire({ territoire: null, pays: null })).toEqual({ territoire: null, pays: null })
+})
+
+test('les filtres lisent les natures, l’époque et « ajouté par moi » ; la carte des visiteurs n’en rend pas', () => {
+  const base = {
+    id: 'a',
+    nom: 'A',
+    lat: 1,
+    lng: 2,
+    nature: 'lieu',
+    icone: null,
+    couleur: null,
+    etat: 'visite',
+    revendication: null,
+  }
+  const [avec] = lireLieux([
+    { ...base, natures: ['t1', 't2'], epoque: 'renaissance', ajoute: true },
+  ])
+  expect(avec).toMatchObject({ natures: ['t1', 't2'], epoque: 'renaissance', ajoute: true })
+  const [sans] = lireLieux([base])
+  expect(sans).toMatchObject({ natures: [], epoque: null, ajoute: false })
+})
+
+test('les listes des filtres se lisent', () => {
+  expect(
+    lireFiltres({
+      natures: [{ id: 't1', nom: 'Châteaux', icone: null, couleur: '#a9260f' }],
+      epoques: [{ id: 'not-applicable', nom: 'Non concerné' }],
+    }),
+  ).toEqual({
+    natures: [{ id: 't1', nom: 'Châteaux', icone: null, couleur: '#a9260f' }],
+    epoques: [{ id: 'not-applicable', nom: 'Non concerné' }],
+  })
 })

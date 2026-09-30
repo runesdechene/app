@@ -19,6 +19,7 @@ const api = vi.hoisted(() => ({
   fetchCartePublique: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
+  fetchFiltres: vi.fn(() => Promise.resolve({ natures: [], epoques: [] })),
 }))
 vi.mock('../api/carte', () => api)
 
@@ -39,6 +40,9 @@ const LIEUX: LieuCarte[] = [
     couleur: null,
     etat: 'connu',
     revendication: null,
+    natures: [],
+    epoque: null,
+    ajoute: false,
   },
   {
     id: 'inconnu',
@@ -50,6 +54,9 @@ const LIEUX: LieuCarte[] = [
     couleur: null,
     etat: 'inconnu',
     revendication: null,
+    natures: [],
+    epoque: null,
+    ajoute: false,
   },
 ]
 
@@ -117,7 +124,7 @@ test('un dessin plus ancien n’écrase jamais le plus récent', async () => {
   })
 
   await userEvent.click(screen.getByRole('button', { name: 'Filtre' }))
-  await userEvent.click(screen.getByRole('switch', { name: 'Seulement mes lieux' }))
+  await userEvent.click(screen.getByRole('radio', { name: 'À découvrir' }))
   await waitFor(() => {
     expect(carte().source.setData).toHaveBeenCalledTimes(1)
   })
@@ -128,7 +135,7 @@ test('un dessin plus ancien n’écrase jamais le plus récent', async () => {
   })
   expect(carte().source.setData).toHaveBeenCalledTimes(1)
   expect(carte().source.setData.mock.lastCall?.[0]).toMatchObject({
-    features: [{ properties: { id: 'connu' } }],
+    features: [{ properties: { id: 'inconnu' } }],
   })
 })
 
@@ -163,12 +170,15 @@ test('sans géolocalisation du tout, « Ma position » le dit aussi', async () =
   expect(await screen.findByText('Position indisponible')).toBeInTheDocument()
 })
 
-test('le bouton Filtre ouvre la feuille « Seulement mes lieux »', async () => {
+test('le bouton Filtre ouvre la feuille ; un filtre choisi se voit, et le bouton dit ce qui reste', async () => {
   afficher()
   await userEvent.click(screen.getByRole('button', { name: 'Filtre' }))
   expect(screen.getByRole('dialog', { name: 'Filtrer la carte' })).toBeInTheDocument()
-  await userEvent.click(screen.getByRole('switch', { name: 'Seulement mes lieux' }))
-  expect(screen.getByRole('switch', { name: 'Seulement mes lieux' })).toBeChecked()
+  expect(await screen.findByRole('button', { name: 'Voir les 2 lieux' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('radio', { name: 'À découvrir' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Voir le lieu' }))
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Filtre (actif)' })).toBeInTheDocument()
 })
 
 test('quand le tiroir s’ouvre, la carte vise le centre de sa partie visible', () => {

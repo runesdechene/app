@@ -122,6 +122,13 @@
   height: 20px;
 }
 
+/* Un filtre actif : le bouton cerclé de rouge, qu'on n'oublie pas qu'une partie des lieux est
+   cachée. */
+.filtre[data-actif] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bandeau,
   .inscription,

@@ -8,8 +8,9 @@
  *            `CarteVisiteur` : la même carte pour qui n'a pas de compte (la vitrine) — positions floutées,
  *            ni filtre, ni territoire, ni préférences ; toucher un lieu ouvre son aperçu, et la
  *            carte glisse jusqu'au lieu dont l'aperçu est ouvert.
- * ATTENTION — la feuille du filtre et « Seulement mes lieux » sont un réglage de la vue, gardé
- *            ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec leur valeur.
+ * ATTENTION — la feuille du filtre et les filtres (progression, natures, époques) sont un réglage
+ *            de la vue, gardé ici : pas d'adresse, le retour arrière ne les rouvrirait pas avec
+ *            leur valeur. Un filtre actif se voit sur le bouton.
  *            L'attribution OpenStreetMap est obligatoire : elle reste, repliée.
  */
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
@@ -24,6 +25,7 @@ import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
+import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
@@ -67,7 +69,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
   const { id: lieuOuvert } = useParams()
   const [sansPosition, setSansPosition] = useState(false)
   const [filtreOuvert, setFiltreOuvert] = useState(false)
-  const [mesLieux, setMesLieux] = useState(false)
+  const [filtres, setFiltres] = useState(FILTRES_VIDES)
   // Un dessin des marques qui échoue (canevas absent, icône illisible) se dit comme un échec de
   // chargement ; « Réessayer » relance les deux.
   const [marquesEnPanne, setMarquesEnPanne] = useState(false)
@@ -159,7 +161,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
   useEffect(() => {
     if (!carte || !lieux) return
     let actif = true
-    const montres = mesLieux ? lieux.filter((l) => l.etat !== 'inconnu') : lieux
+    const montres = filtrer(lieux, filtres)
     ajouterMarques(carte, montres, couleurs, couleurTypes).then(
       () => {
         if (actif) carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
@@ -171,7 +173,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
     return () => {
       actif = false
     }
-  }, [carte, lieux, couleurs, couleurTypes, mesLieux, essai])
+  }, [carte, lieux, couleurs, couleurTypes, filtres, essai])
 
   useEffect(() => {
     if (!sansPosition) return
@@ -226,7 +228,8 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
           <button
             type="button"
             className={styles.filtre}
-            aria-label="Filtre"
+            data-actif={filtresActifs(filtres) || undefined}
+            aria-label={filtresActifs(filtres) ? 'Filtre (actif)' : 'Filtre'}
             onClick={() => {
               setFiltreOuvert(true)
             }}
@@ -254,8 +257,9 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
       </button>
       {filtreOuvert && (
         <FiltreFeuille
-          mesLieux={mesLieux}
-          onMesLieux={setMesLieux}
+          lieux={lieux ?? []}
+          filtres={filtres}
+          onFiltres={setFiltres}
           onFermer={() => {
             setFiltreOuvert(false)
           }}
