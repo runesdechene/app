@@ -81,6 +81,8 @@ export function Vitrine() {
       </h1>
 
       <div className={styles.description}>
+        {/* Uriel, 30/09 : ce que les gens se disent — « pourquoi ça n'existe pas ? » */}
+        <p className={styles.accroche}>Rejoins une confrérie moderne d’aventuriers.</p>
         <p className={styles.promesse}>
           Châteaux oubliés, dolmens millénaires, sources sacrées : des milliers de hauts lieux
           attendent qu’on les redécouvre. Une carte vivante pour réenchanter le monde et recréer du

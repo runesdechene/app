@@ -291,6 +291,15 @@
     text-align: center;
   }
 
+  .accroche {
+    margin: 0;
+    color: var(--color-sur-accent);
+    font-family: var(--font-titre);
+    font-size: var(--titre-section-size);
+    letter-spacing: var(--titre-tracking);
+    line-height: var(--titre-leading);
+  }
+
   .promesse {
     margin: 0;
     color: var(--color-sur-accent);
