@@ -1,0 +1,138 @@
+/*
+ * QUOI     — les marques des Actifs (maquette 362:182) : un portrait cerclé d'ocre et une gélule
+ *            « Nom · titre » ; parti depuis peu, désaturé et transparent ; soi, cerclé de rouge,
+ *            avec un halo qui respire. De très loin (`data-loin` sur la carte), des pastilles.
+ */
+.actif,
+.moi {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.portrait {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  padding: 0;
+  border: 2.5px solid var(--color-ocre);
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+  transition:
+    width var(--duree-douce) var(--courbe-douce),
+    height var(--duree-douce) var(--courbe-douce);
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.etiquette {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-feuille) 92%, transparent);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+}
+
+/* Soi : cerclé de rouge, un halo qui respire. */
+.moi {
+  position: relative;
+}
+
+.moi .portrait {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-sur-accent);
+  outline: 2px solid var(--color-accent);
+  cursor: default;
+}
+
+.moi .etiquette {
+  color: var(--color-accent);
+  font-weight: var(--weight-gras);
+}
+
+.halo {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  translate: -50% 0;
+  animation: respirer 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes respirer {
+  0%,
+  100% {
+    scale: 0.7;
+    opacity: 0.9;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 0.4;
+  }
+}
+
+/* De très loin : des pastilles, sans étiquette. */
+:global([data-loin]) .portrait {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+:global([data-loin]) .portrait > * {
+  visibility: hidden;
+}
+
+:global([data-loin]) .etiquette,
+:global([data-loin]) .halo {
+  display: none;
+}
+
+/* Parti il y a moins d'une heure : il s'efface, il ne disparaît pas. */
+.actif[data-recent='true'] {
+  opacity: 0.55;
+}
+
+.actif[data-recent='true'] .portrait {
+  border-color: var(--color-texte-pale);
+  filter: grayscale(1);
+}
+
+.actif[data-recent='true'] .etiquette {
+  color: var(--color-texte-doux);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actif,
+  .moi,
+  .portrait {
+    transition: none;
+  }
+
+  .halo {
+    animation: none;
+  }
+}

@@ -8,3 +8,5 @@
   découverte disent quand revient le prochain point.
 - `ancienneExplore.ts` — choisir la V1 (cookie `explore_version`) et y revenir : toute sortie vers la V1
   passe par là, sinon la V1 renvoie aussitôt vers la V2.
+- `signe.ts` — « sous le signe de … », article accordé au nom du Fragment : le profil et la carte
+  d'un Explorateur (zone Carte) le disent pareil.

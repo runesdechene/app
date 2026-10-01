@@ -1,0 +1,89 @@
+/*
+ * QUOI     — la carte d'un Explorateur : la couverture du profil en petit (maquette 366:236) — le
+ *            parchemin, le signe en filigrane qui se fond vers le bas, le portrait posé sur sa
+ *            tête — puis l'identité et deux boutons.
+ */
+.carte {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) 0;
+  padding: var(--space-6) var(--space-4) var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-carte) var(--radius-carte) 0 0;
+  background: url('../../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
+  text-align: center;
+}
+
+/* Le parchemin à mi-voix, comme sur le profil. */
+.carte::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: color-mix(in srgb, var(--color-fond) 50%, transparent);
+  content: '';
+}
+
+/* Le motif grand et présent, la tête derrière le portrait, qui se fond vers le bas. */
+.filigrane {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: -1;
+  width: 83%;
+  max-width: 300px;
+  transform: translateX(-50%);
+  opacity: 0.17;
+  mask: linear-gradient(to bottom, var(--color-encre) 55%, transparent);
+  pointer-events: none;
+}
+
+.nom {
+  margin: var(--space-2) 0 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--nom-profil-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+}
+
+.niveau,
+.signe,
+.etat {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-shadow:
+    0 0 2px var(--color-fond),
+    0 0 4px var(--color-fond),
+    0 0 8px var(--color-fond);
+}
+
+.niveau {
+  color: var(--color-texte-doux);
+}
+
+.signe {
+  color: var(--color-ocre);
+  font-style: italic;
+}
+
+.etat {
+  color: var(--color-succes);
+  font-weight: var(--weight-semi);
+}
+
+.etat[data-recent] {
+  color: var(--color-texte-pale);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-3);
+}

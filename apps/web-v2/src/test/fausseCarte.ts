@@ -31,6 +31,18 @@ export class FausseCarte {
     if (f) this.ecouteurs.set(type, [...(this.ecouteurs.get(type) ?? []), f])
   }
 
+  off(type: string, ecouteur: Ecouteur) {
+    this.ecouteurs.set(
+      type,
+      (this.ecouteurs.get(type) ?? []).filter((f) => f !== ecouteur),
+    )
+  }
+
+  conteneur = document.createElement('div')
+  getContainer() {
+    return this.conteneur
+  }
+
   emettre(type: string, evenement?: unknown) {
     for (const f of this.ecouteurs.get(type) ?? []) f(evenement)
   }
@@ -46,8 +58,13 @@ export class FausseCarte {
   remove() {}
   addSource() {}
   addLayer() {}
-  getSource() {
-    return this.source
+  // La source des lieux est `source` ; toute autre (les zones des Actifs) a la sienne.
+  autresSources = new Map<string, { setData: ReturnType<typeof vi.fn> }>()
+  getSource(id: string) {
+    if (id === 'lieux') return this.source
+    const autre = this.autresSources.get(id) ?? { setData: vi.fn() }
+    this.autresSources.set(id, autre)
+    return autre
   }
   getCenter() {
     return { lat: 46.6, lng: 2.4 }
@@ -60,5 +77,24 @@ export class FausseCarte {
   }
   getTerrain() {
     return this.terrain
+  }
+}
+
+// Une fausse marque MapLibre : son élément est posé dans la page, pour que le test le touche.
+export class FausseMarque {
+  element: HTMLElement
+  constructor({ element }: { element: HTMLElement }) {
+    this.element = element
+  }
+  setLngLat() {
+    return this
+  }
+  addTo() {
+    document.body.append(this.element)
+    return this
+  }
+  remove() {
+    this.element.remove()
+    return this
   }
 }

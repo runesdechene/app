@@ -10,8 +10,8 @@ import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
 
 vi.mock('maplibre-gl', async () => {
-  const { FausseCarte } = await import('./fausseCarte')
-  return { default: { Map: FausseCarte } }
+  const { FausseCarte, FausseMarque } = await import('./fausseCarte')
+  return { default: { Map: FausseCarte, Marker: FausseMarque } }
 })
 
 class FauxResizeObserver implements ResizeObserver {

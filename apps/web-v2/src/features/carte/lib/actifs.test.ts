@@ -1,6 +1,6 @@
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import type { Actif } from '../api/lireActifs'
-import { cercle, distanceDe, parProximite, zonesEnGeoJSON } from './actifs'
+import { ajouterZones, cercle, distanceDe, parProximite, ZONES, zonesEnGeoJSON } from './actifs'
 
 const actif = (id: string, lat: number, lng: number, autre: Partial<Actif> = {}): Actif => ({
   id,
@@ -47,4 +47,11 @@ test('des zones pour les seuls brouillés, qui savent s’ils sont récents', ()
   ])
   expect(geo.features).toHaveLength(1)
   expect(geo.features[0]?.properties).toEqual({ id: 'b', recent: true })
+})
+
+test('les zones se posent sous les lieux : un voile et un contour', () => {
+  const map = { addSource: vi.fn(), addLayer: vi.fn<(calque: unknown, avant?: string) => void>() }
+  ajouterZones(map, '#9c7c55', 'billes')
+  expect(map.addSource).toHaveBeenCalledWith(ZONES, expect.objectContaining({ type: 'geojson' }))
+  expect(map.addLayer.mock.calls.map((c) => c[1])).toEqual(['billes', 'billes'])
 })

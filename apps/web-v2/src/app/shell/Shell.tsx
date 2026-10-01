@@ -16,6 +16,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
+import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
+import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
@@ -41,9 +43,15 @@ import styles from './Shell.module.css'
 
 const SCREENS: Record<TabId, () => ReactNode> = {
   accueil: AccueilScreen,
-  carte: () => <CarteScreen sousLaRecherche={<JaugeEnergie />} />,
+  carte: CarteDeLaCoquille,
   messages: MessagesScreen,
   compte: CompteScreen,
+}
+
+// La carte de la coquille : la jauge d'énergie sous la recherche, et son propre portrait.
+function CarteDeLaCoquille() {
+  const { profil } = useExplorateur(useMonIdentifiant())
+  return <CarteScreen sousLaRecherche={<JaugeEnergie />} monAvatar={profil?.avatarUrl ?? null} />
 }
 
 export function Shell() {

@@ -20,11 +20,15 @@ import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import position from '@/assets/ui/position.svg'
 import roseDesVents from '@/assets/ui/rose-des-vents.svg'
+import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { Button } from '@/shared/ui/Button'
+import { useActifs } from '../hooks/useActifs'
+import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
+import { ajouterZones } from '../lib/actifs'
 import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { dureeDouce } from '../lib/mouvement'
@@ -32,7 +36,10 @@ import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques } from '../lib/sceaux'
 import { FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { suivreSurvol } from '../lib/survol'
+import { CarteExplorateur } from './CarteExplorateur'
 import styles from './CarteScreen.module.css'
+import { CompteurActifs } from './CompteurActifs'
+import { FeuilleActifs } from './FeuilleActifs'
 import { FiltreFeuille } from './FiltreFeuille'
 import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
@@ -41,9 +48,16 @@ const DUREE_MESSAGE = 3000
 
 type Vue = { lat: number; lng: number; zoom: number }
 
-// `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie).
-export function CarteScreen({ sousLaRecherche }: { sousLaRecherche?: ReactNode }) {
-  return <CarteVivante visiteur={false} sousLaRecherche={sousLaRecherche} />
+// `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie) ;
+// `monAvatar` : le portrait de « Toi » sur la carte.
+export function CarteScreen({
+  sousLaRecherche,
+  monAvatar = null,
+}: {
+  sousLaRecherche?: ReactNode
+  monAvatar?: string | null
+}) {
+  return <CarteVivante visiteur={false} sousLaRecherche={sousLaRecherche} monAvatar={monAvatar} />
 }
 
 // La carte de la vitrine, pour qui n'a pas de compte.
@@ -54,9 +68,11 @@ export function CarteVisiteur() {
 function CarteVivante({
   visiteur,
   sousLaRecherche,
+  monAvatar = null,
 }: {
   visiteur: boolean
   sousLaRecherche?: ReactNode
+  monAvatar?: string | null
 }) {
   const conteneur = useRef<HTMLDivElement>(null)
   // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
@@ -81,6 +97,18 @@ function CarteVivante({
   // chargement ; « Réessayer » relance les deux.
   const [marquesEnPanne, setMarquesEnPanne] = useState(false)
   const [essai, setEssai] = useState(0)
+  // Les Actifs (Explorateurs en ligne ou passés dans l'heure) et soi : pas pour la vitrine.
+  const actifs = useActifs(!visiteur)
+  const maPosition = useMaPosition()
+  const [explorateurOuvert, setExplorateurOuvert] = useState<string | null>(null)
+  const [listeOuverte, setListeOuverte] = useState(false)
+  useActifsSurLaCarte(
+    visiteur ? null : carte,
+    actifs,
+    { point: maPosition, avatar: monAvatar },
+    setExplorateurOuvert,
+  )
+  const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -119,6 +147,7 @@ function CarteVivante({
       // Les marques à la mesure de l'écran (lue à l'ouverture de la carte).
       const ecran = echelleEcran(window.innerWidth, window.innerHeight)
       ajouterCalques(map, couleurs, ecran)
+      if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
       suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()
@@ -245,7 +274,17 @@ function CarteVivante({
           </button>
         )}
       </div>
-      {sousLaRecherche && <div className={styles.sousLaRecherche}>{sousLaRecherche}</div>}
+      {!visiteur && (
+        <div className={styles.sousLaRecherche}>
+          {sousLaRecherche}
+          <CompteurActifs
+            nombre={actifs.length}
+            onOuvrir={() => {
+              setListeOuverte(true)
+            }}
+          />
+        </div>
+      )}
       <div className={styles.inscription}>
         <Inscription nom={territoire} />
       </div>
@@ -263,6 +302,28 @@ function CarteVivante({
       >
         <img src={position} alt="" />
       </button>
+      {listeOuverte && (
+        <FeuilleActifs
+          actifs={actifs}
+          moi={maPosition}
+          onChoisir={(id) => {
+            setListeOuverte(false)
+            setExplorateurOuvert(id)
+          }}
+          onFermer={() => {
+            setListeOuverte(false)
+          }}
+        />
+      )}
+      {actifOuvert && (
+        <CarteExplorateur
+          actif={actifOuvert}
+          moi={maPosition}
+          onFermer={() => {
+            setExplorateurOuvert(null)
+          }}
+        />
+      )}
       {filtreOuvert && (
         <FiltreFeuille
           lieux={lieux ?? []}

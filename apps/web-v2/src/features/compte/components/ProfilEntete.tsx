@@ -18,7 +18,7 @@ import { Text } from '@/shared/ui/Text'
 import type { ExplorateurProfile, TitrePorte } from '../api/lireProfil'
 import { decouperBio } from '../lib/bio'
 import { phraseCondition } from '../lib/conditionTitre'
-import { sousLeSigne } from '../lib/signe'
+import { sousLeSigne } from '@/shared/lib/signe'
 import { ProfilChiffres } from './ProfilChiffres'
 import styles from './ProfilEntete.module.css'
 

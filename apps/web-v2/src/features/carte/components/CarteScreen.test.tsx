@@ -23,6 +23,9 @@ const api = vi.hoisted(() => ({
 }))
 vi.mock('../api/carte', () => api)
 
+const actifs = vi.hoisted(() => ({ fetchActifs: vi.fn<() => Promise<unknown[]>>() }))
+vi.mock('../api/actifs', () => actifs)
+
 const marques = vi.hoisted(() => ({ ajouterMarques: vi.fn<() => Promise<void>>() }))
 vi.mock('../lib/sceaux', async (original) => ({
   ...(await original<typeof import('../lib/sceaux')>()),
@@ -63,6 +66,7 @@ const LIEUX: LieuCarte[] = [
 beforeEach(() => {
   api.fetchCarteLieux.mockResolvedValue(LIEUX)
   marques.ajouterMarques.mockResolvedValue(undefined)
+  actifs.fetchActifs.mockResolvedValue([])
 })
 
 afterEach(() => {
@@ -90,6 +94,31 @@ function charger() {
     carte().emettre('load')
   })
 }
+
+test('un Actif devient un portrait sur la carte ; le toucher ouvre sa carte', async () => {
+  actifs.fetchActifs.mockResolvedValue([
+    {
+      id: 'k1',
+      nom: 'Kelpie',
+      avatar: null,
+      niveau: 17,
+      titre: 'Arpenteur',
+      signe: null,
+      lat: 43.7,
+      lng: 7.4,
+      brouille: false,
+      vuA: new Date().toISOString(),
+      enLigne: true,
+    },
+  ])
+  afficher()
+  charger()
+  expect(await screen.findByRole('button', { name: '1 actif' })).toBeInTheDocument()
+  await userEvent.click(await screen.findByRole('button', { name: 'Kelpie' }))
+  expect(await screen.findByRole('dialog', { name: 'Kelpie' })).toHaveTextContent(
+    'Arpenteur · niveau 17',
+  )
+})
 
 test('si les lieux ne se chargent pas, la carte reste là et propose de réessayer', async () => {
   api.fetchCarteLieux.mockRejectedValue(new Error('réseau'))

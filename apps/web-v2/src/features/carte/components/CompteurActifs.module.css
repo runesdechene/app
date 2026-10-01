@@ -1,0 +1,50 @@
+/*
+ * QUOI     — le compteur des Actifs : la même gélule de verre que la jauge d'énergie.
+ */
+.compteur {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-feuille) 88%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  cursor: pointer;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.compteur:active {
+  scale: 0.97;
+}
+
+.point {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-rond);
+  background: var(--color-succes);
+}
+
+.nombre {
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+.libelle {
+  color: var(--color-texte-doux);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compteur {
+    transition: none;
+  }
+}

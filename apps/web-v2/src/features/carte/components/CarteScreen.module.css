@@ -57,6 +57,8 @@
 /* Sous la recherche : la jauge d'énergie (maquette « Énergie — 1 »). L'inscription descend. */
 .sousLaRecherche {
   position: absolute;
+  display: flex;
+  gap: var(--space-2);
   top: 68px;
   left: calc(24px + var(--decalage-carte));
   z-index: 1;
