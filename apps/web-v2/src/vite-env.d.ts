@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-pwa/client" />
 /**
  * QUOI     — déclare les variables d'environnement que la V2 lit (fichier .env racine).
  * POURQUOI — sans cette déclaration, TypeScript ignore leurs noms ; une faute de frappe

@@ -59,8 +59,9 @@ s'en sert pour savoir que le déploiement est arrivé (01/10/2026). Le numéro v
 **How to apply :** avant chaque `netlify deploy` de la V2, monter `version` — le dernier chiffre pour
 une correction (1.0.1), celui du milieu pour une fonctionnalité (1.1.0) — puis `pnpm build`, puis
 déployer. Le nom (Pythéas) vaut pour toute la 1.x ; une grande refonte change de nom et de premier
-chiffre. Le service worker de la V2 sert l'ancienne version jusqu'au rechargement suivant : si le
-numéro n'a pas bougé, recharger d'abord.
+chiffre. Depuis 1.0.7, l'app cherche une nouvelle version toutes les heures et à chaque retour au
+premier plan, et se recharge d'elle-même (`src/app/miseAJour.ts`) ; avant, l'app installée restait
+coincée sur l'ancienne (Uriel, 01/10 : « toujours Pythéas 1.0.0 »).
 
 ## Netlify deploy — toujours chemin absolu
 

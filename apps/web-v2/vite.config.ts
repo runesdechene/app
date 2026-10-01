@@ -31,6 +31,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // L'enregistrement se fait dans src/app/miseAJour.ts (vérifications régulières).
+      injectRegister: false,
       scope: '/v2/',
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
