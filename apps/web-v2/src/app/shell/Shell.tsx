@@ -32,6 +32,7 @@ import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
+import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
 import { TABS, type TabId } from '../navigation/tabs'
@@ -111,7 +112,7 @@ export function Shell() {
         <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
         {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
           y compris dans la V2 installée en application, qui n'a pas de barre d'adresse. */}
-        <a className={styles.retourV1} href={V1_URL}>
+        <a className={styles.retourV1} href={V1_URL} onClick={choisirLaV1}>
           <Text variant="libelle">Revenir V1</Text>
         </a>
         <div className={styles.actions}>

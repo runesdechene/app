@@ -18,6 +18,7 @@ import palette from '@/assets/ui/palette.svg'
 import pas from '@/assets/ui/pas.svg'
 import question from '@/assets/ui/question.svg'
 import repere from '@/assets/ui/repere.svg'
+import { revenirALaV1 } from '@/shared/lib/ancienneExplore'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -29,7 +30,6 @@ import {
   usePreferences,
   type Reglage,
 } from '../hooks/usePreferences'
-import { revenirALAncienneExplore } from '../lib/ancienneExplore'
 import styles from './PreferencesPage.module.css'
 
 export function PreferencesPage() {
@@ -121,7 +121,7 @@ export function PreferencesPage() {
           </span>
           <img className={styles.chevron} src={chevron} alt="" />
         </a>
-        <button type="button" className={styles.ligne} onClick={revenirALAncienneExplore}>
+        <button type="button" className={styles.ligne} onClick={revenirALaV1}>
           <img className={styles.icone} src={retour} alt="" />
           <span className={styles.texte}>
             <span className={styles.titre}>Revenir à l’ancienne Explore</span>

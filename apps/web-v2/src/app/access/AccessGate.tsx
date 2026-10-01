@@ -5,13 +5,16 @@
  *            bouton retour de la V1 ne ramène pas vers une porte fermée.
  */
 import { useEffect, type ReactNode } from 'react'
+import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
 import { decideAccess } from './decideAccess'
 import { useV2Access } from './useV2Access'
 import styles from './AccessGate.module.css'
 
 export const V1_URL = '/'
 
+// Partir vers la V1, en défaisant le choix de la V2 : sinon la V1 renverrait ici, en boucle.
 function leaveToV1() {
+  choisirLaV1()
   window.location.replace(V1_URL)
 }
 
@@ -37,7 +40,7 @@ export function AccessGate({
         <button type="button" className={styles.button} onClick={retry}>
           Réessayer
         </button>
-        <a className={styles.link} href={V1_URL}>
+        <a className={styles.link} href={V1_URL} onClick={choisirLaV1}>
           Retour à la V1
         </a>
       </main>

@@ -159,9 +159,17 @@ test('Notifications ouvert par-dessus un détail se ferme sur l’onglet, sans r
   })
 })
 
-test('un lien « Revenir V1 » est toujours visible pendant la construction', async () => {
+test('un lien « Revenir V1 » est toujours visible, et retient le choix de la V1', async () => {
+  document.cookie = 'explore_version=v2; path=/'
   renderAt('/messages')
-  expect(await screen.findByRole('link', { name: 'Revenir V1' })).toHaveAttribute('href', '/')
+  const lien = await screen.findByRole('link', { name: 'Revenir V1' })
+  expect(lien).toHaveAttribute('href', '/')
+  // Sans ce choix, la V1 renverrait aussitôt vers la V2 (son pop-up l'a retenue).
+  lien.addEventListener('click', (e) => {
+    e.preventDefault()
+  })
+  await userEvent.click(lien)
+  expect(document.cookie).toContain('explore_version=v1')
 })
 
 test('une barre oblique finale n’ouvre pas de détail', async () => {
