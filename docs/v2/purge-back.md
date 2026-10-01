@@ -11,6 +11,7 @@
 | Coupe des Héritages (`get_coupe_state`, tables associées) | classement entre Maisons, abandonné | supprimer | après bascule | spec V2 §1 |
 | La Cour (`place_court_*`, `invest_crowns`, couronnes, mécénat, veilleurs) | prendre un lieu à un autre, abandonné | supprimer | après bascule | spec V2 §1 |
 | Contestation de lieu | abandonnée | supprimer | après bascule | spec V2 §1 |
+| Bonus d'énergie : `users.max_energy`, `factions.bonus_energy` / `bonus_regen_energy`, `title_fragments.bonus_type` `max_energy` / `regen_energy`, multiplicateur outsider sur l'énergie | ignorés depuis la mig 399 (jauge = 10 + 1 par Fragment, un point par heure) ; la page Réglages du Hub ne les écrit plus | supprimer | après bascule | spec énergie 01/10 |
 | Compagnies (mig 295, grades, bannières, buckets `faction-emblems` / `faction-patterns`) | Maisons qui s'affrontent, abandonnées | supprimer | après bascule | spec V2 §1 |
 | Gloire V1 (`notoriety_points`, `exploration_points`, `erudition_points`…) | ⚠️ le **niveau reste** (révision 27/09) : ne supprimer que ce qui ne nourrit plus `xp_total` ; vérifier chaque colonne avant | trier, puis supprimer | après bascule | spec V2 §1 révisé |
 | Énergie (`energy_points`, `max_energy`, `energy_reset_at`, `preview_action_cost`, coût de `discover_place`) | supprimée : découvrir devient gratuit | supprimer | après bascule | décision 27/09 |
