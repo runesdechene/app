@@ -26,7 +26,7 @@ const FICHE: Pick<FicheLieu, 'id' | 'nom' | 'photos' | 'type' | 'moi'> = {
   moi: { visiteLe: null, envie: false, decouvert: false },
 }
 
-const PRIX = { max: 10, prochainDans: null, parPoint: 3600 }
+const PRIX = { max: 10, prochainDans: null, parPoint: 3600, gratuitKm: 80 }
 
 beforeEach(() => {
   ici.position = { latitude: 45, longitude: 1 }
@@ -89,6 +89,7 @@ test('pas assez d’énergie : le geste est fermé, on dit quand revenir', async
   expect(screen.getByText('· il t’en reste 1')).toBeInTheDocument()
   expect(screen.getByText('Reviens dans 1 h 23 pour le révéler')).toBeInTheDocument()
   expect(screen.getByText(/Le prochain point revient dans 23 min/)).toBeInTheDocument()
+  expect(screen.getByText(/Les lieux à moins de 80 km restent gratuits/)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Découvrir' })).toBeDisabled()
 })
 
@@ -112,6 +113,20 @@ test('le serveur refuse (la jauge a baissé ailleurs) : le voile revient, avec s
   expect(screen.queryByText('Ton 38ᵉ lieu découvert !')).toBeNull()
   expect(screen.queryByRole('alert')).toBeNull()
   expect(screen.getByRole('heading', { name: 'Un lieu inconnu' })).toBeInTheDocument()
+})
+
+test('après un refus, le voile est un voile neuf : repeint, prêt à être gratté', async () => {
+  api.fetchCoutDecouverte.mockResolvedValue({ ...PRIX, cout: 1, distanceKm: 300, points: 5 })
+  api.decouvrirLieu.mockRejectedValue(new Error('réseau'))
+  const { container } = monter()
+  await screen.findByText('1 point d’énergie')
+  const avant = container.querySelector('canvas')
+  await userEvent.click(screen.getByRole('button', { name: 'Découvrir' }))
+  if (avant) fireEvent.animationEnd(avant)
+  expect(await screen.findByRole('alert')).toBeInTheDocument()
+  const apres = container.querySelector('canvas')
+  expect(apres).not.toBeNull()
+  expect(apres).not.toBe(avant)
 })
 
 test('sans position : le prix sans position, et de quoi la donner', async () => {

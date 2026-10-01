@@ -2,12 +2,14 @@
  * QUOI     — le geste « Découvrir » (maquettes 250:128, 250:134, 250:140) : un lieu inconnu
  *            s'ouvre voilé — sa photo floutée sous un parchemin — ; le doigt déchire le voile,
  *            passé la moitié le reste s'arrache, un tintement, puis la récompense. Sous la
- *            consigne, le prix (maquettes « Énergie — 2 à 4 », 01/10) : gratuit à moins de
- *            100 km, sinon des points d'énergie ; quand la jauge ne suffit pas, le geste se ferme.
+ *            consigne, le prix (maquettes « Énergie — 2 à 4 », 01/10) : gratuit dans la zone
+ *            gratuite (100 km par défaut, réglée dans le Hub), sinon des points d'énergie ; quand
+ *            la jauge ne suffit pas, le geste se ferme.
  * POURQUOI — Uriel, 28/09 : « un truc classe et addictif ». Pas de bouton au centre : le geste
  *            suffit ; « Découvrir », discret en bas, arrache tout d'un coup pour qui ne gratte pas.
  *            La découverte part à la base dès que l'arrachage commence : elle arrive pendant
- *            l'animation, la récompense n'attend pas. Si la base refuse, le voile revient.
+ *            l'animation, la récompense n'attend pas. Si la base refuse (jauge trop basse, réseau),
+ *            une nouvelle tentative commence avec un voile neuf, repeint : le lieu reste caché.
  * ATTENTION — animations réduites : le voile disparaît sans s'envoler (aucune fin d'animation
  *            n'arriverait).
  */
@@ -36,33 +38,46 @@ function avantAssez(c: CoutDecouverte) {
   return (c.cout - c.points - 1) * c.parPoint + (c.prochainDans ?? c.parPoint)
 }
 
-export function DecouverteLieu({
+type Props = { fiche: Pick<FicheLieu, 'id' | 'nom' | 'photos' | 'type'>; onFermer: () => void }
+
+// Chaque tentative a son voile : une tentative refusée laisse place à la suivante, voile neuf.
+export function DecouverteLieu(props: Props) {
+  const [tentative, setTentative] = useState(0)
+  return (
+    <Tentative
+      key={tentative}
+      {...props}
+      refusee={tentative > 0}
+      onRefus={() => {
+        setTentative((n) => n + 1)
+      }}
+    />
+  )
+}
+
+function Tentative({
   fiche,
   onFermer,
-}: {
-  fiche: Pick<FicheLieu, 'id' | 'nom' | 'photos' | 'type'>
-  onFermer: () => void
-}) {
+  refusee,
+  onRefus,
+}: Props & { refusee: boolean; onRefus: () => void }) {
   const position = useMaPosition()
   const { cout, utiliserMaPosition } = useCoutDecouverte(fiche.id, position)
-  const { decouvrir, recompense, echec, acceder } = useDecouvrir(fiche.id, position)
+  const { decouvrir, recompense, acceder } = useDecouvrir(fiche.id, position, onRefus)
   const [lance, setLance] = useState(false) // l'arrachage a commencé
   const [arrache, setArrache] = useState(false) // le voile est parti
   const photo = fiche.photos[0]?.url ?? null
   // Tant que le prix n'est pas lu, le geste reste ouvert : la base aura le dernier mot.
   const assez = !cout || cout.points >= cout.cout
-  // Un refus de la base remet le voile : rien n'a été découvert.
-  const enCours = lance && !echec
-  const parti = arrache && !echec
 
   const lancer = () => {
-    if (enCours || !assez) return
+    if (lance || !assez) return
     setLance(true)
     decouvrir()
     if (mouvementReduit()) setArrache(true)
   }
   const { canevas, gratte, gratter, lever } = useGrattage(photo, lancer)
-  const revele = parti && recompense !== null
+  const revele = arrache && recompense !== null
 
   useEffect(() => {
     if (revele) tinter()
@@ -76,10 +91,10 @@ export function DecouverteLieu({
         <span className={styles.sansPhoto} />
       )}
 
-      {!parti && (
+      {!arrache && (
         <canvas
           ref={canevas}
-          className={enCours ? styles.arrache : styles.voile}
+          className={lance ? styles.arrache : styles.voile}
           aria-hidden="true"
           onPointerMove={assez ? gratter : undefined}
           onPointerLeave={lever}
@@ -90,7 +105,7 @@ export function DecouverteLieu({
         />
       )}
 
-      {!enCours && (
+      {!lance && (
         <>
           <div
             className={gratte && assez ? styles.consigneEffacee : styles.consigne}
@@ -118,10 +133,10 @@ export function DecouverteLieu({
         </>
       )}
 
-      {echec && assez && (
+      {refusee && !lance && assez && (
         <div role="alert" className={styles.echec}>
           La découverte n’a pas pu être enregistrée.
-          <button type="button" className={styles.reessayer} onClick={decouvrir}>
+          <button type="button" className={styles.reessayer} onClick={lancer}>
             Réessayer
           </button>
         </div>
@@ -187,7 +202,7 @@ function Prix({
       <span className={styles.precision}>
         {assez
           ? `Il t’en restera ${String(c.points - c.cout)} sur ${String(c.max)}`
-          : `Le prochain point revient dans ${attente(c.prochainDans ?? c.parPoint)}. Les lieux à moins de 100 km restent gratuits.`}
+          : `Le prochain point revient dans ${attente(c.prochainDans ?? c.parPoint)}. Les lieux à moins de ${KM.format(c.gratuitKm)} km restent gratuits.`}
       </span>
       {c.distanceKm === null && (
         <button type="button" className={styles.maPosition} onClick={onPosition}>

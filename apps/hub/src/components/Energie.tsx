@@ -52,15 +52,15 @@ export function Energie() {
     setSaving(true)
     setSaveError(null)
     try {
-      for (const champ of Object.keys(CLES) as (keyof ReglagesEnergie)[]) {
-        const valeur = champ === 'minutesParPoint' ? reglages[champ] * 60 : reglages[champ]
-        const { error } = await supabase
-          .from('app_settings')
-          .upsert({ key: CLES[champ], value: String(valeur) }, { onConflict: 'key' })
-        if (error) {
-          setSaveError(error.message)
-          return
-        }
+      // Tout d'un coup : un enregistrement à moitié laisserait des paliers dans le désordre.
+      const lignes = (Object.keys(CLES) as (keyof ReglagesEnergie)[]).map(champ => ({
+        key: CLES[champ],
+        value: String(champ === 'minutesParPoint' ? reglages[champ] * 60 : reglages[champ]),
+      }))
+      const { error } = await supabase.from('app_settings').upsert(lignes, { onConflict: 'key' })
+      if (error) {
+        setSaveError(error.message)
+        return
       }
       await fetchAll()
     } catch (e) {

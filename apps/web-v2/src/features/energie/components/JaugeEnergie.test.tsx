@@ -20,7 +20,13 @@ function afficher() {
 }
 
 test('en recharge : les points, le maximum, le prochain point', async () => {
-  api.fetchEnergie.mockResolvedValue({ points: 7, max: 10, prochainDans: 1380, parPoint: 3600 })
+  api.fetchEnergie.mockResolvedValue({
+    points: 7,
+    max: 10,
+    prochainDans: 1380,
+    parPoint: 1800,
+    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+  })
   afficher()
   const jauge = await screen.findByRole('button', { name: /énergie/i })
   expect(jauge).toHaveTextContent('7')
@@ -29,7 +35,13 @@ test('en recharge : les points, le maximum, le prochain point', async () => {
 })
 
 test('pleine : pas de compte à rebours', async () => {
-  api.fetchEnergie.mockResolvedValue({ points: 10, max: 10, prochainDans: null, parPoint: 3600 })
+  api.fetchEnergie.mockResolvedValue({
+    points: 10,
+    max: 10,
+    prochainDans: null,
+    parPoint: 1800,
+    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+  })
   afficher()
   const jauge = await screen.findByRole('button', { name: /énergie/i })
   expect(jauge).toHaveTextContent('/ 10')
@@ -37,11 +49,18 @@ test('pleine : pas de compte à rebours', async () => {
 })
 
 test('la toucher explique la règle', async () => {
-  api.fetchEnergie.mockResolvedValue({ points: 7, max: 10, prochainDans: 1380, parPoint: 3600 })
+  api.fetchEnergie.mockResolvedValue({
+    points: 7,
+    max: 10,
+    prochainDans: 1380,
+    parPoint: 1800,
+    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+  })
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: /énergie/i }))
   const feuille = screen.getByRole('dialog', { name: 'L’énergie' })
-  expect(feuille).toHaveTextContent('gratuit à moins de 100 km')
-  expect(feuille).toHaveTextContent('Un point revient chaque heure')
+  expect(feuille).toHaveTextContent('gratuit à moins de 80 km')
+  expect(feuille).toHaveTextContent('2 jusqu’à 1 200 km, 4 au-delà')
+  expect(feuille).toHaveTextContent('Un point revient toutes les 30 min')
   expect(feuille).toHaveTextContent('ajoute un point à ta jauge')
 })

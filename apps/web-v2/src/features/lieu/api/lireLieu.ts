@@ -211,6 +211,7 @@ export type CoutDecouverte = {
   max: number
   prochainDans: number | null
   parPoint: number
+  gratuitKm: number
 }
 
 export function lireCoutDecouverte(json: unknown): CoutDecouverte {
@@ -222,5 +223,6 @@ export function lireCoutDecouverte(json: unknown): CoutDecouverte {
     max: nombre(c.max),
     prochainDans: ouNull(nombre)(c.prochainDans),
     parPoint: nombre(c.parPoint),
+    gratuitKm: nombre(c.gratuitKm),
   }
 }

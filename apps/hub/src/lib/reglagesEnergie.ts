@@ -37,12 +37,13 @@ export const DEFAUTS: ReglagesEnergie = {
 
 // Une phrase par erreur, ou null si tout va bien.
 export function erreurReglages(r: ReglagesEnergie): string | null {
-  if (Object.values(r).some(v => !Number.isFinite(v) || v < 0)) return 'Chaque valeur doit être un nombre positif.'
+  if (Object.values(r).some(v => !Number.isInteger(v) || v < 0)) return 'Chaque valeur doit être un nombre entier positif.'
   if (r.maxSansFragment < 1) return 'La jauge doit compter au moins 1 point.'
   if (r.minutesParPoint < 10) return 'Un point ne peut pas revenir en moins de 10 minutes.'
   if (!(r.gratuitKm < r.palier1Km && r.palier1Km < r.palier2Km)) {
     return 'Les distances doivent aller croissant : zone gratuite, puis palier 1, puis palier 2.'
   }
+  if (!(r.cout1 <= r.cout2 && r.cout2 <= r.cout3)) return 'Plus un lieu est loin, plus il coûte : prix 1 ≤ prix 2 ≤ au-delà.'
   return null
 }
 
