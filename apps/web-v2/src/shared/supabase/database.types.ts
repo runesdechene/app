@@ -1823,6 +1823,24 @@ export type Database = {
         }
         Relationships: []
       }
+      grille_brouillage: {
+        Row: {
+          olat: number
+          olng: number
+          seule: boolean
+        }
+        Insert: {
+          olat: number
+          olng: number
+          seule?: boolean
+        }
+        Update: {
+          olat?: number
+          olng?: number
+          seule?: boolean
+        }
+        Relationships: []
+      }
       home_banners: {
         Row: {
           active: boolean
@@ -6129,6 +6147,7 @@ export type Database = {
       _xp_for_level: { Args: { p_level: number }; Returns: number }
       accueil_ajoutes: { Args: { p_limite?: number }; Returns: Json }
       accueil_nouveaute: { Args: never; Returns: Json }
+      actifs_carte: { Args: never; Returns: Json }
       activite_publique: { Args: { p_limite?: number }; Returns: Json }
       add_announcement_comment: {
         Args: {
