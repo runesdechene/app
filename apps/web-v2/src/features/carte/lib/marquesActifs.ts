@@ -51,6 +51,16 @@ function remplir(element: HTMLElement, a: Actif, onToucher: (id: string) => void
   element.dataset.recent = String(!a.enLigne)
 }
 
+// Un toucher sur un portrait ne descend pas jusqu'à la carte : sinon le lieu sous les pieds de
+// l'Explorateur s'ouvrirait en même temps que sa carte (MapLibre écoute ces gestes sur la carte).
+function garderPourSoi(element: HTMLElement) {
+  for (const type of ['mousedown', 'pointerdown', 'touchstart', 'click']) {
+    element.addEventListener(type, (e) => {
+      e.stopPropagation()
+    })
+  }
+}
+
 export function suivreActifs(poser: Poser, onToucher: (id: string) => void) {
   const marques = new Map<string, { marque: Marque; element: HTMLElement }>()
   let moi: Marque | null = null
@@ -74,6 +84,7 @@ export function suivreActifs(poser: Poser, onToucher: (id: string) => void) {
         }
         const element = document.createElement('div')
         element.className = styles.actif ?? ''
+        garderPourSoi(element)
         remplir(element, a, onToucher)
         marques.set(a.id, { marque: poser(element, ou), element })
       }

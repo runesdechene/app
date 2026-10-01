@@ -111,18 +111,17 @@
   display: none;
 }
 
-/* Parti il y a moins d'une heure : il s'efface, il ne disparaît pas. */
-.actif[data-recent='true'] {
-  opacity: 0.55;
-}
-
+/* Parti il y a moins d'une heure : il s'efface, il ne disparaît pas. L'opacité se pose sur les
+   enfants : MapLibre réécrit celle de la marque elle-même à chaque déplacement. */
 .actif[data-recent='true'] .portrait {
   border-color: var(--color-texte-pale);
+  opacity: 0.55;
   filter: grayscale(1);
 }
 
 .actif[data-recent='true'] .etiquette {
   color: var(--color-texte-doux);
+  opacity: 0.7;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -82,6 +82,7 @@ test('la feuille : les plus proches d’abord, en ligne ou depuis quand, la dist
 })
 
 test('la carte d’un Explorateur : son signe, son titre, sa distance, et où aller', async () => {
+  const fermer = vi.fn()
   const router = avecRouteur(
     <CarteExplorateur
       actif={actif('k1', {
@@ -89,7 +90,7 @@ test('la carte d’un Explorateur : son signe, son titre, sa distance, et où al
         signe: { nom: 'Hoplite', imageUrl: 'hoplite.png' },
       })}
       moi={NICE}
-      onFermer={vi.fn()}
+      onFermer={fermer}
     />,
   )
   const carte = await screen.findByRole('dialog', { name: 'Kelpie' })
@@ -99,6 +100,8 @@ test('la carte d’un Explorateur : son signe, son titre, sa distance, et où al
   expect(carte).toHaveTextContent('En ligne · à 11 km de toi')
   await userEvent.click(within(carte).getByRole('button', { name: 'Envoyer un murmure' }))
   expect(router.state.location.pathname).toBe('/messages/murmures/k1')
+  // Elle se ferme en partant : sinon elle resterait par-dessus le murmure.
+  expect(fermer).toHaveBeenCalled()
 })
 
 test('sans signe, sans titre, sans position : rien d’orphelin', async () => {

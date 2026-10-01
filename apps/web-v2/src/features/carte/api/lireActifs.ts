@@ -13,7 +13,8 @@ export type Actif = {
   avatar: string | null
   niveau: number
   titre: string | null
-  signe: { nom: string; imageUrl: string } | null
+  // Un Fragment sans illustration garde son nom (« sous le signe de… »), sans filigrane.
+  signe: { nom: string; imageUrl: string | null } | null
   lat: number
   lng: number
   brouille: boolean
@@ -23,7 +24,7 @@ export type Actif = {
 
 function lireSigne(v: unknown) {
   const s = objet(v)
-  return { nom: chaine(s.nom), imageUrl: chaine(s.imageUrl) }
+  return { nom: chaine(s.nom), imageUrl: ouNull(chaine)(s.imageUrl) }
 }
 
 export const lireActifs = liste((v): Actif => {

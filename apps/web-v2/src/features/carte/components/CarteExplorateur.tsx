@@ -4,7 +4,8 @@
  *            derrière le portrait, sur le fond parchemin ; son nom, son titre, son niveau, « en
  *            ligne · à 12 km de toi » ; « Voir le profil » et « Envoyer un murmure ».
  * POURQUOI — Uriel, 01/10 : la même couverture que le profil — on reconnaît la personne du premier
- *            coup d'œil. Sans signe, le parchemin seul.
+ *            coup d'œil. Sans signe, le parchemin seul. Partir (profil, murmure) la referme :
+ *            sinon elle resterait par-dessus l'écran suivant (la carte reste montée).
  */
 import { useNavigate } from 'react-router'
 import type { Point } from '@/shared/lib/distance'
@@ -37,7 +38,7 @@ export function CarteExplorateur({
   return (
     <Feuille titre={a.nom} onFermer={onFermer}>
       <div className={styles.carte}>
-        {a.signe && <img className={styles.filigrane} src={a.signe.imageUrl} alt="" />}
+        {a.signe?.imageUrl && <img className={styles.filigrane} src={a.signe.imageUrl} alt="" />}
         <Avatar url={a.avatar} nom={a.nom} taille="grand" />
         <h2 className={styles.nom}>{a.nom}</h2>
         <p className={styles.niveau}>{niveau}</p>
@@ -54,6 +55,7 @@ export function CarteExplorateur({
           <Button
             kind="secondaire"
             onClick={() => {
+              onFermer()
               void navigate(`/carte/explorateur/${a.id}`)
             }}
           >
@@ -61,6 +63,7 @@ export function CarteExplorateur({
           </Button>
           <Button
             onClick={() => {
+              onFermer()
               void navigate(`/messages/murmures/${a.id}`)
             }}
           >

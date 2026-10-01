@@ -38,10 +38,12 @@ carte paraît vide. Voir passer d'autres Explorateurs donne le sentiment de vie.
 - La présence vient de `presences` (migration 365), que la V2 alimente chaque minute
   (`signaler_presence`) quand la position est autorisée. Les lignes vivent désormais une heure
   (elles en vivaient 10). Les compagnons (`_presents_autour`) gardent leur fenêtre de 10 minutes.
-- **Le brouillage se fait dans la base** : la position renvoyée est déplacée de 0 à 40 km dans une
-  direction tirée du jour et de l'Explorateur — stable d'une lecture à l'autre, différente le
-  lendemain. La zone de 50 km dessinée autour contient donc toujours la vraie position, sans la
-  révéler. La vraie position ne sort jamais de la base.
+- **Le brouillage se fait dans la base** : on rend le centre de la case (environ 20 km) d'une grille
+  dont l'origine est un secret de la base. On ne remonte pas au point sans le secret ; on ne voit pas
+  bouger dans la case ; revenir chaque jour au même endroit redonne la même case (moyenner
+  n'apprend rien). La zone de 50 km dessinée autour contient toujours la vraie position. La vraie
+  position ne sort jamais de la base. *(Relecture du 01/10 : un décalage tiré du jour et de
+  l'identifiant se recalculait hors de la base, et révélait les déplacements.)*
 - Pas de réglage « me cacher » pour l'instant (Uriel, 01/10) : le brouillage suffit.
 - La carte relit les Actifs chaque minute.
 

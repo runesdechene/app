@@ -65,6 +65,26 @@ test('toucher une marque ouvre l’Explorateur', () => {
   expect(onToucher).toHaveBeenCalledWith('kelpie')
 })
 
+test('toucher un portrait ne touche pas la carte dessous (le lieu sous ses pieds)', () => {
+  const { suivi, posees, onToucher } = monter()
+  suivi.actifs([actif('kelpie')])
+  const element = posees[0]?.element
+  if (!element) throw new Error('pas de marque')
+  const parent = document.createElement('div')
+  parent.append(element)
+  const carte = vi.fn()
+  for (const type of ['mousedown', 'pointerdown', 'click', 'touchstart']) {
+    parent.addEventListener(type, carte)
+  }
+  const bouton = element.querySelector('button')
+  for (const type of ['mousedown', 'pointerdown', 'touchstart']) {
+    bouton?.dispatchEvent(new Event(type, { bubbles: true }))
+  }
+  bouton?.click()
+  expect(onToucher).toHaveBeenCalledWith('kelpie')
+  expect(carte).not.toHaveBeenCalled()
+})
+
 test('soi : rien sans position, « Toi » à sa position, puis suivi', () => {
   const { suivi, posees, poser } = monter()
   suivi.moi(null, null)
