@@ -54,6 +54,19 @@
   transition: left var(--duree-douce) var(--courbe-douce);
 }
 
+/* Sous la recherche : la jauge d'énergie (maquette « Énergie — 1 »). L'inscription descend. */
+.sousLaRecherche {
+  position: absolute;
+  top: 68px;
+  left: calc(24px + var(--decalage-carte));
+  z-index: 1;
+  transition: left var(--duree-douce) var(--courbe-douce);
+}
+
+.ecran[data-sous-la-recherche] .inscription {
+  top: 108px;
+}
+
 .rose {
   position: absolute;
   bottom: 20px; /* maquette 162:107 */
@@ -133,7 +146,8 @@
   .bandeau,
   .inscription,
   .rose,
-  .haut {
+  .haut,
+  .sousLaRecherche {
     transition: none;
   }
 }

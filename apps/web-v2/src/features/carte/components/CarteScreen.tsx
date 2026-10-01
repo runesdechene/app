@@ -15,7 +15,7 @@
  */
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import position from '@/assets/ui/position.svg'
@@ -41,8 +41,9 @@ const DUREE_MESSAGE = 3000
 
 type Vue = { lat: number; lng: number; zoom: number }
 
-export function CarteScreen() {
-  return <CarteVivante visiteur={false} />
+// `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie).
+export function CarteScreen({ sousLaRecherche }: { sousLaRecherche?: ReactNode }) {
+  return <CarteVivante visiteur={false} sousLaRecherche={sousLaRecherche} />
 }
 
 // La carte de la vitrine, pour qui n'a pas de compte.
@@ -50,7 +51,13 @@ export function CarteVisiteur() {
   return <CarteVivante visiteur />
 }
 
-function CarteVivante({ visiteur }: { visiteur: boolean }) {
+function CarteVivante({
+  visiteur,
+  sousLaRecherche,
+}: {
+  visiteur: boolean
+  sousLaRecherche?: ReactNode
+}) {
   const conteneur = useRef<HTMLDivElement>(null)
   // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
   // `--decalage-carte` (posée par la coquille ; 0 sur mobile ou tiroir replié).
@@ -200,7 +207,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
   }
 
   return (
-    <div className={styles.ecran}>
+    <div className={styles.ecran} data-sous-la-recherche={sousLaRecherche ? true : undefined}>
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
       <div ref={placeDuTiroir} className={styles.placeDuTiroir} aria-hidden="true" />
       {(erreur || marquesEnPanne) && (
@@ -238,6 +245,7 @@ function CarteVivante({ visiteur }: { visiteur: boolean }) {
           </button>
         )}
       </div>
+      {sousLaRecherche && <div className={styles.sousLaRecherche}>{sousLaRecherche}</div>}
       <div className={styles.inscription}>
         <Inscription nom={territoire} />
       </div>

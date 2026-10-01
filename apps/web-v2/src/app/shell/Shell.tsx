@@ -16,6 +16,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { CarteScreen } from '@/features/carte/components/CarteScreen'
+import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { seDeconnecter } from '@/features/compte/api/session'
@@ -39,7 +40,7 @@ import styles from './Shell.module.css'
 
 const SCREENS: Record<TabId, () => ReactNode> = {
   accueil: AccueilScreen,
-  carte: CarteScreen,
+  carte: () => <CarteScreen sousLaRecherche={<JaugeEnergie />} />,
   messages: MessagesScreen,
   compte: CompteScreen,
 }
