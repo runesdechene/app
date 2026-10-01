@@ -37,23 +37,20 @@ export async function basculerEnvie(id: string) {
   return booleen(data)
 }
 
+// Ma position pour la base, ou rien : sans position, la base prend le prix le plus haut.
+function ouJeSuis(position: Point | null) {
+  return position ? { p_lat: position.latitude, p_lng: position.longitude } : {}
+}
+
 // Découvrir depuis ma position : au-delà de 100 km, la base fait payer de l'énergie (399).
 export async function decouvrirLieu(id: string, position: Point | null) {
-  const { data, error } = await supabase.rpc('decouvrir_lieu', {
-    p_id: id,
-    p_lat: position?.latitude,
-    p_lng: position?.longitude,
-  })
+  const { data, error } = await supabase.rpc('decouvrir_lieu', { p_id: id, ...ouJeSuis(position) })
   if (error) throw error
   return lireRecompense(data)
 }
 
 export async function fetchCoutDecouverte(id: string, position: Point | null) {
-  const { data, error } = await supabase.rpc('cout_decouverte', {
-    p_id: id,
-    p_lat: position?.latitude,
-    p_lng: position?.longitude,
-  })
+  const { data, error } = await supabase.rpc('cout_decouverte', { p_id: id, ...ouJeSuis(position) })
   if (error) throw error
   return lireCoutDecouverte(data)
 }

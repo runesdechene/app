@@ -6276,7 +6276,7 @@ export type Database = {
       }
       correspondant: { Args: { p_avec: string }; Returns: Json }
       cout_decouverte: {
-        Args: { p_id: string; p_lat: number; p_lng: number }
+        Args: { p_id: string; p_lat?: number; p_lng?: number }
         Returns: Json
       }
       create_announcement: {
