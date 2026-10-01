@@ -47,6 +47,7 @@ import { MobileTopBar } from '../components/navigation/MobileTopBar'
 import { MobileStatsBar } from '../components/navigation/MobileStatsBar'
 import { BottomTabbar } from '../components/navigation/BottomTabbar'
 import { VersionBadge } from '../components/map/badges/VersionBadge'
+import { NouvelleExploreBandeau } from '../components/v2/NouvelleExploreBandeau'
 import { useAppConfigStore } from '../stores/appConfigStore'
 import { useGloryRulesStore } from '../stores/gloryRulesStore'
 import { NotificationBell } from '../components/notifications/NotificationBell'
@@ -444,6 +445,7 @@ export default function MapPage() {
           }}
         >
           <div style={{ pointerEvents: 'auto' }}><UpdateBanner /></div>
+          <div style={{ pointerEvents: 'auto' }}><NouvelleExploreBandeau /></div>
         </div>
       )}
       {!addPlaceMode && !authLoading && isAuthenticated && <SearchBar />}

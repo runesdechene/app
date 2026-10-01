@@ -18,6 +18,7 @@ import { FragmentEnigma } from '../enigma/FragmentEnigma'
 import { ExpeditionCreator } from '../expeditions/ExpeditionCreator'
 import { ExpeditionModal } from '../expeditions/ExpeditionModal'
 import { UpdateBanner } from '../pwa/UpdateBanner'
+import { NouvelleExploreBandeau } from '../v2/NouvelleExploreBandeau'
 import '../../pages/HomePage.css'
 
 export interface HomeFeedProps {
@@ -104,6 +105,7 @@ export function HomeFeed({ openFactionModal, showActivity = true, onSeeMoreActiv
     <>
       <main className="home-page-scroll">
         <UpdateBanner />
+        <NouvelleExploreBandeau />
         <HomeBannerCard />
 
         <section className="home-section">
