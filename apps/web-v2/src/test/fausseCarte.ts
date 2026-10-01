@@ -31,6 +31,18 @@ export class FausseCarte {
     if (f) this.ecouteurs.set(type, [...(this.ecouteurs.get(type) ?? []), f])
   }
 
+  off(type: string, ecouteur: Ecouteur) {
+    this.ecouteurs.set(
+      type,
+      (this.ecouteurs.get(type) ?? []).filter((f) => f !== ecouteur),
+    )
+  }
+
+  conteneur = document.createElement('div')
+  getContainer() {
+    return this.conteneur
+  }
+
   emettre(type: string, evenement?: unknown) {
     for (const f of this.ecouteurs.get(type) ?? []) f(evenement)
   }

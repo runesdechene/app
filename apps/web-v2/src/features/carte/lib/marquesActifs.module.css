@@ -1,7 +1,8 @@
 /*
  * QUOI     — les marques des Actifs (maquette 362:182) : un portrait cerclé d'ocre et une gélule
  *            « Nom · titre » ; parti depuis peu, désaturé et transparent ; soi, cerclé de rouge,
- *            avec un halo qui respire. À tout zoom (Uriel, 01/10 : même dézoomé, on voit les gens).
+ *            avec un halo qui respire. De très loin (`data-loin` sur la carte), les portraits
+ *            restent et les noms se taisent (Uriel, 01/10).
  */
 .actif,
 .moi {
@@ -93,6 +94,11 @@
     scale: 1;
     opacity: 0.4;
   }
+}
+
+/* De très loin : les portraits, sans les noms. */
+:global([data-loin]) .etiquette {
+  display: none;
 }
 
 /* Parti il y a moins d'une heure : il s'efface, il ne disparaît pas. L'opacité se pose sur les

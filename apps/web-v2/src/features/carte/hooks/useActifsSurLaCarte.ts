@@ -1,6 +1,7 @@
 /**
  * QUOI     — les Actifs et soi, posés sur la carte : les portraits (marques MapLibre) et les zones
- *            des pistes brouillées. Portraits et noms à tout zoom (Uriel, 01/10).
+ *            des pistes brouillées. De très loin, les portraits restent et les noms se taisent
+ *            (`data-loin` sur la carte — Uriel, 01/10).
  * POURQUOI — CarteScreen dit seulement quoi montrer ; ici, comment le tenir à jour à chaque
  *            relecture et à chaque déplacement de soi.
  * ATTENTION — `onToucher` doit être stable (un setState) : le suivi le garde du premier rendu.
@@ -11,6 +12,8 @@ import type { Point } from '@/shared/lib/distance'
 import type { Actif } from '../api/lireActifs'
 import { ZONES, zonesEnGeoJSON } from '../lib/actifs'
 import { suivreActifs } from '../lib/marquesActifs'
+
+const ZOOM_LOIN = 6
 
 export function useActifsSurLaCarte(
   carte: Carte | null,
@@ -27,8 +30,14 @@ export function useActifsSurLaCarte(
       onToucher,
     )
     suivi.current = s
+    const loin = () => {
+      carte.getContainer().toggleAttribute('data-loin', carte.getZoom() < ZOOM_LOIN)
+    }
+    loin()
+    carte.on('zoom', loin)
     return () => {
       s.vider()
+      carte.off('zoom', loin)
       suivi.current = null
     }
   }, [carte, onToucher])

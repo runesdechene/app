@@ -120,6 +120,21 @@ test('un Actif devient un portrait sur la carte ; le toucher ouvre sa carte', as
   )
 })
 
+test('de très loin, les portraits restent, les noms se taisent', () => {
+  afficher()
+  charger()
+  carte().zoom = 4
+  act(() => {
+    carte().emettre('zoom')
+  })
+  expect(carte().getContainer()).toHaveAttribute('data-loin')
+  carte().zoom = 8
+  act(() => {
+    carte().emettre('zoom')
+  })
+  expect(carte().getContainer()).not.toHaveAttribute('data-loin')
+})
+
 test('si les lieux ne se chargent pas, la carte reste là et propose de réessayer', async () => {
   api.fetchCarteLieux.mockRejectedValue(new Error('réseau'))
   afficher()
