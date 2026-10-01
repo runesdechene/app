@@ -107,11 +107,15 @@ button.coeurs {
   grid-row: 1;
   grid-column: 3;
   justify-self: end;
+  justify-content: center;
   align-items: center;
-  padding: 2px 0 0;
+  min-width: 26px; /* une cible qu'on attrape, plus grande que le cœur */
+  min-height: 20px;
+  margin-right: calc(-1 * var(--space-1));
+  padding: 0;
   border: none;
   background: none;
-  color: var(--color-texte-pale);
+  color: var(--color-texte-doux);
   cursor: pointer;
   opacity: 0;
   transition: opacity var(--duree-douce) var(--courbe-douce);
