@@ -51,10 +51,11 @@ export function Notifications() {
   )
 }
 
-// Où mène une notification : le lieu, le Registre pour une mention, les Nouveautés pour une mise à
-// jour, nulle part sinon.
+// Où mène une notification : le lieu, le Registre pour une mention ou un cœur sur un message, les
+// Nouveautés pour une mise à jour, nulle part sinon.
 function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'
+  if (n.type === 'salut' && n.evenement === 'message') return '/messages'
   if (n.type === 'mise_a_jour') return '../nouveautes'
   return n.lieu ? `../lieu/${n.lieu.id}` : null
 }

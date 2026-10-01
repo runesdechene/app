@@ -37,6 +37,12 @@ export async function ecrire(canal: Canal, texte: string, mentions: string[]) {
   if (error) throw error
 }
 
+// Un cœur de plus sur un message (migration 409) : la base refuse son propre message.
+export async function saluerMessage(id: number) {
+  const { error } = await supabase.rpc('saluer', { p_evenement: `message:${String(id)}` })
+  if (error) throw error
+}
+
 // Les Explorateurs dont le nom commence par ce qu'on tape après « @ ».
 export async function chercherExplorateurs(debut: string) {
   // Jusqu'à 12 : « le » en touche des dizaines (migration 407).

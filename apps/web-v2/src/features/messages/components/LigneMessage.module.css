@@ -1,0 +1,176 @@
+/*
+ * QUOI     — un message du Registre (maquette 45:278) : heure pâle, portrait, nom gris, texte
+ *            16 px ; ses cœurs sous le texte, et le cœur qui remplace l'heure au survol sur PC.
+ */
+.message,
+.suite {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: start;
+  gap: var(--space-2);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+  touch-action: manipulation; /* le double toucher salue, il ne zoome pas */
+}
+
+/* La suite d'un même auteur : collée au message d'avant (le gap de la liste, moins presque tout). */
+.suite {
+  margin-top: calc(var(--space-1) - var(--space-4));
+}
+
+.heure {
+  padding-top: 2px;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--dense-leading);
+  overflow-wrap: anywhere;
+}
+
+.nom {
+  color: var(--color-texte-doux);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+/* Une mention : le nom en gras, à l'encre, vers son profil. */
+.mention {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+/* Un message qui me mentionne : un voile rouge translucide et un filet rouge à gauche — le rouge
+   de la pastille, pour ce qui m'est adressé (Uriel, 30/09 : le beige ne se voyait pas). */
+.mentionne {
+  margin-inline: calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-petit);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.prefixe {
+  color: var(--color-canal-bugs-texte);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+/* Les cœurs reçus : sous le texte, la pastille des saluts de l'Accueil. */
+.coeurs {
+  position: relative;
+  display: inline-flex;
+  grid-column: 2;
+  justify-self: start;
+  align-items: center;
+  gap: var(--space-1);
+  height: 20px;
+  margin-top: calc(-1 * var(--space-1));
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  transition:
+    background var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+button.coeurs {
+  cursor: pointer;
+}
+
+.coeurs[aria-pressed='true'] {
+  background: var(--color-accent-clair);
+  color: var(--color-accent);
+}
+
+.coeurs:active {
+  scale: 0.9;
+}
+
+/* Sans cœur encore : sur PC, un cœur prend la place de l'heure au survol ; au téléphone, le
+   double toucher suffit. Toujours là pour le clavier. */
+.aimer {
+  position: relative;
+  display: none;
+  grid-row: 1;
+  grid-column: 3;
+  justify-self: end;
+  align-items: center;
+  padding: 2px 0 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-pale);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.aimer:hover {
+  color: var(--color-accent);
+}
+
+.aimer:focus-visible {
+  display: inline-flex;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .aimer {
+    display: inline-flex;
+  }
+
+  .heure {
+    grid-row: 1;
+    grid-column: 3;
+    transition: opacity var(--duree-douce) var(--courbe-douce);
+  }
+
+  .message:hover .aimer,
+  .suite:hover .aimer {
+    opacity: 1;
+  }
+
+  .message:hover .heure:has(+ .aimer),
+  .suite:hover .heure:has(+ .aimer) {
+    opacity: 0;
+  }
+}
+
+.coeur {
+  width: 12px;
+  height: 12px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .suite {
+    animation: none;
+  }
+
+  .coeurs,
+  .aimer,
+  .heure {
+    transition: none;
+  }
+}

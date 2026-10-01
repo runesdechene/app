@@ -63,20 +63,6 @@
   display: none;
 }
 
-.message,
-.suite {
-  display: grid;
-  grid-template-columns: 22px 1fr auto;
-  align-items: start;
-  gap: var(--space-2);
-  animation: apparaitre var(--duree-douce) var(--courbe-douce);
-}
-
-/* La suite d'un même auteur : collée au message d'avant (le gap de la liste, moins presque tout). */
-.suite {
-  margin-top: calc(var(--space-1) - var(--space-4));
-}
-
 /* Le jour : un filet au pinceau de part et d'autre, comme les moments des Murmures. */
 .jour {
   display: flex;
@@ -105,53 +91,6 @@
   rotate: 180deg;
 }
 
-.heure {
-  padding-top: 2px;
-  color: var(--color-texte-pale);
-  font-family: var(--font-corps);
-  font-size: var(--legende-size);
-  font-variant-numeric: tabular-nums;
-}
-
-.texte {
-  margin: 0;
-  color: var(--color-texte);
-  font-family: var(--font-corps);
-  font-size: var(--corps-size);
-  line-height: var(--dense-leading);
-  overflow-wrap: anywhere;
-}
-
-.nom {
-  color: var(--color-texte-doux);
-  font-size: var(--sous-titre-size);
-  font-weight: var(--weight-gras);
-  text-decoration: none;
-}
-
-/* Une mention : le nom en gras, à l'encre, vers son profil. */
-.mention {
-  color: var(--color-encre);
-  font-weight: var(--weight-semi);
-  text-decoration: none;
-}
-
-/* Un message qui me mentionne : un voile rouge translucide et un filet rouge à gauche — le rouge
-   de la pastille, pour ce qui m'est adressé (Uriel, 30/09 : le beige ne se voyait pas). */
-.mentionne {
-  margin-inline: calc(-1 * var(--space-2));
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-petit);
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  box-shadow: inset 3px 0 0 var(--color-accent);
-}
-
-.prefixe {
-  color: var(--color-canal-bugs-texte);
-  font-size: var(--sous-titre-size);
-  font-weight: var(--weight-gras);
-}
-
 .alerte {
   margin: 0;
   padding: 0 var(--space-6) var(--space-2);
@@ -160,19 +99,7 @@
   font-size: var(--legende-size);
 }
 
-@keyframes apparaitre {
-  from {
-    opacity: 0;
-    translate: 0 4px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .message,
-  .suite {
-    animation: none;
-  }
-
   .filtre,
   .filtreBugs {
     transition: none;

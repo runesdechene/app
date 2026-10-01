@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -18,6 +18,7 @@ const api = vi.hoisted(() => ({
   fetchRegistreNonLus: vi.fn(() => Promise.resolve({ messages: 0, mentions: 0 })),
   marquerRegistreLu: vi.fn(() => Promise.resolve()),
   fetchPassages: vi.fn<() => Promise<Passage[]>>(() => Promise.resolve([])),
+  saluerMessage: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/registre', () => api)
 
@@ -26,7 +27,15 @@ const GAUTIER = { id: 'u2', nom: 'Gautier', avatar: null }
 const KELPIE = { id: 'u9', nom: 'Kelpie', avatar: null }
 const ASH = { id: 'u8', nom: 'Ash', avatar: null }
 
+// Un message de Gautier, et ses cœurs.
+function balade(saluts: number, salue: boolean) {
+  const quand = '2026-09-28T07:12:00Z'
+  const message = { id: 7, canal: 'general', texte: 'Belle balade hier.', quand, auteur: GAUTIER }
+  return { ...message, moi: false, mentions: [], mentionneMoi: false, saluts, salue }
+}
+
 beforeEach(() => {
+  vi.clearAllMocks()
   api.fetchRegistre.mockResolvedValue([
     {
       id: 1,
@@ -299,4 +308,65 @@ test('le Registre ouvert est lu : le marqueur avance', async () => {
   await vi.waitFor(() => {
     expect(api.marquerRegistreLu).toHaveBeenCalled()
   })
+})
+
+test('un cœur sur le message d’un autre : le compteur monte tout de suite', async () => {
+  api.fetchRegistre.mockResolvedValue([balade(2, false)])
+  monter()
+  const coeur = await screen.findByRole('button', { name: 'Saluer le message de Gautier (2)' })
+  api.fetchRegistre.mockResolvedValue([balade(3, true)])
+  await userEvent.click(coeur)
+  expect(api.saluerMessage).toHaveBeenCalledWith(7)
+  expect(
+    await screen.findByRole('button', { name: 'Saluer le message de Gautier (3)' }),
+  ).toHaveAttribute('aria-pressed', 'true')
+})
+
+test('sans cœur, le bouton reste discret ; le premier cœur fait apparaître le compteur', async () => {
+  api.fetchRegistre.mockResolvedValue([balade(0, false)])
+  monter()
+  const coeur = await screen.findByRole('button', { name: 'Saluer le message de Gautier' })
+  expect(coeur).toHaveTextContent(/^$/)
+  api.fetchRegistre.mockResolvedValue([balade(1, true)])
+  await userEvent.click(coeur)
+  expect(
+    await screen.findByRole('button', { name: 'Saluer le message de Gautier (1)' }),
+  ).toHaveTextContent('1')
+})
+
+test('au téléphone, un double toucher sur le message envoie un cœur', async () => {
+  api.fetchRegistre.mockResolvedValue([balade(0, false)])
+  monter()
+  const texte = await screen.findByText('Belle balade hier.')
+  fireEvent.pointerUp(texte, { pointerType: 'touch' })
+  expect(api.saluerMessage).not.toHaveBeenCalled()
+  fireEvent.pointerUp(texte, { pointerType: 'touch' })
+  await waitFor(() => {
+    expect(api.saluerMessage).toHaveBeenCalledWith(7)
+  })
+})
+
+test('mon message ne se salue pas : ses cœurs se lisent sans bouton', async () => {
+  api.fetchRegistre.mockResolvedValue([
+    {
+      id: 8,
+      canal: 'general',
+      texte: 'Merci à tous.',
+      quand: '2026-09-28T07:12:00Z',
+      auteur: URIEL,
+      moi: true,
+      mentions: [],
+      mentionneMoi: false,
+      saluts: 4,
+      salue: false,
+    },
+  ])
+  monter()
+  const message = (await screen.findByText('Merci à tous.')).closest('li')
+  if (!message) throw new Error('ligne absente')
+  expect(within(message).queryByRole('button', { name: /Saluer/ })).toBeNull()
+  expect(message).toHaveTextContent('4')
+  fireEvent.pointerUp(message, { pointerType: 'touch' })
+  fireEvent.pointerUp(message, { pointerType: 'touch' })
+  expect(api.saluerMessage).not.toHaveBeenCalled()
 })

@@ -10,23 +10,22 @@
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
  *            gens qui passent (migration 408) : qui a rejoint EXPLORE — on lui souhaite la
- *            bienvenue sur place —, qui vient de se connecter.
+ *            bienvenue sur place —, qui vient de se connecter. Chaque message se dessine par
+ *            `LigneMessage`, avec ses cœurs (migration 409).
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import { Avatar } from '@/shared/ui/Avatar'
-import { CANAUX, type Canal, type Mention, type Personne } from '../api/lireRegistre'
+import { CANAUX, type Canal, type Personne } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
 import { entremeler } from '../lib/fil'
-import { autreJour, heureDe, jourDe } from '../lib/jour'
-import { decouper } from '../lib/mentions'
+import { autreJour, jourDe } from '../lib/jour'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
+import { LigneMessage } from './LigneMessage'
 import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
 import styles from './Registre.module.css'
@@ -35,10 +34,9 @@ const NOMS: Record<Canal, { filtre: string; court: string }> = {
   general: { filtre: 'Canal général', court: 'Général' },
   bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
 }
-const PREFIXE_BUGS = '[Bug & Suggestions]'
 
 export function Registre() {
-  const { messages, passages, erreur, ecrire, echecEnvoi } = useRegistre()
+  const { messages, passages, erreur, ecrire, saluer, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
   // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
@@ -128,34 +126,7 @@ export function Registre() {
           return (
             <Fragment key={m.id}>
               {jour}
-              <li
-                className={[
-                  suite ? styles.suite : styles.message,
-                  m.mentionneMoi && styles.mentionne,
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
-                {suite ? (
-                  <span aria-hidden="true" />
-                ) : (
-                  <Avatar url={m.auteur.avatar} nom={m.auteur.nom} taille="mini" />
-                )}
-                <p className={styles.texte}>
-                  {!suite && (
-                    <>
-                      <Link className={styles.nom} to={`/messages/explorateur/${m.auteur.id}`}>
-                        {m.auteur.nom}
-                      </Link>{' '}
-                    </>
-                  )}
-                  {prefixe && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
-                  <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
-                </p>
-                <time className={styles.heure} dateTime={m.quand}>
-                  {heureDe(m.quand)}
-                </time>
-              </li>
+              <LigneMessage message={m} suite={suite} prefixe={prefixe} onSaluer={saluer} />
             </Fragment>
           )
         })}
@@ -207,18 +178,5 @@ export function Registre() {
         </p>
       )}
     </div>
-  )
-}
-
-// Le texte d'un message, ses « @Nom » en liens vers les profils.
-function TexteAvecMentions({ texte, mentions }: { texte: string; mentions: Mention[] }) {
-  return decouper(texte, mentions).map((morceau, i) =>
-    'mention' in morceau ? (
-      <Link key={i} className={styles.mention} to={`/messages/explorateur/${morceau.mention.id}`}>
-        @{morceau.mention.nom}
-      </Link>
-    ) : (
-      <Fragment key={i}>{morceau.texte}</Fragment>
-    ),
   )
 }

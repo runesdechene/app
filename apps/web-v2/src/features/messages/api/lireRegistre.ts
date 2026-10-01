@@ -15,6 +15,8 @@ export type Message = {
   moi: boolean
   mentions: Mention[] // les Explorateurs mentionnés (@Nom), migration 373
   mentionneMoi: boolean
+  saluts: number // les cœurs reçus, à volonté (migration 409)
+  salue: boolean // j'en ai donné
 }
 export type Mention = { id: string; nom: string }
 export type Personne = Mention & { avatar: string | null }
@@ -77,6 +79,9 @@ function lireMessage(v: unknown): Message {
     // Absents tant que la migration 373 n'est pas passée : aucune mention.
     mentions: Array.isArray(m.mentions) ? liste(lireMention)(m.mentions) : [],
     mentionneMoi: m.mentionneMoi === true,
+    // Absents tant que la migration 409 n'est pas passée : aucun cœur.
+    saluts: typeof m.saluts === 'number' ? m.saluts : 0,
+    salue: m.salue === true,
   }
 }
 
