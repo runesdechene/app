@@ -57,6 +57,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // « autoUpdate » ne s'active pas tout seul : sans ces deux réglages, une nouvelle version
+        // s'installe puis attend que toute l'app soit fermée — jamais, sur un téléphone (02/10 :
+        // un navigateur resté sur 1.0.9 pendant six déploiements).
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],
