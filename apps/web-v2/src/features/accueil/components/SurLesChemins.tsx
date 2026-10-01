@@ -39,7 +39,7 @@ const ICONES = {
 const VERBES = {
   visite: 'a visité',
   ajout: 'a ajouté',
-  arrivee: 'a rejoint EXPLORE ! Souhaite-lui la bienvenue !',
+  arrivee: 'a rejoint EXPLORE !',
   connexion: 'vient de se connecter',
   revendication: 'vient de revendiquer',
   enrichi: 'a enrichi',
@@ -102,6 +102,18 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
             {' '}
             <Link className={styles.lieu} to={`/accueil/lieu/${lieu.id}`}>
               {lieu.nom}
+            </Link>
+          </>
+        )}
+        {chemin.type === 'arrivee' && !chemin.moi && (
+          <>
+            {' '}
+            <Link
+              className={styles.bienvenue}
+              to="/messages"
+              state={{ mentionner: { id: qui.id, nom: qui.nom, avatar: qui.avatar } }}
+            >
+              Souhaite-lui la bienvenue !
             </Link>
           </>
         )}

@@ -12,10 +12,11 @@
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
+import { chaine, objet, ouNull } from '@/shared/lib/lire'
 import { Avatar } from '@/shared/ui/Avatar'
-import { CANAUX, type Canal, type Mention } from '../api/lireRegistre'
+import { CANAUX, type Canal, type Mention, type Personne } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
@@ -34,6 +35,13 @@ const NOMS: Record<Canal, { filtre: string; court: string }> = {
 const PREFIXE_BUGS = '[Bug & Suggestions]'
 const HEURE = new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', minute: '2-digit' })
 
+// L'Explorateur à mentionner, quand on arrive de « Souhaite-lui la bienvenue ! » (l'état de
+// l'adresse, lu comme les réponses de la base : rien n'est supposé).
+function personneAMentionner(etat: unknown): Personne | null {
+  const m = ouNull(objet)(objet(etat ?? {}).mentionner ?? null)
+  return m ? { id: chaine(m.id), nom: chaine(m.nom), avatar: ouNull(chaine)(m.avatar) } : null
+}
+
 export function Registre() {
   const { messages, erreur, ecrire, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
@@ -44,6 +52,28 @@ export function Registre() {
   const [texte, setTexte] = useState('')
   const [curseur, setCurseur] = useState(0)
   const mentions = useMentions(texte, curseur)
+  const placer = (apres: { texte: string; curseur: number }) => {
+    // Le texte s'écrit tout de suite, puis le curseur se pose après « @Nom » : une lettre tapée
+    // aussitôt ne le voit jamais revenir en arrière.
+    flushSync(() => {
+      setTexte(apres.texte)
+      setCurseur(apres.curseur)
+    })
+    champ.current?.setSelectionRange(apres.curseur, apres.curseur)
+  }
+
+  // Arrivé par « Souhaite-lui la bienvenue ! » (Sur les chemins) : la personne est déjà mentionnée.
+  const location = useLocation()
+  const [arriveePour, setArriveePour] = useState<string | null>(null)
+  const aMentionner = personneAMentionner(location.state as unknown)
+  const key = location.key
+  if (aMentionner && arriveePour !== key) {
+    setArriveePour(key)
+    mentions.ajouter(aMentionner)
+    const debut = `@${aMentionner.nom} `
+    setTexte(debut)
+    setCurseur(debut.length)
+  }
 
   const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
 
@@ -138,20 +168,18 @@ export function Registre() {
             setTexte(t)
             setCurseur(c)
           },
+          clavier: (e) => {
+            const choisie = mentions.clavier(e)
+            if (choisie) placer(mentions.choisir(choisie))
+          },
         }}
         dessus={
           mentions.suggestions.length > 0 && (
             <ListeMentions
               personnes={mentions.suggestions}
+              actif={mentions.actif}
               onChoisir={(p) => {
-                const apres = mentions.choisir(p)
-                // Le texte s'écrit tout de suite, puis le curseur se pose après « @Nom » : une
-                // lettre tapée aussitôt ne le voit jamais revenir en arrière.
-                flushSync(() => {
-                  setTexte(apres.texte)
-                  setCurseur(apres.curseur)
-                })
-                champ.current?.setSelectionRange(apres.curseur, apres.curseur)
+                placer(mentions.choisir(p))
               }}
             />
           )

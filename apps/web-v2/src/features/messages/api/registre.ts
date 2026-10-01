@@ -32,7 +32,11 @@ export async function ecrire(canal: Canal, texte: string, mentions: string[]) {
 
 // Les Explorateurs dont le nom commence par ce qu'on tape après « @ ».
 export async function chercherExplorateurs(debut: string) {
-  const { data, error } = await supabase.rpc('chercher_explorateurs', { p_debut: debut })
+  // Jusqu'à 12 : « le » en touche des dizaines (migration 407).
+  const { data, error } = await supabase.rpc('chercher_explorateurs', {
+    p_debut: debut,
+    p_limite: 12,
+  })
   if (error) throw error
   return lirePersonnes(data)
 }

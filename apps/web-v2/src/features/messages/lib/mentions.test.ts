@@ -5,7 +5,14 @@ test('une mention en cours : un @ en début ou après une espace, jusqu’au cur
   expect(mentionEnCours('Salut @Gau', 10)).toEqual({ debut: 6, recherche: 'Gau' })
   expect(mentionEnCours('@', 1)).toEqual({ debut: 0, recherche: '' })
   expect(mentionEnCours('mon@mail', 8)).toBeNull()
-  expect(mentionEnCours('Salut @Gautier ça va', 20)).toBeNull()
+  expect(mentionEnCours('Salut @Gautier ça va', 20, ['Gautier'])).toBeNull()
+})
+
+test('une mention suit les espaces (« @le mar ») et s’arrête après un nom choisi', () => {
+  expect(mentionEnCours('Salut @le mar', 13)).toEqual({ debut: 6, recherche: 'le mar' })
+  const texte = '@Le Marcheur de Plumes merci'
+  expect(mentionEnCours(texte, texte.length, ['Le Marcheur de Plumes'])).toBeNull()
+  expect(mentionEnCours(`@${'a'.repeat(41)}`, 42)).toBeNull()
 })
 
 test('choisir une mention remplace ce qui est tapé par « @Nom », et place le curseur après', () => {

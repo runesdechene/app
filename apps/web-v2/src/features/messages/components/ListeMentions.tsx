@@ -11,18 +11,20 @@ import styles from './ListeMentions.module.css'
 
 export function ListeMentions({
   personnes,
+  actif,
   onChoisir,
 }: {
   personnes: Personne[]
+  actif: number
   onChoisir: (p: Personne) => void
 }) {
   return (
     <ul className={[menu.liste, styles.mentions].join(' ')} role="listbox" aria-label="Mentionner">
-      {personnes.map((p) => (
+      {personnes.map((p, i) => (
         <li
           key={p.id}
           role="option"
-          aria-selected={false}
+          aria-selected={i === actif}
           tabIndex={0}
           className={[menu.option, styles.personne].join(' ')}
           // Au pointeur appuyé, pas au clic : le champ ne perd pas la main avant le choix.

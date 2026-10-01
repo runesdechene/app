@@ -19,3 +19,8 @@
   background: var(--color-pastille);
   outline: none;
 }
+
+/* La proposition choisie au clavier. */
+.personne[aria-selected='true'] {
+  background: color-mix(in srgb, var(--color-sable) 55%, transparent);
+}

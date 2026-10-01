@@ -48,9 +48,9 @@ beforeEach(() => {
   api.ecrire.mockResolvedValue(undefined)
 })
 
-function monter() {
+function monter(etat?: unknown) {
   const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
-    initialEntries: ['/messages'],
+    initialEntries: [{ pathname: '/messages', state: etat }],
   })
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -205,6 +205,41 @@ test('« @ » puis le début d’un nom propose des Explorateurs ; le choisir le
   expect(api.ecrire).toHaveBeenCalledWith('general', 'Salut @Gautier de Bilskimir tu as vu ?', [
     'u2',
   ])
+})
+
+test('au clavier : les flèches choisissent dans la liste, Entrée mentionne sans envoyer', async () => {
+  api.chercherExplorateurs.mockResolvedValue([
+    { id: 'u2', nom: 'Le Barde', avatar: null },
+    { id: 'u3', nom: 'Le Marcheur de Plumes', avatar: null },
+  ])
+  monter()
+  await screen.findByRole('list', { name: 'Registre' })
+  const champ = screen.getByRole('textbox', { name: 'Écrire quelque chose' })
+  await userEvent.type(champ, '@le')
+  await screen.findByRole('option', { name: /Le Marcheur de Plumes/ })
+  expect(screen.getByRole('option', { name: /Le Barde/ })).toHaveAttribute('aria-selected', 'true')
+  await userEvent.keyboard('{ArrowDown}')
+  expect(screen.getByRole('option', { name: /Le Marcheur/ })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  await userEvent.keyboard('{Enter}')
+  expect(champ).toHaveValue('@Le Marcheur de Plumes ')
+  expect(api.ecrire).not.toHaveBeenCalled()
+  await userEvent.type(champ, '@le')
+  await screen.findByRole('listbox', { name: 'Mentionner' })
+  await userEvent.keyboard('{Escape}')
+  expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
+})
+
+test('arrivé par « Souhaite-lui la bienvenue ! » : la personne est déjà mentionnée', async () => {
+  monter({ mentionner: { id: 'u9', nom: 'Kelpie', avatar: null } })
+  await screen.findByRole('list', { name: 'Registre' })
+  const champ = screen.getByRole('textbox', { name: 'Écrire quelque chose' })
+  expect(champ).toHaveValue('@Kelpie ')
+  await userEvent.type(champ, 'bienvenue !')
+  await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
+  expect(api.ecrire).toHaveBeenCalledWith('general', '@Kelpie bienvenue !', ['u9'])
 })
 
 test('une mention s’affiche en lien vers le profil ; un message qui me mentionne se distingue', async () => {

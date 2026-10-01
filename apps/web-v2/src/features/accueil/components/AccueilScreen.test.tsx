@@ -147,6 +147,16 @@ test('le fil dit qui a fait quoi, où et quand', async () => {
   expect(revendication).toHaveTextContent('Mathéo vient de revendiquer Pointe du Becquet')
 })
 
+test('sur l’arrivée d’un autre, « Souhaite-lui la bienvenue ! » ouvre le Registre, la personne mentionnée', async () => {
+  const router = monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  await userEvent.click(within(fil).getByRole('link', { name: 'Souhaite-lui la bienvenue !' }))
+  expect(router.state.location.pathname).toBe('/messages')
+  expect(router.state.location.state).toEqual({
+    mentionner: { id: 'u4', nom: 'Claire', avatar: null },
+  })
+})
+
 test('un récit enrichi se dit aussi', async () => {
   api.fetchChemins.mockResolvedValue([
     { ...VISITE, id: 'enrichi:l3:u7:1', type: 'enrichi', qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },

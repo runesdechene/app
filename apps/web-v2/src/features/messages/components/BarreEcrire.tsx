@@ -7,13 +7,15 @@
  * ATTENTION — `saisie` rend le texte à qui le tient (le Registre, pour les mentions) : il suit
  *            alors aussi le curseur. Sans elle, la barre tient son texte seule (les Murmures).
  */
-import { useState, type ReactNode, type RefObject } from 'react'
+import { useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
 import envoyer from '@/assets/ui/envoyer.svg'
 import styles from './BarreEcrire.module.css'
 
 type Saisie = {
   texte: string
   changer: (texte: string, curseur: number) => void
+  // Les touches, avant la barre : la liste des mentions s'en sert (flèches, Entrée, Échap).
+  clavier?: (e: KeyboardEvent<HTMLInputElement>) => void
   champ: RefObject<HTMLInputElement | null>
 }
 
@@ -63,6 +65,7 @@ export function BarreEcrire({
         onChange={(e) => {
           changer(e.target.value, e.target.selectionStart ?? e.target.value.length)
         }}
+        onKeyDown={saisie?.clavier}
         onSelect={(e) => {
           changer(e.currentTarget.value, e.currentTarget.selectionStart ?? texte.length)
         }}

@@ -7,13 +7,15 @@
 export type Mention = { id: string; nom: string }
 export type Morceau = { texte: string } | { mention: Mention }
 
-// La mention en cours : un « @ » en début de texte ou après une espace, puis des lettres jusqu'au
-// curseur (sans espace). Rend où elle commence et ce qui est tapé.
-export function mentionEnCours(texte: string, curseur: number) {
+// La mention en cours : un « @ » en début de texte ou après une espace, puis jusqu'au curseur — les
+// espaces comprises (« @le mar » pour « Le Marcheur de Plumes », Uriel 01/10), 40 caractères au plus.
+// Une fois un nom choisi et suivi d'une espace, la mention est finie : la suite est le message.
+export function mentionEnCours(texte: string, curseur: number, choisis: readonly string[] = []) {
   const avant = texte.slice(0, curseur)
-  const m = /(^|\s)@([^\s@]*)$/.exec(avant)
+  const m = /(^|\s)@([^@\n]{0,40})$/.exec(avant)
   if (!m) return null
   const recherche = m[2] ?? ''
+  if (choisis.some((nom) => recherche.startsWith(`${nom} `))) return null
   return { debut: curseur - recherche.length - 1, recherche }
 }
 
