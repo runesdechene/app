@@ -4,7 +4,10 @@
  *            « Ma position » (spec Carte).
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
- *            couleur » bascule.
+ *            couleur » bascule. Rien n'attend ce qui peut venir après (Uriel, 02/10 : « la carte
+ *            reste très longue à charger ») : les calques se posent dès que le style est prêt, sans
+ *            attendre les tuiles du fond ; les icônes partent dès que les lieux arrivent ; le
+ *            relief ne vient qu'une fois les lieux posés.
  *            `CarteVisiteur` : la même carte pour qui n'a pas de compte (la vitrine) — positions floutées,
  *            ni filtre, ni territoire, ni préférences ; toucher un lieu ouvre son aperçu, et la
  *            carte glisse jusqu'au lieu dont l'aperçu est ouvert.
@@ -33,8 +36,8 @@ import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
-import { ajouterMarques } from '../lib/sceaux'
-import { FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
+import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
+import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { suivreSurvol } from '../lib/survol'
 import { CarteExplorateur } from './CarteExplorateur'
 import styles from './CarteScreen.module.css'
@@ -143,7 +146,7 @@ function CarteVivante({
       }
     })
 
-    map.on('load', () => {
+    map.on('style.load', () => {
       // Les marques à la mesure de l'écran (lue à l'ouverture de la carte).
       const ecran = echelleEcran(window.innerWidth, window.innerHeight)
       ajouterCalques(map, couleurs, ecran)
@@ -192,6 +195,10 @@ function CarteVivante({
     if (lieu) carte.flyTo({ center: [lieu.lng, lieu.lat], zoom: 11 })
   }, [visiteur, carte, lieux, lieuOuvert])
 
+  useEffect(() => {
+    if (lieux) prechargerIcones(lieux)
+  }, [lieux])
+
   // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
   // `actif` passe à faux dès qu'un nouveau dessin part, ou que l'écran se ferme.
   useEffect(() => {
@@ -200,7 +207,9 @@ function CarteVivante({
     const montres = filtrer(lieux, filtres)
     ajouterMarques(carte, montres, couleurs, couleurTypes).then(
       () => {
-        if (actif) carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
+        if (!actif) return
+        carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
+        ajouterOmbrage(carte, couleurs)
       },
       () => {
         if (actif) setMarquesEnPanne(true)

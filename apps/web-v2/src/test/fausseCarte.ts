@@ -1,6 +1,6 @@
 /**
  * QUOI     — une fausse carte MapLibre pour les tests : elle retient ses écouteurs, et le test
- *            déclenche lui-même « load », « zoomend »…
+ *            déclenche lui-même « style.load », « zoomend »…
  * POURQUOI — MapLibre a besoin de WebGL, que jsdom n'a pas. `setup.ts` la met à la place de la
  *            vraie pour tous les tests.
  */
@@ -57,7 +57,13 @@ export class FausseCarte {
   setStyle() {}
   remove() {}
   addSource() {}
-  addLayer() {}
+  addLayer = vi.fn()
+  getLayer(): unknown {
+    return undefined
+  }
+  getStyle() {
+    return { layers: [] }
+  }
   // La source des lieux est `source` ; toute autre (les zones des Actifs) a la sienne.
   autresSources = new Map<string, { setData: ReturnType<typeof vi.fn> }>()
   getSource(id: string) {

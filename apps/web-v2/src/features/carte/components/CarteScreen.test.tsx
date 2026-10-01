@@ -26,7 +26,10 @@ vi.mock('../api/carte', () => api)
 const actifs = vi.hoisted(() => ({ fetchActifs: vi.fn<() => Promise<unknown[]>>() }))
 vi.mock('../api/actifs', () => actifs)
 
-const marques = vi.hoisted(() => ({ ajouterMarques: vi.fn<() => Promise<void>>() }))
+const marques = vi.hoisted(() => ({
+  ajouterMarques: vi.fn<() => Promise<void>>(),
+  prechargerIcones: vi.fn(),
+}))
 vi.mock('../lib/sceaux', async (original) => ({
   ...(await original<typeof import('../lib/sceaux')>()),
   ...marques,
@@ -89,11 +92,37 @@ function carte(): FausseCarte {
   return FausseCarte.derniere
 }
 
+// Le style est prêt : les lieux n'attendent pas les tuiles du fond (02/10).
 function charger() {
   act(() => {
-    carte().emettre('load')
+    carte().emettre('style.load')
   })
 }
+
+test('les icônes des lieux partent dès que les lieux arrivent, avant que la carte soit prête', async () => {
+  afficher()
+  await waitFor(() => {
+    expect(marques.prechargerIcones).toHaveBeenCalledWith(LIEUX)
+  })
+  expect(carte().source.setData).not.toHaveBeenCalled()
+})
+
+test('le relief ne se pose qu’une fois les lieux posés', async () => {
+  afficher()
+  charger()
+  await waitFor(() => {
+    expect(carte().addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'ombrage' }),
+      undefined,
+    )
+  })
+  const ombrage = carte().addLayer.mock.calls.findIndex(
+    ([c]) => (c as { id: string }).id === 'ombrage',
+  )
+  expect(carte().addLayer.mock.invocationCallOrder[ombrage]).toBeGreaterThan(
+    carte().source.setData.mock.invocationCallOrder[0] ?? Infinity,
+  )
+})
 
 test('un Actif devient un portrait sur la carte ; le toucher ouvre sa carte', async () => {
   actifs.fetchActifs.mockResolvedValue([

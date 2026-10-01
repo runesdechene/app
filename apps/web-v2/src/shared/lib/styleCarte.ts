@@ -3,8 +3,11 @@
  *            forêts en olive pâle, un ombrage de relief léger (spec Carte §2).
  * POURQUOI — une carte médiévale, à plat, qui laisse la place aux lieux : les petites routes,
  *            les bâtiments et les points d'intérêt du fond disparaissent.
- * ATTENTION — fonction pure : le style reçu est copié, jamais modifié. Le terrain 3D n'est pas
- *            posé ici ; il s'allume à l'inclinaison (`relief.ts`).
+ * ATTENTION — `styleParchemin` est pure : le style reçu est copié, jamais modifié. Ni l'ombrage
+ *            ni le terrain 3D n'y sont posés : l'ombrage vient après les lieux (`ajouterOmbrage`) —
+ *            ses tuiles de relief, ~70 Ko chacune, retardaient l'apparition des lieux (Uriel, 02/10 :
+ *            « la carte reste très longue à charger ») ; le terrain s'allume à l'inclinaison
+ *            (`relief.ts`). Les sources de relief, elles, restent déclarées dans le style.
  */
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
 import type { CouleursCarte } from './couleursCarte'
@@ -59,23 +62,6 @@ export function styleParchemin(style: StyleSpecification, c: CouleursCarte): Sty
   const s = structuredClone(style)
   const layers = s.layers.filter((l) => !RETIRES.test(l.id)).map((l) => habiller(l, c))
 
-  // L'ombrage passe sous les routes, les rivières et les limites : il teinte le sol, pas le trait.
-  const premiereRoute = layers.findIndex((l) => /road|tunnel|bridge|waterway|boundary/.test(l.id))
-  const ombrage: LayerSpecification = {
-    id: 'ombrage',
-    type: 'hillshade',
-    source: 'relief',
-    paint: {
-      'hillshade-method': 'igor',
-      'hillshade-exaggeration': 0.3,
-      'hillshade-shadow-color': c.ombre,
-      'hillshade-highlight-color': 'transparent',
-      'hillshade-accent-color': 'transparent',
-      'hillshade-illumination-direction': 315,
-    },
-  }
-  layers.splice(premiereRoute === -1 ? layers.length : premiereRoute, 0, ombrage)
-
   return {
     ...s,
     layers,
@@ -107,4 +93,36 @@ export function styleParchemin(style: StyleSpecification, c: CouleursCarte): Sty
       'fog-ground-blend': 0.5,
     },
   }
+}
+
+// Ce dont l'ombrage a besoin d'une carte (la vraie, ou celle des tests).
+type CarteOmbrable = {
+  getLayer: (id: string) => unknown
+  getStyle: () => { layers: { id: string }[] }
+  addLayer: (couche: LayerSpecification, avant?: string) => unknown
+}
+
+// L'ombrage du relief, posé une fois, sous les routes, les rivières et les limites : il teinte le
+// sol, pas le trait.
+export function ajouterOmbrage(carte: CarteOmbrable, c: CouleursCarte) {
+  if (carte.getLayer('ombrage')) return
+  const premiereRoute = carte
+    .getStyle()
+    .layers.find((l) => /road|tunnel|bridge|waterway|boundary/.test(l.id))
+  carte.addLayer(
+    {
+      id: 'ombrage',
+      type: 'hillshade',
+      source: 'relief',
+      paint: {
+        'hillshade-method': 'igor',
+        'hillshade-exaggeration': 0.3,
+        'hillshade-shadow-color': c.ombre,
+        'hillshade-highlight-color': 'transparent',
+        'hillshade-accent-color': 'transparent',
+        'hillshade-illumination-direction': 315,
+      },
+    },
+    premiereRoute?.id,
+  )
 }

@@ -18,7 +18,7 @@ import { Link } from 'react-router'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
-import { FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
+import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { useEndroit, useVoisins } from '../hooks/useAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { chercherEndroits, type Resultat } from '../lib/adresse'
@@ -58,6 +58,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
       attributionControl: { compact: true },
     })
     map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs) })
+    map.on('style.load', () => {
+      ajouterOmbrage(map, couleurs)
+    })
     map.on('movestart', () => {
       setEnMouvement(true)
     })

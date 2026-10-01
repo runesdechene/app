@@ -1,7 +1,7 @@
 import type { StyleSpecification } from 'maplibre-gl'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import type { CouleursCarte } from './couleursCarte'
-import { styleParchemin } from './styleCarte'
+import { ajouterOmbrage, styleParchemin } from './styleCarte'
 
 const couleurs: CouleursCarte = {
   fond: '#ecdcbb',
@@ -23,14 +23,36 @@ const base = {
   ],
 } as StyleSpecification
 
-test('les petites routes disparaissent, les forêts prennent l’olive pâle, l’ombrage est ajouté', () => {
+test('les petites routes disparaissent, les forêts prennent l’olive pâle', () => {
   const s = styleParchemin(base, couleurs)
   expect(s.layers.map((l) => l.id)).not.toContain('road_minor')
   expect(s.layers.find((l) => l.id === 'landcover_wood')?.paint).toMatchObject({
     'fill-color': couleurs.foret,
   })
-  expect(s.layers.some((l) => l.type === 'hillshade')).toBe(true)
   expect(s.terrain).toBeUndefined()
+})
+
+test('l’ombrage n’est pas dans le style : ses tuiles ne passent qu’après les lieux', () => {
+  const s = styleParchemin(base, couleurs)
+  expect(s.layers.some((l) => l.type === 'hillshade')).toBe(false)
+  expect(s.sources).toHaveProperty('relief')
+})
+
+test('l’ombrage se pose une fois, sous la première route', () => {
+  const addLayer = vi.fn()
+  const calques = [{ id: 'background' }, { id: 'road_major' }, { id: 'label_city' }]
+  const carte = {
+    getLayer: (id: string) => (addLayer.mock.calls.length > 0 && id === 'ombrage' ? {} : undefined),
+    getStyle: () => ({ layers: calques }),
+    addLayer,
+  }
+  ajouterOmbrage(carte, couleurs)
+  ajouterOmbrage(carte, couleurs)
+  expect(addLayer).toHaveBeenCalledTimes(1)
+  expect(addLayer).toHaveBeenCalledWith(
+    expect.objectContaining({ id: 'ombrage', type: 'hillshade', source: 'relief' }),
+    'road_major',
+  )
 })
 
 test('le style reçu n’est jamais modifié', () => {

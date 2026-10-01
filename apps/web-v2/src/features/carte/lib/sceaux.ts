@@ -6,6 +6,8 @@
  *            fluides sur un téléphone (spec Carte §3).
  * ATTENTION — une icône de type qui ne se charge ou ne se dessine pas retombe sur le losange par
  *            défaut : jamais une marque vide. Dessin en pixelRatio 2 (52 px = 26 px à l'écran).
+ *            Chaque icône ne se télécharge qu'une fois : `prechargerIcones` la demande dès que les
+ *            lieux arrivent, pendant que la carte prépare son fond (02/10).
  */
 import type { Map as Carte } from 'maplibre-gl'
 import iconeDefaut from '@/assets/ui/sceau-defaut.svg'
@@ -50,9 +52,25 @@ function chargerImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
-async function chargerIcone(src: string | null): Promise<HTMLImageElement> {
-  if (src === null) return chargerImage(iconeDefaut)
-  return chargerImage(src).catch(() => chargerImage(iconeDefaut))
+const icones = new Map<string | null, Promise<HTMLImageElement>>()
+
+function chargerIcone(src: string | null): Promise<HTMLImageElement> {
+  let icone = icones.get(src)
+  if (!icone) {
+    icone =
+      src === null
+        ? chargerImage(iconeDefaut)
+        : chargerImage(src).catch(() => chargerImage(iconeDefaut))
+    icones.set(src, icone)
+  }
+  return icone
+}
+
+// Les icônes des lieux connus, demandées sans attendre la carte.
+export function prechargerIcones(lieux: LieuCarte[]) {
+  for (const l of lieux) {
+    if (l.nature === 'lieu' && l.etat !== 'inconnu') void chargerIcone(l.icone)
+  }
 }
 
 // L'icône du type, recolorée d'une seule teinte (elle sert de pochoir).
@@ -198,7 +216,6 @@ export async function ajouterMarques(
   pilule(map, 'pilule-moi', c.encre, c.encre)
 
   const connus = lieux.filter((l) => l.nature === 'lieu' && l.etat !== 'inconnu')
-  const icones = new Map(connus.map((l) => [l.icone, chargerIcone(l.icone)]))
   await Promise.all(
     connus.map(async (l) => {
       const nom = nomImage(l, couleurTypes)
@@ -208,7 +225,7 @@ export async function ajouterMarques(
         if (couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
         return sceauVisite(icone, c)
       }
-      const icone = await (icones.get(l.icone) ?? chargerIcone(null))
+      const icone = await chargerIcone(l.icone)
       // Une icône qui se charge mais ne se dessine pas (SVG sans taille, par exemple) prend
       // l'icône par défaut ; si même celle-là échoue, l'erreur remonte à l'écran.
       let image: ImageData
