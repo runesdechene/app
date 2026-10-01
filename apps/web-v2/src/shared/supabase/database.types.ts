@@ -5842,10 +5842,6 @@ export type Database = {
       }
     }
     Functions: {
-      aimer_message: {
-        Args: { p_aime: boolean; p_message: number }
-        Returns: undefined
-      }
       _announcement_slugify: { Args: { p_title: string }; Returns: string }
       _answer_enigma_internal: {
         Args: { p_answer: string; p_enigma_id: number; p_user_id: string }
@@ -6203,6 +6199,10 @@ export type Database = {
         Returns: Json
       }
       aimer_lieu: { Args: { p_id: string }; Returns: Json }
+      aimer_message: {
+        Args: { p_aime: boolean; p_message: number }
+        Returns: undefined
+      }
       ajouter_lieu: {
         Args: {
           p_adresse: string
