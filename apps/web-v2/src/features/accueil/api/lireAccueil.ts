@@ -46,7 +46,9 @@ export type GrandsExplorateurs = {
   dixieme: number | null
 }
 
-export type TypeDeChemin = 'visite' | 'ajout' | 'arrivee'
+// connexion, revendication, enrichi : migration 406 (Uriel, 01/10 — « pour créer de la vie »).
+export type TypeDeChemin =
+  'visite' | 'ajout' | 'arrivee' | 'connexion' | 'revendication' | 'enrichi'
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
   type: TypeDeChemin
@@ -63,7 +65,14 @@ export type Chemin = {
   salue: boolean
 }
 
-const TYPES: readonly TypeDeChemin[] = ['visite', 'ajout', 'arrivee']
+const TYPES: readonly TypeDeChemin[] = [
+  'visite',
+  'ajout',
+  'arrivee',
+  'connexion',
+  'revendication',
+  'enrichi',
+]
 
 function typeDeChemin(v: unknown): TypeDeChemin {
   const t = TYPES.find((type) => type === v)

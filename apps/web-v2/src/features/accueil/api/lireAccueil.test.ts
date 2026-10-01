@@ -43,6 +43,15 @@ test('une ligne du fil se lit ; une arrivée n’a pas de lieu', () => {
   expect(arrivee?.lieu).toBeNull()
 })
 
+test('les connexions, revendications et récits enrichis se lisent (migration 406)', () => {
+  const lignes = lireChemins([
+    { ...CHEMIN, id: 'connexion:u1:1', type: 'connexion', lieu: null },
+    { ...CHEMIN, id: 'revendication:l1:u1:1', type: 'revendication' },
+    { ...CHEMIN, id: 'enrichi:l1:u1:1', type: 'enrichi' },
+  ])
+  expect(lignes.map((l) => l.type)).toEqual(['connexion', 'revendication', 'enrichi'])
+})
+
 test('un type de ligne inconnu est refusé, pas deviné', () => {
   expect(() => lireChemins([{ ...CHEMIN, type: 'couronne' }])).toThrow()
 })

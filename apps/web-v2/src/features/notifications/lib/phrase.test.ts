@@ -55,6 +55,15 @@ test('une mention cite le message ; un salut dit ce qui est salué', () => {
   expect(texte({ ...base, type: 'salut', evenement: 'arrivee', lieu: null })).toBe(
     'Kelpie a salué ton arrivée',
   )
+  expect(texte({ ...base, type: 'salut', evenement: 'connexion', lieu: null })).toBe(
+    'Kelpie a salué ton passage',
+  )
+  expect(texte({ ...base, type: 'salut', evenement: 'revendication', lieu: null })).toBe(
+    'Kelpie a salué ta revendication',
+  )
+  expect(texte({ ...base, type: 'salut', evenement: 'enrichi', lieu: null })).toBe(
+    'Kelpie a salué ton récit',
+  )
 })
 
 test('un lieu disparu, un compte effacé : la phrase tient quand même', () => {

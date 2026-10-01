@@ -1,6 +1,7 @@
 /**
- * QUOI     — « Sur les chemins » (maquette 27:2) : le fil de la communauté — qui a visité, ajouté
- *            un lieu, rejoint les Explorateurs — et son seul geste, Saluer (le cœur).
+ * QUOI     — « Sur les chemins » (maquette 27:2) : le fil de la communauté — qui a visité, ajouté,
+ *            revendiqué, enrichi un lieu, rejoint EXPLORE, vient de se connecter — et son seul
+ *            geste, Saluer (le cœur).
  * POURQUOI — spec V2 §5 : pas de commentaires, pas d'émojis ; un salut et son compteur. On ne
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
  *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes ; « Voir toute
@@ -11,6 +12,9 @@
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
+import drapeau from '@/assets/ui/drapeau.svg'
+import pas from '@/assets/ui/pas.svg'
+import plume from '@/assets/ui/plume.svg'
 import lieuIcone from '@/assets/ui/lieu.svg'
 import sectionChemins from '@/assets/ui/section-chemins.svg'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -23,8 +27,23 @@ import { useEnvols } from '@/shared/hooks/useEnvols'
 import { Envols } from '@/shared/ui/Envols'
 import styles from './SurLesChemins.module.css'
 
-const ICONES = { visite: cheminVisite, ajout: lieuIcone, arrivee: cheminArrivee }
-const VERBES = { visite: 'a visité', ajout: 'a ajouté', arrivee: 'a rejoint les Explorateurs' }
+const ICONES = {
+  visite: cheminVisite,
+  ajout: lieuIcone,
+  arrivee: cheminArrivee,
+  connexion: pas,
+  revendication: drapeau,
+  enrichi: plume,
+}
+// Les phrases d'Uriel (01/10) : une arrivée appelle la bienvenue.
+const VERBES = {
+  visite: 'a visité',
+  ajout: 'a ajouté',
+  arrivee: 'a rejoint EXPLORE ! Souhaite-lui la bienvenue !',
+  connexion: 'vient de se connecter',
+  revendication: 'vient de revendiquer',
+  enrichi: 'a enrichi',
+}
 const D_ABORD = 5
 
 export function SurLesChemins() {

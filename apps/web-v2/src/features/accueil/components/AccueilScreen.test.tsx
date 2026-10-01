@@ -75,6 +75,25 @@ beforeEach(() => {
       lieu: null,
       saluts: 0,
     },
+    {
+      ...VISITE,
+      id: 'connexion:u5:1',
+      type: 'connexion',
+      qui: { ...LUNA, id: 'u5', nom: 'Kelpie' },
+      lieu: null,
+    },
+    {
+      ...VISITE,
+      id: 'revendication:l3:u6:1',
+      type: 'revendication',
+      qui: { ...LUNA, id: 'u6', nom: 'Mathéo' },
+    },
+    {
+      ...VISITE,
+      id: 'enrichi:l3:u7:1',
+      type: 'enrichi',
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+    },
   ])
   api.saluer.mockResolvedValue({ saluts: 3, salue: true })
   position.positionSiAutorisee.mockResolvedValue({ latitude: 48.1, longitude: -1.6 })
@@ -119,11 +138,22 @@ test('un lieu ajouté récemment ouvre sa fiche dans l’Accueil', async () => {
 test('le fil dit qui a fait quoi, où et quand', async () => {
   monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
-  const [visite, ajout, arrivee] = within(fil).getAllByRole('listitem')
+  const [visite, ajout, arrivee, connexion, revendication] = within(fil).getAllByRole('listitem')
   expect(visite).toHaveTextContent('Luna a visité Pointe du Becquet')
   expect(visite).toHaveTextContent('Manche, à l’instant')
   expect(ajout).toHaveTextContent('Uriel a ajouté Menhir de Kerloas')
-  expect(arrivee).toHaveTextContent('Claire a rejoint les Explorateurs')
+  expect(arrivee).toHaveTextContent('Claire a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
+  expect(connexion).toHaveTextContent('Kelpie vient de se connecter')
+  expect(revendication).toHaveTextContent('Mathéo vient de revendiquer Pointe du Becquet')
+})
+
+test('un récit enrichi se dit aussi', async () => {
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'enrichi:l3:u7:1', type: 'enrichi', qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getByRole('listitem')).toHaveTextContent('Aelis a enrichi Pointe du Becquet')
 })
 
 test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
