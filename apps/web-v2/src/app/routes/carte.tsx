@@ -5,13 +5,18 @@
  *            reçoivent le cadre de détail et la fonction de fermeture.
  * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
  */
+import { lazy, Suspense } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
-import { ParcoursAjout } from '@/features/ajout/components/ParcoursAjout'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
+
+// Le parcours d'ajout porte une carte (MapLibre) : il se charge à l'ouverture, pas avant.
+const ParcoursAjout = lazy(() =>
+  import('@/features/ajout/components/ParcoursAjout').then((m) => ({ default: m.ParcoursAjout })),
+)
 
 // /<onglet>/ajouter — la feuille du « + » (maquette 201:216)
 export function RouteAjouter() {
@@ -27,16 +32,18 @@ export function RouteAjouterLieu() {
   const { key } = useLocation()
   const navigate = useNavigate()
   return (
-    <ParcoursAjout
-      etape={etape}
-      onQuitter={() => {
-        if (key === 'default') void navigate(`/${tab}`, { replace: true })
-        else void navigate(-1)
-      }}
-      onVoirLieu={(id) => {
-        void navigate(`/${tab}/lieu/${id}`, { replace: true })
-      }}
-    />
+    <Suspense fallback={null}>
+      <ParcoursAjout
+        etape={etape}
+        onQuitter={() => {
+          if (key === 'default') void navigate(`/${tab}`, { replace: true })
+          else void navigate(-1)
+        }}
+        onVoirLieu={(id) => {
+          void navigate(`/${tab}/lieu/${id}`, { replace: true })
+        }}
+      />
+    </Suspense>
   )
 }
 

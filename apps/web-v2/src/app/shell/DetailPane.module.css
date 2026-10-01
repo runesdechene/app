@@ -14,7 +14,7 @@
 
   /* Le même parchemin que les écrans ; il reste en place pendant que le contenu défile. */
   background:
-    url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat,
+    url('../../assets/ui/fond-parchemin.webp') center top / cover no-repeat,
     var(--color-fond);
   padding-top: env(safe-area-inset-top);
 }

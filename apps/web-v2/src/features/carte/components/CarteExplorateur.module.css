@@ -13,7 +13,7 @@
   padding: var(--space-6) var(--space-4) var(--space-2);
   overflow: hidden;
   border-radius: var(--radius-carte) var(--radius-carte) 0 0;
-  background: url('../../../assets/ui/fond-parchemin.png') center top / cover no-repeat;
+  background: url('../../../assets/ui/fond-parchemin.webp') center top / cover no-repeat;
   text-align: center;
 }
 

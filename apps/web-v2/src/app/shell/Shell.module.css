@@ -203,7 +203,7 @@
     /* Le parchemin des écrans du téléphone (global.css), ici porté par le tiroir lui-même : il
        reste en place pendant que le contenu défile. */
     background:
-      url('../../assets/ui/fond-parchemin.png') center top / cover no-repeat,
+      url('../../assets/ui/fond-parchemin.webp') center top / cover no-repeat,
       var(--color-fond);
     box-shadow: 6px 0 24px color-mix(in srgb, var(--color-ombre) 18%, transparent); /* 30 % − 40 % (Uriel, 28/09) */
     transition: translate var(--duree-douce) var(--courbe-douce);

@@ -38,7 +38,7 @@
     border: 10px solid var(--color-encre);
     border-radius: 48px;
     padding: var(--space-8) var(--space-4) var(--space-6);
-    background: var(--color-fond) url('../../assets/ui/fond-parchemin.png') top center / 100% auto
+    background: var(--color-fond) url('../../assets/ui/fond-parchemin.webp') top center / 100% auto
       no-repeat;
     box-shadow: var(--ombre-bouton);
     scrollbar-width: none;

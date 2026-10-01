@@ -11,13 +11,26 @@
  *            réagit pas : un clic égaré ne doit pas faire perdre une inscription en cours. Sur
  *            téléphone, l'onboarding reste plein écran et la carte n'est pas chargée.
  */
+import { lazy, Suspense } from 'react'
 import { Link, Outlet } from 'react-router'
-import { CarteVisiteur } from '@/features/carte/components/CarteScreen'
 import { Onboarding } from '@/features/onboarding/components/Onboarding'
 import { ApercuLieu } from '@/features/vitrine/components/ApercuLieu'
 import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import styles from './vitrine.module.css'
+
+// La carte des visiteurs (MapLibre) se charge à part : la vitrine s'affiche d'abord.
+const CarteVisiteurChargee = lazy(() =>
+  import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteVisiteur })),
+)
+
+function CarteVisiteur() {
+  return (
+    <Suspense fallback={null}>
+      <CarteVisiteurChargee />
+    </Suspense>
+  )
+}
 
 export function RouteCarteVisiteur() {
   const connecte = useConnecte()

@@ -4,7 +4,7 @@
  *            ici est ce qui s'affiche. `inert` la rend non cliquable : on la montre, on ne
  *            navigue pas depuis la page de DA.
  */
-import logotype from '@/assets/ui/logotype.png'
+import logotype from '@/assets/ui/logotype.webp'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { TabBar } from '../shell/TabBar'
 import styles from './DaPage.module.css'

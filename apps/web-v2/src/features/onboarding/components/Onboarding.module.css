@@ -12,7 +12,7 @@
   max-width: 480px;
   margin: 0 auto;
   background:
-    url('../../../assets/ui/fond-parchemin.png') center top / 100% auto no-repeat,
+    url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto no-repeat,
     var(--color-fond);
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
 }

@@ -12,10 +12,9 @@
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
-import { CarteScreen } from '@/features/carte/components/CarteScreen'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
@@ -28,7 +27,7 @@ import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
 import engrenage from '@/assets/ui/engrenage.svg'
-import logotype from '@/assets/ui/logotype.png'
+import logotype from '@/assets/ui/logotype.webp'
 import replier from '@/assets/ui/replier.svg'
 import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
@@ -36,6 +35,7 @@ import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
 import { VERSION } from '@/shared/lib/version'
+import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
 import { TABS, type TabId } from '../navigation/tabs'
@@ -49,10 +49,20 @@ const SCREENS: Record<TabId, () => ReactNode> = {
   compte: CompteScreen,
 }
 
+// La carte et son moteur (MapLibre, le plus gros morceau de l'app) ne se chargent qu'à l'ouverture
+// de la carte : le premier écran répond sans attendre.
+const CarteScreen = lazy(() =>
+  import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteScreen })),
+)
+
 // La carte de la coquille : la jauge d'énergie sous la recherche, et son propre portrait.
 function CarteDeLaCoquille() {
   const { profil } = useExplorateur(useMonIdentifiant())
-  return <CarteScreen sousLaRecherche={<JaugeEnergie />} monAvatar={profil?.avatarUrl ?? null} />
+  return (
+    <Suspense fallback={null}>
+      <CarteScreen sousLaRecherche={<JaugeEnergie />} monAvatar={profil?.avatarUrl ?? null} />
+    </Suspense>
+  )
 }
 
 export function Shell() {
@@ -71,6 +81,13 @@ export function Shell() {
   // La coquille elle-même : toutes les feuilles s'y posent, leur voile couvre toute l'app.
   const [racine, setRacine] = useState<HTMLDivElement | null>(null)
   if (active !== null && active !== 'carte' && active !== dernierTiroir) setDernierTiroir(active)
+  // Un onglet ne démarre qu'à sa première visite, puis reste monté (il garde sa place) : à
+  // l'ouverture, seul l'écran regardé charge ses images et ses données. Sur ordinateur, la carte
+  // est toujours visible derrière le tiroir : elle démarre d'emblée.
+  const [visites, setVisites] = useState<ReadonlySet<TabId>>(() => new Set(active ? [active] : []))
+  if (active !== null && !visites.has(active)) setVisites(new Set([...visites, active]))
+  const surOrdinateur = useSurOrdinateur()
+  const monte = (id: TabId) => visites.has(id) || (id === 'carte' && surOrdinateur)
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
   const boutonAjouter = useRef<HTMLButtonElement>(null)
   const overlayWasOpen = useRef(false)
@@ -192,7 +209,7 @@ export function Shell() {
                   scrollers.current[id] = element
                 }}
               >
-                <Screen />
+                {monte(id) && <Screen />}
               </section>
             )
           })}

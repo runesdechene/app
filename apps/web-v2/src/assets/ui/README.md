@@ -5,8 +5,8 @@ remplacer une image : écraser le fichier **sous le même nom**. Aucun code à t
 
 | Fichier                                                                                 | Taille actuelle  | Où il s'affiche                                                                                                  |
 | --------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `fond-parchemin.png`                                                                    | 390 × 732 (1x)   | fond de tous les écrans et des détails — **à ré-exporter en @3x**                                                |
-| `logotype.png`                                                                          | 2520 × 455       | bandeau, à gauche (affiché en 216 × 39)                                                                          |
+| `fond-parchemin.webp`                                                                    | 390 × 732 (1x)   | fond de tous les écrans et des détails — **à ré-exporter en @3x**                                                |
+| `logotype.webp`                                                                          | 864 × 156        | bandeau, à gauche (affiché en 216 × 39)                                                                          |
 | `logo-explore.webp`                                                                     | 1263 × 287       | la vitrine sur ordinateur : le logo en ligne avec « EXPLORE », peint en crème (pochoir)                          |
 | `barre-lisiere.png`                                                                     | 1024 × 40        | lisière de forêt au-dessus de la barre d'onglets                                                                 |
 | `onglet-accueil.png`                                                                    | 120 × 120        | icône de l'onglet Accueil (affichée en 24 px)                                                                    |

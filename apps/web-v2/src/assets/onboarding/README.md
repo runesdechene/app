@@ -16,4 +16,4 @@ et passées en WebP. Pour remplacer une image : écraser le fichier **sous le m�
 | `vetement.svg`              | E-mail et Nom : le vêtement (« Tu as déjà un vêtement… »)             |
 | `voyageur.webp`             | Bienvenue : le voyageur sur son rocher                                |
 
-Le fond est le parchemin des écrans (`../ui/fond-parchemin.png`), déjà là.
+Le fond est le parchemin des écrans (`../ui/fond-parchemin.webp`), déjà là.

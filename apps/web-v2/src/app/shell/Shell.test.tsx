@@ -3,7 +3,7 @@
  * POURQUOI — c'est la promesse centrale de la navigation (spec socle §4bis).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, vi } from 'vitest'
@@ -71,6 +71,20 @@ function renderAt(path: string | string[]) {
   )
   return router
 }
+
+test('sur téléphone, un onglet ne démarre qu’à sa première visite, puis reste monté', async () => {
+  const router = renderAt('/accueil')
+  await screen.findByText('La loutre')
+  expect(screen.queryByTestId('carte')).toBeNull()
+  await act(async () => {
+    await router.navigate('/carte')
+  })
+  expect(await screen.findByTestId('carte')).toBeInTheDocument()
+  await act(async () => {
+    await router.navigate('/accueil')
+  })
+  expect(screen.getByTestId('carte')).toBeInTheDocument()
+})
 
 test('/ redirige vers l’Accueil', async () => {
   const router = renderAt('/')
