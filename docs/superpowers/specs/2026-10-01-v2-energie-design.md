@@ -69,6 +69,23 @@ Le registre de purge reçoit : `users.max_energy`, `factions.bonus_*energy*`,
 - Après une découverte payante, la jauge se met à jour sans recharger la page (cache TanStack
   Query invalidé).
 
+## Le Hub : une page « Énergie »
+
+Une page dédiée, pour les administrateurs, qui règle sans toucher au code :
+
+- **le maximum sans Fragment** (`default_max_energy`, 10) — le joueur a ce chiffre + 1 par Fragment ;
+- **le temps de reprise d'un point** (`energy_base_cycle`, saisi en minutes, 60) ;
+- **les distances et les prix** : la zone gratuite (100 km), les deux paliers (500, 1 500 km) et
+  les trois coûts (1, 2, 3).
+
+Elle écrit dans `app_settings` comme le fait déjà la page « Réglages ». Un rappel en tête dit ce
+que vit le joueur avec les valeurs saisies (« 10 points + 1 par Fragment, un point toutes les
+60 min, gratuit à moins de 100 km… »).
+
+La page « Réglages » perd sa partie énergie : le maximum par joueur (`users.max_energy`, ignoré
+désormais) et le temps de recharge (déplacé ici). Ses paliers de distance restent : ce sont ceux
+de la V1, jusqu'à la bascule.
+
 ## Erreurs et cas limites
 
 - Le serveur a toujours le dernier mot. Si l'écran a affiché un prix et que le serveur refuse
