@@ -1,6 +1,7 @@
 /*
  * QUOI     — un message du Registre (maquette 45:278) : heure pâle, portrait, nom gris, texte
- *            16 px ; ses cœurs sous le texte, et le cœur qui remplace l'heure au survol sur PC.
+ *            16 px ; ses cœurs sous le texte (le mien, puis qui a aimé), le cœur qui remplace l'heure
+ *            au survol sur PC, et la liste de qui a aimé.
  */
 .message,
 .suite {
@@ -64,39 +65,64 @@
   font-weight: var(--weight-gras);
 }
 
-/* Les cœurs reçus : sous le texte, la pastille des saluts de l'Accueil. */
+/* Les cœurs : sous le texte, une pastille — mon cœur, puis les portraits et le nombre. */
 .coeurs {
-  position: relative;
   display: inline-flex;
   grid-column: 2;
   justify-self: start;
   align-items: center;
   gap: var(--space-1);
-  height: 20px;
+  height: 24px;
   margin-top: calc(-1 * var(--space-1));
   padding: 0 var(--space-2);
-  border: none;
   border-radius: var(--radius-rond);
   background: var(--color-sable);
   color: var(--color-texte-doux);
-  font-family: var(--font-corps);
-  font-size: var(--legende-size);
-  transition:
-    background var(--duree-douce) var(--courbe-douce),
-    scale var(--duree-elan) var(--courbe-elan);
 }
 
-button.coeurs {
+.basculer,
+.qui {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
   cursor: pointer;
 }
 
-.coeurs[aria-pressed='true'] {
-  background: var(--color-accent-clair);
+.basculer {
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: var(--radius-rond);
+  transition:
+    color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.basculer[aria-pressed='true'] {
   color: var(--color-accent);
 }
 
-.coeurs:active {
-  scale: 0.9;
+.basculer:active {
+  scale: 0.85;
+}
+
+/* Les portraits se chevauchent un peu, le nombre suit. */
+.qui {
+  gap: var(--space-1);
+}
+
+.qui > * + * {
+  margin-left: -8px;
+}
+
+.qui > :last-child:not(:first-child) {
+  margin-left: 0;
 }
 
 /* Sans cœur encore : sur PC, un cœur prend la place de l'heure au survol ; au téléphone, le
@@ -159,6 +185,25 @@ button.coeurs {
   mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
 }
 
+/* La liste de qui a aimé, dans la feuille. */
+.liste {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  text-decoration: none;
+}
+
 @keyframes apparaitre {
   from {
     opacity: 0;
@@ -172,7 +217,7 @@ button.coeurs {
     animation: none;
   }
 
-  .coeurs,
+  .basculer,
   .aimer,
   .heure {
     transition: none;

@@ -14,8 +14,8 @@ function message(id: number, quand: string): Message {
     moi: false,
     mentions: [],
     mentionneMoi: false,
-    saluts: 0,
-    salue: false,
+    coeurs: [],
+    aime: false,
   }
 }
 

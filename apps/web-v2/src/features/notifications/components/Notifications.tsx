@@ -51,7 +51,7 @@ export function Notifications() {
   )
 }
 
-// Où mène une notification : le lieu, le Registre pour une mention ou un cœur sur un message, les
+// Où mène une notification : le lieu, le Registre pour une mention ou un message aimé, les
 // Nouveautés pour une mise à jour, nulle part sinon.
 function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'

@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -18,7 +18,7 @@ const api = vi.hoisted(() => ({
   fetchRegistreNonLus: vi.fn(() => Promise.resolve({ messages: 0, mentions: 0 })),
   marquerRegistreLu: vi.fn(() => Promise.resolve()),
   fetchPassages: vi.fn<() => Promise<Passage[]>>(() => Promise.resolve([])),
-  saluerMessage: vi.fn(() => Promise.resolve()),
+  aimerMessage: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/registre', () => api)
 
@@ -27,11 +27,11 @@ const GAUTIER = { id: 'u2', nom: 'Gautier', avatar: null }
 const KELPIE = { id: 'u9', nom: 'Kelpie', avatar: null }
 const ASH = { id: 'u8', nom: 'Ash', avatar: null }
 
-// Un message de Gautier, et ses cœurs.
-function balade(saluts: number, salue: boolean) {
+// Un message de Gautier, et qui l'a aimé.
+function balade(coeurs: (typeof URIEL)[], aime: boolean) {
   const quand = '2026-09-28T07:12:00Z'
   const message = { id: 7, canal: 'general', texte: 'Belle balade hier.', quand, auteur: GAUTIER }
-  return { ...message, moi: false, mentions: [], mentionneMoi: false, saluts, salue }
+  return { ...message, moi: false, mentions: [], mentionneMoi: false, coeurs, aime }
 }
 
 beforeEach(() => {
@@ -46,6 +46,8 @@ beforeEach(() => {
       moi: true,
       mentions: [],
       mentionneMoi: false,
+      coeurs: [],
+      aime: false,
     },
     {
       id: 2,
@@ -56,6 +58,8 @@ beforeEach(() => {
       moi: false,
       mentions: [],
       mentionneMoi: false,
+      coeurs: [],
+      aime: false,
     },
   ])
   api.ecrire.mockResolvedValue(undefined)
@@ -114,6 +118,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       moi: false,
       mentions: [],
       mentionneMoi: false,
+      coeurs: [],
+      aime: false,
     },
     {
       id: 2,
@@ -124,6 +130,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       moi: false,
       mentions: [],
       mentionneMoi: false,
+      coeurs: [],
+      aime: false,
     },
     {
       id: 3,
@@ -134,6 +142,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
       moi: false,
       mentions: [],
       mentionneMoi: false,
+      coeurs: [],
+      aime: false,
     },
   ])
   monter()
@@ -156,6 +166,8 @@ test('dans un groupe, le préfixe « Bug & Suggestions » ne s’écrit qu’une
     moi: false,
     mentions: [],
     mentionneMoi: false,
+    coeurs: [],
+    aime: false,
   })
   api.fetchRegistre.mockResolvedValue([
     bug(1, 14, 'La carte ne charge pas.'),
@@ -182,6 +194,8 @@ test('un séparateur à chaque nouveau jour ; minuit coupe un groupe', async () 
     moi: false,
     mentions: [],
     mentionneMoi: false,
+    coeurs: [],
+    aime: false,
   })
   api.fetchRegistre.mockResolvedValue([
     message(1, new Date(2026, 8, 27, 23, 58), 'Bonne nuit.'),
@@ -294,6 +308,8 @@ test('une mention s’affiche en lien vers le profil ; un message qui me mention
       moi: false,
       mentions: [{ id: 'u1', nom: 'Uriel' }],
       mentionneMoi: true,
+      coeurs: [],
+      aime: false,
     },
   ])
   monter()
@@ -310,63 +326,12 @@ test('le Registre ouvert est lu : le marqueur avance', async () => {
   })
 })
 
-test('un cœur sur le message d’un autre : le compteur monte tout de suite', async () => {
-  api.fetchRegistre.mockResolvedValue([balade(2, false)])
+test('aimer un message passe par la base : un cœur, puis le Registre se relit', async () => {
+  api.fetchRegistre.mockResolvedValue([balade([], false)])
   monter()
-  const coeur = await screen.findByRole('button', { name: 'Saluer le message de Gautier (2)' })
-  api.fetchRegistre.mockResolvedValue([balade(3, true)])
+  const coeur = await screen.findByRole('button', { name: 'Aimer le message de Gautier' })
+  api.fetchRegistre.mockResolvedValue([balade([URIEL], true)])
   await userEvent.click(coeur)
-  expect(api.saluerMessage).toHaveBeenCalledWith(7)
-  expect(
-    await screen.findByRole('button', { name: 'Saluer le message de Gautier (3)' }),
-  ).toHaveAttribute('aria-pressed', 'true')
-})
-
-test('sans cœur, le bouton reste discret ; le premier cœur fait apparaître le compteur', async () => {
-  api.fetchRegistre.mockResolvedValue([balade(0, false)])
-  monter()
-  const coeur = await screen.findByRole('button', { name: 'Saluer le message de Gautier' })
-  expect(coeur).toHaveTextContent(/^$/)
-  api.fetchRegistre.mockResolvedValue([balade(1, true)])
-  await userEvent.click(coeur)
-  expect(
-    await screen.findByRole('button', { name: 'Saluer le message de Gautier (1)' }),
-  ).toHaveTextContent('1')
-})
-
-test('au téléphone, un double toucher sur le message envoie un cœur', async () => {
-  api.fetchRegistre.mockResolvedValue([balade(0, false)])
-  monter()
-  const texte = await screen.findByText('Belle balade hier.')
-  fireEvent.pointerUp(texte, { pointerType: 'touch' })
-  expect(api.saluerMessage).not.toHaveBeenCalled()
-  fireEvent.pointerUp(texte, { pointerType: 'touch' })
-  await waitFor(() => {
-    expect(api.saluerMessage).toHaveBeenCalledWith(7)
-  })
-})
-
-test('mon message ne se salue pas : ses cœurs se lisent sans bouton', async () => {
-  api.fetchRegistre.mockResolvedValue([
-    {
-      id: 8,
-      canal: 'general',
-      texte: 'Merci à tous.',
-      quand: '2026-09-28T07:12:00Z',
-      auteur: URIEL,
-      moi: true,
-      mentions: [],
-      mentionneMoi: false,
-      saluts: 4,
-      salue: false,
-    },
-  ])
-  monter()
-  const message = (await screen.findByText('Merci à tous.')).closest('li')
-  if (!message) throw new Error('ligne absente')
-  expect(within(message).queryByRole('button', { name: /Saluer/ })).toBeNull()
-  expect(message).toHaveTextContent('4')
-  fireEvent.pointerUp(message, { pointerType: 'touch' })
-  fireEvent.pointerUp(message, { pointerType: 'touch' })
-  expect(api.saluerMessage).not.toHaveBeenCalled()
+  expect(api.aimerMessage).toHaveBeenCalledWith(7, true)
+  expect(await screen.findByRole('button', { name: 'Voir qui a aimé (1)' })).toBeInTheDocument()
 })

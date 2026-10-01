@@ -56,7 +56,7 @@ test('une mention cite le message ; un salut dit ce qui est salué', () => {
     'Kelpie a salué ton arrivée',
   )
   expect(texte({ ...base, type: 'salut', evenement: 'message', lieu: null })).toBe(
-    'Kelpie a salué ton message',
+    'Kelpie a aimé ton message',
   )
   expect(texte({ ...base, type: 'salut', evenement: 'connexion', lieu: null })).toBe(
     'Kelpie a salué ton passage',

@@ -11,7 +11,7 @@
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
  *            gens qui passent (migration 408) : qui a rejoint EXPLORE — on lui souhaite la
  *            bienvenue sur place —, qui vient de se connecter. Chaque message se dessine par
- *            `LigneMessage`, avec ses cœurs (migration 409).
+ *            `LigneMessage`, avec ses cœurs (migration 410).
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -36,7 +36,7 @@ const NOMS: Record<Canal, { filtre: string; court: string }> = {
 }
 
 export function Registre() {
-  const { messages, passages, erreur, ecrire, saluer, echecEnvoi } = useRegistre()
+  const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
   // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
@@ -126,7 +126,13 @@ export function Registre() {
           return (
             <Fragment key={m.id}>
               {jour}
-              <LigneMessage message={m} suite={suite} prefixe={prefixe} onSaluer={saluer} />
+              <LigneMessage
+                message={m}
+                suite={suite}
+                prefixe={prefixe}
+                aimeEnCours={aimeEnCours?.id === m.id ? aimeEnCours.aime : undefined}
+                onAimer={aimer}
+              />
             </Fragment>
           )
         })}

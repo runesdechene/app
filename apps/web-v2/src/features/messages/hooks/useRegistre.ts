@@ -4,28 +4,27 @@
  *            recoller à la main. Écrire relit aussi : son message apparaît tout de suite.
  *            Le Registre ouvert est lu : chaque liste reçue marque « lu jusqu'ici » (migration 394),
  *            et le point des messages ratés s'éteint.
- *            Un cœur sur un message (migration 409) compte tout de suite ; quand la rafale est
- *            finie, le Registre se relit (même motif que les saluts de l'Accueil).
+ *            Un cœur sur un message (migration 410) : celui qu'on envoie se montre tout de suite
+ *            (`aimeEnCours`), puis le Registre se relit et la base fait foi.
  *            Les gens qui passent (migration 408) n'arrivent pas en temps réel : ils sont relus
  *            chaque minute, et à chaque nouveau message. Ils ne comptent pas dans les non-lus.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import type { Canal, Message } from '../api/lireRegistre'
+import type { Canal } from '../api/lireRegistre'
 import {
   ecouterRegistre,
   ecrire,
   fetchPassages,
   fetchRegistre,
   fetchRegistreNonLus,
+  aimerMessage,
   marquerRegistreLu,
-  saluerMessage,
 } from '../api/registre'
 
 const registreKey = ['registre'] as const
 const nonLusKey = ['registre', 'nonLus'] as const
 const passagesKey = ['registre', 'passages'] as const
-const saluerKey = ['saluer-message'] as const
 
 export function useRegistre() {
   const queryClient = useQueryClient()
@@ -59,28 +58,18 @@ export function useRegistre() {
     },
   })
 
-  const salut = useMutation({
-    mutationKey: saluerKey,
-    mutationFn: (id: number) => saluerMessage(id),
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: registreKey, exact: true })
-      queryClient.setQueryData<Message[]>(registreKey, (messages) =>
-        messages?.map((m) => (m.id === id ? { ...m, saluts: m.saluts + 1, salue: true } : m)),
-      )
-    },
-    onSettled: () => {
-      // Cet envoi compte encore parmi ceux en cours : 1, c'est le dernier de la rafale.
-      if (queryClient.isMutating({ mutationKey: saluerKey }) === 1) {
-        void queryClient.invalidateQueries({ queryKey: registreKey, exact: true })
-      }
-    },
+  const coeur = useMutation({
+    mutationFn: (v: { id: number; aime: boolean }) => aimerMessage(v.id, v.aime),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: registreKey, exact: true }),
   })
 
   return {
     messages: query.data,
-    saluer: (id: number) => {
-      salut.mutate(id)
+    aimer: (id: number, aime: boolean) => {
+      coeur.mutate({ id, aime })
     },
+    // Le cœur parti, pas encore compté par la base.
+    aimeEnCours: coeur.isPending ? coeur.variables : null,
     // Sans eux, le Registre reste entier : un passage manqué ne vaut pas une alerte.
     passages: passages.data ?? [],
     erreur: query.isError,

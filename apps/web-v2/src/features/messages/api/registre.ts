@@ -37,9 +37,10 @@ export async function ecrire(canal: Canal, texte: string, mentions: string[]) {
   if (error) throw error
 }
 
-// Un cœur de plus sur un message (migration 409) : la base refuse son propre message.
-export async function saluerMessage(id: number) {
-  const { error } = await supabase.rpc('saluer', { p_evenement: `message:${String(id)}` })
+// Aimer un message, ou ne plus l'aimer : un cœur par personne (migration 410). La base refuse
+// son propre message.
+export async function aimerMessage(id: number, aime: boolean) {
+  const { error } = await supabase.rpc('aimer_message', { p_message: id, p_aime: aime })
   if (error) throw error
 }
 
