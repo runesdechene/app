@@ -18,8 +18,8 @@ carte paraît vide. Voir passer d'autres Explorateurs donne le sentiment de vie.
   50 km, le portrait au centre, « quelque part par ici ». Jamais un faux point précis.
 - **Parti depuis moins d'une heure** : le portrait reste, désaturé et transparent, avec « il y a
   23 min ». Au-delà d'une heure, il disparaît.
-- **Tout le monde est montré**, sans groupes. De très loin (zoom < 6), les portraits deviennent de
-  petites pastilles, pour que la carte reste lisible.
+- **Tout le monde est montré**, sans groupes, portraits et noms à tout zoom (Uriel, 01/10 : même
+  dézoomé au maximum, on voit les gens).
 - **« X actifs »** à côté de la jauge d'énergie : en ligne et passés dans l'heure, soi exclu.
 
 ## Ce qu'on touche

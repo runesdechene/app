@@ -19,6 +19,7 @@ import pas from '@/assets/ui/pas.svg'
 import question from '@/assets/ui/question.svg'
 import repere from '@/assets/ui/repere.svg'
 import { revenirALaV1 } from '@/shared/lib/ancienneExplore'
+import { VERSION } from '@/shared/lib/version'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -133,7 +134,7 @@ export function PreferencesPage() {
         </button>
       </Carte>
 
-      <Text variant="libelle">Runes de Chêne — Porte l’Histoire</Text>
+      <Text variant="libelle">Runes de Chêne — Porte l’Histoire · {VERSION}</Text>
     </div>
   )
 }

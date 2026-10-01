@@ -10,13 +10,22 @@
 /// <reference types="vitest/config" />
 import path from 'node:path'
 import react from '@vitejs/plugin-react'
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+// La version affichée en bas de la barre (shared/lib/version.ts) : celle de package.json.
+const { version } = JSON.parse(
+  readFileSync(path.resolve(import.meta.dirname, 'package.json'), 'utf-8'),
+) as {
+  version: string
+}
 
 const FOND = '#fcf3e4' // --color-fond (tokens.css) — le manifeste ne lit pas les variables CSS.
 
 export default defineConfig({
   base: '/v2/',
+  define: { __VERSION__: JSON.stringify(version) },
   envDir: path.resolve(import.meta.dirname, '../..'),
   plugins: [
     react(),

@@ -35,6 +35,7 @@ import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
 import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
+import { VERSION } from '@/shared/lib/version'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
 import { TABS, type TabId } from '../navigation/tabs'
@@ -123,6 +124,8 @@ export function Shell() {
         <a className={styles.retourV1} href={V1_URL} onClick={choisirLaV1}>
           <Text variant="libelle">Revenir V1</Text>
         </a>
+        {/* Uriel, 01/10 : le numéro qui dit que le dernier déploiement est arrivé. */}
+        <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>
           <button
             ref={boutonAjouter}

@@ -50,6 +50,18 @@ interactif du projet et plante sans terminal. Créer un site par l'API, hors du 
 après le premier déploiement). Vérifier toute nouvelle redirection avec
 `curl -sL -o /dev/null -w "%{http_code} %{num_redirects}" <url>`.
 
+## V2 : monter la version avant chaque déploiement
+
+La V2 affiche « Pythéas 1.0.0 » en bas de sa barre (et en bas des Préférences sur mobile) : Uriel
+s'en sert pour savoir que le déploiement est arrivé (01/10/2026). Le numéro vient de
+`apps/web-v2/package.json` (`version`), posé au build par Vite (`__VERSION__`).
+
+**How to apply :** avant chaque `netlify deploy` de la V2, monter `version` — le dernier chiffre pour
+une correction (1.0.1), celui du milieu pour une fonctionnalité (1.1.0) — puis `pnpm build`, puis
+déployer. Le nom (Pythéas) vaut pour toute la 1.x ; une grande refonte change de nom et de premier
+chiffre. Le service worker de la V2 sert l'ancienne version jusqu'au rechargement suivant : si le
+numéro n'a pas bougé, recharger d'abord.
+
 ## Netlify deploy — toujours chemin absolu
 
 Toujours utiliser le chemin absolu pour `--dir` dans `netlify deploy`.

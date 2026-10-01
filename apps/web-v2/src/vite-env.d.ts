@@ -11,3 +11,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Le numéro de version de package.json, posé par Vite au build (vite.config.ts).
+declare const __VERSION__: string
