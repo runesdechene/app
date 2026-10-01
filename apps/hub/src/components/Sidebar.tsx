@@ -76,6 +76,7 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
             <NavLink to="/carte/enigmes" className={({ isActive }) => isActive ? 'active' : ''}>Enigmes</NavLink>
             <NavLink to="/carte/missions" className={({ isActive }) => isActive ? 'active' : ''}>Missions</NavLink>
             <NavLink to="/carte/reglages" className={({ isActive }) => isActive ? 'active' : ''}>Reglages</NavLink>
+            <NavLink to="/carte/energie" className={({ isActive }) => isActive ? 'active' : ''}>Énergie</NavLink>
             <NavLink to="/carte/divers" className={({ isActive }) => isActive ? 'active' : ''}>Divers</NavLink>
             <NavLink to="/carte/landing" className={({ isActive }) => isActive ? 'active' : ''}>Page d'accueil</NavLink>
             <NavLink to="/carte/regles" className={({ isActive }) => isActive ? 'active' : ''}>Règles</NavLink>

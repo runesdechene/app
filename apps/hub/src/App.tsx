@@ -21,6 +21,7 @@ import { Banners } from './components/Banners'
 import { Enigmas } from './components/Enigmas'
 import { Missions } from './components/Missions'
 import { Settings } from './components/Settings'
+import { Energie } from './components/Energie'
 import { GameRules } from './components/GameRules'
 import { TutorialManager } from './components/TutorialManager'
 import { ShopifySync } from './components/ShopifySync'
@@ -120,6 +121,7 @@ function App() {
           <Route path="/carte/enigmes" element={<Enigmas />} />
           <Route path="/carte/missions" element={<Missions />} />
           <Route path="/carte/reglages" element={<Settings />} />
+          <Route path="/carte/energie" element={<Energie />} />
           <Route path="/carte/divers" element={<Divers />} />
           <Route path="/carte/landing" element={<LandingConfig />} />
           <Route path="/carte/regles" element={<GameRules />} />
