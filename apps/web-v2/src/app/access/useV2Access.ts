@@ -8,12 +8,15 @@
  *            Délai de ACCESS_TIMEOUT_MS : hors connexion, supabase-js peut réessayer pendant des
  *            dizaines de secondes ; au-delà du délai, on bascule en `error` plutôt qu'attendre.
  *            Connexion ou déconnexion (y compris dans un onglet V1) → la vérification est refaite.
- *            Une entrée autorisée met à jour la dernière connexion (touch_last_login), comme la V1.
+ *            Une entrée autorisée met à jour la dernière connexion (touch_last_login), comme la V1 ;
+ *            un retour dans l'app aussi, après dix minutes ailleurs (`retours.ts`) : c'est ce que
+ *            « vient de se connecter » raconte dans le Registre.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { supabase } from '@/shared/supabase/client'
 import type { AccessState } from './decideAccess'
+import { compterLesRetours } from './retours'
 
 export const ACCESS_TIMEOUT_MS = 8000
 const ACCESS_KEY = ['v2-access']
@@ -25,11 +28,14 @@ async function fetchAccess(): Promise<{ hasSession: boolean; hasAccess: boolean 
 
   const { data, error } = await supabase.rpc('has_v2_access')
   if (error) throw error
-  // La dernière connexion (l'en-tête d'un Murmure la montre) : sans attendre, sans bloquer.
-  if (data) {
-    void supabase.rpc('touch_last_login', { p_user_id: sessionData.session.user.id })
-  }
+  if (data) noterLaConnexion(sessionData.session.user.id)
   return { hasSession: true, hasAccess: data }
+}
+
+// La dernière connexion (l'en-tête d'un Murmure, le Registre, le Hub la lisent) : sans attendre,
+// sans bloquer.
+function noterLaConnexion(userId: string) {
+  void supabase.rpc('touch_last_login', { p_user_id: userId })
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -69,6 +75,17 @@ export function useV2Access(): { state: AccessState; retry: () => void } {
     queryFn: () => withTimeout(fetchAccess(), ACCESS_TIMEOUT_MS),
     staleTime: Infinity,
   })
+
+  // Revenir dans l'app compte comme l'ouvrir — seulement une fois entré.
+  const autorise = query.data?.hasAccess === true
+  useEffect(() => {
+    if (!autorise) return
+    return compterLesRetours(() => {
+      void supabase.auth.getSession().then(({ data }) => {
+        if (data.session) noterLaConnexion(data.session.user.id)
+      })
+    })
+  }, [autorise])
 
   const retry = () => {
     void query.refetch()
