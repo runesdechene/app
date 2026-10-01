@@ -8,6 +8,7 @@
  *            article officiel INSEE) : on l'affiche telle quelle, sans la recomposer. Sa
  *            silhouette (la forme du département) se dessine en pochoir devant (migration 362).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import murmure from '@/assets/ui/murmure.svg'
@@ -37,7 +38,7 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
     <>
       <header className={styles.entete}>
         {profil.signe?.imageUrl && (
-          <img className={styles.filigrane} src={profil.signe.imageUrl} alt="" />
+          <img className={styles.filigrane} src={aLaTaille(profil.signe.imageUrl, 320)} alt="" />
         )}
 
         <Avatar url={profil.avatarUrl} nom={profil.nom} taille="grand" />

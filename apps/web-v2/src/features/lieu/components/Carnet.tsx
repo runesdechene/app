@@ -6,6 +6,7 @@
  * POURQUOI — les commentaires de la V1 reviennent sous la fiche, dans le ton de la V2. Sur la fiche,
  *            les trois derniers mots et « Lire les N mots » ; la page du carnet les montre tous.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { ilYA } from '@/shared/lib/ilYA'
@@ -85,7 +86,7 @@ function MotDuCarnet({
           <div className={styles.photos}>
             {mot.photos.map((url) => (
               <a key={url} href={url} target="_blank" rel="noreferrer">
-                <img src={url} alt="" loading="lazy" />
+                <img src={aLaTaille(url, 72)} alt="" loading="lazy" decoding="async" />
               </a>
             ))}
           </div>

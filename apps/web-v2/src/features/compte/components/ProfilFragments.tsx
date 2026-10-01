@@ -8,6 +8,7 @@
  * ATTENTION — sur le profil d'un autre, les Fragments ne sont que montrés : aucun bouton, et
  *            jamais ce qu'il n'a pas (décision d'Uriel, 27/09 : ne pas pousser à l'achat).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useState } from 'react'
 import { Button } from '@/shared/ui/Button'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -31,7 +32,15 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
     return (
       <>
         <span className={styles.motifVignette}>
-          {f.imageUrl && <img src={f.imageUrl} alt="" draggable={false} />}
+          {f.imageUrl && (
+            <img
+              src={aLaTaille(f.imageUrl, 104)}
+              alt=""
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
         </span>
         <span className={styles.nomMotif}>{f.nom}</span>
       </>
@@ -90,7 +99,9 @@ export function ProfilFragments({ profil }: { profil: ExplorateurProfile }) {
           }}
         >
           <div className={styles.explication}>
-            {ouvert.imageUrl && <img className={styles.motif} src={ouvert.imageUrl} alt="" />}
+            {ouvert.imageUrl && (
+              <img className={styles.motif} src={aLaTaille(ouvert.imageUrl, 160)} alt="" />
+            )}
             <Text variant="titre-carte">{ouvert.nom}</Text>
             {profil.signe?.id === ouvert.id ? (
               <Text variant="corps">Ton profil est sous ce signe.</Text>

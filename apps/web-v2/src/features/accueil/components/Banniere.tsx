@@ -5,6 +5,7 @@
  *            réglées dans le Hub, bannière par bannière, passées au CSS en variables. Toute la
  *            carte mène à la boutique.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useBanniere } from '../hooks/useAccueil'
 import styles from './Banniere.module.css'
 
@@ -27,7 +28,7 @@ export function Banniere() {
         '--ombre-force': String(banniere.ombre.force),
       }}
     >
-      <img className={styles.image} src={banniere.image} alt="" />
+      <img className={styles.image} src={aLaTaille(banniere.image, 420)} alt="" decoding="async" />
       <span className={styles.voile} aria-hidden="true" />
       <span className={styles.texte}>
         <span className={styles.tag}>Boutique</span>

@@ -10,6 +10,7 @@
  * ATTENTION — le formulaire naît une fois la fiche lue : ses valeurs de départ ne bougent plus.
  *            `onModifie` dit à la route s'il y a quelque chose à perdre (« Abandonner ? »).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/shared/ui/Button'
@@ -71,7 +72,7 @@ function Formulaire({
   const [valeur, setValeur] = useState(depart)
   const [nouvelles, setNouvelles] = useState<PhotoBrouillon[]>([])
   const [note, setNote] = useState('')
-  const photo = depart.photos[0]?.url
+  const photo = aLaTaille(depart.photos[0]?.url ?? null, 430)
 
   const champsChanges =
     valeur.nom.trim() !== depart.nom ||
@@ -208,7 +209,7 @@ function Photos({
       <ul className={styles.vignettes} aria-label="Ses photos">
         {existantes.map((p) => (
           <li key={p.url} className={styles.vignette}>
-            <img src={p.vignette} alt="" />
+            <img src={aLaTaille(p.vignette, 64)} alt="" loading="lazy" decoding="async" />
           </li>
         ))}
         {nouvelles.map((p) => (

@@ -7,6 +7,7 @@
  *            coup d'œil. Sans signe, le parchemin seul. Partir (profil, murmure) la referme :
  *            sinon elle resterait par-dessus l'écran suivant (la carte reste montée).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useNavigate } from 'react-router'
 import type { Point } from '@/shared/lib/distance'
 import { sousLeSigne } from '@/shared/lib/signe'
@@ -38,7 +39,9 @@ export function CarteExplorateur({
   return (
     <Feuille titre={a.nom} onFermer={onFermer}>
       <div className={styles.carte}>
-        {a.signe?.imageUrl && <img className={styles.filigrane} src={a.signe.imageUrl} alt="" />}
+        {a.signe?.imageUrl && (
+          <img className={styles.filigrane} src={aLaTaille(a.signe.imageUrl, 300)} alt="" />
+        )}
         <Avatar url={a.avatar} nom={a.nom} taille="grand" />
         <h2 className={styles.nom}>{a.nom}</h2>
         <p className={styles.niveau}>{niveau}</p>

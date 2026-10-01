@@ -11,6 +11,7 @@
  * ATTENTION — l'icône de catégorie est un pochoir (comme en V1), peint en crème, SANS rond de
  *            couleur : sur une photo, une couleur de catégorie peut jurer (Uriel, 27/09).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { Link, useLocation } from 'react-router'
 import { Avatar } from '@/shared/ui/Avatar'
 import { distanceKm, formatDistance, type Point } from '@/shared/lib/distance'
@@ -55,9 +56,10 @@ export function LieuCarte({
         {lieu.imageUrl && (
           <img
             className={styles.photo}
-            src={lieu.imageUrl}
+            src={aLaTaille(lieu.imageUrl, 290)}
             alt=""
             loading="lazy"
+            decoding="async"
             draggable={false}
           />
         )}

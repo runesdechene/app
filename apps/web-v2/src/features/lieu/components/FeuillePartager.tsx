@@ -7,6 +7,7 @@
  *            refait pas ; sans lui (un ordinateur), la ligne disparaît. « Envoyer à un
  *            Explorateur » arrive avec les Messages.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useEffect, useState } from 'react'
 import chevron from '@/assets/ui/chevron.svg'
 import copier from '@/assets/ui/copier.svg'
@@ -47,7 +48,7 @@ export function FeuillePartager({
     <Feuille titre="Partager ce lieu" onFermer={onFermer}>
       <h2 className={styles.titre}>Partager ce lieu</h2>
       <div className={styles.apercu}>
-        {vignette && <img className={styles.vignette} src={vignette} alt="" />}
+        {vignette && <img className={styles.vignette} src={aLaTaille(vignette, 50)} alt="" />}
         <span>
           <span className={styles.apercuNom}>{fiche.nom}</span>
           {fiche.type && <span className={styles.apercuType}>{fiche.type.nom}</span>}

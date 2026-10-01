@@ -7,6 +7,7 @@
  *            lieu est retenu, la fin de l'onboarding l'ouvre sur la carte. Il s'affiche en
  *            fenêtre au-dessus de la carte des visiteurs ; la croix y ramène.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { Link, useParams } from 'react-router'
 import { retenirLieu } from '@/shared/lib/apresEntree'
 import { useApercu, useConnecte } from '../hooks/useVitrine'
@@ -56,7 +57,7 @@ export function ApercuLieu() {
       <title>{`${lieu.nom} — Runes de Chêne Explore`}</title>
       {lieu.extrait && <meta name="description" content={lieu.extrait} />}
       <div className={styles.photo}>
-        {lieu.photo && <img className={styles.image} src={lieu.photo} alt="" />}
+        {lieu.photo && <img className={styles.image} src={aLaTaille(lieu.photo, 440)} alt="" />}
         <Link className={styles.fermer} to="/bienvenue/carte" aria-label="Fermer l’aperçu" />
       </div>
 

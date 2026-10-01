@@ -13,6 +13,7 @@
  * ATTENTION — animations réduites : le voile disparaît sans s'envoler (aucune fin d'animation
  *            n'arriverait).
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useEffect, useState } from 'react'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { attente } from '@/shared/lib/attente'
@@ -66,7 +67,8 @@ function Tentative({
   const { decouvrir, recompense, acceder } = useDecouvrir(fiche.id, position, onRefus)
   const [lance, setLance] = useState(false) // l'arrachage a commencé
   const [arrache, setArrache] = useState(false) // le voile est parti
-  const photo = fiche.photos[0]?.url ?? null
+  // Plein écran : à la largeur de l'écran (le voile, lui, la réduit à 24 px — useGrattage).
+  const photo = aLaTaille(fiche.photos[0]?.url ?? null, Math.min(window.innerWidth, 1000))
   // Tant que le prix n'est pas lu, le geste reste ouvert : la base aura le dernier mot.
   const assez = !cout || cout.points >= cout.cout
 
@@ -76,7 +78,10 @@ function Tentative({
     decouvrir()
     if (mouvementReduit()) setArrache(true)
   }
-  const { canevas, gratte, gratter, lever } = useGrattage(photo, lancer)
+  const { canevas, gratte, gratter, lever } = useGrattage(
+    aLaTaille(fiche.photos[0]?.url ?? null, 24),
+    lancer,
+  )
   const revele = arrache && recompense !== null
 
   useEffect(() => {

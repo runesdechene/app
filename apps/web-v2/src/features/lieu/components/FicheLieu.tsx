@@ -7,6 +7,7 @@
  *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { useState, type ReactNode } from 'react'
 import drapeau from '@/assets/ui/drapeau.svg'
 import epingle from '@/assets/ui/epingle.svg'
@@ -81,7 +82,7 @@ export function FicheLieu({
     <article className={styles.fiche}>
       <div className={styles.photo}>
         {photo ? (
-          <img className={styles.image} src={photo.url} alt="" />
+          <img className={styles.image} src={aLaTaille(photo.url, 430)} alt="" />
         ) : (
           fiche.type?.icone && (
             <span className={styles.sansPhoto} style={{ '--icone': `url(${fiche.type.icone})` }} />
@@ -112,7 +113,7 @@ export function FicheLieu({
                     setGrande(i)
                   }}
                 >
-                  <img src={p.vignette} alt="" />
+                  <img src={aLaTaille(p.vignette, 33)} alt="" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>

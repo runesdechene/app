@@ -7,6 +7,7 @@
  *            vient d'ailleurs (`poser`) : la carte réelle en vrai, une fausse en test.
  * ATTENTION — une marque retirée est détruite (`remove`) : sinon elle reste accrochée à la carte.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import type { Point } from '@/shared/lib/distance'
 import { ilYA } from '@/shared/lib/ilYA'
 import type { Actif } from '../api/lireActifs'
@@ -24,7 +25,8 @@ function etiquette(a: Actif): string {
 function portrait(avatar: string | null, nom: string): HTMLElement {
   if (avatar) {
     const img = document.createElement('img')
-    img.src = avatar
+    img.src = aLaTaille(avatar, 36)
+    img.decoding = 'async'
     img.alt = ''
     return img
   }

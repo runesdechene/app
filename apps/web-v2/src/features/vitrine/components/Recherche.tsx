@@ -8,6 +8,7 @@
  * ATTENTION — les résultats ne se montrent que tant que la recherche a le focus (CSS
  *            :focus-within) : toucher ailleurs ou Échap les range, sans code d'ouverture.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import type { Ref } from 'react'
 import { Link } from 'react-router'
 import type { Nature } from '../api/lireVitrine'
@@ -81,7 +82,13 @@ export function Recherche({
                 <li key={l.id}>
                   <Link className={styles.lieu} to={`/bienvenue/carte/lieu/${l.id}`}>
                     {l.vignette ? (
-                      <img className={styles.vignette} src={l.vignette} alt="" loading="lazy" />
+                      <img
+                        className={styles.vignette}
+                        src={aLaTaille(l.vignette, 44)}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
                     ) : (
                       <span className={styles.vignette} aria-hidden="true" />
                     )}

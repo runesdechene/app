@@ -6,6 +6,7 @@
  *            Ajoutés racontent ce que la communauté découvre, souvent loin. Sans position
  *            partagée, ou rien à moins de 100 km, le bloc ne s'affiche pas.
  */
+import { aLaTaille } from '@/shared/lib/image'
 import { Link } from 'react-router'
 import sectionPresDeToi from '@/assets/ui/pin-gps.svg'
 import { formatDistance } from '@/shared/lib/distance'
@@ -27,7 +28,13 @@ export function PresDeToi() {
           <li key={l.id}>
             <Link className={styles.lieu} to={`/accueil/lieu/${l.id}`}>
               {l.imageUrl ? (
-                <img className={styles.vignette} src={l.imageUrl} alt="" />
+                <img
+                  className={styles.vignette}
+                  src={aLaTaille(l.imageUrl, 56)}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <span className={styles.vignette} aria-hidden="true" />
               )}
