@@ -201,3 +201,26 @@ export function lireCarnet(json: unknown): Carnet | null {
   const c = objet(json)
   return { total: nombre(c.total), mots: liste(lireMot)(c.mots) }
 }
+
+// Le prix d'une découverte depuis ma position, et ma jauge (cout_decouverte, migration 399).
+// `distanceKm` est null sans position : le prix est alors le plus haut.
+export type CoutDecouverte = {
+  cout: number
+  distanceKm: number | null
+  points: number
+  max: number
+  prochainDans: number | null
+  parPoint: number
+}
+
+export function lireCoutDecouverte(json: unknown): CoutDecouverte {
+  const c = objet(json)
+  return {
+    cout: nombre(c.cout),
+    distanceKm: ouNull(nombre)(c.distanceKm),
+    points: nombre(c.points),
+    max: nombre(c.max),
+    prochainDans: ouNull(nombre)(c.prochainDans),
+    parPoint: nombre(c.parPoint),
+  }
+}

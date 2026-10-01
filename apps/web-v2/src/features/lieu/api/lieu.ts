@@ -5,12 +5,14 @@
  */
 import { booleen, chaine, liste, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
+import type { Point } from '@/shared/lib/distance'
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
 import { envoyerPhotos } from '@/shared/supabase/photos'
 import {
   lireCarnet,
   lireCoeurs,
   lireCompagnons,
+  lireCoutDecouverte,
   lireHistoire,
   lireExplorateurs,
   lireFiche,
@@ -35,10 +37,25 @@ export async function basculerEnvie(id: string) {
   return booleen(data)
 }
 
-export async function decouvrirLieu(id: string) {
-  const { data, error } = await supabase.rpc('decouvrir_lieu', { p_id: id })
+// Découvrir depuis ma position : au-delà de 100 km, la base fait payer de l'énergie (399).
+export async function decouvrirLieu(id: string, position: Point | null) {
+  const { data, error } = await supabase.rpc('decouvrir_lieu', {
+    p_id: id,
+    p_lat: position?.latitude ?? null,
+    p_lng: position?.longitude ?? null,
+  })
   if (error) throw error
   return lireRecompense(data)
+}
+
+export async function fetchCoutDecouverte(id: string, position: Point | null) {
+  const { data, error } = await supabase.rpc('cout_decouverte', {
+    p_id: id,
+    p_lat: position?.latitude ?? null,
+    p_lng: position?.longitude ?? null,
+  })
+  if (error) throw error
+  return lireCoutDecouverte(data)
 }
 
 export async function visiterLieu(id: string, lat: number, lng: number) {

@@ -26,7 +26,7 @@ function monter() {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
-  const rendu = renderHook(() => useDecouvrir('a'), { wrapper })
+  const rendu = renderHook(() => useDecouvrir('a', null), { wrapper })
   return { client, relire, ...rendu }
 }
 

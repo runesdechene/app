@@ -11,7 +11,7 @@ coquille par `app/routes/lieu.tsx` ; la zone n'importe aucune autre zone.
 
 - `api/` — lectures et écritures Supabase (migrations 364-365).
 - `lib/` — les règles pures : distance, état du bouton, ligne de faits.
-- `hooks/` — le cache, la position, la visite, la revendication, la présence, la suppression, les cœurs.
+- `hooks/` — le cache, la position, la visite, la revendication, la présence, la suppression, les cœurs, la découverte et son prix en énergie (migration 399).
 - `components/` — la fiche, le bouton, la fenêtre, les feuilles (options, partager, cœurs,
   histoire de la fiche, signaler), les cœurs (`CoeursLieu`), le Carnet de passage
   (`Carnet`, `EcrireAuCarnet`).

@@ -106,6 +106,62 @@
   }
 }
 
+/* Le prix (maquettes « Énergie — 2 à 4 ») : une gélule de verre sous la consigne. */
+.prix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-sur-accent) 50%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 32%, transparent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-shadow: none;
+  backdrop-filter: blur(6px);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.prix strong {
+  font-weight: var(--weight-gras);
+}
+
+.eclair {
+  width: 10px;
+  height: 15px;
+  background: var(--color-sur-accent);
+  mask: url('../../../assets/ui/eclair.svg') center / contain no-repeat;
+}
+
+.precision {
+  max-width: 300px;
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  opacity: 0.9;
+}
+
+.maPosition {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-decoration: underline;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Pas assez d'énergie : le sceau pâlit, le geste est fermé. */
+.consigne[data-terne] .sceau,
+.consigne[data-terne] .inconnu {
+  opacity: 0.4;
+}
+
 /* « Découvrir » : pour qui ne gratte pas. Discret, en bas. */
 .decouvrir {
   position: absolute;
@@ -122,6 +178,10 @@
   font-size: var(--flux-size);
   font-weight: var(--weight-gras);
   backdrop-filter: blur(4px);
+}
+
+.decouvrir:disabled {
+  opacity: 0.45;
 }
 
 .echec {
