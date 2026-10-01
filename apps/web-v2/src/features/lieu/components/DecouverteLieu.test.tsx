@@ -4,7 +4,7 @@
  *            (`animationEnd`), le grattage au doigt n'est pas rejoué ici (le bouton suffit).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import type { FicheLieu } from '../api/lireLieu'
@@ -16,7 +16,22 @@ vi.mock('../api/lieu', () => api)
 const ici = vi.hoisted(() => ({
   position: null as { latitude: number; longitude: number } | null,
 }))
-vi.mock('@/shared/hooks/useMaPosition', () => ({ useMaPosition: () => ici.position }))
+// Comme le vrai crochet : la position vit dans le cache, sous ['ma-position'].
+vi.mock('@/shared/hooks/useMaPosition', async () => {
+  const { useQuery } = await import('@tanstack/react-query')
+  return {
+    useMaPosition: () =>
+      useQuery({
+        queryKey: ['ma-position'],
+        queryFn: () => ici.position,
+        initialData: ici.position,
+        staleTime: Infinity,
+      }).data ?? null,
+  }
+})
+
+const demande = vi.hoisted(() => ({ demanderPosition: vi.fn() }))
+vi.mock('@/shared/lib/position', () => demande)
 
 const FICHE: Pick<FicheLieu, 'id' | 'nom' | 'photos' | 'type' | 'moi'> = {
   id: 'a',
@@ -30,6 +45,8 @@ const PRIX = { max: 10, prochainDans: null, parPoint: 3600, gratuitKm: 80 }
 
 beforeEach(() => {
   ici.position = { latitude: 45, longitude: 1 }
+  demande.demanderPosition.mockReset()
+  demande.demanderPosition.mockResolvedValue(null)
   api.decouvrirLieu.mockReset()
   api.decouvrirLieu.mockResolvedValue({ rang: 38, gain: 1, niveau: 12, avant: 0.62, apres: 0.64 })
   api.fetchCoutDecouverte.mockReset()
@@ -139,6 +156,21 @@ test('sans position : le prix sans position, et de quoi la donner', async () => 
   expect(api.fetchCoutDecouverte).toHaveBeenCalledWith('a', null)
 })
 
+test('sans position, le voile la demande lui-même : un lieu proche redevient gratuit', async () => {
+  ici.position = null
+  demande.demanderPosition.mockResolvedValue({ latitude: 45, longitude: 1 })
+  api.fetchCoutDecouverte.mockImplementation((_id: string, p: unknown) =>
+    Promise.resolve(
+      p
+        ? { ...PRIX, cout: 0, distanceKm: 42, points: 10 }
+        : { ...PRIX, cout: 3, distanceKm: null, points: 10 },
+    ),
+  )
+  monter()
+  expect(await screen.findByText('Gratuit')).toBeInTheDocument()
+  expect(demande.demanderPosition).toHaveBeenCalledTimes(1)
+})
+
 test('la position arrive après : le prix se relit avec elle', async () => {
   ici.position = null
   api.fetchCoutDecouverte.mockImplementation((_id: string, p: unknown) =>
@@ -148,14 +180,11 @@ test('la position arrive après : le prix se relit avec elle', async () => {
         : { ...PRIX, cout: 3, distanceKm: null, points: 10 },
     ),
   )
-  const { rerender, client } = monter()
+  const { client } = monter()
   expect(await screen.findByText('3 points d’énergie')).toBeInTheDocument()
-  ici.position = { latitude: 45, longitude: 1 }
-  rerender(
-    <QueryClientProvider client={client}>
-      <DecouverteLieu fiche={FICHE} onFermer={vi.fn()} />
-    </QueryClientProvider>,
-  )
+  act(() => {
+    client.setQueryData(['ma-position'], { latitude: 45, longitude: 1 })
+  })
   expect(await screen.findByText('Gratuit')).toBeInTheDocument()
   expect(api.fetchCoutDecouverte).toHaveBeenLastCalledWith('a', { latitude: 45, longitude: 1 })
 })
