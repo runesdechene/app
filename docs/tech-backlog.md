@@ -42,6 +42,24 @@
 
 - [ ] **2 migrations orphelines non filées** — `grade_founding_always_counts_306/307` (appliquées prod via MCP le 25/06, SQL perdu au `repair --reverted`). Effet **superseded** par 306/307/311/312/318 → repo = source de vérité OK ; à reconstituer seulement si on veut un repo 100 % rejouable.
 
+## Hub — les « Réactivations » ne mesurent pas des réactivations (découvert le 01/10/2026)
+
+- [ ] **Le chiffre est faux depuis sa création (28/02/2026).** Voulu : un ancien compte qui revient
+  sur la nouvelle app, compté **une seule fois**. Codé : « compte de plus de 7 j (30 j sur le
+  tableau de bord) connecté dans la période » = des anciens comptes **actifs**, recomptés à chaque
+  période (`Dashboard.tsx` compteurs, `Users.tsx` badge « Réactivé ! » et export). *Reporté par
+  Uriel le 01/10.*
+  - Correctif proposé : une colonne « revenu le », écrite une fois à la première ouverture d'un
+    ancien compte (`touch_last_login`), remplie au mieux pour le passé ; l'ancien chiffre renommé
+    « Anciens comptes actifs ». **Il manque la date de sortie de la nouvelle app**, qui définit
+    « ancien » — à demander à Uriel.
+  - Le vrai chiffre se retrouve en partie : `last_login_at` n'est écrite que par la nouvelle app,
+    depuis le 28/02. Au 01/10, sur 4 282 comptes créés avant février 2026, 174 revenus — mais par
+    groupe : boutique (`account_source = shopify`) 30/1 311, inscrits jamais actifs 78/2 125,
+    **vrais Explorateurs 66/846 (8 %)**. Minimum : un retour avant le 28/02 n'a pas laissé de trace.
+  - Depuis la V2 1.0.10, revenir dans l'app après 10 min avance aussi `last_login_at` : les
+    compteurs actuels montent un peu sans qu'il y ait plus de retours.
+
 ## V2 — zone Compte, suites (27/09)
 
 - [ ] **Article de chaque Fragment dans le Hub** — un champ (« l' », « le », « la », aucun) pour que le profil dise juste *sous le signe de l'Hoplite / du Varègue / d'Avalon*. Remplace la règle approchée de `apps/web-v2/src/features/compte/lib/signe.ts` (décision d'Uriel).
