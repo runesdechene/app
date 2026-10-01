@@ -34,22 +34,21 @@ test('un lieu ajouté prend la forme d’une carte de lieu', () => {
   expect(lieu).toMatchObject({ nom: 'Pointe du Becquet', categorie: { icone: 'i.svg' } })
 })
 
-test('une ligne du fil se lit ; une arrivée n’a pas de lieu', () => {
-  const [visite, arrivee] = lireChemins([
-    CHEMIN,
-    { ...CHEMIN, id: 'arrivee:u1', type: 'arrivee', lieu: null },
-  ])
+test('une ligne du fil se lit', () => {
+  const [visite] = lireChemins([CHEMIN])
   expect(visite?.lieu?.region).toBe('Manche')
-  expect(arrivee?.lieu).toBeNull()
 })
 
-test('les connexions, revendications et récits enrichis se lisent (migration 406)', () => {
+test('les revendications et récits enrichis se lisent (migration 406)', () => {
   const lignes = lireChemins([
-    { ...CHEMIN, id: 'connexion:u1:1', type: 'connexion', lieu: null },
     { ...CHEMIN, id: 'revendication:l1:u1:1', type: 'revendication' },
     { ...CHEMIN, id: 'enrichi:l1:u1:1', type: 'enrichi' },
   ])
-  expect(lignes.map((l) => l.type)).toEqual(['connexion', 'revendication', 'enrichi'])
+  expect(lignes.map((l) => l.type)).toEqual(['revendication', 'enrichi'])
+})
+
+test('les arrivées et les connexions sont parties au Registre (migration 408)', () => {
+  expect(() => lireChemins([{ ...CHEMIN, id: 'arrivee:u1', type: 'arrivee' }])).toThrow()
 })
 
 test('un type de ligne inconnu est refusé, pas deviné', () => {

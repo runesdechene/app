@@ -5,6 +5,7 @@ Supabase (ESLint le refuse) : les données arrivent par `../hooks/`, qui passe p
 
 - `MessagesScreen` — les deux onglets : La communauté, Les Murmures.
 - `Registre` — les canaux à cocher, les messages, la barre pour écrire.
+- `LignePassage` — dans le Registre, quelqu'un a rejoint EXPLORE ou vient de se connecter.
 - `ListeMurmures` — les correspondants, le sceau sur ce qui n'est pas lu.
 - `Conversation` — une conversation de Murmures, sans bulles.
 - `BarreEcrire` — la barre pour écrire, partagée par le Registre et les Murmures.

@@ -1,0 +1,71 @@
+/*
+ * QUOI     — un passage dans le Registre : centré, au crayon pâle, entre les messages. L'arrivée
+ *            se voit (portrait, bienvenue en rouge) ; la connexion se murmure.
+ */
+.arrivee,
+.connexion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  text-align: center;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.arrivee {
+  font-size: var(--corps-size);
+}
+
+.connexion {
+  font-size: var(--legende-size);
+  opacity: 0.8;
+}
+
+.texte {
+  margin: 0;
+  line-height: var(--dense-leading);
+}
+
+.nom {
+  color: var(--color-texte-doux);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+/* « Souhaite-lui la bienvenue ! » : le rouge de ce qui appelle un geste. */
+.bienvenue {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+}
+
+.bienvenue:hover,
+.bienvenue:focus-visible {
+  text-decoration: underline;
+}
+
+.heure {
+  font-size: var(--legende-size);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrivee,
+  .connexion {
+    animation: none;
+  }
+}

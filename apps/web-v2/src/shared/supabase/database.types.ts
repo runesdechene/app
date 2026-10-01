@@ -7147,6 +7147,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      passages_au_registre: { Args: never; Returns: Json }
       plant_flag: {
         Args: {
           p_expedition_name?: string

@@ -4,6 +4,8 @@
  *            recoller à la main. Écrire relit aussi : son message apparaît tout de suite.
  *            Le Registre ouvert est lu : chaque liste reçue marque « lu jusqu'ici » (migration 394),
  *            et le point des messages ratés s'éteint.
+ *            Les gens qui passent (migration 408) n'arrivent pas en temps réel : ils sont relus
+ *            chaque minute, et à chaque nouveau message. Ils ne comptent pas dans les non-lus.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
@@ -11,6 +13,7 @@ import type { Canal } from '../api/lireRegistre'
 import {
   ecouterRegistre,
   ecrire,
+  fetchPassages,
   fetchRegistre,
   fetchRegistreNonLus,
   marquerRegistreLu,
@@ -18,10 +21,16 @@ import {
 
 const registreKey = ['registre'] as const
 const nonLusKey = ['registre', 'nonLus'] as const
+const passagesKey = ['registre', 'passages'] as const
 
 export function useRegistre() {
   const queryClient = useQueryClient()
   const query = useQuery({ queryKey: registreKey, queryFn: fetchRegistre })
+  const passages = useQuery({
+    queryKey: passagesKey,
+    queryFn: fetchPassages,
+    refetchInterval: 60 * 1000,
+  })
 
   useEffect(
     () =>
@@ -48,6 +57,8 @@ export function useRegistre() {
 
   return {
     messages: query.data,
+    // Sans eux, le Registre reste entier : un passage manqué ne vaut pas une alerte.
+    passages: passages.data ?? [],
     erreur: query.isError,
     ecrire: (canal: Canal, texte: string, mentions: string[] = []) =>
       envoi.mutateAsync({ canal, texte, mentions }),

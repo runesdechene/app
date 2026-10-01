@@ -49,6 +49,7 @@ const registre = vi.hoisted(() => ({
   ecouterRegistre: () => () => undefined,
   fetchRegistre: () => Promise.resolve([]),
   marquerRegistreLu: () => Promise.resolve(),
+  fetchPassages: () => Promise.resolve([]),
   ecrire: () => Promise.resolve(),
   chercherExplorateurs: () => Promise.resolve([]),
 }))

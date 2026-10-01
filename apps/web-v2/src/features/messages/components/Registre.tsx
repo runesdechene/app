@@ -8,23 +8,26 @@
  *            qui parle. Un nom ouvre le profil, dans Messages, qui reste derrière. On mentionne avec
  *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
- *            septembre ») : minuit coupe aussi un groupe.
+ *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
+ *            gens qui passent (migration 408) : qui a rejoint EXPLORE — on lui souhaite la
+ *            bienvenue sur place —, qui vient de se connecter.
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import { chaine, objet, ouNull } from '@/shared/lib/lire'
 import { Avatar } from '@/shared/ui/Avatar'
 import { CANAUX, type Canal, type Mention, type Personne } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
-import { autreJour, jourDe } from '../lib/jour'
+import { entremeler } from '../lib/fil'
+import { autreJour, heureDe, jourDe } from '../lib/jour'
 import { decouper } from '../lib/mentions'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
+import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
 import styles from './Registre.module.css'
 
@@ -33,17 +36,9 @@ const NOMS: Record<Canal, { filtre: string; court: string }> = {
   bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
 }
 const PREFIXE_BUGS = '[Bug & Suggestions]'
-const HEURE = new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', minute: '2-digit' })
-
-// L'Explorateur à mentionner, quand on arrive de « Souhaite-lui la bienvenue ! » (l'état de
-// l'adresse, lu comme les réponses de la base : rien n'est supposé).
-function personneAMentionner(etat: unknown): Personne | null {
-  const m = ouNull(objet)(objet(etat ?? {}).mentionner ?? null)
-  return m ? { id: chaine(m.id), nom: chaine(m.nom), avatar: ouNull(chaine)(m.avatar) } : null
-}
 
 export function Registre() {
-  const { messages, erreur, ecrire, echecEnvoi } = useRegistre()
+  const { messages, passages, erreur, ecrire, echecEnvoi } = useRegistre()
   const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
   const [canal, setCanal] = useState<Canal>('general')
   // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
@@ -62,20 +57,21 @@ export function Registre() {
     champ.current?.setSelectionRange(apres.curseur, apres.curseur)
   }
 
-  // Arrivé par « Souhaite-lui la bienvenue ! » (Sur les chemins) : la personne est déjà mentionnée.
-  const location = useLocation()
-  const [arriveePour, setArriveePour] = useState<string | null>(null)
-  const aMentionner = personneAMentionner(location.state as unknown)
-  const key = location.key
-  if (aMentionner && arriveePour !== key) {
-    setArriveePour(key)
-    mentions.ajouter(aMentionner)
-    const debut = `@${aMentionner.nom} `
-    setTexte(debut)
-    setCurseur(debut.length)
+  // « Souhaite-lui la bienvenue ! » : la personne mentionnée en tête de ce qu'on écrivait, dans
+  // le canal général, le curseur juste après son nom.
+  const souhaiterLaBienvenue = (p: Personne) => {
+    mentions.ajouter(p)
+    setCanal('general')
+    champ.current?.focus()
+    const debut = `@${p.nom} `
+    placer({ texte: debut + texte, curseur: debut.length })
   }
 
-  const visibles = (messages ?? []).filter((m) => coches.has(m.canal))
+  // Les gens qui passent ne vivent que dans le canal général.
+  const fil = entremeler(
+    (messages ?? []).filter((m) => coches.has(m.canal)),
+    coches.has('general') ? passages : [],
+  )
 
   const basculer = (c: Canal) => {
     setCoches((avant) => {
@@ -107,19 +103,31 @@ export function Registre() {
 
       {erreur && <p className={styles.alerte}>Le Registre n’a pas pu être lu.</p>}
       <ol ref={coller} className={styles.messages} aria-label="Registre">
-        {visibles.map((m, i) => {
-          const nouveauJour = autreJour(visibles[i - 1]?.quand, m.quand)
+        {fil.map((ligne, i) => {
+          const nouveauJour = autreJour(fil[i - 1]?.quand, ligne.quand)
+          const jour = nouveauJour && (
+            <li role="separator" aria-label={jourDe(ligne.quand)} className={styles.jour}>
+              {jourDe(ligne.quand)}
+            </li>
+          )
+          if (ligne.sorte === 'passage') {
+            return (
+              <Fragment key={ligne.passage.id}>
+                {jour}
+                <LignePassage passage={ligne.passage} onBienvenue={souhaiterLaBienvenue} />
+              </Fragment>
+            )
+          }
+          const m = ligne.message
+          const avant = fil[i - 1]
+          const precedent = avant?.sorte === 'message' ? avant.message : undefined
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
-          const suite = !nouveauJour && estLaSuite(visibles[i - 1], m)
+          const suite = !nouveauJour && estLaSuite(precedent, m)
           // Dans un groupe, le préfixe du canal ne se répète pas : il revient si le canal change.
-          const prefixe = m.canal === 'bugs' && !(suite && visibles[i - 1]?.canal === 'bugs')
+          const prefixe = m.canal === 'bugs' && !(suite && precedent?.canal === 'bugs')
           return (
             <Fragment key={m.id}>
-              {nouveauJour && (
-                <li role="separator" aria-label={jourDe(m.quand)} className={styles.jour}>
-                  {jourDe(m.quand)}
-                </li>
-              )}
+              {jour}
               <li
                 className={[
                   suite ? styles.suite : styles.message,
@@ -145,7 +153,7 @@ export function Registre() {
                   <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
                 </p>
                 <time className={styles.heure} dateTime={m.quand}>
-                  {HEURE.format(new Date(m.quand))}
+                  {heureDe(m.quand)}
                 </time>
               </li>
             </Fragment>

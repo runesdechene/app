@@ -5,6 +5,12 @@
  *            une nuit entre les deux (Uriel, 28/09).
  */
 const DATE = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+const HEURE = new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', minute: '2-digit' })
+
+// L'heure d'une ligne du Registre, à droite : « 13:40 ».
+export function heureDe(quand: string): string {
+  return HEURE.format(new Date(quand))
+}
 
 function minuit(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()

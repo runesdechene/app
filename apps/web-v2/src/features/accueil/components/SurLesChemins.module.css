@@ -160,15 +160,3 @@ button.salut {
     transition: none;
   }
 }
-
-/* « Souhaite-lui la bienvenue ! » : ouvre le Registre, la personne déjà mentionnée. */
-.bienvenue {
-  color: var(--color-accent);
-  font-weight: var(--weight-semi);
-  text-decoration: none;
-}
-
-.bienvenue:hover,
-.bienvenue:focus-visible {
-  text-decoration: underline;
-}

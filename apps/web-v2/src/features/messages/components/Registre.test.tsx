@@ -7,6 +7,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
+import type { Passage } from '../api/lireRegistre'
 import { Registre } from './Registre'
 
 const api = vi.hoisted(() => ({
@@ -16,11 +17,14 @@ const api = vi.hoisted(() => ({
   chercherExplorateurs: vi.fn(),
   fetchRegistreNonLus: vi.fn(() => Promise.resolve({ messages: 0, mentions: 0 })),
   marquerRegistreLu: vi.fn(() => Promise.resolve()),
+  fetchPassages: vi.fn<() => Promise<Passage[]>>(() => Promise.resolve([])),
 }))
 vi.mock('../api/registre', () => api)
 
 const URIEL = { id: 'u1', nom: 'Uriel', avatar: null }
 const GAUTIER = { id: 'u2', nom: 'Gautier', avatar: null }
+const KELPIE = { id: 'u9', nom: 'Kelpie', avatar: null }
+const ASH = { id: 'u8', nom: 'Ash', avatar: null }
 
 beforeEach(() => {
   api.fetchRegistre.mockResolvedValue([
@@ -48,9 +52,9 @@ beforeEach(() => {
   api.ecrire.mockResolvedValue(undefined)
 })
 
-function monter(etat?: unknown) {
+function monter() {
   const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
-    initialEntries: [{ pathname: '/messages', state: etat }],
+    initialEntries: ['/messages'],
   })
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -232,14 +236,42 @@ test('au clavier : les flèches choisissent dans la liste, Entrée mentionne san
   expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
 })
 
-test('arrivé par « Souhaite-lui la bienvenue ! » : la personne est déjà mentionnée', async () => {
-  monter({ mentionner: { id: 'u9', nom: 'Kelpie', avatar: null } })
-  await screen.findByRole('list', { name: 'Registre' })
-  const champ = screen.getByRole('textbox', { name: 'Écrire quelque chose' })
+test('les gens qui passent s’écrivent entre les messages du canal général', async () => {
+  api.fetchPassages.mockResolvedValue([
+    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
+    { id: 'connexion:u8', type: 'connexion', quand: '2026-09-28T07:14:00Z', qui: ASH, moi: false },
+  ])
+  monter()
+  const registre = await screen.findByRole('list', { name: 'Registre' })
+  await within(registre).findByText(/vient de se connecter/)
+  const [, arrivee, connexion] = within(registre).getAllByRole('listitem')
+  expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
+  expect(connexion).toHaveTextContent('Ash vient de se connecter')
+  // Le canal général décoché : les passages s'en vont avec lui.
+  await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
+  expect(within(registre).queryByText(/vient de se connecter/)).toBeNull()
+})
+
+test('« Souhaite-lui la bienvenue ! » : la personne est mentionnée, on écrit dans le général', async () => {
+  api.fetchPassages.mockResolvedValue([
+    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
+  ])
+  monter()
+  await userEvent.click(await screen.findByRole('button', { name: 'Souhaite-lui la bienvenue !' }))
+  const champ = screen.getByRole('textbox')
   expect(champ).toHaveValue('@Kelpie ')
-  await userEvent.type(champ, 'bienvenue !')
-  await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
+  expect(champ).toHaveFocus()
+  await userEvent.type(champ, 'bienvenue !{Enter}')
   expect(api.ecrire).toHaveBeenCalledWith('general', '@Kelpie bienvenue !', ['u9'])
+})
+
+test('mon arrivée ne m’invite pas à me souhaiter la bienvenue', async () => {
+  api.fetchPassages.mockResolvedValue([
+    { id: 'arrivee:u1', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: URIEL, moi: true },
+  ])
+  monter()
+  expect(await screen.findByText(/a rejoint EXPLORE/)).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Souhaite-lui la bienvenue !' })).toBeNull()
 })
 
 test('une mention s’affiche en lien vers le profil ; un message qui me mentionne se distingue', async () => {

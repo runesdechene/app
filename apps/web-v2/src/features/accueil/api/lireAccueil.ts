@@ -46,9 +46,9 @@ export type GrandsExplorateurs = {
   dixieme: number | null
 }
 
-// connexion, revendication, enrichi : migration 406 (Uriel, 01/10 — « pour créer de la vie »).
-export type TypeDeChemin =
-  'visite' | 'ajout' | 'arrivee' | 'connexion' | 'revendication' | 'enrichi'
+// revendication, enrichi : migration 406 (Uriel, 01/10 — « pour créer de la vie »). Les arrivées
+// et les connexions sont parties au Registre (migration 408).
+export type TypeDeChemin = 'visite' | 'ajout' | 'revendication' | 'enrichi'
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
   type: TypeDeChemin
@@ -65,14 +65,7 @@ export type Chemin = {
   salue: boolean
 }
 
-const TYPES: readonly TypeDeChemin[] = [
-  'visite',
-  'ajout',
-  'arrivee',
-  'connexion',
-  'revendication',
-  'enrichi',
-]
+const TYPES: readonly TypeDeChemin[] = ['visite', 'ajout', 'revendication', 'enrichi']
 
 function typeDeChemin(v: unknown): TypeDeChemin {
   const t = TYPES.find((type) => type === v)

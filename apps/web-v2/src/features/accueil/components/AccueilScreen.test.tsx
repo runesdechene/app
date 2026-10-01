@@ -69,24 +69,10 @@ beforeEach(() => {
     },
     {
       ...VISITE,
-      id: 'arrivee:u4',
-      type: 'arrivee',
-      qui: { ...LUNA, id: 'u4', nom: 'Claire' },
-      lieu: null,
-      saluts: 0,
-    },
-    {
-      ...VISITE,
-      id: 'connexion:u5:1',
-      type: 'connexion',
-      qui: { ...LUNA, id: 'u5', nom: 'Kelpie' },
-      lieu: null,
-    },
-    {
-      ...VISITE,
       id: 'revendication:l3:u6:1',
       type: 'revendication',
       qui: { ...LUNA, id: 'u6', nom: 'Mathéo' },
+      saluts: 0,
     },
     {
       ...VISITE,
@@ -138,23 +124,11 @@ test('un lieu ajouté récemment ouvre sa fiche dans l’Accueil', async () => {
 test('le fil dit qui a fait quoi, où et quand', async () => {
   monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
-  const [visite, ajout, arrivee, connexion, revendication] = within(fil).getAllByRole('listitem')
+  const [visite, ajout, revendication] = within(fil).getAllByRole('listitem')
   expect(visite).toHaveTextContent('Luna a visité Pointe du Becquet')
   expect(visite).toHaveTextContent('Manche, à l’instant')
   expect(ajout).toHaveTextContent('Uriel a ajouté Menhir de Kerloas')
-  expect(arrivee).toHaveTextContent('Claire a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
-  expect(connexion).toHaveTextContent('Kelpie vient de se connecter')
   expect(revendication).toHaveTextContent('Mathéo vient de revendiquer Pointe du Becquet')
-})
-
-test('sur l’arrivée d’un autre, « Souhaite-lui la bienvenue ! » ouvre le Registre, la personne mentionnée', async () => {
-  const router = monter()
-  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
-  await userEvent.click(within(fil).getByRole('link', { name: 'Souhaite-lui la bienvenue !' }))
-  expect(router.state.location.pathname).toBe('/messages')
-  expect(router.state.location.state).toEqual({
-    mentionner: { id: 'u4', nom: 'Claire', avatar: null },
-  })
 })
 
 test('un récit enrichi se dit aussi', async () => {
@@ -218,9 +192,11 @@ test('la page du fil : toute l’activité, et l’on y salue', async () => {
 test('sans salut, le cœur est seul : pas de « 0 »', async () => {
   monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
-  const arrivee = within(fil).getAllByRole('listitem')[2]
-  if (!arrivee) throw new Error('ligne absente')
-  expect(within(arrivee).getByRole('button', { name: /Saluer Claire/ })).toHaveTextContent(/^$/)
+  const revendication = within(fil).getAllByRole('listitem')[2]
+  if (!revendication) throw new Error('ligne absente')
+  expect(within(revendication).getByRole('button', { name: /Saluer Mathéo/ })).toHaveTextContent(
+    /^$/,
+  )
 })
 
 test('on salue à volonté : chaque toucher envoie un cœur, et en fait s’envoler un', async () => {

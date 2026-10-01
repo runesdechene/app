@@ -7,7 +7,7 @@
  */
 import { nombre, objet } from '@/shared/lib/lire'
 import { supabase } from '@/shared/supabase/client'
-import { lirePersonnes, lireRegistre, type Canal } from './lireRegistre'
+import { lirePassages, lirePersonnes, lireRegistre, type Canal } from './lireRegistre'
 
 // Les 200 derniers messages (le plus que la base rende) : une mention reste retrouvable un moment
 // (Uriel, 30/09 : « il faudra un historique plus grand »).
@@ -18,6 +18,13 @@ export async function fetchRegistre() {
   })
   if (error) throw error
   return lireRegistre(data)
+}
+
+// Les gens qui passent (migration 408) : les arrivées, et la dernière connexion de chacun.
+export async function fetchPassages() {
+  const { data, error } = await supabase.rpc('passages_au_registre')
+  if (error) throw error
+  return lirePassages(data)
 }
 
 // `mentions` : les identifiants des Explorateurs mentionnés (@Nom) — la base vérifie chacun.
