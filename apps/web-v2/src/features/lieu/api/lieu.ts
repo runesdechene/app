@@ -41,8 +41,8 @@ export async function basculerEnvie(id: string) {
 export async function decouvrirLieu(id: string, position: Point | null) {
   const { data, error } = await supabase.rpc('decouvrir_lieu', {
     p_id: id,
-    p_lat: position?.latitude ?? null,
-    p_lng: position?.longitude ?? null,
+    p_lat: position?.latitude,
+    p_lng: position?.longitude,
   })
   if (error) throw error
   return lireRecompense(data)
@@ -51,8 +51,8 @@ export async function decouvrirLieu(id: string, position: Point | null) {
 export async function fetchCoutDecouverte(id: string, position: Point | null) {
   const { data, error } = await supabase.rpc('cout_decouverte', {
     p_id: id,
-    p_lat: position?.latitude ?? null,
-    p_lng: position?.longitude ?? null,
+    p_lat: position?.latitude,
+    p_lng: position?.longitude,
   })
   if (error) throw error
   return lireCoutDecouverte(data)

@@ -5862,6 +5862,10 @@ export type Database = {
         }
         Returns: Json
       }
+      _cout_decouverte: {
+        Args: { p_id: string; p_lat: number; p_lng: number }
+        Returns: Json
+      }
       _create_place_internal: {
         Args: {
           p_address?: string
@@ -5926,6 +5930,7 @@ export type Database = {
         Args: { p_lat1: number; p_lat2: number; p_lng1: number; p_lng2: number }
         Returns: number
       }
+      _energie_max: { Args: { p_user: string }; Returns: number }
       _enigma_answer_matches: {
         Args: { p_correct: string; p_user: string }
         Returns: boolean
@@ -6057,6 +6062,7 @@ export type Database = {
         }[]
       }
       _region_montree: { Args: { p_user: string }; Returns: string }
+      _reglage: { Args: { p_cle: string; p_defaut: number }; Returns: number }
       _require_min_discoveries: {
         Args: { p_min: number; p_user_id: string }
         Returns: Json
@@ -6269,6 +6275,10 @@ export type Database = {
         Returns: Json
       }
       correspondant: { Args: { p_avec: string }; Returns: Json }
+      cout_decouverte: {
+        Args: { p_id: string; p_lat: number; p_lng: number }
+        Returns: Json
+      }
       create_announcement: {
         Args: { p_title: string; p_type: string }
         Returns: {
@@ -6406,7 +6416,10 @@ export type Database = {
         Returns: Json
       }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
-      decouvrir_lieu: { Args: { p_id: string }; Returns: Json }
+      decouvrir_lieu: {
+        Args: { p_id: string; p_lat?: number; p_lng?: number }
+        Returns: Json
+      }
       delete_carnet: {
         Args: { p_place_id: string; p_user_id: string }
         Returns: Json
@@ -7095,6 +7108,7 @@ export type Database = {
         }
         Returns: Json
       }
+      mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
       mute_user: { Args: { p_target_user_id: string }; Returns: Json }
