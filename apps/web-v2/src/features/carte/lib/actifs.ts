@@ -1,8 +1,9 @@
 /**
  * QUOI     — ranger les Actifs (les plus proches d'abord), dire leur distance, dessiner la zone
  *            d'un Explorateur qui brouille ses pistes.
- * POURQUOI — la zone (50 km) contient toujours sa vraie position, que la base a déplacée de
- *            40 km au plus : on montre « quelque part par ici », jamais un faux point précis.
+ * POURQUOI — la base rend le centre d'une case d'environ 20 km, à 15 km au plus du vrai point : la
+ *            zone de 25 km (Uriel, 01/10) le contient donc toujours. On montre « quelque part par
+ *            ici », jamais un faux point précis.
  */
 import type { Feature, FeatureCollection, Polygon } from 'geojson'
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
@@ -10,7 +11,7 @@ import { distanceKm, formatDistance, type Point } from '@/shared/lib/distance'
 import { ilYA } from '@/shared/lib/ilYA'
 import type { Actif } from '../api/lireActifs'
 
-export const RAYON_ZONE_KM = 50
+export const RAYON_ZONE_KM = 25
 
 const position = (a: Actif): Point => ({ latitude: a.lat, longitude: a.lng })
 

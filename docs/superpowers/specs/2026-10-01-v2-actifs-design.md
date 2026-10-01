@@ -15,7 +15,7 @@ carte paraît vide. Voir passer d'autres Explorateurs donne le sentiment de vie.
   position (que soi seul voit). Pas de position, pas de marque.
 - **Les autres Actifs** : leur portrait cerclé d'ocre et une étiquette « Nom · titre ».
 - **Pistes brouillées** (`users.brouiller_pistes`, vrai par défaut) : une zone pointillée d'environ
-  50 km, le portrait au centre, « quelque part par ici ». Jamais un faux point précis.
+  25 km (Uriel, 01/10 : 50 km, c'était trop), le portrait au centre, « quelque part par ici ». Jamais un faux point précis.
 - **Parti depuis moins d'une heure** : le portrait reste, désaturé et transparent, avec « il y a
   23 min ». Au-delà d'une heure, il disparaît.
 - **Tout le monde est montré**, sans groupes, portraits et noms à tout zoom (Uriel, 01/10 : même
@@ -41,7 +41,7 @@ carte paraît vide. Voir passer d'autres Explorateurs donne le sentiment de vie.
 - **Le brouillage se fait dans la base** : on rend le centre de la case (environ 20 km) d'une grille
   dont l'origine est un secret de la base. On ne remonte pas au point sans le secret ; on ne voit pas
   bouger dans la case ; revenir chaque jour au même endroit redonne la même case (moyenner
-  n'apprend rien). La zone de 50 km dessinée autour contient toujours la vraie position. La vraie
+  n'apprend rien). La zone de 25 km dessinée autour contient toujours la vraie position (le centre est à 15 km au plus). La vraie
   position ne sort jamais de la base. *(Relecture du 01/10 : un décalage tiré du jour et de
   l'identifiant se recalculait hors de la base, et révélait les déplacements.)*
 - Pas de réglage « me cacher » pour l'instant (Uriel, 01/10) : le brouillage suffit.
