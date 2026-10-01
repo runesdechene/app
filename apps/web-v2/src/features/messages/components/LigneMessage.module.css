@@ -65,7 +65,7 @@
   font-weight: var(--weight-gras);
 }
 
-/* Les cœurs : sous le texte, une pastille — mon cœur, puis les portraits et le nombre. */
+/* Les cœurs : sous le texte, une gélule — les portraits, puis le cœur et le nombre. */
 .coeurs {
   display: inline-flex;
   grid-column: 2;
@@ -81,7 +81,8 @@
 }
 
 .basculer,
-.qui {
+.qui,
+.compte {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -91,13 +92,18 @@
   color: inherit;
   font-family: var(--font-corps);
   font-size: var(--legende-size);
+}
+
+.basculer,
+.qui {
   cursor: pointer;
 }
 
-.basculer {
-  justify-content: center;
-  min-width: 22px;
+.basculer,
+.compte {
+  gap: var(--space-1);
   height: 22px;
+  padding: 0 var(--space-1);
   border-radius: var(--radius-rond);
   transition:
     color var(--duree-douce) var(--courbe-douce),
@@ -112,17 +118,9 @@
   scale: 0.85;
 }
 
-/* Les portraits se chevauchent un peu, le nombre suit. */
-.qui {
-  gap: var(--space-1);
-}
-
+/* Les portraits se chevauchent un peu. */
 .qui > * + * {
   margin-left: -8px;
-}
-
-.qui > :last-child:not(:first-child) {
-  margin-left: 0;
 }
 
 /* Sans cœur encore : sur PC, un cœur prend la place de l'heure au survol ; au téléphone, le

@@ -4,8 +4,9 @@
  * POURQUOI — Uriel, 02/10 : « un seul like, mais on voit qui a liké — plus fort », et on peut le
  *            retirer. La colonne reste dense : au téléphone, un double toucher sur le message
  *            allume le cœur (il ne l'éteint jamais : on ne retire pas un cœur en tapotant) ; sur PC,
- *            un cœur remplace l'heure au survol. Sous le texte, les cœurs : le mien qu'on allume ou
- *            éteint, puis les portraits et le nombre, qui ouvrent la liste. Jamais « 0 ». Son
+ *            un cœur remplace l'heure au survol. Sous le texte, une gélule : les portraits de qui a
+ *            aimé (ils ouvrent la liste), puis le cœur et le nombre, qu'on allume ou éteint (Uriel,
+ *            02/10 : les portraits d'abord, « plus beau »). Jamais « 0 ». Son
  *            propre message ne s'aime pas : on y lit seulement qui l'a aimé.
  */
 import { Fragment, useRef, useState } from 'react'
@@ -87,20 +88,6 @@ export function LigneMessage({
 
       {nombre > 0 ? (
         <div className={styles.coeurs}>
-          {m.moi ? (
-            <span className={styles.coeur} aria-hidden="true" />
-          ) : (
-            <button
-              type="button"
-              className={styles.basculer}
-              aria-label={nom}
-              aria-pressed={aime}
-              onClick={basculer}
-            >
-              <span className={styles.coeur} aria-hidden="true" />
-              <Envols envols={envols} onFin={finir} />
-            </button>
-          )}
           <button
             type="button"
             className={styles.qui}
@@ -113,8 +100,25 @@ export function LigneMessage({
             {m.coeurs.slice(0, PORTRAITS).map((p) => (
               <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
             ))}
-            {nombre}
           </button>
+          {m.moi ? (
+            <span className={styles.compte}>
+              <span className={styles.coeur} aria-hidden="true" />
+              {nombre}
+            </span>
+          ) : (
+            <button
+              type="button"
+              className={styles.basculer}
+              aria-label={nom}
+              aria-pressed={aime}
+              onClick={basculer}
+            >
+              <span className={styles.coeur} aria-hidden="true" />
+              {nombre}
+              <Envols envols={envols} onFin={finir} />
+            </button>
+          )}
         </div>
       ) : (
         !m.moi && (
