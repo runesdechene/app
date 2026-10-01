@@ -21,6 +21,7 @@ import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { seDeconnecter } from '@/features/compte/api/session'
+import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import ajouter from '@/assets/ui/ajouter.svg'
@@ -70,6 +71,8 @@ export function Shell() {
   const navigate = useNavigate()
   // Tant que l'app est ouverte (position déjà autorisée) : être proposé comme compagnon.
   useSignalerPresence()
+  // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
+  usePreparerLaCarte()
   const nonLues = useNonLues()
   const { actif: active, detail, feuille, tiroir } = disposition(pathname)
   const overlayOpen = detail || feuille

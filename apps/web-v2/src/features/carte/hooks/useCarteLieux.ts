@@ -8,13 +8,17 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchCarteLieux, fetchCartePublique } from '../api/carte'
 import type { LieuCarte } from '../api/lireCarte'
 
+// Les lieux de l'Explorateur connecté : la même clé pour la carte et pour sa préparation
+// (usePreparerLaCarte).
+export const carteLieuxKey = ['carte', 'lieux'] as const
+
 export function useCarteLieux(visiteur: boolean): {
   lieux: LieuCarte[] | undefined
   erreur: boolean
   reessayer: () => void
 } {
   const query = useQuery({
-    queryKey: ['carte', visiteur ? 'publique' : 'lieux'],
+    queryKey: visiteur ? ['carte', 'publique'] : carteLieuxKey,
     queryFn: visiteur ? fetchCartePublique : fetchCarteLieux,
   })
   return {
