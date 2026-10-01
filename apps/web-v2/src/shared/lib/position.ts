@@ -22,3 +22,20 @@ export async function positionSiAutorisee(): Promise<Point | null> {
     )
   })
 }
+
+// Demande la position, quitte à faire apparaître la question du navigateur : seulement sur un
+// geste de l'Explorateur (« Utiliser ma position »).
+export function demanderPosition(): Promise<Point | null> {
+  if (!('geolocation' in navigator)) return Promise.resolve(null)
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        resolve({ latitude: p.coords.latitude, longitude: p.coords.longitude })
+      },
+      () => {
+        resolve(null)
+      },
+      { maximumAge: 10 * 60 * 1000, timeout: 8000 },
+    )
+  })
+}
