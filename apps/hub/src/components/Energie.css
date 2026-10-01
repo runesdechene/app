@@ -94,10 +94,10 @@
   background: none;
 }
 
-/* La règle des distances : quatre segments, du gratuit au plus cher. */
+/* La règle des distances : cinq segments, du gratuit au plus cher. */
 .energie-regle {
   display: grid;
-  grid-template-columns: 1.1fr 1.2fr 1.4fr 1.6fr;
+  grid-template-columns: repeat(5, 1fr);
   margin-bottom: 20px;
   overflow: hidden;
   border: 1px solid var(--color-border-strong);
@@ -119,6 +119,7 @@
 .energie-segment[data-cout='1'] { --intensite: 1; }
 .energie-segment[data-cout='2'] { --intensite: 2; }
 .energie-segment[data-cout='3'] { --intensite: 3; }
+.energie-segment[data-cout='4'] { --intensite: 4; }
 
 .energie-segment--gratuit {
   background: rgba(42, 122, 48, 0.08);

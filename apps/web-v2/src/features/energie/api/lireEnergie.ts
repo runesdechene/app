@@ -9,9 +9,11 @@ export type Regle = {
   gratuitKm: number
   palier1Km: number
   palier2Km: number
+  palier3Km: number
   cout1: number
   cout2: number
   cout3: number
+  cout4: number
 }
 
 export type Energie = {
@@ -28,9 +30,11 @@ function lireRegle(json: unknown): Regle {
     gratuitKm: nombre(r.gratuitKm),
     palier1Km: nombre(r.palier1Km),
     palier2Km: nombre(r.palier2Km),
+    palier3Km: nombre(r.palier3Km),
     cout1: nombre(r.cout1),
     cout2: nombre(r.cout2),
     cout3: nombre(r.cout3),
+    cout4: nombre(r.cout4),
   }
 }
 

@@ -3,7 +3,7 @@
  *            s'ouvre voilé — sa photo floutée sous un parchemin — ; le doigt déchire le voile,
  *            passé la moitié le reste s'arrache, un tintement, puis la récompense. Sous la
  *            consigne, le prix (maquettes « Énergie — 2 à 4 », 01/10) : gratuit dans la zone
- *            gratuite (100 km par défaut, réglée dans le Hub), sinon des points d'énergie ; quand
+ *            gratuite (50 km, réglée dans le Hub), sinon des points d'énergie ; quand
  *            la jauge ne suffit pas, le geste se ferme.
  * POURQUOI — Uriel, 28/09 : « un truc classe et addictif ». Pas de bouton au centre : le geste
  *            suffit ; « Découvrir », discret en bas, arrache tout d'un coup pour qui ne gratte pas.

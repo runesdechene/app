@@ -19,7 +19,8 @@ function phrasesDeLaRegle({ regle: r, parPoint }: Energie) {
   return [
     `Découvrir est gratuit à moins de ${KM.format(r.gratuitKm)} km de toi. Plus loin, ça coûte : ` +
       `${points(r.cout1)} jusqu’à ${KM.format(r.palier1Km)} km, ${String(r.cout2)} jusqu’à ` +
-      `${KM.format(r.palier2Km)} km, ${String(r.cout3)} au-delà.`,
+      `${KM.format(r.palier2Km)} km, ${String(r.cout3)} jusqu’à ${KM.format(r.palier3Km)} km, ` +
+      `${String(r.cout4)} au-delà.`,
     parPoint === 3600
       ? 'Un point revient chaque heure.'
       : `Un point revient toutes les ${attente(parPoint)}.`,

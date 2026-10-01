@@ -25,7 +25,16 @@ test('en recharge : les points, le maximum, le prochain point', async () => {
     max: 10,
     prochainDans: 1380,
     parPoint: 1800,
-    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+    regle: {
+      gratuitKm: 80,
+      palier1Km: 150,
+      palier2Km: 400,
+      palier3Km: 1200,
+      cout1: 1,
+      cout2: 2,
+      cout3: 3,
+      cout4: 5,
+    },
   })
   afficher()
   const jauge = await screen.findByRole('button', { name: /énergie/i })
@@ -40,7 +49,16 @@ test('pleine : pas de compte à rebours', async () => {
     max: 10,
     prochainDans: null,
     parPoint: 1800,
-    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+    regle: {
+      gratuitKm: 80,
+      palier1Km: 150,
+      palier2Km: 400,
+      palier3Km: 1200,
+      cout1: 1,
+      cout2: 2,
+      cout3: 3,
+      cout4: 5,
+    },
   })
   afficher()
   const jauge = await screen.findByRole('button', { name: /énergie/i })
@@ -54,13 +72,22 @@ test('la toucher explique la règle', async () => {
     max: 10,
     prochainDans: 1380,
     parPoint: 1800,
-    regle: { gratuitKm: 80, palier1Km: 400, palier2Km: 1200, cout1: 1, cout2: 2, cout3: 4 },
+    regle: {
+      gratuitKm: 80,
+      palier1Km: 150,
+      palier2Km: 400,
+      palier3Km: 1200,
+      cout1: 1,
+      cout2: 2,
+      cout3: 3,
+      cout4: 5,
+    },
   })
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: /énergie/i }))
   const feuille = screen.getByRole('dialog', { name: 'L’énergie' })
   expect(feuille).toHaveTextContent('gratuit à moins de 80 km')
-  expect(feuille).toHaveTextContent('2 jusqu’à 1 200 km, 4 au-delà')
+  expect(feuille).toHaveTextContent('2 jusqu’à 400 km, 3 jusqu’à 1 200 km, 5 au-delà')
   expect(feuille).toHaveTextContent('Un point revient toutes les 30 min')
   expect(feuille).toHaveTextContent('ajoute un point à ta jauge')
 })

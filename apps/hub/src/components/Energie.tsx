@@ -86,7 +86,8 @@ export function Energie() {
     { cout: 0, de: 0, a: reglages.gratuitKm },
     { cout: reglages.cout1, de: reglages.gratuitKm, a: reglages.palier1Km },
     { cout: reglages.cout2, de: reglages.palier1Km, a: reglages.palier2Km },
-    { cout: reglages.cout3, de: reglages.palier2Km, a: null },
+    { cout: reglages.cout3, de: reglages.palier2Km, a: reglages.palier3Km },
+    { cout: reglages.cout4, de: reglages.palier3Km, a: null },
   ]
 
   return (
@@ -123,11 +124,13 @@ export function Energie() {
           {champ('gratuitKm', 'Zone gratuite', 'km')}
           {champ('palier1Km', 'Palier 1', 'km')}
           {champ('palier2Km', 'Palier 2', 'km')}
+          {champ('palier3Km', 'Palier 3', 'km')}
         </div>
         <div className="energie-ligne">
           {champ('cout1', 'Jusqu’au palier 1', 'points')}
           {champ('cout2', 'Jusqu’au palier 2', 'points')}
-          {champ('cout3', 'Au-delà', 'points')}
+          {champ('cout3', 'Jusqu’au palier 3', 'points')}
+          {champ('cout4', 'Au-delà', 'points')}
         </div>
         <p className="energie-note">Sans position, un lieu coûte le prix « Au-delà ».</p>
       </section>
