@@ -62,6 +62,7 @@
   --color-fiche-recit: #806262;
   --color-fiche-badge: #9b3f39; /* un type sans couleur */
   --color-fiche-badge-texte: #fff; /* le texte et l'icône du type, en blanc (Uriel, 28/09) */
+  --color-fiche-fleche: #fff; /* les flèches posées sur les photos d'un lieu (02/10) */
   --color-fiche-credit: #bc7f3b; /* « Luna », la date */
   --color-fiche-credit-texte: #524d4d;
   --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */

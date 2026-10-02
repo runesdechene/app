@@ -6,6 +6,9 @@
  */
 .fiche {
   display: grid;
+
+  /* Rien ne doit élargir la fiche au-delà du tiroir (une longue galerie le faisait, 02/10). */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr; /* le parchemin descend au moins jusqu'en bas de l'écran */
   min-height: 100dvh;
 }
@@ -48,13 +51,6 @@
   pointer-events: none;
 }
 
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  animation: apparaitre var(--duree-douce) var(--courbe-douce);
-}
-
 /* Sans photo : le parchemin et l'icône du type, en grand. */
 .sansPhoto {
   position: absolute;
@@ -85,6 +81,7 @@
     url('../../../assets/ui/fond-fiche.webp') center -54px / 100% auto no-repeat,
     var(--color-fond);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: start; /* seul le fond descend jusqu'en bas : les écarts restent ceux du contenu */
   gap: var(--space-3);
   padding: var(--space-3) 25px var(--space-8);
@@ -101,12 +98,21 @@
   margin-left: auto;
 }
 
+/* Beaucoup de photos : la galerie défile, elle ne pousse jamais la fiche. */
 .galerie {
   display: flex;
+  min-width: 0;
   gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.galerie::-webkit-scrollbar {
+  display: none;
 }
 
 .vignette {
+  flex: none;
   width: 32px;
   height: 33px;
   padding: 0;
@@ -364,7 +370,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .image,
   .chargement {
     animation: none;
   }

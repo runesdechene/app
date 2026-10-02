@@ -46,6 +46,7 @@ export const COLOR_TOKENS = [
   '--color-fiche-recit',
   '--color-fiche-badge',
   '--color-fiche-badge-texte',
+  '--color-fiche-fleche',
   '--color-fiche-credit',
   '--color-fiche-credit-texte',
   '--color-fiche-credit-pale',

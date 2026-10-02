@@ -1,0 +1,93 @@
+/*
+ * QUOI     — la bande des photos d'un lieu, accrochée photo par photo, et ses deux flèches
+ *            discrètes : un chevron blanc sur un disque d'ombre translucide, comme le partage.
+ */
+.defile {
+  position: absolute;
+  inset: 0;
+}
+
+.bande {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+}
+
+.bande::-webkit-scrollbar {
+  display: none;
+}
+
+.photo {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.precedente,
+.suivante {
+  position: absolute;
+  top: 50%;
+  z-index: 2; /* au-dessus du voile de la photo */
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 35%, transparent);
+  cursor: pointer;
+  opacity: 0.75;
+  translate: 0 -50%;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.precedente::before,
+.suivante::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  background: var(--color-fiche-fleche);
+  mask: url('../../../assets/ui/chevron.svg') center / contain no-repeat;
+}
+
+.precedente {
+  left: var(--space-2);
+}
+
+.precedente::before {
+  rotate: 180deg;
+}
+
+.suivante {
+  right: var(--space-2);
+}
+
+.precedente:hover,
+.suivante:hover,
+.precedente:focus-visible,
+.suivante:focus-visible {
+  opacity: 1;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    animation: none;
+  }
+
+  .precedente,
+  .suivante {
+    transition: none;
+  }
+}

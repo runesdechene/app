@@ -1,5 +1,6 @@
 /**
- * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photo au bord déchiré,
+ * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photos au bord déchiré
+ *            (qu'on fait défiler, 02/10),
  *            galerie, titre et ses deux boutons ronds, type, ligne de faits, adresse, Explorateurs,
  *            revendication, bouton de visite, récit, crédits. Les cœurs (30/09) : la pastille à
  *            droite de la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
@@ -8,7 +9,7 @@
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
  */
 import { aLaTaille } from '@/shared/lib/image'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import drapeau from '@/assets/ui/drapeau.svg'
 import epingle from '@/assets/ui/epingle.svg'
 import etoiles from '@/assets/ui/etoiles.svg'
@@ -18,6 +19,7 @@ import pas from '@/assets/ui/pas.svg'
 import signetPlein from '@/assets/ui/signet-plein.svg'
 import signet from '@/assets/ui/signet.svg'
 import { Avatar } from '@/shared/ui/Avatar'
+import { DefilePhotos } from './DefilePhotos'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import type { FicheLieu as Fiche } from '../api/lireLieu'
@@ -58,6 +60,11 @@ export function FicheLieu({
   const { coeurs, aimer } = useCoeurs(id)
   const moi = useMoi()
   const [grande, setGrande] = useState(0)
+  // La photo change (au doigt, aux flèches) : sa vignette se range dans la partie visible.
+  const galerie = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    galerie.current?.children[grande]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [grande])
 
   if (erreur) {
     return (
@@ -72,7 +79,6 @@ export function FicheLieu({
   if (fiche === undefined) return <div className={styles.chargement} aria-busy="true" />
   if (fiche === null) return <EmptyState>Ce lieu n’existe pas ou n’est plus visible</EmptyState>
 
-  const photo = fiche.photos[grande] ?? fiche.photos[0]
   const faits = ligneDeFaits(fiche.faits)
   // On ne s'envoie pas de cœurs sur son propre lieu (la base le refuse aussi).
   const peutAimer = moi !== undefined && moi.id !== fiche.auteur?.id
@@ -81,8 +87,8 @@ export function FicheLieu({
   return (
     <article className={styles.fiche}>
       <div className={styles.photo}>
-        {photo ? (
-          <img className={styles.image} src={aLaTaille(photo.url, 430)} alt="" />
+        {fiche.photos.length > 0 ? (
+          <DefilePhotos photos={fiche.photos} active={grande} onChoisir={setGrande} />
         ) : (
           fiche.type?.icone && (
             <span className={styles.sansPhoto} style={{ '--icone': `url(${fiche.type.icone})` }} />
@@ -101,7 +107,7 @@ export function FicheLieu({
       <div className={styles.corps}>
         <div className={styles.haut}>
           {fiche.photos.length > 1 && (
-            <div className={styles.galerie}>
+            <div ref={galerie} className={styles.galerie}>
               {fiche.photos.map((p, i) => (
                 <button
                   key={p.url}
