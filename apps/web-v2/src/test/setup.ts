@@ -11,8 +11,10 @@ import { vi } from 'vitest'
 
 vi.mock('maplibre-gl', async () => {
   const { FausseCarte, FausseMarque } = await import('./fausseCarte')
-  return { default: { Map: FausseCarte, Marker: FausseMarque } }
+  return { Map: FausseCarte, Marker: FausseMarque, setWorkerUrl: () => undefined }
 })
+// Le worker de MapLibre, que Vite empaquette à part (shared/lib/maplibre.ts) : une adresse suffit.
+vi.mock('maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url', () => ({ default: 'worker.js' }))
 
 class FauxResizeObserver implements ResizeObserver {
   observe() {}

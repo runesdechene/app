@@ -6,7 +6,8 @@
  *            relecture et à chaque déplacement de soi.
  * ATTENTION — `onToucher` doit être stable (un setState) : le suivi le garde du premier rendu.
  */
-import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
+import { maplibregl } from '@/shared/lib/maplibre'
+import type { GeoJSONSource, Map as Carte } from 'maplibre-gl'
 import { useEffect, useRef } from 'react'
 import type { Point } from '@/shared/lib/distance'
 import type { Actif } from '../api/lireActifs'
@@ -44,7 +45,7 @@ export function useActifsSurLaCarte(
 
   useEffect(() => {
     suivi.current?.actifs(actifs)
-    carte?.getSource<GeoJSONSource>(ZONES)?.setData(zonesEnGeoJSON(actifs))
+    void carte?.getSource<GeoJSONSource>(ZONES)?.setData(zonesEnGeoJSON(actifs))
   }, [carte, actifs])
 
   useEffect(() => {

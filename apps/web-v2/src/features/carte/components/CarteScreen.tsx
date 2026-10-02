@@ -16,7 +16,8 @@
  *            leur valeur. Un filtre actif se voit sur le bouton.
  *            L'attribution OpenStreetMap est obligatoire : elle reste, repliée.
  */
-import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
+import { maplibregl } from '@/shared/lib/maplibre'
+import type { GeoJSONSource, Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useIsRestoring } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -230,7 +231,7 @@ function CarteVivante({
       () => {
         performance.mark('carte:marques-dessinees')
         if (!actif) return
-        carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
+        void carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
         ajouterOmbrage(carte, couleurs)
         setLieuxPoses(true)
         performance.mark('carte:lieux-poses')

@@ -11,7 +11,7 @@
  * ATTENTION — l'endroit et les voisins ne se demandent qu'une fois la carte posée (moveend) ;
  *            l'épingle se soulève pendant le glissé et retombe à l'arrêt.
  */
-import maplibregl from 'maplibre-gl'
+import { maplibregl } from '@/shared/lib/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
