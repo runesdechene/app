@@ -150,6 +150,8 @@ function CarteVivante({
     })
 
     map.on('style.load', () => {
+      // Les repères du chargement (onglet Performance, ou performance.getEntriesByType('mark')).
+      performance.mark('carte:style-pret')
       // Les marques à la mesure de l'écran (lue à l'ouverture de la carte).
       const ecran = echelleEcran(window.innerWidth, window.innerHeight)
       ajouterCalques(map, couleurs, ecran)
@@ -205,7 +207,9 @@ function CarteVivante({
   }, [visiteur, carte, tiroirMesure, lieux, lieuOuvert])
 
   useEffect(() => {
-    if (lieux) prechargerIcones(lieux)
+    if (!lieux) return
+    performance.mark('carte:lieux-recus')
+    prechargerIcones(lieux)
   }, [lieux])
 
   // Un dessin lancé avant le dernier changement (filtre, couleurs) ne doit jamais l'écraser :
@@ -216,9 +220,11 @@ function CarteVivante({
     const montres = filtrer(lieux, filtres)
     ajouterMarques(carte, montres, couleurs, couleurTypes).then(
       () => {
+        performance.mark('carte:marques-dessinees')
         if (!actif) return
         carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
         ajouterOmbrage(carte, couleurs)
+        performance.mark('carte:lieux-poses')
       },
       () => {
         if (actif) setMarquesEnPanne(true)
