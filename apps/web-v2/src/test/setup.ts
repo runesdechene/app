@@ -11,7 +11,7 @@ import { vi } from 'vitest'
 
 vi.mock('maplibre-gl', async () => {
   const { FausseCarte, FausseMarque } = await import('./fausseCarte')
-  return { Map: FausseCarte, Marker: FausseMarque }
+  return { default: { Map: FausseCarte, Marker: FausseMarque } }
 })
 
 class FauxResizeObserver implements ResizeObserver {
