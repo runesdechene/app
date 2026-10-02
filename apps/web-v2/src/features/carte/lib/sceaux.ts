@@ -198,6 +198,22 @@ function pilule(map: Carte, nom: string, fond: string, bord: string) {
   })
 }
 
+// Les marques à dessiner : une par image, avec un lieu qui la porte (des milliers de lieux
+// partagent quelques dizaines d'images) ; pas celles déjà sur la carte.
+export function marquesADessiner(
+  lieux: LieuCarte[],
+  couleurTypes: boolean,
+  dejaLa: (nom: string) => boolean,
+): Map<string, LieuCarte> {
+  const aDessiner = new Map<string, LieuCarte>()
+  for (const l of lieux) {
+    if (l.nature !== 'lieu' || l.etat === 'inconnu') continue
+    const nom = nomImage(l, couleurTypes)
+    if (!aDessiner.has(nom) && !dejaLa(nom)) aDessiner.set(nom, l)
+  }
+  return aDessiner
+}
+
 function ajouter(map: Carte, nom: string, image: ImageData) {
   if (!map.hasImage(nom)) map.addImage(nom, image, { pixelRatio: RATIO })
 }
@@ -215,11 +231,11 @@ export async function ajouterMarques(
   pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
   pilule(map, 'pilule-moi', c.encre, c.encre)
 
-  const connus = lieux.filter((l) => l.nature === 'lieu' && l.etat !== 'inconnu')
+  // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de
+  // calcul sur un PC, bien plus sur un téléphone).
+  const aDessiner = marquesADessiner(lieux, couleurTypes, (nom) => map.hasImage(nom))
   await Promise.all(
-    connus.map(async (l) => {
-      const nom = nomImage(l, couleurTypes)
-      if (map.hasImage(nom)) return
+    [...aDessiner].map(async ([nom, l]) => {
       const dessiner = (icone: HTMLImageElement) => {
         if (l.etat === 'connu') return sceauConnu(icone, c)
         if (couleurTypes && l.couleur) return sceauCouleur(icone, l.couleur)
