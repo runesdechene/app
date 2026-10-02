@@ -15,6 +15,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { supabase } from '@/shared/supabase/client'
+import { oublierLeCache } from '../queryClient'
 import type { AccessState } from './decideAccess'
 import { compterLesRetours } from './retours'
 
@@ -61,6 +62,8 @@ export function useV2Access(): { state: AccessState; retry: () => void } {
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
+      // Déconnecté (ici ou dans un onglet V1) : le cache de la session, et sa copie, s'effacent.
+      if (event === 'SIGNED_OUT') oublierLeCache()
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         void queryClient.invalidateQueries({ queryKey: ACCESS_KEY })
       }

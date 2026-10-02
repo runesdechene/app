@@ -18,6 +18,7 @@
  */
 import maplibregl, { type GeoJSONSource, type Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { useIsRestoring } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
@@ -39,6 +40,7 @@ import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { suivreSurvol } from '../lib/survol'
+import { AttenteLieux } from './AttenteLieux'
 import { CarteExplorateur } from './CarteExplorateur'
 import styles from './CarteScreen.module.css'
 import { CompteurActifs } from './CompteurActifs'
@@ -87,6 +89,12 @@ function CarteVivante({
   const [tiroirMesure, setTiroirMesure] = useState(false)
   const [couleurs] = useState(() => lireCouleurs(document.documentElement))
   const { lieux, erreur, reessayer } = useCarteLieux(visiteur)
+  // La toute première fois (rien de gardé sur l'appareil), la carte dit que les lieux arrivent.
+  // On le sait une fois relue la copie gardée : sinon l'attente clignoterait à chaque ouverture.
+  const relecture = useIsRestoring()
+  const [premiereFois, setPremiereFois] = useState<boolean | null>(null)
+  if (premiereFois === null && !relecture) setPremiereFois(lieux === undefined)
+  const [lieuxPoses, setLieuxPoses] = useState(false)
   const couleurTypes = useLieuxEnCouleur(!visiteur)
   const navigate = useNavigate()
   // « Trouver sur la carte » (fiche d'un lieu) arrive par l'adresse : /carte?centre=lat,lng.
@@ -224,6 +232,7 @@ function CarteVivante({
         if (!actif) return
         carte.getSource<GeoJSONSource>(SOURCE)?.setData(enGeoJSON(montres, couleurTypes))
         ajouterOmbrage(carte, couleurs)
+        setLieuxPoses(true)
         performance.mark('carte:lieux-poses')
       },
       () => {
@@ -263,6 +272,7 @@ function CarteVivante({
     <div className={styles.ecran} data-sous-la-recherche={sousLaRecherche ? true : undefined}>
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
       <div ref={placeDuTiroir} className={styles.placeDuTiroir} aria-hidden="true" />
+      {premiereFois && <AttenteLieux finie={lieuxPoses || erreur || marquesEnPanne} />}
       {(erreur || marquesEnPanne) && (
         <div role="alert" className={styles.bandeau}>
           <span>Les lieux n’ont pas pu être chargés</span>

@@ -1,0 +1,56 @@
+/*
+ * QUOI     — la gélule « Les lieux arrivent… », posée au centre de la carte : parchemin, rose des
+ *            vents qui tourne, l'inscription en IM Fell comme le nom du territoire.
+ */
+.attente {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--decalage-carte, 0px) / 2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--color-encre) 15%, transparent);
+  color: var(--color-texte);
+  font-family: var(--font-inscription);
+  font-size: var(--corps-size);
+  font-style: italic;
+  pointer-events: none;
+  translate: -50% -50%;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    visibility var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.attente[data-fini] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.rose {
+  width: 26px;
+  height: 26px;
+  animation: tourner 2.4s linear infinite;
+}
+
+@keyframes tourner {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attente {
+    transition: none;
+  }
+
+  .rose {
+    animation: none;
+  }
+}

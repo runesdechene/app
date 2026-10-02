@@ -92,6 +92,29 @@ function carte(): FausseCarte {
   return FausseCarte.derniere
 }
 
+test('à la première ouverture, la carte dit que les lieux arrivent, puis se tait', async () => {
+  afficher()
+  const attente = screen.getByRole('status', { name: 'Les lieux arrivent…' })
+  expect(attente).not.toHaveAttribute('data-fini')
+  charger()
+  await waitFor(() => {
+    expect(attente).toHaveAttribute('data-fini')
+  })
+})
+
+test('les lieux déjà gardés sur l’appareil : rien à attendre, rien n’est dit', () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  client.setQueryData(['carte', 'lieux'], LIEUX)
+  render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <CarteScreen />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  )
+  expect(screen.queryByRole('status', { name: 'Les lieux arrivent…' })).toBeNull()
+})
+
 // Le style est prêt : les lieux n'attendent pas les tuiles du fond (02/10).
 function charger() {
   act(() => {
