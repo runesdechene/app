@@ -4,9 +4,9 @@
  * POURQUOI — les photos d'un téléphone pèsent plusieurs Mo : on les réduit dès qu'elles sont
  *            choisies, comme les lieux de la V1 (mêmes tailles, même format, même dossier). La
  *            position de la photo place d'abord l'épingle (maquette 288:178) : on la lit avec
- *            exifr, la bibliothèque standard, plutôt qu'un lecteur maison.
+ *            exifr, la bibliothèque standard, plutôt qu'un lecteur maison — chargée seulement quand
+ *            on choisit une photo, pas au démarrage de l'app (02/10).
  */
-import exifr from 'exifr'
 import type { Point } from '@/shared/lib/distance'
 
 export const GRANDE = 1920
@@ -54,6 +54,7 @@ export async function preparerPhoto(fichier: File): Promise<PhotoPreparee> {
 
 export async function positionDeLaPhoto(fichier: File): Promise<Point | null> {
   try {
+    const { default: exifr } = await import('exifr')
     const gps = await exifr.gps(fichier)
     if (!Number.isFinite(gps.latitude) || !Number.isFinite(gps.longitude)) return null
     return { latitude: gps.latitude, longitude: gps.longitude }
