@@ -254,22 +254,35 @@ test('le bouton Filtre ouvre la feuille ; un filtre choisi se voit, et le bouton
   expect(screen.getByRole('button', { name: 'Filtre (actif)' })).toBeInTheDocument()
 })
 
-test('quand le tiroir s’ouvre, la carte vise le centre de sa partie visible', () => {
-  let signaler: (largeur: number) => void = () => {}
+// Un ResizeObserver qui, comme celui du navigateur, mesure dès qu'il observe ; `signaler` en
+// envoie d'autres (le tiroir qui s'ouvre ou se replie).
+function tiroirDe(largeur: number) {
+  let rappel: (entrees: { contentRect: { width: number } }[]) => void = () => {}
   vi.stubGlobal(
     'ResizeObserver',
     class {
-      constructor(rappel: (entrees: { contentRect: { width: number } }[]) => void) {
-        signaler = (largeur) => {
-          rappel([{ contentRect: { width: largeur } }])
-        }
+      constructor(r: typeof rappel) {
+        rappel = r
       }
-      observe() {}
+      observe() {
+        rappel([{ contentRect: { width: largeur } }])
+      }
       disconnect() {}
     },
   )
+  return (l: number) => {
+    rappel([{ contentRect: { width: l } }])
+  }
+}
+
+test('la carte se pose d’emblée à côté du tiroir, puis glisse quand il s’ouvre ou se replie', () => {
+  const signaler = tiroirDe(0)
   afficher()
   charger()
+  expect(carte().jumpTo).toHaveBeenCalledWith({
+    padding: { left: 0, top: 0, right: 0, bottom: 0 },
+  })
+  expect(carte().easeTo).not.toHaveBeenCalled()
   act(() => {
     signaler(420)
   })
@@ -277,7 +290,9 @@ test('quand le tiroir s’ouvre, la carte vise le centre de sa partie visible', 
     expect.objectContaining({ padding: { left: 420, top: 0, right: 0, bottom: 0 } }),
   )
 })
-test('?centre=lat,lng : la carte vole jusqu’au lieu une fois chargée', () => {
+
+test('?centre=lat,lng : la carte vole jusqu’au lieu, et rien ne coupe son vol', () => {
+  tiroirDe(420)
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
@@ -290,6 +305,11 @@ test('?centre=lat,lng : la carte vole jusqu’au lieu une fois chargée', () => 
   expect(carte().flyTo).toHaveBeenCalledWith(
     expect.objectContaining({ center: [6.1, 45.9], zoom: 14 }),
   )
+  // Le tiroir est mesuré avant le vol : aucune animation ne vient l'interrompre.
+  expect(carte().jumpTo.mock.invocationCallOrder[0]).toBeLessThan(
+    carte().flyTo.mock.invocationCallOrder[0] ?? 0,
+  )
+  expect(carte().easeTo).not.toHaveBeenCalled()
 })
 
 test('au survol d’un lieu, la main apparaît et le lieu se détache ; elle s’en va quand on le quitte', () => {
@@ -303,6 +323,7 @@ test('au survol d’un lieu, la main apparaît et le lieu se détache ; elle s�
 })
 
 test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’au lieu ouvert', async () => {
+  tiroirDe(0)
   api.fetchCartePublique.mockResolvedValue(LIEUX)
   api.fetchLieuxEnCouleur.mockClear()
   render(

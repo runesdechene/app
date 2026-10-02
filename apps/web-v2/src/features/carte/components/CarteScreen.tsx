@@ -82,6 +82,9 @@ function CarteVivante({
   // `--decalage-carte` (posée par la coquille ; 0 sur mobile ou tiroir replié).
   const placeDuTiroir = useRef<HTMLDivElement>(null)
   const [carte, setCarte] = useState<Carte | null>(null)
+  // Le tiroir mesuré : un vol (?centre, l'aperçu du visiteur) l'attend, sinon le décalage du
+  // tiroir, posé juste après, couperait le vol (MapLibre ne tient qu'un mouvement à la fois).
+  const [tiroirMesure, setTiroirMesure] = useState(false)
   const [couleurs] = useState(() => lireCouleurs(document.documentElement))
   const { lieux, erreur, reessayer } = useCarteLieux(visiteur)
   const couleurTypes = useLieuxEnCouleur(!visiteur)
@@ -160,17 +163,23 @@ function CarteVivante({
     }
   }, [couleurs, navigate, visiteur])
 
-  // Quand le tiroir s'ouvre ou se replie, la carte vise le centre de sa partie visible : elle
-  // glisse au rythme du tiroir (MapLibre coupe l'animation si l'on a réduit les animations).
+  // La carte vise le centre de sa partie visible : à l'ouverture, elle se pose d'emblée à côté
+  // du tiroir ; quand il s'ouvre ou se replie, elle glisse à son rythme (MapLibre coupe
+  // l'animation si l'on a réduit les animations).
   useEffect(() => {
     const repere = placeDuTiroir.current
     if (!carte || !repere) return
+    let premiereMesure = true
     const observateur = new ResizeObserver(([entree]) => {
       if (!entree) return
-      carte.easeTo({
-        padding: { left: entree.contentRect.width, top: 0, right: 0, bottom: 0 },
-        duration: dureeDouce(document.documentElement),
-      })
+      const padding = { left: entree.contentRect.width, top: 0, right: 0, bottom: 0 }
+      if (premiereMesure) {
+        premiereMesure = false
+        carte.jumpTo({ padding })
+        setTiroirMesure(true)
+        return
+      }
+      carte.easeTo({ padding, duration: dureeDouce(document.documentElement) })
     })
     observateur.observe(repere)
     return () => {
@@ -180,20 +189,20 @@ function CarteVivante({
 
   // La carte vole jusqu'au lieu demandé, puis l'adresse redevient /carte (sans historique).
   useEffect(() => {
-    if (!carte || !centre) return
+    if (!carte || !centre || !tiroirMesure) return
     const [lat, lng] = centre.split(',').map(Number)
     if (lat !== undefined && lng !== undefined && Number.isFinite(lat) && Number.isFinite(lng)) {
       carte.flyTo({ center: [lng, lat], zoom: 14 })
     }
     setRecherche({}, { replace: true })
-  }, [carte, centre, setRecherche])
+  }, [carte, centre, tiroirMesure, setRecherche])
 
   // Visiteur : la carte glisse jusqu'au lieu dont l'aperçu s'ouvre (sa position floutée).
   useEffect(() => {
-    if (!visiteur || !carte || !lieux || !lieuOuvert) return
+    if (!visiteur || !carte || !tiroirMesure || !lieux || !lieuOuvert) return
     const lieu = lieux.find((l) => l.id === lieuOuvert)
     if (lieu) carte.flyTo({ center: [lieu.lng, lieu.lat], zoom: 11 })
-  }, [visiteur, carte, lieux, lieuOuvert])
+  }, [visiteur, carte, tiroirMesure, lieux, lieuOuvert])
 
   useEffect(() => {
     if (lieux) prechargerIcones(lieux)
