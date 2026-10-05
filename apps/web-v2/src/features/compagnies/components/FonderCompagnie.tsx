@@ -13,7 +13,8 @@ import { fonder } from '../api/compagnies'
 import type { ChampsFiche } from '../api/lireCompagnies'
 import { compagniesKey } from '../hooks/useCompagnies'
 import { messageDeRefus } from '../lib/refus'
-import { ChampsCompagnie, PALETTE } from './ChampsCompagnie'
+import { PALETTE } from '../lib/palette'
+import { ChampsCompagnie } from './ChampsCompagnie'
 import styles from './GererCompagnie.module.css'
 
 const VIDE: ChampsFiche = {

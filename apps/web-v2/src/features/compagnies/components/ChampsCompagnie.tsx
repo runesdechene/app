@@ -9,19 +9,10 @@ import { useState } from 'react'
 import { Segments } from '@/shared/ui/Segments'
 import type { ChampsFiche } from '../api/lireCompagnies'
 import { envoyerAvatar } from '../api/compagnies'
+import { PALETTE } from '../lib/palette'
 import { AvatarCompagnie } from './AvatarCompagnie'
 import styles from './ChampsCompagnie.module.css'
 
-export const PALETTE = [
-  '#5f6f86',
-  '#4f7a4a',
-  '#7a5c9b',
-  '#a0522d',
-  '#b03a3a',
-  '#9e8038',
-  '#3f6b72',
-  '#eaeae6',
-]
 const ACCES = [
   { id: 'publique', libelle: 'Publique' },
   { id: 'privee', libelle: 'Privée' },
