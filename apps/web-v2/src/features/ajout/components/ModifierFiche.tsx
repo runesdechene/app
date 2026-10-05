@@ -21,7 +21,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Segments } from '@/shared/ui/Segments'
-import { ajouterPhotosLieu, fetchFicheAModifier, modifierLieu } from '../api/ajout'
+import {
+  ajouterPhotosLieu,
+  fetchFicheAModifier,
+  modifierLieu,
+  type FicheModifiee,
+} from '../api/ajout'
 import type { Fiche } from '../api/lireAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import type { PhotoBrouillon } from '../lib/brouillon'
@@ -43,6 +48,21 @@ function messageDeRefus(erreur: unknown): string {
     typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
   if (code === '22023') return 'Un champ est trop long : 1 000 signes au plus par rubrique.'
   return 'Les changements n’ont pas pu être enregistrés. Vérifie les champs, puis réessaie.'
+}
+
+// Seules les infos en plus touchées partent : une rubrique omise garde sa valeur en base, et ce
+// qu'un autre y aurait écrit entre-temps n'est pas défait.
+function infosChangees(depart: Fiche, valeur: Fiche) {
+  const acces = valeur.acces.trim()
+  const quand = valeur.quand.trim()
+  const bonASavoir = valeur.bonASavoir.trim()
+  const bivouacTolere = valeur.bivouacTolere
+  return {
+    ...(acces !== depart.acces && { acces }),
+    ...(quand !== depart.quand && { quand }),
+    ...(bonASavoir !== depart.bonASavoir && { bonASavoir }),
+    ...(bivouacTolere !== depart.bivouacTolere && { bivouacTolere }),
+  }
 }
 
 const ONGLETS = [
@@ -134,18 +154,15 @@ function Formulaire({
     mutationFn: async () => {
       if (nouvelles.length > 0) await ajouterPhotosLieu(id, nouvelles)
       if (champsChanges) {
-        await modifierLieu(
-          id,
-          {
-            ...valeur,
-            nom: valeur.nom.trim(),
-            recit: valeur.recit.trim(),
-            acces: valeur.acces.trim(),
-            quand: valeur.quand.trim(),
-            bonASavoir: valeur.bonASavoir.trim(),
-          },
-          note,
-        )
+        const fiche: FicheModifiee = {
+          nom: valeur.nom.trim(),
+          natures: valeur.natures,
+          epoque: valeur.epoque,
+          annee: valeur.annee,
+          recit: valeur.recit.trim(),
+          ...infosChangees(depart, valeur),
+        }
+        await modifierLieu(id, fiche, note)
       }
     },
     onSuccess: () => {

@@ -59,17 +59,18 @@ export async function fetchFicheAModifier(id: string) {
   return lireFicheAModifier(data)
 }
 
-// Ce qu'on enregistre en modifiant une fiche : les champs de l'ajout, le récit et les infos en plus.
+// Ce qu'on enregistre en modifiant une fiche : les champs de l'ajout, le récit, et les infos en plus
+// qu'on a touchées.
 export type FicheModifiee = Champs & {
   recit: string
-  acces: string
-  quand: string
-  bonASavoir: string
-  bivouacTolere: boolean
+  acces?: string
+  quand?: string
+  bonASavoir?: string
+  bivouacTolere?: boolean
 }
 
-// Modifier une fiche (migs 387, 414) : chaque enregistrement est une version. Les infos en plus
-// partent toujours : une chaîne vide vide la rubrique.
+// Modifier une fiche (migs 387, 414) : chaque enregistrement est une version. Une info en plus
+// absente garde sa valeur en base ; une chaîne vide vide la rubrique.
 export async function modifierLieu(id: string, f: FicheModifiee, note: string) {
   const { error } = await supabase.rpc('modifier_lieu', {
     p_id: id,
@@ -79,10 +80,10 @@ export async function modifierLieu(id: string, f: FicheModifiee, note: string) {
     ...(f.epoque !== null && { p_epoque: f.epoque }),
     ...(f.annee !== null && { p_annee: f.annee }),
     ...(note.trim() !== '' && { p_note: note }),
-    p_acces: f.acces,
-    p_quand: f.quand,
-    p_bon_a_savoir: f.bonASavoir,
-    p_bivouac_tolere: f.bivouacTolere,
+    ...(f.acces !== undefined && { p_acces: f.acces }),
+    ...(f.quand !== undefined && { p_quand: f.quand }),
+    ...(f.bonASavoir !== undefined && { p_bon_a_savoir: f.bonASavoir }),
+    ...(f.bivouacTolere !== undefined && { p_bivouac_tolere: f.bivouacTolere }),
   })
   if (error) throw error
 }

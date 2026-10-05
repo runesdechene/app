@@ -120,7 +120,7 @@ test('deux onglets : le récit, puis les infos en plus ; la saisie reste en pass
   expect(screen.getByRole('textbox', { name: 'Le récit' })).toHaveValue('Une tour carrée. Encore.')
 })
 
-test('un seul enregistrement envoie le récit, les rubriques, le bivouac et le mot', async () => {
+test('un seul enregistrement envoie le récit, les rubriques touchées et le mot ; une rubrique intacte ne part pas', async () => {
   api.modifierLieu.mockResolvedValue(undefined)
   monter()
   await userEvent.click(await screen.findByRole('radio', { name: 'Infos en plus' }))
@@ -134,12 +134,15 @@ test('un seul enregistrement envoie le récit, les rubriques, le bivouac et le m
   await waitFor(() => {
     expect(api.modifierLieu).toHaveBeenCalledWith(
       'a',
-      expect.objectContaining({
+      {
+        nom: 'Chateau de Jonjeac',
+        natures: ['chateau'],
+        epoque: null,
+        annee: null,
         recit: 'Une tour carrée.',
         acces: '',
         bonASavoir: 'Pas de feu',
-        bivouacTolere: false,
-      }),
+      },
       'conseil',
     )
   })
