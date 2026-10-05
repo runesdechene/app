@@ -6686,12 +6686,12 @@ export type Database = {
       }
       fonder_compagnie: {
         Args: {
-          p_avatar: string
+          p_avatar?: string
           p_couleur: string
           p_devise: string
           p_mission: string
           p_nom: string
-          p_privee: boolean
+          p_privee?: boolean
         }
         Returns: Json
       }
@@ -7281,17 +7281,17 @@ export type Database = {
       }
       modifier_compagnie: {
         Args: {
-          p_avatar: string
-          p_chef_f: string
-          p_chef_m: string
+          p_avatar?: string
+          p_chef_f?: string
+          p_chef_m?: string
           p_couleur: string
           p_devise: string
           p_id: string
           p_mission: string
           p_nom: string
-          p_officier_f: string
-          p_officier_m: string
-          p_privee: boolean
+          p_officier_f?: string
+          p_officier_m?: string
+          p_privee?: boolean
         }
         Returns: undefined
       }

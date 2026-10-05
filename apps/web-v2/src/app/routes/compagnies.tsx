@@ -6,6 +6,7 @@
 import { useParams } from 'react-router'
 import { EcranFonder } from '@/features/compagnies/components/EcranFonder'
 import { FicheCompagnie } from '@/features/compagnies/components/FicheCompagnie'
+import { GererCompagnie } from '@/features/compagnies/components/GererCompagnie'
 import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { DetailPane } from '../shell/DetailPane'
 
@@ -31,6 +32,15 @@ export function RouteCompagnie() {
   return (
     <DetailPane title="Compagnie" surImage>
       <FicheCompagnie key={id} id={id} />
+    </DetailPane>
+  )
+}
+
+export function RouteGerer() {
+  const { id = '' } = useParams()
+  return (
+    <DetailPane title="Gérer la Compagnie">
+      <GererCompagnie key={id} id={id} />
     </DetailPane>
   )
 }

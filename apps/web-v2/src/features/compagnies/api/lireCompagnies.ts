@@ -23,6 +23,15 @@ export type ListeCompagnies = {
   autres: CarteCompagnie[]
 }
 export type Roles = { chefM: string; chefF: string; officierM: string; officierF: string }
+// Ce qu'on écrit en fondant ou en gérant : la fiche d'une Compagnie.
+export type ChampsFiche = {
+  nom: string
+  devise: string
+  mission: string
+  couleur: string
+  avatar: string | null
+  privee: boolean
+}
 export type Membre = {
   id: string
   nom: string
