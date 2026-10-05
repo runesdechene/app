@@ -1044,6 +1044,49 @@ export type Database = {
         }
         Relationships: []
       }
+      demandes_compagnie: {
+        Row: {
+          cree_le: string
+          faction_id: string
+          mot: string | null
+          user_id: string
+        }
+        Insert: {
+          cree_le?: string
+          faction_id: string
+          mot?: string | null
+          user_id: string
+        }
+        Update: {
+          cree_le?: string
+          faction_id?: string
+          mot?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demandes_compagnie_faction_id_fkey"
+            columns: ["faction_id"]
+            isOneToOne: false
+            referencedRelation: "factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandes_compagnie_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandes_compagnie_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enigma_responses: {
         Row: {
           answer_given: string
@@ -1273,6 +1316,7 @@ export type Database = {
           id: string
           is_neutral: boolean
           place_id: string
+          pour_compagnie: string | null
           title: string | null
         }
         Insert: {
@@ -1281,6 +1325,7 @@ export type Database = {
           id?: string
           is_neutral?: boolean
           place_id: string
+          pour_compagnie?: string | null
           title?: string | null
         }
         Update: {
@@ -1289,6 +1334,7 @@ export type Database = {
           id?: string
           is_neutral?: boolean
           place_id?: string
+          pour_compagnie?: string | null
           title?: string | null
         }
         Relationships: [
@@ -1304,6 +1350,13 @@ export type Database = {
             columns: ["place_id"]
             isOneToOne: false
             referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expeditions_pour_compagnie_fkey"
+            columns: ["pour_compagnie"]
+            isOneToOne: false
+            referencedRelation: "factions"
             referencedColumns: ["id"]
           },
         ]
@@ -1440,6 +1493,7 @@ export type Database = {
           is_founder: boolean
           joined_at: string
           last_heralded_grade: number | null
+          role: string
           user_id: string
         }
         Insert: {
@@ -1449,6 +1503,7 @@ export type Database = {
           is_founder?: boolean
           joined_at?: string
           last_heralded_grade?: number | null
+          role?: string
           user_id: string
         }
         Update: {
@@ -1458,6 +1513,7 @@ export type Database = {
           is_founder?: boolean
           joined_at?: string
           last_heralded_grade?: number | null
+          role?: string
           user_id?: string
         }
         Relationships: [
@@ -1529,17 +1585,23 @@ export type Database = {
           bonus_regen_energy: number
           bonus_regen_vitalite: number | null
           bonus_vitalite: number | null
+          chef_f: string
+          chef_m: string
           color: string
           created_at: string | null
           created_by: string | null
           description: string | null
+          devise: string | null
           emblem_icon: string | null
           emblem_mono: string
           govern_grades: number
           id: string
           image_url: string | null
+          officier_f: string
+          officier_m: string
           order: number
           pattern: string | null
+          privee: boolean
           public_slug: string | null
           retired: boolean
           tags: string[]
@@ -1557,17 +1619,23 @@ export type Database = {
           bonus_regen_energy?: number
           bonus_regen_vitalite?: number | null
           bonus_vitalite?: number | null
+          chef_f?: string
+          chef_m?: string
           color?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          devise?: string | null
           emblem_icon?: string | null
           emblem_mono?: string
           govern_grades?: number
           id: string
           image_url?: string | null
+          officier_f?: string
+          officier_m?: string
           order?: number
           pattern?: string | null
+          privee?: boolean
           public_slug?: string | null
           retired?: boolean
           tags?: string[]
@@ -1585,17 +1653,23 @@ export type Database = {
           bonus_regen_energy?: number
           bonus_regen_vitalite?: number | null
           bonus_vitalite?: number | null
+          chef_f?: string
+          chef_m?: string
           color?: string
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          devise?: string | null
           emblem_icon?: string | null
           emblem_mono?: string
           govern_grades?: number
           id?: string
           image_url?: string | null
+          officier_f?: string
+          officier_m?: string
           order?: number
           pattern?: string | null
+          privee?: boolean
           public_slug?: string | null
           retired?: boolean
           tags?: string[]
@@ -3362,6 +3436,7 @@ export type Database = {
           is_neutral: boolean
           place_id: string
           planted_at: string
+          pour_compagnie: string | null
           previous_expedition_id: string | null
           veilleur_user_id: string | null
         }
@@ -3372,6 +3447,7 @@ export type Database = {
           is_neutral?: boolean
           place_id: string
           planted_at?: string
+          pour_compagnie?: string | null
           previous_expedition_id?: string | null
           veilleur_user_id?: string | null
         }
@@ -3382,6 +3458,7 @@ export type Database = {
           is_neutral?: boolean
           place_id?: string
           planted_at?: string
+          pour_compagnie?: string | null
           previous_expedition_id?: string | null
           veilleur_user_id?: string | null
         }
@@ -3405,6 +3482,13 @@ export type Database = {
             columns: ["place_id"]
             isOneToOne: true
             referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "place_veille_pour_compagnie_fkey"
+            columns: ["pour_compagnie"]
+            isOneToOne: false
+            referencedRelation: "factions"
             referencedColumns: ["id"]
           },
           {
@@ -5891,6 +5975,7 @@ export type Database = {
         Args: { p_caller: string; p_place_id: string }
         Returns: boolean
       }
+      _carte_compagnie: { Args: { p_id: string; p_moi: string }; Returns: Json }
       _carte_lieu: { Args: { p_place_id: string }; Returns: Json }
       _contribute_to_place_internal: {
         Args: {
@@ -5982,6 +6067,7 @@ export type Database = {
         Args: { p_from?: string; p_to?: string; p_user_id: string }
         Returns: number
       }
+      _est_porteur: { Args: { p_user: string }; Returns: boolean }
       _etat_du_lieu: {
         Args: { p_id: string }
         Returns: {
@@ -6107,6 +6193,10 @@ export type Database = {
           pays: string
         }[]
       }
+      _refus: {
+        Args: { p_hint: string; p_message: string }
+        Returns: undefined
+      }
       _region_montree: { Args: { p_user: string }; Returns: string }
       _reglage: { Args: { p_cle: string; p_defaut: number }; Returns: number }
       _require_min_discoveries: {
@@ -6116,6 +6206,10 @@ export type Database = {
       _require_min_level: {
         Args: { p_min_level: number; p_user_id: string }
         Returns: Json
+      }
+      _role_compagnie: {
+        Args: { p_id: string; p_user: string }
+        Returns: string
       }
       _rubrique_v1: {
         Args: {
@@ -6128,6 +6222,7 @@ export type Database = {
         Returns: undefined
       }
       _silhouette: { Args: { p_geom: unknown }; Returns: Json }
+      _succession: { Args: { p_id: string }; Returns: undefined }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
       _unlike_contribution_internal: {
         Args: { p_contribution_id: number; p_user_id: string }
@@ -6167,6 +6262,15 @@ export type Database = {
       _user_place_score: {
         Args: { p_place_id: string; p_user_id: string }
         Returns: number
+      }
+      _verifier_fiche: {
+        Args: {
+          p_couleur: string
+          p_devise: string
+          p_mission: string
+          p_nom: string
+        }
+        Returns: undefined
       }
       _visit_place_gps_internal: {
         Args: {
@@ -6293,6 +6397,10 @@ export type Database = {
       }
       carte_lieux: { Args: never; Returns: Json }
       carte_publique: { Args: never; Returns: Json }
+      changer_role: {
+        Args: { p_id: string; p_role: string; p_user: string }
+        Returns: undefined
+      }
       cheat_refill: { Args: { p_user_id: string }; Returns: Json }
       cheat_refill_target: {
         Args: { p_caller_id: string; p_target_name: string }
@@ -6318,6 +6426,8 @@ export type Database = {
         Returns: undefined
       }
       coeurs_du_lieu: { Args: { p_id: string }; Returns: Json }
+      compagnie: { Args: { p_id: string }; Returns: Json }
+      compagnies: { Args: never; Returns: Json }
       compagnons_possibles: { Args: { p_id: string }; Returns: Json }
       contribute_to_place: {
         Args: {
@@ -6571,6 +6681,17 @@ export type Database = {
           p_reason: string
           p_user_id: string
           p_voyage_id: string
+        }
+        Returns: Json
+      }
+      fonder_compagnie: {
+        Args: {
+          p_avatar: string
+          p_couleur: string
+          p_devise: string
+          p_mission: string
+          p_nom: string
+          p_privee: boolean
         }
         Returns: Json
       }
@@ -7111,6 +7232,7 @@ export type Database = {
       }
       marquer_notifications_lues: { Args: never; Returns: number }
       marquer_registre_lu: { Args: never; Returns: undefined }
+      mes_canaux: { Args: never; Returns: Json }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mes_notifications: { Args: never; Returns: Json }
@@ -7155,6 +7277,22 @@ export type Database = {
       }
       moderate_submission: {
         Args: { p_crowns?: number; p_status: string; p_submission_id: string }
+        Returns: undefined
+      }
+      modifier_compagnie: {
+        Args: {
+          p_avatar: string
+          p_chef_f: string
+          p_chef_m: string
+          p_couleur: string
+          p_devise: string
+          p_id: string
+          p_mission: string
+          p_nom: string
+          p_officier_f: string
+          p_officier_m: string
+          p_privee: boolean
+        }
         Returns: undefined
       }
       modifier_lieu: {
@@ -7279,6 +7417,7 @@ export type Database = {
         }
         Returns: Json
       }
+      quitter_compagnie: { Args: { p_id: string }; Returns: undefined }
       randomize_position_on_land: {
         Args: { p_lat: number; p_lng: number }
         Returns: Json
@@ -7320,6 +7459,10 @@ export type Database = {
         Returns: Json
       }
       registre_non_lus: { Args: never; Returns: Json }
+      rejoindre_compagnie: {
+        Args: { p_id: string; p_mot?: string }
+        Returns: Json
+      }
       remove_company_member: {
         Args: {
           p_company_id: string
@@ -7352,6 +7495,10 @@ export type Database = {
         Args: { p_place_id: string; p_title: string; p_user_id: string }
         Returns: Json
       }
+      repondre_demande: {
+        Args: { p_id: string; p_oui: boolean; p_user: string }
+        Returns: undefined
+      }
       request_join_voyage: {
         Args: { p_message?: string; p_user_id: string; p_voyage_id: string }
         Returns: Json
@@ -7369,8 +7516,17 @@ export type Database = {
         Args: { p_place_id: string; p_revision_id: number; p_user_id: string }
         Returns: Json
       }
+      retirer_membre: {
+        Args: { p_id: string; p_user: string }
+        Returns: undefined
+      }
       revendiquer_lieu: {
-        Args: { p_compagnons: string[]; p_id: string; p_nom: string }
+        Args: {
+          p_compagnons: string[]
+          p_id: string
+          p_nom: string
+          p_pour_compagnie?: string
+        }
         Returns: Json
       }
       revenir_a_version: { Args: { p_version: number }; Returns: Json }
