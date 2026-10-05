@@ -30,7 +30,11 @@ export function FenetreRevendication({
   fiche: Pick<FicheLieu, 'id' | 'nom'>
   onFermer: () => void
 }) {
-  const { compagnons, noms, revendiquer, enCours, erreur } = useRevendication(fiche.id, true)
+  const { compagnons, noms, compagnies, revendiquer, enCours, erreur } = useRevendication(
+    fiche.id,
+    true,
+  )
+  const [pour, setPour] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>('seul')
   const [coches, setCoches] = useState<ReadonlySet<string>>(new Set())
   const [nom, setNom] = useState('')
@@ -50,7 +54,7 @@ export function FenetreRevendication({
   }
 
   function valider() {
-    const envoi = enGroupe ? revendiquer(choisis, nom.trim()) : revendiquer([], null)
+    const envoi = enGroupe ? revendiquer(choisis, nom.trim(), pour) : revendiquer([], null, pour)
     envoi.then(onFermer, () => undefined) // l'échec est écrit par `erreur`
   }
 
@@ -106,6 +110,36 @@ export function FenetreRevendication({
               )}
             </>
           )}
+        </div>
+      )}
+
+      {compagnies.length > 0 && (
+        <div className={styles.expedition}>
+          <p className={styles.libelle}>Pour une Compagnie (facultatif)</p>
+          <div className={styles.noms}>
+            <PastilleChoix
+              libelle="Aucune"
+              choisie={pour === null}
+              onClick={() => {
+                setPour(null)
+              }}
+            />
+            {compagnies.map((c) => (
+              <PastilleChoix
+                key={c.id}
+                libelle={c.nom}
+                choisie={pour === c.id}
+                onClick={() => {
+                  setPour(c.id)
+                }}
+              />
+            ))}
+          </div>
+          <p className={styles.aide}>
+            La fiche du lieu dira « pour{' '}
+            {compagnies.find((c) => c.id === pour)?.nom ?? 'ta Compagnie'} », et le lieu rejoindra «
+            Leurs lieux ». La carte garde ton nom.
+          </p>
         </div>
       )}
 

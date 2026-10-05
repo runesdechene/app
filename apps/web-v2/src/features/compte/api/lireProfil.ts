@@ -45,6 +45,7 @@ export type ExplorateurProfile = {
   envies: Lieu[] | null
   signe: Signe | null
   fragmentsADecouvrir: number | null // sur son propre profil seulement (migration 360)
+  compagnies: { id: string; nom: string; couleur: string }[] // ses Compagnies (migration 422)
   estMoi: boolean
 }
 
@@ -143,6 +144,13 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       envies: ouNull(liste(lieu))(o.envies),
       signe: ouNull(signe)(o.signe),
       fragmentsADecouvrir: facultatif(nombre, o.fragmentsADecouvrir),
+      compagnies:
+        o.compagnies === undefined
+          ? []
+          : liste((v) => {
+              const c = objet(v)
+              return { id: chaine(c.id), nom: chaine(c.nom), couleur: chaine(c.couleur) }
+            })(o.compagnies),
       estMoi: booleen(o.estMoi),
     }
   } catch {

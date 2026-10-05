@@ -213,3 +213,20 @@ test('sur son propre lieu, on lit ses cœurs sans pouvoir s’en envoyer', async
   expect(api.aimerLieu).not.toHaveBeenCalled()
   expect(within(pastille).getByText('42')).toBeInTheDocument()
 })
+
+test('une revendication pour une Compagnie le dit, et mène à sa fiche', async () => {
+  api.fetchFiche.mockResolvedValue({
+    ...FICHE,
+    revendication: {
+      nom: 'LES LOUPS',
+      moi: false,
+      depuis: '2026-09-12T10:00:00Z',
+      pourCompagnie: { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' },
+    },
+  })
+  afficher()
+  expect(await screen.findByRole('link', { name: 'Le Lys de Fer' })).toHaveAttribute(
+    'href',
+    '/compagnie/f-lys',
+  )
+})

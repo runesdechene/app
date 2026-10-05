@@ -440,3 +440,9 @@
     transition: none;
   }
 }
+
+/* « · pour Le Lys de Fer » : le nom de la Compagnie mène à sa fiche (mig 422). */
+.pourCompagnie {
+  color: inherit;
+  font-weight: var(--weight-semi);
+}

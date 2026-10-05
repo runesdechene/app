@@ -19,12 +19,21 @@ function afficher({
   compagnons,
   noms,
   erreur = null,
+  compagnies = [],
 }: {
   compagnons: Compagnon[]
   noms: string[]
   erreur?: string | null
+  compagnies?: { id: string; nom: string; couleur: string }[]
 }) {
-  revendication_.mockReturnValue({ compagnons, noms, revendiquer, enCours: false, erreur })
+  revendication_.mockReturnValue({
+    compagnons,
+    noms,
+    compagnies,
+    revendiquer,
+    enCours: false,
+    erreur,
+  })
   render(
     <FenetreRevendication fiche={{ id: 'a', nom: 'Château de Jonjeac' }} onFermer={onFermer} />,
   )
@@ -38,7 +47,7 @@ test('seul : « Revendiquer » n’envoie ni compagnon ni nom', async () => {
   expect(screen.getByText('Personne d’autre n’est ici en ce moment')).toBeInTheDocument()
   await userEvent.click(screen.getByRole('radio', { name: 'Seul' }))
   await userEvent.click(screen.getByRole('button', { name: 'Revendiquer' }))
-  expect(revendiquer).toHaveBeenCalledWith([], null)
+  expect(revendiquer).toHaveBeenCalledWith([], null, null)
 })
 
 test('en expédition : je coche un compagnon présent et je choisis un nom passé', async () => {
@@ -48,7 +57,7 @@ test('en expédition : je coche un compagnon présent et je choisis un nom pass�
   await userEvent.click(screen.getByRole('checkbox', { name: /Rémy/ }))
   await userEvent.click(screen.getByRole('button', { name: 'Les Loups' }))
   await userEvent.click(screen.getByRole('button', { name: 'Revendiquer' }))
-  expect(revendiquer).toHaveBeenCalledWith(['b'], 'Les Loups')
+  expect(revendiquer).toHaveBeenCalledWith(['b'], 'Les Loups', null)
 })
 
 test('en expédition sans nom : « Revendiquer » attend un nom', async () => {
@@ -87,6 +96,7 @@ test('un compagnon coché qui s’en va ne bloque pas la revendication', async (
   revendication_.mockReturnValue({
     compagnons: [REMY],
     noms: [],
+    compagnies: [],
     revendiquer,
     enCours: false,
     erreur: null,
@@ -99,6 +109,7 @@ test('un compagnon coché qui s’en va ne bloque pas la revendication', async (
   revendication_.mockReturnValue({
     compagnons: [],
     noms: [],
+    compagnies: [],
     revendiquer,
     enCours: false,
     erreur: null,
@@ -107,5 +118,23 @@ test('un compagnon coché qui s’en va ne bloque pas la revendication', async (
   const bouton = screen.getByRole('button', { name: 'Revendiquer' })
   expect(bouton).toBeEnabled()
   await userEvent.click(bouton)
-  expect(revendiquer).toHaveBeenCalledWith([], null)
+  expect(revendiquer).toHaveBeenCalledWith([], null, null)
+})
+
+test('pour une Compagnie : « Aucune » par défaut, ou l’une des miennes', async () => {
+  afficher({
+    compagnons: [],
+    noms: [],
+    compagnies: [{ id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }],
+  })
+  expect(screen.getByText('Pour une Compagnie (facultatif)')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Aucune' })).toHaveAttribute('aria-pressed', 'true')
+  await userEvent.click(screen.getByRole('button', { name: 'Le Lys de Fer' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Revendiquer' }))
+  expect(revendiquer).toHaveBeenCalledWith([], null, 'f-lys')
+})
+
+test('sans Compagnie, pas de choix « Pour une Compagnie »', () => {
+  afficher({ compagnons: [], noms: [] })
+  expect(screen.queryByText('Pour une Compagnie (facultatif)')).not.toBeInTheDocument()
 })

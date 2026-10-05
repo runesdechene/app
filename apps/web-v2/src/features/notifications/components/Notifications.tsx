@@ -57,6 +57,11 @@ function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'
   if (n.type === 'salut' && n.evenement === 'message') return '/messages'
   if (n.type === 'mise_a_jour') return '../nouveautes'
+  if (n.compagnie) {
+    return n.type === 'demande_compagnie'
+      ? `../compagnie/${n.compagnie.id}/gerer`
+      : `../compagnie/${n.compagnie.id}`
+  }
   return n.lieu ? `../lieu/${n.lieu.id}` : null
 }
 

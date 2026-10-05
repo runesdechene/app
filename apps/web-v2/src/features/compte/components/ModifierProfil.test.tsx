@@ -56,6 +56,7 @@ const PROFIL: ExplorateurProfile = {
   envies: [],
   signe: null,
   fragmentsADecouvrir: null,
+  compagnies: [],
   estMoi: true,
 }
 vi.mock('../api/explorateur', () => ({ fetchExplorateur: () => Promise.resolve(PROFIL) }))

@@ -15,6 +15,7 @@ export type Notification = {
   nombre: number | null
   extrait: string | null
   evenement: string | null
+  compagnie: { id: string; nom: string } | null // une demande de Compagnie (migration 421)
 }
 
 function lirePersonne(v: unknown): Personne {
@@ -39,5 +40,10 @@ export const lireNotifications = liste((v): Notification => {
     nombre: ouNull(nombre)(n.nombre),
     extrait: ouNull(chaine)(n.extrait),
     evenement: ouNull(chaine)(n.evenement),
+    // Absente avant la migration 421 : aucune.
+    compagnie: ouNull((v) => {
+      const c = objet(v)
+      return { id: chaine(c.id), nom: chaine(c.nom) }
+    })(n.compagnie ?? null),
   }
 })

@@ -32,6 +32,7 @@ const BASE: ExplorateurProfile = {
   envies: [],
   signe: null,
   fragmentsADecouvrir: null,
+  compagnies: [],
   estMoi: true,
 }
 

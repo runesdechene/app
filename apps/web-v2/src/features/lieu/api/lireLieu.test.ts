@@ -88,3 +88,19 @@ test('les compagnons portent leur distance', () => {
     120,
   )
 })
+
+test('la revendication dit pour quelle Compagnie ; absente, null', () => {
+  const f = lireFiche({
+    ...COMPLET,
+    revendication: {
+      ...COMPLET.revendication,
+      pourCompagnie: { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' },
+    },
+  })
+  expect(f?.revendication?.pourCompagnie).toEqual({
+    id: 'f-lys',
+    nom: 'Le Lys de Fer',
+    couleur: '#5f6f86',
+  })
+  expect(lireFiche(COMPLET)?.revendication?.pourCompagnie).toBeNull()
+})

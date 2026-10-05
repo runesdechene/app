@@ -1,0 +1,24 @@
+/*
+ * QUOI     — les gélules des Compagnies d'un Explorateur : sa couleur en voile, son nom à son encre.
+ */
+.compagnies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-6);
+  list-style: none;
+}
+
+.gelule {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--couleur) 18%, var(--color-fond));
+  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-decoration: none;
+}

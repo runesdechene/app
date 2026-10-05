@@ -45,7 +45,13 @@ export type FicheLieu = {
   rubriques: { acces: string | null; quand: string | null; bonASavoir: string | null }
   bivouacTolere: boolean
   explorateurs: { nombre: number; derniers: Personne[] }
-  revendication: { nom: string; moi: boolean; depuis: string } | null
+  revendication: {
+    nom: string
+    moi: boolean
+    depuis: string
+    // « pour Le Lys de Fer » (migration 422).
+    pourCompagnie: { id: string; nom: string; couleur: string } | null
+  } | null
   auteur: Personne | null
   ajouteLe: string
   // Ajouté sans y être (migration 393) : le crédit de l'auteur est plus discret.
@@ -80,7 +86,16 @@ function lireType(v: unknown) {
 
 function lireRevendication(v: unknown) {
   const r = objet(v)
-  return { nom: chaine(r.nom), moi: booleen(r.moi), depuis: chaine(r.depuis) }
+  return {
+    nom: chaine(r.nom),
+    moi: booleen(r.moi),
+    depuis: chaine(r.depuis),
+    // Absente avant la migration 422 : aucune.
+    pourCompagnie: ouNull((v) => {
+      const c = objet(v)
+      return { id: chaine(c.id), nom: chaine(c.nom), couleur: chaine(c.couleur) }
+    })(r.pourCompagnie ?? null),
+  }
 }
 
 export function lireFiche(json: unknown): FicheLieu | null {

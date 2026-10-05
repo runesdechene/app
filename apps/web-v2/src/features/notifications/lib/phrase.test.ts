@@ -15,6 +15,7 @@ const base: Notification = {
   nombre: null,
   extrait: null,
   evenement: null,
+  compagnie: null,
 }
 const texte = (n: Notification) =>
   phraseDe(n)
@@ -75,5 +76,15 @@ test('une mention cite le message ; un salut dit ce qui est salué', () => {
 test('un lieu disparu, un compte effacé : la phrase tient quand même', () => {
   expect(texte({ ...base, qui: null, lieu: null })).toBe(
     'Quelqu’un a envoyé des cœurs à un lieu disparu',
+  )
+})
+
+test('les demandes d’une Compagnie', () => {
+  const compagnie = { id: 'f-lys', nom: 'Le Lys de Fer' }
+  expect(texte({ ...base, type: 'demande_compagnie', lieu: null, compagnie })).toBe(
+    'Kelpie demande à rejoindre Le Lys de Fer',
+  )
+  expect(texte({ ...base, type: 'demande_acceptee', lieu: null, compagnie })).toBe(
+    'Ta demande pour Le Lys de Fer est acceptée',
   )
 })

@@ -35,6 +35,7 @@ const COMPLET = {
   envies: null,
   signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
   fragmentsADecouvrir: 5,
+  compagnies: [],
   estMoi: true,
 }
 
@@ -89,4 +90,13 @@ test('une carte sans coordonnées, catégorie ni auteur reste lisible', () => {
     categorie: null,
     auteur: null,
   })
+})
+
+test('ses Compagnies se lisent ; absentes, aucune', () => {
+  const p = lireProfil({
+    ...COMPLET,
+    compagnies: [{ id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }],
+  })
+  expect(p?.compagnies).toEqual([{ id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }])
+  expect(lireProfil({ ...COMPLET, compagnies: undefined })?.compagnies).toEqual([])
 })

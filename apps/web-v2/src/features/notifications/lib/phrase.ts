@@ -43,6 +43,18 @@ export function phraseDe(n: Notification): Morceau[] {
       return [t('Ta fiche de '), lieu, t(` a été vue ${combien} fois`)]
     case 'milestone_likes':
       return [lieu, t(` a reçu ${combien} cœurs`)]
+    case 'demande_compagnie':
+      return [
+        qui,
+        t(' demande à rejoindre '),
+        { texte: n.compagnie?.nom ?? 'ta Compagnie', sorte: 'lieu' },
+      ]
+    case 'demande_acceptee':
+      return [
+        t('Ta demande pour '),
+        { texte: n.compagnie?.nom ?? 'une Compagnie', sorte: 'lieu' },
+        t(' est acceptée'),
+      ]
     case 'mention':
       return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]
     case 'mise_a_jour':

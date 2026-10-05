@@ -52,6 +52,7 @@ const PROFIL: ExplorateurProfile = {
   envies: [carte('p3', 'Mont Bégo')],
   signe: null,
   fragmentsADecouvrir: 5,
+  compagnies: [],
   estMoi: true,
 }
 

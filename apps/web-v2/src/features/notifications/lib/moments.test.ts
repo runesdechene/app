@@ -15,6 +15,7 @@ const n = (id: number, quand: Date): Notification => ({
   nombre: null,
   extrait: null,
   evenement: null,
+  compagnie: null,
 })
 
 test('trois rubriques, dans l’ordre, sans rubrique vide', () => {

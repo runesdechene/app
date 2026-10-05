@@ -11,6 +11,7 @@
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
  */
 import { aLaTaille } from '@/shared/lib/image'
+import { Link } from 'react-router'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 import acces from '@/assets/ui/acces.svg'
 import bivouacIcone from '@/assets/ui/bivouac.svg'
@@ -218,6 +219,18 @@ export function FicheLieu({
             <span className={styles.depuis}>
               · depuis le {DEPUIS.format(new Date(fiche.revendication.depuis))}
             </span>
+            {fiche.revendication.pourCompagnie && (
+              <span className={styles.depuis}>
+                · pour{' '}
+                <Link
+                  className={styles.pourCompagnie}
+                  to={`../../compagnie/${fiche.revendication.pourCompagnie.id}`}
+                  relative="path"
+                >
+                  {fiche.revendication.pourCompagnie.nom}
+                </Link>
+              </span>
+            )}
           </p>
         )}
 
