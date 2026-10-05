@@ -31,6 +31,13 @@ les photos.
   texte 14 px `--color-texte-doux`), chacune précédée de son icône au trait (Lucide `route`,
   `calendar-days`, `lightbulb` → `assets/ui/acces.svg`, `quand.svg`, `bon-a-savoir.svg`) ; puis
   « Enrichir la fiche ». La ligne de faits sous le titre ne garde que l'époque et le siècle.
+- **Les crédits du pied de fiche restent, sous « Enrichir la fiche »** (maquette retouchée par Uriel, 05/10) :
+  « Lieu ajouté par Luna ✶ le 17 octobre 2026 » (déjà codé), puis « Enrichi par Mathéo » **avec son portrait**
+  (aujourd'hui `url={null}`) et, en pâle, **ce qu'il a apporté** : « Texte », « Image » ou « Image + Texte ».
+  « Enrichi par » = la dernière personne, autre que l'auteur, qui a fait une version (récit ou rubrique) ou
+  ajouté une photo ; « Texte » si elle a fait au moins une version, « Image » si elle a ajouté au moins une
+  photo. `fiche_lieu.enrichiPar` le lit dans `versions_lieu` et les photos, plus dans
+  `place_description_revisions`.
 - **Modifier** : l'étape du récit devient deux onglets `Segments` (la brique existante) : « Le récit » (un
   grand champ) et « Infos en plus » (les trois rubriques, mêmes icônes, un exemple en italique quand le champ
   est vide). Un seul « Enregistrer les changements » pour les deux onglets → une seule version. Au pied :
