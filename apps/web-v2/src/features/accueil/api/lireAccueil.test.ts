@@ -47,6 +47,11 @@ test('les revendications et récits enrichis se lisent (migration 406)', () => {
   expect(lignes.map((l) => l.type)).toEqual(['revendication', 'enrichi'])
 })
 
+test('une modification est une ligne des chemins (migration 415)', () => {
+  const lignes = lireChemins([{ ...CHEMIN, id: 'modifie:l1:u1:1', type: 'modifie' }])
+  expect(lignes.map((l) => l.type)).toEqual(['modifie'])
+})
+
 test('les arrivées reviennent (migration 411) ; les connexions, non', () => {
   const [arrivee] = lireChemins([{ ...CHEMIN, id: 'arrivee:u1', type: 'arrivee', lieu: null }])
   expect(arrivee?.type).toBe('arrivee')

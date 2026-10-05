@@ -32,6 +32,7 @@ const ICONES = {
   arrivee: cheminArrivee,
   revendication: drapeau,
   enrichi: plume,
+  modifie: plume,
 }
 // Les phrases d'Uriel (01/10).
 const VERBES = {
@@ -40,6 +41,7 @@ const VERBES = {
   arrivee: 'a rejoint EXPLORE !',
   revendication: 'vient de revendiquer',
   enrichi: 'a enrichi',
+  modifie: 'a modifié', // le nom, la nature ou l'époque (mig 415)
 }
 const D_ABORD = 5
 
