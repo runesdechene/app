@@ -9,13 +9,15 @@
  *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
- *            gens qui passent (migration 408) : qui a rejoint EXPLORE — on lui souhaite la
- *            bienvenue sur place —, qui vient de se connecter. Chaque message se dessine par
+ *            arrivées (migrations 408, 411) : qui a rejoint EXPLORE — on lui souhaite la bienvenue
+ *            sur place, ou depuis « Sur les chemins », la personne déjà mentionnée. Chaque message se dessine par
  *            `LigneMessage`, avec ses cœurs (migration 410).
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { useLocation } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
+import { chaine, objet, ouNull } from '@/shared/lib/lire'
 import { CANAUX, type Canal, type Personne } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
@@ -25,7 +27,6 @@ import { autreJour, jourDe } from '../lib/jour'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
-import { LigneConnexions } from './LigneConnexions'
 import { LigneMessage } from './LigneMessage'
 import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
@@ -34,6 +35,13 @@ import styles from './Registre.module.css'
 const NOMS: Record<Canal, { filtre: string; court: string }> = {
   general: { filtre: 'Canal général', court: 'Général' },
   bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
+}
+
+// La personne à accueillir, quand on arrive de « Souhaite-lui la bienvenue ! » (l'état de
+// l'adresse, lu comme les réponses de la base : rien n'est supposé).
+function personneAMentionner(etat: unknown): Personne | null {
+  const m = ouNull(objet)(objet(etat ?? {}).mentionner ?? null)
+  return m ? { id: chaine(m.id), nom: chaine(m.nom), avatar: ouNull(chaine)(m.avatar) } : null
 }
 
 export function Registre() {
@@ -66,7 +74,20 @@ export function Registre() {
     placer({ texte: debut + texte, curseur: debut.length })
   }
 
-  // Les gens qui passent ne vivent que dans le canal général.
+  // Arrivé par « Souhaite-lui la bienvenue ! » de « Sur les chemins » : la bienvenue est prête,
+  // une fois par arrivée sur la page.
+  const location = useLocation()
+  const [bienvenuePour, setBienvenuePour] = useState<string | null>(null)
+  const aAccueillir = personneAMentionner(location.state as unknown)
+  if (aAccueillir && bienvenuePour !== location.key) {
+    setBienvenuePour(location.key)
+    mentions.ajouter(aAccueillir)
+    const debut = `@${aAccueillir.nom} `
+    setTexte(debut)
+    setCurseur(debut.length)
+  }
+
+  // Les arrivées ne vivent que dans le canal général.
   const fil = entremeler(
     (messages ?? []).filter((m) => coches.has(m.canal)),
     coches.has('general') ? passages : [],
@@ -114,14 +135,6 @@ export function Registre() {
               <Fragment key={ligne.passage.id}>
                 {jour}
                 <LignePassage passage={ligne.passage} onBienvenue={souhaiterLaBienvenue} />
-              </Fragment>
-            )
-          }
-          if (ligne.sorte === 'connexions') {
-            return (
-              <Fragment key={ligne.passages[0]?.id ?? ligne.quand}>
-                {jour}
-                <LigneConnexions passages={ligne.passages} />
               </Fragment>
             )
           }

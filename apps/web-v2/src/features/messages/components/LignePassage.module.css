@@ -1,6 +1,6 @@
 /*
- * QUOI     — une arrivée dans le Registre : centrée, au crayon pâle, entre les messages, mais qui se
- *            voit (portrait, bienvenue en rouge).
+ * QUOI     — une arrivée dans le Registre : centrée, petite, au crayon pâle, entre les messages ;
+ *            seule la bienvenue, en rouge, appelle le geste (Uriel, 05/10 : plus discrète).
  */
 .arrivee {
   display: flex;
@@ -10,7 +10,7 @@
   gap: var(--space-1) var(--space-2);
   color: var(--color-texte-pale);
   font-family: var(--font-corps);
-  font-size: var(--corps-size);
+  font-size: var(--legende-size);
   text-align: center;
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
 }

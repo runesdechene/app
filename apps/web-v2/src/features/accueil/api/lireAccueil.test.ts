@@ -47,8 +47,10 @@ test('les revendications et récits enrichis se lisent (migration 406)', () => {
   expect(lignes.map((l) => l.type)).toEqual(['revendication', 'enrichi'])
 })
 
-test('les arrivées et les connexions sont parties au Registre (migration 408)', () => {
-  expect(() => lireChemins([{ ...CHEMIN, id: 'arrivee:u1', type: 'arrivee' }])).toThrow()
+test('les arrivées reviennent (migration 411) ; les connexions, non', () => {
+  const [arrivee] = lireChemins([{ ...CHEMIN, id: 'arrivee:u1', type: 'arrivee', lieu: null }])
+  expect(arrivee?.type).toBe('arrivee')
+  expect(() => lireChemins([{ ...CHEMIN, id: 'connexion:u1:1', type: 'connexion' }])).toThrow()
 })
 
 test('un type de ligne inconnu est refusé, pas deviné', () => {

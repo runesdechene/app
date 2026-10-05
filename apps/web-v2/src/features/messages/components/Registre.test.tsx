@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -25,7 +25,6 @@ vi.mock('../api/registre', () => api)
 const URIEL = { id: 'u1', nom: 'Uriel', avatar: null }
 const GAUTIER = { id: 'u2', nom: 'Gautier', avatar: null }
 const KELPIE = { id: 'u9', nom: 'Kelpie', avatar: null }
-const ASH = { id: 'u8', nom: 'Ash', avatar: null }
 
 // Un message de Gautier, et qui l'a aimé.
 function balade(coeurs: (typeof URIEL)[], aime: boolean) {
@@ -259,26 +258,36 @@ test('au clavier : les flèches choisissent dans la liste, Entrée mentionne san
   expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
 })
 
-test('les gens qui passent s’écrivent dans le canal général ; les connexions d’affilée, en une ligne', async () => {
-  const ilYa = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString()
+test('les arrivées s’écrivent dans le canal général, discrètes et sans portrait ; plus de connexions', async () => {
   api.fetchPassages.mockResolvedValue([
-    { id: 'arrivee:u9', type: 'arrivee', quand: ilYa(30), qui: KELPIE, moi: false },
-    { id: 'connexion:u8', type: 'connexion', quand: ilYa(20), qui: ASH, moi: false },
-    { id: 'connexion:u2', type: 'connexion', quand: ilYa(10), qui: GAUTIER, moi: false },
+    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
   ])
   monter()
   const registre = await screen.findByRole('list', { name: 'Registre' })
-  expect(
-    await within(registre).findByText('Kelpie', { exact: false, selector: 'a' }),
-  ).toBeInTheDocument()
-  const lignes = within(registre).getAllByRole('listitem')
-  expect(lignes.some((l) => l.textContent.includes('Kelpie a rejoint EXPLORE !'))).toBe(true)
-  expect(
-    lignes.filter((l) => l.textContent.includes('Gautier et Ash se sont connectés')),
-  ).toHaveLength(1)
-  // Le canal général décoché : les passages s'en vont avec lui.
+  const arrivee = (await within(registre).findByText(/a rejoint EXPLORE/)).closest('li')
+  if (!arrivee) throw new Error('ligne absente')
+  expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
+  expect(within(arrivee).queryByRole('img')).toBeNull()
+  // Le canal général décoché : les arrivées s'en vont avec lui.
   await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
-  expect(within(registre).queryByText(/se sont connectés/)).toBeNull()
+  expect(within(registre).queryByText(/a rejoint EXPLORE/)).toBeNull()
+})
+
+test('arrivé par « Souhaite-lui la bienvenue ! » (Sur les chemins) : la personne est déjà mentionnée', async () => {
+  const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
+    initialEntries: [{ pathname: '/messages', state: { mentionner: KELPIE } }],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  const champ = await screen.findByRole('textbox')
+  await waitFor(() => {
+    expect(champ).toHaveValue('@Kelpie ')
+  })
+  await userEvent.type(champ, 'bienvenue !{Enter}')
+  expect(api.ecrire).toHaveBeenCalledWith('general', '@Kelpie bienvenue !', ['u9'])
 })
 
 test('« Souhaite-lui la bienvenue ! » : la personne est mentionnée, on écrit dans le général', async () => {

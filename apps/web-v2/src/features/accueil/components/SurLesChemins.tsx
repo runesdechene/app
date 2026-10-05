@@ -1,7 +1,8 @@
 /**
  * QUOI     — « Sur les chemins » (maquette 27:2) : le fil des lieux — qui a visité, ajouté,
- *            revendiqué, enrichi un lieu — et son seul geste, Saluer (le cœur). Qui rejoint EXPLORE
- *            ou vient de se connecter vit dans le Registre (Uriel, 01/10, migration 408).
+ *            revendiqué, enrichi un lieu —, qui a rejoint EXPLORE (un moment de bienvenue, Uriel
+ *            05/10), et son seul geste, Saluer (le cœur). « Souhaite-lui la bienvenue ! » ouvre le
+ *            Registre, la personne déjà mentionnée.
  * POURQUOI — spec V2 §5 : pas de commentaires, pas d'émojis ; un salut et son compteur. On ne
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
  *            un lieu sa fiche — dans l'Accueil, qui reste derrière. Cinq lignes ; « Voir toute
@@ -10,6 +11,7 @@
  *            toucher fait s'envoler un petit cœur, pour qu'une rafale devienne une armée.
  */
 import { Link } from 'react-router'
+import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
 import cheminVisite from '@/assets/ui/chemin-visite.svg'
 import drapeau from '@/assets/ui/drapeau.svg'
 import plume from '@/assets/ui/plume.svg'
@@ -28,6 +30,7 @@ import styles from './SurLesChemins.module.css'
 const ICONES = {
   visite: cheminVisite,
   ajout: lieuIcone,
+  arrivee: cheminArrivee,
   revendication: drapeau,
   enrichi: plume,
 }
@@ -35,6 +38,7 @@ const ICONES = {
 const VERBES = {
   visite: 'a visité',
   ajout: 'a ajouté',
+  arrivee: 'a rejoint EXPLORE !',
   revendication: 'vient de revendiquer',
   enrichi: 'a enrichi',
 }
@@ -96,6 +100,18 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
             {' '}
             <Link className={styles.lieu} to={`/accueil/lieu/${lieu.id}`}>
               {lieu.nom}
+            </Link>
+          </>
+        )}
+        {chemin.type === 'arrivee' && !chemin.moi && (
+          <>
+            {' '}
+            <Link
+              className={styles.bienvenue}
+              to="/messages"
+              state={{ mentionner: { id: qui.id, nom: qui.nom, avatar: qui.avatar } }}
+            >
+              Souhaite-lui la bienvenue !
             </Link>
           </>
         )}
