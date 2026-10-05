@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -408,4 +408,18 @@ test('« Ouvrir le canal » d’une Compagnie : ?canal coche sa gélule et la ch
     'aria-pressed',
     'true',
   )
+})
+
+test('?canal choisit le canal même quand La Communauté était déjà ouverte (l’écran reste monté)', async () => {
+  const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
+    initialEntries: ['/messages'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  await screen.findByRole('textbox', { name: 'Écrire quelque chose' })
+  await act(() => router.navigate('/messages?canal=f-lys'))
+  expect(await screen.findByRole('textbox', { name: 'Écrire au Lys de Fer' })).toBeInTheDocument()
 })

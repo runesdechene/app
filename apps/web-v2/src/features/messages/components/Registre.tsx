@@ -64,10 +64,13 @@ const STYLES_DES_FILTRES: Record<(typeof FILTRES_FIXES)[number], string | undefi
 
 export function Registre() {
   const { compagnies, pret } = useCanaux()
+  const [demande] = useSearchParams()
   // Le fil attend mes Compagnies (une lecture courte) ; les rejoindre ou les quitter le remonte :
-  // ses gélules et son choix repartent du choix gardé, sans effet qui recolle l'état.
+  // ses gélules et son choix repartent du choix gardé, sans effet qui recolle l'état. Un nouveau
+  // « ?canal= » le remonte aussi : l'onglet reste monté, « Ouvrir le canal » arrive sur un fil ouvert.
   if (!pret) return <div className={styles.registre} aria-busy="true" />
-  return <Fil key={compagnies.map((c) => c.id).join()} compagnies={compagnies} />
+  const cle = `${compagnies.map((c) => c.id).join()}|${demande.get('canal') ?? ''}`
+  return <Fil key={cle} compagnies={compagnies} />
 }
 
 function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
