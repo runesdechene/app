@@ -80,13 +80,18 @@ export function lireAjout(json: unknown): Ajout {
   }
 }
 
-// La fiche telle qu'elle est, pour l'écran « Modifier » (mig 387) ; null : pas visible.
+// La fiche telle qu'elle est, pour l'écran « Modifier » (mig 387) ; null : pas visible. Les infos en
+// plus (mig 414) arrivent en chaînes, vides quand il n'y a rien : ce sont les valeurs des champs.
 export type Fiche = {
   nom: string
   natures: string[]
   epoque: string | null
   annee: number | null
   recit: string
+  acces: string
+  quand: string
+  bonASavoir: string
+  bivouacTolere: boolean
   photos: { url: string; vignette: string }[]
 }
 
@@ -99,6 +104,10 @@ export function lireFicheAModifier(json: unknown): Fiche | null {
     epoque: ouNull(chaine)(f.epoque),
     annee: ouNull(nombre)(f.annee),
     recit: chaine(f.recit),
+    acces: ouNull(chaine)(f.acces) ?? '',
+    quand: ouNull(chaine)(f.quand) ?? '',
+    bonASavoir: ouNull(chaine)(f.bonASavoir) ?? '',
+    bivouacTolere: booleen(f.bivouacTolere),
     photos: liste((v) => {
       const p = objet(v)
       return { url: chaine(p.url), vignette: chaine(p.vignette) }

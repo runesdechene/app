@@ -4,7 +4,7 @@
  *            quelque chose à perdre ; un refus se dit en clair.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { ModifierFiche } from './ModifierFiche'
@@ -41,6 +41,10 @@ beforeEach(() => {
     epoque: null,
     annee: null,
     recit: 'Une tour carrée.',
+    acces: 'Par le sentier',
+    quand: '',
+    bonASavoir: '',
+    bivouacTolere: false,
     photos: [{ url: 'u1', vignette: 'v1' }],
   })
 })
@@ -63,7 +67,10 @@ test('les champs partent de la fiche ; enregistrer envoie les changements et rev
   await userEvent.clear(champ)
   await userEvent.type(champ, 'Château de Jonjeac')
   await userEvent.click(screen.getByRole('button', { name: 'Bas Moyen Âge' }))
-  await userEvent.type(screen.getByRole('textbox', { name: 'Ce que tu as changé' }), 'accent')
+  await userEvent.type(
+    screen.getByRole('textbox', { name: 'Un mot sur ta modification (facultatif)' }),
+    'accent',
+  )
   await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
   expect(api.modifierLieu).toHaveBeenCalledWith(
     'a',
@@ -100,4 +107,40 @@ test('rien de touché : le bouton attend', async () => {
   monter()
   expect(await screen.findByRole('button', { name: 'Enregistrer les changements' })).toBeDisabled()
   expect(modifie).not.toHaveBeenCalledWith(true)
+})
+
+test('deux onglets : le récit, puis les infos en plus ; la saisie reste en passant de l’un à l’autre', async () => {
+  monter()
+  const recit = await screen.findByRole('textbox', { name: 'Le récit' })
+  await userEvent.type(recit, ' Encore.')
+  await userEvent.click(screen.getByRole('radio', { name: 'Infos en plus' }))
+  expect(screen.getByRole('textbox', { name: 'Accès' })).toHaveValue('Par le sentier')
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Bivouac toléré' }))
+  await userEvent.click(screen.getByRole('radio', { name: 'Le récit' }))
+  expect(screen.getByRole('textbox', { name: 'Le récit' })).toHaveValue('Une tour carrée. Encore.')
+})
+
+test('un seul enregistrement envoie le récit, les rubriques, le bivouac et le mot', async () => {
+  api.modifierLieu.mockResolvedValue(undefined)
+  monter()
+  await userEvent.click(await screen.findByRole('radio', { name: 'Infos en plus' }))
+  await userEvent.type(screen.getByRole('textbox', { name: 'Bon à savoir' }), 'Pas de feu')
+  await userEvent.clear(screen.getByRole('textbox', { name: 'Accès' }))
+  await userEvent.type(
+    screen.getByRole('textbox', { name: 'Un mot sur ta modification (facultatif)' }),
+    'conseil',
+  )
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
+  await waitFor(() => {
+    expect(api.modifierLieu).toHaveBeenCalledWith(
+      'a',
+      expect.objectContaining({
+        recit: 'Une tour carrée.',
+        acces: '',
+        bonASavoir: 'Pas de feu',
+        bivouacTolere: false,
+      }),
+      'conseil',
+    )
+  })
 })

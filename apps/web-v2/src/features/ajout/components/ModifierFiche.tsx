@@ -1,8 +1,9 @@
 /**
- * QUOI     — « Modifier la fiche » (maquette « Lieu — modifier la fiche », 30/09) : la photo et sa
- *            lisière, les champs de l'ajout (nom, natures, époque, année), le récit dans son
- *            carnet, les photos (celles du lieu, puis « ＋ Ajouter des photos »), un mot sur ce qui
- *            a changé, « Enregistrer les changements ».
+ * QUOI     — « Modifier la fiche » (maquettes 304:397, 379:523, 381:236) : la photo et sa lisière, les
+ *            champs de l'ajout (nom, natures, époque, année), puis deux onglets `Segments` — « Le
+ *            récit » (son carnet) et « Infos en plus » (accès, quand y aller, bon à savoir, bivouac
+ *            toléré ; Uriel, 05/10) —, les photos, « Un mot sur ta modification », « Enregistrer les
+ *            changements » : un seul enregistrement, une seule version.
  * POURQUOI — faire vivre un lieu : ouvert à qui l'a découvert, chaque enregistrement est une
  *            version (mig 387) qu'on retrouve dans « L'histoire de la fiche » ; les photos ajoutées
  *            rejoignent la fiche (mig 388). Les champs sont ceux de l'ajout (ChampsDuLieu) : les
@@ -10,11 +11,16 @@
  * ATTENTION — le formulaire naît une fois la fiche lue : ses valeurs de départ ne bougent plus.
  *            `onModifie` dit à la route s'il y a quelque chose à perdre (« Abandonner ? »).
  */
+import acces from '@/assets/ui/acces.svg'
+import bivouac from '@/assets/ui/bivouac.svg'
+import bonASavoir from '@/assets/ui/bon-a-savoir.svg'
+import quand from '@/assets/ui/quand.svg'
 import { aLaTaille } from '@/shared/lib/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
+import { Segments } from '@/shared/ui/Segments'
 import { ajouterPhotosLieu, fetchFicheAModifier, modifierLieu } from '../api/ajout'
 import type { Fiche } from '../api/lireAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
@@ -33,8 +39,37 @@ function messageDeRefus(erreur: unknown): string {
   if (indice === 'decouvrir') return 'Découvre ce lieu sur la carte avant de le modifier.'
   if (indice === 'limite') return 'Beaucoup de changements aujourd’hui : reviens demain.'
   if (indice === 'plein') return 'Ce lieu a déjà trente photos : c’est le plafond.'
+  const code =
+    typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
+  if (code === '22023') return 'Un champ est trop long : 1 000 signes au plus par rubrique.'
   return 'Les changements n’ont pas pu être enregistrés. Vérifie les champs, puis réessaie.'
 }
+
+const ONGLETS = [
+  { id: 'recit', libelle: 'Le récit' },
+  { id: 'infos', libelle: 'Infos en plus' },
+] as const
+
+const RUBRIQUES = [
+  {
+    cle: 'acces',
+    titre: 'Accès',
+    icone: acces,
+    exemple: 'Comment y aller : « vingt minutes à pied depuis le hameau »',
+  },
+  {
+    cle: 'quand',
+    titre: 'Quand y aller',
+    icone: quand,
+    exemple: 'La saison, le moment : « au printemps, tôt le matin »',
+  },
+  {
+    cle: 'bonASavoir',
+    titre: 'Bon à savoir',
+    icone: bonASavoir,
+    exemple: 'Un conseil, une précaution : « la visite coûte 5 € », « attention au bétail »…',
+  },
+] as const
 
 export function ModifierFiche({
   id,
@@ -72,6 +107,8 @@ function Formulaire({
   const [valeur, setValeur] = useState(depart)
   const [nouvelles, setNouvelles] = useState<PhotoBrouillon[]>([])
   const [note, setNote] = useState('')
+  const [onglet, setOnglet] = useState<'recit' | 'infos'>('recit')
+  const aideDuMot = useId()
   const photo = aLaTaille(depart.photos[0]?.url ?? null, 430)
 
   const champsChanges =
@@ -79,7 +116,11 @@ function Formulaire({
     valeur.natures.join() !== depart.natures.join() ||
     valeur.epoque !== depart.epoque ||
     valeur.annee !== depart.annee ||
-    valeur.recit.trim() !== depart.recit
+    valeur.recit.trim() !== depart.recit ||
+    valeur.acces.trim() !== depart.acces ||
+    valeur.quand.trim() !== depart.quand ||
+    valeur.bonASavoir.trim() !== depart.bonASavoir ||
+    valeur.bivouacTolere !== depart.bivouacTolere
   const modifie = champsChanges || nouvelles.length > 0 || note.trim() !== ''
   const complet =
     valeur.nom.trim() !== '' && valeur.natures.length > 0 && valeur.recit.trim() !== ''
@@ -95,7 +136,14 @@ function Formulaire({
       if (champsChanges) {
         await modifierLieu(
           id,
-          { ...valeur, nom: valeur.nom.trim(), recit: valeur.recit.trim() },
+          {
+            ...valeur,
+            nom: valeur.nom.trim(),
+            recit: valeur.recit.trim(),
+            acces: valeur.acces.trim(),
+            quand: valeur.quand.trim(),
+            bonASavoir: valeur.bonASavoir.trim(),
+          },
           note,
         )
       }
@@ -119,11 +167,17 @@ function Formulaire({
           }}
         />
 
-        <h2 className={nom.etiquette}>Son récit</h2>
-        <div className={recit.carnet}>
+        <Segments
+          libelle="Le récit ou les infos en plus"
+          options={ONGLETS}
+          valeur={onglet}
+          onChange={setOnglet}
+        />
+        {/* Les deux onglets restent montés : la saisie de l'un survit quand on passe à l'autre. */}
+        <div hidden={onglet !== 'recit'} className={recit.carnet}>
           <textarea
             className={recit.texte}
-            aria-label="Son récit"
+            aria-label="Le récit"
             maxLength={5000}
             value={valeur.recit}
             onChange={(e) => {
@@ -131,6 +185,38 @@ function Formulaire({
             }}
           />
           <span className={recit.compte}>{valeur.recit.length} signes</span>
+        </div>
+        <div hidden={onglet !== 'infos'} className={styles.infos}>
+          {RUBRIQUES.map((r) => (
+            <label key={r.cle} className={styles.rubrique}>
+              <span className={nom.etiquette}>
+                <img src={r.icone} alt="" className={styles.icone} />
+                {r.titre}
+              </span>
+              <textarea
+                className={styles.champ}
+                aria-label={r.titre}
+                maxLength={1000}
+                rows={2}
+                placeholder={r.exemple}
+                value={valeur[r.cle]}
+                onChange={(e) => {
+                  setValeur((avant) => ({ ...avant, [r.cle]: e.target.value }))
+                }}
+              />
+            </label>
+          ))}
+          <label className={styles.case}>
+            <input
+              type="checkbox"
+              checked={valeur.bivouacTolere}
+              onChange={(e) => {
+                setValeur((avant) => ({ ...avant, bivouacTolere: e.target.checked }))
+              }}
+            />
+            <img src={bivouac} alt="" className={styles.icone} />
+            Bivouac toléré
+          </label>
         </div>
 
         <h2 className={nom.etiquette}>Ses photos</h2>
@@ -143,16 +229,30 @@ function Formulaire({
       </div>
 
       <div className={styles.pied}>
-        <input
-          className={styles.note}
-          aria-label="Ce que tu as changé"
-          placeholder="Ce que tu as changé, en un mot (facultatif)"
-          maxLength={140}
-          value={note}
-          onChange={(e) => {
-            setNote(e.target.value)
-          }}
-        />
+        <div className={styles.mot}>
+          <label className={styles.mot}>
+            <span className={styles.motTitre}>
+              Un mot sur ta modification <span className={styles.facultatif}>(facultatif)</span>
+            </span>
+            <input
+              className={styles.note}
+              aria-describedby={aideDuMot}
+              placeholder={
+                onglet === 'recit'
+                  ? 'Ex. : « ajouté l’histoire de la porte »'
+                  : 'Ex. : « précisé l’accès depuis le hameau »'
+              }
+              maxLength={140}
+              value={note}
+              onChange={(e) => {
+                setNote(e.target.value)
+              }}
+            />
+          </label>
+          <span id={aideDuMot} className={styles.aide}>
+            Il s’affiche dans l’histoire de la fiche, à côté de ton nom.
+          </span>
+        </div>
         {enregistrer.isError && (
           <p className={styles.refus} role="alert">
             {messageDeRefus(enregistrer.error)}

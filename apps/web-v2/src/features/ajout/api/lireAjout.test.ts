@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { lireAjout, lireEpoques, lireNatures, lireVoisins } from './lireAjout'
+import { lireAjout, lireEpoques, lireFicheAModifier, lireNatures, lireVoisins } from './lireAjout'
 
 test('les natures se lisent ; une couleur qui n’est pas un hex tombe ; « sans époque » se lit', () => {
   expect(
@@ -41,4 +41,25 @@ test('la réponse de l’ajout : le lieu, le rang, la visite, l’expérience', 
   expect(
     lireAjout({ id: 'l9', rang: 17, surPlace: true, gain: 11, niveau: 12, avant: 0.7, apres: 0.8 }),
   ).toEqual({ id: 'l9', rang: 17, surPlace: true, gain: 11, niveau: 12, avant: 0.7, apres: 0.8 })
+})
+
+test('la fiche à modifier lit ses rubriques (vides : chaîne vide) et son bivouac', () => {
+  const f = lireFicheAModifier({
+    nom: 'Jonjeac',
+    natures: ['chateau'],
+    epoque: null,
+    annee: null,
+    recit: 'Une tour.',
+    acces: 'Par le sentier',
+    quand: null,
+    bonASavoir: null,
+    bivouacTolere: true,
+    photos: [],
+  })
+  expect(f).toMatchObject({
+    acces: 'Par le sentier',
+    quand: '',
+    bonASavoir: '',
+    bivouacTolere: true,
+  })
 })

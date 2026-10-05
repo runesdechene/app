@@ -59,8 +59,18 @@ export async function fetchFicheAModifier(id: string) {
   return lireFicheAModifier(data)
 }
 
-// Modifier une fiche (mig 387) : chaque enregistrement est une version.
-export async function modifierLieu(id: string, f: Champs & { recit: string }, note: string) {
+// Ce qu'on enregistre en modifiant une fiche : les champs de l'ajout, le récit et les infos en plus.
+export type FicheModifiee = Champs & {
+  recit: string
+  acces: string
+  quand: string
+  bonASavoir: string
+  bivouacTolere: boolean
+}
+
+// Modifier une fiche (migs 387, 414) : chaque enregistrement est une version. Les infos en plus
+// partent toujours : une chaîne vide vide la rubrique.
+export async function modifierLieu(id: string, f: FicheModifiee, note: string) {
   const { error } = await supabase.rpc('modifier_lieu', {
     p_id: id,
     p_nom: f.nom,
@@ -69,6 +79,10 @@ export async function modifierLieu(id: string, f: Champs & { recit: string }, no
     ...(f.epoque !== null && { p_epoque: f.epoque }),
     ...(f.annee !== null && { p_annee: f.annee }),
     ...(note.trim() !== '' && { p_note: note }),
+    p_acces: f.acces,
+    p_quand: f.quand,
+    p_bon_a_savoir: f.bonASavoir,
+    p_bivouac_tolere: f.bivouacTolere,
   })
   if (error) throw error
 }
