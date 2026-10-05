@@ -12,7 +12,8 @@ que dans l'historique on puisse vraiment voir les ajouts de chacun ! »
 ## Ce qu'on construit
 
 1. **Un récit partagé** et **trois rubriques pratiques** — **Accès**, **Quand y aller**, **Bon à
-   savoir** — qui s'enrichissent de la même façon. Une rubrique vide ne s'affiche pas.
+   savoir** — qui s'enrichissent de la même façon. Une rubrique vide ne s'affiche pas. Plus une case
+   **« Bivouac toléré »** (oui/non, Uriel 05/10 : « bivouac devait être un booléen »).
 2. **Chaque enregistrement est une version**, avec son auteur, sa date et un mot facultatif.
 3. **L'histoire de la fiche** liste les versions ; toucher une version montre ce qu'elle a ajouté
    (souligné vert) et retiré (barré).
@@ -30,6 +31,7 @@ les photos.
   fiche › » ; puis un filet et les rubriques remplies, **plus discrètes que le récit** (titre 13 px semi-gras,
   texte 14 px `--color-texte-doux`), chacune précédée de son icône au trait (Lucide `route`,
   `calendar-days`, `lightbulb` → `assets/ui/acces.svg`, `quand.svg`, `bon-a-savoir.svg`) ; puis
+  la ligne « Bivouac toléré » (icône Lucide `tent` → `assets/ui/bivouac.svg`) si la case est cochée ; puis
   « Enrichir la fiche ». La ligne de faits sous le titre ne garde que l'époque et le siècle.
 - **Le pied de fiche, sous « Enrichir la fiche »** (maquette retouchée par Uriel, 05/10) : seulement
   « Lieu ajouté par Luna ✶ le 17 octobre 2026 » (déjà codé). La ligne « Enrichi par » disparaît : elle
@@ -37,12 +39,13 @@ les photos.
   mort supprimé dans le même commit) ; « Féliciter » (`CoeursDesAuteurs`) nomme les auteurs de `recit_par`.
 - **Modifier** : l'étape du récit devient deux onglets `Segments` (la brique existante) : « Le récit » (un
   grand champ) et « Infos en plus » (les trois rubriques, mêmes icônes, un exemple en italique quand le champ
-  est vide). Un seul « Enregistrer les changements » pour les deux onglets → une seule version. Au pied :
+  est vide), puis la case « Bivouac toléré ». Un seul « Enregistrer les changements » pour les deux onglets → une seule version. Au pied :
   « Un mot sur ta modification (facultatif) », un champ avec un exemple, et « Il s'affiche dans l'histoire
   de la fiche, à côté de ton nom. »
 - **L'histoire de la fiche** (`FeuilleHistoire`) : « Aelis a enrichi l'accès », « Tristan a ajouté « Bon à
   savoir » »… ; la plus récente est « Actuelle », les autres « Voir › ».
-- **Une version** (nouvelle feuille, adresse propre) : qui, quand, le mot ; pour chaque champ changé, son
+- **Une version** (dans la feuille de l'histoire : comme les autres feuilles de la fiche, un moment et
+  pas une adresse — `app/routes/lieu.tsx`) : qui, quand, le mot ; pour chaque champ changé, son
   texte avec l'ajouté souligné vert et le retiré barré ; « Revenir à cette version » (crée une nouvelle
   version, comme aujourd'hui).
 
@@ -53,16 +56,23 @@ les photos.
 Une version reste une **photo complète** de la fiche (le modèle de la mig 387) :
 
 ```sql
-ALTER TABLE versions_lieu ADD COLUMN acces text, ADD COLUMN quand text, ADD COLUMN bon_a_savoir text;
-ALTER TABLE places ADD COLUMN acces text, ADD COLUMN quand text, ADD COLUMN bon_a_savoir text;
+ALTER TABLE versions_lieu ADD COLUMN acces text, ADD COLUMN quand text, ADD COLUMN bon_a_savoir text,
+  ADD COLUMN bivouac_tolere boolean NOT NULL DEFAULT false;
+ALTER TABLE places ADD COLUMN acces text, ADD COLUMN quand text, ADD COLUMN bon_a_savoir text,
+  ADD COLUMN bivouac_tolere boolean NOT NULL DEFAULT false;
 ```
 
 `places` porte l'état actuel (lu par la fiche et la carte) ; `versions_lieu` porte l'histoire. Une
 rubrique vide est `NULL`. Longueur : 1 000 signes au plus par rubrique.
 
+Les vieilles colonnes `places.accessibility` (« easy »/« medium » sur 32 lieux), `best_season` et
+`bivouac` (texte, vides partout, vérifié le 05/10) ne sont plus lues par la V2 : `fiche_lieu.faits` ne
+garde que l'époque et l'année (code mort supprimé : `SAISONS`, `ACCES` de `lib/faits.ts`). Elles vont au
+registre de purge.
+
 ### Une seule fonction écrit : `modifier_lieu`
 
-Copiée de sa définition live (mig 387), elle reçoit `p_acces`, `p_quand`, `p_bon_a_savoir` :
+Copiée de sa définition live (mig 387), elle reçoit `p_acces`, `p_quand`, `p_bon_a_savoir`, `p_bivouac_tolere` :
 
 - « Rien n'a changé » compare aussi les rubriques ;
 - met à jour `places` ;
@@ -76,10 +86,10 @@ La signature change : l'ancienne est supprimée dans la même migration (DROP v�
 
 ### Lire
 
-- `fiche_lieu` (live : mig 395) renvoie `acces`, `quand`, `bon_a_savoir` et `recit_par` : la liste
+- `fiche_lieu` (live : mig 395) renvoie `acces`, `quand`, `bon_a_savoir`, `bivouacTolere` et `recit_par` : la liste
   `{id, nom, avatar}` des auteurs des versions où le récit a changé (l'origine comprise), dans l'ordre de leur
   première version.
-- `histoire_du_lieu` (live : mig 387) : `champs` gagne `acces`, `quand`, `bon_a_savoir`.
+- `histoire_du_lieu` (live : mig 387) : `champs` gagne `acces`, `quand`, `bon_a_savoir`, `bivouac`.
 - **Nouvelle** `version_du_lieu(p_version bigint)` → `{qui, quand, note, champs: [{champ, avant, apres}]}`
   pour les seuls champs textuels changés (récit et rubriques ; nom, nature et époque restent en mots).
 - La comparaison mot à mot se fait dans l'appli avec la bibliothèque `diff` (`diffWords`), pas en SQL et pas
