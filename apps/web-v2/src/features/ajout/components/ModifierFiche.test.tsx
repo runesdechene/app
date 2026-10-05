@@ -170,6 +170,15 @@ test('un seul enregistrement envoie le récit, les rubriques touchées et le mot
   })
 })
 
+test('le compte des signes du récit se pose sous le champ, pas par-dessus son texte', async () => {
+  monter()
+  const recit = await screen.findByRole('textbox', { name: 'Le récit' })
+  const compte = screen.getByText('16 signes')
+  expect(compte).toHaveClass('compteSous')
+  expect(compte).not.toHaveClass('compte')
+  expect(recit.nextElementSibling).toBe(compte)
+})
+
 test('le récit accepte 10 000 signes : des récits de l’ancienne appli dépassent 5 000 (mig 418)', async () => {
   monter()
   expect(await screen.findByRole('textbox', { name: 'Le récit' })).toHaveAttribute(

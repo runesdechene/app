@@ -70,10 +70,26 @@
 /* Le récit à modifier : le cadre du carnet de l'ajout, sans ses lignes — elles gênaient la lecture
    d'un texte déjà long (Uriel, 05/10). */
 .recit {
-  position: relative;
   border: 1px solid var(--color-sable);
   border-radius: var(--radius-carte);
   background: var(--color-feuille);
+}
+
+/* Le champ n'a plus à garder la place du compte : celui-ci se pose dessous. */
+.recit > textarea {
+  padding-bottom: var(--space-2);
+}
+
+/* Le compte des signes sous le champ, dans le cadre : posé par-dessus (comme à l'ajout), il cachait
+   la dernière ligne d'un long récit qui défile. */
+.compteSous {
+  display: block;
+  padding: 0 var(--space-4) var(--space-2);
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+  text-align: right;
 }
 
 /* L'onglet « Infos en plus » : trois rubriques et la case du bivouac (maquette 381:236). */

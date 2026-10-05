@@ -202,7 +202,7 @@ function Formulaire({
               setValeur((avant) => ({ ...avant, recit: e.target.value }))
             }}
           />
-          <span className={recit.compte}>{valeur.recit.length} signes</span>
+          <span className={styles.compteSous}>{valeur.recit.length} signes</span>
         </div>
         <div hidden={onglet !== 'infos'} className={styles.infos}>
           {RUBRIQUES.map((r) => (
