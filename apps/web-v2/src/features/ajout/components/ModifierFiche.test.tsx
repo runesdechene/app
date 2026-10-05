@@ -115,6 +115,16 @@ test('des photos s’ajoutent : rattachées au lieu, sans nouvelle version', asy
   expect(fini).toHaveBeenCalled()
 })
 
+test('« Un mot sur ta modification » : le champ a sa classe, pas celle du bloc qui l’entoure', async () => {
+  monter()
+  const champ = await screen.findByRole('textbox', {
+    name: 'Un mot sur ta modification (facultatif)',
+  })
+  const etiquette = champ.closest('label')
+  expect(etiquette).toHaveClass('motChamp')
+  expect(etiquette).not.toHaveClass('mot')
+})
+
 test('rien de touché : le bouton attend', async () => {
   monter()
   expect(await screen.findByRole('button', { name: 'Enregistrer les changements' })).toBeDisabled()

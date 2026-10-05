@@ -248,7 +248,7 @@ function Formulaire({
 
       <div className={styles.pied}>
         <div className={styles.mot}>
-          <label className={styles.mot}>
+          <label className={styles.motChamp}>
             <span className={styles.motTitre}>
               Un mot sur ta modification <span className={styles.facultatif}>(facultatif)</span>
             </span>

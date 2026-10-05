@@ -42,6 +42,12 @@
   gap: 6px;
 }
 
+/* Le titre et le champ, dans l'étiquette. */
+.motChamp {
+  display: grid;
+  gap: 6px;
+}
+
 .motTitre {
   color: var(--color-texte);
   font-family: var(--font-corps);
