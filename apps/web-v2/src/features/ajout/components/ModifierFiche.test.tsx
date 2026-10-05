@@ -90,6 +90,18 @@ test('un refus de la base se dit en clair, et on reste', async () => {
   expect(fini).not.toHaveBeenCalled()
 })
 
+test('un champ trop long pour la base se dit sans parler d’une seule rubrique', async () => {
+  api.modifierLieu.mockRejectedValue({ message: 'Un récit, de 1 à 10000 signes', code: '22023' })
+  monter()
+  await userEvent.type(await screen.findByRole('textbox', { name: 'Son nom' }), ' !')
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer les changements' }))
+  expect(
+    await screen.findByText(
+      'Un champ dépasse la longueur permise : vérifie le récit et les infos en plus.',
+    ),
+  ).toBeInTheDocument()
+})
+
 test('des photos s’ajoutent : rattachées au lieu, sans nouvelle version', async () => {
   monter()
   const choisir = await screen.findByLabelText(/Ajouter des photos/)

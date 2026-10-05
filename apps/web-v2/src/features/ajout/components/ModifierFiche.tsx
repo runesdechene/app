@@ -46,7 +46,8 @@ function messageDeRefus(erreur: unknown): string {
   if (indice === 'plein') return 'Ce lieu a déjà trente photos : c’est le plafond.'
   const code =
     typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
-  if (code === '22023') return 'Un champ est trop long : 1 000 signes au plus par rubrique.'
+  if (code === '22023')
+    return 'Un champ dépasse la longueur permise : vérifie le récit et les infos en plus.'
   return 'Les changements n’ont pas pu être enregistrés. Vérifie les champs, puis réessaie.'
 }
 
