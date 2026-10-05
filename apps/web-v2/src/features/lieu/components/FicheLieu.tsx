@@ -257,7 +257,7 @@ export function FicheLieu({
             </p>
           )}
           {enrichi.length > 0 && (
-            <p className={styles.credit}>
+            <p className={styles.credit} data-distance={fiche.ajoutADistance || undefined}>
               <span className={styles.portraits}>
                 {enrichi.slice(0, 3).map((p) => (
                   <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
@@ -268,7 +268,7 @@ export function FicheLieu({
                 {enrichi.map((p, i) => (
                   <Fragment key={p.id}>
                     {liaison(i, enrichi.length)}
-                    <strong className={styles.nomCredit}>{p.nom}</strong>
+                    <strong className={styles.nomEnrichi}>{p.nom}</strong>
                   </Fragment>
                 ))}
               </span>

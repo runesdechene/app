@@ -387,6 +387,16 @@
   font-weight: var(--weight-normal);
 }
 
+/* Qui a enrichi le récit : la teinte de la ligne de l'ajout, le nom sans or (Uriel, 05/10). */
+.nomEnrichi {
+  font-weight: var(--weight-semi);
+}
+
+.credit[data-distance] .nomEnrichi {
+  color: var(--color-fiche-ligne);
+  font-weight: var(--weight-normal);
+}
+
 .etoiles {
   width: 15px;
   height: 14px;

@@ -111,6 +111,8 @@ test('ajouté sur place, le crédit est plein ; à distance, il le dit et se fai
   const distant = await screen.findByText(/Lieu ajouté à distance par/)
   expect(distant).toHaveTextContent('Lieu ajouté à distance par Luna')
   expect(distant.closest('p')).toHaveAttribute('data-distance')
+  // La ligne « Récit enrichi par » prend la même teinte que celle de l'ajout (Uriel, 05/10).
+  expect(distant.closest('p')?.nextElementSibling).toHaveAttribute('data-distance')
 })
 
 test('« Envie d’y aller » bascule tout de suite', async () => {
