@@ -1,6 +1,6 @@
 /**
  * QUOI     — « Sur les chemins » (maquette 27:2) : le fil des lieux — qui a visité, ajouté,
- *            revendiqué, enrichi un lieu —, qui a rejoint EXPLORE (un moment de bienvenue, Uriel
+ *            revendiqué, enrichi un lieu —, qui a fondé ou rejoint une Compagnie (mig 425), qui a rejoint EXPLORE (un moment de bienvenue, Uriel
  *            05/10), et son seul geste, Saluer (le cœur).
  * POURQUOI — spec V2 §5 : pas de commentaires, pas d'émojis ; un salut et son compteur. On ne
  *            salue pas sa propre ligne : le compteur s'y lit sans bouton. Un nom ouvre le profil,
@@ -15,6 +15,7 @@ import cheminVisite from '@/assets/ui/chemin-visite.svg'
 import drapeau from '@/assets/ui/drapeau.svg'
 import plume from '@/assets/ui/plume.svg'
 import lieuIcone from '@/assets/ui/lieu.svg'
+import compagnieIcone from '@/assets/ui/onglet-compagnies.svg'
 import sectionChemins from '@/assets/ui/section-chemins.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Chemin } from '../api/lireAccueil'
@@ -33,6 +34,8 @@ const ICONES = {
   revendication: drapeau,
   enrichi: plume,
   modifie: plume,
+  fondation: compagnieIcone,
+  adhesion: compagnieIcone,
 }
 // Les phrases d'Uriel (01/10).
 const VERBES = {
@@ -42,6 +45,8 @@ const VERBES = {
   revendication: 'vient de revendiquer',
   enrichi: 'a enrichi',
   modifie: 'a modifié', // le nom, la nature ou l'époque (mig 415)
+  fondation: 'a fondé',
+  adhesion: 'a rejoint',
 }
 const D_ABORD = 5
 
@@ -77,7 +82,7 @@ export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
 }
 
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
-  const { qui, lieu } = chemin
+  const { qui, lieu, compagnie } = chemin
   const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
   const { envols, lancer, finir } = useEnvols()
   return (
@@ -101,6 +106,14 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
             {' '}
             <Link className={styles.lieu} to={`/accueil/lieu/${lieu.id}`}>
               {lieu.nom}
+            </Link>
+          </>
+        )}
+        {compagnie && (
+          <>
+            {' '}
+            <Link className={styles.lieu} to={`/accueil/compagnie/${compagnie.id}`}>
+              {compagnie.nom}
             </Link>
           </>
         )}

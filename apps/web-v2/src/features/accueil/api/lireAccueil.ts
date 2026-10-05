@@ -48,7 +48,16 @@ export type GrandsExplorateurs = {
 
 // revendication, enrichi : migration 406 (Uriel, 01/10 — « pour créer de la vie »). Les arrivées
 // reviennent (migration 411, Uriel 05/10 : « un moment de bienvenue ») ; les connexions, non.
-export type TypeDeChemin = 'visite' | 'ajout' | 'arrivee' | 'revendication' | 'enrichi' | 'modifie'
+// fondation, adhesion : fonder ou rejoindre une Compagnie publique (migration 425, Uriel 05/10).
+export type TypeDeChemin =
+  | 'visite'
+  | 'ajout'
+  | 'arrivee'
+  | 'revendication'
+  | 'enrichi'
+  | 'modifie'
+  | 'fondation'
+  | 'adhesion'
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
   type: TypeDeChemin
@@ -60,6 +69,7 @@ export type Chemin = {
     region: string | null
     type: { icone: string; couleur: string | null } | null // mig 375
   } | null
+  compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -72,6 +82,8 @@ const TYPES: readonly TypeDeChemin[] = [
   'revendication',
   'enrichi',
   'modifie',
+  'fondation',
+  'adhesion',
 ]
 
 function typeDeChemin(v: unknown): TypeDeChemin {
@@ -159,6 +171,11 @@ function lireChemin(v: unknown): Chemin {
         type: lireTypeDeLieu(lieu.type),
       }
     })(c.lieu),
+    // Absente avant la migration 425 : aucune.
+    compagnie: ouNull((v) => {
+      const f = objet(v)
+      return { id: chaine(f.id), nom: chaine(f.nom), couleur: chaine(f.couleur) }
+    })(c.compagnie ?? null),
     moi: booleen(c.moi),
     saluts: nombre(c.saluts),
     salue: booleen(c.salue),

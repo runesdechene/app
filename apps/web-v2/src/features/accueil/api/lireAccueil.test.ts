@@ -175,3 +175,15 @@ test('les Grands Explorateurs se lisent : la tête, ma place, le dixième', () =
     dixieme: null,
   })
 })
+
+test('fonder et rejoindre une Compagnie sont des lignes du fil, avec leur Compagnie (migration 425)', () => {
+  const lys = { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }
+  const [fondation, adhesion] = lireChemins([
+    { ...CHEMIN, id: 'fondation:f-lys:u1', type: 'fondation', lieu: null, compagnie: lys },
+    { ...CHEMIN, id: 'adhesion:f-lys:u2', type: 'adhesion', lieu: null, compagnie: lys },
+  ])
+  expect(fondation).toMatchObject({ type: 'fondation', compagnie: lys })
+  expect(adhesion?.type).toBe('adhesion')
+  // Une ligne de lieu n'a pas de Compagnie ; absente (avant la 425), aucune.
+  expect(lireChemins([CHEMIN])[0]?.compagnie).toBeNull()
+})

@@ -270,3 +270,27 @@ test('sans position partagée, pas de « Près de toi »', async () => {
   expect(screen.queryByRole('list', { name: 'À explorer près de toi' })).toBeNull()
   expect(api.fetchPresDeMoi).not.toHaveBeenCalled()
 })
+
+test('fonder et rejoindre une Compagnie se disent ; son nom ouvre sa fiche dans l’Accueil', async () => {
+  const lys = { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'fondation:f-lys:u1', type: 'fondation', lieu: null, compagnie: lys },
+    {
+      ...VISITE,
+      id: 'adhesion:f-lys:u7',
+      type: 'adhesion',
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+      lieu: null,
+      compagnie: lys,
+    },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [fondation, adhesion] = within(fil).getAllByRole('listitem')
+  expect(fondation).toHaveTextContent('Luna a fondé Le Lys de Fer')
+  expect(adhesion).toHaveTextContent('Aelis a rejoint Le Lys de Fer')
+  expect(within(fondation as HTMLElement).getByRole('link', { name: 'Le Lys de Fer' })).toHaveAttribute(
+    'href',
+    '/accueil/compagnie/f-lys',
+  )
+})

@@ -71,6 +71,8 @@ export function phraseDe(n: Notification): Morceau[] {
       if (n.evenement === 'revendication') return [qui, t(' a salué ta revendication')]
       if (n.evenement === 'enrichi') return [qui, t(' a salué ton récit')]
       if (n.evenement === 'modifie') return [qui, t(' a salué ta modification')]
+      if (n.evenement === 'fondation') return [qui, t(' a salué ta nouvelle Compagnie')]
+      if (n.evenement === 'adhesion') return [qui, t(' a salué ton entrée dans une Compagnie')]
       return [qui, t(' a salué ton arrivée')]
     default:
       return [qui, t(' a laissé une trace sur '), lieu]

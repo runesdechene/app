@@ -88,3 +88,12 @@ test('les demandes d’une Compagnie', () => {
     'Ta demande pour Le Lys de Fer est acceptée',
   )
 })
+
+test('un salut sur sa Compagnie fondée ou rejointe', () => {
+  expect(texte({ ...base, type: 'salut', evenement: 'fondation', lieu: null })).toBe(
+    'Kelpie a salué ta nouvelle Compagnie',
+  )
+  expect(texte({ ...base, type: 'salut', evenement: 'adhesion', lieu: null })).toBe(
+    'Kelpie a salué ton entrée dans une Compagnie',
+  )
+})
