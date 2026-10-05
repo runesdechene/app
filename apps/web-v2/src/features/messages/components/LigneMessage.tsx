@@ -2,12 +2,11 @@
  * QUOI     — un message du Registre : le portrait, le nom, le texte et ses « @Nom », l'heure à
  *            droite ; et ses cœurs — un par personne, et l'on voit qui a aimé (migration 410).
  * POURQUOI — Uriel, 02/10 : « un seul like, mais on voit qui a liké — plus fort », et on peut le
- *            retirer. La colonne reste dense : au téléphone, un double toucher sur le message
- *            allume le cœur (il ne l'éteint jamais : on ne retire pas un cœur en tapotant) ; sur PC,
- *            un cœur remplace l'heure au survol. Sous le texte, une gélule : les portraits de qui a
- *            aimé (ils ouvrent la liste), puis le cœur et le nombre, qu'on allume ou éteint (Uriel,
- *            02/10 : les portraits d'abord, « plus beau »). Jamais « 0 ». Son
- *            propre message ne s'aime pas : on y lit seulement qui l'a aimé.
+ *            retirer. Puis 05/10 : le cœur toujours sous l'heure, sur chaque message — les siens
+ *            compris (« ça peut arriver ») —, sinon « c'est perturbant ». Au téléphone, un double
+ *            toucher sur le message l'allume aussi (il ne l'éteint jamais : on ne retire pas un
+ *            cœur en tapotant). Sous le texte, dès le premier cœur, une gélule : les portraits de
+ *            qui a aimé et le nombre, qui ouvrent la liste. Jamais « 0 ».
  */
 import { Fragment, useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -56,7 +55,7 @@ export function LigneMessage({
         .filter(Boolean)
         .join(' ')}
       onPointerUp={(e) => {
-        if (m.moi || aime || e.pointerType === 'mouse') return
+        if (aime || e.pointerType === 'mouse') return
         const avant = dernierToucher.current
         if (avant !== null && e.timeStamp - avant < DOUBLE_TOUCHER_MS) {
           dernierToucher.current = null
@@ -82,51 +81,40 @@ export function LigneMessage({
         {prefixe && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
         <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
       </p>
-      <time className={styles.heure} dateTime={m.quand}>
-        {heureDe(m.quand)}
-      </time>
+      {/* À droite : l'heure, et sous elle le cœur — sur chaque message, les siens compris. */}
+      <div className={styles.cote}>
+        <time className={styles.heure} dateTime={m.quand}>
+          {heureDe(m.quand)}
+        </time>
+        <button
+          type="button"
+          className={styles.aimer}
+          aria-label={nom}
+          aria-pressed={aime}
+          onClick={basculer}
+        >
+          <span className={styles.coeur} aria-hidden="true" />
+          <Envols envols={envols} onFin={finir} />
+        </button>
+      </div>
 
-      {nombre > 0 ? (
-        <div className={styles.coeurs}>
-          <button
-            type="button"
-            className={styles.qui}
-            aria-label={`Voir qui a aimé (${String(nombre)})`}
-            title={m.coeurs.map((p) => p.nom).join(', ')}
-            onClick={() => {
-              setListe(true)
-            }}
-          >
+      {nombre > 0 && (
+        <button
+          type="button"
+          className={styles.coeurs}
+          aria-label={`Voir qui a aimé (${String(nombre)})`}
+          title={m.coeurs.map((p) => p.nom).join(', ')}
+          onClick={() => {
+            setListe(true)
+          }}
+        >
+          <span className={styles.portraits}>
             {m.coeurs.slice(0, PORTRAITS).map((p) => (
               <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
             ))}
-          </button>
-          {m.moi ? (
-            <span className={styles.compte}>
-              <span className={styles.coeur} aria-hidden="true" />
-              {nombre}
-            </span>
-          ) : (
-            <button
-              type="button"
-              className={styles.basculer}
-              aria-label={nom}
-              aria-pressed={aime}
-              onClick={basculer}
-            >
-              <span className={styles.coeur} aria-hidden="true" />
-              {nombre}
-              <Envols envols={envols} onFin={finir} />
-            </button>
-          )}
-        </div>
-      ) : (
-        !m.moi && (
-          <button type="button" className={styles.aimer} aria-label={nom} onClick={basculer}>
-            <span className={styles.coeur} aria-hidden="true" />
-            <Envols envols={envols} onFin={finir} />
-          </button>
-        )
+          </span>
+          {nombre}
+        </button>
       )}
 
       {liste && (
