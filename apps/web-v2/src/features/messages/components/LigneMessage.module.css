@@ -74,7 +74,9 @@
   gap: 2px;
 }
 
-/* Le cœur de chaque message : un trait pâle ; rouge quand je l'ai donné. */
+/* Le cœur de chaque message, sous l'heure : il n'apparaît qu'au survol (Uriel, 05/10), même si
+   d'autres ont déjà aimé ; rouge quand je l'ai donné. Au doigt, pas de survol : le double toucher
+   aime, et le cœur ne reste visible que si je l'ai donné — pour pouvoir le retirer. */
 .aimer {
   position: relative;
   display: grid;
@@ -86,9 +88,32 @@
   background: none;
   color: var(--color-texte-pale);
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
   transition:
+    opacity var(--duree-douce) var(--courbe-douce),
     color var(--duree-douce) var(--courbe-douce),
     scale var(--duree-elan) var(--courbe-elan);
+}
+
+.aimer:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: hover) {
+  .message:hover .aimer,
+  .suite:hover .aimer {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (hover: none) {
+  .aimer[aria-pressed='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .aimer:hover,
