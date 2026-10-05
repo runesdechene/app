@@ -55,6 +55,7 @@ export function LigneMessage({
       className={[suite ? styles.suite : styles.message, m.mentionneMoi && styles.mentionne]
         .filter(Boolean)
         .join(' ')}
+      data-canal={m.canal}
       onPointerUp={(e) => {
         if (aime || e.pointerType === 'mouse') return
         const avant = dernierToucher.current

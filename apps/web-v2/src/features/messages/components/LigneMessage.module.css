@@ -35,6 +35,12 @@
   overflow-wrap: anywhere;
 }
 
+/* Le texte d'un message de « Bugs & suggestions » prend l'encre de sa gélule (Uriel, 05/10). */
+.message[data-canal='bugs'] .texte,
+.suite[data-canal='bugs'] .texte {
+  color: var(--color-canal-bugs-texte);
+}
+
 .nom {
   color: var(--color-texte-doux);
   font-size: var(--sous-titre-size);

@@ -111,3 +111,20 @@ test('mon propre message s’aime aussi (ça peut arriver)', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Aimer le message de Gautier' }))
   expect(onAimer).toHaveBeenCalledWith(7, true)
 })
+
+test('chaque message porte son canal : celui des bugs prend la couleur de sa gélule', () => {
+  render(
+    <MemoryRouter>
+      <ul>
+        <LigneMessage
+          message={{ ...message([], false), canal: 'bugs' }}
+          suite={false}
+          prefixe
+          aimeEnCours={undefined}
+          onAimer={vi.fn()}
+        />
+      </ul>
+    </MemoryRouter>,
+  )
+  expect(screen.getByRole('listitem')).toHaveAttribute('data-canal', 'bugs')
+})
