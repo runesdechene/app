@@ -1,6 +1,7 @@
 /*
  * QUOI     — un message du Registre (maquette 45:278) : heure pâle, portrait, nom gris, texte
- *            16 px ; le cœur sous l'heure, qui a aimé sous le texte, et la liste de qui a aimé.
+ *            16 px ; ses cœurs sous le texte (le mien, puis qui a aimé), le cœur qui remplace l'heure
+ *            au survol sur PC, et la liste de qui a aimé.
  */
 .message,
 .suite {
@@ -64,72 +65,7 @@
   font-weight: var(--weight-gras);
 }
 
-/* À droite, l'heure et, sous elle, le cœur : sur toute la hauteur du message. */
-.cote {
-  display: flex;
-  grid-row: 1 / span 2;
-  grid-column: 3;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-/* Le cœur de chaque message, sous l'heure : il n'apparaît qu'au survol (Uriel, 05/10), même si
-   d'autres ont déjà aimé ; rouge quand je l'ai donné. Au doigt, pas de survol : le double toucher
-   aime, et le cœur ne reste visible que si je l'ai donné — pour pouvoir le retirer. */
-.aimer {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 20px;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-texte-pale);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--duree-douce) var(--courbe-douce),
-    color var(--duree-douce) var(--courbe-douce),
-    scale var(--duree-elan) var(--courbe-elan);
-}
-
-.aimer:focus-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (hover: hover) {
-  .message:hover .aimer,
-  .suite:hover .aimer {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-@media (hover: none) {
-  .aimer[aria-pressed='true'] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-.aimer:hover,
-.aimer:focus-visible {
-  color: var(--color-accent);
-}
-
-.aimer[aria-pressed='true'] {
-  color: var(--color-accent);
-}
-
-.aimer:active {
-  scale: 0.85;
-}
-
-/* Sous le texte, dès le premier cœur : les portraits de qui a aimé et le nombre. */
+/* Les cœurs : sous le texte, une gélule — les portraits, puis le cœur et le nombre. */
 .coeurs {
   display: inline-flex;
   grid-column: 2;
@@ -138,23 +74,100 @@
   gap: var(--space-1);
   height: 24px;
   margin-top: calc(-1 * var(--space-1));
-  padding: 0 var(--space-2) 0 var(--space-1);
-  border: none;
+  padding: 0 var(--space-2) 0 0;
   border-radius: var(--radius-rond);
   background: var(--color-sable);
   color: var(--color-texte-doux);
+}
+
+.basculer,
+.qui {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
   font-family: var(--font-corps);
   font-size: var(--legende-size);
   cursor: pointer;
 }
 
-/* Les portraits se chevauchent un peu. */
-.portraits {
-  display: inline-flex;
+.basculer {
+  gap: var(--space-1);
+  height: 22px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-rond);
+  transition:
+    color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
 }
 
-.portraits > * + * {
+.basculer[aria-pressed='true'] {
+  color: var(--color-accent);
+}
+
+.basculer:active {
+  scale: 0.85;
+}
+
+/* Les portraits se chevauchent un peu. */
+.qui > * + * {
   margin-left: -8px;
+}
+
+/* Sans cœur encore : sur PC, un cœur prend la place de l'heure au survol ; au téléphone, le
+   double toucher suffit. Toujours là pour le clavier. */
+.aimer {
+  position: relative;
+  display: none;
+  grid-row: 1;
+  grid-column: 3;
+  justify-self: end;
+  justify-content: center;
+  align-items: center;
+  min-width: 26px; /* une cible qu'on attrape, plus grande que le cœur */
+  min-height: 20px;
+  margin-right: calc(-1 * var(--space-1));
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.aimer:hover {
+  color: var(--color-accent);
+}
+
+.aimer:focus-visible {
+  display: inline-flex;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .aimer {
+    display: inline-flex;
+  }
+
+  .heure {
+    grid-row: 1;
+    grid-column: 3;
+    transition: opacity var(--duree-douce) var(--courbe-douce);
+  }
+
+  .message:hover .aimer,
+  .suite:hover .aimer {
+    opacity: 1;
+  }
+
+  .message:hover .heure:has(+ .aimer),
+  .suite:hover .heure:has(+ .aimer) {
+    opacity: 0;
+  }
 }
 
 .coeur {
@@ -196,7 +209,9 @@
     animation: none;
   }
 
-  .aimer {
+  .basculer,
+  .aimer,
+  .heure {
     transition: none;
   }
 }

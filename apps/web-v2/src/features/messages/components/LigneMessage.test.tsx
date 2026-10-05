@@ -1,7 +1,7 @@
 /**
- * QUOI     — un message du Registre et ses cœurs : un cœur sous l'heure de chaque message, les
- *            siens compris ; un par personne, qu'on retire ; le double toucher n'allume que ; on
- *            voit qui a aimé.
+ * QUOI     — un message du Registre et ses cœurs : un par personne, qu'on retire ; le cœur du
+ *            survol, à la place de l'heure, tant que je n'ai pas aimé ; le double toucher n'allume
+ *            que ; on voit qui a aimé ; son propre message s'aime aussi.
  */
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -47,33 +47,32 @@ function monter(m: Message, aimeEnCours?: boolean) {
   return onAimer
 }
 
-test('un cœur sous l’heure de chaque message, même sans aucun cœur encore', async () => {
-  const onAimer = monter(message([], false))
-  const coeur = screen.getByRole('button', { name: 'Aimer le message de Gautier' })
-  expect(coeur).toHaveAttribute('aria-pressed', 'false')
-  expect(screen.queryByRole('button', { name: /Voir qui a aimé/ })).toBeNull()
-  await userEvent.click(coeur)
-  expect(onAimer).toHaveBeenCalledWith(7, true)
-})
-
-test('le cœur se retire', async () => {
+test('mon cœur donné : la gélule le retire ; le cœur du survol n’apparaît plus', async () => {
   const onAimer = monter(message([KELPIE], true))
-  const coeur = screen.getByRole('button', { name: 'Aimer le message de Gautier' })
+  expect(screen.queryByRole('button', { name: 'Aimer le message de Gautier' })).toBeNull()
+  const coeur = screen.getByRole('button', { name: 'Aimer le message de Gautier (1)' })
   expect(coeur).toHaveAttribute('aria-pressed', 'true')
   await userEvent.click(coeur)
   expect(onAimer).toHaveBeenCalledWith(7, false)
 })
 
-test('son propre message a son cœur aussi', async () => {
-  const onAimer = monter(message([], false, true))
+test('déjà aimé par d’autres, pas par moi : le cœur du survol est là', async () => {
+  const onAimer = monter(message([KELPIE], false))
   await userEvent.click(screen.getByRole('button', { name: 'Aimer le message de Gautier' }))
   expect(onAimer).toHaveBeenCalledWith(7, true)
+})
+
+test('sans cœur encore, le bouton discret allume le premier', async () => {
+  const onAimer = monter(message([], false))
+  await userEvent.click(screen.getByRole('button', { name: 'Aimer le message de Gautier' }))
+  expect(onAimer).toHaveBeenCalledWith(7, true)
+  expect(screen.queryByRole('button', { name: /Voir qui a aimé/ })).toBeNull()
 })
 
 test('le cœur se compte tout de suite, avant la réponse de la base', () => {
   monter(message([KELPIE], false), true)
   expect(screen.getByRole('button', { name: 'Voir qui a aimé (2)' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Aimer le message de Gautier' })).toHaveAttribute(
+  expect(screen.getByRole('button', { name: 'Aimer le message de Gautier (2)' })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
@@ -105,4 +104,10 @@ test('on voit qui a aimé : les portraits, puis la liste des noms vers leurs pro
     '/messages/explorateur/u9',
   )
   expect(within(liste).getByRole('link', { name: /Ash/ })).toBeInTheDocument()
+})
+
+test('mon propre message s’aime aussi (ça peut arriver)', async () => {
+  const onAimer = monter(message([], false, true))
+  await userEvent.click(screen.getByRole('button', { name: 'Aimer le message de Gautier' }))
+  expect(onAimer).toHaveBeenCalledWith(7, true)
 })
