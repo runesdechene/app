@@ -8,6 +8,8 @@ function message(id: number, quand: string): Message {
   return {
     id,
     canal: 'general',
+    canalNom: null,
+    canalCouleur: null,
     texte: 'bonjour',
     quand,
     auteur: { id: 'u1', nom: 'Uriel', avatar: null },

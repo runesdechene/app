@@ -23,12 +23,14 @@ import {
 } from '../api/registre'
 
 const registreKey = ['registre'] as const
+const filKey = ['registre', 'fil'] as const
 const nonLusKey = ['registre', 'nonLus'] as const
 const passagesKey = ['registre', 'passages'] as const
 
-export function useRegistre() {
+// `canaux` : le général, les bugs et mes Compagnies (mig 422) ; en changer relit le fil.
+export function useRegistre(canaux: readonly Canal[]) {
   const queryClient = useQueryClient()
-  const query = useQuery({ queryKey: registreKey, queryFn: fetchRegistre })
+  const query = useQuery({ queryKey: [...filKey, ...canaux], queryFn: () => fetchRegistre(canaux) })
   const passages = useQuery({
     queryKey: passagesKey,
     queryFn: fetchPassages,
@@ -60,7 +62,7 @@ export function useRegistre() {
 
   const coeur = useMutation({
     mutationFn: (v: { id: number; aime: boolean }) => aimerMessage(v.id, v.aime),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: registreKey, exact: true }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: filKey }),
   })
 
   return {

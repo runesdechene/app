@@ -18,6 +18,8 @@ function message(coeurs: Personne[], aime: boolean, moi = false): Message {
   return {
     id: 7,
     canal: 'general',
+    canalNom: null,
+    canalCouleur: null,
     texte: 'Belle balade hier.',
     quand: '2026-09-28T07:12:00Z',
     auteur: GAUTIER,
@@ -37,7 +39,7 @@ function monter(m: Message, aimeEnCours?: boolean) {
         <LigneMessage
           message={m}
           suite={false}
-          prefixe={false}
+          prefixe={null}
           aimeEnCours={aimeEnCours}
           onAimer={onAimer}
         />
@@ -119,7 +121,7 @@ test('chaque message porte son canal : celui des bugs prend la couleur de sa gé
         <LigneMessage
           message={{ ...message([], false), canal: 'bugs' }}
           suite={false}
-          prefixe
+          prefixe="[Bug & Suggestions]"
           aimeEnCours={undefined}
           onAimer={vi.fn()}
         />

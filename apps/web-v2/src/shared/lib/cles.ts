@@ -7,3 +7,5 @@
  */
 export const cheminsKey = ['accueil', 'chemins'] as const
 export const coeursDuLieuKey = (id: string) => ['lieu', id, 'coeurs'] as const
+// Mes Compagnies (mig 422) : rejoindre ou quitter (zone Compagnies) relit les gélules de La Communauté.
+export const canauxKey = ['canaux'] as const

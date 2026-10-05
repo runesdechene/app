@@ -21,6 +21,12 @@ const api = vi.hoisted(() => ({
   aimerMessage: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/registre', () => api)
+const canaux = vi.hoisted(() => ({
+  fetchCanaux: vi.fn(() =>
+    Promise.resolve([{ id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }]),
+  ),
+}))
+vi.mock('@/shared/supabase/canaux', () => canaux)
 
 const URIEL = { id: 'u1', nom: 'Uriel', avatar: null }
 const GAUTIER = { id: 'u2', nom: 'Gautier', avatar: null }
@@ -29,7 +35,15 @@ const KELPIE = { id: 'u9', nom: 'Kelpie', avatar: null }
 // Un message de Gautier, et qui l'a aimé.
 function balade(coeurs: (typeof URIEL)[], aime: boolean) {
   const quand = '2026-09-28T07:12:00Z'
-  const message = { id: 7, canal: 'general', texte: 'Belle balade hier.', quand, auteur: GAUTIER }
+  const message = {
+    id: 7,
+    canal: 'general',
+    canalNom: null,
+    canalCouleur: null,
+    texte: 'Belle balade hier.',
+    quand,
+    auteur: GAUTIER,
+  }
   return { ...message, moi: false, mentions: [], mentionneMoi: false, coeurs, aime }
 }
 
@@ -40,6 +54,8 @@ beforeEach(() => {
     {
       id: 1,
       canal: 'general',
+      canalNom: null,
+      canalCouleur: null,
       texte: 'Il y a du monde ici bas ?',
       quand: '2026-09-28T07:12:00Z',
       auteur: URIEL,
@@ -52,6 +68,8 @@ beforeEach(() => {
     {
       id: 2,
       canal: 'bugs',
+      canalNom: null,
+      canalCouleur: null,
       texte: 'Je ne peux pas planter un lieu.',
       quand: '2026-09-28T07:15:00Z',
       auteur: GAUTIER,
@@ -65,9 +83,9 @@ beforeEach(() => {
   api.ecrire.mockResolvedValue(undefined)
 })
 
-function monter() {
+function monter(adresse = '/messages') {
   const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
-    initialEntries: ['/messages'],
+    initialEntries: [adresse],
   })
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -112,6 +130,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
     {
       id: 1,
       canal: 'general',
+      canalNom: null,
+      canalCouleur: null,
       texte: 'Toujours.',
       quand: '2026-09-28T07:14:00Z',
       auteur: GAUTIER,
@@ -124,6 +144,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
     {
       id: 2,
       canal: 'bugs',
+      canalNom: null,
+      canalCouleur: null,
       texte: 'J’en ai marre.',
       quand: '2026-09-28T07:15:00Z',
       auteur: GAUTIER,
@@ -136,6 +158,8 @@ test('les messages d’affilée d’une même personne se groupent : ni portrait
     {
       id: 3,
       canal: 'general',
+      canalNom: null,
+      canalCouleur: null,
       texte: 'Plus tard.',
       quand: '2026-09-28T07:40:00Z',
       auteur: GAUTIER,
@@ -160,6 +184,8 @@ test('dans un groupe, le préfixe « Bug & Suggestions » ne s’écrit qu’une
   const bug = (id: number, minute: number, texte: string) => ({
     id,
     canal: 'bugs',
+    canalNom: null,
+    canalCouleur: null,
     texte,
     quand: `2026-09-28T07:${String(minute).padStart(2, '0')}:00Z`,
     auteur: GAUTIER,
@@ -188,6 +214,8 @@ test('un séparateur à chaque nouveau jour ; minuit coupe un groupe', async () 
   const message = (id: number, quand: Date, texte: string) => ({
     id,
     canal: 'general',
+    canalNom: null,
+    canalCouleur: null,
     texte,
     quand: quand.toISOString(),
     auteur: GAUTIER,
@@ -283,6 +311,8 @@ test('une mention s’affiche en lien vers le profil ; un message qui me mention
     {
       id: 9,
       canal: 'general',
+      canalNom: null,
+      canalCouleur: null,
       texte: '@Uriel tu passes samedi ?',
       quand: '2026-09-28T07:12:00Z',
       auteur: GAUTIER,
@@ -343,4 +373,39 @@ test('un canal décoché le reste à la prochaine ouverture ; « Activité » ne
   )
   await userEvent.click(screen.getByRole('button', { name: /^Canal :/ }))
   expect(screen.queryByRole('option', { name: /Activité/ })).toBeNull()
+})
+
+test('mes Compagnies sont des gélules à leur couleur, cochées d’office', async () => {
+  monter()
+  const g = await screen.findByRole('button', { name: 'Le Lys de Fer' })
+  expect(g).toHaveAttribute('aria-pressed', 'true')
+  expect(g.style.getPropertyValue('--couleur')).toBe('#5f6f86')
+  expect(screen.getByRole('link', { name: /Compagnies/ })).toHaveAttribute(
+    'href',
+    '/messages/compagnies',
+  )
+})
+
+test('écrire dans une Compagnie : le champ le dit, et le message part dans son canal', async () => {
+  monter()
+  await screen.findByRole('button', { name: 'Le Lys de Fer' })
+  await userEvent.click(screen.getByRole('button', { name: 'Canal : Général' }))
+  await userEvent.click(screen.getByRole('option', { name: 'Le Lys de Fer' }))
+  const champ = screen.getByRole('textbox', { name: 'Écrire au Lys de Fer' })
+  await userEvent.type(champ, 'On monte à Joux ?')
+  await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
+  expect(api.ecrire).toHaveBeenCalledWith('f-lys', 'On monte à Joux ?', [])
+})
+
+test('« Ouvrir le canal » d’une Compagnie : ?canal coche sa gélule et la choisit', async () => {
+  localStorage.setItem(
+    'explore-v2:registre:filtres',
+    JSON.stringify({ coches: ['general'], connus: ['general', 'bugs', 'activite', 'f-lys'] }),
+  )
+  monter('/messages?canal=f-lys')
+  expect(await screen.findByRole('textbox', { name: 'Écrire au Lys de Fer' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Le Lys de Fer' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
 })

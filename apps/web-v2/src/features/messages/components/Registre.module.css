@@ -19,7 +19,9 @@
 
 .filtre,
 .filtreBugs,
-.filtreActivite {
+.filtreActivite,
+.filtreCompagnie,
+.plusCompagnies {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -48,9 +50,26 @@
   color: var(--color-canal-activite-texte);
 }
 
+/* Une Compagnie : sa couleur en voile, son nom à son encre, mêlée à l'encre du site pour rester lisible
+   même si la couleur est très claire (mig 422). */
+.filtreCompagnie {
+  background: color-mix(in srgb, var(--couleur) 18%, var(--color-fond));
+  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+}
+
+/* « ＋ Compagnies » : une gélule en pointillés qui mène à la page des Compagnies. */
+.plusCompagnies {
+  outline: 1px dashed var(--color-accent);
+  outline-offset: -1px;
+  background: none;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
 .filtre[aria-pressed='false'],
 .filtreBugs[aria-pressed='false'],
-.filtreActivite[aria-pressed='false'] {
+.filtreActivite[aria-pressed='false'],
+.filtreCompagnie[aria-pressed='false'] {
   opacity: 0.45;
 }
 

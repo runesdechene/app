@@ -1,14 +1,17 @@
 /**
- * QUOI     — la forme d'un message du Registre, lue depuis le JSON de la migration 371 ; et celle
+ * QUOI     — la forme d'un message du Registre, lue depuis le JSON de la migration 371 (son canal :
+ *            le général, les bugs, ou une Compagnie, migration 422) ; et celle
  *            d'une arrivée (quelqu'un a rejoint EXPLORE), migrations 408 et 411.
  * POURQUOI — rien n'est supposé : un canal ou un passage inconnu est refusé, pas deviné.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
-export type Canal = 'general' | 'bugs'
+export type Canal = string // 'general', 'bugs', ou l'id d'une Compagnie (mig 422)
 export type Message = {
   id: number
   canal: Canal
+  canalNom: string | null // une Compagnie : son nom et sa couleur
+  canalCouleur: string | null
   texte: string
   quand: string
   auteur: { id: string; nom: string; avatar: string | null }
@@ -28,13 +31,7 @@ export type Passage = {
   moi: boolean
 }
 
-export const CANAUX: readonly Canal[] = ['general', 'bugs']
-
-function canal(v: unknown): Canal {
-  const c = CANAUX.find((x) => x === v)
-  if (!c) throw new Error('canal inconnu')
-  return c
-}
+export const CANAUX_FIXES: readonly Canal[] = ['general', 'bugs']
 
 function lireMention(v: unknown): Mention {
   const m = objet(v)
@@ -66,7 +63,10 @@ function lireMessage(v: unknown): Message {
   const a = objet(m.auteur)
   return {
     id: nombre(m.id),
-    canal: canal(m.canal),
+    canal: chaine(m.canal),
+    // Absents avant la migration 422 : le général et les bugs n'en ont pas.
+    canalNom: ouNull(chaine)(m.canalNom ?? null),
+    canalCouleur: ouNull(chaine)(m.canalCouleur ?? null),
     texte: chaine(m.texte),
     quand: chaine(m.quand),
     auteur: { id: chaine(a.id), nom: chaine(a.nom), avatar: ouNull(chaine)(a.avatar) },

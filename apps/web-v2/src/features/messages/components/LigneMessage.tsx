@@ -20,7 +20,6 @@ import { heureDe } from '../lib/jour'
 import { decouper } from '../lib/mentions'
 import styles from './LigneMessage.module.css'
 
-const PREFIXE_BUGS = '[Bug & Suggestions]'
 // Deux touchers plus rapprochés que ça : un double toucher.
 const DOUBLE_TOUCHER_MS = 350
 const PORTRAITS = 3
@@ -34,7 +33,7 @@ export function LigneMessage({
 }: {
   message: Message
   suite: boolean // la suite d'un même auteur : ni portrait ni nom
-  prefixe: boolean // « [Bug & Suggestions] » devant le texte
+  prefixe: string | null // « [Bug & Suggestions] », « [Le Lys de Fer] » devant le texte
   aimeEnCours: boolean | undefined // mon cœur parti, pas encore compté par la base
   onAimer: (id: number, aime: boolean) => void
 }) {
@@ -55,7 +54,8 @@ export function LigneMessage({
       className={[suite ? styles.suite : styles.message, m.mentionneMoi && styles.mentionne]
         .filter(Boolean)
         .join(' ')}
-      data-canal={m.canal}
+      data-canal={m.canalCouleur === null ? m.canal : 'compagnie'}
+      style={m.canalCouleur === null ? undefined : { '--couleur': m.canalCouleur }}
       onPointerUp={(e) => {
         if (aime || e.pointerType === 'mouse') return
         const avant = dernierToucher.current
@@ -80,7 +80,7 @@ export function LigneMessage({
             </Link>{' '}
           </>
         )}
-        {prefixe && <span className={styles.prefixe}>{PREFIXE_BUGS} </span>}
+        {prefixe && <span className={styles.prefixe}>{prefixe} </span>}
         <TexteAvecMentions texte={m.texte} mentions={m.mentions} />
       </p>
       <time className={styles.heure} dateTime={m.quand}>

@@ -11,16 +11,22 @@
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
  *            arrivées (migrations 408, 411) : qui a rejoint EXPLORE, d'affilée en une ligne. Chaque message se dessine par
  *            `LigneMessage`, avec ses cœurs (migration 410).
+ *            Chaque Compagnie dont je suis membre est un canal de plus (migration 422) : une gélule à
+ *            sa couleur, ses messages à son encre, et « ＋ Compagnies » mène à la page des Compagnies.
+ *            `?canal=<id>` (« Ouvrir le canal » sur la fiche d'une Compagnie) coche et choisit ce canal.
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { Link, useSearchParams } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import { CANAUX, type Canal } from '../api/lireRegistre'
+import { CANAUX_FIXES, type Canal, type Message } from '../api/lireRegistre'
+import { useCanaux, type CanalCompagnie } from '../hooks/useCanaux'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
 import { entremeler } from '../lib/fil'
-import { FILTRES, garderFiltres, lireFiltres, type Filtre } from '../lib/filtres'
+import { aideDuChamp } from '../lib/aide'
+import { FILTRES_FIXES, garderFiltres, lireFiltres, type Filtre } from '../lib/filtres'
 import { autreJour, jourDe } from '../lib/jour'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
@@ -30,14 +36,13 @@ import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
 import styles from './Registre.module.css'
 
-// Les gélules à cocher ; « Activité » se lit, on n'y écrit pas.
-const NOMS_DES_FILTRES: Record<Filtre, string> = {
+// Les gélules fixes ; « Activité » se lit, on n'y écrit pas.
+const NOMS_DES_FILTRES: Record<(typeof FILTRES_FIXES)[number], string> = {
   general: 'Canal général',
   bugs: 'Bugs & suggestions',
   activite: 'Activité',
 }
-// Le canal où l'on écrit, dans la barre.
-const NOMS_COURTS: Record<Canal, string> = { general: 'Général', bugs: 'Bugs & suggestions' }
+const PREFIXE_BUGS = '[Bug & Suggestions]'
 
 // Le stockage de l'appareil, s'il est permis (il peut être refusé : navigation privée).
 function stockage() {
@@ -48,16 +53,40 @@ function stockage() {
   }
 }
 
-const STYLES_DES_FILTRES: Record<Filtre, string | undefined> = {
+const STYLES_DES_FILTRES: Record<(typeof FILTRES_FIXES)[number], string | undefined> = {
   general: styles.filtre,
   bugs: styles.filtreBugs,
   activite: styles.filtreActivite,
 }
 
 export function Registre() {
-  const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi } = useRegistre()
-  const [coches, setCoches] = useState<Set<Filtre>>(() => lireFiltres(stockage()))
-  const [canal, setCanal] = useState<Canal>('general')
+  const { compagnies, pret } = useCanaux()
+  // Le fil attend mes Compagnies (une lecture courte) ; les rejoindre ou les quitter le remonte :
+  // ses gélules et son choix repartent du choix gardé, sans effet qui recolle l'état.
+  if (!pret) return <div className={styles.registre} aria-busy="true" />
+  return <Fil key={compagnies.map((c) => c.id).join()} compagnies={compagnies} />
+}
+
+function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
+  const ids = compagnies.map((c) => c.id)
+  const connus = [...FILTRES_FIXES, ...ids]
+  const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi } = useRegistre([
+    ...CANAUX_FIXES,
+    ...ids,
+  ])
+  // « ?canal= » (« Ouvrir le canal » sur la fiche d'une Compagnie) : coché et choisi à l'arrivée.
+  const [demande] = useSearchParams()
+  const voulu = ids.find((id) => id === demande.get('canal'))
+  const [coches, setCoches] = useState<Set<Filtre>>(() => {
+    const gardees = lireFiltres(stockage(), connus)
+    if (voulu !== undefined) gardees.add(voulu)
+    return gardees
+  })
+  const [canal, setCanal] = useState<Canal>(voulu ?? 'general')
+  const compagnieDe = (c: Canal) => compagnies.find((x) => x.id === c)
+  const nomDuCanal = (c: Canal) =>
+    c === 'general' ? 'Général' : c === 'bugs' ? 'Bugs & suggestions' : (compagnieDe(c)?.nom ?? c)
+  const ouverte = compagnieDe(canal)
   // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
   const coller = useColleEnBas()
   const champ = useRef<HTMLInputElement>(null)
@@ -87,13 +116,13 @@ export function Registre() {
     else apres.add(f)
     if (apres.size === 0) return // au moins une gélule reste cochée
     setCoches(apres)
-    garderFiltres(stockage(), apres)
+    garderFiltres(stockage(), apres, connus)
   }
 
   return (
     <div className={styles.registre}>
       <div className={styles.filtres} role="group" aria-label="Canaux">
-        {FILTRES.map((c) => (
+        {FILTRES_FIXES.map((c) => (
           <button
             key={c}
             type="button"
@@ -107,6 +136,24 @@ export function Registre() {
             {NOMS_DES_FILTRES[c]}
           </button>
         ))}
+        {compagnies.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            className={styles.filtreCompagnie}
+            style={{ '--couleur': c.couleur }}
+            aria-pressed={coches.has(c.id)}
+            onClick={() => {
+              basculer(c.id)
+            }}
+          >
+            {coches.has(c.id) && <img src={coche} alt="" width={10} height={10} />}
+            {c.nom}
+          </button>
+        ))}
+        <Link className={styles.plusCompagnies} to="compagnies" relative="path">
+          ＋ Compagnies
+        </Link>
       </div>
 
       {erreur && <p className={styles.alerte}>Le Registre n’a pas pu être lu.</p>}
@@ -132,7 +179,7 @@ export function Registre() {
           // La suite d'un même auteur : ni portrait ni nom, juste le texte et l'heure, serrés.
           const suite = !nouveauJour && estLaSuite(precedent, m)
           // Dans un groupe, le préfixe du canal ne se répète pas : il revient si le canal change.
-          const prefixe = m.canal === 'bugs' && !(suite && precedent?.canal === 'bugs')
+          const prefixe = suite && precedent?.canal === m.canal ? null : prefixeDe(m)
           return (
             <Fragment key={m.id}>
               {jour}
@@ -149,7 +196,7 @@ export function Registre() {
       </ol>
 
       <BarreEcrire
-        invite="Écrire quelque chose"
+        invite={ouverte ? aideDuChamp(ouverte.nom) : 'Écrire quelque chose'}
         maximum={500}
         onEnvoyer={(t) =>
           ecrire(canal, t, mentions.mentionsDe(t)).then(() => {
@@ -179,7 +226,15 @@ export function Registre() {
             />
           )
         }
-        avant={<ChoixCanal canaux={CANAUX} noms={NOMS_COURTS} valeur={canal} onChange={setCanal} />}
+        avant={
+          <ChoixCanal
+            canaux={[...CANAUX_FIXES, ...ids]}
+            nom={nomDuCanal}
+            couleur={(c) => compagnieDe(c)?.couleur ?? null}
+            valeur={canal}
+            onChange={setCanal}
+          />
+        }
       />
       {echecEnvoi && (
         <p role="alert" className={styles.alerte}>
@@ -188,4 +243,10 @@ export function Registre() {
       )}
     </div>
   )
+}
+
+// Le préfixe d'un message : celui des bugs, ou le nom de sa Compagnie ; rien pour le général.
+function prefixeDe(m: Message): string | null {
+  if (m.canal === 'bugs') return PREFIXE_BUGS
+  return m.canalNom === null ? null : `[${m.canalNom}]`
 }

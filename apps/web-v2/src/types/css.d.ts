@@ -13,6 +13,7 @@ declare module 'react' {
     '--icone'?: string
     '--nombre'?: string
     '--rang'?: string
+    '--couleur'?: string // la couleur d'une Compagnie (gélule, message, fiche — mig 422)
     '--type'?: string // la couleur d'un type de lieu (le badge de la fiche)
     '--avant'?: string // la jauge du niveau avant une découverte (elle se remplit jusqu'à --mesure)
     // La bannière de la boutique : les couleurs réglées dans le Hub, bannière par bannière.

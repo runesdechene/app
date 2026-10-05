@@ -11,9 +11,9 @@ import { lirePassages, lirePersonnes, lireRegistre, type Canal } from './lireReg
 
 // Les 200 derniers messages (le plus que la base rende) : une mention reste retrouvable un moment
 // (Uriel, 30/09 : « il faudra un historique plus grand »).
-export async function fetchRegistre() {
+export async function fetchRegistre(canaux: readonly Canal[]) {
   const { data, error } = await supabase.rpc('registre', {
-    p_canaux: ['general', 'bugs'],
+    p_canaux: [...canaux],
     p_limite: 200,
   })
   if (error) throw error

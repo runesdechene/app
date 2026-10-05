@@ -3,7 +3,8 @@
  *            couleur du canal choisi, qui ouvre une petite liste des canaux.
  * POURQUOI — Uriel, 28/09 : un vrai « select », mais pas la liste du système (« horrible ») ;
  *            la pastille prend la couleur de son canal (crème pour le général, bleu pour les
- *            bugs). La liste se ferme au choix, en touchant ailleurs, ou avec Échap.
+ *            bugs, la sienne pour une Compagnie). La liste se ferme au choix, en touchant ailleurs,
+ *            ou avec Échap.
  */
 import { useEffect, useRef, useState } from 'react'
 import type { Canal } from '../api/lireRegistre'
@@ -12,12 +13,14 @@ import menu from './Menu.module.css'
 
 export function ChoixCanal({
   canaux,
-  noms,
+  nom,
+  couleur,
   valeur,
   onChange,
 }: {
   canaux: readonly Canal[]
-  noms: Record<Canal, string>
+  nom: (canal: Canal) => string
+  couleur: (canal: Canal) => string | null // une Compagnie : sa couleur
   valeur: Canal
   onChange: (canal: Canal) => void
 }) {
@@ -44,21 +47,27 @@ export function ChoixCanal({
     onChange(c)
     setOuvert(false)
   }
-  const teinte = (c: Canal) => (c === 'bugs' ? styles.bugs : styles.general)
+  const teinte = (c: Canal) =>
+    c === 'bugs' ? styles.bugs : couleur(c) === null ? styles.general : styles.compagnie
+  const style = (c: Canal) => {
+    const teinteLibre = couleur(c)
+    return teinteLibre === null ? undefined : { '--couleur': teinteLibre }
+  }
 
   return (
     <div ref={cadre} className={styles.choix}>
       <button
         type="button"
         className={[styles.pastille, teinte(valeur)].join(' ')}
-        aria-label={`Canal : ${noms[valeur]}`}
+        style={style(valeur)}
+        aria-label={`Canal : ${nom(valeur)}`}
         aria-haspopup="listbox"
         aria-expanded={ouvert}
         onClick={() => {
           setOuvert(!ouvert)
         }}
       >
-        {noms[valeur]}
+        {nom(valeur)}
         <span className={styles.chevron} aria-hidden="true" />
       </button>
       {ouvert && (
@@ -69,6 +78,7 @@ export function ChoixCanal({
               role="option"
               aria-selected={c === valeur}
               className={[menu.option, teinte(c)].join(' ')}
+              style={style(c)}
               tabIndex={0}
               onClick={() => {
                 choisir(c)
@@ -80,7 +90,7 @@ export function ChoixCanal({
                 }
               }}
             >
-              {noms[c]}
+              {nom(c)}
             </li>
           ))}
         </ul>
