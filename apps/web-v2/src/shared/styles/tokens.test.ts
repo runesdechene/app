@@ -27,6 +27,7 @@ const PASSED_INLINE = new Set([
   '--teinte-sous-titre',
   '--ombre-texte',
   '--ombre-force',
+  '--couleur', // la couleur d'une Compagnie (mig 422)
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
