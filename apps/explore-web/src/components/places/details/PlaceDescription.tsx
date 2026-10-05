@@ -8,14 +8,15 @@ import { LikersModal } from '../modals/LikersModal'
 import './PlaceDescription.css'
 
 interface Props {
+  placeId: string
   description: V05Description | null
   canEdit: boolean              // a découvert le lieu
-  onEdit: () => void
+  // 05/10/2026 : le récit s'enrichit dans la nouvelle appli (V2) ; la V1 est en lecture seule.
   onOpenHistory: () => void
   onChanged: () => void
 }
 
-export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, onChanged }: Props) {
+export function PlaceDescription({ placeId, description, canEdit, onOpenHistory, onChanged }: Props) {
   const userId = usePlayerStore(s => s.userId)
   const [liked, setLiked] = useState(description?.likedByMe ?? false)
   const [count, setCount] = useState(description?.votesUp ?? 0)
@@ -53,7 +54,7 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
       <div className="place-descr place-descr-empty">
         <div className="place-descr-rule"><span>LE LIEU</span></div>
         <p className="place-descr-invite">Aucune description pour l'instant.{canEdit ? ' Sois le premier à décrire ce lieu.' : ''}</p>
-        {canEdit && <button className="place-descr-contribute" onClick={onEdit}>✎ Décrire ce lieu</button>}
+        {canEdit && <a className="place-descr-contribute" href={`/v2/carte/lieu/${placeId}/modifier`}>✎ Enrichir dans la nouvelle appli</a>}
       </div>
     )
   }
@@ -97,7 +98,7 @@ export function PlaceDescription({ description, canEdit, onEdit, onOpenHistory, 
         </div>
         <div className="place-descr-actions">
           <LikeButton liked={liked} count={count} disabled={!userId || busy} variant="seal" onToggle={toggleLike} />
-          {canEdit && <button className="place-descr-contribute" onClick={onEdit}>✎ Contribuer</button>}
+          {canEdit && <a className="place-descr-contribute" href={`/v2/carte/lieu/${placeId}/modifier`}>✎ Enrichir dans la nouvelle appli</a>}
         </div>
       </div>
 

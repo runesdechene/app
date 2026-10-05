@@ -24,7 +24,6 @@ import { ShareButton } from '../actions/ShareButton'
 import { useCalendarRef } from '../../../hooks/useCalendarRef'
 import { formatYear } from '../../../lib/calendarUtils'
 import { formatRelativeTime } from '../../../lib/dateFormat'
-import { DescriptionEditModal } from '../modals/DescriptionEditModal'
 import { DescriptionHistoryModal } from '../modals/DescriptionHistoryModal'
 import { AddPhotoModal } from '../modals/AddPhotoModal'
 import { EditPlaceTagsModal } from '../modals/EditPlaceTagsModal'
@@ -403,7 +402,6 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleDraft, setTitleDraft] = useState(place.title)
   const [titleSaving, setTitleSaving] = useState(false)
-  const [showEditDescr, setShowEditDescr] = useState(false)
   const [showEditTags, setShowEditTags] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showAddPhoto, setShowAddPhoto] = useState(false)
@@ -906,8 +904,8 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
         />
 
         {/* Description collaborative */}
-        <PlaceDescription description={v05?.description ?? null} canEdit={canEditMeta}
-          onEdit={() => setShowEditDescr(true)} onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
+        <PlaceDescription placeId={place.id} description={v05?.description ?? null} canEdit={canEditMeta}
+          onOpenHistory={() => setShowHistory(true)} onChanged={refreshV05} />
 
         {/* Zone 4 — Tabs */}
         <div className="place-tabs" ref={tabsRef}>
@@ -997,18 +995,10 @@ function DiscoveredPlaceContent({ place, onClose, userEmail: _userEmail, onRefet
       </div>
 
       {/* Modales flottantes (portal vers body) */}
-      {showEditDescr && (
-        <DescriptionEditModal
-          placeId={place.id}
-          initial={v05?.description?.content ?? ''}
-          onClose={() => setShowEditDescr(false)}
-          onSaved={() => { setShowEditDescr(false); refreshV05() }}
-        />
-      )}
       {showHistory && (
         <DescriptionHistoryModal
           placeId={place.id}
-          canRestore={canEditMeta}
+          canRestore={false}
           onClose={() => setShowHistory(false)}
           onRestored={() => { setShowHistory(false); refreshV05() }}
         />

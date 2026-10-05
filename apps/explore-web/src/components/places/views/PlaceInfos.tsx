@@ -102,7 +102,7 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
         )}
       </div>
 
-      {/* InfoRows existants */}
+      {/* InfoRows existants — en lecture seule depuis le 05/10/2026 : on les enrichit dans la V2. */}
       {(['accessibility', 'season', 'warning'] as const).map(type => {
         const config = INFO_CONFIG[type]
         const existing = infos.find(i => i.type === type)
@@ -118,11 +118,16 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
             content={existing?.content ?? null}
             userName={existing?.userName ?? null}
             updatedAt={existing?.updatedAt ?? null}
-            canEdit={!!userId}
+            canEdit={false}
             onSaved={onRefresh}
           />
         )
       })}
+      {userId && (
+        <a className="info-empty-action" href={`/v2/carte/lieu/${placeId}/modifier`}>
+          ✎ Enrichir dans la nouvelle appli
+        </a>
+      )}
 
     </div>
   )
