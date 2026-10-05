@@ -23,6 +23,7 @@ import { useIsRestoring } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
+import plus from '@/assets/ui/plus.svg'
 import position from '@/assets/ui/position.svg'
 import roseDesVents from '@/assets/ui/rose-des-vents.svg'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
@@ -55,15 +56,24 @@ const DUREE_MESSAGE = 3000
 type Vue = { lat: number; lng: number; zoom: number }
 
 // `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie) ;
-// `monAvatar` : le portrait de « Toi » sur la carte.
+// `monAvatar` : le portrait de « Toi » sur la carte ; `onAjouter` : le « + » qui ouvre l'ajout.
 export function CarteScreen({
   sousLaRecherche,
   monAvatar = null,
+  onAjouter,
 }: {
   sousLaRecherche?: ReactNode
   monAvatar?: string | null
+  onAjouter?: () => void
 }) {
-  return <CarteVivante visiteur={false} sousLaRecherche={sousLaRecherche} monAvatar={monAvatar} />
+  return (
+    <CarteVivante
+      visiteur={false}
+      sousLaRecherche={sousLaRecherche}
+      monAvatar={monAvatar}
+      onAjouter={onAjouter}
+    />
+  )
 }
 
 // La carte de la vitrine, pour qui n'a pas de compte.
@@ -75,10 +85,12 @@ function CarteVivante({
   visiteur,
   sousLaRecherche,
   monAvatar = null,
+  onAjouter,
 }: {
   visiteur: boolean
   sousLaRecherche?: ReactNode
   monAvatar?: string | null
+  onAjouter?: (() => void) | undefined
 }) {
   const conteneur = useRef<HTMLDivElement>(null)
   // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
@@ -329,9 +341,20 @@ function CarteVivante({
           Position indisponible
         </p>
       )}
+      {onAjouter && (
+        <button
+          type="button"
+          className={styles.ajouter}
+          aria-label="Ajouter un lieu"
+          onClick={onAjouter}
+        >
+          <img src={plus} alt="" />
+        </button>
+      )}
       <button
         type="button"
         className={styles.position}
+        data-au-dessus={onAjouter ? true : undefined}
         aria-label="Ma position"
         onClick={allerAMaPosition}
       >

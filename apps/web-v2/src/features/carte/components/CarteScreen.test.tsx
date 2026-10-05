@@ -115,6 +115,29 @@ test('les lieux déjà gardés sur l’appareil : rien à attendre, rien n’est
   expect(screen.queryByRole('status', { name: 'Les lieux arrivent…' })).toBeNull()
 })
 
+test('le « + » de la carte ouvre l’ajout ; la vitrine n’en a pas', async () => {
+  const onAjouter = vi.fn()
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const { unmount } = render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <CarteScreen onAjouter={onAjouter} />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  )
+  await userEvent.click(screen.getByRole('button', { name: 'Ajouter un lieu' }))
+  expect(onAjouter).toHaveBeenCalledTimes(1)
+  unmount()
+  render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <CarteVisiteur />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  )
+  expect(screen.queryByRole('button', { name: 'Ajouter un lieu' })).toBeNull()
+})
+
 // Le style est prêt : les lieux n'attendent pas les tuiles du fond (02/10).
 function charger() {
   act(() => {

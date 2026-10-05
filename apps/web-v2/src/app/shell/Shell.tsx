@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : logotype, « Ajouter » et la cloche, barre d'onglets, les quatre écrans
+ * QUOI     — la coquille : logotype, la cloche, barre d'onglets, les quatre écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les quatre écrans restent MONTÉS : leur état et leur défilement survivent au
  *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
@@ -12,7 +12,7 @@
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
@@ -24,7 +24,6 @@ import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
-import ajouter from '@/assets/ui/ajouter.svg'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
 import engrenage from '@/assets/ui/engrenage.svg'
@@ -56,12 +55,35 @@ const CarteScreen = lazy(() =>
   import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteScreen })),
 )
 
-// La carte de la coquille : la jauge d'énergie sous la recherche, et son propre portrait.
+// Ouvrir un panneau (« ajouter », « notifications »…) par-dessus l'onglet courant. Ce qui est
+// déjà ouvert ne s'empile pas une seconde fois dans l'historique. Un panneau prend la place du
+// détail ouvert (un lieu…) au lieu de s'empiler dessus : le fermer ramène à l'onglet, sans
+// rouvrir le détail d'avant (Uriel, 30/09).
+function useOuvrir() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { actif } = disposition(pathname)
+  return (segment: string) => {
+    const racine = `/${actif ?? 'carte'}`
+    const adresse = `${racine}/${segment}`
+    if (pathname !== adresse) void navigate(adresse, { replace: pathname !== racine })
+  }
+}
+
+// La carte de la coquille : la jauge d'énergie sous la recherche, son propre portrait, et le « + »
+// qui ouvre l'ajout (Uriel, 05/10 : le seul « + », sur la carte, téléphone comme PC).
 function CarteDeLaCoquille() {
   const { profil } = useExplorateur(useMonIdentifiant())
+  const ouvrir = useOuvrir()
   return (
     <Suspense fallback={null}>
-      <CarteScreen sousLaRecherche={<JaugeEnergie />} monAvatar={profil?.avatarUrl ?? null} />
+      <CarteScreen
+        sousLaRecherche={<JaugeEnergie />}
+        monAvatar={profil?.avatarUrl ?? null}
+        onAjouter={() => {
+          ouvrir('ajouter')
+        }}
+      />
     </Suspense>
   )
 }
@@ -92,27 +114,32 @@ export function Shell() {
   const surOrdinateur = useSurOrdinateur()
   const monte = (id: TabId) => visites.has(id) || (id === 'carte' && surOrdinateur)
   const scrollers = useRef<Partial<Record<TabId, HTMLElement | null>>>({})
-  const boutonAjouter = useRef<HTMLButtonElement>(null)
+  const boutonNotifications = useRef<HTMLButtonElement>(null)
   const overlayWasOpen = useRef(false)
+  const ouvrePar = useRef<HTMLElement | null>(null)
+  const ouvrir = useOuvrir()
 
-  // À la fermeture d'un détail ou d'une feuille, le focus revient à « Ajouter » (clavier,
-  // lecteur d'écran) au lieu de se perdre en haut de la page.
+  // Le bouton qui ouvre un détail ou une feuille (le « + » de la carte, la cloche…) : relevé
+  // avant que la feuille ne prenne le focus — un effet de mise en page passe avant les siens.
+  useLayoutEffect(() => {
+    if (!overlayWasOpen.current && overlayOpen) {
+      ouvrePar.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null
+    }
+  }, [overlayOpen])
+
+  // À la fermeture, le focus lui revient — à la cloche s'il n'est plus là — au lieu de se perdre
+  // en haut de la page (clavier, lecteur d'écran).
   useEffect(() => {
-    if (overlayWasOpen.current && !overlayOpen) boutonAjouter.current?.focus()
+    if (overlayWasOpen.current && !overlayOpen) {
+      const retour = ouvrePar.current?.isConnected ? ouvrePar.current : boutonNotifications.current
+      retour?.focus()
+    }
     overlayWasOpen.current = overlayOpen
   }, [overlayOpen])
 
   function scrollTop(tab: TabId) {
     scrollers.current[tab]?.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  // Ce qui est déjà ouvert ne s'empile pas une seconde fois dans l'historique. Un panneau de
-  // l'en-tête prend la place du détail ouvert (un lieu…) au lieu de s'empiler dessus : le fermer
-  // ramène à l'onglet, sans rouvrir le détail d'avant (Uriel, 30/09).
-  function ouvrir(segment: string) {
-    const racine = `/${active ?? 'carte'}`
-    const adresse = `${racine}/${segment}`
-    if (pathname !== adresse) void navigate(adresse, { replace: pathname !== racine })
   }
 
   return (
@@ -148,17 +175,7 @@ export function Shell() {
         <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>
           <button
-            ref={boutonAjouter}
-            type="button"
-            className={styles.action}
-            aria-label="Ajouter"
-            onClick={() => {
-              ouvrir('ajouter')
-            }}
-          >
-            <img src={ajouter} alt="" />
-          </button>
-          <button
+            ref={boutonNotifications}
             type="button"
             className={styles.action}
             aria-label="Notifications"

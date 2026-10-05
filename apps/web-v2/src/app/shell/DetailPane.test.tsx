@@ -88,10 +88,10 @@ test('ouvert à froid, fermer remplace par la racine sans quitter l’app', asyn
 })
 
 test('le retour système ferme la feuille « Ajouter »', async () => {
-  const router = renderAt('/accueil')
-  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter' }))
+  const router = renderAt('/carte')
+  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter un lieu' }))
   await router.navigate(-1)
-  expect(router.state.location.pathname).toBe('/accueil')
+  expect(router.state.location.pathname).toBe('/carte')
   // router.navigate agit hors du cycle de rendu de React : on attend le rendu suivant.
   await waitFor(() => {
     expect(screen.queryByRole('dialog', { name: 'Ajouter sur la carte' })).not.toBeInTheDocument()
@@ -100,8 +100,8 @@ test('le retour système ferme la feuille « Ajouter »', async () => {
 
 test('la feuille déjà ouverte : « Ajouter » ne l’empile pas une seconde fois', async () => {
   const router = renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter' }))
-  await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter un lieu' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Ajouter un lieu' }))
   await router.navigate(-1)
   expect(router.state.location.pathname).toBe('/carte')
 })
@@ -114,13 +114,13 @@ test('revenir sur un onglet rouvre sa dernière adresse', async () => {
   expect(router.state.location.pathname).toBe('/carte/explorateur/u2')
 })
 
-test('fermer la feuille rend le focus à « Ajouter »', async () => {
+test('fermer la feuille rend le focus au bouton qui l’a ouverte', async () => {
   renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter un lieu' }))
   await screen.findByRole('dialog', { name: 'Ajouter sur la carte' })
   await userEvent.keyboard('{Escape}')
   await waitFor(() => {
-    expect(screen.getByRole('button', { name: 'Ajouter' })).toHaveFocus()
+    expect(screen.getByRole('button', { name: 'Ajouter un lieu' })).toHaveFocus()
   })
 })
 

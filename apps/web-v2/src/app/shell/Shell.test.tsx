@@ -193,16 +193,17 @@ test('une barre oblique finale n’ouvre pas de détail', async () => {
   expect(document.querySelector('[data-detail]')).toBeNull()
 })
 
-test('l’en-tête porte « Ajouter » et « Notifications », la barre porte le Compte', async () => {
+test('l’en-tête porte « Notifications », la barre porte le Compte ; un seul « + », sur la carte', async () => {
   renderAt('/carte')
-  expect(await screen.findByRole('button', { name: 'Ajouter' })).toBeInTheDocument()
+  expect(await screen.findByRole('button', { name: 'Ajouter un lieu' })).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: /Ajouter/ })).toHaveLength(1)
   expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Compte/ })).toBeInTheDocument()
 })
 
-test('« Ajouter » ouvre la feuille par-dessus l’onglet courant', async () => {
+test('le « + » de la carte ouvre la feuille « Ajouter »', async () => {
   const router = renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Ajouter un lieu' }))
   expect(router.state.location.pathname).toBe('/carte/ajouter')
   expect(await screen.findByRole('dialog', { name: 'Ajouter sur la carte' })).toBeInTheDocument()
 })
