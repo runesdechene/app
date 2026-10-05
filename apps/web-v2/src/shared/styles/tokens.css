@@ -59,7 +59,7 @@
   --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */
   --color-fiche-ligne: #786666; /* adresse, Explorateurs, revendication, faits */
   --color-fiche-aide: #b39b9b; /* « Toucher l'adresse… », « depuis le… » */
-  --color-fiche-recit: #806262;
+  --color-fiche-recit: #5c4545; /* foncé le 05/10 pour la lecture (avant #806262) */
   --color-fiche-badge: #9b3f39; /* un type sans couleur */
   --color-fiche-badge-texte: #fff; /* le texte et l'icône du type, en blanc (Uriel, 28/09) */
   --color-fiche-fleche: #fff; /* les flèches posées sur les photos d'un lieu (02/10) */
