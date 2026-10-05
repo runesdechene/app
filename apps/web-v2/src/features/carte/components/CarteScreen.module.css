@@ -103,21 +103,30 @@
   bottom: 108px;
 }
 
-/* Le « + » : le seul, en bas à droite, sous le pouce (Uriel, 05/10 — « bien visible »). Un carré
-   d'encre plein, le « + » clair, comme le pochoir de l'ancienne barre. */
+/* Le « + » : le seul, en bas à droite, sous le pouce (Uriel, 05/10 — « bien visible »). Un sceau de
+   cire : disque rouge de l'app, en relief (clair en haut, profond en bas), un fin anneau clair
+   comme le bord d'un cachet, le « + » couleur parchemin. */
 .ajouter {
   position: absolute;
   right: 24px;
   bottom: 40px; /* au-dessus de la mention OpenStreetMap, obligatoire */
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   padding: 0;
   border: none;
-  border-radius: 16px;
-  background: var(--color-encre);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-encre) 35%, transparent);
+  border-radius: var(--radius-rond);
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--color-accent) 80%, var(--color-sur-accent)),
+    var(--color-accent) 55%,
+    color-mix(in srgb, var(--color-accent) 75%, var(--color-ombre))
+  );
+  box-shadow:
+    inset 0 0 0 4px var(--color-accent),
+    inset 0 0 0 5px color-mix(in srgb, var(--color-sur-accent) 45%, transparent),
+    0 4px 14px color-mix(in srgb, var(--color-accent) 45%, transparent);
   cursor: pointer;
   transition: scale var(--duree-elan) var(--courbe-elan);
 }
