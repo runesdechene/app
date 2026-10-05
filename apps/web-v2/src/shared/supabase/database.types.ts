@@ -3475,12 +3475,15 @@ export type Database = {
       }
       places: {
         Row: {
+          acces: string | null
           accessibility: string | null
           address: string
           author_id: string
           begin_at: string | null
           best_season: string | null
           bivouac: string | null
+          bivouac_tolere: boolean
+          bon_a_savoir: string | null
           created_at: string
           departement: string | null
           end_at: string | null
@@ -3496,6 +3499,7 @@ export type Database = {
           pays: string | null
           place_type_id: string
           private: boolean
+          quand: string | null
           sensible: boolean | null
           seo_description: string | null
           seo_generated_at: string | null
@@ -3509,12 +3513,15 @@ export type Database = {
           year_exact: number | null
         }
         Insert: {
+          acces?: string | null
           accessibility?: string | null
           address: string
           author_id: string
           begin_at?: string | null
           best_season?: string | null
           bivouac?: string | null
+          bivouac_tolere?: boolean
+          bon_a_savoir?: string | null
           created_at: string
           departement?: string | null
           end_at?: string | null
@@ -3530,6 +3537,7 @@ export type Database = {
           pays?: string | null
           place_type_id: string
           private: boolean
+          quand?: string | null
           sensible?: boolean | null
           seo_description?: string | null
           seo_generated_at?: string | null
@@ -3543,12 +3551,15 @@ export type Database = {
           year_exact?: number | null
         }
         Update: {
+          acces?: string | null
           accessibility?: string | null
           address?: string
           author_id?: string
           begin_at?: string | null
           best_season?: string | null
           bivouac?: string | null
+          bivouac_tolere?: boolean
+          bon_a_savoir?: string | null
           created_at?: string
           departement?: string | null
           end_at?: string | null
@@ -3564,6 +3575,7 @@ export type Database = {
           pays?: string | null
           place_type_id?: string
           private?: boolean
+          quand?: string | null
           sensible?: boolean | null
           seo_description?: string | null
           seo_generated_at?: string | null
@@ -5103,8 +5115,11 @@ export type Database = {
       }
       versions_lieu: {
         Row: {
+          acces: string | null
           annee: number | null
           auteur: string | null
+          bivouac_tolere: boolean
+          bon_a_savoir: string | null
           cree_le: string
           epoque: string | null
           id: number
@@ -5112,11 +5127,15 @@ export type Database = {
           nom: string
           note: string | null
           place_id: string
+          quand: string | null
           recit: string
         }
         Insert: {
+          acces?: string | null
           annee?: number | null
           auteur?: string | null
+          bivouac_tolere?: boolean
+          bon_a_savoir?: string | null
           cree_le?: string
           epoque?: string | null
           id?: number
@@ -5124,11 +5143,15 @@ export type Database = {
           nom: string
           note?: string | null
           place_id: string
+          quand?: string | null
           recit: string
         }
         Update: {
+          acces?: string | null
           annee?: number | null
           auteur?: string | null
+          bivouac_tolere?: boolean
+          bon_a_savoir?: string | null
           cree_le?: string
           epoque?: string | null
           id?: number
@@ -5136,6 +5159,7 @@ export type Database = {
           nom?: string
           note?: string | null
           place_id?: string
+          quand?: string | null
           recit?: string
         }
         Relationships: [
@@ -5961,10 +5985,14 @@ export type Database = {
       _etat_du_lieu: {
         Args: { p_id: string }
         Returns: {
+          acces: string
           annee: number
+          bivouac_tolere: boolean
+          bon_a_savoir: string
           epoque: string
           natures: string[]
           nom: string
+          quand: string
           recit: string
         }[]
       }
@@ -6088,6 +6116,16 @@ export type Database = {
       _require_min_level: {
         Args: { p_min_level: number; p_user_id: string }
         Returns: Json
+      }
+      _rubrique_v1: {
+        Args: {
+          p_apres: string
+          p_avant: string
+          p_id: string
+          p_qui: string
+          p_type: string
+        }
+        Returns: undefined
       }
       _silhouette: { Args: { p_geom: unknown }; Returns: Json }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
@@ -7121,12 +7159,16 @@ export type Database = {
       }
       modifier_lieu: {
         Args: {
+          p_acces?: string
           p_annee?: number
+          p_bivouac_tolere?: boolean
+          p_bon_a_savoir?: string
           p_epoque?: string
           p_id: string
           p_natures: string[]
           p_nom: string
           p_note?: string
+          p_quand?: string
           p_recit: string
         }
         Returns: Json
@@ -7655,6 +7697,7 @@ export type Database = {
         Returns: string
       }
       validate_emoji_throw: { Args: { p_emoji: string }; Returns: Json }
+      version_du_lieu: { Args: { p_version: number }; Returns: Json }
       visit_place_gps: {
         Args: {
           p_place_id: string
