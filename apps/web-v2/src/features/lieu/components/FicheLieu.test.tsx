@@ -93,8 +93,8 @@ test('la fiche montre le lieu tel que maquetté', async () => {
     'href',
     expect.stringContaining('45.9,6.1'),
   )
-  expect(screen.getByText(/Récit partagé de/)).toHaveTextContent('Récit partagé de Luna et Mathéo')
-  expect(screen.queryByText(/Enrichi par/)).not.toBeInTheDocument()
+  expect(screen.getByText(/Récit enrichi par/)).toHaveTextContent('Récit enrichi par Mathéo')
+  expect(screen.queryByText(/Récit de /)).not.toBeInTheDocument()
 })
 
 test('ajouté sur place, le crédit est plein ; à distance, il le dit et se fait discret', async () => {
@@ -148,10 +148,11 @@ test('les rubriques remplies et le bivouac s’affichent, une rubrique vide non'
   expect(screen.getByText('Bivouac toléré')).toBeInTheDocument()
 })
 
-test('un seul auteur : « Récit de … » ; « Enrichir la fiche » appelle onEnrichir', async () => {
+test('l’auteur seul a écrit : pas de ligne « Récit enrichi par » ; « Enrichir la fiche » appelle onEnrichir', async () => {
   api.fetchFiche.mockResolvedValue({ ...FICHE, recitPar: [{ id: 'l', nom: 'Luna', avatar: null }] })
   afficher()
-  expect(await screen.findByText(/Récit de/)).toHaveTextContent('Récit de Luna')
+  expect(await screen.findByText(/Lieu ajouté par/)).toBeInTheDocument()
+  expect(screen.queryByText(/Récit enrichi par/)).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Enrichir la fiche' }))
   expect(onEnrichir).toHaveBeenCalled()
 })

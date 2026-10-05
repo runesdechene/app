@@ -2,9 +2,9 @@
  * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photos au bord déchiré
  *            (qu'on fait défiler, 02/10),
  *            galerie, titre et ses deux boutons ronds, type, ligne de faits, adresse, Explorateurs,
- *            revendication, bouton de visite, le récit et son crédit (« Récit partagé de… »), les
- *            infos en plus (accès, quand y aller, bon à savoir, bivouac), « Enrichir la fiche », le
- *            crédit de l'ajout (maquette 379:237, 05/10). Les cœurs (30/09) : la pastille à droite de
+ *            revendication, bouton de visite, le récit, les infos en plus (accès, quand y aller, bon à
+ *            savoir, bivouac), « Enrichir la fiche », puis les crédits : « Lieu ajouté par… » et, si
+ *            d'autres l'ont écrit, « Récit enrichi par… » (Uriel, 05/10). Les cœurs (30/09) : la pastille à droite de
  *            la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
  * POURQUOI — spec fiche §2 : chaque ligne sans donnée disparaît, jamais une ligne vide ; la fiche
  *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
@@ -34,7 +34,7 @@ import { useEnvie } from '../hooks/useEnvie'
 import { useFiche } from '../hooks/useFiche'
 import { useMoi } from '../hooks/useMoi'
 import { adresseCourte } from '../lib/adresse'
-import { phraseDuRecit } from '../lib/credit'
+import { enrichisseurs, liaison } from '../lib/credit'
 import { ligneDeFaits } from '../lib/faits'
 import { Carnet } from './Carnet'
 import { CoeursDesAuteurs, PastilleCoeurs } from './CoeursLieu'
@@ -89,6 +89,7 @@ export function FicheLieu({
   if (fiche === null) return <EmptyState>Ce lieu n’existe pas ou n’est plus visible</EmptyState>
 
   const faits = ligneDeFaits(fiche.faits)
+  const enrichi = enrichisseurs(fiche.recitPar, fiche.auteur?.id ?? null)
   // On ne s'envoie pas de cœurs sur son propre lieu (la base le refuse aussi).
   const peutAimer = moi !== undefined && moi.id !== fiche.auteur?.id
   const itineraire = `https://www.google.com/maps/dir/?api=1&destination=${String(fiche.lat)},${String(fiche.lng)}`
@@ -132,6 +133,24 @@ export function FicheLieu({
                 </button>
               ))}
             </div>
+          )}
+          {enrichi.length > 0 && (
+            <p className={styles.credit}>
+              <span className={styles.portraits}>
+                {enrichi.slice(0, 3).map((p) => (
+                  <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
+                ))}
+              </span>
+              <span>
+                Récit enrichi par{' '}
+                {enrichi.map((p, i) => (
+                  <Fragment key={p.id}>
+                    {liaison(i, enrichi.length)}
+                    <strong className={styles.nomCredit}>{p.nom}</strong>
+                  </Fragment>
+                ))}
+              </span>
+            </p>
           )}
           {coeurs && moi && (
             <PastilleCoeurs
@@ -226,16 +245,6 @@ export function FicheLieu({
           <section className={styles.recit} aria-label="Le récit">
             <h3 className={styles.rubrique}>Le récit</h3>
             <p className={styles.texte}>{fiche.recit}</p>
-            {fiche.recitPar.length > 0 && (
-              <p className={styles.recitPar}>
-                <span className={styles.portraits}>
-                  {fiche.recitPar.slice(0, 3).map((p) => (
-                    <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
-                  ))}
-                </span>
-                <span>{creditEnValeur(fiche.recitPar.map((p) => p.nom))}</span>
-              </p>
-            )}
           </section>
         )}
 
@@ -285,22 +294,6 @@ export function FicheLieu({
         <Carnet id={id} limite={3} />
       </div>
     </article>
-  )
-}
-
-// La phrase de crédit, les noms en or (la même découpe que phraseDuRecit).
-function creditEnValeur(noms: string[]) {
-  if (phraseDuRecit(noms) === null) return null
-  return (
-    <>
-      {noms.length === 1 ? 'Récit de ' : 'Récit partagé de '}
-      {noms.map((n, i) => (
-        <Fragment key={n + String(i)}>
-          {i > 0 && (i === noms.length - 1 ? ' et ' : ', ')}
-          <strong className={styles.nomCredit}>{n}</strong>
-        </Fragment>
-      ))}
-    </>
   )
 }
 
