@@ -83,6 +83,8 @@
   /* Le Registre (Figma 45:278) : le canal « Bugs & suggestions » a sa couleur */
   --color-canal-bugs: #c4baeb;
   --color-canal-bugs-texte: #4f45a8;
+  --color-canal-activite: #ead9b4; /* « Activité » dans le Registre (05/10) */
+  --color-canal-activite-texte: #7d5a2c;
 
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;

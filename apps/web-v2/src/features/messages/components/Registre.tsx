@@ -20,6 +20,7 @@ import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
 import { entremeler } from '../lib/fil'
+import { FILTRES, garderFiltres, lireFiltres, type Filtre } from '../lib/filtres'
 import { autreJour, jourDe } from '../lib/jour'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
@@ -29,14 +30,33 @@ import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
 import styles from './Registre.module.css'
 
-const NOMS: Record<Canal, { filtre: string; court: string }> = {
-  general: { filtre: 'Canal général', court: 'Général' },
-  bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
+// Les gélules à cocher ; « Activité » se lit, on n'y écrit pas.
+const NOMS_DES_FILTRES: Record<Filtre, string> = {
+  general: 'Canal général',
+  bugs: 'Bugs & suggestions',
+  activite: 'Activité',
+}
+// Le canal où l'on écrit, dans la barre.
+const NOMS_COURTS: Record<Canal, string> = { general: 'Général', bugs: 'Bugs & suggestions' }
+
+// Le stockage de l'appareil, s'il est permis (il peut être refusé : navigation privée).
+function stockage() {
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
+
+const STYLES_DES_FILTRES: Record<Filtre, string | undefined> = {
+  general: styles.filtre,
+  bugs: styles.filtreBugs,
+  activite: styles.filtreActivite,
 }
 
 export function Registre() {
   const { messages, passages, erreur, ecrire, aimer, aimeEnCours, echecEnvoi } = useRegistre()
-  const [coches, setCoches] = useState<Set<Canal>>(() => new Set(CANAUX))
+  const [coches, setCoches] = useState<Set<Filtre>>(() => lireFiltres(stockage()))
   const [canal, setCanal] = useState<Canal>('general')
   // Le dernier message reste en vue ; seule la liste défile, le haut et la barre restent fixes.
   const coller = useColleEnBas()
@@ -54,36 +74,37 @@ export function Registre() {
     champ.current?.setSelectionRange(apres.curseur, apres.curseur)
   }
 
-  // Les arrivées ne vivent que dans le canal général.
+  // Les arrivées vivent dans « Activité ».
   const fil = entremeler(
     (messages ?? []).filter((m) => coches.has(m.canal)),
-    coches.has('general') ? passages : [],
+    coches.has('activite') ? passages : [],
+    messages?.[0]?.quand,
   )
 
-  const basculer = (c: Canal) => {
-    setCoches((avant) => {
-      const apres = new Set(avant)
-      if (apres.has(c)) apres.delete(c)
-      else apres.add(c)
-      return apres.size === 0 ? avant : apres // au moins un canal reste coché
-    })
+  const basculer = (f: Filtre) => {
+    const apres = new Set(coches)
+    if (apres.has(f)) apres.delete(f)
+    else apres.add(f)
+    if (apres.size === 0) return // au moins une gélule reste cochée
+    setCoches(apres)
+    garderFiltres(stockage(), apres)
   }
 
   return (
     <div className={styles.registre}>
       <div className={styles.filtres} role="group" aria-label="Canaux">
-        {CANAUX.map((c) => (
+        {FILTRES.map((c) => (
           <button
             key={c}
             type="button"
-            className={c === 'bugs' ? styles.filtreBugs : styles.filtre}
+            className={STYLES_DES_FILTRES[c]}
             aria-pressed={coches.has(c)}
             onClick={() => {
               basculer(c)
             }}
           >
             {coches.has(c) && <img src={coche} alt="" width={10} height={10} />}
-            {NOMS[c].filtre}
+            {NOMS_DES_FILTRES[c]}
           </button>
         ))}
       </div>
@@ -158,14 +179,7 @@ export function Registre() {
             />
           )
         }
-        avant={
-          <ChoixCanal
-            canaux={CANAUX}
-            noms={{ general: NOMS.general.court, bugs: NOMS.bugs.court }}
-            valeur={canal}
-            onChange={setCanal}
-          />
-        }
+        avant={<ChoixCanal canaux={CANAUX} noms={NOMS_COURTS} valeur={canal} onChange={setCanal} />}
       />
       {echecEnvoi && (
         <p role="alert" className={styles.alerte}>

@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -35,6 +35,7 @@ function balade(coeurs: (typeof URIEL)[], aime: boolean) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  localStorage.clear()
   api.fetchRegistre.mockResolvedValue([
     {
       id: 1,
@@ -269,8 +270,11 @@ test('les arrivées s’écrivent dans le canal général, discrètes et sans po
   expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE !')
   expect(within(arrivee).queryByRole('button')).toBeNull()
   expect(within(arrivee).queryByRole('img')).toBeNull()
-  // Le canal général décoché : les arrivées s'en vont avec lui.
+  // Les arrivées vivent dans « Activité » : le canal général décoché ne les retire pas,
+  // « Activité » décochée, si.
   await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
+  expect(within(registre).getByText(/a rejoint EXPLORE/)).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: /Activité/ }))
   expect(within(registre).queryByText(/a rejoint EXPLORE/)).toBeNull()
 })
 
@@ -325,4 +329,18 @@ test('des arrivées d’affilée : une seule ligne, sans bouton de bienvenue', a
   if (!groupe) throw new Error('ligne absente')
   expect(groupe).toHaveTextContent('Kelpie et Ash ont rejoint EXPLORE !')
   expect(within(groupe).queryByRole('button')).toBeNull()
+})
+
+test('un canal décoché le reste à la prochaine ouverture ; « Activité » ne s’écrit pas', async () => {
+  monter()
+  await userEvent.click(await screen.findByRole('button', { name: /Activité/ }))
+  expect(screen.getByRole('button', { name: /Activité/ })).toHaveAttribute('aria-pressed', 'false')
+  cleanup()
+  monter()
+  expect(await screen.findByRole('button', { name: /Activité/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
+  await userEvent.click(screen.getByRole('button', { name: /^Canal :/ }))
+  expect(screen.queryByRole('option', { name: /Activité/ })).toBeNull()
 })

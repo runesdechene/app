@@ -3,8 +3,9 @@
  *            leur heure ; les arrivées d'affilée, le même jour, ne font qu'une ligne.
  * POURQUOI — Uriel, 01/10 puis 05/10 : les bienvenues vivent dans le Registre ; les connexions,
  *            essayées, n'apportaient rien et ont été retirées ; les arrivées qui se suivent se
- *            regroupent. Une arrivée plus ancienne que le premier message chargé ne s'affiche
- *            pas : elle flotterait seule en haut, sans conversation autour.
+ *            regroupent. Une arrivée plus ancienne que le premier message chargé (`depuis`, quels
+ *            que soient les canaux cochés) ne s'affiche pas : elle flotterait seule en haut, sans
+ *            conversation autour.
  */
 import type { Message, Passage } from '../api/lireRegistre'
 import { autreJour } from './jour'
@@ -16,13 +17,16 @@ export type Ligne =
 
 const heure = (quand: string) => new Date(quand).getTime()
 
-export function entremeler(messages: Message[], arrivees: Passage[]): Ligne[] {
-  const premier = messages[0]
-  if (!premier) return []
+export function entremeler(
+  messages: Message[],
+  arrivees: Passage[],
+  depuis: string | undefined,
+): Ligne[] {
+  if (depuis === undefined) return []
   const ranges: Ligne[] = [
     ...messages.map((message) => ({ sorte: 'message' as const, quand: message.quand, message })),
     ...arrivees
-      .filter((passage) => heure(passage.quand) >= heure(premier.quand))
+      .filter((passage) => heure(passage.quand) >= heure(depuis))
       .map((passage) => ({
         sorte: 'arrivees' as const,
         quand: passage.quand,

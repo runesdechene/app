@@ -63,6 +63,8 @@ export const COLOR_TOKENS = [
   '--color-confetti-vert',
   '--color-canal-bugs',
   '--color-canal-bugs-texte',
+  '--color-canal-activite',
+  '--color-canal-activite-texte',
 ] as const
 
 export const DA_SHOWCASED = [

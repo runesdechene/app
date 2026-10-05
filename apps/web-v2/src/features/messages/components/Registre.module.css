@@ -18,7 +18,8 @@
 }
 
 .filtre,
-.filtreBugs {
+.filtreBugs,
+.filtreActivite {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -41,8 +42,15 @@
   color: var(--color-canal-bugs-texte);
 }
 
+/* « Activité » (les nouveaux comptes…) : un ocre de parchemin, on la lit sans y écrire. */
+.filtreActivite {
+  background: var(--color-canal-activite);
+  color: var(--color-canal-activite-texte);
+}
+
 .filtre[aria-pressed='false'],
-.filtreBugs[aria-pressed='false'] {
+.filtreBugs[aria-pressed='false'],
+.filtreActivite[aria-pressed='false'] {
   opacity: 0.45;
 }
 
@@ -101,7 +109,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .filtre,
-  .filtreBugs {
+  .filtreBugs,
+  .filtreActivite {
     transition: none;
   }
 }
