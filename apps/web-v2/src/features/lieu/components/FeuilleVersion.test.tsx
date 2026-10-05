@@ -18,6 +18,7 @@ test('ce que la version a ajouté et retiré, champ par champ', () => {
           { champ: 'acces', avant: '', apres: 'Par le sentier' },
         ],
       }}
+      resume="a enrichi le récit et l’accès"
       actuelle={false}
       enCours={false}
       onRevenir={vi.fn()}
@@ -35,6 +36,7 @@ test('la version actuelle ne propose pas d’y revenir', () => {
   render(
     <FeuilleVersionContenu
       version={{ id: 8, quand: '2026-09-23T10:00:00Z', note: null, qui: null, champs: [] }}
+      resume="a changé le nom"
       actuelle
       enCours={false}
       onRevenir={vi.fn()}

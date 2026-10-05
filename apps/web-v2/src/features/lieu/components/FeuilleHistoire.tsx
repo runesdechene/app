@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Feuille } from '@/shared/ui/Feuille'
+import type { Version } from '../api/lireLieu'
 import { useHistoire } from '../hooks/useHistoire'
 import { ceQuiAChange } from '../lib/versions'
 import { VersionChoisie } from './FeuilleVersion'
@@ -17,17 +18,18 @@ const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', yea
 
 export function FeuilleHistoire({ id, onFermer }: { id: string; onFermer: () => void }) {
   const { versions, revenir, enCours, echec } = useHistoire(id)
-  const [choisie, setChoisie] = useState<number | null>(null)
+  const [choisie, setChoisie] = useState<{ id: number; ligne: Version } | null>(null)
   return (
     <Feuille titre="L’histoire de la fiche" onFermer={onFermer}>
       <h2 className={styles.titre}>L’histoire de la fiche</h2>
       {choisie !== null ? (
         <VersionChoisie
-          id={choisie}
-          actuelle={choisie === versions?.[0]?.id}
+          id={choisie.id}
+          ligne={choisie.ligne}
+          actuelle={choisie.id === versions?.[0]?.id}
           enCours={enCours}
           onRevenir={() => {
-            revenir(choisie)
+            revenir(choisie.id)
             setChoisie(null)
           }}
           onRetour={() => {
@@ -66,7 +68,7 @@ export function FeuilleHistoire({ id, onFermer }: { id: string; onFermer: () => 
                       type="button"
                       className={styles.version}
                       onClick={() => {
-                        setChoisie(versionId)
+                        setChoisie({ id: versionId, ligne: v })
                       }}
                     >
                       {ligne}
