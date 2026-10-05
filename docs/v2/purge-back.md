@@ -12,7 +12,7 @@
 | La Cour (`place_court_*`, `invest_crowns`, couronnes, mécénat, veilleurs) | prendre un lieu à un autre, abandonné | supprimer | après bascule | spec V2 §1 |
 | Contestation de lieu | abandonnée | supprimer | après bascule | spec V2 §1 |
 | Bonus d'énergie : `users.max_energy`, `factions.bonus_energy` / `bonus_regen_energy`, `title_fragments.bonus_type` `max_energy` / `regen_energy`, multiplicateur outsider sur l'énergie | ignorés depuis la mig 399 (jauge = 10 + 1 par Fragment, un point par heure) ; la page Réglages du Hub ne les écrit plus | supprimer | après bascule | spec énergie 01/10 |
-| Compagnies (mig 295, grades, bannières, buckets `faction-emblems` / `faction-patterns`) | Maisons qui s'affrontent, abandonnées | supprimer | après bascule | spec V2 §1 |
+| Compagnies, ce que la V2 ne lit plus : `faction_grade_labels` et les grades de `faction_members` (repris en Chef / Officiers par la mig 420), bannières et motifs (`factions.pattern*`, seau `faction-patterns`), `users.faction_id` (la Compagnie active V1 — `fonder` / `rejoindre` l'écrivent encore pour la V1), `create_faction` & co. | les Compagnies restent (antennes locales, migs 420-423) ; seuls les morceaux V1 partent | supprimer | après bascule | spec compagnies 05/10 |
 | Gloire V1 (`notoriety_points`, `exploration_points`, `erudition_points`…) | ⚠️ le **niveau reste** (révision 27/09) : ne supprimer que ce qui ne nourrit plus `xp_total` ; vérifier chaque colonne avant | trier, puis supprimer | après bascule | spec V2 §1 révisé |
 | Énergie (`energy_points`, `max_energy`, `energy_reset_at`, `preview_action_cost`, coût de `discover_place`) | supprimée : découvrir devient gratuit | supprimer | après bascule | décision 27/09 |
 | Expéditions joueur-joueur (`voyage_*`) | abandonnées | supprimer | après bascule | spec V2 §1 |
@@ -63,3 +63,6 @@
 | `users.charte_signee_le`, `signer_charte()`, `nommer_explorateur(text)`, `mon_entree()` | l'onboarding : Charte, nom, numéro d'Explorateur | mig 370 |
 | `registre(text[], int)`, `ecrire_au_registre(text, text)` | le Registre (Messages) : lire, écrire, le nom posé par la base | mig 371 |
 | `murmures`, `murmurer(text, text)`, `mes_murmures()`, `conversation(text, int)`, `lire_murmures(text)` | les Murmures, messages privés | mig 372 |
+| `factions.privee/devise/chef_m/chef_f/officier_m/officier_f`, `faction_members.role`, `demandes_compagnie`, `expeditions.pour_compagnie`, `place_veille.pour_compagnie`, `_est_porteur`, `_role_compagnie` | les Compagnies V2 : fiche, rôles nommés, demandes, revendiquer pour une Compagnie | mig 420 |
+| `compagnies()`, `compagnie(text)`, `fonder_compagnie`, `modifier_compagnie`, `rejoindre_compagnie`, `repondre_demande`, `quitter_compagnie`, `changer_role`, `retirer_membre` ; notifications `demande_compagnie` / `demande_acceptee` | les gestes d'une Compagnie | migs 421, 423 |
+| `mes_canaux()` ; `registre` / `ecrire_au_registre` / `registre_non_lus` aux canaux des Compagnies ; `revendiquer_lieu(…, p_pour_compagnie)` | chaque Compagnie est un canal de La Communauté | mig 422 |
