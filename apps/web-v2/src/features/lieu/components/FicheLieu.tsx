@@ -134,24 +134,6 @@ export function FicheLieu({
               ))}
             </div>
           )}
-          {enrichi.length > 0 && (
-            <p className={styles.credit}>
-              <span className={styles.portraits}>
-                {enrichi.slice(0, 3).map((p) => (
-                  <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
-                ))}
-              </span>
-              <span>
-                Récit enrichi par{' '}
-                {enrichi.map((p, i) => (
-                  <Fragment key={p.id}>
-                    {liaison(i, enrichi.length)}
-                    <strong className={styles.nomCredit}>{p.nom}</strong>
-                  </Fragment>
-                ))}
-              </span>
-            </p>
-          )}
           {coeurs && moi && (
             <PastilleCoeurs
               coeurs={coeurs}
@@ -271,6 +253,24 @@ export function FicheLieu({
                   <img className={styles.etoiles} src={etoiles} alt="" />
                 )}
                 <span className={styles.date}>le {LE.format(new Date(fiche.ajouteLe))}</span>
+              </span>
+            </p>
+          )}
+          {enrichi.length > 0 && (
+            <p className={styles.credit}>
+              <span className={styles.portraits}>
+                {enrichi.slice(0, 3).map((p) => (
+                  <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
+                ))}
+              </span>
+              <span>
+                Récit enrichi par{' '}
+                {enrichi.map((p, i) => (
+                  <Fragment key={p.id}>
+                    {liaison(i, enrichi.length)}
+                    <strong className={styles.nomCredit}>{p.nom}</strong>
+                  </Fragment>
+                ))}
               </span>
             </p>
           )}

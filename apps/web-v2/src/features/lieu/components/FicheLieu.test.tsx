@@ -95,6 +95,9 @@ test('la fiche montre le lieu tel que maquetté', async () => {
   )
   expect(screen.getByText(/Récit enrichi par/)).toHaveTextContent('Récit enrichi par Mathéo')
   expect(screen.queryByText(/Récit de /)).not.toBeInTheDocument()
+  // Dans les crédits du pied de fiche, juste sous « Lieu ajouté par… » (Uriel, 05/10).
+  const ajout = screen.getByText(/Lieu ajouté par/).closest('p')
+  expect(ajout?.nextElementSibling).toHaveTextContent('Récit enrichi par Mathéo')
 })
 
 test('ajouté sur place, le crédit est plein ; à distance, il le dit et se fait discret', async () => {
