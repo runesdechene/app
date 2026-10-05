@@ -83,9 +83,12 @@
   vertical-align: -2px;
 }
 
+/* Le champ grandit avec son texte (l'accès d'un lieu tient souvent en plusieurs lignes, 05/10). */
 .champ {
   width: 100%;
-  min-height: 64px;
+  min-height: 96px;
+  max-height: 320px;
+  field-sizing: content;
   padding: var(--space-3);
   border: 1px solid var(--color-sable);
   border-radius: var(--radius);

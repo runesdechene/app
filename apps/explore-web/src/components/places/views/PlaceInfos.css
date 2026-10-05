@@ -23,16 +23,6 @@
   font-weight: 600;
   color: var(--color-ink);
 }
-.info-edit-btn {
-  margin-left: auto;
-  background: none;
-  border: none;
-  font-family: var(--font-accent);
-  font-size: 11px;
-  color: var(--color-sepia-dark);
-  cursor: pointer;
-  text-decoration: underline;
-}
 .info-content p {
   font-family: var(--font-body);
   font-size: 13px;
@@ -73,17 +63,6 @@
 
 /* Edit mode */
 .info-edit { margin-top: 4px; }
-.info-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--color-parchment-dark);
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--color-ink);
-  background: var(--color-parchment);
-  resize: vertical;
-}
 .info-edit-actions {
   display: flex;
   gap: 8px;

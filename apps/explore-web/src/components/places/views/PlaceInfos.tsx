@@ -23,9 +23,9 @@ interface PlaceInfosProps {
 }
 
 const INFO_CONFIG = {
-  accessibility: { icon: '♿', label: 'Accessibilité', placeholder: 'Facile / Modéré / Difficile + détails...', emptyAction: 'Ajouter une accessibilité' },
-  season: { icon: '🌿', label: 'Saison idéale', placeholder: 'Printemps, été, toute l\'année...', emptyAction: 'Ajouter une saison' },
-  warning: { icon: '⚠️', label: 'Information importante', placeholder: 'Danger, propriété privée, horaires...', emptyAction: 'Ajouter une info' },
+  accessibility: { icon: '♿', label: 'Accessibilité' },
+  season: { icon: '🌿', label: 'Saison idéale' },
+  warning: { icon: '⚠️', label: 'Information importante' },
 } as const
 
 export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefresh }: PlaceInfosProps) {
@@ -109,17 +109,11 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
         return (
           <InfoRow
             key={type}
-            placeId={placeId}
-            type={type}
             icon={config.icon}
             label={config.label}
-            placeholder={config.placeholder}
-            emptyAction={config.emptyAction}
             content={existing?.content ?? null}
             userName={existing?.userName ?? null}
             updatedAt={existing?.updatedAt ?? null}
-            canEdit={false}
-            onSaved={onRefresh}
           />
         )
       })}
@@ -133,85 +127,28 @@ export function PlaceInfos({ placeId, infos, eraId, eraName, yearExact, onRefres
   )
 }
 
-function InfoRow({ placeId, type, icon, label, placeholder, emptyAction, content, userName, updatedAt, canEdit, onSaved }: {
-  placeId: string
-  type: string
+// Lecture seule depuis le 05/10/2026 : accès, saison et infos s'enrichissent dans la V2.
+function InfoRow({ icon, label, content, userName, updatedAt }: {
   icon: string
   label: string
-  placeholder: string
-  emptyAction: string
   content: string | null
   userName: string | null
   updatedAt: string | null
-  canEdit: boolean
-  onSaved: () => void
 }) {
-  const userId = usePlayerStore(s => s.userId)
-  const [editing, setEditing] = useState(false)
-  const [value, setValue] = useState(content ?? '')
-  const [saving, setSaving] = useState(false)
-
-  async function save() {
-    if (!userId || !value.trim() || saving) return
-    if (!window.confirm("Cette information est importante pour le patrimoine et les futurs visiteurs. Confirmez-vous qu'elle est fiable ?")) return
-    setSaving(true)
-    const { data, error } = await supabase.rpc('contribute_to_place', {
-      p_user_id: userId,
-      p_place_id: placeId,
-      p_type: type,
-      p_content: value.trim(),
-    })
-    if (!error && data?.success) {
-      // V067 — décision Uriel 2026-05-03 : ces contributions (accessibility
-      // / season / warning) sont des INFOS communautaires qui n'attribuent
-      // PAS de points (ni en DB ni en UI).
-      setEditing(false)
-      onSaved()
-    }
-    setSaving(false)
-  }
-
   return (
     <div className="info-row">
       <div className="info-row-header">
         <span className="info-icon">{icon}</span>
         <span className="info-label">{label}</span>
-        {canEdit && !editing && (
-          <button className="info-edit-btn" onClick={() => setEditing(true)}>
-            Modifier
-          </button>
-        )}
       </div>
 
-      {editing ? (
-        <div className="info-edit">
-          <textarea
-            className="info-textarea"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder={placeholder}
-            rows={2}
-          />
-          <div className="info-edit-actions">
-            <button className="info-save-btn" onClick={save} disabled={saving || !value.trim()}>
-              {saving ? 'Enregistrement...' : 'Enregistrer'}
-            </button>
-            <button className="info-cancel-btn" onClick={() => { setEditing(false); setValue(content ?? '') }}>
-              Annuler
-            </button>
-          </div>
-        </div>
-      ) : content ? (
+      {content ? (
         <div className="info-content">
           <p>{content}</p>
           {userName && updatedAt && (
             <span className="info-meta">Modifié par {userName} · {getTimeAgo(updatedAt)}</span>
           )}
         </div>
-      ) : canEdit ? (
-        <button className="info-empty-action" onClick={() => setEditing(true)}>
-          {emptyAction}
-        </button>
       ) : (
         <p className="info-empty">Aucune information renseignée</p>
       )}

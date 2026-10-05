@@ -197,7 +197,7 @@ function Formulaire({
                 className={styles.champ}
                 aria-label={r.titre}
                 maxLength={1000}
-                rows={2}
+                rows={4}
                 placeholder={r.exemple}
                 value={valeur[r.cle]}
                 onChange={(e) => {
