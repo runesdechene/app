@@ -13,12 +13,15 @@
  *            `LigneMessage`, avec ses cœurs (migration 410).
  *            Chaque Compagnie dont je suis membre est un canal de plus (migration 422) : une gélule à
  *            sa couleur, ses messages à son encre, et « ＋ Compagnies » mène à la page des Compagnies.
+ *            Les gélules tiennent sur une ligne qui défile, sans barre visible ; à la souris, on la
+ *            tient et on la tire (Uriel, 05/10).
  *            `?canal=<id>` (« Ouvrir le canal » sur la fiche d'une Compagnie) coche et choisit ce canal.
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Link, useSearchParams } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
+import { useGlisser } from '@/shared/hooks/useGlisser'
 import { CANAUX_FIXES, type Canal, type Message } from '../api/lireRegistre'
 import { useCanaux, type CanalCompagnie } from '../hooks/useCanaux'
 import { useColleEnBas } from '../hooks/useColleEnBas'
@@ -76,6 +79,7 @@ function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
   ])
   // « ?canal= » (« Ouvrir le canal » sur la fiche d'une Compagnie) : coché et choisi à l'arrivée.
   const [demande] = useSearchParams()
+  const glisser = useGlisser()
   const voulu = ids.find((id) => id === demande.get('canal'))
   const [coches, setCoches] = useState<Set<Filtre>>(() => {
     const gardees = lireFiltres(stockage(), connus)
@@ -121,7 +125,7 @@ function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
 
   return (
     <div className={styles.registre}>
-      <div className={styles.filtres} role="group" aria-label="Canaux">
+      <div ref={glisser} className={styles.filtres} role="group" aria-label="Canaux">
         {FILTRES_FIXES.map((c) => (
           <button
             key={c}

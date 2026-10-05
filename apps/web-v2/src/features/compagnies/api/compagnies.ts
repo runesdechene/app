@@ -20,6 +20,11 @@ export async function fetchCompagnie(id: string) {
   return lireFicheCompagnie(data)
 }
 
+export async function quitter(id: string) {
+  const { error } = await supabase.rpc('quitter_compagnie', { p_id: id })
+  if (error) throw error
+}
+
 // Publique : on en devient membre ; privée : la demande part aux officiers.
 export async function rejoindre(id: string, mot?: string): Promise<'membre' | 'demande'> {
   const { data, error } = await supabase.rpc('rejoindre_compagnie', {

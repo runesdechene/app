@@ -12,9 +12,11 @@
 
 .filtres {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6) var(--space-2);
+  overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
+  scrollbar-width: none;
 }
 
 .filtre,
@@ -31,6 +33,8 @@
   border-radius: var(--radius);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: opacity var(--duree-douce) var(--courbe-douce);
 }
 

@@ -5,6 +5,7 @@
 .messages {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr); /* la rangée des canaux défile au lieu d'élargir l'écran */
   height: 100%;
   padding-top: var(--space-4);
 }
