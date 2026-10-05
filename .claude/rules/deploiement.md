@@ -32,6 +32,18 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 - **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
 
+## La V1 se déploie depuis `apps/explore-web`, jamais d'ailleurs
+
+**Le piège** (05/10/2026) : déployée depuis le scratchpad, la V1 est partie sans ses redirections —
+elles vivent dans `apps/explore-web/netlify.toml`, que la CLI ne lit que dans le dossier courant.
+`/v2/*` a répondu 404 pendant deux minutes. Au même moment, `--site=<SITE_ID>` répondait « Project
+not found » ; `--site=runesdechene` (le nom) passait.
+
+**How to apply :** `cd apps/explore-web && npx netlify-cli deploy --prod --no-build --dir="<chemin
+absolu>/apps/explore-web/dist" --site=runesdechene`, puis vérifier
+`curl -s -o /dev/null -w '%{http_code}' https://app.runesdechene.com/v2/` → 200 et une page
+`/lieu/<slug>` → 200.
+
 ## V2 : ne jamais déployer la V1 avant le site `rdc-web-v2`
 
 Depuis la branche `feat/v2-socle`, le `netlify.toml` de la V1 redirige `/v2/*` vers le site
