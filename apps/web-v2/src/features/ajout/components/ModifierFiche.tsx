@@ -178,7 +178,7 @@ function Formulaire({
           <textarea
             className={recit.texte}
             aria-label="Le récit"
-            maxLength={5000}
+            maxLength={10000}
             value={valeur.recit}
             onChange={(e) => {
               setValeur((avant) => ({ ...avant, recit: e.target.value }))

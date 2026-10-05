@@ -144,3 +144,11 @@ test('un seul enregistrement envoie le récit, les rubriques, le bivouac et le m
     )
   })
 })
+
+test('le récit accepte 10 000 signes : des récits de l’ancienne appli dépassent 5 000 (mig 418)', async () => {
+  monter()
+  expect(await screen.findByRole('textbox', { name: 'Le récit' })).toHaveAttribute(
+    'maxLength',
+    '10000',
+  )
+})

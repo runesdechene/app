@@ -75,3 +75,11 @@
 - Le compteur agrège toute la durée de vie : pas de fenêtre par drop.
 - L'identité de session ne survit pas au navigateur : un second onglet compte une seconde écoute. À trancher.
 - Écrans back-office connectés (liste et fiche joueur, tableau de bord, Fragments, Sync Shopify) basculés sur la vue staff, jamais testés avec une session admin.
+
+## Hub : la modération écrit le récit sans version (relecture « Enrichir un lieu », 05/10/2026)
+
+`mod_update_place` (mig 329, appelée par `apps/hub/src/components/moderation/PlaceEditPanel.tsx`) met à
+jour `places.text` et `title` sans ligne dans `versions_lieu` ni mise à jour de `place_contributions` :
+une correction de modérateur recrée l'écart V1/V2 que la mig 416 a réparé, et la version « Actuelle »
+ne correspond plus à la fiche. À faire : qu'elle passe par une version (auteur = le modérateur, note
+« Modération ») et tienne `place_contributions` à jour, comme `modifier_lieu` (mig 414).
