@@ -80,7 +80,7 @@ ALTER TABLE factions ADD COLUMN privee boolean NOT NULL DEFAULT false, ADD COLUM
 ALTER TABLE faction_members ADD COLUMN role text NOT NULL DEFAULT 'membre'
   CHECK (role IN ('chef', 'officier', 'membre'));
 CREATE TABLE demandes_compagnie (faction_id, user_id, mot text, cree_le, PRIMARY KEY (faction_id, user_id));
-ALTER TABLE veille_history ADD COLUMN pour_compagnie text REFERENCES factions(id) ON DELETE SET NULL;
+ALTER TABLE expeditions ADD COLUMN pour_compagnie text REFERENCES factions(id) ON DELETE SET NULL;  -- l'historique (« Leurs lieux »)
 ALTER TABLE place_veille ADD COLUMN pour_compagnie text REFERENCES factions(id) ON DELETE SET NULL;
 ```
 
