@@ -3,7 +3,7 @@
  *            sont cochés, et l'écriture dans le canal choisi.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -266,50 +266,12 @@ test('les arrivées s’écrivent dans le canal général, discrètes et sans po
   const registre = await screen.findByRole('list', { name: 'Registre' })
   const arrivee = (await within(registre).findByText(/a rejoint EXPLORE/)).closest('li')
   if (!arrivee) throw new Error('ligne absente')
-  expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
+  expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE !')
+  expect(within(arrivee).queryByRole('button')).toBeNull()
   expect(within(arrivee).queryByRole('img')).toBeNull()
   // Le canal général décoché : les arrivées s'en vont avec lui.
   await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
   expect(within(registre).queryByText(/a rejoint EXPLORE/)).toBeNull()
-})
-
-test('arrivé par « Souhaite-lui la bienvenue ! » (Sur les chemins) : la personne est déjà mentionnée', async () => {
-  const router = createMemoryRouter([{ path: '*', element: <Registre /> }], {
-    initialEntries: [{ pathname: '/messages', state: { mentionner: KELPIE } }],
-  })
-  render(
-    <QueryClientProvider client={new QueryClient()}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  )
-  const champ = await screen.findByRole('textbox')
-  await waitFor(() => {
-    expect(champ).toHaveValue('@Kelpie ')
-  })
-  await userEvent.type(champ, 'bienvenue !{Enter}')
-  expect(api.ecrire).toHaveBeenCalledWith('general', '@Kelpie bienvenue !', ['u9'])
-})
-
-test('« Souhaite-lui la bienvenue ! » : la personne est mentionnée, on écrit dans le général', async () => {
-  api.fetchPassages.mockResolvedValue([
-    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
-  ])
-  monter()
-  await userEvent.click(await screen.findByRole('button', { name: 'Souhaite-lui la bienvenue !' }))
-  const champ = screen.getByRole('textbox')
-  expect(champ).toHaveValue('@Kelpie ')
-  expect(champ).toHaveFocus()
-  await userEvent.type(champ, 'bienvenue !{Enter}')
-  expect(api.ecrire).toHaveBeenCalledWith('general', '@Kelpie bienvenue !', ['u9'])
-})
-
-test('mon arrivée ne m’invite pas à me souhaiter la bienvenue', async () => {
-  api.fetchPassages.mockResolvedValue([
-    { id: 'arrivee:u1', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: URIEL, moi: true },
-  ])
-  monter()
-  expect(await screen.findByText(/a rejoint EXPLORE/)).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: 'Souhaite-lui la bienvenue !' })).toBeNull()
 })
 
 test('une mention s’affiche en lien vers le profil ; un message qui me mentionne se distingue', async () => {
@@ -349,4 +311,18 @@ test('aimer un message passe par la base : un cœur, puis le Registre se relit',
   await userEvent.click(coeur)
   expect(api.aimerMessage).toHaveBeenCalledWith(7, true)
   expect(await screen.findByRole('button', { name: 'Voir qui a aimé (1)' })).toBeInTheDocument()
+})
+
+test('des arrivées d’affilée : une seule ligne, sans bouton de bienvenue', async () => {
+  const ASH = { id: 'u8', nom: 'Ash', avatar: null }
+  api.fetchPassages.mockResolvedValue([
+    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
+    { id: 'arrivee:u8', type: 'arrivee', quand: '2026-09-28T07:14:00Z', qui: ASH, moi: false },
+  ])
+  monter()
+  const registre = await screen.findByRole('list', { name: 'Registre' })
+  const groupe = (await within(registre).findByText(/ont rejoint EXPLORE/)).closest('li')
+  if (!groupe) throw new Error('ligne absente')
+  expect(groupe).toHaveTextContent('Kelpie et Ash ont rejoint EXPLORE !')
+  expect(within(groupe).queryByRole('button')).toBeNull()
 })

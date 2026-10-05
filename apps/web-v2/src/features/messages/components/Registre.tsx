@@ -9,16 +9,13 @@
  *            « @ » (migration 373) : la mention s'affiche en lien, et un message qui me mentionne
  *            est doucement surligné. Un séparateur marque chaque nouveau jour (« Hier », « Samedi 26
  *            septembre ») : minuit coupe aussi un groupe. Entre les messages du canal général, les
- *            arrivées (migrations 408, 411) : qui a rejoint EXPLORE — on lui souhaite la bienvenue
- *            sur place, ou depuis « Sur les chemins », la personne déjà mentionnée. Chaque message se dessine par
+ *            arrivées (migrations 408, 411) : qui a rejoint EXPLORE, d'affilée en une ligne. Chaque message se dessine par
  *            `LigneMessage`, avec ses cœurs (migration 410).
  */
 import { Fragment, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useLocation } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
-import { chaine, objet, ouNull } from '@/shared/lib/lire'
-import { CANAUX, type Canal, type Personne } from '../api/lireRegistre'
+import { CANAUX, type Canal } from '../api/lireRegistre'
 import { useColleEnBas } from '../hooks/useColleEnBas'
 import { useMentions } from '../hooks/useMentions'
 import { useRegistre } from '../hooks/useRegistre'
@@ -35,13 +32,6 @@ import styles from './Registre.module.css'
 const NOMS: Record<Canal, { filtre: string; court: string }> = {
   general: { filtre: 'Canal général', court: 'Général' },
   bugs: { filtre: 'Bugs & suggestions', court: 'Bugs & suggestions' },
-}
-
-// La personne à accueillir, quand on arrive de « Souhaite-lui la bienvenue ! » (l'état de
-// l'adresse, lu comme les réponses de la base : rien n'est supposé).
-function personneAMentionner(etat: unknown): Personne | null {
-  const m = ouNull(objet)(objet(etat ?? {}).mentionner ?? null)
-  return m ? { id: chaine(m.id), nom: chaine(m.nom), avatar: ouNull(chaine)(m.avatar) } : null
 }
 
 export function Registre() {
@@ -62,29 +52,6 @@ export function Registre() {
       setCurseur(apres.curseur)
     })
     champ.current?.setSelectionRange(apres.curseur, apres.curseur)
-  }
-
-  // « Souhaite-lui la bienvenue ! » : la personne mentionnée en tête de ce qu'on écrivait, dans
-  // le canal général, le curseur juste après son nom.
-  const souhaiterLaBienvenue = (p: Personne) => {
-    mentions.ajouter(p)
-    setCanal('general')
-    champ.current?.focus()
-    const debut = `@${p.nom} `
-    placer({ texte: debut + texte, curseur: debut.length })
-  }
-
-  // Arrivé par « Souhaite-lui la bienvenue ! » de « Sur les chemins » : la bienvenue est prête,
-  // une fois par arrivée sur la page.
-  const location = useLocation()
-  const [bienvenuePour, setBienvenuePour] = useState<string | null>(null)
-  const aAccueillir = personneAMentionner(location.state as unknown)
-  if (aAccueillir && bienvenuePour !== location.key) {
-    setBienvenuePour(location.key)
-    mentions.ajouter(aAccueillir)
-    const debut = `@${aAccueillir.nom} `
-    setTexte(debut)
-    setCurseur(debut.length)
   }
 
   // Les arrivées ne vivent que dans le canal général.
@@ -130,11 +97,11 @@ export function Registre() {
               {jourDe(ligne.quand)}
             </li>
           )
-          if (ligne.sorte === 'arrivee') {
+          if (ligne.sorte === 'arrivees') {
             return (
-              <Fragment key={ligne.passage.id}>
+              <Fragment key={ligne.passages[0]?.id ?? ligne.quand}>
                 {jour}
-                <LignePassage passage={ligne.passage} onBienvenue={souhaiterLaBienvenue} />
+                <LignePassage passages={ligne.passages} />
               </Fragment>
             )
           }

@@ -1,51 +1,73 @@
 /**
- * QUOI     — une arrivée dans le Registre : « Kelpie a rejoint EXPLORE ! Souhaite-lui la
- *            bienvenue ! »
- * POURQUOI — Uriel, 01/10 : les bienvenues vivent dans le Registre. Puis, 05/10 : plus discrète,
- *            sans portrait (un nouveau venu n'en a jamais encore). La ligne est centrée, sans
- *            bulle de message : on voit que personne ne parle. La bienvenue s'écrit sur
- *            place, la personne déjà mentionnée. On ne se souhaite pas la bienvenue à soi-même.
+ * QUOI     — les arrivées dans le Registre : « Kelpie a rejoint EXPLORE ! », ou, à plusieurs
+ *            d'affilée, « Kelpie et Ash ont rejoint EXPLORE ! » — au-delà de trois, « et 4 autres »,
+ *            la liste au toucher.
+ * POURQUOI — Uriel, 05/10 : discrète, sans portrait (un nouveau venu n'en a jamais encore), et
+ *            alignée sur la conversation — la petite icône dans la colonne des portraits, le texte
+ *            dans celle des noms, l'heure à droite. Pas de bouton de bienvenue : 10 à 20
+ *            inscriptions d'un coup feraient trop de mentions ; chacun l'écrit s'il en a envie.
  */
+import { useState } from 'react'
 import { Link } from 'react-router'
 import cheminArrivee from '@/assets/ui/chemin-arrivee.svg'
-import type { Passage, Personne } from '../api/lireRegistre'
+import { Feuille } from '@/shared/ui/Feuille'
+import type { Passage } from '../api/lireRegistre'
+import { phraseDesArrivees } from '../lib/arrivees'
 import { heureDe } from '../lib/jour'
 import styles from './LignePassage.module.css'
 
-export function LignePassage({
-  passage,
-  onBienvenue,
-}: {
-  passage: Passage
-  onBienvenue: (p: Personne) => void
-}) {
-  const { qui } = passage
+export function LignePassage({ passages }: { passages: Passage[] }) {
+  const [liste, setListe] = useState(false)
+  const dernier = passages.at(-1)
+  if (!dernier) return null
+  const phrase = phraseDesArrivees(passages.map((p) => p.qui.nom))
+  const [seul] = passages
+
   return (
-    <li className={styles.arrivee}>
-      <img src={cheminArrivee} alt="" width={14} height={14} />
+    <li className={styles.arrivees}>
+      <img className={styles.icone} src={cheminArrivee} alt="" width={14} height={14} />
       <p className={styles.texte}>
-        <Link className={styles.nom} to={`/messages/explorateur/${qui.id}`}>
-          {qui.nom}
-        </Link>{' '}
-        a rejoint EXPLORE !
-        {!passage.moi && (
-          <>
-            {' '}
-            <button
-              type="button"
-              className={styles.bienvenue}
-              onClick={() => {
-                onBienvenue(qui)
-              }}
-            >
-              Souhaite-lui la bienvenue !
-            </button>
-          </>
-        )}
+        {passages.length === 1 && seul ? (
+          <Link className={styles.nom} to={`/messages/explorateur/${seul.qui.id}`}>
+            {seul.qui.nom}
+          </Link>
+        ) : passages.length > 3 ? (
+          <button
+            type="button"
+            className={styles.qui}
+            onClick={() => {
+              setListe(true)
+            }}
+          >
+            {phrase.qui}
+          </button>
+        ) : (
+          <span className={styles.nom}>{phrase.qui}</span>
+        )}{' '}
+        {phrase.verbe}
       </p>
-      <time className={styles.heure} dateTime={passage.quand}>
-        {heureDe(passage.quand)}
+      <time className={styles.heure} dateTime={dernier.quand}>
+        {heureDe(dernier.quand)}
       </time>
+
+      {liste && (
+        <Feuille
+          titre="Nouveaux venus"
+          onFermer={() => {
+            setListe(false)
+          }}
+        >
+          <ul className={styles.liste}>
+            {passages.map((p) => (
+              <li key={p.id}>
+                <Link className={styles.personne} to={`/messages/explorateur/${p.qui.id}`}>
+                  {p.qui.nom}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Feuille>
+      )}
     </li>
   )
 }

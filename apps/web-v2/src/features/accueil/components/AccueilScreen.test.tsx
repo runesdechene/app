@@ -138,19 +138,15 @@ test('le fil dit qui a fait quoi, où et quand', async () => {
   expect(revendication).toHaveTextContent('Mathéo vient de revendiquer Pointe du Becquet')
 })
 
-test('une arrivée est un moment de bienvenue : son lien ouvre le Registre, la personne mentionnée', async () => {
-  const router = monter()
+test('une arrivée se dit dans le fil, sans lien de bienvenue', async () => {
+  monter()
   const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
   const arrivee = within(fil)
     .getByText(/a rejoint EXPLORE/)
     .closest('li')
   if (!arrivee) throw new Error('ligne absente')
-  expect(arrivee).toHaveTextContent('Claire a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
-  await userEvent.click(within(arrivee).getByRole('link', { name: 'Souhaite-lui la bienvenue !' }))
-  expect(router.state.location.pathname).toBe('/messages')
-  expect(router.state.location.state).toEqual({
-    mentionner: { id: 'u4', nom: 'Claire', avatar: null },
-  })
+  expect(arrivee).toHaveTextContent('Claire a rejoint EXPLORE !')
+  expect(within(arrivee).queryByRole('link', { name: /bienvenue/ })).toBeNull()
 })
 
 test('un récit enrichi se dit aussi', async () => {

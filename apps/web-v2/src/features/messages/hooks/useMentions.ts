@@ -36,11 +36,8 @@ export function useMentions(texte: string, curseur: number) {
     setActif(0)
   }
 
-  const ajouter = (p: Personne) => {
-    setChoisies((avant) => (avant.some((c) => c.id === p.id) ? avant : [...avant, p]))
-  }
   const choisir = (p: Personne) => {
-    ajouter(p)
+    setChoisies((avant) => (avant.some((c) => c.id === p.id) ? avant : [...avant, p]))
     return insererMention(texte, curseur, p.nom)
   }
 
@@ -49,8 +46,6 @@ export function useMentions(texte: string, curseur: number) {
     actif: Math.min(actif, Math.max(suggestions.length - 1, 0)),
     // Choisir un Explorateur : le texte et le curseur, avec « @Nom » à la place de ce qui était tapé.
     choisir,
-    // Arrivé d'ailleurs (« Souhaite-lui la bienvenue ! ») : déjà mentionné, sans rien chercher.
-    ajouter,
     // Le clavier dans la liste : ↑ ↓ pour choisir, Entrée pour mentionner, Échap pour fermer.
     // Rend la personne choisie à Entrée (sinon rien) ; l'événement ne va pas plus loin.
     clavier: (e: KeyboardEvent): Personne | null => {
