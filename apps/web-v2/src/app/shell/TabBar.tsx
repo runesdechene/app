@@ -1,5 +1,5 @@
 /**
- * QUOI     — la barre des quatre onglets : icône gravée + libellé, lisière de forêt au-dessus ;
+ * QUOI     — la barre des cinq onglets : icône gravée + libellé, lisière de forêt au-dessus ;
  *            l'onglet Compte montre l'avatar de l'Explorateur à la place d'une icône.
  * POURQUOI — un toucher est traduit par resolveTabPress (règles mobiles) puis appliqué ici.
  *            Sur PC, un fond clair glisse jusqu'à l'onglet actif : un seul élément, le curseur,
@@ -16,6 +16,7 @@ import { useNonLus } from '@/features/messages/hooks/useMurmures'
 import { useRegistreNonLus } from '@/features/messages/hooks/useRegistre'
 import accueilIcon from '@/assets/ui/onglet-accueil.png'
 import carteIcon from '@/assets/ui/onglet-carte.png'
+import compagniesIcon from '@/assets/ui/onglet-compagnies.svg'
 import messagesIcon from '@/assets/ui/onglet-messages.png'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Pastille } from '@/shared/ui/Pastille'
@@ -26,13 +27,14 @@ import { useTabMemory } from '../navigation/useTabMemory'
 import styles from './TabBar.module.css'
 
 // Sur PC, la barre n'a pas d'onglet Carte (la carte y est toujours là) : le curseur se range
-// parmi les trois autres, et disparaît quand la Carte est active.
+// parmi les quatre autres, et disparaît quand la Carte est active.
 const ONGLETS_PC = TABS.filter((tab) => tab.id !== 'carte')
 
 const ICONS: Record<Exclude<TabId, 'compte'>, string> = {
   accueil: accueilIcon,
   carte: carteIcon,
   messages: messagesIcon,
+  compagnies: compagniesIcon,
 }
 
 export function TabBar({

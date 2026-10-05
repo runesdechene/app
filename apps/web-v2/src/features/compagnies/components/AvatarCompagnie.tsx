@@ -3,6 +3,7 @@
  * POURQUOI — une Compagnie fondée sans image se reconnaît quand même (maquettes 6 et 2).
  */
 import { aLaTaille } from '@/shared/lib/image'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import styles from './AvatarCompagnie.module.css'
 
 export function AvatarCompagnie({
@@ -19,7 +20,7 @@ export function AvatarCompagnie({
   return (
     <span
       className={styles.avatar}
-      style={{ '--couleur': couleur, '--mesure': `${String(taille)}px` }}
+      style={{ ...teinteCompagnie(couleur), '--mesure': `${String(taille)}px` }}
       data-grand={taille >= 64 || undefined}
       aria-hidden="true"
     >

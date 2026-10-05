@@ -76,7 +76,7 @@
 .suite[data-canal='compagnie'] .texte,
 .message[data-canal='compagnie'] .prefixe,
 .suite[data-canal='compagnie'] .prefixe {
-  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  color: var(--encre-compagnie);
 }
 
 /* Les cœurs : sous le texte, une gélule — les portraits, puis le cœur et le nombre. */

@@ -11,7 +11,7 @@
   border: 2px solid var(--color-fond);
   border-radius: var(--radius-rond);
   background: var(--couleur);
-  color: var(--color-fond);
+  color: var(--sur-couleur);
   font-family: var(--font-inscription);
   font-size: var(--titre-carte-size);
 }

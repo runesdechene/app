@@ -43,8 +43,10 @@ revendiquer » (Uriel).
    à sa couleur** après « Canal général » et « Bugs & suggestions », cochable comme elles (choix gardé,
    `lib/filtres.ts`) ; ses messages portent « [Le Lys de Fer] » et s'écrivent **à son encre** ; le sélecteur
    du champ propose mes Compagnies et le champ dit « Écrire au Lys de Fer… » à sa couleur ; **répondre à un
-   message choisit son canal**. La rangée de gélules passe à la ligne. Au bout : « **＋ Compagnies** ».
-2. **La page « Les Compagnies »** — `/<onglet>/compagnies`, ouverte par « ＋ Compagnies » (maquette 6 ;
+   message choisit son canal**. La rangée de gélules tient sur une ligne qui glisse (Uriel, 05/10). Au bout :
+   « **＋ Compagnies** », qui mène à l'onglet.
+2. **La page « Les Compagnies »** — **l'écran de l'onglet Compagnies**, `/compagnies` (Uriel, 05/10 : un
+   cinquième onglet, sur mobile et sur PC ; remplace `/<onglet>/compagnies`), ouverte aussi par « ＋ Compagnies » (maquette 6 ;
    la feuille de la maquette 3 en est la version courte, écartée au profit de la page) : une recherche (nom,
    devise, mission) ; Mes Compagnies (rôle, nombre de membres) ; Découvrir (devise en italique, membres,
    « Privée », un bouton « Rejoindre » ou « Demander ») ; « ＋ Fonder une Compagnie ». Un non-Porteur qui

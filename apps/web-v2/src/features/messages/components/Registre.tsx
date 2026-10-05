@@ -22,6 +22,7 @@ import { flushSync } from 'react-dom'
 import { Link, useSearchParams } from 'react-router'
 import coche from '@/assets/ui/coche-canal.svg'
 import { useGlisser } from '@/shared/hooks/useGlisser'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import { CANAUX_FIXES, type Canal, type Message } from '../api/lireRegistre'
 import { useCanaux, type CanalCompagnie } from '../hooks/useCanaux'
 import { useColleEnBas } from '../hooks/useColleEnBas'
@@ -148,7 +149,7 @@ function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
             key={c.id}
             type="button"
             className={styles.filtreCompagnie}
-            style={{ '--couleur': c.couleur }}
+            style={teinteCompagnie(c.couleur)}
             aria-pressed={coches.has(c.id)}
             onClick={() => {
               basculer(c.id)
@@ -158,7 +159,7 @@ function Fil({ compagnies }: { compagnies: CanalCompagnie[] }) {
             {c.nom}
           </button>
         ))}
-        <Link className={styles.plusCompagnies} to="compagnies" relative="path">
+        <Link className={styles.plusCompagnies} to="/compagnies">
           ＋ Compagnies
         </Link>
       </div>

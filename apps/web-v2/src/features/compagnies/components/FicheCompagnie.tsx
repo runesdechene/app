@@ -8,6 +8,7 @@
  */
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
@@ -33,7 +34,7 @@ export function FicheCompagnie({ id }: { id: string }) {
   const gere = fiche.monRole === 'chef' || fiche.monRole === 'officier'
 
   return (
-    <article className={styles.fiche} style={{ '--couleur': fiche.couleur }}>
+    <article className={styles.fiche} style={teinteCompagnie(fiche.couleur)}>
       <div className={styles.bandeau} />
       <div className={styles.corps}>
         <AvatarCompagnie

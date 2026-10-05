@@ -58,7 +58,7 @@
    même si la couleur est très claire (mig 422). */
 .filtreCompagnie {
   background: color-mix(in srgb, var(--couleur) 18%, var(--color-fond));
-  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  color: var(--encre-compagnie);
 }
 
 /* « ＋ Compagnies » : une gélule en pointillés qui mène à la page des Compagnies. */

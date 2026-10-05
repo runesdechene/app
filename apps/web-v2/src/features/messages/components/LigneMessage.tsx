@@ -12,6 +12,7 @@
 import { Fragment, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { useEnvols } from '@/shared/hooks/useEnvols'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Envols } from '@/shared/ui/Envols'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -55,7 +56,7 @@ export function LigneMessage({
         .filter(Boolean)
         .join(' ')}
       data-canal={m.canalCouleur === null ? m.canal : 'compagnie'}
-      style={m.canalCouleur === null ? undefined : { '--couleur': m.canalCouleur }}
+      style={m.canalCouleur === null ? undefined : teinteCompagnie(m.canalCouleur)}
       onPointerUp={(e) => {
         if (aime || e.pointerType === 'mouse') return
         const avant = dernierToucher.current

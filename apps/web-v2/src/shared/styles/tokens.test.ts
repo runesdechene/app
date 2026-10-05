@@ -9,6 +9,7 @@
 /// <reference types="node" />
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { ENCRE, FOND } from '../lib/teinte'
 
 const SRC = path.resolve(import.meta.dirname, '../..')
 const PASSED_INLINE = new Set([
@@ -28,6 +29,8 @@ const PASSED_INLINE = new Set([
   '--ombre-texte',
   '--ombre-force',
   '--couleur', // la couleur d'une Compagnie (mig 422)
+  '--encre-compagnie', // son encre lisible (shared/lib/teinte.ts)
+  '--sur-couleur',
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
@@ -51,4 +54,9 @@ test('chaque var(--…) utilisée est définie dans tokens.css', () => {
     }
   }
   expect(unknown).toEqual([])
+})
+
+test('la teinte des Compagnies recopie le fond et l’encre des jetons', () => {
+  expect(tokens).toContain(`--color-fond: ${FOND};`)
+  expect(tokens).toContain(`--color-encre: ${ENCRE};`)
 })

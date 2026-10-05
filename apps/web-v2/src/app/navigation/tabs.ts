@@ -1,16 +1,17 @@
 /**
- * QUOI     — la liste des quatre onglets et les règles qui répondent à un toucher.
+ * QUOI     — la liste des cinq onglets et les règles qui répondent à un toucher.
  * POURQUOI — conventions mobiles (spec socle §4bis) : chaque onglet se souvient de sa dernière
  *            adresse ; toucher l'onglet actif remonte à sa racine, puis en haut de page.
  * ATTENTION — l'onglet se lit dans le PREMIER segment de l'URL (/carte/compte → carte). Toute
  *            future adresse d'un écran doit donc commencer par son onglet.
  */
-export type TabId = 'accueil' | 'carte' | 'messages' | 'compte'
+export type TabId = 'accueil' | 'carte' | 'messages' | 'compagnies' | 'compte'
 
 export const TABS = [
   { id: 'accueil', label: 'Accueil', path: '/accueil' },
   { id: 'carte', label: 'Carte', path: '/carte' },
   { id: 'messages', label: 'Messages', path: '/messages' },
+  { id: 'compagnies', label: 'Compagnies', path: '/compagnies' },
   { id: 'compte', label: 'Compte', path: '/compte' },
 ] as const satisfies readonly { id: TabId; label: string; path: `/${TabId}` }[]
 

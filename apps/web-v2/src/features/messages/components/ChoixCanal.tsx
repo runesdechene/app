@@ -7,6 +7,7 @@
  *            ou avec Échap.
  */
 import { useEffect, useRef, useState } from 'react'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import type { Canal } from '../api/lireRegistre'
 import styles from './ChoixCanal.module.css'
 import menu from './Menu.module.css'
@@ -51,7 +52,7 @@ export function ChoixCanal({
     c === 'bugs' ? styles.bugs : couleur(c) === null ? styles.general : styles.compagnie
   const style = (c: Canal) => {
     const teinteLibre = couleur(c)
-    return teinteLibre === null ? undefined : { '--couleur': teinteLibre }
+    return teinteLibre === null ? undefined : teinteCompagnie(teinteLibre)
   }
 
   return (

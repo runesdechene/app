@@ -1,22 +1,14 @@
 /**
- * QUOI     — /<onglet>/compagnies (la page des Compagnies), /<onglet>/compagnies/fonder et
- *            /<onglet>/compagnie/<id> (sa fiche), dans le cadre de détail.
+ * QUOI     — /<onglet>/compagnie/fonder, /<onglet>/compagnie/<id> (sa fiche) et sa page Gérer,
+ *            dans le cadre de détail. La page des Compagnies, elle, est l'écran de l'onglet
+ *            Compagnies (Uriel, 05/10).
  * POURQUOI — la zone Compagnies ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre.
  */
 import { useParams } from 'react-router'
 import { EcranFonder } from '@/features/compagnies/components/EcranFonder'
 import { FicheCompagnie } from '@/features/compagnies/components/FicheCompagnie'
 import { GererCompagnie } from '@/features/compagnies/components/GererCompagnie'
-import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { DetailPane } from '../shell/DetailPane'
-
-export function RouteCompagnies() {
-  return (
-    <DetailPane title="Les Compagnies">
-      <PageCompagnies />
-    </DetailPane>
-  )
-}
 
 export function RouteFonder() {
   return (

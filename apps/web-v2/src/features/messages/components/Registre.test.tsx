@@ -382,7 +382,7 @@ test('mes Compagnies sont des gélules à leur couleur, cochées d’office', as
   expect(g.style.getPropertyValue('--couleur')).toBe('#5f6f86')
   expect(screen.getByRole('link', { name: /Compagnies/ })).toHaveAttribute(
     'href',
-    '/messages/compagnies',
+    '/compagnies',
   )
 })
 

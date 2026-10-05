@@ -1,7 +1,7 @@
 /**
- * QUOI     — la coquille : logotype, la cloche, barre d'onglets, les quatre écrans
+ * QUOI     — la coquille : logotype, la cloche, barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
- * POURQUOI — les quatre écrans restent MONTÉS : leur état et leur défilement survivent au
+ * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
  *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
  *            visible. Sur desktop, la carte reste toujours là et l'onglet actif (ou un détail)
  *            s'ouvre dans un tiroir à côté (spec socle §4bis, Uriel 28/09). Le JavaScript dit
@@ -20,6 +20,7 @@ import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
 import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
+import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
@@ -46,6 +47,7 @@ const SCREENS: Record<TabId, () => ReactNode> = {
   accueil: AccueilScreen,
   carte: CarteDeLaCoquille,
   messages: MessagesScreen,
+  compagnies: PageCompagnies,
   compte: CompteScreen,
 }
 

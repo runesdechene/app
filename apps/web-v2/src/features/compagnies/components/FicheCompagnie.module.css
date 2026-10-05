@@ -36,7 +36,7 @@
 
 .devise {
   margin: 0;
-  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  color: var(--encre-compagnie);
   font-family: var(--font-inscription);
   font-size: var(--titre-carte-size);
   font-style: italic;
@@ -116,7 +116,7 @@
 
 .role {
   display: block;
-  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  color: var(--encre-compagnie);
   font-family: var(--font-inscription);
   font-size: var(--sous-titre-size);
   font-style: italic;

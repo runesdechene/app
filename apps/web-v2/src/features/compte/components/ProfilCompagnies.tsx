@@ -4,6 +4,7 @@
  *            qu'à ses membres (la base le décide, migration 422).
  */
 import { Link } from 'react-router'
+import { teinteCompagnie } from '@/shared/lib/teinte'
 import type { ExplorateurProfile } from '../api/lireProfil'
 import styles from './ProfilCompagnies.module.css'
 
@@ -15,7 +16,7 @@ export function ProfilCompagnies({ profil }: { profil: ExplorateurProfile }) {
         <li key={c.id}>
           <Link
             className={styles.gelule}
-            style={{ '--couleur': c.couleur }}
+            style={teinteCompagnie(c.couleur)}
             to={`../../compagnie/${c.id}`}
             relative="path"
           >

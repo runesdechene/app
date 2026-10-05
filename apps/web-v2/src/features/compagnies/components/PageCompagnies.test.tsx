@@ -37,10 +37,10 @@ function monter(liste: ListeCompagnies) {
   api.fetchCompagnies.mockResolvedValue(liste)
   const router = createMemoryRouter(
     [
-      { path: '/messages/compagnies', element: <PageCompagnies /> },
-      { path: '/messages/compagnies/fonder', element: <EcranFonder /> },
+      { path: '/compagnies', element: <PageCompagnies /> },
+      { path: '/compagnies/compagnie/fonder', element: <EcranFonder /> },
     ],
-    { initialEntries: ['/messages/compagnies'] },
+    { initialEntries: ['/compagnies'] },
   )
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -61,7 +61,7 @@ test('mes Compagnies, puis Découvrir ; une privée se demande, une publique se 
   expect(await screen.findByRole('heading', { name: 'Mes Compagnies' })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Le Lys de Fer/ })).toHaveAttribute(
     'href',
-    '/messages/compagnie/f-lys',
+    '/compagnies/compagnie/f-lys',
   )
   expect(screen.getByRole('button', { name: 'Demander à rejoindre Helvetia' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Rejoindre Verte Guilde' }))

@@ -44,7 +44,7 @@ export function PageCompagnies() {
           <ul className={styles.liste}>
             {liste.miennes.filter(garder).map((c) => (
               <li key={c.id}>
-                <Link className={styles.ligne} to={`../compagnie/${c.id}`} relative="path">
+                <Link className={styles.ligne} to={`/compagnies/compagnie/${c.id}`}>
                   <AvatarCompagnie nom={c.nom} avatar={c.avatar} couleur={c.couleur} taille={44} />
                   <span className={styles.texte}>
                     <span className={styles.nom}>{c.nom}</span>
@@ -73,7 +73,7 @@ export function PageCompagnies() {
           <ul className={styles.liste}>
             {liste.autres.filter(garder).map((c) => (
               <li key={c.id} className={styles.ligne}>
-                <Link className={styles.lien} to={`../compagnie/${c.id}`} relative="path">
+                <Link className={styles.lien} to={`/compagnies/compagnie/${c.id}`}>
                   <AvatarCompagnie nom={c.nom} avatar={c.avatar} couleur={c.couleur} taille={44} />
                   <span className={styles.texte}>
                     <span className={styles.nom}>{c.nom}</span>
@@ -97,7 +97,7 @@ export function PageCompagnies() {
         </section>
       )}
 
-      <Link className={styles.fonder} to="fonder" relative="path">
+      <Link className={styles.fonder} to="/compagnies/compagnie/fonder">
         ＋ Fonder une Compagnie
       </Link>
       <p className={styles.note}>Fonder est réservé aux Porteurs. Rejoindre est ouvert à tous.</p>

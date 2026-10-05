@@ -41,7 +41,7 @@ export function FonderCompagnie() {
     onSuccess: (id) => {
       void queryClient.invalidateQueries({ queryKey: compagniesKey })
       void queryClient.invalidateQueries({ queryKey: canauxKey })
-      void navigate(`../../compagnie/${id}`, { relative: 'path' })
+      void navigate(`../${id}`, { relative: 'path' })
     },
   })
 

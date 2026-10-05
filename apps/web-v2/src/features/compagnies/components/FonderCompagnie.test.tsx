@@ -20,10 +20,10 @@ beforeEach(() => {
   vi.clearAllMocks()
   router = createMemoryRouter(
     [
-      { path: '/messages/compagnies/fonder', element: <FonderCompagnie /> },
+      { path: '/messages/compagnie/fonder', element: <FonderCompagnie /> },
       { path: '/messages/compagnie/:id', element: <p>la fiche</p> },
     ],
-    { initialEntries: ['/messages/compagnies/fonder'] },
+    { initialEntries: ['/messages/compagnie/fonder'] },
   )
   render(
     <QueryClientProvider client={new QueryClient()}>

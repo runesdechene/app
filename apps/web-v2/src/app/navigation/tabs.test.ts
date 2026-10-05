@@ -4,8 +4,8 @@
  */
 import { aRetenir, isTabId, resolveTabPress, tabOf, TABS } from './tabs'
 
-test('quatre onglets, dans l’ordre de la maquette', () => {
-  expect(TABS.map((t) => t.id)).toEqual(['accueil', 'carte', 'messages', 'compte'])
+test('cinq onglets, dans l’ordre de la maquette', () => {
+  expect(TABS.map((t) => t.id)).toEqual(['accueil', 'carte', 'messages', 'compagnies', 'compte'])
   expect(isTabId('codex')).toBe(false)
   expect(isTabId('compte')).toBe(true)
 })

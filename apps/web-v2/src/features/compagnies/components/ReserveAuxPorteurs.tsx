@@ -22,7 +22,7 @@ export function ReserveAuxPorteurs() {
       <a className={styles.boutique} href="https://runesdechene.com" target="_blank" rel="noopener">
         Découvrir la boutique ›
       </a>
-      <Link className={styles.rejoindre} to=".." relative="path">
+      <Link className={styles.rejoindre} to="/compagnies">
         Rejoindre une Compagnie
       </Link>
       <p className={styles.client}>

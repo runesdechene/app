@@ -258,7 +258,7 @@ test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Car
   await screen.findByRole('button', { name: 'Messages' })
   expect(curseur()?.getAttribute('style')).toContain('--rang: 1')
   await userEvent.click(screen.getByRole('button', { name: 'Compte' }))
-  expect(curseur()?.getAttribute('style')).toContain('--rang: 2')
+  expect(curseur()?.getAttribute('style')).toContain('--rang: 3')
   await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
   expect(curseur()).toBeNull()
 })

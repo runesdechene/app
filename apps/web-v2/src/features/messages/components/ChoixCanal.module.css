@@ -37,7 +37,7 @@
 /* Une Compagnie : sa couleur en voile, son nom à son encre, mêlée à l'encre du site pour rester lisible. */
 .compagnie {
   background: color-mix(in srgb, var(--couleur) 18%, var(--color-fond));
-  color: color-mix(in srgb, var(--couleur) 40%, var(--color-encre));
+  color: var(--encre-compagnie);
 }
 
 .chevron {

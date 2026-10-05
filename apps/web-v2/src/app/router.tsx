@@ -15,7 +15,7 @@ import { RootLayout } from './RootLayout'
 import { RouteChemins, RouteClassement } from './routes/accueil'
 import { RouteAjouter, RouteAjouterLieu, RouteNotifications, RouteNouveautes } from './routes/carte'
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
-import { RouteCompagnie, RouteCompagnies, RouteFonder, RouteGerer } from './routes/compagnies'
+import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
 import { RouteMurmure } from './routes/messages'
 import { RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
 import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
@@ -55,8 +55,7 @@ export const routes: RouteObject[] = [
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'preferences', Component: RoutePreferences },
               { path: 'murmures/:id', Component: RouteMurmure },
-              { path: 'compagnies', Component: RouteCompagnies },
-              { path: 'compagnies/fonder', Component: RouteFonder },
+              { path: 'compagnie/fonder', Component: RouteFonder },
               { path: 'compagnie/:id', Component: RouteCompagnie },
               { path: 'compagnie/:id/gerer', Component: RouteGerer },
               { path: 'classement', Component: RouteClassement },

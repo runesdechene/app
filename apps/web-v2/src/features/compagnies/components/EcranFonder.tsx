@@ -1,5 +1,5 @@
 /**
- * QUOI     — /<onglet>/compagnies/fonder : le formulaire pour un Porteur, sinon « C'est réservé aux
+ * QUOI     — /<onglet>/compagnie/fonder : le formulaire pour un Porteur, sinon « C'est réservé aux
  *            Porteurs ».
  * POURQUOI — chacun peut toucher « Fonder » ; c'est l'écran qui dit la règle (spec compagnies).
  */
