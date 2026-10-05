@@ -69,3 +69,16 @@ test('un refus de la base : le fil se relit', async () => {
     expect(client.getQueryState(CLE)?.isInvalidated).toBe(true)
   })
 })
+
+test('saluer un ajout, c’est aimer le lieu : ses cœurs de fiche se relisent aussi', async () => {
+  api.saluer.mockResolvedValue({ saluts: 3, salue: true })
+  const { client, saluer } = monter()
+  const FICHE = ['lieu', 'l3', 'coeurs']
+  client.setQueryData(FICHE, { total: 2, miens: 0, qui: [] })
+  act(() => {
+    saluer('ajout:l3')
+  })
+  await waitFor(() => {
+    expect(client.getQueryState(FICHE)?.isInvalidated).toBe(true)
+  })
+})

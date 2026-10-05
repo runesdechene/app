@@ -14,8 +14,7 @@ import {
   fetchPresDeMoi,
 } from '../api/accueil'
 import type { Periode, TypeDeClassement } from '../api/lireAccueil'
-
-export const cheminsKey = ['accueil', 'chemins'] as const
+import { cheminsKey } from '@/shared/lib/cles'
 
 // Tirée au hasard une fois par ouverture : elle ne change pas pendant qu'on la regarde.
 export function useBanniere() {

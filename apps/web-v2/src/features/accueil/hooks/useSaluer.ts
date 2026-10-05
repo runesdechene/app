@@ -9,7 +9,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { saluer } from '../api/accueil'
 import type { Chemin } from '../api/lireAccueil'
-import { cheminsKey } from './useAccueil'
+import { cheminsKey, coeursDuLieuKey } from '@/shared/lib/cles'
 
 const saluerKey = ['saluer'] as const
 
@@ -25,10 +25,14 @@ export function useSaluer() {
         chemins?.map((c) => (c.id === id ? { ...c, saluts: c.saluts + 1, salue: true } : c)),
       )
     },
-    onSettled: () => {
+    onSettled: (_reponse, _erreur, id) => {
       // Cet envoi compte encore parmi ceux en cours : 1, c'est le dernier de la rafale.
       if (queryClient.isMutating({ mutationKey: saluerKey }) === 1) {
         void queryClient.invalidateQueries({ queryKey: cheminsKey })
+      }
+      // Saluer un ajout, c'est aimer le lieu (migration 413) : sa fiche se relit aussi.
+      if (id.startsWith('ajout:')) {
+        void queryClient.invalidateQueries({ queryKey: coeursDuLieuKey(id.slice('ajout:'.length)) })
       }
     },
   })
