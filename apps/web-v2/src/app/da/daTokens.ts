@@ -65,6 +65,8 @@ export const COLOR_TOKENS = [
   '--color-canal-bugs-texte',
   '--color-canal-activite',
   '--color-canal-activite-texte',
+  '--color-ajoute',
+  '--color-retire',
 ] as const
 
 export const DA_SHOWCASED = [

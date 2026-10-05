@@ -9,6 +9,7 @@ const api = vi.hoisted(() => ({
   fetchCoeurs: vi.fn(),
   fetchHistoire: vi.fn(),
   revenirAVersion: vi.fn(() => Promise.resolve()),
+  fetchVersion: vi.fn(),
   signalerLieu: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../api/lieu', () => api)
@@ -209,7 +210,7 @@ test('« Modifier la fiche » mène à l’écran de modification du lieu', asyn
   expect(router.state.location.pathname).toBe('/carte/lieu/a/modifier')
 })
 
-test('« L’histoire de la fiche » : chaque version en mots, et revenir à une ancienne', async () => {
+test('« L’histoire de la fiche » : chaque version en mots ; on en touche une, on la voit, on y revient', async () => {
   api.fetchHistoire.mockResolvedValue([
     {
       id: 3,
@@ -232,8 +233,19 @@ test('« L’histoire de la fiche » : chaque version en mots, et revenir à une
   expect(await screen.findByText(/a enrichi le récit/)).toBeInTheDocument()
   expect(screen.getByText('Actuelle')).toBeInTheDocument()
   expect(screen.getByText(/a ajouté le lieu/)).toBeInTheDocument()
-  await userEvent.click(screen.getByRole('button', { name: 'Revenir' }))
+  api.fetchVersion.mockResolvedValue({
+    id: 1,
+    quand: '2026-08-17T10:00:00Z',
+    note: null,
+    qui: { id: 'l', nom: 'Luna', avatar: null },
+    champs: [],
+  })
+  await userEvent.click(screen.getByRole('button', { name: /Luna a ajouté le lieu/ }))
+  expect(api.fetchVersion).toHaveBeenCalledWith(1)
+  await userEvent.click(await screen.findByRole('button', { name: 'Revenir à cette version' }))
   expect(api.revenirAVersion).toHaveBeenCalledWith(1, expect.anything())
+  // Revenu, la feuille rend la liste.
+  expect(await screen.findByText('Actuelle')).toBeInTheDocument()
 })
 
 test('« Signaler » : une raison, un mot, puis un merci', async () => {

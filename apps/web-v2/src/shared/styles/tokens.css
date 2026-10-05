@@ -85,6 +85,8 @@
   --color-canal-bugs-texte: #4f45a8;
   --color-canal-activite: #ead9b4; /* « Activité » dans le Registre (05/10) */
   --color-canal-activite-texte: #7d5a2c;
+  --color-ajoute: #38733f; /* ce qu'une version de fiche ajoute (05/10) */
+  --color-retire: #b8736b; /* ce qu'elle retire */
 
   /* Polices */
   --font-titre: 'Bebas Neue', sans-serif;

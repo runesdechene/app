@@ -1,0 +1,70 @@
+/*
+ * QUOI     — « Une version » (maquette 379:417) : l'ajouté souligné vert, le retiré barré pâle.
+ */
+.version {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.qui {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+}
+
+.quand {
+  display: block;
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.titre {
+  margin: 0 0 var(--space-2);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+}
+
+.version ins {
+  color: var(--color-ajoute);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.version del {
+  color: var(--color-retire);
+}
+
+.legende {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.retour {
+  justify-self: start;
+  margin-bottom: var(--space-3);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}

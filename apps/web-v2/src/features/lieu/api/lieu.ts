@@ -14,6 +14,7 @@ import {
   lireCompagnons,
   lireCoutDecouverte,
   lireHistoire,
+  lireVersionDetail,
   lireExplorateurs,
   lireFiche,
   lireRecompense,
@@ -122,6 +123,13 @@ export async function fetchHistoire(id: string) {
   const { data, error } = await supabase.rpc('histoire_du_lieu', { p_id: id })
   if (error) throw error
   return lireHistoire(data)
+}
+
+// Une version de la fiche, avant et après (mig 415).
+export async function fetchVersion(id: number) {
+  const { data, error } = await supabase.rpc('version_du_lieu', { p_version: id })
+  if (error) throw error
+  return lireVersionDetail(data)
 }
 
 // Reposer une version (mig 387) : les mêmes règles que modifier, et une version de plus.

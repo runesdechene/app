@@ -173,6 +173,38 @@ export function lireHistoire(json: unknown): Version[] | null {
   })(json)
 }
 
+export type ChampEcrit = 'recit' | 'acces' | 'quand' | 'bon_a_savoir'
+export type VersionDetail = {
+  id: number
+  quand: string
+  note: string | null
+  qui: Personne | null
+  champs: { champ: ChampEcrit; avant: string; apres: string }[]
+}
+const CHAMPS_ECRITS: readonly ChampEcrit[] = ['recit', 'acces', 'quand', 'bon_a_savoir']
+
+function lireChampEcrit(v: unknown): ChampEcrit {
+  const champ = CHAMPS_ECRITS.find((c) => c === v)
+  if (champ === undefined) throw new Error('champ de version inconnu')
+  return champ
+}
+
+// Une version et ce qu'elle a changé (mig 415) ; null : introuvable ou invisible.
+export function lireVersionDetail(json: unknown): VersionDetail | null {
+  if (json === null) return null
+  const v = objet(json)
+  return {
+    id: nombre(v.id),
+    quand: chaine(v.quand),
+    note: ouNull(chaine)(v.note),
+    qui: ouNull(lirePersonne)(v.qui),
+    champs: liste((c) => {
+      const o = objet(c)
+      return { champ: lireChampEcrit(o.champ), avant: chaine(o.avant), apres: chaine(o.apres) }
+    })(v.champs),
+  }
+}
+
 // Le Carnet de passage (mig 389) ; null : le lieu n'est pas visible.
 function lireMot(v: unknown): Mot {
   const m = objet(v)

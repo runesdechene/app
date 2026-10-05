@@ -36,9 +36,8 @@ function siecle(annee: number): string {
 }
 
 export function ligneDeFaits(f: FicheLieu['faits']): string | null {
-  const morceaux = [
-    f.epoque,
-    f.annee === null ? null : siecle(f.annee),
-  ].filter((m): m is string => m !== null)
+  const morceaux = [f.epoque, f.annee === null ? null : siecle(f.annee)].filter(
+    (m): m is string => m !== null,
+  )
   return morceaux.length > 0 ? morceaux.join(' · ') : null
 }

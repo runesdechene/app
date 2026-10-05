@@ -155,7 +155,7 @@
 
 /* L'histoire : la version actuelle, et le retour vers une autre. */
 .actuelle,
-.revenir {
+.voir {
   flex: none;
   font-family: var(--font-corps);
   font-size: var(--legende-size);
@@ -166,11 +166,21 @@
   color: var(--color-ocre);
 }
 
-.revenir {
+.voir {
+  color: var(--color-texte-doux);
+}
+
+/* Une version qu'on touche pour la voir : toute la ligne, sans allure de bouton. */
+.version {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
   padding: 0;
   border: none;
   background: none;
-  color: var(--color-accent);
+  font: inherit;
+  text-align: start;
   cursor: pointer;
 }
 

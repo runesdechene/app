@@ -23,3 +23,11 @@ test('une version se dit en mots', () => {
     'a changé le nom, la nature et le récit',
   )
 })
+
+test('les rubriques et le bivouac se disent aussi', () => {
+  expect(ceQuiAChange(v(['acces']))).toBe('a enrichi l’accès')
+  expect(ceQuiAChange(v(['bon_a_savoir']))).toBe('a enrichi « Bon à savoir »')
+  expect(ceQuiAChange(v(['quand', 'recit']))).toBe('a enrichi « Quand y aller » et le récit')
+  expect(ceQuiAChange(v(['bivouac']))).toBe('a changé le bivouac')
+  expect(ceQuiAChange(v(['nom', 'acces']))).toBe('a changé le nom et l’accès')
+})
