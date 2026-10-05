@@ -5,6 +5,7 @@
  * POURQUOI — voir ce que chacun a ajouté (Uriel, 05/10). Revenir crée une version de plus : rien ne se
  *            perd. La version vit dans la feuille de l'histoire : un moment, pas une adresse.
  */
+import { useEffect, useRef } from 'react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import type { ChampEcrit, Version, VersionDetail } from '../api/lireLieu'
@@ -84,7 +85,7 @@ export function FeuilleVersionContenu({
 }
 
 // La version touchée dans l'histoire (sa ligne dit ce qu'elle a changé) : chargée, puis montrée ;
-// « ‹ L'histoire » ramène à la liste.
+// « ‹ L'histoire » ramène à la liste. Le focus va à ce bouton : la ligne touchée a disparu.
 export function VersionChoisie({
   id,
   ligne,
@@ -101,9 +102,13 @@ export function VersionChoisie({
   onRetour: () => void
 }) {
   const { version, erreur } = useVersion(id)
+  const retour = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    retour.current?.focus()
+  }, [])
   return (
     <>
-      <button type="button" className={styles.retour} onClick={onRetour}>
+      <button ref={retour} type="button" className={styles.retour} onClick={onRetour}>
         ‹ L’histoire
       </button>
       {erreur ? (

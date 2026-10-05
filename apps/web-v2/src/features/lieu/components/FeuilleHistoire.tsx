@@ -5,7 +5,7 @@
  * POURQUOI — Modifier est ouvert à tous : l'histoire le rend sûr. Revenir à une version en crée
  *            une nouvelle, rien ne se perd.
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Feuille } from '@/shared/ui/Feuille'
 import type { Version } from '../api/lireLieu'
@@ -19,6 +19,12 @@ const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', yea
 export function FeuilleHistoire({ id, onFermer }: { id: string; onFermer: () => void }) {
   const { versions, revenir, enCours, echec } = useHistoire(id)
   const [choisie, setChoisie] = useState<{ id: number; ligne: Version } | null>(null)
+  // De retour à la liste, le focus revient à la ligne de la dernière version vue.
+  const [vue, setVue] = useState<number | null>(null)
+  const ligneVue = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (choisie === null) ligneVue.current?.focus()
+  }, [choisie])
   return (
     <Feuille titre="L’histoire de la fiche" onFermer={onFermer}>
       <h2 className={styles.titre}>L’histoire de la fiche</h2>
@@ -65,9 +71,11 @@ export function FeuilleHistoire({ id, onFermer }: { id: string; onFermer: () => 
                     <div className={styles.personne}>{ligne}</div>
                   ) : (
                     <button
+                      ref={versionId === vue ? ligneVue : undefined}
                       type="button"
                       className={styles.version}
                       onClick={() => {
+                        setVue(versionId)
                         setChoisie({ id: versionId, ligne: v })
                       }}
                     >

@@ -280,6 +280,40 @@ test('une version sans texte changé dit ce qu’elle a changé : « a changé l
   expect(screen.queryByText('Actuelle')).not.toBeInTheDocument()
 })
 
+test('le focus suit : la version ouverte le donne à « ‹ L’histoire », le retour à sa ligne', async () => {
+  api.fetchHistoire.mockResolvedValue([
+    {
+      id: 5,
+      quand: '2026-09-24T10:00:00Z',
+      origine: false,
+      champs: ['recit'],
+      note: null,
+      qui: { id: 'a', nom: 'Aelis', avatar: null },
+    },
+    {
+      id: 4,
+      quand: '2026-09-23T10:00:00Z',
+      origine: false,
+      champs: ['nom'],
+      note: null,
+      qui: { id: 'm', nom: 'Mathéo', avatar: null },
+    },
+  ])
+  api.fetchVersion.mockResolvedValue({
+    id: 4,
+    quand: '2026-09-23T10:00:00Z',
+    note: null,
+    qui: { id: 'm', nom: 'Mathéo', avatar: null },
+    champs: [],
+  })
+  dans(<FeuilleHistoire id="a" onFermer={vi.fn()} />)
+  await userEvent.click(await screen.findByRole('button', { name: /Mathéo a changé le nom/ }))
+  const retour = screen.getByRole('button', { name: '‹ L’histoire' })
+  expect(retour).toHaveFocus()
+  await userEvent.click(retour)
+  expect(screen.getByRole('button', { name: /Mathéo a changé le nom/ })).toHaveFocus()
+})
+
 test('« Signaler » : une raison, un mot, puis un merci', async () => {
   dans(<FeuilleSignaler id="a" onFermer={vi.fn()} />)
   const envoyer = screen.getByRole('button', { name: 'Envoyer le signalement' })
