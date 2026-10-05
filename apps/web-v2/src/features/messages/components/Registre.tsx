@@ -25,6 +25,7 @@ import { autreJour, jourDe } from '../lib/jour'
 import { estLaSuite } from '../lib/suite'
 import { BarreEcrire } from './BarreEcrire'
 import { ChoixCanal } from './ChoixCanal'
+import { LigneConnexions } from './LigneConnexions'
 import { LigneMessage } from './LigneMessage'
 import { LignePassage } from './LignePassage'
 import { ListeMentions } from './ListeMentions'
@@ -108,11 +109,19 @@ export function Registre() {
               {jourDe(ligne.quand)}
             </li>
           )
-          if (ligne.sorte === 'passage') {
+          if (ligne.sorte === 'arrivee') {
             return (
               <Fragment key={ligne.passage.id}>
                 {jour}
                 <LignePassage passage={ligne.passage} onBienvenue={souhaiterLaBienvenue} />
+              </Fragment>
+            )
+          }
+          if (ligne.sorte === 'connexions') {
+            return (
+              <Fragment key={ligne.passages[0]?.id ?? ligne.quand}>
+                {jour}
+                <LigneConnexions passages={ligne.passages} />
               </Fragment>
             )
           }

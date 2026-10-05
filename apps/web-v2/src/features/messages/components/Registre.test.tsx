@@ -259,20 +259,26 @@ test('au clavier : les flèches choisissent dans la liste, Entrée mentionne san
   expect(screen.queryByRole('listbox', { name: 'Mentionner' })).toBeNull()
 })
 
-test('les gens qui passent s’écrivent entre les messages du canal général', async () => {
+test('les gens qui passent s’écrivent dans le canal général ; les connexions d’affilée, en une ligne', async () => {
+  const ilYa = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString()
   api.fetchPassages.mockResolvedValue([
-    { id: 'arrivee:u9', type: 'arrivee', quand: '2026-09-28T07:13:00Z', qui: KELPIE, moi: false },
-    { id: 'connexion:u8', type: 'connexion', quand: '2026-09-28T07:14:00Z', qui: ASH, moi: false },
+    { id: 'arrivee:u9', type: 'arrivee', quand: ilYa(30), qui: KELPIE, moi: false },
+    { id: 'connexion:u8', type: 'connexion', quand: ilYa(20), qui: ASH, moi: false },
+    { id: 'connexion:u2', type: 'connexion', quand: ilYa(10), qui: GAUTIER, moi: false },
   ])
   monter()
   const registre = await screen.findByRole('list', { name: 'Registre' })
-  await within(registre).findByText(/vient de se connecter/)
-  const [, arrivee, connexion] = within(registre).getAllByRole('listitem')
-  expect(arrivee).toHaveTextContent('Kelpie a rejoint EXPLORE ! Souhaite-lui la bienvenue !')
-  expect(connexion).toHaveTextContent('Ash vient de se connecter')
+  expect(
+    await within(registre).findByText('Kelpie', { exact: false, selector: 'a' }),
+  ).toBeInTheDocument()
+  const lignes = within(registre).getAllByRole('listitem')
+  expect(lignes.some((l) => l.textContent.includes('Kelpie a rejoint EXPLORE !'))).toBe(true)
+  expect(
+    lignes.filter((l) => l.textContent.includes('Gautier et Ash se sont connectés')),
+  ).toHaveLength(1)
   // Le canal général décoché : les passages s'en vont avec lui.
   await userEvent.click(screen.getByRole('button', { name: /Canal général/ }))
-  expect(within(registre).queryByText(/vient de se connecter/)).toBeNull()
+  expect(within(registre).queryByText(/se sont connectés/)).toBeNull()
 })
 
 test('« Souhaite-lui la bienvenue ! » : la personne est mentionnée, on écrit dans le général', async () => {

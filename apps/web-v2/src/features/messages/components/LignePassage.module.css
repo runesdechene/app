@@ -1,9 +1,8 @@
 /*
- * QUOI     — un passage dans le Registre : centré, au crayon pâle, entre les messages. L'arrivée
- *            se voit (portrait, bienvenue en rouge) ; la connexion se murmure.
+ * QUOI     — une arrivée dans le Registre : centrée, au crayon pâle, entre les messages, mais qui se
+ *            voit (portrait, bienvenue en rouge).
  */
-.arrivee,
-.connexion {
+.arrivee {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -11,17 +10,9 @@
   gap: var(--space-1) var(--space-2);
   color: var(--color-texte-pale);
   font-family: var(--font-corps);
+  font-size: var(--corps-size);
   text-align: center;
   animation: apparaitre var(--duree-douce) var(--courbe-douce);
-}
-
-.arrivee {
-  font-size: var(--corps-size);
-}
-
-.connexion {
-  font-size: var(--legende-size);
-  opacity: 0.8;
 }
 
 .texte {
@@ -64,8 +55,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .arrivee,
-  .connexion {
+  .arrivee {
     animation: none;
   }
 }

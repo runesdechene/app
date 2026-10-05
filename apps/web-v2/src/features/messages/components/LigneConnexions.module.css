@@ -1,0 +1,94 @@
+/*
+ * QUOI     — une ligne de connexions dans le Registre : centrée, petite, au crayon pâle — elle se
+ *            murmure ; les portraits se chevauchent ; la liste de qui est passé, dans la feuille.
+ */
+.connexions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: center;
+  opacity: 0.85;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.texte {
+  margin: 0;
+  line-height: var(--dense-leading);
+}
+
+.nom {
+  color: var(--color-texte-doux);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.groupe {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.groupe:hover,
+.groupe:focus-visible {
+  color: var(--color-texte-doux);
+}
+
+/* Les portraits se chevauchent un peu. */
+.portraits {
+  display: inline-flex;
+}
+
+.portraits > * + * {
+  margin-left: -8px;
+}
+
+.heure {
+  font-variant-numeric: tabular-nums;
+}
+
+/* La liste de qui est passé, dans la feuille. */
+.liste {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  text-decoration: none;
+}
+
+.qui {
+  flex: 1;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connexions {
+    animation: none;
+  }
+}
