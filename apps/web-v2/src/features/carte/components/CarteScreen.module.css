@@ -97,19 +97,19 @@
   height: 22px;
 }
 
-/* Avec le « + » dessous : « Ma position » monte d'un cran, centrée sur lui. */
-.position[data-au-dessus] {
-  right: 28px;
-  bottom: 108px;
+/* Avec le « + » : « Ma position » au-dessus de la mention OpenStreetMap, obligatoire. */
+.position[data-avec-ajouter] {
+  bottom: 40px;
 }
 
-/* Le « + » : le seul, en bas à droite, sous le pouce (Uriel, 05/10 — « bien visible »). Un sceau de
+/* Le « + » : le seul, en bas à droite, au-dessus de « Ma position » et centré sur elle (Uriel,
+   05/10 — « bien visible »). Un sceau de
    cire : disque rouge de l'app, en relief (clair en haut, profond en bas), un fin anneau clair
    comme le bord d'un cachet, le « + » couleur parchemin. */
 .ajouter {
   position: absolute;
-  right: 24px;
-  bottom: 40px; /* au-dessus de la mention OpenStreetMap, obligatoire */
+  right: 19px;
+  bottom: 100px;
   display: grid;
   place-items: center;
   width: 58px;
@@ -143,7 +143,7 @@
 .message {
   position: absolute;
   right: 24px;
-  bottom: 164px; /* au-dessus de « Ma position » et du « + » */
+  bottom: 170px; /* au-dessus du « + » et de « Ma position » */
   margin: 0;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-rond);

@@ -354,7 +354,7 @@ function CarteVivante({
       <button
         type="button"
         className={styles.position}
-        data-au-dessus={onAjouter ? true : undefined}
+        data-avec-ajouter={onAjouter ? true : undefined}
         aria-label="Ma position"
         onClick={allerAMaPosition}
       >
