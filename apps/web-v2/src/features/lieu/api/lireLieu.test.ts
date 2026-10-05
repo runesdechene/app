@@ -12,13 +12,15 @@ const COMPLET = {
   nature: 'lieu',
   photos: [{ url: 'u1', vignette: 'v1' }],
   type: { nom: 'Château et fortins', icone: 'i.svg', couleur: '#9b3f39' },
-  faits: { epoque: 'Moyen Âge', annee: 1150, saison: null, acces: 'easy', bivouac: null },
+  faits: { epoque: 'Moyen Âge', annee: 1150 },
+  rubriques: { acces: 'Par le sentier', quand: null, bonASavoir: null },
+  bivouacTolere: true,
+  recitPar: [{ id: 'l', nom: 'Luna', avatar: null }],
   explorateurs: { nombre: 3, derniers: [{ id: 'u', nom: 'Rémy', avatar: null }] },
   revendication: { nom: 'LES LOUPS', moi: false, depuis: '2026-09-12T10:00:00Z' },
   auteur: { id: 'l', nom: 'Luna', avatar: null },
   ajouteLe: '2026-01-01T00:00:00Z',
   ajoutADistance: false,
-  enrichiPar: null,
   moi: { visiteLe: null, envie: true },
 }
 
@@ -29,6 +31,13 @@ test('une fiche complète se lit', () => {
     moi: { envie: true },
     revendication: { nom: 'LES LOUPS' },
   })
+})
+
+test('la fiche lit ses rubriques, son bivouac et qui a écrit le récit', () => {
+  const f = lireFiche(COMPLET)
+  expect(f?.rubriques).toEqual({ acces: 'Par le sentier', quand: null, bonASavoir: null })
+  expect(f?.bivouacTolere).toBe(true)
+  expect(f?.recitPar.map((p) => p.nom)).toEqual(['Luna'])
 })
 
 test('un lieu introuvable ou invisible se lit « null »', () => {
@@ -43,7 +52,7 @@ test('un lieu nu reste lisible : pas de photo, de type, de faits, de revendicati
     adresse: null,
     revendication: null,
     auteur: null,
-    faits: { epoque: null, annee: null, saison: null, acces: null, bivouac: null },
+    faits: { epoque: null, annee: null },
     explorateurs: { nombre: 0, derniers: [] },
   }
   expect(lireFiche(nu)).toMatchObject({

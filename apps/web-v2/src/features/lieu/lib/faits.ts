@@ -1,21 +1,9 @@
 /**
- * QUOI     — la ligne de faits sous le type : époque, siècle, saison, accès, bivouac.
+ * QUOI     — la ligne de faits sous le type : l'époque et le siècle.
  * POURQUOI — elle répond aux questions de qui envisage d'y aller ; elle ne dit que ce qui est
  *            connu, et disparaît sinon (spec fiche §2).
  */
 import type { FicheLieu } from '../api/lireLieu'
-
-const ACCES: Record<string, string> = {
-  easy: 'accès facile',
-  medium: 'accès moyen',
-  hard: 'accès difficile',
-}
-const SAISONS: Record<string, string> = {
-  spring: 'idéal au printemps',
-  summer: 'idéal en été',
-  autumn: 'idéal en automne',
-  winter: 'idéal en hiver',
-}
 
 function romain(n: number): string {
   const table: [number, string][] = [
@@ -51,9 +39,6 @@ export function ligneDeFaits(f: FicheLieu['faits']): string | null {
   const morceaux = [
     f.epoque,
     f.annee === null ? null : siecle(f.annee),
-    f.saison === null ? null : (SAISONS[f.saison] ?? f.saison),
-    f.acces === null ? null : (ACCES[f.acces] ?? f.acces),
-    f.bivouac === null ? null : `bivouac ${f.bivouac}`,
   ].filter((m): m is string => m !== null)
   return morceaux.length > 0 ? morceaux.join(' · ') : null
 }

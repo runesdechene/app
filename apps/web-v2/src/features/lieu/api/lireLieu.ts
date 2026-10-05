@@ -40,20 +40,18 @@ export type FicheLieu = {
   lng: number
   photos: { url: string; vignette: string }[]
   type: { nom: string; icone: string | null; couleur: string | null } | null
-  faits: {
-    epoque: string | null
-    annee: number | null
-    saison: string | null
-    acces: string | null
-    bivouac: string | null
-  }
+  faits: { epoque: string | null; annee: number | null }
+  // Les infos en plus (mig 414) : une rubrique vide est null ; le bivouac, une case.
+  rubriques: { acces: string | null; quand: string | null; bonASavoir: string | null }
+  bivouacTolere: boolean
   explorateurs: { nombre: number; derniers: Personne[] }
   revendication: { nom: string; moi: boolean; depuis: string } | null
   auteur: Personne | null
   ajouteLe: string
   // Ajouté sans y être (migration 393) : le crédit de l'auteur est plus discret.
   ajoutADistance: boolean
-  enrichiPar: { id: string; nom: string } | null
+  // Qui a écrit le récit, par ordre d'arrivée (mig 415) : « Récit partagé de… ».
+  recitPar: Personne[]
   moi: { visiteLe: string | null; envie: boolean; decouvert: boolean }
 }
 // Ce que rapporte une découverte : son rang, l'expérience gagnée, et la jauge du niveau (0 à 1).
@@ -85,17 +83,13 @@ function lireRevendication(v: unknown) {
   return { nom: chaine(r.nom), moi: booleen(r.moi), depuis: chaine(r.depuis) }
 }
 
-function lireEnrichi(v: unknown) {
-  const e = objet(v)
-  return { id: chaine(e.id), nom: chaine(e.nom) }
-}
-
 export function lireFiche(json: unknown): FicheLieu | null {
   if (json === null) return null
   const f = objet(json)
   const faits = objet(f.faits)
   const explorateurs = objet(f.explorateurs)
   const moi = objet(f.moi)
+  const rubriques = objet(f.rubriques)
   return {
     id: chaine(f.id),
     // Absent tant que la base ne le rend pas (migration 366) : pas de page publique, pas d'erreur.
@@ -107,13 +101,13 @@ export function lireFiche(json: unknown): FicheLieu | null {
     lng: nombre(f.lng),
     photos: liste(lirePhoto)(f.photos),
     type: ouNull(lireType)(f.type),
-    faits: {
-      epoque: ouNull(chaine)(faits.epoque),
-      annee: ouNull(nombre)(faits.annee),
-      saison: ouNull(chaine)(faits.saison),
-      acces: ouNull(chaine)(faits.acces),
-      bivouac: ouNull(chaine)(faits.bivouac),
+    faits: { epoque: ouNull(chaine)(faits.epoque), annee: ouNull(nombre)(faits.annee) },
+    rubriques: {
+      acces: ouNull(chaine)(rubriques.acces),
+      quand: ouNull(chaine)(rubriques.quand),
+      bonASavoir: ouNull(chaine)(rubriques.bonASavoir),
     },
+    bivouacTolere: booleen(f.bivouacTolere),
     explorateurs: {
       nombre: nombre(explorateurs.nombre),
       derniers: liste(lirePersonne)(explorateurs.derniers),
@@ -122,7 +116,7 @@ export function lireFiche(json: unknown): FicheLieu | null {
     auteur: ouNull(lirePersonne)(f.auteur),
     ajouteLe: chaine(f.ajouteLe),
     ajoutADistance: booleen(f.ajoutADistance),
-    enrichiPar: ouNull(lireEnrichi)(f.enrichiPar),
+    recitPar: liste(lirePersonne)(f.recitPar),
     moi: {
       visiteLe: ouNull(chaine)(moi.visiteLe),
       envie: booleen(moi.envie),

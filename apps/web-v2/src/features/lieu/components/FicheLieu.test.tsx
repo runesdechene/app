@@ -30,13 +30,18 @@ const FICHE = {
     { url: 'u2', vignette: 'v2' },
   ],
   type: { nom: 'Château et fortins', icone: null, couleur: '#9b3f39' },
-  faits: { epoque: 'Moyen Âge', annee: 1150, saison: null, acces: null, bivouac: null },
+  faits: { epoque: 'Moyen Âge', annee: 1150 },
+  rubriques: { acces: null, quand: null, bonASavoir: null },
+  bivouacTolere: false,
   explorateurs: { nombre: 3, derniers: [] },
   revendication: { nom: 'LES LOUPS', moi: false, depuis: '2026-09-12T10:00:00Z' },
   auteur: { id: 'l', nom: 'Luna', avatar: null },
   ajouteLe: '2026-01-01T00:00:00Z',
   ajoutADistance: false,
-  enrichiPar: { id: 'm', nom: 'Mathéo' },
+  recitPar: [
+    { id: 'l', nom: 'Luna', avatar: null },
+    { id: 'm', nom: 'Mathéo', avatar: null },
+  ],
   moi: { visiteLe: null, envie: false },
 }
 
@@ -56,6 +61,7 @@ beforeEach(() => {
 })
 
 const onCoeurs = vi.fn()
+const onEnrichir = vi.fn()
 
 function afficher() {
   render(
@@ -68,6 +74,7 @@ function afficher() {
           onOptions={vi.fn()}
           onPartager={vi.fn()}
           onCoeurs={onCoeurs}
+          onEnrichir={onEnrichir}
           boutonVisite={() => <span>bouton</span>}
         />
       </MemoryRouter>
@@ -86,7 +93,8 @@ test('la fiche montre le lieu tel que maquetté', async () => {
     'href',
     expect.stringContaining('45.9,6.1'),
   )
-  expect(screen.getByText(/Enrichi par/)).toBeInTheDocument()
+  expect(screen.getByText(/Récit partagé de/)).toHaveTextContent('Récit partagé de Luna et Mathéo')
+  expect(screen.queryByText(/Enrichi par/)).not.toBeInTheDocument()
 })
 
 test('ajouté sur place, le crédit est plein ; à distance, il le dit et se fait discret', async () => {
@@ -117,14 +125,35 @@ test('un lieu nu n’affiche aucune ligne vide', async () => {
     photos: [],
     type: null,
     revendication: null,
-    enrichiPar: null,
-    faits: { epoque: null, annee: null, saison: null, acces: null, bivouac: null },
+    recitPar: [],
+    faits: { epoque: null, annee: null },
     explorateurs: { nombre: 0, derniers: [] },
   })
   afficher()
   expect(await screen.findByText('Personne n’a encore foulé ce lieu')).toBeInTheDocument()
   expect(screen.queryByText(/Revendiqué par/)).toBeNull()
   expect(screen.queryByText(/siècle/)).toBeNull()
+})
+
+test('les rubriques remplies et le bivouac s’affichent, une rubrique vide non', async () => {
+  api.fetchFiche.mockResolvedValue({
+    ...FICHE,
+    rubriques: { acces: 'Par le sentier', quand: null, bonASavoir: 'Pas de feu' },
+    bivouacTolere: true,
+  })
+  afficher()
+  expect(await screen.findByText('Par le sentier')).toBeInTheDocument()
+  expect(screen.getByText('Pas de feu')).toBeInTheDocument()
+  expect(screen.queryByText('Quand y aller')).not.toBeInTheDocument()
+  expect(screen.getByText('Bivouac toléré')).toBeInTheDocument()
+})
+
+test('un seul auteur : « Récit de … » ; « Enrichir la fiche » appelle onEnrichir', async () => {
+  api.fetchFiche.mockResolvedValue({ ...FICHE, recitPar: [{ id: 'l', nom: 'Luna', avatar: null }] })
+  afficher()
+  expect(await screen.findByText(/Récit de/)).toHaveTextContent('Récit de Luna')
+  await userEvent.click(screen.getByRole('button', { name: 'Enrichir la fiche' }))
+  expect(onEnrichir).toHaveBeenCalled()
 })
 
 test('un lieu introuvable le dit', async () => {

@@ -2,20 +2,26 @@
  * QUOI     — la fiche d'un lieu, dans l'ordre de la maquette 229:128 : photos au bord déchiré
  *            (qu'on fait défiler, 02/10),
  *            galerie, titre et ses deux boutons ronds, type, ligne de faits, adresse, Explorateurs,
- *            revendication, bouton de visite, récit, crédits. Les cœurs (30/09) : la pastille à
- *            droite de la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
+ *            revendication, bouton de visite, le récit et son crédit (« Récit partagé de… »), les
+ *            infos en plus (accès, quand y aller, bon à savoir, bivouac), « Enrichir la fiche », le
+ *            crédit de l'ajout (maquette 379:237, 05/10). Les cœurs (30/09) : la pastille à droite de
+ *            la galerie, « Féliciter » sous les crédits ; puis le Carnet de passage.
  * POURQUOI — spec fiche §2 : chaque ligne sans donnée disparaît, jamais une ligne vide ; la fiche
  *            ne connaît ni la coquille ni les feuilles — la route les lui passe.
  * ATTENTION — `boutonVisite` est une fonction : le bouton a besoin de la fiche chargée.
  */
 import { aLaTaille } from '@/shared/lib/image'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import acces from '@/assets/ui/acces.svg'
+import bivouacIcone from '@/assets/ui/bivouac.svg'
+import bonASavoir from '@/assets/ui/bon-a-savoir.svg'
 import drapeau from '@/assets/ui/drapeau.svg'
 import epingle from '@/assets/ui/epingle.svg'
 import etoiles from '@/assets/ui/etoiles.svg'
 import options from '@/assets/ui/options.svg'
 import partager from '@/assets/ui/partager.svg'
 import pas from '@/assets/ui/pas.svg'
+import quand from '@/assets/ui/quand.svg'
 import signetPlein from '@/assets/ui/signet-plein.svg'
 import signet from '@/assets/ui/signet.svg'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -28,6 +34,7 @@ import { useEnvie } from '../hooks/useEnvie'
 import { useFiche } from '../hooks/useFiche'
 import { useMoi } from '../hooks/useMoi'
 import { adresseCourte } from '../lib/adresse'
+import { phraseDuRecit } from '../lib/credit'
 import { ligneDeFaits } from '../lib/faits'
 import { Carnet } from './Carnet'
 import { CoeursDesAuteurs, PastilleCoeurs } from './CoeursLieu'
@@ -47,12 +54,14 @@ export function FicheLieu({
   onOptions,
   onPartager,
   onCoeurs,
+  onEnrichir,
   boutonVisite,
 }: {
   id: string
   onOptions: () => void
   onPartager: () => void
   onCoeurs: () => void
+  onEnrichir: () => void
   boutonVisite: (fiche: Fiche) => ReactNode
 }) {
   const { fiche, erreur, reessayer } = useFiche(id)
@@ -214,11 +223,29 @@ export function FicheLieu({
         <div className={styles.visite}>{boutonVisite(fiche)}</div>
 
         {fiche.recit && (
-          <section className={styles.recit} aria-label="À propos">
-            <h3 className={styles.rubrique}>À propos</h3>
+          <section className={styles.recit} aria-label="Le récit">
+            <h3 className={styles.rubrique}>Le récit</h3>
             <p className={styles.texte}>{fiche.recit}</p>
+            {fiche.recitPar.length > 0 && (
+              <p className={styles.recitPar}>
+                <span className={styles.portraits}>
+                  {fiche.recitPar.slice(0, 3).map((p) => (
+                    <Avatar key={p.id} url={p.avatar} nom={p.nom} taille="mini" />
+                  ))}
+                </span>
+                <span>{creditEnValeur(fiche.recitPar.map((p) => p.nom))}</span>
+              </p>
+            )}
           </section>
         )}
+
+        <InfosEnPlus rubriques={fiche.rubriques} bivouac={fiche.bivouacTolere} />
+
+        <div className={styles.enrichir}>
+          <Button kind="secondaire" onClick={onEnrichir}>
+            Enrichir la fiche
+          </Button>
+        </div>
 
         <footer className={styles.credits}>
           {fiche.auteur && (
@@ -238,21 +265,19 @@ export function FicheLieu({
               </span>
             </p>
           )}
-          {fiche.enrichiPar && (
-            <p className={styles.credit}>
-              <Avatar url={null} nom={fiche.enrichiPar.nom} taille="mini" />
-              <span>
-                Enrichi par <strong>{fiche.enrichiPar.nom}</strong>
-              </span>
-            </p>
-          )}
           {coeurs && moi && (
             <CoeursDesAuteurs
               coeurs={coeurs}
               peutAimer={peutAimer}
               onAimer={aimer}
               onVoir={onCoeurs}
-              auteurs={[fiche.auteur?.nom, fiche.enrichiPar?.nom].filter((n) => n !== undefined)}
+              auteurs={[
+                ...new Set(
+                  [fiche.auteur?.nom, ...fiche.recitPar.map((p) => p.nom)].filter(
+                    (n) => n !== undefined,
+                  ),
+                ),
+              ]}
             />
           )}
         </footer>
@@ -260,5 +285,52 @@ export function FicheLieu({
         <Carnet id={id} limite={3} />
       </div>
     </article>
+  )
+}
+
+// La phrase de crédit, les noms en or (la même découpe que phraseDuRecit).
+function creditEnValeur(noms: string[]) {
+  if (phraseDuRecit(noms) === null) return null
+  return (
+    <>
+      {noms.length === 1 ? 'Récit de ' : 'Récit partagé de '}
+      {noms.map((n, i) => (
+        <Fragment key={n + String(i)}>
+          {i > 0 && (i === noms.length - 1 ? ' et ' : ', ')}
+          <strong className={styles.nomCredit}>{n}</strong>
+        </Fragment>
+      ))}
+    </>
+  )
+}
+
+const RUBRIQUES = [
+  { cle: 'acces', titre: 'Accès', icone: acces },
+  { cle: 'quand', titre: 'Quand y aller', icone: quand },
+  { cle: 'bonASavoir', titre: 'Bon à savoir', icone: bonASavoir },
+] as const
+
+// Les infos en plus : plus discrètes que le récit (Uriel, 05/10) ; une rubrique vide ne s'affiche pas.
+function InfosEnPlus({ rubriques, bivouac }: { rubriques: Fiche['rubriques']; bivouac: boolean }) {
+  const remplies = RUBRIQUES.filter((r) => rubriques[r.cle] !== null)
+  if (remplies.length === 0 && !bivouac) return null
+  return (
+    <section className={styles.infos} aria-label="Infos en plus">
+      {remplies.map((r) => (
+        <div key={r.cle} className={styles.info}>
+          <img className={styles.iconeInfo} src={r.icone} alt="" />
+          <div>
+            <h4 className={styles.titreInfo}>{r.titre}</h4>
+            <p className={styles.texteInfo}>{rubriques[r.cle]}</p>
+          </div>
+        </div>
+      ))}
+      {bivouac && (
+        <p className={styles.info}>
+          <img className={styles.iconeInfo} src={bivouacIcone} alt="" />
+          <span className={styles.titreInfo}>Bivouac toléré</span>
+        </p>
+      )}
+    </section>
   )
 }

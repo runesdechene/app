@@ -54,3 +54,4 @@ en attendant son remplacement par Uriel.
 
 L'avatar n'a pas d'image par défaut : la maquette montre la photo d'Uriel, qui ne peut pas
 servir à tout le monde. Tant que la zone Compte n'existe pas, c'est un cercle sable.
+| `acces.svg`, `quand.svg`, `bon-a-savoir.svg`, `bivouac.svg` | 18 × 18 | Fiche et « Modifier » : les infos en plus et le bivouac (Lucide route, calendar-days, lightbulb, tent ; maquette 379:237) |

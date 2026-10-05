@@ -7,7 +7,7 @@
  *            Échap.
  */
 import { useRef, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
 import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
 import { QuestionAbandon } from '@/features/ajout/components/QuestionAbandon'
@@ -36,6 +36,7 @@ function Lieu({ id }: { id: string }) {
   const { fiche } = useFiche(id)
   const [ouvert, setOuvert] = useState<Ouvert>(null)
   const fermerDetail = useFermerDetail()
+  const navigate = useNavigate()
   const fermer = () => {
     setOuvert(null)
   }
@@ -61,6 +62,9 @@ function Lieu({ id }: { id: string }) {
         }}
         onCoeurs={() => {
           setOuvert('coeurs')
+        }}
+        onEnrichir={() => {
+          void navigate('modifier', { relative: 'path' })
         }}
         boutonVisite={(f) => (
           <BoutonVisite
