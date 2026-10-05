@@ -61,6 +61,15 @@
   font-style: italic;
 }
 
+/* Le récit à modifier : le cadre du carnet de l'ajout, sans ses lignes — elles gênaient la lecture
+   d'un texte déjà long (Uriel, 05/10). */
+.recit {
+  position: relative;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+}
+
 /* L'onglet « Infos en plus » : trois rubriques et la case du bivouac (maquette 381:236). */
 .infos {
   display: grid;

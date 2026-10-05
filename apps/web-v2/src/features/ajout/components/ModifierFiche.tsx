@@ -174,7 +174,7 @@ function Formulaire({
           onChange={setOnglet}
         />
         {/* Les deux onglets restent montés : la saisie de l'un survit quand on passe à l'autre. */}
-        <div hidden={onglet !== 'recit'} className={recit.carnet}>
+        <div hidden={onglet !== 'recit'} className={styles.recit}>
           <textarea
             className={recit.texte}
             aria-label="Le récit"
