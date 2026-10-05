@@ -7,7 +7,11 @@
   position: relative; /* une feuille (« Ajouter ») se pose sur toute la coquille */
   height: 100dvh;
   display: grid;
-  grid-template-columns: 1fr auto auto;
+
+  /* minmax(0, 1fr) : la colonne du logo cède sur un petit écran. En `1fr`, elle ne descendait
+     jamais sous le logo (216 px) : l'en-tête faisait 407 px, plus qu'un iPhone, et toute l'app
+     débordait à droite — on devait dézoomer (02/10, plaintes des Explorateurs). */
+  grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
     'logo retour actions'
@@ -19,7 +23,7 @@
   grid-area: logo;
   align-self: center;
   width: 216px;
-  max-width: 60vw;
+  max-width: calc(100% - 2 * var(--space-4)); /* il rapetisse avec sa colonne, sans déborder */
   height: auto;
   margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) var(--space-2);
 }
