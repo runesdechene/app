@@ -106,7 +106,11 @@ export function VersionChoisie({
       <button type="button" className={styles.retour} onClick={onRetour}>
         ‹ L’histoire
       </button>
-      {erreur || version === null ? (
+      {erreur ? (
+        <p className={styles.legende}>
+          La version n’a pas pu être chargée. Réessaie dans un instant.
+        </p>
+      ) : version === null ? (
         <p className={styles.legende}>Cette version n’existe plus.</p>
       ) : version === undefined ? (
         <div aria-busy="true" />
