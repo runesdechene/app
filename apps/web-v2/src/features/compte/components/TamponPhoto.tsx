@@ -7,8 +7,7 @@
  *            le papier en `darken`) : `isolation: isolate` garde ces mélanges dans le disque.
  */
 import { aLaTaille } from '@/shared/lib/image'
-/* eslint-disable-next-line no-restricted-imports */
-import type { Nature, Tampon } from '@/features/compte/api/lirePasseport'
+import type { Nature, Tampon } from '../api/lirePasseport'
 import styles from './TamponPhoto.module.css'
 
 export function TamponPhoto({

@@ -4,10 +4,8 @@
  * POURQUOI — l'encre fonce à mesure qu'une nature se répète ; une nature jamais visitée reste
  *            en pointillés, sans couleur : ce qui manque se voit aussi.
  */
-/* eslint-disable-next-line no-restricted-imports */
-import type { Nature } from '@/features/compte/api/lirePasseport'
-/* eslint-disable-next-line no-restricted-imports */
-import type { Encre } from '@/features/compte/lib/passeport'
+import type { Nature } from '../api/lirePasseport'
+import type { Encre } from '../lib/passeport'
 import styles from './TamponNature.module.css'
 
 export function TamponNature({
