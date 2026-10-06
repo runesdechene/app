@@ -131,6 +131,42 @@
   z-index: 1;
 }
 
+/* Le pin posé (maquette 2) : le même rond que sur ma carte — crème, bordé d'accent, l'icône au
+   centre, sur le point même. Il se pose d'un petit élan. */
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -22px;
+  border: 3px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-carte-halo);
+  box-shadow: 0 2px 6px var(--color-ombre);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+@starting-style {
+  .pin {
+    scale: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin {
+    transition: none;
+  }
+}
+
+.pin img {
+  width: 24px;
+  height: 24px;
+}
+
 .horsLigne {
   position: absolute;
   inset: 0;

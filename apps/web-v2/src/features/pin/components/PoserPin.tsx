@@ -18,7 +18,9 @@ import { VALIDITE_JOURS } from '@/shared/lib/validitePin'
 import { useEnLigne } from '@/shared/hooks/useEnLigne'
 import { PRECISION_MAX_M, usePositionPrecise } from '@/shared/hooks/usePositionPrecise'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
+import pinGps from '@/assets/ui/pin-gps.svg'
 import { useMesPins, usePoserPin } from '../hooks/usePins'
+import { heure } from '../lib/heure'
 import styles from './PoserPin.module.css'
 
 const ZOOM = 16
@@ -62,9 +64,10 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
   }, [enLigne])
 
   // Dépend de la latitude / longitude (pas de l'objet) et de enLigne : la carte recréée au retour
-  // du réseau se recentre aussitôt, sans attendre le prochain relevé GPS.
-  const latitude = point?.latitude
-  const longitude = point?.longitude
+  // du réseau se recentre aussitôt, sans attendre le prochain relevé GPS. Posé, le pin ne bouge
+  // plus : la carte se centre sur lui, pas sur ma position qui dérive.
+  const latitude = (pose?.point ?? point)?.latitude
+  const longitude = (pose?.point ?? point)?.longitude
   useEffect(() => {
     if (latitude !== undefined && longitude !== undefined) {
       carte.current?.jumpTo({ center: [longitude, latitude], zoom: ZOOM })
@@ -96,13 +99,24 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
           <PlanSatellite vue={vue} onChanger={changerVue} />
         </div>
       )}
-      <span className={styles.repere} aria-hidden="true" />
+      {/* Posé : le repère devient le pin (maquette 2) ; avant, le point de ma position. */}
+      {poser.isSuccess ? (
+        <span className={styles.pin} role="img" aria-label="Ton pin">
+          <img src={pinGps} alt="" />
+        </span>
+      ) : (
+        <span className={styles.repere} aria-hidden="true" />
+      )}
 
       <section className={styles.feuille} aria-label="Ton pin">
         <span className={styles.poignee} aria-hidden="true" />
         {poser.isSuccess ? (
           <>
-            <p className={styles.indice}>✓ Posé{envoye ? '' : ' · dans ton téléphone'}</p>
+            <p className={styles.indice}>
+              {[pose ? `✓ Posé à ${heure(pose.poseLe)}` : '✓ Posé', envoye ? null : 'dans ton téléphone']
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
             <h2 className={styles.endroit}>
               {enLigne ? (endroit?.titre ?? 'Ton pin est posé') : 'Ton pin est posé'}
             </h2>

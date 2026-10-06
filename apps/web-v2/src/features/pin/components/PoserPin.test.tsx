@@ -131,3 +131,35 @@ test('l’attribution des tuiles se voit : dépliée, en haut à droite, hors de
     'top-right',
   )
 })
+
+test('posé : le badge dit l’heure de la pose (maquette 2), et « dans ton téléphone » sans réseau', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
+  pins.useMesPins.mockReturnValue([PIN])
+  monter()
+  expect(screen.getByText(/^✓ Posé à \d{1,2} h \d{2}$/)).toBeInTheDocument()
+})
+
+test('posé sans réseau : l’heure, puis « dans ton téléphone »', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  reseau.useEnLigne.mockReturnValue(false)
+  pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
+  pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true }])
+  monter()
+  expect(screen.getByText(/^✓ Posé à \d{1,2} h \d{2} · dans ton téléphone$/)).toBeInTheDocument()
+})
+
+test('posé : le repère devient le pin, centré sur sa position', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.71, longitude: 7.21 }, precision: 8 })
+  pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
+  pins.useMesPins.mockReturnValue([PIN])
+  monter()
+  expect(screen.getByRole('img', { name: 'Ton pin' })).toBeInTheDocument()
+  expect(FausseCarte.derniere?.jumpTo).toHaveBeenLastCalledWith({ center: [7.2, 43.7], zoom: 16 })
+})
+
+test('avant la pose : le point rouge de ma position, pas le pin', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  monter()
+  expect(screen.queryByRole('img', { name: 'Ton pin' })).not.toBeInTheDocument()
+})

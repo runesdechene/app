@@ -10,14 +10,11 @@ import chevron from '@/assets/ui/chevron.svg'
 import pinGps from '@/assets/ui/pin-gps.svg'
 import { dureeRestante } from '@/shared/lib/validitePin'
 import type { PinAffiche } from '../hooks/usePins'
+import { heure } from '../lib/heure'
 import styles from './TesPins.module.css'
 
 function quand(d: Date) {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-}
-
-function heure(d: Date) {
-  return d.toLocaleTimeString('fr-FR', { hour: 'numeric', minute: '2-digit' }).replace(':', ' h ')
 }
 
 function nom(p: PinAffiche) {
