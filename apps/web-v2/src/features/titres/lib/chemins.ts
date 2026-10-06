@@ -29,6 +29,12 @@ export function compteurEnClair(stat: string, n: number): string {
   return `${String(n)} ${n > 1 ? unite[1] : unite[0]}`
 }
 
+// Où on en est vers un seuil : « 60 / 150 lieux visités », « niveau 12 / 15 ».
+export function progresEnClair(stat: string, compteur: number, min: number): string {
+  if (stat === 'level') return `niveau ${String(compteur)} / ${String(min)}`
+  return `${String(compteur)} / ${compteurEnClair(stat, min)}`
+}
+
 // Le premier titre pas encore obtenu, ou null si tout le chemin est gagné.
 export function prochain(chemin: Chemin): TitreDuChemin | null {
   return chemin.titres.find((t) => !t.obtenu) ?? null

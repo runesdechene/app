@@ -3,7 +3,7 @@
  */
 import { expect, test } from 'vitest'
 import type { Chemin } from '../api/lireMesTitres'
-import { compteurEnClair, nomDuChemin, prochain } from './chemins'
+import { compteurEnClair, nomDuChemin, prochain, progresEnClair } from './chemins'
 
 const titre = (min: number, obtenu: boolean) => ({
   id: min,
@@ -43,4 +43,10 @@ test('chaque chemin a son nom et son compteur en clair', () => {
   expect(compteurEnClair('places_visited', 60)).toBe('60 lieux visités')
   expect(compteurEnClair('places_added', 1)).toBe('1 lieu ajouté')
   expect(compteurEnClair('places_enriched', 4)).toBe('4 lieux enrichis')
+})
+
+test('la progression se lit d’un trait, le niveau compris', () => {
+  expect(progresEnClair('level', 12, 15)).toBe('niveau 12 / 15')
+  expect(progresEnClair('places_visited', 60, 150)).toBe('60 / 150 lieux visités')
+  expect(progresEnClair('places_enriched', 0, 1)).toBe('0 / 1 lieu enrichi')
 })

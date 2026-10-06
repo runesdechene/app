@@ -10,7 +10,7 @@ import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import type { Chemin, TitreDuChemin } from '../api/lireMesTitres'
 import { useMesTitres } from '../hooks/useMesTitres'
-import { compteurEnClair, nomDuChemin, prochain } from '../lib/chemins'
+import { compteurEnClair, nomDuChemin, prochain, progresEnClair } from '../lib/chemins'
 import { Barre, FeuilleTitre, type TitreTouche } from './FeuilleTitre'
 import styles from './PageTitres.module.css'
 
@@ -117,7 +117,7 @@ function BlocChemin({
             {t === suivant ? (
               <div className={styles.progres}>
                 <span className={styles.seuil}>
-                  {`${String(chemin.compteur)} / ${compteurEnClair(chemin.stat, t.min)}`}
+                  {progresEnClair(chemin.stat, chemin.compteur, t.min)}
                 </span>
                 <Barre valeur={chemin.compteur} max={t.min} nom={t.nom} />
               </div>
