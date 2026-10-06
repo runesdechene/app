@@ -5,7 +5,7 @@
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
  * ATTENTION — la forme suit les migrations 354-362. Un champ ajouté là-bas s'ajoute ici.
  */
-import type { ConditionTitre } from '../lib/conditionTitre'
+import { lireCondition, type ConditionTitre } from '../lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
 export type Categorie = { icone: string; couleur: string }
@@ -84,18 +84,7 @@ function auteur(v: unknown): Auteur {
 
 function titre(v: unknown): TitrePorte {
   const o = objet(v)
-  return { id: nombre(o.id), nom: chaine(o.nom), condition: condition(o.condition) }
-}
-
-// Une condition illisible ne fait pas tomber le profil : le titre s'affiche, son origine se
-// dit alors « Gagné en jouant ».
-function condition(v: unknown): ConditionTitre | null {
-  try {
-    const o = objet(v)
-    return { stat: chaine(o.stat), min: nombre(o.min) }
-  } catch {
-    return null
-  }
+  return { id: nombre(o.id), nom: chaine(o.nom), condition: lireCondition(o.condition) }
 }
 
 function signe(v: unknown): Signe {
