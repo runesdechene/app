@@ -8,9 +8,11 @@
  *            lui passe que les pins envoyés (ceux en attente n'ont pas encore de fiche).
  *            Dessin en pixelRatio 2 (88 px = 44 px à l'écran). La couche se pose à chaque
  *            `style.load` mais une seule fois ; l'image arrive quand l'icône est chargée.
+ *            Le pin et ses jours passent au-dessus des lieux (06/10 : « 12 j » se perdait sous
+ *            les sceaux voisins) : calque tout en haut, ni caché ni cachant.
  */
 import type { FeatureCollection, Point as PointGeo } from 'geojson'
-import type { Map as Carte, PointLike } from 'maplibre-gl'
+import type { AddLayerObject, Map as Carte, PointLike, SourceSpecification } from 'maplibre-gl'
 import pinGps from '@/assets/ui/pin-gps.svg'
 import type { Point } from '@/shared/lib/distance'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
@@ -93,10 +95,23 @@ function dessinerPin(icone: HTMLImageElement | null, c: CouleursCarte, accent: s
   return ctx.getImageData(0, 0, TAILLE, TAILLE)
 }
 
+// Ce que la pose des pins demande à la carte, et rien de plus.
+type SupportDesPins = {
+  getLayer: (id: string) => unknown
+  addSource: (id: string, source: SourceSpecification) => unknown
+  addLayer: (calque: AddLayerObject) => unknown
+  moveLayer: (id: string) => unknown
+  hasImage: (id: string) => boolean
+  addImage: (id: string, image: ImageData, options: { pixelRatio: number }) => unknown
+}
+
 // La source et le calque tout de suite (vides : `setData` peut venir sans attendre), l'image dès
-// que l'icône est chargée. Idempotent : `style.load` peut revenir.
-export async function poserMesPins(map: Carte, c: CouleursCarte): Promise<void> {
-  if (!map.getLayer(MES_PINS)) {
+// que l'icône est chargée. Idempotent : `style.load` peut revenir ; le calque, s'il existe déjà,
+// remonte alors au-dessus de tout ce qui aurait été posé après lui.
+export async function poserMesPins(map: SupportDesPins, c: CouleursCarte): Promise<void> {
+  if (map.getLayer(MES_PINS)) {
+    map.moveLayer(MES_PINS)
+  } else {
     map.addSource(MES_PINS, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
     map.addLayer({
       id: MES_PINS,
@@ -111,6 +126,7 @@ export async function poserMesPins(map: Carte, c: CouleursCarte): Promise<void> 
         'text-size': 10,
         'text-offset': [0, 1.9],
         'text-allow-overlap': true,
+        'text-ignore-placement': true,
       },
       paint: { 'text-color': c.halo, 'text-halo-color': c.encre, 'text-halo-width': 2 },
     })

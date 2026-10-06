@@ -3,7 +3,9 @@
  *            avec ses jours ; le dessin du pin trouve un canevas même sans OffscreenCanvas.
  */
 import { expect, test, vi } from 'vitest'
-import { contexte2d, enGeoJSONPins } from './mesPins'
+import { FausseCarte } from '@/test/fausseCarte'
+import type { CouleursCarte } from '@/shared/lib/couleursCarte'
+import { contexte2d, enGeoJSONPins, MES_PINS, poserMesPins } from './mesPins'
 
 test('un point par pin, en [lng, lat], avec ses jours', () => {
   const g = enGeoJSONPins([{ id: 'a', point: { latitude: 43.7, longitude: 7.2 }, jours: 12 }])
@@ -26,4 +28,43 @@ test('sans OffscreenCanvas (iOS avant 16.4) : le pin se dessine sur un canevas o
   expect(getContext).toHaveBeenCalledWith('2d')
   getContext.mockRestore()
   vi.unstubAllGlobals()
+})
+
+const couleurs: CouleursCarte = {
+  fond: '#ecdcbb',
+  eau: '#bfc3ad',
+  route: '#9c7c55',
+  encre: '#3f3024',
+  halo: '#f4e9d1',
+  foret: '#b9b58a',
+  ombre: '#5a442c8c',
+}
+
+function carteAvecIcone() {
+  const carte = new FausseCarte()
+  carte.hasImage.mockReturnValue(true)
+  return carte
+}
+
+test('le pin et ses jours passent par-dessus les lieux : rien ne les cache, ils ne cachent rien', async () => {
+  const carte = carteAvecIcone()
+  await poserMesPins(carte, couleurs)
+  const [calque] = carte.addLayer.mock.calls[0] ?? []
+  expect(calque).toMatchObject({
+    id: MES_PINS,
+    layout: {
+      'icon-allow-overlap': true,
+      'icon-ignore-placement': true,
+      'text-allow-overlap': true,
+      'text-ignore-placement': true,
+    },
+  })
+})
+
+test('reposé alors qu’il existe déjà : le calque des pins remonte tout en haut', async () => {
+  const carte = carteAvecIcone()
+  await poserMesPins(carte, couleurs)
+  await poserMesPins(carte, couleurs)
+  expect(carte.addLayer).toHaveBeenCalledOnce()
+  expect(carte.moveLayer).toHaveBeenCalledWith(MES_PINS)
 })
