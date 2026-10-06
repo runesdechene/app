@@ -3,9 +3,11 @@
  * POURQUOI — un pin naît hors ligne (pinsEnAttente) ; il part au lancement, au retour du réseau et
  *            à l'ouverture du « + » (hooks/usePins). Le lieu-dit se cherche maintenant, faute de
  *            réseau à la pose ; sans réponse du géocodeur, le pin part sans.
- * ATTENTION — une erreur réseau arrête l'envoi (on réessaiera) ; un refus du serveur (code
- *            Postgres : précision, date, position) est définitif : le pin reste dans le téléphone
- *            et l'écran le signale, il n'est jamais jeté en silence.
+ * ATTENTION — seuls les refus propres de `poser_pin` sont définitifs : 22023 (position ou date
+ *            impossibles) et P0001 (GPS trop imprécis). Le pin reste alors dans le téléphone et
+ *            l'écran le signale, il n'est jamais jeté en silence. Tout autre échec (coupure,
+ *            jeton expiré PGRST301, connexion requise 42501, panne serveur) arrête l'envoi sans
+ *            rien marquer : on réessaiera.
  */
 import { endroitDe } from '@/shared/lib/adresse'
 import { poserPin } from '../api/pins'
@@ -13,9 +15,10 @@ import { garderPinEnAttente, lirePinsEnAttente, retirerPinEnAttente } from './pi
 
 export type Envoi = { envoyes: number; refuses: string[] }
 
-// Une erreur PostgREST porte un code Postgres ; une coupure réseau, non.
+const REFUS_DE_POSER_PIN = ['22023', 'P0001']
+
 function refusDuServeur(e: unknown): boolean {
-  return typeof e === 'object' && e !== null && 'code' in e && typeof e.code === 'string' && e.code !== ''
+  return typeof e === 'object' && e !== null && 'code' in e && typeof e.code === 'string' && REFUS_DE_POSER_PIN.includes(e.code)
 }
 
 export async function envoyerPinsEnAttente(): Promise<Envoi> {

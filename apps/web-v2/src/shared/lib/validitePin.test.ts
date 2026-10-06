@@ -2,7 +2,7 @@
  * QUOI     — combien de jours il reste à un pin, et comment le dire.
  */
 import { expect, test } from 'vitest'
-import { dureeRestante, joursRestants } from './validite'
+import { dureeRestante, joursRestants } from './validitePin'
 
 const JOUR = 24 * 60 * 60 * 1000
 const pose = new Date('2026-10-01T14:32:00Z')

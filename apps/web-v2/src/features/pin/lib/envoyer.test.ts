@@ -64,3 +64,21 @@ test('un pin déjà refusé ne repart plus', async () => {
   expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
   expect(api.poserPin).not.toHaveBeenCalled()
 })
+
+test.each([
+  { code: 'PGRST301', message: 'JWT expired' },
+  { code: '42501', message: 'connexion requise' },
+])('une erreur du serveur qui n’est pas un refus du pin ($code) arrête l’envoi, sans rien marquer', async (erreur) => {
+  attente.lirePinsEnAttente.mockResolvedValue([A, B])
+  api.poserPin.mockRejectedValue(erreur)
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
+  expect(api.poserPin).toHaveBeenCalledTimes(1)
+  expect(attente.garderPinEnAttente).not.toHaveBeenCalled()
+  expect(attente.retirerPinEnAttente).not.toHaveBeenCalled()
+})
+
+test('GPS trop imprécis (P0001) : refus définitif aussi', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A])
+  api.poserPin.mockRejectedValue({ code: 'P0001', message: 'Précision insuffisante' })
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: ['a'] })
+})
