@@ -10,7 +10,10 @@
  *            la souris ne l'ouvre pas (useGlisser annule le clic).
  * ATTENTION — l'icône de catégorie est un pochoir (comme en V1), peint en crème, SANS rond de
  *            couleur : sur une photo, une couleur de catégorie peut jurer (Uriel, 27/09).
+ *            pastille et coin ne servent qu'au passeport (date du jour, tampon de la nature) ;
+ *            le coin déborde de la carte, le rognage est donc sur le lien, pas sur la carte.
  */
+import { type ReactNode } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
 import { Link, useLocation } from 'react-router'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -32,10 +35,14 @@ export function LieuCarte({
   lieu,
   position,
   avecAuteur,
+  pastille,
+  coin,
 }: {
   lieu: LieuDeCarte
   position: Point | null
   avecAuteur: boolean
+  pastille?: string
+  coin?: ReactNode
 }) {
   const distance =
     position && lieu.latitude !== null && lieu.longitude !== null
@@ -65,6 +72,7 @@ export function LieuCarte({
         )}
         <span className={styles.voileHaut} aria-hidden="true" />
         {distance && <span className={styles.distance}>{distance}</span>}
+        {pastille && <span className={styles.pastille}>{pastille}</span>}
         <span className={styles.bas}>
           {lieu.categorie && (
             <span
@@ -82,6 +90,7 @@ export function LieuCarte({
           )}
         </span>
       </Link>
+      {coin && <span className={styles.coin}>{coin}</span>}
     </li>
   )
 }

@@ -7,7 +7,6 @@
   flex: 0 0 auto;
   width: 290px;
   height: 196px;
-  overflow: hidden;
   border-radius: var(--radius-carte);
   background: var(--color-barre);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 18%, transparent);
@@ -17,6 +16,8 @@
 .lien {
   display: block;
   height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-carte);
   color: inherit;
   text-decoration: none;
   transition: scale var(--duree-elan) var(--courbe-elan);
@@ -119,4 +120,25 @@
   font-family: var(--font-condensee);
   font-size: var(--meta-size);
   white-space: nowrap;
+}
+
+/* Passeport : la date en pastille à gauche, le tampon à cheval sur le coin haut-droit. */
+.pastille {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-fond) 90%, transparent);
+  color: var(--color-texte);
+  font-family: var(--font-condensee);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-gras);
+}
+
+.coin {
+  position: absolute;
+  top: calc(var(--space-3) * -1);
+  right: calc(var(--space-2) * -1);
+  pointer-events: none;
 }
