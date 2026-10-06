@@ -159,7 +159,7 @@
   right: 24px;
   left: calc(24px + var(--decalage-carte));
   transition: left var(--duree-douce) var(--courbe-douce);
-  z-index: 1;
+  z-index: 2; /* ses résultats passent par-dessus la jauge et les Actifs, juste dessous */
   display: flex;
   gap: 10px; /* maquette 165:128 */
 }
