@@ -39,6 +39,29 @@ test('attente, puis la position et sa précision, qui s’affine', () => {
   expect(result.current).toMatchObject({ precision: 8 })
 })
 
+test('position introuvable (localisation coupée dans le téléphone) : indisponible', () => {
+  const { result } = renderHook(() => usePositionPrecise())
+  act(() => {
+    echouer({ code: 2 })
+  })
+  expect(result.current).toEqual({ etat: 'indisponible' })
+})
+
+test('délai dépassé sans jamais une position : indisponible ; après une position, on la garde', () => {
+  const { result } = renderHook(() => usePositionPrecise())
+  act(() => {
+    echouer({ code: 3 })
+  })
+  expect(result.current).toEqual({ etat: 'indisponible' })
+  act(() => {
+    suivre({ coords: { latitude: 43.7, longitude: 7.2, accuracy: 8 } })
+  })
+  act(() => {
+    echouer({ code: 3 })
+  })
+  expect(result.current).toMatchObject({ etat: 'trouvee', precision: 8 })
+})
+
 test('localisation refusée', () => {
   const { result } = renderHook(() => usePositionPrecise())
   act(() => {

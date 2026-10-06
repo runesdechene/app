@@ -4,7 +4,8 @@
  * POURQUOI — Uriel, 06/10 : le pin ne garde qu'une position, en deux appuis (un appui raté ne pose
  *            rien), même sans réseau ; les photos se prennent avec le téléphone. Au-delà de
  *            ± 200 m, on ne pose pas. Le délai de 15 jours se dit avant de poser.
- * ATTENTION — hors ligne, le fond de carte ne charge pas : l'écran le dit (2b).
+ * ATTENTION — hors ligne, le fond de carte ne charge pas : l'écran le dit (2b). « Posé » ne fait
+ *            jamais attendre l'envoi ; « dans ton téléphone » tant que le pin n'est pas parti.
  */
 import { maplibregl } from '@/shared/lib/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
@@ -17,7 +18,7 @@ import { VALIDITE_JOURS } from '@/shared/lib/validitePin'
 import { useEnLigne } from '@/shared/hooks/useEnLigne'
 import { PRECISION_MAX_M, usePositionPrecise } from '@/shared/hooks/usePositionPrecise'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
-import { usePoserPin } from '../hooks/usePins'
+import { useMesPins, usePoserPin } from '../hooks/usePins'
 import styles from './PoserPin.module.css'
 
 const ZOOM = 16
@@ -26,6 +27,10 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
   const position = usePositionPrecise()
   const enLigne = useEnLigne()
   const poser = usePoserPin()
+  // Le pin posé est-il parti ? On le lit dans la liste (pas dans `navigator.onLine` : un réseau
+  // faible se dit « en ligne » sans rien envoyer). Pas encore dans la liste : il attend.
+  const pose = useMesPins().find((p) => p.id === poser.data)
+  const envoye = pose !== undefined && !pose.enAttente
   const [vue, setVue] = useState<VueCarte>('plan')
   const conteneur = useRef<HTMLDivElement>(null)
   const carte = useRef<maplibregl.Map | null>(null)
@@ -96,14 +101,16 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
         <span className={styles.poignee} aria-hidden="true" />
         {poser.isSuccess ? (
           <>
-            <p className={styles.indice}>✓ Posé{enLigne ? '' : ' · dans ton téléphone'}</p>
+            <p className={styles.indice}>✓ Posé{envoye ? '' : ' · dans ton téléphone'}</p>
             <h2 className={styles.endroit}>
               {enLigne ? (endroit?.titre ?? 'Ton pin est posé') : 'Ton pin est posé'}
             </h2>
             <p className={styles.detail}>
-              {enLigne
+              {envoye
                 ? `encore ${String(VALIDITE_JOURS)} jours pour le compléter`
-                : 'Pas de réseau : il partira tout seul dès qu’il revient.'}
+                : enLigne
+                  ? 'Pas encore envoyé : il partira tout seul dès que le réseau le permet.'
+                  : 'Pas de réseau : il partira tout seul dès qu’il revient.'}
             </p>
             <div className={styles.encadre}>
               <strong>Prends tes photos avec ton téléphone</strong>
@@ -114,11 +121,13 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
             </button>
             <p className={styles.note}>Tu le retrouveras dans « + » et sur ta carte.</p>
           </>
-        ) : position.etat === 'refusee' ? (
+        ) : position.etat === 'refusee' || position.etat === 'indisponible' ? (
           <>
             <h2 className={styles.endroit}>Où es-tu ?</h2>
             <p className={styles.detail}>
-              Autorise la localisation pour cette app dans les réglages de ton téléphone, puis reviens.
+              {position.etat === 'refusee'
+                ? 'Autorise la localisation pour cette app dans les réglages de ton téléphone, puis reviens.'
+                : 'Ton téléphone ne trouve pas sa position : active la localisation, ou mets-toi à découvert.'}
             </p>
           </>
         ) : (
