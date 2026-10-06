@@ -61,11 +61,11 @@ Dans l'ordre de la maquette :
 
 | Onglet | Contenu | Règle |
 |---|---|---|
-| **Ajoutés** | les lieux dont il est l'auteur (`places.author_id`) | prioritaire : un lieu ajouté n'apparaît nulle part ailleurs (on n'ajoute qu'un lieu où l'on a été) |
-| **Visités** | ses visites sur place (`place_explorers`), moins ses ajouts | un lieu visité n'est plus une envie |
+| **Ajoutés** | les lieux dont il est l'auteur (`places.author_id`) | ajouté sur place, il est aussi dans Visités ; à distance, non (mig 393) |
+| **Visités** | ses visites sur place (`place_explorers`), ses ajouts sur place compris (mig 426) | un lieu visité n'est plus une envie |
 | **Envie d'y aller** | sa liste d'envies (`place_wishlist`), moins le reste | **publique par défaut** — c'est une invitation à grouper ; masquable dans Préférences |
 
-Chaque onglet affiche son nombre (« Ajoutés 2 · Visités 18 »), et le même dédoublonnage.
+Chaque onglet affiche son nombre (« Ajoutés 2 · Visités 18 »), et ce même tri.
 
 ## 4. Modifier mon profil et Préférences
 
@@ -89,8 +89,8 @@ Féminin — Chevalière) · **Enregistrer**.
 **`get_profil_explorateur(p_user_id text)`**, `SECURITY DEFINER`, `search_path` épinglé,
 exécutable par `authenticated`. Elle renvoie **exactement** ce qu'un profil public a le droit
 de montrer, en un aller-retour : identité, niveau, titres portés, bio, Instagram, date
-d'inscription, badges, ligne d'attache, fragments, et les trois listes **déjà dédoublonnées**
-(Ajoutés > Visités > Envie d'y aller ; cette dernière seulement si montrée, ou si c'est moi).
+d'inscription, badges, ligne d'attache, fragments, et les trois listes **préparées par la base**
+(un ajout sur place est aussi visité ; Envie d'y aller exclut les deux, et ne paraît que si montrée, ou si c'est moi).
 Jamais d'e-mail, jamais de position.
 
 *Écartées :* lire les tables depuis la V2 (six requêtes, chaque colonne exposée devient un
