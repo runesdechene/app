@@ -16,3 +16,6 @@ geste (IndexedDB) et se reprend depuis la feuille « Ajouter ».
   `ChampsDuLieu`), `AjouterFeuille`, `ParcoursAjout` (le cadre), `EnTete`, `BoutonSuivant`,
   `DepuisUnPin` (le brouillon né d'un pin GPS, « Remplacer ton brouillon en cours ? »), et une
   étape par fichier : `EtapePhoto`, `EtapeLieu`, `EtapeNom`, `EtapeRecit`, `EtapeApercu`.
+
+Un brouillon peut naître d'un pin (`brouillon.pin`) : sa position prime, la base juge « sur place »
+sur lui (427) ; `DepuisUnPin` le prépare.

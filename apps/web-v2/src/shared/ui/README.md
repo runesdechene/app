@@ -17,3 +17,4 @@ Supabase ; aucune n'écrit une valeur visuelle en dur (Stylelint).
 - `BilleType` — la bille d'un type de lieu : sa couleur, son icône en blanc (Accueil, Ajouter).
 - `Envols` — les cœurs qui s'envolent d'un bouton, un par toucher (saluts, cœurs d'un lieu).
 - `Segments` — un choix exclusif en segments ; la zone éclairée glisse sous le choix.
+- `PlanSatellite` — le plan satellite d'un endroit (pose d'un pin, étape « Où » de l'ajout).

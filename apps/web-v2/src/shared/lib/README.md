@@ -14,3 +14,6 @@
   (Carte) et le cercle d'un pin GPS (étape « Où » de l'ajout).
 - `image.ts` — une image de Supabase à la taille où on l'affiche (redimensionnée à la volée) : toute
   image distante passe par là.
+- `styleSatellite.ts` — le fond satellite de la carte : le plan de l'étape « Où » et de la pose d'un pin.
+- `validitePin.ts` — un pin vaut 15 jours : l'échéance et le temps restant (« Tes pins », fiche d'un pin).
+- `adresse.ts` — l'endroit en mots (adresse lisible d'une position) : l'ajout d'un lieu et les pins le partagent.
