@@ -65,6 +65,20 @@
   cursor: pointer;
 }
 
+.secondaire {
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  border: 1.5px solid var(--color-accent);
+  border-radius: 14px;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
 .supprimer {
   display: block;
   margin: var(--space-3) auto 0;

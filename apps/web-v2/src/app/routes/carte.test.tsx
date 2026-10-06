@@ -3,7 +3,8 @@
  *            compléter) renvoie à la feuille du « + » une fois la liste arrivée ; avant, rien.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import type { PinAffiche } from '@/features/pin/hooks/usePins'
@@ -68,4 +69,14 @@ test('compléter un pin inconnu, ou encore en attente, renvoie au « + »', asyn
   await waitFor(() => {
     expect(router.state.location.pathname).toBe('/carte/ajouter')
   })
+})
+
+test('« Voir sur la carte » ouvre la carte sur le pin, sans empiler d’historique', async () => {
+  pins.liste = [{ ...EN_ATTENTE, id: 'envoye', enAttente: false }]
+  const router = monter('/carte/ajouter/pin/envoye')
+  await userEvent.click(await screen.findByRole('button', { name: 'Voir sur la carte' }))
+  await waitFor(() => {
+    expect(router.state.location.pathname).toBe('/carte')
+  })
+  expect(router.state.location.search).toBe('?pin=envoye')
 })

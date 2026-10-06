@@ -34,10 +34,11 @@ export class FausseCarte {
     if (f) this.ecouteurs.set(type, [...(this.ecouteurs.get(type) ?? []), f])
   }
 
-  off(type: string, ecouteur: Ecouteur) {
+  off(type: string, calqueOuEcouteur: unknown, ecouteur?: Ecouteur) {
+    const f = typeof calqueOuEcouteur === 'function' ? calqueOuEcouteur : ecouteur
     this.ecouteurs.set(
       type,
-      (this.ecouteurs.get(type) ?? []).filter((f) => f !== ecouteur),
+      (this.ecouteurs.get(type) ?? []).filter((e) => e !== f),
     )
   }
 
@@ -59,10 +60,15 @@ export class FausseCarte {
 
   setStyle() {}
   remove() {}
-  addSource() {}
-  addLayer = vi.fn()
-  getLayer(): unknown {
-    return undefined
+  addSource = vi.fn()
+  hasImage = vi.fn<(nom: string) => boolean>(() => false)
+  addImage = vi.fn()
+  calquesPoses = new Set<string>()
+  addLayer = vi.fn((calque: { id: string }) => {
+    this.calquesPoses.add(calque.id)
+  })
+  getLayer(id: string): unknown {
+    return this.calquesPoses.has(id) ? { id } : undefined
   }
   getStyle() {
     return { layers: [] }

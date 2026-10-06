@@ -109,6 +109,9 @@ export function RouteFichePin() {
       onCompleter={() => {
         void navigate(`/${tab}/ajouter/pin/${id}/completer`, { replace: true })
       }}
+      onVoirSurLaCarte={() => {
+        void navigate(`/carte?pin=${id}`, { replace: true })
+      }}
     />
   )
 }

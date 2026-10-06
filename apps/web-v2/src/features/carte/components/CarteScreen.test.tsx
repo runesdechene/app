@@ -162,9 +162,7 @@ test('le relief ne se pose qu’une fois les lieux posés', async () => {
       undefined,
     )
   })
-  const ombrage = carte().addLayer.mock.calls.findIndex(
-    ([c]) => (c as { id: string }).id === 'ombrage',
-  )
+  const ombrage = carte().addLayer.mock.calls.findIndex(([c]) => c.id === 'ombrage')
   expect(carte().addLayer.mock.invocationCallOrder[ombrage]).toBeGreaterThan(
     carte().source.setData.mock.invocationCallOrder[0] ?? Infinity,
   )

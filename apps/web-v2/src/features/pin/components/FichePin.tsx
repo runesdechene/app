@@ -1,10 +1,10 @@
 /**
  * QUOI     — la petite carte d'un pin (maquette « Pin GPS — 4 ») : son lieu-dit, sa date, ses jours,
- *            « Compléter le lieu », « Supprimer ce pin ».
+ *            « Compléter le lieu », « Voir sur la carte », « Supprimer ce pin ».
  * POURQUOI — même carte depuis la feuille du « + » et depuis la carte. Supprimer demande
  *            confirmation dans la carte elle-même (jamais de boîte du navigateur).
- * ATTENTION — un pin encore dans le téléphone (en attente, ou refusé) ne se complète pas : le
- *            serveur ne le connaît pas. Il ne peut que se supprimer.
+ * ATTENTION — un pin encore dans le téléphone (en attente, ou refusé) ne se complète pas et ne
+ *            se voit pas sur la carte : le serveur ne le connaît pas. Il ne peut que se supprimer.
  */
 import { useState } from 'react'
 import pinGps from '@/assets/ui/pin-gps.svg'
@@ -13,9 +13,14 @@ import { Feuille } from '@/shared/ui/Feuille'
 import { useMesPins, useSupprimerPin } from '../hooks/usePins'
 import styles from './FichePin.module.css'
 
-type Props = { id: string; onFermer: () => void; onCompleter: () => void }
+type Props = {
+  id: string
+  onFermer: () => void
+  onCompleter: () => void
+  onVoirSurLaCarte: () => void
+}
 
-export function FichePin({ id, onFermer, onCompleter }: Props) {
+export function FichePin({ id, onFermer, onCompleter, onVoirSurLaCarte }: Props) {
   const pin = useMesPins().find((p) => p.id === id)
   const supprimer = useSupprimerPin()
   const [confirmer, setConfirmer] = useState(false)
@@ -40,6 +45,11 @@ export function FichePin({ id, onFermer, onCompleter }: Props) {
       {!pin.enAttente && (
         <button type="button" className={styles.principal} onClick={onCompleter}>
           Compléter le lieu
+        </button>
+      )}
+      {!pin.enAttente && (
+        <button type="button" className={styles.secondaire} onClick={onVoirSurLaCarte}>
+          Voir sur la carte
         </button>
       )}
       {confirmer ? (

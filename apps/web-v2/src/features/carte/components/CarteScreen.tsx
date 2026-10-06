@@ -32,12 +32,14 @@ import { useActifs } from '../hooks/useActifs'
 import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
+import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
 import { ajouterZones } from '../lib/actifs'
 import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
+import { poserMesPins, type PinsDeLaCarte } from '../lib/mesPins'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
@@ -62,17 +64,19 @@ export function CarteScreen({
   sousLaRecherche,
   soi = null,
   onAjouter,
+  ...pins
 }: {
   sousLaRecherche?: ReactNode
   soi?: Soi | null
   onAjouter?: () => void
-}) {
+} & PinsDeLaCarte) {
   return (
     <CarteVivante
       visiteur={false}
       sousLaRecherche={sousLaRecherche}
       soi={soi}
       onAjouter={onAjouter}
+      {...pins}
     />
   )
 }
@@ -87,12 +91,13 @@ function CarteVivante({
   sousLaRecherche,
   soi = null,
   onAjouter,
+  ...pins
 }: {
   visiteur: boolean
   sousLaRecherche?: ReactNode
   soi?: Soi | null
   onAjouter?: (() => void) | undefined
-}) {
+} & PinsDeLaCarte) {
   const conteneur = useRef<HTMLDivElement>(null)
   // La place que le tiroir du PC prend sur la carte : un repère invisible, large de
   // `--decalage-carte` (posée par la coquille ; 0 sur mobile ou tiroir replié).
@@ -131,6 +136,7 @@ function CarteVivante({
   const [explorateurOuvert, setExplorateurOuvert] = useState<string | null>(null)
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
+  useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {
@@ -173,6 +179,7 @@ function CarteVivante({
       const ecran = echelleEcran(window.innerWidth, window.innerHeight)
       ajouterCalques(map, couleurs, ecran)
       if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
+      if (!visiteur) void poserMesPins(map, couleurs).catch(() => undefined)
       suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()

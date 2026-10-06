@@ -13,7 +13,7 @@
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
@@ -24,7 +24,7 @@ import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
-import { useEnvoyerPins } from '@/features/pin/hooks/usePins'
+import { useEnvoyerPins, useMesPins } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -79,9 +79,23 @@ function useOuvrir() {
 function CarteDeLaCoquille() {
   const { profil } = useExplorateur(useMonIdentifiant())
   const ouvrir = useOuvrir()
+  const navigate = useNavigate()
+  // Mes pins sur la carte (seulement ceux que le serveur connaît) ; « Voir sur la carte » arrive
+  // par /carte?pin=<id> : la carte s'y centre, puis la demande est retirée.
+  const pins = useMesPins().filter((p) => !p.enAttente)
+  const [recherche, setRecherche] = useSearchParams()
+  const centrerSur = pins.find((p) => p.id === recherche.get('pin'))?.point
   return (
     <Suspense fallback={null}>
       <CarteScreen
+        mesPins={pins.map(({ id, point, jours }) => ({ id, point, jours }))}
+        onToucherPin={(id) => {
+          void navigate(`/carte/ajouter/pin/${id}`)
+        }}
+        centrerSur={centrerSur}
+        onCentre={() => {
+          setRecherche({}, { replace: true })
+        }}
         sousLaRecherche={<JaugeEnergie />}
         soi={
           profil
