@@ -24,6 +24,7 @@ import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
+import { useEnvoyerPins } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -100,6 +101,7 @@ export function Shell() {
   const navigate = useNavigate()
   // Tant que l'app est ouverte (position déjà autorisée) : être proposé comme compagnon.
   useSignalerPresence()
+  useEnvoyerPins() // les pins posés sans réseau partent dès qu'il revient
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
   usePreparerLaCarte()
   const nonLues = useNonLues()
