@@ -11,7 +11,9 @@ au 06/10. La V2 n'a que l'entrée grisée « Un pin GPS · bientôt » dans la f
 
 ## Ce qu'on construit
 
-1. **Poser un pin** sur sa position, en deux appuis, avec des photos facultatives juste après (autant qu'on veut).
+1. **Poser un pin** sur sa position, en deux appuis. **Rien d'autre** : ni photo ni texte à écrire (Uriel 06/10 —
+   les photos se prennent avec l'appareil photo du téléphone, elles restent dans sa galerie si le pin se
+   perd ; *écarté : des photos prises dans l'app, une copie locale, l'enregistrement dans la galerie*).
 2. **Le compléter plus tard** en vrai lieu, **en gardant « sur place »** — la visite (datée du pin) et la
    revendication, comme un ajout à moins de 200 m (mig 393).
 3. **Retrouver ses pins** dans la feuille du « + » et sur sa carte (visibles de soi seul).
@@ -38,16 +40,15 @@ par notification avant péremption, le point d'intérêt (l'autre entrée grisé
 **Pas de nouvelle table.** `place_drafts` (V1, mig 264) convient telle quelle : `id`, `user_id`,
 `latitude`/`longitude` (real), `accuracy_m`, `title`, `images` (jsonb, même forme que `places.images`),
 `status` (`open` / `published`), `published_place_id`, `published_at`, `created_at` (horodatage serveur =
-la preuve). RLS : chacun ses pins (lecture, écriture, suppression). Les photos vont dans
-`place-images/places/<moi>/…`, comme celles d'un lieu (règles de la mig 385). Le **lieu-dit** est trouvé
-une fois, à la pose, et rangé dans `title`.
+la preuve). RLS : chacun ses pins (lecture, écriture, suppression). La V2 n'écrit jamais `images` ; les
+quelques pins de la V1 qui en ont (les plus récents datent du 15/09, déjà périmés) les gardent sans que la
+V2 les montre. Le **lieu-dit** est trouvé une fois, à la pose, et rangé dans `title`.
 
-**Cinq fonctions V2**, toutes gardées par l'identité de la session (jamais un `p_user_id` venu du client) :
+**Quatre fonctions V2**, toutes gardées par l'identité de la session (jamais un `p_user_id` venu du client) :
 
 | Fonction | Rôle |
 |---|---|
 | `poser_pin(lat, lng, précision, lieu_dit)` | pose le pin ; date serveur ; ne rapporte rien |
-| `photos_du_pin(pin, images)` | ajoute les photos prises juste après, une ou plusieurs — la pose n'attend jamais les photos |
 | `mes_pins()` | mes pins ouverts, avec `joursRestants` (négatif = périmé) ; pour la feuille du « + » et la carte |
 | `ajouter_lieu(…, p_pin)` | **un paramètre de plus**, facultatif : avec un pin, « sur place » se juge sur le pin (règles ci-dessus) au lieu de la position du téléphone ; le pin passe `published` avec `published_place_id` |
 | `visiter_depuis_pin(pin, lieu)` | le « C'est lui » : pin valide et à moins de 200 m du lieu → visite datée du pin, **sans revendication** (elle reste un geste fait sur place) ; pin périmé → il se ferme sans visite, et l'écran le dit |
@@ -63,17 +64,19 @@ table, donc un pin posé d'un côté se voit de l'autre.
 1. **Poser** — « Un pin GPS » n'est plus grisé. Un appui ouvre une petite carte centrée sur moi, la
    précision du GPS, **« Poser mon pin ici »**, et : *« Tu auras 15 jours pour le compléter en gardant
    “sur place”. »* Deux appuis plutôt qu'un : un appui raté ne pose rien. Ensuite : *« Pin posé · encore
-   15 jours »*, **« Des photos »** (facultatif, autant qu'on veut : une bande de vignettes et une case « + ») et
-   **« C'est tout »**.
-2. **La feuille du « + »** — une section **« Tes pins »** : la photo ou l'icône du pin, le lieu-dit, la
+   15 jours »*, *« Prends tes photos avec ton téléphone : tu les choisiras dans ta galerie en complétant le
+   lieu »*, et **« C'est tout »**.
+2. **La feuille du « + »** — une section **« Tes pins »** : l'icône du pin, le lieu-dit, la
    date, *« encore 12 jours »* (périmé : *« sera ajouté à distance »*). Un appui : **Compléter · Voir sur la
    carte · Supprimer**.
 3. **Ma carte** — mes pins avec leur icône (`assets/ui/pin-gps.svg`), visibles de moi seul ; un appui
    ouvre la même petite carte qu'à la feuille.
 4. **Compléter** — s'il y a des lieux à moins de 200 m : *« C'est l'un de ceux-là ? »* et leurs cartes ;
    **« C'est lui »** → la visite, le pin se ferme ; **« Non, c'est un autre »** → la suite. Puis **le
-   parcours d'ajout existant**, pré-rempli (photos et position du pin), ouvert à la première étape qui
-   manque. À « placer le lieu », **un cercle de 200 m** autour du pin ; on peut en sortir, l'écran prévient :
+   parcours d'ajout existant**, pré-rempli de la position du pin, ouvert à l'étape photo : on y
+   choisit ses photos dans la galerie (l'étape lit déjà la position qu'y inscrit l'appareil ; pour un pin, **la position du pin prime** :
+   c'est elle qui juge le cercle).
+   À « placer le lieu », **un cercle de 200 m** autour du pin ; on peut en sortir, l'écran prévient :
    *« hors du cercle, il sera ajouté à distance »*. Le serveur juge, l'écran annonce.
 5. **Le brouillon local** (IndexedDB, un seul à la fois) retient aussi son pin. Compléter un pin quand un
    autre ajout est en cours demande d'abord : *« Remplacer ton brouillon en cours ? »*
@@ -87,7 +90,6 @@ table, donc un pin posé d'un côté se voit de l'autre.
 - **GPS imprécis** : la précision est affichée ; au-delà de 200 m, « Poser mon pin ici » est grisé et dit
   pourquoi (*« GPS trop imprécis (± 340 m) — attends un instant »*) — un pin aussi flou ne prouverait rien.
 - **Pas de réseau sur place** : voir point ouvert 1.
-- **Photo qui échoue** : le pin reste posé ; la photo se reprend à la complétion.
 - **Pin complété depuis un autre appareil** : `mes_pins()` vient du serveur, la liste suit.
 
 ## Points ouverts
@@ -108,5 +110,5 @@ table, donc un pin posé d'un côté se voit de l'autre.
 
 ## Les maquettes
 
-Dessinées le 06/10 (rangée « PIN GPS », nœud 411:315) : poser · pin posé · pin posé avec des photos · la feuille du « + » avec « Tes pins » · la petite carte d'un pin · « C'est l'un de
+Dessinées le 06/10 (rangée « PIN GPS », nœud 411:315) : poser · pin posé · la feuille du « + » avec « Tes pins » · la petite carte d'un pin · « C'est l'un de
 ceux-là ? » · l'étape « placer le lieu » avec le cercle et le bouton Plan / Satellite · un pin sur ma carte.
