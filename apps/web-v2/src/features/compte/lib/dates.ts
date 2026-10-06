@@ -19,5 +19,7 @@ export function moisLong(cle: string): string {
 }
 
 export function depuis(quand: string, auJour: boolean): string {
-  return auJour ? `depuis le ${LONGUE.format(enDate(quand))}` : `depuis ${moisLong(quand.slice(0, 7))}`
+  return auJour
+    ? `depuis le ${LONGUE.format(enDate(quand))}`
+    : `depuis ${moisLong(quand.slice(0, 7))}`
 }

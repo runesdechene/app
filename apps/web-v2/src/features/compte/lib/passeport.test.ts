@@ -3,9 +3,23 @@
  */
 import { expect, test } from 'vitest'
 import type { Nature, Tampon } from '../api/lirePasseport'
-import { AILLEURS, comptes, encre, enDate, parMois, parNature, parTerritoire, territoireDe } from './passeport'
+import {
+  AILLEURS,
+  comptes,
+  encre,
+  enDate,
+  parMois,
+  parNature,
+  parTerritoire,
+  territoireDe,
+} from './passeport'
 
-const N = (id: string): Nature => ({ id, nom: id, icone: `https://x/${id}.svg`, couleur: '#000000' })
+const N = (id: string): Nature => ({
+  id,
+  nom: id,
+  icone: `https://x/${id}.svg`,
+  couleur: '#000000',
+})
 const T = (id: string, quand: string, o: Partial<Tampon> = {}): Tampon => ({
   id,
   nom: id,
@@ -39,7 +53,7 @@ test('territoire : département, sinon pays, sinon Ailleurs', () => {
   expect(territoireDe(T('a', '2026-10-01', { departement: null, pays: null }))).toBe(AILLEURS)
 })
 
-test('par territoire : le plus récemment tamponné d\'abord, tampons récents d\'abord', () => {
+test("par territoire : le plus récemment tamponné d'abord, tampons récents d'abord", () => {
   const r = parTerritoire([
     T('a', '2026-10-06'),
     T('b', '2026-10-01', { departement: null, pays: 'Italie' }),
@@ -51,7 +65,7 @@ test('par territoire : le plus récemment tamponné d\'abord, tampons récents d
   ])
 })
 
-test('par mois : le plus récent d\'abord', () => {
+test("par mois : le plus récent d'abord", () => {
   const r = parMois([T('a', '2026-10-06'), T('b', '2026-09-28'), T('c', '2026-10-01')])
   expect(r.map((m) => [m.cle, m.tampons.map((x) => x.id)])).toEqual([
     ['2026-10', ['a', 'c']],

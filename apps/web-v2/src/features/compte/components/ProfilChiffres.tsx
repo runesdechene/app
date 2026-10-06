@@ -13,7 +13,7 @@ function accorder(n: number, un: string, plusieurs: string): string {
 export function ProfilChiffres({ profil }: { profil: ExplorateurProfile }) {
   const chiffres = [
     [profil.ajoutes.length, accorder(profil.ajoutes.length, 'Lieu ajouté', 'Lieux ajoutés')],
-    [profil.visites.length, accorder(profil.visites.length, 'Lieu visité', 'Lieux visités')],
+    [profil.nbVisites, accorder(profil.nbVisites, 'Lieu visité', 'Lieux visités')],
     [profil.fragments.length, accorder(profil.fragments.length, 'Fragment', 'Fragments')],
   ] as const
   return (

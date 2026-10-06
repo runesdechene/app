@@ -45,7 +45,7 @@ const profil = (id: string): ExplorateurProfile => ({
   attache: null,
   fragments: [],
   ajoutes: [],
-  visites: [],
+  nbVisites: 0,
   envies: [],
   signe: null,
   fragmentsADecouvrir: null,

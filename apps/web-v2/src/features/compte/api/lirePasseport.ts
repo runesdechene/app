@@ -23,7 +23,12 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/
 
 function nature(v: unknown): Nature {
   const o = objet(v)
-  return { id: chaine(o.id), nom: chaine(o.nom), icone: chaine(o.icone), couleur: chaine(o.couleur) }
+  return {
+    id: chaine(o.id),
+    nom: chaine(o.nom),
+    icone: chaine(o.icone),
+    couleur: chaine(o.couleur),
+  }
 }
 
 function tampon(v: unknown): Tampon | null {

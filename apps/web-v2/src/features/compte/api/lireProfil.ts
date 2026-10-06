@@ -3,7 +3,7 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit les migrations 354-362. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-362 et 431. Un champ ajouté là-bas s'ajoute ici.
  */
 import { lireCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -41,7 +41,7 @@ export type ExplorateurProfile = {
   attache: Attache | null
   fragments: Fragment[]
   ajoutes: Lieu[]
-  visites: Lieu[]
+  nbVisites: number // lieux distincts visités (migration 431) ; la liste vit dans le passeport
   envies: Lieu[] | null
   signe: Signe | null
   fragmentsADecouvrir: number | null // sur son propre profil seulement (migration 360)
@@ -129,7 +129,7 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
       attache: ouNull(attache)(o.attache),
       fragments: liste(fragment)(o.fragments),
       ajoutes: liste(lieu)(o.ajoutes),
-      visites: liste(lieu)(o.visites),
+      nbVisites: o.nbVisites === undefined ? 0 : nombre(o.nbVisites),
       envies: ouNull(liste(lieu))(o.envies),
       signe: ouNull(signe)(o.signe),
       fragmentsADecouvrir: facultatif(nombre, o.fragmentsADecouvrir),

@@ -1,6 +1,6 @@
 /**
- * QUOI     — le bas du profil : Lieux ajoutés, Visités, Envie d'y aller, en sections de cartes
- *            (maquette « COMPTE — sous le signe de l'Hoplite », 27/09).
+ * QUOI     — le bas du profil : Lieux ajoutés, le Passeport (à la place de Visités, spec
+ *            2026-10-07), Envie d'y aller (maquette « COMPTE — sous le signe de l'Hoplite », 27/09).
  * POURQUOI — les listes arrivent prêtes de la base : un ajout sur place est aussi visité
  *            (migration 426), Envie d'y aller exclut les deux.
  *            `envies === null` : l'Explorateur les masque, la section n'existe pas. Une section
@@ -11,6 +11,7 @@ import { useGlisser } from '@/shared/hooks/useGlisser'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import type { Point } from '@/shared/lib/distance'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
+import { PasseportProfil } from './PasseportProfil'
 import styles from './ProfilDecouvertes.module.css'
 
 export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
@@ -23,7 +24,7 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
         position={position}
         avecAuteur={false}
       />
-      <Section titre="Visités" lieux={profil.visites} position={position} avecAuteur />
+      <PasseportProfil id={profil.id} />
       {profil.envies && (
         <Section titre="Envie d’y aller" lieux={profil.envies} position={position} avecAuteur />
       )}

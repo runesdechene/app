@@ -16,6 +16,8 @@ const fetchExplorateur = vi.hoisted(() =>
 vi.mock('../api/explorateur', () => ({ fetchExplorateur }))
 const choisirSigne = vi.hoisted(() => vi.fn(() => Promise.resolve()))
 vi.mock('../api/monProfil', () => ({ choisirSigne }))
+const fetchPasseport = vi.hoisted(() => vi.fn(() => Promise.resolve(null)))
+vi.mock('../api/passeport', () => ({ fetchPasseport }))
 const position = vi.hoisted(() =>
   vi.fn(() => Promise.resolve<{ latitude: number; longitude: number } | null>(null)),
 )
@@ -48,8 +50,8 @@ const PROFIL: ExplorateurProfile = {
   },
   fragments: [{ id: 3, nom: 'Hoplite', imageUrl: null }],
   ajoutes: [carte('p1', 'Dolmen de la Pierre Levée')],
-  visites: [carte('p2', 'Abbaye du Thoronet', 'Gautier de Bilskirnir')],
-  envies: [carte('p3', 'Mont Bégo')],
+  nbVisites: 1,
+  envies: [carte('p3', 'Mont Bégo', 'Gautier de Bilskirnir')],
   signe: null,
   fragmentsADecouvrir: 5,
   compagnies: [],
@@ -146,20 +148,20 @@ test('sur le profil d’un autre, ses Fragments ne se choisissent pas', async ()
   expect(screen.queryByRole('button', { name: /Hoplite/ })).toBeNull()
 })
 
-test('les découvertes en trois sections, chacune avec son nombre', async () => {
+test('les découvertes : Lieux ajoutés et Envie d’y aller, chacun avec son nombre', async () => {
   afficher(PROFIL)
   expect(await screen.findByRole('region', { name: 'Lieux ajoutés' })).toHaveTextContent('1')
-  expect(screen.getByRole('region', { name: 'Visités' })).toHaveTextContent('Abbaye du Thoronet')
+  expect(screen.queryByRole('region', { name: 'Visités' })).toBeNull()
   expect(screen.getByRole('region', { name: 'Envie d’y aller' })).toHaveTextContent('Mont Bégo')
 })
 
 test('envies masquées : pas de section « Envie d’y aller » du tout', async () => {
   afficher({ ...PROFIL, estMoi: false, envies: null })
-  await screen.findByRole('region', { name: 'Visités' })
+  await screen.findByRole('region', { name: 'Lieux ajoutés' })
   expect(screen.queryByRole('region', { name: 'Envie d’y aller' })).toBeNull()
 })
 
-test('un lieu visité dit qui l’a ajouté', async () => {
+test('un lieu envié dit qui l’a ajouté', async () => {
   afficher(PROFIL)
   expect(await screen.findByText('par Gautier de Bilskirnir')).toBeInTheDocument()
 })
@@ -167,14 +169,14 @@ test('un lieu visité dit qui l’a ajouté', async () => {
 test('sans position autorisée, aucune distance', async () => {
   position.mockResolvedValue(null)
   afficher(PROFIL)
-  await screen.findByText('Abbaye du Thoronet')
+  await screen.findByText('Mont Bégo')
   expect(screen.queryByText(/km/)).toBeNull()
 })
 
 test('avec la position de celui qui regarde, la distance de chaque lieu', async () => {
   position.mockResolvedValue({ latitude: 43.7102, longitude: 7.262 })
   afficher(PROFIL)
-  expect(await screen.findAllByText('159 km')).toHaveLength(3)
+  expect(await screen.findAllByText('159 km')).toHaveLength(2)
 })
 
 test('le bandeau de chiffres : lieux ajoutés, visités, fragments', async () => {

@@ -31,7 +31,7 @@ const COMPLET = {
       auteur: { id: 'u1', nom: 'Uriel', avatarUrl: null },
     },
   ],
-  visites: [],
+  nbVisites: 4,
   envies: null,
   signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
   fragmentsADecouvrir: 5,
@@ -80,8 +80,8 @@ test('pas de signe : null', () => {
 })
 
 test('une carte sans coordonnées, catégorie ni auteur reste lisible', () => {
-  const p = lireProfil({ ...COMPLET, visites: [{ id: 'p2', nom: 'Abbaye', imageUrl: null }] })
-  expect(p?.visites[0]).toEqual({
+  const p = lireProfil({ ...COMPLET, ajoutes: [{ id: 'p2', nom: 'Abbaye', imageUrl: null }] })
+  expect(p?.ajoutes[0]).toEqual({
     id: 'p2',
     nom: 'Abbaye',
     imageUrl: null,
@@ -90,6 +90,11 @@ test('une carte sans coordonnées, catégorie ni auteur reste lisible', () => {
     categorie: null,
     auteur: null,
   })
+})
+
+test('le nombre de lieux visités ; absent (profil en cache d’avant la 431) → 0', () => {
+  expect(lireProfil(COMPLET)?.nbVisites).toBe(4)
+  expect(lireProfil({ ...COMPLET, nbVisites: undefined })?.nbVisites).toBe(0)
 })
 
 test('ses Compagnies se lisent ; absentes, aucune', () => {

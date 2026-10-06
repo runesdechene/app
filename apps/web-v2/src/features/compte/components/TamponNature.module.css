@@ -11,7 +11,9 @@
   height: 46px;
   border: 2px solid var(--couleur);
   border-radius: var(--radius-rond);
-  box-shadow: inset 0 0 0 3px var(--color-fond), inset 0 0 0 4px var(--couleur);
+  box-shadow:
+    inset 0 0 0 3px var(--color-fond),
+    inset 0 0 0 4px var(--couleur);
   rotate: -6deg;
 }
 
