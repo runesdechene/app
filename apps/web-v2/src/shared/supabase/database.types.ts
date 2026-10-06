@@ -6915,6 +6915,7 @@ export type Database = {
         Args: { p_place_id: string; p_user_id: string }
         Returns: Json
       }
+      get_passeport: { Args: { p_user_id: string }; Returns: Json }
       get_photo_submissions: {
         Args: { p_status?: string }
         Returns: {
