@@ -12,14 +12,15 @@ import { useEffect, useRef } from 'react'
 import type { Point } from '@/shared/lib/distance'
 import type { Actif } from '../api/lireActifs'
 import { ZONES, zonesEnGeoJSON } from '../lib/actifs'
-import { suivreActifs } from '../lib/marquesActifs'
+import { suivreActifs, type Soi } from '../lib/marquesActifs'
 
 const ZOOM_LOIN = 6
 
 export function useActifsSurLaCarte(
   carte: Carte | null,
   actifs: Actif[],
-  moi: { point: Point | null; avatar: string | null },
+  maPosition: Point | null,
+  soi: Soi | null,
   onToucher: (id: string) => void,
 ) {
   const suivi = useRef<ReturnType<typeof suivreActifs> | null>(null)
@@ -48,7 +49,11 @@ export function useActifsSurLaCarte(
     void carte?.getSource<GeoJSONSource>(ZONES)?.setData(zonesEnGeoJSON(actifs))
   }, [carte, actifs])
 
+  // `soi` est refait à chaque rendu : on suit ses champs, pas l'objet.
+  const nom = soi?.nom
+  const avatar = soi?.avatar ?? null
+  const titre = soi?.titre ?? null
   useEffect(() => {
-    suivi.current?.moi(moi.point, moi.avatar)
-  }, [carte, moi.point, moi.avatar])
+    suivi.current?.moi(maPosition, nom === undefined ? null : { nom, avatar, titre })
+  }, [carte, maPosition, nom, avatar, titre])
 }

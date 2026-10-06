@@ -30,6 +30,7 @@ import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { Button } from '@/shared/ui/Button'
 import { useActifs } from '../hooks/useActifs'
 import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
+import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
@@ -56,21 +57,21 @@ const DUREE_MESSAGE = 3000
 type Vue = { lat: number; lng: number; zoom: number }
 
 // `sousLaRecherche` : ce que la coquille pose sous la recherche (la jauge d'énergie) ;
-// `monAvatar` : le portrait de « Toi » sur la carte ; `onAjouter` : le « + » qui ouvre l'ajout.
+// `soi` : son portrait, son nom et son titre sur la carte ; `onAjouter` : le « + » qui ouvre l'ajout.
 export function CarteScreen({
   sousLaRecherche,
-  monAvatar = null,
+  soi = null,
   onAjouter,
 }: {
   sousLaRecherche?: ReactNode
-  monAvatar?: string | null
+  soi?: Soi | null
   onAjouter?: () => void
 }) {
   return (
     <CarteVivante
       visiteur={false}
       sousLaRecherche={sousLaRecherche}
-      monAvatar={monAvatar}
+      soi={soi}
       onAjouter={onAjouter}
     />
   )
@@ -84,12 +85,12 @@ export function CarteVisiteur() {
 function CarteVivante({
   visiteur,
   sousLaRecherche,
-  monAvatar = null,
+  soi = null,
   onAjouter,
 }: {
   visiteur: boolean
   sousLaRecherche?: ReactNode
-  monAvatar?: string | null
+  soi?: Soi | null
   onAjouter?: (() => void) | undefined
 }) {
   const conteneur = useRef<HTMLDivElement>(null)
@@ -129,12 +130,7 @@ function CarteVivante({
   const maPosition = useMaPosition()
   const [explorateurOuvert, setExplorateurOuvert] = useState<string | null>(null)
   const [listeOuverte, setListeOuverte] = useState(false)
-  useActifsSurLaCarte(
-    visiteur ? null : carte,
-    actifs,
-    { point: maPosition, avatar: monAvatar },
-    setExplorateurOuvert,
-  )
+  useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {

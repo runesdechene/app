@@ -72,7 +72,8 @@ function useOuvrir() {
   }
 }
 
-// La carte de la coquille : la jauge d'énergie sous la recherche, son propre portrait, et le « + »
+// La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, premier
+// titre porté, comme les autres Explorateurs), et le « + »
 // qui ouvre l'ajout (Uriel, 05/10 : le seul « + », sur la carte, téléphone comme PC).
 function CarteDeLaCoquille() {
   const { profil } = useExplorateur(useMonIdentifiant())
@@ -81,7 +82,11 @@ function CarteDeLaCoquille() {
     <Suspense fallback={null}>
       <CarteScreen
         sousLaRecherche={<JaugeEnergie />}
-        monAvatar={profil?.avatarUrl ?? null}
+        soi={
+          profil
+            ? { nom: profil.nom, avatar: profil.avatarUrl, titre: profil.titres[0]?.nom ?? null }
+            : null
+        }
         onAjouter={() => {
           ouvrir('ajouter')
         }}

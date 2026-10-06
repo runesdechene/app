@@ -85,22 +85,26 @@ test('toucher un portrait ne touche pas la carte dessous (le lieu sous ses pieds
   expect(carte).not.toHaveBeenCalled()
 })
 
-test('soi : rien sans position, « Toi » à sa position, puis suivi', () => {
+const uriel = { nom: 'Uriel', avatar: 'moi.jpg', titre: 'Cartographe' }
+
+test('soi : rien sans position ni profil, son nom et son titre à sa position, puis suivi', () => {
   const { suivi, posees, poser } = monter()
-  suivi.moi(null, null)
+  suivi.moi(null, uriel)
+  suivi.moi({ latitude: 45, longitude: 1 }, null)
   expect(poser).not.toHaveBeenCalled()
-  suivi.moi({ latitude: 45, longitude: 1 }, 'moi.jpg')
-  expect(posees[0]?.element.textContent).toContain('Toi')
+  suivi.moi({ latitude: 45, longitude: 1 }, uriel)
+  expect(posees[0]?.element.textContent).toContain('Uriel · Cartographe')
   expect(posees[0]?.ou).toEqual([1, 45])
-  suivi.moi({ latitude: 46, longitude: 2 }, 'moi.jpg')
+  suivi.moi({ latitude: 46, longitude: 2 }, { ...uriel, titre: null })
   expect(poser).toHaveBeenCalledTimes(1)
   expect(posees[0]?.marque.setLngLat).toHaveBeenCalledWith([2, 46])
+  expect(posees[0]?.element.textContent).toBe('Uriel')
 })
 
 test('vider retire tout', () => {
   const { suivi, posees } = monter()
   suivi.actifs([actif('kelpie')])
-  suivi.moi({ latitude: 45, longitude: 1 }, null)
+  suivi.moi({ latitude: 45, longitude: 1 }, uriel)
   suivi.vider()
   expect(posees.every((p) => vi.mocked(p.marque.remove).mock.calls.length === 1)).toBe(true)
 })
