@@ -23,11 +23,13 @@ const props = {
 const CHAPELLE = { id: 'l1', nom: 'Chapelle Saint-Roch', imageUrl: null, metres: 40 }
 
 function monter() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+    <QueryClientProvider client={client}>
       <CestLunDeCeuxLa {...props} />
     </QueryClientProvider>,
   )
+  return client
 }
 
 beforeEach(() => {
@@ -37,12 +39,17 @@ beforeEach(() => {
 test('« C’est lui » : visite datée du pin, puis la fiche du lieu', async () => {
   api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
   api.visiterDepuisPin.mockResolvedValue({ visite: true })
+  const invalider = vi.spyOn(QueryClient.prototype, 'invalidateQueries')
   monter()
   await userEvent.click(await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }))
   expect(api.visiterDepuisPin).toHaveBeenCalledWith('p1', 'l1')
   await waitFor(() => {
     expect(props.onVisite).toHaveBeenCalledWith('l1', true)
   })
+  // Le pin fermé quitte aussitôt « Tes pins » ; la fiche du lieu visité se recharge.
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['pins'] })
+  expect(invalider).toHaveBeenCalledWith({ queryKey: ['lieu', 'l1'] })
+  invalider.mockRestore()
 })
 
 test('« Non, c’est un autre lieu » ouvre l’ajout, sans visite', async () => {

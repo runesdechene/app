@@ -5,11 +5,12 @@
  * ATTENTION — `onAutre` part aussi tout seul quand la liste revient vide : la route le garde
  *            stable (useCallback), sinon l'effet repartirait à chaque rendu.
  */
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
 import { Feuille } from '@/shared/ui/Feuille'
 import { fetchLieuxProches, visiterDepuisPin } from '../api/pins'
+import { PINS } from '../hooks/usePins'
 import styles from './CestLunDeCeuxLa.module.css'
 
 type Props = {
@@ -24,9 +25,19 @@ const TITRE = 'C’est l’un de ceux-là ?'
 
 export function CestLunDeCeuxLa({ pin, poseLe, onVisite, onAutre, onFermer }: Props) {
   const proches = useQuery({ queryKey: ['pins', pin, 'proches'], queryFn: () => fetchLieuxProches(pin) })
+  const queryClient = useQueryClient()
   const visiter = useMutation({
     mutationFn: (lieu: string) => visiterDepuisPin(pin, lieu),
     onSuccess: (r, lieu) => {
+      // Le pin se ferme : il quitte « Tes pins » et la carte tout de suite ; la visite compte
+      // partout où l'ajout d'un lieu compte (mêmes clés que `usePoser`).
+      void queryClient.invalidateQueries({ queryKey: PINS })
+      void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
+      void queryClient.invalidateQueries({ queryKey: ['accueil'] })
+      void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
+      // La fiche du lieu visité : `ficheKey` (zone lieu), en clé littérale — une zone n'en
+      // importe pas une autre.
+      void queryClient.invalidateQueries({ queryKey: ['lieu', lieu] })
       onVisite(lieu, r.visite)
     },
   })

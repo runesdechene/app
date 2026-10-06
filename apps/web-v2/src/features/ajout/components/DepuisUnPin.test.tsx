@@ -22,6 +22,15 @@ const PIN = {
 }
 const ouvrir = vi.fn()
 
+// Un brouillon de ce pin, laissé à l'étape du nom (photo et point déjà là).
+const ENTAME: Brouillon = {
+  ...BROUILLON_VIDE,
+  etape: 'nom',
+  photos: [{ id: 'f1', grande: new Blob(), vignette: new Blob() }],
+  point: { latitude: 43.7, longitude: 7.2 },
+  pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-10-03T12:00:00.000Z' },
+}
+
 beforeEach(() => {
   stockage.get.mockReset()
   stockage.set.mockClear()
@@ -34,10 +43,10 @@ function dernierEnregistre(): Brouillon | undefined {
   return stockage.set.mock.calls.at(-1)?.[1]
 }
 
-test('aucun brouillon : celui du pin s’enregistre, et l’ajout s’ouvre', async () => {
+test('aucun brouillon : celui du pin s’enregistre, et l’ajout s’ouvre à la photo', async () => {
   render(<DepuisUnPin pin={PIN} onOuvrir={ouvrir} />)
   await waitFor(() => {
-    expect(ouvrir).toHaveBeenCalled()
+    expect(ouvrir).toHaveBeenCalledWith('photo')
   })
   expect(dernierEnregistre()?.pin?.id).toBe('p1')
 })
@@ -55,29 +64,26 @@ test('« Remplacer » : le brouillon du pin prend la place', async () => {
   render(<DepuisUnPin pin={PIN} onOuvrir={ouvrir} />)
   await userEvent.click(await screen.findByRole('button', { name: 'Remplacer' }))
   await waitFor(() => {
-    expect(ouvrir).toHaveBeenCalled()
+    expect(ouvrir).toHaveBeenCalledWith('photo')
   })
   expect(dernierEnregistre()?.pin?.id).toBe('p1')
   expect(dernierEnregistre()?.nom).toBe('')
 })
 
-test('« Garder mon brouillon » : rien ne s’écrit, l’ajout s’ouvre sur l’ancien', async () => {
-  stockage.get.mockResolvedValue({ ...BROUILLON_VIDE, nom: 'Château' })
+test('« Garder mon brouillon » : rien ne s’écrit, l’ancien se reprend à son étape', async () => {
+  stockage.get.mockResolvedValue({ ...ENTAME, pin: null })
   render(<DepuisUnPin pin={PIN} onOuvrir={ouvrir} />)
   await userEvent.click(await screen.findByRole('button', { name: 'Garder mon brouillon' }))
-  expect(ouvrir).toHaveBeenCalled()
+  expect(ouvrir).toHaveBeenCalledWith('nom')
   expect(stockage.set).not.toHaveBeenCalled()
 })
 
 test('le brouillon en cours est déjà celui de ce pin : pas de question', async () => {
-  stockage.get.mockResolvedValue({
-    ...BROUILLON_VIDE,
-    nom: 'Château',
-    pin: { id: 'p1', point: PIN.point, poseLe: PIN.poseLe.toISOString() },
-  })
+  stockage.get.mockResolvedValue(ENTAME)
   render(<DepuisUnPin pin={PIN} onOuvrir={ouvrir} />)
   await waitFor(() => {
-    expect(ouvrir).toHaveBeenCalled()
+    expect(ouvrir).toHaveBeenCalledWith('nom')
   })
+  expect(stockage.set).not.toHaveBeenCalled()
   expect(screen.queryByText('Remplacer ton brouillon en cours ?')).not.toBeInTheDocument()
 })

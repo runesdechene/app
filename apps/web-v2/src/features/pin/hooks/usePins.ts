@@ -52,8 +52,14 @@ export async function lireTout(): Promise<PinAffiche[]> {
   return [...enAttente, ...envoyes]
 }
 
+// `undefined` tant que la liste n'est pas arrivée : une adresse de pin attend avant de conclure
+// qu'il n'existe pas.
+export function useMesPinsCharges(): PinAffiche[] | undefined {
+  return useQuery({ queryKey: PINS, queryFn: lireTout, networkMode: 'always' }).data
+}
+
 export function useMesPins(): PinAffiche[] {
-  return useQuery({ queryKey: PINS, queryFn: lireTout, networkMode: 'always' }).data ?? []
+  return useMesPinsCharges() ?? []
 }
 
 export function useEnvoyerPins(): void {

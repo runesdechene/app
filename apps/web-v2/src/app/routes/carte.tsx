@@ -8,13 +8,13 @@
  */
 import { lazy, Suspense, useCallback, useContext, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useLocation, useNavigate, useParams } from 'react-router'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
 import { DepuisUnPin } from '@/features/ajout/components/DepuisUnPin'
 import { CestLunDeCeuxLa } from '@/features/pin/components/CestLunDeCeuxLa'
 import { FichePin } from '@/features/pin/components/FichePin'
 import { TesPins } from '@/features/pin/components/TesPins'
-import { useMesPins } from '@/features/pin/hooks/usePins'
+import { useMesPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
@@ -90,14 +90,22 @@ export function RoutePoserPin() {
   return racine ? createPortal(ecran, racine) : ecran
 }
 
-// /<onglet>/ajouter/pin/:id — la petite carte d'un pin (maquette « Pin GPS — 4 »)
+// /<onglet>/ajouter/pin/:id — la petite carte d'un pin (maquette « Pin GPS — 4 »). Un pin inconnu
+// à l'arrivée (lien périmé) renvoie à la feuille du « + » ; un pin vu puis supprimé, non : la
+// fiche se ferme d'elle-même.
 export function RouteFichePin() {
   const { tab = 'carte', id = '' } = useParams()
   const navigate = useNavigate()
+  const fermer = useFermerDetail()
+  const pins = useMesPinsCharges()
+  const [vu, setVu] = useState(false)
+  const present = pins?.some((p) => p.id === id) ?? false
+  if (present && !vu) setVu(true)
+  if (pins && !present && !vu) return <Navigate to={`/${tab}/ajouter`} replace />
   return (
     <FichePin
       id={id}
-      onFermer={useFermerDetail()}
+      onFermer={fermer}
       onCompleter={() => {
         void navigate(`/${tab}/ajouter/pin/${id}/completer`, { replace: true })
       }}
@@ -112,19 +120,22 @@ export function RouteCompleterPin() {
   const { tab = 'carte', id = '' } = useParams()
   const navigate = useNavigate()
   const fermer = useFermerDetail()
-  const pin = useMesPins().find((p) => p.id === id)
+  const pins = useMesPinsCharges()
+  const pin = pins?.find((p) => p.id === id)
   const [autre, setAutre] = useState(false)
   // Stable : la feuille l'appelle d'elle-même quand aucun lieu n'est proche.
   const versAjout = useCallback(() => {
     setAutre(true)
   }, [])
-  if (!pin) return null
+  if (!pins) return null // la liste arrive
+  // Inconnu, ou encore dans le téléphone (le serveur ne le connaît pas) : retour au « + ».
+  if (!pin || pin.enAttente) return <Navigate to={`/${tab}/ajouter`} replace />
   if (autre) {
     return (
       <DepuisUnPin
         pin={pin}
-        onOuvrir={() => {
-          void navigate(`/${tab}/ajouter/lieu/photo`, { replace: true })
+        onOuvrir={(etape) => {
+          void navigate(`/${tab}/ajouter/lieu/${etape}`, { replace: true })
         }}
       />
     )
