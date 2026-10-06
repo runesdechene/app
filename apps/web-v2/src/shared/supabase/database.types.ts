@@ -6179,6 +6179,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      _pin_frais: { Args: { p_pose_le: string }; Returns: boolean }
       _presents_autour: {
         Args: { p_id: string }
         Returns: {
@@ -6205,6 +6206,16 @@ export type Database = {
       }
       _require_min_level: {
         Args: { p_min_level: number; p_user_id: string }
+        Returns: Json
+      }
+      _revendiquer: {
+        Args: {
+          p_id: string
+          p_moi: string
+          p_nom: string
+          p_pour: string
+          p_valides: string[]
+        }
         Returns: Json
       }
       _role_compagnie: {
@@ -6357,6 +6368,7 @@ export type Database = {
           p_ma_longitude?: number
           p_natures: string[]
           p_nom: string
+          p_pin?: string
           p_recit: string
         }
         Returns: Json
