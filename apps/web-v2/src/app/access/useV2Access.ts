@@ -7,6 +7,8 @@
  *            `error`, et l'écran propose alors de réessayer ou de revenir à la V1.
  *            Délai de ACCESS_TIMEOUT_MS : hors connexion, supabase-js peut réessayer pendant des
  *            dizaines de secondes ; au-delà du délai, on bascule en `error` plutôt qu'attendre.
+ *            L'accès accordé est gardé sur l'appareil (queryClient) : hors ligne, il ouvre la V2 ;
+ *            un accès retiré se voit à la prochaine ouverture en ligne.
  *            Connexion ou déconnexion (y compris dans un onglet V1) → la vérification est refaite.
  *            Une entrée autorisée met à jour la dernière connexion (touch_last_login), comme la V1 ;
  *            un retour dans l'app aussi, après dix minutes ailleurs (`retours.ts`) : c'est ce que
@@ -20,7 +22,7 @@ import type { AccessState } from './decideAccess'
 import { compterLesRetours } from './retours'
 
 export const ACCESS_TIMEOUT_MS = 8000
-const ACCESS_KEY = ['v2-access']
+export const ACCESS_KEY = ['v2-access']
 
 async function fetchAccess(): Promise<{ hasSession: boolean; hasAccess: boolean }> {
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
@@ -76,7 +78,10 @@ export function useV2Access(): { state: AccessState; retry: () => void } {
   const query = useQuery({
     queryKey: ACCESS_KEY,
     queryFn: () => withTimeout(fetchAccess(), ACCESS_TIMEOUT_MS),
-    staleTime: Infinity,
+    // Relu à chaque ouverture (un accès retiré se voit), mais une copie gardée suffit à ouvrir :
+    // hors ligne, la relecture échoue et la copie fait foi.
+    staleTime: 0,
+    networkMode: 'offlineFirst',
   })
 
   // Revenir dans l'app compte comme l'ouvrir — seulement une fois entré.
@@ -94,7 +99,7 @@ export function useV2Access(): { state: AccessState; retry: () => void } {
     void query.refetch()
   }
 
+  if (query.data) return { state: { status: 'ready', ...query.data }, retry }
   if (query.isPending) return { state: { status: 'loading' }, retry }
-  if (query.isError) return { state: { status: 'error' }, retry }
-  return { state: { status: 'ready', ...query.data }, retry }
+  return { state: { status: 'error' }, retry }
 }

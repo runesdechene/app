@@ -1,6 +1,6 @@
 /**
  * QUOI     — l'instance TanStack Query partagée par toute l'app, et ce qu'elle garde sur
- *            l'appareil entre deux ouvertures : les lieux de la carte.
+ *            l'appareil entre deux ouvertures : les lieux de la carte et l'accès accordé.
  * POURQUOI — un seul cache : deux écrans qui demandent la même donnée ne la chargent qu'une fois.
  *            Les lieux gardés (Uriel, 02/10 : « oui pour garder les lieux ») : la carte s'affiche
  *            dès l'ouverture, puis se met à jour derrière. Dans IndexedDB (~1,5 Mo) : le
@@ -24,9 +24,20 @@ export const queryClient = new QueryClient({
 
 // Gardés une semaine : la requête doit vivre aussi longtemps que sa copie sur l'appareil.
 queryClient.setQueryDefaults(carteLieuxKey, { gcTime: SEPT_JOURS })
+queryClient.setQueryDefaults(['v2-access'], { gcTime: SEPT_JOURS })
 
-export function aGarderSurLAppareil(cle: QueryKey, etat: QueryStatus): boolean {
-  return etat === 'success' && cle[0] === carteLieuxKey[0] && cle[1] === carteLieuxKey[1]
+// L'accès accordé se garde aussi : sans lui, l'app ne s'ouvre pas hors ligne (pin GPS, 06/10).
+// Un refus ne se garde jamais : il se redemande.
+export function aGarderSurLAppareil(cle: QueryKey, etat: QueryStatus, donnees: unknown): boolean {
+  if (etat !== 'success') return false
+  if (cle[0] === carteLieuxKey[0] && cle[1] === carteLieuxKey[1]) return true
+  return (
+    cle[0] === 'v2-access' &&
+    typeof donnees === 'object' &&
+    donnees !== null &&
+    'hasAccess' in donnees &&
+    donnees.hasAccess === true
+  )
 }
 
 // Pendant la relecture de la copie, TanStack met toutes les requêtes en pause — l'accès compris.
@@ -57,7 +68,8 @@ export const persistance: Omit<PersistQueryClientOptions, 'queryClient'> = {
   maxAge: SEPT_JOURS,
   buster: __VERSION__,
   dehydrateOptions: {
-    shouldDehydrateQuery: (query) => aGarderSurLAppareil(query.queryKey, query.state.status),
+    shouldDehydrateQuery: (query) =>
+      aGarderSurLAppareil(query.queryKey, query.state.status, query.state.data),
   },
 }
 
