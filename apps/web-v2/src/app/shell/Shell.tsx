@@ -12,7 +12,16 @@
  * ATTENTION — chaque écran racine est son propre conteneur de défilement (voir le CSS) ; c'est
  *            lui qu'on remonte au double toucher, pas la fenêtre.
  */
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { AccueilScreen } from '@/features/accueil/components/AccueilScreen'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
@@ -24,7 +33,7 @@ import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
-import { useEnvoyerPins, useMesPins } from '@/features/pin/hooks/usePins'
+import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -82,19 +91,27 @@ function CarteDeLaCoquille() {
   const navigate = useNavigate()
   // Mes pins sur la carte (seulement ceux que le serveur connaît) ; « Voir sur la carte » arrive
   // par /carte?pin=<id> : la carte s'y centre, puis la demande est retirée.
-  const pins = useMesPins().filter((p) => !p.enAttente)
+  const charges = useMesPinsCharges()
+  const pins = useMemo(() => (charges ?? []).filter((p) => !p.enAttente), [charges])
+  const mesPins = useMemo(() => pins.map(({ id, point, jours }) => ({ id, point, jours })), [pins])
   const [recherche, setRecherche] = useSearchParams()
   const centrerSur = pins.find((p) => p.id === recherche.get('pin'))?.point
   return (
     <Suspense fallback={null}>
       <CarteScreen
-        mesPins={pins.map(({ id, point, jours }) => ({ id, point, jours }))}
+        mesPins={mesPins}
         onToucherPin={(id) => {
           void navigate(`/carte/ajouter/pin/${id}`)
         }}
         centrerSur={centrerSur}
         onCentre={() => {
-          setRecherche({}, { replace: true })
+          setRecherche(
+            (p) => {
+              p.delete('pin')
+              return p
+            },
+            { replace: true },
+          )
         }}
         sousLaRecherche={<JaugeEnergie />}
         soi={

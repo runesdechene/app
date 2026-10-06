@@ -61,6 +61,7 @@ export class FausseCarte {
   setStyle() {}
   remove() {}
   addSource = vi.fn()
+  queryRenderedFeatures = vi.fn<(...args: unknown[]) => unknown[]>(() => [])
   hasImage = vi.fn<(nom: string) => boolean>(() => false)
   addImage = vi.fn()
   calquesPoses = new Set<string>()

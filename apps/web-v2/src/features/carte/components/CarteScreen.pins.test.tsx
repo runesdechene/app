@@ -19,6 +19,11 @@ vi.mock('../api/carte', () => ({
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
   fetchFiltres: vi.fn(() => Promise.resolve({ natures: [], epoques: [] })),
 }))
+const navigations = vi.hoisted(() => vi.fn())
+vi.mock('react-router', async (original) => ({
+  ...(await original<typeof import('react-router')>()),
+  useNavigate: () => navigations,
+}))
 vi.mock('../api/actifs', () => ({ fetchActifs: vi.fn(() => Promise.resolve([])) }))
 vi.mock('../lib/sceaux', async (original) => ({
   ...(await original<typeof import('../lib/sceaux')>()),
@@ -108,4 +113,27 @@ test('« Voir sur la carte » : la carte vole jusqu’au pin, une fois le tiroir
     carte().flyTo.mock.invocationCallOrder[0] ?? 0,
   )
   expect(onCentre).toHaveBeenCalledTimes(1)
+})
+
+test('mes pins : après un second style.load, la source reçoit de nouveau les pins', () => {
+  afficher({ mesPins: MES_PINS })
+  charger()
+  const { setData } = carte().getSource('mes-pins')
+  setData.mockClear()
+  charger()
+  expect(setData).toHaveBeenCalledWith(
+    expect.objectContaining({
+      features: [expect.objectContaining({ properties: { id: 'p1', jours: '12 j' } })],
+    }),
+  )
+})
+
+test('un pin posé sur un lieu : son toucher n’ouvre que le pin', () => {
+  const onToucherPin = vi.fn()
+  afficher({ mesPins: MES_PINS, onToucherPin })
+  charger()
+  carte().queryRenderedFeatures.mockReturnValue([{}])
+  carte().emettre('click', { point: { x: 1, y: 2 }, features: [{ properties: { id: 'p1' } }] })
+  expect(onToucherPin).toHaveBeenCalledTimes(1)
+  expect(navigations).not.toHaveBeenCalled()
 })

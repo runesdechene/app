@@ -39,7 +39,7 @@ import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '
 import { ajouterZones } from '../lib/actifs'
 import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
-import { poserMesPins, type PinsDeLaCarte } from '../lib/mesPins'
+import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
@@ -167,7 +167,7 @@ function CarteVivante({
 
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
-      if (typeof id === 'string') {
+      if (typeof id === 'string' && !surUnPin(map, e.point)) {
         void navigate(visiteur ? `/bienvenue/carte/lieu/${id}` : `/carte/lieu/${id}`)
       }
     })

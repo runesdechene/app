@@ -9,18 +9,35 @@
  */
 import type { GeoJSONSource, Map as Carte } from 'maplibre-gl'
 import { useEffect, useRef } from 'react'
-import { enGeoJSONPins, MES_PINS, type PinsDeLaCarte } from '../lib/mesPins'
+import { enGeoJSONPins, MES_PINS, type MonPin, type PinsDeLaCarte } from '../lib/mesPins'
 
 const ZOOM_PIN = 16
 
+const AUCUN: MonPin[] = []
+
 export function useMesPinsSurLaCarte(
   carte: Carte | null,
-  { mesPins = [], onToucherPin, centrerSur, onCentre }: PinsDeLaCarte,
+  { mesPins = AUCUN, onToucherPin, centrerSur, onCentre }: PinsDeLaCarte,
   pret: boolean,
 ) {
+  const derniers = useRef(mesPins)
   useEffect(() => {
+    derniers.current = mesPins
     void carte?.getSource<GeoJSONSource>(MES_PINS)?.setData(enGeoJSONPins(mesPins))
   }, [carte, mesPins])
+
+  // Un style rechargé repart d'une source vide : les pins courants y reviennent. Écouteur posé
+  // après celui de CarteScreen (qui recrée la source), donc exécuté après lui.
+  useEffect(() => {
+    if (!carte) return
+    const reposer = () => {
+      void carte.getSource<GeoJSONSource>(MES_PINS)?.setData(enGeoJSONPins(derniers.current))
+    }
+    carte.on('style.load', reposer)
+    return () => {
+      carte.off('style.load', reposer)
+    }
+  }, [carte])
 
   const toucher = useRef(onToucherPin)
   const fin = useRef(onCentre)

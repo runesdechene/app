@@ -10,7 +10,7 @@
  *            `style.load` mais une seule fois ; l'image arrive quand l'icône est chargée.
  */
 import type { FeatureCollection, Point as PointGeo } from 'geojson'
-import type { Map as Carte } from 'maplibre-gl'
+import type { Map as Carte, PointLike } from 'maplibre-gl'
 import pinGps from '@/assets/ui/pin-gps.svg'
 import type { Point } from '@/shared/lib/distance'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
@@ -45,6 +45,14 @@ export function enGeoJSONPins(
   }
 }
 
+// Le point touché est-il sur un de mes pins ? (le clic d'un lieu dessous s'efface alors)
+export function surUnPin(map: Carte, point: PointLike): boolean {
+  return (
+    map.getLayer(MES_PINS) !== undefined &&
+    map.queryRenderedFeatures(point, { layers: [MES_PINS] }).length > 0
+  )
+}
+
 function chargerIcone(): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
@@ -56,7 +64,7 @@ function chargerIcone(): Promise<HTMLImageElement> {
   })
 }
 
-function dessinerPin(icone: HTMLImageElement, c: CouleursCarte, accent: string) {
+function dessinerPin(icone: HTMLImageElement | null, c: CouleursCarte, accent: string) {
   const ctx = new OffscreenCanvas(TAILLE, TAILLE).getContext('2d')
   if (!ctx) throw new Error('canevas indisponible')
   ctx.beginPath()
@@ -66,7 +74,7 @@ function dessinerPin(icone: HTMLImageElement, c: CouleursCarte, accent: string) 
   ctx.lineWidth = 5
   ctx.strokeStyle = accent
   ctx.stroke()
-  ctx.drawImage(icone, (TAILLE - ICONE) / 2, (TAILLE - ICONE) / 2, ICONE, ICONE)
+  if (icone) ctx.drawImage(icone, (TAILLE - ICONE) / 2, (TAILLE - ICONE) / 2, ICONE, ICONE)
   return ctx.getImageData(0, 0, TAILLE, TAILLE)
 }
 
@@ -93,7 +101,8 @@ export async function poserMesPins(map: Carte, c: CouleursCarte): Promise<void> 
     })
   }
   if (map.hasImage(MES_PINS)) return
-  const icone = await chargerIcone()
+  // Sans icône (elle ne se charge pas), le rond reste : jamais une image manquante.
+  const icone = await chargerIcone().catch(() => null)
   const accent = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-accent')
     .trim()
