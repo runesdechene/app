@@ -1,0 +1,106 @@
+/*
+ * QUOI     — le détail d'un territoire : résumé, natures, puis un mois par rangée qui défile
+ *            (même carrousel que les sections du profil), les mois anciens en lignes repliées.
+ */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-8);
+}
+
+.resume,
+.rubrique,
+.natures,
+.replie {
+  margin: 0 var(--space-6);
+}
+
+.resume {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.rubrique {
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.natures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mois {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.cadre {
+  display: flex;
+}
+
+/* Le haut de la rangée laisse la place au tampon qui déborde du coin des cartes. */
+.rangee {
+  display: flex;
+  flex: 1;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  overflow-x: auto;
+  cursor: grab;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.rangee::-webkit-scrollbar {
+  display: none;
+}
+
+.replie {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+}
+
+.lien {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.squelette {
+  height: 320px;
+  margin: var(--space-4) var(--space-6);
+  border-radius: var(--radius-carte);
+  background: var(--color-barre);
+}

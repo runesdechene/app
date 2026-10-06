@@ -1,0 +1,99 @@
+/*
+ * QUOI     — une pile de pages de papier réglé ; chaque page : nom en Bebas, compte, « +N › »,
+ *            puis ses tampons photo qui se chevauchent, légèrement tournés.
+ */
+.pages {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-4) var(--space-6) var(--space-8);
+  list-style: none;
+}
+
+.page {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 27px,
+      color-mix(in srgb, var(--color-ocre) 25%, transparent) 27px 28px
+    ),
+    var(--color-barre);
+  color: inherit;
+  text-decoration: none;
+}
+
+.entete {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.nom {
+  flex: 1;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  letter-spacing: var(--titre-tracking);
+}
+
+.compte {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.plus {
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.tampons {
+  display: flex;
+  padding-bottom: var(--space-2);
+}
+
+.tampons > * + * {
+  margin-left: calc(var(--space-6) * -1);
+}
+
+.tampons > :nth-child(odd) {
+  rotate: -5deg;
+}
+
+.tampons > :nth-child(even) {
+  rotate: 4deg;
+  translate: 0 var(--space-2);
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+}
+
+.reessayer {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.squelette {
+  height: 240px;
+  margin: var(--space-4) var(--space-6);
+  border-radius: var(--radius-carte);
+  background: var(--color-barre);
+}

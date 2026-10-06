@@ -6,6 +6,8 @@
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import { BadgesExplorateur } from '@/features/compte/components/BadgesExplorateur'
 import { ModifierProfil } from '@/features/compte/components/ModifierProfil'
+import { PasseportOuvert } from '@/features/compte/components/PasseportOuvert'
+import { PasseportTerritoire } from '@/features/compte/components/PasseportTerritoire'
 import { PreferencesPage } from '@/features/compte/components/PreferencesPage'
 import { ProfilExplorateur } from '@/features/compte/components/ProfilExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
@@ -45,6 +47,27 @@ export function RouteModifier() {
   return (
     <DetailPane title="Modifier mon profil">
       <ModifierProfil onTermine={termine} />
+    </DetailPane>
+  )
+}
+
+// /<onglet>/explorateur/<id>/passeport — le passeport ouvert, une page par territoire
+export function RoutePasseport() {
+  const { id = '' } = useParams()
+  return (
+    <DetailPane title="Passeport">
+      <PasseportOuvert id={id} />
+    </DetailPane>
+  )
+}
+
+// /<onglet>/explorateur/<id>/passeport/<territoire> — un territoire en détail. react-router
+// rend le paramètre décodé (« Côtes-d’Armor »).
+export function RoutePasseportTerritoire() {
+  const { id = '', territoire = '' } = useParams()
+  return (
+    <DetailPane title={territoire}>
+      <PasseportTerritoire id={id} territoire={territoire} />
     </DetailPane>
   )
 }

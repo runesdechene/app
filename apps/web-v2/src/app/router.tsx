@@ -27,7 +27,13 @@ import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
 import { RouteMurmure } from './routes/messages'
 import { RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
-import { RouteExplorateur, RouteModifier, RoutePreferences } from './routes/compte'
+import {
+  RouteExplorateur,
+  RouteModifier,
+  RoutePasseport,
+  RoutePasseportTerritoire,
+  RoutePreferences,
+} from './routes/compte'
 import { Shell } from './shell/Shell'
 
 export const routes: RouteObject[] = [
@@ -66,6 +72,11 @@ export const routes: RouteObject[] = [
               { path: 'lieu/:id/carnet', Component: RouteCarnet },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
+              { path: 'explorateur/:id/passeport', Component: RoutePasseport },
+              {
+                path: 'explorateur/:id/passeport/:territoire',
+                Component: RoutePasseportTerritoire,
+              },
               { path: 'preferences', Component: RoutePreferences },
               { path: 'murmures/:id', Component: RouteMurmure },
               { path: 'compagnie/fonder', Component: RouteFonder },
