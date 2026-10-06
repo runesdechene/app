@@ -139,3 +139,11 @@
     transition: none;
   }
 }
+
+.erreur {
+  margin: var(--space-2) 0 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: center;
+}

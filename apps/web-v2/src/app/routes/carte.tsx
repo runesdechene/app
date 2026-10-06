@@ -14,7 +14,12 @@ import { DepuisUnPin } from '@/features/ajout/components/DepuisUnPin'
 import { CestLunDeCeuxLa } from '@/features/pin/components/CestLunDeCeuxLa'
 import { FichePin } from '@/features/pin/components/FichePin'
 import { TesPins } from '@/features/pin/components/TesPins'
-import { useMesPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
+import {
+  useEnvoyerALOuverture,
+  useMesPins,
+  useMesPinsCharges,
+  type PinAffiche,
+} from '@/features/pin/hooks/usePins'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
@@ -32,6 +37,7 @@ export function RouteAjouter() {
   const { tab = 'carte' } = useParams()
   const navigate = useNavigate()
   const pins = useMesPins()
+  useEnvoyerALOuverture() // spec : les pins en attente partent aussi à l'ouverture du « + »
   return (
     <AjouterFeuille
       onFermer={useFermerDetail()}
@@ -118,13 +124,17 @@ export function RouteFichePin() {
 
 // /<onglet>/ajouter/pin/:id/completer — « C'est l'un de ceux-là ? » (maquette « Pin GPS — 5 »),
 // puis le parcours d'ajout sur un brouillon né du pin (« Remplacer ton brouillon en cours ? »
-// d'abord, si un autre attend).
+// d'abord, si un autre attend). Le pin vu à l'arrivée est gardé : « C'est lui » le ferme (la liste
+// relue ne l'a plus), et l'écran doit pouvoir finir de le dire (« Pin fermé, sans visite »).
 export function RouteCompleterPin() {
   const { tab = 'carte', id = '' } = useParams()
   const navigate = useNavigate()
   const fermer = useFermerDetail()
   const pins = useMesPinsCharges()
-  const pin = pins?.find((p) => p.id === id)
+  const [vu, setVu] = useState<PinAffiche | null>(null)
+  const trouve = pins?.find((p) => p.id === id)
+  if (trouve && vu?.id !== trouve.id) setVu(trouve)
+  const pin = trouve ?? (vu?.id === id ? vu : undefined)
   const [autre, setAutre] = useState(false)
   // Stable : la feuille l'appelle d'elle-même quand aucun lieu n'est proche.
   const versAjout = useCallback(() => {
@@ -147,6 +157,7 @@ export function RouteCompleterPin() {
     <CestLunDeCeuxLa
       pin={pin.id}
       poseLe={pin.poseLe}
+      // Sans visite (pin périmé), la feuille l'a déjà dit avant d'offrir « Voir le lieu ».
       onVisite={(lieu) => {
         void navigate(`/${tab}/lieu/${lieu}`, { replace: true })
       }}

@@ -3,20 +3,47 @@
  *            compléter) renvoie à la feuille du « + » une fois la liste arrivée ; avant, rien.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import type { PinAffiche } from '@/features/pin/hooks/usePins'
-import { RouteCompleterPin, RouteFichePin } from './carte'
+import { RouteAjouter, RouteCompleterPin, RouteFichePin } from './carte'
 
-const pins = vi.hoisted(() => ({
-  liste: undefined as PinAffiche[] | undefined,
-}))
-vi.mock('@/features/pin/hooks/usePins', () => ({
-  useMesPinsCharges: () => pins.liste,
-  useMesPins: () => pins.liste ?? [],
-  useSupprimerPin: () => ({ mutate: vi.fn(), isPending: false }),
+// La liste est une petite source externe : la changer refait le rendu, comme le cache relu.
+const pins = vi.hoisted(() => {
+  const abonnes = new Set<() => void>()
+  const etat = {
+    liste: undefined as PinAffiche[] | undefined,
+    envoyerALOuverture: vi.fn(),
+    abonner: (f: () => void) => {
+      abonnes.add(f)
+      return () => {
+        abonnes.delete(f)
+      }
+    },
+    relire: (l: PinAffiche[]) => {
+      etat.liste = l
+      abonnes.forEach((f) => {
+        f()
+      })
+    },
+  }
+  return etat
+})
+vi.mock('@/features/pin/hooks/usePins', async () => {
+  const { useSyncExternalStore } = await import('react')
+  const useListe = () => useSyncExternalStore(pins.abonner, () => pins.liste)
+  return {
+    useMesPinsCharges: useListe,
+    useMesPins: () => useListe() ?? [],
+    useSupprimerPin: () => ({ mutate: vi.fn(), isPending: false }),
+    useEnvoyerALOuverture: pins.envoyerALOuverture,
+  }
+})
+// « C'est l'un de ceux-là ? » a ses propres tests : ici, seule compte la route qui la porte.
+vi.mock('@/features/pin/components/CestLunDeCeuxLa', () => ({
+  CestLunDeCeuxLa: () => <p>Les lieux proches du pin</p>,
 }))
 
 const EN_ATTENTE: PinAffiche = {
@@ -38,6 +65,7 @@ function monter(chemin: string) {
     [
       { path: '/:tab/ajouter/pin/:id', Component: RouteFichePin },
       { path: '/:tab/ajouter/pin/:id/completer', Component: RouteCompleterPin },
+      { path: '/:tab/ajouter', Component: RouteAjouter },
       { path: '*', element: null },
     ],
     { initialEntries: [chemin] },
@@ -69,6 +97,23 @@ test('compléter un pin inconnu, ou encore en attente, renvoie au « + »', asyn
   await waitFor(() => {
     expect(router.state.location.pathname).toBe('/carte/ajouter')
   })
+})
+
+test('ouvrir le « + » envoie les pins en attente', () => {
+  pins.liste = []
+  monter('/carte/ajouter')
+  expect(pins.envoyerALOuverture).toHaveBeenCalled()
+})
+
+test('compléter : le pin fermé pendant « C’est lui » ne renvoie pas au « + » (l’écran finit de le dire)', async () => {
+  pins.liste = [{ ...EN_ATTENTE, id: 'envoye', enAttente: false }]
+  const router = monter('/carte/ajouter/pin/envoye/completer')
+  expect(await screen.findByText('Les lieux proches du pin')).toBeInTheDocument()
+  act(() => {
+    pins.relire([]) // « C'est lui » l'a fermé : la liste relue ne l'a plus
+  })
+  expect(router.state.location.pathname).toBe('/carte/ajouter/pin/envoye/completer')
+  expect(screen.getByText('Les lieux proches du pin')).toBeInTheDocument()
 })
 
 test('« Voir sur la carte » ouvre la carte sur le pin, sans empiler d’historique', async () => {

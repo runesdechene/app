@@ -86,6 +86,11 @@ export function FichePin({ id, onFermer, onCompleter, onVoirSurLaCarte }: Props)
           Supprimer ce pin
         </button>
       )}
+      {supprimer.isError && (
+        <p className={styles.erreur} role="alert">
+          Le pin n’a pas pu être supprimé. Réessaie.
+        </p>
+      )}
     </Feuille>
   )
 }

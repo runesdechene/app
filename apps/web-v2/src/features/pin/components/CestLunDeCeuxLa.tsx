@@ -4,10 +4,13 @@
  *            lieu, datée du pin, sans revendication. Sans lieu proche, on passe à l'ajout.
  * ATTENTION — `onAutre` part aussi tout seul quand la liste revient vide : la route le garde
  *            stable (useCallback), sinon l'effet repartirait à chaque rendu.
+ *            Pin périmé (spec : « il se ferme sans visite, et l'écran le dit ») : la note le dit
+ *            avant, et « Pin fermé, sans visite » après, avant d'aller au lieu.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
+import { joursRestants } from '@/shared/lib/validitePin'
 import { Feuille } from '@/shared/ui/Feuille'
 import { fetchLieuxProches, visiterDepuisPin } from '../api/pins'
 import { PINS } from '../hooks/usePins'
@@ -38,9 +41,11 @@ export function CestLunDeCeuxLa({ pin, poseLe, onVisite, onAutre, onFermer }: Pr
       // La fiche du lieu visité : `ficheKey` (zone lieu), en clé littérale — une zone n'en
       // importe pas une autre.
       void queryClient.invalidateQueries({ queryKey: ['lieu', lieu] })
-      onVisite(lieu, r.visite)
+      // Sans visite (pin périmé), l'écran le dit d'abord ; « Voir le lieu » mène ensuite au lieu.
+      if (r.visite) onVisite(lieu, true)
     },
   })
+  const perime = joursRestants(poseLe, new Date()) <= 0
   const vide = proches.data?.length === 0
   useEffect(() => {
     if (vide) onAutre()
@@ -58,6 +63,26 @@ export function CestLunDeCeuxLa({ pin, poseLe, onVisite, onAutre, onFermer }: Pr
           }}
         >
           Réessayer
+        </button>
+      </Feuille>
+    )
+  }
+  const lieu = visiter.variables
+  if (visiter.data?.visite === false && lieu !== undefined) {
+    return (
+      <Feuille titre={TITRE} onFermer={onFermer}>
+        <h2 className={styles.titre}>Pin fermé, sans visite</h2>
+        <p className={styles.detail}>
+          Ton pin avait plus de 15 jours : il est fermé, et la visite ne compte pas.
+        </p>
+        <button
+          type="button"
+          className={styles.autre}
+          onClick={() => {
+            onVisite(lieu, false)
+          }}
+        >
+          Voir le lieu
         </button>
       </Feuille>
     )
@@ -104,7 +129,11 @@ export function CestLunDeCeuxLa({ pin, poseLe, onVisite, onAutre, onFermer }: Pr
           La visite n’a pas pu compter. Réessaie.
         </p>
       )}
-      <p className={styles.note}>« C’est lui » compte ta visite, datée du jour de ton pin.</p>
+      <p className={styles.note}>
+        {perime
+          ? 'Ton pin a plus de 15 jours : « C’est lui » le ferme sans compter de visite.'
+          : '« C’est lui » compte ta visite, datée du jour de ton pin.'}
+      </p>
     </Feuille>
   )
 }

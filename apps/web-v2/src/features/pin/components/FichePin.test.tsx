@@ -8,10 +8,10 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import type { PinAffiche } from '../hooks/usePins'
 import { FichePin } from './FichePin'
 
-const pins = vi.hoisted(() => ({ liste: [] as PinAffiche[] }))
+const pins = vi.hoisted(() => ({ liste: [] as PinAffiche[], suppressionRatee: false }))
 vi.mock('../hooks/usePins', () => ({
   useMesPins: () => pins.liste,
-  useSupprimerPin: () => ({ mutate: vi.fn(), isPending: false }),
+  useSupprimerPin: () => ({ mutate: vi.fn(), isPending: false, isError: pins.suppressionRatee }),
 }))
 
 const ENVOYE: PinAffiche = {
@@ -26,6 +26,13 @@ const ENVOYE: PinAffiche = {
 
 beforeEach(() => {
   pins.liste = [ENVOYE]
+  pins.suppressionRatee = false
+})
+
+test('une suppression ratée se dit', () => {
+  pins.suppressionRatee = true
+  monter('p1')
+  expect(screen.getByRole('alert')).toHaveTextContent('Le pin n’a pas pu être supprimé. Réessaie.')
 })
 
 function monter(id: string, onVoirSurLaCarte = vi.fn()) {

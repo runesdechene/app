@@ -22,11 +22,11 @@ const props = {
 
 const CHAPELLE = { id: 'l1', nom: 'Chapelle Saint-Roch', imageUrl: null, metres: 40 }
 
-function monter() {
+function monter(autres: { poseLe?: Date } = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
-      <CestLunDeCeuxLa {...props} />
+      <CestLunDeCeuxLa {...props} {...autres} />
     </QueryClientProvider>,
   )
   return client
@@ -50,6 +50,30 @@ test('« C’est lui » : visite datée du pin, puis la fiche du lieu', async ()
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['pins'] })
   expect(invalider).toHaveBeenCalledWith({ queryKey: ['lieu', 'l1'] })
   invalider.mockRestore()
+})
+
+test('pin de plus de 15 jours : la note dit que « C’est lui » le ferme sans visite', async () => {
+  api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
+  monter({ poseLe: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000) })
+  expect(await screen.findByText(/Ton pin a plus de 15 jours : « C’est lui » le ferme sans compter de visite/)).toBeInTheDocument()
+  expect(screen.queryByText(/compte ta visite/)).not.toBeInTheDocument()
+})
+
+test('pin frais : la note promet la visite', async () => {
+  api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
+  monter({ poseLe: new Date() })
+  expect(await screen.findByText(/« C’est lui » compte ta visite/)).toBeInTheDocument()
+})
+
+test('« C’est lui » sans visite (pin périmé) : l’écran le dit, puis « Voir le lieu »', async () => {
+  api.fetchLieuxProches.mockResolvedValue([CHAPELLE])
+  api.visiterDepuisPin.mockResolvedValue({ visite: false })
+  monter()
+  await userEvent.click(await screen.findByRole('button', { name: /C’est lui.*Chapelle Saint-Roch/ }))
+  expect(await screen.findByText(/Pin fermé, sans visite/)).toBeInTheDocument()
+  expect(props.onVisite).not.toHaveBeenCalled()
+  await userEvent.click(screen.getByRole('button', { name: 'Voir le lieu' }))
+  expect(props.onVisite).toHaveBeenCalledWith('l1', false)
 })
 
 test('« Non, c’est un autre lieu » ouvre l’ajout, sans visite', async () => {
