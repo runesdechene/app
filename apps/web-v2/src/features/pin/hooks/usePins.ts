@@ -26,7 +26,7 @@ export type PinAffiche = {
   refuse: boolean // en attente, mais refusé par le serveur : à supprimer
 }
 
-async function lireTout(): Promise<PinAffiche[]> {
+export async function lireTout(): Promise<PinAffiche[]> {
   const maintenant = new Date()
   const enAttente = (await lirePinsEnAttente()).map((p) => {
     const poseLe = new Date(p.poseLe)
@@ -40,8 +40,12 @@ async function lireTout(): Promise<PinAffiche[]> {
       refuse: p.refuse === true,
     }
   })
-  // Sans réseau, le serveur ne répond pas : on montre au moins les pins du téléphone.
-  const serveur = await fetchMesPins().catch(() => ({ validiteJours: VALIDITE_JOURS, pins: [] }))
+  // Hors ligne, le serveur ne répond pas : on montre au moins les pins du téléphone. En ligne, une
+  // erreur (500, jeton expiré) remonte : la requête garde ses données précédentes et réessaie.
+  const serveur = await fetchMesPins().catch((e: unknown) => {
+    if (navigator.onLine) throw e
+    return { validiteJours: VALIDITE_JOURS, pins: [] }
+  })
   const envoyes = serveur.pins
     .filter((p) => !enAttente.some((a) => a.id === p.id))
     .map((p) => ({ ...p, jours: joursRestants(p.poseLe, maintenant, serveur.validiteJours), enAttente: false, refuse: false }))
@@ -57,9 +61,12 @@ export function useEnvoyerPins(): void {
   const queryClient = useQueryClient()
   useEffect(() => {
     if (!enLigne) return
-    void envoyerPinsEnAttente().then((e) => {
-      if (e.envoyes > 0) void queryClient.invalidateQueries({ queryKey: PINS })
-    })
+    void envoyerPinsEnAttente()
+      .then((e) => {
+        // Un pin refusé change d'état à l'écran, comme un pin envoyé.
+        if (e.envoyes > 0 || e.refuses.length > 0) void queryClient.invalidateQueries({ queryKey: PINS })
+      })
+      .catch(() => undefined) // IndexedDB refusé : on réessaiera au prochain déclencheur
   }, [enLigne, queryClient])
 }
 

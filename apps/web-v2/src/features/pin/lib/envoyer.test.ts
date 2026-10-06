@@ -84,10 +84,22 @@ test('GPS trop imprécis (P0001) : refus définitif aussi', async () => {
 })
 
 test('deux envois à la fois n’en font qu’un : chaque pin part une seule fois', async () => {
-  attente.lirePinsEnAttente.mockResolvedValue([A, B])
+  attente.lirePinsEnAttente.mockResolvedValueOnce([A, B]).mockResolvedValue([])
   api.poserPin.mockResolvedValue(undefined)
   const [premier, second] = await Promise.all([envoyerPinsEnAttente(), envoyerPinsEnAttente()])
   expect(api.poserPin).toHaveBeenCalledTimes(2)
   expect(second).toBe(premier)
   expect(premier).toEqual({ envoyes: 2, refuses: [] })
+})
+
+test('un pin posé pendant un envoi part dans une seconde passe', async () => {
+  const C = { ...A, id: 'c' }
+  attente.lirePinsEnAttente.mockResolvedValueOnce([A]).mockResolvedValueOnce([C]).mockResolvedValue([])
+  api.poserPin.mockResolvedValue(undefined)
+  const premier = envoyerPinsEnAttente()
+  const second = envoyerPinsEnAttente() // arrive pendant la première passe
+  expect(await second).toEqual({ envoyes: 2, refuses: [] })
+  expect(await premier).toEqual({ envoyes: 2, refuses: [] })
+  expect(api.poserPin).toHaveBeenCalledWith(C, 'Près de Colomars')
+  expect(attente.lirePinsEnAttente).toHaveBeenCalledTimes(2)
 })

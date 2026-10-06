@@ -9,7 +9,8 @@
  *            jeton expiré PGRST301, connexion requise 42501, panne serveur) arrête l'envoi sans
  *            rien marquer : on réessaiera.
  *            Un seul envoi à la fois : les appels simultanés (lancement, retour du réseau, pose)
- *            partagent le même, sinon un pin partirait deux fois.
+ *            partagent le même, sinon un pin partirait deux fois ; ils en réclament une passe de
+ *            plus, pour le pin posé pendant que la première lisait sa liste.
  */
 import { endroitDe } from '@/shared/lib/adresse'
 import { poserPin } from '../api/pins'
@@ -45,10 +46,29 @@ async function envoyer(): Promise<Envoi> {
 }
 
 let enCours: Promise<Envoi> | null = null
+let aRefaire = false
+
+// Un appel arrivé pendant un envoi (un pin posé entre-temps) lève `aRefaire` : une passe de plus
+// part avant de rendre la main, car la passe en cours a peut-être déjà lu la liste.
+async function passes(): Promise<Envoi> {
+  const total = await envoyer()
+  while (aRefaire) {
+    aRefaire = false
+    const suite = await envoyer()
+    total.envoyes += suite.envoyes
+    total.refuses.push(...suite.refuses)
+  }
+  return total
+}
 
 export function envoyerPinsEnAttente(): Promise<Envoi> {
-  enCours ??= envoyer().finally(() => {
+  if (enCours) {
+    aRefaire = true
+    return enCours
+  }
+  enCours = passes().finally(() => {
     enCours = null
+    aRefaire = false
   })
   return enCours
 }
