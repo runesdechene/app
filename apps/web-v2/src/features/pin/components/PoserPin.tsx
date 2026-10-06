@@ -108,9 +108,11 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
             <p className={styles.detail}>
               {envoye
                 ? `encore ${String(VALIDITE_JOURS)} jours pour le compléter`
-                : enLigne
-                  ? 'Pas encore envoyé : il partira tout seul dès que le réseau le permet.'
-                  : 'Pas de réseau : il partira tout seul dès qu’il revient.'}
+                : pose?.refuse
+                  ? 'Le serveur a refusé ce pin (l’heure ou le GPS du téléphone étaient faux). Tu peux le supprimer depuis « + ».'
+                  : enLigne
+                    ? 'Pas encore envoyé : il partira tout seul dès que le réseau le permet.'
+                    : 'Pas de réseau : il partira tout seul dès qu’il revient.'}
             </p>
             <div className={styles.encadre}>
               <strong>Prends tes photos avec ton téléphone</strong>

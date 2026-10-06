@@ -178,7 +178,27 @@ test('les pins posés par un autre compte sur ce téléphone ne se montrent pas'
     { ...ATT, id: 'ancien' }, // posé avant que le pin retienne son compte
   ])
   api.fetchMesPins.mockResolvedValue({ validiteJours: 15, pins: [] })
+  client.setQueryData(['moi'], 'moi')
   expect((await lireTout(client)).map((p) => p.id)).toEqual(['mien', 'ancien'])
+  expect(api.monIdentifiant).not.toHaveBeenCalled()
+})
+
+test('compte pas encore connu (froid) : tous les pins se montrent, sans demander la session', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([
+    { ...ATT, id: 'a', userId: 'quelquun' },
+    { ...ATT, id: 'b' },
+  ])
+  api.fetchMesPins.mockResolvedValue({ validiteJours: 15, pins: [] })
+  expect((await lireTout(client)).map((p) => p.id)).toEqual(['a', 'b'])
+  expect(api.monIdentifiant).not.toHaveBeenCalled()
+})
+
+test('un pin qui vient de partir ne disparaît pas quand la relecture échoue : il se montre envoyé', async () => {
+  client.setQueryData(PINS, [{ ...S1_AFFICHE, id: 'parti', enAttente: true }])
+  attente.lirePinsEnAttente.mockResolvedValue([])
+  api.fetchMesPins.mockRejectedValue(new TypeError('Failed to fetch'))
+  const r = await lireTout(client)
+  expect(r.map((p) => [p.id, p.enAttente, p.refuse])).toEqual([['parti', false, false]])
 })
 
 test('supprimer un pin du téléphone marche hors ligne', async () => {
@@ -187,4 +207,14 @@ test('supprimer un pin du téléphone marche hors ligne', async () => {
   const { result } = renderHook(() => useSupprimerPin(), { wrapper })
   await act(() => result.current.mutateAsync({ ...S1_AFFICHE, id: 'att', enAttente: true }))
   expect(attente.retirerPinEnAttente).toHaveBeenCalledWith('att')
+  expect(api.supprimerPin).not.toHaveBeenCalled()
+})
+
+test('supprimer un pin affiché en attente mais déjà parti : supprimé aussi sur le serveur', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([])
+  attente.retirerPinEnAttente.mockResolvedValue(false)
+  api.supprimerPin.mockRejectedValue(new Error('réseau'))
+  const { result } = renderHook(() => useSupprimerPin(), { wrapper })
+  await act(() => result.current.mutateAsync({ ...S1_AFFICHE, id: 'att', enAttente: true }))
+  expect(api.supprimerPin).toHaveBeenCalledWith('att')
 })

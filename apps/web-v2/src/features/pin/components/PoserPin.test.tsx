@@ -89,6 +89,15 @@ test('posé avec un réseau faible : encore dans le téléphone, l’écran le d
   expect(screen.queryByText(/encore 15 jours/)).not.toBeInTheDocument()
 })
 
+test('posé puis refusé par le serveur pendant que l’écran est ouvert : l’écran le dit', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })
+  pins.useMesPins.mockReturnValue([{ ...PIN, enAttente: true, refuse: true }])
+  monter()
+  expect(screen.getByText(/Le serveur a refusé ce pin/)).toBeInTheDocument()
+  expect(screen.queryByText(/il partira tout seul/)).not.toBeInTheDocument()
+})
+
 test('posé et envoyé : encore 15 jours pour le compléter', () => {
   position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
   pins.usePoserPin.mockReturnValue({ mutate: poser, isSuccess: true, isPending: false, data: 'p1' })

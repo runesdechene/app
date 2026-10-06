@@ -14,10 +14,10 @@ import { useEffect } from 'react'
 import { useEnLigne } from '@/shared/hooks/useEnLigne'
 import type { Point } from '@/shared/lib/distance'
 import { joursRestants } from '@/shared/lib/validitePin'
-import { fetchMesPins, monIdentifiant, supprimerPin } from '../api/pins'
+import { fetchMesPins, supprimerPin } from '../api/pins'
 import type { Pin } from '../api/lirePins'
 import { envoyerPinsEnAttente } from '../lib/envoyer'
-import { estAMoi, garderPinEnAttente, lirePinsEnAttente, retirerPinEnAttente } from '../lib/pinsEnAttente'
+import { garderPinEnAttente, lirePinsEnAttente, retirerPinEnAttente } from '../lib/pinsEnAttente'
 
 export const PINS = ['pins'] as const
 // Le compte connecté : la clé de `useMonIdentifiant` (zone compte), en clé littérale — une zone
@@ -36,12 +36,12 @@ export type PinAffiche = {
 
 export async function lireTout(queryClient: QueryClient): Promise<PinAffiche[]> {
   const maintenant = new Date()
-  // Déjà en cache presque toujours (la coquille le lit) : rien n'est alors redemandé.
-  const moi = await queryClient
-    .query({ queryKey: MOI, queryFn: monIdentifiant, staleTime: Infinity })
-    .catch(() => null)
-  const enAttente = (await lirePinsEnAttente())
-    .filter((p) => estAMoi(p, moi))
+  // Sans rien attendre : hors ligne avec un jeton expiré, lire la session dure ~30 s. Compte
+  // inconnu (`undefined`, `null`) : tout se montre ; seul un pin d'un autre compte connu se cache.
+  const moi = queryClient.getQueryData<string | null>(MOI)
+  const tous = await lirePinsEnAttente()
+  const enAttente = tous
+    .filter((p) => !p.userId || !moi || p.userId === moi)
     .map((p) => {
       const poseLe = new Date(p.poseLe)
       return {
@@ -64,8 +64,11 @@ export async function lireTout(queryClient: QueryClient): Promise<PinAffiche[]> 
     refuse: false,
   })
   // Ceux du serveur que la liste connaissait déjà : gardés quand il ne répond pas.
+  // Un pin affiché en attente qui n'est plus dans le téléphone vient de partir : il se montre envoyé.
   const connus = () =>
-    (queryClient.getQueryData<PinAffiche[]>(PINS) ?? []).filter((p) => !p.enAttente).map((p) => envoye(p))
+    (queryClient.getQueryData<PinAffiche[]>(PINS) ?? [])
+      .filter((p) => !p.enAttente || !tous.some((t) => t.id === p.id))
+      .map((p) => envoye(p))
   let serveur: PinAffiche[]
   if (!navigator.onLine) {
     serveur = connus()
@@ -86,7 +89,8 @@ export async function lireTout(queryClient: QueryClient): Promise<PinAffiche[]> 
 // qu'il n'existe pas.
 export function useMesPinsCharges(): PinAffiche[] | undefined {
   const queryClient = useQueryClient()
-  return useQuery({ queryKey: PINS, queryFn: () => lireTout(queryClient), networkMode: 'always' }).data
+  return useQuery({ queryKey: PINS, queryFn: () => lireTout(queryClient), networkMode: 'always' })
+    .data
 }
 
 export function useMesPins(): PinAffiche[] {
@@ -99,7 +103,8 @@ function envoyerDerriere(queryClient: QueryClient): void {
   if (!navigator.onLine) return
   void envoyerPinsEnAttente()
     .then((e) => {
-      if (e.envoyes > 0 || e.refuses.length > 0) void queryClient.invalidateQueries({ queryKey: PINS })
+      if (e.envoyes > 0 || e.refuses.length > 0)
+        void queryClient.invalidateQueries({ queryKey: PINS })
     })
     .catch(() => undefined) // IndexedDB refusé : on réessaiera au prochain déclencheur
 }
@@ -162,8 +167,15 @@ export function useSupprimerPin() {
   return useMutation({
     networkMode: 'always',
     mutationFn: async (p: PinAffiche) => {
-      if (p.enAttente) await retirerPinEnAttente(p.id)
-      else await supprimerPin(p.id)
+      if (!p.enAttente) return supprimerPin(p.id)
+      // Plus dans le téléphone : il est parti entre-temps, le serveur l'a. Hors ligne, la
+      // prochaine lecture de la liste le montrera de nouveau.
+      if (!(await retirerPinEnAttente(p.id)) && navigator.onLine)
+        await supprimerPin(p.id).catch(() => undefined)
+    },
+    // Sorti du cache tout de suite : une relecture ratée ne doit pas le « ressusciter ».
+    onSuccess: (_r, p) => {
+      queryClient.setQueryData<PinAffiche[]>(PINS, (liste) => liste?.filter((x) => x.id !== p.id))
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: PINS }),
   })
