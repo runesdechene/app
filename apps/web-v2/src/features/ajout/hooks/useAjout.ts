@@ -4,15 +4,13 @@
  * POURQUOI — poser le lieu envoie d'abord les photos (une à une), puis crée le lieu avec la
  *            position du téléphone si elle est déjà accordée : la base décide alors si la visite
  *            compte (200 m). Ensuite la carte, l'Accueil et le profil se relisent : le lieu y est.
- * ATTENTION — l'endroit (Nominatim) n'est demandé qu'une fois la carte posée, arrondi à une
- *            dizaine de mètres : glisser la carte ne déclenche pas une rafale de questions.
+ * ATTENTION — l'endroit en mots vit dans shared/hooks/useEndroit (partagé avec le pin GPS).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { envoyerPhotos } from '@/shared/supabase/photos'
 import { ajouterLieu, fetchEpoques, fetchNatures, fetchVoisins } from '../api/ajout'
-import { endroitDe } from '@/shared/lib/adresse'
 import { jeterBrouillon, type Brouillon } from '../lib/brouillon'
 
 export function useNatures() {
@@ -40,17 +38,6 @@ export function useVoisins(point: Point | null) {
     enabled: point !== null,
   })
   return query.data ?? []
-}
-
-export function useEndroit(point: Point | null) {
-  const query = useQuery({
-    queryKey: ['ajout', 'endroit', ...cle(point)],
-    queryFn: ({ signal }) => (point ? endroitDe(point, signal) : null),
-    enabled: point !== null,
-    staleTime: Infinity,
-    retry: false,
-  })
-  return query.data ?? null
 }
 
 // La pose en cours se lit ailleurs (on ne quitte pas le parcours pendant qu'elle part).
