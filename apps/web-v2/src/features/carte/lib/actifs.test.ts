@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 import type { Actif } from '../api/lireActifs'
-import { ajouterZones, cercle, distanceDe, parProximite, ZONES, zonesEnGeoJSON } from './actifs'
+import { ajouterZones, distanceDe, parProximite, ZONES, zonesEnGeoJSON } from './actifs'
 
 const actif = (id: string, lat: number, lng: number, autre: Partial<Actif> = {}): Actif => ({
   id,
@@ -30,14 +30,6 @@ test('la distance : exacte, approchée si brouillée, rien sans position', () =>
   expect(distanceDe(actif('a', 43.7, 7.4), NICE)).toBe('11 km')
   expect(distanceDe(actif('b', 44.0, 7.26, { brouille: true }), NICE)).toBe('~ 33 km')
   expect(distanceDe(actif('c', 44, 7), null)).toBeNull()
-})
-
-test('un cercle fermé, au bon rayon', () => {
-  const points = cercle(45, 1, 50)
-  expect(points[0]).toEqual(points.at(-1))
-  const [lng, lat] = points[0] ?? [0, 0]
-  const km = Math.hypot((lat - 45) * 111, (lng - 1) * 111 * Math.cos((45 * Math.PI) / 180))
-  expect(Math.round(km)).toBe(50)
 })
 
 test('des zones pour les seuls brouillés, qui savent s’ils sont récents', () => {

@@ -10,5 +10,7 @@
   passe par là, sinon la V1 renvoie aussitôt vers la V2.
 - `signe.ts` — « sous le signe de … », article accordé au nom du Fragment : le profil et la carte
   d'un Explorateur (zone Carte) le disent pareil.
+- `cercle.ts` — un cercle de rayon donné, en polygone MapLibre : la zone d'un Explorateur brouillé
+  (Carte) et le cercle d'un pin GPS (étape « Où » de l'ajout).
 - `image.ts` — une image de Supabase à la taille où on l'affiche (redimensionnée à la volée) : toute
   image distante passe par là.

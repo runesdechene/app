@@ -7,6 +7,7 @@
  */
 import type { Feature, FeatureCollection, Polygon } from 'geojson'
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
+import { cercle } from '@/shared/lib/cercle'
 import { distanceKm, formatDistance, type Point } from '@/shared/lib/distance'
 import { ilYA } from '@/shared/lib/ilYA'
 import type { Actif } from '../api/lireActifs'
@@ -31,20 +32,6 @@ export function distanceDe(actif: Actif, moi: Point | null): string | null {
   if (!moi) return null
   const texte = formatDistance(distanceKm(moi, position(actif)))
   return actif.brouille ? `~ ${texte}` : texte
-}
-
-// Un cercle sur la carte, en [lng, lat] : le premier point referme le tracé.
-export function cercle(lat: number, lng: number, km: number, n = 48): [number, number][] {
-  const points: [number, number][] = []
-  for (let i = 0; i < n; i++) {
-    const angle = (2 * Math.PI * i) / n
-    points.push([
-      lng + (km / (111 * Math.cos((lat * Math.PI) / 180))) * Math.sin(angle),
-      lat + (km / 111) * Math.cos(angle),
-    ])
-  }
-  const premier = points[0]
-  return premier ? [...points, premier] : points
 }
 
 type Zone = { id: string; recent: boolean }
