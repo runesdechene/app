@@ -12,12 +12,27 @@ import type { Ajout } from '../api/lireAjout'
 import type { Brouillon, Etape } from '../lib/brouillon'
 import styles from './EtapeApercu.module.css'
 
+// Le pin complété n'existe plus (supprimé, fermé par « C'est lui » ou complété ailleurs) : la
+// base refuse tout ajout qui le cite (428, P0002).
+function pinIntrouvable(erreur: unknown): boolean {
+  return (
+    typeof erreur === 'object' &&
+    erreur !== null &&
+    'code' in erreur &&
+    erreur.code === 'P0002' &&
+    'message' in erreur &&
+    typeof erreur.message === 'string' &&
+    erreur.message.includes('Pin introuvable')
+  )
+}
+
 // La base refuse avec un indice (hint) ou un code (migration 381) : chacun a sa phrase.
 function messageDeRefus(erreur: unknown): string {
   const indice =
     typeof erreur === 'object' && erreur !== null && 'hint' in erreur ? erreur.hint : null
   const code =
     typeof erreur === 'object' && erreur !== null && 'code' in erreur ? erreur.code : null
+  if (pinIntrouvable(erreur)) return 'Ton pin n’existe plus : le lieu sera ajouté à distance.'
   if (indice === 'decouvertes') {
     return 'Découvre d’abord trois lieux sur la carte : ils t’apprennent ce qu’on y cherche. Ton brouillon t’attend.'
   }
@@ -32,10 +47,12 @@ function messageDeRefus(erreur: unknown): string {
 
 export function EtapeApercu({
   brouillon,
+  changer,
   onAller,
   onPose,
 }: {
   brouillon: Brouillon
+  changer: (modif: Partial<Brouillon>) => void
   onAller: (etape: Etape) => void
   onPose: (ajout: Ajout) => void
 }) {
@@ -153,6 +170,10 @@ export function EtapeApercu({
             poser.mutate(brouillon, {
               onSuccess: (ajout) => {
                 onPose(ajout)
+              },
+              // Le brouillon oublie son pin (et l'enregistre) : le prochain essai passe à distance.
+              onError: (erreur) => {
+                if (brouillon.pin && pinIntrouvable(erreur)) changer({ pin: null })
               },
             })
           }}

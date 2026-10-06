@@ -80,7 +80,9 @@ test('sur téléphone, un onglet ne démarre qu’à sa première visite, puis r
   await act(async () => {
     await router.navigate('/carte')
   })
-  expect(await screen.findByTestId('carte')).toBeInTheDocument()
+  // Premier chargement de la carte (import paresseux) : sous la charge de toute la suite, il
+  // dépasse parfois la seconde d'attente par défaut.
+  expect(await screen.findByTestId('carte', {}, { timeout: 5000 })).toBeInTheDocument()
   await act(async () => {
     await router.navigate('/accueil')
   })
