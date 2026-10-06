@@ -31,6 +31,7 @@ const PASSED_INLINE = new Set([
   '--couleur', // la couleur d'une Compagnie (mig 422)
   '--encre-compagnie', // son encre lisible (shared/lib/teinte.ts)
   '--sur-couleur',
+  '--taille', // la taille d'un tampon photo, posée par la rangée qui le contient
 ])
 
 const cssFiles = readdirSync(SRC, { recursive: true, encoding: 'utf8' })

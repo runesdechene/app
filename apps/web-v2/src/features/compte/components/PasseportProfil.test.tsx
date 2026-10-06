@@ -2,7 +2,7 @@
  * QUOI     — le passeport sur le profil : un tampon par nature, les comptes, le lien d'ouverture.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import type { Passeport } from '../api/lirePasseport'
@@ -38,11 +38,9 @@ beforeEach(() => {
   api.fetchPasseport.mockResolvedValue(PASSEPORT)
 })
 
-function afficher() {
+function afficher(client = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
   render(
-    <QueryClientProvider
-      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
-    >
+    <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={['/compte/explorateur/u1']}>
         <Routes>
           <Route path="/:tab/explorateur/:id" element={<PasseportProfil id="u1" />} />
@@ -60,7 +58,7 @@ test('un tampon par nature, les manquantes en pointillés', async () => {
 
 test('le titre, les comptes et le lien d’ouverture', async () => {
   afficher()
-  expect(await screen.findByRole('heading', { name: /Passeport\s*3/ })).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: /Passeport\s*3 tampons/ })).toBeInTheDocument()
   expect(screen.getByText('2 départements · 2 pays')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Ouvrir le passeport ›' })).toHaveAttribute(
     'href',
@@ -92,4 +90,15 @@ test('erreur : une ligne et Réessayer', async () => {
   afficher()
   expect(await screen.findByText('Le passeport n’a pas pu s’ouvrir.')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
+})
+
+test('une visite invalide ["explorateur"] : le passeport se recharge', async () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  afficher(client)
+  expect(await screen.findByRole('heading', { name: /3 tampons/ })).toBeInTheDocument()
+  api.fetchPasseport.mockResolvedValue({ ...PASSEPORT, tampons: [...PASSEPORT.tampons, T('d')] })
+  await client.invalidateQueries({ queryKey: ['explorateur'] })
+  await waitFor(() => {
+    expect(screen.getByRole('heading', { name: /4 tampons/ })).toBeInTheDocument()
+  })
 })

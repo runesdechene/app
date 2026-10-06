@@ -41,8 +41,8 @@ export function LieuCarte({
   lieu: LieuDeCarte
   position: Point | null
   avecAuteur: boolean
-  pastille?: string
-  coin?: ReactNode
+  pastille?: string | undefined
+  coin?: ReactNode | undefined
 }) {
   const distance =
     position && lieu.latitude !== null && lieu.longitude !== null

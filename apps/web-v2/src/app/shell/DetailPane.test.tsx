@@ -27,6 +27,9 @@ vi.mock('@/features/compte/api/monProfil', () => ({
   titresDebloques: () => Promise.resolve([]),
   choisirSigne: () => Promise.resolve(),
 }))
+vi.mock('@/features/compte/api/passeport', () => ({
+  fetchPasseport: () => Promise.resolve(null),
+}))
 vi.mock('@/features/compte/api/preferences', () => ({
   mesPreferences: () => Promise.resolve({ titleGender: 'm' }),
 }))

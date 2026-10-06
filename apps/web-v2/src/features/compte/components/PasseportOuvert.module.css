@@ -54,13 +54,21 @@
   font-weight: var(--weight-gras);
 }
 
+/* 4 tampons qui se recouvrent d'un quart : 3,25 tailles de large, donc 30 % de la rangée au
+   plus chacun (97,5 %) ; 96 px quand la place le permet. */
 .tampons {
   display: flex;
+  min-width: 0;
   padding-bottom: var(--space-2);
+  container-type: inline-size;
+}
+
+.tampons > * {
+  --taille: min(96px, 30cqw);
 }
 
 .tampons > * + * {
-  margin-left: calc(var(--space-6) * -1);
+  margin-left: calc(var(--taille) * -0.25);
 }
 
 .tampons > :nth-child(odd) {

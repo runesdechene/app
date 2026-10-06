@@ -41,7 +41,10 @@ export function PasseportProfil({ id }: { id: string }) {
   return (
     <section className={styles.section} aria-label="Passeport">
       <h2 className={styles.titre}>
-        Passeport <span className={styles.nombre}>{passeport.tampons.length}</span>
+        Passeport{' '}
+        <span className={styles.nombre}>
+          {accorder(passeport.tampons.length, 'tampon', 'tampons')}
+        </span>
       </h2>
       <div className={styles.page}>
         {parNature(passeport.natures, passeport.tampons).map((n) => (

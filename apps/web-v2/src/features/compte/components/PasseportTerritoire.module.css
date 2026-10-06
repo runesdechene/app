@@ -1,6 +1,6 @@
 /*
  * QUOI     — le détail d'un territoire : résumé, natures, puis un mois par rangée qui défile
- *            (même carrousel que les sections du profil), les mois anciens en lignes repliées.
+ *            (même carrousel que les sections du profil), les mois anciens repliés (le titre du mois les ouvre).
  */
 .page {
   display: grid;
@@ -11,8 +11,7 @@
 
 .resume,
 .rubrique,
-.natures,
-.replie {
+.natures {
   margin: 0 var(--space-6);
 }
 
@@ -45,6 +44,14 @@
 
 .cadre {
   display: flex;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 calc(var(--space-2) * -1);
+  }
 }
 
 /* Le haut de la rangée laisse la place au tampon qui déborde du coin des cartes. */
@@ -64,18 +71,26 @@
   display: none;
 }
 
-.replie {
-  justify-self: start;
+.bascule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: 0;
   border: 0;
   background: none;
-  color: var(--color-texte-doux);
-  font-family: var(--font-condensee);
-  font-size: var(--libelle-size);
-  font-weight: var(--weight-gras);
-  letter-spacing: var(--libelle-tracking);
-  text-transform: uppercase;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   cursor: pointer;
+}
+
+.chevron {
+  transition: rotate var(--duree-douce) var(--courbe-douce);
+}
+
+.bascule[aria-expanded='true'] .chevron {
+  rotate: 90deg;
 }
 
 .etat {
@@ -103,4 +118,11 @@
   margin: var(--space-4) var(--space-6);
   border-radius: var(--radius-carte);
   background: var(--color-barre);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cadre,
+  .chevron {
+    transition: none;
+  }
 }

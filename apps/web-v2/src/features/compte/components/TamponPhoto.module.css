@@ -1,13 +1,13 @@
 /*
- * QUOI     — disque de 96 px cerclé de pointillés à la couleur de la nature ; la photo en
+ * QUOI     — disque de 96 px (ou `--taille`) cerclé de pointillés à la couleur de la nature ; la photo en
  *            bichrome dedans ; la date en pastille crème à cheval sur le bas.
  */
 .tampon {
   position: relative;
   display: inline-block;
   flex: none;
-  width: 96px;
-  height: 96px;
+  width: var(--taille, 96px);
+  height: var(--taille, 96px);
 }
 
 .disque {

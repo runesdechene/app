@@ -24,7 +24,7 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
         position={position}
         avecAuteur={false}
       />
-      <PasseportProfil id={profil.id} />
+      {profil.nbVisites > 0 && <PasseportProfil id={profil.id} />}
       {profil.envies && (
         <Section titre="Envie d’y aller" lieux={profil.envies} position={position} avecAuteur />
       )}

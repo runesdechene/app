@@ -91,11 +91,26 @@ test('page 3 : résumé, deux mois ouverts, les autres repliés et dépliables',
   const octobre = screen.getByRole('region', { name: /octobre 2026/i })
   expect(within(octobre).getAllByRole('link')).toHaveLength(6)
   expect(within(octobre).getByText('6 oct.')).toBeInTheDocument()
-  expect(screen.getByRole('region', { name: /septembre 2026/i })).toBeInTheDocument()
+  expect(within(octobre).getByRole('button', { name: /octobre 2026/i })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  )
+  expect(
+    within(screen.getByRole('region', { name: /septembre 2026/i })).getByRole('link'),
+  ).toBeInTheDocument()
   const aout = screen.getByRole('button', { name: /août 2026 · 1 tampon/i })
+  expect(aout).toHaveAttribute('aria-expanded', 'false')
   expect(screen.queryByRole('link', { name: /Lieu h/ })).not.toBeInTheDocument()
   await userEvent.click(aout)
+  expect(aout).toHaveAttribute('aria-expanded', 'true')
+  expect(aout).toHaveFocus()
   expect(screen.getByRole('link', { name: /Lieu h/ })).toBeInTheDocument()
+})
+
+test('page 3 : la carte ne répète pas la nature (aucun tampon annoncé)', async () => {
+  afficher('/compte/explorateur/u1/passeport/Alpes-Maritimes')
+  await screen.findByRole('link', { name: /Lieu a/ })
+  expect(screen.queryByRole('img', { name: /Châteaux : 1 lieu/ })).not.toBeInTheDocument()
 })
 
 test('page 3 : chez un autre, pas de pastille du jour', async () => {
