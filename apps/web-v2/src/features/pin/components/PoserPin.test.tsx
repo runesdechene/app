@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
+import { FausseCarte } from '@/test/fausseCarte'
 
 const position = vi.hoisted(() => ({ usePositionPrecise: vi.fn() }))
 vi.mock('@/shared/hooks/usePositionPrecise', () => ({ ...position, PRECISION_MAX_M: 200 }))
@@ -63,4 +64,11 @@ test('posé sans réseau : il partira tout seul', () => {
   expect(screen.getByRole('heading', { name: 'Ton pin est posé' })).toBeInTheDocument()
   expect(screen.getByText(/il partira tout seul/)).toBeInTheDocument()
   expect(screen.getByText(/Prends tes photos avec ton téléphone/)).toBeInTheDocument()
+})
+
+test('la carte n’est pas interactive et se centre sur la position connue', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  monter()
+  expect(FausseCarte.derniere?.options).toMatchObject({ interactive: false })
+  expect(FausseCarte.derniere?.jumpTo).toHaveBeenCalledWith({ center: [7.2, 43.7], zoom: 16 })
 })

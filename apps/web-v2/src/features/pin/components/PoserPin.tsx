@@ -39,6 +39,8 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
       container: conteneur.current,
       center: [2.4, 46.6],
       zoom: 5,
+      // « Ta position » : la carte ne se glisse ni ne se zoome, le repère reste sur le point.
+      interactive: false,
       attributionControl: { compact: true },
     })
     map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current) })
@@ -53,9 +55,15 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
     }
   }, [enLigne])
 
+  // Dépend de la latitude / longitude (pas de l'objet) et de enLigne : la carte recréée au retour
+  // du réseau se recentre aussitôt, sans attendre le prochain relevé GPS.
+  const latitude = point?.latitude
+  const longitude = point?.longitude
   useEffect(() => {
-    if (point) carte.current?.jumpTo({ center: [point.longitude, point.latitude], zoom: ZOOM })
-  }, [point])
+    if (latitude !== undefined && longitude !== undefined) {
+      carte.current?.jumpTo({ center: [longitude, latitude], zoom: ZOOM })
+    }
+  }, [latitude, longitude, enLigne])
 
   const changerVue = (v: VueCarte) => {
     setVue(v)

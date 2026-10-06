@@ -22,7 +22,10 @@ export class FausseCarte {
   jumpTo = vi.fn()
   easeTo = vi.fn()
 
-  constructor() {
+  options: unknown
+
+  constructor(options?: unknown) {
+    this.options = options
     FausseCarte.derniere = this
   }
 
