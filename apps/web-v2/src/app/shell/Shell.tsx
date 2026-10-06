@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : logotype, la cloche, barre d'onglets, les cinq écrans
+ * QUOI     — la coquille : logotype, la coupe et la cloche, barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
  *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
@@ -26,6 +26,7 @@ import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
+import coupe from '@/assets/ui/coupe.svg'
 import embleme from '@/assets/ui/embleme.png'
 import engrenage from '@/assets/ui/engrenage.svg'
 import logotype from '@/assets/ui/logotype.webp'
@@ -181,6 +182,17 @@ export function Shell() {
         {/* Uriel, 01/10 : le numéro qui dit que le dernier déploiement est arrivé. */}
         <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>
+          {/* Tous les titres (Uriel, 06/10) : au-dessus de la cloche sur PC, à sa gauche au téléphone. */}
+          <button
+            type="button"
+            className={styles.action}
+            aria-label="Tous les titres"
+            onClick={() => {
+              ouvrir('titres')
+            }}
+          >
+            <img src={coupe} alt="" />
+          </button>
           <button
             ref={boutonNotifications}
             type="button"
