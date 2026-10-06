@@ -1,0 +1,175 @@
+/*
+ * QUOI     — le panneau « Tous les titres » (maquette 112:107) : cartes parchemin par chemin,
+ *            gélules pleines (obtenu) ou en pointillés (à gagner), portées cerclées de rouge ;
+ *            « D'une autre époque » en pointillés.
+ */
+.page {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+}
+
+.resume {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.compte {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+}
+
+.nombre {
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+}
+
+.aide,
+.explication {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.explication {
+  font-style: italic;
+}
+
+.chemin,
+.ancien {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+}
+
+.ancien {
+  border-style: dashed;
+  background: none;
+}
+
+.entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.nomChemin,
+.nomAncien {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.nomAncien {
+  color: var(--color-texte-doux);
+}
+
+.compteur,
+.seuil {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.titres {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.progres {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+}
+
+.gelules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.gelule {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px dashed var(--color-texte-doux);
+  border-radius: var(--radius-rond);
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  cursor: pointer;
+  transition: transform var(--duree-douce) var(--courbe-douce);
+}
+
+.gelule:active {
+  transform: scale(0.97);
+}
+
+.gelule[data-obtenu] {
+  border: 1px solid transparent;
+  background: var(--color-pilule);
+  color: var(--color-encre);
+}
+
+.gelule[data-porte] {
+  border-color: var(--color-accent);
+}
+
+.marque {
+  color: var(--color-ocre);
+}
+
+.porte {
+  color: var(--color-texte-doux);
+}
+
+/* Obtenu ou à gagner : la couleur le montre, ce texte le dit au lecteur d'écran. */
+.pourLecteur {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+}
+
+.chargement {
+  min-height: 240px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gelule {
+    transition: none;
+  }
+}

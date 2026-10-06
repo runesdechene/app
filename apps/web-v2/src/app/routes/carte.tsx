@@ -1,7 +1,7 @@
 /**
  * QUOI     — les adresses de l'en-tête, branchées sur la coquille : la feuille « Ajouter », le
  *            parcours « Ajouter un lieu », le pin GPS (poser, sa petite carte, le compléter), les
- *            notifications et les nouveautés de l'app.
+ *            notifications, les nouveautés de l'app et tous les titres.
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que ses écrans
  *            reçoivent le cadre de détail et la fonction de fermeture.
  * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
@@ -22,6 +22,7 @@ import {
 } from '@/features/pin/hooks/usePins'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
+import { PageTitres } from '@/features/titres/components/PageTitres'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
@@ -181,6 +182,15 @@ export function RouteNouveautes() {
   return (
     <DetailPane title="Nouveautés">
       <Nouveautes />
+    </DetailPane>
+  )
+}
+
+// /<onglet>/titres — tous les titres, ouverts depuis la coupe (maquette 112:107)
+export function RouteTitres() {
+  return (
+    <DetailPane title="Tous les titres">
+      <PageTitres />
     </DetailPane>
   )
 }

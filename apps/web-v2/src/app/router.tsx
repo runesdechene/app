@@ -21,6 +21,7 @@ import {
   RouteCompleterPin,
   RouteNotifications,
   RouteNouveautes,
+  RouteTitres,
 } from './routes/carte'
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
@@ -59,6 +60,7 @@ export const routes: RouteObject[] = [
               { path: 'ajouter/pin/:id/completer', Component: RouteCompleterPin },
               { path: 'notifications', Component: RouteNotifications },
               { path: 'nouveautes', Component: RouteNouveautes },
+              { path: 'titres', Component: RouteTitres },
               { path: 'lieu/:id', Component: RouteLieu },
               { path: 'lieu/:id/modifier', Component: RouteModifierLieu },
               { path: 'lieu/:id/carnet', Component: RouteCarnet },

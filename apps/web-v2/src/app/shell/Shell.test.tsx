@@ -54,6 +54,9 @@ const registre = vi.hoisted(() => ({
   chercherExplorateurs: () => Promise.resolve([]),
 }))
 vi.mock('@/features/messages/api/registre', () => registre)
+vi.mock('@/features/titres/api/mesTitres', () => ({
+  fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [], autreEpoque: [] }),
+}))
 beforeEach(() => {
   murmures.fetchFils.mockResolvedValue([])
   registre.fetchRegistreNonLus.mockResolvedValue({ messages: 0, mentions: 0 })
@@ -270,4 +273,20 @@ test('sur PC, Préférences et Déconnexion sont dans la barre, sous la cloche',
   await userEvent.click(await screen.findByRole('button', { name: 'Préférences' }))
   expect(router.state.location.pathname).toBe('/carte/preferences')
   expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+})
+
+test('la coupe ouvre « Tous les titres » ; fermer ramène à l’onglet', async () => {
+  const router = renderAt(['/accueil', '/accueil/chemins'])
+  await userEvent.click(await screen.findByRole('button', { name: 'Tous les titres' }))
+  expect(router.state.location.pathname).toBe('/accueil/titres')
+  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  await vi.waitFor(() => {
+    expect(router.state.location.pathname).toBe('/accueil')
+  })
+})
+
+test('la coupe est là sur la carte aussi, à côté de la cloche', async () => {
+  renderAt('/carte')
+  expect(await screen.findByRole('button', { name: 'Tous les titres' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
 })

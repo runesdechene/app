@@ -61,12 +61,10 @@ const PROFIL: ExplorateurProfile = {
 }
 vi.mock('../api/explorateur', () => ({ fetchExplorateur: () => Promise.resolve(PROFIL) }))
 
-function ouvrir() {
+function ouvrir(client = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
   const onTermine = vi.fn()
   render(
-    <QueryClientProvider
-      client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
-    >
+    <QueryClientProvider client={client}>
       <ModifierProfil onTermine={onTermine} />
     </QueryClientProvider>,
   )
@@ -170,4 +168,15 @@ test('changer deux fois de photo libère le premier aperçu', async () => {
   await userEvent.upload(choix, new File(['b'], 'b.jpg', { type: 'image/jpeg' }))
   expect(revoke).toHaveBeenCalledWith('blob:1')
   vi.unstubAllGlobals()
+})
+
+test('après Enregistrer, « Tous les titres » relit les titres portés', async () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  client.setQueryData(['mes-titres'], { obtenus: 0, total: 0, chemins: [], autreEpoque: [] })
+  ouvrir(client)
+  await userEvent.click(await screen.findByRole('button', { name: 'Hoplite' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+  await vi.waitFor(() => {
+    expect(client.getQueryState(['mes-titres'])?.isInvalidated).toBe(true)
+  })
 })

@@ -6865,6 +6865,7 @@ export type Database = {
       }
       get_map_veilles: { Args: never; Returns: Json }
       get_member_grade_label: { Args: { p_user_id: string }; Returns: string }
+      get_mes_titres: { Args: never; Returns: Json }
       get_mission_participants: {
         Args: { p_limit?: number; p_slug: string }
         Returns: Json

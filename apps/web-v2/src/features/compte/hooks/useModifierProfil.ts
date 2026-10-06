@@ -63,6 +63,8 @@ export function useModifierProfil(): {
     } finally {
       await queryClient.invalidateQueries({ queryKey: explorateurKey(moi ?? '') })
       await queryClient.invalidateQueries({ queryKey: ['preferences'] })
+      // « Tous les titres » dit lesquels sont portés (zone titres, même clé).
+      await queryClient.invalidateQueries({ queryKey: ['mes-titres'] })
     }
   }
 
