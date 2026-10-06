@@ -289,6 +289,15 @@
   text-align: center;
 }
 
+/* Le cercle d'un pin encore frais : dedans, « sur place » ; dehors, ajouté à distance. */
+.visite[data-cercle='dedans'] {
+  color: var(--color-succes);
+}
+
+.visite[data-cercle='dehors'] {
+  color: var(--color-accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .medaillon,
   .pointe,

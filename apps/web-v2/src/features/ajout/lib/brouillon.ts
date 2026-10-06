@@ -16,6 +16,9 @@ export type Etape = (typeof ETAPES)[number]
 
 export type PhotoBrouillon = PhotoAEnvoyer
 
+// Le pin GPS qu'on complète : sa date en texte ISO (IndexedDB garde le brouillon tel quel).
+export type PinDuBrouillon = { id: string; point: Point; poseLe: string }
+
 export type Brouillon = {
   etape: Etape
   photos: PhotoBrouillon[]
@@ -27,6 +30,7 @@ export type Brouillon = {
   epoque: string | null // null : « je ne sais pas »
   annee: number | null
   recit: string
+  pin: PinDuBrouillon | null // le pin qu'on complète (spec pin GPS) : sa position prime
 }
 
 export const BROUILLON_VIDE: Brouillon = {
@@ -40,6 +44,12 @@ export const BROUILLON_VIDE: Brouillon = {
   epoque: null,
   annee: null,
   recit: '',
+  pin: null,
+}
+
+// Compléter un pin : un brouillon neuf, à sa position ; les photos viennent de la galerie.
+export function brouillonDuPin(p: { id: string; point: Point; poseLe: Date }): Brouillon {
+  return { ...BROUILLON_VIDE, pin: { id: p.id, point: p.point, poseLe: p.poseLe.toISOString() } }
 }
 
 // Ce que chaque étape reçoit du parcours.

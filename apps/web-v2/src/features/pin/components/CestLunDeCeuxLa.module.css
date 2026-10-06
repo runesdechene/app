@@ -1,0 +1,111 @@
+/*
+ * QUOI     — « C'est l'un de ceux-là ? » (maquette « Pin GPS — 5 ») : titre Bebas, une ligne
+ *            bordée par lieu proche (comme le voisin de l'étape « Où »), « C'est lui » plein,
+ *            « Non, c'est un autre lieu » bordé pleine largeur, une note en italique.
+ */
+.titre {
+  margin: 0 0 var(--space-1);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.detail {
+  margin: 0 0 var(--space-3);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.lieu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+}
+
+.photo {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius);
+  background: var(--color-sable);
+  object-fit: cover;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+.distance {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.cestLui {
+  flex: none;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.cestLui:disabled {
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+  cursor: default;
+}
+
+.autre {
+  width: 100%;
+  min-height: 50px;
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.erreur {
+  margin: var(--space-2) 0 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: center;
+}
+
+.note {
+  margin: var(--space-3) 0 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}

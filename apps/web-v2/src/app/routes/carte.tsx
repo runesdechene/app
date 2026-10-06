@@ -1,14 +1,20 @@
 /**
  * QUOI     — les adresses de l'en-tête, branchées sur la coquille : la feuille « Ajouter », le
- *            parcours « Ajouter un lieu », les notifications et les nouveautés de l'app.
+ *            parcours « Ajouter un lieu », le pin GPS (poser, sa petite carte, le compléter), les
+ *            notifications et les nouveautés de l'app.
  * POURQUOI — la zone ne connaît pas la coquille (règle ESLint) : c'est ici que ses écrans
  *            reçoivent le cadre de détail et la fonction de fermeture.
  * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
  */
-import { lazy, Suspense, useContext } from 'react'
+import { lazy, Suspense, useCallback, useContext, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
+import { DepuisUnPin } from '@/features/ajout/components/DepuisUnPin'
+import { CestLunDeCeuxLa } from '@/features/pin/components/CestLunDeCeuxLa'
+import { FichePin } from '@/features/pin/components/FichePin'
+import { TesPins } from '@/features/pin/components/TesPins'
+import { useMesPins } from '@/features/pin/hooks/usePins'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
@@ -20,9 +26,27 @@ const ParcoursAjout = lazy(() =>
   import('@/features/ajout/components/ParcoursAjout').then((m) => ({ default: m.ParcoursAjout })),
 )
 
-// /<onglet>/ajouter — la feuille du « + » (maquette 201:216)
+// /<onglet>/ajouter — la feuille du « + » (maquette 201:216) ; « Tes pins » en tête (zone pin),
+// posé ici : la zone ajout ne connaît pas la zone pin.
 export function RouteAjouter() {
-  return <AjouterFeuille onFermer={useFermerDetail()} />
+  const { tab = 'carte' } = useParams()
+  const navigate = useNavigate()
+  const pins = useMesPins()
+  return (
+    <AjouterFeuille
+      onFermer={useFermerDetail()}
+      enTete={
+        pins.length > 0 ? (
+          <TesPins
+            pins={pins}
+            onOuvrir={(id) => {
+              void navigate(`/${tab}/ajouter/pin/${id}`, { replace: true })
+            }}
+          />
+        ) : undefined
+      }
+    />
+  )
 }
 
 // /<onglet>/ajouter/lieu/<étape> — le parcours « Ajouter un lieu ». Quitter revient d'une entrée
@@ -64,6 +88,58 @@ export function RoutePoserPin() {
     </Suspense>
   )
   return racine ? createPortal(ecran, racine) : ecran
+}
+
+// /<onglet>/ajouter/pin/:id — la petite carte d'un pin (maquette « Pin GPS — 4 »)
+export function RouteFichePin() {
+  const { tab = 'carte', id = '' } = useParams()
+  const navigate = useNavigate()
+  return (
+    <FichePin
+      id={id}
+      onFermer={useFermerDetail()}
+      onCompleter={() => {
+        void navigate(`/${tab}/ajouter/pin/${id}/completer`, { replace: true })
+      }}
+    />
+  )
+}
+
+// /<onglet>/ajouter/pin/:id/completer — « C'est l'un de ceux-là ? » (maquette « Pin GPS — 5 »),
+// puis le parcours d'ajout sur un brouillon né du pin (« Remplacer ton brouillon en cours ? »
+// d'abord, si un autre attend).
+export function RouteCompleterPin() {
+  const { tab = 'carte', id = '' } = useParams()
+  const navigate = useNavigate()
+  const fermer = useFermerDetail()
+  const pin = useMesPins().find((p) => p.id === id)
+  const [autre, setAutre] = useState(false)
+  // Stable : la feuille l'appelle d'elle-même quand aucun lieu n'est proche.
+  const versAjout = useCallback(() => {
+    setAutre(true)
+  }, [])
+  if (!pin) return null
+  if (autre) {
+    return (
+      <DepuisUnPin
+        pin={pin}
+        onOuvrir={() => {
+          void navigate(`/${tab}/ajouter/lieu/photo`, { replace: true })
+        }}
+      />
+    )
+  }
+  return (
+    <CestLunDeCeuxLa
+      pin={pin.id}
+      poseLe={pin.poseLe}
+      onVisite={(lieu) => {
+        void navigate(`/${tab}/lieu/${lieu}`, { replace: true })
+      }}
+      onAutre={versAjout}
+      onFermer={fermer}
+    />
+  )
 }
 
 // /<onglet>/notifications

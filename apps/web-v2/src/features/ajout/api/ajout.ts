@@ -48,6 +48,8 @@ export async function ajouterLieu(b: Brouillon, images: ImageEnvoyee[], ici: Poi
     ...(b.epoque !== null && { p_epoque: b.epoque }),
     ...(b.annee !== null && { p_annee: b.annee }),
     ...(ici && { p_ma_latitude: ici.latitude, p_ma_longitude: ici.longitude }),
+    // Un pin (427) : la base juge « sur place » sur lui.
+    ...(b.pin && { p_pin: b.pin.id }),
   })
   if (error) throw error
   return lireAjout(data)

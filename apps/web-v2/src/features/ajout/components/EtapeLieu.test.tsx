@@ -113,3 +113,23 @@ test('« C’est ici » garde le point où la carte s’est posée, et son adres
   )
   expect(suivant).toHaveBeenCalled()
 })
+
+test('le pin prime sur la photo : la carte part du pin, et le cercle juge', async () => {
+  monter({
+    ...brouillon,
+    positionPhoto: { latitude: 45, longitude: 5 },
+    pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: new Date().toISOString() },
+  })
+  expect(FausseCarte.derniere?.options).toEqual(expect.objectContaining({ center: [7.2, 43.7] }))
+  expect(await screen.findByText(/Placé d’après ton pin/)).toBeInTheDocument()
+  expect(screen.getByText(/Dans le cercle de ton pin/)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Mon pin/ })).toBeInTheDocument()
+})
+
+test('un pin de plus de 15 jours : le lieu sera ajouté à distance', async () => {
+  monter({
+    ...brouillon,
+    pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-01-01T12:00:00Z' },
+  })
+  expect(await screen.findByText(/Ton pin a plus de 15 jours/)).toBeInTheDocument()
+})

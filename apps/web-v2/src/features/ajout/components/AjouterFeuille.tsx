@@ -7,8 +7,11 @@
  *            l'a laissé.
  * ATTENTION — « Un pin GPS » ouvre /<onglet>/ajouter/pin (écran plein cadre, hors du parcours) ;
  *            seul le point d'intérêt viendra plus tard : désactivé, il le dit (« bientôt »).
+ *            « Tes pins » arrive par `enTete`, posé par la route : la zone ajout ne connaît pas
+ *            la zone pin (règle ESLint).
  */
 import { useQuery } from '@tanstack/react-query'
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import chevron from '@/assets/ui/chevron.svg'
 import lieu from '@/assets/ui/lieu.svg'
@@ -36,12 +39,13 @@ const CE_QUI_RESTE: Record<Etape, string> = {
   apercu: 'il ne reste qu’à le poser',
 }
 
-// Un brouillon qui vaut d'être repris : au moins une photo ou un nom.
+// Un brouillon qui vaut d'être repris : au moins une photo, un nom, ou le pin qu'il complète.
 function aReprendre(b: Brouillon | null): b is Brouillon {
-  return b !== null && (b.photos.length > 0 || b.nom.trim() !== '')
+  return b !== null && (b.photos.length > 0 || b.nom.trim() !== '' || b.pin !== null)
 }
 
-export function AjouterFeuille({ onFermer }: { onFermer: () => void }) {
+// `enTete` : ce que la route pose sous le titre (« Tes pins », zone pin) ; un filet le sépare.
+export function AjouterFeuille({ onFermer, enTete }: { onFermer: () => void; enTete?: ReactNode }) {
   const navigate = useNavigate()
   const { data: brouillon = null } = useQuery({
     queryKey: ['ajout', 'brouillon'],
@@ -56,6 +60,12 @@ export function AjouterFeuille({ onFermer }: { onFermer: () => void }) {
   return (
     <Feuille titre="Ajouter sur la carte" onFermer={onFermer}>
       <p className={styles.titre}>Ajouter sur la carte</p>
+      {enTete && (
+        <>
+          {enTete}
+          <hr className={styles.filet} />
+        </>
+      )}
       {aReprendre(brouillon) && <Reprendre brouillon={brouillon} onReprendre={ouvrir} />}
       <button
         type="button"

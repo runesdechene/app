@@ -57,6 +57,7 @@ export function usePoser() {
       void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
       void queryClient.invalidateQueries({ queryKey: ['accueil'] })
       void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
+      void queryClient.invalidateQueries({ queryKey: ['pins'] }) // le pin complété est publié
     },
   })
 }

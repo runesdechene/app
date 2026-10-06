@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 import {
   BROUILLON_VIDE,
+  brouillonDuPin,
   ceQuiManque,
   derniereEtapePossible,
   etapeDeReprise,
@@ -37,4 +38,16 @@ test('on ne va pas plus loin que la première étape incomplète', () => {
 test('un brouillon se reprend à l’étape gardée, jamais plus loin que possible', () => {
   expect(etapeDeReprise({ ...complet, etape: 'nom' })).toBe('nom')
   expect(etapeDeReprise({ ...complet, etape: 'apercu', recit: '' })).toBe('recit')
+})
+
+test('un brouillon né d’un pin : la position du pin, et rien d’autre', () => {
+  const b = brouillonDuPin({
+    id: 'p1',
+    point: { latitude: 43.7, longitude: 7.2 },
+    poseLe: new Date('2026-10-03T12:00:00Z'),
+  })
+  expect(b).toEqual({
+    ...BROUILLON_VIDE,
+    pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-10-03T12:00:00.000Z' },
+  })
 })

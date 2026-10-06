@@ -10,6 +10,13 @@
   font-size: var(--titre-carte-size);
 }
 
+/* Le filet sous l'en-tête reçu (« Tes pins ») : il le sépare des choix. */
+.filet {
+  margin: 0 0 var(--space-3);
+  border: none;
+  border-top: 1px solid var(--color-sable);
+}
+
 .choix {
   display: flex;
   align-items: center;

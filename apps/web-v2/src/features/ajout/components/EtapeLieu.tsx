@@ -8,6 +8,8 @@
  *            des mots. Un lieu à moins de 50 m se signale ici, pas à la fin (« c'est le même ? »).
  *            Sur place (200 m au plus de moi), la visite compte et le lieu est à mon nom ; sinon, il
  *            est « ajouté à distance » (Uriel, 30/09 ; la base en juge, mig 393).
+ *            Un pin GPS prime sur tout (spec pin GPS) : la carte part de lui, son cercle de 200 m
+ *            est dessiné, et c'est lui qui juge « sur place » (15 jours au plus ; mig 427).
  * ATTENTION — l'endroit et les voisins ne se demandent qu'une fois la carte posée (moveend) ;
  *            l'épingle se soulève pendant le glissé et retombe à l'arrêt.
  */
@@ -15,11 +17,13 @@ import { maplibregl } from '@/shared/lib/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
+import { cercle } from '@/shared/lib/cercle'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { appliquerVue, type VueCarte } from '@/shared/lib/styleSatellite'
+import { joursRestants } from '@/shared/lib/validitePin'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { useEndroit } from '@/shared/hooks/useEndroit'
 import { useVoisins } from '../hooks/useAjout'
@@ -31,15 +35,16 @@ import styles from './EtapeLieu.module.css'
 const ZOOM_PROCHE = 15
 const RAYON_VISITE_KM = 0.2 // le rayon de la visite en V2 (visiter_lieu)
 
-type Origine = 'photo' | 'moi' | 'carte' | null
+type Origine = 'pin' | 'photo' | 'moi' | 'carte' | null
 
 export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const conteneur = useRef<HTMLDivElement>(null)
   const carte = useRef<maplibregl.Map | null>(null)
-  const depart = brouillon.point ?? brouillon.positionPhoto
+  const pin = brouillon.pin
+  const depart = brouillon.point ?? pin?.point ?? brouillon.positionPhoto
   const [centre, setCentre] = useState<Point | null>(depart)
   const [origine, setOrigine] = useState<Origine>(
-    brouillon.point ? 'carte' : brouillon.positionPhoto ? 'photo' : null,
+    brouillon.point ? 'carte' : pin ? 'pin' : brouillon.positionPhoto ? 'photo' : null,
   )
   const [moi, setMoi] = useState<Point | null>(null)
   const [enMouvement, setEnMouvement] = useState(false)
@@ -51,6 +56,8 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const [vue, setVue] = useState<VueCarte>('plan')
   const couleurs = useRef(lireCouleurs(document.documentElement))
   const premiereVue = useRef(true)
+  // Le pin, lu par l'effet de naissance de la carte sans le relancer (comme le point de départ).
+  const pinDuBrouillon = useRef(pin)
 
   useEffect(() => {
     if (!conteneur.current) return
@@ -69,6 +76,27 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     // dépend du style se repose alors ; l'ombrage ignore le satellite (pas de source de relief).
     map.on('style.load', () => {
       ajouterOmbrage(map, couleurs.current)
+      const pin = pinDuBrouillon.current
+      if (pin && !map.getSource('cercle-du-pin')) {
+        const contour = cercle(pin.point.latitude, pin.point.longitude, RAYON_VISITE_KM)
+        map.addSource('cercle-du-pin', {
+          type: 'geojson',
+          data: { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [contour] } },
+        })
+        const encre = couleurs.current.encre
+        map.addLayer({
+          id: 'cercle-du-pin-voile',
+          type: 'fill',
+          source: 'cercle-du-pin',
+          paint: { 'fill-color': encre, 'fill-opacity': 0.07 },
+        })
+        map.addLayer({
+          id: 'cercle-du-pin-contour',
+          type: 'line',
+          source: 'cercle-du-pin',
+          paint: { 'line-color': encre, 'line-width': 2, 'line-dasharray': [3, 2] },
+        })
+      }
     })
     map.on('movestart', () => {
       setEnMouvement(true)
@@ -121,6 +149,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     )
   }
 
+  // Avec un pin, c'est lui qui juge : frais (15 jours) et le point dans son cercle.
+  const pinFrais = pin ? joursRestants(new Date(pin.poseLe), new Date()) > 0 : false
+  const dansLeCercle = pin && centre ? distanceKm(pin.point, centre) <= RAYON_VISITE_KM : false
   const surPlace = moi && centre ? distanceKm(moi, centre) <= RAYON_VISITE_KM : false
   const voisin = voisins[0]
 
@@ -147,6 +178,12 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
 
       <section className={styles.feuille} aria-label="C’est ici ?">
         <span className={styles.poignee} aria-hidden="true" />
+        {origine === 'pin' && pin && (
+          <p className={styles.indice}>
+            Placé d’après ton pin du{' '}
+            {new Date(pin.poseLe).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+          </p>
+        )}
         {origine === 'photo' && <p className={styles.indice}>Placé d’après ta photo</p>}
         {origine === 'moi' && <p className={styles.indice}>Placé là où tu es</p>}
         <h2 className={styles.endroit}>{endroit?.titre ?? 'Déplace la carte'}</h2>
@@ -174,8 +211,19 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
         )}
 
         <div className={styles.gestes}>
-          <button type="button" className={styles.ici} onClick={jeSuisIci}>
-            <span className={styles.cible} aria-hidden="true" /> Je suis ici
+          <button
+            type="button"
+            className={styles.ici}
+            onClick={
+              pin
+                ? () => {
+                    allerA(pin.point, 17)
+                    setOrigine('pin')
+                  }
+                : jeSuisIci
+            }
+          >
+            <span className={styles.cible} aria-hidden="true" /> {pin ? 'Mon pin' : 'Je suis ici'}
           </button>
           <button
             type="button"
@@ -190,11 +238,24 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
             C’est ici
           </button>
         </div>
-        <p className={styles.visite}>
-          {surPlace
-            ? 'Tu es sur place : ta visite comptera, et le lieu sera à ton nom.'
-            : 'Tu n’es pas sur place : le lieu sera marqué « ajouté à distance ».'}
-        </p>
+        {pin ? (
+          <p
+            className={styles.visite}
+            data-cercle={pinFrais ? (dansLeCercle ? 'dedans' : 'dehors') : undefined}
+          >
+            {!pinFrais
+              ? 'Ton pin a plus de 15 jours : le lieu sera marqué « ajouté à distance ».'
+              : dansLeCercle
+                ? 'Dans le cercle de ton pin : ta visite et ta revendication compteront.'
+                : 'Hors du cercle de ton pin : il sera ajouté à distance. Reviens dans le cercle pour le garder « sur place ».'}
+          </p>
+        ) : (
+          <p className={styles.visite}>
+            {surPlace
+              ? 'Tu es sur place : ta visite comptera, et le lieu sera à ton nom.'
+              : 'Tu n’es pas sur place : le lieu sera marqué « ajouté à distance ».'}
+          </p>
+        )}
       </section>
     </div>
   )

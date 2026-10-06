@@ -17,6 +17,8 @@ import {
   RouteAjouter,
   RouteAjouterLieu,
   RoutePoserPin,
+  RouteFichePin,
+  RouteCompleterPin,
   RouteNotifications,
   RouteNouveautes,
 } from './routes/carte'
@@ -53,6 +55,8 @@ export const routes: RouteObject[] = [
               { path: 'ajouter', Component: RouteAjouter },
               { path: 'ajouter/lieu/:etape', Component: RouteAjouterLieu },
               { path: 'ajouter/pin', Component: RoutePoserPin },
+              { path: 'ajouter/pin/:id', Component: RouteFichePin },
+              { path: 'ajouter/pin/:id/completer', Component: RouteCompleterPin },
               { path: 'notifications', Component: RouteNotifications },
               { path: 'nouveautes', Component: RouteNouveautes },
               { path: 'lieu/:id', Component: RouteLieu },

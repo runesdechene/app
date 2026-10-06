@@ -37,7 +37,7 @@ function estEtape(v: string | undefined): v is Etape {
 
 // Un brouillon qui vaut d'être gardé : au moins une photo ou un nom.
 function commence(b: Brouillon) {
-  return b.photos.length > 0 || b.nom.trim() !== ''
+  return b.photos.length > 0 || b.nom.trim() !== '' || b.pin !== null
 }
 
 // Les étapes posées sur une photo : l'en-tête passe en crème.

@@ -13,5 +13,6 @@ geste (IndexedDB) et se reprend depuis la feuille « Ajouter ».
 - `hooks/` — `useBrouillon`, `useAjout` (natures, époques, voisins, l'endroit, poser le lieu),
   `useUrlDe` (afficher une photo du brouillon).
 - `components/` — `ModifierFiche` (modifier un lieu, mig 387 : mêmes champs que l'ajout, via
-  `ChampsDuLieu`), `AjouterFeuille`, `ParcoursAjout` (le cadre), `EnTete`, `BoutonSuivant`, et une
+  `ChampsDuLieu`), `AjouterFeuille`, `ParcoursAjout` (le cadre), `EnTete`, `BoutonSuivant`,
+  `DepuisUnPin` (le brouillon né d'un pin GPS, « Remplacer ton brouillon en cours ? »), et une
   étape par fichier : `EtapePhoto`, `EtapeLieu`, `EtapeNom`, `EtapeRecit`, `EtapeApercu`.

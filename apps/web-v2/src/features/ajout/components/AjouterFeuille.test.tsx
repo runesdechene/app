@@ -5,6 +5,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { BROUILLON_VIDE } from '../lib/brouillon'
@@ -17,9 +18,14 @@ beforeEach(() => {
   stockage.get.mockResolvedValue(undefined)
 })
 
-function monter() {
+function monter(enTete?: ReactNode) {
   const router = createMemoryRouter(
-    [{ path: '/:tab/ajouter/*', element: <AjouterFeuille onFermer={() => undefined} /> }],
+    [
+      {
+        path: '/:tab/ajouter/*',
+        element: <AjouterFeuille onFermer={() => undefined} enTete={enTete} />,
+      },
+    ],
     { initialEntries: ['/carte/ajouter'] },
   )
   render(
@@ -57,4 +63,22 @@ test('un brouillon attend : on le reprend là où on l’a laissé', async () =>
   expect(reprendre).toHaveTextContent('Château de Colomars · il te reste le récit')
   await userEvent.click(reprendre)
   expect(router.state.location.pathname).toBe('/carte/ajouter/lieu/recit')
+})
+
+test('l’en-tête reçu (« Tes pins ») passe avant le brouillon à reprendre', async () => {
+  stockage.get.mockResolvedValue({ ...BROUILLON_VIDE, nom: 'Château de Colomars' })
+  monter(<p>Tes pins</p>)
+  const reprendre = await screen.findByRole('button', { name: /Reprendre ton brouillon/ })
+  const pins = screen.getByText('Tes pins')
+  expect(pins.compareDocumentPosition(reprendre) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(screen.getByRole('separator')).toBeInTheDocument()
+})
+
+test('un brouillon né d’un pin, sans photo ni nom, se reprend aussi', async () => {
+  stockage.get.mockResolvedValue({
+    ...BROUILLON_VIDE,
+    pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-10-03T12:00:00Z' },
+  })
+  monter()
+  expect(await screen.findByRole('button', { name: /Reprendre ton brouillon/ })).toBeInTheDocument()
 })
