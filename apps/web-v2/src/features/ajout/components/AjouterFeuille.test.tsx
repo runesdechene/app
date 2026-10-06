@@ -36,10 +36,11 @@ test('« Un lieu » ouvre le parcours, à sa première étape', async () => {
   expect(router.state.location.pathname).toBe('/carte/ajouter/lieu/photo')
 })
 
-test('le point d’intérêt et le pin GPS restent pour plus tard', async () => {
-  monter()
+test('le pin GPS s’ouvre ; le point d’intérêt reste pour plus tard', async () => {
+  const router = monter()
   expect(await screen.findByRole('button', { name: /Un point d’intérêt/ })).toBeDisabled()
-  expect(screen.getByRole('button', { name: /Un pin GPS/ })).toBeDisabled()
+  await userEvent.click(screen.getByRole('button', { name: /Un pin GPS/ }))
+  expect(router.state.location.pathname).toBe('/carte/ajouter/pin')
 })
 
 test('un brouillon attend : on le reprend là où on l’a laissé', async () => {

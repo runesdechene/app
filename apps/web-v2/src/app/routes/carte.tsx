@@ -5,11 +5,13 @@
  *            reçoivent le cadre de détail et la fonction de fermeture.
  * ATTENTION — la fiche d'un lieu vit dans lieu.tsx.
  */
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useContext } from 'react'
+import { createPortal } from 'react-dom'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { AjouterFeuille } from '@/features/ajout/components/AjouterFeuille'
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
+import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
@@ -45,6 +47,23 @@ export function RouteAjouterLieu() {
       />
     </Suspense>
   )
+}
+
+const PoserPin = lazy(() =>
+  import('@/features/pin/components/PoserPin').then((m) => ({ default: m.PoserPin })),
+)
+
+// /<onglet>/ajouter/pin — poser un pin GPS (maquettes « Pin GPS — 1 à 2b »). Plein écran, posé dans
+// la racine des feuilles comme le parcours d'ajout.
+export function RoutePoserPin() {
+  const racine = useContext(RacineDesFeuilles)
+  const fermer = useFermerDetail()
+  const ecran = (
+    <Suspense fallback={null}>
+      <PoserPin onFermer={fermer} />
+    </Suspense>
+  )
+  return racine ? createPortal(ecran, racine) : ecran
 }
 
 // /<onglet>/notifications

@@ -5,8 +5,8 @@
  *            « Un lieu » ouvre le parcours à la place de la feuille (l'adresse est remplacée : le
  *            retour ramène à l'onglet, pas à la feuille). Un brouillon se reprend à l'étape où on
  *            l'a laissé.
- * ATTENTION — le point d'intérêt et le pin GPS viendront plus tard, par le même parcours :
- *            désactivés, et ils le disent (« bientôt »).
+ * ATTENTION — « Un pin GPS » ouvre /<onglet>/ajouter/pin (écran plein cadre, hors du parcours) ;
+ *            seul le point d'intérêt viendra plus tard : désactivé, il le dit (« bientôt »).
  */
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
@@ -25,12 +25,6 @@ const PLUS_TARD = [
     texte:
       'Anecdote, objet, curiosité locale, établissement dans l’esprit de la marque... trop petit pour être un lieu, mais qui mérite d’être partagé aux autres membres.',
     icone: pointInteret,
-  },
-  {
-    titre: 'Un pin GPS',
-    texte:
-      'Marque ta position maintenant, et complète le plus tard. Idéal pour aller vite et profiter de ton explo.',
-    icone: pinGps,
   },
 ] as const
 
@@ -75,6 +69,23 @@ export function AjouterFeuille({ onFermer }: { onFermer: () => void }) {
           <span className={styles.nom}>Un lieu</span>
           <span className={styles.description}>
             Un lieu oublié que tu veux faire connaître : photo, récit, position.
+          </span>
+        </span>
+        <img className={styles.chevron} src={chevron} alt="" />
+      </button>
+      <button
+        type="button"
+        className={styles.choix}
+        onClick={() => {
+          void navigate('pin', { relative: 'path', replace: true })
+        }}
+      >
+        <img className={styles.icone} src={pinGps} alt="" />
+        <span className={styles.texte}>
+          <span className={styles.nom}>Un pin GPS</span>
+          <span className={styles.description}>
+            Marque ta position maintenant, et complète le plus tard. Idéal pour aller vite et profiter
+            de ton explo.
           </span>
         </span>
         <img className={styles.chevron} src={chevron} alt="" />
