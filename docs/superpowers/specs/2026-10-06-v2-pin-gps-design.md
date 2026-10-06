@@ -58,6 +58,14 @@ V2 les montre. Le **lieu-dit** est trouvé une fois, à la pose, et rangé dans 
 | `ajouter_lieu(…, p_pin)` | **un paramètre de plus**, facultatif : avec un pin, « sur place » se juge sur le pin (règles ci-dessus) au lieu de la position du téléphone ; le pin passe `published` avec `published_place_id` |
 | `visiter_depuis_pin(pin, lieu)` | le « C'est lui » : pin valide et à moins de 200 m du lieu → visite datée du pin, **sans revendication** (elle reste un geste fait sur place) ; pin périmé → il se ferme sans visite, et l'écran le dit |
 
+**La revendication sans la présence en direct** (Uriel 06/10). `revendiquer_lieu` exige une visite de moins
+de 30 minutes et une présence en direct près du lieu ; `ajouter_lieu` sur place la contourne en écrivant la
+position du téléphone dans `presences`. Avec un pin vieux de plusieurs jours, les deux contrôles échouent, et
+écrire la position du pin dans `presences` montrerait l'auteur « présent maintenant » aux autres pendant 10
+minutes. On extrait donc l'écriture de la revendication dans une fonction interne, `_revendiquer(lieu, moi,
+compagnons, nom, pour)` : `revendiquer_lieu` l'appelle après ses contrôles, `ajouter_lieu` l'appelle
+directement (pin ou sur place) et n'écrit plus dans `presences`.
+
 Les **lieux à moins de 200 m du pin** se lisent par une fonction existante si l'une convient (à vérifier
 au plan, avant d'en créer une). **Supprimer** passe par la règle RLS en place.
 
