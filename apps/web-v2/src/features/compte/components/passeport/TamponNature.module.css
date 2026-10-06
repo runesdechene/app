@@ -1,0 +1,62 @@
+/*
+ * QUOI     — un tampon rond de 46 px (32 px en « petit ») : cercle épais, cercle fin, icône
+ *            peinte à la couleur de la nature, compte en bas. Absent : pointillés pâles.
+ */
+.tampon {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2px solid var(--couleur);
+  border-radius: var(--radius-rond);
+  box-shadow: inset 0 0 0 3px var(--color-fond), inset 0 0 0 4px var(--couleur);
+  rotate: -6deg;
+}
+
+.tampon:nth-child(even) {
+  rotate: 5deg;
+}
+
+.tampon[data-taille='petit'] {
+  width: 32px;
+  height: 32px;
+}
+
+.tampon[data-encre='pale'] {
+  opacity: 0.55;
+}
+
+.tampon[data-encre='moyen'] {
+  opacity: 0.8;
+}
+
+.tampon[data-absent] {
+  border: 1.5px dashed var(--color-texte-pale);
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.icone {
+  width: 45%;
+  height: 45%;
+  background: var(--couleur);
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.tampon[data-absent] .icone {
+  background: var(--color-texte-pale);
+}
+
+.compte {
+  position: absolute;
+  bottom: -2px;
+  padding: 0 3px;
+  background: var(--color-fond);
+  color: var(--couleur);
+  font-family: var(--font-condensee);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  line-height: 1;
+}
