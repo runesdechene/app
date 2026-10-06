@@ -4,12 +4,14 @@
  *            Esri World Imagery, gratuites et sans clé, déjà utilisées par la V1
  *            (apps/explore-web/src/lib/map-style.ts) ; l'attribution est obligatoire.
  * ATTENTION — la carte globale n'a pas encore de satellite (« à terme », hors de ce chantier).
- *            Le retour au plan repose l'ombrage une seule fois (`once`) : un écouteur permanent
- *            de « style.load » le chercherait aussi sur le satellite, qui n'a pas sa source.
+ *            Chaque carte qui l'utilise garde UN gestionnaire permanent de « style.load » qui pose
+ *            ce qui dépend du style (l'ombrage, qui ignore le satellite faute de source de relief) :
+ *            `diff: false` remplace le style en entier, donc « style.load » repart à chaque
+ *            changement de vue. Aucun `once` ici : il s'empilerait avec ce gestionnaire.
  */
 import type { Map as CarteMapLibre, StyleSpecification } from 'maplibre-gl'
 import type { CouleursCarte } from './couleursCarte'
-import { ajouterOmbrage, FOND, styleParchemin } from './styleCarte'
+import { FOND, styleParchemin } from './styleCarte'
 
 export type VueCarte = 'plan' | 'satellite'
 
@@ -29,11 +31,11 @@ export const STYLE_SATELLITE: StyleSpecification = {
 
 export function appliquerVue(map: CarteMapLibre, vue: VueCarte, couleurs: CouleursCarte) {
   if (vue === 'satellite') {
-    map.setStyle(STYLE_SATELLITE)
+    map.setStyle(STYLE_SATELLITE, { diff: false })
     return
   }
-  map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs) })
-  map.once('style.load', () => {
-    ajouterOmbrage(map, couleurs)
+  map.setStyle(FOND, {
+    diff: false,
+    transformStyle: (_avant, fond) => styleParchemin(fond, couleurs),
   })
 }

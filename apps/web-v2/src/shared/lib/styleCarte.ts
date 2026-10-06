@@ -98,6 +98,7 @@ export function styleParchemin(style: StyleSpecification, c: CouleursCarte): Sty
 // Ce dont l'ombrage a besoin d'une carte (la vraie, ou celle des tests).
 type CarteOmbrable = {
   getLayer: (id: string) => unknown
+  getSource: (id: string) => unknown
   getStyle: () => { layers: { id: string }[] }
   addLayer: (couche: LayerSpecification, avant?: string) => unknown
 }
@@ -105,6 +106,8 @@ type CarteOmbrable = {
 // L'ombrage du relief, posé une fois, sous les routes, les rivières et les limites : il teinte le
 // sol, pas le trait.
 export function ajouterOmbrage(carte: CarteOmbrable, c: CouleursCarte) {
+  // Sans source de relief (la vue satellite), il n'y a rien à ombrer.
+  if (!carte.getSource('relief')) return
   if (carte.getLayer('ombrage')) return
   const premiereRoute = carte
     .getStyle()

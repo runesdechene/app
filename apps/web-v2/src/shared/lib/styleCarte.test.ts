@@ -42,6 +42,7 @@ test('l’ombrage se pose une fois, sous la première route', () => {
   const addLayer = vi.fn()
   const calques = [{ id: 'background' }, { id: 'road_major' }, { id: 'label_city' }]
   const carte = {
+    getSource: () => ({}),
     getLayer: (id: string) => (addLayer.mock.calls.length > 0 && id === 'ombrage' ? {} : undefined),
     getStyle: () => ({ layers: calques }),
     addLayer,
@@ -53,6 +54,18 @@ test('l’ombrage se pose une fois, sous la première route', () => {
     expect.objectContaining({ id: 'ombrage', type: 'hillshade', source: 'relief' }),
     'road_major',
   )
+})
+
+test('sans source « relief » (vue satellite), l’ombrage ne se pose pas', () => {
+  const addLayer = vi.fn()
+  const carte = {
+    getSource: () => undefined,
+    getLayer: () => undefined,
+    getStyle: () => ({ layers: [{ id: 'satellite' }] }),
+    addLayer,
+  }
+  ajouterOmbrage(carte, couleurs)
+  expect(addLayer).not.toHaveBeenCalled()
 })
 
 test('le style reçu n’est jamais modifié', () => {

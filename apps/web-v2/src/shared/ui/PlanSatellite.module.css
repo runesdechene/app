@@ -10,6 +10,7 @@
 }
 
 .vue {
+  min-height: var(--cible-tactile);
   padding: 6px 12px;
   border: 0;
   border-radius: 999px;

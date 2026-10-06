@@ -64,8 +64,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     map.setStyle(FOND, {
       transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current),
     })
-    // Une seule fois : sur le satellite, la source de relief n'existe pas (voir appliquerVue).
-    map.once('style.load', () => {
+    // Permanent : « style.load » repart à chaque changement de vue (appliquerVue), et ce qui
+    // dépend du style se repose alors ; l'ombrage ignore le satellite (pas de source de relief).
+    map.on('style.load', () => {
       ajouterOmbrage(map, couleurs.current)
     })
     map.on('movestart', () => {
