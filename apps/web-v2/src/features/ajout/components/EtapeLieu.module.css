@@ -40,6 +40,25 @@
   z-index: 2;
 }
 
+/* L'attribution des tuiles (Esri l'exige visible) : sous le bouton Plan / Satellite, alignée sur
+   lui ; en bas, la feuille la cachait. Le bouton mesure une cible tactile + 8 px. */
+/* stylelint-disable selector-class-pattern -- les classes de MapLibre, pas les nôtres */
+.carte :global(.maplibregl-ctrl-top-right) {
+  top: calc(var(--space-2) + 46px + var(--space-2) + var(--cible-tactile) + 8px + var(--space-2));
+  right: var(--space-6);
+  max-width: calc(100% - 2 * var(--space-6));
+}
+
+.carte :global(.maplibregl-ctrl.maplibregl-ctrl-attrib) {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-sur-accent) 85%, transparent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: right;
+}
+/* stylelint-enable selector-class-pattern */
+
 .champ {
   width: 100%;
   min-height: 46px;

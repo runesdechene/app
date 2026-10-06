@@ -12,7 +12,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { useEndroit } from '@/shared/hooks/useEndroit'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
-import { appliquerVue, type VueCarte } from '@/shared/lib/styleSatellite'
+import { appliquerVue, attributionVisible, type VueCarte } from '@/shared/lib/styleSatellite'
 import { ajouterOmbrage, FOND, styleParchemin } from '@/shared/lib/styleCarte'
 import { VALIDITE_JOURS } from '@/shared/lib/validitePin'
 import { useEnLigne } from '@/shared/hooks/useEnLigne'
@@ -46,8 +46,9 @@ export function PoserPin({ onFermer }: { onFermer: () => void }) {
       zoom: 5,
       // « Ta position » : la carte ne se glisse ni ne se zoome, le repère reste sur le point.
       interactive: false,
-      attributionControl: { compact: true },
+      attributionControl: false,
     })
+    attributionVisible(map)
     map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current) })
     // Permanent : « style.load » repart à chaque changement de vue ; l'ombrage ignore le satellite.
     map.on('style.load', () => {

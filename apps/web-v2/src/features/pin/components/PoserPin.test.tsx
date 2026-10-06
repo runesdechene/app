@@ -120,3 +120,14 @@ test('la carte n’est pas interactive et se centre sur la position connue', () 
   expect(FausseCarte.derniere?.options).toMatchObject({ interactive: false })
   expect(FausseCarte.derniere?.jumpTo).toHaveBeenCalledWith({ center: [7.2, 43.7], zoom: 16 })
 })
+
+test('l’attribution des tuiles se voit : dépliée, en haut à droite, hors de la feuille', () => {
+  position.usePositionPrecise.mockReturnValue({ etat: 'trouvee', point: { latitude: 43.7, longitude: 7.2 }, precision: 8 })
+  monter()
+  const carte = FausseCarte.derniere
+  expect(carte?.options).toEqual(expect.objectContaining({ attributionControl: false }))
+  expect(carte?.addControl).toHaveBeenCalledWith(
+    expect.objectContaining({ options: { compact: false } }),
+    'top-right',
+  )
+})

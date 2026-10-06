@@ -10,8 +10,13 @@ import '@testing-library/jest-dom/vitest'
 import { vi } from 'vitest'
 
 vi.mock('maplibre-gl', async () => {
-  const { FausseCarte, FausseMarque } = await import('./fausseCarte')
-  return { Map: FausseCarte, Marker: FausseMarque, setWorkerUrl: () => undefined }
+  const { FausseAttribution, FausseCarte, FausseMarque } = await import('./fausseCarte')
+  return {
+    Map: FausseCarte,
+    Marker: FausseMarque,
+    AttributionControl: FausseAttribution,
+    setWorkerUrl: () => undefined,
+  }
 })
 // Le worker de MapLibre, que Vite empaquette à part (shared/lib/maplibre.ts) : une adresse suffit.
 vi.mock('maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url', () => ({ default: 'worker.js' }))

@@ -59,6 +59,8 @@ export class FausseCarte {
   }
 
   setStyle = vi.fn<(style: unknown, options?: unknown) => void>()
+  addControl = vi.fn<(controle: unknown, coin?: string) => void>()
+  moveLayer = vi.fn()
   remove() {}
   addSource = vi.fn()
   queryRenderedFeatures = vi.fn<(...args: unknown[]) => unknown[]>(() => [])
@@ -94,6 +96,11 @@ export class FausseCarte {
   getTerrain() {
     return this.terrain
   }
+}
+
+// Un faux contrôle d'attribution : il garde ses options, pour que le test les lise.
+export class FausseAttribution {
+  constructor(readonly options?: unknown) {}
 }
 
 // Une fausse marque MapLibre : son élément est posé dans la page, pour que le test le touche.

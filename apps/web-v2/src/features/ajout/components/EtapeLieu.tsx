@@ -21,7 +21,7 @@ import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
-import { appliquerVue, type VueCarte } from '@/shared/lib/styleSatellite'
+import { appliquerVue, attributionVisible, type VueCarte } from '@/shared/lib/styleSatellite'
 import { joursRestants } from '@/shared/lib/validitePin'
 import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { useEndroit } from '@/shared/hooks/useEndroit'
@@ -69,8 +69,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
       ...(depart
         ? { center: [depart.longitude, depart.latitude] as [number, number], zoom: ZOOM_PROCHE }
         : FRANCE),
-      attributionControl: { compact: true },
+      attributionControl: false,
     })
+    attributionVisible(map)
     map.setStyle(FOND, {
       transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current),
     })

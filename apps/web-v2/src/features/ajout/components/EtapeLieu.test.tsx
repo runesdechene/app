@@ -188,3 +188,14 @@ test('en mode strict, la carte naît en plan sans recharger son style', async ()
   // Le mode strict monte deux cartes ; celle qui reste n'a chargé son style qu'une fois.
   expect(FausseCarte.derniere?.setStyle).toHaveBeenCalledOnce()
 })
+
+test('l’attribution des tuiles se voit : dépliée, en haut à droite, hors de la feuille', async () => {
+  monter(AVEC_PIN)
+  await screen.findByText(/Placé d’après ton pin/)
+  const carte = FausseCarte.derniere
+  expect(carte?.options).toEqual(expect.objectContaining({ attributionControl: false }))
+  expect(carte?.addControl).toHaveBeenCalledWith(
+    expect.objectContaining({ options: { compact: false } }),
+    'top-right',
+  )
+})
