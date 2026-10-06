@@ -32,6 +32,14 @@
   padding: var(--space-2) var(--space-6) 0;
 }
 
+/* Plan / Satellite : sous le champ (padding haut + 46 px de champ + un petit écart), à sa droite. */
+.vues {
+  position: absolute;
+  top: calc(var(--space-2) + 46px + var(--space-2));
+  right: var(--space-6);
+  z-index: 2;
+}
+
 .champ {
   width: 100%;
   min-height: 46px;

@@ -31,6 +31,15 @@ export class FausseCarte {
     if (f) this.ecouteurs.set(type, [...(this.ecouteurs.get(type) ?? []), f])
   }
 
+  // `once` : l'écouteur ne part qu'une fois (la vraie carte le retire après l'appel).
+  once(type: string, ecouteur: Ecouteur) {
+    const unique: Ecouteur = (e) => {
+      this.off(type, unique)
+      ecouteur(e)
+    }
+    this.on(type, unique)
+  }
+
   off(type: string, ecouteur: Ecouteur) {
     this.ecouteurs.set(
       type,

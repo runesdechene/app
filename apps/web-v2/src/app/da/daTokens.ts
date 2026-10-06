@@ -82,6 +82,7 @@ export const DA_SHOWCASED = [
   'LieuCarte',
   'Pastille',
   'PastilleChoix',
+  'PlanSatellite',
   'Recompense',
   'Segments',
   'Text',

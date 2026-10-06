@@ -7,6 +7,7 @@ import { useState } from 'react'
 import fondFiche from '@/assets/ui/fond-fiche.webp'
 import partager from '@/assets/ui/partager.svg'
 import lieu from '@/assets/ui/lieu.svg'
+import type { VueCarte } from '@/shared/lib/styleSatellite'
 import { Avatar } from '@/shared/ui/Avatar'
 import { BilleType } from '@/shared/ui/BilleType'
 import { Button } from '@/shared/ui/Button'
@@ -19,6 +20,7 @@ import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { Pastille } from '@/shared/ui/Pastille'
+import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { PastilleChoix } from '@/shared/ui/PastilleChoix'
 import { Recompense } from '@/shared/ui/Recompense'
 import { Segments } from '@/shared/ui/Segments'
@@ -53,6 +55,7 @@ function rien() {
 export function DaBriques() {
   const [allume, setAllume] = useState(true)
   const [accord, setAccord] = useState<'m' | 'f'>('m')
+  const [vue, setVue] = useState<VueCarte>('plan')
   const [nom, setNom] = useState('Uriel')
   const [presentation, setPresentation] = useState(PRESENTATION_PLEINE.slice(0, 300))
 
@@ -178,6 +181,10 @@ export function DaBriques() {
 
       <DaSection name="Segments">
         <Segments libelle="Accord" options={ACCORDS} valeur={accord} onChange={setAccord} />
+      </DaSection>
+
+      <DaSection name="PlanSatellite">
+        <PlanSatellite vue={vue} onChanger={setVue} />
       </DaSection>
 
       <DaSection name="LieuCarte">

@@ -19,6 +19,8 @@ import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
+import { appliquerVue, type VueCarte } from '@/shared/lib/styleSatellite'
+import { PlanSatellite } from '@/shared/ui/PlanSatellite'
 import { useEndroit, useVoisins } from '../hooks/useAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { chercherEndroits, type Resultat } from '@/shared/lib/adresse'
@@ -45,11 +47,13 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const photo = useUrlDe(brouillon.photos[0]?.vignette)
   // La carte naît une fois, à ce point de départ : une ref, lue par l'effet sans le relancer.
   const pointDeDepart = useRef(depart)
+  const [vue, setVue] = useState<VueCarte>('plan')
+  const couleurs = useRef(lireCouleurs(document.documentElement))
+  const premiereVue = useRef(true)
 
   useEffect(() => {
     if (!conteneur.current) return
     const depart = pointDeDepart.current
-    const couleurs = lireCouleurs(document.documentElement)
     const map = new maplibregl.Map({
       container: conteneur.current,
       ...(depart
@@ -57,9 +61,12 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
         : FRANCE),
       attributionControl: { compact: true },
     })
-    map.setStyle(FOND, { transformStyle: (_avant, fond) => styleParchemin(fond, couleurs) })
-    map.on('style.load', () => {
-      ajouterOmbrage(map, couleurs)
+    map.setStyle(FOND, {
+      transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current),
+    })
+    // Une seule fois : sur le satellite, la source de relief n'existe pas (voir appliquerVue).
+    map.once('style.load', () => {
+      ajouterOmbrage(map, couleurs.current)
     })
     map.on('movestart', () => {
       setEnMouvement(true)
@@ -85,6 +92,15 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
       carte.current = null
     }
   }, [])
+
+  // Plan ↔ satellite : pas au premier rendu, la carte naît déjà en plan.
+  useEffect(() => {
+    if (premiereVue.current) {
+      premiereVue.current = false
+      return
+    }
+    if (carte.current) appliquerVue(carte.current, vue, couleurs.current)
+  }, [vue])
 
   const allerA = (p: Point, zoom = ZOOM_PROCHE) => {
     carte.current?.flyTo({ center: [p.longitude, p.latitude], zoom, essential: true })
@@ -115,6 +131,10 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
           allerA(r.point, 14)
         }}
       />
+
+      <div className={styles.vues}>
+        <PlanSatellite vue={vue} onChanger={setVue} />
+      </div>
 
       {/* L'épingle : la photo, fixe au centre de la carte. */}
       <div className={styles.epingle} data-souleve={enMouvement || undefined} aria-hidden="true">
