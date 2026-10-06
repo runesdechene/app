@@ -5,7 +5,7 @@
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
  * ATTENTION — la forme suit les migrations 354-362. Un champ ajouté là-bas s'ajoute ici.
  */
-import { lireCondition, type ConditionTitre } from '../lib/conditionTitre'
+import { lireCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
 export type Categorie = { icone: string; couleur: string }
