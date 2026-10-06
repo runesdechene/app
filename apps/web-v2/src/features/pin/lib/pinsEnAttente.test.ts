@@ -10,6 +10,10 @@ vi.mock('idb-keyval', () => ({
     memoire.set(cle, v)
     return Promise.resolve()
   },
+  update: (cle: string, fn: (v: unknown) => unknown) => {
+    memoire.set(cle, fn(memoire.get(cle)))
+    return Promise.resolve()
+  },
 }))
 
 import { garderPinEnAttente, lirePinsEnAttente, retirerPinEnAttente } from './pinsEnAttente'

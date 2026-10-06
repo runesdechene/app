@@ -3,9 +3,10 @@
  * POURQUOI — Uriel, 06/10 : le pin se pose sans réseau, « c'est tout l'intérêt ». Il naît ici
  *            (IndexedDB, comme le brouillon de lieu) avec son id et sa date, puis part au serveur
  *            (`envoyer.ts`) ; le serveur l'accepte une seule fois par id.
- * ATTENTION — si le navigateur efface ses données avant l'envoi, le pin est perdu (accepté, spec).
+ * ATTENTION — garder et retirer passent par `update` (une transaction), jamais lire puis écrire.
+ *            Si le navigateur efface ses données avant l'envoi, le pin est perdu (accepté, spec).
  */
-import { get, set } from 'idb-keyval'
+import { get, update } from 'idb-keyval'
 
 export type PinEnAttente = {
   id: string
@@ -26,12 +27,12 @@ export async function lirePinsEnAttente(): Promise<PinEnAttente[]> {
   }
 }
 
+// `update` lit et écrit dans une seule transaction : un pin posé pendant qu'un envoi se termine
+// ne peut pas être écrasé par une liste lue plus tôt.
 export async function garderPinEnAttente(p: PinEnAttente): Promise<void> {
-  const pins = await lirePinsEnAttente()
-  await set(CLE, [...pins.filter((x) => x.id !== p.id), p])
+  await update<PinEnAttente[]>(CLE, (pins) => [...(pins ?? []).filter((x) => x.id !== p.id), p])
 }
 
 export async function retirerPinEnAttente(id: string): Promise<void> {
-  const pins = await lirePinsEnAttente()
-  await set(CLE, pins.filter((x) => x.id !== id))
+  await update<PinEnAttente[]>(CLE, (pins) => (pins ?? []).filter((x) => x.id !== id))
 }

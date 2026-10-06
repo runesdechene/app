@@ -82,3 +82,12 @@ test('GPS trop imprécis (P0001) : refus définitif aussi', async () => {
   api.poserPin.mockRejectedValue({ code: 'P0001', message: 'Précision insuffisante' })
   expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: ['a'] })
 })
+
+test('deux envois à la fois n’en font qu’un : chaque pin part une seule fois', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A, B])
+  api.poserPin.mockResolvedValue(undefined)
+  const [premier, second] = await Promise.all([envoyerPinsEnAttente(), envoyerPinsEnAttente()])
+  expect(api.poserPin).toHaveBeenCalledTimes(2)
+  expect(second).toBe(premier)
+  expect(premier).toEqual({ envoyes: 2, refuses: [] })
+})

@@ -8,6 +8,8 @@
  *            l'écran le signale, il n'est jamais jeté en silence. Tout autre échec (coupure,
  *            jeton expiré PGRST301, connexion requise 42501, panne serveur) arrête l'envoi sans
  *            rien marquer : on réessaiera.
+ *            Un seul envoi à la fois : les appels simultanés (lancement, retour du réseau, pose)
+ *            partagent le même, sinon un pin partirait deux fois.
  */
 import { endroitDe } from '@/shared/lib/adresse'
 import { poserPin } from '../api/pins'
@@ -21,7 +23,7 @@ function refusDuServeur(e: unknown): boolean {
   return typeof e === 'object' && e !== null && 'code' in e && typeof e.code === 'string' && REFUS_DE_POSER_PIN.includes(e.code)
 }
 
-export async function envoyerPinsEnAttente(): Promise<Envoi> {
+async function envoyer(): Promise<Envoi> {
   const envoi: Envoi = { envoyes: 0, refuses: [] }
   for (const p of await lirePinsEnAttente()) {
     if (p.refuse) continue
@@ -40,4 +42,13 @@ export async function envoyerPinsEnAttente(): Promise<Envoi> {
     envoi.envoyes += 1
   }
   return envoi
+}
+
+let enCours: Promise<Envoi> | null = null
+
+export function envoyerPinsEnAttente(): Promise<Envoi> {
+  enCours ??= envoyer().finally(() => {
+    enCours = null
+  })
+  return enCours
 }
