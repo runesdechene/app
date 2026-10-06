@@ -16,7 +16,7 @@ vi.mock('idb-keyval', () => ({
   },
 }))
 
-import { garderPinEnAttente, lirePinsEnAttente, retirerPinEnAttente } from './pinsEnAttente'
+import { garderPinEnAttente, lirePinsEnAttente, marquerRefuse, retirerPinEnAttente } from './pinsEnAttente'
 
 const PIN = { id: 'p1', latitude: 43.7, longitude: 7.2, precision: 8, poseLe: '2026-10-06T12:32:00.000Z' }
 
@@ -29,6 +29,21 @@ test('vide au départ ; garder puis lire ; retirer', async () => {
   await garderPinEnAttente(PIN)
   expect(await lirePinsEnAttente()).toEqual([PIN])
   await retirerPinEnAttente('p1')
+  expect(await lirePinsEnAttente()).toEqual([])
+})
+
+test('retirer dit si le pin était encore là', async () => {
+  await garderPinEnAttente(PIN)
+  expect(await retirerPinEnAttente('p1')).toBe(true)
+  expect(await retirerPinEnAttente('p1')).toBe(false)
+})
+
+test('marquer refusé un pin supprimé entre-temps ne le fait pas revenir', async () => {
+  await garderPinEnAttente(PIN)
+  expect(await marquerRefuse('p1')).toBe(true)
+  expect(await lirePinsEnAttente()).toEqual([{ ...PIN, refuse: true }])
+  await retirerPinEnAttente('p1')
+  expect(await marquerRefuse('p1')).toBe(false)
   expect(await lirePinsEnAttente()).toEqual([])
 })
 

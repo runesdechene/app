@@ -8,6 +8,13 @@ import { booleen, objet } from '@/shared/lib/lire'
 import type { PinEnAttente } from '../lib/pinsEnAttente'
 import { lireLieuxProches, lireMesPins, type LieuProche, type MesPins } from './lirePins'
 
+// Le compte connecté (null sans session) : un pin retient le sien, et ne part que sous lui.
+export async function monIdentifiant(): Promise<string | null> {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return data.session?.user.id ?? null
+}
+
 export async function poserPin(p: PinEnAttente, lieuDit: string | null): Promise<void> {
   const { error } = await supabase.rpc('poser_pin', {
     p_id: p.id,

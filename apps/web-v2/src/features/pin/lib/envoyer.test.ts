@@ -1,12 +1,14 @@
 /**
  * QUOI     — envoyer les pins en attente : un par un, retirés une fois acceptés ; une coupure
- *            arrête l'envoi sans rien perdre ; un refus définitif garde le pin et le signale.
+ *            arrête l'envoi sans rien perdre ; un refus définitif garde le pin et le signale ;
+ *            seuls les pins du compte connecté partent ; un pin supprimé pendant l'envoi ne
+ *            revient pas.
  */
 import { beforeEach, expect, test, vi } from 'vitest'
 
-const attente = vi.hoisted(() => ({ lirePinsEnAttente: vi.fn(), retirerPinEnAttente: vi.fn(), garderPinEnAttente: vi.fn() }))
-vi.mock('./pinsEnAttente', () => attente)
-const api = vi.hoisted(() => ({ poserPin: vi.fn() }))
+const attente = vi.hoisted(() => ({ lirePinsEnAttente: vi.fn(), retirerPinEnAttente: vi.fn(), marquerRefuse: vi.fn() }))
+vi.mock('./pinsEnAttente', async (vrai) => ({ ...(await vrai<typeof import('./pinsEnAttente')>()), ...attente }))
+const api = vi.hoisted(() => ({ poserPin: vi.fn(), supprimerPin: vi.fn(), monIdentifiant: vi.fn() }))
 vi.mock('../api/pins', () => api)
 const adresse = vi.hoisted(() => ({ endroitDe: vi.fn() }))
 vi.mock('@/shared/lib/adresse', () => adresse)
@@ -18,8 +20,10 @@ const B = { ...A, id: 'b' }
 
 beforeEach(() => {
   vi.resetAllMocks()
-  attente.retirerPinEnAttente.mockResolvedValue(undefined)
-  attente.garderPinEnAttente.mockResolvedValue(undefined)
+  attente.retirerPinEnAttente.mockResolvedValue(true)
+  attente.marquerRefuse.mockResolvedValue(true)
+  api.monIdentifiant.mockResolvedValue('moi')
+  api.supprimerPin.mockResolvedValue(undefined)
   adresse.endroitDe.mockResolvedValue({ titre: 'Près de Colomars', detail: '', adresse: '' })
 })
 
@@ -48,13 +52,24 @@ test('un envoi interrompu se reprend : la coupure arrête, rien n’est retiré'
   expect(attente.retirerPinEnAttente).not.toHaveBeenCalled()
 })
 
-test('refus définitif (date impossible) : le pin est gardé et signalé, les autres partent', async () => {
+test('refus définitif (position impossible) : le pin est gardé et signalé, les autres partent', async () => {
   attente.lirePinsEnAttente.mockResolvedValue([A, B])
   api.poserPin
-    .mockRejectedValueOnce({ code: '22023', message: 'Date de pose impossible' })
+    .mockRejectedValueOnce({ code: '22023', message: 'Position impossible', hint: 'position' })
     .mockResolvedValueOnce(undefined)
   expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 1, refuses: ['a'] })
-  expect(attente.garderPinEnAttente).toHaveBeenCalledWith({ ...A, refuse: true })
+  expect(attente.marquerRefuse).toHaveBeenCalledWith('a')
+  expect(attente.retirerPinEnAttente).toHaveBeenCalledTimes(1)
+  expect(attente.retirerPinEnAttente).toHaveBeenCalledWith('b')
+})
+
+test('une date dans le futur (horloge du téléphone en avance) se réessaiera : rien n’est marqué', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A, B])
+  api.poserPin
+    .mockRejectedValueOnce({ code: '22023', message: 'Date de pose impossible', hint: 'date' })
+    .mockResolvedValueOnce(undefined)
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 1, refuses: [] })
+  expect(attente.marquerRefuse).not.toHaveBeenCalled()
   expect(attente.retirerPinEnAttente).toHaveBeenCalledTimes(1)
   expect(attente.retirerPinEnAttente).toHaveBeenCalledWith('b')
 })
@@ -73,7 +88,7 @@ test.each([
   api.poserPin.mockRejectedValue(erreur)
   expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
   expect(api.poserPin).toHaveBeenCalledTimes(1)
-  expect(attente.garderPinEnAttente).not.toHaveBeenCalled()
+  expect(attente.marquerRefuse).not.toHaveBeenCalled()
   expect(attente.retirerPinEnAttente).not.toHaveBeenCalled()
 })
 
@@ -81,6 +96,39 @@ test('GPS trop imprécis (P0001) : refus définitif aussi', async () => {
   attente.lirePinsEnAttente.mockResolvedValue([A])
   api.poserPin.mockRejectedValue({ code: 'P0001', message: 'Précision insuffisante' })
   expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: ['a'] })
+})
+
+test('un pin supprimé pendant son envoi, accepté par le serveur : supprimé là-bas aussi, pas compté', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A])
+  api.poserPin.mockResolvedValue(undefined)
+  attente.retirerPinEnAttente.mockResolvedValue(false) // il n'était plus dans le téléphone
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
+  expect(api.supprimerPin).toHaveBeenCalledWith('a')
+})
+
+test('un pin supprimé pendant son envoi, refusé : il ne revient pas et ne compte pas', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A])
+  api.poserPin.mockRejectedValue({ code: 'P0001', message: 'Précision insuffisante' })
+  attente.marquerRefuse.mockResolvedValue(false)
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
+})
+
+test('les pins d’un autre compte restent dans le téléphone, sans partir', async () => {
+  const AUTRE = { ...A, id: 'x', userId: 'quelquun' }
+  const MIEN = { ...B, userId: 'moi' }
+  const ANCIEN = { ...A, id: 'c' } // posé avant que le pin retienne son compte : le mien
+  attente.lirePinsEnAttente.mockResolvedValue([AUTRE, MIEN, ANCIEN])
+  api.poserPin.mockResolvedValue(undefined)
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 2, refuses: [] })
+  expect(api.poserPin).not.toHaveBeenCalledWith(AUTRE, expect.anything())
+  expect(attente.retirerPinEnAttente).not.toHaveBeenCalledWith('x')
+})
+
+test('sans session, rien ne part', async () => {
+  attente.lirePinsEnAttente.mockResolvedValue([A])
+  api.monIdentifiant.mockResolvedValue(null)
+  expect(await envoyerPinsEnAttente()).toEqual({ envoyes: 0, refuses: [] })
+  expect(api.poserPin).not.toHaveBeenCalled()
 })
 
 test('deux envois à la fois n’en font qu’un : chaque pin part une seule fois', async () => {
