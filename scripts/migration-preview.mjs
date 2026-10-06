@@ -1,5 +1,5 @@
 /**
- * migration-preview.mjs — diff visuel d'une migration avant `db query`.
+ * migration-preview.mjs — diff visuel d'une migration avant `db push`.
  *
  * Pour chaque CREATE OR REPLACE FUNCTION dans la migration cible, retrouve
  * la version actuellement définie (dernière occurrence dans migrations
@@ -17,7 +17,7 @@
  *   1. Écrire la migration
  *   2. node scripts/migration-preview.mjs supabase/migrations/NNN_*.sql
  *   3. Lire le diff. Si surprenant → revoir la migration AVANT d'apply.
- *   4. npx supabase db query --linked -f supabase/migrations/NNN_*.sql
+ *   4. npx supabase db push --linked (canal unique : docs/db/migrations-workflow.md)
  */
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -47,12 +47,16 @@ function extractFunctions(sql) {
   while ((match = re.exec(sql)) !== null) {
     const name = match[1]
     const start = match.index
-    const dollarStart = sql.indexOf('$$', start)
-    if (dollarStart === -1) continue
-    const dollarEnd = sql.indexOf('$$', dollarStart + 2)
+    // Le corps est entre deux balises identiques : `$$` à la main, `$function$` quand la
+    // définition est copiée du live (pg_get_functiondef).
+    const ouverture = /\$[A-Za-z_]*\$/.exec(sql.slice(start))
+    if (ouverture === null) continue
+    const tag = ouverture[0]
+    const dollarStart = start + ouverture.index
+    const dollarEnd = sql.indexOf(tag, dollarStart + tag.length)
     if (dollarEnd === -1) continue
     const semi = sql.indexOf(';', dollarEnd)
-    const end = semi === -1 ? dollarEnd + 2 : semi + 1
+    const end = semi === -1 ? dollarEnd + tag.length : semi + 1
     out.push({ name, fullText: sql.slice(start, end) })
   }
   return out
