@@ -1,6 +1,6 @@
 # Le pin GPS — conception
 
-> 06/10/2026 · V2 (`apps/web-v2`) · maquettes Figma à dessiner (fichier « Runes de Chêne - App V2 »)
+> 06/10/2026 · V2 (`apps/web-v2`) · maquettes Figma « Pin GPS — 1 à 6b » (fichier App v2, nœud 411:315 et voisins)
 
 ## Pourquoi
 
@@ -11,7 +11,7 @@ au 06/10. La V2 n'a que l'entrée grisée « Un pin GPS · bientôt » dans la f
 
 ## Ce qu'on construit
 
-1. **Poser un pin** sur sa position, en deux appuis, avec une photo facultative juste après.
+1. **Poser un pin** sur sa position, en deux appuis, avec des photos facultatives juste après (autant qu'on veut).
 2. **Le compléter plus tard** en vrai lieu, **en gardant « sur place »** — la visite (datée du pin) et la
    revendication, comme un ajout à moins de 200 m (mig 393).
 3. **Retrouver ses pins** dans la feuille du « + » et sur sa carte (visibles de soi seul).
@@ -47,7 +47,7 @@ une fois, à la pose, et rangé dans `title`.
 | Fonction | Rôle |
 |---|---|
 | `poser_pin(lat, lng, précision, lieu_dit)` | pose le pin ; date serveur ; ne rapporte rien |
-| `photos_du_pin(pin, images)` | ajoute les photos prises juste après — la pose n'attend jamais la photo |
+| `photos_du_pin(pin, images)` | ajoute les photos prises juste après, une ou plusieurs — la pose n'attend jamais les photos |
 | `mes_pins()` | mes pins ouverts, avec `joursRestants` (négatif = périmé) ; pour la feuille du « + » et la carte |
 | `ajouter_lieu(…, p_pin)` | **un paramètre de plus**, facultatif : avec un pin, « sur place » se juge sur le pin (règles ci-dessus) au lieu de la position du téléphone ; le pin passe `published` avec `published_place_id` |
 | `visiter_depuis_pin(pin, lieu)` | le « C'est lui » : pin valide et à moins de 200 m du lieu → visite datée du pin, **sans revendication** (elle reste un geste fait sur place) ; pin périmé → il se ferme sans visite, et l'écran le dit |
@@ -63,7 +63,8 @@ table, donc un pin posé d'un côté se voit de l'autre.
 1. **Poser** — « Un pin GPS » n'est plus grisé. Un appui ouvre une petite carte centrée sur moi, la
    précision du GPS, **« Poser mon pin ici »**, et : *« Tu auras 15 jours pour le compléter en gardant
    “sur place”. »* Deux appuis plutôt qu'un : un appui raté ne pose rien. Ensuite : *« Pin posé · encore
-   15 jours »*, **« Prendre une photo »** (facultatif) et **« C'est tout »**.
+   15 jours »*, **« Des photos »** (facultatif, autant qu'on veut : une bande de vignettes et une case « + ») et
+   **« C'est tout »**.
 2. **La feuille du « + »** — une section **« Tes pins »** : la photo ou l'icône du pin, le lieu-dit, la
    date, *« encore 12 jours »* (périmé : *« sera ajouté à distance »*). Un appui : **Compléter · Voir sur la
    carte · Supprimer**.
@@ -105,7 +106,7 @@ table, donc un pin posé d'un côté se voit de l'autre.
   change) ; le parcours d'ajout reprend un pin à la bonne étape ; l'avertissement « hors du cercle ».
 - Le parcours entier dans le navigateur (`pnpm dev`), puis `pnpm build`.
 
-## Maquettes à dessiner (Figma, avant le plan)
+## Les maquettes
 
-Poser (avant / après) · la feuille du « + » avec « Tes pins » · la petite carte d'un pin · « C'est l'un de
+Dessinées le 06/10 (rangée « PIN GPS », nœud 411:315) : poser · pin posé · pin posé avec des photos · la feuille du « + » avec « Tes pins » · la petite carte d'un pin · « C'est l'un de
 ceux-là ? » · l'étape « placer le lieu » avec le cercle et le bouton Plan / Satellite · un pin sur ma carte.
