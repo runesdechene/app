@@ -8,6 +8,7 @@
 import { phraseCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
+import { compteurEnClair } from '../lib/chemins'
 import styles from './FeuilleTitre.module.css'
 
 export type TitreTouche = {
@@ -30,7 +31,7 @@ export function FeuilleTitre({ titre, onFermer }: { titre: TitreTouche; onFermer
         {titre.cas === 'obtenu' && (
           <>
             <Text variant="corps">{phrase}</Text>
-            <Text variant="sous-titre">{`Tu en as ${String(compteur)}. Il est à toi pour toujours.`}</Text>
+            <Text variant="sous-titre">{`Aujourd’hui : ${titre.condition ? compteurEnClair(titre.condition.stat, compteur) : String(compteur)}.`}</Text>
             <Text variant="legende">
               Tu choisis les trois titres de ton profil dans « Modifier mon profil ».
             </Text>

@@ -155,6 +155,7 @@ function Gelule({
       </span>
       {nom}
       {porte && <span className={styles.porte}> · sur ton profil</span>}
+      <span className={styles.pourLecteur}>{obtenu ? ' · obtenu' : ' · à gagner'}</span>
     </button>
   )
 }

@@ -86,7 +86,7 @@ test('un titre obtenu s’explique', async () => {
   await userEvent.click(await screen.findByRole('button', { name: /Cheminant/ }))
   const feuille = screen.getByRole('dialog', { name: 'Cheminant' })
   expect(within(feuille).getByText('Débloqué en visitant 50 lieux sur place.')).toBeInTheDocument()
-  expect(within(feuille).getByText('Tu en as 60. Il est à toi pour toujours.')).toBeInTheDocument()
+  expect(within(feuille).getByText('Aujourd’hui : 60 lieux visités.')).toBeInTheDocument()
 })
 
 test('un titre à gagner montre où on en est', async () => {
@@ -110,4 +110,28 @@ test('une erreur se dit, et se réessaie', async () => {
   afficher()
   expect(await screen.findByText('Tes titres n’ont pas pu être chargés')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
+})
+
+test('un lecteur d’écran entend ce qui est obtenu et ce qui reste à gagner', async () => {
+  afficher()
+  const visites = await screen.findByRole('region', { name: 'Les visites' })
+  expect(within(visites).getByRole('button', { name: /Cheminant.*obtenu/ })).toBeInTheDocument()
+  expect(within(visites).getByRole('button', { name: /Errant.*à gagner/ })).toBeInTheDocument()
+})
+
+test('le niveau se dit en niveau, pas en nombre', async () => {
+  api.fetchMesTitres.mockResolvedValue({
+    ...titres,
+    chemins: [
+      {
+        stat: 'level',
+        compteur: 12,
+        titres: [{ id: 7, nom: 'Compagnon', min: 5, obtenu: true, porte: false }],
+      },
+    ],
+  })
+  afficher()
+  await userEvent.click(await screen.findByRole('button', { name: /Compagnon/ }))
+  const feuille = screen.getByRole('dialog', { name: 'Compagnon' })
+  expect(within(feuille).getByText('Aujourd’hui : niveau 12.')).toBeInTheDocument()
 })

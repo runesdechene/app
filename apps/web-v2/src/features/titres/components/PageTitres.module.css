@@ -147,6 +147,16 @@
   color: var(--color-texte-doux);
 }
 
+/* Obtenu ou à gagner : la couleur le montre, ce texte le dit au lecteur d'écran. */
+.pourLecteur {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .etat {
   display: grid;
   justify-items: center;
