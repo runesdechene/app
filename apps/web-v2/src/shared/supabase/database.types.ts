@@ -7157,6 +7157,7 @@ export type Database = {
         Returns: Json
       }
       lieu_a_modifier: { Args: { p_id: string }; Returns: Json }
+      lieux_pres_du_pin: { Args: { p_pin: string }; Returns: Json }
       lieux_voisins: {
         Args: { p_latitude: number; p_longitude: number }
         Returns: Json
@@ -7248,6 +7249,7 @@ export type Database = {
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mes_notifications: { Args: never; Returns: Json }
+      mes_pins: { Args: never; Returns: Json }
       migrate_user_to_auth_id: {
         Args: { p_new_id: string; p_old_id: string }
         Returns: Json
@@ -7354,6 +7356,17 @@ export type Database = {
           p_user_lng: number
         }
         Returns: Json
+      }
+      poser_pin: {
+        Args: {
+          p_id: string
+          p_latitude: number
+          p_lieu_dit: string
+          p_longitude: number
+          p_pose_le: string
+          p_precision: number
+        }
+        Returns: undefined
       }
       pres_de_moi: {
         Args: { p_latitude: number; p_longitude: number }
@@ -7873,6 +7886,10 @@ export type Database = {
           p_user_lat: number
           p_user_lng: number
         }
+        Returns: Json
+      }
+      visiter_depuis_pin: {
+        Args: { p_lieu: string; p_pin: string }
         Returns: Json
       }
       visiter_lieu: {
