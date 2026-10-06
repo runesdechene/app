@@ -5,7 +5,7 @@ import type { Map as CarteMapLibre } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { CouleursCarte } from './couleursCarte'
 import { FOND } from './styleCarte'
-import { appliquerVue, STYLE_SATELLITE } from './styleSatellite'
+import { appliquerVue, estSatellite, STYLE_SATELLITE } from './styleSatellite'
 
 const couleurs = {} as CouleursCarte
 
@@ -30,4 +30,9 @@ test('le plan recharge le fond parchemin en entier (diff: false)', () => {
   const { setStyle, carte } = fausseCarte()
   appliquerVue(carte, 'plan', couleurs)
   expect(setStyle).toHaveBeenCalledExactlyOnceWith(FOND, expect.objectContaining({ diff: false }))
+})
+
+test('la vue satellite se lit sur la carte : son calque d’imagerie est là', () => {
+  expect(estSatellite({ getLayer: (id: string) => (id === 'satellite' ? { id } : undefined) })).toBe(true)
+  expect(estSatellite({ getLayer: () => undefined })).toBe(false)
 })

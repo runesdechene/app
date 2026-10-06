@@ -29,6 +29,11 @@ export const STYLE_SATELLITE: StyleSpecification = {
   layers: [{ id: 'satellite', type: 'raster', source: 'esri-satellite' }],
 }
 
+// La vue en cours se lit sur la carte elle-même : son calque d'imagerie est là ou non.
+export function estSatellite(carte: { getLayer: (id: string) => unknown }): boolean {
+  return carte.getLayer('satellite') !== undefined
+}
+
 export function appliquerVue(map: CarteMapLibre, vue: VueCarte, couleurs: CouleursCarte) {
   if (vue === 'satellite') {
     map.setStyle(STYLE_SATELLITE, { diff: false })

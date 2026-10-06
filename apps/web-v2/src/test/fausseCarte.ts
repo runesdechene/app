@@ -58,7 +58,7 @@ export class FausseCarte {
     return this.canevas
   }
 
-  setStyle() {}
+  setStyle = vi.fn<(style: unknown, options?: unknown) => void>()
   remove() {}
   addSource = vi.fn()
   queryRenderedFeatures = vi.fn<(...args: unknown[]) => unknown[]>(() => [])

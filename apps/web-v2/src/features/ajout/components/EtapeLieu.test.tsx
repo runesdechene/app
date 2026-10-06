@@ -5,6 +5,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { StrictMode } from 'react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, expect, test, vi } from 'vitest'
@@ -43,16 +44,17 @@ beforeEach(() => {
   ])
 })
 
-function monter(b: Brouillon = brouillon) {
+function monter(b: Brouillon = brouillon, strict = false) {
   const router = createMemoryRouter(
     [{ path: '*', element: <EtapeLieu brouillon={b} changer={changer} onSuivant={suivant} /> }],
     { initialEntries: ['/carte/ajouter/lieu/lieu'] },
   )
-  render(
+  const arbre = (
     <QueryClientProvider client={new QueryClient()}>
       <RouterProvider router={router} />
-    </QueryClientProvider>,
+    </QueryClientProvider>
   )
+  render(strict ? <StrictMode>{arbre}</StrictMode> : arbre)
 }
 
 test('la carte part de la position de la photo, et le dit', async () => {
@@ -132,4 +134,57 @@ test('un pin de plus de 15 jours : le lieu sera ajouté à distance', async () =
     pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: '2026-01-01T12:00:00Z' },
   })
   expect(await screen.findByText(/Ton pin a plus de 15 jours/)).toBeInTheDocument()
+})
+
+const AVEC_PIN: Brouillon = {
+  ...brouillon,
+  pin: { id: 'p1', point: { latitude: 43.7, longitude: 7.2 }, poseLe: new Date().toISOString() },
+}
+
+function calquesPoses(carte: FausseCarte): unknown[] {
+  return carte.addLayer.mock.calls.map(([c]) => c.id)
+}
+
+// Un style neuf (plan ↔ satellite) repart sans aucun calque : la fausse carte les oublie.
+function nouveauStyle(carte: FausseCarte, satellite: boolean) {
+  carte.calquesPoses.clear()
+  if (satellite) carte.calquesPoses.add('satellite')
+  carte.addLayer.mockClear()
+}
+
+test('le cercle du pin se pose sur le plan, et revient sur le satellite, bordé pour s’y lire', async () => {
+  monter(AVEC_PIN)
+  await screen.findByText(/Placé d’après ton pin/)
+  const carte = FausseCarte.derniere
+  if (!carte) throw new Error('pas de carte')
+  act(() => {
+    carte.emettre('style.load')
+  })
+  expect(calquesPoses(carte)).toEqual(expect.arrayContaining(['cercle-du-pin-voile', 'cercle-du-pin-contour']))
+  nouveauStyle(carte, true)
+  act(() => {
+    carte.emettre('style.load')
+  })
+  expect(calquesPoses(carte)).toEqual(
+    expect.arrayContaining(['cercle-du-pin-voile', 'cercle-du-pin-lisere', 'cercle-du-pin-contour']),
+  )
+})
+
+test('un style chargé sans le cercle le retrouve au premier « styledata »', async () => {
+  monter(AVEC_PIN)
+  await screen.findByText(/Placé d’après ton pin/)
+  const carte = FausseCarte.derniere
+  if (!carte) throw new Error('pas de carte')
+  nouveauStyle(carte, true)
+  act(() => {
+    carte.emettre('styledata')
+  })
+  expect(calquesPoses(carte)).toContain('cercle-du-pin-contour')
+})
+
+test('en mode strict, la carte naît en plan sans recharger son style', async () => {
+  monter(AVEC_PIN, true)
+  await screen.findByText(/Placé d’après ton pin/)
+  // Le mode strict monte deux cartes ; celle qui reste n'a chargé son style qu'une fois.
+  expect(FausseCarte.derniere?.setStyle).toHaveBeenCalledOnce()
 })

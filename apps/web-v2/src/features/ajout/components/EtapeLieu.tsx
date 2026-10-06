@@ -17,7 +17,6 @@ import { maplibregl } from '@/shared/lib/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { cercle } from '@/shared/lib/cercle'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { distanceKm, type Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
@@ -30,6 +29,7 @@ import { useVoisins } from '../hooks/useAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
 import { chercherEndroits, type Resultat } from '@/shared/lib/adresse'
 import type { ProprietesEtape } from '../lib/brouillon'
+import { poserCercleDuPin } from '../lib/cercleDuPin'
 import styles from './EtapeLieu.module.css'
 
 const ZOOM_PROCHE = 15
@@ -55,7 +55,9 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
   const pointDeDepart = useRef(depart)
   const [vue, setVue] = useState<VueCarte>('plan')
   const couleurs = useRef(lireCouleurs(document.documentElement))
-  const premiereVue = useRef(true)
+  // La vue que porte la carte : elle naît en plan. Le mode strict rejoue les effets au montage,
+  // et un simple « premier rendu » y rechargeait le style à peine né.
+  const vueDeLaCarte = useRef<VueCarte>('plan')
   // Le pin, lu par l'effet de naissance de la carte sans le relancer (comme le point de départ).
   const pinDuBrouillon = useRef(pin)
 
@@ -72,32 +74,19 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     map.setStyle(FOND, {
       transformStyle: (_avant, fond) => styleParchemin(fond, couleurs.current),
     })
+    vueDeLaCarte.current = 'plan'
     // Permanent : « style.load » repart à chaque changement de vue (appliquerVue), et ce qui
     // dépend du style se repose alors ; l'ombrage ignore le satellite (pas de source de relief).
+    // Le cercle se repose aussi au « styledata » : un style chargé ne repart jamais sans lui.
+    const poserLeCercle = () => {
+      const pin = pinDuBrouillon.current
+      if (pin) poserCercleDuPin(map, pin.point, couleurs.current)
+    }
     map.on('style.load', () => {
       ajouterOmbrage(map, couleurs.current)
-      const pin = pinDuBrouillon.current
-      if (pin && !map.getSource('cercle-du-pin')) {
-        const contour = cercle(pin.point.latitude, pin.point.longitude, RAYON_VISITE_KM)
-        map.addSource('cercle-du-pin', {
-          type: 'geojson',
-          data: { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [contour] } },
-        })
-        const encre = couleurs.current.encre
-        map.addLayer({
-          id: 'cercle-du-pin-voile',
-          type: 'fill',
-          source: 'cercle-du-pin',
-          paint: { 'fill-color': encre, 'fill-opacity': 0.07 },
-        })
-        map.addLayer({
-          id: 'cercle-du-pin-contour',
-          type: 'line',
-          source: 'cercle-du-pin',
-          paint: { 'line-color': encre, 'line-width': 2, 'line-dasharray': [3, 2] },
-        })
-      }
+      poserLeCercle()
     })
+    map.on('styledata', poserLeCercle)
     map.on('movestart', () => {
       setEnMouvement(true)
     })
@@ -123,13 +112,11 @@ export function EtapeLieu({ brouillon, changer, onSuivant }: ProprietesEtape) {
     }
   }, [])
 
-  // Plan ↔ satellite : pas au premier rendu, la carte naît déjà en plan.
+  // Plan ↔ satellite : seulement quand la vue choisie diffère de celle de la carte.
   useEffect(() => {
-    if (premiereVue.current) {
-      premiereVue.current = false
-      return
-    }
-    if (carte.current) appliquerVue(carte.current, vue, couleurs.current)
+    if (!carte.current || vue === vueDeLaCarte.current) return
+    vueDeLaCarte.current = vue
+    appliquerVue(carte.current, vue, couleurs.current)
   }, [vue])
 
   const allerA = (p: Point, zoom = ZOOM_PROCHE) => {
