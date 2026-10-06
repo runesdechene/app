@@ -12,7 +12,7 @@ import type { Point } from '@/shared/lib/distance'
 import { positionSiAutorisee } from '@/shared/lib/position'
 import { envoyerPhotos } from '@/shared/supabase/photos'
 import { ajouterLieu, fetchEpoques, fetchNatures, fetchVoisins } from '../api/ajout'
-import { endroitDe } from '../lib/adresse'
+import { endroitDe } from '@/shared/lib/adresse'
 import { jeterBrouillon, type Brouillon } from '../lib/brouillon'
 
 export function useNatures() {

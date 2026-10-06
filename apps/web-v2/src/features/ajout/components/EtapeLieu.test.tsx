@@ -15,7 +15,7 @@ import { EtapeLieu } from './EtapeLieu'
 const api = vi.hoisted(() => ({ fetchVoisins: vi.fn() }))
 vi.mock('../api/ajout', () => api)
 const geocodeur = vi.hoisted(() => ({ endroitDe: vi.fn(), chercherEndroits: vi.fn() }))
-vi.mock('../lib/adresse', () => geocodeur)
+vi.mock('@/shared/lib/adresse', () => geocodeur)
 const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
 vi.mock('@/shared/lib/position', () => position)
 

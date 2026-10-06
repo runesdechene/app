@@ -21,7 +21,7 @@ import { positionSiAutorisee } from '@/shared/lib/position'
 import { ajouterOmbrage, FOND, FRANCE, styleParchemin } from '@/shared/lib/styleCarte'
 import { useEndroit, useVoisins } from '../hooks/useAjout'
 import { useUrlDe } from '@/shared/hooks/useUrlDe'
-import { chercherEndroits, type Resultat } from '../lib/adresse'
+import { chercherEndroits, type Resultat } from '@/shared/lib/adresse'
 import type { ProprietesEtape } from '../lib/brouillon'
 import styles from './EtapeLieu.module.css'
 

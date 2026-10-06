@@ -9,7 +9,7 @@
 import type { PhotoAEnvoyer } from '@/shared/lib/photo'
 import { del, get, set } from 'idb-keyval'
 import type { Point } from '@/shared/lib/distance'
-import type { Endroit } from './adresse'
+import type { Endroit } from '@/shared/lib/adresse'
 
 export const ETAPES = ['photo', 'lieu', 'nom', 'recit', 'apercu'] as const
 export type Etape = (typeof ETAPES)[number]
