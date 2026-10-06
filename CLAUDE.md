@@ -66,7 +66,9 @@ Graphify se reconstruit seul au commit (hook `post-commit`, + `scripts/graphify-
 ## Livrer
 
 - Front modifié → `pnpm dev` et le parcours testé dans le navigateur, puis `pnpm build` OK.
-- Commit à chaque étape qui marche ; push par lots, **toujours en fin de session**.
+- Commit à chaque étape qui marche ; push par lots, **toujours en fin de session**. Le push est le
+  mien, **y compris les commits d'une autre session** sur la branche : je ne les laisse pas en
+  attente (Uriel, 06/10 — sinon le hook `Stop` relance en boucle).
 - Fin de session : une décision → `_État.md` du vault ; un piège → `.claude/rules/`. Rien d'autre.
 
 ## Nouvelle machine
