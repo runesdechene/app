@@ -4,6 +4,8 @@
  * POURQUOI — rien n'est supposé : un rôle inconnu est refusé ; une fiche introuvable vaut null.
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
+import { lireLieuDeCarte } from '@/shared/lib/lieuDeCarte'
+import type { LieuDeCarte } from '@/shared/ui/LieuCarte'
 
 export type Role = 'chef' | 'officier' | 'membre'
 export type CarteCompagnie = {
@@ -56,7 +58,7 @@ export type FicheCompagnie = {
   nbMembres: number
   // Vide pour qui n'est pas d'une Compagnie privée (migration 434) : seul le nombre se voit.
   membres: Membre[]
-  lieux: { id: string; nom: string; par: string | null; quand: string }[]
+  lieux: LieuDeCarte[] // en cartes ; l'auteur est qui l'a revendiqué (migration 438)
   demandes: { id: string; nom: string; avatar: string | null; mot: string | null; quand: string }[]
 }
 
@@ -126,15 +128,7 @@ export function lireFicheCompagnie(json: unknown): FicheCompagnie | null {
         titre: ouNull(chaine)(m.titre),
       }
     })(f.membres),
-    lieux: liste((v) => {
-      const l = objet(v)
-      return {
-        id: chaine(l.id),
-        nom: chaine(l.nom),
-        par: ouNull(chaine)(l.par),
-        quand: chaine(l.quand),
-      }
-    })(f.lieux),
+    lieux: liste(lireLieuDeCarte)(f.lieux),
     demandes: liste((v) => {
       const d = objet(v)
       return {

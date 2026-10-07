@@ -289,8 +289,19 @@ test('fonder et rejoindre une Compagnie se disent ; son nom ouvre sa fiche dans 
   const [fondation, adhesion] = within(fil).getAllByRole('listitem')
   expect(fondation).toHaveTextContent('Luna a fondé Le Lys de Fer')
   expect(adhesion).toHaveTextContent('Aelis a rejoint Le Lys de Fer')
-  expect(within(fondation as HTMLElement).getByRole('link', { name: 'Le Lys de Fer' })).toHaveAttribute(
-    'href',
-    '/accueil/compagnie/f-lys',
+  expect(
+    within(fondation as HTMLElement).getByRole('link', { name: 'Le Lys de Fer' }),
+  ).toHaveAttribute('href', '/accueil/compagnie/f-lys')
+})
+
+test('une revendication pour une Compagnie la nomme', async () => {
+  const lys = { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'revendication:l1:u2:1', type: 'revendication', compagnie: lys },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getByRole('listitem')).toHaveTextContent(
+    'Luna vient de revendiquer Pointe du Becquet pour Le Lys de Fer',
   )
 })

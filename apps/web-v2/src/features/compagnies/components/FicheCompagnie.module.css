@@ -19,6 +19,7 @@
 
 .corps {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* le carrousel ne doit pas élargir la page */
   gap: var(--space-3);
   margin-top: -46px;
   padding: 0 var(--space-6);
@@ -43,8 +44,7 @@
 }
 
 .infos,
-.sousSection,
-.par {
+.sousSection {
   margin: 0;
   color: var(--color-texte-doux);
   font-family: var(--font-corps);
@@ -90,8 +90,7 @@
   list-style: none;
 }
 
-.personne,
-.lieu {
+.personne {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -99,13 +98,7 @@
   text-decoration: none;
 }
 
-.lieu {
-  display: grid;
-  gap: 2px;
-}
-
-.qui,
-.nomLieu {
+.qui {
   display: block;
   color: var(--color-encre);
   font-family: var(--font-corps);
@@ -193,4 +186,26 @@
   color: var(--color-accent);
   font-family: var(--font-corps);
   font-size: var(--legende-size);
+}
+
+/* « Leurs lieux » : les cartes défilent jusqu'aux bords de l'écran. */
+.cadre {
+  display: flex;
+  margin: var(--space-2) calc(-1 * var(--space-6)) 0;
+}
+
+.rangee {
+  display: flex;
+  flex: 1;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-6) var(--space-2);
+  overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.rangee::-webkit-scrollbar {
+  display: none;
 }

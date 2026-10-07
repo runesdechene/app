@@ -58,7 +58,17 @@ test('la fiche se lit ; disparue, elle vaut null', () => {
         titre: 'Arpenteur du Jura',
       },
     ],
-    lieux: [{ id: 'l1', nom: 'Château de Joux', par: 'Gautier', quand: '2026-09-28T10:00:00Z' }],
+    lieux: [
+      {
+        id: 'l1',
+        nom: 'Château de Joux',
+        imageUrl: 'https://exemple.test/joux.webp',
+        latitude: null,
+        longitude: null,
+        categorie: null,
+        auteur: { nom: 'Gautier', avatarUrl: null },
+      },
+    ],
     demandes: [],
   })
   expect(f).toMatchObject({ privee: true, demandee: true, monRole: null })

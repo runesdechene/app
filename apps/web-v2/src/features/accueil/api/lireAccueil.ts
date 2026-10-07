@@ -6,7 +6,7 @@
  *            cartes de lieu partagées (`LieuDeCarte`).
  */
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
-import type { LieuDeCarte } from '@/shared/ui/LieuCarte'
+import { lireLieuDeCarte } from '@/shared/lib/lieuDeCarte'
 
 export type Banniere = {
   image: string
@@ -69,7 +69,7 @@ export type Chemin = {
     region: string | null
     type: { icone: string; couleur: string | null } | null // mig 375
   } | null
-  compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion
+  compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion, revendication « pour » (438)
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -133,22 +133,6 @@ export function lireBanniere(json: unknown): Banniere | null {
       sousTitre: hex(b.subtitleColor, '#ffffff'),
     },
     ombre: { couleur: hex(b.shadowColor, '#000000'), force: Number(b.shadowStrength ?? 0) },
-  }
-}
-
-function lireLieuDeCarte(v: unknown): LieuDeCarte {
-  const l = objet(v)
-  return {
-    id: chaine(l.id),
-    nom: chaine(l.nom),
-    imageUrl: ouNull(chaine)(l.imageUrl),
-    latitude: ouNull(nombre)(l.latitude),
-    longitude: ouNull(nombre)(l.longitude),
-    categorie: ouNull((c) => ({ icone: chaine(objet(c).icone) }))(l.categorie),
-    auteur: ouNull((a) => ({
-      nom: chaine(objet(a).nom),
-      avatarUrl: ouNull(chaine)(objet(a).avatarUrl),
-    }))(l.auteur),
   }
 }
 

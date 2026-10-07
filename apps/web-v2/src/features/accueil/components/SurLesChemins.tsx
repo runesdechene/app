@@ -111,7 +111,8 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
         )}
         {compagnie && (
           <>
-            {' '}
+            {/* Une revendication pour sa Compagnie : « … Château de Joux pour Le Lys de Fer ». */}
+            {lieu ? ' pour ' : ' '}
             <Link className={styles.lieu} to={`/accueil/compagnie/${compagnie.id}`}>
               {compagnie.nom}
             </Link>

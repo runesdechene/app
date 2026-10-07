@@ -2,18 +2,22 @@
  * QUOI     — la fiche d'une Compagnie (maquettes 389:309 et 454:272) : le bandeau à sa couleur,
  *            l'avatar, le nom, la devise, la mission ; le bouton selon ma place ; qui la mène (le Chef
  *            et les Officiers, rôles accordés) ; les membres, chacun avec son niveau et son titre, les
- *            huit derniers venus puis « Voir les autres » ; « Leurs lieux » ; « Gérer » pour le Chef
+ *            huit derniers venus puis « Voir les autres » ; « Leurs lieux » en cartes photo, comme
+ *            sur le profil (migration 438) ; « Gérer » pour le Chef
  *            et les Officiers ; « Quitter » pour un membre.
  * POURQUOI — une Compagnie est une antenne locale qu'on rejoint d'un geste (publique) ou sur demande
  *            (privée) ; son canal vit dans La Communauté (« Ouvrir le canal » y coche sa gélule).
  */
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { useGlisser } from '@/shared/hooks/useGlisser'
+import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import { teinteCompagnie } from '@/shared/lib/teinte'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Feuille } from '@/shared/ui/Feuille'
+import { LieuCarte } from '@/shared/ui/LieuCarte'
 import type { FicheCompagnie as Fiche } from '../api/lireCompagnies'
 import { useCompagnie } from '../hooks/useCompagnie'
 import { messageDeRefus } from '../lib/refus'
@@ -28,6 +32,8 @@ export function FicheCompagnie({ id }: { id: string }) {
   const { fiche, erreur, rejoindre, quitter, enCours, refus } = useCompagnie(id)
   const [quitterOuvert, setQuitterOuvert] = useState(false)
   const [tousLesMembres, setTousLesMembres] = useState(false)
+  const position = useMaPosition()
+  const glisser = useGlisser()
   if (erreur) return <EmptyState>La Compagnie n’a pas pu être chargée</EmptyState>
   if (fiche === undefined) return <div className={styles.chargement} aria-busy="true" />
   if (fiche === null) return <EmptyState>Cette Compagnie n’existe plus.</EmptyState>
@@ -137,19 +143,14 @@ export function FicheCompagnie({ id }: { id: string }) {
               Leurs lieux
             </h3>
             <p className={styles.sousSection}>Revendiqués pour la Compagnie</p>
-            <ul className={styles.liste}>
-              {fiche.lieux.map((l) => (
-                <li key={l.id}>
-                  <Link className={styles.lieu} to={`../../lieu/${l.id}`} relative="path">
-                    <span className={styles.nomLieu}>{l.nom}</span>
-                    <span className={styles.par}>
-                      {l.par ? `par ${l.par} · ` : ''}
-                      {LE.format(new Date(l.quand))}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Carrousel : cadre flex > rangée flex: 1 qui défile (règle de interface.md). */}
+            <div className={styles.cadre}>
+              <ul ref={glisser} className={styles.rangee}>
+                {fiche.lieux.map((l) => (
+                  <LieuCarte key={l.id} lieu={l} position={position} avecAuteur />
+                ))}
+              </ul>
+            </div>
           </section>
         )}
 
