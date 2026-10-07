@@ -12,7 +12,7 @@ const api = vi.hoisted(() => ({ fetchMesEnigmes: vi.fn(), fetchMaCulture: vi.fn(
 vi.mock('../api/mesEnigmes', () => api)
 
 function afficher() {
-  render(
+  return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <MemoryRouter>
         <PageCulture id="byzantine" />
@@ -22,7 +22,14 @@ function afficher() {
 }
 
 const byzance = {
-  culture: { id: 'byzantine', nom: 'Byzance', icone: null, couleur: '#a93d76', zone: 'entre la Thrace et l’Asie Mineure' },
+  culture: {
+    id: 'byzantine',
+    nom: 'Byzance',
+    icone: null,
+    couleur: '#a93d76',
+    zone: 'entre la Thrace et l’Asie Mineure',
+    presentation: 'Pendant mille ans, l’Empire romain d’Orient…',
+  },
   resolues: 14,
   total: 72,
   centre: { lat: 41, lng: 28.9 },
@@ -67,6 +74,19 @@ test('chaque énigme porte son numéro fixe ; on les range par date de réussite
   cartes = screen.getAllByRole('listitem')
   expect(cartes[0]).toHaveTextContent('N° 30')
   expect(cartes[1]).toHaveTextContent('N° 242')
+})
+
+test('la page s’ouvre sur le portrait de la culture, réglé dans le Hub ; sans portrait, pas d’encart', async () => {
+  api.fetchMaCulture.mockResolvedValue(byzance)
+  const { unmount } = afficher()
+  expect(await screen.findByRole('region', { name: 'Byzance, en quelques mots' })).toHaveTextContent(
+    'Pendant mille ans, l’Empire romain d’Orient…',
+  )
+  unmount()
+  api.fetchMaCulture.mockResolvedValue({ ...byzance, culture: { ...byzance.culture, presentation: null } })
+  afficher()
+  await screen.findByText('14 / 72')
+  expect(screen.queryByRole('region', { name: 'Byzance, en quelques mots' })).toBeNull()
 })
 
 test('sans cercle, pas de lien vers la carte', async () => {

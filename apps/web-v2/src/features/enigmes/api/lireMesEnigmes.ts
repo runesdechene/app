@@ -17,7 +17,15 @@ export type MesEnigmes = { resolues: number; total: number; cultures: CultureRes
 // `numero` : son numéro fixe, le même pour tous (migration 448).
 export type EnigmeApprise = { numero: number; reponse: string; question: string; explication: string; le: string }
 export type MaCulture = {
-  culture: { id: string; nom: string; icone: string | null; couleur: string | null; zone: string | null }
+  // presentation : le portrait de la culture, réglé dans le Hub (migration 450).
+  culture: {
+    id: string
+    nom: string
+    icone: string | null
+    couleur: string | null
+    zone: string | null
+    presentation: string | null
+  }
   resolues: number
   total: number
   centre: { lat: number; lng: number } | null
@@ -63,6 +71,7 @@ export function lireMaCulture(v: unknown): MaCulture {
       icone: texteOuNull(c.icone),
       couleur: texteOuNull(c.couleur),
       zone: texteOuNull(c.zone),
+      presentation: texteOuNull(c.presentation ?? null),
     },
     resolues: nombre(o.resolues),
     total: nombre(o.total),

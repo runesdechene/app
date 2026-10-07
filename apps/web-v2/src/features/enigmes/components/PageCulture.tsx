@@ -1,5 +1,6 @@
 /**
- * QUOI     — une culture dans « Les énigmes » (maquette 478:526) : « 14 / 72 résolues », l'encart de
+ * QUOI     — une culture dans « Les énigmes » (maquette 478:526) : son portrait (réglé dans le Hub),
+ *            « 14 / 72 résolues », l'encart de
  *            ce qui reste à percer (où ça s'éveille, et le lien qui vole sur la carte), puis chaque
  *            énigme résolue, à son numéro fixe — sa question, qui se déplie sur sa réponse et son « Le
  *            savais-tu ? » —, rangées par date de réussite (la plus récente en tête) ou par numéro. Tout en écriture droite et lisible : l'italique penchée ne se lisait pas (Uriel, 07/10).
@@ -37,6 +38,12 @@ export function PageCulture({ id }: { id: string }) {
   const encart = encartEnClair(total - resolues, culture.nom, culture.zone)
   return (
     <div className={styles.page} style={culture.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
+      {/* Le portrait de la culture, réglé dans le Hub : donner envie de s'y intéresser (Uriel, 07/10). */}
+      {culture.presentation && (
+        <section className={styles.portrait} aria-label={`${culture.nom}, en quelques mots`}>
+          <p className={styles.portraitTexte}>{culture.presentation}</p>
+        </section>
+      )}
       <div className={styles.resume}>
         <PastilleCulture icone={culture.icone} couleur={culture.couleur} taille="grande" />
         <p className={styles.compte}>

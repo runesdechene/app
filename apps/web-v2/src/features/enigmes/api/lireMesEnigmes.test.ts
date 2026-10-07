@@ -33,6 +33,8 @@ test('une culture : sa zone, son centre, ce qu’on a appris', () => {
   expect(c.centre).toEqual({ lat: 41, lng: 28.9 })
   expect(c.enigmes[0]?.reponse).toBe('Sainte-Sophie')
   expect(c.enigmes[0]?.numero).toBe(242)
+  // Avant la migration 450, pas de portrait.
+  expect(c.culture.presentation).toBeNull()
 })
 
 test('une culture sans zone ni cercle : zone et centre absents', () => {
