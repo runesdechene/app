@@ -20,6 +20,7 @@ export function useEnigme(id: number) {
     onSettled: () => {
       void client.invalidateQueries({ queryKey: ['enigmes-en-attente'] })
       void client.invalidateQueries({ queryKey: ['mes-titres'] })
+      void client.invalidateQueries({ queryKey: ['mes-enigmes'] })
     },
   })
   return {

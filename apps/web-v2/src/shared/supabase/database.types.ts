@@ -1165,6 +1165,7 @@ export type Database = {
           id: string
           label: string
           sort_order: number
+          zone: string | null
         }
         Insert: {
           active?: boolean
@@ -1175,6 +1176,7 @@ export type Database = {
           id: string
           label: string
           sort_order?: number
+          zone?: string | null
         }
         Update: {
           active?: boolean
@@ -1185,6 +1187,7 @@ export type Database = {
           id?: string
           label?: string
           sort_order?: number
+          zone?: string | null
         }
         Relationships: []
       }
@@ -6284,6 +6287,13 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      _enigmes_resolues: {
+        Args: { p_theme: string; p_user: string }
+        Returns: {
+          enigma_id: number
+          le: string
+        }[]
+      }
       _est_porteur: { Args: { p_user: string }; Returns: boolean }
       _etat_du_lieu: {
         Args: { p_id: string }
@@ -6944,6 +6954,7 @@ export type Database = {
           p_id: string
           p_label: string
           p_ordre: number
+          p_zone?: string
         }
         Returns: undefined
       }
@@ -7521,6 +7532,8 @@ export type Database = {
       marquer_notifications_lues: { Args: never; Returns: number }
       marquer_registre_lu: { Args: never; Returns: undefined }
       mes_canaux: { Args: never; Returns: Json }
+      mes_enigmes: { Args: never; Returns: Json }
+      mes_enigmes_culture: { Args: { p_theme: string }; Returns: Json }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mes_notifications: { Args: never; Returns: Json }
