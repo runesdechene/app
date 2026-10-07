@@ -4021,46 +4021,6 @@ table select {
   font-weight: 600;
 }
 
-/* Accès V2 — pastille « V2 compatible » (convention spec V2 §2) : ocre de la DA V2. */
-.badge-v2 {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: rgba(138, 111, 58, 0.14);
-  color: #8a6f3a;
-  font-size: 0.62rem;
-  letter-spacing: 0.3px;
-  vertical-align: 1px;
-}
-
-.ud-v2-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 28px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.ud-v2-toggle input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-primary);
-  cursor: pointer;
-}
-
-.ud-v2-toggle input:disabled {
-  cursor: wait;
-}
-
-.ud-v2-error {
-  margin-top: 4px;
-  font-size: 0.75rem;
-  color: var(--color-danger);
-}
-
 .ud-section {
   margin-bottom: 28px;
 }

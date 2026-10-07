@@ -21,7 +21,6 @@ interface UserInfo {
   energy_points: number
   max_energy: number
   game_mode: string | null
-  v2_access: boolean
   user_crowns: { balance: number } | null
 }
 
@@ -68,8 +67,6 @@ export function UserDetail() {
   const navigate = useNavigate()
 
   const [user, setUser] = useState<UserInfo | null>(null)
-  const [savingV2, setSavingV2] = useState(false)
-  const [v2Error, setV2Error] = useState<string | null>(null)
   const [faction, setFaction] = useState<FactionInfo | null>(null)
   const [fragments, setFragments] = useState<FragmentInfo[]>([])
   const [purchaseLogs, setPurchaseLogs] = useState<PurchaseLog[]>([])
@@ -95,7 +92,7 @@ export function UserDetail() {
       // Fetch user
       const { data: userData, error: userErr } = await supabase
         .from('users_admin')
-        .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, faction_id, account_source, shopify_customer_id, avatar_url, notoriety_points, exploration_points, erudition_points, energy_points, max_energy, game_mode, v2_access, user_crowns(balance)')
+        .select('id, email_address, first_name, display_name, role, is_active, created_at, last_login_at, faction_id, account_source, shopify_customer_id, avatar_url, notoriety_points, exploration_points, erudition_points, energy_points, max_energy, game_mode, user_crowns(balance)')
         .eq('id', userId!)
         .single()
 
@@ -184,18 +181,6 @@ export function UserDetail() {
     }
   }
 
-  // Accès à la V2 en construction (mig 344). Les admins y ont accès d'office.
-  async function toggleV2Access(enabled: boolean) {
-    if (!user || savingV2) return
-    setSavingV2(true)
-    const { error: e } = await supabase.rpc('set_v2_access', { p_user_id: user.id, p_enabled: enabled })
-    setSavingV2(false)
-    // Erreur locale à la case : la fiche du joueur reste affichée.
-    if (e) { setV2Error(e.message); return }
-    setV2Error(null)
-    setUser({ ...user, v2_access: enabled })
-  }
-
   if (loading) return <div className="loading">Chargement...</div>
   if (error || !user) return (
     <div>
@@ -236,25 +221,6 @@ export function UserDetail() {
         <div className="ud-card">
           <div className="ud-card-label">Role</div>
           <div className="ud-card-value">{user.role}</div>
-        </div>
-        <div className="ud-card ud-card-v2">
-          <div className="ud-card-label">
-            Accès V2 <span className="badge-v2">V2 compatible</span>
-          </div>
-          {user.role === 'admin' ? (
-            <div className="ud-card-value">D'office (admin)</div>
-          ) : (
-            <label className="ud-v2-toggle">
-              <input
-                type="checkbox"
-                checked={user.v2_access}
-                disabled={savingV2}
-                onChange={e => void toggleV2Access(e.target.checked)}
-              />
-              <span>{user.v2_access ? 'Autorisé' : 'Non autorisé'}</span>
-            </label>
-          )}
-          {v2Error && <div className="ud-v2-error">{v2Error}</div>}
         </div>
         <div className="ud-card">
           <div className="ud-card-label">Heritage</div>
