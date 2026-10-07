@@ -53,7 +53,11 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
       <div className={styles.contenu}>
         <header className={styles.entete}>
           <span className={styles.icone} style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}>
-            {enigme.culture.icone ? <img src={enigme.culture.icone} alt="" /> : null}
+            {enigme.culture.icone ? (
+              <img src={enigme.culture.icone} alt="" />
+            ) : (
+              <span className={styles.pastille} data-testid="pastille-culture" />
+            )}
           </span>
           <Text variant="titre-section">{enigme.culture.nom}</Text>
         </header>

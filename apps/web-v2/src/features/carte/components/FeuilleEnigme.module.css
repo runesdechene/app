@@ -23,6 +23,13 @@
   background: var(--color-feuille);
 }
 
+.pastille {
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: var(--couleur-culture, var(--color-carte-encre));
+}
+
 .icone img {
   width: 60%;
   height: 60%;

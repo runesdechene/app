@@ -64,3 +64,23 @@ test('une énigme rendormie le dit', async () => {
   fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
   expect(await screen.findByText('Cette énigme s’est rendormie.')).toBeInTheDocument()
 })
+
+test('deux touchers rapides n’envoient qu’une réponse', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockReturnValue(new Promise(() => undefined))
+  monter()
+  await retourner()
+  const bouton = await screen.findByRole('button', { name: 'Sainte-Sophie' })
+  fireEvent.click(bouton)
+  fireEvent.click(bouton)
+  await waitFor(() => {
+    expect(percerEnigme).toHaveBeenCalledTimes(1)
+  })
+})
+
+test('une culture sans icône montre une pastille', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  monter()
+  await retourner()
+  expect(await screen.findByTestId('pastille-culture')).toBeInTheDocument()
+})

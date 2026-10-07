@@ -49,8 +49,14 @@ export function ajouterCalquesEnigmes(map: SupportDeCalques, ecran: number) {
   map.addLayer({ id: CALQUE_SCEAUX_ENIGMES, type: 'symbol', source: SOURCE_ENIGMES, minzoom: ZOOM_DES_SCEAUX, layout: marque('enigme-sceau') })
 }
 
-function toile(taille: number) {
-  const ctx = new OffscreenCanvas(taille * RATIO, taille * RATIO).getContext('2d')
+// OffscreenCanvas manque sur iOS avant 16.4 : un canevas ordinaire, jamais affiché, le remplace
+// (même repli que `contexte2d` des pins).
+export function toileDesEnigmes(taille: number) {
+  const cote = taille * RATIO
+  const ctx =
+    typeof OffscreenCanvas !== 'undefined'
+      ? new OffscreenCanvas(cote, cote).getContext('2d')
+      : Object.assign(document.createElement('canvas'), { width: cote, height: cote }).getContext('2d')
   if (!ctx) throw new Error('canevas indisponible')
   ctx.scale(RATIO, RATIO)
   return ctx
@@ -58,7 +64,7 @@ function toile(taille: number) {
 
 // Un point de cire dans un halo pâle.
 function eclat(c: CouleursCarte) {
-  const ctx = toile(ECLAT)
+  const ctx = toileDesEnigmes(ECLAT)
   const m = ECLAT / 2
   ctx.globalAlpha = 0.2
   ctx.fillStyle = c.cire
@@ -77,7 +83,7 @@ function eclat(c: CouleursCarte) {
 
 // Le sceau de cire et son « ? » en IM Fell English.
 function sceau(c: CouleursCarte) {
-  const ctx = toile(SCEAU)
+  const ctx = toileDesEnigmes(SCEAU)
   const m = SCEAU / 2
   ctx.fillStyle = c.cire
   ctx.beginPath()

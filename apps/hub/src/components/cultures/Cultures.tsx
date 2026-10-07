@@ -1,6 +1,6 @@
 /**
  * QUOI     — les cultures des énigmes : nom, icône, couleur, complément de titre, active, et leur zone
- *            (un à trois cercles) sur une carte, avec les « ? » éveillés en ce moment.
+ *            (autant de cercles qu'on veut, tirés à égalité) sur une carte, avec les « ? » éveillés.
  * POURQUOI — spec énigmes (2026-10-07) : la zone et l'icône de chaque culture se règlent ici ; les
  *            titres (« Sage des arcanes scandinaves ») se renomment quand le complément change.
  * ATTENTION — écriture par la RPC `enregistrer_culture` (réservée aux admins) : la table n'a pas de
@@ -128,11 +128,11 @@ export function Cultures() {
             <label className="faction-field"><input type="checkbox" checked={culture.active} onChange={(e) => changer({ active: e.target.checked })} /> Active</label>
             <p className="cultures-stats">{culture.stock} énigmes dans le stock · {culture.total} points au total · {culture.eveils.length} « ? » éveillés</p>
             <div className="cultures-cercles">
-              <span className="faction-field-label">Zone ({culture.cercles.length} / 3 cercles) — un clic sur la carte pose un centre</span>
+              <span className="faction-field-label">Zone : {culture.cercles.length} cercle{culture.cercles.length > 1 ? 's' : ''}, chacun tiré à égalité — un clic sur la carte en pose un (5 km ≈ un site précis)</span>
               {culture.cercles.map((c, i) => (
                 <div key={i} className="cultures-cercle">
                   <span>{c.lat.toFixed(2)}, {c.lng.toFixed(2)}</span>
-                  <input type="range" min={50} max={800} step={10} value={c.rayon_km}
+                  <input type="range" min={5} max={1000} step={5} value={c.rayon_km}
                     onChange={(e) => changer({ cercles: culture.cercles.map((x, j) => (j === i ? { ...x, rayon_km: Number(e.target.value) } : x)) })} />
                   <span>{c.rayon_km} km</span>
                   <button className="btn-danger" onClick={() => changer({ cercles: culture.cercles.filter((_, j) => j !== i) })}>Retirer</button>
@@ -145,7 +145,7 @@ export function Cultures() {
             eveils={culture.eveils}
             couleur={culture.couleur ?? '#a94842'}
             onPoser={(lat, lng) => {
-              if (culture.cercles.length < 3) changer({ cercles: [...culture.cercles, { lat, lng, rayon_km: 250 }] })
+              changer({ cercles: [...culture.cercles, { lat, lng, rayon_km: 50 }] })
             }}
           />
         </div>

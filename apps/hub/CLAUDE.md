@@ -36,7 +36,7 @@ Toujours requêter par **email** (pas par id), voir `docs/db/auth.md`.
 ## Cultures des énigmes
 
 `/carte/cultures` (`components/cultures/`) : icône (bucket `tag-icons`, dossier `cultures/`), couleur,
-complément de titre et zone (1 à 3 cercles sur une carte MapLibre) de chaque culture, plus les « ? »
+complément de titre et zone (autant de cercles qu'on veut, de 5 km à 1 000 km, tirés à égalité — migration 444) de chaque culture, plus les « ? »
 éveillés. Écriture par la RPC `enregistrer_culture` (admins), lecture par `cultures_du_hub` (migration
 441, spec `docs/superpowers/specs/2026-10-07-v2-enigmes-design.md`).
 

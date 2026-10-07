@@ -40,3 +40,7 @@ test('connaissance et Polymathe ont leur phrase', () => {
   expect(phraseCondition({ stat: 'connaissance', min: 10 })).toBe('Débloqué en réunissant 10 points de connaissance.')
   expect(phraseCondition({ stat: 'polymathe', min: 3 })).toBe('Débloqué en devenant Sage dans 3 cultures.')
 })
+
+test('un seul point de connaissance se dit au singulier', () => {
+  expect(phraseCondition({ stat: 'connaissance', min: 1 })).toBe('Débloqué en réunissant 1 point de connaissance.')
+})
