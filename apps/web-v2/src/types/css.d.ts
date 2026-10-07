@@ -30,5 +30,6 @@ declare module 'react' {
     '--x'?: string
     '--y'?: string
     '--couleur-culture'?: string
+    '--icone'?: string // l'icône d'une culture, en masque peint à sa couleur
   }
 }

@@ -17,10 +17,11 @@
   height: 2.75rem;
 }
 
-.pastille img {
+.icone {
   width: 60%;
   height: 60%;
-  object-fit: contain;
+  background: var(--couleur-culture, var(--color-carte-encre));
+  mask: var(--icone) center / contain no-repeat;
 }
 
 .disque {

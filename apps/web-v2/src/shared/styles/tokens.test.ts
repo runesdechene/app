@@ -31,6 +31,7 @@ const PASSED_INLINE = new Set([
   '--x',
   '--y',
   '--couleur-culture',
+  '--icone',
   '--couleur', // la couleur d'une Compagnie (mig 422)
   '--encre-compagnie', // son encre lisible (shared/lib/teinte.ts)
   '--sur-couleur',
