@@ -21,7 +21,6 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 | `runesdechene` (Explore, `apps/web-v2` depuis la bascule du 07/10/2026) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
-| `rdc-web-v2` | `64c61b33-40c1-4505-966a-d0b136cac69b` | servait `/v2/*` avant la bascule — **ne plus déployer**, à supprimer |
 | `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
 - **Vérifier** : la page sert le build local (`curl -s https://app.runesdechene.com/ | grep -o
