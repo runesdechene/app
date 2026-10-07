@@ -1,6 +1,6 @@
 /*
- * QUOI     — le détail d'un territoire : résumé, natures, puis un mois par rangée qui défile
- *            (même carrousel que les sections du profil), les mois anciens repliés (le titre du mois les ouvre).
+ * QUOI     — le détail d'un territoire : résumé, natures, puis un mois par liste de cartes
+ *            empilées en pleine largeur, les mois anciens repliés (le titre du mois les ouvre).
  */
 .page {
   display: grid;
@@ -42,8 +42,13 @@
   gap: var(--space-2);
 }
 
-.cadre {
-  display: flex;
+/* Le haut de la liste laisse la place au tampon qui déborde du coin des cartes. */
+.liste {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  list-style: none;
   transition:
     opacity var(--duree-douce) var(--courbe-douce),
     translate var(--duree-douce) var(--courbe-douce);
@@ -52,23 +57,6 @@
     opacity: 0;
     translate: 0 calc(var(--space-2) * -1);
   }
-}
-
-/* Le haut de la rangée laisse la place au tampon qui déborde du coin des cartes. */
-.rangee {
-  display: flex;
-  flex: 1;
-  gap: var(--space-3);
-  margin: 0;
-  padding: var(--space-4) var(--space-6) var(--space-2);
-  overflow-x: auto;
-  cursor: grab;
-  list-style: none;
-  scrollbar-width: none;
-}
-
-.rangee::-webkit-scrollbar {
-  display: none;
 }
 
 .bascule {
@@ -121,7 +109,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cadre,
+  .liste,
   .chevron {
     transition: none;
   }

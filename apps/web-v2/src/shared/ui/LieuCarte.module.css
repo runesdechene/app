@@ -12,6 +12,12 @@
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 18%, transparent);
 }
 
+/* Passeport : une carte par ligne, sur toute la largeur. */
+.carte[data-pleine-largeur] {
+  width: 100%;
+  height: 180px;
+}
+
 /* Le lien couvre toute la carte ; il s'enfonce un peu sous le doigt. Il porte le rognage arrondi
    (le tampon du passeport déborde de la carte, pas du lien) : il doit être positionné, sinon la
    photo et les dégradés, placés en absolu, s'accrochent à la carte et échappent au rognage —

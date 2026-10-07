@@ -1,15 +1,14 @@
 /**
  * QUOI     — un territoire en détail (maquette « Passeport — 3 », 442:272) : le résumé, ses
- *            natures, puis un défilement horizontal par mois de cartes « Lieux ajoutés », le
+ *            natures, puis par mois les cartes « Lieux ajoutés » empilées en pleine largeur, le
  *            tampon de la nature posé sur le coin, la date du jour en pastille (pour soi).
- * POURQUOI — « sans tampon pour les lieux en détail, juste un scroll horizontal » (Uriel,
- *            07/10) : la photo redevient l'héroïne, le tampon reste en coin. Les deux mois
+ * POURQUOI — la photo redevient l'héroïne (Uriel, 07/10), le tampon reste en coin ; les cartes
+ *            s'empilent plutôt que de défiler (changement validé le 07/10). Les deux mois
  *            les plus récents sont ouverts, les autres repliés : la page reste courte.
  *            Le titre d'un mois est un bouton (`aria-expanded`) : le focus reste dessus.
  */
 import { useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { useGlisser } from '@/shared/hooks/useGlisser'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
 import type { Nature, Tampon } from '../api/lirePasseport'
 import { usePasseport } from '../hooks/usePasseport'
@@ -81,7 +80,7 @@ function TerritoireInconnu({ id }: { id: string }) {
   )
 }
 
-// Le titre du mois est un bouton : il garde le focus quand la rangée s'ouvre ou se ferme.
+// Le titre du mois est un bouton : il garde le focus quand la liste s'ouvre ou se ferme.
 function SectionMois({
   mois,
   natures,
@@ -93,7 +92,6 @@ function SectionMois({
   auJour: boolean
   ouvertAuDepart: boolean
 }) {
-  const glisser = useGlisser()
   const [ouvert, setOuvert] = useState(ouvertAuDepart)
   const titre = `${moisLong(mois.cle)} · ${String(mois.tampons.length)} ${mois.tampons.length > 1 ? 'tampons' : 'tampon'}`
   return (
@@ -114,18 +112,16 @@ function SectionMois({
         </button>
       </h3>
       {ouvert && (
-        <div className={styles.cadre}>
-          <ul ref={glisser} className={styles.rangee}>
-            {mois.tampons.map((t) => (
-              <Carte
-                key={t.id}
-                tampon={t}
-                nature={t.nature === null ? null : (natures.get(t.nature) ?? null)}
-                auJour={auJour}
-              />
-            ))}
-          </ul>
-        </div>
+        <ul className={styles.liste}>
+          {mois.tampons.map((t) => (
+            <Carte
+              key={t.id}
+              tampon={t}
+              nature={t.nature === null ? null : (natures.get(t.nature) ?? null)}
+              auJour={auJour}
+            />
+          ))}
+        </ul>
       )}
     </section>
   )
@@ -153,6 +149,7 @@ function Carte({
       }}
       position={null}
       avecAuteur={false}
+      pleineLargeur
       pastille={auJour ? dateCourte(tampon.quand, true) : undefined}
       coin={
         nature ? (

@@ -3,7 +3,7 @@
  *            date à gauche et un tampon par-dessus le coin. Une carte de lieu du profil ouvre
  *            sa fiche, dans l'onglet où l'on se trouve.
  */
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router'
 import { expect, test } from 'vitest'
@@ -68,6 +68,14 @@ test("la pastille et le coin s'affichent", () => {
   afficher({ pastille: '2 oct.', coin: <span>tampon</span> })
   expect(screen.getByText('2 oct.')).toBeInTheDocument()
   expect(screen.getByText('tampon')).toBeInTheDocument()
+})
+
+test('pleineLargeur pose son attribut, sans lui la carte n’en a pas', () => {
+  afficher({ pleineLargeur: true })
+  expect(screen.getByRole('listitem')).toHaveAttribute('data-pleine-largeur')
+  cleanup()
+  afficher()
+  expect(screen.getByRole('listitem')).not.toHaveAttribute('data-pleine-largeur')
 })
 
 test('sans elles, rien de plus', () => {

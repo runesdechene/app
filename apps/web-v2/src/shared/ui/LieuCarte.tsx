@@ -12,6 +12,8 @@
  *            couleur : sur une photo, une couleur de catégorie peut jurer (Uriel, 27/09).
  *            pastille et coin ne servent qu'au passeport (date du jour, tampon de la nature) ;
  *            le coin déborde de la carte, le rognage est donc sur le lien, pas sur la carte.
+ *            pleineLargeur (passeport) : la carte prend la largeur de sa colonne, 180 px de haut,
+ *            au lieu de 290 × 196 ; la photo se demande alors plus large.
  */
 import { type ReactNode } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
@@ -37,12 +39,14 @@ export function LieuCarte({
   avecAuteur,
   pastille,
   coin,
+  pleineLargeur,
 }: {
   lieu: LieuDeCarte
   position: Point | null
   avecAuteur: boolean
   pastille?: string | undefined
   coin?: ReactNode | undefined
+  pleineLargeur?: boolean | undefined
 }) {
   const distance =
     position && lieu.latitude !== null && lieu.longitude !== null
@@ -53,7 +57,7 @@ export function LieuCarte({
   const onglet = useLocation().pathname.split('/')[1] ?? 'compte'
 
   return (
-    <li className={styles.carte}>
+    <li className={styles.carte} data-pleine-largeur={pleineLargeur ? '' : undefined}>
       <Link
         className={styles.lien}
         to={`/${onglet}/lieu/${lieu.id}`}
@@ -63,7 +67,7 @@ export function LieuCarte({
         {lieu.imageUrl && (
           <img
             className={styles.photo}
-            src={aLaTaille(lieu.imageUrl, 290)}
+            src={aLaTaille(lieu.imageUrl, pleineLargeur ? 400 : 290)}
             alt=""
             loading="lazy"
             decoding="async"
