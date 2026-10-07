@@ -61,7 +61,12 @@ vi.mock('@/features/enigmes/api/mesEnigmes', () => ({
 vi.mock('@/features/titres/api/mesTitres', () => ({
   fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [], cultures: [], polymathe: null }),
 }))
+// Téléphone par défaut ; un test passe sur PC avec `ecran.pc = true`.
+const ecran = vi.hoisted(() => ({ pc: false }))
+vi.mock('@/shared/hooks/useSurOrdinateur', () => ({ useSurOrdinateur: () => ecran.pc }))
+
 beforeEach(() => {
+  ecran.pc = false
   murmures.fetchFils.mockResolvedValue([])
   registre.fetchRegistreNonLus.mockResolvedValue({ messages: 0, mentions: 0 })
 })
@@ -272,8 +277,9 @@ test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Car
   expect(curseur()).toBeNull()
 })
 
-// Le menu du profil (maquette 476:434, Uriel 07/10) : le portrait l'ouvre ; la coupe, l'engrenage et
-// la sortie y sont entrés ; la cloche reste dans la barre.
+// Le menu du profil (maquette 476:434, Uriel 07/10), sur téléphone : le portrait l'ouvre ; la coupe,
+// l'engrenage et la sortie y sont entrés ; la cloche reste dans la barre. Sur PC, rien ne change :
+// les icônes restent en bas à gauche et le portrait mène au profil (Uriel, 07/10).
 async function ouvrirLeMenu() {
   await userEvent.click(await screen.findByRole('button', { name: 'Compte' }))
   return screen.findByRole('dialog', { name: 'Mon menu' })
@@ -309,10 +315,30 @@ test('« Préférences » s’ouvre depuis le menu', async () => {
   expect(router.state.location.pathname).toBe('/carte/preferences')
 })
 
-test('la cloche reste dans la barre ; la coupe, l’engrenage et la sortie n’y sont plus', async () => {
+test('sur téléphone, la cloche reste dans la barre ; la coupe, l’engrenage et la sortie n’y sont plus', async () => {
   renderAt('/carte')
   expect(await screen.findByRole('button', { name: 'Notifications' })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: 'Tous les titres' })).toBeNull()
   expect(screen.queryByRole('button', { name: 'Préférences' })).toBeNull()
   expect(screen.queryByRole('button', { name: 'Se déconnecter' })).toBeNull()
+})
+
+test('sur PC, toucher le portrait ouvre le profil, sans menu', async () => {
+  ecran.pc = true
+  const router = renderAt('/accueil')
+  await userEvent.click(await screen.findByRole('button', { name: 'Compte' }))
+  expect(router.state.location.pathname).toBe('/compte')
+  expect(screen.queryByRole('dialog', { name: 'Mon menu' })).toBeNull()
+})
+
+test('sur PC, les énigmes, les titres, les préférences et la sortie sont dans la barre, autour de la cloche', async () => {
+  ecran.pc = true
+  const router = renderAt('/accueil')
+  await userEvent.click(await screen.findByRole('button', { name: 'Les énigmes' }))
+  expect(router.state.location.pathname).toBe('/accueil/enigmes')
+  await userEvent.click(screen.getByRole('button', { name: 'Tous les titres' }))
+  expect(router.state.location.pathname).toBe('/accueil/titres')
+  await userEvent.click(screen.getByRole('button', { name: 'Préférences' }))
+  expect(router.state.location.pathname).toBe('/accueil/preferences')
+  expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
 })

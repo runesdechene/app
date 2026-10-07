@@ -1,5 +1,6 @@
 /**
- * QUOI     — la coquille : logotype, la coupe et la cloche, barre d'onglets, les cinq écrans
+ * QUOI     — la coquille : logotype, la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
+ *            sortie), barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
  *            changement d'onglet sans aucun code de restauration. Sur mobile, seul l'actif est
@@ -30,14 +31,19 @@ import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
+import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
+import coupe from '@/assets/ui/coupe.svg'
 import embleme from '@/assets/ui/embleme.png'
+import engrenage from '@/assets/ui/engrenage.svg'
+import enigmes from '@/assets/ui/menu-enigmes.svg'
 import logotype from '@/assets/ui/logotype.webp'
 import replier from '@/assets/ui/replier.svg'
+import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
@@ -198,6 +204,32 @@ export function Shell() {
         {/* Uriel, 01/10 : le numéro qui dit que le dernier déploiement est arrivé. */}
         <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>
+          {/* Sur PC, les énigmes et les titres au-dessus de la cloche, les préférences et la sortie
+              dessous (Uriel, 07/10) ; sur téléphone, ils vivent dans le menu du profil. */}
+          {surOrdinateur && (
+            <>
+              <button
+                type="button"
+                className={styles.action}
+                aria-label="Les énigmes"
+                onClick={() => {
+                  ouvrir('enigmes')
+                }}
+              >
+                <img src={enigmes} alt="" />
+              </button>
+              <button
+                type="button"
+                className={styles.action}
+                aria-label="Tous les titres"
+                onClick={() => {
+                  ouvrir('titres')
+                }}
+              >
+                <img src={coupe} alt="" />
+              </button>
+            </>
+          )}
           <button
             ref={boutonNotifications}
             type="button"
@@ -212,6 +244,32 @@ export function Shell() {
               <Pastille count={nonLues} />
             </span>
           </button>
+          {surOrdinateur && (
+            <>
+              <button
+                type="button"
+                className={styles.action}
+                aria-label="Préférences"
+                onClick={() => {
+                  ouvrir('preferences')
+                }}
+              >
+                <img src={engrenage} alt="" />
+              </button>
+              <button
+                type="button"
+                className={styles.action}
+                aria-label="Se déconnecter"
+                onClick={() => {
+                  // La garde d'accès voit la session tomber et renvoie vers la V1 ; un échec laisse
+                  // simplement la session ouverte.
+                  void seDeconnecter().catch(() => undefined)
+                }}
+              >
+                <img src={sortie} alt="" />
+              </button>
+            </>
+          )}
         </div>
         <main className={styles.main}>
           {TABS.map(({ id, label }) => {

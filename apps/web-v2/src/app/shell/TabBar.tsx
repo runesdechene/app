@@ -5,7 +5,7 @@
  *            Sur PC, un fond clair glisse jusqu'à l'onglet actif : un seul élément, le curseur,
  *            déplacé en CSS selon son rang (`--rang`), comme la brique Segments.
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
- *            (mémoire, double toucher ; le portrait ouvre le menu du profil). aria-current marque l'onglet actif pour les lecteurs
+ *            (mémoire, double toucher ; sur téléphone, le portrait ouvre le menu du profil). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
  *            L'onglet Messages porte la pastille des murmures non lus, posée sur son icône.
  */
@@ -22,6 +22,7 @@ import messagesIcon from '@/assets/ui/onglet-messages.png'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
+import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
@@ -57,11 +58,13 @@ export function TabBar({
   const pourMoi = useNonLus() + registre.mentions
 
   const [menuOuvert, setMenuOuvert] = useState(false)
+  const surOrdinateur = useSurOrdinateur()
 
   function press(pressed: TabId) {
     onToucher()
-    // Le portrait ouvre le menu du profil (Uriel, 07/10), même quand Compte est déjà l'onglet actif.
-    if (pressed === 'compte') {
+    // Sur téléphone, le portrait ouvre le menu du profil (Uriel, 07/10), même quand Compte est déjà
+    // l'onglet actif ; sur PC, il mène au profil, les autres entrées étant dans la barre.
+    if (pressed === 'compte' && !surOrdinateur) {
       setMenuOuvert(true)
       return
     }

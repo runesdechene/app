@@ -111,11 +111,6 @@
   display: none;
 }
 
-/* Préférences et Déconnexion : dans la barre sur PC seulement (Uriel, 28/09). */
-.pc {
-  display: none;
-}
-
 /* Mobile : le détail couvre tout l'écran, au-dessus de la barre. */
 .shell > aside {
   position: fixed;
@@ -291,10 +286,6 @@
     flex-direction: column;
     align-items: center;
     margin: 0 0 var(--space-2);
-  }
-
-  .actions .pc {
-    display: grid;
   }
 
   .retourV1 {
