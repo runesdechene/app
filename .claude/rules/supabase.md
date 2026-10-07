@@ -253,3 +253,14 @@ proposait `migration repair --status reverted 427` — qui aurait effacé sa tra
 `db push` réclame une migration distante absente : ne jamais `repair` ; copier le fichier depuis
 l'autre worktree, **sans le committer**, le temps du push (`--dry-run` d'abord : seule la sienne doit
 partir), puis le retirer. Une migration numérotée sous la dernière appliquée demande `--include-all`.
+
+## Une migration qui retire une clé lue par le front en ligne casse la prod si elle passe avant lui
+
+**Le piège** (07/10/2026, mig 433) : `get_mes_titres` perdait sa clé `autreEpoque`, que la V2 en
+ligne exigeait (`liste(...)` lève sur `undefined`). Le plan disait « front d'abord », mais la
+migration a été poussée avant le déploiement : « Tous les titres » en erreur en prod jusqu'au 1.2.3.
+
+**How to apply :** une migration ne retire jamais une clé, une colonne ou un paramètre que le front
+**déployé** lit encore. Soit la garder (vide) jusqu'au déploiement puis la retirer dans une
+migration suivante, soit déployer le front d'abord **et** n'écrire le fichier qu'après. Un ordre
+écrit dans un message ne protège pas : le fichier poussé peut partir avec le premier `db push`.
