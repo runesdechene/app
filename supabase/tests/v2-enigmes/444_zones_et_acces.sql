@@ -15,11 +15,11 @@ DECLARE
   v_avant  int;
 BEGIN
   -- 1. Cinq cercles, dont quatre de 5 km : tirés à égalité, les petits reçoivent ~4 points sur 5.
+  -- Le tirage dépend de g : sans ça, Postgres n'appelle la fonction qu'une fois pour les 400 lignes.
   SELECT count(*) INTO v_dans_petits
-    FROM generate_series(1, 400) g,
-         LATERAL public._point_dans_les_cercles(
-           '[{"lat":60,"lng":10,"rayon_km":800},{"lat":40,"lng":20,"rayon_km":5},{"lat":41,"lng":21,"rayon_km":5},{"lat":42,"lng":22,"rayon_km":5},{"lat":43,"lng":23,"rayon_km":5}]'::jsonb) p
-   WHERE p.lat < 45;
+    FROM generate_series(1, 400) g
+   WHERE (SELECT p.lat FROM public._point_dans_les_cercles(CASE WHEN g > 0 THEN
+           '[{"lat":60,"lng":10,"rayon_km":800},{"lat":40,"lng":20,"rayon_km":5},{"lat":41,"lng":21,"rayon_km":5},{"lat":42,"lng":22,"rayon_km":5},{"lat":43,"lng":23,"rayon_km":5}]'::jsonb END) p) < 45;
   ASSERT v_dans_petits BETWEEN 260 AND 380, format('cercles à égalité : %s / 400 dans les petits', v_dans_petits);
 
   -- 2. Le Hub accepte six cercles, refuse un rayon de moins de 5 km.
