@@ -242,3 +242,14 @@ Un paramètre `p_user_id` venu du client n'est qu'une affirmation de l'appelant.
       and pg_get_functiondef(p.oid) ~* '(insert\s+into|update\s+[a-z_.]+\s+set|delete\s+from)'
       and has_function_privilege('authenticated', p.oid, 'execute');
    ```
+
+## Deux sessions, deux worktrees : réserver les numéros de migration, et `db push` voit l'autre
+
+**Le piège** (06/10/2026, pin GPS et « Tous les titres » en parallèle) : l'autre session avait
+appliqué sa 427 en prod depuis son worktree ; mon `db push` refusait (`DbPushMissingLocalError`) et
+proposait `migration repair --status reverted 427` — qui aurait effacé sa trace.
+
+**How to apply :** réserver ses numéros par message à l'autre session **avant** d'écrire. Si
+`db push` réclame une migration distante absente : ne jamais `repair` ; copier le fichier depuis
+l'autre worktree, **sans le committer**, le temps du push (`--dry-run` d'abord : seule la sienne doit
+partir), puis le retirer. Une migration numérotée sous la dernière appliquée demande `--include-all`.
