@@ -2,17 +2,18 @@
 
 > Validé avec Uriel le 07/10/2026 (jour J). Remplace, pour l'adresse, la décision du 01/10
 > (« Explore à `/explore` ») et précise la décision 001 (`docs/v2/decisions/001-app-separee.md`).
+> Révisé le même jour : **une seule appli, Explore, le Campement en zone Porteurs à l'intérieur**
+> (retours des joueurs et de l'équipe) — Explore revient à la racine.
 
 ## Décisions
 
 - **Coupure nette.** Le jour de la bascule, toute adresse de la V1 mène à la V2 (l'écran
   équivalent quand il existe). Pas de V1 en sursis. `apps/explore-web` est supprimée le lendemain.
-- **Explore sous `/explore/`, son service worker à la racine** (Uriel, 07/10). Les écrans et
-  l'appli installée (portée du manifeste) vivent sous `/explore/` : une future appli Campement
-  (`/campement/`) captera ses liens sur Android, ce qu'une portée `/` interdirait. Le service
-  worker, lui, s'enregistre avec la portée `/` : il **remplace** celui de la V1 dans la même
-  inscription — les abonnements push survivent, la V1 en cache disparaît. La racine et les
-  vieilles adresses V1 redirigent vers `/explore/…`.
+- **Explore à la racine** `app.runesdechene.com/` (Uriel, 07/10). Une seule appli : le Campement
+  sera une zone d'Explore, à l'adresse `/campement`, que les e-mails, un QR code, les discussions et
+  le compte client de la boutique donnent directement. Le service worker, servi à `/sw.js` avec la
+  portée `/`, **remplace** celui de la V1 dans la même inscription — les abonnements push
+  survivent, la V1 en cache disparaît. Les vieux liens `/carte`, `/accueil` marchent tels quels.
 - **Le push suit la cloche de la V2** : ce qui touche tes lieux et toi, les mentions, les
   Compagnies, les Nouveautés. Les types V1 sans écran V2 (énigme du jour, expéditions, articles,
   Cour) s'arrêtent ; l'énigme du jour reviendra avec son chantier.
@@ -35,13 +36,9 @@
 - **Même site Netlify que la V1 aujourd'hui** (`runesdechene`, ID `1b29da09-…`) : il porte le
   domaine et son certificat ; on y déploie le `dist` de la V2. Pas de changement de DNS ni de
   domaine. Le site `rdc-web-v2` ne sert plus après la bascule (à supprimer plus tard).
-- La V2 passe sous `/explore/` : `base: '/explore/'`, `basename: '/explore'`, manifeste
-  `scope: '/explore/'`, `start_url: '/explore/accueil'`, `id: '/explore/'` ; service worker
-  enregistré avec la portée `/` (en-tête `Service-Worker-Allowed: /` sur `/explore/sw.js`) ;
-  `index.html` : `/v2` → `/explore` (canonique, `og:url`, `og:image`, JSON-LD) ; le lien du Hub
-  `Signalements.tsx:22`.
-- Netlify publie `dist/` à la racine du site et sert `/explore/*` depuis lui (règle 200
-  `/explore/*` → `/:splat`) ; `/` → `/explore/` en 301.
+- La V2 passe à la racine : `base: '/'`, `basename` retiré, PWA `scope: '/'`, manifeste
+  `id: '/'`, `start_url: '/accueil'` ; `index.html` perd ses `/v2` (canonique, `og:url`,
+  `og:image`, JSON-LD) ; le lien du Hub `Signalements.tsx:22`.
 - `apps/web-v2/netlify.toml` reprend les règles de la V1 : en-tête `frame-ancestors`, `/lieu/*`,
   `/sitemap.xml`, `/mouvement` vers seo-pages, puis le repli SPA. `/_astro/*` ne revient pas
   (seo-pages n'est plus en Astro). `public/_redirects` disparaît au profit du `netlify.toml`.
@@ -54,16 +51,14 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
 
 | V1 | V2 |
 |---|---|
-| `/` | `/explore/` |
-| `/post-login`, `/accueil` | `/explore/accueil` |
-| `/carte?placeId=:id` | `/explore/carte/lieu/:id` |
-| `/carte` | `/explore/carte` |
-| `/chat` | `/explore/messages` |
-| `/compagnies` | `/explore/compagnies` |
-| `/activite` | `/explore/accueil/chemins` |
-| `/nouvelles`, `/article/*` | `/explore/accueil/nouveautes` |
-| `/v2/*` | `/explore/:splat` |
-| `/?company=:slug` | `/explore/?company=:slug` (l'appli ouvre la fiche) |
+| `/post-login` | `/accueil` |
+| `/carte?placeId=:id` | `/carte/lieu/:id` |
+| `/chat` | `/messages` |
+| `/activite` | `/accueil/chemins` |
+| `/nouvelles`, `/article/*` | `/accueil/nouveautes` |
+| `/v2/*` | `/:splat` (sauf `/v2/sw.js`, voir plan, tâche 8b) |
+
+`/`, `/carte`, `/accueil`, `/compagnies` et `/?company=` ne changent pas d'adresse.
 
 - `/?company=<public_slug>` : l'appli lit le paramètre au démarrage et ouvre la fiche de la
   Compagnie (`factions.public_slug` → id, par une petite RPC ou `compagnies()`).
@@ -74,9 +69,9 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
 ## 3. Service worker et push
 
 - vite-plugin-pwa passe en **`injectManifest`** avec `src/sw.ts` (V2) : précache, repli de
-  navigation sur `/explore/index.html` **en liste blanche** — seulement les écrans d'Explore
-  (`/explore/`, `/explore/accueil`, `/explore/carte`, `/explore/messages`, `/explore/compagnies`,
-  `/explore/compte`, `/explore/bienvenue`, `/explore/da`) ; tout le reste va au serveur,
+  navigation sur `/index.html` **en liste blanche** — seulement les écrans d'Explore (`/`,
+  `/accueil`, `/carte`, `/messages`, `/compagnies`, `/compte`, `/bienvenue`, `/da` ; `/campement`
+  s'y ajoutera avec sa zone) ; tout le reste va au serveur,
   `skipWaiting` + `clientsClaim` (règle `v2.md`), gestionnaires `push` et `notificationclick`
   (ouvre ou focalise l'appli sur l'URL du push). Fichier servi à `/sw.js` : même adresse et même
   portée que la V1, donc il la remplace et garde ses abonnements.
@@ -87,7 +82,7 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
 - **`send-push`** : `categories.ts` et `payloads.ts` connaissent les types V2
   (`_notification_v2`, migration 421) avec le lien de `cibleDe` (`Notifications.tsx`), écrit sans
   préfixe (`/accueil/lieu/<id>`) : le service worker le pose sous la base de l'appli
-  (`/v2/` avant la bascule, `/explore/` après). Les types V1 sans équivalent
+  (`/v2/` avant la bascule, `/` après). Les types V1 sans équivalent
   deviennent `silent`.
 - **Nouveautés** : un push à chaque publication (`publier_mise_a_jour`) vers
   `/accueil/nouveautes`, comme les Annonces (migration 220) : une notification de type
@@ -98,32 +93,30 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
 - **`USER_UPDATED`** : la V2 recopie l'e-mail changé dans `users.email_address` comme la V1
   (`useAuth.ts:37-43`).
 
-## Les autres applis du domaine — `/campement`, `/scan`
+## Les autres usages du domaine — `/scan`, `/lieu`…
 
 Le service worker, de portée `/`, ne doit jamais avaler un autre usage du domaine (Uriel, 07/10).
 
-- **Préfixes réservés**, qu'Explore n'utilise jamais pour ses écrans : `/campement`, `/scan`,
-  `/lieu`, `/mouvement`, `/sitemap.xml`, `/sw.js`. (`/scan` : le scan vit sur l'accueil du
-  Campement, décision du 07/10 ; réservé par prudence.)
+- **Préfixes réservés**, qu'Explore n'utilise jamais pour ses écrans : `/scan`, `/lieu`,
+  `/mouvement`, `/sitemap.xml`, `/sw.js`. (`/scan` : la page publique du scan, sans compte.)
+  `/campement` n'est plus réservé : c'est une zone d'Explore (décision du 07/10).
 - **Netlify** : la première règle qui correspond gagne. Les règles des préfixes réservés sont
-  écrites **avant** le repli SPA d'Explore. `/campement/*` et `/scan/*` y figurent dès la bascule,
-  en commentaire tant que leur site n'existe pas — le jour venu, on décommente.
+  écrites **avant** le repli SPA d'Explore. `/scan/*` y figure dès la bascule, en commentaire
+  tant que sa page n'existe pas.
 - **Service worker** : liste blanche (§3). Un sous-dossier qui n'est pas d'Explore va au serveur,
   sans qu'on touche à Explore.
-- **Le Campement** : une appli à part ou une partie d'Explore, ce sera tranché avec son chantier
-  (pistes et risques notés dans le `_État.md` du 07/10). Pour la bascule : réserver `/campement/`
-  (Netlify et liste blanche), rien d'autre — les deux options restent ouvertes.
-- `/scan` : le scan vit sur l'accueil du Campement ; réservé par prudence.
-- **Le routeur d'Explore** : sa route `*` → `/accueil` ne voit jamais `/campement` (Netlify et le
-  service worker l'ont déjà orienté ailleurs) ; un test le vérifie sur la liste blanche.
+- **Le Campement** : une zone d'Explore à `/campement`, construite avec son chantier. D'ici là,
+  un lien `/campement` mène à l'accueil (la route `*` d'Explore).
+- **Le routeur d'Explore** : sa route `*` → `/accueil` ne voit jamais `/lieu` ni `/scan` (Netlify
+  et le service worker les ont déjà orientés ailleurs) ; un test le vérifie sur la liste blanche.
 
 ## 4. Le jour J, dans l'ordre
 
 1. **Préalables, livrés sous `/v2` pendant que la V1 tourne** : push (service worker V2 encore
    en portée `/v2/`, testé sur un téléphone), `/?company=`, `USER_UPDATED`, fichiers déménagés.
-2. **Préparation de `/explore/`** dans une branche, sans déployer : `base`, portée, `netlify.toml`,
+2. **Préparation de la racine** dans une branche, sans déployer : `base`, portée, `netlify.toml`,
    redirections, `index.html`. Build, `vite preview`, parcours dans le navigateur.
-3. **Bascule** (Uriel lance) : build `/explore/`, `netlify deploy --prod` sur le site `runesdechene`
+3. **Bascule** (Uriel lance) : build racine, `netlify deploy --prod` sur le site `runesdechene`
    depuis `apps/web-v2`. Dans Supabase → Auth → URL : Site URL `https://app.runesdechene.com`,
    redirections sans `/v2/`.
 4. **Vérification en prod** : `/`, `/bienvenue`, `/carte/lieu/<id>`, `/lieu/<slug>` (seo),
@@ -143,4 +136,4 @@ service worker de la V2 serait alors remplacé à son tour par celui de la V1 (m
 
 ## Hors périmètre
 
-`/campement` et le scan ; la purge de la base au-delà du jour J ; l'énigme du jour.
+La zone Campement et le scan ; la purge de la base au-delà du jour J ; l'énigme du jour.
