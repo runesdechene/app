@@ -99,11 +99,14 @@ Explore à la racine ne doit jamais avaler un futur sous-dossier (Uriel, 07/10).
   en commentaire tant que leur site n'existe pas — le jour venu, on décommente.
 - **Service worker** : liste blanche (§3). Un sous-dossier qui n'est pas d'Explore va au serveur,
   sans qu'on touche à Explore.
-- **Appli installée** : la portée d'Explore est `/` (ses écrans sont à la racine). Le Campement
-  aura sa propre PWA, portée `/campement/`, son propre `id` de manifeste et son propre service
-  worker, à `/campement/sw.js` (portée plus précise : il l'emporte sous `/campement/`). Limite
-  connue : un lien vers `/campement` touché **dans** l'appli Explore installée s'ouvre dans sa
-  fenêtre — comportement normal des navigateurs, pas bloquant.
+- **Le Campement est une seconde porte de la même appli** (Uriel, 07/10) : même code, même
+  service worker, mêmes droits ; seuls changent le manifeste (nom, icône, `id`, portée
+  `/campement/`), l'onglet d'entrée, l'ordre des onglets et l'accueil. Explore donne accès au
+  Campement et le Campement à Explore, dans la même fenêtre — pas de passage d'une appli à l'autre.
+  Règle de construction : **les droits suivent la personne (Porteur), pas la porte** ; une porte
+  n'est qu'un fichier de réglages. Spec propre au Campement, plus tard. Pour la bascule : réserver
+  `/campement/` (Netlify et liste blanche), rien d'autre.
+- `/scan` : le scan vit sur l'accueil du Campement ; réservé par prudence.
 - **Le routeur d'Explore** : sa route `*` → `/accueil` ne voit jamais `/campement` (Netlify et le
   service worker l'ont déjà orienté ailleurs) ; un test le vérifie sur la liste blanche.
 
