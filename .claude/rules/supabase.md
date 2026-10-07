@@ -264,3 +264,13 @@ migration a été poussée avant le déploiement : « Tous les titres » en erre
 **déployé** lit encore. Soit la garder (vide) jusqu'au déploiement puis la retirer dans une
 migration suivante, soit déployer le front d'abord **et** n'écrire le fichier qu'après. Un ordre
 écrit dans un message ne protège pas : le fichier poussé peut partir avec le premier `db push`.
+
+## Le Site URL de la prod se règle au tableau de bord, jamais par `config push`
+
+**Le piège** (constaté à la bascule, 07/10/2026) : le Site URL de la prod valait
+`http://localhost:3000/`, la valeur de `supabase/config.toml` (local). Tout lien d'e-mail sans
+adresse de retour acceptée (changement d'e-mail, confirmation) renvoyait vers localhost.
+
+**How to apply :** ne jamais lancer `supabase config push` vers la prod (il recopie `config.toml`).
+Le réglage de prod, au tableau de bord → Authentication → URL Configuration : Site URL
+`https://app.runesdechene.com`, Redirect URLs `https://app.runesdechene.com/**` (+ l'entrée locale).
