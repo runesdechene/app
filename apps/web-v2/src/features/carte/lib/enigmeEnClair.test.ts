@@ -3,7 +3,7 @@
  */
 import { expect, test } from 'vitest'
 import type { Verdict } from '../api/lireEnigmes'
-import { connaissanceEnClair, gainsEnClair, messageErreur, MOTS_DE_FETE, motDeFete, piedEnClair, prochainEnClair } from './enigmeEnClair'
+import { connaissanceEnClair, gainsEnClair, messageErreur, MOTS_DE_FETE, motDeFete, relanceEnClair, prochainEnClair } from './enigmeEnClair'
 
 const verdict = (v: Partial<Verdict>): Verdict => ({
   juste: true, reponse: 'Sainte-Sophie', explication: '', xp: 1, gagnes: 2, points: 16, total: 130,
@@ -27,10 +27,10 @@ test('le prochain titre, ou tous gagnés', () => {
   expect(prochainEnClair(verdict({ prochain: null }), 'Byzance')).toBe('Tous les titres de Byzance sont à toi.')
 })
 
-test('le pied dit ce qui attend encore', () => {
-  expect(piedEnClair(0)).toBe('C’était le dernier « ? » qui t’attendait. D’autres s’éveillent chaque matin.')
-  expect(piedEnClair(1)).toBe('Un autre « ? » t’attend sur la carte.')
-  expect(piedEnClair(3)).toBe('3 autres « ? » t’attendent sur la carte.')
+test('la relance dit ce qui attend encore', () => {
+  expect(relanceEnClair(0)).toEqual({ titre: 'C’était le dernier « ? »', phrase: 'D’autres s’éveillent chaque matin.' })
+  expect(relanceEnClair(1)).toEqual({ titre: 'Encore un « ? »', phrase: 'Il t’attend sur la carte.' })
+  expect(relanceEnClair(3)).toEqual({ titre: 'Encore 3 « ? »', phrase: 'Ils t’attendent sur la carte.' })
 })
 
 test('une énigme rendormie se dit, le reste aussi', () => {

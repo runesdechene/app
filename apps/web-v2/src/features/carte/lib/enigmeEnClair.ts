@@ -32,10 +32,11 @@ export function prochainEnClair(v: Verdict, culture: string): string {
   return `Encore ${String(reste)} ${reste > 1 ? 'points' : 'point'} pour « ${v.prochain.nom} ».`
 }
 
-export function piedEnClair(reste: number): string {
-  if (reste === 0) return 'C’était le dernier « ? » qui t’attendait. D’autres s’éveillent chaque matin.'
-  if (reste === 1) return 'Un autre « ? » t’attend sur la carte.'
-  return `${String(reste)} autres « ? » t’attendent sur la carte.`
+// La relance sous le verdict : ce qui attend encore sur la carte, en titre et en phrase.
+export function relanceEnClair(reste: number): { titre: string; phrase: string } {
+  if (reste === 0) return { titre: 'C’était le dernier « ? »', phrase: 'D’autres s’éveillent chaque matin.' }
+  if (reste === 1) return { titre: 'Encore un « ? »', phrase: 'Il t’attend sur la carte.' }
+  return { titre: `Encore ${String(reste)} « ? »`, phrase: 'Ils t’attendent sur la carte.' }
 }
 
 // `P0002` : l'éveil s'est effacé (le réveil du matin) ou a déjà reçu sa réponse.

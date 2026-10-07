@@ -12,7 +12,7 @@ import { Text } from '@/shared/ui/Text'
 import type { EnigmeOuverte, Verdict } from '../api/lireEnigmes'
 import type { EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { useEnigme } from '../hooks/useEnigme'
-import { piedEnClair } from '../lib/enigmeEnClair'
+import { relanceEnClair } from '../lib/enigmeEnClair'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
 import { BilanDuVerdict, FeteDuVerdict } from './VerdictEnigme'
 import styles from './FeuilleEnigme.module.css'
@@ -75,11 +75,32 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         )}
         {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
         {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
-        <Text variant="legende">
-          {verdict ? piedEnClair(verdict.resteEnAttente) : 'Une seule réponse. Juste : +1 XP et des points de connaissance.'}
-        </Text>
+        {verdict ? (
+          <Relance reste={verdict.resteEnAttente} onFermer={onFermer} />
+        ) : (
+          <Text variant="legende">Une seule réponse. Juste : +1 XP et des points de connaissance.</Text>
+        )}
       </div>
     </Feuille>
+  )
+}
+
+// Sous le verdict, ce qui attend encore : le même sceau de cire que sur la carte, et le retour à elle.
+function Relance({ reste, onFermer }: { reste: number; onFermer: () => void }) {
+  const { titre, phrase } = relanceEnClair(reste)
+  return (
+    <div className={styles.relance}>
+      <span className={styles.cire} aria-hidden="true">
+        ?
+      </span>
+      <span className={styles.relanceTexte}>
+        <span className={styles.relanceTitre}>{titre}</span>
+        <span className={styles.relancePhrase}>{phrase}</span>
+        <button type="button" className={styles.retour} onClick={onFermer}>
+          Retour à la carte<span aria-hidden="true"> →</span>
+        </button>
+      </span>
+    </div>
   )
 }
 

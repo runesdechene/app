@@ -13,11 +13,13 @@ vi.mock('../api/enigmes', () => ({
   percerEnigme: (id: number, r: string) => percerEnigme(id, r),
 }))
 
+const onFermer = vi.fn()
+
 function monter() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
-      <FeuilleEnigme touchee={{ id: 4, x: 100, y: 200 }} onFermer={() => undefined} />
+      <FeuilleEnigme touchee={{ id: 4, x: 100, y: 200 }} onFermer={onFermer} />
     </QueryClientProvider>,
   )
 }
@@ -56,7 +58,10 @@ test('le sceau retourné, la question et ses réponses ; une réponse juste mont
   expect(percerEnigme).toHaveBeenCalledWith(4, 'Sainte-Sophie')
   expect(screen.getByText('Te voilà Apprentie de Byzance. Il se porte depuis ton profil.')).toBeInTheDocument()
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
-  expect(screen.getByText('2 autres « ? » t’attendent sur la carte.')).toBeInTheDocument()
+  expect(screen.getByText('Encore 2 « ? »')).toBeInTheDocument()
+  expect(screen.getByText('Ils t’attendent sur la carte.')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Retour à la carte' }))
+  expect(onFermer).toHaveBeenCalled()
 })
 
 test('une énigme rendormie le dit', async () => {
