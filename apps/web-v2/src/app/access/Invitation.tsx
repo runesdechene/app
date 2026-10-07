@@ -3,7 +3,7 @@
  *            partagés) ouvrent la fiche de la Compagnie.
  * POURQUOI — la bascule (spec 2026-10-07) : la V1 disparaît, ses liens restent. La base traduit
  *            la clé (public_slug, ou l'identifiant des plus anciens liens) : compagnie_par_lien,
- *            migration 446.
+ *            migration 453.
  * ATTENTION — rendu derrière la garde d'accès : il faut un compte pour voir une Compagnie. Une clé
  *            inconnue ne fait rien, l'Explorateur reste où il est.
  */

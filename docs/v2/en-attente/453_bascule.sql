@@ -46,7 +46,7 @@ BEGIN
           (auth.uid())::text)
   RETURNING id INTO v_id;
 
-  -- 446 : le push, à ceux qui en ont un et l'acceptent.
+  -- 453 : le push, à ceux qui en ont un et l'acceptent.
   INSERT INTO notifications (recipient_id, type, data)
   SELECT u.id, 'mise_a_jour', jsonb_build_object('id', v_id, 'titre', btrim(p_titre))
     FROM users u
