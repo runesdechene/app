@@ -32,7 +32,10 @@ export function quandEnClair(iso: string, maintenant = new Date()): string {
   return MOIS_ANNEE.format(le)
 }
 
-// `/carte?zone=lat,lng` : la carte y vole (lu par `features/carte/lib/zone.ts`).
+// `/carte?centre=lat,lng,zoom` : la carte y vole, au zoom où les sceaux « ? » se touchent
+// (lu par `features/carte/lib/centre.ts` ; ZOOM_DES_SCEAUX vaut 6).
+const ZOOM_DES_SCEAUX = 6.5
+
 export function lienVersLaCarte(centre: { lat: number; lng: number }): string {
-  return `/carte?zone=${String(centre.lat)},${String(centre.lng)}`
+  return `/carte?centre=${String(centre.lat)},${String(centre.lng)},${String(ZOOM_DES_SCEAUX)}`
 }

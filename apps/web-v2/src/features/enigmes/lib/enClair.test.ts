@@ -30,5 +30,5 @@ test('la date d’une bonne réponse, en mots', () => {
 })
 
 test('le lien vers la carte vole sur le centre de la culture', () => {
-  expect(lienVersLaCarte({ lat: 41, lng: 28.9 })).toBe('/carte?zone=41,28.9')
+  expect(lienVersLaCarte({ lat: 41, lng: 28.9 })).toBe('/carte?centre=41,28.9,6.5')
 })

@@ -43,6 +43,7 @@ import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
+import { lireCentre } from '../lib/centre'
 import { claquerLaCire } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
@@ -120,7 +121,8 @@ function CarteVivante({
   const [lieuxPoses, setLieuxPoses] = useState(false)
   const couleurTypes = useLieuxEnCouleur(!visiteur)
   const navigate = useNavigate()
-  // « Trouver sur la carte » (fiche d'un lieu) arrive par l'adresse : /carte?centre=lat,lng.
+  // « Trouver sur la carte » (fiche d'un lieu) et « Les chercher sur la carte » (énigmes) arrivent par
+  // l'adresse : /carte?centre=lat,lng[,zoom].
   const [recherche, setRecherche] = useSearchParams()
   const centre = recherche.get('centre')
   const [vue, setVue] = useState<Vue | null>(null)
@@ -223,13 +225,11 @@ function CarteVivante({
     }
   }, [carte])
 
-  // La carte vole jusqu'au lieu demandé, puis l'adresse redevient /carte (sans historique).
+  // La carte vole jusqu'à l'endroit demandé, puis l'adresse redevient /carte (sans historique).
   useEffect(() => {
     if (!carte || !centre || !tiroirMesure) return
-    const [lat, lng] = centre.split(',').map(Number)
-    if (lat !== undefined && lng !== undefined && Number.isFinite(lat) && Number.isFinite(lng)) {
-      carte.flyTo({ center: [lng, lat], zoom: 14 })
-    }
+    const vise = lireCentre(centre)
+    if (vise) carte.flyTo({ center: [vise.lng, vise.lat], zoom: vise.zoom })
     setRecherche({}, { replace: true })
   }, [carte, centre, tiroirMesure, setRecherche])
 
