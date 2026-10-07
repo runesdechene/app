@@ -16,12 +16,16 @@ beforeEach(() => {
       titre: 'Filtrer la carte',
       texte: 'Un seul bouton.\n\n- Par nature : plusieurs à la fois.',
       quand: '2026-09-30T10:00:00Z',
+      image: 'https://exemple.test/filtres.webp',
+      version: 'Pythéas 1.0.12',
     },
     {
       id: 1,
       titre: 'Ajouter à distance',
       texte: 'Plus besoin d’y être.',
       quand: '2026-09-28T10:00:00Z',
+      image: null,
+      version: null,
     },
   ])
 })
@@ -38,12 +42,15 @@ test('la dernière en entier, sa liste mise en forme ; les précédentes dessous
   afficher()
   expect(await screen.findByRole('heading', { name: 'Filtrer la carte' })).toBeInTheDocument()
   expect(screen.getByText('30 septembre')).toBeInTheDocument()
+  expect(screen.getByText(/· Pythéas 1\.0\.12/)).toBeInTheDocument()
+  expect(document.querySelector('img')).toHaveAttribute('src', 'https://exemple.test/filtres.webp')
   expect(screen.getByText('Un seul bouton.')).toBeInTheDocument()
   expect(screen.getByText('Par nature').tagName).toBe('STRONG')
   const precedentes = screen.getByRole('region', { name: 'Précédentes' })
   expect(
     within(precedentes).getByRole('heading', { name: 'Ajouter à distance' }),
   ).toBeInTheDocument()
+  expect(precedentes.querySelector('img')).toBeNull()
 })
 
 test('aucune mise à jour : on le dit', async () => {

@@ -1,6 +1,6 @@
 /*
  * QUOI     — la page « Nouveautés » : la dernière sur une carte claire (date ocre en capitales
- *            condensées, titre Bebas, texte), les précédentes à plat, en plus petit.
+ *            condensées, titre Bebas, image, texte), les précédentes à plat, en plus petit.
  */
 .nouveautes {
   display: grid;
@@ -51,6 +51,13 @@
   font-size: var(--titre-ecran-size);
   font-weight: var(--weight-normal);
   line-height: var(--titre-leading);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-petit);
 }
 
 .paragraphe,

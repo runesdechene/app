@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import { supabase } from '../lib/supabase'
 
-// Les mises à jour de l'app (migration 397) : elles arrivent dans la cloche de la V2, sous
-// « Nouveautés d'Explore ». Écrites pour les joueurs : jamais de détail technique.
+// Les mises à jour de l'app (migrations 397, 436) : elles arrivent dans la cloche de la V2, sous
+// « Nouveautés d'Explore ». Écrites pour les joueurs : jamais de détail technique. Une image
+// (seau `announcement-covers`, comme les Annonces) et un numéro de version, facultatifs.
 interface MiseAJour {
   id: number
   titre: string
   texte: string
   quand: string
+  image: string | null
+  version: string | null
 }
 
 const AIDE = `Un paragraphe par bloc, séparés par une ligne vide.
@@ -18,6 +21,8 @@ export function MisesAJour() {
   const [loading, setLoading] = useState(true)
   const [titre, setTitre] = useState('')
   const [texte, setTexte] = useState('')
+  const [image, setImage] = useState<string | null>(null)
+  const [version, setVersion] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
 
@@ -37,15 +42,41 @@ export function MisesAJour() {
     setBusy(true)
     setMsg(null)
     try {
-      const { error } = await supabase.rpc('publier_mise_a_jour', { p_titre: titre, p_texte: texte })
+      const { error } = await supabase.rpc('publier_mise_a_jour', {
+        p_titre: titre, p_texte: texte, p_image: image, p_version: version,
+      })
       if (error) {
         setMsg(error.message)
         return
       }
       setTitre('')
       setTexte('')
+      setImage(null)
+      setVersion('')
       setMsg('Publiée : elle est dans la cloche de chacun.')
       await fetchList()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const envoyerImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setBusy(true)
+    setMsg(null)
+    try {
+      const ext = file.name.split('.').pop() || 'webp'
+      const path = `mise-a-jour-${Date.now()}.${ext}`
+      const { error } = await supabase.storage
+        .from('announcement-covers')
+        .upload(path, file, { contentType: file.type })
+      if (error) {
+        setMsg(`Image non envoyée : ${error.message}`)
+        return
+      }
+      setImage(supabase.storage.from('announcement-covers').getPublicUrl(path).data.publicUrl)
     } finally {
       setBusy(false)
     }
@@ -85,6 +116,25 @@ export function MisesAJour() {
           value={texte}
           onChange={e => setTexte(e.target.value)}
         />
+        <input
+          className="mod-search"
+          placeholder="Version (facultatif, ex. Pythéas 1.2.4)"
+          maxLength={30}
+          value={version}
+          onChange={e => setVersion(e.target.value)}
+        />
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <label className="mod-btn" style={{ cursor: 'pointer' }}>
+            {image ? 'Changer l’image' : 'Ajouter une image'}
+            <input type="file" accept="image/*" hidden onChange={envoyerImage} disabled={busy} />
+          </label>
+          {image && (
+            <button className="mod-btn mask" onClick={() => setImage(null)} disabled={busy}>
+              Retirer l’image
+            </button>
+          )}
+        </div>
+        {image && <img src={image} alt="" style={{ maxWidth: 320, borderRadius: 8 }} />}
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <button className="mod-btn" onClick={publier} disabled={!pret || busy}>
             Publier
@@ -104,12 +154,14 @@ export function MisesAJour() {
               <div style={{ fontWeight: 600 }}>{m.titre}</div>
               <div className="mod-meta">
                 {new Date(m.quand).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' })}
+                {m.version && ` · ${m.version}`}
               </div>
             </div>
             <button className="mod-btn mask" onClick={() => supprimer(m)} disabled={busy}>
               Supprimer
             </button>
           </div>
+          {m.image && <img src={m.image} alt="" style={{ maxWidth: 320, borderRadius: 8, marginTop: 8 }} />}
           <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, marginTop: 8 }}>{m.texte}</div>
         </div>
       ))}
