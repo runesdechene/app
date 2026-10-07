@@ -4,6 +4,8 @@
  * POURQUOI — des phrases, pas des noms de colonnes : chaque réglage dit ce qu'il change pour
  *            l'Explorateur. « Montrer tes envies » s'ajoute à la maquette (spec Compte).
  *            Chaque ligne porte son icône de la maquette (`assets/ui/`).
+ *            « Sur ce téléphone » abonne ce téléphone aux notifications push (spec bascule §3) ;
+ *            sur iPhone hors de l'appli installée, la ligne dit comment faire.
  * ATTENTION — un réglage refusé par la base revient à sa place, avec un message : jamais un
  *            interrupteur qui ment.
  */
@@ -31,10 +33,12 @@ import {
   usePreferences,
   type Reglage,
 } from '../hooks/usePreferences'
+import { usePush } from '../hooks/usePush'
 import styles from './PreferencesPage.module.css'
 
 export function PreferencesPage() {
   const { preferences, erreurChargement, reessayer, regler, echec } = usePreferences()
+  const push = usePush()
   if (erreurChargement) {
     return (
       <div className={styles.page}>
@@ -68,7 +72,34 @@ export function PreferencesPage() {
         </p>
       )}
 
+      {push.echec && (
+        <p role="alert" className={styles.alerte}>
+          Les notifications n’ont pas pu être activées. Vérifie qu’elles sont autorisées pour ce
+          site, puis réessaie.
+        </p>
+      )}
+
       <Carte titre="Ce qu’on t’envoie">
+        {push.permis !== 'impossible' && (
+          <Ligne
+            icone={cloche}
+            titre="Sur ce téléphone"
+            description={
+              push.permis === 'possible'
+                ? 'Recevoir les notifications ici, même l’appli fermée.'
+                : 'Sur iPhone : ajoute d’abord l’appli à ton écran d’accueil.'
+            }
+          >
+            {push.permis === 'possible' && (
+              <Interrupteur
+                libelle="Sur ce téléphone"
+                actif={push.abonne}
+                desactive={push.enCours}
+                onChange={push.changer}
+              />
+            )}
+          </Ligne>
+        )}
         {ligne(
           'pushImportant',
           cloche,

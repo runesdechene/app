@@ -28,6 +28,14 @@ const api = vi.hoisted(() => ({
 }))
 vi.mock('../api/preferences', () => api)
 
+const push = vi.hoisted(() => ({
+  pushDeCeTelephone: vi.fn((): 'possible' | 'installer-d-abord' | 'impossible' => 'possible'),
+  estAbonne: vi.fn(() => Promise.resolve(false)),
+  abonner: vi.fn(() => Promise.resolve()),
+  desabonner: vi.fn(() => Promise.resolve()),
+}))
+vi.mock('../lib/push', () => push)
+
 function ouvrir() {
   render(
     <QueryClientProvider
@@ -121,4 +129,22 @@ test('préférences illisibles : un message et « Réessayer », jamais un écra
   ouvrir()
   expect(await screen.findByText('Tes préférences n’ont pas pu être chargées')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Réessayer' })).toBeInTheDocument()
+})
+
+test('« Sur ce téléphone » abonne ce téléphone aux notifications', async () => {
+  ouvrir()
+  await userEvent.click(await screen.findByRole('switch', { name: 'Sur ce téléphone' }))
+  await waitFor(() => {
+    expect(push.abonner).toHaveBeenCalled()
+  })
+})
+
+test('sur iPhone hors de l’appli installée, la ligne dit comment faire', async () => {
+  push.pushDeCeTelephone.mockReturnValue('installer-d-abord')
+  ouvrir()
+  expect(
+    await screen.findByText('Sur iPhone : ajoute d’abord l’appli à ton écran d’accueil.'),
+  ).toBeInTheDocument()
+  expect(screen.queryByRole('switch', { name: 'Sur ce téléphone' })).toBeNull()
+  push.pushDeCeTelephone.mockReturnValue('possible')
 })
