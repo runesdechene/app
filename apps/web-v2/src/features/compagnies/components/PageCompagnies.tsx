@@ -1,6 +1,7 @@
 /**
  * QUOI     — la page « Les Compagnies » (maquette 396:236) : une recherche, mes Compagnies, Découvrir
- *            (la devise, les membres, « Privée », Rejoindre ou Demander), et « Fonder une Compagnie ».
+ *            (la devise, les lieux et les membres, « Privée », Rejoindre ou Demander), et « Fonder une
+ *            Compagnie ». Rangées par lieux revendiqués, sans rang (Uriel, 07/10, migration 439).
  * POURQUOI — des antennes locales qu'on rejoint à volonté (Uriel, 05/10). Rejoindre est ouvert à
  *            tous ; fonder, aux Porteurs — « Fonder » mène quand même chacun à son écran, qui dit
  *            pourquoi à qui ne l'est pas.
@@ -12,6 +13,13 @@ import { useCompagnies } from '../hooks/useCompagnies'
 import { correspond } from '../lib/chercher'
 import { AvatarCompagnie } from './AvatarCompagnie'
 import styles from './PageCompagnies.module.css'
+
+// « 12 lieux · 35 membres » : l'activité d'abord, c'est elle qui range la liste.
+function compteurs(c: CarteCompagnie) {
+  const membres = `${String(c.membres)} membre${c.membres > 1 ? 's' : ''}`
+  if (c.lieux === 0) return membres
+  return `${String(c.lieux)} lieu${c.lieux > 1 ? 'x' : ''} · ${membres}`
+}
 
 export function PageCompagnies() {
   const { liste, erreur, rejoindre, enCours } = useCompagnies()
@@ -48,9 +56,7 @@ export function PageCompagnies() {
                   <AvatarCompagnie nom={c.nom} avatar={c.avatar} couleur={c.couleur} taille={44} />
                   <span className={styles.texte}>
                     <span className={styles.nom}>{c.nom}</span>
-                    <span className={styles.info}>
-                      {c.membres} membre{c.membres > 1 ? 's' : ''}
-                    </span>
+                    <span className={styles.info}>{compteurs(c)}</span>
                   </span>
                   <span className={styles.chevron} aria-hidden="true">
                     ›
@@ -80,7 +86,7 @@ export function PageCompagnies() {
                     {c.devise && <span className={styles.devise}>{c.devise}</span>}
                     <span className={styles.info}>
                       {c.privee ? 'Privée · ' : ''}
-                      {c.membres} membre{c.membres > 1 ? 's' : ''}
+                      {compteurs(c)}
                     </span>
                   </span>
                 </Link>

@@ -25,6 +25,7 @@ const CARTE = {
   avatar: null,
   privee: false,
   membres: 35,
+  lieux: 12,
   role: null,
   demandee: false,
 } as const
@@ -66,6 +67,16 @@ test('mes Compagnies, puis Découvrir ; une privée se demande, une publique se 
   expect(screen.getByRole('button', { name: 'Demander à rejoindre Helvetia' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Rejoindre Verte Guilde' }))
   expect(api.rejoindre).toHaveBeenCalledWith('f-v')
+})
+
+test('chaque Compagnie dit ses lieux revendiqués, puis ses membres', async () => {
+  monter({
+    porteur: false,
+    miennes: [],
+    autres: [CARTE, { ...CARTE, id: 'f-n', nom: 'Nouvelle', lieux: 0, membres: 1 }],
+  })
+  expect(await screen.findByText('12 lieux · 35 membres')).toBeInTheDocument()
+  expect(screen.getByText('1 membre')).toBeInTheDocument()
 })
 
 test('une demande déjà envoyée attend', async () => {

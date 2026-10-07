@@ -16,6 +16,7 @@ export type CarteCompagnie = {
   avatar: string | null
   privee: boolean
   membres: number
+  lieux: number // revendiqués pour elle ; la liste se range ainsi (migration 439)
   role: Role | null // ma place ; null : je n'en suis pas
   demandee: boolean // j'ai demandé à rejoindre (Compagnie privée)
 }
@@ -80,6 +81,7 @@ function lireCarte(v: unknown): CarteCompagnie {
     avatar: ouNull(chaine)(c.avatar),
     privee: booleen(c.privee),
     membres: nombre(c.membres),
+    lieux: nombre(c.lieux),
     role: ouNull(role)(c.role),
     demandee: booleen(c.demandee),
   }

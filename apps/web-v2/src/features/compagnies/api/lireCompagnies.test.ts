@@ -12,6 +12,7 @@ const CARTE = {
   avatar: null,
   privee: false,
   membres: 35,
+  lieux: 12,
   role: 'chef',
   demandee: false,
 }
