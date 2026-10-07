@@ -60,7 +60,12 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.ts',
-      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Ce que le domaine sert encore pour d'autres que l'appli (e-mails, tutoriel du Hub,
+        // icônes des V1 installées) : servi, pas mis en cache sur chaque téléphone.
+        globIgnores: ['res/**', 'email-*', 'pwa-*.png'],
+      },
     }),
   ],
   resolve: {

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" fill="none">
+  <rect width="400" height="260" rx="16" fill="#1e1a14"/>
+  <!-- Lueur chaude -->
+  <radialGradient id="warmglow" cx="50%" cy="45%">
+    <stop offset="0" stop-color="#c77a3a" stop-opacity=".12"/>
+    <stop offset="1" stop-color="#1e1a14" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="400" height="260" rx="16" fill="url(#warmglow)"/>
+  <!-- Coffre -->
+  <g transform="translate(140,50)">
+    <!-- Base du coffre -->
+    <rect x="0" y="50" width="120" height="70" rx="6" fill="#5c3d1e" stroke="#8B6914" stroke-width="2"/>
+    <!-- Couvercle ouvert -->
+    <path d="M0 50 Q0 20 60 10 Q120 20 120 50Z" fill="#6b4a28" stroke="#8B6914" stroke-width="2"/>
+    <!-- Serrure -->
+    <circle cx="60" cy="75" r="8" fill="#8B6914" opacity=".6"/>
+    <rect x="57" y="72" width="6" height="10" rx="1" fill="#5c3d1e"/>
+    <!-- Lueur intérieure -->
+    <ellipse cx="60" cy="50" rx="40" ry="15" fill="#f0c060" opacity=".2"/>
+    <!-- Ferrures -->
+    <rect x="15" y="55" width="90" height="3" rx="1" fill="#8B6914" opacity=".3"/>
+    <rect x="15" y="95" width="90" height="3" rx="1" fill="#8B6914" opacity=".3"/>
+  </g>
+  <!-- Points d'interrogation flottants -->
+  <g font-family="serif" fill="#d4a017">
+    <text x="100" y="70" font-size="28" opacity=".15" transform="rotate(-15,100,70)">?</text>
+    <text x="300" y="80" font-size="22" opacity=".12" transform="rotate(10,300,80)">?</text>
+    <text x="80" y="180" font-size="18" opacity=".1" transform="rotate(-8,80,180)">?</text>
+    <text x="320" y="170" font-size="24" opacity=".12" transform="rotate(12,320,170)">?</text>
+  </g>
+  <!-- 3 étoiles (3 énigmes/jour) -->
+  <g transform="translate(130,175)">
+    <g transform="translate(0,0)">
+      <polygon points="15,0 19,11 30,11 21,18 24,29 15,22 6,29 9,18 0,11 11,11" fill="#d4a017" opacity=".7"/>
+    </g>
+    <g transform="translate(50,0)">
+      <polygon points="15,0 19,11 30,11 21,18 24,29 15,22 6,29 9,18 0,11 11,11" fill="#d4a017" opacity=".7"/>
+    </g>
+    <g transform="translate(100,0)">
+      <polygon points="15,0 19,11 30,11 21,18 24,29 15,22 6,29 9,18 0,11 11,11" fill="#d4a017" opacity=".7"/>
+    </g>
+  </g>
+  <!-- Label -->
+  <text x="200" y="230" text-anchor="middle" font-size="11" fill="#8a7a60" font-family="serif" letter-spacing="2">3 PAR JOUR</text>
+</svg>
