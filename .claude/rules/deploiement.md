@@ -42,6 +42,10 @@ courant : déployée d'ailleurs, l'appli partirait sans elles (piège du 05/10 a
 --prod --no-build --dir="<chemin absolu>/apps/web-v2/dist" --site=runesdechene` (le nom ; en cas de
 « Not Found », l'identifiant). Vérifier ensuite `/lieu/<slug>` → 200, `/v2/accueil` → 301 vers
 `/accueil`, `/v2/sw.js` → 200 (le service worker qui retire l'ancienne inscription de `/v2/`).
+Puis **annoncer la version** : `node scripts/sync-app-version.mjs` (écrit `app_settings.explore.version`
+depuis `apps/web-v2/package.json`, avec `SUPABASE_SERVICE_ROLE_KEY` du `.env`). Sans elle, la
+fenêtre « Une nouvelle version d'Explore est arrivée » ne force rien : seuls les téléphones dont
+le service worker a vu la mise à jour la proposent.
 
 ## Le Hub : `--site=<ID>` et `--no-build`, jamais son nom
 

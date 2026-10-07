@@ -1,6 +1,6 @@
 /**
- * QUOI     — point d'entrée de la V2 : tient l'app à jour, monte le cache de données (et ce qu'il
- *            garde sur l'appareil) et le routeur dans #root.
+ * QUOI     — point d'entrée de la V2 : tient l'app à jour (et dit quand une version arrive),
+ *            monte le cache de données (et ce qu'il garde sur l'appareil) et le routeur dans #root.
  */
 import './shared/styles/tokens.css'
 import './shared/styles/global.css'
@@ -11,6 +11,7 @@ import { RouterProvider } from 'react-router/dom'
 import { persistance, queryClient } from './app/queryClient'
 import { router } from './app/router'
 import { tenirAJour } from './app/miseAJour'
+import { NouvelleVersion } from './app/NouvelleVersion'
 
 tenirAJour()
 
@@ -21,6 +22,7 @@ createRoot(root).render(
   <StrictMode>
     <PersistQueryClientProvider client={queryClient} persistOptions={persistance}>
       <RouterProvider router={router} />
+      <NouvelleVersion />
     </PersistQueryClientProvider>
   </StrictMode>,
 )
