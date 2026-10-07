@@ -1,0 +1,145 @@
+/*
+ * QUOI     — une culture dans « Les énigmes » (maquette 478:526) : le compte, l'encart parchemin au
+ *            sceau de cire, puis une carte par énigme apprise.
+ */
+.page {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+}
+
+.resume {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.compte {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--corps-size);
+}
+
+.nombre {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+}
+
+.piste {
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+.rempli {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--couleur-culture, var(--color-accent));
+  transform-origin: left;
+  scale: var(--mesure) 1;
+}
+
+/* L'encart : ce qui reste à percer, au premier regard (Uriel, 07/10 : « un joli cadre »). */
+.encart {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-ocre);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.sceau {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--color-carte-halo);
+  border-radius: 50%;
+  background: var(--color-carte-cire);
+  box-shadow: 0 2px 4px color-mix(in srgb, var(--color-ombre) 40%, transparent);
+  color: var(--color-carte-halo);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-section-size);
+  font-style: italic;
+}
+
+.encartTexte {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.encartTitre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+  font-weight: var(--weight-normal);
+}
+
+.encartPhrase {
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--flux-size);
+}
+
+.lien {
+  color: var(--color-accent);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.appris {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+}
+
+.tete {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.reponse {
+  color: var(--color-encre);
+  font-weight: var(--weight-gras);
+}
+
+.quand {
+  flex: none;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+}
+
+.question {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.savais {
+  color: var(--color-fiche-recit);
+  font-family: var(--font-inscription);
+  font-size: var(--recit-enigme-size);
+  font-style: italic;
+}
