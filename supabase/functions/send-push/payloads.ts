@@ -1,5 +1,9 @@
-// Format des push payloads par type de notification.
-// Wording sobre, ligne éditoriale Voie 3 (RdC 2026).
+// Le texte et l'écran d'un push, par type de notification — ceux de la cloche de la V2
+// (`_notification_v2`, migration 421 ; phrases de apps/web-v2/src/features/notifications/lib/phrase.ts).
+// L'URL est un chemin d'appli sans base (« /accueil/lieu/<id> ») : le service worker de la V2 la
+// pose sous sa base (/v2/, puis /explore/ après la bascule — spec 2026-10-07-v2-bascule §3).
+// Les noms (`actorName`, `placeTitle`) sont complétés par index.ts quand la notification n'a que
+// les identifiants.
 
 export interface PushPayload {
   title: string
@@ -9,110 +13,96 @@ export interface PushPayload {
 
 type Data = Record<string, unknown>
 
-const fr = (s: unknown, fallback = ''): string =>
-  s === undefined || s === null ? fallback : String(s)
+const texte = (v: unknown, repli = ''): string =>
+  v === undefined || v === null || v === '' ? repli : String(v)
+
+const ficheDuLieu = (data: Data): string => {
+  const id = texte(data.placeId)
+  return id ? `/accueil/lieu/${id}` : '/accueil'
+}
 
 export function formatPayload(type: string, data: Data): PushPayload | null {
+  const qui = texte(data.actorName, 'Quelqu’un')
+  const lieu = texte(data.placeTitle, 'un de tes lieux')
+  const nombre = Number(data.viewCount ?? data.explorerCount ?? data.likeCount ?? data.visitorsToday ?? 0)
+  const surLeLieu = (title: string, body: string): PushPayload => ({
+    title,
+    body,
+    url: ficheDuLieu(data),
+  })
+
   switch (type) {
-    case 'daily_enigma_ready':
-      return {
-        title: 'Ton énigme du jour',
-        body:  'Le coffre t’attend.',
-        url:   '/carte?enigma=daily',
-      }
+    case 'new_comment':
+      return surLeLieu(`${qui} a commenté ${lieu}`, 'Va voir ce qu’on en dit.')
+    case 'comment_reply':
+      return surLeLieu(`${qui} t’a répondu`, `Sur ${lieu}.`)
+    case 'new_carnet':
+      return surLeLieu(`${qui} a écrit sur ${lieu}`, 'Un nouveau mot dans le carnet.')
+    case 'coeur_mot':
+      return surLeLieu(`${qui} a aimé ton mot`, `Sur ${lieu}.`)
+    case 'like_carnet':
+      return surLeLieu(`${qui} a aimé ton récit`, `Celui de ${lieu}.`)
+    case 'like_contribution':
+      return surLeLieu(`${qui} a envoyé des cœurs à ${lieu}`, 'Ton lieu plaît.')
+    case 'description_edited':
+      return surLeLieu(`${qui} a enrichi le récit de ${lieu}`, 'Va lire ce qui a changé.')
+    case 'lieu_modifie':
+      return surLeLieu(`${qui} a modifié ${lieu}`, 'Va voir ce qui a changé.')
+    case 'new_photo':
+      return surLeLieu(`${qui} a ajouté des photos à ${lieu}`, 'De nouvelles images.')
+    case 'place_position_edited':
+      return surLeLieu(`${qui} a corrigé la position de ${lieu}`, 'Le lieu a bougé sur la carte.')
+    case 'exploration':
+      return surLeLieu(
+        nombre === 1 ? `1 Explorateur a foulé ${lieu}` : `${nombre} Explorateurs ont foulé ${lieu}`,
+        'Aujourd’hui.',
+      )
+    case 'milestone_exploration':
+      return surLeLieu(`${nombre} Explorateurs ont foulé ${lieu}`, 'Un cap pour ton lieu.')
+    case 'milestone_vues':
+      return surLeLieu(`Ta fiche de ${lieu} a été vue ${nombre} fois`, 'Un cap pour ton lieu.')
+    case 'milestone_likes':
+      return surLeLieu(`${lieu} a reçu ${nombre} cœurs`, 'Un cap pour ton lieu.')
 
-    case 'expedition_message': {
-      const author        = fr(data.author_name, 'Un compagnon')
-      const expeditionId  = fr(data.expedition_id)
-      const expeditionName = fr(data.expedition_name, 'l’expédition')
-      const preview       = fr(data.preview, '').slice(0, 80)
+    case 'mention':
       return {
-        title: `Message — ${expeditionName}`,
-        body:  preview ? `${author} : ${preview}` : `${author} a écrit.`,
-        // V0.7.11 (10/05) — pointe sur /accueil (où ExpeditionModal est mounted)
-        // au lieu de /carte (qui n'a ni parser ?expedition= ni la modale).
-        url:   expeditionId ? `/accueil?expedition=${expeditionId}` : '/accueil',
+        title: `${qui} t’a mentionné`,
+        body: texte(data.extrait, 'Dans le Registre.').slice(0, 120),
+        url: '/messages',
+      }
+    case 'salut': {
+      const evenement = texte(data.evenement).split(':')[0]
+      if (evenement === 'message') {
+        return { title: `${qui} a aimé ton message`, body: 'Dans le Registre.', url: '/messages' }
+      }
+      return data.placeId
+        ? surLeLieu(`${qui} t’a salué`, `Pour ${lieu}.`)
+        : { title: `${qui} t’a salué`, body: 'Sur les chemins.', url: '/accueil' }
+    }
+
+    case 'demande_compagnie': {
+      const id = texte(data.compagnieId)
+      return {
+        title: `${qui} demande à rejoindre ${texte(data.compagnieNom, 'ta Compagnie')}`,
+        body: 'Accepte ou refuse sa demande.',
+        url: id ? `/accueil/compagnie/${id}/gerer` : '/accueil',
+      }
+    }
+    case 'demande_acceptee': {
+      const id = texte(data.compagnieId)
+      return {
+        title: `Bienvenue dans ${texte(data.compagnieNom, 'ta Compagnie')}`,
+        body: 'Ta demande est acceptée.',
+        url: id ? `/accueil/compagnie/${id}` : '/accueil',
       }
     }
 
-    case 'place_taken_remote':
-    case 'place_taken_back_gps':
-    case 'place_reaffirmed': {
-      const placeId   = fr(data.place_id)
-      const placeName = fr(data.place_name, 'Un de tes lieux')
+    case 'mise_a_jour':
       return {
-        title: type === 'place_reaffirmed'
-          ? `${placeName} t’a échappé`
-          : `${placeName} a changé de mains`,
-        body:  'Reviens jeter un œil sur la carte.',
-        url:   placeId ? `/carte?placeId=${placeId}` : '/carte',
+        title: 'Nouveautés d’Explore',
+        body: texte(data.titre, 'Une mise à jour est arrivée.'),
+        url: '/accueil/nouveautes',
       }
-    }
-
-    case 'level_up_imminent': {
-      const xpDiff   = Number(data.xp_diff ?? 0)
-      const nextLevel = Number(data.next_level ?? 0)
-      return {
-        title: `Plus que ${xpDiff} XP avant niveau ${nextLevel}`,
-        body:  'Reviens jouer une énigme.',
-        url:   '/carte?enigma=daily',
-      }
-    }
-
-    case 'weekly_new_places_recap': {
-      const count   = Number(data.count ?? 0)
-      const samples = fr(data.sample_names_csv, '')
-      return {
-        title: `${count} nouveaux lieux cette semaine`,
-        body:  samples ? `${samples}…` : 'Découvre la nouvelle carte.',
-        url:   '/carte?layer=new',
-      }
-    }
-
-    case 'new_comment': {
-      const actor   = fr(data.actorName, 'Quelqu’un')
-      const place   = fr(data.placeTitle, 'un de tes lieux')
-      const placeId = fr(data.placeId)
-      return {
-        title: `${actor} a commenté ${place}`,
-        body:  'Va voir ce qu’on en dit.',
-        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
-      }
-    }
-
-    case 'comment_reply': {
-      const actor   = fr(data.actorName, 'Quelqu’un')
-      const place   = fr(data.placeTitle, 'un lieu')
-      const placeId = fr(data.placeId)
-      return {
-        title: `${actor} t’a répondu`,
-        body:  `Sur ${place}.`,
-        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
-      }
-    }
-
-    case 'like_contribution': {
-      const actor   = fr(data.actorName, 'Quelqu’un')
-      const place   = fr(data.placeTitle, 'un lieu')
-      const placeId = fr(data.placeId)
-      const isDesc  = fr(data.contributionType) === 'description'
-      return {
-        title: isDesc ? `${actor} a aimé une description` : `${actor} a aimé ton commentaire`,
-        body:  isDesc ? `La description de ${place} que tu as enrichie.` : `Sur ${place}.`,
-        url:   placeId ? `/carte?placeId=${placeId}&placeTab=discussion` : '/carte',
-      }
-    }
-
-    case 'announcement': {
-      const slug      = fr(data.slug)
-      const title     = fr(data.title, 'Une nouvelle de Runes de Chêne')
-      const pushText  = fr(data.push_text, '').slice(0, 120)
-      return {
-        title,
-        body:  pushText || 'Touche pour lire la nouvelle.',
-        url:   slug ? `/article/${slug}` : '/nouvelles',
-      }
-    }
 
     default:
       return null
