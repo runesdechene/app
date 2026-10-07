@@ -43,9 +43,10 @@ async function recopierLEmail(userId: string, email: string) {
 }
 
 // La dernière connexion (l'en-tête d'un Murmure, le Registre, le Hub la lisent) : sans attendre,
-// sans bloquer.
+// sans bloquer. Une requête supabase-js ne part que lorsqu'on l'attend : `.then()` l'envoie (sans
+// lui, la dernière connexion est restée figée depuis le passage à la V2).
 function noterLaConnexion(userId: string) {
-  void supabase.rpc('touch_last_login', { p_user_id: userId })
+  void supabase.rpc('touch_last_login', { p_user_id: userId }).then()
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {

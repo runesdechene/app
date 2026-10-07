@@ -10,7 +10,9 @@ import { vi } from 'vitest'
 import { ACCESS_TIMEOUT_MS, useV2Access } from './useV2Access'
 
 // Par défaut, un réseau qui ne répond jamais ; un test peut le piloter.
-const rpcReponse = vi.hoisted(() => vi.fn(() => new Promise(() => undefined)))
+const rpcReponse = vi.hoisted(() =>
+  vi.fn<(nom: string) => PromiseLike<unknown>>(() => new Promise(() => undefined)),
+)
 const sessionReponse = vi.hoisted(() => vi.fn(() => new Promise(() => undefined)))
 vi.mock('@/shared/supabase/client', () => ({
   supabase: {
@@ -48,6 +50,22 @@ test('réseau muet : chargement, puis erreur une fois le délai écoulé', async
   })
 
   expect(result.current.state.status).toBe('error')
+})
+
+test('une entrée autorisée envoie vraiment la dernière connexion', async () => {
+  // Comme supabase-js : une requête ne part que lorsqu'on l'attend (`then`).
+  const envoyees: string[] = []
+  rpcReponse.mockImplementation((nom) => ({
+    then(siOk, siErreur) {
+      envoyees.push(nom)
+      return Promise.resolve({ data: true, error: null }).then(siOk, siErreur)
+    },
+  }))
+  sessionReponse.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null })
+  renderHook(() => useV2Access(), { wrapper })
+  await waitFor(() => {
+    expect(envoyees).toContain('touch_last_login')
+  })
 })
 
 test('hors ligne, avec l’accès gardé : la V2 s’ouvre quand même', async () => {
