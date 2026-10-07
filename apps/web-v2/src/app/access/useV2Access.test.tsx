@@ -56,7 +56,9 @@ test('hors ligne, avec l’accès gardé : la V2 s’ouvre quand même', async (
   sessionReponse.mockResolvedValue({ data: { session: { user: { id: 'u1' } } }, error: null })
   rpcReponse.mockRejectedValue(new TypeError('Failed to fetch'))
   const { result } = renderHook(() => useV2Access(), {
-    wrapper: ({ children }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>,
+    wrapper: ({ children }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    ),
   })
   // La copie est relue en ligne ; ici la relecture échoue, et la copie fait foi.
   await waitFor(() => {

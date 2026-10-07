@@ -142,7 +142,11 @@ test('/modifier de mon profil : le formulaire', async () => {
 test('Préférences s’ouvre depuis le menu du profil, et fermer ramène à Compte', async () => {
   const router = renderAt('/compte')
   await userEvent.click(await screen.findByRole('button', { name: 'Compte' }))
-  await userEvent.click(within(await screen.findByRole('dialog', { name: 'Mon menu' })).getByRole('button', { name: /Préférences/ }))
+  await userEvent.click(
+    within(await screen.findByRole('dialog', { name: 'Mon menu' })).getByRole('button', {
+      name: /Préférences/,
+    }),
+  )
   expect(await screen.findByRole('heading', { name: 'Préférences' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   expect(router.state.location.pathname).toBe('/compte')

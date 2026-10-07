@@ -59,7 +59,8 @@ vi.mock('@/features/enigmes/api/mesEnigmes', () => ({
   fetchMaCulture: () => Promise.reject(new Error('pas dans ce test')),
 }))
 vi.mock('@/features/titres/api/mesTitres', () => ({
-  fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [], cultures: [], polymathe: null }),
+  fetchMesTitres: () =>
+    Promise.resolve({ obtenus: 0, total: 0, chemins: [], cultures: [], polymathe: null }),
 }))
 // Téléphone par défaut ; un test passe sur PC avec `ecran.pc = true`.
 const ecran = vi.hoisted(() => ({ pc: false }))
@@ -288,7 +289,13 @@ async function ouvrirLeMenu() {
 test('toucher le portrait ouvre le menu du profil, même depuis Compte', async () => {
   renderAt('/compte')
   const menu = await ouvrirLeMenu()
-  for (const nom of ['Mon profil', 'Les énigmes', 'Tous les titres', 'Préférences', 'Se déconnecter']) {
+  for (const nom of [
+    'Mon profil',
+    'Les énigmes',
+    'Tous les titres',
+    'Préférences',
+    'Se déconnecter',
+  ]) {
     expect(within(menu).getByRole('button', { name: new RegExp(nom) })).toBeInTheDocument()
   }
 })
@@ -305,7 +312,9 @@ test('« Les énigmes » et « Tous les titres » s’ouvrent en panneau sur l�
   const router = renderAt('/accueil')
   await userEvent.click(within(await ouvrirLeMenu()).getByRole('button', { name: /Les énigmes/ }))
   expect(router.state.location.pathname).toBe('/accueil/enigmes')
-  await userEvent.click(within(await ouvrirLeMenu()).getByRole('button', { name: /Tous les titres/ }))
+  await userEvent.click(
+    within(await ouvrirLeMenu()).getByRole('button', { name: /Tous les titres/ }),
+  )
   expect(router.state.location.pathname).toBe('/accueil/titres')
 })
 

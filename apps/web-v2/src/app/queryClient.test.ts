@@ -18,7 +18,9 @@ test('ni des lieux pas encore arrivés, ni le reste de l’app', () => {
 test('l’accès accordé se garde ; un refus ou une erreur jamais', () => {
   const accorde = { hasSession: true, hasAccess: true }
   expect(aGarderSurLAppareil(['v2-access'], 'success', accorde)).toBe(true)
-  expect(aGarderSurLAppareil(['v2-access'], 'success', { hasSession: true, hasAccess: false })).toBe(false)
+  expect(
+    aGarderSurLAppareil(['v2-access'], 'success', { hasSession: true, hasAccess: false }),
+  ).toBe(false)
   expect(aGarderSurLAppareil(['v2-access'], 'error', undefined)).toBe(false)
   expect(aGarderSurLAppareil(['accueil'], 'success', {})).toBe(false)
 })

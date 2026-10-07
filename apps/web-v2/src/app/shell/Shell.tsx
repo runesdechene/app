@@ -71,7 +71,6 @@ const CarteScreen = lazy(() =>
   import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteScreen })),
 )
 
-
 // La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, premier
 // titre porté, comme les autres Explorateurs), et le « + »
 // qui ouvre l'ajout (Uriel, 05/10 : le seul « + », sur la carte, téléphone comme PC).

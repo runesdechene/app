@@ -13,6 +13,8 @@
  *            Une entrée autorisée met à jour la dernière connexion (touch_last_login), comme la V1 ;
  *            un retour dans l'app aussi, après dix minutes ailleurs (`retours.ts`) : c'est ce que
  *            « vient de se connecter » raconte dans le Registre.
+ *            Un e-mail changé (USER_UPDATED) est recopié dans `users`, et les autres sessions
+ *            fermées, comme le faisait la V1.
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
@@ -33,6 +35,11 @@ async function fetchAccess(): Promise<{ hasSession: boolean; hasAccess: boolean 
   if (error) throw error
   if (data) noterLaConnexion(sessionData.session.user.id)
   return { hasSession: true, hasAccess: data }
+}
+
+async function recopierLEmail(userId: string, email: string) {
+  await supabase.from('users').update({ email_address: email }).eq('id', userId)
+  await supabase.auth.signOut({ scope: 'others' })
 }
 
 // La dernière connexion (l'en-tête d'un Murmure, le Registre, le Hub la lisent) : sans attendre,
@@ -63,7 +70,12 @@ export function useV2Access(): { state: AccessState; retry: () => void } {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      // L'e-mail vient de changer : la fiche le recopie, et les autres sessions sont fermées —
+      // ce que faisait la V1 (useAuth), qui disparaît à la bascule.
+      if (event === 'USER_UPDATED' && session?.user.email) {
+        void recopierLEmail(session.user.id, session.user.email)
+      }
       // Déconnecté (ici ou dans un onglet V1) : le cache de la session, et sa copie, s'effacent.
       if (event === 'SIGNED_OUT') oublierLeCache()
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {

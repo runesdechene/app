@@ -46,17 +46,27 @@ export function MenuDuProfil({ onFermer }: { onFermer: () => void }) {
             <div className={styles.nom}>
               <span className={styles.prenom}>{profil.nom}</span>
               <span className={styles.niveau}>
-                {[`Niveau ${String(profil.niveau)}`, profil.titres[0]?.nom].filter(Boolean).join(' · ')}
+                {[`Niveau ${String(profil.niveau)}`, profil.titres[0]?.nom]
+                  .filter(Boolean)
+                  .join(' · ')}
               </span>
             </div>
           </div>
         )}
         <ul className={styles.lignes}>
-          <Ligne icone={iconeProfil} libelle="Mon profil" onToucher={aller(() => void navigate('/compte'))} />
+          <Ligne
+            icone={iconeProfil}
+            libelle="Mon profil"
+            onToucher={aller(() => void navigate('/compte'))}
+          />
           <Ligne
             icone={iconeEnigmes}
             libelle="Les énigmes"
-            detail={mesEnigmes ? `${String(mesEnigmes.resolues)} résolue${mesEnigmes.resolues > 1 ? 's' : ''}` : null}
+            detail={
+              mesEnigmes
+                ? `${String(mesEnigmes.resolues)} résolue${mesEnigmes.resolues > 1 ? 's' : ''}`
+                : null
+            }
             onToucher={aller(() => {
               ouvrir('enigmes')
             })}
@@ -64,7 +74,9 @@ export function MenuDuProfil({ onFermer }: { onFermer: () => void }) {
           <Ligne
             icone={iconeTitres}
             libelle="Tous les titres"
-            detail={titres ? `${String(titres.obtenus)} obtenu${titres.obtenus > 1 ? 's' : ''}` : null}
+            detail={
+              titres ? `${String(titres.obtenus)} obtenu${titres.obtenus > 1 ? 's' : ''}` : null
+            }
             onToucher={aller(() => {
               ouvrir('titres')
             })}

@@ -6707,6 +6707,7 @@ export type Database = {
       }
       coeurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       compagnie: { Args: { p_id: string }; Returns: Json }
+      compagnie_par_lien: { Args: { p_cle: string }; Returns: string }
       compagnies: { Args: never; Returns: Json }
       compagnons_possibles: { Args: { p_id: string }; Returns: Json }
       contribute_to_place: {
