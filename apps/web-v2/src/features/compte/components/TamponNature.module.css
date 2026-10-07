@@ -54,12 +54,12 @@
 
 .compte {
   position: absolute;
-  bottom: -2px;
+  bottom: -5px;
   padding: 0 3px;
   background: var(--color-fond);
   color: var(--couleur);
   font-family: var(--font-condensee);
-  font-size: var(--micro-size);
+  font-size: var(--meta-size); /* 12 px : plus gros que le micro, à la demande d'Uriel (07/10) */
   font-weight: var(--weight-gras);
   line-height: 1;
 }
