@@ -28,9 +28,9 @@ test('le prochain titre, ou tous gagnés', () => {
 })
 
 test('la relance dit ce qui attend encore', () => {
-  expect(relanceEnClair(0)).toEqual({ titre: 'C’était le dernier « ? »', phrase: 'D’autres s’éveillent chaque matin.' })
-  expect(relanceEnClair(1)).toEqual({ titre: 'Encore un « ? »', phrase: 'Il t’attend sur la carte.' })
-  expect(relanceEnClair(3)).toEqual({ titre: 'Encore 3 « ? »', phrase: 'Ils t’attendent sur la carte.' })
+  expect(relanceEnClair(0)).toEqual({ titre: 'C’était la dernière énigme', phrase: 'Une nouvelle apparaît chaque jour.' })
+  expect(relanceEnClair(1)).toEqual({ titre: 'Encore une énigme', phrase: 'Elle t’attend sur la carte. Une nouvelle apparaît chaque jour.' })
+  expect(relanceEnClair(3)).toEqual({ titre: 'Encore 3 énigmes', phrase: 'Elles t’attendent sur la carte. Une nouvelle apparaît chaque jour.' })
 })
 
 test('une énigme rendormie se dit, le reste aussi', () => {

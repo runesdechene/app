@@ -34,9 +34,10 @@ export function prochainEnClair(v: Verdict, culture: string): string {
 
 // La relance sous le verdict : ce qui attend encore sur la carte, en titre et en phrase.
 export function relanceEnClair(reste: number): { titre: string; phrase: string } {
-  if (reste === 0) return { titre: 'C’était le dernier « ? »', phrase: 'D’autres s’éveillent chaque matin.' }
-  if (reste === 1) return { titre: 'Encore un « ? »', phrase: 'Il t’attend sur la carte.' }
-  return { titre: `Encore ${String(reste)} « ? »`, phrase: 'Ils t’attendent sur la carte.' }
+  const chaqueJour = 'Une nouvelle apparaît chaque jour.'
+  if (reste === 0) return { titre: 'C’était la dernière énigme', phrase: chaqueJour }
+  if (reste === 1) return { titre: 'Encore une énigme', phrase: `Elle t’attend sur la carte. ${chaqueJour}` }
+  return { titre: `Encore ${String(reste)} énigmes`, phrase: `Elles t’attendent sur la carte. ${chaqueJour}` }
 }
 
 // `P0002` : l'éveil s'est effacé (le réveil du matin) ou a déjà reçu sa réponse.
