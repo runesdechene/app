@@ -19,6 +19,7 @@ interface Culture {
   couleur: string | null
   icone: string | null
   complement: string | null
+  zone: string | null
   cercles: Cercle[]
   active: boolean
   ordre: number
@@ -71,6 +72,7 @@ export function Cultures() {
         const { error } = await supabase.rpc('enregistrer_culture', {
           p_id: c.id, p_label: c.label, p_couleur: c.couleur ?? '', p_icone: c.icone ?? '',
           p_complement: c.complement ?? '', p_cercles: c.cercles, p_active: c.active, p_ordre: c.ordre,
+          p_zone: c.zone ?? '',
         })
         if (error) throw error
       }
@@ -119,6 +121,8 @@ export function Cultures() {
               <input className="settings-input" value={culture.label} onChange={(e) => changer({ label: e.target.value })} /></label>
             <label className="faction-field"><span className="faction-field-label">Complément de titre (« Sage … »)</span>
               <input className="settings-input" value={culture.complement ?? ''} placeholder="des arcanes scandinaves" onChange={(e) => changer({ complement: e.target.value })} /></label>
+            <label className="faction-field"><span className="faction-field-label">Où elle s’éveille (une phrase, page « Les énigmes »)</span>
+              <input className="settings-input" value={culture.zone ?? ''} placeholder="entre la Thrace et l’Asie Mineure" onChange={(e) => changer({ zone: e.target.value })} /></label>
             <label className="faction-field"><span className="faction-field-label">Couleur</span>
               <input type="color" value={culture.couleur ?? '#a94842'} onChange={(e) => changer({ couleur: e.target.value })} /></label>
             <div className="faction-field"><span className="faction-field-label">Icône</span>
