@@ -51,9 +51,3 @@ test('la progression se lit d’un trait, le niveau compris', () => {
   expect(progresEnClair('places_enriched', 0, 1)).toBe('0 / 1 lieu enrichi')
 })
 
-test('la connaissance et Polymathe se disent en clair', () => {
-  expect(compteurEnClair('connaissance', 1)).toBe('1 point de connaissance')
-  expect(progresEnClair('connaissance', 16, 20)).toBe('16 / 20 points de connaissance')
-  expect(nomDuChemin('polymathe')).toBe('Au-delà des cultures')
-  expect(progresEnClair('polymathe', 1, 3)).toBe('1 / 3 cultures où tu es Sage')
-})

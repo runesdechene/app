@@ -15,8 +15,6 @@ vi.mock('../api/mesTitres', () => api)
 const titres: MesTitres = {
   obtenus: 3,
   total: 9,
-  cultures: [],
-  polymathe: null,
   chemins: [
     {
       stat: 'places_visited',

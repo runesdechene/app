@@ -45,10 +45,6 @@ export function PageTitres() {
       {titres.chemins.map((chemin) => (
         <BlocChemin key={chemin.stat} chemin={chemin} onToucher={setTouche} />
       ))}
-      {titres.cultures.map((c) => (
-        <BlocChemin key={c.id} chemin={c.chemin} nom={c.nom} onToucher={setTouche} />
-      ))}
-      {titres.polymathe && <BlocChemin chemin={titres.polymathe} onToucher={setTouche} />}
 
       {touche && (
         <FeuilleTitre
@@ -64,16 +60,13 @@ export function PageTitres() {
 
 function BlocChemin({
   chemin,
-  nom: nomDonne,
   onToucher,
 }: {
   chemin: Chemin
-  // Le nom d'une culture des énigmes : le chemin « connaissance » ne se nomme pas seul.
-  nom?: string
   onToucher: (t: TitreTouche) => void
 }) {
   const suivant = prochain(chemin)
-  const nom = nomDonne ?? nomDuChemin(chemin.stat)
+  const nom = nomDuChemin(chemin.stat)
   const toucher = (t: TitreDuChemin) => {
     onToucher({
       nom: t.nom,
