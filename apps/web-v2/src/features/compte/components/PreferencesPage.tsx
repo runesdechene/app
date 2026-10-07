@@ -94,7 +94,7 @@ export function PreferencesPage() {
           'showDepartement',
           repere,
           'Montrer ton département',
-          '« Noble représentant de… », déduit de tes visites.',
+          '« Noble représentant de… » sous ton nom. Ton passeport reste visible.',
         )}
         {ligne(
           'showEnvies',

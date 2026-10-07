@@ -157,7 +157,7 @@ function Carte({
       coin={
         nature ? (
           <span aria-hidden="true">
-            <TamponNature nature={nature} compte={1} encre="fort" taille="petit" />
+            <TamponNature nature={nature} compte={1} encre="fort" taille="coin" />
           </span>
         ) : undefined
       }

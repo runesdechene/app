@@ -1,5 +1,5 @@
 /*
- * QUOI     — un tampon rond de 46 px (32 px en « petit ») : cercle épais, cercle fin, icône
+ * QUOI     — un tampon rond de 46 px (54 px, sans compte, en « coin » d'une carte) : cercle épais, cercle fin, icône
  *            peinte à la couleur de la nature, compte en bas. Absent : pointillés pâles.
  */
 .tampon {
@@ -21,9 +21,10 @@
   rotate: 5deg;
 }
 
-.tampon[data-taille='petit'] {
-  width: 32px;
-  height: 32px;
+.tampon[data-taille='coin'] {
+  width: 54px;
+  height: 54px;
+  background: var(--color-fond);
 }
 
 .tampon[data-encre='pale'] {

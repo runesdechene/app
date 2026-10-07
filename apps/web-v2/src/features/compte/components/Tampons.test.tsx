@@ -24,6 +24,15 @@ test('un tampon de nature visitée : son compte et son encre', () => {
   expect(screen.getByText('×18')).toBeInTheDocument()
 })
 
+test('le tampon de coin : visité, mais sans compte', () => {
+  render(<TamponNature nature={NATURE} compte={1} encre="fort" taille="coin" />)
+  expect(screen.getByRole('img', { name: 'Châteaux : 1 lieu' })).toHaveAttribute(
+    'data-taille',
+    'coin',
+  )
+  expect(screen.queryByText(/×/)).not.toBeInTheDocument()
+})
+
 test('une nature jamais visitée : en pointillés, sans compte', () => {
   render(<TamponNature nature={NATURE} compte={0} encre={null} />)
   expect(screen.getByRole('img', { name: 'Châteaux : pas encore' })).toHaveAttribute('data-absent')

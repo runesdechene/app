@@ -17,7 +17,7 @@ export function TamponNature({
   nature: Nature
   compte: number
   encre: Encre | null
-  taille?: 'normal' | 'petit'
+  taille?: 'normal' | 'coin'
 }) {
   const libelle =
     encre === null
@@ -34,7 +34,7 @@ export function TamponNature({
       style={{ '--couleur': nature.couleur, '--icone': `url(${nature.icone})` }}
     >
       <span className={styles.icone} aria-hidden="true" />
-      {encre !== null && (
+      {encre !== null && taille !== 'coin' && (
         <span className={styles.compte} aria-hidden="true">
           ×{compte}
         </span>
