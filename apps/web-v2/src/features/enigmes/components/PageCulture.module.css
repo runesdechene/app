@@ -140,6 +140,6 @@
 .savais {
   color: var(--color-fiche-recit);
   font-family: var(--font-inscription);
-  font-size: var(--recit-enigme-size);
+  font-size: var(--savais-enigme-size);
   font-style: italic;
 }

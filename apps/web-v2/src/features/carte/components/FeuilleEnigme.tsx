@@ -1,7 +1,8 @@
 /**
- * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — la
- *            culture, le récit, la question, les réponses ; après la réponse, le verdict.
- * POURQUOI — maquettes « Énigmes — 3, 4, 5 » et « 5b à 5d ». Une seule réponse (QCM : un bouton par
+ * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — « Énigme »
+ *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict.
+ * POURQUOI — maquettes « Énigmes — 3 » et « 5b à 5d », et la feuille redessinée « A » (Figma 484:434,
+ *            choisie par Uriel le 07/10 : la première version n'était « pas sexy » et peu lisible). Une seule réponse (QCM : un bouton par
  *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou
  *            fausse, montre « Le savais-tu ? » — ce qui compte, c'est d'apprendre.
  */
@@ -57,17 +58,17 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}
       >
         <header className={styles.entete}>
-          <span className={styles.icone}>
-            {enigme.culture.icone ? (
-              <img src={enigme.culture.icone} alt="" />
-            ) : (
-              <span className={styles.pastille} data-testid="pastille-culture" />
-            )}
+          {/* Le sceau de la culture : son icône du Hub, ou son initiale si elle n'en a pas. */}
+          <span className={styles.sceau} data-testid="sceau-culture">
+            {enigme.culture.icone ? <img src={enigme.culture.icone} alt="" /> : enigme.culture.nom.charAt(0)}
           </span>
-          <Text variant="titre-section">{enigme.culture.nom}</Text>
+          <span className={styles.titre}>
+            <span className={styles.surtitre}>Énigme</span>
+            <span className={styles.culture}>{enigme.culture.nom}</span>
+          </span>
         </header>
         {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{enigme.recit}</p>}
-        <Text variant={verdict ? 'legende' : 'corps'}>{enigme.question}</Text>
+        {verdict ? <Text variant="legende">{enigme.question}</Text> : <p className={styles.question}>{enigme.question}</p>}
         {/* Un titre gagné prend la place : les réponses se replient (maquette 5d). */}
         {!verdict?.nouveauxTitres.length && (
           <Reponses enigme={enigme} verdict={verdict} choisie={choisie} envoi={envoi} onRepondre={envoyer} />
@@ -75,7 +76,7 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
         {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
         <Text variant="legende">
-          {verdict ? piedEnClair(verdict.resteEnAttente) : 'Une seule réponse. Si tu te trompes, tu découvres l’explication, sans points.'}
+          {verdict ? piedEnClair(verdict.resteEnAttente) : 'Une seule réponse. Juste : +1 XP et des points de connaissance.'}
         </Text>
       </div>
     </Feuille>
@@ -125,7 +126,7 @@ function Reponses({
   }
   return (
     <div className={styles.choix}>
-      {enigme.choix.map((c) => (
+      {enigme.choix.map((c, i) => (
         <button
           key={c}
           type="button"
@@ -137,6 +138,9 @@ function Reponses({
             onRepondre(c)
           }}
         >
+          <span className={styles.lettre} aria-hidden="true">
+            {'ABCDEFGH'.charAt(i)}
+          </span>
           {c}
         </button>
       ))}

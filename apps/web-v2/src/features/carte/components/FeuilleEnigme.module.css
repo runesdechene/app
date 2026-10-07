@@ -1,6 +1,6 @@
 /*
- * QUOI     — la feuille d'une énigme : la culture, le récit en IM Fell, les réponses, le verdict
- *            (maquettes « Énigmes — 4 et 5 », Figma 460:380 et 460:467).
+ * QUOI     — la feuille d'une énigme : « Énigme » et le sceau de la culture, le récit,
+ *            la question, les réponses lettrées (maquette « A », Figma 484:434).
  */
 .contenu {
   display: grid;
@@ -13,35 +13,64 @@
   gap: var(--space-3);
 }
 
-.icone {
+/* Le sceau : l'icône de la culture (ou son initiale) à l'encre, sur fond clair, cerclé de sa couleur. */
+.sceau {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 2px solid var(--couleur-culture, var(--color-carte-encre));
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1.5px solid var(--couleur-culture, var(--color-ocre));
   border-radius: 50%;
-  background: var(--color-feuille);
+  background: var(--color-pastille);
+  color: var(--couleur-culture, var(--color-carte-encre));
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  line-height: 1;
 }
 
-.pastille {
-  width: 40%;
-  height: 40%;
-  border-radius: 50%;
-  background: var(--couleur-culture, var(--color-carte-encre));
-}
-
-.icone img {
+.sceau img {
   width: 60%;
   height: 60%;
   object-fit: contain;
 }
 
+.titre {
+  display: grid;
+}
+
+.surtitre {
+  color: var(--couleur-culture, var(--color-ocre));
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.culture {
+  color: var(--color-encre);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+/* Le récit se lit d'abord : du Cabin à interligne large, tenu par un filet (l'IM Fell italique
+   était joli mais peu lisible, 07/10). */
 .recit {
   margin: 0;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-ocre);
   color: var(--color-fiche-recit);
-  font-family: var(--font-inscription);
   font-size: var(--recit-enigme-size);
-  font-style: italic;
+  line-height: var(--recit-enigme-leading);
+}
+
+.question {
+  margin: 0;
+  color: var(--color-carte-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--question-enigme-size);
+  line-height: var(--dense-leading);
 }
 
 .choix,
@@ -63,9 +92,27 @@
 }
 
 .choixBouton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-left: var(--space-3);
   transition:
     background var(--duree-douce) var(--courbe-douce),
     border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.lettre {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-ocre);
+  border-radius: 50%;
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
 }
 
 .choixBouton:disabled {

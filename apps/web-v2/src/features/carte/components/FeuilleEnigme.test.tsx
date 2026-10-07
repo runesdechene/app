@@ -81,11 +81,21 @@ test('deux touchers rapides n’envoient qu’une réponse', async () => {
   })
 })
 
-test('une culture sans icône montre une pastille', async () => {
+test('l’en-tête dit « Énigme » et la culture ; sans icône, le sceau porte son initiale', async () => {
   ouvrirEnigme.mockResolvedValue(enigme)
   monter()
   await retourner()
-  expect(await screen.findByTestId('pastille-culture')).toBeInTheDocument()
+  expect(await screen.findByText('Énigme')).toBeInTheDocument()
+  expect(screen.getByText('Byzance')).toBeInTheDocument()
+  expect(screen.getByTestId('sceau-culture')).toHaveTextContent('B')
+})
+
+test('les réponses portent une lettre, hors de leur nom', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  monter()
+  await retourner()
+  const bouton = await screen.findByRole('button', { name: 'Sainte-Irène' })
+  expect(bouton).toHaveTextContent('B')
 })
 
 test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu', async () => {

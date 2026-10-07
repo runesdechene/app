@@ -44,7 +44,7 @@ import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
 import { lireCentre } from '../lib/centre'
-import { claquerLaCire } from '../lib/cire'
+import { retournerLeSceau } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
@@ -145,7 +145,7 @@ function CarteVivante({
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
   const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
   useEnigmesSurLaCarte(visiteur ? null : carte, (t) => {
-    claquerLaCire()
+    retournerLeSceau()
     setEnigmeTouchee(t)
   })
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
