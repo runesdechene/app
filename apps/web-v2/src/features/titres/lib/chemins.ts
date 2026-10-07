@@ -10,12 +10,15 @@ const NOMS: Record<string, string> = {
   places_visited: 'Les visites',
   places_added: 'Les lieux ajoutés',
   places_enriched: 'Les lieux enrichis',
+  polymathe: 'Au-delà des cultures',
 }
 
 const UNITES: Record<string, [string, string]> = {
   places_visited: ['lieu visité', 'lieux visités'],
   places_added: ['lieu ajouté', 'lieux ajoutés'],
   places_enriched: ['lieu enrichi', 'lieux enrichis'],
+  connaissance: ['point de connaissance', 'points de connaissance'],
+  polymathe: ['culture où tu es Sage', 'cultures où tu es Sage'],
 }
 
 export function nomDuChemin(stat: string): string {

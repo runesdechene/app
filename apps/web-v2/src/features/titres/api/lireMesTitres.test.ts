@@ -40,3 +40,22 @@ test('les titres d’une autre époque ne se lisent plus', () => {
 test('un JSON mal formé lève une erreur', () => {
   expect(() => lireMesTitres({ obtenus: 'trois' })).toThrow()
 })
+
+test('les cultures deviennent des chemins de connaissance, Polymathe à part', () => {
+  const t = lireMesTitres({
+    obtenus: 1, total: 41, chemins: [],
+    cultures: [{ id: 'byzantine', nom: 'Byzance', icone: null, couleur: null, points: 5, total: 130,
+      titres: [{ id: 300, nom: 'Curieuse de Byzance', min: 1, obtenu: true, porte: false }] }],
+    polymathe: { id: 199, nom: 'Polymathe', compteur: 0, obtenu: false, porte: false },
+  })
+  expect(t.cultures[0]).toEqual({ id: 'byzantine', nom: 'Byzance', chemin: { stat: 'connaissance', compteur: 5,
+    titres: [{ id: 300, nom: 'Curieuse de Byzance', min: 1, obtenu: true, porte: false }] } })
+  expect(t.polymathe).toEqual({ stat: 'polymathe', compteur: 0,
+    titres: [{ id: 199, nom: 'Polymathe', min: 3, obtenu: false, porte: false }] })
+})
+
+test('une base sans énigmes encore : pas de cultures, pas de Polymathe', () => {
+  const t = lireMesTitres({ obtenus: 0, total: 0, chemins: [] })
+  expect(t.cultures).toEqual([])
+  expect(t.polymathe).toBeNull()
+})
