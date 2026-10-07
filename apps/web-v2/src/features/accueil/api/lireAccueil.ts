@@ -58,6 +58,8 @@ export type TypeDeChemin =
   | 'modifie'
   | 'fondation'
   | 'adhesion'
+  | 'enigme' // une énigme percée (migration 448)
+export type CultureDuChemin = { id: string; nom: string; couleur: string | null; icone: string | null }
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
   type: TypeDeChemin
@@ -70,6 +72,8 @@ export type Chemin = {
     type: { icone: string; couleur: string | null } | null // mig 375
   } | null
   compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion, revendication « pour » (438)
+  culture: CultureDuChemin | null // une énigme percée : sa culture, jamais sa réponse (448)
+  nombre: number // combien ce jour-là (« a percé 3 énigmes », 448)
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -84,6 +88,7 @@ const TYPES: readonly TypeDeChemin[] = [
   'modifie',
   'fondation',
   'adhesion',
+  'enigme',
 ]
 
 function typeDeChemin(v: unknown): TypeDeChemin {
@@ -160,6 +165,18 @@ function lireChemin(v: unknown): Chemin {
       const f = objet(v)
       return { id: chaine(f.id), nom: chaine(f.nom), couleur: chaine(f.couleur) }
     })(c.compagnie ?? null),
+    // Absentes avant la migration 448 : aucune culture, une fois.
+    culture: ouNull((v) => {
+      const k = objet(v)
+      const couleur = ouNull(chaine)(k.couleur ?? null)
+      return {
+        id: chaine(k.id),
+        nom: chaine(k.nom),
+        couleur: couleur && HEX.test(couleur) ? couleur : null,
+        icone: ouNull(chaine)(k.icone ?? null),
+      }
+    })(c.culture ?? null),
+    nombre: c.nombre === undefined ? 1 : nombre(c.nombre),
     moi: booleen(c.moi),
     saluts: nombre(c.saluts),
     salue: booleen(c.salue),

@@ -187,3 +187,25 @@ test('fonder et rejoindre une Compagnie sont des lignes du fil, avec leur Compag
   // Une ligne de lieu n'a pas de Compagnie ; absente (avant la 425), aucune.
   expect(lireChemins([CHEMIN])[0]?.compagnie).toBeNull()
 })
+
+test('une énigme percée se lit avec sa culture et le nombre du jour (migration 448)', () => {
+  const [enigme] = lireChemins([
+    {
+      ...CHEMIN,
+      id: 'enigme:u1:2026-10-07',
+      type: 'enigme',
+      lieu: null,
+      culture: { id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: 'spqr.svg' },
+      nombre: 3,
+    },
+  ])
+  expect(enigme?.type).toBe('enigme')
+  expect(enigme?.culture).toEqual({ id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: 'spqr.svg' })
+  expect(enigme?.nombre).toBe(3)
+})
+
+test('avant la migration 448, une ligne n’a ni culture ni nombre : aucune, et une', () => {
+  const [visite] = lireChemins([CHEMIN])
+  expect(visite?.culture).toBeNull()
+  expect(visite?.nombre).toBe(1)
+})

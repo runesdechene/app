@@ -16,6 +16,7 @@ import drapeau from '@/assets/ui/drapeau.svg'
 import plume from '@/assets/ui/plume.svg'
 import lieuIcone from '@/assets/ui/lieu.svg'
 import compagnieIcone from '@/assets/ui/onglet-compagnies.svg'
+import enigmeIcone from '@/assets/ui/menu-enigmes.svg'
 import sectionChemins from '@/assets/ui/section-chemins.svg'
 import { Avatar } from '@/shared/ui/Avatar'
 import type { Chemin } from '../api/lireAccueil'
@@ -36,6 +37,7 @@ const ICONES = {
   modifie: plume,
   fondation: compagnieIcone,
   adhesion: compagnieIcone,
+  enigme: enigmeIcone,
 }
 // Les phrases d'Uriel (01/10).
 const VERBES = {
@@ -47,6 +49,7 @@ const VERBES = {
   modifie: 'a modifié', // le nom, la nature ou l'époque (mig 415)
   fondation: 'a fondé',
   adhesion: 'a rejoint',
+  enigme: 'a percé une énigme',
 }
 const D_ABORD = 5
 
@@ -82,16 +85,22 @@ export function FilDesChemins({ chemins }: { chemins: Chemin[] }) {
 }
 
 function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) => void }) {
-  const { qui, lieu, compagnie } = chemin
+  const { qui, lieu, compagnie, culture } = chemin
   const ou = [lieu?.region, ilYA(chemin.quand)].filter(Boolean).join(', ')
   const { envols, lancer, finir } = useEnvols()
   return (
-    <li className={styles.ligne}>
+    <li className={styles.ligne} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
       {chemin.type === 'ajout' && lieu?.type ? (
         // Un lieu ajouté : la bille de son type (Uriel, 29/09).
         <span className={styles.bille}>
           <BilleType icone={lieu.type.icone} couleur={lieu.type.couleur} />
         </span>
+      ) : culture?.icone ? (
+        // Une énigme percée : le logo de sa culture, peint à sa couleur (Uriel, 07/10).
+        <span
+          className={styles.logo}
+          style={{ '--icone': `url("${culture.icone}")` }}
+        />
       ) : (
         <img className={styles.type} src={ICONES[chemin.type]} alt="" />
       )}
@@ -100,7 +109,18 @@ function Ligne({ chemin, onSaluer }: { chemin: Chemin; onSaluer: (id: string) =>
         <Link className={styles.qui} to={`/accueil/explorateur/${qui.id}`}>
           {qui.nom}
         </Link>{' '}
-        {VERBES[chemin.type]}
+        {chemin.type === 'enigme' && chemin.nombre > 1
+          ? `a percé ${String(chemin.nombre)} énigmes`
+          : VERBES[chemin.type]}
+        {culture && (
+          <>
+            {/* La culture, jamais la question ni la réponse (pas de spoiler) ; elle mène à « Les énigmes ». */}
+            {' · '}
+            <Link className={styles.culture} to={`/accueil/enigmes/${culture.id}`}>
+              {culture.nom}
+            </Link>
+          </>
+        )}
         {lieu && (
           <>
             {' '}

@@ -58,6 +58,16 @@
   opacity: 0.8;
 }
 
+/* Le logo de la culture d'une énigme percée : un masque peint à sa couleur. */
+.logo {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  background: var(--couleur-culture, var(--color-ocre));
+  mask: var(--icone) center / contain no-repeat;
+}
+
 /* La bille du type d'un lieu ajouté, calée sur la première ligne du texte. */
 .bille {
   display: grid;
@@ -80,6 +90,12 @@
 
 .lieu {
   color: var(--color-ocre);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.culture {
+  color: var(--couleur-culture, var(--color-ocre));
   font-weight: var(--weight-semi);
   text-decoration: none;
 }
