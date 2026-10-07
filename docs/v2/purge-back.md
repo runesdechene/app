@@ -40,7 +40,7 @@
 | Toutes les vues de `public` en `security_invoker = off` | les default privileges donnent ALL à `authenticated` sur toute nouvelle vue ; une vue qui s'exécute en propriétaire et reste modifiable ouvre l'écriture (cas `users_admin`, corrigé mig 345) | **audité le 27/09** : les 3 autres vues (`daily_enigma_status`, `movement_stats`, `movement_wall_photos`) sont en `security_invoker=true` et non modifiables — leurs droits d'écriture affichés sont sans effet. Révoquer par propreté | après bascule | relecture 27/09 |
 | `cleanup_old_chat_messages()` | purge tout à 14 jours, murmures compris | **résolu par construction** (28/09) : les murmures vivent dans leur propre table (`murmures`, mig 372), que la purge ne touche pas | — | spec V2 §10 |
 | Seau `place-images` : policy INSERT ouverte à tout `authenticated` | n'importe quel connecté pouvait déposer dans le dossier d'un autre | **corrigé par la mig 385** (même ligne ci-dessous) ; restent ouverts à tout connecté, chacun dans son seau : `tag-icons` (Hub, modérateurs compris), `faction-patterns`, `app-assets` — à restreindre au staff | après bascule | Task 8 compte, 27/09 |
-| `chat_messages.user_name` écrit par le client | la V1 insère elle-même le nom affiché : n'importe qui peut signer un message du nom d'un autre | la V2 écrit par `ecrire_au_registre` (le nom posé par la base, mig 371) ; côté V1, retirer l'INSERT direct (policies `chat_insert_*`) à la bascule | après bascule | relecture 28/09 |
+| `chat_messages.user_name` écrit par le client | la V1 insère elle-même le nom affiché : n'importe qui peut signer un message du nom d'un autre | la V2 écrit par `ecrire_au_registre` (le nom posé par la base, mig 371) ; **fait par la mig 454** : les policies `chat_insert_*` sont parties avec la V1 | fait 07/10 | relecture 28/09 |
 | `unlock_pending_fragments(p_user_id, p_email)` | lisait l'e-mail fourni par l'appelant : on pouvait réclamer les Fragments achetés par un autre client | **corrigé** par la mig 369 (l'e-mail vérifié du jeton) — à appliquer | au GO d'Uriel | relecture 28/09 |
 | **`storage.objects` : policies « Allow all 1snxhtj » et « Enable storage 1lvpvk4 »** (INSERT/UPDATE/DELETE `true`, tous seaux) | tout compte connecté pouvait déposer, écraser ou effacer n'importe quel fichier | **corrigé par la mig 385, à appliquer** (écrite et testée le 30/09) : chacun ses dossiers dans `place-images` (`places/<moi>/`, `<moi>/`), chef ou admin pour `faction-emblems`, admins pour les seaux du Hub | au GO d'Uriel | relecture Ajouter un lieu, 30/09 |
 | `delete_place(p_user_id, p_place_id)` (V1, reprise par la V2 le 30/09) | SECURITY DEFINER **sans `search_path` fixé** ; rend son refus en `{ error }` au lieu de le lever ; n'efface pas les fichiers des photos dans `place-images` (orphelins) | réécrire en `supprimer_lieu(p_id)` (auth.uid(), `search_path`, refus levés, photos effacées) | avec « faire vivre un lieu » | suppression d'un lieu en V2, 30/09 |
@@ -50,9 +50,9 @@
 
 | Objet | Rôle | Source |
 |---|---|---|
-| `users.v2_access` | autorisation V2 par compte — **ne sert plus depuis la mig 398** (V2 ouverte à tous) : à retirer avec la case du Hub | mig 344 |
-| `has_v2_access()` | la V2 demande si l'appelant peut entrer — tout compte connecté depuis la mig 398 ; à retirer à la bascule | mig 344, 398 |
-| `set_v2_access(text, boolean)` | le Hub coche / décoche — sans effet depuis la mig 398 | mig 344 |
+| `users.v2_access` | **retirée par la mig 454** avec la case du Hub (la vue `users_admin` refaite sans elle) | mig 344 |
+| `has_v2_access()` | la V2 demande si l'appelant peut entrer — tout compte connecté depuis la mig 398. **Gardée** à la bascule : elle dit encore si le compte a sa fiche dans `users` | mig 344, 398 |
+| `set_v2_access(text, boolean)` | **retirée par la mig 454** | mig 344 |
 | Supabase Auth — URL `/v2/` | à autoriser quand la zone Compte aura sa propre connexion | spec socle §9 |
 | PostGIS, `geo_departements`, `geo_pays`, `places.departement` / `pays`, `_rattacher_lieu`, déclencheur `places_rattacher` | rattacher chaque lieu (profil, régions parcourues) ; DROM rattachés au pays seulement ; 2 îlots isolés sans rattachement | migs 349-351 |
 | déclencheur `envie_visitee` (`_trg_envie_visitee`) | une visite retire le lieu des envies (listes exclusives) | mig 352 |
