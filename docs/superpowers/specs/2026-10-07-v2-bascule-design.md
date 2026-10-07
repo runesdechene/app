@@ -64,7 +64,9 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
 ## 3. Service worker et push
 
 - vite-plugin-pwa passe en **`injectManifest`** avec `src/sw.ts` (V2) : précache, repli de
-  navigation sur `index.html` (sauf `/lieu/`, `/sitemap`, `/mouvement`, `/campement`),
+  navigation sur `index.html` **en liste blanche** — seulement les adresses d'Explore (`/`,
+  `/accueil`, `/carte`, `/messages`, `/compagnies`, `/compte`, `/bienvenue`, `/da`) ; tout le
+  reste va au serveur (voir « Les autres applis du domaine »),
   `skipWaiting` + `clientsClaim` (règle `v2.md`), gestionnaires `push` et `notificationclick`
   (ouvre ou focalise l'appli sur l'URL du push). Fichier servi à `/sw.js` : même adresse et même
   portée que la V1, donc il la remplace et garde ses abonnements.
@@ -84,6 +86,26 @@ Redirections Netlify (301), dans `apps/web-v2/netlify.toml` :
   sa liste. Une modification (`modifier_mise_a_jour`) ne renvoie rien.
 - **`USER_UPDATED`** : la V2 recopie l'e-mail changé dans `users.email_address` comme la V1
   (`useAuth.ts:37-43`).
+
+## Les autres applis du domaine — `/campement`, `/scan`
+
+Explore à la racine ne doit jamais avaler un futur sous-dossier (Uriel, 07/10).
+
+- **Préfixes réservés**, qu'Explore n'utilise jamais pour ses écrans : `/campement`, `/scan`,
+  `/lieu`, `/mouvement`, `/sitemap.xml`, `/sw.js`. (`/scan` : le scan vit sur l'accueil du
+  Campement, décision du 07/10 ; réservé par prudence.)
+- **Netlify** : la première règle qui correspond gagne. Les règles des préfixes réservés sont
+  écrites **avant** le repli SPA d'Explore. `/campement/*` et `/scan/*` y figurent dès la bascule,
+  en commentaire tant que leur site n'existe pas — le jour venu, on décommente.
+- **Service worker** : liste blanche (§3). Un sous-dossier qui n'est pas d'Explore va au serveur,
+  sans qu'on touche à Explore.
+- **Appli installée** : la portée d'Explore est `/` (ses écrans sont à la racine). Le Campement
+  aura sa propre PWA, portée `/campement/`, son propre `id` de manifeste et son propre service
+  worker, à `/campement/sw.js` (portée plus précise : il l'emporte sous `/campement/`). Limite
+  connue : un lien vers `/campement` touché **dans** l'appli Explore installée s'ouvre dans sa
+  fenêtre — comportement normal des navigateurs, pas bloquant.
+- **Le routeur d'Explore** : sa route `*` → `/accueil` ne voit jamais `/campement` (Netlify et le
+  service worker l'ont déjà orienté ailleurs) ; un test le vérifie sur la liste blanche.
 
 ## 4. Le jour J, dans l'ordre
 
