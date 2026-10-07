@@ -58,9 +58,13 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}
       >
         <header className={styles.entete}>
-          {/* Le sceau de la culture : son icône du Hub, ou son initiale si elle n'en a pas. */}
+          {/* Le sceau de la culture : son icône du Hub peinte à sa couleur, ou son initiale. */}
           <span className={styles.sceau} data-testid="sceau-culture">
-            {enigme.culture.icone ? <img src={enigme.culture.icone} alt="" /> : enigme.culture.nom.charAt(0)}
+            {enigme.culture.icone ? (
+              <span className={styles.logo} style={{ '--icone': `url("${enigme.culture.icone}")` }} />
+            ) : (
+              enigme.culture.nom.charAt(0)
+            )}
           </span>
           <span className={styles.titre}>
             <span className={styles.surtitre}>Énigme</span>

@@ -29,10 +29,12 @@
   line-height: 1;
 }
 
-.sceau img {
+/* L'icône sert de masque que la couleur de la culture remplit : jamais en noir (Uriel, 07/10). */
+.logo {
   width: 60%;
   height: 60%;
-  object-fit: contain;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
 }
 
 .titre {

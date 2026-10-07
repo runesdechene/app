@@ -96,6 +96,15 @@ test('l’en-tête dit « Énigme » et la culture ; sans icône, le sceau porte
   expect(screen.getByTestId('sceau-culture')).toHaveTextContent('B')
 })
 
+test('le logo de la culture se peint à sa couleur, jamais en noir', async () => {
+  ouvrirEnigme.mockResolvedValue({ ...enigme, culture: { ...enigme.culture, icone: 'https://x/chrisme.svg', couleur: '#a93d76' } })
+  monter()
+  await retourner()
+  const sceau = await screen.findByTestId('sceau-culture')
+  expect(sceau.querySelector('img')).toBeNull()
+  expect(sceau.querySelector('[style*="--icone"]')?.getAttribute('style')).toContain('https://x/chrisme.svg')
+})
+
 test('les réponses portent une lettre, hors de leur nom', async () => {
   ouvrirEnigme.mockResolvedValue(enigme)
   monter()

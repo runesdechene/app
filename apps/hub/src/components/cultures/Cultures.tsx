@@ -126,7 +126,13 @@ export function Cultures() {
             <label className="faction-field"><span className="faction-field-label">Couleur</span>
               <input type="color" value={culture.couleur ?? '#a94842'} onChange={(e) => changer({ couleur: e.target.value })} /></label>
             <div className="faction-field"><span className="faction-field-label">Icône</span>
-              {culture.icone && <img className="cultures-icone" src={culture.icone} alt="" />}
+              {/* L'aperçu tel que l'app la peint : la forme de l'icône, remplie de la couleur de la culture. */}
+              {culture.icone && (
+                <span
+                  className="cultures-icone"
+                  style={{ backgroundColor: culture.couleur ?? '#a94842', maskImage: `url("${culture.icone}")` }}
+                />
+              )}
               <button className="btn-secondary" disabled={uploading} onClick={() => fichier.current?.click()}>{uploading ? 'Envoi…' : 'Choisir une image'}</button>
               <input ref={fichier} type="file" accept="image/svg+xml,image/png,image/webp" hidden onChange={handleUpload} /></div>
             <label className="faction-field"><input type="checkbox" checked={culture.active} onChange={(e) => changer({ active: e.target.checked })} /> Active</label>

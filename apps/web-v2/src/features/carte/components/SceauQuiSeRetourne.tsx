@@ -43,7 +43,11 @@ export function SceauQuiSeRetourne({
       <span className={styles.dos} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
         <Cire />
         <span className={styles.coeur}>
-          {culture?.icone ? <img src={culture.icone} alt="" /> : culture?.nom.charAt(0)}
+          {culture?.icone ? (
+            <span className={styles.logo} style={{ '--icone': `url("${culture.icone}")` }} />
+          ) : (
+            culture?.nom.charAt(0)
+          )}
         </span>
       </span>
     </div>

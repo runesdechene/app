@@ -21,9 +21,10 @@ test('derrière, le cachet prend la couleur de la culture et porte son initiale'
   expect(container.querySelector('[style*="--couleur-culture: #a93d76"]')).not.toBeNull()
 })
 
-test('avec un logo, le cachet porte le logo de la culture', () => {
+test('avec un logo, le cachet porte le logo de la culture, peint à sa couleur', () => {
   const { container } = render(
     <SceauQuiSeRetourne x={10} y={20} culture={{ ...byzance, icone: 'https://x/chrisme.png' }} onFini={() => undefined} />,
   )
-  expect(container.querySelector('img[src="https://x/chrisme.png"]')).not.toBeNull()
+  expect(container.querySelector('img')).toBeNull()
+  expect(container.querySelector('[style*="--icone"]')?.getAttribute('style')).toContain('https://x/chrisme.png')
 })

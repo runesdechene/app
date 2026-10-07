@@ -74,10 +74,12 @@
   font-size: var(--titre-section-size);
 }
 
-.coeur img {
+/* Le logo, peint à la couleur de la culture (il sert de masque). */
+.logo {
   width: 70%;
   height: 70%;
-  object-fit: contain;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
 }
 
 /* Il part de la taille du sceau de la carte (36 px sur 64) et grandit en se retournant. */
