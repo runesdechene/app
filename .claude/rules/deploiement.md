@@ -18,31 +18,30 @@ Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `-
 
 | Site | SITE_ID | Domaine |
 |---|---|---|
-| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
+| `runesdechene` (Explore, `apps/web-v2` depuis la bascule du 07/10/2026) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
-| `rdc-web-v2` (la V2) | `64c61b33-40c1-4505-966a-d0b136cac69b` | sert `/v2/*` via rewrite de la V1 (créé le 30/09/2026) |
+| `rdc-web-v2` | `64c61b33-40c1-4505-966a-d0b136cac69b` | servait `/v2/*` avant la bascule — **ne plus déployer**, à supprimer |
 | `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
-- **Après chaque deploy explore-web** : `node scripts/sync-app-version.mjs` (lit `# X.Y.Z` en tête
-  de `apps/explore-web/CHANGELOG.md`, écrit `app_settings.app.latest_version` → `UpdateBanner`).
-  Requiert `SUPABASE_SERVICE_ROLE_KEY` dans le `.env`.
-- **Vérifier** : `curl -s https://app.runesdechene.com/sw.js | grep -oE "matchPrecache|KILL_SWITCH"`.
+- **Vérifier** : la page sert le build local (`curl -s https://app.runesdechene.com/ | grep -o
+  'assets/index-[^"]*\.js'` = celui de `apps/web-v2/dist/index.html`), `curl -s …/sw.js | grep
+  showNotification`, puis la version affichée dans le navigateur (deux rechargements).
 - **Rollback éprouvé** : `git revert HEAD --no-edit`, rebuild, redeploy. Ou rollback Netlify en un clic.
 - **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
 
-## La V1 se déploie depuis `apps/explore-web`, jamais d'ailleurs
+## Explore se déploie depuis `apps/web-v2`, sur le site `runesdechene`
 
-**Le piège** (05/10/2026) : déployée depuis le scratchpad, la V1 est partie sans ses redirections —
-elles vivent dans `apps/explore-web/netlify.toml`, que la CLI ne lit que dans le dossier courant.
-`/v2/*` a répondu 404 pendant deux minutes. Au même moment, `--site=<SITE_ID>` répondait « Project
-not found » ; `--site=runesdechene` (le nom) passait.
+Depuis la bascule (07/10/2026, spec `docs/superpowers/specs/2026-10-07-v2-bascule-design.md`),
+la V2 **est** `app.runesdechene.com`. Ses règles (seo-pages, vieilles adresses V1, `/v2/*`, en-tête
+pour la boutique) vivent dans `apps/web-v2/netlify.toml`, que la CLI ne lit que dans le dossier
+courant : déployée d'ailleurs, l'appli partirait sans elles (piège du 05/10 avec la V1).
 
-**How to apply :** `cd apps/explore-web && npx netlify-cli deploy --prod --no-build --dir="<chemin
-absolu>/apps/explore-web/dist" --site=runesdechene`, puis vérifier
-`curl -s -o /dev/null -w '%{http_code}' https://app.runesdechene.com/v2/` → 200 et une page
-`/lieu/<slug>` → 200.
+**How to apply :** `pnpm build` dans `apps/web-v2`, puis `cd apps/web-v2 && npx netlify-cli deploy
+--prod --no-build --dir="<chemin absolu>/apps/web-v2/dist" --site=runesdechene` (le nom ; en cas de
+« Not Found », l'identifiant). Vérifier ensuite `/lieu/<slug>` → 200, `/v2/accueil` → 301 vers
+`/accueil`, `/v2/sw.js` → 200 (le service worker qui retire l'ancienne inscription de `/v2/`).
 
 ## Le Hub : `--site=<ID>` et `--no-build`, jamais son nom
 
@@ -53,14 +52,7 @@ répond « Failed retrieving site data … Not Found ». Avec l'identifiant et `
 `pnpm build` dans `apps/hub`). Pour la V1 c'est l'inverse (le nom passe, l'identifiant non) : en cas
 de « Not Found », essayer l'autre forme.
 
-## V2 : ne jamais déployer la V1 avant le site `rdc-web-v2`
-
-Depuis la branche `feat/v2-socle`, le `netlify.toml` de la V1 redirige `/v2/*` vers le site
-`rdc-web-v2`, et le menu montre « Essayer la V2 » aux comptes autorisés. **Tant que ce site
-n'existe pas et n'est pas déployé**, un déploiement de la V1 contenant ces changements envoie
-`/v2/` vers une 404. Ordre obligatoire : site V2 d'abord, V1 ensuite (spec socle §7).
-Ne pas fusionner `feat/v2-socle` dans `main` avant le premier déploiement de la V2 — ou retirer
-la redirection du `netlify.toml` au moment de la fusion.
+## Netlify : créer un site, écrire une redirection
 
 **Monorepo** : dans le dépôt, `netlify sites:create` (et d'autres commandes) ouvre un choix
 interactif du projet et plante sans terminal. Créer un site par l'API, hors du dépôt :
