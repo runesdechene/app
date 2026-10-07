@@ -18,7 +18,7 @@ export const CALQUE_SCEAUX_ENIGMES = 'enigmes-sceaux'
 export const ZOOM_DES_SCEAUX = 6
 
 const RATIO = 2
-const ECLAT = 18
+const ECLAT = 30
 const SCEAU = 36
 
 export function enGeoJSONEnigmes(enigmes: EnigmeEnAttente[]): FeatureCollection<Point, { id: number }> {
@@ -62,20 +62,23 @@ export function toileDesEnigmes(taille: number) {
   return ctx
 }
 
-// Un point de cire dans un halo pâle.
+// Un point de cire cerclé de crème, dans deux halos : il doit se voir dézoomé, entre les lieux
+// (Uriel, 07/10 : « plus visible au dézoom »).
 function eclat(c: CouleursCarte) {
   const ctx = toileDesEnigmes(ECLAT)
   const m = ECLAT / 2
-  ctx.globalAlpha = 0.2
   ctx.fillStyle = c.cire
-  ctx.beginPath()
-  ctx.arc(m, m, m, 0, Math.PI * 2)
-  ctx.fill()
+  for (const [rayon, opacite] of [[m, 0.18], [m * 0.62, 0.32]] as const) {
+    ctx.globalAlpha = opacite
+    ctx.beginPath()
+    ctx.arc(m, m, rayon, 0, Math.PI * 2)
+    ctx.fill()
+  }
   ctx.globalAlpha = 1
   ctx.beginPath()
-  ctx.arc(m, m, 4, 0, Math.PI * 2)
+  ctx.arc(m, m, 5.5, 0, Math.PI * 2)
   ctx.fill()
-  ctx.lineWidth = 1.5
+  ctx.lineWidth = 2
   ctx.strokeStyle = c.halo
   ctx.stroke()
   return ctx.getImageData(0, 0, ECLAT * RATIO, ECLAT * RATIO)
