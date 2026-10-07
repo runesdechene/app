@@ -25,10 +25,3 @@
   font-size: var(--bouton-size);
   letter-spacing: var(--bouton-tracking);
 }
-
-.link {
-  min-height: var(--cible-tactile);
-  display: inline-grid;
-  place-content: center;
-  color: var(--color-accent);
-}

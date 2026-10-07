@@ -14,7 +14,7 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
-    'logo retour actions'
+    'logo . actions'
     'main main main'
     'nav nav nav';
 }
@@ -30,18 +30,6 @@
 
 .embleme {
   display: none;
-}
-
-.retourV1 {
-  grid-area: retour;
-  white-space: nowrap;
-  align-self: center;
-  min-height: var(--cible-tactile);
-  display: inline-grid;
-  place-content: center;
-  margin-top: env(safe-area-inset-top);
-  text-decoration: none;
-  opacity: 0.7;
 }
 
 .version {
@@ -136,7 +124,7 @@
       'nav main'
       '. main'
       'actions main'
-      'retour main'
+      '. main'
       'version main';
   }
 
@@ -286,13 +274,6 @@
     flex-direction: column;
     align-items: center;
     margin: 0 0 var(--space-2);
-  }
-
-  .retourV1 {
-    position: relative;
-    z-index: 3;
-    justify-self: center;
-    margin: 0;
   }
 
   .version {

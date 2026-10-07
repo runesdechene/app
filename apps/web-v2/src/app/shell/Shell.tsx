@@ -46,11 +46,8 @@ import replier from '@/assets/ui/replier.svg'
 import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
-import { Text } from '@/shared/ui/Text'
-import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
 import { VERSION } from '@/shared/lib/version'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
-import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
 import { useOuvrir } from '../navigation/useOuvrir'
 import { TABS, type TabId } from '../navigation/tabs'
@@ -195,11 +192,6 @@ export function Shell() {
         {/* Le logotype en entier sur mobile ; l'emblème seul dans la barre verticale du desktop. */}
         <img className={styles.logo} src={logotype} alt="Runes de Chêne" />
         <img className={styles.embleme} src={embleme} alt="Runes de Chêne" />
-        {/* Pendant la construction (spec socle §6) : la sortie vers la V1 reste toujours visible,
-          y compris dans la V2 installée en application, qui n'a pas de barre d'adresse. */}
-        <a className={styles.retourV1} href={V1_URL} onClick={choisirLaV1}>
-          <Text variant="libelle">Revenir V1</Text>
-        </a>
         {/* Uriel, 01/10 : le numéro qui dit que le dernier déploiement est arrivé. */}
         <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>

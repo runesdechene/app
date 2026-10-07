@@ -1,26 +1,22 @@
 /**
- * QUOI     — la porte de la V2 : laisse passer, renvoie vers la V1, ou propose de réessayer.
- * POURQUOI — la V2 est réservée aux comptes autorisés pendant sa construction (spec socle §6).
- * ATTENTION — `leave` utilise location.replace : la V2 ne reste pas dans l'historique, donc le
- *            bouton retour de la V1 ne ramène pas vers une porte fermée.
+ * QUOI     — la porte de l'appli : laisse passer, envoie à la vitrine (/bienvenue) qui n'a pas de
+ *            session, ou propose de réessayer hors connexion.
+ * POURQUOI — depuis la bascule (spec 2026-10-07), il n'y a plus de V1 vers qui renvoyer.
+ * ATTENTION — `leave` utilise location.replace : la page refusée ne reste pas dans l'historique,
+ *            le bouton retour ne ramène pas vers une porte fermée.
  */
 import { useEffect, type ReactNode } from 'react'
-import { choisirLaV1 } from '@/shared/lib/ancienneExplore'
 import { decideAccess } from './decideAccess'
 import { useV2Access } from './useV2Access'
 import styles from './AccessGate.module.css'
 
-export const V1_URL = '/'
-
-// Partir vers la V1, en défaisant le choix de la V2 : sinon la V1 renverrait ici, en boucle.
-function leaveToV1() {
-  choisirLaV1()
-  window.location.replace(V1_URL)
+function allerALaVitrine() {
+  window.location.replace(`${import.meta.env.BASE_URL}bienvenue`)
 }
 
 export function AccessGate({
   children,
-  leave = leaveToV1,
+  leave = allerALaVitrine,
 }: {
   children: ReactNode
   leave?: () => void
@@ -40,9 +36,6 @@ export function AccessGate({
         <button type="button" className={styles.button} onClick={retry}>
           Réessayer
         </button>
-        <a className={styles.link} href={V1_URL} onClick={choisirLaV1}>
-          Retour à la V1
-        </a>
       </main>
     )
   }
@@ -50,10 +43,10 @@ export function AccessGate({
     // Jamais d'écran vide : la vérification peut prendre quelques secondes hors connexion.
     return (
       <main className={styles.offline} aria-busy="true">
-        <p>Ouverture de la V2…</p>
+        <p>Ouverture…</p>
       </main>
     )
   }
-  // 'leave' : la redirection vers la V1 est en cours (effet ci-dessus).
+  // 'leave' : le départ vers la vitrine est en cours (effet ci-dessus).
   return null
 }

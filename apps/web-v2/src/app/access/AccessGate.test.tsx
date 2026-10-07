@@ -23,7 +23,7 @@ test('affiche l’app quand l’accès est accordé', () => {
   expect(screen.getByText('contenu V2')).toBeInTheDocument()
 })
 
-test('renvoie vers la V1 sans accès, sans rien afficher de la V2', () => {
+test('sans accès, part vers la vitrine sans rien afficher de l’appli', () => {
   const leave = vi.fn()
   vi.mocked(useV2Access).mockReturnValue({
     state: { status: 'ready', hasSession: true, hasAccess: false },
@@ -34,14 +34,14 @@ test('renvoie vers la V1 sans accès, sans rien afficher de la V2', () => {
   expect(screen.queryByText('contenu V2')).not.toBeInTheDocument()
 })
 
-test('hors connexion : message, bouton Réessayer et lien vers la V1', async () => {
+test('hors connexion : message et bouton Réessayer, plus de lien vers la V1', async () => {
   const retry = vi.fn()
   vi.mocked(useV2Access).mockReturnValue({ state: { status: 'error' }, retry })
   render(<AccessGate leave={vi.fn()}>contenu V2</AccessGate>)
   expect(screen.getByText(/hors connexion/i)).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Réessayer' }))
   expect(retry).toHaveBeenCalledOnce()
-  expect(screen.getByRole('link', { name: 'Retour à la V1' })).toHaveAttribute('href', '/')
+  expect(screen.queryByRole('link')).toBeNull()
 })
 
 test('pendant le chargement : un message discret, rien de la V2', () => {
@@ -49,6 +49,6 @@ test('pendant le chargement : un message discret, rien de la V2', () => {
   vi.mocked(useV2Access).mockReturnValue({ state: { status: 'loading' }, retry: vi.fn() })
   render(<AccessGate leave={leave}>contenu V2</AccessGate>)
   expect(screen.queryByText('contenu V2')).not.toBeInTheDocument()
-  expect(screen.getByText('Ouverture de la V2…')).toBeInTheDocument()
+  expect(screen.getByText('Ouverture…')).toBeInTheDocument()
   expect(leave).not.toHaveBeenCalled()
 })
