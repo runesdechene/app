@@ -14,6 +14,8 @@
  *            le coin déborde de la carte, le rognage est donc sur le lien, pas sur la carte.
  *            pleineLargeur (passeport) : la carte prend la largeur de sa colonne, 180 px de haut,
  *            au lieu de 290 × 196 ; la photo se demande alors plus large.
+ *            legende (fiche d'une Compagnie, « Revendiqué par … ») : une ligne posée sous la carte,
+ *            hors de sa hauteur ; la rangée qui la porte lui laisse la place en bas.
  */
 import { type ReactNode } from 'react'
 import { aLaTaille } from '@/shared/lib/image'
@@ -40,6 +42,7 @@ export function LieuCarte({
   pastille,
   coin,
   pleineLargeur,
+  legende,
 }: {
   lieu: LieuDeCarte
   position: Point | null
@@ -47,6 +50,7 @@ export function LieuCarte({
   pastille?: string | undefined
   coin?: ReactNode | undefined
   pleineLargeur?: boolean | undefined
+  legende?: ReactNode | undefined
 }) {
   const distance =
     position && lieu.latitude !== null && lieu.longitude !== null
@@ -95,6 +99,7 @@ export function LieuCarte({
         </span>
       </Link>
       {coin && <span className={styles.coin}>{coin}</span>}
+      {legende && <p className={styles.legende}>{legende}</p>}
     </li>
   )
 }

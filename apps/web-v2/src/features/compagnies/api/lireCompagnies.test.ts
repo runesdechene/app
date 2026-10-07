@@ -67,6 +67,7 @@ test('la fiche se lit ; disparue, elle vaut null', () => {
         longitude: null,
         categorie: null,
         auteur: { nom: 'Gautier', avatarUrl: null },
+        quand: '2026-09-28T10:00:00Z',
       },
     ],
     demandes: [],

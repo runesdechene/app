@@ -58,7 +58,7 @@ export type FicheCompagnie = {
   nbMembres: number
   // Vide pour qui n'est pas d'une Compagnie privée (migration 434) : seul le nombre se voit.
   membres: Membre[]
-  lieux: LieuDeCarte[] // en cartes ; l'auteur est qui l'a revendiqué (migration 438)
+  lieux: (LieuDeCarte & { quand: string })[] // en cartes ; l'auteur est qui l'a revendiqué (mig 438)
   demandes: { id: string; nom: string; avatar: string | null; mot: string | null; quand: string }[]
 }
 
@@ -128,7 +128,7 @@ export function lireFicheCompagnie(json: unknown): FicheCompagnie | null {
         titre: ouNull(chaine)(m.titre),
       }
     })(f.membres),
-    lieux: liste(lireLieuDeCarte)(f.lieux),
+    lieux: liste((v) => ({ ...lireLieuDeCarte(v), quand: chaine(objet(v).quand) }))(f.lieux),
     demandes: liste((v) => {
       const d = objet(v)
       return {

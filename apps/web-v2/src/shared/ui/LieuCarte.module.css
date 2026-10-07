@@ -152,3 +152,21 @@
   right: calc(var(--space-2) * -1);
   pointer-events: none;
 }
+
+/* Sous la carte, hors de sa hauteur fixe : « Revendiqué par … » (fiche d'une Compagnie). */
+.legende {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  left: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

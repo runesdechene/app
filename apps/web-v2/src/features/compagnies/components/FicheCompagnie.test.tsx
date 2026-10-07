@@ -57,6 +57,7 @@ const FICHE: Fiche = {
       longitude: null,
       categorie: null,
       auteur: { nom: 'Gautier', avatarUrl: null },
+      quand: '2026-09-28T10:00:00Z',
     },
   ],
   demandes: [],
@@ -92,6 +93,14 @@ test('la fiche : devise, mission, qui la mène avec son rôle accordé, ses lieu
     '/messages/lieu/l1',
   )
   expect(screen.queryByRole('link', { name: /Gérer la Compagnie/ })).not.toBeInTheDocument()
+})
+
+test('leurs lieux : leur nombre, et sous chaque carte qui l’a revendiqué et quand', async () => {
+  monter(FICHE)
+  expect(await screen.findByRole('heading', { name: 'Leurs lieux · 1' })).toBeInTheDocument()
+  expect(screen.getByText(/Revendiqué par/)).toHaveTextContent(
+    'Revendiqué par Gautier · 28 septembre',
+  )
 })
 
 test('chaque membre avec son niveau et son titre, vers son profil', async () => {

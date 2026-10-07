@@ -3,7 +3,8 @@
  *            l'avatar, le nom, la devise, la mission ; le bouton selon ma place ; qui la mène (le Chef
  *            et les Officiers, rôles accordés) ; les membres, chacun avec son niveau et son titre, les
  *            huit derniers venus puis « Voir les autres » ; « Leurs lieux » en cartes photo, comme
- *            sur le profil (migration 438) ; « Gérer » pour le Chef
+ *            sur le profil, « Revendiqué par … » sous chacune (migration 438, maquette 461:362) ;
+ *            « Gérer » pour le Chef
  *            et les Officiers ; « Quitter » pour un membre.
  * POURQUOI — une Compagnie est une antenne locale qu'on rejoint d'un geste (publique) ou sur demande
  *            (privée) ; son canal vit dans La Communauté (« Ouvrir le canal » y coche sa gélule).
@@ -12,6 +13,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { useGlisser } from '@/shared/hooks/useGlisser'
 import { useMaPosition } from '@/shared/hooks/useMaPosition'
+import drapeau from '@/assets/ui/drapeau.svg'
 import { teinteCompagnie } from '@/shared/lib/teinte'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
@@ -26,6 +28,7 @@ import { AvatarCompagnie } from './AvatarCompagnie'
 import styles from './FicheCompagnie.module.css'
 
 const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+const LE_JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
 const VISIBLES = 8 // membres montrés avant « Voir les autres »
 
 export function FicheCompagnie({ id }: { id: string }) {
@@ -140,14 +143,36 @@ export function FicheCompagnie({ id }: { id: string }) {
         {fiche.lieux.length > 0 && (
           <section aria-labelledby="lieux">
             <h3 id="lieux" className={styles.section}>
-              Leurs lieux
+              Leurs lieux · {fiche.lieux.length}
             </h3>
             <p className={styles.sousSection}>Revendiqués pour la Compagnie</p>
             {/* Carrousel : cadre flex > rangée flex: 1 qui défile (règle de interface.md). */}
             <div className={styles.cadre}>
               <ul ref={glisser} className={styles.rangee}>
                 {fiche.lieux.map((l) => (
-                  <LieuCarte key={l.id} lieu={l} position={position} avecAuteur />
+                  <LieuCarte
+                    key={l.id}
+                    lieu={l}
+                    position={position}
+                    avecAuteur={false}
+                    legende={
+                      // « par … » sur la carte laissait croire à l'auteur du lieu (Uriel, 07/10).
+                      <>
+                        <img className={styles.drapeau} src={drapeau} alt="" />
+                        <span className={styles.revendique}>
+                          Revendiqué
+                          {l.auteur && (
+                            <>
+                              {' par '}
+                              <strong>{l.auteur.nom}</strong>
+                            </>
+                          )}
+                          {' · '}
+                          {LE_JOUR.format(new Date(l.quand))}
+                        </span>
+                      </>
+                    }
+                  />
                 ))}
               </ul>
             </div>
