@@ -3,7 +3,7 @@
  *            rayonne dessous.
  */
 import { expect, test, vi } from 'vitest'
-import { ajouterCalquesEnigmes, toileDesEnigmes, onde, CALQUE_ONDES_ENIGMES, CALQUE_ECLATS, CALQUE_SCEAUX_ENIGMES, enGeoJSONEnigmes, SOURCE_ENIGMES, ZOOM_DES_SCEAUX } from './enigmes'
+import { ajouterCalquesEnigmes, toileDesEnigmes, onde, sansLEnigme, CALQUE_ONDES_ENIGMES, CALQUE_ECLATS, CALQUE_SCEAUX_ENIGMES, enGeoJSONEnigmes, SOURCE_ENIGMES, ZOOM_DES_SCEAUX } from './enigmes'
 
 test('une énigme devient un point qui ne porte que son id', () => {
   const g = enGeoJSONEnigmes([{ id: 7, lat: 41, lng: 28.9 }])
@@ -43,4 +43,9 @@ test('l’onde part de la marque, s’élargit et s’efface', () => {
   expect(onde(0.5).part).toBe(0.5)
   expect(onde(0.5).opacite).toBeLessThan(0.5)
   expect(onde(1).opacite).toBe(0)
+})
+
+test('l’énigme touchée quitte la carte le temps qu’elle se retourne au-dessus', () => {
+  expect(sansLEnigme(7)).toEqual(['!=', ['get', 'id'], 7])
+  expect(sansLEnigme(null)).toBeNull()
 })

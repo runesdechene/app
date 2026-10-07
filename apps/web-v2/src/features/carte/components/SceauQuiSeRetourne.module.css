@@ -9,6 +9,7 @@
   width: 64px;
   height: 64px;
   translate: -50% -50%;
+  scale: 0.5625; /* en attendant l'énigme, la taille exacte du sceau de la carte (36 px) */
   transform-style: preserve-3d;
   pointer-events: none;
 }
@@ -26,10 +27,8 @@
   backface-visibility: hidden;
 }
 
-.face {
-  border: 2px solid var(--color-carte-halo);
-  border-radius: 50%;
-  background: var(--color-carte-cire);
+.point {
+  position: relative;
   color: var(--color-carte-halo);
   font-family: var(--font-inscription);
   font-size: var(--sceau-size);
@@ -40,7 +39,8 @@
   rotate: y 180deg;
 }
 
-/* Le cachet : la cire à la couleur de la culture, un anneau plus sombre où la matrice a pressé. */
+/* La cire des deux faces : un bord crème qui la détache de la carte, la couleur de la culture au dos,
+   un anneau plus sombre où la matrice a pressé. */
 .cire {
   position: absolute;
   inset: 0;
@@ -50,6 +50,8 @@
 
 .cire path {
   fill: var(--couleur-culture, var(--color-carte-cire));
+  stroke: var(--color-carte-halo);
+  stroke-width: 3;
 }
 
 .cire circle {
@@ -78,13 +80,16 @@
   object-fit: contain;
 }
 
+/* Il part de la taille du sceau de la carte (36 px sur 64) et grandit en se retournant. */
 @keyframes retourner {
   from {
     rotate: y 0deg;
+    scale: 0.5625;
   }
 
   to {
     rotate: y 180deg;
+    scale: 1;
   }
 }
 
@@ -92,5 +97,6 @@
   .sceau[data-retourne] {
     animation: none;
     rotate: y 180deg;
+    scale: 1;
   }
 }

@@ -1,5 +1,6 @@
 /**
- * QUOI     — le bord irrégulier d'un cachet de cire, en chemin SVG (repère 96 × 96, centré).
+ * QUOI     — le bord irrégulier d'un cachet de cire, en chemin SVG (repère 96 × 96, centré) : le sceau
+ *            « ? » de la carte et les deux faces du sceau qui se retourne.
  * POURQUOI — choix d'Uriel (07/10) : au toucher, un vrai cachet se retourne, à la couleur et au logo
  *            de la culture. Un cercle parfait faisait pastille ; la cire coule et ondule.
  */

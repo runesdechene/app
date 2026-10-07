@@ -4,13 +4,15 @@
  */
 import { render, screen } from '@testing-library/react'
 import { expect, test } from 'vitest'
+import { BORD_DE_CIRE } from '../lib/cachet'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
 
 const byzance = { id: 'byzantine', nom: 'Byzance', icone: null, couleur: '#a93d76' }
 
-test('devant, le sceau « ? » qu’on a touché', () => {
-  render(<SceauQuiSeRetourne x={10} y={20} culture={null} onFini={() => undefined} />)
+test('devant, le sceau « ? » qu’on a touché, au même bord de cire que le cachet', () => {
+  const { container } = render(<SceauQuiSeRetourne x={10} y={20} culture={null} onFini={() => undefined} />)
   expect(screen.getByText('?')).toBeInTheDocument()
+  expect(container.querySelectorAll(`path[d="${BORD_DE_CIRE}"]`)).toHaveLength(2)
 })
 
 test('derrière, le cachet prend la couleur de la culture et porte son initiale', () => {

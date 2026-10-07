@@ -147,7 +147,7 @@ function CarteVivante({
   useEnigmesSurLaCarte(visiteur ? null : carte, (t) => {
     retournerLeSceau()
     setEnigmeTouchee(t)
-  })
+  }, enigmeTouchee?.id ?? null)
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {

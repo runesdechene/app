@@ -8,9 +8,10 @@
  *            seules les images attendent la police du « ? ».
  */
 import type { FeatureCollection, Point } from 'geojson'
-import type { AddLayerObject, Map as Carte, PointLike, SourceSpecification } from 'maplibre-gl'
+import type { AddLayerObject, FilterSpecification, Map as Carte, PointLike, SourceSpecification } from 'maplibre-gl'
 import type { EnigmeEnAttente } from '../api/lireEnigmes'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
+import { BORD_DE_CIRE } from './cachet'
 
 export const SOURCE_ENIGMES = 'enigmes'
 export const CALQUE_ONDES_ENIGMES = 'enigmes-ondes'
@@ -99,17 +100,20 @@ function eclat(c: CouleursCarte) {
   return ctx.getImageData(0, 0, ECLAT * RATIO, ECLAT * RATIO)
 }
 
-// Le sceau de cire et son « ? » en IM Fell English.
+// Le sceau de cire et son « ? » en IM Fell English : le même bord irrégulier que le cachet qui se
+// retourne au toucher (Uriel, 07/10), dessiné dans le repère 96 × 96 de `BORD_DE_CIRE`.
 function sceau(c: CouleursCarte) {
   const ctx = toileDesEnigmes(SCEAU)
   const m = SCEAU / 2
+  ctx.save()
+  ctx.scale(SCEAU / 96, SCEAU / 96)
+  const bord = new Path2D(BORD_DE_CIRE)
   ctx.fillStyle = c.cire
-  ctx.beginPath()
-  ctx.arc(m, m, m - 2, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.lineWidth = 2
+  ctx.fill(bord)
+  ctx.lineWidth = 5
   ctx.strokeStyle = c.halo
-  ctx.stroke()
+  ctx.stroke(bord)
+  ctx.restore()
   ctx.fillStyle = c.halo
   ctx.font = 'italic 24px "IM Fell English"'
   ctx.textAlign = 'center'
@@ -146,6 +150,14 @@ export function fairePulser(map: Carte, couleur: string, ecran: number): () => v
   return () => {
     cancelAnimationFrame(image)
   }
+}
+
+export const CALQUES_ENIGMES = [CALQUE_ONDES_ENIGMES, CALQUE_ECLATS, CALQUE_SCEAUX_ENIGMES]
+
+// L'énigme touchée quitte la carte le temps que son sceau se retourne par-dessus : on ne doit voir
+// qu'un sceau, celui qui pivote (Uriel, 07/10).
+export function sansLEnigme(id: number | null): FilterSpecification | null {
+  return id === null ? null : ['!=', ['get', 'id'], id]
 }
 
 // Le clic des lieux s'efface devant un sceau d'énigme (même motif que `surUnPin`).

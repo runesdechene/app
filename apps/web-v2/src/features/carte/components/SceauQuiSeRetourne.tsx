@@ -36,16 +36,26 @@ export function SceauQuiSeRetourne({
       aria-hidden="true"
       onAnimationEnd={onFini}
     >
-      <span className={styles.face}>?</span>
+      <span className={styles.face}>
+        <Cire />
+        <span className={styles.point}>?</span>
+      </span>
       <span className={styles.dos} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
-        <svg className={styles.cire} viewBox="0 0 96 96">
-          <path d={BORD_DE_CIRE} />
-          <circle cx="48" cy="48" r="31" />
-        </svg>
+        <Cire />
         <span className={styles.coeur}>
           {culture?.icone ? <img src={culture.icone} alt="" /> : culture?.nom.charAt(0)}
         </span>
       </span>
     </div>
+  )
+}
+
+// La cire des deux faces : le bord irrégulier et l'anneau où la matrice a pressé.
+function Cire() {
+  return (
+    <svg className={styles.cire} viewBox="0 0 96 96">
+      <path d={BORD_DE_CIRE} />
+      <circle cx="48" cy="48" r="31" />
+    </svg>
   )
 }
