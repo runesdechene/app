@@ -1,5 +1,5 @@
 /**
- * QUOI     — ce que la page /v2/da doit montrer : les couleurs des jetons et les briques.
+ * QUOI     — ce que la page /da doit montrer : les couleurs des jetons et les briques.
  * POURQUOI — deux tests comparent ces listes à la réalité (tokens.css, dossier shared/ui) :
  *            rien ne peut exister sans apparaître sur la page.
  */

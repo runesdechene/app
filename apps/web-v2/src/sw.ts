@@ -5,8 +5,8 @@
  * POURQUOI — à la bascule (spec 2026-10-07-v2-bascule §3), il prend la portée / et remplace celui
  *            de la V1 sur les téléphones, dans la même inscription : les abonnements push suivent.
  *            Avant, sous /v2/, il apprend déjà à recevoir les push.
- * ATTENTION — deux notions : la base de l'appli (BASE_URL, /v2/ puis /explore/) et la portée du
- *            service worker (/v2/ puis /). La liste blanche et les liens se jugent sur la base.
+ * ATTENTION — la liste blanche et les liens se jugent sur la base de l'appli (BASE_URL : /v2/
+ *            avant la bascule, / après).
  *            skipWaiting + clientsClaim : une nouvelle version prend la main tout de suite (règle
  *            v2.md, piège du 02/10).
  */

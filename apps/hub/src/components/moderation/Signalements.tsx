@@ -19,7 +19,7 @@ const RAISONS: Record<string, string> = {
   autre: 'Autre',
 }
 
-const APP = 'https://app.runesdechene.com/v2/carte/lieu/'
+const APP = 'https://app.runesdechene.com/carte/lieu/'
 
 export function Signalements() {
   const [rows, setRows] = useState<Signalement[]>([])

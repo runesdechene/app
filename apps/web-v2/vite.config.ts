@@ -1,11 +1,10 @@
 /**
  * QUOI     — configuration de Vite (serveur de dev, build, PWA) et de Vitest (tests).
- * POURQUOI — la V2 est servie sous /v2/ : `base` fait pointer tous les fichiers générés
- *            vers /v2/…, et `envDir` lit le même .env racine que la V1 et le Hub.
- * ATTENTION — en dev, le proxy sert la V1 sur le même port : lancer `pnpm dev` (V1) ET
- *            `pnpm dev:v2`, puis tout ouvrir sur http://localhost:5174.
- *            PWA : service worker maison (src/sw.ts), portée /v2/ — il ne touche jamais la V1,
- *            et celui de la V1 ignore /v2 (apps/explore-web/src/sw.ts).
+ * POURQUOI — depuis la bascule (spec 2026-10-07-v2-bascule), Explore est servi à la racine
+ *            d'app.runesdechene.com ; `envDir` lit le même .env racine que le Hub.
+ * ATTENTION — PWA : service worker maison (src/sw.ts), portée / — servi à /sw.js, il remplace
+ *            celui de la V1 sur les téléphones et garde ses abonnements push. Il ne sert que les
+ *            écrans d'Explore (liste blanche, src/sw/ecrans.ts).
  */
 /// <reference types="vitest/config" />
 import path from 'node:path'
@@ -24,7 +23,7 @@ const { version } = JSON.parse(
 const FOND = '#fcf3e4' // --color-fond (tokens.css) — le manifeste ne lit pas les variables CSS.
 
 export default defineConfig({
-  base: '/v2/',
+  base: '/',
   define: { __VERSION__: JSON.stringify(version) },
   envDir: path.resolve(import.meta.dirname, '../..'),
   plugins: [
@@ -33,14 +32,15 @@ export default defineConfig({
       registerType: 'autoUpdate',
       // L'enregistrement se fait dans src/app/miseAJour.ts (vérifications régulières).
       injectRegister: false,
-      scope: '/v2/',
+      scope: '/',
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
         name: 'Runes de Chêne',
         short_name: 'Runes de Chêne',
         lang: 'fr',
-        start_url: '/v2/accueil',
-        scope: '/v2/',
+        id: '/',
+        start_url: '/accueil',
+        scope: '/',
         display: 'standalone',
         background_color: FOND,
         theme_color: FOND,
@@ -64,21 +64,14 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Ce que le domaine sert encore pour d'autres que l'appli (e-mails, tutoriel du Hub,
         // icônes des V1 installées) : servi, pas mis en cache sur chaque téléphone.
-        globIgnores: ['res/**', 'email-*', 'pwa-*.png'],
+        globIgnores: ['res/**', 'email-*', 'pwa-*.png', 'v2/**'],
       },
     }),
   ],
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, 'src') },
   },
-  server: {
-    port: 5174,
-    // En local comme en prod, V1 et V2 partagent une origine : tout ce qui n'est pas /v2 part
-    // vers le serveur de dev de la V1 (`pnpm dev`, port 3000). Même origine = même session.
-    proxy: {
-      '^/(?!v2(/|$)).*': { target: 'http://localhost:3000', ws: true },
-    },
-  },
+  server: { port: 5174 },
   test: {
     environment: 'jsdom',
     globals: true,

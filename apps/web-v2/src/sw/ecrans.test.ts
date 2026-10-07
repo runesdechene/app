@@ -4,8 +4,8 @@
 import { expect, test } from 'vitest'
 import { cheminDansLAppli, ecransExplore } from './ecrans'
 
-test('les écrans d’Explore, sous /v2/ comme sous /explore/', () => {
-  for (const base of ['/v2/', '/explore/']) {
+test('les écrans d’Explore, sous /v2/ (avant la bascule) comme à la racine', () => {
+  for (const base of ['/v2/', '/']) {
     for (const ecran of [
       '',
       'accueil',
@@ -23,23 +23,21 @@ test('les écrans d’Explore, sous /v2/ comme sous /explore/', () => {
 
 test('tout le reste du domaine va au serveur', () => {
   for (const chemin of [
-    '/',
-    '/campement',
-    '/campement/accueil',
     '/scan',
     '/lieu/chateau-de-joux',
     '/mouvement',
     '/sitemap.xml',
-    '/carte',
-    '/explore/accueillir',
+    '/sw.js',
+    '/accueillir',
     '/v2/accueil',
+    '/v2/sw.js',
   ]) {
-    expect(ecransExplore('/explore/').test(chemin)).toBe(false)
+    expect(ecransExplore('/').test(chemin)).toBe(false)
   }
 })
 
 test('un lien de push se pose sous la base de l’appli', () => {
-  expect(cheminDansLAppli('/accueil/lieu/1', '/explore/')).toBe('/explore/accueil/lieu/1')
+  expect(cheminDansLAppli('/accueil/lieu/1', '/')).toBe('/accueil/lieu/1')
   expect(cheminDansLAppli('/accueil/lieu/1', '/v2/')).toBe('/v2/accueil/lieu/1')
-  expect(cheminDansLAppli('/messages?canal=x', '/explore/')).toBe('/explore/messages?canal=x')
+  expect(cheminDansLAppli('/messages?canal=x', '/')).toBe('/messages?canal=x')
 })

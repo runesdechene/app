@@ -5,7 +5,6 @@
  *            feuille (/carte/ajouter).
  *            /bienvenue : la vitrine, où l'on cherche sans compte ; /bienvenue/carte : la carte des
  *            visiteurs, positions floutées, et l'aperçu d'un lieu par-dessus (…/lieu/<id>) ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
- * ATTENTION — basename '/v2' : dans le code on écrit '/carte', le navigateur affiche '/v2/carte'.
  */
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 import { Vitrine } from '@/features/vitrine/components/Vitrine'
@@ -97,4 +96,4 @@ export const routes: RouteObject[] = [
   },
 ]
 
-export const router = createBrowserRouter(routes, { basename: '/v2' })
+export const router = createBrowserRouter(routes)

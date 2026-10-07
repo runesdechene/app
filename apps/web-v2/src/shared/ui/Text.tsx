@@ -1,7 +1,7 @@
 /**
  * QUOI     — le seul moyen d'écrire du texte stylé dans la V2.
  * POURQUOI — un écran choisit un style nommé, jamais une taille (décision 007). Les douze
- *            styles sont ceux relevés dans la maquette Figma et montrés sur /v2/da.
+ *            styles sont ceux relevés dans la maquette Figma et montrés sur /da.
  */
 import type { ReactNode } from 'react'
 import type { TextVariant } from './textVariants'

@@ -3,8 +3,8 @@
  * POURQUOI — un seul client pour toute l'app ; les types générés font vérifier chaque nom de
  *            table, de colonne et de RPC par le compilateur.
  * ATTENTION — options de `createClient` laissées PAR DÉFAUT : la clé de stockage par défaut
- *            (`sb-<projet>-auth-token`) est celle de la V1. C'est elle qui fait partager la
- *            session entre / et /v2/. Changer `storageKey` = déconnecter la V2 de la V1.
+ *            (`sb-<projet>-auth-token`) est celle de la V1 : à la bascule, les joueurs gardent la
+ *            session qu'elle avait ouverte. Changer `storageKey` = déconnecter tout le monde.
  */
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'

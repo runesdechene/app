@@ -1,10 +1,10 @@
 /**
  * QUOI     — ce que le service worker sert lui-même (les écrans d'Explore) et où il pose le lien
- *            d'un push (sous la base de l'appli : /v2/ avant la bascule, /explore/ après).
+ *            d'un push (sous la base de l'appli : /v2/ avant la bascule, / après).
  * POURQUOI — après la bascule, le service worker prend la portée / : il ne doit jamais avaler un
- *            autre usage du domaine (/campement, /scan, les pages /lieu de seo-pages ; spec
+ *            autre usage du domaine (/scan, les pages /lieu de seo-pages ; spec
  *            2026-10-07-v2-bascule, « préfixes réservés »). Une liste blanche ne s'oublie pas
- *            quand un nouveau sous-dossier arrive.
+ *            quand un nouveau sous-dossier arrive. La zone Campement s'y ajoutera ('campement').
  */
 const ECRANS = ['accueil', 'carte', 'messages', 'compagnies', 'compte', 'bienvenue', 'da']
 

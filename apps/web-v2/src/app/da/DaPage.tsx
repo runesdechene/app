@@ -1,5 +1,5 @@
 /**
- * QUOI     — la page de référence de la DA, à l'adresse /v2/da, présentée en faux téléphones.
+ * QUOI     — la page de référence de la DA, à l'adresse /da, présentée en faux téléphones.
  * POURQUOI — « pas d'élément sauvage » (décision 007) : tout ce que la V2 a le droit d'afficher
  *            est ici, et nulle part ailleurs. Mobile d'abord : chaque élément se montre à la
  *            largeur d'un téléphone. Uriel valide la DA sur cette page.
