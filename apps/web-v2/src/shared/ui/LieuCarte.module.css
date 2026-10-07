@@ -12,8 +12,12 @@
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-encre) 18%, transparent);
 }
 
-/* Le lien couvre toute la carte ; il s'enfonce un peu sous le doigt. */
+/* Le lien couvre toute la carte ; il s'enfonce un peu sous le doigt. Il porte le rognage arrondi
+   (le tampon du passeport déborde de la carte, pas du lien) : il doit être positionné, sinon la
+   photo et les dégradés, placés en absolu, s'accrochent à la carte et échappent au rognage —
+   coins carrés partout (1.2.0, 07/10). */
 .lien {
+  position: relative;
   display: block;
   height: 100%;
   overflow: hidden;
