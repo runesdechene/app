@@ -274,3 +274,18 @@ adresse de retour acceptée (changement d'e-mail, confirmation) renvoyait vers l
 **How to apply :** ne jamais lancer `supabase config push` vers la prod (il recopie `config.toml`).
 Le réglage de prod, au tableau de bord → Authentication → URL Configuration : Site URL
 `https://app.runesdechene.com`, Redirect URLs `https://app.runesdechene.com/**` (+ l'entrée locale).
+
+## « Confirm email » doit rester activé, et la fiche naît à la confirmation
+
+**Le piège** (07-08/10/2026) : « Confirm email » était coupé. Demander un code pour une adresse
+inconnue créait aussitôt un compte **confirmé** (0,1 s, sans code saisi) et, par
+`on_auth_user_created`, sa fiche : une faute de frappe laissait un « Explorateur 4DDF », un script
+créait `df-audit-…@example.com`, et `handle_new_user` rattachait à ce compte la fiche existante au
+même e-mail (ancien compte, client Shopify) sans preuve que l'adresse lui appartient.
+
+**How to apply :** « Confirm email » activé (tableau de bord → Authentication → Sign In /
+Providers), le modèle « Confirm sign up » porte `{{ .Token }}` (la V2 demande un code, pas un
+lien). La fiche naît à la confirmation (mig 455 : `on_auth_user_created` seulement si confirmé
+d'emblée, `on_auth_user_confirmed` sinon). Signe d'un compte créé sans humain : confirmé moins
+d'une seconde après sa création. Demander un code laisse une ligne « en attente » dans
+`auth.users`, sans fiche : invisible dans l'appli.
