@@ -4,9 +4,11 @@ Maquettes Figma 94:107 à 95:107 ; décisions d'Uriel du 27/09 (`_État.md` d'Ex
 lit en entier avant de se signer, au pouce maintenu ; un seul rouge par écran. Base : migration 370
 (Charte, nom, « mon entrée ») et 369 (les Fragments réclamés avec l'e-mail vérifié).
 
-On y entre depuis la vitrine (`features/vitrine`, `/bienvenue`) : `/bienvenue/<étape>` — `preambule`, `charte`, `email`, `code`, `nom`, `fin` —,
-**hors de la garde d'accès** : on y arrive sans compte. Chaque écran a son adresse ; ce qu'on a dit
-(Charte signée, e-mail) voyage avec la navigation (`useParcours`).
+On y entre depuis la vitrine (`features/vitrine`, `/bienvenue`) : `/bienvenue/<étape>` — `preambule`, `email`, `code`, puis
+`charte` et `nom` s'ils manquent au compte, et `fin` —, **hors de la garde d'accès** : on y arrive
+sans compte. La Charte se signe une fois connecté : un compte qui l'a déjà signée ne la revoit pas
+(08/10). Chaque écran a son adresse ; ce qu'on a dit (l'e-mail, la connexion faite) voyage avec la
+navigation (`useParcours`).
 
 - `api/` — `entree.ts` (code par e-mail, Fragments, Charte, nom, mon entrée) et
   `lireEntree.ts` (la forme des réponses).

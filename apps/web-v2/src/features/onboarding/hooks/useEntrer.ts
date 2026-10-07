@@ -1,9 +1,10 @@
 /**
  * QUOI     — entrer avec le code reçu : la connexion, puis ce qui en découle — les Fragments
- *            achetés avec cet e-mail rejoignent le compte, la Charte signée s'enregistre — et
- *            l'écran suivant : la Charte (si elle manque), le nom (s'il manque), la bienvenue.
- * POURQUOI — un client déjà connu qui « se connecte » n'a jamais signé la Charte : il la lit
- *            une fois, connecté, puis entre. Un nom déjà choisi ne se redemande pas.
+ *            achetés avec cet e-mail rejoignent le compte — et l'écran suivant : la Charte (si
+ *            elle manque), le nom (s'il manque), la bienvenue.
+ * POURQUOI — la Charte se signe une fois, connecté : avant l'e-mail, on ne sait pas qui entre, et
+ *            un compte qui l'avait déjà signée la resignait (Uriel, 08/10). Un nom déjà choisi ne
+ *            se redemande pas.
  * ATTENTION — réclamer les Fragments ne doit pas bloquer l'entrée : un échec vaut « aucun ».
  */
 import { useMutation } from '@tanstack/react-query'
@@ -26,7 +27,6 @@ export function useEntrer() {
       const email = parcours.email ?? ''
       const moi = await verifierCode(email, code)
       const fragments = await reclamerFragments(moi, email).catch(() => 0)
-      if (parcours.charte) await signerCharte()
       return { entree: await fetchEntree(), fragments }
     },
     onSuccess: ({ entree, fragments }) => {

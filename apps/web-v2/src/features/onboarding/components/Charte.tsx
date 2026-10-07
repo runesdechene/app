@@ -8,6 +8,7 @@
  * ATTENTION — animations réduites : un simple appui signe (aucune fin d'animation n'arriverait).
  */
 import { useState } from 'react'
+import { Navigate } from 'react-router'
 import camaraderie from '@/assets/onboarding/charte-camaraderie.svg'
 import decouvertes from '@/assets/onboarding/charte-decouvertes.svg'
 import peuples from '@/assets/onboarding/charte-peuples.svg'
@@ -63,16 +64,13 @@ const PRINCIPES = [
 const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export function Charte() {
-  const { parcours, aller } = useParcours()
+  const { parcours } = useParcours()
   const { signerPuisEntrer } = useEntrer()
   const [appui, setAppui] = useState(false)
   const { repere, lu } = useLuJusquauBout()
-  // Pas encore connecté : la signature voyage jusqu'à la connexion. Déjà connecté : elle
-  // s'enregistre tout de suite.
-  const signer = () => {
-    if (parcours.connecte) signerPuisEntrer()
-    else aller('email', { charte: true })
-  }
+  // La Charte se signe connecté, quand elle manque au compte ; sans connexion, on la demande.
+  if (!parcours.connecte) return <Navigate to="/bienvenue/email" replace />
+  const signer = signerPuisEntrer
   const appuyer = () => {
     if (mouvementReduit()) signer()
     else setAppui(true)

@@ -15,7 +15,7 @@ export function Preambule() {
       bas={
         <Suivant
           onClick={() => {
-            aller('charte')
+            aller('email')
           }}
         />
       }
