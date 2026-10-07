@@ -44,6 +44,15 @@ absolu>/apps/explore-web/dist" --site=runesdechene`, puis vérifier
 `curl -s -o /dev/null -w '%{http_code}' https://app.runesdechene.com/v2/` → 200 et une page
 `/lieu/<slug>` → 200.
 
+## Le Hub : `--site=<ID>` et `--no-build`, jamais son nom
+
+**Le piège** (07/10/2026) : `--site=hub-runesdechene` sans `--no-build` lance un build Netlify qui
+répond « Failed retrieving site data … Not Found ». Avec l'identifiant et `--no-build`, c'est passé :
+`npx netlify-cli deploy --prod --no-build --dir "<abs>/apps/hub/dist" --functions
+"<abs>/apps/hub/netlify/functions" --site=d1cac03c-19a1-4b92-be72-fa3805428cd1` (build fait avant,
+`pnpm build` dans `apps/hub`). Pour la V1 c'est l'inverse (le nom passe, l'identifiant non) : en cas
+de « Not Found », essayer l'autre forme.
+
 ## V2 : ne jamais déployer la V1 avant le site `rdc-web-v2`
 
 Depuis la branche `feat/v2-socle`, le `netlify.toml` de la V1 redirige `/v2/*` vers le site
