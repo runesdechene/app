@@ -5,12 +5,8 @@
   "description": "Runes de Chêne - Monorepo",
   "packageManager": "pnpm@10.5.2",
   "scripts": {
-    "dev": "pnpm --filter explore-web dev",
-    "dev:web": "pnpm --filter explore-web dev",
-    "dev:v2": "pnpm --filter web-v2 dev",
-    "build": "pnpm --filter explore-web build",
-    "build:web": "pnpm --filter explore-web build",
-    "build:v2": "pnpm --filter web-v2 build"
+    "dev": "pnpm --filter web-v2 dev",
+    "build": "pnpm --filter web-v2 build"
   },
   "devDependencies": {
     "sharp": "^0.34.5",

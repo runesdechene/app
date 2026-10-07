@@ -9,7 +9,6 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-const V1 = { group: ['**/explore-web/**'], message: 'La V2 n’importe jamais la V1.' }
 const OTHER_ZONE_BY_PATH = {
   group: ['../../*'],
   message: 'Remonter de deux dossiers = changer de zone. Passer par @/shared.',
@@ -34,7 +33,7 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
       'no-console': 'error',
       'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
-      'no-restricted-imports': ['error', { patterns: [V1, OTHER_ZONE_BY_PATH] }],
+      'no-restricted-imports': ['error', { patterns: [OTHER_ZONE_BY_PATH] }],
       'no-restricted-syntax': [
         'error',
         {
@@ -65,7 +64,6 @@ export default tseslint.config(
         'error',
         {
           patterns: [
-            V1,
             OTHER_ZONE_BY_PATH,
             OTHER_ZONE,
             { group: ['@/app/*'], message: 'Une zone ne dépend pas de la coquille.' },
@@ -85,7 +83,6 @@ export default tseslint.config(
             { name: '@supabase/supabase-js', message: 'Un composant ne parle pas à Supabase.' },
           ],
           patterns: [
-            V1,
             OTHER_ZONE_BY_PATH,
             {
               group: ['@/shared/supabase/*'],
@@ -109,7 +106,6 @@ export default tseslint.config(
             { name: '@supabase/supabase-js', message: 'Un composant ne parle pas à Supabase.' },
           ],
           patterns: [
-            V1,
             OTHER_ZONE_BY_PATH,
             OTHER_ZONE,
             { group: ['@/app/*'], message: 'Une zone ne dépend pas de la coquille.' },
