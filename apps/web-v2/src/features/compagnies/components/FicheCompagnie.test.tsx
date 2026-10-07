@@ -36,9 +36,17 @@ const FICHE: Fiche = {
   demandee: false,
   nbMembres: 3,
   membres: [
-    { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' },
-    { id: 'u2', nom: 'Luna', avatar: null, role: 'officier', genre: 'f' },
-    { id: 'u3', nom: 'Rémy', avatar: null, role: 'membre', genre: 'm' },
+    { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm', niveau: 20, titre: null },
+    { id: 'u2', nom: 'Luna', avatar: null, role: 'officier', genre: 'f', niveau: 15, titre: null },
+    {
+      id: 'u3',
+      nom: 'Rémy',
+      avatar: null,
+      role: 'membre',
+      genre: 'm',
+      niveau: 11,
+      titre: 'Arpenteur du Jura',
+    },
   ],
   lieux: [{ id: 'l1', nom: 'Château de Joux', par: 'Gautier', quand: '2026-09-28T10:00:00Z' }],
   demandes: [],
@@ -74,6 +82,32 @@ test('la fiche : devise, mission, qui la mène avec son rôle accordé, ses lieu
     '/messages/lieu/l1',
   )
   expect(screen.queryByRole('link', { name: /Gérer la Compagnie/ })).not.toBeInTheDocument()
+})
+
+test('chaque membre avec son niveau et son titre, vers son profil', async () => {
+  monter(FICHE)
+  expect(await screen.findByRole('heading', { name: 'Les membres · 1' })).toBeInTheDocument()
+  const remy = screen.getByRole('link', { name: /Rémy/ })
+  expect(remy).toHaveTextContent('Niveau 11 · Arpenteur du Jura')
+  expect(remy).toHaveAttribute('href', '/messages/explorateur/u3')
+})
+
+test('au-delà de huit membres, « Voir les autres » déplie le reste', async () => {
+  const membres = Array.from({ length: 11 }, (_, i) => ({
+    id: `m${String(i)}`,
+    nom: `Membre ${String(i)}`,
+    avatar: null,
+    role: 'membre' as const,
+    genre: 'm' as const,
+    niveau: 3,
+    titre: null,
+  }))
+  monter({ ...FICHE, membres })
+  expect(await screen.findByText('Membre 7')).toBeInTheDocument()
+  expect(screen.queryByText('Membre 8')).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Voir les 3 autres ⌄' }))
+  expect(screen.getByText('Membre 10')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Voir les/ })).not.toBeInTheDocument()
 })
 
 test('le bouton selon ma place', async () => {

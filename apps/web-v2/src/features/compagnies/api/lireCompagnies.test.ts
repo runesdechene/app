@@ -47,11 +47,26 @@ test('la fiche se lit ; disparue, elle vaut null', () => {
     monRole: null,
     demandee: true,
     nbMembres: 1,
-    membres: [{ id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' }],
+    membres: [
+      {
+        id: 'u1',
+        nom: 'Uriel',
+        avatar: null,
+        role: 'chef',
+        genre: 'm',
+        niveau: 12,
+        titre: 'Arpenteur du Jura',
+      },
+    ],
     lieux: [{ id: 'l1', nom: 'Château de Joux', par: 'Gautier', quand: '2026-09-28T10:00:00Z' }],
     demandes: [],
   })
   expect(f).toMatchObject({ privee: true, demandee: true, monRole: null })
-  expect(f?.membres[0]).toMatchObject({ role: 'chef', genre: 'm' })
+  expect(f?.membres[0]).toMatchObject({
+    role: 'chef',
+    genre: 'm',
+    niveau: 12,
+    titre: 'Arpenteur du Jura',
+  })
   expect(lireFicheCompagnie(null)).toBeNull()
 })

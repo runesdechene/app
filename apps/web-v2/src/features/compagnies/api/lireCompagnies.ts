@@ -38,6 +38,8 @@ export type Membre = {
   avatar: string | null
   role: Role
   genre: 'm' | 'f'
+  niveau: number
+  titre: string | null // le premier titre qu'il porte (migration 435)
 }
 export type FicheCompagnie = {
   id: string
@@ -120,6 +122,8 @@ export function lireFicheCompagnie(json: unknown): FicheCompagnie | null {
         avatar: ouNull(chaine)(m.avatar),
         role: role(m.role),
         genre: m.genre === 'f' ? 'f' : 'm',
+        niveau: nombre(m.niveau),
+        titre: ouNull(chaine)(m.titre),
       }
     })(f.membres),
     lieux: liste((v) => {

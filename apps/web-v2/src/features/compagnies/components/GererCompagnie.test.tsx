@@ -41,8 +41,16 @@ const FICHE: FicheCompagnie = {
   demandee: false,
   nbMembres: 2,
   membres: [
-    { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' },
-    { id: 'u3', nom: 'Rémy', avatar: null, role: 'membre', genre: 'm' },
+    { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm', niveau: 20, titre: null },
+    {
+      id: 'u3',
+      nom: 'Rémy',
+      avatar: null,
+      role: 'membre',
+      genre: 'm',
+      niveau: 11,
+      titre: 'Arpenteur du Jura',
+    },
   ],
   lieux: [],
   demandes: [

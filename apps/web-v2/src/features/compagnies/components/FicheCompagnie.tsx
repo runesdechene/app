@@ -1,8 +1,9 @@
 /**
- * QUOI     — la fiche d'une Compagnie (maquette 389:309) : le bandeau à sa couleur, l'avatar, le nom,
- *            la devise, la mission ; le bouton selon ma place ; qui la mène (le Chef et les
- *            Officiers, rôles accordés) ; les membres ; « Leurs lieux » ; « Gérer » pour le Chef et
- *            les Officiers ; « Quitter » pour un membre.
+ * QUOI     — la fiche d'une Compagnie (maquettes 389:309 et 454:272) : le bandeau à sa couleur,
+ *            l'avatar, le nom, la devise, la mission ; le bouton selon ma place ; qui la mène (le Chef
+ *            et les Officiers, rôles accordés) ; les membres, chacun avec son niveau et son titre, les
+ *            huit derniers venus puis « Voir les autres » ; « Leurs lieux » ; « Gérer » pour le Chef
+ *            et les Officiers ; « Quitter » pour un membre.
  * POURQUOI — une Compagnie est une antenne locale qu'on rejoint d'un geste (publique) ou sur demande
  *            (privée) ; son canal vit dans La Communauté (« Ouvrir le canal » y coche sa gélule).
  */
@@ -21,11 +22,12 @@ import { AvatarCompagnie } from './AvatarCompagnie'
 import styles from './FicheCompagnie.module.css'
 
 const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-const PORTRAITS = 6
+const VISIBLES = 8 // membres montrés avant « Voir les autres »
 
 export function FicheCompagnie({ id }: { id: string }) {
   const { fiche, erreur, rejoindre, quitter, enCours, refus } = useCompagnie(id)
   const [quitterOuvert, setQuitterOuvert] = useState(false)
+  const [tousLesMembres, setTousLesMembres] = useState(false)
   if (erreur) return <EmptyState>La Compagnie n’a pas pu être chargée</EmptyState>
   if (fiche === undefined) return <div className={styles.chargement} aria-busy="true" />
   if (fiche === null) return <EmptyState>Cette Compagnie n’existe plus.</EmptyState>
@@ -65,7 +67,7 @@ export function FicheCompagnie({ id }: { id: string }) {
             <h3 id="meneurs" className={styles.section}>
               Qui la mène
             </h3>
-            <ul className={styles.meneurs}>
+            <ul className={styles.liste}>
               {meneurs.map((m) => (
                 <li key={m.id}>
                   <Link
@@ -88,20 +90,44 @@ export function FicheCompagnie({ id }: { id: string }) {
         {autres.length > 0 && (
           <section aria-labelledby="membres">
             <h3 id="membres" className={styles.section}>
-              Les membres
+              Les membres · {autres.length}
             </h3>
-            <p className={styles.membres}>
-              <span className={styles.portraits}>
-                {autres.slice(0, PORTRAITS).map((m) => (
-                  <Avatar key={m.id} url={m.avatar} nom={m.nom} taille="mini" />
-                ))}
-              </span>
-              {autres
-                .slice(0, 3)
-                .map((m) => m.nom)
-                .join(', ')}
-              {autres.length > 3 && ` et ${String(autres.length - 3)} autres`}
-            </p>
+            <ul className={styles.liste}>
+              {(tousLesMembres ? autres : autres.slice(0, VISIBLES)).map((m) => (
+                <li key={m.id} className={styles.membre}>
+                  <Link
+                    className={styles.personne}
+                    to={`../../explorateur/${m.id}`}
+                    relative="path"
+                  >
+                    <Avatar url={m.avatar} nom={m.nom} taille="petit" />
+                    <span>
+                      <span className={styles.qui}>{m.nom}</span>
+                      <span className={styles.niveau}>
+                        Niveau {m.niveau}
+                        {m.titre && (
+                          <>
+                            {' · '}
+                            <span className={styles.titre}>{m.titre}</span>
+                          </>
+                        )}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {!tousLesMembres && autres.length > VISIBLES && (
+              <button
+                type="button"
+                className={styles.voirTous}
+                onClick={() => {
+                  setTousLesMembres(true)
+                }}
+              >
+                Voir les {autres.length - VISIBLES} autres ⌄
+              </button>
+            )}
           </section>
         )}
 
@@ -111,7 +137,7 @@ export function FicheCompagnie({ id }: { id: string }) {
               Leurs lieux
             </h3>
             <p className={styles.sousSection}>Revendiqués pour la Compagnie</p>
-            <ul className={styles.lieux}>
+            <ul className={styles.liste}>
               {fiche.lieux.map((l) => (
                 <li key={l.id}>
                   <Link className={styles.lieu} to={`../../lieu/${l.id}`} relative="path">

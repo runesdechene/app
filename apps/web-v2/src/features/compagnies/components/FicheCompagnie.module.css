@@ -1,7 +1,7 @@
 /*
  * QUOI     — la fiche d'une Compagnie (maquette 389:309) : un bandeau à sa couleur, l'avatar qui
  *            chevauche le bord, le nom en Bebas, la devise à son encre, les sections du Chef et
- *            des Officiers, des membres et de leurs lieux.
+ *            des Officiers, des membres (maquette 454:272) et de leurs lieux.
  */
 .fiche {
   display: grid;
@@ -82,8 +82,7 @@
   letter-spacing: var(--titre-tracking);
 }
 
-.meneurs,
-.lieux {
+.liste {
   display: grid;
   gap: var(--space-3);
   margin: var(--space-2) 0 0;
@@ -122,23 +121,48 @@
   font-style: italic;
 }
 
-.membres {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: var(--space-2) 0 0;
+.niveau {
+  display: block;
   color: var(--color-texte-doux);
   font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.titre {
+  font-family: var(--font-inscription);
   font-size: var(--sous-titre-size);
+  font-style: italic;
 }
 
-.portraits {
-  display: inline-flex;
-  flex: none;
+/* Les membres dépliés par « Voir les autres » arrivent en fondu. */
+.membre {
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 -6px;
+  }
 }
 
-.portraits > * + * {
-  margin-left: -8px;
+.voirTous {
+  justify-self: start;
+  margin-top: var(--space-3);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .membre {
+    transition: none;
+  }
 }
 
 .gerer,
