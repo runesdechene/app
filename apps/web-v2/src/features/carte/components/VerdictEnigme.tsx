@@ -16,7 +16,7 @@ import type { Verdict } from '../api/lireEnigmes'
 import { connaissanceEnClair, motDeFete, prochainEnClair } from '../lib/enigmeEnClair'
 import styles from './VerdictEnigme.module.css'
 
-const CONFETTIS = 14
+const CONFETTIS = 22
 const APRES_LE_TINTEMENT = 700
 
 export function FeteDuVerdict({ verdict }: { verdict: Verdict }) {

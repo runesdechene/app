@@ -62,11 +62,12 @@
   font-size: var(--titre-section-size);
 }
 
-/* Les confettis tombent dans la tête de la feuille, puis s'effacent. */
+/* Les confettis tombent sur toute la feuille, par-dessus les réponses, puis s'effacent : coupés
+   à la tête de la feuille, on n'en voyait que quelques brins (essai du 07/10). */
 .confettis {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -74,11 +75,11 @@
   position: absolute;
   top: -16px;
   left: calc(mod(var(--rang) * 37 + 5, 95) * 1%);
-  width: 6px;
-  height: 11px;
+  width: 7px;
+  height: 12px;
   border-radius: 2px;
   background: var(--color-accent);
-  animation: tomber 1.8s cubic-bezier(0.3, 0.6, 0.6, 1) calc(mod(var(--rang) * 7, 10) * 60ms) both;
+  animation: tomber 2.4s cubic-bezier(0.3, 0.6, 0.6, 1) calc(mod(var(--rang) * 7, 10) * 60ms) both;
 }
 
 .confettis span:nth-child(4n + 2) {
@@ -210,7 +211,7 @@
 
   100% {
     opacity: 0;
-    translate: 0 140px;
+    translate: 0 420px;
     rotate: 400deg;
   }
 }
