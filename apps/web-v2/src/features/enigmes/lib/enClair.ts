@@ -11,7 +11,7 @@ export function encartEnClair(restantes: number, culture: string, zone: string |
   if (restantes <= 0) return { titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' }
   return {
     titre: restantes === 1 ? 'Encore une énigme à percer' : `Encore ${String(restantes)} énigmes à percer`,
-    phrase: `Chaque matin, une énigme de ${culture} s’éveille ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : les sceaux « ? » t’attendent.`,
+    phrase: `Chaque matin, une énigme de ${culture} s’éveille ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : elles t’y attendent.`,
   }
 }
 
@@ -32,10 +32,10 @@ export function quandEnClair(iso: string, maintenant = new Date()): string {
   return MOIS_ANNEE.format(le)
 }
 
-// `/carte?centre=lat,lng,zoom` : la carte y vole, au zoom où les sceaux « ? » se touchent
-// (lu par `features/carte/lib/centre.ts` ; ZOOM_DES_SCEAUX vaut 6).
-const ZOOM_DES_SCEAUX = 6.5
+// `/carte?centre=lat,lng,zoom` : la carte y vole, à l'échelle d'un pays, où la zone d'une culture
+// tient à l'écran (lu par `features/carte/lib/centre.ts`).
+const ZOOM_DE_LA_ZONE = 6.5
 
 export function lienVersLaCarte(centre: { lat: number; lng: number }): string {
-  return `/carte?centre=${String(centre.lat)},${String(centre.lng)},${String(ZOOM_DES_SCEAUX)}`
+  return `/carte?centre=${String(centre.lat)},${String(centre.lng)},${String(ZOOM_DE_LA_ZONE)}`
 }

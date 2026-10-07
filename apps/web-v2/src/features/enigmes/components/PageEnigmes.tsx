@@ -1,7 +1,9 @@
 /**
- * QUOI     — la page « Les énigmes » (maquette 478:452) : combien d'énigmes résolues sur le total,
- *            puis une ligne par culture — sa pastille, « 14 / 72 résolues », une fine jauge — qui
- *            ouvre ce qu'on y a appris.
+ * QUOI     — la page « Les énigmes » : un bilan en tête (« 194 énigmes résolues sur 419 », sa jauge,
+ *            une phrase), puis une carte par culture — sa pastille, son nom, « 61 / 77 énigmes
+ *            résolues », sa jauge — qui ouvre ce qu'on y a appris.
+ *            Refaite le 07/10 (Uriel : « trop petit, ça ne se voit pas ») ; on dit « énigmes », jamais
+ *            « les ? ».
  * POURQUOI — Uriel, 07/10 : « qu'on sache combien d'énigmes on a déjà répondues juste ». Ni
  *            pourcentage ni titres : la progression vit dans « Tous les titres », le jeu sur la carte.
  */
@@ -32,16 +34,23 @@ export function PageEnigmes({ onOuvrirCulture }: { onOuvrirCulture: (id: string)
   }
   if (!mesEnigmes) return null
 
+  const part = mesEnigmes.total > 0 ? mesEnigmes.resolues / mesEnigmes.total : 0
   return (
     <div className={styles.page}>
-      <div className={styles.resume}>
-        <p className={styles.aide}>Ce que tu as appris en perçant les « ? » de la carte.</p>
+      <section className={styles.bilan} aria-label="Mes énigmes">
         <p className={styles.compte}>
           <span className={styles.nombre}>{mesEnigmes.resolues}</span>
-          <span>{`${resoluesEnClair(mesEnigmes.resolues)} sur ${String(mesEnigmes.total)}`}</span>
+          <span className={styles.sur}>{`${resoluesEnClair(mesEnigmes.resolues)} sur ${String(mesEnigmes.total)}`}</span>
         </p>
-        <p className={styles.aide}>Touche une culture pour relire ses réponses et ses « Le savais-tu ? ».</p>
-      </div>
+        <span className={styles.piste} data-grande aria-hidden="true">
+          <span className={styles.rempli} style={{ '--mesure': String(part) }} />
+        </span>
+        <p className={styles.phrase}>
+          Chaque énigme que tu perces sur la carte t’apprend un fait d’Histoire. Retrouve-les ici, culture
+          par culture.
+        </p>
+      </section>
+      <h2 className={styles.rubrique}>Par culture</h2>
       <ul className={styles.cultures}>
         {mesEnigmes.cultures.map((c) => (
           <li key={c.id}>
@@ -53,21 +62,19 @@ export function PageEnigmes({ onOuvrirCulture }: { onOuvrirCulture: (id: string)
                 onOuvrirCulture(c.id)
               }}
             >
-              <span className={styles.tete}>
-                <PastilleCulture icone={c.icone} couleur={c.couleur} taille="petite" />
-                <span className={styles.nom}>
-                  <span className={styles.titre}>{c.nom}</span>
-                  <span className={styles.part}>{`${String(c.resolues)} / ${String(c.total)} résolues`}</span>
-                </span>
-                <span className={styles.chevron} aria-hidden="true">
-                  ›
+              <PastilleCulture icone={c.icone} couleur={c.couleur} taille="grande" />
+              <span className={styles.nom}>
+                <span className={styles.titre}>{c.nom}</span>
+                <span className={styles.part}>{`${String(c.resolues)} / ${String(c.total)} ${resoluesEnClair(c.resolues)}`}</span>
+                <span className={styles.piste} aria-hidden="true">
+                  <span
+                    className={styles.rempli}
+                    style={{ '--mesure': String(c.total > 0 ? c.resolues / c.total : 0) }}
+                  />
                 </span>
               </span>
-              <span className={styles.piste} aria-hidden="true">
-                <span
-                  className={styles.rempli}
-                  style={{ '--mesure': String(c.total > 0 ? c.resolues / c.total : 0) }}
-                />
+              <span className={styles.chevron} aria-hidden="true">
+                ›
               </span>
             </button>
           </li>

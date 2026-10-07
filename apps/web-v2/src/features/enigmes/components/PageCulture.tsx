@@ -9,7 +9,7 @@
 import { Link } from 'react-router'
 import { Text } from '@/shared/ui/Text'
 import { useMaCulture } from '../hooks/useMesEnigmes'
-import { encartEnClair, lienVersLaCarte, quandEnClair } from '../lib/enClair'
+import { encartEnClair, lienVersLaCarte, quandEnClair, resoluesEnClair } from '../lib/enClair'
 import { PastilleCulture } from './PastilleCulture'
 import styles from './PageCulture.module.css'
 
@@ -33,7 +33,7 @@ export function PageCulture({ id }: { id: string }) {
         <PastilleCulture icone={culture.icone} couleur={culture.couleur} taille="grande" />
         <p className={styles.compte}>
           <span className={styles.nombre}>{`${String(resolues)} / ${String(total)}`}</span>
-          <span>résolues</span>
+          <span>{resoluesEnClair(resolues)}</span>
         </p>
       </div>
       <span className={styles.piste} aria-hidden="true">
