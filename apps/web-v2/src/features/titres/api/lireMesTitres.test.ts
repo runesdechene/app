@@ -17,13 +17,11 @@ const brut = {
       ],
     },
   ],
-  autreEpoque: [
-    { id: 1, nom: 'Novice', condition: { stat: 'discoveries', min: 0 }, porte: true },
-    { id: 9, nom: 'Banneret', condition: 'cassée', porte: false },
-  ],
+  // La base d'avant la migration 433 envoie encore cette clé : on ne la lit plus.
+  autreEpoque: [{ id: 9, nom: 'Banneret', condition: 'cassée', porte: false }],
 }
 
-test('les chemins et l’autre époque se lisent', () => {
+test('les chemins se lisent', () => {
   const t = lireMesTitres(brut)
   expect(t.obtenus).toBe(3)
   expect(t.chemins[0]?.titres[1]).toEqual({
@@ -33,16 +31,10 @@ test('les chemins et l’autre époque se lisent', () => {
     obtenu: false,
     porte: false,
   })
-  expect(t.autreEpoque[0]).toEqual({
-    id: 1,
-    nom: 'Novice',
-    condition: { stat: 'discoveries', min: 0 },
-    porte: true,
-  })
 })
 
-test('une condition illisible n’empêche pas de lire le titre', () => {
-  expect(lireMesTitres(brut).autreEpoque[1]?.condition).toBeNull()
+test('les titres d’une autre époque ne se lisent plus', () => {
+  expect('autreEpoque' in lireMesTitres(brut)).toBe(false)
 })
 
 test('un JSON mal formé lève une erreur', () => {

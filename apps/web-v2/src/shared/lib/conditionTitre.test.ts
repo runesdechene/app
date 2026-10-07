@@ -11,10 +11,9 @@ test('les hauts faits se disent en une phrase', () => {
   expect(phraseCondition({ stat: 'places_added', min: 1 })).toBe('Débloqué en ajoutant 1 lieu.')
 })
 
-test('un titre sans seuil est offert à l’arrivée', () => {
-  expect(phraseCondition({ stat: 'discoveries', min: 0 })).toBe(
-    'Offert à chaque nouvel Explorateur.',
-  )
+test('un chemin refermé n’a plus de phrase : « Gagné en jouant. »', () => {
+  expect(phraseCondition({ stat: 'plantages', min: 30 })).toBe('Gagné en jouant.')
+  expect(phraseCondition({ stat: 'discoveries', min: 0 })).toBe('Gagné en jouant.')
 })
 
 test('une condition inconnue ou absente reste honnête', () => {

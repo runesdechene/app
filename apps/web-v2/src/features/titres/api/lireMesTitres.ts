@@ -1,11 +1,9 @@
 /**
- * QUOI     — mes titres, lus depuis `get_mes_titres` (migration 430) : le compte, les chemins
- *            vivants (chaque titre, son seuil, obtenu ou non, porté ou non), et les titres gagnés
- *            sur un chemin refermé (« D'une autre époque »).
+ * QUOI     — mes titres, lus depuis `get_mes_titres` (migrations 430, 433) : le compte et les
+ *            chemins vivants (chaque titre, son seuil, obtenu ou non, porté ou non).
  * POURQUOI — la base décide ce qui est obtenu (la même règle que get_user_titles) : le front ne
  *            recalcule jamais un seuil.
  */
-import { lireCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet } from '@/shared/lib/lire'
 
 export type TitreDuChemin = {
@@ -16,17 +14,10 @@ export type TitreDuChemin = {
   porte: boolean
 }
 export type Chemin = { stat: string; compteur: number; titres: TitreDuChemin[] }
-export type TitreAncien = {
-  id: number
-  nom: string
-  condition: ConditionTitre | null
-  porte: boolean
-}
 export type MesTitres = {
   obtenus: number
   total: number
   chemins: Chemin[]
-  autreEpoque: TitreAncien[]
 }
 
 function titreDuChemin(v: unknown): TitreDuChemin {
@@ -49,22 +40,11 @@ function chemin(v: unknown): Chemin {
   }
 }
 
-function titreAncien(v: unknown): TitreAncien {
-  const o = objet(v)
-  return {
-    id: nombre(o.id),
-    nom: chaine(o.nom),
-    condition: lireCondition(o.condition),
-    porte: booleen(o.porte),
-  }
-}
-
 export function lireMesTitres(v: unknown): MesTitres {
   const o = objet(v)
   return {
     obtenus: nombre(o.obtenus),
     total: nombre(o.total),
     chemins: liste(chemin)(o.chemins),
-    autreEpoque: liste(titreAncien)(o.autreEpoque),
   }
 }

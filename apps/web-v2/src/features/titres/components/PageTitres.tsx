@@ -1,7 +1,7 @@
 /**
- * QUOI     — le panneau « Tous les titres » (maquette 112:107) : le compte, un bloc par chemin
- *            vivant (les titres par seuil, le prochain avec sa barre, les portés cerclés), puis
- *            « D'une autre époque » (les titres gagnés sur un chemin refermé).
+ * QUOI     — le panneau « Tous les titres » (maquette 112:107) : le compte, puis un bloc par chemin
+ *            vivant (les titres par seuil, le prochain avec sa barre, les portés cerclés). Les titres
+ *            de l'ancien jeu sont partis avec la V1 (Uriel, 06/10 — migration 433).
  * POURQUOI — aucun endroit ne montrait les titres qu'on peut gagner (Uriel, 06/10). La base range ;
  *            ici, on montre.
  */
@@ -45,28 +45,6 @@ export function PageTitres() {
       {titres.chemins.map((chemin) => (
         <BlocChemin key={chemin.stat} chemin={chemin} onToucher={setTouche} />
       ))}
-
-      {titres.autreEpoque.length > 0 && (
-        <section className={styles.ancien} aria-label="D’une autre époque">
-          <h2 className={styles.nomAncien}>D’une autre époque</h2>
-          <p className={styles.explication}>
-            Gagnés dans l’ancienne version du jeu. Ils restent à toi et se portent toujours.
-          </p>
-          <div className={styles.gelules}>
-            {titres.autreEpoque.map((t) => (
-              <Gelule
-                key={t.id}
-                nom={t.nom}
-                obtenu
-                porte={t.porte}
-                onToucher={() => {
-                  setTouche({ nom: t.nom, cas: 'ancien', condition: t.condition, compteur: null })
-                }}
-              />
-            ))}
-          </div>
-        </section>
-      )}
 
       {touche && (
         <FeuilleTitre

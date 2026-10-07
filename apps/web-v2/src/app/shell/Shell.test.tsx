@@ -55,7 +55,7 @@ const registre = vi.hoisted(() => ({
 }))
 vi.mock('@/features/messages/api/registre', () => registre)
 vi.mock('@/features/titres/api/mesTitres', () => ({
-  fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [], autreEpoque: [] }),
+  fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [] }),
 }))
 beforeEach(() => {
   murmures.fetchFils.mockResolvedValue([])

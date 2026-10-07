@@ -32,9 +32,6 @@ const titres: MesTitres = {
       titres: [{ id: 5, nom: 'Glaneur', min: 1, obtenu: false, porte: false }],
     },
   ],
-  autreEpoque: [
-    { id: 9, nom: 'Banneret', condition: { stat: 'plantages', min: 30 }, porte: false },
-  ],
 }
 
 beforeEach(() => {
@@ -68,19 +65,6 @@ test('le compte, un bloc par chemin, le prochain avec sa barre', async () => {
   expect(screen.getByRole('region', { name: 'Les lieux enrichis' })).toBeInTheDocument()
 })
 
-test('d’une autre époque : seulement ce qui est gagné', async () => {
-  afficher()
-  const ancien = await screen.findByRole('region', { name: 'D’une autre époque' })
-  expect(within(ancien).getByRole('button', { name: /Banneret/ })).toBeInTheDocument()
-})
-
-test('sans titre d’une autre époque, le bloc ne s’affiche pas', async () => {
-  api.fetchMesTitres.mockResolvedValue({ ...titres, autreEpoque: [] })
-  afficher()
-  await screen.findByRole('region', { name: 'Les visites' })
-  expect(screen.queryByRole('region', { name: 'D’une autre époque' })).toBeNull()
-})
-
 test('un titre obtenu s’explique', async () => {
   afficher()
   await userEvent.click(await screen.findByRole('button', { name: /Cheminant/ }))
@@ -95,14 +79,6 @@ test('un titre à gagner montre où on en est', async () => {
   const feuille = screen.getByRole('dialog', { name: 'Errant' })
   expect(within(feuille).getByText('Se gagne en visitant 150 lieux sur place.')).toBeInTheDocument()
   expect(within(feuille).getByText('60 / 150 — encore 90')).toBeInTheDocument()
-})
-
-test('un titre d’une autre époque dit que le chemin s’est refermé', async () => {
-  afficher()
-  await userEvent.click(await screen.findByRole('button', { name: /Banneret/ }))
-  const feuille = screen.getByRole('dialog', { name: 'Banneret' })
-  expect(within(feuille).getByText('Débloqué en veillant sur 30 lieux.')).toBeInTheDocument()
-  expect(within(feuille).getByText(/Ce chemin s’est refermé avec la V2/)).toBeInTheDocument()
 })
 
 test('une erreur se dit, et se réessaie', async () => {
@@ -134,4 +110,15 @@ test('le niveau se dit en niveau, pas en nombre', async () => {
   await userEvent.click(await screen.findByRole('button', { name: /Compagnon/ }))
   const feuille = screen.getByRole('dialog', { name: 'Compagnon' })
   expect(within(feuille).getByText('Aujourd’hui : niveau 12.')).toBeInTheDocument()
+})
+
+test('plus de bloc « D’une autre époque », même si la base en envoie encore un', async () => {
+  api.fetchMesTitres.mockResolvedValue({
+    ...titres,
+    autreEpoque: [{ id: 9, nom: 'Banneret', condition: null, porte: false }],
+  })
+  afficher()
+  await screen.findByRole('region', { name: 'Les visites' })
+  expect(screen.queryByRole('region', { name: 'D’une autre époque' })).toBeNull()
+  expect(screen.queryByRole('button', { name: /Banneret/ })).toBeNull()
 })

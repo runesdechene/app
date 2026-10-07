@@ -1,7 +1,6 @@
 /**
- * QUOI     — la feuille d'un titre touché (maquettes « Titres — 3a/3b/3c ») : obtenu (comment, et
- *            où on en est), à gagner (comment, et la barre), d'une autre époque (comment, et que le
- *            chemin s'est refermé).
+ * QUOI     — la feuille d'un titre touché (maquettes « Titres — 3a/3b ») : obtenu (comment, et où
+ *            on en est), ou à gagner (comment, et la barre).
  * POURQUOI — toucher un titre l'explique (Uriel, 27/09). Pas de « Porter ce titre » : le choix
  *            reste dans « Modifier mon profil » (Uriel, 06/10).
  */
@@ -13,7 +12,7 @@ import styles from './FeuilleTitre.module.css'
 
 export type TitreTouche = {
   nom: string
-  cas: 'obtenu' | 'a-gagner' | 'ancien'
+  cas: 'obtenu' | 'a-gagner'
   condition: ConditionTitre | null
   compteur: number | null
 }
@@ -43,14 +42,6 @@ export function FeuilleTitre({ titre, onFermer }: { titre: TitreTouche; onFermer
             <Barre valeur={compteur} max={titre.condition.min} nom={titre.nom} />
             <Text variant="sous-titre">
               {`${String(compteur)} / ${String(titre.condition.min)} — encore ${String(titre.condition.min - compteur)}`}
-            </Text>
-          </>
-        )}
-        {titre.cas === 'ancien' && (
-          <>
-            <Text variant="corps">{phrase}</Text>
-            <Text variant="sous-titre">
-              Ce chemin s’est refermé avec la V2 : le titre reste à toi et se porte toujours.
             </Text>
           </>
         )}

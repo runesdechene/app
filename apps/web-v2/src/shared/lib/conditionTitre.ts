@@ -8,18 +8,12 @@ import { chaine, nombre, objet } from '@/shared/lib/lire'
 
 export type ConditionTitre = { stat: string; min: number }
 
-// Chaque statistique de get_user_titles, en français d'Explorateur : n → fin de phrase.
+// Chaque chemin vivant (migration 433), en français d'Explorateur : n → fin de phrase.
 const PHRASES: Record<string, (n: number) => string> = {
   level: (n) => `en atteignant le niveau ${String(n)}`,
-  discoveries: (n) => `en découvrant ${lieux(n)}`,
   places_visited: (n) => `en visitant ${lieux(n)} sur place`,
   places_added: (n) => `en ajoutant ${lieux(n)}`,
   places_enriched: (n) => `en enrichissant ${lieux(n)}`,
-  carnets: (n) => `en écrivant ${String(n)} ${n > 1 ? 'carnets' : 'carnet'} de lieu`,
-  enigma_score: (n) => `en résolvant des énigmes (score de ${String(n)})`,
-  plantages: (n) => `en veillant sur ${lieux(n)}`,
-  mecenat_total: (n) => `en offrant ${String(n)} Couronnes en mécénat`,
-  mecenat_top1_count: (n) => `en devenant premier mécène de ${lieux(n)}`,
 }
 
 function lieux(n: number): string {
@@ -28,7 +22,6 @@ function lieux(n: number): string {
 
 export function phraseCondition(condition: ConditionTitre | null): string {
   if (!condition) return 'Gagné en jouant.'
-  if (condition.min <= 0) return 'Offert à chaque nouvel Explorateur.'
   const phrase = PHRASES[condition.stat]
   return phrase ? `Débloqué ${phrase(condition.min)}.` : 'Gagné en jouant.'
 }
