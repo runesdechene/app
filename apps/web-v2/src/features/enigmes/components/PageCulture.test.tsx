@@ -47,6 +47,20 @@ test('une carte par énigme apprise : réponse, question, le savais-tu', async (
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
 })
 
+test('chaque énigme porte son numéro, de la première percée (n° 1) à la dernière, en tête', async () => {
+  api.fetchMaCulture.mockResolvedValue({
+    ...byzance,
+    enigmes: [
+      { reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La coupole…', le: '2026-05-03T10:00:00Z' },
+      { reponse: 'Justinien', question: 'Quel empereur ?', explication: 'Le code…', le: '2026-04-01T10:00:00Z' },
+    ],
+  })
+  afficher()
+  const cartes = await screen.findAllByRole('listitem')
+  expect(cartes[0]).toHaveTextContent('N° 2')
+  expect(cartes[1]).toHaveTextContent('N° 1')
+})
+
 test('sans cercle, pas de lien vers la carte', async () => {
   api.fetchMaCulture.mockResolvedValue({ ...byzance, centre: null })
   afficher()

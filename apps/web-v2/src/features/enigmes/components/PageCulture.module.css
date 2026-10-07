@@ -108,8 +108,8 @@
 
 .carte {
   display: grid;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-2);
+  padding: var(--space-4);
   border: 1px solid var(--color-bord);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
@@ -117,13 +117,15 @@
 
 .tete {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
-.reponse {
-  color: var(--color-encre);
-  font-weight: var(--weight-gras);
+.numero {
+  color: var(--couleur-culture, var(--color-ocre));
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
 }
 
 .quand {
@@ -132,14 +134,42 @@
   font-size: var(--legende-size);
 }
 
+/* La question en IM Fell droit, comme sur la feuille de l'énigme : élégante et lisible. */
 .question {
-  color: var(--color-texte-doux);
-  font-size: var(--legende-size);
+  color: var(--color-carte-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--question-apprise-size);
+  line-height: var(--dense-leading);
 }
 
+.reponse {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.bonne {
+  color: var(--color-succes);
+  font-weight: var(--weight-gras);
+}
+
+.etiquette {
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+/* Le savais-tu, comme le récit de la feuille : du Cabin à interligne large, tenu par un filet. */
 .savais {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-ocre);
   color: var(--color-fiche-recit);
-  font-family: var(--font-inscription);
-  font-size: var(--savais-enigme-size);
-  font-style: italic;
+  font-size: var(--recit-enigme-size);
+  line-height: var(--recit-enigme-leading);
 }

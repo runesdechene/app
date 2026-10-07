@@ -115,7 +115,7 @@
   --recit-enigme-size: 0.9375rem; /* le récit d'une énigme, Cabin : 15 px (Figma 484:434) */
   --recit-enigme-leading: 1.55; /* et son interligne large : 23 px */
   --question-enigme-size: 1.3125rem; /* sa question, IM Fell : 21 px */
-  --savais-enigme-size: 1.0625rem; /* « Le savais-tu ? » d'une énigme résolue, IM Fell : 17 px */
+  --question-apprise-size: 1.0625rem; /* la question d'une énigme résolue, dans « Les énigmes » : 17 px */
   --bio-leading: 1.29;
   --inscription-size: 1.875rem; /* le nom du territoire sur la carte : 30 px (maquette 200:192) */
   --inscription-tracking: 0.02em;

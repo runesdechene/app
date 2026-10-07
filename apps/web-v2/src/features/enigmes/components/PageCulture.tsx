@@ -1,7 +1,8 @@
 /**
  * QUOI     — une culture dans « Les énigmes » (maquette 478:526) : « 14 / 72 résolues », l'encart de
  *            ce qui reste à percer (où ça s'éveille, et le lien qui vole sur la carte), puis chaque
- *            énigme résolue — sa réponse, sa question, son « Le savais-tu ? » — la plus récente en tête.
+ *            énigme résolue, numérotée — sa question, sa réponse, son « Le savais-tu ? » — la plus récente en
+ *            tête. Tout en écriture droite et lisible : l'italique penchée ne se lisait pas (Uriel, 07/10).
  * POURQUOI — ce qu'on a appris se relit (Uriel, 07/10). Les énigmes ratées n'y sont pas : elles
  *            reviendront sur la carte.
  */
@@ -55,14 +56,22 @@ export function PageCulture({ id }: { id: string }) {
       </section>
 
       <ul className={styles.appris}>
-        {enigmes.map((e) => (
+        {enigmes.map((e, i) => (
           <li key={`${e.reponse}-${e.le}`} className={styles.carte}>
             <span className={styles.tete}>
-              <span className={styles.reponse}>{e.reponse}</span>
+              {/* La plus récente est en tête : son numéro est le plus grand, la première percée est le n° 1. */}
+              <span className={styles.numero}>{`N° ${String(enigmes.length - i)}`}</span>
               <span className={styles.quand}>{quandEnClair(e.le)}</span>
             </span>
             <span className={styles.question}>{e.question}</span>
-            <span className={styles.savais}>{e.explication}</span>
+            <span className={styles.reponse}>
+              <span className={styles.etiquette}>Réponse</span>
+              <span className={styles.bonne}>{e.reponse}</span>
+            </span>
+            <span className={styles.savais}>
+              <span className={styles.etiquette}>Le savais-tu ?</span>
+              <span>{e.explication}</span>
+            </span>
           </li>
         ))}
       </ul>
