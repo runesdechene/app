@@ -4,8 +4,8 @@
  *            vers /v2/…, et `envDir` lit le même .env racine que la V1 et le Hub.
  * ATTENTION — en dev, le proxy sert la V1 sur le même port : lancer `pnpm dev` (V1) ET
  *            `pnpm dev:v2`, puis tout ouvrir sur http://localhost:5174.
- *            PWA : portée /v2/ — ce service worker ne touche jamais la V1, et celui de la V1
- *            ignore /v2 (apps/explore-web/src/sw.ts).
+ *            PWA : service worker maison (src/sw.ts), portée /v2/ — il ne touche jamais la V1,
+ *            et celui de la V1 ignore /v2 (apps/explore-web/src/sw.ts).
  */
 /// <reference types="vitest/config" />
 import path from 'node:path'
@@ -55,14 +55,12 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        // « autoUpdate » ne s'active pas tout seul : sans ces deux réglages, une nouvelle version
-        // s'installe puis attend que toute l'app soit fermée — jamais, sur un téléphone (02/10 :
-        // un navigateur resté sur 1.0.9 pendant six déploiements).
-        skipWaiting: true,
-        clientsClaim: true,
-      },
+      // Service worker maison (src/sw.ts) : précache, liste blanche, push. skipWaiting et
+      // clientsClaim y sont écrits (piège du 02/10 : sans eux, une version reste en attente).
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
     }),
   ],
   resolve: {

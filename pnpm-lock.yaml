@@ -225,6 +225,12 @@ importers:
       react-router:
         specifier: 8.4.0
         version: 8.4.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      workbox-precaching:
+        specifier: 7.4.1
+        version: 7.4.1
+      workbox-routing:
+        specifier: 7.4.1
+        version: 7.4.1
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
