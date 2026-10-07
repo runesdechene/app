@@ -176,7 +176,7 @@ export function MisesAJour() {
       {loading && rows.length === 0 && <div className="loading">Chargement…</div>}
       {!loading && rows.length === 0 && <div className="empty">Aucune mise à jour publiée.</div>}
       {rows.map(m => (
-        <div key={m.id} className="mod-row" style={{ padding: 12 }}>
+        <div key={m.id} className="mod-row" style={{ display: 'block', padding: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
             <div>
               <div style={{ fontWeight: 600 }}>{m.titre}</div>

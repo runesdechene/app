@@ -83,3 +83,10 @@ jour `places.text` et `title` sans ligne dans `versions_lieu` ni mise à jour de
 une correction de modérateur recrée l'écart V1/V2 que la mig 416 a réparé, et la version « Actuelle »
 ne correspond plus à la fiche. À faire : qu'elle passe par une version (auteur = le modérateur, note
 « Modération ») et tienne `place_contributions` à jour, comme `modifier_lieu` (mig 414).
+
+## Hub : `Photos.css` redéfinit `.mod-row` pour tout le Hub (07/10/2026)
+
+`apps/hub/src/components/photos/Photos.css` pose `.mod-row { display: flex; … }` sans préfixe : le CSS
+du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui utilisent `.mod-row`
+(Mises à jour : l'image et le texte se rangeaient côte à côte). Contourné dans `MisesAJour.tsx`
+(`display: 'block'` en ligne). À faire : renommer les classes de `Photos.css` (`photo-row…`).
