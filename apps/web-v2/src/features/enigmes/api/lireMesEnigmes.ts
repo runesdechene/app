@@ -14,7 +14,8 @@ export type CultureResolue = {
   total: number
 }
 export type MesEnigmes = { resolues: number; total: number; cultures: CultureResolue[] }
-export type EnigmeApprise = { reponse: string; question: string; explication: string; le: string }
+// `numero` : son numéro fixe, le même pour tous (migration 448).
+export type EnigmeApprise = { numero: number; reponse: string; question: string; explication: string; le: string }
 export type MaCulture = {
   culture: { id: string; nom: string; icone: string | null; couleur: string | null; zone: string | null }
   resolues: number
@@ -44,7 +45,7 @@ export function lireMesEnigmes(v: unknown): MesEnigmes {
 
 function enigmeApprise(v: unknown): EnigmeApprise {
   const o = objet(v)
-  return { reponse: chaine(o.reponse), question: chaine(o.question), explication: chaine(o.explication), le: chaine(o.le) }
+  return { numero: nombre(o.numero), reponse: chaine(o.reponse), question: chaine(o.question), explication: chaine(o.explication), le: chaine(o.le) }
 }
 
 function centre(v: unknown) {

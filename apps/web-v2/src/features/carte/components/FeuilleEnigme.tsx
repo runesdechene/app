@@ -67,7 +67,7 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
             )}
           </span>
           <span className={styles.titre}>
-            <span className={styles.surtitre}>Énigme</span>
+            <span className={styles.surtitre}>{`Énigme n° ${String(enigme.numero)}`}</span>
             <span className={styles.culture}>{enigme.culture.nom}</span>
           </span>
         </header>

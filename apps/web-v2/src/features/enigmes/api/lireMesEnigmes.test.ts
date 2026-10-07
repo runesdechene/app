@@ -27,11 +27,12 @@ test('une culture : sa zone, son centre, ce qu’on a appris', () => {
     resolues: 1,
     total: 72,
     centre: { lat: 41, lng: 28.9 },
-    enigmes: [{ reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La coupole…', le: '2026-10-07T09:00:00Z' }],
+    enigmes: [{ numero: 242, reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La coupole…', le: '2026-10-07T09:00:00Z' }],
   })
   expect(c.culture.zone).toBe('entre la Thrace et l’Asie Mineure')
   expect(c.centre).toEqual({ lat: 41, lng: 28.9 })
   expect(c.enigmes[0]?.reponse).toBe('Sainte-Sophie')
+  expect(c.enigmes[0]?.numero).toBe(242)
 })
 
 test('une culture sans zone ni cercle : zone et centre absents', () => {

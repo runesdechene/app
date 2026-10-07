@@ -9,6 +9,7 @@ import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire
 export type EnigmeEnAttente = { id: number; lat: number; lng: number }
 export type Culture = { id: string; nom: string; icone: string | null; couleur: string | null }
 export type EnigmeOuverte = {
+  numero: number // son numéro fixe, le même pour tous (migration 448)
   culture: Culture
   recit: string
   question: string
@@ -50,6 +51,7 @@ function culture(v: unknown): Culture {
 export function lireOuverture(v: unknown): EnigmeOuverte {
   const o = objet(v)
   return {
+    numero: nombre(o.numero),
     culture: culture(o.culture),
     recit: chaine(o.recit),
     question: chaine(o.question),

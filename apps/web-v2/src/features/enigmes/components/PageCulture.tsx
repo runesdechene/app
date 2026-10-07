@@ -56,11 +56,11 @@ export function PageCulture({ id }: { id: string }) {
       </section>
 
       <ul className={styles.appris}>
-        {enigmes.map((e, i) => (
-          <li key={`${e.reponse}-${e.le}`} className={styles.carte}>
+        {enigmes.map((e) => (
+          <li key={e.numero} className={styles.carte}>
             <span className={styles.tete}>
-              {/* La plus récente est en tête : son numéro est le plus grand, la première percée est le n° 1. */}
-              <span className={styles.numero}>{`N° ${String(enigmes.length - i)}`}</span>
+              {/* Son numéro fixe, le même pour tous : « je bloque sur la 242 » (Uriel, 07/10). */}
+              <span className={styles.numero}>{`N° ${String(e.numero)}`}</span>
               <span className={styles.quand}>{quandEnClair(e.le)}</span>
             </span>
             <span className={styles.question}>{e.question}</span>

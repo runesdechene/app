@@ -188,7 +188,7 @@ test('fonder et rejoindre une Compagnie sont des lignes du fil, avec leur Compag
   expect(lireChemins([CHEMIN])[0]?.compagnie).toBeNull()
 })
 
-test('une énigme percée se lit avec sa culture et le nombre du jour (migration 448)', () => {
+test('une énigme percée se lit avec sa culture et le nombre du jour (migration 449)', () => {
   const [enigme] = lireChemins([
     {
       ...CHEMIN,
@@ -204,7 +204,7 @@ test('une énigme percée se lit avec sa culture et le nombre du jour (migration
   expect(enigme?.nombre).toBe(3)
 })
 
-test('avant la migration 448, une ligne n’a ni culture ni nombre : aucune, et une', () => {
+test('avant la migration 449, une ligne n’a ni culture ni nombre : aucune, et une', () => {
   const [visite] = lireChemins([CHEMIN])
   expect(visite?.culture).toBeNull()
   expect(visite?.nombre).toBe(1)

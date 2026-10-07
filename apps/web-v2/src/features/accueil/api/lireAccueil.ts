@@ -58,7 +58,7 @@ export type TypeDeChemin =
   | 'modifie'
   | 'fondation'
   | 'adhesion'
-  | 'enigme' // une énigme percée (migration 448)
+  | 'enigme' // une énigme percée (migration 449)
 export type CultureDuChemin = { id: string; nom: string; couleur: string | null; icone: string | null }
 export type Chemin = {
   id: string // la ligne, telle que la base la connaît pour les saluts
@@ -72,8 +72,8 @@ export type Chemin = {
     type: { icone: string; couleur: string | null } | null // mig 375
   } | null
   compagnie: { id: string; nom: string; couleur: string } | null // fondation, adhesion, revendication « pour » (438)
-  culture: CultureDuChemin | null // une énigme percée : sa culture, jamais sa réponse (448)
-  nombre: number // combien ce jour-là (« a percé 3 énigmes », 448)
+  culture: CultureDuChemin | null // une énigme percée : sa culture, jamais sa réponse (449)
+  nombre: number // combien ce jour-là (« a percé 3 énigmes », 449)
   moi: boolean // ma propre ligne : pas de salut possible
   saluts: number
   salue: boolean
@@ -165,7 +165,7 @@ function lireChemin(v: unknown): Chemin {
       const f = objet(v)
       return { id: chaine(f.id), nom: chaine(f.nom), couleur: chaine(f.couleur) }
     })(c.compagnie ?? null),
-    // Absentes avant la migration 448 : aucune culture, une fois.
+    // Absentes avant la migration 449 : aucune culture, une fois.
     culture: ouNull((v) => {
       const k = objet(v)
       const couleur = ouNull(chaine)(k.couleur ?? null)

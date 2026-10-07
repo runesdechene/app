@@ -40,6 +40,7 @@ const enigme = {
   question: 'Quel monument Justinien a-t-il fait construire ?',
   format: 'qcm',
   choix: ['Sainte-Sophie', 'Sainte-Irène'],
+  numero: 242,
 }
 
 test('le sceau retourné, la question et ses réponses ; une réponse juste montre les gains', async () => {
@@ -91,7 +92,8 @@ test('l’en-tête dit « Énigme » et la culture ; sans icône, le sceau porte
   ouvrirEnigme.mockResolvedValue(enigme)
   monter()
   await retourner()
-  expect(await screen.findByText('Énigme')).toBeInTheDocument()
+  // Son numéro fixe, le même pour tous : « je bloque sur la 242 ».
+  expect(await screen.findByText('Énigme n° 242')).toBeInTheDocument()
   expect(screen.getByText('Byzance')).toBeInTheDocument()
   expect(screen.getByTestId('sceau-culture')).toHaveTextContent('B')
 })

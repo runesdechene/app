@@ -16,13 +16,15 @@ test('ouverture : une culture sans icône ni couleur reste lisible', () => {
     format: 'qcm',
     choix: ['Sainte-Sophie', 'Sainte-Irène'],
     difficulte: 'easy',
+    numero: 242,
   })
+  expect(o.numero).toBe(242)
   expect(o.culture).toEqual({ id: 'byzantine', nom: 'Byzantine', icone: null, couleur: null })
   expect(o.choix).toEqual(['Sainte-Sophie', 'Sainte-Irène'])
 })
 
 test('ouverture : une réponse libre n’a pas de choix, un format inconnu devient libre', () => {
-  const base = { culture: { id: 'r', nom: 'Rome', icone: null, couleur: '#c94436' }, recit: '', question: '?' }
+  const base = { culture: { id: 'r', nom: 'Rome', icone: null, couleur: '#c94436' }, recit: '', question: '?', numero: 1 }
   expect(lireOuverture({ ...base, format: 'free', choix: null }).choix).toBeNull()
   expect(lireOuverture({ ...base, format: 'autre', choix: null }).format).toBe('free')
 })
