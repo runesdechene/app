@@ -1,6 +1,6 @@
 /**
  * QUOI     — les énigmes sur la carte : une source, deux calques (des éclats de loin, des sceaux « ? »
- *            de près) et leurs deux images, dessinées au canevas.
+ *            de près) et leurs deux images, dessinées au canevas ; dessous, une onde qui rayonne.
  * POURQUOI — maquettes « Énigmes — 1 et 2 » : dézoomée, chaque énigme n'est qu'un éclat, à sa place,
  *            sans regroupement ni chiffre ; à l'échelle d'un pays, le sceau se touche. Tous les sceaux
  *            sont pareils : la culture se découvre au toucher.
@@ -13,6 +13,7 @@ import type { EnigmeEnAttente } from '../api/lireEnigmes'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 export const SOURCE_ENIGMES = 'enigmes'
+export const CALQUE_ONDES_ENIGMES = 'enigmes-ondes'
 export const CALQUE_ECLATS = 'enigmes-eclats'
 export const CALQUE_SCEAUX_ENIGMES = 'enigmes-sceaux'
 export const ZOOM_DES_SCEAUX = 6
@@ -20,6 +21,13 @@ export const ZOOM_DES_SCEAUX = 6
 const RATIO = 2
 const ECLAT = 30
 const SCEAU = 36
+const PERIODE = 2200 // ms : une onde par battement, lente, pour appeler sans agacer
+
+// Où en est l'onde à la phase `t` (0 → 1) : `part` de son élargissement, et son opacité qui
+// s'éteint en chemin.
+export function onde(t: number): { part: number; opacite: number } {
+  return { part: t, opacite: 0.5 * (1 - t) ** 2 }
+}
 
 export function enGeoJSONEnigmes(enigmes: EnigmeEnAttente[]): FeatureCollection<Point, { id: number }> {
   return {
@@ -44,6 +52,13 @@ export function ajouterCalquesEnigmes(map: SupportDeCalques, ecran: number) {
     'icon-size': ecran,
     'icon-allow-overlap': true,
     'icon-ignore-placement': true,
+  })
+  // L'onde, sous les marques : un cercle de cire dont `fairePulser` fait varier le rayon et l'opacité.
+  map.addLayer({
+    id: CALQUE_ONDES_ENIGMES,
+    type: 'circle',
+    source: SOURCE_ENIGMES,
+    paint: { 'circle-color': 'transparent', 'circle-radius': 0, 'circle-opacity': 0 },
   })
   map.addLayer({ id: CALQUE_ECLATS, type: 'symbol', source: SOURCE_ENIGMES, maxzoom: ZOOM_DES_SCEAUX, layout: marque('enigme-eclat') })
   map.addLayer({ id: CALQUE_SCEAUX_ENIGMES, type: 'symbol', source: SOURCE_ENIGMES, minzoom: ZOOM_DES_SCEAUX, layout: marque('enigme-sceau') })
@@ -108,6 +123,29 @@ export async function poserEnigmes(map: Carte, c: CouleursCarte, ecran: number):
   await document.fonts.load('italic 24px "IM Fell English"')
   if (!map.hasImage('enigme-eclat')) map.addImage('enigme-eclat', eclat(c), { pixelRatio: RATIO })
   if (!map.hasImage('enigme-sceau')) map.addImage('enigme-sceau', sceau(c), { pixelRatio: RATIO })
+  fairePulser(map, c.cire, ecran)
+}
+
+// Les énigmes rayonnent (Uriel, 07/10) : une onde part de chaque marque, s'élargit et s'efface, en
+// boucle. Le rayon d'un cercle s'anime image par image (comme le survol, `survol.ts`) ; il suit le
+// zoom : de la taille de l'éclat de loin, du sceau de près. Animations réduites : pas d'onde.
+export function fairePulser(map: Carte, couleur: string, ecran: number): () => void {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => undefined
+  map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-color', couleur)
+  let image = 0
+  const pas = (maintenant: number) => {
+    if (!map.getLayer(CALQUE_ONDES_ENIGMES)) return
+    const { part, opacite } = onde((maintenant % PERIODE) / PERIODE)
+    const eclat = (5 + part * 14) * ecran
+    const sceau = (16 + part * 16) * ecran
+    map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-radius', ['step', ['zoom'], eclat, ZOOM_DES_SCEAUX, sceau])
+    map.setPaintProperty(CALQUE_ONDES_ENIGMES, 'circle-opacity', opacite)
+    image = requestAnimationFrame(pas)
+  }
+  image = requestAnimationFrame(pas)
+  return () => {
+    cancelAnimationFrame(image)
+  }
 }
 
 // Le clic des lieux s'efface devant un sceau d'énigme (même motif que `surUnPin`).
