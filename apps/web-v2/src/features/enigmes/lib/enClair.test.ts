@@ -2,7 +2,7 @@
  * QUOI     — les phrases de la page « Les énigmes » : le compte, l'encart, la date, le lien vers la carte.
  */
 import { expect, test } from 'vitest'
-import { encartEnClair, lienVersLaCarte, quandEnClair, resoluesEnClair } from './enClair'
+import { encartEnClair, lienVersLaCarte, prochainEnClair, quandEnClair, resoluesEnClair } from './enClair'
 
 test('résolues au singulier jusqu’à une', () => {
   expect(resoluesEnClair(0)).toBe('énigme résolue')
@@ -31,4 +31,10 @@ test('la date d’une bonne réponse, en mots', () => {
 
 test('le lien vers la carte vole sur le centre de la culture', () => {
   expect(lienVersLaCarte({ lat: 41, lng: 28.9 })).toBe('/carte?centre=41,28.9,6.5')
+})
+
+test('ce qui manque pour le titre suivant (mig 452)', () => {
+  expect(prochainEnClair({ titre: 'Maître de Byzance', rang: 7, manque: 12 })).toBe('Encore 12 points pour Maître de Byzance')
+  expect(prochainEnClair({ titre: 'Curieux de Byzance', rang: 1, manque: 1 })).toBe('Encore 1 point pour Curieux de Byzance')
+  expect(prochainEnClair(null)).toBe('Tu as atteint le plus haut titre de cette culture.')
 })

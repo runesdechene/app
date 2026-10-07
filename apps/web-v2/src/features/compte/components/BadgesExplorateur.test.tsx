@@ -33,6 +33,8 @@ const BASE: ExplorateurProfile = {
   signe: null,
   fragmentsADecouvrir: null,
   compagnies: [],
+  connaissances: [],
+  polymathe: null,
   estMoi: true,
 }
 

@@ -14,8 +14,6 @@ const PHRASES: Record<string, (n: number) => string> = {
   places_visited: (n) => `en visitant ${lieux(n)} sur place`,
   places_added: (n) => `en ajoutant ${lieux(n)}`,
   places_enriched: (n) => `en enrichissant ${lieux(n)}`,
-  connaissance: (n) => `en réunissant ${String(n)} ${n > 1 ? 'points' : 'point'} de connaissance`,
-  polymathe: (n) => `en devenant Sage dans ${String(n)} cultures`,
 }
 
 function lieux(n: number): string {

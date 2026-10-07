@@ -32,6 +32,8 @@ const byzance = {
   },
   resolues: 14,
   total: 72,
+  grade: { titre: 'Lettré de Byzance', rang: 3 },
+  prochain: { titre: 'Initié de Byzance', rang: 4, manque: 6 },
   centre: { lat: 41, lng: 28.9 },
   enigmes: [
     { numero: 242, reponse: 'Sainte-Sophie', question: 'Quel monument ?', explication: 'La plus grande coupole…', le: '2026-05-03T10:00:00Z' },
@@ -87,6 +89,23 @@ test('la page s’ouvre sur le portrait de la culture, réglé dans le Hub ; san
   afficher()
   await screen.findByText('14 / 72')
   expect(screen.queryByRole('region', { name: 'Byzance, en quelques mots' })).toBeNull()
+})
+
+test('mon grade dans la culture, ses étoiles, et ce qui manque pour le suivant (mig 452)', async () => {
+  api.fetchMaCulture.mockResolvedValue(byzance)
+  afficher()
+  const grade = await screen.findByRole('region', { name: 'Mon grade' })
+  expect(grade).toHaveTextContent('Lettré de Byzance')
+  expect(grade).toHaveTextContent('Encore 6 points pour Initié de Byzance')
+  expect(screen.getByRole('img', { name: 'rang 3 sur 7' })).toBeInTheDocument()
+})
+
+test('sans grade encore : seulement ce qui manque pour le premier', async () => {
+  api.fetchMaCulture.mockResolvedValue({ ...byzance, grade: null, prochain: { titre: 'Curieux de Byzance', rang: 1, manque: 1 } })
+  afficher()
+  const grade = await screen.findByRole('region', { name: 'Mon grade' })
+  expect(grade).toHaveTextContent('Encore 1 point pour Curieux de Byzance')
+  expect(screen.queryByRole('img', { name: /sur 7/ })).toBeNull()
 })
 
 test('sans cercle, pas de lien vers la carte', async () => {

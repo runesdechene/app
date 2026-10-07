@@ -22,6 +22,7 @@
 | `accueil_nouveaute()` | la V2 ne l'appelle plus : « Nouvelles de la marque » retirée de l'Accueil (Uriel, 28/09), la Saga prendra sa place ; `announcements` reste, le Hub et la V1 s'en servent | supprimer si la Saga ne la reprend pas | après bascule | 28/09 |
 | `places.accessibility`, `places.best_season`, `places.bivouac` | remplacées par `acces`, `quand`, `bivouac_tolere` (mig 414) ; plus lues par la V2 | supprimer | après bascule | spec enrichir 05/10 |
 | `edit_place_description`, `restore_place_description_revision`, `get_place_description_history`, `place_description_revisions`, `contribute_to_place` (types texte), `_rubrique_v1` | V1 en lecture seule (mig 414) ; l'histoire vit dans `versions_lieu` | supprimer | quand la V1 s'arrête | spec enrichir 05/10 |
+| `get_mes_titres` : clés `cultures` (toujours `[]`) et `polymathe` (toujours NULL) | les connaissances ont quitté « Tous les titres » (gélules du profil) ; les clés restent pour la V2 1.5/1.6 qui les lit | retirer les deux clés, et leur lecture dans `lireMesTitres.ts` | quand aucune V2 en ligne ne les lit plus | mig 452 |
 
 ## 1bis. En sommeil — ne PAS supprimer
 

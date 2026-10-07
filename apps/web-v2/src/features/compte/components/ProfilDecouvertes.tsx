@@ -13,6 +13,7 @@ import { useMaPosition } from '@/shared/hooks/useMaPosition'
 import type { Point } from '@/shared/lib/distance'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
 import { PasseportProfil } from './PasseportProfil'
+import { ProfilConnaissances } from './ProfilConnaissances'
 import styles from './ProfilDecouvertes.module.css'
 
 export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
@@ -28,6 +29,7 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
       {profil.envies && (
         <Section titre="Envie d’y aller" lieux={profil.envies} position={position} avecAuteur />
       )}
+      <ProfilConnaissances profil={profil} />
       {profil.nbVisites > 0 && <PasseportProfil id={profil.id} />}
     </>
   )

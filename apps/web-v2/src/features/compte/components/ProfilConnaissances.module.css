@@ -1,0 +1,123 @@
+/*
+ * QUOI     — les gélules « Connaissances » du profil (maquette 500:897) : une ligne qui défile.
+ */
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* le carrousel ne doit pas élargir la page */
+  gap: var(--space-2);
+}
+
+.titre {
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-detail-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.nombre {
+  margin-left: var(--space-1);
+  color: var(--color-texte-pale);
+}
+
+.aide {
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+}
+
+.cadre {
+  display: flex;
+}
+
+.rangee {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-1) var(--space-6) var(--space-2);
+  overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.rangee::-webkit-scrollbar {
+  display: none;
+}
+
+/* Une gélule, teintée de la couleur de sa culture. */
+.gelule {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--couleur-culture, var(--color-ocre)) 50%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--couleur-culture, var(--color-ocre)) 10%, transparent);
+}
+
+.gelule[data-polymathe] {
+  --couleur-culture: var(--color-ocre);
+}
+
+/* Le petit cachet : la couleur de la culture, son logo (ou son initiale) sur un cœur clair. */
+.sceau {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--couleur-culture, var(--color-ocre));
+}
+
+.coeur {
+  display: grid;
+  place-items: center;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: var(--color-feuille);
+  color: var(--couleur-culture, var(--color-ocre));
+  font-family: var(--font-titre);
+  font-size: var(--legende-size);
+  line-height: 1;
+}
+
+.logo {
+  width: 75%;
+  height: 75%;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.texte {
+  display: grid;
+}
+
+.nom {
+  color: var(--couleur-culture, var(--color-ocre));
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  white-space: nowrap;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-texte-pale);
+  font-size: var(--micro-size);
+  white-space: nowrap;
+}
+
+.etoiles {
+  color: var(--couleur-culture, var(--color-ocre));
+  letter-spacing: var(--libelle-tracking);
+}

@@ -36,6 +36,10 @@ const COMPLET = {
   signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' },
   fragmentsADecouvrir: 5,
   compagnies: [],
+  connaissances: [
+    { culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null }, titre: 'Sage de Byzance', rang: 6, enigmes: 36 },
+  ],
+  polymathe: null,
   estMoi: true,
 }
 
@@ -104,4 +108,13 @@ test('ses Compagnies se lisent ; absentes, aucune', () => {
   })
   expect(p?.compagnies).toEqual([{ id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }])
   expect(lireProfil({ ...COMPLET, compagnies: undefined })?.compagnies).toEqual([])
+})
+
+test('avant la migration 452, ni connaissances ni Polymathe', () => {
+  const ancien: Record<string, unknown> = { ...COMPLET }
+  delete ancien.connaissances
+  delete ancien.polymathe
+  const p = lireProfil(ancien)
+  expect(p?.connaissances).toEqual([])
+  expect(p?.polymathe).toBeNull()
 })

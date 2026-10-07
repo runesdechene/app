@@ -16,6 +16,9 @@ export type CultureResolue = {
 export type MesEnigmes = { resolues: number; total: number; cultures: CultureResolue[] }
 // `numero` : son numéro fixe, le même pour tous (migration 448).
 export type EnigmeApprise = { numero: number; reponse: string; question: string; explication: string; le: string }
+// Mon grade dans la culture et le titre suivant, avec ce qui manque en points (migration 452).
+export type Grade = { titre: string; rang: number }
+export type Prochain = { titre: string; rang: number; manque: number }
 export type MaCulture = {
   // presentation : le portrait de la culture, réglé dans le Hub (migration 450).
   culture: {
@@ -28,6 +31,8 @@ export type MaCulture = {
   }
   resolues: number
   total: number
+  grade: Grade | null
+  prochain: Prochain | null
   centre: { lat: number; lng: number } | null
   enigmes: EnigmeApprise[]
 }
@@ -75,7 +80,20 @@ export function lireMaCulture(v: unknown): MaCulture {
     },
     resolues: nombre(o.resolues),
     total: nombre(o.total),
+    // Absents avant la migration 452 : aucun.
+    grade: o.grade === undefined ? null : ouNull(grade)(o.grade),
+    prochain: o.prochain === undefined ? null : ouNull(prochain)(o.prochain),
     centre: ouNull(centre)(o.centre),
     enigmes: liste(enigmeApprise)(o.enigmes),
   }
+}
+
+function grade(v: unknown): Grade {
+  const o = objet(v)
+  return { titre: chaine(o.titre), rang: nombre(o.rang) }
+}
+
+function prochain(v: unknown): Prochain {
+  const o = objet(v)
+  return { titre: chaine(o.titre), rang: nombre(o.rang), manque: nombre(o.manque) }
 }
