@@ -1,0 +1,31 @@
+/*
+ * QUOI     — la pastille d'une culture : un rond crème cerclé de sa couleur, son icône ou un disque.
+ */
+.pastille {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.125rem;
+  height: 2.125rem;
+  border: 2px solid var(--couleur-culture, var(--color-carte-encre));
+  border-radius: 50%;
+  background: var(--color-feuille);
+}
+
+.pastille[data-taille='grande'] {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.pastille img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+
+.disque {
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  background: var(--couleur-culture, var(--color-carte-encre));
+}

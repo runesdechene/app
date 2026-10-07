@@ -28,6 +28,9 @@ const PASSED_INLINE = new Set([
   '--teinte-sous-titre',
   '--ombre-texte',
   '--ombre-force',
+  '--x',
+  '--y',
+  '--couleur-culture',
   '--couleur', // la couleur d'une Compagnie (mig 422)
   '--encre-compagnie', // son encre lisible (shared/lib/teinte.ts)
   '--sur-couleur',

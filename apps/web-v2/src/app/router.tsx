@@ -22,6 +22,8 @@ import {
   RouteNotifications,
   RouteNouveautes,
   RouteTitres,
+  RouteEnigmes,
+  RouteEnigmesCulture,
 } from './routes/carte'
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
@@ -67,6 +69,8 @@ export const routes: RouteObject[] = [
               { path: 'notifications', Component: RouteNotifications },
               { path: 'nouveautes', Component: RouteNouveautes },
               { path: 'titres', Component: RouteTitres },
+              { path: 'enigmes', Component: RouteEnigmes },
+              { path: 'enigmes/:culture', Component: RouteEnigmesCulture },
               { path: 'lieu/:id', Component: RouteLieu },
               { path: 'lieu/:id/modifier', Component: RouteModifierLieu },
               { path: 'lieu/:id/carnet', Component: RouteCarnet },

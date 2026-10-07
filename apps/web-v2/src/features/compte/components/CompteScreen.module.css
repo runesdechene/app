@@ -1,6 +1,5 @@
 /*
- * QUOI     — l'onglet Compte : les badges en haut à droite, le profil, puis les entrées du compte
- *            (grandes cibles, Cabin semi-gras ; la déconnexion en rouge).
+ * QUOI     — l'onglet Compte : les badges en haut à droite, puis le profil.
  */
 .compte {
   position: relative;
@@ -16,43 +15,10 @@
   z-index: 1;
 }
 
-.entrees {
-  display: grid;
-  justify-items: start;
-  padding: 0 var(--space-6);
-}
-
-.entree {
-  min-height: var(--cible-tactile);
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--color-encre);
-  font-family: var(--font-corps);
-  font-size: var(--corps-size);
-  font-weight: var(--weight-semi);
-  text-align: left;
-}
-
-.sortie {
-  color: var(--color-accent);
-}
-
-.alerte {
-  margin: 0;
-  color: var(--color-accent);
-  font-family: var(--font-corps);
-  font-size: var(--legende-size);
-}
-
-/* Sur PC, Préférences et Déconnexion vivent dans la barre de gauche (Uriel, 28/09). Sans l'en-tête
-   du téléphone, le portrait touchait le haut du tiroir : ~50 px d'air au-dessus (Uriel, 28/09). */
+/* Sur PC, sans l'en-tête du téléphone, le portrait touchait le haut du tiroir : ~50 px d'air
+   au-dessus (Uriel, 28/09). */
 @container app (width >= 1024px) {
   .compte {
     padding-top: calc(var(--space-8) + var(--space-4));
-  }
-
-  .entrees {
-    display: none;
   }
 }

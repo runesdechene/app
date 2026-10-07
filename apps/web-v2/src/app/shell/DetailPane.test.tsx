@@ -72,10 +72,8 @@ function renderAt(path: string) {
 test('l’onglet Compte montre mon profil', async () => {
   renderAt('/compte')
   expect(await screen.findByText('Uriel')).toBeInTheDocument()
-  // La page Compte a ses propres entrées (la barre PC en a aussi : jsdom ne lit pas le CSS).
-  const compte = screen.getByRole('navigation', { name: 'Mon compte' })
-  expect(within(compte).getByRole('button', { name: 'Préférences' })).toBeInTheDocument()
-  expect(within(compte).getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+  // Préférences et la sortie sont dans le menu du profil (07/10), plus sur la page.
+  expect(screen.queryByRole('navigation', { name: 'Mon compte' })).toBeNull()
 })
 
 test('le profil d’un autre s’intitule « Profil »', async () => {
@@ -141,9 +139,10 @@ test('/modifier de mon profil : le formulaire', async () => {
   expect(await screen.findByRole('heading', { name: 'Modifier mon profil' })).toBeInTheDocument()
 })
 
-test('Préférences s’ouvre depuis l’onglet Compte, et fermer y ramène', async () => {
+test('Préférences s’ouvre depuis le menu du profil, et fermer ramène à Compte', async () => {
   const router = renderAt('/compte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Préférences' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Compte' }))
+  await userEvent.click(within(await screen.findByRole('dialog', { name: 'Mon menu' })).getByRole('button', { name: /Préférences/ }))
   expect(await screen.findByRole('heading', { name: 'Préférences' })).toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   expect(router.state.location.pathname).toBe('/compte')

@@ -8,7 +8,7 @@ import { aLaTaille } from '@/shared/lib/image'
 import styles from './Avatar.module.css'
 
 // La largeur affichée de chaque format (Avatar.module.css) : l'image arrive à cette taille.
-const PIXELS = { mini: 22, petit: 36, grand: 120 } as const
+const PIXELS = { mini: 22, petit: 36, moyen: 52, grand: 120 } as const
 
 export function Avatar({
   url,
@@ -17,7 +17,7 @@ export function Avatar({
 }: {
   url: string | null
   nom: string
-  taille: 'mini' | 'petit' | 'grand'
+  taille: 'mini' | 'petit' | 'moyen' | 'grand'
 }) {
   const className = [styles.avatar, styles[taille]].join(' ')
   if (url) {

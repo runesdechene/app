@@ -23,6 +23,9 @@ import {
 import { Notifications } from '@/features/notifications/components/Notifications'
 import { Nouveautes } from '@/features/notifications/components/Nouveautes'
 import { PageTitres } from '@/features/titres/components/PageTitres'
+import { PageCulture } from '@/features/enigmes/components/PageCulture'
+import { PageEnigmes } from '@/features/enigmes/components/PageEnigmes'
+import { useMaCulture } from '@/features/enigmes/hooks/useMesEnigmes'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
@@ -191,6 +194,32 @@ export function RouteTitres() {
   return (
     <DetailPane title="Tous les titres">
       <PageTitres />
+    </DetailPane>
+  )
+}
+
+// « Les énigmes » (Uriel, 07/10) : un panneau sur l'onglet courant, comme « Tous les titres » ;
+// une culture s'ouvre en dessous (/…/enigmes/<culture>).
+export function RouteEnigmes() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  return (
+    <DetailPane title="Les énigmes">
+      <PageEnigmes
+        onOuvrirCulture={(id) => {
+          void navigate(`${pathname}/${id}`)
+        }}
+      />
+    </DetailPane>
+  )
+}
+
+export function RouteEnigmesCulture() {
+  const { culture = '' } = useParams()
+  const { maCulture } = useMaCulture(culture)
+  return (
+    <DetailPane title={maCulture?.culture.nom ?? 'Les énigmes'}>
+      <PageCulture id={culture} />
     </DetailPane>
   )
 }

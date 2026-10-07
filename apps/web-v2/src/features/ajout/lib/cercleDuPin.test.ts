@@ -14,6 +14,7 @@ const couleurs: CouleursCarte = {
   halo: '#f4e9d1',
   foret: '#b9b58a',
   ombre: '#5a442c8c',
+  cire: '#a94842',
 }
 const PIN = { latitude: 43.7, longitude: 7.2 }
 

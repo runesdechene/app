@@ -17,8 +17,9 @@ Cette spec remplace, pour les énigmes, la ligne « Couronnes et énigmes en som
 ## Le jeu
 
 - **Des cultures** : Mythologie nordique, Mondes celtes, Rome antique, Grèce antique, Byzance au lancement
-  (les cinq thèmes de la V1, `enigma_themes`, ~450 énigmes). Chacune a une **zone** sur la carte : deux ou
-  trois cercles tracés dans le Hub, mer comprise. Les zones **se chevauchent exprès** (l'Égée est grecque et
+  (les cinq thèmes de la V1, `enigma_themes`, ~450 énigmes). Chacune a une **zone** sur la carte : autant de
+  cercles qu'on veut, tracés dans le Hub (5 km à 1 000 km), mer comprise — chacun tiré à égalité, un
+  petit cercle vaut un site précis (Uriel, 07/10, migration 444). Les zones **se chevauchent exprès** (l'Égée est grecque et
   byzantine).
 - **Le réveil** : chaque matin, chaque culture éveille **une énigme**, posée à un point tiré **au hasard dans
   sa zone**. Les positions sont **les mêmes pour tous**. Au plus **7 énigmes éveillées par culture** : au-delà,

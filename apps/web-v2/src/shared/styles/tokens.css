@@ -54,6 +54,7 @@
   --color-carte-halo: #f4e9d1;
   --color-carte-foret: #b9b58a;
   --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
+  --color-carte-cire: #a94842; /* le sceau des énigmes : l'accent, en hex pour MapLibre */
 
   /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */
   --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */
@@ -111,6 +112,7 @@
   --nom-profil-size: 2.25rem; /* le nom sous le portrait : 36 px (maquette 123:107) */
   --rangee-size: 1.125rem; /* « Ses fragments », onglets des découvertes : 18 px */
   --bio-size: 1rem; /* la présentation : 16 px (Uriel, 27/09 : deux points de plus) */
+  --recit-enigme-size: 1.0625rem; /* le récit d'une énigme, IM Fell : 17 px (Figma 460:380) */
   --bio-leading: 1.29;
   --inscription-size: 1.875rem; /* le nom du territoire sur la carte : 30 px (maquette 200:192) */
   --inscription-tracking: 0.02em;

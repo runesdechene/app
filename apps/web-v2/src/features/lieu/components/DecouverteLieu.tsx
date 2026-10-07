@@ -21,9 +21,9 @@ import type { CoutDecouverte, FicheLieu } from '../api/lireLieu'
 import { useCoutDecouverte } from '../hooks/useCoutDecouverte'
 import { useDecouvrir } from '../hooks/useDecouvrir'
 import { useGrattage } from '../hooks/useGrattage'
-import { tinter } from '../lib/tintement'
 import styles from './DecouverteLieu.module.css'
 import { Recompense } from '@/shared/ui/Recompense'
+import { tinter } from '@/shared/lib/sons'
 
 const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const KM = new Intl.NumberFormat('fr-FR')

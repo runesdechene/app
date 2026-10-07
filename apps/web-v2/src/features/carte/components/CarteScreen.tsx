@@ -33,6 +33,8 @@ import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
+import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
+import { FeuilleEnigme } from './FeuilleEnigme'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
@@ -40,6 +42,9 @@ import { ajouterZones } from '../lib/actifs'
 import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
+import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
+import { lireCentre } from '../lib/centre'
+import { claquerLaCire } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
@@ -116,7 +121,8 @@ function CarteVivante({
   const [lieuxPoses, setLieuxPoses] = useState(false)
   const couleurTypes = useLieuxEnCouleur(!visiteur)
   const navigate = useNavigate()
-  // « Trouver sur la carte » (fiche d'un lieu) arrive par l'adresse : /carte?centre=lat,lng.
+  // « Trouver sur la carte » (fiche d'un lieu) et « Les chercher sur la carte » (énigmes) arrivent par
+  // l'adresse : /carte?centre=lat,lng[,zoom].
   const [recherche, setRecherche] = useSearchParams()
   const centre = recherche.get('centre')
   const [vue, setVue] = useState<Vue | null>(null)
@@ -137,6 +143,11 @@ function CarteVivante({
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
+  const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
+  useEnigmesSurLaCarte(visiteur ? null : carte, (t) => {
+    claquerLaCire()
+    setEnigmeTouchee(t)
+  })
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {
@@ -167,7 +178,7 @@ function CarteVivante({
 
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
-      if (typeof id === 'string' && !surUnPin(map, e.point)) {
+      if (typeof id === 'string' && !surUnPin(map, e.point) && !surUneEnigme(map, e.point)) {
         void navigate(visiteur ? `/bienvenue/carte/lieu/${id}` : `/carte/lieu/${id}`)
       }
     })
@@ -180,6 +191,7 @@ function CarteVivante({
       ajouterCalques(map, couleurs, ecran)
       if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
       if (!visiteur) void poserMesPins(map, couleurs).catch(() => undefined)
+      if (!visiteur) void poserEnigmes(map, couleurs, ecran).catch(() => undefined)
       suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()
@@ -213,13 +225,11 @@ function CarteVivante({
     }
   }, [carte])
 
-  // La carte vole jusqu'au lieu demandé, puis l'adresse redevient /carte (sans historique).
+  // La carte vole jusqu'à l'endroit demandé, puis l'adresse redevient /carte (sans historique).
   useEffect(() => {
     if (!carte || !centre || !tiroirMesure) return
-    const [lat, lng] = centre.split(',').map(Number)
-    if (lat !== undefined && lng !== undefined && Number.isFinite(lat) && Number.isFinite(lng)) {
-      carte.flyTo({ center: [lng, lat], zoom: 14 })
-    }
+    const vise = lireCentre(centre)
+    if (vise) carte.flyTo({ center: [vise.lng, vise.lat], zoom: vise.zoom })
     setRecherche({}, { replace: true })
   }, [carte, centre, tiroirMesure, setRecherche])
 
@@ -373,6 +383,15 @@ function CarteVivante({
           }}
           onFermer={() => {
             setListeOuverte(false)
+          }}
+        />
+      )}
+      {enigmeTouchee && (
+        <FeuilleEnigme
+          key={enigmeTouchee.id}
+          touchee={enigmeTouchee}
+          onFermer={() => {
+            setEnigmeTouchee(null)
           }}
         />
       )}

@@ -1093,6 +1093,7 @@ export type Database = {
           correct: boolean
           enigma_id: number
           erudition_gained: number
+          eveil_id: number | null
           fragment_id: number | null
           id: number
           influence_gained: number
@@ -1104,6 +1105,7 @@ export type Database = {
           correct: boolean
           enigma_id: number
           erudition_gained?: number
+          eveil_id?: number | null
           fragment_id?: number | null
           id?: number
           influence_gained?: number
@@ -1115,6 +1117,7 @@ export type Database = {
           correct?: boolean
           enigma_id?: number
           erudition_gained?: number
+          eveil_id?: number | null
           fragment_id?: number | null
           id?: number
           influence_gained?: number
@@ -1127,6 +1130,13 @@ export type Database = {
             columns: ["enigma_id"]
             isOneToOne: false
             referencedRelation: "enigmas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enigma_responses_eveil_id_fkey"
+            columns: ["eveil_id"]
+            isOneToOne: false
+            referencedRelation: "enigmes_eveillees"
             referencedColumns: ["id"]
           },
           {
@@ -1148,27 +1158,36 @@ export type Database = {
       enigma_themes: {
         Row: {
           active: boolean
+          cercles: Json
           color: string | null
+          complement: string | null
           icon: string | null
           id: string
           label: string
           sort_order: number
+          zone: string | null
         }
         Insert: {
           active?: boolean
+          cercles?: Json
           color?: string | null
+          complement?: string | null
           icon?: string | null
           id: string
           label: string
           sort_order?: number
+          zone?: string | null
         }
         Update: {
           active?: boolean
+          cercles?: Json
           color?: string | null
+          complement?: string | null
           icon?: string | null
           id?: string
           label?: string
           sort_order?: number
+          zone?: string | null
         }
         Relationships: []
       }
@@ -1231,6 +1250,51 @@ export type Database = {
           },
           {
             foreignKeyName: "enigmas_theme_fkey"
+            columns: ["theme"]
+            isOneToOne: false
+            referencedRelation: "enigma_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enigmes_eveillees: {
+        Row: {
+          effacee_le: string | null
+          enigma_id: number
+          eveillee_le: string
+          id: number
+          lat: number
+          lng: number
+          theme: string
+        }
+        Insert: {
+          effacee_le?: string | null
+          enigma_id: number
+          eveillee_le?: string
+          id?: never
+          lat: number
+          lng: number
+          theme: string
+        }
+        Update: {
+          effacee_le?: string | null
+          enigma_id?: number
+          eveillee_le?: string
+          id?: never
+          lat?: number
+          lng?: number
+          theme?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enigmes_eveillees_enigma_id_fkey"
+            columns: ["enigma_id"]
+            isOneToOne: false
+            referencedRelation: "enigmas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enigmes_eveillees_theme_fkey"
             columns: ["theme"]
             isOneToOne: false
             referencedRelation: "enigma_themes"
@@ -2365,24 +2429,30 @@ export type Database = {
       mises_a_jour: {
         Row: {
           id: number
+          image: string | null
           par: string | null
           publiee_le: string
           texte: string
           titre: string
+          version: string | null
         }
         Insert: {
           id?: number
+          image?: string | null
           par?: string | null
           publiee_le?: string
           texte: string
           titre: string
+          version?: string | null
         }
         Update: {
           id?: number
+          image?: string | null
           par?: string | null
           publiee_le?: string
           texte?: string
           titre?: string
+          version?: string | null
         }
         Relationships: [
           {
@@ -2729,6 +2799,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      paliers_connaissance: {
+        Row: {
+          nom_f: string
+          nom_m: string
+          palier: number
+          part: number
+          plancher: number
+        }
+        Insert: {
+          nom_f: string
+          nom_m: string
+          palier: number
+          part: number
+          plancher: number
+        }
+        Update: {
+          nom_f?: string
+          nom_m?: string
+          palier?: number
+          part?: number
+          plancher?: number
+        }
+        Relationships: []
       }
       password_resets: {
         Row: {
@@ -4206,6 +4300,59 @@ export type Database = {
           },
         ]
       }
+      revendications: {
+        Row: {
+          cree_le: string
+          id: number
+          place_id: string
+          pour_compagnie: string | null
+          user_id: string
+        }
+        Insert: {
+          cree_le?: string
+          id?: number
+          place_id: string
+          pour_compagnie?: string | null
+          user_id: string
+        }
+        Update: {
+          cree_le?: string
+          id?: number
+          place_id?: string
+          pour_compagnie?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revendications_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revendications_pour_compagnie_fkey"
+            columns: ["pour_compagnie"]
+            isOneToOne: false
+            referencedRelation: "factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revendications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revendications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           created_at: string
@@ -4703,6 +4850,7 @@ export type Database = {
           icon: string | null
           id: number
           name: string
+          name_f: string | null
           order: number
           type: string
           unlocks: string[] | null
@@ -4715,6 +4863,7 @@ export type Database = {
           icon?: string | null
           id?: number
           name: string
+          name_f?: string | null
           order?: number
           type: string
           unlocks?: string[] | null
@@ -4727,6 +4876,7 @@ export type Database = {
           icon?: string | null
           id?: number
           name?: string
+          name_f?: string | null
           order?: number
           type?: string
           unlocks?: string[] | null
@@ -4737,6 +4887,46 @@ export type Database = {
             columns: ["faction_id"]
             isOneToOne: false
             referencedRelation: "factions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      titres_connaissance: {
+        Row: {
+          obtenu_le: string
+          title_id: number
+          user_id: string
+        }
+        Insert: {
+          obtenu_le?: string
+          title_id: number
+          user_id: string
+        }
+        Update: {
+          obtenu_le?: string
+          title_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "titres_connaissance_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "titres_connaissance_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "titres_connaissance_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
             referencedColumns: ["id"]
           },
         ]
@@ -5964,6 +6154,10 @@ export type Database = {
         }
         Returns: Json
       }
+      _attribuer_titres_connaissance: {
+        Args: { p_theme: string; p_user: string }
+        Returns: string[]
+      }
       _auteur_du_chemin: { Args: { p_evenement: string }; Returns: string }
       _barem: { Args: { p_default?: number; p_key: string }; Returns: number }
       _blob_dominant_faction: {
@@ -6011,6 +6205,7 @@ export type Database = {
         }
         Returns: Json
       }
+      _creer_titres_culture: { Args: { p_theme: string }; Returns: undefined }
       _crown_eligible_today: {
         Args: { p_n_total: number; p_place_id: string; p_user_id: string }
         Returns: boolean
@@ -6067,6 +6262,38 @@ export type Database = {
         Args: { p_from?: string; p_to?: string; p_user_id: string }
         Returns: number
       }
+      _enigmes_du_jeu: {
+        Args: { p_theme: string }
+        Returns: {
+          active: boolean
+          answer: string
+          choices: Json | null
+          created_at: string
+          difficulty: string
+          explanation: string
+          format: string
+          fragment_id: number | null
+          id: number
+          lore_text: string
+          place_tag: string | null
+          question: string
+          theme: string | null
+          type: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "enigmas"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      _enigmes_resolues: {
+        Args: { p_theme: string; p_user: string }
+        Returns: {
+          enigma_id: number
+          le: string
+        }[]
+      }
       _est_porteur: { Args: { p_user: string }; Returns: boolean }
       _etat_du_lieu: {
         Args: { p_id: string }
@@ -6082,6 +6309,25 @@ export type Database = {
           recit: string
         }[]
       }
+      _eveil_en_attente: {
+        Args: { p_eveil: number }
+        Returns: {
+          effacee_le: string | null
+          enigma_id: number
+          eveillee_le: string
+          id: number
+          lat: number
+          lng: number
+          theme: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "enigmes_eveillees"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      _eveiller_enigmes: { Args: never; Returns: number }
       _faction_chef: { Args: { p_faction_id: string }; Returns: string }
       _faction_gold_coupe: {
         Args: { p_faction_id: string; p_from?: string; p_to?: string }
@@ -6118,6 +6364,7 @@ export type Database = {
       _level_from_xp: { Args: { p_xp: number }; Returns: number }
       _lieu_public: { Args: { p_id: string }; Returns: boolean }
       _lieu_visible: { Args: { p_id: string }; Returns: boolean }
+      _lieux_compagnie: { Args: { p_id: string }; Returns: number }
       _member_gold_coupe: {
         Args: {
           p_faction_id: string
@@ -6133,6 +6380,13 @@ export type Database = {
       }
       _mot: { Args: { p_id: number }; Returns: Json }
       _nature_de: { Args: { p_id: string }; Returns: Json }
+      _nom_titre: {
+        Args: {
+          p_genre: string
+          p_titre: Database["public"]["Tables"]["titles"]["Row"]
+        }
+        Returns: string
+      }
       _notification_v2: { Args: { p_type: string }; Returns: boolean }
       _notify_court_challengers: {
         Args: {
@@ -6180,6 +6434,15 @@ export type Database = {
         }
       }
       _pin_frais: { Args: { p_pose_le: string }; Returns: boolean }
+      _poids_enigme: { Args: { p_difficulte: string }; Returns: number }
+      _point_dans_les_cercles: {
+        Args: { p_cercles: Json }
+        Returns: Record<string, unknown>
+      }
+      _points_connaissance: {
+        Args: { p_theme: string; p_user: string }
+        Returns: number
+      }
       _presents_autour: {
         Args: { p_id: string }
         Returns: {
@@ -6232,9 +6495,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      _seuil_connaissance: {
+        Args: { p_palier: number; p_theme: string }
+        Returns: number
+      }
       _silhouette: { Args: { p_geom: unknown }; Returns: Json }
       _succession: { Args: { p_id: string }; Returns: undefined }
       _top_user_for_place: { Args: { p_place_id: string }; Returns: string }
+      _total_connaissance: { Args: { p_theme: string }; Returns: number }
       _unlike_contribution_internal: {
         Args: { p_contribution_id: number; p_user_id: string }
         Returns: Json
@@ -6598,6 +6866,7 @@ export type Database = {
         }
         Returns: Json
       }
+      cultures_du_hub: { Args: never; Returns: Json }
       daitch_mokotoff: { Args: { "": string }; Returns: string[] }
       decouvrir_lieu: {
         Args: { p_id: string; p_lat?: number; p_lng?: number }
@@ -6673,6 +6942,21 @@ export type Database = {
           p_voyage_id: string
         }
         Returns: Json
+      }
+      enigmes_en_attente: { Args: never; Returns: Json }
+      enregistrer_culture: {
+        Args: {
+          p_active: boolean
+          p_cercles: Json
+          p_complement: string
+          p_couleur: string
+          p_icone: string
+          p_id: string
+          p_label: string
+          p_ordre: number
+          p_zone?: string
+        }
+        Returns: undefined
       }
       epoques: { Args: never; Returns: Json }
       explorateurs_du_lieu: { Args: { p_id: string }; Returns: Json }
@@ -7248,6 +7532,8 @@ export type Database = {
       marquer_notifications_lues: { Args: never; Returns: number }
       marquer_registre_lu: { Args: never; Returns: undefined }
       mes_canaux: { Args: never; Returns: Json }
+      mes_enigmes: { Args: never; Returns: Json }
+      mes_enigmes_culture: { Args: { p_theme: string }; Returns: Json }
       mes_murmures: { Args: never; Returns: Json }
       mes_noms_d_expedition: { Args: never; Returns: string[] }
       mes_notifications: { Args: never; Returns: Json }
@@ -7327,6 +7613,16 @@ export type Database = {
         }
         Returns: Json
       }
+      modifier_mise_a_jour: {
+        Args: {
+          p_id: number
+          p_image?: string
+          p_texte: string
+          p_titre: string
+          p_version?: string
+        }
+        Returns: Json
+      }
       mon_energie: { Args: never; Returns: Json }
       mon_entree: { Args: never; Returns: Json }
       murmurer: { Args: { p_a: string; p_texte: string }; Returns: Json }
@@ -7347,7 +7643,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      ouvrir_enigme: { Args: { p_eveil: number }; Returns: Json }
       passages_au_registre: { Args: never; Returns: Json }
+      percer_enigme: {
+        Args: { p_eveil: number; p_reponse: string }
+        Returns: Json
+      }
       plant_flag: {
         Args: {
           p_expedition_name?: string
@@ -7394,7 +7695,12 @@ export type Database = {
         Returns: Json
       }
       publier_mise_a_jour: {
-        Args: { p_texte: string; p_titre: string }
+        Args: {
+          p_image?: string
+          p_texte: string
+          p_titre: string
+          p_version?: string
+        }
         Returns: Json
       }
       publish_announcement: {
