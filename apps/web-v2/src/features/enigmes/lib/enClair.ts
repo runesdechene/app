@@ -39,3 +39,10 @@ const ZOOM_DE_LA_ZONE = 6.5
 export function lienVersLaCarte(centre: { lat: number; lng: number }): string {
   return `/carte?centre=${String(centre.lat)},${String(centre.lng)},${String(ZOOM_DE_LA_ZONE)}`
 }
+
+// Ranger les énigmes apprises : par date de réussite (la plus récente en tête, l'ordre de la base)
+// ou par numéro, du plus petit au plus grand.
+export type Tri = 'date' | 'numero'
+export function rangerEnigmes<T extends { numero: number }>(enigmes: T[], tri: Tri): T[] {
+  return tri === 'numero' ? [...enigmes].sort((a, b) => a.numero - b.numero) : enigmes
+}

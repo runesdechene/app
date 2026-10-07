@@ -1,20 +1,28 @@
 /**
  * QUOI     — une culture dans « Les énigmes » (maquette 478:526) : « 14 / 72 résolues », l'encart de
  *            ce qui reste à percer (où ça s'éveille, et le lien qui vole sur la carte), puis chaque
- *            énigme résolue, numérotée — sa question, sa réponse, son « Le savais-tu ? » — la plus récente en
- *            tête. Tout en écriture droite et lisible : l'italique penchée ne se lisait pas (Uriel, 07/10).
+ *            énigme résolue, à son numéro fixe — sa question, qui se déplie sur sa réponse et son « Le
+ *            savais-tu ? » —, rangées par date de réussite (la plus récente en tête) ou par numéro. Tout en écriture droite et lisible : l'italique penchée ne se lisait pas (Uriel, 07/10).
  * POURQUOI — ce qu'on a appris se relit (Uriel, 07/10). Les énigmes ratées n'y sont pas : elles
  *            reviendront sur la carte.
  */
+import { useState } from 'react'
 import { Link } from 'react-router'
+import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { useMaCulture } from '../hooks/useMesEnigmes'
-import { encartEnClair, lienVersLaCarte, quandEnClair, resoluesEnClair } from '../lib/enClair'
+import { encartEnClair, lienVersLaCarte, quandEnClair, rangerEnigmes, resoluesEnClair, type Tri } from '../lib/enClair'
 import { PastilleCulture } from './PastilleCulture'
 import styles from './PageCulture.module.css'
 
+const TRIS = [
+  { id: 'date', libelle: 'Par date' },
+  { id: 'numero', libelle: 'Par numéro' },
+] as const
+
 export function PageCulture({ id }: { id: string }) {
   const { maCulture, erreur } = useMaCulture(id)
+  const [tri, setTri] = useState<Tri>('date')
 
   if (erreur) {
     return (
@@ -55,23 +63,33 @@ export function PageCulture({ id }: { id: string }) {
         </div>
       </section>
 
+      {enigmes.length > 1 && (
+        <Segments libelle="Ranger les énigmes" options={TRIS} valeur={tri} onChange={setTri} />
+      )}
       <ul className={styles.appris}>
-        {enigmes.map((e) => (
+        {rangerEnigmes(enigmes, tri).map((e) => (
           <li key={e.numero} className={styles.carte}>
-            <span className={styles.tete}>
-              {/* Son numéro fixe, le même pour tous : « je bloque sur la 242 » (Uriel, 07/10). */}
-              <span className={styles.numero}>{`N° ${String(e.numero)}`}</span>
-              <span className={styles.quand}>{quandEnClair(e.le)}</span>
-            </span>
-            <span className={styles.question}>{e.question}</span>
-            <span className={styles.reponse}>
-              <span className={styles.etiquette}>Réponse</span>
-              <span className={styles.bonne}>{e.reponse}</span>
-            </span>
-            <span className={styles.savais}>
-              <span className={styles.etiquette}>Le savais-tu ?</span>
-              <span>{e.explication}</span>
-            </span>
+            {/* Repliée, la question ; dépliée au toucher, la réponse et le savais-tu (Uriel, 07/10). */}
+            <details className={styles.pli}>
+              <summary className={styles.sommaire}>
+                <span className={styles.tete}>
+                  {/* Son numéro fixe, le même pour tous : « je bloque sur la 242 » (Uriel, 07/10). */}
+                  <span className={styles.numero}>{`N° ${String(e.numero)}`}</span>
+                  <span className={styles.quand}>{quandEnClair(e.le)}</span>
+                </span>
+                <span className={styles.question}>{e.question}</span>
+              </summary>
+              <div className={styles.deplie}>
+                <span className={styles.reponse}>
+                  <span className={styles.etiquette}>Réponse</span>
+                  <span className={styles.bonne}>{e.reponse}</span>
+                </span>
+                <span className={styles.savais}>
+                  <span className={styles.etiquette}>Le savais-tu ?</span>
+                  <span>{e.explication}</span>
+                </span>
+              </div>
+            </details>
           </li>
         ))}
       </ul>

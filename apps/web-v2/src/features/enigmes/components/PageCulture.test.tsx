@@ -3,6 +3,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { expect, test, vi } from 'vitest'
 import { PageCulture } from './PageCulture'
@@ -39,15 +40,18 @@ test('le compte, l’encart et le lien qui vole sur la zone', async () => {
   expect(screen.getByRole('link', { name: /Les chercher sur la carte/ })).toHaveAttribute('href', '/carte?centre=41,28.9,6.5')
 })
 
-test('une carte par énigme apprise : réponse, question, le savais-tu', async () => {
+test('une énigme apprise montre sa question ; la réponse et le savais-tu se déplient au toucher', async () => {
   api.fetchMaCulture.mockResolvedValue(byzance)
   afficher()
-  expect(await screen.findByText('Sainte-Sophie')).toBeInTheDocument()
-  expect(screen.getByText('Quel monument ?')).toBeInTheDocument()
-  expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
+  const question = await screen.findByText('Quel monument ?')
+  expect(screen.getByText('Sainte-Sophie')).not.toBeVisible()
+  expect(screen.getByText('La plus grande coupole…')).not.toBeVisible()
+  await userEvent.click(question)
+  expect(screen.getByText('Sainte-Sophie')).toBeVisible()
+  expect(screen.getByText('La plus grande coupole…')).toBeVisible()
 })
 
-test('chaque énigme porte son numéro fixe, le même pour tous ; les trous sont les énigmes pas encore percées', async () => {
+test('chaque énigme porte son numéro fixe ; on les range par date de réussite ou par numéro', async () => {
   api.fetchMaCulture.mockResolvedValue({
     ...byzance,
     enigmes: [
@@ -56,9 +60,13 @@ test('chaque énigme porte son numéro fixe, le même pour tous ; les trous sont
     ],
   })
   afficher()
-  const cartes = await screen.findAllByRole('listitem')
+  let cartes = await screen.findAllByRole('listitem')
   expect(cartes[0]).toHaveTextContent('N° 242')
   expect(cartes[1]).toHaveTextContent('N° 30')
+  await userEvent.click(screen.getByRole('radio', { name: 'Par numéro' }))
+  cartes = screen.getAllByRole('listitem')
+  expect(cartes[0]).toHaveTextContent('N° 30')
+  expect(cartes[1]).toHaveTextContent('N° 242')
 })
 
 test('sans cercle, pas de lien vers la carte', async () => {
