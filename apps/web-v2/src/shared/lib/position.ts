@@ -6,6 +6,34 @@
  */
 import type { Point } from './distance'
 
+// Où en est l'autorisation de position de ce navigateur. « impossible » : pas de géolocalisation,
+// ou pas de moyen de lire l'autorisation (la présence ne s'envoie alors jamais).
+export type Autorisation = 'accordee' | 'a-demander' | 'refusee' | 'impossible'
+
+const SELON_LE_NAVIGATEUR: Record<PermissionState, Autorisation> = {
+  granted: 'accordee',
+  prompt: 'a-demander',
+  denied: 'refusee',
+}
+
+export function autorisationDe(statut: PermissionStatus): Autorisation {
+  return SELON_LE_NAVIGATEUR[statut.state]
+}
+
+export async function statutDeLaPosition(): Promise<PermissionStatus | null> {
+  if (!('geolocation' in navigator) || !('permissions' in navigator)) return null
+  try {
+    return await navigator.permissions.query({ name: 'geolocation' })
+  } catch {
+    return null
+  }
+}
+
+export async function lireAutorisation(): Promise<Autorisation> {
+  const statut = await statutDeLaPosition()
+  return statut ? autorisationDe(statut) : 'impossible'
+}
+
 export async function positionSiAutorisee(): Promise<Point | null> {
   if (!('geolocation' in navigator) || !('permissions' in navigator)) return null
   const permission = await navigator.permissions.query({ name: 'geolocation' })

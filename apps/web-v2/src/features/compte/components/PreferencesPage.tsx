@@ -1,6 +1,7 @@
 /**
  * QUOI     — les Préférences (maquette 91:166) : ce qu'on t'envoie, ta présence sur la carte,
- *            ton compte.
+ *            ton compte. « Apparaître sur la carte » dit où en est l'autorisation de position et
+ *            la demande si elle ne l'a jamais été (07/10 : sans elle, on reste invisible).
  * POURQUOI — des phrases, pas des noms de colonnes : chaque réglage dit ce qu'il change pour
  *            l'Explorateur. « Montrer tes envies » s'ajoute à la maquette (spec Compte).
  *            Chaque ligne porte son icône de la maquette (`assets/ui/`).
@@ -17,8 +18,10 @@ import coeur from '@/assets/ui/coeur.svg'
 import courriel from '@/assets/ui/courriel.svg'
 import palette from '@/assets/ui/palette.svg'
 import pas from '@/assets/ui/pas.svg'
+import positionIcone from '@/assets/ui/position.svg'
 import question from '@/assets/ui/question.svg'
 import repere from '@/assets/ui/repere.svg'
+import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
 import { VERSION } from '@/shared/lib/version'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
@@ -34,9 +37,19 @@ import {
 import { usePush } from '../hooks/usePush'
 import styles from './PreferencesPage.module.css'
 
+// Ce que dit la ligne « Apparaître sur la carte » : on ne retire pas une autorisation depuis la
+// page, c'est le navigateur qui la garde — d'où un bouton seulement pour la demander.
+const SUR_LA_CARTE = {
+  accordee: 'Les Explorateurs te voient passer tant qu’Explore est ouverte.',
+  'a-demander': 'Autorise ta position pour que les Explorateurs te voient passer.',
+  refusee:
+    'Ta position est bloquée : autorise-la dans les réglages de ton navigateur ou de ton téléphone.',
+} as const
+
 export function PreferencesPage() {
   const { preferences, erreurChargement, reessayer, regler, echec } = usePreferences()
   const push = usePush()
+  const position = useAutorisationPosition()
   if (erreurChargement) {
     return (
       <div className={styles.page}>
@@ -113,6 +126,19 @@ export function PreferencesPage() {
       </Carte>
 
       <Carte titre="Ta présence sur la carte">
+        {position.autorisation && position.autorisation !== 'impossible' && (
+          <Ligne
+            icone={positionIcone}
+            titre="Apparaître sur la carte"
+            description={SUR_LA_CARTE[position.autorisation]}
+          >
+            {position.autorisation === 'a-demander' && (
+              <Button kind="discret" onClick={() => void position.autoriser()}>
+                Autoriser
+              </Button>
+            )}
+          </Ligne>
+        )}
         {ligne(
           'brouillerPistes',
           pas,

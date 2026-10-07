@@ -32,6 +32,7 @@ import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
 import { seDeconnecter } from '@/features/compte/api/session'
+import { InvitationPosition } from '@/features/carte/components/InvitationPosition'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
@@ -116,7 +117,7 @@ function CarteDeLaCoquille() {
 export function Shell() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  // Tant que l'app est ouverte (position déjà autorisée) : être proposé comme compagnon.
+  // Tant que l'app est ouverte (position autorisée) : sur la carte, et proposé comme compagnon.
   useSignalerPresence()
   useEnvoyerPins() // les pins posés sans réseau partent dès qu'il revient
   // Au téléphone, l'app s'ouvre sur l'Accueil : la carte se prépare derrière.
@@ -285,6 +286,8 @@ export function Shell() {
           })}
         </main>
         <Outlet />
+        {/* Une seule fois, si la position n'a jamais été demandée : sans elle, invisible. */}
+        <InvitationPosition />
         <TabBar
           onScrollTop={scrollTop}
           onToucher={() => {

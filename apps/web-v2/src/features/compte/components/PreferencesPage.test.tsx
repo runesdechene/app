@@ -5,7 +5,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi } from 'vitest'
+import { vi, type Mock } from 'vitest'
+import type { Autorisation } from '@/shared/lib/position'
 import { PreferencesPage } from './PreferencesPage'
 
 const api = vi.hoisted(() => ({
@@ -35,6 +36,14 @@ const push = vi.hoisted(() => ({
   desabonner: vi.fn(() => Promise.resolve()),
 }))
 vi.mock('../lib/push', () => push)
+
+type Position = { autorisation: Autorisation | null; autoriser: Mock<() => Promise<void>> }
+const position = vi.hoisted(
+  (): Position => ({ autorisation: 'accordee', autoriser: vi.fn(() => Promise.resolve()) }),
+)
+vi.mock('@/shared/hooks/useAutorisationPosition', () => ({
+  useAutorisationPosition: () => position,
+}))
 
 function ouvrir() {
   render(
@@ -147,4 +156,40 @@ test('sur iPhone hors de l’appli installée, la ligne dit comment faire', asyn
   ).toBeInTheDocument()
   expect(screen.queryByRole('switch', { name: 'Sur ce téléphone' })).toBeNull()
   push.pushDeCeTelephone.mockReturnValue('possible')
+})
+
+test('« Apparaître sur la carte » : jamais demandée, un bouton la demande', async () => {
+  position.autorisation = 'a-demander'
+  ouvrir()
+  await userEvent.click(await screen.findByRole('button', { name: 'Autoriser' }))
+  expect(position.autoriser).toHaveBeenCalled()
+  position.autorisation = 'accordee'
+})
+
+test('« Apparaître sur la carte » : accordée, elle le dit', async () => {
+  ouvrir()
+  expect(
+    await screen.findByText('Les Explorateurs te voient passer tant qu’Explore est ouverte.'),
+  ).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Autoriser' })).toBeNull()
+})
+
+test('« Apparaître sur la carte » : refusée, elle dit où la rouvrir', async () => {
+  position.autorisation = 'refusee'
+  ouvrir()
+  expect(
+    await screen.findByText(
+      'Ta position est bloquée : autorise-la dans les réglages de ton navigateur ou de ton téléphone.',
+    ),
+  ).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Autoriser' })).toBeNull()
+  position.autorisation = 'accordee'
+})
+
+test('sans géolocalisation, pas de ligne « Apparaître sur la carte »', async () => {
+  position.autorisation = 'impossible'
+  ouvrir()
+  expect(await screen.findByRole('region', { name: 'Ta présence sur la carte' })).toBeInTheDocument()
+  expect(screen.queryByText('Apparaître sur la carte')).toBeNull()
+  position.autorisation = 'accordee'
 })

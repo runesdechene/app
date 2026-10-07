@@ -1,19 +1,21 @@
 /**
  * QUOI     — tant que l'app est ouverte et la position autorisée, signaler sa présence au serveur
  *            au plus une fois par minute ; dès qu'on l'autorise en cours de route, aussi.
- * POURQUOI — c'est ce qui permet d'être proposé comme compagnon à qui revendique un lieu à côté
- *            (spec fiche §6). Jamais de demande de permission ici : sans autorisation, rien.
+ * POURQUOI — c'est ce qui fait apparaître l'Explorateur sur la carte (Actifs) et le propose comme
+ *            compagnon à qui revendique un lieu à côté (spec fiche §6). Jamais de demande de
+ *            permission ici : c'est l'invitation « Apparaître sur la carte » qui la fait.
  */
 import { useEffect } from 'react'
+import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
 import { signalerPresence } from '../api/lieu'
 
 const UNE_MINUTE = 60_000
 
 export function useSignalerPresence() {
+  const { autorisation } = useAutorisationPosition()
+
   useEffect(() => {
-    if (!('geolocation' in navigator) || !('permissions' in navigator)) return
-    let annule = false
-    let minuteur: ReturnType<typeof setInterval> | undefined
+    if (autorisation !== 'accordee') return
     const signaler = () => {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
@@ -24,24 +26,10 @@ export function useSignalerPresence() {
         { maximumAge: UNE_MINUTE, timeout: 15_000 },
       )
     }
-    const suivre = (statut: PermissionStatus) => {
-      clearInterval(minuteur)
-      if (annule || statut.state !== 'granted') return
-      signaler()
-      minuteur = setInterval(signaler, UNE_MINUTE)
-    }
-    navigator.permissions.query({ name: 'geolocation' }).then(
-      (statut) => {
-        statut.onchange = () => {
-          suivre(statut)
-        }
-        suivre(statut)
-      },
-      () => undefined,
-    )
+    signaler()
+    const minuteur = setInterval(signaler, UNE_MINUTE)
     return () => {
-      annule = true
       clearInterval(minuteur)
     }
-  }, [])
+  }, [autorisation])
 }
