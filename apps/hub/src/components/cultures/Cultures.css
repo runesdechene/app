@@ -5,3 +5,4 @@
 .cultures-stats { color: #857575; font-size: 13px; }
 .cultures-cercle { display: grid; grid-template-columns: 110px 1fr 60px auto; gap: 8px; align-items: center; }
 .cultures-carte { height: 520px; border-radius: 12px; overflow: hidden; }
+.cultures-champs .settings-input { width: 100%; box-sizing: border-box; }
