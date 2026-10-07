@@ -1,0 +1,84 @@
+# QUOI     — les règles du domaine app.runesdechene.com depuis la bascule (spec 2026-10-07) :
+#            l'en-tête qui laisse la boutique afficher l'appli, les pages de seo-pages, les
+#            vieilles adresses de la V1, puis Explore pour tout le reste.
+# ATTENTION — la première règle qui correspond gagne : les préfixes réservés AVANT le repli.
+[build]
+  publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors https://runesdechene.com https://*.runesdechene.com https://*.myshopify.com"
+
+# Les service workers ne se gardent jamais en cache : une nouvelle version doit être vue.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/v2/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Préfixes réservés — seo-pages
+[[redirects]]
+  from = "/lieu/*"
+  to = "https://rdc-seo-pages.netlify.app/lieu/:splat"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "https://rdc-seo-pages.netlify.app/sitemap.xml"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/mouvement"
+  to = "https://rdc-seo-pages.netlify.app/mouvement"
+  status = 200
+  force = true
+
+# Préfixe réservé — à venir (décommenter le jour où la page du scan existe)
+# [[redirects]]
+#   from = "/scan/*"
+#   to = "https://<site-scan>.netlify.app/scan/:splat"
+#   status = 200
+#   force = true
+
+# Vieilles adresses de la V1 (coupure nette, 07/10)
+[[redirects]]
+  from = "/carte"
+  query = { placeId = ":id" }
+  to = "/carte/lieu/:id"
+  status = 301
+  force = true
+[[redirects]]
+  from = "/post-login"
+  to = "/accueil"
+  status = 301
+[[redirects]]
+  from = "/chat"
+  to = "/messages"
+  status = 301
+[[redirects]]
+  from = "/activite"
+  to = "/accueil/chemins"
+  status = 301
+[[redirects]]
+  from = "/nouvelles"
+  to = "/accueil/nouveautes"
+  status = 301
+[[redirects]]
+  from = "/article/*"
+  to = "/accueil/nouveautes"
+  status = 301
+# Sans force : le fichier /v2/sw.js (tâche 8b) est servi tel quel, le reste de /v2/ redirigé.
+[[redirects]]
+  from = "/v2/*"
+  to = "/:splat"
+  status = 301
+
+# Explore : toute autre adresse sert l'appli (les fichiers existants passent avant).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

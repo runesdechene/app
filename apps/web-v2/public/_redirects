@@ -1,3 +1,0 @@
-# QUOI — toute adresse de la V2 sert l'appli (React Router lit l'adresse) : sans ce renvoi,
-# recharger /v2/carte donne une 404. Les fichiers qui existent (assets, sw.js) passent avant.
-/*  /index.html  200
