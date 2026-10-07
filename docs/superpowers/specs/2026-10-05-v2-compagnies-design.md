@@ -113,8 +113,11 @@ ALTER TABLE place_veille ADD COLUMN pour_compagnie text REFERENCES factions(id) 
 
 ## La cohabitation avec la V1 (jusqu'à la bascule)
 
-- La V1 garde sa « Compagnie active » (`users.faction_id`) : rejoindre en V2 ne la change pas ; **quitter en
-  V2 la Compagnie active V1 la vide** (`users.faction_id = NULL`).
+- La V1 garde sa « Compagnie active » (`users.faction_id`) : rejoindre (ou être accepté) en V2 la pose
+  si le joueur n'en avait pas, sinon ne la change pas ; **quitter en V2 la Compagnie active V1 la vide**
+  (`users.faction_id = NULL`). (Le code faisait déjà ainsi ; Uriel l'a retenu le 07/10.)
+- Une Compagnie privée ne montre ses membres qu'à eux : un non-membre n'en voit que le nombre
+  (`nbMembres`, migration 434).
 - Ce que la V2 ignore (Couronnes investies, or, Coupe, bannières, bonus, grades à pouvoirs, territoires)
   reste à la V1 et va au registre de purge (`docs/v2/purge-back.md`) ; pas de DROP tant que la V1 tourne.
 - `pour_compagnie` n'existe pas pour la V1.

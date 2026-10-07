@@ -34,6 +34,7 @@ const FICHE: Fiche = {
   },
   monRole: null,
   demandee: false,
+  nbMembres: 3,
   membres: [
     { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' },
     { id: 'u2', nom: 'Luna', avatar: null, role: 'officier', genre: 'f' },
@@ -84,6 +85,20 @@ test('une privée se demande ; une demande envoyée attend', async () => {
   monter({ ...FICHE, privee: true })
   await userEvent.click(await screen.findByRole('button', { name: 'Demander à rejoindre' }))
   expect(api.rejoindre).toHaveBeenCalledWith('f-lys')
+})
+
+test('une privée vue du dehors : le nombre de membres, pas leurs noms', async () => {
+  monter({ ...FICHE, privee: true, membres: [] })
+  expect(await screen.findByText(/3 membres/)).toBeInTheDocument()
+  expect(screen.queryByText('Uriel')).not.toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Qui la mène' })).not.toBeInTheDocument()
+})
+
+test('un geste refusé le dit', async () => {
+  api.rejoindre.mockRejectedValueOnce(new Error('réseau'))
+  monter(FICHE)
+  await userEvent.click(await screen.findByRole('button', { name: 'Rejoindre la Compagnie' }))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Réessaie dans un instant')
 })
 
 test('une demande déjà envoyée', async () => {

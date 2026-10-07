@@ -39,6 +39,7 @@ const FICHE: FicheCompagnie = {
   },
   monRole: 'chef',
   demandee: false,
+  nbMembres: 2,
   membres: [
     { id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' },
     { id: 'u3', nom: 'Rémy', avatar: null, role: 'membre', genre: 'm' },

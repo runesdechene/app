@@ -46,6 +46,7 @@ test('la fiche se lit ; disparue, elle vaut null', () => {
     },
     monRole: null,
     demandee: true,
+    nbMembres: 1,
     membres: [{ id: 'u1', nom: 'Uriel', avatar: null, role: 'chef', genre: 'm' }],
     lieux: [{ id: 'l1', nom: 'Château de Joux', par: 'Gautier', quand: '2026-09-28T10:00:00Z' }],
     demandes: [],

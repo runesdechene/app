@@ -1,7 +1,8 @@
 /**
  * QUOI     — la fiche d'une Compagnie (migration 421), et les gestes « Rejoindre » et « Quitter ».
  * POURQUOI — chaque geste change ma place, mes canaux de La Communauté et la liste : on relit la
- *            fiche, `canauxKey` et la liste des Compagnies.
+ *            fiche, `canauxKey` et la liste des Compagnies. Un geste refusé rend son erreur
+ *            (`refus`), pour que la fiche le dise.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { canauxKey } from '@/shared/lib/cles'
@@ -30,5 +31,6 @@ export function useCompagnie(id: string) {
       sortir.mutate()
     },
     enCours: entrer.isPending || sortir.isPending,
+    refus: entrer.error ?? sortir.error,
   }
 }

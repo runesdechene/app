@@ -15,6 +15,7 @@ import { EmptyState } from '@/shared/ui/EmptyState'
 import { Feuille } from '@/shared/ui/Feuille'
 import type { FicheCompagnie as Fiche } from '../api/lireCompagnies'
 import { useCompagnie } from '../hooks/useCompagnie'
+import { messageDeRefus } from '../lib/refus'
 import { nomDuRole } from '../lib/roles'
 import { AvatarCompagnie } from './AvatarCompagnie'
 import styles from './FicheCompagnie.module.css'
@@ -23,7 +24,7 @@ const LE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', yea
 const PORTRAITS = 6
 
 export function FicheCompagnie({ id }: { id: string }) {
-  const { fiche, erreur, rejoindre, quitter, enCours } = useCompagnie(id)
+  const { fiche, erreur, rejoindre, quitter, enCours, refus } = useCompagnie(id)
   const [quitterOuvert, setQuitterOuvert] = useState(false)
   if (erreur) return <EmptyState>La Compagnie n’a pas pu être chargée</EmptyState>
   if (fiche === undefined) return <div className={styles.chargement} aria-busy="true" />
@@ -47,12 +48,17 @@ export function FicheCompagnie({ id }: { id: string }) {
         {fiche.devise && <p className={styles.devise}>{fiche.devise}</p>}
         <p className={styles.infos}>
           {fiche.privee ? 'Compagnie privée' : 'Compagnie publique'} · fondée le{' '}
-          {LE.format(new Date(fiche.fondeeLe))} · {fiche.membres.length} membre
-          {fiche.membres.length > 1 ? 's' : ''}
+          {LE.format(new Date(fiche.fondeeLe))} · {fiche.nbMembres} membre
+          {fiche.nbMembres > 1 ? 's' : ''}
         </p>
         {fiche.mission && <p className={styles.mission}>{fiche.mission}</p>}
 
         <BoutonDeLaFiche fiche={fiche} enCours={enCours} onRejoindre={rejoindre} />
+        {refus !== null && (
+          <p className={styles.refus} role="alert">
+            {messageDeRefus(refus)}
+          </p>
+        )}
 
         {meneurs.length > 0 && (
           <section aria-labelledby="meneurs">

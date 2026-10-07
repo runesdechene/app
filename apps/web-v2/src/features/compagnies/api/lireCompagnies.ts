@@ -51,6 +51,8 @@ export type FicheCompagnie = {
   roles: Roles
   monRole: Role | null
   demandee: boolean
+  nbMembres: number
+  // Vide pour qui n'est pas d'une Compagnie privée (migration 434) : seul le nombre se voit.
   membres: Membre[]
   lieux: { id: string; nom: string; par: string | null; quand: string }[]
   demandes: { id: string; nom: string; avatar: string | null; mot: string | null; quand: string }[]
@@ -109,6 +111,7 @@ export function lireFicheCompagnie(json: unknown): FicheCompagnie | null {
     },
     monRole: ouNull(role)(f.monRole),
     demandee: booleen(f.demandee),
+    nbMembres: nombre(f.nbMembres),
     membres: liste((v): Membre => {
       const m = objet(v)
       return {
