@@ -1,5 +1,5 @@
 /*
- * QUOI     — le sceau touché qui se retourne : la cire « ? » devant, la culture derrière.
+ * QUOI     — le sceau touché qui se retourne : la cire « ? » devant, le cachet de la culture derrière.
  */
 .sceau {
   position: absolute;
@@ -23,13 +23,13 @@
   inset: 0;
   display: grid;
   place-items: center;
-  border-radius: 50%;
   backface-visibility: hidden;
 }
 
 .face {
-  background: var(--color-carte-cire);
   border: 2px solid var(--color-carte-halo);
+  border-radius: 50%;
+  background: var(--color-carte-cire);
   color: var(--color-carte-halo);
   font-family: var(--font-inscription);
   font-size: var(--sceau-size);
@@ -37,22 +37,45 @@
 }
 
 .dos {
-  background: var(--color-feuille);
-  border: 3px solid var(--couleur-culture, var(--color-carte-encre));
   rotate: y 180deg;
 }
 
-.dos img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
+/* Le cachet : la cire à la couleur de la culture, un anneau plus sombre où la matrice a pressé. */
+.cire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.pastille {
-  width: 40%;
-  height: 40%;
+.cire path {
+  fill: var(--couleur-culture, var(--color-carte-cire));
+}
+
+.cire circle {
+  fill: none;
+  stroke: color-mix(in srgb, var(--couleur-culture, var(--color-carte-cire)) 70%, var(--color-carte-encre));
+  stroke-width: 2.5;
+}
+
+/* Au cœur, un rond clair : le logo de la culture s'y lit, quelles que soient ses couleurs. */
+.coeur {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56%;
+  height: 56%;
   border-radius: 50%;
-  background: var(--couleur-culture, var(--color-carte-encre));
+  background: var(--color-feuille);
+  color: var(--couleur-culture, var(--color-carte-cire));
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+}
+
+.coeur img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
 }
 
 @keyframes retourner {

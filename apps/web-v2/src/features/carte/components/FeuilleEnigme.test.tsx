@@ -30,7 +30,8 @@ async function retourner() {
   await waitFor(() => {
     expect(document.querySelector('[data-retourne]')).not.toBeNull()
   })
-  fireEvent.animationEnd(screen.getByText('?'))
+  const sceau = document.querySelector('[data-retourne]')
+  if (sceau) fireEvent.animationEnd(sceau)
 }
 
 const enigme = {

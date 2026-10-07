@@ -1,11 +1,14 @@
 /**
- * QUOI     — le sceau touché, posé à l'endroit du doigt : tant que l'énigme se charge il attend, puis
- *            il se retourne et montre l'icône de la culture (ou sa couleur, sans icône).
- * POURQUOI — maquette « Énigmes — 3 », sans la pluie d'éclats (UI sobre, `.claude/rules/interface.md`).
+ * QUOI     — le sceau « ? » touché, posé à l'endroit du doigt : tant que l'énigme se charge il attend,
+ *            puis il se retourne sur un cachet de cire à la couleur et au logo de la culture (ou à son
+ *            initiale, sans logo).
+ * POURQUOI — Uriel, 07/10 : le sceau de la carte, puis le cachet de la culture. Sans pluie d'éclats
+ *            (UI sobre, `.claude/rules/interface.md`).
  * ATTENTION — mouvement réduit : pas de rotation, `onFini` dès que la culture est connue.
  */
 import { useEffect } from 'react'
 import type { Culture } from '../api/lireEnigmes'
+import { BORD_DE_CIRE } from '../lib/cachet'
 import styles from './SceauQuiSeRetourne.module.css'
 
 const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -35,7 +38,13 @@ export function SceauQuiSeRetourne({
     >
       <span className={styles.face}>?</span>
       <span className={styles.dos} style={culture?.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
-        {culture?.icone ? <img src={culture.icone} alt="" /> : <span className={styles.pastille} />}
+        <svg className={styles.cire} viewBox="0 0 96 96">
+          <path d={BORD_DE_CIRE} />
+          <circle cx="48" cy="48" r="31" />
+        </svg>
+        <span className={styles.coeur}>
+          {culture?.icone ? <img src={culture.icone} alt="" /> : culture?.nom.charAt(0)}
+        </span>
       </span>
     </div>
   )
