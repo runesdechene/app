@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 // Les mises à jour de l'app (migrations 397, 436) : elles arrivent dans la cloche de la V2, sous
 // « Nouveautés d'Explore ». Écrites pour les joueurs : jamais de détail technique. Une image
 // (seau `announcement-covers`, comme les Annonces) et un numéro de version, facultatifs.
+// « Modifier » corrige une mise à jour publiée sans changer sa date (migration 437) : la cloche
+// ne se rallume pas.
 interface MiseAJour {
   id: number
   titre: string
@@ -25,6 +27,7 @@ export function MisesAJour() {
   const [version, setVersion] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+  const [enEdition, setEnEdition] = useState<number | null>(null)
 
   const fetchList = useCallback(async () => {
     setLoading(true)
@@ -38,23 +41,43 @@ export function MisesAJour() {
 
   useEffect(() => { fetchList() }, [fetchList])
 
-  const publier = async () => {
+  const vider = () => {
+    setTitre('')
+    setTexte('')
+    setImage(null)
+    setVersion('')
+    setEnEdition(null)
+  }
+
+  const modifier = (m: MiseAJour) => {
+    setTitre(m.titre)
+    setTexte(m.texte)
+    setImage(m.image)
+    setVersion(m.version ?? '')
+    setEnEdition(m.id)
+    setMsg(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const enregistrer = async () => {
     setBusy(true)
     setMsg(null)
     try {
-      const { error } = await supabase.rpc('publier_mise_a_jour', {
-        p_titre: titre, p_texte: texte, p_image: image, p_version: version,
-      })
+      const champs = { p_titre: titre, p_texte: texte, p_image: image, p_version: version }
+      const { error } = enEdition === null
+        ? await supabase.rpc('publier_mise_a_jour', champs)
+        : await supabase.rpc('modifier_mise_a_jour', { p_id: enEdition, ...champs })
       if (error) {
         setMsg(error.message)
         return
       }
-      setTitre('')
-      setTexte('')
-      setImage(null)
-      setVersion('')
-      setMsg('Publiée : elle est dans la cloche de chacun.')
+      setMsg(enEdition === null
+        ? 'Publiée : elle est dans la cloche de chacun.'
+        : 'Modifiée : la cloche ne se rallume pas.')
+      vider()
       await fetchList()
+    } catch (e) {
+      setMsg(`${e}`)
     } finally {
       setBusy(false)
     }
@@ -136,9 +159,14 @@ export function MisesAJour() {
         </div>
         {image && <img src={image} alt="" style={{ maxWidth: 320, borderRadius: 8 }} />}
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button className="mod-btn" onClick={publier} disabled={!pret || busy}>
-            Publier
+          <button className="mod-btn" onClick={enregistrer} disabled={!pret || busy}>
+            {enEdition === null ? 'Publier' : 'Enregistrer'}
           </button>
+          {enEdition !== null && (
+            <button className="mod-btn mask" onClick={vider} disabled={busy}>
+              Annuler
+            </button>
+          )}
           <span className="mod-meta">{texte.trim().length} / 3000</span>
           {msg && <span className="mod-meta">{msg}</span>}
         </div>
@@ -157,9 +185,14 @@ export function MisesAJour() {
                 {m.version && ` · ${m.version}`}
               </div>
             </div>
-            <button className="mod-btn mask" onClick={() => supprimer(m)} disabled={busy}>
-              Supprimer
-            </button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <button className="mod-btn" onClick={() => modifier(m)} disabled={busy}>
+                Modifier
+              </button>
+              <button className="mod-btn mask" onClick={() => supprimer(m)} disabled={busy}>
+                Supprimer
+              </button>
+            </div>
           </div>
           {m.image && <img src={m.image} alt="" style={{ maxWidth: 320, borderRadius: 8, marginTop: 8 }} />}
           <div style={{ whiteSpace: 'pre-wrap', fontSize: 14, marginTop: 8 }}>{m.texte}</div>
