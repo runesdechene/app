@@ -3,7 +3,7 @@
  * POURQUOI — `get_profil_explorateur` renvoie du JSON (type `Json` : n'importe quoi pour le
  *            compilateur). On vérifie chaque champ au lieu de le « caster » : un profil mal formé
  *            devient `null` (« introuvable ») plutôt qu'un écran à trous.
- * ATTENTION — la forme suit les migrations 354-362 et 431. Un champ ajouté là-bas s'ajoute ici.
+ * ATTENTION — la forme suit les migrations 354-362, 431 et 452. Un champ ajouté là-bas s'ajoute ici.
  */
 import { lireCondition, type ConditionTitre } from '@/shared/lib/conditionTitre'
 import { booleen, chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
@@ -26,6 +26,14 @@ export type Fragment = { id: number; nom: string; imageUrl: string | null }
 // La forme du département (ou du pays), prête pour un <path> SVG (migration 362).
 export type Silhouette = { d: string; viewBox: string }
 export type Attache = { texte: string; silhouette: Silhouette | null }
+// Une connaissance : le plus haut titre gagné dans une culture des énigmes, son rang (1 à 7) et
+// les énigmes résolues — une gélule du profil, jamais un titre qu'on porte (migration 452).
+export type Connaissance = {
+  culture: { id: string; nom: string; couleur: string | null; icone: string | null }
+  titre: string
+  rang: number
+  enigmes: number
+}
 
 export type ExplorateurProfile = {
   id: string
@@ -46,6 +54,8 @@ export type ExplorateurProfile = {
   signe: Signe | null
   fragmentsADecouvrir: number | null // sur son propre profil seulement (migration 360)
   compagnies: { id: string; nom: string; couleur: string }[] // ses Compagnies (migration 422)
+  connaissances: Connaissance[] // migration 452
+  polymathe: string | null // son nom accordé, s'il l'a gagné (migration 452)
   estMoi: boolean
 }
 
@@ -107,6 +117,22 @@ function silhouette(v: unknown): Silhouette {
   return { d: chaine(o.d), viewBox: chaine(o.viewBox) }
 }
 
+function connaissance(v: unknown): Connaissance {
+  const o = objet(v)
+  const c = objet(o.culture)
+  return {
+    culture: {
+      id: chaine(c.id),
+      nom: chaine(c.nom),
+      couleur: ouNull(chaine)(c.couleur ?? null),
+      icone: ouNull(chaine)(c.icone ?? null),
+    },
+    titre: chaine(o.titre),
+    rang: nombre(o.rang),
+    enigmes: nombre(o.enigmes),
+  }
+}
+
 function role(v: unknown): 'admin' | 'moderator' | null {
   return v === 'admin' || v === 'moderator' ? v : null
 }
@@ -140,6 +166,9 @@ export function lireProfil(json: unknown): ExplorateurProfile | null {
               const c = objet(v)
               return { id: chaine(c.id), nom: chaine(c.nom), couleur: chaine(c.couleur) }
             })(o.compagnies),
+      // Absentes avant la migration 452 : aucune.
+      connaissances: o.connaissances === undefined ? [] : liste(connaissance)(o.connaissances),
+      polymathe: o.polymathe === undefined ? null : ouNull(chaine)(o.polymathe),
       estMoi: booleen(o.estMoi),
     }
   } catch {

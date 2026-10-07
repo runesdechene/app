@@ -60,6 +60,35 @@
   scale: var(--mesure) 1;
 }
 
+/* Mon grade : le titre gagné ici et ses étoiles, puis ce qui manque pour le suivant. */
+.grade {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.gradeTitre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--couleur-culture, var(--color-ocre));
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.etoiles {
+  font-size: var(--legende-size);
+  letter-spacing: var(--libelle-tracking);
+}
+
+.gradeSuivant {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+}
+
 /* L'encart : ce qui reste à percer, au premier regard (Uriel, 07/10 : « un joli cadre »). */
 .encart {
   display: flex;

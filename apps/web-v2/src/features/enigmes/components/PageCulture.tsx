@@ -12,7 +12,15 @@ import { Link } from 'react-router'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { useMaCulture } from '../hooks/useMesEnigmes'
-import { encartEnClair, lienVersLaCarte, quandEnClair, rangerEnigmes, resoluesEnClair, type Tri } from '../lib/enClair'
+import {
+  encartEnClair,
+  lienVersLaCarte,
+  prochainEnClair,
+  quandEnClair,
+  rangerEnigmes,
+  resoluesEnClair,
+  type Tri,
+} from '../lib/enClair'
 import { PastilleCulture } from './PastilleCulture'
 import styles from './PageCulture.module.css'
 
@@ -34,7 +42,7 @@ export function PageCulture({ id }: { id: string }) {
   }
   if (!maCulture) return null
 
-  const { culture, resolues, total, centre, enigmes } = maCulture
+  const { culture, resolues, total, grade, prochain, centre, enigmes } = maCulture
   const encart = encartEnClair(total - resolues, culture.nom, culture.zone)
   return (
     <div className={styles.page} style={culture.couleur ? { '--couleur-culture': culture.couleur } : undefined}>
@@ -54,6 +62,20 @@ export function PageCulture({ id }: { id: string }) {
       <span className={styles.piste} aria-hidden="true">
         <span className={styles.rempli} style={{ '--mesure': String(total > 0 ? resolues / total : 0) }} />
       </span>
+
+      {/* Mon grade (le plus haut titre gagné ici, ses étoiles) et ce qui manque pour le suivant :
+          la progression vit ici, pas dans « Tous les titres » (Uriel, 07/10 — migration 452). */}
+      <section className={styles.grade} aria-label="Mon grade">
+        {grade && (
+          <p className={styles.gradeTitre}>
+            {grade.titre}
+            <span className={styles.etoiles} role="img" aria-label={`rang ${String(grade.rang)} sur 7`}>
+              {'★'.repeat(grade.rang)}
+            </span>
+          </p>
+        )}
+        <p className={styles.gradeSuivant}>{prochainEnClair(prochain)}</p>
+      </section>
 
       <section className={styles.encart} aria-label={encart.titre}>
         <span className={styles.sceau} aria-hidden="true">

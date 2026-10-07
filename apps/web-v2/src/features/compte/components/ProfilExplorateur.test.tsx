@@ -3,7 +3,7 @@
  *            murmure »), des envies masquées, un Explorateur introuvable.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { vi } from 'vitest'
@@ -55,6 +55,8 @@ const PROFIL: ExplorateurProfile = {
   signe: null,
   fragmentsADecouvrir: 5,
   compagnies: [],
+  connaissances: [],
+  polymathe: null,
   estMoi: true,
 }
 
@@ -153,6 +155,30 @@ test('les découvertes : Lieux ajoutés et Envie d’y aller, chacun avec son no
   expect(await screen.findByRole('region', { name: 'Lieux ajoutés' })).toHaveTextContent('1')
   expect(screen.queryByRole('region', { name: 'Visités' })).toBeNull()
   expect(screen.getByRole('region', { name: 'Envie d’y aller' })).toHaveTextContent('Mont Bégo')
+})
+
+test('ses connaissances : une gélule par culture — son titre, son rang en étoiles, ses énigmes (mig 452)', async () => {
+  afficher({
+    ...PROFIL,
+    connaissances: [
+      { culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null }, titre: 'Sage de Byzance', rang: 6, enigmes: 36 },
+      { culture: { id: 'celtique', nom: 'Celtique', couleur: '#57b33d', icone: null }, titre: 'Érudit celte', rang: 5, enigmes: 61 },
+    ],
+    polymathe: 'Polymathe',
+  })
+  const section = await screen.findByRole('region', { name: 'Connaissances' })
+  // Polymathe en tête, la couronne ; puis les cultures, la plus haute d'abord.
+  const [poly, byzance] = within(section).getAllByRole('listitem')
+  expect(poly).toHaveTextContent('Polymathe')
+  expect(byzance).toHaveTextContent('Sage de Byzance')
+  expect(byzance).toHaveTextContent('36 énigmes')
+  expect(within(byzance as HTMLElement).getByRole('img', { name: 'rang 6 sur 7' })).toBeInTheDocument()
+})
+
+test('sans connaissance, pas de section « Connaissances »', async () => {
+  afficher(PROFIL)
+  await screen.findByRole('region', { name: 'Lieux ajoutés' })
+  expect(screen.queryByRole('region', { name: 'Connaissances' })).toBeNull()
 })
 
 test('envies masquées : pas de section « Envie d’y aller » du tout', async () => {

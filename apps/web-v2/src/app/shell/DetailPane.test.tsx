@@ -53,6 +53,8 @@ const profil = (id: string): ExplorateurProfile => ({
   signe: null,
   fragmentsADecouvrir: null,
   compagnies: [],
+  connaissances: [],
+  polymathe: null,
   estMoi: id === 'u1',
 })
 vi.mock('@/features/compte/api/explorateur', () => ({

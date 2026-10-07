@@ -46,3 +46,9 @@ export type Tri = 'date' | 'numero'
 export function rangerEnigmes<T extends { numero: number }>(enigmes: T[], tri: Tri): T[] {
   return tri === 'numero' ? [...enigmes].sort((a, b) => a.numero - b.numero) : enigmes
 }
+
+// Ce qui manque pour le titre suivant, en points de connaissance ; au sommet, rien ne manque.
+export function prochainEnClair(prochain: { titre: string; rang: number; manque: number } | null): string {
+  if (!prochain) return 'Tu as atteint le plus haut titre de cette culture.'
+  return `Encore ${String(prochain.manque)} ${prochain.manque > 1 ? 'points' : 'point'} pour ${prochain.titre}`
+}
