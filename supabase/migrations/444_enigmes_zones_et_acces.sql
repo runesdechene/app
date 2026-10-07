@@ -5,8 +5,9 @@
 --      Toutes les écritures passent par des fonctions SECURITY DEFINER (answer_enigma, percer_enigme…),
 --      et seul le Hub (admins) lit enigmas en direct : on ferme le reste. (3) enigmes_en_attente rend ses
 --      points dans un ordre qui ne trahit plus la culture (l'ordre des id suivait la boucle du réveil).
--- BASE: _point_dans_les_cercles, enregistrer_culture, enigmes_en_attente — définitions des migrations
---       440 et 441 (identiques en live, appliquées le 07/10), modifiées aux seuls endroits ci-dessous.
+--      (4) Uriel, 07/10 : la bonne réponse se fête — percer_enigme dit le niveau et la jauge avant / après.
+-- BASE: _point_dans_les_cercles, enregistrer_culture, enigmes_en_attente, percer_enigme — définitions des
+--       migrations 440 et 441 (identiques en live, appliquées le 07/10), modifiées aux seuls endroits ci-dessous.
 -- SCHEMA CHECKED (2026-10-07) : pg_policies enigma_responses (responses_insert, responses_select),
 --   enigmas (enigmas_select) ; grants ALL à anon et authenticated sur les deux tables ; aucune appli
 --   n'écrit enigma_responses ni ne lit enigmas en direct hors du Hub (grep apps/).
@@ -76,3 +77,61 @@ REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON public.enigma_responses FROM anon, au
 DROP POLICY IF EXISTS enigmas_select ON public.enigmas;
 CREATE POLICY enigmas_select ON public.enigmas FOR SELECT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid()::text AND u.role = 'admin'));
+
+-- 6. Le verdict dit le niveau et sa jauge avant / après, pour que la fête la remplisse sous les yeux
+CREATE OR REPLACE FUNCTION public.percer_enigme(p_eveil bigint, p_reponse text)
+RETURNS json LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
+DECLARE
+  v_moi      text := auth.uid()::text;
+  w          enigmes_eveillees := public._eveil_en_attente(p_eveil);
+  e          enigmas;
+  v_juste    boolean;
+  v_genre    text;
+  v_xp_avant int;
+  v_xp_apres int;
+  v_nouveaux text[] := '{}';
+  v_prochain json;
+  v_niveau   int;
+  v_seuil    int;
+  v_suivant  int;
+BEGIN
+  SELECT * INTO e FROM enigmas WHERE id = w.enigma_id;
+  v_juste := CASE WHEN e.format = 'free' THEN public._enigma_answer_matches(p_reponse, e.answer)
+                  ELSE public._enigma_normalize(p_reponse) = public._enigma_normalize(e.answer) END;
+  SELECT COALESCE(xp_total, 0), COALESCE(title_gender, 'm') INTO v_xp_avant, v_genre FROM users WHERE id = v_moi;
+
+  -- Pas de Couronnes (en sommeil dans Explore) : on n'appelle pas _answer_enigma_internal.
+  INSERT INTO enigma_responses (enigma_id, user_id, answer_given, correct, influence_gained, erudition_gained, eveil_id)
+  VALUES (e.id, v_moi, left(p_reponse, 500), v_juste, 0, 0, w.id);
+
+  IF v_juste THEN v_nouveaux := public._attribuer_titres_connaissance(v_moi, e.theme); END IF;
+  SELECT COALESCE(xp_total, 0) INTO v_xp_apres FROM users WHERE id = v_moi;
+  v_niveau := public._level_from_xp(v_xp_apres);
+  v_seuil := public._xp_for_level(v_niveau);
+  v_suivant := public._xp_for_level(v_niveau + 1);
+
+  SELECT json_build_object('nom', public._nom_titre(t, v_genre),
+                           'seuil', public._seuil_connaissance(e.theme, (t.condition->>'palier')::int))
+    INTO v_prochain
+    FROM titles t
+   WHERE t.condition->>'stat' = 'connaissance' AND t.condition->>'theme' = e.theme
+     AND NOT EXISTS (SELECT 1 FROM titres_connaissance c WHERE c.user_id = v_moi AND c.title_id = t.id)
+   ORDER BY (t.condition->>'palier')::int LIMIT 1;
+
+  RETURN json_build_object(
+    'juste', v_juste,
+    'reponse', e.answer,
+    'explication', e.explanation,
+    'xp', v_xp_apres - v_xp_avant,
+    'niveau', v_niveau,
+    -- Monter de niveau fait repartir la jauge de zéro (comme decouvrir_lieu, mig 401).
+    'avant', CASE WHEN public._level_from_xp(v_xp_avant) < v_niveau THEN 0
+                  ELSE round((v_xp_avant - v_seuil)::numeric / greatest(1, v_suivant - v_seuil), 3) END,
+    'apres', round((v_xp_apres - v_seuil)::numeric / greatest(1, v_suivant - v_seuil), 3),
+    'gagnes', CASE WHEN v_juste THEN public._poids_enigme(e.difficulty) ELSE 0 END,
+    'points', public._points_connaissance(v_moi, e.theme),
+    'total', public._total_connaissance(e.theme),
+    'nouveauxTitres', to_json(v_nouveaux),
+    'prochain', v_prochain,
+    'resteEnAttente', json_array_length(public.enigmes_en_attente()));
+END $$;

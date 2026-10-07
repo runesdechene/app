@@ -31,7 +31,9 @@ test('verdict : le prochain titre peut manquer', () => {
   const v = lireVerdict({
     juste: true, reponse: 'Sainte-Sophie', explication: 'La coupole…', xp: 1, gagnes: 1,
     points: 16, total: 130, nouveauxTitres: ['Apprentie de Byzance'], prochain: null, resteEnAttente: 3,
+    niveau: 12, avant: 0.62, apres: 0.64,
   })
   expect(v.prochain).toBeNull()
   expect(v.nouveauxTitres).toEqual(['Apprentie de Byzance'])
+  expect(v.niveau).toEqual({ niveau: 12, avant: 0.62, apres: 0.64 })
 })

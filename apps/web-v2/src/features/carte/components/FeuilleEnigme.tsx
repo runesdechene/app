@@ -1,8 +1,9 @@
 /**
  * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — la
  *            culture, le récit, la question, les réponses ; après la réponse, le verdict.
- * POURQUOI — maquettes « Énigmes — 3, 4, 5 ». Une seule réponse (QCM : un bouton par choix ; libre :
- *            un champ) ; juste ou fausse, « Le savais-tu ? » s'affiche — ce qui compte, c'est d'apprendre.
+ * POURQUOI — maquettes « Énigmes — 3, 4, 5 » et « 5b à 5d ». Une seule réponse (QCM : un bouton par
+ *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou
+ *            fausse, montre « Le savais-tu ? » — ce qui compte, c'est d'apprendre.
  */
 import { useState } from 'react'
 import { Feuille } from '@/shared/ui/Feuille'
@@ -10,8 +11,9 @@ import { Text } from '@/shared/ui/Text'
 import type { EnigmeOuverte, Verdict } from '../api/lireEnigmes'
 import type { EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { useEnigme } from '../hooks/useEnigme'
-import { connaissanceEnClair, gainsEnClair, piedEnClair, prochainEnClair } from '../lib/enigmeEnClair'
+import { piedEnClair } from '../lib/enigmeEnClair'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
+import { BilanDuVerdict, FeteDuVerdict } from './VerdictEnigme'
 import styles from './FeuilleEnigme.module.css'
 
 export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; onFermer: () => void }) {
@@ -50,9 +52,12 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
 
   return (
     <Feuille titre={`Énigme · ${enigme.culture.nom}`} onFermer={onFermer}>
-      <div className={styles.contenu}>
+      <div
+        className={styles.contenu}
+        style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}
+      >
         <header className={styles.entete}>
-          <span className={styles.icone} style={enigme.culture.couleur ? { '--couleur-culture': enigme.culture.couleur } : undefined}>
+          <span className={styles.icone}>
             {enigme.culture.icone ? (
               <img src={enigme.culture.icone} alt="" />
             ) : (
@@ -61,11 +66,14 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
           </span>
           <Text variant="titre-section">{enigme.culture.nom}</Text>
         </header>
-        <p className={styles.recit}>{enigme.recit}</p>
-        <Text variant="corps">{enigme.question}</Text>
-        <Reponses enigme={enigme} verdict={verdict} choisie={choisie} envoi={envoi} onRepondre={envoyer} />
+        {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{enigme.recit}</p>}
+        <Text variant={verdict ? 'legende' : 'corps'}>{enigme.question}</Text>
+        {/* Un titre gagné prend la place : les réponses se replient (maquette 5d). */}
+        {!verdict?.nouveauxTitres.length && (
+          <Reponses enigme={enigme} verdict={verdict} choisie={choisie} envoi={envoi} onRepondre={envoyer} />
+        )}
         {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
-        {verdict && <LeVerdict verdict={verdict} culture={enigme.culture.nom} />}
+        {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
         <Text variant="legende">
           {verdict ? piedEnClair(verdict.resteEnAttente) : 'Une seule réponse. Si tu te trompes, tu découvres l’explication, sans points.'}
         </Text>
@@ -112,7 +120,6 @@ function Reponses({
             Répondre
           </button>
         )}
-        {verdict && !verdict.juste && <Text variant="legende">{`La réponse : ${verdict.reponse}`}</Text>}
       </form>
     )
   }
@@ -134,28 +141,5 @@ function Reponses({
         </button>
       ))}
     </div>
-  )
-}
-
-function LeVerdict({ verdict, culture }: { verdict: Verdict; culture: string }) {
-  return (
-    <section className={styles.verdict} aria-live="polite">
-      {verdict.juste && (
-        <ul className={styles.gains}>
-          {gainsEnClair(verdict, culture).map((g) => (
-            <li key={g}>{g}</li>
-          ))}
-        </ul>
-      )}
-      {verdict.nouveauxTitres.map((t) => (
-        <Text key={t} variant="sous-titre">{`Te voilà ${t}.`}</Text>
-      ))}
-      <div className={styles.savais}>
-        <Text variant="legende">Le savais-tu ?</Text>
-        <Text variant="flux">{verdict.explication}</Text>
-      </div>
-      <Text variant="legende">{connaissanceEnClair(verdict.points, verdict.total, culture)}</Text>
-      <Text variant="legende">{prochainEnClair(verdict, culture)}</Text>
-    </section>
   )
 }

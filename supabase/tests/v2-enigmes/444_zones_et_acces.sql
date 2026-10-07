@@ -49,6 +49,16 @@ BEGIN
   ASSERT v_erreur = 'refusé', 'insertion directe dans enigma_responses refusée';
   ASSERT v_lu = 0, format('un non-admin lit %s énigmes', v_lu);
 
+  -- 3 bis. Le verdict dit le niveau et la jauge avant / après (la fête les anime).
+  PERFORM set_config('request.jwt.claims', json_build_object('sub', v_moi, 'role', 'authenticated')::text, true);
+  DECLARE v_verdict json;
+  BEGIN
+    v_verdict := public.percer_enigme((public.enigmes_en_attente()->0->>'id')::bigint, 'réponse au hasard');
+    ASSERT (v_verdict->>'niveau')::int > 0, 'le verdict dit le niveau';
+    ASSERT (v_verdict->>'avant')::numeric BETWEEN 0 AND 1 AND (v_verdict->>'apres')::numeric BETWEEN 0 AND 1,
+      'la jauge avant / après est une part de 0 à 1';
+  END;
+
   -- 4. Un éveil effacé ne s'ouvre plus.
   PERFORM set_config('request.jwt.claims', json_build_object('sub', v_moi, 'role', 'authenticated')::text, true);
   v_eveil := (public.enigmes_en_attente()->0->>'id')::bigint;

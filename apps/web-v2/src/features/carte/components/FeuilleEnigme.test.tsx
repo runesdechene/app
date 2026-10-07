@@ -44,14 +44,17 @@ test('le sceau retourné, la question et ses réponses ; une réponse juste mont
   percerEnigme.mockResolvedValue({
     juste: true, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 1, gagnes: 1,
     points: 5, total: 130, nouveauxTitres: ['Apprentie de Byzance'], prochain: { nom: 'Lettrée de Byzance', seuil: 10 },
-    resteEnAttente: 2,
+    resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
   })
   monter()
   await retourner()
   fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Sophie' }))
   expect(await screen.findByText('+1 XP')).toBeInTheDocument()
+  expect(screen.getByText('La réponse : Sainte-Sophie')).toBeInTheDocument()
+  expect(screen.getByRole('progressbar', { name: 'Niveau 12' })).toBeInTheDocument()
+  expect(screen.getByRole('progressbar', { name: 'Byzance' })).toBeInTheDocument()
   expect(percerEnigme).toHaveBeenCalledWith(4, 'Sainte-Sophie')
-  expect(screen.getByText('Te voilà Apprentie de Byzance.')).toBeInTheDocument()
+  expect(screen.getByText('Te voilà Apprentie de Byzance. Il se porte depuis ton profil.')).toBeInTheDocument()
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
   expect(screen.getByText('2 autres « ? » t’attendent sur la carte.')).toBeInTheDocument()
 })
@@ -83,4 +86,20 @@ test('une culture sans icône montre une pastille', async () => {
   monter()
   await retourner()
   expect(await screen.findByTestId('pastille-culture')).toBeInTheDocument()
+})
+
+test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockResolvedValue({
+    juste: false, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 0, gagnes: 0,
+    points: 4, total: 130, nouveauxTitres: [], prochain: { nom: 'Apprentie de Byzance', seuil: 4 },
+    resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
+  })
+  monter()
+  await retourner()
+  fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
+  expect(await screen.findByText('Pas cette fois')).toBeInTheDocument()
+  expect(screen.getByText('La réponse : Sainte-Sophie')).toBeInTheDocument()
+  expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
+  expect(screen.queryByText('+1 XP')).toBeNull()
 })

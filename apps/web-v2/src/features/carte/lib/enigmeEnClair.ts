@@ -7,6 +7,13 @@
 import { objet } from '@/shared/lib/lire'
 import type { Verdict } from '../api/lireEnigmes'
 
+// Le mot d'une bonne réponse, tiré au sort (maquette « Énigmes — 5b », validée le 07/10).
+export const MOTS_DE_FETE = ['Bien vu !', 'Juste !', 'Les dieux t’approuvent', 'Tu le savais !']
+
+export function motDeFete(alea: number): string {
+  return MOTS_DE_FETE[Math.min(MOTS_DE_FETE.length - 1, Math.floor(alea * MOTS_DE_FETE.length))] ?? 'Juste !'
+}
+
 export function gainsEnClair(v: Verdict, culture: string): string[] {
   const gains: string[] = []
   if (v.xp > 0) gains.push(`+${String(v.xp)} XP`)

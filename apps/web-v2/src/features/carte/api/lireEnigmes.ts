@@ -26,6 +26,8 @@ export type Verdict = {
   nouveauxTitres: string[]
   prochain: { nom: string; seuil: number } | null
   resteEnAttente: number
+  // La jauge du niveau, en part de 0 à 1 : la fête la remplit d'avant à après (comme Découvrir).
+  niveau: { niveau: number; avant: number; apres: number }
 }
 
 function enAttente(v: unknown): EnigmeEnAttente {
@@ -74,5 +76,6 @@ export function lireVerdict(v: unknown): Verdict {
     nouveauxTitres: liste(chaine)(o.nouveauxTitres),
     prochain: ouNull(prochain)(o.prochain),
     resteEnAttente: nombre(o.resteEnAttente),
+    niveau: { niveau: nombre(o.niveau), avant: nombre(o.avant), apres: nombre(o.apres) },
   }
 }

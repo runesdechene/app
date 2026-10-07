@@ -73,6 +73,7 @@
 }
 
 .choixBouton[data-juste] {
+  animation: pulser var(--duree-elan) var(--courbe-elan);
   border-color: var(--color-succes);
   background: var(--color-succes-fond);
   color: var(--color-succes);
@@ -107,47 +108,20 @@
   cursor: not-allowed;
 }
 
-.verdict {
-  display: grid;
-  gap: var(--space-2);
-  transition: opacity var(--duree-douce) var(--courbe-douce);
-}
 
-@starting-style {
-  .verdict {
-    opacity: 0;
+/* La bonne réponse « pulse » une fois, au verdict. */
+@keyframes pulser {
+  50% {
+    scale: 1.04;
   }
 }
 
-.gains {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.gains li {
-  padding: var(--space-1) var(--space-3);
-  border-radius: 999px;
-  background: var(--color-pastille);
-  color: var(--color-brun);
-  font-size: var(--flux-size);
-  font-weight: var(--weight-gras);
-}
-
-.savais {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .choixBouton,
-  .verdict {
+  .choixBouton[data-juste] {
+    animation: none;
+  }
+
+  .choixBouton {
     transition: none;
   }
 }
