@@ -33,6 +33,7 @@ import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
+import { useEnigmesSurLaCarte } from '../hooks/useEnigmesSurLaCarte'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
@@ -40,6 +41,8 @@ import { ajouterZones } from '../lib/actifs'
 import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
+import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
+import { claquerLaCire } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
 import { reliefVoulu } from '../lib/relief'
 import { ajouterMarques, prechargerIcones } from '../lib/sceaux'
@@ -137,6 +140,9 @@ function CarteVivante({
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
+  useEnigmesSurLaCarte(visiteur ? null : carte, () => {
+    claquerLaCire()
+  })
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
   useEffect(() => {
@@ -167,7 +173,7 @@ function CarteVivante({
 
     map.on('click', CALQUES_LIEUX, (e) => {
       const id: unknown = e.features?.[0]?.properties.id
-      if (typeof id === 'string' && !surUnPin(map, e.point)) {
+      if (typeof id === 'string' && !surUnPin(map, e.point) && !surUneEnigme(map, e.point)) {
         void navigate(visiteur ? `/bienvenue/carte/lieu/${id}` : `/carte/lieu/${id}`)
       }
     })
@@ -180,6 +186,7 @@ function CarteVivante({
       ajouterCalques(map, couleurs, ecran)
       if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
       if (!visiteur) void poserMesPins(map, couleurs).catch(() => undefined)
+      if (!visiteur) void poserEnigmes(map, couleurs, ecran).catch(() => undefined)
       suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()

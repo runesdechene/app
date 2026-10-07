@@ -54,6 +54,7 @@
   --color-carte-halo: #f4e9d1;
   --color-carte-foret: #b9b58a;
   --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
+  --color-carte-cire: #a94842; /* le sceau des énigmes : l'accent, en hex pour MapLibre */
 
   /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */
   --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */

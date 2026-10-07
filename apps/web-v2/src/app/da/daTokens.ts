@@ -40,6 +40,7 @@ export const COLOR_TOKENS = [
   '--color-carte-halo',
   '--color-carte-foret',
   '--color-carte-ombre',
+  '--color-carte-cire',
   '--color-fiche-titre',
   '--color-fiche-ligne',
   '--color-fiche-aide',
