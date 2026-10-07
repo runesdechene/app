@@ -181,8 +181,9 @@
   gap: var(--space-2);
 }
 
+/* La bonne réponse, à la couleur de la culture (Uriel, 07/10). */
 .bonne {
-  color: var(--color-succes);
+  color: var(--couleur-culture, var(--color-accent));
   font-weight: var(--weight-gras);
 }
 
