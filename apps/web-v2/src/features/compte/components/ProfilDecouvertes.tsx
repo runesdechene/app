@@ -1,6 +1,7 @@
 /**
- * QUOI     — le bas du profil : Lieux ajoutés, le Passeport (à la place de Visités, spec
- *            2026-10-07), Envie d'y aller (maquette « COMPTE — sous le signe de l'Hoplite », 27/09).
+ * QUOI     — le bas du profil : le Passeport (à la place de Visités, spec 2026-10-07 ; en tête
+ *            depuis le 07/10, Uriel), Lieux ajoutés, Envie d'y aller (maquette « COMPTE — sous le
+ *            signe de l'Hoplite », 27/09).
  * POURQUOI — les listes arrivent prêtes de la base : un ajout sur place est aussi visité
  *            (migration 426), Envie d'y aller exclut les deux.
  *            `envies === null` : l'Explorateur les masque, la section n'existe pas. Une section
@@ -18,13 +19,13 @@ export function ProfilDecouvertes({ profil }: { profil: ExplorateurProfile }) {
   const position = useMaPosition()
   return (
     <>
+      {profil.nbVisites > 0 && <PasseportProfil id={profil.id} />}
       <Section
         titre="Lieux ajoutés"
         lieux={profil.ajoutes}
         position={position}
         avecAuteur={false}
       />
-      {profil.nbVisites > 0 && <PasseportProfil id={profil.id} />}
       {profil.envies && (
         <Section titre="Envie d’y aller" lieux={profil.envies} position={position} avecAuteur />
       )}
