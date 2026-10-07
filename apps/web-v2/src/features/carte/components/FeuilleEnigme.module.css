@@ -1,0 +1,146 @@
+/*
+ * QUOI     — la feuille d'une énigme : la culture, le récit en IM Fell, les réponses, le verdict
+ *            (maquettes « Énigmes — 4 et 5 », Figma 460:380 et 460:467).
+ */
+.contenu {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.icone {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--couleur-culture, var(--color-carte-encre));
+  border-radius: 50%;
+  background: var(--color-feuille);
+}
+
+.icone img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+
+.recit {
+  margin: 0;
+  color: var(--color-fiche-recit);
+  font-family: var(--font-inscription);
+  font-size: var(--recit-enigme-size);
+  font-style: italic;
+}
+
+.choix,
+.libre {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.choixBouton,
+.champ {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--color-sur-accent);
+  color: var(--color-texte);
+  font: inherit;
+  text-align: left;
+}
+
+.choixBouton {
+  transition:
+    background var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.choixBouton:disabled {
+  color: var(--color-texte-pale);
+}
+
+.choixBouton[data-juste] {
+  border-color: var(--color-succes);
+  background: var(--color-succes-fond);
+  color: var(--color-succes);
+  font-weight: var(--weight-gras);
+}
+
+.choixBouton[data-fausse] {
+  border-color: var(--color-accent);
+  background: var(--color-rose);
+  color: var(--color-accent);
+}
+
+/* Le bouton d'envoi du formulaire libre : le bouton principal de shared/ui/Button. */
+.envoyer {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border: 2px solid var(--color-accent-clair);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  box-shadow: var(--ombre-bouton);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+}
+
+.envoyer:disabled {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+  cursor: not-allowed;
+}
+
+.verdict {
+  display: grid;
+  gap: var(--space-2);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+@starting-style {
+  .verdict {
+    opacity: 0;
+  }
+}
+
+.gains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gains li {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--color-pastille);
+  color: var(--color-brun);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+}
+
+.savais {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choixBouton,
+  .verdict {
+    transition: none;
+  }
+}

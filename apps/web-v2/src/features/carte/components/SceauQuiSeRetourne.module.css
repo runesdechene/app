@@ -1,0 +1,73 @@
+/*
+ * QUOI     — le sceau touché qui se retourne : la cire « ? » devant, la culture derrière.
+ */
+.sceau {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  z-index: 3;
+  width: 64px;
+  height: 64px;
+  translate: -50% -50%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.sceau[data-retourne] {
+  animation: retourner calc(var(--duree-elan) * 2) var(--courbe-douce) forwards;
+}
+
+.face,
+.dos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  backface-visibility: hidden;
+}
+
+.face {
+  background: var(--color-carte-cire);
+  border: 2px solid var(--color-carte-halo);
+  color: var(--color-carte-halo);
+  font-family: var(--font-inscription);
+  font-size: var(--sceau-size);
+  font-style: italic;
+}
+
+.dos {
+  background: var(--color-feuille);
+  border: 3px solid var(--couleur-culture, var(--color-carte-encre));
+  rotate: y 180deg;
+}
+
+.dos img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+
+.pastille {
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: var(--couleur-culture, var(--color-carte-encre));
+}
+
+@keyframes retourner {
+  from {
+    rotate: y 0deg;
+  }
+
+  to {
+    rotate: y 180deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sceau[data-retourne] {
+    animation: none;
+    rotate: y 180deg;
+  }
+}

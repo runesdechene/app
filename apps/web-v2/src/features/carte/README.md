@@ -11,4 +11,5 @@ Conception de l'écran : `docs/superpowers/specs/2026-09-28-v2-carte-design.md`.
 - `api/` — `carte.ts` parle à Supabase (`carte_lieux`, `territoire_en`) ; `lireCarte.ts` lit
   leur JSON.
 - Énigmes (spec `2026-10-07-v2-enigmes-design.md`) : `api/enigmes.ts` + `lireEnigmes.ts`, `lib/enigmes.ts`
-  (calques), `lib/cire.ts` (son), `hooks/useEnigmesSurLaCarte.ts`, `components/enigme/` (la feuille).
+  (calques), `lib/cire.ts` (son), `hooks/useEnigmesSurLaCarte.ts` et `useEnigme.ts`,
+  `components/SceauQuiSeRetourne.tsx` puis `FeuilleEnigme.tsx` (la feuille).

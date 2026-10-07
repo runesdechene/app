@@ -33,7 +33,8 @@ import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
-import { useEnigmesSurLaCarte } from '../hooks/useEnigmesSurLaCarte'
+import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
+import { FeuilleEnigme } from './FeuilleEnigme'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
 import { ajouterCalques, CALQUES_LIEUX, echelleEcran, enGeoJSON, SOURCE } from '../lib/calques'
@@ -140,8 +141,10 @@ function CarteVivante({
   const [listeOuverte, setListeOuverte] = useState(false)
   useActifsSurLaCarte(visiteur ? null : carte, actifs, maPosition, soi, setExplorateurOuvert)
   useMesPinsSurLaCarte(visiteur ? null : carte, pins, tiroirMesure)
-  useEnigmesSurLaCarte(visiteur ? null : carte, () => {
+  const [enigmeTouchee, setEnigmeTouchee] = useState<EnigmeTouchee | null>(null)
+  useEnigmesSurLaCarte(visiteur ? null : carte, (t) => {
     claquerLaCire()
+    setEnigmeTouchee(t)
   })
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
 
@@ -380,6 +383,15 @@ function CarteVivante({
           }}
           onFermer={() => {
             setListeOuverte(false)
+          }}
+        />
+      )}
+      {enigmeTouchee && (
+        <FeuilleEnigme
+          key={enigmeTouchee.id}
+          touchee={enigmeTouchee}
+          onFermer={() => {
+            setEnigmeTouchee(null)
           }}
         />
       )}

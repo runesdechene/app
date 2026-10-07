@@ -1,0 +1,42 @@
+/**
+ * QUOI     — ce que la feuille d'une énigme dit après la réponse : les gains, la part de la culture
+ *            connue, le prochain titre, ce qui attend encore sur la carte, et l'erreur.
+ * POURQUOI — maquette « Énigmes — 5 ». « Byzance : tu en connais 12 % » plutôt qu'une phrase qui
+ *            accorderait le nom de chaque culture (« de la Grèce », « de Rome »…).
+ */
+import { objet } from '@/shared/lib/lire'
+import type { Verdict } from '../api/lireEnigmes'
+
+export function gainsEnClair(v: Verdict, culture: string): string[] {
+  const gains: string[] = []
+  if (v.xp > 0) gains.push(`+${String(v.xp)} XP`)
+  if (v.gagnes > 0) gains.push(`+${String(v.gagnes)} connaissance · ${culture}`)
+  return gains
+}
+
+export function connaissanceEnClair(points: number, total: number, culture: string): string {
+  const part = total > 0 ? Math.floor((points / total) * 100) : 0
+  return `${culture} : tu en connais ${String(part)} %.`
+}
+
+export function prochainEnClair(v: Verdict, culture: string): string {
+  if (!v.prochain) return `Tous les titres de ${culture} sont à toi.`
+  const reste = Math.max(0, v.prochain.seuil - v.points)
+  return `Encore ${String(reste)} ${reste > 1 ? 'points' : 'point'} pour « ${v.prochain.nom} ».`
+}
+
+export function piedEnClair(reste: number): string {
+  if (reste === 0) return 'C’était le dernier « ? » qui t’attendait. D’autres s’éveillent chaque matin.'
+  if (reste === 1) return 'Un autre « ? » t’attend sur la carte.'
+  return `${String(reste)} autres « ? » t’attendent sur la carte.`
+}
+
+// `P0002` : l'éveil s'est effacé (le réveil du matin) ou a déjà reçu sa réponse.
+export function messageErreur(e: unknown): string {
+  try {
+    if (objet(e).code === 'P0002') return 'Cette énigme s’est rendormie.'
+  } catch {
+    // pas un objet : erreur réseau ou autre
+  }
+  return 'La réponse n’est pas partie. Réessaie.'
+}
