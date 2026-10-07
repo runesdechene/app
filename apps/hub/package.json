@@ -12,6 +12,7 @@
     "@supabase/supabase-js": "^2.39.3",
     "dompurify": "^3.4.8",
     "jszip": "^3.10.1",
+    "maplibre-gl": "6.11.2",
     "marked": "^18.0.5",
     "react": "19.0.0",
     "react-dom": "19.0.0",
