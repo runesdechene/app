@@ -1,0 +1,99 @@
+/*
+ * QUOI     — le menu du profil (maquette 476:434) : la tête (portrait, nom, niveau), des lignes au
+ *            même gabarit — icône, libellé, détail, chevron —, un trait, puis la sortie en rouge.
+ */
+.menu {
+  display: grid;
+}
+
+.qui {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-sable);
+}
+
+.nom {
+  display: grid;
+}
+
+.prenom {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  line-height: 1;
+}
+
+.niveau {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.lignes {
+  display: grid;
+  margin: 0;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--color-sable);
+  list-style: none;
+}
+
+.ligne,
+.sortie {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: var(--cible-tactile);
+  padding: var(--space-3) 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font: inherit;
+  font-size: var(--corps-size);
+  text-align: left;
+  cursor: pointer;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.sortie {
+  color: var(--color-accent);
+}
+
+.ligne:active,
+.sortie:active {
+  opacity: 0.6;
+}
+
+.ligne img,
+.sortie img {
+  width: 22px;
+  height: 22px;
+}
+
+.libelle {
+  flex: 1;
+}
+
+.detail {
+  color: var(--color-texte-doux);
+  font-size: var(--sous-titre-size);
+}
+
+.chevron {
+  color: var(--color-texte-pale);
+  font-size: var(--titre-carte-size);
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: var(--legende-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ligne,
+  .sortie {
+    transition: none;
+  }
+}

@@ -5,10 +5,11 @@
  *            Sur PC, un fond clair glisse jusqu'à l'onglet actif : un seul élément, le curseur,
  *            déplacé en CSS selon son rang (`--rang`), comme la brique Segments.
  * ATTENTION — ce sont des <button>, pas des <a> : un onglet n'ouvre pas toujours son adresse
- *            (mémoire, double toucher). aria-current marque l'onglet actif pour les lecteurs
+ *            (mémoire, double toucher ; le portrait ouvre le menu du profil). aria-current marque l'onglet actif pour les lecteurs
  *            d'écran. Les icônes sont décoratives (aria-hidden) : le libellé porte le nom.
  *            L'onglet Messages porte la pastille des murmures non lus, posée sur son icône.
  */
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { useExplorateur } from '@/features/compte/hooks/useExplorateur'
 import { useMonIdentifiant } from '@/features/compte/hooks/useMonIdentifiant'
@@ -24,6 +25,7 @@ import { Text } from '@/shared/ui/Text'
 import { ROUVERT_PAR_UN_ONGLET } from '../navigation/closeDetail'
 import { resolveTabPress, tabOf, TABS, type TabId } from '../navigation/tabs'
 import { useTabMemory } from '../navigation/useTabMemory'
+import { MenuDuProfil } from './MenuDuProfil'
 import styles from './TabBar.module.css'
 
 // Sur PC, la barre n'a pas d'onglet Carte (la carte y est toujours là) : le curseur se range
@@ -54,8 +56,15 @@ export function TabBar({
   // Le rouge, pour ce qui m'est adressé : les Murmures non lus et les mentions de moi.
   const pourMoi = useNonLus() + registre.mentions
 
+  const [menuOuvert, setMenuOuvert] = useState(false)
+
   function press(pressed: TabId) {
     onToucher()
+    // Le portrait ouvre le menu du profil (Uriel, 07/10), même quand Compte est déjà l'onglet actif.
+    if (pressed === 'compte') {
+      setMenuOuvert(true)
+      return
+    }
     const action = resolveTabPress({ active, pressed, pathname, memory })
     if (action.kind === 'navigate') void navigate(action.to, { state: ROUVERT_PAR_UN_ONGLET })
     else onScrollTop(pressed)
@@ -101,6 +110,13 @@ export function TabBar({
           )}
         </button>
       ))}
+      {menuOuvert && (
+        <MenuDuProfil
+          onFermer={() => {
+            setMenuOuvert(false)
+          }}
+        />
+      )}
     </nav>
   )
 }

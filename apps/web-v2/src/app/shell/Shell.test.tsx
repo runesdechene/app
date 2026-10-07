@@ -3,7 +3,7 @@
  * POURQUOI — c'est la promesse centrale de la navigation (spec socle §4bis).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeEach, vi } from 'vitest'
@@ -54,6 +54,10 @@ const registre = vi.hoisted(() => ({
   chercherExplorateurs: () => Promise.resolve([]),
 }))
 vi.mock('@/features/messages/api/registre', () => registre)
+vi.mock('@/features/enigmes/api/mesEnigmes', () => ({
+  fetchMesEnigmes: () => Promise.resolve({ resolues: 137, total: 451, cultures: [] }),
+  fetchMaCulture: () => Promise.reject(new Error('pas dans ce test')),
+}))
 vi.mock('@/features/titres/api/mesTitres', () => ({
   fetchMesTitres: () => Promise.resolve({ obtenus: 0, total: 0, chemins: [], cultures: [], polymathe: null }),
 }))
@@ -262,31 +266,53 @@ test('sur PC, le fond de l’onglet actif glisse d’un onglet à l’autre (Car
   renderAt('/messages')
   await screen.findByRole('button', { name: 'Messages' })
   expect(curseur()?.getAttribute('style')).toContain('--rang: 1')
-  await userEvent.click(screen.getByRole('button', { name: 'Compte' }))
-  expect(curseur()?.getAttribute('style')).toContain('--rang: 3')
+  await userEvent.click(screen.getByRole('button', { name: 'Compagnies' }))
+  expect(curseur()?.getAttribute('style')).toContain('--rang: 2')
   await userEvent.click(screen.getByRole('button', { name: 'Carte' }))
   expect(curseur()).toBeNull()
 })
 
-test('sur PC, Préférences et Déconnexion sont dans la barre, sous la cloche', async () => {
-  const router = renderAt('/carte')
-  await userEvent.click(await screen.findByRole('button', { name: 'Préférences' }))
-  expect(router.state.location.pathname).toBe('/carte/preferences')
-  expect(screen.getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+// Le menu du profil (maquette 476:434, Uriel 07/10) : le portrait l'ouvre ; la coupe, l'engrenage et
+// la sortie y sont entrés ; la cloche reste dans la barre.
+async function ouvrirLeMenu() {
+  await userEvent.click(await screen.findByRole('button', { name: 'Compte' }))
+  return screen.findByRole('dialog', { name: 'Mon menu' })
+}
+
+test('toucher le portrait ouvre le menu du profil, même depuis Compte', async () => {
+  renderAt('/compte')
+  const menu = await ouvrirLeMenu()
+  for (const nom of ['Mon profil', 'Les énigmes', 'Tous les titres', 'Préférences', 'Se déconnecter']) {
+    expect(within(menu).getByRole('button', { name: new RegExp(nom) })).toBeInTheDocument()
+  }
 })
 
-test('la coupe ouvre « Tous les titres » ; fermer ramène à l’onglet', async () => {
-  const router = renderAt(['/accueil', '/accueil/chemins'])
-  await userEvent.click(await screen.findByRole('button', { name: 'Tous les titres' }))
+test('« Mon profil » ferme le menu et ouvre l’onglet Compte', async () => {
+  const router = renderAt('/accueil')
+  const menu = await ouvrirLeMenu()
+  await userEvent.click(within(menu).getByRole('button', { name: /Mon profil/ }))
+  expect(router.state.location.pathname).toBe('/compte')
+  expect(screen.queryByRole('dialog', { name: 'Mon menu' })).toBeNull()
+})
+
+test('« Les énigmes » et « Tous les titres » s’ouvrent en panneau sur l’onglet courant', async () => {
+  const router = renderAt('/accueil')
+  await userEvent.click(within(await ouvrirLeMenu()).getByRole('button', { name: /Les énigmes/ }))
+  expect(router.state.location.pathname).toBe('/accueil/enigmes')
+  await userEvent.click(within(await ouvrirLeMenu()).getByRole('button', { name: /Tous les titres/ }))
   expect(router.state.location.pathname).toBe('/accueil/titres')
-  await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
-  await vi.waitFor(() => {
-    expect(router.state.location.pathname).toBe('/accueil')
-  })
 })
 
-test('la coupe est là sur la carte aussi, à côté de la cloche', async () => {
+test('« Préférences » s’ouvre depuis le menu', async () => {
+  const router = renderAt('/carte')
+  await userEvent.click(within(await ouvrirLeMenu()).getByRole('button', { name: /Préférences/ }))
+  expect(router.state.location.pathname).toBe('/carte/preferences')
+})
+
+test('la cloche reste dans la barre ; la coupe, l’engrenage et la sortie n’y sont plus', async () => {
   renderAt('/carte')
-  expect(await screen.findByRole('button', { name: 'Tous les titres' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
+  expect(await screen.findByRole('button', { name: 'Notifications' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Tous les titres' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Préférences' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Se déconnecter' })).toBeNull()
 })

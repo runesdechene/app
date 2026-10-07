@@ -30,18 +30,14 @@ import { JaugeEnergie } from '@/features/energie/components/JaugeEnergie'
 import { CompteScreen } from '@/features/compte/components/CompteScreen'
 import { MessagesScreen } from '@/features/messages/components/MessagesScreen'
 import { PageCompagnies } from '@/features/compagnies/components/PageCompagnies'
-import { seDeconnecter } from '@/features/compte/api/session'
 import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
 import cloche from '@/assets/ui/cloche.svg'
-import coupe from '@/assets/ui/coupe.svg'
 import embleme from '@/assets/ui/embleme.png'
-import engrenage from '@/assets/ui/engrenage.svg'
 import logotype from '@/assets/ui/logotype.webp'
 import replier from '@/assets/ui/replier.svg'
-import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
 import { Text } from '@/shared/ui/Text'
@@ -50,6 +46,7 @@ import { VERSION } from '@/shared/lib/version'
 import { useSurOrdinateur } from '@/shared/hooks/useSurOrdinateur'
 import { V1_URL } from '../access/AccessGate'
 import { disposition } from '../navigation/disposition'
+import { useOuvrir } from '../navigation/useOuvrir'
 import { TABS, type TabId } from '../navigation/tabs'
 import { TabBar } from './TabBar'
 import styles from './Shell.module.css'
@@ -68,20 +65,6 @@ const CarteScreen = lazy(() =>
   import('@/features/carte/components/CarteScreen').then((m) => ({ default: m.CarteScreen })),
 )
 
-// Ouvrir un panneau (« ajouter », « notifications »…) par-dessus l'onglet courant. Ce qui est
-// déjà ouvert ne s'empile pas une seconde fois dans l'historique. Un panneau prend la place du
-// détail ouvert (un lieu…) au lieu de s'empiler dessus : le fermer ramène à l'onglet, sans
-// rouvrir le détail d'avant (Uriel, 30/09).
-function useOuvrir() {
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const { actif } = disposition(pathname)
-  return (segment: string) => {
-    const racine = `/${actif ?? 'carte'}`
-    const adresse = `${racine}/${segment}`
-    if (pathname !== adresse) void navigate(adresse, { replace: pathname !== racine })
-  }
-}
 
 // La carte de la coquille : la jauge d'énergie sous la recherche, soi (portrait, nom, premier
 // titre porté, comme les autres Explorateurs), et le « + »
@@ -215,17 +198,6 @@ export function Shell() {
         {/* Uriel, 01/10 : le numéro qui dit que le dernier déploiement est arrivé. */}
         <span className={styles.version}>{VERSION}</span>
         <div className={styles.actions}>
-          {/* Tous les titres (Uriel, 06/10) : au-dessus de la cloche sur PC, à sa gauche au téléphone. */}
-          <button
-            type="button"
-            className={styles.action}
-            aria-label="Tous les titres"
-            onClick={() => {
-              ouvrir('titres')
-            }}
-          >
-            <img src={coupe} alt="" />
-          </button>
           <button
             ref={boutonNotifications}
             type="button"
@@ -239,29 +211,6 @@ export function Shell() {
             <span className={styles.nonLues}>
               <Pastille count={nonLues} />
             </span>
-          </button>
-          {/* Sur PC seulement (le CSS les cache sur mobile, où elles vivent sur la page Compte). */}
-          <button
-            type="button"
-            className={[styles.action, styles.pc].join(' ')}
-            aria-label="Préférences"
-            onClick={() => {
-              ouvrir('preferences')
-            }}
-          >
-            <img src={engrenage} alt="" />
-          </button>
-          <button
-            type="button"
-            className={[styles.action, styles.pc].join(' ')}
-            aria-label="Se déconnecter"
-            onClick={() => {
-              // La garde d'accès voit la session tomber et renvoie vers la V1 ; un échec laisse
-              // simplement la session ouverte (la page Compte le dit sur mobile).
-              void seDeconnecter().catch(() => undefined)
-            }}
-          >
-            <img src={sortie} alt="" />
           </button>
         </div>
         <main className={styles.main}>
