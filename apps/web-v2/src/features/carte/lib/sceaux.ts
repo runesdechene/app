@@ -177,8 +177,9 @@ function etoile(c: CouleursCarte) {
 }
 
 // Le fond d'une pilule : une gélule étirable autour du nom (`icon-text-fit`). La mienne en
-// encre pleine, les autres en parchemin cerclé d'encre pâle.
-function pilule(map: Carte, nom: string, fond: string, bord: string) {
+// encre pleine, les autres en parchemin cerclé d'encre pâle. `teintable` : une forme blanche que
+// le calque colore lieu par lieu (`icon-color`) — la gélule « NOUVEAU », à la couleur du lieu.
+function pilule(map: Carte, nom: string, fond: string, bord: string, teintable = false) {
   const [largeur, hauteur, rayon] = [40, 24, 12]
   const ctx = new OffscreenCanvas(largeur, hauteur).getContext('2d')
   if (!ctx) throw new Error('canevas indisponible')
@@ -195,6 +196,7 @@ function pilule(map: Carte, nom: string, fond: string, bord: string) {
     stretchX: [[rayon, largeur - rayon]],
     stretchY: [[rayon - 1, rayon + 1]],
     content: [rayon, 4, largeur - rayon, hauteur - 4],
+    sdf: teintable,
   })
 }
 
@@ -230,7 +232,7 @@ export async function ajouterMarques(
   ajouter(map, 'curiosite', etoile(c))
   pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
   pilule(map, 'pilule-moi', c.encre, c.encre)
-  pilule(map, 'pilule-nouveau', c.cire, c.cire) // la gélule « NOUVEAU » (nouveaux.ts)
+  pilule(map, 'pilule-nouveau', '#ffffff', '#ffffff', true) // la gélule « NOUVEAU » (nouveaux.ts)
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de
   // calcul sur un PC, bien plus sur un téléphone).

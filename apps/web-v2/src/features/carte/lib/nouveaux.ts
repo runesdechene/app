@@ -2,7 +2,9 @@
  * QUOI     — les nouveaux lieux sur la carte (Figma 523:722, « A en couleur, avec C en plus », Uriel
  *            08/10) : sous la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert,
  *            un halo et une onde à la couleur de sa nature, qui rayonne lentement ; de plus près, une
- *            gélule « NOUVEAU » sous la marque (Uriel, 08/10 : « pour que les gens comprennent »).
+ *            gélule « NOUVEAU » sous la marque (Uriel, 08/10 : « pour que les gens comprennent »), à la
+ *            couleur du lieu elle aussi. La marque d'un lieu neuf passe au-dessus des autres (son
+ *            propre calque, calques.ts).
  * POURQUOI — ce qui rayonne appelle à être touché (comme le « ? » des énigmes) ; la couleur dit déjà
  *            ce qu'on va découvrir. L'onde est plus lente que celle des énigmes, pour ne pas les
  *            confondre. Calques MapLibre sur la source des lieux : la propriété `nouveau` (migration
@@ -86,7 +88,7 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
       'text-allow-overlap': false,
       'icon-allow-overlap': false,
     },
-    paint: { 'text-color': c.halo },
+    paint: { 'text-color': c.halo, 'icon-color': ['coalesce', ['get', 'couleur'], c.cire] },
   }
 }
 
