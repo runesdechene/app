@@ -58,7 +58,7 @@ test('aucun lieu n’est regroupé, même dézoomé ; les marques grandissent av
   ajouterCalques(map, couleurs)
   expect(map.addSource.mock.calls[0]?.[1]).not.toHaveProperty('cluster')
   const calques = map.addLayer.mock.calls.map(([calque]) => calque)
-  expect(calques.map((c) => c.id)).toEqual(['billes', 'sceaux', 'curiosites', 'nouveaux', 'survol', 'pilules'])
+  expect(calques.map((c) => c.id)).toEqual(['billes', 'sceaux', 'curiosites', 'survol', 'pilules'])
   for (const calque of calques.slice(0, 2)) {
     expect(calque).toHaveProperty(['layout', 'icon-size', 0], 'interpolate')
   }

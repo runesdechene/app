@@ -2,33 +2,33 @@
  * QUOI     — les nouveaux lieux sur la carte (Figma 525:740, piste 2 « l'encre », Uriel 08/10) : autour
  *            de la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert, un fin anneau
  *            d'encre qui s'élargit et s'efface, en boucle lente ; de plus près, une gélule d'encre
- *            « NOUVEAU » sous la marque. La marque d'un lieu neuf passe au-dessus des autres (son propre
- *            calque, calques.ts).
+ *            « NOUVEAU » sous la marque. Le lieu lui-même reste à sa place parmi les autres (Uriel,
+ *            08/10 : l'anneau suffit à le signaler).
  * POURQUOI — les couleurs par nature faisaient « pêle-mêle » (Uriel, 08/10) : une seule encre, un contour
  *            seul. On le remarque par le mouvement, pas par la couleur. L'anneau est plus lent que l'onde
  *            des énigmes, pour ne pas les confondre. Calques MapLibre sur la source des lieux : la
  *            propriété `nouveau` (migration 469) suffit.
- * ATTENTION — la taille suit PALIERS_NOUVEAUX (calques.ts), au premier niveau de l'expression de zoom ;
+ * ATTENTION — la taille suit la courbe des marques (PALIERS, calques.ts), au premier niveau de l'expression de zoom ;
  *            l'anneau s'anime image par image (comme `fairePulser` des énigmes). Animations réduites :
  *            un anneau fixe.
  */
 import type { AddLayerObject, ExpressionSpecification, FilterSpecification, Map as Carte } from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { PALIERS_NOUVEAUX, SOURCE } from './calques'
+import { PALIERS, SOURCE } from './calques'
 
 export const CALQUE_ANNEAU_NOUVEAUX = 'nouveaux-anneau'
 export const CALQUE_GELULE_NOUVEAUX = 'nouveaux-gelule'
 
 const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne les confonde pas
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
-const ELAN = 8 // de combien l'anneau s'élargit au-delà de la marque
+const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
 const DE_PLUS_PRES = 9 // la gélule ne s'affiche qu'à partir de là : de loin, l'anneau suffit
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
 export function rayonAuZoom(rayon: number): ExpressionSpecification {
-  return ['interpolate', ['linear'], ['zoom'], ...PALIERS_NOUVEAUX.flatMap(([z, t]) => [z, Math.round(rayon * t * 1000) / 1000])]
+  return ['interpolate', ['linear'], ['zoom'], ...PALIERS.flatMap(([z, t]) => [z, Math.round(rayon * t * 1000) / 1000])]
 }
 
 // Où en est l'anneau à la phase `t` (0 → 1) : il naît transparent au bord de la marque, se dessine en
@@ -84,10 +84,10 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
   }
 }
 
-// L'anneau se pose au-dessus de tous les lieux ordinaires, juste sous la marque du lieu neuf (le calque
-// « nouveaux » de calques.ts) ; la gélule par-dessus tout ; puis l'anneau s'anime.
+// L'anneau se pose au-dessus des marques (sous le lieu survolé), pour qu'aucun voisin ne le cache ;
+// la gélule par-dessus tout ; puis l'anneau s'anime.
 export function poserNouveaux(map: Carte, c: CouleursCarte, ecran: number): () => void {
-  map.addLayer(calqueAnneau(c, ecran), 'nouveaux')
+  map.addLayer(calqueAnneau(c, ecran), 'survol')
   map.addLayer(calqueGelule(c))
   return faireRayonner(map, ecran)
 }
