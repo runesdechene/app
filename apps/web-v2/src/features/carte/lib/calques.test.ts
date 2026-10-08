@@ -39,7 +39,6 @@ test('un lieu devient un point avec sa marque et sa pilule', () => {
     etat: 'visite',
     nature: 'lieu',
     nouveau: false,
-    couleur: '#708d44',
     image: 'visite-x.svg',
     pilule: 'Rémy',
     moi: true,

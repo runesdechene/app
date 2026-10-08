@@ -32,8 +32,7 @@ type Proprietes = {
   image: string
   pilule?: string
   moi?: boolean
-  nouveau: boolean // l'onde et la gélule « NOUVEAU » (nouveaux.ts)
-  couleur: string | null // la couleur de sa nature : celle de son onde
+  nouveau: boolean // l'anneau et la gélule « NOUVEAU » (nouveaux.ts)
 }
 
 export function enGeoJSON(
@@ -51,7 +50,6 @@ export function enGeoJSON(
         nature: l.nature,
         image: nomImage(l, couleurTypes),
         nouveau: l.nouveau,
-        couleur: l.couleur,
         ...(l.revendication && { pilule: l.revendication.nom, moi: l.revendication.moi }),
       },
     })),
@@ -150,7 +148,7 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     filter: ['==', ['get', 'nature'], 'curiosite'],
     layout: marque(ecran),
   })
-  // Les lieux neufs, par-dessus tous les autres ; leur onde et leur gélule : nouveaux.ts.
+  // Les lieux neufs, par-dessus tous les autres ; leur anneau et leur gélule : nouveaux.ts.
   map.addLayer({
     id: 'nouveaux',
     type: 'symbol',

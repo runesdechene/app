@@ -1,17 +1,19 @@
 /**
- * QUOI     — les nouveaux lieux : une onde qui part de la marque et s'efface, à la couleur de la
- *            nature (l'encre de cire à défaut), une taille qui suit le zoom, une gélule au-dessus.
+ * QUOI     — les nouveaux lieux : un fin anneau d'encre qui part de la marque et s'efface, une taille
+ *            qui suit le zoom, une gélule d'encre sous la marque.
  */
 import { expect, test } from 'vitest'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { calqueGelule, calquesNouveaux, ondeNouveau, rayonAuZoom } from './nouveaux'
+import { anneauNouveau, calqueAnneau, calqueGelule, rayonAuZoom } from './nouveaux'
 
-const c = { cire: '#a94842', halo: '#fffaf2' } as CouleursCarte
+const c = { encre: '#494841', halo: '#fffaf2' } as CouleursCarte
 
-test('l’onde part du bord de la marque, s’élargit et s’efface', () => {
-  expect(ondeNouveau(0)).toEqual({ rayon: 13, opacite: 0.5 })
-  expect(ondeNouveau(1)).toEqual({ rayon: 21, opacite: 0 })
-  expect(ondeNouveau(0.5).opacite).toBeLessThan(ondeNouveau(0).opacite)
+test('l’anneau naît transparent, se dessine en s’élargissant, puis s’efface : jamais d’un coup', () => {
+  expect(anneauNouveau(0)).toEqual({ rayon: 14, opacite: 0 })
+  expect(anneauNouveau(0.5)).toEqual({ rayon: 18, opacite: 0.8 })
+  expect(anneauNouveau(1).rayon).toBe(22)
+  expect(anneauNouveau(1).opacite).toBeCloseTo(0)
+  expect(anneauNouveau(0.1).opacite).toBeLessThan(anneauNouveau(0.3).opacite)
 })
 
 test('la taille suit le zoom, avec la courbe au premier niveau (exigence de MapLibre)', () => {
@@ -19,22 +21,20 @@ test('la taille suit le zoom, avec la courbe au premier niveau (exigence de MapL
   expect(rayonAuZoom(10)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 8, 8, 10, 12, 11.5])
 })
 
-test('halo et onde : seulement les lieux nouveaux, à la couleur de leur nature', () => {
-  for (const calque of calquesNouveaux(c, 1)) {
-    expect(calque).toMatchObject({
-      type: 'circle',
-      filter: ['==', ['get', 'nouveau'], true],
-      paint: { 'circle-color': ['coalesce', ['get', 'couleur'], '#a94842'] },
-    })
-  }
+test('un contour d’encre seul, seulement pour les lieux nouveaux', () => {
+  expect(calqueAnneau(c, 1)).toMatchObject({
+    type: 'circle',
+    filter: ['==', ['get', 'nouveau'], true],
+    paint: { 'circle-opacity': 0, 'circle-stroke-color': '#494841' },
+  })
 })
 
-test('la gélule « NOUVEAU » se pose sous la marque (sous la pilule si le lieu en a une), à sa couleur, et seulement de près', () => {
+test('la gélule « NOUVEAU », à l’encre, se pose sous la marque, et seulement de près', () => {
   expect(calqueGelule(c)).toMatchObject({
     type: 'symbol',
     minzoom: 9,
     filter: ['==', ['get', 'nouveau'], true],
     layout: { 'text-anchor': 'top' },
-    paint: { 'icon-color': ['coalesce', ['get', 'couleur'], '#a94842'] },
+    paint: { 'icon-color': '#494841', 'text-color': '#fffaf2' },
   })
 })
