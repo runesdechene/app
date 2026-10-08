@@ -1,6 +1,7 @@
 /*
- * QUOI     — les Fragments sur la carte : un médaillon de parchemin cerclé d'encre qui porte
- *            l'illustration, flotte doucement au-dessus de son ombre, et le nom du Fragment dessous.
+ * QUOI     — les Fragments sur la carte : une vignette, petite carte en hauteur au format des dessins
+ *            (la carte « Motif » du récit en miniature) — fond de surface, liseré d'encre, coins de
+ *            carte — un peu penchée, qui flotte au-dessus de son ombre ; le nom dessous, en Bebas.
  *            De très loin (`data-loin` sur la carte), le nom se tait.
  */
 .fragment {
@@ -13,53 +14,79 @@
   }
 }
 
-.medaillon {
+.vignette {
+  --penche: -5deg;
+
   grid-area: 1 / 1;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  overflow: hidden;
+  width: 48px;
+  height: 64px;
+  box-sizing: border-box;
   padding: 4px;
-  border: 2px solid var(--color-encre);
-  border-radius: var(--radius-rond);
-  background: var(--color-feuille);
+  border: 1.5px solid var(--color-encre);
+  border-radius: var(--radius-vignette);
+  background: var(--color-surface);
   color: var(--color-encre);
   font-family: var(--font-titre);
-  font-size: var(--sous-titre-size);
-  box-shadow: 0 4px 10px color-mix(in srgb, var(--color-encre) 25%, transparent);
+  font-size: var(--titre-carte-size);
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 6px 14px color-mix(in srgb, var(--color-encre) 30%, transparent);
   cursor: pointer;
-  animation: flotter 4s ease-in-out infinite;
+  rotate: var(--penche);
+  animation: flotter 4.5s ease-in-out infinite;
+  transition: scale var(--duree-douce) var(--courbe-douce);
 }
 
-.medaillon img {
+.vignette[data-penche='droite'] {
+  --penche: 4deg;
+
+  animation-delay: -2.2s; /* les vignettes ne flottent pas toutes en même temps */
+}
+
+.vignette:hover,
+.vignette:focus-visible {
+  scale: 1.08;
+}
+
+.vignette:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.vignette img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* L'ombre, au sol : elle se resserre quand le médaillon monte. Posée sous lui dans la grille. */
+/* L'ombre, au sol : elle se resserre quand la vignette monte. */
 .ombre {
   grid-area: 1 / 1;
   align-self: end;
-  width: 30px;
-  height: 6px;
-  margin-bottom: -10px;
+  width: 36px;
+  height: 7px;
+  margin-bottom: -12px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-encre) 30%, transparent);
-  animation: respirerOmbre 4s ease-in-out infinite;
+  background: color-mix(in srgb, var(--color-encre) 28%, transparent);
+  filter: blur(1px);
+  animation: respirerOmbre 4.5s ease-in-out infinite;
+}
+
+.fragment:has([data-penche='droite']) .ombre {
+  animation-delay: -2.2s;
 }
 
 .nom {
-  margin-top: 12px;
+  margin-top: 14px;
   padding: 1px var(--space-2);
   border-radius: var(--radius-rond);
   background: color-mix(in srgb, var(--color-feuille) 92%, transparent);
   color: var(--color-encre);
   font-family: var(--font-titre);
-  font-size: var(--legende-size);
+  font-size: var(--sous-titre-size);
   letter-spacing: 0.04em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -70,7 +97,7 @@
   }
 
   50% {
-    translate: 0 -5px;
+    translate: 0 -6px;
   }
 }
 
@@ -82,8 +109,8 @@
   }
 
   50% {
-    scale: 0.75;
-    opacity: 0.6;
+    scale: 0.7;
+    opacity: 0.55;
   }
 }
 
@@ -92,11 +119,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fragment {
+  .fragment,
+  .vignette {
     transition: none;
   }
 
-  .medaillon,
+  .vignette,
   .ombre {
     animation: none;
   }

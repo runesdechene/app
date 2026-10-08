@@ -1,5 +1,5 @@
 /**
- * QUOI     — les Fragments sur la carte : un médaillon par Fragment, posé à son origine, retiré quand
+ * QUOI     — les Fragments sur la carte : une vignette par Fragment, posé à son origine, retiré quand
  *            il quitte la liste ; le toucher rend son id.
  */
 import { expect, test, vi } from 'vitest'
@@ -29,12 +29,12 @@ function monter() {
   return { suivi: suivreFragments(poser, onToucher), posees, onToucher }
 }
 
-test('un médaillon par Fragment, posé à son origine, avec son illustration à la taille de la carte', () => {
+test('une vignette par Fragment, posé à son origine, avec son illustration à la taille de la carte', () => {
   const { suivi, posees } = monter()
   suivi.fragments([fragment(11, { lat: 37.08, lng: 22.43 }), fragment(5)])
   expect(posees.map((p) => p.ou)).toEqual([[22.43, 37.08], [2, 45]])
   expect(posees[0]?.element.querySelector('img')?.getAttribute('src')).toBe(
-    'https://cdn.shopify.com/s/files/f.webp?width=88',
+    'https://cdn.shopify.com/s/files/f.webp?width=80',
   )
   expect(posees[0]?.element.textContent).toContain('Fragment 11')
 })
@@ -48,7 +48,7 @@ test('un Fragment qui quitte la liste perd sa marque ; vider retire tout', () =>
   expect(posees.at(-1)?.marque.remove).toHaveBeenCalled()
 })
 
-test('sans illustration, l’initiale ; toucher le médaillon rend l’id du Fragment', () => {
+test('sans illustration, l’initiale ; toucher la vignette rend l’id du Fragment', () => {
   const { suivi, posees, onToucher } = monter()
   suivi.fragments([fragment(7, { nom: 'Hécate', illustration: null })])
   const bouton = posees[0]?.element.querySelector('button')
