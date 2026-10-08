@@ -8,9 +8,12 @@ import { FeuilleEnigme } from './FeuilleEnigme'
 
 const ouvrirEnigme = vi.fn<(id: number) => Promise<unknown>>()
 const percerEnigme = vi.fn<(id: number, r: string) => Promise<unknown>>()
+const signalerEnigme = vi.fn<(numero: number, raison: string, precision: string) => Promise<void>>()
 vi.mock('../api/enigmes', () => ({
   ouvrirEnigme: (id: number) => ouvrirEnigme(id),
   percerEnigme: (id: number, r: string) => percerEnigme(id, r),
+  signalerEnigme: (numero: number, raison: string, precision: string) =>
+    signalerEnigme(numero, raison, precision),
 }))
 
 const onFermer = vi.fn()
@@ -129,4 +132,37 @@ test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu',
   expect(screen.getByText('La réponse : Sainte-Sophie')).toBeInTheDocument()
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
   expect(screen.queryByText('+1 XP')).toBeNull()
+})
+
+const FAUX = {
+  juste: false, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 0, gagnes: 0,
+  points: 5, total: 130, nouveauxTitres: [], prochain: null,
+  resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
+}
+
+test('pas de signalement avant la réponse', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  monter()
+  await retourner()
+  await screen.findByRole('button', { name: 'Sainte-Sophie' })
+  expect(screen.queryByRole('button', { name: 'Signaler une erreur ou une injustice' })).toBeNull()
+})
+
+test('après le verdict, signaler : une raison, un mot, un merci, puis retour à l’énigme', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockResolvedValue(FAUX)
+  signalerEnigme.mockResolvedValue(undefined)
+  monter()
+  await retourner()
+  fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }))
+  fireEvent.click(screen.getByRole('radio', { name: 'Ma réponse aurait dû être acceptée' }))
+  fireEvent.change(screen.getByRole('textbox', { name: 'Un mot de plus' }), {
+    target: { value: 'les deux sont justes' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Envoyer le signalement' }))
+  expect(await screen.findByText('Merci')).toBeInTheDocument()
+  expect(signalerEnigme).toHaveBeenCalledWith(242, 'reponse_refusee', 'les deux sont justes')
+  fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  expect(await screen.findByText('Pas cette fois')).toBeInTheDocument()
 })

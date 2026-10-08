@@ -1,6 +1,7 @@
 /**
  * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — « Énigme »
- *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict.
+ *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict,
+ *            et tout en bas un lien discret pour signaler une erreur (mig 464).
  * POURQUOI — maquettes « Énigmes — 3 » et « 5b à 5d », et la feuille redessinée « A » (Figma 484:434,
  *            choisie par Uriel le 07/10 : la première version n'était « pas sexy » et peu lisible). Une seule réponse (QCM : un bouton par
  *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou
@@ -14,6 +15,7 @@ import type { EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { useEnigme } from '../hooks/useEnigme'
 import { relanceEnClair } from '../lib/enigmeEnClair'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
+import { FeuilleSignalerEnigme } from './FeuilleSignalerEnigme'
 import { BilanDuVerdict, FeteDuVerdict } from './VerdictEnigme'
 import styles from './FeuilleEnigme.module.css'
 
@@ -21,6 +23,7 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
   const { enigme, erreurOuverture, repondre, verdict, envoi, erreurReponse } = useEnigme(touchee.id)
   const [retourne, setRetourne] = useState(false)
   const [choisie, setChoisie] = useState<string | null>(null)
+  const [signaler, setSignaler] = useState(false)
 
   if (erreurOuverture) {
     return (
@@ -40,6 +43,18 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         culture={enigme?.culture ?? null}
         onFini={() => {
           if (enigme) setRetourne(true)
+        }}
+      />
+    )
+  }
+
+  // Le verdict reste dans la mutation de useEnigme : fermer le signalement le retrouve intact.
+  if (signaler) {
+    return (
+      <FeuilleSignalerEnigme
+        numero={enigme.numero}
+        onFermer={() => {
+          setSignaler(false)
         }}
       />
     )
@@ -83,6 +98,17 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
           <Relance reste={verdict.resteEnAttente} onFermer={onFermer} />
         ) : (
           <Text variant="legende">Une seule réponse. Juste : +1 XP et des points de connaissance.</Text>
+        )}
+        {verdict && (
+          <button
+            type="button"
+            className={styles.signaler}
+            onClick={() => {
+              setSignaler(true)
+            }}
+          >
+            Signaler une erreur ou une injustice
+          </button>
         )}
       </div>
     </Feuille>
