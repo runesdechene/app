@@ -61,6 +61,7 @@ test('les filtres se cumulent', () => {
     progression: 'visites' as const,
     natures: new Set(['chateau']),
     epoques: new Set(['renaissance']),
+    fragments: true,
   }
   expect(filtrer(TOUS, f)).toEqual([])
 })
@@ -74,4 +75,9 @@ test('le nombre de lieux de chaque nature', () => {
       ['dolmen', 1],
     ]),
   )
+})
+
+test('les Fragments sont montrés par défaut ; les masquer compte comme un filtre actif', () => {
+  expect(FILTRES_VIDES.fragments).toBe(true)
+  expect(filtresActifs({ ...FILTRES_VIDES, fragments: false })).toBe(true)
 })

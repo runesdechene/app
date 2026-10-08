@@ -20,7 +20,7 @@ import { maplibregl } from '@/shared/lib/maplibre'
 import type { GeoJSONSource, Map as Carte } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useIsRestoring } from '@tanstack/react-query'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import filtre from '@/assets/ui/filtre.svg'
 import plus from '@/assets/ui/plus.svg'
@@ -34,6 +34,7 @@ import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
+import { useFragmentsSurLaCarte } from '../hooks/useFragmentsSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
 import { useLieuxEnCouleur } from '../hooks/useLieuxEnCouleur'
 import { useTerritoire } from '../hooks/useTerritoire'
@@ -149,6 +150,12 @@ function CarteVivante({
     setEnigmeTouchee(t)
   }, enigmeTouchee?.id ?? null)
   const actifOuvert = actifs.find((a) => a.id === explorateurOuvert)
+  // Les Fragments à leur origine, pour tous (la vitrine aussi) : toucher un médaillon ouvre son récit.
+  const ouvrirFragment = useCallback(
+    (id: number) => void navigate(visiteur ? `/bienvenue/carte/fragment/${String(id)}` : `/carte/fragment/${String(id)}`),
+    [navigate, visiteur],
+  )
+  useFragmentsSurLaCarte(carte, filtres.fragments, ouvrirFragment)
 
   useEffect(() => {
     if (!conteneur.current) return

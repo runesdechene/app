@@ -25,3 +25,12 @@ test('jamais plus de 2 000 px, et les autres adresses restent telles quelles', (
   expect(aLaTaille('blob:http://localhost/123', 100)).toBe('blob:http://localhost/123')
   expect(aLaTaille(null, 100)).toBeNull()
 })
+
+test('une image de Shopify est redimensionnée par son CDN, au double de la taille affichée', () => {
+  expect(aLaTaille('https://cdn.shopify.com/s/files/1/0728/files/illu.webp?v=17', 48)).toBe(
+    'https://cdn.shopify.com/s/files/1/0728/files/illu.webp?v=17&width=96',
+  )
+  expect(aLaTaille('https://cdn.shopify.com/s/files/illu.png', 300)).toBe(
+    'https://cdn.shopify.com/s/files/illu.png?width=600',
+  )
+})

@@ -90,6 +90,22 @@ export function FiltreFeuille({
           />
 
           <div className={styles.rubrique}>
+            <h3 className={styles.titreRubrique}>Sur la carte</h3>
+          </div>
+          <div className={styles.puces}>
+            <button
+              type="button"
+              className={styles.epoque}
+              aria-pressed={filtres.fragments}
+              onClick={() => {
+                onFiltres({ ...filtres, fragments: !filtres.fragments })
+              }}
+            >
+              Les Fragments, à leur origine
+            </button>
+          </div>
+
+          <div className={styles.rubrique}>
             <h3 className={styles.titreRubrique}>Natures</h3>
             <span className={styles.aide}>Plusieurs à la fois</span>
           </div>

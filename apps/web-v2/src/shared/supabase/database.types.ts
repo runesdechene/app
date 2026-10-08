@@ -1164,6 +1164,7 @@ export type Database = {
           icon: string | null
           id: string
           label: string
+          presentation: string | null
           sort_order: number
           zone: string | null
         }
@@ -1175,6 +1176,7 @@ export type Database = {
           icon?: string | null
           id: string
           label: string
+          presentation?: string | null
           sort_order?: number
           zone?: string | null
         }
@@ -1186,6 +1188,7 @@ export type Database = {
           icon?: string | null
           id?: string
           label?: string
+          presentation?: string | null
           sort_order?: number
           zone?: string | null
         }
@@ -4781,17 +4784,32 @@ export type Database = {
           ability_cooldown_hours: number | null
           ability_type: string | null
           ability_value: number | null
+          artiste: string | null
+          audio_url: string | null
           bonus_type: string | null
           bonus_value: number | null
           collection: string | null
           created_at: string | null
           description: string | null
+          fond_url: string | null
+          heritage: string | null
+          histoire: string | null
           icon: string | null
           icon_url: string | null
           id: number
+          illustration_sombre_url: string | null
+          illustration_url: string | null
           image_url: string | null
           link_url: string | null
           name: string
+          narrateur: string | null
+          origine_lat: number | null
+          origine_lng: number | null
+          origine_nom: string | null
+          resume: string | null
+          shopify_collection: string | null
+          shopify_handle: string | null
+          synchronise_le: string | null
           theme: string | null
           visible: boolean
         }
@@ -4799,17 +4817,32 @@ export type Database = {
           ability_cooldown_hours?: number | null
           ability_type?: string | null
           ability_value?: number | null
+          artiste?: string | null
+          audio_url?: string | null
           bonus_type?: string | null
           bonus_value?: number | null
           collection?: string | null
           created_at?: string | null
           description?: string | null
+          fond_url?: string | null
+          heritage?: string | null
+          histoire?: string | null
           icon?: string | null
           icon_url?: string | null
           id?: number
+          illustration_sombre_url?: string | null
+          illustration_url?: string | null
           image_url?: string | null
           link_url?: string | null
           name: string
+          narrateur?: string | null
+          origine_lat?: number | null
+          origine_lng?: number | null
+          origine_nom?: string | null
+          resume?: string | null
+          shopify_collection?: string | null
+          shopify_handle?: string | null
+          synchronise_le?: string | null
           theme?: string | null
           visible?: boolean
         }
@@ -4817,17 +4850,32 @@ export type Database = {
           ability_cooldown_hours?: number | null
           ability_type?: string | null
           ability_value?: number | null
+          artiste?: string | null
+          audio_url?: string | null
           bonus_type?: string | null
           bonus_value?: number | null
           collection?: string | null
           created_at?: string | null
           description?: string | null
+          fond_url?: string | null
+          heritage?: string | null
+          histoire?: string | null
           icon?: string | null
           icon_url?: string | null
           id?: number
+          illustration_sombre_url?: string | null
+          illustration_url?: string | null
           image_url?: string | null
           link_url?: string | null
           name?: string
+          narrateur?: string | null
+          origine_lat?: number | null
+          origine_lng?: number | null
+          origine_nom?: string | null
+          resume?: string | null
+          shopify_collection?: string | null
+          shopify_handle?: string | null
+          synchronise_le?: string | null
           theme?: string | null
           visible?: boolean
         }
@@ -5937,6 +5985,7 @@ export type Database = {
           bio: string | null
           biography: string | null
           brouiller_pistes: boolean | null
+          charte_signee_le: string | null
           conquest_points: number | null
           conquest_reset_at: string | null
           construction_points: number | null
@@ -5966,6 +6015,7 @@ export type Database = {
           last_device_os: string | null
           last_device_version: string | null
           last_login_at: string | null
+          lieux_en_couleur: boolean | null
           location_name: string | null
           location_zip: string | null
           max_conquest: number | null
@@ -5980,6 +6030,9 @@ export type Database = {
           rank: string | null
           role: string | null
           shopify_customer_id: number | null
+          show_departement: boolean | null
+          show_envies: boolean | null
+          signe_fragment_id: number | null
           timezone: string | null
           title_gender: string | null
           tutorial_completed_at: string | null
@@ -5999,6 +6052,7 @@ export type Database = {
           bio?: string | null
           biography?: string | null
           brouiller_pistes?: boolean | null
+          charte_signee_le?: string | null
           conquest_points?: number | null
           conquest_reset_at?: string | null
           construction_points?: number | null
@@ -6028,6 +6082,7 @@ export type Database = {
           last_device_os?: string | null
           last_device_version?: string | null
           last_login_at?: string | null
+          lieux_en_couleur?: boolean | null
           location_name?: string | null
           location_zip?: string | null
           max_conquest?: number | null
@@ -6042,6 +6097,9 @@ export type Database = {
           rank?: string | null
           role?: string | null
           shopify_customer_id?: number | null
+          show_departement?: boolean | null
+          show_envies?: boolean | null
+          signe_fragment_id?: number | null
           timezone?: string | null
           title_gender?: string | null
           tutorial_completed_at?: string | null
@@ -6061,6 +6119,7 @@ export type Database = {
           bio?: string | null
           biography?: string | null
           brouiller_pistes?: boolean | null
+          charte_signee_le?: string | null
           conquest_points?: number | null
           conquest_reset_at?: string | null
           construction_points?: number | null
@@ -6090,6 +6149,7 @@ export type Database = {
           last_device_os?: string | null
           last_device_version?: string | null
           last_login_at?: string | null
+          lieux_en_couleur?: boolean | null
           location_name?: string | null
           location_zip?: string | null
           max_conquest?: number | null
@@ -6104,6 +6164,9 @@ export type Database = {
           rank?: string | null
           role?: string | null
           shopify_customer_id?: number | null
+          show_departement?: boolean | null
+          show_envies?: boolean | null
+          signe_fragment_id?: number | null
           timezone?: string | null
           title_gender?: string | null
           tutorial_completed_at?: string | null
@@ -6128,6 +6191,13 @@ export type Database = {
             columns: ["faction_id"]
             isOneToOne: false
             referencedRelation: "factions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_signe_fragment_id_fkey"
+            columns: ["signe_fragment_id"]
+            isOneToOne: false
+            referencedRelation: "title_fragments"
             referencedColumns: ["id"]
           },
         ]
@@ -6618,6 +6688,10 @@ export type Database = {
         Args: { p_aime: boolean; p_message: number }
         Returns: undefined
       }
+      ajouter_fragment: {
+        Args: { p_collection: string; p_nom: string }
+        Returns: number
+      }
       ajouter_lieu: {
         Args: {
           p_adresse: string
@@ -6949,7 +7023,18 @@ export type Database = {
           p_id: string
           p_label: string
           p_ordre: number
+          p_presentation?: string
           p_zone?: string
+        }
+        Returns: undefined
+      }
+      enregistrer_fragment: {
+        Args: {
+          p_id: number
+          p_origine_lat: number
+          p_origine_lng: number
+          p_origine_nom: string
+          p_visible: boolean
         }
         Returns: undefined
       }
@@ -6986,6 +7071,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fragments_sur_la_carte: { Args: never; Returns: Json }
       get_active_community_quest: { Args: { p_user_id: string }; Returns: Json }
       get_all_fragments: { Args: { p_user_id: string }; Returns: Json }
       get_all_player_titles: { Args: { p_user_id: string }; Returns: Json }
@@ -8002,6 +8088,10 @@ export type Database = {
       soundex: { Args: { "": string }; Returns: string }
       supprimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       sur_les_chemins: { Args: { p_limite?: number }; Returns: Json }
+      synchroniser_fragments: {
+        Args: { p_illustrations: Json }
+        Returns: number
+      }
       territoire_en: { Args: { p_lat: number; p_lng: number }; Returns: Json }
       territory_radius_km: { Args: { p_score: number }; Returns: number }
       text_soundex: { Args: { "": string }; Returns: string }
