@@ -1,0 +1,51 @@
+/* L'écran « Notifications » : les jetons du Hub (parchemin, brun, rouge sang, Cinzel). La bulle
+   d'exemple imite un push sur un téléphone : c'est ce que reçoit l'Explorateur. */
+
+.notif-erreur { color: var(--color-primary); }
+
+.notif-chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.notif-chiffre { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius); }
+.notif-chiffre-valeur { font-family: var(--font-title-family); font-size: 30px; color: var(--color-text); line-height: 1.1; }
+.notif-chiffre-libelle { font-size: 14px; color: var(--color-text-secondary); }
+.notif-chiffre--sourd .notif-chiffre-valeur { color: var(--color-muted); }
+
+.notif-groupe { margin-bottom: 32px; }
+.notif-groupe h2 { margin: 0; font-family: var(--font-title-family); font-size: 20px; }
+.notif-compte { display: inline-block; min-width: 22px; padding: 0 7px; margin-left: 6px; border-radius: 11px; font-size: 14px;
+  background: var(--color-primary-light); color: var(--color-primary); text-align: center; vertical-align: middle; }
+.notif-aide { margin: 4px 0 14px; color: var(--color-muted); font-size: 14px; }
+
+.notif-sortes { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.notif-sorte { display: flex; flex-direction: column; gap: 6px; padding: 14px; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius); }
+.notif-sorte-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.notif-sorte-tete h3 { margin: 0; font-family: var(--font-title-family); font-size: 16px; }
+.notif-sorte-tete code { font-size: 12px; color: var(--color-muted); }
+.notif-sorte-quand, .notif-sorte-pour { margin: 0; font-size: 14px; color: var(--color-text-secondary); line-height: 1.4; }
+
+/* La bulle : un push tel qu'il s'affiche, sombre et arrondi comme sur un téléphone. */
+.notif-bulle { display: flex; flex-direction: column; gap: 2px; margin: 6px 0 2px; padding: 10px 12px; border-radius: 14px;
+  background: var(--color-text); color: var(--color-surface); font-size: 14px; line-height: 1.35; box-shadow: var(--shadow-md); }
+.notif-bulle-app { font-size: 12px; opacity: 0.6; }
+.notif-bulle strong { font-weight: 600; }
+.notif-sans-push { margin: 6px 0 2px; font-size: 14px; color: var(--color-muted); font-style: italic; }
+
+.notif-sorte-chiffres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 4px 0 0; }
+.notif-sorte-chiffres div { display: flex; flex-direction: column; }
+.notif-sorte-chiffres dt { font-family: var(--font-accent-family); font-size: 12px; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.notif-sorte-chiffres dd { margin: 0; font-size: 15px; }
+.notif-alerte { margin: 0; padding: 6px 10px; border-radius: 6px; background: var(--color-primary-light); color: var(--color-primary); font-size: 14px; }
+
+.notif-fil { list-style: none; margin: 0; padding: 0; }
+.notif-fil-ligne { display: grid; grid-template-columns: 110px 170px minmax(0, 1fr) 70px; gap: 12px; align-items: baseline;
+  padding: 8px 0; border-bottom: 1px solid var(--color-border); font-size: 15px; }
+.notif-fil-ligne--sourde { opacity: 0.55; }
+.notif-fil-quand, .notif-fil-lu { color: var(--color-muted); font-size: 14px; }
+.notif-fil-nom { font-family: var(--font-title-family); font-size: 14px; }
+.notif-fil-detail { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notif-fil-detail em { color: var(--color-text-secondary); }
+
+@media (max-width: 720px) {
+  .notif-fil-ligne { grid-template-columns: 1fr; gap: 2px; }
+}
