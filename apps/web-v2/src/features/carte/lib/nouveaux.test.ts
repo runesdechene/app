@@ -32,7 +32,7 @@ test('un contour d’encre seul, seulement pour les lieux nouveaux', () => {
 test('la gélule « NOUVEAU », à l’encre, se pose sous la marque, et seulement de près', () => {
   expect(calqueGelule(c)).toMatchObject({
     type: 'symbol',
-    minzoom: 9,
+    minzoom: 7,
     filter: ['==', ['get', 'nouveau'], true],
     layout: { 'text-anchor': 'top' },
     paint: { 'icon-color': '#494841', 'text-color': '#fffaf2' },

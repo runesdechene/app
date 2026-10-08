@@ -23,7 +23,7 @@ const PERIODE = 3000 // ms : plus lent que les énigmes (2 200), pour qu'on ne l
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
 const ELAN = 4 // de combien l'anneau s'élargit au-delà de la marque (réduit de moitié, Uriel 08/10)
 const TRAIT = 1.2 // l'épaisseur de l'anneau
-const DE_PLUS_PRES = 9 // la gélule ne s'affiche qu'à partir de là : de loin, l'anneau suffit
+const DE_PLUS_PRES = 7 // la gélule s'affiche dès l'échelle d'une région (9 → 7, Uriel 08/10) ; plus loin, l'anneau suffit
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
