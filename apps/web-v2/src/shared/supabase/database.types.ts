@@ -7848,6 +7848,7 @@ export type Database = {
         Args: { p_limite?: number; p_nature?: string; p_texte?: string }
         Returns: Json
       }
+      recit_du_fragment: { Args: { p_id: number }; Returns: Json }
       register_push_subscription: {
         Args: {
           p_auth: string

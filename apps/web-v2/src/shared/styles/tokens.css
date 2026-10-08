@@ -24,6 +24,8 @@
   /* Accents */
   --color-accent: #a94842;
   --color-accent-clair: #e89f9f;
+  --color-onglet: #796f65; /* un onglet choisi et son trait (récit d'un Fragment, Figma 101:107) */
+  --color-onglet-ferme: #b8b3ad; /* un onglet verrouillé (« Ses énigmes ») */
   --color-rose: #ebd2d2;
   --color-ocre: #a89369;
   --color-kaki: #46493c;

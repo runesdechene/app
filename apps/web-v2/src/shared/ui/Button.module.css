@@ -72,3 +72,11 @@
   color: var(--color-desactive-texte);
   cursor: not-allowed;
 }
+
+/* Un lien habillé en bouton : centré comme lui, sans soulignement. */
+.lien {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

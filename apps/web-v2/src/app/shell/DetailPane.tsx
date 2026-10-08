@@ -9,6 +9,8 @@
  *            comme un nom écrit à la main (la même conversation).
  *            `surImage` : le contenu commence par une photo pleine largeur (la fiche d'un lieu) —
  *            la flèche claire se pose dessus, le titre n'est plus visible mais reste annoncé.
+ *            `titreCache` : la même chose sur un fond clair (le récit d'un Fragment, maquette 99:145) —
+ *            la flèche sombre, le nom écrit dans la page.
  *            La flèche est toujours là, sur PC comme sur mobile (Uriel, 30/09).
  */
 import { useEffect, useRef, type ReactNode } from 'react'
@@ -21,6 +23,7 @@ export function DetailPane({
   title,
   actions,
   surImage = false,
+  titreCache = false,
   avant,
   sousTitre,
   plume = false,
@@ -30,6 +33,7 @@ export function DetailPane({
   title: string
   actions?: ReactNode
   surImage?: boolean
+  titreCache?: boolean
   avant?: ReactNode | undefined
   sousTitre?: string | undefined
   plume?: boolean
@@ -47,7 +51,7 @@ export function DetailPane({
 
   return (
     <aside
-      className={[styles.pane, surImage && styles.surImage].filter(Boolean).join(' ')}
+      className={[styles.pane, (surImage || titreCache) && styles.surImage].filter(Boolean).join(' ')}
       aria-labelledby="detail-title"
       data-detail
     >
@@ -61,7 +65,7 @@ export function DetailPane({
             id="detail-title"
             ref={heading}
             tabIndex={-1}
-            className={[styles.title, surImage && styles.masque, plume && styles.plume]
+            className={[styles.title, (surImage || titreCache) && styles.masque, plume && styles.plume]
               .filter(Boolean)
               .join(' ')}
           >

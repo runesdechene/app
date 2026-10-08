@@ -1,0 +1,141 @@
+/*
+ * QUOI     — le récit d'un Fragment (maquette 99:145) : le parchemin et ses arbres en tête, tout centré
+ *            sur 334 px, le motif dans sa carte, les onglets soulignés, le récit en Cabin 16 px.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-2) 28px calc(env(safe-area-inset-bottom) + var(--space-6));
+  background:
+    url('../../../assets/ui/fond-parchemin.webp') center top / 100% auto no-repeat,
+    var(--color-fond);
+}
+
+.page > * {
+  width: 100%;
+  max-width: 334px;
+}
+
+.surtitre,
+.heritage {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  text-align: center;
+}
+
+.surtitre {
+  font-size: var(--flux-size);
+}
+
+.heritage {
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.nom {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  text-align: center;
+}
+
+.motif {
+  display: grid;
+  place-items: center;
+  width: auto;
+  padding: 16px 32px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: var(--color-surface);
+}
+
+.motif img {
+  display: block;
+  object-fit: contain;
+  opacity: 0.8;
+}
+
+/* Les onglets : « Son histoire » choisi, souligné ; « Ses énigmes » verrouillé. */
+.onglets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-onglet) 20%, transparent);
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+}
+
+.onglet,
+.ferme {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 9px;
+}
+
+.onglet {
+  color: var(--color-onglet);
+  box-shadow: inset 0 -3px 0 var(--color-onglet);
+}
+
+.ferme {
+  color: var(--color-onglet-ferme);
+}
+
+.histoire {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 6px;
+}
+
+.paragraphe {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: 24px;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.paragraphe strong {
+  font-weight: var(--weight-semi);
+}
+
+.lireTout {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: 0.9375rem;
+  font-weight: var(--weight-semi);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.acheter {
+  display: grid;
+  margin-top: var(--space-6);
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paragraphe {
+    transition: none;
+  }
+}

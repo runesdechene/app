@@ -36,3 +36,11 @@ test('actif : transmet le toucher', async () => {
   await userEvent.click(screen.getByRole('button'))
   expect(onClick).toHaveBeenCalledOnce()
 })
+
+test('avec href, un lien habillé en bouton, ouvert dans un nouvel onglet', () => {
+  render(<Button href="https://runesdechene.com/collections/hoplite">Acheter ce Fragment</Button>)
+  const lien = screen.getByRole('link', { name: 'Acheter ce Fragment' })
+  expect(lien).toHaveAttribute('href', 'https://runesdechene.com/collections/hoplite')
+  expect(lien).toHaveAttribute('target', '_blank')
+  expect(lien).toHaveClass('principal')
+})

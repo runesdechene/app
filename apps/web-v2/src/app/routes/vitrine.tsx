@@ -1,6 +1,7 @@
 /**
  * QUOI     — /bienvenue/carte : la carte pour qui n'a pas de compte, positions floutées ;
- *            /bienvenue/carte/lieu/<id> : l'aperçu d'un lieu, au centre, par-dessus la carte ; et
+ *            /bienvenue/carte/lieu/<id> : l'aperçu d'un lieu, au centre, par-dessus la carte ;
+ *            /bienvenue/carte/fragment/<id> : le récit d'un Fragment, de la même façon ; et
  *            /bienvenue/<étape> : l'onboarding, qui sur PC se pose lui aussi en écran sur la carte.
  * POURQUOI — Uriel, 30/09 : le visiteur qui ferme l'aperçu profite de la carte, choisit d'autres
  *            lieux, et retrouve à chaque fois la même invitation à rejoindre. La carte vient de la
@@ -12,7 +13,8 @@
  *            téléphone, l'onboarding reste plein écran et la carte n'est pas chargée.
  */
 import { lazy, Suspense } from 'react'
-import { Link, Outlet } from 'react-router'
+import { Link, Outlet, useParams } from 'react-router'
+import { RecitFragment } from '@/features/fragments/components/RecitFragment'
 import { Onboarding } from '@/features/onboarding/components/Onboarding'
 import { ApercuLieu } from '@/features/vitrine/components/ApercuLieu'
 import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
@@ -54,6 +56,18 @@ export function RouteApercuLieu() {
       <Link className={styles.voile} to="/bienvenue/carte" aria-label="Fermer l’aperçu" />
       <div className={styles.fenetre}>
         <ApercuLieu />
+      </div>
+    </div>
+  )
+}
+
+export function RouteApercuFragment() {
+  const id = Number(useParams().id)
+  return (
+    <div className={styles.calque}>
+      <Link className={styles.voile} to="/bienvenue/carte" aria-label="Fermer le récit" />
+      <div className={styles.fenetre}>
+        <RecitFragment key={id} id={id} />
       </div>
     </div>
   )

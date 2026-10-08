@@ -16,6 +16,8 @@ export const COLOR_TOKENS = [
   '--color-sur-accent',
   '--color-accent',
   '--color-accent-clair',
+  '--color-onglet',
+  '--color-onglet-ferme',
   '--color-rose',
   '--color-ocre',
   '--color-kaki',

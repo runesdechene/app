@@ -3,6 +3,7 @@
  * POURQUOI — tout état navigable est une URL (spec socle §4bis). Premier segment = l'onglet ;
  *            ce qui suit = un détail ouvert par-dessus (ex. /carte/explorateur/<id>), ou une
  *            feuille (/carte/ajouter).
+ *            /<onglet>/fragment/<id> : le récit d'un Fragment, ouvert depuis la carte.
  *            /bienvenue : la vitrine, où l'on cherche sans compte ; /bienvenue/carte : la carte des
  *            visiteurs, positions floutées, et l'aperçu d'un lieu par-dessus (…/lieu/<id>) ; /bienvenue/<étape> : les écrans d'entrée. Tous hors de la garde d'accès.
  */
@@ -27,7 +28,8 @@ import {
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
 import { RouteMurmure } from './routes/messages'
-import { RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
+import { RouteApercuFragment, RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
+import { RouteFragment } from './routes/fragments'
 import {
   RouteExplorateur,
   RouteModifier,
@@ -43,7 +45,10 @@ export const routes: RouteObject[] = [
   {
     path: '/bienvenue/carte',
     Component: RouteCarteVisiteur,
-    children: [{ path: 'lieu/:id', Component: RouteApercuLieu }],
+    children: [
+      { path: 'lieu/:id', Component: RouteApercuLieu },
+      { path: 'fragment/:id', Component: RouteApercuFragment },
+    ],
   },
   { path: '/bienvenue/:etape', Component: RouteOnboarding },
   {
@@ -73,6 +78,7 @@ export const routes: RouteObject[] = [
               { path: 'lieu/:id', Component: RouteLieu },
               { path: 'lieu/:id/modifier', Component: RouteModifierLieu },
               { path: 'lieu/:id/carnet', Component: RouteCarnet },
+              { path: 'fragment/:id', Component: RouteFragment },
               { path: 'explorateur/:id', Component: RouteExplorateur },
               { path: 'explorateur/:id/modifier', Component: RouteModifier },
               { path: 'explorateur/:id/passeport', Component: RoutePasseport },
