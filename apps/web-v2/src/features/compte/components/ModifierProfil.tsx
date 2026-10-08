@@ -18,6 +18,7 @@ import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import type { Titre } from '../api/lireProfil'
 import { useModifierProfil, type ValeursProfil } from '../hooks/useModifierProfil'
+import { pseudoInstagram } from '../lib/instagram'
 import styles from './ModifierProfil.module.css'
 
 const TITRES_MAX = 3
@@ -98,7 +99,7 @@ function Formulaire({
         {
           ...valeurs,
           nom: valeurs.nom.trim(),
-          instagram: valeurs.instagram.trim().replace(/^@/, ''),
+          instagram: pseudoInstagram(valeurs.instagram) ?? valeurs.instagram.trim(),
         },
         photo?.fichier ?? null,
       )
