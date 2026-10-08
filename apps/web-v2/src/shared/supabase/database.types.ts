@@ -7034,6 +7034,7 @@ export type Database = {
           p_origine_lat: number
           p_origine_lng: number
           p_origine_nom: string
+          p_theme: string
           p_visible: boolean
         }
         Returns: undefined
