@@ -69,10 +69,10 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
       'text-font': ['Noto Sans Bold'],
       'text-size': 8,
       'text-letter-spacing': 0.08,
-      // Sous la marque, comme un nom ; dès le zoom 12, un lieu revendiqué a déjà sa pilule à cet
-      // endroit (calques.ts) : la gélule se pose alors juste dessous.
+      // Sous la marque, à la place du nom de qui l'a revendiqué (calques.ts ne le montre pas sur un
+      // lieu neuf) : jamais les deux empilés.
       'text-anchor': 'top',
-      'text-offset': ['step', ['zoom'], ['literal', [0, 2.1]], 12, ['case', ['has', 'pilule'], ['literal', [0, 3.9]], ['literal', [0, 2.1]]]],
+      'text-offset': [0, 2.1],
       'icon-image': 'pilule-nouveau',
       'icon-text-fit': 'both',
       'icon-text-fit-padding': [2, 5, 2, 5],

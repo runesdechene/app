@@ -22,8 +22,10 @@ export const SOURCE = 'lieux'
 export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites']
 export const CALQUE_SURVOL = 'survol'
 
-// De près seulement : les pilules et les points d'intérêt ne chargent pas la vue d'ensemble.
+// De près seulement : les points d'intérêt ne chargent pas la vue d'ensemble.
 const DE_PRES = 12
+// Le nom de qui a revendiqué un lieu : dès l'échelle d'un département (12 → 9, Uriel 08/10).
+const DE_PRES_PILULES = 9
 
 type Proprietes = {
   id: string
@@ -149,8 +151,9 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     id: 'pilules',
     type: 'symbol',
     source: SOURCE,
-    minzoom: DE_PRES,
-    filter: ['has', 'pilule'],
+    minzoom: DE_PRES_PILULES,
+    // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés.
+    filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true]],
     layout: {
       'text-field': ['upcase', ['get', 'pilule']],
       'text-font': ['Noto Sans Bold'],
