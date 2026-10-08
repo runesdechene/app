@@ -28,11 +28,11 @@ test('halo et onde : seulement les lieux nouveaux, à la couleur de leur nature'
   }
 })
 
-test('la gélule « NOUVEAU » se pose au-dessus de la marque, et seulement de près', () => {
+test('la gélule « NOUVEAU » se pose sous la marque (sous la pilule si le lieu en a une), et seulement de près', () => {
   expect(calqueGelule(c)).toMatchObject({
     type: 'symbol',
     minzoom: 9,
     filter: ['==', ['get', 'nouveau'], true],
-    layout: { 'text-anchor': 'bottom' },
+    layout: { 'text-anchor': 'top' },
   })
 })

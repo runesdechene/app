@@ -2,7 +2,7 @@
  * QUOI     — les nouveaux lieux sur la carte (Figma 523:722, « A en couleur, avec C en plus », Uriel
  *            08/10) : sous la marque d'un lieu ajouté depuis moins de 14 jours et pas encore ouvert,
  *            un halo et une onde à la couleur de sa nature, qui rayonne lentement ; de plus près, une
- *            gélule « NOUVEAU » au-dessus de la marque.
+ *            gélule « NOUVEAU » sous la marque (Uriel, 08/10 : « pour que les gens comprennent »).
  * POURQUOI — ce qui rayonne appelle à être touché (comme le « ? » des énigmes) ; la couleur dit déjà
  *            ce qu'on va découvrir. L'onde est plus lente que celle des énigmes, pour ne pas les
  *            confondre. Calques MapLibre sur la source des lieux : la propriété `nouveau` (migration
@@ -75,9 +75,10 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
       'text-font': ['Noto Sans Bold'],
       'text-size': 8,
       'text-letter-spacing': 0.08,
-      // Au-dessus de la marque : la pilule de revendication est déjà dessous.
-      'text-anchor': 'bottom',
-      'text-offset': [0, -2.1],
+      // Sous la marque, comme un nom ; dès le zoom 12, un lieu revendiqué a déjà sa pilule à cet
+      // endroit (calques.ts) : la gélule se pose alors juste dessous.
+      'text-anchor': 'top',
+      'text-offset': ['step', ['zoom'], ['literal', [0, 2.1]], 12, ['case', ['has', 'pilule'], ['literal', [0, 3.9]], ['literal', [0, 2.1]]]],
       'icon-image': 'pilule-nouveau',
       'icon-text-fit': 'both',
       'icon-text-fit-padding': [2, 5, 2, 5],
