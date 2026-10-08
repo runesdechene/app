@@ -10,7 +10,7 @@
  */
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { catalogue, sorteDe, typesConnus, type Category, type SorteDeNotification } from '../../lib/catalogueNotifications'
+import { catalogue, sorteDe, typesConnus, typesQuiPartent, type Category, type SorteDeNotification } from '../../lib/catalogueNotifications'
 import './Notifications.css'
 
 interface ChiffresSorte {
@@ -57,7 +57,7 @@ export function Notifications() {
     setLoading(true)
     setErreur(null)
     try {
-      const { data, error } = await supabase.rpc('notifications_du_hub', { p_types: typesConnus() })
+      const { data, error } = await supabase.rpc('notifications_du_hub', { p_types: typesConnus(), p_fil: typesQuiPartent() })
       if (error) throw error
       setDonnees(data as DonneesDuHub)
     } catch (e) {
@@ -121,11 +121,11 @@ export function Notifications() {
       })}
 
       <section className="notif-groupe">
-        <h2>Les 50 dernières</h2>
-        <p className="notif-aide">Tous les Explorateurs confondus, la plus récente en haut.</p>
+        <h2>Les 50 dernières qui sont parties</h2>
+        <p className="notif-aide">Tous les Explorateurs confondus, la plus récente en haut ; les silencieuses n’y figurent pas.</p>
         <ol className="notif-fil">
           {donnees.fil.map((n) => (
-            <li key={n.id} className={sorteDe(n.type).categorie === 'silent' ? 'notif-fil-ligne notif-fil-ligne--sourde' : 'notif-fil-ligne'}>
+            <li key={n.id} className="notif-fil-ligne">
               <span className="notif-fil-quand">{date(n.quand)}</span>
               <span className="notif-fil-nom">{sorteDe(n.type).nom}</span>
               <span className="notif-fil-detail">
@@ -151,8 +151,8 @@ function Sorte({ sorte: s, chiffres: c, cloche }: { sorte: SorteDeNotification; 
         <h3>{s.nom}</h3>
         <code>{s.type}</code>
       </div>
-      <p className="notif-sorte-quand">Quand {s.quand}.</p>
-      <p className="notif-sorte-pour">Pour {s.pour}.</p>
+      <p className="notif-sorte-quand"><span>Quand</span> {s.quand}.</p>
+      <p className="notif-sorte-pour"><span>Pour</span> {s.pour}.</p>
       {s.exemple ? (
         <div className="notif-bulle" aria-label="Le push tel qu’il arrive sur le téléphone">
           <span className="notif-bulle-app">Explore · maintenant</span>

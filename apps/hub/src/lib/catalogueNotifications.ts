@@ -43,6 +43,16 @@ const DESCRIPTIONS: Record<string, { nom: string; quand: string; pour: string }>
   milestone_exploration: { nom: 'Palier de visites', quand: 'un lieu atteint un palier de visites', pour: 'son auteur' },
   milestone_vues: { nom: 'Palier de vues', quand: 'une fiche atteint un palier de vues', pour: 'l’auteur du lieu' },
   milestone_likes: { nom: 'Palier de cœurs', quand: 'un lieu atteint un palier de cœurs', pour: 'son auteur' },
+  // Les sortes de la V1 encore créées, silencieuses.
+  daily_enigma_ready: { nom: 'Énigme du jour (V1)', quand: 'chaque jour à 12 h 30, jusqu’au 08/10 (remplacée par « Énigme du jour »)', pour: 'presque tous les comptes' },
+  level_up_imminent: { nom: 'Presque le niveau suivant (V1)', quand: 'chaque jour à 17 h, quand on frôle le niveau suivant', pour: 'les Explorateurs concernés' },
+  place_taken_remote: { nom: 'Lieu pris à distance (Cour V1)', quand: 'quelqu’un prend un lieu par la Cour de la V1', pour: 'l’ancien veilleur' },
+  place_taken_remote_self: { nom: 'Lieu pris à distance, pour soi (Cour V1)', quand: 'on prend soi-même un lieu par la Cour de la V1', pour: 'soi' },
+  place_taken_back_gps: { nom: 'Lieu repris sur place (Cour V1)', quand: 'un lieu est repris sur place dans la Cour de la V1', pour: 'l’ancien veilleur' },
+  place_court_attack: { nom: 'Attaque de la Cour (V1)', quand: 'quelqu’un investit contre un lieu tenu', pour: 'son veilleur' },
+  place_court_support: { nom: 'Soutien de la Cour (V1)', quand: 'quelqu’un soutient un lieu tenu', pour: 'son veilleur' },
+  place_court_high_threat: { nom: 'Lieu menacé (Cour V1)', quand: 'un lieu tenu est près d’être pris', pour: 'son veilleur' },
+  mecene_principal_gained: { nom: 'Mécène principal (Cour V1)', quand: 'on devient le premier mécène d’un lieu', pour: 'le nouveau mécène' },
 }
 
 // De quoi remplir un exemple de texte, comme le ferait une vraie notification.
@@ -66,8 +76,8 @@ export function sorteDe(type: string): SorteDeNotification {
   return {
     type,
     nom: d?.nom ?? type,
-    quand: d?.quand ?? 'ancienne sorte, sans description',
-    pour: d?.pour ?? '—',
+    quand: d?.quand ?? 'sorte héritée de la V1, sans description',
+    pour: d?.pour ?? 'inconnu',
     categorie: categoryOf(type),
     exemple: exemple ? { title: exemple.title, body: exemple.body } : null,
   }
@@ -76,6 +86,11 @@ export function sorteDe(type: string): SorteDeNotification {
 /** Les sortes que le catalogue connaît : celles de send-push et celles qu'on a décrites. */
 export function typesConnus(): string[] {
   return [...new Set([...Object.keys(CATEGORY_BY_TYPE), ...Object.keys(DESCRIPTIONS)])]
+}
+
+/** Les sortes qui partent vraiment : celles que send-push ne range pas en silencieuses. */
+export function typesQuiPartent(): string[] {
+  return Object.keys(CATEGORY_BY_TYPE).filter((t) => categoryOf(t) !== 'silent')
 }
 
 /** Toutes les sortes que send-push sait envoyer, plus celles vues en base (souvent silencieuses). */
