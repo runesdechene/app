@@ -12,7 +12,7 @@ import { supabase } from '../../lib/supabase'
 import { fetchIllustrationsCompletes, texteRiche, type IllustrationComplete } from '../../lib/shopifyIllustrations'
 import { SaveBar } from '../SaveBar'
 import { CarteOrigine } from './CarteOrigine'
-import './Fragments.css'
+import './FragmentsShopify.css'
 
 interface Fragment {
   id: number
@@ -39,7 +39,7 @@ const COLONNES =
 const dateCourte = (iso: string) =>
   new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
 
-export function Fragments() {
+export function FragmentsShopify() {
   const [fragments, setFragments] = useState<Fragment[]>([])
   const [enregistres, setEnregistres] = useState<Fragment[]>([])
   const [illustrations, setIllustrations] = useState<IllustrationComplete[] | null>(null)
