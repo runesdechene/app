@@ -62,6 +62,18 @@ const PALIERS: [zoom: number, taille: number][] = [
   [12, 1.15],
 ]
 
+// La même courbe pour une marque HTML (les Fragments) : son échelle au zoom `zoom`.
+export function echelleAuZoom(zoom: number): number {
+  const [premier] = PALIERS
+  const dernier = PALIERS[PALIERS.length - 1]
+  if (!premier || !dernier || zoom <= premier[0]) return premier?.[1] ?? 1
+  if (zoom >= dernier[0]) return dernier[1]
+  const i = PALIERS.findIndex(([z]) => z > zoom)
+  const [z0, t0] = PALIERS[i - 1] ?? premier
+  const [z1, t1] = PALIERS[i] ?? dernier
+  return t0 + ((zoom - z0) / (z1 - z0)) * (t1 - t0)
+}
+
 // Sur un grand écran, les marques grandissent avec lui (Uriel, 30/09 : sur un écran 2K ou 4K,
 // les lieux étaient bien trop petits). Selon le plus petit côté de la fenêtre : 1 jusqu'à un
 // écran 1080p, 1,4 pour un 2K, 1,8 pour un 4K et au-delà ; entre deux, on glisse de l'un à l'autre.
