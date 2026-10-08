@@ -1,6 +1,6 @@
 # Les énigmes signalées — conception
 
-> 08/10/2026 · V2 (`apps/web-v2`), Hub (`apps/hub`), base (migration 460) · pas de maquette : le style de
+> 08/10/2026 · V2 (`apps/web-v2`), Hub (`apps/hub`), base (migration 462) · pas de maquette : le style de
 > « Signaler ce lieu » · décision dans le `_État.md` d'Explore (Tranché, 08/10) · complète
 > `2026-10-07-v2-enigmes-design.md`
 
@@ -40,9 +40,9 @@ points, ni les titres.
   - `erreur` — « La réponse ou l'explication est fausse »
   - `autre` — « Autre chose »
 - **Après l'envoi** : « Merci » et « L'équipe va regarder cette énigme de près. », puis Fermer.
-- **Erreur** : le message renvoyé par la base (limite du jour, etc.), comme pour un lieu.
+- **Erreur** : « Le signalement n’est pas parti. Réessaie dans un instant. », comme pour un lieu.
 
-## En base (migration 460)
+## En base (migration 462)
 
 - **`signalements_enigme`**, calquée sur `signalements_lieu` (migration 387) :
   `id`, `enigma_id` (→ `enigmas`, cascade), `user_id` (→ `users`, cascade), `raison` (les trois valeurs),
@@ -58,7 +58,8 @@ points, ni les titres.
   l'énigme (n°, question, `answer`, `accepted_answers`, format), la raison, le mot, la réponse donnée, qui
   et quand.
 - **`traiter_signalement_enigme(p_id, p_accepter boolean)`** — admins : clôt le signalement ; avec
-  `p_accepter`, ajoute d'abord `reponse_donnee` aux variantes (énigme libre seulement, sans doublon).
+  `p_accepter`, ajoute d'abord `reponse_donnee` aux variantes (énigme libre seulement, sans doublon) et
+  clôt aussi les autres signalements ouverts de cette énigme que la variante rend justes.
 - **Auto-tests** dans la migration (comme la 003) : avec « Eudes de Paris » en réponse et « Eudes » en
   variante, « eudes » est juste et « Paris » ne l'est pas.
 
