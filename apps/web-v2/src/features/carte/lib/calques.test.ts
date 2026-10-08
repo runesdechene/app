@@ -88,9 +88,9 @@ test('le facteur d’écran multiplie chaque palier de toutes les marques', () =
   expect(billes).toHaveProperty(['layout', 'icon-size'], taille(2))
 })
 
-test('le nom de qui a revendiqué un lieu, dès le zoom 9, mais pas sur un lieu neuf (« NOUVEAU » à sa place)', () => {
+test('le nom de qui a revendiqué un lieu, dès le zoom 9, ni sur un lieu neuf (« NOUVEAU » à sa place) ni sur un lieu inconnu', () => {
   const map = { addSource: vi.fn(), addLayer: vi.fn<(calque: AddLayerObject) => void>() }
   ajouterCalques(map, couleurs)
   const pilules = map.addLayer.mock.calls.map(([calque]) => calque).find((c) => c.id === 'pilules')
-  expect(pilules).toMatchObject({ minzoom: 9, filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true]] })
+  expect(pilules).toMatchObject({ minzoom: 9, filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true], ['!=', ['get', 'etat'], 'inconnu']] })
 })

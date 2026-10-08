@@ -152,8 +152,9 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     type: 'symbol',
     source: SOURCE,
     minzoom: DE_PRES_PILULES,
-    // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés.
-    filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true]],
+    // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés. Et
+    // aucun nom sous un lieu encore inconnu (Uriel, 08/10).
+    filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true], ['!=', ['get', 'etat'], 'inconnu']],
     layout: {
       'text-field': ['upcase', ['get', 'pilule']],
       'text-font': ['Noto Sans Bold'],
