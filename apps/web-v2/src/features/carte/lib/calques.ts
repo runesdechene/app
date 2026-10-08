@@ -31,6 +31,8 @@ type Proprietes = {
   image: string
   pilule?: string
   moi?: boolean
+  nouveau: boolean // l'onde et la gélule « NOUVEAU » (nouveaux.ts)
+  couleur: string | null // la couleur de sa nature : celle de son onde
 }
 
 export function enGeoJSON(
@@ -47,6 +49,8 @@ export function enGeoJSON(
         etat: l.etat,
         nature: l.nature,
         image: nomImage(l, couleurTypes),
+        nouveau: l.nouveau,
+        couleur: l.couleur,
         ...(l.revendication && { pilule: l.revendication.nom, moi: l.revendication.moi }),
       },
     })),

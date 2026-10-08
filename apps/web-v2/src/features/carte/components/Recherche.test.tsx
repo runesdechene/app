@@ -33,6 +33,7 @@ function lieu(l: Partial<LieuCarte>): LieuCarte {
     natures: [],
     epoque: null,
     ajoute: false,
+    nouveau: false,
     ...l,
   }
 }

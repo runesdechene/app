@@ -6514,6 +6514,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      _pseudo_instagram: { Args: { p_saisie: string }; Returns: string }
       _rattacher_lieu: {
         Args: { p_lat: number; p_lng: number }
         Returns: {
@@ -7525,6 +7526,7 @@ export type Database = {
         Returns: Json
       }
       lieu_a_modifier: { Args: { p_id: string }; Returns: Json }
+      lieu_vu: { Args: { p_id: string }; Returns: undefined }
       lieux_pres_du_pin: { Args: { p_pin: string }; Returns: Json }
       lieux_voisins: {
         Args: { p_latitude: number; p_longitude: number }
@@ -7712,6 +7714,10 @@ export type Database = {
       natures_de_lieu: { Args: never; Returns: Json }
       natures_publiques: { Args: never; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
+      notifications_du_hub: {
+        Args: { p_fil?: string[]; p_types: string[] }
+        Returns: Json
+      }
       notifications_non_lues: { Args: never; Returns: number }
       notify: {
         Args: { p_data: Json; p_recipient: string; p_type: string }

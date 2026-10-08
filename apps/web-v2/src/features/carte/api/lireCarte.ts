@@ -22,6 +22,8 @@ export type LieuCarte = {
   natures: string[]
   epoque: string | null
   ajoute: boolean
+  // Ajouté depuis moins de 14 jours, et pas encore ouvert par moi (migration 469) : il rayonne.
+  nouveau: boolean
 }
 
 // Ce que la feuille des filtres propose (filtres_de_carte, migration 396).
@@ -58,6 +60,7 @@ function lireLieu(v: unknown): LieuCarte {
     natures: Array.isArray(l.natures) ? liste(chaine)(l.natures) : [],
     epoque: ouNull(chaine)(l.epoque ?? null),
     ajoute: l.ajoute === true,
+    nouveau: l.nouveau === true,
   }
 }
 

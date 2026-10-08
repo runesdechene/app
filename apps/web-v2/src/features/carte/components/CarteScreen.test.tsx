@@ -49,6 +49,7 @@ const LIEUX: LieuCarte[] = [
     natures: [],
     epoque: null,
     ajoute: false,
+    nouveau: false,
   },
   {
     id: 'inconnu',
@@ -63,6 +64,7 @@ const LIEUX: LieuCarte[] = [
     natures: [],
     epoque: null,
     ajoute: false,
+    nouveau: false,
   },
 ]
 

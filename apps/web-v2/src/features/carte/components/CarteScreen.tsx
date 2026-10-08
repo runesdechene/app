@@ -43,6 +43,7 @@ import { filtrer, FILTRES_VIDES, filtresActifs } from '../lib/filtres'
 import { lireCouleurs } from '@/shared/lib/couleursCarte'
 import { poserMesPins, surUnPin, type PinsDeLaCarte } from '../lib/mesPins'
 import { poserEnigmes, surUneEnigme } from '../lib/enigmes'
+import { poserNouveaux } from '../lib/nouveaux'
 import { lireCentre } from '../lib/centre'
 import { retournerLeSceau } from '../lib/cire'
 import { dureeDouce } from '../lib/mouvement'
@@ -192,6 +193,8 @@ function CarteVivante({
       if (!visiteur) ajouterZones(map, couleurs.route, 'billes')
       if (!visiteur) void poserMesPins(map, couleurs).catch(() => undefined)
       if (!visiteur) void poserEnigmes(map, couleurs, ecran).catch(() => undefined)
+      // Les lieux neufs rayonnent, pour les visiteurs aussi (nouveaux.ts).
+      poserNouveaux(map, couleurs, ecran)
       suivreSurvol(map, CALQUES_LIEUX, ecran)
       setCarte(map)
       lireVue()

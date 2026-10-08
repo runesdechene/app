@@ -230,6 +230,7 @@ export async function ajouterMarques(
   ajouter(map, 'curiosite', etoile(c))
   pilule(map, 'pilule', c.halo, melanger(c.encre, c.halo, 0.45))
   pilule(map, 'pilule-moi', c.encre, c.encre)
+  pilule(map, 'pilule-nouveau', c.cire, c.cire) // la gélule « NOUVEAU » (nouveaux.ts)
 
   // Chaque image une seule fois (02/10 : dessinée pour chaque lieu, elle coûtait une seconde de
   // calcul sur un PC, bien plus sur un téléphone).

@@ -28,6 +28,7 @@ const lieu: LieuCarte = {
   natures: [],
   epoque: null,
   ajoute: false,
+  nouveau: false,
 }
 
 test('un lieu devient un point avec sa marque et sa pilule', () => {
@@ -37,6 +38,8 @@ test('un lieu devient un point avec sa marque et sa pilule', () => {
     id: 'a',
     etat: 'visite',
     nature: 'lieu',
+    nouveau: false,
+    couleur: '#708d44',
     image: 'visite-x.svg',
     pilule: 'Rémy',
     moi: true,
