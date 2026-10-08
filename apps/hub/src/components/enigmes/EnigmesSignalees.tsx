@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import './EnigmesSignalees.css'
 
-// Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 464).
+// Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 465).
 // Accepter ajoute la réponse du joueur aux réponses acceptées et clôt les signalements qu'elle règle.
 interface SignalementEnigme {
   id: number

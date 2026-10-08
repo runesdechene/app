@@ -1,7 +1,7 @@
 /**
  * QUOI     — « Signaler une erreur » sur une énigme : trois raisons, un mot, puis un merci.
  * POURQUOI — les joueurs trouvaient les énigmes trop strictes (« Eudes » pour « Eudes de Paris ») : ce
- *            qu'ils contestent arrive dans le Hub, qui peut accepter leur réponse (spec du 08/10, mig 464).
+ *            qu'ils contestent arrive dans le Hub, qui peut accepter leur réponse (spec du 08/10, mig 465).
  */
 import { FeuilleDeSignalement, type Raison } from '@/shared/ui/FeuilleDeSignalement'
 import { signalerEnigme, type RaisonEnigme } from '../api/enigmes'

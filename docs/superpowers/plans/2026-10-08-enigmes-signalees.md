@@ -5,7 +5,7 @@
 **Goal :** plusieurs réponses acceptées par énigme, un lien « Signaler une erreur ou une injustice » sous le
 verdict, et un écran « Énigmes signalées » dans le Hub qui accepte une réponse en un clic.
 
-**Architecture :** une migration (464) ajoute `enigmas.accepted_answers`, une fonction pure `_enigma_juste`
+**Architecture :** une migration (465) ajoute `enigmas.accepted_answers`, une fonction pure `_enigma_juste`
 utilisée par `percer_enigme`, la table `signalements_enigme` et trois RPC, calquées sur les signalements de
 lieu (migration 387). Dans la V2, la feuille « Signaler ce lieu » devient un composant partagé
 (`shared/ui/FeuilleDeSignalement`) que le lieu et l'énigme configurent. Dans le Hub, un champ « Autres
@@ -18,7 +18,7 @@ réponses acceptées » dans le formulaire, et un nouvel écran calqué sur `mod
 ## Global Constraints
 
 - Branche `feat/enigmes-souples`, partie de `origin/feat/fragments-carte` (la prod).
-- Migration **464**. Avant de l'appliquer, vérifier qu'aucune branche distante n'a pris 464
+- Migration **465**. Avant de l'appliquer, vérifier qu'aucune branche distante n'a pris 465
   (`git fetch` puis `git ls-tree --name-only origin/feat/fragments-carte supabase/migrations/ | tail -2`) ;
   si oui, renuméroter.
 - Canal unique : `npx supabase db push --dry-run --linked` puis `npx supabase db push --linked`
@@ -55,7 +55,7 @@ réponses acceptées » dans le formulaire, et un nouvel écran calqué sur `mod
 
 ---
 
-### Task 1 : migration 464 — variantes, signalements, RPC
+### Task 1 : migration 465 — variantes, signalements, RPC
 
 **Files :**
 - Create : `supabase/migrations/463_enigmes_signalees.sql`
@@ -321,7 +321,7 @@ node scripts/migration-preview.mjs supabase/migrations/463_enigmes_signalees.sql
 npx supabase db push --dry-run --linked
 ```
 
-Expected : aucun 464 ailleurs ; le preview ne montre, pour `percer_enigme`, que la ligne `v_juste` ; le
+Expected : aucun 465 ailleurs ; le preview ne montre, pour `percer_enigme`, que la ligne `v_juste` ; le
 dry-run liste seulement `463_enigmes_signalees.sql`.
 
 - [ ] **Step 4 : appliquer**
@@ -373,12 +373,12 @@ BEGIN
   IF EXISTS (SELECT 1 FROM signalements_enigme WHERE enigma_id = r.enigme AND traite_le IS NULL) THEN
     RAISE EXCEPTION 'accepter aurait dû clore les deux signalements';
   END IF;
-  RAISE NOTICE 'parcours 464 : OK';
+  RAISE NOTICE 'parcours 465 : OK';
 END $$;
 ROLLBACK;
 ```
 
-Expected : `NOTICE: parcours 464 : OK`, puis `ROLLBACK` (rien ne reste en base). Si `auth.uid()` ne lit pas
+Expected : `NOTICE: parcours 465 : OK`, puis `ROLLBACK` (rien ne reste en base). Si `auth.uid()` ne lit pas
 `request.jwt.claims` dans ce contexte, le dire et vérifier à la place par le parcours navigateur (Task 6).
 
 - [ ] **Step 6 : régénérer les types de la V2**
@@ -395,7 +395,7 @@ Expected : `signaler_enigme`, `signalements_enigme_du_hub`, `traiter_signalement
 
 ```bash
 git add supabase/migrations/463_enigmes_signalees.sql apps/web-v2/src/shared/supabase/database.types.ts
-git commit -m "feat(enigmes): réponses acceptées et signalements d'énigme (mig 464)"
+git commit -m "feat(enigmes): réponses acceptées et signalements d'énigme (mig 465)"
 ```
 
 ---
@@ -760,13 +760,13 @@ injustice » introuvable.
 
 - [ ] **Step 3 : l'appel à la base**
 
-Ajouter à la fin de `features/carte/api/enigmes.ts` (et mettre « quatre RPC (migrations 441, 464) » dans
+Ajouter à la fin de `features/carte/api/enigmes.ts` (et mettre « quatre RPC (migrations 441, 465) » dans
 l'en-tête) :
 
 ```ts
 export type RaisonEnigme = 'reponse_refusee' | 'erreur' | 'autre'
 
-// Signaler une énigme (mig 464) : la base relève elle-même ma dernière réponse.
+// Signaler une énigme (mig 465) : la base relève elle-même ma dernière réponse.
 export async function signalerEnigme(numero: number, raison: RaisonEnigme, precision: string) {
   const { error } = await supabase.rpc('signaler_enigme', {
     p_enigme: numero,
@@ -785,7 +785,7 @@ export async function signalerEnigme(numero: number, raison: RaisonEnigme, preci
 /**
  * QUOI     — « Signaler une erreur » sur une énigme : trois raisons, un mot, puis un merci.
  * POURQUOI — les joueurs trouvaient les énigmes trop strictes (« Eudes » pour « Eudes de Paris ») : ce
- *            qu'ils contestent arrive dans le Hub, qui peut accepter leur réponse (spec du 08/10, mig 464).
+ *            qu'ils contestent arrive dans le Hub, qui peut accepter leur réponse (spec du 08/10, mig 465).
  */
 import { FeuilleDeSignalement, type Raison } from '@/shared/ui/FeuilleDeSignalement'
 import { signalerEnigme, type RaisonEnigme } from '../api/enigmes'
@@ -847,7 +847,7 @@ Dans `FeuilleEnigme.tsx` :
 ```
 
 - compléter l'en-tête QUOI : « …après la réponse, le verdict, et tout en bas un lien discret pour signaler
-  une erreur (mig 464). »
+  une erreur (mig 465). »
 
 Le verdict ne se perd pas : il vit dans la mutation de `useEnigme`, qui reste montée.
 
@@ -978,7 +978,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
-// Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 464).
+// Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 465).
 interface SignalementEnigme {
   id: number
   raison: string

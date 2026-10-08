@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react'
 import type { AnswerFormat, Difficulty, EnigmaForm, EnigmaType, Tag, Theme } from './types'
 
-// Le formulaire d'une énigme : sorti d'Enigmas.tsx quand il a dépassé 700 lignes (variantes, mig 464).
+// Le formulaire d'une énigme : sorti d'Enigmas.tsx quand il a dépassé 700 lignes (variantes, mig 465).
 export function FormulaireEnigme({
   form,
   setForm,

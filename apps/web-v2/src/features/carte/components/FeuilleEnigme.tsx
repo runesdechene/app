@@ -1,7 +1,7 @@
 /**
  * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — « Énigme »
  *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict,
- *            et tout en bas un lien discret pour signaler une erreur (mig 464).
+ *            et tout en bas un lien discret pour signaler une erreur (mig 465).
  * POURQUOI — maquettes « Énigmes — 3 » et « 5b à 5d », et la feuille redessinée « A » (Figma 484:434,
  *            choisie par Uriel le 07/10 : la première version n'était « pas sexy » et peu lisible). Une seule réponse (QCM : un bouton par
  *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou

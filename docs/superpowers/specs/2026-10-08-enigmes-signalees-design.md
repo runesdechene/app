@@ -1,6 +1,6 @@
 # Les énigmes signalées — conception
 
-> 08/10/2026 · V2 (`apps/web-v2`), Hub (`apps/hub`), base (migration 464) · pas de maquette : le style de
+> 08/10/2026 · V2 (`apps/web-v2`), Hub (`apps/hub`), base (migration 465) · pas de maquette : le style de
 > « Signaler ce lieu » · décision dans le `_État.md` d'Explore (Tranché, 08/10) · complète
 > `2026-10-07-v2-enigmes-design.md`
 
@@ -42,7 +42,7 @@ points, ni les titres.
 - **Après l'envoi** : « Merci » et « L'équipe va regarder cette énigme de près. », puis Fermer.
 - **Erreur** : « Le signalement n’est pas parti. Réessaie dans un instant. », comme pour un lieu.
 
-## En base (migration 464)
+## En base (migration 465)
 
 - **`signalements_enigme`**, calquée sur `signalements_lieu` (migration 387) :
   `id`, `enigma_id` (→ `enigmas`, cascade), `user_id` (→ `users`, cascade), `raison` (les trois valeurs),
