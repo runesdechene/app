@@ -1,0 +1,62 @@
+.frag-tete { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 16px; }
+.frag-tete h1 { margin: 0; }
+.frag-sous-titre { margin: 4px 0 0; color: var(--color-text-secondary); font-size: 15px; }
+
+.frag-bandeau { margin: 0 0 16px; padding: 10px 14px; border-radius: var(--radius); background: rgba(42, 122, 48, 0.08);
+  color: var(--color-success); font-size: 15px; }
+.frag-bandeau--erreur { background: var(--color-primary-light); color: var(--color-primary); }
+
+/* La rangée des Fragments : chaque tuile montre l'illustration telle qu'on la reconnaît en boutique. */
+.frag-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.frag-tuile { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px; text-align: left;
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); cursor: pointer;
+  font: inherit; color: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+.frag-tuile:hover { border-color: var(--color-border-strong); }
+.frag-tuile:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.frag-tuile--choisie { border-color: var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
+.frag-tuile--masquee .frag-tuile-image { opacity: 0.4; }
+.frag-tuile-image { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 6px;
+  background: var(--color-bg) center / contain no-repeat; }
+.frag-tuile-vide { color: var(--color-muted); font-size: 13px; text-align: center; }
+.frag-tuile-nom { font-family: var(--font-title-family); font-size: 15px; line-height: 1.2; }
+.frag-etat { font-size: 13px; color: var(--color-primary); }
+.frag-etat--ok { color: var(--color-success); }
+
+/* La fiche : le contenu de Shopify à gauche, l'origine à droite. */
+.frag-fiche { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 24px; align-items: start;
+  padding: 20px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; }
+.frag-entete h2 { margin: 0; font-family: var(--font-title-family); font-size: 26px; }
+.frag-heritage { margin: 2px 0 0; font-style: italic; color: var(--color-text-secondary); }
+.frag-champs { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px 14px; margin: 16px 0; font-size: 15px; }
+.frag-champs dt { color: var(--color-muted); font-family: var(--font-accent-family); text-transform: uppercase; font-size: 13px;
+  letter-spacing: 0.04em; padding-top: 2px; }
+.frag-champs dd { margin: 0; line-height: 1.5; }
+.frag-champs em { color: var(--color-muted); }
+.frag-champs audio { width: 100%; max-width: 320px; height: 36px; }
+.frag-recit { white-space: pre-line; max-height: 220px; overflow-y: auto; padding-right: 6px; }
+.frag-discret { color: var(--color-muted); font-size: 14px; }
+
+.frag-origine { display: grid; gap: 12px; }
+.frag-origine-champs .settings-input { width: 100%; box-sizing: border-box; }
+.frag-origine-champs .frag-discret { margin: 6px 0; }
+.frag-origine-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.frag-visible { display: flex; align-items: center; gap: 6px; font-size: 15px; }
+.frag-carte { height: 440px; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-border); }
+
+/* L'épingle : la petite icône d'illustration, comme elle flottera dans Explore. */
+.frag-pin { width: 34px; height: 34px; border-radius: 50%; background: #fbf6e8 center / 80% no-repeat;
+  border: 2px solid #3a2e1e; box-shadow: 0 2px 6px rgba(58, 46, 30, 0.35); opacity: 0.55;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-title-family); font-size: 14px; }
+.frag-pin--choisi { width: 52px; height: 52px; border-color: var(--color-primary); opacity: 1; z-index: 1; }
+
+.frag-motifs { margin-top: 32px; }
+.frag-motifs h2 { font-family: var(--font-title-family); font-size: 20px; margin: 0 0 4px; }
+.frag-compte { display: inline-block; min-width: 22px; padding: 0 7px; margin-left: 6px; border-radius: 11px; font-size: 14px;
+  background: var(--color-primary-light); color: var(--color-primary); text-align: center; vertical-align: middle; }
+.frag-motif { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--color-border); }
+.frag-motif-image { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 6px; background: var(--color-surface) center / contain no-repeat; }
+.frag-motif-nom { flex: 1; font-size: 15px; }
+
+@media (max-width: 900px) {
+  .frag-fiche { grid-template-columns: minmax(0, 1fr); }
+}

@@ -27,6 +27,7 @@ import { GameRules } from './components/GameRules'
 import { TutorialManager } from './components/TutorialManager'
 import { ShopifySync } from './components/ShopifySync'
 import { FragmentsAudio } from './components/FragmentsAudio'
+import { Fragments } from './components/fragments/Fragments'
 import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
 import { MisesAJour } from './components/MisesAJour'
@@ -129,6 +130,7 @@ function App() {
           <Route path="/carte/regles" element={<GameRules />} />
           <Route path="/carte/tutoriel" element={<TutorialManager />} />
           <Route path="/shopify/sync" element={<ShopifySync />} />
+          <Route path="/shopify/fragments" element={<Fragments />} />
           <Route path="/shopify/fragments-audio" element={<FragmentsAudio />} />
           <Route path="/annonces" element={<AnnouncementsList />} />
           <Route path="/annonces/nouvelle" element={<ComposerAnnonce />} />
