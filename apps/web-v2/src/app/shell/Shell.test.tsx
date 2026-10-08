@@ -169,7 +169,7 @@ test('mentionné dans la communauté : du rouge, comme un murmure, et les deux s
 
 test('un détail rouvert par son onglet se ferme sur l’onglet, pas sur l’onglet d’avant', async () => {
   const router = renderAt('/messages/preferences')
-  await userEvent.click(await screen.findByRole('button', { name: 'Accueil' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Explore' }))
   await userEvent.click(screen.getByRole('button', { name: 'Messages' }))
   expect(router.state.location.pathname).toBe('/messages/preferences')
   await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
