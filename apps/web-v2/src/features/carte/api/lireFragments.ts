@@ -1,6 +1,7 @@
 /**
  * QUOI     — les Fragments de la carte, lus depuis `fragments_sur_la_carte` (migration 458).
- * POURQUOI — chaque Fragment visible qui a une origine, avec la petite icône de son illustration.
+ * POURQUOI — chaque Fragment visible qui a une origine, et la couleur de sa culture (migration 460 :
+ *            null si le Fragment n'a pas de culture).
  */
 import { chaine, liste, nombre, objet, ouNull } from '@/shared/lib/lire'
 
@@ -10,6 +11,7 @@ export type FragmentSurLaCarte = {
   illustration: string | null
   heritage: string | null
   origine: string | null
+  couleur: string | null
   lat: number
   lng: number
 }
@@ -22,6 +24,7 @@ function fragment(v: unknown): FragmentSurLaCarte {
     illustration: ouNull(chaine)(o.illustration),
     heritage: ouNull(chaine)(o.heritage),
     origine: ouNull(chaine)(o.origine),
+    couleur: ouNull(chaine)(o.couleur),
     lat: nombre(o.lat),
     lng: nombre(o.lng),
   }

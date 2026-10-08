@@ -1,11 +1,19 @@
 /*
- * QUOI     — un Fragment sur la carte (Figma 513:802) : l'illustration sans cadre, 38 × 53 px au zoom
- *            de la maquette, sur un halo de parchemin de 94 × 101 px qui s'efface vers les bords
- *            (opaque au centre, 85 % à mi-chemin, transparent au bord). Tout suit le zoom par
- *            `--echelle-fragments` (la courbe des lieux, posée par le hook).
+ * QUOI     — un Fragment sur la carte : l'éclat taillé (Figma 516:659), 21 px de large au zoom de la
+ *            maquette, une ombre douce dessous. Ses facettes sont la couleur de la culture
+ *            (`--culture`, le rouge de la marque à défaut), éclaircie ou assombrie : avec le rouge,
+ *            on retrouve les teintes de la maquette. Il suit le zoom par `--echelle-fragments` (la courbe
+ *            des lieux, posée par le hook), grossit un peu au survol.
+ * ATTENTION — jamais de `position` sur `.fragment` : MapLibre pose ses marqueurs en `absolute`, et
+ *            un `relative` les empile les uns sous les autres (décalés, 08/10).
  */
 .fragment {
-  --taille: calc(39px * var(--echelle-fragments, 1));
+  --eclat-base: var(--culture, var(--color-accent));
+  --eclat-clair: color-mix(in srgb, var(--eclat-base) 25%, white);
+  --eclat-rose: color-mix(in srgb, var(--eclat-base) 55%, white);
+  --eclat-moyen: color-mix(in srgb, var(--eclat-base) 82%, white);
+  --eclat-sombre: color-mix(in srgb, var(--eclat-base) 72%, black);
+  --eclat-nuit: color-mix(in srgb, var(--eclat-base) 52%, black);
 
   transition: opacity var(--duree-douce) var(--courbe-douce);
 
@@ -14,62 +22,37 @@
   }
 }
 
-/* Le halo, sous l'illustration. Jamais de `position` sur `.fragment` : MapLibre pose ses marqueurs
-   en `absolute`, et un `relative` les empile les uns sous les autres (décalés, 08/10). */
-.illustration::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(var(--taille) * 2.45);
-  height: calc(var(--taille) * 2.6);
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-fond) 97%, transparent) 0%,
-    color-mix(in srgb, var(--color-fond) 85%, transparent) 55%,
-    transparent 100%
-  );
-  translate: -50% -50%;
-  content: '';
-  pointer-events: none;
-  z-index: -1;
-}
-
-.illustration {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--taille);
+.eclat {
+  display: block;
+  width: calc(21px * var(--echelle-fragments, 1));
   padding: 0;
   border: none;
   background: none;
-  color: var(--color-encre);
-  font-family: var(--font-titre);
-  font-size: var(--titre-carte-size);
   cursor: pointer;
+  filter: drop-shadow(0 2px 2px color-mix(in srgb, var(--color-encre) 40%, transparent));
   transition: scale var(--duree-douce) var(--courbe-douce);
 }
 
-.illustration:hover,
-.illustration:focus-visible {
-  scale: 1.08;
+.eclat:hover,
+.eclat:focus-visible {
+  scale: 1.15;
 }
 
-.illustration:focus-visible {
+.eclat:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
-.illustration img {
-  position: relative;
+.eclat svg {
   display: block;
   width: 100%;
   height: auto;
+  overflow: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fragment,
-  .illustration {
+  .eclat {
     transition: none;
   }
 }

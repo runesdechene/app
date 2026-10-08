@@ -57,6 +57,12 @@
 .frag-motif-image { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 6px; background: var(--color-surface) center / contain no-repeat; }
 .frag-motif-nom { flex: 1; font-size: 15px; }
 
+/* La culture : l'éclat de la carte, en aperçu, à la couleur choisie. */
+.frag-culture { display: flex; align-items: center; gap: 10px; }
+.frag-culture .settings-input { flex: 1; }
+.frag-eclat { flex: none; width: 14px; height: 24px; clip-path: polygon(50% 0, 100% 25%, 90% 72%, 50% 100%, 10% 72%, 0 25%);
+  box-shadow: inset -5px 0 0 rgba(0, 0, 0, 0.25); }
+
 @media (max-width: 900px) {
   .frag-fiche { grid-template-columns: minmax(0, 1fr); }
 }

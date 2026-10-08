@@ -16,6 +16,7 @@
 | Gloire V1 (`notoriety_points`, `exploration_points`, `erudition_points`…) | ⚠️ le **niveau reste** (révision 27/09) : ne supprimer que ce qui ne nourrit plus `xp_total` ; vérifier chaque colonne avant | trier, puis supprimer | après bascule | spec V2 §1 révisé |
 | Énergie (`energy_points`, `max_energy`, `energy_reset_at`, `preview_action_cost`, coût de `discover_place`) | supprimée : découvrir devient gratuit | supprimer | après bascule | décision 27/09 |
 | Expéditions joueur-joueur (`voyage_*`) | abandonnées | supprimer | après bascule | spec V2 §1 |
+| `enregistrer_fragment` à cinq paramètres (sans `p_theme`) | remplacée par la version à six (culture du Fragment) ; le Hub en ligne l'appelle encore | supprimer | après le déploiement du Hub qui envoie `p_theme` | mig 461 |
 | Quêtes du jour (et leurs tables) | abandonnées — ≠ Missions, qui restent | supprimer | après bascule | spec V2 §1 |
 | `floor_glory`, `floor_crowns` sur les appels | liés à la Gloire et à la Cour | supprimer | au portage des appels | spec V2, reste à faire |
 | Image `app-fragments/fragment-3.webp` (seau de stockage) | l'image de « Demiurge (Admin) », Fragment retiré par la mig 359 | supprimer à la main dans le stockage | dès la 359 appliquée | mig 359, 27/09 |

@@ -1,6 +1,7 @@
 /**
- * QUOI     — les Fragments sur la carte : une illustration par Fragment, posé à son origine, retiré quand
- *            il quitte la liste ; le toucher rend son id.
+ * QUOI     — les Fragments sur la carte : un éclat par Fragment, posé à son origine, le même pour tous
+ *            (on ne sait pas lequel avant de toucher) ; retiré quand il quitte la liste ; le toucher
+ *            rend son id.
  */
 import { expect, test, vi } from 'vitest'
 import type { FragmentSurLaCarte } from '../api/lireFragments'
@@ -13,6 +14,7 @@ const fragment = (id: number, autre: Partial<FragmentSurLaCarte> = {}): Fragment
   illustration: 'https://cdn.shopify.com/s/files/f.webp',
   heritage: null,
   origine: null,
+  couleur: '#1d4e89',
   lat: 45,
   lng: 2,
   ...autre,
@@ -29,14 +31,21 @@ function monter() {
   return { suivi: suivreFragments(poser, onToucher), posees, onToucher }
 }
 
-test('une illustration par Fragment, posé à son origine, avec son illustration à la taille de la carte', () => {
+test('un éclat par Fragment, posé à son origine, sans rien dire du Fragment', () => {
   const { suivi, posees } = monter()
-  suivi.fragments([fragment(11, { lat: 37.08, lng: 22.43 }), fragment(5)])
+  suivi.fragments([fragment(11, { nom: 'Hoplite', lat: 37.08, lng: 22.43 }), fragment(5)])
   expect(posees.map((p) => p.ou)).toEqual([[22.43, 37.08], [2, 45]])
-  expect(posees[0]?.element.querySelector('img')?.getAttribute('src')).toBe(
-    'https://cdn.shopify.com/s/files/f.webp?width=88',
-  )
-  expect(posees[0]?.element.querySelector('button')?.getAttribute('aria-label')).toBe('Fragment 11, son récit')
+  const element = posees[0]?.element
+  expect(element?.textContent?.trim()).toBe('')
+  expect(element?.querySelector('button')?.getAttribute('aria-label')).not.toContain('Hoplite')
+  expect(element?.querySelector('img')).toBeNull()
+})
+
+test('l’éclat prend la couleur de la culture ; sans culture, il garde le rouge de la marque', () => {
+  const { suivi, posees } = monter()
+  suivi.fragments([fragment(1), fragment(2, { couleur: null })])
+  expect(posees[0]?.element.style.getPropertyValue('--culture')).toBe('#1d4e89')
+  expect(posees[1]?.element.style.getPropertyValue('--culture')).toBe('')
 })
 
 test('un Fragment qui quitte la liste perd sa marque ; vider retire tout', () => {
@@ -48,11 +57,9 @@ test('un Fragment qui quitte la liste perd sa marque ; vider retire tout', () =>
   expect(posees.at(-1)?.marque.remove).toHaveBeenCalled()
 })
 
-test('sans illustration, l’initiale ; toucher l’illustration rend l’id du Fragment', () => {
+test('toucher l’éclat rend l’id du Fragment', () => {
   const { suivi, posees, onToucher } = monter()
-  suivi.fragments([fragment(7, { nom: 'Hécate', illustration: null })])
-  const bouton = posees[0]?.element.querySelector('button')
-  expect(bouton?.textContent).toBe('H')
-  bouton?.click()
+  suivi.fragments([fragment(7)])
+  posees[0]?.element.querySelector('button')?.click()
   expect(onToucher).toHaveBeenCalledWith(7)
 })

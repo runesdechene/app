@@ -4,6 +4,7 @@
  * POURQUOI — décision du 08/10 (vault, Explore/_État.md « Fragments ») : Shopify reste la source,
  *            le Hub aspire et n'ajoute que ce que Shopify n'a pas. Une ligne de title_fragments = un
  *            Fragment ; un métaobjet sans ligne est un ancien motif, listé ici pour le tri.
+ *            La culture (celle des énigmes) donne sa couleur à l'éclat du Fragment sur la carte (mig 460-461).
  * ATTENTION — écriture par les RPC `synchroniser_fragments`, `ajouter_fragment`, `enregistrer_fragment`
  *            (admins, mig 457) : la table n'a pas de policy d'écriture. SaveBar + refetch.
  */
@@ -31,10 +32,17 @@ interface Fragment {
   origine_lat: number | null
   origine_lng: number | null
   origine_nom: string | null
+  theme: string | null // la culture, celle des énigmes (enigma_themes.id)
+}
+
+interface Culture {
+  id: string
+  label: string
+  couleur: string | null
 }
 
 const COLONNES =
-  'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom'
+  'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom, theme'
 
 const dateCourte = (iso: string) =>
   new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -42,6 +50,7 @@ const dateCourte = (iso: string) =>
 export function FragmentsShopify() {
   const [fragments, setFragments] = useState<Fragment[]>([])
   const [enregistres, setEnregistres] = useState<Fragment[]>([])
+  const [cultures, setCultures] = useState<Culture[]>([])
   const [illustrations, setIllustrations] = useState<IllustrationComplete[] | null>(null)
   const [erreurShopify, setErreurShopify] = useState<string | null>(null)
   const [choisi, setChoisi] = useState<number | null>(null)
@@ -73,6 +82,9 @@ export function FragmentsShopify() {
     setLoading(true)
     try {
       await fetchFragments()
+      const { data, error } = await supabase.rpc('cultures_du_hub')
+      if (error) throw error
+      setCultures(((data ?? []) as Culture[]).map(({ id, label, couleur }) => ({ id, label, couleur })))
     } catch (e) {
       setSaveError(`${e}`)
     } finally {
@@ -133,7 +145,7 @@ export function FragmentsShopify() {
       for (const f of modifies) {
         const { error } = await supabase.rpc('enregistrer_fragment', {
           p_id: f.id, p_origine_lat: f.origine_lat, p_origine_lng: f.origine_lng,
-          p_origine_nom: f.origine_nom ?? '', p_visible: f.visible,
+          p_origine_nom: f.origine_nom ?? '', p_visible: f.visible, p_theme: f.theme ?? '',
         })
         if (error) throw error
       }
@@ -223,6 +235,14 @@ export function FragmentsShopify() {
                   ? `${fragment.origine_lat.toFixed(4)}, ${fragment.origine_lng.toFixed(4)} — un clic sur la carte le déplace`
                   : 'Un clic sur la carte pose son point d’origine.'}
               </p>
+              <label className="faction-field"><span className="faction-field-label">Culture (la couleur de son éclat sur la carte)</span>
+                <span className="frag-culture">
+                  <span className="frag-eclat" style={{ backgroundColor: cultures.find((c) => c.id === fragment.theme)?.couleur ?? '#a94842' }} />
+                  <select className="settings-input" value={fragment.theme ?? ''} onChange={(e) => changer({ theme: e.target.value || null })}>
+                    <option value="">Aucune (rouge de la marque)</option>
+                    {cultures.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                  </select>
+                </span></label>
               <div className="frag-origine-actions">
                 {fragment.origine_lat !== null && (
                   <button className="btn-secondary" onClick={() => changer({ origine_lat: null, origine_lng: null })}>Retirer le point</button>
