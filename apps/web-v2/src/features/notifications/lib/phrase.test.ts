@@ -97,3 +97,13 @@ test('un salut sur sa Compagnie fondée ou rejointe', () => {
     'Kelpie a salué ton entrée dans une Compagnie',
   )
 })
+
+test('une visite, une revendication reprise, un nouveau membre (mig 464)', () => {
+  expect(texte({ ...base, type: 'visite' })).toBe('Kelpie a visité Château de Jonjeac')
+  expect(texte({ ...base, type: 'revendication_reprise' })).toBe(
+    'Kelpie a revendiqué Château de Jonjeac, que tu tenais',
+  )
+  expect(
+    texte({ ...base, type: 'nouveau_membre', lieu: null, compagnie: { id: 'c', nom: 'Les Arpenteurs' } }),
+  ).toBe('Kelpie a rejoint Les Arpenteurs')
+})

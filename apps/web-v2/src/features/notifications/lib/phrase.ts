@@ -37,6 +37,10 @@ export function phraseDe(n: Notification): Morceau[] {
       return n.nombre === 1
         ? [t('1 Explorateur a foulé '), lieu, t(' aujourd’hui')]
         : [t(`${combien} Explorateurs ont foulé `), lieu, t(' aujourd’hui')]
+    case 'visite':
+      return [qui, t(' a visité '), lieu]
+    case 'revendication_reprise':
+      return [qui, t(' a revendiqué '), lieu, t(', que tu tenais')]
     case 'milestone_exploration':
       return [t(`${combien} Explorateurs ont foulé `), lieu]
     case 'milestone_vues':
@@ -54,6 +58,12 @@ export function phraseDe(n: Notification): Morceau[] {
         t('Ta demande pour '),
         { texte: n.compagnie?.nom ?? 'une Compagnie', sorte: 'lieu' },
         t(' est acceptée'),
+      ]
+    case 'nouveau_membre':
+      return [
+        qui,
+        t(' a rejoint '),
+        { texte: n.compagnie?.nom ?? 'ta Compagnie', sorte: 'lieu' },
       ]
     case 'mention':
       return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]

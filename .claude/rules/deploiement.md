@@ -152,3 +152,16 @@ Première utilisation réelle : 23/06/2026 — récompense Coupe des Héritages 
 **Gabarit HTML RdC** (réutiliser le style des templates existants) : table parchemin `#f7f1e3`, bannière `https://app.runesdechene.com/email-banner.jpg`, logo `https://app.runesdechene.com/email-logo.png`, titre serif, bouton doré `#8a6d3b`. Voir `renderCrownsAwarded` comme base.
 
 **Règle d'envoi** : voir [[feedback_never_send_without_explicit_go]] — jamais d'envoi sans GO explicite isolé. Liens promo Shopify : `https://runesdechene.com/discount/CODE` applique le code automatiquement.
+
+## L'edge function `send-push` se déploie toujours avec `--no-verify-jwt`
+
+**Le piège** (08/10/2026) : le déclencheur `push_on_notification` appelle `send-push` avec le seul
+en-tête `X-Push-Secret`, sans jeton. Un `supabase functions deploy send-push` sans l'option
+réactive la vérification du jeton : la passerelle refuse alors tous les appels, et plus aucun push ne
+part, sans erreur visible nulle part. Deux minutes ainsi le 08/10, rattrapées par un redéploiement.
+
+**How to apply :** `npx supabase functions deploy send-push --use-api --no-verify-jwt` (`--use-api` :
+sans Docker ; `--linked` n'existe pas pour cette commande). Vérifier ensuite
+`curl -s -X POST <SUPABASE_URL>/functions/v1/send-push -d '{}'` → `unauthorized` (le refus de la
+fonction elle-même, faute de secret) ; un JSON « Missing authorization header » veut dire que la
+passerelle bloque encore.

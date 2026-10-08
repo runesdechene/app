@@ -115,7 +115,7 @@ export function PreferencesPage() {
           'pushImportant',
           cloche,
           'Les nouvelles importantes',
-          'Un nouveau fragment, un rendez-vous près de chez toi.',
+          'Ce qui touche tes lieux et tes Compagnies, et l’énigme qui t’attend sur la carte.',
         )}
         {ligne(
           'pushRecap',
