@@ -23,6 +23,9 @@ export const CALQUE_GELULE_NOUVEAUX = 'nouveaux-gelule'
 
 const PERIODE = 3000 // ms : plus lente que les énigmes (2 200), pour qu'on ne les confonde pas
 const RAYON = 13 // le rayon d'une marque à la taille 1 (sceau de 26 px)
+// Ce qui dépasse autour de la marque, réduit de moitié le 08/10 (Uriel) : le halo fixe et l'élan de l'onde.
+const DEBORD_HALO = 2
+const ELAN_ONDE = 8
 const DE_PLUS_PRES = 9 // la gélule ne s'affiche qu'à partir de là : de loin, l'onde suffit
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
@@ -36,7 +39,7 @@ export function rayonAuZoom(rayon: number): ExpressionSpecification {
 
 // Où en est l'onde à la phase `t` (0 → 1) : elle part du bord de la marque, s'élargit, s'efface.
 export function ondeNouveau(t: number): { rayon: number; opacite: number } {
-  return { rayon: RAYON + t * 16, opacite: 0.5 * (1 - t) ** 2 }
+  return { rayon: RAYON + t * ELAN_ONDE, opacite: 0.5 * (1 - t) ** 2 }
 }
 
 export function calquesNouveaux(c: CouleursCarte, ecran: number): AddLayerObject[] {
@@ -47,7 +50,7 @@ export function calquesNouveaux(c: CouleursCarte, ecran: number): AddLayerObject
       type: 'circle',
       source: SOURCE,
       filter: estNouveau,
-      paint: { 'circle-color': couleur, 'circle-opacity': 0.4, 'circle-radius': rayonAuZoom((RAYON + 4) * ecran) },
+      paint: { 'circle-color': couleur, 'circle-opacity': 0.4, 'circle-radius': rayonAuZoom((RAYON + DEBORD_HALO) * ecran) },
     },
     {
       id: CALQUE_ONDE_NOUVEAUX,

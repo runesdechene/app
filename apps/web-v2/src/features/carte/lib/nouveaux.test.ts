@@ -10,7 +10,7 @@ const c = { cire: '#a94842', halo: '#fffaf2' } as CouleursCarte
 
 test('l’onde part du bord de la marque, s’élargit et s’efface', () => {
   expect(ondeNouveau(0)).toEqual({ rayon: 13, opacite: 0.5 })
-  expect(ondeNouveau(1)).toEqual({ rayon: 29, opacite: 0 })
+  expect(ondeNouveau(1)).toEqual({ rayon: 21, opacite: 0 })
   expect(ondeNouveau(0.5).opacite).toBeLessThan(ondeNouveau(0).opacite)
 })
 
