@@ -1,7 +1,7 @@
 import type { AddLayerObject, SourceSpecification } from 'maplibre-gl'
 import { expect, test, vi } from 'vitest'
 import type { LieuCarte } from '../api/lireCarte'
-import { ajouterCalques, echelleAuZoom, echelleEcran, enGeoJSON, taille } from './calques'
+import { ajouterCalques, echelleEcran, enGeoJSON, taille } from './calques'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
 
 const couleurs: CouleursCarte = {
@@ -84,11 +84,4 @@ test('le facteur d’écran multiplie chaque palier de toutes les marques', () =
   ajouterCalques(map, couleurs, 2)
   const billes = map.addLayer.mock.calls[0]?.[0]
   expect(billes).toHaveProperty(['layout', 'icon-size'], taille(2))
-})
-
-test('l’échelle d’une marque HTML suit la courbe des lieux : un point de loin, entière de près', () => {
-  expect(echelleAuZoom(2)).toBe(0.5)
-  expect(echelleAuZoom(6)).toBeCloseTo(0.65)
-  expect(echelleAuZoom(12)).toBe(1.15)
-  expect(echelleAuZoom(16)).toBe(1.15)
 })
