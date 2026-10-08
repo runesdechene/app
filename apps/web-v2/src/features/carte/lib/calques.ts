@@ -70,6 +70,15 @@ const PALIERS: [zoom: number, taille: number][] = [
   [12, 1.15],
 ]
 
+// De loin, un lieu neuf rétrécit moins que les autres (80 % de sa taille au lieu de 50 %) : il doit
+// émerger du semis des lieux (Uriel, 08/10 : « dézoomés, ils se noient »). Sa marque et son halo
+// (nouveaux.ts) suivent cette courbe.
+export const PALIERS_NOUVEAUX: [zoom: number, taille: number][] = [
+  [4, 0.8],
+  [8, 1],
+  [12, 1.15],
+]
+
 // Sur un grand écran, les marques grandissent avec lui (Uriel, 30/09 : sur un écran 2K ou 4K,
 // les lieux étaient bien trop petits). Selon le plus petit côté de la fenêtre : 1 jusqu'à un
 // écran 1080p, 1,4 pour un 2K, 1,8 pour un 4K et au-delà ; entre deux, on glisse de l'un à l'autre.
@@ -147,7 +156,11 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     type: 'symbol',
     source: SOURCE,
     filter: ['all', estLieu, estNouveau],
-    layout: marque(ecran),
+    // De loin, il rétrécit moins que les autres (PALIERS_NOUVEAUX).
+    layout: {
+      ...marque(ecran),
+      'icon-size': ['interpolate', ['linear'], ['zoom'], ...PALIERS_NOUVEAUX.flatMap(([z, t]) => [z, Math.round(t * ecran * 1000) / 1000])],
+    },
   })
   // Le lieu survolé, redessiné par-dessus : c'est lui qui grossit et « pulse » au clic (survol.ts).
   map.addLayer({

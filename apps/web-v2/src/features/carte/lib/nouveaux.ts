@@ -15,7 +15,7 @@
  */
 import type { AddLayerObject, ExpressionSpecification, FilterSpecification, Map as Carte } from 'maplibre-gl'
 import type { CouleursCarte } from '@/shared/lib/couleursCarte'
-import { SOURCE } from './calques'
+import { PALIERS_NOUVEAUX, SOURCE } from './calques'
 
 export const CALQUE_HALO_NOUVEAUX = 'nouveaux-halo'
 export const CALQUE_ONDE_NOUVEAUX = 'nouveaux-onde'
@@ -27,10 +27,11 @@ const DE_PLUS_PRES = 9 // la gélule ne s'affiche qu'à partir de là : de loin,
 
 const estNouveau: FilterSpecification = ['==', ['get', 'nouveau'], true]
 
-// Le rayon d'un cercle qui suit la courbe des marques (`PALIERS` de calques.ts) : MapLibre veut la
-// courbe de zoom au premier niveau, on multiplie donc chaque palier.
+// La courbe de taille d'un lieu neuf, qui rétrécit moins que les autres de loin : PALIERS_NOUVEAUX
+// (calques.ts). MapLibre veut la courbe de zoom au premier niveau.
+
 export function rayonAuZoom(rayon: number): ExpressionSpecification {
-  return ['interpolate', ['linear'], ['zoom'], 4, rayon * 0.5, 8, rayon * 0.8, 12, rayon * 1.15]
+  return ['interpolate', ['linear'], ['zoom'], ...PALIERS_NOUVEAUX.flatMap(([z, t]) => [z, Math.round(rayon * t * 1000) / 1000])]
 }
 
 // Où en est l'onde à la phase `t` (0 → 1) : elle part du bord de la marque, s'élargit, s'efface.
@@ -92,9 +93,11 @@ export function calqueGelule(c: CouleursCarte): AddLayerObject {
   }
 }
 
-// Les calques se posent sous les marques (halo et onde) et au-dessus (gélule), puis l'onde s'anime.
+// Halo et onde se posent au-dessus de tous les lieux ordinaires, juste sous la marque du lieu neuf
+// (le calque « nouveaux » de calques.ts) : de loin, les autres ne les recouvrent plus (Uriel, 08/10).
+// La gélule, par-dessus tout ; puis l'onde s'anime.
 export function poserNouveaux(map: Carte, c: CouleursCarte, ecran: number): () => void {
-  for (const calque of calquesNouveaux(c, ecran)) map.addLayer(calque, 'billes')
+  for (const calque of calquesNouveaux(c, ecran)) map.addLayer(calque, 'nouveaux')
   map.addLayer(calqueGelule(c))
   return faireRayonner(map, ecran)
 }

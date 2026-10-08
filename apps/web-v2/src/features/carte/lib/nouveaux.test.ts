@@ -15,7 +15,8 @@ test('l’onde part du bord de la marque, s’élargit et s’efface', () => {
 })
 
 test('la taille suit le zoom, avec la courbe au premier niveau (exigence de MapLibre)', () => {
-  expect(rayonAuZoom(10)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 5, 8, 8, 12, 11.5])
+  // De loin, il garde 80 % de sa taille (les autres lieux tombent à 50 %).
+  expect(rayonAuZoom(10)).toEqual(['interpolate', ['linear'], ['zoom'], 4, 8, 8, 10, 12, 11.5])
 })
 
 test('halo et onde : seulement les lieux nouveaux, à la couleur de leur nature', () => {
