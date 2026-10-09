@@ -14,8 +14,8 @@ avec le calendrier choisi**.
 
 | Valeur | Libellé dans les Préférences | Ligne d'explication |
 |---|---|---|
-| `chretien` | Chrétien — av. / ap. J.-C. | Compté depuis la naissance de Jésus selon Denys le Petit (VIe siècle), qui s'est trompé de quelques années : les historiens la placent entre 7 et 4 av. J.-C. |
-| `moderne` (défaut) | Moderne — AEC / EC | Les mêmes années, sans référence religieuse : avant / de l'ère commune. |
+| `chretien` (défaut) | Chrétien — av. / ap. J.-C. | Compté depuis la naissance de Jésus selon Denys le Petit (VIe siècle), qui s'est trompé de quelques années : les historiens la placent entre 7 et 4 av. J.-C. |
+| `moderne` | Moderne — av. è. c. / è. c. | Les mêmes années, sans référence religieuse : avant l’ère commune / ère commune (l’usage francophone, plutôt que AEC / EC). |
 | `rome` | Fondation de Rome | Compté depuis la fondation légendaire de Rome, en 753 av. J.-C. |
 | `constantinople` | Chute de Constantinople | Compté depuis la prise de Constantinople par les Ottomans, en 1453. |
 
@@ -26,17 +26,21 @@ livres et des panneaux.
 
 ## Le réglage
 
-- `users.calendrier text NOT NULL DEFAULT 'moderne'`, contrainte `CHECK` sur les quatre valeurs. Il suit le
+- `users.calendrier text NOT NULL DEFAULT 'chretien'`, contrainte `CHECK` sur les quatre valeurs. Il suit le
   joueur d'un appareil à l'autre (la V1 le gardait dans le navigateur).
-- **Moderne par défaut** (Uriel, 09/10) : à la mise en ligne, tout le monde passe de « av. J.-C. » à « AEC »
-  sur les fiches et dans les énigmes, sauf qui choisit « Chrétien ».
 - `set_calendrier(p_calendrier text)` : `set_my_preference` ne prend que des booléens. Même forme que
   `set_title_gender` (316) : valeur inconnue → `{error}`.
 - `get_my_preferences()` renvoie en plus `calendrier`. Réécrite depuis sa définition **live**, copiée entière.
 - Dans *Préférences* (`PreferencesPage.tsx`) : une ligne « Calendrier » qui montre le calendrier choisi et
   ouvre les quatre choix, chacun avec sa ligne d'explication. Mise à jour optimiste, comme les
   interrupteurs (`usePreferences`).
-- Sans compte (vitrine, scan) : `moderne`.
+- Sans compte (vitrine, scan) : `chretien`.
+- **Dans l'onboarding** (Uriel, 09/10) : une étape `calendrier` (`/bienvenue/calendrier`) juste après
+  `nom`, avec les quatre choix et leurs lignes d'explication, « Chrétien » présélectionné, puis « Continuer »
+  qui enregistre (`set_calendrier`). Elle s'affiche dans le même passage que `nom` (un compte neuf) ; un
+  compte existant ne la voit pas et garde `chretien`, modifiable dans les Préférences. Le composant des
+  quatre choix est le même que celui des Préférences. Pas de maquette : le cadre `Page` et le style de
+  l'écran `Nom`.
 
 ## Les règles de conversion
 
@@ -57,8 +61,8 @@ pas d'an zéro), puis :
   Rome ».
 - `constantinople` : `d = a − 1453`. `d > 0` → « d ap. la chute de Constantinople » ; `d < 0` → « −d av. la
   chute de Constantinople » ; `d = 0` → « l'année de la chute de Constantinople ».
-- `moderne` : même nombre ; « av. J.-C. » devient « AEC », « ap. J.-C. » devient « EC », rien reste rien.
-- `chretien` : **le contenu de la balise, mot pour mot.** Le texte écrit est donc la version chrétienne ; tous les autres calendriers, y compris `moderne` par défaut, le convertissent.
+- `moderne` : même nombre ; « av. J.-C. » devient « av. è. c. », « ap. J.-C. » devient « è. c. », rien reste rien.
+- `chretien` : **le contenu de la balise, mot pour mot.** Le texte écrit est donc la version chrétienne ; tous les autres calendriers le convertissent.
 
 **Un siècle** se convertit par son milieu (Uriel, 09/10) : le IIIe siècle av. J.-C. (−300 à −201) a pour
 milieu −250, soit l'an 504 de Rome → « VIᵉ siècle ap. la fondation de Rome ». Le rang du siècle d'un compte
@@ -66,9 +70,9 @@ N est `ceil(N / 100)`, dans les deux sens.
 
 | Écrit | Chrétien | Moderne | Fondation de Rome | Chute de Constantinople |
 |---|---|---|---|---|
-| `{52 av. J.-C.}` | 52 av. J.-C. | 52 AEC | 702 ap. la fondation de Rome | 1504 av. la chute de Constantinople |
+| `{52 av. J.-C.}` | 52 av. J.-C. | 52 av. è. c. | 702 ap. la fondation de Rome | 1504 av. la chute de Constantinople |
 | `{930}` | 930 | 930 | 1683 ap. la fondation de Rome | 523 av. la chute de Constantinople |
-| `{IIIe siècle av. J.-C.}` | IIIe siècle av. J.-C. | IIIᵉ siècle AEC | VIᵉ siècle ap. la fondation de Rome | XVIIIᵉ siècle av. la chute de Constantinople |
+| `{IIIe siècle av. J.-C.}` | IIIe siècle av. J.-C. | IIIᵉ siècle av. è. c. | VIᵉ siècle ap. la fondation de Rome | XVIIIᵉ siècle av. la chute de Constantinople |
 | `{1515}` | 1515 | 1515 | 2268 ap. la fondation de Rome | 62 ap. la chute de Constantinople |
 
 La V1 ajoutait 753 sans tenir compte de l'an zéro : elle se trompait d'un an sur toute date avant notre ère.
@@ -87,7 +91,7 @@ du Hub et l'appli calculent la même chose (aujourd'hui ils ne partagent aucun c
 
 ## Où ça s'applique
 
-**L'appli** — un hook `useCalendrier()` lit les préférences (`moderne` sans compte) :
+**L'appli** — un hook `useCalendrier()` lit les préférences (`chretien` sans compte) :
 - `FeuilleEnigme` : récit, question, choix du QCM. Un choix s'affiche converti, mais `onRepondre` reçoit le
   choix **tel qu'il est stocké** : `percer_enigme` compare toujours les mêmes textes, rien ne change côté
   serveur. Le repérage du bon choix après le verdict (`c === verdict.reponse`) compare aussi les textes
@@ -98,8 +102,8 @@ du Hub et l'appli calculent la même chose (aujourd'hui ils ne partagent aucun c
   fondation de Rome ».
 - `EtapeApercu` : l'année dans le calendrier choisi.
 
-**La saisie de l'année** à l'ajout d'un lieu (`ChampsDuLieu`) se fait **en AEC / EC** quel que soit le
-calendrier choisi (Uriel, 09/10) : la case « av. J.-C. » devient « AEC ». Mêmes années, rien ne change dans
+**La saisie de l'année** à l'ajout d'un lieu (`ChampsDuLieu`) se fait **en ère commune** quel que soit le
+calendrier choisi (Uriel, 09/10) : la case « av. J.-C. » devient « av. è. c. ». Mêmes années, rien ne change dans
 la base (négatif = avant notre ère). Pas de saisie dans les autres calendriers : convertir à la saisie,
 comme la V1, multiplie les erreurs.
 
