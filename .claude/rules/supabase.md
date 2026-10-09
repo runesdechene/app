@@ -254,6 +254,11 @@ proposait `migration repair --status reverted 427` — qui aurait effacé sa tra
 l'autre worktree, **sans le committer**, le temps du push (`--dry-run` d'abord : seule la sienne doit
 partir), puis le retirer. Une migration numérotée sous la dernière appliquée demande `--include-all`.
 
+**Le CLI ne compare que le numéro** (08/10, trois sessions sur 462 à 469) : si une autre session a déjà
+appliqué une `465_autre_nom`, ma `465_mienne` passe pour appliquée — le dry-run dit « à jour » et rien ne
+part, sans erreur. Juste avant le push, lire le nom en prod :
+`select version, name from supabase_migrations.schema_migrations order by version desc limit 5`.
+
 ## Une migration qui retire une clé lue par le front en ligne casse la prod si elle passe avant lui
 
 **Le piège** (07/10/2026, mig 433) : `get_mes_titres` perdait sa clé `autreEpoque`, que la V2 en

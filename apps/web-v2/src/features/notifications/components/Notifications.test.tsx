@@ -45,6 +45,17 @@ beforeEach(() => {
       evenement: null,
     },
     {
+      id: 3,
+      type: 'enigme_acceptee',
+      quand: maintenant.toISOString(),
+      lu: false,
+      qui: null,
+      lieu: null,
+      nombre: null,
+      extrait: 'n° 287',
+      evenement: null,
+    },
+    {
       id: 1,
       type: 'mise_a_jour',
       quand: maintenant.toISOString(),
@@ -106,4 +117,12 @@ test('rien de nouveau : on le dit', async () => {
   afficher()
   expect(await screen.findByText('Rien de nouveau pour l’instant')).toBeInTheDocument()
   expect(api.marquerLues).not.toHaveBeenCalled()
+})
+
+test('une réponse d’énigme acceptée mène à « Les énigmes »', async () => {
+  afficher()
+  const aujourdhui = await screen.findByRole('region', { name: 'Aujourd’hui' })
+  expect(
+    within(aujourdhui).getByRole('link', { name: /Ta réponse à l’énigme n° 287 est acceptée/ }),
+  ).toHaveAttribute('href', '/accueil/enigmes')
 })

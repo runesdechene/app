@@ -56,3 +56,11 @@ Deno.test('les notifications ajoutées le 08/10 (mig 464) partent, avec leur éc
   assertEquals(formatPayload('nouveau_membre', { actorName: 'Kelpie', compagnieId: 'c1', compagnieNom: 'Les Arpenteurs' })?.url, '/accueil/compagnie/c1')
   assertEquals(formatPayload('enigme_du_jour', {})?.url, '/carte')
 })
+
+Deno.test('une réponse d’énigme acceptée part et ouvre « Les énigmes » (mig 473)', () => {
+  assertEquals(categoryOf('enigme_acceptee'), 'important')
+  const p = formatPayload('enigme_acceptee', { extrait: 'n° 287' })
+  assertEquals(p?.title, 'Ta réponse est acceptée')
+  assertEquals(p?.body, 'Énigme n° 287 : ton point t’est rendu.')
+  assertEquals(p?.url, '/accueil/enigmes')
+})

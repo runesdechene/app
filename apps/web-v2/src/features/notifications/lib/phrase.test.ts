@@ -107,3 +107,9 @@ test('une visite, une revendication reprise, un nouveau membre (mig 464)', () =>
     texte({ ...base, type: 'nouveau_membre', lieu: null, compagnie: { id: 'c', nom: 'Les Arpenteurs' } }),
   ).toBe('Kelpie a rejoint Les Arpenteurs')
 })
+
+test('une réponse d’énigme acceptée dans le Hub (mig 473)', () => {
+  expect(texte({ ...base, type: 'enigme_acceptee', qui: null, lieu: null, extrait: 'n° 287' })).toBe(
+    'Ta réponse à l’énigme n° 287 est acceptée : ton point t’est rendu',
+  )
+})

@@ -16,6 +16,9 @@ paths:
 
 Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `--site <SITE_ID>`.
 
+`npx netlify-cli` peut casser (« Cannot read properties of null (reading 'package') », 09/10/2026) :
+la CLI est installée en global par pnpm, `netlify deploy …` avec les mêmes options passe.
+
 | Site | SITE_ID | Domaine |
 |---|---|---|
 | `runesdechene` (Explore, `apps/web-v2` depuis la bascule du 07/10/2026) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |

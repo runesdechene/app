@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
@@ -13,6 +13,9 @@ interface SidebarProps {
 export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
   const [pending, setPending] = useState(0)
   const [signalements, setSignalements] = useState(0)
+  const [enigmesSignalees, setEnigmesSignalees] = useState(0)
+  // Recompter à chaque page : une file traitée ne garde pas son ancien badge.
+  const { pathname } = useLocation()
 
   useEffect(() => {
     let active = true
@@ -22,8 +25,14 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
     supabase.rpc('mod_signalements').then(({ data }) => {
       if (active && Array.isArray(data)) setSignalements(data.length)
     })
+    // Réservé aux admins : la RPC refuse les autres.
+    if (isAdmin) {
+      supabase.rpc('signalements_enigme_du_hub').then(({ data }) => {
+        if (active && Array.isArray(data)) setEnigmesSignalees(data.length)
+      })
+    }
     return () => { active = false }
-  }, [])
+  }, [isAdmin, pathname])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -74,6 +83,14 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
             <NavLink to="/carte/publicites" className={({ isActive }) => isActive ? 'active' : ''}>Publicites</NavLink>
             <NavLink to="/carte/bannieres" className={({ isActive }) => isActive ? 'active' : ''}>Bannières</NavLink>
             <NavLink to="/carte/enigmes" className={({ isActive }) => isActive ? 'active' : ''}>Enigmes</NavLink>
+            <NavLink to="/carte/enigmes-signalees" className={({ isActive }) => isActive ? 'active' : ''}>
+              Énigmes signalées
+              {enigmesSignalees > 0 && (
+                <span style={{ marginLeft: 8, background: '#e0a73d', color: '#2b2b2b', fontSize: 11, fontWeight: 700, minWidth: 18, display: 'inline-block', textAlign: 'center', padding: '1px 7px', borderRadius: 999, verticalAlign: 'middle' }}>
+                  {enigmesSignalees}
+                </span>
+              )}
+            </NavLink>
             <NavLink to="/carte/cultures" className={({ isActive }) => isActive ? 'active' : ''}>Cultures</NavLink>
             <NavLink to="/carte/missions" className={({ isActive }) => isActive ? 'active' : ''}>Missions</NavLink>
             <NavLink to="/carte/reglages" className={({ isActive }) => isActive ? 'active' : ''}>Reglages</NavLink>

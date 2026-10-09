@@ -1,0 +1,49 @@
+/* Énigmes signalées : une copie par signalement. Le seul accent, c'est la paire de réponses,
+   celle du joueur à l'encre rouge, comme une correction en marge. */
+.signalees-intro { max-width: 64ch; margin: 0 0 20px; color: var(--color-text-secondary); line-height: 1.5; }
+.signalees-erreur { color: var(--color-danger); margin: 0 0 16px; }
+.signalees-vide { color: var(--color-muted); font-style: italic; }
+.signalees-liste { display: grid; gap: 16px; max-width: 820px; }
+
+.signalement {
+  padding: 20px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.signalement-question { margin: 0 0 16px; color: var(--color-text-secondary); line-height: 1.5; }
+.signalement-numero { display: block; margin-bottom: 2px; color: var(--color-muted); font-size: 13px; }
+
+.signalement-paire {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: 14px 0;
+  border-block: 1px solid var(--color-border);
+}
+.signalement-paire > div { display: grid; gap: 4px; align-content: start; }
+.signalement-etiquette { color: var(--color-muted); font-size: 13px; }
+.signalement-reponse {
+  font-family: var(--font-title-family);
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.signalement-reponse--joueur { color: var(--color-primary); }
+.signalement-variantes { color: var(--color-text-secondary); font-size: 14px; }
+.signalement-pas-repondu { color: var(--color-muted); font-style: italic; line-height: 1.6; }
+.signalement-proposition { margin: 14px 0 0; line-height: 1.5; }
+.signalement-proposition strong { font-family: var(--font-title-family); font-size: 18px; font-weight: 400; }
+
+.signalement-motif { margin: 14px 0 2px; line-height: 1.5; }
+.signalement-quand { margin: 0; color: var(--color-muted); font-size: 13px; }
+
+.signalement-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.signalement-actions a.btn-secondary { display: inline-flex; align-items: center; text-decoration: none; }
+
+@media (max-width: 640px) {
+  .signalement { padding: 16px; }
+  .signalement-paire { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}

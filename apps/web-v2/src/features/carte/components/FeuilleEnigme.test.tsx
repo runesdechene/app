@@ -8,9 +8,12 @@ import { FeuilleEnigme } from './FeuilleEnigme'
 
 const ouvrirEnigme = vi.fn<(id: number) => Promise<unknown>>()
 const percerEnigme = vi.fn<(id: number, r: string) => Promise<unknown>>()
+const signalerEnigme = vi.fn<(numero: number, raison: string, precision: string, proposition: string) => Promise<void>>()
 vi.mock('../api/enigmes', () => ({
   ouvrirEnigme: (id: number) => ouvrirEnigme(id),
   percerEnigme: (id: number, r: string) => percerEnigme(id, r),
+  signalerEnigme: (numero: number, raison: string, precision: string, proposition: string) =>
+    signalerEnigme(numero, raison, precision, proposition),
 }))
 
 const onFermer = vi.fn()
@@ -129,4 +132,83 @@ test('une réponse fausse : pas cette fois, la bonne réponse, et le savais-tu',
   expect(screen.getByText('La réponse : Sainte-Sophie')).toBeInTheDocument()
   expect(screen.getByText('La plus grande coupole…')).toBeInTheDocument()
   expect(screen.queryByText('+1 XP')).toBeNull()
+})
+
+const FAUX = {
+  juste: false, reponse: 'Sainte-Sophie', explication: 'La plus grande coupole…', xp: 0, gagnes: 0,
+  points: 5, total: 130, nouveauxTitres: [], prochain: null,
+  resteEnAttente: 2, niveau: { niveau: 12, avant: 0.5, apres: 0.5 },
+}
+
+test('avant la réponse, un seul lien : « Signaler une erreur » sous la question', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  monter()
+  await retourner()
+  await screen.findByRole('button', { name: 'Sainte-Sophie' })
+  expect(screen.getByRole('button', { name: 'Signaler une erreur' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Signaler une erreur ou une injustice' })).toBeNull()
+})
+
+test('signaler l’énoncé avant de répondre, proposer la bonne réponse, puis répondre quand même', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockResolvedValue(FAUX)
+  signalerEnigme.mockResolvedValue(undefined)
+  monter()
+  await retourner()
+  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur' }))
+  // Pas encore de réponse : rien à faire accepter.
+  expect(screen.queryByRole('radio', { name: 'Ma réponse aurait dû être acceptée' })).toBeNull()
+  expect(screen.queryByRole('textbox', { name: 'Quelle serait la bonne réponse ?' })).toBeNull()
+  fireEvent.click(screen.getByRole('radio', { name: 'L’énoncé est faux ou ambigu' }))
+  fireEvent.change(screen.getByRole('textbox', { name: 'Quelle serait la bonne réponse ?' }), {
+    target: { value: 'Sainte-Irène' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Envoyer le signalement' }))
+  expect(await screen.findByText('Merci')).toBeInTheDocument()
+  expect(signalerEnigme).toHaveBeenCalledWith(242, 'erreur', '', 'Sainte-Irène')
+  fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
+  expect(await screen.findByText('Pas cette fois')).toBeInTheDocument()
+})
+
+test('la réponse tapée survit au signalement', async () => {
+  ouvrirEnigme.mockResolvedValue({ ...enigme, format: 'free', choix: null })
+  monter()
+  await retourner()
+  fireEvent.change(await screen.findByRole('textbox', { name: 'Ta réponse' }), { target: { value: 'Eudes' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Signaler une erreur' }))
+  fireEvent.click(screen.getByTestId('voile'))
+  expect(await screen.findByRole('textbox', { name: 'Ta réponse' })).toHaveValue('Eudes')
+})
+
+test('après une bonne réponse, on signale encore le contenu, pas une réponse refusée', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockResolvedValue({ ...FAUX, juste: true })
+  monter()
+  await retourner()
+  fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Sophie' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }))
+  expect(screen.getByRole('radio', { name: 'L’énoncé, la réponse ou l’explication est faux' })).toBeInTheDocument()
+  expect(screen.queryByRole('radio', { name: 'Ma réponse aurait dû être acceptée' })).toBeNull()
+})
+
+test('après le verdict, signaler : une raison, un mot, un merci, puis retour à l’énigme', async () => {
+  ouvrirEnigme.mockResolvedValue(enigme)
+  percerEnigme.mockResolvedValue(FAUX)
+  signalerEnigme.mockResolvedValue(undefined)
+  monter()
+  await retourner()
+  fireEvent.click(await screen.findByRole('button', { name: 'Sainte-Irène' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Signaler une erreur ou une injustice' }))
+  // La proposition ne vaut que pour une erreur de contenu : sa réponse, la base la connaît.
+  fireEvent.click(screen.getByRole('radio', { name: 'Ma réponse aurait dû être acceptée' }))
+  expect(screen.queryByRole('textbox', { name: 'Quelle serait la bonne réponse ?' })).toBeNull()
+  fireEvent.change(screen.getByRole('textbox', { name: 'Un mot de plus' }), {
+    target: { value: 'les deux sont justes' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Envoyer le signalement' }))
+  expect(await screen.findByText('Merci')).toBeInTheDocument()
+  expect(signalerEnigme).toHaveBeenCalledWith(242, 'reponse_refusee', 'les deux sont justes', '')
+  fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+  expect(await screen.findByText('Pas cette fois')).toBeInTheDocument()
 })

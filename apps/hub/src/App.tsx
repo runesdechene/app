@@ -20,6 +20,7 @@ import { Ads } from './components/Ads'
 import { Banners } from './components/Banners'
 import { Enigmas } from './components/Enigmas'
 import { Cultures } from './components/cultures/Cultures'
+import { EnigmesSignalees } from './components/enigmes/EnigmesSignalees'
 import { Missions } from './components/Missions'
 import { Settings } from './components/Settings'
 import { Energie } from './components/Energie'
@@ -122,6 +123,7 @@ function App() {
           <Route path="/carte/publicites" element={<Ads />} />
           <Route path="/carte/bannieres" element={<Banners />} />
           <Route path="/carte/enigmes" element={<Enigmas />} />
+          <Route path="/carte/enigmes-signalees" element={<EnigmesSignalees />} />
           <Route path="/carte/cultures" element={<Cultures />} />
           <Route path="/carte/missions" element={<Missions />} />
           <Route path="/carte/reglages" element={<Settings />} />

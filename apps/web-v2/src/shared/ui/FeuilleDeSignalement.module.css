@@ -1,0 +1,102 @@
+/*
+ * QUOI     — la feuille « Signaler » : titre Bebas, raisons bordées (une seule choisie), un mot.
+ */
+.titre {
+  margin: 0 0 var(--space-3);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.description {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+.avertissement,
+.refus {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.avertissement {
+  color: var(--color-texte);
+}
+
+.refus {
+  color: var(--color-accent);
+}
+
+.raisons {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: none;
+}
+
+.raisons legend {
+  margin-bottom: var(--space-2);
+}
+
+.raison {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.raison:has(input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent-clair) 18%, transparent);
+}
+
+.raison input {
+  accent-color: var(--color-accent);
+}
+
+.precision {
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) 14px;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  resize: vertical;
+}
+
+/* La proposition apparaît avec la raison qui la demande : elle se pose, elle ne surgit pas. */
+.proposition {
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .raison,
+  .proposition {
+    transition: none;
+  }
+}
