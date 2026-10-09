@@ -46,3 +46,13 @@ Deno.test('les types de la V1 se taisent', () => {
   assertEquals(categoryOf('milestone_vues'), 'recap')
   assertEquals(categoryOf('mention'), 'important')
 })
+
+Deno.test('les notifications ajoutées le 08/10 (mig 464) partent, avec leur écran', () => {
+  for (const type of ['visite', 'revendication_reprise', 'nouveau_membre', 'enigme_du_jour']) {
+    assertEquals(categoryOf(type), 'important')
+  }
+  assertEquals(formatPayload('visite', { actorName: 'Kelpie', placeTitle: 'Montmajour', placeId: 'p1' })?.url, '/accueil/lieu/p1')
+  assertEquals(formatPayload('revendication_reprise', { actorName: 'Kelpie', placeTitle: 'Montmajour', placeId: 'p1' })?.title, 'Kelpie a revendiqué Montmajour')
+  assertEquals(formatPayload('nouveau_membre', { actorName: 'Kelpie', compagnieId: 'c1', compagnieNom: 'Les Arpenteurs' })?.url, '/accueil/compagnie/c1')
+  assertEquals(formatPayload('enigme_du_jour', {})?.url, '/carte')
+})

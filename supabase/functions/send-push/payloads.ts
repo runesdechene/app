@@ -57,6 +57,10 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
         nombre === 1 ? `1 Explorateur a foulé ${lieu}` : `${nombre} Explorateurs ont foulé ${lieu}`,
         'Aujourd’hui.',
       )
+    case 'visite':
+      return surLeLieu(`${qui} a visité ${lieu}`, 'Ton lieu a reçu un Explorateur.')
+    case 'revendication_reprise':
+      return surLeLieu(`${qui} a revendiqué ${lieu}`, 'Tu le tenais : va le reprendre.')
     case 'milestone_exploration':
       return surLeLieu(`${nombre} Explorateurs ont foulé ${lieu}`, 'Un cap pour ton lieu.')
     case 'milestone_vues':
@@ -96,6 +100,21 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
         url: id ? `/accueil/compagnie/${id}` : '/accueil',
       }
     }
+
+    case 'nouveau_membre': {
+      const id = texte(data.compagnieId)
+      return {
+        title: `${qui} a rejoint ${texte(data.compagnieNom, 'ta Compagnie')}`,
+        body: 'Souhaite-lui la bienvenue.',
+        url: id ? `/accueil/compagnie/${id}` : '/accueil',
+      }
+    }
+    case 'enigme_du_jour':
+      return {
+        title: 'Une énigme t’attend sur la carte',
+        body: 'Touche le « ? » pour la retourner.',
+        url: '/carte',
+      }
 
     case 'mise_a_jour':
       return {
