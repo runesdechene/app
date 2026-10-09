@@ -39,8 +39,9 @@ des vues du vrai t-shirt ajoutées à la main par les admins**, depuis le scanne
 
 ## Le parcours (maquettes 530:796 et suivantes)
 
-0. **L'entrée** : l'icône du scanner (celle déjà dessinée en haut du Récit) rejoint « + » et la cloche en haut
-   de l'Accueil. Depuis un QR du stand ou du flyer, on arrive directement sur `/scan`, appli installée ou non.
+0. **L'entrée** : l'icône du scanner (celle déjà dessinée en haut du Récit) se pose devant la cloche, dans
+   l'en-tête de la coquille — le même pour tous les onglets, donc visible partout (la maquette la montre sur
+   l'Accueil ; il n'y a pas de « + » dans cet en-tête, le seul est sur la carte). Depuis un QR du stand ou du flyer, on arrive directement sur `/scan`, appli installée ou non.
 1. **On vise** : « Vise le motif, de près. Ça bipe tout seul. » La caméra s'ouvre tout de suite ; le modèle se
    charge pendant qu'on vise. Rien à toucher.
 2. **Bip** : reconnu → un bip, une petite vibration (Android), les coins du viseur passent à la cire, une carte
@@ -50,15 +51,17 @@ des vues du vrai t-shirt ajoutées à la main par les admins**, depuis le scanne
 4. **Apprendre cette vue** (admins seulement) : une feuille en bas du même scanner — le Fragment (par défaut
    celui que le modèle croit voir), « Ajouter cette vue », le nombre de vues de ce Fragment, « Retirer la
    dernière ».
-5. **Le Récit** : l'écran existant (Figma 99:145), sans compte. Un membre l'ouvre dans l'appli (avec ses
-   onglets) ; un visiteur sur la page publique `/fragment/:id`.
+5. **Le Récit** : l'écran existant (Figma 99:145), sans compte. Un membre l'ouvre dans l'appli, avec ses
+   onglets (`/accueil/fragment/:id`) ; un visiteur sur `/scan/fragment/:id`, le Récit seul sur le fond du
+   scanner (la page publique `/bienvenue/carte/fragment/:id` s'ouvre sur la carte des visiteurs, qui n'a plus
+   de Fragments).
 
-**« Voir tous les Fragments »** : une liste simple (illustration et nom de chaque Fragment visible) qui mène à
+**« Voir tous les Fragments »** (`/scan/fragments`) : une liste simple (illustration et nom de chaque Fragment visible) qui mène à
 son Récit. Elle sert aussi quand la caméra est refusée.
 
 ## Les empreintes (Supabase)
 
-Une table, une ligne par référence :
+Une table `scan_empreintes`, une ligne par référence :
 
 | colonne | sens |
 |---|---|
@@ -69,10 +72,12 @@ Une table, une ligne par référence :
 | `modele` | le modèle qui l'a calculée (`mobilenet_v3_small`) ; changer de modèle invalide les anciennes |
 | `ajoutee_par`, `ajoutee_le` | |
 
-- **Lecture pour tous**, sans compte, par une RPC `empreintes_du_scan()` qui rend, pour le modèle courant, les
-  empreintes des Fragments visibles avec leur id et leur nom (un seul appel à l'ouverture du scanner).
-- **Écriture réservée aux admins** (`role = 'admin'`), par RPC : `ajouter_empreinte(fragment, vecteur, source)`,
-  `retirer_empreinte(id)`, `remplacer_empreintes_illustration(fragment, vecteurs[])` (le Hub remplace d'un coup
+- **Lecture pour tous**, sans compte, par une RPC `empreintes_du_scan(p_modele)` qui rend, pour ce modèle, les
+  Fragments visibles qui ont des empreintes : id, nom, illustration, et leurs empreintes (id, source,
+  vecteur) — un seul appel à l'ouverture du scanner. Les vecteurs sont arrondis à 4 décimales avant
+  d'être enregistrés (le poids de l'appel).
+- **Écriture réservée aux admins** (`role = 'admin'`), par RPC : `ajouter_vue(fragment, vecteur, modele)`,
+  `retirer_empreinte(id)` (« Retirer la dernière » retire la vue la plus récente du Fragment), `remplacer_empreintes_illustration(fragment, vecteurs[])` (le Hub remplace d'un coup
   celles d'un Fragment).
 - **Les scans** : une table `scans` (Fragment, quand, l'Explorateur s'il est connecté), remplie par une RPC
   `noter_scan(fragment)` ouverte à tous ; un bip = une ligne. Les admins en lisent les comptes.
@@ -84,7 +89,8 @@ Numéros de migration : à partir de 470.
 - **Une adresse, `/scan`**, servie par Explore. La redirection réservée dans `apps/web-v2/netlify.toml`
   (« Préfixe réservé — à venir », vers un autre site) est retirée : le scan est **dans** Explore (Uriel, 08/10),
   ce qui remplace sur ce point la spec de bascule (« Explore n'utilise jamais `/scan` pour ses écrans »). La
-  route est publique : elle n'exige ni compte ni onboarding.
+  route est publique (posée avant la garde d'accès, comme `/bienvenue`) : ni compte ni onboarding. Le service
+  worker ajoute `scan` à sa liste blanche d'écrans (`src/sw/ecrans.ts`).
 - **Une zone `features/scan`** : l'appel aux empreintes, le chargeur du modèle, la boucle d'analyse, la règle du
   bip, l'écran, la feuille des admins, la liste des Fragments.
 - **La reconnaissance** : plusieurs fois par seconde, le carré du viseur passe au modèle ; on garde, par
@@ -95,11 +101,12 @@ Numéros de migration : à partir de 470.
   Puis 2,5 s de silence. Trois constantes, départ **0,45 / 0,05 / 3** (l'essai), fixées après le test de
   l'atelier. La règle est une fonction pure, testée seule.
 - **Le modèle** (`@mediapipe/tasks-vision`) se charge **à part** (import dynamique) : le reste de l'appli ne
-  grossit pas. Le modèle et ses fichiers wasm sont **servis par notre domaine** (pas de dépendance au CDN de
-  Google) et gardés en cache par le service worker : le deuxième scan démarre sans attendre, même hors réseau.
-  Essayer le GPU, retomber sur le CPU.
+  grossit pas. Le modèle et ses fichiers wasm sont **servis par notre domaine, sous `/modeles/`** (pas de
+  dépendance au CDN de Google ; ouverts au Hub par CORS) et gardés en cache par le service worker
+  (`CacheFirst`) : le deuxième scan démarre sans attendre, même hors réseau. Essayer le GPU, retomber sur le
+  CPU.
 - **Le son sur iPhone** : Safari ne joue un son qu'après un toucher, et ne vibre pas.
-  - depuis l'icône de l'Accueil, ce toucher débloque le son ;
+  - depuis l'icône de l'en-tête, ce toucher débloque le son ;
   - arrivé par un QR sans avoir rien touché, l'écran montre d'abord un grand bouton **« Scanner »** (il débloque
     le son et, sur iPhone, déclenche la demande de caméra) ;
   - sans vibration, le signal visuel (coins à la cire, nom) suffit.
@@ -107,9 +114,9 @@ Numéros de migration : à partir de 470.
 - **Les admins** : la feuille « Apprendre cette vue » n'existe que pour `role = 'admin'`. L'empreinte d'une vue
   est celle du carré du viseur au moment du toucher ; elle part en base et sert au scan suivant de tout le monde.
 
-## Le Hub (page Fragments)
+## Le Hub (page « Fragments (Shopify) », `components/fragments/FragmentsShopify.tsx`)
 
-- Après la synchro Shopify, les empreintes des **illustrations** se calculent dans le navigateur (même modèle,
+- Le Hub charge le même modèle depuis `app.runesdechene.com/modeles/`. Après la synchro Shopify, les empreintes des **illustrations** se calculent dans le navigateur (même modèle,
   chaque illustration posée sur fond blanc et sur fond noir, entière et recadrée au centre — comme l'essai) et
   remplacent les anciennes ; un bouton « Recalculer » pour un Fragment.
 - Par Fragment : le nombre de **vues apprises**, chacune retirable ; un Fragment visible **sans aucune vue** est
