@@ -8166,7 +8166,7 @@ export type Database = {
       }
       signalements_enigme_du_hub: { Args: never; Returns: Json }
       signaler_enigme: {
-        Args: { p_enigme: number; p_precision?: string; p_raison: string }
+        Args: { p_enigme: number; p_precision?: string; p_proposition?: string; p_raison: string }
         Returns: Json
       }
       signaler_lieu: {
