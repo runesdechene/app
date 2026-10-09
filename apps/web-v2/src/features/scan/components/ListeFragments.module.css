@@ -1,0 +1,27 @@
+/* La liste des Fragments : une grille de vignettes sur le parchemin, deux par ligne au téléphone. */
+.liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fragment {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  text-decoration: none;
+}
+
+.fragment img {
+  width: 100%;
+  aspect-ratio: 164 / 227;
+  object-fit: contain;
+  border-radius: 12px;
+  background: var(--color-surface);
+}

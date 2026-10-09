@@ -28,8 +28,14 @@ import {
 import { RouteCarnet, RouteLieu, RouteModifierLieu } from './routes/lieu'
 import { RouteCompagnie, RouteFonder, RouteGerer } from './routes/compagnies'
 import { RouteMurmure } from './routes/messages'
-import { RouteApercuFragment, RouteApercuLieu, RouteCarteVisiteur, RouteOnboarding } from './routes/vitrine'
+import {
+  RouteApercuFragment,
+  RouteApercuLieu,
+  RouteCarteVisiteur,
+  RouteOnboarding,
+} from './routes/vitrine'
 import { RouteFragment } from './routes/fragments'
+import { RouteScan, RouteScanFragment, RouteScanFragments } from './routes/scan'
 import {
   RouteExplorateur,
   RouteModifier,
@@ -51,6 +57,10 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: '/bienvenue/:etape', Component: RouteOnboarding },
+  // Le scan : public lui aussi, un QR du stand y mène sans compte (spec 2026-10-09-v2-scan).
+  { path: '/scan', Component: RouteScan },
+  { path: '/scan/fragments', Component: RouteScanFragments },
+  { path: '/scan/fragment/:id', Component: RouteScanFragment },
   {
     path: '/',
     Component: RootLayout,
