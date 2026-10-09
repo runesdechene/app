@@ -52,11 +52,12 @@ export function Notifications() {
 }
 
 // Où mène une notification : le lieu, le Registre pour une mention ou un message aimé, les
-// Nouveautés pour une mise à jour, nulle part sinon.
+// Nouveautés pour une mise à jour, « Les énigmes » pour une réponse acceptée, nulle part sinon.
 function cibleDe(n: Notification) {
   if (n.type === 'mention') return '/messages'
   if (n.type === 'salut' && n.evenement === 'message') return '/messages'
   if (n.type === 'mise_a_jour') return '../nouveautes'
+  if (n.type === 'enigme_acceptee') return '../enigmes'
   if (n.compagnie) {
     return n.type === 'demande_compagnie'
       ? `../compagnie/${n.compagnie.id}/gerer`

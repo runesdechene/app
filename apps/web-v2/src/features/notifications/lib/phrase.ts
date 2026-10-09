@@ -67,6 +67,12 @@ export function phraseDe(n: Notification): Morceau[] {
       ]
     case 'mention':
       return [qui, t(` t’a mentionné dans le Registre : « ${n.extrait ?? ''} »`)]
+    case 'enigme_acceptee':
+      return [
+        t('Ta réponse à l’énigme '),
+        { texte: n.extrait ?? '', sorte: 'lieu' },
+        t(' est acceptée : ton point t’est rendu'),
+      ]
     case 'mise_a_jour':
       return [
         { texte: 'Nouveautés d’Explore', sorte: 'qui' },

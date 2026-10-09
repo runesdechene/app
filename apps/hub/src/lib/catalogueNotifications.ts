@@ -38,6 +38,7 @@ const DESCRIPTIONS: Record<string, { nom: string; quand: string; pour: string }>
   visite: { nom: 'Visite d’un lieu', quand: 'un Explorateur visite un lieu pour la première fois', pour: 'l’auteur du lieu' },
   revendication_reprise: { nom: 'Lieu repris', quand: 'quelqu’un revendique un lieu déjà tenu', pour: 'celui qui le tenait' },
   nouveau_membre: { nom: 'Nouveau membre', quand: 'quelqu’un rejoint une Compagnie publique', pour: 'les autres membres' },
+  enigme_acceptee: { nom: 'Réponse d’énigme acceptée', quand: 'le Hub accepte une réponse signalée', pour: 'les joueurs qui l’avaient signalée' },
   enigme_du_jour: { nom: 'Énigme du jour', quand: 'chaque jour vers 12 h 30, si une énigme réveillée attend', pour: 'les abonnés absents depuis 18 h' },
   exploration: { nom: 'Visites du jour (V1)', quand: 'ancien récapitulatif des visites', pour: 'l’auteur du lieu' },
   milestone_exploration: { nom: 'Palier de visites', quand: 'un lieu atteint un palier de visites', pour: 'son auteur' },

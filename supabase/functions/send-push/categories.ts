@@ -25,6 +25,7 @@ export const CATEGORY_BY_TYPE: Record<string, Category> = {
   revendication_reprise: 'important', // mig 464 : on revendique un lieu que tu tenais
   nouveau_membre: 'important', // mig 464 : quelqu'un rejoint ta Compagnie
   enigme_du_jour: 'important', // mig 464 : une énigme t'attend sur la carte (une fois par jour)
+  enigme_acceptee: 'important', // mig 473 : le Hub accepte la réponse qu'on avait signalée
   exploration: 'recap',
   milestone_exploration: 'recap',
   milestone_vues: 'recap',

@@ -4,7 +4,8 @@ import { supabase } from '../../lib/supabase'
 import './EnigmesSignalees.css'
 
 // Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 470).
-// Accepter ajoute la réponse du joueur aux réponses acceptées et clôt les signalements qu'elle règle.
+// Accepter ajoute la réponse du joueur aux réponses acceptées, clôt les signalements qu'elle règle et
+// rend leur point à ces joueurs (mig 473).
 // Depuis la 472, on peut signaler avant de répondre, et proposer une bonne réponse : la proposition se
 // lit, elle ne s'accepte pas (une réponse attendue fausse se réécrit dans « Modifier l'énigme »).
 interface SignalementEnigme {
@@ -63,7 +64,8 @@ export function EnigmesSignalees() {
     <div className="section signalees">
       <div className="page-header"><h1>Énigmes signalées</h1></div>
       <p className="signalees-intro">
-        Ce que les joueurs contestent après leur réponse. Accepter une réponse vaut pour la suite, pas pour le passé.
+        Ce que les joueurs contestent, avant ou après leur réponse. Accepter une réponse la fait valoir pour la
+        suite, et rend son point à ceux qui l’avaient signalée : ils en sont prévenus.
       </p>
 
       {erreur && <p className="signalees-erreur" role="alert">{erreur}</p>}

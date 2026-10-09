@@ -88,11 +88,19 @@ points, ni les titres.
 - **471** : accepter ne clôt plus que les refus que la variante ajoutée rend justes — avant, il fermait aussi
   les signalements de contenu des joueurs qui avaient juste.
 
+## Le 09/10 : rendre son point à qui a signalé (mig 473)
+
+Revient en partie sur « pas rétroactif » (Uriel, 09/10) : **ceux qui ont signalé** récupèrent leur point quand
+« Accepter » clôt leur signalement — leur dernière réponse devient juste (les points de connaissance suivent),
++1 XP (sauf réponse d'avant `_xp_epoch()`), les titres de connaissance gagnés, et une notification
+`enigme_acceptee` (cloche et push : « Ta réponse à l'énigme n° 287 est acceptée : ton point t'est rendu », vers
+« Les énigmes »). Rien pour qui avait déjà percé l'énigme ni pour qui n'a pas signalé. « Sur les chemins » ne
+bouge pas.
+
 ## Hors champ
 
 - Le tableau de toutes les mauvaises réponses.
-- La rétroactivité.
-- Prévenir le joueur que sa réponse a été acceptée.
+- La rétroactivité pour qui n'a pas signalé.
 
 ## Vérifier
 

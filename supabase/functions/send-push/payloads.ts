@@ -116,6 +116,13 @@ export function formatPayload(type: string, data: Data): PushPayload | null {
         url: '/carte',
       }
 
+    case 'enigme_acceptee':
+      return {
+        title: 'Ta réponse est acceptée',
+        body: `Énigme ${texte(data.extrait, '')} : ton point t’est rendu.`,
+        url: '/accueil/enigmes',
+      }
+
     case 'mise_a_jour':
       return {
         title: 'Nouveautés d’Explore',
