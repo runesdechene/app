@@ -31,9 +31,9 @@ livres et des panneaux.
 - `set_calendrier(p_calendrier text)` : `set_my_preference` ne prend que des booléens. Même forme que
   `set_title_gender` (316) : valeur inconnue → `{error}`.
 - `get_my_preferences()` renvoie en plus `calendrier`. Réécrite depuis sa définition **live**, copiée entière.
-- Dans *Préférences* (`PreferencesPage.tsx`) : une ligne « Calendrier » qui montre le calendrier choisi et
-  ouvre les quatre choix, chacun avec sa ligne d'explication. Mise à jour optimiste, comme les
-  interrupteurs (`usePreferences`).
+- Dans *Préférences* (`PreferencesPage.tsx`) : une carte « Ton calendrier » qui montre directement les
+  quatre choix, chacun avec sa ligne d'explication (plus simple qu'une ligne qui ouvre une feuille).
+  Mise à jour optimiste, comme les interrupteurs.
 - Sans compte (vitrine, scan) : `chretien`.
 - **Dans l'onboarding** (Uriel, 09/10) : une étape `calendrier` (`/bienvenue/calendrier`) juste après
   `nom`, avec les quatre choix et leurs lignes d'explication, « Chrétien » présélectionné, puis « Continuer »
@@ -83,11 +83,13 @@ TypeScript pur, sans dépendance, testé avec Vitest. Utilisé par l'appli **et*
 du Hub et l'appli calculent la même chose (aujourd'hui ils ne partagent aucun code).
 
 - `type Calendrier = 'chretien' | 'moderne' | 'rome' | 'constantinople'` et les libellés du tableau.
-- `dateEnClair(contenu, calendrier)` : une balise → le texte affiché.
+- `CALENDRIERS` (valeur, libellé, explication) et `estCalendrier(v)`.
 - `texteEnClair(texte, calendrier)` : un texte entier, toutes ses balises converties.
 - `balisesIncomprises(texte)` : pour l'aperçu du Hub.
-- `siecleDe(annee, calendrier)` : pour la fiche d'un lieu. `romain()` et `siecle()` de
-  `features/lieu/lib/faits.ts` y déménagent (plus de doublon).
+- `anneeEnClair(annee, calendrier)` et `siecleEnClair(annee, calendrier)` : pour l'aperçu d'ajout et la
+  fiche d'un lieu. Le siècle d'une année exacte se prend sur l'année convertie ; une balise de siècle passe
+  par son milieu, puis par `siecleEnClair`. `romain()` et `siecle()` de `features/lieu/lib/faits.ts` y
+  déménagent (plus de doublon).
 
 ## Où ça s'applique
 
