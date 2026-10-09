@@ -1196,6 +1196,7 @@ export type Database = {
       }
       enigmas: {
         Row: {
+          accepted_answers: string[]
           active: boolean
           answer: string
           choices: Json | null
@@ -1212,6 +1213,7 @@ export type Database = {
           type: string
         }
         Insert: {
+          accepted_answers?: string[]
           active?: boolean
           answer: string
           choices?: Json | null
@@ -1228,6 +1230,7 @@ export type Database = {
           type: string
         }
         Update: {
+          accepted_answers?: string[]
           active?: boolean
           answer?: string
           choices?: Json | null
@@ -4518,6 +4521,78 @@ export type Database = {
         }
         Relationships: []
       }
+      signalements_enigme: {
+        Row: {
+          cree_le: string
+          enigma_id: number
+          id: number
+          precision: string | null
+          raison: string
+          reponse_donnee: string
+          traite_le: string | null
+          traite_par: string | null
+          user_id: string
+        }
+        Insert: {
+          cree_le?: string
+          enigma_id: number
+          id?: number
+          precision?: string | null
+          raison: string
+          reponse_donnee: string
+          traite_le?: string | null
+          traite_par?: string | null
+          user_id: string
+        }
+        Update: {
+          cree_le?: string
+          enigma_id?: number
+          id?: number
+          precision?: string | null
+          raison?: string
+          reponse_donnee?: string
+          traite_le?: string | null
+          traite_par?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signalements_enigme_enigma_id_fkey"
+            columns: ["enigma_id"]
+            isOneToOne: false
+            referencedRelation: "enigmas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_enigme_traite_par_fkey"
+            columns: ["traite_par"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_enigme_traite_par_fkey"
+            columns: ["traite_par"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_enigme_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signalements_enigme_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signalements_lieu: {
         Row: {
           cree_le: string
@@ -6321,6 +6396,10 @@ export type Database = {
         Args: { p_correct: string; p_user: string }
         Returns: boolean
       }
+      _enigma_juste: {
+        Args: { p_answer: string; p_reponse: string; p_variantes: string[] }
+        Returns: boolean
+      }
       _enigma_normalize: { Args: { p_input: string }; Returns: string }
       _enigma_score_weighted: {
         Args: { p_from?: string; p_to?: string; p_user_id: string }
@@ -6329,6 +6408,7 @@ export type Database = {
       _enigmes_du_jeu: {
         Args: { p_theme: string }
         Returns: {
+          accepted_answers: string[]
           active: boolean
           answer: string
           choices: Json | null
@@ -8084,6 +8164,11 @@ export type Database = {
         Args: { p_storage_path: string; p_user_id: string; p_voyage_id: string }
         Returns: Json
       }
+      signalements_enigme_du_hub: { Args: never; Returns: Json }
+      signaler_enigme: {
+        Args: { p_enigme: number; p_precision?: string; p_raison: string }
+        Returns: Json
+      }
       signaler_lieu: {
         Args: { p_id: string; p_precision?: string; p_raison: string }
         Returns: Json
@@ -8124,6 +8209,10 @@ export type Database = {
         Returns: Json
       }
       touch_last_login: { Args: { p_user_id: string }; Returns: Json }
+      traiter_signalement_enigme: {
+        Args: { p_accepter?: boolean; p_id: number }
+        Returns: Json
+      }
       unaccent: { Args: { "": string }; Returns: string }
       unaccent_fallback: { Args: { p: string }; Returns: string }
       unlike_contribution: {
