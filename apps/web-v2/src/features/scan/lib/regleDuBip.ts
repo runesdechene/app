@@ -10,6 +10,9 @@ export type Place = { fragment: number; ressemblance: number }
 export type EtatBip = { fragment: number | null; suite: number; silenceJusqua: number }
 
 export const SEUIL = 0.45
+// Un seul Fragment a des empreintes (les premières vues, avant le Hub) : pas de deuxième pour juger
+// l'avance, alors on exige plus. Réglé avec les trois autres au test de l'atelier.
+export const SEUIL_SEUL = 0.6
 export const AVANCE = 0.05
 export const SUITE = 3
 export const SILENCE_MS = 2500
@@ -49,8 +52,9 @@ export function avancer(
   const [premier, second] = classement
   const net =
     premier !== undefined &&
-    premier.ressemblance >= SEUIL &&
-    premier.ressemblance - (second?.ressemblance ?? 0) >= AVANCE
+    (second === undefined
+      ? premier.ressemblance >= SEUIL_SEUL
+      : premier.ressemblance >= SEUIL && premier.ressemblance - second.ressemblance >= AVANCE)
   if (!net) return { etat: { ...etat, fragment: null, suite: 0 }, bip: null }
   const suite = etat.fragment === premier.fragment ? etat.suite + 1 : 1
   if (suite >= SUITE && maintenant >= etat.silenceJusqua) {

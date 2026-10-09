@@ -41,3 +41,20 @@ test('un viseur qui ressemble nettement à un Fragment, image après image, bipe
     { timeout: 3000 },
   )
 })
+
+test('une analyse qui échoue en cours de route (contexte GPU perdu) rend `erreur` et s’arrête', async () => {
+  const empreinteur = vi.fn(() => {
+    throw new Error('contexte perdu')
+  })
+  chargerModele.mockResolvedValueOnce(empreinteur)
+  const ref = video()
+  const { result } = renderHook(() =>
+    useAnalyse(ref, [{ fragment: 7, vecteur: [1, 0] }], true, vi.fn()),
+  )
+  await waitFor(() => {
+    expect(result.current.erreur).toBe(true)
+  })
+  const appels = empreinteur.mock.calls.length
+  await new Promise((fini) => setTimeout(fini, 400))
+  expect(empreinteur.mock.calls.length).toBe(appels)
+})

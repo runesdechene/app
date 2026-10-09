@@ -15,6 +15,7 @@ import { useAnalyse } from '../hooks/useAnalyse'
 import { useCamera } from '../hooks/useCamera'
 import { useEmpreintes } from '../hooks/useEmpreintes'
 import { cheminDuRecit } from '../lib/chemin'
+import { SEUIL } from '../lib/regleDuBip'
 import { biper, debloquerSon, sonDebloque } from '../lib/son'
 import { FeuilleApprendre } from './FeuilleApprendre'
 import styles from './ScanScreen.module.css'
@@ -46,20 +47,24 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
   )
   const [conseil, setConseil] = useState(false)
 
+  // Le conseil ne compte qu'à partir du moment où l'on peut vraiment reconnaître : à la première
+  // ouverture, le modèle se télécharge (plusieurs Mo) et rien n'est encore analysé.
+  const vise = camera === 'en-marche' && analyse.pret && references !== undefined
   useEffect(() => {
-    if (camera !== 'en-marche' || reconnu !== null) return
+    if (!vise || reconnu !== null) return
     const minuteur = window.setTimeout(() => {
       setConseil(true)
     }, CONSEIL_MS)
     return () => {
       window.clearTimeout(minuteur)
     }
-  }, [camera, reconnu])
+  }, [vise, reconnu])
 
   useEffect(() => {
     if (reconnu === null) return
     const minuteur = window.setTimeout(() => {
-      void navigate(cheminDuRecit(reconnu, connecte))
+      // Le Récit remplace le scanner : le retour ne rouvre pas la caméra devant le t-shirt.
+      void navigate(cheminDuRecit(reconnu, connecte), { replace: true })
     }, VERS_LE_RECIT_MS)
     return () => {
       window.clearTimeout(minuteur)
@@ -124,6 +129,10 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
             <p className={styles.nom}>{fragment.nom}</p>
           </div>
         </div>
+      ) : !vise ? (
+        <div className={styles.consigne}>
+          <p>Préparation du scan…</p>
+        </div>
       ) : (
         <div className={styles.consigne}>
           <p>
@@ -141,7 +150,11 @@ export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: bool
       {!connecte && <p className={styles.pied}>Aucun compte nécessaire</p>}
       {admin && camera === 'en-marche' && reconnu === null && (
         <FeuilleApprendre
-          suggestion={analyse.meilleur?.fragment ?? null}
+          suggestion={
+            analyse.meilleur && analyse.meilleur.ressemblance >= SEUIL
+              ? analyse.meilleur.fragment
+              : null
+          }
           empreinteActuelle={analyse.empreinteActuelle}
         />
       )}

@@ -47,8 +47,7 @@ export function useAnalyse(
     let etat = DEPART
     let dernierPas = 0
     let image = 0
-    const pas = (maintenant: number) => {
-      image = requestAnimationFrame(pas)
+    const analyser = (maintenant: number) => {
       const v = video.current
       if (!v || v.readyState < 2 || maintenant - dernierPas < PAS_MS) return
       dernierPas = maintenant
@@ -59,6 +58,17 @@ export function useAnalyse(
       const suite = avancer(etat, classement, maintenant)
       etat = suite.etat
       if (suite.bip !== null) rappel.current(suite.bip)
+    }
+    // Un modèle qui casse en route (contexte GPU perdu après une mise en veille) : on s'arrête et
+    // on le dit, plutôt que de viser sans fin sans jamais biper.
+    const pas = (maintenant: number) => {
+      try {
+        analyser(maintenant)
+      } catch {
+        setErreur(true)
+        return
+      }
+      image = requestAnimationFrame(pas)
     }
     image = requestAnimationFrame(pas)
     return () => {

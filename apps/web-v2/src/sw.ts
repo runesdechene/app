@@ -13,7 +13,7 @@
  */
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { CacheFirst } from 'workbox-strategies'
+import { StaleWhileRevalidate } from 'workbox-strategies'
 import { cheminDansLAppli, ecransExplore } from './sw/ecrans'
 
 declare const self: ServiceWorkerGlobalScope
@@ -32,11 +32,13 @@ registerRoute(
   ),
 )
 
-// Le modèle du scan et ses wasm (~10 Mo) : téléchargés à la première ouverture du scanner, puis
-// servis depuis le cache — le deuxième scan démarre sans attendre, même hors réseau.
+// Le modèle du scan et ses wasm (plusieurs Mo) : téléchargés à la première ouverture du scanner,
+// puis servis depuis le cache — le deuxième scan démarre sans attendre, même hors réseau. Revérifiés
+// derrière (StaleWhileRevalidate) : leurs adresses ne changent pas d'une version à l'autre, et un
+// cache jamais revérifié garderait pour toujours un vieux modèle ou de vieux wasm.
 registerRoute(
   ({ url }) => url.origin === self.location.origin && url.pathname.startsWith(`${base}modeles/`),
-  new CacheFirst({ cacheName: 'modeles' }),
+  new StaleWhileRevalidate({ cacheName: 'modeles' }),
 )
 
 self.addEventListener('activate', (event) => {

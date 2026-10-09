@@ -7,6 +7,7 @@ import {
   AVANCE,
   DEPART,
   SEUIL,
+  SEUIL_SEUL,
   SILENCE_MS,
   SUITE,
   arrondir,
@@ -89,4 +90,15 @@ test(`après un bip, ${String(SILENCE_MS)} ms de silence`, () => {
 
 test('arrondir garde 4 décimales (le poids des empreintes en base)', () => {
   expect(arrondir([0.123456, -0.98766])).toEqual([0.1235, -0.9877])
+})
+
+test('un seul Fragment en lice : sans deuxième pour l’avance, il faut le seuil du Fragment seul', () => {
+  const suite = (classement: { fragment: number; ressemblance: number }[]) => {
+    let r = avancer(DEPART, classement, 0)
+    for (let i = 1; i < SUITE; i++) r = avancer(r.etat, classement, i * 100)
+    return r.bip
+  }
+  expect(SEUIL_SEUL).toBeGreaterThan(SEUIL)
+  expect(suite([{ fragment: 7, ressemblance: SEUIL_SEUL - 0.01 }])).toBeNull()
+  expect(suite([{ fragment: 7, ressemblance: SEUIL_SEUL }])).toBe(7)
 })

@@ -4,13 +4,18 @@
  */
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 
 const etat = vi.hoisted(() => ({
   son: true,
   camera: 'en-marche',
-  analyse: { pret: true, erreur: false, meilleur: null, empreinteActuelle: () => null },
+  analyse: {
+    pret: true,
+    erreur: false,
+    meilleur: null as { fragment: number; ressemblance: number } | null,
+    empreinteActuelle: () => null,
+  },
   empreintes: {
     fragments: [] as { id: number; nom: string; illustration: string | null; empreintes: [] }[],
     erreur: false,
@@ -36,21 +41,40 @@ vi.mock('../hooks/useAnalyse', () => ({
 }))
 vi.mock('../hooks/useEmpreintes', () => ({
   useEmpreintes: () => etat.empreintes,
-  useFragmentsVisibles: () => [],
+  useFragmentsVisibles: () => ({ fragments: [], erreur: false }),
 }))
 vi.mock('../api/scan', () => ({ noterScan }))
+const feuille = vi.hoisted(() => ({ suggestion: undefined as number | null | undefined }))
 vi.mock('./FeuilleApprendre', () => ({
-  FeuilleApprendre: () => <section aria-label="Apprendre cette vue" />,
+  FeuilleApprendre: ({ suggestion }: { suggestion: number | null }) => {
+    feuille.suggestion = suggestion
+    return <section aria-label="Apprendre cette vue" />
+  },
 }))
 
 import { ScanScreen } from './ScanScreen'
 
+function Retour() {
+  const navigate = useNavigate()
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigate(-1)
+      }}
+    >
+      Récit membre
+    </button>
+  )
+}
+
 function ouvrir(admin = false) {
   return render(
-    <MemoryRouter initialEntries={['/scan']}>
+    <MemoryRouter initialEntries={['/avant', '/scan']} initialIndex={1}>
       <Routes>
         <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
-        <Route path="/accueil/fragment/:id" element={<p>Récit membre</p>} />
+        <Route path="/avant" element={<p>Avant le scan</p>} />
+        <Route path="/accueil/fragment/:id" element={<Retour />} />
         <Route path="/scan/fragment/:id" element={<p>Récit visiteur</p>} />
       </Routes>
     </MemoryRouter>,
@@ -160,4 +184,36 @@ test('un admin voit « Apprendre cette vue » ; un joueur, non', () => {
   unmount()
   ouvrir()
   expect(screen.queryByRole('region', { name: 'Apprendre cette vue' })).not.toBeInTheDocument()
+})
+
+test('pendant que le modèle se prépare : « Préparation du scan… », et pas de conseil trompeur', () => {
+  etat.analyse = { ...etat.analyse, pret: false }
+  ouvrir()
+  expect(screen.getByText('Préparation du scan…')).toBeInTheDocument()
+  act(() => {
+    vi.advanceTimersByTime(8000)
+  })
+  expect(screen.queryByText(/Pas encore reconnu/)).not.toBeInTheDocument()
+})
+
+test('le Récit remplace le scanner : le retour ramène avant le scan, sans rebiper', async () => {
+  ouvrir()
+  act(() => {
+    etat.surBip?.(11)
+  })
+  act(() => {
+    vi.advanceTimersByTime(600)
+  })
+  await userEvent.click(screen.getByRole('button', { name: 'Récit membre' }))
+  expect(screen.getByText('Avant le scan')).toBeInTheDocument()
+})
+
+test('la feuille des admins ne reçoit une suggestion qu’au-dessus du seuil', () => {
+  etat.analyse = { ...etat.analyse, meilleur: { fragment: 11, ressemblance: 0.2 } }
+  const { unmount } = ouvrir(true)
+  expect(feuille.suggestion).toBeNull()
+  unmount()
+  etat.analyse = { ...etat.analyse, meilleur: { fragment: 11, ressemblance: 0.8 } }
+  ouvrir(true)
+  expect(feuille.suggestion).toBe(11)
 })

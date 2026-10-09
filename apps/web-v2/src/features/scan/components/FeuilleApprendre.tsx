@@ -14,11 +14,15 @@ type Props = { suggestion: number | null; empreinteActuelle: () => number[] | nu
 
 export function FeuilleApprendre({ suggestion, empreinteActuelle }: Props) {
   const client = useQueryClient()
-  const tous = useFragmentsVisibles() ?? []
+  const tous = useFragmentsVisibles().fragments ?? []
   const { fragments } = useEmpreintes()
-  const [choisi, setChoisi] = useState<number | null>(null)
+  const [fragment, setFragment] = useState<number | null>(suggestion)
   const [occupe, setOccupe] = useState(false)
-  const fragment = choisi ?? suggestion ?? tous[0]?.id ?? null
+
+  // La première suggestion se fige (ajustée pendant le rendu, comme le veut React) : le modèle change
+  // d'avis plusieurs fois par seconde, et une vue rangée sous le mauvais Fragment ferait biper tout le
+  // monde sur le mauvais Récit.
+  if (fragment === null && suggestion !== null) setFragment(suggestion)
   const vues =
     fragments?.find((f) => f.id === fragment)?.empreintes.filter((e) => e.source === 'vue') ?? []
   const derniere = vues.reduce<number | null>(
@@ -43,9 +47,12 @@ export function FeuilleApprendre({ suggestion, empreinteActuelle }: Props) {
         className={styles.choix}
         value={fragment ?? ''}
         onChange={(e) => {
-          setChoisi(Number(e.target.value))
+          setFragment(Number(e.target.value))
         }}
       >
+        <option value="" disabled>
+          Choisir le Fragment
+        </option>
         {tous.map((f) => (
           <option key={f.id} value={f.id}>
             {f.nom}

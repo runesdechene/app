@@ -10,10 +10,13 @@ const ajouterVue = vi.hoisted(() => vi.fn(() => Promise.resolve(99)))
 const retirerEmpreinte = vi.hoisted(() => vi.fn(() => Promise.resolve()))
 vi.mock('../api/scan', () => ({ ajouterVue, retirerEmpreinte }))
 vi.mock('../hooks/useEmpreintes', () => ({
-  useFragmentsVisibles: () => [
-    { id: 11, nom: 'Hoplite', illustration: null },
-    { id: 12, nom: 'Loutre', illustration: null },
-  ],
+  useFragmentsVisibles: () => ({
+    fragments: [
+      { id: 11, nom: 'Hoplite', illustration: null },
+      { id: 12, nom: 'Loutre', illustration: null },
+    ],
+    erreur: false,
+  }),
   useEmpreintes: () => ({
     fragments: [
       {
@@ -66,5 +69,27 @@ test('retirer la dernière retire la vue la plus récente du Fragment', async ()
 
 test('sans image du viseur encore, on ne peut rien ajouter', () => {
   ouvrir(11, null)
+  expect(screen.getByRole('button', { name: 'Ajouter cette vue' })).toBeDisabled()
+})
+
+test('la suggestion se fige : le modèle qui change d’avis ne change pas le Fragment choisi', () => {
+  const client = new QueryClient()
+  const vue = () => [0.1]
+  const { rerender } = render(
+    <QueryClientProvider client={client}>
+      <FeuilleApprendre suggestion={11} empreinteActuelle={vue} />
+    </QueryClientProvider>,
+  )
+  rerender(
+    <QueryClientProvider client={client}>
+      <FeuilleApprendre suggestion={12} empreinteActuelle={vue} />
+    </QueryClientProvider>,
+  )
+  expect(screen.getByRole('combobox')).toHaveValue('11')
+})
+
+test('sans suggestion, aucun Fragment choisi d’office : on choisit avant d’ajouter', () => {
+  ouvrir(null)
+  expect(screen.getByRole('combobox')).toHaveValue('')
   expect(screen.getByRole('button', { name: 'Ajouter cette vue' })).toBeDisabled()
 })

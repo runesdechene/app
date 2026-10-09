@@ -24,7 +24,10 @@ function modele(): Promise<ImageEmbedder> {
       l2Normalize: true,
       quantize: false,
     }),
-  )
+  ).catch((erreur: unknown) => {
+    chargement = null // un échec (Explore pas encore déployé, réseau) se rejoue au prochain clic
+    throw erreur
+  })
   return chargement
 }
 

@@ -10,7 +10,10 @@ import { cheminDuRecit } from '../lib/chemin'
 import styles from './ListeFragments.module.css'
 
 export function ListeFragments({ connecte }: { connecte: boolean }) {
-  const fragments = useFragmentsVisibles()
+  const { fragments, erreur } = useFragmentsVisibles()
+  if (erreur && !fragments) {
+    return <p className={styles.erreur}>La liste n’a pas pu se charger. Vérifie ta connexion.</p>
+  }
   return (
     <ul className={styles.liste}>
       {fragments?.map((f) => (

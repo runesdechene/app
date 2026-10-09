@@ -117,18 +117,34 @@ export function FragmentsShopify() {
       const { data, error } = await supabase.rpc('synchroniser_fragments', { p_illustrations: lues })
       if (error) throw error
       await fetchFragments()
-      // Les empreintes de scan suivent les illustrations (spec 2026-10-09-v2-scan).
+      const maj = `${data as number} Fragment${(data as number) > 1 ? 's' : ''} mis à jour depuis Shopify`
+      setSynchro(maj)
+      // Les empreintes de scan suivent les illustrations (spec 2026-10-09-v2-scan). Un Fragment qui
+      // échoue (image refusée, modèle injoignable) n'arrête pas les autres : on le nomme à la fin.
       const { data: aRecalculer } = await supabase
         .from('title_fragments')
-        .select('id, illustration_url, illustration_sombre_url')
+        .select('id, name, illustration_url, illustration_sombre_url')
         .eq('visible', true)
-      const liste = (aRecalculer ?? []) as { id: number; illustration_url: string | null; illustration_sombre_url: string | null }[]
-      let n = 0
-      for (const f of liste) {
-        setSynchro(`Empreintes de scan : ${++n} / ${liste.length}…`)
-        await recalculerIllustrations(f)
+      const liste = (aRecalculer ?? []) as {
+        id: number
+        name: string
+        illustration_url: string | null
+        illustration_sombre_url: string | null
+      }[]
+      const echecs: string[] = []
+      for (const [i, f] of liste.entries()) {
+        setSynchro(`${maj} · empreintes de scan : ${i + 1} / ${liste.length}…`)
+        try {
+          await recalculerIllustrations(f)
+        } catch {
+          echecs.push(f.name)
+        }
       }
-      setSynchro(`${data as number} Fragment${(data as number) > 1 ? 's' : ''} mis à jour depuis Shopify, empreintes de scan recalculées`)
+      setSynchro(
+        echecs.length
+          ? `${maj} · empreintes de scan : ${liste.length - echecs.length} / ${liste.length}, échec pour ${echecs.join(', ')}`
+          : `${maj} · empreintes de scan recalculées`,
+      )
       await fetchScans()
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : JSON.stringify(e))

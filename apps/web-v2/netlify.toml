@@ -76,6 +76,13 @@
   to = "/:splat"
   status = 301
 
+# Le modèle du scan : un fichier absent est une vraie 404, jamais l'appli servie en 200 (le service
+# worker la garderait comme modèle).
+[[redirects]]
+  from = "/modeles/*"
+  to = "/404"
+  status = 404
+
 # Explore : toute autre adresse sert l'appli (les fichiers existants passent avant).
 [[redirects]]
   from = "/*"
