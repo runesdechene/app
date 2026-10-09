@@ -11,6 +11,8 @@ paths:
 
 ## Découvrir = à distance + énergie. Visiter = GPS + gratuit. Ne jamais confondre.
 
+> **V2 (27-28/09/2026)** : l'énergie est supprimée ; **découvrir reste à distance mais devient gratuit et sans limite** (geste « Découvrir » : carte floutée, révélée, +1 d'expérience via `places_discovered` method `remote`). La distinction des mots tient toujours : découvrir = à distance, visiter = sur place.
+
 **Règle :** dans tout brainstorm, spec, plan, code, copy user-facing : **"découvrir" = action à distance qui coûte de l'énergie** (révéler un lieu sans y aller). **"Visiter" / "explorer en GPS" / "poser ma marque" = action physique sur place, gratuite** (proximity < 500m).
 
 **Why :** Uriel l'a recadré une 1ère fois (date antérieure non tracée), puis re-recadré le 7 mai 2026 quand j'ai écrit la spec + plan + code de l'éco Couronnes en branchant le gain sur `v_method = 'gps'`. La spec elle-même disait "Découverte d'un lieu (1ère visite GPS)" — j'ai propagé la confusion jusqu'au CHANGELOG. Indice donné par Uriel et zappé : "on dépense de l'énergie pour découvrir, et l'énergie c'est seulement à distance". Donc énergie + découverte sont liés sémantiquement → GPS gratuit ne peut pas être une "découverte".

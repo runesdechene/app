@@ -1,0 +1,72 @@
+/*
+ * QUOI     — la barre sable, ses segments en Bebas Neue, et la zone éclairée qui glisse
+ *            (maquette 91:107).
+ */
+.segments {
+  position: relative;
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: var(--space-1);
+  padding: 5px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-vignette) 57%, transparent);
+}
+
+/* La zone éclairée : la largeur d'un segment, décalée d'autant de segments que le rang. Un
+   léger dépassement à l'arrivée lui donne de l'élan. Le décalage s'écrit en deux termes :
+   Chrome perd l'écart dans « rang × (100 % + écart) ». */
+.curseur {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc((100% - 10px - (var(--nombre) - 1) * var(--space-1)) / var(--nombre));
+  border-radius: var(--radius-petit);
+  background: var(--color-surface);
+  translate: calc(var(--rang) * 100% + var(--rang) * var(--space-1)) 0;
+  transition: translate var(--duree-elan) var(--courbe-elan);
+}
+
+.segment {
+  position: relative; /* au-dessus de la zone éclairée */
+  display: grid;
+  place-items: center;
+  padding: var(--space-2) 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  cursor: pointer;
+  transition: color 0.25s;
+}
+
+.segment:has(:checked) {
+  color: var(--color-encre);
+}
+
+.segment:has(:focus-visible) {
+  border-radius: var(--radius-petit);
+  outline: 2px solid var(--color-ocre);
+  outline-offset: -2px;
+}
+
+/* Le libellé et sa marque éventuelle (une pastille), côte à côte. */
+.libelle {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Le vrai bouton radio reste là pour le clavier et les lecteurs d'écran, mais invisible. */
+.radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curseur,
+  .segment {
+    transition: none;
+  }
+}

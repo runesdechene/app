@@ -1,0 +1,107 @@
+/*
+ * QUOI     — la liste d'un classement : les rangs en chiffres romains droits (IM Fell), le
+ *            premier cerclé d'ocre, un filet entre deux lignes ; ma place, une ligne comme les
+ *            autres, détachée par un filet pointillé.
+ */
+.classement {
+  display: grid;
+}
+
+.tete {
+  display: grid;
+  margin: 0;
+  padding: 0 var(--space-6);
+  list-style: none;
+}
+
+.ligne,
+.maPlace {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto; /* « VIII » tient dans 40 px */
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.ligne + .ligne {
+  border-top: 1px solid var(--color-sable);
+}
+
+/* Ma place, sous la tête : la même ligne, détachée par un filet pointillé. Son rang peut être
+   long (« CCXLVIII ») : la colonne s'étire. */
+.maPlace {
+  grid-template-columns: minmax(40px, auto) minmax(0, 1fr) auto;
+  margin: 0 var(--space-6);
+  border-top: 1px dashed var(--color-sable);
+}
+
+.rang {
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+  font-style: normal;
+  text-align: center;
+}
+
+.ligne[data-premier] .rang {
+  color: var(--color-ocre);
+}
+
+.qui {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.portrait {
+  display: grid;
+  flex-shrink: 0;
+}
+
+.ligne[data-premier] .portrait {
+  border-radius: var(--radius-rond);
+  box-shadow: 0 0 0 1.5px var(--color-ocre);
+}
+
+.texte {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nom {
+  overflow: hidden;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.compte {
+  display: grid;
+  justify-items: end;
+  color: var(--color-encre);
+  font-family: var(--font-condensee);
+  font-size: var(--rangee-size);
+  font-weight: var(--weight-gras);
+  line-height: var(--titre-leading);
+}
+
+.unite {
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+}

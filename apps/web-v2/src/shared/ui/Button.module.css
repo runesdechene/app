@@ -1,0 +1,82 @@
+/*
+ * QUOI     — les trois sortes de bouton et leur état désactivé.
+ */
+.principal,
+.secondaire {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+  box-shadow: var(--ombre-bouton);
+}
+
+.principal {
+  border: 2px solid var(--color-accent-clair);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.secondaire {
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+}
+
+.discret {
+  min-height: var(--cible-tactile);
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  color: var(--color-texte-doux);
+}
+
+/* Doux : le bouton du profil (« Envoyer un murmure », « Modifier mon profil »). */
+.doux {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border: 2px solid var(--color-desactive-bord);
+  border-radius: var(--radius);
+  background: var(--color-doux-fond);
+  color: var(--color-brun);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  box-shadow: 0 0 8px 5px color-mix(in srgb, var(--color-ocre) 15%, transparent);
+}
+
+.doux:disabled {
+  cursor: default;
+}
+
+/* Désactivé : la teinte de « Marquer ma visite (274 km trop loin) » dans la maquette. */
+.principal:disabled,
+.secondaire:disabled {
+  border-color: var(--color-desactive-bord);
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+  cursor: not-allowed;
+}
+
+/* Le discret n'a ni fond ni bord : seule sa couleur change. */
+.discret:disabled {
+  color: var(--color-desactive-texte);
+  cursor: not-allowed;
+}
+
+/* Un lien habillé en bouton : centré comme lui, sans soulignement. */
+.lien {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

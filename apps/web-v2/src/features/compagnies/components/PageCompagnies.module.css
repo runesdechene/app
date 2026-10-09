@@ -1,0 +1,157 @@
+/*
+ * QUOI     — la page « Les Compagnies » (maquette 396:236) : l'air des Murmures, des noms en lettre de
+ *            copiste, la devise en italique, un bouton rouge pour fonder.
+ */
+.page {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-6) calc(164px + var(--space-4));
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.phrase {
+  margin: 0 0 var(--space-3);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.recherche {
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+}
+
+.recherche:focus {
+  border-color: var(--color-ocre);
+  outline: none;
+}
+
+.section {
+  margin: var(--space-6) 0 var(--space-2);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ligne,
+.lien {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+
+.lien {
+  flex: 1;
+  min-width: 0;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+}
+
+.devise {
+  color: var(--color-texte-doux);
+  font-family: var(--font-inscription);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.info {
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.chevron {
+  color: var(--color-texte-pale);
+  font-size: var(--titre-carte-size);
+}
+
+.entrer {
+  flex: none;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--color-accent);
+  border-radius: var(--radius-rond);
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.entrer:disabled {
+  border-color: var(--color-sable);
+  color: var(--color-texte-pale);
+  cursor: default;
+}
+
+.fonder {
+  display: grid;
+  place-items: center;
+  min-height: var(--cible-tactile);
+  margin-top: var(--space-6);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.note,
+.vide {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}

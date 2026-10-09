@@ -242,3 +242,55 @@ Un paramètre `p_user_id` venu du client n'est qu'une affirmation de l'appelant.
       and pg_get_functiondef(p.oid) ~* '(insert\s+into|update\s+[a-z_.]+\s+set|delete\s+from)'
       and has_function_privilege('authenticated', p.oid, 'execute');
    ```
+
+## Deux sessions, deux worktrees : réserver les numéros de migration, et `db push` voit l'autre
+
+**Le piège** (06/10/2026, pin GPS et « Tous les titres » en parallèle) : l'autre session avait
+appliqué sa 427 en prod depuis son worktree ; mon `db push` refusait (`DbPushMissingLocalError`) et
+proposait `migration repair --status reverted 427` — qui aurait effacé sa trace.
+
+**How to apply :** réserver ses numéros par message à l'autre session **avant** d'écrire. Si
+`db push` réclame une migration distante absente : ne jamais `repair` ; copier le fichier depuis
+l'autre worktree, **sans le committer**, le temps du push (`--dry-run` d'abord : seule la sienne doit
+partir), puis le retirer. Une migration numérotée sous la dernière appliquée demande `--include-all`.
+
+**Le CLI ne compare que le numéro** (08/10, trois sessions sur 462 à 469) : si une autre session a déjà
+appliqué une `465_autre_nom`, ma `465_mienne` passe pour appliquée — le dry-run dit « à jour » et rien ne
+part, sans erreur. Juste avant le push, lire le nom en prod :
+`select version, name from supabase_migrations.schema_migrations order by version desc limit 5`.
+
+## Une migration qui retire une clé lue par le front en ligne casse la prod si elle passe avant lui
+
+**Le piège** (07/10/2026, mig 433) : `get_mes_titres` perdait sa clé `autreEpoque`, que la V2 en
+ligne exigeait (`liste(...)` lève sur `undefined`). Le plan disait « front d'abord », mais la
+migration a été poussée avant le déploiement : « Tous les titres » en erreur en prod jusqu'au 1.2.3.
+
+**How to apply :** une migration ne retire jamais une clé, une colonne ou un paramètre que le front
+**déployé** lit encore. Soit la garder (vide) jusqu'au déploiement puis la retirer dans une
+migration suivante, soit déployer le front d'abord **et** n'écrire le fichier qu'après. Un ordre
+écrit dans un message ne protège pas : le fichier poussé peut partir avec le premier `db push`.
+
+## Le Site URL de la prod se règle au tableau de bord, jamais par `config push`
+
+**Le piège** (constaté à la bascule, 07/10/2026) : le Site URL de la prod valait
+`http://localhost:3000/`, la valeur de `supabase/config.toml` (local). Tout lien d'e-mail sans
+adresse de retour acceptée (changement d'e-mail, confirmation) renvoyait vers localhost.
+
+**How to apply :** ne jamais lancer `supabase config push` vers la prod (il recopie `config.toml`).
+Le réglage de prod, au tableau de bord → Authentication → URL Configuration : Site URL
+`https://app.runesdechene.com`, Redirect URLs `https://app.runesdechene.com/**` (+ l'entrée locale).
+
+## « Confirm email » doit rester activé, et la fiche naît à la confirmation
+
+**Le piège** (07-08/10/2026) : « Confirm email » était coupé. Demander un code pour une adresse
+inconnue créait aussitôt un compte **confirmé** (0,1 s, sans code saisi) et, par
+`on_auth_user_created`, sa fiche : une faute de frappe laissait un « Explorateur 4DDF », un script
+créait `df-audit-…@example.com`, et `handle_new_user` rattachait à ce compte la fiche existante au
+même e-mail (ancien compte, client Shopify) sans preuve que l'adresse lui appartient.
+
+**How to apply :** « Confirm email » activé (tableau de bord → Authentication → Sign In /
+Providers), le modèle « Confirm sign up » porte `{{ .Token }}` (la V2 demande un code, pas un
+lien). La fiche naît à la confirmation (mig 455 : `on_auth_user_created` seulement si confirmé
+d'emblée, `on_auth_user_confirmed` sinon). Signe d'un compte créé sans humain : confirmé moins
+d'une seconde après sa création. Demander un code laisse une ligne « en attente » dans
+`auth.users`, sans fiche : invisible dans l'appli.

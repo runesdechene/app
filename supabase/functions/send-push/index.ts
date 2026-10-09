@@ -72,6 +72,27 @@ async function loadConfig(): Promise<AppConfig | null> {
   return cachedConfig
 }
 
+async function avecLesNoms(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const complet = { ...data }
+  if (!complet.actorName && typeof complet.actorId === 'string') {
+    const { data: u } = await supabase
+      .from('users')
+      .select('display_name, first_name')
+      .eq('id', complet.actorId)
+      .maybeSingle()
+    if (u) complet.actorName = u.display_name || u.first_name || 'Explorateur'
+  }
+  if (!complet.placeTitle && typeof complet.placeId === 'string') {
+    const { data: p } = await supabase
+      .from('places')
+      .select('title')
+      .eq('id', complet.placeId)
+      .maybeSingle()
+    if (p) complet.placeTitle = p.title
+  }
+  return complet
+}
+
 const ok = () => new Response(JSON.stringify({ ok: true }), {
   headers: { 'Content-Type': 'application/json' },
 })
@@ -130,8 +151,9 @@ serve(async (req) => {
   const subList = (subs ?? []) as SubRow[]
   if (subList.length === 0) return ok()
 
-  // 4. Format payload
-  const payload = formatPayload(type, data)
+  // 4. Format payload — les notifications de la V2 n'ont souvent que les identifiants : on
+  //    complète le nom de qui et le titre du lieu (bascule du 07/10/2026).
+  const payload = formatPayload(type, await avecLesNoms(data))
   if (!payload) return ok()
   const payloadJson = JSON.stringify(payload)
 

@@ -39,6 +39,12 @@ verbatim — structure HTML + classes CSS + propriétés flex — au lieu de
 re-déduire ma propre solution. Inventer un raccourci a coûté cinq commits
 et plusieurs allers-retours énervés sur cette session.
 
+**Règle dérivée — dans une grille CSS** (V2, 27/09/2026) : un carrousel placé dans une colonne
+de `display: grid` élargit TOUTE la grille (et la page défile en travers), car une colonne
+`auto` ne descend pas sous la largeur de son contenu. Poser `grid-template-columns:
+minmax(0, 1fr)` sur chaque grille qui contient le carrousel (`ProfilExplorateur`,
+`ProfilFragments`).
+
 ## ProfileMenu (desktop) et MobileHeader (mobile) — toujours modifier les deux ensemble
 
 **Le piège** (rencontré 2026-05-02) : j'avais retiré l'option "Référentiel calendaire" de `ProfileMenu` mais j'ai oublié que le menu mobile vit dans `MobileHeader.tsx` séparément — ce dernier n'avait JAMAIS eu l'option calendrier non plus, mais aussi pas le toggle GPS ni "Changer email". Uriel s'est retrouvé sur mobile sans pouvoir désactiver le brouillage GPS — feature critique.
@@ -54,6 +60,10 @@ et plusieurs allers-retours énervés sur cette session.
 **À faire en cleanup** : extraire un sous-composant `<UserMenuContent>` qui contient tous les boutons (Voir profil / Faction / Changer email / GPS toggle / Se déconnecter), et l'utiliser depuis les 2 wrappers (ProfileMenu = avatar trigger + dropdown desktop, MobileHeader = hamburger trigger + dropdown mobile). Une seule source de vérité pour les options.
 
 ## Textes toujours trop petits
+
+> **V1 seulement.** La V2 (`apps/web-v2`) suit l'échelle de sa maquette Figma, validée par Uriel
+> le 27/09/2026 (légendes 12 px, flux 13 px, corps 16 px) : « au plus proche de l'esprit des
+> maquettes ». Ses tailles vivent dans `tokens.css` et se voient sur `/v2/da`.
 
 Ne JAMAIS descendre en dessous de 15px pour du texte lisible sur le web. Le body doit être 18px minimum pour du contenu qu'on lit. Les labels/breadcrumbs au minimum 14-15px.
 
@@ -233,3 +243,11 @@ L'inconstance était frustrante : le Visual Companion est super pratique pour br
 ## Trace
 
 - 8 mai 2026 — session V0.7.6 — premier essai HTML standalone bricolé pour la Court Tension Bar, recadrage Uriel ("pourquoi pas un serveur React ?"), création composant React + pnpm dev, puis re-recadrage ("avec l'autre système t'utilisais un port différent et 3 propositions"). Fouille dans les plugins pour identifier le Visual Companion. Cette règle ferme la confusion.
+
+## `calc()` : un nombre × (pourcentage + longueur) perd la longueur dans `translate`
+
+**Le piège** (27/09/2026, brique `Segments`) : `translate: calc(var(--rang) * (100% + var(--space-1)))`
+se calcule dans Chrome comme `100%` tout court. L'écart disparaît et le curseur tombe 4 px à côté.
+
+**How to apply :** distribuer le produit, `calc(var(--rang) * 100% + var(--rang) * var(--space-1))`.
+Vérifier une animation dans un onglet visible : un onglet en arrière-plan fige les transitions.

@@ -1,0 +1,86 @@
+/*
+ * QUOI     — la feuille des Actifs : titre Bebas, une ligne par Explorateur (portrait, nom, état,
+ *            distance) ; les partis depuis peu, grisés.
+ */
+.feuille {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.chapo {
+  margin: 0 0 var(--space-2);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+.liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste > li + li {
+  border-top: 1px solid var(--color-sable);
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  text-align: left;
+  cursor: pointer;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nom {
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.sous {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.etat {
+  color: var(--color-succes);
+  font-weight: var(--weight-semi);
+}
+
+.distance {
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+}
+
+.ligne[data-recent] {
+  opacity: 0.6;
+}
+
+.ligne[data-recent] .etat {
+  color: var(--color-texte-pale);
+}

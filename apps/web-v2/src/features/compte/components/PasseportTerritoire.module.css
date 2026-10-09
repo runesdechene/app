@@ -1,0 +1,116 @@
+/*
+ * QUOI     — le détail d'un territoire : résumé, natures, puis un mois par liste de cartes
+ *            empilées en pleine largeur, les mois anciens repliés (le titre du mois les ouvre).
+ */
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-8);
+}
+
+.resume,
+.rubrique,
+.natures {
+  margin: 0 var(--space-6);
+}
+
+.resume {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.rubrique {
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.natures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mois {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+/* Le haut de la liste laisse la place au tampon qui déborde du coin des cartes. */
+.liste {
+  display: grid;
+  gap: var(--space-6);
+  margin: 0;
+  padding: var(--space-4) var(--space-6) var(--space-2);
+  list-style: none;
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 calc(var(--space-2) * -1);
+  }
+}
+
+.bascule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.chevron {
+  transition: rotate var(--duree-douce) var(--courbe-douce);
+}
+
+.bascule[aria-expanded='true'] .chevron {
+  rotate: 90deg;
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+}
+
+.lien {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.squelette {
+  height: 320px;
+  margin: var(--space-4) var(--space-6);
+  border-radius: var(--radius-carte);
+  background: var(--color-barre);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liste,
+  .chevron {
+    transition: none;
+  }
+}

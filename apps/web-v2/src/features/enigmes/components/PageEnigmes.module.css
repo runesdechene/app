@@ -1,0 +1,160 @@
+/*
+ * QUOI     — la page « Les énigmes » : le bilan dans un cadre ocre, puis une carte par culture, à sa
+ *            couleur, lisible d'un coup d'œil (Uriel, 07/10).
+ */
+.page {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+}
+
+/* Le bilan : le même cadre que l'encart d'une culture. */
+.bilan {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-ocre);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.compte {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.nombre {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--code-size);
+  line-height: 1;
+}
+
+.sur {
+  color: var(--color-texte);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.phrase {
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+}
+
+.rubrique {
+  margin: var(--space-2) 0 0;
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.cultures {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.culture {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--color-sur-accent);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    scale var(--duree-elan) var(--courbe-elan),
+    border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.culture:hover {
+  border-color: var(--couleur-culture, var(--color-ocre));
+}
+
+.culture:active {
+  scale: 0.98;
+}
+
+.nom {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+}
+
+.titre {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  line-height: 1;
+}
+
+.part {
+  color: var(--couleur-culture, var(--color-accent));
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+.chevron {
+  color: var(--color-texte-pale);
+  font-size: var(--titre-section-size);
+}
+
+.piste {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+.piste[data-grande] {
+  height: 10px;
+}
+
+.rempli {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--couleur-culture, var(--color-accent));
+  transform-origin: left;
+  scale: var(--mesure) 1;
+  animation: remplir 0.9s var(--courbe-douce) both;
+}
+
+.reessayer {
+  justify-self: start;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+}
+
+/* Les jauges se remplissent à l'ouverture. */
+@keyframes remplir {
+  from {
+    scale: 0 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .culture,
+  .rempli {
+    transition: none;
+    animation: none;
+  }
+}

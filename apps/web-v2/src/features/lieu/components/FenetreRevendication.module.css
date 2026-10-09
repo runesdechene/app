@@ -1,0 +1,97 @@
+/*
+ * QUOI     — la fenêtre de revendication (maquette 232:128) : titre Bebas, texte doux, les
+ *            compagnons en lignes crème bordées, le nom de l'expédition et ses pastilles.
+ */
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.intro,
+.aide {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+.expedition {
+  display: grid;
+  gap: var(--space-3);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.libelle {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}
+
+.compagnon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.distance {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.case {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-accent);
+}
+
+.noms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    translate: 0 var(--space-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expedition {
+    animation: none;
+  }
+}

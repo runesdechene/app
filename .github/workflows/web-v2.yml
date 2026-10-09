@@ -1,0 +1,36 @@
+# QUOI     — vérifie la V2 à chaque push qui la touche.
+# POURQUOI — rien n'arrive en ligne cassé ; c'est la « CI légère » du backlog technique,
+#            limitée à la V2 pour commencer. Typecheck, lint (ESLint + Stylelint), format,
+#            tests (dont ceux qui gardent la DA fermée), build.
+name: web-v2
+
+on:
+  push:
+    paths:
+      - 'apps/web-v2/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/web-v2.yml'
+  pull_request:
+    paths:
+      - 'apps/web-v2/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      # La V2 refuse de démarrer sans ces variables ; la CI n'a pas besoin des vraies.
+      VITE_SUPABASE_URL: http://localhost
+      VITE_SUPABASE_ANON_KEY: ci
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web-v2 typecheck
+      - run: pnpm --filter web-v2 lint
+      - run: pnpm --filter web-v2 format:check
+      - run: pnpm --filter web-v2 test
+      - run: pnpm --filter web-v2 build

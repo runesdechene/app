@@ -1,0 +1,229 @@
+/*
+ * QUOI     — le verdict d'une énigme (maquettes « Énigmes — 5b, 5c, 5d ») : la fête en tête, puis
+ *            les jauges et « Le savais-tu ? ». Même langage que la récompense de Découvrir.
+ */
+.fete {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+  padding-block: var(--space-3);
+  text-align: center;
+  animation: eclore var(--duree-elan) var(--courbe-elan) both;
+}
+
+.mot {
+  margin: 0;
+  color: var(--color-brun);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  line-height: 1;
+}
+
+.fete[data-juste] .mot {
+  color: var(--color-accent);
+}
+
+.reponse {
+  margin: 0;
+  color: var(--color-encre);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.titre {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  justify-self: stretch;
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-ocre);
+  border-radius: var(--radius);
+  background: var(--color-pastille);
+  animation: eclore var(--duree-elan) var(--courbe-elan) 0.7s both;
+}
+
+.surtitre {
+  color: var(--color-ocre);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--pilule-tracking);
+  text-transform: uppercase;
+}
+
+.gelule {
+  padding: var(--space-1) var(--space-4);
+  border: 1.5px solid var(--color-accent);
+  border-radius: var(--radius-rond);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+}
+
+/* Les confettis tombent sur toute la feuille, par-dessus les réponses, puis s'effacent : coupés
+   à la tête de la feuille, on n'en voyait que quelques brins (essai du 07/10). */
+.confettis {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.confettis span {
+  position: absolute;
+  top: -16px;
+  left: calc(mod(var(--rang) * 37 + 5, 95) * 1%);
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  animation: tomber 2.4s cubic-bezier(0.3, 0.6, 0.6, 1) calc(mod(var(--rang) * 7, 10) * 60ms) both;
+}
+
+.confettis span:nth-child(4n + 2) {
+  background: var(--color-ocre);
+}
+
+.confettis span:nth-child(4n + 3) {
+  background: var(--color-confetti-or);
+}
+
+.confettis span:nth-child(4n + 4) {
+  background: var(--color-confetti-vert);
+}
+
+.bilan {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.jauges {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.jauge {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ligne {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--legende-size);
+}
+
+.nomJauge {
+  color: var(--color-encre);
+  font-weight: var(--weight-gras);
+}
+
+.gain {
+  color: var(--color-confetti-or);
+  font-weight: var(--weight-gras);
+}
+
+.jauge[data-culture] .gain {
+  color: var(--couleur-culture, var(--color-accent));
+}
+
+.piste {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+/* La jauge part d'où elle en était et avance jusqu'à la nouvelle valeur (comme Découvrir). */
+.rempli {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-confetti-or);
+  transform-origin: left;
+  scale: var(--mesure) 1;
+  animation: remplir 0.9s var(--courbe-douce) 0.45s both;
+}
+
+.jauge[data-culture] .rempli {
+  background: var(--couleur-culture, var(--color-accent));
+}
+
+.savais {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+/* Faux : ce qu'il faut retenir passe au premier plan. */
+.savais[data-faux] {
+  border: 1px solid var(--color-ocre);
+}
+
+.savaisTitre {
+  color: var(--color-ocre);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.savais[data-faux] .savaisTitre {
+  font-size: var(--sous-titre-size);
+}
+
+.explication {
+  margin: 0;
+  color: var(--color-texte);
+  font-size: var(--flux-size);
+}
+
+.savais[data-faux] .explication {
+  color: var(--color-encre);
+  font-size: var(--corps-size);
+}
+
+@keyframes eclore {
+  from {
+    opacity: 0;
+    scale: 0.8;
+  }
+}
+
+@keyframes remplir {
+  from {
+    scale: var(--avant) 1;
+  }
+}
+
+@keyframes tomber {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 420px;
+    rotate: 400deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fete,
+  .titre,
+  .rempli {
+    animation: none;
+  }
+
+  .confettis {
+    display: none;
+  }
+}

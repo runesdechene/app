@@ -207,3 +207,108 @@ export async function fetchProduitsSansIllustration(): Promise<ProduitsSansIllus
     tronque: data.products.pageInfo.hasNextPage,
   }
 }
+
+/** Un métaobjet Illustration, tel que la synchro des Fragments l'envoie à `synchroniser_fragments`. */
+export interface IllustrationComplete {
+  handle: string
+  nom: string
+  collection: string // handle de la collection Shopify, '' si aucune
+  resume: string
+  histoire: string // valeur brute de son_histoire (texte riche Shopify en JSON)
+  illustration_url: string
+  illustration_sombre_url: string
+  fond_url: string
+  audio_url: string
+  artiste: string
+  narrateur: string
+  heritage: string
+}
+
+interface ChampShopify {
+  key: string
+  value: string | null
+  reference: {
+    __typename: string
+    image?: { url: string }
+    url?: string
+    sources?: Array<{ url: string }>
+    handle?: string
+    title?: string
+    displayName?: string
+    nom?: { value: string | null } | null
+  } | null
+}
+
+/** L'adresse d'un fichier, le nom d'un artiste, le titre d'une collection : ce qu'un champ montre. */
+function lire(champs: ChampShopify[], cle: string): string {
+  const champ = champs.find((c) => c.key === cle)
+  if (!champ) return ''
+  const ref = champ.reference
+  if (!ref) return champ.value ?? ''
+  return ref.image?.url ?? ref.url ?? ref.sources?.[0]?.url ?? ref.nom?.value ?? ref.title ?? ref.displayName ?? ''
+}
+
+/** Tous les métaobjets Illustration, avec leurs fichiers et leurs références résolus. */
+export async function fetchIllustrationsCompletes(): Promise<IllustrationComplete[]> {
+  const query = `{
+    metaobjects(type: "${ILLUSTRATION_TYPE}", first: 100) {
+      pageInfo { hasNextPage }
+      nodes {
+        handle
+        displayName
+        fields {
+          key
+          value
+          reference {
+            __typename
+            ... on MediaImage { image { url } }
+            ... on GenericFile { url }
+            ... on Video { sources { url } }
+            ... on Collection { handle title }
+            ... on Metaobject { displayName nom: field(key: "nom") { value } }
+          }
+        }
+      }
+    }
+  }`
+  const data = await graphql<{
+    metaobjects: {
+      pageInfo: { hasNextPage: boolean }
+      nodes: Array<{ handle: string; displayName: string; fields: ChampShopify[] }>
+    }
+  }>(query)
+  if (data.metaobjects.pageInfo.hasNextPage) {
+    throw new Error('Plus de 100 Illustrations dans Shopify : la synchro ne lit que les 100 premières')
+  }
+  return data.metaobjects.nodes.map(({ handle, displayName, fields }) => {
+    const collection = fields.find((c) => c.key === 'collection')?.reference?.handle ?? ''
+    return {
+      handle,
+      nom: lire(fields, 'nom') || displayName,
+      collection,
+      resume: lire(fields, 'resume'),
+      histoire: lire(fields, 'son_histoire'),
+      illustration_url: lire(fields, 'image_pour_fond_clair'),
+      illustration_sombre_url: lire(fields, 'image_pour_fond_sombre'),
+      fond_url: lire(fields, 'image_fond_de_fragment'),
+      audio_url: lire(fields, AUDIO_FIELD_KEY),
+      artiste: lire(fields, 'artiste'),
+      narrateur: lire(fields, 'narrateur_audio'),
+      heritage: lire(fields, 'collection_d_heritage'),
+    }
+  })
+}
+
+/** Le texte riche de Shopify (JSON `root` > paragraphes > textes) en paragraphes simples. */
+export function texteRiche(valeur: string | null): string {
+  if (!valeur) return ''
+  type Noeud = { type?: string; value?: string; children?: Noeud[] }
+  let racine: Noeud
+  try {
+    racine = JSON.parse(valeur) as Noeud
+  } catch {
+    return valeur // déjà du texte simple
+  }
+  const texte = (n: Noeud): string => n.value ?? (n.children ?? []).map(texte).join('')
+  return (racine.children ?? []).map(texte).join('\n\n')
+}

@@ -1,0 +1,189 @@
+/*
+ * QUOI     — l'en-tête centré du profil (maquette COMPTE 89:124) et le filigrane du signe
+ *            (109:107), très pâle, derrière.
+ */
+.entete {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+  text-align: center;
+}
+
+/* La couverture (maquette 123:107) : le motif grand et présent, qui se fond vers le bas. */
+.filigrane {
+  position: absolute;
+  top: 8px; /* le portrait se pose sur le motif, à la place de sa tête (Uriel, 27/09) */
+  left: 50%;
+  z-index: -1;
+  width: 83%;
+  max-width: 320px;
+  transform: translateX(-50%);
+  opacity: 0.17;
+
+  /* Le motif se fond vers le bas ; pour un masque, seule l'opacité de la couleur compte. */
+  mask: linear-gradient(to bottom, var(--color-encre) 55%, transparent);
+  pointer-events: none;
+}
+
+.identite {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.nom,
+.niveau {
+  margin: 0;
+  font-family: var(--font-titre);
+  line-height: var(--titre-leading);
+  letter-spacing: var(--titre-tracking);
+}
+
+.nom {
+  color: var(--color-encre);
+  font-size: var(--nom-profil-size);
+}
+
+.niveau {
+  color: var(--color-texte-doux);
+  font-size: var(--rubrique-size);
+}
+
+/* Une aura de parchemin détache ces petites lignes du Fragment en filigrane (Uriel, 27/09). */
+.niveau,
+.signe {
+  text-shadow:
+    0 0 2px var(--color-fond),
+    0 0 4px var(--color-fond),
+    0 0 8px var(--color-fond);
+}
+
+.signe {
+  margin: 0;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size); /* 14 px : deux points de plus (Uriel, 27/09) */
+  font-style: italic;
+}
+
+.signe b {
+  font-weight: var(--weight-gras);
+}
+
+.titres {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+
+.titre {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.marque {
+  color: var(--color-ocre);
+  font-style: normal;
+}
+
+.bio {
+  margin: var(--space-2) 0 0;
+  max-width: 302px;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--bio-size);
+  line-height: var(--bio-leading);
+  white-space: pre-line;
+}
+
+.bio a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.details {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1); /* Instagram, date et département respirent (Uriel, 27/09) */
+  margin-top: var(--space-3);
+  line-height: var(--bio-leading);
+}
+
+.instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-lien);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-decoration: none;
+}
+
+/* L'icône Instagram de la maquette « Modifier mon profil », teintée comme le lien. */
+.iconeInstagram {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/instagram.svg') center / contain no-repeat;
+}
+
+.depuis,
+.attache {
+  margin: 0;
+  line-height: var(--bio-leading);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.depuis {
+  color: var(--color-texte-pale);
+}
+
+.attache {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-texte-doux);
+}
+
+/* La forme du département, en pochoir de la couleur du texte. */
+.silhouette {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentcolor;
+}
+
+.action {
+  display: grid;
+  justify-self: stretch;
+  margin-top: var(--space-2);
+}
+
+.explication {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.marqueGrande {
+  margin: 0;
+  color: var(--color-ocre);
+  font-size: var(--titre-ecran-size);
+  line-height: 1;
+}

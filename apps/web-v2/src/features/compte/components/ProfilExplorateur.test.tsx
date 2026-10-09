@@ -1,0 +1,228 @@
+/**
+ * QUOI     — le profil public : le sien (« Modifier mon profil »), celui d'un autre (« Envoyer un
+ *            murmure »), des envies masquées, un Explorateur introuvable.
+ */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { createMemoryRouter, RouterProvider } from 'react-router'
+import { vi } from 'vitest'
+import type { ExplorateurProfile } from '../api/lireProfil'
+import { ProfilExplorateur } from './ProfilExplorateur'
+
+const fetchExplorateur = vi.hoisted(() =>
+  vi.fn<(id: string) => Promise<ExplorateurProfile | null>>(),
+)
+vi.mock('../api/explorateur', () => ({ fetchExplorateur }))
+const choisirSigne = vi.hoisted(() => vi.fn(() => Promise.resolve()))
+vi.mock('../api/monProfil', () => ({ choisirSigne }))
+const fetchPasseport = vi.hoisted(() => vi.fn(() => Promise.resolve(null)))
+vi.mock('../api/passeport', () => ({ fetchPasseport }))
+const position = vi.hoisted(() =>
+  vi.fn(() => Promise.resolve<{ latitude: number; longitude: number } | null>(null)),
+)
+vi.mock('@/shared/lib/position', () => ({ positionSiAutorisee: position }))
+
+const carte = (id: string, nom: string, auteur: string | null = null) => ({
+  id,
+  nom,
+  imageUrl: null,
+  latitude: 43.2965,
+  longitude: 5.3698,
+  categorie: { icone: 'https://x/ruines.svg', couleur: '#a9260f' },
+  auteur: auteur ? { id: 'a' + id, nom: auteur, avatarUrl: null } : null,
+})
+
+const PROFIL: ExplorateurProfile = {
+  id: 'u1',
+  nom: 'Uriel',
+  avatarUrl: null,
+  niveau: 12,
+  titres: [{ id: 1, nom: 'Chevalier errant', condition: { stat: 'places_visited', min: 50 } }],
+  bio: 'Fondateur de @runesdechene',
+  instagram: 'uriel.runesdechene',
+  inscritLe: '2024-09-30T10:00:00+00:00',
+  porteurVerifie: true,
+  role: 'admin',
+  attache: {
+    texte: 'Noble représentant des Alpes-Maritimes',
+    silhouette: { d: 'M 0 0 L 1 0 1 -1 Z', viewBox: '0 -1 1 1' },
+  },
+  fragments: [{ id: 3, nom: 'Hoplite', imageUrl: null }],
+  ajoutes: [carte('p1', 'Dolmen de la Pierre Levée')],
+  nbVisites: 1,
+  envies: [carte('p3', 'Mont Bégo', 'Gautier de Bilskirnir')],
+  signe: null,
+  fragmentsADecouvrir: 5,
+  compagnies: [],
+  connaissances: [],
+  polymathe: null,
+  estMoi: true,
+}
+
+function afficher(profil: ExplorateurProfile | null) {
+  fetchExplorateur.mockResolvedValue(profil)
+  const router = createMemoryRouter(
+    [{ path: '/:tab/explorateur/:id', element: <ProfilExplorateur id="u1" /> }],
+    { initialEntries: ['/carte/explorateur/u1'] },
+  )
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  return router
+}
+
+test('mon profil : « Modifier mon profil », jamais de murmure', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('button', { name: 'Modifier mon profil' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /murmure/ })).toBeNull()
+})
+
+test('« Modifier mon profil » ouvre la modification, même depuis l’écran Compte', async () => {
+  // L'écran Compte est dessiné hors des routes de l'onglet : une adresse relative y partait de
+  // la racine (/modifier) et ramenait à l'Accueil.
+  fetchExplorateur.mockResolvedValue(PROFIL)
+  const router = createMemoryRouter([{ path: '*', element: <ProfilExplorateur id="u1" /> }], {
+    initialEntries: ['/compte'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  await userEvent.click(await screen.findByRole('button', { name: 'Modifier mon profil' }))
+  expect(router.state.location.pathname).toBe('/compte/explorateur/u1/modifier')
+})
+
+test('le profil d’un autre : « Envoyer un murmure » ouvre la conversation, jamais « Modifier »', async () => {
+  const router = afficher({ ...PROFIL, estMoi: false })
+  const murmurer = await screen.findByRole('button', { name: /Envoyer un murmure/ })
+  expect(screen.queryByRole('button', { name: 'Modifier mon profil' })).toBeNull()
+  await userEvent.click(murmurer)
+  expect(router.state.location.pathname).toBe('/messages/murmures/u1')
+})
+
+test('l’en-tête dit qui il est', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByText('Uriel')).toBeInTheDocument()
+  expect(screen.getByText('Niveau 12')).toBeInTheDocument()
+  expect(screen.getByText('Chevalier errant')).toBeInTheDocument()
+  expect(screen.getByText('Noble représentant des Alpes-Maritimes')).toBeInTheDocument()
+  expect(screen.getByText('Explorateur depuis le 30 septembre 2024')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: '@runesdechene' })).toHaveAttribute(
+    'href',
+    'https://www.instagram.com/runesdechene/',
+  )
+})
+
+test('Explorateur introuvable : un message, jamais un écran vide', async () => {
+  afficher(null)
+  expect(await screen.findByText('Cet Explorateur est introuvable')).toBeInTheDocument()
+})
+
+test('toucher un titre dit comment il a été gagné', async () => {
+  afficher(PROFIL)
+  await userEvent.click(await screen.findByRole('button', { name: /Chevalier errant/ }))
+  expect(screen.getByRole('dialog', { name: 'Chevalier errant' })).toHaveTextContent(
+    'Débloqué en visitant 50 lieux sur place.',
+  )
+})
+
+test('sous le signe d’un Fragment : filigrane et ligne discrète', async () => {
+  afficher({ ...PROFIL, signe: { id: 3, nom: 'Hoplite', imageUrl: 'https://x/h.webp' } })
+  const nom = await screen.findByText('Hoplite', { selector: 'b' }) // le nom du Fragment en gras
+  expect(nom.parentElement).toHaveTextContent('sous le signe de l’Hoplite')
+  expect(document.querySelector('img[src="https://x/h.webp"]')).not.toBeNull()
+})
+
+test('sur mon profil, toucher un Fragment permet de me placer sous son signe', async () => {
+  afficher(PROFIL)
+  await userEvent.click(await screen.findByRole('button', { name: /Hoplite/ }))
+  await userEvent.click(screen.getByRole('button', { name: 'Me placer sous ce signe' }))
+  expect(choisirSigne).toHaveBeenCalledWith(3)
+})
+
+test('sur le profil d’un autre, ses Fragments ne se choisissent pas', async () => {
+  afficher({ ...PROFIL, estMoi: false })
+  await screen.findByText('Hoplite')
+  expect(screen.queryByRole('button', { name: /Hoplite/ })).toBeNull()
+})
+
+test('les découvertes : Lieux ajoutés et Envie d’y aller, chacun avec son nombre', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('region', { name: 'Lieux ajoutés' })).toHaveTextContent('1')
+  expect(screen.queryByRole('region', { name: 'Visités' })).toBeNull()
+  expect(screen.getByRole('region', { name: 'Envie d’y aller' })).toHaveTextContent('Mont Bégo')
+})
+
+test('ses connaissances : une gélule par culture — son titre, son rang en étoiles, ses énigmes (mig 452)', async () => {
+  afficher({
+    ...PROFIL,
+    connaissances: [
+      { culture: { id: 'byzantine', nom: 'Byzance', couleur: '#a93d76', icone: null }, titre: 'Sage de Byzance', rang: 6, enigmes: 36 },
+      { culture: { id: 'celtique', nom: 'Celtique', couleur: '#57b33d', icone: null }, titre: 'Érudit celte', rang: 5, enigmes: 61 },
+    ],
+    polymathe: 'Polymathe',
+  })
+  const section = await screen.findByRole('region', { name: 'Connaissances' })
+  // Polymathe en tête, la couronne ; puis les cultures, la plus haute d'abord.
+  const [poly, byzance] = within(section).getAllByRole('listitem')
+  expect(poly).toHaveTextContent('Polymathe')
+  expect(byzance).toHaveTextContent('Sage de Byzance')
+  expect(byzance).toHaveTextContent('36 énigmes')
+  expect(within(byzance as HTMLElement).getByRole('img', { name: 'rang 6 sur 7' })).toBeInTheDocument()
+})
+
+test('sans connaissance, pas de section « Connaissances »', async () => {
+  afficher(PROFIL)
+  await screen.findByRole('region', { name: 'Lieux ajoutés' })
+  expect(screen.queryByRole('region', { name: 'Connaissances' })).toBeNull()
+})
+
+test('envies masquées : pas de section « Envie d’y aller » du tout', async () => {
+  afficher({ ...PROFIL, estMoi: false, envies: null })
+  await screen.findByRole('region', { name: 'Lieux ajoutés' })
+  expect(screen.queryByRole('region', { name: 'Envie d’y aller' })).toBeNull()
+})
+
+test('un lieu envié dit qui l’a ajouté', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByText('par Gautier de Bilskirnir')).toBeInTheDocument()
+})
+
+test('sans position autorisée, aucune distance', async () => {
+  position.mockResolvedValue(null)
+  afficher(PROFIL)
+  await screen.findByText('Mont Bégo')
+  expect(screen.queryByText(/km/)).toBeNull()
+})
+
+test('avec la position de celui qui regarde, la distance de chaque lieu', async () => {
+  position.mockResolvedValue({ latitude: 43.7102, longitude: 7.262 })
+  afficher(PROFIL)
+  expect(await screen.findAllByText('159 km')).toHaveLength(2)
+})
+
+test('le bandeau de chiffres : lieux ajoutés, visités, fragments', async () => {
+  afficher(PROFIL)
+  const chiffres = await screen.findByRole('list', { name: 'En chiffres' })
+  expect(chiffres).toHaveTextContent('1Lieu ajouté')
+  expect(chiffres).toHaveTextContent('1Lieu visité')
+  expect(chiffres).toHaveTextContent('1Fragment')
+})
+
+test('sur mon profil, une tuile invite à découvrir les autres Fragments, sur la boutique', async () => {
+  afficher(PROFIL)
+  expect(await screen.findByRole('link', { name: /5 à découvrir/ })).toHaveAttribute(
+    'href',
+    'https://runesdechene.com/collections/all',
+  )
+})
+
+test('chez un autre, jamais de Fragments manquants', async () => {
+  afficher({ ...PROFIL, estMoi: false, fragmentsADecouvrir: null })
+  await screen.findByText('Hoplite')
+  expect(screen.queryByText(/à découvrir/)).toBeNull()
+})

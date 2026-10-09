@@ -1,0 +1,224 @@
+/*
+ * QUOI     — poser un pin (maquettes « Pin GPS — 1, 1b, 2, 2b ») : la carte plein cadre, un repère
+ *            au centre (ma position), la feuille du bas arrondie. Plein écran, par-dessus l'app.
+ */
+.poser {
+  position: fixed;
+  inset: 0;
+  z-index: 20; /* comme le parcours d'ajout : au-dessus des feuilles et du tiroir */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--color-fond);
+}
+
+.carte {
+  position: absolute;
+  inset: 0;
+}
+
+.feuille {
+  position: relative;
+  z-index: 2;
+  grid-row: 3;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  border-radius: var(--radius-feuille) var(--radius-feuille) 0 0;
+  background: var(--color-fond);
+  box-shadow: 0 -4px 18px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+}
+
+.poignee {
+  justify-self: center;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-sable);
+}
+
+.indice {
+  justify-self: start;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  color: var(--color-fiche-titre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.endroit {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.entete {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding: var(--space-4);
+  background: linear-gradient(var(--color-fond), transparent);
+}
+
+.fermer {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: url('@/assets/ui/croix.svg') center / 16px no-repeat;
+}
+
+.titreEcran {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-corps);
+  font-weight: var(--weight-semi);
+  color: var(--color-encre);
+}
+
+.vues {
+  position: absolute;
+  top: 72px;
+  right: var(--space-4);
+  z-index: 2;
+}
+
+/* L'attribution des tuiles (Esri l'exige visible) : sous le bouton Plan / Satellite, alignée sur
+   lui ; en bas, la feuille la cachait. Le bouton mesure une cible tactile + 8 px. */
+/* stylelint-disable selector-class-pattern -- les classes de MapLibre, pas les nôtres */
+.carte :global(.maplibregl-ctrl-top-right) {
+  top: calc(72px + var(--cible-tactile) + 8px + var(--space-2));
+  right: var(--space-4);
+  max-width: calc(100% - 2 * var(--space-4));
+}
+
+.carte :global(.maplibregl-ctrl.maplibregl-ctrl-attrib) {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-sur-accent) 85%, transparent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: right;
+}
+/* stylelint-enable selector-class-pattern */
+
+.repere {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px;
+  border: 3px solid var(--color-sur-accent);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 2px 6px var(--color-ombre);
+  z-index: 1;
+}
+
+/* Le pin posé (maquette 2) : le même rond que sur ma carte — crème, bordé d'accent, l'icône au
+   centre, sur le point même. Il se pose d'un petit élan. */
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -22px;
+  border: 3px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-carte-halo);
+  box-shadow: 0 2px 6px var(--color-ombre);
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+@starting-style {
+  .pin {
+    scale: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin {
+    transition: none;
+  }
+}
+
+.pin img {
+  width: 24px;
+  height: 24px;
+}
+
+.horsLigne {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--space-6);
+  background: var(--color-sable);
+  color: var(--color-texte-pale);
+  font-style: italic;
+  text-align: center;
+}
+
+.indice[data-imprecis] {
+  background: var(--color-rose);
+  color: var(--color-accent);
+}
+
+.encadre {
+  display: grid;
+  gap: 3px;
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: 12px;
+  background: var(--color-surface);
+  font-size: var(--legende-size);
+}
+
+.encadre strong {
+  color: var(--color-encre);
+}
+
+.principal {
+  width: 100%;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-weight: var(--weight-gras);
+}
+
+.principal:disabled {
+  background: var(--color-desactive-fond);
+  color: var(--color-desactive-texte);
+}
+
+.note {
+  margin: var(--space-3) 0 0;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}

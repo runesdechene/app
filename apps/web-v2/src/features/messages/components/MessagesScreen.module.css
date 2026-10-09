@@ -1,0 +1,15 @@
+/*
+ * QUOI     — l'onglet Messages : les deux onglets en haut, puis le Registre qui prend toute la
+ *            hauteur restante (sa barre d'écriture reste en bas).
+ */
+.messages {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr); /* la rangée des canaux défile au lieu d'élargir l'écran */
+  height: 100%;
+  padding-top: var(--space-4);
+}
+
+.onglets {
+  padding: 0 var(--space-6);
+}

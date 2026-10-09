@@ -117,6 +117,50 @@ export function Banners() {
     }
   }
 
+  // Changer l'image d'une bannière existante : envoyée tout de suite (comme à la création),
+  // sans passer par la SaveBar ; l'ancienne image quitte le bucket une fois la ligne à jour.
+  async function handleReplaceImage(id: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const banner = banners.find(b => b.id === id)
+    if (!banner) return
+    setUploading(true)
+
+    const ext = file.name.split('.').pop() || 'webp'
+    const path = `banner-${Date.now()}.${ext}`
+
+    try {
+      const { error: upErr } = await supabase.storage
+        .from('home-banners')
+        .upload(path, file, { contentType: file.type })
+      if (upErr) {
+        alert(`Erreur upload: ${upErr.message}`)
+        return
+      }
+
+      const imageUrl = supabase.storage.from('home-banners').getPublicUrl(path).data.publicUrl
+      const { error } = await supabase.from('home_banners').update({ image_url: imageUrl }).eq('id', id)
+      if (error) {
+        alert(`Erreur changement d'image : ${error.message}`)
+        await supabase.storage.from('home-banners').remove([path])
+        return
+      }
+
+      const ancienFichier = banner.image_url.split('/').pop()?.split('?')[0]
+      if (ancienFichier) await supabase.storage.from('home-banners').remove([ancienFichier])
+
+      // Les deux états reçoivent la nouvelle image : les modifications non enregistrées restent.
+      setBanners(prev => prev.map(b => b.id === id ? { ...b, image_url: imageUrl } : b))
+      setSavedBanners(prev => prev.map(b => b.id === id ? { ...b, image_url: imageUrl } : b))
+    } catch (err) {
+      console.error('[Banners] replace image threw', err)
+      alert(`Erreur upload: ${err instanceof Error ? err.message : err}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   function update(id: number, field: keyof HomeBanner, value: string | boolean | number | null) {
     setBanners(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b))
   }
@@ -220,7 +264,19 @@ export function Banners() {
       <div className="pub-screens-grid">
         {banners.map(b => (
           <div key={b.id} className={`pub-screen-card${b.active ? '' : ' inactive'}`}>
-            <img src={b.image_url} alt="" className="pub-screen-img" />
+            <div className="pub-screen-img-wrap">
+              <img src={b.image_url} alt="" className="pub-screen-img" />
+              <label className={`pub-screen-img-change${uploading ? ' disabled' : ''}`}>
+                {uploading ? 'Upload...' : "Changer l'image"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={uploading}
+                  onChange={e => handleReplaceImage(b.id, e)}
+                />
+              </label>
+            </div>
             <div className="pub-screen-fields">
               <input
                 type="text"

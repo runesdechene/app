@@ -1,0 +1,54 @@
+/**
+ * QUOI     — ce que dit la page « Les énigmes » : « énigme(s) résolue(s) », l'encart de ce qui reste
+ *            à percer, la date d'une bonne réponse, et le lien qui vole sur la zone d'une culture.
+ * POURQUOI — maquettes 478:452 et 478:526 (Uriel, 07/10 : « un joli cadre qui explique bien le truc »).
+ */
+export function resoluesEnClair(n: number): string {
+  return n > 1 ? 'énigmes résolues' : 'énigme résolue'
+}
+
+export function encartEnClair(restantes: number, culture: string, zone: string | null) {
+  if (restantes <= 0) return { titre: 'Tout est percé', phrase: 'De nouvelles énigmes viendront.' }
+  return {
+    titre: restantes === 1 ? 'Encore une énigme à percer' : `Encore ${String(restantes)} énigmes à percer`,
+    phrase: `Chaque matin, une énigme de ${culture} s’éveille ${zone ?? 'quelque part dans sa zone'}. Zoome sur la carte : elles t’y attendent.`,
+  }
+}
+
+const JOUR_MOIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
+const MOIS_ANNEE = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
+
+function memeJour(a: Date, b: Date) {
+  return a.toDateString() === b.toDateString()
+}
+
+export function quandEnClair(iso: string, maintenant = new Date()): string {
+  const le = new Date(iso)
+  const hier = new Date(maintenant)
+  hier.setDate(hier.getDate() - 1)
+  if (memeJour(le, maintenant)) return 'aujourd’hui'
+  if (memeJour(le, hier)) return 'hier'
+  if (le.getFullYear() === maintenant.getFullYear()) return JOUR_MOIS.format(le)
+  return MOIS_ANNEE.format(le)
+}
+
+// `/carte?centre=lat,lng,zoom` : la carte y vole, à l'échelle d'un pays, où la zone d'une culture
+// tient à l'écran (lu par `features/carte/lib/centre.ts`).
+const ZOOM_DE_LA_ZONE = 6.5
+
+export function lienVersLaCarte(centre: { lat: number; lng: number }): string {
+  return `/carte?centre=${String(centre.lat)},${String(centre.lng)},${String(ZOOM_DE_LA_ZONE)}`
+}
+
+// Ranger les énigmes apprises : par date de réussite (la plus récente en tête, l'ordre de la base)
+// ou par numéro, du plus petit au plus grand.
+export type Tri = 'date' | 'numero'
+export function rangerEnigmes<T extends { numero: number }>(enigmes: T[], tri: Tri): T[] {
+  return tri === 'numero' ? [...enigmes].sort((a, b) => a.numero - b.numero) : enigmes
+}
+
+// Ce qui manque pour le titre suivant, en points de connaissance ; au sommet, rien ne manque.
+export function prochainEnClair(prochain: { titre: string; rang: number; manque: number } | null): string {
+  if (!prochain) return 'Tu as atteint le plus haut titre de cette culture.'
+  return `Encore ${String(prochain.manque)} ${prochain.manque > 1 ? 'points' : 'point'} pour ${prochain.titre}`
+}

@@ -1,10 +1,11 @@
 /**
- * Sync la version courante du bundle PWA dans la DB.
+ * Annonce en base la version d'Explore qui vient d'être déployée.
  *
- * Lit le premier "# X.Y.Z" du CHANGELOG.md de explore-web, l'upserte dans
- * app_settings (key = 'app.latest_version'). Le frontend compare cette
- * valeur à la version locale du bundle pour afficher le bandeau "Mise à
- * jour disponible" aux users qui tournent sur un bundle plus ancien.
+ * Lit `version` dans apps/web-v2/package.json et l'écrit dans app_settings
+ * (key = 'explore.version'). L'appli compare cette valeur à la sienne : plus
+ * ancienne, elle affiche « Une nouvelle version d'Explore est arrivée » et
+ * force la mise à jour (apps/web-v2/src/app/miseAJour.ts). Depuis la bascule
+ * du 07/10/2026 ; avant, la V1 lisait app.latest_version dans son CHANGELOG.
  *
  * Usage : node scripts/sync-app-version.mjs
  *
@@ -12,8 +13,7 @@
  *   - VITE_SUPABASE_URL
  *   - SUPABASE_SERVICE_ROLE_KEY
  *
- * À enchaîner après chaque netlify deploy de explore-web (cf. script
- * "deploy" du package.json apps/explore-web).
+ * À lancer après chaque déploiement d'Explore (.claude/rules/deploiement.md).
  */
 
 import { readFileSync, existsSync } from 'node:fs'
@@ -48,33 +48,26 @@ if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
   process.exit(1)
 }
 
-// ─── Lit la version depuis CHANGELOG.md ──────────────────────────────────
-const changelogPath = resolve(ROOT, 'apps/explore-web/CHANGELOG.md')
-if (!existsSync(changelogPath)) {
-  console.error(`❌ CHANGELOG.md introuvable : ${changelogPath}`)
+// ─── Lit la version d'Explore ────────────────────────────────────────────
+const paquet = resolve(ROOT, 'apps/web-v2/package.json')
+const { version } = JSON.parse(readFileSync(paquet, 'utf-8'))
+
+if (!/^\d+\.\d+\.\d+$/.test(version ?? '')) {
+  console.error(`❌ Version illisible dans ${paquet} : ${version}`)
   process.exit(1)
 }
 
-const changelog = readFileSync(changelogPath, 'utf-8')
-const versionLine = changelog.split(/\r?\n/).find((l) => l.startsWith('# '))
-const version = versionLine?.slice(2).trim()
-
-if (!version) {
-  console.error('❌ Aucun "# X.Y.Z" trouvé en tête du CHANGELOG.md.')
-  process.exit(1)
-}
-
-// ─── Upsert app_settings.app.latest_version ──────────────────────────────
+// ─── Upsert app_settings.explore.version ─────────────────────────────────
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 
 const { error } = await supabase
   .from('app_settings')
-  .upsert({ key: 'app.latest_version', value: version }, { onConflict: 'key' })
+  .upsert({ key: 'explore.version', value: version }, { onConflict: 'key' })
 
 if (error) {
   console.error('❌ Erreur Supabase :', error.message)
   process.exit(1)
 }
 
-console.log(`✅ app_settings.app.latest_version = "${version}"`)
-console.log(`   Les users sur un bundle ancien verront désormais le bandeau de mise à jour.`)
+console.log(`✅ app_settings.explore.version = "${version}"`)
+console.log(`   Les Explorateurs sur une version plus ancienne verront la fenêtre de mise à jour.`)

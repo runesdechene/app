@@ -1,0 +1,228 @@
+/*
+ * QUOI     — la fiche d'une Compagnie (maquette 389:309) : un bandeau à sa couleur, l'avatar qui
+ *            chevauche le bord, le nom en Bebas, la devise à son encre, les sections du Chef et
+ *            des Officiers, des membres (maquette 454:272) et de leurs lieux.
+ */
+.fiche {
+  display: grid;
+  padding-bottom: calc(164px + var(--space-4));
+}
+
+.chargement {
+  min-height: 40vh;
+}
+
+.bandeau {
+  height: 150px;
+  background: var(--couleur);
+}
+
+.corps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* le carrousel ne doit pas élargir la page */
+  gap: var(--space-3);
+  margin-top: -46px;
+  padding: 0 var(--space-6);
+}
+
+.nom {
+  margin: var(--space-2) 0 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+  line-height: var(--titre-leading);
+}
+
+.devise {
+  margin: 0;
+  color: var(--encre-compagnie);
+  font-family: var(--font-inscription);
+  font-size: var(--titre-carte-size);
+  font-style: italic;
+}
+
+.infos,
+.sousSection {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.mission {
+  margin: 0;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+}
+
+.canal {
+  display: grid;
+  place-items: center;
+  min-height: var(--cible-tactile);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-fond);
+  font-family: var(--font-corps);
+  font-size: var(--bouton-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.section {
+  margin: var(--space-4) 0 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+
+.qui {
+  display: block;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+}
+
+.role {
+  display: block;
+  color: var(--encre-compagnie);
+  font-family: var(--font-inscription);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+.niveau {
+  display: block;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.titre {
+  font-family: var(--font-inscription);
+  font-size: var(--sous-titre-size);
+  font-style: italic;
+}
+
+/* Les membres dépliés par « Voir les autres » arrivent en fondu. */
+.membre {
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    translate var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+
+.voirTous {
+  justify-self: start;
+  margin-top: var(--space-3);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .membre {
+    transition: none;
+  }
+}
+
+.gerer,
+.quitter {
+  justify-self: start;
+  margin-top: var(--space-4);
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gerer {
+  color: var(--color-accent);
+}
+
+.quitter {
+  margin-top: 0;
+  color: var(--color-texte-doux);
+}
+
+.refus {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+/* « Leurs lieux » : les cartes défilent jusqu'aux bords de l'écran ; la rangée garde en bas la
+   place de leur légende (« Revendiqué par … »), posée sous chaque carte. */
+.cadre {
+  display: flex;
+  margin: var(--space-2) calc(-1 * var(--space-6)) 0;
+}
+
+.rangee {
+  display: flex;
+  flex: 1;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-6) var(--space-8);
+  overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.rangee::-webkit-scrollbar {
+  display: none;
+}
+
+.drapeau {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.revendique {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.revendique strong {
+  font-weight: var(--weight-semi);
+}

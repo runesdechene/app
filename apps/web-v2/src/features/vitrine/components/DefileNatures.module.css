@@ -1,0 +1,125 @@
+/*
+ * QUOI     — le défilé des natures, d'un bord de l'écran à l'autre : des gélules translucides et
+ *            floutées (texte de 12 px, filet de 0,75 px, maquette 325:317) qui deviennent blanches
+ *            au survol. Sur le parchemin du téléphone, crème ; sur la photo de l'ordinateur, une
+ *            vitre fumée comme celle de l'activité.
+ * ATTENTION — chaque rangée finit par le même écart que celui qui sépare deux gélules : reculer
+ *            de la moitié de la piste (une rangée) retombe pile sur la copie. Pas de masque sur le
+ *            cadre (pour fondre les bords) : il couperait le flou des gélules de la photo.
+ */
+.cadre {
+  width: 100%;
+  padding: 2px 0;
+  overflow: hidden;
+}
+
+.piste {
+  display: flex;
+  width: max-content;
+  animation: defiler var(--duree-defile) linear infinite;
+}
+
+/* Le défilé s'arrête sous la souris ou le clavier : la gélule visée ne s'enfuit pas. */
+.cadre:hover .piste,
+.cadre:focus-within .piste {
+  animation-play-state: paused;
+}
+
+.rangee {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0 6px 0 0;
+  list-style: none;
+}
+
+.rangee li {
+  flex: 0 0 auto;
+}
+
+.nature {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px var(--space-3) 5px 10px;
+  border: 0.75px solid color-mix(in srgb, var(--color-bord) 60%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-sur-accent) 35%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  letter-spacing: var(--titre-tracking);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--duree-douce) var(--courbe-douce),
+    color var(--duree-elan) var(--courbe-elan),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.nature:hover,
+.nature:focus-visible {
+  background: var(--color-sur-accent);
+}
+
+.nature:active {
+  scale: 0.96;
+}
+
+/* Choisie : blanche, comme au survol, et elle le reste (Uriel, 30/09). */
+.nature[aria-pressed='true'] {
+  border-color: var(--color-sur-accent);
+  background: var(--color-sur-accent);
+  color: var(--color-encre);
+}
+
+.icone {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+@media (width >= 1024px) {
+  .nature {
+    border-color: color-mix(in srgb, var(--color-sur-accent) 22%, transparent);
+    background: color-mix(in srgb, var(--color-ombre) 28%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--color-sur-accent);
+  }
+
+  .nature:hover,
+  .nature:focus-visible,
+  .nature[aria-pressed='true'] {
+    border-color: var(--color-sur-accent);
+    background: var(--color-sur-accent);
+    color: var(--color-encre);
+  }
+}
+
+@keyframes defiler {
+  to {
+    translate: -50%;
+  }
+}
+
+/* Mouvement réduit : pas de défilé ni de copie, la rangée se fait glisser au doigt. */
+@media (prefers-reduced-motion: reduce) {
+  .cadre {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .piste {
+    animation: none;
+  }
+
+  .rangee[data-copie] {
+    display: none;
+  }
+
+  .nature {
+    transition: none;
+  }
+}

@@ -1,0 +1,54 @@
+/*
+ * QUOI     — les Grands Explorateurs sur l'Accueil : la rubrique (parchemin roulé, titre, filet),
+ *            la liste, et « Voir tout le classement » en lien discret.
+ */
+
+.grands {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.rubrique {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.rubrique::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--color-sable);
+}
+
+.icone {
+  width: 18px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+}
+
+.tout {
+  justify-self: start;
+  margin: 0 var(--space-6);
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+/* La période, au bout du filet, à droite, discrète (Uriel, 29/09) : après le filet (order). */
+.periode {
+  order: 1;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}

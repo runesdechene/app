@@ -1,0 +1,19 @@
+# lib — le calcul pur que plusieurs zones partagent
+
+- `lire.ts` — les petits lecteurs du JSON renvoyé par les fonctions de la base : chacun rend la
+  valeur attendue ou lève une erreur. Compte et Carte s'en servent.
+- `couleursCarte.ts`, `styleCarte.ts` — la carte parchemin (le fond OpenFreeMap recoloré aux
+  couleurs des jetons) : la Carte et l'étape « Où » de l'ajout d'un lieu la partagent.
+- `attente.ts` — une attente lisible (« 23 min », « 1 h 24 ») : la jauge d'énergie et le voile de
+  découverte disent quand revient le prochain point.
+- `ancienneExplore.ts` — choisir la V1 (cookie `explore_version`) et y revenir : toute sortie vers la V1
+  passe par là, sinon la V1 renvoie aussitôt vers la V2.
+- `signe.ts` — « sous le signe de … », article accordé au nom du Fragment : le profil et la carte
+  d'un Explorateur (zone Carte) le disent pareil.
+- `cercle.ts` — un cercle de rayon donné, en polygone MapLibre : la zone d'un Explorateur brouillé
+  (Carte) et le cercle d'un pin GPS (étape « Où » de l'ajout).
+- `image.ts` — une image de Supabase à la taille où on l'affiche (redimensionnée à la volée) : toute
+  image distante passe par là.
+- `styleSatellite.ts` — le fond satellite de la carte : le plan de l'étape « Où » et de la pose d'un pin.
+- `validitePin.ts` — un pin vaut 15 jours : l'échéance et le temps restant (« Tes pins », fiche d'un pin).
+- `adresse.ts` — l'endroit en mots (adresse lisible d'une position) : l'ajout d'un lieu et les pins le partagent.

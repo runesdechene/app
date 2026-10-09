@@ -1,0 +1,94 @@
+/*
+ * QUOI     — la bannière de la boutique : l'image en fond, le voile par-dessus, le texte calé en
+ *            bas à gauche (le rendu de la V1, texte descendu : Uriel 28/09), 30 px plus haute qu'en V1 (140 au lieu de 110). Les couleurs viennent du
+ *            Hub, en variables posées par le composant (--voile, --teinte-*, --ombre-*).
+ */
+.banniere {
+  position: relative;
+  display: block;
+  height: 140px;
+  margin: 0 var(--space-6);
+  overflow: hidden;
+  border: 1px solid var(--color-ocre);
+  border-radius: var(--radius-carte);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-ombre) 18%, transparent);
+  text-decoration: none;
+  transition:
+    translate var(--duree-douce) var(--courbe-douce),
+    box-shadow var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.banniere:hover {
+  translate: 0 -1px;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-ombre) 24%, transparent);
+}
+
+.banniere:active {
+  scale: 0.99;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Plein à gauche sous le texte, presque effacé à droite : les proportions de la V1
+   (la force réglée, puis 0,5 / 0,85 et 0,2 / 0,85 d'elle). */
+.voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--voile) calc(var(--voile-force) * 100%), transparent) 0%,
+    color-mix(in srgb, var(--voile) calc(var(--voile-force) * 58.8%), transparent) 60%,
+    color-mix(in srgb, var(--voile) calc(var(--voile-force) * 23.5%), transparent) 100%
+  );
+}
+
+.texte {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-6);
+  text-shadow: 0 1px 3px
+    color-mix(in srgb, var(--ombre-texte) calc(var(--ombre-force) * 100%), transparent);
+}
+
+.tag {
+  font-family: var(--font-condensee);
+  font-size: var(--pilule-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  color: var(--teinte-tag);
+  text-transform: uppercase;
+}
+
+.titre {
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--bandeau-titre-tracking);
+  line-height: var(--titre-leading);
+  color: var(--teinte-titre);
+  text-transform: uppercase;
+}
+
+.sousTitre {
+  font-family: var(--font-inscription);
+  font-size: var(--flux-size);
+  font-style: italic;
+  line-height: var(--dense-leading);
+  color: var(--teinte-sous-titre);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banniere {
+    transition: none;
+  }
+}

@@ -1,0 +1,299 @@
+/*
+ * QUOI     — la grille de la coquille, mobile puis desktop.
+ * POURQUOI — une seule structure HTML ; le CSS place bandeau, onglets et détail selon la
+ *            largeur (spec socle §4bis). Aucune détection d'appareil en JavaScript.
+ */
+.shell {
+  position: relative; /* une feuille (« Ajouter ») se pose sur toute la coquille */
+  height: 100dvh;
+  display: grid;
+
+  /* minmax(0, 1fr) : la colonne du logo cède sur un petit écran. En `1fr`, elle ne descendait
+     jamais sous le logo (216 px) : l'en-tête faisait 407 px, plus qu'un iPhone, et toute l'app
+     débordait à droite — on devait dézoomer (02/10, plaintes des Explorateurs). */
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'logo . actions'
+    'main main main'
+    'nav nav nav';
+}
+
+.logo {
+  grid-area: logo;
+  align-self: center;
+  width: 216px;
+  max-width: calc(100% - 2 * var(--space-4)); /* il rapetisse avec sa colonne, sans déborder */
+  height: auto;
+  margin: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4) var(--space-2);
+}
+
+.embleme {
+  display: none;
+}
+
+.version {
+  display: none; /* sur mobile, la version est en bas des Préférences */
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  margin: calc(env(safe-area-inset-top) + var(--space-3)) var(--space-3) var(--space-2) 0;
+}
+
+/* « Ajouter » et la cloche : des pochoirs de 24 px dans une cible tactile (maquette 162:107). */
+.action {
+  position: relative;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  display: grid;
+  place-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.action img {
+  width: 24px;
+  height: 24px;
+}
+
+/* La pastille des notifications non lues, à cheval sur le coin haut droit de la cloche. */
+.nonLues {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: grid;
+}
+
+.main {
+  grid-area: main;
+  position: relative;
+  min-height: 0;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none; /* comme les détails : on défile sans barre */
+}
+
+.screen::-webkit-scrollbar {
+  display: none;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+/* Mobile : un seul écran à la fois ; la carte, toujours montée, se retire derrière les autres. */
+.screen[data-derriere] {
+  display: none;
+}
+
+/* Le bouton qui replie le tiroir n'existe que sur desktop. */
+.replier {
+  display: none;
+}
+
+/* Mobile : le détail couvre tout l'écran, au-dessus de la barre. */
+.shell > aside {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
+/* Container query, pas media query : la coquille suit la largeur de son cadre (#root dans
+   l'app, un faux téléphone sur /v2/da), jamais celle de l'écran. */
+@container app (width >= 1024px) {
+  /* Desktop (spec socle §4bis, Uriel 28/09) : à gauche une barre verticale, comme la V1 —
+     l'emblème, les onglets, puis « Ajouter », la cloche et la sortie vers la V1 en bas. La carte
+     occupe tout le reste et ne bouge jamais ; le tiroir glisse PAR-DESSUS elle, et la carte
+     écarte ses propres boutons de la largeur du tiroir (`--decalage-carte`). Rien ne se
+     redimensionne pendant l'animation : pas de saccade (Uriel, 28/09). */
+  .shell {
+    overflow: hidden; /* le tiroir replié glisse hors de l'écran, sous la barre */
+    grid-template-columns: var(--barre-laterale) 1fr;
+    grid-template-rows: auto auto auto 1fr auto auto;
+    grid-template-areas:
+      'replier main'
+      'logo main'
+      'nav main'
+      '. main'
+      'actions main'
+      '. main'
+      'version main';
+  }
+
+  .shell[data-tiroir='open'] {
+    --decalage-carte: var(--tiroir);
+  }
+
+  /* En haut de la barre, comme la V1 : replie le tiroir sans jamais le fermer. Un pochoir
+     d'encre sans cadre, de la famille de « + » et de la cloche ; retourné pour déplier. */
+  .replier {
+    z-index: 3;
+    grid-area: replier;
+    justify-self: center;
+    display: grid;
+    place-items: center;
+    width: var(--cible-tactile);
+    height: var(--cible-tactile);
+    margin-top: var(--space-2);
+    padding: 0;
+    border: none;
+    background: none;
+  }
+
+  .replier img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .replier[aria-expanded='false'] img {
+    scale: -1 1;
+  }
+
+  /* Le fond de la barre : une case de la grille sur toute la hauteur, au-dessus du tiroir. */
+  .shell::before {
+    content: '';
+    z-index: 2;
+    grid-row: 1 / -1;
+    grid-column: 1;
+    border-right: 1px solid var(--color-sable);
+    background: var(--color-barre);
+  }
+
+  /* Les écrans deviennent des cases de la grille, toutes dans la zone de la carte. */
+  .main {
+    display: contents;
+  }
+
+  /* Le tiroir : collé à la barre, par-dessus la carte ; il glisse en translation. */
+  .screen,
+  .shell > aside {
+    position: relative;
+    inset: auto;
+    z-index: 1;
+    grid-area: main;
+    justify-self: start;
+    width: var(--tiroir);
+    min-height: 0;
+
+    /* Le tiroir se détache de la carte par une ombre franche et un léger arrondi côté carte, sans
+       aucune bordure (Uriel, 28/09). */
+    border-radius: 0 var(--radius-petit) var(--radius-petit) 0;
+
+    /* Le parchemin des écrans du téléphone (global.css), ici porté par le tiroir lui-même : il
+       reste en place pendant que le contenu défile. */
+    background:
+      url('../../assets/ui/fond-parchemin.webp') center top / cover no-repeat,
+      var(--color-fond);
+    box-shadow: 6px 0 24px color-mix(in srgb, var(--color-ombre) 18%, transparent); /* 30 % − 40 % (Uriel, 28/09) */
+    transition: translate var(--duree-douce) var(--courbe-douce);
+  }
+
+  /* Un détail se pose par-dessus l'écran de l'onglet. */
+  .shell > aside {
+    z-index: 1;
+  }
+
+  /* Une seule ombre à la fois : celle du dessus. Sous un détail, l'écran de l'onglet reste en
+     place (on le retrouve à la fermeture) mais éteint la sienne — deux ombres superposées
+     faisaient une tache trop forte (Uriel, 28/09). Dès que le détail commence à partir
+     (`data-sortant`, posé par replierDetail), l'ombre revient en même temps qu'il glisse. */
+  .screen {
+    transition:
+      translate var(--duree-douce) var(--courbe-douce),
+      box-shadow var(--duree-douce) var(--courbe-douce);
+  }
+
+  .shell:has(> aside:not([data-sortant])) .screen {
+    box-shadow: none;
+  }
+
+  /* À son apparition (un onglet ouvert depuis la carte, une fiche), il arrive en glissant. */
+  @starting-style {
+    .screen,
+    .shell > aside {
+      translate: -100% 0;
+    }
+  }
+
+  /* La carte, sous tout le reste, sur toute la largeur. */
+  .screen[data-ecran='carte'],
+  .screen[data-derriere] {
+    z-index: 0;
+    display: block;
+    justify-self: stretch;
+    width: auto;
+    border-radius: 0;
+    box-shadow: none;
+    transition: none;
+  }
+
+  @starting-style {
+    .screen[data-ecran='carte'] {
+      translate: none;
+    }
+  }
+
+  /* Replié, le tiroir glisse sous la barre, puis devient invisible et hors d'atteinte au
+     clavier — une fois qu'il a fini de glisser (le délai), pas avant. */
+  .shell:not([data-tiroir]) > aside,
+  .shell:not([data-tiroir]) .screen:not([data-ecran='carte']) {
+    visibility: hidden;
+    translate: -100% 0;
+    transition:
+      translate var(--duree-douce) var(--courbe-douce),
+      visibility 0s linear var(--duree-douce);
+  }
+
+  .logo {
+    display: none;
+  }
+
+  /* L'emblème du logotype, découpé à part (assets/ui/embleme.png) : net et centré. */
+  .embleme {
+    position: relative;
+    z-index: 3;
+    grid-area: logo;
+    justify-self: center;
+    display: block;
+    width: 44px;
+    height: 44px;
+    margin: var(--space-3) 0 var(--space-6);
+  }
+
+  .actions {
+    position: relative;
+    z-index: 3;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 0 var(--space-2);
+  }
+
+  .version {
+    position: relative;
+    z-index: 3;
+    grid-area: version;
+    justify-self: center;
+    display: block;
+    margin: 0 0 var(--space-4);
+    padding: 0 var(--space-1);
+    color: var(--color-texte-pale);
+    font-family: var(--font-condensee);
+    font-size: var(--micro-size);
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .shell > aside {
+    transition: none;
+  }
+}

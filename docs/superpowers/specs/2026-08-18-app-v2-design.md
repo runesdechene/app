@@ -4,15 +4,50 @@
 > Toutes les zones sont validées en structure ; les points ouverts sont en bas.
 > La fondation technique (où vit le code, la pile, l'accès) est dans `2026-09-26-v2-socle-design.md`.
 
+## 0. Révision du 28/09/2026 — Explore, et une marque à deux produits
+
+> **Cette section l'emporte sur tout ce qui la contredit plus bas.** Tranchée avec Uriel le
+> 27-28/09/2026 (voir le `_État.md` du projet). Les sections §1 à §9 restent la mémoire de la
+> conception d'origine ; là où elles disent autre chose, c'est ici qui fait foi.
+
+**Pourquoi.** Ce qui fait vendre au stand, c'est l'illustration et l'histoire qu'on raconte — pas
+l'app. Une cliente : « magnifique, mais je ne voyage pas ». La carte ne vit que par une vingtaine
+d'actifs par mois. On arrête de faire avaler une appli globale au client : **une marque, deux
+produits, un seul compte**, et c'est la marque qui guide le client.
+
+**Les deux produits.**
+- **Runes de Chêne Explore** (`apps/web-v2`) — la carte des lieux, **offerte** à la communauté.
+  On la termine, puis on l'entretient sans la développer. « Explore » s'entend comme l'impératif :
+  *va, et explore*.
+- **Le Campement** — plus tard, **sur la boutique** : un bouton flottant qui ouvre, dans un tiroir
+  (web app en iframe, même domaine), *Mes Fragments* (le Codex : récit, audio, Anecdotes réservées
+  aux acheteurs), *Mes Couronnes* (réductions), *Mon compte*. Spec à part, **après** Explore.
+
+**Explore, ce qui reste.** Quatre onglets : **Accueil · Carte · Messages · Compte** (le Compte avec
+l'avatar dans la barre basse). L'en-tête commun porte le logo, **« + »** (Ajouter : un lieu ou un
+pin GPS) et **la cloche** des notifications.
+
+**Ce qui tombe d'Explore.** Le **Codex** (§8 : il vit dans le Campement), le **Campement** (§9 :
+les votes passeront par email, et le nom sert à la boutique), les **trois lectures** de la Carte
+(§7 : « Aujourd'hui / Mes pas / Le temps », incompréhensibles à l'écran). **Explore ne fait pas
+gagner de Couronnes** ; il affiche le solde, et le toucher ouvre le Campement.
+
+**La Carte** a sa propre spec : `2026-09-28-v2-carte-design.md` (elle remplace §7).
+
 ## 1. Intention
 
-La V2 est un **fork parallèle** de `apps/explore-web`, développé pendant que la V1 tourne.
-Même base de données, même techno. Elle **remplacera la V1** à terme.
+La V2 est une **app neuve** (`apps/web-v2`), écrite de zéro pendant que la V1 tourne, contre
+la même base de données. Elle **remplacera la V1** à terme.
 
 Trois qualités visées : **plus simple, plus propre, orientée marque**.
 
 ### Le principe qui commande tout
 
+> **Révisé le 27/09/2026 — la V2 met fin à la compétition sans fin.** Elle garde la
+> progression visible (niveau, titres, coups d'éclat) et des podiums **qui bougent** : mensuels,
+> remis à zéro, mis en avant ; plus un panthéon éternel. Ce qui tombe, c'est la guerre
+> perpétuelle (Coupe, Cour, capture à distance). *Formule d'origine, conservée pour mémoire :*
+>
 > **La V2 n'enlève pas la progression. Elle enlève la comparaison.**
 > « Moi contre moi-même » : je crée mon profil, j'explore, je progresse — et mes pairs
 > me **félicitent** au lieu de me classer.
@@ -36,7 +71,7 @@ Tout ce qui relève de la **compétition entre joueurs** :
 | La Cour — Couronnes, mécénat, veilleurs | `place_court_*`, `invest_crowns` : prendre un lieu à un autre |
 | Contestation de lieu | — |
 | Compagnies (Maisons, principale/alliée, chef, grades) | mig 295, `factionGroupStore`, Hall, bannières |
-| Gloire / XP / niveaux | la progression **comparable** |
+| ~~Gloire / XP / niveaux~~ | **révisé le 27/09/2026 : le niveau reste** (voir ci-dessous) |
 | Énigmes (daily, fragment, lieu) | + les 3 crons et la boucle de rétention quotidienne |
 | Expéditions joueur-joueur | tables `voyage_*`, chat privé, comptes rendus |
 | Quêtes du jour | `dailyQuestsStore`, drip, mini-quêtes |
@@ -46,6 +81,14 @@ Tout ce qui relève de la **compétition entre joueurs** :
 > gagne contre personne et ne classe personne, il vient avec l'objet. C'est un marqueur
 > d'identité et d'appartenance, pas un rang. Ce qui tombe, c'est la progression *comparable* —
 > Gloire, XP, niveaux.
+
+> ✅ **Le niveau reste — révisé le 27/09/2026.** Uriel : la fierté sociale est le sel du jeu
+> (niveau, titres, coups d'éclat). Figer les niveaux V1 en sceau a été écarté : injuste pour les
+> futurs joueurs. **Podiums mensuels (remis à zéro, mis en avant) + panthéon éternel** : c'est
+> la compétition **sans fin** qui tombe, pas le classement. **L'XP vient des gestes** : visiter
+> sur place et réunir un fragment (forte), ajouter ou enrichir un lieu et répondre à un appel
+> (moyenne), les énigmes à leur réveil ; **jamais la découverte à distance**, devenue gratuite
+> (sinon cliquer 3 000 pastilles ferait monter de niveau). Montants exacts à régler.
 
 > ⚠️ **« Quêtes du jour » n'est pas « Missions ».** Les Quêtes étaient la boucle de rétention
 > quotidienne, et elles tombent. Les **Missions** — les appels photo de la marque, source
@@ -70,8 +113,8 @@ V1 actuels perdront ces systèmes. Le chemin de migration est un chantier à par
 
 ## 2. Cadre technique
 
-- **Fork parallèle** de `apps/explore-web`. Même DB Supabase, même stack
-  (React 18 + Vite + TS strict + MapLibre + Zustand).
+- **App neuve `apps/web-v2`, écrite de zéro** — plus un fork de explore-web. Fondation technique
+  (emplacement, pile, accès, navigation) : `2026-09-26-v2-socle-design.md`.
 - **PWA installable.** Pas de coquille native (Capacitor/Tauri) dans ce chantier.
   On conçoit pour que la porte reste ouverte : pas d'API web exotique, navigation au
   pouce, offline soigné.
@@ -128,6 +171,10 @@ fonctionnelle » ne veut pas dire inventer une navigation, mais prendre la plus 
 mettre l'originalité dans la matière — icônes gravées, textures, pas de pictos Material.
 
 ## 4. Compte client — VALIDÉ
+
+> **Révisé le 27/09/2026** : le Compte devient un **profil public de Porteur** + un **menu
+> avatar** (maquettes Figma COMPTE et Menu Avatar). Design complet :
+> `2026-09-27-v2-compte-design.md`. Ce qui suit reste valable pour le lien avec l'achat.
 
 Sous « moi contre moi-même », le Compte n'est **pas une carte de joueur**. Pas de niveau,
 pas de titre, pas de rang. C'est le **registre de son propre parcours**.
@@ -391,6 +438,14 @@ seraient des listes d'inconnus. Alors :
 > deux** — le nouveau venu lirait deux fois la même chose.
 
 ### DA — source de vérité
+
+> **Remplacé le 27/09/2026 par la DA fixée de la V2.** Uriel a tranché : **la maquette Figma
+> « App v2 » fait foi**, pas la boutique. Valeurs gravées dans `apps/web-v2/src/shared/styles/tokens.css`
+> et montrées sur `/v2/da` (décision `docs/v2/decisions/007-da-fixee.md`). Écarts retenus : fond
+> `#fcf3e4`, encre `#494841`, accent `#a94842`, ocre `#a89369` ; **trois polices** (Bebas Neue,
+> Cabin, **Cabin Condensed**) ; le texte tient en 4 niveaux. L'écran « Connexion » du Figma est une
+> ébauche ancienne (autre DA, vocabulaire V1) : il ne fait pas foi. Le tableau ci-dessous est
+> l'historique.
 
 La direction artistique vient de **la boutique `runesdechene.com`** (thème Crépuscule,
 `config/settings_data.json`), **pas** de l'app V1 :
@@ -985,6 +1040,14 @@ murmure ») sans jamais en montrer le contenu.
    place**.
 
 ## Points ouverts
+
+- **Décidé le 27/09/2026** : **énergie supprimée** — un lieu sort du brouillard d'un simple clic,
+  gratuitement ; **capture à distance supprimée** ; **Couronnes et énigmes en sommeil** (ni
+  gagnées ni affichées en V2.0, tables et soldes gardés). Piste Couronnes : une cagnotte commune
+  du Campement.
+- **Revendiquer un lieu sur place** — piste qu'Uriel n'exclut pas (« pour la gloire personnelle,
+  saine compétition » ; les joueurs s'en amusent). ⚠️ À concilier avec le principe « on enlève la
+  comparaison » (§1) avant de la concevoir.
 
 - Ordre de construction retenu par Uriel : **Compte client → Accueil → Carte**, puis
   Codex et Campement.

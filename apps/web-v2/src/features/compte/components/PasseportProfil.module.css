@@ -1,0 +1,81 @@
+/*
+ * QUOI     — la section passeport du profil : titre comme les autres sections, une page de
+ *            papier réglé où les tampons s'alignent, puis les comptes et le lien.
+ */
+.section {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-detail-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.nombre {
+  margin-left: var(--space-1);
+  color: var(--color-texte-pale);
+}
+
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 27px,
+      color-mix(in srgb, var(--color-ocre) 25%, transparent) 27px 28px
+    ),
+    var(--color-barre);
+}
+
+.pied {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.ouvrir {
+  color: var(--color-accent);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.squelette {
+  height: 180px;
+  margin: 0 var(--space-6);
+  border-radius: var(--radius-carte);
+  background: var(--color-barre);
+}
+
+.erreur {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.reessayer {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}

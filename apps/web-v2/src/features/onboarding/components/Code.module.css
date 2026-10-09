@@ -1,0 +1,84 @@
+/*
+ * QUOI     — les six cases du code (maquette 94:319) : des chiffres Bebas 46 px sur un trait ; la
+ *            case à remplir a un trait plein. Une seule saisie, invisible, couvre les six cases.
+ */
+.cases {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.saisie {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  font-size: var(--corps-size); /* 16 px : iOS ne zoome pas sur le champ */
+  caret-color: transparent;
+}
+
+.case,
+.caseActive {
+  display: grid;
+  place-items: end center;
+  height: 62px;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-bord);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--code-size);
+  line-height: 1;
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.caseActive {
+  border-bottom: 2px solid var(--color-encre);
+}
+
+.liens {
+  display: flex;
+  justify-content: space-between;
+}
+
+.renvoyer,
+.changer {
+  min-height: var(--cible-tactile);
+  padding: 0 2px;
+  border: none;
+  background: none;
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.renvoyer {
+  color: var(--color-encre);
+  text-decoration: underline;
+}
+
+.renvoyer:disabled {
+  color: var(--color-texte-pale);
+  text-decoration: none;
+}
+
+.changer {
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+  text-decoration: underline;
+}
+
+.indesirables {
+  margin: var(--space-8) 0 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case,
+  .caseActive {
+    transition: none;
+  }
+}

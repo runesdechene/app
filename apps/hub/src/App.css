@@ -3097,6 +3097,37 @@ table select {
   display: block;
 }
 
+/* « Changer l'image » : posé sur l'image, en bas à droite (Banners). */
+.pub-screen-img-wrap {
+  position: relative;
+}
+
+.pub-screen-img-change {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  background: var(--color-button);
+  color: var(--color-button--text);
+  font-family: var(--font-body-family);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(58, 46, 30, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.pub-screen-img-change:hover {
+  transform: translateY(-1px);
+}
+
+.pub-screen-img-change.disabled {
+  background: var(--color-button--disabled);
+  cursor: default;
+  transform: none;
+}
+
 .pub-screen-fields {
   padding: 10px;
   display: flex;
@@ -3332,6 +3363,22 @@ table select {
 }
 
 .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn-secondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

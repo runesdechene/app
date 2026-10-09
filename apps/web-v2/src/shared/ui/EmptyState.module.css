@@ -1,0 +1,10 @@
+/*
+ * QUOI     — centre le message dans l'écran. Le style du texte vient de Text.
+ */
+.empty {
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  padding: var(--space-6);
+  text-align: center;
+}

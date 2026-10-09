@@ -1,0 +1,146 @@
+/*
+ * QUOI     — le cadre du parcours : sur téléphone, tout l'écran ; sur PC, une fenêtre au centre
+ *            (420 px, arrondie, ombrée) sur un voile qui assombrit la carte (maquette 294:146).
+ *            Chaque étape entre en glissant de la droite.
+ */
+.parcours {
+  position: fixed;
+  inset: 0;
+  z-index: 20; /* au-dessus des feuilles et du tiroir : « presque hors de l'app » */
+  display: grid;
+}
+
+.voile {
+  display: none;
+}
+
+.fenetre {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--color-fond);
+}
+
+.etape {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  animation: entrer var(--duree-douce) var(--courbe-douce);
+}
+
+/* L'en-tête d'une étape sur photo se pose par-dessus la photo. */
+.fenetre:has(header[data-clair]) {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.fenetre:has(header[data-clair]) > header {
+  position: absolute;
+  inset: 0 0 auto;
+}
+
+.question {
+  margin: 0 0 var(--space-1);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}
+
+.explication {
+  margin: 0 0 var(--space-4);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.choix {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.garder,
+.jeter {
+  min-height: 50px;
+  border-radius: var(--radius-carte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+}
+
+.garder {
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+}
+
+.jeter {
+  border: 1px solid var(--color-bord);
+  background: none;
+  color: var(--color-texte);
+}
+
+/* La fête : la photo du lieu, plein cadre ; la récompense par-dessus. */
+.fete {
+  position: relative;
+  grid-row: 1 / -1;
+  min-height: 100%;
+  background: var(--color-ombre);
+}
+
+.photoFete {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes entrer {
+  from {
+    opacity: 0;
+    translate: 28px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etape {
+    animation: none;
+  }
+}
+
+/* Sur PC : une fenêtre au centre, la carte assombrie derrière. */
+@container app (width >= 1024px) {
+  .parcours {
+    place-items: center;
+  }
+
+  .voile {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: color-mix(in srgb, var(--color-ombre) 55%, transparent);
+    animation: fondre var(--duree-douce) var(--courbe-douce);
+  }
+
+  .fenetre {
+    width: 420px;
+    height: min(860px, calc(100% - 2 * var(--space-8)));
+    border-radius: var(--radius-feuille);
+    box-shadow: 0 24px 60px color-mix(in srgb, var(--color-ombre) 45%, transparent);
+    animation: paraitre var(--duree-elan) var(--courbe-elan);
+  }
+
+  @keyframes fondre {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes paraitre {
+    from {
+      opacity: 0;
+      scale: 0.96;
+    }
+  }
+}

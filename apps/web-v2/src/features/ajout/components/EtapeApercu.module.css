@@ -1,0 +1,250 @@
+/*
+ * QUOI     — l'aperçu (maquette 293:146) : la fiche — la photo (330 px, voile en haut, lisière en
+ *            bas, comme la vraie fiche), la mention « Voilà ta fiche », le nom en Bebas, le badge de
+ *            la nature, les faits, l'endroit, le récit — puis le pied collé en bas.
+ */
+.apercu {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+.defile {
+  overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+}
+
+.photo {
+  position: relative;
+  height: 330px;
+  background: var(--color-ombre);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-ombre) 60%, transparent),
+    transparent 40%
+  );
+  pointer-events: none;
+}
+
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  z-index: 1;
+  aspect-ratio: 1920 / 74;
+  background: var(--color-fond);
+  mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+/* Toute la photo ramène aux photos ; la flèche et la mention passent par-dessus. */
+.retoucherPhoto {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.retour {
+  position: absolute;
+  top: var(--space-6);
+  left: var(--space-4);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  color: var(--color-sur-accent);
+  cursor: pointer;
+}
+
+.fleche {
+  width: 22px;
+  height: 22px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/fleche-retour-claire.svg') center / contain no-repeat;
+}
+
+.mention {
+  position: absolute;
+  top: calc(var(--space-6) + 6px);
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  translate: -50% 0;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 55%, transparent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.corps {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+}
+
+.vignettes {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vignette {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-vignette);
+  object-fit: cover;
+}
+
+/* Une partie de la fiche : on la touche pour la retoucher. */
+.partie {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-2);
+  border: 1px dashed transparent;
+  border-radius: var(--radius);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.partie:hover,
+.partie:focus-visible {
+  border-color: var(--color-ocre);
+  outline: none;
+}
+
+.nom {
+  margin: 0;
+  color: var(--color-fiche-titre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+}
+
+.faits {
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+}
+
+.endroit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-semi);
+}
+
+.repere {
+  width: 18px;
+  height: 18px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/lieu.svg') center / contain no-repeat;
+}
+
+.aPropos {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+}
+
+.recit {
+  color: var(--color-fiche-recit);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+}
+
+.pied {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  border-top: 1px solid var(--color-sable);
+  background: var(--color-fond);
+}
+
+.charte,
+.refus {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}
+
+.charte {
+  color: var(--color-texte-doux);
+}
+
+.refus {
+  color: var(--color-accent);
+}
+
+.poser {
+  min-height: 54px;
+  border: none;
+  border-radius: var(--radius-carte);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.poser:active {
+  scale: 0.98;
+}
+
+.poser:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partie,
+  .poser {
+    transition: none;
+  }
+}

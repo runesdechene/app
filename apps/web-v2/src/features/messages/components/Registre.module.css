@@ -1,0 +1,139 @@
+/*
+ * QUOI     — le Registre (maquette 45:278) : les pastilles de canaux (crème, et violette pour
+ *            « Bugs & suggestions »), une colonne dense (heure pâle, portrait, nom gris, texte
+ *            16 px), puis la barre d'écriture arrondie, le canal choisi posé sur son bord.
+ */
+.registre {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.filtres {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-2);
+  overflow-x: auto;
+  cursor: grab; /* à la souris : tenir et tirer (useGlisser) */
+  scrollbar-width: none;
+}
+
+.filtre,
+.filtreBugs,
+.filtreActivite,
+.filtreCompagnie,
+.plusCompagnies {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 25px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.filtre {
+  background: var(--color-pastille);
+  color: var(--color-texte);
+}
+
+.filtreBugs {
+  background: var(--color-canal-bugs);
+  color: var(--color-canal-bugs-texte);
+}
+
+/* « Activité » (les nouveaux comptes…) : un ocre de parchemin, on la lit sans y écrire. */
+.filtreActivite {
+  background: var(--color-canal-activite);
+  color: var(--color-canal-activite-texte);
+}
+
+/* Une Compagnie : sa couleur en voile, son nom à son encre, mêlée à l'encre du site pour rester lisible
+   même si la couleur est très claire (mig 422). */
+.filtreCompagnie {
+  background: color-mix(in srgb, var(--couleur) 18%, var(--color-fond));
+  color: var(--encre-compagnie);
+}
+
+/* « ＋ Compagnies » : une gélule en pointillés qui mène à la page des Compagnies. */
+.plusCompagnies {
+  outline: 1px dashed var(--color-accent);
+  outline-offset: -1px;
+  background: none;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.filtre[aria-pressed='false'],
+.filtreBugs[aria-pressed='false'],
+.filtreActivite[aria-pressed='false'],
+.filtreCompagnie[aria-pressed='false'] {
+  opacity: 0.45;
+}
+
+.messages {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-3) var(--space-6);
+  overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+  list-style: none;
+}
+
+.messages::-webkit-scrollbar {
+  display: none;
+}
+
+/* Le jour : un filet au pinceau de part et d'autre, comme les moments des Murmures. */
+.jour {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.jour::before,
+.jour::after {
+  content: '';
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-encre) 20%, transparent)
+  );
+}
+
+.jour::after {
+  rotate: 180deg;
+}
+
+.alerte {
+  margin: 0;
+  padding: 0 var(--space-6) var(--space-2);
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filtre,
+  .filtreBugs,
+  .filtreActivite {
+    transition: none;
+  }
+}

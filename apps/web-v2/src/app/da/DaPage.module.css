@@ -1,0 +1,205 @@
+/*
+ * QUOI     — mise en page de /v2/da. Mobile d'abord : une colonne. Dès que l'écran le
+ *            permet, une galerie de faux téléphones qui défile de côté, un téléphone à la fois.
+ */
+
+/* Fond uni : le parchemin est porté par chaque téléphone, pas par la page (demande d'Uriel). */
+.page {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--color-fond);
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+  padding: calc(env(safe-area-inset-top) + var(--space-6)) 0 var(--space-8);
+}
+
+.entete {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+}
+
+.galerie {
+  display: grid;
+  gap: var(--space-8);
+}
+
+/* Les noms de jetons : pas de police monospace du navigateur, la police des libellés. */
+.page code {
+  font-family: var(--font-condensee);
+  font-size: var(--meta-size);
+  color: var(--color-texte-doux);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nuance,
+.ligne {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.echantillon {
+  height: 3rem;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--nuance);
+}
+
+.espace {
+  width: var(--mesure);
+  height: var(--space-4);
+  background: var(--color-accent);
+}
+
+.rayon {
+  height: 3rem;
+  border: 2px solid var(--color-encre);
+  border-radius: var(--mesure);
+}
+
+.rangee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cadre {
+  height: 12rem;
+  border: 1px dashed var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
+/* La feuille se pose dans son conteneur positionné : ici, un cadre à la taille d'un bas d'écran. */
+.cadreFeuille {
+  position: relative;
+  height: 14rem;
+  overflow: hidden;
+  border: 1px dashed var(--color-bord);
+  border-radius: var(--radius-carte);
+}
+
+/* La coquille montrée dans un téléphone : bandeau en haut, barre d'onglets en bas. */
+.coquille {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
+
+  /* Mêmes zones que la vraie coquille : la barre d'onglets se place dans « nav ». */
+  grid-template-areas:
+    'bandeau'
+    'milieu'
+    'nav';
+  min-height: 36rem;
+  margin: calc(var(--space-8) * -1) calc(var(--space-4) * -1) calc(var(--space-6) * -1);
+}
+
+.bandeau {
+  grid-area: bandeau;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+}
+
+.logo {
+  width: 216px;
+  max-width: 60%;
+  height: auto;
+}
+
+.avatar {
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+@media (width >= 480px) {
+  .galerie {
+    display: flex;
+    gap: var(--space-8);
+    overflow-x: auto;
+    padding: 0 var(--space-6) var(--space-4);
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--space-6);
+  }
+
+  .entete {
+    padding: 0 var(--space-6);
+  }
+
+  .coquille {
+    min-height: calc(844px - 20px);
+  }
+}
+
+/* Les tailles propres au profil, montrées telles qu'elles s'affichent. */
+.tailleDetail,
+.tailleNom,
+.tailleRangee {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+}
+
+.tailleDetail {
+  font-size: var(--titre-detail-size);
+}
+
+.tailleNom {
+  font-size: var(--nom-profil-size);
+}
+
+.tailleRangee {
+  font-size: var(--rangee-size);
+}
+
+.tailleBio {
+  margin: 0;
+  font-family: var(--font-corps);
+  font-size: var(--bio-size);
+  line-height: var(--bio-leading);
+}
+
+/* La récompense se pose sur une photo : un cadre de téléphone, la photo en fond. */
+.fete {
+  position: relative;
+  width: 360px;
+  max-width: 100%;
+  height: 640px;
+  overflow: hidden;
+  border-radius: var(--radius-carte);
+  background: var(--avatar) center / cover;
+}
+
+/* Le bouton de la brique Envols : les cœurs partent de son coin. */
+.envols {
+  position: relative;
+}

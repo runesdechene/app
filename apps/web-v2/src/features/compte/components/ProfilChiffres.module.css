@@ -1,0 +1,39 @@
+/*
+ * QUOI     — trois colonnes entre deux filets ; le nombre en Bebas Neue, le libellé en petites
+ *            capitales condensées (maquette 123:107).
+ */
+.chiffres {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-self: stretch;
+  margin: 0;
+  padding: var(--space-2) 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-texte-doux) 20%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-texte-doux) 20%, transparent);
+  list-style: none;
+}
+
+.chiffre {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+}
+
+.chiffre + .chiffre {
+  border-left: 1px solid color-mix(in srgb, var(--color-texte-doux) 20%, transparent);
+}
+
+.nombre {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  line-height: 1;
+}
+
+.libelle {
+  color: var(--color-texte-doux);
+  font-family: var(--font-condensee);
+  font-size: var(--libelle-size);
+  letter-spacing: var(--libelle-tracking);
+  text-transform: uppercase;
+}

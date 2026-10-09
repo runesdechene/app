@@ -1,0 +1,191 @@
+/*
+ * QUOI     — les feuilles « Ce lieu » et « Partager ce lieu » (maquettes 231:128, 236:128) : le
+ *            style de la feuille « Ajouter » — titre Bebas, lignes crème bordées, icône, chevron.
+ */
+.titre {
+  margin: 0 0 var(--space-3);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: 10px var(--space-3) 10px 10px;
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-pastille) 60%, transparent);
+}
+
+.vignette {
+  flex: none;
+  width: 48px;
+  height: 50px;
+  border: 2px solid var(--color-fiche-vignette);
+  border-radius: var(--radius-petit);
+  object-fit: cover;
+}
+
+.apercuNom {
+  display: block;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+}
+
+.apercuType {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.choix {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* maquette 201:216 */
+  width: 100%;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+  text-align: left;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.choix:active {
+  scale: 0.98;
+}
+
+.icone {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.nom {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.description {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+.avertissement,
+.refus {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+}
+
+.avertissement {
+  color: var(--color-texte);
+}
+
+.refus {
+  color: var(--color-accent);
+}
+
+.gestes {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* « Les cœurs » : une ligne par personne, son nombre de cœurs à droite. */
+.gens {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.personne {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nomPersonne {
+  flex: 1;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.nombreCoeurs {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+}
+
+.petitCoeur {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+/* L'histoire : la version actuelle, et le retour vers une autre. */
+.actuelle,
+.voir {
+  flex: none;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.actuelle {
+  color: var(--color-ocre);
+}
+
+.voir {
+  color: var(--color-texte-doux);
+}
+
+/* Une version qu'on touche pour la voir : toute la ligne, sans allure de bouton. */
+.version {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choix {
+    transition: none;
+  }
+}

@@ -1,0 +1,66 @@
+/*
+ * QUOI     — un cœur qui s'envole à chaque toucher : il monte, dérive un peu, s'efface sur la fin.
+ *            Trois dérives en alternance, pour qu'une rafale s'éparpille au lieu de monter en file.
+ */
+.envol {
+  position: absolute;
+  top: 4px;
+  left: var(--space-1);
+  width: 13px;
+  height: 13px;
+  background: var(--color-accent);
+  mask: url('../../assets/ui/coeur.svg') center / contain no-repeat;
+  pointer-events: none;
+  animation: envol var(--duree-envol) var(--courbe-douce) forwards;
+}
+
+.envol:nth-of-type(3n + 1) {
+  animation-name: envol-gauche;
+}
+
+.envol:nth-of-type(3n) {
+  animation-name: envol-droite;
+}
+
+@keyframes envol {
+  60% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 4px -42px;
+    scale: 1.4;
+  }
+}
+
+@keyframes envol-gauche {
+  60% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: -10px -38px;
+    scale: 1.4;
+  }
+}
+
+@keyframes envol-droite {
+  60% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 12px -46px;
+    scale: 1.4;
+  }
+}
+
+/* Sans mouvement : le cœur ne vole pas, mais il finit quand même (la liste se vide). */
+@media (prefers-reduced-motion: reduce) {
+  .envol {
+    animation-duration: 1ms;
+  }
+}

@@ -1,0 +1,42 @@
+/*
+ * QUOI     — pastille sable (maquette COMPTE) ; choisie : bord rouge 1,5 px et fond ocré.
+ */
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 27px; /* même hauteur pour toutes, marque ou non */
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+/* En choix (Modifier mon profil, maquette 91:107) : claire et bordée tant qu'on ne l'a pas prise. */
+.choix {
+  height: 30px;
+  border-color: var(--color-bord);
+  background: color-mix(in srgb, var(--color-sur-accent) 50%, transparent);
+  color: var(--color-texte-doux);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+}
+
+.choisie {
+  border: 1.5px solid var(--color-accent);
+  background: var(--color-choisie);
+  color: var(--color-encre);
+  font-weight: var(--weight-semi);
+}
+
+.coche {
+  width: 12px;
+  height: 12px;
+}
+
+.marque {
+  color: var(--color-ocre);
+}

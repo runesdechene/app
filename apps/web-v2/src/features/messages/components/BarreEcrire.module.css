@@ -1,0 +1,54 @@
+/*
+ * QUOI     — la barre pour écrire : un cadre arrondi translucide, le champ, le bouton rond sable.
+ */
+.barre {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) var(--space-4) var(--space-3);
+  padding: var(--space-4) var(--space-2) var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-bord) 84%, transparent);
+  border-radius: var(--radius-feuille);
+  background: color-mix(in srgb, var(--color-sur-accent) 72%, transparent);
+}
+
+.champ {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.envoyer {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-pastille);
+  transition:
+    opacity var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.envoyer:disabled {
+  opacity: 0.5;
+}
+
+.envoyer:active:not(:disabled) {
+  scale: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envoyer {
+    transition: none;
+  }
+}

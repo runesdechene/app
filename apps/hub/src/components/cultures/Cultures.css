@@ -1,0 +1,9 @@
+.cultures-liste { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.cultures-fiche { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px; align-items: start; }
+.cultures-champs { display: grid; gap: 12px; }
+.cultures-icone { display: block; width: 40px; height: 40px; mask-position: center; mask-size: contain; mask-repeat: no-repeat; }
+.cultures-stats { color: #857575; font-size: 13px; }
+.cultures-cercle { display: grid; grid-template-columns: 110px 1fr 60px auto; gap: 8px; align-items: center; }
+.cultures-carte { height: 520px; border-radius: 12px; overflow: hidden; }
+.cultures-champs .settings-input { width: 100%; box-sizing: border-box; }
+.cultures-portrait { resize: vertical; font-family: inherit; line-height: 1.5; }

@@ -1,0 +1,345 @@
+/*
+ * QUOI     — le Carnet de passage : titre Bebas et nombre de mots, une ligne en IM Fell, le champ
+ *            d'écriture sur fond feuille, puis les mots — visage, nom, « est venu·e » en vert,
+ *            quand ; le texte ; les photos en vignettes ; ♥ et « Répondre ». Les réponses, un cran
+ *            en retrait.
+ */
+.carnet {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.titre {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+  font-weight: var(--weight-normal);
+}
+
+.compte {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.chapo {
+  margin: calc(-1 * var(--space-2)) 0 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+/* Sur sa propre page, le carnet a ses marges. */
+.carnet[data-page] {
+  margin-top: 0;
+  padding: var(--space-2) var(--space-6) var(--space-8);
+}
+
+/* Le tiroir porte déjà le titre. */
+.carnet[data-page] .titre {
+  display: none;
+}
+
+/* Écrire : le champ sur fond feuille, l'appareil à droite ; « Envoyer » dès qu'il y a un mot. */
+.ecrire {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ecrire[data-reponse] {
+  margin-top: var(--space-2);
+}
+
+.champ {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background: var(--color-feuille);
+  transition: border-color var(--duree-douce) var(--courbe-douce);
+}
+
+.champ:focus-within {
+  border-color: var(--color-ocre);
+}
+
+.texte {
+  flex: 1;
+  min-height: 24px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+  resize: none;
+}
+
+.texte::placeholder {
+  color: var(--color-texte-pale);
+  font-family: var(--font-inscription);
+  font-style: italic;
+}
+
+.texte:focus {
+  outline: none;
+}
+
+.appareil {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.appareil img {
+  width: 22px;
+  height: 22px;
+}
+
+.appareil:has(input:disabled) {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.jointes {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jointe {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.jointe img,
+.photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.retirer {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-size: var(--legende-size);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.envoyer {
+  justify-self: end;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.envoyer:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.refus {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+/* Les mots. */
+.mots {
+  display: grid;
+  gap: var(--space-6);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mot {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.mot[data-reponse] {
+  margin-top: var(--space-4);
+}
+
+.corps {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-corps);
+}
+
+.qui {
+  color: var(--color-encre);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+}
+
+.venu {
+  padding: 1px 7px;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-vert) 25%, transparent);
+  color: var(--color-kaki);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+}
+
+.quand {
+  color: var(--color-texte-doux);
+  font-size: var(--legende-size);
+}
+
+.texteMot {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.photos a {
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border-radius: var(--radius-petit);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.coeurs,
+.action,
+.actionDiscrete,
+.effacer {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+}
+
+.coeurs {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-texte-doux);
+}
+
+button.coeurs,
+.action,
+.actionDiscrete,
+.effacer {
+  cursor: pointer;
+}
+
+.coeurs[aria-pressed='true'] {
+  color: var(--color-accent);
+}
+
+.coeurs:active {
+  scale: 0.9;
+}
+
+.coeur {
+  width: 14px;
+  height: 14px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+.action {
+  color: var(--color-ocre);
+}
+
+.actionDiscrete {
+  color: var(--color-texte-pale);
+}
+
+.effacer {
+  color: var(--color-accent);
+}
+
+.tout {
+  justify-self: start;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+@keyframes apparaitre {
+  0% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .champ {
+    transition: none;
+  }
+
+  .envoyer {
+    animation: none;
+  }
+}

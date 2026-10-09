@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
@@ -12,14 +12,27 @@ interface SidebarProps {
 
 export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
   const [pending, setPending] = useState(0)
+  const [signalements, setSignalements] = useState(0)
+  const [enigmesSignalees, setEnigmesSignalees] = useState(0)
+  // Recompter à chaque page : une file traitée ne garde pas son ancien badge.
+  const { pathname } = useLocation()
 
   useEffect(() => {
     let active = true
     supabase.rpc('get_photo_submissions', { p_status: 'pending' }).then(({ data }) => {
       if (active && Array.isArray(data)) setPending(data.length)
     })
+    supabase.rpc('mod_signalements').then(({ data }) => {
+      if (active && Array.isArray(data)) setSignalements(data.length)
+    })
+    // Réservé aux admins : la RPC refuse les autres.
+    if (isAdmin) {
+      supabase.rpc('signalements_enigme_du_hub').then(({ data }) => {
+        if (active && Array.isArray(data)) setEnigmesSignalees(data.length)
+      })
+    }
     return () => { active = false }
-  }, [])
+  }, [isAdmin, pathname])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -36,6 +49,14 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
       <nav className="sidebar-nav">
         <NavLink to="/moderation" className={({ isActive }) => isActive ? 'active' : ''}>
           Modération
+        </NavLink>
+        <NavLink to="/signalements" className={({ isActive }) => isActive ? 'active' : ''}>
+          Signalements
+          {signalements > 0 && (
+            <span style={{ marginLeft: 8, background: '#e0a73d', color: '#2b2b2b', fontSize: 11, fontWeight: 700, minWidth: 18, display: 'inline-block', textAlign: 'center', padding: '1px 7px', borderRadius: 999, verticalAlign: 'middle' }}>
+              {signalements}
+            </span>
+          )}
         </NavLink>
         <div className="sidebar-section-label">La Carte</div>
         <NavLink to="/carte/tags" className={({ isActive }) => isActive ? 'active' : ''}>
@@ -62,16 +83,29 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
             <NavLink to="/carte/publicites" className={({ isActive }) => isActive ? 'active' : ''}>Publicites</NavLink>
             <NavLink to="/carte/bannieres" className={({ isActive }) => isActive ? 'active' : ''}>Bannières</NavLink>
             <NavLink to="/carte/enigmes" className={({ isActive }) => isActive ? 'active' : ''}>Enigmes</NavLink>
+            <NavLink to="/carte/enigmes-signalees" className={({ isActive }) => isActive ? 'active' : ''}>
+              Énigmes signalées
+              {enigmesSignalees > 0 && (
+                <span style={{ marginLeft: 8, background: '#e0a73d', color: '#2b2b2b', fontSize: 11, fontWeight: 700, minWidth: 18, display: 'inline-block', textAlign: 'center', padding: '1px 7px', borderRadius: 999, verticalAlign: 'middle' }}>
+                  {enigmesSignalees}
+                </span>
+              )}
+            </NavLink>
+            <NavLink to="/carte/cultures" className={({ isActive }) => isActive ? 'active' : ''}>Cultures</NavLink>
             <NavLink to="/carte/missions" className={({ isActive }) => isActive ? 'active' : ''}>Missions</NavLink>
             <NavLink to="/carte/reglages" className={({ isActive }) => isActive ? 'active' : ''}>Reglages</NavLink>
+            <NavLink to="/carte/energie" className={({ isActive }) => isActive ? 'active' : ''}>Énergie</NavLink>
             <NavLink to="/carte/divers" className={({ isActive }) => isActive ? 'active' : ''}>Divers</NavLink>
             <NavLink to="/carte/landing" className={({ isActive }) => isActive ? 'active' : ''}>Page d'accueil</NavLink>
             <NavLink to="/carte/regles" className={({ isActive }) => isActive ? 'active' : ''}>Règles</NavLink>
             <NavLink to="/carte/tutoriel" className={({ isActive }) => isActive ? 'active' : ''}>Tutoriel</NavLink>
             <div className="sidebar-section-label">Communication</div>
             <NavLink to="/annonces" className={({ isActive }) => isActive ? 'active' : ''}>Annonces</NavLink>
+            <NavLink to="/mises-a-jour" className={({ isActive }) => isActive ? 'active' : ''}>Mises à jour de l'app</NavLink>
+            <NavLink to="/notifications" className={({ isActive }) => isActive ? 'active' : ''}>Notifications</NavLink>
             <div className="sidebar-section-label">Shopify</div>
             <NavLink to="/shopify/sync" className={({ isActive }) => isActive ? 'active' : ''}>Synchro Emails</NavLink>
+            <NavLink to="/shopify/fragments" className={({ isActive }) => isActive ? 'active' : ''}>Fragments (Shopify)</NavLink>
             <NavLink to="/shopify/fragments-audio" className={({ isActive }) => isActive ? 'active' : ''}>Fragments audio</NavLink>
           </>
         )}

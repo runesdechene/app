@@ -16,20 +16,71 @@ paths:
 
 Une machine fraîche n'a pas de `netlify link` (interactif) : toujours passer `--site <SITE_ID>`.
 
+`npx netlify-cli` peut casser (« Cannot read properties of null (reading 'package') », 09/10/2026) :
+la CLI est installée en global par pnpm, `netlify deploy …` avec les mêmes options passe.
+
 | Site | SITE_ID | Domaine |
 |---|---|---|
-| `runesdechene` (explore-web) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
+| `runesdechene` (Explore, `apps/web-v2` depuis la bascule du 07/10/2026) | `1b29da09-c7af-44bf-9c31-465bfaae9d74` | `app.runesdechene.com` |
 | `hub-runesdechene` | `d1cac03c-19a1-4b92-be72-fa3805428cd1` | `hub.runesdechene.com` |
 | `rdc-seo-pages` | `5a5b9cb9-d330-41d7-a037-6bd65ac67eb9` | sert `/lieu/*` via rewrite |
 | `runesdechene-demo` (borne) | `01d23d77-db08-4ecd-a0b6-f2b76035deb6` | `demo.runesdechene.com` — **abandonnée le 26/09/2026**, branche `demo-borne` supprimée : ne plus déployer |
 
-- **Après chaque deploy explore-web** : `node scripts/sync-app-version.mjs` (lit `# X.Y.Z` en tête
-  de `apps/explore-web/CHANGELOG.md`, écrit `app_settings.app.latest_version` → `UpdateBanner`).
-  Requiert `SUPABASE_SERVICE_ROLE_KEY` dans le `.env`.
-- **Vérifier** : `curl -s https://app.runesdechene.com/sw.js | grep -oE "matchPrecache|KILL_SWITCH"`.
+- **Vérifier** : la page sert le build local (`curl -s https://app.runesdechene.com/ | grep -o
+  'assets/index-[^"]*\.js'` = celui de `apps/web-v2/dist/index.html`), `curl -s …/sw.js | grep
+  showNotification`, puis la version affichée dans le navigateur (deux rechargements).
 - **Rollback éprouvé** : `git revert HEAD --no-edit`, rebuild, redeploy. Ou rollback Netlify en un clic.
 - **Build Netlify** : pnpm 10 bloque le post-install d'esbuild → `onlyBuiltDependencies` +
   `packageManager` dans le `package.json` racine. Ne pas les retirer.
+
+## Explore se déploie depuis `apps/web-v2`, sur le site `runesdechene`
+
+Depuis la bascule (07/10/2026, spec `docs/superpowers/specs/2026-10-07-v2-bascule-design.md`),
+la V2 **est** `app.runesdechene.com`. Ses règles (seo-pages, vieilles adresses V1, `/v2/*`, en-tête
+pour la boutique) vivent dans `apps/web-v2/netlify.toml`, que la CLI ne lit que dans le dossier
+courant : déployée d'ailleurs, l'appli partirait sans elles (piège du 05/10 avec la V1).
+
+**How to apply :** `pnpm build` dans `apps/web-v2`, puis `cd apps/web-v2 && npx netlify-cli deploy
+--prod --no-build --dir="<chemin absolu>/apps/web-v2/dist" --site=runesdechene` (le nom ; en cas de
+« Not Found », l'identifiant). Vérifier ensuite `/lieu/<slug>` → 200, `/v2/accueil` → 301 vers
+`/accueil`, `/v2/sw.js` → 200 (le service worker qui retire l'ancienne inscription de `/v2/`).
+Puis **annoncer la version** : `node scripts/sync-app-version.mjs` (écrit `app_settings.explore.version`
+depuis `apps/web-v2/package.json`, avec `SUPABASE_SERVICE_ROLE_KEY` du `.env`). Sans elle, la
+fenêtre « Une nouvelle version d'Explore est arrivée » ne force rien : seuls les téléphones dont
+le service worker a vu la mise à jour la proposent.
+
+## Le Hub : `--site=<ID>` et `--no-build`, jamais son nom
+
+**Le piège** (07/10/2026) : `--site=hub-runesdechene` sans `--no-build` lance un build Netlify qui
+répond « Failed retrieving site data … Not Found ». Avec l'identifiant et `--no-build`, c'est passé :
+`npx netlify-cli deploy --prod --no-build --dir "<abs>/apps/hub/dist" --functions
+"<abs>/apps/hub/netlify/functions" --site=d1cac03c-19a1-4b92-be72-fa3805428cd1` (build fait avant,
+`pnpm build` dans `apps/hub`). Pour la V1 c'est l'inverse (le nom passe, l'identifiant non) : en cas
+de « Not Found », essayer l'autre forme.
+
+## Netlify : créer un site, écrire une redirection
+
+**Monorepo** : dans le dépôt, `netlify sites:create` (et d'autres commandes) ouvre un choix
+interactif du projet et plante sans terminal. Créer un site par l'API, hors du dépôt :
+`npx netlify-cli api createSiteInTeam --data '{"account_slug":"uriellahoussaye","body":{"name":"…"}}'`.
+
+**Redirections Netlify : la barre finale ne compte pas.** Une règle `from = "/v2"` attrape aussi
+`/v2/` : « /v2 → /v2/ » en 301 bouclait sur elle-même (30/09/2026, `/v2/` inaccessible juste
+après le premier déploiement). Vérifier toute nouvelle redirection avec
+`curl -sL -o /dev/null -w "%{http_code} %{num_redirects}" <url>`.
+
+## V2 : monter la version avant chaque déploiement
+
+La V2 affiche « Pythéas 1.0.0 » en bas de sa barre (et en bas des Préférences sur mobile) : Uriel
+s'en sert pour savoir que le déploiement est arrivé (01/10/2026). Le numéro vient de
+`apps/web-v2/package.json` (`version`), posé au build par Vite (`__VERSION__`).
+
+**How to apply :** avant chaque `netlify deploy` de la V2, monter `version` — le dernier chiffre pour
+une correction (1.0.1), celui du milieu pour une fonctionnalité (1.1.0) — puis `pnpm build`, puis
+déployer. Le nom (Pythéas) vaut pour toute la 1.x ; une grande refonte change de nom et de premier
+chiffre. Depuis 1.0.7, l'app cherche une nouvelle version toutes les heures et à chaque retour au
+premier plan, et se recharge d'elle-même (`src/app/miseAJour.ts`) ; avant, l'app installée restait
+coincée sur l'ancienne (Uriel, 01/10 : « toujours Pythéas 1.0.0 »).
 
 ## Netlify deploy — toujours chemin absolu
 
@@ -104,3 +155,16 @@ Première utilisation réelle : 23/06/2026 — récompense Coupe des Héritages 
 **Gabarit HTML RdC** (réutiliser le style des templates existants) : table parchemin `#f7f1e3`, bannière `https://app.runesdechene.com/email-banner.jpg`, logo `https://app.runesdechene.com/email-logo.png`, titre serif, bouton doré `#8a6d3b`. Voir `renderCrownsAwarded` comme base.
 
 **Règle d'envoi** : voir [[feedback_never_send_without_explicit_go]] — jamais d'envoi sans GO explicite isolé. Liens promo Shopify : `https://runesdechene.com/discount/CODE` applique le code automatiquement.
+
+## L'edge function `send-push` se déploie toujours avec `--no-verify-jwt`
+
+**Le piège** (08/10/2026) : le déclencheur `push_on_notification` appelle `send-push` avec le seul
+en-tête `X-Push-Secret`, sans jeton. Un `supabase functions deploy send-push` sans l'option
+réactive la vérification du jeton : la passerelle refuse alors tous les appels, et plus aucun push ne
+part, sans erreur visible nulle part. Deux minutes ainsi le 08/10, rattrapées par un redéploiement.
+
+**How to apply :** `npx supabase functions deploy send-push --use-api --no-verify-jwt` (`--use-api` :
+sans Docker ; `--linked` n'existe pas pour cette commande). Vérifier ensuite
+`curl -s -X POST <SUPABASE_URL>/functions/v1/send-push -d '{}'` → `unauthorized` (le refus de la
+fonction elle-même, faute de secret) ; un JSON « Missing authorization header » veut dire que la
+passerelle bloque encore.

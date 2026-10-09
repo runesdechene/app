@@ -1,0 +1,85 @@
+/*
+ * QUOI     — le champ de recherche de la carte (maquette 165:129), les lieux trouvés, puis les
+ *            Explorateurs (leur portrait devant le nom).
+ */
+.recherche {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.champ {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* maquette 165:129 */
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+}
+
+.loupe {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.saisie {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  outline: none;
+}
+
+.saisie::placeholder {
+  color: var(--color-texte-doux);
+}
+
+.resultats {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  max-height: min(60dvh, 480px);
+  overflow-y: auto;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: var(--color-sur-accent);
+}
+
+.liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.liste + .liste {
+  border-top: 1px solid var(--color-bord);
+}
+
+.resultat {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--cible-tactile);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  text-align: left;
+  text-decoration: none;
+}
+
+/* Un filet entre deux résultats, lieux comme Explorateurs. */
+.liste > * + * {
+  border-top: 1px solid var(--color-bord);
+}

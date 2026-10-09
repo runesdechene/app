@@ -2,13 +2,15 @@
 
 > pnpm workspaces · TypeScript strict · Supabase · Netlify
 > L'état du projet, les décisions et la façon de travailler avec Uriel vivent dans le vault
-> **Mon Cerveau** : lire le Claude.MD du vault, le '\_État.md' associé à ce projet (Runes de Chêne) et '\_Socle'. Ici, le code seulement.
+> **Mon Cerveau** : lire le Claude.MD du vault, l'état de l'appli
+> `1. LE MÉTIER/1. Runes de Chêne/Explore/_État.md` (la marque a le sien, un dossier au-dessus) et
+> '\_Socle'. Ici, le code seulement.
 
 ## Où sont les choses
 
 | Quoi                                                     | Où                                                              |
 | -------------------------------------------------------- | --------------------------------------------------------------- |
-| App publique V1 (`app.runesdechene.com`)                 | `apps/explore-web/`                                             |
+| Explore, l'appli (`app.runesdechene.com`, depuis la bascule du 07/10) | `apps/web-v2/` — carnet : `docs/v2/`                |
 | Back-office (`hub.runesdechene.com`)                     | `apps/hub/`                                                     |
 | Pages SEO (`/lieu/*`)                                    | `apps/seo-pages/`                                               |
 | Base, migrations, RPC, edge functions                    | `supabase/`                                                     |
@@ -41,6 +43,10 @@ Graphify se reconstruit seul au commit (hook `post-commit`, + `scripts/graphify-
 
 ## Règles
 
+- **Le code est un chef-d'œuvre de simplicité** (Uriel, 27/09/2026) : simple, compréhensible,
+  propre, épuré. On ne réinvente pas la roue : l'outil standard avant le code maison. Pas de
+  tournure d'esprit bizarre, pas d'astuce. Si c'est compliqué à lire, c'est à réécrire.
+  Détail : `.claude/rules/v2.md`.
 - **pnpm** uniquement ; `npx` / `pnpm dlx` seulement pour `supabase`.
 - **TS strict** : pas de `any`, `@ts-ignore`, `as unknown as`.
 - **Conventional Commits.**
@@ -59,7 +65,9 @@ Graphify se reconstruit seul au commit (hook `post-commit`, + `scripts/graphify-
 ## Livrer
 
 - Front modifié → `pnpm dev` et le parcours testé dans le navigateur, puis `pnpm build` OK.
-- Commit à chaque étape qui marche ; push par lots, **toujours en fin de session**.
+- Commit à chaque étape qui marche ; push par lots, **toujours en fin de session**. Le push est le
+  mien, **y compris les commits d'une autre session** sur la branche : je ne les laisse pas en
+  attente (Uriel, 06/10 — sinon le hook `Stop` relance en boucle).
 - Fin de session : une décision → `_État.md` du vault ; un piège → `.claude/rules/`. Rien d'autre.
 
 ## Nouvelle machine

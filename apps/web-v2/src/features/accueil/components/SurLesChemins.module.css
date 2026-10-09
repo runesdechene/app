@@ -1,0 +1,178 @@
+/*
+ * QUOI     — le fil « Sur les chemins » (maquette 27:2) : un filet prolonge la rubrique ; chaque
+ *            ligne pose, à même le parchemin, le pictogramme du type, le portrait, la phrase
+ *            (Cabin 13 px) et sa ligne d'aide, puis la pastille du salut à droite.
+ */
+.chemins {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.rubrique {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0 var(--space-6);
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+/* Le filet qui prolonge le titre jusqu'au bord. */
+.rubrique::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--color-sable);
+}
+
+.icone {
+  width: 24px;
+  height: 27px;
+  object-fit: contain;
+  opacity: 0.7;
+}
+
+.fil {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0 var(--space-6);
+  list-style: none;
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: 20px auto 1fr auto;
+  align-items: start;
+  gap: var(--space-3);
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.type {
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* Le logo de la culture d'une énigme percée : un masque peint à sa couleur. */
+.logo {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  background: var(--couleur-culture, var(--color-ocre));
+  mask: var(--icone) center / contain no-repeat;
+}
+
+/* La bille du type d'un lieu ajouté, calée sur la première ligne du texte. */
+.bille {
+  display: grid;
+  margin-top: 1px;
+}
+
+.texte {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  line-height: var(--dense-leading);
+}
+
+.qui {
+  color: var(--color-encre);
+  font-weight: var(--weight-gras);
+  text-decoration: none;
+}
+
+.lieu {
+  color: var(--color-ocre);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.culture {
+  color: var(--couleur-culture, var(--color-ocre));
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+.ou {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-texte-pale);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+/* La pastille du salut : un cœur et son compteur ; rose quand je salue. */
+.salut {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 26px;
+  height: 22px;
+  padding: 0 var(--space-1);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-semi);
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+button.salut {
+  cursor: pointer;
+}
+
+.salut[aria-pressed='true'] {
+  background: var(--color-accent-clair);
+  color: var(--color-accent);
+}
+
+.salut:active {
+  scale: 0.9;
+}
+
+.coeur {
+  width: 13px;
+  height: 13px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+/* « Voir toute l'activité » : un lien discret sous le fil, pas un bouton de plus. */
+.tout {
+  justify-self: start;
+  margin: 0 var(--space-6);
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--meta-size);
+  font-weight: var(--weight-semi);
+  text-decoration: none;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ligne {
+    animation: none;
+  }
+
+  .salut {
+    transition: none;
+  }
+}

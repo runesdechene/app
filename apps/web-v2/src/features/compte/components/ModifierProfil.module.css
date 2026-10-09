@@ -1,0 +1,68 @@
+/*
+ * QUOI     — le formulaire en une colonne, la photo centrée en tête, le bouton sur toute la largeur.
+ */
+.formulaire {
+  display: grid;
+  gap: 28px; /* maquette 91:107 */
+  padding: var(--space-1) var(--space-6) var(--space-8); /* même marge haute que le profil (Uriel, 27/09) */
+}
+
+.photo {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+/* « Changer la photo » : une pastille ocre avec son appareil photo. */
+.changerPhoto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px var(--space-3);
+  border: none;
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ocre) 14%, transparent);
+  color: var(--color-ocre);
+  font-family: var(--font-condensee);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--libelle-tracking);
+}
+
+.changerPhoto img {
+  width: 14px;
+  height: 14px;
+}
+
+.groupe {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.groupe legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--color-encre);
+}
+
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.avertissement {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}
+
+.envoi {
+  display: grid;
+  gap: var(--space-2);
+}

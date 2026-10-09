@@ -1,0 +1,104 @@
+/*
+ * QUOI     — le sceau touché qui se retourne : la cire « ? » devant, le cachet de la culture derrière.
+ */
+.sceau {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  z-index: 3;
+  width: 64px;
+  height: 64px;
+  translate: -50% -50%;
+  scale: 0.5625; /* en attendant l'énigme, la taille exacte du sceau de la carte (36 px) */
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.sceau[data-retourne] {
+  animation: retourner calc(var(--duree-elan) * 2) var(--courbe-douce) forwards;
+}
+
+.face,
+.dos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+}
+
+.point {
+  position: relative;
+  color: var(--color-carte-halo);
+  font-family: var(--font-inscription);
+  font-size: var(--sceau-size);
+  font-style: italic;
+}
+
+.dos {
+  rotate: y 180deg;
+}
+
+/* La cire des deux faces : un bord crème qui la détache de la carte, la couleur de la culture au dos,
+   un anneau plus sombre où la matrice a pressé. */
+.cire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cire path {
+  fill: var(--couleur-culture, var(--color-carte-cire));
+  stroke: var(--color-carte-halo);
+  stroke-width: 3;
+}
+
+.cire circle {
+  fill: none;
+  stroke: color-mix(in srgb, var(--couleur-culture, var(--color-carte-cire)) 70%, var(--color-carte-encre));
+  stroke-width: 2.5;
+}
+
+/* Au cœur, un rond clair : le logo de la culture s'y lit, quelles que soient ses couleurs. */
+.coeur {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56%;
+  height: 56%;
+  border-radius: 50%;
+  background: var(--color-feuille);
+  color: var(--couleur-culture, var(--color-carte-cire));
+  font-family: var(--font-titre);
+  font-size: var(--titre-section-size);
+}
+
+/* Le logo, peint à la couleur de la culture (il sert de masque). */
+.logo {
+  width: 70%;
+  height: 70%;
+  background: currentcolor;
+  mask: var(--icone) center / contain no-repeat;
+}
+
+/* Il part de la taille du sceau de la carte (36 px sur 64) et grandit en se retournant. */
+@keyframes retourner {
+  from {
+    rotate: y 0deg;
+    scale: 0.5625;
+  }
+
+  to {
+    rotate: y 180deg;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sceau[data-retourne] {
+    animation: none;
+    rotate: y 180deg;
+    scale: 1;
+  }
+}

@@ -1,0 +1,16 @@
+/*
+ * QUOI     — la colonne du profil ; l'état d'erreur centré avec son bouton.
+ */
+.profil {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* une colonne qui ne s'élargit pas au carrousel */
+  gap: var(--space-6);
+  padding-top: var(--space-1);
+}
+
+.etat {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-4);
+}

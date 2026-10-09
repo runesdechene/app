@@ -1,0 +1,109 @@
+/*
+ * QUOI     — les cœurs d'un lieu (maquettes « Lieu — aimer » A et B) : la pastille ♥ taillée comme
+ *            les boutons ronds de la fiche ; « Féliciter … » en large bouton ; la rangée des
+ *            visages. Rose quand j'ai déjà envoyé un cœur.
+ */
+.pastille,
+.feliciter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--color-ombre) 22%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-fiche-rond) 51%, transparent);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.pastille {
+  flex: none;
+  height: 35px;
+  padding: 0 11px 0 10px;
+  font-size: var(--sous-titre-size);
+}
+
+.feliciter {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  font-size: var(--sous-titre-size);
+}
+
+.pastille[aria-pressed='true'],
+.feliciter[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent-clair) 30%, transparent);
+  color: var(--color-accent);
+}
+
+.pastille:active,
+.feliciter:active {
+  scale: 0.95;
+}
+
+.coeur {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: currentcolor;
+  mask: url('../../../assets/ui/coeur.svg') center / contain no-repeat;
+}
+
+/* Les cœurs s'envolent du cœur du bouton. */
+.pastille [data-envol],
+.feliciter [data-envol] {
+  top: 10px;
+  left: 12px;
+}
+
+.feliciter [data-envol] {
+  top: 15px;
+  left: var(--space-4);
+}
+
+.libelle {
+  flex: 1;
+  text-align: left;
+}
+
+.auteurs {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.qui {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: left;
+  cursor: pointer;
+}
+
+.visages {
+  display: flex;
+}
+
+.visages > * + * {
+  margin-left: -6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pastille,
+  .feliciter {
+    transition: none;
+  }
+}

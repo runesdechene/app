@@ -1,0 +1,27 @@
+/*
+ * QUOI     — l'écran « hors connexion » de la garde.
+ * POURQUOI — seul écran visible avant la coquille ; il n'utilise que les jetons (tokens.css).
+ */
+.offline {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  text-align: center;
+  background: var(--color-fond);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+}
+
+.button {
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-surface);
+  font-family: var(--font-titre);
+  font-size: var(--bouton-size);
+  letter-spacing: var(--bouton-tracking);
+}

@@ -1,0 +1,63 @@
+/**
+ * QUOI     — les lectures du parcours (natures, époques, lieux voisins, l'endroit en mots) et le
+ *            geste final : poser le lieu.
+ * POURQUOI — poser le lieu envoie d'abord les photos (une à une), puis crée le lieu avec la
+ *            position du téléphone si elle est déjà accordée : la base décide alors si la visite
+ *            compte (200 m). Ensuite la carte, l'Accueil et le profil se relisent : le lieu y est.
+ * ATTENTION — l'endroit en mots vit dans shared/hooks/useEndroit (partagé avec le pin GPS).
+ */
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { Point } from '@/shared/lib/distance'
+import { positionSiAutorisee } from '@/shared/lib/position'
+import { envoyerPhotos } from '@/shared/supabase/photos'
+import { ajouterLieu, fetchEpoques, fetchNatures, fetchVoisins } from '../api/ajout'
+import { jeterBrouillon, type Brouillon } from '../lib/brouillon'
+
+export function useNatures() {
+  return (
+    useQuery({ queryKey: ['ajout', 'natures'], queryFn: fetchNatures, staleTime: Infinity }).data ??
+    []
+  )
+}
+
+export function useEpoques() {
+  return (
+    useQuery({ queryKey: ['ajout', 'epoques'], queryFn: fetchEpoques, staleTime: Infinity }).data ??
+    []
+  )
+}
+
+function cle(point: Point | null) {
+  return point ? [point.latitude.toFixed(4), point.longitude.toFixed(4)] : [null, null]
+}
+
+export function useVoisins(point: Point | null) {
+  const query = useQuery({
+    queryKey: ['ajout', 'voisins', ...cle(point)],
+    queryFn: () => (point ? fetchVoisins(point) : []),
+    enabled: point !== null,
+  })
+  return query.data ?? []
+}
+
+// La pose en cours se lit ailleurs (on ne quitte pas le parcours pendant qu'elle part).
+export const POSE = ['ajout', 'poser']
+
+export function usePoser() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: POSE,
+    mutationFn: async (b: Brouillon) => {
+      const images = await envoyerPhotos(b.photos)
+      return ajouterLieu(b, images, await positionSiAutorisee())
+    },
+    // Ici et non dans l'écran : le brouillon est jeté même si l'écran a disparu entre-temps.
+    onSuccess: () => {
+      void jeterBrouillon()
+      void queryClient.invalidateQueries({ queryKey: ['carte', 'lieux'] })
+      void queryClient.invalidateQueries({ queryKey: ['accueil'] })
+      void queryClient.invalidateQueries({ queryKey: ['explorateur'] })
+      void queryClient.invalidateQueries({ queryKey: ['pins'] }) // le pin complété est publié
+    },
+  })
+}

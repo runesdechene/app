@@ -1,0 +1,129 @@
+/*
+ * QUOI     — la barre d'onglets. Mobile : en bas, fond de la barre, lisière de forêt posée
+ *            au-dessus. Desktop : les onglets empilés dans la barre verticale de gauche, sans
+ *            l'onglet Carte (la carte y est toujours là) ; un fond clair glisse jusqu'à l'actif,
+ *            avec l'élan du curseur des Segments (Uriel, 28/09).
+ * POURQUOI — relevé Figma (NAVBAR 46:422) : la lisière (image « 0101 », 1920 × 74) coiffe la
+ *            barre sur toute sa largeur ; les onglets sont espacés selon leur largeur réelle
+ *            (pas cinq colonnes égales, qui rognaient « Campement ») ; toutes les icônes à la
+ *            même intensité (Uriel, 28/09 : l'actif plus foncé faisait des couleurs inégales).
+ */
+.bar {
+  grid-area: nav;
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  padding: var(--space-4) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom));
+  background: var(--color-barre);
+}
+
+/* La lisière de forêt, posée juste au-dessus de la barre, dans ses proportions d'origine. */
+.bar::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 100%;
+  aspect-ratio: 1920 / 74;
+  background: url('../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.tab {
+  position: relative;
+  min-height: var(--cible-tactile);
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  border: none;
+  background: none;
+  white-space: nowrap;
+}
+
+/* L'icône est un pochoir : sa forme vient de l'image, sa couleur du jeton --color-encre.
+   Toutes les icônes ont ainsi exactement la même teinte, quelle que soit l'image déposée. */
+.icon {
+  width: 24px;
+  height: 24px;
+  background: var(--color-encre);
+  mask: var(--icone) center / contain no-repeat;
+  opacity: 0.7;
+  transition: opacity 0.25s;
+}
+
+.tab[aria-current='page'] .icon {
+  opacity: 1;
+}
+
+/* La pastille des non-lus, à cheval sur le coin haut droit de l'icône. Elle vient après le
+   libellé dans le HTML, pour qu'on entende « Messages, 3 non lus ». */
+.nonLus {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 6px);
+  display: grid;
+}
+
+/* Le curseur n'existe que sur PC. */
+.curseur {
+  display: none;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+@container app (width >= 1024px) {
+  .bar {
+    position: relative;
+    z-index: 3; /* au-dessus du tiroir qui glisse sous la barre */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0;
+    background: none;
+  }
+
+  .bar::before {
+    display: none;
+  }
+
+  .tab {
+    position: relative; /* au-dessus du curseur */
+    width: calc(var(--barre-laterale) - var(--space-4));
+    height: var(--onglet-pc);
+    align-content: center;
+    padding: 0 var(--space-1);
+  }
+
+  .tab[data-onglet='carte'] {
+    display: none;
+  }
+
+  /* Le fond clair de l'onglet actif, qui glisse d'un onglet à l'autre. Le décalage s'écrit en
+     deux termes : Chrome perd l'écart dans « rang × (100 % + écart) » (.claude/rules). */
+  .curseur {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    display: block;
+    width: calc(var(--barre-laterale) - var(--space-4));
+    height: var(--onglet-pc);
+    border-radius: var(--radius-petit);
+    background: var(--color-sur-accent);
+    translate: -50% calc(var(--rang) * 100% + var(--rang) * var(--space-2));
+    transition: translate var(--duree-elan) var(--courbe-elan);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon,
+  .curseur {
+    transition: none;
+  }
+}

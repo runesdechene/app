@@ -42,6 +42,30 @@
 
 - [ ] **2 migrations orphelines non filées** — `grade_founding_always_counts_306/307` (appliquées prod via MCP le 25/06, SQL perdu au `repair --reverted`). Effet **superseded** par 306/307/311/312/318 → repo = source de vérité OK ; à reconstituer seulement si on veut un repo 100 % rejouable.
 
+## Hub — les « Réactivations » ne mesurent pas des réactivations (découvert le 01/10/2026)
+
+- [ ] **Le chiffre est faux depuis sa création (28/02/2026).** Voulu : un ancien compte qui revient
+  sur la nouvelle app, compté **une seule fois**. Codé : « compte de plus de 7 j (30 j sur le
+  tableau de bord) connecté dans la période » = des anciens comptes **actifs**, recomptés à chaque
+  période (`Dashboard.tsx` compteurs, `Users.tsx` badge « Réactivé ! » et export). *Reporté par
+  Uriel le 01/10.*
+  - Correctif proposé : une colonne « revenu le », écrite une fois à la première ouverture d'un
+    ancien compte (`touch_last_login`), remplie au mieux pour le passé ; l'ancien chiffre renommé
+    « Anciens comptes actifs ». **Il manque la date de sortie de la nouvelle app**, qui définit
+    « ancien » — à demander à Uriel.
+  - Le vrai chiffre se retrouve en partie : `last_login_at` n'est écrite que par la nouvelle app,
+    depuis le 28/02. Au 01/10, sur 4 282 comptes créés avant février 2026, 174 revenus — mais par
+    groupe : boutique (`account_source = shopify`) 30/1 311, inscrits jamais actifs 78/2 125,
+    **vrais Explorateurs 66/846 (8 %)**. Minimum : un retour avant le 28/02 n'a pas laissé de trace.
+  - Depuis la V2 1.0.10, revenir dans l'app après 10 min avance aussi `last_login_at` : les
+    compteurs actuels montent un peu sans qu'il y ait plus de retours.
+
+## V2 — zone Compte, suites (27/09)
+
+- [ ] **Article de chaque Fragment dans le Hub** — un champ (« l' », « le », « la », aucun) pour que le profil dise juste *sous le signe de l'Hoplite / du Varègue / d'Avalon*. Remplace la règle approchée de `apps/web-v2/src/features/compte/lib/signe.ts` (décision d'Uriel).
+- [ ] **Titres offerts** — table (qui, quel titre, pourquoi, quand, offert par), action « Offrir un titre » dans le Hub réservée à Uriel, marque propre et feuille « Offert par Runes de Chêne — pourquoi, quand » dans la V2. Rares, jamais liés à un achat.
+- [ ] **Page « Tous les titres »** — maquette en cours ; les compteurs existent déjà (`get_all_player_titles().stats`).
+
 ## Idées non instruites
 
 - [ ] **Système d'emails séquencés** — brouillon de schéma jamais appliqué : `docs/db/drafts/systeme-emails-BROUILLON.sql` (tables `email_subscribers`, `email_sequences`, séquences `shopify_welcome` / `app_welcome` / `post_order` en J1/J3/J7/J10). Aucune de ces tables n'existe en prod ni dans le repo. À instruire ou à jeter — pas à appliquer tel quel.
@@ -51,3 +75,18 @@
 - Le compteur agrège toute la durée de vie : pas de fenêtre par drop.
 - L'identité de session ne survit pas au navigateur : un second onglet compte une seconde écoute. À trancher.
 - Écrans back-office connectés (liste et fiche joueur, tableau de bord, Fragments, Sync Shopify) basculés sur la vue staff, jamais testés avec une session admin.
+
+## Hub : la modération écrit le récit sans version (relecture « Enrichir un lieu », 05/10/2026)
+
+`mod_update_place` (mig 329, appelée par `apps/hub/src/components/moderation/PlaceEditPanel.tsx`) met à
+jour `places.text` et `title` sans ligne dans `versions_lieu` ni mise à jour de `place_contributions` :
+une correction de modérateur recrée l'écart V1/V2 que la mig 416 a réparé, et la version « Actuelle »
+ne correspond plus à la fiche. À faire : qu'elle passe par une version (auteur = le modérateur, note
+« Modération ») et tienne `place_contributions` à jour, comme `modifier_lieu` (mig 414).
+
+## Hub : `Photos.css` redéfinit `.mod-row` pour tout le Hub (07/10/2026)
+
+`apps/hub/src/components/photos/Photos.css` pose `.mod-row { display: flex; … }` sans préfixe : le CSS
+du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui utilisent `.mod-row`
+(Mises à jour : l'image et le texte se rangeaient côte à côte). Contourné dans `MisesAJour.tsx`
+(`display: 'block'` en ligne). À faire : renommer les classes de `Photos.css` (`photo-row…`).

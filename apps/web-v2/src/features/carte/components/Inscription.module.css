@@ -1,0 +1,51 @@
+/*
+ * QUOI     — l'inscription du territoire : IM Fell English italique 30 px, encre de la carte,
+ *            un halo de parchemin pour se lire sur le relief (maquette 200:191).
+ */
+.inscription {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* maquette 200:191 */
+  margin: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease-out;
+  animation: apparaitre 400ms ease-out;
+}
+
+.efface {
+  opacity: 0;
+}
+
+.nom {
+  color: var(--color-carte-encre);
+  font-family: var(--font-inscription);
+  font-size: var(--inscription-size);
+  font-style: italic;
+  letter-spacing: var(--inscription-tracking);
+  text-shadow: 0 0 3px var(--color-carte-halo);
+  white-space: nowrap;
+}
+
+.fleuron {
+  flex: none;
+  width: 70px;
+  height: 14px;
+}
+
+.retourne {
+  scale: -1 1;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inscription {
+    transition: none;
+    animation: none;
+  }
+}

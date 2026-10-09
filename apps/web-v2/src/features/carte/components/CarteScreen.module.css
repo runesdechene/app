@@ -1,0 +1,199 @@
+/*
+ * QUOI     — la carte plein écran ; par-dessus : la recherche et le filtre, l'inscription du territoire, la rose des vents
+ *            en bas à gauche, « Ma position » en bas à droite (maquette 162:107), et le bandeau
+ *            discret quand les lieux ne se chargent pas.
+ * ATTENTION — sur PC, le tiroir de la coquille passe par-dessus la carte : ses boutons se
+ *            décalent de `--decalage-carte` (0 sur mobile ou tiroir replié), en glissant avec
+ *            lui. La carte elle-même ne bouge pas.
+ */
+.ecran {
+  position: relative;
+  height: 100%;
+  background: var(--color-carte-fond);
+}
+
+.carte {
+  position: absolute;
+  inset: 0;
+}
+
+/* Invisible : sa largeur est la place du tiroir, que la carte observe pour se recentrer. */
+.placeDuTiroir {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--decalage-carte);
+  height: 0;
+  pointer-events: none;
+}
+
+.bandeau {
+  position: absolute;
+  top: var(--space-3);
+  left: calc(50% + var(--decalage-carte) / 2);
+  transition: left var(--duree-douce) var(--courbe-douce);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.inscription {
+  position: absolute;
+  top: 72px; /* sous la recherche, maquette 162:107 */
+  right: 0;
+  left: var(--decalage-carte);
+  transition: left var(--duree-douce) var(--courbe-douce);
+}
+
+/* Sous la recherche : la jauge d'énergie (maquette « Énergie — 1 »). L'inscription descend. */
+.sousLaRecherche {
+  position: absolute;
+  display: flex;
+  gap: var(--space-2);
+  top: 68px;
+  left: calc(24px + var(--decalage-carte));
+  z-index: 1;
+  transition: left var(--duree-douce) var(--courbe-douce);
+}
+
+.ecran[data-sous-la-recherche] .inscription {
+  top: 108px;
+}
+
+.rose {
+  position: absolute;
+  bottom: 20px; /* maquette 162:107 */
+  left: calc(22px + var(--decalage-carte));
+  transition: left var(--duree-douce) var(--courbe-douce);
+  width: 74px;
+  height: 74px;
+  pointer-events: none;
+}
+
+.position {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-sur-accent); /* maquette 162:129 : #fffaf2 */
+}
+
+.position img {
+  width: 22px;
+  height: 22px;
+}
+
+/* Avec le « + » : « Ma position » au-dessus de la mention OpenStreetMap, obligatoire. */
+.position[data-avec-ajouter] {
+  bottom: 40px;
+}
+
+/* Le « + » : le seul, en bas à droite, au-dessus de « Ma position » et centré sur elle (Uriel,
+   05/10 — « bien visible »). Un sceau de
+   cire : disque rouge de l'app, en relief (clair en haut, profond en bas), un fin anneau clair
+   comme le bord d'un cachet, le « + » couleur parchemin. */
+.ajouter {
+  position: absolute;
+  right: 19px;
+  bottom: 100px;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-rond);
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--color-accent) 80%, var(--color-sur-accent)),
+    var(--color-accent) 55%,
+    color-mix(in srgb, var(--color-accent) 75%, var(--color-ombre))
+  );
+  box-shadow:
+    inset 0 0 0 4px var(--color-accent),
+    inset 0 0 0 5px color-mix(in srgb, var(--color-sur-accent) 45%, transparent),
+    0 4px 14px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  cursor: pointer;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.ajouter:active {
+  scale: 0.92;
+}
+
+.ajouter img {
+  width: 26px;
+  height: 26px;
+}
+
+.message {
+  position: absolute;
+  right: 24px;
+  bottom: 170px; /* au-dessus du « + » et de « Ma position » */
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.haut {
+  position: absolute;
+  top: var(--space-3);
+  right: 24px;
+  left: calc(24px + var(--decalage-carte));
+  transition: left var(--duree-douce) var(--courbe-douce);
+  z-index: 2; /* ses résultats passent par-dessus la jauge et les Actifs, juste dessous */
+  display: flex;
+  gap: 10px; /* maquette 165:128 */
+}
+
+.filtre {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+}
+
+.filtre img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Un filtre actif : le bouton cerclé de rouge, qu'on n'oublie pas qu'une partie des lieux est
+   cachée. */
+.filtre[data-actif] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bandeau,
+  .inscription,
+  .rose,
+  .haut,
+  .sousLaRecherche,
+  .ajouter {
+    transition: none;
+  }
+}

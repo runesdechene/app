@@ -1,0 +1,195 @@
+/*
+ * QUOI     — toute la DA en variables : couleurs, polices, échelle de texte, espacements, formes.
+ * POURQUOI — source unique (décision 007). Stylelint refuse toute valeur visuelle ailleurs.
+ *            Valeurs relevées dans la maquette Figma « App v2 » le 27/09/2026 ; les ~25 nuances
+ *            de texte de la maquette sont fondues en 4 niveaux. Validées par Uriel sur /v2/da.
+ * ATTENTION — ajouter une valeur ici = la montrer sur /v2/da (src/app/da/). Un écart avec la
+ *            spec V2 §5 (la boutique) se tranche avec Uriel, jamais en silence.
+ */
+:root {
+  /* Fonds */
+  --color-fond: #fcf3e4;
+  --color-surface: #faedd7;
+  --color-barre: #f6e7cf;
+  --color-sable: #e7dcca;
+  --color-bord: #c9bcbc;
+
+  /* Texte, du plus fort au plus pâle */
+  --color-encre: #494841;
+  --color-texte: #594848;
+  --color-texte-doux: #857575;
+  --color-texte-pale: #ab9d9d;
+  --color-sur-accent: #fffaf2;
+
+  /* Accents */
+  --color-accent: #a94842;
+  --color-accent-clair: #e89f9f;
+  --color-onglet: #796f65; /* un onglet choisi et son trait (récit d'un Fragment, Figma 101:107) */
+  --color-onglet-ferme: #b8b3ad; /* un onglet verrouillé (« Ses énigmes ») */
+  --color-rose: #ebd2d2;
+  --color-ocre: #a89369;
+  --color-kaki: #46493c;
+  --color-vert: #9ab788;
+
+  /* Profil (maquette COMPTE 89:124, 27/09) */
+  --color-lien: #495cd4; /* @instagram */
+  --color-succes: #5c8f41; /* texte du badge « Client Runes de Chêne » */
+  --color-succes-fond: #d1f9dc;
+  --color-pastille: #f6e1c3; /* fond des titres portés */
+  --color-choisie: #f1dcc0; /* fond d'une pastille choisie (Modifier mon profil) */
+  --color-vignette: #ead3ad; /* bas du dégradé des cartes de Fragments : un parchemin doré (Figma 123:107) */
+  --color-brun: #9c7963; /* texte du bouton doux (« Envoyer un murmure ») */
+  --color-doux-fond: color-mix(in srgb, #ffead5 72%, transparent); /* fond du bouton doux */
+  --color-feuille: #fff9f0; /* la feuille « Ses découvertes » */
+  --color-ombre: #1f1a14; /* l'ombre des photos : un brun presque noir, jamais gris */
+
+  /* Désactivé — « Marquer ma visite (274 km trop loin) », maquette fiche lieu */
+  --color-desactive-fond: color-mix(in srgb, #ffead5 49%, transparent);
+  --color-desactive-bord: #e2c9b9;
+  --color-desactive-texte: #dbbfad;
+
+  /* La carte (spec Carte §2) : lues au démarrage par features/carte/lib/couleurs.ts */
+  --color-carte-fond: #ecdcbb;
+  --color-carte-eau: #bfc3ad;
+  --color-carte-route: #9c7c55;
+  --color-carte-encre: #3f3024;
+  --color-carte-halo: #f4e9d1;
+  --color-carte-foret: #b9b58a;
+  --color-carte-ombre: #5a442c8c; /* 55 % : MapLibre lit le hex, pas color-mix */
+  --color-carte-cire: #a94842; /* le sceau des énigmes : l'accent, en hex pour MapLibre */
+
+  /* La fiche d'un lieu (Figma 229:128, palette de la maquette du 19/08) */
+  --color-fiche-titre: #5c5151; /* le nom du lieu, « Le récit » */
+  --color-fiche-ligne: #786666; /* adresse, Explorateurs, revendication, faits */
+  --color-fiche-aide: #b39b9b; /* « Toucher l'adresse… », « depuis le… » */
+  --color-fiche-recit: #5c4545; /* foncé le 05/10 pour la lecture (avant #806262) */
+  --color-fiche-badge: #9b3f39; /* un type sans couleur */
+  --color-fiche-badge-texte: #fff; /* le texte et l'icône du type, en blanc (Uriel, 28/09) */
+  --color-fiche-fleche: #fff; /* les flèches posées sur les photos d'un lieu (02/10) */
+  --color-fiche-credit: #bc7f3b; /* « Luna », la date */
+  --color-fiche-credit-texte: #524d4d;
+  --color-fiche-credit-pale: #ccc4c4; /* « Image + Texte » */
+  --color-fiche-rond: #fbebd3; /* fond des boutons ronds, à 51 % */
+  --color-fiche-vignette: #937558; /* le cadre de la vignette choisie */
+  --color-fiche-lisiere: #fdf1e0; /* le bord déchiré : la teinte du fond à la jonction */
+  --color-accent-bord: #c96a6a; /* le filet du bouton rouge */
+  --color-pilule: #f6ead0; /* la pilule de revendication */
+  --color-pilule-texte: #5a4331;
+
+  /* La découverte d'un lieu (Figma 250:128-140) : le voile, sa déchirure, les confettis */
+  --color-voile: #eddbbd; /* le lavis de parchemin posé sur la photo floutée */
+  --color-voile-bord: #734d2e; /* les bords brunis du voile */
+  --color-dechirure: #fdf5e6; /* la lisière claire des fibres arrachées */
+  --color-confetti-or: #d4a84c;
+  --color-confetti-vert: #738c66;
+
+  /* Le Registre (Figma 45:278) : le canal « Bugs & suggestions » a sa couleur */
+  --color-canal-bugs: #c4baeb;
+  --color-canal-bugs-texte: #4f45a8;
+  --color-canal-activite: #ead9b4; /* « Activité » dans le Registre (05/10) */
+  --color-canal-activite-texte: #7d5a2c;
+  --color-ajoute: #38733f; /* ce qu'une version de fiche ajoute (05/10) */
+  --color-retire: #b8736b; /* ce qu'elle retire */
+
+  /* Polices */
+  --font-titre: 'Bebas Neue', sans-serif;
+  --font-corps: 'Cabin', sans-serif;
+  --font-condensee: 'Cabin Condensed', sans-serif;
+  --font-inscription: 'IM Fell English', serif; /* le nom du territoire sur la carte */
+  --weight-normal: 400;
+  --weight-semi: 600;
+  --weight-gras: 700;
+
+  /* Styles de texte — Bebas Neue */
+  --titre-ecran-size: 2rem;
+  --titre-section-size: 1.5rem;
+  --titre-carte-size: 1.25rem;
+  --rubrique-size: 1rem;
+  --surtitre-size: 0.875rem;
+  --titre-leading: 1.1;
+  --titre-tracking: 0.01em;
+
+  /* Tailles propres au profil (maquette COMPTE 89:124) */
+  --titre-detail-size: 1.375rem; /* « MON COMPTE », en tête d'un détail : 22 px */
+  --nom-profil-size: 2.25rem; /* le nom sous le portrait : 36 px (maquette 123:107) */
+  --rangee-size: 1.125rem; /* « Ses fragments », onglets des découvertes : 18 px */
+  --bio-size: 1rem; /* la présentation : 16 px (Uriel, 27/09 : deux points de plus) */
+  --recit-enigme-size: 0.9375rem; /* le récit d'une énigme, Cabin : 15 px (Figma 484:434) */
+  --recit-enigme-leading: 1.55; /* et son interligne large : 23 px */
+  --question-enigme-size: 1.3125rem; /* sa question, IM Fell : 21 px */
+  --question-apprise-size: 1.0625rem; /* la question d'une énigme résolue, dans « Les énigmes » : 17 px */
+  --bio-leading: 1.29;
+  --inscription-size: 1.875rem; /* le nom du territoire sur la carte : 30 px (maquette 200:192) */
+  --inscription-tracking: 0.02em;
+  --pilule-size: 0.6875rem; /* le nom sur une pilule de revendication : 11 px (Figma 229:188) */
+  --pilule-tracking: 0.08em;
+  --bandeau-tracking: 0.12em; /* « BOUTIQUE » sur la bannière de l'Accueil (rendu V1) */
+  --bandeau-titre-tracking: 0.04em; /* le titre de la bannière */
+
+  /* Styles de texte — Cabin */
+  --corps-size: 1rem;
+  --sous-titre-size: 0.875rem;
+  --flux-size: 0.8125rem;
+  --legende-size: 0.75rem;
+  --micro-size: 0.625rem;
+  --sceau-size: 3.5rem; /* le « ? » du voile d'un lieu inconnu (Figma 250:128) */
+  --fete-size: 2.5rem; /* le 🎉 de la récompense (250:140) */
+  --suivant-size: 1.875rem; /* « Suivant → » de l'onboarding : Bebas 30 px (Figma 94:142) */
+  --code-size: 2.875rem; /* les chiffres du code reçu par e-mail : Bebas 46 px (94:319) */
+  --explore-tracking: 0.45em; /* « E X P L O R E » sous le logo (94:107) */
+  --vitrine-surtitre-size: 1.625rem; /* « Porter l'Histoire » sur la vitrine : 26 px (314:146) */
+  --vitrine-surtitre-pc-size: 2.25rem; /* le même, sur ordinateur : 36 px (314:203) */
+  --vitrine-titre-pc-size: 4rem; /* « Explorer le monde », sur ordinateur : 64 px */
+  --vitrine-accroche-size: 1.1875rem; /* « Rejoins une confrérie… », sur ordinateur : 19 px */
+  --vitrine-phrase-size: 0.9375rem; /* « 3 473 hauts lieux… » : 15 px */
+  --vitrine-leading: 1.35; /* la phrase des chiffres et l'activité, sur la photo */
+  --corps-leading: 1.45;
+  --dense-leading: 1.25;
+  --carnet-leading: 24px; /* une ligne du carnet de l'ajout d'un lieu : le texte s'y pose */
+
+  /* Styles de texte — Cabin Condensed */
+  --libelle-size: 0.75rem;
+  --libelle-tracking: 0.03em;
+  --meta-size: 0.75rem;
+
+  /* Bouton */
+  --bouton-size: 0.875rem;
+  --bouton-tracking: 0.02em;
+
+  /* Espacements */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Formes */
+  --radius-vignette: 5px;
+  --radius-petit: 8px;
+  --radius: 10px;
+  --radius-carte: 15px;
+  --radius-feuille: 20px; /* la feuille « Ses découvertes » */
+  --radius-rond: 999px;
+  --ombre-bouton: 0 0 8px 5px color-mix(in srgb, var(--color-sable) 40%, transparent);
+
+  /* Coquille */
+  --tabbar-height: 85px;
+  --cible-tactile: 44px;
+  --barre-laterale: 88px; /* desktop : la barre verticale des onglets, comme la V1 */
+  --onglet-pc: 60px; /* desktop : la hauteur d'un onglet de la barre, et de son curseur */
+
+  /* Mouvement — toute l'application est animée (Uriel, 28/09 ; .claude/rules/v2.md) :
+     « douce » pour ce qui glisse ou apparaît, « élan » pour un choix qui se pose. */
+  --duree-douce: 0.32s;
+  --courbe-douce: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duree-elan: 0.38s;
+  --duree-envol: 0.9s; /* un cœur qui s'envole (le salut de l'Accueil) */
+  --duree-defile: 90s; /* un tour complet du défilé des natures, sur la vitrine */
+  --duree-activite: 5s; /* une activité de la vitrine : elle apparaît, reste, s'efface */
+  --courbe-elan: cubic-bezier(0.34, 1.4, 0.55, 1);
+  --hauteur-ecran: 100dvh; /* un écran d'onboarding : toute la page, ou toute la fenêtre sur la carte (PC) */
+  --tiroir: 420px; /* desktop : le tiroir, un peu plus large qu'une maquette de téléphone (390) */
+  --decalage-carte: 0px; /* desktop : la marge que la carte laisse au tiroir ouvert — posée par la coquille */
+  --background-attachment: fixed;
+}

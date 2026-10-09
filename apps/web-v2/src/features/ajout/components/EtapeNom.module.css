@@ -1,0 +1,222 @@
+/*
+ * QUOI     — l'étape « Nom, nature, époque » (maquette 291:146) : la photo en tête (un voile en
+ *            haut pour l'en-tête, la lisière de la fiche en bas — jamais un dégradé, Uriel 29/09),
+ *            le nom en Bebas, les puces de nature (une choisie : fond doré et bille numérotée à sa
+ *            couleur) et d'époque (une choisie : encre pleine).
+ */
+.nom {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+}
+
+.photo {
+  position: relative;
+  height: 250px;
+  background: var(--color-ombre);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-ombre) 60%, transparent),
+    transparent 45%
+  );
+}
+
+/* La lisière de la fiche : la découpe des sapins, à la teinte du parchemin. */
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  z-index: 1;
+  aspect-ratio: 1920 / 74;
+  background: var(--color-fond);
+  mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+}
+
+.corps {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6) var(--space-4);
+}
+
+.etiquette {
+  margin: var(--space-3) 0 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.champNom {
+  width: 100%;
+  padding: 0 0 var(--space-1);
+  border: none;
+  border-bottom: 1px solid var(--color-sable);
+  background: none;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  line-height: var(--titre-leading);
+  caret-color: var(--color-accent);
+}
+
+.champNom::placeholder {
+  color: var(--color-sable);
+}
+
+.champNom:focus {
+  border-bottom-color: var(--color-accent);
+  outline: none;
+}
+
+.aide {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+}
+
+.puces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.puce,
+.epoque {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    border-color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+/* Une nature s'ouvre sur sa bille : le bord gauche la serre. */
+.puce {
+  padding-left: 5px;
+}
+
+.puce:active,
+.epoque:active {
+  scale: 0.96;
+}
+
+.puce[aria-pressed='true'] {
+  border-color: var(--color-ocre);
+  background: var(--color-pastille);
+  color: var(--color-encre);
+  font-weight: var(--weight-gras);
+}
+
+.puce:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* La bille d'une nature choisie : sa couleur, son rang. Elle éclôt au choix. */
+.bille {
+  display: grid;
+  place-items: center;
+  width: 20px; /* la taille de BilleType : l'icône cède la place au rang sans saut */
+  height: 20px;
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-ocre));
+  color: var(--color-sur-accent);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  animation: eclore var(--duree-elan) var(--courbe-elan);
+}
+
+.epoque[aria-pressed='true'] {
+  border-color: var(--color-encre);
+  background: var(--color-encre);
+  color: var(--color-sur-accent);
+}
+
+.preciser {
+  justify-self: start;
+  margin-top: var(--space-2);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-ocre);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+}
+
+.annee {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.champAnnee {
+  width: 96px;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius);
+  background: var(--color-feuille);
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+.avant {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+}
+
+@keyframes eclore {
+  0% {
+    scale: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puce,
+  .epoque {
+    transition: none;
+  }
+
+  .bille {
+    animation: none;
+  }
+}

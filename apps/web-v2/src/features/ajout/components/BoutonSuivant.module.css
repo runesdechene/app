@@ -1,0 +1,55 @@
+/*
+ * QUOI     — le pied de chaque étape : la raison de l'attente en italique, puis le bouton rouge
+ *            pleine largeur (maquettes 291:146, 291:209, 293:146).
+ */
+.pied {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) var(--space-6);
+  background: linear-gradient(to bottom, transparent, var(--color-fond) 30%);
+}
+
+.manque {
+  margin: 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-style: italic;
+  text-align: center;
+}
+
+.bouton {
+  min-height: 54px;
+  border: none;
+  border-radius: var(--radius-carte);
+  background: var(--color-accent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+  cursor: pointer;
+  transition:
+    background-color var(--duree-douce) var(--courbe-douce),
+    scale var(--duree-elan) var(--courbe-elan);
+}
+
+.bouton:active {
+  scale: 0.98;
+}
+
+.bouton:disabled {
+  background: var(--color-desactive-bord);
+  cursor: default;
+  scale: 1;
+}
+
+.bouton[aria-busy] {
+  background: var(--color-accent);
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bouton {
+    transition: none;
+  }
+}

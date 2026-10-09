@@ -1,36 +1,9 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { SaveBar } from './SaveBar'
-
-type EnigmaType = 'daily' | 'place'
-type Difficulty = 'very_easy' | 'easy' | 'medium' | 'hard'
-type AnswerFormat = 'qcm' | 'free'
-
-interface Enigma {
-  id: number
-  type: EnigmaType
-  difficulty: Difficulty
-  theme: string | null
-  place_tag: string | null
-  lore_text: string
-  question: string
-  format: AnswerFormat
-  choices: string[] | null
-  answer: string
-  explanation: string
-  active: boolean
-  created_at: string
-}
-
-interface Theme {
-  id: string
-  label: string
-}
-
-interface Tag {
-  id: string
-  title: string
-}
+import { FormulaireEnigme } from './enigmes/FormulaireEnigme'
+import type { AnswerFormat, Difficulty, Enigma, EnigmaForm, EnigmaType, Tag, Theme } from './enigmes/types'
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   very_easy: 'Facile',
@@ -53,7 +26,7 @@ const TYPE_LABELS: Record<EnigmaType, string> = {
 
 const PER_PAGE = 20
 
-const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at'> = {
+const EMPTY_ENIGMA: EnigmaForm = {
   type: 'daily',
   difficulty: 'easy',
   theme: null,
@@ -63,6 +36,7 @@ const EMPTY_ENIGMA: Omit<Enigma, 'id' | 'created_at'> = {
   format: 'qcm',
   choices: ['', '', '', ''],
   answer: '',
+  accepted_answers: [],
   explanation: '',
   active: true,
 }
@@ -87,6 +61,7 @@ export function Enigmas() {
   // Editing
   const [editingId, setEditingId] = useState<number | 'new' | null>(null)
   const [editForm, setEditForm] = useState(EMPTY_ENIGMA)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   useEffect(() => {
     fetchData()
@@ -113,6 +88,7 @@ export function Enigmas() {
           format: (e.format as AnswerFormat) || 'qcm',
           choices: (e.choices as string[] | null) ?? null,
           answer: String(e.answer ?? ''),
+          accepted_answers: Array.isArray(e.accepted_answers) ? (e.accepted_answers as string[]) : [],
           explanation: String(e.explanation ?? ''),
           active: Boolean(e.active),
           created_at: String(e.created_at ?? ''),
@@ -183,10 +159,20 @@ export function Enigmas() {
       format: enigma.format,
       choices: enigma.choices ? [...enigma.choices] : ['', '', '', ''],
       answer: enigma.answer,
+      accepted_answers: [...enigma.accepted_answers],
       explanation: enigma.explanation,
       active: enigma.active,
     })
   }
+
+  // « Modifier l'énigme » depuis les énigmes signalées : /carte/enigmes?edit=242.
+  useEffect(() => {
+    const id = Number(searchParams.get('edit'))
+    const enigma = enigmas.find(e => e.id === id)
+    if (!enigma) return
+    startEdit(enigma)
+    setSearchParams({}, { replace: true })
+  }, [enigmas])
 
   function startCreate() {
     setEditingId('new')
@@ -196,28 +182,6 @@ export function Enigmas() {
   function cancelEdit() {
     setEditingId(null)
     setSaveError(null)
-  }
-
-  function updateChoice(idx: number, value: string) {
-    setEditForm(prev => {
-      const choices = [...(prev.choices || ['', '', '', ''])]
-      choices[idx] = value
-      return { ...prev, choices }
-    })
-  }
-
-  function addChoice() {
-    setEditForm(prev => ({
-      ...prev,
-      choices: [...(prev.choices || []), ''],
-    }))
-  }
-
-  function removeChoice(idx: number) {
-    setEditForm(prev => ({
-      ...prev,
-      choices: (prev.choices || []).filter((_, i) => i !== idx),
-    }))
   }
 
   async function handleSaveForm() {
@@ -236,6 +200,9 @@ export function Enigmas() {
           ? (editForm.choices || []).filter(c => c.trim())
           : null,
         answer: editForm.answer,
+        accepted_answers: editForm.format === 'free'
+          ? editForm.accepted_answers.map(a => a.trim()).filter(Boolean)
+          : [],
         explanation: editForm.explanation,
         active: editForm.active,
       }
@@ -330,152 +297,7 @@ export function Enigmas() {
           <div style={{ color: '#ef4444', marginBottom: 12 }}>{saveError}</div>
         )}
 
-        <div className="divers-card" style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-            <label className="settings-global-field">
-              <span>Type</span>
-              <select
-                value={editForm.type}
-                onChange={e => setEditForm(prev => ({ ...prev, type: e.target.value as EnigmaType }))}
-                className="settings-input"
-              >
-                <option value="daily">Quotidienne</option>
-                <option value="place">De lieu</option>
-              </select>
-            </label>
-            <label className="settings-global-field">
-              <span>Difficulte</span>
-              <select
-                value={editForm.difficulty}
-                onChange={e => setEditForm(prev => ({ ...prev, difficulty: e.target.value as Difficulty }))}
-                className="settings-input"
-              >
-                <option value="very_easy">Très facile</option>
-                <option value="easy">Facile</option>
-                <option value="medium">Moyen</option>
-                <option value="hard">Difficile</option>
-              </select>
-            </label>
-            <label className="settings-global-field">
-              <span>Thème</span>
-              <select
-                value={editForm.theme || ''}
-                onChange={e => setEditForm(prev => ({ ...prev, theme: e.target.value || null }))}
-                className="settings-input"
-              >
-                <option value="">Aucun (universel)</option>
-                {themes.map(t => (
-                  <option key={t.id} value={t.id}>{t.label}</option>
-                ))}
-              </select>
-            </label>
-            <label className="settings-global-field">
-              <span>Tag de lieu</span>
-              <select
-                value={editForm.place_tag || ''}
-                onChange={e => setEditForm(prev => ({ ...prev, place_tag: e.target.value || null }))}
-                className="settings-input"
-              >
-                <option value="">Aucun</option>
-                {tags.map(t => (
-                  <option key={t.id} value={t.id}>{t.title}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="faction-field" style={{ marginBottom: 12 }}>
-            <label className="faction-field-label">Texte narratif (lore)</label>
-            <textarea
-              value={editForm.lore_text}
-              onChange={e => setEditForm(prev => ({ ...prev, lore_text: e.target.value }))}
-              className="faction-description-input"
-              rows={3}
-              placeholder="Un peu de contexte historique ou narratif..."
-            />
-          </div>
-
-          <div className="faction-field" style={{ marginBottom: 12 }}>
-            <label className="faction-field-label">Question</label>
-            <textarea
-              value={editForm.question}
-              onChange={e => setEditForm(prev => ({ ...prev, question: e.target.value }))}
-              className="faction-description-input"
-              rows={2}
-              placeholder="La question posee au joueur..."
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-            <label className="settings-global-field">
-              <span>Format de reponse</span>
-              <select
-                value={editForm.format}
-                onChange={e => setEditForm(prev => ({ ...prev, format: e.target.value as AnswerFormat }))}
-                className="settings-input"
-              >
-                <option value="qcm">QCM</option>
-                <option value="free">Libre</option>
-              </select>
-            </label>
-          </div>
-
-          {editForm.format === 'qcm' && (
-            <div className="faction-field" style={{ marginBottom: 12 }}>
-              <label className="faction-field-label">Choix</label>
-              {(editForm.choices || []).map((choice, idx) => (
-                <div key={idx} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-                  <input
-                    type="text"
-                    value={choice}
-                    onChange={e => updateChoice(idx, e.target.value)}
-                    className="faction-title-input"
-                    placeholder={`Choix ${idx + 1}`}
-                  />
-                  {(editForm.choices || []).length > 2 && (
-                    <button className="btn-danger" onClick={() => removeChoice(idx)} title="Supprimer">
-                      &times;
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button className="btn-secondary" onClick={addChoice} style={{ marginTop: 4 }}>
-                + Ajouter un choix
-              </button>
-            </div>
-          )}
-
-          <div className="faction-field" style={{ marginBottom: 12 }}>
-            <label className="faction-field-label">Reponse correcte</label>
-            <input
-              type="text"
-              value={editForm.answer}
-              onChange={e => setEditForm(prev => ({ ...prev, answer: e.target.value }))}
-              className="faction-title-input"
-              placeholder="La bonne reponse..."
-            />
-          </div>
-
-          <div className="faction-field" style={{ marginBottom: 12 }}>
-            <label className="faction-field-label">Explication</label>
-            <textarea
-              value={editForm.explanation}
-              onChange={e => setEditForm(prev => ({ ...prev, explanation: e.target.value }))}
-              className="faction-description-input"
-              rows={2}
-              placeholder="Pourquoi cette reponse est correcte..."
-            />
-          </div>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={editForm.active}
-              onChange={e => setEditForm(prev => ({ ...prev, active: e.target.checked }))}
-            />
-            <span>Active</span>
-          </label>
-        </div>
+        <FormulaireEnigme form={editForm} setForm={setEditForm} themes={themes} tags={tags} />
 
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn-primary" onClick={handleSaveForm} disabled={saving}>

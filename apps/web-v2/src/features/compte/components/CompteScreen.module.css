@@ -1,0 +1,24 @@
+/*
+ * QUOI     — l'onglet Compte : les badges en haut à droite, puis le profil.
+ */
+.compte {
+  position: relative;
+  display: grid;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.badges {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-3);
+  z-index: 1;
+}
+
+/* Sur PC, sans l'en-tête du téléphone, le portrait touchait le haut du tiroir : ~50 px d'air
+   au-dessus (Uriel, 28/09). */
+@container app (width >= 1024px) {
+  .compte {
+    padding-top: calc(var(--space-8) + var(--space-4));
+  }
+}

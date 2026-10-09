@@ -1,0 +1,80 @@
+/*
+ * QUOI     — voile encre à 35 %, panneau parchemin aux coins hauts arrondis, poignée sable ;
+ *            sur PC, le panneau apparaît au centre de l'écran (Uriel, 28/09).
+ * POURQUOI — `position: absolute` et non `fixed` : la feuille reste dans la coquille (et dans
+ *            les faux téléphones de /v2/da), qui est son conteneur positionné.
+ */
+.feuille {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.voile {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-encre) 35%, transparent);
+}
+
+.panneau {
+  position: relative;
+  align-self: center;
+  width: min(100%, 480px); /* sur grand écran, la feuille ne traverse pas tout l'écran */
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-carte) var(--radius-carte) 0 0;
+  background: var(--color-fond);
+  outline: none;
+  animation: monte 0.2s ease-out;
+}
+
+.poignee {
+  justify-self: center;
+  width: 34px;
+  height: 5px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--color-sable);
+}
+
+@keyframes monte {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panneau {
+    animation: none;
+  }
+}
+
+/* Sur PC : au centre de l'écran, par-dessus toute l'app, sans poignée (rien à tirer). */
+@container app (width >= 1024px) {
+  .feuille {
+    justify-content: center;
+  }
+
+  .panneau {
+    padding-bottom: var(--space-6);
+    border-radius: var(--radius-carte);
+    animation-name: paraitre;
+    animation-duration: var(--duree-douce);
+    animation-timing-function: var(--courbe-douce);
+  }
+
+  .poignee {
+    display: none;
+  }
+}
+
+@keyframes paraitre {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}

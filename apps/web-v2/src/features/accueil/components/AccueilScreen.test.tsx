@@ -1,0 +1,323 @@
+/**
+ * QUOI     — l'Accueil (maquette 27:2) : les lieux ajoutés ouvrent leur fiche, le fil dit qui a
+ *            fait quoi, et l'on y salue.
+ */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { createMemoryRouter, RouterProvider } from 'react-router'
+import { beforeEach, expect, test, vi } from 'vitest'
+import { AccueilScreen } from './AccueilScreen'
+import { PageChemins } from './PageChemins'
+
+const api = vi.hoisted(() => ({
+  fetchBanniere: vi.fn(),
+  fetchAjoutes: vi.fn(),
+  fetchPresDeMoi: vi.fn(),
+  fetchGrandsExplorateurs: vi.fn(),
+  fetchChemins: vi.fn(),
+  saluer: vi.fn(),
+}))
+vi.mock('../api/accueil', () => api)
+
+// La position du téléphone : accordée, sauf là où un test la refuse.
+const position = vi.hoisted(() => ({ positionSiAutorisee: vi.fn() }))
+vi.mock('@/shared/lib/position', () => position)
+
+const LUNA = { id: 'u2', nom: 'Luna', avatar: null }
+const VISITE = {
+  id: 'visite:l1:u2',
+  type: 'visite',
+  quand: new Date().toISOString(),
+  qui: LUNA,
+  lieu: { id: 'l1', nom: 'Pointe du Becquet', region: 'Manche' },
+  moi: false,
+  saluts: 2,
+  salue: false,
+}
+
+beforeEach(() => {
+  api.fetchBanniere.mockResolvedValue({
+    image: 'celtes.jpg',
+    titre: 'Les Mystères Celtes',
+    sousTitre: 'Au cœur de la première Europe',
+    lien: 'https://runesdechene.com/celtes',
+    voile: { couleur: '#e3d5b1', opacite: 0.85 },
+    couleurs: { tag: '#3b4a78', titre: '#5b4949', sousTitre: '#69604f' },
+    ombre: { couleur: '#000000', force: 0 },
+  })
+  api.fetchAjoutes.mockResolvedValue([
+    {
+      id: 'l9',
+      nom: 'Château de Jonjeac',
+      imageUrl: null,
+      latitude: null,
+      longitude: null,
+      categorie: null,
+      auteur: { nom: 'Luna', avatarUrl: null },
+    },
+  ])
+  api.fetchChemins.mockResolvedValue([
+    VISITE,
+    {
+      ...VISITE,
+      id: 'ajout:l3',
+      type: 'ajout',
+      moi: true,
+      qui: { ...LUNA, id: 'u1', nom: 'Uriel' },
+      lieu: { id: 'l3', nom: 'Menhir de Kerloas', region: 'Finistère' },
+    },
+    {
+      ...VISITE,
+      id: 'revendication:l3:u6:1',
+      type: 'revendication',
+      qui: { ...LUNA, id: 'u6', nom: 'Mathéo' },
+      saluts: 0,
+    },
+    {
+      ...VISITE,
+      id: 'arrivee:u4',
+      type: 'arrivee',
+      qui: { ...LUNA, id: 'u4', nom: 'Claire' },
+      lieu: null,
+    },
+    {
+      ...VISITE,
+      id: 'enrichi:l3:u7:1',
+      type: 'enrichi',
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+    },
+  ])
+  api.saluer.mockResolvedValue({ saluts: 3, salue: true })
+  position.positionSiAutorisee.mockResolvedValue({ latitude: 48.1, longitude: -1.6 })
+  api.fetchGrandsExplorateurs.mockResolvedValue({ tete: [], moi: null, dixieme: null })
+  api.fetchPresDeMoi.mockResolvedValue([
+    {
+      id: 'l7',
+      nom: 'Dolmen de la Roche-aux-Fées',
+      imageUrl: 'd.jpg',
+      type: { nom: 'Mégalithe', icone: 'm.svg', couleur: '#80974e' },
+      metres: 4200,
+    },
+  ])
+})
+
+function monter() {
+  const router = createMemoryRouter([{ path: '*', element: <AccueilScreen /> }], {
+    initialEntries: ['/accueil'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  return router
+}
+
+test('une bannière de la boutique, tirée au hasard, mène à la boutique', async () => {
+  monter()
+  const banniere = await screen.findByRole('link', { name: /Les Mystères Celtes/ })
+  expect(banniere).toHaveAttribute('href', 'https://runesdechene.com/celtes')
+  expect(banniere).toHaveTextContent('Boutique')
+  expect(banniere).toHaveTextContent('Au cœur de la première Europe')
+})
+
+test('un lieu ajouté récemment ouvre sa fiche dans l’Accueil', async () => {
+  const router = monter()
+  await userEvent.click(await screen.findByRole('link', { name: /Château de Jonjeac/ }))
+  expect(router.state.location.pathname).toBe('/accueil/lieu/l9')
+})
+
+test('le fil dit qui a fait quoi, où et quand', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [visite, ajout, revendication] = within(fil).getAllByRole('listitem')
+  expect(visite).toHaveTextContent('Luna a visité Pointe du Becquet')
+  expect(visite).toHaveTextContent('Manche, à l’instant')
+  expect(ajout).toHaveTextContent('Uriel a ajouté Menhir de Kerloas')
+  expect(revendication).toHaveTextContent('Mathéo vient de revendiquer Pointe du Becquet')
+})
+
+test('une arrivée se dit dans le fil, sans lien de bienvenue', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const arrivee = within(fil)
+    .getByText(/a rejoint EXPLORE/)
+    .closest('li')
+  if (!arrivee) throw new Error('ligne absente')
+  expect(arrivee).toHaveTextContent('Claire a rejoint EXPLORE !')
+  expect(within(arrivee).queryByRole('link', { name: /bienvenue/ })).toBeNull()
+})
+
+test('un récit enrichi se dit aussi', async () => {
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'enrichi:l3:u7:1', type: 'enrichi', qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getByRole('listitem')).toHaveTextContent('Aelis a enrichi Pointe du Becquet')
+})
+
+test('une énigme percée se dit avec sa culture, jamais sa réponse ; la culture mène à « Les énigmes »', async () => {
+  const romaine = { id: 'romaine', nom: 'Romaine', couleur: '#a94842', icone: null }
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'enigme:u7:a', type: 'enigme', lieu: null, culture: romaine, nombre: 1, qui: { ...LUNA, id: 'u7', nom: 'Aelis' } },
+    { ...VISITE, id: 'enigme:u8:a', type: 'enigme', lieu: null, culture: romaine, nombre: 3, qui: { ...LUNA, id: 'u8', nom: 'Mathéo' } },
+  ])
+  const router = monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [une, trois] = within(fil).getAllByRole('listitem')
+  expect(une).toHaveTextContent('Aelis a percé une énigme · Romaine')
+  expect(trois).toHaveTextContent('Mathéo a percé 3 énigmes · Romaine')
+  if (!une) throw new Error('ligne absente')
+  await userEvent.click(within(une).getByRole('link', { name: 'Romaine' }))
+  expect(router.state.location.pathname).toBe('/accueil/enigmes/romaine')
+})
+
+test('on salue la ligne d’un autre ; la sienne ne se salue pas', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [visite, ajout] = within(fil).getAllByRole('listitem')
+  if (!visite || !ajout) throw new Error('lignes absentes')
+  const saluer = within(visite).getByRole('button', { name: /Saluer Luna/ })
+  expect(saluer).toHaveAttribute('aria-pressed', 'false')
+  // Le fil relu après le salut : la base compte le cœur.
+  api.fetchChemins.mockResolvedValue([{ ...VISITE, saluts: 3, salue: true }])
+  await userEvent.click(saluer)
+  expect(api.saluer).toHaveBeenCalledWith('visite:l1:u2')
+  expect(await within(visite).findByRole('button', { name: /Saluer Luna/ })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  expect(within(ajout).queryByRole('button')).toBeNull()
+})
+
+test('le fil montre cinq lignes ; « Voir toute l’activité » ouvre le fil dans l’Accueil', async () => {
+  api.fetchChemins.mockResolvedValue(
+    Array.from({ length: 8 }, (_, i) => ({ ...VISITE, id: `visite:l${String(i)}:u2` })),
+  )
+  const router = monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getAllByRole('listitem')).toHaveLength(5)
+  await userEvent.click(screen.getByRole('link', { name: 'Voir toute l’activité' }))
+  expect(router.state.location.pathname).toBe('/accueil/chemins')
+})
+
+test('la page du fil : toute l’activité, et l’on y salue', async () => {
+  api.fetchChemins.mockResolvedValue(
+    Array.from({ length: 8 }, (_, i) => ({ ...VISITE, id: `visite:l${String(i)}:u2` })),
+  )
+  const router = createMemoryRouter([{ path: '*', element: <PageChemins /> }], {
+    initialEntries: ['/accueil/chemins'],
+  })
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  )
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getAllByRole('listitem')).toHaveLength(8)
+  await userEvent.click(
+    within(fil).getAllByRole('button', { name: /Saluer Luna/ })[0] as HTMLElement,
+  )
+  expect(api.saluer).toHaveBeenCalledWith('visite:l0:u2')
+})
+
+test('sans salut, le cœur est seul : pas de « 0 »', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const revendication = within(fil).getAllByRole('listitem')[2]
+  if (!revendication) throw new Error('ligne absente')
+  expect(within(revendication).getByRole('button', { name: /Saluer Mathéo/ })).toHaveTextContent(
+    /^$/,
+  )
+})
+
+test('on salue à volonté : chaque toucher envoie un cœur, et en fait s’envoler un', async () => {
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const visite = within(fil).getAllByRole('listitem')[0]
+  if (!visite) throw new Error('ligne absente')
+  const saluer = within(visite).getByRole('button', { name: /Saluer Luna/ })
+  await userEvent.click(saluer)
+  await userEvent.click(saluer)
+  await userEvent.click(saluer)
+  expect(api.saluer).toHaveBeenCalledTimes(3)
+  expect(saluer.querySelectorAll('[data-envol]')).toHaveLength(3)
+})
+
+test('un lieu ajouté porte la bille de son type, dans sa couleur', async () => {
+  api.fetchChemins.mockResolvedValue([
+    {
+      ...VISITE,
+      id: 'ajout:l3',
+      type: 'ajout',
+      lieu: {
+        id: 'l3',
+        nom: 'Menhir de Kerloas',
+        region: 'Finistère',
+        type: { icone: 'menhir.svg', couleur: '#80974e' },
+      },
+    },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const bille = fil.querySelector<HTMLElement>('[data-bille-type]')
+  if (!bille) throw new Error('bille du type absente')
+  expect(bille.style.getPropertyValue('--type')).toBe('#80974e')
+})
+
+test('près de toi : les lieux proches, leur type et leur distance ; un lieu ouvre sa fiche', async () => {
+  const router = monter()
+  const pres = await screen.findByRole('list', { name: 'À explorer près de toi' })
+  expect(pres).toHaveTextContent('Dolmen de la Roche-aux-Fées')
+  expect(pres).toHaveTextContent('Mégalithe')
+  expect(pres).toHaveTextContent('4 km')
+  expect(pres.querySelector('[data-bille-type]')).not.toBeNull()
+  expect(api.fetchPresDeMoi).toHaveBeenCalledWith({ latitude: 48.1, longitude: -1.6 })
+  await userEvent.click(within(pres).getByRole('link', { name: /Dolmen/ }))
+  expect(router.state.location.pathname).toBe('/accueil/lieu/l7')
+})
+
+test('sans position partagée, pas de « Près de toi »', async () => {
+  position.positionSiAutorisee.mockResolvedValue(null)
+  monter()
+  await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(screen.queryByRole('list', { name: 'À explorer près de toi' })).toBeNull()
+  expect(api.fetchPresDeMoi).not.toHaveBeenCalled()
+})
+
+test('fonder et rejoindre une Compagnie se disent ; son nom ouvre sa fiche dans l’Accueil', async () => {
+  const lys = { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'fondation:f-lys:u1', type: 'fondation', lieu: null, compagnie: lys },
+    {
+      ...VISITE,
+      id: 'adhesion:f-lys:u7',
+      type: 'adhesion',
+      qui: { ...LUNA, id: 'u7', nom: 'Aelis' },
+      lieu: null,
+      compagnie: lys,
+    },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  const [fondation, adhesion] = within(fil).getAllByRole('listitem')
+  expect(fondation).toHaveTextContent('Luna a fondé Le Lys de Fer')
+  expect(adhesion).toHaveTextContent('Aelis a rejoint Le Lys de Fer')
+  expect(
+    within(fondation as HTMLElement).getByRole('link', { name: 'Le Lys de Fer' }),
+  ).toHaveAttribute('href', '/accueil/compagnie/f-lys')
+})
+
+test('une revendication pour une Compagnie la nomme', async () => {
+  const lys = { id: 'f-lys', nom: 'Le Lys de Fer', couleur: '#5f6f86' }
+  api.fetchChemins.mockResolvedValue([
+    { ...VISITE, id: 'revendication:l1:u2:1', type: 'revendication', compagnie: lys },
+  ])
+  monter()
+  const fil = await screen.findByRole('list', { name: 'Sur les chemins' })
+  expect(within(fil).getByRole('listitem')).toHaveTextContent(
+    'Luna vient de revendiquer Pointe du Becquet pour Le Lys de Fer',
+  )
+})

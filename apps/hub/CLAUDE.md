@@ -33,6 +33,13 @@ cd apps/hub && netlify deploy --prod --dir "$PWD/dist" --functions "$PWD/netlify
 
 Toujours requêter par **email** (pas par id), voir `docs/db/auth.md`.
 
+## Cultures des énigmes
+
+`/carte/cultures` (`components/cultures/`) : icône (bucket `tag-icons`, dossier `cultures/`), couleur,
+complément de titre et zone (autant de cercles qu'on veut, de 5 km à 1 000 km, tirés à égalité — migration 444) de chaque culture, plus les « ? »
+éveillés. Écriture par la RPC `enregistrer_culture` (admins), lecture par `cultures_du_hub` (migration
+441, spec `docs/superpowers/specs/2026-10-07-v2-enigmes-design.md`).
+
 ## Vues de monitoring V0.7 phase 5
 
 `Divers.tsx` héberge la section **Bascules récentes** (V0.7 phase 5, 5 mai 2026) :

@@ -1,0 +1,230 @@
+/*
+ * QUOI     — la découverte d'un lieu, pleine page (le tiroir sur PC) : la photo au fond, le voile
+ *            par-dessus, la consigne au centre, « Découvrir » discret en bas ; puis la récompense
+ *            sur la photo nette (maquettes 250:128, 250:134, 250:140).
+ * ATTENTION — `--rang` (l'ordre d'un confetti), `--avant` et `--mesure` (la jauge) arrivent en
+ *            style inline.
+ */
+.decouverte {
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-ombre);
+}
+
+.photo,
+.sansPhoto,
+.voile,
+.arrache {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.sansPhoto {
+  background:
+    url('../../../assets/ui/fond-fiche.webp') center / cover,
+    var(--color-fond);
+}
+
+/* Le voile : on le gratte au doigt, et à la souris en passant (sans clic). */
+.voile {
+  touch-action: none;
+  cursor: grab;
+}
+
+/* Passé la moitié, ce qui reste s'arrache d'un coup et s'envole. */
+.arrache {
+  pointer-events: none;
+  animation: senvoler 0.7s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+/* La consigne, au centre ; elle s'efface dès que le doigt se pose. */
+.consigne,
+.consigneEffacee {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  color: var(--color-sur-accent);
+  text-align: center;
+  text-shadow: 0 1px 8px color-mix(in srgb, var(--color-ombre) 60%, transparent);
+  pointer-events: none;
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+}
+
+.consigneEffacee {
+  opacity: 0;
+}
+
+.inconnu {
+  margin: 0;
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--titre-tracking);
+}
+
+.sceau {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border: 3px solid color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+  border-radius: var(--radius-rond);
+  font-family: var(--font-titre);
+  font-size: var(--sceau-size);
+  line-height: 1;
+}
+
+.phrase {
+  margin: 0;
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+}
+
+/* Au doigt ou à la souris : la phrase suit l'appareil. */
+.aLaSouris {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .auDoigt {
+    display: none;
+  }
+
+  .aLaSouris {
+    display: inline;
+  }
+}
+
+/* Le prix (maquettes « Énergie — 2 à 4 ») : une gélule de verre sous la consigne. */
+.prix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-sur-accent) 50%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 32%, transparent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-shadow: none;
+  backdrop-filter: blur(6px);
+  transition: opacity var(--duree-douce) var(--courbe-douce);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+.prix strong {
+  font-weight: var(--weight-gras);
+}
+
+.eclair {
+  width: 10px;
+  height: 15px;
+  background: var(--color-sur-accent);
+  mask: url('../../../assets/ui/eclair.svg') center / contain no-repeat;
+}
+
+.precision {
+  max-width: 300px;
+  font-family: var(--font-condensee);
+  font-size: var(--sous-titre-size);
+  opacity: 0.9;
+}
+
+.maPosition {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-decoration: underline;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Pas assez d'énergie : le sceau pâlit, le geste est fermé. */
+.consigne[data-terne] .sceau,
+.consigne[data-terne] .inconnu {
+  opacity: 0.4;
+}
+
+/* « Découvrir » : pour qui ne gratte pas. Discret, en bas. */
+.decouvrir {
+  position: absolute;
+  bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  min-height: var(--cible-tactile);
+  padding: 0 var(--space-6);
+  border: 1px solid color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+  border-radius: var(--radius-rond);
+  background: color-mix(in srgb, var(--color-ombre) 25%, transparent);
+  color: var(--color-sur-accent);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-gras);
+  backdrop-filter: blur(4px);
+}
+
+.decouvrir:disabled {
+  opacity: 0.45;
+}
+
+.echec {
+  position: absolute;
+  inset: auto var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-petit);
+  background: var(--color-fond);
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  text-align: center;
+}
+
+.reessayer {
+  border: none;
+  background: none;
+  color: var(--color-encre);
+  font: inherit;
+  font-weight: var(--weight-gras);
+  text-decoration: underline;
+}
+
+@keyframes senvoler {
+  to {
+    opacity: 0;
+    translate: 0 -12%;
+    rotate: -4deg;
+    scale: 1.08;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrache {
+    animation: none;
+  }
+
+  .consigne,
+  .consigneEffacee {
+    transition: none;
+  }
+}

@@ -1,0 +1,33 @@
+/*
+ * QUOI     — deux petits badges arrondis : vert pour « Client Runes de Chêne », sable pour le rôle.
+ */
+.verifie,
+.role {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 25px;
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  white-space: nowrap;
+}
+
+.verifie {
+  background: var(--color-succes-fond);
+  color: var(--color-succes);
+}
+
+.role {
+  background: var(--color-barre);
+  color: var(--color-accent);
+}
+
+.explication {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}

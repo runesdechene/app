@@ -1,0 +1,87 @@
+/*
+ * QUOI     — cartes crème bordées, lignes séparées d'un filet ; titre en Cabin semi-gras,
+ *            description en légende (maquette 91:166).
+ */
+.page {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6) var(--space-8);
+  text-align: center;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.carte {
+  display: grid;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* maquette 91:166 */
+  width: 100%;
+  min-height: var(--cible-tactile);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: none;
+  color: var(--color-texte-doux);
+  text-align: left;
+  text-decoration: none;
+}
+
+.carte > * + * {
+  border-top: 1px solid color-mix(in srgb, var(--color-bord) 60%, transparent);
+}
+
+.icone {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.texte {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+}
+
+.titre {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.description {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}
+
+.changement {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.alerte {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  font-weight: var(--weight-semi);
+}

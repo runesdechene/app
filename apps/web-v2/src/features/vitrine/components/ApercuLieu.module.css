@@ -1,0 +1,195 @@
+/*
+ * QUOI     — l'aperçu d'un lieu, dans les habits de sa fiche (229:128) : la photo et son bord
+ *            déchiré, le parchemin, le nom en Bebas, la pastille de la nature ; le récit s'efface
+ *            dans le parchemin quand il a une suite ; l'invitation au bas. La fenêtre qui la porte
+ *            (sur la carte) vit dans app/routes/vitrine.
+ * ATTENTION — la couleur de la nature et son icône arrivent en variables inline (`--type`,
+ *            `--icone`), la seule forme de style inline autorisée.
+ */
+.apercu {
+  display: grid;
+  background: var(--color-fond);
+}
+
+.photo {
+  position: relative;
+  aspect-ratio: 440 / 320;
+  overflow: hidden;
+  background: var(--color-sable);
+}
+
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-ombre) 49%, transparent),
+    transparent 39%
+  );
+  pointer-events: none;
+}
+
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  z-index: 1;
+  aspect-ratio: 1920 / 74;
+  background: var(--color-fond);
+  mask: url('../../../assets/ui/barre-lisiere.png') bottom center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: apparaitre var(--duree-douce) var(--courbe-douce);
+}
+
+.fermer {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2;
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  background: var(--color-sur-accent);
+  mask: url('../../../assets/ui/croix.svg') center / 22px no-repeat;
+}
+
+.corps {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-3) 25px var(--space-6);
+}
+
+.nom {
+  margin: 0;
+  color: var(--color-fiche-titre);
+  font-family: var(--font-titre);
+  font-size: var(--nom-profil-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.badge {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  min-height: 26px;
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-fiche-badge-texte);
+  font-family: var(--font-condensee);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-gras);
+}
+
+.badgeIcone {
+  width: 16px;
+  height: 16px;
+  background: var(--color-fiche-badge-texte);
+  mask: var(--icone) center / contain no-repeat;
+}
+
+.faits {
+  margin: 0;
+  color: var(--color-fiche-ligne);
+  font-family: var(--font-condensee);
+  font-size: var(--flux-size);
+}
+
+.recit {
+  margin: var(--space-2) 0 0;
+  color: var(--color-fiche-recit);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  white-space: pre-line;
+}
+
+/* Le récit continue : ses dernières lignes s'effacent dans le parchemin. */
+.recit[data-suite] {
+  mask: linear-gradient(to bottom, var(--color-encre) 45%, transparent);
+}
+
+.invitation {
+  display: grid;
+  gap: 6px;
+  margin-top: var(--space-4);
+}
+
+.promesse {
+  margin: 0 0 var(--space-2);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  line-height: var(--corps-leading);
+  text-align: center;
+}
+
+.rejoindre {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  border: 2px solid var(--color-accent-clair);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  box-shadow: var(--ombre-bouton);
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bouton-tracking);
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.rejoindre:active {
+  scale: 0.98;
+}
+
+.connecter,
+.retour {
+  display: grid;
+  place-items: center;
+  min-height: var(--cible-tactile);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+  text-decoration: underline;
+}
+
+.absent {
+  margin: var(--space-8) 0 0;
+  color: var(--color-fiche-titre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  text-align: center;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    animation: none;
+  }
+
+  .rejoindre {
+    transition: none;
+  }
+}

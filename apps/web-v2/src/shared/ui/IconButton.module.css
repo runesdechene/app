@@ -1,0 +1,18 @@
+/*
+ * QUOI     — bouton-icône rond, 44 px de cible tactile (la maquette dessine 36 px).
+ */
+.bouton {
+  width: var(--cible-tactile);
+  height: var(--cible-tactile);
+  display: inline-grid;
+  place-content: center;
+  padding: 0;
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-rond);
+  background: var(--color-surface);
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+}

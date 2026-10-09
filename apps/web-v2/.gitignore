@@ -1,0 +1,3 @@
+# QUOI — fichiers générés propres à la V2, jamais versionnés.
+*.tsbuildinfo
+dev-dist/

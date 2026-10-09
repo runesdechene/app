@@ -1,0 +1,72 @@
+/*
+ * QUOI     — libellé Bebas Neue, champ crème arrondi, pied en légende avec le compteur à droite.
+ */
+.champ {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.libelle {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rubrique-size);
+  letter-spacing: var(--titre-tracking);
+}
+
+.saisie {
+  width: 100%;
+  min-height: var(--cible-tactile);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-bord);
+  border-radius: var(--radius-carte);
+  background: color-mix(in srgb, var(--color-sur-accent) 55%, transparent);
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  line-height: var(--corps-leading);
+  resize: none;
+  field-sizing: content; /* la présentation s'affiche en entier, sans ascenseur (maquette 91:107) */
+}
+
+.cadre {
+  position: relative;
+}
+
+.icone {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  width: 18px;
+  height: 18px;
+  translate: 0 -50%;
+}
+
+.avecIcone {
+  padding-left: calc(var(--space-4) + 18px + 10px);
+}
+
+.saisie:focus-visible {
+  outline: 2px solid var(--color-ocre);
+  outline-offset: 1px;
+}
+
+.pied {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+}
+
+.compteur,
+.plein {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.plein {
+  color: var(--color-accent);
+  font-weight: var(--weight-gras);
+}

@@ -19,16 +19,23 @@ import { ShopifyUnlocks } from './components/ShopifyUnlocks'
 import { Ads } from './components/Ads'
 import { Banners } from './components/Banners'
 import { Enigmas } from './components/Enigmas'
+import { Cultures } from './components/cultures/Cultures'
+import { EnigmesSignalees } from './components/enigmes/EnigmesSignalees'
 import { Missions } from './components/Missions'
 import { Settings } from './components/Settings'
+import { Energie } from './components/Energie'
 import { GameRules } from './components/GameRules'
 import { TutorialManager } from './components/TutorialManager'
 import { ShopifySync } from './components/ShopifySync'
 import { FragmentsAudio } from './components/FragmentsAudio'
+import { FragmentsShopify } from './components/fragments/FragmentsShopify'
+import { Notifications } from './components/notifications/Notifications'
 import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
+import { MisesAJour } from './components/MisesAJour'
 import { Sidebar } from './components/Sidebar'
 import { PlacesModeration } from './components/moderation/PlacesModeration'
+import { Signalements } from './components/moderation/Signalements'
 import './App.css'
 
 function AccessDenied({ onSignOut, email, role }: { onSignOut: () => void; email?: string; role?: string | null }) {
@@ -87,6 +94,7 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/moderation" element={<PlacesModeration />} />
+            <Route path="/signalements" element={<Signalements />} />
             <Route path="/carte/tags" element={<TagsManager />} />
             <Route path="*" element={<PlacesModeration />} />
           </Routes>
@@ -105,6 +113,7 @@ function App() {
           <Route path="/users/:userId" element={<UserDetail />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/moderation" element={<PlacesModeration />} />
+            <Route path="/signalements" element={<Signalements />} />
           <Route path="/carte/tags" element={<TagsManager />} />
           <Route path="/carte/factions" element={<Factions />} />
           <Route path="/carte/titres" element={<TitlesManager />} />
@@ -114,17 +123,23 @@ function App() {
           <Route path="/carte/publicites" element={<Ads />} />
           <Route path="/carte/bannieres" element={<Banners />} />
           <Route path="/carte/enigmes" element={<Enigmas />} />
+          <Route path="/carte/enigmes-signalees" element={<EnigmesSignalees />} />
+          <Route path="/carte/cultures" element={<Cultures />} />
           <Route path="/carte/missions" element={<Missions />} />
           <Route path="/carte/reglages" element={<Settings />} />
+          <Route path="/carte/energie" element={<Energie />} />
           <Route path="/carte/divers" element={<Divers />} />
           <Route path="/carte/landing" element={<LandingConfig />} />
           <Route path="/carte/regles" element={<GameRules />} />
           <Route path="/carte/tutoriel" element={<TutorialManager />} />
           <Route path="/shopify/sync" element={<ShopifySync />} />
+          <Route path="/shopify/fragments" element={<FragmentsShopify />} />
           <Route path="/shopify/fragments-audio" element={<FragmentsAudio />} />
           <Route path="/annonces" element={<AnnouncementsList />} />
           <Route path="/annonces/nouvelle" element={<ComposerAnnonce />} />
           <Route path="/annonces/:id" element={<ComposerAnnonce />} />
+          <Route path="/mises-a-jour" element={<MisesAJour />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </main>
     </div>

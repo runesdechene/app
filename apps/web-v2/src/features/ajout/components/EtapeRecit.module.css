@@ -1,0 +1,165 @@
+/*
+ * QUOI     — l'étape « Récit » (maquette 291:209) : la fiche en petit (vignette 56 px, nom en Bebas,
+ *            badge de la nature à sa couleur), « Raconte-le », le carnet (papier plus clair, lignes
+ *            fines tous les 24 px, texte en IM Fell italique), puis les pistes en pastilles.
+ */
+.recit {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none; /* on défile sans barre, comme partout dans l'app */
+}
+
+.corps {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+}
+
+.fiche {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.vignette {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
+  background: var(--color-sable);
+  object-fit: cover;
+}
+
+.ficheTexte {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.nomLieu {
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--rangee-size);
+  line-height: var(--titre-leading);
+}
+
+.badge {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-rond);
+  background: var(--type, var(--color-fiche-badge));
+  color: var(--color-sur-accent);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-ecran-size);
+  font-weight: var(--weight-normal);
+  line-height: var(--titre-leading);
+}
+
+.chapo {
+  margin: 0 0 var(--space-2);
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--sous-titre-size);
+}
+
+/* Le carnet : des lignes tous les 24 px, sur lesquelles le texte se pose. */
+.carnet {
+  position: relative;
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-carte);
+  background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 23px,
+        var(--color-choisie) 23px,
+        var(--color-choisie) 24px
+      )
+      0 18px / 100% calc(100% - 44px) no-repeat,
+    var(--color-feuille);
+}
+
+.texte {
+  display: block;
+  width: 100%;
+  min-height: 240px;
+  padding: 18px var(--space-4) 36px;
+  border: none;
+  background: none;
+  color: var(--color-fiche-recit);
+  font-family: var(--font-inscription);
+  font-size: var(--corps-size);
+  font-style: italic;
+  line-height: var(--carnet-leading); /* la hauteur d'une ligne du carnet */
+  resize: none;
+  caret-color: var(--color-accent);
+}
+
+.texte:focus {
+  outline: none;
+}
+
+.texte::placeholder {
+  color: var(--color-texte-pale);
+}
+
+.compte {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-2);
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+}
+
+.etiquette {
+  margin: var(--space-3) 0 0;
+  color: var(--color-texte-pale);
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-gras);
+  letter-spacing: var(--bandeau-tracking);
+  text-transform: uppercase;
+}
+
+.pistes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.piste {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-sable);
+  border-radius: var(--radius-rond);
+  background: none;
+  color: var(--color-texte);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  cursor: pointer;
+  transition: scale var(--duree-elan) var(--courbe-elan);
+}
+
+.piste:active {
+  scale: 0.96;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piste {
+    transition: none;
+  }
+}
