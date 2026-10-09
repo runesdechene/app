@@ -1,6 +1,6 @@
 /**
  * QUOI     — les énigmes de la carte côté Supabase : celles qui m'attendent, en ouvrir une, y répondre.
- * POURQUOI — quatre RPC (migrations 441, 465) ; le JSON est lu par `lireEnigmes.ts`.
+ * POURQUOI — quatre RPC (migrations 441, 470) ; le JSON est lu par `lireEnigmes.ts`.
  */
 import { supabase } from '@/shared/supabase/client'
 import { lireEnAttente, lireOuverture, lireVerdict } from './lireEnigmes'
@@ -25,7 +25,7 @@ export async function percerEnigme(id: number, reponse: string) {
 
 export type RaisonEnigme = 'reponse_refusee' | 'erreur' | 'autre'
 
-// Signaler une énigme (mig 465) : la base relève elle-même ma dernière réponse.
+// Signaler une énigme (mig 470) : la base relève elle-même ma dernière réponse.
 export async function signalerEnigme(numero: number, raison: RaisonEnigme, precision: string) {
   const { error } = await supabase.rpc('signaler_enigme', {
     p_enigme: numero,
