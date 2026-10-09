@@ -54,6 +54,7 @@ export class FausseCarte {
   canevas = { style: { cursor: '' } }
   setFilter = vi.fn()
   setLayoutProperty = vi.fn()
+  setPaintProperty = vi.fn()
   getCanvas() {
     return this.canevas
   }
