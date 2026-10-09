@@ -90,3 +90,16 @@ ne correspond plus à la fiche. À faire : qu'elle passe par une version (auteur
 du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui utilisent `.mod-row`
 (Mises à jour : l'image et le texte se rangeaient côte à côte). Contourné dans `MisesAJour.tsx`
 (`display: 'block'` en ligne). À faire : renommer les classes de `Photos.css` (`photo-row…`).
+
+## Le scan — mineurs de la relecture (09/10/2026)
+
+> Relecture de la branche du scan (spec `2026-10-09-v2-scan`) : les 8 points importants sont
+> corrigés (commit `843e73af`) ; ceux-ci sont reportés, aucun ne bloque le test de l'atelier.
+
+- [ ] **Vieux téléphones** : sans `navigator.mediaDevices` (navigateurs intégrés, iOS < 14.3), `useCamera` lève ; sans `AudioContext` (iOS < 14.1, `webkitAudioContext` seul), `debloquerSon` lève et le bouton « Scanner » ne fait rien. Garder les deux, et un état « caméra absente ».
+- [ ] **Son** : `biper()` ne relance pas un contexte `suspended`/`interrupted` (appel, notification) ; l'iPhone en silencieux ne joue pas Web Audio (`navigator.audioSession.type = 'playback'` là où il existe). Au deuxième passage, `resume()` étant asynchrone, le bouton « Scanner » peut réapparaître après le toucher de l'icône.
+- [ ] **Caméra** : toute erreur dit « refusée » (même `NotReadableError`, `NotFoundError`) ; elle reste allumée dans un onglet caché ; une piste `ended` après la veille iOS laisse le viseur noir (`visibilitychange`).
+- [ ] **Rendu** : `setMeilleur` redessine `ScanScreen` ~8 fois par seconde, même pour un visiteur qui n'en a pas besoin.
+- [ ] **Feuille des admins** : `agir` sans `catch` — un `ajouter_vue` raté ne dit rien.
+- [ ] **SQL** : `noter_scan` ouvert à tous sans limite (le chiffre des scans peut être gonflé ; les bips de l'atelier comptent) ; `remplacer_empreintes_illustration` efface sans filtrer sur `modele` (ajouter `AND modele = p_modele`) ; le test des RPC vit hors dépôt (à ranger sous `supabase/tests/`).
+- [ ] **Retour du scanner** : un lien vers `/accueil` ou `/bienvenue`, pas le retour du navigateur ; depuis la carte, on revient sur l'Accueil.
