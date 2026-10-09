@@ -80,6 +80,7 @@ export const DA_SHOWCASED = [
   'EmptyState',
   'Envols',
   'Feuille',
+  'FeuilleDeSignalement',
   'IconButton',
   'Interrupteur',
   'LieuCarte',

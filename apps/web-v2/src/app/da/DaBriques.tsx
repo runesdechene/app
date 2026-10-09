@@ -16,6 +16,7 @@ import { useEnvols } from '@/shared/hooks/useEnvols'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Envols } from '@/shared/ui/Envols'
 import { Feuille } from '@/shared/ui/Feuille'
+import { FeuilleDeSignalement } from '@/shared/ui/FeuilleDeSignalement'
 import { IconButton } from '@/shared/ui/IconButton'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { LieuCarte } from '@/shared/ui/LieuCarte'
@@ -51,6 +52,13 @@ const LIEU = {
 function rien() {
   return undefined
 }
+
+async function envoyerPourRien() {}
+
+const RAISONS = [
+  { id: 'reponse_refusee', libelle: 'Ma réponse aurait dû être acceptée' },
+  { id: 'autre', libelle: 'Autre chose' },
+]
 
 export function DaBriques() {
   const [allume, setAllume] = useState(true)
@@ -200,6 +208,19 @@ export function DaBriques() {
             <Text variant="corps">Mon profil</Text>
             <Text variant="corps">Préférences</Text>
           </Feuille>
+        </div>
+      </DaSection>
+
+      <DaSection name="FeuilleDeSignalement">
+        <div className={styles.cadreFeuille}>
+          <FeuilleDeSignalement
+            titre="Signaler une erreur"
+            consigne="Qu’est-ce qui ne va pas ? L’équipe regarde chaque signalement."
+            raisons={RAISONS}
+            merci="L’équipe va regarder cette énigme de près."
+            onEnvoyer={envoyerPourRien}
+            onFermer={rien}
+          />
         </div>
       </DaSection>
     </>
