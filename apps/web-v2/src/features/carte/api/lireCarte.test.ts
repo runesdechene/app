@@ -90,3 +90,12 @@ test('les listes des filtres se lisent', () => {
     epoques: [{ id: 'not-applicable', nom: 'Non concerné' }],
   })
 })
+
+test('un lieu nouveau pour moi le dit ; sans la clé (ancienne réponse), il ne l’est pas', () => {
+  const [neuf, ancien] = lireLieux([
+    { id: 'n', nom: 'Neuf', lat: 45, lng: 5, nature: 'lieu', icone: null, couleur: '#a9260f', etat: 'inconnu', revendication: null, nouveau: true },
+    { id: 'a', nom: 'Ancien', lat: 45, lng: 5, nature: 'lieu', icone: null, couleur: null, etat: 'inconnu', revendication: null },
+  ])
+  expect(neuf?.nouveau).toBe(true)
+  expect(ancien?.nouveau).toBe(false)
+})

@@ -193,3 +193,9 @@ export async function effacerMot(id: number) {
   const { error } = await supabase.rpc('effacer_mot', { p_id: id })
   if (error) throw error
 }
+
+// Une fiche ouverte (migration 469) : le lieu cesse d'être « nouveau » pour moi, et ses vues comptent
+// pour ses paliers. Sans attendre : la requête ne part qu'avec `then()` (.claude/rules/v2.md).
+export function noterLieuVu(id: string) {
+  void supabase.rpc('lieu_vu', { p_id: id }).then()
+}

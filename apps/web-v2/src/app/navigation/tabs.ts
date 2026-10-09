@@ -8,7 +8,7 @@
 export type TabId = 'accueil' | 'carte' | 'messages' | 'compagnies' | 'compte'
 
 export const TABS = [
-  { id: 'accueil', label: 'Accueil', path: '/accueil' },
+  { id: 'accueil', label: 'Explore', path: '/accueil' }, // « Explore » (Uriel, 08/10) ; l'adresse reste /accueil
   { id: 'carte', label: 'Carte', path: '/carte' },
   { id: 'messages', label: 'Messages', path: '/messages' },
   { id: 'compagnies', label: 'Compagnies', path: '/compagnies' },

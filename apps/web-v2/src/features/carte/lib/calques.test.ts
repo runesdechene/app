@@ -28,6 +28,7 @@ const lieu: LieuCarte = {
   natures: [],
   epoque: null,
   ajoute: false,
+  nouveau: false,
 }
 
 test('un lieu devient un point avec sa marque et sa pilule', () => {
@@ -37,6 +38,7 @@ test('un lieu devient un point avec sa marque et sa pilule', () => {
     id: 'a',
     etat: 'visite',
     nature: 'lieu',
+    nouveau: false,
     image: 'visite-x.svg',
     pilule: 'Rémy',
     moi: true,
@@ -84,4 +86,11 @@ test('le facteur d’écran multiplie chaque palier de toutes les marques', () =
   ajouterCalques(map, couleurs, 2)
   const billes = map.addLayer.mock.calls[0]?.[0]
   expect(billes).toHaveProperty(['layout', 'icon-size'], taille(2))
+})
+
+test('le nom de qui a revendiqué un lieu, dès le zoom 9, ni sur un lieu neuf (« NOUVEAU » à sa place) ni sur un lieu inconnu', () => {
+  const map = { addSource: vi.fn(), addLayer: vi.fn<(calque: AddLayerObject) => void>() }
+  ajouterCalques(map, couleurs)
+  const pilules = map.addLayer.mock.calls.map(([calque]) => calque).find((c) => c.id === 'pilules')
+  expect(pilules).toMatchObject({ minzoom: 9, filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true], ['!=', ['get', 'etat'], 'inconnu']] })
 })

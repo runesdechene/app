@@ -4,7 +4,7 @@
  * POURQUOI — `lieux` vaut `undefined` pendant le chargement ; l'écran propose de réessayer
  *            en cas d'erreur.
  */
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { fetchCarteLieux, fetchCartePublique } from '../api/carte'
 import type { LieuCarte } from '../api/lireCarte'
 
@@ -28,4 +28,11 @@ export function useCarteLieux(visiteur: boolean): {
       void query.refetch()
     },
   }
+}
+
+// Un lieu dont on vient d'ouvrir la fiche cesse de rayonner tout de suite, sans relire la carte.
+export function oublierNouveau(client: QueryClient, id: string) {
+  client.setQueryData<LieuCarte[]>(carteLieuxKey, (lieux) =>
+    lieux?.map((l) => (l.id === id && l.nouveau ? { ...l, nouveau: false } : l)),
+  )
 }

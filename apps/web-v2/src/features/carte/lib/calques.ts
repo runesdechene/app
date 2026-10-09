@@ -1,6 +1,7 @@
 /**
- * QUOI     — les lieux sur la carte : la source et ses quatre calques, du dessous au dessus —
- *            billes, sceaux, points d'intérêt, pilules (spec Carte §3).
+ * QUOI     — les lieux sur la carte : la source et ses calques, du dessous au dessus — billes,
+ *            sceaux, points d'intérêt, survol, pilules (spec Carte §3). L'anneau et la gélule des lieux
+ *            neufs : nouveaux.ts.
  * POURQUOI — des calques MapLibre, dessinés par la carte graphique : des milliers de lieux sans
  *            ralentir. Aucun regroupement (Uriel, 28/09, comme la V1) : dézoomée, la carte montre
  *            tous les lieux, en plus petit — l'effet de constellation.
@@ -21,8 +22,10 @@ export const SOURCE = 'lieux'
 export const CALQUES_LIEUX = ['billes', 'sceaux', 'curiosites']
 export const CALQUE_SURVOL = 'survol'
 
-// De près seulement : les pilules et les points d'intérêt ne chargent pas la vue d'ensemble.
+// De près seulement : les points d'intérêt ne chargent pas la vue d'ensemble.
 const DE_PRES = 12
+// Le nom de qui a revendiqué un lieu : dès l'échelle d'un département (12 → 9, Uriel 08/10).
+const DE_PRES_PILULES = 9
 
 type Proprietes = {
   id: string
@@ -31,6 +34,7 @@ type Proprietes = {
   image: string
   pilule?: string
   moi?: boolean
+  nouveau: boolean // l'anneau et la gélule « NOUVEAU » (nouveaux.ts)
 }
 
 export function enGeoJSON(
@@ -47,6 +51,7 @@ export function enGeoJSON(
         etat: l.etat,
         nature: l.nature,
         image: nomImage(l, couleurTypes),
+        nouveau: l.nouveau,
         ...(l.revendication && { pilule: l.revendication.nom, moi: l.revendication.moi }),
       },
     })),
@@ -55,8 +60,9 @@ export function enGeoJSON(
 
 const estLieu: ExpressionSpecification = ['==', ['get', 'nature'], 'lieu']
 
-// La marque grandit avec le zoom : un point de loin, le sceau entier de près.
-const PALIERS: [zoom: number, taille: number][] = [
+// La marque grandit avec le zoom : un point de loin, le sceau entier de près. L'anneau des lieux
+// neufs suit la même courbe (nouveaux.ts).
+export const PALIERS: [zoom: number, taille: number][] = [
   [4, 0.5],
   [8, 0.8],
   [12, 1.15],
@@ -145,8 +151,10 @@ export function ajouterCalques(map: SupportDeCalques, c: CouleursCarte, ecran = 
     id: 'pilules',
     type: 'symbol',
     source: SOURCE,
-    minzoom: DE_PRES,
-    filter: ['has', 'pilule'],
+    minzoom: DE_PRES_PILULES,
+    // Un lieu neuf montre « NOUVEAU » à la place du nom (nouveaux.ts) : jamais les deux empilés. Et
+    // aucun nom sous un lieu encore inconnu (Uriel, 08/10).
+    filter: ['all', ['has', 'pilule'], ['!=', ['get', 'nouveau'], true], ['!=', ['get', 'etat'], 'inconnu']],
     layout: {
       'text-field': ['upcase', ['get', 'pilule']],
       'text-font': ['Noto Sans Bold'],

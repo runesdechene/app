@@ -20,6 +20,7 @@ import type { ExplorateurProfile, TitrePorte } from '../api/lireProfil'
 import { decouperBio } from '../lib/bio'
 import { phraseCondition } from '@/shared/lib/conditionTitre'
 import { sousLeSigne } from '@/shared/lib/signe'
+import { pseudoInstagram } from '../lib/instagram'
 import { ProfilChiffres } from './ProfilChiffres'
 import styles from './ProfilEntete.module.css'
 
@@ -27,6 +28,7 @@ const DATE_LONGUE = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' })
 
 export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
   const navigate = useNavigate()
+  const instagram = pseudoInstagram(profil.instagram)
   // L'onglet où l'on est : le profil s'affiche dans l'écran Compte (dessiné par la coquille,
   // hors des routes de l'onglet) ou en détail d'un autre onglet. Une adresse relative
   // (« modifier ») partait de la racine sur l'écran Compte et ramenait à l'Accueil (30/09).
@@ -91,15 +93,15 @@ export function ProfilEntete({ profil }: { profil: ExplorateurProfile }) {
         )}
 
         <div className={styles.details}>
-          {profil.instagram && (
+          {instagram && (
             <a
               className={styles.instagram}
-              href={`https://www.instagram.com/${profil.instagram}/`}
+              href={`https://www.instagram.com/${instagram}/`}
               target="_blank"
               rel="noreferrer"
             >
               <span className={styles.iconeInstagram} aria-hidden="true" />
-              {profil.instagram}
+              {instagram}
             </a>
           )}
           <p className={styles.depuis}>

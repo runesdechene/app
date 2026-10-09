@@ -29,6 +29,7 @@ import { TutorialManager } from './components/TutorialManager'
 import { ShopifySync } from './components/ShopifySync'
 import { FragmentsAudio } from './components/FragmentsAudio'
 import { FragmentsShopify } from './components/fragments/FragmentsShopify'
+import { Notifications } from './components/notifications/Notifications'
 import { AnnouncementsList } from './components/annonces/AnnouncementsList'
 import { ComposerAnnonce } from './components/annonces/ComposerAnnonce'
 import { MisesAJour } from './components/MisesAJour'
@@ -138,6 +139,7 @@ function App() {
           <Route path="/annonces/nouvelle" element={<ComposerAnnonce />} />
           <Route path="/annonces/:id" element={<ComposerAnnonce />} />
           <Route path="/mises-a-jour" element={<MisesAJour />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Routes>
       </main>
     </div>

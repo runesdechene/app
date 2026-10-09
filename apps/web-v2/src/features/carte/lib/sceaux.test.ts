@@ -15,6 +15,7 @@ const lieu: LieuCarte = {
   natures: [],
   epoque: null,
   ajoute: false,
+  nouveau: false,
 }
 
 test('chaque lieu reçoit la marque de son état', () => {

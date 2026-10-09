@@ -4,9 +4,11 @@
  *            « Partager ce lieu ». Un lieu encore inconnu passe d'abord par sa découverte.
  * POURQUOI — la zone Lieu ne connaît pas la coquille : c'est ici qu'elle reçoit le cadre. Fenêtre
  *            et feuilles sont des moments, pas des adresses : un état local, fermé par le voile ou
- *            Échap.
+ *            Échap. Ouvrir une fiche éteint l'onde du lieu s'il était nouveau (migration 469) : noté en
+ *            base, et effacé du cache de la carte — c'est ici que les deux zones se rencontrent.
  */
-import { useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { BoutonVisite } from '@/features/lieu/components/BoutonVisite'
 import { ModifierFiche } from '@/features/ajout/components/ModifierFiche'
@@ -21,6 +23,8 @@ import { FeuillePartager } from '@/features/lieu/components/FeuillePartager'
 import { FeuilleSignaler } from '@/features/lieu/components/FeuilleSignaler'
 import { FicheLieu } from '@/features/lieu/components/FicheLieu'
 import { useFiche } from '@/features/lieu/hooks/useFiche'
+import { noterLieuVu } from '@/features/lieu/api/lieu'
+import { oublierNouveau } from '@/features/carte/hooks/useCarteLieux'
 import { useFermerDetail } from '../navigation/useFermerDetail'
 import { DetailPane } from '../shell/DetailPane'
 
@@ -34,6 +38,11 @@ export function RouteLieu() {
 
 function Lieu({ id }: { id: string }) {
   const { fiche } = useFiche(id)
+  const client = useQueryClient()
+  useEffect(() => {
+    noterLieuVu(id)
+    oublierNouveau(client, id)
+  }, [client, id])
   const [ouvert, setOuvert] = useState<Ouvert>(null)
   const fermerDetail = useFermerDetail()
   const navigate = useNavigate()
