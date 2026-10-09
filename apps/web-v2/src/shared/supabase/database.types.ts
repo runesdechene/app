@@ -4497,6 +4497,101 @@ export type Database = {
           },
         ]
       }
+      scan_empreintes: {
+        Row: {
+          ajoutee_le: string
+          ajoutee_par: string | null
+          fragment_id: number
+          id: number
+          modele: string
+          source: string
+          vecteur: number[]
+        }
+        Insert: {
+          ajoutee_le?: string
+          ajoutee_par?: string | null
+          fragment_id: number
+          id?: never
+          modele: string
+          source: string
+          vecteur: number[]
+        }
+        Update: {
+          ajoutee_le?: string
+          ajoutee_par?: string | null
+          fragment_id?: number
+          id?: never
+          modele?: string
+          source?: string
+          vecteur?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scan_empreintes_ajoutee_par_fkey"
+            columns: ["ajoutee_par"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scan_empreintes_ajoutee_par_fkey"
+            columns: ["ajoutee_par"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scan_empreintes_fragment_id_fkey"
+            columns: ["fragment_id"]
+            isOneToOne: false
+            referencedRelation: "title_fragments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scans: {
+        Row: {
+          fragment_id: number
+          id: number
+          quand: string
+          user_id: string | null
+        }
+        Insert: {
+          fragment_id: number
+          id?: never
+          quand?: string
+          user_id?: string | null
+        }
+        Update: {
+          fragment_id?: number
+          id?: never
+          quand?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scans_fragment_id_fkey"
+            columns: ["fragment_id"]
+            isOneToOne: false
+            referencedRelation: "title_fragments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_unlocks: {
         Row: {
           created_at: string | null
@@ -6694,6 +6789,7 @@ export type Database = {
         Args: { p_place_id: string; p_user_id: string }
         Returns: number
       }
+      _vecteur_du_scan: { Args: { p: Json }; Returns: number[] }
       _verifier_fiche: {
         Args: {
           p_couleur: string
@@ -6800,6 +6896,10 @@ export type Database = {
       ajouter_photos_lieu: {
         Args: { p_id: string; p_images: Json }
         Returns: Json
+      }
+      ajouter_vue: {
+        Args: { p_fragment: number; p_modele: string; p_vecteur: Json }
+        Returns: number
       }
       answer_enigma: {
         Args: { p_answer: string; p_enigma_id: number; p_user_id: string }
@@ -7100,6 +7200,7 @@ export type Database = {
         }
         Returns: Json
       }
+      empreintes_du_scan: { Args: { p_modele: string }; Returns: Json }
       enigmes_en_attente: { Args: never; Returns: Json }
       enregistrer_culture: {
         Args: {
@@ -7801,6 +7902,7 @@ export type Database = {
       natures_de_lieu: { Args: never; Returns: Json }
       natures_publiques: { Args: never; Returns: Json }
       nommer_explorateur: { Args: { p_nom: string }; Returns: string }
+      noter_scan: { Args: { p_fragment: number }; Returns: undefined }
       notifications_du_hub: {
         Args: { p_fil?: string[]; p_types: string[] }
         Returns: Json
@@ -7992,6 +8094,10 @@ export type Database = {
         Args: { p_submission_id: string; p_tag_id: string }
         Returns: undefined
       }
+      remplacer_empreintes_illustration: {
+        Args: { p_fragment: number; p_modele: string; p_vecteurs: Json }
+        Returns: number
+      }
       rename_expedition: {
         Args: { p_expedition_id: string; p_name: string; p_user_id: string }
         Returns: Json
@@ -8025,6 +8131,7 @@ export type Database = {
         Args: { p_place_id: string; p_revision_id: number; p_user_id: string }
         Returns: Json
       }
+      retirer_empreinte: { Args: { p_id: number }; Returns: undefined }
       retirer_membre: {
         Args: { p_id: string; p_user: string }
         Returns: undefined
@@ -8049,6 +8156,7 @@ export type Database = {
         Returns: Json
       }
       saluer: { Args: { p_evenement: string }; Returns: Json }
+      scan_du_hub: { Args: { p_modele: string }; Returns: Json }
       send_company_message: {
         Args: { p_company_id: string; p_content: string; p_user_id: string }
         Returns: Json
