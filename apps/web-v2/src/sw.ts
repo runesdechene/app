@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 /**
  * QUOI     — le service worker de la V2 : le précache, le repli de navigation sur l'appli pour
- *            ses seuls écrans, et les notifications push (afficher, ouvrir le bon écran).
+ *            ses seuls écrans, le modèle du scan en cache, et les notifications push (afficher,
+ *            ouvrir le bon écran).
  * POURQUOI — à la bascule (spec 2026-10-07-v2-bascule §3), il prend la portée / et remplace celui
  *            de la V1 sur les téléphones, dans la même inscription : les abonnements push suivent.
  *            Avant, sous /v2/, il apprend déjà à recevoir les push.
@@ -12,6 +13,7 @@
  */
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { CacheFirst } from 'workbox-strategies'
 import { cheminDansLAppli, ecransExplore } from './sw/ecrans'
 
 declare const self: ServiceWorkerGlobalScope
@@ -28,6 +30,13 @@ registerRoute(
     async ({ request }) => (await matchPrecache(`${base}index.html`)) ?? fetch(request),
     { allowlist: [ecransExplore(base)] },
   ),
+)
+
+// Le modèle du scan et ses wasm (~10 Mo) : téléchargés à la première ouverture du scanner, puis
+// servis depuis le cache — le deuxième scan démarre sans attendre, même hors réseau.
+registerRoute(
+  ({ url }) => url.origin === self.location.origin && url.pathname.startsWith(`${base}modeles/`),
+  new CacheFirst({ cacheName: 'modeles' }),
 )
 
 self.addEventListener('activate', (event) => {

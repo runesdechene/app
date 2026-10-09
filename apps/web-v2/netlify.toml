@@ -19,6 +19,12 @@
   for = "/v2/sw.js"
   [headers.values]
     Cache-Control = "no-cache"
+# Le modèle du scan : ouvert au Hub (qui calcule les empreintes des illustrations), gardé une semaine.
+[[headers]]
+  for = "/modeles/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=604800"
 
 # Préfixes réservés — seo-pages
 [[redirects]]
@@ -36,13 +42,6 @@
   to = "https://rdc-seo-pages.netlify.app/mouvement"
   status = 200
   force = true
-
-# Préfixe réservé — à venir (décommenter le jour où la page du scan existe)
-# [[redirects]]
-#   from = "/scan/*"
-#   to = "https://<site-scan>.netlify.app/scan/:splat"
-#   status = 200
-#   force = true
 
 # Vieilles adresses de la V1 (coupure nette, 07/10)
 [[redirects]]

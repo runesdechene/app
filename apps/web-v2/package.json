@@ -19,6 +19,7 @@
     "gen:types": "pnpm dlx supabase gen types typescript --linked --schema public > src/shared/supabase/database.types.ts"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "1.1.0",
     "@supabase/supabase-js": "2.117.2",
     "@tanstack/query-async-storage-persister": "5.104.0",
     "@tanstack/react-query": "5.104.0",
@@ -31,7 +32,8 @@
     "react-dom": "19.3.0",
     "react-router": "8.4.0",
     "workbox-precaching": "7.4.1",
-    "workbox-routing": "7.4.1"
+    "workbox-routing": "7.4.1",
+    "workbox-strategies": "7.4.1"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -56,6 +58,7 @@
     "typescript-eslint": "8.70.1",
     "vite": "8.3.1",
     "vite-plugin-pwa": "1.3.0",
+    "vite-plugin-static-copy": "^4.1.1",
     "vitest": "5.0.2",
     "workbox-build": "7.4.1",
     "workbox-window": "7.4.1"
