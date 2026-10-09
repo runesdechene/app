@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User } from '@supabase/supabase-js'
@@ -14,6 +14,8 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
   const [pending, setPending] = useState(0)
   const [signalements, setSignalements] = useState(0)
   const [enigmesSignalees, setEnigmesSignalees] = useState(0)
+  // Recompter à chaque page : une file traitée ne garde pas son ancien badge.
+  const { pathname } = useLocation()
 
   useEffect(() => {
     let active = true
@@ -30,7 +32,7 @@ export function Sidebar({ user, role: _role, isAdmin }: SidebarProps) {
       })
     }
     return () => { active = false }
-  }, [isAdmin])
+  }, [isAdmin, pathname])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()

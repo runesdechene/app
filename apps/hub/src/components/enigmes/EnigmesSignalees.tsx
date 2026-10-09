@@ -71,7 +71,7 @@ export function EnigmesSignalees() {
       {erreur && <p className="signalees-erreur" role="alert">{erreur}</p>}
       {loading && rows.length === 0 && <div className="loading">Chargement…</div>}
       {!loading && rows.length === 0 && !erreur && (
-        <p className="signalees-vide">Aucune énigme signalée. Les signalements arrivent ici depuis le verdict d’une énigme.</p>
+        <p className="signalees-vide">Aucune énigme signalée. Les joueurs signalent depuis la feuille d’une énigme, avant ou après leur réponse.</p>
       )}
 
       <div className="signalees-liste">
