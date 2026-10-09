@@ -6611,6 +6611,10 @@ export type Database = {
       }
       _region_montree: { Args: { p_user: string }; Returns: string }
       _reglage: { Args: { p_cle: string; p_defaut: number }; Returns: number }
+      _rendre_le_point: {
+        Args: { p_enigme: number; p_user: string }
+        Returns: boolean
+      }
       _require_min_discoveries: {
         Args: { p_min: number; p_user_id: string }
         Returns: Json
