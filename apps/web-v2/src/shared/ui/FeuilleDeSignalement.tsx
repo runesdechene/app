@@ -1,6 +1,7 @@
 /**
  * QUOI     — une feuille « Signaler » : des raisons (une seule choisie), un mot facultatif, « Envoyer le
- *            signalement » ; puis un merci.
+ *            signalement » ; puis un merci. `proposition` ajoute un champ quand une raison le demande
+ *            (l'énigme : « Quelle serait la bonne réponse ? »).
  * POURQUOI — la même feuille sert au lieu (maquette « Lieu — signaler », 30/09) et à l'énigme (08/10,
  *            sans maquette : « au style de Signaler ce lieu ») ; chacun donne ses raisons et son envoi.
  */
@@ -12,11 +13,15 @@ import styles from './FeuilleDeSignalement.module.css'
 
 export type Raison<R extends string> = { id: R; libelle: string }
 
+// Le champ facultatif qui n'apparaît qu'avec la raison `pour`.
+export type Proposition<R extends string> = { pour: R; libelle: string }
+
 export function FeuilleDeSignalement<R extends string>({
   titre,
   consigne,
   raisons,
   merci,
+  proposition,
   onEnvoyer,
   onFermer,
 }: {
@@ -24,13 +29,16 @@ export function FeuilleDeSignalement<R extends string>({
   consigne: string
   raisons: Raison<R>[]
   merci: string
-  onEnvoyer: (raison: R, precision: string) => Promise<void>
+  proposition?: Proposition<R>
+  onEnvoyer: (raison: R, precision: string, proposition: string) => Promise<void>
   onFermer: () => void
 }) {
   const [raison, setRaison] = useState<R | null>(null)
   const [precision, setPrecision] = useState('')
+  const [propose, setPropose] = useState('')
+  const avecProposition = proposition !== undefined && raison === proposition.pour
   const envoi = useMutation({
-    mutationFn: (r: R) => onEnvoyer(r, precision),
+    mutationFn: (r: R) => onEnvoyer(r, precision, avecProposition ? propose : ''),
   })
 
   if (envoi.isSuccess) {
@@ -64,6 +72,18 @@ export function FeuilleDeSignalement<R extends string>({
           </label>
         ))}
       </fieldset>
+      {avecProposition && (
+        <input
+          className={[styles.precision, styles.proposition].join(' ')}
+          aria-label={proposition.libelle}
+          placeholder={proposition.libelle}
+          maxLength={200}
+          value={propose}
+          onChange={(e) => {
+            setPropose(e.target.value)
+          }}
+        />
+      )}
       <textarea
         className={styles.precision}
         aria-label="Un mot de plus"

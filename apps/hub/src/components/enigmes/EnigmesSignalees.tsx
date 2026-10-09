@@ -5,11 +5,14 @@ import './EnigmesSignalees.css'
 
 // Les énigmes que les joueurs contestent, envoyées depuis le verdict de la V2 (migration 470).
 // Accepter ajoute la réponse du joueur aux réponses acceptées et clôt les signalements qu'elle règle.
+// Depuis la 472, on peut signaler avant de répondre, et proposer une bonne réponse : la proposition se
+// lit, elle ne s'accepte pas (une réponse attendue fausse se réécrit dans « Modifier l'énigme »).
 interface SignalementEnigme {
   id: number
   raison: string
   precision: string | null
-  reponseDonnee: string
+  reponseDonnee: string | null
+  reponseProposee: string | null
   quand: string
   enigme: { numero: number; question: string; reponse: string; variantes: string[]; format: 'qcm' | 'free' }
   qui: { id: string; nom: string }
@@ -17,7 +20,7 @@ interface SignalementEnigme {
 
 const RAISONS: Record<string, string> = {
   reponse_refusee: 'Sa réponse aurait dû être acceptée',
-  erreur: 'La réponse ou l’explication est fausse',
+  erreur: 'L’énoncé, la réponse ou l’explication est faux',
   autre: 'Autre chose',
 }
 
@@ -87,9 +90,19 @@ export function EnigmesSignalees() {
               </div>
               <div>
                 <span className="signalement-etiquette">Réponse de {s.qui.nom}</span>
-                <span className="signalement-reponse signalement-reponse--joueur">{s.reponseDonnee}</span>
+                {s.reponseDonnee !== null ? (
+                  <span className="signalement-reponse signalement-reponse--joueur">{s.reponseDonnee}</span>
+                ) : (
+                  <span className="signalement-pas-repondu">N’a pas encore répondu</span>
+                )}
               </div>
             </div>
+
+            {s.reponseProposee && (
+              <p className="signalement-proposition">
+                Selon {s.qui.nom}, la bonne réponse serait <strong>{s.reponseProposee}</strong>
+              </p>
+            )}
 
             <p className="signalement-motif">
               <strong>{RAISONS[s.raison] ?? s.raison}</strong>
@@ -100,7 +113,7 @@ export function EnigmesSignalees() {
             </p>
 
             <div className="signalement-actions">
-              {s.enigme.format === 'free' && (
+              {s.enigme.format === 'free' && s.reponseDonnee !== null && (
                 <button className="btn-primary" onClick={() => traiter(s, true)} disabled={busy === s.id}>
                   Accepter cette réponse
                 </button>

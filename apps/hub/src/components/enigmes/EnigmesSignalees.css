@@ -33,6 +33,9 @@
 }
 .signalement-reponse--joueur { color: var(--color-primary); }
 .signalement-variantes { color: var(--color-text-secondary); font-size: 14px; }
+.signalement-pas-repondu { color: var(--color-muted); font-style: italic; line-height: 1.6; }
+.signalement-proposition { margin: 14px 0 0; line-height: 1.5; }
+.signalement-proposition strong { font-family: var(--font-title-family); font-size: 18px; font-weight: 400; }
 
 .signalement-motif { margin: 14px 0 2px; line-height: 1.5; }
 .signalement-quand { margin: 0; color: var(--color-muted); font-size: 13px; }

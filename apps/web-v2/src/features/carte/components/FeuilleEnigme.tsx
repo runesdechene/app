@@ -1,7 +1,8 @@
 /**
  * QUOI     — une énigme touchée sur la carte : le sceau se retourne, puis la feuille monte — « Énigme »
  *            et sa culture, le récit, la question, les réponses lettrées ; après la réponse, le verdict,
- *            et tout en bas un lien discret pour signaler une erreur (mig 470).
+ *            et tout en bas un lien discret pour signaler une erreur (mig 470). Avant de répondre, ce lien
+ *            est sous la question (mig 472) : un énoncé faux se signale, puis on répond quand même.
  * POURQUOI — maquettes « Énigmes — 3 » et « 5b à 5d », et la feuille redessinée « A » (Figma 484:434,
  *            choisie par Uriel le 07/10 : la première version n'était « pas sexy » et peu lisible). Une seule réponse (QCM : un bouton par
  *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou
@@ -15,7 +16,7 @@ import type { EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { useEnigme } from '../hooks/useEnigme'
 import { relanceEnClair } from '../lib/enigmeEnClair'
 import { SceauQuiSeRetourne } from './SceauQuiSeRetourne'
-import { FeuilleSignalerEnigme } from './FeuilleSignalerEnigme'
+import { FeuilleSignalerEnigme, type OuEnEst } from './FeuilleSignalerEnigme'
 import { BilanDuVerdict, FeteDuVerdict } from './VerdictEnigme'
 import styles from './FeuilleEnigme.module.css'
 
@@ -23,6 +24,8 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
   const { enigme, erreurOuverture, repondre, verdict, envoi, erreurReponse } = useEnigme(touchee.id)
   const [retourne, setRetourne] = useState(false)
   const [choisie, setChoisie] = useState<string | null>(null)
+  // La réponse tapée vit ici : la feuille de signalement remplace un moment les réponses.
+  const [libre, setLibre] = useState('')
   const [signaler, setSignaler] = useState(false)
 
   if (erreurOuverture) {
@@ -50,9 +53,11 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
 
   // Le verdict reste dans la mutation de useEnigme : fermer le signalement le retrouve intact.
   if (signaler) {
+    const ouEnEst: OuEnEst = !verdict ? 'avant' : verdict.juste ? 'juste' : 'faux'
     return (
       <FeuilleSignalerEnigme
         numero={enigme.numero}
+        ouEnEst={ouEnEst}
         onFermer={() => {
           setSignaler(false)
         }}
@@ -88,9 +93,28 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
         </header>
         {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{enigme.recit}</p>}
         {verdict ? <Text variant="legende">{enigme.question}</Text> : <p className={styles.question}>{enigme.question}</p>}
+        {!verdict && (
+          <button
+            type="button"
+            className={[styles.signaler, styles.signalerQuestion].join(' ')}
+            onClick={() => {
+              setSignaler(true)
+            }}
+          >
+            Signaler une erreur
+          </button>
+        )}
         {/* Un titre gagné prend la place : les réponses se replient (maquette 5d). */}
         {!verdict?.nouveauxTitres.length && (
-          <Reponses enigme={enigme} verdict={verdict} choisie={choisie} envoi={envoi} onRepondre={envoyer} />
+          <Reponses
+            enigme={enigme}
+            verdict={verdict}
+            choisie={choisie}
+            libre={libre}
+            onLibre={setLibre}
+            envoi={envoi}
+            onRepondre={envoyer}
+          />
         )}
         {erreurReponse && <Text variant="legende">{erreurReponse}</Text>}
         {verdict && <BilanDuVerdict verdict={verdict} culture={enigme.culture.nom} />}
@@ -138,16 +162,19 @@ function Reponses({
   enigme,
   verdict,
   choisie,
+  libre,
+  onLibre,
   envoi,
   onRepondre,
 }: {
   enigme: EnigmeOuverte
   verdict: Verdict | undefined
   choisie: string | null
+  libre: string
+  onLibre: (r: string) => void
   envoi: boolean
   onRepondre: (r: string) => void
 }) {
-  const [libre, setLibre] = useState('')
   if (enigme.format === 'free' || !enigme.choix) {
     return (
       <form
@@ -162,7 +189,7 @@ function Reponses({
           value={libre}
           disabled={envoi || verdict !== undefined}
           onChange={(e) => {
-            setLibre(e.target.value)
+            onLibre(e.target.value)
           }}
           aria-label="Ta réponse"
           placeholder="Ta réponse"

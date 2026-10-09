@@ -74,6 +74,20 @@ points, ni les titres.
   - **Clore** — sans suite.
 - Rechargement après chaque action, comme `Signalements`.
 
+## Le 09/10 : signaler avant de répondre, proposer la bonne réponse (migs 471, 472)
+
+- **Sous la question**, avant la réponse, un lien « Signaler une erreur » ; raisons « L'énoncé est faux ou
+  ambigu » et « Autre chose ». Fermer la feuille ramène à l'énigme, la réponse tapée intacte : on répond
+  ensuite. Après le verdict, seul le lien du bas reste ; « Ma réponse aurait dû être acceptée » n'y figure
+  qu'après un « Pas cette fois », et « erreur » devient « L'énoncé, la réponse ou l'explication est faux ».
+- **« Quelle serait la bonne réponse ? »** : un champ (200 signes) qui apparaît avec le motif « erreur »,
+  rangé dans `reponse_proposee`. Le Hub l'affiche ; **« Accepter » ne l'utilise jamais** (Uriel, 09/10) :
+  une réponse attendue fausse se réécrit dans « Modifier l'énigme ».
+- En base : `reponse_donnee` devient facultative (« N'a pas encore répondu » dans le Hub, pas d'« Accepter ») ;
+  `signaler_enigme` prend un 4e argument facultatif ; « refusée » sans réponse reste refusé.
+- **471** : accepter ne clôt plus que les refus que la variante ajoutée rend justes — avant, il fermait aussi
+  les signalements de contenu des joueurs qui avaient juste.
+
 ## Hors champ
 
 - Le tableau de toutes les mauvaises réponses.
