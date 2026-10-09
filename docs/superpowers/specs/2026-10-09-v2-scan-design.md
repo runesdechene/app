@@ -131,3 +131,8 @@ Numéros de migration : à partir de 470.
 
 - Les réglages définitifs du bip (après l'atelier).
 - Un bouton « Scanner » ailleurs que sur l'Accueil (carte, onglets) si l'usage le demande.
+- **Plus tard, scanner autre chose qu'un motif** (Uriel, 09/10) : une création d'un événement qui débloque
+  quelque chose, ou un lieu ancien — de préférence le lieu lui-même (une pierre sculptée, une inscription
+  existante), jamais une marque laissée sur un monument. Le principe ne change pas : une empreinte apprise par
+  les admins. Il faudra alors que `scan_empreintes` puisse désigner autre chose qu'un Fragment ; rien n'est
+  construit pour ça maintenant.
