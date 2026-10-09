@@ -1,7 +1,7 @@
 /**
  * QUOI     — le scanner (maquettes 530:915, 530:946, 530:982) : la caméra derrière un viseur, l'analyse
  *            en continu, le bip qui montre le Fragment puis ouvre son Récit ; au bout de 8 s, un conseil
- *            et « Voir tous les Fragments ».
+ *            et « Voir tous les Fragments » ; pour les admins, la feuille « Apprendre cette vue » (530:1013).
  * POURQUOI — comme un QR code, sans QR code (spec 2026-10-09-v2-scan). Arrivé sans avoir touché
  *            l'écran (un QR du stand), le son n'est pas débloqué : un grand bouton « Scanner » d'abord.
  * ATTENTION — la caméra ne s'allume qu'une fois le son débloqué ; elle s'éteint en quittant l'écran.
@@ -16,12 +16,13 @@ import { useCamera } from '../hooks/useCamera'
 import { useEmpreintes } from '../hooks/useEmpreintes'
 import { cheminDuRecit } from '../lib/chemin'
 import { biper, debloquerSon, sonDebloque } from '../lib/son'
+import { FeuilleApprendre } from './FeuilleApprendre'
 import styles from './ScanScreen.module.css'
 
 const CONSEIL_MS = 8000
 const VERS_LE_RECIT_MS = 600
 
-export function ScanScreen({ connecte }: { connecte: boolean }) {
+export function ScanScreen({ connecte, admin }: { connecte: boolean; admin: boolean }) {
   const navigate = useNavigate()
   const video = useRef<HTMLVideoElement>(null)
   const [demarre, setDemarre] = useState(sonDebloque)
@@ -138,7 +139,12 @@ export function ScanScreen({ connecte }: { connecte: boolean }) {
         </div>
       )}
       {!connecte && <p className={styles.pied}>Aucun compte nécessaire</p>}
-      {/* Task 7 : la feuille des admins se pose ici. */}
+      {admin && camera === 'en-marche' && reconnu === null && (
+        <FeuilleApprendre
+          suggestion={analyse.meilleur?.fragment ?? null}
+          empreinteActuelle={analyse.empreinteActuelle}
+        />
+      )}
     </main>
   )
 }

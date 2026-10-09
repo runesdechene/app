@@ -7,6 +7,7 @@
 import { lazy, Suspense } from 'react'
 import { Link, useParams } from 'react-router'
 import { RecitFragment } from '@/features/fragments/components/RecitFragment'
+import { useMoi } from '@/features/lieu/hooks/useMoi'
 import { useConnecte } from '@/features/vitrine/hooks/useVitrine'
 import { ListeFragments } from '@/features/scan/components/ListeFragments'
 import fleche from '@/assets/ui/fleche-retour.svg'
@@ -18,9 +19,10 @@ const ScanScreenCharge = lazy(() =>
 
 export function RouteScan() {
   const connecte = useConnecte()
+  const admin = useMoi()?.admin ?? false
   return (
     <Suspense fallback={null}>
-      <ScanScreenCharge connecte={connecte} />
+      <ScanScreenCharge connecte={connecte} admin={admin} />
     </Suspense>
   )
 }

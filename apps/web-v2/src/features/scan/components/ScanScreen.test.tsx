@@ -39,14 +39,17 @@ vi.mock('../hooks/useEmpreintes', () => ({
   useFragmentsVisibles: () => [],
 }))
 vi.mock('../api/scan', () => ({ noterScan }))
+vi.mock('./FeuilleApprendre', () => ({
+  FeuilleApprendre: () => <section aria-label="Apprendre cette vue" />,
+}))
 
 import { ScanScreen } from './ScanScreen'
 
-function ouvrir() {
+function ouvrir(admin = false) {
   return render(
     <MemoryRouter initialEntries={['/scan']}>
       <Routes>
-        <Route path="/scan" element={<ScanScreen connecte={etat.connecte} />} />
+        <Route path="/scan" element={<ScanScreen connecte={etat.connecte} admin={admin} />} />
         <Route path="/accueil/fragment/:id" element={<p>Récit membre</p>} />
         <Route path="/scan/fragment/:id" element={<p>Récit visiteur</p>} />
       </Routes>
@@ -149,4 +152,12 @@ test('le modèle ou les empreintes en échec : un message, pas une attente sans 
   etat.empreintes = { fragments: [], erreur: true }
   ouvrir()
   expect(screen.getAllByText('Le scan n’a pas pu se préparer.').length).toBeGreaterThan(0)
+})
+
+test('un admin voit « Apprendre cette vue » ; un joueur, non', () => {
+  const { unmount } = ouvrir(true)
+  expect(screen.getByRole('region', { name: 'Apprendre cette vue' })).toBeInTheDocument()
+  unmount()
+  ouvrir()
+  expect(screen.queryByRole('region', { name: 'Apprendre cette vue' })).not.toBeInTheDocument()
 })
