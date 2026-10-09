@@ -51,7 +51,9 @@ export function DetailPane({
 
   return (
     <aside
-      className={[styles.pane, (surImage || titreCache) && styles.surImage].filter(Boolean).join(' ')}
+      className={[styles.pane, (surImage || titreCache) && styles.surImage]
+        .filter(Boolean)
+        .join(' ')}
       aria-labelledby="detail-title"
       data-detail
     >
@@ -65,7 +67,11 @@ export function DetailPane({
             id="detail-title"
             ref={heading}
             tabIndex={-1}
-            className={[styles.title, (surImage || titreCache) && styles.masque, plume && styles.plume]
+            className={[
+              styles.title,
+              (surImage || titreCache) && styles.masque,
+              plume && styles.plume,
+            ]
               .filter(Boolean)
               .join(' ')}
           >

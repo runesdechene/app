@@ -1,5 +1,5 @@
 /**
- * QUOI     — la coquille : logotype, la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
+ * QUOI     — la coquille : logotype, le scanner et la cloche (et sur PC les énigmes, la coupe, l'engrenage, la
  *            sortie), barre d'onglets, les cinq écrans
  *            racines, le détail, et sur desktop le tiroir et son bouton pour le replier.
  * POURQUOI — les cinq écrans restent MONTÉS : leur état et leur défilement survivent au
@@ -37,6 +37,7 @@ import { usePreparerLaCarte } from '@/features/carte/hooks/usePreparerLaCarte'
 import { useSignalerPresence } from '@/features/lieu/hooks/useSignalerPresence'
 import { useEnvoyerPins, useMesPinsCharges } from '@/features/pin/hooks/usePins'
 import { useNonLues } from '@/features/notifications/hooks/useNotifications'
+import { debloquerSon } from '@/features/scan/lib/son'
 import cloche from '@/assets/ui/cloche.svg'
 import coupe from '@/assets/ui/coupe.svg'
 import embleme from '@/assets/ui/embleme.png'
@@ -44,6 +45,7 @@ import engrenage from '@/assets/ui/engrenage.svg'
 import enigmes from '@/assets/ui/menu-enigmes.svg'
 import logotype from '@/assets/ui/logotype.webp'
 import replier from '@/assets/ui/replier.svg'
+import scanner from '@/assets/ui/scanner.svg'
 import sortie from '@/assets/ui/sortie.svg'
 import { RacineDesFeuilles } from '@/shared/ui/racineDesFeuilles'
 import { Pastille } from '@/shared/ui/Pastille'
@@ -222,6 +224,18 @@ export function Shell() {
               </button>
             </>
           )}
+          {/* Le scanner (spec 2026-10-09-v2-scan) : ce toucher débloque aussi le son du bip (Safari). */}
+          <button
+            type="button"
+            className={styles.action}
+            aria-label="Scanner un Fragment"
+            onClick={() => {
+              debloquerSon()
+              void navigate('/scan')
+            }}
+          >
+            <img src={scanner} alt="" />
+          </button>
           <button
             ref={boutonNotifications}
             type="button"
