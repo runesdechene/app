@@ -1,5 +1,5 @@
 /**
- * QUOI     — les natures et les époques que la feuille des filtres propose.
+ * QUOI     — les natures et les époques que la feuille des filtres propose, et les bornes des époques.
  * POURQUOI — elles ne bougent presque jamais : lues une fois, gardées en cache. On ne les demande
  *            qu'à l'ouverture de la feuille (`actif`).
  */

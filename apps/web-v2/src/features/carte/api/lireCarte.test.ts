@@ -83,11 +83,17 @@ test('les listes des filtres se lisent', () => {
   expect(
     lireFiltres({
       natures: [{ id: 't1', nom: 'Châteaux', icone: null, couleur: '#a9260f' }],
-      epoques: [{ id: 'not-applicable', nom: 'Non concerné' }],
+      epoques: [
+        { id: 'early-middle-ages', nom: 'Haut Moyen Âge', debut: 476, fin: 1000 },
+        { id: 'not-applicable', nom: 'Non concerné', debut: null },
+      ],
     }),
   ).toEqual({
     natures: [{ id: 't1', nom: 'Châteaux', icone: null, couleur: '#a9260f' }],
-    epoques: [{ id: 'not-applicable', nom: 'Non concerné' }],
+    epoques: [
+      { id: 'early-middle-ages', nom: 'Haut Moyen Âge', debut: 476, fin: 1000 },
+      { id: 'not-applicable', nom: 'Non concerné', debut: null, fin: null },
+    ],
   })
 })
 

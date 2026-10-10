@@ -26,9 +26,11 @@ export type LieuCarte = {
   nouveau: boolean
 }
 
-// Ce que la feuille des filtres propose (filtres_de_carte, migration 396).
+// Ce que la feuille des filtres propose (filtres_de_carte, migrations 396 et 477).
+// Les bornes d'une époque sont des années chrétiennes (négatif = av. J.-C.), `null` si ouvertes.
 export type NatureFiltre = { id: string; nom: string; icone: string | null; couleur: string | null }
-export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: { id: string; nom: string }[] }
+export type EpoqueFiltre = { id: string; nom: string; debut: number | null; fin: number | null }
+export type FiltresDeCarte = { natures: NatureFiltre[]; epoques: EpoqueFiltre[] }
 
 export type Territoire = { territoire: string | null; pays: string | null }
 
@@ -76,9 +78,14 @@ export function lireFiltres(json: unknown): FiltresDeCarte {
         couleur: ouNull(chaine)(n.couleur),
       }
     })(f.natures),
-    epoques: liste((v) => {
+    epoques: liste((v): EpoqueFiltre => {
       const e = objet(v)
-      return { id: chaine(e.id), nom: chaine(e.nom) }
+      return {
+        id: chaine(e.id),
+        nom: chaine(e.nom),
+        debut: ouNull(nombre)(e.debut ?? null),
+        fin: ouNull(nombre)(e.fin ?? null),
+      }
     })(f.epoques),
   }
 }
