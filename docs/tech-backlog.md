@@ -115,3 +115,14 @@ du Hub est global, la règle écrase celle d'`App.css` sur toutes les pages qui 
 - [ ] **Hub** : la recherche des énigmes porte sur le texte brut (avec accolades) ; le garde QCM compare la réponse rognée mais enregistre la réponse telle quelle (sans effet : `percer_enigme` normalise) ; des accolades tapées par un joueur dans un signalement disparaissent à l'affichage.
 - [ ] **Énigme #58** : QCM dont la réponse n'est pas l'un des choix (antérieur au calendrier, injouable).
 - [ ] **Lockfile** : un second vitest/vite résout `@types/node` 25.2.0 (24.19.0 ailleurs) — aligner le devDep pour dédoublonner.
+
+## La frise des époques — mineurs de la relecture (11/10/2026)
+
+> Branche `feat/frise-des-epoques` (spec `2026-10-10-frise-des-epoques-design.md`), en prod en
+> Pythéas 1.16.0 : aucun point important ouvert ; ceux-ci sont reportés.
+
+- [ ] **Bouton Filtre** : une plage choisie dans la frise le cercle aussi de rouge (`filtresActifs` inchangé, voulu par la spec) ; on ouvre « Filtre (actif) » et rien n'y est choisi. Piste : une ligne dans la feuille qui nomme la plage de la frise.
+- [ ] **Animation** : la bande entre en fondu mais sort d'un coup ; la rose, « Ma position » et le « + » restent atteignables au clavier pendant le fondu (`visibility` bascule à la fin).
+- [ ] **Tests** : `frise.ts` sans cas « frise vide » ni « ensemble non contigu » ; l'assertion « pas de bouton Renaissance » de la feuille peut passer avant la réponse ; le test du sablier ne vérifie que le libellé.
+- [ ] **CSS** : `Sablier.tsx` importe `CarteScreen.module.css` ; `FriseDesEpoques.module.css` est le seul fichier à utiliser `composes:` ; la règle `data-bord` (années aux bords) ne sert que si la première époque a un début ou la dernière une fin.
+- [ ] **SQL** : `supabase/tests/v2-carte/396_filtres_de_carte.sql` rejoue la 396 (sans `debut`/`fin`) : le pointer sur la 477 s'il resservait.
