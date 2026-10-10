@@ -3,6 +3,7 @@
  * POURQUOI — une brique se valide dans tous ses états, pas seulement le plus flatteur. Les
  *            briques qui réagissent (interrupteur, onglets, champ) sont vivantes : on les essaie.
  */
+import type { Calendrier } from '@runes/calendrier'
 import { useState } from 'react'
 import fondFiche from '@/assets/ui/fond-fiche.webp'
 import partager from '@/assets/ui/partager.svg'
@@ -12,6 +13,7 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { BilleType } from '@/shared/ui/BilleType'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
+import { ChoixDuCalendrier } from '@/shared/ui/ChoixDuCalendrier'
 import { useEnvols } from '@/shared/hooks/useEnvols'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Envols } from '@/shared/ui/Envols'
@@ -63,6 +65,7 @@ const RAISONS = [
 export function DaBriques() {
   const [allume, setAllume] = useState(true)
   const [accord, setAccord] = useState<'m' | 'f'>('m')
+  const [calendrier, setCalendrier] = useState<Calendrier>('chretien')
   const [vue, setVue] = useState<VueCarte>('plan')
   const [nom, setNom] = useState('Uriel')
   const [presentation, setPresentation] = useState(PRESENTATION_PLEINE.slice(0, 300))
@@ -189,6 +192,10 @@ export function DaBriques() {
 
       <DaSection name="Segments">
         <Segments libelle="Accord" options={ACCORDS} valeur={accord} onChange={setAccord} />
+      </DaSection>
+
+      <DaSection name="ChoixDuCalendrier">
+        <ChoixDuCalendrier valeur={calendrier} onChange={setCalendrier} />
       </DaSection>
 
       <DaSection name="PlanSatellite">

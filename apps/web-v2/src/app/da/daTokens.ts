@@ -77,6 +77,7 @@ export const DA_SHOWCASED = [
   'BilleType',
   'Button',
   'Champ',
+  'ChoixDuCalendrier',
   'EmptyState',
   'Envols',
   'Feuille',
