@@ -4,9 +4,11 @@
  */
 import { expect, test } from 'vitest'
 import {
+  anneeCourte,
   anneeEnClair,
   balisesIncomprises,
   CALENDRIERS,
+  compteDuCalendrier,
   estCalendrier,
   siecleEnClair,
   texteEnClair,
@@ -88,4 +90,23 @@ test('estCalendrier ne reconnaît que les quatre', () => {
   expect(estCalendrier('rome')).toBe(true)
   expect(estCalendrier('gaulois')).toBe(false)
   expect(estCalendrier(null)).toBe(false)
+})
+
+test('anneeCourte : le nombre seul, « av. » avant le début du compte', () => {
+  expect(anneeCourte(476, 'chretien')).toBe('476')
+  expect(anneeCourte(-3300, 'chretien')).toBe('3300 av.')
+  expect(anneeCourte(-3300, 'moderne')).toBe('3300 av.')
+  expect(anneeCourte(476, 'rome')).toBe('1229')
+  expect(anneeCourte(-1200, 'rome')).toBe('447 av.')
+  expect(anneeCourte(-1, 'rome')).toBe('753')
+  expect(anneeCourte(930, 'constantinople')).toBe('523 av.')
+  expect(anneeCourte(1453, 'constantinople')).toBe('0')
+  expect(anneeCourte(1600, 'constantinople')).toBe('147')
+})
+
+test('compteDuCalendrier : la fin de phrase de la frise', () => {
+  expect(compteDuCalendrier('chretien')).toBe('avant et après J.-C.')
+  expect(compteDuCalendrier('moderne')).toBe('avant et pendant l’ère commune')
+  expect(compteDuCalendrier('rome')).toBe('en années depuis la fondation de Rome')
+  expect(compteDuCalendrier('constantinople')).toBe('en années depuis la chute de Constantinople')
 })

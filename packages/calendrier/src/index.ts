@@ -125,6 +125,27 @@ export function siecleEnClair(a: number, calendrier: Calendrier): string {
   return siecle(a, calendrier, false)
 }
 
+// Les bornes de la frise des époques : le nombre seul, le calendrier est nommé une fois à côté
+// (`compteDuCalendrier`). L'année de la chute, en Constantinople, est l'an 0 de son compte.
+export function anneeCourte(a: number, calendrier: Calendrier): string {
+  const compte = compter(a, calendrier)
+  if (!compte) return '0'
+  return compte.sens === 'av' ? `${String(compte.n)} av.` : String(compte.n)
+}
+
+export function compteDuCalendrier(calendrier: Calendrier): string {
+  switch (calendrier) {
+    case 'chretien':
+      return 'avant et après J.-C.'
+    case 'moderne':
+      return 'avant et pendant l’ère commune'
+    case 'rome':
+      return 'en années depuis la fondation de Rome'
+    case 'constantinople':
+      return 'en années depuis la chute de Constantinople'
+  }
+}
+
 const BALISE = /\{([^{}]*)\}/g
 const ANNEE = /^([1-9]\d{0,3})(?: (av|ap)\. J\.-C\.)?$/
 const SIECLE = /^([IVXLC]+)(?:e|er|ᵉ|ᵉʳ) siècle(?: (av|ap)\. J\.-C\.)?$/
