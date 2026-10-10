@@ -1,0 +1,53 @@
+/*
+ * QUOI     — une option par ligne, séparées d'un filet ; choisie : le bord rouge des pastilles
+ *            choisies (PastilleChoix), titre et légende comme les lignes des Préférences.
+ */
+.choix {
+  display: grid;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--cible-tactile);
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-carte);
+  cursor: pointer;
+}
+
+.option + .option {
+  border-top-color: color-mix(in srgb, var(--color-bord) 60%, transparent);
+}
+
+.option:has(.radio:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-choisie);
+}
+
+.radio {
+  flex: none;
+  margin-top: 3px;
+  accent-color: var(--color-accent);
+}
+
+.texte {
+  display: grid;
+  gap: var(--space-1);
+  text-align: left;
+}
+
+.libelle {
+  color: var(--color-encre);
+  font-family: var(--font-corps);
+  font-size: var(--corps-size);
+  font-weight: var(--weight-semi);
+}
+
+.explication {
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--legende-size);
+  line-height: var(--dense-leading);
+}

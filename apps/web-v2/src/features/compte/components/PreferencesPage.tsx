@@ -7,6 +7,7 @@
  *            Chaque ligne porte son icône de la maquette (`assets/ui/`).
  *            « Sur ce téléphone » abonne ce téléphone aux notifications push (spec bascule §3) ;
  *            sur iPhone hors de l'appli installée, la ligne dit comment faire.
+ *            Le calendrier (spec 2026-10-09) : où s'affichent les dates des lieux et des énigmes.
  * ATTENTION — un réglage refusé par la base revient à sa place, avec un message : jamais un
  *            interrupteur qui ment.
  */
@@ -22,9 +23,11 @@ import positionIcone from '@/assets/ui/position.svg'
 import question from '@/assets/ui/question.svg'
 import repere from '@/assets/ui/repere.svg'
 import { useAutorisationPosition } from '@/shared/hooks/useAutorisationPosition'
+import { useCalendrier, useChoisirCalendrier } from '@/shared/hooks/useCalendrier'
 import { VERSION } from '@/shared/lib/version'
 import { Button } from '@/shared/ui/Button'
 import { Champ } from '@/shared/ui/Champ'
+import { ChoixDuCalendrier } from '@/shared/ui/ChoixDuCalendrier'
 import { EmptyState } from '@/shared/ui/EmptyState'
 import { Interrupteur } from '@/shared/ui/Interrupteur'
 import { Text } from '@/shared/ui/Text'
@@ -50,6 +53,8 @@ export function PreferencesPage() {
   const { preferences, erreurChargement, reessayer, regler, echec } = usePreferences()
   const push = usePush()
   const position = useAutorisationPosition()
+  const calendrierActuel = useCalendrier()
+  const choixDuCalendrier = useChoisirCalendrier()
   if (erreurChargement) {
     return (
       <div className={styles.page}>
@@ -77,7 +82,7 @@ export function PreferencesPage() {
 
   return (
     <div className={styles.page}>
-      {echec && (
+      {(echec || choixDuCalendrier.echec) && (
         <p role="alert" className={styles.alerte}>
           Ce réglage n’a pas pu être enregistré. Réessaie dans un instant.
         </p>
@@ -163,6 +168,15 @@ export function PreferencesPage() {
           'Mes lieux en couleur',
           'Les lieux que tu as visités prennent la couleur de leur type.',
         )}
+      </Carte>
+
+      <Carte titre="Ton calendrier">
+        <ChoixDuCalendrier
+          valeur={calendrierActuel}
+          onChange={(c) => {
+            choixDuCalendrier.choisir(c)
+          }}
+        />
       </Carte>
 
       <Carte titre="Ton compte">

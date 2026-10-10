@@ -1,5 +1,5 @@
 /**
- * QUOI     — les Préférences : trois cartes, des interrupteurs qui écrivent la bonne clé et
+ * QUOI     — les Préférences : quatre cartes, des interrupteurs qui écrivent la bonne clé et
  *            reviennent en arrière si l'écriture échoue, le changement d'e-mail, le lien Hub.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -45,6 +45,12 @@ vi.mock('@/shared/hooks/useAutorisationPosition', () => ({
   useAutorisationPosition: () => position,
 }))
 
+const calendrier = vi.hoisted(() => ({
+  lireCalendrier: vi.fn((): Promise<'chretien' | 'rome'> => Promise.resolve('chretien')),
+  reglerCalendrier: vi.fn<(c: string) => Promise<void>>(() => Promise.resolve()),
+}))
+vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
+
 function ouvrir() {
   render(
     <QueryClientProvider
@@ -55,10 +61,11 @@ function ouvrir() {
   )
 }
 
-test('les trois cartes et leurs réglages', async () => {
+test('les quatre cartes et leurs réglages', async () => {
   ouvrir()
   expect(await screen.findByRole('region', { name: 'Ce qu’on t’envoie' })).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Ta présence sur la carte' })).toBeInTheDocument()
+  expect(screen.getByRole('region', { name: 'Ton calendrier' })).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Ton compte' })).toBeInTheDocument()
   expect(screen.getByRole('switch', { name: 'Les nouvelles importantes' })).toBeChecked()
   expect(screen.getByRole('switch', { name: 'Le récit de la semaine' })).not.toBeChecked()
@@ -192,4 +199,17 @@ test('sans géolocalisation, pas de ligne « Apparaître sur la carte »', async
   expect(await screen.findByRole('region', { name: 'Ta présence sur la carte' })).toBeInTheDocument()
   expect(screen.queryByText('Apparaître sur la carte')).toBeNull()
   position.autorisation = 'accordee'
+})
+
+test('le calendrier : quatre choix expliqués, Rome s’enregistre', async () => {
+  ouvrir()
+  const carte = await screen.findByRole('region', { name: 'Ton calendrier' })
+  expect(carte).toHaveTextContent('Denys le Petit')
+  expect(screen.getByRole('radio', { name: /Chrétien/ })).toBeChecked()
+  calendrier.lireCalendrier.mockResolvedValue('rome')
+  await userEvent.click(screen.getByRole('radio', { name: /Fondation de Rome/ }))
+  expect(screen.getByRole('radio', { name: /Fondation de Rome/ })).toBeChecked()
+  await waitFor(() => {
+    expect(calendrier.reglerCalendrier.mock.calls[0]?.[0]).toBe('rome')
+  })
 })
