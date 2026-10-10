@@ -2,6 +2,14 @@
 -- Le nom d'une période ne se convertit pas d'un calendrier à l'autre : « Monde post-1945 » perd son
 -- année. filtres_de_carte renvoie les bornes de chaque époque, que la frise écrit dans le
 -- calendrier du joueur. Définition de départ : la live du 10/10 (dernière version, mig 396).
+-- SCHEMA CHECKED (2026-10-10) :
+--   eras.id          : character varying — confirmed via information_schema
+--   eras.name        : character varying — confirmed
+--   eras.year_start  : integer — confirmed
+--   eras.year_end    : integer — confirmed
+--   eras.sort_order  : smallint — confirmed
+--   tags.id, tags.title, tags.icon, tags.color : character varying — confirmed
+--   tags."order"     : integer — confirmed
 
 UPDATE eras SET name = 'Après-guerre mondiale' WHERE id = 'post-1945';
 
