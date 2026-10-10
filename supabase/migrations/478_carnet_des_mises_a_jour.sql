@@ -20,13 +20,15 @@
 --      coeur_mise_a_jour (l'auteur de la note, au premier cœur d'une personne).
 --   5. mises_a_jour_publiees (live copiée entière) : en plus coeurs, miens, mots, aMoi.
 --   6. _notification_v2 (live copiée entière) : la cloche de la V2 montre les quatre types.
+--   7. mes_notifications (live copiée entière) : pour ces quatre types, l'extrait est le titre de la note.
 -- SCHEMA CHECKED (11/10/2026, information_schema et définitions live) :
 --   mises_a_jour(id bigint, titre text, texte text, publiee_le timestamptz, par text, image text,
 --     version text) ; coeurs_mot(contribution_id int, user_id varchar, nombre int, premier_le,
 --     dernier_le timestamptz) ; coeurs_lieu(place_id varchar, user_id varchar, nombre int, premier_le,
 --     dernier_le timestamptz) ; notifications(id int, recipient_id text, type text, data jsonb, read
 --     boolean, created_at timestamptz) ; users(id varchar, role, display_name, first_name, avatar_url) ;
---   storage.objects(bucket_id, name) ; notify(text, text, jsonb) ; _is_staff() ;
+--   storage.objects(bucket_id, name) ; places(id, title) ; _nouveautes_lues_jusqua() ;
+--   notify(text, text, jsonb) ; _is_staff() ;
 --   user_public_name(text, text, text).
 
 CREATE TABLE public.mots_mise_a_jour (
@@ -388,6 +390,53 @@ AS $function$
     'lieu_modifie', 'coeur_mot', 'demande_compagnie', 'demande_acceptee',
     'visite', 'revendication_reprise', 'nouveau_membre', 'enigme_acceptee',
     'mot_mise_a_jour', 'reponse_mise_a_jour', 'coeur_mot_mise_a_jour', 'coeur_mise_a_jour']);
+$function$;
+
+-- 7. La cloche (live copiée entière) : sous une mise à jour, le titre de la note tient lieu d'extrait.
+CREATE OR REPLACE FUNCTION public.mes_notifications()
+ RETURNS json
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  WITH lignes AS (
+    SELECT n.created_at AS quand, json_build_object(
+      'id', n.id,
+      'type', n.type,
+      'quand', n.created_at,
+      'lu', n.read,
+      'qui', CASE WHEN u.id IS NULL THEN NULL ELSE json_build_object(
+               'id', u.id, 'nom', user_public_name(u.id, u.display_name, u.first_name),
+               'avatar', u.avatar_url) END,
+      'lieu', CASE WHEN p.id IS NULL THEN NULL ELSE json_build_object('id', p.id, 'nom', p.title) END,
+      'nombre', COALESCE(n.data->>'viewCount', n.data->>'explorerCount', n.data->>'likeCount',
+                         n.data->>'visitorsToday')::int,
+      -- 478 : sous une mise à jour, son titre tient lieu d'extrait.
+      'extrait', CASE WHEN n.type LIKE '%mise_a_jour' THEN n.data->>'titre' ELSE n.data->>'extrait' END,
+      'evenement', NULLIF(split_part(COALESCE(n.data->>'evenement', ''), ':', 1), ''),
+      -- 421 : la Compagnie d'une demande.
+      'compagnie', CASE WHEN n.data ? 'compagnieId' THEN
+        json_build_object('id', n.data->>'compagnieId', 'nom', n.data->>'compagnieNom') END) AS ligne
+    FROM (SELECT * FROM notifications
+          WHERE recipient_id = (auth.uid())::text AND public._notification_v2(type)
+          ORDER BY created_at DESC LIMIT 50) n
+    LEFT JOIN users u ON u.id = n.data->>'actorId'
+    LEFT JOIN places p ON p.id = n.data->>'placeId'
+    UNION ALL
+    -- Les mises à jour : le titre tient lieu d'extrait.
+    SELECT m.publiee_le, json_build_object(
+      'id', m.id,
+      'type', 'mise_a_jour',
+      'quand', m.publiee_le,
+      'lu', COALESCE(m.publiee_le <= public._nouveautes_lues_jusqua(), true),
+      'qui', NULL, 'lieu', NULL, 'nombre', NULL,
+      'extrait', m.titre,
+      'evenement', NULL,
+      'compagnie', NULL)
+    FROM mises_a_jour m
+  )
+  SELECT COALESCE(json_agg(l.ligne ORDER BY l.quand DESC), '[]'::json)
+  FROM (SELECT * FROM lignes ORDER BY quand DESC LIMIT 50) l;
 $function$;
 
 REVOKE ALL ON FUNCTION public._mot_mise_a_jour(bigint) FROM PUBLIC, anon, authenticated;

@@ -10,6 +10,7 @@ DECLARE
   carnet json; coeurs json; liste json; ma_note json;
   admins int; notif_admins_m1 int; notif_admins_r1 int; notif_a_r1 int; notif_reponse int;
   notif_coeur_mot int; notif_coeur_note int; coeur_mot json; reste int; reste_note int;
+  cloche text;
   refus text[] := '{}';
 BEGIN
   SELECT count(*) INTO admins FROM users WHERE role::text = 'admin';
@@ -54,6 +55,9 @@ BEGIN
 
   -- L'auteur de la note ne s'envoie pas de cœur ; l'équipe efface le mot, ses réponses partent.
   PERFORM set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  -- La cloche de l'admin : la réponse, avec le titre de la note pour extrait.
+  SELECT j->>'extrait' INTO cloche FROM json_array_elements(public.mes_notifications()) j
+   WHERE j->>'type' = 'reponse_mise_a_jour' LIMIT 1;
   BEGIN PERFORM public.aimer_mise_a_jour(note); refus := refus || 'coeur-sa-note-ACCEPTE'::text; EXCEPTION WHEN others THEN refus := refus || SQLERRM; END;
   PERFORM public.effacer_mot_mise_a_jour(m1);
   SELECT count(*) INTO reste FROM mots_mise_a_jour WHERE id IN (m1, r1, r2);
@@ -64,12 +68,12 @@ BEGIN
   SELECT (SELECT count(*) FROM mots_mise_a_jour WHERE mise_a_jour_id = note)
        + (SELECT count(*) FROM coeurs_mise_a_jour WHERE mise_a_jour_id = note) INTO reste_note;
 
-  RAISE EXCEPTION 'BILAN admins=% notif_admins_m1=% (attendu admins-1) notif_admins_r1=% (attendu admins-1) notif_a_r1=% (attendu 1) notif_reponse=% parent_r2=m1:% mots=% reponses=% photos=% venu=% coeurs=% notif_coeur_note=% coeur_mot=% notif_coeur_mot=% liste=% reste=% reste_note=% | refus=%',
+  RAISE EXCEPTION 'BILAN admins=% notif_admins_m1=% (attendu admins-1) notif_admins_r1=% (attendu admins-1) notif_a_r1=% (attendu 1) notif_reponse=% parent_r2=m1:% mots=% reponses=% photos=% venu=% coeurs=% notif_coeur_note=% coeur_mot=% notif_coeur_mot=% liste=% cloche=% (attendu Remonte le temps) reste=% reste_note=% | refus=%',
     admins, notif_admins_m1, notif_admins_r1, notif_a_r1, notif_reponse, parent_r2 = m1,
     json_array_length(carnet->'mots'), json_array_length(carnet->'mots'->0->'reponses'),
     json_array_length(carnet->'mots'->0->'reponses'->0->'photos'), carnet->'mots'->0->>'venu',
     coeurs::text, notif_coeur_note, coeur_mot::text, notif_coeur_mot,
     json_build_object('coeurs', ma_note->'coeurs', 'miens', ma_note->'miens', 'mots', ma_note->'mots', 'aMoi', ma_note->'aMoi')::text,
-    reste, reste_note, array_to_string(refus, ' | ');
+    cloche, reste, reste_note, array_to_string(refus, ' | ');
 END $test$;
 ROLLBACK;
