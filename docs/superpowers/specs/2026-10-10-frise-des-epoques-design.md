@@ -20,8 +20,8 @@ le filtre des époques de la carte reste une liste de boutons dont un nom porte 
   pendant ce temps. Le sablier est **à l'encre** tant que la frise est ouverte **ou** qu'une plage est
   choisie : c'est le seul rappel d'un filtre quand la frise est repliée (pas de gélule, Uriel, 10/10).
 - Pareil sur PC et sur téléphone. Sur PC, la bande est centrée en bas de la partie carte ; sur téléphone,
-  elle se pose au-dessus de la barre du bas, et la rose des vents et « Ma position » s'effacent tant
-  qu'elle est ouverte.
+  elle se pose au-dessus de la barre du bas. La rose des vents, « Ma position » et le « + » s'effacent
+  tant qu'elle est ouverte (le « + » serait recouvert par la bande).
 - La bande :
   - en tête, la plage en clair — « Haut Moyen Âge → Renaissance » — et dessous « de 1229 à 2353 — en
     années depuis la fondation de Rome » ; au repos, « Toutes les époques » et « Glisse les poignées pour
@@ -31,7 +31,7 @@ le filtre des époques de la carte reste une liste de boutons dont un nom porte 
     (≈ 29 px par case) il n'y tient pas, « Préhistoire » et « Ère digitale » marquent les deux bouts ;
   - **deux poignées**, une à chaque bout de la plage, l'année de la borne écrite sous chacune ; une
     borne ouverte (le début de la Préhistoire, la fin de l'Ère digitale) n'a pas d'année ;
-  - sur PC, un lien « Tout » remet la frise au repos.
+  - hors du repos, un lien « Tout » remet la frise au repos (sur PC comme sur téléphone).
 - Au repos (les deux poignées aux deux bouts), rien n'est filtré.
 - La plage choisie ne survit pas à la fermeture de l'onglet, comme les autres filtres aujourd'hui.
 - Sans compte (vitrine) : ni sablier ni frise, comme le bouton des filtres.
