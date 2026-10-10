@@ -3,10 +3,10 @@
  *            d'héritage, son illustration, les onglets « Son histoire » et « Ses énigmes »
  *            (verrouillé), sa voix off, le début de son histoire (« Lire tout le récit » déplie la
  *            suite), et « Acheter ce Fragment ».
- * POURQUOI — toucher un Fragment sur la carte ouvre son histoire, ouverte à tous ; ses énigmes, à
+ * POURQUOI — scanner un Fragment (ou suivre son adresse) ouvre son histoire, ouverte à tous ; ses énigmes, à
  *            créer, seront réservées à ses Porteurs (décision du 08/10).
- * ATTENTION — pas encore de scanner ni de Campement : leurs entrées de la maquette (l'icône du
- *            scanner, « Déjà Porteur ? Entrer au Campement ») attendent qu'ils existent.
+ * ATTENTION — pas encore de Campement : son entrée de la maquette (« Déjà Porteur ? Entrer au
+ *            Campement ») attend qu'il existe. On arrive ici aussi par le scan (/scan).
  */
 import { useState } from 'react'
 import cadenas from '@/assets/ui/cadenas.svg'
@@ -69,7 +69,12 @@ export function RecitFragment({ id }: { id: number }) {
       {recit.heritage && <p className={styles.heritage}>de la collection {recit.heritage}</p>}
       {recit.illustration && (
         <div className={styles.motif}>
-          <img src={aLaTaille(recit.illustration, 164)} alt={`L’illustration de ${recit.nom}`} width={164} height={227} />
+          <img
+            src={aLaTaille(recit.illustration, 164)}
+            alt={`L’illustration de ${recit.nom}`}
+            width={164}
+            height={227}
+          />
         </div>
       )}
 
@@ -84,7 +89,10 @@ export function RecitFragment({ id }: { id: number }) {
       </div>
 
       {recit.audio && (
-        <LecteurAudio src={recit.audio} ligne={recit.narrateur ? `Lu par ${recit.narrateur}` : recit.nom} />
+        <LecteurAudio
+          src={recit.audio}
+          ligne={recit.narrateur ? `Lu par ${recit.narrateur}` : recit.nom}
+        />
       )}
 
       <div className={styles.histoire}>

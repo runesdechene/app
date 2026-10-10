@@ -1,6 +1,7 @@
 /**
  * QUOI     — l'instance TanStack Query partagée par toute l'app, et ce qu'elle garde sur
- *            l'appareil entre deux ouvertures : les lieux de la carte et l'accès accordé.
+ *            l'appareil entre deux ouvertures : les lieux de la carte, l'accès accordé, et les
+ *            empreintes du scan.
  * POURQUOI — un seul cache : deux écrans qui demandent la même donnée ne la chargent qu'une fois.
  *            Les lieux gardés (Uriel, 02/10 : « oui pour garder les lieux ») : la carte s'affiche
  *            dès l'ouverture, puis se met à jour derrière. Dans IndexedDB (~1,5 Mo) : le
@@ -25,12 +26,15 @@ export const queryClient = new QueryClient({
 // Gardés une semaine : la requête doit vivre aussi longtemps que sa copie sur l'appareil.
 queryClient.setQueryDefaults(carteLieuxKey, { gcTime: SEPT_JOURS })
 queryClient.setQueryDefaults(['v2-access'], { gcTime: SEPT_JOURS })
+queryClient.setQueryDefaults(['scan'], { gcTime: SEPT_JOURS })
 
 // L'accès accordé se garde aussi : sans lui, l'app ne s'ouvre pas hors ligne (pin GPS, 06/10).
 // Un refus ne se garde jamais : il se redemande.
 export function aGarderSurLAppareil(cle: QueryKey, etat: QueryStatus, donnees: unknown): boolean {
   if (etat !== 'success') return false
   if (cle[0] === carteLieuxKey[0] && cle[1] === carteLieuxKey[1]) return true
+  // Les empreintes du scan et la liste des Fragments : le deuxième scan marche hors réseau.
+  if (cle[0] === 'scan') return true
   return (
     cle[0] === 'v2-access' &&
     typeof donnees === 'object' &&

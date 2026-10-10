@@ -1,0 +1,7 @@
+/* Le bloc Scan d'un Fragment : les jetons du Hub. « À filmer » à la façon des alertes de l'écran Notifications. */
+.scan-fragment { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border); }
+.scan-fragment h3 { margin: 0; font-family: var(--font-title-family); font-size: 18px; }
+.scan-fragment p { margin: 0; }
+.scan-a-filmer, .scan-erreur { padding: 6px 10px; border-radius: 6px; background: var(--color-primary-light); color: var(--color-primary); font-size: 14px; }
+.scan-vues { margin: 0; padding-left: 18px; font-size: 14px; }
+.scan-chiffres { color: var(--color-text-secondary); font-size: 14px; }

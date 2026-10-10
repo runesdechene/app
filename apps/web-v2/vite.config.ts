@@ -12,6 +12,7 @@ import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 // La version affichée en bas de la barre (shared/lib/version.ts) : celle de package.json.
 const { version } = JSON.parse(
@@ -28,6 +29,17 @@ export default defineConfig({
   envDir: path.resolve(import.meta.dirname, '../..'),
   plugins: [
     react(),
+    // Les fichiers wasm du modèle de vision, à la version installée : servis sous /modeles/wasm
+    // (spec 2026-10-09-v2-scan) ; jamais précachés, le service worker les garde à la demande.
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'node_modules/@mediapipe/tasks-vision/wasm/*',
+          dest: 'modeles/wasm',
+          rename: { stripBase: true },
+        },
+      ],
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       // L'enregistrement se fait dans src/app/miseAJour.ts (vérifications régulières).
@@ -64,7 +76,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Ce que le domaine sert encore pour d'autres que l'appli (e-mails, tutoriel du Hub,
         // icônes des V1 installées) : servi, pas mis en cache sur chaque téléphone.
-        globIgnores: ['res/**', 'email-*', 'pwa-*.png', 'v2/**'],
+        globIgnores: ['res/**', 'email-*', 'pwa-*.png', 'v2/**', 'modeles/**'],
       },
     }),
   ],

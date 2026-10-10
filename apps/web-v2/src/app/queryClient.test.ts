@@ -37,3 +37,9 @@ test('une relecture qui traîne n’arrête pas l’app : passé le délai, on r
 test('une relecture rapide rend la copie', async () => {
   await expect(auPlusTard(Promise.resolve('copie'), 1500)).resolves.toBe('copie')
 })
+
+test('les empreintes du scan et la liste des Fragments se gardent : le deuxième scan marche hors réseau', () => {
+  expect(aGarderSurLAppareil(['scan', 'empreintes'], 'success', [])).toBe(true)
+  expect(aGarderSurLAppareil(['scan', 'fragments'], 'success', [])).toBe(true)
+  expect(aGarderSurLAppareil(['scan', 'empreintes'], 'error', undefined)).toBe(false)
+})

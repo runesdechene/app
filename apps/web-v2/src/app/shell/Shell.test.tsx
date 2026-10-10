@@ -65,6 +65,8 @@ vi.mock('@/features/titres/api/mesTitres', () => ({
 // Téléphone par défaut ; un test passe sur PC avec `ecran.pc = true`.
 const ecran = vi.hoisted(() => ({ pc: false }))
 vi.mock('@/shared/hooks/useSurOrdinateur', () => ({ useSurOrdinateur: () => ecran.pc }))
+const son = vi.hoisted(() => ({ debloquerSon: vi.fn(), sonDebloque: () => false, biper: vi.fn() }))
+vi.mock('@/features/scan/lib/son', () => son)
 
 beforeEach(() => {
   ecran.pc = false
@@ -207,6 +209,15 @@ test('l’en-tête porte « Notifications », la barre porte le Compte ; un seul
   expect(screen.getAllByRole('button', { name: /Ajouter/ })).toHaveLength(1)
   expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Compte/ })).toBeInTheDocument()
+})
+
+test('l’icône du scanner, devant la cloche, ouvre /scan et débloque le son du bip', async () => {
+  const router = renderAt('/accueil')
+  const scanner = await screen.findByRole('button', { name: 'Scanner un Fragment' })
+  expect(scanner.nextElementSibling).toBe(screen.getByRole('button', { name: 'Notifications' }))
+  await userEvent.click(scanner)
+  expect(son.debloquerSon).toHaveBeenCalled()
+  expect(router.state.location.pathname).toBe('/scan')
 })
 
 test('le « + » de la carte ouvre la feuille « Ajouter »', async () => {

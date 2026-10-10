@@ -15,6 +15,9 @@ test('les écrans d’Explore, sous /v2/ (avant la bascule) comme à la racine',
       'compte',
       'bienvenue/carte',
       'da',
+      'scan',
+      'scan/fragment/4',
+      'scan/fragments',
     ]) {
       expect(ecransExplore(base).test(base + ecran)).toBe(true)
     }
@@ -23,7 +26,8 @@ test('les écrans d’Explore, sous /v2/ (avant la bascule) comme à la racine',
 
 test('tout le reste du domaine va au serveur', () => {
   for (const chemin of [
-    '/scan',
+    '/scanner',
+    '/modeles/mobilenet_v3_small.tflite',
     '/lieu/chateau-de-joux',
     '/mouvement',
     '/sitemap.xml',

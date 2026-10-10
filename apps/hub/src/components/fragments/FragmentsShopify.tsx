@@ -13,6 +13,8 @@ import { supabase } from '../../lib/supabase'
 import { fetchIllustrationsCompletes, texteRiche, type IllustrationComplete } from '../../lib/shopifyIllustrations'
 import { SaveBar } from '../SaveBar'
 import { CarteOrigine } from './CarteOrigine'
+import { ScanDuFragment, type ScanDUnFragment } from './ScanDuFragment'
+import { MODELE, recalculerIllustrations } from '../../lib/empreintesScan'
 import './FragmentsShopify.css'
 
 interface Fragment {
@@ -24,6 +26,7 @@ interface Fragment {
   resume: string | null
   histoire: string | null
   illustration_url: string | null
+  illustration_sombre_url: string | null
   audio_url: string | null
   artiste: string | null
   narrateur: string | null
@@ -42,7 +45,7 @@ interface Culture {
 }
 
 const COLONNES =
-  'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom, theme'
+  'id, name, link_url, visible, shopify_handle, resume, histoire, illustration_url, illustration_sombre_url, audio_url, artiste, narrateur, heritage, synchronise_le, origine_lat, origine_lng, origine_nom, theme'
 
 const dateCourte = (iso: string) =>
   new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -59,6 +62,7 @@ export function FragmentsShopify() {
   const [synchro, setSynchro] = useState<string | null>(null) // compte rendu de la dernière synchro
   const [synchronisant, setSynchronisant] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [scans, setScans] = useState<ScanDUnFragment[]>([]) // le scan de chaque Fragment (spec 2026-10-09-v2-scan)
 
   async function fetchFragments() {
     const { data, error } = await supabase.from('title_fragments').select(COLONNES).order('name')
@@ -95,7 +99,13 @@ export function FragmentsShopify() {
   useEffect(() => {
     void fetchData()
     void fetchShopify()
+    void fetchScans()
   }, [])
+
+  async function fetchScans() {
+    const { data, error } = await supabase.rpc('scan_du_hub', { p_modele: MODELE })
+    if (!error) setScans(data as ScanDUnFragment[])
+  }
 
   async function synchroniser() {
     setSynchronisant(true)
@@ -106,8 +116,36 @@ export function FragmentsShopify() {
       setIllustrations(lues)
       const { data, error } = await supabase.rpc('synchroniser_fragments', { p_illustrations: lues })
       if (error) throw error
-      setSynchro(`${data as number} Fragment${(data as number) > 1 ? 's' : ''} mis à jour depuis Shopify`)
       await fetchFragments()
+      const maj = `${data as number} Fragment${(data as number) > 1 ? 's' : ''} mis à jour depuis Shopify`
+      setSynchro(maj)
+      // Les empreintes de scan suivent les illustrations (spec 2026-10-09-v2-scan). Un Fragment qui
+      // échoue (image refusée, modèle injoignable) n'arrête pas les autres : on le nomme à la fin.
+      const { data: aRecalculer } = await supabase
+        .from('title_fragments')
+        .select('id, name, illustration_url, illustration_sombre_url')
+        .eq('visible', true)
+      const liste = (aRecalculer ?? []) as {
+        id: number
+        name: string
+        illustration_url: string | null
+        illustration_sombre_url: string | null
+      }[]
+      const echecs: string[] = []
+      for (const [i, f] of liste.entries()) {
+        setSynchro(`${maj} · empreintes de scan : ${i + 1} / ${liste.length}…`)
+        try {
+          await recalculerIllustrations(f)
+        } catch {
+          echecs.push(f.name)
+        }
+      }
+      setSynchro(
+        echecs.length
+          ? `${maj} · empreintes de scan : ${liste.length - echecs.length} / ${liste.length}, échec pour ${echecs.join(', ')}`
+          : `${maj} · empreintes de scan recalculées`,
+      )
+      await fetchScans()
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : JSON.stringify(e))
     } finally {
@@ -133,6 +171,8 @@ export function FragmentsShopify() {
   }
 
   const fragment = fragments.find((f) => f.id === choisi) ?? null
+  // Les Fragments visibles sans aucune vue du vrai t-shirt : le scan les reconnaît mal.
+  const aFilmer = fragments.filter((f) => f.visible && !scans.find((s) => s.id === f.id)?.vues.length).length
   const changer = (patch: Partial<Fragment>) => {
     setFragments((prev) => prev.map((f) => (f.id === choisi ? { ...f, ...patch } : f)))
   }
@@ -177,6 +217,7 @@ export function FragmentsShopify() {
           <p className="frag-sous-titre">
             {fragments.length} Fragments · contenu tiré de Shopify
             {derniere ? `, synchronisé le ${dateCourte(derniere)}` : ', jamais synchronisé'}
+            {` · ${aFilmer} à filmer pour le scan`}
           </p>
         </div>
         <button className="btn-primary" disabled={synchronisant} onClick={() => void synchroniser()}>
@@ -253,6 +294,8 @@ export function FragmentsShopify() {
             </div>
             <CarteOrigine points={points} choisi={fragment.id}
               onPoser={(lat, lng) => changer({ origine_lat: lat, origine_lng: lng })} />
+            <ScanDuFragment fragment={fragment} scan={scans.find((s) => s.id === fragment.id)}
+              onChange={() => void fetchScans()} />
           </div>
         </div>
       )}
