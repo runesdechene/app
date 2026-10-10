@@ -125,6 +125,28 @@ export function siecleEnClair(a: number, calendrier: Calendrier): string {
   return siecle(a, calendrier, false)
 }
 
+const MOIS = [
+  'janvier',
+  'février',
+  'mars',
+  'avril',
+  'mai',
+  'juin',
+  'juillet',
+  'août',
+  'septembre',
+  'octobre',
+  'novembre',
+  'décembre',
+] as const
+
+// La date du jour (ou d'un jour) dans le calendrier du joueur : le jour et le mois ne changent
+// pas, l'année passe par `anneeEnClair`. Lue dans le fuseau de l'appareil.
+export function dateEnClair(date: Date, calendrier: Calendrier): string {
+  const jour = date.getDate() === 1 ? '1er' : String(date.getDate())
+  return `${jour} ${MOIS[date.getMonth()] ?? ''} ${anneeEnClair(date.getFullYear(), calendrier)}`
+}
+
 // Les bornes de la frise des époques : le nombre seul, le calendrier est nommé une fois à côté
 // (`compteDuCalendrier`). L'année de la chute, en Constantinople, est l'an 0 de son compte.
 export function anneeCourte(a: number, calendrier: Calendrier): string {
@@ -151,7 +173,7 @@ const ANNEE = /^([1-9]\d{0,3})(?: (av|ap)\. J\.-C\.)?$/
 const SIECLE = /^([IVXLC]+)(?:e|er|ᵉ|ᵉʳ) siècle(?: (av|ap)\. J\.-C\.)?$/
 
 // Le contenu d'une balise, converti ; `null` s'il sort de la grammaire de la spec.
-function dateEnClair(contenu: string, calendrier: Calendrier): string | null {
+function baliseEnClair(contenu: string, calendrier: Calendrier): string | null {
   const enAnnee = ANNEE.exec(contenu)
   const enSiecle = SIECLE.exec(contenu)
   if (!enAnnee && !enSiecle) return null
@@ -169,14 +191,14 @@ function dateEnClair(contenu: string, calendrier: Calendrier): string | null {
 export function texteEnClair(texte: string, calendrier: Calendrier): string {
   return texte.replace(BALISE, (_balise, contenu: string) => {
     const propre = contenu.trim()
-    return dateEnClair(propre, calendrier) ?? propre
+    return baliseEnClair(propre, calendrier) ?? propre
   })
 }
 
 export function balisesIncomprises(texte: string): string[] {
   const incomprises = [...texte.matchAll(BALISE)]
     .map((m) => (m[1] ?? '').trim())
-    .filter((contenu) => dateEnClair(contenu, 'moderne') === null)
+    .filter((contenu) => baliseEnClair(contenu, 'moderne') === null)
   const horsBalises = texte.replace(BALISE, '')
   return /[{}]/.test(horsBalises) ? [...incomprises, 'une accolade seule'] : incomprises
 }

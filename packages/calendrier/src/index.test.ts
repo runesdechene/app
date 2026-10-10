@@ -8,6 +8,7 @@ import {
   anneeEnClair,
   balisesIncomprises,
   CALENDRIERS,
+  dateEnClair,
   compteDuCalendrier,
   estCalendrier,
   siecleEnClair,
@@ -109,4 +110,16 @@ test('compteDuCalendrier : la fin de phrase de la frise', () => {
   expect(compteDuCalendrier('moderne')).toBe('avant et pendant l’ère commune')
   expect(compteDuCalendrier('rome')).toBe('en années depuis la fondation de Rome')
   expect(compteDuCalendrier('constantinople')).toBe('en années depuis la chute de Constantinople')
+})
+
+test('dateEnClair : le jour et le mois inchangés, l’année dans le calendrier', () => {
+  const jour = new Date(2026, 9, 11)
+  expect(dateEnClair(jour, 'chretien')).toBe('11 octobre 2026')
+  expect(dateEnClair(jour, 'moderne')).toBe('11 octobre 2026')
+  expect(dateEnClair(jour, 'rome')).toBe('11 octobre 2779 ap. la fondation de Rome')
+  expect(dateEnClair(jour, 'constantinople')).toBe('11 octobre 573 ap. la chute de Constantinople')
+})
+
+test('dateEnClair : « 1er » pour le premier du mois', () => {
+  expect(dateEnClair(new Date(2026, 0, 1), 'chretien')).toBe('1er janvier 2026')
 })
