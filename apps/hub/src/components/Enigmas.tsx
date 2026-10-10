@@ -193,6 +193,11 @@ export function Enigmas() {
       setSaveError('Une réponse libre (ou une variante) ne peut pas être une date balisée : passe en QCM, ou écris-la sans accolades.')
       return
     }
+    // Un QCM dont la réponse n'est pas l'un des choix, à la lettre, ne se gagne pas : le balisage rend l'écart probable.
+    if (editForm.format === 'qcm' && !(editForm.choices || []).filter(c => c.trim()).includes(editForm.answer.trim())) {
+      setSaveError("La réponse doit être exactement l'un des choix (accolades comprises) : sinon personne ne peut réussir l'énigme.")
+      return
+    }
     setSaving(true)
     try {
       const payload = {
