@@ -9,7 +9,9 @@
  * ATTENTION — les sons partent à l'arrivée du verdict, juste après le toucher : le navigateur les
  *            laisse jouer. Animations réduites : rien ne bouge, tout est déjà à sa place.
  */
+import { texteEnClair } from '@runes/calendrier'
 import { useEffect, useState } from 'react'
+import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { soupirer, tinter, tinterGrave } from '@/shared/lib/sons'
 import { Text } from '@/shared/ui/Text'
 import type { Verdict } from '../api/lireEnigmes'
@@ -21,6 +23,7 @@ const APRES_LE_TINTEMENT = 700
 
 export function FeteDuVerdict({ verdict }: { verdict: Verdict }) {
   const [mot] = useState(() => motDeFete(Math.random()))
+  const calendrier = useCalendrier()
   const titreGagne = verdict.nouveauxTitres.length > 0
 
   useEffect(() => {
@@ -46,7 +49,7 @@ export function FeteDuVerdict({ verdict }: { verdict: Verdict }) {
         </div>
       )}
       <p className={styles.mot}>{verdict.juste ? mot : 'Pas cette fois'}</p>
-      <p className={styles.reponse}>{`La réponse : ${verdict.reponse}`}</p>
+      <p className={styles.reponse}>{`La réponse : ${texteEnClair(verdict.reponse, calendrier)}`}</p>
       {verdict.nouveauxTitres.map((t) => (
         <div key={t} className={styles.titre}>
           <span className={styles.surtitre}>Nouveau titre</span>
@@ -61,6 +64,7 @@ export function FeteDuVerdict({ verdict }: { verdict: Verdict }) {
 }
 
 export function BilanDuVerdict({ verdict, culture }: { verdict: Verdict; culture: string }) {
+  const calendrier = useCalendrier()
   const part = (points: number) => (verdict.total > 0 ? Math.min(1, points / verdict.total) : 0)
   return (
     <div className={styles.bilan}>
@@ -84,7 +88,7 @@ export function BilanDuVerdict({ verdict, culture }: { verdict: Verdict; culture
       )}
       <div className={styles.savais} data-faux={verdict.juste ? undefined : true}>
         <span className={styles.savaisTitre}>Le savais-tu ?</span>
-        <p className={styles.explication}>{verdict.explication}</p>
+        <p className={styles.explication}>{texteEnClair(verdict.explication, calendrier)}</p>
       </div>
       {!verdict.juste && <Text variant="legende">{connaissanceEnClair(verdict.points, verdict.total, culture)}</Text>}
     </div>

@@ -5,10 +5,12 @@
  *            énigme résolue, à son numéro fixe — sa question, qui se déplie sur sa réponse et son « Le
  *            savais-tu ? » —, rangées par date de réussite (la plus récente en tête) ou par numéro. Tout en écriture droite et lisible : l'italique penchée ne se lisait pas (Uriel, 07/10).
  * POURQUOI — ce qu'on a appris se relit (Uriel, 07/10). Les énigmes ratées n'y sont pas : elles
- *            reviendront sur la carte.
+ *            reviendront sur la carte. Les dates balisées s'affichent dans le calendrier du joueur.
  */
+import { texteEnClair } from '@runes/calendrier'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { Segments } from '@/shared/ui/Segments'
 import { Text } from '@/shared/ui/Text'
 import { useMaCulture } from '../hooks/useMesEnigmes'
@@ -32,6 +34,7 @@ const TRIS = [
 export function PageCulture({ id }: { id: string }) {
   const { maCulture, erreur } = useMaCulture(id)
   const [tri, setTri] = useState<Tri>('date')
+  const calendrier = useCalendrier()
 
   if (erreur) {
     return (
@@ -106,16 +109,16 @@ export function PageCulture({ id }: { id: string }) {
                   <span className={styles.numero}>{`N° ${String(e.numero)}`}</span>
                   <span className={styles.quand}>{quandEnClair(e.le)}</span>
                 </span>
-                <span className={styles.question}>{e.question}</span>
+                <span className={styles.question}>{texteEnClair(e.question, calendrier)}</span>
               </summary>
               <div className={styles.deplie}>
                 <span className={styles.reponse}>
                   <span className={styles.etiquette}>Réponse</span>
-                  <span className={styles.bonne}>{e.reponse}</span>
+                  <span className={styles.bonne}>{texteEnClair(e.reponse, calendrier)}</span>
                 </span>
                 <span className={styles.savais}>
                   <span className={styles.etiquette}>Le savais-tu ?</span>
-                  <span>{e.explication}</span>
+                  <span>{texteEnClair(e.explication, calendrier)}</span>
                 </span>
               </div>
             </details>

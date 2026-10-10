@@ -16,6 +16,12 @@ vi.mock('../api/enigmes', () => ({
     signalerEnigme(numero, raison, precision, proposition),
 }))
 
+const calendrier = vi.hoisted(() => ({
+  lireCalendrier: vi.fn((): Promise<'chretien' | 'rome'> => Promise.resolve('chretien')),
+  reglerCalendrier: vi.fn(),
+}))
+vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
+
 const onFermer = vi.fn()
 
 function monter() {
@@ -211,4 +217,27 @@ test('après le verdict, signaler : une raison, un mot, un merci, puis retour à
   expect(signalerEnigme).toHaveBeenCalledWith(242, 'reponse_refusee', 'les deux sont justes', '')
   fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
   expect(await screen.findByText('Pas cette fois')).toBeInTheDocument()
+})
+
+test('en calendrier de Rome : les dates converties, le choix stocké part au serveur', async () => {
+  calendrier.lireCalendrier.mockResolvedValue('rome')
+  ouvrirEnigme.mockResolvedValue({
+    ...enigme,
+    recit: 'En {52 av. J.-C.}, Vercingétorix se rend.',
+    question: 'Quand Alésia tombe-t-elle ?',
+    choix: ['{52 av. J.-C.}', '{58 av. J.-C.}'],
+  })
+  percerEnigme.mockResolvedValue({
+    juste: true, reponse: '{52 av. J.-C.}', explication: 'César le raconte en {51 av. J.-C.}.', xp: 1, gagnes: 1,
+    points: 5, total: 130, nouveauxTitres: [], prochain: null,
+    resteEnAttente: 0, niveau: { niveau: 12, avant: 0.5, apres: 0.52 },
+  })
+  monter()
+  await retourner()
+  expect(await screen.findByText('En 702 ap. la fondation de Rome, Vercingétorix se rend.')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '702 ap. la fondation de Rome' }))
+  expect(await screen.findByText('La réponse : 702 ap. la fondation de Rome')).toBeInTheDocument()
+  expect(percerEnigme).toHaveBeenCalledWith(4, '{52 av. J.-C.}')
+  expect(screen.getByText('César le raconte en 703 ap. la fondation de Rome.')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '702 ap. la fondation de Rome' })).toHaveAttribute('data-juste', 'true')
 })

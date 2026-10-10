@@ -11,6 +11,12 @@ import { PageCulture } from './PageCulture'
 const api = vi.hoisted(() => ({ fetchMesEnigmes: vi.fn(), fetchMaCulture: vi.fn() }))
 vi.mock('../api/mesEnigmes', () => api)
 
+const calendrier = vi.hoisted(() => ({
+  lireCalendrier: vi.fn((): Promise<'moderne'> => Promise.resolve('moderne')),
+  reglerCalendrier: vi.fn(),
+}))
+vi.mock('@/shared/lib/calendrierDuCompte', () => calendrier)
+
 function afficher() {
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -113,4 +119,14 @@ test('sans cercle, pas de lien vers la carte', async () => {
   afficher()
   expect(await screen.findByText('Encore 58 énigmes à percer')).toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /Les chercher sur la carte/ })).toBeNull()
+})
+
+test('les énigmes résolues dans le calendrier choisi', async () => {
+  api.fetchMaCulture.mockResolvedValue({
+    ...byzance,
+    enigmes: [{ ...byzance.enigmes[0], question: 'Que se passe-t-il en {52 av. J.-C.} ?', reponse: '{IIIe siècle av. J.-C.}' }],
+  })
+  afficher()
+  expect(await screen.findByText('Que se passe-t-il en 52 av. è. c. ?')).toBeInTheDocument()
+  expect(screen.getByText('IIIᵉ siècle av. è. c.')).toBeInTheDocument()
 })

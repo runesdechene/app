@@ -7,8 +7,12 @@
  *            choisie par Uriel le 07/10 : la première version n'était « pas sexy » et peu lisible). Une seule réponse (QCM : un bouton par
  *            choix ; libre : un champ) ; le verdict (VerdictEnigme) fête la bonne réponse et, juste ou
  *            fausse, montre « Le savais-tu ? » — ce qui compte, c'est d'apprendre.
+ * ATTENTION — les dates balisées s'affichent dans le calendrier du joueur ; un choix part au serveur
+ *            tel qu'il est stocké (spec calendrier).
  */
+import { texteEnClair, type Calendrier } from '@runes/calendrier'
 import { useState } from 'react'
+import { useCalendrier } from '@/shared/hooks/useCalendrier'
 import { Feuille } from '@/shared/ui/Feuille'
 import { Text } from '@/shared/ui/Text'
 import type { EnigmeOuverte, Verdict } from '../api/lireEnigmes'
@@ -22,6 +26,7 @@ import styles from './FeuilleEnigme.module.css'
 
 export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; onFermer: () => void }) {
   const { enigme, erreurOuverture, repondre, verdict, envoi, erreurReponse } = useEnigme(touchee.id)
+  const calendrier = useCalendrier()
   const [retourne, setRetourne] = useState(false)
   const [choisie, setChoisie] = useState<string | null>(null)
   // La réponse tapée vit ici : la feuille de signalement remplace un moment les réponses.
@@ -91,8 +96,8 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
             <span className={styles.culture}>{enigme.culture.nom}</span>
           </span>
         </header>
-        {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{enigme.recit}</p>}
-        {verdict ? <Text variant="legende">{enigme.question}</Text> : <p className={styles.question}>{enigme.question}</p>}
+        {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>}
+        {verdict ? <Text variant="legende">{texteEnClair(enigme.question, calendrier)}</Text> : <p className={styles.question}>{texteEnClair(enigme.question, calendrier)}</p>}
         {!verdict && (
           <button
             type="button"
@@ -110,6 +115,7 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
             enigme={enigme}
             verdict={verdict}
             choisie={choisie}
+            calendrier={calendrier}
             libre={libre}
             onLibre={setLibre}
             envoi={envoi}
@@ -162,6 +168,7 @@ function Reponses({
   enigme,
   verdict,
   choisie,
+  calendrier,
   libre,
   onLibre,
   envoi,
@@ -170,6 +177,7 @@ function Reponses({
   enigme: EnigmeOuverte
   verdict: Verdict | undefined
   choisie: string | null
+  calendrier: Calendrier
   libre: string
   onLibre: (r: string) => void
   envoi: boolean
@@ -219,7 +227,7 @@ function Reponses({
           <span className={styles.lettre} aria-hidden="true">
             {'ABCDEFGH'.charAt(i)}
           </span>
-          {c}
+          {texteEnClair(c, calendrier)}
         </button>
       ))}
     </div>
