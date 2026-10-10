@@ -83,6 +83,9 @@ importers:
 
   apps/web-v2:
     dependencies:
+      '@runes/calendrier':
+        specifier: workspace:*
+        version: link:../../packages/calendrier
       '@supabase/supabase-js':
         specifier: 2.117.2
         version: 2.117.2
