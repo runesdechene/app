@@ -90,7 +90,8 @@ Rome « de 1229 à 2353 — en années depuis la fondation de Rome ».
 - `FiltreFeuille.tsx` : la rubrique « Époques » disparaît (code mort supprimé dans le même commit) ;
   « Réinitialiser » remet aussi la frise au repos, puisqu'il vide `Filtres`.
 - L'icône du sablier : un SVG dans les icônes de la carte, dessiné comme dans la maquette.
-- La page DA (`/da`) reçoit la frise, comme chaque brique.
+- La page DA (`/da`) ne la montre pas : elle ne porte que les briques de `shared/ui`, et la frise
+  appartient à la carte.
 
 ## Ne change pas
 
