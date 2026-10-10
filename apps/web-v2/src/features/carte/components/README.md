@@ -3,3 +3,6 @@
 `SceauQuiSeRetourne` (le sceau posé sous le doigt, qui se retourne quand l'énigme est chargée) puis
 `FeuilleEnigme` (la culture, le récit, la question, la réponse, le verdict). Spec :
 `docs/superpowers/specs/2026-10-07-v2-enigmes-design.md`.
+
+`FriseDesEpoques` : la frise des époques, une bande sur la carte (une case par époque, deux poignées).
+Spec : `docs/superpowers/specs/2026-10-10-frise-des-epoques`.

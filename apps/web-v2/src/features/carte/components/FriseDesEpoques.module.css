@@ -1,0 +1,220 @@
+/*
+ * QUOI     — la frise des époques (maquettes Figma 539:851 PC, 542:878 téléphone) : l'en-tête, la
+ *            piste de cases, deux poignées natives posées dessus, les bornes dessous.
+ * ATTENTION — les deux sliders débordent de 11 px (la demi-poignée) de chaque côté : ainsi le
+ *            centre de la poignée tombe pile sur le bord d'une case.
+ */
+.bande {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  border: 1px solid var(--color-sable);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-feuille) 94%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-ombre) 14%, transparent);
+}
+
+.tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.titre {
+  margin: 0;
+  color: var(--color-encre);
+  font-family: var(--font-titre);
+  font-size: var(--titre-carte-size);
+  font-weight: var(--weight-normal);
+}
+
+.detail {
+  margin: 0;
+  color: var(--color-texte-doux);
+  font-family: var(--font-corps);
+  font-size: var(--pilule-size);
+}
+
+.tout {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-family: var(--font-corps);
+  font-size: var(--flux-size);
+  font-weight: var(--weight-semi);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.piste {
+  position: relative;
+}
+
+.cases {
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  border-radius: 3px;
+  background: var(--color-sable);
+  color: var(--color-texte-doux);
+  text-align: center;
+}
+
+.case:first-child {
+  border-radius: 10px 3px 3px 10px;
+}
+
+.case:last-child {
+  border-radius: 3px 10px 10px 3px;
+}
+
+.case[data-dedans] {
+  background: var(--color-encre);
+  color: var(--color-sur-accent);
+}
+
+.nom {
+  display: none;
+  overflow: hidden;
+  font-family: var(--font-corps);
+  font-size: var(--micro-size);
+  font-weight: var(--weight-semi);
+  line-height: var(--dense-leading);
+  line-clamp: 2;
+}
+
+.poignee {
+  position: absolute;
+  top: 0;
+  height: 28px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+}
+
+.debut,
+.fin {
+  width: calc((var(--n) - 1) / var(--n) * 100% + 22px);
+}
+
+.debut {
+  composes: poignee;
+  left: -11px;
+}
+
+.fin {
+  composes: poignee;
+  left: calc(100% / var(--n) - 11px);
+}
+
+.poignee::-webkit-slider-runnable-track {
+  background: none;
+}
+
+.poignee::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-encre);
+  border-radius: var(--radius-rond);
+  background: var(--color-feuille);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-ombre) 30%, transparent);
+  pointer-events: auto;
+  cursor: grab;
+  appearance: none;
+}
+
+.poignee::-moz-range-track {
+  background: none;
+}
+
+.poignee::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-encre);
+  border-radius: var(--radius-rond);
+  background: var(--color-feuille);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-ombre) 30%, transparent);
+  pointer-events: auto;
+  cursor: grab;
+}
+
+.poignee:focus-visible {
+  outline: none;
+}
+
+.poignee:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.poignee:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.bornes {
+  position: relative;
+  height: var(--space-4);
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-corps);
+  font-size: var(--pilule-size);
+}
+
+.bout {
+  position: absolute;
+  left: 0;
+  color: var(--color-texte-pale);
+}
+
+.boutFin {
+  composes: bout;
+  right: 0;
+  left: auto;
+}
+
+.annee {
+  position: absolute;
+  color: var(--color-encre);
+  font-weight: var(--weight-gras);
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+.annee[data-cote='debut'] {
+  left: calc(var(--de) / var(--n) * 100%);
+}
+
+.annee[data-cote='fin'] {
+  left: calc((var(--a) + 1) / var(--n) * 100%);
+}
+
+@media (width >= 1024px) {
+  .case,
+  .poignee {
+    height: 40px;
+  }
+
+  .nom {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .bout {
+    display: none;
+  }
+}

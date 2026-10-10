@@ -35,6 +35,9 @@ const PASSED_INLINE = new Set([
   '--couleur', // la couleur d'une Compagnie (mig 422)
   '--encre-compagnie', // son encre lisible (shared/lib/teinte.ts)
   '--sur-couleur',
+  '--n', // la frise des époques : le nombre d'époques, la plage choisie (de, a)
+  '--de',
+  '--a',
   '--taille', // la taille d'un tampon photo, posée par la rangée qui le contient
 ])
 

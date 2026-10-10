@@ -30,6 +30,10 @@ declare module 'react' {
     '--x'?: string
     '--y'?: string
     '--couleur-culture'?: string
+    // La frise des époques : le nombre d'époques et la plage choisie (rangs de la première et de la dernière).
+    '--n'?: string
+    '--de'?: string
+    '--a'?: string
     '--icone'?: string // l'icône d'une culture, en masque peint à sa couleur
   }
 }
