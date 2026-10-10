@@ -76,6 +76,8 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
     repondre(r)
   }
 
+  const question = texteEnClair(enigme.question, calendrier)
+
   return (
     <Feuille titre={`Énigme · ${enigme.culture.nom}`} onFermer={onFermer}>
       <div
@@ -97,7 +99,7 @@ export function FeuilleEnigme({ touchee, onFermer }: { touchee: EnigmeTouchee; o
           </span>
         </header>
         {verdict ? <FeteDuVerdict verdict={verdict} /> : <p className={styles.recit}>{texteEnClair(enigme.recit, calendrier)}</p>}
-        {verdict ? <Text variant="legende">{texteEnClair(enigme.question, calendrier)}</Text> : <p className={styles.question}>{texteEnClair(enigme.question, calendrier)}</p>}
+        {verdict ? <Text variant="legende">{question}</Text> : <p className={styles.question}>{question}</p>}
         {!verdict && (
           <button
             type="button"
