@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { texteEnClair } from '@runes/calendrier'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import './EnigmesSignalees.css'
@@ -79,13 +80,13 @@ export function EnigmesSignalees() {
           <article key={s.id} className="signalement">
             <p className="signalement-question">
               <span className="signalement-numero">Énigme n° {s.enigme.numero}</span>
-              {s.enigme.question}
+              {texteEnClair(s.enigme.question, 'chretien')}
             </p>
 
             <div className="signalement-paire">
               <div>
                 <span className="signalement-etiquette">Attendue</span>
-                <span className="signalement-reponse">{s.enigme.reponse}</span>
+                <span className="signalement-reponse">{texteEnClair(s.enigme.reponse, 'chretien')}</span>
                 {s.enigme.variantes.length > 0 && (
                   <span className="signalement-variantes">ou {s.enigme.variantes.join(', ')}</span>
                 )}
@@ -93,7 +94,7 @@ export function EnigmesSignalees() {
               <div>
                 <span className="signalement-etiquette">Réponse de {s.qui.nom}</span>
                 {s.reponseDonnee !== null ? (
-                  <span className="signalement-reponse signalement-reponse--joueur">{s.reponseDonnee}</span>
+                  <span className="signalement-reponse signalement-reponse--joueur">{texteEnClair(s.reponseDonnee, 'chretien')}</span>
                 ) : (
                   <span className="signalement-pas-repondu">N’a pas encore répondu</span>
                 )}

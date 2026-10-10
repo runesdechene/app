@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@runes/calendrier": "workspace:*",
     "@supabase/supabase-js": "^2.39.3",
     "dompurify": "^3.4.8",
     "jszip": "^3.10.1",

@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
+import { ApercuCalendriers } from './ApercuCalendriers'
 import type { AnswerFormat, Difficulty, EnigmaForm, EnigmaType, Tag, Theme } from './types'
 
 // Le formulaire d'une énigme : sorti d'Enigmas.tsx quand il a dépassé 700 lignes (variantes, mig 470).
@@ -185,6 +186,8 @@ export function FormulaireEnigme({
           placeholder="Pourquoi cette reponse est correcte..."
         />
       </div>
+
+      <ApercuCalendriers form={form} />
 
       <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input

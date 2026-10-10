@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { texteEnClair } from '@runes/calendrier'
 import { supabase } from '../lib/supabase'
 import { SaveBar } from './SaveBar'
 import { FormulaireEnigme } from './enigmes/FormulaireEnigme'
@@ -187,6 +188,13 @@ export function Enigmas() {
   async function handleSaveForm() {
     setSaving(true)
     setSaveError(null)
+    // Une réponse libre ne se balise pas : personne ne taperait « 702 ap. la fondation de Rome »
+    // (spec calendrier).
+    if (editForm.format === 'free' && /[{}]/.test(editForm.answer)) {
+      setSaveError('Une réponse libre ne peut pas être une date balisée : passe en QCM, ou écris-la sans accolades.')
+      setSaving(false)
+      return
+    }
     try {
       const payload = {
         type: editForm.type,
@@ -430,7 +438,7 @@ export function Enigmas() {
                       </span>
                     </td>
                     <td style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {e.question || <span style={{ opacity: 0.4 }}>Pas de question</span>}
+                      {texteEnClair(e.question, 'chretien') || <span style={{ opacity: 0.4 }}>Pas de question</span>}
                     </td>
                     <td style={{ fontSize: 11 }}>{themeName}</td>
                     <td style={{ textAlign: 'center' }}>
