@@ -529,6 +529,52 @@ export type Database = {
           },
         ]
       }
+      coeurs_mise_a_jour: {
+        Row: {
+          dernier_le: string
+          mise_a_jour_id: number
+          nombre: number
+          premier_le: string
+          user_id: string
+        }
+        Insert: {
+          dernier_le?: string
+          mise_a_jour_id: number
+          nombre?: number
+          premier_le?: string
+          user_id: string
+        }
+        Update: {
+          dernier_le?: string
+          mise_a_jour_id?: number
+          nombre?: number
+          premier_le?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coeurs_mise_a_jour_mise_a_jour_id_fkey"
+            columns: ["mise_a_jour_id"]
+            isOneToOne: false
+            referencedRelation: "mises_a_jour"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mise_a_jour_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mise_a_jour_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coeurs_mot: {
         Row: {
           contribution_id: number
@@ -568,6 +614,52 @@ export type Database = {
           },
           {
             foreignKeyName: "coeurs_mot_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coeurs_mot_mise_a_jour: {
+        Row: {
+          dernier_le: string
+          mot_id: number
+          nombre: number
+          premier_le: string
+          user_id: string
+        }
+        Insert: {
+          dernier_le?: string
+          mot_id: number
+          nombre?: number
+          premier_le?: string
+          user_id: string
+        }
+        Update: {
+          dernier_le?: string
+          mot_id?: number
+          nombre?: number
+          premier_le?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coeurs_mot_mise_a_jour_mot_id_fkey"
+            columns: ["mot_id"]
+            isOneToOne: false
+            referencedRelation: "mots_mise_a_jour"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mot_mise_a_jour_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coeurs_mot_mise_a_jour_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users_admin"
@@ -2677,6 +2769,65 @@ export type Database = {
           title?: string
         }
         Relationships: []
+      }
+      mots_mise_a_jour: {
+        Row: {
+          created_at: string
+          id: number
+          images: Json
+          mise_a_jour_id: number
+          parent_id: number | null
+          texte: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          images?: Json
+          mise_a_jour_id: number
+          parent_id?: number | null
+          texte: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          images?: Json
+          mise_a_jour_id?: number
+          parent_id?: number | null
+          texte?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mots_mise_a_jour_mise_a_jour_id_fkey"
+            columns: ["mise_a_jour_id"]
+            isOneToOne: false
+            referencedRelation: "mises_a_jour"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mots_mise_a_jour_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "mots_mise_a_jour"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mots_mise_a_jour_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mots_mise_a_jour_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users_admin"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       murmures: {
         Row: {
@@ -6624,6 +6775,7 @@ export type Database = {
         Returns: number
       }
       _mot: { Args: { p_id: number }; Returns: Json }
+      _mot_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       _nature_de: { Args: { p_id: string }; Returns: Json }
       _nom_titre: {
         Args: {
@@ -6875,6 +7027,7 @@ export type Database = {
         Args: { p_aime: boolean; p_message: number }
         Returns: undefined
       }
+      aimer_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       ajouter_fragment: {
         Args: { p_collection: string; p_nom: string }
         Returns: number
@@ -6924,10 +7077,15 @@ export type Database = {
         Returns: Json
       }
       basculer_coeur_mot: { Args: { p_id: number }; Returns: Json }
+      basculer_coeur_mot_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       basculer_envie: { Args: { p_id: string }; Returns: boolean }
       broadcast_announcement_push: { Args: { p_id: string }; Returns: Json }
       cancel_voyage: {
         Args: { p_user_id: string; p_voyage_id: string }
+        Returns: Json
+      }
+      carnet_de_mise_a_jour: {
+        Args: { p_id: number; p_limite?: number }
         Returns: Json
       }
       carnet_du_lieu: {
@@ -6964,6 +7122,7 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      coeurs_de_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       coeurs_du_lieu: { Args: { p_id: string }; Returns: Json }
       compagnie: { Args: { p_id: string }; Returns: Json }
       compagnie_par_lien: { Args: { p_cle: string }; Returns: string }
@@ -7190,11 +7349,21 @@ export type Database = {
         Args: { p_canal: string; p_mentions?: string[]; p_texte: string }
         Returns: Json
       }
+      ecrire_sous_mise_a_jour: {
+        Args: {
+          p_id: number
+          p_images?: Json
+          p_parent?: number
+          p_texte: string
+        }
+        Returns: Json
+      }
       edit_place_description: {
         Args: { p_content: string; p_place_id: string; p_user_id: string }
         Returns: Json
       }
       effacer_mot: { Args: { p_id: number }; Returns: Json }
+      effacer_mot_mise_a_jour: { Args: { p_id: number }; Returns: Json }
       eject_voyage_participant: {
         Args: {
           p_chief_user_id: string
