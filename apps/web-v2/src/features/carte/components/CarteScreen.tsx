@@ -1,7 +1,8 @@
 /**
  * QUOI     — l'onglet Carte : le fond parchemin, les lieux en calques, le relief qui se lève
- *            quand on incline, la recherche et le filtre, le nom du territoire, la rose des vents,
- *            « Ma position » (spec Carte).
+ *            quand on incline, la recherche, le filtre et le sablier (la frise des époques, qui
+ *            prend la place de la rose, de « Ma position » et du « + » tant qu'elle est ouverte),
+ *            le nom du territoire, la rose des vents, « Ma position » (spec Carte).
  * POURQUOI — la carte est créée une fois et vit tant que l'onglet est monté ; les lieux arrivent
  *            ensuite et se redessinent quand ils changent, ou quand l'option « Mes lieux en
  *            couleur » bascule. Rien n'attend ce qui peut venir après (Uriel, 02/10 : « la carte
@@ -32,6 +33,7 @@ import { useActifs } from '../hooks/useActifs'
 import { useActifsSurLaCarte } from '../hooks/useActifsSurLaCarte'
 import type { Soi } from '../lib/marquesActifs'
 import { useCarteLieux } from '../hooks/useCarteLieux'
+import { useFiltresDeCarte } from '../hooks/useFiltresDeCarte'
 import { useMesPinsSurLaCarte } from '../hooks/useMesPinsSurLaCarte'
 import { useEnigmesSurLaCarte, type EnigmeTouchee } from '../hooks/useEnigmesSurLaCarte'
 import { FeuilleEnigme } from './FeuilleEnigme'
@@ -57,8 +59,10 @@ import styles from './CarteScreen.module.css'
 import { CompteurActifs } from './CompteurActifs'
 import { FeuilleActifs } from './FeuilleActifs'
 import { FiltreFeuille } from './FiltreFeuille'
+import { FriseDesEpoques } from './FriseDesEpoques'
 import { Inscription } from './Inscription'
 import { Recherche } from './Recherche'
+import { Sablier } from './Sablier'
 
 const DUREE_MESSAGE = 3000
 
@@ -132,7 +136,10 @@ function CarteVivante({
   const { id: lieuOuvert } = useParams()
   const [sansPosition, setSansPosition] = useState(false)
   const [filtreOuvert, setFiltreOuvert] = useState(false)
+  const [friseOuverte, setFriseOuverte] = useState(false)
   const [filtres, setFiltres] = useState(FILTRES_VIDES)
+  // Même clé de cache que la feuille des filtres : une seule lecture.
+  const { epoques } = useFiltresDeCarte(friseOuverte)
   // Un dessin des marques qui échoue (canevas absent, icône illisible) se dit comme un échec de
   // chargement ; « Réessayer » relance les deux.
   const [marquesEnPanne, setMarquesEnPanne] = useState(false)
@@ -298,7 +305,11 @@ function CarteVivante({
   }
 
   return (
-    <div className={styles.ecran} data-sous-la-recherche={sousLaRecherche ? true : undefined}>
+    <div
+      className={styles.ecran}
+      data-sous-la-recherche={sousLaRecherche ? true : undefined}
+      data-frise={friseOuverte || undefined}
+    >
       <div ref={conteneur} className={styles.carte} data-testid="carte" />
       <div ref={placeDuTiroir} className={styles.placeDuTiroir} aria-hidden="true" />
       {premiereFois && <AttenteLieux finie={lieuxPoses || erreur || marquesEnPanne} />}
@@ -323,6 +334,15 @@ function CarteVivante({
           membres={!visiteur}
           onAller={({ lat, lng }) => carte?.flyTo({ center: [lng, lat], zoom: 14 })}
         />
+        {!visiteur && (
+          <Sablier
+            ouvert={friseOuverte}
+            actif={friseOuverte || filtres.epoques.size > 0}
+            onBasculer={() => {
+              setFriseOuverte(!friseOuverte)
+            }}
+          />
+        )}
         {!visiteur && (
           <button
             type="button"
@@ -376,6 +396,17 @@ function CarteVivante({
       >
         <img src={position} alt="" />
       </button>
+      {!visiteur && friseOuverte && (
+        <div className={styles.frise}>
+          <FriseDesEpoques
+            epoques={epoques}
+            choix={filtres.epoques}
+            onChoix={(choix) => {
+              setFiltres({ ...filtres, epoques: choix })
+            }}
+          />
+        </div>
+      )}
       {listeOuverte && (
         <FeuilleActifs
           actifs={actifs}

@@ -6,7 +6,7 @@
  * POURQUOI — MapLibre ne tourne pas dans jsdom : la fausse carte vient de `src/test/`.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { vi } from 'vitest'
@@ -19,7 +19,15 @@ const api = vi.hoisted(() => ({
   fetchCartePublique: vi.fn<() => Promise<LieuCarte[]>>(),
   fetchLieuxEnCouleur: vi.fn(() => Promise.resolve(false)),
   fetchTerritoire: vi.fn(() => Promise.resolve({ territoire: null, pays: null })),
-  fetchFiltres: vi.fn(() => Promise.resolve({ natures: [], epoques: [] })),
+  fetchFiltres: vi.fn(() =>
+    Promise.resolve({
+      natures: [],
+      epoques: [
+        { id: 'early-middle-ages', nom: 'Haut Moyen Âge', debut: 476, fin: 1000 },
+        { id: 'renaissance', nom: 'Renaissance', debut: 1453, fin: 1600 },
+      ],
+    }),
+  ),
 }))
 vi.mock('../api/carte', () => api)
 
@@ -298,6 +306,26 @@ test('le bouton Filtre ouvre la feuille ; un filtre choisi se voit, et le bouton
   await userEvent.click(screen.getByRole('button', { name: 'Voir le lieu' }))
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Filtre (actif)' })).toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: 'Filtre (actif)' }))
+  expect(screen.queryByRole('button', { name: 'Renaissance' })).not.toBeInTheDocument()
+})
+
+test('le sablier ouvre la frise ; refermée sur une plage, il reste à l’encre', async () => {
+  afficher()
+  const sablier = screen.getByRole('button', { name: 'Frise des époques' })
+  expect(sablier).not.toHaveAttribute('data-actif')
+  await userEvent.click(sablier)
+  expect(await screen.findByRole('region', { name: 'La frise des époques' })).toBeInTheDocument()
+  fireEvent.change(await screen.findByRole('slider', { name: 'Fin de la plage' }), {
+    target: { value: '0' },
+  })
+  expect(await screen.findAllByText('Haut Moyen Âge')).not.toHaveLength(0)
+  await userEvent.click(sablier)
+  expect(screen.queryByRole('region', { name: 'La frise des époques' })).not.toBeInTheDocument()
+  expect(sablier).toHaveAttribute('data-actif')
+  await userEvent.click(screen.getByRole('button', { name: 'Filtre (actif)' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Réinitialiser' }))
+  expect(sablier).not.toHaveAttribute('data-actif')
 })
 
 // Un ResizeObserver qui, comme celui du navigateur, mesure dès qu'il observe ; `signaler` en
@@ -390,4 +418,5 @@ test('le visiteur voit la carte publique, sans filtre ni préférences, jusqu’
   expect(api.fetchCarteLieux).not.toHaveBeenCalled()
   expect(api.fetchLieuxEnCouleur).not.toHaveBeenCalled()
   expect(screen.queryByRole('button', { name: 'Filtre' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Frise des époques' })).not.toBeInTheDocument()
 })

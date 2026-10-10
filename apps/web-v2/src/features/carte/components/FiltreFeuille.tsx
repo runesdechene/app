@@ -1,11 +1,11 @@
 /**
  * QUOI     — la feuille du bouton Filtre (maquette « Carte — Filtrer », Uriel 30/09) : ma
- *            progression (Tout · À découvrir · Visités · Ajoutés), les natures, les époques ;
+ *            progression (Tout · À découvrir · Visités · Ajoutés), les natures ;
  *            « Réinitialiser » en haut, « Voir les N lieux » en bas.
  * POURQUOI — spec Carte : un seul bouton, les filtres dans une feuille, jamais en pastilles sur
  *            la carte. Les filtres s'appliquent tout de suite ; le bouton du bas dit combien de
  *            lieux restent, et ferme. Mêmes pastilles qu'« Ajouter un lieu » : la nature et sa
- *            bille, l'époque en encre une fois choisie.
+ *            bille. Les époques ne sont plus ici : elles sont sur la carte, dans la frise (sablier).
  * ATTENTION — la feuille garde son en-tête et son bouton ; seul le milieu défile.
  */
 import { Feuille } from '@/shared/ui/Feuille'
@@ -50,7 +50,7 @@ export function FiltreFeuille({
   onFiltres: (f: Filtres) => void
   onFermer: () => void
 }) {
-  const { natures, epoques } = useFiltresDeCarte(true)
+  const { natures } = useFiltresDeCarte(true)
   const compte = compterNatures(lieux)
   const restants = filtrer(lieux, filtres).length
   // Les plus fréquentes d'abord : ce qu'on cherche le plus est en haut (comme la vitrine).
@@ -111,25 +111,6 @@ export function FiltreFeuille({
             ))}
           </div>
 
-          <div className={styles.rubrique}>
-            <h3 className={styles.titreRubrique}>Époques</h3>
-            <span className={styles.aide}>Plusieurs à la fois</span>
-          </div>
-          <div className={styles.puces}>
-            {epoques.map((e) => (
-              <button
-                key={e.id}
-                type="button"
-                className={styles.epoque}
-                aria-pressed={filtres.epoques.has(e.id)}
-                onClick={() => {
-                  onFiltres({ ...filtres, epoques: basculer(filtres.epoques, e.id) })
-                }}
-              >
-                {e.nom}
-              </button>
-            ))}
-          </div>
         </div>
 
         <button type="button" className={styles.voir} onClick={onFermer}>

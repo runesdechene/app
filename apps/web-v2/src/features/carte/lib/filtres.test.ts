@@ -57,6 +57,12 @@ test('les époques : sans époque, un lieu compte comme « Indéfinie »', () =>
   ).toEqual(['c', 's'])
 })
 
+test('une plage d’époques cache « Non concerné » et les lieux sans époque', () => {
+  expect(ids(filtrer(TOUS, { ...FILTRES_VIDES, epoques: new Set(['late-middle-ages']) }))).toEqual([
+    'c',
+  ])
+})
+
 test('les filtres se cumulent', () => {
   const f = {
     progression: 'visites' as const,

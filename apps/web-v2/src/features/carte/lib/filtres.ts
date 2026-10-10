@@ -1,7 +1,7 @@
 /**
  * QUOI     — les filtres de la carte (maquette « Carte — Filtrer », Uriel 30/09) : ma progression,
- *            les natures, les époques. Un lieu passe s'il répond à chacun ; dans les natures et les
- *            époques, l'une ou l'autre suffit.
+ *            les natures, les époques (choisies dans la frise du sablier, sur la carte). Un lieu passe
+ *            s'il répond à chacun ; dans les natures et les époques, l'une ou l'autre suffit.
  * POURQUOI — des fonctions pures : la carte filtre les lieux déjà chargés, sans requête, et tout
  *            se teste sans carte. Un lieu sans époque compte comme « Indéfinie ».
  */

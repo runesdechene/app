@@ -1,7 +1,8 @@
 /*
- * QUOI     — la carte plein écran ; par-dessus : la recherche et le filtre, l'inscription du territoire, la rose des vents
+ * QUOI     — la carte plein écran ; par-dessus : la recherche, le sablier et le filtre, l'inscription du territoire, la rose des vents
  *            en bas à gauche, « Ma position » en bas à droite (maquette 162:107), et le bandeau
- *            discret quand les lieux ne se chargent pas.
+ *            discret quand les lieux ne se chargent pas. Le sablier ouvre la frise des époques, en
+ *            bas ; elle efface la rose, « Ma position » et le « + » (`[data-frise]`).
  * ATTENTION — sur PC, le tiroir de la coquille passe par-dessus la carte : ses boutons se
  *            décalent de `--decalage-carte` (0 sur mobile ou tiroir replié), en glissant avec
  *            lui. La carte elle-même ne bouge pas.
@@ -164,7 +165,8 @@
   gap: 10px; /* maquette 165:128 */
 }
 
-.filtre {
+.filtre,
+.sablier {
   display: grid;
   flex: none;
   place-items: center;
@@ -173,6 +175,19 @@
   border: 1px solid var(--color-bord);
   border-radius: var(--radius-carte);
   background: color-mix(in srgb, var(--color-sur-accent) 90%, transparent);
+}
+
+.sablier {
+  color: var(--color-texte);
+  padding: 0;
+  cursor: pointer;
+}
+
+/* La frise ouverte, ou une plage choisie : le sablier à l'encre. */
+.sablier[data-actif] {
+  border-color: var(--color-encre);
+  background: var(--color-encre);
+  color: var(--color-sur-accent);
 }
 
 .filtre img {
@@ -187,11 +202,35 @@
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
+/* La bande de la frise, en bas : à partir de 1024 px, centrée sur la partie carte. */
+.frise {
+  position: absolute;
+  bottom: 20px;
+  left: calc(24px + var(--decalage-carte));
+  right: 24px;
+  z-index: 1;
+  transition: left var(--duree-douce) var(--courbe-douce);
+}
+
+@media (width >= 1024px) {
+  .frise {
+    right: auto;
+    width: min(960px, calc(100% - var(--decalage-carte) - 48px));
+  }
+}
+
+.ecran[data-frise] .rose,
+.ecran[data-frise] .position,
+.ecran[data-frise] .ajouter {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bandeau,
   .inscription,
   .rose,
   .haut,
+  .frise,
   .sousLaRecherche,
   .ajouter {
     transition: none;
